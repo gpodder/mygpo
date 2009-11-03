@@ -39,6 +39,12 @@ class Podcast(models.Model):
     description = models.TextField()
     link = models.URLField()
     last_update = models.DateTimeField()
+    
+    def subscriptions(self):
+        return Subscription.objects.filter(podcast=self)
+    
+    def subscription_count(self):
+        return self.subscriptions().count()
 
     def __unicode__(self):
         return self.title
@@ -87,7 +93,7 @@ class Subscription(models.Model):
     podcast = models.ForeignKey(Podcast)
 
     def __unicode__(self):
-        return '(%s, %s)' % (self.user, self.podcast)
+        return '%s - %s on %s' % (self.device.user, self.podcast, self.device)
     
     class Meta:
         db_table = 'current_subscription'

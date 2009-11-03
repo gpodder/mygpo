@@ -22,6 +22,7 @@ class UserAdmin(admin.ModelAdmin):
 
 class PodcastAdmin(admin.ModelAdmin):
     inlines = [EpisodeInline]
+    list_display = ['title', 'description', 'url', 'link', 'last_update', 'subscription_count']
 
 class DeviceAdmin(admin.ModelAdmin):
     inlines = [SubscriptionActionInline]
