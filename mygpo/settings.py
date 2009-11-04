@@ -81,3 +81,10 @@ INSTALLED_APPS = (
     'mygpo.api',
     'mygpo.web'
 )
+
+AUTHENTICATION_BACKENDS = (
+    'mygpo.UserAccountModelBackend',
+)
+
+CUSTOM_USER_MODEL = 'mygpo.api.models.CustomUser'
+

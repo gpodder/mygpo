@@ -17,7 +17,7 @@ class SubscriptionActionInline(admin.TabularInline):
     model = SubscriptionAction
     extra = 3
 
-class UserAdmin(admin.ModelAdmin):
+class UserAccountAdmin(admin.ModelAdmin):
     inlines = [DeviceInline, EpisodeActionInline]
 
 class PodcastAdmin(admin.ModelAdmin):
@@ -27,8 +27,7 @@ class PodcastAdmin(admin.ModelAdmin):
 class DeviceAdmin(admin.ModelAdmin):
     inlines = [SubscriptionActionInline]
 
-admin.site.register(User, UserAdmin)
+admin.site.register(UserAccount, UserAccountAdmin)
 admin.site.register(Podcast, PodcastAdmin)
 admin.site.register(Device, DeviceAdmin)
 admin.site.register(Subscription)
-

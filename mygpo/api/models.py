@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User, UserManager
 
 EPISODE_ACTION_TYPES = (
         ('download', 'downloaded'),
@@ -21,11 +22,12 @@ SUBSCRIPTION_ACTION_TYPES = (
         ('unsubscribe', 'unsubscribed')
     )
 
-class User(models.Model):
-    username = models.SlugField(max_length=100)
-    password = models.CharField(max_length=200)
-    email = models.EmailField()
+#inheriting from User, as described in 
+#http://scottbarnham.com/blog/2008/08/21/extending-the-django-user-model-with-inheritance/
+class UserAccount(User):
     public_profile = models.BooleanField()
+
+    objects = UserManager()
 
     def __unicode__(self):
         return self.username
