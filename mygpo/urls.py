@@ -10,6 +10,9 @@ urlpatterns = patterns('',
     (r'^$', 'mygpo.web.views.home'),
     (r'^info/$', 'django.views.generic.simple.direct_to_template', {'template': 'info.html'}),
 
+    (r'^upload$', 'mygpo.api.legacy.upload'),
+    (r'^getlist$', 'mygpo.api.legacy.getlist'),
+    
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
