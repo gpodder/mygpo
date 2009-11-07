@@ -1,34 +1,34 @@
 # Create your views here.
 
 def upload(request):
-    emailaddr = request.GET['username']
-    password  = request.GET['password']
     action    = request.GET['action']
     protocol  = request.GET['protocol']
     opml_file = request.FILES['opml']
     opml      = opml_file.read()
     
-    user = UserAccount.objects.get(email__exact=emailaddr)
-    if !user:
+    if !auth(request):
         #@AUTHFAIL
     
-    if !user.check_password(password):
-        #@AUTHFAIL
-
     #read podcasts
 
 
 def getlist(request):
+    if !auth(request):
+        #@AUTHFAIL
+
+    # build and send list
+
+
+def auth(request):
     emailaddr = request.GET['username']
     password  = request.GET['password']
 
     user = UserAccount.objects.get(email__exact=emailaddr)
     if !user:
-        #@AUTHFAIL
+        return false
 
     if !user.check_password(password):
-        #@AUTHFAIL
+        return false
+    
+    return user
 
-    # build and send list
-
-   
