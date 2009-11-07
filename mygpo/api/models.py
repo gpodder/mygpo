@@ -67,6 +67,17 @@ class Episode(models.Model):
     class Meta:
         db_table = 'episode'
 
+class Device(models.Model):
+    user = models.ForeignKey(User)
+    name = models.CharField(max_length=100)
+    type = models.CharField(max_length=10, choices=DEVICE_TYPES)
+
+    def __unicode__(self):
+        return '%s (%s)' % (self.name, self.type)
+
+    class Meta:
+        db_table = 'device'
+
 class EpisodeAction(models.Model):
     user = models.ForeignKey(User, primary_key=True)
     episode = models.ForeignKey(Episode)
@@ -81,16 +92,6 @@ class EpisodeAction(models.Model):
     class Meta:
         db_table = 'episode_log'
 
-class Device(models.Model):
-    user = models.ForeignKey(User)
-    name = models.CharField(max_length=100)
-    type = models.CharField(max_length=10, choices=DEVICE_TYPES)
-
-    def __unicode__(self):
-        return '%s (%s)' % (self.name, self.type)
-    
-    class Meta:
-        db_table = 'device'
 
 class Subscription(models.Model):
     device = models.ForeignKey(Device, primary_key=True)
