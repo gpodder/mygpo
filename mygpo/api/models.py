@@ -70,8 +70,10 @@ class Episode(models.Model):
 class EpisodeAction(models.Model):
     user = models.ForeignKey(User, primary_key=True)
     episode = models.ForeignKey(Episode)
+    device = models.ForeignKey(Device)
     action = models.CharField(max_length=10, choices=EPISODE_ACTION_TYPES)
     timestamp = models.DateTimeField()
+    playmark = models.IntegerField()
 
     def __unicode__(self):
         return '%s %s %s' % self.user, self.action, self.episode
