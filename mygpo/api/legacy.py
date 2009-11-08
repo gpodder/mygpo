@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from mygpo.api.opml import Importer
+from mygpo.api.opml import Importer, Exporter
 from mygpo.api.models import Subscription, Podcast, UserAccount, SubscriptionAction, Device
 from datetime import datetime
 from django.utils.datastructures import MultiValueDictKeyError
@@ -43,11 +43,17 @@ def upload(request):
     return HttpResponse('@SUCCESS')
 
 def getlist(request):
-    if (not auth(request)):
+
+    user = auth(request)
+    if (not user):
         return HttpResponse('@AUTHFAIL')
 
-    # build and send list
+    podcasts = [s.podcast for s in Subscription.objects.filter(user=user)]
+    exporter = Exporter(filename='')
 
+    opml = exporter.generate(podcasts)
+
+    return HttpResponse(opml)
 
 def auth(request):
     emailaddr = request.GET['username']
