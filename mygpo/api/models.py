@@ -49,7 +49,7 @@ class Podcast(models.Model):
         return self.subscriptions().count()
 
     def __unicode__(self):
-        return self.title
+        return self.title if self.title != '' else self.url
     
     class Meta:
         db_table = 'podcast'
@@ -105,7 +105,7 @@ class Subscription(models.Model):
         db_table = 'current_subscription'
 
 class SubscriptionAction(models.Model):
-    device = models.ForeignKey(Device, primary_key=True)
+    device = models.ForeignKey(Device)
     podcast = models.ForeignKey(Podcast)
     action = models.CharField(max_length=12, choices=SUBSCRIPTION_ACTION_TYPES)
     timestamp = models.DateTimeField()
@@ -115,4 +115,5 @@ class SubscriptionAction(models.Model):
     
     class Meta:
         db_table = 'subscription_log'
+        unique_together = ('device', 'podcast', 'action', 'timestamp')
 
