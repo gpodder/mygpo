@@ -1,48 +1,43 @@
 from django.http import HttpResponse
 from mygpo.api.opml import Importer
-from mygpo.api.models import Subscription, Podcast, UserAccount
+from mygpo.api.models import Subscription, Podcast, UserAccount, SubscriptionAction, Device
+from datetime import datetime
+from django.utils.datastructures import MultiValueDictKeyError
+
+LEGACY_DEVICE='Legacy Device'
 
 def upload(request):
-    emailaddr = request.GET['username']
-    action    = request.GET['action']
-    protocol  = request.GET['protocol']
-    opml_file = request.FILES['opml']
-    opml      = opml_file.read()
-    
-    if (not auth(request)):
+    try:
+        emailaddr = request.GET['username']
+        action    = request.GET['action']
+        protocol  = request.GET['protocol']
+        opml      = request.FILES['opml'].read()
+    except MultiValueDictKeyError:
+        return HttpResponse("@PROTOERROR")
+
+    user = auth(request)
+    if (not user):
         return HttpResponse('@AUTHFAIL')
 
-    try:
-        existing = Subscription.objects.get(user__email__exact=emailaddr)
-    except Subscription.DoesNotExist:
-        existing = []
-
-    print existing
+    existing = Subscription.objects.filter(user__email__exact=emailaddr)
 
     existing_urls = [e.podcast.url for e in existing]
 
-    print existing_urls
-    
-    i = Importer(content=request.raw_post_data)
-    podcasts = i.items
+    i = Importer(content=opml)
+    podcast_urls = [p['url'] for p in i.items]
 
     new = [item for item in i.items if item['url'] not in existing_urls]
-    rem = [e.podcast for e in existing if e.podcast.url not in i.items]
+    rem = [e.podcast for e in existing if e.podcast.url not in podcast_urls]
 
-    print new
-    print rem
+    d, created = Device.objects.get_or_create(user=user, name__exact=LEGACY_DEVICE, defaults={'type': 'other'})
 
     for n in new:
-        try:
-            p = Podcast.objects.get(url__exact=n['url'])
-        except Podcast.DoesNotExist:
-            p = Podcast(url=n['url'])
-            p.save()
-        s = SubscriptionAction(podcast=p,action='subscribe', timestamp=now())
+        p, created = Podcast.objects.get_or_create(url=n['url'])
+        s = SubscriptionAction(podcast=p,action='subscribe', timestamp=datetime.now(), device=d)
         s.save()
 
-    for p in rem:
-        s = SubscriptionAction(podcast=p, action='unsubscribe', timestamp=now())
+    for r in rem:
+        s = SubscriptionAction(podcast=r, action='unsubscribe', timestamp=datetime.now(), device=d)
         s.save()
 
     return HttpResponse('@SUCCESS')
