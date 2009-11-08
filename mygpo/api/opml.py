@@ -95,7 +95,7 @@ class Exporter(object):
 
     FEED_TYPE = 'rss'
 
-    def __init__( self, filename):
+    def __init__( self, filename=''):
         if filename.endswith( '.opml') or filename.endswith( '.xml'):
             self.filename = filename
         else:
@@ -136,7 +136,7 @@ class Exporter(object):
         doc.appendChild(opml)
 
         head = doc.createElement( 'head')
-        head.appendChild( self.create_node( doc, 'title', 'gPodder subscriptions'))
+        head.appendChild( self.create_node( doc, 'title', 'my.gpodder.org Subscriptions'))
         head.appendChild( self.create_node( doc, 'dateCreated', formatdate(localtime=True)))
         opml.appendChild( head)
 
