@@ -32,7 +32,10 @@ def upload(request):
     d, created = Device.objects.get_or_create(user=user, name__exact=LEGACY_DEVICE, defaults={'type': 'other'})
 
     for n in new:
-        p, created = Podcast.objects.get_or_create(url=n['url'])
+        p, created = Podcast.objects.get_or_create(url=n['url'], defaults={
+                'title' : n['title'],
+                'description': n['description'],
+                'last_update': datetime.now() })
         s = SubscriptionAction(podcast=p,action='subscribe', timestamp=datetime.now(), device=d)
         s.save()
 
