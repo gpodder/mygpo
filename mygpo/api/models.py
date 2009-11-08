@@ -97,6 +97,7 @@ class Subscription(models.Model):
     device = models.ForeignKey(Device, primary_key=True)
     podcast = models.ForeignKey(Podcast)
     user = models.ForeignKey(UserAccount)
+    subscribed_since = models.DateTimeField()
 
     def __unicode__(self):
         return '%s - %s on %s' % (self.device.user, self.podcast, self.device)
