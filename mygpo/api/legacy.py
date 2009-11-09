@@ -8,14 +8,15 @@ LEGACY_DEVICE='Legacy Device'
 
 def upload(request):
     try:
-        emailaddr = request.GET['username']
-        action    = request.GET['action']
-        protocol  = request.GET['protocol']
+        emailaddr = request.POST['username']
+        password  = request.POST['password']
+        action    = request.POST['action']
+        protocol  = request.POST['protocol']
         opml      = request.FILES['opml'].read()
     except MultiValueDictKeyError:
         return HttpResponse("@PROTOERROR")
 
-    user = auth(request)
+    user = auth(emailaddr, password)
     if (not user):
         return HttpResponse('@AUTHFAIL')
 
@@ -46,8 +47,10 @@ def upload(request):
     return HttpResponse('@SUCCESS')
 
 def getlist(request):
+    emailaddr = request.GET['username']
+    password  = request.GET['password']
 
-    user = auth(request)
+    user = auth(emailaddr, password)
     if (not user):
         return HttpResponse('@AUTHFAIL')
 
@@ -58,9 +61,7 @@ def getlist(request):
 
     return HttpResponse(opml)
 
-def auth(request):
-    emailaddr = request.GET['username']
-    password  = request.GET['password']
+def auth(emailaddr, password):
 
     try:
         user = UserAccount.objects.get(email__exact=emailaddr)
