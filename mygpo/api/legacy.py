@@ -30,7 +30,13 @@ def upload(request):
     new = [item for item in i.items if item['url'] not in existing_urls]
     rem = [e.podcast for e in existing if e.podcast.url not in podcast_urls]
 
-    d, created = Device.objects.get_or_create(user=user, name__exact=LEGACY_DEVICE, defaults={'type': 'other'})
+    try:
+        d = user.default_device
+    except Device.DoesNotExist:
+        d = Device(user=user, type='other', name=LEGACY_DEVICE)
+        d.save()
+        user.default_device = d
+        user.save()
 
     for n in new:
         p, created = Podcast.objects.get_or_create(url=n['url'], defaults={
