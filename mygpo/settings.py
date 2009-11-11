@@ -1,5 +1,8 @@
 # Django settings for mygpo project.
 
+# http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges#ChangedthewayURLpathsaredetermined
+FORCE_SCRIPT_NAME=""
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
