@@ -80,7 +80,7 @@ class Importer(object):
                 #log( 'OPML import finished, but no items found: %s', url, sender = self)
                 print 'OPML import finished, but no items found: %s' % url
                 pass
-        except Exception as e:
+        except Exception, e:
             #log( 'Cannot import OPML from URL: %s', url, traceback=True, sender = self)
             print 'Cannot import OPML from URL: %s: %s' % (url, e)
             pass

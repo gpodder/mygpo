@@ -53,11 +53,11 @@ def upload(request):
     return HttpResponse('@SUCCESS')
 
 def getlist(request):
-    emailaddr = request.GET['username']
-    password  = request.GET['password']
+    emailaddr = request.GET.get('username', None)
+    password = request.GET.get('password', None)
 
     user = auth(emailaddr, password)
-    if (not user):
+    if user is None:
         return HttpResponse('@AUTHFAIL')
 
     podcasts = [s.podcast for s in Subscription.objects.filter(user=user)]
@@ -68,14 +68,16 @@ def getlist(request):
     return HttpResponse(opml)
 
 def auth(emailaddr, password):
+    if emailaddr is None or password is None:
+        return None
 
     try:
         user = UserAccount.objects.get(email__exact=emailaddr)
     except UserAccount.DoesNotExist:
-        return False
+        return None
 
     if not user.check_password(password):
-        return False
+        return None
     
     return user
 
