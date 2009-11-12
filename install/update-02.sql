@@ -10,4 +10,4 @@ CREATE TABLE `sync_group` (
 
 ALTER TABLE user DROP COLUMN default_device_id;
 ALTER TABLE device ADD COLUMN sync_group_id REFERENCES sync_group(id);
-
+ALTER TABLE device ADD COLUMN `uid` varchar(50) NOT NULL;
