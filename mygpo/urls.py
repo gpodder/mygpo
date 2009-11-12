@@ -13,7 +13,6 @@ urlpatterns = patterns('',
     (r'^upload$', 'mygpo.api.legacy.upload'),
     (r'^getlist$', 'mygpo.api.legacy.getlist'),
  
-    (r'^subscriptions/(?P<username>\w+)/default.(?P<format>\w+)', 'mygpo.api.simple.all_subscriptions'),
     (r'^subscriptions/(?P<username>\w+)/(?P<device>\w+).(?P<format>\w+)', 'mygpo.api.simple.device_subscription'),
     
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
