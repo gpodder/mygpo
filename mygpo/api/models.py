@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User, UserManager
+import hashlib
 
 EPISODE_ACTION_TYPES = (
         ('download', 'downloaded'),
@@ -42,12 +43,16 @@ class Podcast(models.Model):
     description = models.TextField()
     link = models.URLField()
     last_update = models.DateTimeField()
+    logo_url = models.CharField(1000)
     
     def subscriptions(self):
         return Subscription.objects.filter(podcast=self)
     
     def subscription_count(self):
         return self.subscriptions().count()
+
+    def logo_shortname(self):
+        return hashlib.sha1(self.logo_url).hexdigest()
 
     def __unicode__(self):
         return self.title if self.title != '' else self.url
