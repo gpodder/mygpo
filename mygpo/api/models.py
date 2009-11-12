@@ -27,7 +27,6 @@ SUBSCRIPTION_ACTION_TYPES = (
 #http://scottbarnham.com/blog/2008/08/21/extending-the-django-user-model-with-inheritance/
 class UserAccount(User):
     public_profile = models.BooleanField()
-    default_device = models.ForeignKey('Device')
 
     objects = UserManager()
 
@@ -43,7 +42,7 @@ class Podcast(models.Model):
     description = models.TextField()
     link = models.URLField()
     last_update = models.DateTimeField()
-    logo_url = models.CharField(1000)
+    logo_url = models.CharField(max_length=1000)
     
     def subscriptions(self):
         return Subscription.objects.filter(podcast=self)
@@ -73,10 +72,22 @@ class Episode(models.Model):
     class Meta:
         db_table = 'episode'
 
+class SyncGroup(models.Model):
+    user = models.ForeignKey(User)
+    
+    def __unicode__(self):
+        '%s - %s' % (user, ', '.join(devices = Device.objects.filter(sync_group=self)))
+             
+    class Meta:
+        db_table = 'sync_group'
+
+
 class Device(models.Model):
     user = models.ForeignKey(User)
+    uid = models.SlugField(max_length=50)
     name = models.CharField(max_length=100)
     type = models.CharField(max_length=10, choices=DEVICE_TYPES)
+    sync_group = models.ForeignKey(SyncGroup, blank=True, null=True)
 
     def __unicode__(self):
         return '%s (%s)' % (self.name, self.type)

@@ -23,6 +23,9 @@ class UserAccountForm(forms.ModelForm):
         super(UserAccountForm, self).__init__(*args, **kwargs)
         self.fields['default_device'].queryset = Device.objects.filter(user=self.instance)
 
+class SyncGroupAdmin(admin.ModelAdmin):
+    inlines = [DeviceInline]
+
 class UserAccountAdmin(admin.ModelAdmin):
     inlines = [DeviceInline, EpisodeActionInline]
     form = UserAccountForm
@@ -36,6 +39,7 @@ class DeviceAdmin(admin.ModelAdmin):
 
 admin.site.register(UserAccount, UserAccountAdmin)
 admin.site.register(Podcast, PodcastAdmin)
+admin.site.register(SyncGroup, SyncGroupAdmin)
 admin.site.register(Device, DeviceAdmin)
 admin.site.register(Subscription)
 admin.site.register(SubscriptionAction)
