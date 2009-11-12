@@ -4,7 +4,8 @@ from mygpo.api.models import Subscription, Podcast, UserAccount, SubscriptionAct
 from datetime import datetime
 from django.utils.datastructures import MultiValueDictKeyError
 
-LEGACY_DEVICE='Legacy Device'
+LEGACY_DEVICE_NAME = 'Legacy Device'
+LEGACY_DEVICE_UID  = 'legacy'
 
 def upload(request):
     try:
@@ -30,13 +31,8 @@ def upload(request):
     new = [item for item in i.items if item['url'] not in existing_urls]
     rem = [e.podcast for e in existing if e.podcast.url not in podcast_urls]
 
-    try:
-        d = user.default_device
-    except Device.DoesNotExist:
-        d = Device(user=user, type='other', name=LEGACY_DEVICE)
-        d.save()
-        user.default_device = d
-        user.save()
+    d, created = Device.objects.get_or_create(user=user, uid=LEGACY_DEVICE_UID,
+            defaults = {'type': 'unknown', 'name': LEGACY_DEVICE_NAME})
 
     for n in new:
         p, created = Podcast.objects.get_or_create(url=n['url'], defaults={
