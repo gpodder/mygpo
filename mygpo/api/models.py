@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User, UserManager
+from datetime import datetime
 import hashlib
 
 EPISODE_ACTION_TYPES = (
@@ -41,7 +42,7 @@ class Podcast(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
     link = models.URLField()
-    last_update = models.DateTimeField()
+    last_update = models.DateTimeField(null=True,blank=True)
     logo_url = models.CharField(max_length=1000)
     
     def subscriptions(self):
@@ -186,7 +187,7 @@ class EpisodeAction(models.Model):
     episode = models.ForeignKey(Episode)
     device = models.ForeignKey(Device)
     action = models.CharField(max_length=10, choices=EPISODE_ACTION_TYPES)
-    timestamp = models.DateTimeField()
+    timestamp = models.DateTimeField(default=datetime.now)
     playmark = models.IntegerField()
 
     def __unicode__(self):
@@ -212,7 +213,7 @@ class SubscriptionActionBase(models.Model):
     device = models.ForeignKey(Device)
     podcast = models.ForeignKey(Podcast)
     action = models.CharField(max_length=12, choices=SUBSCRIPTION_ACTION_TYPES)
-    timestamp = models.DateTimeField()
+    timestamp = models.DateTimeField(blank=True, default=datetime.now)
 
     def __unicode__(self):
         return '%s %s %s' % (self.device, self.action, self.podcast)
