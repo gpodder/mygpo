@@ -95,7 +95,12 @@ class Device(models.Model):
         return '%s (%s)' % (self.name, self.type)
 
     def get_subscriptions(self):
+        self.sync()
         return Subscription.objects.filter(device=self)
+
+    def sync(self):
+        for s in self.get_sync_actions():
+            SubscriptionAction.objects.create(device=self, podcast=s.podcast, timestamp=s.timestamp, action=s.action)
 
     def get_sync_actions(self):
         """
@@ -104,7 +109,7 @@ class Device(models.Model):
         to synchronize it with its SyncGroup
         """
         all_sync_actions = SyncGroupSubscriptionAction.objects.filter(sync_group=self.sync_group)
-        podcasts = [p.podcast for p in self.get_subscriptions()]
+        podcasts = [p.podcast for p in Subscription.objects.filter(device=self)]
         sync_actions = []
         for s in all_sync_actions:
             a = self.latest_action(s.podcast)
