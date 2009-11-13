@@ -15,11 +15,11 @@ def upload(request):
         protocol  = request.POST['protocol']
         opml      = request.FILES['opml'].read()
     except MultiValueDictKeyError:
-        return HttpResponse("@PROTOERROR")
+        return HttpResponse("@PROTOERROR", mimetype='text/plain')
 
     user = auth(emailaddr, password)
     if (not user):
-        return HttpResponse('@AUTHFAIL')
+        return HttpResponse('@AUTHFAIL', mimetype='text/plain')
 
     existing = Subscription.objects.filter(user__email__exact=emailaddr)
 
@@ -46,7 +46,7 @@ def upload(request):
         s = SubscriptionAction(podcast=r, action='unsubscribe', timestamp=datetime.now(), device=d)
         s.save()
 
-    return HttpResponse('@SUCCESS')
+    return HttpResponse('@SUCCESS', mimetype='text/plain')
 
 def getlist(request):
     emailaddr = request.GET.get('username', None)
@@ -54,14 +54,14 @@ def getlist(request):
 
     user = auth(emailaddr, password)
     if user is None:
-        return HttpResponse('@AUTHFAIL')
+        return HttpResponse('@AUTHFAIL', mimetype='text/plain')
 
     podcasts = [s.podcast for s in Subscription.objects.filter(user=user)]
     exporter = Exporter(filename='')
 
     opml = exporter.generate(podcasts)
 
-    return HttpResponse(opml)
+    return HttpResponse(opml, mimetype='text/xml')
 
 def auth(emailaddr, password):
     if emailaddr is None or password is None:
