@@ -102,12 +102,26 @@ class Device(models.Model):
         SubscriptionActions that need to be saved for the current device
         to synchronize it with its SyncGroup
         """
-        latest_action = SubscriptionAction.objects.all().order_by('-timestamp')[0]
-        all_sync_actions = SyncGroupSubscriptionAction.objects.filter(sync_group=self.sync_group, timestamp__gte=latest_action.timestamp)
-        subscriptions = self.get_subscriptions()
-        sync_actions = [s for s in all_sync_actions if s.device != self and not s.podcast in subscriptions]
+        all_sync_actions = SyncGroupSubscriptionAction.objects.filter(sync_group=self.sync_group)
+        podcasts = [p.podcast for p in self.get_subscriptions()]
+        sync_actions = []
+        for s in all_sync_actions:
+            a = self.latest_action(s.podcast)
+
+            if a != None and s.timestamp <= a.timestamp: continue
+
+            if s.action == 'subscribe' and not s.podcast in podcasts:
+                sync_actions.append(s)
+            elif s.action == 'unsubscribe' and s.podcast in podcasts:
+                sync_actions.append(s)
         return sync_actions
 
+    def latest_action(self, podcast):
+        actions = SubscriptionAction.objects.filter(podcast=podcast,device=self).order_by('-timestamp')
+        if len(actions) == 0:
+            return None
+        else:
+            return actions[0]
 
     def sync_with(self, other):
         """
