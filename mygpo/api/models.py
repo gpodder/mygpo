@@ -76,7 +76,8 @@ class SyncGroup(models.Model):
     user = models.ForeignKey(User)
     
     def __unicode__(self):
-        '%s - %s' % (user, ', '.join(devices = Device.objects.filter(sync_group=self)))
+        devices = [d.name for d in Device.objects.filter(sync_group=self)]
+        return '%s - %s' % (self.user, ', '.join(devices))
              
     class Meta:
         db_table = 'sync_group'
@@ -91,6 +92,77 @@ class Device(models.Model):
 
     def __unicode__(self):
         return '%s (%s)' % (self.name, self.type)
+
+    def get_subscriptions(self):
+        return Subscription.objects.filter(device=self)
+
+    def get_sync_actions(self):
+        """
+        returns the SyncGroupSubscriptionActions correspond to the
+        SubscriptionActions that need to be saved for the current device
+        to synchronize it with its SyncGroup
+        """
+        latest_action = SubscriptionAction.objects.all().order_by('-timestamp')[0]
+        all_sync_actions = SyncGroupSubscriptionAction.objects.filter(sync_group=self.sync_group, timestamp__gte=latest_action.timestamp)
+        subscriptions = self.get_subscriptions()
+        sync_actions = [s for s in all_sync_actions if s.device != self and not s.podcast in subscriptions]
+        return sync_actions
+
+
+    def sync_with(self, other):
+        """
+        set the device to be synchronized with the other device.
+        this method places them in the same SyncGroup. get_sync_actions() can 
+        then return the SyncGroupSubscriptionActions for brining the device 
+        in sync with its group
+        """
+        if self.user != other.user:
+            raise ValueError('the devices belong to different users')
+
+        if self.sync_group == other.sync_group and self.sync_group != None:
+            return
+
+        if self.sync_group != None:
+            if other.sync_group == None:
+                other.sync_group = self.sync_group
+                other.save
+
+            else:
+                raise ValueError('the devices are in different sync groups')
+
+        else:
+            if other.sync_group == None:
+                g = SyncGroup.objects.create(user=self.user)
+                self.sync_group=g
+                self.save()
+                other.sync_group=g
+                other.save()
+
+            else:
+                self.syn_group = other.sync_group
+                self.save()
+
+    def unsync(self):
+        """
+        stops synchronizing the device
+        this method removes the device from its SyncGroup. If only one
+        device remains in the SyncGroup, it is removed so the device can
+        be used in other groups.
+        """
+        if self.sync_group == None:
+            raise ValueError('the device is not synced')
+
+        g = self.sync_group
+        self.sync_group = None
+        self.save()
+
+        devices = Device.objects.filter(sync_group=g)
+        if devices.count() == 1:
+            d = devices[0]
+            d.sync_group = None
+            d.save()
+
+        g.delete()
 
     class Meta:
         db_table = 'device'
@@ -122,7 +194,7 @@ class Subscription(models.Model):
     class Meta:
         db_table = 'current_subscription'
 
-class SubscriptionAction(models.Model):
+class SubscriptionActionBase(models.Model):
     device = models.ForeignKey(Device)
     podcast = models.ForeignKey(Podcast)
     action = models.CharField(max_length=12, choices=SUBSCRIPTION_ACTION_TYPES)
@@ -130,8 +202,23 @@ class SubscriptionAction(models.Model):
 
     def __unicode__(self):
         return '%s %s %s' % (self.device, self.action, self.podcast)
+
+    class Meta:
+        abstract = True
+        unique_together = ('device', 'podcast', 'action', 'timestamp')
+
+class SubscriptionAction(SubscriptionActionBase):
     
     class Meta:
         db_table = 'subscription_log'
-        unique_together = ('device', 'podcast', 'action', 'timestamp')
+
+class SyncGroupSubscriptionAction(SubscriptionActionBase):
+    """ READ ONLY MODEL """
+    sync_group = models.ForeignKey(SyncGroup)
+
+    def save(self, **kwargs):
+        raise NotImplementedError
+
+    class Meta:
+        db_table = 'sync_group_subscription_log'
 
