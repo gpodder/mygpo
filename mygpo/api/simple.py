@@ -1,7 +1,7 @@
-from mygpo.api.basic_auth import logged_in_or_basicauth
+from mygpo.api.basic_auth import require_valid_user
 from django.http import HttpResponse
 
-@logged_in_or_basicauth
+@require_valid_user()
 def device_subscription(request, username, device, format):
     return HttpResponse()
 

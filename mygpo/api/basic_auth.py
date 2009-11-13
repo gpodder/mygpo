@@ -45,7 +45,7 @@ def view_or_basicauth(view, request, test_func, realm = "", *args, **kwargs):
 
 #############################################################################
 #
-def logged_in_or_basicauth(realm = ""):
+def require_valid_user(realm = ""):
     """
     A simple decorator that requires a user to be logged in. If they are not
     logged in the request is examined for a 'authorization' header.
