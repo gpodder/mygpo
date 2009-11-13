@@ -21,7 +21,10 @@ def upload(request):
     if (not user):
         return HttpResponse('@AUTHFAIL', mimetype='text/plain')
 
-    existing = Subscription.objects.filter(user__email__exact=emailaddr)
+    d, created = Device.objects.get_or_create(user=user, uid=LEGACY_DEVICE_UID,
+        defaults = {'type': 'unknown', 'name': LEGACY_DEVICE_NAME})
+
+    existing = Subscription.objects.filter(user=user, device=d)
 
     existing_urls = [e.podcast.url for e in existing]
 
@@ -30,9 +33,6 @@ def upload(request):
 
     new = [item for item in i.items if item['url'] not in existing_urls]
     rem = [e.podcast for e in existing if e.podcast.url not in podcast_urls]
-
-    d, created = Device.objects.get_or_create(user=user, uid=LEGACY_DEVICE_UID,
-            defaults = {'type': 'unknown', 'name': LEGACY_DEVICE_NAME})
 
     for n in new:
         p, created = Podcast.objects.get_or_create(url=n['url'], defaults={
@@ -56,7 +56,10 @@ def getlist(request):
     if user is None:
         return HttpResponse('@AUTHFAIL', mimetype='text/plain')
 
-    podcasts = [s.podcast for s in Subscription.objects.filter(user=user)]
+    d, created = Device.objects.get_or_create(user=user, uid=LEGACY_DEVICE_UID,
+        defaults = {'type': 'unknown', 'name': LEGACY_DEVICE_NAME})
+
+    podcasts = [s.podcast for s in d.get_subscriptions()]
     exporter = Exporter(filename='')
 
     opml = exporter.generate(podcasts)
