@@ -118,7 +118,7 @@ class Exporter(object):
         """
         outline = doc.createElement( 'outline')
         outline.setAttribute( 'title', channel.title)
-        outline.setAttribute( 'text', channel.description)
+        outline.setAttribute( 'text', channel.description if channel.description != None else '')
         outline.setAttribute( 'xmlUrl', channel.url)
         outline.setAttribute( 'type', self.FEED_TYPE)
         return outline
@@ -144,7 +144,7 @@ class Exporter(object):
         for channel in channels:
             body.appendChild( self.create_outline( doc, channel))
         opml.appendChild( body)
-        return doc.toprettyxml(encoding='utf-8', indent='    ', newl=os.linesep)       
+        return doc.toprettyxml(encoding='utf-8', indent='    ', newl=os.linesep)
 
     def write( self, channels):
         """
