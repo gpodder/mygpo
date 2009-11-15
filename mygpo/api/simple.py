@@ -1,5 +1,6 @@
 from mygpo.api.basic_auth import require_valid_user
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
+from mygpo.api.models import Device
 
 @require_valid_user()
 def subscriptions(request, username, device, format):
@@ -20,7 +21,8 @@ def subscriptions(request, username, device, format):
 def format_subscriptions(subscriptions, format):
     if format == 'txt':
         #return subscriptions formatted as txt
-        return HttpRequest('', mimetype='text/plain')
+        s = "\n".join(subscriptions)
+        return HttpRequest(s, mimetype='text/plain')
 
     elif format == 'opml':
         e = Exporter(subscriptions)
@@ -31,7 +33,8 @@ def format_subscriptions(subscriptions, format):
 
 def get_subscriptions(device):
     # get and return subscription list from database (use backend to sync)
-    return []
+    d, created = Device.objects.get_or_create(user=user, uid=device.uid, name=device.name, type=device.type)
+    return [p.podcast for p in d.get_subscriptions()]
 
 def parse_subscription(raw_post_data, format):
     if format == 'txt':
