@@ -4,8 +4,9 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <link rel="shortcut icon" href="http://gpodder.org/favicon.png">
   <style type="text/css">
-      body { font-family: DeJaVu Sans, Bitstream Vera Sans, sans-serif; font-size: 12px; padding-left: 50px; padding-right: 50px;}
-      h3 { color: #535;}
+      	body { font-family: DeJaVu Sans, Bitstream Vera Sans, sans-serif; font-size: 12px; padding-left: 50px; padding-right: 50px;}
+	h2 { margin-top:0px;}
+      	h3 { color: #535;}
         hr { border-width: 0px; border-bottom: 1px #aaa dotted; }
         img { border-width: 0px; }
         ul#gpodder-menu { margin: 10px; padding-top: 10px; z-index: 900; text-align: center; }
@@ -45,7 +46,7 @@
 <h1 style="margin: 0px; padding: 0px; position: absolute; top: 0px; left: 20px; height: 70px; z-index: 100;">
     <strong><img style="padding-top: 10px; width: 64px; height: 64px;" alt="gPodder" title="gPodder" src="http://gpodder.org/images/weblogo64.png"></strong>
 </h1>
-<div style="position: absolute; z-index: 10; top: 0px; left: 0px; right: 0px; background-color: rgb(102, 102, 102); -moz-border-radius-bottomright: 30px; padding-bottom: 10px;">
+<div style="position: absolute; z-index: 10; top: 0px; left: 0px; right: 0px; background-color: rgb(102, 102, 102); padding-bottom: 10px;">
 <ul id="gpodder-menu">
   <li><a href="http://gpodder.org/"><img src="http://gpodder.org/images/icons/go-home.png" alt="">Home</a></li>
   <li><a href="http://gpodder.org/news.html"><img src="http://gpodder.org/images/icons/accessories-text-editor.png" alt="">News</a></li>
@@ -56,7 +57,7 @@
 </ul>
 </div>
 <hr>
-<div style="margin-right: 5%; padding-top: 80px; padding-bottom: 10px;">
+<div style="margin-right: 5%; padding-top: 80px; padding-bottom: 10px; float:left;">
 {% block content %}
     <h1>gPodder Web Service</h1>
     <p>...will go online soon...</p>
@@ -65,6 +66,22 @@
         <li><a href="toplist.opml">Toplist as OPML</a></li>
     </ul>
 {% endblock %}
+</div>
+<div style="padding-top: 80px; width:200px; height:70%; margin-right:-58px; padding-bottom: 10px; float:right; background-color: rgb(102, 102, 102); -moz-border-radius-bottomleft: 30px;">
+	<span style="width:20px; position:absolute; margin-top:-32px; margin-left:-20px; background-color:rgb(102, 102, 102);">&nbsp;</span>
+	<span style="width:20px; position:absolute; margin-top:-32px; margin-left:-20px; -moz-border-radius-topright: 30px; background-color:rgb(255,255,255);">&nbsp;</span>
+	
+	<div style="margin-left:10px; padding:3px; padding-bottom:10px; margin-right:10px; color:rgb(70%,70%,70%); border:1px solid rgb(70%,70%,70%);">
+		<h2>Login</h2>
+		Username:
+		<input name="user" type="text" />
+		Password:
+		<input name="pwd" type="password" />
+		<input type="submit" value="Login" style="margin-left:90px; margin-top:15px;" />
+	</div>
+	<div style="margin-left:10px; padding:3px; padding-bottom:10px; margin-right:10px; color:rgb(70%,70%,70%);">
+		Not yet a member? <a href="#">Register!</a>
+	</div>
 </div>
 <hr style="clear: both;">
 <address>© 2005-2009 <a class="noextlink" href="http://thpinfo.com/">Thomas Perl</a> and
