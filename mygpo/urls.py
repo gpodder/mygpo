@@ -1,3 +1,4 @@
+import os.path
 from django.conf.urls.defaults import *
 
 # Uncomment the next two lines to enable the admin:
@@ -21,4 +22,7 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     (r'^admin/(.*)', admin.site.root),
+
+    (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': os.path.abspath('%s/../media/' % os.path.dirname(__file__))}),
+    
 )
