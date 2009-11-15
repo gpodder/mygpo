@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Create a User Account</h1>
+
+  <form action="/contact/" method="POST">
+   {{ form.as_p }}
+   <input type="submit" value="Submit" />
+  </form>
+
+{% endblock %}
+

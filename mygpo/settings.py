@@ -83,9 +83,12 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
+    'registration',
     'mygpo.api',
     'mygpo.web'
 )
+
+ACCOUNT_ACTIVATION_DAYS = 7
 
 AUTHENTICATION_BACKENDS = (
     'mygpo.auth_backends.UserAccountModelBackend',
