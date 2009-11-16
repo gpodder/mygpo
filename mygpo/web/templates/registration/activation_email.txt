@@ -1,0 +1,5 @@
+Click on the link below to activate your account on my.gpodder.org
+
+{{activation_key}}
+
+
