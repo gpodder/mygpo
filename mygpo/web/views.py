@@ -1,4 +1,5 @@
 from django.shortcuts import render_to_response
+from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from mygpo.api.models import Podcast
 
@@ -29,11 +30,7 @@ def login_user(request):
        user = authenticate(username=username, password=password)
        if user is not None:
               login(request, user)
-              return render_to_response('home.html', {
-                     'authenticated': True,
-                     'login_message': username,
-                     'podcast_count': podcasts
-              })
+              return HttpResponseRedirect('/')
        else:
               return render_to_response('home.html', {
                      'error': True,
