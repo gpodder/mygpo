@@ -9,6 +9,8 @@ urlpatterns = patterns('',
     # Example:
     # (r'^mygpo/', include('mygpo.foo.urls')),
     (r'^$', 'mygpo.web.views.home'),
+    (r'^login/$', 'mygpo.web.views.login_user'),
+    (r'^logout/$', 'mygpo.web.views.logout_user'),
     (r'^info/$', 'django.views.generic.simple.direct_to_template', {'template': 'info.html'}),
 
     (r'^upload$', 'mygpo.api.legacy.upload'),

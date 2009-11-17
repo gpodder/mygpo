@@ -70,18 +70,28 @@
 <div style="padding-top: 80px; width:200px; height:70%; margin-right:-58px; padding-bottom: 10px; float:right; background-color: rgb(102, 102, 102); -moz-border-radius-bottomleft: 30px;">
 	<span style="width:20px; position:absolute; margin-top:-32px; margin-left:-20px; background-color:rgb(102, 102, 102);">&nbsp;</span>
 	<span style="width:20px; position:absolute; margin-top:-32px; margin-left:-20px; -moz-border-radius-topright: 30px; background-color:rgb(255,255,255);">&nbsp;</span>
-	
+	{% if error %}
+	 <p style="margin-left:10px; color:rgb(210,105,30);">{{ error_message }}</p>
+	{% endif %}
+	{% if authenticated %}
+	<p style="margin-left:10px; color:rgb(70%,70%,70%);">logged in as {{ login_message }}<br />
+	<a href="../logout/">logout!</a>
+	</p>
+	{% else %}
 	<div style="margin-left:10px; padding:3px; padding-bottom:10px; margin-right:10px; color:rgb(70%,70%,70%); border:1px solid rgb(70%,70%,70%);">
 		<h2>Login</h2>
+		<form action="../login/" method="post">
 		Username:
 		<input name="user" type="text" />
 		Password:
 		<input name="pwd" type="password" />
 		<input type="submit" value="Login" style="margin-left:90px; margin-top:15px;" />
+		</form>
 	</div>
 	<div style="margin-left:10px; padding:3px; padding-bottom:10px; margin-right:10px; color:rgb(70%,70%,70%);">
 		Not yet a member? <a href="#">Register!</a>
 	</div>
+	{% endif %}
 </div>
 <hr style="clear: both;">
 <address>© 2005-2009 <a class="noextlink" href="http://thpinfo.com/">Thomas Perl</a> and
