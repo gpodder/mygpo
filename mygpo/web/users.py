@@ -37,7 +37,6 @@ def login_user(request):
 
 
 def logout_user(request):
-       podcasts = Podcast.objects.count()
        logout(request)
        return HttpResponseRedirect('/')
 
