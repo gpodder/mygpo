@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>my.gpodder.org</h1>
+  <p>The username has to be accepted or changed!</p>
+  <form action="../migrate/" method="post">
+  Old Username:&nbsp;&nbsp;&nbsp;<input type="text" name="oldusername" value="{{username}}" readonly="readonly" style="background-color:lightgrey;" /><br /><br />
+  New Username:&nbsp;<input type="text" name="newusername"/><br /><br />
+  <input type="checkbox" name="leave" />&nbsp;leave old username<br /><br />
+  <input type="submit" name="submit" value="Submit" />
+  </form>
+{% endblock %}
+
