@@ -26,26 +26,20 @@ def login_user(request):
                            'username': user
                      })
               else:
-                     return render_to_response('home.html', {
-                           'authenticated': True,
-                           'login_message': username,
-                           'podcast_count': podcasts
-                     })
+                     return HttpResponseRedirect('/')
        else:
               return render_to_response('home.html', {
                      'error': True,
                      'error_message': 'User not known or wrong password',
                      'podcast_count': podcasts
               })
-      
+
 
 
 def logout_user(request):
        podcasts = Podcast.objects.count()
        logout(request)
-       return render_to_response('home.html', {
-             'podcast_count': podcasts
-       })
+       return HttpResponseRedirect('/')
 
 
 def migrate_user(request):
@@ -79,11 +73,7 @@ def migrate_user(request):
                       user.username = newusername
                       user.generated_id = 0
                       user.save()
-                      return render_to_response('home.html', {
-                           'authenticated': True,
-                           'login_message': user,
-                           'podcast_count': podcasts
-                      })
+                      return HttpResponseRedirect('/')
                  else:
                       return render_to_response('migrate.html', {
                            'error': True,
