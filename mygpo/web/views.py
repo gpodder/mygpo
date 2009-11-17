@@ -26,6 +26,7 @@ def login_user(request):
                      'error_message': 'No user or pwd entered',
                      'podcast_count': podcasts
               })
+
        user = authenticate(username=username, password=password)
        if user is not None:
               login(request, user)
@@ -40,6 +41,8 @@ def login_user(request):
                      'error_message': 'User not known or wrong password',
                      'podcast_count': podcasts
               })
+      
+
 
 def logout_user(request):
        podcasts = Podcast.objects.count()
