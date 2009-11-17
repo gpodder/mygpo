@@ -1,4 +1,5 @@
 from django.shortcuts import render_to_response
+from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from mygpo.api.models import Podcast
 

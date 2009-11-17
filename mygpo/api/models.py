@@ -28,6 +28,7 @@ SUBSCRIPTION_ACTION_TYPES = (
 #http://scottbarnham.com/blog/2008/08/21/extending-the-django-user-model-with-inheritance/
 class UserAccount(User):
     public_profile = models.BooleanField()
+    generated_id = models.BooleanField()
 
     objects = UserManager()
 
