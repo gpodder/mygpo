@@ -2,6 +2,10 @@
 
 {% block content %}
   <h1>my.gpodder.org</h1>
+  {% if change_username %}
+  <h2>You have to accept or change your username</h2>
+  {% else %}
   <p>{{ podcast_count }} Podcasts!</p>
+  {% endif %}
 {% endblock %}
 

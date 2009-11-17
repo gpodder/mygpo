@@ -32,6 +32,7 @@ def login_user(request):
               login(request, user)
               return render_to_response('home.html', {
                      'authenticated': True,
+                     'change_password': user.generated_id,
                      'login_message': username,
                      'podcast_count': podcasts
               })
