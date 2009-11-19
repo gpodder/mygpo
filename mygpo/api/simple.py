@@ -3,13 +3,13 @@ from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbid
 from mygpo.api.models import Device
 
 @require_valid_user()
-def subscriptions(request, username, device, format):
+def subscriptions(request, username, device_uid, format):
     
     if request.user.username != username:
         return HttpResponseForbidden()
 
     if request.method == 'GET':
-        return format_subscriptions(get_subscriptions(device), format)
+        return format_subscriptions(get_subscriptions(username, device), format)
         
     elif request.method == 'PUT':
         return set_subscriptions(device, parse_subscription(request.raw_post_data, format))
@@ -21,7 +21,8 @@ def subscriptions(request, username, device, format):
 def format_subscriptions(subscriptions, format):
     if format == 'txt':
         #return subscriptions formatted as txt
-        s = "\n".join(subscriptions)
+        urls = [p.url for p in subscriptions]
+        s = "\n".join(urls)
         return HttpRequest(s, mimetype='text/plain')
 
     elif format == 'opml':
@@ -31,10 +32,10 @@ def format_subscriptions(subscriptions, format):
     elif format == 'json':
         return JsonRequest(subscriptions)
 
-def get_subscriptions(device):
-    # get and return subscription list from database (use backend to sync)
-    d, created = Device.objects.get_or_create(user=user, uid=device.uid, name=device.name, type=device.type)
-    return [p.podcast for p in d.get_subscriptions()]
+def get_subscriptions(username, device_uid):
+    #get and return subscription list from database (use backend to sync)
+    d = Device.objects.get(uid=device_uid, user__username=username)
+    return [p.podcast for p in device.get_subscriptions()]
 
 def parse_subscription(raw_post_data, format):
     if format == 'txt':
