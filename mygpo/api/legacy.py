@@ -77,6 +77,6 @@ def auth(emailaddr, password):
 
     if not user.check_password(password):
         return None
-    
+
     return user
 
