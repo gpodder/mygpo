@@ -34,6 +34,10 @@ def login_user(request):
 def migrate_user(request):
     user = request.user
     username = request.POST.get('username', user.username)
+
+    if username == '':
+        username = user.username
+
     if user.username != username:
         if User.objects.filter(username__exact=username).count() > 0:
             return render_to_response('migrate.html', {'error': True, 'error_message': '%s is already taken' % username, 'username': user.username})
