@@ -17,7 +17,7 @@ urlpatterns = patterns('',
     (r'^migrate/$', 'mygpo.web.users.migrate_user'),
     (r'^register/$',  register, {'profile_callback': UserProfile.objects.create, 'success_url': '../registration_complete/' }),
     (r'^registration_complete/$', 'django.views.generic.simple.direct_to_template', {'template': 'registration/registration_complete.html'}),
-    (r'^activate/(?P<key>\w+)$', activate),
+    (r'^activate/(?P<activation_key>\w+)$', activate),
     (r'^info/$', 'django.views.generic.simple.direct_to_template', {'template': 'info.html'}),
 
     (r'^upload$', 'mygpo.api.legacy.upload'),
