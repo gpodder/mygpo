@@ -2,10 +2,12 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from mygpo.api.models import Podcast, UserAccount
-
+from registration.forms import RegistrationForm
+from registration.views import activate, register
+from registration.models import RegistrationProfile
 
 def login_user(request):
-       podcasts = Podcast.objects.count()
+       podcasts = Podcast.objects.count()       
        try:
               username = request.POST['user']
               password = request.POST['pwd']
@@ -15,7 +17,6 @@ def login_user(request):
                      'error_message': 'No user or pwd entered',
                      'podcast_count': podcasts
               })
-
        user = authenticate(username=username, password=password)
        if user is not None:
               login(request, user)
@@ -81,3 +82,14 @@ def migrate_user(request):
                            'login_message': request.user,
                            'username': request.user
                       })
+
+
+def buildregister_user(request):
+       return register(request,'registration.backends.default.DefaultBackend')
+
+def register_user(request):
+       return register(request, '../registration_complete/')
+       
+def activate_user(request):
+	userkey = request.GET['key']  
+	return activate(request, userkey, 'registration/activate.html', {'account' : True})
