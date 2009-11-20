@@ -15,7 +15,7 @@ class UserAccountModelBackend(ModelBackend):
                 return None
         else:
             try:
-                user = self.user_class.objects.get(username=username)                
+                user = self.user_class.objects.get(username=username)
             except self.user_class.DoesNotExist:
                 return None
         if user.check_password(password):
