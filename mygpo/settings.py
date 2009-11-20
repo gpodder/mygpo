@@ -99,3 +99,5 @@ DEFAULT_FROM_EMAIL = 'mygpo@my.gpodder.org'
 
 AUTH_PROFILE_MODULE = "api.UserProfile"
 
+LOGIN_URL = '/login/'
+

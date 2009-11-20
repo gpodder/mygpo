@@ -3,6 +3,7 @@
   <title>{% block title %}{% endblock %}my.gPodder.org</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <link rel="shortcut icon" href="http://gpodder.org/favicon.png">
+  <link rel="stylesheet" href="/media/screen.css" type="text/css" />
   <style type="text/css">
       	body { font-family: DeJaVu Sans, Bitstream Vera Sans, sans-serif; font-size: 12px; padding-left: 50px; padding-right: 50px;}
 	h2 { margin-top:0px;}
@@ -41,7 +42,7 @@
             content: '';
             padding-left: 0px;
         }
-		
+
 		table.register th {
 			font-weight:normal;
 			width:150px;
@@ -63,7 +64,14 @@
 </ul>
 </div>
 <hr>
+
+
 <div style="margin-right: 5%; padding-top: 80px; padding-bottom: 10px; float:left;">
+
+{% if error_message %}
+ <div class="error">{{ error_message }}</div>
+{% endif %}
+
 {% block content %}
     <h1>gPodder Web Service</h1>
     <p>...will go online soon...</p>
@@ -76,27 +84,10 @@
 <div style="padding-top: 80px; width:200px; height:70%; margin-right:-58px; padding-bottom: 10px; float:right; background-color: rgb(102, 102, 102); -moz-border-radius-bottomleft: 30px;">
 	<span style="width:20px; position:absolute; margin-top:-32px; margin-left:-20px; background-color:rgb(102, 102, 102);">&nbsp;</span>
 	<span style="width:20px; position:absolute; margin-top:-32px; margin-left:-20px; -moz-border-radius-topright: 30px; background-color:rgb(255,255,255);">&nbsp;</span>
-	{% if error %}
-	 <p style="margin-top:-20px; margin-left:10px; color:rgb(210,105,30);">{{ error_message }}</p>
-	{% endif %}
-	{% if authenticated %}
-	<p style="margin-left:10px; color:rgb(70%,70%,70%);">logged in as {{ login_message }}<br />
-	<a href="../logout/">logout!</a>
+	{% if user.is_authenticated %}
+	<p style="margin-left:10px; color:rgb(70%,70%,70%);">logged in as {{ user.username }}<br />
+	<a href="/logout/">logout!</a>
 	</p>
-	{% else %}
-	<div style="margin-left:10px; padding:3px; padding-bottom:10px; margin-right:10px; color:rgb(70%,70%,70%); border:1px solid rgb(70%,70%,70%);">
-		<h2>Login</h2>
-		<form action="../login/" method="post">
-		Username:<br />
-		<input name="user" type="text" style="width:90%;"/><br />
-		Password:<br />
-		<input name="pwd" type="password" style="width:90%;" /><br />
-		<input type="submit" value="Login" style="margin-left:90px; margin-top:15px;" />
-		</form>
-	</div>
-	<div style="margin-left:10px; padding:3px; padding-bottom:10px; margin-right:10px; color:rgb(70%,70%,70%);">
-		Not yet a member? <a href="../register/">Register!</a>
-	</div>
 	{% endif %}
 </div>
 <hr style="clear: both;">

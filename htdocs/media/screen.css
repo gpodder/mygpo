@@ -1,0 +1,7 @@
+div.error
+{
+    border: thin solid: #7d0c0c;
+    padding: 2em;
+    font-weight: bold;
+    color: #c20000;
+}
