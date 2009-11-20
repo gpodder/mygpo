@@ -3,6 +3,7 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.template.defaultfilters import slugify
 from registration.forms import RegistrationForm
 from registration.views import activate, register
 from registration.models import RegistrationProfile
@@ -40,7 +41,9 @@ def migrate_user(request):
 
     if user.username != username:
         if User.objects.filter(username__exact=username).count() > 0:
-            return render_to_response('migrate.html', {'error': True, 'error_message': '%s is already taken' % username, 'username': user.username})
+            return render_to_response('migrate.html', {'error_message': '%s is already taken' % username, 'username': user.username})
+        if slugify(username) != username:
+            return render_to_response('migrate.html', {'error_message': '%s is not a valid username. Please use characters, numbers, underscore and dash only.' % username, 'username': user.username})
         else:
             user.username = username
             user.save()
