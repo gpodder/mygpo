@@ -5,3 +5,10 @@ div.error
     font-weight: bold;
     color: #c20000;
 }
+
+table.register th {
+    font-weight:normal;
+    width:150px;
+    text-align:left;
+}
+
