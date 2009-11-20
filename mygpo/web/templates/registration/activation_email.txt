@@ -1,5 +1,5 @@
 Click on the link below to activate your account on my.gpodder.org
 
-{{activation_key}}
+http://dev.gpodder.org:8000/activate?key={{activation_key}}
 
 
