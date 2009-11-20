@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from mygpo.api.opml import Importer, Exporter
-from mygpo.api.models import Subscription, Podcast, SubscriptionAction, Device
+from mygpo.api.models import Subscription, Podcast, SubscriptionAction, Device, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION
 from datetime import datetime
 from django.utils.datastructures import MultiValueDictKeyError
 
@@ -40,11 +40,11 @@ def upload(request):
                 'title' : n['title'],
                 'description': n['description'],
                 'last_update': datetime.now() })
-        s = SubscriptionAction(podcast=p,action='subscribe', timestamp=datetime.now(), device=d)
+        s = SubscriptionAction(podcast=p,action=SUBSCRIBE_ACTION, timestamp=datetime.now(), device=d)
         s.save()
 
     for r in rem:
-        s = SubscriptionAction(podcast=r, action='unsubscribe', timestamp=datetime.now(), device=d)
+        s = SubscriptionAction(podcast=r, action=UNSUBSCRIBE_ACTION, timestamp=datetime.now(), device=d)
         s.save()
 
     return HttpResponse('@SUCCESS', mimetype='text/plain')
