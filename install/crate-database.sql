@@ -59,7 +59,7 @@ CREATE TABLE subscription_log (
     id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
     device_id INT REFERENCES device (id),
     podcast_id INT REFERENCES podcast (id),
-    action ENUM ('subscribe', 'unsubscribe') NOT NULL,
+    action TINYINT(1) NOT NULL,
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (device_id, podcast_id, action, timestamp)
 );
