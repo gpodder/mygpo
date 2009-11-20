@@ -1,13 +1,14 @@
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
-from mygpo.api.models import Podcast, UserAccount
+from django.contrib.auth.models import User
+from mygpo.api.models import Podcast
 from registration.forms import RegistrationForm
 from registration.views import activate, register
 from registration.models import RegistrationProfile
 
 def login_user(request):
-       podcasts = Podcast.objects.count()       
+       podcasts = Podcast.objects.count()
        try:
               username = request.POST['user']
               password = request.POST['pwd']
@@ -20,14 +21,17 @@ def login_user(request):
        user = authenticate(username=username, password=password)
        if user is not None:
               login(request, user)
-              if user.generated_id:
+
+              p = user.get_profile()
+              if p.generated_id:
                      return render_to_response('migrate.html', {
                            'authenticated': True,
                            'login_message': username,
                            'username': user
                      })
               else:
-                     return HttpResponseRedirect('/')
+                  return HttpResponseRedirect('/')
+
        else:
               return render_to_response('home.html', {
                      'error': True,
@@ -67,7 +71,7 @@ def migrate_user(request):
                       'username': request.user
                  })
             else:
-                 tempuser = UserAccount.objects.get(username__exact=newusername)
+                 tempuser = User.objects.get(username__exact=newusername)
                  if tempuser == '':
                       user = request.user
                       user.username = newusername
@@ -83,13 +87,3 @@ def migrate_user(request):
                            'username': request.user
                       })
 
-
-def buildregister_user(request):
-       return register(request,'registration.backends.default.DefaultBackend')
-
-def register_user(request):
-       return register(request, '../registration_complete/')
-       
-def activate_user(request):
-	userkey = request.GET['key']  
-	return activate(request, userkey, 'registration/activate.html', {'account' : True})

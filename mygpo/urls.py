@@ -1,5 +1,7 @@
 import os.path
 from django.conf.urls.defaults import *
+from registration.views import activate, register
+from mygpo.api.models import UserProfile
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -12,10 +14,9 @@ urlpatterns = patterns('',
     (r'^login/$', 'mygpo.web.users.login_user'),
     (r'^logout/$', 'mygpo.web.users.logout_user'),
     (r'^migrate/$', 'mygpo.web.users.migrate_user'),
-    (r'^register/$', 'mygpo.web.users.buildregister_user'),
-    (r'^registered/$', 'mygpo.web.users.register_user'),
+    (r'^register/$',  register, {'profile_callback': UserProfile.objects.create, 'success_url': '../registration_complete/' }),
     (r'^registration_complete/$', 'django.views.generic.simple.direct_to_template', {'template': 'registration/registration_complete.html'}),
-    (r'^activate/$', 'mygpo.web.users.activate_user'),
+    (r'^activate/(?P<key>\w+)$', activate),
     (r'^info/$', 'django.views.generic.simple.direct_to_template', {'template': 'info.html'}),
 
     (r'^upload$', 'mygpo.api.legacy.upload'),

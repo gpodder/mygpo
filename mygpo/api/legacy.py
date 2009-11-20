@@ -1,6 +1,7 @@
 from django.http import HttpResponse
+from django.contrib.auth.models import User
 from mygpo.api.opml import Importer, Exporter
-from mygpo.api.models import Subscription, Podcast, UserAccount, SubscriptionAction, Device
+from mygpo.api.models import Subscription, Podcast, SubscriptionAction, Device
 from datetime import datetime
 from django.utils.datastructures import MultiValueDictKeyError
 
@@ -71,8 +72,8 @@ def auth(emailaddr, password):
         return None
 
     try:
-        user = UserAccount.objects.get(email__exact=emailaddr)
-    except UserAccount.DoesNotExist:
+        user = User.objects.get(email__exact=emailaddr)
+    except User.DoesNotExist:
         return None
 
     if not user.check_password(password):

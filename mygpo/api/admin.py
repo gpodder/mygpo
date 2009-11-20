@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django import forms
+from django.contrib.auth.models import User
+from django.contrib.auth.admin import UserAdmin
 from mygpo.api.models import *
 
 class DeviceInline(admin.TabularInline):
@@ -18,17 +20,14 @@ class SubscriptionActionInline(admin.TabularInline):
     model = SubscriptionAction
     extra = 3
 
-class UserAccountForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super(UserAccountForm, self).__init__(*args, **kwargs)
-        self.fields['default_device'].queryset = Device.objects.filter(user=self.instance)
-
 class SyncGroupAdmin(admin.ModelAdmin):
     inlines = [DeviceInline]
 
-class UserAccountAdmin(admin.ModelAdmin):
-    inlines = [DeviceInline, EpisodeActionInline]
-    form = UserAccountForm
+class UserProfileInline(admin.StackedInline):
+    model = UserProfile
+
+class UserProfileAdmin(admin.ModelAdmin):
+    inlines = [UserProfileInline, DeviceInline, EpisodeActionInline]
 
 class PodcastAdmin(admin.ModelAdmin):
     inlines = [EpisodeInline]
@@ -37,9 +36,11 @@ class PodcastAdmin(admin.ModelAdmin):
 class DeviceAdmin(admin.ModelAdmin):
     inlines = [SubscriptionActionInline]
 
-admin.site.register(UserAccount, UserAccountAdmin)
+admin.site.unregister(User)
+admin.site.register(User, UserProfileAdmin)
 admin.site.register(Podcast, PodcastAdmin)
 admin.site.register(SyncGroup, SyncGroupAdmin)
 admin.site.register(Device, DeviceAdmin)
 admin.site.register(Subscription)
 admin.site.register(SubscriptionAction)
+

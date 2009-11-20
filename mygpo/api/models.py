@@ -24,17 +24,15 @@ SUBSCRIPTION_ACTION_TYPES = (
         ('unsubscribe', 'unsubscribed')
     )
 
-#inheriting from User, as described in 
-#http://scottbarnham.com/blog/2008/08/21/extending-the-django-user-model-with-inheritance/
-class UserAccount(User):
+class UserProfile(models.Model):
+    user = models.ForeignKey(User, unique=True, db_column='user_ptr_id')
+
     public_profile = models.BooleanField()
     generated_id = models.BooleanField()
 
-    objects = UserManager()
-
     def __unicode__(self):
-        return self.username
-    
+        return '%s (%s, %s)' % (self.user.username, self.public_profile, self.generated_id)
+
     class Meta:
         db_table = 'user'
 
@@ -206,7 +204,7 @@ class EpisodeAction(models.Model):
 class Subscription(models.Model):
     device = models.ForeignKey(Device, primary_key=True)
     podcast = models.ForeignKey(Podcast)
-    user = models.ForeignKey(UserAccount)
+    user = models.ForeignKey(User)
     subscribed_since = models.DateTimeField()
 
     def __unicode__(self):
