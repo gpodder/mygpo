@@ -7,6 +7,7 @@ from django.template.defaultfilters import slugify
 from registration.forms import RegistrationForm
 from registration.views import activate, register
 from registration.models import RegistrationProfile
+from mygpo.api.models import UserProfile
 
 def login_user(request):
        try:
@@ -19,10 +20,15 @@ def login_user(request):
        if user is not None:
               login(request, user)
 
-              if user.get_profile().generated_id:
-                     return render_to_response('migrate.html', {
+              try:
+                  if user.get_profile().generated_id:
+                      return render_to_response('migrate.html', {
                            'username': user
-                     })
+                      })
+              except UserProfile.DoesNotExist:
+                  UserProfile.objects.create(user=user)
+                  return HttpResponseRedirect('/')
+
               else:
                   return HttpResponseRedirect('/')
 
