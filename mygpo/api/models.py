@@ -89,7 +89,7 @@ class Device(models.Model):
     sync_group = models.ForeignKey(SyncGroup, blank=True, null=True)
 
     def __unicode__(self):
-        return '%s (%s)' % (self.name, self.type)
+        return '%s - %s (%s)' % (self.user, self.name, self.type)
 
     def get_subscriptions(self):
         #self.sync()
