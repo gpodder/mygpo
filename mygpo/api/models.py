@@ -92,7 +92,7 @@ class Device(models.Model):
         return '%s - %s (%s)' % (self.user, self.name, self.type)
 
     def get_subscriptions(self):
-        self.sync()
+        #self.sync()
         return Subscription.objects.filter(device=self)
 
     def sync(self):
