@@ -1,11 +1,12 @@
 from django.test import TestCase
-from mygpo.api.models import Device, Podcast, UserAccount, SubscriptionAction
+from django.contrib.auth.models import User
+from mygpo.api.models import Device, Podcast, SubscriptionAction
 
 class SyncTest(TestCase):
     def test_sync_actions(self):
         # this test does not yet complete when run as a unit test
         # because django does not set up the views
-        u  = UserAccount.objects.create(username='u')
+        u  = User.objects.create(username='u')
         d1 = Device.objects.create(name='d1', type='other', user=u)
         d2 = Device.objects.create(name='d2', type='other', user=u)
         p1 = Podcast.objects.create(title='p1', url='http://p1.com/')

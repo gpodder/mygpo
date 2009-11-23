@@ -1,95 +1,61 @@
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
-from mygpo.api.models import Podcast, UserAccount
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from django.template.defaultfilters import slugify
 from registration.forms import RegistrationForm
 from registration.views import activate, register
 from registration.models import RegistrationProfile
+from mygpo.api.models import UserProfile
 
 def login_user(request):
-       podcasts = Podcast.objects.count()       
        try:
               username = request.POST['user']
               password = request.POST['pwd']
        except:
-              return render_to_response('home.html', {
-                     'error': True,
-                     'error_message': 'No user or pwd entered',
-                     'podcast_count': podcasts
-              })
+              return render_to_response('login.html')
+
        user = authenticate(username=username, password=password)
        if user is not None:
               login(request, user)
-              if user.generated_id:
-                     return render_to_response('migrate.html', {
-                           'authenticated': True,
-                           'login_message': username,
+
+              try:
+                  if user.get_profile().generated_id:
+                      return render_to_response('migrate.html', {
                            'username': user
-                     })
+                      })
+              except UserProfile.DoesNotExist:
+                  UserProfile.objects.create(user=user)
+                  return HttpResponseRedirect('/')
+
               else:
-                     return HttpResponseRedirect('/')
+                  return HttpResponseRedirect('/')
+
        else:
-              return render_to_response('home.html', {
-                     'error': True,
-                     'error_message': 'User not known or wrong password',
-                     'podcast_count': podcasts
+              return render_to_response('login.html', {
+                     'error_message': 'Unknown user or wrong password',
               })
 
-
-
-def logout_user(request):
-       logout(request)
-       return HttpResponseRedirect('/')
-
-
+@login_required
 def migrate_user(request):
-      podcasts = Podcast.objects.count()
-      oldusername = request.POST.get('oldusername', None)
-      newusername = request.POST.get('newusername', None)
-      leave = request.POST.get('leave', None)
-      submit = request.POST.get('submit', None)
-      if leave:
-            user = request.user
-            user.generated_id = 0
+    user = request.user
+    username = request.POST.get('username', user.username)
+
+    if username == '':
+        username = user.username
+
+    if user.username != username:
+        if User.objects.filter(username__exact=username).count() > 0:
+            return render_to_response('migrate.html', {'error_message': '%s is already taken' % username, 'username': user.username})
+        if slugify(username) != username:
+            return render_to_response('migrate.html', {'error_message': '%s is not a valid username. Please use characters, numbers, underscore and dash only.' % username, 'username': user.username})
+        else:
+            user.username = username
             user.save()
-            return render_to_response('home.html', {
-                 'authenticated': True,
-                 'login_message': request.user,
-                 'podcast_count': podcasts
-            })
-      else:
-            if newusername == '':
-                 return render_to_response('migrate.html', {
-                      'error': True,
-                      'error_message': 'You have to fill in a new username in order to change',
-                      'authenticated': True,
-                      'login_message': request.user,
-                      'username': request.user
-                 })
-            else:
-                 tempuser = UserAccount.objects.get(username__exact=newusername)
-                 if tempuser == '':
-                      user = request.user
-                      user.username = newusername
-                      user.generated_id = 0
-                      user.save()
-                      return HttpResponseRedirect('/')
-                 else:
-                      return render_to_response('migrate.html', {
-                           'error': True,
-                           'error_message': 'Username exists',
-                           'authenticated': True,
-                           'login_message': request.user,
-                           'username': request.user
-                      })
 
+    user.get_profile().generated_id = 0
+    user.get_profile().save()
 
-def buildregister_user(request):
-       return register(request,'registration.backends.default.DefaultBackend')
+    return HttpResponseRedirect('/')
 
-def register_user(request):
-       return register(request, '../registration_complete/')
-       
-def activate_user(request):
-	userkey = request.GET['key']  
-	return activate(request, userkey, 'registration/activate.html', {'account' : True})

@@ -91,7 +91,13 @@ INSTALLED_APPS = (
 ACCOUNT_ACTIVATION_DAYS = 7
 
 AUTHENTICATION_BACKENDS = (
-    'mygpo.auth_backends.UserAccountModelBackend',
+    'django.contrib.auth.backends.ModelBackend',
+    'mygpo.auth_backends.EmailAuthenticationBackend',
 )
 
-CUSTOM_USER_MODEL = 'api.UserAccount'
+DEFAULT_FROM_EMAIL = 'mygpo@my.gpodder.org'
+
+AUTH_PROFILE_MODULE = "api.UserProfile"
+
+LOGIN_URL = '/login/'
+

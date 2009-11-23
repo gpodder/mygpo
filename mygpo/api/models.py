@@ -19,22 +19,18 @@ DEVICE_TYPES = (
         ('other', 'Other')
     )
 
-SUBSCRIPTION_ACTION_TYPES = (
-        ('subscribe', 'subscribed'),
-        ('unsubscribe', 'unsubscribed')
-    )
+SUBSCRIBE_ACTION = 1
+UNSUBSCRIBE_ACTION = -1
 
-#inheriting from User, as described in 
-#http://scottbarnham.com/blog/2008/08/21/extending-the-django-user-model-with-inheritance/
-class UserAccount(User):
-    public_profile = models.BooleanField()
-    generated_id = models.BooleanField()
+class UserProfile(models.Model):
+    user = models.ForeignKey(User, unique=True, db_column='user_ptr_id')
 
-    objects = UserManager()
+    public_profile = models.BooleanField(default=True)
+    generated_id = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return self.username
-    
+        return '%s (%s, %s)' % (self.user.username, self.public_profile, self.generated_id)
+
     class Meta:
         db_table = 'user'
 
@@ -93,10 +89,10 @@ class Device(models.Model):
     sync_group = models.ForeignKey(SyncGroup, blank=True, null=True)
 
     def __unicode__(self):
-        return '%s (%s)' % (self.name, self.type)
+        return '%s - %s (%s)' % (self.user, self.name, self.type)
 
     def get_subscriptions(self):
-        self.sync()
+        #self.sync()
         return Subscription.objects.filter(device=self)
 
     def sync(self):
@@ -117,9 +113,9 @@ class Device(models.Model):
 
             if a != None and s.timestamp <= a.timestamp: continue
 
-            if s.action == 'subscribe' and not s.podcast in podcasts:
+            if s.action == SUBSCRIBE_ACTION and not s.podcast in podcasts:
                 sync_actions.append(s)
-            elif s.action == 'unsubscribe' and s.podcast in podcasts:
+            elif s.action == UNUSBSCRIBE_ACTION and s.podcast in podcasts:
                 sync_actions.append(s)
         return sync_actions
 
@@ -192,7 +188,7 @@ class EpisodeAction(models.Model):
     user = models.ForeignKey(User, primary_key=True)
     episode = models.ForeignKey(Episode)
     device = models.ForeignKey(Device)
-    action = models.CharField(max_length=10, choices=EPISODE_ACTION_TYPES)
+    action = models.IntegerField(choices=EPISODE_ACTION_TYPES)
     timestamp = models.DateTimeField(default=datetime.now)
     playmark = models.IntegerField()
 
@@ -206,7 +202,7 @@ class EpisodeAction(models.Model):
 class Subscription(models.Model):
     device = models.ForeignKey(Device, primary_key=True)
     podcast = models.ForeignKey(Podcast)
-    user = models.ForeignKey(UserAccount)
+    user = models.ForeignKey(User)
     subscribed_since = models.DateTimeField()
 
     def __unicode__(self):
@@ -218,11 +214,14 @@ class Subscription(models.Model):
 class SubscriptionActionBase(models.Model):
     device = models.ForeignKey(Device)
     podcast = models.ForeignKey(Podcast)
-    action = models.CharField(max_length=12, choices=SUBSCRIPTION_ACTION_TYPES)
+    action = models.IntegerField()
     timestamp = models.DateTimeField(blank=True, default=datetime.now)
 
+    def action_string(self):
+        return 'subscribe' if self.action == SUBSCRIBE_ACTION else 'unsubscribe'
+
     def __unicode__(self):
-        return '%s %s %s' % (self.device, self.action, self.podcast)
+        return '%s %s %s %s' % (self.device.user, self.device, self.action_string(), self.podcast)
 
     class Meta:
         abstract = True

@@ -1,11 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h1>my.gpodder.org</h1>
-  <p>my.gpodder.org is a webservice for synchronizing podcast subscriptions on several devices and applications.</p>
-  <p>We are currently tracking {{ podcast_count }} Podcasts!</p>
-
-   <h2>Login</h2>
+  <h1>Login</h1>
    <form action="../login/" method="post">
     Username or Email-Address:<br />
     <input name="user" type="text" style="width:90%;"/><br />
