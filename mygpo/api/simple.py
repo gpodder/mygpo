@@ -1,8 +1,9 @@
 from mygpo.api.basic_auth import require_valid_user
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, Http404
 from mygpo.api.models import Device
 from mygpo.api.opml import Exporter
 from mygpo.api.json import JsonResponse
+from django.core import serializers
 
 @require_valid_user()
 def subscriptions(request, username, device_uid, format):
@@ -14,8 +15,7 @@ def subscriptions(request, username, device_uid, format):
         return format_subscriptions(get_subscriptions(username, device_uid), format)
         
     elif request.method == 'PUT':
-	return request.raw_post_data
-        #return set_subscriptions(device_uid, parse_subscription(request.raw_post_data, format))
+        return set_subscriptions(device_uid, parse_subscription(request.raw_post_data, format))
 
     else:
         return HttpResponseBadReqest()
@@ -32,12 +32,16 @@ def format_subscriptions(subscriptions, format):
         return HttpResponse(Exporter().generate(subscriptions), mimetype='text/xml')
     
     elif format == 'json':
-	urls = [p.url for p in subscriptions]
-        return JsonResponse(urls)
+	json_serializer = serializers.get_serializer("json")()
+	p = json_serializer.serialize(subscriptions, ensure_ascii=False, fields=('title', 'description', 'url'))
+        return JsonResponse(p)
 
 def get_subscriptions(username, device_uid):
     #get and return subscription list from database (use backend to sync)
-    d = Device.objects.get(uid=device_uid, user__username=username)
+    try:
+    	d = Device.objects.get(uid=device_uid, user__username=username)
+    except Device.DoesNotExist:
+	raise Http404
     return [p.podcast for p in d.get_subscriptions()]
 
 def parse_subscription(raw_post_data, format):
