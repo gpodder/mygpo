@@ -46,7 +46,7 @@ def upload(request):
 
     existing_urls = [e.podcast.url for e in existing]
 
-    i = Importer(content=opml)
+    i = Importer(opml)
     podcast_urls = [p['url'] for p in i.items]
 
     new = [item for item in i.items if item['url'] not in existing_urls]
@@ -78,7 +78,10 @@ def getlist(request):
         defaults = {'type': 'unknown', 'name': LEGACY_DEVICE_NAME})
 
     podcasts = [s.podcast for s in d.get_subscriptions()]
-    exporter = Exporter(filename='')
+
+    # FIXME: Get username and set a proper title (e.g. "thp's subscription list")
+    title = 'Your subscription list'
+    exporter = Exporter(title)
 
     opml = exporter.generate(podcasts)
 

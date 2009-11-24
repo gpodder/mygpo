@@ -18,7 +18,7 @@
 from mygpo.api.basic_auth import require_valid_user
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from mygpo.api.models import Device
-from mygpo.api.opml import Exporter
+from mygpo.api.opml import Exporter, Importer
 from mygpo.api.json import JsonResponse
 
 @require_valid_user()
@@ -46,8 +46,12 @@ def format_subscriptions(subscriptions, format):
         return HttpResponse(s, mimetype='text/plain')
 
     elif format == 'opml':
-        return HttpResponse(Exporter().generate(subscriptions), mimetype='text/xml')
-    
+        # FIXME: We could include the username in the title
+        title = 'Your subscription list'
+        exporter = Exporter(title)
+        opml = exporter.generate(subscriptions)
+        return HttpResponse(opml, mimetype='text/xml')
+
     elif format == 'json':
 	urls = [p.url for p in subscriptions]
         return JsonResponse(urls)
@@ -62,7 +66,7 @@ def parse_subscription(raw_post_data, format):
         return []
 
     elif format == 'opml':
-        i = Importer(content=raw_post_data)
+        i = Importer(raw_post_data)
         return i.items
 
     elif format == 'json':
