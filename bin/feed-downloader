@@ -22,12 +22,51 @@ USER_AGENT = 'mygpo crawler (+http://my.gpodder.org)'
 
 import os
 import sys
+import datetime
+import socket
+
+os.environ['DJANGO_SETTINGS_MODULE'] = 'mygpo.settings'
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from mygpo import feedcore
+from mygpo.api import models
 
+socket.setdefaulttimeout(10)
 fetcher = feedcore.Fetcher(USER_AGENT)
 
-# FIXME FIXME
+UPDATE_LIMIT = datetime.datetime.now() - datetime.timedelta(days=15)
+
+#fetch_queue = models.Podcast.objects.all()
+fetch_queue = models.Podcast.objects.filter(last_update__lt=UPDATE_LIMIT)
+
+for podcast in fetch_queue:
+    # XXX: Wrong data format in the database?
+    podcast.url = podcast.url.lstrip('"')
+
+    print podcast.url
+
+    try:
+        fetcher.fetch(podcast.url)
+    except feedcore.Offline:
+        pass
+    except feedcore.InvalidFeed:
+        pass
+    except feedcore.WifiLogin:
+        pass
+    except feedcore.AuthenticationRequired:
+        pass
+    except feedcore.NewLocation, location:
+        podcast.url = location.data
+    except feedcore.UpdatedFeed, updated:
+        feed = updated.data
+        podcast.title = feed.feed.get('title', podcast.url)
+        podcast.link = feed.feed.get('link', podcast.url)
+        podcast.description = feed.feed.get('subtitle', podcast.description)
+
+    podcast.last_update = datetime.datetime.now()
+    try:
+        podcast.save()
+    except Exception, e:
+        print e
 
