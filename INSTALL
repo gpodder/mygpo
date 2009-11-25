@@ -1,0 +1,53 @@
+
+                   Deployment instructions for my.gpodder.org
+                   ------------------------------------------
+
+Dependencies:
+
+  * python (>= 2.5)
+  * python-django
+  * django-registration
+  * MySQL Server (>= 5.0)
+  * python-mysqldb
+  * lighttpd
+  * python-feedparser
+
+1. Creating the database
+
+In MySQL, do the following (the SUPER grant is needed for
+triggers to work in MySQL 5.0):
+
+  CREATE DATABASE mygpo;
+  GRANT ALL ON mygpo.* TO mygpo@localhost WITH GRANT OPTION;
+  GRANT SUPER ON *.* TO MYGPO@localhost;
+  FLUSH PRIVILEGES;
+
+
+2. Initialize the database
+
+Run in the mygpo/ subdirectory (possibly after setting the
+DB parameters in mygpo/settings.py):
+
+  python manage.py syncdb
+
+When asked to create a superuser, say NO.
+
+Now, run every SQL-Script in the install/ subdirectory, starting
+with "create.sql" and working your way all the way through the
+update scripts (these are split because we are doing incremental
+schema updates on the production server).
+
+
+3. Setup the web server using lighttpd
+
+There is a mygpo.lighttpd.conf file shipped with the source. Please
+customize it to your needs, and then include it from your lighttpd
+main configuration file.
+
+4. Restart lighttpd
+
+On Debian:
+
+  /etc/init.d/lighttpd restart
+
+
