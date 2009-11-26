@@ -19,6 +19,7 @@
 import os.path
 from django.conf.urls.defaults import *
 from registration.views import activate, register
+from registration.forms import RegistrationFormUniqueEmail
 from mygpo.api.models import UserProfile
 from django.contrib.auth.views import logout
 
@@ -33,7 +34,7 @@ urlpatterns = patterns('',
     (r'^login/$', 'mygpo.web.users.login_user'),
     (r'^logout/$', logout, {'next_page': '/'}),
     (r'^migrate/$', 'mygpo.web.users.migrate_user'),
-    (r'^register/$',  register, {'profile_callback': UserProfile.objects.create, 'success_url': '../registration_complete/' }),
+    (r'^register/$',  register, {'profile_callback': UserProfile.objects.create, 'success_url': '../registration_complete/', 'form_class': RegistrationFormUniqueEmail}),
     (r'^registration_complete/$', 'django.views.generic.simple.direct_to_template', {'template': 'registration/registration_complete.html'}),
     (r'^activate/(?P<activation_key>\w+)$', activate),
     (r'^info/$', 'django.views.generic.simple.direct_to_template', {'template': 'info.html'}),
