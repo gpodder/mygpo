@@ -109,3 +109,27 @@ CREATE VIEW current_subscription AS SELECT device_id, podcast_id, c.user_ptr_id 
     GROUP BY a.podcast_id, b.user_id 
     having summe>0;
 
+
+-- podcast
+create index url_index on podcast ( url (50) );
+create index title_index on podcast ( title (50) );
+create index last_update_index on podcast (last_update);
+
+-- user
+create index user_ptr_index on user (user_ptr_id);
+create index public_profile_index on user (public_profile);
+
+-- device
+create index name_index on device (name);
+create index user_index on device (user_id);
+create index type_index on device (type);
+create index uid_index on device (uid);
+create index sync_g_index on device (sync_group_id);
+
+-- subscription_log
+create index podcast_index on subscription_log(podcast_id);
+create index action_index on subscription_log(action);
+create index timestamp_index on subscription_log(timestamp);
+create index device_index on subscription_log(device_id);
+
+

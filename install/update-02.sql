@@ -10,6 +10,7 @@ ALTER TABLE device ADD COLUMN sync_group_id INT REFERENCES sync_group(id);
 ALTER TABLE device ADD COLUMN `uid` varchar(50) NOT NULL;
 
 -- selects the latest action for each pair (device_id, podcast_id) --
+DROP TABLE IF EXISTS sync_group_subscription_log;
 DROP VIEW IF EXISTS sync_group_subscription_log;
 CREATE VIEW sync_group_subscription_log AS
     SELECT subscription_log.id AS id, device_id, podcast_id, action, timestamp, sync_group_id

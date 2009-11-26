@@ -64,6 +64,7 @@ CREATE TABLE subscription_log (
     UNIQUE (device_id, podcast_id, action, timestamp)
 );
 
+DROP TABLE IF EXISTS current_subscription;
 DROP VIEW IF EXISTS current_subscription;
 
 CREATE VIEW current_subscription AS
