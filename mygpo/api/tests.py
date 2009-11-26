@@ -31,13 +31,13 @@ class SyncTest(TestCase):
         p3 = Podcast.objects.create(title='p3', url='http://p3.com/')
         p4 = Podcast.objects.create(title='p4', url='http://p4.com/')
 
-        s1 = SubscriptionAction.objects.create(device=d1, podcast=p1, action='subscribe')
-        s2 = SubscriptionAction.objects.create(device=d2, podcast=p2, action='subscribe')
-        u2 = SubscriptionAction.objects.create(device=d2, podcast=p2, action='unsubscribe')
-        s3 = SubscriptionAction.objects.create(device=d1, podcast=p3, action='subscribe')
-        s3_= SubscriptionAction.objects.create(device=d2, podcast=p3, action='subscribe')
-        s4 = SubscriptionAction.objects.create(device=d2, podcast=p4, action='subscribe')
-        u3 = SubscriptionAction.objects.create(device=d2, podcast=p3, action='unsubscribe')
+        s1 = SubscriptionAction.objects.create(device=d1, podcast=p1, action='1')
+        s2 = SubscriptionAction.objects.create(device=d2, podcast=p2, action='1')
+        u2 = SubscriptionAction.objects.create(device=d2, podcast=p2, action='-1')
+        s3 = SubscriptionAction.objects.create(device=d1, podcast=p3, action='1')
+        s3_= SubscriptionAction.objects.create(device=d2, podcast=p3, action='1')
+        s4 = SubscriptionAction.objects.create(device=d2, podcast=p4, action='1')
+        u3 = SubscriptionAction.objects.create(device=d2, podcast=p3, action='-1')
 
         d1.sync_with(d2)
 

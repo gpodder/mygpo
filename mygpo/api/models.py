@@ -89,11 +89,14 @@ class Episode(models.Model):
 
 class SyncGroup(models.Model):
     user = models.ForeignKey(User)
-    
+
     def __unicode__(self):
         devices = [d.name for d in Device.objects.filter(sync_group=self)]
         return '%s - %s' % (self.user, ', '.join(devices))
-             
+
+    def devices(self):
+        return Device.objects.filter(sync_group=self)
+
     class Meta:
         db_table = 'sync_group'
 
@@ -122,21 +125,41 @@ class Device(models.Model):
         SubscriptionActions that need to be saved for the current device
         to synchronize it with its SyncGroup
         """
-        all_sync_actions = SyncGroupSubscriptionAction.objects.filter(sync_group=self.sync_group)
-        podcasts = [p.podcast for p in Subscription.objects.filter(device=self)]
-        sync_actions = []
-        for s in all_sync_actions:
-            a = self.latest_action(s.podcast)
+        if self.sync_group == None:
+            return []
 
-            if a != None and s.timestamp <= a.timestamp: continue
+        devices = self.sync_group.devices().exclude(pk=self.id)
 
-            if s.action == SUBSCRIBE_ACTION and not s.podcast in podcasts:
-                sync_actions.append(s)
-            elif s.action == UNUSBSCRIBE_ACTION and s.podcast in podcasts:
-                sync_actions.append(s)
+        sync_actions = self.latest_actions()
+
+        for d in devices:
+            a = d.latest_actions()
+            for s in a.keys:
+                if (not s.podcast.has_key(s)) or (a[s].timestamp > sync_actions[s].timestamp):
+                    if sync_actions[s].actions != a[s].action:
+                        sync_actions[s] = a[s]
+
         return sync_actions
 
+    def latest_actions(self):
+        """
+        returns the latest action for each podcast
+        that has an action on this device
+        """
+        #all podcasts that have an action on this device
+        podcasts = [sa.podcast for sa in SubscriptionAction.objects.filter(device=self)]
+        podcasts = list(set(podcasts)) #remove duplicates
+
+        actions = {}
+        for p in podcasts:
+            actions[p] = self.latest_action(p)
+
+        return actions
+
     def latest_action(self, podcast):
+        """
+        returns the latest action for the given podcast on this device
+        """
         actions = SubscriptionAction.objects.filter(podcast=podcast,device=self).order_by('-timestamp')
         if len(actions) == 0:
             return None
@@ -228,7 +251,7 @@ class Subscription(models.Model):
     class Meta:
         db_table = 'current_subscription'
 
-class SubscriptionActionBase(models.Model):
+class SubscriptionAction(models.Model):
     device = models.ForeignKey(Device)
     podcast = models.ForeignKey(Podcast)
     action = models.IntegerField()
@@ -241,21 +264,6 @@ class SubscriptionActionBase(models.Model):
         return '%s %s %s %s' % (self.device.user, self.device, self.action_string(), self.podcast)
 
     class Meta:
-        abstract = True
-        unique_together = ('device', 'podcast', 'action', 'timestamp')
-
-class SubscriptionAction(SubscriptionActionBase):
-    
-    class Meta:
         db_table = 'subscription_log'
-
-class SyncGroupSubscriptionAction(SubscriptionActionBase):
-    """ READ ONLY MODEL """
-    sync_group = models.ForeignKey(SyncGroup)
-
-    def save(self, **kwargs):
-        raise NotImplementedError
-
-    class Meta:
-        db_table = 'sync_group_subscription_log'
+        unique_together = ('device', 'podcast', 'action', 'timestamp')
 
