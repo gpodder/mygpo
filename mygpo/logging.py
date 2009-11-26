@@ -15,4 +15,12 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# Create your views here.
+# my.gpodder.org logging module
+
+import syslog
+
+syslog.openlog('my.gpodder.org')
+
+def log(message):
+    syslog.syslog(message)
+
