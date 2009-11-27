@@ -134,10 +134,18 @@ class Device(models.Model):
 
         for d in devices:
             a = d.latest_actions()
-            for s in a.keys:
-                if (not s.podcast.has_key(s)) or (a[s].timestamp > sync_actions[s].timestamp):
-                    if sync_actions[s].actions != a[s].action:
+            for s in a.keys():
+                if not sync_actions.has_key(s):
+		    if a[s].action == SUBSCRIBE_ACTION:
+			sync_actions[s] = a[s]
+		elif a[s].newer_than(sync_actions[s]) and (sync_actions[s].action != a[s].action):
                         sync_actions[s] = a[s]
+
+	#remove actions that did not change
+	current_state = self.latest_actions()
+	for podcast in current_state.keys():
+	    if sync_actions[podcast] == current_state[podcast]:
+		del sync_actions[podcast]
 
         return sync_actions
 
@@ -160,7 +168,7 @@ class Device(models.Model):
         """
         returns the latest action for the given podcast on this device
         """
-        actions = SubscriptionAction.objects.filter(podcast=podcast,device=self).order_by('-timestamp')
+        actions = SubscriptionAction.objects.filter(podcast=podcast,device=self).order_by('-timestamp', '-id')
         if len(actions) == 0:
             return None
         else:
@@ -259,6 +267,10 @@ class SubscriptionAction(models.Model):
 
     def action_string(self):
         return 'subscribe' if self.action == SUBSCRIBE_ACTION else 'unsubscribe'
+
+    def newer_than(self, action):
+        if (self.timestamp == action.timestamp): return self.id > action.id
+	return self.timestamp > action.timestamp
 
     def __unicode__(self):
         return '%s %s %s %s' % (self.device.user, self.device, self.action_string(), self.podcast)

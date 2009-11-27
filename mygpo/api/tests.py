@@ -39,10 +39,13 @@ class SyncTest(TestCase):
         s4 = SubscriptionAction.objects.create(device=d2, podcast=p4, action='1')
         u3 = SubscriptionAction.objects.create(device=d2, podcast=p3, action='-1')
 
+	#d1: p1, p3
+	#d2: p2, -p2, p3, p4, -p3
+
         d1.sync_with(d2)
 
-        #d1: p1, p3
-        #d2: p4
+        #d1: -p3, +p4
+        #d2: +p1
 
         sa1 = d1.get_sync_actions()
         sa2 = d2.get_sync_actions()
@@ -50,30 +53,17 @@ class SyncTest(TestCase):
         self.assertEqual( len(sa1), 2)
         self.assertEqual( len(sa2), 1)
 
-        self.assertEqual( sa1[0].device, d2)
-        self.assertEqual( sa1[0].podcast, p4)
-        self.assertEqual( sa1[0].action, 'subscribe')
+        self.assertEqual( sa1[p4].device, d2)
+        self.assertEqual( sa1[p4].podcast, p4)
+        self.assertEqual( sa1[p4].action, 1)
 
-        self.assertEqual( sa1[1].device, d2)
-        self.assertEqual( sa1[1].podcast, p3)
-        self.assertEqual( sa1[1].action, 'unsubscribe')
+        self.assertEqual( sa1[p3].device, d2)
+        self.assertEqual( sa1[p3].podcast, p3)
+        self.assertEqual( sa1[p3].action, -1)
 
-        self.assertEqual( sa2[0].device, d1)
-        self.assertEqual( sa2[0].podcast, p1)
-        self.assertEqual( sa2[0].action, 'subscribe')
+        self.assertEqual( sa2[p1].device, d1)
+        self.assertEqual( sa2[p1].podcast, p1)
+        self.assertEqual( sa2[p1].action, 1)
 
 
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
-        """
-        Tests that 1 + 1 always equals 2.
-        """
-        self.failUnlessEqual(1 + 1, 2)
-
-__test__ = {"doctest": """
-Another way to test that 1 + 1 is equal to 2.
-
->>> 1 + 1 == 2
-True
-"""}
 
