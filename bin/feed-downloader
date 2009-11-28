@@ -1,0 +1,72 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+#
+# This file is part of my.gpodder.org.
+#
+# my.gpodder.org is free software: you can redistribute it and/or modify it
+# under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
+#
+# my.gpodder.org is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+# License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
+#
+
+USER_AGENT = 'mygpo crawler (+http://my.gpodder.org)'
+
+
+import os
+import sys
+import datetime
+import socket
+
+os.environ['DJANGO_SETTINGS_MODULE'] = 'mygpo.settings'
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
+from mygpo import feedcore
+from mygpo.api import models
+
+socket.setdefaulttimeout(10)
+fetcher = feedcore.Fetcher(USER_AGENT)
+
+UPDATE_LIMIT = datetime.datetime.now() - datetime.timedelta(days=15)
+
+#fetch_queue = models.Podcast.objects.all()
+fetch_queue = models.Podcast.objects.filter(last_update__lt=UPDATE_LIMIT)
+
+for podcast in fetch_queue:
+    # XXX: Wrong data format in the database?
+    podcast.url = podcast.url.lstrip('"')
+
+    print podcast.url
+
+    try:
+        fetcher.fetch(podcast.url)
+    except feedcore.Offline:
+        pass
+    except feedcore.InvalidFeed:
+        pass
+    except feedcore.WifiLogin:
+        pass
+    except feedcore.AuthenticationRequired:
+        pass
+    except feedcore.NewLocation, location:
+        podcast.url = location.data
+    except feedcore.UpdatedFeed, updated:
+        feed = updated.data
+        podcast.title = feed.feed.get('title', podcast.url)
+        podcast.link = feed.feed.get('link', podcast.url)
+        podcast.description = feed.feed.get('subtitle', podcast.description)
+
+    podcast.last_update = datetime.datetime.now()
+    try:
+        podcast.save()
+    except Exception, e:
+        print e
+

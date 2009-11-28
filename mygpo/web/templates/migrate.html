@@ -2,12 +2,11 @@
 
 {% block content %}
   <h1>my.gpodder.org</h1>
-  <p>The username has to be accepted or changed!</p>
-  <form action="../migrate/" method="post">
-  Old Username:&nbsp;&nbsp;&nbsp;<input type="text" name="oldusername" value="{{username}}" readonly="readonly" style="background-color:lightgrey;" /><br /><br />
-  New Username:&nbsp;<input type="text" name="newusername"/><br /><br />
-  <input type="checkbox" name="leave" />&nbsp;leave old username<br /><br />
+  <p>The new my.gpodder.org uses usernames instead of email addresses. Based on your email address, we think you might like <strong>{{username}}</strong>, but you can change that if you want to.</p>
+  <form action="/migrate/" method="post">
+  Username: <input type="text" name="username" value="{{ username }}"/><br /><br />
   <input type="submit" name="submit" value="Submit" />
   </form>
+  <p>You can keep your old user settings in gPodder. Once the next version (with lots of new features) is release, you'll have to replace your email address with your username.</p>
 {% endblock %}
 

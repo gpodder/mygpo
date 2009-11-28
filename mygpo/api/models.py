@@ -1,3 +1,20 @@
+#
+# This file is part of my.gpodder.org.
+#
+# my.gpodder.org is free software: you can redistribute it and/or modify it
+# under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
+#
+# my.gpodder.org is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+# License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
+#
+
 from django.db import models
 from django.contrib.auth.models import User, UserManager
 from datetime import datetime
@@ -19,22 +36,18 @@ DEVICE_TYPES = (
         ('other', 'Other')
     )
 
-SUBSCRIPTION_ACTION_TYPES = (
-        ('subscribe', 'subscribed'),
-        ('unsubscribe', 'unsubscribed')
-    )
+SUBSCRIBE_ACTION = 1
+UNSUBSCRIBE_ACTION = -1
 
-#inheriting from User, as described in 
-#http://scottbarnham.com/blog/2008/08/21/extending-the-django-user-model-with-inheritance/
-class UserAccount(User):
-    public_profile = models.BooleanField()
-    generated_id = models.BooleanField()
+class UserProfile(models.Model):
+    user = models.ForeignKey(User, unique=True, db_column='user_ptr_id')
 
-    objects = UserManager()
+    public_profile = models.BooleanField(default=True)
+    generated_id = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return self.username
-    
+        return '%s (%s, %s)' % (self.user.username, self.public_profile, self.generated_id)
+
     class Meta:
         db_table = 'user'
 
@@ -76,11 +89,14 @@ class Episode(models.Model):
 
 class SyncGroup(models.Model):
     user = models.ForeignKey(User)
-    
+
     def __unicode__(self):
         devices = [d.name for d in Device.objects.filter(sync_group=self)]
         return '%s - %s' % (self.user, ', '.join(devices))
-             
+
+    def devices(self):
+        return Device.objects.filter(sync_group=self)
+
     class Meta:
         db_table = 'sync_group'
 
@@ -93,10 +109,10 @@ class Device(models.Model):
     sync_group = models.ForeignKey(SyncGroup, blank=True, null=True)
 
     def __unicode__(self):
-        return '%s (%s)' % (self.name, self.type)
+        return '%s - %s (%s)' % (self.user, self.name, self.type)
 
     def get_subscriptions(self):
-        self.sync()
+        #self.sync()
         return Subscription.objects.filter(device=self)
 
     def sync(self):
@@ -109,22 +125,50 @@ class Device(models.Model):
         SubscriptionActions that need to be saved for the current device
         to synchronize it with its SyncGroup
         """
-        all_sync_actions = SyncGroupSubscriptionAction.objects.filter(sync_group=self.sync_group)
-        podcasts = [p.podcast for p in Subscription.objects.filter(device=self)]
-        sync_actions = []
-        for s in all_sync_actions:
-            a = self.latest_action(s.podcast)
+        if self.sync_group == None:
+            return []
 
-            if a != None and s.timestamp <= a.timestamp: continue
+        devices = self.sync_group.devices().exclude(pk=self.id)
 
-            if s.action == 'subscribe' and not s.podcast in podcasts:
-                sync_actions.append(s)
-            elif s.action == 'unsubscribe' and s.podcast in podcasts:
-                sync_actions.append(s)
+        sync_actions = self.latest_actions()
+
+        for d in devices:
+            a = d.latest_actions()
+            for s in a.keys():
+                if not sync_actions.has_key(s):
+		    if a[s].action == SUBSCRIBE_ACTION:
+			sync_actions[s] = a[s]
+		elif a[s].newer_than(sync_actions[s]) and (sync_actions[s].action != a[s].action):
+                        sync_actions[s] = a[s]
+
+	#remove actions that did not change
+	current_state = self.latest_actions()
+	for podcast in current_state.keys():
+	    if sync_actions[podcast] == current_state[podcast]:
+		del sync_actions[podcast]
+
         return sync_actions
 
+    def latest_actions(self):
+        """
+        returns the latest action for each podcast
+        that has an action on this device
+        """
+        #all podcasts that have an action on this device
+        podcasts = [sa.podcast for sa in SubscriptionAction.objects.filter(device=self)]
+        podcasts = list(set(podcasts)) #remove duplicates
+
+        actions = {}
+        for p in podcasts:
+            actions[p] = self.latest_action(p)
+
+        return actions
+
     def latest_action(self, podcast):
-        actions = SubscriptionAction.objects.filter(podcast=podcast,device=self).order_by('-timestamp')
+        """
+        returns the latest action for the given podcast on this device
+        """
+        actions = SubscriptionAction.objects.filter(podcast=podcast,device=self).order_by('-timestamp', '-id')
         if len(actions) == 0:
             return None
         else:
@@ -192,7 +236,7 @@ class EpisodeAction(models.Model):
     user = models.ForeignKey(User, primary_key=True)
     episode = models.ForeignKey(Episode)
     device = models.ForeignKey(Device)
-    action = models.CharField(max_length=10, choices=EPISODE_ACTION_TYPES)
+    action = models.IntegerField(choices=EPISODE_ACTION_TYPES)
     timestamp = models.DateTimeField(default=datetime.now)
     playmark = models.IntegerField()
 
@@ -206,7 +250,7 @@ class EpisodeAction(models.Model):
 class Subscription(models.Model):
     device = models.ForeignKey(Device, primary_key=True)
     podcast = models.ForeignKey(Podcast)
-    user = models.ForeignKey(UserAccount)
+    user = models.ForeignKey(User)
     subscribed_since = models.DateTimeField()
 
     def __unicode__(self):
@@ -215,31 +259,23 @@ class Subscription(models.Model):
     class Meta:
         db_table = 'current_subscription'
 
-class SubscriptionActionBase(models.Model):
+class SubscriptionAction(models.Model):
     device = models.ForeignKey(Device)
     podcast = models.ForeignKey(Podcast)
-    action = models.CharField(max_length=12, choices=SUBSCRIPTION_ACTION_TYPES)
+    action = models.IntegerField()
     timestamp = models.DateTimeField(blank=True, default=datetime.now)
 
+    def action_string(self):
+        return 'subscribe' if self.action == SUBSCRIBE_ACTION else 'unsubscribe'
+
+    def newer_than(self, action):
+        if (self.timestamp == action.timestamp): return self.id > action.id
+	return self.timestamp > action.timestamp
+
     def __unicode__(self):
-        return '%s %s %s' % (self.device, self.action, self.podcast)
+        return '%s %s %s %s' % (self.device.user, self.device, self.action_string(), self.podcast)
 
-    class Meta:
-        abstract = True
-        unique_together = ('device', 'podcast', 'action', 'timestamp')
-
-class SubscriptionAction(SubscriptionActionBase):
-    
     class Meta:
         db_table = 'subscription_log'
-
-class SyncGroupSubscriptionAction(SubscriptionActionBase):
-    """ READ ONLY MODEL """
-    sync_group = models.ForeignKey(SyncGroup)
-
-    def save(self, **kwargs):
-        raise NotImplementedError
-
-    class Meta:
-        db_table = 'sync_group_subscription_log'
+        unique_together = ('device', 'podcast', 'action', 'timestamp')
 

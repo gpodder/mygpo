@@ -1,37 +1,40 @@
-#http://scottbarnham.com/blog/2008/08/21/extending-the-django-user-model-with-inheritance/
+#
+# This file is part of my.gpodder.org.
+#
+# my.gpodder.org is free software: you can redistribute it and/or modify it
+# under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
+#
+# my.gpodder.org is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+# License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
+#
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.contrib.auth.backends import ModelBackend
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.fields import email_re
 from django.db.models import get_model
 
-class UserAccountModelBackend(ModelBackend):
+class EmailAuthenticationBackend(ModelBackend):
     def authenticate(self, username=None, password=None):
         if email_re.search(username):
             try:
-                user = self.user_class.objects.get(email=username)
-            except self.user_class.DoesNotExist:
+                user = User.objects.filter(email=username)[0]
+                return user if user.check_password(password) else None
+            except:
                 return None
-        else:
-            try:
-                user = self.user_class.objects.get(username=username)                
-            except self.user_class.DoesNotExist:
-                return None
-        if user.check_password(password):
-                    return user
+        return None
 
     def get_user(self, user_id):
         try:
-            return self.user_class.objects.get(pk=user_id)
-        except self.user_class.DoesNotExist:
+            return User.objects.get(pk=user_id)
+        except User.DoesNotExist:
             return None
-
-    @property
-    def user_class(self):
-        if not hasattr(self, '_user_class'):
-            self._user_class = get_model(*settings.CUSTOM_USER_MODEL.split('.', 2))
-            if not self._user_class:
-                raise ImproperlyConfigured('Could not get custom user model')
-        return self._user_class
 

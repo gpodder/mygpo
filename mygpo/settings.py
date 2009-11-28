@@ -1,4 +1,20 @@
 # Django settings for mygpo project.
+#
+# This file is part of my.gpodder.org.
+#
+# my.gpodder.org is free software: you can redistribute it and/or modify it
+# under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
+#
+# my.gpodder.org is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+# License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
+#
 
 import os.path
 
@@ -27,7 +43,7 @@ DATABASE_PORT = ''             # Set to empty string for default. Not used with 
 # although not all choices may be available on all operating systems.
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
-TIME_ZONE = 'America/Chicago'
+TIME_ZONE = 'UTC'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -91,7 +107,13 @@ INSTALLED_APPS = (
 ACCOUNT_ACTIVATION_DAYS = 7
 
 AUTHENTICATION_BACKENDS = (
-    'mygpo.auth_backends.UserAccountModelBackend',
+    'django.contrib.auth.backends.ModelBackend',
+    'mygpo.auth_backends.EmailAuthenticationBackend',
 )
 
-CUSTOM_USER_MODEL = 'api.UserAccount'
+DEFAULT_FROM_EMAIL = 'mygpo@my.gpodder.org'
+
+AUTH_PROFILE_MODULE = "api.UserProfile"
+
+LOGIN_URL = '/login/'
+

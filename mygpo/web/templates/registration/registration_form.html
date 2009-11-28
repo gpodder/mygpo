@@ -3,9 +3,11 @@
 {% block content %}
   <h1>Create a User Account</h1>
 
-  <form action="/contact/" method="POST">
-   {{ form.as_p }}
-   <input type="submit" value="Submit" />
+  <form action="/register/" method="POST">
+  <table class="register">
+   {{ form.as_table }}
+   <tr><th></th><td><input type="submit" value="Register" /></td></tr>
+   </table>
   </form>
 
 {% endblock %}

@@ -1,6 +1,24 @@
+#
+# This file is part of my.gpodder.org.
+#
+# my.gpodder.org is free software: you can redistribute it and/or modify it
+# under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
+#
+# my.gpodder.org is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+# License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
+#
+
 from django.http import HttpResponse
+from django.contrib.auth.models import User
 from mygpo.api.opml import Importer, Exporter
-from mygpo.api.models import Subscription, Podcast, UserAccount, SubscriptionAction, Device
+from mygpo.api.models import Subscription, Podcast, SubscriptionAction, Device, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION
 from datetime import datetime
 from django.utils.datastructures import MultiValueDictKeyError
 
@@ -28,7 +46,7 @@ def upload(request):
 
     existing_urls = [e.podcast.url for e in existing]
 
-    i = Importer(content=opml)
+    i = Importer(opml)
     podcast_urls = [p['url'] for p in i.items]
 
     new = [item for item in i.items if item['url'] not in existing_urls]
@@ -39,11 +57,11 @@ def upload(request):
                 'title' : n['title'],
                 'description': n['description'],
                 'last_update': datetime.now() })
-        s = SubscriptionAction(podcast=p,action='subscribe', timestamp=datetime.now(), device=d)
+        s = SubscriptionAction(podcast=p,action=SUBSCRIBE_ACTION, timestamp=datetime.now(), device=d)
         s.save()
 
     for r in rem:
-        s = SubscriptionAction(podcast=r, action='unsubscribe', timestamp=datetime.now(), device=d)
+        s = SubscriptionAction(podcast=r, action=UNSUBSCRIBE_ACTION, timestamp=datetime.now(), device=d)
         s.save()
 
     return HttpResponse('@SUCCESS', mimetype='text/plain')
@@ -60,7 +78,10 @@ def getlist(request):
         defaults = {'type': 'unknown', 'name': LEGACY_DEVICE_NAME})
 
     podcasts = [s.podcast for s in d.get_subscriptions()]
-    exporter = Exporter(filename='')
+
+    # FIXME: Get username and set a proper title (e.g. "thp's subscription list")
+    title = 'Your subscription list'
+    exporter = Exporter(title)
 
     opml = exporter.generate(podcasts)
 
@@ -71,12 +92,12 @@ def auth(emailaddr, password):
         return None
 
     try:
-        user = UserAccount.objects.get(email__exact=emailaddr)
-    except UserAccount.DoesNotExist:
+        user = User.objects.get(email__exact=emailaddr)
+    except User.DoesNotExist:
         return None
 
     if not user.check_password(password):
         return None
-    
+
     return user
 
