@@ -53,11 +53,19 @@ class PodcastAdmin(admin.ModelAdmin):
 class DeviceAdmin(admin.ModelAdmin):
     inlines = [SubscriptionActionInline]
 
+class SubscriptionAdmin(admin.ModelAdmin):
+    #empty ModelAdmin to work around bug 685
+    pass
+
+class SubscriptionActionAdmin(admin.ModelAdmin):
+    #empty ModelAdmin to work around bug 685
+    pass
+
 admin.site.unregister(User)
 admin.site.register(User, UserProfileAdmin)
 admin.site.register(Podcast, PodcastAdmin)
 admin.site.register(SyncGroup, SyncGroupAdmin)
 admin.site.register(Device, DeviceAdmin)
-admin.site.register(Subscription)
-admin.site.register(SubscriptionAction)
+admin.site.register(Subscription, SubscriptionAdmin)
+admin.site.register(SubscriptionAction, SubscriptionActionAdmin)
 

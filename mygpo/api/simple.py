@@ -17,9 +17,14 @@
 
 from mygpo.api.basic_auth import require_valid_user
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, Http404
+<<<<<<< HEAD:mygpo/api/simple.py
 from mygpo.api.models import Device, SubscriptionAction
+=======
+from mygpo.api.models import Device
+>>>>>>> 0d1d0b4ff5e300df602b0e88e8798fd9fc52fe62:mygpo/api/simple.py
 from mygpo.api.opml import Exporter, Importer
 from mygpo.api.json import JsonResponse
+from django.core import serializers
 
 @require_valid_user()
 def subscriptions(request, username, device_uid, format):
