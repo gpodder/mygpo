@@ -16,15 +16,9 @@
 #
 
 from mygpo.api.basic_auth import require_valid_user
-<<<<<<< HEAD:mygpo/api/simple.py
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, Http404
 from mygpo.api.models import Device, SubscriptionAction
-from mygpo.api.opml import Exporter
-=======
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
-from mygpo.api.models import Device
 from mygpo.api.opml import Exporter, Importer
->>>>>>> a85ea6372af96277f06888391f9f9d74d3911a51:mygpo/api/simple.py
 from mygpo.api.json import JsonResponse
 
 @require_valid_user()
@@ -34,21 +28,16 @@ def subscriptions(request, username, device_uid, format):
         return HttpResponseForbidden()
 
     if request.method == 'GET':
-        return format_subscriptions(get_subscriptions(username, device_uid), format)
+        return format_subscriptions(get_subscriptions(username, device_uid), format, username)
         
     elif request.method == 'PUT':
-<<<<<<< HEAD:mygpo/api/simple.py
-        return set_subscriptions(parse_subscription(request.raw_post_data, format, username, device_uid))
-=======
-	return request.raw_post_data
+	    return HttpResponse(request.raw_post_data.split('\''), mimetype='text/xml')
         #return set_subscriptions(device_uid, parse_subscription(request.raw_post_data, format))
->>>>>>> a85ea6372af96277f06888391f9f9d74d3911a51:mygpo/api/simple.py
-
     else:
         return HttpResponseBadReqest()
 
 
-def format_subscriptions(subscriptions, format):
+def format_subscriptions(subscriptions, format, username):
     if format == 'txt':
         #return subscriptions formatted as txt
         urls = [p.url for p in subscriptions]
@@ -56,21 +45,14 @@ def format_subscriptions(subscriptions, format):
         return HttpResponse(s, mimetype='text/plain')
 
     elif format == 'opml':
-        # FIXME: We could include the username in the title
-        title = 'Your subscription list'
+        title = username + '\'s subscription list'
         exporter = Exporter(title)
         opml = exporter.generate(subscriptions)
         return HttpResponse(opml, mimetype='text/xml')
 
     elif format == 'json':
-<<<<<<< HEAD:mygpo/api/simple.py
-	json_serializer = serializers.get_serializer("json")()
-	p = json_serializer.serialize(subscriptions, fields=('title', 'description', 'url'))
-        return JsonResponse(p)
-=======
-	urls = [p.url for p in subscriptions]
+        urls = [p.url for p in subscriptions]
         return JsonResponse(urls)
->>>>>>> a85ea6372af96277f06888391f9f9d74d3911a51:mygpo/api/simple.py
 
 def get_subscriptions(username, device_uid):
     #get and return subscription list from database (use backend to sync)
@@ -79,16 +61,11 @@ def get_subscriptions(username, device_uid):
 
 def parse_subscription(raw_post_data, format, username, device_uid):
     if format == 'txt':
-	urls = []
+	    urls = raw_post_data.split('\n')
 
     elif format == 'opml':
-<<<<<<< HEAD:mygpo/api/simple.py
         i = Importer(content=raw_post_data)
-	urls = [p['url'] for p in i.items]
-=======
-        i = Importer(raw_post_data)
-        return i.items
->>>>>>> a85ea6372af96277f06888391f9f9d74d3911a51:mygpo/api/simple.py
+        urls = [p['url'] for p in i.items]
 
     elif format == 'json':
         #deserialize json
@@ -109,17 +86,14 @@ def set_subscriptions(subscriptions):
     d, created = Device.objects.get_or_create(uid=subscriptions[2], user__username=subscriptions[3])
 
     for r in rem:
-	s=SubscriptionAction(podcast=r, action='unsubscribe', timestamp=datetime.now(), device=d)
-	s.save()
+	    s=SubscriptionAction(podcast=r, action='unsubscribe', timestamp=datetime.now(), device=d)
+	    s.save()
 	
     for n in new:
-	 p, created = Podcast.objects.get_or_create(url=n['url'], defaults={
-                'title' : n['title'],
-                'description': n['description'],
-                'last_update': datetime.now() })
-
-	s=SubscriptionAction(podcast=p, action='subscribe', timestamp=datetime.now(), device=d)
+        p, created = Podcast.objects.get_or_create(url=n['url'], defaults={'title' : n['title'], 'description': n['description'], 'last_update': datetime.now() })
+        
+        s=SubscriptionAction(podcast=p, action='subscribe', timestamp=datetime.now(), device=d)
         s.save()
 
-    return HttpResponse('Success', mimetype='text/plain#)
+    return HttpResponse('Success', mimetype='text/plain')
 
