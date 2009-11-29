@@ -1,0 +1,48 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-11-29 13:26+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: web/templates/home-user.html:5
+msgid "Your Subscriptions"
+msgstr "Deine Abonnements"
+
+#: web/templates/home-user.html:6
+msgid "This page is currently in development."
+msgstr "Diese Seite befindet sich im Aufbau."
+
+#: web/templates/home.html:6
+msgid ""
+"my.gpodder.org is a webservice for synchronizing podcast subscriptions on "
+"several devices and applications."
+msgstr ""
+"my.gpodder.org ist ein Webservice für das Synchronisieren von Podcast-"
+"Abonnements auf verschiedenen Geräten und Anwendungen."
+
+#: web/templates/home.html:8
+msgid "We are currently tracking one Podcast!"
+msgid_plural "We are currently tracking %(podcast_count)s Podcasts!"
+msgstr[0] "Es wird zur Zeit ein Podcast verfolgt!"
+msgstr[1] "Es werden zur Zeit %(podcast_count)s Podcast verfolgt!"
+
+#: web/templates/home.html:20
+msgid "Not yet a member?"
+msgstr "Noch kein Mitglied?"
+
+#: web/templates/home.html:20
+msgid "Register!"
+msgstr "Registrieren!"
+
