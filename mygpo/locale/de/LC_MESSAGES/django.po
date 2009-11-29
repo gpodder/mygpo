@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-11-29 10:39+0100\n"
+"POT-Creation-Date: 2009-11-29 13:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -33,20 +33,16 @@ msgstr ""
 "Abonnements auf verschiedenen Geräten und Anwendungen."
 
 #: web/templates/home.html:8
-#, fuzzy, python-format
-msgid ""
-"\n"
-"  We are currently tracking one Podcast!\n"
-msgid_plural ""
-"\n"
-"  We are currently tracking %(podcast_count)s Podcasts!\n"
-msgstr[0] ""
-" \n"
-" Es wird zur Zeit ein Podcast verfolgt!\n"
-msgstr[1] ""
-" \n"
-" Es werden zur Zeit %(podcast_count)s Podcasts verfolgt!\n"
+msgid "We are currently tracking one Podcast!"
+msgid_plural "We are currently tracking %(podcast_count)s Podcasts!"
+msgstr[0] "Es wird zur Zeit ein Podcast verfolgt!"
+msgstr[1] "Es werden zur Zeit %(podcast_count)s Podcast verfolgt!"
 
-#: web/templates/home.html:24
+#: web/templates/home.html:20
 msgid "Not yet a member?"
 msgstr "Noch kein Mitglied?"
+
+#: web/templates/home.html:20
+msgid "Register!"
+msgstr "Registrieren!"
+
