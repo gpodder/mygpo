@@ -20,13 +20,26 @@ from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbid
 from mygpo.api.models import Device
 from mygpo.api.json import JsonResponse
 from django.core import serializers
+from time import mktime
+from datetime import datetime
+import json
 
 @require_valid_user()
 def subscriptions(request, username, device_uid):
-    
+
     if request.user.username != username:
         return HttpResponseForbidden()
 
+    timestamp = mktime(datetime.now().timetuple())
+
+    if request.method == 'GET':
+
+
+    elif request.method == 'POST':
+        actions = json.loads(request.POST['data'])
+
+    else
+        return HttpResponseBadRequest()
 
 @require_valid_user()
 def episodes(request, username):
