@@ -22,6 +22,7 @@ from mygpo.api.opml import Exporter, Importer
 from mygpo.api.json import JsonResponse
 from django.core import serializers
 from datetime import datetime
+import re
 
 @require_valid_user()
 def subscriptions(request, username, device_uid, format):
@@ -70,9 +71,9 @@ def parse_subscription(raw_post_data, format, username, device_uid):
         urls = [p['url'] for p in i.items]
 
     elif format == 'json':
-        #deserialize json
-        sub = raw_post_data[3:-1].split(',')
-        urls = [x[1:-1] for x in sub]
+        sub = raw_post_data.split('"')
+        pattern = '^[a-zA-z]+'
+        urls = [x for x in sub if re.search(pattern, x) != None]
 
     else: raise ValueError('unsupported format %s' % format)
 
