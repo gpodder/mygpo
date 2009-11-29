@@ -39,10 +39,18 @@ urlpatterns = patterns('',
     (r'^activate/(?P<activation_key>\w+)$', activate),
     (r'^info/$', 'django.views.generic.simple.direct_to_template', {'template': 'info.html'}),
 
+    #Legacy API
     (r'^upload$', 'mygpo.api.legacy.upload'),
     (r'^getlist$', 'mygpo.api.legacy.getlist'),
 
+    #Simple API
     (r'^subscriptions/(?P<username>\w+)/(?P<device>\w+).(?P<format>(txt|opml|json))', 'mygpo.api.simple.subscriptions'),
+
+    #Advanced API
+    (r'^api/1/subscriptions/(?P<username>\w+)/(?P<device_uid>\w+).json', 'mygpo.api.advanced.subscriptions'),
+    (r'^api/1/episodes/(?P<username>\w+).json', 'mygpo.api.advanced.episodes'),
+    (r'^api/1/devices/(?P<username>\w+)/(?P<device_uid>\w+).json', 'mygpo.api.advanced.device'),
+    (r'^api/1/devices/(?P<username>\w+)/devices.json'),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs'
     # to INSTALLED_APPS to enable admin documentation:
