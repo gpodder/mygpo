@@ -17,10 +17,11 @@
 
 from mygpo.api.basic_auth import require_valid_user
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, Http404
-from mygpo.api.models import Device, SubscriptionAction
+from mygpo.api.models import Device, SubscriptionAction, Podcast, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION
 from mygpo.api.opml import Exporter, Importer
 from mygpo.api.json import JsonResponse
 from django.core import serializers
+from datetime import datetime
 
 @require_valid_user()
 def subscriptions(request, username, device_uid, format):
@@ -32,8 +33,7 @@ def subscriptions(request, username, device_uid, format):
         return format_subscriptions(get_subscriptions(username, device_uid), format, username)
         
     elif request.method == 'PUT':
-	    return HttpResponse(request.raw_post_data.split('\''), mimetype='text/xml')
-        #return set_subscriptions(device_uid, parse_subscription(request.raw_post_data, format))
+        return set_subscriptions(parse_subscription(request.raw_post_data, format, username, device_uid))
     else:
         return HttpResponseBadReqest()
 
@@ -62,7 +62,8 @@ def get_subscriptions(username, device_uid):
 
 def parse_subscription(raw_post_data, format, username, device_uid):
     if format == 'txt':
-	urls = raw_post_data.split('\n')
+	    urls = raw_post_data.split('\n')
+	    urls = [x for x in urls if x != '\r']
 
     elif format == 'opml':
         i = Importer(content=raw_post_data)
@@ -70,31 +71,30 @@ def parse_subscription(raw_post_data, format, username, device_uid):
 
     elif format == 'json':
         #deserialize json
-        urls = []
+        sub = raw_post_data[3:-1].split(',')
+        urls = [x[1:-1] for x in sub]
 
     else: raise ValueError('unsupported format %s' % format)
 
-    old = [p.url for p in get_subscriptions(username, device_uid)]
-    new = [p for p in urls if urls not in old]
-    rem = [p for p in old if old not in urls]
-    return new, rem, username, device_uid
+    d, created = Device.objects.get_or_create(user__username=username, uid=device_uid, defaults = {'type': 'other', 'name': 'unknown'})
+    old = [p.url for p in d.get_subscriptions()]
+    new = [p for p in urls if p not in old]
+    rem = [p for p in old if p not in urls]
+    return new, rem, username, d
 
 
 def set_subscriptions(subscriptions):
-    new = subscriptions[0]
-    rem = subscriptions[1]
-
-    d, created = Device.objects.get_or_create(uid=subscriptions[2], user__username=subscriptions[3])
-
+    new, rem, username, d = subscriptions
+    
     for r in rem:
-	    s=SubscriptionAction(podcast=r, action='unsubscribe', timestamp=datetime.now(), device=d)
+	    s = SubscriptionAction(podcast=r, action=UNSUBSCRIBE_ACTION, timestamp=datetime.now(), device=d)
 	    s.save()
 	
     for n in new:
-        p, created = Podcast.objects.get_or_create(url=n['url'], defaults={'title' : n['title'], 'description': n['description'], 'last_update': datetime.now() })
+        p, created = Podcast.objects.get_or_create(url=n,defaults={'title':n,'description':n,'last_update':datetime.now()})
         
-        s=SubscriptionAction(podcast=p, action='subscribe', timestamp=datetime.now(), device=d)
+        s = SubscriptionAction(podcast=p,action=SUBSCRIBE_ACTION, timestamp=datetime.now(), device=d)
         s.save()
-
+        
     return HttpResponse('Success', mimetype='text/plain')
 
