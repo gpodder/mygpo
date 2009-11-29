@@ -17,14 +17,7 @@
 
 from mygpo.api.basic_auth import require_valid_user
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, Http404
-<<<<<<< HEAD:mygpo/api/simple.py
-<<<<<<< HEAD:mygpo/api/simple.py
 from mygpo.api.models import Device, SubscriptionAction
-=======
-=======
->>>>>>> e4a263586e9b47bdb14c14a7b3d299e58b7d699c:mygpo/api/simple.py
-from mygpo.api.models import Device
->>>>>>> 0d1d0b4ff5e300df602b0e88e8798fd9fc52fe62:mygpo/api/simple.py
 from mygpo.api.opml import Exporter, Importer
 from mygpo.api.json import JsonResponse
 from django.core import serializers
@@ -69,7 +62,7 @@ def get_subscriptions(username, device_uid):
 
 def parse_subscription(raw_post_data, format, username, device_uid):
     if format == 'txt':
-	    urls = raw_post_data.split('\n')
+	urls = raw_post_data.split('\n')
 
     elif format == 'opml':
         i = Importer(content=raw_post_data)
