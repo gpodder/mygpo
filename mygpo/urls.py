@@ -50,7 +50,7 @@ urlpatterns = patterns('',
     (r'^api/1/subscriptions/(?P<username>\w+)/(?P<device_uid>\w+).json', 'mygpo.api.advanced.subscriptions'),
     (r'^api/1/episodes/(?P<username>\w+).json', 'mygpo.api.advanced.episodes'),
     (r'^api/1/devices/(?P<username>\w+)/(?P<device_uid>\w+).json', 'mygpo.api.advanced.device'),
-    (r'^api/1/devices/(?P<username>\w+)/devices.json'),
+    (r'^api/1/devices/(?P<username>\w+)/devices.json', 'mygpo.apo.advaced.devices'),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs'
     # to INSTALLED_APPS to enable admin documentation:
