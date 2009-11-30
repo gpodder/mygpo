@@ -5,7 +5,7 @@
   <h1>my.gpodder.org</h1>
   <p>{% trans "my.gpodder.org is a webservice for synchronizing podcast subscriptions on several devices and applications." %}</p>
 <p>
-{% blocktrans count list|length as podcast_count %}We are currently tracking one Podcast!{% plural %}We are currently tracking {{ podcast_count }} Podcasts!{% endblocktrans %}
+{% blocktrans %}We are currently tracking {{ podcast_count }} Podcasts!{% endblocktrans %}
 </p>
    <h2>Login</h2>
    <form action="../login/" method="post">
