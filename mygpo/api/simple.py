@@ -17,10 +17,12 @@
 
 from mygpo.api.basic_auth import require_valid_user
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, Http404
-from mygpo.api.models import Device
+from mygpo.api.models import Device, SubscriptionAction, Podcast, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION
 from mygpo.api.opml import Exporter, Importer
 from mygpo.api.json import JsonResponse
 from django.core import serializers
+from datetime import datetime
+import re
 
 @require_valid_user()
 def subscriptions(request, username, device_uid, format):
@@ -29,17 +31,15 @@ def subscriptions(request, username, device_uid, format):
         return HttpResponseForbidden()
 
     if request.method == 'GET':
-        return format_subscriptions(get_subscriptions(username, device_uid), format)
+        return format_subscriptions(get_subscriptions(username, device_uid), format, username)
         
     elif request.method == 'PUT':
-	return request.raw_post_data
-        #return set_subscriptions(device_uid, parse_subscription(request.raw_post_data, format))
-
+        return set_subscriptions(parse_subscription(request.raw_post_data, format, username, device_uid))
     else:
         return HttpResponseBadReqest()
 
 
-def format_subscriptions(subscriptions, format):
+def format_subscriptions(subscriptions, format, username):
     if format == 'txt':
         #return subscriptions formatted as txt
         urls = [p.url for p in subscriptions]
@@ -47,14 +47,13 @@ def format_subscriptions(subscriptions, format):
         return HttpResponse(s, mimetype='text/plain')
 
     elif format == 'opml':
-        # FIXME: We could include the username in the title
-        title = 'Your subscription list'
+        title = username + '\'s subscription list'
         exporter = Exporter(title)
         opml = exporter.generate(subscriptions)
         return HttpResponse(opml, mimetype='text/xml')
 
     elif format == 'json':
-	urls = [p.url for p in subscriptions]
+        urls = [p.url for p in subscriptions]
         return JsonResponse(urls)
 
 def get_subscriptions(username, device_uid):
@@ -62,20 +61,43 @@ def get_subscriptions(username, device_uid):
     d = Device.objects.get(uid=device_uid, user__username=username)
     return [p.podcast for p in d.get_subscriptions()]
 
-def parse_subscription(raw_post_data, format):
+def parse_subscription(raw_post_data, format, username, device_uid):
     if format == 'txt':
-        return []
+	    urls = raw_post_data.split('\n')
+	    urls = [x for x in urls if x != '\r']
 
     elif format == 'opml':
-        i = Importer(raw_post_data)
-        return i.items
+        i = Importer(content=raw_post_data)
+        urls = [p['url'] for p in i.items]
 
     elif format == 'json':
-        #deserialize json
-        return []
+        sub = raw_post_data.split('"')
+        pattern = '^[a-zA-z]+'
+        urls = [x for x in sub if re.search(pattern, x) != None]
 
     else: raise ValueError('unsupported format %s' % format)
 
-def set_subscriptions(device_uid, subscriptions):
-    # save subscriptions in database
-    pass
+    d, created = Device.objects.get_or_create(user__username=username, uid=device_uid, defaults = {'type': 'other', 'name': 'unknown'})
+    podcasts = [p.podcast for p in d.get_subscriptions()]
+    old = [p.url for p in podcasts]
+    new = [p for p in urls if p not in old]
+    rem = [p for p in old if p not in urls]
+    return new, rem, username, d
+
+
+def set_subscriptions(subscriptions):
+    new, rem, username, d = subscriptions
+    
+    print new
+    for r in rem:
+	    s = SubscriptionAction(podcast=r, action=UNSUBSCRIBE_ACTION, timestamp=datetime.now(), device=d)
+	    s.save()
+	
+    for n in new:
+        p, created = Podcast.objects.get_or_create(url=n,defaults={'title':n,'description':n,'last_update':datetime.now()})
+        
+        s = SubscriptionAction(podcast=p,action=SUBSCRIBE_ACTION, timestamp=datetime.now(), device=d)
+        s.save()
+        
+    return HttpResponse('Success', mimetype='text/plain')
+
