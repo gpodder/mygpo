@@ -2,11 +2,12 @@
 
 {% block content %}
   <h1>my.gpodder.org</h1>
-  <p>The new my.gpodder.org uses usernames instead of email addresses. Based on your email address, we think you might like <strong>{{username}}</strong>, but you can change that if you want to.</p>
+  <p>{% trans "The new my.gpodder.org uses usernames instead of email addresses. Based on your email address, we think you might like " %}<strong>{{username}}</strong>{% trans ", but you can change that if you want to." %}</p>
+
   <form action="/migrate/" method="post">
   Username: <input type="text" name="username" value="{{ username }}"/><br /><br />
   <input type="submit" name="submit" value="Submit" />
   </form>
-  <p>You can keep your old user settings in gPodder. Once the next version (with lots of new features) is release, you'll have to replace your email address with your username.</p>
+  <p>{% trans "You can keep your old user settings in gPodder. Once the next version (with lots of new features) is release, you'll have to replace your email address with your username." %}</p>
 {% endblock %}
 
