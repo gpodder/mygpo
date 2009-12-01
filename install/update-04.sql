@@ -83,4 +83,5 @@ END;//
 DELIMITER ;
 
 
+ALTER TABLE episode_log MODIFY action ENUM ('download', 'play', 'delete', 'new') NOT NULL;
 
