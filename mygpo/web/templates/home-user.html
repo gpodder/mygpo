@@ -6,19 +6,19 @@
   <p>{% trans "This page is currently in development." %}</p>
   <table style="width:100%;">
 	<tr>
-		<th style="padding-right:100px;"></th>
+		<th style="padding-right:100px;">{{ test }}</th>
 		<th style="padding-right:200px;">Title</th>
 		<th style="padding-right:200px;">Latest Episode</th>
 		<th style="padding-right:200px;">Devices</th>
 	</tr>
        {% for s in subscriptionlist %}
 	<tr>
-		<td>{{ s.logo }}</td>
+		<td>{{ s.logo_url }}</td>
 		<td>{{ s.title }}</td>
 		<td>Episode</td>
-		<td>{{ s.device }}</td>
+		<td>device</td>
 	</tr>
-       {% endfor %} 
+       {% endfor %}
   </table>
 {% endblock %}
 
