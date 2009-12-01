@@ -22,19 +22,21 @@ from mygpo.api.opml import Exporter, Importer
 from mygpo.api.json import JsonResponse
 from django.core import serializers
 from datetime import datetime
+from mygpo.api.httpresponse import HttpResponseNotAuthorized
 import re
 
 @require_valid_user()
 def subscriptions(request, username, device_uid, format):
     
     if request.user.username != username:
-        return HttpResponseForbidden()
+        #throw 401
+        return HttpResponseNotAuthorized()
 
     if request.method == 'GET':
-        return format_subscriptions(get_subscriptions(username, device_uid), format, username)
+        return format_subscriptions(get_subscriptions(request.user, device_uid), format, username)
         
     elif request.method == 'PUT':
-        return set_subscriptions(parse_subscription(request.raw_post_data, format, username, device_uid))
+        return set_subscriptions(parse_subscription(request.raw_post_data, format, request.user, device_uid))
     else:
         return HttpResponseBadReqest()
 
@@ -44,6 +46,7 @@ def format_subscriptions(subscriptions, format, username):
         #return subscriptions formatted as txt
         urls = [p.url for p in subscriptions]
         s = "\n".join(urls)
+        s += "\n"
         return HttpResponse(s, mimetype='text/plain')
 
     elif format == 'opml':
@@ -56,18 +59,18 @@ def format_subscriptions(subscriptions, format, username):
         urls = [p.url for p in subscriptions]
         return JsonResponse(urls)
 
-def get_subscriptions(username, device_uid):
+def get_subscriptions(user, device_uid):
     #get and return subscription list from database (use backend to sync)
     try:
-        d = Device.objects.get(uid=device_uid, user__username=username)
+        d = Device.objects.get(uid=device_uid, user=user)
     except Device.DoesNotExist:
-        raise Http404
+        raise Http404('Device doesn\'t exist!')
     return [p.podcast for p in d.get_subscriptions()]
 
-def parse_subscription(raw_post_data, format, username, device_uid):
+def parse_subscription(raw_post_data, format, user, device_uid):
     if format == 'txt':
-	    urls = raw_post_data.split('\n')
-	    urls = [x for x in urls if x != '\r']
+        sub = raw_post_data.split('\n')
+        urls = [x for x in sub if x != '\r']
 
     elif format == 'opml':
         i = Importer(content=raw_post_data)
@@ -75,32 +78,37 @@ def parse_subscription(raw_post_data, format, username, device_uid):
 
     elif format == 'json':
         sub = raw_post_data.split('"')
-        pattern = '^[a-zA-z]+'
+        pattern = '^[a-zA-z]'
         urls = [x for x in sub if re.search(pattern, x) != None]
 
     else: raise ValueError('unsupported format %s' % format)
-
-    d, created = Device.objects.get_or_create(user__username=username, uid=device_uid, defaults = {'type': 'other', 'name': 'unknown'})
+    
+    d, created = Device.objects.get_or_create(user=user, uid=device_uid, 
+                defaults = {'type': 'other', 'name': 'unknown_' + device_uid})
+    
     podcasts = [p.podcast for p in d.get_subscriptions()]
-    old = [p.url for p in podcasts]
+    old = [p.url for p in podcasts]    
     new = [p for p in urls if p not in old]
     rem = [p for p in old if p not in urls]
-    return new, rem, username, d
+    
+    return new, rem, d
 
 
 def set_subscriptions(subscriptions):
-    new, rem, username, d = subscriptions
+    new, rem, d = subscriptions
     
-    print new
-    for r in rem:
-	    s = SubscriptionAction(podcast=r, action=UNSUBSCRIBE_ACTION, timestamp=datetime.now(), device=d)
-	    s.save()
+    if new != []:
+        for n in new:
+            p, created = Podcast.objects.get_or_create(url=n,
+                        defaults={'title':n,'description':n,'last_update':datetime.now()})
+            s = SubscriptionAction(podcast=p, action=SUBSCRIBE_ACTION, device=d)
+            s.save()
+    
+    if rem != []: 
+        for r in rem:
+            p = Podcast.objects.get(url=r)
+            s = SubscriptionAction(podcast=p, action=UNSUBSCRIBE_ACTION, device=d)
+            s.save()
 	
-    for n in new:
-        p, created = Podcast.objects.get_or_create(url=n,defaults={'title':n,'description':n,'last_update':datetime.now()})
-        
-        s = SubscriptionAction(podcast=p,action=SUBSCRIBE_ACTION, timestamp=datetime.now(), device=d)
-        s.save()
-        
     return HttpResponse('Success', mimetype='text/plain')
 
