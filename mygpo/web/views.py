@@ -23,31 +23,10 @@ from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeActio
 
 def home(request):
        if request.user.is_authenticated():
-              userid = UserProfile.objects.filter(user=request.user)[0].id
-              device = Device.objects.filter(user=userid)
-              device_ids = [d.id for d in device]
-              sublog = SubscriptionAction.objects.filter(device__in=device_ids)
-              sublog_podcastids = [s.podcast_id for s in sublog]
-              podcast = Podcast.objects.filter(id__in=sublog_podcastids)
-              podcast_titles = [p.title for p in podcast]
-              podcast_logourls = [p.logo_url for p in podcast]
-              podcast_ids = [p.id for p in podcast]
-                       
-              subscriptionlist = Ddict( dict )
-
-              for listindex, title in enumerate(podcast_titles):
-                    subscriptionlist[listindex]['logo'] = podcast_logourls[listindex]
-                    subscriptionlist[listindex]['title'] = title                     
-                    
-                    sl = SubscriptionAction.objects.filter(podcast=podcast_ids[listindex])
-                    sldev_ids = [s.device.id for s in sl]  
-                    dev = Device.objects.filter(id__in=sldev_ids)
-                    dev_names = [d.name for d in dev]
-                    subscriptionlist[listindex]['device'] = dev_names                          
+              subscriptionlist = create_subscriptionlist(request)              
 
               return render_to_response('home-user.html', {
-                    'subscriptionlist': subscriptionlist,
-                    'test': subscriptionlist[0]['device']
+                    'subscriptionlist': subscriptionlist
               }, context_instance=RequestContext(request))
 
        else:
@@ -56,12 +35,30 @@ def home(request):
                     'podcast_count': podcasts
               })
 
-class Ddict(dict):
-    def __init__(self, default=None):
-        self.default = default
+def create_subscriptionlist(request):
+      userid = UserProfile.objects.filter(user=request.user)[0].id
+      device = Device.objects.filter(user__id=userid)
+      device_ids = [d.id for d in device]
+      sublog = SubscriptionAction.objects.filter(device__in=device_ids)
+      sublog_podcastids = [s.podcast_id for s in sublog]
 
-    def __getitem__(self, key):
-        if not self.has_key(key):
-            self[key] = self.default()
-        return dict.__getitem__(self, key)
+      podcast = Podcast.objects.filter(id__in=sublog_podcastids).order_by('title')
+      subscriptionlist = [{'title': p.title, 'logo': p.logo_url, 'id': p.id} for p in podcast]
 
+      for index, entry in enumerate(subscriptionlist):
+            sublog_for_device = SubscriptionAction.objects.filter(podcast__id=subscriptionlist[index]['id'])
+            sublog_devids = [s.device.id for s in sublog_for_device]
+            dev = Device.objects.filter(id__in=sublog_devids, user__id=userid).values_list('name', flat=True)
+            subscriptionlist[index]['device'] = ''
+            for d in dev:
+                 subscriptionlist[index]['device'] += d + ", "
+            subscriptionlist[index]['episode'] = 'epi'
+      return subscriptionlist
+
+
+
+
+#sl = SubscriptionAction.objects.filter(podcast=podcast_ids[listindex])
+#sldev_ids = [s.device.id for s in sl]  
+#dev = Device.objects.filter(id__in=sldev_ids)
+#dev_names = [d.name for d in dev]
