@@ -52,7 +52,7 @@ class UserProfile(models.Model):
         db_table = 'user'
 
 class Podcast(models.Model):
-    url = models.URLField()
+    url = models.URLField(unique=True)
     title = models.CharField(max_length=100)
     description = models.TextField()
     link = models.URLField()
@@ -76,7 +76,7 @@ class Podcast(models.Model):
 
 class Episode(models.Model):
     podcast = models.ForeignKey(Podcast)
-    url = models.URLField()
+    url = models.URLField(unique=True)
     title = models.CharField(max_length=100)
     description = models.TextField()
     link = models.URLField()
@@ -267,7 +267,7 @@ class Device(models.Model):
 class EpisodeAction(models.Model):
     user = models.ForeignKey(User, primary_key=True)
     episode = models.ForeignKey(Episode)
-    device = models.ForeignKey(Device)
+    device = models.ForeignKey(Device,)
     action = models.IntegerField(choices=EPISODE_ACTION_TYPES)
     timestamp = models.DateTimeField(default=datetime.now)
     playmark = models.IntegerField()
@@ -277,6 +277,7 @@ class EpisodeAction(models.Model):
 
     class Meta:
         db_table = 'episode_log'
+        unique_together = ('user', 'episode', 'timestamp')
 
 
 class Subscription(models.Model):
@@ -309,5 +310,5 @@ class SubscriptionAction(models.Model):
 
     class Meta:
         db_table = 'subscription_log'
-        unique_together = ('device', 'podcast', 'action', 'timestamp')
+        unique_together = ('device', 'podcast', 'timestamp')
 
