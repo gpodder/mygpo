@@ -41,9 +41,24 @@ def create_subscriptionlist(request):
       device_ids = [d.id for d in device]
       sublog = SubscriptionAction.objects.filter(device__in=device_ids)
       sublog_podcastids = [s.podcast_id for s in sublog]
-      podcast = Podcast.objects.filter(id__in=sublog_podcastids)
+
+      podcast = Podcast.objects.filter(id__in=sublog_podcastids).order_by('title')
       subscriptionlist = [{'title': p.title, 'logo': p.logo_url, 'id': p.id} for p in podcast]
+
       for index, entry in enumerate(subscriptionlist):
+            sublog_for_device = SubscriptionAction.objects.filter(podcast__id=subscriptionlist[index]['id'])
+            sublog_devids = [s.device.id for s in sublog_for_device]
+            dev = Device.objects.filter(id__in=sublog_devids, user__id=userid).values_list('name', flat=True)
+            subscriptionlist[index]['device'] = ''
+            for d in dev:
+                 subscriptionlist[index]['device'] += d + ", "
             subscriptionlist[index]['episode'] = 'epi'
       return subscriptionlist
 
+
+
+
+#sl = SubscriptionAction.objects.filter(podcast=podcast_ids[listindex])
+#sldev_ids = [s.device.id for s in sl]  
+#dev = Device.objects.filter(id__in=sldev_ids)
+#dev_names = [d.name for d in dev]

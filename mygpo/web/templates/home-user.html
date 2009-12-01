@@ -8,15 +8,19 @@
 	<tr>
 		<th style="padding-right:100px;">{{ test }}</th>
 		<th style="padding-right:200px;">Title</th>
-		<th style="padding-right:200px;">Latest Episode</th>
+		<!-- th style="padding-right:200px;">Latest Episode</th -->
 		<th style="padding-right:200px;">Devices</th>
 	</tr>
        {% for s in subscriptionlist %}
 	<tr>
-		<td>{{ s.logo_url }}</td>
+		<td> 
+                  {% if s.logo %}
+                  <img src="{{ s.logo }}" style="width:40px; height:30px;" />
+                  {% endif %}                  
+              </td>
 		<td>{{ s.title }}</td>
-		<td>Episode</td>
-		<td>device</td>
+		<!-- td>{{ s.episode }}</td -->
+		<td>{{ s.device }}</td>
 	</tr>
        {% endfor %}
   </table>
