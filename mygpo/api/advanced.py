@@ -63,6 +63,7 @@ def subscriptions(request, username, device_uid):
     else:
         return HttpResponseNotAllowed(['GET', 'POST'])
 
+
 def update_subscriptions(user, device, add, remove):
     for add in actions['add']:
         p = Podcast.objects.get_or_create(url=add)
@@ -72,9 +73,10 @@ def update_subscriptions(user, device, add, remove):
         p = Podcast.objects.get_or_create(url=remove)
         s = SubscriptionAction.objects.create(podcast=p,device=d,action=UNSUBSCRIBE_ACTION)
 
+
 def get_subscription_changes(user, device, since, until):
     actions = {}
-    for a in SubscriptionAction.objects.filter(device=device, timestamp__gt=since).order_by('timestamp'):
+    for a in SubscriptionAction.objects.filter(device=device, timestamp__gt=since, timestamp__lt=until).order_by('timestamp'):
         #ordered by ascending date; newer entries overwriter older ones
         actions[a.podcast] = a
 
@@ -88,6 +90,7 @@ def get_subscription_changes(user, device, since, until):
             remove.append(a.podcast.url)
 
     return {'add': add, 'remove': remove, 'timestamp': until}
+
 
 @require_valid_user()
 def episodes(request, username):
@@ -106,8 +109,38 @@ def episodes(request, username):
         update_episodes(request.user, actions)
         return HttpResponse()
 
+    elif request.method == 'GET':
+        podcast_id = request.GET.get('podcast', None)
+        device_id  = request.GET.get('device', None)
+        since      = request.GET.get('since', None)
+
+        try:
+            podcast = Podcast.objects.get(pk=podcast_id) if podcast_id else None
+            device  = Device.objects.get(pk=device_id) if device_id else None
+        except:
+            return Http404
+
+        return JsonRequest(get_episode_changes(request.user, podcast, device, since, now))
+
     else:
-        return HttpResponseNotAllowed(['POST'])
+        return HttpResponseNotAllowed(['POST', 'GET'])
+
+
+def get_episode_changes(user, podcast, device, since, until).
+    actions = []
+    for a in EpisodeAction.objects.filter(user=user, podcast=podcast, device=device, timestamp__gt=since, timestamp__lt=until):
+        action = {
+            'podcast': a.episode.podcast.url,
+            'episode': a.episode.url,
+            'action':  a.action,
+            'timestamp': a.timestamp
+        }
+
+        if a.action == 'play': action['time'] = a.playmark
+
+        actions.append(action)
+
+    return {'timestamp': since, 'actions': actions}
 
 
 def update_episodes(user, actions):
@@ -130,6 +163,7 @@ def update_episodes(user, actions):
 
         EpisodeAction.objects.create(user=user, episode=episode, device=device, action=action, timestamp=timestamp, playmark=position)
 
+
 @require_valid_user()
 def device(request, username, device_uid):
 
@@ -146,7 +180,7 @@ def device(request, username, device_uid):
 
         if 'type' in data:
             if not data['type'] in DEVICE_TYPES:
-                return 
+                return HttpResponseBadRequest('invalid device type %s' % data['type'])
             d.type = data['type']
 
         d.save()
