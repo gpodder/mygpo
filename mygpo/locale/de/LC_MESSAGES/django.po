@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-11-29 13:26+0100\n"
+"POT-Creation-Date: 2009-11-30 18:29+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -33,10 +33,9 @@ msgstr ""
 "Abonnements auf verschiedenen Geräten und Anwendungen."
 
 #: web/templates/home.html:8
-msgid "We are currently tracking one Podcast!"
-msgid_plural "We are currently tracking %(podcast_count)s Podcasts!"
-msgstr[0] "Es wird zur Zeit ein Podcast verfolgt!"
-msgstr[1] "Es werden zur Zeit %(podcast_count)s Podcast verfolgt!"
+#, python-format
+msgid "We are currently tracking %(podcast_count)s Podcasts!"
+msgstr "Es werden zur Zeit %(podcast_count)s Podcasts verfolgt!"
 
 #: web/templates/home.html:20
 msgid "Not yet a member?"
@@ -46,3 +45,19 @@ msgstr "Noch kein Mitglied?"
 msgid "Register!"
 msgstr "Registrieren!"
 
+#: web/templates/migrate.html:5
+msgid ""
+"The new my.gpodder.org uses usernames instead of email addresses. Based on "
+"your email address, we think you might like "
+msgstr "Das neue my.gpodder.org Benutzername anstatt Emailadressen, der basierend auf deiner Emailadresse erzeugt wird. Wir denken, du wirst ihn mögen "
+
+#: web/templates/migrate.html:5
+msgid ", but you can change that if you want to."
+msgstr ", falls nicht kannst du ihn einfach ändern."
+
+#: web/templates/migrate.html:11
+msgid ""
+"You can keep your old user settings in gPodder. Once the next version (with "
+"lots of new features) is release, you'll have to replace your email address "
+"with your username."
+msgstr "Du kannst deine alten Einstellung von gPodder übernehmen. Sobald die nächste Version (mit vielen neuen Funktionen) veröffentlicht wurde, musst du für den Zugang deinen neuen Benutzernamen bentzen."
