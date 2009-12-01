@@ -58,7 +58,10 @@ def format_subscriptions(subscriptions, format, username):
 
 def get_subscriptions(username, device_uid):
     #get and return subscription list from database (use backend to sync)
-    d = Device.objects.get(uid=device_uid, user__username=username)
+    try:
+        d = Device.objects.get(uid=device_uid, user__username=username)
+    except Device.DoesNotExist:
+        raise Http404
     return [p.podcast for p in d.get_subscriptions()]
 
 def parse_subscription(raw_post_data, format, username, device_uid):
