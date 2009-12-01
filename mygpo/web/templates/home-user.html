@@ -4,5 +4,21 @@
 {% block content %}
   <h1>{% trans "Your Subscriptions" %}</h1>
   <p>{% trans "This page is currently in development." %}</p>
+  <table style="width:100%;">
+	<tr>
+		<th style="padding-right:100px;"></th>
+		<th style="padding-right:200px;">Title</th>
+		<th style="padding-right:200px;">Latest Episode</th>
+		<th style="padding-right:200px;">Devices</th>
+	</tr>
+       {% for s in subscriptionlist %}
+	<tr>
+		<td>{{ s.logo }}</td>
+		<td>{{ s.title }}</td>
+		<td>Episode</td>
+		<td>{{ s.device }}</td>
+	</tr>
+       {% endfor %} 
+  </table>
 {% endblock %}
 

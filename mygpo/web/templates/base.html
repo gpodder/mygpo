@@ -99,6 +99,10 @@
 	<p style="margin-left:10px; color:rgb(70%,70%,70%);">logged in as {{ user.username }}<br />
 	<a href="/logout/">logout!</a>
 	</p>
+    	{% else %}
+	<p style="margin-left:10px; color:rgb(70%,70%,70%);">
+	<a href="/login/">login!</a>
+	</p>
 	{% endif %}
 </div>
 <hr style="clear: both;">
