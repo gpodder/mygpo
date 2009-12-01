@@ -44,7 +44,7 @@ urlpatterns = patterns('',
     (r'^getlist$', 'mygpo.api.legacy.getlist'),
 
     #Simple API
-    (r'^subscriptions/(?P<username>\w+)/(?P<device>\w+).(?P<format>(txt|opml|json))', 'mygpo.api.simple.subscriptions'),
+    (r'^subscriptions/(?P<username>\w+)/(?P<device_uid>\w+).(?P<format>(txt|opml|json))', 'mygpo.api.simple.subscriptions'),
 
     #Advanced API
     (r'^api/1/subscriptions/(?P<username>\w+)/(?P<device_uid>\w+).json', 'mygpo.api.advanced.subscriptions'),
