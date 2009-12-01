@@ -5,23 +5,23 @@ DELIMITER //
 CREATE TRIGGER subscription_log_trigger BEFORE INSERT ON subscription_log
 FOR EACH ROW
 BEGIN
-	declare help_id INT;
-	set help_id = 0;
+    declare help_id INT;
+    set help_id = 0;
 
-	SELECT count(a.user_id) into help_id FROM current_subscription a 
-			where a.device_id = new.device_id
-			and a.podcast_id = new.podcast_id;
+    SELECT count(a.user_id) into help_id FROM current_subscription a 
+            where a.device_id = new.device_id
+            and a.podcast_id = new.podcast_id;
 
-	IF new.action = 1 THEN
-		
-		IF help_id > 0 THEN
-			call Fail('This subscription already exists!');
-		END IF;
-    	ELSE
-    		IF help_id < 1 THEN
-			call Fail('This subscription not exists!');
-		END IF;
-    	END IF;
+    IF new.action = 1 THEN
+        
+        IF help_id > 0 THEN
+            call Fail('This subscription already exists!');
+        END IF;
+        ELSE
+            IF help_id < 1 THEN
+            call Fail('This subscription not exists!');
+        END IF;
+        END IF;
 
 END;//
 DELIMITER ;
@@ -32,14 +32,14 @@ DELIMITER //
 CREATE TRIGGER podcast_trig_url_unique BEFORE INSERT ON podcast
 FOR EACH ROW
 BEGIN
-	declare help_url varchar(3000);
-	set help_url = 0;
+    declare help_url INT;
+    set help_url = 0;
   
-   	SELECT count(a.url) into help_url FROM podcast a where a.url=new.url;
+       SELECT count(a.url) into help_url FROM podcast a where a.url=new.url;
 
-	IF help_url > 0 THEN
-		call Fail('This URL already exists!');
-	END IF;
+    IF help_url > 0 THEN
+        call Fail('This URL already exists!');
+    END IF;
 
 END;//
 DELIMITER ;
@@ -65,38 +65,38 @@ DELIMITER $$
 DROP PROCEDURE IF EXISTS update_toplist $$
 CREATE PROCEDURE update_toplist()
 BEGIN
-	DECLARE deadlock INT DEFAULT 0;
-    	DECLARE attempts INT DEFAULT 0;
+    DECLARE deadlock INT DEFAULT 0;
+        DECLARE attempts INT DEFAULT 0;
 
-	try_loop:WHILE (attempts<3) DO
-	BEGIN
-		DECLARE deadlock_detected CONDITION FOR 1213;
-    		DECLARE EXIT HANDLER FOR deadlock_detected
-    			BEGIN
-    				ROLLBACK;
-    				SET deadlock=1;
-    			END;
-    		SET deadlock=0;
-   			
-    		START TRANSACTION;
-			DELETE FROM toplist;
-			INSERT INTO toplist (SELECT a.podcast_id, COUNT(*) AS count_subscription
-						FROM (SELECT DISTINCT podcast_id, user_id 
-							FROM public_subscription) a 
-						GROUP BY podcast_id);
-			
-			COMMIT;
-		END;
-		IF deadlock=0 THEN
-    			LEAVE try_loop;
-    		ELSE
-    			SET attempts=attempts+1;
-    		END IF;
-    	END WHILE try_loop;
+    try_loop:WHILE (attempts<3) DO
+    BEGIN
+        DECLARE deadlock_detected CONDITION FOR 1213;
+            DECLARE EXIT HANDLER FOR deadlock_detected
+                BEGIN
+                    ROLLBACK;
+                    SET deadlock=1;
+                END;
+            SET deadlock=0;
+               
+            START TRANSACTION;
+            DELETE FROM toplist;
+            INSERT INTO toplist (SELECT a.podcast_id, COUNT(*) AS count_subscription
+                        FROM (SELECT DISTINCT podcast_id, user_id 
+                            FROM public_subscription) a 
+                        GROUP BY podcast_id);
+            
+            COMMIT;
+        END;
+        IF deadlock=0 THEN
+                LEAVE try_loop;
+            ELSE
+                SET attempts=attempts+1;
+            END IF;
+        END WHILE try_loop;
 
-	IF deadlock=1 THEN
-		call FAIL('Toplist is not updated!');
-	END IF;
+    IF deadlock=1 THEN
+        call FAIL('Toplist is not updated!');
+    END IF;
 
 END $$
 DELIMITER ;
