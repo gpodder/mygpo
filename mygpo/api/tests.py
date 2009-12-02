@@ -17,7 +17,8 @@
 
 from django.test import TestCase
 from django.contrib.auth.models import User
-from mygpo.api.models import Device, Podcast, SubscriptionAction
+from mygpo.api.models import Device, Podcast, SubscriptionAction, UserProfile
+from put_test import put_data
 
 class SyncTest(TestCase):
     def test_sync_actions(self):
@@ -65,5 +66,100 @@ class SyncTest(TestCase):
         self.assertEqual( sa2[p1].podcast, p1)
         self.assertEqual( sa2[p1].action, 1)
 
+class SimpleTest(TestCase):
+    def test_put_get_data(self):
+        p1 = 'http://www.podcast1.com'
+        p2 = 'http://www.podcast2.com'
+        p3 = 'http://www.podcast3.com'
+    
+        d1 = 1
+        d2 = 2
+        d3 = 3
+    
+        f1 = 'txt'
+        f2 = 'json'
+        f3 = 'opml'
+    
+        data_txt_1 = '%s\n%s\n' % (p1, p2)
+        data_txt_2 = '%s\n%s\n' % (p2, p3)
+    
+        data_json_1 = '[\n"%s",\n"%s"\n]' % (p1, p2)
+        data_json_2 = '[\n"%s",\n"%s"\n]' % (p2, p3)
 
+        data_opml_1 = '<?xml version="1.0" encoding="UTF-8"?><opml version="2.0"><head><title>subscription list</title>\
+                       <dateCreated>Tue, 01 Dec 2009 10:06:18 +0000</dateCreated></head><body>\
+                       <outline text="p1" title="p1" type="rss" xmlUrl="%s"/>\
+                       <outline text="p2" title="p2" type="rss" xmlUrl="%s"/>\
+                       </body></opml>' % (p1, p2)
+        data_opml_2 = '<?xml version="1.0" encoding="UTF-8"?><opml version="2.0"><head><title>subscription list</title>\
+                       <dateCreated>Tue, 01 Dec 2009 10:06:18 +0000</dateCreated></head><body>\
+                       <outline text="p2" title="p2" type="rss" xmlUrl="%s"/>\
+                       <outline text="p3" title="p3" type="rss" xmlUrl="%s"/>\
+                       </body></opml>' % (p2, p3)
+    
+        un = 'u'
+        pw = 'u'
+        u  = User.objects.create(username=un, password=pw)
+        UserProfile.objects.create(user=u)
+        
+        #1. put 2 new podcasts
+        p = put_data(d1, f1, data_txt_1, un, pw)
+        #self.assertEqual(p, 'Success')
+        
+        #device 1 txt
+        device = Device.objects.get(uid=d1, user=u)
+        
+        s = [p.podcast for p in device.get_subscriptions()]
+        urls = [p.url for p in s]
+        self.assertEqual( len(s), 2)
+        self.assertEqual(urls[0], p1)
+        self.assertEqual(urls[1], p2) 
+        
+        #2. put 1 new podcast and delete 1 old
+        put_data(d1, f1, data_txt_2, un, pw)
+        s = [p.podcast for p in device.get_subscriptions()]
+        urls = [p.url for p in s]
+        self.assertEqual( len(s), 2)
+        self.assertEqual(urls[0], p2)
+        self.assertEqual(urls[1], p3) 
+        
+        #3. put 2 new podcasts
+        put_data(d2, f2, data_json_1, un, pw)
+        
+        #device 2 json
+        device = Device.objects.get(uid=d2, user=u)
+        
+        s = [p.podcast for p in device.get_subscriptions()]
+        urls = [p.url for p in s]
+        self.assertEqual( len(s), 2)
+        self.assertEqual(urls[0], p1)
+        self.assertEqual(urls[1], p2) 
+
+        #4. put 1 new podcast and delete 1 old
+        put_data(d2, f2, data_json_2, un, pw)
+        s = [p.podcast for p in device.get_subscriptions()]
+        urls = [p.url for p in s]
+        self.assertEqual( len(s), 2)
+        self.assertEqual(urls[0], p2)
+        self.assertEqual(urls[1], p3) 
+        
+        #5. put 2 new podcasts
+        put_data(d3, f3, data_opml_1, un, pw)
+        
+        #device 3 opml
+        device = Device.objects.get(uid=d3, user=u)
+        
+        s = [p.podcast for p in device.get_subscriptions()]
+        urls = [p.url for p in s]
+        self.assertEqual( len(s), 2)
+        self.assertEqual(urls[0], p1)
+        self.assertEqual(urls[1], p2) 
+        
+        #6. put 1 new podcast and delete 1 old
+        put_data(d3, f3, data_opml_2, un, pw)
+        s = [p.podcast for p in device.get_subscriptions()]
+        urls = [p.url for p in s]
+        self.assertEqual( len(s), 2)
+        self.assertEqual(urls[0], p2)
+        self.assertEqual(urls[1], p3) 
 
