@@ -70,14 +70,15 @@ def get_subscriptions(user, device_uid):
 def parse_subscription(raw_post_data, format, user, device_uid):
     if format == 'txt':
         sub = raw_post_data.split('\n')
-        urls = [x for x in sub if x != '\r']
+        p = '^[a-zA-z]'
+        urls = [x for x in sub if re.search(p, x) != None]
 
     elif format == 'opml':
         i = Importer(content=raw_post_data)
         urls = [p['url'] for p in i.items]
 
     elif format == 'json':
-        sub = raw_post_data.split('"')
+        sub = raw_post_data[1:-1].split('"')
         pattern = '^[a-zA-z]'
         urls = [x for x in sub if re.search(pattern, x) != None]
 
