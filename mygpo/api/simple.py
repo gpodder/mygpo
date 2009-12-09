@@ -24,6 +24,13 @@ from django.core import serializers
 from datetime import datetime
 from mygpo.api.httpresponse import HttpResponseNotAuthorized
 import re
+try:
+    # Try to import the JSON module (if we are on Python 2.6)
+    import json
+except ImportError:
+    # No JSON module available - fallback to simplejson (Python < 2.6)
+    import simplejson as json
+    
 
 @require_valid_user()
 def subscriptions(request, username, device_uid, format):
@@ -78,9 +85,7 @@ def parse_subscription(raw_post_data, format, user, device_uid):
         urls = [p['url'] for p in i.items]
 
     elif format == 'json':
-        sub = raw_post_data[1:-1].split('"')
-        pattern = '^[a-zA-z]'
-        urls = [x for x in sub if re.search(pattern, x) != None]
+        urls = json.loads(raw_post_data)
 
     else: raise ValueError('unsupported format %s' % format)
     
@@ -91,13 +96,12 @@ def parse_subscription(raw_post_data, format, user, device_uid):
     old = [p.url for p in podcasts]    
     new = [p for p in urls if p not in old]
     rem = [p for p in old if p not in urls]
-    
-    return new, rem, d
 
+    return new, rem, d
 
 def set_subscriptions(subscriptions):
     new, rem, d = subscriptions
-    
+
     if new != []:
         for n in new:
             p, created = Podcast.objects.get_or_create(url=n,
@@ -105,11 +109,11 @@ def set_subscriptions(subscriptions):
             s = SubscriptionAction(podcast=p, action=SUBSCRIBE_ACTION, device=d)
             s.save()
     
-    if rem != []: 
+    if rem != []:
         for r in rem:
             p = Podcast.objects.get(url=r)
-            s = SubscriptionAction(podcast=p, action=UNSUBSCRIBE_ACTION, device=d)
+            s = SubscriptionAction(podcast=p, device=d, action=UNSUBSCRIBE_ACTION)
             s.save()
-	
-    return HttpResponse('Success', mimetype='text/plain')
+
+    return HttpResponse('Success\n', mimetype='text/plain')
 
