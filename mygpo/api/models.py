@@ -24,7 +24,7 @@ EPISODE_ACTION_TYPES = (
         ('download', 'downloaded'),
         ('play',     'played'),
         ('delete',   'deleted'),
-        ('new'),     'marked new')
+        ('new',      'marked new')
     )
 
 DEVICE_TYPES = (
