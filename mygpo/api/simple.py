@@ -52,8 +52,8 @@ def format_subscriptions(subscriptions, format, username):
     if format == 'txt':
         #return subscriptions formatted as txt
         urls = [p.url for p in subscriptions]
-        s = "\n".join(urls)
-        s += "\n"
+        s = '\n'.join(urls)
+        s += '\n'
         return HttpResponse(s, mimetype='text/plain')
 
     elif format == 'opml':
@@ -91,7 +91,7 @@ def parse_subscription(raw_post_data, format, user, device_uid):
     
     d, created = Device.objects.get_or_create(user=user, uid=device_uid, 
                 defaults = {'type': 'other', 'name': 'unknown_' + device_uid})
-    
+
     podcasts = [p.podcast for p in d.get_subscriptions()]
     old = [p.url for p in podcasts]    
     new = [p for p in urls if p not in old]
@@ -101,19 +101,18 @@ def parse_subscription(raw_post_data, format, user, device_uid):
 
 def set_subscriptions(subscriptions):
     new, rem, d = subscriptions
-
-    if new != []:
-        for n in new:
-            p, created = Podcast.objects.get_or_create(url=n,
-                        defaults={'title':n,'description':n,'last_update':datetime.now()})
-            s = SubscriptionAction(podcast=p, action=SUBSCRIBE_ACTION, device=d)
-            s.save()
+    print new, rem
     
-    if rem != []:
-        for r in rem:
-            p = Podcast.objects.get(url=r)
-            s = SubscriptionAction(podcast=p, device=d, action=UNSUBSCRIBE_ACTION)
-            s.save()
+    for r in rem:
+        p = Podcast.objects.get(url=r)
+        s = SubscriptionAction(podcast=p, device=d, action=UNSUBSCRIBE_ACTION)
+        s.save()
+    
+    for n in new:
+        p, created = Podcast.objects.get_or_create(url=n,
+            defaults={'title':n,'description':n,'last_update':datetime.now()})
+        s = SubscriptionAction(podcast=p, action=SUBSCRIBE_ACTION, device=d)
+        s.save()
 
     return HttpResponse('Success\n', mimetype='text/plain')
 
