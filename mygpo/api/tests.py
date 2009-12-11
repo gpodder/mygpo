@@ -21,6 +21,7 @@ from mygpo.api.models import Device, Podcast, SubscriptionAction, UserProfile
 from put_test import put_data
 from django.http import HttpRequest
 from mygpo.api.simple import subscriptions
+import time
 
 class SyncTest(TestCase):
     def test_sync_actions(self):
@@ -35,15 +36,21 @@ class SyncTest(TestCase):
         p4 = Podcast.objects.create(title='p4', url='http://p4.com/')
 
         s1 = SubscriptionAction.objects.create(device=d1, podcast=p1, action='1')
+        time.sleep(1)
         s2 = SubscriptionAction.objects.create(device=d2, podcast=p2, action='1')
+        time.sleep(1)
         u2 = SubscriptionAction.objects.create(device=d2, podcast=p2, action='-1')
+        time.sleep(1)
         s3 = SubscriptionAction.objects.create(device=d1, podcast=p3, action='1')
+        time.sleep(1)
         s3_= SubscriptionAction.objects.create(device=d2, podcast=p3, action='1')
+        time.sleep(1)
         s4 = SubscriptionAction.objects.create(device=d2, podcast=p4, action='1')
+        time.sleep(1)
         u3 = SubscriptionAction.objects.create(device=d2, podcast=p3, action='-1')
 
-	#d1: p1, p3
-	#d2: p2, -p2, p3, p4, -p3
+        #d1: p1, p3
+        #d2: p2, -p2, p3, p4, -p3
 
         d1.sync_with(d2)
 
