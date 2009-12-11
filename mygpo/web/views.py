@@ -20,6 +20,7 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext
 from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction
+from mygpo.web.forms import UserAccountForm
 
 def home(request):
        if request.user.is_authenticated():
@@ -56,6 +57,30 @@ def create_subscriptionlist(request):
       return subscriptionlist
 
 
+def account(request):
+    success = False
+
+    if request.method == 'POST':
+        form = UserAccountForm(request.POST)
+
+        if form.is_valid():
+            request.user.email = form.cleaned_data['email']
+            request.user.save()
+            request.user.get_profile().public_profile = form.cleaned_data['public']
+            request.user.get_profile().save()
+
+            success = True
+
+    else:
+        form = UserAccountForm({
+            'email': request.user.email,
+            'public': request.user.get_profile().public_profile
+            })
+
+    return render_to_response('account.html', {
+        'form': form,
+        'success': success
+    }, context_instance=RequestContext(request))
 
 
 #sl = SubscriptionAction.objects.filter(podcast=podcast_ids[listindex])

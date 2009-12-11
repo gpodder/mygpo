@@ -37,6 +37,8 @@ urlpatterns = patterns('',
     (r'^register/$',  register, {'profile_callback': UserProfile.objects.create, 'success_url': '../registration_complete/', 'form_class': RegistrationFormUniqueEmail}),
     (r'^registration_complete/$', 'django.views.generic.simple.direct_to_template', {'template': 'registration/registration_complete.html'}),
     (r'^activate/(?P<activation_key>\w+)$', activate),
+
+    (r'account/$', 'mygpo.web.views.account'),
     (r'^info/$', 'django.views.generic.simple.direct_to_template', {'template': 'info.html'}),
 
     #Legacy API

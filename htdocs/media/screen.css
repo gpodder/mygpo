@@ -12,3 +12,27 @@ table.register th {
     text-align:left;
 }
 
+.success
+{
+    background-color: #b7f46e;
+    border: #539800 thin solid;
+    width: 100%;
+    padding: 1em 1em 1em 45px;
+    background-image: url('emblem-default.png');
+    background-repeat: no-repeat;
+    background-position: 3px 50%;
+}
+
+#navigation a
+{
+    color: black;
+}
+
+ul#navigation
+{
+    list-style-type: none;
+    margin: 1em;
+    border: 0;
+    padding: 0;
+}
+

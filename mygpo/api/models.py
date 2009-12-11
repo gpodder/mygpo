@@ -23,9 +23,8 @@ import hashlib
 EPISODE_ACTION_TYPES = (
         ('download', 'downloaded'),
         ('play',     'played'),
-        ('sync',     'synced'),
-        ('lock',     'locked'),
-        ('delete',   'deleted')
+        ('delete',   'deleted'),
+        ('new',      'marked new')
     )
 
 DEVICE_TYPES = (
