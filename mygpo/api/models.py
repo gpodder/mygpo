@@ -35,8 +35,14 @@ DEVICE_TYPES = (
         ('other', 'Other')
     )
 
+
 SUBSCRIBE_ACTION = 1
 UNSUBSCRIBE_ACTION = -1
+
+SUBSCRIPTION_ACTION_TYPES = (
+        (SUBSCRIBE_ACTION, 'subscribed'),
+        (UNSUBSCRIBE_ACTION, 'unsubscribed')
+    )
 
 class UserProfile(models.Model):
     user = models.ForeignKey(User, unique=True, db_column='user_ptr_id')
@@ -52,15 +58,15 @@ class UserProfile(models.Model):
 
 class Podcast(models.Model):
     url = models.URLField(unique=True)
-    title = models.CharField(max_length=100)
-    description = models.TextField()
-    link = models.URLField()
+    title = models.CharField(max_length=100, blank=True)
+    description = models.TextField(blank=True, null=True)
+    link = models.URLField(blank=True, null=True)
     last_update = models.DateTimeField(null=True,blank=True)
-    logo_url = models.CharField(max_length=1000)
-    
+    logo_url = models.CharField(max_length=1000,null=True,blank=True)
+
     def subscriptions(self):
         return Subscription.objects.filter(podcast=self)
-    
+
     def subscription_count(self):
         return self.subscriptions().count()
 
@@ -69,20 +75,20 @@ class Podcast(models.Model):
 
     def __unicode__(self):
         return self.title if self.title != '' else self.url
-    
+
     class Meta:
         db_table = 'podcast'
 
 class Episode(models.Model):
     podcast = models.ForeignKey(Podcast)
     url = models.URLField(unique=True)
-    title = models.CharField(max_length=100)
-    description = models.TextField()
-    link = models.URLField()
+    title = models.CharField(max_length=100, blank=True)
+    description = models.TextField(null=True, blank=True)
+    link = models.URLField(null=True, blank=True)
 
     def __unicode__(self):
         return self.title
-    
+
     class Meta:
         db_table = 'episode'
 
@@ -121,7 +127,7 @@ class SyncGroup(models.Model):
 class Device(models.Model):
     user = models.ForeignKey(User)
     uid = models.SlugField(max_length=50)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, blank=True)
     type = models.CharField(max_length=10, choices=DEVICE_TYPES)
     sync_group = models.ForeignKey(SyncGroup, blank=True, null=True)
 
@@ -266,10 +272,10 @@ class Device(models.Model):
 class EpisodeAction(models.Model):
     user = models.ForeignKey(User, primary_key=True)
     episode = models.ForeignKey(Episode)
-    device = models.ForeignKey(Device,)
+    device = models.ForeignKey(Device)
     action = models.IntegerField(choices=EPISODE_ACTION_TYPES)
     timestamp = models.DateTimeField(default=datetime.now)
-    playmark = models.IntegerField()
+    playmark = models.IntegerField(null=True, blank=True)
 
     def __unicode__(self):
         return '%s %s %s' % self.user, self.action, self.episode
@@ -287,14 +293,15 @@ class Subscription(models.Model):
 
     def __unicode__(self):
         return '%s - %s on %s' % (self.device.user, self.podcast, self.device)
-    
+
     class Meta:
         db_table = 'current_subscription'
+        managed = False
 
 class SubscriptionAction(models.Model):
     device = models.ForeignKey(Device)
     podcast = models.ForeignKey(Podcast)
-    action = models.IntegerField()
+    action = models.IntegerField(choices=SUBSCRIPTION_ACTION_TYPES)
     timestamp = models.DateTimeField(blank=True, default=datetime.now)
 
     def action_string(self):
