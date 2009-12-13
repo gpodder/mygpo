@@ -23,7 +23,7 @@ from django.core import serializers
 from time import mktime
 from datetime import datetime
 import json
-import xml.utils.iso8601
+import dateutil.parser
 
 
 @require_valid_user()
@@ -155,7 +155,7 @@ def update_episodes(user, actions):
             return HttpResponseBadRequest('not all required fields (podcast, episode, action) given')
 
         device = Device.objects.get_or_create(user=user, uid=e['device'], defaults={'name': 'Unknown', 'type': 'other'}) if 'device' in e else None
-        timestamp = iso8601.parse(e['timestamp']) if 'timestamp' in e else None
+        timestamp = dateutil.parser.parse(e['timestamp']) if 'timestamp' in e else None
         position = datetime.strptime(e['position'], '%H:%M:%S').time() if 'position' in e else None
 
         if position and action != 'play':
