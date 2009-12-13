@@ -54,7 +54,7 @@ def subscriptions(request, username, device_uid):
         except KeyError:
             return HttpResponseBadRequest('parameter since missing')
 
-        changes = get_subscription_changes(user, device, since, now)
+        changes = get_subscription_changes(request.user, device, since, now)
 
         return JsonResponse(changes)
 
