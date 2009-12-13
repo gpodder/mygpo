@@ -18,12 +18,21 @@
 from mygpo.api.basic_auth import require_valid_user
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, Http404, HttpResponseNotAllowed
 from mygpo.api.models import Device, Podcast, SubscriptionAction, Episode, EpisodeAction, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, EPISODE_ACTION_TYPES, DEVICE_TYPES
-from mygpo.api.json import JsonResponse
+from mygpo.api.httpresponse import JsonResponse
 from django.core import serializers
 from time import mktime
 from datetime import datetime
-import json
 import dateutil.parser
+
+try:
+    #try to import the JSON module (if we are on Python 2.6)
+    import json
+except ImportError:
+    # No JSON module available - fallback to simplejson (Python < 2.6)
+    print "No JSON module available - fallback to simplejson (Python < 2.6)"
+    import simplejson as json
+
+print dir(json)
 
 
 @require_valid_user()
