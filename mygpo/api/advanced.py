@@ -59,11 +59,15 @@ def subscriptions(request, username, device_uid):
         return JsonResponse(changes)
 
     elif request.method == 'POST':
-        d = Device.objects.get_or_create(user=request.user, uid=device_uid)
+        d, created = Device.objects.get_or_create(user=request.user, uid=device_uid)
 
         actions = json.loads(request.POST['data'])
         add = actions['add'] if 'add' in actions else []
         rem = actions['remove'] if 'remove' in actions else []
+
+        for a in add:
+            if a in rem:
+                return HttpResponseBadRequest('can not add and remove %s at the same time' % a)
 
         update_subscriptions(request.user, d, add, rem)
 
@@ -75,11 +79,11 @@ def subscriptions(request, username, device_uid):
 
 def update_subscriptions(user, device, add, remove):
     for a in add:
-        p = Podcast.objects.get_or_create(url=a)
+        p, p_created = Podcast.objects.get_or_create(url=a)
         s = SubscriptionAction.objects.create(podcast=p,device=device,action=SUBSCRIBE_ACTION)
 
     for r in remove:
-        p = Podcast.objects.get_or_create(url=r)
+        p, p_created = Podcast.objects.get_or_create(url=r)
         s = SubscriptionAction.objects.create(podcast=p,device=device,action=UNSUBSCRIBE_ACTION)
 
 
@@ -163,7 +167,7 @@ def update_episodes(user, actions):
         except:
             return HttpResponseBadRequest('not all required fields (podcast, episode, action) given')
 
-        device = Device.objects.get_or_create(user=user, uid=e['device'], defaults={'name': 'Unknown', 'type': 'other'}) if 'device' in e else None
+        device, created = Device.objects.get_or_create(user=user, uid=e['device'], defaults={'name': 'Unknown', 'type': 'other'}) if 'device' in e else None
         timestamp = dateutil.parser.parse(e['timestamp']) if 'timestamp' in e else None
         position = datetime.strptime(e['position'], '%H:%M:%S').time() if 'position' in e else None
 
@@ -180,7 +184,7 @@ def device(request, username, device_uid):
         return HttpResponseForbidden()
 
     if request.method == 'POST':
-        d = Device.objects.get_or_create(user=request.user, uid=device_uid)
+        d, created = Device.objects.get_or_create(user=request.user, uid=device_uid)
 
         data = json.loads(request.POST['data'])
 
