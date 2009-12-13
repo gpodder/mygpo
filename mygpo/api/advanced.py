@@ -74,13 +74,13 @@ def subscriptions(request, username, device_uid):
 
 
 def update_subscriptions(user, device, add, remove):
-    for add in actions['add']:
-        p = Podcast.objects.get_or_create(url=add)
-        s = SubscriptionAction.objects.create(podcast=p,device=d,action=SUBSCRIBE_ACTION)
+    for a in add:
+        p = Podcast.objects.get_or_create(url=a)
+        s = SubscriptionAction.objects.create(podcast=p,device=device,action=SUBSCRIBE_ACTION)
 
-    for remove in actions['remove']:
-        p = Podcast.objects.get_or_create(url=remove)
-        s = SubscriptionAction.objects.create(podcast=p,device=d,action=UNSUBSCRIBE_ACTION)
+    for r in remove:
+        p = Podcast.objects.get_or_create(url=r)
+        s = SubscriptionAction.objects.create(podcast=p,device=device,action=UNSUBSCRIBE_ACTION)
 
 
 def get_subscription_changes(user, device, since, until):
