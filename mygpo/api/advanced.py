@@ -41,7 +41,7 @@ def subscriptions(request, username, device_uid):
     if request.user.username != username:
         return HttpResponseForbidden()
 
-    now = mktime(datetime.now().timetuple())
+    now = int(mktime(datetime.now().timetuple()))
 
     if request.method == 'GET':
         try:
@@ -111,7 +111,7 @@ def episodes(request, username):
     if request.user.username != username:
         return HttpResponseForbidden()
 
-    now = mktime(datetime.now().timetuple())
+    now = int(mktime(datetime.now().timetuple()))
 
     if request.method == 'POST':
         try:
