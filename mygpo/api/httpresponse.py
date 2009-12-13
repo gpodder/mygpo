@@ -18,6 +18,7 @@
 from django.http import HttpResponse
 from django.core.serializers import json, serialize
 from django.db.models.query import QuerySet
+from django.core.serializers.json import DjangoJSONEncoder
 try:
     #try to import the JSON module (if we are on Python 2.6)
     import json
@@ -38,8 +39,8 @@ class JsonResponse(HttpResponse):
         if isinstance(object, QuerySet):
             content = serialize('json', object)
         else:
-            content = simplejson.dumps(
-                object, indent=2, cls=json.DjangoJSONEncoder,
+            content = json.dumps(
+                object, indent=2, cls=DjangoJSONEncoder,
                 ensure_ascii=False)
         super(JsonResponse, self).__init__(
             content, content_type='application/json')
