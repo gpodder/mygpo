@@ -296,7 +296,8 @@ class Subscription(models.Model):
 
     class Meta:
         db_table = 'current_subscription'
-        managed = False
+        #not available in Django 1.0 (Debian stable)
+        #managed = False
 
 class SubscriptionAction(models.Model):
     device = models.ForeignKey(Device)
