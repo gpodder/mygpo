@@ -8,7 +8,7 @@
 	<tr>
 		<th style="padding-right:100px;">{{ test }}</th>
 		<th style="padding-right:200px;">Title</th>
-		<!-- th style="padding-right:200px;">Latest Episode</th -->
+		<th style="padding-right:200px;">Latest Episode</th>
 		<th style="padding-right:200px;">Devices</th>
 	</tr>
        {% for s in subscriptionlist %}
@@ -19,7 +19,7 @@
                   {% endif %}                  
               </td>
 		<td>{{ s.title }}</td>
-		<!-- td>{{ s.episode }}</td -->
+		<td>{{ s.episode }}</td>
 		<td>{{ s.device }}</td>
 	</tr>
        {% endfor %}

@@ -50,10 +50,19 @@ def create_subscriptionlist(request):
             sublog_for_device = SubscriptionAction.objects.filter(podcast__id=subscriptionlist[index]['id'])
             sublog_devids = [s.device.id for s in sublog_for_device]
             dev = Device.objects.filter(id__in=sublog_devids, user__id=userid).values_list('name', flat=True)
+            latest_actions = EpisodeAction.objects.filter(episode__podcast__id=subscriptionlist[index]['id']).order_by('-timestamp')
+            subscriptionlist[index]['episode'] = ''            
+            if latest_actions.count() > 0:
+                 episode = latest_actions[0].episode.title
+                 timestamp = latest_actions[0].timestamp.strftime('%d.%m.%Y %H:%M')
+                 subscriptionlist[index]['episode'] += episode + ", " + timestamp
             subscriptionlist[index]['device'] = ''
-            for d in dev:
-                 subscriptionlist[index]['device'] += d + ", "
-            subscriptionlist[index]['episode'] = 'epi'
+            
+            for i, d in enumerate(dev):
+                 if i == 0:
+                       subscriptionlist[index]['device'] += d
+                 else:
+                       subscriptionlist[index]['device'] += ", "  + d           
       return subscriptionlist
 
 
