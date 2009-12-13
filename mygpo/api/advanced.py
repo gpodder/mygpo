@@ -126,7 +126,7 @@ def episodes(request, username):
         return HttpResponseNotAllowed(['POST', 'GET'])
 
 
-def get_episode_changes(user, podcast, device, since, until).
+def get_episode_changes(user, podcast, device, since, until):
     actions = []
     for a in EpisodeAction.objects.filter(user=user, podcast=podcast, device=device, timestamp__gt=since, timestamp__lt=until):
         action = {
