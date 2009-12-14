@@ -19,7 +19,7 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext
-from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction
+from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry
 from mygpo.web.forms import UserAccountForm
 
 def home(request):
@@ -80,6 +80,14 @@ def account(request):
     return render_to_response('account.html', {
         'form': form,
         'success': success
+    }, context_instance=RequestContext(request))
+
+def toplist(request):
+    len = 30
+    entries = ToplistEntry.objects.all().order_by('-subscriptions')[:len]
+    return render_to_response('toplist.html', {
+        'count'  : len,
+        'entries': entries,
     }, context_instance=RequestContext(request))
 
 

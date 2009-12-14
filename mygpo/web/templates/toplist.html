@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+  <h1>{% trans "Toplist" %}</h1>
+
+  <p>{% blocktrans %}These are the {{ count }} most susbscribed podcasts.{% endblocktrans %}</p>
+
+  <table>
+   <tr>
+    <th>{% trans "#" %}</th>
+    <th>{% trans "Podcast" %}</th>
+    <th>{% trans "Subscribers" %}</th>
+   </tr>
+  {% for entry in entries %}
+   <tr>
+    <td>{{ forloop.counter }}</td>
+    <td>{{ entry.podcast }}</td>
+    <td>{{ entry.subscriptions }}</td>
+   </tr>
+  {% endfor %}
+  </table>
+
+{% endblock %}
+
