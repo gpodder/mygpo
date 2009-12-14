@@ -4,11 +4,11 @@
 {% block content %}
   <h1>{% trans "Your Subscriptions" %}</h1>
   <p>{% trans "This page is currently in development." %}</p>
-  <table style="width:100%;">
+  <table class="subscriptionlist" style="width:100%;">
 	<tr>
-		<th style="padding-right:100px;">{{ test }}</th>
-		<th style="padding-right:200px;">Title</th>
-		<!-- th style="padding-right:200px;">Latest Episode</th -->
+		<th style="padding-right:100px;">&nbsp;</th>
+		<th class="subscription" style="padding-right:200px;">Title</th>
+		<th style="padding-right:200px;">Latest Episode</th>
 		<th style="padding-right:200px;">Devices</th>
 	</tr>
        {% for s in subscriptionlist %}
@@ -18,8 +18,8 @@
                   <img src="{{ s.logo }}" style="width:40px; height:30px;" />
                   {% endif %}                  
               </td>
-		<td>{{ s.title }}</td>
-		<!-- td>{{ s.episode }}</td -->
+		<td style="font-weight:bold">{{ s.title }}</td>
+		<td>{{ s.episode }}</td>
 		<td>{{ s.device }}</td>
 	</tr>
        {% endfor %}
