@@ -14,8 +14,10 @@ BEGIN
     DECLARE attempts INT DEFAULT 0;
     DECLARE done INT DEFAULT 0;
     DECLARE user_help INT DEFAULT 0;
+    DECLARE pod_count INT DEFAULT 0;
     DECLARE cur1 CURSOR FOR SELECT user_ptr_id FROM user;
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+    
 
 
     DROP TABLE IF EXISTS suggestion_pod;
@@ -44,17 +46,24 @@ BEGIN
             REPEAT
                 FETCH cur1 INTO user_help;
 
-            IF NOT done THEN
+                IF NOT done THEN
                     DELETE FROM suggestion_pod;
                     DELETE FROM suggestion_user;
 select user_help;
                     insert into suggestion_pod (select podcast_id from public_subscription where user_id=user_help);
-                    insert into suggestion_user (select user_id from public_subscription, suggestion_pod where podcast_id=podID group by user_id);
-                    insert into suggestion (select user_help, podcast_id, count(podcast_id) as priority 
+
+                    SELECT count(*) into pod_count FROM suggestion_pod;
+
+                    IF pod_count > 0 THEN
+                        insert into suggestion_user (select user_id from public_subscription, suggestion_pod where podcast_id=podID group by user_id);
+                        insert into suggestion (select user_help, podcast_id, count(podcast_id) as priority 
                                      from public_subscription, suggestion_user 
                                      where user_id=userID and podcast_id not in (select * from suggestion_pod) 
                                      group by user_help, podcast_id order by priority DESC LIMIT 10);
-         
+                    ELSE
+                        insert into suggestion (select user_help, podcast_id, subscription_count as priority from toplist 
+                                     group by user_help, podcast_id order by subscription_count DESC LIMIT 10);
+                    END IF;
                 END IF;
             UNTIL done END REPEAT;
 
@@ -85,6 +94,7 @@ CREATE PROCEDURE update_suggestion_for(IN user_par INT)
 BEGIN
     DECLARE deadlock INT DEFAULT 0;
     DECLARE attempts INT DEFAULT 0;
+    DECLARE pod_count INT DEFAULT 0;
         
     DROP TABLE IF EXISTS suggestion_pod;
     CREATE TABLE suggestion_pod (
@@ -112,12 +122,19 @@ BEGIN
             DELETE FROM suggestion_user;
 
             insert into suggestion_pod (select podcast_id from public_subscription where user_id=user_par);
-            insert into suggestion_user (select user_id from public_subscription, suggestion_pod where podcast_id=podID group by user_id);
-            insert into suggestion (select user_par, podcast_id, count(podcast_id) as priority 
+	    
+            SELECT count(*) into pod_count FROM suggestion_pod;
+
+            IF pod_count > 0 THEN
+                insert into suggestion_user (select user_id from public_subscription, suggestion_pod where podcast_id=podID group by user_id);
+                insert into suggestion (select user_par, podcast_id, count(podcast_id) as priority 
                                      from public_subscription, suggestion_user 
                                      where user_id=userID and podcast_id not in (select * from suggestion_pod) 
                                      group by user_par, podcast_id order by priority DESC LIMIT 10);
-         
+            ELSE
+                insert into suggestion (select user_par, podcast_id, subscription_count as priority from toplist 
+                group by user_par, podcast_id order by subscription_count DESC LIMIT 10);
+            END IF;
             COMMIT;
         END;
         IF deadlock=0 THEN
