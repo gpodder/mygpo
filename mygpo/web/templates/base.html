@@ -1,4 +1,5 @@
-<html><head>
+<html>
+ <head>
 <!--
 #
 # This file is part of my.gpodder.org.
@@ -21,93 +22,59 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <link rel="shortcut icon" href="http://gpodder.org/favicon.png">
   <link rel="stylesheet" href="/media/screen.css" type="text/css" />
-  <style type="text/css">
-      	body { font-family: DeJaVu Sans, Bitstream Vera Sans, sans-serif; font-size: 12px; padding-left: 50px; padding-right: 50px;}
-	h2 { margin-top:0px;}
-      	h3 { color: #535;}
-        hr { border-width: 0px; border-bottom: 1px #aaa dotted; }
-        img { border-width: 0px; }
-        ul#gpodder-menu { margin: 10px; padding-top: 10px; z-index: 900; text-align: center; }
-        ul#gpodder-menu li { display: inline; font-weight: bold; padding-right: 4px; margin-bottom: 5px; }
-        ul#gpodder-menu li a { text-decoration: none; color: rgb(70%, 70%, 70%); padding: 6px; border: 1px rgb(40%, 40%, 40%) solid; -moz-border-radius: 5px; }
-        ul#gpodder-menu li a:hover { color: rgb(10%, 10%, 10%); background-color: white; border-bottom: 1px rgb(60%, 60%, 60%) solid;border-right: 1px rgb(40%, 60%, 40%) solid; border-left: 1px rgb(70%, 70%, 70%) solid;border-top: 1px rgb(70%, 70%, 70%) solid; }
-        ul#gpodder-menu li strong { background-color: white; padding: 6px; border-top: 1px solid rgb(60%, 60%, 60%); border-left: 1px solid rgb(60%, 60%, 60%); border-bottom: 1px solid rgb(70%, 70%, 70%); color: black; -moz-border-radius: 5px;}
-        ul#gpodder-menu li img { vertical-align: middle; padding-right: 2px; }
-        a { color: blue; text-decoration: none; }
-        a:hover { text-decoration: underline; }
-        p#version-info { position: absolute; top: 10px; right: 10px; text-align: right; }
-        ul.highlights { padding-left: 10px; list-style-type: none; }
-        ul.highlights strong { font-size: 13pt; } address {font-style: normal; color: #aaa; text-align:center;} address a { color: #aaaaff; }
-        table.downloads td { background-color: #eee; }
-        a[href^="http://"]:after, a[href^="https://"]:after {
-            content: url(http://gpodder.org/images/external.png);
-            padding-left: 2px;
-        }
-        /* ..but not URLs linking to the bug tracker or mygpo */
-        a[href^="http://gpodder.org"]:after, a.noextlink:after,
-          a.imgonlylink:after {
-            content: '';
-            padding-left: 0px;
-        }
-        a[href^="http://bugs.gpodder.org"]:after, a.noextlink:after,
-          a.imgonlylink:after {
-            content: '';
-            padding-left: 0px;
-        }
-        a[href^="http://my.gpodder.org"]:after, a.noextlink:after,
-          a.imgonlylink:after {
-            content: '';
-            padding-left: 0px;
-        }
-    </style>
-</head><body>
-<h1 style="margin: 0px; padding: 0px; position: absolute; top: 0px; left: 20px; height: 70px; z-index: 100;">
-    <strong><img style="padding-top: 10px; width: 64px; height: 64px;" alt="gPodder" title="gPodder" src="http://gpodder.org/images/weblogo64.png"></strong>
-</h1>
-<div style="position: absolute; z-index: 10; top: 0px; left: 0px; right: 0px; background-color: rgb(102, 102, 102); padding-bottom: 10px;">
-<ul id="gpodder-menu">
-  <li><a href="http://gpodder.org/"><img src="http://gpodder.org/images/icons/go-home.png" alt="">Home</a></li>
-  <li><a href="http://gpodder.org/news.html"><img src="http://gpodder.org/images/icons/accessories-text-editor.png" alt="">News</a></li>
-  <li><a href="http://gpodder.org/downloads.html"><img src="http://gpodder.org/images/icons/package-x-generic.png" alt="">Download</a></li>
-  <li><a href="http://gpodder.org/documentation.html"><img src="http://gpodder.org/images/icons/help-browser.png" alt="">Help</a></li>
-  <li><a href="http://bugs.gpodder.org/"><img src="http://gpodder.org/images/icons/dialog-warning.png" alt="">Bugs</a></li>
-  <li><strong><img src="http://gpodder.org/images/icons/mygpo.png" alt="">Web Service</strong></li>
-</ul>
-</div>
-<hr>
+  <link rel="stylesheet" href="/media/screen-base.css" type="text/css" />
+ </head>
+ <body>
+  <h1 id="logo">
+   <strong><img alt="gPodder" title="gPodder" src="http://gpodder.org/images/weblogo64.png" /></strong>
+  </h1>
+  <div id="topnav">
+   <ul id="gpodder-menu">
+    <li><a href="http://gpodder.org/"><img src="http://gpodder.org/images/icons/go-home.png" alt="">Home</a></li>
+    <li><a href="http://gpodder.org/news.html"><img src="http://gpodder.org/images/icons/accessories-text-editor.png" alt="">News</a></li>
+    <li><a href="http://gpodder.org/downloads.html"><img src="http://gpodder.org/images/icons/package-x-generic.png" alt="">Download</a></li>
+    <li><a href="http://gpodder.org/documentation.html"><img src="http://gpodder.org/images/icons/help-browser.png" alt="">Help</a></li>
+    <li><a href="http://bugs.gpodder.org/"><img src="http://gpodder.org/images/icons/dialog-warning.png" alt="">Bugs</a></li>
+    <li><strong><img src="http://gpodder.org/images/icons/mygpo.png" alt="">Web Service</strong></li>
+   </ul>
+  </div>
 
+  <hr>
 
-<div style="margin-right: 5%; padding-top: 80px; padding-bottom: 10px; float:left; width: 70%">
+  <div id="body">
 
-{% if error_message %}
- <div class="error">{{ error_message }}</div>
-{% endif %}
+   {% if error_message %}
+    <div class="error">{{ error_message }}</div>
+   {% endif %}
 
-{% block content %}
+   {% block content %}
     <h1>gPodder Web Service</h1>
     <p>...will go online soon...</p>
     <ul>
-        <li><a href="http://gpodder.org/wiki/Web_Services">Wiki page</a></li>
-        <li><a href="toplist.opml">Toplist as OPML</a></li>
+     <li><a href="http://gpodder.org/wiki/Web_Services">Wiki page</a></li>
+     <li><a href="toplist.opml">Toplist as OPML</a></li>
     </ul>
-{% endblock %}
-</div>
-<div style="padding-top: 80px; width:200px; height:70%; margin-right:-58px; padding-bottom: 10px; float:right; background-color: rgb(102, 102, 102); -moz-border-radius-bottomleft: 30px;">
-	<span style="width:20px; position:absolute; margin-top:-32px; margin-left:-20px; background-color:rgb(102, 102, 102);">&nbsp;</span>
-	<span style="width:20px; position:absolute; margin-top:-32px; margin-left:-20px; -moz-border-radius-topright: 30px; background-color:rgb(255,255,255);">&nbsp;</span>
-	{% if user.is_authenticated %}
-	<p style="margin-left:10px; color:rgb(70%,70%,70%);">logged in as {{ user.username }}</p>
-    <ul id="navigation">
+   {% endblock %}
+  </div>
+  <div id="navigation">
+   <span class="spacer1">&nbsp;</span>
+   <span class="spacer2">&nbsp;</span>
+   {% if user.is_authenticated %}
+    <ul id="menu">
+     <li>logged in as {{ user.username }}</li>
      <li><a href="/account/">Account settings</a></li>
-	 <li><a href="/logout/">logout!</a></li>
+     <li><a href="/logout/">logout!</a></li>
     </ul>
-  	{% else %}
-    <ul id="navigation">
-	 <li><a href="/login/">login!</a></li>
+   {% else %}
+    <ul id="menu">
+     <li><a href="/login/">login!</a></li>
     </ul>
-	{% endif %}
-</div>
-<hr style="clear: both;">
-<address>© 2005-2009 <a class="noextlink" href="http://thpinfo.com/">Thomas Perl</a> and
-the gPodder Team</address>
-</body></html>
+   {% endif %}
+  </div>
+
+  <hr style="clear: both;">
+
+  <address>© 2005-2009 <a class="noextlink" href="http://thpinfo.com/">Thomas Perl</a> andthe gPodder Team</address>
+ </body>
+</html>
+

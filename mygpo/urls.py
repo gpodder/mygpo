@@ -43,6 +43,7 @@ urlpatterns = patterns('',
 
     (r'^toplist/$', 'mygpo.web.views.toplist'),
     (r'^toplist/(?P<count>\d+).opml', 'mygpo.web.views.toplist_opml'),
+    (r'^toplist.opml$', 'mygpo.web.views.toplist_opml', {'count': 50}),
 
     #Legacy API
     (r'^upload$', 'mygpo.api.legacy.upload'),
