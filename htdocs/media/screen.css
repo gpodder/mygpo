@@ -46,6 +46,7 @@ table.list
     margin-top: 2em;
     font-size: 1em;
     border-collapse: collapse;
+    width: 100%;
 }
 
 table.list th
