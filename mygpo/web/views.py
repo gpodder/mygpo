@@ -16,11 +16,13 @@
 #
 
 from django.shortcuts import render_to_response
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext
 from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry
 from mygpo.web.forms import UserAccountForm
+from mygpo.api.opml import Exporter
+from django.utils.translation import ugettext as _
 
 def home(request):
        if request.user.is_authenticated():
@@ -90,6 +92,15 @@ def toplist(request):
         'entries': entries,
     }, context_instance=RequestContext(request))
 
+
+def toplist_opml(request, count):
+    entries = ToplistEntry.objects.all().order_by('-subscriptions')[:count]
+    exporter = Exporter(_('my.gpodder.org - Top %s') % count)
+
+    opml = exporter.generate([e.podcast for e in entries])
+
+    return HttpResponse(opml, mimetype='text/xml')
+ 
 
 #sl = SubscriptionAction.objects.filter(podcast=podcast_ids[listindex])
 #sldev_ids = [s.device.id for s in sl]  
