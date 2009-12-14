@@ -79,6 +79,18 @@ class Podcast(models.Model):
     class Meta:
         db_table = 'podcast'
 
+
+class ToplistEntry(models.Model):
+    podcast = models.ForeignKey(Podcast)
+    subscriptions = models.IntegerField(db_column='subscription_count')
+
+    def __unicode__(self):
+        return '%s (%s)' % (self.podcast, self.subscriptions)
+
+    class Meta:
+        db_table = 'toplist'
+
+
 class Episode(models.Model):
     podcast = models.ForeignKey(Podcast)
     url = models.URLField(unique=True)
@@ -296,7 +308,8 @@ class Subscription(models.Model):
 
     class Meta:
         db_table = 'current_subscription'
-        managed = False
+        #not available in Django 1.0 (Debian stable)
+        #managed = False
 
 class SubscriptionAction(models.Model):
     device = models.ForeignKey(Device)

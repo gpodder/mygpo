@@ -41,6 +41,9 @@ urlpatterns = patterns('',
     (r'account/$', 'mygpo.web.views.account'),
     (r'^info/$', 'django.views.generic.simple.direct_to_template', {'template': 'info.html'}),
 
+    (r'^toplist/$', 'mygpo.web.views.toplist'),
+    (r'^toplist/(?P<count>\d+).opml', 'mygpo.web.views.toplist_opml'),
+
     #Legacy API
     (r'^upload$', 'mygpo.api.legacy.upload'),
     (r'^getlist$', 'mygpo.api.legacy.getlist'),
