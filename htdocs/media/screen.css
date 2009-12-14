@@ -23,12 +23,12 @@ table.register th {
     background-position: 3px 50%;
 }
 
-#navigation a
+#menu a
 {
     color: black;
 }
 
-ul#navigation
+ul#menu
 {
     list-style-type: none;
     margin: 1em;
