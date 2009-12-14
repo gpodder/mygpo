@@ -1,9 +1,13 @@
 div.error
 {
-    border: thin solid: #7d0c0c;
-    padding: 2em;
-    font-weight: bold;
-    color: #c20000;
+    background-color: #fa7080;
+    border: #f5001d thin solid;
+    width: 100%;
+    padding: 1em 1em 1em 45px;
+    background-image: url('dialog-error.png');
+    background-repeat: no-repeat;
+    background-position: 3px 50%;
+    margin: .5em;
 }
 
 table.register th {
@@ -21,6 +25,7 @@ table.register th {
     background-image: url('emblem-default.png');
     background-repeat: no-repeat;
     background-position: 3px 50%;
+    margin: .5em;
 }
 
 #menu a
