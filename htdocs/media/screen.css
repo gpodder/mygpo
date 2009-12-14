@@ -41,3 +41,28 @@ ul#menu
     padding: 0;
 }
 
+table.list
+{
+    margin-top: 2em;
+    font-size: 1em;
+    border-collapse: collapse;
+}
+
+table.list th
+{
+    text-align: left;
+    border-bottom: thin solid black;
+    padding: 0;
+    margin: 0;
+}
+
+table.list th,
+table.list td
+{
+    padding-right: 1em;
+}
+
+table td.numeric
+{
+    text-align: right;
+}
