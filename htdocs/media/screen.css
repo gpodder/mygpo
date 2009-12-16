@@ -28,6 +28,24 @@ table.register th {
     margin: .5em;
 }
 
+.info
+{
+    background-color: #7277d8;
+    border: #080e73 thin solid;
+    width: 100%;
+    padding: 1em 1em 1em 45px;
+    background-image: url('info.png');
+    background-repeat: no-repeat;
+    background-position: 3px 50%;
+    margin: .5em;
+}
+
+.info a
+{
+    color: black;
+}
+
+
 #menu a
 {
     color: black;
