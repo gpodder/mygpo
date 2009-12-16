@@ -59,17 +59,16 @@
   <div id="navigation">
    <span class="spacer1">&nbsp;</span>
    <span class="spacer2">&nbsp;</span>
-   {% if user.is_authenticated %}
-    <ul id="menu">
+   <ul id="menu">
+    {% if user.is_authenticated %}
      <li>logged in as {{ user.username }}</li>
      <li><a href="/account/">Account settings</a></li>
      <li><a href="/logout/">logout!</a></li>
-    </ul>
-   {% else %}
-    <ul id="menu">
+    {% else %}
      <li><a href="/login/">login!</a></li>
-    </ul>
-   {% endif %}
+    {% endif %}
+    <li><a href="/toplist/">Podcast-Toplist</a></li>
+   </ul>
   </div>
 
   <hr style="clear: both;">
