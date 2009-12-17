@@ -36,3 +36,22 @@ ul#navigation
     padding: 0;
 }
 
+table.subscriptionlist {
+   border-collapse:collapse;
+}
+
+table.subscriptionlist th {
+   border-bottom: 1px solid #b3b3b3;
+   font-weight:bold;
+   color:#b3b3b3;
+   font-style:italic;
+   text-align:left;
+}
+
+a.listlink {
+   color:#b3b3b3;
+}
+
+a.listlink:hover {
+   text-decoration:underline;
+}

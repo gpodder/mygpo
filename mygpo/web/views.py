@@ -65,6 +65,25 @@ def create_subscriptionlist(request):
                        subscriptionlist[index]['device'] += ", "  + d           
       return subscriptionlist
 
+def create_subscriptionhistory(request, pid): 
+    podcastname = Podcast.objects.filter(id=pid).values_list('title', flat=True)
+    sublog = SubscriptionAction.objects.filter(podcast__id = pid).order_by('-timestamp')
+    subscriptionhistorylist = [{'timestamp': s.timestamp.strftime('%d.%m.%Y %H:%M'), 'device_id': s.device_id, 'action': s.action} for s in sublog]
+    for index, entry in enumerate(subscriptionhistorylist):
+        dev = Device.objects.filter(id=subscriptionhistorylist[index]['device_id']).values_list('name', flat=True)
+        subscriptionhistorylist[index]['device'] = ''
+            
+        for i, d in enumerate(dev):
+            if i == 0:
+               subscriptionhistorylist [index]['device'] += d
+            else:
+               subscriptionhistorylist [index]['device'] += ", "  + d 
+
+    return render_to_response('subscriptionhistory.html', {
+                    'subscriptionhistorylist': subscriptionhistorylist,
+                    'podcastname': podcastname[0]
+              }, context_instance=RequestContext(request))
+
 
 def account(request):
     success = False
@@ -91,8 +110,3 @@ def account(request):
         'success': success
     }, context_instance=RequestContext(request))
 
-
-#sl = SubscriptionAction.objects.filter(podcast=podcast_ids[listindex])
-#sldev_ids = [s.device.id for s in sl]  
-#dev = Device.objects.filter(id__in=sldev_ids)
-#dev_names = [d.name for d in dev]
