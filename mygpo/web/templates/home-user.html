@@ -13,13 +13,17 @@
        {% for s in subscriptionlist %}
 	<tr>
 		<td> 
-                  {% if s.logo %}
-                  <img src="{{ s.logo }}" style="width:40px; height:30px;" />
+                  {% if s.podcast.logo_url %}
+                  <img src="{{ s.podcast.logo_url }}" style="width:40px; height:30px;" />
                   {% endif %}                  
               </td>
-		<td style="font-weight:bold"><a class="listlink" href="/podcast/{{ s.id }}">{{ s.title }}</a></td>
+		<td style="font-weight:bold"><a class="listlink" href="/podcast/{{ s.podcast.id }}">{{ s.podcast }}</a></td>
+    {% if s.episode %}
 		<td>{{ s.episode }}</td>
-		<td>{{ s.device }}</td>
+    {% else %}
+      <td></td>
+    {% endif %}
+		<td>{{ s.devices|join:", " }}</td>
 	</tr>
        {% endfor %}
   </table>

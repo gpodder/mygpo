@@ -19,7 +19,7 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext
-from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry
+from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, Subscription
 from mygpo.web.forms import UserAccountForm
 from mygpo.api.opml import Exporter
 from django.utils.translation import ugettext as _
@@ -39,33 +39,19 @@ def home(request):
               })
 
 def create_subscriptionlist(request):
-      userid = UserProfile.objects.filter(user=request.user)[0].id
-      device = Device.objects.filter(user__id=userid)
-      device_ids = [d.id for d in device]
-      sublog = SubscriptionAction.objects.filter(device__in=device_ids)
-      sublog_podcastids = [s.podcast_id for s in sublog]
+    subscriptions = Subscription.objects.filter(user=request.user)
+    l = {}
+    for s in subscriptions:
+        if s.podcast in l:
+            l[s.podcast]['devices'].append(s.device.name)
+        else:
+            e = Episode.objects.filter(podcast=s.podcast).order_by('-timestamp')
+            episode = e[0] if e.count() > 0 else None
+            devices = [s.device.name]
+            l[s.podcast] = {'podcast': s.podcast, 'episode': episode, 'devices': devices}
 
-      podcast = Podcast.objects.filter(id__in=sublog_podcastids).order_by('title')
-      subscriptionlist = [{'title': p.title, 'logo': p.logo_url, 'id': p.id} for p in podcast]
+    return l.values()
 
-      for index, entry in enumerate(subscriptionlist):
-            sublog_for_device = SubscriptionAction.objects.filter(podcast__id=subscriptionlist[index]['id'])
-            sublog_devids = [s.device.id for s in sublog_for_device]
-            dev = Device.objects.filter(id__in=sublog_devids, user__id=userid).values_list('name', flat=True)
-            latest_actions = EpisodeAction.objects.filter(episode__podcast__id=subscriptionlist[index]['id']).order_by('-timestamp')
-            subscriptionlist[index]['episode'] = ''            
-            if latest_actions.count() > 0:
-                 episode = latest_actions[0].episode.title
-                 timestamp = latest_actions[0].timestamp.strftime('%d.%m.%Y %H:%M')
-                 subscriptionlist[index]['episode'] += episode + ", " + timestamp
-            subscriptionlist[index]['device'] = ''
-            
-            for i, d in enumerate(dev):
-                 if i == 0:
-                       subscriptionlist[index]['device'] += d
-                 else:
-                       subscriptionlist[index]['device'] += ", "  + d           
-      return subscriptionlist
 
 def create_subscriptionhistory(request, pid): 
     podcastname = Podcast.objects.filter(id=pid).values_list('title', flat=True)
