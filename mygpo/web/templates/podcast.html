@@ -9,7 +9,7 @@
               <th>{% trans "Action" %}</th>
 		<th>{% trans "Devices" %}</th>
 	</tr>
-       {% for s in subscriptionhistorylist %}
+       {% for s in history %}
 	<tr>
 		<td>{{ s.timestamp }}</td>
 		<td>
@@ -20,7 +20,7 @@
 			{% trans "unsubscribe" %}
 		{% endifequal %}
               </td>
-		<td>{{ s.device }}</td>
+		<td>{{ s.device.name }}</td>
 	</tr>
        {% endfor %}
   </table>

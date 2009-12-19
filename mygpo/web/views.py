@@ -53,24 +53,14 @@ def create_subscriptionlist(request):
     return l.values()
 
 
-def create_subscriptionhistory(request, pid): 
-    podcastname = Podcast.objects.filter(id=pid).values_list('title', flat=True)
-    sublog = SubscriptionAction.objects.filter(podcast__id = pid).order_by('-timestamp')
-    subscriptionhistorylist = [{'timestamp': s.timestamp.strftime('%d.%m.%Y %H:%M'), 'device_id': s.device_id, 'action': s.action} for s in sublog]
-    for index, entry in enumerate(subscriptionhistorylist):
-        dev = Device.objects.filter(id=subscriptionhistorylist[index]['device_id']).values_list('name', flat=True)
-        subscriptionhistorylist[index]['device'] = ''
-            
-        for i, d in enumerate(dev):
-            if i == 0:
-               subscriptionhistorylist [index]['device'] += d
-            else:
-               subscriptionhistorylist [index]['device'] += ", "  + d 
-
-    return render_to_response('subscriptionhistory.html', {
-                    'subscriptionhistorylist': subscriptionhistorylist,
-                    'podcastname': podcastname[0]
-              }, context_instance=RequestContext(request))
+def podcast(request, pid):
+    podcast = Podcast.objects.get(pk=pid)
+    devices = Device.objects.filter(user=request.user)
+    history = SubscriptionAction.objects.filter(podcast=podcast,device__in=devices).order_by('-timestamp')
+    return render_to_response('podcast.html', {
+        'history': history,
+        'podcast': podcast
+    }, context_instance=RequestContext(request))
 
 
 def account(request):
