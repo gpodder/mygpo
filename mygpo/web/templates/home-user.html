@@ -3,13 +3,12 @@
 
 {% block content %}
   <h1>{% trans "Your Subscriptions" %}</h1>
-  <p>{% trans "This page is currently in development." %}</p>
   <table class="list">
 	<tr>
 		<th>&nbsp;</th>
-		<th>Title</th>
-		<th>Latest Episode</th>
-		<th>Devices</th>
+		<th>{% trans "Title" %}</th>
+		<th>{% trans "Latest Episode" %}</th>
+		<th>{% trans "Devices" %}</th>
 	</tr>
        {% for s in subscriptionlist %}
 	<tr>
@@ -18,7 +17,7 @@
                   <img src="{{ s.logo }}" style="width:40px; height:30px;" />
                   {% endif %}                  
               </td>
-		<td style="font-weight:bold">{{ s.title }}</td>
+		<td style="font-weight:bold"><a class="listlink" href="/podcast/{{ s.id }}">{{ s.title }}</a></td>
 		<td>{{ s.episode }}</td>
 		<td>{{ s.device }}</td>
 	</tr>

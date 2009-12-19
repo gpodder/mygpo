@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+  <h1>{% trans "Subscription History" %}: {{ podcastname }}</h1>
+  <table class="subscriptionlist" style="width:100%;">
+	<tr>
+		<th>{% trans "Timestamp" %}</th>
+              <th>{% trans "Action" %}</th>
+		<th>{% trans "Devices" %}</th>
+	</tr>
+       {% for s in subscriptionhistorylist %}
+	<tr>
+		<td>{{ s.timestamp }}</td>
+		<td>
+		{% ifequal s.action 1 %}
+			{% trans "subscribe" %}
+		{% endifequal %}
+		{% ifequal s.action -1 %}
+			{% trans "unsubscribe" %}
+		{% endifequal %}
+              </td>
+		<td>{{ s.device }}</td>
+	</tr>
+       {% endfor %}
+  </table>
+  <br /><br />
+  <a href="/">{% trans "back!" %}</a> 
+{% endblock %}
+

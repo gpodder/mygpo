@@ -20,9 +20,45 @@ msgstr ""
 msgid "Your Subscriptions"
 msgstr "Deine Abonnements"
 
-#: web/templates/home-user.html:6
-msgid "This page is currently in development."
-msgstr "Diese Seite befindet sich im Aufbau."
+#: web/templates/home-user.html:9
+msgid "Title"
+msgstr "Titel"
+
+#: web/templates/home-user.html:10
+msgid "Latest Episode"
+msgstr "Letzte Episode"
+
+#: web/templates/home-user.html:11
+msgid "Devices"
+msgstr "Geräte"
+
+#: web/templates/subscriptionhistory.html:5
+msgid "Subscription History"
+msgstr "Abonnementverlauf"
+
+#: web/templates/subscriptionhistory.html:8
+msgid "Timestamp"
+msgstr "Zeitpunkt"
+
+#: web/templates/subscriptionhistory.html:9
+msgid "Action"
+msgstr "Aktivität"
+
+#: web/templates/subscriptionhistory.html:10
+msgid "Devices"
+msgstr "Geräte"
+
+#: web/templates/subscriptionhistory.html:17
+msgid "subscribe"
+msgstr "abonniert"
+
+#: web/templates/subscriptionhistory.html:20
+msgid "unsubscribe"
+msgstr "beendet"
+
+#: web/templates/subscriptionhistory.html:28
+msgid "back!"
+msgstr "zurück!"
 
 #: web/templates/home.html:6
 msgid ""
