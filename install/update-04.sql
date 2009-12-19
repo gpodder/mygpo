@@ -54,13 +54,6 @@ BEGIN
 END $$
 DELIMITER ;
 
--- converting the column subscription_log.action from varchar to tinyint(1)
-alter table subscription_log add column action_tmp tinyint(1);
-update subscription_log set action_tmp = 1 where action = 'subscribe';
-update subscription_log set action_tmp = -1 where action = 'unsubscribe';
-alter table subscription_log drop column action;
-alter table subscription_log change action_tmp action tinyint(1);
-
 CREATE UNIQUE INDEX unique_subscription_log ON subscription_log (device_id, podcast_id, timestamp);
 CREATE UNIQUE INDEX unique_episode_lg ON episode_log (user_id, episode_id, timestamp);
 
