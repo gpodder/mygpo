@@ -29,7 +29,7 @@ BEGIN
                             FROM public_subscription) a
                         GROUP BY podcast_id);
             DELETE FROM toplist;
-            INSERT INTO toplist (podcast_id, subscription_count, id) VALUES (SELECT podcast_id, subscription_count, NULL FROM toplist_temp
+            INSERT INTO toplist (podcast_id, subscription_count, id) (SELECT podcast_id, subscription_count, NULL FROM toplist_temp
                         ORDER BY subscription_count DESC LIMIT 100);
 
             COMMIT;
