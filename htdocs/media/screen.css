@@ -86,3 +86,24 @@ table td.numeric
     text-align: right;
 }
 
+.description
+{
+    color: #666;
+}
+
+.URL
+{
+    text-decoration: none;
+    color: black;
+}
+
+.URL:hover
+{
+    text-decoration: underline;
+}
+
+h1
+{
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
