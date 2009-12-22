@@ -23,6 +23,8 @@ from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeActio
 from mygpo.web.forms import UserAccountForm
 from mygpo.api.opml import Exporter
 from django.utils.translation import ugettext as _
+from mygpo.api.basic_auth import require_valid_user
+from django.contrib.auth.decorators import login_required
 
 def home(request):
        if request.user.is_authenticated():
@@ -53,6 +55,7 @@ def create_subscriptionlist(request):
     return l.values()
 
 
+@login_required
 def podcast(request, pid):
     podcast = Podcast.objects.get(pk=pid)
     devices = Device.objects.filter(user=request.user)
@@ -63,6 +66,7 @@ def podcast(request, pid):
     }, context_instance=RequestContext(request))
 
 
+@login_required
 def account(request):
     success = False
 
@@ -88,6 +92,7 @@ def account(request):
         'success': success
     }, context_instance=RequestContext(request))
 
+
 def toplist(request):
     len = 30
     entries = ToplistEntry.objects.all().order_by('-subscriptions')[:len]
@@ -106,12 +111,15 @@ def toplist_opml(request, count):
     return HttpResponse(opml, mimetype='text/xml')
  
 
+@login_required
 def suggestions(request):
     entries = SuggestionEntry.objects.filter(user=request.user).order_by('-priority')
     return render_to_response('suggestions.html', {
         'entries': entries
     }, context_instance=RequestContext(request))
 
+
+@require_valid_user()
 def suggestions_opml(request, count):
     entries = SuggestionEntry.objects.filter(user=request.user).order_by('-priority')
     exporter = Exporter(_('my.gpodder.org - %s Suggestions') % count)
