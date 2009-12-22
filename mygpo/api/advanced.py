@@ -47,7 +47,7 @@ def subscriptions(request, username, device_uid):
         try:
             d = Device.objects.get(user=request.user, uid=device_uid)
         except Device.DoesNotExist:
-            return Http404('device %s does not exist' % device_uid)
+            raise Http404('device %s does not exist' % device_uid)
 
         try:
             since = request.GET['since']
@@ -131,7 +131,7 @@ def episodes(request, username):
             podcast = Podcast.objects.get(pk=podcast_id) if podcast_id else None
             device  = Device.objects.get(pk=device_id) if device_id else None
         except:
-            return Http404
+            raise Http404
 
         return JsonRequest(get_episode_changes(request.user, podcast, device, since, now))
 
