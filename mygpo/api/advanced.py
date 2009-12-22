@@ -23,6 +23,8 @@ from django.core import serializers
 from time import mktime
 from datetime import datetime
 import dateutil.parser
+from mygpo.logging import log
+from django.db import IntegrityError
 
 try:
     #try to import the JSON module (if we are on Python 2.6)
@@ -31,9 +33,6 @@ except ImportError:
     # No JSON module available - fallback to simplejson (Python < 2.6)
     print "No JSON module available - fallback to simplejson (Python < 2.6)"
     import simplejson as json
-
-print dir(json)
-
 
 @require_valid_user()
 def subscriptions(request, username, device_uid):
@@ -80,11 +79,17 @@ def subscriptions(request, username, device_uid):
 def update_subscriptions(user, device, add, remove):
     for a in add:
         p, p_created = Podcast.objects.get_or_create(url=a)
-        s = SubscriptionAction.objects.create(podcast=p,device=device,action=SUBSCRIBE_ACTION)
+        try:
+            s = SubscriptionAction.objects.create(podcast=p,device=device,action=SUBSCRIBE_ACTION)
+        except IntegrityError, e:
+            log('can\'t add subscription %s for user %s: %s' % (a, user, e))
 
     for r in remove:
         p, p_created = Podcast.objects.get_or_create(url=r)
-        s = SubscriptionAction.objects.create(podcast=p,device=device,action=UNSUBSCRIBE_ACTION)
+        try:
+            s = SubscriptionAction.objects.create(podcast=p,device=device,action=UNSUBSCRIBE_ACTION)
+        except IntegrityError, e:
+            log('can\'t remove subscription %s for user %s: %s' % (r, user, e))
 
 
 def get_subscription_changes(user, device, since, until):
