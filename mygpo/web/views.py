@@ -19,7 +19,7 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext
-from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, Subscription
+from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, Subscription, SuggestionEntry
 from mygpo.web.forms import UserAccountForm
 from mygpo.api.opml import Exporter
 from django.utils.translation import ugettext as _
@@ -106,4 +106,17 @@ def toplist_opml(request, count):
     return HttpResponse(opml, mimetype='text/xml')
  
 
+def suggestions(request):
+    entries = SuggestionEntry.objects.filter(user=request.user).order_by('-priority')
+    return render_to_response('suggestions.html', {
+        'entries': entries
+    }, context_instance=RequestContext(request))
+
+def suggestions_opml(request, count):
+    entries = SuggestionEntry.objects.filter(user=request.user).order_by('-priority')
+    exporter = Exporter(_('my.gpodder.org - %s Suggestions') % count)
+
+    opml = exporter.generate([e.podcast for e in entries])
+
+    return HttpResponse(opml, mimetype='text/xml')
 
