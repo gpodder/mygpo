@@ -9,6 +9,14 @@
    <p class="description">{{ podcast.description }}</p>
   {% endif %}
 
+  <h2>Devices</h2>
+  <strong>You have subscribed this podcast on</strong>
+  <ul>
+  {% for device in devices %}
+   <li>{{ device }}</li>
+  {% endfor %}
+  </ul>
+
   <h2>{% trans "Subscription History" %}</h2>
   <table class="list">
 	<tr>
