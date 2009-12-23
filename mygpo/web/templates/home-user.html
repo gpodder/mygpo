@@ -23,7 +23,7 @@
     </td>
     <td><a class="listlink" href="/podcast/{{ s.podcast.id }}">{{ s.podcast }}</a></td>
     {% if s.episode %}
-     <td>{{ s.episode }}</td>
+     <td><a href="/episode/{{s.episode.id}}">{{ s.episode.title|default:"Unnamed Episode" }}</a></td>
     {% else %}
      <td></td>
     {% endif %}
