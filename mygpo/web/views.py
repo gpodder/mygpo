@@ -60,9 +60,11 @@ def podcast(request, pid):
     podcast = Podcast.objects.get(pk=pid)
     devices = Device.objects.filter(user=request.user)
     history = SubscriptionAction.objects.filter(podcast=podcast,device__in=devices).order_by('-timestamp')
+    subscribed_devices = [s.device for s in Subscription.objects.filter(podcast=podcast,user=request.user)]
     return render_to_response('podcast.html', {
         'history': history,
-        'podcast': podcast
+        'podcast': podcast,
+        'devices': subscribed_devices,
     }, context_instance=RequestContext(request))
 
 
@@ -119,7 +121,7 @@ def suggestions(request):
     }, context_instance=RequestContext(request))
 
 
-@require_valid_user()
+@require_valid_user
 def suggestions_opml(request, count):
     entries = SuggestionEntry.objects.filter(user=request.user).order_by('-priority')
     exporter = Exporter(_('my.gpodder.org - %s Suggestions') % count)

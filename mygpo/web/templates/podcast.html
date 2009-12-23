@@ -11,9 +11,9 @@
 
   <h2>Devices</h2>
   <strong>You have subscribed this podcast on</strong>
-  <ul>
+  <ul class="devices">
   {% for device in devices %}
-   <li>{{ device }}</li>
+   <li class="{{device.type}}">{{ device.name }}</li>
   {% endfor %}
   </ul>
 

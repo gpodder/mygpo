@@ -107,3 +107,30 @@ h1
     margin-bottom: 0;
     padding-bottom: 0;
 }
+
+
+ul.devices li.desktop
+{
+    list-style-image: url('16x16/computer.png');
+}
+
+ul.devices li.laptop
+{
+    list-style-image: url('16x16/pda.png');
+}
+
+ul.devices li.mobile
+{
+    list-style-image: url('16x16/pda.png');
+}
+
+ul.devices li.server
+{
+    list-style-image: url('16x16/server.png');
+}
+
+ul.devices li.other
+{
+    list-style-image: url('16x16/audio-x-generic.png');
+}
+
