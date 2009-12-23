@@ -108,6 +108,7 @@ class Episode(models.Model):
     title = models.CharField(max_length=100, blank=True)
     description = models.TextField(null=True, blank=True)
     link = models.URLField(null=True, blank=True)
+    timestamp = models.DateTimeField(null=True, blank=True)
 
     def __unicode__(self):
         return self.title
