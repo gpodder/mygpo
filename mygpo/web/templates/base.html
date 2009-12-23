@@ -59,17 +59,28 @@
   <div id="navigation">
    <span class="spacer1">&nbsp;</span>
    <span class="spacer2">&nbsp;</span>
-   <ul id="menu">
-    <li><a href="/">Home</a></li>
-    {% if user.is_authenticated %}
-     <li>logged in as {{ user.username }}</li>
-     <li><a href="/account/">Account settings</a></li>
-     <li><a href="/logout/">logout!</a></li>
-    {% else %}
-     <li><a href="/login/">login!</a></li>
-    {% endif %}
-    <li><a href="/toplist/">Podcast-Toplist</a></li>
-   </ul>
+
+   {% if user.is_authenticated %}
+    <ul class="menu">
+     <li><a href="/">{{ user.username }}'s Home</a></li>
+     <li><a href="/account/">Your settings</a></li>
+     <li><a href="/logout/">Logout</a></li>
+    </ul>
+
+    <ul class="menu">
+     <li><strong>Podcasts</strong></li>
+     <li><a href="/toplist/">Toplist</a></li>
+     <li><a href="/suggestions/">Suggestions</a></li>
+    </ul>
+   {% else %}
+    <ul class="menu">
+     <li><a href="/">Home</a></li>
+     <li><a href="/login/">Login</a></li>
+     <li><a href="/register/">Register</a></li>
+     <li><a href="/toplist/">Podcast-Toplist</a></li>
+    </ul>
+   {% endif %}
+
   </div>
 
   <hr style="clear: both;">
