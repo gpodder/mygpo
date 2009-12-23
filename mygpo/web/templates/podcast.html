@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load humanize %}
 
 {% block content %}
   <h1>{% if podcast.title %}{{ podcast.title }}{% else %}{% trans "Unnamed Podcast" %}{%endif%}</h1>
@@ -26,7 +27,7 @@
 	</tr>
        {% for s in history %}
 	<tr>
-		<td>{{ s.timestamp }}</td>
+		<td><abbr title="{{ s.timestamp }}">{{ s.timestamp|naturalday }}</abbr></td>
 		<td>
 		{% ifequal s.action 1 %}
 			{% trans "subscribe" %}

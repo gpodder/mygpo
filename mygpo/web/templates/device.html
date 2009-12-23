@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load humanize %}
 
 {% block content %}
   <h1>{{ device.name }}</h1>
@@ -17,7 +18,7 @@
     <tr>
      <td></td>
      <td><a href="/podcast/{{subscription.podcast.id}}">{{ subscription.podcast }}</a></td>
-     <td>{{subscription.subscribed_since}}</td>
+     <td><abbr title="{{subscription.subscribed_since}}">{{subscription.subscribed_since|naturalday}}</abbr></td>
     </tr>
    {% endfor %}
   </table>
