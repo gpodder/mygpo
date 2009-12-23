@@ -40,7 +40,8 @@ def subscriptions(request, username, device_uid):
     if request.user.username != username:
         return HttpResponseForbidden()
 
-    now = int(mktime(datetime.now().timetuple()))
+    now = datetime.now()
+    now_ = int(mktime(now.timetuple()))
 
     if request.method == 'GET':
         try:
@@ -49,11 +50,13 @@ def subscriptions(request, username, device_uid):
             raise Http404('device %s does not exist' % device_uid)
 
         try:
-            since = request.GET['since']
+            since_ = request.GET['since']
         except KeyError:
             return HttpResponseBadRequest('parameter since missing')
 
-        changes = get_subscription_changes(request.user, device, since, now)
+        since = datetime.fromtimestamp(float(since_))
+
+        changes = get_subscription_changes(request.user, d, since, now)
 
         return JsonResponse(changes)
 
@@ -70,7 +73,7 @@ def subscriptions(request, username, device_uid):
 
         update_subscriptions(request.user, d, add, rem)
 
-        return JsonResponse({'timestamp': now})
+        return JsonResponse({'timestamp': now_})
 
     else:
         return HttpResponseNotAllowed(['GET', 'POST'])
@@ -101,13 +104,14 @@ def get_subscription_changes(user, device, since, until):
     add = []
     remove = []
 
-    for a in actions:
+    for a in actions.values():
         if a.action == SUBSCRIBE_ACTION:
             add.append(a.podcast.url)
         elif a.action == UNSUBSCRIBE_ACTION:
             remove.append(a.podcast.url)
 
-    return {'add': add, 'remove': remove, 'timestamp': until}
+    until_ = int(mktime(until.timetuple()))
+    return {'add': add, 'remove': remove, 'timestamp': until_}
 
 
 @require_valid_user
