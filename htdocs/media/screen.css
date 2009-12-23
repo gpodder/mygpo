@@ -134,3 +134,8 @@ ul.devices li.other
     list-style-image: url('16x16/audio-x-generic.png');
 }
 
+div.rate
+{
+    padding-top: 2em;
+    padding-bottom: 3em;
+}

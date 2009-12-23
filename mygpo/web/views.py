@@ -19,12 +19,13 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext
-from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, Subscription, SuggestionEntry
+from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, Subscription, SuggestionEntry, Rating
 from mygpo.web.forms import UserAccountForm, DeviceForm
 from mygpo.api.opml import Exporter
 from django.utils.translation import ugettext as _
 from mygpo.api.basic_auth import require_valid_user
 from django.contrib.auth.decorators import login_required
+from datetime import datetime
 
 def home(request):
        if request.user.is_authenticated():
@@ -115,9 +116,17 @@ def toplist_opml(request, count):
 
 @login_required
 def suggestions(request):
+
+    rated = False
+
+    if 'rate' in request.GET:
+        Rating.objects.create(target='suggestions', user=request.user, rating=request.GET['rate'], timestamp=datetime.now())
+        rated = True
+
     entries = SuggestionEntry.objects.filter(user=request.user).order_by('-priority')
     return render_to_response('suggestions.html', {
-        'entries': entries
+        'entries': entries,
+        'rated'  : rated
     }, context_instance=RequestContext(request))
 
 

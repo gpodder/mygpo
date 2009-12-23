@@ -343,3 +343,15 @@ class SubscriptionAction(models.Model):
         db_table = 'subscription_log'
         unique_together = ('device', 'podcast', 'timestamp')
 
+class Rating(models.Model):
+    target = models.CharField(max_length=15)
+    user = models.ForeignKey(User)
+    rating = models.IntegerField()
+    timestamp = models.DateTimeField(default=datetime.now)
+
+    class Meta:
+        db_table = 'ratings'
+
+    def __unicode__(self):
+        return '%s rates %s as %s on %s' % (self.user, self.target, self.rating, self.timestamp)
+

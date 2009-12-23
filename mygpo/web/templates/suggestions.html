@@ -2,11 +2,16 @@
 {% load i18n %}
 
 {% block content %}
+
+  {% if rated %}
+   <div class="success">Thanks for your feedback!</div>
+  {% endif %}
+
   <h1>{% trans "Suggested Podcasts" %}</h1>
 
   <p>{% blocktrans with entries|length as suggestion_count %}We've selected {{ suggestion_count }} podcasts which you might like.{% endblocktrans %}</p>
 
-  <table>
+  <table class="list">
    <tr>
     <th></th>
     <th>{% trans "Podcast" %}</th>
@@ -15,11 +20,21 @@
   {% for entry in entries %}
    <tr>
     <td>{% if entry.podcast.logo_url %}<img href="{{ entry.podcast.logo_url }}" />{% endif %}</td>
-    <td>{{ entry.podcast }}</td>
+    <td><a href="/podcast/{{entry.podcast.id}}">{{ entry.podcast }}</a></td>
     <td><a href="{{ entry.podcast.url }}">{{ entry.podcast.url }}</a></td>
    </tr>
   {% endfor %}
   </table>
+
+  <div class="rate">
+   <strong>Do you like our suggestions?</strong>
+   <a href="/suggestions/?rate=1">
+    <img src="/media/16x16/emblem-default.png" alt="Yes" />
+   </a>
+   <a href="/suggestions/?rate=-1">
+    <img src="/media/16x16/emblem-important.png" alt="No" />
+   </a>
+  </div>
 
   <div class="info"><strong>Get your suggestions on your Client</strong>! Access <a href="http://my.gpodder.org/suggestions/15.opml">http://my.gpodder.org/suggestions/15.opml</a> to get 15 of our recommended podcasts.</div>
 {% endblock %}
