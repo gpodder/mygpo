@@ -17,14 +17,15 @@
 
 from mygpo.api.basic_auth import require_valid_user
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, Http404, HttpResponseNotAllowed
-from mygpo.api.models import Device, Podcast, SubscriptionAction, Episode, EpisodeAction, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, EPISODE_ACTION_TYPES, DEVICE_TYPES
+from mygpo.api.models import Device, Podcast, SubscriptionAction, Episode, EpisodeAction, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, EPISODE_ACTION_TYPES, DEVICE_TYPES, Subscription
 from mygpo.api.httpresponse import JsonResponse
 from django.core import serializers
 from time import mktime
-from datetime import datetime
+from datetime import datetime, timedelta
 import dateutil.parser
 from mygpo.logging import log
 from django.db import IntegrityError
+import re
 
 try:
     #try to import the JSON module (if we are on Python 2.6)
@@ -168,22 +169,24 @@ def get_episode_changes(user, podcast, device, since, until):
 def update_episodes(user, actions):
     for e in actions:
         try:
-            podcast = Podcast.objects.get(url=e['podcast'])
-            episode = Episode.objects.get(podcast=podcast, url=e['episode'])
+            podcast, p_created = Podcast.objects.get_or_create(url=e['podcast'])
+            episode, e_created = Episode.objects.get_or_create(podcast=podcast, url=e['episode'])
             action  = e['action']
-            if not action in EPISODE_ACTION_TYPES:
+            if not valid_episodeaction(action):
                 return HttpResponseBadRequest('invalid action %s' % action)
         except:
             return HttpResponseBadRequest('not all required fields (podcast, episode, action) given')
 
         device, created = Device.objects.get_or_create(user=user, uid=e['device'], defaults={'name': 'Unknown', 'type': 'other'}) if 'device' in e else None
         timestamp = dateutil.parser.parse(e['timestamp']) if 'timestamp' in e else None
-        position = datetime.strptime(e['position'], '%H:%M:%S').time() if 'position' in e else None
+        position = parseTimeDelta(e['position']) if 'position' in e else None
+        playmark = position['seconds'] if position else None
 
         if position and action != 'play':
             return HttpResponseBadRequest('parameter position can only be used with action play')
 
-        EpisodeAction.objects.create(user=user, episode=episode, device=device, action=action, timestamp=timestamp, playmark=position)
+        EpisodeAction.objects.create(user=user, episode=episode, device=device, action=action, timestamp=timestamp, playmark=playmark)
+
 
 
 @require_valid_user
@@ -201,7 +204,7 @@ def device(request, username, device_uid):
             d.name = data['caption']
 
         if 'type' in data:
-            if not data['type'] in DEVICE_TYPES:
+            if not valid_devicetype(data['type']):
                 return HttpResponseBadRequest('invalid device type %s' % data['type'])
             d.type = data['type']
 
@@ -212,6 +215,37 @@ def device(request, username, device_uid):
     else:
         return HttpResponseNotAllowed(['POST'])
 
+def valid_devicetype(type):
+    for t in DEVICE_TYPES:
+        if t[0] == type:
+            return True
+    return False
+
+def valid_episodeaction(type):
+    for t in EPISODE_ACTION_TYPES:
+        if t[0] == type:
+            return True
+    return False
+
+# http://kbyanc.blogspot.com/2007/08/python-reconstructing-timedeltas-from.html
+def parseTimeDelta(s):
+    """Create timedelta object representing time delta
+       expressed in a string
+   
+    Takes a string in the format produced by calling str() on
+    a python timedelta object and returns a timedelta instance
+    that would produce that string.
+   
+    Acceptable formats are: "X days, HH:MM:SS" or "HH:MM:SS".
+    """
+    if s is None:
+        return None
+    d = re.match(
+            r'((?P<days>\d+) days, )?(?P<hours>\d+):'
+            r'(?P<minutes>\d+):(?P<seconds>\d+)',
+            str(s)).groupdict(0)
+    return timedelta(**dict(( (key, int(value))
+                              for key, value in d.items() )))
 
 @require_valid_user
 def devices(request, username):

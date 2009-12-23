@@ -296,7 +296,7 @@ class EpisodeAction(models.Model):
     user = models.ForeignKey(User, primary_key=True)
     episode = models.ForeignKey(Episode)
     device = models.ForeignKey(Device)
-    action = models.IntegerField(choices=EPISODE_ACTION_TYPES)
+    action = models.CharField(max_length=10, choices=EPISODE_ACTION_TYPES)
     timestamp = models.DateTimeField(default=datetime.now)
     playmark = models.IntegerField(null=True, blank=True)
 
