@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load humanize %}
+
+{% block content %}
+  <h1>{{ episode.title|default:"Unnamed Episode" }}</h1>
+  <div>{%blocktrans with episode.podcast as podcast and episode.podcast.id as podcast_id %}An episode of the <a href="/podcast/{{ podcast_id }}">{{ podcast }}</a> podcast.{% endblocktrans %}</div>
+
+  {% if episode.timestamp %}
+   <div>Released on {{episode.timestamp}}.</div>
+  {% endif %}
+
+  {% if episode.description %}
+   <p class="description">{{ episode.description }}</p>
+  {% endif %}
+
+  <div class="links"><strong>Links: </strong>
+   <a href="{{episode.url}}">Feed</a>
+   {% if episode.link %}<a href="{{episode.link}}">Website</a>{% endif %}
+  </div>
+
+  <h2>{% trans "Your Episode History" %}</h2>
+  <table class="list">
+   <tr>
+    <th>{% trans "When" %}</th>
+    <th>{% trans "What" %}</th>
+    <th>{% trans "Where" %}</th>
+   </tr>
+
+   {% for s in history %}
+    <tr>
+     <td><abbr title="{{ s.timestamp }}">{{ s.timestamp|naturalday }}</abbr></td>
+     <td>{{ s.action }}</td>
+     <td><a href="/device/{{ s.device.id }}">{{ s.device.name }}</a></td>
+	</tr>
+   {% endfor %}
+  </table>
+  <br /><br />
+
+  {% if not episode.title %}
+   <div class="info"><strong>{% trans "Why Unnamed Episode?" %}</strong> {% trans "Because we display names after we have fetched the information form the feed -- and this may take some time. Until this is completed, the podcast will simply be called this way." %}</div>
+  {% endif %}
+
+{% endblock %}
+

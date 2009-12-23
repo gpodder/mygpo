@@ -39,6 +39,8 @@ urlpatterns = patterns('',
     (r'^activate/(?P<activation_key>\w+)$', activate),
     (r'^podcast/(?P<pid>\w+)$', 'mygpo.web.views.podcast'),
 
+    (r'^episode/(?P<id>\d+)$', 'mygpo.web.views.episode'),
+
     (r'account/$', 'mygpo.web.views.account'),
     (r'^info/$', 'django.views.generic.simple.direct_to_template', {'template': 'info.html'}),
 

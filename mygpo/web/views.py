@@ -62,10 +62,32 @@ def podcast(request, pid):
     devices = Device.objects.filter(user=request.user)
     history = SubscriptionAction.objects.filter(podcast=podcast,device__in=devices).order_by('-timestamp')
     subscribed_devices = [s.device for s in Subscription.objects.filter(podcast=podcast,user=request.user)]
+    episodes = episode_list(podcast, request.user)
     return render_to_response('podcast.html', {
         'history': history,
         'podcast': podcast,
         'devices': subscribed_devices,
+        'episodes': episodes,
+    }, context_instance=RequestContext(request))
+
+def episode_list(podcast, user):
+    list = {}
+    episodes = Episode.objects.filter(podcast=podcast).order_by('-timestamp')
+    for e in episodes:
+        list[e] = None
+        for action in EpisodeAction.objects.filter(episode=e, user=user).order_by('timestamp'):
+            list[e] = action
+
+    return list
+
+@login_required
+def episode(request, id):
+    episode = Episode.objects.get(pk=id)
+    history = EpisodeAction.objects.filter(user=request.user, episode=episode).order_by('-timestamp')
+
+    return render_to_response('episode.html', {
+        'episode': episode,
+        'history': history,
     }, context_instance=RequestContext(request))
 
 

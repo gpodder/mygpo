@@ -17,6 +17,48 @@
    <li class="{{device.type}}"><a href="/device/{{ device.id }}">{{ device.name }}</a></li>
   {% endfor %}
   </ul>
+  
+  {% if not episodes|length_is:"0" %}
+   <h2>{% trans "Episodes" %}</h2>
+   <table class="list">
+    <tr>
+     <th></th>
+     <th>{% trans "Title" %}</th>
+     <th>{% trans "Description" %}</th>
+     <th>{% trans "Released" %}</th>
+    </tr>
+ 
+    {% for episode, action in episodes.items %}
+     <tr>
+      <td>
+       {% if not action %} 
+        <img src="/media/16x16/emblem-new.png" alt="new" />
+       {% endif %}
+
+       {% ifequal action.action "new" %}
+        <img src="/media/16x16/emblem-new.png" alt="new" />
+       {% endifequal %}
+
+       {% ifequal action.action "download" %}
+        <img src="/media/16x16/folder.png" alt="downloaded" />
+       {% endifequal %}
+
+       {% ifequal action.action "play" %}
+        <img src="/media/16x16/media-playback-start.png" alt="played" />
+       {% endifequal %}
+
+       {% ifequal action.action "delete" %}
+        <img src="/media/16x16/user-trash-full.png" alt="deleted" />
+       {% endifequal %}
+      </td>
+      <td><a href="/episode/{{ episode.id }}">{{ episode.title|default:"Unknown Episode" }}</a></td>
+      <td class="description">{{ episode.description|default:"" }}</td>
+      <td>{{ episode.timestamp|default:""|naturalday }}</td>
+
+     </tr>
+    {% endfor %}
+   </table>
+  {% endif %}
 
   <h2>{% trans "Subscription History" %}</h2>
   <table class="list">
