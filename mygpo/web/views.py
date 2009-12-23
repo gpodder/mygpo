@@ -20,7 +20,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext
 from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, Subscription, SuggestionEntry
-from mygpo.web.forms import UserAccountForm
+from mygpo.web.forms import UserAccountForm, DeviceForm
 from mygpo.api.opml import Exporter
 from django.utils.translation import ugettext as _
 from mygpo.api.basic_auth import require_valid_user
@@ -129,4 +129,34 @@ def suggestions_opml(request, count):
     opml = exporter.generate([e.podcast for e in entries])
 
     return HttpResponse(opml, mimetype='text/xml')
+
+def device(request, device_id):
+    device = Device.objects.get(pk=device_id)
+    subscriptions = Subscription.objects.filter(device=device)
+    success = False
+
+    if request.method == 'POST':
+        form = DeviceForm(request.POST)
+
+        if form.is_valid():
+            device.name = form.cleaned_data['name']
+            device.type = form.cleaned_data['type']
+            device.uid  = form.cleaned_data['uid']
+            device.save()
+            success = True
+
+    else:
+        form = DeviceForm({
+            'name': device.name,
+            'type': device.type,
+            'uid' : device.uid
+            })
+
+    return render_to_response('device.html', {
+        'device': device,
+        'form': form,
+        'success': success,
+        'subscriptions': subscriptions,
+    }, context_instance=RequestContext(request))
+
 

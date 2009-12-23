@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+  <h1>{{ device.name }}</h1>
+
+  <h2>Podcasts</h2>
+  <p>{% trans "You have subscribed the following podcasts on this device" %}
+  <table class="list">
+   <tr>
+    <th></th>
+    <th>{% trans "Title" %}</th>
+    <th>{% trans "Since" %}</th>
+   </tr>
+
+   {% for subscription in subscriptions %}
+    <tr>
+     <td></td>
+     <td><a href="/podcast/{{subscription.podcast.id}}">{{ subscription.podcast }}</a></td>
+     <td>{{subscription.subscribed_since}}</td>
+    </tr>
+   {% endfor %}
+  </table>
+
+  <h2>Edit</h2>
+  {% if success %}
+   <div class="success">{% trans "Your settings have been saved." %}</div>
+  {% endif %}
+
+  <form action="" method="POST">
+   {{ form.as_p }}
+   <input type="submit" value="Save" />
+  </form>
+
+  <div class="info">The <strong>UID</strong> connects your physical device with this page, so you should enter the same text on your device and here.</div>
+
+{% endblock %}
+

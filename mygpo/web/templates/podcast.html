@@ -13,7 +13,7 @@
   <strong>You have subscribed this podcast on</strong>
   <ul class="devices">
   {% for device in devices %}
-   <li class="{{device.type}}">{{ device.name }}</li>
+   <li class="{{device.type}}"><a href="/device/{{ device.id }}">{{ device.name }}</a></li>
   {% endfor %}
   </ul>
 
