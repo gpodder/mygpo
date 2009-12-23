@@ -2,31 +2,40 @@
 {% load i18n %}
 
 {% block content %}
-  <h1>{% trans "my.gpodder.org" %}
-  <h2>{% trans "Your Subscriptions" %}</h2>
-  <table class="list">
-	<tr>
-		<th>&nbsp;</th>
-		<th>{% trans "Title" %}</th>
-		<th>{% trans "Latest Episode" %}</th>
-		<th>{% trans "Devices" %}</th>
-	</tr>
-       {% for s in subscriptionlist %}
-	<tr>
-		<td> 
-                  {% if s.podcast.logo_url %}
-                  <img src="{{ s.podcast.logo_url }}" style="width:40px; height:30px;" />
-                  {% endif %}                  
-              </td>
-		<td style="font-weight:bold"><a class="listlink" href="/podcast/{{ s.podcast.id }}">{{ s.podcast }}</a></td>
+ <h1>{% trans "my.gpodder.org" %}
+
+ {% if not subscriptionlist|length_is:"0" %}
+ <h2>{% trans "Your Subscriptions" %}</h2>
+ <table class="list">
+  <tr>
+   <th>&nbsp;</th>
+   <th>{% trans "Title" %}</th>
+   <th>{% trans "Latest Episode" %}</th>
+   <th>{% trans "Devices" %}</th>
+  </tr>
+  
+  {% for s in subscriptionlist %}
+   <tr>
+    <td> 
+     {% if s.podcast.logo_url %}
+      <img src="{{ s.podcast.logo_url }}" style="width:40px; height:30px;" />
+     {% endif %}                  
+    </td>
+    <td><a class="listlink" href="/podcast/{{ s.podcast.id }}">{{ s.podcast }}</a></td>
     {% if s.episode %}
-		<td>{{ s.episode }}</td>
+     <td>{{ s.episode }}</td>
     {% else %}
-      <td></td>
+     <td></td>
     {% endif %}
-		<td>{{ s.devices|join:", " }}</td>
-	</tr>
-       {% endfor %}
+    <td>{{ s.devices|join:", " }}</td>
+   </tr>
+  {% endfor %}
   </table>
+ {% else %}
+
+ <h2>{% trans "Where to start?" %}</h2>
+ <p>{% blocktrans with user.username as username %}my.gpodder.org help you to track your podcasts which you have subscribed on your devices - desktop computer, notebook, mobile devices, etc. To start using my.gpodder.org set up <a href="http://gpodder.org">gPodder</a> with your username &ndash; <strong>{{username}}</strong> &ndash; and password and upload your podcasts. They will automatically show up here.{% endblocktrans %}</p>
+
+ {% endif %}
 {% endblock %}
 
