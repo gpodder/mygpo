@@ -34,7 +34,7 @@ except ImportError:
     print "No JSON module available - fallback to simplejson (Python < 2.6)"
     import simplejson as json
 
-@require_valid_user()
+@require_valid_user
 def subscriptions(request, username, device_uid):
 
     if request.user.username != username:
@@ -110,7 +110,7 @@ def get_subscription_changes(user, device, since, until):
     return {'add': add, 'remove': remove, 'timestamp': until}
 
 
-@require_valid_user()
+@require_valid_user
 def episodes(request, username):
 
     if request.user.username != username:
@@ -182,7 +182,7 @@ def update_episodes(user, actions):
         EpisodeAction.objects.create(user=user, episode=episode, device=device, action=action, timestamp=timestamp, playmark=position)
 
 
-@require_valid_user()
+@require_valid_user
 def device(request, username, device_uid):
 
     if request.user.username != username:
@@ -209,7 +209,7 @@ def device(request, username, device_uid):
         return HttpResponseNotAllowed(['POST'])
 
 
-@require_valid_user()
+@require_valid_user
 def devices(request, username):
 
     if request.user.username != username:
