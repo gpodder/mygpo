@@ -122,7 +122,7 @@ ul.devices li.laptop
 
 ul.devices li.mobile
 {
-    list-style-image: url('16x16/pda.png');
+    list-style-image: url('16x16/multimedia-player.png');
 }
 
 ul.devices li.server
