@@ -6,7 +6,7 @@
 
   <p>{% blocktrans %}These are the {{ count }} most susbscribed podcasts.{% endblocktrans %}</p>
 
-  <table>
+  <table class="list">
    <tr>
     <th>{% trans "#" %}</th>
     <th>{% trans "Podcast" %}</th>
@@ -16,7 +16,7 @@
    <tr>
     <td>{{ forloop.counter }}</td>
     <td>{{ entry.podcast }}</td>
-    <td>{{ entry.subscriptions }}</td>
+    <td class="numeric">{{ entry.subscriptions }}</td>
    </tr>
   {% endfor %}
   </table>
