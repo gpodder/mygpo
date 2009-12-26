@@ -62,7 +62,7 @@ def subscriptions(request, username, device_uid):
         return JsonResponse(changes)
 
     elif request.method == 'POST':
-        d, created = Device.objects.get_or_create(user=request.user, uid=device_uid)
+        d, created = Device.objects.get_or_create(user=request.user, uid=device_uid, defaults = {'type': 'other', 'name': 'New Device'})
 
         actions = json.loads(request.POST['data'])
         add = actions['add'] if 'add' in actions else []
