@@ -162,6 +162,7 @@ def suggestions_opml(request, count):
 
     return HttpResponse(opml, mimetype='text/xml')
 
+@login_required
 def device(request, device_id):
     device = Device.objects.get(pk=device_id)
     subscriptions = device.get_subscriptions()
@@ -199,6 +200,7 @@ def device(request, device_id):
     }, context_instance=RequestContext(request))
 
 
+@login_required
 def device_sync(request, device_id):
 
     if request.method != 'POST':
@@ -225,7 +227,7 @@ def device_sync(request, device_id):
 
     return HttpResponseRedirect('/device/%s' % device_id)
 
-
+@login_required
 def device_unsync(request, device_id):
     if request.method != 'GET':
         return HttpResponseNotAllowed(['GET'])
