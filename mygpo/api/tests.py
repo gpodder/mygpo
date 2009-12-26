@@ -16,12 +16,23 @@
 #
 
 from django.test import TestCase
+from django.test.client import Client
 from django.contrib.auth.models import User
 from mygpo.api.models import Device, Podcast, SubscriptionAction, UserProfile
 from put_test import put_data
 from django.http import HttpRequest
 from mygpo.api.simple import subscriptions
+from mygpo.api.advanced import devices
 import time
+
+try:
+    #try to import the JSON module (if we are on Python 2.6)
+    import json
+except ImportError:
+    # No JSON module available - fallback to simplejson (Python < 2.6)
+    print "No JSON module available - fallback to simplejson (Python < 2.6)"
+    import simplejson as json
+
 
 class SyncTest(TestCase):
     def test_sync_actions(self):
@@ -74,6 +85,79 @@ class SyncTest(TestCase):
         self.assertEqual( sa2[p1].device, d1)
         self.assertEqual( sa2[p1].podcast, p1)
         self.assertEqual( sa2[p1].action, 1)
+
+class AdvancedAPITest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create(username='adv', email='adv@mygpo')
+        self.user.set_password('adv1')
+        self.user.save()
+        self.device1 = Device.objects.create(user=self.user, name='d1', uid='uid1', type='desktop')
+        self.device2 = Device.objects.create(user=self.user, name='d2', uid='uid2', type='mobile')
+        self.client = Client()
+        l = self.client.login(username='adv', password='adv1')
+        self.assertEqual(l, True)
+
+    def test_device_list(self):
+        response = self.client.get('/api/1/devices/%s.json' % self.user.username)
+        json_list = response.content
+        list = json.loads(json_list)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(list), 2)
+        self.assertEqual(list[0], {u'id': u'uid1', u'caption': u'd1', u'type': u'desktop', u'subscriptions': 0})
+        self.assertEqual(list[1], {u'id': u'uid2', u'caption': u'd2', u'type': u'mobile',  u'subscriptions': 0})
+
+    def test_rename_device(self):
+        req = {'caption': 'd2!', 'type': 'server'}
+        reqs = json.dumps(req)
+
+        self.client.post('/api/1/devices/%s/%s.json' % (self.user.username, self.device2.uid), data={'data': reqs})
+
+        response = self.client.get('/api/1/devices/%s.json' % self.user.username)
+        json_list = response.content
+        list = json.loads(json_list)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(list), 2)
+        self.assertEqual(list[0], {u'id': u'uid1', u'caption': u'd1',  u'type': u'desktop', u'subscriptions': 0})
+        self.assertEqual(list[1], {u'id': u'uid2', u'caption': u'd2!', u'type': u'server',  u'subscriptions': 0})
+
+
+    def test_add_remove_subscriptions(self):
+        req = {"add": ["http://example.com/feed.rss", "http://example.org/podcast.php", "http://example.net/foo.xml"]}
+        reqs = json.dumps(req)
+
+        #adding 3 subscriptions
+        response = self.client.post('/api/1/subscriptions/%s/%s.json' % (self.user.username, self.device1.uid), data={'data': reqs})
+        self.assertEqual(response.status_code, 200)
+        
+        resp = json.loads(response.content)
+        add_timestamp = resp['timestamp']
+
+        #qerying subscription changes
+        response = self.client.get('/api/1/subscriptions/%s/%s.json' % (self.user.username, self.device1.uid), {'since': add_timestamp-1})
+        changes = json.loads(response.content)
+
+        self.assertEqual(changes['add'], ["http://example.com/feed.rss", "http://example.org/podcast.php", "http://example.net/foo.xml"])
+        self.assertEqual(len(changes['remove']), 0)
+
+        #removing the 1st and 3rd subscription
+        req = {"add": [], 'remove': ["http://example.com/feed.rss","http://example.net/foo.xml"]}
+        reqs = json.dumps(req)
+        time.sleep(1)
+        response = self.client.post('/api/1/subscriptions/%s/%s.json' % (self.user.username, self.device1.uid), data={'data': reqs})
+        self.assertEqual(response.status_code, 200)
+
+        resp = json.loads(response.content)
+        timestamp = resp['timestamp']
+
+        #changes since beginning, should return 1 addition, 2 removals
+        response = self.client.get('/api/1/subscriptions/%s/%s.json' % (self.user.username, self.device1.uid), {'since': add_timestamp-1})
+        changes = json.loads(response.content)
+        self.assertEqual(changes['add'], ["http://example.org/podcast.php"])
+        self.assertEqual(changes['remove'], ["http://example.com/feed.rss","http://example.net/foo.xml"])
+
+        #changes including removal
+
 
 class SimpleTest(TestCase):
     def test_put_get_data(self):
