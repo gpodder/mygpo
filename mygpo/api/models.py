@@ -18,6 +18,7 @@
 from django.db import models
 from django.contrib.auth.models import User, UserManager
 from datetime import datetime
+from django.utils.translation import ugettext as _
 import hashlib
 
 EPISODE_ACTION_TYPES = (
@@ -131,7 +132,7 @@ class SyncGroup(models.Model):
 
     def __unicode__(self):
         devices = [d.name for d in Device.objects.filter(sync_group=self)]
-        return '%s - %s' % (self.user, ', '.join(devices))
+        return ', '.join(devices)
 
     def devices(self):
         return Device.objects.filter(sync_group=self)
@@ -156,10 +157,10 @@ class Device(models.Model):
     sync_group = models.ForeignKey(SyncGroup, blank=True, null=True)
 
     def __unicode__(self):
-        return '%s - %s (%s)' % (self.user, self.name, self.type)
+        return self.name if self.name else _('Unnamed Device (%s)' % self.uid)
 
     def get_subscriptions(self):
-        #self.sync()
+        self.sync()
         return Subscription.objects.filter(device=self)
 
     def sync(self):
@@ -196,18 +197,18 @@ class Device(models.Model):
             a = d.latest_actions()
             for s in a.keys():
                 if not sync_actions.has_key(s):
-		    if a[s].action == SUBSCRIBE_ACTION:
-			sync_actions[s] = a[s]
-		elif a[s].newer_than(sync_actions[s]) and (sync_actions[s].action != a[s].action):
+                    if a[s].action == SUBSCRIBE_ACTION:
                         sync_actions[s] = a[s]
+                elif a[s].newer_than(sync_actions[s]) and (sync_actions[s].action != a[s].action):
+                    sync_actions[s] = a[s]
 
-	#remove actions that did not change
-	current_state = self.latest_actions()
-	for podcast in current_state.keys():
-	    if sync_actions[podcast] == current_state[podcast]:
-		del sync_actions[podcast]
+        #remove actions that did not change
+        current_state = self.latest_actions()
+        for podcast in current_state.keys():
+            if sync_actions[podcast] == current_state[podcast]:
+               del sync_actions[podcast]
 
-        return sync_actions
+        return sync_actions.values()
 
     def latest_actions(self):
         """
@@ -279,6 +280,7 @@ class Device(models.Model):
             raise ValueError('the device is not synced')
 
         g = self.sync_group
+        print g
         self.sync_group = None
         self.save()
 
@@ -287,8 +289,7 @@ class Device(models.Model):
             d = devices[0]
             d.sync_group = None
             d.save()
-
-        g.delete()
+            g.delete()
 
     class Meta:
         db_table = 'device'
@@ -334,7 +335,7 @@ class SubscriptionAction(models.Model):
 
     def newer_than(self, action):
         if (self.timestamp == action.timestamp): return self.id > action.id
-	return self.timestamp > action.timestamp
+        return self.timestamp > action.timestamp
 
     def __unicode__(self):
         return '%s %s %s %s' % (self.device.user, self.device, self.action_string(), self.podcast)

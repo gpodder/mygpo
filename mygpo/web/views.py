@@ -16,16 +16,17 @@
 #
 
 from django.shortcuts import render_to_response
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed
 from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext
-from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, Subscription, SuggestionEntry, Rating
-from mygpo.web.forms import UserAccountForm, DeviceForm
+from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, Subscription, SuggestionEntry, Rating, SyncGroup
+from mygpo.web.forms import UserAccountForm, DeviceForm, SyncForm
 from mygpo.api.opml import Exporter
 from django.utils.translation import ugettext as _
 from mygpo.api.basic_auth import require_valid_user
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
+import re
 
 def home(request):
        if request.user.is_authenticated():
@@ -163,21 +164,25 @@ def suggestions_opml(request, count):
 
 def device(request, device_id):
     device = Device.objects.get(pk=device_id)
-    subscriptions = Subscription.objects.filter(device=device)
+    subscriptions = device.get_subscriptions()
+    synced_with = list(device.sync_group.devices()) if device.sync_group else []
+    if device in synced_with: synced_with.remove(device)
     success = False
+    sync_form = SyncForm()
+    sync_form.set_device(device)
 
     if request.method == 'POST':
-        form = DeviceForm(request.POST)
+        device_form = DeviceForm(request.POST)
 
-        if form.is_valid():
-            device.name = form.cleaned_data['name']
-            device.type = form.cleaned_data['type']
-            device.uid  = form.cleaned_data['uid']
+        if device_form.is_valid():
+            device.name = device_form.cleaned_data['name']
+            device.type = device_form.cleaned_data['type']
+            device.uid  = device_form.cleaned_data['uid']
             device.save()
             success = True
 
     else:
-        form = DeviceForm({
+        device_form = DeviceForm({
             'name': device.name,
             'type': device.type,
             'uid' : device.uid
@@ -185,9 +190,48 @@ def device(request, device_id):
 
     return render_to_response('device.html', {
         'device': device,
-        'form': form,
+        'device_form': device_form,
+        'sync_form': sync_form,
         'success': success,
         'subscriptions': subscriptions,
+        'synced_with': synced_with,
+        'has_sync_targets': len(device.sync_targets()) > 0
     }, context_instance=RequestContext(request))
 
+
+def device_sync(request, device_id):
+
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+        
+    form = SyncForm(request.POST)
+    if not form.is_valid():
+        return HttpResponseBadRequest('invalid')
+
+    target = form.cleaned_data['targets']
+
+    m = re.match('^([dg])(\d+)$', target)
+    if m == None:
+        return HttpResponseBadRequest()
+
+    if m.group(1) == 'd':
+        target = Device.objects.get(pk=m.group(2))
+    else:
+        target = SyncGroup.objects.get(pk=m.group(2))
+
+    device = Device.objects.get(pk=device_id)
+
+    device.sync_with(target)
+
+    return HttpResponseRedirect('/device/%s' % device_id)
+
+
+def device_unsync(request, device_id):
+    if request.method != 'GET':
+        return HttpResponseNotAllowed(['GET'])
+
+    device = Device.objects.get(pk=device_id)
+    device.unsync()
+
+    return HttpResponseRedirect('/device/%s' % device_id)
 

@@ -52,6 +52,8 @@ urlpatterns = patterns('',
     (r'^suggestions/(?P<count>\d+).opml$', 'mygpo.web.views.suggestions_opml'),
 
     (r'^device/(?P<device_id>\d+)$', 'mygpo.web.views.device'),
+    (r'^device/(?P<device_id>\d+)/sync$', 'mygpo.web.views.device_sync'),
+    (r'^device/(?P<device_id>\d+)/unsync$', 'mygpo.web.views.device_unsync'),
 
     #Legacy API
     (r'^upload$', 'mygpo.api.legacy.upload'),
