@@ -319,10 +319,30 @@ class Subscription(models.Model):
     def __unicode__(self):
         return '%s - %s on %s' % (self.device.user, self.podcast, self.device)
 
+    def get_meta(self):
+        #this is different than get_or_create because it does not necessarily create a new meta-object
+        try:
+            return SubscriptionMeta.objects.get(user=self.user, podcast=self.podcast)
+        except SubscriptionMeta.DoesNotExist:
+            return SubscriptionMeta(user=self.user, podcast=self.podcast)
+
     class Meta:
         db_table = 'current_subscription'
         #not available in Django 1.0 (Debian stable)
         #managed = False
+
+
+class SubscriptionMeta(models.Model):
+    user = models.ForeignKey(User)
+    podcast = models.ForeignKey(Podcast)
+    public = models.BooleanField(default=True)
+
+    def __unicode__(self):
+        return '%s - %s - %s' % (self.user, self.podcast, self.public)
+
+    class Meta:
+        db_table = 'subscription'
+
 
 class SubscriptionAction(models.Model):
     device = models.ForeignKey(Device)
