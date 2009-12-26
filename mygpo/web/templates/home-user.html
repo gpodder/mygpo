@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load devices %}
 
 {% block content %}
  <h1>{% trans "my.gpodder.org" %}
@@ -27,7 +28,7 @@
     {% else %}
      <td></td>
     {% endif %}
-    <td>{{ s.devices|join:", " }}</td>
+    <td>{{ s.devices|device_list }}</td>
    </tr>
   {% endfor %}
   </table>

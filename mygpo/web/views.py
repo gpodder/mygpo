@@ -46,11 +46,11 @@ def create_subscriptionlist(request):
     l = {}
     for s in subscriptions:
         if s.podcast in l:
-            l[s.podcast]['devices'].append(s.device.name)
+            l[s.podcast]['devices'].append(s.device)
         else:
             e = Episode.objects.filter(podcast=s.podcast).order_by('-timestamp')
             episode = e[0] if e.count() > 0 else None
-            devices = [s.device.name]
+            devices = [s.device]
             l[s.podcast] = {'podcast': s.podcast, 'episode': episode, 'devices': devices}
 
     return l.values()
