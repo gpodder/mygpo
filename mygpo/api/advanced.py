@@ -98,7 +98,7 @@ def update_subscriptions(user, device, add, remove):
 
 def get_subscription_changes(user, device, since, until):
     actions = {}
-    for a in SubscriptionAction.objects.filter(device=device, timestamp__gt=since, timestamp__lt=until).order_by('timestamp'):
+    for a in SubscriptionAction.objects.filter(device=device, timestamp__gt=since, timestamp__lte=until).order_by('timestamp'):
         #ordered by ascending date; newer entries overwriter older ones
         actions[a.podcast] = a
 
@@ -151,7 +151,7 @@ def episodes(request, username):
 
 def get_episode_changes(user, podcast, device, since, until):
     actions = []
-    for a in EpisodeAction.objects.filter(user=user, podcast=podcast, device=device, timestamp__gt=since, timestamp__lt=until):
+    for a in EpisodeAction.objects.filter(user=user, podcast=podcast, device=device, timestamp__gt=since, timestamp__lte=until):
         action = {
             'podcast': a.episode.podcast.url,
             'episode': a.episode.url,
