@@ -19,20 +19,18 @@ from mygpo.api.basic_auth import require_valid_user
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, Http404
 from mygpo.api.models import Device, SubscriptionAction, Podcast, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION
 from mygpo.api.opml import Exporter, Importer
-from mygpo.api.json import JsonResponse
+from mygpo.api.httpresponse import JsonResponse
 from django.core import serializers
 from datetime import datetime
 from mygpo.api.httpresponse import HttpResponseNotAuthorized
 import re
-try:
-    # Try to import the JSON module (if we are on Python 2.6)
-    import json
-except ImportError:
-    # No JSON module available - fallback to simplejson (Python < 2.6)
-    import simplejson as json
-    
 
-@require_valid_user()
+try:
+    import simplejson as json
+except ImportError:
+    import json
+
+@require_valid_user
 def subscriptions(request, username, device_uid, format):
     
     if request.user.username != username:
@@ -114,5 +112,6 @@ def set_subscriptions(subscriptions):
         s = SubscriptionAction(podcast=p, action=SUBSCRIBE_ACTION, device=d)
         s.save()
 
-    return HttpResponse('Success\n', mimetype='text/plain')
+    # Only an empty response is a successful response
+    return HttpResponse('', mimetype='text/plain')
 
