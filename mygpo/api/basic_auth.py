@@ -15,9 +15,6 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-#from http://www.djangosnippets.org/snippets/243/
-import base64
-
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login
 
@@ -25,28 +22,28 @@ from django.contrib.auth import authenticate, login
 #
 def view_or_basicauth(view, request, test_func, realm = "", *args, **kwargs):
     """
-    This is a helper function used by both 'logged_in_or_basicauth' and
+    This is a helper function used by both 'require_valid_user' and
     'has_perm_or_basicauth' that does the nitty of determining if they
     are already logged in or if they have provided proper http-authorization
     and returning the view if all goes well, otherwise responding with a 401.
     """
     if test_func(request.user):
         # Already logged in, just return the view.
-        #
         return view(request, *args, **kwargs)
 
     # They are not logged in. See if they provided login credentials
-    #
     if 'HTTP_AUTHORIZATION' in request.META:
-        auth = request.META['HTTP_AUTHORIZATION'].split()
+        auth = request.META['HTTP_AUTHORIZATION'].split(None, 1)
         if len(auth) == 2:
+            auth_type, credentials = auth
+
             # NOTE: We are only support basic authentication for now.
-            #
-            if auth[0].lower() == "basic":
-                uname, passwd = base64.b64decode(auth[1]).split(':')
-                user = authenticate(username=uname, password=passwd)
-                if user is not None:
-                    if user.is_active:
+            if auth_type.lower() == 'basic':
+                credentials = credentials.decode('base64').split(':', 1)
+                if len(credentials) == 2:
+                    uname, passwd = credentials
+                    user = authenticate(username=uname, password=passwd)
+                    if user is not None and user.is_active:
                         login(request, user)
                         request.user = user
                         return view(request, *args, **kwargs)
@@ -54,7 +51,6 @@ def view_or_basicauth(view, request, test_func, realm = "", *args, **kwargs):
     # Either they did not provide an authorization header or
     # something in the authorization attempt failed. Send a 401
     # back to them to ask them to authenticate.
-    #
     response = HttpResponse()
     response.status_code = 401
     response['WWW-Authenticate'] = 'Basic realm="%s"' % realm
@@ -62,7 +58,7 @@ def view_or_basicauth(view, request, test_func, realm = "", *args, **kwargs):
 
 #############################################################################
 #
-def require_valid_user(realm = ""):
+def require_valid_user(protected_view):
     """
     A simple decorator that requires a user to be logged in. If they are not
     logged in the request is examined for a 'authorization' header.
@@ -83,21 +79,19 @@ def require_valid_user(realm = ""):
     auth (and they do NOT support a redirect to a form where they post a
     username/password.)
 
-    Use is simple:
-
-    @logged_in_or_basicauth
-    def your_view:
-        ...
-
-    You can provide the name of the realm to ask for authentication within.
+    XXX: Fix usage descriptions, ideally provide an example as doctest.
     """
-    def view_decorator(func):
-        def wrapper(request, *args, **kwargs):
-            return view_or_basicauth(func, request,
-                                     lambda u: u.is_authenticated(),
-                                     realm, *args, **kwargs)
-        return wrapper
-    return view_decorator
+    def wrapper(request, *args, **kwargs):
+        def check_valid_user(user):
+            return user.is_authenticated()
+
+        return view_or_basicauth(protected_view, \
+                                 request, \
+                                 check_valid_user, \
+                                 '', \
+                                 *args, \
+                                 **kwargs)
+    return wrapper
 
 #############################################################################
 #

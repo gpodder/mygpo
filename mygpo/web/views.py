@@ -16,11 +16,17 @@
 #
 
 from django.shortcuts import render_to_response
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed
 from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext
-from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction
-from mygpo.web.forms import UserAccountForm
+from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, Subscription, SuggestionEntry, Rating, SyncGroup, SUBSCRIBE_ACTION
+from mygpo.web.forms import UserAccountForm, DeviceForm, SyncForm
+from mygpo.api.opml import Exporter
+from django.utils.translation import ugettext as _
+from mygpo.api.basic_auth import require_valid_user
+from django.contrib.auth.decorators import login_required
+from datetime import datetime
+import re
 
 def home(request):
        if request.user.is_authenticated():
@@ -37,35 +43,93 @@ def home(request):
               })
 
 def create_subscriptionlist(request):
-      userid = UserProfile.objects.filter(user=request.user)[0].id
-      device = Device.objects.filter(user__id=userid)
-      device_ids = [d.id for d in device]
-      sublog = SubscriptionAction.objects.filter(device__in=device_ids)
-      sublog_podcastids = [s.podcast_id for s in sublog]
+    #sync all devices first
+    for d in Device.objects.filter(user=request.user):
+        d.sync()
 
-      podcast = Podcast.objects.filter(id__in=sublog_podcastids).order_by('title')
-      subscriptionlist = [{'title': p.title, 'logo': p.logo_url, 'id': p.id} for p in podcast]
+    subscriptions = Subscription.objects.filter(user=request.user)
 
-      for index, entry in enumerate(subscriptionlist):
-            sublog_for_device = SubscriptionAction.objects.filter(podcast__id=subscriptionlist[index]['id'])
-            sublog_devids = [s.device.id for s in sublog_for_device]
-            dev = Device.objects.filter(id__in=sublog_devids, user__id=userid).values_list('name', flat=True)
-            latest_actions = EpisodeAction.objects.filter(episode__podcast__id=subscriptionlist[index]['id']).order_by('-timestamp')
-            subscriptionlist[index]['episode'] = ''            
-            if latest_actions.count() > 0:
-                 episode = latest_actions[0].episode.title
-                 timestamp = latest_actions[0].timestamp.strftime('%d.%m.%Y %H:%M')
-                 subscriptionlist[index]['episode'] += episode + ", " + timestamp
-            subscriptionlist[index]['device'] = ''
-            
-            for i, d in enumerate(dev):
-                 if i == 0:
-                       subscriptionlist[index]['device'] += d
-                 else:
-                       subscriptionlist[index]['device'] += ", "  + d           
-      return subscriptionlist
+    l = {}
+    for s in subscriptions:
+        if s.podcast in l:
+            l[s.podcast]['devices'].append(s.device)
+        else:
+            e = Episode.objects.filter(podcast=s.podcast).order_by('-timestamp')
+            episode = e[0] if e.count() > 0 else None
+            devices = [s.device]
+            l[s.podcast] = {'podcast': s.podcast, 'episode': episode, 'devices': devices}
+
+    return l.values()
 
 
+@login_required
+def podcast(request, pid):
+    podcast = Podcast.objects.get(pk=pid)
+    devices = Device.objects.filter(user=request.user)
+    history = SubscriptionAction.objects.filter(podcast=podcast,device__in=devices).order_by('-timestamp')
+    subscribed_devices = [s.device for s in Subscription.objects.filter(podcast=podcast,user=request.user)]
+    episodes = episode_list(podcast, request.user)
+    return render_to_response('podcast.html', {
+        'history': history,
+        'podcast': podcast,
+        'devices': subscribed_devices,
+        'episodes': episodes,
+    }, context_instance=RequestContext(request))
+
+@login_required
+def podcast_subscribe(request, pid):
+    podcast = Podcast.objects.get(pk=pid)
+
+    if request.method == 'POST':
+        form = SyncForm(request.POST)
+
+        target = form.get_target()
+
+        if isinstance(target, SyncGroup):
+            device = target.devices()[0]
+        else:
+            device = target
+
+        SubscriptionAction.objects.create(podcast=podcast, device=device, action=SUBSCRIBE_ACTION)
+
+        return HttpResponseRedirect('/podcast/%s' % podcast.id)
+
+    else:
+        targets = list(Device.objects.filter(user=request.user, sync_group=None))
+        groups = SyncGroup.objects.filter(user=request.user)
+        targets.extend( list(groups) )
+
+        form = SyncForm()
+        form.set_targets(targets, _('With which client do you want to subscribe?'))
+
+        return render_to_response('subscribe.html', {
+            'podcast': podcast,
+            'form': form
+        }, context_instance=RequestContext(request))
+
+
+def episode_list(podcast, user):
+    list = {}
+    episodes = Episode.objects.filter(podcast=podcast).order_by('-timestamp')
+    for e in episodes:
+        list[e] = None
+        for action in EpisodeAction.objects.filter(episode=e, user=user).order_by('timestamp'):
+            list[e] = action
+
+    return list
+
+@login_required
+def episode(request, id):
+    episode = Episode.objects.get(pk=id)
+    history = EpisodeAction.objects.filter(user=request.user, episode=episode).order_by('-timestamp')
+
+    return render_to_response('episode.html', {
+        'episode': episode,
+        'history': history,
+    }, context_instance=RequestContext(request))
+
+
+@login_required
 def account(request):
     success = False
 
@@ -92,7 +156,110 @@ def account(request):
     }, context_instance=RequestContext(request))
 
 
-#sl = SubscriptionAction.objects.filter(podcast=podcast_ids[listindex])
-#sldev_ids = [s.device.id for s in sl]  
-#dev = Device.objects.filter(id__in=sldev_ids)
-#dev_names = [d.name for d in dev]
+def toplist(request, len=30):
+    entries = ToplistEntry.objects.all().order_by('-subscriptions')[:len]
+    return render_to_response('toplist.html', {
+        'entries': entries,
+    }, context_instance=RequestContext(request))
+
+
+def toplist_opml(request, count):
+    entries = ToplistEntry.objects.all().order_by('-subscriptions')[:count]
+    exporter = Exporter(_('my.gpodder.org - Top %s') % count)
+
+    opml = exporter.generate([e.podcast for e in entries])
+
+    return HttpResponse(opml, mimetype='text/xml')
+ 
+
+@login_required
+def suggestions(request):
+
+    rated = False
+
+    if 'rate' in request.GET:
+        Rating.objects.create(target='suggestions', user=request.user, rating=request.GET['rate'], timestamp=datetime.now())
+        rated = True
+
+    entries = SuggestionEntry.objects.filter(user=request.user).order_by('-priority')
+    return render_to_response('suggestions.html', {
+        'entries': entries,
+        'rated'  : rated
+    }, context_instance=RequestContext(request))
+
+
+@require_valid_user
+def suggestions_opml(request, count):
+    entries = SuggestionEntry.objects.filter(user=request.user).order_by('-priority')
+    exporter = Exporter(_('my.gpodder.org - %s Suggestions') % count)
+
+    opml = exporter.generate([e.podcast for e in entries])
+
+    return HttpResponse(opml, mimetype='text/xml')
+
+@login_required
+def device(request, device_id):
+    device = Device.objects.get(pk=device_id)
+    subscriptions = device.get_subscriptions()
+    synced_with = list(device.sync_group.devices()) if device.sync_group else []
+    if device in synced_with: synced_with.remove(device)
+    success = False
+    sync_form = SyncForm()
+    sync_form.set_targets(device.sync_targets(), _('Synchronize with the following devices'))
+
+    if request.method == 'POST':
+        device_form = DeviceForm(request.POST)
+
+        if device_form.is_valid():
+            device.name = device_form.cleaned_data['name']
+            device.type = device_form.cleaned_data['type']
+            device.uid  = device_form.cleaned_data['uid']
+            device.save()
+            success = True
+
+    else:
+        device_form = DeviceForm({
+            'name': device.name,
+            'type': device.type,
+            'uid' : device.uid
+            })
+
+    return render_to_response('device.html', {
+        'device': device,
+        'device_form': device_form,
+        'sync_form': sync_form,
+        'success': success,
+        'subscriptions': subscriptions,
+        'synced_with': synced_with,
+        'has_sync_targets': len(device.sync_targets()) > 0
+    }, context_instance=RequestContext(request))
+
+
+@login_required
+def device_sync(request, device_id):
+
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+        
+    form = SyncForm(request.POST)
+    if not form.is_valid():
+        return HttpResponseBadRequest('invalid')
+
+    target = form.get_target()
+
+    device = Device.objects.get(pk=device_id)
+
+    device.sync_with(target)
+
+    return HttpResponseRedirect('/device/%s' % device_id)
+
+@login_required
+def device_unsync(request, device_id):
+    if request.method != 'GET':
+        return HttpResponseNotAllowed(['GET'])
+
+    device = Device.objects.get(pk=device_id)
+    device.unsync()
+
+    return HttpResponseRedirect('/device/%s' % device_id)
+

@@ -1,9 +1,13 @@
 div.error
 {
-    border: thin solid: #7d0c0c;
-    padding: 2em;
-    font-weight: bold;
-    color: #c20000;
+    background-color: #fa7080;
+    border: #f5001d thin solid;
+    width: 100%;
+    padding: 1em 1em 1em 45px;
+    background-image: url('dialog-error.png');
+    background-repeat: no-repeat;
+    background-position: 3px 50%;
+    margin: .5em;
 }
 
 table.register th {
@@ -21,14 +25,33 @@ table.register th {
     background-image: url('emblem-default.png');
     background-repeat: no-repeat;
     background-position: 3px 50%;
+    margin: .5em;
 }
 
-#navigation a
+.info
+{
+    background-color: #7277d8;
+    border: #080e73 thin solid;
+    width: 100%;
+    padding: 1em 1em 1em 45px;
+    background-image: url('info.png');
+    background-repeat: no-repeat;
+    background-position: 3px 50%;
+    margin: .5em;
+}
+
+.info a
 {
     color: black;
 }
 
-ul#navigation
+
+.menu a
+{
+    color: black;
+}
+
+ul.menu
 {
     list-style-type: none;
     margin: 1em;
@@ -36,3 +59,84 @@ ul#navigation
     padding: 0;
 }
 
+table.list
+{
+    margin-top: 2em;
+    font-size: 1em;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+table.list th
+{
+    text-align: left;
+    border-bottom: thin solid black;
+    padding: 0;
+    margin: 0;
+}
+
+table.list th,
+table.list td
+{
+    padding-right: 1em;
+}
+
+table td.numeric
+{
+    text-align: right;
+}
+
+.description
+{
+    color: #666;
+}
+
+.URL
+{
+    text-decoration: none;
+    color: black;
+}
+
+.URL:hover
+{
+    text-decoration: underline;
+}
+
+h1, h2
+{
+    padding-top: 1em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+
+ul.devices li.desktop
+{
+    list-style-image: url('16x16/computer.png');
+}
+
+ul.devices li.laptop
+{
+    list-style-image: url('16x16/pda.png');
+}
+
+ul.devices li.mobile
+{
+    list-style-image: url('16x16/multimedia-player.png');
+}
+
+ul.devices li.server
+{
+    list-style-image: url('16x16/server.png');
+}
+
+ul.devices li.other
+{
+    list-style-image: url('16x16/audio-x-generic.png');
+}
+
+div.rate
+{
+    padding-top: 2em;
+    padding-bottom: 3em;
+}

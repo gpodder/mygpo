@@ -19,7 +19,7 @@ from mygpo.api.basic_auth import require_valid_user
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, Http404
 from mygpo.api.models import Device, SubscriptionAction, Podcast, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION
 from mygpo.api.opml import Exporter, Importer
-from mygpo.api.json import JsonResponse
+from mygpo.api.httpresponse import JsonResponse
 from django.core import serializers
 from datetime import datetime
 from mygpo.api.httpresponse import HttpResponseNotAuthorized
@@ -32,7 +32,7 @@ except ImportError:
     import simplejson as json
     
 
-@require_valid_user()
+@require_valid_user
 def subscriptions(request, username, device_uid, format):
     
     if request.user.username != username:

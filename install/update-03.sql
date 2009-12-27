@@ -132,4 +132,10 @@ create index action_index on subscription_log(action);
 create index timestamp_index on subscription_log(timestamp);
 create index device_index on subscription_log(device_id);
 
+-- converting the column subscription_log.action from varchar to tinyint(1)
+alter table subscription_log add column action_tmp tinyint(1);
+update subscription_log set action_tmp = 1 where action = 'subscribe';
+update subscription_log set action_tmp = -1 where action = 'unsubscribe';
+alter table subscription_log drop column action;
+alter table subscription_log change action_tmp action tinyint(1);
 

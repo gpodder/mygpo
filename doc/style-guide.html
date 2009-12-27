@@ -18,11 +18,11 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 -->
-  <title>{% block title %}{% endblock %}my.gPodder.org</title>
+  <title>my.gpodder.org Style Guide</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <link rel="shortcut icon" href="http://gpodder.org/favicon.png">
-  <link rel="stylesheet" href="/media/screen.css" type="text/css" />
-  <link rel="stylesheet" href="/media/screen-base.css" type="text/css" />
+  <link rel="stylesheet" href="../htdocs/media/screen.css" type="text/css" />
+  <link rel="stylesheet" href="../htdocs/media/screen-base.css" type="text/css" />
  </head>
  <body>
   <h1 id="logo">
@@ -43,44 +43,35 @@
 
   <div id="body">
 
-   {% if error_message %}
-    <div class="error">{{ error_message }}</div>
-   {% endif %}
+    <h1>my.gpodder.org Style Guide</h1>
 
-   {% block content %}
-    <h1>gPodder Web Service</h1>
-    <p>...will go online soon...</p>
-    <ul>
-     <li><a href="http://gpodder.org/wiki/Web_Services">Wiki page</a></li>
-     <li><a href="toplist.opml">Toplist as OPML</a></li>
-    </ul>
-   {% endblock %}
+    <div class="success">Such boxes can be used to indicate the successful competion of some action. CSS-Class: <strong>success</strong></div>
+
+   <div class="error">Use such boxes to indicate failure. CSS-Class: <strong>error</strong></div>
+
+   <table class="list">
+    <tr>
+     <th>Column 1</th>
+     <th>Column 2</td>
+     <th>Numeric column</th>
+    </tr>
+    <tr>
+     <td>This is a sample list table</td>
+     <td>You can indicate numeric columns like this:</td>
+     <td class="numeric">1234</td>
+    </tr>
+   </table>
+
+   <div class="info">This style can be used to style infos and remarks. CSS-Class: <strong>info</strong></div>
+
+
   </div>
   <div id="navigation">
    <span class="spacer1">&nbsp;</span>
    <span class="spacer2">&nbsp;</span>
-
-   {% if user.is_authenticated %}
-    <ul class="menu">
-     <li><a href="/">{{ user.username }}'s Home</a></li>
-     <li><a href="/account/">Your settings</a></li>
-     <li><a href="/logout/">Logout</a></li>
+    <ul id="menu">
+     <li></li>
     </ul>
-
-    <ul class="menu">
-     <li><strong>Podcasts</strong></li>
-     <li><a href="/toplist/">Toplist</a></li>
-     <li><a href="/suggestions/">Suggestions</a></li>
-    </ul>
-   {% else %}
-    <ul class="menu">
-     <li><a href="/">Home</a></li>
-     <li><a href="/login/">Login</a></li>
-     <li><a href="/register/">Register</a></li>
-     <li><a href="/toplist/">Podcast-Toplist</a></li>
-    </ul>
-   {% endif %}
-
   </div>
 
   <hr style="clear: both;">

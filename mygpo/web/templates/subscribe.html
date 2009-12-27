@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+  <h1>
+   {% if podcast.title %}
+    {% blocktrans with podcast.title as podcasttitle %}Subscribe to {{podcasttitle }}{% endblocktrans %}
+   {% else %}
+    {% trans "Subscribe to this podcast" %}
+   {% endif %}
+  </h1>
+  <a href="{{ podcast.url }}" class="URL">{{ podcast.url }}</a>
+
+  {% if podcast.description %}
+   <p class="description">{{ podcast.description }}</p>
+  {% endif %}
+
+  <form action="" method="post">
+   {{ form.as_p }}
+   <input type="submit" label="{% trans "OK" %}" />
+  </form>
+
+  {% if not podcast.title %}
+   <div class="info"><strong>{% trans "Why Unnamed Podcast?" %}</strong> {% trans "Because we display names after we have fetched the information form the feed -- and this may take some time. Until this is completed, the podcast will simply be called this way." %}</div>
+  {% endif %}
+
+{% endblock %}
+

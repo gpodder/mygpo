@@ -18,6 +18,7 @@
 from django.db import models
 from django.contrib.auth.models import User, UserManager
 from datetime import datetime
+from django.utils.translation import ugettext as _
 import hashlib
 
 EPISODE_ACTION_TYPES = (
@@ -79,12 +80,36 @@ class Podcast(models.Model):
     class Meta:
         db_table = 'podcast'
 
+
+class ToplistEntry(models.Model):
+    podcast = models.ForeignKey(Podcast)
+    subscriptions = models.IntegerField(db_column='subscription_count')
+
+    def __unicode__(self):
+        return '%s (%s)' % (self.podcast, self.subscriptions)
+
+    class Meta:
+        db_table = 'toplist'
+
+class SuggestionEntry(models.Model):
+    podcast = models.ForeignKey(Podcast)
+    user = models.ForeignKey(User)
+    priority = models.IntegerField()
+
+    def __unicode__(self):
+        return '%s (%s)' % (self.podcast, self.priority)
+
+    class Meta:
+        db_table = 'suggestion'
+
+
 class Episode(models.Model):
     podcast = models.ForeignKey(Podcast)
     url = models.URLField(unique=True)
     title = models.CharField(max_length=100, blank=True)
     description = models.TextField(null=True, blank=True)
     link = models.URLField(null=True, blank=True)
+    timestamp = models.DateTimeField(null=True, blank=True)
 
     def __unicode__(self):
         return self.title
@@ -107,7 +132,7 @@ class SyncGroup(models.Model):
 
     def __unicode__(self):
         devices = [d.name for d in Device.objects.filter(sync_group=self)]
-        return '%s - %s' % (self.user, ', '.join(devices))
+        return ', '.join(devices)
 
     def devices(self):
         return Device.objects.filter(sync_group=self)
@@ -132,10 +157,10 @@ class Device(models.Model):
     sync_group = models.ForeignKey(SyncGroup, blank=True, null=True)
 
     def __unicode__(self):
-        return '%s - %s (%s)' % (self.user, self.name, self.type)
+        return self.name if self.name else _('Unnamed Device (%s)' % self.uid)
 
     def get_subscriptions(self):
-        #self.sync()
+        self.sync()
         return Subscription.objects.filter(device=self)
 
     def sync(self):
@@ -172,18 +197,18 @@ class Device(models.Model):
             a = d.latest_actions()
             for s in a.keys():
                 if not sync_actions.has_key(s):
-		    if a[s].action == SUBSCRIBE_ACTION:
-			sync_actions[s] = a[s]
-		elif a[s].newer_than(sync_actions[s]) and (sync_actions[s].action != a[s].action):
+                    if a[s].action == SUBSCRIBE_ACTION:
                         sync_actions[s] = a[s]
+                elif a[s].newer_than(sync_actions[s]) and (sync_actions[s].action != a[s].action):
+                    sync_actions[s] = a[s]
 
-	#remove actions that did not change
-	current_state = self.latest_actions()
-	for podcast in current_state.keys():
-	    if sync_actions[podcast] == current_state[podcast]:
-		del sync_actions[podcast]
+        #remove actions that did not change
+        current_state = self.latest_actions()
+        for podcast in current_state.keys():
+            if sync_actions[podcast] == current_state[podcast]:
+               del sync_actions[podcast]
 
-        return sync_actions
+        return sync_actions.values()
 
     def latest_actions(self):
         """
@@ -255,6 +280,7 @@ class Device(models.Model):
             raise ValueError('the device is not synced')
 
         g = self.sync_group
+        print g
         self.sync_group = None
         self.save()
 
@@ -263,8 +289,7 @@ class Device(models.Model):
             d = devices[0]
             d.sync_group = None
             d.save()
-
-        g.delete()
+            g.delete()
 
     class Meta:
         db_table = 'device'
@@ -273,7 +298,7 @@ class EpisodeAction(models.Model):
     user = models.ForeignKey(User, primary_key=True)
     episode = models.ForeignKey(Episode)
     device = models.ForeignKey(Device)
-    action = models.IntegerField(choices=EPISODE_ACTION_TYPES)
+    action = models.CharField(max_length=10, choices=EPISODE_ACTION_TYPES)
     timestamp = models.DateTimeField(default=datetime.now)
     playmark = models.IntegerField(null=True, blank=True)
 
@@ -294,10 +319,30 @@ class Subscription(models.Model):
     def __unicode__(self):
         return '%s - %s on %s' % (self.device.user, self.podcast, self.device)
 
+    def get_meta(self):
+        #this is different than get_or_create because it does not necessarily create a new meta-object
+        try:
+            return SubscriptionMeta.objects.get(user=self.user, podcast=self.podcast)
+        except SubscriptionMeta.DoesNotExist:
+            return SubscriptionMeta(user=self.user, podcast=self.podcast)
+
     class Meta:
         db_table = 'current_subscription'
         #not available in Django 1.0 (Debian stable)
         #managed = False
+
+
+class SubscriptionMeta(models.Model):
+    user = models.ForeignKey(User)
+    podcast = models.ForeignKey(Podcast)
+    public = models.BooleanField(default=True)
+
+    def __unicode__(self):
+        return '%s - %s - %s' % (self.user, self.podcast, self.public)
+
+    class Meta:
+        db_table = 'subscription'
+
 
 class SubscriptionAction(models.Model):
     device = models.ForeignKey(Device)
@@ -310,7 +355,7 @@ class SubscriptionAction(models.Model):
 
     def newer_than(self, action):
         if (self.timestamp == action.timestamp): return self.id > action.id
-	return self.timestamp > action.timestamp
+        return self.timestamp > action.timestamp
 
     def __unicode__(self):
         return '%s %s %s %s' % (self.device.user, self.device, self.action_string(), self.podcast)
@@ -318,4 +363,16 @@ class SubscriptionAction(models.Model):
     class Meta:
         db_table = 'subscription_log'
         unique_together = ('device', 'podcast', 'timestamp')
+
+class Rating(models.Model):
+    target = models.CharField(max_length=15)
+    user = models.ForeignKey(User)
+    rating = models.IntegerField()
+    timestamp = models.DateTimeField(default=datetime.now)
+
+    class Meta:
+        db_table = 'ratings'
+
+    def __unicode__(self):
+        return '%s rates %s as %s on %s' % (self.user, self.target, self.rating, self.timestamp)
 

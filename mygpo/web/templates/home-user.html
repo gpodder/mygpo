@@ -1,28 +1,42 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load devices %}
 
 {% block content %}
-  <h1>{% trans "Your Subscriptions" %}</h1>
-  <p>{% trans "This page is currently in development." %}</p>
-  <table style="width:100%;">
-	<tr>
-		<th style="padding-right:100px;">{{ test }}</th>
-		<th style="padding-right:200px;">Title</th>
-		<th style="padding-right:200px;">Latest Episode</th>
-		<th style="padding-right:200px;">Devices</th>
-	</tr>
-       {% for s in subscriptionlist %}
-	<tr>
-		<td> 
-                  {% if s.logo %}
-                  <img src="{{ s.logo }}" style="width:40px; height:30px;" />
-                  {% endif %}                  
-              </td>
-		<td>{{ s.title }}</td>
-		<td>{{ s.episode }}</td>
-		<td>{{ s.device }}</td>
-	</tr>
-       {% endfor %}
+ <h1>{% trans "my.gpodder.org" %}
+
+ {% if not subscriptionlist|length_is:"0" %}
+ <h2>{% trans "Your Subscriptions" %}</h2>
+ <table class="list">
+  <tr>
+   <th>&nbsp;</th>
+   <th>{% trans "Podcast" %}</th>
+   <th>{% trans "Latest Episode" %}</th>
+   <th>{% trans "Subscribed on" %}</th>
+  </tr>
+  
+  {% for s in subscriptionlist %}
+   <tr>
+    <td> 
+     {% if s.podcast.logo_url %}
+      <img src="{{ s.podcast.logo_url }}" style="width:40px; height:30px;" />
+     {% endif %}                  
+    </td>
+    <td><a class="listlink" href="/podcast/{{ s.podcast.id }}">{{ s.podcast }}</a></td>
+    {% if s.episode %}
+     <td><a href="/episode/{{s.episode.id}}">{{ s.episode.title|default:"Unnamed Episode" }}</a></td>
+    {% else %}
+     <td></td>
+    {% endif %}
+    <td>{{ s.devices|device_list }}</td>
+   </tr>
+  {% endfor %}
   </table>
+ {% else %}
+
+ <h2>{% trans "Where to start?" %}</h2>
+ <p>{% blocktrans with user.username as username %}my.gpodder.org help you to track your podcasts which you have subscribed on your devices - desktop computer, notebook, mobile devices, etc. To start using my.gpodder.org set up <a href="http://gpodder.org">gPodder</a> with your username &ndash; <strong>{{username}}</strong> &ndash; and password and upload your podcasts. They will automatically show up here.{% endblocktrans %}</p>
+
+ {% endif %}
 {% endblock %}
 

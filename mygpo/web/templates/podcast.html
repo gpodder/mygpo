@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load humanize %}
+{% load episodes %}
+
+{% block content %}
+  <h1>{% if podcast.title %}{{ podcast.title }}{% else %}{% trans "Unnamed Podcast" %}{%endif%}</h1>
+  <a href="{{ podcast.url }}" class="URL">{{ podcast.url }}</a>
+
+  {% if podcast.description %}
+   <p class="description">{{ podcast.description }}</p>
+  {% endif %}
+
+  {% if devices|length_is:"0" %}
+   <a href="/podcast/{{ podcast.id }}/subscribe">
+    {% if podcast.title %}
+     {% blocktrans with podcast.title as podcasttitle %}Subscribe to {{ podcasttitle }}{% endblocktrans %}
+    {% else %}
+     {% trans "Subscribe to this podcast" %}
+    {% endif %}
+   </a>
+  {% else %}
+   <h2>Devices</h2>
+   <strong>You have subscribed this podcast on</strong>
+   <ul class="devices">
+   {% for device in devices %}
+    <li class="{{device.type}}"><a href="/device/{{ device.id }}">{{ device.name }}</a></li>
+   {% endfor %}
+   </ul>
+  {% endif %}
+
+  {% if not episodes|length_is:"0" %}
+   <h2>{% trans "Episodes" %}</h2>
+   <table class="list">
+    <tr>
+     <th></th>
+     <th>{% trans "Title" %}</th>
+     <th>{% trans "Description" %}</th>
+     <th>{% trans "Released" %}</th>
+    </tr>
+ 
+    {% for episode, action in episodes.items %}
+     <tr>
+      <td>{{ action|episode_status_icon }}</td>
+      <td><a href="/episode/{{ episode.id }}">{{ episode.title|default:"Unknown Episode" }}</a></td>
+      <td class="description">{{ episode.description|default:"" }}</td>
+      <td>{{ episode.timestamp|default:""|naturalday }}</td>
+
+     </tr>
+    {% endfor %}
+   </table>
+  {% endif %}
+
+  {% if not history|length_is:"0" %}
+   <h2>{% trans "Subscription History" %}</h2>
+   <table class="list">
+    <tr>
+     <th>{% trans "Timestamp" %}</th>
+     <th>{% trans "Action" %}</th>
+     <th>{% trans "Devices" %}</th>
+    </tr>
+    {% for s in history %}
+     <tr>
+      <td><abbr title="{{ s.timestamp }}">{{ s.timestamp|naturalday }}</abbr></td>
+      <td>
+       {% ifequal s.action 1 %}
+        {% trans "subscribe" %}
+       {% endifequal %}
+       {% ifequal s.action -1 %}
+        {% trans "unsubscribe" %}
+       {% endifequal %}
+      </td>
+      <td>{{ s.device.name }}</td>
+     </tr>
+    {% endfor %}
+   </table>
+  {% endif %}
+
+  {% if not podcast.title %}
+   <div class="info"><strong>{% trans "Why Unnamed Podcast?" %}</strong> {% trans "Because we display names after we have fetched the information form the feed -- and this may take some time. Until this is completed, the podcast will simply be called this way." %}</div>
+  {% endif %}
+
+{% endblock %}
+

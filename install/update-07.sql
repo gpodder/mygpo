@@ -1,8 +1,3 @@
--- replaced by mygpo.api.models.Device.latest_actions()
-DROP VIEW IF EXISTS sync_group_subscription_log;
-DROP VIEW IF EXISTS sync_group_current_subscription;
-
-
 DELIMITER $$
 DROP PROCEDURE IF EXISTS update_toplist $$
 CREATE PROCEDURE update_toplist()
@@ -26,17 +21,17 @@ BEGIN
                     SET deadlock=1;
                 END;
             SET deadlock=0;
-               
+
             START TRANSACTION;
             DELETE FROM toplist_temp;
             INSERT INTO toplist_temp (SELECT a.podcast_id, COUNT(*) AS count_subscription
-                        FROM (SELECT DISTINCT podcast_id, user_id 
-                            FROM public_subscription) a 
+                        FROM (SELECT DISTINCT podcast_id, user_id
+                            FROM public_subscription) a
                         GROUP BY podcast_id);
             DELETE FROM toplist;
-            INSERT INTO toplist (SELECT podcast_id, subscription_count FROM toplist_temp
+            INSERT INTO toplist (podcast_id, subscription_count, id) (SELECT podcast_id, subscription_count, NULL FROM toplist_temp
                         ORDER BY subscription_count DESC LIMIT 100);
-            
+
             COMMIT;
         END;
         IF deadlock=0 THEN
@@ -53,28 +48,4 @@ BEGIN
 
 END $$
 DELIMITER ;
-
-CREATE UNIQUE INDEX unique_subscription_log ON subscription_log (device_id, podcast_id, timestamp);
-CREATE UNIQUE INDEX unique_episode_lg ON episode_log (user_id, episode_id, timestamp);
-
-DROP TRIGGER IF EXISTS episode_trig_unique;
-
-DELIMITER //
-CREATE TRIGGER episode_trig_unique BEFORE INSERT ON episode
-FOR EACH ROW
-BEGIN
-    declare help_url INT;
-    set help_url = 0;
-  
-       SELECT count(a.id) into help_url FROM episode a where a.url=new.url and a.podcast_id=new.podcast_id;
-
-    IF help_url > 0 THEN
-        call Fail('This episode already exists!');
-    END IF;
-
-END;//
-DELIMITER ;
-
-
-ALTER TABLE episode_log MODIFY action ENUM ('download', 'play', 'delete', 'new') NOT NULL;
 
