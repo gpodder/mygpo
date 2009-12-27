@@ -37,7 +37,9 @@ urlpatterns = patterns('',
     (r'^register/$',  register, {'profile_callback': UserProfile.objects.create, 'success_url': '../registration_complete/', 'form_class': RegistrationFormUniqueEmail}),
     (r'^registration_complete/$', 'django.views.generic.simple.direct_to_template', {'template': 'registration/registration_complete.html'}),
     (r'^activate/(?P<activation_key>\w+)$', activate),
+
     (r'^podcast/(?P<pid>\w+)$', 'mygpo.web.views.podcast'),
+    (r'^podcast/(?P<pid>\w+)/subscribe$', 'mygpo.web.views.podcast_subscribe'),
 
     (r'^episode/(?P<id>\d+)$', 'mygpo.web.views.episode'),
 

@@ -1,6 +1,7 @@
 from django import forms
 from django.utils.translation import ugettext as _
-from mygpo.api.models import Device, DEVICE_TYPES
+from mygpo.api.models import Device, DEVICE_TYPES, SyncGroup
+import re
 
 class UserAccountForm(forms.Form):
     email = forms.EmailField(label=_('Your Email Address'))
@@ -15,15 +16,9 @@ class DeviceForm(forms.Form):
 class SyncForm(forms.Form):
     targets = forms.CharField()
 
-#    def __init__(self, device=None, *args, **kwargs):
-#        super( SyncForm, self ).__init__(*args, **kwargs)
-#
-#        targets = self.sync_target_choices(device.sync_targets())
-#        self.fields['targets'] = forms.ChoiceField(choices=targets, label=_('Synchronize with the following devices'))
-#
-    def set_device(self, device):
-        targets = self.sync_target_choices(device.sync_targets())
-        self.fields['targets'] = forms.ChoiceField(choices=targets, label=_('Synchronize with the following devices'))
+    def set_targets(self, sync_targets, label=''):
+        targets = self.sync_target_choices(sync_targets)
+        self.fields['targets'] = forms.ChoiceField(choices=targets, label=label)
 
     def sync_target_choices(self, targets):
         """
@@ -35,4 +30,19 @@ class SyncForm(forms.Form):
         target.
         """
         return [('%s%s' % ('d' if isinstance(t, Device) else 'g', t.id), t) for t in targets]
+
+
+    def get_target(self):
+        if not self.is_valid():
+            raise ValueError()
+
+        target = self.cleaned_data['targets']
+        m = re.match('^([dg])(\d+)$', target)
+        if m == None:
+            raise ValueError()
+
+        if m.group(1) == 'd':
+            return Device.objects.get(pk=m.group(2))
+        else:
+            return SyncGroup.objects.get(pk=m.group(2))
 

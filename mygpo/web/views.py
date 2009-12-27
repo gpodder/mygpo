@@ -19,7 +19,7 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed
 from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext
-from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, Subscription, SuggestionEntry, Rating, SyncGroup
+from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, Subscription, SuggestionEntry, Rating, SyncGroup, SUBSCRIBE_ACTION
 from mygpo.web.forms import UserAccountForm, DeviceForm, SyncForm
 from mygpo.api.opml import Exporter
 from django.utils.translation import ugettext as _
@@ -43,7 +43,12 @@ def home(request):
               })
 
 def create_subscriptionlist(request):
+    #sync all devices first
+    for d in Device.objects.filter(user=request.user):
+        d.sync()
+
     subscriptions = Subscription.objects.filter(user=request.user)
+
     l = {}
     for s in subscriptions:
         if s.podcast in l:
@@ -70,6 +75,38 @@ def podcast(request, pid):
         'devices': subscribed_devices,
         'episodes': episodes,
     }, context_instance=RequestContext(request))
+
+@login_required
+def podcast_subscribe(request, pid):
+    podcast = Podcast.objects.get(pk=pid)
+
+    if request.method == 'POST':
+        form = SyncForm(request.POST)
+
+        target = form.get_target()
+
+        if isinstance(target, SyncGroup):
+            device = target.devices()[0]
+        else:
+            device = target
+
+        SubscriptionAction.objects.create(podcast=podcast, device=device, action=SUBSCRIBE_ACTION)
+
+        return HttpResponseRedirect('/podcast/%s' % podcast.id)
+
+    else:
+        targets = list(Device.objects.filter(user=request.user, sync_group=None))
+        groups = SyncGroup.objects.filter(user=request.user)
+        targets.extend( list(groups) )
+
+        form = SyncForm()
+        form.set_targets(targets, _('With which client do you want to subscribe?'))
+
+        return render_to_response('subscribe.html', {
+            'podcast': podcast,
+            'form': form
+        }, context_instance=RequestContext(request))
+
 
 def episode_list(podcast, user):
     list = {}
@@ -170,7 +207,7 @@ def device(request, device_id):
     if device in synced_with: synced_with.remove(device)
     success = False
     sync_form = SyncForm()
-    sync_form.set_device(device)
+    sync_form.set_targets(device.sync_targets(), _('Synchronize with the following devices'))
 
     if request.method == 'POST':
         device_form = DeviceForm(request.POST)
@@ -210,16 +247,7 @@ def device_sync(request, device_id):
     if not form.is_valid():
         return HttpResponseBadRequest('invalid')
 
-    target = form.cleaned_data['targets']
-
-    m = re.match('^([dg])(\d+)$', target)
-    if m == None:
-        return HttpResponseBadRequest()
-
-    if m.group(1) == 'd':
-        target = Device.objects.get(pk=m.group(2))
-    else:
-        target = SyncGroup.objects.get(pk=m.group(2))
+    target = form.get_target()
 
     device = Device.objects.get(pk=device_id)
 
