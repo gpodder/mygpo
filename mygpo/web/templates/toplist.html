@@ -4,7 +4,7 @@
 {% block content %}
   <h1>{% trans "Toplist" %}</h1>
 
-  <p>{% blocktrans %}These are the {{ count }} most subscribed podcasts.{% endblocktrans %}</p>
+  <p>{% blocktrans with entries|length as count %}These are the {{ count }} most subscribed podcasts.{% endblocktrans %}</p>
 
   <table class="list">
    <tr>
@@ -15,7 +15,7 @@
   {% for entry in entries %}
    <tr>
     <td>{{ forloop.counter }}</td>
-    <td>{{ entry.podcast }}</td>
+    <td><a href="/podcast/{{ entry.podcast.id }}">{{ entry.podcast }}</a></td>
     <td class="numeric">{{ entry.subscriptions }}</td>
    </tr>
   {% endfor %}

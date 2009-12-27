@@ -156,11 +156,9 @@ def account(request):
     }, context_instance=RequestContext(request))
 
 
-def toplist(request):
-    len = 30
+def toplist(request, len=30):
     entries = ToplistEntry.objects.all().order_by('-subscriptions')[:len]
     return render_to_response('toplist.html', {
-        'count'  : len,
         'entries': entries,
     }, context_instance=RequestContext(request))
 
