@@ -21,6 +21,8 @@ from mygpo.api.opml import Importer, Exporter
 from mygpo.api.models import Subscription, Podcast, SubscriptionAction, Device, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION
 from datetime import datetime
 from django.utils.datastructures import MultiValueDictKeyError
+from django.db import IntegrityError
+from mygpo.logging import log
 
 LEGACY_DEVICE_NAME = 'Legacy Device'
 LEGACY_DEVICE_UID  = 'legacy'
@@ -49,20 +51,27 @@ def upload(request):
     i = Importer(opml)
     podcast_urls = [p['url'] for p in i.items]
 
-    new = [item for item in i.items if item['url'] not in existing_urls]
-    rem = [e.podcast for e in existing if e.podcast.url not in podcast_urls]
+    new = [item['url'] for item in i.items if item['url'] not in existing_urls]
+    rem = [e.podcast.url for e in existing if e.podcast.url not in podcast_urls]
+
+    #remove duplicates
+    new = list(set(new))
+    rem = list(set(rem))
 
     for n in new:
-        p, created = Podcast.objects.get_or_create(url=n['url'], defaults={
-                'title' : n['title'],
-                'description': n['description'],
-                'last_update': datetime.now() })
-        s = SubscriptionAction(podcast=p,action=SUBSCRIBE_ACTION, timestamp=datetime.now(), device=d)
-        s.save()
+        p, created = Podcast.objects.get_or_create(url=n)
+
+        try:
+            SubscriptionAction.objects.create(podcast=p,action=SUBSCRIBE_ACTION, timestamp=datetime.now(), device=d)
+        except IntegrityError, e:
+            log('/upload: error while adding subscription: user: %s, podcast: %s, error: %s' % (user.id, p.id, e))
 
     for r in rem:
-        s = SubscriptionAction(podcast=r, action=UNSUBSCRIBE_ACTION, timestamp=datetime.now(), device=d)
-        s.save()
+        p, created = Podcast.objects.get_or_create(url=r)
+        try:
+            SubscriptionAction.objects.create(podcast=p, action=UNSUBSCRIBE_ACTION, timestamp=datetime.now(), device=d)
+        except IntegrityError, e:
+            log('/upload: error while removing subscription: user: %s, podcast: %s, error: %s' % (user.id, p.id, e))
 
     return HttpResponse('@SUCCESS', mimetype='text/plain')
 
