@@ -54,7 +54,7 @@ BEGIN
                     DELETE FROM suggestion_pod;
                     DELETE FROM suggestion_user;
 select user_help;
-                    insert into suggestion_pod (select podcast_id from public_subscription where user_id=user_help);
+                    insert into suggestion_pod (select podcast_id from current_subscription where user_id=user_help);
 
                     SELECT count(*) into pod_count FROM suggestion_pod;
 
@@ -128,7 +128,7 @@ BEGIN
                DELETE FROM suggestion_pod;
                DELETE FROM suggestion_user;
 
-               insert into suggestion_pod (select podcast_id from public_subscription where user_id=user_par);
+               insert into suggestion_pod (select podcast_id from current_subscription where user_id=user_par);
 	    
                SELECT count(*) into pod_count FROM suggestion_pod;
 
