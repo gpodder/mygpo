@@ -99,7 +99,7 @@ class SuggestionEntry(models.Model):
     @staticmethod
     def forUser(user):
         subscriptions = [x.podcast for x in Subscription.objects.filter(user=user)]
-        suggestions = SuggestionEntry.objects.filter(user=user)
+        suggestions = SuggestionEntry.objects.filter(user=user).order_by('-priority')
         return [s for s in suggestions if s.podcast not in subscriptions]
 
     def __unicode__(self):
