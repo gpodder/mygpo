@@ -96,6 +96,12 @@ class SuggestionEntry(models.Model):
     user = models.ForeignKey(User)
     priority = models.IntegerField()
 
+    @staticmethod
+    def forUser(user):
+        subscriptions = [x.podcast for x in Subscription.objects.filter(user=user)]
+        suggestions = SuggestionEntry.objects.filter(user=user)
+        return [s for s in suggestions if s.podcast not in subscriptions]
+
     def __unicode__(self):
         return '%s (%s)' % (self.podcast, self.priority)
 
