@@ -18,7 +18,7 @@
 from django.test import TestCase
 from django.test.client import Client
 from django.contrib.auth.models import User
-from mygpo.api.models import Device, Podcast, SubscriptionAction, UserProfile
+from mygpo.api.models import Device, Podcast, SubscriptionAction, UserProfile, EpisodeAction
 from put_test import put_data
 from django.http import HttpRequest
 from mygpo.api.simple import subscriptions
@@ -94,6 +94,10 @@ class AdvancedAPITest(TestCase):
         self.user.save()
         self.device1 = Device.objects.create(user=self.user, name='d1', uid='uid1', type='desktop')
         self.device2 = Device.objects.create(user=self.user, name='d2', uid='uid2', type='mobile')
+        self.url1 = 'http://example.com/feed.rss'
+        self.url2 = 'http://example.org/podcast.php'
+        self.url3 = 'http://example.net/foo.xml'
+
         self.client = Client()
         l = self.client.login(username='adv', password='adv1')
         self.assertEqual(l, True)
@@ -124,13 +128,13 @@ class AdvancedAPITest(TestCase):
 
 
     def test_add_remove_subscriptions(self):
-        req = {"add": ["http://example.com/feed.rss", "http://example.org/podcast.php", "http://example.net/foo.xml"]}
+        req = {"add": [self.url1, self.url2, self.url3]}
         reqs = json.dumps(req)
 
         #adding 3 subscriptions
         response = self.client.post('/api/1/subscriptions/%s/%s.json' % (self.user.username, self.device1.uid), data={'data': reqs})
         self.assertEqual(response.status_code, 200)
-        
+
         resp = json.loads(response.content)
         add_timestamp = resp['timestamp']
 
@@ -138,11 +142,11 @@ class AdvancedAPITest(TestCase):
         response = self.client.get('/api/1/subscriptions/%s/%s.json' % (self.user.username, self.device1.uid), {'since': add_timestamp-1})
         changes = json.loads(response.content)
 
-        self.assertEqual(changes['add'], ["http://example.com/feed.rss", "http://example.org/podcast.php", "http://example.net/foo.xml"])
+        self.assertEqual(changes['add'], [self.url1, self.url2, self.url3])
         self.assertEqual(len(changes['remove']), 0)
 
         #removing the 1st and 3rd subscription
-        req = {"add": [], 'remove': ["http://example.com/feed.rss","http://example.net/foo.xml"]}
+        req = {"add": [], 'remove': [self.url1, self.url3]}
         reqs = json.dumps(req)
         time.sleep(1)
         response = self.client.post('/api/1/subscriptions/%s/%s.json' % (self.user.username, self.device1.uid), data={'data': reqs})
@@ -154,10 +158,48 @@ class AdvancedAPITest(TestCase):
         #changes since beginning, should return 1 addition, 2 removals
         response = self.client.get('/api/1/subscriptions/%s/%s.json' % (self.user.username, self.device1.uid), {'since': add_timestamp-1})
         changes = json.loads(response.content)
-        self.assertEqual(changes['add'], ["http://example.org/podcast.php"])
-        self.assertEqual(changes['remove'], ["http://example.com/feed.rss","http://example.net/foo.xml"])
+        self.assertEqual(changes['add'], [self.url2])
+        self.assertEqual(changes['remove'], [self.url1, self.url3])
 
-        #changes including removal
+
+    def test_episode_update(self):
+        req =  [{"podcast": self.url1,
+                 "episode": "http://example.com/files/s01e20.mp3",
+                 "device": self.device1.uid,
+                 "action": "download",
+                 "timestamp": "2009-12-12T09:00:00"},
+                {"podcast": self.url2,
+                 "episode": "http://ftp.example.org/foo.ogg",
+                 "action": "play",
+                 "position": "01:00:00"}]
+        reqs = json.dumps(req)
+        response = self.client.post('/api/1/episodes/%s.json' % self.user.username, data={'data': reqs})
+        self.assertEqual(response.status_code, 200)
+
+        resp = json.loads(response.content)
+        timestamp = resp['timestamp']
+
+        response = self.client.get('/api/1/episodes/%s.json' % self.user.username)
+        changes = json.loads(response.content)
+        self.assertEqual(len(changes['actions']), 2)
+        self.assertTrue(self.hash_subset({u'action': u'download', u'podcast': self.url1, u'episode': u'http://example.com/files/s01e20.mp3'}, changes['actions'][0]))
+        self.assertTrue(self.hash_subset({u'action': u'play', u'podcast': self.url2, u'episode': u'http://ftp.example.org/foo.ogg'}, changes['actions'][1]))
+
+#        #currently fails, seems to be a bug in the test client
+#        response = self.client.get('/api/1/episodes/%s.json' % self.user.username, {'podcast': self.url2})
+#        self.assertEqual(response.status_code, 200)
+#        changes = json.loads(response.content)
+#        self.assertEqual(len(changes['actions']), 1)
+#        self.assertTrue(self.hash_subset({u'action': u'play', u'podcast': self.url2, u'episode': u'http://ftp.example.org/foo.ogg'}, changes['actions'][0]))
+
+
+    def hash_subset(self, hash1, hash2):
+        for x in hash1.keys():
+            if not x in hash2:
+                return False
+            if hash2[x] != hash1[x]:
+                return False
+        return True
 
 
 class SimpleTest(TestCase):
