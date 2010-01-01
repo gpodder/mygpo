@@ -23,7 +23,7 @@ from django.core import serializers
 from time import mktime
 from datetime import datetime, timedelta
 import dateutil.parser
-from mygpo.logging import log
+from mygpo.log import log
 from django.db import IntegrityError
 import re
 
