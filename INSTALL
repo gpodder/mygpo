@@ -13,6 +13,8 @@ Dependencies:
   * python-feedparser
   * python-dateutil
   * python-json or python-simplejson
+  * django-haystack
+  * woosh
 
 1. Creating the database
 
