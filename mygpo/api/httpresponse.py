@@ -16,15 +16,14 @@
 #
 
 from django.http import HttpResponse
-from django.core.serializers import json, serialize
+from django.core.serializers import serialize
 from django.db.models.query import QuerySet
 from django.core.serializers.json import DjangoJSONEncoder
+
 try:
-    #try to import the JSON module (if we are on Python 2.6)
-    import json
-except ImportError:
-    # No JSON module available - fallback to simplejson (Python < 2.6)
     import simplejson as json
+except ImportError:
+    import json
 
 
 def HttpResponseNotAuthorized():

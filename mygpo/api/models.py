@@ -96,6 +96,12 @@ class SuggestionEntry(models.Model):
     user = models.ForeignKey(User)
     priority = models.IntegerField()
 
+    @staticmethod
+    def forUser(user):
+        subscriptions = [x.podcast for x in Subscription.objects.filter(user=user)]
+        suggestions = SuggestionEntry.objects.filter(user=user).order_by('-priority')
+        return [s for s in suggestions if s.podcast not in subscriptions]
+
     def __unicode__(self):
         return '%s (%s)' % (self.podcast, self.priority)
 
@@ -112,7 +118,7 @@ class Episode(models.Model):
     timestamp = models.DateTimeField(null=True, blank=True)
 
     def __unicode__(self):
-        return self.title
+        return '%s (%s)' % (self.title, self.podcast)
 
     class Meta:
         db_table = 'episode'
@@ -295,15 +301,15 @@ class Device(models.Model):
         db_table = 'device'
 
 class EpisodeAction(models.Model):
-    user = models.ForeignKey(User, primary_key=True)
+    user = models.ForeignKey(User)
     episode = models.ForeignKey(Episode)
-    device = models.ForeignKey(Device)
+    device = models.ForeignKey(Device,null=True)
     action = models.CharField(max_length=10, choices=EPISODE_ACTION_TYPES)
     timestamp = models.DateTimeField(default=datetime.now)
     playmark = models.IntegerField(null=True, blank=True)
 
     def __unicode__(self):
-        return '%s %s %s' % self.user, self.action, self.episode
+        return '%s %s %s' % (self.user, self.action, self.episode)
 
     class Meta:
         db_table = 'episode_log'

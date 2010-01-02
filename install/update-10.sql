@@ -162,3 +162,21 @@ BEGIN
 
 END $$
 DELIMITER ;
+
+
+
+DROP TABLE IF EXISTS episode_log;
+CREATE TABLE episode_log (
+    id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    user_id INT NOT NULL,
+    episode_id INT NOT NULL,
+    device_id INT,
+    action ENUM ('download', 'play', 'delete', 'new') NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    playmark INT DEFAULT 0,
+    FOREIGN KEY (user_id) REFERENCES auth_user (id),
+    FOREIGN KEY (episode_id) REFERENCES episode (id),
+    FOREIGN KEY (device_id) REFERENCES device (id),
+    UNIQUE (user_id, episode_id, timestamp)
+);
+
