@@ -88,7 +88,7 @@ def parse_subscription(raw_post_data, format, user, device_uid):
     else: raise ValueError('unsupported format %s' % format)
     
     d, created = Device.objects.get_or_create(user=user, uid=device_uid, 
-                defaults = {'type': 'other', 'name': 'unknown_' + device_uid})
+                defaults = {'type': 'other', 'name': device_uid})
 
     podcasts = [p.podcast for p in d.get_subscriptions()]
     old = [p.url for p in podcasts]    
@@ -99,7 +99,6 @@ def parse_subscription(raw_post_data, format, user, device_uid):
 
 def set_subscriptions(subscriptions):
     new, rem, d = subscriptions
-    print new, rem
     
     for r in rem:
         p = Podcast.objects.get(url=r)
