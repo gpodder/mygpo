@@ -22,7 +22,7 @@ from mygpo.api.models import Subscription, Podcast, SubscriptionAction, Device, 
 from datetime import datetime
 from django.utils.datastructures import MultiValueDictKeyError
 from django.db import IntegrityError
-from mygpo.logging import log
+from mygpo.log import log
 
 LEGACY_DEVICE_NAME = 'Legacy Device'
 LEGACY_DEVICE_UID  = 'legacy'

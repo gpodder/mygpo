@@ -1,0 +1,5 @@
+{{ object.title|default:"" }}
+{{ object.url }}
+{{ object.link|default:"" }}
+{{ object.description|default:"" }}
+

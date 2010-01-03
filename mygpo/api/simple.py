@@ -24,13 +24,11 @@ from django.core import serializers
 from datetime import datetime
 from mygpo.api.httpresponse import HttpResponseNotAuthorized
 import re
+
 try:
-    # Try to import the JSON module (if we are on Python 2.6)
-    import json
-except ImportError:
-    # No JSON module available - fallback to simplejson (Python < 2.6)
     import simplejson as json
-    
+except ImportError:
+    import json
 
 @require_valid_user
 def subscriptions(request, username, device_uid, format):
@@ -90,7 +88,7 @@ def parse_subscription(raw_post_data, format, user, device_uid):
     else: raise ValueError('unsupported format %s' % format)
     
     d, created = Device.objects.get_or_create(user=user, uid=device_uid, 
-                defaults = {'type': 'other', 'name': 'unknown_' + device_uid})
+                defaults = {'type': 'other', 'name': device_uid})
 
     podcasts = [p.podcast for p in d.get_subscriptions()]
     old = [p.url for p in podcasts]    
@@ -101,7 +99,6 @@ def parse_subscription(raw_post_data, format, user, device_uid):
 
 def set_subscriptions(subscriptions):
     new, rem, d = subscriptions
-    print new, rem
     
     for r in rem:
         p = Podcast.objects.get(url=r)
@@ -114,5 +111,6 @@ def set_subscriptions(subscriptions):
         s = SubscriptionAction(podcast=p, action=SUBSCRIBE_ACTION, device=d)
         s.save()
 
-    return HttpResponse('Success\n', mimetype='text/plain')
+    # Only an empty response is a successful response
+    return HttpResponse('', mimetype='text/plain')
 

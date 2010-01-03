@@ -23,7 +23,7 @@ from django.core import serializers
 from time import mktime
 from datetime import datetime, timedelta
 import dateutil.parser
-from mygpo.logging import log
+from mygpo.log import log
 from django.db import IntegrityError
 import re
 
@@ -121,7 +121,8 @@ def episodes(request, username):
     if request.user.username != username:
         return HttpResponseForbidden()
 
-    now = int(mktime(datetime.now().timetuple()))
+    now = datetime.now()
+    now_ = int(mktime(now.timetuple()))
 
     if request.method == 'POST':
         try:
@@ -130,7 +131,8 @@ def episodes(request, username):
             return HttpResponseBadRequest()
 
         update_episodes(request.user, actions)
-        return HttpResponse()
+
+        return JsonResponse({'timestamp': now_})
 
     elif request.method == 'GET':
         podcast_id = request.GET.get('podcast', None)
@@ -143,7 +145,7 @@ def episodes(request, username):
         except:
             raise Http404
 
-        return JsonRequest(get_episode_changes(request.user, podcast, device, since, now))
+        return JsonResponse(get_episode_changes(request.user, podcast, device, since, now))
 
     else:
         return HttpResponseNotAllowed(['POST', 'GET'])
@@ -151,7 +153,18 @@ def episodes(request, username):
 
 def get_episode_changes(user, podcast, device, since, until):
     actions = []
-    for a in EpisodeAction.objects.filter(user=user, podcast=podcast, device=device, timestamp__gt=since, timestamp__lte=until):
+    eactions = EpisodeAction.objects.filter(user=user, timestamp__lte=until)
+
+    if podcast:
+        eactions = eactions.filter(episode__podcast=podcast)
+
+    if device:
+        eactions = eactions.filter(device=device)
+
+    if since: # we can't use None with __gt
+        eactions = eactions.filter(timestamp__gt=since)
+
+    for a in eactions:
         action = {
             'podcast': a.episode.podcast.url,
             'episode': a.episode.url,
@@ -163,7 +176,9 @@ def get_episode_changes(user, podcast, device, since, until):
 
         actions.append(action)
 
-    return {'timestamp': since, 'actions': actions}
+    until_ = int(mktime(until.timetuple()))
+
+    return {'actions': actions, 'timestamp': until_}
 
 
 def update_episodes(user, actions):
@@ -177,10 +192,13 @@ def update_episodes(user, actions):
         except:
             return HttpResponseBadRequest('not all required fields (podcast, episode, action) given')
 
-        device, created = Device.objects.get_or_create(user=user, uid=e['device'], defaults={'name': 'Unknown', 'type': 'other'}) if 'device' in e else None
-        timestamp = dateutil.parser.parse(e['timestamp']) if 'timestamp' in e else None
+        if 'device' in e:
+            device, created = Device.objects.get_or_create(user=user, uid=e['device'], defaults={'name': 'Unknown', 'type': 'other'})
+        else:
+            device, created = None, False
+        timestamp = dateutil.parser.parse(e['timestamp']) if 'timestamp' in e else datetime.now()
         position = parseTimeDelta(e['position']) if 'position' in e else None
-        playmark = position['seconds'] if position else None
+        playmark = position.seconds if position else None
 
         if position and action != 'play':
             return HttpResponseBadRequest('parameter position can only be used with action play')

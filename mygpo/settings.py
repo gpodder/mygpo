@@ -102,6 +102,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.humanize',
     'registration',
+    'haystack',
     'mygpo.api',
     'mygpo.web'
 )
@@ -118,4 +119,9 @@ DEFAULT_FROM_EMAIL = 'mygpo@my.gpodder.org'
 AUTH_PROFILE_MODULE = "api.UserProfile"
 
 LOGIN_URL = '/login/'
+
+#see http://haystacksearch.org/docs/
+HAYSTACK_SITECONF = 'mygpo.search_sites'
+HAYSTACK_SEARCH_ENGINE = 'whoosh'
+HAYSTACK_WHOOSH_PATH = os.path.abspath('%s/../search_index' % os.path.dirname(__file__))
 

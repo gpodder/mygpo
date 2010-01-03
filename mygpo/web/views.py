@@ -181,7 +181,7 @@ def suggestions(request):
         Rating.objects.create(target='suggestions', user=request.user, rating=request.GET['rate'], timestamp=datetime.now())
         rated = True
 
-    entries = SuggestionEntry.objects.filter(user=request.user).order_by('-priority')
+    entries = SuggestionEntry.forUser(request.user)
     return render_to_response('suggestions.html', {
         'entries': entries,
         'rated'  : rated
@@ -190,7 +190,7 @@ def suggestions(request):
 
 @require_valid_user
 def suggestions_opml(request, count):
-    entries = SuggestionEntry.objects.filter(user=request.user).order_by('-priority')
+    entries = SuggestionEntry.forUser(request.user)
     exporter = Exporter(_('my.gpodder.org - %s Suggestions') % count)
 
     opml = exporter.generate([e.podcast for e in entries])

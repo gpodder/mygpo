@@ -1,4 +1,4 @@
-ALTER TABLE user ADD COLUMN suggestion_up_to_date INTEGER;
+ALTER TABLE user ADD COLUMN suggestion_up_to_date INTEGER DEFAULT 0;
 
 update user set suggestion_up_to_date = 0;
 
@@ -46,15 +46,15 @@ BEGIN
          START TRANSACTION;
             OPEN cur1;
 
-            DELETE FROM suggestion;
             REPEAT
                 FETCH cur1 INTO user_help;
 
                 IF NOT done THEN
+                    DELETE FROM suggestion where user_id=user_help;
                     DELETE FROM suggestion_pod;
                     DELETE FROM suggestion_user;
 select user_help;
-                    insert into suggestion_pod (select podcast_id from public_subscription where user_id=user_help);
+                    insert into suggestion_pod (select podcast_id from current_subscription where user_id=user_help);
 
                     SELECT count(*) into pod_count FROM suggestion_pod;
 
@@ -128,7 +128,7 @@ BEGIN
                DELETE FROM suggestion_pod;
                DELETE FROM suggestion_user;
 
-               insert into suggestion_pod (select podcast_id from public_subscription where user_id=user_par);
+               insert into suggestion_pod (select podcast_id from current_subscription where user_id=user_par);
 	    
                SELECT count(*) into pod_count FROM suggestion_pod;
 
@@ -159,6 +159,78 @@ BEGIN
 
         DROP TABLE IF EXISTS suggestion_user;
         DROP TABLE IF EXISTS suggestion_pod;         
+
+END $$
+DELIMITER ;
+
+
+
+DROP TABLE IF EXISTS episode_log;
+CREATE TABLE episode_log (
+    id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    user_id INT NOT NULL,
+    episode_id INT NOT NULL,
+    device_id INT,
+    action ENUM ('download', 'play', 'delete', 'new') NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    playmark INT DEFAULT 0,
+    FOREIGN KEY (user_id) REFERENCES auth_user (id),
+    FOREIGN KEY (episode_id) REFERENCES episode (id),
+    FOREIGN KEY (device_id) REFERENCES device (id),
+    UNIQUE (user_id, episode_id, timestamp)
+);
+
+ALTER TABLE toplist ADD COLUMN old_place INTEGER DEFAULT 0;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS update_toplist $$
+CREATE PROCEDURE update_toplist()
+BEGIN
+    DECLARE deadlock INT DEFAULT 0;
+    DECLARE attempts INT DEFAULT 0;
+
+    DROP TABLE IF EXISTS toplist_temp;
+    CREATE TABLE toplist_temp (
+            podcast_id INT PRIMARY KEY REFERENCES podcast (id),
+            subscription_count INT NOT NULL DEFAULT 0,
+            old_place INT DEFAULT 0,
+            INDEX(podcast_id)
+    );
+
+    try_loop:WHILE (attempts<3) DO
+    BEGIN
+        DECLARE deadlock_detected CONDITION FOR 1213;
+            DECLARE EXIT HANDLER FOR deadlock_detected
+                BEGIN
+                    ROLLBACK;
+                    SET deadlock=1;
+                END;
+            SET deadlock=0;
+
+            START TRANSACTION;
+            DELETE FROM toplist_temp;
+            INSERT INTO toplist_temp (SELECT a.podcast_id, COUNT(*) AS count_subscription, 
+                                       (select (id - (select min(id) from toplist) + 1) from toplist where podcast_id = a.podcast_id)
+                        FROM (SELECT DISTINCT podcast_id, user_id
+                            FROM public_subscription) a
+                        GROUP BY podcast_id);
+            DELETE FROM toplist;
+            INSERT INTO toplist (podcast_id, subscription_count, id, old_place) (SELECT podcast_id, subscription_count, NULL, old_place FROM toplist_temp
+                        ORDER BY subscription_count DESC LIMIT 100);
+
+            COMMIT;
+        END;
+        IF deadlock=0 THEN
+                LEAVE try_loop;
+            ELSE
+                SET attempts=attempts+1;
+            END IF;
+            END WHILE try_loop;
+
+        IF deadlock=1 THEN
+            call FAIL('Toplist is not updated!');
+        END IF;
+        DROP TABLE IF EXISTS toplist_temp;
 
 END $$
 DELIMITER ;

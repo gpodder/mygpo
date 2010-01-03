@@ -5,12 +5,16 @@
 Dependencies:
 
   * python (>= 2.5)
-  * python-django
-  * django-registration
+  * python-django (>= 1.0)
+  * python-django-registration (>= 0.7)
   * MySQL Server (>= 5.0)
   * python-mysqldb
   * lighttpd
   * python-feedparser
+  * python-dateutil
+  * python-json or python-simplejson
+  * django-haystack
+  * woosh
 
 1. Creating the database
 
@@ -30,7 +34,7 @@ DB parameters in mygpo/settings.py):
 
   python manage.py syncdb
 
-When asked to create a superuser, say NO.
+When asked to create a superuser, you can say YES.
 
 Now, run every SQL-Script in the install/ subdirectory, starting
 with "create.sql" and working your way all the way through the
