@@ -83,6 +83,7 @@ class Podcast(models.Model):
 
 class ToplistEntry(models.Model):
     podcast = models.ForeignKey(Podcast)
+    oldplace = models.IntegerField(db_column='old_place')
     subscriptions = models.IntegerField(db_column='subscription_count')
 
     def __unicode__(self):
