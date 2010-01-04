@@ -83,6 +83,7 @@ class Podcast(models.Model):
 
 class ToplistEntry(models.Model):
     podcast = models.ForeignKey(Podcast)
+    oldplace = models.IntegerField(db_column='old_place')
     subscriptions = models.IntegerField(db_column='subscription_count')
 
     def __unicode__(self):
@@ -335,7 +336,7 @@ class Subscription(models.Model):
     class Meta:
         db_table = 'current_subscription'
         #not available in Django 1.0 (Debian stable)
-        #managed = False
+        managed = False
 
 
 class SubscriptionMeta(models.Model):
