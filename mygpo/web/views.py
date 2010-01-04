@@ -61,7 +61,6 @@ def create_subscriptionlist(request):
 
     return l.values()
 
-
 @login_required
 def podcast(request, pid):
     podcast = Podcast.objects.get(pk=pid)
@@ -74,6 +73,13 @@ def podcast(request, pid):
         'podcast': podcast,
         'devices': subscribed_devices,
         'episodes': episodes,
+    }, context_instance=RequestContext(request))
+
+def history(request, len=20):
+    devices = Device.objects.filter(user=request.user)
+    history = SubscriptionAction.objects.filter(device__in=devices).order_by('-timestamp')[:len]
+    return render_to_response('history.html', {
+        'history': history,
     }, context_instance=RequestContext(request))
 
 @login_required
