@@ -18,7 +18,7 @@
 from django.test import TestCase
 from django.test.client import Client
 from django.contrib.auth.models import User
-from mygpo.api.models import Device, Podcast, SubscriptionAction, UserProfile, EpisodeAction
+from mygpo.api.models import Device, Podcast, Subscription, SubscriptionAction, UserProfile, EpisodeAction
 from put_test import put_data
 from django.http import HttpRequest
 from mygpo.api.simple import subscriptions
@@ -259,6 +259,7 @@ class SimpleTest(TestCase):
         self.assertEqual(urls[1], p2) 
         
         #2. put 1 new podcast and delete 1 old
+        time.sleep(1)
         r.raw_post_data = data_txt_2
         subscriptions(request=r, username=un, device_uid=d1, format=f1)
         
@@ -269,6 +270,7 @@ class SimpleTest(TestCase):
         self.assertEqual(urls[1], p3) 
         
         #3. put 2 new podcasts
+        time.sleep(1)
         r.raw_post_data = data_json_1
         subscriptions(request=r, username=un, device_uid=d2, format=f2)
         
@@ -282,6 +284,7 @@ class SimpleTest(TestCase):
         self.assertEqual(urls[1], p2) 
 
         #4. put 1 new podcast and delete 1 old
+        time.sleep(1)
         r.raw_post_data = data_json_2
         subscriptions(request=r, username=un, device_uid=d2, format=f2)
         
@@ -292,6 +295,7 @@ class SimpleTest(TestCase):
         self.assertEqual(urls[1], p3) 
         
         #5. put 2 new podcasts
+        time.sleep(1)
         r.raw_post_data = data_opml_1
         subscriptions(request=r, username=un, device_uid=d3, format=f3)
         
@@ -305,6 +309,7 @@ class SimpleTest(TestCase):
         self.assertEqual(urls[1], p2) 
         
         #6. put 1 new podcast and delete 1 old
+        time.sleep(1)
         r.raw_post_data = data_opml_2
         subscriptions(request=r, username=un, device_uid=d3, format=f3)
         

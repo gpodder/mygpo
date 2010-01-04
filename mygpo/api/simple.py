@@ -24,6 +24,7 @@ from django.core import serializers
 from datetime import datetime
 from mygpo.api.httpresponse import HttpResponseNotAuthorized
 import re
+from mygpo.log import log
 
 try:
     import simplejson as json
@@ -76,7 +77,12 @@ def parse_subscription(raw_post_data, format, user, device_uid):
     if format == 'txt':
         sub = raw_post_data.split('\n')
         p = '^[a-zA-z]'
-        urls = [x for x in sub if re.search(p, x) != None]
+        urls = []
+        for x in sub:
+            if re.search(p, x) == None:
+                log('parse_subscription (txt): invalid podcast url: %s' % x)
+            else:
+                urls.append(x)
 
     elif format == 'opml':
         i = Importer(content=raw_post_data)

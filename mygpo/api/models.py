@@ -336,7 +336,7 @@ class Subscription(models.Model):
     class Meta:
         db_table = 'current_subscription'
         #not available in Django 1.0 (Debian stable)
-        #managed = False
+        managed = False
 
 
 class SubscriptionMeta(models.Model):
