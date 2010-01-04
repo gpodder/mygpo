@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load humanize %}
+
+{% block content %}
+  <h1>{% trans "Subscription History" %}</h1>
+
+   {% if not history|length_is:"0" %}
+   <table class="list">
+    <tr>
+     <th>{% trans "Timestamp" %}</th>
+     <th>{% trans "Action" %}</th>
+     <th>{% trans "Devices" %}</th>
+    </tr>
+    {% for s in history %}
+     <tr>
+      <td><abbr title="{{ s.timestamp }}">{{ s.timestamp|naturalday }}</abbr></td>
+      <td>
+       {% ifequal s.action 1 %}
+        {% trans "subscribe" %}
+       {% endifequal %}
+       {% ifequal s.action -1 %}
+        {% trans "unsubscribe" %}
+       {% endifequal %}
+      </td>
+      <td>{{ s.device.name }}</td>
+     </tr>
+    {% endfor %}
+   </table>
+  {% endif %}
+{% endblock %}
+
