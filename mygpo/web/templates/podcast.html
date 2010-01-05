@@ -20,8 +20,8 @@
     {% endif %}
    </a>
   {% else %}
-   <h2>Devices</h2>
-   <strong>You have subscribed this podcast on</strong>
+   <h2>{% trans "Devices" %}</h2>
+   <strong>{% trans "You have subscribed this podcast on" %}</strong>
    <ul class="devices">
    {% for device in devices %}
     <li class="{{device.type}}"><a href="/device/{{ device.id }}">{{ device.name }}</a></li>

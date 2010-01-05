@@ -6,7 +6,7 @@
 {% block content %}
   <h1>{{ device.name }}</h1>
 
-  <h2>Podcasts</h2>
+  <h2>{% trans "Podcasts" %}</h2>
   <p>{% trans "You have subscribed the following podcasts on this device" %}
   <table class="list">
    <tr>
@@ -24,7 +24,7 @@
    {% endfor %}
   </table>
 
-  <h2>Synchronize</h2>
+  <h2>{% trans "Synchronize" %}</h2>
   <p>{% blocktrans %}If you synchronize devices, they will always have the same subscriptions. A podcast that is subscribed on one device, will automatically be added to all synchronized devices.{% endblocktrans %}</p>
 
   {% if synced_with|length_is:"0" %}

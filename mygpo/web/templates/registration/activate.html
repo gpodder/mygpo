@@ -2,11 +2,11 @@
 
 {% block content %}
   {% if account %}
-  <h1>Account activated</h1>
-  <p>Your account has been activated! Enjoy using my.gpodder.org</p>
+  <h1>{% trans "Account activated" %}</h1>
+  <p>{% trans "Your account has been activated! Enjoy using my.gpodder.org" %}</p>
   {% else %}
-  <h1>Account not activated</h1>
-  <p>Your account could not be activated successfully.</p>
+  <h1>{% trans "Account not activated" %}</h1>
+  <p>{% trans "Your account could not be activated successfully." %}</p>
   {% endif %}
 {% endblock %}
 
