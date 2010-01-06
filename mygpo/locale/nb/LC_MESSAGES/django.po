@@ -1,0 +1,433 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Jim Nygård <jim@nygard.priv.no>, 2010, 2010.
+msgid ""
+msgstr ""
+"Project-Id-Version: 2.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-01-05 23:28+0100\n"
+"PO-Revision-Date: 2010-01-06 11:48+0100\n"
+"Last-Translator: Jim Nygård <jim@nygard.priv.no>\n"
+"Language-Team: gpodder <>\n"
+"Language: nb\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Virtaal 0.3.1\n"
+
+#: api/models.py:167
+#, python-format
+msgid "Unnamed Device (%s)"
+msgstr "Enhet uten navn (%s)"
+
+#: web/forms.py:7
+msgid "Your Email Address"
+msgstr "Din e-postadresse"
+
+#: web/forms.py:8
+msgid "May we use your subscriptions for the toplist and suggestions?"
+msgstr "Kan vi bruke dine abonnement til topplisten og forslagslisten?"
+
+#: web/forms.py:11
+msgid "Name of this device"
+msgstr "Navn på enheten"
+
+#: web/forms.py:12
+msgid "What kind of device is this?"
+msgstr "Hva slags enhet er dette?"
+
+#: web/forms.py:13
+msgid "What UID is configured on the pysical device?"
+msgstr "Hvilken UID er konfigurert på den fysiske enheten?"
+
+#: web/views.py:103
+msgid "With which client do you want to subscribe?"
+msgstr "Med hvilken klient vil du abonnere?"
+
+#: web/views.py:168
+#, python-format
+msgid "my.gpodder.org - Top %s"
+msgstr "my.gpodder.org - Topp %s"
+
+#: web/views.py:194
+#, python-format
+msgid "my.gpodder.org - %s Suggestions"
+msgstr "my.gpodder.org - %s Forslag"
+
+#: web/views.py:208
+msgid "Synchronize with the following devices"
+msgstr "Synkroniser med disse enhetene"
+
+#: web/templates/account.html:5
+msgid "Account Settings"
+msgstr "Kontoinnstillinger"
+
+#: web/templates/account.html:8 web/templates/device.html:50
+msgid "Your settings have been saved."
+msgstr "Dine innstillinger er lagret."
+
+#: web/templates/account.html:11
+msgid "Update the settings for your account"
+msgstr "Oppdater innstillingene for kontoen din"
+
+#: web/templates/device.html:9
+msgid "Podcasts"
+msgstr "Podcaster"
+
+#: web/templates/device.html:10
+msgid "You have subscribed the following podcasts on this device"
+msgstr "Du abonnerer på følgende podcaster på denne enheten"
+
+#: web/templates/device.html:14 web/templates/podcast.html:37
+msgid "Title"
+msgstr "Tittel"
+
+#: web/templates/device.html:15
+msgid "Since"
+msgstr "Siden"
+
+#: web/templates/device.html:27
+msgid "Synchronize"
+msgstr "Synkroniser"
+
+#: web/templates/device.html:28
+msgid ""
+"If you synchronize devices, they will always have the same subscriptions. A "
+"podcast that is subscribed on one device, will automatically be added to all "
+"synchronized devices."
+msgstr ""
+"Når du synkroniserer enheter vil de alltid ha de samme abonnementene. En "
+"podcast som blir lagt til på en enhet vil automatisk bli lagt til på alle "
+"synkroniserte enheter."
+
+#: web/templates/device.html:32
+#, python-format
+msgid "%(devicename)s is currently not synchronized with other devices."
+msgstr "%(devicename)s er for øyeblikket ikke synkronisert med andre enheter."
+
+#: web/templates/device.html:36
+#, python-format
+msgid "%(devicename)s is currently synchronized with %(synclist)s."
+msgstr "%(devicename)s er for øyeblikket synkronisert med %(synclist)s."
+
+#: web/templates/device.html:37
+#, python-format
+msgid "Stop synchronisation for %(devicename)s "
+msgstr "Stopp synkroniserine av %(devicename)s "
+
+#: web/templates/device.html:44 web/templates/subscribe.html:20
+msgid "OK"
+msgstr "OK"
+
+#: web/templates/episode.html:7
+#, python-format
+msgid ""
+"An episode of the <a href=\"/podcast/%(podcast_id)s\">%(podcast)s</a> "
+"podcast."
+msgstr ""
+"En episode fra <a href=\"/podcast/%(podcast_id)s\">%(podcast)s</a> podcast."
+
+#: web/templates/episode.html:22
+msgid "Your Episode History"
+msgstr "Din episodehistorikk"
+
+#: web/templates/episode.html:25
+msgid "When"
+msgstr "Når"
+
+#: web/templates/episode.html:26
+msgid "What"
+msgstr "Hva"
+
+#: web/templates/episode.html:27
+msgid "Where"
+msgstr "Hvor"
+
+#: web/templates/episode.html:41
+msgid "Why Unnamed Episode?"
+msgstr "Episoden uten navn?"
+
+#: web/templates/episode.html:41 web/templates/podcast.html:80
+#: web/templates/subscribe.html:24
+msgid ""
+"Because we display names after we have fetched the information form the feed "
+"-- and this may take some time. Until this is completed, the podcast will "
+"simply be called this way."
+msgstr ""
+"Fordi vi viser navnene etter å ha hentet informasjonen i strømmen, dette kan "
+"ta litt tid. I mellomtiden vil podcasten vises uten navn."
+
+#: web/templates/home-user.html:6
+msgid "my.gpodder.org"
+msgstr "my.gpodder.org"
+
+#: web/templates/home-user.html:9
+msgid "Your Subscriptions"
+msgstr "Dine Abonnement"
+
+#: web/templates/home-user.html:13 web/templates/suggestions.html:17
+#: web/templates/toplist.html:13
+msgid "Podcast"
+msgstr "Podcast"
+
+#: web/templates/home-user.html:14
+msgid "Latest Episode"
+msgstr "Siste episode"
+
+#: web/templates/home-user.html:15
+msgid "Subscribed on"
+msgstr "Abonnert på"
+
+#: web/templates/home-user.html:37
+msgid "Where to start?"
+msgstr "Hvor skal jeg begynne?"
+
+#: web/templates/home-user.html:38
+#, python-format
+msgid ""
+"my.gpodder.org help you to track your podcasts which you have subscribed on "
+"your devices - desktop computer, notebook, mobile devices, etc. To start "
+"using my.gpodder.org set up <a href=\"http://gpodder.org\">gPodder</a> with "
+"your username &ndash; <strong>%(username)s</strong> &ndash; and password and "
+"upload your podcasts. They will automatically show up here."
+msgstr ""
+"my.gpodder.org hjelper deg å holde oversikt over podcastabonnement på flere "
+"enheter - PCer, mobiltelefoner, mp3 spillere, osv. For å komme i gang med my."
+"gpodder.org sett opp <a href=\"http://gpodder.org\">gPodder</a> med "
+"brukernavn &ndash; <strong>%(username)s</strong> &ndash; og passord og last "
+"opp dine podcaster. De vil vises her automatisk."
+
+#: web/templates/home.html:6
+msgid ""
+"my.gpodder.org is a webservice for synchronizing podcast subscriptions on "
+"several devices and applications."
+msgstr ""
+"my.gpodder.org er en nettside for synkroniseringe av pocastabonnementer på "
+"flere enheter og programmer."
+
+#: web/templates/home.html:8
+#, python-format
+msgid "We are currently tracking %(podcast_count)s Podcasts!"
+msgstr "Vi følger for øyeblikket %(podcast_count)s podcaster!"
+
+#: web/templates/home.html:20 web/templates/login.html:14
+msgid "Not yet a member?"
+msgstr "Ikke medlem ennå?"
+
+#: web/templates/home.html:20 web/templates/login.html:14
+msgid "Register!"
+msgstr "Registrer!"
+
+#: web/templates/migrate.html:5
+msgid ""
+"The new my.gpodder.org uses usernames instead of email addresses. Based on "
+"your email address, we think you might like "
+msgstr ""
+"Den nye my.gpodder.org bruker brukernavn i stedet for e-postadresse. Basert "
+"på din e-postadresse foreslår vi "
+
+#: web/templates/migrate.html:5
+msgid ", but you can change that if you want to."
+msgstr ", men du kan endre dette hvis du ønsker."
+
+#: web/templates/migrate.html:11
+msgid ""
+"You can keep your old user settings in gPodder. Once the next version (with "
+"lots of new features) is release, you'll have to replace your email address "
+"with your username."
+msgstr ""
+"Du kan beholde dine gamle innstillinger i gPodder. Når den neste versjonen "
+"(med mange nye funksjoner) er tilgjeng må du bytte ut e-postadressen med "
+"brukernavnet ditt."
+
+#: web/templates/podcast.html:7
+msgid "Unnamed Podcast"
+msgstr "Podcast uten navn"
+
+#: web/templates/podcast.html:17 web/templates/subscribe.html:7
+#, python-format
+msgid "Subscribe to %(podcasttitle)s"
+msgstr "Abonner på %(podcasttitle)s"
+
+#: web/templates/podcast.html:19 web/templates/subscribe.html:9
+msgid "Subscribe to this podcast"
+msgstr "Abonner på denne podcasten"
+
+#: web/templates/podcast.html:23 web/templates/podcast.html.py:60
+msgid "Devices"
+msgstr "Enheter"
+
+#: web/templates/podcast.html:24
+msgid "You have subscribed this podcast on"
+msgstr "Du abonnerer på denne podcasten på"
+
+#: web/templates/podcast.html:33
+msgid "Episodes"
+msgstr "Episoder"
+
+#: web/templates/podcast.html:38
+msgid "Description"
+msgstr "Beskrivelse"
+
+#: web/templates/podcast.html:39
+msgid "Released"
+msgstr "Utgitt"
+
+#: web/templates/podcast.html:55
+msgid "Subscription History"
+msgstr "Abonnementshistorikk"
+
+#: web/templates/podcast.html:58
+msgid "Timestamp"
+msgstr "Tidspunkt"
+
+#: web/templates/podcast.html:59
+msgid "Action"
+msgstr "Handling"
+
+#: web/templates/podcast.html:67
+msgid "subscribe"
+msgstr "abonner"
+
+#: web/templates/podcast.html:70
+msgid "unsubscribe"
+msgstr "avslutt abonnement"
+
+#: web/templates/podcast.html:80 web/templates/subscribe.html:24
+msgid "Why Unnamed Podcast?"
+msgstr "Podcast uten navn?"
+
+#: web/templates/suggestions.html:10
+msgid "Suggested Podcasts"
+msgstr "Podcastforslag"
+
+#: web/templates/suggestions.html:12
+#, python-format
+msgid "We've selected %(suggestion_count)s podcasts which you might like."
+msgstr "Vi har valgt %(suggestion_count)s podcaster som du kanskje liker."
+
+#: web/templates/suggestions.html:18
+msgid "URL"
+msgstr "URL"
+
+#: web/templates/suggestions.html:30
+msgid "Do you like our suggestions?"
+msgstr "Liker du våre anbefalinger?"
+
+#: web/templates/toplist.html:5
+msgid "Toplist"
+msgstr "Toppliste"
+
+#: web/templates/toplist.html:7
+#, python-format
+msgid "These are the %(count)s most subscribed podcasts."
+msgstr "Dette er de %(count)s mest populære podcastene."
+
+#: web/templates/toplist.html:11
+msgid "#"
+msgstr "#"
+
+#: web/templates/toplist.html:12
+msgid "Last week"
+msgstr "Forrige uke"
+
+#: web/templates/toplist.html:14
+msgid "Subscribers"
+msgstr "Abonnenter"
+
+#: web/templates/registration/activate.html:5
+#: web/templates/registration/activation_complete.html:4
+msgid "Account activated"
+msgstr "Konto aktivert"
+
+#: web/templates/registration/activate.html:6
+#: web/templates/registration/activation_complete.html:5
+msgid "Your account has been activated! Enjoy using my.gpodder.org"
+msgstr "Kontoen er aktivert! Velkommen til my.gpodder.org"
+
+#: web/templates/registration/activate.html:8
+msgid "Account not activated"
+msgstr "Kontoen er ikke aktivert"
+
+#: web/templates/registration/activate.html:9
+msgid "Your account could not be activated successfully."
+msgstr "Kontoen kunne ikke aktiveres."
+
+#: web/templates/registration/registration_complete.html:4
+msgid "Registration complete"
+msgstr "Du er nå registert"
+
+#: web/templates/registration/registration_complete.html:5
+msgid ""
+"Please confirm your account using the email you should just have recieved."
+msgstr "Du må bekrefte kontoen med e-posten du nå skal ha mottatt."
+
+#: web/templates/registration/registration_form.html:4
+msgid "Create a User Account"
+msgstr "Opprett en brukerkonto"
+
+#: web/templates/search/search.html:6
+msgid "Search"
+msgstr "Søk"
+
+#: web/templates/search/search.html:20
+msgid "Results"
+msgstr "Resultater"
+
+#: web/templatetags/devices.py:11
+msgid "Desktop"
+msgstr "Desktop"
+
+#: web/templatetags/devices.py:13
+msgid "Laptop"
+msgstr "Laptop"
+
+#: web/templatetags/devices.py:15
+msgid "Mobile"
+msgstr "Mobil"
+
+#: web/templatetags/devices.py:17
+msgid "Server"
+msgstr "Server"
+
+#: web/templatetags/devices.py:19
+msgid "Other"
+msgstr "Annen"
+
+#: web/templatetags/episodes.py:10
+msgid "This episode has not yet been played"
+msgstr "Denne episoden er ikke avspilt ennå"
+
+#: web/templatetags/episodes.py:13 web/templatetags/episodes.py:14
+#, python-format
+msgid " on %s"
+msgstr "på %s"
+
+#: web/templatetags/episodes.py:17
+msgid "This episode has been marked new"
+msgstr "Denne episoden er markert som ny"
+
+#: web/templatetags/episodes.py:19
+msgid "This episode has been downloaded"
+msgstr "Denne episoden er lastet ned"
+
+#: web/templatetags/episodes.py:21
+msgid "This episode has been played"
+msgstr "Denne episoden er avspilt"
+
+#: web/templatetags/episodes.py:23
+msgid "This episode has been deleted"
+msgstr "Denne episoden er slettet"
+
+#: web/templatetags/podcasts.py:12
+msgid "Logo"
+msgstr "Logo"
+
+#: web/templatetags/podcasts.py:14
+msgid "No Logo available"
+msgstr "Ingen logo tilgjengelig"
+
+#~ msgid "back!"
+#~ msgstr "zurück!"
