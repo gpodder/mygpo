@@ -81,7 +81,7 @@ msgstr ""
 
 #: web/templates/device.html:14 web/templates/podcast.html:37
 msgid "Title"
-msgstr "Titel"
+msgstr ""
 
 #: web/templates/device.html:15
 msgid "Since"
@@ -125,9 +125,8 @@ msgid ""
 msgstr ""
 
 #: web/templates/episode.html:22
-#, fuzzy
 msgid "Your Episode History"
-msgstr "Abonnementverlauf"
+msgstr ""
 
 #: web/templates/episode.html:25
 msgid "When"
@@ -159,7 +158,7 @@ msgstr ""
 
 #: web/templates/home-user.html:9
 msgid "Your Subscriptions"
-msgstr "Deine Abonnements"
+msgstr ""
 
 #: web/templates/home-user.html:13 web/templates/suggestions.html:17
 #: web/templates/toplist.html:13
@@ -168,12 +167,11 @@ msgstr ""
 
 #: web/templates/home-user.html:14
 msgid "Latest Episode"
-msgstr "Letzte Episode"
+msgstr ""
 
 #: web/templates/home-user.html:15
-#, fuzzy
 msgid "Subscribed on"
-msgstr "abonniert"
+msgstr ""
 
 #: web/templates/home-user.html:37
 msgid "Where to start?"
@@ -194,33 +192,29 @@ msgid ""
 "my.gpodder.org is a webservice for synchronizing podcast subscriptions on "
 "several devices and applications."
 msgstr ""
-"my.gpodder.org ist ein Webservice für das Synchronisieren von Podcast-"
-"Abonnements auf verschiedenen Geräten und Anwendungen."
 
 #: web/templates/home.html:8
 #, python-format
 msgid "We are currently tracking %(podcast_count)s Podcasts!"
-msgstr "Es werden zur Zeit %(podcast_count)s Podcasts verfolgt!"
+msgstr ""
 
 #: web/templates/home.html:20 web/templates/login.html:14
 msgid "Not yet a member?"
-msgstr "Noch kein Mitglied?"
+msgstr ""
 
 #: web/templates/home.html:20 web/templates/login.html:14
 msgid "Register!"
-msgstr "Registrieren!"
+msgstr ""
 
 #: web/templates/migrate.html:5
 msgid ""
 "The new my.gpodder.org uses usernames instead of email addresses. Based on "
 "your email address, we think you might like "
 msgstr ""
-"Das neue my.gpodder.org Benutzername anstatt Emailadressen, der basierend "
-"auf deiner Emailadresse erzeugt wird. Wir denken, du wirst ihn mögen "
 
 #: web/templates/migrate.html:5
 msgid ", but you can change that if you want to."
-msgstr ", falls nicht kannst du ihn einfach ändern."
+msgstr ""
 
 #: web/templates/migrate.html:11
 msgid ""
@@ -228,9 +222,6 @@ msgid ""
 "lots of new features) is release, you'll have to replace your email address "
 "with your username."
 msgstr ""
-"Du kannst deine alten Einstellung von gPodder übernehmen. Sobald die nächste "
-"Version (mit vielen neuen Funktionen) veröffentlicht wurde, musst du für den "
-"Zugang deinen neuen Benutzernamen benutzen."
 
 #: web/templates/podcast.html:7
 msgid "Unnamed Podcast"
@@ -247,21 +238,19 @@ msgstr ""
 
 #: web/templates/podcast.html:23 web/templates/podcast.html.py:60
 msgid "Devices"
-msgstr "Geräte"
+msgstr ""
 
 #: web/templates/podcast.html:24
 msgid "You have subscribed this podcast on"
 msgstr ""
 
 #: web/templates/podcast.html:33
-#, fuzzy
 msgid "Episodes"
-msgstr "Letzte Episode"
+msgstr ""
 
 #: web/templates/podcast.html:38
-#, fuzzy
 msgid "Description"
-msgstr "Deine Abonnements"
+msgstr ""
 
 #: web/templates/podcast.html:39
 msgid "Released"
@@ -269,23 +258,23 @@ msgstr ""
 
 #: web/templates/podcast.html:55
 msgid "Subscription History"
-msgstr "Abonnementverlauf"
+msgstr ""
 
 #: web/templates/podcast.html:58
 msgid "Timestamp"
-msgstr "Zeitpunkt"
+msgstr ""
 
 #: web/templates/podcast.html:59
 msgid "Action"
-msgstr "Aktivität"
+msgstr ""
 
 #: web/templates/podcast.html:67
 msgid "subscribe"
-msgstr "abonniert"
+msgstr ""
 
 #: web/templates/podcast.html:70
 msgid "unsubscribe"
-msgstr "beendet"
+msgstr ""
 
 #: web/templates/podcast.html:80 web/templates/subscribe.html:24
 msgid "Why Unnamed Podcast?"
@@ -326,9 +315,8 @@ msgid "Last week"
 msgstr ""
 
 #: web/templates/toplist.html:14
-#, fuzzy
 msgid "Subscribers"
-msgstr "abonniert"
+msgstr ""
 
 #: web/templates/registration/activate.html:5
 #: web/templates/registration/activation_complete.html:4
@@ -421,6 +409,3 @@ msgstr ""
 #: web/templatetags/podcasts.py:14
 msgid "No Logo available"
 msgstr ""
-
-#~ msgid "back!"
-#~ msgstr "zurück!"
