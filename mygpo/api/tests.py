@@ -32,7 +32,7 @@ except ImportError:
     print "No JSON module available - fallback to simplejson (Python < 2.6)"
     import simplejson as json
 
-"""
+
 class SyncTest(TestCase):
     # FIXME: Broken testcase - please fix!
     def tXest_sync_actions(self):
@@ -199,7 +199,7 @@ class AdvancedAPITest(TestCase):
             if hash2[x] != hash1[x]:
                 return False
         return True
-"""
+
 
 class SimpleAPITest(TestCase):
 
