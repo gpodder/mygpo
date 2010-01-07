@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-05 23:28+0100\n"
+"POT-Creation-Date: 2010-01-07 17:15+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -69,6 +69,20 @@ msgstr ""
 
 #: web/templates/account.html:11
 msgid "Update the settings for your account"
+msgstr ""
+
+#: web/templates/authors.html:5
+msgid "For podcast authors"
+msgstr ""
+
+#: web/templates/authors.html:8
+msgid ""
+"You can paste this code on your website, so users of mygpo can directly "
+"subscribe to your podcast!"
+msgstr ""
+
+#: web/templates/authors.html:9
+msgid "Change the field 'YOUR_ADRESS' with the adress of your podcast."
 msgstr ""
 
 #: web/templates/device.html:9

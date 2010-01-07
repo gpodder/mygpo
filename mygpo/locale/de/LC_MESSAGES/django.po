@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-05 23:28+0100\n"
+"POT-Creation-Date: 2010-01-07 17:15+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,65 +19,82 @@ msgstr ""
 #: api/models.py:167
 #, python-format
 msgid "Unnamed Device (%s)"
-msgstr ""
+msgstr "Unbenanntes Gerät (%s)"
 
 #: web/forms.py:7
 msgid "Your Email Address"
-msgstr ""
+msgstr "Deine Email Adresse"
 
 #: web/forms.py:8
 msgid "May we use your subscriptions for the toplist and suggestions?"
-msgstr ""
+msgstr "Dürfen wir deine Abonnements für die Berechnung der Topliste und "
+"Empfehlungen verwenden?"
 
 #: web/forms.py:11
 msgid "Name of this device"
-msgstr ""
+msgstr "Name dieses Gerätes"
 
 #: web/forms.py:12
 msgid "What kind of device is this?"
-msgstr ""
+msgstr "Welcher Art ist dieses Gerät?"
 
 #: web/forms.py:13
 msgid "What UID is configured on the pysical device?"
-msgstr ""
+msgstr "Welche UID besitzt das physikalische Gerät?"
 
 #: web/views.py:103
 msgid "With which client do you want to subscribe?"
-msgstr ""
+msgstr "Auf welchem Benutzer willst du aboonieren?"
 
 #: web/views.py:168
 #, python-format
 msgid "my.gpodder.org - Top %s"
-msgstr ""
+msgstr "my.gpodder.org - Top %s"
 
 #: web/views.py:194
 #, python-format
 msgid "my.gpodder.org - %s Suggestions"
-msgstr ""
+msgstr "my.gpodder.org - %s Empfehlungen"
 
 #: web/views.py:208
 msgid "Synchronize with the following devices"
-msgstr ""
+msgstr "Synchronisierung der folgenden Geräte"
 
 #: web/templates/account.html:5
 msgid "Account Settings"
-msgstr ""
+msgstr "Konto-Einstellungen"
 
 #: web/templates/account.html:8 web/templates/device.html:50
 msgid "Your settings have been saved."
-msgstr ""
+msgstr "Ihre Einstellungen wurden gespeichert."
 
 #: web/templates/account.html:11
 msgid "Update the settings for your account"
+msgstr "Aktualisierung der Konto-Einstellungen"
+
+#: web/templates/authors.html:5
+msgid "For podcast authors"
+msgstr "Für die Podcast-Autoren"
+
+#: web/templates/authors.html:8
+msgid ""
+"You can paste this code on your website, so users of mygpo can directly "
+"subscribe to your podcast!"
 msgstr ""
+"Du kannst diesen Code auf deine Webseite geben, damit die Benutzer von mygpo "
+"direkt deinen Podcast abonnieren können!"
+
+#: web/templates/authors.html:9
+msgid "Change the field 'YOUR_ADRESS' with the adress of your podcast."
+msgstr "Ändere YOUR_ADRESS in die Adresse deines Podcastes um."
 
 #: web/templates/device.html:9
 msgid "Podcasts"
-msgstr ""
+msgstr "Podcasts"
 
 #: web/templates/device.html:10
 msgid "You have subscribed the following podcasts on this device"
-msgstr ""
+msgstr "Du hast die folgenden Podcasts auf diesem Gerät abonniert"
 
 #: web/templates/device.html:14 web/templates/podcast.html:37
 msgid "Title"
@@ -85,11 +102,11 @@ msgstr "Titel"
 
 #: web/templates/device.html:15
 msgid "Since"
-msgstr ""
+msgstr "seit"
 
 #: web/templates/device.html:27
 msgid "Synchronize"
-msgstr ""
+msgstr "Synchronisierung"
 
 #: web/templates/device.html:28
 msgid ""
@@ -97,25 +114,28 @@ msgid ""
 "podcast that is subscribed on one device, will automatically be added to all "
 "synchronized devices."
 msgstr ""
+"Falls du einige Geräte synchronisierst, werden auf diesen Geräten immer die "
+"selbenAbonnements vorhanden sein. Ein Podcast der auf einem Gerät abonniert "
+"wurde, wird automatisch an alle synchronisierten Geräte weitergegeben."
 
 #: web/templates/device.html:32
 #, python-format
 msgid "%(devicename)s is currently not synchronized with other devices."
-msgstr ""
+msgstr "%(devicename)s wird zur Zeit mit keinem anderen Gerät synchronisiert."
 
 #: web/templates/device.html:36
 #, python-format
 msgid "%(devicename)s is currently synchronized with %(synclist)s."
-msgstr ""
+msgstr "%(devicename)s wird zur Zeit mit %(synclist)s synchronisiert."
 
 #: web/templates/device.html:37
 #, python-format
 msgid "Stop synchronisation for %(devicename)s "
-msgstr ""
+msgstr "Beende die Synchronisation für %(devicename)s "
 
 #: web/templates/device.html:44 web/templates/subscribe.html:20
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: web/templates/episode.html:7
 #, python-format
@@ -123,27 +143,27 @@ msgid ""
 "An episode of the <a href=\"/podcast/%(podcast_id)s\">%(podcast)s</a> "
 "podcast."
 msgstr ""
+"Eine Episode für <a href=\"/podcast/%(podcast_id)s\">%(podcast)s</a> Podcast."
 
 #: web/templates/episode.html:22
-#, fuzzy
 msgid "Your Episode History"
-msgstr "Abonnementverlauf"
+msgstr "Dein Episoden Verlauf"
 
 #: web/templates/episode.html:25
 msgid "When"
-msgstr ""
+msgstr "Wann"
 
 #: web/templates/episode.html:26
 msgid "What"
-msgstr ""
+msgstr "Was"
 
 #: web/templates/episode.html:27
 msgid "Where"
-msgstr ""
+msgstr "Wo"
 
 #: web/templates/episode.html:41
 msgid "Why Unnamed Episode?"
-msgstr ""
+msgstr "Warum unbenannte Episoden?"
 
 #: web/templates/episode.html:41 web/templates/podcast.html:80
 #: web/templates/subscribe.html:24
@@ -152,10 +172,13 @@ msgid ""
 "-- and this may take some time. Until this is completed, the podcast will "
 "simply be called this way."
 msgstr ""
+"Da die Beschaffung der Namen und anderer Informationen etwas Zeit in "
+"Anspruch nehmen kann. Bis dies erledigt ist wird der Podcast auf diese Wiese "
+"dargestellt."
 
 #: web/templates/home-user.html:6
 msgid "my.gpodder.org"
-msgstr ""
+msgstr "my.gpodder.org"
 
 #: web/templates/home-user.html:9
 msgid "Your Subscriptions"
@@ -164,20 +187,19 @@ msgstr "Deine Abonnements"
 #: web/templates/home-user.html:13 web/templates/suggestions.html:17
 #: web/templates/toplist.html:13
 msgid "Podcast"
-msgstr ""
+msgstr "Podcast"
 
 #: web/templates/home-user.html:14
 msgid "Latest Episode"
 msgstr "Letzte Episode"
 
 #: web/templates/home-user.html:15
-#, fuzzy
 msgid "Subscribed on"
-msgstr "abonniert"
+msgstr "Abonniert auf"
 
 #: web/templates/home-user.html:37
 msgid "Where to start?"
-msgstr ""
+msgstr "Wie kannst du beginnen?"
 
 #: web/templates/home-user.html:38
 #, python-format
@@ -188,6 +210,12 @@ msgid ""
 "your username &ndash; <strong>%(username)s</strong> &ndash; and password and "
 "upload your podcasts. They will automatically show up here."
 msgstr ""
+"my.gpodder.org hilft dir deine Podcasts zu verwalten, welche du auf deinen "
+"Geräten - PC, Laptop, mobile Geräte, ... - abonniert hast. Zum Einstieg in "
+"my.gpodder.org installiere <a href=\"http://gpodder.org\">gPodder</a> mit "
+"deinem Benutzername &ndash; <strong>%(username)s</strong> &ndash; und deinem "
+"Passwort. Dann lade deine Podcasts rauf und sie werden automatisch hier "
+"angezeigt."
 
 #: web/templates/home.html:6
 msgid ""
@@ -234,16 +262,16 @@ msgstr ""
 
 #: web/templates/podcast.html:7
 msgid "Unnamed Podcast"
-msgstr ""
+msgstr "Unbenannter Podcast"
 
 #: web/templates/podcast.html:17 web/templates/subscribe.html:7
 #, python-format
 msgid "Subscribe to %(podcasttitle)s"
-msgstr ""
+msgstr "Abonniere %(podcasttitle)s"
 
 #: web/templates/podcast.html:19 web/templates/subscribe.html:9
 msgid "Subscribe to this podcast"
-msgstr ""
+msgstr "Abonniere diesen Podcast"
 
 #: web/templates/podcast.html:23 web/templates/podcast.html.py:60
 msgid "Devices"
@@ -251,21 +279,19 @@ msgstr "Geräte"
 
 #: web/templates/podcast.html:24
 msgid "You have subscribed this podcast on"
-msgstr ""
+msgstr "Dieser Podcast wurde abonniert am"
 
 #: web/templates/podcast.html:33
-#, fuzzy
 msgid "Episodes"
-msgstr "Letzte Episode"
+msgstr "Episoden"
 
 #: web/templates/podcast.html:38
-#, fuzzy
 msgid "Description"
-msgstr "Deine Abonnements"
+msgstr "Beschreibung"
 
 #: web/templates/podcast.html:39
 msgid "Released"
-msgstr ""
+msgstr "Veröffentlicht"
 
 #: web/templates/podcast.html:55
 msgid "Subscription History"
@@ -289,138 +315,138 @@ msgstr "beendet"
 
 #: web/templates/podcast.html:80 web/templates/subscribe.html:24
 msgid "Why Unnamed Podcast?"
-msgstr ""
+msgstr "Warum unbenannte Podcasts?"
 
 #: web/templates/suggestions.html:10
 msgid "Suggested Podcasts"
-msgstr ""
+msgstr "Vorgeschlagene Podcasts"
 
 #: web/templates/suggestions.html:12
 #, python-format
 msgid "We've selected %(suggestion_count)s podcasts which you might like."
-msgstr ""
+msgstr "Es werden diese %(suggestion_count)s Podcasts vorgeschlagen."
 
 #: web/templates/suggestions.html:18
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: web/templates/suggestions.html:30
 msgid "Do you like our suggestions?"
-msgstr ""
+msgstr "Bist du mit den Empfehlungen zufrieden?"
 
 #: web/templates/toplist.html:5
 msgid "Toplist"
-msgstr ""
+msgstr "Topliste"
 
 #: web/templates/toplist.html:7
 #, python-format
 msgid "These are the %(count)s most subscribed podcasts."
-msgstr ""
+msgstr "Dies sind die %(count)s meist abonnierten Podcasts."
 
 #: web/templates/toplist.html:11
 msgid "#"
-msgstr ""
+msgstr "#"
 
 #: web/templates/toplist.html:12
 msgid "Last week"
-msgstr ""
+msgstr "Letzte Woche"
 
 #: web/templates/toplist.html:14
-#, fuzzy
 msgid "Subscribers"
-msgstr "abonniert"
+msgstr "Abonnenten"
 
 #: web/templates/registration/activate.html:5
 #: web/templates/registration/activation_complete.html:4
 msgid "Account activated"
-msgstr ""
+msgstr "Konto aktiviert"
 
 #: web/templates/registration/activate.html:6
 #: web/templates/registration/activation_complete.html:5
 msgid "Your account has been activated! Enjoy using my.gpodder.org"
-msgstr ""
+msgstr "Dein Konto wurde aktiviert! Viel Spaß mit my.gpodder.org"
 
 #: web/templates/registration/activate.html:8
 msgid "Account not activated"
-msgstr ""
+msgstr "Konto nicht aktiviert"
 
 #: web/templates/registration/activate.html:9
 msgid "Your account could not be activated successfully."
-msgstr ""
+msgstr "Dein Konto konnte nicht erfolgreich aktiviert werden."
 
 #: web/templates/registration/registration_complete.html:4
 msgid "Registration complete"
-msgstr ""
+msgstr "Registrierung abgeschlossen"
 
 #: web/templates/registration/registration_complete.html:5
 msgid ""
 "Please confirm your account using the email you should just have recieved."
 msgstr ""
+"Bitte bestätige dein Konto mit Hilfe der Email, die du gerade erhlaten hast."
 
 #: web/templates/registration/registration_form.html:4
 msgid "Create a User Account"
-msgstr ""
+msgstr "Erstelle ein Benutzer-Konto"
 
 #: web/templates/search/search.html:6
 msgid "Search"
-msgstr ""
+msgstr "Suche"
 
 #: web/templates/search/search.html:20
 msgid "Results"
-msgstr ""
+msgstr "Ergebnisse"
 
 #: web/templatetags/devices.py:11
 msgid "Desktop"
-msgstr ""
+msgstr "Desktop"
 
 #: web/templatetags/devices.py:13
 msgid "Laptop"
-msgstr ""
+msgstr "Laptop"
 
 #: web/templatetags/devices.py:15
 msgid "Mobile"
-msgstr ""
+msgstr "Handy"
 
 #: web/templatetags/devices.py:17
 msgid "Server"
-msgstr ""
+msgstr "Server"
 
 #: web/templatetags/devices.py:19
 msgid "Other"
-msgstr ""
+msgstr "Andere"
 
 #: web/templatetags/episodes.py:10
 msgid "This episode has not yet been played"
-msgstr ""
+msgstr "Diese Episode wurde noch nicht abgespielt"
 
 #: web/templatetags/episodes.py:13 web/templatetags/episodes.py:14
 #, python-format
 msgid " on %s"
-msgstr ""
+msgstr " an %s"
 
 #: web/templatetags/episodes.py:17
 msgid "This episode has been marked new"
-msgstr ""
+msgstr "Diese Episode wurde als neu markiert"
 
 #: web/templatetags/episodes.py:19
 msgid "This episode has been downloaded"
-msgstr ""
+msgstr "Diese Episode wurde heruntergeladen"
 
 #: web/templatetags/episodes.py:21
 msgid "This episode has been played"
-msgstr ""
+msgstr "Diese Episode wurde abgespielt"
 
 #: web/templatetags/episodes.py:23
 msgid "This episode has been deleted"
-msgstr ""
+msgstr "Diese Episode wurde gelöscht"
 
 #: web/templatetags/podcasts.py:12
 msgid "Logo"
-msgstr ""
+msgstr "Logo"
 
 #: web/templatetags/podcasts.py:14
 msgid "No Logo available"
-msgstr ""
+msgstr "Kein Logo verfügbar"
 
 #~ msgid "back!"
 #~ msgstr "zurück!"
