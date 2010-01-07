@@ -272,14 +272,6 @@ def podcast_subscribe_url(request):
          
     podcast, created = Podcast.objects.get_or_create(url=url,
             defaults={'title':url,'description':url,'last_update':datetime.now()})
-    devices = Device.objects.filter(user=request.user)
-    history = SubscriptionAction.objects.filter(podcast=podcast,device__in=devices).order_by('-timestamp')
-    subscribed_devices = [s.device for s in Subscription.objects.filter(podcast=podcast,user=request.user)]
-    episodes = episode_list(podcast, request.user)
-    return render_to_response('podcast.html', {
-        'history': history,
-        'podcast': podcast,
-        'devices': subscribed_devices,
-        'episodes': episodes,
-    }, context_instance=RequestContext(request))
+            
+    return HttpResponseRedirect('/podcast/%d/subscribe' % podcast.pk)
     
