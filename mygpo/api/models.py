@@ -74,6 +74,26 @@ class Podcast(models.Model):
     def logo_shortname(self):
         return hashlib.sha1(self.logo_url).hexdigest()
 
+    def subscribe_targets(self, user):
+        """
+        returns all Devices and SyncGroups on which this podcast can be subsrbied. This excludes all
+        devices/syncgroups on which the podcast is already subscribed
+        """
+        targets = []
+
+        devices = Device.objects.filter(user=user)
+        for d in devices:
+            subscriptions = [x.podcast for x in d.get_subscriptions()]
+            if self in subscriptions: continue
+
+            if d.sync_group:
+                if not d.sync_group in targets: targets.append(d.sync_group)
+            else:
+                targets.append(d)
+
+        return targets
+
+
     def __unicode__(self):
         return self.title if self.title != '' else self.url
 
