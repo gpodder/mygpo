@@ -19,7 +19,6 @@ from django.test import TestCase
 from django.test.client import Client
 from django.contrib.auth.models import User
 from mygpo.api.models import Device, Podcast, Subscription, SubscriptionAction, UserProfile, EpisodeAction
-from put_test import put_data
 from django.http import HttpRequest
 from mygpo.api.simple import subscriptions
 from mygpo.api.advanced import devices
@@ -202,120 +201,187 @@ class AdvancedAPITest(TestCase):
         return True
 
 
-class SimpleTest(TestCase):
-    def test_put_get_data(self):
-        p1 = 'http://www.podcast1.com'
-        p2 = 'http://www.podcast2.com'
-        p3 = 'http://www.podcast3.com'
-    
-        d1 = '1'
-        d2 = '2'
-        d3 = '3'
-    
-        f1 = 'txt'
-        f2 = 'json'
-        f3 = 'opml'
-    
-        data_txt_1 = '%s\n%s\n' % (p1, p2)
-        data_txt_2 = '%s\n%s\n' % (p2, p3)
-    
-        data_json_1 = '[\n"%s",\n"%s"\n]' % (p1, p2)
-        data_json_2 = '[\n"%s",\n"%s"\n]' % (p2, p3)
+class SimpleAPITest(TestCase):
 
-        data_opml_1 = '<?xml version="1.0" encoding="UTF-8"?>\n<opml version="2.0">\n<head>\n<title>subscription list</title>\n\
-                       <dateCreated>Tue, 01 Dec 2009 10:06:18 +0000</dateCreated>\n</head>\n<body>\n\
-                       <outline text="p1" title="p1" type="rss" xmlUrl="%s"/>\n\
-                       <outline text="p2" title="p2" type="rss" xmlUrl="%s"/>\n\
-                       </body>\n</opml>\n' % (p1, p2)
-        data_opml_2 = '<?xml version="1.0" encoding="UTF-8"?><opml version="2.0"><head><title>subscription list</title>\
-                       <dateCreated>Tue, 01 Dec 2009 10:06:18 +0000</dateCreated></head><body>\
-                       <outline text="p2" title="p2" type="rss" xmlUrl="%s"/>\
-                       <outline text="p3" title="p3" type="rss" xmlUrl="%s"/>\
-                       </body></opml>' % (p2, p3)
-    
+    def setUp(self):
         un = 'u'
         pw = 'u'
-        u  = User.objects.create(username=un, password=pw)
-        UserProfile.objects.create(user=u)
+        self.user = User.objects.create(username=un, email='u@mygpo')
+        self.user.set_password(pw)
+        self.user.save()
+        UserProfile.objects.create(user=self.user)
         
         r = HttpRequest()
         r.method = 'PUT'
-        r.user = u
+        r.user = self.user
+        
+        self.req = r
+        self.p1 = 'http://www.podcast1.com'
+        self.p2 = 'http://www.podcast2.com'
+        self.p3 = 'http://www.podcast3.com'
+        
+        self.client = Client()
+        login = self.client.login(username=un, password=pw)
+        self.assertEqual(login, True)
+
+    def test_put_get_txt(self):
+        d1 = '1'
+        f1 = 'txt'
+    
+        data_txt_1 = '%s\n%s\n' % (self.p1, self.p2)
+        data_txt_2 = '%s\n%s\n' % (self.p2, self.p3)
         
         #1. put 2 new podcasts
-        r.raw_post_data = data_txt_1
-        put = subscriptions(request=r, username=un, device_uid=d1, format=f1)
+        self.req.raw_post_data = data_txt_1
+        put = subscriptions(request=self.req, username=self.user.username, device_uid=d1, format=f1)
         # Successful requests should return the empty string + status code 200
         self.assertEqual(put.status_code, 200)
         self.assertEqual(put.content, '')
         
         #device 1 txt
-        device = Device.objects.get(uid=d1, user=u)
+        device = Device.objects.get(uid=d1, user=self.user)
         
+        #get subscriptions
         s = [p.podcast for p in device.get_subscriptions()]
         urls = [p.url for p in s]
         self.assertEqual(len(urls), 2)
-        self.assertEqual(urls[0], p1)
-        self.assertEqual(urls[1], p2) 
+        self.assertEqual(urls[0], self.p1)
+        self.assertEqual(urls[1], self.p2) 
         
         #2. put 1 new podcast and delete 1 old
         time.sleep(1)
-        r.raw_post_data = data_txt_2
-        subscriptions(request=r, username=un, device_uid=d1, format=f1)
+        self.req.raw_post_data = data_txt_2
+        subscriptions(request=self.req, username=self.user.username, device_uid=d1, format=f1)
         
+        #get subscriptions
         s = [p.podcast for p in device.get_subscriptions()]
         urls = [p.url for p in s]
         self.assertEqual( len(s), 2)
-        self.assertEqual(urls[0], p2)
-        self.assertEqual(urls[1], p3) 
-        
-        #3. put 2 new podcasts
-        time.sleep(1)
-        r.raw_post_data = data_json_1
-        subscriptions(request=r, username=un, device_uid=d2, format=f2)
+        self.assertEqual(urls[0], self.p2)
+        self.assertEqual(urls[1], self.p3) 
+
+    def test_put_get_json(self):
+        d2 = '2'
+        f2 = 'json'
+    
+        data_json_1 = '[\n"%s",\n"%s"\n]' % (self.p1, self.p2)
+        data_json_2 = '[\n"%s",\n"%s"\n]' % (self.p2, self.p3)
+    
+        #1. put 2 new podcasts
+        self.req.raw_post_data = data_json_1
+        subscriptions(request=self.req, username=self.user.username, device_uid=d2, format=f2)
         
         #device 2 json
-        device = Device.objects.get(uid=d2, user=u)
+        device = Device.objects.get(uid=d2, user=self.user)
         
+        #get subscriptions
         s = [p.podcast for p in device.get_subscriptions()]
         urls = [p.url for p in s]
         self.assertEqual( len(s), 2)
-        self.assertEqual(urls[0], p1)
-        self.assertEqual(urls[1], p2) 
+        self.assertEqual(urls[0], self.p1)
+        self.assertEqual(urls[1], self.p2) 
 
-        #4. put 1 new podcast and delete 1 old
+        #2. put 1 new podcast and delete 1 old
         time.sleep(1)
-        r.raw_post_data = data_json_2
-        subscriptions(request=r, username=un, device_uid=d2, format=f2)
+        self.req.raw_post_data = data_json_2
+        subscriptions(request=self.req, username=self.user.username, device_uid=d2, format=f2)
         
+        #get subscriptions
         s = [p.podcast for p in device.get_subscriptions()]
         urls = [p.url for p in s]
         self.assertEqual( len(s), 2)
-        self.assertEqual(urls[0], p2)
-        self.assertEqual(urls[1], p3) 
+        self.assertEqual(urls[0], self.p2)
+        self.assertEqual(urls[1], self.p3) 
         
-        #5. put 2 new podcasts
-        time.sleep(1)
-        r.raw_post_data = data_opml_1
-        subscriptions(request=r, username=un, device_uid=d3, format=f3)
+    def test_put_get_opml(self):
+        d3 = '3'
+        f3 = 'opml'  
         
+        data_opml_1 = '<?xml version="1.0" encoding="UTF-8"?>\n<opml version="2.0">\n<head>\n<title>subscription list</title>\n\
+                       <dateCreated>Tue, 01 Dec 2009 10:06:18 +0000</dateCreated>\n</head>\n<body>\n\
+                       <outline text="p1" title="p1" type="rss" xmlUrl="%s"/>\n\
+                       <outline text="p2" title="p2" type="rss" xmlUrl="%s"/>\n\
+                       </body>\n</opml>\n' % (self.p1, self.p2)
+        data_opml_2 = '<?xml version="1.0" encoding="UTF-8"?><opml version="2.0"><head><title>subscription list</title>\
+                       <dateCreated>Tue, 01 Dec 2009 10:06:18 +0000</dateCreated></head><body>\
+                       <outline text="p2" title="p2" type="rss" xmlUrl="%s"/>\
+                       <outline text="p3" title="p3" type="rss" xmlUrl="%s"/>\
+                       </body></opml>' % (self.p2, self.p3)
+      
+        #1. put 2 new podcasts
+        self.req.raw_post_data = data_opml_1
+        subscriptions(request=self.req, username=self.user.username, device_uid=d3, format=f3)
+      
         #device 3 opml
-        device = Device.objects.get(uid=d3, user=u)
+        device = Device.objects.get(uid=d3, user=self.user)
         
+        #get subscriptions
         s = [p.podcast for p in device.get_subscriptions()]
         urls = [p.url for p in s]
         self.assertEqual( len(s), 2)
-        self.assertEqual(urls[0], p1)
-        self.assertEqual(urls[1], p2) 
+        self.assertEqual(urls[0], self.p1)
+        self.assertEqual(urls[1], self.p2) 
         
-        #6. put 1 new podcast and delete 1 old
+        #2. put 1 new podcast and delete 1 old
         time.sleep(1)
-        r.raw_post_data = data_opml_2
-        subscriptions(request=r, username=un, device_uid=d3, format=f3)
+        self.req.raw_post_data = data_opml_2
+        subscriptions(request=self.req, username=self.user.username, device_uid=d3, format=f3)
         
+        #get subscriptions
         s = [p.podcast for p in device.get_subscriptions()]
         urls = [p.url for p in s]
         self.assertEqual( len(s), 2)
-        self.assertEqual(urls[0], p2)
-        self.assertEqual(urls[1], p3) 
+        self.assertEqual(urls[0], self.p2)
+        self.assertEqual(urls[1], self.p3)
+        
+        
+    def test_put_json_client(self):
+        device = 'ipod'
+        urls = [self.p1, self.p2, self.p3]
+        reqs = json.dumps(urls)
+        
+        #put json - add 3 podcasts
+        response = self.client.put('/subscriptions/%s/%s.json' % (self.user.username, device), data={'raw_post_data':reqs})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, '')
+        
+        #get json - get 3 podcasts
+        response = self.client.get('/subscriptions/%s/%s.json' % (self.user.username, device), {})
+        get = json.loads(response.content)
+        
+        self.assertEqual(get, [self.p1, self.p2, self.p3])
 
+    def test_put_txt_get_json_client(self):
+        device = 'mobdev'
+        reqs = '%s\n%s\n%s\n' % (self.p1, self.p2, self.p3)
+        
+        #put txt - add 3 podcasts
+        response = self.client.put('/subscriptions/%s/%s.txt' % (self.user.username, device), data={'raw_post_data':reqs})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, '')
+        
+        #qerying subscription changes
+        response = self.client.get('/subscriptions/%s/%s.json' % (self.user.username, device), {})
+        get = json.loads(response.content)
+        
+        self.assertEqual(get, [self.p1, self.p2, self.p3])
+        
+    def test_put_opml_get_json_client(self):
+        device = 'pc'
+        reqs = '<?xml version="1.0" encoding="UTF-8"?>\n<opml version="2.0">\n<head>\n<title>subscription list</title>\n\
+                       <dateCreated>Tue, 01 Dec 2009 10:06:18 +0000</dateCreated>\n</head>\n<body>\n\
+                       <outline text="p1" title="p1" type="rss" xmlUrl="%s"/>\n\
+                       <outline text="p2" title="p2" type="rss" xmlUrl="%s"/>\n\
+                       <outline text="p3" title="p3" type="rss" xmlUrl="%s"/>\n\
+                       </body>\n</opml>\n' % (self.p1, self.p2, self.p3)
+        
+        #put json - add 3 podcasts
+        response = self.client.put('/subscriptions/%s/%s.opml' % (self.user.username, device), data={'raw_post_data':reqs})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, '')
+        
+        #qerying subscription changes
+        response = self.client.get('/subscriptions/%s/%s.json' % (self.user.username, device), {})
+        get = json.loads(response.content)
+        
+        self.assertEqual(get, [self.p1, self.p2, self.p3])

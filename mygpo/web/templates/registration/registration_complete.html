@@ -1,7 +1,8 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block content %}
-  <h1>Registration complete</h1>
-  <p>Please confirm your account using the email you should just have recieved.</p>
+  <h1>{% trans "Registration complete" %}</h1>
+  <p>{% trans "Please confirm your account using the email you should just have recieved." %}</p>
 {% endblock %}
 

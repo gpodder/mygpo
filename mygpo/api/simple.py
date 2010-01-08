@@ -76,7 +76,7 @@ def get_subscriptions(user, device_uid):
 def parse_subscription(raw_post_data, format, user, device_uid):
     if format == 'txt':
         sub = raw_post_data.split('\n')
-        p = '^[a-zA-z]'
+        p = '^http'
         urls = []
         for x in sub:
             if re.search(p, x) == None:
@@ -85,11 +85,15 @@ def parse_subscription(raw_post_data, format, user, device_uid):
                 urls.append(x)
 
     elif format == 'opml':
-        i = Importer(content=raw_post_data)
+        begin = raw_post_data.find('<?xml')
+        end = raw_post_data.find('</opml>') + 7
+        i = Importer(content=raw_post_data[begin:end])
         urls = [p['url'] for p in i.items]
 
     elif format == 'json':
-        urls = json.loads(raw_post_data)
+        begin = raw_post_data.find('[')
+        end = raw_post_data.find(']') + 1
+        urls = json.loads(raw_post_data[begin:end])
 
     else: raise ValueError('unsupported format %s' % format)
     
