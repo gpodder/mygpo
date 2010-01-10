@@ -78,6 +78,8 @@ urlpatterns = patterns('',
     (r'^subscribe', 'mygpo.web.views.podcast_subscribe_url'),
     (r'^authors/$', 'django.views.generic.simple.direct_to_template', {'template': 'authors.html'}),
 
+    (r'^online-help', 'django.views.generic.simple.direct_to_template', {'template': 'online-help.html'}),
+
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs'
     # to INSTALLED_APPS to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),

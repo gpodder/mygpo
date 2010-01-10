@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+  <h1>{% trans "Online Help" %}</h1>
+  <div>
+   <ul>
+    <li>
+     <a href="#1">{% trans "How can I configure my devices?" %}</a>
+     <ul>
+      <li><a href="#1.1">{% trans "How can I a new device?" %}</a></li>
+      <li><a href="#1.2">{% trans "How can I edit a device?" %}</a></li>
+     </ul>
+    </li>
+    <li>
+     <a href="#2">{% trans "How can I configure the synchronisation between devices?" %}</a>
+     <ul>
+      <li><a href="#2.1">{% trans "How can I start a synchronisation?" %}</a></li>
+      <li><a href="#2.2">{% trans "How can I stop a synchronisation?" %}</a></li>
+     </ul>
+    </li>
+    <li><a href="#3">{% trans "How can I copy single subscriptions between devices?" %}</a></li>
+   </ul>
+  </div>
+  
+  <div class="ohelp">
+   <h2 id="1" class="ohelp">{% trans "How can I configure my devices?" %}</h2>
+   <h3 id="1.1">{% trans "How can I a new device?" %}</h3>
+   <h3 id="1.2">{% trans "How can I edit a device?" %}</h3>
+   <p>{% trans "Click on your &quot;home&quot;-link." %}<br />
+   {% trans "Now you can see your devices, click on one of them." %}</p>
+   <p><img src="/media/online-help/userhomesingle.png" class="ohelp" /></p>
+   <p>{% trans "You are redirected to another page.<br />On the bottom of the page there's a field named &quot;Edit&quot;" %}</p>
+   <p><img src="/media/online-help/deviceedit.png" class="ohelp" /></p>
+   <p>{% trans "Here you can edit the name, the type and the uid. But pay attention if you edit the uid! If you enter a false one your subscriptions won't be synchronize with your device anymore." %}</p>
+  </div>
+     
+  <div class="ohelp">
+   <h2 id="2" class="ohelp">{% trans "How can I configure the synchronisation between devices?" %}</h2>
+   <h3 id="2.1">{% trans "How can I start a synchronisation?" %}</h3>
+   <p>{% trans "Choose a device on your home-screen and click on it." %}</p>
+   <p><img src="/media/online-help/userhome.png" class="ohelp" /></p>
+   <p>{% trans "Go to the field &quotSynchronize&quot, choose your desired device and click on the &quot;OK&quot;-button." %}</p>
+   <p><img src="/media/online-help/startsync.png" class="ohelp" /></p>
+   <p>{% trans "Now the two devices are synchronized." %}</p>
+   
+   <h3 id="2.2">{% trans "How can I stop a synchronisation?" %}</h3>
+   <p>{% trans "Click on your &quot;home&quot;-link." %}<br />
+   {% trans "Choose a device on which you would like to stop the synchronisation and click on it." %}</p>
+   <p><img src="/media/online-help/userhomesync.png" class="ohelp" /></p>
+   <p>{% trans "Go to the field &quot;Synchronize&quot; and click on &quot;Stop synchronisation for your device&quot;" %}</p>
+   <p><img src="/media/online-help/stopsync.png" class="ohelp" /></p>  
+   <p>{% trans "Now the two devices are unsynchronized again." %}</p> 
+  </div>
+  
+  <div class="ohelp">
+   <h2 id="3" class="ohelp">{% trans "How can I copy single subscriptions between devices?" %}</h2>
+   <p>{% trans "Click on your &quot;home&quot;-link." %}<br />
+   {% trans "Choose the podcast which you would like to copy on another device and click on it." %}</p>
+   <p><img src="/media/online-help/userhomesingle.png" class="ohelp" /></p>
+   <p>{% trans "Under the field &quot;Devices&quot; you see the link &quot;Subscribe to ... on other devices&quot; click on it." %}</p>
+   <p><img src="/media/online-help/subscribetootherdev.png" class="ohelp" /></p>
+   <p>{% trans "On the next page you can choose your desired device on which you want to copy the subscription." %}<br />
+   {% trans "After hitting the &quot;OK&quot;-button, the subscription has been copied." %}</p>
+  </div>
+  
+{% endblock %}

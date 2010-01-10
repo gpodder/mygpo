@@ -146,3 +146,24 @@ div.subscribe
     padding: 1em 0 1em 0;
 }
 
+h2.ohelp
+{
+    padding-top: 0;
+}
+
+img.ohelp
+{
+    border: 1px solid rgb(40%, 40%, 40%) ; 
+}
+
+div.ohelp
+{
+    width: 50em;
+    padding-left: 3em;
+    padding-right: 3em;    
+    border: 1px solid rgb(40%, 40%, 40%) ;
+    -moz-border-radius: 10px;
+    margin-bottom: 2em;
+}
+
+
