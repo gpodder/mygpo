@@ -19,23 +19,23 @@ msgstr ""
 #: api/models.py:187
 #, python-format
 msgid "Unnamed Device (%s)"
-msgstr ""
+msgstr "Dispositivo non specificato"
 
 #: web/forms.py:7
 msgid "Your Email Address"
-msgstr ""
+msgstr "Il vostro email address"
 
 #: web/forms.py:8
 msgid "May we use your subscriptions for the toplist and suggestions?"
-msgstr ""
+msgstr "Possiamo usare i vostri abbonamenti per il toplist ed i suggerimenti?"
 
 #: web/forms.py:11
 msgid "Name of this device"
-msgstr ""
+msgstr "Nome di questo dispositivo"
 
 #: web/forms.py:12
 msgid "What kind of device is this?"
-msgstr ""
+msgstr "Che genere di dispositivo è questo?"
 
 #: web/forms.py:13
 msgid "What UID is configured on the pysical device?"
@@ -48,12 +48,12 @@ msgstr ""
 #: web/views.py:174
 #, python-format
 msgid "my.gpodder.org - Top %s"
-msgstr ""
+msgstr "my.gpodder.org - Top %s"
 
 #: web/views.py:200
 #, python-format
 msgid "my.gpodder.org - %s Suggestions"
-msgstr ""
+msgstr "my.gpodder.org - %s suggerimenti"
 
 #: web/views.py:214
 msgid "Synchronize with the following devices"
@@ -69,15 +69,15 @@ msgstr ""
 
 #: web/templates/401.html:4
 msgid "Unauthorized"
-msgstr ""
+msgstr "Non autorizzato"
 
 #: web/templates/401.html:5
 msgid "This page is only available to registered users."
-msgstr ""
+msgstr "Questa pagina è a disposizione soltanto degli utenti registrati."
 
 #: web/templates/404.html:4
 msgid "Not found"
-msgstr ""
+msgstr "Non trovato"
 
 #: web/templates/404.html:5
 msgid "The requested document could not be found."
@@ -85,7 +85,7 @@ msgstr ""
 
 #: web/templates/500.html:4
 msgid "Internal Server Error"
-msgstr ""
+msgstr "Errore del server interno"
 
 #: web/templates/500.html:5
 msgid ""
@@ -95,7 +95,7 @@ msgstr ""
 
 #: web/templates/account.html:5
 msgid "Account Settings"
-msgstr ""
+msgstr "Regolazioni di cliente"
 
 #: web/templates/account.html:8 web/templates/device.html:50
 msgid "Your settings have been saved."
@@ -107,7 +107,7 @@ msgstr ""
 
 #: web/templates/authors.html:5
 msgid "For podcast authors"
-msgstr ""
+msgstr "Per gli autori dei podcasts"
 
 #: web/templates/authors.html:8
 msgid ""
@@ -121,7 +121,7 @@ msgstr ""
 
 #: web/templates/device.html:9
 msgid "Podcasts"
-msgstr ""
+msgstr "Podcasts"
 
 #: web/templates/device.html:10
 msgid "You have subscribed the following podcasts on this device"
@@ -129,15 +129,15 @@ msgstr ""
 
 #: web/templates/device.html:14 web/templates/podcast.html:56
 msgid "Title"
-msgstr ""
+msgstr "Titolo"
 
 #: web/templates/device.html:15
 msgid "Since"
-msgstr ""
+msgstr "da"
 
 #: web/templates/device.html:27
 msgid "Synchronize"
-msgstr ""
+msgstr "Sincronizzi"
 
 #: web/templates/device.html:28
 msgid ""
@@ -163,7 +163,7 @@ msgstr ""
 
 #: web/templates/device.html:44 web/templates/subscribe.html:20
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: web/templates/episode.html:7
 #, python-format
@@ -178,15 +178,15 @@ msgstr ""
 
 #: web/templates/episode.html:25
 msgid "When"
-msgstr ""
+msgstr "Quando"
 
 #: web/templates/episode.html:26
 msgid "What"
-msgstr ""
+msgstr "Cosa"
 
 #: web/templates/episode.html:27
 msgid "Where"
-msgstr ""
+msgstr "Dove"
 
 #: web/templates/episode.html:41
 msgid "Why Unnamed Episode?"
@@ -206,28 +206,28 @@ msgstr ""
 
 #: web/templates/history.html:11 web/templates/podcast.html:77
 msgid "Timestamp"
-msgstr ""
+msgstr "Data"
 
 #: web/templates/history.html:12 web/templates/podcast.html:78
 msgid "Action"
-msgstr ""
+msgstr "Azione"
 
 #: web/templates/history.html:13 web/templates/podcast.html:29
 #: web/templates/podcast.html.py:79
 msgid "Devices"
-msgstr ""
+msgstr "Dispositivo"
 
 #: web/templates/history.html:20 web/templates/podcast.html:86
 msgid "subscribe"
-msgstr ""
+msgstr "abboni"
 
 #: web/templates/history.html:23 web/templates/podcast.html:89
 msgid "unsubscribe"
-msgstr ""
+msgstr "disdica"
 
 #: web/templates/home-user.html:6
 msgid "my.gpodder.org"
-msgstr ""
+msgstr "my.gpodder.org"
 
 #: web/templates/home-user.html:9
 msgid "Your Subscriptions"
