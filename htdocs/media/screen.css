@@ -30,8 +30,8 @@ table.register th {
 
 .info
 {
-    background-color: #7277d8;
-    border: #080e73 thin solid;
+    background-color: #eeeeee;
+    border: #aaaaaa thin solid;
     width: 100%;
     padding: 1em 1em 1em 45px;
     background-image: url('info.png');
