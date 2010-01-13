@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load humanize %}
+{% load devices %}
 
 {% block content %}
   <h1>{% trans "Subscription History" %}</h1>
@@ -8,22 +9,24 @@
    {% if not history|length_is:"0" %}
    <table class="list">
     <tr>
+     <th>{% trans "Podcast" %}</th>
      <th>{% trans "Timestamp" %}</th>
      <th>{% trans "Action" %}</th>
-     <th>{% trans "Devices" %}</th>
+     <th>{% trans "Device" %}</th>
     </tr>
     {% for s in history %}
      <tr>
+      <td><a href="/podcast/{{ s.podcast.id }}">{{ s.podcast }}</a></td>
       <td><abbr title="{{ s.timestamp }}">{{ s.timestamp|naturalday }}</abbr></td>
       <td>
        {% ifequal s.action 1 %}
-        {% trans "subscribe" %}
+        <img src="/media/subscribe.png" />
        {% endifequal %}
        {% ifequal s.action -1 %}
-        {% trans "unsubscribe" %}
+        <img src="/media/unsubscribe.png" />
        {% endifequal %}
       </td>
-      <td>{{ s.device.name }}</td>
+      <td><a href="/device/{{ s.device.id }}">{{ s.device|device_icon }} {{ s.device.name }}</a></td>
      </tr>
     {% endfor %}
    </table>
