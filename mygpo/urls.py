@@ -60,13 +60,14 @@ urlpatterns = patterns('',
     (r'^device/(?P<device_id>\d+)/unsync$', 'mygpo.web.views.device_unsync'),
 
     (r'^search/', include('haystack.urls')),
+    #(r'^search.opml', ''),
 
     #Legacy API
     (r'^upload$', 'mygpo.api.legacy.upload'),
     (r'^getlist$', 'mygpo.api.legacy.getlist'),
 
     #Simple API
-    (r'^subscriptions/(?P<username>\w+)/(?P<device_uid>\w+).(?P<format>(txt|opml|json))', 'mygpo.api.simple.subscriptions'),
+    (r'^subscriptions/(?P<username>\w+)/(?P<device_uid>\w+).(?P<format>\w+)', 'mygpo.api.simple.subscriptions'),
 
     #Advanced API
     (r'^api/1/subscriptions/(?P<username>\w+)/(?P<device_uid>\w+).json', 'mygpo.api.advanced.subscriptions'),

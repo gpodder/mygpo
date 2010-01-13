@@ -26,10 +26,10 @@ except ImportError:
     import json
 
 
-def HttpResponseNotAuthorized():
-    response =  HttpResponse(('You\'re not authorized to visit this area!'), mimetype="text/plain")
+def HttpErrorResponse(code, msg):
+    response =  HttpResponse(('%s' % msg), mimetype="text/plain")
     response['WWW-Authenticate'] = 'Basic realm=""'
-    response.status_code = 401
+    response.status_code = code
     return response
 
 #from http://www.djangosnippets.org/snippets/154/
