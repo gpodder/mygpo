@@ -12,21 +12,40 @@
   {% endif %}
 
   {% if devices|length_is:"0" %}
-   <a href="/podcast/{{ podcast.id }}/subscribe">
-    {% if podcast.title %}
-     {% blocktrans with podcast.title as podcasttitle %}Subscribe to {{ podcasttitle }}{% endblocktrans %}
-    {% else %}
-     {% trans "Subscribe to this podcast" %}
-    {% endif %}
-   </a>
+
+   {% if can_subscribe %}
+    <div class="subscribe">
+     <a href="/podcast/{{ podcast.id }}/subscribe">
+      {% if podcast.title %}
+       {% blocktrans with podcast.title as podcasttitle %}Subscribe to {{ podcasttitle }}{% endblocktrans %}
+      {% else %}
+       {% trans "Subscribe to this podcast" %}
+      {% endif %}
+     </a>
+    </div>
+   {% endif %}
+
   {% else %}
-   <h2>Devices</h2>
-   <strong>You have subscribed this podcast on</strong>
+   <h2>{% trans "Devices" %}</h2>
+   <strong>{% trans "You have subscribed this podcast on" %}</strong>
    <ul class="devices">
    {% for device in devices %}
-    <li class="{{device.type}}"><a href="/device/{{ device.id }}">{{ device.name }}</a></li>
+    <li class="{{device.type}}"><a href="/device/{{ device.id }}">{{ device }}</a></li>
    {% endfor %}
    </ul>
+
+   {% if can_subscribe %}
+    <div class="subscribe">
+     <a href="/podcast/{{ podcast.id }}/subscribe">
+      {% if podcast.title %}
+       {% blocktrans with podcast.title as podcasttitle %}Subscribe to {{ podcasttitle }} on other devices{% endblocktrans %}
+      {% else %}
+       {% trans "Subscribe to this podcast on other devices" %}
+      {% endif %}
+     </a>
+    </div>
+   {% endif %}
+
   {% endif %}
 
   {% if not episodes|length_is:"0" %}

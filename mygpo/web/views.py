@@ -16,7 +16,7 @@
 #
 
 from django.shortcuts import render_to_response
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, Http404
 from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext
 from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, Subscription, SuggestionEntry, Rating, SyncGroup, SUBSCRIBE_ACTION
@@ -67,11 +67,13 @@ def podcast(request, pid):
     devices = Device.objects.filter(user=request.user)
     history = SubscriptionAction.objects.filter(podcast=podcast,device__in=devices).order_by('-timestamp')
     subscribed_devices = [s.device for s in Subscription.objects.filter(podcast=podcast,user=request.user)]
+    subscribe_targets = podcast.subscribe_targets(request.user)
     episodes = episode_list(podcast, request.user)
     return render_to_response('podcast.html', {
         'history': history,
         'podcast': podcast,
         'devices': subscribed_devices,
+        'can_subscribe': len(subscribe_targets) > 0,
         'episodes': episodes,
     }, context_instance=RequestContext(request))
 
@@ -101,9 +103,7 @@ def podcast_subscribe(request, pid):
         return HttpResponseRedirect('/podcast/%s' % podcast.id)
 
     else:
-        targets = list(Device.objects.filter(user=request.user, sync_group=None))
-        groups = SyncGroup.objects.filter(user=request.user)
-        targets.extend( list(groups) )
+        targets = podcast.subscribe_targets(request.user)
 
         form = SyncForm()
         form.set_targets(targets, _('With which client do you want to subscribe?'))
@@ -269,3 +269,15 @@ def device_unsync(request, device_id):
 
     return HttpResponseRedirect('/device/%s' % device_id)
 
+@login_required
+def podcast_subscribe_url(request):
+    url = request.GET.get('url')
+    
+    if url == None:
+        raise Http404('http://my.gpodder.org/subscribe?url=http://www.example.com/podcast.xml')
+         
+    podcast, created = Podcast.objects.get_or_create(url=url,
+            defaults={'title':url,'description':url,'last_update':datetime.now()})
+            
+    return HttpResponseRedirect('/podcast/%d/subscribe' % podcast.pk)
+    

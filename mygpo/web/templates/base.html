@@ -20,7 +20,7 @@
 -->
   <title>{% block title %}{% endblock %}my.gPodder.org</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <link rel="shortcut icon" href="http://gpodder.org/favicon.png">
+  <link rel="shortcut icon" href="http://my.gpodder.org/favicon.png">
   <link rel="stylesheet" href="/media/screen.css" type="text/css" />
   <link rel="stylesheet" href="/media/screen-base.css" type="text/css" />
  </head>
@@ -74,12 +74,21 @@
      <li><a href="/suggestions/">Suggestions</a></li>
      <li><a href="/history/">History</a></li>
     </ul>
+    
+    <ul class="menu">
+     <li><a href="/authors/">For podcast authors</a></li>
+    </ul>
+    
    {% else %}
     <ul class="menu">
      <li><a href="/">Home</a></li>
      <li><a href="/login/">Login</a></li>
      <li><a href="/register/">Register</a></li>
      <li><a href="/toplist/">Podcast-Toplist</a></li>
+    </ul>
+    
+    <ul class="menu">
+     <li><a href="/authors/">For podcast authors</a></li>
     </ul>
    {% endif %}
 
