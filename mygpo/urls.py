@@ -68,6 +68,7 @@ urlpatterns = patterns('',
 
     #Simple API
     (r'^subscriptions/(?P<username>\w+)/(?P<device_uid>\w+).(?P<format>\w+)', 'mygpo.api.simple.subscriptions'),
+    (r'^toplist/(?P<number>\d+).(?P<format>\w+)', 'mygpo.api.simple.toplist'),
 
     #Advanced API
     (r'^api/1/subscriptions/(?P<username>\w+)/(?P<device_uid>\w+).json', 'mygpo.api.advanced.subscriptions'),

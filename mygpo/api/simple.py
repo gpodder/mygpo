@@ -17,7 +17,7 @@
 
 from mygpo.api.basic_auth import require_valid_user
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
-from mygpo.api.models import Device, SubscriptionAction, Podcast, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION
+from mygpo.api.models import Device, SubscriptionAction, Podcast, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, ToplistEntry
 from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
 from django.core import serializers
@@ -137,3 +137,41 @@ def set_subscriptions(subscriptions):
     # Only an empty response is a successful response
     return HttpResponse('', mimetype='text/plain')
 
+def toplist(request, number, format):
+    if request.method == 'GET':
+        if int(number) not in range(1,100):
+            print number
+            number = 100
+        return format_toplist(get_toplist(number), number, format)
+    else:
+        return HttpResponseBadRequest('Invalid request')
+
+def get_toplist(number):
+    entries = ToplistEntry.objects.all().order_by('-subscriptions')[:number]
+    toplist = []
+    for e in entries:
+        pid = e.podcast_id
+        p = Podcast.objects.get(pk=pid)
+        entry = {'url':p.url, 'title':p.title, 'description':p.description, 'subscribers':e.subscriptions, 'subscribers_last_week':e.oldplace}
+        toplist.append(entry)
+        
+    return toplist
+
+def format_toplist(toplist, number, format): 
+    if format == 'txt':
+        urls = [t['url'] for t in toplist]
+        s = '\n'.join(urls)
+        s += '\n'
+        return HttpResponse(s, mimetype='text/plain')
+
+    elif format == 'opml':
+        title = 'Top %d' % number
+        exporter = Exporter(title)
+        opml = exporter.generate(toplist)
+        return HttpResponse(opml, mimetype='text/xml')
+
+    elif format == 'json':
+        return JsonResponse(toplist)
+        
+    else: 
+        return HttpResponseBadRequest('Invalid format')
