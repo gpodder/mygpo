@@ -25,6 +25,7 @@ from datetime import datetime
 from mygpo.api.httpresponse import HttpErrorResponse
 import re
 from mygpo.log import log
+from haystack.query import SearchQuerySet
 
 try:
     import simplejson as json
@@ -117,6 +118,7 @@ def parse_subscription(raw_post_data, format, user, device_uid):
 
     return format_ok, new, rem, d
 
+
 def set_subscriptions(subscriptions):
     format_ok, new, rem, d = subscriptions
     
@@ -137,6 +139,7 @@ def set_subscriptions(subscriptions):
     # Only an empty response is a successful response
     return HttpResponse('', mimetype='text/plain')
 
+#get toplist
 def toplist(request, number, format):
     if request.method == 'GET':
         if int(number) not in range(1,100):
@@ -145,6 +148,7 @@ def toplist(request, number, format):
         return format_toplist(get_toplist(number), number, format)
     else:
         return HttpResponseBadRequest('Invalid request')
+
 
 def get_toplist(number):
     entries = ToplistEntry.objects.all().order_by('-subscriptions')[:number]
@@ -156,6 +160,7 @@ def get_toplist(number):
         toplist.append(entry)
         
     return toplist
+
 
 def format_toplist(toplist, number, format): 
     if format == 'txt':
@@ -175,3 +180,47 @@ def format_toplist(toplist, number, format):
         
     else: 
         return HttpResponseBadRequest('Invalid format')
+
+#get search 
+def search(request, format):
+    if request.method == 'GET':
+        query = request.GET.get('q')
+        
+        if query == None:
+            return HttpErrorResponse(404, '/search.opml|txt|json?q={query}')
+        
+        return format_results(get_results(query), format)
+    else:
+        return HttpResponseBadRequest('Invalid request')
+        
+        
+def get_results(query):
+    search = SearchQuerySet().filter(content=query).models(Podcast)
+    results = []
+    for r in search:
+        p = Podcast.objects.get(pk=r.pk)
+        results.append(p)
+        
+    return results
+    
+    
+def format_results(results, format):
+    if format == 'txt':
+        urls = [r.url for r in results]
+        s = '\n'.join(urls)
+        s += '\n'
+        return HttpResponse(s, mimetype='text/plain')
+
+    elif format == 'opml':
+        title = 'Search results'
+        exporter = Exporter(title)
+        opml = exporter.generate(results)
+        return HttpResponse(opml, mimetype='text/xml')
+
+    elif format == 'json':
+        json = [{'url':p.url, 'title':p.title, 'description':p.description} for p in results]
+        return JsonResponse(json)
+        
+    else: 
+        return HttpResponseBadRequest('Invalid format')
+        
