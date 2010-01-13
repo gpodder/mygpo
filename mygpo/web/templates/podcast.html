@@ -64,10 +64,10 @@
       <td><abbr title="{{ s.timestamp }}">{{ s.timestamp|naturalday }}</abbr></td>
       <td>
        {% ifequal s.action 1 %}
-        {% trans "subscribe" %}
+        <img src="/media/subscribe.png" />
        {% endifequal %}
        {% ifequal s.action -1 %}
-        {% trans "unsubscribe" %}
+        <img src="/media/unsubscribe.png" />
        {% endifequal %}
       </td>
       <td>{{ s.device.name }}</td>

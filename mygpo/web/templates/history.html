@@ -8,19 +8,21 @@
    {% if not history|length_is:"0" %}
    <table class="list">
     <tr>
+     <th>{% trans "Podcast" %}</th>
      <th>{% trans "Timestamp" %}</th>
      <th>{% trans "Action" %}</th>
      <th>{% trans "Devices" %}</th>
     </tr>
     {% for s in history %}
      <tr>
+      <td>{{ s.podcast }}</td>
       <td><abbr title="{{ s.timestamp }}">{{ s.timestamp|naturalday }}</abbr></td>
       <td>
        {% ifequal s.action 1 %}
-        {% trans "subscribe" %}
+        <img src="/media/subscribe.png" />
        {% endifequal %}
        {% ifequal s.action -1 %}
-        {% trans "unsubscribe" %}
+        <img src="/media/unsubscribe.png" />
        {% endifequal %}
       </td>
       <td>{{ s.device.name }}</td>
