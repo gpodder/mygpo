@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-07 17:15+0100\n"
+"POT-Creation-Date: 2010-01-10 13:06+0100\n"
 "PO-Revision-Date: 2010-01-06 11:48+0100\n"
 "Last-Translator: Jim Nygård <jim@nygard.priv.no>\n"
 "Language-Team: gpodder <>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Virtaal 0.3.1\n"
 
-#: api/models.py:167
+#: api/models.py:187
 #, python-format
 msgid "Unnamed Device (%s)"
 msgstr "Enhet uten navn (%s)"
@@ -42,23 +42,57 @@ msgstr "Hva slags enhet er dette?"
 msgid "What UID is configured on the pysical device?"
 msgstr "Hvilken UID er konfigurert på den fysiske enheten?"
 
-#: web/views.py:103
+#: web/views.py:109
 msgid "With which client do you want to subscribe?"
 msgstr "Med hvilken klient vil du abonnere?"
 
-#: web/views.py:168
+#: web/views.py:174
 #, python-format
 msgid "my.gpodder.org - Top %s"
 msgstr "my.gpodder.org - Topp %s"
 
-#: web/views.py:194
+#: web/views.py:200
 #, python-format
 msgid "my.gpodder.org - %s Suggestions"
 msgstr "my.gpodder.org - %s Forslag"
 
-#: web/views.py:208
+#: web/views.py:214
 msgid "Synchronize with the following devices"
 msgstr "Synkroniser med disse enhetene"
+
+#: web/templates/400.html:4
+msgid "Bad request"
+msgstr ""
+
+#: web/templates/400.html:5
+msgid "There has been an error processing your request."
+msgstr ""
+
+#: web/templates/401.html:4
+msgid "Unauthorized"
+msgstr ""
+
+#: web/templates/401.html:5
+msgid "This page is only available to registered users."
+msgstr ""
+
+#: web/templates/404.html:4
+msgid "Not found"
+msgstr ""
+
+#: web/templates/404.html:5
+msgid "The requested document could not be found."
+msgstr ""
+
+#: web/templates/500.html:4
+msgid "Internal Server Error"
+msgstr ""
+
+#: web/templates/500.html:5
+msgid ""
+"An error occured while processing your request. An e-mail with the error "
+"description has been sent to the developers."
+msgstr ""
 
 #: web/templates/account.html:5
 msgid "Account Settings"
@@ -94,7 +128,7 @@ msgstr "Podcaster"
 msgid "You have subscribed the following podcasts on this device"
 msgstr "Du abonnerer på følgende podcaster på denne enheten"
 
-#: web/templates/device.html:14 web/templates/podcast.html:37
+#: web/templates/device.html:14 web/templates/podcast.html:56
 msgid "Title"
 msgstr "Tittel"
 
@@ -163,7 +197,7 @@ msgstr "Hvor"
 msgid "Why Unnamed Episode?"
 msgstr "Episoden uten navn?"
 
-#: web/templates/episode.html:41 web/templates/podcast.html:80
+#: web/templates/episode.html:41 web/templates/podcast.html:99
 #: web/templates/subscribe.html:24
 msgid ""
 "Because we display names after we have fetched the information form the feed "
@@ -172,6 +206,31 @@ msgid ""
 msgstr ""
 "Fordi vi viser navnene etter å ha hentet informasjonen i strømmen, dette kan "
 "ta litt tid. I mellomtiden vil podcasten vises uten navn."
+
+#: web/templates/history.html:6 web/templates/podcast.html:74
+msgid "Subscription History"
+msgstr "Abonnementshistorikk"
+
+#: web/templates/history.html:11 web/templates/podcast.html:77
+msgid "Timestamp"
+msgstr "Tidspunkt"
+
+#: web/templates/history.html:12 web/templates/podcast.html:78
+msgid "Action"
+msgstr "Handling"
+
+#: web/templates/history.html:13 web/templates/podcast.html:29
+#: web/templates/podcast.html.py:79
+msgid "Devices"
+msgstr "Enheter"
+
+#: web/templates/history.html:20 web/templates/podcast.html:86
+msgid "subscribe"
+msgstr "abonner"
+
+#: web/templates/history.html:23 web/templates/podcast.html:89
+msgid "unsubscribe"
+msgstr "avslutt abonnement"
 
 #: web/templates/home-user.html:6
 msgid "my.gpodder.org"
@@ -226,15 +285,15 @@ msgstr ""
 msgid "We are currently tracking %(podcast_count)s Podcasts!"
 msgstr "Vi følger for øyeblikket %(podcast_count)s podcaster!"
 
-#: web/templates/home.html:20 web/templates/login.html:14
+#: web/templates/home.html:20 web/templates/login.html:15
 msgid "Not yet a member?"
 msgstr "Ikke medlem ennå?"
 
-#: web/templates/home.html:20 web/templates/login.html:14
+#: web/templates/home.html:20 web/templates/login.html:15
 msgid "Register!"
 msgstr "Registrer!"
 
-#: web/templates/migrate.html:5
+#: web/templates/migrate.html:6
 msgid ""
 "The new my.gpodder.org uses usernames instead of email addresses. Based on "
 "your email address, we think you might like "
@@ -242,11 +301,11 @@ msgstr ""
 "Den nye my.gpodder.org bruker brukernavn i stedet for e-postadresse. Basert "
 "på din e-postadresse foreslår vi "
 
-#: web/templates/migrate.html:5
+#: web/templates/migrate.html:6
 msgid ", but you can change that if you want to."
 msgstr ", men du kan endre dette hvis du ønsker."
 
-#: web/templates/migrate.html:11
+#: web/templates/migrate.html:12
 msgid ""
 "You can keep your old user settings in gPodder. Once the next version (with "
 "lots of new features) is release, you'll have to replace your email address "
@@ -260,56 +319,42 @@ msgstr ""
 msgid "Unnamed Podcast"
 msgstr "Podcast uten navn"
 
-#: web/templates/podcast.html:17 web/templates/subscribe.html:7
+#: web/templates/podcast.html:20 web/templates/subscribe.html:7
 #, python-format
 msgid "Subscribe to %(podcasttitle)s"
 msgstr "Abonner på %(podcasttitle)s"
 
-#: web/templates/podcast.html:19 web/templates/subscribe.html:9
+#: web/templates/podcast.html:22 web/templates/subscribe.html:9
 msgid "Subscribe to this podcast"
 msgstr "Abonner på denne podcasten"
 
-#: web/templates/podcast.html:23 web/templates/podcast.html.py:60
-msgid "Devices"
-msgstr "Enheter"
-
-#: web/templates/podcast.html:24
+#: web/templates/podcast.html:30
 msgid "You have subscribed this podcast on"
 msgstr "Du abonnerer på denne podcasten på"
 
-#: web/templates/podcast.html:33
+#: web/templates/podcast.html:41
+#, fuzzy, python-format
+msgid "Subscribe to %(podcasttitle)s on other devices"
+msgstr "Abonner på %(podcasttitle)s"
+
+#: web/templates/podcast.html:43
+#, fuzzy
+msgid "Subscribe to this podcast on other devices"
+msgstr "Abonner på denne podcasten"
+
+#: web/templates/podcast.html:52
 msgid "Episodes"
 msgstr "Episoder"
 
-#: web/templates/podcast.html:38
+#: web/templates/podcast.html:57
 msgid "Description"
 msgstr "Beskrivelse"
 
-#: web/templates/podcast.html:39
+#: web/templates/podcast.html:58
 msgid "Released"
 msgstr "Utgitt"
 
-#: web/templates/podcast.html:55
-msgid "Subscription History"
-msgstr "Abonnementshistorikk"
-
-#: web/templates/podcast.html:58
-msgid "Timestamp"
-msgstr "Tidspunkt"
-
-#: web/templates/podcast.html:59
-msgid "Action"
-msgstr "Handling"
-
-#: web/templates/podcast.html:67
-msgid "subscribe"
-msgstr "abonner"
-
-#: web/templates/podcast.html:70
-msgid "unsubscribe"
-msgstr "avslutt abonnement"
-
-#: web/templates/podcast.html:80 web/templates/subscribe.html:24
+#: web/templates/podcast.html:99 web/templates/subscribe.html:24
 msgid "Why Unnamed Podcast?"
 msgstr "Podcast uten navn?"
 
@@ -351,34 +396,34 @@ msgstr "Forrige uke"
 msgid "Subscribers"
 msgstr "Abonnenter"
 
-#: web/templates/registration/activate.html:5
-#: web/templates/registration/activation_complete.html:4
+#: web/templates/registration/activate.html:6
+#: web/templates/registration/activation_complete.html:5
 msgid "Account activated"
 msgstr "Konto aktivert"
 
-#: web/templates/registration/activate.html:6
-#: web/templates/registration/activation_complete.html:5
+#: web/templates/registration/activate.html:7
+#: web/templates/registration/activation_complete.html:6
 msgid "Your account has been activated! Enjoy using my.gpodder.org"
 msgstr "Kontoen er aktivert! Velkommen til my.gpodder.org"
 
-#: web/templates/registration/activate.html:8
+#: web/templates/registration/activate.html:9
 msgid "Account not activated"
 msgstr "Kontoen er ikke aktivert"
 
-#: web/templates/registration/activate.html:9
+#: web/templates/registration/activate.html:10
 msgid "Your account could not be activated successfully."
 msgstr "Kontoen kunne ikke aktiveres."
 
-#: web/templates/registration/registration_complete.html:4
+#: web/templates/registration/registration_complete.html:5
 msgid "Registration complete"
 msgstr "Du er nå registert"
 
-#: web/templates/registration/registration_complete.html:5
+#: web/templates/registration/registration_complete.html:6
 msgid ""
 "Please confirm your account using the email you should just have recieved."
 msgstr "Du må bekrefte kontoen med e-posten du nå skal ha mottatt."
 
-#: web/templates/registration/registration_form.html:4
+#: web/templates/registration/registration_form.html:5
 msgid "Create a User Account"
 msgstr "Opprett en brukerkonto"
 

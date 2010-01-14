@@ -10,14 +10,11 @@ BEGIN
     DECLARE cur1 CURSOR FOR SELECT user_ptr_id FROM user where suggestion_up_to_date = 0;
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
     
-
-
-    DROP TABLE IF EXISTS suggestion_pod;
-    CREATE TABLE suggestion_pod (
+    CREATE TEMPORARY TABLE suggestion_pod (
        podID INT
     );
-    DROP TABLE IF EXISTS suggestion_user;
-    CREATE TABLE suggestion_user (
+    
+    CREATE TEMPORARY TABLE suggestion_user (
        userID INT
     );
 
@@ -73,10 +70,7 @@ select user_help;
 
         IF deadlock=1 THEN
             call FAIL('Suggestion are not updated!');
-        END IF;
-
-        DROP TABLE IF EXISTS suggestion_user;
-        DROP TABLE IF EXISTS suggestion_pod;         
+        END IF;         
 
 END $$
 DELIMITER ;
@@ -90,12 +84,11 @@ BEGIN
     DECLARE pod_count INT DEFAULT 0;
     DECLARE utd INT DEFAULT 0;
         
-    DROP TABLE IF EXISTS suggestion_pod;
-    CREATE TABLE suggestion_pod (
+    CREATE TEMPORARY TABLE suggestion_pod (
        podID INT
     );
-    DROP TABLE IF EXISTS suggestion_user;
-    CREATE TABLE suggestion_user (
+    
+    CREATE TEMPORARY TABLE suggestion_user (
        userID INT
     );
 
@@ -143,11 +136,71 @@ BEGIN
 
         IF deadlock=1 THEN
             call FAIL('Suggestion are not updated!');
-        END IF;
-
-        DROP TABLE IF EXISTS suggestion_user;
-        DROP TABLE IF EXISTS suggestion_pod;         
+        END IF;       
 
 END $$
 DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS update_toplist $$
+CREATE PROCEDURE update_toplist()
+BEGIN
+    DECLARE deadlock INT DEFAULT 0;
+    DECLARE attempts INT DEFAULT 0;
+
+    CREATE TEMPORARY TABLE toplist_temp (
+            podcast_id INT PRIMARY KEY REFERENCES podcast (id),
+            subscription_count INT NOT NULL DEFAULT 0,
+            old_place INT DEFAULT 0,
+            INDEX(podcast_id)
+    );
+
+    try_loop:WHILE (attempts<3) DO
+    BEGIN
+        DECLARE deadlock_detected CONDITION FOR 1213;
+            DECLARE EXIT HANDLER FOR deadlock_detected
+                BEGIN
+                    ROLLBACK;
+                    SET deadlock=1;
+                END;
+            SET deadlock=0;
+
+            START TRANSACTION;
+            DELETE FROM toplist_temp;
+            INSERT INTO toplist_temp (SELECT a.podcast_id, COUNT(*) AS count_subscription, 
+                                       (select (id - (select min(id) from toplist) + 1) from toplist where podcast_id = a.podcast_id)
+                        FROM (SELECT DISTINCT podcast_id, user_id
+                            FROM public_subscription) a
+                        GROUP BY podcast_id);
+            DELETE FROM toplist;
+            INSERT INTO toplist (podcast_id, subscription_count, id, old_place) (SELECT podcast_id, subscription_count, NULL, old_place FROM toplist_temp
+                        ORDER BY subscription_count DESC LIMIT 100);
+
+            COMMIT;
+        END;
+        IF deadlock=0 THEN
+                LEAVE try_loop;
+            ELSE
+                SET attempts=attempts+1;
+            END IF;
+            END WHILE try_loop;
+
+        IF deadlock=1 THEN
+            call FAIL('Toplist is not updated!');
+        END IF;
+
+END $$
+DELIMITER ;
+
+DROP TABLE IF EXISTS podcast_tags;
+CREATE TABLE podcast_tags (
+    id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    tag VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+    podcast_id INT NOT NULL,
+    source VARCHAR(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+    user_id INT,
+    weight INT,
+    FOREIGN KEY (user_id) REFERENCES auth_user (id),
+    FOREIGN KEY (podcast_id) REFERENCES podcast (id)
+);
 
