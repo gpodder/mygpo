@@ -86,6 +86,12 @@ def history(request, len=20):
         'history': history,
     }, context_instance=RequestContext(request))
 
+def devices(request):
+    devices = Device.objects.filter(user=request.user)
+    return render_to_response('devicelist.html', {
+        'devices': devices,
+    }, context_instance=RequestContext(request))
+
 @login_required
 def podcast_subscribe(request, pid):
     podcast = Podcast.objects.get(pk=pid)
