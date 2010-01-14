@@ -166,4 +166,22 @@ div.ohelp
     margin-bottom: 2em;
 }
 
+div.devicesLeft
+{
+    float:left;
+	width: 10em;
+}
+
+div.devicesRight
+{
+    float:left;
+    margin-top:-5px;
+	width: 26px;
+	height: 26px;
+}
+
+div.devicesClear
+{
+    clear:left;
+}
 

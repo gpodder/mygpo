@@ -40,6 +40,7 @@ urlpatterns = patterns('',
 
     (r'^podcast/(?P<pid>\w+)$', 'mygpo.web.views.podcast'),
     (r'^podcast/(?P<pid>\w+)/subscribe$', 'mygpo.web.views.podcast_subscribe'),
+    (r'^podcast/(?P<pid>\w+)/unsubscribe/(?P<device_id>\w+)', 'mygpo.web.views.podcast_unsubscribe'),
 
     (r'^episode/(?P<id>\d+)$', 'mygpo.web.views.episode'),
 

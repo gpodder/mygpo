@@ -30,7 +30,11 @@
    <strong>{% trans "You have subscribed this podcast on" %}</strong>
    <ul class="devices">
    {% for device in devices %}
-    <li class="{{device.type}}"><a href="/device/{{ device.id }}">{{ device }}</a></li>
+    <li class="{{device.type}}">
+     <div class="devicesLeft"><a href="/device/{{ device.id }}">{{ device }}</a></div>
+     <div class="devicesRight"><a href="{{unsubscribe}}/{{ device.id }}?return_to=/podcast/{{ podcast.id }}"><img src="/media/unsubscribe.png" /></a></div>
+     <div class="devicesClear"></div>
+    </li>
    {% endfor %}
    </ul>
 
