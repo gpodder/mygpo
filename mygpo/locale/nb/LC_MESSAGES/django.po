@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-14 18:03+0100\n"
+"POT-Creation-Date: 2010-01-14 18:57+0100\n"
 "PO-Revision-Date: 2010-01-06 11:48+0100\n"
 "Last-Translator: Jim Nygård <jim@nygard.priv.no>\n"
 "Language-Team: gpodder <>\n"
@@ -39,24 +39,25 @@ msgid "What kind of device is this?"
 msgstr "Hva slags enhet er dette?"
 
 #: web/forms.py:13
-msgid "What UID is configured on the pysical device?"
+#, fuzzy
+msgid "What UID is configured on the physical device?"
 msgstr "Hvilken UID er konfigurert på den fysiske enheten?"
 
-#: web/views.py:109
+#: web/views.py:111
 msgid "With which client do you want to subscribe?"
 msgstr "Med hvilken klient vil du abonnere?"
 
-#: web/views.py:174
+#: web/views.py:189
 #, python-format
 msgid "my.gpodder.org - Top %s"
 msgstr "my.gpodder.org - Topp %s"
 
-#: web/views.py:200
+#: web/views.py:215
 #, python-format
 msgid "my.gpodder.org - %s Suggestions"
 msgstr "my.gpodder.org - %s Forslag"
 
-#: web/views.py:214
+#: web/views.py:229
 msgid "Synchronize with the following devices"
 msgstr "Synkroniser med disse enhetene"
 
@@ -98,7 +99,7 @@ msgstr ""
 msgid "Account Settings"
 msgstr "Kontoinnstillinger"
 
-#: web/templates/account.html:8 web/templates/device.html:50
+#: web/templates/account.html:8 web/templates/device.html:52
 msgid "Your settings have been saved."
 msgstr "Dine innstillinger er lagret."
 
@@ -106,8 +107,7 @@ msgstr "Dine innstillinger er lagret."
 msgid "Update the settings for your account"
 msgstr "Oppdater innstillingene for kontoen din"
 
-#: web/templates/authors.html:5 web/templates/base.html:81
-#: web/templates/base.html.py:93
+#: web/templates/authors.html:5 web/templates/base.html:100
 msgid "For podcast authors"
 msgstr ""
 
@@ -121,65 +121,80 @@ msgstr ""
 msgid "Change the field 'YOUR_ADRESS' with the adress of your podcast."
 msgstr ""
 
-#: web/templates/base.html:67
-msgid "'s Home"
-msgstr ""
-
 #: web/templates/base.html:68
 #, fuzzy
-msgid "Your settings"
-msgstr "Kontoinnstillinger"
+msgid "Subscriptions"
+msgstr "Dine Abonnement"
 
 #: web/templates/base.html:69
+msgid "History"
+msgstr ""
+
+#: web/templates/base.html:70 web/templates/podcast.html:29
+#: web/templates/podcast.html.py:83
+msgid "Devices"
+msgstr "Enheter"
+
+#: web/templates/base.html:71
+#, fuzzy
+msgid "Settings"
+msgstr "Kontoinnstillinger"
+
+#: web/templates/base.html:72
 #, fuzzy
 msgid "Logout"
 msgstr "Logo"
 
-#: web/templates/base.html:73 web/templates/device.html:9
-msgid "Podcasts"
-msgstr "Podcaster"
+#: web/templates/base.html:76 web/templates/base.html.py:91
+msgid "Discover"
+msgstr ""
 
-#: web/templates/base.html:74 web/templates/search/search.html:6
+#: web/templates/base.html:77 web/templates/base.html.py:92
+#: web/templates/search/search.html:6
 msgid "Search"
 msgstr "Søk"
 
-#: web/templates/base.html:75 web/templates/toplist.html:5
+#: web/templates/base.html:78 web/templates/base.html.py:93
+#: web/templates/toplist.html:5
 msgid "Toplist"
 msgstr "Toppliste"
 
-#: web/templates/base.html:76
+#: web/templates/base.html:79
 #, fuzzy
 msgid "Suggestions"
 msgstr "Podcastforslag"
 
-#: web/templates/base.html:77
-msgid "History"
-msgstr ""
-
-#: web/templates/base.html:86
+#: web/templates/base.html:85
 msgid "Home"
 msgstr ""
 
-#: web/templates/base.html:87
+#: web/templates/base.html:86
 #, fuzzy
 msgid "Login"
 msgstr "Logo"
 
-#: web/templates/base.html:88
+#: web/templates/base.html:87
 #, fuzzy
 msgid "Register"
 msgstr "Registrer!"
 
-#: web/templates/base.html:89
-#, fuzzy
-msgid "Podcast-Toplist"
+#: web/templates/base.html:98
+msgid "Documentation"
+msgstr ""
+
+#: web/templates/base.html:99 web/templates/online-help.html:5
+msgid "Online Help"
+msgstr ""
+
+#: web/templates/device.html:9
+msgid "Podcasts"
 msgstr "Podcaster"
 
 #: web/templates/device.html:10
 msgid "You have subscribed the following podcasts on this device"
 msgstr "Du abonnerer på følgende podcaster på denne enheten"
 
-#: web/templates/device.html:14 web/templates/podcast.html:56
+#: web/templates/device.html:14 web/templates/podcast.html:60
 msgid "Title"
 msgstr "Tittel"
 
@@ -187,11 +202,16 @@ msgstr "Tittel"
 msgid "Since"
 msgstr "Siden"
 
-#: web/templates/device.html:27
+#: web/templates/device.html:16
+#, fuzzy
+msgid "Unsubscribe"
+msgstr "avslutt abonnement"
+
+#: web/templates/device.html:29
 msgid "Synchronize"
 msgstr "Synkroniser"
 
-#: web/templates/device.html:28
+#: web/templates/device.html:30
 msgid ""
 "If you synchronize devices, they will always have the same subscriptions. A "
 "podcast that is subscribed on one device, will automatically be added to all "
@@ -201,22 +221,22 @@ msgstr ""
 "podcast som blir lagt til på en enhet vil automatisk bli lagt til på alle "
 "synkroniserte enheter."
 
-#: web/templates/device.html:32
+#: web/templates/device.html:34
 #, python-format
 msgid "%(devicename)s is currently not synchronized with other devices."
 msgstr "%(devicename)s er for øyeblikket ikke synkronisert med andre enheter."
 
-#: web/templates/device.html:36
+#: web/templates/device.html:38
 #, python-format
 msgid "%(devicename)s is currently synchronized with %(synclist)s."
 msgstr "%(devicename)s er for øyeblikket synkronisert med %(synclist)s."
 
-#: web/templates/device.html:37
+#: web/templates/device.html:39
 #, python-format
 msgid "Stop synchronisation for %(devicename)s "
 msgstr "Stopp synkroniserine av %(devicename)s "
 
-#: web/templates/device.html:44 web/templates/subscribe.html:20
+#: web/templates/device.html:46 web/templates/subscribe.html:20
 msgid "OK"
 msgstr "OK"
 
@@ -248,7 +268,7 @@ msgstr "Hvor"
 msgid "Why Unnamed Episode?"
 msgstr "Episoden uten navn?"
 
-#: web/templates/episode.html:41 web/templates/podcast.html:99
+#: web/templates/episode.html:41 web/templates/podcast.html:103
 #: web/templates/subscribe.html:24
 msgid ""
 "Because we display names after we have fetched the information form the feed "
@@ -258,7 +278,7 @@ msgstr ""
 "Fordi vi viser navnene etter å ha hentet informasjonen i strømmen, dette kan "
 "ta litt tid. I mellomtiden vil podcasten vises uten navn."
 
-#: web/templates/history.html:7 web/templates/podcast.html:74
+#: web/templates/history.html:7 web/templates/podcast.html:78
 msgid "Subscription History"
 msgstr "Abonnementshistorikk"
 
@@ -267,11 +287,11 @@ msgstr "Abonnementshistorikk"
 msgid "Podcast"
 msgstr "Podcast"
 
-#: web/templates/history.html:13 web/templates/podcast.html:77
+#: web/templates/history.html:13 web/templates/podcast.html:81
 msgid "Timestamp"
 msgstr "Tidspunkt"
 
-#: web/templates/history.html:14 web/templates/podcast.html:78
+#: web/templates/history.html:14 web/templates/podcast.html:82
 msgid "Action"
 msgstr "Handling"
 
@@ -358,6 +378,120 @@ msgstr ""
 "(med mange nye funksjoner) er tilgjeng må du bytte ut e-postadressen med "
 "brukernavnet ditt."
 
+#: web/templates/online-help.html:9 web/templates/online-help.html.py:27
+#, fuzzy
+msgid "How can I configure my devices?"
+msgstr "Hvilken UID er konfigurert på den fysiske enheten?"
+
+#: web/templates/online-help.html:11 web/templates/online-help.html.py:28
+msgid "How can I add a new device?"
+msgstr ""
+
+#: web/templates/online-help.html:12 web/templates/online-help.html.py:31
+msgid "How can I edit a device?"
+msgstr ""
+
+#: web/templates/online-help.html:16 web/templates/online-help.html.py:41
+msgid "How can I configure the synchronisation between devices?"
+msgstr ""
+
+#: web/templates/online-help.html:18 web/templates/online-help.html.py:42
+msgid "How can I start a synchronisation?"
+msgstr ""
+
+#: web/templates/online-help.html:19 web/templates/online-help.html.py:49
+msgid "How can I stop a synchronisation?"
+msgstr ""
+
+#: web/templates/online-help.html:22 web/templates/online-help.html.py:59
+msgid "How can I copy single subscriptions between devices?"
+msgstr ""
+
+#: web/templates/online-help.html:29
+msgid "Open the gPodder Podcast-Client on your PC or MAC."
+msgstr ""
+
+#: web/templates/online-help.html:30
+msgid ""
+"Upload your podcasts and if it's asked, enter your username and password. "
+"The server will create you a new device."
+msgstr ""
+
+#: web/templates/online-help.html:32 web/templates/online-help.html.py:50
+#: web/templates/online-help.html:60
+msgid "Click on your &quot;home&quot;-link."
+msgstr ""
+
+#: web/templates/online-help.html:33
+msgid "Now you can see your devices, click on one of them."
+msgstr ""
+
+#: web/templates/online-help.html:35
+msgid ""
+"You are redirected to another page.<br />On the bottom of the page there's a "
+"field named &quot;Edit&quot;"
+msgstr ""
+
+#: web/templates/online-help.html:37
+msgid ""
+"Here you can edit the name, the type and the uid. But pay attention if you "
+"edit the uid! If you enter a false one your subscriptions won't be "
+"synchronize with your device anymore."
+msgstr ""
+
+#: web/templates/online-help.html:43
+msgid "Choose a device on your home-screen and click on it."
+msgstr ""
+
+#: web/templates/online-help.html:45
+msgid ""
+"Go to the field &quot;Synchronize&quot;, choose your desired device and "
+"click on the &quot;OK&quot;-button."
+msgstr ""
+
+#: web/templates/online-help.html:47
+msgid "Now the two devices are synchronized."
+msgstr ""
+
+#: web/templates/online-help.html:51
+msgid ""
+"Choose a device on which you would like to stop the synchronisation and "
+"click on it."
+msgstr ""
+
+#: web/templates/online-help.html:53
+msgid ""
+"Go to the field &quot;Synchronize&quot; and click on &quot;Stop "
+"synchronisation for your device&quot;"
+msgstr ""
+
+#: web/templates/online-help.html:55
+msgid "Now the two devices are unsynchronized again."
+msgstr ""
+
+#: web/templates/online-help.html:61
+msgid ""
+"Choose the podcast which you would like to copy on another device and click "
+"on it."
+msgstr ""
+
+#: web/templates/online-help.html:63
+msgid ""
+"Under the field &quot;Devices&quot; you see the link &quot;Subscribe to ... "
+"on other devices&quot; click on it."
+msgstr ""
+
+#: web/templates/online-help.html:65
+msgid ""
+"On the next page you can choose your desired device on which you want to "
+"copy the subscription."
+msgstr ""
+
+#: web/templates/online-help.html:66
+msgid ""
+"After hitting the &quot;OK&quot;-button, the subscription has been copied."
+msgstr ""
+
 #: web/templates/podcast.html:7
 msgid "Unnamed Podcast"
 msgstr "Podcast uten navn"
@@ -371,37 +505,33 @@ msgstr "Abonner på %(podcasttitle)s"
 msgid "Subscribe to this podcast"
 msgstr "Abonner på denne podcasten"
 
-#: web/templates/podcast.html:29 web/templates/podcast.html.py:79
-msgid "Devices"
-msgstr "Enheter"
-
 #: web/templates/podcast.html:30
 msgid "You have subscribed this podcast on"
 msgstr "Du abonnerer på denne podcasten på"
 
-#: web/templates/podcast.html:41
+#: web/templates/podcast.html:45
 #, fuzzy, python-format
 msgid "Subscribe to %(podcasttitle)s on other devices"
 msgstr "Abonner på %(podcasttitle)s"
 
-#: web/templates/podcast.html:43
+#: web/templates/podcast.html:47
 #, fuzzy
 msgid "Subscribe to this podcast on other devices"
 msgstr "Abonner på denne podcasten"
 
-#: web/templates/podcast.html:52
+#: web/templates/podcast.html:56
 msgid "Episodes"
 msgstr "Episoder"
 
-#: web/templates/podcast.html:57
+#: web/templates/podcast.html:61
 msgid "Description"
 msgstr "Beskrivelse"
 
-#: web/templates/podcast.html:58
+#: web/templates/podcast.html:62
 msgid "Released"
 msgstr "Utgitt"
 
-#: web/templates/podcast.html:99 web/templates/subscribe.html:24
+#: web/templates/podcast.html:103 web/templates/subscribe.html:24
 msgid "Why Unnamed Podcast?"
 msgstr "Podcast uten navn?"
 
@@ -527,11 +657,16 @@ msgstr "Logo"
 msgid "No Logo available"
 msgstr "Ingen logo tilgjengelig"
 
+#, fuzzy
+#~ msgid "Your settings"
+#~ msgstr "Kontoinnstillinger"
+
+#, fuzzy
+#~ msgid "Podcast-Toplist"
+#~ msgstr "Podcaster"
+
 #~ msgid "subscribe"
 #~ msgstr "abonner"
-
-#~ msgid "unsubscribe"
-#~ msgstr "avslutt abonnement"
 
 #~ msgid "back!"
 #~ msgstr "zurück!"
