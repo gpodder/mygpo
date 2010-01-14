@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-14 19:07+0100\n"
+"POT-Creation-Date: 2010-01-14 19:36+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -106,7 +106,8 @@ msgid "Your settings have been saved."
 msgstr "Ihre Einstellungen wurden gespeichert."
 
 #: web/templates/account.html:11
-msgid "Update the settings for your account"
+#, fuzzy
+msgid "Update the settings for your account."
 msgstr "Aktualisierung der Konto-Einstellungen"
 
 #: web/templates/authors.html:5 web/templates/base.html:100
@@ -421,7 +422,7 @@ msgid "How can I copy single subscriptions between devices?"
 msgstr ""
 
 #: web/templates/online-help.html:29
-msgid "Open the gPodder Podcast-Client on your PC or MAC."
+msgid "Open the &quot;gPodder Podcast-Client&quot; on your PC or MAC."
 msgstr ""
 
 #: web/templates/online-help.html:30
@@ -432,7 +433,7 @@ msgstr ""
 
 #: web/templates/online-help.html:32 web/templates/online-help.html.py:50
 #: web/templates/online-help.html:60
-msgid "Click on your &quot;home&quot;-link."
+msgid "Click on your &quot;Subscriptions&quot;-link."
 msgstr ""
 
 #: web/templates/online-help.html:33
@@ -453,7 +454,8 @@ msgid ""
 msgstr ""
 
 #: web/templates/online-help.html:43
-msgid "Choose a device on your home-screen and click on it."
+msgid ""
+"Choose a device on your &quot;Subscriptions-screen&quot; and click on it."
 msgstr ""
 
 #: web/templates/online-help.html:45
