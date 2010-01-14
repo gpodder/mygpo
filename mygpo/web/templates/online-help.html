@@ -8,7 +8,7 @@
     <li>
      <a href="#1">{% trans "How can I configure my devices?" %}</a>
      <ul>
-      <li><a href="#1.1">{% trans "How can I a new device?" %}</a></li>
+      <li><a href="#1.1">{% trans "How can I add a new device?" %}</a></li>
       <li><a href="#1.2">{% trans "How can I edit a device?" %}</a></li>
      </ul>
     </li>
@@ -25,11 +25,13 @@
   
   <div class="ohelp">
    <h2 id="1" class="ohelp">{% trans "How can I configure my devices?" %}</h2>
-   <h3 id="1.1">{% trans "How can I a new device?" %}</h3>
+   <h3 id="1.1">{% trans "How can I add a new device?" %}</h3>
+   <p>{% trans "Open the gPodder Podcast-Client on your PC or MAC." %}</p>
+   <p>{% trans "Upload your podcasts and if it's asked, enter your username and password. The server will create you a new device." %}</p>
    <h3 id="1.2">{% trans "How can I edit a device?" %}</h3>
    <p>{% trans "Click on your &quot;home&quot;-link." %}<br />
    {% trans "Now you can see your devices, click on one of them." %}</p>
-   <p><img src="/media/online-help/userhomesingle.png" class="ohelp" /></p>
+   <p><img src="/media/online-help/userhome.png" class="ohelp" /></p>
    <p>{% trans "You are redirected to another page.<br />On the bottom of the page there's a field named &quot;Edit&quot;" %}</p>
    <p><img src="/media/online-help/deviceedit.png" class="ohelp" /></p>
    <p>{% trans "Here you can edit the name, the type and the uid. But pay attention if you edit the uid! If you enter a false one your subscriptions won't be synchronize with your device anymore." %}</p>
