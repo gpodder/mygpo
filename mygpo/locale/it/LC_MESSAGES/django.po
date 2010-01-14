@@ -19,7 +19,7 @@ msgstr ""
 #: api/models.py:187
 #, python-format
 msgid "Unnamed Device (%s)"
-msgstr "Dispositivo non specificato"
+msgstr "Dispositivo non specificato (%s)"
 
 #: web/forms.py:7
 msgid "Your Email Address"
