@@ -168,7 +168,7 @@ BEGIN
             START TRANSACTION;
             DELETE FROM toplist_temp;
             INSERT INTO toplist_temp (SELECT a.podcast_id, COUNT(*) AS count_subscription, 
-                                       (select (id - (select min(id) from toplist) + 1) from toplist where podcast_id = a.podcast_id)
+                                       (select COALESCE((id - (select min(id) from toplist) + 1),0) from toplist where podcast_id = a.podcast_id)
                         FROM (SELECT DISTINCT podcast_id, user_id
                             FROM public_subscription) a
                         GROUP BY podcast_id);
