@@ -10,7 +10,7 @@ class UserAccountForm(forms.Form):
 class DeviceForm(forms.Form):
     name = forms.CharField(max_length=100, label=_('Name of this device'))
     type = forms.ChoiceField(choices=DEVICE_TYPES, label=_('What kind of device is this?'))
-    uid = forms.CharField(max_length=50, label=_('What UID is configured on the pysical device?'))
+    uid = forms.CharField(max_length=50, label=_('What UID is configured on the physical device?'))
 
 
 class SyncForm(forms.Form):
