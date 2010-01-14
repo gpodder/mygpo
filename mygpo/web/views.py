@@ -162,7 +162,7 @@ def account(request):
     }, context_instance=RequestContext(request))
 
 
-def toplist(request, len=50):
+def toplist(request, len=100):
     entries = ToplistEntry.objects.all().order_by('-subscriptions')[:len]
     return render_to_response('toplist.html', {
         'entries': entries,
