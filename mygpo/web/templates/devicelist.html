@@ -15,7 +15,7 @@
     </tr>
     {% for d in devices %}
      <tr>
-      <td><a href="/device/{{ d.id }}">{{ d.name }}</a></td>
+      <td><a href="/device/{{ d.id }}">{{ d|device_icon }}{{ d.name }}</a></td>
       <td>{{ d.type }}</td>
       <td>{{ d.uid }}</td>
      </tr>
