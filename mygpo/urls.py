@@ -48,6 +48,7 @@ urlpatterns = patterns('',
     (r'^info/$', 'django.views.generic.simple.direct_to_template', {'template': 'info.html'}),
 
     (r'^history/$', 'mygpo.web.views.history'),
+    (r'^devices/$', 'mygpo.web.views.devices'),
 
     (r'^toplist/$', 'mygpo.web.views.toplist'),
     (r'^toplist/(?P<count>\d+).opml', 'mygpo.web.views.toplist_opml'),

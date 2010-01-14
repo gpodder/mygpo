@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load humanize %}
+{% load devices %}
+
+{% block content %}
+  <h1>{% trans "Device List" %}</h1>
+
+   {% if not devices|length_is:"0" %}
+   <table class="list">
+    <tr>
+     <th>{% trans "Name" %}</th>
+     <th>{% trans "Type" %}</th>
+     <th>{% trans "UID" %}</th>
+    </tr>
+    {% for d in devices %}
+     <tr>
+      <td><a href="/device/{{ d.id }}">{{ d|device_icon }}{{ d.name }}</a></td>
+      <td>{{ d.type }}</td>
+      <td>{{ d.uid }}</td>
+     </tr>
+    {% endfor %}
+   </table>
+  {% endif %}
+{% endblock %}
+
