@@ -40,6 +40,7 @@ urlpatterns = patterns('',
 
     (r'^podcast/(?P<pid>\w+)$', 'mygpo.web.views.podcast'),
     (r'^podcast/(?P<pid>\w+)/subscribe$', 'mygpo.web.views.podcast_subscribe'),
+    (r'^podcast/(?P<pid>\w+)/unsubscribe/(?P<device_id>\w+)', 'mygpo.web.views.podcast_unsubscribe'),
 
     (r'^episode/(?P<id>\d+)$', 'mygpo.web.views.episode'),
 
@@ -66,7 +67,9 @@ urlpatterns = patterns('',
     (r'^getlist$', 'mygpo.api.legacy.getlist'),
 
     #Simple API
-    (r'^subscriptions/(?P<username>\w+)/(?P<device_uid>\w+).(?P<format>(txt|opml|json))', 'mygpo.api.simple.subscriptions'),
+    (r'^subscriptions/(?P<username>\w+)/(?P<device_uid>\w+).(?P<format>\w+)', 'mygpo.api.simple.subscriptions'),
+    (r'^toplist/(?P<number>\d+).(?P<format>\w+)', 'mygpo.api.simple.toplist'),
+    (r'^search.(?P<format>\w+)', 'mygpo.api.simple.search'),
 
     #Advanced API
     (r'^api/1/subscriptions/(?P<username>\w+)/(?P<device_uid>\w+).json', 'mygpo.api.advanced.subscriptions'),
@@ -77,6 +80,8 @@ urlpatterns = patterns('',
     #Subscribe with my.gpodder.org
     (r'^subscribe', 'mygpo.web.views.podcast_subscribe_url'),
     (r'^authors/$', 'django.views.generic.simple.direct_to_template', {'template': 'authors.html'}),
+
+    (r'^online-help', 'django.views.generic.simple.direct_to_template', {'template': 'online-help.html'}),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs'
     # to INSTALLED_APPS to enable admin documentation:

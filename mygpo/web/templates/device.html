@@ -13,6 +13,7 @@
     <th></th>
     <th>{% trans "Title" %}</th>
     <th>{% trans "Since" %}</th>
+    <th>{% trans "Unsubscribe" %}</th>
    </tr>
 
    {% for subscription in subscriptions %}
@@ -20,6 +21,7 @@
      <td></td>
      <td><a href="/podcast/{{subscription.podcast.id}}">{{ subscription.podcast }}</a></td>
      <td><abbr title="{{subscription.subscribed_since}}">{{subscription.subscribed_since|naturalday}}</abbr></td>
+     <td><a href="/podcast/{{subscription.podcast.id}}/unsubscribe/{{ device.id }}?return_to=/device/{{ device.id }}"><img src="/media/unsubscribe.png" /></a></td>
     </tr>
    {% endfor %}
   </table>

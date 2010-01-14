@@ -385,3 +385,47 @@ class SimpleAPITest(TestCase):
         get = json.loads(response.content)
         
         self.assertEqual(get, [self.p1, self.p2, self.p3])
+        
+    def test_put_invalid_format(self):
+        device = 'ipod'
+        urls = [self.p1, self.p2, self.p3]
+        reqs = json.dumps(urls)
+        
+        #put json - add 3 podcasts
+        response = self.client.put('/subscriptions/%s/%s.iso' % (self.user.username, device), data={'raw_post_data':reqs})
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.content, 'Invalid format')
+
+
+    def test_put_valid_json_get_invalid_format(self):
+        device = 'ipod'
+        urls = [self.p1, self.p2, self.p3]
+        reqs = json.dumps(urls)
+        
+        #put json - add 3 podcasts
+        response = self.client.put('/subscriptions/%s/%s.json' % (self.user.username, device), data={'raw_post_data':reqs})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, '')        
+        
+        #qerying subscription changes
+        response = self.client.get('/subscriptions/%s/%s.iso' % (self.user.username, device), {})
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.content, 'Invalid format')
+        
+    def test_get_invalid_device(self):
+        device = 'invalid'
+        
+        #qerying subscription changes
+        response = self.client.get('/subscriptions/%s/%s.txt' % (self.user.username, device), {})
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.content, 'Invalid device ID')
+        
+    def test_get_invalid_user(self):
+        username = 'invalid'
+        device = 'invalid'
+        
+        #qerying subscription changes
+        response = self.client.get('/subscriptions/%s/%s.txt' % (username, device), {})
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.content, 'Invalid user')
+        

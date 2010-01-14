@@ -16,15 +16,16 @@
 #
 
 from mygpo.api.basic_auth import require_valid_user
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, Http404
-from mygpo.api.models import Device, SubscriptionAction, Podcast, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
+from mygpo.api.models import Device, SubscriptionAction, Podcast, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, ToplistEntry
 from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
 from django.core import serializers
 from datetime import datetime
-from mygpo.api.httpresponse import HttpResponseNotAuthorized
+from mygpo.api.httpresponse import HttpErrorResponse
 import re
 from mygpo.log import log
+from haystack.query import SearchQuerySet
 
 try:
     import simplejson as json
@@ -35,19 +36,22 @@ except ImportError:
 def subscriptions(request, username, device_uid, format):
     
     if request.user.username != username:
-        #throw 401
-        return HttpResponseNotAuthorized()
+        return HttpErrorResponse(401, 'Invalid user')
 
     if request.method == 'GET':
         return format_subscriptions(get_subscriptions(request.user, device_uid), format, username)
         
     elif request.method == 'PUT':
         return set_subscriptions(parse_subscription(request.raw_post_data, format, request.user, device_uid))
+    
     else:
-        return HttpResponseBadReqest()
+        return HttpResponseBadRequest()
 
 
 def format_subscriptions(subscriptions, format, username):
+    if subscriptions == 404:
+        return HttpErrorResponse(404, 'Invalid device ID')
+
     if format == 'txt':
         #return subscriptions formatted as txt
         urls = [p.url for p in subscriptions]
@@ -64,16 +68,21 @@ def format_subscriptions(subscriptions, format, username):
     elif format == 'json':
         urls = [p.url for p in subscriptions]
         return JsonResponse(urls)
+        
+    else: 
+        return HttpResponseBadRequest('Invalid format')
+
 
 def get_subscriptions(user, device_uid):
     #get and return subscription list from database (use backend to sync)
     try:
         d = Device.objects.get(uid=device_uid, user=user)
     except Device.DoesNotExist:
-        raise Http404('Device doesn\'t exist!')
+        return 404
     return [p.podcast for p in d.get_subscriptions()]
 
 def parse_subscription(raw_post_data, format, user, device_uid):
+    format_ok = True
     if format == 'txt':
         sub = raw_post_data.split('\n')
         p = '^http'
@@ -95,7 +104,9 @@ def parse_subscription(raw_post_data, format, user, device_uid):
         end = raw_post_data.find(']') + 1
         urls = json.loads(raw_post_data[begin:end])
 
-    else: raise ValueError('unsupported format %s' % format)
+    else:
+        urls = []
+        format_ok = False
     
     d, created = Device.objects.get_or_create(user=user, uid=device_uid, 
                 defaults = {'type': 'other', 'name': device_uid})
@@ -105,10 +116,14 @@ def parse_subscription(raw_post_data, format, user, device_uid):
     new = [p for p in urls if p not in old]
     rem = [p for p in old if p not in urls]
 
-    return new, rem, d
+    return format_ok, new, rem, d
+
 
 def set_subscriptions(subscriptions):
-    new, rem, d = subscriptions
+    format_ok, new, rem, d = subscriptions
+    
+    if format_ok == False:
+        return HttpResponseBadRequest('Invalid format') 
     
     for r in rem:
         p = Podcast.objects.get(url=r)
@@ -124,3 +139,88 @@ def set_subscriptions(subscriptions):
     # Only an empty response is a successful response
     return HttpResponse('', mimetype='text/plain')
 
+#get toplist
+def toplist(request, number, format):
+    if request.method == 'GET':
+        if int(number) not in range(1,100):
+            print number
+            number = 100
+        return format_toplist(get_toplist(number), number, format)
+    else:
+        return HttpResponseBadRequest('Invalid request')
+
+
+def get_toplist(number):
+    entries = ToplistEntry.objects.all().order_by('-subscriptions')[:number]
+    toplist = []
+    for e in entries:
+        pid = e.podcast_id
+        p = Podcast.objects.get(pk=pid)
+        entry = {'url':p.url, 'title':p.title, 'description':p.description, 'subscribers':e.subscriptions, 'subscribers_last_week':e.oldplace}
+        toplist.append(entry)
+        
+    return toplist
+
+
+def format_toplist(toplist, number, format): 
+    if format == 'txt':
+        urls = [t['url'] for t in toplist]
+        s = '\n'.join(urls)
+        s += '\n'
+        return HttpResponse(s, mimetype='text/plain')
+
+    elif format == 'opml':
+        title = 'Top %d' % number
+        exporter = Exporter(title)
+        opml = exporter.generate(toplist)
+        return HttpResponse(opml, mimetype='text/xml')
+
+    elif format == 'json':
+        return JsonResponse(toplist)
+        
+    else: 
+        return HttpResponseBadRequest('Invalid format')
+
+#get search 
+def search(request, format):
+    if request.method == 'GET':
+        query = request.GET.get('q')
+        
+        if query == None:
+            return HttpErrorResponse(404, '/search.opml|txt|json?q={query}')
+        
+        return format_results(get_results(query), format)
+    else:
+        return HttpResponseBadRequest('Invalid request')
+        
+        
+def get_results(query):
+    search = SearchQuerySet().filter(content=query).models(Podcast)
+    results = []
+    for r in search:
+        p = Podcast.objects.get(pk=r.pk)
+        results.append(p)
+        
+    return results
+    
+    
+def format_results(results, format):
+    if format == 'txt':
+        urls = [r.url for r in results]
+        s = '\n'.join(urls)
+        s += '\n'
+        return HttpResponse(s, mimetype='text/plain')
+
+    elif format == 'opml':
+        title = 'Search results'
+        exporter = Exporter(title)
+        opml = exporter.generate(results)
+        return HttpResponse(opml, mimetype='text/xml')
+
+    elif format == 'json':
+        json = [{'url':p.url, 'title':p.title, 'description':p.description} for p in results]
+        return JsonResponse(json)
+        
+    else: 
+        return HttpResponseBadRequest('Invalid format')
+        

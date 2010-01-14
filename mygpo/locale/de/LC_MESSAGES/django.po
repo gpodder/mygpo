@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-07 17:15+0100\n"
+"POT-Creation-Date: 2010-01-10 13:06+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: api/models.py:167
+#: api/models.py:187
 #, python-format
 msgid "Unnamed Device (%s)"
 msgstr "Unbenanntes Gerät (%s)"
@@ -27,7 +27,8 @@ msgstr "Deine Email Adresse"
 
 #: web/forms.py:8
 msgid "May we use your subscriptions for the toplist and suggestions?"
-msgstr "Dürfen wir deine Abonnements für die Berechnung der Topliste und "
+msgstr ""
+"Dürfen wir deine Abonnements für die Berechnung der Topliste und "
 "Empfehlungen verwenden?"
 
 #: web/forms.py:11
@@ -42,23 +43,59 @@ msgstr "Welcher Art ist dieses Gerät?"
 msgid "What UID is configured on the pysical device?"
 msgstr "Welche UID besitzt das physikalische Gerät?"
 
-#: web/views.py:103
+#: web/views.py:109
 msgid "With which client do you want to subscribe?"
 msgstr "Auf welchem Benutzer willst du aboonieren?"
 
-#: web/views.py:168
+#: web/views.py:174
 #, python-format
 msgid "my.gpodder.org - Top %s"
 msgstr "my.gpodder.org - Top %s"
 
-#: web/views.py:194
+#: web/views.py:200
 #, python-format
 msgid "my.gpodder.org - %s Suggestions"
 msgstr "my.gpodder.org - %s Empfehlungen"
 
-#: web/views.py:208
+#: web/views.py:214
 msgid "Synchronize with the following devices"
 msgstr "Synchronisierung der folgenden Geräte"
+
+#: web/templates/400.html:4
+msgid "Bad request"
+msgstr "Unbekannte Anfrage"
+
+#: web/templates/400.html:5
+msgid "There has been an error processing your request."
+msgstr "Bei der Bearbeitung der Anfrage ist ein Fehler aufgetreten."
+
+#: web/templates/401.html:4
+msgid "Unauthorized"
+msgstr "Nicht autorisiert"
+
+#: web/templates/401.html:5
+msgid "This page is only available to registered users."
+msgstr "Diese Seite ist ausschließlich für registrierte Benutzer."
+
+#: web/templates/404.html:4
+msgid "Not found"
+msgstr "Nicht gefunden"
+
+#: web/templates/404.html:5
+msgid "The requested document could not be found."
+msgstr "Das angefragte Dokument konnte nicht gefunden werden."
+
+#: web/templates/500.html:4
+msgid "Internal Server Error"
+msgstr "Interner Server Fehler"
+
+#: web/templates/500.html:5
+msgid ""
+"An error occured while processing your request. An e-mail with the error "
+"description has been sent to the developers."
+msgstr ""
+"Während der Bearbeitung der Anfrage ist ein Fehler aufgetreten. Eine E-mail, "
+"die diesen Vorfall beschreibt wurde an die Entwickler gesendet."
 
 #: web/templates/account.html:5
 msgid "Account Settings"
@@ -96,7 +133,7 @@ msgstr "Podcasts"
 msgid "You have subscribed the following podcasts on this device"
 msgstr "Du hast die folgenden Podcasts auf diesem Gerät abonniert"
 
-#: web/templates/device.html:14 web/templates/podcast.html:37
+#: web/templates/device.html:14 web/templates/podcast.html:56
 msgid "Title"
 msgstr "Titel"
 
@@ -165,7 +202,7 @@ msgstr "Wo"
 msgid "Why Unnamed Episode?"
 msgstr "Warum unbenannte Episoden?"
 
-#: web/templates/episode.html:41 web/templates/podcast.html:80
+#: web/templates/episode.html:41 web/templates/podcast.html:99
 #: web/templates/subscribe.html:24
 msgid ""
 "Because we display names after we have fetched the information form the feed "
@@ -175,6 +212,31 @@ msgstr ""
 "Da die Beschaffung der Namen und anderer Informationen etwas Zeit in "
 "Anspruch nehmen kann. Bis dies erledigt ist wird der Podcast auf diese Wiese "
 "dargestellt."
+
+#: web/templates/history.html:6 web/templates/podcast.html:74
+msgid "Subscription History"
+msgstr "Abonnementverlauf"
+
+#: web/templates/history.html:11 web/templates/podcast.html:77
+msgid "Timestamp"
+msgstr "Zeitpunkt"
+
+#: web/templates/history.html:12 web/templates/podcast.html:78
+msgid "Action"
+msgstr "Aktivität"
+
+#: web/templates/history.html:13 web/templates/podcast.html:29
+#: web/templates/podcast.html.py:79
+msgid "Devices"
+msgstr "Geräte"
+
+#: web/templates/history.html:20 web/templates/podcast.html:86
+msgid "subscribe"
+msgstr "abonniert"
+
+#: web/templates/history.html:23 web/templates/podcast.html:89
+msgid "unsubscribe"
+msgstr "beendet"
 
 #: web/templates/home-user.html:6
 msgid "my.gpodder.org"
@@ -230,15 +292,15 @@ msgstr ""
 msgid "We are currently tracking %(podcast_count)s Podcasts!"
 msgstr "Es werden zur Zeit %(podcast_count)s Podcasts verfolgt!"
 
-#: web/templates/home.html:20 web/templates/login.html:14
+#: web/templates/home.html:20 web/templates/login.html:15
 msgid "Not yet a member?"
 msgstr "Noch kein Mitglied?"
 
-#: web/templates/home.html:20 web/templates/login.html:14
+#: web/templates/home.html:20 web/templates/login.html:15
 msgid "Register!"
 msgstr "Registrieren!"
 
-#: web/templates/migrate.html:5
+#: web/templates/migrate.html:6
 msgid ""
 "The new my.gpodder.org uses usernames instead of email addresses. Based on "
 "your email address, we think you might like "
@@ -246,11 +308,11 @@ msgstr ""
 "Das neue my.gpodder.org Benutzername anstatt Emailadressen, der basierend "
 "auf deiner Emailadresse erzeugt wird. Wir denken, du wirst ihn mögen "
 
-#: web/templates/migrate.html:5
+#: web/templates/migrate.html:6
 msgid ", but you can change that if you want to."
 msgstr ", falls nicht kannst du ihn einfach ändern."
 
-#: web/templates/migrate.html:11
+#: web/templates/migrate.html:12
 msgid ""
 "You can keep your old user settings in gPodder. Once the next version (with "
 "lots of new features) is release, you'll have to replace your email address "
@@ -264,56 +326,41 @@ msgstr ""
 msgid "Unnamed Podcast"
 msgstr "Unbenannter Podcast"
 
-#: web/templates/podcast.html:17 web/templates/subscribe.html:7
+#: web/templates/podcast.html:20 web/templates/subscribe.html:7
 #, python-format
 msgid "Subscribe to %(podcasttitle)s"
 msgstr "Abonniere %(podcasttitle)s"
 
-#: web/templates/podcast.html:19 web/templates/subscribe.html:9
+#: web/templates/podcast.html:22 web/templates/subscribe.html:9
 msgid "Subscribe to this podcast"
 msgstr "Abonniere diesen Podcast"
 
-#: web/templates/podcast.html:23 web/templates/podcast.html.py:60
-msgid "Devices"
-msgstr "Geräte"
-
-#: web/templates/podcast.html:24
+#: web/templates/podcast.html:30
 msgid "You have subscribed this podcast on"
 msgstr "Dieser Podcast wurde abonniert am"
 
-#: web/templates/podcast.html:33
+#: web/templates/podcast.html:41
+#, python-format
+msgid "Subscribe to %(podcasttitle)s on other devices"
+msgstr "Abonniere %(podcasttitle)s auf einem anderen Gerät"
+
+#: web/templates/podcast.html:43
+msgid "Subscribe to this podcast on other devices"
+msgstr "Abonniere diesen Podcast auf einem anderen Gerät"
+
+#: web/templates/podcast.html:52
 msgid "Episodes"
 msgstr "Episoden"
 
-#: web/templates/podcast.html:38
+#: web/templates/podcast.html:57
 msgid "Description"
 msgstr "Beschreibung"
 
-#: web/templates/podcast.html:39
+#: web/templates/podcast.html:58
 msgid "Released"
 msgstr "Veröffentlicht"
 
-#: web/templates/podcast.html:55
-msgid "Subscription History"
-msgstr "Abonnementverlauf"
-
-#: web/templates/podcast.html:58
-msgid "Timestamp"
-msgstr "Zeitpunkt"
-
-#: web/templates/podcast.html:59
-msgid "Action"
-msgstr "Aktivität"
-
-#: web/templates/podcast.html:67
-msgid "subscribe"
-msgstr "abonniert"
-
-#: web/templates/podcast.html:70
-msgid "unsubscribe"
-msgstr "beendet"
-
-#: web/templates/podcast.html:80 web/templates/subscribe.html:24
+#: web/templates/podcast.html:99 web/templates/subscribe.html:24
 msgid "Why Unnamed Podcast?"
 msgstr "Warum unbenannte Podcasts?"
 
@@ -355,35 +402,35 @@ msgstr "Letzte Woche"
 msgid "Subscribers"
 msgstr "Abonnenten"
 
-#: web/templates/registration/activate.html:5
-#: web/templates/registration/activation_complete.html:4
+#: web/templates/registration/activate.html:6
+#: web/templates/registration/activation_complete.html:5
 msgid "Account activated"
 msgstr "Konto aktiviert"
 
-#: web/templates/registration/activate.html:6
-#: web/templates/registration/activation_complete.html:5
+#: web/templates/registration/activate.html:7
+#: web/templates/registration/activation_complete.html:6
 msgid "Your account has been activated! Enjoy using my.gpodder.org"
 msgstr "Dein Konto wurde aktiviert! Viel Spaß mit my.gpodder.org"
 
-#: web/templates/registration/activate.html:8
+#: web/templates/registration/activate.html:9
 msgid "Account not activated"
 msgstr "Konto nicht aktiviert"
 
-#: web/templates/registration/activate.html:9
+#: web/templates/registration/activate.html:10
 msgid "Your account could not be activated successfully."
 msgstr "Dein Konto konnte nicht erfolgreich aktiviert werden."
 
-#: web/templates/registration/registration_complete.html:4
+#: web/templates/registration/registration_complete.html:5
 msgid "Registration complete"
 msgstr "Registrierung abgeschlossen"
 
-#: web/templates/registration/registration_complete.html:5
+#: web/templates/registration/registration_complete.html:6
 msgid ""
 "Please confirm your account using the email you should just have recieved."
 msgstr ""
 "Bitte bestätige dein Konto mit Hilfe der Email, die du gerade erhlaten hast."
 
-#: web/templates/registration/registration_form.html:4
+#: web/templates/registration/registration_form.html:5
 msgid "Create a User Account"
 msgstr "Erstelle ein Benutzer-Konto"
 
