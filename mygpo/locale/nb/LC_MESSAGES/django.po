@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-14 18:57+0100\n"
+"POT-Creation-Date: 2010-01-14 19:07+0100\n"
 "PO-Revision-Date: 2010-01-06 11:48+0100\n"
 "Last-Translator: Jim Nygård <jim@nygard.priv.no>\n"
 "Language-Team: gpodder <>\n"
@@ -43,21 +43,21 @@ msgstr "Hva slags enhet er dette?"
 msgid "What UID is configured on the physical device?"
 msgstr "Hvilken UID er konfigurert på den fysiske enheten?"
 
-#: web/views.py:111
+#: web/views.py:117
 msgid "With which client do you want to subscribe?"
 msgstr "Med hvilken klient vil du abonnere?"
 
-#: web/views.py:189
+#: web/views.py:195
 #, python-format
 msgid "my.gpodder.org - Top %s"
 msgstr "my.gpodder.org - Topp %s"
 
-#: web/views.py:215
+#: web/views.py:221
 #, python-format
 msgid "my.gpodder.org - %s Suggestions"
 msgstr "my.gpodder.org - %s Forslag"
 
-#: web/views.py:229
+#: web/views.py:235
 msgid "Synchronize with the following devices"
 msgstr "Synkroniser med disse enhetene"
 
@@ -239,6 +239,23 @@ msgstr "Stopp synkroniserine av %(devicename)s "
 #: web/templates/device.html:46 web/templates/subscribe.html:20
 msgid "OK"
 msgstr "OK"
+
+#: web/templates/devicelist.html:7
+#, fuzzy
+msgid "Device List"
+msgstr "Enheter"
+
+#: web/templates/devicelist.html:12
+msgid "Name"
+msgstr ""
+
+#: web/templates/devicelist.html:13
+msgid "Type"
+msgstr ""
+
+#: web/templates/devicelist.html:14
+msgid "UID"
+msgstr ""
 
 #: web/templates/episode.html:7
 #, python-format

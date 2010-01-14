@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-14 18:57+0100\n"
+"POT-Creation-Date: 2010-01-14 19:07+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -41,21 +41,21 @@ msgstr "Che genere di dispositivo è questo?"
 msgid "What UID is configured on the physical device?"
 msgstr ""
 
-#: web/views.py:111
+#: web/views.py:117
 msgid "With which client do you want to subscribe?"
 msgstr ""
 
-#: web/views.py:189
+#: web/views.py:195
 #, python-format
 msgid "my.gpodder.org - Top %s"
 msgstr "my.gpodder.org - Top %s"
 
-#: web/views.py:215
+#: web/views.py:221
 #, python-format
 msgid "my.gpodder.org - %s Suggestions"
 msgstr "my.gpodder.org - %s suggerimenti"
 
-#: web/views.py:229
+#: web/views.py:235
 msgid "Synchronize with the following devices"
 msgstr ""
 
@@ -229,6 +229,23 @@ msgstr ""
 #: web/templates/device.html:46 web/templates/subscribe.html:20
 msgid "OK"
 msgstr "OK"
+
+#: web/templates/devicelist.html:7
+#, fuzzy
+msgid "Device List"
+msgstr "Dispositivo"
+
+#: web/templates/devicelist.html:12
+msgid "Name"
+msgstr ""
+
+#: web/templates/devicelist.html:13
+msgid "Type"
+msgstr ""
+
+#: web/templates/devicelist.html:14
+msgid "UID"
+msgstr ""
 
 #: web/templates/episode.html:7
 #, python-format
