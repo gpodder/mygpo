@@ -1,3 +1,5 @@
+{% load i18n %}
+
 <html>
  <head>
 <!--
@@ -63,35 +65,41 @@
    {% if user.is_authenticated %}
     <ul class="menu">
      <li class="heading"><strong>{{ user.username }}</strong></li>
-     <li><a href="/">Subscriptions</a></li>
-     <li><a href="/history/">History</a></li>
-     <li><a href="/account/">Settings</a></li>
-     <li><a href="/logout/">Logout</a></li>
+     <li><a href="/">{% trans "Subscriptions" %}</a></li>
+     <li><a href="/history/">{% trans "History" %}</a></li>
+     <li><a href="/account/">{% trans "Settings" %}</a></li>
+     <li><a href="/logout/">{% trans "Logout" %}</a></li>
     </ul>
 
     <ul class="menu">
-     <li class="heading"><strong>Discover</strong></li>
-     <li><a href="/search/">Search</a></li>
-     <li><a href="/toplist/">Toplist</a></li>
-     <li><a href="/suggestions/">Suggestions</a></li>
+     <li class="heading"><strong>{% trans "Discover" %}</strong></li>
+     <li><a href="/search/">{% trans "Search" %}</a></li>
+     <li><a href="/toplist/">{% trans "Toplist" %}</a></li>
+     <li><a href="/suggestions/">{% trans "Suggestions" %}</a></li>
     </ul>
     
     <ul class="menu">
-     <li class="heading"><strong>Documentation</strong></li>
-     <li><a href="/online-help/">Online Help</a></li>
-     <li><a href="/authors/">For podcast authors</a></li>
+     <li class="heading"><strong>{% trans "Documentation" %}</strong></li>
+     <li><a href="/online-help/">{% trans "Online Help" %}</a></li>
+     <li><a href="/authors/">{% trans "For podcast authors" %}</a></li>
     </ul>
     
    {% else %}
     <ul class="menu">
-     <li><a href="/">Home</a></li>
-     <li><a href="/login/">Login</a></li>
-     <li><a href="/register/">Register</a></li>
-     <li><a href="/toplist/">Podcast-Toplist</a></li>
+     <li class="heading"><strong>my.gpodder.org</strong></li>
+     <li><a href="/">{% trans "Home" %}</a></li>
+     <li><a href="/login/">{% trans "Login" %}</a></li>
+     <li><a href="/register/">{% trans "Register" %}</a></li>
+    </ul>
+
+    <ul>
+     <li class="heading"><strong>{% trans "Discover" %}</strong></li>
+     <li><a href="/search/">{% trans "Search" %}</a></li>
+     <li><a href="/toplist/">{% trans "Toplist" %}</a></li>
     </ul>
     
     <ul class="menu">
-     <li><a href="/authors/">For podcast authors</a></li>
+     <li><a href="/authors/">{% trans "For podcast authors" %}</a></li>
     </ul>
    {% endif %}
 

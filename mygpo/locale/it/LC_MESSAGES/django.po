@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-10 13:06+0100\n"
+"POT-Creation-Date: 2010-01-14 18:03+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -105,7 +105,8 @@ msgstr ""
 msgid "Update the settings for your account"
 msgstr ""
 
-#: web/templates/authors.html:5
+#: web/templates/authors.html:5 web/templates/base.html:81
+#: web/templates/base.html.py:93
 msgid "For podcast authors"
 msgstr "Per gli autori dei podcasts"
 
@@ -119,8 +120,54 @@ msgstr ""
 msgid "Change the field 'YOUR_ADRESS' with the adress of your podcast."
 msgstr ""
 
-#: web/templates/device.html:9
+#: web/templates/base.html:67
+msgid "'s Home"
+msgstr ""
+
+#: web/templates/base.html:68
+#, fuzzy
+msgid "Your settings"
+msgstr "Regolazioni di cliente"
+
+#: web/templates/base.html:69
+msgid "Logout"
+msgstr ""
+
+#: web/templates/base.html:73 web/templates/device.html:9
 msgid "Podcasts"
+msgstr "Podcasts"
+
+#: web/templates/base.html:74 web/templates/search/search.html:6
+msgid "Search"
+msgstr ""
+
+#: web/templates/base.html:75 web/templates/toplist.html:5
+msgid "Toplist"
+msgstr ""
+
+#: web/templates/base.html:76
+msgid "Suggestions"
+msgstr ""
+
+#: web/templates/base.html:77
+msgid "History"
+msgstr ""
+
+#: web/templates/base.html:86
+msgid "Home"
+msgstr ""
+
+#: web/templates/base.html:87
+msgid "Login"
+msgstr ""
+
+#: web/templates/base.html:88
+msgid "Register"
+msgstr ""
+
+#: web/templates/base.html:89
+#, fuzzy
+msgid "Podcast-Toplist"
 msgstr "Podcasts"
 
 #: web/templates/device.html:10
@@ -200,30 +247,27 @@ msgid ""
 "simply be called this way."
 msgstr ""
 
-#: web/templates/history.html:6 web/templates/podcast.html:74
+#: web/templates/history.html:7 web/templates/podcast.html:74
 msgid "Subscription History"
 msgstr ""
 
-#: web/templates/history.html:11 web/templates/podcast.html:77
+#: web/templates/history.html:12 web/templates/home-user.html:13
+#: web/templates/suggestions.html:17 web/templates/toplist.html:13
+msgid "Podcast"
+msgstr ""
+
+#: web/templates/history.html:13 web/templates/podcast.html:77
 msgid "Timestamp"
 msgstr "Data"
 
-#: web/templates/history.html:12 web/templates/podcast.html:78
+#: web/templates/history.html:14 web/templates/podcast.html:78
 msgid "Action"
 msgstr "Azione"
 
-#: web/templates/history.html:13 web/templates/podcast.html:29
-#: web/templates/podcast.html.py:79
-msgid "Devices"
+#: web/templates/history.html:15
+#, fuzzy
+msgid "Device"
 msgstr "Dispositivo"
-
-#: web/templates/history.html:20 web/templates/podcast.html:86
-msgid "subscribe"
-msgstr "abboni"
-
-#: web/templates/history.html:23 web/templates/podcast.html:89
-msgid "unsubscribe"
-msgstr "disdica"
 
 #: web/templates/home-user.html:6
 msgid "my.gpodder.org"
@@ -231,11 +275,6 @@ msgstr "my.gpodder.org"
 
 #: web/templates/home-user.html:9
 msgid "Your Subscriptions"
-msgstr ""
-
-#: web/templates/home-user.html:13 web/templates/suggestions.html:17
-#: web/templates/toplist.html:13
-msgid "Podcast"
 msgstr ""
 
 #: web/templates/home-user.html:14
@@ -309,6 +348,10 @@ msgstr ""
 msgid "Subscribe to this podcast"
 msgstr ""
 
+#: web/templates/podcast.html:29 web/templates/podcast.html.py:79
+msgid "Devices"
+msgstr "Dispositivo"
+
 #: web/templates/podcast.html:30
 msgid "You have subscribed this podcast on"
 msgstr ""
@@ -353,10 +396,6 @@ msgstr ""
 
 #: web/templates/suggestions.html:30
 msgid "Do you like our suggestions?"
-msgstr ""
-
-#: web/templates/toplist.html:5
-msgid "Toplist"
 msgstr ""
 
 #: web/templates/toplist.html:7
@@ -405,10 +444,6 @@ msgstr ""
 
 #: web/templates/registration/registration_form.html:5
 msgid "Create a User Account"
-msgstr ""
-
-#: web/templates/search/search.html:6
-msgid "Search"
 msgstr ""
 
 #: web/templates/search/search.html:20
@@ -467,3 +502,9 @@ msgstr ""
 #: web/templatetags/podcasts.py:14
 msgid "No Logo available"
 msgstr ""
+
+#~ msgid "subscribe"
+#~ msgstr "abboni"
+
+#~ msgid "unsubscribe"
+#~ msgstr "disdica"

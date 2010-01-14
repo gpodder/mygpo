@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-10 13:06+0100\n"
+"POT-Creation-Date: 2010-01-14 18:03+0100\n"
 "PO-Revision-Date: 2010-01-06 11:48+0100\n"
 "Last-Translator: Jim Nygård <jim@nygard.priv.no>\n"
 "Language-Team: gpodder <>\n"
@@ -106,7 +106,8 @@ msgstr "Dine innstillinger er lagret."
 msgid "Update the settings for your account"
 msgstr "Oppdater innstillingene for kontoen din"
 
-#: web/templates/authors.html:5
+#: web/templates/authors.html:5 web/templates/base.html:81
+#: web/templates/base.html.py:93
 msgid "For podcast authors"
 msgstr ""
 
@@ -120,8 +121,58 @@ msgstr ""
 msgid "Change the field 'YOUR_ADRESS' with the adress of your podcast."
 msgstr ""
 
-#: web/templates/device.html:9
+#: web/templates/base.html:67
+msgid "'s Home"
+msgstr ""
+
+#: web/templates/base.html:68
+#, fuzzy
+msgid "Your settings"
+msgstr "Kontoinnstillinger"
+
+#: web/templates/base.html:69
+#, fuzzy
+msgid "Logout"
+msgstr "Logo"
+
+#: web/templates/base.html:73 web/templates/device.html:9
 msgid "Podcasts"
+msgstr "Podcaster"
+
+#: web/templates/base.html:74 web/templates/search/search.html:6
+msgid "Search"
+msgstr "Søk"
+
+#: web/templates/base.html:75 web/templates/toplist.html:5
+msgid "Toplist"
+msgstr "Toppliste"
+
+#: web/templates/base.html:76
+#, fuzzy
+msgid "Suggestions"
+msgstr "Podcastforslag"
+
+#: web/templates/base.html:77
+msgid "History"
+msgstr ""
+
+#: web/templates/base.html:86
+msgid "Home"
+msgstr ""
+
+#: web/templates/base.html:87
+#, fuzzy
+msgid "Login"
+msgstr "Logo"
+
+#: web/templates/base.html:88
+#, fuzzy
+msgid "Register"
+msgstr "Registrer!"
+
+#: web/templates/base.html:89
+#, fuzzy
+msgid "Podcast-Toplist"
 msgstr "Podcaster"
 
 #: web/templates/device.html:10
@@ -207,30 +258,27 @@ msgstr ""
 "Fordi vi viser navnene etter å ha hentet informasjonen i strømmen, dette kan "
 "ta litt tid. I mellomtiden vil podcasten vises uten navn."
 
-#: web/templates/history.html:6 web/templates/podcast.html:74
+#: web/templates/history.html:7 web/templates/podcast.html:74
 msgid "Subscription History"
 msgstr "Abonnementshistorikk"
 
-#: web/templates/history.html:11 web/templates/podcast.html:77
+#: web/templates/history.html:12 web/templates/home-user.html:13
+#: web/templates/suggestions.html:17 web/templates/toplist.html:13
+msgid "Podcast"
+msgstr "Podcast"
+
+#: web/templates/history.html:13 web/templates/podcast.html:77
 msgid "Timestamp"
 msgstr "Tidspunkt"
 
-#: web/templates/history.html:12 web/templates/podcast.html:78
+#: web/templates/history.html:14 web/templates/podcast.html:78
 msgid "Action"
 msgstr "Handling"
 
-#: web/templates/history.html:13 web/templates/podcast.html:29
-#: web/templates/podcast.html.py:79
-msgid "Devices"
+#: web/templates/history.html:15
+#, fuzzy
+msgid "Device"
 msgstr "Enheter"
-
-#: web/templates/history.html:20 web/templates/podcast.html:86
-msgid "subscribe"
-msgstr "abonner"
-
-#: web/templates/history.html:23 web/templates/podcast.html:89
-msgid "unsubscribe"
-msgstr "avslutt abonnement"
 
 #: web/templates/home-user.html:6
 msgid "my.gpodder.org"
@@ -239,11 +287,6 @@ msgstr "my.gpodder.org"
 #: web/templates/home-user.html:9
 msgid "Your Subscriptions"
 msgstr "Dine Abonnement"
-
-#: web/templates/home-user.html:13 web/templates/suggestions.html:17
-#: web/templates/toplist.html:13
-msgid "Podcast"
-msgstr "Podcast"
 
 #: web/templates/home-user.html:14
 msgid "Latest Episode"
@@ -328,6 +371,10 @@ msgstr "Abonner på %(podcasttitle)s"
 msgid "Subscribe to this podcast"
 msgstr "Abonner på denne podcasten"
 
+#: web/templates/podcast.html:29 web/templates/podcast.html.py:79
+msgid "Devices"
+msgstr "Enheter"
+
 #: web/templates/podcast.html:30
 msgid "You have subscribed this podcast on"
 msgstr "Du abonnerer på denne podcasten på"
@@ -374,10 +421,6 @@ msgstr "URL"
 #: web/templates/suggestions.html:30
 msgid "Do you like our suggestions?"
 msgstr "Liker du våre anbefalinger?"
-
-#: web/templates/toplist.html:5
-msgid "Toplist"
-msgstr "Toppliste"
 
 #: web/templates/toplist.html:7
 #, python-format
@@ -426,10 +469,6 @@ msgstr "Du må bekrefte kontoen med e-posten du nå skal ha mottatt."
 #: web/templates/registration/registration_form.html:5
 msgid "Create a User Account"
 msgstr "Opprett en brukerkonto"
-
-#: web/templates/search/search.html:6
-msgid "Search"
-msgstr "Søk"
 
 #: web/templates/search/search.html:20
 msgid "Results"
@@ -487,6 +526,12 @@ msgstr "Logo"
 #: web/templatetags/podcasts.py:14
 msgid "No Logo available"
 msgstr "Ingen logo tilgjengelig"
+
+#~ msgid "subscribe"
+#~ msgstr "abonner"
+
+#~ msgid "unsubscribe"
+#~ msgstr "avslutt abonnement"
 
 #~ msgid "back!"
 #~ msgstr "zurück!"

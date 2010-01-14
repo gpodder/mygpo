@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-10 13:06+0100\n"
+"POT-Creation-Date: 2010-01-14 18:03+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -109,7 +109,8 @@ msgstr "Ihre Einstellungen wurden gespeichert."
 msgid "Update the settings for your account"
 msgstr "Aktualisierung der Konto-Einstellungen"
 
-#: web/templates/authors.html:5
+#: web/templates/authors.html:5 web/templates/base.html:81
+#: web/templates/base.html.py:93
 msgid "For podcast authors"
 msgstr "Für die Podcast-Autoren"
 
@@ -125,9 +126,53 @@ msgstr ""
 msgid "Change the field 'YOUR_ADRESS' with the adress of your podcast."
 msgstr "Ändere YOUR_ADRESS in die Adresse deines Podcastes um."
 
-#: web/templates/device.html:9
+#: web/templates/base.html:67
+msgid "'s Home"
+msgstr "'s Home"
+
+#: web/templates/base.html:68
+msgid "Your settings"
+msgstr "Konto-Einstellungen"
+
+#: web/templates/base.html:69
+msgid "Logout"
+msgstr "Abmelden"
+
+#: web/templates/base.html:73 web/templates/device.html:9
 msgid "Podcasts"
 msgstr "Podcasts"
+
+#: web/templates/base.html:74 web/templates/search/search.html:6
+msgid "Search"
+msgstr "Suche"
+
+#: web/templates/base.html:75 web/templates/toplist.html:5
+msgid "Toplist"
+msgstr "Topliste"
+
+#: web/templates/base.html:76
+msgid "Suggestions"
+msgstr "Empfehlungen"
+
+#: web/templates/base.html:77
+msgid "History"
+msgstr "Verlauf"
+
+#: web/templates/base.html:86
+msgid "Home"
+msgstr "Home"
+
+#: web/templates/base.html:87
+msgid "Login"
+msgstr "Anmelden"
+
+#: web/templates/base.html:88
+msgid "Register"
+msgstr "Registrieren"
+
+#: web/templates/base.html:89
+msgid "Podcast-Toplist"
+msgstr "Podcast-Topliste"
 
 #: web/templates/device.html:10
 msgid "You have subscribed the following podcasts on this device"
@@ -139,7 +184,7 @@ msgstr "Titel"
 
 #: web/templates/device.html:15
 msgid "Since"
-msgstr "seit"
+msgstr "Seit"
 
 #: web/templates/device.html:27
 msgid "Synchronize"
@@ -213,30 +258,26 @@ msgstr ""
 "Anspruch nehmen kann. Bis dies erledigt ist wird der Podcast auf diese Wiese "
 "dargestellt."
 
-#: web/templates/history.html:6 web/templates/podcast.html:74
+#: web/templates/history.html:7 web/templates/podcast.html:74
 msgid "Subscription History"
 msgstr "Abonnementverlauf"
 
-#: web/templates/history.html:11 web/templates/podcast.html:77
+#: web/templates/history.html:12 web/templates/home-user.html:13
+#: web/templates/suggestions.html:17 web/templates/toplist.html:13
+msgid "Podcast"
+msgstr "Podcast"
+
+#: web/templates/history.html:13 web/templates/podcast.html:77
 msgid "Timestamp"
 msgstr "Zeitpunkt"
 
-#: web/templates/history.html:12 web/templates/podcast.html:78
+#: web/templates/history.html:14 web/templates/podcast.html:78
 msgid "Action"
 msgstr "Aktivität"
 
-#: web/templates/history.html:13 web/templates/podcast.html:29
-#: web/templates/podcast.html.py:79
-msgid "Devices"
+#: web/templates/history.html:15
+msgid "Device"
 msgstr "Geräte"
-
-#: web/templates/history.html:20 web/templates/podcast.html:86
-msgid "subscribe"
-msgstr "abonniert"
-
-#: web/templates/history.html:23 web/templates/podcast.html:89
-msgid "unsubscribe"
-msgstr "beendet"
 
 #: web/templates/home-user.html:6
 msgid "my.gpodder.org"
@@ -245,11 +286,6 @@ msgstr "my.gpodder.org"
 #: web/templates/home-user.html:9
 msgid "Your Subscriptions"
 msgstr "Deine Abonnements"
-
-#: web/templates/home-user.html:13 web/templates/suggestions.html:17
-#: web/templates/toplist.html:13
-msgid "Podcast"
-msgstr "Podcast"
 
 #: web/templates/home-user.html:14
 msgid "Latest Episode"
@@ -335,6 +371,10 @@ msgstr "Abonniere %(podcasttitle)s"
 msgid "Subscribe to this podcast"
 msgstr "Abonniere diesen Podcast"
 
+#: web/templates/podcast.html:29 web/templates/podcast.html.py:79
+msgid "Devices"
+msgstr "Geräte"
+
 #: web/templates/podcast.html:30
 msgid "You have subscribed this podcast on"
 msgstr "Dieser Podcast wurde abonniert am"
@@ -380,10 +420,6 @@ msgstr "URL"
 #: web/templates/suggestions.html:30
 msgid "Do you like our suggestions?"
 msgstr "Bist du mit den Empfehlungen zufrieden?"
-
-#: web/templates/toplist.html:5
-msgid "Toplist"
-msgstr "Topliste"
 
 #: web/templates/toplist.html:7
 #, python-format
@@ -433,10 +469,6 @@ msgstr ""
 #: web/templates/registration/registration_form.html:5
 msgid "Create a User Account"
 msgstr "Erstelle ein Benutzer-Konto"
-
-#: web/templates/search/search.html:6
-msgid "Search"
-msgstr "Suche"
 
 #: web/templates/search/search.html:20
 msgid "Results"
@@ -494,6 +526,12 @@ msgstr "Logo"
 #: web/templatetags/podcasts.py:14
 msgid "No Logo available"
 msgstr "Kein Logo verfügbar"
+
+#~ msgid "subscribe"
+#~ msgstr "abonniert"
+
+#~ msgid "unsubscribe"
+#~ msgstr "beendet"
 
 #~ msgid "back!"
 #~ msgstr "zurück!"
