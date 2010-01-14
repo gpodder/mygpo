@@ -62,21 +62,23 @@
 
    {% if user.is_authenticated %}
     <ul class="menu">
-     <li><a href="/">{{ user.username }}'s Home</a></li>
-     <li><a href="/account/">Your settings</a></li>
-     <li><a href="/online-help/">Online Help</a></li>
+     <li class="heading"><strong>{{ user.username }}</strong></li>
+     <li><a href="/">Subscriptions</a></li>
+     <li><a href="/history/">History</a></li>
+     <li><a href="/account/">Settings</a></li>
      <li><a href="/logout/">Logout</a></li>
     </ul>
 
     <ul class="menu">
-     <li><strong>Podcasts</strong></li>
+     <li class="heading"><strong>Discover</strong></li>
      <li><a href="/search/">Search</a></li>
      <li><a href="/toplist/">Toplist</a></li>
      <li><a href="/suggestions/">Suggestions</a></li>
-     <li><a href="/history/">History</a></li>
     </ul>
     
     <ul class="menu">
+     <li class="heading"><strong>Documentation</strong></li>
+     <li><a href="/online-help/">Online Help</a></li>
      <li><a href="/authors/">For podcast authors</a></li>
     </ul>
     

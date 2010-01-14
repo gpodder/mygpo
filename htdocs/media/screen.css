@@ -59,6 +59,26 @@ ul.menu
     padding: 0;
 }
 
+ul.menu li {
+    margin: 3px;
+    padding-left: 10px;
+}
+
+ul.menu li.heading {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.menu strong {
+    color: #75507b;
+    background-color: white;
+    padding: 3px;
+    padding-left: 10px;
+    padding-right: 10px;
+    -moz-border-radius: 5px;
+    margin-left: -10px;
+}
+
 table.list
 {
     margin-top: 2em;
