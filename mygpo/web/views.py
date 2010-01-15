@@ -215,15 +215,6 @@ def suggestions(request):
     }, context_instance=RequestContext(request))
 
 
-@require_valid_user
-def suggestions_opml(request, count):
-    entries = SuggestionEntry.forUser(request.user)
-    exporter = Exporter(_('my.gpodder.org - %s Suggestions') % count)
-
-    opml = exporter.generate([e.podcast for e in entries])
-
-    return HttpResponse(opml, mimetype='text/xml')
-
 @login_required
 def device(request, device_id):
     device = Device.objects.get(pk=device_id)

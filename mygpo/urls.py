@@ -51,11 +51,9 @@ urlpatterns = patterns('',
     (r'^devices/$', 'mygpo.web.views.devices'),
 
     (r'^toplist/$', 'mygpo.web.views.toplist'),
-    (r'^toplist/(?P<count>\d+).opml', 'mygpo.web.views.toplist_opml'),
     (r'^toplist.opml$', 'mygpo.web.views.toplist_opml', {'count': 50}),
 
     (r'^suggestions/$', 'mygpo.web.views.suggestions'),
-    (r'^suggestions/(?P<count>\d+).opml$', 'mygpo.web.views.suggestions_opml'),
 
     (r'^device/(?P<device_id>\d+)$', 'mygpo.web.views.device'),
     (r'^device/(?P<device_id>\d+)/sync$', 'mygpo.web.views.device_sync'),
@@ -69,8 +67,9 @@ urlpatterns = patterns('',
 
     #Simple API
     (r'^subscriptions/(?P<username>\w+)/(?P<device_uid>\w+).(?P<format>\w+)', 'mygpo.api.simple.subscriptions'),
-    (r'^toplist/(?P<number>\d+).(?P<format>\w+)', 'mygpo.api.simple.toplist'),
+    (r'^toplist/(?P<count>\d+).(?P<format>\w+)', 'mygpo.api.simple.toplist'),
     (r'^search.(?P<format>\w+)', 'mygpo.api.simple.search'),
+    (r'^suggestions/(?P<count>\d+).(?P<format>\w+)', 'mygpo.api.simple.suggestions'),
 
     #Advanced API
     (r'^api/1/subscriptions/(?P<username>\w+)/(?P<device_uid>\w+).json', 'mygpo.api.advanced.subscriptions'),
