@@ -403,3 +403,17 @@ class Rating(models.Model):
     def __unicode__(self):
         return '%s rates %s as %s on %s' % (self.user, self.target, self.rating, self.timestamp)
 
+class URLSanitizingRule(models.Model):
+    use_podcast = models.BooleanField()
+    use_episode = models.BooleanField()
+    search = models.CharField(max_length=100)
+    replace = models.CharField(max_length=100)
+    priority = models.PositiveIntegerField()
+    description = models.TextField(null=False, blank=True)
+
+    class Meta:
+        db_table = 'sanitizing_rules'
+
+    def __unicode__(self):
+        return '%s -> %s' % (self.search, self.replace)
+

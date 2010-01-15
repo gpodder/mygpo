@@ -36,3 +36,15 @@ BEGIN
 
 END $$
 DELIMITER ;
+
+
+CREATE TABLE `sanitizing_rules` (
+    `id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    `use_podcast` bool NOT NULL,
+    `use_episode` bool NOT NULL,
+    `search` varchar(100) NOT NULL,
+    `replace` varchar(100) NOT NULL,
+    `priority` integer UNSIGNED NOT NULL,
+    `description` longtext NOT NULL
+);
+
