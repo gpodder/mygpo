@@ -14,7 +14,6 @@ def basic_sanitizing(url):
     """
     does basic sanitizing through urlparse and additionally converts the netloc to lowercase
     """
-    url = url.strip()
     r = urlparse.urlsplit(url)
     netloc = r.netloc.lower()
     r2 = urlparse.SplitResult(r.scheme, netloc, r.path, r.query, r.fragment)
@@ -81,7 +80,7 @@ def maintenance():
             merged += 1
 
         except Podcast.DoesNotExist, e:
-            log('updating podcast %s - %s => %s' % (p.id, p.url, su))
+            log('updating podcast %s - "%s" => "%s"' % (p.id, p.url, su))
             p.url = su
             p.save()
             updated += 1
@@ -93,7 +92,7 @@ def maintenance():
 
 def rewrite_podcasts(p_old, p_new):
 
-    log('merging podcast %s (%s) to correct podcast %s (%s)' % (p_old.id, p_old.url, p_new.id, p_new.url))
+    log('merging podcast %s "%s" to correct podcast %s "%s"' % (p_old.id, p_old.url, p_new.id, p_new.url))
 
     # we simply delete incorrect toplist and suggestions entries, 
     # because we can't re-calculate them
@@ -131,11 +130,11 @@ def rewrite_episodes(p_old, p_new):
             e_new = Episode.objects.get(podcast=p_new, url=e.url)
             log('episode %s (url %s, podcast %s) already exists; updating episode actions for episode %s (url %s, podcast %s)' % (e_new.id, e.url, p_new.id, e.id, e.url, p_old.id))
             rewrite_episode_actions(e, e_new)
-            log('episode actions for episode %s (url %s, podcast %s) updated, deleting.' % (e.id, e.url, p_old.id))
+            log('episode actions for episode %s (url "%s", podcast %s) updated, deleting.' % (e.id, e.url, p_old.id))
             e.delete()
 
         except Episode.DoesNotExist:
-            log('updating episode %s (url %s, podcast %s => %s)' % (e.id, e.url, p_old.id, p_new.od))
+            log('updating episode %s (url "%s", podcast %s => %s)' % (e.id, e.url, p_old.id, p_new.od))
             e.podcast = p_new
             e.save()
 

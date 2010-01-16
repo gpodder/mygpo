@@ -408,7 +408,7 @@ class URLSanitizingRule(models.Model):
     use_podcast = models.BooleanField()
     use_episode = models.BooleanField()
     search = models.CharField(max_length=100)
-    replace = models.CharField(max_length=100)
+    replace = models.CharField(max_length=100, null=False, blank=True)
     priority = models.PositiveIntegerField()
     description = models.TextField(null=False, blank=True)
 
