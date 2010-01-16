@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-14 19:36+0100\n"
+"POT-Creation-Date: 2010-01-15 16:57+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -52,12 +52,7 @@ msgstr "Wähle ein Gerät zum abonnieren:"
 msgid "my.gpodder.org - Top %s"
 msgstr "my.gpodder.org - Top %s"
 
-#: web/views.py:221
-#, python-format
-msgid "my.gpodder.org - %s Suggestions"
-msgstr "my.gpodder.org - %s Empfehlungen"
-
-#: web/views.py:235
+#: web/views.py:226
 msgid "Synchronize with the following devices"
 msgstr "Synchronisierung der folgenden Geräte"
 
@@ -670,6 +665,9 @@ msgstr "Logo"
 #: web/templatetags/podcasts.py:14
 msgid "No Logo available"
 msgstr "Kein Logo verfügbar"
+
+#~ msgid "my.gpodder.org - %s Suggestions"
+#~ msgstr "my.gpodder.org - %s Empfehlungen"
 
 #~ msgid "'s Home"
 #~ msgstr "'s Home"
