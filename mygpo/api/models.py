@@ -369,6 +369,7 @@ class SubscriptionMeta(models.Model):
 
     class Meta:
         db_table = 'subscription'
+        unique_together = ('user', 'podcast')
 
 
 class SubscriptionAction(models.Model):

@@ -48,3 +48,7 @@ CREATE TABLE `sanitizing_rules` (
     `description` longtext NOT NULL
 );
 
+alter table subscription add column id int unique auto_increment;
+
+create unique index unique_subscription_meta on subscription (user_id, podcast_id);
+
