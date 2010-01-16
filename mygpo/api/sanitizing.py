@@ -14,6 +14,7 @@ def basic_sanitizing(url):
     """
     does basic sanitizing through urlparse and additionally converts the netloc to lowercase
     """
+    url = url.strip()
     r = urlparse.urlsplit(url)
     netloc = r.netloc.lower()
     r2 = urlparse.SplitResult(r.scheme, netloc, r.path, r.query, r.fragment)
@@ -59,7 +60,7 @@ def maintenance():
     sanitized_urls = []
     for p in podcasts:
         count += 1
-        if (count % 1000) == 0: print '%s %% (podcast id %s)' % (((count + 0.0)/podcasts.count()*100), p.id)
+        if (count % 100) == 0: print '%s %% (podcast id %s)' % (((count + 0.0)/podcasts.count()*100), p.id)
 
         su = sanitize_url(p.url)
         if su == p.url: 
@@ -68,7 +69,14 @@ def maintenance():
     
         try:
             su_podcast = Podcast.objects.get(url=su)
+
+            if p == su_podcast:
+                unchanged += 1
+                continue
+
             rewrite_podcasts(p, su_podcast)
+            tmp = Subscription.objects.filter(podcast=p)
+            if tmp.count() > 0: print tmp.count()
             p.delete()
             merged += 1
 
