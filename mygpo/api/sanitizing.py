@@ -9,6 +9,7 @@ def sanitize_url(url, podcast=True, episode=False):
     url = apply_sanitizing_rules(url, podcast, episode)
     return url
 
+
 def basic_sanitizing(url):
     """
     does basic sanitizing through urlparse and additionally converts the netloc to lowercase
@@ -52,6 +53,7 @@ def maintenance():
     updated = 0
 
     count = 0
+
     podcasts = Podcast.objects.all()
     duplicates = 0
     sanitized_urls = []
@@ -140,5 +142,4 @@ def rewrite_episode_actions(e_old, e_new):
 
         except Exception as e:
             log('error updating episode action %s: %s, deleting' % (sa.id, e))
-            ea.delete()
 
