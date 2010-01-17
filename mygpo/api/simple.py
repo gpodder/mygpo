@@ -109,7 +109,10 @@ def parse_subscription(raw_post_data, format, user, device_uid):
         urls = []
         format_ok = False
 
-    urls_sanitized = [ sanitize_url(u) for u in urls ]
+    urls_sanitized = []
+    for u in urls:
+        us = sanitize_url(u)
+        if us != '': urls_sanitized.append(us)
     
     d, created = Device.objects.get_or_create(user=user, uid=device_uid, 
                 defaults = {'type': 'other', 'name': device_uid})

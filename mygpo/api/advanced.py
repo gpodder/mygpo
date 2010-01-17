@@ -90,13 +90,13 @@ def update_subscriptions(user, device, add, remove):
 
     for u in add:
         us = sanitize_url(u)
-        if u != us: updated_urls.append( (u, us) )
-        add_sanitized.append(us)
+        if u != us:  updated_urls.append( (u, us) )
+        if us != '': add_sanitized.append(us)
 
     for u in remove:
         us = sanitize_url(u)
-        if u != us: updated_urls.append( (u, us) )
-        rem_sanitized.append(us)
+        if u != us:  updated_urls.append( (u, us) )
+        if us != '': rem_sanitized.append(us)
 
     for a in add_sanitized:
         if a in rem_sanitized:
