@@ -23,6 +23,7 @@ from datetime import datetime
 from django.utils.datastructures import MultiValueDictKeyError
 from django.db import IntegrityError
 from mygpo.log import log
+from mygpo.api.sanitizing import sanitize_url
 
 LEGACY_DEVICE_NAME = 'Legacy Device'
 LEGACY_DEVICE_UID  = 'legacy'
@@ -49,7 +50,7 @@ def upload(request):
     existing_urls = [e.podcast.url for e in existing]
 
     i = Importer(opml)
-    podcast_urls = [p['url'] for p in i.items]
+    podcast_urls = [ sanitize_url(p['url']) for p in i.items]
 
     new = [item['url'] for item in i.items if item['url'] not in existing_urls]
     rem = [e.podcast.url for e in existing if e.podcast.url not in podcast_urls]

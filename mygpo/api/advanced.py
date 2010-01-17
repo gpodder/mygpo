@@ -19,6 +19,7 @@ from mygpo.api.basic_auth import require_valid_user
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, Http404, HttpResponseNotAllowed
 from mygpo.api.models import Device, Podcast, SubscriptionAction, Episode, EpisodeAction, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, EPISODE_ACTION_TYPES, DEVICE_TYPES, Subscription
 from mygpo.api.httpresponse import JsonResponse
+from mygpo.api.sanitizing import sanitize_url
 from django.core import serializers
 from time import mktime
 from datetime import datetime, timedelta
@@ -68,33 +69,54 @@ def subscriptions(request, username, device_uid):
         add = actions['add'] if 'add' in actions else []
         rem = actions['remove'] if 'remove' in actions else []
 
-        for a in add:
-            if a in rem:
-                return HttpResponseBadRequest('can not add and remove %s at the same time' % a)
+        try:
+            updated_urls = update_subscriptions(request.user, d, add, rem)
+        except IntegrityError as e:
+            return HttpResponseBadRequest(e)
 
-        update_subscriptions(request.user, d, add, rem)
-
-        return JsonResponse({'timestamp': now_})
+        return JsonResponse({
+            'timestamp': now_, 
+            'updated_urls': updated_urls 
+            })
 
     else:
         return HttpResponseNotAllowed(['GET', 'POST'])
 
 
 def update_subscriptions(user, device, add, remove):
-    for a in add:
+    updated_urls = []
+    add_sanitized = []
+    rem_sanitized = []
+
+    for u in add:
+        us = sanitize_url(u)
+        if u != us: updated_urls.append( (u, us) )
+        add_sanitized.append(us)
+
+    for u in remove:
+        us = sanitize_url(u)
+        if u != us: updated_urls.append( (u, us) )
+        rem_sanitized.append(us)
+
+    for a in add_sanitized:
+        if a in rem_sanitized:
+           raise IntegrityError('can not add and remove %s at the same time' % a)
+
+    for a in add_sanitized:
         p, p_created = Podcast.objects.get_or_create(url=a)
         try:
             s = SubscriptionAction.objects.create(podcast=p,device=device,action=SUBSCRIBE_ACTION)
         except IntegrityError, e:
             log('can\'t add subscription %s for user %s: %s' % (a, user, e))
 
-    for r in remove:
+    for r in rem_sanitized:
         p, p_created = Podcast.objects.get_or_create(url=r)
         try:
             s = SubscriptionAction.objects.create(podcast=p,device=device,action=UNSUBSCRIBE_ACTION)
         except IntegrityError, e:
             log('can\'t remove subscription %s for user %s: %s' % (r, user, e))
 
+    return updated_urls
 
 def get_subscription_changes(user, device, since, until):
     actions = {}
