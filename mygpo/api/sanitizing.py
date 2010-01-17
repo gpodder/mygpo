@@ -56,6 +56,7 @@ def maintenance():
     unchanged = 0
     merged = 0
     updated = 0
+    deleted = 0
 
     count = 0
 
@@ -68,6 +69,11 @@ def maintenance():
         su = sanitize_url(p.url, rules)
         if su == p.url: 
             unchanged += 1
+            continue
+
+        if su == '':
+            delete_podcast(p)
+            deleted += 1
             continue
     
         try:
@@ -92,6 +98,12 @@ def maintenance():
     print ' * %s unchanged' % unchanged
     print ' * %s merged' % merged
     print ' * %s updated' % updated
+    print ' * %s deleted' % deleted
+
+
+def delete_podcast(p):
+    SubscriptionAction.objects.filter(podcast=p).delete()
+    p.delete()
 
 
 def rewrite_podcasts(p_old, p_new):
