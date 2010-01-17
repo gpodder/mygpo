@@ -4,9 +4,9 @@ import urlparse
 import re
 import sys
 
-def sanitize_url(url, podcast=True, episode=False):
+def sanitize_url(url, podcast=True, episode=False, rules=URLSanitizingRule.objects.all().order_by('priority')):
     url = basic_sanitizing(url)
-    url = apply_sanitizing_rules(url, podcast, episode)
+    url = apply_sanitizing_rules(url, rules, podcast, episode)
     return url
 
 
@@ -19,21 +19,24 @@ def basic_sanitizing(url):
     r2 = urlparse.SplitResult(r.scheme, netloc, r.path, r.query, r.fragment)
     return r2.geturl()
 
-def apply_sanitizing_rules(url, podcast=True, episode=False):
+def apply_sanitizing_rules(url, rules, podcast=True, episode=False):
     """
     applies all url sanitizing rules to the given url
     setting podcast=True uses only those rules which have use_podcast set to True. 
     When passing podcast=False this check is ommitted. The same is valid
     for episode.
     """
-    rules = URLSanitizingRule.objects.all().order_by('priority')
     if podcast: rules = rules.filter(use_podcast=True)
     if episode: rules = rules.filter(use_podcast=True)
 
     for r in rules:
-        url = re.sub(r.search, r.replace, url)
+        if r.search_precompiled:
+            url = r.rearch_precompiled.sub(r.replace, url)
+        else:
+            url = re.sub(r.search, r.replace, url)
 
     return url
+
 
 def maintenance():
     """
@@ -46,7 +49,9 @@ def maintenance():
     print ' * %s podcasts' % Podcast.objects.count()
     print ' * %s rules' % URLSanitizingRule.objects.count()
     print
-    print 'working...'
+
+    print 'precompiling regular expressions'
+    rules = precompile_rules()
 
     unchanged = 0
     merged = 0
@@ -60,8 +65,7 @@ def maintenance():
     for p in podcasts:
         count += 1
         if (count % 100) == 0: print '%s %% (podcast id %s)' % (((count + 0.0)/podcasts.count()*100), p.id)
-
-        su = sanitize_url(p.url)
+        su = sanitize_url(p.url, rules)
         if su == p.url: 
             unchanged += 1
             continue
@@ -149,4 +153,15 @@ def rewrite_episode_actions(e_old, e_new):
 
         except Exception as e:
             log('error updating episode action %s: %s, deleting' % (sa.id, e))
+
+
+def precompile_rules(rules=URLSanitizingRule.objects.all().order_by('priority')):
+    rules_p = []
+    for rule in rules:
+        r = re.compile(rule.search)
+        rule.search_precompile = r
+        rules_p.append( rule )
+
+    return rules_p
+
 
