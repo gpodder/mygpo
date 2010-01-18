@@ -5,6 +5,9 @@ BEGIN
     DECLARE deadlock INT DEFAULT 0;
     DECLARE attempts INT DEFAULT 0;
     DECLARE done INT DEFAULT 0;
+    DECLARE user_help INT DEFAULT 0;
+    DECLARE day_count INT DEFAULT 0;
+    DECLARE cur1 CURSOR FOR select user_id from registration_registrationprofile where activation_key<>"ALREADY_ACTIVATED";
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
 
     try_loop:WHILE (attempts<3) DO
@@ -18,8 +21,23 @@ BEGIN
          SET deadlock=0;
                
          START TRANSACTION;
+OPEN cur1;
 
-            delete from auth_user where is_active=0 and datediff(date(now()), date(date_joined)) > 7;
+            REPEAT
+                FETCH cur1 INTO user_help;
+
+                IF NOT done THEN
+
+                    SELECT datediff(date(now()), date(date_joined)) into day_count FROM auth_user where id=user_help;
+
+                    IF day_count > 7 THEN
+                        delete from auth_user where id=user_help;
+                        delete from registration_registrationprofile where user_id=user_help;
+                    END IF;
+                END IF;
+            UNTIL done END REPEAT;
+
+            CLOSE cur1;
 
             COMMIT;  
         END;
@@ -53,4 +71,6 @@ alter table subscription add column id int unique auto_increment;
 create unique index unique_subscription_meta on subscription (user_id, podcast_id);
 
 create unique index unique_device_user_uid on device (user_id, uid);
+
+
 
