@@ -389,56 +389,60 @@ msgstr ""
 
 #: web/templates/online-help.html:9 web/templates/online-help.html.py:27
 msgid "How can I configure my devices?"
-msgstr ""
+msgstr "Wie kann ich meine Geräte konfigurieren?"
 
 #: web/templates/online-help.html:11 web/templates/online-help.html.py:28
 msgid "How can I add a new device?"
-msgstr ""
+msgstr "Wie kann ich ein neues Gerät anlegen?"
 
 #: web/templates/online-help.html:12 web/templates/online-help.html.py:31
 msgid "How can I edit a device?"
-msgstr ""
+msgstr "Wie kann ich die Einstellungen meines Gerätes verändern?"
 
 #: web/templates/online-help.html:16 web/templates/online-help.html.py:41
 msgid "How can I configure the synchronisation between devices?"
-msgstr ""
+msgstr "Wie kann ich Geräte synchronisieren?"
 
 #: web/templates/online-help.html:18 web/templates/online-help.html.py:42
 msgid "How can I start a synchronisation?"
-msgstr ""
+msgstr "Wie kann ich die Synchronisation starten?"
 
 #: web/templates/online-help.html:19 web/templates/online-help.html.py:49
 msgid "How can I stop a synchronisation?"
-msgstr ""
+msgstr "Wie kann ich die Synchronisation stoppen?"
 
 #: web/templates/online-help.html:22 web/templates/online-help.html.py:59
 msgid "How can I copy single subscriptions between devices?"
-msgstr ""
+msgstr "Wie kann ich einzelne Abonnements auf ein anderes Gerät kopieren?"
 
 #: web/templates/online-help.html:29
 msgid "Open the &quot;gPodder Podcast-Client&quot; on your PC or MAC."
-msgstr ""
+msgstr "Öffne das &quot;gPodder Podcast-Konto&quot; auf deinem PC oder MAC."
 
 #: web/templates/online-help.html:30
 msgid ""
 "Upload your podcasts and if it's asked, enter your username and password. "
 "The server will create you a new device."
 msgstr ""
+"Lade deine Podcasts rauf und gib falls nötig deinen Benutzername und dein Passwort ein."
+"Der Server wird ein neues Gerät anlegen."
 
 #: web/templates/online-help.html:32 web/templates/online-help.html.py:50
 #: web/templates/online-help.html:60
 msgid "Click on your &quot;Subscriptions&quot;-link."
-msgstr ""
+msgstr "Klicke auf deinen &quot;Abonnements&quot;-Link."
 
 #: web/templates/online-help.html:33
 msgid "Now you can see your devices, click on one of them."
-msgstr ""
+msgstr "Jetzt kannst du deine Geräte sehen, klicke auf eines von ihnen."
 
 #: web/templates/online-help.html:35
 msgid ""
 "You are redirected to another page.<br />On the bottom of the page there's a "
 "field named &quot;Edit&quot;"
 msgstr ""
+"Du wurdest weitergeleitet. <br />Am Ende der Seite befindet sich ein "
+"Feld mit dem Namen &quot;Bearbeiten&quot;"
 
 #: web/templates/online-help.html:37
 msgid ""
@@ -446,60 +450,76 @@ msgid ""
 "edit the uid! If you enter a false one your subscriptions won't be "
 "synchronize with your device anymore."
 msgstr ""
+"Hier kannst du den Namen, den Typ oder die UID ändern. Aber bitte Vorsicht beim "
+"ändern der UID, falls du eine falsche eingibst, können deine Abonnements nicht "
+"länger mit diesem Gerät synchronisiert werden."
 
 #: web/templates/online-help.html:43
 msgid ""
 "Choose a device on your &quot;Subscriptions-screen&quot; and click on it."
 msgstr ""
+"Suche ein Gerät auf dem &quot;Abonnements-Bildschirm&quot; aus und klicke darauf."
 
 #: web/templates/online-help.html:45
 msgid ""
 "Go to the field &quot;Synchronize&quot;, choose your desired device and "
 "click on the &quot;OK&quot;-button."
 msgstr ""
+"Suche das Feld &quot;Synchronisieren&quot;, suche dein Gerät und "
+"klicke auf &quot;OK&quot;."
 
 #: web/templates/online-help.html:47
 msgid "Now the two devices are synchronized."
-msgstr ""
+msgstr "Deine Geräte wurden erfolgreich synchronisiert."
 
 #: web/templates/online-help.html:51
 msgid ""
 "Choose a device on which you would like to stop the synchronisation and "
 "click on it."
 msgstr ""
+"Suche das Gerät aus bei dem die Synchronisation gestoppt werden soll "
+"und klicke darauf."
 
 #: web/templates/online-help.html:53
 msgid ""
 "Go to the field &quot;Synchronize&quot; and click on &quot;Stop "
 "synchronisation for your device&quot;"
 msgstr ""
+"Suche das Feld &quot;Synchronisieren&quot; und klicke auf &quot;Beende "
+"die Synchronisation für dieses Gerät&quot;"
 
 #: web/templates/online-help.html:55
 msgid "Now the two devices are unsynchronized again."
-msgstr ""
+msgstr "Die Synchronisation wurde erfolgreich beendet."
 
 #: web/templates/online-help.html:61
 msgid ""
 "Choose the podcast which you would like to copy on another device and click "
 "on it."
 msgstr ""
+"Suche den Podcast, der kopiert werden soll und klicke auf ihn."
 
 #: web/templates/online-help.html:63
 msgid ""
 "Under the field &quot;Devices&quot; you see the link &quot;Subscribe to ... "
 "on other devices&quot; click on it."
 msgstr ""
+"Unter dem Feld &quot;Geräte&quot; findest du den Link &quot;Abonnieren auf ... "
+"auf einem anderen Gerät&quot;, klicke darauf."
 
 #: web/templates/online-help.html:65
 msgid ""
 "On the next page you can choose your desired device on which you want to "
 "copy the subscription."
 msgstr ""
+"Auf der nächsten Seite kannst du das Gerät aussuchen, auf welches du das "
+"Abonnement kopieren möchtest."
 
 #: web/templates/online-help.html:66
 msgid ""
 "After hitting the &quot;OK&quot;-button, the subscription has been copied."
 msgstr ""
+"Nach dem Bestätigen mit dem &quot;OK&quot;-Knopf wird das Abonnement kopiert."
 
 #: web/templates/podcast.html:7
 msgid "Unnamed Podcast"

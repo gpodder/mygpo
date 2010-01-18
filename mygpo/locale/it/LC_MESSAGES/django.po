@@ -19,7 +19,7 @@ msgstr ""
 #: api/models.py:187
 #, python-format
 msgid "Unnamed Device (%s)"
-msgstr "Dispositivo non nominato (%s)"
+msgstr "Strumento tecnico non nominato (%s)"
 
 #: web/forms.py:7
 msgid "Your Email Address"
@@ -31,19 +31,19 @@ msgstr "Possiamo usare i vostri abbonamenti per la classifica e per i suggerimen
 
 #: web/forms.py:11
 msgid "Name of this device"
-msgstr "Nome di questo dispositivo"
+msgstr "Nome di questo strumento tecnico"
 
 #: web/forms.py:12
 msgid "What kind of device is this?"
-msgstr "Che genere di dispositivo é questo?"
+msgstr "Che genere di strumento tecnico é questo?"
 
 #: web/forms.py:13
 msgid "What UID is configured on the physical device?"
-msgstr "Che tipo UID possiede questo dispositivo fisico?"
+msgstr "Che tipo UID possiede questo strumento tecnico fisico?"
 
 #: web/views.py:117
 msgid "With which client do you want to subscribe?"
-msgstr "Scegli un dispositivo per fare un' abbonamento"
+msgstr "Scegli un strumento tecnico per fare un' abbonamento"
 
 #: web/views.py:195
 #, python-format
@@ -52,7 +52,7 @@ msgstr "my.gpodder.org - Top %s"
 
 #: web/views.py:226
 msgid "Synchronize with the following devices"
-msgstr "Sincronizzazione dei dispositivi seguenti"
+msgstr "Sincronizzazione dei strumenti tecnici seguenti"
 
 #: web/templates/400.html:4
 msgid "Bad request"
@@ -125,7 +125,7 @@ msgstr "Corso temporale"
 #: web/templates/base.html:70 web/templates/podcast.html:29
 #: web/templates/podcast.html.py:83
 msgid "Devices"
-msgstr "Dispositivi"
+msgstr "Strumenti tecnici"
 
 #: web/templates/base.html:71
 msgid "Settings"
@@ -179,7 +179,7 @@ msgstr "Podcasts"
 
 #: web/templates/device.html:10
 msgid "You have subscribed the following podcasts on this device"
-msgstr "Ti sei abbonato i podcats seguenti sul tuo dispositivo."
+msgstr "Ti sei abbonato i podcats seguenti sul tuo strumento tecnico."
 
 #: web/templates/device.html:14 web/templates/podcast.html:60
 msgid "Title"
@@ -202,12 +202,12 @@ msgid ""
 "If you synchronize devices, they will always have the same subscriptions. A "
 "podcast that is subscribed on one device, will automatically be added to all "
 "synchronized devices."
-msgstr "Se sincronizzi alcuni dispositivi , lì saranno disponibili sempre gli stessi abbonamenti. Un podcast che è stato abbonato su un dispositivo, sarà trasmesso automaticamente a tutti gli dispositivi sincronizzati."
+msgstr "Se sincronizzi alcuni strumenti tecnici , lì saranno disponibili sempre gli stessi abbonamenti. Un podcast che è stato abbonato su un strumento tecnico, sarà trasmesso automaticamente a tutti gli strumenti tecnici sincronizzati."
 
 #: web/templates/device.html:34
 #, python-format
 msgid "%(devicename)s is currently not synchronized with other devices."
-msgstr "%(devicename)s al momento non è sincronizzato con altri dispositivi."
+msgstr "%(devicename)s al momento non è sincronizzato con altri strumenti tecnici."
 
 #: web/templates/device.html:38
 #, python-format
@@ -225,7 +225,7 @@ msgstr "OK"
 
 #: web/templates/devicelist.html:7
 msgid "Device List"
-msgstr "Lista dispositivi"
+msgstr "Lista strumenti tecnici"
 
 #: web/templates/devicelist.html:12
 msgid "Name"
@@ -293,7 +293,7 @@ msgstr "Azione"
 
 #: web/templates/history.html:15
 msgid "Device"
-msgstr "Dispositivo"
+msgstr "Strumento tecnico"
 
 #: web/templates/home-user.html:6
 msgid "my.gpodder.org"
@@ -323,7 +323,7 @@ msgid ""
 "using my.gpodder.org set up <a href=\"http://gpodder.org\">gPodder</a> with "
 "your username &ndash; <strong>%(username)s</strong> &ndash; and password and "
 "upload your podcasts. They will automatically show up here."
-msgstr "my.gpodder.org ti aiuta amministrare i tuoi podcast, i quali ti sei abbonato sui tuoi dispositivi - computer, portatile, dispositivi mobili. Per iniziare a usare my.gpodder.org installa <a href=\"http://gpodder.org\">gPodder</a> con il tuo username &ndash; <strong>%(username)s</strong> &ndash; e con la tua password. Poi carica i tuoi podcast. Saranno automaticamente indicati qui."
+msgstr "my.gpodder.org ti aiuta amministrare i tuoi podcast, i quali ti sei abbonato sui tuoi strumenti tecnici - computer, portatile, strumenti tecnici mobili. Per iniziare a usare my.gpodder.org installa <a href=\"http://gpodder.org\">gPodder</a> con il tuo username &ndash; <strong>%(username)s</strong> &ndash; e con la tua password. Poi carica i tuoi podcast. Saranno automaticamente indicati qui."
 
 #: web/templates/home.html:6
 msgid ""
