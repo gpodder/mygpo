@@ -87,6 +87,11 @@ table.list
     width: 100%;
 }
 
+table.list tr:hover td
+{
+    background-color: #ddd;
+}
+
 table.list th
 {
     text-align: left;

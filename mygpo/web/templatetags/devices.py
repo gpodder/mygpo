@@ -19,6 +19,10 @@ DEVICE_TYPE_ICONS = {
 }
 
 @register.filter
+def device_type(device):
+    return DEVICE_TYPES_DICT.get(device.type, _('Unknown'))
+
+@register.filter
 def device_icon(device, size=16):
     icon = DEVICE_TYPE_ICONS.get(device.type, None)
     caption = DEVICE_TYPES_DICT.get(device.type, None)
