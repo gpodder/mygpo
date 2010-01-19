@@ -65,7 +65,7 @@ def subscriptions(request, username, device_uid):
     elif request.method == 'POST':
         d, created = Device.objects.get_or_create(user=request.user, uid=device_uid, defaults = {'type': 'other', 'name': 'New Device'})
 
-        actions = json.loads(request.POST['data'])
+        actions = json.loads(request.raw_post_data)
         add = actions['add'] if 'add' in actions else []
         rem = actions['remove'] if 'remove' in actions else []
 
@@ -148,7 +148,7 @@ def episodes(request, username):
 
     if request.method == 'POST':
         try:
-            actions = json.loads(request.POST['data'])
+            actions = json.loads(request.raw_post_data)
         except KeyError:
             return HttpResponseBadRequest()
 
@@ -235,10 +235,12 @@ def device(request, username, device_uid):
     if request.user.username != username:
         return HttpResponseForbidden()
 
-    if request.method == 'POST':
+    # Workaround for mygpoclient 1.0: It uses "PUT" requests
+    # instead of "POST" requests for uploading device settings
+    if request.method ('POST', 'PUT'):
         d, created = Device.objects.get_or_create(user=request.user, uid=device_uid)
 
-        data = json.loads(request.POST['data'])
+        data = json.loads(request.raw_post_data)
 
         if 'caption' in data:
             d.name = data['caption']
