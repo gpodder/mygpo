@@ -37,7 +37,7 @@ BEGIN
 END $$
 DELIMITER ;
 
-
+DROP TABLE IF EXISTS `sanitizing_rules`;
 CREATE TABLE `sanitizing_rules` (
     `id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY,
     `use_podcast` bool NOT NULL,
