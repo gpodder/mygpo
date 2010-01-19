@@ -1,6 +1,8 @@
 from django import template
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext
+
+_ = ugettext
 
 from mygpo.api.models import DEVICE_TYPES
 
@@ -28,6 +30,7 @@ def device_icon(device, size=16):
     caption = DEVICE_TYPES_DICT.get(device.type, None)
 
     if icon is not None and caption is not None:
+        caption = ugettext(caption)
         html = ('<img src="/media/%(size)dx%(size)d/%(icon)s" '+
                 'alt="%(caption)s" class="device_icon"/>') % locals()
         return mark_safe(html)
