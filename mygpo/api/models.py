@@ -22,18 +22,18 @@ from django.utils.translation import ugettext as _
 import hashlib
 
 EPISODE_ACTION_TYPES = (
-        ('download', 'downloaded'),
-        ('play',     'played'),
-        ('delete',   'deleted'),
-        ('new',      'marked new')
+        ('download', _('downloaded')),
+        ('play',     _('played')),
+        ('delete',   _('deleted')),
+        ('new',      _('marked as new'))
     )
 
 DEVICE_TYPES = (
-        ('desktop', 'Desktop'),
-        ('laptop', 'Laptop'),
-        ('mobile', 'Mobile'),
-        ('server', 'Server'),
-        ('other', 'Other')
+        ('desktop', _('Desktop')),
+        ('laptop', _('Laptop')),
+        ('mobile', _('Cell phone')),
+        ('server', _('Server')),
+        ('other', _('Other'))
     )
 
 

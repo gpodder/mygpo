@@ -1,26 +1,36 @@
 from django import template
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
-import hashlib
+
+from mygpo.api.models import DEVICE_TYPES
 
 register = template.Library()
 
-@register.filter
-def device_icon(device,size=16):
-    if device.type == 'desktop':
-        s = '<img src="/media/%sx%s/computer.png" alt="%s" />' % (size, size, _('Desktop'))
-    elif device.type == 'laptop':
-        s = '<img src="/media/%sx%s/pda.png" alt="%s" />' % (size, size, _('Laptop'))
-    elif device.type == 'mobile':
-        s = '<img src="/media/%sx%s/multimedia-player.png" alt="%s" />' % (size, size, _('Mobile'))
-    elif device.type == 'server':
-        s = '<img src="/media/%sx%s/server.png" alt="%s" />' % (size, size, _('Server'))
-    else:
-        s = '<img src="/media/%sx%s/audio-x-generic.png" alt="%s" />' % (size, size, _('Other'))
+# Create a dictionary of device_type -> caption mappings
+DEVICE_TYPES_DICT = dict(DEVICE_TYPES)
 
-    return mark_safe(s)
+# This dictionary maps device types to their icon files
+DEVICE_TYPE_ICONS = {
+        'desktop': 'computer.png',
+        'laptop': 'stock_notebook.png',
+        'mobile': 'stock_cell-phone.png',
+        'server': 'server.png',
+        'other': 'audio-x-generic.png',
+}
+
+@register.filter
+def device_icon(device, size=16):
+    icon = DEVICE_TYPE_ICONS.get(device, None)
+    caption = DEVICE_TYPES_DICT.get(device, None)
+
+    if icon is not None and caption is not None:
+        html = ('<img src="/media/%(size)dx%(size)d/%(icon)s" '+
+                'alt="%(caption)s" class="device_icon"/>') % locals()
+        return mark_safe(html)
+
+    return ''
 
 @register.filter
 def device_list(devices):
     return mark_safe(', '.join([ '<a href="/device/%s">%s&nbsp;%s</a>' % (d.id, device_icon(d), d.name) for d in devices]))
-        
+
