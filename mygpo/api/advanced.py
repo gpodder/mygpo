@@ -70,13 +70,13 @@ def subscriptions(request, username, device_uid):
         rem = actions['remove'] if 'remove' in actions else []
 
         try:
-            updated_urls = update_subscriptions(request.user, d, add, rem)
+            update_urls = update_subscriptions(request.user, d, add, rem)
         except IntegrityError, e:
             return HttpResponseBadRequest(e)
 
         return JsonResponse({
             'timestamp': now_, 
-            'updated_urls': updated_urls 
+            'update_urls': update_urls,
             })
 
     else:
