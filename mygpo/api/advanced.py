@@ -71,7 +71,7 @@ def subscriptions(request, username, device_uid):
 
         try:
             updated_urls = update_subscriptions(request.user, d, add, rem)
-        except IntegrityError as e:
+        except IntegrityError, e:
             return HttpResponseBadRequest(e)
 
         return JsonResponse({
@@ -231,13 +231,12 @@ def update_episodes(user, actions):
 
 @require_valid_user
 def device(request, username, device_uid):
-
     if request.user.username != username:
         return HttpResponseForbidden()
 
     # Workaround for mygpoclient 1.0: It uses "PUT" requests
     # instead of "POST" requests for uploading device settings
-    if request.method ('POST', 'PUT'):
+    if request.method in ('POST', 'PUT'):
         d, created = Device.objects.get_or_create(user=request.user, uid=device_uid)
 
         data = json.loads(request.raw_post_data)

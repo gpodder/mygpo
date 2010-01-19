@@ -246,7 +246,7 @@ def device(request, device_id):
             try:
                 device.save()
                 success = True
-            except IntegrityError as ie:
+            except IntegrityError, ie:
                 device = Device.objects.get(pk=device_id)
                 error_message = _('You can\'t use the same UID for two devices.')
 
