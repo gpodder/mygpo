@@ -54,3 +54,6 @@ create unique index unique_subscription_meta on subscription (user_id, podcast_i
 
 create unique index unique_device_user_uid on device (user_id, uid);
 
+alter table subscription_log change timestamp timestamp datetime not null;
+alter table episode_log change timestamp timestamp datetime not null;
+
