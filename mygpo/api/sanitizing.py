@@ -170,7 +170,7 @@ def rewrite_episode_actions(e_old, e_new):
 def precompile_rules(rules=URLSanitizingRule.objects.all().order_by('priority')):
     rules_p = []
     for rule in rules:
-        r = re.compile(rule.search)
+        r = re.compile(rule.search, re.UNICODE)
         rule.search_precompile = r
         rules_p.append( rule )
 
