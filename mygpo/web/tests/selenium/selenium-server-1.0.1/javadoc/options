@@ -1,0 +1,19 @@
+-classpath 'C:/hudson/workspace/selenium-rc-trunk-win-headless/trunk/server-coreless/target/classes;c:/hudson/workspace/selenium-rc-trunk-win-headless/tmp/bouncycastle/bcprov-jdk15/135/bcprov-jdk15-135.jar;c:/hudson/workspace/selenium-rc-trunk-win-headless/tmp/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar;c:/hudson/workspace/selenium-rc-trunk-win-headless/tmp/org/apache/ant/ant-launcher/1.7.1/ant-launcher-1.7.1.jar;c:/hudson/workspace/selenium-rc-trunk-win-headless/tmp/org/apache/ant/ant/1.7.1/ant-1.7.1.jar;c:/hudson/workspace/selenium-rc-trunk-win-headless/tmp/javax/servlet/servlet-api/2.4/servlet-api-2.4.jar;c:/hudson/workspace/selenium-rc-trunk-win-headless/tmp/jetty/org.mortbay.jetty/5.1.12/org.mortbay.jetty-5.1.12.jar;c:/hudson/workspace/selenium-rc-trunk-win-headless/tmp/commons-codec/commons-codec/1.3/commons-codec-1.3.jar'
+ -encoding
+'ISO-8859-1'
+-protected
+-sourcepath
+'C:/hudson/workspace/selenium-rc-trunk-win-headless/trunk/server-coreless/src/main/java'
+-author
+-bottom
+'Copyright &#169; 2009. All Rights Reserved.'
+-charset
+'ISO-8859-1'
+-d
+'C:/hudson/workspace/selenium-rc-trunk-win-headless/trunk/server-coreless/target/apidocs'
+-doctitle
+'Selenium RC Server (Coreless) 1.0.1 API'
+-use
+-version
+-windowtitle
+'Selenium RC Server (Coreless) 1.0.1 API'
