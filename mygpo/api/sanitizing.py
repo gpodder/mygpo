@@ -135,7 +135,7 @@ def rewrite_podcasts(p_old, p_new):
             log('updating subscription action %s (device %s, action %s, timestamp %s, podcast %s => %s)' % (sa.id, sa.device.id, sa.action, sa.timestamp, sa.podcast.id, p_new.id))
             sa.podcast = p_new
             sa.save()
-        except Exception as e:
+        except Exception, e:
             log('error updating subscription action %s: %s, deleting' % (sa.id, e))
             sa.delete()
 
@@ -163,14 +163,14 @@ def rewrite_episode_actions(e_old, e_new):
             ea.epsidode = e_new
             ea.save()
 
-        except Exception as e:
+        except Exception, e:
             log('error updating episode action %s: %s, deleting' % (sa.id, e))
 
 
 def precompile_rules(rules=URLSanitizingRule.objects.all().order_by('priority')):
     rules_p = []
     for rule in rules:
-        r = re.compile(rule.search)
+        r = re.compile(rule.search, re.UNICODE)
         rule.search_precompile = r
         rules_p.append( rule )
 

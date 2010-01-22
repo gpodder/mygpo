@@ -21,29 +21,7 @@ from datetime import datetime
 from django.utils.translation import ugettext as _
 import hashlib
 
-EPISODE_ACTION_TYPES = (
-        ('download', 'downloaded'),
-        ('play',     'played'),
-        ('delete',   'deleted'),
-        ('new',      'marked new')
-    )
-
-DEVICE_TYPES = (
-        ('desktop', 'Desktop'),
-        ('laptop', 'Laptop'),
-        ('mobile', 'Mobile'),
-        ('server', 'Server'),
-        ('other', 'Other')
-    )
-
-
-SUBSCRIBE_ACTION = 1
-UNSUBSCRIBE_ACTION = -1
-
-SUBSCRIPTION_ACTION_TYPES = (
-        (SUBSCRIBE_ACTION, 'subscribed'),
-        (UNSUBSCRIBE_ACTION, 'unsubscribed')
-    )
+from mygpo.api.constants import EPISODE_ACTION_TYPES, DEVICE_TYPES, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SUBSCRIPTION_ACTION_TYPES
 
 class UserProfile(models.Model):
     user = models.ForeignKey(User, unique=True, db_column='user_ptr_id')

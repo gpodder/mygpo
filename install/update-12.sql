@@ -55,7 +55,7 @@ OPEN cur1;
 END $$
 DELIMITER ;
 
-
+DROP TABLE IF EXISTS `sanitizing_rules`;
 CREATE TABLE `sanitizing_rules` (
     `id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY,
     `use_podcast` bool NOT NULL,
@@ -72,5 +72,6 @@ create unique index unique_subscription_meta on subscription (user_id, podcast_i
 
 create unique index unique_device_user_uid on device (user_id, uid);
 
-
+alter table subscription_log change timestamp timestamp datetime not null;
+alter table episode_log change timestamp timestamp datetime not null;
 
