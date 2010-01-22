@@ -19,6 +19,7 @@ from mygpo.api.basic_auth import require_valid_user
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, Http404, HttpResponseNotAllowed
 from mygpo.api.models import Device, Podcast, SubscriptionAction, Episode, EpisodeAction, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, EPISODE_ACTION_TYPES, DEVICE_TYPES, Subscription
 from mygpo.api.httpresponse import JsonResponse
+from mygpo.api.sanitizing import sanitize_url
 from django.core import serializers
 from time import mktime
 from datetime import datetime, timedelta
@@ -64,37 +65,58 @@ def subscriptions(request, username, device_uid):
     elif request.method == 'POST':
         d, created = Device.objects.get_or_create(user=request.user, uid=device_uid, defaults = {'type': 'other', 'name': 'New Device'})
 
-        actions = json.loads(request.POST['data'])
+        actions = json.loads(request.raw_post_data)
         add = actions['add'] if 'add' in actions else []
         rem = actions['remove'] if 'remove' in actions else []
 
-        for a in add:
-            if a in rem:
-                return HttpResponseBadRequest('can not add and remove %s at the same time' % a)
+        try:
+            update_urls = update_subscriptions(request.user, d, add, rem)
+        except IntegrityError, e:
+            return HttpResponseBadRequest(e)
 
-        update_subscriptions(request.user, d, add, rem)
-
-        return JsonResponse({'timestamp': now_})
+        return JsonResponse({
+            'timestamp': now_, 
+            'update_urls': update_urls,
+            })
 
     else:
         return HttpResponseNotAllowed(['GET', 'POST'])
 
 
 def update_subscriptions(user, device, add, remove):
-    for a in add:
+    updated_urls = []
+    add_sanitized = []
+    rem_sanitized = []
+
+    for u in add:
+        us = sanitize_url(u)
+        if u != us:  updated_urls.append( (u, us) )
+        if us != '': add_sanitized.append(us)
+
+    for u in remove:
+        us = sanitize_url(u)
+        if u != us:  updated_urls.append( (u, us) )
+        if us != '': rem_sanitized.append(us)
+
+    for a in add_sanitized:
+        if a in rem_sanitized:
+           raise IntegrityError('can not add and remove %s at the same time' % a)
+
+    for a in add_sanitized:
         p, p_created = Podcast.objects.get_or_create(url=a)
         try:
             s = SubscriptionAction.objects.create(podcast=p,device=device,action=SUBSCRIBE_ACTION)
         except IntegrityError, e:
             log('can\'t add subscription %s for user %s: %s' % (a, user, e))
 
-    for r in remove:
+    for r in rem_sanitized:
         p, p_created = Podcast.objects.get_or_create(url=r)
         try:
             s = SubscriptionAction.objects.create(podcast=p,device=device,action=UNSUBSCRIBE_ACTION)
         except IntegrityError, e:
             log('can\'t remove subscription %s for user %s: %s' % (r, user, e))
 
+    return updated_urls
 
 def get_subscription_changes(user, device, since, until):
     actions = {}
@@ -126,7 +148,7 @@ def episodes(request, username):
 
     if request.method == 'POST':
         try:
-            actions = json.loads(request.POST['data'])
+            actions = json.loads(request.raw_post_data)
         except KeyError:
             return HttpResponseBadRequest()
 
@@ -209,14 +231,15 @@ def update_episodes(user, actions):
 
 @require_valid_user
 def device(request, username, device_uid):
-
     if request.user.username != username:
         return HttpResponseForbidden()
 
-    if request.method == 'POST':
+    # Workaround for mygpoclient 1.0: It uses "PUT" requests
+    # instead of "POST" requests for uploading device settings
+    if request.method in ('POST', 'PUT'):
         d, created = Device.objects.get_or_create(user=request.user, uid=device_uid)
 
-        data = json.loads(request.POST['data'])
+        data = json.loads(request.raw_post_data)
 
         if 'caption' in data:
             d.name = data['caption']

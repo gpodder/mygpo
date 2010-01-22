@@ -25,6 +25,7 @@ from mygpo.api.opml import Exporter
 from django.utils.translation import ugettext as _
 from mygpo.api.basic_auth import require_valid_user
 from django.contrib.auth.decorators import login_required
+from django.db import IntegrityError
 from datetime import datetime
 import re
 
@@ -222,6 +223,7 @@ def device(request, device_id):
     synced_with = list(device.sync_group.devices()) if device.sync_group else []
     if device in synced_with: synced_with.remove(device)
     success = False
+    error_message = None
     sync_form = SyncForm()
     sync_form.set_targets(device.sync_targets(), _('Synchronize with the following devices'))
 
@@ -232,8 +234,12 @@ def device(request, device_id):
             device.name = device_form.cleaned_data['name']
             device.type = device_form.cleaned_data['type']
             device.uid  = device_form.cleaned_data['uid']
-            device.save()
-            success = True
+            try:
+                device.save()
+                success = True
+            except IntegrityError, ie:
+                device = Device.objects.get(pk=device_id)
+                error_message = _('You can\'t use the same UID for two devices.')
 
     else:
         device_form = DeviceForm({
@@ -247,6 +253,7 @@ def device(request, device_id):
         'device_form': device_form,
         'sync_form': sync_form,
         'success': success,
+        'error_message': error_message,
         'subscriptions': subscriptions,
         'synced_with': synced_with,
         'has_sync_targets': len(device.sync_targets()) > 0

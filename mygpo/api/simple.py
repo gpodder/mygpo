@@ -20,6 +20,7 @@ from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbid
 from mygpo.api.models import Device, SubscriptionAction, Podcast, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, ToplistEntry, SuggestionEntry
 from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
+from mygpo.api.sanitizing import sanitize_url
 from django.core import serializers
 from datetime import datetime
 from mygpo.api.httpresponse import HttpErrorResponse
@@ -107,14 +108,19 @@ def parse_subscription(raw_post_data, format, user, device_uid):
     else:
         urls = []
         format_ok = False
+
+    urls_sanitized = []
+    for u in urls:
+        us = sanitize_url(u)
+        if us != '': urls_sanitized.append(us)
     
     d, created = Device.objects.get_or_create(user=user, uid=device_uid, 
                 defaults = {'type': 'other', 'name': device_uid})
 
     podcasts = [p.podcast for p in d.get_subscriptions()]
     old = [p.url for p in podcasts]    
-    new = [p for p in urls if p not in old]
-    rem = [p for p in old if p not in urls]
+    new = [p for p in urls_sanitized if p not in old]
+    rem = [p for p in old if p not in urls_sanitized]
 
     return format_ok, new, rem, d
 

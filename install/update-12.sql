@@ -36,3 +36,24 @@ BEGIN
 
 END $$
 DELIMITER ;
+
+DROP TABLE IF EXISTS `sanitizing_rules`;
+CREATE TABLE `sanitizing_rules` (
+    `id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    `use_podcast` bool NOT NULL,
+    `use_episode` bool NOT NULL,
+    `search` varchar(100) NOT NULL,
+    `replace` varchar(100) NOT NULL,
+    `priority` integer UNSIGNED NOT NULL,
+    `description` longtext NOT NULL
+);
+
+alter table subscription add column id int unique auto_increment;
+
+create unique index unique_subscription_meta on subscription (user_id, podcast_id);
+
+create unique index unique_device_user_uid on device (user_id, uid);
+
+alter table subscription_log change timestamp timestamp datetime not null;
+alter table episode_log change timestamp timestamp datetime not null;
+

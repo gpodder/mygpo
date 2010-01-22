@@ -87,6 +87,11 @@ table.list
     width: 100%;
 }
 
+table.list tr:hover td
+{
+    background-color: #ddd;
+}
+
 table.list th
 {
     text-align: left;
@@ -130,6 +135,12 @@ h1, h2
 }
 
 
+img.device_icon
+{
+    padding: 3px;
+    vertical-align: middle;
+}
+
 ul.devices li.desktop
 {
     list-style-image: url('16x16/computer.png');
@@ -137,12 +148,12 @@ ul.devices li.desktop
 
 ul.devices li.laptop
 {
-    list-style-image: url('16x16/pda.png');
+    list-style-image: url('16x16/stock_notebook.png');
 }
 
 ul.devices li.mobile
 {
-    list-style-image: url('16x16/multimedia-player.png');
+    list-style-image: url('16x16/stock_cell-phone.png');
 }
 
 ul.devices li.server
