@@ -170,7 +170,7 @@ class Device(models.Model):
 
     def sync(self):
         for s in self.get_sync_actions():
-            SubscriptionAction.objects.create(device=self, podcast=s.podcast, timestamp=s.timestamp, action=s.action)
+            SubscriptionAction.objects.create(device=self, podcast=s.podcast, action=s.action)
 
     def sync_targets(self):
         """
