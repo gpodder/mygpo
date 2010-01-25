@@ -96,31 +96,36 @@ def devices(request):
 @login_required
 def podcast_subscribe(request, pid):
     podcast = Podcast.objects.get(pk=pid)
+    error_message = None
 
     if request.method == 'POST':
         form = SyncForm(request.POST)
 
-        target = form.get_target()
+        try:
+            target = form.get_target()
 
-        if isinstance(target, SyncGroup):
-            device = target.devices()[0]
-        else:
-            device = target
+            if isinstance(target, SyncGroup):
+                device = target.devices()[0]
+            else:
+                device = target
 
-        SubscriptionAction.objects.create(podcast=podcast, device=device, action=SUBSCRIBE_ACTION)
+            SubscriptionAction.objects.create(podcast=podcast, device=device, action=SUBSCRIBE_ACTION)
 
-        return HttpResponseRedirect('/podcast/%s' % podcast.id)
+            return HttpResponseRedirect('/podcast/%s' % podcast.id)
 
-    else:
-        targets = podcast.subscribe_targets(request.user)
+        except ValueError, e:
+            error_message = _('Could not subscribe to the podcast: %s' % e)
 
-        form = SyncForm()
-        form.set_targets(targets, _('With which client do you want to subscribe?'))
+    targets = podcast.subscribe_targets(request.user)
 
-        return render_to_response('subscribe.html', {
-            'podcast': podcast,
-            'form': form
-        }, context_instance=RequestContext(request))
+    form = SyncForm()
+    form.set_targets(targets, _('With which client do you want to subscribe?'))
+
+    return render_to_response('subscribe.html', {
+        'error_message': error_message,
+        'podcast': podcast,
+        'form': form
+    }, context_instance=RequestContext(request))
 
 @login_required
 def podcast_unsubscribe(request, pid, device_id):
@@ -216,15 +221,6 @@ def suggestions(request):
     }, context_instance=RequestContext(request))
 
 
-@require_valid_user
-def suggestions_opml(request, count):
-    entries = SuggestionEntry.forUser(request.user)
-    exporter = Exporter(_('my.gpodder.org - %s Suggestions') % count)
-
-    opml = exporter.generate([e.podcast for e in entries])
-
-    return HttpResponse(opml, mimetype='text/xml')
-
 @login_required
 def device(request, device_id):
     device = Device.objects.get(pk=device_id)
@@ -246,7 +242,7 @@ def device(request, device_id):
             try:
                 device.save()
                 success = True
-            except IntegrityError as ie:
+            except IntegrityError, ie:
                 device = Device.objects.get(pk=device_id)
                 error_message = _('You can\'t use the same UID for two devices.')
 
@@ -279,11 +275,14 @@ def device_sync(request, device_id):
     if not form.is_valid():
         return HttpResponseBadRequest('invalid')
 
-    target = form.get_target()
+    try:
+        target = form.get_target()
 
-    device = Device.objects.get(pk=device_id)
+        device = Device.objects.get(pk=device_id)
+        device.sync_with(target)
 
-    device.sync_with(target)
+    except ValueError, e:
+        log('error while syncing device %s: %s' % (device_id, e))
 
     return HttpResponseRedirect('/device/%s' % device_id)
 

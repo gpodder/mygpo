@@ -17,7 +17,7 @@
 
 from mygpo.api.basic_auth import require_valid_user
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
-from mygpo.api.models import Device, SubscriptionAction, Podcast, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, ToplistEntry
+from mygpo.api.models import Device, SubscriptionAction, Podcast, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, ToplistEntry, SuggestionEntry
 from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url
@@ -146,43 +146,34 @@ def set_subscriptions(subscriptions):
     return HttpResponse('', mimetype='text/plain')
 
 #get toplist
-def toplist(request, number, format):
+def toplist(request, count, format):
     if request.method == 'GET':
-        if int(number) not in range(1,100):
-            print number
-            number = 100
-        return format_toplist(get_toplist(number), number, format)
+        if int(count) not in range(1,100):
+            count = 100
+        return format_toplist(get_toplist(count), count, format)
     else:
         return HttpResponseBadRequest('Invalid request')
 
 
-def get_toplist(number):
-    entries = ToplistEntry.objects.all().order_by('-subscriptions')[:number]
-    toplist = []
-    for e in entries:
-        pid = e.podcast_id
-        p = Podcast.objects.get(pk=pid)
-        entry = {'url':p.url, 'title':p.title, 'description':p.description, 'subscribers':e.subscriptions, 'subscribers_last_week':e.oldplace}
-        toplist.append(entry)
-        
-    return toplist
+def get_toplist(count):        
+    return ToplistEntry.objects.all().order_by('-subscriptions')[:int(count)]
 
 
-def format_toplist(toplist, number, format): 
+def format_toplist(toplist, count, format): 
     if format == 'txt':
-        urls = [t['url'] for t in toplist]
+        urls = [t.podcast.url for t in toplist]
         s = '\n'.join(urls)
         s += '\n'
         return HttpResponse(s, mimetype='text/plain')
 
     elif format == 'opml':
-        title = 'Top %d' % number
-        exporter = Exporter(title)
-        opml = exporter.generate(toplist)
+        exporter = Exporter('my.gpodder.org - Top %s' % count)
+        opml = exporter.generate([t.podcast for t in toplist])
         return HttpResponse(opml, mimetype='text/xml')
 
     elif format == 'json':
-        return JsonResponse(toplist)
+        json = [{'url':t.podcast.url, 'title':t.podcast.title, 'description':t.podcast.description, 'subscribers':t.subscriptions, 'subscribers_last_week':t.oldplace} for t in toplist]
+        return JsonResponse(json)
         
     else: 
         return HttpResponseBadRequest('Invalid format')
@@ -218,13 +209,45 @@ def format_results(results, format):
         return HttpResponse(s, mimetype='text/plain')
 
     elif format == 'opml':
-        title = 'Search results'
-        exporter = Exporter(title)
+        exporter = Exporter('my.gpodder.org - Search')
         opml = exporter.generate(results)
         return HttpResponse(opml, mimetype='text/xml')
 
     elif format == 'json':
         json = [{'url':p.url, 'title':p.title, 'description':p.description} for p in results]
+        return JsonResponse(json)
+        
+    else: 
+        return HttpResponseBadRequest('Invalid format')
+       
+#get suggestions
+@require_valid_user
+def suggestions(request, count, format):
+    if request.method == 'GET':
+        if int(count) not in range(1,100):
+            count = 100
+        return format_suggestions(get_suggestions(request.user, count), count, format)
+    else:
+        return HttpResponseBadRequest('Invalid request')
+        
+def get_suggestions(user, count):
+    suggestions = SuggestionEntry.forUser(user)[:int(count)]
+    return [s.podcast for s in suggestions]
+    
+def format_suggestions(suggestions, count, format):
+    if format == 'txt':
+        urls = [s.url for s in suggestions]
+        s = '\n'.join(urls)
+        s += '\n'
+        return HttpResponse(s, mimetype='text/plain')
+
+    elif format == 'opml':
+        exporter = Exporter('my.gpodder.org - %s Suggestions' % count)
+        opml = exporter.generate(suggestions)
+        return HttpResponse(opml, mimetype='text/xml')
+
+    elif format == 'json':
+        json = [{'url':p.url, 'title':p.title, 'description':p.description} for p in suggestions]
         return JsonResponse(json)
         
     else: 
