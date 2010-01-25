@@ -57,6 +57,7 @@ def maintenance():
     merged = 0
     updated = 0
     deleted = 0
+    error = 0
 
     count = 0
 
@@ -66,39 +67,63 @@ def maintenance():
     for p in podcasts:
         count += 1
         if (count % 100) == 0: print '%s %% (podcast id %s)' % (((count + 0.0)/podcasts.count()*100), p.id)
-        su = sanitize_url(p.url, rules)
+        try:
+            su = sanitize_url(p.url, rules)
+        except Exception, e:
+            log('failed to sanitize url for podcast %s: %s' % (p.id, e))
+            error += 1
+            continue
+
+        # nothing to do
         if su == p.url: 
             unchanged += 1
             continue
 
+        # invalid podcast, remove
         if su == '':
-            delete_podcast(p)
-            deleted += 1
+            try:
+                delete_podcast(p)
+                deleted += 1
+            except Exception, e:
+                log('failed to delete podcast %s: %s' % (p.id, e))
+                error += 1
+
             continue
-    
+
         try:
             su_podcast = Podcast.objects.get(url=su)
 
-            if p == su_podcast:
-                unchanged += 1
-                continue
+        except Podcast.DoesNotExist, e:
+            # "target" podcast does not exist, we simply change the url
+            log('updating podcast %s - "%s" => "%s"' % (p.id, p.url, su))
+            p.url = su
+            p.save()
+            updated += 1
+            continue
 
+        # nothing to do
+        if p == su_podcast:
+            unchanged += 1
+            continue
+
+        # last option - merge podcasts
+        try:
             rewrite_podcasts(p, su_podcast)
             tmp = Subscription.objects.filter(podcast=p)
             if tmp.count() > 0: print tmp.count()
             p.delete()
             merged += 1
 
-        except Podcast.DoesNotExist, e:
-            log('updating podcast %s - "%s" => "%s"' % (p.id, p.url, su))
-            p.url = su
-            p.save()
-            updated += 1
+        except Exception, e:
+            log('error rewriting podcast %s: %s' % (p.id, e))
+            error += 1
+            continue
 
     print ' * %s unchanged' % unchanged
     print ' * %s merged' % merged
     print ' * %s updated' % updated
     print ' * %s deleted' % deleted
+    print ' * %s error' % error
 
 
 def delete_podcast(p):
