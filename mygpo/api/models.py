@@ -330,7 +330,10 @@ class Subscription(models.Model):
             return SubscriptionMeta.objects.get(user=self.user, podcast=self.podcast)
         except SubscriptionMeta.DoesNotExist:
             return SubscriptionMeta(user=self.user, podcast=self.podcast)
-
+    #this method has to be overwritten, if not it tries to delete a view
+    def delete(self):
+        pass
+    
     class Meta:
         db_table = 'current_subscription'
         #not available in Django 1.0 (Debian stable)

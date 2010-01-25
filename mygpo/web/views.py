@@ -299,4 +299,11 @@ def podcast_subscribe_url(request):
             defaults={'title':url,'description':url,'last_update':datetime.now()})
             
     return HttpResponseRedirect('/podcast/%d/subscribe' % podcast.pk)
+
+@login_required
+def delete_account(request):
+    user = request.user
+    user.delete()
+    logout
+    return render_to_response('delete_account.html')
     
