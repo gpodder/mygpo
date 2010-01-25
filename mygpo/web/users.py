@@ -25,6 +25,8 @@ from registration.forms import RegistrationForm
 from registration.views import activate, register
 from registration.models import RegistrationProfile
 from mygpo.api.models import UserProfile
+from django.contrib.sites.models import Site
+from django.conf import settings
 
 def login_user(request):
        try:
@@ -36,10 +38,12 @@ def login_user(request):
        user = authenticate(username=username, password=password)
        if user is not None:
               login(request, user)
+              current_site = Site.objects.get(id=settings.SITE_ID)
 
               try:
                   if user.get_profile().generated_id:
                       return render_to_response('migrate.html', {
+                           'url': current_site,
                            'username': user
                       })
               except UserProfile.DoesNotExist:
@@ -63,10 +67,11 @@ def migrate_user(request):
         username = user.username
 
     if user.username != username:
+        current_site = Site.objects.get(id=settings.SITE_ID)
         if User.objects.filter(username__exact=username).count() > 0:
-            return render_to_response('migrate.html', {'error_message': '%s is already taken' % username, 'username': user.username})
+            return render_to_response('migrate.html', {'error_message': '%s is already taken' % username, 'url': current_site, 'username': user.username})
         if slugify(username) != username:
-            return render_to_response('migrate.html', {'error_message': '%s is not a valid username. Please use characters, numbers, underscore and dash only.' % username, 'username': user.username})
+            return render_to_response('migrate.html', {'error_message': '%s is not a valid username. Please use characters, numbers, underscore and dash only.' % username, 'url': current_site, 'username': user.username})
         else:
             user.username = username
             user.save()
