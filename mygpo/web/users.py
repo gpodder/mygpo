@@ -39,7 +39,7 @@ def login_user(request):
        user = authenticate(username=username, password=password)
        if user is not None:
               login(request, user)
-              current_site = Site.objects.get(id=settings.SITE_ID)
+              current_site = Site.objects.get_current()
 
               try:
                   if user.get_profile().generated_id:
