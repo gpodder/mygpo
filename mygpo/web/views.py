@@ -69,7 +69,11 @@ def create_subscriptionlist(request):
     return l.values()
 
 def podcast(request, pid):
-    podcast = Podcast.objects.get(pk=pid)
+    try:
+        podcast = Podcast.objects.get(pk=pid)
+    except Podcast.DoesNotExist:
+        raise Http404('There is no podcast with id %s' % pid)
+
     if request.user.is_authenticated():        
         devices = Device.objects.filter(user=request.user)
         history = SubscriptionAction.objects.filter(podcast=podcast,device__in=devices).order_by('-timestamp')
