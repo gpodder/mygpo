@@ -67,23 +67,32 @@ def create_subscriptionlist(request):
 
     return l.values()
 
-@login_required
 def podcast(request, pid):
-    podcast = Podcast.objects.get(pk=pid)
-    devices = Device.objects.filter(user=request.user)
-    history = SubscriptionAction.objects.filter(podcast=podcast,device__in=devices).order_by('-timestamp')
-    subscribed_devices = [s.device for s in Subscription.objects.filter(podcast=podcast,user=request.user)]
-    subscribe_targets = podcast.subscribe_targets(request.user)
-    episodes = episode_list(podcast, request.user)
-    unsubscribe = '/podcast/' + pid + '/unsubscribe'
-    return render_to_response('podcast.html', {
-        'history': history,
-        'podcast': podcast,
-        'devices': subscribed_devices,
-        'can_subscribe': len(subscribe_targets) > 0,
-        'episodes': episodes,
-        'unsubscribe': unsubscribe,
-    }, context_instance=RequestContext(request))
+    if request.user.is_authenticated():
+        podcast = Podcast.objects.get(pk=pid)
+        devices = Device.objects.filter(user=request.user)
+        history = SubscriptionAction.objects.filter(podcast=podcast,device__in=devices).order_by('-timestamp')
+        subscribed_devices = [s.device for s in Subscription.objects.filter(podcast=podcast,user=request.user)]
+        subscribe_targets = podcast.subscribe_targets(request.user)
+        episodes = episode_list(podcast, request.user)
+        unsubscribe = '/podcast/' + pid + '/unsubscribe'
+        return render_to_response('podcast.html', {
+            'history': history,
+            'podcast': podcast,
+            'devices': subscribed_devices,
+            'can_subscribe': len(subscribe_targets) > 0,
+            'episodes': episodes,
+            'unsubscribe': unsubscribe,
+        }, context_instance=RequestContext(request))
+    else:
+        podcast = Podcast.objects.get(pk=pid)
+        current_site = Site.objects.get_current()
+
+        return render_to_response('podcast.html', {
+            'podcast': podcast,   
+            'url': current_site,
+            'anonymous': True         
+        }, context_instance=RequestContext(request))
 
 def history(request, len=20):
     devices = Device.objects.filter(user=request.user)
