@@ -15,10 +15,15 @@
    <p class="description">{{ podcast.description }}</p>
   {% endif %}
 
-  <form action="" method="post">
-   {{ form.as_p }}
-   <input type="submit" value="{% trans "OK" %}" />
-  </form>
+  {% if can_subscribe %}
+   <form action="" method="post">
+    {{ form.as_p }}
+    <input type="submit" value="{% trans "OK" %}" />
+   </form>
+  {% else %}
+   <p>{% trans "You can't subscribe to this podcast, because you don't have any devices (on which you don't have subscribed to the podcast already." %}</p>
+   <p>{% blocktrans %}If you're new here, you should start by reading our <a href="/online-help/">introduction</a>.{% endblocktrans %}</p>
+  {% endif %}
 
   {% if not podcast.title %}
    <div class="info"><strong>{% trans "Why Unnamed Podcast?" %}</strong> {% trans "Because we display names after we have fetched the information form the feed -- and this may take some time. Until this is completed, the podcast will simply be called this way." %}</div>

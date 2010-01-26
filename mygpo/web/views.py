@@ -138,6 +138,7 @@ def podcast_subscribe(request, pid):
     return render_to_response('subscribe.html', {
         'error_message': error_message,
         'podcast': podcast,
+        'can_subscribe': len(targets) > 0,
         'form': form
     }, context_instance=RequestContext(request))
 
