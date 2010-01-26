@@ -230,3 +230,54 @@ div.devicesClear
     clear:left;
 }
 
+
+form.search input[type="text"]
+{
+    width: 70%;
+    display: inline;
+}
+
+form.search ul
+{
+    display: inline;
+}
+
+form.search ul li
+{
+    list-style: none;
+    display: inline;
+}
+
+form.search input[type="submit"]
+{
+    display: inline;
+}
+
+div.result img
+{
+    float: left;
+}
+
+div.result a.podcast
+{
+    font-size: 1.2em;
+    color: black;
+    padding-top: 2em;
+    font-weight: bold;
+    display: block;
+}
+
+div.result span.episode
+{
+    display: list-item;
+    margin-left: 2em;
+}
+
+div.result span.episode a
+{
+    color: black;
+}
+
+div.result
+{
+}

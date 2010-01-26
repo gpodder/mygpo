@@ -1,37 +1,42 @@
 {% extends 'base.html' %}
 
 {% load i18n %}
+{% load podcasts %}
 
 {% block content %}
     <h2>{% trans "Search" %}</h2>
 
-    <form method="get" action=".">
-        <table>
-            {{ form.as_table }}
-            <tr>
-                <td>&nbsp;</td>
-                <td>
-                    <input type="submit" value="Search">
-                </td>
-            </tr>
-        </table>
+    <form method="get" action="." class="search">
 
-        {% if query %}
-            <h3>{% trans "Results" %}</h3>
+     {% for field in form %}
+      {{ field.errors }}
+      {{ field }}
+     {% endfor %}
 
-            {% for result in page.object_list %}
-                <p>
-                  {% ifequal result.model_name "podcast" %}
-                    <a href="/podcast/{{ result.pk }}">{{ result.object }}</a>
-                  {% endifequal %}
-                  {% ifequal result.model_name "episode" %}
-                    <a href="/episode/{{ result.pk }}">{{ result.object }}</a>
-                  {% endifequal %}
-                </p>
-            {% endfor %}
-        {% else %}
-            {# Show some example queries to run, maybe query syntax, something else? #}
-        {% endif %}
+     <input type="submit" value="Search">
     </form>
+
+    {% if query %}
+     <h3>{% trans "Results" %}</h3>
+
+     {% for result in page.object_list %}
+      <div class="result">
+       {% ifequal result.model_name "podcast" %}
+        <a class="podcast" href="/podcast/{{ result.pk }}">{{ result.object }}</a>
+        <span class="description">{{ result.object.description|default:""|truncatewords:"15" }}</span>
+       {% endifequal %}
+
+       {% ifequal result.model_name "episode" %}
+         {% ifchanged result.object.podcast %}
+         <a class="podcast" href="/podcast/{{ result.object.podcast.id }}">{{ result.object.podcast }}</a>
+          {% endifchanged %}
+         <span class="episode">
+          <a class="episode" href="/episode/{{ result.pk }}">{{ result.object.title }}</a>
+          <span class="description">{{ result.object.description|default:""|truncatewords:"15" }}</span>
+         </span>
+       {% endifequal %}
+      </div>
+     {% endfor %}
+    {% endif %}
 {% endblock %}
 
