@@ -112,6 +112,19 @@ table td.numeric
     text-align: right;
 }
 
+table.list tr.group
+{
+    font-weight: bold;
+    height: 3em;
+    vertical-align: bottom;
+}
+
+table.list tr.group:hover td
+{
+    /* don't show hover effect for group rows */
+    background-color: inherit;
+}
+
 .description
 {
     color: #666;

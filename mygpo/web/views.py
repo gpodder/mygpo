@@ -106,7 +106,7 @@ def history(request, len=20):
     }, context_instance=RequestContext(request))
 
 def devices(request):
-    devices = Device.objects.filter(user=request.user,deleted=False)
+    devices = Device.objects.filter(user=request.user,deleted=False).order_by('sync_group')
     return render_to_response('devicelist.html', {
         'devices': devices,
     }, context_instance=RequestContext(request))

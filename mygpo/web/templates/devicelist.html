@@ -13,6 +13,15 @@
      <th>{% trans "UID" %}</th>
     </tr>
     {% for d in devices %}
+     {% ifchanged d.sync_group %}
+      <tr class="group">
+       <td colspan="3">
+        {% if not d.sync_group %}{% trans "Not synchronized" %}
+        {% else %}{% trans "Synchronized" %}
+        {% endif %}
+       </td>
+      </tr>
+     {% endifchanged %}
      <tr>
       <td><a href="/device/{{ d.id }}">{{ d|device_icon }}{{ d.name }}</a></td>
       <td>{{ d|device_type }}</td>
