@@ -29,6 +29,7 @@ from django.db import IntegrityError
 from datetime import datetime
 from django.contrib.sites.models import Site
 from django.conf import settings
+from mygpo.api.sanitizing import sanitize_url
 import re
 
 def home(request):
@@ -339,8 +340,12 @@ def podcast_subscribe_url(request):
     if url == None:
         raise Http404('http://my.gpodder.org/subscribe?url=http://www.example.com/podcast.xml')
 
-    podcast, created = Podcast.objects.get_or_create(url=url,
-            defaults={'title':url,'description':url,'last_update':datetime.now()})
+    url = sanitize_url(url)
+
+    if url == '':
+        raise Http404('Please specify a valid url')
+
+    podcast, created = Podcast.objects.get_or_create(url=url)
 
     return HttpResponseRedirect('/podcast/%d/subscribe' % podcast.pk)
 
