@@ -3,6 +3,10 @@
 {% load devices %}
 
 {% block content %}
+{% if deletedevice_success %}
+   <div class="success">{% blocktrans %}The device {{ device_name }} has been deleted.{% endblocktrans %}</div>
+{% endif %}
+
 <h1>{% trans "Your Subscriptions" %}</h1>
 
  {% if not subscriptionlist|length_is:"0" %}

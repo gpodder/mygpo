@@ -47,7 +47,7 @@
    </form>
   {% endif %}
 
-  <h2>Edit</h2>
+  <h2>{% trans "Edit" %}</h2>
   {% if success %}
    <div class="success">{% trans "Your settings have been saved." %}</div>
   {% endif %}
@@ -57,6 +57,11 @@
    <input type="submit" value="Save" />
   </form>
 
+  <h2>{% trans "Delete" %}</h2>
+  <form action="/device/{{ device.id }}/delete" method="POST">
+   <input type="submit" value="{% trans "Delete this device" %}" />
+  </form>
+  <br />
   <div class="info">The <strong>UID</strong> connects your physical device with this page, so you should enter the same text on your device and here.</div>
 
 {% endblock %}

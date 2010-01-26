@@ -160,6 +160,7 @@ class Device(models.Model):
     name = models.CharField(max_length=100, blank=True)
     type = models.CharField(max_length=10, choices=DEVICE_TYPES)
     sync_group = models.ForeignKey(SyncGroup, blank=True, null=True)
+    deleted = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.name if self.name else _('Unnamed Device (%s)' % self.uid)

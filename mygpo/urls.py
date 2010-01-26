@@ -58,6 +58,7 @@ urlpatterns = patterns('',
     (r'^device/(?P<device_id>\d+)$', 'mygpo.web.views.device'),
     (r'^device/(?P<device_id>\d+)/sync$', 'mygpo.web.views.device_sync'),
     (r'^device/(?P<device_id>\d+)/unsync$', 'mygpo.web.views.device_unsync'),
+    (r'^device/(?P<device_id>\d+)/delete$', 'mygpo.web.views.device_delete'),
 
     (r'^search/', include('haystack.urls')),
 

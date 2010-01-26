@@ -93,7 +93,7 @@ def history(request, len=20):
     }, context_instance=RequestContext(request))
 
 def devices(request):
-    devices = Device.objects.filter(user=request.user)
+    devices = Device.objects.filter(user=request.user,deleted=False)
     return render_to_response('devicelist.html', {
         'devices': devices,
     }, context_instance=RequestContext(request))
@@ -271,6 +271,25 @@ def device(request, device_id):
         'subscriptions': subscriptions,
         'synced_with': synced_with,
         'has_sync_targets': len(device.sync_targets()) > 0
+    }, context_instance=RequestContext(request))
+
+
+@login_required
+def device_delete(request, device_id):
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+   
+    device = Device.objects.get(pk=device_id)
+    device.deleted = True
+    device.save()
+
+    current_site = Site.objects.get_current()
+    subscriptionlist = create_subscriptionlist(request)              
+    return render_to_response('home-user.html', {
+         'subscriptionlist': subscriptionlist,
+         'url': current_site,
+	  'deletedevice_success': True,
+         'device_name': device.name
     }, context_instance=RequestContext(request))
 
 
