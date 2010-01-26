@@ -9,24 +9,29 @@
   {% if device.deleted %}<div class="info">{% trans "This device was deleted." %}</div>{% endif %}
 
   <h2>{% trans "Podcasts" %}</h2>
-  <p>{% trans "You have subscribed the following podcasts on this device" %}
-  <table class="list">
-   <tr>
-    <th></th>
-    <th>{% trans "Title" %}</th>
-    <th>{% trans "Since" %}</th>
-    <th>{% trans "Unsubscribe" %}</th>
-   </tr>
 
-   {% for subscription in subscriptions %}
+  {% if not subscriptions|length_is:"0" %}
+   <p>{% trans "You have subscribed the following podcasts on this device" %}
+   <table class="list">
     <tr>
-     <td></td>
-     <td><a href="/podcast/{{subscription.podcast.id}}">{{ subscription.podcast }}</a></td>
-     <td><abbr title="{{subscription.subscribed_since}}">{{subscription.subscribed_since|naturalday}}</abbr></td>
-     <td><a href="/podcast/{{subscription.podcast.id}}/unsubscribe/{{ device.id }}?return_to=/device/{{ device.id }}"><img src="/media/unsubscribe.png" /></a></td>
+     <th></th>
+     <th>{% trans "Title" %}</th>
+     <th>{% trans "Since" %}</th>
+     <th>{% trans "Unsubscribe" %}</th>
     </tr>
-   {% endfor %}
-  </table>
+
+    {% for subscription in subscriptions %}
+     <tr>
+      <td></td>
+      <td><a href="/podcast/{{subscription.podcast.id}}">{{ subscription.podcast }}</a></td>
+      <td><abbr title="{{subscription.subscribed_since}}">{{subscription.subscribed_since|naturalday}}</abbr></td>
+      <td><a href="/podcast/{{subscription.podcast.id}}/unsubscribe/{{ device.id }}?return_to=/device/{{ device.id }}"><img src="/media/unsubscribe.png" /></a></td>
+     </tr>
+    {% endfor %}
+   </table>
+  {% else %}
+   <p>{% trans "You don't have any podcasts subscribed on this device. Go ahead and upload some." %}</p>
+  {% endif %}
 
   {% if not device.deleted %}
 
