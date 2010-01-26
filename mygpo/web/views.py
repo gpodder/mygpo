@@ -68,8 +68,8 @@ def create_subscriptionlist(request):
     return l.values()
 
 def podcast(request, pid):
-    if request.user.is_authenticated():
-        podcast = Podcast.objects.get(pk=pid)
+    podcast = Podcast.objects.get(pk=pid)
+    if request.user.is_authenticated():        
         devices = Device.objects.filter(user=request.user)
         history = SubscriptionAction.objects.filter(podcast=podcast,device__in=devices).order_by('-timestamp')
         subscribed_devices = [s.device for s in Subscription.objects.filter(podcast=podcast,user=request.user)]
@@ -85,14 +85,13 @@ def podcast(request, pid):
             'unsubscribe': unsubscribe,
         }, context_instance=RequestContext(request))
     else:
-        podcast = Podcast.objects.get(pk=pid)
         current_site = Site.objects.get_current()
-
         return render_to_response('podcast.html', {
-            'podcast': podcast,   
-            'url': current_site,
-            'anonymous': True         
+            'podcast': podcast,
+            'url': current_site
         }, context_instance=RequestContext(request))
+
+
 
 def history(request, len=20):
     devices = Device.objects.filter(user=request.user)

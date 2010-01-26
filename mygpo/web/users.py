@@ -33,13 +33,13 @@ def login_user(request):
               username = request.POST['user']
               password = request.POST['pwd']
        except:
-              current_site = Site.objects.get(id=settings.SITE_ID)
+              current_site = Site.objects.get_current()
               return render_to_response('login.html', {'url': current_site})
 
        user = authenticate(username=username, password=password)
        if user is not None:
               login(request, user)
-              current_site = Site.objects.get(id=settings.SITE_ID)
+              current_site = Site.objects.get_current()
 
               try:
                   if user.get_profile().generated_id:
@@ -68,7 +68,7 @@ def migrate_user(request):
         username = user.username
 
     if user.username != username:
-        current_site = Site.objects.get(id=settings.SITE_ID)
+        current_site = Site.objects.get_current()
         if User.objects.filter(username__exact=username).count() > 0:
             return render_to_response('migrate.html', {'error_message': '%s is already taken' % username, 'url': current_site, 'username': user.username})
         if slugify(username) != username:
