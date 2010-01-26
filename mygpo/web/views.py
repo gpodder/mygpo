@@ -34,7 +34,7 @@ import re
 def home(request):
        current_site = Site.objects.get_current()
        if request.user.is_authenticated():
-              subscriptionlist = create_subscriptionlist(request)              
+              subscriptionlist = create_subscriptionlist(request)
 
               return render_to_response('home-user.html', {
                     'subscriptionlist': subscriptionlist,
@@ -89,9 +89,9 @@ def podcast(request, pid):
         current_site = Site.objects.get_current()
 
         return render_to_response('podcast.html', {
-            'podcast': podcast,   
+            'podcast': podcast,
             'url': current_site,
-            'anonymous': True         
+            'anonymous': True
         }, context_instance=RequestContext(request))
 
 def history(request, len=20):
@@ -145,14 +145,14 @@ def podcast_subscribe(request, pid):
 def podcast_unsubscribe(request, pid, device_id):
 
     return_to = request.GET.get('return_to')
-    
+
     if return_to == None:
         raise Http404('Wrong URL')
 
     podcast = Podcast.objects.get(pk=pid)
     device = Device.objects.get(pk=device_id)
     SubscriptionAction.objects.create(podcast=podcast, device=device, action=UNSUBSCRIBE_ACTION, timestamp=datetime.now())
-    
+
     return HttpResponseRedirect(return_to)
 
 def episode_list(podcast, user):
@@ -219,7 +219,7 @@ def toplist_opml(request, count):
     opml = exporter.generate([e.podcast for e in entries])
 
     return HttpResponse(opml, mimetype='text/xml')
- 
+
 
 @login_required
 def suggestions(request):
@@ -287,13 +287,13 @@ def device(request, device_id):
 def device_delete(request, device_id):
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
-   
+
     device = Device.objects.get(pk=device_id)
     device.deleted = True
     device.save()
 
     current_site = Site.objects.get_current()
-    subscriptionlist = create_subscriptionlist(request)              
+    subscriptionlist = create_subscriptionlist(request)
     return render_to_response('home-user.html', {
          'subscriptionlist': subscriptionlist,
          'url': current_site,
@@ -307,7 +307,7 @@ def device_sync(request, device_id):
 
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
-        
+
     form = SyncForm(request.POST)
     if not form.is_valid():
         return HttpResponseBadRequest('invalid')
@@ -336,15 +336,15 @@ def device_unsync(request, device_id):
 @login_required
 def podcast_subscribe_url(request):
     url = request.GET.get('url')
-    
+
     if url == None:
         raise Http404('http://my.gpodder.org/subscribe?url=http://www.example.com/podcast.xml')
-         
+
     podcast, created = Podcast.objects.get_or_create(url=url,
             defaults={'title':url,'description':url,'last_update':datetime.now()})
-            
+
     return HttpResponseRedirect('/podcast/%d/subscribe' % podcast.pk)
-    
+
 
 def author(request):
     current_site = Site.objects.get_current()
