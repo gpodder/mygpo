@@ -11,7 +11,7 @@
    <p class="description">{{ podcast.description }}</p>
   {% endif %}
 
-  {% if anonymous %}
+  {% if not user.is_authenticated %}
     <div class="subscribe">
      <a href="/podcast/{{ podcast.id }}/subscribe">
       {% if podcast.title %}

@@ -33,7 +33,8 @@ def login_user(request):
               username = request.POST['user']
               password = request.POST['pwd']
        except:
-              return render_to_response('login.html')
+              current_site = Site.objects.get(id=settings.SITE_ID)
+              return render_to_response('login.html', {'url': current_site})
 
        user = authenticate(username=username, password=password)
        if user is not None:
