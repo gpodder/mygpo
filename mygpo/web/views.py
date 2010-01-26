@@ -27,20 +27,25 @@ from mygpo.api.basic_auth import require_valid_user
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from datetime import datetime
+from django.contrib.sites.models import Site
+from django.conf import settings
 import re
 
 def home(request):
+       current_site = Site.objects.get(id=settings.SITE_ID)
        if request.user.is_authenticated():
               subscriptionlist = create_subscriptionlist(request)              
 
               return render_to_response('home-user.html', {
-                    'subscriptionlist': subscriptionlist
+                    'subscriptionlist': subscriptionlist,
+                    'url': current_site
               }, context_instance=RequestContext(request))
 
        else:
               podcasts = Podcast.objects.count()
               return render_to_response('home.html', {
-                    'podcast_count': podcasts
+                    'podcast_count': podcasts,
+                    'url': current_site
               })
 
 def create_subscriptionlist(request):
@@ -191,8 +196,10 @@ def account(request):
 
 def toplist(request, len=100):
     entries = ToplistEntry.objects.all().order_by('-subscriptions')[:len]
+    current_site = Site.objects.get(id=settings.SITE_ID)
     return render_to_response('toplist.html', {
         'entries': entries,
+        'url': current_site
     }, context_instance=RequestContext(request))
 
 
@@ -215,9 +222,11 @@ def suggestions(request):
         rated = True
 
     entries = SuggestionEntry.forUser(request.user)
+    current_site = Site.objects.get(id=settings.SITE_ID)
     return render_to_response('suggestions.html', {
         'entries': entries,
-        'rated'  : rated
+        'rated'  : rated,
+        'url': current_site
     }, context_instance=RequestContext(request))
 
 
@@ -308,3 +317,11 @@ def podcast_subscribe_url(request):
             
     return HttpResponseRedirect('/podcast/%d/subscribe' % podcast.pk)
     
+
+def author(request):
+    current_site = Site.objects.get(id=settings.SITE_ID)
+    return render_to_response('authors.html', {
+        'url': current_site
+    }, context_instance=RequestContext(request))
+
+
