@@ -59,7 +59,7 @@ class Podcast(models.Model):
         """
         targets = []
 
-        devices = Device.objects.filter(user=user)
+        devices = Device.objects.filter(user=user, deleted=False)
         for d in devices:
             subscriptions = [x.podcast for x in d.get_subscriptions()]
             if self in subscriptions: continue
@@ -177,7 +177,7 @@ class Device(models.Model):
         """
         returns all Devices and SyncGroups that can be used as a parameter for self.sync_with()
         """
-        sync_targets = list(Device.objects.filter(user=self.user, sync_group=None).exclude(pk=self.id))
+        sync_targets = list(Device.objects.filter(user=self.user, sync_group=None, deleted=False).exclude(pk=self.id))
 
         sync_groups = SyncGroup.objects.filter(user=self.user)
         if self.sync_group != None: sync_groups = sync_groups.exclude(pk=self.sync_group.id)

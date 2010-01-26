@@ -6,6 +6,8 @@
 {% block content %}
   <h1>{{ device.name }}</h1>
 
+  <div class="info">{% if device.deleted %}{% trans "This device was deleted." %}{% endif %}</div>
+
   <h2>{% trans "Podcasts" %}</h2>
   <p>{% trans "You have subscribed the following podcasts on this device" %}
   <table class="list">
@@ -25,6 +27,8 @@
     </tr>
    {% endfor %}
   </table>
+
+  {% if not device.deleted %}
 
   <h2>{% trans "Synchronize" %}</h2>
   <p>{% blocktrans %}If you synchronize devices, they will always have the same subscriptions. A podcast that is subscribed on one device, will automatically be added to all synchronized devices.{% endblocktrans %}</p>
@@ -62,6 +66,7 @@
    <input type="submit" value="{% trans "Delete this device" %}" />
   </form>
   <br />
+  {% endif %}
   <div class="info">The <strong>UID</strong> connects your physical device with this page, so you should enter the same text on your device and here.</div>
 
 {% endblock %}
