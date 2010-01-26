@@ -6,7 +6,6 @@
 {% block content %}
   <h1>{% trans "Device List" %}</h1>
 
-   {% if not devices|length_is:"0" %}
    <table class="list">
     <tr>
      <th>{% trans "Name" %}</th>
@@ -21,6 +20,7 @@
      </tr>
     {% endfor %}
    </table>
-  {% endif %}
+
+   <div class="info"><strong>{% trans "How do I a new device?" %}</strong> {% trans "Just upload your subscriptions with a new device using gPodder, and it will automatically show up in this list." %}</div>
 {% endblock %}
 
