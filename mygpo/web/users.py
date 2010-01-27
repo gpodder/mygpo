@@ -25,21 +25,26 @@ from registration.forms import RegistrationForm
 from registration.views import activate, register
 from registration.models import RegistrationProfile
 from mygpo.api.models import UserProfile
+from django.contrib.sites.models import Site
+from django.conf import settings
 
 def login_user(request):
        try:
               username = request.POST['user']
               password = request.POST['pwd']
        except:
-              return render_to_response('login.html')
+              current_site = Site.objects.get_current()
+              return render_to_response('login.html', {'url': current_site})
 
        user = authenticate(username=username, password=password)
        if user is not None:
               login(request, user)
+              current_site = Site.objects.get_current()
 
               try:
                   if user.get_profile().generated_id:
                       return render_to_response('migrate.html', {
+                           'url': current_site,
                            'username': user
                       })
               except UserProfile.DoesNotExist:
@@ -63,10 +68,11 @@ def migrate_user(request):
         username = user.username
 
     if user.username != username:
+        current_site = Site.objects.get_current()
         if User.objects.filter(username__exact=username).count() > 0:
-            return render_to_response('migrate.html', {'error_message': '%s is already taken' % username, 'username': user.username})
+            return render_to_response('migrate.html', {'error_message': '%s is already taken' % username, 'url': current_site, 'username': user.username})
         if slugify(username) != username:
-            return render_to_response('migrate.html', {'error_message': '%s is not a valid username. Please use characters, numbers, underscore and dash only.' % username, 'username': user.username})
+            return render_to_response('migrate.html', {'error_message': '%s is not a valid username. Please use characters, numbers, underscore and dash only.' % username, 'url': current_site, 'username': user.username})
         else:
             user.username = username
             user.save()

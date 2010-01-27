@@ -6,7 +6,6 @@
 {% block content %}
   <h1>{% trans "Device List" %}</h1>
 
-   {% if not devices|length_is:"0" %}
    <table class="list">
     <tr>
      <th>{% trans "Name" %}</th>
@@ -14,6 +13,15 @@
      <th>{% trans "UID" %}</th>
     </tr>
     {% for d in devices %}
+     {% ifchanged d.sync_group %}
+      <tr class="group">
+       <td colspan="3">
+        {% if not d.sync_group %}{% trans "Not synchronized" %}
+        {% else %}{% trans "Synchronized" %}
+        {% endif %}
+       </td>
+      </tr>
+     {% endifchanged %}
      <tr>
       <td><a href="/device/{{ d.id }}">{{ d|device_icon }}{{ d.name }}</a></td>
       <td>{{ d|device_type }}</td>
@@ -21,6 +29,7 @@
      </tr>
     {% endfor %}
    </table>
-  {% endif %}
+
+   <div class="info"><strong>{% trans "How do I add a new device?" %}</strong> {% trans "Just upload your subscriptions with a new device using gPodder, and it will automatically show up in this list." %}</div>
 {% endblock %}
 

@@ -6,25 +6,34 @@
 {% block content %}
   <h1>{{ device.name }}</h1>
 
-  <h2>{% trans "Podcasts" %}</h2>
-  <p>{% trans "You have subscribed the following podcasts on this device" %}
-  <table class="list">
-   <tr>
-    <th></th>
-    <th>{% trans "Title" %}</th>
-    <th>{% trans "Since" %}</th>
-    <th>{% trans "Unsubscribe" %}</th>
-   </tr>
+  {% if device.deleted %}<div class="info">{% trans "This device was deleted." %}</div>{% endif %}
 
-   {% for subscription in subscriptions %}
+  <h2>{% trans "Podcasts" %}</h2>
+
+  {% if not subscriptions|length_is:"0" %}
+   <p>{% trans "You have subscribed the following podcasts on this device" %}
+   <table class="list">
     <tr>
-     <td></td>
-     <td><a href="/podcast/{{subscription.podcast.id}}">{{ subscription.podcast }}</a></td>
-     <td><abbr title="{{subscription.subscribed_since}}">{{subscription.subscribed_since|naturalday}}</abbr></td>
-     <td><a href="/podcast/{{subscription.podcast.id}}/unsubscribe/{{ device.id }}?return_to=/device/{{ device.id }}"><img src="/media/unsubscribe.png" /></a></td>
+     <th></th>
+     <th>{% trans "Title" %}</th>
+     <th>{% trans "Since" %}</th>
+     <th>{% trans "Unsubscribe" %}</th>
     </tr>
-   {% endfor %}
-  </table>
+
+    {% for subscription in subscriptions %}
+     <tr>
+      <td></td>
+      <td><a href="/podcast/{{subscription.podcast.id}}">{{ subscription.podcast }}</a></td>
+      <td><abbr title="{{subscription.subscribed_since}}">{{subscription.subscribed_since|naturalday}}</abbr></td>
+      <td><a href="/podcast/{{subscription.podcast.id}}/unsubscribe/{{ device.id }}?return_to=/device/{{ device.id }}"><img src="/media/unsubscribe.png" /></a></td>
+     </tr>
+    {% endfor %}
+   </table>
+  {% else %}
+   <p>{% trans "You don't have any podcasts subscribed on this device. Go ahead and upload some." %}</p>
+  {% endif %}
+
+  {% if not device.deleted %}
 
   <h2>{% trans "Synchronize" %}</h2>
   <p>{% blocktrans %}If you synchronize devices, they will always have the same subscriptions. A podcast that is subscribed on one device, will automatically be added to all synchronized devices.{% endblocktrans %}</p>
@@ -47,7 +56,7 @@
    </form>
   {% endif %}
 
-  <h2>Edit</h2>
+  <h2>{% trans "Edit" %}</h2>
   {% if success %}
    <div class="success">{% trans "Your settings have been saved." %}</div>
   {% endif %}
@@ -57,6 +66,12 @@
    <input type="submit" value="Save" />
   </form>
 
+  <h2>{% trans "Delete" %}</h2>
+  <form action="/device/{{ device.id }}/delete" method="POST">
+   <input type="submit" value="{% trans "Delete this device" %}" />
+  </form>
+  <br />
+  {% endif %}
   <div class="info">The <strong>UID</strong> connects your physical device with this page, so you should enter the same text on your device and here.</div>
 
 {% endblock %}
