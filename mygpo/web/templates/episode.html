@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load humanize %}
+{% load episodes %}
 
 {% block content %}
   <h1>{{ episode.title|default:"Unnamed Episode" }}</h1>
@@ -30,7 +31,7 @@
    {% for s in history %}
     <tr>
      <td><abbr title="{{ s.timestamp }}">{{ s.timestamp|naturalday }}</abbr></td>
-     <td>{{ s.action }}</td>
+     <td>{{ s|episode_status_icon }}</td>
      <td><a href="/device/{{ s.device.id }}">{{ s.device.name }}</a></td>
 	</tr>
    {% endfor %}

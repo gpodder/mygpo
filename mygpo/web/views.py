@@ -29,6 +29,7 @@ from django.db import IntegrityError
 from datetime import datetime
 from django.contrib.sites.models import Site
 from django.conf import settings
+from sets import Set
 from mygpo.api.sanitizing import sanitize_url
 import re
 
@@ -98,12 +99,26 @@ def podcast(request, pid):
 
 
 
-def history(request, len=20):
+def history(request, len=15):
     devices = Device.objects.filter(user=request.user)
     history = SubscriptionAction.objects.filter(device__in=devices).order_by('-timestamp')[:len]
+    episodehistory = EpisodeAction.objects.filter(device__in=devices).order_by('-timestamp')[:len]
+
+    generalhistory = []
+
+    for row in history:
+        generalhistory.append(row)
+    for row in episodehistory:
+        generalhistory.append(row)
+
+    generalhistory.sort(key=sortkey,reverse=True)
+
     return render_to_response('history.html', {
-        'history': history,
+        'generalhistory': generalhistory
     }, context_instance=RequestContext(request))
+
+def sortkey(x):
+    return x.timestamp 
 
 def devices(request):
     devices = Device.objects.filter(user=request.user,deleted=False).order_by('sync_group')

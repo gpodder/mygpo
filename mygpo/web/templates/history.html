@@ -2,34 +2,45 @@
 {% load i18n %}
 {% load humanize %}
 {% load devices %}
+{% load episodes %}
 
 {% block content %}
-  <h1>{% trans "Subscription History" %}</h1>
+   <h1>{% trans "History" %}</h1>
 
-   {% if not history|length_is:"0" %}
+   {% if not generalhistory|length_is:"0" %}
    <table class="list">
     <tr>
-     <th>{% trans "Podcast" %}</th>
+     <th>{% trans "Podcast/Episode" %}</th>
      <th>{% trans "Timestamp" %}</th>
      <th>{% trans "Action" %}</th>
      <th>{% trans "Device" %}</th>
     </tr>
-    {% for s in history %}
+    {% for s in generalhistory %}
      <tr>
-      <td><a href="/podcast/{{ s.podcast.id }}">{{ s.podcast }}</a></td>
+      <td>
+	{% if s.podcast %}
+	<a href="/podcast/{{ s.podcast.id }}">{{ s.podcast }}</a></td>
+       {% else %}
+	<a href="/episode/{{ s.episode.id }}">{{ s.episode}}</a></td>
+       {% endif %}
       <td><abbr title="{{ s.timestamp }}">{{ s.timestamp|naturalday }}</abbr></td>
       <td>
-       {% ifequal s.action 1 %}
-        <img src="/media/subscribe.png" />
-       {% endifequal %}
-       {% ifequal s.action -1 %}
-        <img src="/media/unsubscribe.png" />
-       {% endifequal %}
+	{% if s.podcast %}
+       	{% ifequal s.action 1 %}
+	        <img src="/media/subscribe.png" />
+	       {% endifequal %}
+       	{% ifequal s.action -1 %}
+	        <img src="/media/unsubscribe.png" />
+	       {% endifequal %}
+	{% else %}
+		{{ s|episode_status_icon }}
+	{% endif %}
       </td>
       <td><a href="/device/{{ s.device.id }}">{{ s.device|device_icon }}&nbsp;{{ s.device.name }}</a></td>
      </tr>
     {% endfor %}
    </table>
   {% endif %}
-{% endblock %}
 
+
+{% endblock %}
