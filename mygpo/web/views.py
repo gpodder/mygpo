@@ -19,7 +19,7 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, Http404
 from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext
-from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, Subscription, SuggestionEntry, Rating, SyncGroup, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION
+from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, Subscription, SuggestionEntry, Rating, SyncGroup, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SubscriptionMeta
 from mygpo.web.forms import UserAccountForm, DeviceForm, SyncForm
 from mygpo.api.opml import Exporter
 from django.utils.translation import ugettext as _
@@ -82,6 +82,7 @@ def podcast(request, pid):
         subscribe_targets = podcast.subscribe_targets(request.user)
         episodes = episode_list(podcast, request.user)
         unsubscribe = '/podcast/' + pid + '/unsubscribe'
+
         return render_to_response('podcast.html', {
             'history': history,
             'podcast': podcast,
@@ -116,6 +117,27 @@ def history(request, len=15):
     return render_to_response('history.html', {
         'generalhistory': generalhistory
     }, context_instance=RequestContext(request))
+
+def historyperdevice(request, device_id, len=15):
+    devices = Device.objects.filter(id=device_id)
+    history = SubscriptionAction.objects.filter(device__in=devices).order_by('-timestamp')[:len]
+    episodehistory = EpisodeAction.objects.filter(device__in=devices).order_by('-timestamp')[:len]
+
+    generalhistory = []
+
+    for row in history:
+        generalhistory.append(row)
+    for row in episodehistory:
+        generalhistory.append(row)
+
+    generalhistory.sort(key=sortkey,reverse=True)
+    device = devices[0]
+
+    return render_to_response('history.html', {
+        'generalhistory': generalhistory,
+        'device': device,
+    }, context_instance=RequestContext(request))
+
 
 def sortkey(x):
     return x.timestamp 

@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load humanize %}
 {% load episodes %}
+{% load devices %}
 
 {% block content %}
   <h1>{% if podcast.title %}{{ podcast.title }}{% else %}{% trans "Unnamed Podcast" %}{%endif%}</h1>
@@ -105,7 +106,7 @@
         <img src="/media/unsubscribe.png" />
        {% endifequal %}
       </td>
-      <td>{{ s.device.name }}</td>
+      <td><a href="/device/{{ s.device.id }}">{{ s.device|device_icon }}&nbsp;{{ s.device.name }}</a></td>
      </tr>
     {% endfor %}
    </table>

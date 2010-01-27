@@ -13,7 +13,6 @@ class DeviceForm(forms.Form):
     type = forms.ChoiceField(choices=DEVICE_TYPES, label=_('What kind of device is this?'))
     uid = forms.CharField(max_length=50, label=_('What UID is configured on the physical device?'))
 
-
 class SyncForm(forms.Form):
     targets = forms.CharField()
 
