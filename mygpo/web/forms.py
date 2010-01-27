@@ -13,6 +13,9 @@ class DeviceForm(forms.Form):
     type = forms.ChoiceField(choices=DEVICE_TYPES, label=_('What kind of device is this?'))
     uid = forms.CharField(max_length=50, label=_('What UID is configured on the physical device?'))
 
+class PrivacyForm(forms.Form):
+    public = forms.BooleanField(required=False, label=_('Should this be a public podcast?'))
+
 class SyncForm(forms.Form):
     targets = forms.CharField()
 

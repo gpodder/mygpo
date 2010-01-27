@@ -20,7 +20,7 @@ from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadReque
 from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext
 from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, Subscription, SuggestionEntry, Rating, SyncGroup, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SubscriptionMeta
-from mygpo.web.forms import UserAccountForm, DeviceForm, SyncForm
+from mygpo.web.forms import UserAccountForm, DeviceForm, SyncForm, PrivacyForm
 from mygpo.api.opml import Exporter
 from django.utils.translation import ugettext as _
 from mygpo.api.basic_auth import require_valid_user
@@ -82,14 +82,36 @@ def podcast(request, pid):
         subscribe_targets = podcast.subscribe_targets(request.user)
         episodes = episode_list(podcast, request.user)
         unsubscribe = '/podcast/' + pid + '/unsubscribe'
+        success = False
+        
+        qs = Subscription.objects.filter(podcast=podcast, user=request.user)
+        if qs.count()>0:
+            subscription = qs[0]
+            subscriptionmeta = subscription.get_meta()
+            if request.method == 'POST':
+                privacy_form = PrivacyForm(request.POST)
+                if privacy_form.is_valid():
+                    subscriptionmeta.public = privacy_form.cleaned_data['public']
+                    try:
+                       subscriptionmeta.save()
+                       success = True
+                    except IntegrityError, ie:
+                       error_message = _('You can\'t use the same UID for two devices.')
+            else:
+                privacy_form = PrivacyForm({
+                    'public': subscriptionmeta.public
+                })
+
 
         return render_to_response('podcast.html', {
             'history': history,
             'podcast': podcast,
+            'privacy_form': privacy_form,
             'devices': subscribed_devices,
             'can_subscribe': len(subscribe_targets) > 0,
             'episodes': episodes,
             'unsubscribe': unsubscribe,
+            'success': success
         }, context_instance=RequestContext(request))
     else:
         current_site = Site.objects.get_current()
