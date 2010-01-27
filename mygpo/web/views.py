@@ -136,6 +136,7 @@ def historyperdevice(request, device_id, len=15):
     return render_to_response('history.html', {
         'generalhistory': generalhistory,
         'device': device,
+        'deviceflag': True
     }, context_instance=RequestContext(request))
 
 

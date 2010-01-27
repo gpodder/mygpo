@@ -5,7 +5,7 @@
 {% load episodes %}
 
 {% block content %}
-   <h1>{% trans "History" %}{% if not device|length_is:"0" %}: {{ device|device_icon }}&nbsp;{{ device.name }}{% endif %}</h1>
+   <h1>{% trans "History" %}{% if deviceflag %}: {{ device|device_icon }}&nbsp;{{ device.name }}{% endif %}</h1>
 
    {% if not generalhistory|length_is:"0" %}
    <table class="list">
