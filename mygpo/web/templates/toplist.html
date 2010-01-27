@@ -16,7 +16,13 @@
   {% for entry in entries %}
    <tr>
     <td>{{ forloop.counter }}</td>
-    <td class="numeric">{{ entry.oldplace|default_if_none:"" }}</td>
+
+    {% ifequal entry.oldplace 0 %}
+        <td>{% trans "New" %}</td>
+    {% else %}
+        <td class="numeric">{{ entry.oldplace|default_if_none:"" }}</td>
+    {% endifequal %}
+      
     <td><a href="/podcast/{{ entry.podcast.id }}">{{ entry.podcast }}</a></td>
     <td class="numeric">{{ entry.subscriptions }}</td>
    </tr>
