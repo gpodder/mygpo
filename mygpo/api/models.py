@@ -327,10 +327,13 @@ class Subscription(models.Model):
 
     def get_meta(self):
         #this is different than get_or_create because it does not necessarily create a new meta-object
-        try:
-            return SubscriptionMeta.objects.get(user=self.user, podcast=self.podcast)
-        except SubscriptionMeta.DoesNotExist:
+        qs = SubscriptionMeta.objects.filter(user=self.user, podcast=self.podcast)
+
+        if qs.count() == 0:
             return SubscriptionMeta(user=self.user, podcast=self.podcast)
+        else:
+            return qs[0]
+
 
     class Meta:
         db_table = 'current_subscription'
