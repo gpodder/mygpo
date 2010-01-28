@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load podcasts %}
 
 {% block content %}
+  <div id="podcastlogo">{{ podcast|podcast_logo:"200" }}</div>
   <h1>
    {% if podcast.title %}
     {% blocktrans with podcast.title|striptags as podcasttitle %}Subscribe to {{podcasttitle }}{% endblocktrans %}

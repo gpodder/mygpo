@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load podcasts %}
 
 {% block content %}
   <h1>{% trans "Toplist" %}</h1>
@@ -10,6 +11,7 @@
    <tr>
     <th>{% trans "#" %}</th>
     <th>{% trans "Last week" %}</th>
+    <th></th>
     <th>{% trans "Podcast" %}</th>
     <th>{% trans "Subscribers" %}</th>
    </tr>
@@ -17,6 +19,7 @@
    <tr>
     <td>{{ forloop.counter }}</td>
     <td class="numeric">{{ entry.oldplace|default_if_none:"" }}</td>
+    <td>{{ entry.podcast|podcast_logo }}</td>
     <td><a href="/podcast/{{ entry.podcast.id }}">{{ entry.podcast|striptags }}</a></td>
     <td class="numeric">{{ entry.subscriptions }}</td>
    </tr>

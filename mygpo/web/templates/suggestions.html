@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load podcasts %}
 
 {% block content %}
 
@@ -20,7 +21,7 @@
    </tr>
   {% for entry in entries %}
    <tr>
-    <td>{% if entry.podcast.logo_url %}<img href="{{ entry.podcast.logo_url }}" />{% endif %}</td>
+    <td>{{ entry.podcast|podcast_logo }}</td>
     <td><a href="/podcast/{{entry.podcast.id}}">{{ entry.podcast|striptags }}</a></td>
     <td><a href="/podcast/{{entry.podcast.id}}/subscribe"><img src="/media/subscribe.png" alt="+" /></a></td>
     <td class="description">{{ entry.podcast.description|striptags|truncatewords:"12" }}</a></td>

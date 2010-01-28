@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load devices %}
+{% load podcasts %}
 
 {% block content %}
 {% if deletedevice_success %}
@@ -20,11 +21,7 @@
   
   {% for s in subscriptionlist %}
    <tr>
-    <td> 
-     {% if s.podcast.logo_url %}
-      <img src="{{ s.podcast.logo_url }}" style="width:40px; height:30px;" />
-     {% endif %}                  
-    </td>
+    <td>{{ s.podcast|podcast_logo }}</td>
     <td><a class="listlink" href="/podcast/{{ s.podcast.id }}">{{ s.podcast|striptags }}</a></td>
     {% if s.episode %}
      <td><a href="/episode/{{s.episode.id}}">{{ s.episode.title|default:"Unnamed Episode"|striptags }}</a></td>

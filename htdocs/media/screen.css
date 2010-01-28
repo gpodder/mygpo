@@ -281,3 +281,9 @@ div.result span.episode a
 div.result
 {
 }
+
+div#podcastlogo
+{
+    float: right;
+    padding-top: 3em;
+}
