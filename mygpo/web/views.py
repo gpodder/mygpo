@@ -27,20 +27,26 @@ from mygpo.api.basic_auth import require_valid_user
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from datetime import datetime
+from django.contrib.sites.models import Site
+from django.conf import settings
+from mygpo.api.sanitizing import sanitize_url
 import re
 
 def home(request):
+       current_site = Site.objects.get_current()
        if request.user.is_authenticated():
-              subscriptionlist = create_subscriptionlist(request)              
+              subscriptionlist = create_subscriptionlist(request)
 
               return render_to_response('home-user.html', {
-                    'subscriptionlist': subscriptionlist
+                    'subscriptionlist': subscriptionlist,
+                    'url': current_site
               }, context_instance=RequestContext(request))
 
        else:
               podcasts = Podcast.objects.count()
               return render_to_response('home.html', {
-                    'podcast_count': podcasts
+                    'podcast_count': podcasts,
+                    'url': current_site
               })
 
 def create_subscriptionlist(request):
@@ -62,23 +68,35 @@ def create_subscriptionlist(request):
 
     return l.values()
 
-@login_required
 def podcast(request, pid):
-    podcast = Podcast.objects.get(pk=pid)
-    devices = Device.objects.filter(user=request.user)
-    history = SubscriptionAction.objects.filter(podcast=podcast,device__in=devices).order_by('-timestamp')
-    subscribed_devices = [s.device for s in Subscription.objects.filter(podcast=podcast,user=request.user)]
-    subscribe_targets = podcast.subscribe_targets(request.user)
-    episodes = episode_list(podcast, request.user)
-    unsubscribe = '/podcast/' + pid + '/unsubscribe'
-    return render_to_response('podcast.html', {
-        'history': history,
-        'podcast': podcast,
-        'devices': subscribed_devices,
-        'can_subscribe': len(subscribe_targets) > 0,
-        'episodes': episodes,
-        'unsubscribe': unsubscribe,
-    }, context_instance=RequestContext(request))
+    try:
+        podcast = Podcast.objects.get(pk=pid)
+    except Podcast.DoesNotExist:
+        raise Http404('There is no podcast with id %s' % pid)
+
+    if request.user.is_authenticated():        
+        devices = Device.objects.filter(user=request.user)
+        history = SubscriptionAction.objects.filter(podcast=podcast,device__in=devices).order_by('-timestamp')
+        subscribed_devices = [s.device for s in Subscription.objects.filter(podcast=podcast,user=request.user)]
+        subscribe_targets = podcast.subscribe_targets(request.user)
+        episodes = episode_list(podcast, request.user)
+        unsubscribe = '/podcast/' + pid + '/unsubscribe'
+        return render_to_response('podcast.html', {
+            'history': history,
+            'podcast': podcast,
+            'devices': subscribed_devices,
+            'can_subscribe': len(subscribe_targets) > 0,
+            'episodes': episodes,
+            'unsubscribe': unsubscribe,
+        }, context_instance=RequestContext(request))
+    else:
+        current_site = Site.objects.get_current()
+        return render_to_response('podcast.html', {
+            'podcast': podcast,
+            'url': current_site
+        }, context_instance=RequestContext(request))
+
+
 
 def history(request, len=20):
     devices = Device.objects.filter(user=request.user)
@@ -88,7 +106,7 @@ def history(request, len=20):
     }, context_instance=RequestContext(request))
 
 def devices(request):
-    devices = Device.objects.filter(user=request.user)
+    devices = Device.objects.filter(user=request.user,deleted=False).order_by('sync_group')
     return render_to_response('devicelist.html', {
         'devices': devices,
     }, context_instance=RequestContext(request))
@@ -96,44 +114,50 @@ def devices(request):
 @login_required
 def podcast_subscribe(request, pid):
     podcast = Podcast.objects.get(pk=pid)
+    error_message = None
 
     if request.method == 'POST':
         form = SyncForm(request.POST)
 
-        target = form.get_target()
+        try:
+            target = form.get_target()
 
-        if isinstance(target, SyncGroup):
-            device = target.devices()[0]
-        else:
-            device = target
+            if isinstance(target, SyncGroup):
+                device = target.devices()[0]
+            else:
+                device = target
 
-        SubscriptionAction.objects.create(podcast=podcast, device=device, action=SUBSCRIBE_ACTION)
+            SubscriptionAction.objects.create(podcast=podcast, device=device, action=SUBSCRIBE_ACTION)
 
-        return HttpResponseRedirect('/podcast/%s' % podcast.id)
+            return HttpResponseRedirect('/podcast/%s' % podcast.id)
 
-    else:
-        targets = podcast.subscribe_targets(request.user)
+        except ValueError, e:
+            error_message = _('Could not subscribe to the podcast: %s' % e)
 
-        form = SyncForm()
-        form.set_targets(targets, _('With which client do you want to subscribe?'))
+    targets = podcast.subscribe_targets(request.user)
 
-        return render_to_response('subscribe.html', {
-            'podcast': podcast,
-            'form': form
-        }, context_instance=RequestContext(request))
+    form = SyncForm()
+    form.set_targets(targets, _('With which client do you want to subscribe?'))
+
+    return render_to_response('subscribe.html', {
+        'error_message': error_message,
+        'podcast': podcast,
+        'can_subscribe': len(targets) > 0,
+        'form': form
+    }, context_instance=RequestContext(request))
 
 @login_required
 def podcast_unsubscribe(request, pid, device_id):
 
     return_to = request.GET.get('return_to')
-    
+
     if return_to == None:
         raise Http404('Wrong URL')
 
     podcast = Podcast.objects.get(pk=pid)
     device = Device.objects.get(pk=device_id)
     SubscriptionAction.objects.create(podcast=podcast, device=device, action=UNSUBSCRIBE_ACTION, timestamp=datetime.now())
-    
+
     return HttpResponseRedirect(return_to)
 
 def episode_list(podcast, user):
@@ -186,8 +210,10 @@ def account(request):
 
 def toplist(request, len=100):
     entries = ToplistEntry.objects.all().order_by('-subscriptions')[:len]
+    current_site = Site.objects.get_current()
     return render_to_response('toplist.html', {
         'entries': entries,
+        'url': current_site
     }, context_instance=RequestContext(request))
 
 
@@ -198,7 +224,7 @@ def toplist_opml(request, count):
     opml = exporter.generate([e.podcast for e in entries])
 
     return HttpResponse(opml, mimetype='text/xml')
- 
+
 
 @login_required
 def suggestions(request):
@@ -210,9 +236,11 @@ def suggestions(request):
         rated = True
 
     entries = SuggestionEntry.forUser(request.user)
+    current_site = Site.objects.get_current()
     return render_to_response('suggestions.html', {
         'entries': entries,
-        'rated'  : rated
+        'rated'  : rated,
+        'url': current_site
     }, context_instance=RequestContext(request))
 
 
@@ -261,20 +289,42 @@ def device(request, device_id):
 
 
 @login_required
+def device_delete(request, device_id):
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+
+    device = Device.objects.get(pk=device_id)
+    device.deleted = True
+    device.save()
+
+    current_site = Site.objects.get_current()
+    subscriptionlist = create_subscriptionlist(request)
+    return render_to_response('home-user.html', {
+         'subscriptionlist': subscriptionlist,
+         'url': current_site,
+	  'deletedevice_success': True,
+         'device_name': device.name
+    }, context_instance=RequestContext(request))
+
+
+@login_required
 def device_sync(request, device_id):
 
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
-        
+
     form = SyncForm(request.POST)
     if not form.is_valid():
         return HttpResponseBadRequest('invalid')
 
-    target = form.get_target()
+    try:
+        target = form.get_target()
 
-    device = Device.objects.get(pk=device_id)
+        device = Device.objects.get(pk=device_id)
+        device.sync_with(target)
 
-    device.sync_with(target)
+    except ValueError, e:
+        log('error while syncing device %s: %s' % (device_id, e))
 
     return HttpResponseRedirect('/device/%s' % device_id)
 
@@ -291,13 +341,17 @@ def device_unsync(request, device_id):
 @login_required
 def podcast_subscribe_url(request):
     url = request.GET.get('url')
-    
+
     if url == None:
         raise Http404('http://my.gpodder.org/subscribe?url=http://www.example.com/podcast.xml')
-         
-    podcast, created = Podcast.objects.get_or_create(url=url,
-            defaults={'title':url,'description':url,'last_update':datetime.now()})
-            
+
+    url = sanitize_url(url)
+
+    if url == '':
+        raise Http404('Please specify a valid url')
+
+    podcast, created = Podcast.objects.get_or_create(url=url)
+
     return HttpResponseRedirect('/podcast/%d/subscribe' % podcast.pk)
 
 @login_required
@@ -307,3 +361,11 @@ def delete_account(request):
     logout
     return render_to_response('delete_account.html')
     
+
+def author(request):
+    current_site = Site.objects.get_current()
+    return render_to_response('authors.html', {
+        'url': current_site
+    }, context_instance=RequestContext(request))
+
+

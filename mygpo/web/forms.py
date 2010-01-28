@@ -1,6 +1,7 @@
 from django import forms
 from django.utils.translation import ugettext as _
 from mygpo.api.models import Device, DEVICE_TYPES, SyncGroup
+from mygpo.log import log
 import re
 
 class UserAccountForm(forms.Form):
@@ -34,12 +35,14 @@ class SyncForm(forms.Form):
 
     def get_target(self):
         if not self.is_valid():
-            raise ValueError()
+            log('no target given in SyncForm')
+            raise ValueError(_('No device selected'))
 
         target = self.cleaned_data['targets']
         m = re.match('^([dg])(\d+)$', target)
         if m == None:
-            raise ValueError()
+            log('invalid target %s given in SyncForm' % target)
+            raise ValueError(_('Invalid device selected: %s') % target)
 
         if m.group(1) == 'd':
             return Device.objects.get(pk=m.group(2))

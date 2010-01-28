@@ -2,8 +2,8 @@
 {% load i18n %}
 
 {% block content %}
-  <h1>my.gpodder.org</h1>
-  <p>{% trans "The new my.gpodder.org uses usernames instead of email addresses. Based on your email address, we think you might like " %}<strong>{{username}}</strong>{% trans ", but you can change that if you want to." %}</p>
+  <h1>{{ url }}</h1>
+  <p>{% blocktrans %}The new {{ url }} uses usernames instead of email addresses. Based on your email address, we think you might like {% endblocktrans %}<strong>{{username}}</strong>{% trans ", but you can change that if you want to." %}</p>
 
   <form action="/migrate/" method="post">
   Username: <input type="text" name="username" value="{{ username }}"/><br /><br />

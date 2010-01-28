@@ -23,6 +23,7 @@ from registration.forms import RegistrationFormUniqueEmail
 from mygpo.api.models import UserProfile
 from django.contrib.auth.views import logout
 
+
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
@@ -46,7 +47,6 @@ urlpatterns = patterns('',
     (r'^episode/(?P<id>\d+)$', 'mygpo.web.views.episode'),
 
     (r'account/$', 'mygpo.web.views.account'),
-    (r'^info/$', 'django.views.generic.simple.direct_to_template', {'template': 'info.html'}),
 
     (r'^history/$', 'mygpo.web.views.history'),
     (r'^devices/$', 'mygpo.web.views.devices'),
@@ -59,6 +59,7 @@ urlpatterns = patterns('',
     (r'^device/(?P<device_id>\d+)$', 'mygpo.web.views.device'),
     (r'^device/(?P<device_id>\d+)/sync$', 'mygpo.web.views.device_sync'),
     (r'^device/(?P<device_id>\d+)/unsync$', 'mygpo.web.views.device_unsync'),
+    (r'^device/(?P<device_id>\d+)/delete$', 'mygpo.web.views.device_delete'),
 
     (r'^search/', include('haystack.urls')),
 
@@ -80,7 +81,9 @@ urlpatterns = patterns('',
 
     #Subscribe with my.gpodder.org
     (r'^subscribe', 'mygpo.web.views.podcast_subscribe_url'),
-    (r'^authors/$', 'django.views.generic.simple.direct_to_template', {'template': 'authors.html'}),
+    #(r'^authors/$', 'django.views.generic.simple.direct_to_template', {'template': 'authors.html'}),
+    (r'^authors/$', 'mygpo.web.views.author'),
+
 
     (r'^online-help', 'django.views.generic.simple.direct_to_template', {'template': 'online-help.html'}),
 

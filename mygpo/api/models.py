@@ -59,7 +59,7 @@ class Podcast(models.Model):
         """
         targets = []
 
-        devices = Device.objects.filter(user=user)
+        devices = Device.objects.filter(user=user, deleted=False)
         for d in devices:
             subscriptions = [x.podcast for x in d.get_subscriptions()]
             if self in subscriptions: continue
@@ -160,6 +160,7 @@ class Device(models.Model):
     name = models.CharField(max_length=100, blank=True)
     type = models.CharField(max_length=10, choices=DEVICE_TYPES)
     sync_group = models.ForeignKey(SyncGroup, blank=True, null=True)
+    deleted = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.name if self.name else _('Unnamed Device (%s)' % self.uid)
@@ -176,7 +177,7 @@ class Device(models.Model):
         """
         returns all Devices and SyncGroups that can be used as a parameter for self.sync_with()
         """
-        sync_targets = list(Device.objects.filter(user=self.user, sync_group=None).exclude(pk=self.id))
+        sync_targets = list(Device.objects.filter(user=self.user, sync_group=None, deleted=False).exclude(pk=self.id))
 
         sync_groups = SyncGroup.objects.filter(user=self.user)
         if self.sync_group != None: sync_groups = sync_groups.exclude(pk=self.sync_group.id)
@@ -326,14 +327,17 @@ class Subscription(models.Model):
 
     def get_meta(self):
         #this is different than get_or_create because it does not necessarily create a new meta-object
-        try:
-            return SubscriptionMeta.objects.get(user=self.user, podcast=self.podcast)
-        except SubscriptionMeta.DoesNotExist:
+        qs = SubscriptionMeta.objects.filter(user=self.user, podcast=self.podcast)
+
+        if qs.count() == 0:
             return SubscriptionMeta(user=self.user, podcast=self.podcast)
+        else:
+            return qs[0]
+            
     #this method has to be overwritten, if not it tries to delete a view
     def delete(self):
         pass
-    
+        
     class Meta:
         db_table = 'current_subscription'
         #not available in Django 1.0 (Debian stable)

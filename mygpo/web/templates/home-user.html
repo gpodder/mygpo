@@ -3,6 +3,10 @@
 {% load devices %}
 
 {% block content %}
+{% if deletedevice_success %}
+   <div class="success">{% blocktrans %}The device {{ device_name }} has been deleted.{% endblocktrans %}</div>
+{% endif %}
+
 <h1>{% trans "Your Subscriptions" %}</h1>
 
  {% if not subscriptionlist|length_is:"0" %}
@@ -34,7 +38,7 @@
  {% else %}
 
  <h2>{% trans "Where to start?" %}</h2>
- <p>{% blocktrans with user.username as username %}my.gpodder.org help you to track your podcasts which you have subscribed on your devices - desktop computer, notebook, mobile devices, etc. To start using my.gpodder.org set up <a href="http://gpodder.org">gPodder</a> with your username &ndash; <strong>{{username}}</strong> &ndash; and password and upload your podcasts. They will automatically show up here.{% endblocktrans %}</p>
+ <p>{% blocktrans with user.username as username %}{{ url }} help you to track your podcasts which you have subscribed on your devices - desktop computer, notebook, mobile devices, etc. To start using my.gpodder.org set up <a href="http://gpodder.org">gPodder</a> with your username &ndash; <strong>{{username}}</strong> &ndash; and password and upload your podcasts. They will automatically show up here.{% endblocktrans %}</p>
 
  {% endif %}
 {% endblock %}

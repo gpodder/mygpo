@@ -2,8 +2,8 @@
 {% load i18n %}
 
 {% block content %}
-  <h1>my.gpodder.org</h1>
-  <p>{% trans "my.gpodder.org is a webservice for synchronizing podcast subscriptions on several devices and applications." %}</p>
+  <h1>{{ url }}</h1>
+  <p>{% blocktrans %}{{ url }} is a webservice for synchronizing podcast subscriptions on several devices and applications.{% endblocktrans %}</p>
 <p>
 {% blocktrans %}We are currently tracking {{ podcast_count }} Podcasts!{% endblocktrans %}
 </p>

@@ -85,6 +85,7 @@ table.list
     font-size: 1em;
     border-collapse: collapse;
     width: 100%;
+    margin-bottom: 2em;
 }
 
 table.list tr:hover td
@@ -109,6 +110,19 @@ table.list td
 table td.numeric
 {
     text-align: right;
+}
+
+table.list tr.group
+{
+    font-weight: bold;
+    height: 3em;
+    vertical-align: bottom;
+}
+
+table.list tr.group:hover td
+{
+    /* don't show hover effect for group rows */
+    background-color: inherit;
 }
 
 .description
@@ -218,3 +232,54 @@ div.devicesClear
     clear:left;
 }
 
+
+form.search input[type="text"]
+{
+    width: 70%;
+    display: inline;
+}
+
+form.search ul
+{
+    display: inline;
+}
+
+form.search ul li
+{
+    list-style: none;
+    display: inline;
+}
+
+form.search input[type="submit"]
+{
+    display: inline;
+}
+
+div.result img
+{
+    float: left;
+}
+
+div.result a.podcast
+{
+    font-size: 1.2em;
+    color: black;
+    padding-top: 2em;
+    font-weight: bold;
+    display: block;
+}
+
+div.result span.episode
+{
+    display: list-item;
+    margin-left: 2em;
+}
+
+div.result span.episode a
+{
+    color: black;
+}
+
+div.result
+{
+}

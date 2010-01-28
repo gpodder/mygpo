@@ -15,13 +15,15 @@
    <tr>
     <th></th>
     <th>{% trans "Podcast" %}</th>
-    <th>{% trans "URL" %}</th>
+    <th>{% trans "Subscribe" %}</th>
+    <th>{% trans "Description" %}</th>
    </tr>
   {% for entry in entries %}
    <tr>
     <td>{% if entry.podcast.logo_url %}<img href="{{ entry.podcast.logo_url }}" />{% endif %}</td>
     <td><a href="/podcast/{{entry.podcast.id}}">{{ entry.podcast }}</a></td>
-    <td><a href="{{ entry.podcast.url }}">{{ entry.podcast.url }}</a></td>
+    <td><a href="/podcast/{{entry.podcast.id}}/subscribe"><img src="/media/subscribe.png" alt="+" /></a></td>
+    <td class="description">{{ entry.podcast.description|truncatewords:"12" }}</a></td>
    </tr>
   {% endfor %}
   </table>
@@ -36,6 +38,6 @@
    </a>
   </div>
 
-  <div class="info"><strong>Get your suggestions on your Client</strong>! Access <a href="http://my.gpodder.org/suggestions/15.opml">http://my.gpodder.org/suggestions/15.opml</a> to get 15 of our recommended podcasts.</div>
+  <div class="info"><strong>Get your suggestions on your Client</strong>! Access <a href="/suggestions/15.opml">http://{{ url }}/suggestions/15.opml</a> to get 15 of our recommended podcasts.</div>
 {% endblock %}
 

@@ -11,7 +11,19 @@
    <p class="description">{{ podcast.description }}</p>
   {% endif %}
 
-  {% if devices|length_is:"0" %}
+  {% if not user.is_authenticated %}
+    <div class="subscribe">
+     <a href="/podcast/{{ podcast.id }}/subscribe">
+      {% if podcast.title %}
+       {% blocktrans with podcast.title as podcasttitle %}Subscribe to {{ podcasttitle }}{% endblocktrans %}
+      {% else %}
+       {% trans "Subscribe to this podcast" %}
+      {% endif %}
+     </a>
+    </div>	
+  {% else %}
+
+  {% if devices|length_is:"0"  %}
 
    {% if can_subscribe %}
     <div class="subscribe">
@@ -97,11 +109,10 @@
      </tr>
     {% endfor %}
    </table>
+  {% endif %} 
   {% endif %}
-
   {% if not podcast.title %}
    <div class="info"><strong>{% trans "Why Unnamed Podcast?" %}</strong> {% trans "Because we display names after we have fetched the information form the feed -- and this may take some time. Until this is completed, the podcast will simply be called this way." %}</div>
   {% endif %}
-
 {% endblock %}
 

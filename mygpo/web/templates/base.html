@@ -20,7 +20,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 -->
-  <title>{% block title %}{% endblock %}my.gPodder.org</title>
+  <title>{% block title %}{% endblock %}my.gpodder.org</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <link rel="shortcut icon" href="http://my.gpodder.org/favicon.png">
   <link rel="stylesheet" href="/media/screen.css" type="text/css" />
@@ -81,7 +81,7 @@
     
    {% else %}
     <ul class="menu">
-     <li class="heading"><strong>my.gpodder.org</strong></li>
+     <li class="heading"><strong>{{ url }}</strong></li>
      <li><a href="/">{% trans "Home" %}</a></li>
      <li><a href="/login/">{% trans "Login" %}</a></li>
      <li><a href="/register/">{% trans "Register" %}</a></li>
@@ -98,6 +98,7 @@
      <li class="heading"><strong>{% trans "Documentation" %}</strong></li>
      <li><a href="/online-help/">{% trans "Online Help" %}</a></li>
      <li><a href="/authors/">{% trans "For podcast authors" %}</a></li>
+     <li><a href="http://wiki.gpodder.org/wiki/Web_Services">{% trans "For Software Developers" %}</a></li>
     </ul>
 
   </div>
