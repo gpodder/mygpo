@@ -226,8 +226,10 @@ def update_episodes(user, actions):
         if position and action != 'play':
             return HttpResponseBadRequest('parameter position can only be used with action play')
 
-        EpisodeAction.objects.create(user=user, episode=episode, device=device, action=action, timestamp=timestamp, playmark=playmark)
-
+        try:
+            EpisodeAction.objects.create(user=user, episode=episode, device=device, action=action, timestamp=timestamp, playmark=playmark)
+        except Exception, e:
+            log('error while adding episode action (user %s, episode %s, device %s, action %s, timestamp %s, playmark %s): %s' % (user, episode, device, action, timestamp, playmark, e))
 
 
 @require_valid_user
