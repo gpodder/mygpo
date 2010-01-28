@@ -158,13 +158,13 @@ def episodes(request, username):
         return JsonResponse({'timestamp': now_})
 
     elif request.method == 'GET':
-        podcast_id = request.GET.get('podcast', None)
-        device_id  = request.GET.get('device', None)
+        podcast_url= request.GET.get('podcast', None)
+        device_uid = request.GET.get('device', None)
         since      = request.GET.get('since', None)
 
         try:
-            podcast = Podcast.objects.get(pk=podcast_id) if podcast_id else None
-            device  = Device.objects.get(pk=device_id) if device_id else None
+            podcast = Podcast.objects.get(url=podcast_url) if podcast_url else None
+            device  = Device.objects.get(user=request.user,uid=device_uid) if device_uid else None
         except:
             raise Http404
 
