@@ -136,7 +136,7 @@ for podcast in fetch_queue:
                     fp.write(urllib2.urlopen(cover_art).read())
                     fp.close()
                     print >>sys.stderr, 'LOGO @', cover_art
-                    podcast.image = cover_art
+                    podcast.logo_url = cover_art
                 except:
                     print >>sys.stderr, 'cannot save image'
 
