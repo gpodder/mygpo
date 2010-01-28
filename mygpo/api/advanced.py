@@ -194,7 +194,7 @@ def get_episode_changes(user, podcast, device, since, until):
             'podcast': a.episode.podcast.url,
             'episode': a.episode.url,
             'action':  a.action,
-            'timestamp': a.timestamp
+            'timestamp': a.timestamp.strftime('%Y-%m-%dT%H:%M:%S') #2009-12-12T09:00:00
         }
 
         if a.action == 'play' and a.playmark:
