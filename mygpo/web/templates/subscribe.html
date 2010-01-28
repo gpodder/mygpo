@@ -4,7 +4,7 @@
 {% block content %}
   <h1>
    {% if podcast.title %}
-    {% blocktrans with podcast.title as podcasttitle %}Subscribe to {{podcasttitle }}{% endblocktrans %}
+    {% blocktrans with podcast.title|striptags as podcasttitle %}Subscribe to {{podcasttitle }}{% endblocktrans %}
    {% else %}
     {% trans "Subscribe to this podcast" %}
    {% endif %}
@@ -12,7 +12,7 @@
   <a href="{{ podcast.url }}" class="URL">{{ podcast.url }}</a>
 
   {% if podcast.description %}
-   <p class="description">{{ podcast.description }}</p>
+   <p class="description">{{ podcast.description|striptags }}</p>
   {% endif %}
 
   {% if can_subscribe %}

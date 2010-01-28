@@ -3,15 +3,15 @@
 {% load humanize %}
 
 {% block content %}
-  <h1>{{ episode.title|default:"Unnamed Episode" }}</h1>
-  <div>{%blocktrans with episode.podcast as podcast and episode.podcast.id as podcast_id %}An episode of the <a href="/podcast/{{ podcast_id }}">{{ podcast }}</a> podcast.{% endblocktrans %}</div>
+  <h1>{{ episode.title|default:"Unnamed Episode"|striptags }}</h1>
+  <div>{%blocktrans with episode.podcast|striptags as podcast and episode.podcast.id as podcast_id %}An episode of the <a href="/podcast/{{ podcast_id }}">{{ podcast }}</a> podcast.{% endblocktrans %}</div>
 
   {% if episode.timestamp %}
    <div>Released on {{episode.timestamp}}.</div>
   {% endif %}
 
   {% if episode.description %}
-   <p class="description">{{ episode.description }}</p>
+   <p class="description">{{ episode.description|striptags }}</p>
   {% endif %}
 
   <div class="links"><strong>Links: </strong>
@@ -31,7 +31,7 @@
     <tr>
      <td><abbr title="{{ s.timestamp }}">{{ s.timestamp|naturalday }}</abbr></td>
      <td>{{ s.action }}</td>
-     <td><a href="/device/{{ s.device.id }}">{{ s.device.name }}</a></td>
+     <td><a href="/device/{{ s.device.id }}">{{ s.device.name|striptags }}</a></td>
 	</tr>
    {% endfor %}
   </table>

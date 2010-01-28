@@ -4,18 +4,18 @@
 {% load episodes %}
 
 {% block content %}
-  <h1>{% if podcast.title %}{{ podcast.title }}{% else %}{% trans "Unnamed Podcast" %}{%endif%}</h1>
+  <h1>{% if podcast.title %}{{ podcast.title|striptags }}{% else %}{% trans "Unnamed Podcast" %}{%endif%}</h1>
   <a href="{{ podcast.url }}" class="URL">{{ podcast.url }}</a>
 
   {% if podcast.description %}
-   <p class="description">{{ podcast.description }}</p>
+   <p class="description">{{ podcast.description|striptags }}</p>
   {% endif %}
 
   {% if not user.is_authenticated %}
     <div class="subscribe">
      <a href="/podcast/{{ podcast.id }}/subscribe">
       {% if podcast.title %}
-       {% blocktrans with podcast.title as podcasttitle %}Subscribe to {{ podcasttitle }}{% endblocktrans %}
+       {% blocktrans with podcast.title|striptags as podcasttitle %}Subscribe to {{ podcasttitle }}{% endblocktrans %}
       {% else %}
        {% trans "Subscribe to this podcast" %}
       {% endif %}
@@ -29,7 +29,7 @@
     <div class="subscribe">
      <a href="/podcast/{{ podcast.id }}/subscribe">
       {% if podcast.title %}
-       {% blocktrans with podcast.title as podcasttitle %}Subscribe to {{ podcasttitle }}{% endblocktrans %}
+       {% blocktrans with podcast.title|striptags as podcasttitle %}Subscribe to {{ podcasttitle }}{% endblocktrans %}
       {% else %}
        {% trans "Subscribe to this podcast" %}
       {% endif %}
@@ -43,7 +43,7 @@
    <ul class="devices">
    {% for device in devices %}
     <li class="{{device.type}}">
-     <div class="devicesLeft"><a href="/device/{{ device.id }}">{{ device }}</a></div>
+     <div class="devicesLeft"><a href="/device/{{ device.id }}">{{ device|striptags }}</a></div>
      <div class="devicesRight"><a href="{{unsubscribe}}/{{ device.id }}?return_to=/podcast/{{ podcast.id }}"><img src="/media/unsubscribe.png" /></a></div>
      <div class="devicesClear"></div>
     </li>
@@ -54,7 +54,7 @@
     <div class="subscribe">
      <a href="/podcast/{{ podcast.id }}/subscribe">
       {% if podcast.title %}
-       {% blocktrans with podcast.title as podcasttitle %}Subscribe to {{ podcasttitle }} on other devices{% endblocktrans %}
+       {% blocktrans with podcast.title|striptags as podcasttitle %}Subscribe to {{ podcasttitle }} on other devices{% endblocktrans %}
       {% else %}
        {% trans "Subscribe to this podcast on other devices" %}
       {% endif %}
@@ -77,8 +77,8 @@
     {% for episode, action in episodes.items %}
      <tr>
       <td>{{ action|episode_status_icon }}</td>
-      <td><a href="/episode/{{ episode.id }}">{{ episode.title|default:"Unknown Episode" }}</a></td>
-      <td class="description">{{ episode.description|default:""|truncatewords:"15" }}</td>
+      <td><a href="/episode/{{ episode.id }}">{{ episode.title|default:"Unknown Episode"|striptags }}</a></td>
+      <td class="description">{{ episode.description|default:""|striptags|truncatewords:"15" }}</td>
       <td>{{ episode.timestamp|default:""|naturalday }}</td>
 
      </tr>
@@ -105,7 +105,7 @@
         <img src="/media/unsubscribe.png" />
        {% endifequal %}
       </td>
-      <td>{{ s.device.name }}</td>
+      <td>{{ s.device.name|striptags }}</td>
      </tr>
     {% endfor %}
    </table>

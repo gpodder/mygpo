@@ -23,9 +23,9 @@
       </tr>
      {% endifchanged %}
      <tr>
-      <td><a href="/device/{{ d.id }}">{{ d|device_icon }}{{ d.name }}</a></td>
+      <td><a href="/device/{{ d.id }}">{{ d|device_icon }}{{ d.name|striptags }}</a></td>
       <td>{{ d|device_type }}</td>
-      <td>{{ d.uid }}</td>
+      <td>{{ d.uid|striptags }}</td>
      </tr>
     {% endfor %}
    </table>

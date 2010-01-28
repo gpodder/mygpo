@@ -17,7 +17,7 @@
    <tr>
     <td>{{ forloop.counter }}</td>
     <td class="numeric">{{ entry.oldplace|default_if_none:"" }}</td>
-    <td><a href="/podcast/{{ entry.podcast.id }}">{{ entry.podcast }}</a></td>
+    <td><a href="/podcast/{{ entry.podcast.id }}">{{ entry.podcast|striptags }}</a></td>
     <td class="numeric">{{ entry.subscriptions }}</td>
    </tr>
   {% endfor %}

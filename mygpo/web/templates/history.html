@@ -16,7 +16,7 @@
     </tr>
     {% for s in history %}
      <tr>
-      <td><a href="/podcast/{{ s.podcast.id }}">{{ s.podcast }}</a></td>
+      <td><a href="/podcast/{{ s.podcast.id }}">{{ s.podcast|striptags }}</a></td>
       <td><abbr title="{{ s.timestamp }}">{{ s.timestamp|naturalday }}</abbr></td>
       <td>
        {% ifequal s.action 1 %}
@@ -26,7 +26,7 @@
         <img src="/media/unsubscribe.png" />
        {% endifequal %}
       </td>
-      <td><a href="/device/{{ s.device.id }}">{{ s.device|device_icon }}&nbsp;{{ s.device.name }}</a></td>
+      <td><a href="/device/{{ s.device.id }}">{{ s.device|device_icon }}&nbsp;{{ s.device.name|striptags }}</a></td>
      </tr>
     {% endfor %}
    </table>

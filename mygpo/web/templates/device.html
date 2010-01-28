@@ -4,7 +4,7 @@
 {% load devices %}
 
 {% block content %}
-  <h1>{{ device.name }}</h1>
+  <h1>{{ device.name|striptags }}</h1>
 
   {% if device.deleted %}<div class="info">{% trans "This device was deleted." %}</div>{% endif %}
 
@@ -23,7 +23,7 @@
     {% for subscription in subscriptions %}
      <tr>
       <td></td>
-      <td><a href="/podcast/{{subscription.podcast.id}}">{{ subscription.podcast }}</a></td>
+      <td><a href="/podcast/{{subscription.podcast.id}}">{{ subscription.podcast|striptags }}</a></td>
       <td><abbr title="{{subscription.subscribed_since}}">{{subscription.subscribed_since|naturalday}}</abbr></td>
       <td><a href="/podcast/{{subscription.podcast.id}}/unsubscribe/{{ device.id }}?return_to=/device/{{ device.id }}"><img src="/media/unsubscribe.png" /></a></td>
      </tr>
@@ -40,12 +40,12 @@
 
   {% if synced_with|length_is:"0" %}
 
-   <p>{% blocktrans with device.name as devicename %}{{ devicename }} is currently not synchronized with other devices.{% endblocktrans %}</p>
+   <p>{% blocktrans with device.name|striptags as devicename %}{{ devicename }} is currently not synchronized with other devices.{% endblocktrans %}</p>
 
   {% else %}
 
-   <p>{% blocktrans with device.name as devicename and synced_with|device_list as synclist %}{{ devicename }} is currently synchronized with {{ synclist }}.{% endblocktrans %}</p>
-   <a href="/device/{{ device.id }}/unsync">{% blocktrans with device.name as devicename %}Stop synchronisation for {{ devicename }} {% endblocktrans %}</a>
+   <p>{% blocktrans with device.name|striptags as devicename and synced_with|device_list as synclist %}{{ devicename }} is currently synchronized with {{ synclist }}.{% endblocktrans %}</p>
+   <a href="/device/{{ device.id }}/unsync">{% blocktrans with device.name|striptags as devicename %}Stop synchronisation for {{ devicename }} {% endblocktrans %}</a>
   
   {% endif %}
 

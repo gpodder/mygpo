@@ -4,7 +4,7 @@
 
 {% block content %}
 {% if deletedevice_success %}
-   <div class="success">{% blocktrans %}The device {{ device_name }} has been deleted.{% endblocktrans %}</div>
+   <div class="success">{% blocktrans with device_name|striptags as devicename %}The device {{ devicename }} has been deleted.{% endblocktrans %}</div>
 {% endif %}
 
 <h1>{% trans "Your Subscriptions" %}</h1>
@@ -25,9 +25,9 @@
       <img src="{{ s.podcast.logo_url }}" style="width:40px; height:30px;" />
      {% endif %}                  
     </td>
-    <td><a class="listlink" href="/podcast/{{ s.podcast.id }}">{{ s.podcast }}</a></td>
+    <td><a class="listlink" href="/podcast/{{ s.podcast.id }}">{{ s.podcast|striptags }}</a></td>
     {% if s.episode %}
-     <td><a href="/episode/{{s.episode.id}}">{{ s.episode.title|default:"Unnamed Episode" }}</a></td>
+     <td><a href="/episode/{{s.episode.id}}">{{ s.episode.title|default:"Unnamed Episode"|striptags }}</a></td>
     {% else %}
      <td></td>
     {% endif %}
@@ -38,7 +38,7 @@
  {% else %}
 
  <h2>{% trans "Where to start?" %}</h2>
- <p>{% blocktrans with user.username as username %}{{ url }} help you to track your podcasts which you have subscribed on your devices - desktop computer, notebook, mobile devices, etc. To start using my.gpodder.org set up <a href="http://gpodder.org">gPodder</a> with your username &ndash; <strong>{{username}}</strong> &ndash; and password and upload your podcasts. They will automatically show up here.{% endblocktrans %}</p>
+ <p>{% blocktrans with user.username|striptags as username %}{{ url }} help you to track your podcasts which you have subscribed on your devices - desktop computer, notebook, mobile devices, etc. To start using my.gpodder.org set up <a href="http://gpodder.org">gPodder</a> with your username &ndash; <strong>{{username}}</strong> &ndash; and password and upload your podcasts. They will automatically show up here.{% endblocktrans %}</p>
 
  {% endif %}
 {% endblock %}
