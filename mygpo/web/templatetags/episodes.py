@@ -20,7 +20,7 @@ def episode_status_icon(action):
         elif action.action == 'play':
             s = '<img src="/media/16x16/media-playback-start.png" alt="played" title="%s" />' % ('%s%s%s' % (_('This episode has been played'),date_string, device_string))
         elif action.action == 'delete':
-            s = '<img src="/media/16x16/user-trash-full.png" alt="deleted" title="%s"/>' %s ('%s%s%s' % (_('This episode has been deleted'),date_string, device_string))
+            s = '<img src="/media/16x16/user-trash-full.png" alt="deleted" title="%s"/>' % ('%s%s%s' % (_('This episode has been deleted'),date_string, device_string))
         else:
             return action.action #this is not marked safe by intention
 
