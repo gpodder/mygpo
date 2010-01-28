@@ -313,7 +313,6 @@ class EpisodeAction(models.Model):
 
     class Meta:
         db_table = 'episode_log'
-        unique_together = ('user', 'episode', 'timestamp')
 
 
 class Subscription(models.Model):
