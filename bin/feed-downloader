@@ -23,6 +23,8 @@ USER_AGENT = 'mygpo crawler (+http://my.gpodder.org)'
 import os
 import sys
 import datetime
+import hashlib
+import urllib2
 import socket
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'mygpo.settings'
@@ -37,13 +39,64 @@ fetcher = feedcore.Fetcher(USER_AGENT)
 
 UPDATE_LIMIT = datetime.datetime.now() - datetime.timedelta(days=15)
 
-#fetch_queue = models.Podcast.objects.all()
-fetch_queue = models.Podcast.objects.filter(last_update__lt=UPDATE_LIMIT)
+if len(sys.argv) > 1:
+    fetch_queue = [models.Podcast.objects.get(url=url) for url in sys.argv[1:]]
+else:
+    #fetch_queue = models.Podcast.objects.all()
+    fetch_queue = models.Podcast.objects.filter(last_update__lt=UPDATE_LIMIT)
+
+def check_mime(mimetype):
+    """Check if a mimetype is a "wanted" media type"""
+    if '/' in mimetype:
+        category, _ignore = mimetype.split('/', 1)
+        return category in ('audio', 'video', 'image')
+    else:
+        return False
+
+def get_episode_url(entry):
+    """Get the download / episode URL of a feedparser entry"""
+    enclosures = getattr(entry, 'enclosures', [])
+    for enclosure in enclosures:
+        if 'href' in enclosure and check_mime(enclosure.get('type', '')):
+            return enclosure['href']
+
+    media_content = getattr(entry, 'media_content', [])
+    for media in media_content:
+        if 'url' in media and check_mime(m.get('type', '')):
+            return media['url']
+
+    links = getattr(entry, 'links', [])
+    for link in links:
+        if not hasattr(link, 'href'):
+            continue
+        # XXX: Implement link detection as in gPodder
+
+    return None
+
+def get_episode_summary(entry):
+    for key in ('summary', 'subtitle', 'link'):
+        value = entry.get(key, None)
+        if value:
+            return value
+
+    return ''
+
+def get_episode_metadata(entry, url):
+    d = {
+            'url': url,
+            'title': entry.get('title', entry.get('link', '')),
+            'description': get_episode_summary(entry),
+            'link': entry.get('link', ''),
+            'timestamp': None,
+    }
+    try:
+        d['timestamp'] = datetime.datetime(*(entry.updated_parsed)[:6])
+    except:
+        d['timestamp'] = None
+
+    return d
 
 for podcast in fetch_queue:
-    # XXX: Wrong data format in the database?
-    podcast.url = podcast.url.lstrip('"')
-
     print podcast.url
 
     try:
@@ -63,6 +116,47 @@ for podcast in fetch_queue:
         podcast.title = feed.feed.get('title', podcast.url)
         podcast.link = feed.feed.get('link', podcast.url)
         podcast.description = feed.feed.get('subtitle', podcast.description)
+
+        cover_art = None
+        image = feed.feed.get('image', None)
+        if image is not None:
+            for key in ('href', 'url'):
+                cover_art = getattr(image, key, None)
+                if cover_art:
+                    break
+
+        if cover_art is not None:
+            image_sha1 = hashlib.sha1()
+            image_sha1.update(cover_art)
+            image_sha1 = image_sha1.hexdigest()
+            filename = os.path.join('htdocs', 'media', 'logo', image_sha1)
+            if not os.path.exists(filename):
+                try:
+                    fp = open(filename, 'w')
+                    fp.write(urllib2.urlopen(cover_art).read())
+                    fp.close()
+                    print >>sys.stderr, 'LOGO @', cover_art
+                    podcast.image = cover_art
+                except:
+                    print >>sys.stderr, 'cannot save image'
+
+        for entry in feed.entries:
+            try:
+                url = get_episode_url(entry)
+                if url is None:
+                    print 'Ignoring entry'
+                    continue
+                e, created = models.Episode.objects.get_or_create(
+                        podcast=podcast,
+                        url=url,
+                        defaults=get_episode_metadata(entry, url))
+                if created:
+                    print 'New episode: ', e.title.encode('utf-8', 'ignore')
+                    e.save()
+            except Exception, e:
+                print 'Cannot get episode:', e
+    except Exception, e:
+        print >>sys.stderr, 'Exception:', e
 
     podcast.last_update = datetime.datetime.now()
     try:
