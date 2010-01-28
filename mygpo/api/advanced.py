@@ -197,7 +197,8 @@ def get_episode_changes(user, podcast, device, since, until):
             'timestamp': a.timestamp
         }
 
-        if a.action == 'play': action['time'] = a.playmark
+        if a.action == 'play' and a.playmark:
+            action['position'] = a.playmark
 
         actions.append(action)
 
