@@ -78,7 +78,7 @@
      <tr>
       <td>{{ action|episode_status_icon }}</td>
       <td><a href="/episode/{{ episode.id }}">{{ episode.title|default:"Unknown Episode" }}</a></td>
-      <td class="description">{{ episode.description|default:"" }}</td>
+      <td class="description">{{ episode.description|default:""|truncatewords:"15" }}</td>
       <td>{{ episode.timestamp|default:""|naturalday }}</td>
 
      </tr>
