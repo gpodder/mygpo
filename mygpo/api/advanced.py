@@ -88,6 +88,10 @@ def update_subscriptions(user, device, add, remove):
     add_sanitized = []
     rem_sanitized = []
 
+    for a in add:
+        if a in rem:
+           raise IntegrityError('can not add and remove %s at the same time' % a)
+
     for u in add:
         us = sanitize_url(u)
         if u != us:  updated_urls.append( (u, us) )
@@ -96,11 +100,8 @@ def update_subscriptions(user, device, add, remove):
     for u in remove:
         us = sanitize_url(u)
         if u != us:  updated_urls.append( (u, us) )
-        if us != '': rem_sanitized.append(us)
-
-    for a in add_sanitized:
-        if a in rem_sanitized:
-           raise IntegrityError('can not add and remove %s at the same time' % a)
+        if us != '' and us not in add_sanitized:
+            rem_sanitized.append(us)
 
     for a in add_sanitized:
         p, p_created = Podcast.objects.get_or_create(url=a)
