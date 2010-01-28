@@ -160,7 +160,9 @@ def episodes(request, username):
     elif request.method == 'GET':
         podcast_url= request.GET.get('podcast', None)
         device_uid = request.GET.get('device', None)
-        since      = request.GET.get('since', None)
+        since_     = request.GET.get('since', None)
+
+        since = datetime.fromtimestamp(float(since_)) if since_ else None
 
         try:
             podcast = Podcast.objects.get(url=podcast_url) if podcast_url else None
