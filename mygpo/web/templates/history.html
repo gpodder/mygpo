@@ -19,7 +19,12 @@
     </tr>
     {% for s in generalhistory %}
      <tr>
-      <td>{{ s.podcast|podcast_logo }}</td>
+      {% if s.podcast %}
+       <td>{{ s.podcast|podcast_logo }}</td>
+      {% else %}
+       <td>{{ s.episode.podcast|podcast_logo }}</td>
+      {% endif %}
+
       <td>
        {% if s.podcast %}
         <a href="/podcast/{{ s.podcast.id }}">{{ s.podcast|striptags }}</a></td>
