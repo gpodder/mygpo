@@ -6,7 +6,11 @@
 {% load episodes %}
 
 {% block content %}
-   <h1>{% trans "History" %}{% if deviceflag %}: {{ device|device_icon }}&nbsp;{{ device.name }}{% endif %}</h1>
+   <h1>{% trans "History" %}{% if singledevice %} {% trans "for" %} {{ singledevice|striptags }}{% endif %}</h1>
+
+   {% if singledevice %}
+    <a href="/device/{{ singledevice.id }}">{% trans "Back to" %} {{ singledevice|device_icon }} {{singledevice|striptags}}</a>
+   {% endif %}
 
    {% if not generalhistory|length_is:"0" %}
    <table class="list">

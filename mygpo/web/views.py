@@ -122,8 +122,12 @@ def podcast(request, pid):
 
 
 
-def history(request, len=15):
-    devices = Device.objects.filter(user=request.user)
+def history(request, len=15, device_id=None):
+    if device_id:
+        devices = Device.objects.filter(id=device_id)
+    else:
+        devices = Device.objects.filter(user=request.user)
+
     history = SubscriptionAction.objects.filter(device__in=devices).order_by('-timestamp')[:len]
     episodehistory = EpisodeAction.objects.filter(device__in=devices).order_by('-timestamp')[:len]
 
@@ -134,36 +138,12 @@ def history(request, len=15):
     for row in episodehistory:
         generalhistory.append(row)
 
-    generalhistory.sort(key=sortkey,reverse=True)
-
-    return render_to_response('history.html', {
-        'generalhistory': generalhistory
-    }, context_instance=RequestContext(request))
-
-def historyperdevice(request, device_id, len=15):
-    devices = Device.objects.filter(id=device_id)
-    history = SubscriptionAction.objects.filter(device__in=devices).order_by('-timestamp')[:len]
-    episodehistory = EpisodeAction.objects.filter(device__in=devices).order_by('-timestamp')[:len]
-
-    generalhistory = []
-
-    for row in history:
-        generalhistory.append(row)
-    for row in episodehistory:
-        generalhistory.append(row)
-
-    generalhistory.sort(key=sortkey,reverse=True)
-    device = devices[0]
+    generalhistory.sort(key=lambda x: x.timestamp,reverse=True)
 
     return render_to_response('history.html', {
         'generalhistory': generalhistory,
-        'device': device,
-        'deviceflag': True
+        'singledevice': devices[0] if device_id else None
     }, context_instance=RequestContext(request))
-
-
-def sortkey(x):
-    return x.timestamp 
 
 def devices(request):
     devices = Device.objects.filter(user=request.user,deleted=False).order_by('sync_group')
