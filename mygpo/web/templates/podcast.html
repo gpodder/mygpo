@@ -3,6 +3,7 @@
 {% load humanize %}
 {% load episodes %}
 {% load podcasts %}
+{% load devices %}
 
 {% block content %}
   <div id="podcastlogo">{{ podcast|podcast_logo:"200" }}</div>
@@ -52,6 +53,16 @@
     </li>
    {% endfor %}
    </ul>
+
+   <h2>{% trans "Privacy" %}</h2>
+   {% if success %}
+      <div class="success">{% trans "Your settings have been saved." %}</div>
+   {% endif %}
+
+   <form action="" method="POST">
+      {{ privacy_form.as_p }}
+      <input type="submit" value="Save" />
+   </form>
 
    {% if can_subscribe %}
     <div class="subscribe">
@@ -108,7 +119,8 @@
         <img src="/media/unsubscribe.png" />
        {% endifequal %}
       </td>
-      <td>{{ s.device.name|striptags }}</td>
+      <td>
+       <a href="/device/{{ s.device.id }}">{{ s.device|device_icon }} {{ s.device.name|striptags }}</a></td>
      </tr>
     {% endfor %}
    </table>

@@ -19,8 +19,8 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, Http404
 from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext
-from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, Subscription, SuggestionEntry, Rating, SyncGroup, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION
-from mygpo.web.forms import UserAccountForm, DeviceForm, SyncForm
+from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, Subscription, SuggestionEntry, Rating, SyncGroup, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SubscriptionMeta
+from mygpo.web.forms import UserAccountForm, DeviceForm, SyncForm, PrivacyForm
 from mygpo.api.opml import Exporter
 from django.utils.translation import ugettext as _
 from mygpo.api.basic_auth import require_valid_user
@@ -29,6 +29,7 @@ from django.db import IntegrityError
 from datetime import datetime
 from django.contrib.sites.models import Site
 from django.conf import settings
+from sets import Set
 from mygpo.api.sanitizing import sanitize_url
 import re
 
@@ -81,13 +82,36 @@ def podcast(request, pid):
         subscribe_targets = podcast.subscribe_targets(request.user)
         episodes = episode_list(podcast, request.user)
         unsubscribe = '/podcast/' + pid + '/unsubscribe'
+        success = False
+        
+        qs = Subscription.objects.filter(podcast=podcast, user=request.user)
+        if qs.count()>0:
+            subscription = qs[0]
+            subscriptionmeta = subscription.get_meta()
+            if request.method == 'POST':
+                privacy_form = PrivacyForm(request.POST)
+                if privacy_form.is_valid():
+                    subscriptionmeta.public = privacy_form.cleaned_data['public']
+                    try:
+                       subscriptionmeta.save()
+                       success = True
+                    except IntegrityError, ie:
+                       error_message = _('You can\'t use the same UID for two devices.')
+            else:
+                privacy_form = PrivacyForm({
+                    'public': subscriptionmeta.public
+                })
+
+
         return render_to_response('podcast.html', {
             'history': history,
             'podcast': podcast,
+            'privacy_form': privacy_form,
             'devices': subscribed_devices,
             'can_subscribe': len(subscribe_targets) > 0,
             'episodes': episodes,
             'unsubscribe': unsubscribe,
+            'success': success
         }, context_instance=RequestContext(request))
     else:
         current_site = Site.objects.get_current()
@@ -98,12 +122,48 @@ def podcast(request, pid):
 
 
 
-def history(request, len=20):
+def history(request, len=15):
     devices = Device.objects.filter(user=request.user)
     history = SubscriptionAction.objects.filter(device__in=devices).order_by('-timestamp')[:len]
+    episodehistory = EpisodeAction.objects.filter(device__in=devices).order_by('-timestamp')[:len]
+
+    generalhistory = []
+
+    for row in history:
+        generalhistory.append(row)
+    for row in episodehistory:
+        generalhistory.append(row)
+
+    generalhistory.sort(key=sortkey,reverse=True)
+
     return render_to_response('history.html', {
-        'history': history,
+        'generalhistory': generalhistory
     }, context_instance=RequestContext(request))
+
+def historyperdevice(request, device_id, len=15):
+    devices = Device.objects.filter(id=device_id)
+    history = SubscriptionAction.objects.filter(device__in=devices).order_by('-timestamp')[:len]
+    episodehistory = EpisodeAction.objects.filter(device__in=devices).order_by('-timestamp')[:len]
+
+    generalhistory = []
+
+    for row in history:
+        generalhistory.append(row)
+    for row in episodehistory:
+        generalhistory.append(row)
+
+    generalhistory.sort(key=sortkey,reverse=True)
+    device = devices[0]
+
+    return render_to_response('history.html', {
+        'generalhistory': generalhistory,
+        'device': device,
+        'deviceflag': True
+    }, context_instance=RequestContext(request))
+
+
+def sortkey(x):
+    return x.timestamp 
 
 def devices(request):
     devices = Device.objects.filter(user=request.user,deleted=False).order_by('sync_group')

@@ -48,6 +48,7 @@ urlpatterns = patterns('',
     (r'account/$', 'mygpo.web.views.account'),
 
     (r'^history/$', 'mygpo.web.views.history'),
+    (r'^history/device/(?P<device_id>\d+)$', 'mygpo.web.views.historyperdevice'),
     (r'^devices/$', 'mygpo.web.views.devices'),
 
     (r'^toplist/$', 'mygpo.web.views.toplist'),
