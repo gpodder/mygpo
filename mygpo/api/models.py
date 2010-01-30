@@ -42,6 +42,8 @@ class Podcast(models.Model):
     link = models.URLField(blank=True, null=True)
     last_update = models.DateTimeField(null=True,blank=True)
     logo_url = models.CharField(max_length=1000,null=True,blank=True)
+    author = models.CharField(max_length=100, null=True, blank=True)
+
 
     def subscriptions(self):
         return Subscription.objects.filter(podcast=self)
@@ -115,6 +117,9 @@ class Episode(models.Model):
     description = models.TextField(null=True, blank=True)
     link = models.URLField(null=True, blank=True)
     timestamp = models.DateTimeField(null=True, blank=True)
+    author = models.CharField(max_length=100, null=True, blank=True)
+    duration = models.PositiveIntegerField(null=True)
+    filesize = models.PositiveIntegerField(null=True)
 
     def __unicode__(self):
         return '%s (%s)' % (self.title, self.podcast)
