@@ -68,5 +68,6 @@ admin.site.register(SyncGroup, SyncGroupAdmin)
 admin.site.register(Device, DeviceAdmin)
 admin.site.register(Subscription, SubscriptionAdmin)
 admin.site.register(SubscriptionAction, SubscriptionActionAdmin)
+admin.site.register(EpisodeAction)
 admin.site.register(URLSanitizingRule)
 
