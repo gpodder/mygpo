@@ -34,12 +34,7 @@
       <td><abbr title="{{ s.timestamp }}">{{ s.timestamp|naturalday }}</abbr></td>
       <td>
        {% if s.podcast %}
-        {% ifequal s.action 1 %}
-         <img src="/media/subscribe.png" />
-        {% endifequal %}
-        {% ifequal s.action -1 %}
-         <img src="/media/unsubscribe.png" />
-        {% endifequal %}
+        {{ s|podcast_status_icon }}
        {% else %}
         {{ s|episode_status_icon }}
        {% endif %}

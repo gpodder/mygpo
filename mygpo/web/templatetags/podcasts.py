@@ -15,3 +15,13 @@ def podcast_logo(podcast, size=32):
 
     return mark_safe(s)
 
+@register.filter
+def podcast_status_icon(action):
+    if action.action == 1:
+        s = '<img src="/media/subscribe.png" />'
+    else:
+        s = '<img src="/media/unsubscribe.png" />'
+
+    return mark_safe(s)
+
+
