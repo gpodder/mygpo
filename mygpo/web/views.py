@@ -86,6 +86,7 @@ def podcast(request, pid):
         
         qs = Subscription.objects.filter(podcast=podcast, user=request.user)
         if qs.count()>0:
+            # subscription meta is valid for all subscriptions, so we get one - doesn't matter which
             subscription = qs[0]
             subscriptionmeta = subscription.get_meta()
             if request.method == 'POST':
@@ -102,6 +103,8 @@ def podcast(request, pid):
                     'public': subscriptionmeta.public
                 })
 
+        else:
+            privacy_form = None
 
         return render_to_response('podcast.html', {
             'history': history,

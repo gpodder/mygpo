@@ -59,10 +59,12 @@
       <div class="success">{% trans "Your settings have been saved." %}</div>
    {% endif %}
 
-   <form action="" method="POST">
-      {{ privacy_form.as_p }}
-      <input type="submit" value="Save" />
-   </form>
+   {% if privacy_form %}
+    <form action="" method="POST">
+     {{ privacy_form.as_p }}
+     <input type="submit" value="Save" />
+    </form>
+   {% endif %}
 
    {% if can_subscribe %}
     <div class="subscribe">
