@@ -397,6 +397,13 @@ def podcast_subscribe_url(request):
 
     return HttpResponseRedirect('/podcast/%d/subscribe' % podcast.pk)
 
+@login_required
+def delete_account(request):
+    user = request.user
+    user.delete()
+    logout
+    return render_to_response('delete_account.html')
+    
 
 def author(request):
     current_site = Site.objects.get_current()

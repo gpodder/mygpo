@@ -20,6 +20,7 @@
      </ul>
     </li>
     <li><a href="#3">{% trans "How can I copy single subscriptions between devices?" %}</a></li>
+    <li><a href="#4">{% trans "How can I delete subscriptions from a device?" %}</a></li>
    </ul>
   </div>
   
@@ -27,9 +28,9 @@
    <h2 id="1" class="ohelp">{% trans "How can I configure my devices?" %}</h2>
    <h3 id="1.1">{% trans "How can I add a new device?" %}</h3>
    <p>{% trans "Open the &quot;gPodder Podcast-Client&quot; on your PC or MAC." %}</p>
-   <p>{% trans "Upload your podcasts and if it's asked, enter your username and password. The server will create you a new device." %}</p>
+   <p>{% trans "Upload your podcasts and if it's asked, enter your username and password. The server will create a new legacy device for you, if no device exists." %}</p>
    <h3 id="1.2">{% trans "How can I edit a device?" %}</h3>
-   <p>{% trans "Click on your &quot;Subscriptions&quot;-link." %}<br />
+   <p>{% trans "Click on your &quot;Subscriptions&quot;- or &quot;Devices&quot;-link." %}<br />
    {% trans "Now you can see your devices, click on one of them." %}</p>
    <p><img src="/media/online-help/userhome.png" class="ohelp" /></p>
    <p>{% trans "You are redirected to another page.<br />On the bottom of the page there's a field named &quot;Edit&quot;" %}</p>
@@ -40,14 +41,14 @@
   <div class="ohelp">
    <h2 id="2" class="ohelp">{% trans "How can I configure the synchronisation between devices?" %}</h2>
    <h3 id="2.1">{% trans "How can I start a synchronisation?" %}</h3>
-   <p>{% trans "Choose a device on your &quot;Subscriptions-screen&quot; and click on it." %}</p>
+   <p>{% trans "Choose a device on your &quot;Subscriptions&quot;- or &quot;Device&quot;-screen and click on it." %}</p>
    <p><img src="/media/online-help/userhome.png" class="ohelp" /></p>
    <p>{% trans "Go to the field &quot;Synchronize&quot;, choose your desired device and click on the &quot;OK&quot;-button." %}</p>
    <p><img src="/media/online-help/startsync.png" class="ohelp" /></p>
-   <p>{% trans "Now the two devices are synchronized." %}</p>
+   <p>{% trans "Now the two devices are synchronized. If this isn't enough, you can synchronize your device with one or more devices!" %}</p>
    
    <h3 id="2.2">{% trans "How can I stop a synchronisation?" %}</h3>
-   <p>{% trans "Click on your &quot;Subscriptions&quot;-link." %}<br />
+   <p>{% trans "Click on your &quot;Subscriptions&quot;- or &quot;Devices&quot;-link." %}<br />
    {% trans "Choose a device on which you would like to stop the synchronisation and click on it." %}</p>
    <p><img src="/media/online-help/userhomesync.png" class="ohelp" /></p>
    <p>{% trans "Go to the field &quot;Synchronize&quot; and click on &quot;Stop synchronisation for your device&quot;" %}</p>
@@ -60,10 +61,25 @@
    <p>{% trans "Click on your &quot;Subscriptions&quot;-link." %}<br />
    {% trans "Choose the podcast which you would like to copy on another device and click on it." %}</p>
    <p><img src="/media/online-help/userhomesingle.png" class="ohelp" /></p>
-   <p>{% trans "Under the field &quot;Devices&quot; you see the link &quot;Subscribe to ... on other devices&quot; click on it." %}</p>
+   <p>{% trans "Below the field &quot;Devices&quot; you see the link &quot;Subscribe to ... on other devices&quot; click on it." %}</p>
    <p><img src="/media/online-help/subscribetootherdev.png" class="ohelp" /></p>
    <p>{% trans "On the next page you can choose your desired device on which you want to copy the subscription." %}<br />
    {% trans "After hitting the &quot;OK&quot;-button, the subscription has been copied." %}</p>
   </div>
   
+  <div class="ohelp">
+   <h2 id="4" class="ohelp">{% trans "How can I delete subscriptions from a device?" %}</h2>
+   <p>{% trans "There are different methods to do that:" %}<br />
+   <p>
+    <ul>
+     <li>{% trans "You can simply delete the subscription on your client and upload your new subscription-list" %}</li>
+     <li>{% trans "or you can choose the podcast which you'd like to unsubscribe and click on it." %}
+      <p><img src="/media/online-help/userhomesingle.png" class="ohelp" /></p>
+      <p>{% trans "Below the field &quot;Devices&quot; you see on which devices you've subscribed the podcast. Now select the device on which the podcast schould be unsubscribed and click on the red/orange-minus on the right." %}</p>
+      <p><img src="/media/online-help/subscribetootherdev.png" class="ohelp" /></p>
+      <p>{% trans "You are redirected to the same page, now the device from which you unsubscribed the podcast shouldn't exist amongst &quot;Devices&quot; anymore." %}</p>
+     </li>
+    </ul>
+   </p>
+  </div>
 {% endblock %}
