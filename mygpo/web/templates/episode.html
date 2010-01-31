@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load humanize %}
 {% load episodes %}
+{% load devices %}
 
 {% block title %}{{ episode.title|default:"Unnamed Episode"|striptags }} - {{ episode.podcast.title|default:"Unnamed Podcast"|striptags}}{% endblock %}
 
@@ -28,13 +29,15 @@
     <th>{% trans "When" %}</th>
     <th>{% trans "What" %}</th>
     <th>{% trans "Where" %}</th>
+    <th></th>
    </tr>
 
    {% for s in history %}
     <tr>
      <td><abbr title="{{ s.timestamp }}">{{ s.timestamp|naturalday }}</abbr></td>
      <td>{{ s|episode_status_icon }}</td>
-     <td><a href="/device/{{ s.device.id }}">{{ s.device.name|striptags }}</a></td>
+     <td><a href="/device/{{ s.device.id }}">{{ s.device|device_icon }} {{ s.device.name|striptags }}</a></td>
+     <td>{% if s.playmark %}{{ s.playmark_time|date:"H:m:s" }}{% endif %}
 	</tr>
    {% endfor %}
   </table>

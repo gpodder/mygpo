@@ -316,6 +316,9 @@ class EpisodeAction(models.Model):
     def __unicode__(self):
         return '%s %s %s' % (self.user, self.action, self.episode)
 
+    def playmark_time(self):
+        return datetime.fromtimestamp(float(self.playmark))
+
     class Meta:
         db_table = 'episode_log'
 
