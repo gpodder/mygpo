@@ -23,6 +23,7 @@
    {% if episode.link %}<a href="{{episode.link}}">Website</a>{% endif %}
   </div>
 
+  {% if not history|length_is:"0" %}
   <h2>{% trans "Your Episode History" %}</h2>
   <table class="list">
    <tr>
@@ -41,6 +42,7 @@
 	</tr>
    {% endfor %}
   </table>
+  {% endif %}
   <br /><br />
 
   {% if not episode.title %}
