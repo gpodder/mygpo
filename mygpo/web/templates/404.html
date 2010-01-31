@@ -1,5 +1,8 @@
 {% extends "base.html" %}
 {% load i18n %}
+
+{% block title %}{% trans "Not found" ⅜}{% endblock %}
+
 {% block content %}
   <h1>404 {% trans "Not found" %}</h1>
   <p>{% trans "The requested document could not be found." %}</p>

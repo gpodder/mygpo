@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% load i18n %}
 
+{% block title %}{% trans "Select a Username" %}{% endblock %}
+
 {% block content %}
   <h1>{{ url }}</h1>
   <p>{% blocktrans with username|striptags as user_name %}The new {{ url }} uses usernames instead of email addresses. Based on your email address, we think you might like <strong>{{user_name}}</strong>, but you can change that if you want to.{% endblocktrans %}</p>

@@ -1,5 +1,8 @@
 {% extends "base.html" %}
 {% load i18n %}
+
+{% block title %}{% trans "Bad request" %}{% endblock %}
+
 {% block content %}
   <h1>400 {% trans "Bad request" %}</h1>
   <p>{% trans "There has been an error processing your request." %}</p>

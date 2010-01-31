@@ -3,6 +3,8 @@
 {% load humanize %}
 {% load episodes %}
 
+{% block title %}{{ episode.title|default:"Unnamed Episode"|striptags }} - {{ episode.podcast.title|default:"Unnamed Podcast"|striptags}}{% endblock %}
+
 {% block content %}
   <h1>{{ episode.title|default:"Unnamed Episode"|striptags }}</h1>
   <div>{%blocktrans with episode.podcast|striptags as podcast and episode.podcast.id as podcast_id %}An episode of the <a href="/podcast/{{ podcast_id }}">{{ podcast }}</a> podcast.{% endblocktrans %}</div>

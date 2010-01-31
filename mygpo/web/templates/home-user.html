@@ -3,6 +3,8 @@
 {% load devices %}
 {% load podcasts %}
 
+{% block title %}{% trans "Your Subscriptions" %}{% endblock %}
+
 {% block content %}
 {% if deletedevice_success %}
    <div class="success">{% blocktrans with device_name|striptags as devicename %}The device {{ devicename }} has been deleted.{% endblocktrans %}</div>

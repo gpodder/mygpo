@@ -5,6 +5,8 @@
 {% load podcasts %}
 {% load devices %}
 
+{% block title %}{{ podcast.title|default:"Unnamed Podcast"|striptags }}{% endblock %}
+
 {% block content %}
   <div id="podcastlogo">{{ podcast|podcast_logo:"200" }}</div>
 

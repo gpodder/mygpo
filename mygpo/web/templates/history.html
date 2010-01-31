@@ -5,6 +5,8 @@
 {% load podcasts %}
 {% load episodes %}
 
+{% block title %}{% trans "History" %}{% if singledevice %} {% trans "for" %} {{ singledevice|striptags }}{% endif %}{% endblock %}
+
 {% block content %}
    <h1>{% trans "History" %}{% if singledevice %} {% trans "for" %} {{ singledevice|striptags }}{% endif %}</h1>
 

@@ -2,6 +2,8 @@
 {% load i18n %}
 {% load podcasts %}
 
+{% block title %}{% blocktrans with podcast.title|default:"Unnamed Podcast"|striptags as podcasttitle %}Subscribe to {{ podcasttitle }}{% endblocktrans %}{% endblock %}
+
 {% block content %}
   <div id="podcastlogo">{{ podcast|podcast_logo:"200" }}</div>
   <h1>

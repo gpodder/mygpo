@@ -4,6 +4,8 @@
 {% load devices %}
 {% load podcasts %}
 
+{% block title %}{% blocktrans with device.name|striptags as devicename %}Device {{ devicename }}{% endblocktrans %}{% endblock %}
+
 {% block content %}
   <h1>{{ device.name|striptags }}</h1>
 
