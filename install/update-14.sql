@@ -1,4 +1,5 @@
 ALTER TABLE podcast ADD COLUMN `author` varchar(100);
+ALTER TABLE podcast ADD COLUMN `language` varchar(10);
 
 ALTER TABLE episode ADD COLUMN `author` varchar(100);
 ALTER TABLE episode ADD COLUMN `duration` integer UNSIGNED;

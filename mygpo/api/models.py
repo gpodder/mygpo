@@ -43,6 +43,7 @@ class Podcast(models.Model):
     last_update = models.DateTimeField(null=True,blank=True)
     logo_url = models.CharField(max_length=1000,null=True,blank=True)
     author = models.CharField(max_length=100, null=True, blank=True)
+    language = models.CharField(max_length=10, null=True, blank=True)
 
 
     def subscriptions(self):
