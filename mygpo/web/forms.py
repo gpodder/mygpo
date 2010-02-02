@@ -51,3 +51,6 @@ class SyncForm(forms.Form):
         else:
             return SyncGroup.objects.get(pk=m.group(2))
 
+class ResendActivationForm(forms.Form):
+    username = forms.CharField(max_length=100, label=_('Please enter your username'))
+

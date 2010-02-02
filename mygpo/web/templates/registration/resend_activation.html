@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Resend Activation Email" %}{% endblock %}
+
+{% block content %}
+ <h1>{% trans "Resend Activation Email" %}</h1>
+
+ <form action="/register/resend-activation" method="post">
+  {{ form.as_table }}
+  <input type="submit" value="{% trans "Send" %}" />
+ </form>
+
+{% endblock %}
+

@@ -20,7 +20,7 @@ from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadReque
 from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext
 from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, Subscription, SuggestionEntry, Rating, SyncGroup, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SubscriptionMeta
-from mygpo.web.forms import UserAccountForm, DeviceForm, SyncForm, PrivacyForm
+from mygpo.web.forms import UserAccountForm, DeviceForm, SyncForm, PrivacyForm, ResendActivationForm
 from mygpo.api.opml import Exporter
 from django.utils.translation import ugettext as _
 from mygpo.api.basic_auth import require_valid_user
@@ -29,6 +29,7 @@ from django.db import IntegrityError
 from datetime import datetime
 from django.contrib.sites.models import Site
 from django.conf import settings
+from registration.models import RegistrationProfile
 from sets import Set
 from mygpo.api.sanitizing import sanitize_url
 import re
@@ -413,4 +414,33 @@ def author(request):
         'url': current_site
     }, context_instance=RequestContext(request))
 
+
+def resend_activation(request):
+    error_message = ''
+
+    if request.method == 'POST':
+        site = Site.objects.get_current()
+        form = ResendActivationForm(request.POST)
+
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            profile = RegistrationProfile.objects.get(user__username=username)
+
+            if profile.activation_key == RegistrationProfile.ACTIVATED:
+                error_message = _('Your account already has been activated. Go ahead and log in.')
+
+            elif profile.activation_key_expired():
+                error_message = _('Your activation key has expired. Please try another username, or retry with the same one tomorrow.')
+            else:
+                profile.send_activation_email(self, site)
+                return render_to_response('registration/resent_activation.html')
+
+        else:
+            error_message = _('Invalid Username entered')
+
+    form = ResendActivationForm()
+    return render_to_response('registration/resend_activation.html', {
+        'form': form,
+        'error_message' : error_message
+        })
 

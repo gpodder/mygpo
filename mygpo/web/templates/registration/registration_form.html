@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% load i18n %}
 
+{% block title %}{% trans "Register" %}{% endblock %}
+
 {% block content %}
   <h1>{% trans "Create a User Account" %}</h1>
 
@@ -10,6 +12,9 @@
    <tr><th></th><td><input type="submit" value="Register" /></td></tr>
    </table>
   </form>
+
+  <p>{% trans "After registration, you'll receive an activation email to confirm the validity of your email address." %}</p>
+  <p>{% blocktrans %}If it doesn't arrive, you can <a href="/register/resend-activation">resend</a> it.{% endblocktrans %}</a>
 
 {% endblock %}
 
