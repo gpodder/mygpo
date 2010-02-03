@@ -86,9 +86,10 @@ def podcast(request, pid):
         subscribe_targets = podcast.subscribe_targets(request.user)
         episodes = episode_list(podcast, request.user)
         success = False
-        
+
+
         qs = Subscription.objects.filter(podcast=podcast, user=request.user)
-        if qs.count()>0:
+        if qs.count()>0 and request.user.get_profile().public_profile:
             # subscription meta is valid for all subscriptions, so we get one - doesn't matter which
             subscription = qs[0]
             subscriptionmeta = subscription.get_meta()

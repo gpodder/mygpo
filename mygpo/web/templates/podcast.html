@@ -56,12 +56,12 @@
    {% endfor %}
    </ul>
 
-   <h2>{% trans "Privacy" %}</h2>
-   {% if success %}
-      <div class="success">{% trans "Your settings have been saved." %}</div>
-   {% endif %}
-
    {% if privacy_form %}
+    <h2>{% trans "Privacy" %}</h2>
+    {% if success %}
+     <div class="success">{% trans "Your settings have been saved." %}</div>
+    {% endif %}
+
     <form action="" method="POST">
      {{ privacy_form.as_p }}
      <input type="submit" value="Save" />
