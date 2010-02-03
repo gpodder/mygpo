@@ -25,8 +25,12 @@ from registration.forms import RegistrationForm
 from registration.views import activate, register
 from registration.models import RegistrationProfile
 from mygpo.api.models import UserProfile
+from mygpo.web.forms import RestorePasswordForm
 from django.contrib.sites.models import Site
 from django.conf import settings
+from django.utils.translation import ugettext as _
+import string
+import random
 
 def login_user(request):
        try:
@@ -55,8 +59,10 @@ def login_user(request):
                   return HttpResponseRedirect('/')
 
        else:
+              form = RestorePasswordForm()
               return render_to_response('login.html', {
                      'error_message': 'Unknown user or wrong password',
+                     'restore_password_form': form
               })
 
 @login_required
@@ -81,4 +87,42 @@ def migrate_user(request):
     user.get_profile().save()
 
     return HttpResponseRedirect('/')
+
+def restore_password(request):
+
+    if request.method != 'POST':
+        return HttpResponseRedirect('/login/')
+
+    form = RestorePasswordForm(request.POST)
+    if not form.is_valid():
+        return HttpResponseRedirect('/login/')
+
+    try:
+        if form.cleaned_data['username']:
+            username = form.cleaned_data['username']
+            user = User.objects.get(username=username)
+
+        elif form.cleaned_data['email']:
+            email = form.cleaned_data['email']
+            user = User.objects.get(email=email)
+        else:
+            raise ValueError('Please provide either email address or username')
+
+    except User.DoesNotExist:
+        error_message = _('User does not exist.')
+        return render_to_response('password_reset_failed.html', {
+            'error_message': error_message
+        })
+
+    except ValueError, e:
+        return render_to_response('password_reset_failed.html', {
+            'error_message': e
+        })
+
+    site = Site.objects.get_current()
+    pwd = "".join(random.sample(string.letters+string.digits, 8))
+    subject = _('Reset password for your account on %s') % site
+    message = _('Here is your new password for your account on %s: %s') % (site, pwd)
+    user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+    return render_to_response('password_reset.html')
 

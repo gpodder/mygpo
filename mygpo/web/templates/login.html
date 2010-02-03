@@ -13,9 +13,18 @@
     <input type="submit" value="Login" style="margin-top:15px;" />
    </form>
 
+  {% if restore_password_form %}
+   <h2>{% trans "Want to restore your password?" %}</h2>
+   <form action="/register/restore_password" method="POST">
+    {{ restore_password_form.as_table }}
+    <input type="submit" value="{% trans "Restore" %}" />
+   </form>
+
+  {% else %}
   <div style="margin-left:10px; padding:3px; padding-bottom:10px; margin-right:10px;">
    {% trans "Not yet a member?" %} <a href="/register/">{% trans "Register!" %}</a>
   </div>
+  {% endif %}
 
 {% endblock %}
 
