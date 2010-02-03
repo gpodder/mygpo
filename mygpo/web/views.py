@@ -427,11 +427,16 @@ def podcast_subscribe_url(request):
 
 @login_required
 def delete_account(request):
-    user = request.user
-    user.delete()
-    logout
-    return render_to_response('delete_account.html')
 
+    if request.method == 'GET':
+        return render_to_response('delete_account.html')
+
+    request.user.is_active = False
+    request.user.save()
+    logout(request)
+    return render_to_response('delete_account.html', {
+        'success': True
+        })
 
 def author(request):
     current_site = Site.objects.get_current()
