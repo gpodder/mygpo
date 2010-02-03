@@ -3,4 +3,4 @@ INSERT INTO `sanitizing_rules` VALUES (2,1,0,'(?P<unchanged>feedburner\\.com.+)\
 INSERT INTO `sanitizing_rules` VALUES (3,1,0,'^\\s+','',0,'Remove leading whitespaces');
 INSERT INTO `sanitizing_rules` VALUES (4,1,0,'\\s+$','',0,'Remove trailing whitespaces');
 INSERT INTO `sanitizing_rules` VALUES (5,1,0,'^[^(https?):].+','',100,'Empty any string that doesn\'t start with either http or https');
-
+INSERT INTO `sanitizing_rules` VALUES (6,1,0,'^https?://([0-9a-zA-z-\.]+\.)?gpodder.org.*','',100,'As gpodder.org doesn\'t host Podcasts, all URLs starting with this domain are considered invalid');
