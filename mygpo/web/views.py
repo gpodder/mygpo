@@ -18,6 +18,7 @@
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, Http404
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 from django.template import RequestContext
 from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, Subscription, SuggestionEntry, Rating, SyncGroup, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SubscriptionMeta
 from mygpo.web.forms import UserAccountForm, DeviceForm, SyncForm, PrivacyForm, ResendActivationForm
@@ -32,6 +33,7 @@ from django.conf import settings
 from registration.models import RegistrationProfile
 from sets import Set
 from mygpo.api.sanitizing import sanitize_url
+from mygpo.web.users import get_user
 import re
 
 def home(request):
@@ -406,7 +408,7 @@ def delete_account(request):
     user.delete()
     logout
     return render_to_response('delete_account.html')
-    
+
 
 def author(request):
     current_site = Site.objects.get_current()
@@ -418,29 +420,39 @@ def author(request):
 def resend_activation(request):
     error_message = ''
 
-    if request.method == 'POST':
-        site = Site.objects.get_current()
-        form = ResendActivationForm(request.POST)
-
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            profile = RegistrationProfile.objects.get(user__username=username)
-
-            if profile.activation_key == RegistrationProfile.ACTIVATED:
-                error_message = _('Your account already has been activated. Go ahead and log in.')
-
-            elif profile.activation_key_expired():
-                error_message = _('Your activation key has expired. Please try another username, or retry with the same one tomorrow.')
-            else:
-                profile.send_activation_email(self, site)
-                return render_to_response('registration/resent_activation.html')
-
-        else:
-            error_message = _('Invalid Username entered')
-
-    form = ResendActivationForm()
-    return render_to_response('registration/resend_activation.html', {
-        'form': form,
-        'error_message' : error_message
+    if request.method == 'GET':
+        form = ResendActivationForm()
+        return render_to_response('registration/resend_activation.html', {
+            'form': form,
         })
+
+    site = Site.objects.get_current()
+    form = ResendActivationForm(request.POST)
+
+    try:
+        if not form.is_valid():
+            raise ValueError(_('Invalid Username entered'))
+
+        try:
+            user = get_user(form.cleaned_data['username'], form.cleaned_data['email'])
+        except User.DoesNotExist:
+            raise ValueError(_('User does not exist.'))
+
+        profile = RegistrationProfile.objects.get(user=user)
+
+        if profile.activation_key == RegistrationProfile.ACTIVATED:
+            raise ValueError(_('Your account already has been activated. Go ahead and log in.'))
+
+        elif profile.activation_key_expired():
+            raise ValueError(_('Your activation key has expired. Please try another username, or retry with the same one tomorrow.'))
+
+    except ValueError, e:
+        return render_to_response('registration/resend_activation.html', {
+           'form': form,
+           'error_message' : e
+        })
+
+
+    profile.send_activation_email(self, site)
+    return render_to_response('registration/resent_activation.html')
 

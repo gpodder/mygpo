@@ -88,6 +88,14 @@ def migrate_user(request):
 
     return HttpResponseRedirect('/')
 
+def get_user(username, email):
+    if username:
+        return User.objects.get(username=username)
+    elif email:
+        return User.objects.get(email=email)
+    else:
+        raise User.DoesNotExist('neither username nor email provided')
+
 def restore_password(request):
 
     if request.method != 'POST':
@@ -98,25 +106,12 @@ def restore_password(request):
         return HttpResponseRedirect('/login/')
 
     try:
-        if form.cleaned_data['username']:
-            username = form.cleaned_data['username']
-            user = User.objects.get(username=username)
-
-        elif form.cleaned_data['email']:
-            email = form.cleaned_data['email']
-            user = User.objects.get(email=email)
-        else:
-            raise ValueError('Please provide either email address or username')
+        get_user(form.cleaned_data['username'], form.cleaned_data['email'])
 
     except User.DoesNotExist:
         error_message = _('User does not exist.')
         return render_to_response('password_reset_failed.html', {
             'error_message': error_message
-        })
-
-    except ValueError, e:
-        return render_to_response('password_reset_failed.html', {
-            'error_message': e
         })
 
     site = Site.objects.get_current()
