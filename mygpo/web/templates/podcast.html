@@ -92,9 +92,9 @@
      <th>{% trans "Released" %}</th>
     </tr>
  
-    {% for episode, action in episodes.items %}
+    {% for episode in episodes %}
      <tr>
-      <td>{{ action|episode_status_icon }}</td>
+      <td>{{ episode.action|episode_status_icon }}</td>
       <td><a href="/episode/{{ episode.id }}">{{ episode.title|default:"Unknown Episode"|striptags }}</a></td>
       <td class="description">{{ episode.description|default:""|striptags|truncatewords:"15" }}</td>
       <td>{{ episode.timestamp|default:""|naturalday }}</td>

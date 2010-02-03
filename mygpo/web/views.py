@@ -208,14 +208,18 @@ def podcast_unsubscribe(request, pid, device_id):
     return HttpResponseRedirect(return_to)
 
 def episode_list(podcast, user):
-    list = {}
+    """
+    Returns a list of episodes, with their action-attribute set to the latest
+    action. The attribute is unsert if there is no episode-action for
+    the episode.
+    """
     episodes = Episode.objects.filter(podcast=podcast).order_by('-timestamp')
     for e in episodes:
-        list[e] = None
-        for action in EpisodeAction.objects.filter(episode=e, user=user).order_by('timestamp'):
-            list[e] = action
+        actions = EpisodeAction.objects.filter(episode=e, user=user).order_by('-timestamp')
+        if actions.count() > 0:
+            e.action = actions[0]
 
-    return list
+    return episodes
 
 def episode(request, id):
     episode = Episode.objects.get(pk=id)
