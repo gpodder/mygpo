@@ -36,10 +36,10 @@ class UserProfile(models.Model):
         db_table = 'user'
 
 class Podcast(models.Model):
-    url = models.URLField(unique=True)
+    url = models.URLField(unique=True, verify_exists=False)
     title = models.CharField(max_length=100, blank=True)
     description = models.TextField(blank=True, null=True)
-    link = models.URLField(blank=True, null=True)
+    link = models.URLField(blank=True, null=True, verify_exists=False)
     last_update = models.DateTimeField(null=True,blank=True)
     logo_url = models.CharField(max_length=1000,null=True,blank=True)
     author = models.CharField(max_length=100, null=True, blank=True)
@@ -113,10 +113,10 @@ class SuggestionEntry(models.Model):
 
 class Episode(models.Model):
     podcast = models.ForeignKey(Podcast)
-    url = models.URLField(unique=True)
+    url = models.URLField(unique=True, verify_exists=False)
     title = models.CharField(max_length=100, blank=True)
     description = models.TextField(null=True, blank=True)
-    link = models.URLField(null=True, blank=True)
+    link = models.URLField(null=True, blank=True, verify_exists=False)
     timestamp = models.DateTimeField(null=True, blank=True)
     author = models.CharField(max_length=100, null=True, blank=True)
     duration = models.PositiveIntegerField(null=True)
