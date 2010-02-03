@@ -85,7 +85,6 @@ def podcast(request, pid):
         subscribed_devices = [s.device for s in Subscription.objects.filter(podcast=podcast,user=request.user)]
         subscribe_targets = podcast.subscribe_targets(request.user)
         episodes = episode_list(podcast, request.user)
-        unsubscribe = '/podcast/' + pid + '/unsubscribe'
         success = False
         
         qs = Subscription.objects.filter(podcast=podcast, user=request.user)
@@ -117,7 +116,6 @@ def podcast(request, pid):
             'devices': subscribed_devices,
             'can_subscribe': len(subscribe_targets) > 0,
             'episodes': episodes,
-            'unsubscribe': unsubscribe,
             'success': success
         }, context_instance=RequestContext(request))
     else:
