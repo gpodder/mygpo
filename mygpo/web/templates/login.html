@@ -19,9 +19,16 @@
     {{ restore_password_form.as_table }}
     <input type="submit" value="{% trans "Restore" %}" />
    </form>
+  {% endif %}
 
-  {% else %}
-  <div style="margin-left:10px; padding:3px; padding-bottom:10px; margin-right:10px;">
+  {% if activation_needed %}
+   <div class="info">
+    <strong>{% trans "Didn't receive your activation mail?" %}</strong> {% blocktrans %}We can try to <a href="/register/resend-activation">send it again</a>.{% endblocktrans %}
+   </div>
+  {% endif %}
+
+  {% if not restore_password_form and not activation_needed %}
+  <div class="info">
    {% trans "Not yet a member?" %} <a href="/register/">{% trans "Register!" %}</a>
   </div>
   {% endif %}

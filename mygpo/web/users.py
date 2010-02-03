@@ -41,29 +41,35 @@ def login_user(request):
               return render_to_response('login.html', {'url': current_site})
 
        user = authenticate(username=username, password=password)
-       if user is not None:
-              login(request, user)
-              current_site = Site.objects.get_current()
 
-              try:
-                  if user.get_profile().generated_id:
-                      return render_to_response('migrate.html', {
-                           'url': current_site,
-                           'username': user
-                      })
-              except UserProfile.DoesNotExist:
-                  UserProfile.objects.create(user=user)
-                  return HttpResponseRedirect('/')
-
-              else:
-                  return HttpResponseRedirect('/')
-
-       else:
+       if not user:
               form = RestorePasswordForm()
               return render_to_response('login.html', {
-                     'error_message': 'Unknown user or wrong password',
+                     'error_message': _('Unknown user or wrong password'),
                      'restore_password_form': form
               })
+
+       if not user.is_active:
+              return render_to_response('login.html', {
+                     'error_message': _('Please activate your user first.'),
+                     'activation_needed': True
+              })
+
+       login(request, user)
+       current_site = Site.objects.get_current()
+
+       try:
+            if user.get_profile().generated_id:
+                return render_to_response('migrate.html', {
+                     'url': current_site,
+                     'username': user
+                })
+       except UserProfile.DoesNotExist:
+            UserProfile.objects.create(user=user)
+            return HttpResponseRedirect('/')
+
+       else:
+            return HttpResponseRedirect('/')
 
 @login_required
 def migrate_user(request):
