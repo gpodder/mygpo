@@ -22,6 +22,7 @@ from django.contrib.auth.models import User
 from django.template import RequestContext
 from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, Subscription, SuggestionEntry, Rating, SyncGroup, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SubscriptionMeta
 from mygpo.web.forms import UserAccountForm, DeviceForm, SyncForm, PrivacyForm, ResendActivationForm
+from django.forms import ValidationError
 from mygpo.api.opml import Exporter
 from django.utils.translation import ugettext as _
 from mygpo.api.basic_auth import require_valid_user
@@ -232,27 +233,49 @@ def episode(request, id):
 @login_required
 def account(request):
     success = False
+    error_message = ''
 
-    if request.method == 'POST':
-        form = UserAccountForm(request.POST)
-
-        if form.is_valid():
-            request.user.email = form.cleaned_data['email']
-            request.user.save()
-            request.user.get_profile().public_profile = form.cleaned_data['public']
-            request.user.get_profile().save()
-
-            success = True
-
-    else:
+    if request.method == 'GET':
         form = UserAccountForm({
             'email': request.user.email,
             'public': request.user.get_profile().public_profile
             })
 
+        return render_to_response('account.html', {
+            'form': form,
+            }, context_instance=RequestContext(request))
+
+    try:
+        form = UserAccountForm(request.POST)
+
+        if not form.is_valid():
+            raise ValueError('Invalid data entered.')
+
+        if form.cleaned_data['password_current']:
+            if not request.user.check_password(form.cleaned_data['password_current']):
+                raise ValueError('Current password is incorrect')
+
+            request.user.set_password(form.cleaned_data['password1'])
+
+        request.user.email = form.cleaned_data['email']
+        request.user.save()
+        request.user.get_profile().public_profile = form.cleaned_data['public']
+        request.user.get_profile().save()
+
+        success = True
+
+    except ValueError, e:
+        success = False
+        error_message = e
+
+    except ValidationError, e:
+        success = False
+        error_message = e
+
     return render_to_response('account.html', {
         'form': form,
-        'success': success
+        'success': success,
+        'error_message': error_message
     }, context_instance=RequestContext(request))
 
 

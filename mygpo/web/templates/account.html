@@ -12,8 +12,14 @@
 
   <p>{% trans "Update the settings for your account." %}</p>
   <form action="/account/" method="POST">
-   {{ form.as_p }}
-   <input type="submit" value="Save" />
+   <table class="form">
+    {{ form.as_table }}
+    <tr>
+     <td colspan="2">
+      <input type="submit" value="Save" />
+     </td>
+    </tr>
+   </table>
   </form>
   
   <p><br /><a href="/delete_account/">{% trans "Delete my account" %}</a><p>

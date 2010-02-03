@@ -1,5 +1,6 @@
 from django import forms
 from django.utils.translation import ugettext as _
+from django.forms.util import ValidationError
 from mygpo.api.models import Device, DEVICE_TYPES, SyncGroup
 from mygpo.log import log
 import re
@@ -7,6 +8,24 @@ import re
 class UserAccountForm(forms.Form):
     email = forms.EmailField(label=_('Your Email Address'))
     public = forms.BooleanField(required=False, label=_('May we use your subscriptions for the toplist and suggestions?'))
+    password_current = forms.CharField(label=_(u'Your current Password'),widget=forms.PasswordInput(render_value=False), required=False)
+    password1 = forms.CharField(label=_(u'Your new Password'),widget=forms.PasswordInput(render_value=False), required=False)
+    password2 = forms.CharField(label=_(u'Please confirm'),widget=forms.PasswordInput(render_value=False), required=False)
+
+    def is_valid(self):
+        if not super(UserAccountForm, self).is_valid(): return False
+
+        if self.cleaned_data['password_current'] or self.cleaned_data['password1'] or self.cleaned_data['password2']:
+            if self.cleaned_data['password_current'] == '':
+                return False #must give current password
+
+            if self.cleaned_data['password1'] == '':
+                return False #cant set empty password
+
+            if self.cleaned_data['password1'] != self.cleaned_data['password2']:
+                return False #must confirm password
+
+        return True
 
 class DeviceForm(forms.Form):
     name = forms.CharField(max_length=100, label=_('Name of this device'))

@@ -289,3 +289,13 @@ div#podcastlogo
     float: right;
     padding-top: 3em;
 }
+
+table.form
+{
+}
+
+table.form th
+{
+    font-weight: normal;
+    text-align: right;
+}
