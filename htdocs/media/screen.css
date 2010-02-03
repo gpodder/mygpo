@@ -299,3 +299,8 @@ table.form th
     font-weight: normal;
     text-align: right;
 }
+
+input.url
+{
+    width: 80%;
+}
