@@ -89,7 +89,7 @@ def update_subscriptions(user, device, add, remove):
     rem_sanitized = []
 
     for a in add:
-        if a in rem:
+        if a in remove:
            raise IntegrityError('can not add and remove %s at the same time' % a)
 
     for u in add:
