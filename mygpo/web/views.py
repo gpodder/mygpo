@@ -27,6 +27,7 @@ from mygpo.api.opml import Exporter
 from django.utils.translation import ugettext as _
 from mygpo.api.basic_auth import require_valid_user
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
 from datetime import datetime
 from django.contrib.sites.models import Site
@@ -74,10 +75,7 @@ def create_subscriptionlist(request):
     return l.values()
 
 def podcast(request, pid):
-    try:
-        podcast = Podcast.objects.get(pk=pid)
-    except Podcast.DoesNotExist:
-        raise Http404('There is no podcast with id %s' % pid)
+    podcast = get_object_or_404(Podcast, pk=pid)
 
     if request.user.is_authenticated():        
         devices = Device.objects.filter(user=request.user)
@@ -159,7 +157,7 @@ def devices(request):
 
 @login_required
 def podcast_subscribe(request, pid):
-    podcast = Podcast.objects.get(pk=pid)
+    podcast = get_object_or_404(Podcast, pk=pid)
     error_message = None
 
     if request.method == 'POST':
@@ -203,7 +201,7 @@ def podcast_unsubscribe(request, pid, device_id):
     if return_to == None:
         raise Http404('Wrong URL')
 
-    podcast = Podcast.objects.get(pk=pid)
+    podcast = get_object_or_404(Podcast, pk=pid)
     device = Device.objects.get(pk=device_id)
     try:
         SubscriptionAction.objects.create(podcast=podcast, device=device, action=UNSUBSCRIBE_ACTION, timestamp=datetime.now())
