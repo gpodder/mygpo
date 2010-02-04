@@ -242,7 +242,7 @@ class Device(models.Model):
         returns the latest action for the given podcast on this device
         """
         actions = SubscriptionAction.objects.filter(podcast=podcast,device=self).order_by('-timestamp', '-id')
-        if len(actions) == 0:
+        if actions.count() == 0:
             return None
         else:
             return actions[0]
