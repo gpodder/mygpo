@@ -202,7 +202,10 @@ def podcast_unsubscribe(request, pid, device_id):
 
     podcast = Podcast.objects.get(pk=pid)
     device = Device.objects.get(pk=device_id)
-    SubscriptionAction.objects.create(podcast=podcast, device=device, action=UNSUBSCRIBE_ACTION, timestamp=datetime.now())
+    try:
+        SubscriptionAction.objects.create(podcast=podcast, device=device, action=UNSUBSCRIBE_ACTION, timestamp=datetime.now())
+    except IntegrityError, e:
+        log('error while unsubscribing from podcast (device %s, podcast %s)' % (device.id, podcast.id))
 
     return HttpResponseRedirect(return_to)
 
