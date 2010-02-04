@@ -173,7 +173,10 @@ def podcast_subscribe(request, pid):
             else:
                 device = target
 
-            SubscriptionAction.objects.create(podcast=podcast, device=device, action=SUBSCRIBE_ACTION)
+            try:
+                SubscriptionAction.objects.create(podcast=podcast, device=device, action=SUBSCRIBE_ACTION)
+            except IntegrityError, e:
+                log('error while subscribing to podcast (device %s, podcast %s)' % (device.id, podcast.id))
 
             return HttpResponseRedirect('/podcast/%s' % podcast.id)
 
