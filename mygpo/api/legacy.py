@@ -63,7 +63,10 @@ def upload(request):
     rem = list(set(rem))
 
     for n in new:
-        p, created = Podcast.objects.get_or_create(url=n)
+        try:
+            p, created = Podcast.objects.get_or_create(url=n)
+        except IntegrityError, e:
+            log('/upload: Error trying to get podcast object: %s (error: %s)' % (n, e))
 
         try:
             SubscriptionAction.objects.create(podcast=p,action=SUBSCRIBE_ACTION, timestamp=datetime.now(), device=d)
