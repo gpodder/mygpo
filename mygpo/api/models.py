@@ -375,7 +375,6 @@ class SubscriptionAction(models.Model):
         return 'subscribe' if self.action == SUBSCRIBE_ACTION else 'unsubscribe'
 
     def newer_than(self, action):
-        if (self.timestamp == action.timestamp): return self.id > action.id
         return self.timestamp > action.timestamp
 
     def __unicode__(self):
