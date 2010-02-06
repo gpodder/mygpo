@@ -83,7 +83,7 @@ def migrate_user(request):
         current_site = Site.objects.get_current()
         if User.objects.filter(username__exact=username).count() > 0:
             return render_to_response('migrate.html', {'error_message': '%s is already taken' % username, 'url': current_site, 'username': user.username})
-        if slugify(username) != username:
+        if slugify(username) != username.lower():
             return render_to_response('migrate.html', {'error_message': '%s is not a valid username. Please use characters, numbers, underscore and dash only.' % username, 'url': current_site, 'username': user.username})
         else:
             user.username = username
