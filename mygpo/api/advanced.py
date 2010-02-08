@@ -153,9 +153,9 @@ def episodes(request, username):
         except KeyError:
             return HttpResponseBadRequest()
 
-        update_episodes(request.user, actions)
+        update_urls = update_episodes(request.user, actions)
 
-        return JsonResponse({'timestamp': now_})
+        return JsonResponse({'timestamp': now_, 'update_urls': update_urls})
 
     elif request.method == 'GET':
         podcast_url= request.GET.get('podcast', None)
@@ -208,9 +208,16 @@ def get_episode_changes(user, podcast, device, since, until):
 
 
 def update_episodes(user, actions):
+    update_urls = []
+
     for e in actions:
+        u = e['podcast']
+        us = sanitize_url(u)
+        if u != us:  update_urls.append( (u, us) )
+        if us == '': continue
+
         try:
-            podcast, p_created = Podcast.objects.get_or_create(url=e['podcast'])
+            podcast, p_created = Podcast.objects.get_or_create(url=us)
             episode, e_created = Episode.objects.get_or_create(podcast=podcast, url=e['episode'])
             action  = e['action']
             if not valid_episodeaction(action):
@@ -233,6 +240,8 @@ def update_episodes(user, actions):
             EpisodeAction.objects.create(user=user, episode=episode, device=device, action=action, timestamp=timestamp, playmark=playmark)
         except Exception, e:
             log('error while adding episode action (user %s, episode %s, device %s, action %s, timestamp %s, playmark %s): %s' % (user, episode, device, action, timestamp, playmark, e))
+
+    return update_urls
 
 
 @require_valid_user
