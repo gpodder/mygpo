@@ -16,7 +16,7 @@
 #
 
 from django.shortcuts import render_to_response
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, Http404
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, Http404, HttpResponseForbidden
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.template import RequestContext
@@ -325,6 +325,10 @@ def suggestions(request):
 @login_required
 def device(request, device_id):
     device = Device.objects.get(pk=device_id)
+
+    if device.user != request.user:
+        return HttpResponseForbidden(_('You are not allowed to access this device'))
+
     subscriptions = device.get_subscriptions()
     synced_with = list(device.sync_group.devices()) if device.sync_group else []
     if device in synced_with: synced_with.remove(device)
