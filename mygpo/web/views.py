@@ -36,6 +36,7 @@ from registration.models import RegistrationProfile
 from sets import Set
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.web.users import get_user
+from mygpo.log import log
 import re
 
 def home(request):
