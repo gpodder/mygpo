@@ -124,6 +124,6 @@ def restore_password(request):
     pwd = "".join(random.sample(string.letters+string.digits, 8))
     subject = _('Reset password for your account on %s') % site
     message = _('Here is your new password for your account on %s: %s') % (site, pwd)
-    user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+    request.user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
     return render_to_response('password_reset.html')
 
