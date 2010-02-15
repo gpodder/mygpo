@@ -493,6 +493,12 @@ def resend_activation(request):
         })
 
 
-    profile.send_activation_email(self, site)
+    try:
+        profile.send_activation_email(site)
+
+    except AttributeError:
+        #old versions of django-registration send registration mails from RegistrationManager
+        RegistrationProfile.objects.send_activation_email(profile, site)
+
     return render_to_response('registration/resent_activation.html')
 
