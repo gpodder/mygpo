@@ -304,3 +304,12 @@ input.url
 {
     width: 80%;
 }
+
+.bar
+{
+    padding-left: 0.5em;
+    background-color: #75507b;
+    color: white;
+    float: left;
+    height: 100%;
+}

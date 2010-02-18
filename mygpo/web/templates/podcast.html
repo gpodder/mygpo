@@ -4,6 +4,7 @@
 {% load episodes %}
 {% load podcasts %}
 {% load devices %}
+{% load charts %}
 
 {% block title %}{{ podcast.title|default:"Unnamed Podcast"|striptags }}{% endblock %}
 
@@ -83,6 +84,7 @@
   {% endif %}
 
   {% if not episodes|length_is:"0" %}
+
    <h2>{% trans "Episodes" %}</h2>
    <table class="list">
     <tr>
@@ -90,6 +92,7 @@
      <th>{% trans "Title" %}</th>
      <th>{% trans "Description" %}</th>
      <th>{% trans "Released" %}</th>
+     <th>{% trans "Listeners" %}</th>
     </tr>
  
     {% for episode in episodes %}
@@ -98,7 +101,11 @@
       <td><a href="/episode/{{ episode.id }}">{{ episode.title|default:"Unknown Episode"|striptags }}</a></td>
       <td class="description">{{ episode.description|default:""|striptags|truncatewords:"15" }}</td>
       <td>{{ episode.timestamp|default:""|naturalday }}</td>
-
+      <td>
+       {% if episode.listeners %}
+        <div class="bar" style="width: {% widthratio episode.listeners max_listeners 100 %}%">{{ episode.listeners }}</div>
+       {% endif %}
+      </td>
      </tr>
     {% endfor %}
    </table>

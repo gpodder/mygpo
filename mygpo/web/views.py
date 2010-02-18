@@ -83,6 +83,8 @@ def podcast(request, pid):
         subscribed_devices = [s.device for s in Subscription.objects.filter(podcast=podcast,user=request.user)]
         subscribe_targets = podcast.subscribe_targets(request.user)
         episodes = episode_list(podcast, request.user)
+        max_listeners = max([x.listeners for x in episodes])
+        print max_listeners
         success = False
 
 
@@ -115,6 +117,7 @@ def podcast(request, pid):
             'devices': subscribed_devices,
             'can_subscribe': len(subscribe_targets) > 0,
             'episodes': episodes,
+            'max_listeners': max_listeners,
             'success': success
         }, context_instance=RequestContext(request))
     else:
@@ -218,6 +221,8 @@ def episode_list(podcast, user):
     """
     episodes = Episode.objects.filter(podcast=podcast).order_by('-timestamp')
     for e in episodes:
+        listeners = EpisodeAction.objects.filter(episode=e, action='play').values('user').distinct()
+        e.listeners = listeners.count()
         actions = EpisodeAction.objects.filter(episode=e, user=user).order_by('-timestamp')
         if actions.count() > 0:
             e.action = actions[0]
