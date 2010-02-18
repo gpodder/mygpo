@@ -36,6 +36,7 @@ from registration.models import RegistrationProfile
 from sets import Set
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.web.users import get_user
+from mygpo.log import log
 import re
 
 def home(request):
@@ -497,6 +498,12 @@ def resend_activation(request):
         })
 
 
-    profile.send_activation_email(self, site)
+    try:
+        profile.send_activation_email(site)
+
+    except AttributeError:
+        #old versions of django-registration send registration mails from RegistrationManager
+        RegistrationProfile.objects.send_activation_email(profile, site)
+
     return render_to_response('registration/resent_activation.html')
 
