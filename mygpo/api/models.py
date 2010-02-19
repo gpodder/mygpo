@@ -22,6 +22,7 @@ from django.utils.translation import ugettext as _
 import hashlib
 
 from mygpo.api.constants import EPISODE_ACTION_TYPES, DEVICE_TYPES, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SUBSCRIPTION_ACTION_TYPES
+from mygpo.log import log
 
 class UserProfile(models.Model):
     user = models.ForeignKey(User, unique=True, db_column='user_ptr_id')
@@ -177,7 +178,10 @@ class Device(models.Model):
 
     def sync(self):
         for s in self.get_sync_actions():
-            SubscriptionAction.objects.create(device=self, podcast=s.podcast, action=s.action)
+            try:
+                SubscriptionAction.objects.create(device=self, podcast=s.podcast, action=s.action)
+            except Exception, e:
+                log('Error adding subscription action: %s (device %s, podcast %s, action %s)' % (str(e), repr(device), repr(podcast), repr(action)))
 
     def sync_targets(self):
         """
