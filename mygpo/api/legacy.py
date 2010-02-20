@@ -72,6 +72,8 @@ def upload(request):
             SubscriptionAction.objects.create(podcast=p,action=SUBSCRIBE_ACTION, timestamp=datetime.now(), device=d)
         except IntegrityError, e:
             log('/upload: error while adding subscription: user: %s, podcast: %s, error: %s' % (user.id, p.id, e))
+        except ValueError, ve:
+            log('/upload: error while adding subscription: user: %s, podcast: %s, error: %s' % (user.id, p.id, e))
 
     for r in rem:
         p, created = Podcast.objects.get_or_create(url=r)
