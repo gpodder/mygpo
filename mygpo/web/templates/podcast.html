@@ -4,6 +4,7 @@
 {% load episodes %}
 {% load podcasts %}
 {% load devices %}
+{% load charts %}
 
 {% block title %}{{ podcast.title|default:"Unnamed Podcast"|striptags }}{% endblock %}
 
@@ -102,7 +103,7 @@
       <td>{{ episode.timestamp|default:""|naturalday }}</td>
       <td>
        {% if episode.listeners %}
-        <div class="bar" style="width: {% widthratio episode.listeners max_listeners 100 %}%">{{ episode.listeners }}</div>
+        {{ episode.listeners|vertical_bar:max_listeners }}
        {% endif %}
       </td>
      </tr>

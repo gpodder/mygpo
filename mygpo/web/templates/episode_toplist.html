@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load podcasts %}
+{% load charts %}
 
 {% block title %}{% trans "Episode-Toplist" %}{% endblock %}
 
@@ -30,7 +31,7 @@
      </a>
     </td>
     <td><a href="/podcast/{{ entry.episode.podcast.id }}">{{ entry.episode.podcast|striptags }}</a></td>
-    <td class="numeric">{{ entry.listeners }}</td>
+    <td>{{ entry.listeners|vertical_bar:max_listeners }}</td>
    </tr>
   {% endfor %}
   </table>

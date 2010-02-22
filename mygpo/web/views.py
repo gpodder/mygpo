@@ -294,9 +294,11 @@ def account(request):
 
 def toplist(request, len=100):
     entries = ToplistEntry.objects.all().order_by('-subscriptions')[:len]
+    max_subscribers = max([e.subscriptions for e in entries])
     current_site = Site.objects.get_current()
     return render_to_response('toplist.html', {
         'entries': entries,
+        'max_subscribers': max_subscribers,
         'url': current_site
     }, context_instance=RequestContext(request))
 
@@ -304,8 +306,10 @@ def toplist(request, len=100):
 def episode_toplist(request, len=100):
     entries = EpisodeToplistEntry.objects.all().order_by('-listeners')[:len]
     current_site = Site.objects.get_current()
+    max_listeners = max([e.listeners for e in entries])
     return render_to_response('episode_toplist.html', {
         'entries': entries,
+        'max_listeners': max_listeners,
         'url': current_site
     }, context_instance=RequestContext(request))
 
