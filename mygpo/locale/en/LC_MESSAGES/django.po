@@ -269,9 +269,9 @@ msgstr ""
 #: web/templates/episode.html:41 web/templates/podcast.html:103
 #: web/templates/subscribe.html:24
 msgid ""
-"Because we display names after we have fetched the information form the feed "
+"Because we display names after we have fetched the information from the feed "
 "-- and this may take some time. Until this is completed, the podcast will "
-"simply be called this way."
+"simply be named this way."
 msgstr ""
 
 #: web/templates/history.html:7 web/templates/podcast.html:78
