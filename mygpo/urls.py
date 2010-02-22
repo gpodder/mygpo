@@ -50,6 +50,8 @@ urlpatterns = patterns('',
     (r'account/$', 'mygpo.web.views.account'),
     (r'account/delete$', 'mygpo.web.views.delete_account'),
 
+    (r'user/(?P<username>\w+)/subscriptions$', 'mygpo.web.views.user_subscriptions'),
+
     (r'^history/$', 'mygpo.web.views.history'),
     (r'^devices/$', 'mygpo.web.views.devices'),
 

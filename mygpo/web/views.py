@@ -20,7 +20,7 @@ from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadReque
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.template import RequestContext
-from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, EpisodeToplistEntry, Subscription, SuggestionEntry, Rating, SyncGroup, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SubscriptionMeta
+from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, EpisodeToplistEntry, Subscription, SuggestionEntry, Rating, SyncGroup, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SubscriptionMeta, SecurityToken
 from mygpo.web.forms import UserAccountForm, DeviceForm, SyncForm, PrivacyForm, ResendActivationForm
 from django.forms import ValidationError
 from mygpo.api.opml import Exporter
@@ -38,6 +38,8 @@ from mygpo.api.sanitizing import sanitize_url
 from mygpo.web.users import get_user
 from mygpo.log import log
 import re
+import random
+import string
 
 def home(request):
        current_site = Site.objects.get_current()
@@ -247,14 +249,29 @@ def episode(request, id):
 def account(request):
     success = False
     error_message = ''
+    site = Site.objects.get_current()
+    token, c = SecurityToken.objects.get_or_create(user=request.user, object='subscriptions', action='r',
+        defaults = {'token': "".join(random.sample(string.letters+string.digits, 32))})
+
 
     if request.method == 'GET':
+
+        if 'public_subscriptions' in request.GET:
+            token.token = ''
+            token.save()
+
+        elif 'private_subscriptions' in request.GET:
+            token.token = "".join(random.sample(string.letters+string.digits, 32))
+            token.save()
+
         form = UserAccountForm({
             'email': request.user.email,
             'public': request.user.get_profile().public_profile
             })
 
         return render_to_response('account.html', {
+            'site': site,
+            'token': token.token,
             'form': form,
             }, context_instance=RequestContext(request))
 
@@ -286,6 +303,8 @@ def account(request):
         error_message = e
 
     return render_to_response('account.html', {
+        'site': site,
+        'token': token.token,
         'form': form,
         'success': success,
         'error_message': error_message
@@ -519,4 +538,22 @@ def resend_activation(request):
         RegistrationProfile.objects.send_activation_email(profile, site)
 
     return render_to_response('registration/resent_activation.html')
+
+
+def user_subscriptions(request, username):
+    user = get_object_or_404(User, username=username)
+
+    token, c = SecurityToken.objects.get_or_create(user=user, object='subscriptions', action='r',
+        defaults = {'token': "".join(random.sample(string.letters+string.digits, 32))})
+
+    u_token = request.GET.get('token', '')
+    if token.token == '' or token.token == u_token:
+        subscriptions = set([s.podcast for s in Subscription.objects.filter(user=user)])
+        return render_to_response('user_subscriptions.html', {
+            'subscriptions': subscriptions,
+            'other_user': user})
+
+    else:
+        return render_to_response('user_subscriptions_denied.html', {
+            'other_user': user})
 

@@ -425,3 +425,15 @@ class URLSanitizingRule(models.Model):
     def __unicode__(self):
         return '%s -> %s' % (self.search, self.replace)
 
+class SecurityToken(models.Model):
+    user = models.ForeignKey(User)
+    token = models.CharField(max_length=32, blank=True)
+    object = models.CharField(max_length=64)
+    action = models.CharField(max_length=10)
+
+    class Meta:
+        db_table = 'security_tokens'
+
+    def __unicode__(self):
+        return '%s %s %s: %s' % (self.user, self.object, self.action, self.token[:5])
+

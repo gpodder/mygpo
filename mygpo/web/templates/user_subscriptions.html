@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load podcasts %}
+
+{% block title %}
+ {% blocktrans with other_user.username as username%}{{ username }}'s Subscriptions{% endblocktrans %}
+{% endblock %}
+
+{% block content %}
+<h1>{% blocktrans with other_user.username as username%}{{ username }}'s Subscriptions{% endblocktrans %}</h1>
+
+ {% if not subscriptionlist|length_is:"0" %}
+ <table class="list">
+  <tr>
+   <th>&nbsp;</th>
+   <th>{% trans "Podcast" %}</th>
+  </tr>
+
+  {% for p in subscriptions %}
+   <tr>
+    <td>{{ p|podcast_logo }}</td>
+    <td><a class="listlink" href="/podcast/{{ p.id }}">{{ p|striptags }}</a></td>
+   </tr>
+  {% endfor %}
+  </table>
+ {% else %}
+
+  <p>{% blocktrans with other_user.username as username %}{{ username }} doesn't have any subscriptions yet.{% endblocktrans %}</p>
+
+ {% endif %}
+
+ {% if user.is_authenticated %}
+  <div class="info"><strong>{% trans "Want to share your subscriptions?" %}</strong> {% blocktrans %}Just go to your <a href/"/account/">account settings</a> to get the link.</a>{% endblocktrans %}</div>
+ {% endif %}
+
+{% endblock %}
+

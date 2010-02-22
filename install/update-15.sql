@@ -16,3 +16,11 @@ CREATE VIEW episode_toplist AS
     ORDER BY listeners
     DESC LIMIT 100;
 
+CREATE TABLE `security_tokens` (
+    `id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    `user_id` integer NOT NULL,
+    `token` varchar(32) NOT NULL,
+    `object` varchar(64) NOT NULL,
+    `action` varchar(10) NOT NULL
+);
+
