@@ -94,6 +94,16 @@ class ToplistEntry(models.Model):
     class Meta:
         db_table = 'toplist'
 
+class EpisodeToplistEntry(models.Model):
+    episode = models.ForeignKey('Episode')
+    listeners = models.PositiveIntegerField()
+
+    def __unicode__(self):
+        return '%s (%s)' % (self.episode, self.listeners)
+
+    class Meta:
+        db_table = 'episode_toplist'
+
 class SuggestionEntry(models.Model):
     podcast = models.ForeignKey(Podcast)
     user = models.ForeignKey(User)

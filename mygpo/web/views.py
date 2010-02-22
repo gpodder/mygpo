@@ -20,7 +20,7 @@ from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadReque
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.template import RequestContext
-from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, Subscription, SuggestionEntry, Rating, SyncGroup, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SubscriptionMeta
+from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, EpisodeToplistEntry, Subscription, SuggestionEntry, Rating, SyncGroup, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SubscriptionMeta
 from mygpo.web.forms import UserAccountForm, DeviceForm, SyncForm, PrivacyForm, ResendActivationForm
 from django.forms import ValidationError
 from mygpo.api.opml import Exporter
@@ -296,6 +296,15 @@ def toplist(request, len=100):
     entries = ToplistEntry.objects.all().order_by('-subscriptions')[:len]
     current_site = Site.objects.get_current()
     return render_to_response('toplist.html', {
+        'entries': entries,
+        'url': current_site
+    }, context_instance=RequestContext(request))
+
+
+def episode_toplist(request, len=100):
+    entries = EpisodeToplistEntry.objects.all().order_by('-listeners')[:len]
+    current_site = Site.objects.get_current()
+    return render_to_response('episode_toplist.html', {
         'entries': entries,
         'url': current_site
     }, context_instance=RequestContext(request))
