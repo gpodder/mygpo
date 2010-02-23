@@ -7,5 +7,5 @@ INSERT INTO `sanitizing_rules` VALUES (5,1,1,'^[^(https?):].+','',100,'Empty any
 INSERT INTO `sanitizing_rules` VALUES (6,1,1,'^https?://([0-9a-zA-z-\.]+\.)?gpodder.org.*','',100,'As gpodder.org doesn\'t host Podcasts, all URLs starting with this domain are considered invalid');
 INSERT INTO `sanitizing_rules` VALUES (7,1,0,'(?P<unchanged>feedburner\\.com.+)\\/$','\\g<unchanged>',2,'Feedburner URLs sometimes have a trailing slash, which can be removed safely');
 INSERT INTO `sanitizing_rules` VALUES (8,1,1,'^.*[^\x20-\x7E].*$', '', 50, 'Remove URLs with non-ascii characters');
-
+INSERT INTO `sanitizing_rules` VALUES (9,1,0,'^http://leoville\\.tv/podcasts/floss\\.xml$', 'http://leo.am/podcasts/floss', 10, 'Rewrite podcast URL of FLOSS Weekly because most users use a URL that is going to break soon (bug 885)');
 
