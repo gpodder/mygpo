@@ -218,7 +218,13 @@ def update_episodes(user, actions):
 
         try:
             podcast, p_created = Podcast.objects.get_or_create(url=us)
-            episode, e_created = Episode.objects.get_or_create(podcast=podcast, url=e['episode'])
+
+            eu = e['episode']
+            eus = sanitize_url(eu, podcast=False, episode=True)
+            if eu != eus: update_urls.append( (eu, eus) )
+            if eus == '': continue
+
+            episode, e_created = Episode.objects.get_or_create(podcast=podcast, url=eus)
             action  = e['action']
             if not valid_episodeaction(action):
                 return HttpResponseBadRequest('invalid action %s' % action)
