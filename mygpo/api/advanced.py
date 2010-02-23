@@ -47,7 +47,7 @@ def subscriptions(request, username, device_uid):
 
     if request.method == 'GET':
         try:
-            d = Device.objects.get(user=request.user, uid=device_uid)
+            d = Device.objects.get(user=request.user, uid=device_uid, deleted=False)
         except Device.DoesNotExist:
             raise Http404('device %s does not exist' % device_uid)
 
@@ -64,6 +64,10 @@ def subscriptions(request, username, device_uid):
 
     elif request.method == 'POST':
         d, created = Device.objects.get_or_create(user=request.user, uid=device_uid, defaults = {'type': 'other', 'name': 'New Device'})
+
+        if d.deleted:
+            d.deleted = False
+            d.save()
 
         actions = json.loads(request.raw_post_data)
         add = actions['add'] if 'add' in actions else []
@@ -166,7 +170,7 @@ def episodes(request, username):
 
         try:
             podcast = Podcast.objects.get(url=podcast_url) if podcast_url else None
-            device  = Device.objects.get(user=request.user,uid=device_uid) if device_uid else None
+            device  = Device.objects.get(user=request.user,uid=device_uid, deleted=False) if device_uid else None
         except:
             raise Http404
 
@@ -233,6 +237,12 @@ def update_episodes(user, actions):
 
         if 'device' in e:
             device, created = Device.objects.get_or_create(user=user, uid=e['device'], defaults={'name': 'Unknown', 'type': 'other'})
+
+            # undelete a previously deleted device
+            if device.deleted:
+                device.deleted = False
+                device.save()
+
         else:
             device, created = None, False
         timestamp = dateutil.parser.parse(e['timestamp']) if 'timestamp' in e else datetime.now()
@@ -259,6 +269,11 @@ def device(request, username, device_uid):
     # instead of "POST" requests for uploading device settings
     if request.method in ('POST', 'PUT'):
         d, created = Device.objects.get_or_create(user=request.user, uid=device_uid)
+
+        #undelete a previously deleted device
+        if d.deleted:
+            d.deleted = False
+            d.save()
 
         data = json.loads(request.raw_post_data)
 
@@ -317,7 +332,7 @@ def devices(request, username):
 
     if request.method == 'GET':
         devices = []
-        for d in Device.objects.filter(user=request.user):
+        for d in Device.objects.filter(user=request.user, deleted=False):
             devices.append({
                 'id': d.uid,
                 'caption': d.name,
