@@ -40,7 +40,7 @@ class JsonResponse(HttpResponse):
         else:
             content = json.dumps(
                 object, indent=2, cls=DjangoJSONEncoder,
-                ensure_ascii=False)
+                ensure_ascii=True)
         super(JsonResponse, self).__init__(
             content, content_type='application/json')
 
