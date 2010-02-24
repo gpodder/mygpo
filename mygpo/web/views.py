@@ -86,7 +86,7 @@ def podcast(request, pid):
         subscribed_devices = [s.device for s in Subscription.objects.filter(podcast=podcast,user=request.user)]
         subscribe_targets = podcast.subscribe_targets(request.user)
         episodes = episode_list(podcast, request.user)
-        max_listeners = max([x.listeners for x in episodes])
+        max_listeners = max([x.listeners for x in episodes]) if len(episodes) else 0
         print max_listeners
         success = False
 
