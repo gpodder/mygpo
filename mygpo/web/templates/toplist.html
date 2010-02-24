@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load podcasts %}
 {% load charts %}
+{% load math %}
 
 {% block title %}{% trans "Toplist" %}{% endblock %}
 
@@ -12,17 +13,24 @@
 
   <table class="list">
    <tr>
-    <th>{% trans "#" %}</th>
-    <th>{% trans "Last week" %}</th>
+    <th class="numeric">{% trans "#" %}</th>
+    <th></th>
     <th></th>
     <th>{% trans "Podcast" %}</th>
     <th>{% trans "Subscribers" %}</th>
    </tr>
   {% for entry in entries %}
    <tr>
-    <td>{{ forloop.counter }}</td>
-    <td class="numeric">
-    {{ entry.oldplace|default:"" }}</td>
+    <td class="numeric position">{{ forloop.counter }}</td>
+    <td class="oldposition">
+     {% if entry.oldplace %}
+      {% if entry.oldplace|subtract:forloop.counter %}
+       {{ entry.oldplace|subtract:forloop.counter|format_diff }}
+      {% endif %}
+     {% else %}
+      <span class="new">{% trans "new" %}</span>
+     {% endif %}
+    </td>
     <td>{{ entry.podcast|podcast_logo }}</td>
     <td><a href="/podcast/{{ entry.podcast.id }}">{{ entry.podcast|striptags }}</a></td>
     <td>{{ entry.subscriptions|vertical_bar:max_subscribers }}</td>

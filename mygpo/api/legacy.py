@@ -45,6 +45,11 @@ def upload(request):
     d, created = Device.objects.get_or_create(user=user, uid=LEGACY_DEVICE_UID,
         defaults = {'type': 'unknown', 'name': LEGACY_DEVICE_NAME})
 
+    # undelete a previously deleted device
+    if d.deleted:
+        d.deleted = False
+        d.save()
+
     existing = Subscription.objects.filter(user=user, device=d)
 
     existing_urls = [e.podcast.url for e in existing]
@@ -92,8 +97,10 @@ def getlist(request):
     if user is None:
         return HttpResponse('@AUTHFAIL', mimetype='text/plain')
 
-    d, created = Device.objects.get_or_create(user=user, uid=LEGACY_DEVICE_UID,
+    d, created = Device.objects.get_or_create(user=user, uid=LEGACY_DEVICE_UID
         defaults = {'type': 'unknown', 'name': LEGACY_DEVICE_NAME})
+
+    # We ignore deleted devices, because the Legacy API doesn't know such a concept
 
     podcasts = [s.podcast for s in d.get_subscriptions()]
 

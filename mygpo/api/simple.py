@@ -16,7 +16,7 @@
 #
 
 from mygpo.api.basic_auth import require_valid_user
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, Http404
 from mygpo.api.models import Device, SubscriptionAction, Podcast, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, ToplistEntry, SuggestionEntry
 from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
@@ -77,9 +77,11 @@ def format_subscriptions(subscriptions, format, username):
 def get_subscriptions(user, device_uid):
     #get and return subscription list from database (use backend to sync)
     try:
-        d = Device.objects.get(uid=device_uid, user=user)
+        d = Device.objects.get(uid=device_uid, user=user, deleted=False)
+
     except Device.DoesNotExist:
-        return 404
+        raise Http404
+
     return [p.podcast for p in d.get_subscriptions()]
 
 def parse_subscription(raw_post_data, format, user, device_uid):
@@ -116,6 +118,11 @@ def parse_subscription(raw_post_data, format, user, device_uid):
     
     d, created = Device.objects.get_or_create(user=user, uid=device_uid, 
                 defaults = {'type': 'other', 'name': device_uid})
+
+    # undelete a previously deleted device
+    if d.deleted:
+        d.deleted = False
+        d.save()
 
     podcasts = [p.podcast for p in d.get_subscriptions()]
     old = [p.url for p in podcasts]    

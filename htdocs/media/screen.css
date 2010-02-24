@@ -107,7 +107,8 @@ table.list td
     padding-right: 1em;
 }
 
-table td.numeric
+table td.numeric,
+table th.numeric
 {
     text-align: right;
 }
@@ -312,4 +313,32 @@ input.url
     color: white;
     float: left;
     height: 100%;
+}
+
+td.position
+{
+    font-size: 1.3em;
+    font-weight: bold;
+    padding-right: 0;
+    margin-right: 0;
+}
+
+td.oldposition
+{
+    font-size: .8em;
+}
+
+.pos
+{
+    color: green;
+}
+
+.neg
+{
+    color: red;
+}
+
+.new
+{
+    color: #555;
 }
