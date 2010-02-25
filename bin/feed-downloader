@@ -40,7 +40,12 @@ fetcher = feedcore.Fetcher(USER_AGENT)
 UPDATE_LIMIT = datetime.datetime.now() - datetime.timedelta(days=15)
 
 if len(sys.argv) > 1:
-    fetch_queue = [models.Podcast.objects.get(url=url) for url in sys.argv[1:]]
+    fetch_queue = []
+    for url in sys.argv[1:]:
+        try:
+            fetch_queue.append(models.Podcast.objects.get(url=url))
+        except:
+            pass
 else:
     #fetch_queue = models.Podcast.objects.all()
     fetch_queue = models.Podcast.objects.filter(last_update__lt=UPDATE_LIMIT)
@@ -130,15 +135,14 @@ for podcast in fetch_queue:
             image_sha1.update(cover_art)
             image_sha1 = image_sha1.hexdigest()
             filename = os.path.join('htdocs', 'media', 'logo', image_sha1)
-            if not os.path.exists(filename):
-                try:
-                    fp = open(filename, 'w')
-                    fp.write(urllib2.urlopen(cover_art).read())
-                    fp.close()
-                    print >>sys.stderr, 'LOGO @', cover_art
-                    podcast.logo_url = cover_art
-                except:
-                    print >>sys.stderr, 'cannot save image'
+            try:
+                fp = open(filename, 'w')
+                fp.write(urllib2.urlopen(cover_art).read())
+                fp.close()
+                print >>sys.stderr, 'LOGO @', cover_art
+                podcast.logo_url = cover_art
+            except:
+                print >>sys.stderr, 'cannot save image'
 
         for entry in feed.entries:
             try:
@@ -146,13 +150,18 @@ for podcast in fetch_queue:
                 if url is None:
                     print 'Ignoring entry'
                     continue
+                md = get_episode_metadata(entry, url)
                 e, created = models.Episode.objects.get_or_create(
                         podcast=podcast,
                         url=url,
-                        defaults=get_episode_metadata(entry, url))
+                        defaults=md)
                 if created:
                     print 'New episode: ', e.title.encode('utf-8', 'ignore')
-                    e.save()
+                else:
+                    print 'Updating', e.title.encode('utf-8', 'ignore')
+                    for key in md:
+                        setattr(e, key, md[key])
+                e.save()
             except Exception, e:
                 print 'Cannot get episode:', e
     except Exception, e:
