@@ -191,7 +191,7 @@ class Device(models.Model):
             try:
                 SubscriptionAction.objects.create(device=self, podcast=s.podcast, action=s.action)
             except Exception, e:
-                log('Error adding subscription action: %s (device %s, podcast %s, action %s)' % (str(e), repr(device), repr(podcast), repr(action)))
+                log('Error adding subscription action: %s (device %s, podcast %s, action %s)' % (str(e), repr(self), repr(s.podcast), repr(s.action)))
 
     def sync_targets(self):
         """
