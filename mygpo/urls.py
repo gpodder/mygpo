@@ -74,16 +74,16 @@ urlpatterns = patterns('',
     (r'^getlist$', 'mygpo.api.legacy.getlist'),
 
     #Simple API
-    (r'^subscriptions/(?P<username>\w+)/(?P<device_uid>[\w.-]+).(?P<format>\w+)', 'mygpo.api.simple.subscriptions'),
-    (r'^toplist/(?P<count>\d+).(?P<format>\w+)', 'mygpo.api.simple.toplist'),
-    (r'^search.(?P<format>\w+)', 'mygpo.api.simple.search'),
-    (r'^suggestions/(?P<count>\d+).(?P<format>\w+)', 'mygpo.api.simple.suggestions'),
+    (r'^subscriptions/(?P<username>\w+)/(?P<device_uid>[\w.-]+)\.(?P<format>\w+)', 'mygpo.api.simple.subscriptions'),
+    (r'^toplist/(?P<count>\d+)\.(?P<format>\w+)', 'mygpo.api.simple.toplist'),
+    (r'^search\.(?P<format>\w+)', 'mygpo.api.simple.search'),
+    (r'^suggestions/(?P<count>\d+)\.(?P<format>\w+)', 'mygpo.api.simple.suggestions'),
 
     #Advanced API
-    (r'^api/1/subscriptions/(?P<username>\w+)/(?P<device_uid>[\w.-]+).json', 'mygpo.api.advanced.subscriptions'),
-    (r'^api/1/episodes/(?P<username>\w+).json', 'mygpo.api.advanced.episodes'),
-    (r'^api/1/devices/(?P<username>\w+)/(?P<device_uid>[\w.-]+).json', 'mygpo.api.advanced.device'),
-    (r'^api/1/devices/(?P<username>\w+).json', 'mygpo.api.advanced.devices'),
+    (r'^api/1/subscriptions/(?P<username>\w+)/(?P<device_uid>[\w.-]+)\.json', 'mygpo.api.advanced.subscriptions'),
+    (r'^api/1/episodes/(?P<username>\w+)\.json', 'mygpo.api.advanced.episodes'),
+    (r'^api/1/devices/(?P<username>\w+)/(?P<device_uid>[\w.-]+)\.json', 'mygpo.api.advanced.device'),
+    (r'^api/1/devices/(?P<username>\w+)\.json', 'mygpo.api.advanced.devices'),
 
     #Subscribe with my.gpodder.org
     (r'^subscribe', 'mygpo.web.views.podcast_subscribe_url'),
