@@ -124,20 +124,21 @@ class SuggestionEntry(models.Model):
 
 class Episode(models.Model):
     podcast = models.ForeignKey(Podcast)
-    url = models.URLField(unique=True, verify_exists=False)
+    url = models.URLField(verify_exists=False)
     title = models.CharField(max_length=100, blank=True)
     description = models.TextField(null=True, blank=True)
     link = models.URLField(null=True, blank=True, verify_exists=False)
     timestamp = models.DateTimeField(null=True, blank=True)
     author = models.CharField(max_length=100, null=True, blank=True)
-    duration = models.PositiveIntegerField(null=True)
-    filesize = models.PositiveIntegerField(null=True)
+    duration = models.PositiveIntegerField(null=True, blank=True)
+    filesize = models.PositiveIntegerField(null=True, blank=True)
 
     def __unicode__(self):
         return '%s (%s)' % (self.title, self.podcast)
 
     class Meta:
         db_table = 'episode'
+        unique_together = ('podcast', 'url')
 
 class SyncGroup(models.Model):
     """
