@@ -29,7 +29,7 @@ from mygpo.api.basic_auth import require_valid_user
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
-from datetime import datetime
+from datetime import datetime, date, timedelta
 from django.contrib.sites.models import Site
 from django.conf import settings
 from registration.models import RegistrationProfile
@@ -37,6 +37,7 @@ from sets import Set
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.web.users import get_user
 from mygpo.log import log
+from mygpo.utils import daterange
 import re
 import random
 import string
@@ -113,8 +114,11 @@ def podcast(request, pid):
         else:
             privacy_form = None
 
+        timeline_data = listener_data(podcast)
+
         return render_to_response('podcast.html', {
             'history': history,
+            'timeline_data': timeline_data,
             'podcast': podcast,
             'privacy_form': privacy_form,
             'devices': subscribed_devices,
@@ -130,7 +134,23 @@ def podcast(request, pid):
             'url': current_site
         }, context_instance=RequestContext(request))
 
+def listener_data(podcast):
+    d = date(2010, 1, 1)
+    day = timedelta(1)
+    start = EpisodeAction.objects.filter(episode__podcast=podcast, timestamp__gte=d).order_by('timestamp').values('timestamp')[0]['timestamp']
 
+    days = []
+    for d in daterange(start):
+        next = d + timedelta(days=1)
+        listeners = EpisodeAction.objects.filter(episode__podcast=podcast, timestamp__gte=d, timestamp__lt=next).values('user_id').distinct().count()
+        e = Episode.objects.filter(podcast=podcast, timestamp__gte=d, timestamp__lt=next)
+        episode = e[0] if e.count() > 0 else None
+        days.append({
+            'date': d,
+            'listeners': listeners,
+            'episode': episode})
+
+    return days
 
 def history(request, len=15, device_id=None):
     if device_id:

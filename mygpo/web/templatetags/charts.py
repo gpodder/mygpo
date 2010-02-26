@@ -23,3 +23,34 @@ def format_diff(value):
 
     return mark_safe(s)
 
+@register.filter
+def timeline(data):
+    s = '<script type="text/javascript" src="http://www.google.com/jsapi"></script>\n'
+    s += '<script type="text/javascript">\n'
+    s += 'google.load("visualization", "1", {"packages":["annotatedtimeline"]});\n'
+    s += 'google.setOnLoadCallback(drawChart);\n'
+    s += 'function drawChart() {\n'
+    s += 'var data = new google.visualization.DataTable();\n'
+    s += 'data.addColumn("date", "Date");\n'
+    s += 'data.addColumn("number", "Listeners");\n'
+    s += 'data.addColumn("string", "title1");\n'
+    s += 'data.addColumn("string", "text1");\n'
+    s += 'data.addRows([\n'
+
+    for r in data:
+        if 'episode' in r and r['episode']:
+            episode = '"%s"' % r['episode'].title
+            episode_ = '"released"'
+        else:
+            episode = 'undefined'
+            episode_ = 'undefined'
+
+        s += '[new Date(%d, %d, %d), %d, %s, %s],\n' % (r['date'].year, r['date'].month-1, r['date'].day, r['listeners'], episode, episode_)
+
+    s += ']);\n'
+    s += 'var chart = new google.visualization.AnnotatedTimeLine(document.getElementById("chart_div"));\n'
+    s += 'chart.draw(data, {displayAnnotations: true});\n'
+    s += '}\n'
+    s += '</script>\n'
+
+    return mark_safe(s)
