@@ -39,7 +39,7 @@ def timeline(data):
 
     for r in data:
         if 'episode' in r and r['episode']:
-            episode = '"%s"' % r['episode'].title
+            episode = '"%s"' % r['episode'].title if r['episode'].title else '"Unnamed Episode"'
             episode_ = '"released"'
         else:
             episode = 'undefined'

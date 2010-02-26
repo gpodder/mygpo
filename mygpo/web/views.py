@@ -88,7 +88,6 @@ def podcast(request, pid):
         subscribe_targets = podcast.subscribe_targets(request.user)
         episodes = episode_list(podcast, request.user)
         max_listeners = max([x.listeners for x in episodes]) if len(episodes) else 0
-        print max_listeners
         success = False
 
 
@@ -137,7 +136,11 @@ def podcast(request, pid):
 def listener_data(podcast):
     d = date(2010, 1, 1)
     day = timedelta(1)
-    start = EpisodeAction.objects.filter(episode__podcast=podcast, timestamp__gte=d).order_by('timestamp').values('timestamp')[0]['timestamp']
+    episodes = EpisodeAction.objects.filter(episode__podcast=podcast, timestamp__gte=d).order_by('timestamp').values('timestamp')
+    if len(episodes) == 0:
+        return []
+
+    start = episodes[0]['timestamp']
 
     days = []
     for d in daterange(start):

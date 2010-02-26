@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load podcasts %}
+
+{% block title %}{% trans "Podcasts Published by You" %}{% endblock %}
+
+{% block content %}
+ <h1>{% trans "Podcasts Published by You" %}</h1>
+
+ {% if not podcasts|length_is:"0" %}
+ <table class="list">
+  <tr>
+   <th>&nbsp;</th>
+   <th>{% trans "Podcast" %}</th>
+  </tr>
+
+  {% for s in podcasts %}
+   <tr>
+    <td>{{ s|podcast_logo }}</td>
+    <td><a class="listlink" href="/publisher/podcast/{{ s.id }}">{{ s|striptags }}</a></td>
+   </tr>
+  {% endfor %}
+  </table>
+ {% endif %}
+
+ {% if user.is_staff %}
+  <form action="/publisher/podcast/search" method="post">
+  {{ form.as_p }}
+  <input type="submit" value="{% trans "Go" %}" />
+ </form>
+ {% endif %}
+
+{% endblock %}
+

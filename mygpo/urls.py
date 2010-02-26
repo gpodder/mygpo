@@ -102,6 +102,12 @@ urlpatterns = patterns('',
 
     (r'^accounts/', include('registration.urls')),
 
+    (r'^publisher/$', 'mygpo.publisher.views.home'),
+    (r'^publisher/podcast/(?P<id>\d+)$', 'mygpo.publisher.views.podcast'),
+    (r'^publisher/podcast/(?P<id>\d+)/episodes$', 'mygpo.publisher.views.episodes'),
+    (r'^publisher/episode/(?P<id>\d+)$', 'mygpo.publisher.views.episode'),
+    (r'^publisher/podcast/search$', 'mygpo.publisher.views.search_podcast'),
+
     (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': os.path.abspath('%s/../htdocs/media/' % os.path.dirname(__file__))}),
 
 )

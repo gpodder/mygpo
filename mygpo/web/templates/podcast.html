@@ -8,10 +8,6 @@
 
 {% block title %}{{ podcast.title|default:"Unnamed Podcast"|striptags }}{% endblock %}
 
-{% block head %}
-  {{ timeline_data|timeline }}
-{% endblock %}
-
 {% block content %}
   <div id="podcastlogo">{{ podcast|podcast_logo:"200" }}</div>
 
@@ -134,9 +130,6 @@
    </table>
   {% endif %} 
   {% endif %}
-
-  <h2>Listener Timeline</h2>
-  <div id="chart_div" style="width: 700px; height: 240px;"></div>
 
   {% if not podcast.title %}
    <div class="info"><strong>{% trans "Why Unnamed Podcast?" %}</strong> {% trans "Because we display names after we have fetched the information form the feed -- and this may take some time. Until this is completed, the podcast will simply be called this way." %}</div>
