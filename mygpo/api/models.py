@@ -399,17 +399,6 @@ class SubscriptionAction(models.Model):
         db_table = 'subscription_log'
         unique_together = ('device', 'podcast', 'timestamp')
 
-class Rating(models.Model):
-    target = models.CharField(max_length=15)
-    user = models.ForeignKey(User)
-    rating = models.IntegerField()
-    timestamp = models.DateTimeField(default=datetime.now)
-
-    class Meta:
-        db_table = 'ratings'
-
-    def __unicode__(self):
-        return '%s rates %s as %s on %s' % (self.user, self.target, self.rating, self.timestamp)
 
 class URLSanitizingRule(models.Model):
     use_podcast = models.BooleanField()
@@ -426,15 +415,4 @@ class URLSanitizingRule(models.Model):
     def __unicode__(self):
         return '%s -> %s' % (self.search, self.replace)
 
-class SecurityToken(models.Model):
-    user = models.ForeignKey(User)
-    token = models.CharField(max_length=32, blank=True)
-    object = models.CharField(max_length=64)
-    action = models.CharField(max_length=10)
-
-    class Meta:
-        db_table = 'security_tokens'
-
-    def __unicode__(self):
-        return '%s %s %s: %s' % (self.user, self.object, self.action, self.token[:5])
 
