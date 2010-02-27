@@ -6,6 +6,12 @@ from mygpo.log import log
 import re
 
 class UserAccountForm(forms.Form):
+    """
+    the form that is used in the account settings.
+
+    if one of the three password fields is set, a password change is assumed
+    and the current and new passwords are checked.
+    """
     email = forms.EmailField(label=_('Your Email Address'))
     public = forms.BooleanField(required=False, label=_('May we use your subscriptions for the toplist and suggestions?'))
     password_current = forms.CharField(label=_(u'Your current Password'),widget=forms.PasswordInput(render_value=False), required=False)
@@ -28,14 +34,25 @@ class UserAccountForm(forms.Form):
         return True
 
 class DeviceForm(forms.Form):
+    """
+    form for editing device information by a user.
+    """
     name = forms.CharField(max_length=100, label=_('Name of this device'))
     type = forms.ChoiceField(choices=DEVICE_TYPES, label=_('What kind of device is this?'))
     uid = forms.CharField(max_length=50, label=_('What UID is configured on the physical device?'))
 
 class PrivacyForm(forms.Form):
+    """
+    Form for editing the privacy settings for a subscription. It is shown on a
+    podcast page if the current user is subscribed to the podcast.
+    """
     public = forms.BooleanField(required=False, label=_('May we include your subscription to this podcast in our (anonymous) statistics?'))
 
 class SyncForm(forms.Form):
+    """
+    Form that is used to select either a single devices or a device group.
+    """
+
     targets = forms.CharField()
 
     def set_targets(self, sync_targets, label=''):
@@ -55,6 +72,10 @@ class SyncForm(forms.Form):
 
 
     def get_target(self):
+        """
+        returns the target (device or device group) that has been selected
+        in the form.
+        """
         if not self.is_valid():
             log('no target given in SyncForm')
             raise ValueError(_('No device selected'))
