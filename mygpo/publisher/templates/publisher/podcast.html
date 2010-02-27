@@ -35,5 +35,10 @@
    <div id="chart_div" style="width: 700px; height: 240px;"></div>
   {% endif %}
 
+
+  {% if device_data %}
+   <h2>Device Usage</h2>
+   {{ device_data|pie_chart }}
+  {% endif %}
 {% endblock %}
 

@@ -1,7 +1,8 @@
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
-from mygpo.api.models import Podcast, Episode
+from mygpo.api.models import Podcast, Episode, EpisodeAction
+from mygpo.api.constants import DEVICE_TYPES
 from mygpo.publisher.models import PodcastPublisher
 from mygpo.publisher.auth import require_publisher
 from mygpo.publisher.forms import SearchPodcastForm, EpisodeForm, PodcastForm
@@ -36,6 +37,7 @@ def podcast(request, id):
         return HttpResponseForbidden()
 
     timeline_data = listener_data(p)
+    device_data = device_stats(p)
 
     if request.method == 'POST':
         form = PodcastForm(request.POST, instance=p)
@@ -49,6 +51,7 @@ def podcast(request, id):
         'podcast': p,
         'form': form,
         'timeline_data': timeline_data,
+        'device_data': device_data,
         }, context_instance=RequestContext(request))
 
 
@@ -88,4 +91,14 @@ def episode(request, id):
         'episode': e,
         'form': form
         }, context_instance=RequestContext(request))
+
+
+def device_stats(podcast):
+    res = {}
+    for type in DEVICE_TYPES:
+        c = EpisodeAction.objects.filter(episode__podcast=podcast, device__type=type[0]).values('user_id').distinct().count()
+        if c > 0:
+            res[type[1]] = c
+
+    return res
 
