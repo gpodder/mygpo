@@ -112,7 +112,7 @@ def restore_password(request):
         return HttpResponseRedirect('/login/')
 
     try:
-        get_user(form.cleaned_data['username'], form.cleaned_data['email'])
+        user = get_user(form.cleaned_data['username'], form.cleaned_data['email'])
 
     except User.DoesNotExist:
         error_message = _('User does not exist.')
@@ -124,6 +124,6 @@ def restore_password(request):
     pwd = "".join(random.sample(string.letters+string.digits, 8))
     subject = _('Reset password for your account on %s') % site
     message = _('Here is your new password for your account on %(site)s: %(password)s') % {'site': site, 'password': pwd}
-    request.user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+    user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
     return render_to_response('password_reset.html')
 
