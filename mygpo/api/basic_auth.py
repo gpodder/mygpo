@@ -17,6 +17,7 @@
 
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login
+from mygpo.log import log
 
 #############################################################################
 #
@@ -29,7 +30,11 @@ def view_or_basicauth(view, request, test_func, realm = "", *args, **kwargs):
     """
     if test_func(request.user):
         # Already logged in, just return the view.
-        return view(request, *args, **kwargs)
+        try:
+            return view(request, *args, **kwargs)
+        except Exception, e:
+            log(e)
+            return HttpResponseBadRequest(e)
 
     # They are not logged in. See if they provided login credentials
     # this header format is used when passing auth-headers
@@ -41,13 +46,7 @@ def view_or_basicauth(view, request, test_func, realm = "", *args, **kwargs):
         auth = request.META['HTTP_AUTHORIZATION']
 
     else:
-        # Either they did not provide an authorization header or
-        # something in the authorization attempt failed. Send a 401
-        # back to them to ask them to authenticate.
-        response = HttpResponse()
-        response.status_code = 401
-        response['WWW-Authenticate'] = 'Basic realm="%s"' % realm
-        return response
+        return auth_request()
 
 
     auth = auth.split(None, 1)
@@ -64,7 +63,24 @@ def view_or_basicauth(view, request, test_func, realm = "", *args, **kwargs):
                 if user is not None and user.is_active:
                     login(request, user)
                     request.user = user
-                    return view(request, *args, **kwargs)
+
+                    try:
+                        return view(request, *args, **kwargs)
+                    except Exception, e:
+                        log(e)
+                        return HttpResponseBadRequest(e)
+
+    return auth_request()
+
+
+def auth_request(realm=''):
+    # Either they did not provide an authorization header or
+    # something in the authorization attempt failed. Send a 401
+    # back to them to ask them to authenticate.
+    response = HttpResponse()
+    response.status_code = 401
+    response['WWW-Authenticate'] = 'Basic realm="%s"' % realm
+    return response
 
 
 #############################################################################
