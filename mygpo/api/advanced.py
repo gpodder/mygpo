@@ -157,7 +157,10 @@ def episodes(request, username):
         except KeyError:
             return HttpResponseBadRequest()
 
-        update_urls = update_episodes(request.user, actions)
+        try:
+            update_urls = update_episodes(request.user, actions)
+        except Exception, e:
+            return HttpResponseBadRequest(e)
 
         return JsonResponse({'timestamp': now_, 'update_urls': update_urls})
 
@@ -220,20 +223,17 @@ def update_episodes(user, actions):
         if u != us:  update_urls.append( (u, us) )
         if us == '': continue
 
-        try:
-            podcast, p_created = Podcast.objects.get_or_create(url=us)
+        podcast, p_created = Podcast.objects.get_or_create(url=us)
 
-            eu = e['episode']
-            eus = sanitize_url(eu, podcast=False, episode=True)
-            if eu != eus: update_urls.append( (eu, eus) )
-            if eus == '': continue
+        eu = e['episode']
+        eus = sanitize_url(eu, podcast=False, episode=True)
+        if eu != eus: update_urls.append( (eu, eus) )
+        if eus == '': continue
 
-            episode, e_created = Episode.objects.get_or_create(podcast=podcast, url=eus)
-            action  = e['action']
-            if not valid_episodeaction(action):
-                return HttpResponseBadRequest('invalid action %s' % action)
-        except:
-            return HttpResponseBadRequest('not all required fields (podcast, episode, action) given')
+        episode, e_created = Episode.objects.get_or_create(podcast=podcast, url=eus)
+        action  = e['action']
+        if not valid_episodeaction(action):
+            raise Exception('invalid action %s' % action)
 
         if 'device' in e:
             device, created = Device.objects.get_or_create(user=user, uid=e['device'], defaults={'name': 'Unknown', 'type': 'other'})
