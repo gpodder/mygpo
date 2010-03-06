@@ -32,29 +32,40 @@ def view_or_basicauth(view, request, test_func, realm = "", *args, **kwargs):
         return view(request, *args, **kwargs)
 
     # They are not logged in. See if they provided login credentials
-    if 'HTTP_AUTHORIZATION' in request.META:
-        auth = request.META['HTTP_AUTHORIZATION'].split(None, 1)
-        if len(auth) == 2:
-            auth_type, credentials = auth
+    # this header format is used when passing auth-headers
+    # from Aapache to fcgi
+    if 'AUTHORIZATION' in request.META:
+        auth = request.META['AUTHORIZATION']
 
-            # NOTE: We are only support basic authentication for now.
-            if auth_type.lower() == 'basic':
-                credentials = credentials.decode('base64').split(':', 1)
-                if len(credentials) == 2:
-                    uname, passwd = credentials
-                    user = authenticate(username=uname, password=passwd)
-                    if user is not None and user.is_active:
-                        login(request, user)
-                        request.user = user
-                        return view(request, *args, **kwargs)
+    elif 'HTTP_AUTHORIZATION' in request.META:
+        auth = request.META['HTTP_AUTHORIZATION']
 
-    # Either they did not provide an authorization header or
-    # something in the authorization attempt failed. Send a 401
-    # back to them to ask them to authenticate.
-    response = HttpResponse()
-    response.status_code = 401
-    response['WWW-Authenticate'] = 'Basic realm="%s"' % realm
-    return response
+    else:
+        # Either they did not provide an authorization header or
+        # something in the authorization attempt failed. Send a 401
+        # back to them to ask them to authenticate.
+        response = HttpResponse()
+        response.status_code = 401
+        response['WWW-Authenticate'] = 'Basic realm="%s"' % realm
+        return response
+
+
+    auth = auth.split(None, 1)
+
+    if len(auth) == 2:
+        auth_type, credentials = auth
+
+        # NOTE: We are only support basic authentication for now.
+        if auth_type.lower() == 'basic':
+            credentials = credentials.decode('base64').split(':', 1)
+            if len(credentials) == 2:
+                uname, passwd = credentials
+                user = authenticate(username=uname, password=passwd)
+                if user is not None and user.is_active:
+                    login(request, user)
+                    request.user = user
+                    return view(request, *args, **kwargs)
+
 
 #############################################################################
 #
