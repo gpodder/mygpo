@@ -21,9 +21,9 @@ from django.db.models.query import QuerySet
 from django.core.serializers.json import DjangoJSONEncoder
 
 try:
-    import simplejson as json
-except ImportError:
     import json
+except ImportError:
+    import simplejson as json
 
 
 def HttpErrorResponse(code, msg):
