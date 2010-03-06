@@ -26,7 +26,7 @@
     <td>{{ s.podcast|podcast_logo }}</td>
     <td><a class="listlink" href="/podcast/{{ s.podcast.id }}">{{ s.podcast|striptags }}</a></td>
     {% if s.episode %}
-     <td><a href="/episode/{{s.episode.id}}">{{ s.episode.title|default:"Unnamed Episode"|striptags }}</a></td>
+     <td><a href="/episode/{{s.episode.id}}">{{ s.episode.shortname|default:"Unnamed Episode"|striptags }}</a></td>
     {% else %}
      <td></td>
     {% endif %}

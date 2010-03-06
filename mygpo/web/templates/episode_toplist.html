@@ -23,8 +23,8 @@
     <td class="numeric">{{ forloop.counter }}</td>
     <td>{{ entry.episode.podcast|podcast_logo }}</td>
     <td><a href="/episode/{{ entry.episode.id }}">
-     {% if entry.episode.title %}
-      {{ entry.episode.title|striptags }}
+     {% if entry.episode.shortname %}
+      {{ entry.episode.shortname|striptags }}
      {% else %}
       {% trans "Unnamed Episode" %}
      {% endif %}

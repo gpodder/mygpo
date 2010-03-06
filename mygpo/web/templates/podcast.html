@@ -89,6 +89,7 @@
    <table class="list">
     <tr>
      <th></th>
+     <th></th>
      <th>{% trans "Title" %}</th>
      <th>{% trans "Description" %}</th>
      <th>{% trans "Released" %}</th>
@@ -98,7 +99,8 @@
     {% for episode in episodes %}
      <tr>
       <td>{{ episode.action|episode_status_icon }}</td>
-      <td><a href="/episode/{{ episode.id }}">{{ episode.title|default:"Unknown Episode"|striptags }}</a></td>
+      <td class="numeric">{{ episode.number}}</td>
+      <td><a href="/episode/{{ episode.id }}">{{ episode.shortname|default:"Unknown Episode"|striptags }}</a></td>
       <td class="description">{{ episode.description|default:""|striptags|truncatewords:"15" }}</td>
       <td>{{ episode.timestamp|default:""|naturalday }}</td>
       <td>
