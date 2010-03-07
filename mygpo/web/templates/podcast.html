@@ -86,23 +86,22 @@
   {% if not episodes|length_is:"0" %}
 
    <h2>{% trans "Episodes" %}</h2>
-   <table class="list">
+   <table class="list episode_list">
     <tr>
      <th></th>
-     <th></th>
-     <th>{% trans "Title" %}</th>
-     <th>{% trans "Description" %}</th>
+     <th>{% trans "Episode" %}</th>
      <th>{% trans "Released" %}</th>
      <th>{% trans "Listeners" %}</th>
     </tr>
  
     {% for episode in episodes %}
      <tr>
-      <td>{{ episode.action|episode_status_icon }}</td>
-      <td class="numeric">{{ episode.number}}</td>
-      <td><a href="/episode/{{ episode.id }}">{{ episode.shortname|default:"Unknown Episode"|striptags }}</a></td>
-      <td class="description">{{ episode.description|default:""|striptags|truncatewords:"15" }}</td>
-      <td>{{ episode.timestamp|default:""|naturalday }}</td>
+      <td style="text-align: center; padding-left: 5px; padding-right: 5px;">{{ episode.action|episode_status_icon }}</td>
+      <td>
+          <p class="title"><a href="/episode/{{ episode.id }}">{{ episode.title|default:"Unknown Episode"|striptags }}</a></p>
+          <p class="description">{{ episode.description|default:""|striptags|truncatewords:"15" }}</p>
+      </td>
+      <td>{{ episode.timestamp|default:""|date:"Y-m-d" }}</td>
       <td>
        {% if episode.listeners %}
         {{ episode.listeners|vertical_bar:max_listeners }}
@@ -132,7 +131,6 @@
    </table>
   {% endif %} 
   {% endif %}
-
   {% if not podcast.title %}
    <div class="info"><strong>{% trans "Why Unnamed Podcast?" %}</strong> {% trans "Because we display names after we have fetched the information form the feed -- and this may take some time. Until this is completed, the podcast will simply be called this way." %}</div>
   {% endif %}

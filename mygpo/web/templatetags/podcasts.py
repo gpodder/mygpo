@@ -11,7 +11,7 @@ def podcast_logo(podcast, size=32):
         sha = hashlib.sha1(podcast.logo_url).hexdigest()
         s = '<img src="/media/logo/%s" alt="%s" height="%s" width="%s" />' % (sha, _('Logo'), size, size)
     else:
-        s = '<img src="/media/logo/default.png" alt="%s" height="%s" width="%s" />' % (_('No Logo available'), size, size)
+        s = '<img src="/media/podcast-%d.png" alt="%s" height="%s" width="%s" />' % (hash(podcast.title)%5, _('No Logo available'), size, size)
 
     return mark_safe(s)
 

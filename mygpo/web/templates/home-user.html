@@ -1,35 +1,42 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load devices %}
+{% load episodes %}
 {% load podcasts %}
 
-{% block title %}{% trans "Your Subscriptions" %}{% endblock %}
+{% block title %}{% trans "My Podcast Subscriptions" %}{% endblock %}
 
 {% block content %}
 {% if deletedevice_success %}
    <div class="success">{% blocktrans with device_name|striptags as devicename %}The device {{ devicename }} has been deleted.{% endblocktrans %}</div>
 {% endif %}
 
-<h1>{% trans "Your Subscriptions" %}</h1>
+<h1>{% trans "My Podcast Subscriptions" %}</h1>
 
  {% if not subscriptionlist|length_is:"0" %}
- <table class="list">
+ <p>{% trans "This is a list of your podcast subscriptions." %}</p>
+ <table class="list podcast_list">
   <tr>
    <th>&nbsp;</th>
    <th>{% trans "Podcast" %}</th>
-   <th>{% trans "Latest Episode" %}</th>
-   <th>{% trans "Subscribed on" %}</th>
+   <th>{% trans "Devices" %}</th>
   </tr>
   
   {% for s in subscriptionlist %}
    <tr>
     <td>{{ s.podcast|podcast_logo }}</td>
-    <td><a class="listlink" href="/podcast/{{ s.podcast.id }}">{{ s.podcast|striptags }}</a></td>
+    <td><a class="listlink" href="/podcast/{{ s.podcast.id }}">{{ s.podcast|striptags }}</a><br/><span class="latest_episode">
     {% if s.episode %}
-     <td><a href="/episode/{{s.episode.id}}">{{ s.episode.shortname|default:"Unnamed Episode"|striptags }}</a></td>
-    {% else %}
-     <td></td>
-    {% endif %}
+    {% trans "Latest Episode:" %} <a href="/episode/{{s.episode.id}}">{{ s.episode.title|default:"Unnamed Episode"|striptags }}</a>
+      {% if s.episode.action %}
+          ({{ s.episode.timestamp|date:"Y-m-d" }}, {{s.episode.action|episode_status_text }})
+      {% else %}
+          ({{ s.episode.timestamp|date:"Y-m-d" }})
+      {% endif %}
+     {% else %}
+       {% trans "No episodes" %}
+     {% endif %}
+     </span></td>
     <td>{{ s.devices|device_list }}</td>
    </tr>
   {% endfor %}

@@ -5,10 +5,11 @@
 {% load podcasts %}
 {% load episodes %}
 
-{% block title %}{% trans "History" %}{% if singledevice %} {% trans "for" %} {{ singledevice|striptags }}{% endif %}{% endblock %}
+{% block title %}{% trans "Subscription and episode history" %}{% if singledevice %} {% trans "for" %} {{ singledevice|striptags }}{% endif %}{% endblock %}
 
 {% block content %}
-   <h1>{% trans "History" %}{% if singledevice %} {% trans "for" %} {{ singledevice|striptags }}{% endif %}</h1>
+<h1>{% trans "Subscription and episode history" %}{% if singledevice %} {% trans "for" %} {{ singledevice|striptags }}{% endif %}</h1>
+<p>{% trans "This is a list of recent subscription and episode actions for your account." %}</p>
 
    {% if singledevice %}
     <a href="/device/{{ singledevice.id }}">{% trans "Back to" %} {{ singledevice|device_icon }} {{singledevice|striptags}}</a>
@@ -19,8 +20,8 @@
     <tr>
      <th></th>
      <th>{% trans "Podcast/Episode" %}</th>
-     <th>{% trans "Timestamp" %}</th>
-     <th>{% trans "Action" %}</th>
+     <th style="text-align: center;">{% trans "Date" %}</th>
+     <th style="text-align: center;">{% trans "Action" %}</th>
      <th>{% trans "Device" %}</th>
     </tr>
     {% for s in generalhistory %}
@@ -37,15 +38,15 @@
        {% else %}
         <a href="/episode/{{ s.episode.id }}">
          {% if s.episode.title %}
-          {{ s.episode|striptags }}
+          {{ s.episode.title|striptags }}
          {% else %}
           {% trans "Unnamed Episode" %}
          {% endif %}
-        </a> (<a href="/podcast/{{ s.episode.podcast.id }}">{{ s.episode.podcast|striptags }}</a>)
+     </a><br/><span class="from_podcast">{% trans "from" %} <a href="/podcast/{{ s.episode.podcast.id }}">{{ s.episode.podcast|striptags }}</a></span>
        {% endif %}
       </td>
-      <td><abbr title="{{ s.timestamp }}">{{ s.timestamp|naturalday }}</abbr></td>
-      <td>
+      <td><span title="{{ s.timestamp }}">{{ s.timestamp|date:"Y-m-d" }}</span></td>
+      <td style="text-align: center;">
        {% if s.podcast %}
         {{ s|podcast_status_icon }}
        {% else %}

@@ -39,5 +39,5 @@ def device_icon(device, size=16):
 
 @register.filter
 def device_list(devices):
-    return mark_safe(', '.join([ '<a href="/device/%s">%s&nbsp;%s</a>' % (d.id, device_icon(d), d.name) for d in devices]))
+    return mark_safe('<br/>'.join([ '<a href="/device/%s">%s&nbsp;%s</a>' % (d.id, device_icon(d), d.name.replace(' ', '&nbsp;')) for d in devices]))
 
