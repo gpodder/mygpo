@@ -19,18 +19,32 @@
   {% endif %}
 
   {% if not user.is_authenticated %}
-    <div class="subscribe">
-     <a href="/podcast/{{ podcast.id }}/subscribe">
-      {% if podcast.title %}
-       {% blocktrans with podcast.title|striptags as podcasttitle %}Subscribe to {{ podcasttitle }}{% endblocktrans %}
-      {% else %}
-       {% trans "Subscribe to this podcast" %}
-      {% endif %}
-     </a>
-    </div>	
+   <div class="subscribe">
+    <a href="/podcast/{{ podcast.id }}/subscribe">
+     {% if podcast.title %}
+      {% blocktrans with podcast.title|striptags as podcasttitle %}Subscribe to {{ podcasttitle }}{% endblocktrans %}
+     {% else %}
+      {% trans "Subscribe to this podcast" %}
+     {% endif %}
+    </a>
+   </div>	
   {% else %}
 
-  {% if devices|length_is:"0"  %}
+   {% if not devices|length_is:"0"  %}
+
+    <h2>{% trans "Devices" %}</h2>
+    <strong>{% trans "You have subscribed this podcast on" %}</strong>
+    <ul class="devices">
+     {% for device in devices %}
+      <li class="{{device.type}}">
+       <div class="devicesLeft"><a href="/device/{{ device.id }}">{{ device|striptags }}</a></div>
+       <div class="devicesRight"><a href="/podcast/{{ podcast.id}}/unsubscribe/{{ device.id }}?return_to=/podcast/{{ podcast.id }}"><img src="/media/unsubscribe.png" /></a></div>
+       <div class="devicesClear"></div>
+      </li>
+     {% endfor %}
+    </ul>
+ 
+   {% endif %}
 
    {% if can_subscribe %}
     <div class="subscribe">
@@ -44,18 +58,6 @@
     </div>
    {% endif %}
 
-  {% else %}
-   <h2>{% trans "Devices" %}</h2>
-   <strong>{% trans "You have subscribed this podcast on" %}</strong>
-   <ul class="devices">
-   {% for device in devices %}
-    <li class="{{device.type}}">
-     <div class="devicesLeft"><a href="/device/{{ device.id }}">{{ device|striptags }}</a></div>
-     <div class="devicesRight"><a href="/podcast/{{ podcast.id}}/unsubscribe/{{ device.id }}?return_to=/podcast/{{ podcast.id }}"><img src="/media/unsubscribe.png" /></a></div>
-     <div class="devicesClear"></div>
-    </li>
-   {% endfor %}
-   </ul>
 
    {% if privacy_form %}
     <h2>{% trans "Privacy" %}</h2>
@@ -68,23 +70,11 @@
      <input type="submit" value="Save" />
     </form>
    {% endif %}
+  
+  {% endif %} {% comment %} End of user-only content{% endcomment  %}
 
-   {% if can_subscribe %}
-    <div class="subscribe">
-     <a href="/podcast/{{ podcast.id }}/subscribe">
-      {% if podcast.title %}
-       {% blocktrans with podcast.title|striptags as podcasttitle %}Subscribe to {{ podcasttitle }} on other devices{% endblocktrans %}
-      {% else %}
-       {% trans "Subscribe to this podcast on other devices" %}
-      {% endif %}
-     </a>
-    </div>
-   {% endif %}
 
-  {% endif %}
-
-  {% if not episodes|length_is:"0" %}
-
+  {% if episodes %}
    <h2>{% trans "Episodes" %}</h2>
    <table class="list">
     <tr>
@@ -111,7 +101,7 @@
    </table>
   {% endif %}
 
-  {% if not history|length_is:"0" %}
+  {% if history %}
    <h2>{% trans "Subscription History" %}</h2>
    <table class="list">
     <tr>
@@ -129,10 +119,10 @@
     {% endfor %}
    </table>
   {% endif %} 
-  {% endif %}
 
   {% if not podcast.title %}
    <div class="info"><strong>{% trans "Why Unnamed Podcast?" %}</strong> {% trans "Because we display names after we have fetched the information form the feed -- and this may take some time. Until this is completed, the podcast will simply be called this way." %}</div>
   {% endif %}
+
 {% endblock %}
 
