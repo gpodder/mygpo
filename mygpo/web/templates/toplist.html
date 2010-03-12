@@ -13,7 +13,7 @@
 
   <table class="list">
    <tr>
-    <th class="numeric">{% trans "#" %}</th>
+    <th></th>
     <th></th>
     <th></th>
     <th>{% trans "Podcast" %}</th>
@@ -21,14 +21,14 @@
    </tr>
   {% for entry in entries %}
    <tr>
-    <td class="numeric position">{{ forloop.counter }}</td>
+    <td class="numeric">{{ forloop.counter }}</td>
     <td class="oldposition">
      {% if entry.oldplace %}
       {% if entry.oldplace|subtract:forloop.counter %}
        {{ entry.oldplace|subtract:forloop.counter|format_diff }}
       {% endif %}
-     {% else %}
-      <span class="new">{% trans "new" %}</span>
+      {% else %}
+      <img src="/media/charts-new.png" alt="new">
      {% endif %}
     </td>
     <td>{{ entry.podcast|podcast_logo }}</td>

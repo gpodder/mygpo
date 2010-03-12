@@ -10,12 +10,11 @@
 
   <p>{% blocktrans with entries|length as count %}These are the {{ count }} most-listened episodes of the last 7 days.{% endblocktrans %}</p>
 
-  <table class="list">
+  <table class="list episode_list">
    <tr>
-    <th>{% trans "#" %}</th>
+    <th></th>
     <th></th>
     <th>{% trans "Episode" %}</th>
-    <th>{% trans "Podcast" %}</th>
     <th>{% trans "Listeners" %}</th>
    </tr>
   {% for entry in entries %}
@@ -28,9 +27,8 @@
      {% else %}
       {% trans "Unnamed Episode" %}
      {% endif %}
-     </a>
-    </td>
-    <td><a href="/podcast/{{ entry.episode.podcast.id }}">{{ entry.episode.podcast|striptags }}</a></td>
+     </a><br/>
+     <span class="from_podcast">{% trans "from" %} <a href="/podcast/{{ entry.episode.podcast.id }}">{{ entry.episode.podcast|striptags }}</a></td>
     <td>{{ entry.listeners|vertical_bar:max_listeners }}</td>
    </tr>
   {% endfor %}

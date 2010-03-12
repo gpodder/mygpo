@@ -26,8 +26,8 @@ def apply_sanitizing_rules(url, rules, podcast=True, episode=False):
     When passing podcast=False this check is ommitted. The same is valid
     for episode.
     """
-    if podcast: rules = rules.filter(use_podcast=True)
-    if episode: rules = rules.filter(use_podcast=True)
+    if podcast: rules = [r for r in rules if r.use_podcast==True]
+    if episode: rules = [r for r in rules if r.use_episode==True]
 
     for r in rules:
         if r.search_precompiled:
@@ -76,7 +76,7 @@ def maintenance():
         count += 1
         if (count % 100) == 0: print '%s %% (podcast id %s)' % (((count + 0.0)/podcasts.count()*100), p.id)
         try:
-            su = sanitize_url(p.url, rules)
+            su = sanitize_url(p.url, rules=rules)
         except Exception, e:
             log('failed to sanitize url for podcast %s: %s' % (p.id, e))
             p_error += 1
@@ -140,7 +140,7 @@ def maintenance():
         count += 1
         if (count % 100) == 0: print '%s %% (episode id %s)' % (((count + 0.0)/episodes.count()*100), e.id)
         try:
-            su = sanitize_url(e.url, rules, podcast=False, episode=True)
+            su = sanitize_url(e.url, rules=rules, podcast=False, episode=True)
         except Exception, ex:
             log('failed to sanitize url for episode %s: %s' % (e.id, ex))
             p_error += 1
@@ -163,7 +163,7 @@ def maintenance():
             continue
 
         try:
-            su_episode = Episode.objects.get(url=su)
+            su_episode = Episode.objects.get(url=su, podcast=e.podcast)
 
         except Episode.DoesNotExist, ex:
             # "target" episode does not exist, we simply change the url
@@ -202,6 +202,11 @@ def maintenance():
 def delete_podcast(p):
     SubscriptionAction.objects.filter(podcast=p).delete()
     p.delete()
+
+
+def delete_episode(e):
+    EpisodeAction.objects.filter(episode=e).delete()
+    e.delete()
 
 
 def rewrite_podcasts(p_old, p_new):
@@ -248,7 +253,7 @@ def rewrite_episodes(p_old, p_new):
             e.delete()
 
         except Episode.DoesNotExist:
-            log('updating episode %s (url "%s", podcast %s => %s)' % (e.id, e.url, p_old.id, p_new.od))
+            log('updating episode %s (url "%s", podcast %s => %s)' % (e.id, e.url, p_old.id, p_new.id))
             e.podcast = p_new
             e.save()
 

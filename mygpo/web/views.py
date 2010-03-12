@@ -20,7 +20,7 @@ from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadReque
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.template import RequestContext
-from mygpo.api.models import Podcast, UserProfile, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, EpisodeToplistEntry, Subscription, SuggestionEntry, SyncGroup, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SubscriptionMeta
+from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, EpisodeToplistEntry, Subscription, SuggestionEntry, SyncGroup, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SubscriptionMeta
 from mygpo.web.models import Rating, SecurityToken
 from mygpo.web.forms import UserAccountForm, DeviceForm, SyncForm, PrivacyForm, ResendActivationForm
 from django.forms import ValidationError
@@ -259,7 +259,7 @@ def episode_list(podcast, user):
     return episodes
 
 def episode(request, id):
-    episode = Episode.objects.get(pk=id)
+    episode = get_object_or_404(Episode, pk=id)
     if request.user.is_authenticated():
         history = EpisodeAction.objects.filter(user=request.user, episode=episode).order_by('-timestamp')
     else:

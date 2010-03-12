@@ -29,9 +29,9 @@ from mygpo.log import log
 from haystack.query import SearchQuerySet
 
 try:
-    import simplejson as json
-except ImportError:
     import json
+except ImportError:
+    import simplejson as json
 
 @require_valid_user
 def subscriptions(request, username, device_uid, format):
