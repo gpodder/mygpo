@@ -47,7 +47,7 @@ def subscriptions(request, username, device_uid, format):
     if request.method == 'GET':
         return format_subscriptions(get_subscriptions(request.user, device_uid), format, username)
         
-    elif request.method == 'PUT':
+    elif request.method in ('PUT', 'POST'):
         return set_subscriptions(parse_subscription(request.raw_post_data, format, request.user, device_uid))
     
     else:
