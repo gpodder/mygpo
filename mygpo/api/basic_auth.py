@@ -15,7 +15,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.contrib.auth import authenticate, login
 from mygpo.log import log
 
@@ -33,7 +33,7 @@ def view_or_basicauth(view, request, test_func, realm = "", *args, **kwargs):
         try:
             return view(request, *args, **kwargs)
         except Exception, e:
-            log(e)
+            log(repr(e))
             return HttpResponseBadRequest(e)
 
     # They are not logged in. See if they provided login credentials
@@ -67,7 +67,7 @@ def view_or_basicauth(view, request, test_func, realm = "", *args, **kwargs):
                     try:
                         return view(request, *args, **kwargs)
                     except Exception, e:
-                        log(e)
+                        log(repr(e))
                         return HttpResponseBadRequest(e)
 
     return auth_request()
