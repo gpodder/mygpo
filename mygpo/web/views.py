@@ -250,9 +250,11 @@ def episode_list(podcast, user):
     for e in episodes:
         listeners = EpisodeAction.objects.filter(episode=e, action='play').values('user').distinct()
         e.listeners = listeners.count()
-        actions = EpisodeAction.objects.filter(episode=e, user=user).order_by('-timestamp')
-        if actions.count() > 0:
-            e.action = actions[0]
+
+        if user.is_authenticated():
+            actions = EpisodeAction.objects.filter(episode=e, user=user).order_by('-timestamp')
+            if actions.count() > 0:
+                e.action = actions[0]
 
     return episodes
 
