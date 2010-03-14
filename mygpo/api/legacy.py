@@ -72,6 +72,7 @@ def upload(request):
             p, created = Podcast.objects.get_or_create(url=n)
         except IntegrityError, e:
             log('/upload: Error trying to get podcast object: %s (error: %s)' % (n, e))
+            continue
 
         try:
             SubscriptionAction.objects.create(podcast=p,action=SUBSCRIBE_ACTION, timestamp=datetime.now(), device=d)
