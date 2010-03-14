@@ -154,12 +154,14 @@ def episodes(request, username):
     if request.method == 'POST':
         try:
             actions = json.loads(request.raw_post_data)
-        except KeyError:
+        except KeyError, e:
+            log('could not parse episode update info for user %s: %s' % (username, e))
             return HttpResponseBadRequest()
 
         try:
             update_urls = update_episodes(request.user, actions)
         except Exception, e:
+            log('could not update episodes for user %s: %s' % (username, e))
             return HttpResponseBadRequest(e)
 
         return JsonResponse({'timestamp': now_, 'update_urls': update_urls})
