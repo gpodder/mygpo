@@ -19,8 +19,12 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.backends import ModelBackend
 from django.core.exceptions import ImproperlyConfigured
-from django.forms.fields import email_re
 from django.db.models import get_model
+
+try:
+    from django.forms.fields import email_re
+except ImportError:
+    from django.core.validators import email_re
 
 class EmailAuthenticationBackend(ModelBackend):
     def authenticate(self, username=None, password=None):
