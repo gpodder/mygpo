@@ -31,10 +31,16 @@ import re
 try:
     #try to import the JSON module (if we are on Python 2.6)
     import json
+
+    # Python 2.5 seems to have a different json module
+    if not 'dumps' in dir(json):
+        raise ImportError
+
 except ImportError:
     # No JSON module available - fallback to simplejson (Python < 2.6)
     print "No JSON module available - fallback to simplejson (Python < 2.6)"
     import simplejson as json
+
 
 @require_valid_user
 def subscriptions(request, username, device_uid):

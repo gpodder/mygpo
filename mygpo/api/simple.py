@@ -30,8 +30,13 @@ from haystack.query import SearchQuerySet
 
 try:
     import json
+
+    # Python 2.5 seems to have a different json module
+    if not 'dumps' in json:
+        raise ImportError
+
 except ImportError:
-    import simplejson as json
+    import json
 
 @require_valid_user
 def subscriptions(request, username, device_uid, format):
