@@ -73,17 +73,6 @@ ul#gpodder-menu li img
     padding-right: 2px; 
 }
 
-a 
-{ 
-    color: blue; 
-    text-decoration: none; 
-}
-
-a:hover 
-{ 
-    text-decoration: underline; 
-}
-
 p#version-info 
 { 
     position: absolute; 
@@ -118,36 +107,6 @@ address a
 table.downloads td 
 { 
     background-color: #eee; 
-}
-
-a[href^="http://"]:after, a[href^="https://"]:after {
-    content: url(http://gpodder.org/images/external.png);
-    padding-left: 2px;
-}
-
-/* ..but not URLs linking to the bug tracker or mygpo */
-a[href^="http://gpodder.org"]:after, 
-a.noextlink:after,
-a.imgonlylink:after 
-{
-    content: '';
-    padding-left: 0px;
-}
-
-a[href^="http://bugs.gpodder.org"]:after, 
-a.noextlink:after,
-a.imgonlylink:after 
-{
-    content: '';
-    padding-left: 0px;
-}
-
-a[href^="http://my.gpodder.org"]:after,
-a.noextlink:after,
-a.imgonlylink:after 
-{
-    content: '';
-    padding-left: 0px;
 }
 
 #logo

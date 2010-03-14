@@ -20,6 +20,7 @@ from django.contrib.auth.models import User, UserManager
 from datetime import datetime
 from django.utils.translation import ugettext as _
 import hashlib
+import re
 
 from mygpo.api.constants import EPISODE_ACTION_TYPES, DEVICE_TYPES, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SUBSCRIPTION_ACTION_TYPES
 from mygpo.log import log
@@ -133,8 +134,21 @@ class Episode(models.Model):
     duration = models.PositiveIntegerField(null=True, blank=True)
     filesize = models.PositiveIntegerField(null=True, blank=True)
 
+    def number(self):
+        m = re.search('\D*(\d+)\D+', self.title)
+        return m.group(1)
+
+    def shortname(self):
+        s = self.title
+        s = s.replace(self.podcast.title, '')
+        s = s.replace(self.number(), '')
+        s = re.search('\W*(.+)', s).group(1)
+        s = s.strip()
+        return s
+
+
     def __unicode__(self):
-        return '%s (%s)' % (self.title, self.podcast)
+        return '%s (%s)' % (self.shortname(), self.podcast)
 
     class Meta:
         db_table = 'episode'

@@ -9,15 +9,19 @@ register = template.Library()
 @register.filter
 def vertical_bar(value, max):
     ratio = float(value) / float(max) * 100
-    s = '<div class="bar" style="width: %s">%s</div>' % (ratio, value)
+    if ratio > 40:
+        left, right = '<span>'+str(value)+'</span>', ''
+    else:
+        left, right = '&nbsp;', '<span>'+str(value)+'</span>'
+    s = '<div class="barbg"><div class="bar" style="width: %s">%s</div>%s</div>' % (ratio, left, right)
     return mark_safe(s)
 
 @register.filter
 def format_diff(value):
-    if value > 0:
-        s = '<span class="pos">+%s</span>' % value
-    elif value < 0:
-        s = '<span class="neg">%s</span>' % value
+    if value > 1:
+        s = '<img src="/media/better.png" title="+%s">' % value
+    elif value < -1:
+        s = '<img src="/media/worse.png" title="%s">' % value
     else:
         s = ''
 

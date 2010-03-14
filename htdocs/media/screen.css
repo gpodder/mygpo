@@ -1,3 +1,12 @@
+a {
+    color: #10488B;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
 div.error
 {
     background-color: #fa7080;
@@ -81,24 +90,36 @@ ul.menu li.heading {
 
 table.list
 {
-    margin-top: 2em;
     font-size: 1em;
     border-collapse: collapse;
     width: 100%;
     margin-bottom: 2em;
 }
 
-table.list tr:hover td
-{
-    background-color: #ddd;
+table.list tr {
+    border: 1px solid white;
+}
+
+table.list tr:nth-child(even) td {
+    background-color: #f7f7f7;
+}
+
+table.list tr:nth-child(odd) td {
+    background-color: #f0f0f0;
+}
+
+table.list tr:nth-child(even):hover td {
+    background-color: #e7e7e7;
+}
+
+table.list tr:nth-child(odd):hover td {
+    background-color: #e0e0e0;
 }
 
 table.list th
 {
     text-align: left;
-    border-bottom: thin solid black;
-    padding: 0;
-    margin: 0;
+    padding: 5px;
 }
 
 table.list th,
@@ -126,6 +147,21 @@ table.list tr.group:hover td
     background-color: inherit;
 }
 
+.episode_list .title
+{
+}
+
+.podcast_list p, .episode_list p
+{
+    margin: 2px 0px 2px 0px;
+    padding: 0px;
+}
+
+.podcast_list p.description, .episode_list p.description
+{
+    font-size: x-small;
+}
+
 .description
 {
     color: #666;
@@ -149,6 +185,13 @@ h1, h2
     padding-bottom: 0;
 }
 
+h1 {
+    font-size: 14pt;
+}
+
+h2 {
+    font-size: 12pt;
+}
 
 img.device_icon
 {
@@ -308,11 +351,25 @@ input.url
 
 .bar
 {
-    padding-left: 0.5em;
-    background-color: #75507b;
+    background-color: #333;
     color: white;
     float: left;
-    height: 100%;
+    text-align: left;
+}
+
+.bar span, .barbg span
+{
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.barbg
+{
+    background-color: #aaa;
+    text-align: right;
+    color: black;
+    float: left;
+    width: 100%;
 }
 
 td.position
@@ -342,3 +399,13 @@ td.oldposition
 {
     color: #555;
 }
+
+span.from_podcast, span.latest_episode {
+    font-size: x-small;
+    color: #666;
+}
+
+span.from_podcast a, span.latest_episode a {
+    color: #333;
+}
+
