@@ -32,7 +32,7 @@ try:
     import json
 
     # Python 2.5 seems to have a different json module
-    if not 'dumps' in json:
+    if not 'dumps' in dir(json):
         raise ImportError
 
 except ImportError:
