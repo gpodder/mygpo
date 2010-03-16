@@ -60,7 +60,7 @@ def upload(request):
         u = sanitize_url(p['url'])
         if u != '': podcast_urls.append(u)
 
-    new = [item['url'] for item in i.items if item['url'] not in existing_urls]
+    new = [u for u in podcast_urls if u not in existing_urls]
     rem = [e.podcast.url for e in existing if e.podcast.url not in podcast_urls]
 
     #remove duplicates
