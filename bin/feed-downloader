@@ -42,6 +42,12 @@ UPDATE_LIMIT = datetime.datetime.now() - datetime.timedelta(days=15)
 if len(sys.argv) > 1:
     fetch_queue = []
     for url in sys.argv[1:]:
+
+        if url == '--toplist':
+            for e in models.ToplistEntry.objects.all().order_by('-subscriptions')[:100]:
+                fetch_queue.append(e.podcast)
+            continue
+
         try:
             fetch_queue.append(models.Podcast.objects.get(url=url))
         except:
