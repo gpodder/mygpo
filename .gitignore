@@ -1,0 +1,4 @@
+*.pyc
+htdocs/media/logo/*
+search_index/*
+logs/*
