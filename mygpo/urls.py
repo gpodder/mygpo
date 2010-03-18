@@ -84,6 +84,10 @@ urlpatterns = patterns('',
     (r'^api/1/devices/(?P<username>\w+)/(?P<device_uid>[\w.-]+)\.json', 'mygpo.api.advanced.device'),
     (r'^api/1/devices/(?P<username>\w+)\.json', 'mygpo.api.advanced.devices'),
 
+    (r'^api/2/auth/(?P<username>\w+)/(?P<device_uid>[\w.-]+)/login\.json', 'mygpo.api.advanced.auth.login'),
+    (r'^api/2/auth/(?P<username>\w+)/(?P<device_uid>[\w.-]+)/logout\.json', 'mygpo.api.advanced.auth.logout'),
+    (r'^api/2/auth/(?P<username>\w+)/(?P<device_uid>[\w.-]+)/validate\.json', 'mygpo.api.advanced.auth.validate'),
+
     #Subscribe with my.gpodder.org
     (r'^subscribe', 'mygpo.web.views.podcast_subscribe_url'),
     #(r'^authors/$', 'django.views.generic.simple.direct_to_template', {'template': 'authors.html'}),
