@@ -133,7 +133,7 @@ class Episode(models.Model):
     duration = models.PositiveIntegerField(null=True, blank=True)
     filesize = models.PositiveIntegerField(null=True, blank=True)
     language = models.CharField(max_length=10, null=True, blank=True)
-
+    last_update = models.DateTimeField(auto_now=True)
 
     def number(self):
         m = re.search('\D*(\d+)\D+', self.title)
