@@ -55,7 +55,7 @@ if len(sys.argv) > 1:
             pass
 else:
     #fetch_queue = models.Podcast.objects.all()
-    fetch_queue = models.Podcast.objects.filter(last_update__lt=UPDATE_LIMIT)
+    fetch_queue = models.Podcast.objects.filter(last_update__lt=UPDATE_LIMIT).iterator()
 
 def check_mime(mimetype):
     """Check if a mimetype is a "wanted" media type"""

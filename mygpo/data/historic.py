@@ -5,7 +5,7 @@ from datetime import date, timedelta
 
 
 def all_podcasts():
-    for p in Podcast.objects.all():
+    for p in Podcast.objects.all().iterator():
         calc_podcast(p)
 
 
