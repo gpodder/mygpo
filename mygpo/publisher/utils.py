@@ -18,6 +18,7 @@
 from datetime import timedelta, date
 from mygpo.utils import daterange
 from mygpo.api.models import Episode, EpisodeAction
+from mygpo.data.models import HistoricPodcastData
 
 def listener_data(podcast):
     d = date(2010, 1, 1)
@@ -40,6 +41,25 @@ def listener_data(podcast):
             'episode': episode})
 
     return days
+
+
+def subscriber_data(podcast):
+    data = {}
+    records = HistoricPodcastData.objects.filter(podcast=podcast).order_by('date')
+    for r in records:
+        s = r.date.strftime('%y-%m')
+        if s in data:
+            data[s] += r.subscriber_count
+        else:
+            data[s] = r.subscriber_count
+
+    list = []
+    for k, v in data.iteritems():
+        list.append({'x': k, 'y': v})
+
+    list.sort(key=lambda x: x['x'])
+
+    return list
 
 
 def check_publisher_permission(user, podcast):

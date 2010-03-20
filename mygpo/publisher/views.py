@@ -6,7 +6,7 @@ from mygpo.api.constants import DEVICE_TYPES
 from mygpo.publisher.models import PodcastPublisher
 from mygpo.publisher.auth import require_publisher
 from mygpo.publisher.forms import SearchPodcastForm, EpisodeForm, PodcastForm
-from mygpo.publisher.utils import listener_data, check_publisher_permission, episode_list
+from mygpo.publisher.utils import listener_data, check_publisher_permission, episode_list, subscriber_data
 
 @require_publisher
 def home(request):
@@ -37,6 +37,7 @@ def podcast(request, id):
         return HttpResponseForbidden()
 
     timeline_data = listener_data(p)
+    subscription_data = subscriber_data(p)
     device_data = device_stats(p)
 
     if request.method == 'POST':
@@ -51,6 +52,7 @@ def podcast(request, id):
         'podcast': p,
         'form': form,
         'timeline_data': timeline_data,
+        'subscriber_data': subscription_data,
         'device_data': device_data,
         }, context_instance=RequestContext(request))
 

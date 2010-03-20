@@ -3,6 +3,7 @@
 {% load humanize %}
 {% load podcasts %}
 {% load charts %}
+{% load pcharts %}
 
 {% block title %}{{ podcast.title|default:"Unnamed Podcast"|striptags }}{% endblock %}
 
@@ -35,6 +36,11 @@
    <div id="chart_div" style="width: 700px; height: 240px;"></div>
   {% endif %}
 
+
+  {% if subscriber_data %}
+   <h2>Subscribers</h2>
+   {{ subscriber_data|bar_chart }}
+  {% endif %}
 
   {% if device_data %}
    <h2>Device Usage</h2>
