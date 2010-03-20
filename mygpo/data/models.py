@@ -8,6 +8,7 @@ class HistoricPodcastData(models.Model):
 
     class Meta:
         db_table = 'historic_podcast_data'
+        unique_together = ('podcast', 'date')
 
 
 class HistoryEpisodeData(models.Model):
@@ -17,4 +18,5 @@ class HistoryEpisodeData(models.Model):
 
     class Meta:
         db_table = 'historic_episode_data'
+        unique_together = ('episode', 'date')
 
