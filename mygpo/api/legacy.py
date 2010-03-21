@@ -125,5 +125,8 @@ def auth(emailaddr, password):
     if not user.check_password(password):
         return None
 
+    if not user.is_active:
+        return None
+
     return user
 
