@@ -26,6 +26,7 @@ import datetime
 import hashlib
 import urllib2
 import socket
+import time
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'mygpo.settings'
 
@@ -33,6 +34,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from mygpo import feedcore
 from mygpo.api import models
+from mygpo.utils import parse_time
 
 socket.setdefaulttimeout(10)
 fetcher = feedcore.Fetcher(USER_AGENT)
@@ -54,7 +56,7 @@ if len(sys.argv) > 1:
             pass
 else:
     #fetch_queue = models.Podcast.objects.all()
-    fetch_queue = models.Podcast.objects.filter(last_update__lt=UPDATE_LIMIT)
+    fetch_queue = models.Podcast.objects.filter(last_update__lt=UPDATE_LIMIT).iterator()
 
 def check_mime(mimetype):
     """Check if a mimetype is a "wanted" media type"""
@@ -92,6 +94,24 @@ def get_episode_summary(entry):
 
     return ''
 
+def get_duration(entry):
+    str = entry.get('itunes_duration', '')
+
+    try:
+        return parse_time(str)
+    except ValueError:
+        return 0
+
+def get_filesize(entry, url):
+    enclosures = getattr(entry, 'enclosures', [])
+    for enclosure in enclosures:
+        if 'href' in enclosure and enclosure['href'] == url:
+            if 'length' in enclosure:
+                return enclosure['length']
+
+            return 0
+    return 0
+
 def get_episode_metadata(entry, url):
     d = {
             'url': url,
@@ -99,6 +119,10 @@ def get_episode_metadata(entry, url):
             'description': get_episode_summary(entry),
             'link': entry.get('link', ''),
             'timestamp': None,
+            'author': entry.get('author', entry.get('itunes_author', '')),
+            'duration': get_duration(entry),
+            'filesize': get_filesize(entry, url),
+            'language': entry.get('language', ''),
     }
     try:
         d['timestamp'] = datetime.datetime(*(entry.updated_parsed)[:6])
@@ -127,6 +151,8 @@ for podcast in fetch_queue:
         podcast.title = feed.feed.get('title', podcast.url)
         podcast.link = feed.feed.get('link', podcast.url)
         podcast.description = feed.feed.get('subtitle', podcast.description)
+        podcast.author = feed.feed.get('author', feed.feed.get('itunes_author', podcast.author))
+        podcast.language = feed.feed.get('language', podcast.language)
 
         cover_art = None
         image = feed.feed.get('image', None)

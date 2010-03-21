@@ -15,26 +15,21 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from datetime import datetime, timedelta, time
-import time
+from django.db import models
+from django.contrib.auth.models import User
+from mygpo.api.models import Episode, Device
+from datetime import datetime
 
-def daterange(from_date, to_date=datetime.now()):
-    while from_date <= to_date:
-        yield from_date
-        from_date = from_date + timedelta(days=1)
-    return
+class Chapter(models.Model):
+    user = models.ForeignKey(User)
+    episode = models.ForeignKey(Episode)
+    device = models.ForeignKey(Device, null=True)
+    created = models.DateTimeField(default=datetime.now)
+    start = models.IntegerField()
+    end = models.IntegerField()
+    label = models.CharField(max_length=50, blank=True)
+    advertisement = models.BooleanField(default=False)
 
-
-def parse_time(str):
-    if not str:
-        raise ValueError('can\'t parse empty string')
-
-    for format in ('%H:%M:%S', '%M:%S'):
-        try:
-            t = time.strptime(str, format)
-            return t.tm_hour * 60*60 + t.tm_min * 60 + t.tm_sec
-        except ValueError, e:
-            continue
-
-    return int(str)
+    class Meta:
+        db_table = 'chapters'
 

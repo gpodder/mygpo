@@ -258,18 +258,6 @@ def episode_list(podcast, user):
 
     return episodes
 
-def episode(request, id):
-    episode = get_object_or_404(Episode, pk=id)
-    if request.user.is_authenticated():
-        history = EpisodeAction.objects.filter(user=request.user, episode=episode).order_by('-timestamp')
-    else:
-        history = []
-
-    return render_to_response('episode.html', {
-        'episode': episode,
-        'history': history,
-    }, context_instance=RequestContext(request))
-
 
 @login_required
 def account(request):

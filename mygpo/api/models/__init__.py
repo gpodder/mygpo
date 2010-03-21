@@ -47,7 +47,6 @@ class Podcast(models.Model):
     author = models.CharField(max_length=100, null=True, blank=True)
     language = models.CharField(max_length=10, null=True, blank=True)
 
-
     def subscriptions(self):
         return Subscription.objects.filter(podcast=self)
 
@@ -133,6 +132,8 @@ class Episode(models.Model):
     author = models.CharField(max_length=100, null=True, blank=True)
     duration = models.PositiveIntegerField(null=True, blank=True)
     filesize = models.PositiveIntegerField(null=True, blank=True)
+    language = models.CharField(max_length=10, null=True, blank=True)
+    last_update = models.DateTimeField(auto_now=True)
 
     def number(self):
         m = re.search('\D*(\d+)\D+', self.title)

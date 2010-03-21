@@ -3,6 +3,7 @@
 {% load humanize %}
 {% load episodes %}
 {% load devices %}
+{% load time %}
 
 {% block title %}{{ episode.title|default:"Unnamed Episode"|striptags }} - {{ episode.podcast.title|default:"Unnamed Podcast"|striptags}}{% endblock %}
 
@@ -22,6 +23,44 @@
    <a href="{{episode.url}}">{% trans "Direct Download" %}</a>
    {% if episode.link %}<a href="{{episode.link}}">Website</a>{% endif %}
   </div>
+
+  {% if user.is_authenticated %}
+   <h2>{% trans "Chapters" %}</h2>
+   <table class="list">
+    <tr>
+     <th></th>
+     <th>{% trans "Ad?" %}</th>
+     <th>{% trans "Label" %}</th>
+     <th></td>
+    </tr>
+
+    {% for chapter in chapters %}
+     <tr>
+      <td>{{ chapter.start|sec_to_time|time:"i:s" }}{% if chapter.start != chapter.end %} - {{ chapter.end|sec_to_time|time:"i:s" }}{% endif %}</td>
+      <td>{% if chapter.advertisement %}Yes{% endif %}</td>
+      <td>{{ chapter.label }}
+      <td><a href="/episode/{{ episode.id }}/remove-chapter/{{ chapter.id}}"><img src="/media/unsubscribe.png" alt="{% trans "Remove" %}" /></a>
+     </tr>
+    {% endfor %}
+    <tr>
+     <form action="/episode/{{ episode.id }}/add-chapter" method="POST">
+      <td>
+       <input type="text" name="start" class="time" /> -
+       <input type="text" name="end" class="time" />
+      </td>
+      <td>
+       <input type="checkbox" name="advertisement" />
+      </td>
+      <td>
+       <input type="text" name="label" />
+      </td>
+      <td>
+       <input type="submit" value="{% trans "Add" %}" />
+      </td>
+     </form>
+    </tr>
+   </table>
+  {% endif %}
 
   {% if not history|length_is:"0" %}
   <h2>{% trans "Your Episode History" %}</h2>

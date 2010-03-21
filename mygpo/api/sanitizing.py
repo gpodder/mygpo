@@ -69,12 +69,13 @@ def maintenance():
 
     count = 0
 
-    podcasts = Podcast.objects.all()
+    podcasts = Podcast.objects.all().iterator()
+    total = Podcast.objects.count()
     duplicates = 0
     sanitized_urls = []
     for p in podcasts:
         count += 1
-        if (count % 100) == 0: print '%s %% (podcast id %s)' % (((count + 0.0)/podcasts.count()*100), p.id)
+        if (count % 100) == 0: print '%s %% (podcast id %s)' % (((count + 0.0)/total*100), p.id)
         try:
             su = sanitize_url(p.url, rules=rules)
         except Exception, e:
@@ -135,10 +136,11 @@ def maintenance():
     print ' * %s error' % p_error
 
     count = 0
-    episodes = Episode.objects.all()
+    total = Episode.objects.count()
+    episodes = Episode.objects.all().iterator()
     for e in episodes:
         count += 1
-        if (count % 100) == 0: print '%s %% (episode id %s)' % (((count + 0.0)/episodes.count()*100), e.id)
+        if (count % 100) == 0: print '%s %% (episode id %s)' % (((count + 0.0)/total*100), e.id)
         try:
             su = sanitize_url(e.url, rules=rules, podcast=False, episode=True)
         except Exception, ex:
