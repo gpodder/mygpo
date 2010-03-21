@@ -34,6 +34,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from mygpo import feedcore
 from mygpo.api import models
+from mygpo.utils import parse_time
 
 socket.setdefaulttimeout(10)
 fetcher = feedcore.Fetcher(USER_AGENT)
@@ -95,19 +96,10 @@ def get_episode_summary(entry):
 
 def get_duration(entry):
     str = entry.get('itunes_duration', '')
-    if not str:
-        return 0
-
-    for format in ('%H:%M:%S', '%M:%S'):
-        try:
-            t = time.strptime(str, format)
-            return t.tm_hour * 60*60 + t.tm_min * 60 + t.tm_sec
-        except ValueError, e:
-            continue
 
     try:
-        return int(str)
-    except ValueError, e:
+        return parse_time(str)
+    except ValueError:
         return 0
 
 def get_filesize(entry, url):
