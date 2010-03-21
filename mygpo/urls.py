@@ -44,7 +44,9 @@ urlpatterns = patterns('',
     (r'^podcast/(?P<pid>\w+)/subscribe$', 'mygpo.web.views.podcast_subscribe'),
     (r'^podcast/(?P<pid>\w+)/unsubscribe/(?P<device_id>\d+)', 'mygpo.web.views.podcast_unsubscribe'),
 
-    (r'^episode/(?P<id>\d+)$', 'mygpo.web.views.episode'),
+    (r'^episode/(?P<id>\d+)$', 'mygpo.web.views.episode.episode'),
+    (r'^episode/(?P<id>\d+)/add-chapter$', 'mygpo.web.views.episode.add_chapter'),
+    (r'^episode/(?P<id>\d+)/remove-chapter/(?P<chapter_id>\d+)$', 'mygpo.web.views.episode.remove_chapter'),
 
     (r'account/$', 'mygpo.web.views.account'),
     (r'account/delete$', 'mygpo.web.views.delete_account'),

@@ -409,3 +409,7 @@ span.from_podcast a, span.latest_episode a {
     color: #333;
 }
 
+.time
+{
+    width: 5em;
+}
