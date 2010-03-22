@@ -562,9 +562,10 @@ def user_subscriptions(request, username):
 
     u_token = request.GET.get('token', '')
     if token.token == '' or token.token == u_token:
-        subscriptions = set([s.podcast for s in Subscription.objects.filter(user=user)])
+        subscriptions = [s for s in Subscription.objects.filter(user=user)]
+        public_subscriptions = set([s.podcast for s in subscriptions if s.get_meta().public])
         return render_to_response('user_subscriptions.html', {
-            'subscriptions': subscriptions,
+            'subscriptions': public_subscriptions,
             'other_user': user})
 
     else:
