@@ -413,3 +413,8 @@ span.from_podcast a, span.latest_episode a {
 {
     width: 5em;
 }
+
+.watermark
+{
+    color: #aaa;
+}

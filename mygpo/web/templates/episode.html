@@ -5,6 +5,11 @@
 {% load devices %}
 {% load time %}
 
+{% block head %}
+ <script type="text/javascript" src="/media/js/jquery-1.4.2.min.js"></script>
+ <script type="text/javascript" src="/media/js/jquery.watermark.min.js"></script>
+{% endblock head %}
+
 {% block title %}{{ episode.title|default:"Unnamed Episode"|striptags }} - {{ episode.podcast.title|default:"Unnamed Podcast"|striptags}}{% endblock %}
 
 {% block content %}
@@ -45,8 +50,8 @@
     <tr>
      <form action="/episode/{{ episode.id }}/add-chapter" method="POST">
       <td>
-       <input type="text" name="start" class="time" /> -
-       <input type="text" name="end" class="time" />
+       <input type="text" name="start" id="start" class="time" /> -
+       <input type="text" name="end" id="end" class="time" />
       </td>
       <td>
        <input type="checkbox" name="advertisement" />
@@ -89,4 +94,12 @@
   {% endif %}
 
 {% endblock %}
+
+
+{% block javascript %}
+ <script type="text/javascript">
+  $("#start").watermark("h:mm:ss", {className: 'watermark'});
+  $("#end").watermark("h:mm:ss", {className: 'watermark'});
+ </script>
+{% endblock javascript %}
 
