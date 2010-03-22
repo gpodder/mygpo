@@ -14,7 +14,8 @@
 <h1>{% trans "My Podcast Subscriptions" %}</h1>
 
  {% if not subscriptionlist|length_is:"0" %}
- <p>{% trans "This is a list of your podcast subscriptions." %}</p>
+ <p>{% trans "This is a list of your podcast subscriptions." %} {% trans "Go to your <a href=\"/account/\">settings page</a> to share it with others." %}</p>
+
  <table class="list podcast_list">
   <tr>
    <th>&nbsp;</th>
