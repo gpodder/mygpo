@@ -12,10 +12,4 @@ class Command(BaseCommand):
             print '%d / %d: %d - %s' % (n, max, p.id, p)
             calc_podcast(p)
 
-        max = Episode.objects.all()
-        n=0
-        for e in Episode.objects.all().iterator():
-            n+=1
-            print '%d / %d: %d - %s' % (n, max, e.id, p)
-            calc_episode(e)
 
