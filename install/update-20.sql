@@ -65,3 +65,8 @@ BEGIN
 END;//
 DELIMITER ;
 
+
+CREATE INDEX subscriptions_user_index ON subscriptions (user_id);
+CREATE INDEX subscriptions_device_index ON subscriptions (device_id);
+CREATE INDEX subscriptions_podcast_index ON subscriptions (podcast_id);
+
