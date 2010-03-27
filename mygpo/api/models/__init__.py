@@ -134,6 +134,7 @@ class Episode(models.Model):
     filesize = models.PositiveIntegerField(null=True, blank=True)
     language = models.CharField(max_length=10, null=True, blank=True)
     last_update = models.DateTimeField(auto_now=True)
+    outdated = models.BooleanField(default=False) #set to true after episode hasn't been found in feed
 
     def number(self):
         m = re.search('\D*(\d+)\D+', self.title)

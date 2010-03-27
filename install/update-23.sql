@@ -107,3 +107,6 @@ CREATE VIEW episode_toplist AS
     DESC LIMIT 100;
 
 
+
+ALTER TABLE episode ADD COLUMN outdated TINYINT(1) DEFAULT 0 NOT NULL;
+

@@ -50,6 +50,10 @@ if len(sys.argv) > 1:
                 fetch_queue.append(e.podcast)
             continue
 
+        if url == '--update-new':
+            podcasts = set(models.Podcast.objects.filter(episode__title='', episode__outdated=False))
+            fetch_queue.extend(podcasts)
+
         try:
             fetch_queue.append(models.Podcast.objects.get(url=url))
         except:
@@ -123,6 +127,7 @@ def get_episode_metadata(entry, url):
             'duration': get_duration(entry),
             'filesize': get_filesize(entry, url),
             'language': entry.get('language', ''),
+            'outdated': False,
     }
     try:
         d['timestamp'] = datetime.datetime(*(entry.updated_parsed)[:6])
@@ -176,6 +181,8 @@ for podcast in fetch_queue:
             except:
                 print >>sys.stderr, 'cannot save image'
 
+        existing_episodes = list(models.Episode.objects.filter(podcast=podcast))
+
         for entry in feed.entries:
             try:
                 url = get_episode_url(entry)
@@ -194,8 +201,18 @@ for podcast in fetch_queue:
                     for key in md:
                         setattr(e, key, md[key])
                 e.save()
+
+                existing_episodes.remove(e)
+
             except Exception, e:
                 print 'Cannot get episode:', e
+
+        # all episodes that could not be found in the feed
+        for e in existing_episodes:
+            if not e.outdated:
+                e.outdated = True
+                e.save()
+
     except Exception, e:
         print >>sys.stderr, 'Exception:', e
 
