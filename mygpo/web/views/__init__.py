@@ -21,6 +21,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.template import RequestContext
 from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, EpisodeToplistEntry, Subscription, SuggestionEntry, SyncGroup, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SubscriptionMeta
+from mygpo.data.models import Listener
 from mygpo.web.models import Rating, SecurityToken
 from mygpo.web.forms import UserAccountForm, DeviceForm, SyncForm, PrivacyForm, ResendActivationForm
 from django.forms import ValidationError
@@ -248,7 +249,7 @@ def episode_list(podcast, user):
     """
     episodes = Episode.objects.filter(podcast=podcast).order_by('-timestamp')
     for e in episodes:
-        listeners = EpisodeAction.objects.filter(episode=e, action='play').values('user').distinct()
+        listeners = Listener.objects.filter(episode=e).values('user').distinct()
         e.listeners = listeners.count()
 
         if user.is_authenticated():
