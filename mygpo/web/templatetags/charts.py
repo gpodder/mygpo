@@ -8,6 +8,9 @@ register = template.Library()
 
 @register.filter
 def vertical_bar(value, max):
+    if max == 0:
+        return ''
+
     ratio = float(value) / float(max) * 100
     if ratio > 40:
         left, right = '<span>'+str(value)+'</span>', ''
