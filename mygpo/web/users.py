@@ -65,7 +65,7 @@ def login_user(request):
                      'username': user
                 })
        except UserProfile.DoesNotExist:
-            UserProfile.objects.create(user=user)
+            profile, c = UserProfile.objects.get_or_create(user=user)
             return HttpResponseRedirect('/')
 
        else:
