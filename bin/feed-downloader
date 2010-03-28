@@ -202,7 +202,8 @@ for podcast in fetch_queue:
                         setattr(e, key, md[key])
                 e.save()
 
-                existing_episodes.remove(e)
+                if e in existing_episodes:
+                    existing_episodes.remove(e)
 
             except Exception, e:
                 print 'Cannot get episode:', e
