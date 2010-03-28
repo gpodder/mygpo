@@ -79,7 +79,7 @@ def get_episode_url(entry):
 
     media_content = getattr(entry, 'media_content', [])
     for media in media_content:
-        if 'url' in media and check_mime(m.get('type', '')):
+        if 'url' in media and check_mime(media.get('type', '')):
             return media['url']
 
     links = getattr(entry, 'links', [])
