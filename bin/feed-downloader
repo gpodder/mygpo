@@ -51,7 +51,7 @@ if len(sys.argv) > 1:
             continue
 
         if url == '--update-new':
-            podcasts = set(models.Podcast.objects.filter(episode__title='', episode__outdated=False))
+            podcasts = models.Podcast.objects.filter(episode__title='', episode__outdated=False).distinct()
             fetch_queue.extend(podcasts)
 
         try:
