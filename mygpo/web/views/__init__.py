@@ -530,7 +530,10 @@ def resend_activation(request):
         except User.DoesNotExist:
             raise ValueError(_('User does not exist.'))
 
-        profile = RegistrationProfile.objects.get(user=user)
+        try:
+            profile = RegistrationProfile.objects.get(user=user)
+        except RegistrationProfile.DoesNotExist:
+            profile = RegistrationProfile.objects.create_profile(user)
 
         if profile.activation_key == RegistrationProfile.ACTIVATED:
             raise ValueError(_('Your account already has been activated. Go ahead and log in.'))
