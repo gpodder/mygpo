@@ -58,9 +58,14 @@ if len(sys.argv) > 1:
             fetch_queue.append(models.Podcast.objects.get(url=url))
         except:
             pass
+
+    count = len(fetch_queue)
+
 else:
     #fetch_queue = models.Podcast.objects.all()
-    fetch_queue = models.Podcast.objects.filter(last_update__lt=UPDATE_LIMIT).iterator()
+    q = models.Podcast.objects.filter(last_update__lt=UPDATE_LIMIT)
+    fetch_queue = q.iterator()
+    count = q.count()
 
 def check_mime(mimetype):
     """Check if a mimetype is a "wanted" media type"""
@@ -136,8 +141,12 @@ def get_episode_metadata(entry, url):
 
     return d
 
+print 'Updating %d podcasts...' % count
+n=0
+
 for podcast in fetch_queue:
-    print podcast.url
+    n+=1
+    print '(%d/%d) %s' % (n, count, podcast.url)
 
     try:
         fetcher.fetch(podcast.url)
