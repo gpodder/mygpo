@@ -38,7 +38,11 @@ def login_user(request):
               password = request.POST['pwd']
        except:
               current_site = Site.objects.get_current()
-              return render_to_response('login.html', {'url': current_site})
+              next = request.GET.get('next', '')
+              return render_to_response('login.html', {
+                    'url': current_site,
+                    'next': next,
+                    })
 
        user = authenticate(username=username, password=password)
 
@@ -66,10 +70,11 @@ def login_user(request):
                 })
        except UserProfile.DoesNotExist:
             profile, c = UserProfile.objects.get_or_create(user=user)
-            return HttpResponseRedirect('/')
 
-       else:
-            return HttpResponseRedirect('/')
+       if request.POST['next']:
+           return HttpResponseRedirect(request.POST['next'])
+
+       return HttpResponseRedirect('/')
 
 @login_required
 def migrate_user(request):
