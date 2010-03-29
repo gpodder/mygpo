@@ -180,11 +180,14 @@ def history(request, len=15, device_id=None):
         'singledevice': devices[0] if device_id else None
     }, context_instance=RequestContext(request))
 
+
+@login_required
 def devices(request):
     devices = Device.objects.filter(user=request.user,deleted=False).order_by('sync_group')
     return render_to_response('devicelist.html', {
         'devices': devices,
     }, context_instance=RequestContext(request))
+
 
 @login_required
 def podcast_subscribe(request, pid):
