@@ -9,6 +9,7 @@ from mygpo.publisher.auth import require_publisher, is_publisher
 from mygpo.publisher.forms import SearchPodcastForm, EpisodeForm, PodcastForm
 from mygpo.publisher.utils import listener_data, check_publisher_permission, episode_list, subscriber_data
 from django.contrib.sites.models import Site
+from mygpo.data.feeddownloader import update_podcasts
 
 
 def home(request):
@@ -64,6 +65,18 @@ def podcast(request, id):
         'subscriber_data': subscription_data,
         'device_data': device_data,
         }, context_instance=RequestContext(request))
+
+
+@require_publisher
+def update_podcast(request, id):
+    p = get_object_or_404(Podcast, pk=id)
+
+    if not check_publisher_permission(request.user, p):
+        return HttpResponseForbidden()
+
+    update_podcasts( [p] )
+
+    return HttpResponseRedirect('/publisher/podcast/%s' % id)
 
 
 @require_publisher
