@@ -159,7 +159,7 @@ for podcast in fetch_queue:
         podcast.author = feed.feed.get('author', feed.feed.get('itunes_author', podcast.author))
         podcast.language = feed.feed.get('language', podcast.language)
 
-        cover_art = None
+        cover_art = podcast.logo_url
         image = feed.feed.get('image', None)
         if image is not None:
             for key in ('href', 'url'):
