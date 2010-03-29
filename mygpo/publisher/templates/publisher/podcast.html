@@ -16,14 +16,11 @@
 {% block content %}
   <div id="podcastlogo">{{ podcast|podcast_logo:"200" }}</div>
 
-  <h1>{% if podcast.title %}{{ podcast.title|striptags }}{% else %}{% trans "Unnamed Podcast" %}{%endif%}</h1>
+  <h1>{% trans "Publisher Pages:" %} {% if podcast.title %}{{ podcast.title|striptags }}{% else %}{% trans "Unnamed Podcast" %}{%endif%}</h1>
   <a href="{{ podcast.url }}" class="URL">{{ podcast.url }}</a>
 
-  <ul>
-   <li><a href="/publisher/podcast/{{ podcast.id }}/episodes">Episodes</a></li>
-  </ul>
-
   <h2>Edit</h2>
+  <p>Please note that information updates from the podcast feed will overwrite any information given here. Please save only what is not contained in the feed.</p>
   <form method="post" action="">
    <table>
     {{ form.as_table }}
@@ -31,19 +28,25 @@
    <input type="submit" value="save" />
   </form>
 
+  <h2>Episodes</h2>
+  <p>View and edit <a href="/publisher/podcast/{{ podcast.id }}/episodes">episode</a> data.</p>
+
+  <h2>Stats</h2>
+
   {% if timeline_data %}
-   <h2>Listener Timeline</h2>
+   <h3>Listener Timeline</h3>
    <div id="chart_div" style="width: 700px; height: 240px;"></div>
   {% endif %}
 
 
   {% if subscriber_data %}
-   <h2>Subscribers</h2>
+   <h3>Subscriptions</h3>
+   <p>Please note that the chart shows subscriptions per user and device, so a single user subscribing to this podcast on 5 devices acccounts for 5 subscriptions.</p>
    {{ subscriber_data|bar_chart }}
   {% endif %}
 
   {% if device_data %}
-   <h2>Device Usage</h2>
+   <h3>Device Usage</h3>
    {{ device_data|pie_chart }}
   {% endif %}
 {% endblock %}

@@ -10,8 +10,17 @@
 {% block content %}
   <div id="podcastlogo">{{ episode.podcast|podcast_logo:"200" }}</div>
 
-  <h1>{% if episode.title %}{{ episode.title|striptags }}{% else %}{% trans "Unnamed Episode" %}{%endif%}</h1>
+  <h1>{% trans "Publisher Pages:" %} {% if episode.title %}{{ episode.title|striptags }}{% else %}{% trans "Unnamed Episode" %}{%endif%}</h1>
   <div>{%blocktrans with episode.podcast|striptags as podcast and episode.podcast.id as podcast_id %}An episode of the <a href="/publisher/podcast/{{ podcast_id }}">{{ podcast }}</a> podcast.{% endblocktrans %}</div>
+
+  <p><a href="/publisher/podcast/{{ episode.podcast.id }}/episodes">{% trans "Return to the episode list" %}</a></p>
+
+  <h2>{% trans "Edit" %}</h2>
+  {% if episode.outdated %}
+   <p>This episode could not be found in the podcast feed. Please complete the data below so users can see the information on the website.</p>
+  {% else %}
+   <p>Please note that updates from the podcast feed will overwrite any information given here. Please save only what is not contained in the feed.</p>
+  {% endif %}
 
   <form method="post" action".">
    <table>
