@@ -3,19 +3,28 @@ from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from mygpo.api.models import Podcast, Episode, EpisodeAction
 from mygpo.api.constants import DEVICE_TYPES
+from django.contrib.auth.decorators import login_required
 from mygpo.publisher.models import PodcastPublisher
-from mygpo.publisher.auth import require_publisher
+from mygpo.publisher.auth import require_publisher, is_publisher
 from mygpo.publisher.forms import SearchPodcastForm, EpisodeForm, PodcastForm
 from mygpo.publisher.utils import listener_data, check_publisher_permission, episode_list, subscriber_data
+from django.contrib.sites.models import Site
 
-@require_publisher
+
 def home(request):
-    podcasts = [x.podcast for x in PodcastPublisher.objects.filter(user=request.user)]
-    form = SearchPodcastForm()
-    return render_to_response('publisher/home.html', {
-        'podcasts': podcasts,
-        'form': form
-        }, context_instance=RequestContext(request))
+    if is_publisher(request.user):
+        podcasts = [x.podcast for x in PodcastPublisher.objects.filter(user=request.user)]
+        form = SearchPodcastForm()
+        return render_to_response('publisher/home.html', {
+            'podcasts': podcasts,
+            'form': form
+            }, context_instance=RequestContext(request))
+
+    else:
+        site = Site.objects.get_current()
+        return render_to_response('publisher/info.html', {
+            'site': site})
+
 
 @require_publisher
 def search_podcast(request):

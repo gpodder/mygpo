@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load podcasts %}
+
+{% block title %}{% trans "Publisher Pages" %}{% endblock %}
+
+{% block content %}
+ <h1>{% trans "Publisher Pages" %}</h1>
+
+ <p>On the <strong>{{site}} Publisher Pages</strong> you can find valuable information about the Podcasts published by you.</p>
+
+ <p>The Publisher Pages are currently in Beta, but if you are publishing a podcast listed on {{site}}, feel free to apply by sending a mail with
+  <ul>
+   <li>the name and URL of the podcast you are publishing</li>
+   <li>an email address that is visible somewhere on the podcast's website (to legitimate you)
+  </ul>
+  to <a href="mailto:stefan@gpodder.net">stefan@gpodder.net</a>.</p>
+
+  <strong>If you already are registered as a publisher, please <a href="/login/">login</a>.</strong>
+
+{% endblock %}
+
