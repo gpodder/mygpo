@@ -31,6 +31,19 @@
 
   {% if user.is_authenticated %}
    <h2>{% trans "Chapters" %}</h2>
+
+   <div class="info">
+    {% if not subscription_meta %}
+     {% blocktrans with episode.podcast.id as podcast_id %}You aren't subscribed to this podcast. Therefor your chapters are also visible to other users. If you do no want that, <a href="/podcast/{{ podcast_id }}/subscribe">subscribe to the podcast</a> and mark your subscription as private.{% endblocktrans %}
+    {% else %}
+     {% if subscription_meta.public %}
+      {%blocktrans with episode.podcast.id as podcast_id %}Your own chapters are shown in bold. If you don't want them to appear to other users, go to the <a href="/podcast/{{ podcast_id }}">podcast page</a> and mark your subscription as private.{% endblocktrans %}
+     {% else %}
+      {% blocktrans with episode.podcast.id as podcast_id %}The following list contains your chapters in bold and those of other users. However, yours are not shown to others, because you've marked your subscription as prive on the <a href="/podcast/{{ podcast_id }}">podcast page</a>. You can change that there, if you want.{% endblocktrans %}
+     {% endif %}
+    {% endif %}
+   </div>
+
    <table class="list">
     <tr>
      <th></th>
@@ -40,11 +53,17 @@
     </tr>
 
     {% for chapter in chapters %}
-     <tr>
+     <tr {% if chapter.user == user %}class="own-chapter"{% endif %} >
       <td>{{ chapter.start|sec_to_time|time:"i:s" }}{% if chapter.start != chapter.end %} - {{ chapter.end|sec_to_time|time:"i:s" }}{% endif %}</td>
       <td>{% if chapter.advertisement %}Yes{% endif %}</td>
-      <td>{{ chapter.label }}
-      <td><a href="/episode/{{ episode.id }}/remove-chapter/{{ chapter.id}}"><img src="/media/unsubscribe.png" alt="{% trans "Remove" %}" /></a>
+      <td>{{ chapter.label }}</strong>
+      <td>
+       {% if chapter.user == user %}
+        <a href="/episode/{{ episode.id }}/remove-chapter/{{ chapter.id}}">
+         <img src="/media/unsubscribe.png" alt="{% trans "Remove" %}" />
+        </a>
+       {% endif %}
+      </td>
      </tr>
     {% endfor %}
     <tr>

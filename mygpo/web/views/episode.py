@@ -18,7 +18,7 @@
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, Http404, HttpResponseForbidden
 from django.template import RequestContext
-from mygpo.api.models import Podcast, Episode, Device, EpisodeAction
+from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, Subscription
 from mygpo.api.models.episodes import Chapter
 from mygpo.utils import parse_time
 from django.utils.translation import ugettext as _
@@ -32,15 +32,22 @@ def episode(request, id):
 
     if request.user.is_authenticated():
         history = EpisodeAction.objects.filter(user=request.user, episode=episode).order_by('-timestamp')
-        chapters = Chapter.objects.filter(user=request.user, episode=episode).order_by('start')
     else:
         history = []
-        chapters = []
+
+    chapters = [c for c in Chapter.objects.filter(episode=episode).order_by('start') if c.is_public() or c.user == request.user]
+
+    subscription_tmp = Subscription.objects.filter(podcast=episode.podcast, user=request.user)
+    if subscription_tmp.exists():
+        subscription_meta = subscription_tmp[0].get_meta()
+    else:
+        subscription_meta = None
 
     return render_to_response('episode.html', {
         'episode': episode,
         'history': history,
         'chapters': chapters,
+        'subscription_meta': subscription_meta,
     }, context_instance=RequestContext(request))
 
 

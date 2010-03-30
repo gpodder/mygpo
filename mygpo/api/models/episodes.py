@@ -17,7 +17,7 @@
 
 from django.db import models
 from django.contrib.auth.models import User
-from mygpo.api.models import Episode, Device
+from mygpo.api.models import Episode, Device, Subscription
 from datetime import datetime
 
 class Chapter(models.Model):
@@ -29,6 +29,19 @@ class Chapter(models.Model):
     end = models.IntegerField()
     label = models.CharField(max_length=50, blank=True)
     advertisement = models.BooleanField(default=False)
+
+    def is_public(self):
+        if not self.user.get_profile().public_profile:
+            return False
+
+        s = Subscription.objects.filter(podcast=self.episode.podcast, user=self.user)
+        if not s.exists():
+            return True
+
+        if not s[0].get_meta().public:
+            return False
+
+        return True
 
     class Meta:
         db_table = 'chapters'
