@@ -71,7 +71,7 @@ def login_user(request):
        except UserProfile.DoesNotExist:
             profile, c = UserProfile.objects.get_or_create(user=user)
 
-       if request.POST['next']:
+       if 'next' in request.POST and request.POST['next'] and request.POST['next'] != '/login/':
            return HttpResponseRedirect(request.POST['next'])
 
        return HttpResponseRedirect('/')
