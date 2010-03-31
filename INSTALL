@@ -5,16 +5,41 @@
 Dependencies:
 
   * python (>= 2.5)
-  * python-django (>= 1.0)
-  * python-django-registration (>= 0.7)
   * MySQL Server (>= 5.0)
   * python-mysqldb
   * lighttpd
   * python-feedparser
   * python-dateutil
-  * python-json or python-simplejson
+  * python-simplejson
+  * python-flup
+
+It's recommended that you use the development version of the following
+libraries, as we're living on the bleeding edge here:
+
+  * django
+    svn co http://code.djangoproject.com/svn/django/trunk/ django
+
+  * django-registration
+    hg clone http://bitbucket.org/ubernostrum/django-registration/
+
   * django-haystack
-  * woosh
+    git clone git://github.com/toastdriven/django-haystack.git
+
+  * whoosh
+    hg clone http://bitbucket.org/mchaput/whoosh/
+
+You can set up the repositories in this source tree by creating a
+"upstream" directory in which you checkout the above code bases.
+
+Then, you create a "lib" folder and symlink the packages from the
+"upstream" directory there:
+
+  cd lib/
+  ln -s ../upstream/django/django
+  ln -s ../upstream/whoosh/src/whoosh
+  ln -s ../upstream/django-haystack/haystack
+  ln -s ../upstream/django-registration/registration
+  cd ..
 
 1. Creating the database
 
@@ -23,9 +48,13 @@ triggers to work in MySQL 5.0):
 
   CREATE DATABASE mygpo;
   GRANT ALL ON mygpo.* TO mygpo@localhost WITH GRANT OPTION;
-  GRANT SUPER ON *.* TO MYGPO@localhost;
+  GRANT SUPER ON *.* TO mygpo@localhost;
+  GRANT ALL ON mygpo.* TO mygpo@'%' WITH GRANT OPTION;
+  GRANT SUPER ON *.* TO mygpo@'%';
   FLUSH PRIVILEGES;
 
+Make sure that MySQL listens only on localhost, or if in
+doubt, assign a password to the "mygpo" user!
 
 2. Initialize the database
 
@@ -41,14 +70,28 @@ with "create.sql" and working your way all the way through the
 update scripts (these are split because we are doing incremental
 schema updates on the production server).
 
+If you are really doing an initial installation, you can also use
+the "install.sh" script which runs all scripts on the local MySQL
+server in the correct order. You should not use this script to
+upgrade the database, as data loss may occur. You have been warned.
+
 
 3. Setup the web server using lighttpd
 
 There is a mygpo.lighttpd.conf file shipped with the source. Please
 customize it to your needs, and then include it from your lighttpd
-main configuration file.
+main configuration file, for example like this:
 
-4. Restart lighttpd
+  include "/srv/mygpo/mygpo.lighttpd.conf"
+
+4. Enable lighttpd modules
+
+The modules you need to enable are: rewrite, fastcgi. On Debian,
+you can enable these using the "lighty-enable-mod" command:
+
+  lighty-enable-mod rewrite fastcgi
+
+5. Restart lighttpd
 
 On Debian:
 

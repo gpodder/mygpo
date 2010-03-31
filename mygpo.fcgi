@@ -22,7 +22,9 @@ import sys
 import os
 
 # Add this directory as custom Python path
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+mygpo_root = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, mygpo_root)
+sys.path.insert(0, os.path.join(mygpo_root, 'lib'))
 
 # Set the DJANGO_SETTINGS_MODULE environment variable
 os.environ['DJANGO_SETTINGS_MODULE'] = 'mygpo.settings'
