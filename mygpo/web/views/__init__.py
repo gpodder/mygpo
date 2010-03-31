@@ -343,7 +343,10 @@ def toplist(request, len=100):
 def episode_toplist(request, len=100):
     entries = EpisodeToplistEntry.objects.all().order_by('-listeners')[:len]
     current_site = Site.objects.get_current()
-    max_listeners = max([e.listeners for e in entries])
+
+    # Determine maximum listener amount (or 0 if no entries exist)
+    max_listeners = max([0]+[e.listeners for e in entries])
+
     return render_to_response('episode_toplist.html', {
         'entries': entries,
         'max_listeners': max_listeners,
