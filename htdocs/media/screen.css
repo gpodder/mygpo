@@ -1,3 +1,59 @@
+body 
+{ 
+    font-family: DeJaVu Sans, Bitstream Vera Sans, sans-serif; 
+    background-color: #333;
+    padding: 0px;
+    margin: 0px;
+}
+
+body, table, td, th
+{
+    font-size: 12px;
+}
+
+h3 
+{ 
+    color: #037;
+}
+
+hr 
+{ 
+    border-width: 0px; 
+    border-bottom: 1px #aaa dotted; 
+}
+
+img 
+{ 
+    border-width: 0px; 
+}
+
+#body
+{
+    width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: white;
+    min-height: 100%;
+    padding: 0px;
+}
+
+#logo
+{
+	float: right;
+	padding: 0px;
+	margin: 10px;
+}
+
+#content-area
+{
+    padding: 20px;
+}
+
+#navigation
+{
+    background-color: rgb(102, 102, 102); 
+}
+
 a {
     color: #10488B;
     text-decoration: none;
@@ -11,7 +67,6 @@ div.error
 {
     background-color: #fa7080;
     border: #f5001d thin solid;
-    width: 100%;
     padding: 1em 1em 1em 45px;
     background-image: url('dialog-error.png');
     background-repeat: no-repeat;
@@ -29,7 +84,6 @@ table.register th {
 {
     background-color: #b7f46e;
     border: #539800 thin solid;
-    width: 100%;
     padding: 1em 1em 1em 45px;
     background-image: url('emblem-default.png');
     background-repeat: no-repeat;
@@ -41,7 +95,6 @@ table.register th {
 {
     background-color: #eeeeee;
     border: #aaaaaa thin solid;
-    width: 100%;
     padding: 1em 1em 1em 45px;
     background-image: url('info.png');
     background-repeat: no-repeat;
@@ -57,42 +110,55 @@ table.register th {
 
 .menu a
 {
-    color: black;
+    color: #aaa;
 }
 
 ul.menu
 {
     list-style-type: none;
-    margin: 1em;
-    border: 0;
-    padding: 0;
+    padding: 10px;
+    margin: 0px;
+    border-width: 0px;
+}
+
+ul.menu:hover
+{
+    background-color: #777;
 }
 
 ul.menu li {
-    margin: 3px;
+    display: inline;
+    padding: 10px;
     padding-left: 10px;
+    border-width: 0px;
+}
+
+ul.menu li:hover {
+    background-color: #999;
+}
+
+ul.menu li:hover a {
+    color: black;
 }
 
 ul.menu li.heading {
-    margin-top: 20px;
-    margin-bottom: 10px;
+    cursor: default;
+}
+
+ul.menu li.heading:hover {
+    background-color: #777;
 }
 
 .menu strong {
-    color: #75507b;
-    background-color: white;
-    padding: 3px;
+    color: white;
     padding-left: 10px;
     padding-right: 10px;
-    -moz-border-radius: 5px;
-    margin-left: -10px;
 }
 
 table.list
 {
     font-size: 1em;
     border-collapse: collapse;
-    width: 100%;
     margin-bottom: 2em;
 }
 
@@ -180,9 +246,8 @@ table.list tr.group:hover td
 
 h1, h2
 {
-    padding-top: 1em;
-    margin-bottom: 0;
-    padding-bottom: 0;
+    padding: 5px 0px 2px 0px;
+    margin: 0px;
 }
 
 h1 {
@@ -253,7 +318,6 @@ div.ohelp
     padding-left: 3em;
     padding-right: 3em;    
     border: 1px solid rgb(40%, 40%, 40%) ;
-    -moz-border-radius: 10px;
     margin-bottom: 2em;
 }
 
@@ -417,4 +481,35 @@ span.from_podcast a, span.latest_episode a {
 .watermark
 {
     color: #aaa;
+}
+
+ul.square-menu
+{
+    padding: 20px;
+}
+
+ul.square-menu li
+{
+    display: block;
+    float: left;
+    width: 100px;
+    height: 100px;
+    margin: 10px;
+    background-color: #aaa;
+    text-align: center;
+}
+
+ul.square-menu li a
+{
+    position: relative;
+    bottom: -40px;
+}
+
+address
+{
+    clear: both;
+    text-align: center;
+    padding: 5px;
+    font-style: normal;
+    color: #999;
 }

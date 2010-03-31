@@ -12,11 +12,11 @@ class UserAccountForm(forms.Form):
     if one of the three password fields is set, a password change is assumed
     and the current and new passwords are checked.
     """
-    email = forms.EmailField(label=_('Your Email Address'))
-    public = forms.BooleanField(required=False, label=_('May we use your subscriptions for the toplist and suggestions?'))
-    password_current = forms.CharField(label=_(u'Your current Password'),widget=forms.PasswordInput(render_value=False), required=False)
-    password1 = forms.CharField(label=_(u'Your new Password'),widget=forms.PasswordInput(render_value=False), required=False)
-    password2 = forms.CharField(label=_(u'Please confirm'),widget=forms.PasswordInput(render_value=False), required=False)
+    email = forms.EmailField(label=_('E-Mail address'))
+    public = forms.BooleanField(required=False, label=_('Use subscriptions in toplist and suggestions'))
+    password_current = forms.CharField(label=_(u'Current password'),widget=forms.PasswordInput(render_value=False), required=False)
+    password1 = forms.CharField(label=_(u'New password'),widget=forms.PasswordInput(render_value=False), required=False)
+    password2 = forms.CharField(label=_(u'Confirm password'),widget=forms.PasswordInput(render_value=False), required=False)
 
     def is_valid(self):
         if not super(UserAccountForm, self).is_valid(): return False

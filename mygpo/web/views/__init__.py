@@ -45,21 +45,21 @@ import random
 import string
 
 def home(request):
-       current_site = Site.objects.get_current()
-       if request.user.is_authenticated():
-              subscriptionlist = create_subscriptionlist(request)
+    current_site = Site.objects.get_current()
+    podcasts = Podcast.objects.count()
+    return render_to_response('home.html', {
+          'podcast_count': podcasts,
+          'url': current_site
+    }, context_instance=RequestContext(request))
 
-              return render_to_response('home-user.html', {
-                    'subscriptionlist': subscriptionlist,
-                    'url': current_site
-              }, context_instance=RequestContext(request))
-
-       else:
-              podcasts = Podcast.objects.count()
-              return render_to_response('home.html', {
-                    'podcast_count': podcasts,
-                    'url': current_site
-              })
+@login_required
+def subscriptions(request):
+    current_site = Site.objects.get_current()
+    subscriptionlist = create_subscriptionlist(request)
+    return render_to_response('subscriptions.html', {
+        'subscriptionlist': subscriptionlist,
+        'url': current_site
+    }, context_instance=RequestContext(request))
 
 def create_subscriptionlist(request):
     #sync all devices first
@@ -297,7 +297,7 @@ def account(request):
         form = UserAccountForm(request.POST)
 
         if not form.is_valid():
-            raise ValueError('Invalid data entered.')
+            raise ValueError(_('Oops! Something went wrong. Please double-check the data you entered.'))
 
         if form.cleaned_data['password_current']:
             if not request.user.check_password(form.cleaned_data['password_current']):

@@ -20,53 +20,24 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 -->
-  <title>{% block title %}{% endblock %} - my.gpodder.org</title>
+  <title>{% block title %}{% endblock %} (gpodder.net)</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <link rel="shortcut icon" href="http://my.gpodder.org/favicon.png">
   <link rel="stylesheet" href="/media/screen.css" type="text/css" />
-  <link rel="stylesheet" href="/media/screen-base.css" type="text/css" />
   {% block head %}{% endblock %}
  </head>
  <body>
-  <h1 id="logo">
-   <strong><img alt="gPodder" title="gPodder" src="http://gpodder.org/images/weblogo64.png" /></strong>
-  </h1>
-  <div id="topnav">
-   <ul id="gpodder-menu">
-    <li><a href="http://gpodder.org/"><img src="http://gpodder.org/images/icons/go-home.png" alt="">Home</a></li>
-    <li><a href="http://gpodder.org/news.html"><img src="http://gpodder.org/images/icons/accessories-text-editor.png" alt="">News</a></li>
-    <li><a href="http://gpodder.org/downloads.html"><img src="http://gpodder.org/images/icons/package-x-generic.png" alt="">Download</a></li>
-    <li><a href="http://gpodder.org/documentation.html"><img src="http://gpodder.org/images/icons/help-browser.png" alt="">Help</a></li>
-    <li><a href="http://bugs.gpodder.org/"><img src="http://gpodder.org/images/icons/dialog-warning.png" alt="">Bugs</a></li>
-    <li><strong><img src="http://gpodder.org/images/icons/mygpo.png" alt="">Web Service</strong></li>
-   </ul>
-  </div>
-
-  <hr>
-
   <div id="body">
+	<h1 id="logo">
+	 <strong><img alt="gPodder" title="gPodder" src="http://gpodder.org/images/weblogo64.png" /></strong>
+	</h1>
 
-   {% if error_message %}
-    <div class="error">{{ error_message }}</div>
-   {% endif %}
-
-   {% block content %}
-    <h1>gPodder Web Service</h1>
-    <p>...will go online soon...</p>
-    <ul>
-     <li><a href="http://gpodder.org/wiki/Web_Services">Wiki page</a></li>
-     <li><a href="toplist.opml">Toplist as OPML</a></li>
-    </ul>
-   {% endblock %}
-  </div>
-  <div id="navigation">
-   <span class="spacer1">&nbsp;</span>
-   <span class="spacer2">&nbsp;</span>
-
+   <div id="navigation">
    {% if user.is_authenticated %}
     <ul class="menu">
-     <li class="heading"><strong>{{ user.username }}</strong></li>
-     <li><a href="/">{% trans "Subscriptions" %}</a></li>
+     <li class="heading"><strong>gpodder.net</strong></li>
+     <li><a href="/">{% trans "Home" %}</a></li>
+     <li><a href="/subscriptions/">{% trans "My Subscriptions" %}</a></li>
      <li><a href="/history/">{% trans "History" %}</a></li>
      <li><a href="/devices/">{% trans "Devices" %}</a></li>
      <li><a href="/account/">{% trans "Settings" %}</a></li>
@@ -83,7 +54,7 @@
     
    {% else %}
     <ul class="menu">
-     <li class="heading"><strong>{{ url }}</strong></li>
+     <li class="heading"><strong>gpodder.net</strong></li>
      <li><a href="/">{% trans "Home" %}</a></li>
      <li><a href="/login/">{% trans "Login" %}</a></li>
      <li><a href="/register/">{% trans "Register" %}</a></li>
@@ -97,18 +68,30 @@
     </ul>
    {% endif %}
     
-    <ul class="menu">
-     <li class="heading"><strong>{% trans "Documentation" %}</strong></li>
-     <li><a href="/online-help/">{% trans "Online Help" %}</a></li>
-     <li><a href="/authors/">{% trans "For podcast authors" %}</a></li>
-     <li><a href="http://wiki.gpodder.org/wiki/Web_Services">{% trans "For Software Developers" %}</a></li>
+   </div>
+
+   <div id="content-area">
+
+   {% if error_message %}
+    <div class="error">{{ error_message }}</div>
+   {% endif %}
+
+   {% block content %}
+    <h1>gPodder Web Service</h1>
+    <p>...will go online soon...</p>
+    <ul>
+     <li><a href="http://gpodder.org/wiki/Web_Services">Wiki page</a></li>
+     <li><a href="toplist.opml">Toplist as OPML</a></li>
     </ul>
-
+   {% endblock %}
+   </div>
+   <address>
+     <hr>
+     <strong>{% trans "Documentation" %}</strong>:
+     <a href="/online-help/">{% trans "Manual" %}</a>,
+     <a href="/authors/">{% trans "Publisher API" %}</a>
+   </address>
   </div>
-
-  <hr style="clear: both;">
-
-  <address>© 2005-2009 <a class="noextlink" href="http://thpinfo.com/">Thomas Perl</a> and the gPodder Team</address>
 
 {% block javascript %}{% endblock javascript %}
 

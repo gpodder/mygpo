@@ -1,28 +1,42 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Account Settings" %}{% endblock %}
+{% block title %}{% trans "Account settings" %}{% endblock %}
 
 {% block content %}
-  <h1>{% trans "Account Settings" %}</h1>
+  <h1>{% trans "Account settings" %}</h1>
 
  {% if success %}
    <div class="success">{% trans "Your settings have been saved." %}</div>
  {% endif %}
-
-  <p>{% trans "Update the settings for your account." %}</p>
   <form action="/account/" method="POST">
-   <table class="form">
-    {{ form.as_table }}
-    <tr>
-     <td colspan="2">
-      <input type="submit" value="Save" />
-     </td>
-    </tr>
-   </table>
+      <h3>{% trans "Contact information and password" %}</h3>
+      <table class="form">
+          <tr>
+              <th>{{ form.email.label_tag }}:</th>
+              <td>{{ form.email }}</td>
+          </tr>
+          <tr>
+              <th>{{ form.password_current.label_tag }}:</th>
+              <td>{{ form.password_current }}</td>
+          </tr>
+          <tr>
+              <th>{{ form.password1.label_tag }}:</th>
+              <td>{{ form.password1 }}</td>
+          </tr>
+          <tr>
+              <th>{{ form.password2.label_tag }}:</th>
+              <td>{{ form.password2 }}</td>
+          </tr>
+      </table>
+      <h3>{% trans "Privacy preferences" %}</h3>
+      <p>{{ form.public }} {{ form.public.label_tag }}</p>
+      <p><input type="submit" value="Update account settings"/></p>
   </form>
 
-  <h2>{% trans "Share your Subscriptions" %}</h2>
+  <hr>
+
+  <h2>{% trans "Share your subscriptions" %}</h2>
   <p>{% trans "To let others know which podcasts you are listening to, you can point them to the following URL." %}</p>
   {% if token %}
    <div class="info"><a href="/user/{{ user.username }}/subscriptions?token={{ token }}">http://{{ site.domain }}/user/{{ user.username }}/subscriptions?token={{ token }}</a></div>
@@ -35,8 +49,12 @@
    <p>{% blocktrans %}You don't want everybody to see your subscriptions? <a href="/account?private_subscriptions">Make them private</a> so that you can give the link to people you trust.{% endblocktrans %}</p>
   {% endif %}
 
-  <h2>Remove your Account</h2>
-  <p><a href="/account/delete">{% trans "Delete my account" %}</a><p>
+  <hr>
+
+  <h2>{% trans "Account-related actions" %}</h2>
+  <ul>
+      <li><a href="/account/delete">{% trans "Delete account" %}</a></li>
+  <ul>
 
 {% endblock %}
 

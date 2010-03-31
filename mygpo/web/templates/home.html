@@ -1,25 +1,24 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Podcast-Webservice" %}{% endblock %}
+{% block title %}{% trans "welcome" %}{% endblock %}
 
 {% block content %}
-  <h1>{{ url }}</h1>
-  <p>{% blocktrans %}{{ url }} is a webservice for synchronizing podcast subscriptions on several devices and applications.{% endblocktrans %}</p>
+
+<h1>{{ url }}: tracking {{ podcast_count }} podcasts</h1>
 <p>
-{% blocktrans %}We are currently tracking {{ podcast_count }} Podcasts!{% endblocktrans %}
+{% blocktrans %}
+This web service allows you to synchronize your
+podcast subscription list and episode actions between different podcast
+clients and devices. You can also use the web service to discover new,
+interesting podcasts based on your existing subscriptions.
+{% endblocktrans %}
 </p>
-   <h2>Login</h2>
-   <form action="../login/" method="post">
-    Username or Email-Address:<br />
-    <input name="user" type="text" style="width:300px;"/><br />
-    Password:<br />
-    <input name="pwd" type="password" style="width:300px;" /><br />
-    <input type="submit" value="Login" style="margin-top:15px;" />
-   </form>
 
-  <div style="margin-left:10px; padding:3px; padding-bottom:10px; margin-right:10px;">
-   {% trans "Not yet a member?" %} <a href="/register/">{% trans "Register!" %}</a>
-  </div>
-{% endblock %}
+<ul class="square-menu">
+    <li><a href="/register/">Register</a></li>
+    <li><a href="/login/">Login</a></li>
+    <li><a href="/subscriptions/">Subscriptions</a></li>
+</ul>
 
+{% endblock content %}
