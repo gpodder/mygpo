@@ -8,7 +8,9 @@
 {% block title %}{{ episode.title|default:"Unnamed Episode"|striptags }}{% endblock %}
 
 {% block content %}
-  <div id="podcastlogo">{{ episode.podcast|podcast_logo:"200" }}</div>
+  {% if podcast.logo_url %}
+  <div id="podcastlogo">{{ episode.podcast|podcast_logo_big }}</div>
+  {% endif %}
 
   <h1>{% trans "Publisher Pages:" %} {% if episode.title %}{{ episode.title|striptags }}{% else %}{% trans "Unnamed Episode" %}{%endif%}</h1>
   <div>{%blocktrans with episode.podcast|striptags as podcast and episode.podcast.id as podcast_id %}An episode of the <a href="/publisher/podcast/{{ podcast_id }}">{{ podcast }}</a> podcast.{% endblocktrans %}</div>

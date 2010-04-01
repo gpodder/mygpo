@@ -9,7 +9,9 @@
 {% block title %}{{ podcast.title|default:"Unnamed Podcast"|striptags }}{% endblock %}
 
 {% block content %}
-  <div id="podcastlogo">{{ podcast|podcast_logo:"200" }}</div>
+  {% if podcast.logo_url %}
+  <div id="podcastlogo">{{ podcast|podcast_logo_big }}</div>
+  {% endif %}
 
   <h1>{% if podcast.title %}{{ podcast.title|striptags }}{% else %}{% trans "Unnamed Podcast" %}{%endif%}</h1>
   <a href="{{ podcast.url }}" class="URL">{{ podcast.url }}</a>
@@ -60,14 +62,14 @@
 
 
    {% if privacy_form %}
-    <h2>{% trans "Privacy" %}</h2>
+    <h2>{% trans "Privacy settings" %}</h2>
     {% if success %}
      <div class="success">{% trans "Your settings have been saved." %}</div>
     {% endif %}
 
     <form action="" method="POST">
-     {{ privacy_form.as_p }}
-     <input type="submit" value="Save" />
+        <p>{{ privacy_form.public }} {{ privacy_form.public.label_tag }}</p>
+        <input type="submit" value="Save" />
     </form>
    {% endif %}
   
@@ -75,7 +77,7 @@
 
 
   {% if episodes %}
-   <h2>{% trans "Episodes" %}</h2>
+   <h2 style="clear: right;">{% trans "Episodes" %}</h2>
    <table class="list episode_list">
     <tr>
      <th></th>

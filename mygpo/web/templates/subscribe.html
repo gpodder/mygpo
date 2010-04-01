@@ -5,7 +5,9 @@
 {% block title %}{% blocktrans with podcast.title|default:"Unnamed Podcast"|striptags as podcasttitle %}Subscribe to {{ podcasttitle }}{% endblocktrans %}{% endblock %}
 
 {% block content %}
-  <div id="podcastlogo">{{ podcast|podcast_logo:"200" }}</div>
+  {% if podcast.logo_url %}
+  <div id="podcastlogo">{{ podcast|podcast_logo_big }}</div>
+  {% endif %}
   <h1>
    {% if podcast.title %}
     {% blocktrans with podcast.title|striptags as podcasttitle %}Subscribe to {{podcasttitle }}{% endblocktrans %}

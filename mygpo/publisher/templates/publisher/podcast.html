@@ -14,7 +14,9 @@
 {% endblock %}
 
 {% block content %}
-  <div id="podcastlogo">{{ podcast|podcast_logo:"200" }}</div>
+  {% if podcast.logo_url %}
+  <div id="podcastlogo">{{ podcast|podcast_logo_big }}</div>
+  {% endif %}
 
   <h1>{% trans "Publisher Pages:" %} {% if podcast.title %}{{ podcast.title|striptags }}{% else %}{% trans "Unnamed Podcast" %}{%endif%}</h1>
   <a href="{{ podcast.url }}" class="URL">{{ podcast.url }}</a>

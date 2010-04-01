@@ -31,6 +31,7 @@ urlpatterns = patterns('',
     # Example:
     # (r'^mygpo/', include('mygpo.foo.urls')),
     (r'^$', 'mygpo.web.views.home'),
+    (r'^media/logo/(?P<size>\d+)/(?P<filename>[^/]*)\.jpg$', 'mygpo.web.views.cover_art'),
     (r'^subscriptions/$', 'mygpo.web.views.subscriptions'),
     (r'^login/$', 'mygpo.web.users.login_user'),
     (r'^logout/$', logout, {'next_page': '/'}),

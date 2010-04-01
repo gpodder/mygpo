@@ -395,7 +395,7 @@ div.result
 div#podcastlogo
 {
     float: right;
-    padding-top: 3em;
+    padding-left: 20px;
 }
 
 table.form

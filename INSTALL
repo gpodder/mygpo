@@ -12,6 +12,7 @@ Dependencies:
   * python-dateutil
   * python-simplejson
   * python-flup
+  * python-imaging
 
 It's recommended that you use the development version of the following
 libraries, as we're living on the bleeding edge here:

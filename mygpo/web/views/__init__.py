@@ -40,9 +40,14 @@ from mygpo.api.sanitizing import sanitize_url
 from mygpo.web.users import get_user
 from mygpo.log import log
 from mygpo.utils import daterange
+from mygpo.constants import PODCAST_LOGO_SIZE, PODCAST_LOGO_BIG_SIZE
 import re
 import random
 import string
+import os
+import Image
+import ImageDraw
+import StringIO
 
 def home(request):
     current_site = Site.objects.get_current()
@@ -51,6 +56,52 @@ def home(request):
           'podcast_count': podcasts,
           'url': current_site
     }, context_instance=RequestContext(request))
+
+
+def cover_art(request, size, filename):
+    size = int(size)
+    if size not in (PODCAST_LOGO_SIZE, PODCAST_LOGO_BIG_SIZE):
+        raise http404('Wrong size')
+
+    # XXX: Is there a "cleaner" way to get the root directory of the installation?
+    root = os.path.join(os.path.dirname(__file__), '..', '..', '..')
+    target = os.path.join(root, 'htdocs', 'media', 'logo', str(size), filename+'.jpg')
+    filename = os.path.join(root, 'htdocs', 'media', 'logo', filename)
+
+    if os.path.exists(filename):
+        target_dir = os.path.dirname(target)
+        if not os.path.isdir(target_dir):
+            os.makedirs(target_dir)
+
+        try:
+            im = Image.open(filename)
+            if im.mode not in ('RGB', 'RGBA'):
+                im = im.convert('RGB')
+        except:
+            raise http404('Cannot open cover file')
+
+        resized = im.resize((size, size), Image.ANTIALIAS)
+
+        # If it's a RGBA image, composite it onto a white background for JPEG
+        if resized.mode == 'RGBA':
+            background = Image.new('RGB', resized.size)
+            draw = ImageDraw.Draw(background)
+            draw.rectangle((-1, -1, resized.size[0]+1, resized.size[1]+1), \
+                    fill=(255, 255, 255))
+            del draw
+            resized = Image.composite(resized, background, resized)
+
+        io = StringIO.StringIO()
+        resized.save(io, 'JPEG', optimize=True, progression=True, quality=80)
+        s = io.getvalue()
+
+        fp = open(target, 'wb')
+        fp.write(s)
+        fp.close()
+
+        return HttpResponse(s, mimetype='image/jpeg')
+    else:
+        raise Http404('Cover art not available')
 
 @login_required
 def subscriptions(request):
