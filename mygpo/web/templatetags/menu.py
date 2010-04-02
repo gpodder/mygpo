@@ -17,6 +17,8 @@ MENU_STRUCTURE = (
             ('/', _('Home')),
             ('/login/', _('Login')),
             ('/register/', _('Register')),
+            ('/authors/', _('Publisher API')),
+            ('/online-help', _('Help')),
         )),
         (_('My Podcasts'), (
             ('/subscriptions/', _('Subscriptions')),
@@ -76,6 +78,8 @@ def section_menu(selected, title=None):
     for uri, caption in get_section_items(selected):
         if uri == selected:
             if title is not None:
+                if len(title) > 35:
+                    title = title[:33] + '...'
                 caption = title
             if uri in HIDDEN_URIS:
                 items.append('<li class="selected">%s</li>' % caption)

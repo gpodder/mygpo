@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% load i18n %}
 
+{% load menu %}
+{% block mainmenu %}{{ "/online-help"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/online-help"|section_menu }}{% endblock %}
+
 {% block title %}{% trans "Online Help" %}{% endblock %}
 
 {% block content %}
