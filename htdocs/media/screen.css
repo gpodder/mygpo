@@ -78,6 +78,7 @@ a:hover {
 
 div.error
 {
+    border-radius: 4px;
     background-color: #fa7080;
     border: #f5001d thin solid;
     padding: 1em 1em 1em 45px;
@@ -97,6 +98,7 @@ table.register th {
 {
     background-color: #b7f46e;
     border: #539800 thin solid;
+    border-radius: 4px;
     padding: 1em 1em 1em 45px;
     background-image: url('emblem-default.png');
     background-repeat: no-repeat;
@@ -106,6 +108,7 @@ table.register th {
 
 .info
 {
+    border-radius: 4px;
     background-color: #eeeeee;
     border: #aaaaaa thin solid;
     padding: 1em 1em 1em 45px;
@@ -139,6 +142,7 @@ ul.menu.secondary
     background-color: #777;
     padding-left: 40px;
     padding-top: 20px;
+    border-top: 1px #666 solid;
 }
 
 ul.menu.primary
@@ -151,10 +155,18 @@ ul.menu li {
     padding: 10px;
     padding-left: 10px;
     border-width: 0px;
+    text-shadow: 0px 0px 3px #333;
+    position: relative;
+    top: 1px;
 }
 
 ul.menu.primary li.selected {
     background-color: #777;
+    background-image: url(navcaps/primary-top-left.png),
+                      url(navcaps/primary-top-right.png);
+    background-position: top left, top right;
+    background-repeat: no-repeat;
+    text-shadow: 0px 0px 4px #333;
 }
 
 ul.menu.primary li.selected:hover {
@@ -168,19 +180,31 @@ ul.menu.secondary li.selected:hover a {
 }
 
 ul.menu.secondary li.selected {
+    position: relative;
+    top: 1px;
     background-color: white;
+    background-image: url(navcaps/secondary-top-left.png),
+                      url(navcaps/secondary-top-right.png),
+                      url(navcaps/secondary-bg-gradient.png);
+    background-position: top left, top right, top left;
+    background-repeat: no-repeat, no-repeat, repeat-x;
+    text-shadow: 0px 0px 4px #777;
 }
 
 ul.menu.secondary li.selected:hover {
     background-color: white;
 }
 
-ul.menu li:hover {
-    background-color: #999;
+ul.menu li a:hover {
+    text-shadow: 0px 0px 5px black;
+}
+
+ul.menu.secondary li.selected a:hover {
+    text-shadow: 0px 0px 5px #444;
 }
 
 ul.menu li:hover a {
-    color: black;
+    text-decoration: none;
 }
 
 ul.menu li.selected a, ul.menu li.selected:hover a {
