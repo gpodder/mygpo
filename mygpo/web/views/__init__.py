@@ -435,7 +435,7 @@ def suggestions(request):
 
 
 @login_required
-def device(request, device_id):
+def device(request, device_id, error_message=None):
     device = Device.objects.get(pk=device_id)
 
     if device.user != request.user:
@@ -445,7 +445,6 @@ def device(request, device_id):
     synced_with = list(device.sync_group.devices()) if device.sync_group else []
     if device in synced_with: synced_with.remove(device)
     success = False
-    error_message = None
     sync_form = SyncForm()
     sync_form.set_targets(device.sync_targets(), _('Synchronize with the following devices'))
 
@@ -527,8 +526,12 @@ def device_unsync(request, device_id):
     if request.method != 'GET':
         return HttpResponseNotAllowed(['GET'])
 
-    device = Device.objects.get(pk=device_id)
-    device.unsync()
+    dev = Device.objects.get(pk=device_id)
+
+    try:
+        dev.unsync()
+    except ValueError, e:
+        return device(request, device_id, e)
 
     return HttpResponseRedirect('/device/%s' % device_id)
 
