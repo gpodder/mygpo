@@ -5,6 +5,10 @@
 {% load podcasts %}
 {% load episodes %}
 
+{% load menu %}
+{% block mainmenu %}{{ "/history/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/history/"|section_menu }}{% endblock %}
+
 {% block title %}{% trans "Subscription and episode history" %}{% if singledevice %} {% trans "for" %} {{ singledevice|striptags }}{% endif %}{% endblock %}
 
 {% block content %}

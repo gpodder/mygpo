@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% load i18n %}
 
+{% load menu %}
+{% block mainmenu %}{{ "/register/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/register/"|section_menu }}{% endblock %}
+
 {% block content %}
   {% if account %}
   <h1>{% trans "Account activated" %}</h1>

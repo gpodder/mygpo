@@ -1,8 +1,14 @@
 {% extends "base.html" %}
+{% include "menu/home.html" %}
+
 {% load i18n %}
 {% load podcasts %}
 {% load charts %}
 {% load math %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/toplist/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/toplist/"|section_menu }}{% endblock %}
 
 {% block title %}{% trans "Toplist" %}{% endblock %}
 

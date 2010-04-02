@@ -5,6 +5,10 @@
 {% load devices %}
 {% load time %}
 
+{% load menu %}
+{% block mainmenu %}{{ "/podcast/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/podcast/"|section_menu:episode.podcast.title }}{% endblock %}
+
 {% block head %}
  <script type="text/javascript" src="/media/js/jquery-1.4.2.min.js"></script>
  <script type="text/javascript" src="/media/js/jquery.watermark.min.js"></script>

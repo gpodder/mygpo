@@ -4,6 +4,10 @@
 {% load episodes %}
 {% load podcasts %}
 
+{% load menu %}
+{% block mainmenu %}{{ "/subscriptions/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/subscriptions/"|section_menu }}{% endblock %}
+
 {% block title %}{% trans "My Podcast Subscriptions" %}{% endblock %}
 
 {% block content %}

@@ -121,9 +121,16 @@ ul.menu
     border-width: 0px;
 }
 
-ul.menu:hover
+ul.menu.secondary
 {
     background-color: #777;
+    padding-left: 40px;
+    padding-top: 20px;
+}
+
+ul.menu.primary
+{
+    padding-top: 20px;
 }
 
 ul.menu li {
@@ -133,12 +140,38 @@ ul.menu li {
     border-width: 0px;
 }
 
+ul.menu.primary li.selected {
+    background-color: #777;
+}
+
+ul.menu.primary li.selected:hover {
+    background-color: #777;
+}
+
+ul.menu.secondary li.selected a,
+ul.menu.secondary li.selected a:hover,
+ul.menu.secondary li.selected:hover a {
+    color: black;
+}
+
+ul.menu.secondary li.selected {
+    background-color: white;
+}
+
+ul.menu.secondary li.selected:hover {
+    background-color: white;
+}
+
 ul.menu li:hover {
     background-color: #999;
 }
 
 ul.menu li:hover a {
     color: black;
+}
+
+ul.menu li.selected a, ul.menu li.selected:hover a {
+    color: white;
 }
 
 ul.menu li.heading {

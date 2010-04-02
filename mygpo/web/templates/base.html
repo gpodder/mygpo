@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load menu %}
 
 <html>
  <head>
@@ -32,42 +33,17 @@
 	 <strong><img alt="gPodder" title="gPodder" src="http://gpodder.org/images/weblogo64.png" /></strong>
 	</h1>
 
-   <div id="navigation">
-   {% if user.is_authenticated %}
-    <ul class="menu">
-     <li class="heading"><strong>gpodder.net</strong></li>
-     <li><a href="/">{% trans "Home" %}</a></li>
-     <li><a href="/subscriptions/">{% trans "My Subscriptions" %}</a></li>
-     <li><a href="/history/">{% trans "History" %}</a></li>
-     <li><a href="/devices/">{% trans "Devices" %}</a></li>
-     <li><a href="/account/">{% trans "Settings" %}</a></li>
-     <li><a href="/logout/">{% trans "Logout" %}</a></li>
+    <div id="navigation">
+      {% block mainmenu %}
+        {{ "/"|main_menu }}
+      {% endblock %}
     </ul>
 
-    <ul class="menu">
-     <li class="heading"><strong>{% trans "Discover" %}</strong></li>
-     <li><a href="/search/">{% trans "Search" %}</a></li>
-     <li><a href="/toplist/">{% trans "Podcast-Toplist" %}</a></li>
-     <li><a href="/toplist/episodes">{% trans "Episode-Toplist" %}</a></li>
-     <li><a href="/suggestions/">{% trans "Suggestions" %}</a></li>
-    </ul>
-    
-   {% else %}
-    <ul class="menu">
-     <li class="heading"><strong>gpodder.net</strong></li>
-     <li><a href="/">{% trans "Home" %}</a></li>
-     <li><a href="/login/">{% trans "Login" %}</a></li>
-     <li><a href="/register/">{% trans "Register" %}</a></li>
-    </ul>
-
-    <ul class="menu">
-     <li class="heading"><strong>{% trans "Discover" %}</strong></li>
-     <li><a href="/search/">{% trans "Search" %}</a></li>
-     <li><a href="/toplist/">{% trans "Podcast-Toplist" %}</a></li>
-     <li><a href="/toplist/episodes">{% trans "Episode-Toplist" %}</a></li>
-    </ul>
-   {% endif %}
-    
+    {% block sectionmenu %}
+      <ul class="menu secondary">
+        <li class="selected"><a href="">{% trans "Page" %}</a></li>
+      </ul>
+    {% endblock %}
    </div>
 
    <div id="content-area">

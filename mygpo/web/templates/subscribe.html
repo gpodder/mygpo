@@ -2,6 +2,10 @@
 {% load i18n %}
 {% load podcasts %}
 
+{% load menu %}
+{% block mainmenu %}{{ "/podcast/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/podcast/"|section_menu:podcast.title }}{% endblock %}
+
 {% block title %}{% blocktrans with podcast.title|default:"Unnamed Podcast"|striptags as podcasttitle %}Subscribe to {{ podcasttitle }}{% endblocktrans %}{% endblock %}
 
 {% block content %}

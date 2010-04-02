@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% load i18n %}
 
+{% load menu %}
+{% block mainmenu %}{{ "/login/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/login/"|section_menu }}{% endblock %}
+
 {% block title %}{% trans "Login" %}{% endblock %}
 
 {% block content %}

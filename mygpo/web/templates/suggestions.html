@@ -2,6 +2,10 @@
 {% load i18n %}
 {% load podcasts %}
 
+{% load menu %}
+{% block mainmenu %}{{ "/suggestions/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/suggestions/"|section_menu }}{% endblock %}
+
 {% block title %}{% trans "Suggested Podcasts" %}{% endblock %}
 
 {% block content %}

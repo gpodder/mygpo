@@ -6,6 +6,10 @@
 {% load devices %}
 {% load charts %}
 
+{% load menu %}
+{% block mainmenu %}{{ "/podcast/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/podcast/"|section_menu:podcast.title }}{% endblock %}
+
 {% block title %}{{ podcast.title|default:"Unnamed Podcast"|striptags }}{% endblock %}
 
 {% block content %}
