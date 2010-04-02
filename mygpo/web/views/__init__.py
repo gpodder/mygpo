@@ -491,7 +491,7 @@ def device_delete(request, device_id):
 
     current_site = Site.objects.get_current()
     subscriptionlist = create_subscriptionlist(request)
-    return render_to_response('home-user.html', {
+    return render_to_response('subscriptions.html', {
          'subscriptionlist': subscriptionlist,
          'url': current_site,
 	  'deletedevice_success': True,
