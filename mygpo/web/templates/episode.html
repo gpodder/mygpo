@@ -93,20 +93,20 @@
   </table>
   {% endif %}
 
-  {% if not history|length_is:"0" %}
-  <h2>{% trans "Your Episode History" %}</h2>
+  {% if history %}
+  <h2>{% trans "History" %}</h2>
   <table class="list">
    <tr>
-    <th>{% trans "When" %}</th>
-    <th>{% trans "What" %}</th>
-    <th>{% trans "Where" %}</th>
+    <th>{% trans "Time" %}</th>
+    <th>{% trans "Action" %}</th>
+    <th>{% trans "Device" %}</th>
     <th></th>
    </tr>
 
    {% for s in history %}
     <tr>
      <td><abbr title="{{ s.timestamp }}">{{ s.timestamp|naturalday }}</abbr></td>
-     <td>{{ s|episode_status_icon }}</td>
+     <td style="text-align: center;">{{ s|episode_status_icon }}</td>
      <td><a href="/device/{{ s.device.id }}">{{ s.device|device_icon }} {{ s.device.name|striptags }}</a></td>
      <td>{% if s.playmark %}{{ s.playmark_time|date:"H:m:s" }}{% endif %}
 	</tr>
