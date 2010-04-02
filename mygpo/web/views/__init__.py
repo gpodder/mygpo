@@ -52,9 +52,13 @@ import StringIO
 def home(request):
     current_site = Site.objects.get_current()
     podcasts = Podcast.objects.count()
+    users = User.objects.count()
+    episodes = Episode.objects.count()
     return render_to_response('home.html', {
           'podcast_count': podcasts,
-          'url': current_site
+          'user_count': users,
+          'episode_count': episodes,
+          'url': current_site,
     }, context_instance=RequestContext(request))
 
 

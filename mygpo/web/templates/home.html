@@ -9,7 +9,7 @@
 
 {% block content %}
 
-<h1>{{ url }}: tracking {{ podcast_count }} podcasts</h1>
+<h1>{{ podcast_count }} podcasts, {{ episode_count}} episodes, {{ user_count}} users</h1>
 <p>
 {% blocktrans %}
 This web service allows you to synchronize your
@@ -19,10 +19,47 @@ interesting podcasts based on your existing subscriptions.
 {% endblocktrans %}
 </p>
 
-<ul class="square-menu">
-    <li><a href="/register/">Register</a></li>
-    <li><a href="/login/">Login</a></li>
-    <li><a href="/subscriptions/">Subscriptions</a></li>
+<h2>{% trans "Highlights" %}</h2>
+<ul>
+    <li>{% trans "Open source - licensed under the Affero GPL v3" %}</li>
+    <li>{% trans "Backup and sync your subscription lists" %}</li>
+    <li>{% trans "Sync episode status information between devices" %}</li>
+    <li>{% trans "Edit device subscriptions on the web" %}</li>
+</ul>
+
+<h2>{% trans "Client applications" %}</h2>
+<p>
+{% blocktrans %}
+This web service offers a public API that can be used to query the podcast
+directory and an authenticated API for synchronizing subscription lists and
+episode actions between the web service and multiple clients.
+{% endblocktrans %}
+</p>
+<h3>{% trans "Applications" %}</h3>
+<ul>
+    <li><strong><a href="http://gpodder.org/">gPodder</a></strong>:
+    {% blocktrans %}
+    An open source podcast client for Linux, Windows, Maemo and Mac OS X.
+    Support for gpodder.net is directly built into gPodder.
+    {% endblocktrans %}
+    </li>
+    <li><strong><a href="http://lincgeek.org/bashpodder/">BashPodder</a></strong>:
+    {% blocktrans %}
+    A simple command-line podcatcher. To synchronize your bp.conf file with
+    gpodder.net, use the "bpsync" utility included in mygpoclient (see below).
+    {% endblocktrans %}
+    </li>
+
+</ul>
+<h3>{% trans "Libraries" %}</h3>
+<ul>
+    <li><strong><a href="http://thpinfo.com/2010/mygpoclient/">mygpoclient</a></strong>:
+    {% blocktrans %}
+    This is the official reference implementation of the client-side API
+    interface. mygpoclient is written in Python and is used by gPodder to
+    interface with the web service.
+    {% endblocktrans %}
+    </li>
 </ul>
 
 {% endblock content %}
