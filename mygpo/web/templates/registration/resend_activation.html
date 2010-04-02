@@ -1,15 +1,42 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Resend Activation Email" %}{% endblock %}
+{% block title %}{% trans "Resend activation e-mail" %}{% endblock %}
 
 {% block content %}
- <h1>{% trans "Resend Activation Email" %}</h1>
-
- <form action="/register/resend-activation" method="post">
-  {{ form.as_table }}
-  <input type="submit" value="{% trans "Send" %}" />
- </form>
-
+   <form action="/register/resend-activation" method="POST">
+       <table style="width: 400px; margin-left: auto; margin-right: auto;">
+           <tr>
+               <td colspan="2" style="text-align: center;">
+                   <h1>{% trans "Resend activation e-mail" %}</h1>
+               </td>
+           </tr>
+           <tr>
+               <td colspan="2" style="padding-bottom: 6px;">
+                   {% blocktrans %}
+                   Please enter either your username or (if you don't know
+                   that either) the e-mail address which you used to register
+                   your account. An e-mail will be sent to you.
+                   {% endblocktrans %}
+               </td>
+           </tr>
+           <tr>
+               <th style="text-align: right;">
+                   {{ form.username.label_tag }}:
+               </th>
+               <td>{{ form.username }}</td>
+           </tr>
+           <tr>
+               <th style="text-align: right;">
+                   {{ form.email.label_tag }}:
+               </th>
+               <td>{{ form.email }}</td>
+           </tr>
+           <tr>
+               <td colspan="2" style="text-align: right;">
+                   <input type="submit" value="{% trans "Send activation e-mail" %}"/>
+               </td>
+           </tr>
+       </table>
+   </form>
 {% endblock %}
-

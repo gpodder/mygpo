@@ -39,6 +39,7 @@ img
 
 #logo
 {
+    display: none;
 	float: right;
 	padding: 0px;
 	margin: 10px;
@@ -47,6 +48,18 @@ img
 #content-area
 {
     padding: 20px;
+}
+
+#logininfo
+{
+    float: right;
+    margin-top: 1px;
+    background-color: white;
+    padding: 5px;
+    text-align: right;
+    background-image: url(logininfo-bottomleft.png);
+    background-repeat: no-repeat;
+    background-position: bottom left;
 }
 
 #navigation

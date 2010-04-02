@@ -5,6 +5,8 @@ from django.utils.translation import ugettext as _
 register = template.Library()
 
 HIDDEN_URIS = (
+        '/login/',
+        '/register/',
         '/podcast/',
         '/device/',
         '/user/subscriptions/',
@@ -15,7 +17,6 @@ MENU_STRUCTURE = (
             ('/', _('Home')),
             ('/login/', _('Login')),
             ('/register/', _('Register')),
-            ('/logout/', _('Logout')),
         )),
         (_('My Podcasts'), (
             ('/subscriptions/', _('Subscriptions')),
@@ -40,13 +41,17 @@ MENU_STRUCTURE = (
 
 @register.filter
 def main_menu(selected):
+    found_section = False
     links = []
     for label, items in MENU_STRUCTURE:
-        links.append((items[0][0], label, [uri for uri, caption in items]))
+        uris = [uri for uri, caption in items]
+        if selected in uris:
+            found_section = True
+        links.append((items[0][0], label, uris))
 
     items = []
     for uri, caption, subpages in links:
-        if selected in subpages:
+        if selected in subpages or ('/' in subpages and not found_section):
             items.append('<li class="selected"><a href="%s">%s</a></li>' % \
                     (uri, caption))
         else:
@@ -59,6 +64,11 @@ def get_section_items(selected):
     for label, items in MENU_STRUCTURE:
         if selected in (uri for uri, caption in items):
             return items
+
+    # If we arrive here, we cannot find the page items, so return a faked one
+    return list(MENU_STRUCTURE[0][1]) + [
+            (selected, selected),
+    ]
 
 @register.filter
 def section_menu(selected, title=None):

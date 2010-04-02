@@ -31,7 +31,17 @@
   <div id="body">
 	<h1 id="logo">
 	 <strong><img alt="gPodder" title="gPodder" src="http://gpodder.org/images/weblogo64.png" /></strong>
-	</h1>
+     </h1>
+
+     <div id="logininfo">
+         {% if user.is_authenticated %}
+             <strong>{{ user.username }}</strong> |
+             <a href="/logout/">Logout</a>
+         {% else %}
+             <a href="/login/">Login</a> |
+             <a href="/register/">Register</a>
+         {% endif %}
+     </div>
 
     <div id="navigation">
       {% block mainmenu %}

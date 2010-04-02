@@ -8,22 +8,74 @@
 {% block title %}{% trans "Login" %}{% endblock %}
 
 {% block content %}
-  <h1>Login</h1>
-   <form action="../login/" method="post">
-    Username or Email-Address:<br />
-    <input name="user" type="text" style="width:90%;"/><br />
-    Password:<br />
-    <input name="pwd" type="password" style="width:90%;" /><br />
-    <input name="next" type="hidden" value="{{ next }}" /><br />
-    <input type="submit" value="Login" style="margin-top:15px;" />
+  {% if restore_password_form %}
+   <form action="/register/restore_password" method="POST">
+       <table style="width: 400px; margin-left: auto; margin-right: auto;">
+           <tr>
+               <td colspan="2" style="text-align: center;">
+                   <h1>{% trans "Password recovery" %}</h1>
+               </td>
+           </tr>
+           <tr>
+               <td colspan="2" style="padding-bottom: 6px;">
+                   {% blocktrans %}
+                   Please enter either your username or (if you don't know
+                   that either) the e-mail address which you used to register
+                   your account. An e-mail will be sent to you.
+                   {% endblocktrans %}
+               </td>
+           </tr>
+           <tr>
+               <th style="text-align: right;">
+                   {{ restore_password_form.username.label_tag }}:
+               </th>
+               <td>{{ restore_password_form.username }}</td>
+           </tr>
+           <tr>
+               <th style="text-align: right;">
+                   {{ restore_password_form.email.label_tag }}:
+               </th>
+               <td>{{ restore_password_form.email }}</td>
+           </tr>
+           <tr>
+               <td colspan="2" style="text-align: right;">
+                   <input type="submit" value="{% trans "Send recovery e-mail" %}"/>
+               </td>
+           </tr>
+       </table>
+   </form>
+   <p><a href="/login/">Back to the login page</a></p>
+  {% else %}
+    {% if next %}
+    <div class="error">
+        {% trans "You need to login to access this page." %}
+    </div>
+    {% endif %}
+  <form action="../login/" method="post">
+      <input name="next" type="hidden" value="{{ next }}" /><br />
+      <table style="margin-left: auto; margin-right: auto;">
+          <tr>
+              <td colspan="2" style="text-align: center;">
+                  <h1>{% trans "Login" %}</h1>
+              </td>
+          </tr>
+          <tr>
+              <th style="text-align: right;">{% trans "Username" %}:</th>
+              <td><input id="login_username" name="user" type="text" style="width: 200px;"/></td>
+          </tr>
+          <tr>
+              <th style="text-align: right;">{% trans "Password" %}:</th>
+              <td><input name="pwd" type="password" style="width: 200px;"/></td>
+          </tr>
+          <tr>
+              <td colspan="2" style="text-align: right;">
+                  <small><a href="?restore_password=1">Forgot your password?</a><small><br/>
+                  <input type="submit" value="Login" style="margin-top: 10px;"/>
+              </td>
+          </tr>
+      </table>
    </form>
 
-  {% if restore_password_form %}
-   <h2>{% trans "Want to restore your password?" %}</h2>
-   <form action="/register/restore_password" method="POST">
-    {{ restore_password_form.as_table }}
-    <input type="submit" value="{% trans "Restore" %}" />
-   </form>
   {% endif %}
 
   {% if activation_needed %}
@@ -33,9 +85,13 @@
   {% endif %}
 
   {% if not restore_password_form and not activation_needed %}
-  <div class="info">
-   {% trans "Not yet a member?" %} <a href="/register/">{% trans "Register!" %}</a>
-  </div>
+  <script type="text/javascript">
+      document.getElementById('login_username').focus();
+  </script>
+  <p style="text-align: center; padding: 20px;">
+      {% trans "Not yet a member?" %}
+      <a href="/register/">{% trans "Create a new account - it's free!" %}</a>
+  </p>
   {% endif %}
 
 {% endblock %}

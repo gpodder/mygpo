@@ -32,49 +32,57 @@ from django.utils.translation import ugettext as _
 import string
 import random
 
+from mygpo.constants import DEFAULT_LOGIN_REDIRECT
+
 def login_user(request):
-       try:
-              username = request.POST['user']
-              password = request.POST['pwd']
-       except:
-              current_site = Site.objects.get_current()
-              next = request.GET.get('next', '')
-              return render_to_response('login.html', {
-                    'url': current_site,
-                    'next': next,
-                    })
+    # Do not show login page for already-logged-in users
+    if request.user.is_authenticated():
+        return HttpResponseRedirect(DEFAULT_LOGIN_REDIRECT)
 
-       user = authenticate(username=username, password=password)
+    if 'user' not in request.POST or 'pwd' not in request.POST:
+        if request.GET.get('restore_password', False):
+            form = RestorePasswordForm()
+        else:
+            form = None
 
-       if not user:
-              form = RestorePasswordForm()
-              return render_to_response('login.html', {
-                     'error_message': _('Unknown user or wrong password'),
-                     'restore_password_form': form
-              })
+        return render_to_response('login.html', {
+            'url': Site.objects.get_current(),
+            'next': request.GET.get('next', ''),
+            'restore_password_form': form,
+        })
 
-       if not user.is_active:
-              return render_to_response('login.html', {
-                     'error_message': _('Please activate your user first.'),
-                     'activation_needed': True
-              })
+    username = request.POST['user']
+    password = request.POST['pwd']
+    user = authenticate(username=username, password=password)
 
-       login(request, user)
-       current_site = Site.objects.get_current()
+    if user is None:
+        return render_to_response('login.html', {
+            'error_message': _('Wrong username or password.'),
+            'next': request.POST.get('next', ''),
+        })
 
-       try:
-            if user.get_profile().generated_id:
-                return render_to_response('migrate.html', {
-                     'url': current_site,
-                     'username': user
-                })
-       except UserProfile.DoesNotExist:
-            profile, c = UserProfile.objects.get_or_create(user=user)
+    if not user.is_active:
+        return render_to_response('login.html', {
+            'error_message': _('Please activate your account first.'),
+            'activation_needed': True,
+        })
 
-       if 'next' in request.POST and request.POST['next'] and request.POST['next'] != '/login/':
-           return HttpResponseRedirect(request.POST['next'])
+    login(request, user)
+    current_site = Site.objects.get_current()
 
-       return HttpResponseRedirect('/')
+    try:
+         if user.get_profile().generated_id:
+             return render_to_response('migrate.html', {
+                  'url': current_site,
+                  'username': user
+             })
+    except UserProfile.DoesNotExist:
+         profile, c = UserProfile.objects.get_or_create(user=user)
+
+    if 'next' in request.POST and request.POST['next'] and request.POST['next'] != '/login/':
+        return HttpResponseRedirect(request.POST['next'])
+
+    return HttpResponseRedirect(DEFAULT_LOGIN_REDIRECT)
 
 @login_required
 def migrate_user(request):

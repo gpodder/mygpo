@@ -97,5 +97,6 @@ class ResendActivationForm(forms.Form):
 
 
 class RestorePasswordForm(forms.Form):
-    username = forms.CharField(max_length=100, label=_('Please enter your username'), required=False)
-    email = forms.CharField(max_length=100, label=_('or the email address used while registering'), required=False)
+    username = forms.CharField(max_length=100, label=_('Username'), required=False)
+    email = forms.CharField(max_length=100, label=_('E-Mail address'), required=False)
+
