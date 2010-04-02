@@ -29,9 +29,6 @@
  </head>
  <body>
   <div id="body">
-	<h1 id="logo">
-	 <strong><img alt="gPodder" title="gPodder" src="http://gpodder.org/images/weblogo64.png" /></strong>
-     </h1>
 
      <div id="logininfo">
          {% if user.is_authenticated %}
@@ -42,6 +39,9 @@
              <a href="/register/">Register</a>
          {% endif %}
      </div>
+     <h1 id="logo" style="clear: right;">
+         <img alt="gPodder" title="gPodder" src="/media/mygpo64.png"/>
+     </h1>
 
     <div id="navigation">
       {% block mainmenu %}

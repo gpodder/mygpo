@@ -40,10 +40,9 @@ img
 
 #logo
 {
-    display: none;
 	float: right;
 	padding: 0px;
-	margin: 10px;
+	margin: 7px 10px 0px 0px;
 }
 
 #content-area
