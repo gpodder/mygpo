@@ -32,16 +32,16 @@ def episode(request, id):
 
     if request.user.is_authenticated():
         history = EpisodeAction.objects.filter(user=request.user, episode=episode).order_by('-timestamp')
+        subscription_tmp = Subscription.objects.filter(podcast=episode.podcast, user=request.user)
+        if subscription_tmp.exists():
+            subscription_meta = subscription_tmp[0].get_meta()
+        else:
+            subscription_meta = None
     else:
         history = []
+        subscription_meta = None
 
     chapters = [c for c in Chapter.objects.filter(episode=episode).order_by('start') if c.is_public() or c.user == request.user]
-
-    subscription_tmp = Subscription.objects.filter(podcast=episode.podcast, user=request.user)
-    if subscription_tmp.exists():
-        subscription_meta = subscription_tmp[0].get_meta()
-    else:
-        subscription_meta = None
 
     return render_to_response('episode.html', {
         'episode': episode,

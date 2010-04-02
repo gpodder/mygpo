@@ -133,14 +133,14 @@ def create_subscriptionlist(request):
 
 def podcast(request, pid):
     podcast = get_object_or_404(Podcast, pk=pid)
+    episodes = episode_list(podcast, request.user)
+    max_listeners = max([x.listeners for x in episodes]) if len(episodes) else 0
 
     if request.user.is_authenticated():        
         devices = Device.objects.filter(user=request.user)
         history = SubscriptionAction.objects.filter(podcast=podcast,device__in=devices).order_by('-timestamp')
         subscribed_devices = [s.device for s in Subscription.objects.filter(podcast=podcast,user=request.user)]
         subscribe_targets = podcast.subscribe_targets(request.user)
-        episodes = episode_list(podcast, request.user)
-        max_listeners = max([x.listeners for x in episodes]) if len(episodes) else 0
         success = False
 
 
@@ -183,7 +183,9 @@ def podcast(request, pid):
         current_site = Site.objects.get_current()
         return render_to_response('podcast.html', {
             'podcast': podcast,
-            'url': current_site
+            'url': current_site,
+            'episodes': episodes,
+            'max_listeners': max_listeners,
         }, context_instance=RequestContext(request))
 
 def listener_data(podcast):
@@ -269,7 +271,7 @@ def podcast_subscribe(request, pid):
     targets = podcast.subscribe_targets(request.user)
 
     form = SyncForm()
-    form.set_targets(targets, _('With which client do you want to subscribe?'))
+    form.set_targets(targets, _('Choose a device:'))
 
     return render_to_response('subscribe.html', {
         'error_message': error_message,

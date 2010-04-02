@@ -25,63 +25,50 @@
   {% endif %}
 
   {% if not user.is_authenticated %}
-   <div class="subscribe">
-    <a href="/podcast/{{ podcast.id }}/subscribe">
-     {% if podcast.title %}
-      {% blocktrans with podcast.title|striptags as podcasttitle %}Subscribe to {{ podcasttitle }}{% endblocktrans %}
-     {% else %}
-      {% trans "Subscribe to this podcast" %}
-     {% endif %}
-    </a>
-   </div>	
+      <p><a href="/podcast/{{ podcast.id }}/subscribe"><img src="/media/subscribe.png" style="vertical-align: middle;" alt=""/> {% trans "Subscribe to this podcast" %}</a></p>
   {% else %}
 
-   {% if not devices|length_is:"0"  %}
+   {% if devices %}
+    <h2>{% trans "My Subscriptions" %}</h2>
 
-    <h2>{% trans "Devices" %}</h2>
-    <strong>{% trans "You have subscribed this podcast on" %}</strong>
-    <ul class="devices">
-     {% for device in devices %}
-      <li class="{{device.type}}">
-       <div class="devicesLeft"><a href="/device/{{ device.id }}">{{ device|striptags }}</a></div>
-       <div class="devicesRight"><a href="/podcast/{{ podcast.id}}/unsubscribe/{{ device.id }}?return_to=/podcast/{{ podcast.id }}"><img src="/media/unsubscribe.png" /></a></div>
-       <div class="devicesClear"></div>
-      </li>
-     {% endfor %}
-    </ul>
- 
+    {% if privacy_form %}
+     {% if success %}
+      <div class="success">{% trans "Your settings have been saved." %}</div>
+     {% endif %}
+
+     <form action="" method="POST">
+         <p>{{ privacy_form.public }} {{ privacy_form.public.label_tag }}</p>
+         <input type="submit" value="Save" />
+     </form>
+    {% endif %}
+
+    <table class="list">
+        <tr>
+            <th>{% trans "Device" %}</th>
+            <th>{% trans "Unsubscribe" %}</th>
+        </tr>
+    {% for device in devices %}
+        <tr>
+            <td>
+                {{ device|device_icon }}
+                <a href="/device/{{ device.id }}">{{ device|striptags }}</a>
+            </td>
+            <td style="text-align: center;">
+                <a href="/podcast/{{ podcast.id }}/unsubscribe/{{ device.id }}?return_to=/podcast/{{ podcast.id }}"><img src="/media/unsubscribe.png" alt="{% trans "Unsubscribe" %}" title="{% trans "Click here to unsubscribe" %}"/></a>
+            </td>
+        </tr>
+    {% endfor %}
+    </table>
    {% endif %}
 
    {% if can_subscribe %}
-    <div class="subscribe">
-     <a href="/podcast/{{ podcast.id }}/subscribe">
-      {% if podcast.title %}
-       {% blocktrans with podcast.title|striptags as podcasttitle %}Subscribe to {{ podcasttitle }}{% endblocktrans %}
-      {% else %}
-       {% trans "Subscribe to this podcast" %}
-      {% endif %}
-     </a>
-    </div>
+       <p><a href="/podcast/{{ podcast.id }}/subscribe"><img src="/media/subscribe.png" style="vertical-align: middle;" alt=""/> {% trans "Subscribe to this podcast" %}</a></p>
    {% endif %}
 
-
-   {% if privacy_form %}
-    <h2>{% trans "Privacy settings" %}</h2>
-    {% if success %}
-     <div class="success">{% trans "Your settings have been saved." %}</div>
-    {% endif %}
-
-    <form action="" method="POST">
-        <p>{{ privacy_form.public }} {{ privacy_form.public.label_tag }}</p>
-        <input type="submit" value="Save" />
-    </form>
-   {% endif %}
-  
   {% endif %} {% comment %} End of user-only content{% endcomment  %}
 
-
   {% if episodes %}
-   <h2 style="clear: right;">{% trans "Episodes" %}</h2>
+   <hr/>
    <table class="list episode_list">
     <tr>
      <th></th>
@@ -89,11 +76,11 @@
      <th>{% trans "Released" %}</th>
      <th>{% trans "Listeners" %}</th>
     </tr>
- 
+
     {% for episode in episodes %}
      <tr>
       <td style="text-align: center; padding-left: 5px; padding-right: 5px;">{{ episode.action|episode_status_icon }}</td>
-      <td>
+      <td style="width: 500px;">
           <p class="title"><a href="/episode/{{ episode.id }}">{{ episode.title|default:"Unknown Episode"|striptags }}</a></p>
           <p class="description">{{ episode.description|default:""|striptags|truncatewords:"15" }}</p>
       </td>
@@ -109,7 +96,8 @@
   {% endif %}
 
   {% if history %}
-   <h2>{% trans "Subscription History" %}</h2>
+   <hr/>
+   <h2>{% trans "Subscription history" %}</h2>
    <table class="list">
     <tr>
      <th>{% trans "Timestamp" %}</th>

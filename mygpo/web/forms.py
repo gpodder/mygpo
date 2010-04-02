@@ -46,7 +46,7 @@ class PrivacyForm(forms.Form):
     Form for editing the privacy settings for a subscription. It is shown on a
     podcast page if the current user is subscribed to the podcast.
     """
-    public = forms.BooleanField(required=False, label=_('Include this subscription in shared subscription list and anonymous statistics'))
+    public = forms.BooleanField(required=False, label=_('Share this subscription with other users (public)'))
 
 class SyncForm(forms.Form):
     """

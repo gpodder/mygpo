@@ -3,6 +3,8 @@
 {% load humanize %}
 {% load episodes %}
 {% load devices %}
+{% load podcasts %}
+{% load mygpoutil %}
 {% load time %}
 
 {% load menu %}
@@ -17,23 +19,24 @@
 {% block title %}{{ episode.title|default:"Unnamed Episode"|striptags }} - {{ episode.podcast.title|default:"Unnamed Podcast"|striptags}}{% endblock %}
 
 {% block content %}
-  <h1>{{ episode.title|default:"Unnamed Episode"|striptags }}</h1>
-  <div>{%blocktrans with episode.podcast|striptags as podcast and episode.podcast.id as podcast_id %}An episode of the <a href="/podcast/{{ podcast_id }}">{{ podcast }}</a> podcast.{% endblocktrans %}</div>
-
-  {% if episode.timestamp %}
-   <div>Released on {{episode.timestamp}}.</div>
+  {% if episode.podcast.logo_url %}
+  <div id="podcastlogo">{{ episode.podcast|podcast_logo_big }}</div>
   {% endif %}
+  <h1>{{ episode.title|default:"Unnamed Episode"|striptags }}</h1>
+  <small class="description">
+      {% trans "from" %} <a href="/podcast/{{ episode.podcast.id }}">{{ episode.podcast }}</a>{% if episode.timestamp %}, {% trans "released" %} {{episode.timestamp}}{% endif %},
+      {% trans "links" %}:
+      <a href="{{episode.url}}">{% trans "download" %}</a>{% if episode.link and episode.link != episode.url %}, <a href="{{episode.link}}">{% trans "website" %}</a>
+      {% endif %}
+  </small>
+  <hr style="clear: none;"/>
 
   {% if episode.description %}
-   <p class="description">{{ episode.description|striptags }}</p>
+   <p>{{ episode.description|remove_html_tags|linebreaksbr }}</p>
   {% endif %}
 
-  <div class="links"><strong>Links: </strong>
-   <a href="{{episode.url}}">{% trans "Direct Download" %}</a>
-   {% if episode.link %}<a href="{{episode.link}}">Website</a>{% endif %}
-  </div>
-
   {% if user.is_authenticated %}
+  <hr/>
    <h2>{% trans "Chapters" %}</h2>
 
    <div class="info">
@@ -87,7 +90,7 @@
       </td>
      </form>
     </tr>
-   </table>
+  </table>
   {% endif %}
 
   {% if not history|length_is:"0" %}
@@ -110,7 +113,6 @@
    {% endfor %}
   </table>
   {% endif %}
-  <br /><br />
 
   {% if not episode.title %}
    <div class="info"><strong>{% trans "Why Unnamed Episode?" %}</strong> {% trans "Because we display names after we have fetched the information form the feed -- and this may take some time. Until this is completed, the podcast will simply be called this way." %}</div>

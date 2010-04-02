@@ -20,6 +20,7 @@ hr
 { 
     border-width: 0px; 
     border-bottom: 1px #aaa dotted; 
+    clear: both;
 }
 
 img 
@@ -341,11 +342,6 @@ div.rate
     padding-bottom: 3em;
 }
 
-div.subscribe
-{
-    padding: 1em 0 1em 0;
-}
-
 h2.ohelp
 {
     padding-top: 0;
@@ -442,6 +438,7 @@ div#podcastlogo
 {
     float: right;
     padding-left: 20px;
+    padding-bottom: 10px;
 }
 
 table.form
