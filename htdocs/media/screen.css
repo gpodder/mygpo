@@ -408,13 +408,15 @@ div.devicesClear
 
 form.search input[type="text"]
 {
-    width: 70%;
+    width: 300px;
     display: inline;
 }
 
 form.search ul
 {
     display: inline;
+    margin: 0px;
+    padding: 0px;
 }
 
 form.search ul li
@@ -425,6 +427,7 @@ form.search ul li
 
 form.search input[type="submit"]
 {
+    margin-top: 20px;
     display: inline;
 }
 

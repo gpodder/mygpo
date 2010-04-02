@@ -10,13 +10,19 @@
 {% block title %}{% trans "Search" %}{% endblock %}
 
 {% block content %}
-    <h2>{% trans "Search" %}</h2>
+<h2>{% trans "Search" %}</h2>
+<p>
+{% blocktrans %}
+Use this page to search for interesting podcasts. We are still working
+on optimizing the search library.
+{% endblocktrans %}
+</p>
 
     <form method="get" action="." class="search">
-
+        {% trans "Search:" %}
      {% for field in form %}
       {{ field.errors }}
-      {{ field }}
+      {{ field }}<br/><br/>
      {% endfor %}
 
      <input type="submit" value="Search">
