@@ -38,7 +38,7 @@
    <p>{% trans "You don't have any podcasts subscribed on this device. Go ahead and upload some." %}</p>
   {% endif %}
 
-  <a href="/device/{{ device.id }}/history">{% blocktrans %} Show history for {{ device }} {% endblocktrans %}</a>
+  <a href="/device/{{ device.id }}/history">{% blocktrans with device.name|striptags as devicename %} Show history for {{ devicename }} {% endblocktrans %}</a>
 
   {% if not device.deleted %}
 
