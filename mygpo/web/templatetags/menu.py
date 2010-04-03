@@ -38,6 +38,8 @@ MENU_STRUCTURE = (
         )),
         (_('Settings'), (
             ('/account/', _('Account')),
+            ('/account/privacy', _('Privacy')),
+            ('/share/', _('Sharing')),
         )),
 )
 

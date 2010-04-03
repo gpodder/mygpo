@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/account/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/share/"|section_menu }}{% endblock %}
+
+{% block title %}{% trans "Sharing" %}{% endblock %}
+
+{% block content %}
+  <h1>{% trans "Share your subscriptions" %}</h1>
+
+  <p>{% trans "To let others know which podcasts you are listening to, you can point them to the following URL." %}</p>
+  {% if token %}
+   <div class="info"><a href="/user/{{ user.username }}/subscriptions?token={{ token }}">http://{{ site.domain }}/user/{{ user.username }}/subscriptions?token={{ token }}</a></div>
+   <p>{% blocktrans %}Only those who know the exact link above can see your subscriptions, but you can <a href="/share/?public_subscriptions">make it public</a> so everyone can see it.{% endblocktrans %}</p>
+   <p>{% blocktrans %}If you gave your link to the wrong people, you can <a href="/share/?private_subscriptions">create a new one</a> - the old one will get invalid then.{% endblocktrans %}</p>
+
+  {% else %}
+
+   <div class="info"><a href="/user/{{ user.username }}/subscriptions">http://{{ site.domain }}/user/{{ user.username }}/subscriptions</a></div>
+   <p>{% blocktrans %}You don't want everybody to see your subscriptions? <a href="/share/?private_subscriptions">Make them private</a> so that you can give the link to people you trust.{% endblocktrans %}</p>
+  {% endif %}
+
+  <hr>
+
+{% endblock %}
+

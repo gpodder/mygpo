@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load podcasts %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/account/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/account/privacy"|section_menu }}{% endblock %}
+
+{% block title %}{% trans "Privacy settings" %}{% endblock %}
+
+{% block content %}
+  <h1>{% trans "Privacy settings" %}</h1>
+  
+  <p>
+   {% if public_subscriptions %}
+    {% blocktrans %}We include anonmyized data about the following subscriptions in our public statistics. You can exclude specific podcasts or <a href="/account/privacy?private_subscriptions">all at once</a>.{% endblocktrans %}
+    <table>
+     <tr>
+      <th></th>
+      <th>{% trans "Podcast" %}</th>
+      <th>{% trans "Mark private" %}</th>
+     </tr>
+
+     {% for podcast in included_subscriptions %}
+      <tr>
+       <td>{{ podcast|podcast_logo }}</td>
+       <td><a href="/podcast/{{ podcast.id }}">{{ podcast.title|striptags|default:"Unnamed Podcast" }}</a></td>
+       <td><a href="/account/privacy?exclude={{ podcast.id }}"><img src="/media/unsubscribe.png" alt="{% trans "Mark private" %}" /></a></td>
+      </tr>
+     {% endfor %}
+
+    </table>
+   {% else %}
+    {% blocktrans %}We don't include your subscriptions in our public statistics. <a href="/account/privacy?public_subscriptions">Include my data.</a>{% endblocktrans %}
+   {% endif %}
+  </p>
+{% endblock %}
+

@@ -320,72 +320,6 @@ def episode_list(podcast, user):
     return episodes
 
 
-@login_required
-def account(request):
-    success = False
-    error_message = ''
-    site = Site.objects.get_current()
-    token, c = SecurityToken.objects.get_or_create(user=request.user, object='subscriptions', action='r',
-        defaults = {'token': "".join(random.sample(string.letters+string.digits, 32))})
-
-
-    if request.method == 'GET':
-
-        if 'public_subscriptions' in request.GET:
-            token.token = ''
-            token.save()
-
-        elif 'private_subscriptions' in request.GET:
-            token.token = "".join(random.sample(string.letters+string.digits, 32))
-            token.save()
-
-        form = UserAccountForm({
-            'email': request.user.email,
-            'public': request.user.get_profile().public_profile
-            })
-
-        return render_to_response('account.html', {
-            'site': site,
-            'token': token.token,
-            'form': form,
-            }, context_instance=RequestContext(request))
-
-    try:
-        form = UserAccountForm(request.POST)
-
-        if not form.is_valid():
-            raise ValueError(_('Oops! Something went wrong. Please double-check the data you entered.'))
-
-        if form.cleaned_data['password_current']:
-            if not request.user.check_password(form.cleaned_data['password_current']):
-                raise ValueError('Current password is incorrect')
-
-            request.user.set_password(form.cleaned_data['password1'])
-
-        request.user.email = form.cleaned_data['email']
-        request.user.save()
-        request.user.get_profile().public_profile = form.cleaned_data['public']
-        request.user.get_profile().save()
-
-        success = True
-
-    except ValueError, e:
-        success = False
-        error_message = e
-
-    except ValidationError, e:
-        success = False
-        error_message = e
-
-    return render_to_response('account.html', {
-        'site': site,
-        'token': token.token,
-        'form': form,
-        'success': success,
-        'error_message': error_message
-    }, context_instance=RequestContext(request))
-
-
 def toplist(request, len=100):
     entries = ToplistEntry.objects.all().order_by('-subscriptions')[:len]
     max_subscribers = max([e.subscriptions for e in entries])
@@ -555,18 +489,6 @@ def podcast_subscribe_url(request):
 
     return HttpResponseRedirect('/podcast/%d/subscribe' % podcast.pk)
 
-@login_required
-def delete_account(request):
-
-    if request.method == 'GET':
-        return render_to_response('delete_account.html')
-
-    request.user.is_active = False
-    request.user.save()
-    logout(request)
-    return render_to_response('delete_account.html', {
-        'success': True
-        })
 
 def author(request):
     current_site = Site.objects.get_current()
@@ -636,9 +558,12 @@ def user_subscriptions(request, username):
         public_subscriptions = set([s.podcast for s in subscriptions if s.get_meta().public])
         return render_to_response('user_subscriptions.html', {
             'subscriptions': public_subscriptions,
-            'other_user': user})
+            'other_user': user
+            }, context_instance=RequestContext(request))
 
     else:
         return render_to_response('user_subscriptions_denied.html', {
-            'other_user': user})
+            'other_user': user
+            }, context_instance=RequestContext(request))
+
 

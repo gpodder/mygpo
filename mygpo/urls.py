@@ -50,8 +50,10 @@ urlpatterns = patterns('',
     (r'^episode/(?P<id>\d+)/add-chapter$', 'mygpo.web.views.episode.add_chapter'),
     (r'^episode/(?P<id>\d+)/remove-chapter/(?P<chapter_id>\d+)$', 'mygpo.web.views.episode.remove_chapter'),
 
-    (r'account/$', 'mygpo.web.views.account'),
-    (r'account/delete$', 'mygpo.web.views.delete_account'),
+    (r'account/$', 'mygpo.web.views.settings.account'),
+    (r'account/privacy$', 'mygpo.web.views.settings.privacy'),
+    (r'account/delete$', 'mygpo.web.views.settings.delete_account'),
+    (r'share/$', 'mygpo.web.views.settings.share'),
 
     (r'user/(?P<username>\w+)/subscriptions$', 'mygpo.web.views.user_subscriptions'),
 
