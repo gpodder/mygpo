@@ -360,27 +360,6 @@ div.rate
     padding-bottom: 3em;
 }
 
-h2.ohelp
-{
-    padding-top: 0;
-}
-
-img.ohelp
-{
-    margin-left: 40px;
-    border: 3px solid rgb(40%, 40%, 40%) ;
-    width: 400px;
-}
-
-div.ohelp
-{
-    width: 40em;
-    padding-left: 3em;
-    padding-right: 3em;    
-    border: 1px solid rgb(40%, 40%, 40%) ;
-    margin-bottom: 2em;
-}
-
 div.devicesLeft
 {
     float:left;
