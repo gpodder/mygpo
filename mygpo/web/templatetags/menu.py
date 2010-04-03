@@ -10,6 +10,7 @@ HIDDEN_URIS = (
         '/podcast/',
         '/device/',
         '/user/subscriptions/',
+        '/publisher/podcast/',
 )
 
 MENU_STRUCTURE = (
@@ -17,7 +18,6 @@ MENU_STRUCTURE = (
             ('/', _('Home')),
             ('/login/', _('Login')),
             ('/register/', _('Register')),
-            ('/authors/', _('Publisher API')),
             ('/online-help', _('Help')),
         )),
         (_('My Podcasts'), (
@@ -40,6 +40,11 @@ MENU_STRUCTURE = (
             ('/account/', _('Account')),
             ('/account/privacy', _('Privacy')),
             ('/share/', _('Sharing')),
+        )),
+        (_('Publisher'), (
+            ('/publisher/', _('Home')),
+            ('/publisher/link/', _('Link to gpodder.net')),
+            ('/publisher/podcast/', _('Podcast')),
         )),
 )
 

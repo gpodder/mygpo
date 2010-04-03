@@ -24,7 +24,8 @@ def home(request):
     else:
         site = Site.objects.get_current()
         return render_to_response('publisher/info.html', {
-            'site': site})
+            'site': site
+            }, context_instance=RequestContext(request))
 
 
 @require_publisher
@@ -125,4 +126,11 @@ def device_stats(podcast):
             res[type[1]] = c
 
     return res
+
+
+def link(request):
+    current_site = Site.objects.get_current()
+    return render_to_response('link.html', {
+        'url': current_site
+        }, context_instance=RequestContext(request))
 

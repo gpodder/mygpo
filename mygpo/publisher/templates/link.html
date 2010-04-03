@@ -2,13 +2,13 @@
 {% load i18n %}
 
 {% load menu %}
-{% block mainmenu %}{{ "/authors/"|main_menu }}{% endblock %}
-{% block sectionmenu %}{{ "/authors/"|section_menu }}{% endblock %}
+{% block mainmenu %}{{ "/publisher/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/publisher/link/"|section_menu }}{% endblock %}
 
 {% block title %}{% trans "For Podcast Authors" %}{% endblock %}
 
 {% block content %}
-  <h1>{% trans "For podcast authors" %}</h1>
+  <h1>{% trans "Link to" %} {{url}}</h1>
 
   <p><img src="/media/author_subscribe.png" /></p>
   <p>{% trans "You can paste this code on your website, so users of mygpo can directly subscribe to your podcast!" %}</p>

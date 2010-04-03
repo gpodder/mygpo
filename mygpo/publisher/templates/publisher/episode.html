@@ -5,6 +5,10 @@
 {% load podcasts %}
 {% load charts %}
 
+{% load menu %}
+{% block mainmenu %}{{ "/publisher/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/publisher/podcast/"|section_menu:episode.podcast.title }}{% endblock %}
+
 {% block title %}{{ episode.title|default:"Unnamed Episode"|striptags }}{% endblock %}
 
 {% block content %}

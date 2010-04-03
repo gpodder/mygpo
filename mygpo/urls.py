@@ -98,8 +98,6 @@ urlpatterns = patterns('',
 
     #Subscribe with my.gpodder.org
     (r'^subscribe', 'mygpo.web.views.podcast_subscribe_url'),
-    #(r'^authors/$', 'django.views.generic.simple.direct_to_template', {'template': 'authors.html'}),
-    (r'^authors/$', 'mygpo.web.views.author'),
 
 
     (r'^online-help', 'django.views.generic.simple.direct_to_template', {'template': 'online-help.html'}),
@@ -119,6 +117,12 @@ urlpatterns = patterns('',
     (r'^publisher/podcast/(?P<id>\d+)/episodes$', 'mygpo.publisher.views.episodes'),
     (r'^publisher/episode/(?P<id>\d+)$', 'mygpo.publisher.views.episode'),
     (r'^publisher/podcast/search$', 'mygpo.publisher.views.search_podcast'),
+    (r'^publisher/link/$', 'mygpo.publisher.views.link'),
+
+    #Subscribe with my.gpodder.org
+    (r'^subscribe', 'mygpo.web.views.podcast_subscribe_url'),
+    (r'^authors/$', 'mygpo.web.views.author'),
+
 
     (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': os.path.abspath('%s/../htdocs/media/' % os.path.dirname(__file__))}),
 

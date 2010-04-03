@@ -490,13 +490,6 @@ def podcast_subscribe_url(request):
     return HttpResponseRedirect('/podcast/%d/subscribe' % podcast.pk)
 
 
-def author(request):
-    current_site = Site.objects.get_current()
-    return render_to_response('authors.html', {
-        'url': current_site
-    }, context_instance=RequestContext(request))
-
-
 def resend_activation(request):
     error_message = ''
 
