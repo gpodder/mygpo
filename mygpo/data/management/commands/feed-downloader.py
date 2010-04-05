@@ -11,6 +11,7 @@ class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option('--toplist', action='store_true', dest='toplist', default=False, help="Update all entries from the Toplist."),
         make_option('--update-new', action='store_true', dest='new', default=False, help="Update all podcasts with new Episodes"),
+        make_option('--list-only', action='store_true', dest='list', default=False, help='Don\'t download/update anything, just list the podcasts to be updated'),
         )
 
 
@@ -35,6 +36,11 @@ class Command(BaseCommand):
         if len(fetch_queue) == 0:
             fetch_queue = models.Podcast.objects.filter(last_update__lt=UPDATE_LIMIT)
 
-        print 'Updating %d podcasts...' % len(fetch_queue)
-        feeddownloader.update_podcasts(fetch_queue)
+        if options.get('list'):
+            print '%d podcasts would be updated' % len(fetch_queue)
+            print '\n'.join([p.url for p in fetch_queue])
+
+        else:
+            print 'Updating %d podcasts...' % len(fetch_queue)
+            feeddownloader.update_podcasts(fetch_queue)
 
