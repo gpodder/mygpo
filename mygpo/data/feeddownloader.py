@@ -35,6 +35,13 @@ from mygpo.utils import parse_time
 socket.setdefaulttimeout(10)
 fetcher = feedcore.Fetcher(USER_AGENT)
 
+
+def mark_outdated(podcast):
+    for e in models.Episode.objects.filter(podcast=podcast):
+        e.outdated = True
+        e.save()
+
+
 def check_mime(mimetype):
     """Check if a mimetype is a "wanted" media type"""
     if '/' in mimetype:
@@ -120,16 +127,13 @@ def update_podcasts(fetch_queue):
 
         try:
             fetcher.fetch(podcast.url)
-        except feedcore.Offline:
-            pass
-        except feedcore.InvalidFeed:
-            pass
-        except feedcore.WifiLogin:
-            pass
-        except feedcore.AuthenticationRequired:
-            pass
+
+        except (feedcore.Offline, feedcore.InvalidFeed, feedcore.WifiLogin, feedcore.AuthenticationRequired):
+            mark_outdated(podcast)
+
         except feedcore.NewLocation, location:
-            podcast.url = location.data
+            pass
+
         except feedcore.UpdatedFeed, updated:
             feed = updated.data
             podcast.title = feed.feed.get('title', podcast.url)
@@ -179,6 +183,12 @@ def update_podcasts(fetch_queue):
                         print 'Updating', e.title.encode('utf-8', 'ignore')
                         for key in md:
                             setattr(e, key, md[key])
+
+                    # we need to distinguish it from non-updated episodes
+                    if not e.title:
+                        e.outdated = True
+                    else:
+                        e.outdated = False
                     e.save()
 
                     if e in existing_episodes:
