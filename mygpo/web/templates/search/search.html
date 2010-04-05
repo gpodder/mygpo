@@ -43,20 +43,16 @@ on optimizing the search library.
          <td>{{ result.object|podcast_logo }}</td>
          <td>
           <a class="podcast" href="/podcast/{{ result.pk }}">{{ result.object }}</a><br />
-          <span class="listlink description">{{ result.object.description|default:""|truncatewords:"15" }}</span>
+          <span class="listlink description">{{ result.object.description|default:""|striptags|truncatewords:"15" }}</span>
          </td>
         {% endifequal %}
 
         {% ifequal result.model_name "episode" %}
-         {% ifchanged result.object.podcast %}
-          <td>{{ result.object.podcast|podcast_logo }}</td>
-          <td>
-           <a class="podcast" href="/podcast/{{ result.object.podcast.id }}">{{ result.object.podcast }}</a>
-         {% endifchanged %}
-           <span class="episode">
-            <a class="episode" href="/episode/{{ result.pk }}">{{ result.object.title }}</a>
-            <span class="description">{{ result.object.description|default:""|truncatewords:"15" }}</span>
-           </span>
+         <td>{{ result.object.podcast|podcast_logo }}</td>
+         <td>
+          <a class="episode" href="/episode/{{ result.pk }}">{{ result.object.title }}</a>
+          (<a class="podcast" href="/podcast/{{ result.object.podcast.id }}">{{ result.object.podcast }}</a>)</br>
+          <span class="description">{{ result.object.description|default:""|striptags|truncatewords:"15" }}</span>
         {% endifequal %}
        </tr>
       {% endfor %}
