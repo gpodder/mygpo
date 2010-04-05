@@ -9,4 +9,5 @@ INSERT INTO `sanitizing_rules` VALUES (7,1,0,'(?P<unchanged>feedburner\\.com.+)\
 INSERT INTO `sanitizing_rules` VALUES (8,1,1,'^.*[^\\x20-\\x7E].*$', '', 50, 'Remove URLs with non-ascii characters');
 INSERT INTO `sanitizing_rules` VALUES (9,1,0,'^http://leoville\\.tv/podcasts/(?P<podcast>\\w+)\\.xml$', 'http://leo.am/podcasts/\\g<podcast>', 10, 'Rewrite URLs of TWiT Podcasts because most users use a URL that is going to break soon (bug 885)');
 INSERT INTO `sanitizing_rules` VALUES (10,1,0,'^http://www\\.dancarlin\\.com/dchh\\.xml$', 'http://feeds.feedburner.com/dancarlin/history', 10, 'Rewrite podcast URL of Dan Carlin\'s Hardcore History because the old URL doesn\'t work anymore (bug 855)');
+INSERT INTO `sanitizing_rules` VALUES (11,1,1,'^.*\\s.*$', '', 10, 'All URLs that contain spaces are considered invalid');
 
