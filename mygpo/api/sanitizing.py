@@ -1,4 +1,5 @@
 from mygpo.api.models import URLSanitizingRule, Podcast, ToplistEntry, SuggestionEntry, SubscriptionAction, SubscriptionMeta, Subscription, Episode, EpisodeAction
+from mygpo.data.models import BackendSubscription
 from mygpo.log import log
 import urlparse
 import re
@@ -34,7 +35,7 @@ def apply_sanitizing_rules(url, rules, podcast=True, episode=False):
             url = r.rearch_precompiled.sub(r.replace, url)
         else:
             # Roundtrip: utf8 (ignore rest) -> unicode -> ascii (ignore invalid)
-            url = url.decode('utf-8', 'ignore').encode('ascii', 'ignore')
+            url = url.decode('utf-8', 'ignore')
             url = re.sub(r.search, r.replace, url)
 
     return url
@@ -203,6 +204,7 @@ def maintenance():
 
 def delete_podcast(p):
     SubscriptionAction.objects.filter(podcast=p).delete()
+    BackendSubscription.objects.filter(podcast=p).delete()
     p.delete()
 
 
@@ -243,6 +245,16 @@ def rewrite_podcasts(p_old, p_new):
         except Exception, e:
             log('error updating subscription action %s: %s, deleting' % (sa.id, e))
             sa.delete()
+
+    for sub in BackendSubscription.objects.filter(podcast=p_old):
+        try:
+            log('updating subscription %s (device %s, user %s, since %s, podcast %s => %s)' % (sub.id, sub.device.id, sub.user.id, sub.subscribed_since, p_old.id, p_new.id))
+            sub.podcast = p_new
+            sub.save()
+        except Exception, e:
+            log('error updating subscription %s: %s, deleting' % (sub.id, e))
+            sub.delete()
+
 
 def rewrite_episodes(p_old, p_new):
 

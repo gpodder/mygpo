@@ -12,6 +12,20 @@ class HistoricPodcastData(models.Model):
         unique_together = ('podcast', 'date')
 
 
+class BackendSubscription(models.Model):
+    """
+    Represents the data in the subscriptions table, which
+    contains all subscriptions, even those for currently deleted devices
+    """
+    device = models.ForeignKey(Device)
+    podcast = models.ForeignKey(Podcast)
+    user = models.ForeignKey(User)
+    subscribed_since = models.DateTimeField()
+
+    class Meta:
+        db_table = 'subscriptions'
+
+
 class Listener(models.Model):
     device = models.ForeignKey(Device)
     user = models.ForeignKey(User)
