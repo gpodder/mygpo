@@ -14,9 +14,9 @@
    height="100"
    id="svg2"
    version="1.1"
-   inkscape:version="0.47pre4 r22446"
+   inkscape:version="0.47 r22583"
    sodipodi:docname="author_subscribe.svg"
-   inkscape:export-filename="/home/ale/Desktop/Zeichnung.png"
+   inkscape:export-filename="/home/stefan/mygpo-src/htdocs/media/author_subscribe.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <defs
@@ -316,8 +316,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.8"
-     inkscape:cx="132.09463"
-     inkscape:cy="1.5226813"
+     inkscape:cx="126.52198"
+     inkscape:cy="30.042947"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -326,7 +326,7 @@
      inkscape:window-width="910"
      inkscape:window-height="754"
      inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-y="56"
      inkscape:window-maximized="0"
      inkscape:snap-to-guides="false"
      inkscape:snap-bbox="true"
@@ -347,7 +347,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -375,40 +375,44 @@
          x="28.192001"
          y="973.35291"
          ry="15.121295"
-         inkscape:export-xdpi="90"
-         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="116"
+         inkscape:export-ydpi="116"
          inkscape:transform-center-x="3.5355334"
-         inkscape:export-filename="/home/ale/Desktop/get-it-on.svg.png" />
+         inkscape:export-filename="/home/stefan/mygpo-src/htdocs/media/author_subscribe.png" />
     </g>
     <text
        xml:space="preserve"
        style="font-size:7.71614933px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#242424;fill-opacity:1;stroke:#342a2a;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;font-family:Purisa;-inkscape-font-specification:Purisa Bold"
-       x="85.847412"
-       y="903.07788"
+       x="90.984207"
+       y="901.78668"
        id="text4329"
-       inkscape:export-filename="/home/ale/Desktop/path6141.png"
+       inkscape:export-filename="/home/stefan/mygpo-src/htdocs/media/author_subscribe.png"
        inkscape:export-xdpi="116.55"
        inkscape:export-ydpi="116.55"
        transform="scale(0.90384311,1.1063867)"><tspan
          sodipodi:role="line"
-         x="85.847412"
-         y="903.07788"
+         x="90.984207"
+         y="901.78668"
          id="tspan4333"
          style="font-size:11.092309px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;writing-mode:lr-tb;fill:#242424;fill-opacity:1;stroke:#342a2a;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;font-family:Purisa;-inkscape-font-specification:Purisa Bold">get it on</tspan><tspan
          sodipodi:role="line"
-         x="85.847412"
-         y="916.94324"
+         x="90.984207"
+         y="915.65204"
          id="tspan4337"
          style="font-size:11.092309px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;writing-mode:lr-tb;fill:#242424;fill-opacity:1;stroke:#342a2a;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;font-family:Purisa;-inkscape-font-specification:Purisa Bold"><tspan
-   style="font-size:11.092309px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;writing-mode:lr-tb;opacity:0.87155917;fill:#242424;fill-opacity:1;stroke:#342a2a;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;font-family:Purisa;-inkscape-font-specification:Purisa Bold"
-   id="tspan6591">my.gpodder.or</tspan>g</tspan></text>
+           style="font-size:11.092309px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;writing-mode:lr-tb;opacity:0.87155917;fill:#242424;fill-opacity:1;stroke:#342a2a;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;font-family:Purisa;-inkscape-font-specification:Purisa Bold"
+           id="tspan6591">gpodder.net</tspan></tspan></text>
     <image
-       y="975.14777"
-       x="31.714287"
-       id="image2884"
-       height="50.5"
+       sodipodi:absref="/home/stefan/mygpo-src/doc/weblogo.png"
+       xlink:href="weblogo.png"
+       inkscape:export-ydpi="116"
+       inkscape:export-xdpi="116"
+       inkscape:export-filename="/home/stefan/mygpo-src/htdocs/media/author_subscribe.png"
        width="45.857143"
-       xlink:href="file:///home/ale/Desktop/ale/mygpo-src/doc/weblogo.png" />
+       height="50.5"
+       id="image2884"
+       x="31.714287"
+       y="975.14777" />
   </g>
   <g
      inkscape:groupmode="layer"
@@ -420,6 +424,7 @@
        d="m 71.396508,976.41128 0,6.69226 -7.07106,0 0,5.17704 6.9448,0 0,6.69226 5.05076,0 0,-6.72383 6.59756,0 0,-5.14547 -6.59756,0 0,-6.62912 -4.9245,-0.0631 z"
        id="path6141"
        inkscape:export-xdpi="116.55"
-       inkscape:export-ydpi="116.55" />
+       inkscape:export-ydpi="116.55"
+       inkscape:export-filename="/home/stefan/mygpo-src/htdocs/media/author_subscribe.png" />
   </g>
 </svg>
