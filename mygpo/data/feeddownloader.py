@@ -31,6 +31,7 @@ import time
 from mygpo import feedcore
 from mygpo.api import models
 from mygpo.utils import parse_time
+from mygpo.api.sanitizing import sanitize_url
 
 socket.setdefaulttimeout(10)
 fetcher = feedcore.Fetcher(USER_AGENT)
@@ -91,10 +92,13 @@ def get_filesize(entry, url):
     for enclosure in enclosures:
         if 'href' in enclosure and enclosure['href'] == url:
             if 'length' in enclosure:
-                return enclosure['length']
+                try:
+                    return int(enclosure['length'])
+                except ValueError:
+                    return None
 
-            return 0
-    return 0
+            return None
+    return None
 
 def get_episode_metadata(entry, url):
     d = {
@@ -132,7 +136,10 @@ def update_podcasts(fetch_queue):
             mark_outdated(podcast)
 
         except feedcore.NewLocation, location:
-            pass
+            new_url = sanitize_url(location.data)
+            if new_url:
+                print new_url
+                podcast.url = new_url
 
         except feedcore.UpdatedFeed, updated:
             feed = updated.data

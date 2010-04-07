@@ -33,7 +33,7 @@ class Command(BaseCommand):
            except:
                 pass
 
-        if len(fetch_queue) == 0:
+        if len(fetch_queue) == 0 and not options.get('toplist') and not options.get('new'):
             fetch_queue = models.Podcast.objects.filter(last_update__lt=UPDATE_LIMIT)
 
         if options.get('list'):
