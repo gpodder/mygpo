@@ -36,13 +36,7 @@
     {% for episode in episodes %}
      {% if not episode.title %}
       <tr>
-       <td><a href="/publisher/episode/{{ episode.id }}">{{ episode.title|default:"Unknown Episode"|striptags }}</a></td>
-       <td>{{ episode.timestamp|default:""|naturalday }}</td>
-       <td>
-        {% if episode.listeners %}
-         {{ episode.listeners|vertical_bar:max_listeners }}
-        {% endif %}
-       </td>
+       <td colspan="3"><a href="/publisher/episode/{{ episode.id }}">{{ episode.url }}</a></td>
       </tr>
      {% endif %}
     {% endfor %}
