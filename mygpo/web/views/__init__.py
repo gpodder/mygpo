@@ -65,7 +65,7 @@ def home(request):
 def cover_art(request, size, filename):
     size = int(size)
     if size not in (PODCAST_LOGO_SIZE, PODCAST_LOGO_BIG_SIZE):
-        raise http404('Wrong size')
+        raise Http404('Wrong size')
 
     # XXX: Is there a "cleaner" way to get the root directory of the installation?
     root = os.path.join(os.path.dirname(__file__), '..', '..', '..')
@@ -82,7 +82,7 @@ def cover_art(request, size, filename):
             if im.mode not in ('RGB', 'RGBA'):
                 im = im.convert('RGB')
         except:
-            raise http404('Cannot open cover file')
+            raise Http404('Cannot open cover file')
 
         resized = im.resize((size, size), Image.ANTIALIAS)
 

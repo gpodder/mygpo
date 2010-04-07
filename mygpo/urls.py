@@ -32,6 +32,7 @@ urlpatterns = patterns('',
     # (r'^mygpo/', include('mygpo.foo.urls')),
     (r'^$', 'mygpo.web.views.home'),
     (r'^media/logo/(?P<size>\d+)/(?P<filename>[^/]*)\.jpg$', 'mygpo.web.views.cover_art'),
+    (r'^logo/(?P<size>\d+)/(?P<filename>[^/]*)\.jpg$', 'mygpo.web.views.cover_art'),
     (r'^subscriptions/$', 'mygpo.web.views.subscriptions'),
     (r'^login/$', 'mygpo.web.users.login_user'),
     (r'^logout/$', logout, {'next_page': '/'}),
@@ -121,7 +122,7 @@ urlpatterns = patterns('',
 
     #Subscribe with my.gpodder.org
     (r'^subscribe', 'mygpo.web.views.podcast_subscribe_url'),
-    (r'^authors/$', 'mygpo.web.views.author'),
+    #(r'^authors/$', 'mygpo.web.views.author'),
 
 
     (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': os.path.abspath('%s/../htdocs/media/' % os.path.dirname(__file__))}),
