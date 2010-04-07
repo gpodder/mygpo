@@ -11,7 +11,7 @@
   <h1>{% trans "Link to" %} {{url}}</h1>
 
   <p><img src="/media/author_subscribe.png" /></p>
-  <p>{% trans "You can paste this code on your website, so users of mygpo can directly subscribe to your podcast!" %}</p>
+  <p>{% blocktrans with url as sitename %}You can paste this code on your website, so users of {{ sitename }} can directly subscribe to your podcast!{% endblocktrans %}</p>
   <p>{% trans "Change the field 'YOUR_ADRESS' with the adress of your podcast." %}</p>
   <p>
    <textarea cols="80" rows="1"><a href="http://{{ url }}/subscribe?url=YOUR_ADRESS"><img src="http://{{ url }}/media/author_subscribe.png" /></a></textarea>
