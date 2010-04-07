@@ -47,10 +47,8 @@ def subscriber_data(podcast):
     data = {}
     records = HistoricPodcastData.objects.filter(podcast=podcast).order_by('date')
     for r in records:
-        s = r.date.strftime('%y-%m')
-        if s in data:
-            data[s] += r.subscriber_count
-        else:
+        if r.date.day == 1:
+            s = r.date.strftime('%y-%m')
             data[s] = r.subscriber_count
 
     list = []
