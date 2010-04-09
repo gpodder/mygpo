@@ -12,5 +12,5 @@ def lookup(dic, key):
 def lookup_list(dict, keys):
     for key in keys:
         if key in dict:
-            yield dict[k]
+            yield dict[key]
 
