@@ -38,6 +38,12 @@
    <p>{% trans "You don't have any podcasts subscribed on this device. Go ahead and upload some." %}</p>
   {% endif %}
 
+  <div style="margin-bottom: 5px;">
+   <a href="/device/{{ device.id }}.opml">
+    <img src="/media/download.png" /> {% trans "Download Subscriptions as OPML" %}
+   </a>
+  </div>
+
   <a href="/device/{{ device.id }}/history">{% blocktrans with device.name|striptags as devicename %} Show history for {{ devicename }} {% endblocktrans %}</a>
 
   {% if not device.deleted %}

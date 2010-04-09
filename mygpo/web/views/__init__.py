@@ -40,9 +40,7 @@ from mygpo.api.sanitizing import sanitize_url
 from mygpo.web.users import get_user
 from mygpo.log import log
 from mygpo.utils import daterange
-
-from mygpo.web import utils
-from mygpo.constants import PODCAST_LOGO_SIZE, PODCAST_LOGO_BIG_SIZE
+from mygpo.api import simple
 import re
 import random
 import string
@@ -462,6 +460,15 @@ def device(request, device_id, error_message=None):
         'synced_with': synced_with,
         'has_sync_targets': len(device.sync_targets()) > 0
     }, context_instance=RequestContext(request))
+
+
+@login_required
+def device_opml(request, device_id):
+    device = get_object_or_404(Device, id=device_id)
+
+    response = simple.subscriptions(request, request.user.username, device.uid, 'opml')
+    response['Content-Disposition'] = 'attachment; filename=%s.opml' % device.uid
+    return response
 
 
 @login_required
