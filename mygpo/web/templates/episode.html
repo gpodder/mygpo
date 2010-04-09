@@ -61,7 +61,7 @@
 
     {% for chapter in chapters %}
      <tr {% if chapter.user == user %}class="own-chapter"{% endif %} >
-      <td>{{ chapter.start|sec_to_time|time:"i:s" }}{% if chapter.start != chapter.end %} - {{ chapter.end|sec_to_time|time:"i:s" }}{% endif %}</td>
+      <td>{{ chapter.start|sec_to_time|time:"H:i:s" }}{% if chapter.start != chapter.end %} - {{ chapter.end|sec_to_time|time:"H:i:s" }}{% endif %}</td>
       <td>{% if chapter.advertisement %}Yes{% endif %}</td>
       <td>{{ chapter.label }}</strong>
       <td>
