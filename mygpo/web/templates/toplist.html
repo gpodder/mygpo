@@ -4,6 +4,7 @@
 {% load podcasts %}
 {% load charts %}
 {% load math %}
+{% load utils %}
 
 {% load menu %}
 {% block mainmenu %}{{ "/toplist/"|main_menu }}{% endblock %}
@@ -14,7 +15,13 @@
 {% block content %}
   <h1>{% trans "Toplist" %}</h1>
 
-  <p>{% blocktrans with entries|length as count %}These are the {{ count }} most subscribed podcasts.{% endblocktrans %}</p>
+  <p>
+   {% if languages|length_is:"0" %}
+    {% blocktrans with entries|length as count %}These are the {{ count }} most subscribed podcasts of all languages. You can chose to show only selected languages <a href="#languages">below</a>.{% endblocktrans %}
+   {% else %}
+    {% blocktrans with entries|length as count and all_languages|lookup_list:languages|join:", " as lang %}The are the {{ count }} most subscribed podcasts for the languages {{ lang }}. You can select the included languages <a href="#languages">below</a>.{% endblocktrans %}
+   {% endif %}
+  </p>
 
   <table class="list">
    <tr>
@@ -28,12 +35,14 @@
    <tr>
     <td class="numeric">{{ forloop.counter }}</td>
     <td class="oldposition">
-     {% if entry.oldplace %}
-      {% if entry.oldplace|subtract:forloop.counter %}
-       {{ entry.oldplace|subtract:forloop.counter|format_diff }}
+     {% if languages|length_is:"0" %}
+      {% if entry.oldplace %}
+       {% if entry.oldplace|subtract:forloop.counter %}
+        {{ entry.oldplace|subtract:forloop.counter|format_diff }}
+       {% endif %}
+       {% else %}
+       <img src="/media/charts-new.png" alt="new">
       {% endif %}
-      {% else %}
-      <img src="/media/charts-new.png" alt="new">
      {% endif %}
     </td>
     <td>{{ entry.podcast|podcast_logo }}</td>
@@ -42,6 +51,39 @@
    </tr>
   {% endfor %}
   </table>
+
+  <h3><a name="languages"></a>{% trans "Languages" %}</h3>
+  {% if languages|length_is:"0" %}
+   <p>Currently showing all languages. Show a specific one:
+    <form action="/toplist/?lang={{ languages|join:"," }}" method="post">
+     <select name="lang">
+      {% for key, name in all_languages.iteritems %}
+       <option value="{{ key }}">{{ name }}</option>
+      {% endfor %}
+     </select>
+     <input type="submit" value="{% trans "Show" %}" />
+    </form>
+   </p>
+  {% else %}
+   <p>Remove a language
+    <ul>
+     {% for lang in languages %}
+      <li>
+       <a href="/toplist/?lang={{ languages|join:","|cut:lang }}">{{ all_languages|lookup:lang }}</a>
+      </li>
+     {% endfor %}
+    </ul>
+    <form action="/toplist/?lang={{ languages|join:"," }}" method="post">
+     <select name="lang">
+      {% for key, name in all_languages.iteritems %}
+       <option value="{{ key }}">{{ name }}</option>
+      {% endfor %}
+     </select>
+     <input type="submit" value="{% trans "Add" %}" />
+    </form>
+    {% blocktrans %}or show <a href="/toplist?lang=">all languages</a>.{% endblocktrans %}
+   </p>
+  {% endif %}
 
   <div class="info"><strong>Get the toplist from your Client</strong>! Access <a href="/toplist/30.opml">http://{{ url }}/toplist/30.opml</a> for the Top-30.</div>
 {% endblock %}

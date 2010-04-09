@@ -40,6 +40,8 @@ from mygpo.api.sanitizing import sanitize_url
 from mygpo.web.users import get_user
 from mygpo.log import log
 from mygpo.utils import daterange
+
+from mygpo.web import utils
 from mygpo.constants import PODCAST_LOGO_SIZE, PODCAST_LOGO_BIG_SIZE
 import re
 import random
@@ -320,14 +322,34 @@ def episode_list(podcast, user):
     return episodes
 
 
-def toplist(request, len=100):
-    entries = ToplistEntry.objects.all().order_by('-subscriptions')[:len]
+def toplist(request, num=100, lang=None):
+
+    if 'lang' in request.GET:
+        lang = [x for x in request.GET.get('lang').split(',') if x]
+
+    if request.method == 'POST':
+        if request.POST.get('lang'):
+            return HttpResponseRedirect('/toplist/?lang=%s' % ','.join(lang + [request.POST.get('lang')]))
+
+    if not 'lang' in request.GET:
+        lang = utils.get_accepted_lang(request)
+
+    if len(lang) == 0:
+        entries = ToplistEntry.objects.order_by('-subscriptions')[:num]
+
+    else:
+        regex = '^(' + '|'.join(lang) + ')'
+        entries = ToplistEntry.objects.filter(podcast__language__regex=regex).order_by('-subscriptions')[:num]
+
     max_subscribers = max([e.subscriptions for e in entries])
     current_site = Site.objects.get_current()
+    all_langs = utils.get_language_names(utils.get_podcast_languages())
     return render_to_response('toplist.html', {
         'entries': entries,
         'max_subscribers': max_subscribers,
-        'url': current_site
+        'url': current_site,
+        'languages': lang,
+        'all_languages': all_langs,
     }, context_instance=RequestContext(request))
 
 
