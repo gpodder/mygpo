@@ -324,15 +324,10 @@ def episode_list(podcast, user):
 
 def toplist(request, num=100, lang=None):
 
-    if 'lang' in request.GET:
-        lang = [x for x in request.GET.get('lang').split(',') if x]
-
-    if request.method == 'POST':
-        if request.POST.get('lang'):
-            return HttpResponseRedirect('/toplist/?lang=%s' % ','.join(lang + [request.POST.get('lang')]))
-
-    if not 'lang' in request.GET:
-        lang = utils.get_accepted_lang(request)
+    try:
+        lang = process_lang_params(request, '/toplist/')
+    except utils.UpdatedException, updated:
+        return HttpResponseRedirect('/toplist/?lang=%s' % ','.join(updated.data))
 
     if len(lang) == 0:
         entries = ToplistEntry.objects.order_by('-subscriptions')[:num]
@@ -353,19 +348,47 @@ def toplist(request, num=100, lang=None):
     }, context_instance=RequestContext(request))
 
 
-def episode_toplist(request, len=100):
-    entries = EpisodeToplistEntry.objects.all().order_by('-listeners')[:len]
+def episode_toplist(request, num=100):
+
+    try:
+        lang = process_lang_params(request, '/toplist/episodes')
+    except utils.UpdatedException, updated:
+        return HttpResponseRedirect('/toplist/episodes?lang=%s' % ','.join(updated.data))
+
+    if len(lang) == 0:
+        entries = EpisodeToplistEntry.objects.order_by('-listeners')[:num]
+
+    else:
+        regex = '^(' + '|'.join(lang) + ')'
+        entries = EpisodeToplistEntry.objects.filter(episode__podcast__language__regex=regex).order_by('-listeners')[:num]
+
     current_site = Site.objects.get_current()
 
     # Determine maximum listener amount (or 0 if no entries exist)
     max_listeners = max([0]+[e.listeners for e in entries])
-
+    all_langs = utils.get_language_names(utils.get_podcast_languages())
     return render_to_response('episode_toplist.html', {
         'entries': entries,
         'max_listeners': max_listeners,
-        'url': current_site
+        'url': current_site,
+        'languages': lang,
+        'all_languages': all_langs,
     }, context_instance=RequestContext(request))
 
+
+def process_lang_params(request, url):
+    if 'lang' in request.GET:
+        lang = list(set([x for x in request.GET.get('lang').split(',') if x]))
+
+    if request.method == 'POST':
+        if request.POST.get('lang'):
+            lang = list(set(lang + [request.POST.get('lang')]))
+        raise utils.UpdatedException(lang)
+
+    if not 'lang' in request.GET:
+        lang = utils.get_accepted_lang(request)
+
+    return lang
 
 def toplist_opml(request, count):
     entries = ToplistEntry.objects.all().order_by('-subscriptions')[:count]

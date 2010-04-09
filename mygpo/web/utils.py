@@ -39,3 +39,10 @@ def get_language_names(lang):
 
     return res
 
+
+class UpdatedException(Exception):
+    """Base exception with additional payload"""
+    def __init__(self, data):
+        Exception.__init__(self)
+        self.data = data
+

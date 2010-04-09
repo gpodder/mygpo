@@ -76,7 +76,9 @@
     <form action="/toplist/?lang={{ languages|join:"," }}" method="post">
      <select name="lang">
       {% for key, name in all_languages.iteritems %}
-       <option value="{{ key }}">{{ name }}</option>
+       {% if not key in languages %}
+        <option value="{{ key }}">{{ name }}</option>
+       {% endif %}
       {% endfor %}
      </select>
      <input type="submit" value="{% trans "Add" %}" />
