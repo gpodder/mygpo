@@ -10,5 +10,7 @@ def lookup(dic, key):
 
 @register.filter
 def lookup_list(dict, keys):
-    return [dict[k] for k in keys if k in keys]
+    for key in keys:
+        if key in dict:
+            yield dict[k]
 
