@@ -1,5 +1,5 @@
 from mygpo.api.models import URLSanitizingRule, Podcast, ToplistEntry, SuggestionEntry, SubscriptionAction, SubscriptionMeta, Subscription, Episode, EpisodeAction
-from mygpo.data.models import BackendSubscription
+from mygpo.data.models import BackendSubscription, Listener, HistoricPodcastData
 from mygpo.log import log
 import urlparse
 import re
@@ -221,6 +221,8 @@ def rewrite_podcasts(p_old, p_new):
     # because we can't re-calculate them
     ToplistEntry.objects.filter(podcast=p_old).delete()
     SuggestionEntry.objects.filter(podcast=p_old).delete()
+    HistoricPodcastData.objects.filter(podcast=p_old).delete()
+    HistoricPodcastData.objects.filter(podcast=p_new).delete()
 
     rewrite_episodes(p_old, p_new)
 
@@ -263,7 +265,9 @@ def rewrite_episodes(p_old, p_new):
             e_new = Episode.objects.get(podcast=p_new, url=e.url)
             log('episode %s (url %s, podcast %s) already exists; updating episode actions for episode %s (url %s, podcast %s)' % (e_new.id, e.url, p_new.id, e.id, e.url, p_old.id))
             rewrite_episode_actions(e, e_new)
-            log('episode actions for episode %s (url "%s", podcast %s) updated, deleting.' % (e.id, e.url, p_old.id))
+            log('episode actions for episode %s (url "%s", podcast %s) updated.' % (e.id, e.url, p_old.id))
+            rewrite_listeners(e, e_new)
+            log('listeners for episode %s (url "%s", podcast %s) updated, deleting.' % (e.id, e.url, p_old.id))
             e.delete()
 
         except Episode.DoesNotExist:
@@ -282,6 +286,19 @@ def rewrite_episode_actions(e_old, e_new):
 
         except Exception, e:
             log('error updating episode action %s: %s, deleting' % (sa.id, e))
+
+
+def rewrite_listeners(e_old, e_new):
+
+    for l in Listener.objects.filter(episode=e_old):
+        try:
+            log('updating listener %s (user %s, device %s, podcast %s, episode %s => %s)' % (l.id, l.device.id, l.podcast.id, e_old.id, e_new.id))
+            l.episode = e_new
+            l.podcast = e_new.podcast
+            l.save()
+
+        except Exception, e:
+            log('error updating listener %s: %s, deleting' % (l.id, e))
 
 
 def precompile_rules(rules=URLSanitizingRule.objects.all().order_by('priority')):
