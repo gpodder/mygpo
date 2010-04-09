@@ -124,12 +124,27 @@ def privacy(request):
         except Podcast.DoesNotExist:
             pass
 
+    if 'include' in request.GET:
+        id = request.GET['include']
+        try:
+            podcast = Podcast.objects.get(pk=id)
+            sm, c = SubscriptionMeta.objects.get_or_create(user=request.user, podcast=podcast, defaults={'public': True})
+
+            if not c:
+                sm.public=True
+                sm.save()
+
+        except Podcast.DoesNotExist:
+            pass
+
     subscriptions = [s for s in Subscription.objects.filter(user=request.user)]
     included_subscriptions = set([s.podcast for s in subscriptions if s.get_meta().public])
+    excluded_subscriptions = set([s.podcast for s in subscriptions if not s.get_meta().public])
 
     return render_to_response('privacy.html', {
         'public_subscriptions': request.user.get_profile().public_profile,
         'included_subscriptions': included_subscriptions,
+        'excluded_subscriptions': excluded_subscriptions,
         }, context_instance=RequestContext(request))
 
 

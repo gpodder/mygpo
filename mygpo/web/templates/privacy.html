@@ -28,8 +28,26 @@
        <td><a href="/account/privacy?exclude={{ podcast.id }}"><img src="/media/unsubscribe.png" alt="{% trans "Mark private" %}" /></a></td>
       </tr>
      {% endfor %}
-
     </table>
+
+    {% if excluded_subscriptions %}
+     <h3>{% trans "Already excluded" %}</h3>
+     <table>
+      <tr>
+       <th></th>
+       <th>{% trans "Podcast" %}</th>
+       <th>{% trans "Mark public" %}</th>
+      </tr>
+
+      {% for podcast in excluded_subscriptions %}
+       <tr>
+        <td>{{ podcast|podcast_logo }}</td>
+        <td><a href="/podcast/{{ podcast.id }}">{{ podcast.title|striptags|default:"Unnamed Podcast" }}</a></td>
+        <td><a href="/account/privacy?include={{ podcast.id }}"><img src="/media/edit-undo.png" alt="{% trans "Mark private" %}" /></a></td>
+       </tr>
+      {% endfor %}
+     </table>
+    {% endif %}
    {% else %}
     {% blocktrans %}We don't include your subscriptions in our public statistics. <a href="/account/privacy?public_subscriptions">Include my data.</a>{% endblocktrans %}
    {% endif %}
