@@ -13,6 +13,7 @@ Dependencies:
   * python-simplejson
   * python-flup
   * python-imaging
+  * python-pybabel
 
 It's recommended that you use the development version of the following
 libraries, as we're living on the bleeding edge here:
