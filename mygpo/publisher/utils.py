@@ -43,6 +43,29 @@ def listener_data(podcast):
     return days
 
 
+def episode_listener_data(episode):
+    d = date(2010, 1, 1)
+    leap = timedelta(days=1)
+
+    episodes = EpisodeAction.objects.filter(episode=episode, timestamp__gte=d).order_by('timestamp').values('timestamp')
+    if len(episodes) == 0:
+        return []
+
+    start = episodes[0]['timestamp']
+
+    intervals = []
+    for d in daterange(start, leap=leap):
+        next = d + leap
+        listeners = EpisodeAction.objects.filter(episode=episode, timestamp__gte=d, timestamp__lt=next).values('user_id').distinct().count()
+        e = episode if episode.timestamp >= d and episode.timestamp <= next else None
+        intervals.append({
+            'date': d,
+            'listeners': listeners,
+            'episode': e})
+
+    return intervals
+
+
 def subscriber_data(podcast):
     data = {}
     records = HistoricPodcastData.objects.filter(podcast=podcast).order_by('date')

@@ -11,6 +11,13 @@
 
 {% block title %}{{ episode.title|default:"Unnamed Episode"|striptags }}{% endblock %}
 
+{% block head %}
+ {% if timeline_data %}
+  {{ timeline_data|timeline }}
+ {% endif %}
+{% endblock %}
+
+
 {% block content %}
   {% if podcast.logo_url %}
   <div id="podcastlogo">{{ episode.podcast|podcast_logo_big }}</div>
@@ -34,5 +41,11 @@
    </table>
    <input type="submit" value="save" />
   </form>
+
+  {% if timeline_data %}
+   <h3>Listener Timeline</h3>
+   <div id="chart_div" style="width: 700px; height: 240px;"></div>
+  {% endif %}
+
 {% endblock %}
 

@@ -18,10 +18,10 @@
 from datetime import datetime, timedelta, time
 import time
 
-def daterange(from_date, to_date=datetime.now()):
+def daterange(from_date, to_date=datetime.now(), leap=timedelta(days=1)):
     while from_date <= to_date:
         yield from_date
-        from_date = from_date + timedelta(days=1)
+        from_date = from_date + leap
     return
 
 

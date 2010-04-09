@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from mygpo.publisher.models import PodcastPublisher
 from mygpo.publisher.auth import require_publisher, is_publisher
 from mygpo.publisher.forms import SearchPodcastForm, EpisodeForm, PodcastForm
-from mygpo.publisher.utils import listener_data, check_publisher_permission, episode_list, subscriber_data
+from mygpo.publisher.utils import listener_data, episode_listener_data, check_publisher_permission, episode_list, subscriber_data
 from django.contrib.sites.models import Site
 from mygpo.data.feeddownloader import update_podcasts
 
@@ -112,9 +112,12 @@ def episode(request, id):
     elif request.method == 'GET':
         form = EpisodeForm(instance=e)
 
+    timeline_data = episode_listener_data(e)
+
     return render_to_response('publisher/episode.html', {
         'episode': e,
-        'form': form
+        'form': form,
+        'timeline_data': timeline_data,
         }, context_instance=RequestContext(request))
 
 
