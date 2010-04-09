@@ -31,7 +31,7 @@ import time
 from mygpo import feedcore
 from mygpo.api import models
 from mygpo.utils import parse_time
-from mygpo.api.sanitizing import sanitize_url
+from mygpo.api.sanitizing import sanitize_url, rewrite_podcasts
 
 socket.setdefaulttimeout(10)
 fetcher = feedcore.Fetcher(USER_AGENT)
@@ -136,10 +136,17 @@ def update_podcasts(fetch_queue):
             mark_outdated(podcast)
 
         except feedcore.NewLocation, location:
+            print location.data
             new_url = sanitize_url(location.data)
             if new_url:
                 print new_url
-                podcast.url = new_url
+                if not models.Podcast.objects.filter(url=new_url).exists():
+                    podcast.url = new_url
+                else:
+                    p = models.Podcast.objects.get(url=new_url)
+                    rewrite_podcasts(podcast, p)
+                    podcast.delete()
+                    continue
 
         except feedcore.UpdatedFeed, updated:
             feed = updated.data

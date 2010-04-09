@@ -151,7 +151,7 @@ class Fetcher(object):
             if url:
                 self._parse_feed(url, None, None, False)
         except UpdatedFeed, updated:
-            raise NewLocation(updated.data)
+            raise NewLocation(updated.data.href)
         except Exception, e:
             pass
 
@@ -194,7 +194,7 @@ class Fetcher(object):
         if status == 200:
             raise UpdatedFeed(feed)
         elif status == 301:
-            raise NewLocation(feed)
+            raise NewLocation(feed.href)
         elif status == 302:
             raise UpdatedFeed(feed)
         elif status == 304:
