@@ -42,7 +42,7 @@
    {% for episode in newest_episodes %}
     <tr>
      <td>{{ episode.podcast|podcast_logo }}</td>
-     <td><a href="/episode/{{ entry.episode.id }}">
+     <td><a href="/episode/{{ episode.id }}">
       {% if episode.title %}
        {{ episode.title|striptags }}
       {% else %}
