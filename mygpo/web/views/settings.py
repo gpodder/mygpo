@@ -28,8 +28,6 @@ from mygpo.api.basic_auth import require_valid_user
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.contrib.sites.models import Site
-import random
-import string
 
 @login_required
 def account(request):
@@ -159,7 +157,7 @@ def share(request):
         token.save()
 
     elif 'private_subscriptions' in request.GET:
-        token.token = "".join(random.sample(string.letters+string.digits, 32))
+        token.random_token()
         token.save()
 
     return render_to_response('share.html', {
