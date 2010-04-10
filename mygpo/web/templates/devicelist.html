@@ -39,6 +39,27 @@
     {% endfor %}
    </table>
 
+   {% if deleted_devices %}
+    <h2>{% trans "Deleted Devices" %}</h2>
+    <table class="list">
+     <tr>
+      <th>{% trans "Name" %}</th>
+      <th>{% trans "Type" %}</th>
+      <th>{% trans "ID" %}</th>
+      <th>{% trans "Reactivate" %}</th>
+     </th>
+    {% for d in deleted_devices %}
+     <tr>
+      <td><a href="/device/{{ d.id }}">{{ d|device_icon }}{{ d.name|striptags }}</a></td>
+      <td>{{ d|device_type }}</td>
+      <td>{{ d.uid|striptags }}</td>
+      <td><a href="/device/{{ d.id }}/undelete"><img src="/media/edit-undo.png" alt="{% trans "Reactivate" %}" /></a></td>
+     </tr>
+    {% endfor %}
+   </table>
+
+
+   {% endif %}
    <div class="info"><strong>{% trans "How do I add a new device?" %}</strong> {% trans "Just upload your subscriptions with a new device using gPodder, and it will automatically show up in this list." %}</div>
 {% endblock %}
 

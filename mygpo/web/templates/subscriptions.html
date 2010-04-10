@@ -11,10 +11,6 @@
 {% block title %}{% trans "My Podcast Subscriptions" %}{% endblock %}
 
 {% block content %}
-{% if deletedevice_success %}
-   <div class="success">{% blocktrans with device_name|striptags as devicename %}The device {{ devicename }} has been deleted.{% endblocktrans %}</div>
-{% endif %}
-
 <h1>{% trans "My Podcast Subscriptions" %}</h1>
 
  {% if not subscriptionlist|length_is:"0" %}

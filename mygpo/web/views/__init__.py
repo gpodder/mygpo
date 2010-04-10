@@ -241,8 +241,11 @@ def history(request, len=15, device_id=None):
 @login_required
 def devices(request):
     devices = Device.objects.filter(user=request.user,deleted=False).order_by('sync_group')
+    deleted_devices = Device.objects.filter(user=request.user,deleted=True)
+
     return render_to_response('devicelist.html', {
         'devices': devices,
+        'deleted_devices': deleted_devices,
     }, context_instance=RequestContext(request))
 
 
@@ -480,14 +483,17 @@ def device_delete(request, device_id):
     device.deleted = True
     device.save()
 
-    current_site = Site.objects.get_current()
-    subscriptionlist = create_subscriptionlist(request)
-    return render_to_response('subscriptions.html', {
-         'subscriptionlist': subscriptionlist,
-         'url': current_site,
-	  'deletedevice_success': True,
-         'device_name': device.name
-    }, context_instance=RequestContext(request))
+    return HttpResponseRedirect('/devices/')
+
+
+@login_required
+def device_undelete(request, device_id):
+    device = get_object_or_404(Device, pk=device_id, user=request.user)
+
+    device.deleted = False
+    device.save()
+
+    return HttpResponseRedirect('/device/%s' % device.id)
 
 
 @login_required
