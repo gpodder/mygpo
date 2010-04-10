@@ -53,6 +53,13 @@ class Podcast(models.Model):
     def subscription_count(self):
         return self.subscriptions().count()
 
+    def subscriber_count(self):
+        return self.subscriptions().values('user').distinct().count()
+
+    def listener_count(self):
+        from mygpo.data.models import Listener
+        return Listener.objects.filter(podcast=self).values('user').distinct().count()
+
     def logo_shortname(self):
         return hashlib.sha1(self.logo_url).hexdigest()
 
@@ -148,6 +155,9 @@ class Episode(models.Model):
         s = s.strip()
         return s
 
+    def listener_count(self):
+        from mygpo.data.models import Listener
+        return Listener.objects.filter(episode=self).values('user').distinct().count()
 
     def __unicode__(self):
         return '%s (%s)' % (self.shortname(), self.podcast)

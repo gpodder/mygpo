@@ -18,7 +18,13 @@
   {% endif %}
 
   <h1>{% if podcast.title %}{{ podcast.title|striptags }}{% else %}{% trans "Unnamed Podcast" %}{%endif%}</h1>
-  <a href="{{ podcast.url }}" class="URL">{{ podcast.url }}</a>
+  <small class="description">
+      {% trans "links" %}:
+      <a href="{{podcast.url}}">{% trans "feed" %}</a>{% if podcast.link %}, <a href="{{podcast.link}}">{% trans "website" %}</a>
+      {% endif %},
+      {% trans "stats:" %} {% blocktrans with podcast.subscriber_count as subscriber_count and podcast.listener_count as listener_count %}{{subscriber_count}} subscribers, {{listener_count}} listeners{% endblocktrans %}
+  </small>
+  <hr style="clear: none;"/>
 
   {% if podcast.description %}
    <p class="description">{{ podcast.description|striptags }}</p>
