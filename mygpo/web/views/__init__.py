@@ -94,15 +94,18 @@ def cover_art(request, size, filename):
     # XXX: Is there a "cleaner" way to get the root directory of the installation?
     root = os.path.join(os.path.dirname(__file__), '..', '..', '..')
     target = os.path.join(root, 'htdocs', 'media', 'logo', str(size), filename+'.jpg')
-    filename = os.path.join(root, 'htdocs', 'media', 'logo', filename)
+    filepath = os.path.join(root, 'htdocs', 'media', 'logo', filename)
 
-    if os.path.exists(filename):
+    if os.path.exists(target):
+        return HttpResponseRedirect('/media/logo/%s/%s.jpg' % (str(size), filename))
+
+    if os.path.exists(filepath):
         target_dir = os.path.dirname(target)
         if not os.path.isdir(target_dir):
             os.makedirs(target_dir)
 
         try:
-            im = Image.open(filename)
+            im = Image.open(filepath)
             if im.mode not in ('RGB', 'RGBA'):
                 im = im.convert('RGB')
         except:
@@ -127,7 +130,7 @@ def cover_art(request, size, filename):
         fp.write(s)
         fp.close()
 
-        return HttpResponse(s, mimetype='image/jpeg')
+        return HttpResponseRedirect('/media/logo/%s/%s.jpg' % (str(size), filename))
     else:
         raise Http404('Cover art not available')
 
