@@ -35,6 +35,10 @@
   </form>
   <p><a href="/publisher/podcast/{{ podcast.id }}/update">{% trans "Update from Feed" %}</a> {% trans "(this might take a few seconds)" %}</p>
 
+  <div class="info">To update all of your published podcasts automatically, you can request the URL (<a href="/publisher/podcast/{{ podcast.id }}?new_token">Create a new token</a>)<br />
+   <strong><a href="/publisher/{{ user.username }}/update?token={{ update_token.token }}">http://{{ site }}/publisher/{{ user.username }}/update?token={{ update_token.token }}</a></strong>
+  </div>
+
   <h2>Episodes</h2>
   <p>View and edit <a href="/publisher/podcast/{{ podcast.id }}/episodes">episode</a> data.</p>
 

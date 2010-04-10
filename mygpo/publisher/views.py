@@ -10,6 +10,9 @@ from mygpo.publisher.forms import SearchPodcastForm, EpisodeForm, PodcastForm
 from mygpo.publisher.utils import listener_data, episode_listener_data, check_publisher_permission, episode_list, subscriber_data
 from django.contrib.sites.models import Site
 from mygpo.data.feeddownloader import update_podcasts
+from mygpo.decorators import requires_token
+from mygpo.web.models import SecurityToken
+from django.contrib.auth.models import User
 
 
 def home(request):
@@ -59,12 +62,22 @@ def podcast(request, id):
     elif request.method == 'GET':
         form = PodcastForm(instance=p)
 
+    update_token, c = SecurityToken.objects.get_or_create(user=request.user, object='published_feeds', action='update')
+
+    if 'new_token' in request.GET:
+        update_token.random_token()
+        update_token.save()
+
+    site = Site.objects.get_current()
+
     return render_to_response('publisher/podcast.html', {
+        'site': site,
         'podcast': p,
         'form': form,
         'timeline_data': timeline_data,
         'subscriber_data': subscription_data,
         'device_data': device_data,
+        'update_token': update_token,
         }, context_instance=RequestContext(request))
 
 
@@ -78,6 +91,16 @@ def update_podcast(request, id):
     update_podcasts( [p] )
 
     return HttpResponseRedirect('/publisher/podcast/%s' % id)
+
+
+@requires_token(object='published_feeds', action='update')
+def update_published_podcasts(request, username):
+    user = get_object_or_404(User, username=username)
+
+    published_podcasts = [p.podcast for p in PodcastPublisher.objects.filter(user=user)]
+    update_podcasts(published_podcasts)
+
+    return HttpResponse('Updated:\n' + '\n'.join([p.url for p in published_podcasts]), mimetype='text/plain')
 
 
 @require_publisher

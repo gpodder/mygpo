@@ -115,6 +115,7 @@ urlpatterns = patterns('',
     (r'^accounts/', include('registration.urls')),
 
     (r'^publisher/$', 'mygpo.publisher.views.home'),
+    (r'^publisher/(?P<username>\w+)/update', 'mygpo.publisher.views.update_published_podcasts'),
     (r'^publisher/podcast/(?P<id>\d+)$', 'mygpo.publisher.views.podcast'),
     (r'^publisher/podcast/(?P<id>\d+)/update$', 'mygpo.publisher.views.update_podcast'),
     (r'^publisher/podcast/(?P<id>\d+)/episodes$', 'mygpo.publisher.views.episodes'),
