@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load devices %}
+{% load episodes %}
+{% load podcasts %}
+{% load humanize %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/"|section_menu }}{% endblock %}
+
+{% block title %}{% trans "Overview" %}{% endblock %}
+
+{% block content %}
+<h1>{% trans "Overview" %}</h1>
+
+ {% if not subscribed_podcasts %}
+  <p>{% blocktrans with site as sitename %}Welcome to {{ sitename }}! You can start using the site by <a href="/online-help">uploading your subscriptions</a> with a supported client. You can then manage your subscriptions online, sync your devices and discover new interesting podcasts.{% endblocktrans %}</p>
+ {% else %}
+  <p>{% blocktrans with subscribed_podcasts|length as subscription_count and devices|length as device_count %}
+   You have subscribed to <a href="/subscriptions/">{{ subscription_count }} podcasts</a> on <a href="/devices/">{{ device_count }} devices</a>. Now you can
+   <ul>
+    <li><a href="/share/">share your subscriptions with others</a></li>
+    <li><a href="/subscriptions/">manage your subscriptions</a></li>
+    <li><a href="/devices/">synchronize your devices</a></li>
+    <li><a href="/suggestions/">view our suggested podcasts</a></li>
+    <li><a href="/toplist/">discover new podcasts in our toplist</a></li>
+   </ul>
+  {% endblocktrans %}</p>
+
+ {% endif %}
+
+ {% if newest_episodes %}
+  <h2>{% trans "Newest Episodes" %}</h2>
+  <table class="list episode_list">
+   <tr>
+    <th></th>
+    <th>{% trans "Episode" %}</th>
+    <th>{% trans "Released" %}</th>
+   </tr>
+ 
+   {% for episode in newest_episodes %}
+    <tr>
+     <td>{{ episode.podcast|podcast_logo }}</td>
+     <td><a href="/episode/{{ entry.episode.id }}">
+      {% if episode.title %}
+       {{ episode.title|striptags }}
+      {% else %}
+       {% trans "Unnamed Episode" %}
+      {% endif %}
+      </a><br/>
+      <span class="from_podcast">{% trans "from" %} <a href="/podcast/{{ episode.podcast.id }}">{{ episode.podcast|striptags }}</a>
+     </td>
+     <td>{{ episode.timestamp|naturalday }}</td>
+    </tr>
+   {% endfor %}
+  </table>
+ {% endif %}
+
+{% endblock %}
+
