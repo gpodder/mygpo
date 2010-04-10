@@ -22,12 +22,13 @@ from django.contrib.auth.models import User
 from django.template import RequestContext
 from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, EpisodeToplistEntry, Subscription, SuggestionEntry, SyncGroup, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SubscriptionMeta
 from mygpo.data.models import Listener
-from mygpo.web.models import Rating, SecurityToken
+from mygpo.web.models import Rating
 from mygpo.web.forms import UserAccountForm, DeviceForm, SyncForm, PrivacyForm, ResendActivationForm
 from django.forms import ValidationError
 from mygpo.api.opml import Exporter
 from django.utils.translation import ugettext as _
 from mygpo.api.basic_auth import require_valid_user
+from mygpo.decorators import requires_token
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
@@ -44,8 +45,6 @@ from mygpo.constants import PODCAST_LOGO_SIZE, PODCAST_LOGO_BIG_SIZE
 from mygpo.web import utils
 from mygpo.api import simple
 import re
-import random
-import string
 import os
 import Image
 import ImageDraw
@@ -500,24 +499,14 @@ def resend_activation(request):
     return render_to_response('registration/resent_activation.html')
 
 
+@requires_token(object='subscriptions', action='r', denied_template='user_subscriptions_denied.html')
 def user_subscriptions(request, username):
     user = get_object_or_404(User, username=username)
-
-    token, c = SecurityToken.objects.get_or_create(user=user, object='subscriptions', action='r',
-        defaults = {'token': "".join(random.sample(string.letters+string.digits, 32))})
-
-    u_token = request.GET.get('token', '')
-    if token.token == '' or token.token == u_token:
-        subscriptions = [s for s in Subscription.objects.filter(user=user)]
-        public_subscriptions = set([s.podcast for s in subscriptions if s.get_meta().public])
-        return render_to_response('user_subscriptions.html', {
-            'subscriptions': public_subscriptions,
-            'other_user': user
-            }, context_instance=RequestContext(request))
-
-    else:
-        return render_to_response('user_subscriptions_denied.html', {
-            'other_user': user
-            }, context_instance=RequestContext(request))
+    subscriptions = [s for s in Subscription.objects.filter(user=user)]
+    public_subscriptions = set([s.podcast for s in subscriptions if s.get_meta().public])
+    return render_to_response('user_subscriptions.html', {
+        'subscriptions': public_subscriptions,
+        'other_user': user
+        }, context_instance=RequestContext(request))
 
 

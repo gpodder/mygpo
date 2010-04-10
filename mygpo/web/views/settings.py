@@ -151,7 +151,7 @@ def privacy(request):
 @login_required
 def share(request):
     site = Site.objects.get_current()
-    token, c = SecurityToken.objects.get_or_create(user=request.user, object='subscriptions', action='r', defaults = {'token': "".join(random.sample(string.letters+string.digits, 32))})
+    token, c = SecurityToken.objects.get_or_create(user=request.user, object='subscriptions', action='r')
 
 
     if 'public_subscriptions' in request.GET:

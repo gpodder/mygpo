@@ -18,6 +18,9 @@
 from django.db import models
 from django.contrib.auth.models import User
 from datetime import datetime
+import random
+import string
+
 
 class Rating(models.Model):
     target = models.CharField(max_length=15)
@@ -34,7 +37,7 @@ class Rating(models.Model):
 
 class SecurityToken(models.Model):
     user = models.ForeignKey(User)
-    token = models.CharField(max_length=32, blank=True)
+    token = models.CharField(max_length=32, blank=True, default=lambda: "".join(random.sample(string.letters+string.digits, 32)))
     object = models.CharField(max_length=64)
     action = models.CharField(max_length=10)
 
@@ -43,5 +46,4 @@ class SecurityToken(models.Model):
 
     def __unicode__(self):
         return '%s %s %s: %s' % (self.user, self.object, self.action, self.token[:5])
-
 
