@@ -59,7 +59,6 @@ urlpatterns = patterns('',
     (r'user/(?P<username>\w+)/subscriptions$', 'mygpo.web.views.user_subscriptions'),
 
     (r'^history/$', 'mygpo.web.views.history'),
-    (r'^devices/$', 'mygpo.web.views.devices'),
 
     (r'^toplist/$', 'mygpo.web.views.toplist'),
     (r'^toplist/episodes$', 'mygpo.web.views.episode_toplist'),
@@ -67,12 +66,13 @@ urlpatterns = patterns('',
 
     (r'^suggestions/$', 'mygpo.web.views.suggestions'),
 
-    (r'^device/(?P<device_id>\d+)$', 'mygpo.web.views.device'),
-    (r'^device/(?P<device_id>\d+).opml$', 'mygpo.web.views.device_opml'),
-    (r'^device/(?P<device_id>\d+)/sync$', 'mygpo.web.views.device_sync'),
-    (r'^device/(?P<device_id>\d+)/unsync$', 'mygpo.web.views.device_unsync'),
-    (r'^device/(?P<device_id>\d+)/delete$', 'mygpo.web.views.device_delete'),
-    (r'^device/(?P<device_id>\d+)/undelete$', 'mygpo.web.views.device_undelete'),
+    (r'^devices/$', 'mygpo.web.views.device.overview'),
+    (r'^device/(?P<device_id>\d+)$', 'mygpo.web.views.device.show'),
+    (r'^device/(?P<device_id>\d+).opml$', 'mygpo.web.views.device.opml'),
+    (r'^device/(?P<device_id>\d+)/sync$', 'mygpo.web.views.device.sync'),
+    (r'^device/(?P<device_id>\d+)/unsync$', 'mygpo.web.views.device.unsync'),
+    (r'^device/(?P<device_id>\d+)/delete$', 'mygpo.web.views.device.delete'),
+    (r'^device/(?P<device_id>\d+)/undelete$', 'mygpo.web.views.device.undelete'),
     (r'^device/(?P<device_id>\d+)/history$', 'mygpo.web.views.history'),
 
     (r'^search/', include('haystack.urls')),

@@ -40,6 +40,8 @@ from mygpo.api.sanitizing import sanitize_url
 from mygpo.web.users import get_user
 from mygpo.log import log
 from mygpo.utils import daterange
+from mygpo.constants import PODCAST_LOGO_SIZE, PODCAST_LOGO_BIG_SIZE
+from mygpo.web import utils
 from mygpo.api import simple
 import re
 import random
@@ -239,17 +241,6 @@ def history(request, len=15, device_id=None):
 
 
 @login_required
-def devices(request):
-    devices = Device.objects.filter(user=request.user,deleted=False).order_by('sync_group')
-    deleted_devices = Device.objects.filter(user=request.user,deleted=True)
-
-    return render_to_response('devicelist.html', {
-        'devices': devices,
-        'deleted_devices': deleted_devices,
-    }, context_instance=RequestContext(request))
-
-
-@login_required
 def podcast_subscribe(request, pid):
     podcast = get_object_or_404(Podcast, pk=pid)
     error_message = None
@@ -417,119 +408,6 @@ def suggestions(request):
         'url': current_site
     }, context_instance=RequestContext(request))
 
-
-@login_required
-def device(request, device_id, error_message=None):
-    device = Device.objects.get(pk=device_id)
-
-    if device.user != request.user:
-        return HttpResponseForbidden(_('You are not allowed to access this device'))
-
-    subscriptions = device.get_subscriptions()
-    synced_with = list(device.sync_group.devices()) if device.sync_group else []
-    if device in synced_with: synced_with.remove(device)
-    success = False
-    sync_form = SyncForm()
-    sync_form.set_targets(device.sync_targets(), _('Synchronize with the following devices'))
-
-    if request.method == 'POST':
-        device_form = DeviceForm(request.POST)
-
-        if device_form.is_valid():
-            device.name = device_form.cleaned_data['name']
-            device.type = device_form.cleaned_data['type']
-            device.uid  = device_form.cleaned_data['uid']
-            try:
-                device.save()
-                success = True
-            except IntegrityError, ie:
-                device = Device.objects.get(pk=device_id)
-                error_message = _('You can\'t use the same UID for two devices.')
-
-    else:
-        device_form = DeviceForm({
-            'name': device.name,
-            'type': device.type,
-            'uid' : device.uid
-            })
-
-    return render_to_response('device.html', {
-        'device': device,
-        'device_form': device_form,
-        'sync_form': sync_form,
-        'success': success,
-        'error_message': error_message,
-        'subscriptions': subscriptions,
-        'synced_with': synced_with,
-        'has_sync_targets': len(device.sync_targets()) > 0
-    }, context_instance=RequestContext(request))
-
-
-@login_required
-def device_opml(request, device_id):
-    device = get_object_or_404(Device, id=device_id)
-
-    response = simple.subscriptions(request, request.user.username, device.uid, 'opml')
-    response['Content-Disposition'] = 'attachment; filename=%s.opml' % device.uid
-    return response
-
-
-@login_required
-def device_delete(request, device_id):
-    if request.method != 'POST':
-        return HttpResponseNotAllowed(['POST'])
-
-    device = Device.objects.get(pk=device_id)
-    device.deleted = True
-    device.save()
-
-    return HttpResponseRedirect('/devices/')
-
-
-@login_required
-def device_undelete(request, device_id):
-    device = get_object_or_404(Device, pk=device_id, user=request.user)
-
-    device.deleted = False
-    device.save()
-
-    return HttpResponseRedirect('/device/%s' % device.id)
-
-
-@login_required
-def device_sync(request, device_id):
-
-    if request.method != 'POST':
-        return HttpResponseNotAllowed(['POST'])
-
-    form = SyncForm(request.POST)
-    if not form.is_valid():
-        return HttpResponseBadRequest('invalid')
-
-    try:
-        target = form.get_target()
-
-        device = Device.objects.get(pk=device_id)
-        device.sync_with(target)
-
-    except ValueError, e:
-        log('error while syncing device %s: %s' % (device_id, e))
-
-    return HttpResponseRedirect('/device/%s' % device_id)
-
-@login_required
-def device_unsync(request, device_id):
-    if request.method != 'GET':
-        return HttpResponseNotAllowed(['GET'])
-
-    dev = Device.objects.get(pk=device_id)
-
-    try:
-        dev.unsync()
-    except ValueError, e:
-        return device(request, device_id, e)
-
-    return HttpResponseRedirect('/device/%s' % device_id)
 
 @login_required
 def podcast_subscribe_url(request):
