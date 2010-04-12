@@ -70,7 +70,7 @@ def maintenance():
 
     count = 0
 
-    podcasts = Podcast.objects.all().iterator()
+    podcasts = Podcast.objects.only('id', 'url').iterator()
     total = Podcast.objects.count()
     duplicates = 0
     sanitized_urls = []
@@ -138,7 +138,7 @@ def maintenance():
 
     count = 0
     total = Episode.objects.count()
-    episodes = Episode.objects.all().iterator()
+    episodes = Episode.objects.only('id', 'url').iterator()
     for e in episodes:
         count += 1
         if (count % 100) == 0: print '%s %% (episode id %s)' % (((count + 0.0)/total*100), e.id)
@@ -267,7 +267,9 @@ def rewrite_episodes(p_old, p_new):
             rewrite_episode_actions(e, e_new)
             log('episode actions for episode %s (url "%s", podcast %s) updated.' % (e.id, e.url, p_old.id))
             rewrite_listeners(e, e_new)
-            log('listeners for episode %s (url "%s", podcast %s) updated, deleting.' % (e.id, e.url, p_old.id))
+            log('listeners for episode %s (url "%s", podcast %s) updated.' % (e.id, e.url, p_old.id))
+            rewrite_chapters(e, e_new)
+            log('chapters for episode %s (url "%s", podcast %s) updated, deleting.' % (e.id, e.url, p_old.id))
             e.delete()
 
         except Episode.DoesNotExist:
@@ -275,9 +277,9 @@ def rewrite_episodes(p_old, p_new):
             e.podcast = p_new
             e.save()
 
-        
+
 def rewrite_episode_actions(e_old, e_new):
-    
+
     for ea in EpisodeAction.objects.filter(episode=e_old):
         try:
             log('updating episode action %s (user %s, timestamp %s, episode %s => %s)' % (ea.id, ea.user.id, ea.timestamp, e_old.id, e_new.id))
@@ -299,6 +301,18 @@ def rewrite_listeners(e_old, e_new):
 
         except Exception, e:
             log('error updating listener %s: %s, deleting' % (l.id, e))
+
+
+def rewrite_chapters(e_old, e_new):
+
+    for c in Chapter.objects.filter(episode=e_old):
+        try:
+            log('updating chapter %s (user %s, device %s, episode %s => %s)' % (c.id, c.device.id, e_old.id, e_new.id))
+            c.episode = e_new
+            c.save()
+
+        except Exception, e:
+            log('error updating chapter %s: %s, deleting' % (c.id, e))
 
 
 def precompile_rules(rules=URLSanitizingRule.objects.all().order_by('priority')):
