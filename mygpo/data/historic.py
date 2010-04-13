@@ -1,5 +1,5 @@
 from mygpo.api.models import Podcast, Episode, SubscriptionAction, EpisodeAction
-from mygpo.data.models import HistoricPodcastData, HistoricEpisodeData
+from mygpo.data.models import HistoricPodcastData
 from mygpo.utils import daterange
 from datetime import date, timedelta
 
@@ -17,8 +17,12 @@ def calc_podcast(podcast):
         prev = latest_historic[0].subscriber_count
 
     else:
-        first = SubscriptionAction.objects.filter(podcast=podcast).order_by('timestamp')[0]
-        start = first.timestamp.date()
+        sas = SubscriptionAction.objects.filter(podcast=podcast).order_by('timestamp')
+        if sas.exists():
+            first = sas[0]
+            start = first.timestamp.date()
+        else:
+            start = date.today()
         prev = 0
 
     for day in daterange(start, date.today() - timedelta(days=1)):

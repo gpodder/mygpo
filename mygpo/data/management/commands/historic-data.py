@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from mygpo.data.historic import calc_podcast, calc_episode
+from mygpo.data.historic import calc_podcast
 from mygpo.api.models import Podcast, Episode
 
 class Command(BaseCommand):
