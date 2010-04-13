@@ -110,7 +110,11 @@ def cover_art(request, size, filename):
         except:
             raise Http404('Cannot open cover file')
 
-        resized = im.resize((size, size), Image.ANTIALIAS)
+        try:
+            resized = im.resize((size, size), Image.ANTIALIAS)
+        except IOError:
+            # raised when trying to read an interlaced PNG; we use the original instead
+            return HttpResponseRedirect('/media/logo/%s' % filename)
 
         # If it's a RGBA image, composite it onto a white background for JPEG
         if resized.mode == 'RGBA':
