@@ -356,7 +356,7 @@ def toplist(request, num=100, lang=None):
         regex = '^(' + '|'.join(lang) + ')'
         entries = ToplistEntry.objects.filter(podcast__language__regex=regex).order_by('-subscriptions')[:num]
 
-    max_subscribers = max([e.subscriptions for e in entries])
+    max_subscribers = max([e.subscriptions for e in entries]) if entries else 0
     current_site = Site.objects.get_current()
     all_langs = utils.get_language_names(utils.get_podcast_languages())
     return render_to_response('toplist.html', {
