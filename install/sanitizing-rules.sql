@@ -11,4 +11,5 @@ INSERT INTO `sanitizing_rules` VALUES (9,1,0,'^http://leoville\\.tv/podcasts/(?P
 INSERT INTO `sanitizing_rules` VALUES (10,1,0,'^http://www\\.dancarlin\\.com/dchh\\.xml$', 'http://feeds.feedburner.com/dancarlin/history', 10, 'Rewrite podcast URL of Dan Carlin\'s Hardcore History because the old URL doesn\'t work anymore (bug 855)');
 INSERT INTO `sanitizing_rules` VALUES (11,1,1,'^.*\\s.*$', '', 10, 'All URLs that contain spaces are considered invalid');
 INSERT INTO `sanitizing_rules` VALUES (12,0,1,'http://media.libsyn.com/media/(?P<res>.*)$', 'http://traffic.libsyn.com/\\g<res>', 10, 'Update new URL for libsy Podcasts (Learn Japanese with Beb and Alex)');
+INSERT INTO `sanitizing_rules` VALUES (13,0,1,'^http://site\\.abc\\.go\\.com/abc/xml/podcastRSS\\?(.*&)?feedPublishKey=(?P<key>\\d+)(&.*)?$', 'http://a.abc.com/abc/xml/podcastRSS?feedPublishKey=\\g<key>', 100, 'Merge URLs for ABC Podcasts (bug 977)');
 
