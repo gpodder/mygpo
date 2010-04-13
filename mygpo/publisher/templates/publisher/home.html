@@ -29,6 +29,7 @@
 
  {% if user.is_staff %}
   <form action="/publisher/podcast/search" method="post">
+  {% csrf_token %}
   {{ form.as_p }}
   <input type="submit" value="{% trans "Go" %}" />
  </form>

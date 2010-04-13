@@ -34,6 +34,7 @@
   <h2>Edit</h2>
   <p>Please note that information updates from the podcast feed will overwrite any information given here. Please save only what is not contained in the feed.</p>
   <form method="post" action="">
+  {% csrf_token %}
    <table>
     {{ form.as_table }}
    </table>

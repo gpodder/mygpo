@@ -49,6 +49,7 @@
   {% if languages|length_is:"0" %}
    <p>Currently showing all languages. Show a specific one:
     <form action="/toplist/?lang={{ languages|join:"," }}" method="post">
+     {% csrf_token %}
      <select name="lang">
       {% for key, name in all_languages.iteritems %}
        <option value="{{ key }}">{{ name }}</option>
@@ -67,6 +68,7 @@
      {% endfor %}
     </ul>
     <form action="/toplist/episodes?lang={{ languages|join:"," }}" method="post">
+     {% csrf_token %}
      <select name="lang">
       {% for key, name in all_languages.iteritems %}
        {% if not key in languages %}

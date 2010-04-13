@@ -43,6 +43,7 @@
      {% endif %}
 
      <form action="" method="POST">
+         {% csrf_token %}
          <p>{{ privacy_form.public }} {{ privacy_form.public.label_tag }}</p>
          <input type="submit" value="Save" />
      </form>

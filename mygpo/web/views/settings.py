@@ -82,14 +82,14 @@ def account(request):
 def delete_account(request):
 
     if request.method == 'GET':
-        return render_to_response('delete_account.html')
+        return render_to_response('delete_account.html', context_instance=RequestContext(request))
 
     request.user.is_active = False
     request.user.save()
     logout(request)
     return render_to_response('delete_account.html', {
         'success': True
-        })
+        }, context_instance=RequestContext(request))
 
 
 @login_required

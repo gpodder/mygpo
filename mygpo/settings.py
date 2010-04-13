@@ -81,6 +81,7 @@ TEMPLATE_LOADERS = (
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -126,4 +127,6 @@ LOGIN_URL = '/login/'
 HAYSTACK_SITECONF = 'mygpo.search_sites'
 HAYSTACK_SEARCH_ENGINE = 'whoosh'
 HAYSTACK_WHOOSH_PATH = os.path.abspath('%s/../search_index' % os.path.dirname(__file__))
+
+CSRF_FAILURE_VIEW='mygpo.security.csrf_failure'
 

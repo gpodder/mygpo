@@ -69,6 +69,7 @@
 
   {% if has_sync_targets %}
    <form action="/device/{{ device.id }}/sync" method="POST">
+    {% csrf_token %}
     {{ sync_form.as_p }}
     <input type="submit" value="{% trans "OK" %}" />
    </form>
@@ -80,12 +81,14 @@
   {% endif %}
 
   <form action="" method="POST">
+   {% csrf_token %}
    {{ device_form.as_p }}
    <input type="submit" value="Save" />
   </form>
 
   <h2>{% trans "Delete" %}</h2>
   <form action="/device/{{ device.id }}/delete" method="POST">
+   {% csrf_token %}
    <input type="submit" value="{% trans "Delete this device" %}" />
   </form>
   <br />

@@ -10,6 +10,7 @@
 {% block content %}
   {% if restore_password_form %}
    <form action="/register/restore_password" method="POST">
+       {% csrf_token %}
        <table style="width: 400px; margin-left: auto; margin-right: auto;">
            <tr>
                <td colspan="2" style="text-align: center;">
@@ -52,6 +53,7 @@
     </div>
     {% endif %}
   <form action="../login/" method="post">
+      {% csrf_token %}
       <input name="next" type="hidden" value="{{ next }}" /><br />
       <table style="margin-left: auto; margin-right: auto;">
           <tr>

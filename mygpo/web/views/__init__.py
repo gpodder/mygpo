@@ -461,7 +461,7 @@ def resend_activation(request):
         form = ResendActivationForm()
         return render_to_response('registration/resend_activation.html', {
             'form': form,
-        })
+        }, context_instance=RequestContext(request))
 
     site = Site.objects.get_current()
     form = ResendActivationForm(request.POST)
@@ -490,7 +490,7 @@ def resend_activation(request):
         return render_to_response('registration/resend_activation.html', {
            'form': form,
            'error_message' : e
-        })
+        }, context_instance=RequestContext(request))
 
 
     try:
@@ -500,7 +500,7 @@ def resend_activation(request):
         #old versions of django-registration send registration mails from RegistrationManager
         RegistrationProfile.objects.send_activation_email(profile, site)
 
-    return render_to_response('registration/resent_activation.html')
+    return render_to_response('registration/resent_activation.html', context_instance=RequestContext(request))
 
 
 @requires_token(object='subscriptions', action='r', denied_template='user_subscriptions_denied.html')

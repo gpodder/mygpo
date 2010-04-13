@@ -76,6 +76,7 @@
     {% endfor %}
     <tr>
      <form action="/episode/{{ episode.id }}/add-chapter" method="POST">
+      {% csrf_token %}
       <td>
        <input type="text" name="start" id="start" class="time" /> -
        <input type="text" name="end" id="end" class="time" />

@@ -43,6 +43,7 @@
   {% endif %}
 
   <form method="post" action".">
+   {% csrf_token %}
    <table>
     {{ form.as_table }}
    </table>

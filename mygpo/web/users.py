@@ -21,6 +21,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.template.defaultfilters import slugify
+from django.template import RequestContext
 from registration.forms import RegistrationForm
 from registration.views import activate, register
 from registration.models import RegistrationProfile
@@ -49,7 +50,7 @@ def login_user(request):
             'url': Site.objects.get_current(),
             'next': request.GET.get('next', ''),
             'restore_password_form': form,
-        })
+        }, context_instance=RequestContext(request))
 
     username = request.POST['user']
     password = request.POST['pwd']
@@ -59,13 +60,13 @@ def login_user(request):
         return render_to_response('login.html', {
             'error_message': _('Wrong username or password.'),
             'next': request.POST.get('next', ''),
-        })
+        }, context_instance=RequestContext(request))
 
     if not user.is_active:
         return render_to_response('login.html', {
             'error_message': _('Please activate your account first.'),
             'activation_needed': True,
-        })
+        }, context_instance=RequestContext(request))
 
     login(request, user)
     current_site = Site.objects.get_current()
@@ -75,7 +76,8 @@ def login_user(request):
              return render_to_response('migrate.html', {
                   'url': current_site,
                   'username': user
-             })
+             }, context_instance=RequestContext(request))
+
     except UserProfile.DoesNotExist:
          profile, c = UserProfile.objects.get_or_create(user=user)
 
@@ -95,9 +97,19 @@ def migrate_user(request):
     if user.username != username:
         current_site = Site.objects.get_current()
         if User.objects.filter(username__exact=username).count() > 0:
-            return render_to_response('migrate.html', {'error_message': '%s is already taken' % username, 'url': current_site, 'username': user.username})
+            return render_to_response('migrate.html', {
+                'error_message': '%s is already taken' % username,
+                'url': current_site,
+                'username': user.username
+                }, context_instance=RequestContext(request))
+
         if slugify(username) != username.lower():
-            return render_to_response('migrate.html', {'error_message': '%s is not a valid username. Please use characters, numbers, underscore and dash only.' % username, 'url': current_site, 'username': user.username})
+            return render_to_response('migrate.html', {
+                'error_message': '%s is not a valid username. Please use characters, numbers, underscore and dash only.' % username,
+                'url': current_site,
+                'username': user.username
+                }, context_instance=RequestContext(request))
+
         else:
             user.username = username
             user.save()
@@ -131,7 +143,7 @@ def restore_password(request):
         error_message = _('User does not exist.')
         return render_to_response('password_reset_failed.html', {
             'error_message': error_message
-        })
+        }, context_instance=RequestContext(request))
 
     site = Site.objects.get_current()
     pwd = "".join(random.sample(string.letters+string.digits, 8))
@@ -140,5 +152,5 @@ def restore_password(request):
     user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
     user.set_password(pwd)
     user.save()
-    return render_to_response('password_reset.html')
+    return render_to_response('password_reset.html', context_instance=RequestContext(request))
 

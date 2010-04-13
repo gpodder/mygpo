@@ -14,6 +14,7 @@
    <div class="success">{% trans "Your settings have been saved." %}</div>
  {% endif %}
   <form action="/account/" method="POST">
+      {% csrf_token %}
       <h3>{% trans "Contact information and password" %}</h3>
       <table class="form">
           <tr>
