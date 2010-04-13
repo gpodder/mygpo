@@ -40,13 +40,13 @@
 
   <div>
    <a href="/device/{{ device.id }}.opml">
-    <img src="/media/download.png" /> {% trans "Download Subscriptions as OPML" %}
+    <img src="/media/download.png" style="vertical-align: middle;" /> {% trans "Download Subscriptions as OPML" %}
    </a>
   </div>
 
   <div>
    <a href="/device/{{ device.id }}/history">
-    <img src="/media/office-calendar.png" />
+    <img src="/media/office-calendar.png" style="vertical-align: middle;" />
     {% blocktrans with device.name|striptags as devicename %} Show history for {{ devicename }} {% endblocktrans %}</a>
    </a>
   </div>
