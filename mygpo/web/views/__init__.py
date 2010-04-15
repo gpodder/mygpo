@@ -191,7 +191,7 @@ def podcast(request, pid):
                        subscriptionmeta.save()
                        success = True
                     except IntegrityError, ie:
-                       error_message = _('You can\'t use the same UID for two devices.')
+                       error_message = _('You can\'t use the same Device ID for two devices.')
             else:
                 privacy_form = PrivacyForm({
                     'public': subscriptionmeta.public

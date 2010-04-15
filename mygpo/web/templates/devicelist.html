@@ -16,7 +16,7 @@
     <tr>
      <th>{% trans "Name" %}</th>
      <th>{% trans "Type" %}</th>
-     <th>{% trans "UID" %}</th>
+     <th>{% trans "Device ID" %}</th>
     </tr>
     {% for d in devices %}
     {% ifchanged d.sync_group %}
@@ -27,7 +27,7 @@
        <tr>
         <th>{% trans "Name" %}</th>
         <th>{% trans "Type" %}</th>
-        <th>{% trans "UID" %}</th>
+        <th>{% trans "Device ID" %}</th>
        </tr>
       {% endif %}
      {% endifchanged %}

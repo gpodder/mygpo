@@ -75,7 +75,7 @@ def show(request, device_id, error_message=None):
                 success = True
             except IntegrityError, ie:
                 device = Device.objects.get(pk=device_id)
-                error_message = _('You can\'t use the same UID for two devices.')
+                error_message = _('You can\'t use the same Device ID for two devices.')
 
     else:
         device_form = DeviceForm({
