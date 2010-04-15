@@ -13,14 +13,29 @@ def get_podcast_languages():
     of these codes is contained in ISO 639.
     """
 
-    r = '^[a-zA-Z]{2}[-_]?.*$'
-
     langs = [x['language'] for x in Podcast.objects.values('language').distinct()]
-    sane_lang = list(set([l[:2] for l in langs if l and re.match(r, l)]))
+    sane_lang = sanitize_language_codes(langs)
 
     sane_lang.sort()
 
     return sane_lang
+
+
+def sanitize_language_codes(langs):
+    """
+    expects a list of language codes and returns a unique lost of the first
+    part of all items. obviously invalid entries are skipped
+
+    >>> sanitize_language_codes(['de-at', 'de-ch'])
+    ['de']
+
+    >>> sanitize_language_codes(['de-at', 'en', 'en-gb', '(asdf', 'Deutsch'])
+    ['de', 'en]
+    """
+
+    r = '^[a-zA-Z]{2}[-_]?.*$'
+    return list(set([l[:2] for l in langs if l and re.match(r, l)]))
+
 
 def get_language_names(lang):
     """

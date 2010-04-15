@@ -408,7 +408,7 @@ def process_lang_params(request, url):
     if not 'lang' in request.GET:
         lang = utils.get_accepted_lang(request)
 
-    return lang
+    return utils.sanitize_language_codes(lang)
 
 def toplist_opml(request, count):
     entries = ToplistEntry.objects.all().order_by('-subscriptions')[:count]
