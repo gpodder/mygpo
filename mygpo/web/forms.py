@@ -36,9 +36,9 @@ class DeviceForm(forms.Form):
     """
     form for editing device information by a user.
     """
-    name = forms.CharField(max_length=100, label=_('Name of this device'))
-    type = forms.ChoiceField(choices=DEVICE_TYPES, label=_('What kind of device is this?'))
-    uid = forms.CharField(max_length=50, label=_('What UID is configured on the physical device?'))
+    name = forms.CharField(max_length=100, label=_('Name'))
+    type = forms.ChoiceField(choices=DEVICE_TYPES, label=_('Type'))
+    uid = forms.CharField(max_length=50, label=_('Device ID'))
 
 class PrivacyForm(forms.Form):
     """

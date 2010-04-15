@@ -82,8 +82,15 @@
 
   <form action="" method="POST">
    {% csrf_token %}
-   {{ device_form.as_p }}
-   <input type="submit" value="Save" />
+   <table class="form">
+    {{ device_form.as_table }}
+    <tr>
+     <td></td>
+     <td>
+      <input type="submit" value="Save" />
+     </td>
+    </tr>
+   </table>
   </form>
 
   <h2>{% trans "Delete" %}</h2>
