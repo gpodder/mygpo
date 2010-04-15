@@ -31,17 +31,23 @@ def apply_sanitizing_rules(url, rules, podcast=True, episode=False):
     if episode: rules = [r for r in rules if r.use_episode==True]
 
     for r in rules:
+        orig = url
+
         if r.search_precompiled:
-            url = r.rearch_precompiled.sub(r.replace, url)
+            url = r.search_precompiled.sub(r.replace, url)
         else:
             # Roundtrip: utf8 (ignore rest) -> unicode -> ascii (ignore invalid)
             url = url.decode('utf-8', 'ignore')
             url = re.sub(r.search, r.replace, url)
 
+        if orig != url:
+            c = getattr(r, 'hits', 0)
+            r.hits = c+1
+
     return url
 
 
-def maintenance():
+def maintenance(dry_run=False):
     """
     This currently checks how many podcasts could be removed by 
     applying both basic sanitizing rules and those from the database.
@@ -52,6 +58,8 @@ def maintenance():
     print ' * %s podcasts' % Podcast.objects.count()
     print ' * %s episodes' % Episode.objects.count()
     print ' * %s rules' % URLSanitizingRule.objects.count()
+    if dry_run:
+        print ' * dry run - nothing will be written to the database'
     print
 
     print 'precompiling regular expressions'
@@ -76,7 +84,7 @@ def maintenance():
     sanitized_urls = []
     for p in podcasts:
         count += 1
-        if (count % 100) == 0: print '%s %% (podcast id %s)' % (((count + 0.0)/total*100), p.id)
+        if (count % 100) == 0: print '% 3.2f%% (podcast id %s)' % (((count + 0.0)/total*100), p.id)
         try:
             su = sanitize_url(p.url, rules=rules)
         except Exception, e:
@@ -92,8 +100,10 @@ def maintenance():
         # invalid podcast, remove
         if su == '':
             try:
-                delete_podcast(p)
+                if not dry_run:
+                    delete_podcast(p)
                 p_deleted += 1
+
             except Exception, e:
                 log('failed to delete podcast %s: %s' % (p.id, e))
                 p_error += 1
@@ -105,9 +115,11 @@ def maintenance():
 
         except Podcast.DoesNotExist, e:
             # "target" podcast does not exist, we simply change the url
-            log('updating podcast %s - "%s" => "%s"' % (p.id, p.url, su))
-            p.url = su
-            p.save()
+            if not dry_run:
+                log('updating podcast %s - "%s" => "%s"' % (p.id, p.url, su))
+                p.url = su
+                p.save()
+
             p_updated += 1
             continue
 
@@ -118,10 +130,12 @@ def maintenance():
 
         # last option - merge podcasts
         try:
-            rewrite_podcasts(p, su_podcast)
-            tmp = Subscription.objects.filter(podcast=p)
-            if tmp.count() > 0: print tmp.count()
-            p.delete()
+            if not dry_run:
+                rewrite_podcasts(p, su_podcast)
+                tmp = Subscription.objects.filter(podcast=p)
+                if tmp.count() > 0: print tmp.count()
+                p.delete()
+
             p_merged += 1
 
         except Exception, e:
@@ -135,13 +149,16 @@ def maintenance():
     print ' * %s updated' % p_updated
     print ' * %s deleted' % p_deleted
     print ' * %s error' % p_error
+    print 'Hits'
+    for r in rules:
+        print ' * %s => %s: %s' % (r.search, r.replace, getattr(r, 'hits', 0))
 
     count = 0
     total = Episode.objects.count()
     episodes = Episode.objects.only('id', 'url').iterator()
     for e in episodes:
         count += 1
-        if (count % 100) == 0: print '%s %% (episode id %s)' % (((count + 0.0)/total*100), e.id)
+        if (count % 100) == 0: print '% 3.2f%% (episode id %s)' % (((count + 0.0)/total*100), e.id)
         try:
             su = sanitize_url(e.url, rules=rules, podcast=False, episode=True)
         except Exception, ex:
@@ -157,7 +174,9 @@ def maintenance():
         # invalid episode, remove
         if su == '':
             try:
-                delete_episode(e)
+                if not dry_run:
+                    delete_episode(e)
+
                 e_deleted += 1
             except Exception, ex:
                 log('failed to delete episode %s: %s' % (e.id, ex))
@@ -170,9 +189,11 @@ def maintenance():
 
         except Episode.DoesNotExist, ex:
             # "target" episode does not exist, we simply change the url
-            log('updating episode %s - "%s" => "%s"' % (e.id, e.url, su))
-            e.url = su
-            e.save()
+            if not dry_run:
+                log('updating episode %s - "%s" => "%s"' % (e.id, e.url, su))
+                e.url = su
+                e.save()
+
             e_updated += 1
             continue
 
@@ -184,8 +205,10 @@ def maintenance():
 
         # last option - merge episodes
         try:
-            rewrite_episode_actions(e, su_episode)
-            e.delete()
+            if not dry_run:
+                rewrite_episode_actions(e, su_episode)
+                e.delete()
+
             e_merged += 1
 
         except Exception, ex:
@@ -200,6 +223,18 @@ def maintenance():
     print ' * %s updated' % e_updated
     print ' * %s deleted' % e_deleted
     print ' * %s error' % e_error
+    print
+    print 'finished %s podcasts' % count
+    print ' * %s unchanged' % p_unchanged
+    print ' * %s merged' % p_merged
+    print ' * %s updated' % p_updated
+    print ' * %s deleted' % p_deleted
+    print ' * %s error' % p_error
+    print
+    print 'Hits'
+    for r in rules:
+        print ' * %s => %s: %s' % (r.search, r.replace, getattr(r, 'hits', 0))
+
 
 
 def delete_podcast(p):
