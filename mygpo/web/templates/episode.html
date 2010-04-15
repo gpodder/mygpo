@@ -20,7 +20,7 @@
 
 {% block content %}
   {% if episode.podcast.logo_url %}
-  <div id="podcastlogo">{{ episode.podcast|podcast_logo_big }}</div>
+   <div id="podcastlogo"><a href="/podcast/{{ episode.podcast.id }}">{{ episode.podcast|podcast_logo_big }}</a></div>
   {% endif %}
   <h1>{{ episode.title|default:"Unnamed Episode"|striptags }}</h1>
   <small class="description">
