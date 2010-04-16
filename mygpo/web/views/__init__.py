@@ -354,7 +354,12 @@ def toplist(request, num=100, lang=None):
 
     else:
         regex = '^(' + '|'.join(lang) + ')'
-        entries = ToplistEntry.objects.filter(podcast__language__regex=regex).order_by('-subscriptions')[:num]
+        podcast_entries = ToplistEntry.objects.filter(podcast__language__regex=regex).order_by('-subscriptions')[:num]
+        group_entries = ToplistEntry.objects.filter(podcast_group__podcast__language__regex=regex).order_by('-subscriptions').distinct()[:num]
+        entries = list(podcast_entries)
+        entries.extend(group_entries)
+        entries.sort(key=lambda x: x.subscriptions, reverse=True)
+        entries = entries[:100]
 
     max_subscribers = max([e.subscriptions for e in entries]) if entries else 0
     current_site = Site.objects.get_current()

@@ -45,8 +45,25 @@
       {% endif %}
      {% endif %}
     </td>
-    <td>{{ entry.podcast|podcast_logo }}</td>
-    <td><a href="/podcast/{{ entry.podcast.id }}">{{ entry.podcast|striptags }}</a></td>
+    <td>
+     {% if entry.podcast %}
+      {{ entry.podcast|podcast_logo }}
+     {% else %}
+      {{ entry.podcast_group.podcasts|first|podcast_logo }}
+     {% endif %}
+    </td>
+    <td>
+     {% if entry.podcast %}
+      <a href="/podcast/{{ entry.podcast.id }}">{{ entry.podcast|striptags }}</a>
+     {% else %}
+      {{entry.podcast_group.title|striptags}}
+      (
+       {% for p in entry.podcast_group.podcasts %}
+        <a href="/podcast/{{ p.id }}">{{ p.group_member_name|striptags }}</a>
+       {% endfor %}
+      )
+     {% endif %}
+    </td>
     <td>{{ entry.subscriptions|vertical_bar:max_subscribers }}</td>
    </tr>
   {% endfor %}

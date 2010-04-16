@@ -46,6 +46,8 @@ class Podcast(models.Model):
     logo_url = models.CharField(max_length=1000,null=True,blank=True)
     author = models.CharField(max_length=100, null=True, blank=True)
     language = models.CharField(max_length=10, null=True, blank=True)
+    group = models.ForeignKey('PodcastGroup', null=True)
+    group_member_name = models.CharField(max_length=20, default=None, null=True, blank=False)
 
     def subscriptions(self):
         return Subscription.objects.filter(podcast=self)
@@ -83,6 +85,40 @@ class Podcast(models.Model):
         return targets
 
 
+    def group_with(self, other, grouptitle, myname, othername):
+        if self.group == other.group and self.group != None:
+            return
+
+        if self.group != None:
+            if other.group == None:
+                self.group.add(other)
+
+            else:
+                raise ValueError('the podcasts are already in different groups')
+        else:
+            if other.group == None:
+                g = PodcastGroup.objects.create(title=grouptitle)
+                g.add(self, myname)
+                g.add(other, othername)
+
+            else:
+                oter.group.add(self)
+
+    def ungroup(self):
+        if self.group == None:
+            raise ValueError('the podcast currently isn\'t in any group')
+
+        g = self.group
+        self.group = None
+        self.save()
+
+        podcasts = Podcast.objects.filter(group=g)
+        if podcasts.count() == 1:
+            p = podcasts[0]
+            p.group = None
+            p.save()
+
+
     def __unicode__(self):
         return self.title if self.title != '' else self.url
 
@@ -90,8 +126,33 @@ class Podcast(models.Model):
         db_table = 'podcast'
 
 
+class PodcastGroup(models.Model):
+    title = models.CharField(max_length=100, blank=False)
+
+    def add(self, podcast, membername):
+        if podcast.group == self:
+            podcast.group_member_name = membername
+
+        elif podcast.group != None:
+            podcast.ungroup()
+
+        podcast.group = self
+        podcast.group_member_name = membername
+        podcast.save()
+
+    def podcasts(self):
+        return Podcast.objects.filter(group=self)
+
+    def __unicode__(self):
+        return self.title
+
+    class Meta:
+        db_table = 'podcast_groups'
+
+
 class ToplistEntry(models.Model):
-    podcast = models.ForeignKey(Podcast)
+    podcast = models.ForeignKey(Podcast, null=True)
+    podcast_group = models.ForeignKey(PodcastGroup, null=True)
     oldplace = models.IntegerField(db_column='old_place')
     subscriptions = models.IntegerField(db_column='subscription_count')
 
