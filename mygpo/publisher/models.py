@@ -7,4 +7,5 @@ class PodcastPublisher(models.Model):
     podcast = models.ForeignKey(Podcast)
 
     class Meta:
+        unique_together = ('user', 'podcast')
         db_table = 'publisher'
