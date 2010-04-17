@@ -27,7 +27,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from mygpo.settings import *
 
 # All allowed procedure names should be listed here
-VALID_PROCEDURES = ('update_suggestion', 'update_toplist')
+VALID_PROCEDURES = ('update_suggestion', )
 
 if len(sys.argv) != 2 or sys.argv[-1] not in VALID_PROCEDURES:
     print >>sys.stderr, """
