@@ -1,4 +1,5 @@
 from mygpo.api.models import URLSanitizingRule, Podcast, ToplistEntry, SuggestionEntry, SubscriptionAction, SubscriptionMeta, Subscription, Episode, EpisodeAction
+from mygpo.api.models.episodes import Chapter
 from mygpo.data.models import BackendSubscription, Listener, HistoricPodcastData
 from mygpo.log import log
 import urlparse
