@@ -19,6 +19,7 @@ from datetime import timedelta, date
 from mygpo.utils import daterange
 from mygpo.api.models import Episode, EpisodeAction
 from mygpo.data.models import HistoricPodcastData
+from mygpo.publisher.models import PodcastPublisher
 
 def listener_data(podcast):
     d = date(2010, 1, 1)
