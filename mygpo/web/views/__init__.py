@@ -169,6 +169,7 @@ def podcast(request, pid):
     podcast = get_object_or_404(Podcast, pk=pid)
     episodes = episode_list(podcast, request.user)
     max_listeners = max([x.listeners for x in episodes]) if len(episodes) else 0
+    related_podcasts = [x for x in podcast.group.podcasts() if x != podcast] if podcast.group else []
 
     if request.user.is_authenticated():        
         devices = Device.objects.filter(user=request.user)
@@ -208,6 +209,7 @@ def podcast(request, pid):
             'podcast': podcast,
             'privacy_form': privacy_form,
             'devices': subscribed_devices,
+            'related_podcasts': related_podcasts,
             'can_subscribe': len(subscribe_targets) > 0,
             'episodes': episodes,
             'max_listeners': max_listeners,
@@ -217,6 +219,7 @@ def podcast(request, pid):
         current_site = Site.objects.get_current()
         return render_to_response('podcast.html', {
             'podcast': podcast,
+            'related_podcasts': related_podcasts,
             'url': current_site,
             'episodes': episodes,
             'max_listeners': max_listeners,

@@ -26,6 +26,15 @@
   </small>
   <hr style="clear: none;"/>
 
+  {% if related_podcasts %}
+   <div class="related-podcasts">
+    <strong>{% trans "Also available" %}</strong>
+    {% for p in related_podcasts %}
+     <a href="/podcast/{{ p.id }}">{{ p.group_member_name|striptags }}</a>
+    {% endfor %}
+   </div>
+  {% endif %}
+
   {% if podcast.description %}
    <p class="description">{{ podcast.description|striptags }}</p>
   {% endif %}

@@ -562,3 +562,7 @@ address
     font-weight: bold;
 }
 
+div.related-podcasts
+{
+    float: right;
+}
