@@ -23,6 +23,7 @@ class BackendSubscription(models.Model):
     subscribed_since = models.DateTimeField()
 
     class Meta:
+        unique_together = ('device', 'podcast', 'user')
         db_table = 'subscriptions'
 
 
