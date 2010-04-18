@@ -27,6 +27,7 @@ from mygpo.api.httpresponse import HttpErrorResponse
 import re
 from mygpo.log import log
 from haystack.query import SearchQuerySet
+from django.views.decorators.csrf import csrf_exempt
 
 try:
     import json
@@ -38,6 +39,7 @@ try:
 except ImportError:
     import json
 
+@csrf_exempt
 @require_valid_user
 def subscriptions(request, username, device_uid, format):
     

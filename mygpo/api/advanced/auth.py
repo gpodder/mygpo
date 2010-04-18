@@ -27,8 +27,10 @@ from django.utils.translation import ugettext as _
 from datetime import datetime, timedelta
 from mygpo.log import log
 import random
+from django.views.decorators.csrf import csrf_exempt
 
 
+@csrf_exempt
 @require_valid_user
 def login(request, username, device_uid):
     """
@@ -49,6 +51,7 @@ def login(request, username, device_uid):
     return JsonResponse(r)
 
 
+@csrf_exempt
 def logout(request, username, device_uid):
     """
     logs out the user. does nothing if he wasn't logged in
@@ -58,6 +61,7 @@ def logout(request, username, device_uid):
     return HttpResponse()
 
 
+@csrf_exempt
 def validate(request, username, device_uid):
     """
     checks if the client has been authenticated for the given useru

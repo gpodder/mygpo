@@ -28,6 +28,7 @@ from datetime import datetime, timedelta
 from mygpo.log import log
 from mygpo.utils import parse_time
 import dateutil.parser
+from django.views.decorators.csrf import csrf_exempt
 
 try:
     #try to import the JSON module (if we are on Python 2.6)
@@ -43,6 +44,7 @@ except ImportError:
     import simplejson as json
 
 
+@csrf_exempt
 @require_valid_user
 def chapters(request, username):
     print request.raw_post_data

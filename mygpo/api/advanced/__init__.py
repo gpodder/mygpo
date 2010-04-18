@@ -27,6 +27,7 @@ import dateutil.parser
 from mygpo.log import log
 from django.db import IntegrityError
 import re
+from django.views.decorators.csrf import csrf_exempt
 
 try:
     #try to import the JSON module (if we are on Python 2.6)
@@ -42,6 +43,7 @@ except ImportError:
     import simplejson as json
 
 
+@csrf_exempt
 @require_valid_user
 def subscriptions(request, username, device_uid):
 
@@ -148,6 +150,7 @@ def get_subscription_changes(user, device, since, until):
     return {'add': add, 'remove': remove, 'timestamp': until_}
 
 
+@csrf_exempt
 @require_valid_user
 def episodes(request, username):
 
@@ -268,6 +271,7 @@ def update_episodes(user, actions):
     return update_urls
 
 
+@csrf_exempt
 @require_valid_user
 def device(request, username, device_uid):
     if request.user.username != username:
@@ -332,6 +336,7 @@ def parseTimeDelta(s):
     return timedelta(**dict(( (key, int(value))
                               for key, value in d.items() )))
 
+@csrf_exempt
 @require_valid_user
 def devices(request, username):
 

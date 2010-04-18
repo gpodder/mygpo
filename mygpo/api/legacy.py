@@ -24,10 +24,12 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.db import IntegrityError
 from mygpo.log import log
 from mygpo.api.sanitizing import sanitize_url
+from django.views.decorators.csrf import csrf_exempt
 
 LEGACY_DEVICE_NAME = 'Legacy Device'
 LEGACY_DEVICE_UID  = 'legacy'
 
+@csrf_exempt
 def upload(request):
     try:
         emailaddr = request.POST['username']
@@ -90,6 +92,7 @@ def upload(request):
 
     return HttpResponse('@SUCCESS', mimetype='text/plain')
 
+@csrf_exempt
 def getlist(request):
     emailaddr = request.GET.get('username', None)
     password = request.GET.get('password', None)
