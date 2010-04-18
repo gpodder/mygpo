@@ -37,8 +37,6 @@ def apply_sanitizing_rules(url, rules, podcast=True, episode=False):
         if r.search_precompiled:
             url = r.search_precompiled.sub(r.replace, url)
         else:
-            # Roundtrip: utf8 (ignore rest) -> unicode -> ascii (ignore invalid)
-            url = url.decode('utf-8', 'ignore')
             url = re.sub(r.search, r.replace, url)
 
         if orig != url:
