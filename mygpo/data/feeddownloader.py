@@ -168,15 +168,15 @@ def update_podcasts(fetch_queue):
                 image_sha1 = hashlib.sha1()
                 image_sha1.update(cover_art)
                 image_sha1 = image_sha1.hexdigest()
-                filename = os.path.join('htdocs', 'media', 'logo', image_sha1)
+                filename = os.path.join('..', 'htdocs', 'media', 'logo', image_sha1)
                 try:
                     fp = open(filename, 'w')
                     fp.write(urllib2.urlopen(cover_art).read())
                     fp.close()
                     print >>sys.stderr, 'LOGO @', cover_art
                     podcast.logo_url = cover_art
-                except:
-                    print >>sys.stderr, 'cannot save image'
+                except Exception, e:
+                    print >>sys.stderr, 'cannot save image: %s' % e
 
             existing_episodes = list(models.Episode.objects.filter(podcast=podcast))
 
