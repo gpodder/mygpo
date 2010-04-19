@@ -422,7 +422,7 @@ def toplist_opml(request, count):
     entries = ToplistEntry.objects.all().order_by('-subscriptions')[:count]
     exporter = Exporter(_('my.gpodder.org - Top %s') % count)
 
-    opml = exporter.generate([e.podcast for e in entries])
+    opml = exporter.generate([e.get_podcast() for e in entries])
 
     return HttpResponse(opml, mimetype='text/xml')
 

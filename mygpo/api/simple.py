@@ -175,18 +175,18 @@ def get_toplist(count):
 
 def format_toplist(toplist, count, format): 
     if format == 'txt':
-        urls = [t.podcast.url for t in toplist]
+        urls = [p.get_podcast().url for p in toplist]
         s = '\n'.join(urls)
         s += '\n'
         return HttpResponse(s, mimetype='text/plain')
 
     elif format == 'opml':
         exporter = Exporter('my.gpodder.org - Top %s' % count)
-        opml = exporter.generate([t.podcast for t in toplist])
+        opml = exporter.generate([t.get_podcast() for t in toplist])
         return HttpResponse(opml, mimetype='text/xml')
 
     elif format == 'json':
-        json = [{'url':t.podcast.url, 'title':t.podcast.title, 'description':t.podcast.description, 'subscribers':t.subscriptions, 'subscribers_last_week':t.oldplace} for t in toplist]
+        json = [{'url':t.get_podcast().url, 'title':t.get_podcast().title,'description':t.get_podcast().description, 'subscribers':t.subscriptions, 'subscribers_last_week':t.oldplace} for t in toplist]
         return JsonResponse(json)
         
     else: 
