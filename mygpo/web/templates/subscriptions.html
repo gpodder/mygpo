@@ -52,7 +52,7 @@
  <div class="info">
   <strong>{% trans "Subscribe to new Podcasts!" %}</strong>
   {% blocktrans %}Browse the <a href="/toplist/">toplist</a> and your <a href="/suggestions/">personal suggestions</a>, <a href="/search/">search</a> or simply copy and paste the podcast's URL here{% endblocktrans %}
-  <form method="get" action="subscribe">
+  <form method="get" action="/subscribe">
    <input class="url" name="url" type="text" />
    <input type="submit" value="{% trans "Subscribe" %}" />
   </form>
