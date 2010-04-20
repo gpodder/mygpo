@@ -21,6 +21,7 @@ from mygpo.api.models import Device, SubscriptionAction, Podcast, SUBSCRIBE_ACTI
 from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url
+from mygpo.api.backend import get_toplist
 from django.core import serializers
 from datetime import datetime
 from mygpo.api.httpresponse import HttpErrorResponse
@@ -167,10 +168,6 @@ def toplist(request, count, format):
         return format_toplist(get_toplist(count), count, format)
     else:
         return HttpResponseBadRequest('Invalid request')
-
-
-def get_toplist(count):        
-    return ToplistEntry.objects.all().order_by('-subscriptions')[:int(count)]
 
 
 def format_toplist(toplist, count, format): 

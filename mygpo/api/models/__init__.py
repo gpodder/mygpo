@@ -156,6 +156,12 @@ class ToplistEntry(models.Model):
     oldplace = models.IntegerField(db_column='old_place')
     subscriptions = models.IntegerField(db_column='subscription_count')
 
+    def get_item(self):
+        if self.podcast:
+            return self.podcast
+        else:
+            return self.podcast_group
+
     def get_podcast(self):
         """
         Returns a podcast which is representative for this toplist-entry

@@ -62,7 +62,7 @@ urlpatterns = patterns('',
 
     (r'^toplist/$', 'mygpo.web.views.toplist'),
     (r'^toplist/episodes$', 'mygpo.web.views.episode_toplist'),
-    (r'^toplist.opml$', 'mygpo.web.views.toplist_opml', {'count': 50}),
+    (r'^toplist.opml$', 'mygpo.api.simple.toplist', {'count': 50, 'format': 'opml'}),
 
     (r'^suggestions/$', 'mygpo.web.views.suggestions'),
 

@@ -44,6 +44,7 @@ from mygpo.utils import daterange
 from mygpo.constants import PODCAST_LOGO_SIZE, PODCAST_LOGO_BIG_SIZE
 from mygpo.web import utils
 from mygpo.api import simple
+from mygpo.api import backend
 import re
 import os
 import Image
@@ -356,13 +357,7 @@ def toplist(request, num=100, lang=None):
         entries = ToplistEntry.objects.order_by('-subscriptions')[:num]
 
     else:
-        regex = '^(' + '|'.join(lang) + ')'
-        podcast_entries = ToplistEntry.objects.filter(podcast__language__regex=regex).order_by('-subscriptions')[:num]
-        group_entries = ToplistEntry.objects.filter(podcast_group__podcast__language__regex=regex).order_by('-subscriptions').distinct()[:num]
-        entries = list(podcast_entries)
-        entries.extend(group_entries)
-        entries.sort(key=lambda x: x.subscriptions, reverse=True)
-        entries = entries[:100]
+        entries = backend.get_toplist(num, lang)
 
     max_subscribers = max([e.subscriptions for e in entries]) if entries else 0
     current_site = Site.objects.get_current()
@@ -417,14 +412,6 @@ def process_lang_params(request, url):
         lang = utils.get_accepted_lang(request)
 
     return utils.sanitize_language_codes(lang)
-
-def toplist_opml(request, count):
-    entries = ToplistEntry.objects.all().order_by('-subscriptions')[:count]
-    exporter = Exporter(_('my.gpodder.org - Top %s') % count)
-
-    opml = exporter.generate([e.get_podcast() for e in entries])
-
-    return HttpResponse(opml, mimetype='text/xml')
 
 
 @login_required

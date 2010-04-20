@@ -35,14 +35,12 @@
    <tr>
     <td class="numeric">{{ forloop.counter }}</td>
     <td class="oldposition">
-     {% if languages|length_is:"0" %}
-      {% if entry.oldplace %}
-       {% if entry.oldplace|subtract:forloop.counter %}
-        {{ entry.oldplace|subtract:forloop.counter|format_diff }}
-       {% endif %}
-       {% else %}
-       <img src="/media/charts-new.png" alt="new">
+     {% if entry.oldplace %}
+      {% if entry.oldplace|subtract:forloop.counter %}
+       {{ entry.oldplace|subtract:forloop.counter|format_diff }}
       {% endif %}
+     {% else %}
+      <img src="/media/charts-new.png" alt="new">
      {% endif %}
     </td>
     <td>
