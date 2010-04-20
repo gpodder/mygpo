@@ -18,6 +18,7 @@
       <a href="/login/">{% trans "Login here" %}</a>
   </p>
   <form action="/register/" method="POST">
+  {% csrf_token %}
   <table class="register">
    {{ form.as_table }}
    <tr><th></th><td><input type="submit" value="Register" /></td></tr>

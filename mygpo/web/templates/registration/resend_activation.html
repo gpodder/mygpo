@@ -5,6 +5,7 @@
 
 {% block content %}
    <form action="/register/resend-activation" method="POST">
+       {% csrf_token %}
        <table style="width: 400px; margin-left: auto; margin-right: auto;">
            <tr>
                <td colspan="2" style="text-align: center;">
