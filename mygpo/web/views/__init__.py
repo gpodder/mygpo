@@ -476,6 +476,8 @@ def resend_activation(request):
             profile = RegistrationProfile.objects.create_profile(user)
 
         if profile.activation_key == RegistrationProfile.ACTIVATED:
+            user.is_active = True
+            user.save()
             raise ValueError(_('Your account already has been activated. Go ahead and log in.'))
 
         elif profile.activation_key_expired():
