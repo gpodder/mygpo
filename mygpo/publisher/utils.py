@@ -24,7 +24,7 @@ from mygpo.publisher.models import PodcastPublisher
 def listener_data(podcast):
     d = date(2010, 1, 1)
     day = timedelta(1)
-    episodes = EpisodeAction.objects.filter(episode__podcast=podcast, timestamp__gte=d).order_by('timestamp').values('timestamp')
+    episodes = EpisodeAction.objects.filter(episode__podcast=podcast, timestamp__gte=d, action='play').order_by('timestamp').values('timestamp')
     if len(episodes) == 0:
         return []
 
@@ -33,7 +33,7 @@ def listener_data(podcast):
     days = []
     for d in daterange(start):
         next = d + timedelta(days=1)
-        listeners = EpisodeAction.objects.filter(episode__podcast=podcast, timestamp__gte=d, timestamp__lt=next).values('user_id').distinct().count()
+        listeners = EpisodeAction.objects.filter(episode__podcast=podcast, timestamp__gte=d, timestamp__lt=next, action='play').values('user_id').distinct().count()
         e = Episode.objects.filter(podcast=podcast, timestamp__gte=d, timestamp__lt=next)
         episode = e[0] if e.count() > 0 else None
         days.append({
