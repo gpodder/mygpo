@@ -15,7 +15,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from mygpo.api.basic_auth import require_valid_user
+from mygpo.api.basic_auth import require_valid_user, check_username
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, Http404, HttpResponseNotAllowed
 from mygpo.api.models import Device, Podcast, SubscriptionAction, Episode, EpisodeAction, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, EPISODE_ACTION_TYPES, DEVICE_TYPES, Subscription
 from mygpo.api.httpresponse import JsonResponse
@@ -45,10 +45,8 @@ except ImportError:
 
 @csrf_exempt
 @require_valid_user
+@check_username
 def subscriptions(request, username, device_uid):
-
-    if request.user.username != username:
-        return HttpResponseForbidden()
 
     now = datetime.now()
     now_ = int(mktime(now.timetuple()))
@@ -152,10 +150,8 @@ def get_subscription_changes(user, device, since, until):
 
 @csrf_exempt
 @require_valid_user
+@check_username
 def episodes(request, username):
-
-    if request.user.username != username:
-        return HttpResponseForbidden()
 
     now = datetime.now()
     now_ = int(mktime(now.timetuple()))
@@ -273,9 +269,8 @@ def update_episodes(user, actions):
 
 @csrf_exempt
 @require_valid_user
+@check_username
 def device(request, username, device_uid):
-    if request.user.username != username:
-        return HttpResponseForbidden()
 
     # Workaround for mygpoclient 1.0: It uses "PUT" requests
     # instead of "POST" requests for uploading device settings
@@ -338,10 +333,8 @@ def parseTimeDelta(s):
 
 @csrf_exempt
 @require_valid_user
+@check_username
 def devices(request, username):
-
-    if request.user.username != username:
-        return HttpResponseForbidden()
 
     if request.method == 'GET':
         devices = []

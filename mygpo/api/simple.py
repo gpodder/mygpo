@@ -15,7 +15,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from mygpo.api.basic_auth import require_valid_user
+from mygpo.api.basic_auth import require_valid_user, check_username
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, Http404
 from mygpo.api.models import Device, SubscriptionAction, Podcast, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, ToplistEntry, SuggestionEntry
 from mygpo.api.opml import Exporter, Importer
@@ -42,11 +42,9 @@ except ImportError:
 
 @csrf_exempt
 @require_valid_user
+@check_username
 def subscriptions(request, username, device_uid, format):
     
-    if request.user.username != username:
-        return HttpErrorResponse(401, 'Invalid user')
-
     if request.method == 'GET':
         return format_subscriptions(get_subscriptions(request.user, device_uid), format, username)
         

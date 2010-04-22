@@ -16,7 +16,7 @@
 #
 
 from django.contrib.auth.models import User
-from mygpo.api.basic_auth import require_valid_user
+from mygpo.api.basic_auth import require_valid_user, check_username
 from django.contrib import auth
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, Http404, HttpResponseNotAllowed
 from mygpo.api.httpresponse import JsonResponse
@@ -32,6 +32,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 @csrf_exempt
 @require_valid_user
+@check_username
 def login(request, username, device_uid):
     """
     authenticates the user with regular http basic auth
@@ -39,9 +40,6 @@ def login(request, username, device_uid):
     """
 
     d, created = Device.objects.get_or_create(user=request.user, uid=device_uid, defaults = {'type': 'other', 'name': _('New Device')})
-
-    if request.user.username != username:
-        return HttpResponseBadRequest('username in authentication and URL don\'t match')
 
     request.session['device'] = device_uid
     request.session.set_expiry(datetime.now()+timedelta(days=365))
@@ -52,6 +50,7 @@ def login(request, username, device_uid):
 
 
 @csrf_exempt
+@check_username
 def logout(request, username, device_uid):
     """
     logs out the user. does nothing if he wasn't logged in

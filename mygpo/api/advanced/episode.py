@@ -15,7 +15,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from mygpo.api.basic_auth import require_valid_user
+from mygpo.api.basic_auth import require_valid_user, check_username
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, Http404, HttpResponseNotAllowed
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.exceptions import ParameterMissing
@@ -46,6 +46,7 @@ except ImportError:
 
 @csrf_exempt
 @require_valid_user
+@check_username
 def chapters(request, username):
     print request.raw_post_data
 

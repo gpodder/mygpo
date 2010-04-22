@@ -120,6 +120,24 @@ def require_valid_user(protected_view):
                                  **kwargs)
     return wrapper
 
+
+def check_username(protected_view):
+    """
+    decorator to check whether the username passed to the view (from the URL)
+    matches the username with which the user is authenticated.
+    """
+    def wrapper(request, username, *args, **kwargs):
+
+        if request.user.username == username:
+            return protected_view(request, *args, username=username, **kwargs)
+
+        else:
+            log('username in authentication (%s) and in requested resource (%s) don\'t match' % (request.user.username, username))
+            return HttpResponseBadRequest('username in authentication (%s) and in requested resource (%s) don\'t match' % (request.user.username, username))
+
+    return wrapper
+
+
 #############################################################################
 #
 def has_perm_or_basicauth(perm, realm = ""):
