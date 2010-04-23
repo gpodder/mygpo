@@ -21,10 +21,11 @@ from mygpo.api.models import Device, Podcast, SubscriptionAction, Episode, Episo
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url
 from django.core import serializers
-from time import mktime
+from time import mktime, gmtime, strftime
 from datetime import datetime, timedelta
 import dateutil.parser
 from mygpo.log import log
+from mygpo.utils import parse_time
 from django.db import IntegrityError
 import re
 from django.views.decorators.csrf import csrf_exempt
@@ -151,8 +152,9 @@ def get_subscription_changes(user, device, since, until):
 @csrf_exempt
 @require_valid_user
 @check_username
-def episodes(request, username):
+def episodes(request, username, version=1):
 
+    version = int(version)
     now = datetime.now()
     now_ = int(mktime(now.timetuple()))
 
@@ -184,13 +186,13 @@ def episodes(request, username):
         except:
             raise Http404
 
-        return JsonResponse(get_episode_changes(request.user, podcast, device, since, now))
+        return JsonResponse(get_episode_changes(request.user, podcast, device, since, now, version))
 
     else:
         return HttpResponseNotAllowed(['POST', 'GET'])
 
 
-def get_episode_changes(user, podcast, device, since, until):
+def get_episode_changes(user, podcast, device, since, until, version):
     actions = []
     eactions = EpisodeAction.objects.filter(user=user, timestamp__lte=until)
 
@@ -212,7 +214,13 @@ def get_episode_changes(user, podcast, device, since, until):
         }
 
         if a.action == 'play' and a.playmark:
-            action['position'] = a.playmark
+            if version == 1:
+                t = gmtime(a.playmark)
+                action['position'] = strftime('%H:%M:%S', t)
+            else:
+                action['position'] = int(a.playmark)
+                action['started'] = int(a.started)
+                action['total'] = int(a.total)
 
         actions.append(action)
 
@@ -253,16 +261,29 @@ def update_episodes(user, actions):
         else:
             device, created = None, False
         timestamp = dateutil.parser.parse(e['timestamp']) if 'timestamp' in e else datetime.now()
-        position = parseTimeDelta(e['position']) if 'position' in e else None
-        playmark = position.seconds if position else None
 
-        if position and action != 'play':
-            return HttpResponseBadRequest('parameter position can only be used with action play')
+        time_values = {'position': None,
+                       'started': None,
+                       'total': None}
+
+        for p in time_values.iterkeys():
+            if not p in e: continue
+            try:
+                time_values[p] = parse_time(repr(e[p]))
+            except ValueError:
+                log('could not parse %s parameter %s for user %s' % (p, e[p], user))
+
+        if (time_values['position'] or time_values['started'] or time_values['total']) and action != 'play':
+            return HttpResponseBadRequest('parameters position, started and total can only be used with action play')
+
+        if (time_values['started'] or time_values['total']) and not time_values['position']:
+            return HttpResponseBadRequest('parameters started and total require paremter position')
 
         try:
-            EpisodeAction.objects.create(user=user, episode=episode, device=device, action=action, timestamp=timestamp, playmark=playmark)
+            EpisodeAction.objects.create(user=user, episode=episode, device=device, action=action, timestamp=timestamp,
+                    playmark=time_values['position'], started=time_values['started'], total=time_values['total'])
         except Exception, e:
-            log('error while adding episode action (user %s, episode %s, device %s, action %s, timestamp %s, playmark %s): %s' % (user, episode, device, action, timestamp, playmark, e))
+            log('error while adding episode action (user %s, episode %s, device %s, action %s, timestamp %s): %s' % (user, episode, device, action, timestamp, e))
 
     return update_urls
 
@@ -311,25 +332,6 @@ def valid_episodeaction(type):
             return True
     return False
 
-# http://kbyanc.blogspot.com/2007/08/python-reconstructing-timedeltas-from.html
-def parseTimeDelta(s):
-    """Create timedelta object representing time delta
-       expressed in a string
-   
-    Takes a string in the format produced by calling str() on
-    a python timedelta object and returns a timedelta instance
-    that would produce that string.
-   
-    Acceptable formats are: "X days, HH:MM:SS" or "HH:MM:SS".
-    """
-    if s is None:
-        return None
-    d = re.match(
-            r'((?P<days>\d+) days, )?(?P<hours>\d+):'
-            r'(?P<minutes>\d+):(?P<seconds>\d+)',
-            str(s)).groupdict(0)
-    return timedelta(**dict(( (key, int(value))
-                              for key, value in d.items() )))
 
 @csrf_exempt
 @require_valid_user

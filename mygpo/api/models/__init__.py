@@ -453,7 +453,9 @@ class EpisodeAction(models.Model):
     device = models.ForeignKey(Device,null=True)
     action = models.CharField(max_length=10, choices=EPISODE_ACTION_TYPES)
     timestamp = models.DateTimeField(default=datetime.now)
+    started = models.IntegerField(null=True, blank=True)
     playmark = models.IntegerField(null=True, blank=True)
+    total = models.IntegerField(null=True, blank=True)
 
     def __unicode__(self):
         return '%s %s %s' % (self.user, self.action, self.episode)

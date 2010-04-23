@@ -89,7 +89,7 @@ urlpatterns = patterns('',
 
     #Advanced API
     (r'^api/1/subscriptions/(?P<username>\w+)/(?P<device_uid>[\w.-]+)\.json', 'mygpo.api.advanced.subscriptions'),
-    (r'^api/1/episodes/(?P<username>\w+)\.json', 'mygpo.api.advanced.episodes'),
+    (r'^api/(?P<version>[12])/episodes/(?P<username>\w+)\.json', 'mygpo.api.advanced.episodes'),
     (r'^api/1/devices/(?P<username>\w+)/(?P<device_uid>[\w.-]+)\.json', 'mygpo.api.advanced.device'),
     (r'^api/1/devices/(?P<username>\w+)\.json', 'mygpo.api.advanced.devices'),
 
