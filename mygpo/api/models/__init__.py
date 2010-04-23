@@ -30,6 +30,7 @@ class UserProfile(models.Model):
 
     public_profile = models.BooleanField(default=True)
     generated_id = models.BooleanField(default=False)
+    deleted = models.BooleanField(default=False)
 
     def __unicode__(self):
         return '%s (%s, %s)' % (self.user.username, self.public_profile, self.generated_id)

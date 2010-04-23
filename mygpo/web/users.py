@@ -63,10 +63,19 @@ def login_user(request):
         }, context_instance=RequestContext(request))
 
     if not user.is_active:
-        return render_to_response('login.html', {
-            'error_message': _('Please activate your account first.'),
-            'activation_needed': True,
-        }, context_instance=RequestContext(request))
+
+        p, c = UserProfile.objects.get_or_create(user=user)
+
+        if p.deleted:
+            return render_to_response('login.html', {
+                'error_message': _('You have deleted your account, but you can register again')
+                }, context_instance=RequestContext(request))
+
+        else:
+            return render_to_response('login.html', {
+                'error_message': _('Please activate your account first.'),
+                'activation_needed': True,
+            }, context_instance=RequestContext(request))
 
     login(request, user)
     current_site = Site.objects.get_current()

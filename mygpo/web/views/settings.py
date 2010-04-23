@@ -84,6 +84,10 @@ def delete_account(request):
     if request.method == 'GET':
         return render_to_response('delete_account.html', context_instance=RequestContext(request))
 
+    profile = request.user.get_profile()
+    profile.deleted = True
+    profile.save()
+
     request.user.is_active = False
     request.user.save()
     logout(request)

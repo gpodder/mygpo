@@ -20,7 +20,7 @@ from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadReque
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.template import RequestContext
-from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, EpisodeToplistEntry, Subscription, SuggestionEntry, SyncGroup, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SubscriptionMeta
+from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, EpisodeToplistEntry, Subscription, SuggestionEntry, SyncGroup, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SubscriptionMeta, UserProfile
 from mygpo.data.models import Listener
 from mygpo.web.models import Rating
 from mygpo.web.forms import UserAccountForm, DeviceForm, SyncForm, PrivacyForm, ResendActivationForm
@@ -469,6 +469,10 @@ def resend_activation(request):
             user = get_user(form.cleaned_data['username'], form.cleaned_data['email'])
         except User.DoesNotExist:
             raise ValueError(_('User does not exist.'))
+
+        p, c = UserProfile.objects.get_or_create(user=user)
+        if p.deleted:
+            raise ValueError(_('You have deleted your account, but you can regster again.'))
 
         try:
             profile = RegistrationProfile.objects.get(user=user)
