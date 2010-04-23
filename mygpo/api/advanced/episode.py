@@ -48,6 +48,10 @@ except ImportError:
 @require_valid_user
 @check_username
 def chapters(request, username):
+
+    now = datetime.now()
+    now_ = int(mktime(now.timetuple()))
+
     if request.method == 'POST':
         req = json.loads(request.raw_post_data)
 
@@ -79,7 +83,10 @@ def chapters(request, username):
             except ParameterMissing, e:
                 return HttpResponseBadRequest(e)
 
-        return JsonResponse({'update_url': update_url})
+        return JsonResponse({
+            'update_url': update_url,
+            'timestamp': now_
+            })
 
     elif request.method == 'GET':
         if not 'podcast' in request.GET:
@@ -112,7 +119,10 @@ def chapters(request, username):
                 'device': c.device.uid
                 })
 
-        return JsonResponse(chapters)
+        return JsonResponse({
+            'chapters': chapters,
+            'timestamp': now_
+            })
 
     else:
         return HttpResponseNotAllowed(['GET', 'POST'])
