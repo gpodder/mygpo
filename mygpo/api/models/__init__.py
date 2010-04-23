@@ -51,13 +51,34 @@ class Podcast(models.Model):
     group_member_name = models.CharField(max_length=20, default=None, null=True, blank=False)
 
     def subscriptions(self):
-        return Subscription.objects.filter(podcast=self)
+        """
+        returns all public subscriptions to this podcast
+        """
+        subscriptions = Subscription.objects.filter(podcast=self)
+
+        # remove users with private profiles
+        subscriptions = subscriptions.exclude(user__userprofile__public_profile=False)
+
+        # remove inactive (eg deleted) users
+        subscriptions = subscriptions.exclude(user__is_active=False)
+
+        # remove uers that have marked their subscription to this podcast as private
+        private_users = SubscriptionMeta.objects.filter(podcast=self, public=False).values('user')
+        subscriptions = subscriptions.exclude(user__in=private_users)
+
+        return subscriptions
+
 
     def subscription_count(self):
         return self.subscriptions().count()
 
     def subscriber_count(self):
-        return self.subscriptions().values('user').distinct().count()
+        """
+        Returns the number of public subscriptions to this podcast
+        """
+        subscriptions = self.subscriptions()
+        return subscriptions.values('user').distinct().count()
+
 
     def listener_count(self):
         from mygpo.data.models import Listener
