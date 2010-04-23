@@ -48,8 +48,6 @@ except ImportError:
 @require_valid_user
 @check_username
 def chapters(request, username):
-    print request.raw_post_data
-
     if request.method == 'POST':
         req = json.loads(request.raw_post_data)
 
@@ -93,10 +91,18 @@ def chapters(request, username):
         podcast_url = request.GET['podcast']
         episode_url = request.GET['episode']
 
+        since_ = request.GET.get('since'], None)
+        since = datetime.fromtimestamp(float(since_)) if since_ else None
+
         podcast = Podcast.objects.get(url=sanitize_url(podcast_url))
         episode = Episode.objects.get(url=sanitize_url(episode_url, podcast=False, episode=True), podcast=podcast)
+        chapter_q = Chapter.objects.filter(user=request.user, episode=episode).order_by('start')
+
+        if since:
+            chapter_q = chapter_q.filter(timestamp__gt=since)
+
         chapters = []
-        for c in Chapter.objects.filter(user=request.user, episode=episode).order_by('start'):
+        for c in chapter_q:
             chapters.append({
                 'start': c.start,
                 'end':   c.end,
