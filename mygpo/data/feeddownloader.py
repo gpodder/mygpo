@@ -183,6 +183,7 @@ def update_podcasts(fetch_queue):
             for entry in feed.entries:
                 try:
                     url = get_episode_url(entry)
+                    url = sanitize_url(url, podcast=False, episode=True)
                     if url is None:
                         print 'Ignoring entry'
                         continue
