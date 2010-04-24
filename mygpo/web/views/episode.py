@@ -20,6 +20,7 @@ from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadReque
 from django.template import RequestContext
 from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, Subscription
 from mygpo.api.models.episodes import Chapter
+from mygpo.api.models.users import EpisodeFavorite
 from mygpo.utils import parse_time
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
@@ -37,9 +38,11 @@ def episode(request, id):
             subscription_meta = subscription_tmp[0].get_meta()
         else:
             subscription_meta = None
+        is_fav = EpisodeFavorite.objects.filter(user=request.user, episode=episode).exists()
     else:
         history = []
         subscription_meta = None
+        is_fav = False
 
     chapters = [c for c in Chapter.objects.filter(episode=episode).order_by('start') if c.is_public() or c.user == request.user]
 
@@ -48,6 +51,7 @@ def episode(request, id):
         'history': history,
         'chapters': chapters,
         'subscription_meta': subscription_meta,
+        'is_favorite': is_fav,
     }, context_instance=RequestContext(request))
 
 
@@ -78,4 +82,23 @@ def remove_chapter(request, id, chapter_id):
     Chapter.objects.filter(user=request.user, id=chapter_id).delete()
 
     return HttpResponseRedirect('/episode/%s' % id)
+
+
+@login_required
+def toggle_favorite(request, id):
+    episode = get_object_or_404(Episode, id=id)
+    fav, c = EpisodeFavorite.objects.get_or_create(user=request.user, episode=episode)
+    if not c:
+        fav.delete()
+
+    return HttpResponseRedirect('/episode/%s' % id)
+
+
+@login_required
+def list_favorites(request):
+    episodes = [x.episode for x in EpisodeFavorite.objects.filter(user=request.user).order_by('-created')]
+
+    return render_to_response('favorites.html', {
+        'episodes': episodes
+        }, context_instance=RequestContext(request))
 

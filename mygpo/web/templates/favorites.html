@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load podcasts %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/subscriptions/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/favorites/"|section_menu }}{% endblock %}
+
+{% block title %}{% trans "Favorite Episodes" %}{% endblock %}
+
+{% block content %}
+  <h1>{% trans "Favorite Episodes" %}</h1>
+
+  <table class="list episode_list">
+   <tr>
+    <th></th>
+    <th></th>
+   </tr>
+  {% for episode in episodes %}
+   <tr>
+    <td>{{ episode.podcast|podcast_logo }}</td>
+    <td><a href="/episode/{{ episode.id }}">
+     {% if episode.title %}
+      {{ episode.title|striptags }}
+     {% else %}
+      {% trans "Unnamed Episode" %}
+     {% endif %}
+     </a><br/>
+     <span class="from_podcast">{% trans "from" %} <a href="/podcast/{{ episode.podcast.id }}">{{ episode.podcast|striptags }}</a></td>
+   </tr>
+  {% endfor %}
+  </table>
+
+{% endblock %}
+

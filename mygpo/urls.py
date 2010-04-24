@@ -50,6 +50,9 @@ urlpatterns = patterns('',
     (r'^episode/(?P<id>\d+)$', 'mygpo.web.views.episode.episode'),
     (r'^episode/(?P<id>\d+)/add-chapter$', 'mygpo.web.views.episode.add_chapter'),
     (r'^episode/(?P<id>\d+)/remove-chapter/(?P<chapter_id>\d+)$', 'mygpo.web.views.episode.remove_chapter'),
+    (r'^episode/(?P<id>\d+)/toggle-favorite', 'mygpo.web.views.episode.toggle_favorite'),
+
+    (r'^favorites/', 'mygpo.web.views.episode.list_favorites'),
 
     (r'account/$', 'mygpo.web.views.settings.account'),
     (r'account/privacy$', 'mygpo.web.views.settings.privacy'),
