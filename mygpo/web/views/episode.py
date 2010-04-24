@@ -103,7 +103,7 @@ def list_favorites(request):
     episodes = [x.episode for x in EpisodeFavorite.objects.filter(user=request.user).order_by('-created')]
 
     token, c = SecurityToken.objects.get_or_create(user=request.user, object='fav-feed', action='r', \
-        defaults={'token': lambda: "".join(random.sample(string.letters+string.digits, 8))})
+        defaults={'token': "".join(random.sample(string.letters+string.digits, 8))})
 
     feed_url = 'http://%s/user/%s/favorites.xml' % (site.domain, request.user)
 
