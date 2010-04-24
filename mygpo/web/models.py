@@ -47,7 +47,11 @@ class SecurityToken(models.Model):
     def __unicode__(self):
         return '%s %s %s: %s' % (self.user, self.object, self.action, self.token[:5])
 
-    def random_token(self):
-        self.token = "".join(random.sample(string.letters+string.digits, 32))
+    def random_token(self, length=32):
+        self.token = "".join(random.sample(string.letters+string.digits, length))
 
+    def check(self, token):
+        if self.token == '':
+            return True
+        return self.token == token
 

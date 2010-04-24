@@ -107,7 +107,8 @@ INSTALLED_APPS = (
     'mygpo.api',
     'mygpo.web',
     'mygpo.publisher',
-    'mygpo.data'
+    'mygpo.data',
+    'mygpo.userfeeds',
 )
 
 ACCOUNT_ACTIVATION_DAYS = 7

@@ -21,12 +21,15 @@ from django.template import RequestContext
 from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, Subscription
 from mygpo.api.models.episodes import Chapter
 from mygpo.api.models.users import EpisodeFavorite
+from mygpo.web.models import SecurityToken
 from mygpo.utils import parse_time
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from datetime import datetime, date, timedelta
 from django.contrib.sites.models import Site
+import random
+import string
 
 def episode(request, id):
     episode = get_object_or_404(Episode, pk=id)
@@ -96,9 +99,33 @@ def toggle_favorite(request, id):
 
 @login_required
 def list_favorites(request):
+    site = Site.objects.get_current()
     episodes = [x.episode for x in EpisodeFavorite.objects.filter(user=request.user).order_by('-created')]
 
+    token, c = SecurityToken.objects.get_or_create(user=request.user, object='fav-feed', action='r', \
+        defaults={'token': lambda: "".join(random.sample(string.letters+string.digits, 8))})
+
+    feed_url = 'http://%s/user/%s/favorites.xml' % (site.domain, request.user)
+
+    try:
+        podcast = Podcast.objects.get(url=feed_url)
+    except Podcast.DoesNotExist:
+        podcast = None
+
+    if 'public_feed' in request.GET:
+        token.token = ''
+        token.save()
+
+    elif 'private_feed' in request.GET:
+        token.random_token(length=8)
+        token.save()
+
+
     return render_to_response('favorites.html', {
-        'episodes': episodes
+        'episodes': episodes,
+        'feed_token': token,
+        'site': site,
+        'feed_url': feed_url,
+        'podcast': podcast,
         }, context_instance=RequestContext(request))
 

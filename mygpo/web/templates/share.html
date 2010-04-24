@@ -8,7 +8,7 @@
 {% block title %}{% trans "Sharing" %}{% endblock %}
 
 {% block content %}
-  <h1>{% trans "Share your subscriptions" %}</h1>
+  <h1>{% trans "Share your Subscriptions" %}</h1>
 
   <p>{% trans "To let others know which podcasts you are listening to, you can point them to the following URL." %}</p>
   {% if token %}
@@ -24,5 +24,11 @@
 
   <hr>
 
+  <h3>{% trans "Share your Favorite Episodes" %}</h3>
+  <p>
+   {% blocktrans %}You can share episodes that you have marked as favorites
+    with others. Go to the <a href="/favorites/">favorites</a> page and
+    find out how.{% endblocktrans %}
+  </p>
 {% endblock %}
 

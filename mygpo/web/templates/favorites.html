@@ -32,9 +32,50 @@
   {% endfor %}
   </table>
 
+  <h2>Favorites-Feed</h2>
+   <p>
+    {% blocktrans with user.username as username and site as sitename %}
+     You can access a feed containing your favorites episodes at
+     <strong><a href="/user/{{ username }}/favorites.xml">{{ feed_url }}</a></strong>.
+    {% endblocktrans %}
+   </p>
+   <div>
+    <a href="/subscribe?url={{ feed_url }}">
+     <img src="/media/subscribe.png" style="vertical-align: middle;" /> {% trans "Subscribe" %}
+    </a>
+   </div>
+
+   <h3>Access to your Favorites</h3>
+   {% if feed_token.token %}
+    <p>
+     {% blocktrans with user.username as username and feed_token.token as token %}
+      To keep your favorites private (from others and from the public pages of {{ site }}),
+      you need to use HTTP-Authentication in your client. Use username
+      <strong>{{ username }}</strong> and password <strong>{{ token }}</strong>.
+     {% endblocktrans %}
+    </p>
+    <ul>
+     <li><a href="/favorites/?private_feed">{% trans "create a new password" %}</a></li>
+     <li><a href="/favorites/?public_feed">{% trans "don't require a password" %}</a>
+      and make my favorites visible on {{ site }}</li>
+    </ul>
+   {% else %}
+    <p>
+     {% blocktrans with site as sitename %}You've marked your favorites-feed as public and others can
+      subscribe to it. It will also be indexed by {{ sitename }}.{% endblocktrans %}
+    </p>
+    <ul>
+     {% if podcast %}
+      <li><a href="/podcast/{{ podcast.id }}">public information about your favorites-feed</a></li>
+     {% endif %}
+     <li><a href="/favorites/?private_feed">{% trans "require a password for this feed" %}</a></li>
+    </ul>
+   {% endif %}
   {% else %}
 
    <p>{% blocktrans %}You don't have any episodes marked as favorites yet. Maybe have a look at the <a href="/toplist/episodes">episode toplist</a>.{% endblocktrans %}</p>
+
+   <p>{% blocktrans %}Once you've selected your favorites, you can subscribe to your very own <em>Favorites-Feed</em> that contains your favorite episodes{% endblocktrans %}</p>
 
   {% endif %}
 

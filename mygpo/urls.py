@@ -60,6 +60,7 @@ urlpatterns = patterns('',
     (r'share/$', 'mygpo.web.views.settings.share'),
 
     (r'user/(?P<username>\w+)/subscriptions$', 'mygpo.web.views.user_subscriptions'),
+    (r'user/(?P<username>\w+)/favorites.xml$', 'mygpo.userfeeds.views.favorite_feed'),
 
     (r'^history/$', 'mygpo.web.views.history'),
 
