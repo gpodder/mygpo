@@ -4,7 +4,6 @@ INSERT INTO `sanitizing_rules` VALUES (2,1,1,'(?P<unchanged>feedburner\\.com.+)\
 INSERT INTO `sanitizing_rules` VALUES (3,1,1,'^\\s+','',0,'Remove leading whitespaces');
 INSERT INTO `sanitizing_rules` VALUES (4,1,1,'\\s+$','',0,'Remove trailing whitespaces');
 INSERT INTO `sanitizing_rules` VALUES (5,1,1,'^[^(https?):].+','',100,'Empty any string that doesn\'t start with either http or https');
-INSERT INTO `sanitizing_rules` VALUES (6,1,1,'^https?://([0-9a-zA-z-\.]+\.)?gpodder.org.*','',100,'As gpodder.org doesn\'t host Podcasts, all URLs starting with this domain are considered invalid');
 INSERT INTO `sanitizing_rules` VALUES (7,1,0,'(?P<unchanged>feedburner\\.com.+)\\/$','\\g<unchanged>',2,'Feedburner URLs sometimes have a trailing slash, which can be removed safely');
 INSERT INTO `sanitizing_rules` VALUES (8,1,1,'^.*[^\\x20-\\x7E].*$', '', 50, 'Remove URLs with non-ascii characters');
 INSERT INTO `sanitizing_rules` VALUES (9,1,0,'^http://leoville\\.tv/podcasts/(?P<podcast>\\w+)\\.xml$', 'http://leo.am/podcasts/\\g<podcast>', 10, 'Rewrite URLs of TWiT Podcasts because most users use a URL that is going to break soon (bug 885)');
