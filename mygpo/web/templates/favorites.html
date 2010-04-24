@@ -11,6 +11,7 @@
 {% block content %}
   <h1>{% trans "Favorite Episodes" %}</h1>
 
+  {% if episodes %}
   <table class="list episode_list">
    <tr>
     <th></th>
@@ -30,6 +31,12 @@
    </tr>
   {% endfor %}
   </table>
+
+  {% else %}
+
+   <p>{% blocktrans %}You don't have any episodes marked as favorites yet. Maybe have a look at the <a href="/toplist/episodes">episode toplist</a>.{% endblocktrans %}</p>
+
+  {% endif %}
 
 {% endblock %}
 
