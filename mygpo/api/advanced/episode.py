@@ -98,7 +98,7 @@ def chapters(request, username):
         podcast_url = request.GET['podcast']
         episode_url = request.GET['episode']
 
-        since_ = request.GET.get('since'], None)
+        since_ = request.GET.get('since', None)
         since = datetime.fromtimestamp(float(since_)) if since_ else None
 
         podcast = Podcast.objects.get(url=sanitize_url(podcast_url))
