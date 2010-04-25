@@ -515,3 +515,8 @@ def user_subscriptions(request, username):
         }, context_instance=RequestContext(request))
 
 
+@login_required
+def all_subscriptions_download(request):
+    podcasts = set([s.podcast for s in Subscription.objects.filter(user=request.user)])
+    return simple.format_subscriptions(podcasts, 'opml', request.user.username)
+
