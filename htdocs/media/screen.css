@@ -566,3 +566,18 @@ div.related-podcasts
 {
     float: right;
 }
+
+div.intro-box
+{
+    text-align: justify;
+    float: left;
+    width: 40%;
+    padding-top: 1em;
+    padding-left: 5%;
+    padding-bottom: 1em;
+}
+
+div.intro-box ul
+{
+    text-align: left;
+}

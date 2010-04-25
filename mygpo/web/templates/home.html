@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load podcasts %}
 
 {% load menu %}
 {% block mainmenu %}{{ "/"|main_menu }}{% endblock %}
@@ -9,63 +10,91 @@
 
 {% block content %}
 
-<h1>{{ podcast_count }} podcasts, {{ episode_count}} episodes, {{ user_count}} users</h1>
-<p>
-{% blocktrans %}
-This web service allows you to synchronize your
-podcast subscription list and episode actions between different podcast
-clients and devices. You can also use the web service to discover new,
-interesting podcasts based on your existing subscriptions.
-{% endblocktrans %}
-</p>
+<h1>gPodder.net &ndash; {% trans "a Podcast-Webservice" %}</h1>
 
-<h2>{% trans "Highlights" %}</h2>
-<ul>
-    <li>{% trans "Open source - licensed under the Affero GPL v3" %}</li>
-    <li>{% trans "Backup and sync your subscription lists" %}</li>
-    <li>{% trans "Sync episode status information between devices" %}</li>
-    <li>{% trans "Edit device subscriptions on the web" %}</li>
-</ul>
+<div class="intro-box">
+ <h3><img style="vertical-align: middle;" src="/media/preferences-system.png" alt="" /> {% trans "Manage Your Podcast-Clients" %}</h3>
+ {% blocktrans %}
+  With gpodder.net you can manage your podcast clients via the
+  web, subscribe to new podcasts and even synchronize gPodder on
+  your notebook and on your mobile phone.
+ {% endblocktrans %}
+</div>
 
-<h2>{% trans "Client applications" %}</h2>
-<p>
-{% blocktrans %}
-This web service offers a public API that can be used to query the podcast
-directory and an authenticated API for synchronizing subscription lists and
-episode actions between the web service and multiple clients.
-{% endblocktrans %}
-</p>
-<h3>{% trans "Applications" %}</h3>
-<ul>
-    <li><strong><a href="http://gpodder.org/">gPodder</a></strong>:
-    {% blocktrans %}
-    An open source podcast client for Linux, Windows, Maemo and Mac OS X.
-    Support for gpodder.net is directly built into gPodder.
-    {% endblocktrans %}
-    </li>
-    <li><strong><a href="http://lincgeek.org/bashpodder/">BashPodder</a></strong>:
-    {% blocktrans %}
-    A simple command-line podcatcher. To synchronize your bp.conf file with
-    gpodder.net, use the "bpsync" utility included in mygpoclient (see below).
-    {% endblocktrans %}
-    </li>
+<div class="intro-box">
+ <h3><img style="vertical-align: middle;" src="/media/emblem-favorite.png" alt="" /> {% trans "Discover Interesting Podcasts" %}</h3>
+ {% blocktrans %}
+  Find new interesting podcasts in our <a href="/toplist/">toplist</a>,
+  see whats <a href="/toplist/episodes">currently listened</a> to by our
+  users and get personalized suggestions.
+ {% endblocktrans %}
+</div>
 
-</ul>
-<h3>{% trans "Libraries" %}</h3>
-<ul>
-    <li><strong><a href="http://thpinfo.com/2010/mygpoclient/">mygpoclient</a></strong>:
-    {% blocktrans %}
-    This is the official reference implementation of the client-side API
-    interface. mygpoclient is written in Python and is used by gPodder to
-    interface with the web service.
-    {% endblocktrans %}
-    </li>
-    <li><strong><a href="http://github.com/nheid/mygpodderlib">mygpodderlib</a></strong>:
-    {% blocktrans %}
-    A Java library by Nico Heid for use on Android or other Java-based
-    platforms - under development.
-    {% endblocktrans %}
-    </li>
-</ul>
+<br style="clear: left;" />
+
+<div class="intro-box">
+ <h3><img style="vertical-align: middle;" src="/media/share-icon-16x16.png" alt="" /> {% trans "Share Interesting Podcasts" %}</h3>
+ {% blocktrans %}
+  Share your podcast subscriptions and favorite episodes with other
+  users and get recommendations by others.
+ {% endblocktrans %}
+</div>
+
+<div class="intro-box">
+ <h3><img style="vertical-align: middle;" src="/media/package-x-generic.png" alt="" /> {% trans "Backup your Data" %}</h3>
+ {% blocktrans %}
+  With having your subscription and listening data <em>in the cloud</em>
+  you always have a copy ready when replacing a computer or buying a
+  new mobile phone.
+ {% endblocktrans %}
+</div>
+
+<hr />
+
+<div class="intro-box">
+ <h3>Supported Clients</h3>
+ <ul>
+  <li><a href="http://gpodder.org/">gPodder</a></li>
+  <li><a href="http://lincgeek.org/bashpodder/">BashPodder</a> {% blocktrans %}(use the
+   <em>bpsync</em> utility included in
+   <a href="http://thpinfo.com/2010/mygpoclient/">mygpoclient</a>){% endblocktrans %}</li>
+ </ul>
+
+ <h3>{% trans "Libraries" %}</h3>
+ <ul>
+  <li><a href="http://thpinfo.com/2010/mygpoclient/">mygpoclient</a></li>
+  <li><a href="http://github.com/nheid/mygpodderlib">mygpodderlib</a></li>
+  <li><a href="http://wiki.gpodder.org/wiki/Web_Services/API_2">{% trans "API Documentation" %}</a></li>
+ </ul>
+
+ <h3>Currently Tracking</h3>
+ <ul>
+  <li>{{ podcast_count }} {% trans "podcasts" %}</li>
+  <li>{{ episode_count}} {% trans "episodes" %}</li>
+  <li>{{ hours_listened }} {% trans "hours listened by" %}</li>
+  <li>{{ user_count}} {% trans "users" %}</li>
+
+ </ul>
+
+</div>
+
+
+<div class="intro-box">
+ <h3>{% trans "Podcast-Toplist" %}</h3>
+ <table class="list">
+  {% for podcast in toplist %}
+   <tr>
+    <td>{{ podcast|podcast_logo }}
+    <td>
+     <a href="/podcast/{{ podcast.id }}">
+      {{ podcast.title }}
+     </a>
+   </tr>
+  {% endfor %}
+ </table>
+ <a href="/toplist/">{% trans "more..." %}</a>
+</div>
+
+<br style="clear: left;" />
 
 {% endblock content %}

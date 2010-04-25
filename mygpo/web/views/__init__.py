@@ -32,6 +32,7 @@ from mygpo.decorators import requires_token
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
+from django.db.models import Sum
 from datetime import datetime, date, timedelta
 from django.contrib.sites.models import Site
 from django.conf import settings
@@ -58,16 +59,32 @@ def home(request):
         return welcome(request)
 
 
-def welcome(request):
+def welcome(request, toplist_entries=10):
     current_site = Site.objects.get_current()
     podcasts = Podcast.objects.count()
     users = User.objects.count()
     episodes = Episode.objects.count()
+    hours_listened = Listener.objects.all().aggregate(hours=Sum('episode__duration'))['hours'] / (60 * 60)
+
+    try:
+        lang = process_lang_params(request, '/toplist/')
+    except utils.UpdatedException, updated:
+        lang = []
+
+    if len(lang) == 0:
+        entries = ToplistEntry.objects.order_by('-subscriptions')[:toplist_entries]
+    else:
+        entries = backend.get_toplist(toplist_entries, lang)
+
+    toplist = [e.get_podcast() for e in entries]
+
     return render_to_response('home.html', {
           'podcast_count': podcasts,
           'user_count': users,
           'episode_count': episodes,
           'url': current_site,
+          'hours_listened': hours_listened,
+          'toplist': toplist,
     }, context_instance=RequestContext(request))
 
 
