@@ -98,9 +98,9 @@ def show(request, device_id, error_message=None):
 
 @login_required
 def opml(request, device_id):
-    device = get_object_or_404(Device, id=device_id)
+    device = get_object_or_404(Device, id=device_id, user=request.user)
 
-    response = simple.subscriptions(request, request.user.username, device.uid, 'opml')
+    response = simple.format_subscriptions(simple.get_subscriptions(request.user, device.uid), 'opml', request.user.username)
     response['Content-Disposition'] = 'attachment; filename=%s.opml' % device.uid
     return response
 
