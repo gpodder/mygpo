@@ -581,3 +581,13 @@ div.intro-box ul
 {
     text-align: left;
 }
+
+div.come-in-box
+{
+    margin-left: -10%;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    clear: both;
+    font-size: 2em;
+    text-align: center;
+}
