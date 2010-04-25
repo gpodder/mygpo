@@ -56,8 +56,6 @@ def subscriptions(request, username, device_uid, format):
 
 
 def format_subscriptions(subscriptions, format, username):
-    if subscriptions == 404:
-        return HttpErrorResponse(404, 'Invalid device ID')
 
     if format == 'txt':
         #return subscriptions formatted as txt
