@@ -1,6 +1,6 @@
 from django import template
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext
 
 register = template.Library()
 
@@ -13,6 +13,7 @@ HIDDEN_URIS = (
         '/publisher/podcast/',
 )
 
+_ = lambda x: x
 MENU_STRUCTURE = (
         ('gpodder.net', (
             ('/', _('Home')),
@@ -63,9 +64,9 @@ def main_menu(selected):
     for uri, caption, subpages in links:
         if selected in subpages or ('/' in subpages and not found_section):
             items.append('<li class="selected"><a href="%s">%s</a></li>' % \
-                    (uri, caption))
+                    (uri, ugettext(caption)))
         else:
-            items.append('<li><a href="%s">%s</a></li>' % (uri, caption))
+            items.append('<li><a href="%s">%s</a></li>' % (uri, ugettext(caption)))
 
     s = '<ul class="menu primary">%s</ul>' % ('\n'.join(items),)
     return mark_safe(s)
@@ -90,12 +91,12 @@ def section_menu(selected, title=None):
                     title = title[:33] + '...'
                 caption = title
             if uri in HIDDEN_URIS:
-                items.append('<li class="selected">%s</li>' % caption)
+                items.append('<li class="selected">%s</li>' % ugettext(caption))
             else:
                 items.append('<li class="selected"><a href="%s">%s</a></li>' % \
-                        (uri, caption))
+                        (uri, ugettext(caption)))
         elif uri not in HIDDEN_URIS:
-            items.append('<li><a href="%s">%s</a></li>' % (uri, caption))
+            items.append('<li><a href="%s">%s</a></li>' % (uri, ugettext(caption)))
 
     s = '<ul class="menu secondary">%s</ul>' % ('\n'.join(items),)
     return mark_safe(s)
