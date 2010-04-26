@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+{% load podcasts %}
+{% load charts %}
+{% load math %}
+{% load utils %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/directory/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/directory/"|section_menu }}{% endblock %}
+
+{% block title %}{% trans "Podcast Directory" %}{% endblock %}
+
+{% block content %}
+  <h1>{% trans "Podcast Directory" %}</h1>
+
+  {% for cat in categories %}
+
+   <div class="intro-box">
+   <h2>{{ cat.tag }}</h2>
+   <table class="list">
+    {% for entry in cat.entries %}
+     <tr>
+      <td>{{ entry.podcast|podcast_logo }}</td>
+      <td>
+       <a href="/podcast/{{ entry.podcast.id }}">
+        {{ entry.podcast.title }}
+       </a>
+     </tr>
+    {% endfor %}
+    <tr>
+     <td></td>
+     <td><a href="/directory/{{ cat.tag }}">{% trans "more..." %}</a></td>
+    </tr>
+   </table>
+   </div>
+  {% endfor %}
+
+  <hr />
+  {% for tag in tag_cloud %}
+   <span style="font-size: {% smartwidthratio tag.entries max_entries 4 1 %}em">
+    <a href="/directory/{{ tag.tag }}">
+     {{ tag.tag }}
+    </a>
+   </span>
+  {% endfor %}
+
+
+{% endblock %}
+

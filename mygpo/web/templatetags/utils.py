@@ -14,3 +14,8 @@ def lookup_list(dict, keys):
         if key in dict:
             yield dict[key]
 
+
+@register.simple_tag
+def smartwidthratio(val, max_val, upper, lower):
+    return max(lower, (float(val) / max_val * upper))
+

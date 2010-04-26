@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+{% load podcasts %}
+{% load charts %}
+{% load math %}
+{% load utils %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/directory/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/directory/"|section_menu }}{% endblock %}
+
+{% block title %}{{ category }}{% endblock %}
+
+{% block content %}
+ <h1>{{ category }}</h1>
+
+ <table class="list">
+  <tr>
+   <th></th>
+   <th>{% trans "Podcast" %}</th>
+   <th>{% trans "Description" %}</th>
+  </tr>
+  {% for entry in entries.object_list %}
+   <tr>
+    <td>{{ entry.podcast|podcast_logo}}</td>
+    <td>
+     <a href="/podcast/{{ entry.podcast.id }}">{{ entry.podcast.title }}</a>
+    </td>
+    <td class="description">
+     {{ entry.podcast.description|truncatewords:15 }}
+    </td>
+   </tr>
+  {% endfor %}
+ </table>
+
+<div class="pagination">
+    <span class="step-links">
+        {% if entries.has_previous %}
+            <a href="?page={{ entries.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ entries.number }} of {{ entries.paginator.num_pages }}.
+        </span>
+
+        {% if entries.has_next %}
+            <a href="?page={{ entries.next_page_number }}">next</a>
+        {% endif %}
+    </span>
+</div>
+
+{% endblock %}
+

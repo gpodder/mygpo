@@ -66,6 +66,9 @@ urlpatterns = patterns('',
 
     (r'^history/$', 'mygpo.web.views.history'),
 
+    (r'^directory/$', 'mygpo.web.views.public.browse'),
+    (r'^directory/(?P<category>[^/]+)$', 'mygpo.web.views.public.category'),
+
     (r'^toplist/$', 'mygpo.web.views.toplist'),
     (r'^toplist/episodes$', 'mygpo.web.views.episode_toplist'),
     (r'^toplist.opml$', 'mygpo.api.simple.toplist', {'count': 50, 'format': 'opml'}),

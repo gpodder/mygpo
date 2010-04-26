@@ -32,6 +32,7 @@ MENU_STRUCTURE = (
             ('/device/', _('Device')),
         )),
         (_('Podcast Directory'), (
+            ('/directory/', _('Directory')),
             ('/toplist/', _('Toplist')),
             ('/search/', _('Search')),
             ('/toplist/episodes', _('Episodes')),
