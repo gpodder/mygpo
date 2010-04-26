@@ -2,6 +2,18 @@ from django.db import models
 from django.contrib.auth.models import User
 from mygpo.api.models import Podcast, Episode, Device
 
+class PodcastTag(models.Model):
+    tag = models.CharField(max_length=100)
+    podcast = models.ForeignKey(Podcast)
+    source = models.CharField(max_length=100)
+    user = models.ForeignKey(User, null=True)
+    weight = models.IntegerField(default=1)
+
+    class Meta:
+        db_table = 'podcast_tags'
+        unique_together = ('podcast', 'source', 'user', 'tag')
+
+
 class HistoricPodcastData(models.Model):
     podcast = models.ForeignKey(Podcast)
     date = models.DateField()

@@ -30,6 +30,7 @@ import time
 
 from mygpo import feedcore
 from mygpo.api import models
+from mygpo.data.models import PodcastTag
 from mygpo.utils import parse_time
 from mygpo.api.sanitizing import sanitize_url, rewrite_podcasts
 
@@ -99,6 +100,30 @@ def get_filesize(entry, url):
 
             return None
     return None
+
+
+def get_feed_tags(feed):
+    tags = []
+
+    for tag in feed.get('tags', []):
+        tags.extend([t for t in tag['term'].split(',') if t])
+
+        if tag['label']:
+            tags.append(tag['label'])
+
+    return set(tags)
+
+
+def update_feed_tags(podcast, tags):
+    src = 'feed'
+
+    #delete all tags not found in the feed anymore
+    PodcastTag.objects.filter(podcast=podcast, source=src).exclude(tag__in=tags).delete()
+
+    #create new found tags
+    for tag in tags:
+        PodcastTag.objects.get_or_create(podcast=podcast, source=src, tag=tag)
+
 
 def get_episode_metadata(entry, url):
     d = {
@@ -177,6 +202,8 @@ def update_podcasts(fetch_queue):
                     podcast.logo_url = cover_art
                 except Exception, e:
                     print >>sys.stderr, 'cannot save image: %s' % e
+
+            update_feed_tags(podcast, get_feed_tags(feed.feed))
 
             existing_episodes = list(models.Episode.objects.filter(podcast=podcast))
 
