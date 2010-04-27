@@ -12,4 +12,5 @@ INSERT INTO `sanitizing_rules` VALUES (11,1,1,'^.*\\s.*$', '', 10, 'All URLs tha
 INSERT INTO `sanitizing_rules` VALUES (12,0,1,'http://media.libsyn.com/media/(?P<res>.*)$', 'http://traffic.libsyn.com/\\g<res>', 10, 'Update new URL for libsy Podcasts (Learn Japanese with Beb and Alex)');
 INSERT INTO `sanitizing_rules` VALUES (13,1,0,'^http://site\\.abc\\.go\\.com/abc/xml/podcastRSS\\?(.*&)?feedPublishKey=(?P<key>\\d+)(&.*)?$', 'http://a.abc.com/abc/xml/podcastRSS?feedPublishKey=\\g<key>', 100, 'Merge URLs for ABC Podcasts (bug 977)');
 INSERT INTO `sanitizing_rules` VALUES (14,1,1,'^(?P<protocol>[a-zA-Z])://[-_\\w]+(:[^@]+)?@(?P<rest>.+)$', '\\g<protocol>://\\g<rest>', 20, 'Remove HTTP-Authentication from URLs');
+INSERT INTO `sanitizing_rules` VALUES (15,0,1,'^(?P<unchanged>http://rpod\\.ru/personal/external/\\d+\\.mp3)\\?[0-9a-f]+$', '\\g<unchanged>', 100, '');
 
