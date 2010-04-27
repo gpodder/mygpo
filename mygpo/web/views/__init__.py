@@ -535,5 +535,7 @@ def user_subscriptions(request, username):
 @login_required
 def all_subscriptions_download(request):
     podcasts = set([s.podcast for s in Subscription.objects.filter(user=request.user)])
-    return simple.format_subscriptions(podcasts, 'opml', request.user.username)
+    response = simple.format_subscriptions(podcasts, 'opml', request.user.username)
+    response['Content-Disposition'] = 'attachment; filename=all-subscriptions.opml'
+    return response
 
