@@ -12,6 +12,8 @@ class Command(BaseCommand):
         make_option('--toplist', action='store_true', dest='toplist', default=False, help="Update all entries from the Toplist."),
         make_option('--update-new', action='store_true', dest='new', default=False, help="Update all podcasts with new Episodes"),
         make_option('--list-only', action='store_true', dest='list', default=False, help='Don\'t download/update anything, just list the podcasts to be updated'),
+
+	make_option('--max', action='store', dest='max', type='int', default=-1, help="Set how many feeds should be updated at maximum")
         )
 
 
@@ -35,6 +37,10 @@ class Command(BaseCommand):
 
         if len(fetch_queue) == 0 and not options.get('toplist') and not options.get('new'):
             fetch_queue = models.Podcast.objects.filter(last_update__lt=UPDATE_LIMIT)
+
+        max = options.get('max', -1)
+        if max > 0:
+            fetch_queue = fetch_queue[:max]
 
         if options.get('list'):
             print '%d podcasts would be updated' % len(fetch_queue)
