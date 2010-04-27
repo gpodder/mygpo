@@ -106,7 +106,8 @@ def get_feed_tags(feed):
     tags = []
 
     for tag in feed.get('tags', []):
-        tags.extend([t for t in tag['term'].split(',') if t])
+        if tag['term']:
+            tags.extend([t for t in tag['term'].split(',') if t])
 
         if tag['label']:
             tags.append(tag['label'])
@@ -210,10 +211,11 @@ def update_podcasts(fetch_queue):
             for entry in feed.entries:
                 try:
                     url = get_episode_url(entry)
-                    url = sanitize_url(url, podcast=False, episode=True)
                     if url is None:
                         print 'Ignoring entry'
                         continue
+
+                    url = sanitize_url(url, podcast=False, episode=True)
                     md = get_episode_metadata(entry, url)
                     e, created = models.Episode.objects.get_or_create(
                         podcast=podcast,
