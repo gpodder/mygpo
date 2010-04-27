@@ -20,25 +20,44 @@ from mygpo.utils import daterange
 from mygpo.api.models import Episode, EpisodeAction
 from mygpo.data.models import HistoricPodcastData
 from mygpo.publisher.models import PodcastPublisher
+from mygpo.api.constants import DEVICE_TYPES
 
-def listener_data(podcast):
-    d = date(2010, 1, 1)
+
+def listener_data(podcasts):
     day = timedelta(1)
-    episodes = EpisodeAction.objects.filter(episode__podcast=podcast, timestamp__gte=d, action='play').order_by('timestamp').values('timestamp')
-    if len(episodes) == 0:
+
+    # get start date
+    d = date(2010, 1, 1)
+    episode_actions = EpisodeAction.objects.filter(episode__podcast__in=podcasts, timestamp__gte=d, action='play').order_by('timestamp').values('timestamp')
+    if len(episode_actions) == 0:
         return []
 
-    start = episodes[0]['timestamp']
+    start = episode_actions[0]['timestamp']
+
+    # pre-calculate episode list, make it index-able by release-date
+    episodes = {}
+    for episode in Episode.objects.filter(podcast__in=podcasts):
+        if episode.timestamp:
+            episodes[episode.timestamp.date()] = episode
 
     days = []
     for d in daterange(start):
         next = d + timedelta(days=1)
-        listeners = EpisodeAction.objects.filter(episode__podcast=podcast, timestamp__gte=d, timestamp__lt=next, action='play').values('user_id').distinct().count()
-        e = Episode.objects.filter(podcast=podcast, timestamp__gte=d, timestamp__lt=next)
-        episode = e[0] if e.count() > 0 else None
+        listener_sum = 0
+
+        # this is faster than .filter(episode__podcast__in=podcasts)
+        for p in podcasts:
+            listeners = EpisodeAction.objects.filter(episode__podcast=p, timestamp__gte=d, timestamp__lt=next, action='play').values('user_id').distinct().count()
+            listener_sum += listeners
+
+        if d.date() in episodes:
+            episode = episodes[d.date()]
+        else:
+            episode = None
+
         days.append({
             'date': d,
-            'listeners': listeners,
+            'listeners': listener_sum,
             'episode': episode})
 
     return days
@@ -67,13 +86,19 @@ def episode_listener_data(episode):
     return intervals
 
 
-def subscriber_data(podcast):
+def subscriber_data(podcasts):
     data = {}
-    records = HistoricPodcastData.objects.filter(podcast=podcast).order_by('date')
+
+    #this is fater than a subquery
+    records = []
+    for p in podcasts:
+        records.extend(HistoricPodcastData.objects.filter(podcast=p).order_by('date'))
+
     for r in records:
         if r.date.day == 1:
             s = r.date.strftime('%y-%m')
-            data[s] = r.subscriber_count
+            val = data.get(s, 0)
+            data[s] = val + r.subscriber_count
 
     list = []
     for k, v in data.iteritems():
@@ -100,4 +125,19 @@ def episode_list(podcast):
         e.listeners = listeners.count()
 
     return episodes
+
+
+def device_stats(podcasts):
+    res = {}
+    for type in DEVICE_TYPES:
+        c = 0
+
+        # this is faster than a subquery
+        for p in podcasts:
+            c += EpisodeAction.objects.filter(episode__podcast=p, device__type=type[0]).values('user_id').distinct().count()
+        if c > 0:
+            res[type[1]] = c
+
+    return res
+
 

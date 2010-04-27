@@ -130,6 +130,7 @@ urlpatterns = patterns('',
     (r'^publisher/podcast/(?P<id>\d+)/episodes$', 'mygpo.publisher.views.episodes'),
     (r'^publisher/episode/(?P<id>\d+)$', 'mygpo.publisher.views.episode'),
     (r'^publisher/podcast/search$', 'mygpo.publisher.views.search_podcast'),
+    (r'^publisher/group/(?P<group_id>\d+)$', 'mygpo.publisher.views.group'),
     (r'^publisher/link/$', 'mygpo.publisher.views.link'),
 
     #Subscribe with my.gpodder.org

@@ -1,13 +1,12 @@
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
-from mygpo.api.models import Podcast, Episode, EpisodeAction
-from mygpo.api.constants import DEVICE_TYPES
+from mygpo.api.models import Podcast, Episode, EpisodeAction, PodcastGroup
 from django.contrib.auth.decorators import login_required
 from mygpo.publisher.models import PodcastPublisher
 from mygpo.publisher.auth import require_publisher, is_publisher
 from mygpo.publisher.forms import SearchPodcastForm, EpisodeForm, PodcastForm
-from mygpo.publisher.utils import listener_data, episode_listener_data, check_publisher_permission, episode_list, subscriber_data
+from mygpo.publisher.utils import listener_data, episode_listener_data, check_publisher_permission, episode_list, subscriber_data, device_stats
 from django.contrib.sites.models import Site
 from mygpo.data.feeddownloader import update_podcasts
 from mygpo.decorators import requires_token
@@ -50,9 +49,9 @@ def podcast(request, id):
     if not check_publisher_permission(request.user, p):
         return HttpResponseForbidden()
 
-    timeline_data = listener_data(p)
-    subscription_data = subscriber_data(p)
-    device_data = device_stats(p)
+    timeline_data = listener_data([p])
+    subscription_data = subscriber_data([p])
+    device_data = device_stats([p])
 
     if request.method == 'POST':
         form = PodcastForm(request.POST, instance=p)
@@ -78,6 +77,27 @@ def podcast(request, id):
         'subscriber_data': subscription_data,
         'device_data': device_data,
         'update_token': update_token,
+        }, context_instance=RequestContext(request))
+
+
+@require_publisher
+def group(request, group_id):
+    g = get_object_or_404(PodcastGroup, id=group_id)
+
+    # users need to have publisher access for at least one of the group's podcasts
+    if not any([check_publisher_permission(request.user, p) for p in g.podcasts()]):
+        return HttpResponseForbidden()
+
+
+    timeline_data = listener_data(g.podcasts())
+    subscription_data = subscriber_data(g.podcasts())
+    device_data = device_stats(g.podcasts())
+
+    return render_to_response('publisher/group.html', {
+        'group': g,
+        'timeline_data': timeline_data,
+        'subscriber_data': subscription_data,
+        'device_data': device_data,
         }, context_instance=RequestContext(request))
 
 
@@ -142,16 +162,6 @@ def episode(request, id):
         'form': form,
         'timeline_data': timeline_data,
         }, context_instance=RequestContext(request))
-
-
-def device_stats(podcast):
-    res = {}
-    for type in DEVICE_TYPES:
-        c = EpisodeAction.objects.filter(episode__podcast=podcast, device__type=type[0]).values('user_id').distinct().count()
-        if c > 0:
-            res[type[1]] = c
-
-    return res
 
 
 def link(request):

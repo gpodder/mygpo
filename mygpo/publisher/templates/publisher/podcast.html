@@ -51,6 +51,10 @@
 
   <h2>Stats</h2>
 
+  {% if podcast.group %}
+   <a href="/publisher/group/{{ podcast.group.id }}">{% trans "Show Group Stats" %}</a>
+  {% endif %}
+
   {% if timeline_data %}
    <h3>Listener Timeline</h3>
    <div id="chart_div" style="width: 700px; height: 240px;"></div>
