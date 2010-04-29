@@ -262,22 +262,30 @@ def update_episodes(user, actions):
             device, created = None, False
         timestamp = dateutil.parser.parse(e['timestamp']) if 'timestamp' in e else datetime.now()
 
-        time_values = {'position': None,
-                       'started': None,
-                       'total': None}
+        # Time values for play actions and their keys in JSON
+        PLAY_ACTION_KEYS = ('position', 'started', 'total')
+        time_values = {}
 
-        for p in time_values.iterkeys():
-            if not p in e: continue
-            try:
-                time_values[p] = parse_time(repr(e[p]))
-            except ValueError:
-                log('could not parse %s parameter %s for user %s' % (p, e[p], user))
+        for key in PLAY_ACTION_KEYS:
+            if key in e:
+                if action != 'play':
+                    # Key found, but must not be supplied (no play action!)
+                    return HttpResponseBadRequest('%s only allowed in play actions' % key)
 
-        if (time_values['position'] or time_values['started'] or time_values['total']) and action != 'play':
-            return HttpResponseBadRequest('parameters position, started and total can only be used with action play')
+                try:
+                    time_values[key] = parse_time(e[p])
+                except ValueError:
+                    log('could not parse %s parameter (value: %s) for user %s' % (p, repr(e[p]), user))
+                    return HttpResponseBadRequest('Wrong format for %s: %s' % (key, repr(e[p])))
+            else:
+                # Value not supplied by client
+                time_values[key] = None
 
-        if (time_values['started'] or time_values['total']) and not time_values['position']:
-            return HttpResponseBadRequest('parameters started and total require paremter position')
+        # Sanity check: If started or total are given, require position
+        if (time_values['started'] is not None or \
+                time_values['total'] is not None) and \
+                time_values['position'] is None:
+            return HttpResponseBadRequest('started and total require position')
 
         try:
             EpisodeAction.objects.create(user=user, episode=episode, device=device, action=action, timestamp=timestamp,

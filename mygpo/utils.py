@@ -25,16 +25,23 @@ def daterange(from_date, to_date=datetime.now(), leap=timedelta(days=1)):
     return
 
 
-def parse_time(str):
-    if not str:
-        raise ValueError('can\'t parse empty string')
+def parse_time(value):
+    if value is None:
+        raise ValueError('None value in parse_time')
+
+    if isinstance(value, int):
+        # Don't need to parse already-converted time value
+        return value
+
+    if value == '':
+        raise ValueError('Empty valueing in parse_time')
 
     for format in ('%H:%M:%S', '%M:%S'):
         try:
-            t = time.strptime(str, format)
+            t = time.strptime(value, format)
             return t.tm_hour * 60*60 + t.tm_min * 60 + t.tm_sec
         except ValueError, e:
             continue
 
-    return int(str)
+    return int(value)
 
