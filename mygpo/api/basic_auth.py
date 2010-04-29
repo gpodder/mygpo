@@ -128,7 +128,7 @@ def check_username(protected_view):
     """
     def wrapper(request, username, *args, **kwargs):
 
-        if request.user.username == username:
+        if request.user.username.lower() == username.lower():
             return protected_view(request, *args, username=username, **kwargs)
 
         else:
