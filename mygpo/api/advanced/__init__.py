@@ -273,10 +273,10 @@ def update_episodes(user, actions):
                     return HttpResponseBadRequest('%s only allowed in play actions' % key)
 
                 try:
-                    time_values[key] = parse_time(e[p])
+                    time_values[key] = parse_time(e[key])
                 except ValueError:
-                    log('could not parse %s parameter (value: %s) for user %s' % (p, repr(e[p]), user))
-                    return HttpResponseBadRequest('Wrong format for %s: %s' % (key, repr(e[p])))
+                    log('could not parse %s parameter (value: %s) for user %s' % (key, repr(e[key]), user))
+                    return HttpResponseBadRequest('Wrong format for %s: %s' % (key, repr(e[key])))
             else:
                 # Value not supplied by client
                 time_values[key] = None
