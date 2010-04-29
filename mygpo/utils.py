@@ -24,6 +24,22 @@ def daterange(from_date, to_date=datetime.now(), leap=timedelta(days=1)):
         from_date = from_date + leap
     return
 
+def format_time(value):
+    """Format an offset (in seconds) to a string
+
+    The offset should be an integer or float value.
+
+    >>> format_time(0)
+    '00:00:00'
+    >>> format_time(20)
+    '00:00:20'
+    >>> format_time(3600)
+    '01:00:00'
+    >>> format_time(10921)
+    '03:02:01'
+    """
+    dt = datetime.utcfromtimestamp(value)
+    return dt.strftime('%H:%M:%S')
 
 def parse_time(value):
     if value is None:

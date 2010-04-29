@@ -2,6 +2,8 @@ from django import template
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
+from mygpo import utils
+
 register = template.Library()
 
 @register.filter
@@ -43,7 +45,17 @@ def episode_status_icon(action):
         elif action.action == 'download':
             s = '<img src="/media/download.png" alt="downloaded" title="%s" />' % ('%s%s%s' % (_('This episode has been downloaded'),date_string, device_string))
         elif action.action == 'play':
-            s = '<img src="/media/playback.png" alt="played" title="%s" />' % ('%s%s%s' % (_('This episode has been played'),date_string, device_string))
+            if action.position is not None:
+                if action.started is not None:
+                    playback_info = _(' from %s to %s') % ( \
+                            utils.format_time(action.started), \
+                            utils.format_time(action.position))
+                else:
+                    playback_info = _(' to position %s') % (\
+                            utils.format_time(action.position))
+            else:
+                playback_info = ''
+            s = '<img src="/media/playback.png" alt="played" title="%s" />' % ('%s%s%s%s' % (_('This episode has been played'),date_string, device_string, playback_info))
         elif action.action == 'delete':
             s = '<img src="/media/delete.png" alt="deleted" title="%s"/>' % ('%s%s%s' % (_('This episode has been deleted'),date_string, device_string))
         else:
