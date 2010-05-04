@@ -225,6 +225,7 @@ table.list
     font-size: 1em;
     border-collapse: collapse;
     margin-bottom: 2em;
+    width: 100%;
 }
 
 table.list tr {
