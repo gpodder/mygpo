@@ -14,7 +14,7 @@
   <p>
    {% if public_subscriptions %}
     {% blocktrans %}We include anonmyized data about the following subscriptions in our public statistics. You can exclude specific podcasts or <a href="/account/privacy?private_subscriptions">all at once</a>.{% endblocktrans %}
-    <table>
+    <table class="list">
      <tr>
       <th></th>
       <th>{% trans "Podcast" %}</th>
@@ -32,7 +32,7 @@
 
     {% if excluded_subscriptions %}
      <h3>{% trans "Already excluded" %}</h3>
-     <table>
+     <table class="list">
       <tr>
        <th></th>
        <th>{% trans "Podcast" %}</th>
