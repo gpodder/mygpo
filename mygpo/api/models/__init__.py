@@ -113,7 +113,7 @@ class Podcast(models.Model):
 
         if self.group != None:
             if other.group == None:
-                self.group.add(other, myname)
+                self.group.add(other, othername)
 
             else:
                 raise ValueError('the podcasts are already in different groups')
