@@ -10,12 +10,15 @@ class PodcastIndex(indexes.SearchIndex):
 
     def get_queryset(self):
         """Used when the entire index for model is updated."""
-        return Podcast.objects.all()#Note.objects.filter(pub_date__lte=datetime.datetime.now())
+        return Podcast.objects.all().exclude(title='')
 
 
 class EpisodeIndex(indexes.SearchIndex):
 
     text = indexes.CharField(document=True, use_template=True)
+
+    def get_queryset(self):
+        return Episode.objects.all().exclude(title='')
 
 
 site.register(Podcast, PodcastIndex)

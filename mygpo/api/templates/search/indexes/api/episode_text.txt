@@ -1,6 +1,2 @@
 {{ object.title|default:"" }}
-{{ object.podcast }}
-{{ object.url }}
-{{ object.link|default:"" }}
-{{ object.description|default:"" }}
 
