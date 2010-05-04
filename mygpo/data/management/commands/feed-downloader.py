@@ -13,7 +13,9 @@ class Command(BaseCommand):
         make_option('--update-new', action='store_true', dest='new', default=False, help="Update all podcasts with new Episodes"),
         make_option('--list-only', action='store_true', dest='list', default=False, help='Don\'t download/update anything, just list the podcasts to be updated'),
 
-	make_option('--max', action='store', dest='max', type='int', default=-1, help="Set how many feeds should be updated at maximum")
+	make_option('--max', action='store', dest='max', type='int', default=-1, help="Set how many feeds should be updated at maximum"),
+
+        make_option('--random', action='store_true', dest='random', default=False, help="Update random podcasts, best used with --max option"),
         )
 
 
@@ -28,6 +30,9 @@ class Command(BaseCommand):
         if options.get('new'):
             podcasts = models.Podcast.objects.filter(episode__title='', episode__outdated=False).distinct()
             fetch_queue.extend(podcasts)
+
+        if options.get('random'):
+            fetch_queue = models.Podcast.objects.all().order_by('?')
 
         for url in args:
            try:
