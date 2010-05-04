@@ -12,5 +12,8 @@ INSERT INTO `sanitizing_rules` VALUES (11,1,1,'^.*\\s.*$', '', 10, 'All URLs tha
 INSERT INTO `sanitizing_rules` VALUES (12,0,1,'http://media.libsyn.com/media/(?P<res>.*)$', 'http://traffic.libsyn.com/\\g<res>', 10, 'Update new URL for libsy Podcasts (Learn Japanese with Beb and Alex)');
 INSERT INTO `sanitizing_rules` VALUES (13,1,0,'^http://site\\.abc\\.go\\.com/abc/xml/podcastRSS\\?(.*&)?feedPublishKey=(?P<key>\\d+)(&.*)?$', 'http://a.abc.com/abc/xml/podcastRSS?feedPublishKey=\\g<key>', 100, 'Merge URLs for ABC Podcasts (bug 977)');
 INSERT INTO `sanitizing_rules` VALUES (14,1,1,'^(?P<protocol>[a-zA-Z])://[-_\\w]+(:[^@]+)?@(?P<rest>.+)$', '\\g<protocol>://\\g<rest>', 20, 'Remove HTTP-Authentication from URLs');
-INSERT INTO `sanitizing_rules` VALUES (15,0,1,'^(?P<unchanged>http://rpod\\.ru/personal/external/\\d+\\.mp3)\\?[0-9a-f]+$', '\\g<unchanged>', 100, '');
-
+INSERT INTO `sanitizing_rules` VALUES (15,0,1,'^(?P<unchanged>http://rpod\\.ru/personal/.+\\.mp[34])\\?[0-9a-z]+$', '\\g<unchanged>', 100, '');
+INSERT INTO `sanitizing_rules` VALUES (16,0,1,'^http://\\d+\\.media\\.collegehumor\\.com/(?P<unchanged>.+)$', 'http://1.media.collegehumor.com/\\g<unchanged>', 100, '');
+INSERT INTO `sanitizing_rules` VALUES (17,1,0,'(?i)^http://feeds\.feedburner\.com/ShotOfJaq$', 'http://shotofjaq.org/feed/', 100, 'Merges Shot of Jaq feeds to the URL given on their Website');
+INSERT INTO `sanitizing_rules` VALUES (18,1,0,'http://shotofjaq\.org/feed$', 'http://shotofjaq.org/feed/', 100, 'Add trailing slash to Shot of Jaq feed URL');
+INSERT INTO `sanitizing_rules` VALUES (19,1,0,'(?i)^http://feeds\.feedburner\.com/ShotOfJaqOGG$', 'http://feeds.feedburner.com/ShotOfJaqOgg', 100, 'Unify all Feedburner URLs for the Shot of Jaq Ogg feed (seems it doesn\'t have an shotofjaq.org url)');
