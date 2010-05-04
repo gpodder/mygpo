@@ -95,11 +95,17 @@ def dashboard(request, episode_count=10):
     subscribed_podcasts = set([s.podcast for s in Subscription.objects.filter(user=request.user)])
     newest_episodes = Episode.objects.filter(podcast__in=subscribed_podcasts).order_by('-timestamp')[:episode_count]
 
+    lang = utils.get_accepted_lang(request)
+    lang = utils.sanitize_language_codes(lang)
+
+    random_podcasts = backend.get_podcasts_for_languages(lang).exclude(title='').order_by('?')[:5]
+
     return render_to_response('dashboard.html', {
             'site': site,
             'devices': devices,
             'subscribed_podcasts': subscribed_podcasts,
             'newest_episodes': newest_episodes,
+            'random_podcasts': random_podcasts,
         }, context_instance=RequestContext(request))
 
 

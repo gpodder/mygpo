@@ -12,8 +12,9 @@
 {% block title %}{% trans "Overview" %}{% endblock %}
 
 {% block content %}
-<h1>{% trans "Overview" %}</h1>
 
+ <div class="intro-box">
+ <h2>{% trans "Overview" %}</h2>
  {% if not subscribed_podcasts %}
   <p>{% blocktrans with site as sitename %}Welcome to {{ sitename }}! You can start using the site by <a href="/online-help">uploading your subscriptions</a> with a supported client. You can then manage your subscriptions online, sync your devices and discover new interesting podcasts.{% endblocktrans %}</p>
  {% else %}
@@ -29,8 +30,27 @@
   {% endblocktrans %}</p>
 
  {% endif %}
+ </div>
+
+ <div class="intro-box">
+  <h2>{% trans "Random Picks" %}</h2>
+
+  <table class="list">
+   {% for podcast in random_podcasts %}
+    <tr>
+     <td>{{ podcast|podcast_logo }}</td>
+     <td><a href="/podcast/{{ podcast.id}}">{{ podcast.title|striptags }}</a></td>
+    </tr>
+   {% endfor %}
+  </table>
+
+ </div>
+
+ <br style="clear: both" />
+
 
  {% if newest_episodes %}
+ <div class="wide-box">
   <h2>{% trans "Newest Episodes" %}</h2>
   <table class="list episode_list">
    <tr>
@@ -55,6 +75,7 @@
     </tr>
    {% endfor %}
   </table>
+ </div>
  {% endif %}
 
 {% endblock %}

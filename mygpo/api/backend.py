@@ -15,7 +15,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from mygpo.api.models import ToplistEntry
+from mygpo.api.models import ToplistEntry, Podcast
 import re
 
 try:
@@ -27,6 +27,14 @@ try:
 
 except ImportError:
     import json
+
+
+def get_podcasts_for_languages(languages=None):
+    if not languages:
+        return Podcast.objects.all()
+
+    regex = '^(' + '|'.join(languages) + ')'
+    return Podcast.objects.filter(language__regex=regex)
 
 
 def get_toplist(count, languages=None):
