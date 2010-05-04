@@ -1,6 +1,6 @@
-from mygpo.api.models import URLSanitizingRule, Podcast, ToplistEntry, SuggestionEntry, SubscriptionAction, SubscriptionMeta, Subscription, Episode, EpisodeAction
+from mygpo.api.models import URLSanitizingRule, Podcast, ToplistEntry, SuggestionEntry, SubscriptionAction, SubscriptionMeta, Subscription, Episode, EpisodeAction, EpisodeToplistEntry
 from mygpo.api.models.episodes import Chapter
-from mygpo.data.models import BackendSubscription, Listener, HistoricPodcastData
+from mygpo.data.models import BackendSubscription, Listener, HistoricPodcastData, PodcastTag
 from mygpo.log import log
 import urlparse
 import re
@@ -83,11 +83,12 @@ def maintenance(dry_run=False):
     sanitized_urls = []
     for p in podcasts:
         count += 1
-        if (count % 100) == 0: print '% 3.2f%% (podcast id %s)' % (((count + 0.0)/total*100), p.id)
+        if (count % 1000) == 0: print '% 3.2f%% (podcast id %s)' % (((count + 0.0)/total*100), p.id)
         try:
             su = sanitize_url(p.url, rules=rules)
         except Exception, e:
             log('failed to sanitize url for podcast %s: %s' % (p.id, e))
+            print 'failed to sanitize url for podcast %s: %s' % (p.id, e)
             p_error += 1
             continue
 
@@ -105,6 +106,7 @@ def maintenance(dry_run=False):
 
             except Exception, e:
                 log('failed to delete podcast %s: %s' % (p.id, e))
+                print 'failed to delete podcast %s: %s' % (p.id, e)
                 p_error += 1
 
             continue
@@ -139,6 +141,7 @@ def maintenance(dry_run=False):
 
         except Exception, e:
             log('error rewriting podcast %s: %s' % (p.id, e))
+            print 'error rewriting podcast %s: %s' % (p.id, e)
             p_error += 1
             continue
 
@@ -157,11 +160,12 @@ def maintenance(dry_run=False):
     episodes = Episode.objects.only('id', 'url').iterator()
     for e in episodes:
         count += 1
-        if (count % 100) == 0: print '% 3.2f%% (episode id %s)' % (((count + 0.0)/total*100), e.id)
+        if (count % 10000) == 0: print '% 3.2f%% (episode id %s)' % (((count + 0.0)/total*100), e.id)
         try:
             su = sanitize_url(e.url, rules=rules, podcast=False, episode=True)
         except Exception, ex:
             log('failed to sanitize url for episode %s: %s' % (e.id, ex))
+            print 'failed to sanitize url for episode %s: %s' % (e.id, ex)
             p_error += 1
             continue
 
@@ -179,6 +183,7 @@ def maintenance(dry_run=False):
                 e_deleted += 1
             except Exception, ex:
                 log('failed to delete episode %s: %s' % (e.id, ex))
+                print 'failed to delete episode %s: %s' % (e.id, ex)
                 e_error += 1
 
             continue
@@ -206,12 +211,16 @@ def maintenance(dry_run=False):
         try:
             if not dry_run:
                 rewrite_episode_actions(e, su_episode)
+                rewrite_listeners(e, su_episode)
+                rewrite_chapters(e, su_episode)
+
                 e.delete()
 
             e_merged += 1
 
         except Exception, ex:
             log('error rewriting episode %s: %s' % (e.id, ex))
+            print 'error rewriting episode %s: %s' % (e.id, ex)
             e_error += 1
             continue
 
@@ -244,6 +253,7 @@ def delete_podcast(p):
 
 def delete_episode(e):
     EpisodeAction.objects.filter(episode=e).delete()
+    Listener.objects.filter(episode=e).delete()
     e.delete()
 
 
@@ -291,6 +301,15 @@ def rewrite_podcasts(p_old, p_new):
             log('error updating subscription %s: %s, deleting' % (sub.id, e))
             sub.delete()
 
+    for tag in PodcastTag.objects.filter(podcast=p_old):
+        try:
+            log('updating tag %s (tag %s, source %s, podcast %s => %s)' % (tag.id, tag.tag, tag.source, p_old.id, p_new.id))
+            tag.podcast = p_new
+            tag.save()
+        except Exception, e:
+            log('error updating tag %s: %s, deleting.' % (tag.id, e))
+            tag.delete()
+
 
 def rewrite_episodes(p_old, p_new):
 
@@ -304,6 +323,7 @@ def rewrite_episodes(p_old, p_new):
             log('listeners for episode %s (url "%s", podcast %s) updated.' % (e.id, e.url, p_old.id))
             rewrite_chapters(e, e_new)
             log('chapters for episode %s (url "%s", podcast %s) updated, deleting.' % (e.id, e.url, p_old.id))
+            if EpisodeToplistEntry.objects.filter(episode=e).exists(): print 'still in toplist!'
             e.delete()
 
         except Episode.DoesNotExist:
@@ -335,6 +355,7 @@ def rewrite_listeners(e_old, e_new):
 
         except Exception, e:
             log('error updating listener %s: %s, deleting' % (l.id, e))
+            l.delete()
 
 
 def rewrite_chapters(e_old, e_new):
