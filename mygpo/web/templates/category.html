@@ -23,12 +23,12 @@
   </tr>
   {% for entry in entries.object_list %}
    <tr>
-    <td>{{ entry.podcast|podcast_logo}}</td>
+    <td>{{ entry.get_podcast|podcast_logo}}</td>
     <td>
-     <a href="/podcast/{{ entry.podcast.id }}">{{ entry.podcast.title }}</a>
+     <a href="/podcast/{{ entry.get_podcast.id }}">{{ entry.get_podcast.title }}</a>
     </td>
     <td class="description">
-     {{ entry.podcast.description|truncatewords:15 }}
+     {{ entry.get_podcast.description|truncatewords:15 }}
     </td>
    </tr>
   {% endfor %}
