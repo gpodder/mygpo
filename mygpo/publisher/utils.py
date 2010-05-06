@@ -19,8 +19,11 @@ from datetime import timedelta, date
 from mygpo.utils import daterange
 from mygpo.api.models import Episode, EpisodeAction
 from mygpo.data.models import HistoricPodcastData
+from mygpo.web.utils import flatten_intervals
 from mygpo.publisher.models import PodcastPublisher
 from mygpo.api.constants import DEVICE_TYPES
+from django.db.models import Avg
+from django.contrib.auth.models import User
 
 
 def listener_data(podcasts):
@@ -140,4 +143,104 @@ def device_stats(podcasts):
 
     return res
 
+
+def episode_heatmap(episode, max_part_num=50, min_part_length=10):
+    """
+    Generates "Heatmap Data" for the given episode
+
+    The episode is split up in parts having max 'max_part_num' segments which
+    are all of the same length, minimum 'min_part_length' seconds.
+
+    For each segment, the number of users that have played it (at least
+    partially) is calculated and returned
+    """
+
+    episode_actions = EpisodeAction.objects.filter(episode=episode, action='play')
+
+    if episode.duration:
+        duration = episode.duration
+    else:
+        duration = episode_actions.aggregate(duration=Avg('total'))['duration']
+
+    part_length = max(min_part_length, int(duration / max_part_num))
+
+    part_num = int(duration / part_length)
+
+    heatmap = [0]*part_num
+
+    user_ids = [x['user'] for x in episode_actions.values('user').distinct()]
+    for user_id in user_ids:
+        user = User.objects.get(id=user_id)
+        actions = episode_actions.filter(user=user, playmark__isnull=False, started__isnull=False)
+        if actions.exists():
+            played_parts = flatten_intervals(actions)
+            user_heatmap = played_parts_to_heatmap(played_parts, part_length, part_num)
+            heatmap = [sum(pair) for pair in zip(heatmap, user_heatmap)]
+
+    return heatmap, part_length
+
+
+def played_parts_to_heatmap(played_parts, part_length, part_count):
+    """
+    takes the (flattened) parts of an episode that a user has played, and
+    generates a heatmap data for this user.
+
+    The result is a list with part_count elements, each having a value
+    of either 0 (user has not played that part) or 1 (user has at least
+    partially played that part)
+    """
+    parts = [0]*part_count
+
+    if not played_parts:
+        return parts
+
+    part_iter = iter(played_parts)
+    current_part = part_iter.next()
+
+    for i in range(0, part_count):
+        part = i * part_length
+        while current_part['end'] < part:
+            try:
+                current_part = part_iter.next()
+            except StopIteration:
+                return parts
+
+        if current_part['start'] <= (part + part_length) and current_part['end'] >= part:
+            parts[i] = 1
+    return parts
+
+
+def colour_repr(val, max_val, colours):
+    """
+    returns a color representing the given value within a color gradient.
+
+    The color gradient is given by a list of (r, g, b) tupels. The value
+    is first located within two colors (of the list) and then approximated
+    between these two colors, based on its position within this segment.
+    """
+    if len(colours) == 1:
+        return colours[0]
+
+    # calculate position in the gradient; defines the segment
+    pos = float(val) / max_val
+    colour_nr1 = min(len(colours)-1, int(pos * (len(colours)-1)))
+    colour_nr2 = min(len(colours)-1, colour_nr1+1)
+    colour1 = colours[ colour_nr1 ]
+    colour2 = colours[ colour_nr2 ]
+
+    r1, g1, b1 = colour1
+    r2, g2, b2 = colour2
+
+    # determine bounds of segment
+    lower_bound = float(max_val) / (len(colours)-1) * colour_nr1
+    upper_bound = min(max_val, lower_bound + float(max_val) / (len(colours)-1))
+
+    # position within the segment
+    percent = (val - lower_bound) / upper_bound
+
+    r_step = r2 - r1
+    g_step = g2 - g1
+    b_step = b2 - b1
+
+    return (r1 + r_step * percent, g1 + g_step * percent, b1 + b_step * percent)
 

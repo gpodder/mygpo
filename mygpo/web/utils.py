@@ -108,6 +108,9 @@ def flatten_intervals(actions):
     actions = filter(lambda x: x.started and x.playmark, actions)
     actions.sort(key=lambda x: x.started)
     played_parts = []
+    if len(actions) == 0:
+        return []
+
     first = actions[0]
     flat_date = {'start': first.started, 'end': first.playmark}
     for action in actions:
