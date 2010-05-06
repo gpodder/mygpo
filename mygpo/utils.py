@@ -30,16 +30,20 @@ def format_time(value):
     The offset should be an integer or float value.
 
     >>> format_time(0)
-    '00:00:00'
+    '00:00'
     >>> format_time(20)
-    '00:00:20'
+    '00:20'
     >>> format_time(3600)
     '01:00:00'
     >>> format_time(10921)
     '03:02:01'
     """
     dt = datetime.utcfromtimestamp(value)
-    return dt.strftime('%H:%M:%S')
+
+    if dt.hour == 0:
+        return dt.strftime('%M:%S')
+    else:
+        return dt.strftime('%H:%M:%S')
 
 def parse_time(value):
     if value is None:
