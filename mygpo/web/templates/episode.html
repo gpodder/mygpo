@@ -52,6 +52,11 @@
     </div>
    {% endif %}
 
+   {% if played_parts %}
+    <h3>Already played</h3>
+    {{ played_parts|played_visualization:duration }}
+   {% endif %}
+
 
   <hr/>
    <h2>{% trans "Chapters" %}</h2>

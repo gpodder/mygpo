@@ -22,6 +22,7 @@ from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, Subscripti
 from mygpo.api.models.episodes import Chapter
 from mygpo.api.models.users import EpisodeFavorite
 from mygpo.web.models import SecurityToken
+from mygpo.web.utils import get_played_parts
 from mygpo.utils import parse_time
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
@@ -42,10 +43,15 @@ def episode(request, id):
         else:
             subscription_meta = None
         is_fav = EpisodeFavorite.objects.filter(user=request.user, episode=episode).exists()
+
+        played_parts, duration = get_played_parts(request.user, episode)
+
     else:
         history = []
         subscription_meta = None
         is_fav = False
+        played_parts = None
+        duration = episode.duration
 
     chapters = [c for c in Chapter.objects.filter(episode=episode).order_by('start') if c.is_public() or c.user == request.user]
 
@@ -55,6 +61,8 @@ def episode(request, id):
         'chapters': chapters,
         'subscription_meta': subscription_meta,
         'is_favorite': is_fav,
+        'played_parts': played_parts,
+        'duration': duration
     }, context_instance=RequestContext(request))
 
 
