@@ -20,6 +20,7 @@ from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadReque
 from django.template import RequestContext
 from mygpo.api.models import Podcast, Episode, ToplistEntry, Subscription
 from mygpo.data.models import PodcastTag
+from mygpo import settings
 from django.shortcuts import get_object_or_404
 from django.db.models import Sum
 from django.contrib.sites.models import Site
@@ -32,9 +33,12 @@ def browse(request, num_categories=10, num_tags_cloud=90, podcasts_per_category=
 
     top_tags = filter(lambda x: not x.tag.startswith('http://'), top_tags)
 
+    excluded_tags = getattr(settings, 'DIRECTORY_EXCLUDED_TAGS', [])
+    top_tags = filter(lambda x: not x.tag in excluded_tags, top_tags)
+
     categories = []
     for tag in top_tags[:num_categories]:
-        entries = ToplistEntry.objects.filter(podcast__podcasttag__tag=tag.tag).order_by('-subscriptions')[:podcasts_per_category]
+        entries = ToplistEntry.objects.filter(podcast__podcasttag__tag=tag.tag).order_by('-subscriptions').distinct()[:podcasts_per_category]
         categories.append({
             'tag': tag.tag,
             'entries': entries
@@ -42,7 +46,7 @@ def browse(request, num_categories=10, num_tags_cloud=90, podcasts_per_category=
 
     tag_cloud = top_tags[num_categories:]
 
-    tag_cloud.sort(key = lambda x: x.tag)
+    tag_cloud.sort(key = lambda x: x.tag.lower())
     max_entries = max([t.entries for t in tag_cloud])
 
     return render_to_response('directory.html', {
