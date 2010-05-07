@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from mygpo.publisher.models import PodcastPublisher
 from mygpo.publisher.auth import require_publisher, is_publisher
 from mygpo.publisher.forms import SearchPodcastForm, EpisodeForm, PodcastForm
-from mygpo.publisher.utils import listener_data, episode_listener_data, check_publisher_permission, episode_list, subscriber_data, device_stats
+from mygpo.publisher.utils import listener_data, episode_listener_data, check_publisher_permission, episode_list, subscriber_data, device_stats, episode_heatmap
 from django.contrib.sites.models import Site
 from mygpo.data.feeddownloader import update_podcasts
 from mygpo.decorators import requires_token
@@ -156,11 +156,14 @@ def episode(request, id):
         form = EpisodeForm(instance=e)
 
     timeline_data = episode_listener_data(e)
+    heatmap_data, part_length = episode_heatmap(e)
 
     return render_to_response('publisher/episode.html', {
         'episode': e,
         'form': form,
         'timeline_data': timeline_data,
+        'heatmap_data': heatmap_data if any([x > 1 for x in heatmap_data]) else None,
+        'heatmap_part_length': part_length,
         }, context_instance=RequestContext(request))
 
 

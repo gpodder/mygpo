@@ -162,6 +162,9 @@ def episode_heatmap(episode, max_part_num=50, min_part_length=10):
     else:
         duration = episode_actions.aggregate(duration=Avg('total'))['duration']
 
+    if not duration:
+        return [0], 0
+
     part_length = max(min_part_length, int(duration / max_part_num))
 
     part_num = int(duration / part_length)
