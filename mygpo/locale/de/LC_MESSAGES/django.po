@@ -56,7 +56,6 @@ msgid "Other"
 msgstr "Andere"
 
 #: api/constants.py:44
-#, fuzzy
 msgid "subscribed"
 msgstr "abonniert"
 
@@ -78,7 +77,6 @@ msgid "URL"
 msgstr "URL"
 
 #: publisher/templates/link.html:8
-#, fuzzy
 msgid "For Podcast Authors"
 msgstr "Für Podcast-Autoren"
 
@@ -440,9 +438,8 @@ msgstr ""
 "  "
 
 #: web/templates/dashboard.html:34
-#, fuzzy
 msgid "Newest Episodes"
-msgstr "Letzte Episode"
+msgstr "Aktuelle Episoden"
 
 #: web/templates/dashboard.html:38 web/templates/episode_toplist.html:28
 #: web/templates/podcast.html:91
@@ -678,31 +675,33 @@ msgstr "Das sind die %(count)s meist-gehörten Episoden der letzten 7 Tage in al
 #, python-format
 msgid "The are the %(count)s most listened episodes of the last seven days for the languages %(lang)s. You can select the included languages <a href=\"#languages\">below</a>."
 msgstr ""
+"Das sind die %(count)s am häufig\r\n"
+"The are the %(count)s most listened episodes of the last seven days for the languages %(lang)s. You can select the included languages <a href=\"#languages\">below</a>."
 
 #: web/templates/episode_toplist.html:48 web/templates/toplist.html:70
 msgid "Languages"
-msgstr ""
+msgstr "Sprachen"
 
 #: web/templates/episode_toplist.html:58 web/templates/toplist.html:80
 msgid "Show"
-msgstr ""
+msgstr "Anzeigen"
 
 #: web/templates/episode_toplist.html:81
 msgid "or show <a href=\"/toplist/episodes?lang=\">all languages</a>."
-msgstr ""
+msgstr "oder <a href=\"/toplist/episodes?lang=\">alle Sprachen</a> anzeigen."
 
 #: web/templates/episode_toplist.html:86
 msgid "You think that's not much?"
-msgstr ""
+msgstr "Wenig Hörer?"
 
 #: web/templates/episode_toplist.html:86
 msgid "You're right - the listener counts are still pretty low, because they are only counted for users of gPodder 2.2 or later, which is rather new. So <a href=\"http://gpodder.org/downloads.html\">get it</a>, if you don't have it already."
-msgstr ""
+msgstr "Das liegt daran, dass die Abspiel-Informationen erst ab gPodder 2.2 übertragen werden."
 
 #: web/templates/favorites.html:9 web/templates/favorites.html.py:12
 #: web/templatetags/menu.py:26
 msgid "Favorite Episodes"
-msgstr ""
+msgstr "Lieblings-Episoden"
 
 #: web/templates/favorites.html:37
 #, python-format
@@ -712,11 +711,13 @@ msgid ""
 "     <strong><a href=\"/user/%(username)s/favorites.xml\">%(feed_url)s</a></strong>.\n"
 "    "
 msgstr ""
+"\n"
+"     Den Feed mit deinen Lieblings-Episoden findest du unter <strong><a href=\"/user/%(username)s/favorites.xml\">%(feed_url)s</a></strong>."
 
 #: web/templates/favorites.html:44 web/templates/subscribe.html:34
 #: web/templates/subscriptions.html:64 web/templates/suggestions.html:25
 msgid "Subscribe"
-msgstr ""
+msgstr "Abonnieren"
 
 #: web/templates/favorites.html:51
 #, python-format
@@ -727,33 +728,35 @@ msgid ""
 "      <strong>%(username)s</strong> and password <strong>%(token)s</strong>.\n"
 "     "
 msgstr ""
+"\n"
+"      Um deine Lieblings-Episoden geheim zu halten (von anderen und den öffentlichen Seiten von %(site)s), kannst du HTTP-Authentifizierung in deinem Client verwenden. Benutzername <strong>%(username)s</strong>, Passwort <strong>%(token)s</strong>."
 
 #: web/templates/favorites.html:58
 msgid "create a new password"
-msgstr ""
+msgstr "Neues Passwort erzeugen"
 
 #: web/templates/favorites.html:59
 msgid "don't require a password"
-msgstr ""
+msgstr "Kein Passwort verwenden"
 
 #: web/templates/favorites.html:64
 #, python-format
 msgid ""
 "You've marked your favorites-feed as public and others can\n"
 "      subscribe to it. It will also be indexed by %(sitename)s."
-msgstr ""
+msgstr "Deine Lieblings-Episoden sind öffentlich und andere können sie abonnieren. Sie werden auch auf %(sitename)s angezeigt."
 
 #: web/templates/favorites.html:71
 msgid "require a password for this feed"
-msgstr ""
+msgstr "Passwort verwenden"
 
 #: web/templates/favorites.html:76
 msgid "You don't have any episodes marked as favorites yet. Maybe have a look at the <a href=\"/toplist/episodes\">episode toplist</a>."
-msgstr ""
+msgstr "Du hast noch keine Lieblings-Episoden markiert."
 
 #: web/templates/favorites.html:78
 msgid "Once you've selected your favorites, you can subscribe to your very own <em>Favorites-Feed</em> that contains your favorite episodes"
-msgstr ""
+msgstr "Lieblings-Episoden können als Feed abonniert werden. Damit kannst du Episoden, die du im Web gefunden hast ganz einfach in einem Feed sammeln und auf deinem Client anhören."
 
 #: web/templates/history.html:12 web/templates/history.html.py:15
 msgid "Subscription and episode history"
@@ -761,15 +764,15 @@ msgstr "Abo-Verlauf"
 
 #: web/templates/history.html:12 web/templates/history.html.py:15
 msgid "for"
-msgstr ""
+msgstr "für"
 
 #: web/templates/history.html:16
 msgid "This is a list of recent subscription and episode actions for your account."
-msgstr ""
+msgstr "Die letzten Aktionen, die mit deinem Account durchgeführt wurden."
 
 #: web/templates/history.html:19
 msgid "Back to"
-msgstr ""
+msgstr "Zurück zu"
 
 #: web/templates/history.html:26
 msgid "Podcast/Episode"
@@ -777,11 +780,11 @@ msgstr "Podcast / Episode"
 
 #: web/templates/history.html:27
 msgid "Date"
-msgstr ""
+msgstr "Datum"
 
 #: web/templates/home.html:9
 msgid "welcome"
-msgstr ""
+msgstr "Willkommen"
 
 #: web/templates/home.html:13
 msgid "a Podcast-Webservice"
@@ -789,7 +792,7 @@ msgstr "ein Podcast-Webservice"
 
 #: web/templates/home.html:16
 msgid "Manage Your Podcast-Clients"
-msgstr ""
+msgstr "Podcast-Clients verwalten"
 
 #: web/templates/home.html:17
 msgid ""
@@ -869,12 +872,10 @@ msgid "API Documentation"
 msgstr "API-Dokumentation"
 
 #: web/templates/home.html:78
-#, fuzzy
 msgid "podcasts"
 msgstr "Podcasts"
 
 #: web/templates/home.html:79
-#, fuzzy
 msgid "episodes"
 msgstr "Episoden"
 
@@ -883,7 +884,6 @@ msgid "hours listened by"
 msgstr ""
 
 #: web/templates/home.html:81
-#, fuzzy
 msgid "users"
 msgstr "Abonnenten"
 
@@ -930,9 +930,8 @@ msgid "Not yet a member?"
 msgstr "Noch kein Mitglied?"
 
 #: web/templates/login.html:95
-#, fuzzy
 msgid "Create a new account - it's free!"
-msgstr "Erstelle ein Benutzer-Konto"
+msgstr "Erstelle einen Account!"
 
 #: web/templates/migrate.html:4
 msgid "Select a Username"
@@ -981,9 +980,8 @@ msgid "A list of your devices can be found on the <a href=\"/devices/\">devices 
 msgstr ""
 
 #: web/templates/online-help.html:27
-#, fuzzy
 msgid "Synchronizing Devices"
-msgstr "Synchronisieren"
+msgstr "Geräte Synchronisieren"
 
 #: web/templates/online-help.html:28
 msgid "If you have at least two devices connected to the webservice, you can synchronize some of them. Open the device page for one of them, click synchronize and select the device to synchronize with. After synchronizing, the subscriptions of the devices will be merged. Adding a subscription at one device will automatically add it to the others. Same for deletions."
@@ -1002,7 +1000,6 @@ msgid "Episode states (such as played, downloaded, etc) are synchronized across 
 msgstr ""
 
 #: web/templates/online-help.html:34
-#, fuzzy
 msgid "Privacy Settings"
 msgstr "Einstellungen"
 
@@ -1165,9 +1162,8 @@ msgid "You can <a href=\"/share/\">share</a> it with others."
 msgstr ""
 
 #: web/templates/subscriptions.html:31
-#, fuzzy
 msgid "Latest Episode:"
-msgstr "Letzte Episode"
+msgstr "Aktuelle Episode"
 
 #: web/templates/subscriptions.html:38
 msgid "No episodes"
@@ -1296,7 +1292,6 @@ msgid "Already got an account?"
 msgstr ""
 
 #: web/templates/registration/registration_form.html:18
-#, fuzzy
 msgid "Login here"
 msgstr "Anmelden"
 
@@ -1339,7 +1334,6 @@ msgid ""
 msgstr ""
 
 #: web/templates/search/search.html:22
-#, fuzzy
 msgid "Search:"
 msgstr "Suchen"
 
@@ -1428,9 +1422,8 @@ msgid "Suggestions"
 msgstr "Empfehlungen"
 
 #: web/templatetags/menu.py:30
-#, fuzzy
 msgid "My Devices"
-msgstr "Geräte"
+msgstr "Meine Geräte"
 
 #: web/templatetags/menu.py:35
 msgid "Directory"
