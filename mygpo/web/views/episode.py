@@ -23,6 +23,7 @@ from mygpo.api.models.episodes import Chapter
 from mygpo.api.models.users import EpisodeFavorite
 from mygpo.web.models import SecurityToken
 from mygpo.web.utils import get_played_parts
+from mygpo.decorators import manual_gc
 from mygpo.utils import parse_time
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
@@ -32,6 +33,7 @@ from django.contrib.sites.models import Site
 import random
 import string
 
+@manual_gc
 def episode(request, id):
     episode = get_object_or_404(Episode, pk=id)
 
@@ -66,6 +68,7 @@ def episode(request, id):
     }, context_instance=RequestContext(request))
 
 
+@manual_gc
 @login_required
 def add_chapter(request, id):
     episode = get_object_or_404(Episode, pk=id)
@@ -88,6 +91,7 @@ def add_chapter(request, id):
     return HttpResponseRedirect('/episode/%s' % id)
 
 
+@manual_gc
 @login_required
 def remove_chapter(request, id, chapter_id):
     Chapter.objects.filter(user=request.user, id=chapter_id).delete()
@@ -95,6 +99,7 @@ def remove_chapter(request, id, chapter_id):
     return HttpResponseRedirect('/episode/%s' % id)
 
 
+@manual_gc
 @login_required
 def toggle_favorite(request, id):
     episode = get_object_or_404(Episode, id=id)
@@ -105,6 +110,7 @@ def toggle_favorite(request, id):
     return HttpResponseRedirect('/episode/%s' % id)
 
 
+@manual_gc
 @login_required
 def list_favorites(request):
     site = Site.objects.get_current()

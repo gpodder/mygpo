@@ -20,6 +20,7 @@ from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadReque
 from django.template import RequestContext
 from mygpo.api.models import Podcast, Episode, ToplistEntry, Subscription
 from mygpo.data.models import PodcastTag
+from mygpo.decorators import manual_gc
 from mygpo import settings
 from django.shortcuts import get_object_or_404
 from django.db.models import Sum
@@ -27,6 +28,7 @@ from django.contrib.sites.models import Site
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 
 
+@manual_gc
 def browse(request, num_categories=10, num_tags_cloud=90, podcasts_per_category=10):
     total = int(num_categories) + int(num_tags_cloud)
     top_tags =  PodcastTag.objects.raw("select *, count(id) as entries from podcast_tags group by tag order by entries desc limit %d" % total)
@@ -56,6 +58,7 @@ def browse(request, num_categories=10, num_tags_cloud=90, podcasts_per_category=
         }, context_instance=RequestContext(request))
 
 
+@manual_gc
 def category(request, category, page_size=20):
     entries = ToplistEntry.objects.filter(podcast__podcasttag__tag=category).order_by('-subscriptions')
 

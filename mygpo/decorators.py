@@ -24,6 +24,7 @@ from django.contrib.auth.models import User
 from django.http import Http404, HttpResponseForbidden
 import random
 import string
+import gc
 
 def requires_token(object, action, denied_template=None):
     """
@@ -67,4 +68,15 @@ def requires_token(object, action, denied_template=None):
 
         return tmp
     return decorator
+
+
+def manual_gc(view):
+    def tmp(*args, **kwargs):
+        print args
+        print kwargs
+        res = view(*args, **kwargs)
+        gc.collect()
+        return res
+
+    return tmp
 

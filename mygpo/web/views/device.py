@@ -32,11 +32,13 @@ from mygpo.api.sanitizing import sanitize_url
 from mygpo.log import log
 from mygpo.utils import daterange
 from mygpo.api import simple
+from mygpo.decorators import manual_gc
 import re
 import random
 import string
 
 
+@manual_gc
 @login_required
 def overview(request):
     devices = Device.objects.filter(user=request.user,deleted=False).order_by('sync_group')
@@ -48,7 +50,7 @@ def overview(request):
     }, context_instance=RequestContext(request))
 
 
-
+@manual_gc
 @login_required
 def show(request, device_id, error_message=None):
     device = Device.objects.get(pk=device_id)
@@ -96,6 +98,7 @@ def show(request, device_id, error_message=None):
     }, context_instance=RequestContext(request))
 
 
+@manual_gc
 @login_required
 def opml(request, device_id):
     device = get_object_or_404(Device, id=device_id, user=request.user)
@@ -105,6 +108,7 @@ def opml(request, device_id):
     return response
 
 
+@manual_gc
 @login_required
 def delete(request, device_id):
     if request.method != 'POST':
@@ -117,6 +121,7 @@ def delete(request, device_id):
     return HttpResponseRedirect('/devices/')
 
 
+@manual_gc
 @login_required
 def undelete(request, device_id):
     device = get_object_or_404(Device, pk=device_id, user=request.user)
@@ -127,6 +132,7 @@ def undelete(request, device_id):
     return HttpResponseRedirect('/device/%s' % device.id)
 
 
+@manual_gc
 @login_required
 def sync(request, device_id):
 
@@ -148,6 +154,8 @@ def sync(request, device_id):
 
     return HttpResponseRedirect('/device/%s' % device_id)
 
+
+@manual_gc
 @login_required
 def unsync(request, device_id):
     if request.method != 'GET':

@@ -28,7 +28,7 @@ from django.forms import ValidationError
 from mygpo.api.opml import Exporter
 from django.utils.translation import ugettext as _
 from mygpo.api.basic_auth import require_valid_user
-from mygpo.decorators import requires_token
+from mygpo.decorators import requires_token, manual_gc
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
@@ -59,6 +59,7 @@ def home(request):
         return welcome(request)
 
 
+@manual_gc
 def welcome(request, toplist_entries=10):
     current_site = Site.objects.get_current()
     podcasts = Podcast.objects.count()
@@ -88,6 +89,7 @@ def welcome(request, toplist_entries=10):
     }, context_instance=RequestContext(request))
 
 
+@manual_gc
 @login_required
 def dashboard(request, episode_count=10):
     site = Site.objects.get_current()
@@ -161,6 +163,7 @@ def cover_art(request, size, filename):
     else:
         raise Http404('Cover art not available')
 
+@manual_gc
 @login_required
 def subscriptions(request):
     current_site = Site.objects.get_current()
@@ -271,6 +274,7 @@ def listener_data(podcast):
 
     return days
 
+@manual_gc
 def history(request, len=15, device_id=None):
     if device_id:
         devices = Device.objects.filter(id=device_id)
@@ -295,6 +299,7 @@ def history(request, len=15, device_id=None):
     }, context_instance=RequestContext(request))
 
 
+@manual_gc
 @login_required
 def podcast_subscribe(request, pid):
     podcast = get_object_or_404(Podcast, pk=pid)
@@ -333,6 +338,8 @@ def podcast_subscribe(request, pid):
         'form': form
     }, context_instance=RequestContext(request))
 
+
+@manual_gc
 @login_required
 def podcast_unsubscribe(request, pid, device_id):
 
@@ -369,6 +376,7 @@ def episode_list(podcast, user):
     return episodes
 
 
+@manual_gc
 def toplist(request, num=100, lang=None):
 
     try:
@@ -394,6 +402,7 @@ def toplist(request, num=100, lang=None):
     }, context_instance=RequestContext(request))
 
 
+@manual_gc
 def episode_toplist(request, num=100):
 
     try:
@@ -437,6 +446,7 @@ def process_lang_params(request, url):
     return utils.sanitize_language_codes(lang)
 
 
+@manual_gc
 @login_required
 def suggestions(request):
 
@@ -455,6 +465,7 @@ def suggestions(request):
     }, context_instance=RequestContext(request))
 
 
+@manual_gc
 @login_required
 def podcast_subscribe_url(request):
     url = request.GET.get('url')
@@ -472,6 +483,7 @@ def podcast_subscribe_url(request):
     return HttpResponseRedirect('/podcast/%d/subscribe' % podcast.pk)
 
 
+@manual_gc
 def resend_activation(request):
     error_message = ''
 
@@ -527,6 +539,7 @@ def resend_activation(request):
     return render_to_response('registration/resent_activation.html', context_instance=RequestContext(request))
 
 
+@manual_gc
 @requires_token(object='subscriptions', action='r', denied_template='user_subscriptions_denied.html')
 def user_subscriptions(request, username):
     user = get_object_or_404(User, username=username)
@@ -538,6 +551,7 @@ def user_subscriptions(request, username):
         }, context_instance=RequestContext(request))
 
 
+@manual_gc
 @login_required
 def all_subscriptions_download(request):
     podcasts = set([s.podcast for s in Subscription.objects.filter(user=request.user)])

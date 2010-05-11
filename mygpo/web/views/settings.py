@@ -25,10 +25,13 @@ from mygpo.web.forms import UserAccountForm
 from django.forms import ValidationError
 from django.utils.translation import ugettext as _
 from mygpo.api.basic_auth import require_valid_user
+from mygpo.decorators import manual_gc
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.contrib.sites.models import Site
 
+
+@manual_gc
 @login_required
 def account(request):
     success = False
@@ -78,6 +81,7 @@ def account(request):
     }, context_instance=RequestContext(request))
 
 
+@manual_gc
 @login_required
 def delete_account(request):
 
@@ -96,6 +100,7 @@ def delete_account(request):
         }, context_instance=RequestContext(request))
 
 
+@manual_gc
 @login_required
 def privacy(request):
 
@@ -150,6 +155,7 @@ def privacy(request):
         }, context_instance=RequestContext(request))
 
 
+@manual_gc
 @login_required
 def share(request):
     site = Site.objects.get_current()
