@@ -1,5 +1,6 @@
 from mygpo.api.models import URLSanitizingRule, Podcast, ToplistEntry, SuggestionEntry, SubscriptionAction, SubscriptionMeta, Subscription, Episode, EpisodeAction, EpisodeToplistEntry
 from mygpo.api.models.episodes import Chapter
+from mygpo.api.models.users import EpisodeFavorite
 from mygpo.data.models import BackendSubscription, Listener, HistoricPodcastData, PodcastTag
 from mygpo.log import log
 import urlparse
@@ -48,7 +49,7 @@ def apply_sanitizing_rules(url, rules, podcast=True, episode=False):
 
 def maintenance(dry_run=False):
     """
-    This currently checks how many podcasts could be removed by 
+    This currently checks how many podcasts could be removed by
     applying both basic sanitizing rules and those from the database.
 
     This will later be used to replace podcasts!
@@ -93,7 +94,7 @@ def maintenance(dry_run=False):
             continue
 
         # nothing to do
-        if su == p.url: 
+        if su == p.url:
             p_unchanged += 1
             continue
 
@@ -213,7 +214,7 @@ def maintenance(dry_run=False):
                 rewrite_episode_actions(e, su_episode)
                 rewrite_listeners(e, su_episode)
                 rewrite_chapters(e, su_episode)
-
+                rewrite_favorites(e, su_episode)
                 e.delete()
 
             e_merged += 1
@@ -261,7 +262,7 @@ def rewrite_podcasts(p_old, p_new):
 
     log('merging podcast %s "%s" to correct podcast %s "%s"' % (p_old.id, p_old.url, p_new.id, p_new.url))
 
-    # we simply delete incorrect toplist and suggestions entries, 
+    # we simply delete incorrect toplist and suggestions entries,
     # because we can't re-calculate them
     ToplistEntry.objects.filter(podcast=p_old).delete()
     SuggestionEntry.objects.filter(podcast=p_old).delete()
@@ -322,8 +323,9 @@ def rewrite_episodes(p_old, p_new):
             rewrite_listeners(e, e_new)
             log('listeners for episode %s (url "%s", podcast %s) updated.' % (e.id, e.url, p_old.id))
             rewrite_chapters(e, e_new)
-            log('chapters for episode %s (url "%s", podcast %s) updated, deleting.' % (e.id, e.url, p_old.id))
-            if EpisodeToplistEntry.objects.filter(episode=e).exists(): print 'still in toplist!'
+            log('chapters for episode %s (url "%s", podcast %s) updated.' % (e.id, e.url, p_old.id))
+            rewrite_favorites(e, e_new)
+            log('favorites for episode %s (url "%s", podcast %s) updated, deleting.' % (e.id, e.url, p_old.id))
             e.delete()
 
         except Episode.DoesNotExist:
@@ -342,6 +344,7 @@ def rewrite_episode_actions(e_old, e_new):
 
         except Exception, e:
             log('error updating episode action %s: %s, deleting' % (sa.id, e))
+            ea.delete()
 
 
 def rewrite_listeners(e_old, e_new):
@@ -368,6 +371,19 @@ def rewrite_chapters(e_old, e_new):
 
         except Exception, e:
             log('error updating chapter %s: %s, deleting' % (c.id, e))
+            c.delete()
+
+
+def rewrite_favorites(e_old, e_new):
+    for f in EpisodeFavorite.objects.filter(episode=e_old):
+        try:
+            log('updating favorite %s (user %s, episode %s => %s)' % (f.id, f.user.id, e_old.id, e_new.id))
+            f.episode = e_new
+            f.save()
+
+        except Exception, e:
+            log('error updating favorite %s: %s, deleting' % (f.id, e))
+            f.delete()
 
 
 def precompile_rules(rules=URLSanitizingRule.objects.all().order_by('priority')):
