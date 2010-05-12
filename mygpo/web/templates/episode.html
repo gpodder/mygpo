@@ -9,7 +9,13 @@
 
 {% load menu %}
 {% block mainmenu %}{{ "/podcast/"|main_menu }}{% endblock %}
-{% block sectionmenu %}{{ "/podcast/"|section_menu:episode.podcast.title }}{% endblock %}
+{% block sectionmenu %}
+ {% if episode.podcast.title %}
+  {{ "/podcast/"|section_menu:episode.podcast.title }}
+ {% else %}
+  {{ "/podcast/"|section_menu:"Unnamed Podcast" }}
+ {% endif %}
+{% endblock %}
 
 {% block head %}
  <script type="text/javascript" src="/media/js/jquery-1.4.2.min.js"></script>

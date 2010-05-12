@@ -8,7 +8,13 @@
 
 {% load menu %}
 {% block mainmenu %}{{ "/podcast/"|main_menu }}{% endblock %}
-{% block sectionmenu %}{{ "/podcast/"|section_menu:podcast.title }}{% endblock %}
+{% block sectionmenu %}
+ {% if podcast.title %}
+  {{ "/podcast/"|section_menu:podcast.title }}
+ {% else %}
+  {{ "/podcast/"|section_menu:"Unnamed Podcast" }}
+ {% endif %}
+{% endblock %}
 
 {% block title %}{{ podcast.title|default:"Unnamed Podcast"|striptags }}{% endblock %}
 
