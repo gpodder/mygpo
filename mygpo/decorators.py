@@ -72,8 +72,6 @@ def requires_token(object, action, denied_template=None):
 
 def manual_gc(view):
     def tmp(*args, **kwargs):
-        print args
-        print kwargs
         res = view(*args, **kwargs)
         gc.collect()
         return res
