@@ -15,7 +15,9 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from mygpo.api.models import Podcast, Episode
+from django.contrib.auth.models import User
+from mygpo.api.models import Podcast, Episode, Subscription
+from mygpo.data.models import PodcastTag
 
 def avg_update_interval(podcast):
     """
@@ -26,4 +28,31 @@ def avg_update_interval(podcast):
     t1 = unique_timestamps[0]['timestamp']
     t2 = unique_timestamps[c-1]['timestamp']
     return max(1, (t2 - t1).days / c)
+
+
+def calc_similar_podcasts(podcast):
+    """
+    calculates and returns a list of podcasts that seem to be similar
+    to the given one.
+
+    Probably an expensive operation
+    """
+    tags = [t.tag for t in PodcastTag.objects.filter(podcast=podcast).only('tag').distinct()]
+    users = User.objects.filter(subscription__podcast=podcast).only('id').distinct()
+    subscribed = Subscription.objects.filter(user__in=users).only('podcast')
+    podcast_list = {}
+    for s in subscribed:
+        if s.podcast == podcast:
+            continue
+        podcast_list[s.podcast] = podcast_list.get(s.podcast, 0) + 1
+
+    for p in podcast_list.iterkeys():
+        ps_tags = [t.tag for t in PodcastTag.objects.filter(podcast=p).only('tag').distinct()]
+        matching_tags = filter(lambda t: t in tags, ps_tags)
+        podcast_list[p] = podcast_list[p] * max(len(matching_tags), 1)
+
+    l = list(podcast_list.iteritems())
+    l.sort(key=lambda (p, count): count, reverse=True)
+    return l
+
 

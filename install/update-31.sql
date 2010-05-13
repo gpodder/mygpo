@@ -9,4 +9,13 @@ CREATE VIEW episode_toplist AS
     HAVING listeners > 0
     ORDER BY listeners;
 
+CREATE TABLE related_podcasts (
+    id INTEGER AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    ref_podcast_id INTEGER NOT NULL,
+    rel_podcast_id INTEGER NOT NULL,
+    priority INTEGER NOT NULL
+);
+
+ALTER TABLE related_podcasts ADD CONSTRAINT ref_podcast_id FOREIGN KEY (ref_podcast_id) REFERENCES podcast (id);
+ALTER TABLE related_podcasts ADD CONSTRAINT rel_podcast_id FOREIGN KEY (rel_podcast_id) REFERENCES podcast (id);
 

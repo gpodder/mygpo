@@ -140,6 +140,9 @@ class Podcast(models.Model):
             p.group = None
             p.save()
 
+    def get_similar(self):
+        from mygpo.data.models import RelatedPodcast
+        return [r.rel_podcast for r in RelatedPodcast.objects.filter(ref_podcast=self)]
 
     def __unicode__(self):
         return self.title if self.title != '' else self.url

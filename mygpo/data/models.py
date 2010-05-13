@@ -51,3 +51,12 @@ class Listener(models.Model):
         db_table = 'listeners'
         managed = False
 
+
+class RelatedPodcast(models.Model):
+    ref_podcast = models.ForeignKey(Podcast, related_name='ref_podcast')
+    rel_podcast = models.ForeignKey(Podcast, related_name='rel_podcast')
+    priority = models.IntegerField()
+
+    class Meta:
+        db_table = 'related_podcasts'
+
