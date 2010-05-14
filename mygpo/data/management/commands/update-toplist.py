@@ -29,11 +29,11 @@ class Command(BaseCommand):
 
         ToplistEntry.objects.all().delete()
 
-        for p in Podcast.objects.filter(group=None):
+        for p in Podcast.objects.filter(group=None).order_by('id'):
             subscription_count = p.subscriber_count()
             ToplistEntry.objects.create(podcast=p, oldplace=old_podcasts.get(p.id, 0), subscriptions=subscription_count)
 
-        for g in PodcastGroup.objects.all():
+        for g in PodcastGroup.objects.all().order_by('id'):
             total = 0
             for p in g.podcasts():
                 total += p.subscriber_count()

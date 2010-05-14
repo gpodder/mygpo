@@ -30,7 +30,11 @@
    </tr>
   {% for entry in entries %}
    <tr>
-    <td class="numeric">{{ forloop.counter }}</td>
+    <td class="numeric toplist-pos">
+     {% ifchanged entry.listeners %}
+      {{ forloop.counter }}
+     {% endifchanged %}
+    </td>
     <td>{{ entry.episode.podcast|podcast_logo }}</td>
     <td><a href="/episode/{{ entry.episode.id }}">
      {% if entry.episode.title %}

@@ -33,7 +33,11 @@
    </tr>
   {% for entry in entries %}
    <tr>
-    <td class="numeric">{{ forloop.counter }}</td>
+    <td class="numeric toplist-pos">
+     {% ifchanged entry.subscriptions %}
+      {{ forloop.counter }}
+     {% endifchanged %}
+    </td>
     <td class="oldposition">
      {% if entry.oldplace %}
       {% if entry.oldplace|subtract:forloop.counter %}
