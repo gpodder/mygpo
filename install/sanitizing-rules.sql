@@ -17,3 +17,6 @@ INSERT INTO `sanitizing_rules` VALUES (16,0,1,'^http://\\d+\\.media\\.collegehum
 INSERT INTO `sanitizing_rules` VALUES (17,1,0,'(?i)^http://feeds\.feedburner\.com/ShotOfJaq$', 'http://shotofjaq.org/feed/', 100, 'Merges Shot of Jaq feeds to the URL given on their Website');
 INSERT INTO `sanitizing_rules` VALUES (18,1,0,'http://shotofjaq\.org/feed$', 'http://shotofjaq.org/feed/', 100, 'Add trailing slash to Shot of Jaq feed URL');
 INSERT INTO `sanitizing_rules` VALUES (19,1,0,'(?i)^http://feeds\.feedburner\.com/ShotOfJaqOGG$', 'http://feeds.feedburner.com/ShotOfJaqOgg', 100, 'Unify all Feedburner URLs for the Shot of Jaq Ogg feed (seems it doesn\'t have an shotofjaq.org url)');
+INSERT INTO `sanitizing_rules` VALUES (20,1,0,'(?i)^http://feeds\.feedburner\.com/TEDTalks_video$', 'http://feeds.feedburner.com/tedtalks_video', 100, 'Unify all TEDTalks podcasts');
+INSERT INTO `sanitizing_rules` VALUES (21,1,0,'(?i)^http://feeds\.feedburner\.com/TEDTalks_audio$', 'http://feeds.feedburner.com/tedtalks_audio', 100, 'Unify all TEDTalks podcasts');
+INSERT INTO `sanitizing_rules` VALUES (22,1,0,'(?i)^http://feeds\.feedburner\.com/TedtalksHD$', 'http://feeds.feedburner.com/tedtalkshd', 100, 'Unify all TEDTalks podcasts');
