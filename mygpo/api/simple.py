@@ -21,7 +21,7 @@ from mygpo.api.models import Device, SubscriptionAction, Podcast, SUBSCRIBE_ACTI
 from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url
-from mygpo.api.backend import get_toplist
+from mygpo.api.backend import get_toplist, get_all_subscriptions
 from django.core import serializers
 from datetime import datetime
 from mygpo.api.httpresponse import HttpErrorResponse
@@ -53,6 +53,14 @@ def subscriptions(request, username, device_uid, format):
     
     else:
         return HttpResponseBadRequest()
+
+
+@csrf_exempt
+@require_valid_user
+@check_username
+def all_subscriptions(request, username, format):
+    podcasts = get_all_subscriptions(request.user)
+    return format_subscriptions(podcasts, format, username)
 
 
 def format_subscriptions(subscriptions, format, username):

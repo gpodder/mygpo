@@ -92,6 +92,7 @@ urlpatterns = patterns('',
 
     #Simple API
     (r'^subscriptions/(?P<username>\w+)/(?P<device_uid>[\w.-]+)\.(?P<format>\w+)', 'mygpo.api.simple.subscriptions'),
+    (r'^subscriptions/(?P<username>\w+)\.(?P<format>\w+)', 'mygpo.api.simple.all_subscriptions'),
     (r'^toplist/(?P<count>\d+)\.(?P<format>\w+)', 'mygpo.api.simple.toplist'),
     (r'^search\.(?P<format>\w+)', 'mygpo.api.simple.search'),
     (r'^suggestions/(?P<count>\d+)\.(?P<format>\w+)', 'mygpo.api.simple.suggestions'),

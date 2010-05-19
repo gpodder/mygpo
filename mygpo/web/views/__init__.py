@@ -63,7 +63,7 @@ def home(request):
 def welcome(request, toplist_entries=10):
     current_site = Site.objects.get_current()
     podcasts = Podcast.objects.count()
-    users = User.objects.count()
+    users = User.objects.filter(is_active=True).count()
     episodes = Episode.objects.count()
     hours_listened = Listener.objects.all().aggregate(hours=Sum('episode__duration'))['hours'] / (60 * 60)
 
@@ -100,7 +100,7 @@ def dashboard(request, episode_count=10):
     lang = utils.get_accepted_lang(request)
     lang = utils.sanitize_language_codes(lang)
 
-    random_podcasts = backend.get_podcasts_for_languages(lang).exclude(title='').order_by('?')[:5]
+    random_podcasts = backend.get_random_picks(lang)[:5]
 
     return render_to_response('dashboard.html', {
             'site': site,
@@ -554,7 +554,7 @@ def user_subscriptions(request, username):
 @manual_gc
 @login_required
 def all_subscriptions_download(request):
-    podcasts = set([s.podcast for s in Subscription.objects.filter(user=request.user)])
+    podcasts = backend.get_all_subscriptions(request.user)
     response = simple.format_subscriptions(podcasts, 'opml', request.user.username)
     response['Content-Disposition'] = 'attachment; filename=all-subscriptions.opml'
     return response

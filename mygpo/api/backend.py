@@ -15,7 +15,9 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from mygpo.api.models import ToplistEntry, Podcast
+from mygpo.api.models import ToplistEntry, Podcast, Subscription
+from django.db.models import Max
+from datetime import datetime, timedelta
 import re
 
 try:
@@ -29,12 +31,12 @@ except ImportError:
     import json
 
 
-def get_podcasts_for_languages(languages=None):
+def get_podcasts_for_languages(languages=None, podcast_query=Podcast.objects.all()):
     if not languages:
         return Podcast.objects.all()
 
     regex = '^(' + '|'.join(languages) + ')'
-    return Podcast.objects.filter(language__regex=regex)
+    return podcast_query.filter(language__regex=regex)
 
 
 def get_toplist(count, languages=None):
@@ -79,3 +81,22 @@ def merge_toplists(podcast_entries, group_entries, sortkey, reverse, count=None)
         entries = entries[:count]
     return entries
 
+
+def get_random_picks(languages=None, recent_days=timedelta(days=7)):
+#    threshold = datetime.today() - recent_days
+
+    all_podcasts    = Podcast.objects.all().exclude(title='').order_by('?')
+    lang_podcasts   = get_podcasts_for_languages(languages, all_podcasts)
+#    recent_podcasts = lang_podcasts.annotate(latest_release=Max('episode__timestamp')).filter(latest_release__gt=threshold)
+
+#    if recent_podcasts.count() > 0:
+#        return recent_podcasts
+
+    if lang_podcasts.count() > 0:
+        return lang_podcasts
+
+    else:
+        return all_podcasts
+
+def get_all_subscriptions(user):
+    return set([s.podcast for s in Subscription.objects.filter(user=user)])
