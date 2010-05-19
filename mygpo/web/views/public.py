@@ -60,7 +60,7 @@ def browse(request, num_categories=10, num_tags_cloud=90, podcasts_per_category=
 
 @manual_gc
 def category(request, category, page_size=20):
-    entries = ToplistEntry.objects.filter(podcast__podcasttag__tag=category).order_by('-subscriptions')
+    entries = ToplistEntry.objects.filter(podcast__podcasttag__tag=category).order_by('-subscriptions').distinct()
 
     paginator = Paginator(entries, page_size)
 
