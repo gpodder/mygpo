@@ -82,7 +82,10 @@ def get_played_parts(user, episode):
     played_parts = flatten_intervals(actions)
 
     # if end of last played part exceeds median length, extend episode
-    length = max(median_length, played_parts[len(played_parts)-1]['end'])
+    if played_parts:
+        length = max(median_length, played_parts[len(played_parts)-1]['end'])
+    else:
+        return None, episode.duration
 
     #split up the played parts in alternating 'unplayed' and 'played'
     #sections, starting with an unplayed
