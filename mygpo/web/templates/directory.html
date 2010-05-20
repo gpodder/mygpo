@@ -43,12 +43,14 @@
   {% endfor %}
 
   <hr />
-  {% for tag in tag_cloud %}
-   <span style="font-size: {% smartwidthratio tag.entries max_entries 4 1 %}em">
-    <a href="/directory/{{ tag.tag }}">{{ tag.tag }}</a>
-   </span>
-  {% endfor %}
 
+  <div id="tagcloud">
+   {% for tag in tag_cloud %}
+    <span style="font-size: {% smartwidthratio tag.entries max_entries 4 1 %}em">
+     <a href="/directory/{{ tag.tag }}">{{ tag.tag }}</a>
+    </span>
+   {% endfor %}
+  </div>
 
 {% endblock %}
 
