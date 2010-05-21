@@ -594,7 +594,6 @@ div.intro-box ul
 
 div.come-in-box
 {
-    margin-left: -10%;
     padding-top: 1em;
     padding-bottom: 1em;
     clear: both;
@@ -610,4 +609,15 @@ div.come-in-box
 #tagcloud
 {
     text-align: justify;
+}
+
+#feature-list h3
+{
+    cursor: pointer;
+}
+
+.sponsoring-podcast
+{
+    padding-top: 1em;
+    padding-bottom: 1em;
 }

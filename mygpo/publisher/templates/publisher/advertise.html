@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load podcasts %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/publisher/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/publisher/advertise"|section_menu }}{% endblock %}
+
+{% block title %}{% trans "Advertise" %}{% endblock %}
+
+{% block content %}
+ <h1>{% blocktrans with site as sitename %}Advertise on {{ sitename }}{% endblocktrans %}</h1>
+
+ <p>{% blocktrans with site as sitename %}For just € 20,-- or US$ 25,-- your podcast will be shown on the <strong>front page of {{ sitename }} for a week</strong>. Additionally it will be the first podcast in <strong>gPodder's list of example podcasts.</strong>{% endblocktrans %}</p>
+
+ <p>{% blocktrans %}You can chose when your advertisement will be active, and the text that will be displayed for your podcast.{% endblocktrans %}</p>
+
+ <h2>{% trans "Front Page" %}</h2>
+ <p>{% blocktrans with site as sitename%}Your podcast will be displayed on the front page of {{ sitename }} for both logged-in and anonymous users.{% endblocktrans %}</p>
+
+ <h2>{% trans "Example Podcasts" %}</h2>
+ <p>{% blocktrans %}The gPodder client offers a list of example podcasts when started for the first time. This list is loaded from the web on demand. For the time of your advertisement, your podcast will be the first in the list.{% endblocktrans %}
+
+ <h2>{% trans "Visitors" %}</h2>
+ <p>{% blocktrans %}Both the front page and the list of example podcasts are accessed by about 3000 people per week (that's <strong>6000 people</strong> in total), who are actively looking for interesting podcasts. We do, however, not guarantee a certain number of visitors during your advertisement period.{% endblocktrans %}</p>
+
+ <h2>{% trans "Start your Advertisement" %}</h2>
+ <p>{% blocktrans with site as sitename %}Contact <a href="mailto:stefan@gpodder.net">stefan@gpodder.net</a> if you would like to advertise on {{ sitename }} or if you have any questions. Payments are done via PayPal to thp@perli.net.{% endblocktrans %}</p>
+
+{% endblock %}
+

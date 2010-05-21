@@ -73,6 +73,8 @@ urlpatterns = patterns('',
     (r'^toplist/episodes$', 'mygpo.web.views.episode_toplist'),
     (r'^toplist.opml$', 'mygpo.api.simple.toplist', {'count': 50, 'format': 'opml'}),
 
+    (r'^gpodder-examples.opml$', 'mygpo.web.views.gpodder_example_podcasts'),
+
     (r'^suggestions/$', 'mygpo.web.views.suggestions'),
 
     (r'^devices/$', 'mygpo.web.views.device.overview'),
@@ -132,7 +134,9 @@ urlpatterns = patterns('',
     (r'^publisher/episode/(?P<id>\d+)$', 'mygpo.publisher.views.episode'),
     (r'^publisher/podcast/search$', 'mygpo.publisher.views.search_podcast'),
     (r'^publisher/group/(?P<group_id>\d+)$', 'mygpo.publisher.views.group'),
+
     (r'^publisher/link/$', 'mygpo.publisher.views.link'),
+    (r'^publisher/advertise', 'mygpo.publisher.views.advertise'),
 
     #Subscribe with my.gpodder.org
     (r'^subscribe', 'mygpo.web.views.podcast_subscribe_url'),

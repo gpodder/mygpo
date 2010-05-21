@@ -1,5 +1,7 @@
 from mygpo.api.models import Podcast, EpisodeAction
+from mygpo.web.models import Advertisement
 from babel import Locale, UnknownLocaleError
+from datetime import datetime
 import re
 
 def get_accepted_lang(request):
@@ -127,4 +129,13 @@ def flatten_intervals(actions):
             flat_date = {'start': action.started, 'end': action.playmark}
     played_parts.append(flat_date)
     return played_parts
+
+
+def get_sponsored_podcast(when=datetime.now):
+    adv = Advertisement.objects.filter(start__lte=when, end__gte=when)
+
+    if not adv.exists():
+        return None
+    else:
+        return adv[0]
 

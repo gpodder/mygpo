@@ -17,6 +17,7 @@
 
 from django.db import models
 from django.contrib.auth.models import User
+from mygpo.api.models import Podcast
 from datetime import datetime
 import random
 import string
@@ -54,4 +55,18 @@ class SecurityToken(models.Model):
         if self.token == '':
             return True
         return self.token == token
+
+
+class Advertisement(models.Model):
+    podcast = models.ForeignKey(Podcast)
+    title = models.CharField(max_length=100)
+    text = models.TextField()
+    start = models.DateTimeField()
+    end = models.DateTimeField()
+
+    class Meta:
+        db_table = 'advertisements'
+
+    def __unicode__(self):
+        return '%s (%s - %s)' % (self.podcast, self.start, self.end)
 

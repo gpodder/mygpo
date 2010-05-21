@@ -9,19 +9,30 @@
 {% block title %}{% trans "Publisher Pages" %}{% endblock %}
 
 {% block content %}
- <h1>{% trans "Publisher Pages" %}</h1>
+ <h1>{% trans "Publisher Services" %}</h1>
 
- <p>On the <strong>{{site}} Publisher Pages</strong> you can find valuable information about the Podcasts published by you.</p>
+ <p>{% blocktrans with site as sitename %}{{ sitename }} offers several services for podcast publishers.{% endblocktrans %}</p>
 
- <p>The Publisher Pages are currently in Beta, but if you are publishing a podcast listed on {{site}}, feel free to apply by sending a mail with
+ <h2>{% trans "Advertise" %}</h2>
+ <p>{% blocktrans with site as sitename %}You can place your podcast on the frontpage of {{ sitename }} to promote your podcast. Users of the gPodder client will also find your podcast as the first item in the list of example podcast.{% endblocktrans %}</p>
+ <p>{% blocktrans %}You can find additional details on the <a href="/publisher/advertise">advertisement page</a>.{% endblocktrans %}</p>
+
+ <h2>{% trans "Publisher Pages" %}</h2>
+ <p>{% blocktrans with site as sitename %}On the <strong>{{ sitename }} Publisher Pages</strong> you can find valuable information about the Podcasts published by you.{% endblocktrans %}</p>
+
+ <p>{% blocktrans with site as sitename %}The Publisher Pages are currently in Beta, but if you are publishing a podcast listed on {{ sitename }}, feel free to apply by sending a mail with
   <ul>
-   <li>your username on {{ site }} (<a href="/register/">register if you don't have one</a>)</li>
+   <li>your username on {{ sitename }} (<a href="/register/">register if you don't have one</a>)</li>
    <li>the name and URL of the podcast you are publishing</li>
    <li>an email address that is visible somewhere on the podcast's website (to legitimate you)
   </ul>
-  to <a href="mailto:stefan@gpodder.net">stefan@gpodder.net</a>.</p>
+  to <a href="mailto:stefan@gpodder.net">stefan@gpodder.net</a>.{% endblocktrans %}</p>
 
-  <strong>If you already are registered as a publisher, please <a href="/login/?next=/publisher/">login</a>.</strong>
+ <p>{% blocktrans %}If you already are registered as a publisher, please <a href="/login/?next=/publisher/">login</a>.{% endblocktrans %}</p>
+
+ <h2>{% blocktrans with site as sitename %}Link to {{ sitename }}{% endblocktrans %}</h2>
+ <p>{% blocktrans with site as sitename %}If you <a href="/publisher/link/">link to {{ sitename }}</a> from your website, you can make it really easy for your visitors to subscribe to your podcast - especially for users of mobile phones.{% endblocktrans %}</p>
+
 
 {% endblock %}
 

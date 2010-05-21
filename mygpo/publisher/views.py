@@ -173,3 +173,10 @@ def link(request):
         'url': current_site
         }, context_instance=RequestContext(request))
 
+
+def advertise(request):
+    site = Site.objects.get_current()
+    return render_to_response('publisher/advertise.html', {
+        'site': site
+    }, context_instance=RequestContext(request))
+

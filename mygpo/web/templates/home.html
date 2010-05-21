@@ -2,6 +2,20 @@
 {% load i18n %}
 {% load podcasts %}
 
+{% block head %}
+ <script type="text/javascript" src="/media/js/jquery-1.4.2.min.js"></script>
+ <script type="text/javascript">
+    $(document).ready(function()
+    {
+        $("#feature-list p").hide();
+        $("#feature-list h3").click(function()
+        {
+            $(this).next("#feature-list p").slideToggle(500);
+        });
+    });
+ </script>
+{% endblock %}
+
 {% load menu %}
 {% block mainmenu %}{{ "/"|main_menu }}{% endblock %}
 {% block sectionmenu %}{{ "/"|section_menu }}{% endblock %}
@@ -12,48 +26,51 @@
 
 <h1>gPodder.net &ndash; {% trans "a Podcast-Webservice" %}</h1>
 
-<div class="intro-box">
+<div class="intro-box" id="feature-list">
  <h3><img style="vertical-align: middle;" src="/media/preferences-system.png" alt="" /> {% trans "Manage Your Podcast-Clients" %}</h3>
- {% blocktrans %}
-  With gpodder.net you can manage your podcast clients via the
+ <p>{% blocktrans %}With gpodder.net you can manage your podcast clients via the
   web, subscribe to new podcasts and even synchronize gPodder on
-  your notebook and on your mobile phone.
- {% endblocktrans %}
-</div>
+  your notebook and on your mobile phone.{% endblocktrans %}</p>
 
-<div class="intro-box">
- <h3><img style="vertical-align: middle;" src="/media/emblem-favorite.png" alt="" /> {% trans "Discover Interesting Podcasts" %}</h3>
- {% blocktrans %}
-  Find new interesting podcasts in our <a href="/toplist/">toplist</a>,
-  see what's <a href="/toplist/episodes">currently listened</a> to by our
-  users and get personalized suggestions.
- {% endblocktrans %}
-</div>
+ <h3><img style="vertical-align: middle;" src="/media/emblem-favorite.png" alt="" /> {% trans "Discover New Podcasts" %}</h3>
+ <p>{% blocktrans %}Find new interesting podcasts in our <a href="/directory/">directory</a> and <a href="/toplist/">toplist</a>, see what's <a href="/toplist/episodes">currently listened</a> to by our users and get personalized suggestions.{% endblocktrans %}</p>
 
-<br style="clear: left;" />
-
-<div class="intro-box">
  <h3><img style="vertical-align: middle;" src="/media/share-icon-16x16.png" alt="" /> {% trans "Share Interesting Podcasts" %}</h3>
- {% blocktrans %}
-  Share your podcast subscriptions and favorite episodes with other
-  users and get recommendations by others.
- {% endblocktrans %}
+ <p>{% blocktrans %}Share your podcast subscriptions and favorite episodes with other users and get recommendations by others.{% endblocktrans %}</p>
+
+ <h3><img style="vertical-align: middle;" src="/media/package-x-generic.png" alt="" /> {% trans "Backup your Subscriptions" %}</h3>
+ <p>{% blocktrans %}With having your subscription and listening data <em>in the cloud</em> you always have a copy ready when replacing a computer or buying a new mobile phone.{% endblocktrans %}</p>
+
+ <h3><img style="vertical-align: middle;"; src="/media/applications-internet.png" alt="" /> Seamless Playback on the Go</h3>
+ <p>{% blocktrans %}Start listening to an episode on your PC and continue playback on your mobile phone &ndash; automatically.{% endblocktrans %}</p>
+
 </div>
 
 <div class="intro-box">
- <h3><img style="vertical-align: middle;" src="/media/package-x-generic.png" alt="" /> {% trans "Backup your Data" %}</h3>
- {% blocktrans %}
-  With having your subscription and listening data <em>in the cloud</em>
-  you always have a copy ready when replacing a computer or buying a
-  new mobile phone.
- {% endblocktrans %}
-</div>
+ <div class="sponsoring-podcast">
+  {% if sponsored_podcast %}
+   <h3>{{ sponsored_podcast.title }} <small>(Supporting Podcast)</small></h3>
+   {{ sponsored_podcast.podcast|podcast_logo }}
+   <div style="margin-left: 40px">{{ sponsored_podcast.text}}</div>
+   <br style="clear: left;"/>
+   <small><a href="publisher/advertise">advertise here</a></small>
+  {% else %}
+   <h3><img style="vertical-align: middle;" src="/media/face-smile.png" alt="" /> {% trans "Advertise your Podcast" %}</h3>
+   {% blocktrans %}Use this space and the <em>Example Podcasts</em> in all
+   gPodder clients &ndash; for just € 20 per week &ndash; to advertise your podcast.
+   Find out more on the <a href="/publisher/advertise">advertisement page</a>.{% endblocktrans %}
+  {% endif %}
+ </div>
 
-<div class="come-in-box">
- <a href="/register/">{% trans "Register" %}</a>
- {% trans "or" %}
- <a href="/login/">{% trans "Login" %}</a>
+ <div class="come-in-box">
+  <a href="/register/">{% trans "Register" %}</a>
+  {% trans "or" %}
+  <a href="/login/">{% trans "Login" %}</a>
+ </div>
+
 </div>
+<br style="clear: both" />
+
 
 <hr />
 

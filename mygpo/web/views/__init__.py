@@ -78,6 +78,7 @@ def welcome(request, toplist_entries=10):
         entries = backend.get_toplist(toplist_entries, lang)
 
     toplist = [e.get_podcast() for e in entries]
+    sponsored_podcast = utils.get_sponsored_podcast()
 
     return render_to_response('home.html', {
           'podcast_count': podcasts,
@@ -86,6 +87,7 @@ def welcome(request, toplist_entries=10):
           'url': current_site,
           'hours_listened': hours_listened,
           'toplist': toplist,
+          'sponsored_podcast': sponsored_podcast,
     }, context_instance=RequestContext(request))
 
 
@@ -101,6 +103,7 @@ def dashboard(request, episode_count=10):
     lang = utils.sanitize_language_codes(lang)
 
     random_podcasts = backend.get_random_picks(lang)[:5]
+    sponsored_podcast = utils.get_sponsored_podcast()
 
     return render_to_response('dashboard.html', {
             'site': site,
@@ -108,6 +111,7 @@ def dashboard(request, episode_count=10):
             'subscribed_podcasts': subscribed_podcasts,
             'newest_episodes': newest_episodes,
             'random_podcasts': random_podcasts,
+            'sponsored_podcast': sponsored_podcast,
         }, context_instance=RequestContext(request))
 
 
@@ -197,6 +201,7 @@ def podcast(request, pid):
     episodes = episode_list(podcast, request.user)
     max_listeners = max([x.listeners for x in episodes]) if len(episodes) else 0
     related_podcasts = [x for x in podcast.group.podcasts() if x != podcast] if podcast.group else []
+    similar_podcasts = podcast.get_similar()
 
     if request.user.is_authenticated():        
         devices = Device.objects.filter(user=request.user)
@@ -237,6 +242,7 @@ def podcast(request, pid):
             'privacy_form': privacy_form,
             'devices': subscribed_devices,
             'related_podcasts': related_podcasts,
+            'similar_podcasts': similar_podcasts,
             'can_subscribe': len(subscribe_targets) > 0,
             'episodes': episodes,
             'max_listeners': max_listeners,
@@ -559,3 +565,9 @@ def all_subscriptions_download(request):
     response['Content-Disposition'] = 'attachment; filename=all-subscriptions.opml'
     return response
 
+
+def gpodder_example_podcasts(request):
+    sponsored_podcast = utils.get_sponsored_podcast()
+    return render_to_response('gpodder_examples.opml', {
+       'sponsored_podcast': sponsored_podcast
+    }, context_instance=RequestContext(request))

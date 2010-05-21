@@ -30,6 +30,17 @@
   {% endblocktrans %}</p>
 
  {% endif %}
+
+ {% if sponsored_podcast %}
+  <div class="sponsoring-podcast">
+   <h3>{{ sponsored_podcast.title }} <small>(Supporting Podcast)</small></h3>
+   <div>{{ sponsored_podcast.podcast|podcast_logo }}</div>
+   <div style="margin-left: 40px">{{ sponsored_podcast.text|truncatewords:"20"}}</div>
+   <br style="clear: left;"/>
+   <small><a href="publisher/advertise">advertise here</a></small>
+  </div>
+ {% endif %}
+
  </div>
 
  <div class="intro-box">

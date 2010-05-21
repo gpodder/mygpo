@@ -46,6 +46,7 @@ MENU_STRUCTURE = (
         )),
         (_('Publisher'), (
             ('/publisher/', _('Home')),
+            ('/publisher/advertise', _('Advertise')),
             ('/publisher/link/', _('Link to gpodder.net')),
             ('/publisher/podcast/', _('Podcast')),
         )),
