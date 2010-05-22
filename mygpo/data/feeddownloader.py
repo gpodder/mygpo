@@ -27,6 +27,7 @@ import hashlib
 import urllib2
 import socket
 import time
+import mimetypes
 
 from mygpo import feedcore
 from mygpo.api import models
@@ -44,8 +45,15 @@ def mark_outdated(podcast):
         e.save()
 
 
-def check_mime(mimetype):
+def check_mime(mimetype, url):
     """Check if a mimetype is a "wanted" media type"""
+
+    if not mimetype:
+        mimetype, _encoding = mimetypes.guess_type(url)
+
+    if not mimetype:
+        return False
+
     if '/' in mimetype:
         category, _ignore = mimetype.split('/', 1)
         return category in ('audio', 'video', 'image')
@@ -56,12 +64,12 @@ def get_episode_url(entry):
     """Get the download / episode URL of a feedparser entry"""
     enclosures = getattr(entry, 'enclosures', [])
     for enclosure in enclosures:
-        if 'href' in enclosure and check_mime(enclosure.get('type', '')):
+        if 'href' in enclosure and check_mime(enclosure.get('type', ''), enclosure['href']):
             return enclosure['href']
 
     media_content = getattr(entry, 'media_content', [])
     for media in media_content:
-        if 'url' in media and check_mime(media.get('type', '')):
+        if 'url' in media and check_mime(media.get('type', ''), media['url']):
             return media['url']
 
     links = getattr(entry, 'links', [])
