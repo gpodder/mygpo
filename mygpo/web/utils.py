@@ -110,7 +110,7 @@ def flatten_intervals(actions):
     list of hashtables with start end elements of the flattened
     play intervals.
     """
-    actions = filter(lambda x: x.started and x.playmark, actions)
+    actions = filter(lambda x: x.started != None and x.playmark != None, actions)
     actions.sort(key=lambda x: x.started)
     played_parts = []
     if len(actions) == 0:
