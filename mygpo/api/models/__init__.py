@@ -222,9 +222,12 @@ class SuggestionEntry(models.Model):
 
     @staticmethod
     def forUser(user):
+        from mygpo.data.models import SuggestionBlacklist
+
         subscriptions = [x.podcast for x in Subscription.objects.filter(user=user)]
         suggestions = SuggestionEntry.objects.filter(user=user).order_by('-priority')
-        return [s for s in suggestions if s.podcast not in subscriptions]
+        blacklist = [x.podcast for x in SuggestionBlacklist.objects.filter(user=user)]
+        return [s for s in suggestions if s.podcast not in subscriptions and s.podcast not in blacklist]
 
     def __unicode__(self):
         return '%s (%s)' % (self.podcast, self.priority)

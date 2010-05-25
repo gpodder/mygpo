@@ -23,6 +23,7 @@
     <th></th>
     <th>{% trans "Podcast" %}</th>
     <th style="text-align: center;">{% trans "Subscribe" %}</th>
+    <th style="text-align: center;">{% trans "Not Interested" %}</th>
    </tr>
   {% for entry in entries %}
    <tr>
@@ -30,7 +31,13 @@
     <td>
         <p class="title"><a href="/podcast/{{entry.podcast.id}}">{{ entry.podcast|striptags }}</a></p>
             <p class="description">{{ entry.podcast.description|striptags|truncatewords:"12" }}</p></td>
-    <td style="text-align: center;"><a href="/podcast/{{entry.podcast.id}}/subscribe"><img src="/media/subscribe.png" alt="+" /></a></td>
+    <td style="text-align: center;">
+     <a href="/podcast/{{entry.podcast.id}}/subscribe"><img src="/media/subscribe.png" alt="+" /></a>
+    </td>
+    <td style="text-align: center;">
+     <a href="/suggestions/?blacklist={{ entry.podcast.id }}">
+      <img src="/media/unsubscribe.png" alt="Not Interested" />
+     </a>
    </tr>
   {% endfor %}
   </table>

@@ -60,3 +60,12 @@ class RelatedPodcast(models.Model):
     class Meta:
         db_table = 'related_podcasts'
 
+
+class SuggestionBlacklist(models.Model):
+    user = models.ForeignKey(User)
+    podcast = models.ForeignKey(Podcast)
+
+    class Meta:
+        db_table = 'suggestion_blacklist'
+        managed = False
+

@@ -21,7 +21,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.template import RequestContext
 from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, EpisodeToplistEntry, Subscription, SuggestionEntry, SyncGroup, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SubscriptionMeta, UserProfile
-from mygpo.data.models import Listener
+from mygpo.data.models import Listener, SuggestionBlacklist
 from mygpo.web.models import Rating
 from mygpo.web.forms import UserAccountForm, DeviceForm, SyncForm, PrivacyForm, ResendActivationForm
 from django.forms import ValidationError
@@ -461,6 +461,14 @@ def suggestions(request):
     if 'rate' in request.GET:
         Rating.objects.create(target='suggestions', user=request.user, rating=request.GET['rate'], timestamp=datetime.now())
         rated = True
+
+    if 'blacklist' in request.GET:
+        try:
+            blacklisted_podcast = Podcast.objects.get(id=request.GET['blacklist'])
+            SuggestionBlacklist.objects.create(user=request.user, podcast=blacklisted_podcast)
+        except Exception, e:
+            print e
+
 
     entries = SuggestionEntry.forUser(request.user)
     current_site = Site.objects.get_current()

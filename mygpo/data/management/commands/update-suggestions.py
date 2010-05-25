@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from optparse import make_option
 from mygpo.api.models import Podcast, SuggestionEntry, Subscription
-from mygpo.data.models import RelatedPodcast
+from mygpo.data.models import RelatedPodcast, SuggestionBlacklist
 from mygpo.data.podcast import calc_similar_podcasts
 
 class Command(BaseCommand):
@@ -33,6 +33,10 @@ class Command(BaseCommand):
 
                 # remove potential suggestions that are in the same group as already subscribed podcasts
                 if r.rel_podcast.group and Subscription.objects.filter(podcast__group=r.rel_podcast.group).exists():
+                    continue
+
+                # don't suggest blacklisted podcasts
+                if SuggestionBlacklist.objects.filter(user=user, podcast=r.rel_podcast).exists():
                     continue
 
                 related_podcasts[r.rel_podcast] = related_podcasts.get(r.rel_podcast, 0) + r.priority
