@@ -89,13 +89,6 @@
 
   {% endif %} {% comment %} End of user-only content{% endcomment  %}
 
-  {% if similar_podcasts %}
-   <h3>Similar Podcasts</h3>
-   {% for p in similar_podcasts %}
-    <a href="/podcast/{{ p.id }}">{{ p.title }}</a>
-   {% endfor %}
-  {% endif %}
-
   {% if episodes %}
    <hr/>
    <table class="list episode_list">

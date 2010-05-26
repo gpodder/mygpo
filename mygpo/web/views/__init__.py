@@ -201,7 +201,6 @@ def podcast(request, pid):
     episodes = episode_list(podcast, request.user)
     max_listeners = max([x.listeners for x in episodes]) if len(episodes) else 0
     related_podcasts = [x for x in podcast.group.podcasts() if x != podcast] if podcast.group else []
-    similar_podcasts = podcast.get_similar()
 
     if request.user.is_authenticated():        
         devices = Device.objects.filter(user=request.user)
@@ -242,7 +241,6 @@ def podcast(request, pid):
             'privacy_form': privacy_form,
             'devices': subscribed_devices,
             'related_podcasts': related_podcasts,
-            'similar_podcasts': similar_podcasts,
             'can_subscribe': len(subscribe_targets) > 0,
             'episodes': episodes,
             'max_listeners': max_listeners,
