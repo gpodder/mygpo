@@ -11,3 +11,6 @@ CREATE TABLE `suggestion_blacklist` (
 ALTER TABLE `suggestion_blacklist` ADD CONSTRAINT `podcast_id` FOREIGN KEY (`podcast_id`) REFERENCES `podcast` (`id`);
 ALTER TABLE `suggestion_blacklist` ADD CONSTRAINT `user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`);
 
+DROP TABLE IF EXISTS suggestion_pod;
+DROP TABLE IF EXISTS suggestion_user;
+
