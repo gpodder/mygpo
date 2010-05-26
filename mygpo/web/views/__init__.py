@@ -466,6 +466,11 @@ def suggestions(request):
         try:
             blacklisted_podcast = Podcast.objects.get(id=request.GET['blacklist'])
             SuggestionBlacklist.objects.create(user=request.user, podcast=blacklisted_podcast)
+
+            p, _created = UserProfile.objects.get_or_create(user=request.user)
+            p.suggestion_up_to_date = False
+            p.save()
+
         except Exception, e:
             print e
 
