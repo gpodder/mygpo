@@ -40,18 +40,25 @@
 
   <div>
    <a href="/device/{{ device.id }}.opml">
-    <img src="/media/download.png" style="vertical-align: middle;" /> {% trans "Download Subscriptions as OPML" %}
+    <img src="/media/download.png" class="action-button" /> {% trans "Download Subscriptions as OPML" %}
    </a>
   </div>
 
   <div>
    <a href="/device/{{ device.id }}/history">
-    <img src="/media/office-calendar.png" style="vertical-align: middle;" />
+    <img src="/media/office-calendar.png" class="action-button" />
     {% blocktrans with device.name|striptags as devicename %} Show history for {{ devicename }} {% endblocktrans %}</a>
    </a>
   </div>
 
   {% if not device.deleted %}
+
+  <div>
+   <a href="/device/{{ device.id}}/edit">
+    <img src="/media/preferences-system-22.png" class="action-button" />
+    {% trans "Edit Device" %}
+   </a>
+  </div>
 
   <h2>{% trans "Synchronize" %}</h2>
   <p>{% blocktrans %}If you synchronize devices, they will always have the same subscriptions. A podcast that is subscribed on one device, will automatically be added to all synchronized devices.{% endblocktrans %}</p>
@@ -75,32 +82,7 @@
    </form>
   {% endif %}
 
-  <h2>{% trans "Edit" %}</h2>
-  {% if success %}
-   <div class="success">{% trans "Your settings have been saved." %}</div>
   {% endif %}
-
-  <form action="" method="POST">
-   {% csrf_token %}
-   <table class="form">
-    {{ device_form.as_table }}
-    <tr>
-     <td></td>
-     <td>
-      <input type="submit" value="Save" />
-     </td>
-    </tr>
-   </table>
-  </form>
-
-  <h2>{% trans "Delete" %}</h2>
-  <form action="/device/{{ device.id }}/delete" method="POST">
-   {% csrf_token %}
-   <input type="submit" value="{% trans "Delete this device" %}" />
-  </form>
-  <br />
-  {% endif %}
-  <div class="info">The <strong>Device ID</strong> connects your physical device with this page, so you should enter the same text on your device and here.</div>
 
 {% endblock %}
 

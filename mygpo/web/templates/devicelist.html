@@ -7,16 +7,17 @@
 {% block mainmenu %}{{ "/devices/"|main_menu }}{% endblock %}
 {% block sectionmenu %}{{ "/devices/"|section_menu }}{% endblock %}
 
-{% block title %}{% trans "Devices" %}{% endblock %}
+{% block title %}{% trans "My Devices" %}{% endblock %}
 
 {% block content %}
-  <h1>{% trans "Device List" %}</h1>
+  <h1>{% trans "My Devices" %}</h1>
 
    <table class="list">
     <tr>
      <th>{% trans "Name" %}</th>
      <th>{% trans "Type" %}</th>
      <th>{% trans "Device ID" %}</th>
+     <th class="buttons">{% trans "Configure" %}</th>
     </tr>
     {% for d in devices %}
     {% ifchanged d.sync_group %}
@@ -28,6 +29,7 @@
         <th>{% trans "Name" %}</th>
         <th>{% trans "Type" %}</th>
         <th>{% trans "Device ID" %}</th>
+        <th class="buttons">{% trans "Configure" %}</th>
        </tr>
       {% endif %}
      {% endifchanged %}
@@ -35,6 +37,11 @@
       <td><a href="/device/{{ d.id }}">{{ d|device_icon }}{{ d.name|striptags }}</a></td>
       <td>{{ d|device_type }}</td>
       <td>{{ d.uid|striptags }}</td>
+      <td class="buttons">
+       <a href="/device/{{ d.id }}/edit">
+        <img src="/media/preferences-system.png" />
+       </a>
+      </td>
      </tr>
     {% endfor %}
    </table>

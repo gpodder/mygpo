@@ -621,3 +621,19 @@ div.come-in-box
     padding-top: 1em;
     padding-bottom: 1em;
 }
+
+.sponsoring-podcast img
+{
+    float: left;
+}
+
+.buttons
+{
+}
+
+.action-button
+{
+    vertical-align: middle;
+    padding-bottom: .5em;
+}
+

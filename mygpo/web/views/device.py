@@ -53,7 +53,7 @@ def overview(request):
 @manual_gc
 @login_required
 def show(request, device_id, error_message=None):
-    device = Device.objects.get(pk=device_id)
+    device = Device.objects.get(pk=device_id, user=request.user)
 
     if device.user != request.user:
         return HttpResponseForbidden(_('You are not allowed to access this device'))
@@ -61,9 +61,25 @@ def show(request, device_id, error_message=None):
     subscriptions = device.get_subscriptions()
     synced_with = list(device.sync_group.devices()) if device.sync_group else []
     if device in synced_with: synced_with.remove(device)
-    success = False
     sync_form = SyncForm()
     sync_form.set_targets(device.sync_targets(), _('Synchronize with the following devices'))
+
+    return render_to_response('device.html', {
+        'device': device,
+        'sync_form': sync_form,
+        'error_message': error_message,
+        'subscriptions': subscriptions,
+        'synced_with': synced_with,
+        'has_sync_targets': len(device.sync_targets()) > 0
+    }, context_instance=RequestContext(request))
+
+
+@login_required
+def edit(request, device_id):
+
+    device = get_object_or_404(Device, id=device_id, user=request.user)
+    success = False
+    error_message = ''
 
     if request.method == 'POST':
         device_form = DeviceForm(request.POST)
@@ -86,16 +102,14 @@ def show(request, device_id, error_message=None):
             'uid' : device.uid
             })
 
-    return render_to_response('device.html', {
+    return render_to_response('device-edit.html', {
         'device': device,
         'device_form': device_form,
-        'sync_form': sync_form,
         'success': success,
         'error_message': error_message,
-        'subscriptions': subscriptions,
-        'synced_with': synced_with,
-        'has_sync_targets': len(device.sync_targets()) > 0
     }, context_instance=RequestContext(request))
+
+
 
 
 @manual_gc

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load humanize %}
+{% load devices %}
+{% load podcasts %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/subscriptions/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/device/"|section_menu:device.name }}{% endblock %}
+
+{% block title %}{% blocktrans with device.name|striptags as devicename %}Device {{ devicename }}{% endblocktrans %}{% endblock %}
+
+{% block content %}
+  <h1>{{ device.name|striptags }}</h1>
+  <hr/>
+
+  <a href="/device/{{ device.id }}">{% trans "Back to" %} {{ device|device_icon }} {{device|striptags}}</a>
+
+  {% if device.deleted %}<div class="info">{% trans "This device was deleted." %}</div>{% endif %}
+
+  {% if not device.deleted %}
+
+
+  <h2>{% trans "Edit" %}</h2>
+  {% if success %}
+   <div class="success">{% trans "Your settings have been saved." %}</div>
+  {% endif %}
+
+  <form action="" method="POST">
+   {% csrf_token %}
+   <table class="form">
+    {{ device_form.as_table }}
+    <tr>
+     <td></td>
+     <td>
+      <input type="submit" value="Save" />
+     </td>
+    </tr>
+   </table>
+  </form>
+
+  <h2>{% trans "Delete" %}</h2>
+  <form action="/device/{{ device.id }}/delete" method="POST">
+   {% csrf_token %}
+   <input type="submit" value="{% trans "Delete this device" %}" />
+  </form>
+  <br />
+  {% endif %}
+  <div class="info">The <strong>Device ID</strong> connects your physical device with this page, so you should enter the same text on your device and here.</div>
+
+{% endblock %}
+

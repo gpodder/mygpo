@@ -24,12 +24,13 @@ MENU_STRUCTURE = (
         (_('My Podcasts'), (
             ('/subscriptions/', _('Subscriptions')),
             ('/favorites/', _('Favorite Episodes')),
+            ('/devices/', _('Devices')),
+            ('/device/', _('Device')),
             ('/history/', _('History')),
             ('/suggestions/', _('Suggestions')),
         )),
-        (_('My Devices'), (
-            ('/devices/', _('Overview')),
-            ('/device/', _('Device')),
+        (_('Share'), (
+            ('/share/', _('Subscriptions')),
         )),
         (_('Podcast Directory'), (
             ('/directory/', _('Directory')),
@@ -42,7 +43,6 @@ MENU_STRUCTURE = (
         (_('Settings'), (
             ('/account/', _('Account')),
             ('/account/privacy', _('Privacy')),
-            ('/share/', _('Sharing')),
         )),
         (_('Publisher'), (
             ('/publisher/', _('Home')),
