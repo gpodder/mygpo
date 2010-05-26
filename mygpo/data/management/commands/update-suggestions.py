@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from optparse import make_option
-from mygpo.api.models import Podcast, SuggestionEntry, Subscription
+from mygpo.api.models import Podcast, SuggestionEntry, Subscription, UserProfile
 from mygpo.data.models import RelatedPodcast, SuggestionBlacklist
 from mygpo.data.podcast import calc_similar_podcasts
 
@@ -49,8 +49,8 @@ class Command(BaseCommand):
             for (p, priority) in podcast_list[:max]:
                 SuggestionEntry.objects.create(podcast=p, priority=priority, user=user)
 
-
-            p = user.get_profile()
+            # flag suggestions up-to-date
+            p, _created = UserProfile.objects.get_or_create(user=user)
             p.suggestion_up_to_date = True
             p.save()
 
