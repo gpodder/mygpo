@@ -21,7 +21,7 @@
 {% block head %}
  <script type="text/javascript" src="/media/js/jquery-1.4.2.min.js"></script>
  <script type="text/javascript" src="/media/js/jquery.watermark.min.js"></script>
- {% if episode.link|is_youtube_video %}
+ {% if episode.url|is_youtube_video %}
   <script type="text/javascript" src="/media/js/swfobject.js"></script>
   <script type="text/javascript" src="/media/js/json2.js"></script>
   <script type="text/javascript" src="/media/js/youtube-handler.js"></script>
@@ -44,7 +44,7 @@
   </small>
   <hr style="clear: none;"/>
 
-  {% if episode.link|is_youtube_video %}
+  {% if episode.url|is_youtube_video %}
     <div id="ytapiplayer">
       You need Flash player 8+ and JavaScript enabled to view this video.
     </div>
@@ -171,7 +171,7 @@
   $("#start").watermark("h:mm:ss", {className: 'watermark'});
   $("#end").watermark("h:mm:ss", {className: 'watermark'});
 
-  {% if episode.link|is_youtube_video %}
+  {% if episode.url|is_youtube_video %}
    {{ episode|embed_youtube_video:user }}
   {% endif %}
 

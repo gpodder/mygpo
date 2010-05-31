@@ -16,7 +16,7 @@ def get_youtube_id(url):
 def embed_youtube_video(episode, user):
 
     s = """embedYoutubeVideo("%s", "%s", "%s", "%s");""" % \
-         (youtube.get_youtube_id(episode.link), user.username, episode.podcast.url, episode.url)
+         (youtube.get_youtube_id(episode.url), user.username, episode.podcast.url, episode.url)
 
     return mark_safe(s)
 
