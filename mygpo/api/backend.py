@@ -100,3 +100,9 @@ def get_random_picks(languages=None, recent_days=timedelta(days=7)):
 
 def get_all_subscriptions(user):
     return set([s.podcast for s in Subscription.objects.filter(user=user)])
+
+def get_public_subscriptions(user):
+    subscriptions = [s for s in Subscription.objects.filter(user=user)]
+    public_subscriptions = set([s.podcast for s in subscriptions if s.get_meta().public])
+    return public_subscriptions
+

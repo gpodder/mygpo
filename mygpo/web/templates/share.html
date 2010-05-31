@@ -10,9 +10,12 @@
 {% block content %}
   <h1>{% trans "Share your Subscriptions" %}</h1>
 
-  <p>{% trans "To let others know which podcasts you are listening to, you can point them to the following URL." %}</p>
+  <p>{% trans "To let others know which podcasts you are listening to, you can point them to one of the following URLs." %}</p>
   {% if token %}
-   <div class="info"><a href="/user/{{ user.username }}/subscriptions?token={{ token }}">http://{{ site.domain }}/user/{{ user.username }}/subscriptions?token={{ token }}</a></div>
+   <div class="info">
+    <a href="/user/{{ user.username }}/subscriptions?token={{ token }}">http://{{ site.domain }}/user/{{ user.username }}/subscriptions?token={{ token }}</a> ({% trans "Website" %})<br />
+    <a href="/user/{{ user.username }}/subscriptions.opml?token={{ token }}">http://{{ site.domain }}/user/{{ user.username }}/subscriptions.opml?token={{ token }}</a> ({% trans "Download" %})
+   </div>
    <p>{% blocktrans %}Only those who know the exact link above can see your subscriptions, but you can <a href="/share/?public_subscriptions">make it public</a> so everyone can see it.{% endblocktrans %}</p>
    <p>{% blocktrans %}If you gave your link to the wrong people, you can <a href="/share/?private_subscriptions">create a new one</a> - the old one will get invalid then.{% endblocktrans %}</p>
 

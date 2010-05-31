@@ -1,0 +1,11 @@
+<opml version="2.0">
+<head>
+    <title>{{ other_user.username }}'s Subscriptions</title>
+</head>
+<body>
+  {% for podcast in subscriptions %}
+    <outline title="{{ podcast.title }}" text="{{ podcast.description|truncatewords:"20" }}" type="rss" xmlUrl="{{ podcast.url }}" htmlUrl="{{ podcast.link }}"/>
+  {% endfor %}
+</body>
+</opml>
+

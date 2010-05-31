@@ -22,7 +22,7 @@ from django.contrib.auth.models import User
 from django.template import RequestContext
 from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, EpisodeToplistEntry, Subscription, SuggestionEntry, SyncGroup, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SubscriptionMeta, UserProfile
 from mygpo.data.models import Listener, SuggestionBlacklist
-from mygpo.web.models import Rating
+from mygpo.web.models import Rating, SecurityToken
 from mygpo.web.forms import UserAccountForm, DeviceForm, SyncForm, PrivacyForm, ResendActivationForm
 from django.forms import ValidationError
 from mygpo.api.opml import Exporter
@@ -560,9 +560,21 @@ def resend_activation(request):
 @requires_token(object='subscriptions', action='r', denied_template='user_subscriptions_denied.html')
 def user_subscriptions(request, username):
     user = get_object_or_404(User, username=username)
-    subscriptions = [s for s in Subscription.objects.filter(user=user)]
-    public_subscriptions = set([s.podcast for s in subscriptions if s.get_meta().public])
+    public_subscriptions = backend.get_public_subscriptions(user)
+    token = SecurityToken.objects.get(object='subscriptions', action='r', user__username=username)
+
     return render_to_response('user_subscriptions.html', {
+        'subscriptions': public_subscriptions,
+        'other_user': user,
+        'token': token,
+        }, context_instance=RequestContext(request))
+
+@requires_token(object='subscriptions', action='r')
+def user_subscriptions_opml(request, username):
+    user = get_object_or_404(User, username=username)
+    public_subscriptions = backend.get_public_subscriptions(user)
+
+    return render_to_response('user_subscriptions.opml', {
         'subscriptions': public_subscriptions,
         'other_user': user
         }, context_instance=RequestContext(request))

@@ -27,6 +27,13 @@
    </tr>
   {% endfor %}
   </table>
+
+  <div>
+   <a href="/user/{{ other_user.username}}/subscriptions.opml{% if token.token %}?token={{ token.token }}{% endif %}">
+    <img src="/media/download.png" class="action-button" /> {% trans "Download Subscriptions as OPML" %}
+   </a>
+  </div>
+
  {% else %}
 
   <p>{% blocktrans with other_user.username as username %}{{ username }} doesn't have any subscriptions yet.{% endblocktrans %}</p>
