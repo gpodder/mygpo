@@ -574,10 +574,12 @@ def user_subscriptions_opml(request, username):
     user = get_object_or_404(User, username=username)
     public_subscriptions = backend.get_public_subscriptions(user)
 
-    return render_to_response('user_subscriptions.opml', {
+    response = render_to_response('user_subscriptions.opml', {
         'subscriptions': public_subscriptions,
         'other_user': user
         }, context_instance=RequestContext(request))
+    response['Content-Disposition'] = 'attachment; filename=%s-subscriptions.opml' % username
+    return response
 
 
 @manual_gc
