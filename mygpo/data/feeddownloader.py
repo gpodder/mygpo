@@ -34,6 +34,7 @@ from mygpo.api import models
 from mygpo.data.models import PodcastTag
 from mygpo.utils import parse_time
 from mygpo.api.sanitizing import sanitize_url, rewrite_podcasts
+from mygpo.data import youtube
 
 socket.setdefaulttimeout(10)
 fetcher = feedcore.Fetcher(USER_AGENT)
@@ -76,6 +77,10 @@ def get_episode_url(entry):
     for link in links:
         if not hasattr(link, 'href'):
             continue
+
+        if youtube.is_video_link(link['href']):
+            return link['href']
+
         # XXX: Implement link detection as in gPodder
 
     return None
