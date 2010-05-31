@@ -21,7 +21,10 @@
 
   {% else %}
 
-   <div class="info"><a href="/user/{{ user.username }}/subscriptions">http://{{ site.domain }}/user/{{ user.username }}/subscriptions</a></div>
+   <div class="info">
+    <a href="/user/{{ user.username }}/subscriptions">http://{{ site.domain }}/user/{{ user.username }}/subscriptions</a> ({% trans "Website" %})<br />
+    <a href="/user/{{ user.username }}/subscriptions.opml">http://{{ site.domain }}/user/{{ user.username }}/subscriptions.opml</a> ({% trans "Download" %})<br />
+   </div>
    <p>{% blocktrans %}You don't want everybody to see your subscriptions? <a href="/share/?private_subscriptions">Make them private</a> so that you can give the link to people you trust.{% endblocktrans %}</p>
   {% endif %}
 
