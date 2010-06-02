@@ -56,8 +56,15 @@ def check_mime(mimetype, url):
         return False
 
     if '/' in mimetype:
-        category, _ignore = mimetype.split('/', 1)
-        return category in ('audio', 'video', 'image')
+        category, type = mimetype.split('/', 1)
+        if category in ('audio', 'video', 'image'):
+            return True
+
+        # application/ogg is a valid mime type for Ogg files
+        # but we do not want to accept all files with application category
+        if type in ('ogg', ):
+            return True
+        return False
     else:
         return False
 
