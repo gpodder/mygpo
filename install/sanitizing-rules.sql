@@ -33,4 +33,5 @@ INSERT INTO `sanitizing_rules` VALUES (32,1,0,'(?i)^http://feeds\\.feedburner\\.
 INSERT INTO `sanitizing_rules` VALUES (33,1,0,'^http://feeds\\.ziffdavis\\.com/ziffdavis/cgmpeg4video/$', 'http://feeds.ziffdavis.com/ziffdavis/cgipodvideo', 100, 'Unify Cranky Geed Podcasts (iPod Video) (bug 1032');
 INSERT INTO `sanitizing_rules` VALUES (34,1,0,'^http://feeds\\.ziffdavis\\.com/ziffdavis/cgipodvideo\\?format=xml$', 'http://feeds.ziffdavis.com/ziffdavis/cgipodvideo', 100, 'Unify Cranky Geed Podcasts (iPod Video) (bug 1032');
 INSERT INTO `sanitizing_rules` VALUES (35,1,0,'^http://rssnewsapps\\.ziffdavis\\.com/audioblogs/crankygeeks/cg\\.wmv\\.xml$', 'http://feeds.feedburner.com/ziffdavis/cgwmvvideo', 100, 'Unify Cranky Geed Podcasts (WMV) (bug 1032');
+INSERT INTO `sanitizing_rules` VALUES (36,1,0,'^http://noagenda\\.podshow\\.com/feed$', 'http://www.mevio.com/feeds/noagenda.xml', 100, 'Unify No Agend Feeds');
 
