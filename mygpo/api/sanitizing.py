@@ -316,7 +316,8 @@ def rewrite_episodes(p_old, p_new):
 
     for e in Episode.objects.filter(podcast=p_old):
         try:
-            e_new = Episode.objects.get(podcast=p_new, url=e.url)
+            e_new, created_ = Episode.objects.get_or_create(podcast=p_new, url=e.url)
+
             log('episode %s (url %s, podcast %s) already exists; updating episode actions for episode %s (url %s, podcast %s)' % (e_new.id, e.url, p_new.id, e.id, e.url, p_old.id))
             rewrite_episode_actions(e, e_new)
             log('episode actions for episode %s (url "%s", podcast %s) updated.' % (e.id, e.url, p_old.id))
@@ -351,7 +352,7 @@ def rewrite_listeners(e_old, e_new):
 
     for l in Listener.objects.filter(episode=e_old):
         try:
-            log('updating listener %s (user %s, device %s, podcast %s, episode %s => %s)' % (l.id, l.device.id, l.podcast.id, e_old.id, e_new.id))
+            log('updating listener %s (user %s, device %s, podcast %s, episode %s => %s)' % (l.id, l.user.id, l.device.id, l.podcast.id, e_old.id, e_new.id))
             l.episode = e_new
             l.podcast = e_new.podcast
             l.save()
