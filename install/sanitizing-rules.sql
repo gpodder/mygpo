@@ -16,7 +16,21 @@ INSERT INTO `sanitizing_rules` VALUES (15,0,1,'^(?P<unchanged>http://rpod\\.ru/p
 INSERT INTO `sanitizing_rules` VALUES (16,0,1,'^http://\\d+\\.media\\.collegehumor\\.com/(?P<unchanged>.+)$', 'http://1.media.collegehumor.com/\\g<unchanged>', 100, '');
 INSERT INTO `sanitizing_rules` VALUES (17,1,0,'(?i)^http://feeds\.feedburner\.com/ShotOfJaq$', 'http://shotofjaq.org/feed/', 100, 'Merges Shot of Jaq feeds to the URL given on their Website');
 INSERT INTO `sanitizing_rules` VALUES (18,1,0,'http://shotofjaq\.org/feed$', 'http://shotofjaq.org/feed/', 100, 'Add trailing slash to Shot of Jaq feed URL');
-INSERT INTO `sanitizing_rules` VALUES (19,1,0,'(?i)^http://feeds\.feedburner\.com/ShotOfJaqOGG$', 'http://feeds.feedburner.com/ShotOfJaqOgg', 100, 'Unify all Feedburner URLs for the Shot of Jaq Ogg feed (seems it doesn\'t have an shotofjaq.org url)');
-INSERT INTO `sanitizing_rules` VALUES (20,1,0,'(?i)^http://feeds\.feedburner\.com/TEDTalks_video$', 'http://feeds.feedburner.com/tedtalks_video', 100, 'Unify all TEDTalks podcasts');
-INSERT INTO `sanitizing_rules` VALUES (21,1,0,'(?i)^http://feeds\.feedburner\.com/TEDTalks_audio$', 'http://feeds.feedburner.com/tedtalks_audio', 100, 'Unify all TEDTalks podcasts');
-INSERT INTO `sanitizing_rules` VALUES (22,1,0,'(?i)^http://feeds\.feedburner\.com/TedtalksHD$', 'http://feeds.feedburner.com/tedtalkshd', 100, 'Unify all TEDTalks podcasts');
+INSERT INTO `sanitizing_rules` VALUES (19,1,0,'(?i)^http://feeds\\.feedburner\\.com/ShotOfJaqOGG$', 'http://feeds.feedburner.com/ShotOfJaqOgg', 100, 'Unify all Feedburner URLs for the Shot of Jaq Ogg feed (seems it doesn\'t have an shotofjaq.org url)');
+INSERT INTO `sanitizing_rules` VALUES (20,1,0,'(?i)^http://feeds\\.feedburner\\.com/TEDTalks_video$', 'http://feeds.feedburner.com/tedtalks_video', 100, 'Unify all TEDTalks podcasts');
+INSERT INTO `sanitizing_rules` VALUES (21,1,0,'(?i)^http://feeds\\.feedburner\\.com/TEDTalks_audio$', 'http://feeds.feedburner.com/tedtalks_audio', 100, 'Unify all TEDTalks podcasts');
+INSERT INTO `sanitizing_rules` VALUES (22,1,0,'(?i)^http://feeds\\.feedburner\\.com/TedtalksHD$', 'http://feeds.feedburner.com/tedtalkshd', 100, 'Unify all TEDTalks podcasts');
+INSERT INTO `sanitizing_rules` VALUES (23,1,0,'(?i)^http://feeds\\.feedburner\\.com/mintcastpodcast$', 'http://www.mintcast.org/feed/podcast/', 100, 'Unify mintCast feeds (bug 1035');
+INSERT INTO `sanitizing_rules` VALUES (24,1,0,'(?i)^http://www.mintcast.org/feed/$', 'http://www.mintcast.org/feed/podcast/', 100, 'Unify mintCast feeds (bug 1035');
+INSERT INTO `sanitizing_rules` VALUES (25,1,0,'(?i)^http://feeds\\.feedburner\\.com/ziffdavis/crankygeekspodcast$', 'http://feeds.ziffdavis.com/ziffdavis/crankygeekspodcast', 100, 'Unify Cranky Geed Podcasts (MP3) (bug 1032');
+INSERT INTO `sanitizing_rules` VALUES (26,1,0,'^http://rssnewsapps\\.ziffdavis\\.com/audioblogs/crankygeeks/cg\\.audio\\.xml/?$', 'http://feeds.ziffdavis.com/ziffdavis/crankygeekspodcast', 100, 'Unify Cranky Geed Podcasts (MP3) (bug 1032');
+INSERT INTO `sanitizing_rules` VALUES (27,1,0,'^http://feeds\\.ziffdavis\\.com/ziffdavis/crankygeekspodcast/$', 'http://feeds.ziffdavis.com/ziffdavis/crankygeekspodcast', 100, 'Unify Cranky Geed Podcasts (MP3) (bug 1032');
+INSERT INTO `sanitizing_rules` VALUES (28,1,0,'(?i)^http://feeds\\.feedburner\\.com/ziffdavis/cgh264video$', 'http://feeds.ziffdavis.com/ziffdavis/cgh264video', 100, 'Unify Cranky Geed Podcasts (H.264) (bug 1032');
+INSERT INTO `sanitizing_rules` VALUES (29,1,0,'^http://rssnewsapps\\.ziffdavis\\.com/audioblogs/crankygeeks/cg\\.h\\.264\\.xml$', 'http://feeds.ziffdavis.com/ziffdavis/cgh264video', 100, 'Unify Cranky Geed Podcasts (H.264) (bug 1032');
+INSERT INTO `sanitizing_rules` VALUES (30,1,0,'^http://rssnewsapps\\.ziffdavis\\.com/audioblogs/crankygeeks/cg\\.ipod\\.xml$', 'http://feeds.ziffdavis.com/ziffdavis/cgipodvideo', 100, 'Unify Cranky Geed Podcasts (iPod Video) (bug 1032');
+INSERT INTO `sanitizing_rules` VALUES (31,1,0,'^http://rssnewsapps\\.ziffdavis\\.com/audioblogs/crankygeeks/cg\\.mp4\\.xml$', 'http://feeds.ziffdavis.com/ziffdavis/cgipodvideo', 100, 'Unify Cranky Geed Podcasts (iPod Video) (bug 1032');
+INSERT INTO `sanitizing_rules` VALUES (32,1,0,'(?i)^http://feeds\\.feedburner\\.com/ziffdavis/cgipodvideo$', 'http://feeds.ziffdavis.com/ziffdavis/cgipodvideo', 100, 'Unify Cranky Geed Podcasts (iPod Video) (bug 1032');
+INSERT INTO `sanitizing_rules` VALUES (33,1,0,'^http://feeds\\.ziffdavis\\.com/ziffdavis/cgmpeg4video/$', 'http://feeds.ziffdavis.com/ziffdavis/cgipodvideo', 100, 'Unify Cranky Geed Podcasts (iPod Video) (bug 1032');
+INSERT INTO `sanitizing_rules` VALUES (34,1,0,'^http://feeds\\.ziffdavis\\.com/ziffdavis/cgipodvideo\\?format=xml$', 'http://feeds.ziffdavis.com/ziffdavis/cgipodvideo', 100, 'Unify Cranky Geed Podcasts (iPod Video) (bug 1032');
+INSERT INTO `sanitizing_rules` VALUES (35,1,0,'^http://rssnewsapps\\.ziffdavis\\.com/audioblogs/crankygeeks/cg\\.wmv\\.xml$', 'http://feeds.feedburner.com/ziffdavis/cgwmvvideo', 100, 'Unify Cranky Geed Podcasts (WMV) (bug 1032');
+
