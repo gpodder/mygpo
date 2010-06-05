@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% load i18n %}
+{% load podcasts %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/search/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/search/"|section_menu }}{% endblock %}
+
+{% block title %}{% trans "Search" %}{% endblock %}
+
+{% block content %}
+<h2>{% trans "Search" %}</h2>
+
+<form method="get" action="." class="search">
+ <input type="text" name="q" {% if q %}value="{{ q }}"{% endif %} >
+ <input type="submit" value="Search">
+</form>
+
+ {% if q %}
+  <h3>{% trans "Results" %}</h3>
+
+  <table class="list">
+   <tr>
+    <th></th>
+    <th></th>
+   </tr>
+
+   {% for result in results.object_list %}
+    <tr>
+     {% ifequal result.obj_type "podcast" %}
+      <td>{{ result.get_object|podcast_logo }}</td>
+      <td>
+       <a class="podcast" href="/podcast/{{ result.obj_id }}">{{ result.get_object }}</a><br />
+       <span class="listlink description">{{ result.get_object.description|default:""|striptags|truncatewords:"15" }}</span>
+      </td>
+     {% endifequal %}
+
+     {% ifequal result.obj_type "podcast_group" %}
+      <td>{{ result.get_object.podcasts|first|podcast_logo }}</td>
+      <td>
+       {{result.get_object.title|striptags}}
+       (
+        {% for p in result.get_object.podcasts %}
+         <a href="/podcast/{{ p.id }}">{{ p.group_member_name|striptags }}</a>
+        {% endfor %}
+       )
+     {% endifequal %}
+    </tr>
+   {% endfor %}
+  </table>
+
+<div class="pagination">
+    <span class="step-links">
+        {% if results.has_previous %}
+            <a href="?q={{q}}&page={{ results.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ results.number }} of {{ results.paginator.num_pages }}.
+        </span>
+
+        {% if results.has_next %}
+            <a href="?q={{q}}&page={{ results.next_page_number }}">next</a>
+        {% endif %}
+    </span>
+</div>
+
+
+ {% endif %}
+{% endblock %}
+

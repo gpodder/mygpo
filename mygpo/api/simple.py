@@ -27,8 +27,8 @@ from datetime import datetime
 from mygpo.api.httpresponse import HttpErrorResponse
 import re
 from mygpo.log import log
-from haystack.query import SearchQuerySet
 from django.views.decorators.csrf import csrf_exempt
+from mygpo.search.util import simple_search
 
 try:
     import json
@@ -193,29 +193,30 @@ def format_toplist(toplist, count, format):
     else: 
         return HttpResponseBadRequest('Invalid format')
 
-#get search 
+#get search
 def search(request, format):
     if request.method == 'GET':
-        query = request.GET.get('q')
-        
+        query = request.GET.get('q').encode('utf-8')
+
         if query == None:
             return HttpErrorResponse(404, '/search.opml|txt|json?q={query}')
-        
+
         return format_results(get_results(query), format)
     else:
         return HttpResponseBadRequest('Invalid request')
-        
-        
+
+
 def get_results(query):
-    search = SearchQuerySet().filter(content=query).models(Podcast)
     results = []
-    for r in search:
-        p = Podcast.objects.get(pk=r.pk)
-        results.append(p)
-        
+    for r in simple_search(query)[:20]:
+        if r.obj_type == 'podcast':
+            results.append(r.get_object())
+        elif r.obj_type == 'podcast_group':
+            results.append(r.get_object().podcasts()[0])
+
     return results
-    
-    
+
+
 def format_results(results, format):
     if format == 'txt':
         urls = [r.url for r in results]

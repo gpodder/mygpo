@@ -88,7 +88,7 @@ urlpatterns = patterns('',
     (r'^device/(?P<device_id>\d+)/history$', 'mygpo.web.views.history'),
     (r'^device/(?P<device_id>\d+)/edit$', 'mygpo.web.views.device.edit'),
 
-    (r'^search/', include('haystack.urls')),
+    (r'^search/', 'mygpo.search.views.search'),
 
     #Legacy API
     (r'^upload$', 'mygpo.api.legacy.upload'),
