@@ -10,7 +10,7 @@ class Command(BaseCommand):
 
         SearchEntry.objects.all().delete()
 
-        toplist = ToplistEntry.objects.all().order_by('-subscriptions')
+        toplist = ToplistEntry.objects.all()
         for e in toplist:
             entry = None
             if e.podcast_group:

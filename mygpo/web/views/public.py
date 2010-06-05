@@ -31,7 +31,7 @@ from django.core.paginator import Paginator, InvalidPage, EmptyPage
 @manual_gc
 def browse(request, num_categories=10, num_tags_cloud=90, podcasts_per_category=10):
     total = int(num_categories) + int(num_tags_cloud)
-    top_tags =  PodcastTag.objects.raw("select *, count(id) as entries from podcast_tags group by tag order by entries desc limit %d" % total)
+    top_tags =  PodcastTag.objects.top_tags()[:total]
 
     top_tags = filter(lambda x: not x.tag.startswith('http://'), top_tags)
 

@@ -2,14 +2,7 @@ from django.db.models import Count
 from mygpo.api.models import Subscription, Podcast
 from mygpo.data.models import PodcastTag
 from mygpo.search.models import SearchEntry
-import shlex
 
-def simple_search(q):
-    qs = SearchEntry.objects.all()
-    for query in shlex.split(q):
-        qs = qs.filter(text__icontains=query)
-
-    return qs.order_by('-priority')
 
 def podcast_group_entry(group, subscriber_count=None):
 

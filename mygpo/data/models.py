@@ -2,12 +2,20 @@ from django.db import models
 from django.contrib.auth.models import User
 from mygpo.api.models import Podcast, Episode, Device
 
+
+class PodcastTagManager(models.Manager):
+
+    def top_tags(self):
+        return self.raw("select *, count(id) as entries from podcast_tags group by tag order by entries desc")
+
 class PodcastTag(models.Model):
     tag = models.CharField(max_length=100)
     podcast = models.ForeignKey(Podcast)
     source = models.CharField(max_length=100)
     user = models.ForeignKey(User, null=True)
     weight = models.IntegerField(default=1)
+
+    objects = PodcastTagManager()
 
     class Meta:
         db_table = 'podcast_tags'

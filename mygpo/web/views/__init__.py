@@ -73,7 +73,7 @@ def welcome(request, toplist_entries=10):
         lang = []
 
     if len(lang) == 0:
-        entries = ToplistEntry.objects.order_by('-subscriptions')[:toplist_entries]
+        entries = ToplistEntry.objects.all()[:toplist_entries]
     else:
         entries = backend.get_toplist(toplist_entries, lang)
 
@@ -389,7 +389,7 @@ def toplist(request, num=100, lang=None):
         return HttpResponseRedirect('/toplist/?lang=%s' % ','.join(updated.data))
 
     if len(lang) == 0:
-        entries = ToplistEntry.objects.order_by('-subscriptions')[:num]
+        entries = ToplistEntry.objects.all()[:num]
 
     else:
         entries = backend.get_toplist(num, lang)
@@ -415,11 +415,11 @@ def episode_toplist(request, num=100):
         return HttpResponseRedirect('/toplist/episodes?lang=%s' % ','.join(updated.data))
 
     if len(lang) == 0:
-        entries = EpisodeToplistEntry.objects.order_by('-listeners')[:num]
+        entries = EpisodeToplistEntry.objects.all()[:num]
 
     else:
         regex = '^(' + '|'.join(lang) + ')'
-        entries = EpisodeToplistEntry.objects.filter(episode__podcast__language__regex=regex).order_by('-listeners')[:num]
+        entries = EpisodeToplistEntry.objects.filter(episode__podcast__language__regex=regex)[:num]
 
     current_site = Site.objects.get_current()
 
@@ -473,7 +473,7 @@ def suggestions(request):
             print e
 
 
-    entries = SuggestionEntry.forUser(request.user)
+    entries = SuggestionEntry.objects.for_user(request.user)
     current_site = Site.objects.get_current()
     return render_to_response('suggestions.html', {
         'entries': entries,

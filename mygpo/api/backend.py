@@ -49,7 +49,7 @@ def get_toplist(count, languages=None):
     based on the same language list
     """
     if not languages:
-        return ToplistEntry.objects.all().order_by('-subscriptions')[:count]
+        return ToplistEntry.objects.all()[:count]
     else:
         regex = '^(' + '|'.join(languages) + ')'
         podcast_entries_base = ToplistEntry.objects.filter(podcast__language__regex=regex)

@@ -14,7 +14,7 @@ class Command(BaseCommand):
         old_podcasts = {}
         old_groups = {}
         n=1
-        for t in ToplistEntry.objects.all().only('subscriptions', 'podcast', 'podcast_group').order_by('-subscriptions'):
+        for t in ToplistEntry.objects.all().only('subscriptions', 'podcast', 'podcast_group'):
 
             if options.get('preserve_oldplace'):
                 oldplace = t.oldplace

@@ -176,11 +176,20 @@ class PodcastGroup(models.Model):
         db_table = 'podcast_groups'
 
 
+class ToplistEntryManager(models.Manager):
+
+    def get_query_set(self):
+        return super(ToplistEntryManager, self).get_query_set().order_by('-subscriptions')
+
+
 class ToplistEntry(models.Model):
     podcast = models.ForeignKey(Podcast, null=True)
     podcast_group = models.ForeignKey(PodcastGroup, null=True)
     oldplace = models.IntegerField(db_column='old_place')
     subscriptions = models.IntegerField(db_column='subscription_count')
+
+    objects = ToplistEntryManager()
+
 
     def get_item(self):
         if self.podcast:
@@ -205,9 +214,18 @@ class ToplistEntry(models.Model):
     class Meta:
         db_table = 'toplist'
 
+
+class EpisodeToplistEntryManager(models.Manager):
+
+    def get_query_set(self):
+        return super(EpisodeToplistEntryManager, self).get_query_set().order_by('-listeners')
+
+
 class EpisodeToplistEntry(models.Model):
     episode = models.ForeignKey('Episode')
     listeners = models.PositiveIntegerField()
+
+    objects = EpisodeToplistEntryManager()
 
     def __unicode__(self):
         return '%s (%s)' % (self.episode, self.listeners)
@@ -215,19 +233,29 @@ class EpisodeToplistEntry(models.Model):
     class Meta:
         db_table = 'episode_toplist'
 
+
+class SuggestionEntryManager(models.Manager):
+
+    def for_user(self, user):
+        from mygpo.data.models import SuggestionBlacklist
+
+        suggestions = SuggestionEntry.objects.filter(user=user).order_by('-priority')
+
+        subscriptions = [x.podcast for x in Subscription.objects.filter(user=user)]
+        suggestions = filter(lambda x: x.podcast not in subscriptions, suggestions)
+
+        blacklist = [x.podcast for x in SuggestionBlacklist.objects.filter(user=user)]
+        suggestions = filter(lambda x: x.podcast not in blacklist, suggestions)
+
+        return suggestions
+
+
 class SuggestionEntry(models.Model):
     podcast = models.ForeignKey(Podcast)
     user = models.ForeignKey(User)
     priority = models.IntegerField()
 
-    @staticmethod
-    def forUser(user):
-        from mygpo.data.models import SuggestionBlacklist
-
-        subscriptions = [x.podcast for x in Subscription.objects.filter(user=user)]
-        suggestions = SuggestionEntry.objects.filter(user=user).order_by('-priority')
-        blacklist = [x.podcast for x in SuggestionBlacklist.objects.filter(user=user)]
-        return [s for s in suggestions if s.podcast not in subscriptions and s.podcast not in blacklist]
+    objects = SuggestionEntryManager()
 
     def __unicode__(self):
         return '%s (%s)' % (self.podcast, self.priority)

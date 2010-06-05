@@ -28,7 +28,7 @@ from mygpo.api.httpresponse import HttpErrorResponse
 import re
 from mygpo.log import log
 from django.views.decorators.csrf import csrf_exempt
-from mygpo.search.util import simple_search
+from mygpo.search.models import SearchEntry
 
 try:
     import json
@@ -208,7 +208,7 @@ def search(request, format):
 
 def get_results(query):
     results = []
-    for r in simple_search(query)[:20]:
+    for r in SearchEntry.objects.search(query)[:20]:
         if r.obj_type == 'podcast':
             results.append(r.get_object())
         elif r.obj_type == 'podcast_group':
@@ -247,7 +247,7 @@ def suggestions(request, count, format):
         return HttpResponseBadRequest('Invalid request')
         
 def get_suggestions(user, count):
-    suggestions = SuggestionEntry.forUser(user)[:int(count)]
+    suggestions = SuggestionEntry.objects.for_user(user)[:int(count)]
     return [s.podcast for s in suggestions]
     
 def format_suggestions(suggestions, count, format):

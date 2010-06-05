@@ -2,7 +2,6 @@ from django.shortcuts import render_to_response
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.template import RequestContext
 from mygpo.search.models import SearchEntry
-from mygpo.search.util import simple_search
 
 def search(request):
 
@@ -10,7 +9,7 @@ def search(request):
 
     if 'q' in request.GET:
         q = request.GET.get('q', '').encode('utf-8')
-        entries = simple_search(q)
+        entries = SearchEntry.objects.search(q)
         paginator = Paginator(entries, page_size)
 
         try:
