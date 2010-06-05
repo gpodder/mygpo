@@ -65,3 +65,10 @@ def parse_time(value):
 
     return int(value)
 
+def parse_bool(val):
+    if isinstance(val, bool):
+        return val
+    if val.lower() == 'true':
+        return True
+    return False
+

@@ -25,7 +25,7 @@ from time import mktime, gmtime, strftime
 from datetime import datetime, timedelta
 import dateutil.parser
 from mygpo.log import log
-from mygpo.utils import parse_time
+from mygpo.utils import parse_time, parse_bool
 from django.db import IntegrityError
 import re
 from django.views.decorators.csrf import csrf_exempt
@@ -177,6 +177,7 @@ def episodes(request, username, version=1):
         podcast_url= request.GET.get('podcast', None)
         device_uid = request.GET.get('device', None)
         since_     = request.GET.get('since', None)
+        aggregated = parse_bool(request.GET.get('aggregated', False))
 
         since = datetime.fromtimestamp(float(since_)) if since_ else None
 
@@ -186,14 +187,19 @@ def episodes(request, username, version=1):
         except:
             raise Http404
 
-        return JsonResponse(get_episode_changes(request.user, podcast, device, since, now, version))
+        print aggregated
+
+        return JsonResponse(get_episode_changes(request.user, podcast, device, since, now, aggregated, version))
 
     else:
         return HttpResponseNotAllowed(['POST', 'GET'])
 
 
-def get_episode_changes(user, podcast, device, since, until, version):
-    actions = []
+def get_episode_changes(user, podcast, device, since, until, aggregated, version):
+    if aggregated:
+        actions = {}
+    else:
+        actions = []
     eactions = EpisodeAction.objects.filter(user=user, timestamp__lte=until)
 
     if podcast:
@@ -204,6 +210,9 @@ def get_episode_changes(user, podcast, device, since, until, version):
 
     if since: # we can't use None with __gt
         eactions = eactions.filter(timestamp__gt=since)
+
+    if aggregated:
+        eactions = eactions.order_by('timestamp')
 
     for a in eactions:
         action = {
@@ -222,9 +231,15 @@ def get_episode_changes(user, podcast, device, since, until, version):
                 action['started'] = int(a.started)
                 action['total'] = int(a.total)
 
-        actions.append(action)
+        if aggregated:
+            actions[a.episode] = action
+        else:
+            actions.append(action)
 
     until_ = int(mktime(until.timetuple()))
+
+    if aggregated:
+        actions = list(actions.itervalues())
 
     return {'actions': actions, 'timestamp': until_}
 
