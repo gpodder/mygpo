@@ -110,6 +110,10 @@ urlpatterns = patterns('',
     (r'^api/2/auth/(?P<username>\w+)/(?P<device_uid>[\w.-]+)/login\.json', 'mygpo.api.advanced.auth.login'),
     (r'^api/2/auth/(?P<username>\w+)/(?P<device_uid>[\w.-]+)/logout\.json', 'mygpo.api.advanced.auth.logout'),
     (r'^api/2/auth/(?P<username>\w+)/(?P<device_uid>[\w.-]+)/validate\.json', 'mygpo.api.advanced.auth.validate'),
+    (r'^api/2/tags/(?P<count>\d+)\.json', 'mygpo.api.advanced.directory.top_tags'),
+    (r'^api/2/tag/(?P<tag>[^/]+)/(?P<count>\d+)\.json', 'mygpo.api.advanced.directory.tag_podcasts'),
+    (r'^api/2/data/podcast\.json', 'mygpo.api.advanced.directory.podcast_info'),
+    (r'^api/2/data/episode\.json', 'mygpo.api.advanced.directory.episode_info'),
 
     (r'^api/2/chapters/(?P<username>\w+)\.json', 'mygpo.api.advanced.episode.chapters'),
 

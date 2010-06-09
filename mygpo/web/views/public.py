@@ -31,16 +31,11 @@ from django.core.paginator import Paginator, InvalidPage, EmptyPage
 @manual_gc
 def browse(request, num_categories=10, num_tags_cloud=90, podcasts_per_category=10):
     total = int(num_categories) + int(num_tags_cloud)
-    top_tags =  PodcastTag.objects.top_tags()[:total]
-
-    top_tags = filter(lambda x: not x.tag.startswith('http://'), top_tags)
-
-    excluded_tags = getattr(settings, 'DIRECTORY_EXCLUDED_TAGS', [])
-    top_tags = filter(lambda x: not x.tag in excluded_tags, top_tags)
+    top_tags =  PodcastTag.objects.top_tags(total)
 
     categories = []
     for tag in top_tags[:num_categories]:
-        entries = ToplistEntry.objects.filter(podcast__podcasttag__tag=tag.tag).order_by('-subscriptions').distinct()[:podcasts_per_category]
+        entries = PodcastTag.objects.podcasts_for_tag(tag.tag)[:podcasts_per_category]
         categories.append({
             'tag': tag.tag,
             'entries': entries
