@@ -7,7 +7,12 @@ class SearchEntryManager(models.Manager):
 
     def search(self, q):
         qs = SearchEntry.objects.all()
-        for query in shlex.split(q):
+        try:
+            tokens = shlex.split(q)
+        except ValueError:
+            tokens = [q]
+
+        for query in tokens:
             qs = qs.filter(text__icontains=query)
 
         return qs.order_by('-priority')
