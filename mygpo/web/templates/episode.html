@@ -7,6 +7,7 @@
 {% load mygpoutil %}
 {% load time %}
 {% load youtube %}
+{% load flickr %}
 
 {% load menu %}
 {% block mainmenu %}{{ "/podcast/"|main_menu }}{% endblock %}
@@ -52,6 +53,10 @@
 
   {% if episode.description %}
    <p>{{ episode.description|remove_html_tags|linebreaksbr }}</p>
+  {% endif %}
+
+  {% if episode.url|is_flickr_photo %}
+   {{ episode|embed_flickr_photo }}
   {% endif %}
 
   {% if user.is_authenticated %}
