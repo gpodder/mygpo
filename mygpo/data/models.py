@@ -1,12 +1,21 @@
 from django.db import models
 from django.contrib.auth.models import User
-from mygpo.api.models import Podcast, Episode, Device
-
+from mygpo.api.models import Podcast, Episode, Device, ToplistEntry
+from mygpo import settings
 
 class PodcastTagManager(models.Manager):
 
-    def top_tags(self):
-        return self.raw("select *, count(id) as entries from podcast_tags group by tag order by entries desc")
+    def top_tags(self, total):
+        tags = self.raw("select *, count(id) as entries from podcast_tags group by tag order by entries desc")[:total]
+
+        tags = filter(lambda x: not x.tag.startswith('http://'), tags)
+
+        excluded_tags = getattr(settings, 'DIRECTORY_EXCLUDED_TAGS', [])
+        return filter(lambda x: not x.tag in excluded_tags, tags)
+
+    def podcasts_for_tag(self, tag):
+        return ToplistEntry.objects.filter(podcast__podcasttag__tag=tag).order_by('-subscriptions').distinct()
+
 
 class PodcastTag(models.Model):
     tag = models.CharField(max_length=100)
