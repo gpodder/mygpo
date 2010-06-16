@@ -47,9 +47,9 @@ def episode_status_icon(action):
         elif action.action == 'play':
             if action.playmark is not None:
                 if action.started is not None:
-                    playback_info = _(' from %s to %s') % ( \
-                            utils.format_time(action.started), \
-                            utils.format_time(action.playmark),)
+                    playback_info = _(' from %(start)s to %(end)s') % { \
+                            'start': utils.format_time(action.started), \
+                            'end': utils.format_time(action.playmark)}
                 else:
                     playback_info = _(' to position %s') % (\
                             utils.format_time(action.playmark),)
