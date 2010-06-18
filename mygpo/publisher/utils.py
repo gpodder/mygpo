@@ -80,7 +80,7 @@ def episode_listener_data(episode):
     for d in daterange(start, leap=leap):
         next = d + leap
         listeners = EpisodeAction.objects.filter(episode=episode, timestamp__gte=d, timestamp__lt=next).values('user_id').distinct().count()
-        e = episode if episode.timestamp >= d and episode.timestamp <= next else None
+        e = episode if episode.timestamp and episode.timestamp >= d and episode.timestamp <= next else None
         intervals.append({
             'date': d,
             'listeners': listeners,
