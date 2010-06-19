@@ -547,7 +547,7 @@ msgid ""
 "  "
 msgstr ""
 "\n"
-"Sie haben <a href=\"/subscriptions/\">%(subscription_count)s Podcasts auf <a href=\"/devices/\">%(device_count)s Geräten</a> abonniert.\n"
+"Sie haben <a href=\"/subscriptions/\">%(subscription_count)s Podcastsa> auf <a href=\"/devices/\">%(device_count)s Geräten</a> abonniert.\n"
 "\n"
 "<ul>\n"
 " <li><a href=\"/share/\">Podcast-Abos anderen empfehlen</a></li>\n"
@@ -1049,11 +1049,11 @@ msgstr "Passwort"
 
 #: web/templates/login.html:85
 msgid "Didn't receive your activation mail?"
-msgstr ""
+msgstr "Aktivierungs-Mail nicht erhalten?"
 
 #: web/templates/login.html:85
 msgid "We can try to <a href=\"/register/resend-activation\">send it again</a>."
-msgstr ""
+msgstr "<a href=\"/register/resend-activation\">erneut senden</a>."
 
 #: web/templates/login.html:94
 msgid "Not yet a member?"
@@ -1065,7 +1065,7 @@ msgstr "Erstelle einen Account!"
 
 #: web/templates/migrate.html:4
 msgid "Select a Username"
-msgstr ""
+msgstr "Benutzername wählen"
 
 #: web/templates/migrate.html:8
 #, python-format
@@ -1079,27 +1079,30 @@ msgstr "Du kannst deine alten Einstellung von gPodder übernehmen. Sobald die n�
 #: web/templates/online-help.html:8 web/templates/online-help.html.py:11
 #: web/templatetags/menu.py:22
 msgid "Help"
-msgstr ""
+msgstr "Hilfe"
 
 #: web/templates/online-help.html:13
 msgid "gpodder.net is a web service to manage your podcast subscriptions via the web. You can synchronize your devices, view status information and discover new interesting podcasts online."
-msgstr ""
+msgstr "gpodder.net ist ein Webservice, mit dem Sie Ihre Podcast-Abos über das Web verwalten können. Außerdem können Sie Ihre Podcast-Clients untereinander synchronisieren und neue interessante Podcasts entdecken."
 
 #: web/templates/online-help.html:15
 msgid "Supported Clients"
-msgstr ""
+msgstr "Unterstützte Clients"
 
 #: web/templates/online-help.html:17
 msgid "<a href=\"http://gpodder.org/\">gPodder</a> since version 2.2"
-msgstr ""
+msgstr "<a href=\"http://gpodder.org/\">gPodder</a> ab Version 2.2"
 
 #: web/templates/online-help.html:18
 msgid "<a href=\"http://lincgeek.org/bashpodder/\">BashPodder</a> with the <a href=\"http://thpinfo.com/2010/mygpoclient/\">mygpoclient</a>"
-msgstr ""
+msgstr "<a href=\"http://lincgeek.org/bashpodder/\">BashPodder</a> mit <a href=\"http://thpinfo.com/2010/mygpoclient/\">mygpoclient</a>"
 
 #: web/templates/online-help.html:21
 msgid "To configure gPodder to connect to gpodder.net, open the my.gpodder.org / gpodder.net configuration dialog from the Subscriptions menu. Enter <strong>username and password</strong> that you've used during the registration on the webservice. The <strong>device ID</strong> is automatically generated from the hostname and will be used to identify this specific device in the webservice. Next <strong>enable the synchronisation</strong> of your subscription list. For the start, <strong>upload your subscription list</strong> to the webservice. Subsequent changes will be transmitted automatically."
 msgstr ""
+"Um gPodder mit Ihrem Account auf gpodder.net zu verknüpfen, öffnen Sie die Einstellungen, geben Ihren Benutzernamen und Ihr Passwort an und aktivieren die Synchronisation.\r\n"
+"\r\n"
+"Danach müssen Sie nur noch Ihre Abo-Liste uploaden, zukünftige Änderungen werden dann automatisch übertragen."
 
 #: web/templates/online-help.html:23 web/templates/podcast.html:127
 #: web/templates/subscriptions.html:23 web/templatetags/menu.py:27
@@ -1108,11 +1111,11 @@ msgstr "Geräte"
 
 #: web/templates/online-help.html:24
 msgid "Each device connected to the webservice will be identified by its <strong>Device ID</strong> which should therefore be unique (at least for your user account). <strong>Do not try to synchronize devices by using the same Device ID.</strong>"
-msgstr ""
+msgstr "Jedes Gerät wird über seine Geräte-ID identifiziert. Diese wird automatisch vom Client generiert und sollte eindeutig sein."
 
 #: web/templates/online-help.html:25
 msgid "A list of your devices can be found on the <a href=\"/devices/\">devices page</a>."
-msgstr ""
+msgstr "Eine Übersicht über Ihre Geräte finden Sie in der <a href=\"/devices/\">Geräte-Liste</a>."
 
 #: web/templates/online-help.html:27
 msgid "Synchronizing Devices"
@@ -1152,7 +1155,7 @@ msgstr ""
 
 #: web/templates/password_reset.html:4
 msgid "Password reset"
-msgstr ""
+msgstr "Ihr Passwort wurde zurückgesetzt"
 
 #: web/templates/password_reset.html:7
 msgid "Your password has been reset"
@@ -1164,11 +1167,11 @@ msgstr ""
 
 #: web/templates/password_reset_failed.html:4
 msgid "Password could not be reset"
-msgstr ""
+msgstr "Passwort nicht zurückgesetzt"
 
 #: web/templates/password_reset_failed.html:7
 msgid "Your password could not be reset"
-msgstr ""
+msgstr "Das Passwort konnte nicht zurückgesetzt werden,"
 
 #: web/templates/password_reset_failed.html:9
 msgid "Unfortunately we were not able to reset your password."
@@ -1189,7 +1192,7 @@ msgstr "Meine Podcast-Abos"
 
 #: web/templates/podcast.html:79
 msgid "Click here to unsubscribe"
-msgstr ""
+msgstr "Abonement entfernen"
 
 #: web/templates/podcast.html:122
 msgid "Subscription history"
@@ -1214,7 +1217,7 @@ msgstr ""
 #: web/templates/privacy.html:21 web/templates/privacy.html.py:28
 #: web/templates/privacy.html:46
 msgid "Mark private"
-msgstr ""
+msgstr "Als Privat markieren"
 
 #: web/templates/privacy.html:34
 msgid "Already excluded"
@@ -1222,7 +1225,7 @@ msgstr ""
 
 #: web/templates/privacy.html:39
 msgid "Mark public"
-msgstr ""
+msgstr "Als Öffentlich markieren"
 
 #: web/templates/privacy.html:52
 msgid "We don't include your subscriptions in our public statistics. <a href=\"/account/privacy?public_subscriptions\">Include my data.</a>"
@@ -1294,7 +1297,7 @@ msgstr ""
 
 #: web/templates/subscriptions.html:11 web/templates/subscriptions.html:14
 msgid "My Podcast Subscriptions"
-msgstr ""
+msgstr "Meine Podcast-Abos"
 
 #: web/templates/subscriptions.html:17
 msgid "This is a list of your podcast subscriptions."
@@ -1340,7 +1343,7 @@ msgstr "Es werden diese %(suggestion_count)s Podcasts vorgeschlagen."
 
 #: web/templates/suggestions.html:26
 msgid "Not Interested"
-msgstr ""
+msgstr "Kein Interesse"
 
 #: web/templates/suggestions.html:46
 msgid "Do you like our suggestions?"
@@ -1367,7 +1370,7 @@ msgstr "Abonnenten"
 
 #: web/templates/toplist.html:107
 msgid "or show <a href=\"/toplist?lang=\">all languages</a>."
-msgstr ""
+msgstr "oder <a href=\"/toplist?lang=\">alle Sprachen</a> anzeigen."
 
 #: web/templates/user_subscriptions.html:10
 #: web/templates/user_subscriptions.html:14
@@ -1453,16 +1456,16 @@ msgstr ""
 #: web/templates/registration/resend_activation.html:4
 #: web/templates/registration/resend_activation.html:12
 msgid "Resend activation e-mail"
-msgstr ""
+msgstr "Aktivierungs-Email erneut senden"
 
 #: web/templates/registration/resend_activation.html:38
 msgid "Send activation e-mail"
-msgstr ""
+msgstr "Aktivierungs-Email senden"
 
 #: web/templates/registration/resent_activation.html:4
 #: web/templates/registration/resent_activation.html:7
 msgid "Sent Activation Email"
-msgstr ""
+msgstr "Aktivierungs-Email gesendet"
 
 #: web/templates/registration/resent_activation.html:9
 msgid "The activation email has been reset."
@@ -1483,7 +1486,7 @@ msgstr ""
 
 #: web/templatetags/episodes.py:20
 msgid "Downloaded"
-msgstr ""
+msgstr "Heruntergeladen"
 
 #: web/templatetags/episodes.py:23
 #, python-format
@@ -1492,7 +1495,7 @@ msgstr ""
 
 #: web/templatetags/episodes.py:25
 msgid "Played"
-msgstr ""
+msgstr "Abgespielt"
 
 #: web/templatetags/episodes.py:28
 #, python-format
@@ -1501,7 +1504,7 @@ msgstr ""
 
 #: web/templatetags/episodes.py:30
 msgid "Deleted"
-msgstr ""
+msgstr "Gelöscht"
 
 #: web/templatetags/episodes.py:32
 msgid "Unknown status"
@@ -1548,7 +1551,7 @@ msgstr "Home"
 
 #: web/templatetags/menu.py:24
 msgid "My Podcasts"
-msgstr ""
+msgstr "Meine Podcasts"
 
 #: web/templatetags/menu.py:25 web/templatetags/menu.py:33
 msgid "Subscriptions"
@@ -1576,7 +1579,7 @@ msgstr "Einstellungen"
 
 #: web/templatetags/menu.py:44
 msgid "Account"
-msgstr ""
+msgstr "Account"
 
 #: web/templatetags/menu.py:45
 msgid "Privacy"
@@ -1584,11 +1587,11 @@ msgstr ""
 
 #: web/templatetags/menu.py:47
 msgid "Publisher"
-msgstr ""
+msgstr "Publisher"
 
 #: web/templatetags/menu.py:50
 msgid "Link to gpodder.net"
-msgstr ""
+msgstr "Auf gpodder.net verlinken"
 
 #: web/templatetags/podcasts.py:14
 msgid "Logo"
@@ -1609,7 +1612,7 @@ msgstr ""
 
 #: web/views/__init__.py:336
 msgid "Choose a device:"
-msgstr ""
+msgstr "Gerät auswählen"
 
 #: web/views/__init__.py:518
 msgid "Invalid Username entered"
