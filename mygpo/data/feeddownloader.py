@@ -223,6 +223,7 @@ def update_podcasts(fetch_queue):
                     print >>sys.stderr, 'LOGO @', cover_art
                     podcast.logo_url = cover_art
                 except Exception, e:
+                    podcast.logo_url = None
                     print >>sys.stderr, 'cannot save image: %s' % e
 
             update_feed_tags(podcast, get_feed_tags(feed.feed))
