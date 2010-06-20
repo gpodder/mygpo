@@ -393,7 +393,7 @@ class Device(models.Model):
         #remove actions that did not change
         current_state = self.latest_actions()
         for podcast in current_state.keys():
-            if podcast in current_state and sync_actions[podcast] == current_state[podcast]:
+            if podcast in current_state and podcast in sync_actions and sync_actions[podcast] == current_state[podcast]:
                del sync_actions[podcast]
 
         return sync_actions.values()
