@@ -139,3 +139,30 @@ def get_sponsored_podcast(when=datetime.now):
     else:
         return adv[0]
 
+
+def get_page_list(start, total, cur, show_max):
+    """
+    returns a list of pages to be linked for navigation in a paginated view
+    """
+    ps = []
+    if (cur - start) > show_max / 2:
+        ps.extend(range(start, show_max / 4))
+        ps.append('...')
+        ps.extend(range(cur - show_max / 4, cur))
+
+    else:
+        ps.extend(range(start, cur))
+
+    ps.append(cur)
+
+    if (total - cur) > show_max / 2:
+        ps.extend(range(cur + 1, cur + show_max / 4))
+        ps.append('...')
+        ps.extend(range(total - show_max / 4, total + 1))
+
+    else:
+        ps.extend(range(cur + 1, total + 1))
+
+    return ps
+
+

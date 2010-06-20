@@ -21,6 +21,7 @@ from django.template import RequestContext
 from mygpo.api.models import Podcast, Episode, ToplistEntry, Subscription
 from mygpo.data.models import PodcastTag
 from mygpo.decorators import manual_gc
+from mygpo.web import utils
 from mygpo import settings
 from django.shortcuts import get_object_or_404
 from django.db.models import Sum
@@ -71,9 +72,12 @@ def category(request, category, page_size=20):
     except (EmptyPage, InvalidPage):
         podcasts = paginator.page(paginator.num_pages)
 
+    page_list = utils.get_page_list(1, podcasts.paginator.num_pages, podcasts.number, 15)
+
     return render_to_response('category.html', {
         'entries': podcasts,
         'category': category,
+        'page_list': page_list,
         }, context_instance=RequestContext(request))
 
 

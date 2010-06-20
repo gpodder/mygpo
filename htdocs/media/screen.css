@@ -638,3 +638,7 @@ div.come-in-box
     padding-bottom: .5em;
 }
 
+.pagination
+{
+    text-align: center;
+}

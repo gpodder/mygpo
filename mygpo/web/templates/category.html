@@ -35,19 +35,33 @@
  </table>
 
 <div class="pagination">
-    <span class="step-links">
-        {% if entries.has_previous %}
-            <a href="?page={{ entries.previous_page_number }}">previous</a>
-        {% endif %}
 
-        <span class="current">
-            Page {{ entries.number }} of {{ entries.paginator.num_pages }}.
-        </span>
+<span class="step-links">
+ {% if entries.has_previous %}
+  <a href="?page={{ entries.previous_page_number }}">previous</a>
+ {% endif %}
 
-        {% if entries.has_next %}
-            <a href="?page={{ entries.next_page_number }}">next</a>
-        {% endif %}
-    </span>
+ {% for page in page_list %}
+
+   {% if page == "..." %}
+    {{ page }}
+   {% else %}
+
+     {% ifequal page entries.number %}
+      <strong>{{ page }}</strong>
+     {% endifequal %}
+     {% ifnotequal page entries.number %}
+      <a href="/directory/{{ category }}?page={{ page }}">{{ page }}</a>
+     {% endifnotequal %}
+   {% endif %}
+
+ {% endfor %}
+
+ {% if entries.has_next %}
+  <a href="?page={{ entries.next_page_number }}">next</a>
+ {% endif %}
+
+
 </div>
 
 {% endblock %}
