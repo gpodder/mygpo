@@ -29,11 +29,13 @@
    {% for result in results.object_list %}
     <tr>
      {% ifequal result.obj_type "podcast" %}
-      <td>{{ result.get_object|podcast_logo }}</td>
-      <td>
-       <a class="podcast" href="/podcast/{{ result.obj_id }}">{{ result.get_object }}</a><br />
-       <span class="listlink description">{{ result.get_object.description|default:""|striptags|truncatewords:"15" }}</span>
-      </td>
+      {% if result.get_object %}
+       <td>{{ result.get_object|podcast_logo }}</td>
+       <td>
+        <a class="podcast" href="/podcast/{{ result.obj_id }}">{{ result.get_object }}</a><br />
+        <span class="listlink description">{{ result.get_object.description|default:""|striptags|truncatewords:"15" }}</span>
+       </td>
+      {% endif %}
      {% endifequal %}
 
      {% ifequal result.obj_type "podcast_group" %}
