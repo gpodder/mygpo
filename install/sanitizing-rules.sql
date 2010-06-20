@@ -34,4 +34,5 @@ INSERT INTO `sanitizing_rules` VALUES (33,1,0,'^http://feeds\\.ziffdavis\\.com/z
 INSERT INTO `sanitizing_rules` VALUES (34,1,0,'^http://feeds\\.ziffdavis\\.com/ziffdavis/cgipodvideo\\?format=xml$', 'http://feeds.ziffdavis.com/ziffdavis/cgipodvideo', 100, 'Unify Cranky Geed Podcasts (iPod Video) (bug 1032');
 INSERT INTO `sanitizing_rules` VALUES (35,1,0,'^http://rssnewsapps\\.ziffdavis\\.com/audioblogs/crankygeeks/cg\\.wmv\\.xml$', 'http://feeds.feedburner.com/ziffdavis/cgwmvvideo', 100, 'Unify Cranky Geed Podcasts (WMV) (bug 1032');
 INSERT INTO `sanitizing_rules` VALUES (36,1,0,'^http://noagenda\\.podshow\\.com/feed$', 'http://www.mevio.com/feeds/noagenda.xml', 100, 'Unify No Agend Feeds');
+INSERT INTO `sanitizing_rules` VALUES (37,1,0,'^(?P<protocol>\\w+)://gdata\\.youtube\\.com/feeds/base/users/(?P<username>\\w+)/uploads\\?alt=rss.*$', '\\g<protocol>://www.youtube.com/rss/user/\g<username>/videos.rss', 100, 'Rewrite Youtube API Feeds to canonical URLs (bug 1057)');
 
