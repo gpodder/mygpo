@@ -156,7 +156,8 @@ def get_page_list(start, total, cur, show_max):
     ps.append(cur)
 
     if (total - cur) > show_max / 2:
-        ps.extend(range(cur + 1, cur + show_max / 4))
+        add = show_max / 2 - len(ps) # for the first pages, show more pages at the beginning
+        ps.extend(range(cur + 1, cur + show_max / 4 + add))
         ps.append('...')
         ps.extend(range(total - show_max / 4, total + 1))
 

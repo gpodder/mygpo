@@ -51,21 +51,32 @@
   </table>
 
 <div class="pagination">
-    <span class="step-links">
-        {% if results.has_previous %}
-            <a href="?q={{q}}&page={{ results.previous_page_number }}">previous</a>
-        {% endif %}
 
-        <span class="current">
-            Page {{ results.number }} of {{ results.paginator.num_pages }}.
-        </span>
+ {% if results.has_previous %}
+  <a href="?q={{ q }}&page={{ results.previous_page_number }}">«</a>
+ {% endif %}
 
-        {% if results.has_next %}
-            <a href="?q={{q}}&page={{ results.next_page_number }}">next</a>
-        {% endif %}
-    </span>
+ {% for page in page_list %}
+  <span class="page-link">
+   {% if page == "..." %}
+    {{ page }}
+   {% else %}
+
+     {% ifequal page results.number %}
+      <strong>{{ page }}</strong>
+     {% endifequal %}
+     {% ifnotequal page results.number %}
+      <a href="?q={{ q }}&page={{ page }}">{{ page }}</a>
+     {% endifnotequal %}
+   {% endif %}
+  </span>
+ {% endfor %}
+
+ {% if results.has_next %}
+  <a href="?q={{ q }}&page={{ results.next_page_number }}">»</a>
+ {% endif %}
+
 </div>
-
 
  {% endif %}
 {% endblock %}

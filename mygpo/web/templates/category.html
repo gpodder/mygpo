@@ -36,13 +36,12 @@
 
 <div class="pagination">
 
-<span class="step-links">
  {% if entries.has_previous %}
-  <a href="?page={{ entries.previous_page_number }}">previous</a>
+  <a href="?page={{ entries.previous_page_number }}">«</a>
  {% endif %}
 
  {% for page in page_list %}
-
+  <span class="page-link">
    {% if page == "..." %}
     {{ page }}
    {% else %}
@@ -51,16 +50,15 @@
       <strong>{{ page }}</strong>
      {% endifequal %}
      {% ifnotequal page entries.number %}
-      <a href="/directory/{{ category }}?page={{ page }}">{{ page }}</a>
+      <a href="?page={{ page }}">{{ page }}</a>
      {% endifnotequal %}
    {% endif %}
-
+  </span>
  {% endfor %}
 
  {% if entries.has_next %}
-  <a href="?page={{ entries.next_page_number }}">next</a>
+  <a href="?page={{ entries.next_page_number }}">»</a>
  {% endif %}
-
 
 </div>
 

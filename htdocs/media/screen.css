@@ -642,3 +642,14 @@ div.come-in-box
 {
     text-align: center;
 }
+
+.pagination
+{
+    font-size: 1.5em;
+}
+
+.pagination span
+{
+    padding: .5em .3em .5em .3em;
+}
+
