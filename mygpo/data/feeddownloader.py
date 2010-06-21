@@ -46,15 +46,16 @@ def mark_outdated(podcast):
         e.save()
 
 
-def check_mime(mimetype, url):
-    """Check if a mimetype is a "wanted" media type"""
+def get_mimetype(mimetype, url):
+    """Returns the mimetype if its a "wanted" media type, otherwise None"""
 
     if not mimetype:
         mimetype, _encoding = mimetypes.guess_type(url)
 
-    if not mimetype:
-        return False
+    return mimetype
 
+
+def check_mimetype(mimetype):
     if '/' in mimetype:
         category, type = mimetype.split('/', 1)
         if category in ('audio', 'video', 'image'):
@@ -64,21 +65,27 @@ def check_mime(mimetype, url):
         # but we do not want to accept all files with application category
         if type in ('ogg', ):
             return True
+
         return False
     else:
         return False
+
 
 def get_episode_url(entry):
     """Get the download / episode URL of a feedparser entry"""
     enclosures = getattr(entry, 'enclosures', [])
     for enclosure in enclosures:
-        if 'href' in enclosure and check_mime(enclosure.get('type', ''), enclosure['href']):
-            return enclosure['href']
+        if 'href' in enclosure:
+            mimetype = get_mimetype(enclosure.get('type', ''), enclosure['href'])
+            if check_mimetype(mimetype):
+                return enclosure['href'], mimetype
 
     media_content = getattr(entry, 'media_content', [])
     for media in media_content:
-        if 'url' in media and check_mime(media.get('type', ''), media['url']):
-            return media['url']
+        if 'url' in media:
+            mimetype = get_mimetype(media.get('type', ''), media['url'])
+            if check_mimetype(mimetype):
+                return media['url'], mimetype
 
     links = getattr(entry, 'links', [])
     for link in links:
@@ -147,7 +154,7 @@ def update_feed_tags(podcast, tags):
             PodcastTag.objects.create(podcast=podcast, source=src, tag=tag)
 
 
-def get_episode_metadata(entry, url):
+def get_episode_metadata(entry, url, mimetype):
     d = {
             'url': url,
             'title': entry.get('title', entry.get('link', '')),
@@ -159,6 +166,7 @@ def get_episode_metadata(entry, url):
             'filesize': get_filesize(entry, url),
             'language': entry.get('language', ''),
             'outdated': False,
+            'mimetype': mimetype,
     }
     try:
         d['timestamp'] = datetime.datetime(*(entry.updated_parsed)[:6])
@@ -232,13 +240,13 @@ def update_podcasts(fetch_queue):
 
             for entry in feed.entries:
                 try:
-                    url = get_episode_url(entry)
+                    url, mimetype = get_episode_url(entry)
                     if url is None:
                         print 'Ignoring entry'
                         continue
 
                     url = sanitize_url(url, podcast=False, episode=True)
-                    md = get_episode_metadata(entry, url)
+                    md = get_episode_metadata(entry, url, mimetype)
                     e, created = models.Episode.objects.get_or_create(
                         podcast=podcast,
                         url=url,

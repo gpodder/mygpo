@@ -277,6 +277,7 @@ class Episode(models.Model):
     language = models.CharField(max_length=10, null=True, blank=True)
     last_update = models.DateTimeField(auto_now=True)
     outdated = models.BooleanField(default=False) #set to true after episode hasn't been found in feed
+    mimetype = models.CharField(max_length=30, blank=True, null=True)
 
     def number(self):
         m = re.search('\D*(\d+)\D+', self.title)
