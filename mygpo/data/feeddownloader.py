@@ -93,11 +93,11 @@ def get_episode_url(entry):
             continue
 
         if youtube.is_video_link(link['href']):
-            return link['href']
+            return link['href'], 'application/x-youtube'
 
         # XXX: Implement link detection as in gPodder
 
-    return None
+    return None, None
 
 def get_episode_summary(entry):
     for key in ('summary', 'subtitle', 'link'):
