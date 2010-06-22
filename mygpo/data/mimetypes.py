@@ -5,6 +5,11 @@ from collections import defaultdict
 # then the podcast is considered to be of that type, too
 TYPE_THRESHOLD=.2
 
+
+_ = lambda s: s
+
+CONTENT_TYPES = (_('image'), _('audio'), _('video'))
+
 def get_podcast_types(podcast):
     """Returns the types of a podcast
 

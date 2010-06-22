@@ -653,7 +653,8 @@ div.come-in-box
     padding: .5em .3em .5em .3em;
 }
 
-.deactivated
+.deactivated,
+.activated:hover
 {
     text-decoration: line-through;
 }

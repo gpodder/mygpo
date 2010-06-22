@@ -8,6 +8,20 @@
 {% block mainmenu %}{{ "/toplist/episodes"|main_menu }}{% endblock %}
 {% block sectionmenu %}{{ "/toplist/episodes"|section_menu }}{% endblock %}
 
+{% block head %}
+ <script type="text/javascript" src="/media/js/jquery-1.4.2.min.js"></script>
+ <script type="text/javascript">
+    $(document).ready(function()
+    {
+        $(".config-toplist").hide();
+        $("#open-config").click(function()
+        {
+            $(".config-toplist").slideToggle(500);
+        });
+    });
+ </script>
+{% endblock head %}
+
 {% block title %}{% trans "Episode-Toplist" %}{% endblock %}
 
 {% block content %}
@@ -15,11 +29,64 @@
 
   <p>
    {% if languages|length_is:"0" %}
-    {% blocktrans with entries|length as count %}These are the {{ count }} most listened episodes of the last seven days of all languages. You can chose to show only selected languages <a href="#languages">below</a>.{% endblocktrans %}
+    {% blocktrans with entries|length as count and types|filter_dict|join:", " as media_types %}These are the {{ count }} most listened {{ media_types }} episodes of the last seven days of all languages.{% endblocktrans %}
    {% else %}
-    {% blocktrans with entries|length as count and all_languages|lookup_list:languages|join:", " as lang %}The are the {{ count }} most listened episodes of the last seven days for the languages {{ lang }}. You can select the included languages <a href="#languages">below</a>.{% endblocktrans %}
+    {% blocktrans with entries|length as count and all_languages|lookup_list:languages|join:", " as lang and types|filter_dict|join:", " as media_types %}The are the {{ count }} most listened {{ media_types }} episodes of the last seven days for the languages {{ lang }}.{% endblocktrans %}
    {% endif %}
+   <a href="#" id="open-config">({% trans "change"%})</a>
   </p>
+
+ <div class="config-toplist">
+  <h3>{% trans "Languages" %}</h3>
+  {% if languages|length_is:"0" %}
+   <div>{% trans "Currently showing all languages." %}<br />
+    {% trans "Show a specific one:" %}
+    <form action="/toplist/episodes?lang={{ languages|join:"," }}" method="post">
+     {% csrf_token %}
+     <select name="lang">
+      {% for key, name in all_languages.iteritems %}
+       <option value="{{ key }}">{{ name }}</option>
+      {% endfor %}
+     </select>
+     <input type="submit" value="{% trans "Show" %}" />
+    </form>
+   </div>
+  {% else %}
+   <div>{% trans "Remove a language" %}
+    <ul>
+     {% for lang in languages %}
+      <li>
+       <a href="/toplist/episodes?lang={{ languages|remove:lang|join:"," }}&types={{ types|filter_dict|join:"," }}">{{ all_languages|lookup:lang }}</a>
+      </li>
+     {% endfor %}
+    </ul>
+    <form action="/toplist/episodes?lang={{ languages|join:"," }}&types={{ types|filter_dict|join:"," }}" method="post">
+     {% csrf_token %}
+     <select name="lang">
+      {% for key, name in all_languages.iteritems %}
+       {% if not key in languages %}
+        <option value="{{ key }}">{{ name }}</option>
+       {% endif %}
+      {% endfor %}
+     </select>
+     <input type="submit" value="{% trans "Add" %}" />
+    </form>
+    {% blocktrans with types|filter_dict|join:"," as type_param %}or show <a href="/toplist/episodes?lang=&types={{ type_param }}">all languages</a>.{% endblocktrans %}
+   </div>
+  {% endif %}
+ </div>
+
+ <div class="config-toplist">
+  <h3>Media Types</h3>
+  {% for type, enabled in types.iteritems %}
+   {% if enabled %}
+    <a class="activated" href="/toplist/episodes?lang={{ languages|join:"," }}&types={{ types|filter_dict|remove:type|join:"," }} ">{{ type }}</a>
+   {% else %}
+    <a class="deactivated" href="/toplist/episodes?lang={{ languages|join:"," }}&types={{ types|filter_dict|append:type|join:"," }}">{{ type }}</a>
+   {% endif %}
+  {% endfor %}
+ </div>
+
 
   <table class="list episode_list">
    <tr>
@@ -48,44 +115,6 @@
    </tr>
   {% endfor %}
   </table>
-
-  <h3><a name="languages"></a>{% trans "Languages" %}</h3>
-  {% if languages|length_is:"0" %}
-   <p>Currently showing all languages. Show a specific one:
-    <form action="/toplist/?lang={{ languages|join:"," }}" method="post">
-     {% csrf_token %}
-     <select name="lang">
-      {% for key, name in all_languages.iteritems %}
-       <option value="{{ key }}">{{ name }}</option>
-      {% endfor %}
-     </select>
-     <input type="submit" value="{% trans "Show" %}" />
-    </form>
-   </p>
-  {% else %}
-   <p>Remove a language
-    <ul>
-     {% for lang in languages %}
-      <li>
-       <a href="/toplist/episodes?lang={{ languages|join:","|cut:lang }}">{{ all_languages|lookup:lang }}</a>
-      </li>
-     {% endfor %}
-    </ul>
-    <form action="/toplist/episodes?lang={{ languages|join:"," }}" method="post">
-     {% csrf_token %}
-     <select name="lang">
-      {% for key, name in all_languages.iteritems %}
-       {% if not key in languages %}
-        <option value="{{ key }}">{{ name }}</option>
-       {% endif %}
-      {% endfor %}
-     </select>
-     <input type="submit" value="{% trans "Add" %}" />
-    </form>
-    {% blocktrans %}or show <a href="/toplist/episodes?lang=">all languages</a>.{% endblocktrans %}
-   </p>
-  {% endif %}
-
 
   <div class="info"><strong>{% trans "You think that's not much?" %}</strong> {% blocktrans %}You're right - the listener counts are still pretty low, because they are only counted for users of gPodder 2.2 or later, which is rather new. So <a href="http://gpodder.org/downloads.html">get it</a>, if you don't have it already.{% endblocktrans %}</div>
 {% endblock %}

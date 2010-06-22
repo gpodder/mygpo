@@ -22,6 +22,7 @@ from django.contrib.auth.models import User
 from django.template import RequestContext
 from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, EpisodeToplistEntry, Subscription, SuggestionEntry, SyncGroup, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SubscriptionMeta, UserProfile
 from mygpo.data.models import Listener, SuggestionBlacklist
+from mygpo.data.mimetypes import CONTENT_TYPES
 from mygpo.web.models import Rating, SecurityToken
 from mygpo.web.forms import UserAccountForm, DeviceForm, SyncForm, PrivacyForm, ResendActivationForm
 from django.forms import ValidationError
@@ -52,9 +53,6 @@ import Image
 import ImageDraw
 import StringIO
 
-_ = lambda s: s
-
-CONTENT_TYPES = (_('image'), _('audio'), _('video'))
 
 def home(request):
     if request.user.is_authenticated():
@@ -423,12 +421,14 @@ def episode_toplist(request, num=100):
     except utils.UpdatedException, updated:
         return HttpResponseRedirect('/toplist/episodes?lang=%s' % ','.join(updated.data))
 
-    if len(lang) == 0:
-        entries = EpisodeToplistEntry.objects.all()[:num]
-
+    type_str = request.GET.get('types', '')
+    set_types = [t for t in type_str.split(',') if t]
+    if set_types:
+        media_types = dict([(t, t in set_types) for t in CONTENT_TYPES])
     else:
-        regex = '^(' + '|'.join(lang) + ')'
-        entries = EpisodeToplistEntry.objects.filter(episode__podcast__language__regex=regex)[:num]
+        media_types = dict([(t, True) for t in CONTENT_TYPES])
+
+    entries = backend.get_episode_toplist(num, lang, set_types)
 
     current_site = Site.objects.get_current()
 
@@ -441,6 +441,7 @@ def episode_toplist(request, num=100):
         'url': current_site,
         'languages': lang,
         'all_languages': all_langs,
+        'types': media_types,
     }, context_instance=RequestContext(request))
 
 

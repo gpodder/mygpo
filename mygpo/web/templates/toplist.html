@@ -82,7 +82,7 @@
   <h3>Media Types</h3>
   {% for type, enabled in types.iteritems %}
    {% if enabled %}
-    <a href="/toplist/?lang={{ languages|join:"," }}&types={{ types|filter_dict|remove:type|join:"," }} ">{{ type }}</a>
+    <a class="activated" href="/toplist/?lang={{ languages|join:"," }}&types={{ types|filter_dict|remove:type|join:"," }} ">{{ type }}</a>
    {% else %}
     <a class="deactivated" href="/toplist/?lang={{ languages|join:"," }}&types={{ types|filter_dict|append:type|join:"," }}">{{ type }}</a>
    {% endif %}

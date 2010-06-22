@@ -15,7 +15,8 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from mygpo.api.models import ToplistEntry, Podcast, Subscription
+from mygpo.api.models import ToplistEntry, Podcast, Subscription, EpisodeToplistEntry
+from mygpo.data.mimetypes import get_type, CONTENT_TYPES
 from django.db.models import Max
 from datetime import datetime, timedelta
 import re
@@ -48,6 +49,12 @@ def get_toplist(count, languages=None, types=None):
     For language-specific lists the entries' oldplace attribute is calculated
     based on the same language list
     """
+
+    # if we include all "known" types, ignore this criteria
+    # this will then include all types, also unknown ones
+    if len(types) == len(CONTENT_TYPES):
+        types = None
+
     if not languages and not types:
         return ToplistEntry.objects.all()[:count]
     else:
@@ -61,7 +68,6 @@ def get_toplist(count, languages=None, types=None):
 
         if types:
             type_regex = '.*(' + '|'.join(types) + ').*'
-            print type_regex
             podcast_entries_base = podcast_entries_base.filter(podcast__content_types__regex=type_regex)
             group_entries_base = group_entries_base.filter(podcast_group__podcast__content_types__regex=type_regex).distinct()
 
@@ -79,6 +85,36 @@ def get_toplist(count, languages=None, types=None):
             x.oldplace = old_items.index(x.get_item())+1 if x.get_item() in old_items else 0
 
         return cur_list
+
+def get_episode_toplist(count, languages=None, types=None):
+    """Returns the first num entries of the episode toplist with the given search criteria"""
+
+    # if we include all "known" types, ignore this criteria
+    # this will then include all types, also unknown ones
+    if len(types) == len(CONTENT_TYPES):
+        types = None
+
+    entries = EpisodeToplistEntry.objects.all()
+
+    if languages:
+        regex = '^(' + '|'.join(languages) + ')'
+        entries = entries.filter(episode__podcast__language__regex=regex)
+
+    if types:
+        # we can just use a regex here, because searching for the right "type" of an
+        # episode is more complex; we first look for all podcasts with the right type
+        # and then look through their episodes
+        type_regex = '.*(' + '|'.join(types) + ').*'
+        entries = entries.filter(episode__podcast__content_types__regex=type_regex)
+        entry_list = []
+        for e in entries:
+            if e.episode.mimetype and get_type(e.episode.mimetype) in types:
+                entry_list.append(e)
+
+            if len(entry_list) >= count:
+                break
+
+    return entries[:count]
 
 
 def merge_toplists(podcast_entries, group_entries, sortkey, reverse, count=None):
