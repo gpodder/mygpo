@@ -52,7 +52,7 @@ def get_toplist(count, languages=None, types=None):
 
     # if we include all "known" types, ignore this criteria
     # this will then include all types, also unknown ones
-    if len(types) == len(CONTENT_TYPES):
+    if types and len(types) == len(CONTENT_TYPES):
         types = None
 
     if not languages and not types:
@@ -91,7 +91,7 @@ def get_episode_toplist(count, languages=None, types=None):
 
     # if we include all "known" types, ignore this criteria
     # this will then include all types, also unknown ones
-    if len(types) == len(CONTENT_TYPES):
+    if types and len(types) == len(CONTENT_TYPES):
         types = None
 
     entries = EpisodeToplistEntry.objects.all()
