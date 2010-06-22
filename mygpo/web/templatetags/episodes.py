@@ -3,6 +3,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
 from mygpo import utils
+from mygpo.data.mimetypes import get_type, get_mimetype
 
 register = template.Library()
 
@@ -101,4 +102,11 @@ def played_visualization(played_parts, length):
     s = '<img src="http://chart.apis.google.com/chart?%s"' % '&'.join(parts)
 
     return mark_safe(s)
+
+
+@register.filter
+def is_image(episode):
+
+    mimetype = get_mimetype(episode.mimetype, episode.url)
+    return get_type(mimetype) == 'image'
 

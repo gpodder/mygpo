@@ -59,6 +59,10 @@
    {{ episode|embed_flickr_photo }}
   {% endif %}
 
+  {% if episode|is_image %}
+   <img src="{{ episode.url }}" />
+  {% endif %}
+
   {% if user.is_authenticated %}
 
    {% if is_favorite %}
