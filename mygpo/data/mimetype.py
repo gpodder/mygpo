@@ -1,5 +1,6 @@
 from mygpo.api.models import Podcast, Episode
 from collections import defaultdict
+import mimetypes
 
 # If 20% of the episodes of a podcast are of a given type,
 # then the podcast is considered to be of that type, too
@@ -34,6 +35,9 @@ def get_type(mimetype):
     All "wanted" mimetypes are mapped to one of audio/video/image
     Everything else returns None
     """
+    if not mimetype:
+        return None
+
     if '/' in mimetype:
         category, type = mimetype.split('/', 1)
         if category in ('audio', 'video', 'image'):

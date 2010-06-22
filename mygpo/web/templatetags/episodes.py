@@ -3,7 +3,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
 from mygpo import utils
-from mygpo.data.mimetypes import get_type, get_mimetype
+from mygpo.data.mimetype import get_type, get_mimetype
 
 register = template.Library()
 

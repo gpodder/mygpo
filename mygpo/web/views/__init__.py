@@ -22,7 +22,7 @@ from django.contrib.auth.models import User
 from django.template import RequestContext
 from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, EpisodeToplistEntry, Subscription, SuggestionEntry, SyncGroup, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SubscriptionMeta, UserProfile
 from mygpo.data.models import Listener, SuggestionBlacklist
-from mygpo.data.mimetypes import CONTENT_TYPES
+from mygpo.data.mimetype import CONTENT_TYPES
 from mygpo.web.models import Rating, SecurityToken
 from mygpo.web.forms import UserAccountForm, DeviceForm, SyncForm, PrivacyForm, ResendActivationForm
 from django.forms import ValidationError
