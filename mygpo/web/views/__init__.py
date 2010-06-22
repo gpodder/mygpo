@@ -52,6 +52,10 @@ import Image
 import ImageDraw
 import StringIO
 
+_ = lambda s: s
+
+CONTENT_TYPES = (_('image'), _('audio'), _('video'))
+
 def home(request):
     if request.user.is_authenticated():
         return dashboard(request)
@@ -388,21 +392,26 @@ def toplist(request, num=100, lang=None):
     except utils.UpdatedException, updated:
         return HttpResponseRedirect('/toplist/?lang=%s' % ','.join(updated.data))
 
-    if len(lang) == 0:
-        entries = ToplistEntry.objects.all()[:num]
-
+    type_str = request.GET.get('types', '')
+    set_types = [t for t in type_str.split(',') if t]
+    if set_types:
+        media_types = dict([(t, t in set_types) for t in CONTENT_TYPES])
     else:
-        entries = backend.get_toplist(num, lang)
+        media_types = dict([(t, True) for t in CONTENT_TYPES])
+
+    entries = backend.get_toplist(num, lang, set_types)
 
     max_subscribers = max([e.subscriptions for e in entries]) if entries else 0
     current_site = Site.objects.get_current()
     all_langs = utils.get_language_names(utils.get_podcast_languages())
+
     return render_to_response('toplist.html', {
         'entries': entries,
         'max_subscribers': max_subscribers,
         'url': current_site,
         'languages': lang,
         'all_languages': all_langs,
+        'types': media_types,
     }, context_instance=RequestContext(request))
 
 

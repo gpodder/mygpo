@@ -39,7 +39,7 @@ def get_podcasts_for_languages(languages=None, podcast_query=Podcast.objects.all
     return podcast_query.filter(language__regex=regex)
 
 
-def get_toplist(count, languages=None):
+def get_toplist(count, languages=None, types=None):
     """
     Returns count podcasts with the most subscribers (individual users)
     If languages is given as an array of 2-character languages codes, only
@@ -48,12 +48,23 @@ def get_toplist(count, languages=None):
     For language-specific lists the entries' oldplace attribute is calculated
     based on the same language list
     """
-    if not languages:
+    if not languages and not types:
         return ToplistEntry.objects.all()[:count]
     else:
-        regex = '^(' + '|'.join(languages) + ')'
-        podcast_entries_base = ToplistEntry.objects.filter(podcast__language__regex=regex)
-        group_entries_base = ToplistEntry.objects.filter(podcast_group__podcast__language__regex=regex).distinct()
+        podcast_entries_base = ToplistEntry.objects.all()
+        group_entries_base = ToplistEntry.objects.all()
+
+        if languages:
+            lang_regex = '^(' + '|'.join(languages) + ')'
+            podcast_entries_base = podcast_entries_base.filter(podcast__language__regex=lang_regex)
+            group_entries_base = group_entries_base.filter(podcast_group__podcast__language__regex=lang_regex).distinct()
+
+        if types:
+            type_regex = '.*(' + '|'.join(types) + ').*'
+            print type_regex
+            podcast_entries_base = podcast_entries_base.filter(podcast__content_types__regex=type_regex)
+            group_entries_base = group_entries_base.filter(podcast_group__podcast__content_types__regex=type_regex).distinct()
+
 
         old_podcast_entries = list(podcast_entries_base.exclude(oldplace=0).order_by('oldplace')[:count])
         old_group_entries = list(group_entries_base.exclude(oldplace=0).order_by('oldplace')[:count])

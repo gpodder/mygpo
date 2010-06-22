@@ -35,6 +35,7 @@ from mygpo.data.models import PodcastTag
 from mygpo.utils import parse_time
 from mygpo.api.sanitizing import sanitize_url, rewrite_podcasts
 from mygpo.data import youtube
+from mygpo.data.mimetypes import get_mimetype, check_mimetype, get_podcast_types
 
 socket.setdefaulttimeout(10)
 fetcher = feedcore.Fetcher(USER_AGENT)
@@ -44,32 +45,6 @@ def mark_outdated(podcast):
     for e in models.Episode.objects.filter(podcast=podcast):
         e.outdated = True
         e.save()
-
-
-def get_mimetype(mimetype, url):
-    """Returns the mimetype if its a "wanted" media type, otherwise None"""
-
-    if not mimetype:
-        mimetype, _encoding = mimetypes.guess_type(url)
-
-    return mimetype
-
-
-def check_mimetype(mimetype):
-    if '/' in mimetype:
-        category, type = mimetype.split('/', 1)
-        if category in ('audio', 'video', 'image'):
-            return True
-
-        # application/ogg is a valid mime type for Ogg files
-        # but we do not want to accept all files with application category
-        if type in ('ogg', ):
-            return True
-
-        return False
-    else:
-        return False
-
 
 def get_episode_url(entry):
     """Get the download / episode URL of a feedparser entry"""
@@ -276,6 +251,8 @@ def update_podcasts(fetch_queue):
                 if not e.outdated:
                     e.outdated = True
                     e.save()
+
+            podcast.content_types = get_podcast_types(podcast)
 
         except Exception, e:
             print >>sys.stderr, 'Exception:', e

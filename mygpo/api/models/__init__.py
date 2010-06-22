@@ -19,6 +19,7 @@ from django.db import models
 from django.contrib.auth.models import User, UserManager
 from datetime import datetime
 from django.utils.translation import ugettext as _
+from mygpo.api.fields import SeparatedValuesField
 import hashlib
 import re
 
@@ -50,6 +51,7 @@ class Podcast(models.Model):
     language = models.CharField(max_length=10, null=True, blank=True)
     group = models.ForeignKey('PodcastGroup', null=True)
     group_member_name = models.CharField(max_length=20, default=None, null=True, blank=False)
+    content_types = SeparatedValuesField(null=True, blank=True)
 
     def subscriptions(self):
         """

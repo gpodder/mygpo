@@ -24,3 +24,16 @@ def smartwidthratio(val, max_val, upper, lower):
 def page_list(cur, start, total, show_max):
     return get_page_list(start, total, cur, show_max)
 
+
+@register.filter
+def filter_dict(dic):
+    return [key for key, val in dic.iteritems() if val]
+
+
+@register.filter
+def append(l, item):
+    return l + [item]
+
+@register.filter
+def remove(l, item):
+    return [x for x in l if x != item]
