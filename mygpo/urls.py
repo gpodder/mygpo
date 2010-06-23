@@ -116,6 +116,7 @@ urlpatterns = patterns('',
     (r'^api/2/data/episode\.json', 'mygpo.api.advanced.directory.episode_info'),
 
     (r'^api/2/chapters/(?P<username>\w+)\.json', 'mygpo.api.advanced.episode.chapters'),
+    (r'^api/2/updates/(?P<username>\w+)/(?P<device_uid>[\w.-]+)\.json', 'mygpo.api.advanced.updates'),
 
     #Subscribe with my.gpodder.org
     (r'^subscribe', 'mygpo.web.views.podcast_subscribe_url'),

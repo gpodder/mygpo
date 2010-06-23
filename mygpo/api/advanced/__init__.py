@@ -20,7 +20,10 @@ from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbid
 from mygpo.api.models import Device, Podcast, SubscriptionAction, Episode, EpisodeAction, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, EPISODE_ACTION_TYPES, DEVICE_TYPES, Subscription
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url
+from mygpo.api.advanced.directory import episode_data, podcast_data
+from mygpo.api.backend import get_all_subscriptions
 from django.core import serializers
+from django.shortcuts import get_object_or_404
 from time import mktime, gmtime, strftime
 from datetime import datetime, timedelta
 import dateutil.parser
@@ -375,4 +378,51 @@ def devices(request, username):
 
     else:
         return HttpResponseNotAllowed(['GET'])
+
+
+@csrf_exempt
+@require_valid_user
+@check_username
+def updates(request, username, device_uid):
+    now = datetime.now()
+    now_ = int(mktime(now.timetuple()))
+
+    device = get_object_or_404(Device, user=request.user, uid=device_uid)
+
+    try:
+        since_ = request.GET['since']
+    except KeyError:
+        return HttpResponseBadRequest('parameter since missing')
+
+    since = datetime.fromtimestamp(float(since_))
+
+    ret = get_subscription_changes(request.user, device, since, now)
+
+    # replace added urls with details
+    podcast_details = []
+    for url in ret['add']:
+        podcast = Podcast.objects.get(url=url)
+        podcast_details.append(podcast_data(podcast))
+
+    ret['add'] = podcast_details
+
+
+    # add episode details
+    subscriptions = get_all_subscriptions(request.user)
+    episode_status = {}
+    for e in Episode.objects.filter(podcast__in=subscriptions, timestamp__gte=since).order_by('timestamp'):
+        episode_status[e] = 'new'
+    for a in EpisodeAction.objects.filter(user=request.user, episode__podcast__in=subscriptions, timestamp__gte=since).order_by('timestamp'):
+        episode_status[a.episode] = a.action
+
+    updates = []
+    for episode, status in episode_status.iteritems():
+        t = episode_data(episode)
+        t['released'] = e.timestamp.strftime('%Y-%m-%dT%H:%M:%S')
+        t['status'] = status
+        updates.append(t)
+
+    ret['updates'] = updates
+
+    return JsonResponse(ret)
 
