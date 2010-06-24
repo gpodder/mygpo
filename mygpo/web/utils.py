@@ -144,6 +144,10 @@ def get_page_list(start, total, cur, show_max):
     """
     returns a list of pages to be linked for navigation in a paginated view
     """
+
+    if show_max >= (total - start):
+        return range(start, total+1)
+
     ps = []
     if (cur - start) > show_max / 2:
         ps.extend(range(start, show_max / 4))
