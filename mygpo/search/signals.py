@@ -4,9 +4,11 @@ from mygpo.search.models import SearchEntry
 from mygpo.search.util import podcast_entry, podcast_group_entry
 
 def update_podcast_entry(sender, instance=False, **kwargs):
-    SearchEntry.objects.filter(obj_type='podcast', obj_id=instance.id).delete()
-    entry = podcast_entry(instance)
-    entry.save()
+    # we don't want podcasts in groups to be indexed separately
+    if instance and not instance.group:
+        SearchEntry.objects.filter(obj_type='podcast', obj_id=instance.id).delete()
+        entry = podcast_entry(instance)
+        entry.save()
 
 def update_podcast_group_entry(sender, instance=False, **kwargs):
     SearchEntry.objects.filter(obj_type='podcast_group', obj_id=instance.id).delete()
