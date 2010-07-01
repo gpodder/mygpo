@@ -15,7 +15,6 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, Http404, HttpResponseForbidden
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -31,10 +30,10 @@ from django.utils.translation import ugettext as _
 from mygpo.api.basic_auth import require_valid_user
 from mygpo.decorators import requires_token, manual_gc
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render_to_response
 from django.db import IntegrityError
 from django.db.models import Sum
-from datetime import datetime, date, timedelta
+from datetime import datetime
 from django.contrib.sites.models import Site
 from django.conf import settings
 from registration.models import RegistrationProfile
@@ -42,7 +41,6 @@ from sets import Set
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.web.users import get_user
 from mygpo.log import log
-from mygpo.utils import daterange
 from mygpo.constants import PODCAST_LOGO_SIZE, PODCAST_LOGO_BIG_SIZE
 from mygpo.web import utils
 from mygpo.api import simple
@@ -198,88 +196,6 @@ def create_subscriptionlist(request):
 
     return l.values()
 
-def podcast(request, pid):
-    podcast = get_object_or_404(Podcast, pk=pid)
-    episodes = episode_list(podcast, request.user)
-    max_listeners = max([x.listeners for x in episodes]) if len(episodes) else 0
-    related_podcasts = [x for x in podcast.group.podcasts() if x != podcast] if podcast.group else []
-
-    if request.user.is_authenticated():        
-        devices = Device.objects.filter(user=request.user)
-        history = SubscriptionAction.objects.filter(podcast=podcast,device__in=devices).order_by('-timestamp')
-        subscribed_devices = [s.device for s in Subscription.objects.filter(podcast=podcast,user=request.user)]
-        subscribe_targets = podcast.subscribe_targets(request.user)
-        success = False
-
-
-        qs = Subscription.objects.filter(podcast=podcast, user=request.user)
-        if qs.count()>0 and request.user.get_profile().public_profile:
-            # subscription meta is valid for all subscriptions, so we get one - doesn't matter which
-            subscription = qs[0]
-            subscriptionmeta = subscription.get_meta()
-            if request.method == 'POST':
-                privacy_form = PrivacyForm(request.POST)
-                if privacy_form.is_valid():
-                    subscriptionmeta.public = privacy_form.cleaned_data['public']
-                    try:
-                       subscriptionmeta.save()
-                       success = True
-                    except IntegrityError, ie:
-                       error_message = _('You can\'t use the same Device ID for two devices.')
-            else:
-                privacy_form = PrivacyForm({
-                    'public': subscriptionmeta.public
-                })
-
-        else:
-            privacy_form = None
-
-        timeline_data = listener_data(podcast)
-
-        return render_to_response('podcast.html', {
-            'history': history,
-            'timeline_data': timeline_data,
-            'podcast': podcast,
-            'privacy_form': privacy_form,
-            'devices': subscribed_devices,
-            'related_podcasts': related_podcasts,
-            'can_subscribe': len(subscribe_targets) > 0,
-            'episodes': episodes,
-            'max_listeners': max_listeners,
-            'success': success
-        }, context_instance=RequestContext(request))
-    else:
-        current_site = Site.objects.get_current()
-        return render_to_response('podcast.html', {
-            'podcast': podcast,
-            'related_podcasts': related_podcasts,
-            'url': current_site,
-            'episodes': episodes,
-            'max_listeners': max_listeners,
-        }, context_instance=RequestContext(request))
-
-def listener_data(podcast):
-    d = date(2010, 1, 1)
-    day = timedelta(1)
-    episodes = EpisodeAction.objects.filter(episode__podcast=podcast, timestamp__gte=d).order_by('timestamp').values('timestamp')
-    if len(episodes) == 0:
-        return []
-
-    start = episodes[0]['timestamp']
-
-    days = []
-    for d in daterange(start):
-        next = d + timedelta(days=1)
-        listeners = EpisodeAction.objects.filter(episode__podcast=podcast, timestamp__gte=d, timestamp__lt=next).values('user_id').distinct().count()
-        e = Episode.objects.filter(podcast=podcast, timestamp__gte=d, timestamp__lt=next)
-        episode = e[0] if e.count() > 0 else None
-        days.append({
-            'date': d,
-            'listeners': listeners,
-            'episode': episode})
-
-    return days
-
 @manual_gc
 def history(request, len=15, device_id=None):
     if device_id:
@@ -362,24 +278,6 @@ def podcast_unsubscribe(request, pid, device_id):
         log('error while unsubscribing from podcast (device %s, podcast %s)' % (device.id, podcast.id))
 
     return HttpResponseRedirect(return_to)
-
-def episode_list(podcast, user):
-    """
-    Returns a list of episodes, with their action-attribute set to the latest
-    action. The attribute is unsert if there is no episode-action for
-    the episode.
-    """
-    episodes = Episode.objects.filter(podcast=podcast).order_by('-timestamp')
-    for e in episodes:
-        listeners = Listener.objects.filter(episode=e).values('user').distinct()
-        e.listeners = listeners.count()
-
-        if user.is_authenticated():
-            actions = EpisodeAction.objects.filter(episode=e, user=user).order_by('-timestamp')
-            if actions.count() > 0:
-                e.action = actions[0]
-
-    return episodes
 
 
 @manual_gc

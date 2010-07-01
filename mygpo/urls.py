@@ -45,9 +45,11 @@ urlpatterns = patterns('',
     (r'^registration_complete/$', 'django.views.generic.simple.direct_to_template', {'template': 'registration/registration_complete.html'}),
     (r'^activate/(?P<activation_key>\w+)$', activate, {'backend': 'registration.backends.default.DefaultBackend'}),
 
-    (r'^podcast/(?P<pid>\w+)$', 'mygpo.web.views.podcast'),
+    (r'^podcast/(?P<pid>\w+)$', 'mygpo.web.views.podcast.show'),
     (r'^podcast/(?P<pid>\w+)/subscribe$', 'mygpo.web.views.podcast_subscribe'),
     (r'^podcast/(?P<pid>\w+)/unsubscribe/(?P<device_id>\d+)', 'mygpo.web.views.podcast_unsubscribe'),
+    (r'^podcast/(?P<pid>\w+)/add-tag', 'mygpo.web.views.podcast.add_tag'),
+    (r'^podcast/(?P<pid>\w+)/remove-tag', 'mygpo.web.views.podcast.remove_tag'),
 
     (r'^episode/(?P<id>\d+)$', 'mygpo.web.views.episode.episode'),
     (r'^episode/(?P<id>\d+)/add-chapter$', 'mygpo.web.views.episode.add_chapter'),

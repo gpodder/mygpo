@@ -664,3 +664,34 @@ div.come-in-box
     float: left;
     padding-right: 2em;
 }
+
+#subscribed-devices-list
+{
+    float: left;
+    width: 45%;
+    margin-right: 3%;
+}
+
+#tag-list
+{
+    padding-left: 2%;
+    float: left;
+    background-color: #f7f7f7;
+    width: 45%;
+}
+
+#tag-list span.other
+{
+    color: #888;
+}
+
+#tag-list span.own a.remove
+{
+    font-size: .7em;
+    font-weight: bold;
+}
+
+#tag-list span.own
+{
+    color: black;
+}

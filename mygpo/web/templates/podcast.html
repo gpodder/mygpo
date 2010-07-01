@@ -64,7 +64,7 @@
      </form>
     {% endif %}
 
-    <table class="list">
+    <table class="list" id="subscribed-devices-list">
         <tr>
             <th>{% trans "Device" %}</th>
             <th>{% trans "Unsubscribe" %}</th>
@@ -81,6 +81,26 @@
         </tr>
     {% endfor %}
     </table>
+
+
+    <div id="tag-list">
+     <h3>Tags</h3>
+     {% for tag in tags %}{% spaceless %}
+       {% if tag.is_own %}
+        <span class="own">{{ tag.tag }} <a class="remove" href="/podcast/{{ podcast.id }}/remove-tag?tag={{ tag.tag }}">X</a></span>
+       {% else %}
+        <span class="other">{{ tag.tag }}</span>
+       {% endif %}
+       {% if not forloop.last %}<span class="seperator">,</span>{% endif %}
+      {% endspaceless %}
+     {% endfor %}
+     <form action="/podcast/{{ podcast.id }}/add-tag">
+      <input type="text" name="tag" />
+      <input type="submit" value="Add" />
+     </form>
+    </div>
+
+
    {% endif %}
 
    {% if can_subscribe %}
