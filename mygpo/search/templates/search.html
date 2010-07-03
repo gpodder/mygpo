@@ -28,7 +28,7 @@
 
    {% for result in results.object_list %}
     <tr>
-     {% ifequal result.obj_type "podcast" %}
+     {% if result.obj_type == "podcast" %}
       {% if result.get_object %}
        <td>{{ result.get_object|podcast_logo }}</td>
        <td>
@@ -36,9 +36,9 @@
         <span class="listlink description">{{ result.get_object.description|default:""|striptags|truncatewords:"15" }}</span>
        </td>
       {% endif %}
-     {% endifequal %}
+     {% endif %}
 
-     {% ifequal result.obj_type "podcast_group" %}
+     {% if result.obj_type == "podcast_group" %}
       <td>{{ result.get_object.podcasts|first|podcast_logo }}</td>
       <td>
        {{result.get_object.title|striptags}}
@@ -47,7 +47,7 @@
          <a href="/podcast/{{ p.id }}">{{ p.group_member_name|striptags }}</a>
         {% endfor %}
        )
-     {% endifequal %}
+     {% endif %}
     </tr>
    {% endfor %}
   </table>
@@ -64,12 +64,11 @@
     {{ page }}
    {% else %}
 
-     {% ifequal page results.number %}
+     {% if page == results.number %}
       <strong>{{ page }}</strong>
-     {% endifequal %}
-     {% ifnotequal page results.number %}
+     {% else %}
       <a href="?q={{ q }}&page={{ page }}">{{ page }}</a>
-     {% endifnotequal %}
+     {% endif %}
    {% endif %}
   </span>
  {% endfor %}

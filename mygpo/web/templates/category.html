@@ -46,12 +46,11 @@
     {{ page }}
    {% else %}
 
-     {% ifequal page entries.number %}
+     {% if page == entries.number %}
       <strong>{{ page }}</strong>
-     {% endifequal %}
-     {% ifnotequal page entries.number %}
+     {% else %}
       <a href="?page={{ page }}">{{ page }}</a>
-     {% endifnotequal %}
+     {% endif %}
    {% endif %}
   </span>
  {% endfor %}
