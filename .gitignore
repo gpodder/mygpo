@@ -2,3 +2,4 @@
 htdocs/media/logo/*
 logs/*
 *.mo
+mygpo/settings_prod.py
