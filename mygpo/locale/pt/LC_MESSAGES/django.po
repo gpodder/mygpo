@@ -14,8 +14,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Country: Portugal\n"
 "X-Poedit-Language: Portuguese\n"
+"X-Poedit-Country: Portugal\n"
 
 #: security.py:30
 msgid "another site"
@@ -1297,7 +1297,7 @@ msgstr "Após o registo, irá receber um e-mail de activação para confirmar a 
 
 #: web/templates/registration/registration_form.html:29
 msgid "If it doesn't arrive, you can <a href=\"/register/resend-activation\">resend</a> it."
-msgstr "Se não receber o e-mail, pode <a href=\"/register/resend-activation\">pedir o reenvio</a> it."
+msgstr "Se não recebeu o e-mail, pode <a href=\"/register/resend-activation\">pedir o reenvio</a>."
 
 #: web/templates/registration/resend_activation.html:4
 #: web/templates/registration/resend_activation.html:12
