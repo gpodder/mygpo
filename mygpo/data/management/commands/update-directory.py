@@ -23,8 +23,8 @@ class Command(BaseCommand):
         for group in groups.iterator():
 
             print group.id
-            DirectoryEntry.objects.filter(group=group).delete()
+            DirectoryEntry.objects.filter(podcast_group=group).delete()
 
             for tag, weight in get_weighted_group_tags(group, source_weights).iteritems():
-                DirectoryEntry.objects.create(group=group, tag=tag, ranking=weight)
+                DirectoryEntry.objects.create(podcast_group=group, tag=tag, ranking=weight)
 
