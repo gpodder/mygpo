@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from mygpo.api.models import Podcast, Episode, Device, ToplistEntry
+from mygpo.api.models import Podcast, Episode, Device, ToplistEntry, PodcastGroup
 from mygpo import settings
 
 class PodcastTagManager(models.Manager):
@@ -14,7 +14,7 @@ class PodcastTagManager(models.Manager):
         return filter(lambda x: not x.tag in excluded_tags, tags)
 
     def podcasts_for_tag(self, tag):
-        return ToplistEntry.objects.filter(podcast__podcasttag__tag=tag).order_by('-subscriptions').distinct()
+        return ToplistEntry.objects.raw("select sum(weight) / max(weight) + subscription_count as relevance, toplist.* from podcast join podcast_tags on podcast.id = podcast_tags.podcast_id join toplist on podcast.id =  toplist.podcast_id where tag = '%s' group by podcast.id order by relevance desc;" % tag)
 
 
 class PodcastTag(models.Model):
@@ -85,4 +85,31 @@ class SuggestionBlacklist(models.Model):
     class Meta:
         db_table = 'suggestion_blacklist'
         managed = False
+
+
+class DirectoryEntry(models.Model):
+    podcast = models.ForeignKey(Podcast, null=True)
+    podcast_group = models.ForeignKey(PodcastGroup, null=True)
+    tag = models.CharField(max_length=100)
+    ranking = models.FloatField()
+
+    def get_item(self):
+        if self.podcast:
+            return self.podcast
+        else:
+            return self.podcast_group
+
+    def get_podcast(self):
+        """
+        Returns a podcast which is representative for this toplist-entry
+        If the entry is a non-grouped podcast, it is returned
+        If the entry is a podcast group, one of its podcasts is returned
+        """
+        if self.podcast:
+            return self.podcast
+        else:
+            return self.podcast_group.podcasts()[0]
+
+    class Meta:
+        db_table = 'directory_entries'
 

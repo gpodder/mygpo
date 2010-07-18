@@ -18,8 +18,8 @@
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, Http404, HttpResponseForbidden
 from django.template import RequestContext
-from mygpo.api.models import Podcast, Episode, ToplistEntry, Subscription
-from mygpo.data.models import PodcastTag
+from mygpo.api.models import Podcast, Episode, Subscription
+from mygpo.data.models import PodcastTag, DirectoryEntry
 from mygpo.decorators import manual_gc
 from mygpo.web import utils
 from mygpo import settings
@@ -56,7 +56,7 @@ def browse(request, num_categories=10, num_tags_cloud=90, podcasts_per_category=
 
 @manual_gc
 def category(request, category, page_size=20):
-    entries = ToplistEntry.objects.filter(podcast__podcasttag__tag=category).order_by('-subscriptions').distinct()
+    entries = DirectoryEntry.objects.filter(tag=category).order_by('-ranking', 'id').distinct()
 
     paginator = Paginator(entries, page_size)
 

@@ -46,7 +46,7 @@
   {% endif %}
 
   {% if not user.is_authenticated %}
-      <p><a href="/podcast/{{ podcast.id }}/subscribe"><img src="/media/subscribe.png" style="vertical-align: middle;" alt=""/> {% trans "Subscribe to this podcast" %}</a></p>
+      <div class="subscribe"><a href="/podcast/{{ podcast.id }}/subscribe"><img src="/media/subscribe.png" style="vertical-align: middle;" alt=""/> {% trans "Subscribe to this podcast" %}</a></div>
   {% else %}
 
    {% if devices %}
@@ -82,6 +82,11 @@
     {% endfor %}
     </table>
 
+   {% endif %}
+
+   {% if can_subscribe %}
+       <div class="subscribe"><a href="/podcast/{{ podcast.id }}/subscribe"><img src="/media/subscribe.png" style="vertical-align: middle;" alt=""/> {% trans "Subscribe to this podcast" %}</a></div>
+   {% endif %}
 
     <div id="tag-list">
      <h3>Tags</h3>
@@ -101,13 +106,7 @@
     </div>
 
 
-   {% endif %}
-
-   {% if can_subscribe %}
-       <p><a href="/podcast/{{ podcast.id }}/subscribe"><img src="/media/subscribe.png" style="vertical-align: middle;" alt=""/> {% trans "Subscribe to this podcast" %}</a></p>
-   {% endif %}
-
-  {% endif %} {% comment %} End of user-only content{% endcomment  %}
+ {% endif %} {% comment %} End of user-only content{% endcomment  %}
 
   {% if episodes %}
    <hr/>
