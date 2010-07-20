@@ -3,19 +3,6 @@ from django.contrib.auth.models import User
 from mygpo.api.models import Podcast, Episode, Device, ToplistEntry, PodcastGroup
 from mygpo import settings
 
-class PodcastTagManager(models.Manager):
-
-    def top_tags(self, total):
-        tags = self.raw("select *, count(id) as entries from podcast_tags group by tag order by entries desc")[:total]
-
-        tags = filter(lambda x: not x.tag.startswith('http://'), tags)
-
-        excluded_tags = getattr(settings, 'DIRECTORY_EXCLUDED_TAGS', [])
-        return filter(lambda x: not x.tag in excluded_tags, tags)
-
-    def podcasts_for_tag(self, tag):
-        return ToplistEntry.objects.raw("select sum(weight) / max(weight) + subscription_count as relevance, toplist.* from podcast join podcast_tags on podcast.id = podcast_tags.podcast_id join toplist on podcast.id =  toplist.podcast_id where tag = '%s' group by podcast.id order by relevance desc;" % tag)
-
 
 class PodcastTag(models.Model):
     tag = models.CharField(max_length=100)
@@ -23,8 +10,6 @@ class PodcastTag(models.Model):
     source = models.CharField(max_length=100)
     user = models.ForeignKey(User, null=True)
     weight = models.IntegerField(default=1)
-
-    objects = PodcastTagManager()
 
     class Meta:
         db_table = 'podcast_tags'
@@ -87,11 +72,27 @@ class SuggestionBlacklist(models.Model):
         managed = False
 
 
+class DirectoryEntryManager(models.Manager):
+
+    def top_tags(self, total):
+        tags = self.raw("select *, count(id) as entries from podcast_tags group by tag order by entries desc")[:total]
+
+        tags = filter(lambda x: not x.tag.startswith('http://'), tags)
+
+        excluded_tags = getattr(settings, 'DIRECTORY_EXCLUDED_TAGS', [])
+        return filter(lambda x: not x.tag in excluded_tags, tags)
+
+    def podcasts_for_tag(self, tag):
+        return DirectoryEntry.objects.filter(tag=tag).order_by('-ranking')
+
+
 class DirectoryEntry(models.Model):
     podcast = models.ForeignKey(Podcast, null=True)
     podcast_group = models.ForeignKey(PodcastGroup, null=True)
     tag = models.CharField(max_length=100)
     ranking = models.FloatField()
+
+    objects = DirectoryEntryManager()
 
     def get_item(self):
         if self.podcast:

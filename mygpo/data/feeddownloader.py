@@ -125,8 +125,7 @@ def update_feed_tags(podcast, tags):
 
     #create new found tags
     for tag in tags:
-        if not PodcastTag.objects.filter(podcast=podcast, source=src, tag=tag).exists():
-            PodcastTag.objects.create(podcast=podcast, source=src, tag=tag)
+        PodcastTag.objects.get_or_create(podcast=podcast, source=src, tag=tag)
 
 
 def get_episode_metadata(entry, url, mimetype):

@@ -9,3 +9,9 @@ CREATE TABLE `directory_entries` (
 ALTER TABLE `directory_entries` ADD CONSTRAINT `podcast_group_id_refs_id_78579aa5` FOREIGN KEY (`podcast_group_id`) REFERENCES `podcast_groups` (`id`);
 ALTER TABLE `directory_entries` ADD CONSTRAINT `podcast_id_refs_id_189112b9` FOREIGN KEY (`podcast_id`) REFERENCES `podcast` (`id`);
 
+
+create temporary table podcast_tags_tmp like podcast_tags;
+insert into podcast_tags_tmp (select * from podcast_tags group by tag, podcast_id, source, user_id, weight);
+delete from podcast_tags;
+insert into podcast_tags (select * from podcast_tags_tmp);
+

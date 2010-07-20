@@ -48,7 +48,7 @@ except ImportError:
 
 @csrf_exempt
 def top_tags(request, count):
-    tags = PodcastTag.objects.top_tags(int(count))
+    tags = DirectoryEntry.objects.top_tags(int(count))
     resp = []
     for t in tags:
         resp.append( {
@@ -61,7 +61,7 @@ def top_tags(request, count):
 @csrf_exempt
 def tag_podcasts(request, tag, count):
     resp = []
-    for p in PodcastTag.objects.podcasts_for_tag(tag)[:int(count)]:
+    for p in DirectoryEntry.objects.podcasts_for_tag(tag)[:int(count)]:
         resp.append( podcast_data(p.get_podcast()) )
 
     return JsonResponse(resp)

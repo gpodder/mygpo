@@ -32,11 +32,11 @@ from django.core.paginator import Paginator, InvalidPage, EmptyPage
 @manual_gc
 def browse(request, num_categories=10, num_tags_cloud=90, podcasts_per_category=10):
     total = int(num_categories) + int(num_tags_cloud)
-    top_tags =  PodcastTag.objects.top_tags(total)
+    top_tags =  DirectoryEntry.objects.top_tags(total)
 
     categories = []
     for tag in top_tags[:num_categories]:
-        entries = PodcastTag.objects.podcasts_for_tag(tag.tag)[:podcasts_per_category]
+        entries = DirectoryEntry.objects.podcasts_for_tag(tag.tag)[:podcasts_per_category]
         categories.append({
             'tag': tag.tag,
             'entries': entries
@@ -56,7 +56,7 @@ def browse(request, num_categories=10, num_tags_cloud=90, podcasts_per_category=
 
 @manual_gc
 def category(request, category, page_size=20):
-    entries = DirectoryEntry.objects.filter(tag=category).order_by('-ranking', 'id').distinct()
+    entries = DirectoryEntry.objects.podcasts_for_tag(category)
 
     paginator = Paginator(entries, page_size)
 
