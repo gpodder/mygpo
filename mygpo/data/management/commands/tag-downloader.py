@@ -4,6 +4,7 @@ from mygpo.data.models import PodcastTag
 from mygpo.data import delicious
 from optparse import make_option
 import time
+import urllib2
 
 class Command(BaseCommand):
 
@@ -43,7 +44,12 @@ class Command(BaseCommand):
             # we don't want to spam delicious
             time.sleep(1)
 
-            tags = delicious.get_tags(p.link)
+            try:
+                f = urllib2.urlopen(p.link)
+            except:
+                continue
+
+            tags = delicious.get_tags(f.url)
 
             for tag, count in tags.iteritems():
                 try:

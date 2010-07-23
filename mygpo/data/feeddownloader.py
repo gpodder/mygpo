@@ -194,11 +194,11 @@ def update_podcasts(fetch_queue):
                         break
 
             if cover_art is not None:
-                image_sha1 = hashlib.sha1()
-                image_sha1.update(cover_art)
-                image_sha1 = image_sha1.hexdigest()
-                filename = os.path.join('..', 'htdocs', 'media', 'logo', image_sha1)
                 try:
+                    image_sha1 = hashlib.sha1()
+                    image_sha1.update(cover_art)
+                    image_sha1 = image_sha1.hexdigest()
+                    filename = os.path.join('..', 'htdocs', 'media', 'logo', image_sha1)
                     fp = open(filename, 'w')
                     fp.write(urllib2.urlopen(cover_art).read())
                     fp.close()

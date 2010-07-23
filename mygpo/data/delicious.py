@@ -19,6 +19,7 @@
 import hashlib
 import json
 import urllib
+import urlparse
 
 def get_tags(url):
     """
@@ -26,15 +27,22 @@ def get_tags(url):
     tags that have been used for the url, with the number of users that have
     used each tag
     """
+    
+    split = urlparse.urlsplit(url)
+    if split.path == '':
+        split = urlparse.SplitResult(split.scheme, split.netloc, '/', split.query, split.fragment)
+    url = split.geturl()
+
     m = hashlib.md5()
     try:
-        m.update(uri)
+        m.update(url.encode('ascii'))
     except:
         return {}
 
     url_md5 = m.hexdigest()
     req = 'http://feeds.delicious.com/v2/json/urlinfo/%s' % url_md5
-    resp = urllib.urlopen('http://feeds.delicious.com/v2/json/urlinfo/%s' % url_md5).read()
+
+    resp = urllib.urlopen(req).read()
     try:
         resp_obj = json.loads(resp)
     except ValueError:
@@ -47,3 +55,5 @@ def get_tags(url):
         for tag, count in o['top_tags'].iteritems():
             tags[tag] = count
 
+
+    return tags
