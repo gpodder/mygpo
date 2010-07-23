@@ -101,6 +101,7 @@ INSTALLED_APPS = (
     'mygpo.publisher',
     'mygpo.data',
     'mygpo.userfeeds',
+    'mygpo.search',
 )
 
 ACCOUNT_ACTIVATION_DAYS = 7
