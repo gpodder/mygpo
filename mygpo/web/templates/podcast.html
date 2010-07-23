@@ -45,10 +45,6 @@
    <p class="description">{{ podcast.description|striptags }}</p>
   {% endif %}
 
-  {% if not user.is_authenticated %}
-      <div class="subscribe"><a href="/podcast/{{ podcast.id }}/subscribe"><img src="/media/subscribe.png" style="vertical-align: middle;" alt=""/> {% trans "Subscribe to this podcast" %}</a></div>
-  {% else %}
-
    {% if devices %}
     <h2>{% trans "My Subscriptions" %}</h2>
 
@@ -63,7 +59,13 @@
          <input type="submit" value="Save" />
      </form>
     {% endif %}
+   {% endif %}
 
+  {% if not user.is_authenticated or can_subscribe %}
+      <div class="subscribe"><a href="/podcast/{{ podcast.id }}/subscribe"><img src="/media/subscribe.png" style="vertical-align: middle;" alt=""/> {% trans "Subscribe to this podcast" %}</a></div>
+  {% endif %}
+
+  {% if devices %}
     <table class="list" id="subscribed-devices-list">
         <tr>
             <th>{% trans "Device" %}</th>
@@ -81,11 +83,6 @@
         </tr>
     {% endfor %}
     </table>
-
-   {% endif %}
-
-   {% if can_subscribe %}
-       <div class="subscribe"><a href="/podcast/{{ podcast.id }}/subscribe"><img src="/media/subscribe.png" style="vertical-align: middle;" alt=""/> {% trans "Subscribe to this podcast" %}</a></div>
    {% endif %}
 
     <div id="tag-list">
@@ -99,14 +96,14 @@
        {% if not forloop.last %}<span class="seperator">,</span>{% endif %}
       {% endspaceless %}
      {% endfor %}
-     <form action="/podcast/{{ podcast.id }}/add-tag">
-      <input type="text" name="tag" />
-      <input type="submit" value="Add" />
-     </form>
+     {% if user.is_authenticated %}
+      <form action="/podcast/{{ podcast.id }}/add-tag">
+       <input type="text" name="tag" />
+       <input type="submit" value="Add" />
+      </form>
+     {% endif %}
     </div>
 
-
- {% endif %} {% comment %} End of user-only content{% endcomment  %}
 
   {% if episodes %}
    <hr/>

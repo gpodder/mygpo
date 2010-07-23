@@ -675,6 +675,9 @@ div.come-in-box
 #tag-list
 {
     padding-left: 2%;
+    padding-bottom: 2%;
+    margin-bottom: 1%;
+    margin-top: 1%;
     float: left;
     background-color: #f7f7f7;
     width: 45%;
