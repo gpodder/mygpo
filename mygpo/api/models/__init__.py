@@ -471,7 +471,6 @@ class Device(models.Model):
             raise ValueError('the device is not synced')
 
         g = self.sync_group
-        print g
         self.sync_group = None
         self.save()
 
