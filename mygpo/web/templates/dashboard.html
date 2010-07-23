@@ -70,12 +70,6 @@
  <div class="wide-box">
   <h2>{% trans "Newest Episodes" %}</h2>
   <table class="list episode_list">
-   <tr>
-    <th></th>
-    <th>{% trans "Episode" %}</th>
-    <th>{% trans "Released" %}</th>
-   </tr>
- 
    {% for episode in newest_episodes %}
     <tr>
      <td>{{ episode.podcast|podcast_logo }}</td>
