@@ -1,10 +1,10 @@
 from django.db.models import Count
 from mygpo.api.models import Subscription, Podcast
 from mygpo.data.models import PodcastTag
-from mygpo.search.models import SearchEntry
 
 
 def podcast_group_entry(group, subscriber_count=None):
+    from mygpo.search.models import SearchEntry
 
     if not subscriber_count:
         subscriber_count = Subscription.objects.filter(podcast__group=group).values('user').distinct().count()
@@ -25,6 +25,7 @@ def podcast_group_entry(group, subscriber_count=None):
 
 
 def podcast_entry(podcast, subscriber_count=None):
+    from mygpo.search.models import SearchEntry
 
     if not subscriber_count:
         subscriber_count = Subscription.objects.filter(podcast=podcast).values('user').distinct().count()
