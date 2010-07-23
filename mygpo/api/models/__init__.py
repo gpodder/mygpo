@@ -500,6 +500,9 @@ class EpisodeAction(models.Model):
     def playmark_time(self):
         return datetime.fromtimestamp(float(self.playmark))
 
+    def started_time(self):
+        return datetime.fromtimestamp(float(self.started))
+
     class Meta:
         db_table = 'episode_log'
 

@@ -162,7 +162,9 @@
        <a href="/device/{{ s.device.id }}">{{ s.device|device_icon }} {{ s.device.name|striptags }}</a>
       {% endif %}
      </td>
-     <td>{% if s.playmark %}{{ s.playmark_time|date:"H:m:s" }}{% endif %}
+     <td>{% if s.started %}{{s.started_time|date:"H:m:s" }} - {% endif %}
+         {% if s.playmark %}{{ s.playmark_time|date:"H:m:s" }}{% endif %}
+     </td>
 	</tr>
    {% endfor %}
   </table>
