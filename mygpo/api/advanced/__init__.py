@@ -190,8 +190,6 @@ def episodes(request, username, version=1):
         except:
             raise Http404
 
-        print aggregated
-
         return JsonResponse(get_episode_changes(request.user, podcast, device, since, now, aggregated, version))
 
     else:
@@ -278,7 +276,8 @@ def update_episodes(user, actions):
 
         else:
             device, created = None, False
-        timestamp = dateutil.parser.parse(e['timestamp']) if 'timestamp' in e else datetime.now()
+
+        timestamp = dateutil.parser.parse(e['timestamp']) if 'timestamp' in e and e['timestamp'] else datetime.now()
 
         # Time values for play actions and their keys in JSON
         PLAY_ACTION_KEYS = ('position', 'started', 'total')
