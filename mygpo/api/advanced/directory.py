@@ -78,8 +78,6 @@ def podcast_info(request):
 def episode_info(request):
     podcast_url = sanitize_url(request.GET.get('podcast', ''))
     episode_url = sanitize_url(request.GET.get('url', ''), podcast=False, episode=True)
-    print podcast_url
-    print episode_url
     episode = get_object_or_404(Episode, url=episode_url, podcast__url=podcast_url)
 
     resp = episode_data(episode)
@@ -89,9 +87,15 @@ def episode_info(request):
 def podcast_data(podcast):
     site = Site.objects.get_current()
     if podcast.group:
-        e = ToplistEntry.objects.get(podcast_group=podcast.group)
+        try:
+            e = ToplistEntry.objects.get(podcast_group=podcast.group)
+
+        # no toplist entry has been created for the group yet
+        except ToplistEntry.DoesNotExist:
+            e = ToplistEntry.objects.get(podcast=podcast)
     else:
         e = ToplistEntry.objects.get(podcast=podcast)
+
     return {
         "url": podcast.url,
         "title": podcast.title,
