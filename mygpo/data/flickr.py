@@ -32,7 +32,11 @@ def get_photo_sizes(photo_id):
 
     resp_obj = json.loads(resp_content)
 
-    return resp_obj['sizes']['size']
+    try:
+        return resp_obj['sizes']['size']
+    except KeyError:
+        return []
+
 
 def get_photo_id(url):
     photo_id_re = 'http://.*flickr.com/[^/]+/([^_]+)_.*'
