@@ -19,7 +19,7 @@
    {% for podcast, taglist in tags_podcast.items %}
     <tr>
      <td>{{ podcast|podcast_logo }}</td>
-     <td><a href="/podcast/{{ podcast.id}}">{{ podcast.title|striptags}}</a></td>
+     <td><a href="/podcast/{{ podcast.id}}">{{ podcast|striptags}}</a></td>
      <td class="tag-list">
      {% for tag in taglist %}{% spaceless %}
        {% if tag.is_own %}
