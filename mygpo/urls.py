@@ -93,6 +93,8 @@ urlpatterns = patterns('',
 
     (r'^search/', 'mygpo.search.views.search'),
 
+    (r'^tags/', 'mygpo.web.views.mytags'),
+
     #Legacy API
     (r'^upload$', 'mygpo.api.legacy.upload'),
     (r'^getlist$', 'mygpo.api.legacy.getlist'),

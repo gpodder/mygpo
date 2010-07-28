@@ -24,6 +24,7 @@ MENU_STRUCTURE = (
         (_('My Podcasts'), (
             ('/subscriptions/', _('Subscriptions')),
             ('/favorites/', _('Favorite Episodes')),
+            ('/tags/', _('My Tags')),
             ('/devices/', _('Devices')),
             ('/device/', _('Device')),
             ('/history/', _('History')),

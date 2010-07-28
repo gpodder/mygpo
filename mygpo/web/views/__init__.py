@@ -20,7 +20,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.template import RequestContext
 from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, EpisodeToplistEntry, Subscription, SuggestionEntry, SyncGroup, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SubscriptionMeta, UserProfile
-from mygpo.data.models import Listener, SuggestionBlacklist
+from mygpo.data.models import Listener, SuggestionBlacklist, PodcastTag
 from mygpo.data.mimetype import CONTENT_TYPES
 from mygpo.web.models import Rating, SecurityToken
 from mygpo.web.forms import UserAccountForm, DeviceForm, SyncForm, PrivacyForm, ResendActivationForm
@@ -503,4 +503,24 @@ def gpodder_example_podcasts(request):
     sponsored_podcast = utils.get_sponsored_podcast()
     return render_to_response('gpodder_examples.opml', {
        'sponsored_podcast': sponsored_podcast
+    }, context_instance=RequestContext(request))
+
+@login_required
+def mytags(request):
+    tags_podcast = {}
+    tags_tag = {}
+    for tag in PodcastTag.objects.filter(user=request.user):
+        if not tag.podcast in tags_podcast:
+            tags_podcast[tag.podcast] = []
+
+        if not tag.tag in tags_tag:
+            tags_tag[tag.tag] = []
+
+        tag.is_own = True
+        tags_podcast[tag.podcast].append(tag)
+        tags_tag[tag.tag].append(tag)
+
+    return render_to_response('mytags.html', {
+        'tags_podcast': tags_podcast,
+        'tags_tag': tags_tag,
     }, context_instance=RequestContext(request))

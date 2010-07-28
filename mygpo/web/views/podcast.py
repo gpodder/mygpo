@@ -156,6 +156,9 @@ def add_tag(request, pid):
         t = t.strip()
         tag = PodcastTag.objects.get_or_create(podcast=podcast, tag=t, source='user', user=request.user)
 
+    if request.GET.get('next', '') == 'mytags':
+        return HttpResponseRedirect('/tags/')
+
     return HttpResponseRedirect('/podcast/%s' % pid)
 
 
@@ -167,5 +170,9 @@ def remove_tag(request, pid):
         return HttpResponseBadRequest()
 
     PodcastTag.objects.filter(podcast=podcast, tag=tag_str, source='user', user=request.user).delete()
+
+    if request.GET.get('next', '') == 'mytags':
+        return HttpResponseRedirect('/tags/')
+
     return HttpResponseRedirect('/podcast/%s' % pid)
 
