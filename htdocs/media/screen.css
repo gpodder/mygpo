@@ -698,3 +698,12 @@ div.come-in-box
 {
     color: black;
 }
+
+input.subscribe
+{
+    background: url(/media/subscribe.png) no-repeat;
+    cursor: pointer;
+    width: 22px;
+    height: 22px;
+    border: none;
+}

@@ -61,7 +61,7 @@
     {% endif %}
    {% endif %}
 
-  {% if not user.is_authenticated or can_subscribe %}
+  {% if not user.is_authenticated %}
       <div class="subscribe"><a href="/podcast/{{ podcast.id }}/subscribe"><img src="/media/subscribe.png" style="vertical-align: middle;" alt=""/> {% trans "Subscribe to this podcast" %}</a></div>
   {% endif %}
 
@@ -82,6 +82,18 @@
             </td>
         </tr>
     {% endfor %}
+        {% if can_subscribe %}
+         <tr>
+          <form action="/podcast/{{ podcast.id}}/subscribe" method="post">
+           {% csrf_token %}
+           <td>{{ subscribe_form.as_p }}</td>
+           <td style="text-align: center;">
+            <input type="submit" class="subscribe" value="" />
+           </td>
+          </form>
+         </tr>
+        {% endif %}
+
     </table>
    {% endif %}
 

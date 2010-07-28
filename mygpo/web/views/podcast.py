@@ -4,7 +4,7 @@ from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
 from mygpo.api.models import Podcast, Episode, EpisodeAction, Device, SubscriptionAction, Subscription
-from mygpo.web.forms import PrivacyForm
+from mygpo.web.forms import PrivacyForm, SyncForm
 from mygpo.data.models import Listener, PodcastTag
 from datetime import date, timedelta
 from mygpo.utils import daterange
@@ -51,6 +51,9 @@ def show(request, pid):
         else:
             privacy_form = None
 
+        subscribe_form = SyncForm()
+        subscribe_form.set_targets(subscribe_targets, '')
+
         timeline_data = listener_data(podcast)
         return render_to_response('podcast.html', {
             'tags': tags,
@@ -61,6 +64,7 @@ def show(request, pid):
             'devices': subscribed_devices,
             'related_podcasts': related_podcasts,
             'can_subscribe': len(subscribe_targets) > 0,
+            'subscribe_form': subscribe_form,
             'episodes': episodes,
             'max_listeners': max_listeners,
             'success': success
