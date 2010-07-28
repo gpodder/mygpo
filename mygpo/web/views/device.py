@@ -20,6 +20,7 @@ from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadReque
 from django.contrib.auth.models import User
 from django.template import RequestContext
 from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, EpisodeToplistEntry, Subscription, SuggestionEntry, SyncGroup, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SubscriptionMeta
+from mygpo.data.models import BackendSubscription, Listener
 from mygpo.web.forms import DeviceForm, SyncForm
 from django.forms import ValidationError
 from django.utils.translation import ugettext as _
@@ -134,6 +135,18 @@ def delete(request, device_id):
 
     return HttpResponseRedirect('/devices/')
 
+
+def delete_permanently(request, device_id):
+
+    device = get_object_or_404(Device, pk=device_id, user=request.user)
+
+    SubscriptionAction.objects.filter(device=device).delete()
+    EpisodeAction.objects.filter(device=device).delete()
+    BackendSubscription.objects.filter(device=device).delete()
+    Listener.objects.filter(device=device).delete()
+    device.delete()
+
+    return HttpResponseRedirect('/devices/')
 
 @manual_gc
 @login_required

@@ -53,14 +53,27 @@
       <th>{% trans "Name" %}</th>
       <th>{% trans "Type" %}</th>
       <th>{% trans "ID" %}</th>
-      <th>{% trans "Reactivate" %}</th>
+      <th>{% trans "Actions" %}</th>
      </th>
     {% for d in deleted_devices %}
      <tr>
       <td><a href="/device/{{ d.id }}">{{ d|device_icon }}{{ d.name|striptags }}</a></td>
       <td>{{ d|device_type }}</td>
       <td>{{ d.uid|striptags }}</td>
-      <td><a href="/device/{{ d.id }}/undelete"><img src="/media/edit-undo.png" alt="{% trans "Reactivate" %}" /></a></td>
+      <td>
+       <div>
+        <a href="/device/{{ d.id }}/undelete">
+         <img src="/media/edit-undo.png" class="action-button" /> {% trans "Reactivate" %}
+        </a>
+       </div>
+
+       <div>
+        <a href="/device/{{ d.id }}/remove">
+         <img src="/media/unsubscribe.png" class="action-button" /> {% trans "Delete Permanently" %}
+        </a>
+       </div>
+      </td>
+
      </tr>
     {% endfor %}
    </table>
