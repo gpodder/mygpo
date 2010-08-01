@@ -22,6 +22,7 @@ from django.utils.translation import ugettext as _
 from mygpo.api.fields import SeparatedValuesField
 import hashlib
 import re
+import json
 
 from mygpo.api.constants import EPISODE_ACTION_TYPES, DEVICE_TYPES, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SUBSCRIPTION_ACTION_TYPES
 from mygpo.log import log
@@ -33,9 +34,20 @@ class UserProfile(models.Model):
     generated_id = models.BooleanField(default=False)
     deleted = models.BooleanField(default=False)
     suggestion_up_to_date = models.BooleanField(default=False)
+    settings = models.TextField(default='{}')
 
     def __unicode__(self):
         return '%s (%s, %s)' % (self.user.username, self.public_profile, self.generated_id)
+
+    def set_setting(self, setting, value):
+        s = json.loads(self.settings)
+        s[setting] = value
+        self.settings = json.dumps(s)
+
+    def save(self, *args, **kwargs):
+        s = json.loads(self.settings)
+        self.public_profile = s.get('public_profile', True)
+        super(UserProfile, self).save(*args, **kwargs)
 
     class Meta:
         db_table = 'user'
@@ -343,6 +355,7 @@ class Device(models.Model):
     type = models.CharField(max_length=10, choices=DEVICE_TYPES)
     sync_group = models.ForeignKey(SyncGroup, blank=True, null=True)
     deleted = models.BooleanField(default=False)
+    settings = models.TextField(default='{}')
 
     def __unicode__(self):
         return self.name if self.name else _('Unnamed Device (%s)' % self.uid)
@@ -350,6 +363,12 @@ class Device(models.Model):
     def get_subscriptions(self):
         self.sync()
         return Subscription.objects.filter(device=self)
+
+    def set_setting(self, setting, value):
+        s = json.loads(self.settings)
+        s[setting] = value
+        self.settings = json.dumps(s)
+
 
     def sync(self):
         for s in self.get_sync_actions():
@@ -538,14 +557,41 @@ class Subscription(models.Model):
 class SubscriptionMeta(models.Model):
     user = models.ForeignKey(User)
     podcast = models.ForeignKey(Podcast)
+    settings = models.TextField(default='{}')
     public = models.BooleanField(default=True)
 
     def __unicode__(self):
         return '%s - %s - %s' % (self.user, self.podcast, self.public)
 
+    def set_setting(self, setting, value):
+        s = json.loads(self.settings)
+        s[setting] = value
+        self.settings = json.dumps(s)
+
+    def save(self, *args, **kwargs):
+        s = json.loads(self.settings)
+        self.public = s.get('public_subscription', True)
+        super(SubscriptionMeta, self).save(*args, **kwargs)
+
+
     class Meta:
         db_table = 'subscription'
         unique_together = ('user', 'podcast')
+
+
+class EpisodeSettings(models.Model):
+    user = models.ForeignKey(User)
+    episode = models.ForeignKey(Episode)
+    settings = models.TextField(default='{}')
+
+    def set_setting(self, setting, value):
+        s = json.loads(self.settings)
+        s[setting] = value
+        self.settings = json.dumps(s)
+
+    class Meta:
+        db_table = 'episode_settings'
+        unique_together = ('user', 'episode')
 
 
 class SubscriptionAction(models.Model):
