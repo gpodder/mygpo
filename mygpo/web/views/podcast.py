@@ -37,7 +37,7 @@ def show(request, pid):
             if request.method == 'POST':
                 privacy_form = PrivacyForm(request.POST)
                 if privacy_form.is_valid():
-                    subscriptionmeta.set_setting('public_subscription', privacy_form.cleaned_data['public'])
+                    subscriptionmeta.settings['public_subscription'] = privacy_form.cleaned_data['public']
                     try:
                        subscriptionmeta.save()
                        success = True

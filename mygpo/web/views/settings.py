@@ -111,11 +111,11 @@ def privacy(request):
             })
 
     if 'private_subscriptions' in request.GET:
-        request.user.get_profile().set_setting('public_profile', False)
+        request.user.get_profile().settings['public_profile'] = False
         request.user.get_profile().save()
 
     elif 'public_subscriptions' in request.GET:
-        request.user.get_profile().set_setting('public_profile', True)
+        request.user.get_profile().settings['public_profile'] = True
         request.user.get_profile().save()
 
     if 'exclude' in request.GET:
@@ -125,7 +125,7 @@ def privacy(request):
             sm, c = SubscriptionMeta.objects.get_or_create(user=request.user, podcast=podcast, defaults={'public': False})
 
             if not c:
-                sm.set_setting('public_subscription', False)
+                sm.settings['public_subscription'] = False
                 sm.save()
 
         except Podcast.DoesNotExist:
@@ -138,7 +138,7 @@ def privacy(request):
             sm, c = SubscriptionMeta.objects.get_or_create(user=request.user, podcast=podcast, defaults={'public': True})
 
             if not c:
-                sm.set_setting('public_subscription', True)
+                sm.settings['public_subscription'] = True
                 sm.save()
 
         except Podcast.DoesNotExist:
