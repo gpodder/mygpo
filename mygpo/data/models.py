@@ -114,3 +114,10 @@ class DirectoryEntry(models.Model):
     class Meta:
         db_table = 'directory_entries'
 
+
+from mygpo.data.signals import update_podcast_tag_entry
+from django.db.models.signals import post_save, pre_delete
+
+post_save.connect(update_podcast_tag_entry, sender=PodcastTag)
+pre_delete.connect(update_podcast_tag_entry, sender=PodcastTag)
+
