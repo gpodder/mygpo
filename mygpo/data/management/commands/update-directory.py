@@ -22,6 +22,9 @@ class Command(BaseCommand):
             DirectoryEntry.objects.filter(podcast=podcast).delete()
 
             for tag, weight in get_weighted_tags(podcast, source_weights).iteritems():
+                if weight == 0:
+                    continue
+
                 DirectoryEntry.objects.create(podcast=podcast, tag=tag, ranking=weight)
 
         groups = PodcastGroup.objects.all().order_by('id').only('id')
