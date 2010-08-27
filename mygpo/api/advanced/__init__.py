@@ -227,6 +227,9 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
             if version == 1:
                 t = gmtime(a.playmark)
                 action['position'] = strftime('%H:%M:%S', t)
+            elif None in (a.playmark, a.started, a.total):
+                log('Ignoring broken episode action in DB: %r' % (a,))
+                continue
             else:
                 action['position'] = int(a.playmark)
                 action['started'] = int(a.started)
