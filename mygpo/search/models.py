@@ -39,3 +39,18 @@ class SearchEntry(models.Model):
         else:
             return None
 
+    def get_podcast(self):
+        """
+        Returns a podcast which is representative for this search-result
+        If the entry is a non-grouped podcast, it is returned
+        If the entry is a podcast group, one of its podcasts is returned
+        """
+        obj = self.get_object()
+
+        if isinstance(obj, Podcast):
+            return obj
+        elif isinstance(obj, PodcastGroup):
+            return obj.podcasts()[0]
+        else:
+            return None
+

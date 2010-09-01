@@ -16,18 +16,14 @@
 #
 
 from mygpo.api.basic_auth import require_valid_user, check_username
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, Http404
-from mygpo.api.models import Device, SubscriptionAction, Podcast, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, ToplistEntry, SuggestionEntry
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed
+from mygpo.api.models import Device, SubscriptionAction, Podcast, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SuggestionEntry
 from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.api.backend import get_toplist, get_all_subscriptions
-from django.core import serializers
-from datetime import datetime
-from mygpo.api.httpresponse import HttpErrorResponse
-import re
-from mygpo.log import log
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404
 from mygpo.search.models import SearchEntry
 
 try:
@@ -38,75 +34,91 @@ try:
         raise ImportError
 
 except ImportError:
-    import json
+    import simplejson as json
+
+
+ALLOWED_FORMATS = ('txt', 'opml', 'json')
+
+def check_format(fn):
+    def tmp(request, format, *args, **kwargs):
+        if not format in ALLOWED_FORMATS:
+            return HttpResponseBadRequest('Invalid format')
+
+        return fn(request, *args, format=format, **kwargs)
+    return tmp
+
 
 @csrf_exempt
 @require_valid_user
 @check_username
+@check_format
 def subscriptions(request, username, device_uid, format):
-    
+
     if request.method == 'GET':
-        return format_subscriptions(get_subscriptions(request.user, device_uid), format, username)
-        
+        title = _('%(username)s\'s Subscription List') % {'username': username}
+        subscriptions = get_subscriptions(request.user, device_uid)
+        return format_podcast_list(subscriptions, format, title)
+
     elif request.method in ('PUT', 'POST'):
-        return set_subscriptions(parse_subscription(request.raw_post_data, format, request.user, device_uid))
-    
+        subscriptions = parse_subscription(request.raw_post_data, format)
+        return set_subscriptions(subscriptions, request.user, device_uid)
+
     else:
-        return HttpResponseBadRequest()
+        return HttpResponseNotAllowed(['GET', 'PUT', 'POST'])
 
 
 @csrf_exempt
 @require_valid_user
 @check_username
+@check_format
 def all_subscriptions(request, username, format):
-    podcasts = get_all_subscriptions(request.user)
-    return format_subscriptions(podcasts, format, username)
+    if request.method != 'GET':
+        return HttpResponseNotAllowed(['GET'])
+
+    subscriptions = get_all_subscriptions(request.user)
+    title = _('%(username)s\'s Subscription List') % {'username': username}
+    return format_podcast_list(subscriptions, format, title)
 
 
-def format_subscriptions(subscriptions, format, username):
+def format_podcast_list(obj_list, format, title, get_podcast=lambda x: x, json_map=lambda x: x.url):
+    """
+    Formats a list of podcasts for use in a API response
 
+    obj_list is a list of podcasts or objects that contain podcasts
+    format is one if txt, opml or json
+    title is a label of the list
+    if obj_list is a list of objects containing podcasts, get_podcast is the
+      function used to get the podcast out of the each of these objects
+    json_map is a function returning the contents of an object (from obj_list)
+      that should be contained in the result (only used for format='json')
+    """
     if format == 'txt':
-        #return subscriptions formatted as txt
-        urls = [p.url for p in subscriptions]
-        s = '\n'.join(urls)
-        s += '\n'
+        podcasts = map(get_podcast, obj_list)
+        s = '\n'.join([p.url for p in podcasts] + [''])
         return HttpResponse(s, mimetype='text/plain')
 
     elif format == 'opml':
-        title = username + '\'s subscription list'
+        podcasts = map(get_podcast, obj_list)
         exporter = Exporter(title)
-        opml = exporter.generate(subscriptions)
+        opml = exporter.generate(podcasts)
         return HttpResponse(opml, mimetype='text/xml')
 
     elif format == 'json':
-        urls = [p.url for p in subscriptions]
-        return JsonResponse(urls)
-        
-    else: 
-        return HttpResponseBadRequest('Invalid format')
+        objs = map(json_map, obj_list)
+        return JsonResponse(objs)
+
+    else:
+        return None
 
 
 def get_subscriptions(user, device_uid):
-    #get and return subscription list from database (use backend to sync)
-    try:
-        d = Device.objects.get(uid=device_uid, user=user, deleted=False)
+    device = get_object_or_404(Device, uid=device_uid, user=user, deleted=False)
+    return [s.podcast for s in device.get_subscriptions()]
 
-    except Device.DoesNotExist:
-        raise Http404
 
-    return [p.podcast for p in d.get_subscriptions()]
-
-def parse_subscription(raw_post_data, format, user, device_uid):
-    format_ok = True
+def parse_subscription(raw_post_data, format):
     if format == 'txt':
-        sub = raw_post_data.split('\n')
-        p = '^http'
-        urls = []
-        for x in sub:
-            if re.search(p, x) == None:
-                log('parse_subscription (txt): invalid podcast url: %s' % x)
-            else:
-                urls.append(x)
+        urls = raw_post_data.split('\n')
 
     elif format == 'opml':
         begin = raw_post_data.find('<?xml')
@@ -120,152 +132,92 @@ def parse_subscription(raw_post_data, format, user, device_uid):
         urls = json.loads(raw_post_data[begin:end])
 
     else:
-        urls = []
-        format_ok = False
+        return []
 
-    urls_sanitized = []
-    for u in urls:
-        us = sanitize_url(u)
-        if us != '': urls_sanitized.append(us)
-    
-    d, created = Device.objects.get_or_create(user=user, uid=device_uid, 
-                defaults = {'type': 'other', 'name': device_uid})
+    urls = map(sanitize_url, urls)
+    urls = filter(lambda x: x, urls)
+    urls = set(urls)
+    return urls
+
+
+def set_subscriptions(urls, user, device_uid):
+    device, created = Device.objects.get_or_create(user=user, uid=device_uid,
+        defaults = {'type': 'other', 'name': device_uid})
 
     # undelete a previously deleted device
-    if d.deleted:
-        d.deleted = False
-        d.save()
+    if device.deleted:
+        device.deleted = False
+        device.save()
 
-    podcasts = [p.podcast for p in d.get_subscriptions()]
-    old = [p.url for p in podcasts]    
-    new = [p for p in urls_sanitized if p not in old]
-    rem = [p for p in old if p not in urls_sanitized]
+    old = [s.podcast.url for s in device.get_subscriptions()]
+    new = [p for p in urls if p not in old]
+    rem = [p for p in old if p not in urls]
 
-    return format_ok, new, rem, d
-
-
-def set_subscriptions(subscriptions):
-    format_ok, new, rem, d = subscriptions
-    
-    if format_ok == False:
-        return HttpResponseBadRequest('Invalid format') 
-    
     for r in rem:
         p = Podcast.objects.get(url=r)
-        s = SubscriptionAction(podcast=p, device=d, action=UNSUBSCRIBE_ACTION)
+        s = SubscriptionAction(podcast=p, device=device, action=UNSUBSCRIBE_ACTION)
         s.save()
-    
+
     for n in new:
-        p, created = Podcast.objects.get_or_create(url=n,
-            defaults={'title':n,'description':n,'last_update':datetime.now()})
-        s = SubscriptionAction(podcast=p, action=SUBSCRIBE_ACTION, device=d)
+        p, created = Podcast.objects.get_or_create(url=n)
+        s = SubscriptionAction(podcast=p, action=SUBSCRIBE_ACTION, device=device)
         s.save()
 
     # Only an empty response is a successful response
     return HttpResponse('', mimetype='text/plain')
 
-#get toplist
+
+@check_format
 def toplist(request, count, format):
-    if request.method == 'GET':
-        if int(count) not in range(1,100):
-            count = 100
-        return format_toplist(get_toplist(count), count, format)
-    else:
-        return HttpResponseBadRequest('Invalid request')
+    if request.method != 'GET':
+        return HttpResponseNotAllowed(['GET'])
+
+    if int(count) not in range(1,100):
+        count = 100
+
+    toplist = get_toplist(count)
+    json_map = lambda t: {'url': t.get_podcast().url,
+                          'title':t.get_podcast().title,
+                          'description':t.get_podcast().description,
+                          'subscribers':t.subscriptions,
+                          'subscribers_last_week':t.oldplace}
+    title = _('gpodder.net - Top %(count)d') % {'count': len(toplist)}
+    return format_podcast_list(toplist,
+                               format,
+                               title,
+                               get_podcast=lambda x: x.get_podcast(),
+                               json_map=json_map)
 
 
-def format_toplist(toplist, count, format): 
-    if format == 'txt':
-        urls = [p.get_podcast().url for p in toplist]
-        s = '\n'.join(urls)
-        s += '\n'
-        return HttpResponse(s, mimetype='text/plain')
-
-    elif format == 'opml':
-        exporter = Exporter('my.gpodder.org - Top %s' % count)
-        opml = exporter.generate([t.get_podcast() for t in toplist])
-        return HttpResponse(opml, mimetype='text/xml')
-
-    elif format == 'json':
-        json = [{'url':t.get_podcast().url, 'title':t.get_podcast().title,'description':t.get_podcast().description, 'subscribers':t.subscriptions, 'subscribers_last_week':t.oldplace} for t in toplist]
-        return JsonResponse(json)
-        
-    else: 
-        return HttpResponseBadRequest('Invalid format')
-
-#get search
+@check_format
 def search(request, format):
-    if request.method == 'GET':
-        query = request.GET.get('q').encode('utf-8')
+    if request.method != 'GET':
+        return HttpResponseNotAllowed(['GET'])
 
-        if query == None:
-            return HttpErrorResponse(404, '/search.opml|txt|json?q={query}')
+    query = request.GET.get('q', '').encode('utf-8')
 
-        return format_results(get_results(query), format)
-    else:
-        return HttpResponseBadRequest('Invalid request')
+    if not query:
+        return HttpResponseBadRequest('/search.opml|txt|json?q={query}')
 
+    results = [r.get_podcast() for r in SearchEntry.objects.search(query)[:20]]
 
-def get_results(query):
-    results = []
-    for r in SearchEntry.objects.search(query)[:20]:
-        if r.obj_type == 'podcast':
-            results.append(r.get_object())
-        elif r.obj_type == 'podcast_group':
-            results.append(r.get_object().podcasts()[0])
-
-    return results
+    json_map = lambda p: {'url':p.url, 'title':p.title, 'description':p.description}
+    title = _('gpodder.net - Search')
+    return format_podcast_list(results, format, title, json_map=json_map)
 
 
-def format_results(results, format):
-    if format == 'txt':
-        urls = [r.url for r in results]
-        s = '\n'.join(urls)
-        s += '\n'
-        return HttpResponse(s, mimetype='text/plain')
-
-    elif format == 'opml':
-        exporter = Exporter('my.gpodder.org - Search')
-        opml = exporter.generate(results)
-        return HttpResponse(opml, mimetype='text/xml')
-
-    elif format == 'json':
-        json = [{'url':p.url, 'title':p.title, 'description':p.description} for p in results]
-        return JsonResponse(json)
-        
-    else: 
-        return HttpResponseBadRequest('Invalid format')
-       
-#get suggestions
 @require_valid_user
+@check_format
 def suggestions(request, count, format):
-    if request.method == 'GET':
-        if int(count) not in range(1,100):
-            count = 100
-        return format_suggestions(get_suggestions(request.user, count), count, format)
-    else:
-        return HttpResponseBadRequest('Invalid request')
-        
-def get_suggestions(user, count):
+    if request.method != 'GET':
+        return HttpResponseNotAllowed(['GET'])
+
+    if int(count) not in range(1,100):
+        count = 100
+
     suggestions = SuggestionEntry.objects.for_user(user)[:int(count)]
-    return [s.podcast for s in suggestions]
-    
-def format_suggestions(suggestions, count, format):
-    if format == 'txt':
-        urls = [s.url for s in suggestions]
-        s = '\n'.join(urls)
-        s += '\n'
-        return HttpResponse(s, mimetype='text/plain')
+    json_map = lambda p: {'url': p.url, 'title': p.title, 'description': p.description}
+    title = _('gpodder.net - %(count)d Suggestions') % {'count': len(suggestions)}
+    return format_podcast_list(suggestions, format, title, json_map=json_map)
 
-    elif format == 'opml':
-        exporter = Exporter('my.gpodder.org - %s Suggestions' % count)
-        opml = exporter.generate(suggestions)
-        return HttpResponse(opml, mimetype='text/xml')
 
-    elif format == 'json':
-        json = [{'url':p.url, 'title':p.title, 'description':p.description} for p in suggestions]
-        return JsonResponse(json)
-        
-    else: 
-        return HttpResponseBadRequest('Invalid format')
-        

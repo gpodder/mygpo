@@ -31,12 +31,6 @@ except ImportError:
     import simplejson as json
 
 
-def HttpErrorResponse(code, msg):
-    response =  HttpResponse(('%s' % msg), mimetype="text/plain")
-    response['WWW-Authenticate'] = 'Basic realm=""'
-    response.status_code = code
-    return response
-
 #from http://www.djangosnippets.org/snippets/154/
 class JsonResponse(HttpResponse):
     def __init__(self, object):
