@@ -22,9 +22,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.template.defaultfilters import slugify
 from django.template import RequestContext
-from registration.forms import RegistrationForm
 from registration.views import activate, register
-from registration.models import RegistrationProfile
 from mygpo.api.models import UserProfile
 from mygpo.web.forms import RestorePasswordForm
 from django.contrib.sites.models import Site
@@ -78,12 +76,12 @@ def login_user(request):
             }, context_instance=RequestContext(request))
 
     login(request, user)
-    current_site = Site.objects.get_current()
 
     try:
          if user.get_profile().generated_id:
+             site = Site.objects.get_current()
              return render_to_response('migrate.html', {
-                  'url': current_site,
+                  'url': site,
                   'username': user
              }, context_instance=RequestContext(request))
 
