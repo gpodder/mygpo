@@ -40,7 +40,7 @@ class UserProfile(models.Model):
         return '%s (%s, %s)' % (self.user.username, self.public_profile, self.generated_id)
 
     def save(self, *args, **kwargs):
-        self.public_profile = settings.get('public_profile', True)
+        self.public_profile = self.settings.get('public_profile', True)
         super(UserProfile, self).save(*args, **kwargs)
 
     class Meta:
