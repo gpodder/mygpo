@@ -17,7 +17,7 @@ def update_podcast_tag_entry(sender, instance=False, **kwargs):
             if weight == 0:
                 continue
 
-            DirectoryEntry.objects.create(podcast=podcast, tag=tag, ranking=weight)
+            DirectoryEntry.objects.create(podcast=instance.podcast, tag=tag, ranking=weight)
 
     else:
         DirectoryEntry.objects.filter(podcast_group=instance.podcast.group).delete()
