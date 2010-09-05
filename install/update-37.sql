@@ -15,3 +15,9 @@ insert into podcast_tags_tmp (select * from podcast_tags group by tag, podcast_i
 delete from podcast_tags;
 insert into podcast_tags (select * from podcast_tags_tmp);
 
+
+create index podcast_id on directory_entries (podcast_id);
+create index podcast_group_id on directory_entries (podcast_group_id);
+create index tag on directory_entries (tag);
+create index ranking on directory_entries (ranking);
+
