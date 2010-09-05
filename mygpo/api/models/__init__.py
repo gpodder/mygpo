@@ -566,6 +566,17 @@ class EpisodeSettings(models.Model):
     episode = models.ForeignKey(Episode)
     settings = JSONField(default={})
 
+    def save(self, *args, **kwargs):
+        super(EpisodeSettings, self).save(*args, **kwargs)
+
+        from mygpo.api.models.users import EpisodeFavorite
+        fav = self.settings.get('is_favorite', False)
+        if fav:
+            EpisodeFavorite.objects.get_or_create(user=self.user, episode=self.episode)
+        else:
+            EpisodeFavorite.objects.filter(user=self.user, episode=self.episode).delete()
+
+
     class Meta:
         db_table = 'episode_settings'
         unique_together = ('user', 'episode')
