@@ -25,6 +25,8 @@ from mygpo.api.backend import get_toplist, get_all_subscriptions
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 from mygpo.search.models import SearchEntry
+from django.utils.translation import ugettext as _
+
 
 try:
     import json
