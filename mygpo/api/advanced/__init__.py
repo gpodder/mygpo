@@ -18,6 +18,7 @@
 from mygpo.api.basic_auth import require_valid_user, check_username
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, Http404, HttpResponseNotAllowed
 from mygpo.api.models import Device, Podcast, SubscriptionAction, Episode, EpisodeAction, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, EPISODE_ACTION_TYPES, DEVICE_TYPES, Subscription
+from mygpo.api.models.users import EpisodeFavorite
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.api.advanced.directory import episode_data, podcast_data
@@ -431,5 +432,13 @@ def updates(request, username, device_uid):
 
     ret['updates'] = updates
 
+    return JsonResponse(ret)
+
+
+@require_valid_user
+@check_username
+def favorites(request, username):
+    favorites = [x.episode for x in EpisodeFavorite.objects.filter(user=request.user).order_by('-created')]
+    ret = map(episode_data, favorites)
     return JsonResponse(ret)
 
