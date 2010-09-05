@@ -307,6 +307,11 @@ def update_episodes(user, actions):
                 time_values['position'] is None:
             return HttpResponseBadRequest('started and total require position')
 
+        # Sanity check: total and position can only appear together
+        if (time_values['total'] or time_values['started']) and \
+            not (time_values['total'] and time_values['started']):
+            return HttpResponseBadRequest('total and started parameters can only appear together')
+
         try:
             EpisodeAction.objects.create(user=user, episode=episode, device=device, action=action, timestamp=timestamp,
                     playmark=time_values['position'], started=time_values['started'], total=time_values['total'])
