@@ -35,4 +35,7 @@ INSERT INTO `sanitizing_rules` VALUES (34,1,0,'^http://feeds\\.ziffdavis\\.com/z
 INSERT INTO `sanitizing_rules` VALUES (35,1,0,'^http://rssnewsapps\\.ziffdavis\\.com/audioblogs/crankygeeks/cg\\.wmv\\.xml$', 'http://feeds.feedburner.com/ziffdavis/cgwmvvideo', 100, 'Unify Cranky Geed Podcasts (WMV) (bug 1032');
 INSERT INTO `sanitizing_rules` VALUES (36,1,0,'^http://noagenda\\.podshow\\.com/feed$', 'http://www.mevio.com/feeds/noagenda.xml', 100, 'Unify No Agend Feeds');
 INSERT INTO `sanitizing_rules` VALUES (37,1,0,'^(?P<protocol>\\w+)://gdata\\.youtube\\.com/feeds/base/users/(?P<username>\\w+)/uploads\\?alt=rss.*$', '\\g<protocol>://www.youtube.com/rss/user/\g<username>/videos.rss', 100, 'Rewrite Youtube API Feeds to canonical URLs (bug 1057)');
+INSERT INTO `sanitizing_rules` VALUES (38,1,0,'(?i)^http://feeds\\.feedburner\\.com/EscapePod$', 'http://escapepod.org/feed/', 100, 'Unify Escape Pod Feeds');
+INSERT INTO `sanitizing_rules` VALUES (39,1,0,'http://hackerpublicradio\\.org/(?P<res>.*)$', 'http://www.hackerpublicradio.org/\\g<res>', 100, 'Unify Hacker Public Radio (bug 1090)');
+INSERT INTO `sanitizing_rules` VALUES (40,1,0,'(?i)^http://feeds\\.feedburner\\.com/HackerMedley$', 'http://hackermedley.org/feed/podcast/', 100, 'Unify Hacker Medley Podcast');
 
