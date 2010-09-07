@@ -15,37 +15,21 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, Http404, HttpResponseForbidden
-from django.contrib.auth import authenticate, login, logout
+from django.http import HttpResponseRedirect, Http404
 from django.contrib.auth.models import User
 from django.template import RequestContext
-from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, EpisodeToplistEntry, Subscription, SuggestionEntry, SyncGroup, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SubscriptionMeta, UserProfile
+from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, Subscription, SuggestionEntry, UserProfile
 from mygpo.data.models import Listener, SuggestionBlacklist, PodcastTag
-from mygpo.data.mimetype import CONTENT_TYPES
-from mygpo.web.models import Rating, SecurityToken
-from mygpo.web.forms import UserAccountForm, DeviceForm, SyncForm, PrivacyForm, ResendActivationForm
-from django.forms import ValidationError
-from mygpo.api.opml import Exporter
-from django.utils.translation import ugettext as _
-from mygpo.api.basic_auth import require_valid_user
-from mygpo.decorators import requires_token, manual_gc
+from mygpo.web.models import Rating
+from mygpo.decorators import manual_gc
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, render_to_response
-from django.db import IntegrityError
+from django.shortcuts import render_to_response
 from django.db.models import Sum
 from datetime import datetime
 from django.contrib.sites.models import Site
-from django.conf import settings
-from registration.models import RegistrationProfile
-from sets import Set
-from mygpo.api.sanitizing import sanitize_url
-from mygpo.web.users import get_user
-from mygpo.log import log
 from mygpo.constants import PODCAST_LOGO_SIZE, PODCAST_LOGO_BIG_SIZE
 from mygpo.web import utils
-from mygpo.api import simple
 from mygpo.api import backend
-import re
 import os
 import Image
 import ImageDraw
@@ -68,7 +52,7 @@ def welcome(request, toplist_entries=10):
     hours_listened = Listener.objects.all().aggregate(hours=Sum('episode__duration'))['hours'] / (60 * 60)
 
     try:
-        lang = process_lang_params(request, '/toplist/')
+        lang = utils.process_lang_params(request, '/toplist/')
     except utils.UpdatedException, updated:
         lang = []
 
@@ -168,35 +152,6 @@ def cover_art(request, size, filename):
         raise Http404('Cover art not available')
 
 @manual_gc
-@login_required
-def subscriptions(request):
-    current_site = Site.objects.get_current()
-    subscriptionlist = create_subscriptionlist(request)
-    return render_to_response('subscriptions.html', {
-        'subscriptionlist': subscriptionlist,
-        'url': current_site
-    }, context_instance=RequestContext(request))
-
-def create_subscriptionlist(request):
-    #sync all devices first
-    for d in Device.objects.filter(user=request.user):
-        d.sync()
-
-    subscriptions = Subscription.objects.filter(user=request.user)
-
-    l = {}
-    for s in subscriptions:
-        if s.podcast in l:
-            l[s.podcast]['devices'].append(s.device)
-        else:
-            e = Episode.objects.filter(podcast=s.podcast, timestamp__isnull=False).order_by('-timestamp')
-            episode = e[0] if e.count() > 0 else None
-            devices = [s.device]
-            l[s.podcast] = {'podcast': s.podcast, 'episode': episode, 'devices': devices}
-
-    return l.values()
-
-@manual_gc
 def history(request, len=15, device_id=None):
     if device_id:
         devices = Device.objects.filter(id=device_id)
@@ -219,143 +174,6 @@ def history(request, len=15, device_id=None):
         'generalhistory': generalhistory,
         'singledevice': devices[0] if device_id else None
     }, context_instance=RequestContext(request))
-
-
-@manual_gc
-@login_required
-def podcast_subscribe(request, pid):
-    podcast = get_object_or_404(Podcast, pk=pid)
-    error_message = None
-
-    if request.method == 'POST':
-        form = SyncForm(request.POST)
-
-        try:
-            target = form.get_target()
-
-            if isinstance(target, SyncGroup):
-                device = target.devices()[0]
-            else:
-                device = target
-
-            try:
-                SubscriptionAction.objects.create(podcast=podcast, device=device, action=SUBSCRIBE_ACTION)
-            except IntegrityError, e:
-                log('error while subscribing to podcast (device %s, podcast %s)' % (device.id, podcast.id))
-
-            return HttpResponseRedirect('/podcast/%s' % podcast.id)
-
-        except ValueError, e:
-            error_message = _('Could not subscribe to the podcast: %s' % e)
-
-    targets = podcast.subscribe_targets(request.user)
-
-    form = SyncForm()
-    form.set_targets(targets, _('Choose a device:'))
-
-    return render_to_response('subscribe.html', {
-        'error_message': error_message,
-        'podcast': podcast,
-        'can_subscribe': len(targets) > 0,
-        'form': form
-    }, context_instance=RequestContext(request))
-
-
-@manual_gc
-@login_required
-def podcast_unsubscribe(request, pid, device_id):
-
-    return_to = request.GET.get('return_to')
-
-    if return_to == None:
-        raise Http404('Wrong URL')
-
-    podcast = get_object_or_404(Podcast, pk=pid)
-    device = Device.objects.get(pk=device_id)
-    try:
-        SubscriptionAction.objects.create(podcast=podcast, device=device, action=UNSUBSCRIBE_ACTION, timestamp=datetime.now())
-    except IntegrityError, e:
-        log('error while unsubscribing from podcast (device %s, podcast %s)' % (device.id, podcast.id))
-
-    return HttpResponseRedirect(return_to)
-
-
-@manual_gc
-def toplist(request, num=100, lang=None):
-
-    try:
-        lang = process_lang_params(request, '/toplist/')
-    except utils.UpdatedException, updated:
-        return HttpResponseRedirect('/toplist/?lang=%s' % ','.join(updated.data))
-
-    type_str = request.GET.get('types', '')
-    set_types = [t for t in type_str.split(',') if t]
-    if set_types:
-        media_types = dict([(t, t in set_types) for t in CONTENT_TYPES])
-    else:
-        media_types = dict([(t, True) for t in CONTENT_TYPES])
-
-    entries = backend.get_toplist(num, lang, set_types)
-
-    max_subscribers = max([e.subscriptions for e in entries]) if entries else 0
-    current_site = Site.objects.get_current()
-    all_langs = utils.get_language_names(utils.get_podcast_languages())
-
-    return render_to_response('toplist.html', {
-        'entries': entries,
-        'max_subscribers': max_subscribers,
-        'url': current_site,
-        'languages': lang,
-        'all_languages': all_langs,
-        'types': media_types,
-    }, context_instance=RequestContext(request))
-
-
-@manual_gc
-def episode_toplist(request, num=100):
-
-    try:
-        lang = process_lang_params(request, '/toplist/episodes')
-    except utils.UpdatedException, updated:
-        return HttpResponseRedirect('/toplist/episodes?lang=%s' % ','.join(updated.data))
-
-    type_str = request.GET.get('types', '')
-    set_types = [t for t in type_str.split(',') if t]
-    if set_types:
-        media_types = dict([(t, t in set_types) for t in CONTENT_TYPES])
-    else:
-        media_types = dict([(t, True) for t in CONTENT_TYPES])
-
-    entries = backend.get_episode_toplist(num, lang, set_types)
-
-    current_site = Site.objects.get_current()
-
-    # Determine maximum listener amount (or 0 if no entries exist)
-    max_listeners = max([0]+[e.listeners for e in entries])
-    all_langs = utils.get_language_names(utils.get_podcast_languages())
-    return render_to_response('episode_toplist.html', {
-        'entries': entries,
-        'max_listeners': max_listeners,
-        'url': current_site,
-        'languages': lang,
-        'all_languages': all_langs,
-        'types': media_types,
-    }, context_instance=RequestContext(request))
-
-
-def process_lang_params(request, url):
-    if 'lang' in request.GET:
-        lang = list(set([x for x in request.GET.get('lang').split(',') if x]))
-
-    if request.method == 'POST':
-        if request.POST.get('lang'):
-            lang = list(set(lang + [request.POST.get('lang')]))
-        raise utils.UpdatedException(lang)
-
-    if not 'lang' in request.GET:
-        lang = utils.get_accepted_lang(request)
-
-    return utils.sanitize_language_codes(lang)
 
 
 @manual_gc
@@ -389,121 +207,6 @@ def suggestions(request):
         'url': current_site
     }, context_instance=RequestContext(request))
 
-
-@manual_gc
-@login_required
-def podcast_subscribe_url(request):
-    url = request.GET.get('url')
-
-    if url == None:
-        raise Http404('http://my.gpodder.org/subscribe?url=http://www.example.com/podcast.xml')
-
-    url = sanitize_url(url)
-
-    if url == '':
-        raise Http404('Please specify a valid url')
-
-    podcast, created = Podcast.objects.get_or_create(url=url)
-
-    return HttpResponseRedirect('/podcast/%d/subscribe' % podcast.pk)
-
-
-@manual_gc
-def resend_activation(request):
-    error_message = ''
-
-    if request.method == 'GET':
-        form = ResendActivationForm()
-        return render_to_response('registration/resend_activation.html', {
-            'form': form,
-        }, context_instance=RequestContext(request))
-
-    site = Site.objects.get_current()
-    form = ResendActivationForm(request.POST)
-
-    try:
-        if not form.is_valid():
-            raise ValueError(_('Invalid Username entered'))
-
-        try:
-            user = get_user(form.cleaned_data['username'], form.cleaned_data['email'])
-        except User.DoesNotExist:
-            raise ValueError(_('User does not exist.'))
-
-        p, c = UserProfile.objects.get_or_create(user=user)
-        if p.deleted:
-            raise ValueError(_('You have deleted your account, but you can regster again.'))
-
-        try:
-            profile = RegistrationProfile.objects.get(user=user)
-        except RegistrationProfile.DoesNotExist:
-            profile = RegistrationProfile.objects.create_profile(user)
-
-        if profile.activation_key == RegistrationProfile.ACTIVATED:
-            user.is_active = True
-            user.save()
-            raise ValueError(_('Your account already has been activated. Go ahead and log in.'))
-
-        elif profile.activation_key_expired():
-            raise ValueError(_('Your activation key has expired. Please try another username, or retry with the same one tomorrow.'))
-
-    except ValueError, e:
-        return render_to_response('registration/resend_activation.html', {
-           'form': form,
-           'error_message' : e
-        }, context_instance=RequestContext(request))
-
-
-    try:
-        profile.send_activation_email(site)
-
-    except AttributeError:
-        #old versions of django-registration send registration mails from RegistrationManager
-        RegistrationProfile.objects.send_activation_email(profile, site)
-
-    return render_to_response('registration/resent_activation.html', context_instance=RequestContext(request))
-
-
-@manual_gc
-@requires_token(object='subscriptions', action='r', denied_template='user_subscriptions_denied.html')
-def user_subscriptions(request, username):
-    user = get_object_or_404(User, username=username)
-    public_subscriptions = backend.get_public_subscriptions(user)
-    token = SecurityToken.objects.get(object='subscriptions', action='r', user__username=username)
-
-    return render_to_response('user_subscriptions.html', {
-        'subscriptions': public_subscriptions,
-        'other_user': user,
-        'token': token,
-        }, context_instance=RequestContext(request))
-
-@requires_token(object='subscriptions', action='r')
-def user_subscriptions_opml(request, username):
-    user = get_object_or_404(User, username=username)
-    public_subscriptions = backend.get_public_subscriptions(user)
-
-    response = render_to_response('user_subscriptions.opml', {
-        'subscriptions': public_subscriptions,
-        'other_user': user
-        }, context_instance=RequestContext(request))
-    response['Content-Disposition'] = 'attachment; filename=%s-subscriptions.opml' % username
-    return response
-
-
-@manual_gc
-@login_required
-def all_subscriptions_download(request):
-    podcasts = backend.get_all_subscriptions(request.user)
-    response = simple.format_subscriptions(podcasts, 'opml', request.user.username)
-    response['Content-Disposition'] = 'attachment; filename=all-subscriptions.opml'
-    return response
-
-
-def gpodder_example_podcasts(request):
-    sponsored_podcast = utils.get_sponsored_podcast()
-    return render_to_response('gpodder_examples.opml', {
-       'sponsored_podcast': sponsored_podcast
-    }, context_instance=RequestContext(request))
 
 @login_required
 def mytags(request):

@@ -27,6 +27,7 @@ from mygpo.api.models import UserProfile
 from mygpo.web.forms import RestorePasswordForm
 from django.contrib.sites.models import Site
 from django.conf import settings
+from mygpo.decorators import requires_token, manual_gc
 from django.utils.translation import ugettext as _
 import string
 import random
@@ -160,4 +161,60 @@ def restore_password(request):
     user.set_password(pwd)
     user.save()
     return render_to_response('password_reset.html', context_instance=RequestContext(request))
+
+
+@manual_gc
+def resend_activation(request):
+    error_message = ''
+
+    if request.method == 'GET':
+        form = ResendActivationForm()
+        return render_to_response('registration/resend_activation.html', {
+            'form': form,
+        }, context_instance=RequestContext(request))
+
+    site = Site.objects.get_current()
+    form = ResendActivationForm(request.POST)
+
+    try:
+        if not form.is_valid():
+            raise ValueError(_('Invalid Username entered'))
+
+        try:
+            user = get_user(form.cleaned_data['username'], form.cleaned_data['email'])
+        except User.DoesNotExist:
+            raise ValueError(_('User does not exist.'))
+
+        p, c = UserProfile.objects.get_or_create(user=user)
+        if p.deleted:
+            raise ValueError(_('You have deleted your account, but you can regster again.'))
+
+        try:
+            profile = RegistrationProfile.objects.get(user=user)
+        except RegistrationProfile.DoesNotExist:
+            profile = RegistrationProfile.objects.create_profile(user)
+
+        if profile.activation_key == RegistrationProfile.ACTIVATED:
+            user.is_active = True
+            user.save()
+            raise ValueError(_('Your account already has been activated. Go ahead and log in.'))
+
+        elif profile.activation_key_expired():
+            raise ValueError(_('Your activation key has expired. Please try another username, or retry with the same one tomorrow.'))
+
+    except ValueError, e:
+        return render_to_response('registration/resend_activation.html', {
+           'form': form,
+           'error_message' : e
+        }, context_instance=RequestContext(request))
+
+
+    try:
+        profile.send_activation_email(site)
+
+    except AttributeError:
+        #old versions of django-registration send registration mails from RegistrationManager
+        RegistrationProfile.objects.send_activation_email(profile, site)
+
+    return render_to_response('registration/resent_activation.html', context_instance=RequestContext(request))
 

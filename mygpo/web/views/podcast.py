@@ -1,13 +1,17 @@
+from datetime import date, timedelta, datetime
+
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
-from mygpo.api.models import Podcast, Episode, EpisodeAction, Device, SubscriptionAction, Subscription
+from django.utils.translation import ugettext as _
+
+from mygpo.api.models import Podcast, Episode, EpisodeAction, Device, SubscriptionAction, Subscription, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SyncGroup
 from mygpo.web.forms import PrivacyForm, SyncForm
 from mygpo.data.models import Listener, PodcastTag
-from datetime import date, timedelta
+from mygpo.decorators import manual_gc
 from mygpo.utils import daterange
 
 
@@ -177,3 +181,79 @@ def remove_tag(request, pid):
 
     return HttpResponseRedirect('/podcast/%s' % pid)
 
+
+@manual_gc
+@login_required
+def subscribe(request, pid):
+    podcast = get_object_or_404(Podcast, pk=pid)
+    error_message = None
+
+    if request.method == 'POST':
+        form = SyncForm(request.POST)
+
+        try:
+            target = form.get_target()
+
+            if isinstance(target, SyncGroup):
+                device = target.devices()[0]
+            else:
+                device = target
+
+            try:
+                SubscriptionAction.objects.create(podcast=podcast, device=device, action=SUBSCRIBE_ACTION)
+            except IntegrityError, e:
+                log('error while subscribing to podcast (device %s, podcast %s)' % (device.id, podcast.id))
+
+            return HttpResponseRedirect('/podcast/%s' % podcast.id)
+
+        except ValueError, e:
+            error_message = _('Could not subscribe to the podcast: %s' % e)
+
+    targets = podcast.subscribe_targets(request.user)
+
+    form = SyncForm()
+    form.set_targets(targets, _('Choose a device:'))
+
+    return render_to_response('subscribe.html', {
+        'error_message': error_message,
+        'podcast': podcast,
+        'can_subscribe': len(targets) > 0,
+        'form': form
+    }, context_instance=RequestContext(request))
+
+
+@manual_gc
+@login_required
+def unsubscribe(request, pid, device_id):
+
+    return_to = request.GET.get('return_to')
+
+    if return_to == None:
+        raise Http404('Wrong URL')
+
+    podcast = get_object_or_404(Podcast, pk=pid)
+    device = Device.objects.get(pk=device_id)
+    try:
+        SubscriptionAction.objects.create(podcast=podcast, device=device, action=UNSUBSCRIBE_ACTION, timestamp=datetime.now())
+    except IntegrityError, e:
+        log('error while unsubscribing from podcast (device %s, podcast %s)' % (device.id, podcast.id))
+
+    return HttpResponseRedirect(return_to)
+
+
+@manual_gc
+@login_required
+def subscribe_url(request):
+    url = request.GET.get('url')
+
+    if url == None:
+        raise Http404('http://my.gpodder.org/subscribe?url=http://www.example.com/podcast.xml')
+
+    url = sanitize_url(url)
+
+    if url == '':
+        raise Http404('Please specify a valid url')
+
+    podcast, created = Podcast.objects.get_or_create(url=url)
+
+    return HttpResponseRedirect('/podcast/%d/subscribe' % podcast.pk)

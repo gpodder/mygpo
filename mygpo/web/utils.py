@@ -171,3 +171,18 @@ def get_page_list(start, total, cur, show_max):
     return ps
 
 
+def process_lang_params(request, url):
+    if 'lang' in request.GET:
+        lang = list(set([x for x in request.GET.get('lang').split(',') if x]))
+
+    if request.method == 'POST':
+        if request.POST.get('lang'):
+            lang = list(set(lang + [request.POST.get('lang')]))
+        raise UpdatedException(lang)
+
+    if not 'lang' in request.GET:
+        lang = get_accepted_lang(request)
+
+    return sanitize_language_codes(lang)
+
+

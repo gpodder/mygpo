@@ -118,7 +118,7 @@ def edit(request, device_id):
 def opml(request, device_id):
     device = get_object_or_404(Device, id=device_id, user=request.user)
 
-    response = simple.format_subscriptions(simple.get_subscriptions(request.user, device.uid), 'opml', request.user.username)
+    response = simple.format_podcast_list(simple.get_subscriptions(request.user, device.uid), 'opml', request.user.username)
     response['Content-Disposition'] = 'attachment; filename=%s.opml' % device.uid
     return response
 
@@ -197,4 +197,7 @@ def unsync(request, device_id):
 
     return HttpResponseRedirect('/device/%s' % device_id)
 
+
+from mygpo.web import views
+history = views.history
 
