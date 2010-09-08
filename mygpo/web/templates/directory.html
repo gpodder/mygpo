@@ -24,14 +24,14 @@
      <tr>
       <td>{{ entry.get_podcast|podcast_logo }}</td>
       <td>
-       <a href="/podcast/{{ entry.get_podcast.id }}">
+       <a href="{% url podcast entry.get_podcast.id %}">
         {{ entry.get_podcast.title }}
        </a>
      </tr>
     {% endfor %}
     <tr>
      <td></td>
-     <td><a href="/directory/{{ cat.tag }}">{% trans "more..." %}</a></td>
+     <td><a href="{% url directory cat.tag %}">{% trans "more..." %}</a></td>
     </tr>
    </table>
    </div>
@@ -47,7 +47,7 @@
   <div id="tagcloud">
    {% for tag in tag_cloud %}
     <span style="font-size: {% smartwidthratio tag.entries max_entries 4 1 %}em">
-     <a href="/directory/{{ tag.tag }}">{{ tag.tag }}</a>
+     <a href="{% url directory tag.tag %}">{{ tag.tag }}</a>
     </span>
    {% endfor %}
   </div>

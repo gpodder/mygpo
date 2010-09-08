@@ -17,12 +17,12 @@
 
  {% if success %}
   <h1>{% trans "Your account has been deleted" %}</h1>
-  <a href="/">{% trans "Thanks" %}</a>
+  <a href="{% url home %}">{% trans "Thanks" %}</a>
 
  {% else %}
   <h1>{% trans "Delete your Account?" %}</h1>
   <p>{% trans "Do you really want to delete your account?" %}</p>
-  <form method="post" action="/account/delete">
+  <form method="post" action="{% url delete-account %}">
    {% csrf_token %}
    <input type="submit" value="{% trans "Yes, please" %}" />
   </form>

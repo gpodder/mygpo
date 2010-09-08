@@ -33,11 +33,11 @@
 
 {% block content %}
   {% if episode.podcast.logo_url %}
-   <div id="podcastlogo"><a href="/podcast/{{ episode.podcast.id }}">{{ episode.podcast|podcast_logo_big }}</a></div>
+   <div id="podcastlogo"><a href="{% url podcast episode.podcast.id %}">{{ episode.podcast|podcast_logo_big }}</a></div>
   {% endif %}
   <h1>{{ episode.title|default:"Unnamed Episode"|striptags }}</h1>
   <small class="description">
-      {% trans "from" %} <a href="/podcast/{{ episode.podcast.id }}">{{ episode.podcast }}</a>{% if episode.timestamp %}, {% trans "released" %} {{episode.timestamp}}{% endif %},
+      {% trans "from" %} <a href="{% url podcast episode.podcast.id %}">{{ episode.podcast }}</a>{% if episode.timestamp %}, {% trans "released" %} {{episode.timestamp}}{% endif %},
       {% trans "links" %}:
       <a href="{{episode.url}}">{% trans "download" %}</a>{% if episode.link and episode.link != episode.url %}, <a href="{{episode.link}}">{% trans "website" %}</a>
       {% endif %},
@@ -67,13 +67,13 @@
 
    {% if is_favorite %}
     <div>
-     <a href="/episode/{{ episode.id }}/toggle-favorite">
+     <a href="{% url episode-fav episode.id %}">
       <img src="/media/fav.png" style="vertical-align: middle;" /> {% trans "Favorite" %}
      </a>
     </div>
    {% else %}
     <div>
-     <a href="/episode/{{ episode.id }}/toggle-favorite">
+     <a href="{% url episode-fav episode.id %}">
       <img src="/media/fav-add.png" style="vertical-align: middle;" /> {% trans "Add as Favorite" %}
      </a>
     </div>
@@ -90,12 +90,14 @@
 
    <div class="info">
     {% if not subscription_meta %}
-     {% blocktrans with episode.podcast.id as podcast_id %}You aren't subscribed to this podcast. Therefor your chapters are also visible to other users. If you do no want that, <a href="/podcast/{{ podcast_id }}/subscribe">subscribe to the podcast</a> and mark your subscription as private.{% endblocktrans %}
+     {% url subscribe podcast_id as subscribe-url %}
+     {% blocktrans with episode.podcast.id as podcast_id %}You aren't subscribed to this podcast. Therefor your chapters are also visible to other users. If you do no want that, <a href="{{ subscribe-url }}">subscribe to the podcast</a> and mark your subscription as private.{% endblocktrans %}
     {% else %}
      {% if subscription_meta.public %}
-      {%blocktrans with episode.podcast.id as podcast_id %}Your own chapters are shown in bold. If you don't want them to appear to other users, go to the <a href="/podcast/{{ podcast_id }}">podcast page</a> and mark your subscription as private.{% endblocktrans %}
+      {% url podcast podast_id as podcast-url %}
+      {%blocktrans with episode.podcast.id as podcast_id %}Your own chapters are shown in bold. If you don't want them to appear to other users, go to the <a href="{{ podcast-url }}">podcast page</a> and mark your subscription as private.{% endblocktrans %}
      {% else %}
-      {% blocktrans with episode.podcast.id as podcast_id %}The following list contains your chapters in bold and those of other users. However, yours are not shown to others, because you've marked your subscription as prive on the <a href="/podcast/{{ podcast_id }}">podcast page</a>. You can change that there, if you want.{% endblocktrans %}
+      {% blocktrans with episode.podcast.id as podcast_id %}The following list contains your chapters in bold and those of other users. However, yours are not shown to others, because you've marked your subscription as prive on the <a href="{{ podcast-url }}">podcast page</a>. You can change that there, if you want.{% endblocktrans %}
      {% endif %}
     {% endif %}
    </div>
@@ -115,7 +117,7 @@
       <td>{{ chapter.label }}</strong>
       <td>
        {% if chapter.user == user %}
-        <a href="/episode/{{ episode.id }}/remove-chapter/{{ chapter.id}}">
+        <a href="{% url remove-chapter episode.id chapter.id %}">
          <img src="/media/unsubscribe.png" alt="{% trans "Remove" %}" />
         </a>
        {% endif %}
@@ -123,7 +125,7 @@
      </tr>
     {% endfor %}
     <tr>
-     <form action="/episode/{{ episode.id }}/add-chapter" method="POST">
+     <form action="{% url add-chapter episode.id %}" method="POST">
       {% csrf_token %}
       <td>
        <input type="text" name="start" id="start" class="time" /> -
@@ -159,7 +161,7 @@
      <td style="text-align: center;">{{ s|episode_status_icon }}</td>
      <td>
       {% if s.device %}
-       <a href="/device/{{ s.device.id }}">{{ s.device|device_icon }} {{ s.device.name|striptags }}</a>
+       <a href="{% url device s.device.id %}">{{ s.device|device_icon }} {{ s.device.name|striptags }}</a>
       {% endif %}
      </td>
      <td>{% if s.started %}{{s.started_time|date:"H:m:s" }} - {% endif %}

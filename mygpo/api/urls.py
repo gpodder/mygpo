@@ -9,9 +9,9 @@ urlpatterns = patterns('',
 urlpatterns += patterns('mygpo.api.simple',
     (r'^subscriptions/(?P<username>\w+)/(?P<device_uid>[\w.-]+)\.(?P<format>\w+)', 'subscriptions'),
     (r'^subscriptions/(?P<username>\w+)\.(?P<format>\w+)', 'all_subscriptions'),
-    (r'^toplist/(?P<count>\d+)\.(?P<format>\w+)', 'toplist'),
+ url(r'^toplist/(?P<count>\d+)\.(?P<format>\w+)', 'toplist',                   name='toplist-opml'),
     (r'^search\.(?P<format>\w+)', 'search'),
-    (r'^suggestions/(?P<count>\d+)\.(?P<format>\w+)', 'suggestions'),
+ url(r'^suggestions/(?P<count>\d+)\.(?P<format>\w+)', 'suggestions',           name='suggestions-opml'),
     (r'^toplist.opml$', 'toplist', {'count': 50, 'format': 'opml'}),
 )
 

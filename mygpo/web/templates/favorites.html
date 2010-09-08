@@ -20,27 +20,28 @@
   {% for episode in episodes %}
    <tr>
     <td>{{ episode.podcast|podcast_logo }}</td>
-    <td><a href="/episode/{{ episode.id }}">
+    <td><a href="{% url episode episode.id %}">
      {% if episode.title %}
       {{ episode.title|striptags }}
      {% else %}
       {% trans "Unnamed Episode" %}
      {% endif %}
      </a><br/>
-     <span class="from_podcast">{% trans "from" %} <a href="/podcast/{{ episode.podcast.id }}">{{ episode.podcast|striptags }}</a></td>
+     <span class="from_podcast">{% trans "from" %} <a href="{% url podcast episode.podcast.id %}">{{ episode.podcast|striptags }}</a></td>
    </tr>
   {% endfor %}
   </table>
 
   <h2>Favorites-Feed</h2>
    <p>
-    {% blocktrans with user.username as username and site as sitename %}
+    {% url favorites-feed user.username as favorites-feed-url %}
+    {% blocktrans with user.username as username and site.domain as domain %}
      You can access a feed containing your favorites episodes at
-     <strong><a href="/user/{{ username }}/favorites.xml">{{ feed_url }}</a></strong>.
+     <strong><a href="{{ favorites-feed-url }}">http://{{ domain }}{{ favorites-feed-url }}</a></strong>.
     {% endblocktrans %}
    </p>
    <div>
-    <a href="/subscribe?url={{ feed_url }}">
+    <a href="{% url subscribe-by-url %}?url=http://{{ site.domain }}{% url favorites-feed user.username %}">
      <img src="/media/subscribe.png" style="vertical-align: middle;" /> {% trans "Subscribe" %}
     </a>
    </div>
@@ -55,8 +56,8 @@
      {% endblocktrans %}
     </p>
     <ul>
-     <li><a href="/favorites/?private_feed">{% trans "create a new password" %}</a></li>
-     <li><a href="/favorites/?public_feed">{% trans "don't require a password" %}</a>
+     <li><a href="{% url favorites %}?private_feed">{% trans "create a new password" %}</a></li>
+     <li><a href="{% url favorites %}?public_feed">{% trans "don't require a password" %}</a>
       and make my favorites visible on {{ site }}</li>
     </ul>
    {% else %}
@@ -66,14 +67,15 @@
     </p>
     <ul>
      {% if podcast %}
-      <li><a href="/podcast/{{ podcast.id }}">public information about your favorites-feed</a></li>
+      <li><a href="{% url podcast podcast.id %}">public information about your favorites-feed</a></li>
      {% endif %}
-     <li><a href="/favorites/?private_feed">{% trans "require a password for this feed" %}</a></li>
+     <li><a href="{% url favorites %}?private_feed">{% trans "require a password for this feed" %}</a></li>
     </ul>
    {% endif %}
   {% else %}
 
-   <p>{% blocktrans %}You don't have any episodes marked as favorites yet. Maybe have a look at the <a href="/toplist/episodes">episode toplist</a>.{% endblocktrans %}</p>
+   {% url episode-toplist as episode-toplist-url %}
+   <p>{% blocktrans %}You don't have any episodes marked as favorites yet. Maybe have a look at the <a href="{{ episode-toplist-url }}">episode toplist</a>.{% endblocktrans %}</p>
 
    <p>{% blocktrans %}Once you've selected your favorites, you can subscribe to your very own <em>Favorites-Feed</em> that contains your favorite episodes{% endblocktrans %}</p>
 

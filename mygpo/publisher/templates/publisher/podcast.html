@@ -33,26 +33,26 @@
 
   <h2>Edit</h2>
   <p>Please note that information updates from the podcast feed will overwrite any information given here. Please save only what is not contained in the feed.</p>
-  <form method="post" action="">
+  <form method="post" action="{% url podcast podcast.id %}">
   {% csrf_token %}
    <table>
     {{ form.as_table }}
    </table>
    <input type="submit" value="save" />
   </form>
-  <p><a href="/publisher/podcast/{{ podcast.id }}/update">{% trans "Update from Feed" %}</a> {% trans "(this might take a few seconds)" %}</p>
+  <p><a href="{% url podcast-publisher-update podcast.id %}">{% trans "Update from Feed" %}</a> {% trans "(this might take a few seconds)" %}</p>
 
-  <div class="info">To update all of your published podcasts automatically, you can request the URL (<a href="/publisher/podcast/{{ podcast.id }}?new_token">Create a new token</a>)<br />
-   <strong><a href="/publisher/{{ user.username }}/update?token={{ update_token.token }}">http://{{ site }}/publisher/{{ user.username }}/update?token={{ update_token.token }}</a></strong>
+  <div class="info">To update all of your published podcasts automatically, you can request the URL (<a href="{% url podcast-publisher-detail podcast.id %}?new_token">Create a new token</a>)<br />
+   <strong><a href="{% url publisher-update user.username %}?token={{ update_token.token }}">http://{{ site }}{% url publisher-update user.username %}?token={{ update_token.token }}</a></strong>
   </div>
 
   <h2>Episodes</h2>
-  <p>View and edit <a href="/publisher/podcast/{{ podcast.id }}/episodes">episode</a> data.</p>
+  <p>View and edit <a href="{% url podcast-publisher-episodes podcast.id %}">episode</a> data.</p>
 
   <h2>Stats</h2>
 
   {% if podcast.group %}
-   <a href="/publisher/group/{{ podcast.group.id }}">{% trans "Show Group Stats" %}</a>
+   <a href="{% url group-publisher podcast.group.id %}">{% trans "Show Group Stats" %}</a>
   {% endif %}
 
   {% if timeline_data %}

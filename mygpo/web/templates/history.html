@@ -16,7 +16,7 @@
 <p>{% trans "This is a list of recent subscription and episode actions for your account." %}</p>
 
    {% if singledevice %}
-    <a href="/device/{{ singledevice.id }}">{% trans "Back to" %} {{ singledevice|device_icon }} {{singledevice|striptags}}</a>
+    <a href="{% url device singledevice.id %}">{% trans "Back to" %} {{ singledevice|device_icon }} {{singledevice|striptags}}</a>
    {% endif %}
 
    {% if not generalhistory|length_is:"0" %}
@@ -38,15 +38,15 @@
 
       <td>
        {% if s.podcast %}
-        <a href="/podcast/{{ s.podcast.id }}">{{ s.podcast|striptags }}</a>
+        <a href="{% url podcast s.podcast.id %}">{{ s.podcast|striptags }}</a>
        {% else %}
-        <a href="/episode/{{ s.episode.id }}">
+        <a href="{% url episode s.episode.id %}">
          {% if s.episode.title %}
           {{ s.episode.title|striptags }}
          {% else %}
           {% trans "Unnamed Episode" %}
          {% endif %}
-     </a><br/><span class="from_podcast">{% trans "from" %} <a href="/podcast/{{ s.episode.podcast.id }}">{{ s.episode.podcast|striptags }}</a></span>
+     </a><br/><span class="from_podcast">{% trans "from" %} <a href="{% url podcast s.episode.podcast.id %}">{{ s.episode.podcast|striptags }}</a></span>
        {% endif %}
       </td>
       <td style="width: 80px;"><span title="{{ s.timestamp }}">{{ s.timestamp|date:"Y-m-d" }}</span></td>
@@ -57,7 +57,7 @@
         {{ s|episode_status_icon }}
        {% endif %}
       </td>
-      <td><a href="/device/{{ s.device.id }}">{{ s.device|device_icon }}&nbsp;{{ s.device.name|striptags }}</a></td>
+      <td><a href="{% url device s.device.id %}">{{ s.device|device_icon }}&nbsp;{{ s.device.name|striptags }}</a></td>
      </tr>
     {% endfor %}
    </table>

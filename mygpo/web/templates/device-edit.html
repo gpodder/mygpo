@@ -14,7 +14,7 @@
   <h1>{{ device.name|striptags }}</h1>
   <hr/>
 
-  <a href="/device/{{ device.id }}">{% trans "Back to" %} {{ device|device_icon }} {{device|striptags}}</a>
+  <a href="{% url device device.id %}">{% trans "Back to" %} {{ device|device_icon }} {{device|striptags}}</a>
 
   {% if device.deleted %}<div class="info">{% trans "This device was deleted." %}</div>{% endif %}
 
@@ -26,7 +26,7 @@
    <div class="success">{% trans "Your settings have been saved." %}</div>
   {% endif %}
 
-  <form action="" method="POST">
+  <form action="{% url device-edit device.id %}" method="POST">
    {% csrf_token %}
    <table class="form">
     {{ device_form.as_table }}
@@ -40,7 +40,7 @@
   </form>
 
   <h2>{% trans "Delete" %}</h2>
-  <form action="/device/{{ device.id }}/delete" method="POST">
+  <form action="{% url device-delete device.id %}" method="POST">
    {% csrf_token %}
    <input type="submit" value="{% trans "Delete this device" %}" />
   </form>

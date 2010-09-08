@@ -12,7 +12,7 @@
 {% block content %}
 <h2>{% trans "Search" %}</h2>
 
-<form method="get" action="." class="search">
+<form method="get" action="{% url search %}" class="search">
  <input type="text" name="q" {% if q %}value="{{ q }}"{% endif %} >
  <input type="submit" value="Search">
 </form>
@@ -32,7 +32,7 @@
       {% if result.get_object %}
        <td>{{ result.get_object|podcast_logo }}</td>
        <td>
-        <a class="podcast" href="/podcast/{{ result.obj_id }}">{{ result.get_object }}</a><br />
+        <a class="podcast" href="{% url podcast result.obj_id %}">{{ result.get_object }}</a><br />
         <span class="listlink description">{{ result.get_object.description|default:""|striptags|truncatewords:"15" }}</span>
        </td>
       {% endif %}
@@ -44,7 +44,7 @@
        {{result.get_object.title|striptags}}
        (
         {% for p in result.get_object.podcasts %}
-         <a href="/podcast/{{ p.id }}">{{ p.group_member_name|striptags }}</a>
+         <a href="{% url podcast p.id %}">{{ p.group_member_name|striptags }}</a>
         {% endfor %}
        )
      {% endif %}
@@ -55,7 +55,7 @@
 <div class="pagination">
 
  {% if results.has_previous %}
-  <a href="?q={{ q }}&page={{ results.previous_page_number }}">«</a>
+  <a href="{% url search %}?q={{ q }}&page={{ results.previous_page_number }}">«</a>
  {% endif %}
 
  {% for page in page_list %}
@@ -67,14 +67,14 @@
      {% if page == results.number %}
       <strong>{{ page }}</strong>
      {% else %}
-      <a href="?q={{ q }}&page={{ page }}">{{ page }}</a>
+      <a href="{% url search %}?q={{ q }}&page={{ page }}">{{ page }}</a>
      {% endif %}
    {% endif %}
   </span>
  {% endfor %}
 
  {% if results.has_next %}
-  <a href="?q={{ q }}&page={{ results.next_page_number }}">»</a>
+  <a href="{% url search %}?q={{ q }}&page={{ results.next_page_number }}">»</a>
  {% endif %}
 
 </div>

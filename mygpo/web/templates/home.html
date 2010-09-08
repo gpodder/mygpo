@@ -33,7 +33,11 @@
   your notebook and on your mobile phone.{% endblocktrans %}</p>
 
  <h3><img style="vertical-align: middle;" src="/media/emblem-favorite.png" alt="" /> {% trans "Discover New Podcasts" %}</h3>
- <p>{% blocktrans %}Find new interesting podcasts in our <a href="/directory/">directory</a> and <a href="/toplist/">toplist</a>, see what's <a href="/toplist/episodes">currently listened</a> to by our users and get personalized suggestions.{% endblocktrans %}</p>
+
+ {% url directory-home as directory-home-url %}
+ {% url toplist as toplist-url %}
+ {% url episode-toplist as episode-toplist-url %}
+ <p>{% blocktrans %}Find new interesting podcasts in our <a href="{{ directory-home-url }}">directory</a> and <a href="{{ toplist-url }}">toplist</a>, see what's <a href="{{ episode-toplist-url }}">currently listened</a> to by our users and get personalized suggestions.{% endblocktrans %}</p>
 
  <h3><img style="vertical-align: middle;" src="/media/openshareicon-16x16.png" alt="" /> {% trans "Share Interesting Podcasts" %}</h3>
  <p>{% blocktrans %}Share your podcast subscriptions and favorite episodes with other users and get recommendations by others.{% endblocktrans %}</p>
@@ -53,14 +57,14 @@
    {{ sponsored_podcast.podcast|podcast_logo }}
    <div style="margin-left: 40px">{{ sponsored_podcast.text}}</div>
    <br style="clear: left;"/>
-   <small><a href="publisher/advertise">advertise here</a></small>
+   <small><a href="{% url advertise %}">advertise here</a></small>
   {% endif %}
  </div>
 
  <div class="come-in-box">
-  <a href="/register/">{% trans "Register" %}</a>
+  <a href="{% url register %}">{% trans "Register" %}</a>
   {% trans "or" %}
-  <a href="/login/">{% trans "Login" %}</a>
+  <a href="{% url login %}">{% trans "Login" %}</a>
  </div>
 
 </div>
@@ -104,14 +108,14 @@
    <tr>
     <td>{{ podcast|podcast_logo }}
     <td>
-     <a href="/podcast/{{ podcast.id }}">
+     <a href="{% url podcast podcast.id %}">
       {{ podcast.title }}
      </a>
    </tr>
   {% endfor %}
   <tr>
    <td></td>
-   <td><a href="/toplist/">{% trans "more..." %}</a></td>
+   <td><a href="{% url toplist %}">{% trans "more..." %}</a></td>
   </tr>
  </table>
 </div>

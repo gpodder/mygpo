@@ -16,16 +16,22 @@
  <div class="intro-box">
  <h2>{% trans "Overview" %}</h2>
  {% if not subscribed_podcasts %}
-  <p>{% blocktrans with site as sitename %}Welcome to {{ sitename }}! You can start using the site by <a href="/online-help">uploading your subscriptions</a> with a supported client. You can then manage your subscriptions online, sync your devices and discover new interesting podcasts.{% endblocktrans %}</p>
+  {% url help as help-url %}
+  <p>{% blocktrans with site as sitename %}Welcome to {{ sitename }}! You can start using the site by <a href="{{ help-url }}">uploading your subscriptions</a> with a supported client. You can then manage your subscriptions online, sync your devices and discover new interesting podcasts.{% endblocktrans %}</p>
  {% else %}
+  {% url subscriptions as subscriptions-url %}
+  {% url devices as devices-url %}
+  {% url share as share-url %}
+  {% url suggestions as suggestions-url %}
+  {% url toplist as toplist-url %}
   <p>{% blocktrans with subscribed_podcasts|length as subscription_count and devices|length as device_count %}
-   You have subscribed to <a href="/subscriptions/">{{ subscription_count }} podcasts</a> on <a href="/devices/">{{ device_count }} devices</a>. Now you can
+   You have subscribed to <a href="{{ subscriptions-url }}">{{ subscription_count }} podcasts</a> on <a href="{{ devices-url }}">{{ device_count }} devices</a>. Now you can
    <ul>
-    <li><a href="/share/">share your subscriptions with others</a></li>
-    <li><a href="/subscriptions/">manage your subscriptions</a></li>
-    <li><a href="/devices/">synchronize your devices</a></li>
-    <li><a href="/suggestions/">view our suggested podcasts</a></li>
-    <li><a href="/toplist/">discover new podcasts in our toplist</a></li>
+    <li><a href="{{ share-url }}">share your subscriptions with others</a></li>
+    <li><a href="{{ subscriptions-url }}">manage your subscriptions</a></li>
+    <li><a href="{{ devices-url }}">synchronize your devices</a></li>
+    <li><a href="{{ suggestions-url }}">view our suggested podcasts</a></li>
+    <li><a href="{{ toplist-url }}">discover new podcasts in our toplist</a></li>
    </ul>
   {% endblocktrans %}</p>
 
@@ -37,7 +43,7 @@
    <div>{{ sponsored_podcast.podcast|podcast_logo }}</div>
    <div style="margin-left: 40px">{{ sponsored_podcast.text|truncatewords:"20"}}</div>
    <br style="clear: left;"/>
-   <small><a href="publisher/advertise">advertise here</a></small>
+   <small><a href="{% url advertise %}">advertise here</a></small>
   </div>
  {% endif %}
 
@@ -50,7 +56,7 @@
    {% for podcast in random_podcasts %}
     <tr>
      <td>{{ podcast|podcast_logo }}</td>
-     <td><a href="/podcast/{{ podcast.id}}">{{ podcast.title|striptags }}</a></td>
+     <td><a href="{% url podcast podcast.id %}">{{ podcast.title|striptags }}</a></td>
     </tr>
    {% endfor %}
   </table>
@@ -68,14 +74,14 @@
    {% for episode in newest_episodes %}
     <tr>
      <td>{{ episode.podcast|podcast_logo }}</td>
-     <td><a href="/episode/{{ episode.id }}">
+     <td><a href="{% url episode episode.id %}">
       {% if episode.title %}
        {{ episode.title|striptags }}
       {% else %}
        {% trans "Unnamed Episode" %}
       {% endif %}
       </a><br/>
-      <span class="from_podcast">{% trans "from" %} <a href="/podcast/{{ episode.podcast.id }}">{{ episode.podcast|striptags }}</a>
+      <span class="from_podcast">{% trans "from" %} <a href="{% url podcast episode.podcast.id %}">{{ episode.podcast|striptags }}</a>
      </td>
      <td>{{ episode.timestamp|naturalday }}</td>
     </tr>

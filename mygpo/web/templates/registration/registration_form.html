@@ -15,9 +15,9 @@
   <h1>{% trans "Create a User Account" %}</h1>
   <p>
       {% trans "Already got an account?" %}
-      <a href="/login/">{% trans "Login here" %}</a>
+      <a href="{% url login %}">{% trans "Login here" %}</a>
   </p>
-  <form action="/register/" method="POST">
+  <form action="{% url register %}" method="POST">
   {% csrf_token %}
   <table class="register">
    {{ form.as_table }}
@@ -26,7 +26,9 @@
   </form>
 
   <p>{% trans "After registration, you'll receive an activation email to confirm the validity of your email address." %}</p>
-  <p>{% blocktrans %}If it doesn't arrive, you can <a href="/register/resend-activation">resend</a> it.{% endblocktrans %}</a>
+
+  {% url resend-activation as resend-activation-url %}
+  <p>{% blocktrans %}If it doesn't arrive, you can <a href="{{ resend-activation-url }}">resend</a> it.{% endblocktrans %}</a>
 
 {% endif %}
 

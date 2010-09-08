@@ -36,7 +36,7 @@
    <div class="related-podcasts">
     <strong>{% trans "Also available" %}</strong>
     {% for p in related_podcasts %}
-     <a href="/podcast/{{ p.id }}">{{ p.group_member_name|striptags }}</a>
+     <a href="{% url podcast p.id %}">{{ p.group_member_name|striptags }}</a>
     {% endfor %}
    </div>
   {% endif %}
@@ -53,7 +53,7 @@
       <div class="success">{% trans "Your settings have been saved." %}</div>
      {% endif %}
 
-     <form action="" method="POST">
+     <form action="{% url podcast podcast.id %}" method="POST">
          {% csrf_token %}
          <p>{{ privacy_form.public }} {{ privacy_form.public.label_tag }}</p>
          <input type="submit" value="Save" />
@@ -62,7 +62,7 @@
    {% endif %}
 
   {% if not user.is_authenticated %}
-      <div class="subscribe"><a href="/podcast/{{ podcast.id }}/subscribe"><img src="/media/subscribe.png" style="vertical-align: middle;" alt=""/> {% trans "Subscribe to this podcast" %}</a></div>
+      <div class="subscribe"><a href="{% url subscribe podcast.id %}"><img src="/media/subscribe.png" style="vertical-align: middle;" alt=""/> {% trans "Subscribe to this podcast" %}</a></div>
   {% endif %}
 
   {% if devices %}
@@ -75,16 +75,16 @@
         <tr>
             <td>
                 {{ device|device_icon }}
-                <a href="/device/{{ device.id }}">{{ device|striptags }}</a>
+                <a href="{% url device device.id %}">{{ device|striptags }}</a>
             </td>
             <td style="text-align: center;">
-                <a href="/podcast/{{ podcast.id }}/unsubscribe/{{ device.id }}?return_to=/podcast/{{ podcast.id }}"><img src="/media/unsubscribe.png" alt="{% trans "Unsubscribe" %}" title="{% trans "Click here to unsubscribe" %}"/></a>
+                <a href="{% url unsubscribe podcast.id device.id %}?return_to=/podcast/{{ podcast.id }}"><img src="/media/unsubscribe.png" alt="{% trans "Unsubscribe" %}" title="{% trans "Click here to unsubscribe" %}"/></a>
             </td>
         </tr>
     {% endfor %}
         {% if can_subscribe %}
          <tr>
-          <form action="/podcast/{{ podcast.id}}/subscribe" method="post">
+          <form action="{% url subscribe podcast.id %}" method="post">
            {% csrf_token %}
            <td>{{ subscribe_form.as_p }}</td>
            <td style="text-align: center;">
@@ -101,7 +101,7 @@
      <h3>Tags</h3>
      {% for tag in tags %}{% spaceless %}
        {% if tag.is_own %}
-        <span class="own">{{ tag.tag }} <a class="remove" href="/podcast/{{ podcast.id }}/remove-tag?tag={{ tag.tag }}">X</a></span>
+        <span class="own">{{ tag.tag }} <a class="remove" href="{% url remove-tag podcast.id %}?tag={{ tag.tag }}">X</a></span>
        {% else %}
         <span class="other">{{ tag.tag }}</span>
        {% endif %}
@@ -131,7 +131,7 @@
      <tr>
       <td style="text-align: center; padding-left: 5px; padding-right: 5px;">{{ episode.action|episode_status_icon }}</td>
       <td style="width: 500px;">
-          <p class="title"><a href="/episode/{{ episode.id }}">{{ episode.title|default:"Unknown Episode"|striptags }}</a></p>
+          <p class="title"><a href="{% url episode episode.id %}">{{ episode.title|default:"Unknown Episode"|striptags }}</a></p>
           <p class="description">{{ episode.description|default:""|striptags|truncatewords:"15" }}</p>
       </td>
       <td>{{ episode.timestamp|default:""|date:"Y-m-d" }}</td>
@@ -159,7 +159,7 @@
       <td><abbr title="{{ s.timestamp }}">{{ s.timestamp|naturalday }}</abbr></td>
       <td>{{ s|podcast_status_icon }}</td>
       <td>
-       <a href="/device/{{ s.device.id }}">{{ s.device|device_icon }} {{ s.device.name|striptags }}</a></td>
+       <a href="{% url device s.device.id %}">{{ s.device|device_icon }} {{ s.device.name|striptags }}</a></td>
      </tr>
     {% endfor %}
    </table>

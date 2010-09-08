@@ -26,7 +26,7 @@
 
   <h1>{% trans "Publisher Pages:" %} {% if episode.title %}{{ episode.title|striptags }}{% else %}{% trans "Unnamed Episode" %}{%endif%}</h1>
   <small class="description">
-      {% trans "from" %} <a href="/podcast/{{ episode.podcast.id }}">{{ episode.podcast }}</a>{% if episode.timestamp %}, {% trans "released" %} {{episode.timestamp}}{% endif %},
+      {% trans "from" %} <a href="{% url podcast episode.podcast.id %}">{{ episode.podcast }}</a>{% if episode.timestamp %}, {% trans "released" %} {{episode.timestamp}}{% endif %},
       {% trans "links" %}:
       <a href="{{episode.url}}">{% trans "download" %}</a>{% if episode.link and episode.link != episode.url %}, <a href="{{episode.link}}">{% trans "website" %}</a>
       {% endif %},
@@ -34,7 +34,7 @@
   </small>
   <hr style="clear: none;"/>
 
-  <p><a href="/publisher/podcast/{{ episode.podcast.id }}/episodes">{% trans "Return to the episode list" %}</a></p>
+  <p><a href="{% url podcast-publisher-episodes episode.podcast.id %}">{% trans "Return to the episode list" %}</a></p>
 
   <h2>{% trans "Edit" %}</h2>
   {% if episode.outdated %}
@@ -43,7 +43,7 @@
    <p>Please note that updates from the podcast feed will overwrite any information given here. Please save only what is not contained in the feed.</p>
   {% endif %}
 
-  <form method="post" action".">
+  <form method="post" action"{% url episode-publisher-detail episode.id %}">
    {% csrf_token %}
    <table>
     {{ form.as_table }}

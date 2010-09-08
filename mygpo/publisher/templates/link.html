@@ -3,7 +3,7 @@
 
 {% load menu %}
 {% block mainmenu %}{{ "/publisher/"|main_menu }}{% endblock %}
-{% block sectionmenu %}{{ "/publisher/link/"|section_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/publisher/link"|section_menu }}{% endblock %}
 
 {% block title %}{% trans "For Podcast Authors" %}{% endblock %}
 
@@ -14,6 +14,6 @@
   <p>{% blocktrans with url as sitename %}You can paste this code on your website, so users of {{ sitename }} can directly subscribe to your podcast!{% endblocktrans %}</p>
   <p>{% trans "Change the field 'YOUR_ADRESS' with the adress of your podcast." %}</p>
   <p>
-   <textarea cols="80" rows="1"><a href="http://{{ url }}/subscribe?url=YOUR_ADRESS"><img src="http://{{ url }}/media/author_subscribe.png" /></a></textarea>
+   <textarea cols="80" rows="1"><a href="http://{{ url }}{% url subscribe-by-url %}?url=YOUR_ADRESS"><img src="http://{{ url }}/media/author_subscribe.png" /></a></textarea>
   </p>
 {% endblock %}

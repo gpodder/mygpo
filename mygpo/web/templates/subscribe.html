@@ -34,15 +34,17 @@
 
    <h2>{% trans "Add a podcast" %}</h2>
   {% if can_subscribe %}
-   <form action="" method="post">
+   <form action="{% url subscribe podcast.id %}" method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="{% trans "Subscribe" %}" />
 </form>
-<p style="padding-top: 20px;"><a href="/podcast/{{ podcast.id }}">{% trans "Back to the podcast page" %}</a></p>
+<p style="padding-top: 20px;"><a href="{% url podcast podcast.id %}">{% trans "Back to the podcast page" %}</a></p>
   {% else %}
    <p>{% trans "You can't subscribe to this podcast, because you don't have any devices (on which you don't have subscribed to the podcast already." %}</p>
-   <p>{% blocktrans %}If you're new here, you should start by reading our <a href="/online-help/">introduction</a>.{% endblocktrans %}</p>
+
+   {% url help as help-url %}
+   <p>{% blocktrans %}If you're new here, you should start by reading our <a href="{{ help-url }}">introduction</a>.{% endblocktrans %}</p>
   {% endif %}
 
   {% if not podcast.title %}

@@ -28,9 +28,9 @@
     {% for subscription in subscriptions %}
      <tr>
       <td>{{ subscription.podcast|podcast_logo }}</td>
-      <td><a href="/podcast/{{subscription.podcast.id}}">{{ subscription.podcast|striptags }}</a></td>
+      <td><a href="{% url podcast subscription.podcast.id %}">{{ subscription.podcast|striptags }}</a></td>
       <td><abbr title="{{subscription.subscribed_since}}">{{subscription.subscribed_since|naturalday}}</abbr></td>
-      <td style="text-align: center;"><a href="/podcast/{{subscription.podcast.id}}/unsubscribe/{{ device.id }}?return_to=/device/{{ device.id }}"><img src="/media/unsubscribe.png" /></a></td>
+      <td style="text-align: center;"><a href="{% url unsubscribe subscription.podcast.id device.id %}?return_to=/device/{{ device.id }}"><img src="/media/unsubscribe.png" /></a></td>
      </tr>
     {% endfor %}
    </table>
@@ -39,13 +39,13 @@
   {% endif %}
 
   <div>
-   <a href="/device/{{ device.id }}.opml">
+   <a href="{% url device-opml device.id %}">
     <img src="/media/opml-icon-22x22.png" class="action-button" /> {% trans "Download Subscriptions as OPML" %}
    </a>
   </div>
 
   <div>
-   <a href="/device/{{ device.id }}/history">
+   <a href="{% url device-history device.id %}">
     <img src="/media/office-calendar.png" class="action-button" />
     {% blocktrans with device.name|striptags as devicename %} Show history for {{ devicename }} {% endblocktrans %}</a>
    </a>
@@ -54,7 +54,7 @@
   {% if not device.deleted %}
 
   <div>
-   <a href="/device/{{ device.id}}/edit">
+   <a href="{% url device-edit device.id %}">
     <img src="/media/preferences-system-22.png" class="action-button" />
     {% trans "Edit Device" %}
    </a>
@@ -70,12 +70,12 @@
   {% else %}
 
    <p>{% blocktrans with device.name|striptags as devicename and synced_with|device_list as synclist %}{{ devicename }} is currently synchronized with {{ synclist }}.{% endblocktrans %}</p>
-   <a href="/device/{{ device.id }}/unsync">{% blocktrans with device.name|striptags as devicename %}Stop synchronisation for {{ devicename }} {% endblocktrans %}</a>
+   <a href="{% url device-unsync device.id %}">{% blocktrans with device.name|striptags as devicename %}Stop synchronisation for {{ devicename }} {% endblocktrans %}</a>
   
   {% endif %}
 
   {% if has_sync_targets %}
-   <form action="/device/{{ device.id }}/sync" method="POST">
+   <form action="{% url device-sync device.id %}" method="POST">
     {% csrf_token %}
     {{ sync_form.as_p }}
     <input type="submit" value="{% trans "OK" %}" />

@@ -19,7 +19,7 @@
   <input type="hidden" name="{{ key }}" value="{{ value }}" />
  {% endfor %}
  <input type="submit" value="{% trans "Yes" %}" />
- <a href="/">{% trans "No" %}</a>
+ <a href="{% url home %}">{% trans "No" %}</a>
 </form>
 
 {% endblock %}

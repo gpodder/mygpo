@@ -14,7 +14,8 @@
 <h1>{% trans "My Podcast Subscriptions" %}</h1>
 
  {% if not subscriptionlist|length_is:"0" %}
- <p>{% trans "This is a list of your podcast subscriptions." %} {% blocktrans %}You can <a href="/share/">share</a> it with others.{% endblocktrans %}</p>
+ {% url share as share-url %}
+ <p>{% trans "This is a list of your podcast subscriptions." %} {% blocktrans %}You can <a href="{{ share-url }}">share</a> it with others.{% endblocktrans %}</p>
 
  <table class="list podcast_list">
   <tr>
@@ -26,9 +27,9 @@
   {% for s in subscriptionlist %}
    <tr>
     <td>{{ s.podcast|podcast_logo }}</td>
-    <td><a class="listlink" href="/podcast/{{ s.podcast.id }}">{{ s.podcast|striptags }}</a><br/><span class="latest_episode">
+    <td><a class="listlink" href="{% url podcast s.podcast.id %}">{{ s.podcast|striptags }}</a><br/><span class="latest_episode">
     {% if s.episode %}
-    {% trans "Latest Episode:" %} <a href="/episode/{{s.episode.id}}">{{ s.episode.title|default:"Unnamed Episode"|striptags }}</a>
+    {% trans "Latest Episode:" %} <a href="{% url episode s.episode.id %}">{{ s.episode.title|default:"Unnamed Episode"|striptags }}</a>
       {% if s.episode.action %}
           ({{ s.episode.timestamp|date:"Y-m-d" }}, {{s.episode.action|episode_status_text }})
       {% else %}
@@ -44,7 +45,7 @@
   </table>
 
   <div>
-   <a href="/subscriptions/all.opml">
+   <a href="{% url subscriptions-download %}">
     <img src="/media/opml-icon-22x22.png" style="vertical-align: middle;" /> {% trans "Download Subscriptions as OPML" %}
    </a>
   </div>
@@ -58,8 +59,11 @@
 
  <div class="info">
   <strong>{% trans "Subscribe to new Podcasts!" %}</strong>
-  {% blocktrans %}Browse the <a href="/toplist/">toplist</a> and your <a href="/suggestions/">personal suggestions</a>, <a href="/search/">search</a> or simply copy and paste the podcast's URL here{% endblocktrans %}
-  <form method="get" action="/subscribe">
+  {% url toplist as toplist-url %}
+  {% url search as search-url %}
+  {% url suggestions as suggestions-url %}
+  {% blocktrans %}Browse the <a href="{{ toplist-url }}">toplist</a> and your <a href="{{ suggestions-url }}">personal suggestions</a>, <a href="{{ search-url }}">search</a> or simply copy and paste the podcast's URL here{% endblocktrans %}
+  <form method="get" action="{% url subscribe-by-url %}">
    <input class="url" name="url" type="text" />
    <input type="submit" value="{% trans "Subscribe" %}" />
   </form>

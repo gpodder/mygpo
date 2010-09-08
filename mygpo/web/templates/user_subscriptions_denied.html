@@ -4,7 +4,7 @@
 
 {% load menu %}
 {% block mainmenu %}{{ "/user/subscriptions/"|main_menu }}{% endblock %}
-{% block sectionmenu %}{{ "/user/subscription/"|section_menu:other_user.username }}{% endblock %}
+{% block sectionmenu %}{{ "/user/subscriptions/"|section_menu:other_user.username }}{% endblock %}
 
 {% block title %}
  {% blocktrans with other_user.username as username%}{{ username }}'s Subscriptions{% endblocktrans %}

@@ -13,7 +13,9 @@
   
   <p>
    {% if public_subscriptions %}
-    {% blocktrans %}We include anonymized data about the following subscriptions in our public statistics. You can exclude specific podcasts or <a href="/account/privacy?private_subscriptions">all at once</a>.{% endblocktrans %}
+
+    {% url privacy as privacy-url %}
+    {% blocktrans %}We include anonymized data about the following subscriptions in our public statistics. You can exclude specific podcasts or <a href="{{ privacy-url }}?private_subscriptions">all at once</a>.{% endblocktrans %}
     <table class="list">
      <tr>
       <th></th>
@@ -24,8 +26,8 @@
      {% for podcast in included_subscriptions %}
       <tr>
        <td>{{ podcast|podcast_logo }}</td>
-       <td><a href="/podcast/{{ podcast.id }}">{{ podcast.title|striptags|default:"Unnamed Podcast" }}</a></td>
-       <td><a href="/account/privacy?exclude={{ podcast.id }}"><img src="/media/unsubscribe.png" alt="{% trans "Mark private" %}" /></a></td>
+       <td><a href="{% url podcast podcast.id %}">{{ podcast.title|striptags|default:"Unnamed Podcast" }}</a></td>
+       <td><a href="{% url privacy %}?exclude={{ podcast.id }}"><img src="/media/unsubscribe.png" alt="{% trans "Mark private" %}" /></a></td>
       </tr>
      {% endfor %}
     </table>
@@ -42,14 +44,16 @@
       {% for podcast in excluded_subscriptions %}
        <tr>
         <td>{{ podcast|podcast_logo }}</td>
-        <td><a href="/podcast/{{ podcast.id }}">{{ podcast.title|striptags|default:"Unnamed Podcast" }}</a></td>
-        <td><a href="/account/privacy?include={{ podcast.id }}"><img src="/media/edit-undo.png" alt="{% trans "Mark private" %}" /></a></td>
+        <td><a href="{% url podcast podcast.id %}">{{ podcast.title|striptags|default:"Unnamed Podcast" }}</a></td>
+        <td><a href="{% url privacy %}?include={{ podcast.id }}"><img src="/media/edit-undo.png" alt="{% trans "Mark private" %}" /></a></td>
        </tr>
       {% endfor %}
      </table>
     {% endif %}
    {% else %}
-    {% blocktrans %}We don't include your subscriptions in our public statistics. <a href="/account/privacy?public_subscriptions">Include my data.</a>{% endblocktrans %}
+
+    {% url privacy as privacy-url %}
+    {% blocktrans %}We don't include your subscriptions in our public statistics. <a href="{{ privacy-url }}?public_subscriptions">Include my data.</a>{% endblocktrans %}
    {% endif %}
   </p>
 {% endblock %}

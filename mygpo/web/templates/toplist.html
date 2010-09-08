@@ -43,7 +43,7 @@
   {% if languages|length_is:"0" %}
    <div>{% trans "Currently showing all languages." %}<br />
     {% trans "Show a specific one:" %}
-    <form action="/toplist/?lang={{ languages|join:"," }}" method="post">
+    <form action="{% url toplist %}?lang={{ languages|join:"," }}" method="post">
      {% csrf_token %}
      <select name="lang">
       {% for key, name in all_languages.iteritems %}
@@ -58,11 +58,11 @@
     <ul>
      {% for lang in languages %}
       <li>
-       <a href="/toplist/?lang={{ languages|remove:lang|join:"," }}&types={{ types|filter_dict|join:"," }}">{{ all_languages|lookup:lang }}</a>
+       <a href="{% url toplist %}?lang={{ languages|remove:lang|join:"," }}&types={{ types|filter_dict|join:"," }}">{{ all_languages|lookup:lang }}</a>
       </li>
      {% endfor %}
     </ul>
-    <form action="/toplist/?lang={{ languages|join:"," }}&types={{ types|filter_dict|join:"," }}" method="post">
+    <form action="{% url toplist %}?lang={{ languages|join:"," }}&types={{ types|filter_dict|join:"," }}" method="post">
      {% csrf_token %}
      <select name="lang">
       {% for key, name in all_languages.iteritems %}
@@ -73,7 +73,9 @@
      </select>
      <input type="submit" value="{% trans "Add" %}" />
     </form>
-    {% blocktrans with types|filter_dict|join:"," as type_param %}or show <a href="/toplist?lang=&types={{ type_param }}">all languages</a>.{% endblocktrans %}
+
+    {% url toplist as toplist-url %}
+    {% blocktrans with types|filter_dict|join:"," as type_param %}or show <a href="{{ toplist-url }}?lang=&types={{ type_param }}">all languages</a>.{% endblocktrans %}
    </div>
   {% endif %}
  </div>
@@ -82,9 +84,9 @@
   <h3>Media Types</h3>
   {% for type, enabled in types.iteritems %}
    {% if enabled %}
-    <a class="activated" href="/toplist/?lang={{ languages|join:"," }}&types={{ types|filter_dict|remove:type|join:"," }} ">{{ type }}</a>
+    <a class="activated" href="{% url toplist %}?lang={{ languages|join:"," }}&types={{ types|filter_dict|remove:type|join:"," }} ">{{ type }}</a>
    {% else %}
-    <a class="deactivated" href="/toplist/?lang={{ languages|join:"," }}&types={{ types|filter_dict|append:type|join:"," }}">{{ type }}</a>
+    <a class="deactivated" href="{% url toplist %}?lang={{ languages|join:"," }}&types={{ types|filter_dict|append:type|join:"," }}">{{ type }}</a>
    {% endif %}
   {% endfor %}
  </div>
@@ -122,12 +124,12 @@
     </td>
     <td>
      {% if entry.podcast %}
-      <a href="/podcast/{{ entry.podcast.id }}">{{ entry.podcast|striptags }}</a>
+      <a href="{% url podcast entry.podcast.id %}">{{ entry.podcast|striptags }}</a>
      {% else %}
       {{entry.podcast_group.title|striptags}}
       (
        {% for p in entry.podcast_group.podcasts %}
-        <a href="/podcast/{{ p.id }}">{{ p.group_member_name|striptags }}</a>
+        <a href="{% url podcast p.id %}">{{ p.group_member_name|striptags }}</a>
        {% endfor %}
       )
      {% endif %}
@@ -137,6 +139,6 @@
   {% endfor %}
   </table>
 
-  <div class="info"><strong>Get the toplist from your Client</strong>! Access <a href="/toplist/30.opml">http://{{ url }}/toplist/30.opml</a> for the Top-30.</div>
+  <div class="info"><strong>Get the toplist from your Client</strong>! Access <a href="{% url toplist-opml 30 "opml" %}">http://{{ url }}{% url toplist-opml 30 "opml" %}</a> for the Top-30.</div>
 {% endblock %}
 

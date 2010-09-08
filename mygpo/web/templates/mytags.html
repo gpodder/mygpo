@@ -19,11 +19,11 @@
    {% for podcast, taglist in tags_podcast.items %}
     <tr>
      <td>{{ podcast|podcast_logo }}</td>
-     <td><a href="/podcast/{{ podcast.id}}">{{ podcast|striptags}}</a></td>
+     <td><a href="{% url podcast podcast.id %}">{{ podcast|striptags}}</a></td>
      <td class="tag-list">
      {% for tag in taglist %}{% spaceless %}
        {% if tag.is_own %}
-        <span class="own">{{ tag.tag }} <a class="remove" href="/podcast/{{ podcast.id }}/remove-tag?tag={{ tag.tag }}&next=mytags">X</a></span>
+        <span class="own">{{ tag.tag }} <a class="remove" href="{% url remove-tag podcast.id %}?tag={{ tag.tag }}&next=mytags">X</a></span>
        {% else %}
         <span class="other">{{ tag.tag }}</span>
        {% endif %}
@@ -31,7 +31,7 @@
       {% endspaceless %}
      {% endfor %}
      {% if user.is_authenticated %}
-      <form action="/podcast/{{ podcast.id }}/add-tag">
+      <form action="{% url add-tag podcast.id %}">
        <input type="text" name="tag" />
        <input type="submit" value="Add" />
        <input type="hidden" name="next" value="mytags" />
@@ -50,7 +50,7 @@
     <td>{{ tag }}</td>
     <td>
      {% for podcast in podcast_list %}
-      <a href="/podcast/{{ podcast.podcast.id }}">{{ podcast.podcast|podcast_logo }}</a>
+      <a href="{% url podcast podcast.podcast.id %}">{{ podcast.podcast|podcast_logo }}</a>
      {% endfor %}
     </td>
    </tr>
@@ -63,7 +63,8 @@
 
   <h1>{% trans "My Tags" %}</h1>
   <div class="info">
-   {% blocktrans %}You didn't tag any photos yet. Go to your <a href="/subscriptions/">subscriptions</a> and tag some.{% endblocktrans %}
+   {% url subscriptions as subscriptions-url %}
+   {% blocktrans %}You didn't tag any photos yet. Go to your <a href="{{ subscriptions-url }}">subscriptions</a> and tag some.{% endblocktrans %}
   </div>
  {% endif %}
 

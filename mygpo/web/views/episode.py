@@ -119,7 +119,8 @@ def list_favorites(request):
     token, c = SecurityToken.objects.get_or_create(user=request.user, object='fav-feed', action='r', \
         defaults={'token': "".join(random.sample(string.letters+string.digits, 8))})
 
-    feed_url = 'http://%s/user/%s/favorites.xml' % (site.domain, request.user)
+    from django.core.urlresolvers import reverse
+    feed_url = 'http://%s/%s' % (site.domain, reverse('favorites-feed', args=[request.user.username]))
 
     try:
         podcast = Podcast.objects.get(url=feed_url)
@@ -139,7 +140,6 @@ def list_favorites(request):
         'episodes': episodes,
         'feed_token': token,
         'site': site,
-        'feed_url': feed_url,
         'podcast': podcast,
         }, context_instance=RequestContext(request))
 

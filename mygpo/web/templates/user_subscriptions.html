@@ -23,13 +23,13 @@
   {% for p in subscriptions %}
    <tr>
     <td>{{ p|podcast_logo }}</td>
-    <td><a class="listlink" href="/podcast/{{ p.id }}">{{ p|striptags }}</a></td>
+    <td><a class="listlink" href="{% url podcast p.id %}">{{ p|striptags }}</a></td>
    </tr>
   {% endfor %}
   </table>
 
   <div>
-   <a href="/user/{{ other_user.username}}/subscriptions.opml{% if token.token %}?token={{ token.token }}{% endif %}">
+   <a href="{% url shared-subscriptions-opml other_user.username %}{% if token.token %}?token={{ token.token }}{% endif %}">
     <img src="/media/download.png" class="action-button" /> {% trans "Download Subscriptions as OPML" %}
    </a>
   </div>
@@ -41,7 +41,10 @@
  {% endif %}
 
  {% if user.is_authenticated %}
-  <div class="info"><strong>{% trans "Want to share your subscriptions?" %}</strong> {% blocktrans %}Get your link on the <a href="/share/">Sharing page</a>.</a>{% endblocktrans %}</div>
+  <div class="info"><strong>{% trans "Want to share your subscriptions?" %}</strong>
+
+  {% url share as share-url %}
+  {% blocktrans %}Get your link on the <a href="{{ share-url }}">Sharing page</a>.</a>{% endblocktrans %}</div>
  {% endif %}
 
 {% endblock %}

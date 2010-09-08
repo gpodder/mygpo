@@ -9,7 +9,7 @@
 
 {% block content %}
   {% if restore_password_form %}
-   <form action="/register/restore_password" method="POST">
+   <form action="{% url restore-password %}" method="POST">
        {% csrf_token %}
        <table style="width: 400px; margin-left: auto; margin-right: auto;">
            <tr>
@@ -45,14 +45,14 @@
            </tr>
        </table>
    </form>
-   <p><a href="/login/">Back to the login page</a></p>
+   <p><a href="{% url login %}">Back to the login page</a></p>
   {% else %}
     {% if next %}
     <div class="error">
         {% trans "You need to login to access this page." %}
     </div>
     {% endif %}
-  <form action="../login/" method="post">
+  <form action="{% url login %}" method="post">
       {% csrf_token %}
       <input name="next" type="hidden" value="{{ next }}" /><br />
       <table style="margin-left: auto; margin-right: auto;">
@@ -71,7 +71,7 @@
           </tr>
           <tr>
               <td colspan="2" style="text-align: right;">
-                  <small><a href="?restore_password=1">Forgot your password?</a><small><br/>
+                  <small><a href="{% url login %}?restore_password=1">Forgot your password?</a><small><br/>
                   <input type="submit" value="Login" style="margin-top: 10px;"/>
               </td>
           </tr>
@@ -82,7 +82,10 @@
 
   {% if activation_needed %}
    <div class="info">
-    <strong>{% trans "Didn't receive your activation mail?" %}</strong> {% blocktrans %}We can try to <a href="/register/resend-activation">send it again</a>.{% endblocktrans %}
+    <strong>{% trans "Didn't receive your activation mail?" %}</strong>
+
+    {% url resend-activation as resend-activation-url %}
+    {% blocktrans %}We can try to <a href="{{ resend-activation-url }}">send it again</a>.{% endblocktrans %}
    </div>
   {% endif %}
 
@@ -92,7 +95,7 @@
   </script>
   <p style="text-align: center; padding: 20px;">
       {% trans "Not yet a member?" %}
-      <a href="/register/">{% trans "Create a new account - it's free!" %}</a>
+      <a href="{% url register %}">{% trans "Create a new account - it's free!" %}</a>
   </p>
   {% endif %}
 

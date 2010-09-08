@@ -4,7 +4,7 @@
 {% block title %}{% trans "Resend activation e-mail" %}{% endblock %}
 
 {% block content %}
-   <form action="/register/resend-activation" method="POST">
+   <form action="{% url resend-activation %}" method="POST">
        {% csrf_token %}
        <table style="width: 400px; margin-left: auto; margin-right: auto;">
            <tr>
