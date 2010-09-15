@@ -25,7 +25,7 @@ from mygpo.decorators import manual_gc
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response
 from django.db.models import Sum
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.contrib.sites.models import Site
 from mygpo.constants import PODCAST_LOGO_SIZE, PODCAST_LOGO_BIG_SIZE
 from mygpo.web import utils
@@ -81,7 +81,9 @@ def dashboard(request, episode_count=10):
     site = Site.objects.get_current()
     devices = Device.objects.filter(user=request.user, deleted=False)
     subscribed_podcasts = set([s.podcast for s in Subscription.objects.filter(user=request.user)])
-    newest_episodes = Episode.objects.filter(podcast__in=subscribed_podcasts).order_by('-timestamp')[:episode_count]
+
+    tomorrow = datetime.today() + timedelta(days=1)
+    newest_episodes = Episode.objects.filter(podcast__in=subscribed_podcasts).filter(timestamp__lt=tomorrow).order_by('-timestamp')[:episode_count]
 
     lang = utils.get_accepted_lang(request)
     lang = utils.sanitize_language_codes(lang)
