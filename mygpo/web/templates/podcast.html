@@ -65,11 +65,11 @@
       <div class="subscribe"><a href="{% url subscribe podcast.id %}"><img src="/media/subscribe.png" style="vertical-align: middle;" alt=""/> {% trans "Subscribe to this podcast" %}</a></div>
   {% endif %}
 
-  {% if devices %}
+  {% if devices or can_subscribe %}
     <table class="list" id="subscribed-devices-list">
         <tr>
             <th>{% trans "Device" %}</th>
-            <th>{% trans "Unsubscribe" %}</th>
+            <th>{% trans "(Un)subscribe" %}</th>
         </tr>
     {% for device in devices %}
         <tr>
