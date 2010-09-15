@@ -27,7 +27,7 @@ urlpatterns = patterns('',
     (r'^',           include('mygpo.userfeeds.urls')),
     (r'^search/',    include('mygpo.search.urls')),
     (r'^accounts/',  include('registration.urls')),
-    (r'^publisher/', include('publisher.urls')),
+    (r'^publisher/', include('mygpo.publisher.urls')),
 
     (r'^admin/(.*)', admin.site.root),
     (r'^media/(?P<path>.*)$', 'django.views.static.serve',
