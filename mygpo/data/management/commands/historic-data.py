@@ -7,7 +7,7 @@ class Command(BaseCommand):
         max = Podcast.objects.count()
         n=0
 
-        for p in Podcast.objects.all().iterator():
+        for p in Podcast.objects.all().order_by('id').iterator():
             n+=1
             print '%d / %d: %d - %s' % (n, max, p.id, p)
             calc_podcast(p)
