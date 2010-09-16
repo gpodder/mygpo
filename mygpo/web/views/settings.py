@@ -25,7 +25,7 @@ from mygpo.web.forms import UserAccountForm
 from django.forms import ValidationError
 from django.utils.translation import ugettext as _
 from mygpo.api.basic_auth import require_valid_user
-from mygpo.decorators import manual_gc
+from mygpo.decorators import manual_gc, allowed_methods
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.contrib.sites.models import Site
@@ -33,6 +33,7 @@ from django.contrib.sites.models import Site
 
 @manual_gc
 @login_required
+@allowed_methods(['GET', 'POST'])
 def account(request):
     success = False
     error_message = ''
@@ -83,6 +84,7 @@ def account(request):
 
 @manual_gc
 @login_required
+@allowed_methods(['GET', 'POST'])
 def delete_account(request):
 
     if request.method == 'GET':
@@ -102,13 +104,8 @@ def delete_account(request):
 
 @manual_gc
 @login_required
+@allowed_methods(['GET'])
 def privacy(request):
-
-    if request.method == 'GET':
-        form = UserAccountForm({
-            'email': request.user.email,
-            'public': request.user.get_profile().public_profile
-            })
 
     if 'private_subscriptions' in request.GET:
         request.user.get_profile().settings['public_profile'] = False

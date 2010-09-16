@@ -11,13 +11,14 @@ from django.utils.translation import ugettext as _
 from mygpo.api.models import Podcast, Episode, EpisodeAction, Device, SubscriptionAction, Subscription, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SyncGroup
 from mygpo.web.forms import PrivacyForm, SyncForm
 from mygpo.data.models import Listener, PodcastTag
-from mygpo.decorators import manual_gc
+from mygpo.decorators import manual_gc, allowed_methods
 from mygpo.utils import daterange
 
 
 MAX_TAGS_ON_PAGE=50
 
 
+@allowed_methods(['GET', 'POST'])
 def show(request, pid):
     podcast = get_object_or_404(Podcast, pk=pid)
     episodes = episode_list(podcast, request.user)
@@ -184,6 +185,7 @@ def remove_tag(request, pid):
 
 @manual_gc
 @login_required
+@allowed_methods(['GET', 'POST'])
 def subscribe(request, pid):
     podcast = get_object_or_404(Podcast, pk=pid)
     error_message = None

@@ -18,7 +18,7 @@
 from django.contrib.auth.models import User
 from mygpo.api.basic_auth import require_valid_user, check_username
 from django.contrib import auth
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, Http404, HttpResponseNotAllowed
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, Http404
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.web.models import SecurityToken
 from django.shortcuts import get_object_or_404

@@ -27,7 +27,7 @@ from mygpo.api.models import UserProfile
 from mygpo.web.forms import RestorePasswordForm
 from django.contrib.sites.models import Site
 from django.conf import settings
-from mygpo.decorators import requires_token, manual_gc
+from mygpo.decorators import requires_token, manual_gc, allowed_methods
 from django.utils.translation import ugettext as _
 import string
 import random
@@ -135,11 +135,9 @@ def get_user(username, email):
     else:
         raise User.DoesNotExist('neither username nor email provided')
 
+
+@allowed_methods(['POST'])
 def restore_password(request):
-
-    if request.method != 'POST':
-        return HttpResponseRedirect('/login/')
-
     form = RestorePasswordForm(request.POST)
     if not form.is_valid():
         return HttpResponseRedirect('/login/')
@@ -164,6 +162,7 @@ def restore_password(request):
 
 
 @manual_gc
+@allowed_methods(['GET', 'POST'])
 def resend_activation(request):
     error_message = ''
 

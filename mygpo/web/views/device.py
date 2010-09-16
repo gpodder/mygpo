@@ -16,7 +16,7 @@
 #
 
 from django.shortcuts import render_to_response
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, Http404, HttpResponseForbidden
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest, Http404, HttpResponseForbidden
 from django.contrib.auth.models import User
 from django.template import RequestContext
 from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, EpisodeToplistEntry, Subscription, SuggestionEntry, SyncGroup, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SubscriptionMeta
@@ -33,7 +33,7 @@ from mygpo.api.sanitizing import sanitize_url
 from mygpo.log import log
 from mygpo.utils import daterange
 from mygpo.api import simple
-from mygpo.decorators import manual_gc
+from mygpo.decorators import manual_gc, allowed_methods
 import re
 import random
 import string
@@ -76,6 +76,7 @@ def show(request, device_id, error_message=None):
 
 
 @login_required
+@allowed_methods(['GET', 'POST'])
 def edit(request, device_id):
 
     device = get_object_or_404(Device, id=device_id, user=request.user)
@@ -125,10 +126,8 @@ def opml(request, device_id):
 
 @manual_gc
 @login_required
+@allowed_methods(['POST'])
 def delete(request, device_id):
-    if request.method != 'POST':
-        return HttpResponseNotAllowed(['POST'])
-
     device = Device.objects.get(pk=device_id)
     device.deleted = True
     device.save()
@@ -161,11 +160,8 @@ def undelete(request, device_id):
 
 @manual_gc
 @login_required
+@allowed_methods(['POST'])
 def sync(request, device_id):
-
-    if request.method != 'POST':
-        return HttpResponseNotAllowed(['POST'])
-
     form = SyncForm(request.POST)
     if not form.is_valid():
         return HttpResponseBadRequest('invalid')
@@ -184,10 +180,8 @@ def sync(request, device_id):
 
 @manual_gc
 @login_required
+@allowed_methods(['GET'])
 def unsync(request, device_id):
-    if request.method != 'GET':
-        return HttpResponseNotAllowed(['GET'])
-
     dev = Device.objects.get(pk=device_id)
 
     try:

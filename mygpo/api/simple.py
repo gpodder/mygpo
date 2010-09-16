@@ -16,7 +16,7 @@
 #
 
 from mygpo.api.basic_auth import require_valid_user, check_username
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed
+from django.http import HttpResponse, HttpResponseBadRequest
 from mygpo.api.models import Device, SubscriptionAction, Podcast, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SuggestionEntry
 from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
@@ -26,6 +26,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 from mygpo.search.models import SearchEntry
 from django.utils.translation import ugettext as _
+from mygpo.decorators import allowed_methods
 
 
 try:
@@ -54,6 +55,7 @@ def check_format(fn):
 @require_valid_user
 @check_username
 @check_format
+@allowed_methods(['GET', 'PUT', 'POST'])
 def subscriptions(request, username, device_uid, format):
 
     if request.method == 'GET':
@@ -65,18 +67,13 @@ def subscriptions(request, username, device_uid, format):
         subscriptions = parse_subscription(request.raw_post_data, format)
         return set_subscriptions(subscriptions, request.user, device_uid)
 
-    else:
-        return HttpResponseNotAllowed(['GET', 'PUT', 'POST'])
-
 
 @csrf_exempt
 @require_valid_user
 @check_username
 @check_format
+@allowed_methods(['GET'])
 def all_subscriptions(request, username, format):
-    if request.method != 'GET':
-        return HttpResponseNotAllowed(['GET'])
-
     subscriptions = get_all_subscriptions(request.user)
     title = _('%(username)s\'s Subscription List') % {'username': username}
     return format_podcast_list(subscriptions, format, title)
@@ -170,10 +167,8 @@ def set_subscriptions(urls, user, device_uid):
 
 
 @check_format
+@allowed_methods(['GET'])
 def toplist(request, count, format):
-    if request.method != 'GET':
-        return HttpResponseNotAllowed(['GET'])
-
     if int(count) not in range(1,100):
         count = 100
 
@@ -192,10 +187,8 @@ def toplist(request, count, format):
 
 
 @check_format
+@allowed_methods(['GET'])
 def search(request, format):
-    if request.method != 'GET':
-        return HttpResponseNotAllowed(['GET'])
-
     query = request.GET.get('q', '').encode('utf-8')
 
     if not query:
@@ -210,10 +203,8 @@ def search(request, format):
 
 @require_valid_user
 @check_format
+@allowed_methods(['GET'])
 def suggestions(request, count, format):
-    if request.method != 'GET':
-        return HttpResponseNotAllowed(['GET'])
-
     if int(count) not in range(1,100):
         count = 100
 

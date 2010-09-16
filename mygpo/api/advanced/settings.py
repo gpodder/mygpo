@@ -16,17 +16,19 @@
 #
 
 from mygpo.api.basic_auth import require_valid_user, check_username
-from django.http import HttpResponseBadRequest, HttpResponseNotAllowed
+from django.http import HttpResponseBadRequest
 from mygpo.api.httpresponse import JsonResponse
 from django.shortcuts import get_object_or_404
 from mygpo.api.models import Device, UserProfile, SubscriptionMeta, EpisodeSettings
 from django.views.decorators.csrf import csrf_exempt
+from mygpo.decorators import allowed_methods
 import json
 
 
 @csrf_exempt
 @require_valid_user
 @check_username
+@allowed_methods(['GET', 'POST'])
 def main(request, username, scope):
 
     models = dict(
@@ -49,9 +51,6 @@ def main(request, username, scope):
     elif request.method == 'POST':
         actions = json.loads(request.raw_post_data)
         return JsonResponse( update_settings(obj, actions) )
-
-    else:
-        return HttpResponseNotAllowed(['GET', 'POST'])
 
 
 def update_settings(obj, actions):

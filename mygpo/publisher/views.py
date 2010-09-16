@@ -9,7 +9,7 @@ from mygpo.publisher.forms import SearchPodcastForm, EpisodeForm, PodcastForm
 from mygpo.publisher.utils import listener_data, episode_listener_data, check_publisher_permission, episode_list, subscriber_data, device_stats, episode_heatmap
 from django.contrib.sites.models import Site
 from mygpo.data.feeddownloader import update_podcasts
-from mygpo.decorators import requires_token
+from mygpo.decorators import requires_token, allowed_methods
 from mygpo.web.models import SecurityToken
 from django.contrib.auth.models import User
 
@@ -43,6 +43,7 @@ def search_podcast(request):
         return HttpResponseRedirect('/publisher/')
 
 @require_publisher
+@allowed_methods(['GET', 'POST'])
 def podcast(request, id):
     p = get_object_or_404(Podcast, pk=id)
 
@@ -141,6 +142,7 @@ def episodes(request, id):
 
 
 @require_publisher
+@allowed_methods(['GET', 'POST'])
 def episode(request, id):
     e = get_object_or_404(Episode, pk=id)
 

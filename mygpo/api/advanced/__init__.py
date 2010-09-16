@@ -16,7 +16,7 @@
 #
 
 from mygpo.api.basic_auth import require_valid_user, check_username
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, Http404, HttpResponseNotAllowed
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, Http404
 from mygpo.api.models import Device, Podcast, SubscriptionAction, Episode, EpisodeAction, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, EPISODE_ACTION_TYPES, DEVICE_TYPES, Subscription
 from mygpo.api.models.users import EpisodeFavorite
 from mygpo.api.httpresponse import JsonResponse
@@ -30,6 +30,7 @@ from datetime import datetime, timedelta
 import dateutil.parser
 from mygpo.log import log
 from mygpo.utils import parse_time, parse_bool
+from mygpo.decorators import allowed_methods
 from django.db import IntegrityError
 import re
 from django.views.decorators.csrf import csrf_exempt
@@ -51,6 +52,7 @@ except ImportError:
 @csrf_exempt
 @require_valid_user
 @check_username
+@allowed_methods(['GET', 'POST'])
 def subscriptions(request, username, device_uid):
 
     now = datetime.now()
@@ -93,9 +95,6 @@ def subscriptions(request, username, device_uid):
             'timestamp': now_, 
             'update_urls': update_urls,
             })
-
-    else:
-        return HttpResponseNotAllowed(['GET', 'POST'])
 
 
 def update_subscriptions(user, device, add, remove):
@@ -156,6 +155,7 @@ def get_subscription_changes(user, device, since, until):
 @csrf_exempt
 @require_valid_user
 @check_username
+@allowed_methods(['GET', 'POST'])
 def episodes(request, username, version=1):
 
     version = int(version)
@@ -192,9 +192,6 @@ def episodes(request, username, version=1):
             raise Http404
 
         return JsonResponse(get_episode_changes(request.user, podcast, device, since, now, aggregated, version))
-
-    else:
-        return HttpResponseNotAllowed(['POST', 'GET'])
 
 
 def get_episode_changes(user, podcast, device, since, until, aggregated, version):
@@ -325,34 +322,32 @@ def update_episodes(user, actions):
 @csrf_exempt
 @require_valid_user
 @check_username
+# Workaround for mygpoclient 1.0: It uses "PUT" requests
+# instead of "POST" requests for uploading device settings
+@allowed_methods(['POST', 'PUT'])
 def device(request, username, device_uid):
 
-    # Workaround for mygpoclient 1.0: It uses "PUT" requests
-    # instead of "POST" requests for uploading device settings
-    if request.method in ('POST', 'PUT'):
-        d, created = Device.objects.get_or_create(user=request.user, uid=device_uid)
+    d, created = Device.objects.get_or_create(user=request.user, uid=device_uid)
 
-        #undelete a previously deleted device
-        if d.deleted:
-            d.deleted = False
-            d.save()
-
-        data = json.loads(request.raw_post_data)
-
-        if 'caption' in data:
-            d.name = data['caption']
-
-        if 'type' in data:
-            if not valid_devicetype(data['type']):
-                return HttpResponseBadRequest('invalid device type %s' % data['type'])
-            d.type = data['type']
-
+    #undelete a previously deleted device
+    if d.deleted:
+        d.deleted = False
         d.save()
 
-        return HttpResponse()
+    data = json.loads(request.raw_post_data)
 
-    else:
-        return HttpResponseNotAllowed(['POST'])
+    if 'caption' in data:
+        d.name = data['caption']
+
+    if 'type' in data:
+        if not valid_devicetype(data['type']):
+           return HttpResponseBadRequest('invalid device type %s' % data['type'])
+        d.type = data['type']
+
+    d.save()
+
+    return HttpResponse()
+
 
 def valid_devicetype(type):
     for t in DEVICE_TYPES:
@@ -370,22 +365,18 @@ def valid_episodeaction(type):
 @csrf_exempt
 @require_valid_user
 @check_username
+@allowed_methods(['GET'])
 def devices(request, username):
+    devices = []
+    for d in Device.objects.filter(user=request.user, deleted=False):
+        devices.append({
+            'id': d.uid,
+            'caption': d.name,
+            'type': d.type,
+            'subscriptions': Subscription.objects.filter(device=d).count()
+        })
 
-    if request.method == 'GET':
-        devices = []
-        for d in Device.objects.filter(user=request.user, deleted=False):
-            devices.append({
-                'id': d.uid,
-                'caption': d.name,
-                'type': d.type,
-                'subscriptions': Subscription.objects.filter(device=d).count()
-            })
-
-        return JsonResponse(devices)
-
-    else:
-        return HttpResponseNotAllowed(['GET'])
+    return JsonResponse(devices)
 
 
 @csrf_exempt

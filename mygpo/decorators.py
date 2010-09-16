@@ -21,7 +21,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from mygpo.web.models import SecurityToken
 from django.contrib.auth.models import User
-from django.http import Http404, HttpResponseForbidden
+from django.http import Http404, HttpResponseForbidden, HttpResponseNotAllowed
 import random
 import string
 import gc
@@ -77,4 +77,17 @@ def manual_gc(view):
         return res
 
     return tmp
+
+
+def allowed_methods(methods):
+    def decorator(fn):
+        def tmp(request, *args, **kwargs):
+            if request.method in methods:
+                return fn(request, *args, **kwargs)
+            else:
+                return HttpResponseNotAllowed(methods)
+
+        return tmp
+
+    return decorator
 
