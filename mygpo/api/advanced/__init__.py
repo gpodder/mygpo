@@ -16,7 +16,7 @@
 #
 
 from mygpo.api.basic_auth import require_valid_user, check_username
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, Http404
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from mygpo.api.models import Device, Podcast, SubscriptionAction, Episode, EpisodeAction, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, EPISODE_ACTION_TYPES, DEVICE_TYPES, Subscription
 from mygpo.api.models.users import EpisodeFavorite
 from mygpo.api.httpresponse import JsonResponse
@@ -59,10 +59,7 @@ def subscriptions(request, username, device_uid):
     now_ = int(mktime(now.timetuple()))
 
     if request.method == 'GET':
-        try:
-            d = Device.objects.get(user=request.user, uid=device_uid, deleted=False)
-        except Device.DoesNotExist:
-            raise Http404('device %s does not exist' % device_uid)
+        d = get_object_or_404(Device, user=request.user, uid=device_uid, deleted=False)
 
         try:
             since_ = request.GET['since']
@@ -185,11 +182,8 @@ def episodes(request, username, version=1):
 
         since = datetime.fromtimestamp(float(since_)) if since_ else None
 
-        try:
-            podcast = Podcast.objects.get(url=podcast_url) if podcast_url else None
-            device  = Device.objects.get(user=request.user,uid=device_uid, deleted=False) if device_uid else None
-        except:
-            raise Http404
+        podcast = get_object_or_404(Podcast, url=podcast_url) if podcast_url else None
+        device  = get_object_or_404(Device, user=request.user,uid=device_uid, deleted=False) if device_uid else None
 
         return JsonResponse(get_episode_changes(request.user, podcast, device, since, now, aggregated, version))
 

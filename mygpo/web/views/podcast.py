@@ -1,6 +1,6 @@
 from datetime import date, timedelta, datetime
 
-from django.http import HttpResponseBadRequest, HttpResponseRedirect
+from django.http import HttpResponseBadRequest, HttpResponseRedirect, Http404
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
@@ -228,9 +228,9 @@ def subscribe(request, pid):
 @login_required
 def unsubscribe(request, pid, device_id):
 
-    return_to = request.GET.get('return_to')
+    return_to = request.GET.get('return_to', None)
 
-    if return_to == None:
+    if not return_to:
         raise Http404('Wrong URL')
 
     podcast = get_object_or_404(Podcast, pk=pid)
@@ -246,9 +246,9 @@ def unsubscribe(request, pid, device_id):
 @manual_gc
 @login_required
 def subscribe_url(request):
-    url = request.GET.get('url')
+    url = request.GET.get('url', None)
 
-    if url == None:
+    if not url:
         raise Http404('http://my.gpodder.org/subscribe?url=http://www.example.com/podcast.xml')
 
     url = sanitize_url(url)
