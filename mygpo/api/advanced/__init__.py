@@ -361,16 +361,19 @@ def valid_episodeaction(type):
 @check_username
 @allowed_methods(['GET'])
 def devices(request, username):
-    devices = []
-    for d in Device.objects.filter(user=request.user, deleted=False):
-        devices.append({
-            'id': d.uid,
-            'caption': d.name,
-            'type': d.type,
-            'subscriptions': Subscription.objects.filter(device=d).count()
-        })
+    devices = Device.objects.filter(user=request.user, deleted=False)
+    devices = map(device_data, devices)
 
     return JsonResponse(devices)
+
+
+def device_data(device):
+    return {
+        'id': d.uid,
+        'caption': d.name,
+        'type': d.type,
+        'subscriptions': Subscription.objects.filter(device=d).count()
+    }
 
 
 @csrf_exempt
