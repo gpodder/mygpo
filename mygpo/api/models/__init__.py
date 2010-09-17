@@ -63,19 +63,7 @@ class Podcast(models.Model):
         """
         returns all public subscriptions to this podcast
         """
-        subscriptions = Subscription.objects.filter(podcast=self)
-
-        # remove users with private profiles
-        subscriptions = subscriptions.exclude(user__userprofile__public_profile=False)
-
-        # remove inactive (eg deleted) users
-        subscriptions = subscriptions.exclude(user__is_active=False)
-
-        # remove uers that have marked their subscription to this podcast as private
-        private_users = SubscriptionMeta.objects.filter(podcast=self, public=False).values('user')
-        subscriptions = subscriptions.exclude(user__in=private_users)
-
-        return subscriptions
+        return Subscription.objects.public_subscriptions([self])
 
 
     def subscription_count(self):
@@ -176,6 +164,23 @@ class PodcastGroup(models.Model):
 
     def podcasts(self):
         return Podcast.objects.filter(group=self)
+
+    def subscriptions(self):
+        """
+        returns the public subscriptions to podcasts in the group
+        """
+        return Subscription.objects.public_subscriptions(self.podcasts())
+
+    def subscription_count(self):
+        return self.subscriptions().count()
+
+    def subscriber_count(self):
+        """
+        Returns the number of public subscriptions to podcasts of this group
+        """
+        subscriptions = self.subscriptions()
+        return subscriptions.values('user').distinct().count()
+
 
     def __unicode__(self):
         return self.title
@@ -514,11 +519,36 @@ class EpisodeAction(models.Model):
         db_table = 'episode_log'
 
 
+class SubscriptionManager(models.Manager):
+
+    def public_subscriptions(self, podcasts=None):
+        """
+        Returns either all public subscriptions or those for the given podcasts
+        """
+
+        subscriptions = self.filter(podcast__in=podcasts) if podcasts else self.all()
+
+        # remove users with private profiles
+        subscriptions = subscriptions.exclude(user__userprofile__public_profile=False)
+
+        # remove inactive (eg deleted) users
+        subscriptions = subscriptions.exclude(user__is_active=False)
+
+        if podcasts:
+            # remove uers that have marked their subscription to this podcast as private
+            private_users = SubscriptionMeta.objects.filter(podcast__in=podcasts, public=False).values('user')
+            subscriptions = subscriptions.exclude(user__in=private_users)
+
+        return subscriptions
+
+
 class Subscription(models.Model):
     device = models.ForeignKey(Device, primary_key=True)
     podcast = models.ForeignKey(Podcast)
     user = models.ForeignKey(User)
     subscribed_since = models.DateTimeField()
+
+    objects = SubscriptionManager()
 
     def __unicode__(self):
         return '%s - %s on %s' % (self.device.user, self.podcast, self.device)

@@ -27,6 +27,27 @@ class SearchEntry(models.Model):
 
     objects = SearchEntryManager()
 
+    @classmethod
+    def from_object(cls, obj=None, subscriber_count=None):
+        """
+        Create a new SearchEntry from either a Podcast or a PodcastGroup
+        """
+        entry = SearchEntry()
+        entry.text = obj.title
+        entry.obj_id = obj.id
+        entry.priority = subscriber_count or obj.get_subscriber_count()
+
+        if isinstance(obj, Podcast):
+            entry.obj_type = 'podcast'
+            podcasts = Podcast.objects.filter(podcast=obj)
+        elif isinstance(obj, PodcastGroup):
+            entry.obj_type = 'podcast_group'
+            podcasts = Podcast.objects.filter(group=group)
+
+        entry.tags = tag_string(PodcastTag.objects.filter(podcast__in=podcasts))
+        return entry
+
+
     def __repr__(self):
         return "<%s '%s'>" % (self.__class__.__name__, self.text[:20])
 
