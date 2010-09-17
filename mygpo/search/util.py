@@ -15,9 +15,7 @@ def podcast_group_entry(group, subscriber_count=None):
     entry.obj_id = group.id
 
     podcasts = Podcast.objects.filter(group=group)
-    tags = PodcastTag.objects.filter(podcast__in=podcasts).annotate(count=Count('podcast')).order_by('count')
-    tag_string = ','.join([t.tag for t in tags])[:200]
-    entry.tags = tag_string
+    entry.tags = tag_string(PodcastTag.objects.filter(podcast__in=podcasts))
 
     entry.priority = subscriber_count
 
@@ -35,11 +33,19 @@ def podcast_entry(podcast, subscriber_count=None):
     entry.obj_type = 'podcast'
     entry.obj_id = podcast.id
 
-    tags = PodcastTag.objects.filter(podcast=podcast).annotate(count=Count('podcast')).order_by('count')
-    tag_string = ','.join([t.tag for t in tags])[:200]
-    entry.tags = tag_string
+    entry.tags = tag_string(PodcastTag.objects.filter(podcast=podcast))
 
     entry.priority = subscriber_count
 
     return entry
+
+
+def tag_string(tags, max_length=200):
+    """
+    returns a string of the most-assigned tags
+
+    tags is expected to be a PodcastTag QuerySet
+    """
+    tags = PodcastTag.objects.top_tags(tags)
+    return ','.join([t['tag'] for t in tags])[:max_length]
 
