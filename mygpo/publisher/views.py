@@ -1,8 +1,7 @@
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
-from mygpo.api.models import Podcast, Episode, EpisodeAction, PodcastGroup
-from django.contrib.auth.decorators import login_required
+from mygpo.api.models import Podcast, Episode, PodcastGroup
 from mygpo.publisher.models import PodcastPublisher
 from mygpo.publisher.auth import require_publisher, is_publisher
 from mygpo.publisher.forms import SearchPodcastForm, EpisodeForm, PodcastForm

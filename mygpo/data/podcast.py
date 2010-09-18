@@ -16,7 +16,7 @@
 #
 
 from django.contrib.auth.models import User
-from mygpo.api.models import Podcast, Episode, Subscription
+from mygpo.api.models import Episode, Subscription
 from mygpo.data.models import PodcastTag
 
 def avg_update_interval(podcast):

@@ -1,6 +1,3 @@
-from django.db.models.signals import post_save, pre_delete
-from mygpo.api.models import Podcast, PodcastGroup
-
 
 def remove_podcast_entry(sender, instance=False, **kwargs):
     from mygpo.search.models import SearchEntry

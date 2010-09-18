@@ -17,17 +17,15 @@
 
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.template.defaultfilters import slugify
 from django.template import RequestContext
-from registration.views import activate, register
 from mygpo.api.models import UserProfile
 from mygpo.web.forms import RestorePasswordForm
 from django.contrib.sites.models import Site
 from django.conf import settings
-from mygpo.decorators import requires_token, manual_gc, allowed_methods
+from mygpo.decorators import manual_gc, allowed_methods
 from django.utils.translation import ugettext as _
 import string
 import random

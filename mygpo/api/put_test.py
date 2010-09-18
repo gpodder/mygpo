@@ -1,4 +1,3 @@
-import sys
 import httplib
 import base64
 import time

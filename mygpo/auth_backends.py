@@ -15,11 +15,8 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.backends import ModelBackend
-from django.core.exceptions import ImproperlyConfigured
-from django.db.models import get_model
 
 try:
     from django.forms.fields import email_re

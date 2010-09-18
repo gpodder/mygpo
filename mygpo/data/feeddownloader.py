@@ -26,8 +26,6 @@ import datetime
 import hashlib
 import urllib2
 import socket
-import time
-import mimetypes
 
 from mygpo import feedcore
 from mygpo.api import models

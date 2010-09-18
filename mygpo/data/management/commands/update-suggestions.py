@@ -1,9 +1,8 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from optparse import make_option
-from mygpo.api.models import Podcast, SuggestionEntry, Subscription, UserProfile
+from mygpo.api.models import SuggestionEntry, Subscription, UserProfile
 from mygpo.data.models import RelatedPodcast, SuggestionBlacklist
-from mygpo.data.podcast import calc_similar_podcasts
 
 class Command(BaseCommand):
 

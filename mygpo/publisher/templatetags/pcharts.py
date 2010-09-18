@@ -3,8 +3,6 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from mygpo.publisher.utils import colour_repr
 from mygpo.utils import format_time
-import hashlib
-import math
 
 register = template.Library()
 

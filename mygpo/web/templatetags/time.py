@@ -1,5 +1,4 @@
 from django import template
-from django.utils.translation import ugettext as _
 from datetime import time
 
 register = template.Library()

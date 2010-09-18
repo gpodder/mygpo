@@ -1,6 +1,5 @@
 from django import template
 from django.utils.safestring import mark_safe
-from mygpo.data import youtube
 from mygpo.data import flickr
 
 register = template.Library()

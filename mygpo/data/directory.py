@@ -15,7 +15,6 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from mygpo.api.models import Podcast, Episode, Subscription
 from mygpo.data.models import PodcastTag
 from django.db.models import Sum, Count, Avg
 from collections import defaultdict

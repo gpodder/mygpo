@@ -16,15 +16,14 @@
 #
 
 from django.db import models
-from django.contrib.auth.models import User, UserManager
+from django.contrib.auth.models import User
 from datetime import datetime
 from django.utils.translation import ugettext as _
 from mygpo.api.fields import SeparatedValuesField, JSONField
 import hashlib
 import re
-import json
 
-from mygpo.api.constants import EPISODE_ACTION_TYPES, DEVICE_TYPES, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SUBSCRIPTION_ACTION_TYPES
+from mygpo.api.constants import EPISODE_ACTION_TYPES, DEVICE_TYPES, SUBSCRIBE_ACTION, SUBSCRIPTION_ACTION_TYPES
 from mygpo.log import log
 
 class UserProfile(models.Model):

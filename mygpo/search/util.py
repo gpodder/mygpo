@@ -1,5 +1,3 @@
-from django.db.models import Count
-from mygpo.api.models import Subscription, Podcast
 from mygpo.data.models import PodcastTag
 
 def tag_string(tags, max_length=200):

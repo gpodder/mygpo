@@ -15,35 +15,12 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from mygpo.api.basic_auth import require_valid_user, check_username
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from mygpo.api.httpresponse import JsonResponse
-from mygpo.exceptions import ParameterMissing
 from django.shortcuts import get_object_or_404
 from mygpo.api.sanitizing import sanitize_url
-from mygpo.api.models import Device, Podcast, Episode, ToplistEntry
-from mygpo.api.models.episodes import Chapter
-from mygpo.data.models import PodcastTag
-from django.utils.translation import ugettext as _
-from datetime import datetime, timedelta
-from mygpo.log import log
-from mygpo.utils import parse_time
-import dateutil.parser
+from mygpo.api.models import Podcast, Episode, ToplistEntry
 from django.contrib.sites.models import Site
 from django.views.decorators.csrf import csrf_exempt
-
-try:
-    #try to import the JSON module (if we are on Python 2.6)
-    import json
-
-    # Python 2.5 seems to have a different json module
-    if not 'dumps' in dir(json):
-        raise ImportError
-
-except ImportError:
-    # No JSON module available - fallback to simplejson (Python < 2.6)
-    print "No JSON module available - fallback to simplejson (Python < 2.6)"
-    import simplejson as json
 
 
 @csrf_exempt
@@ -118,3 +95,4 @@ def episode_data(episode):
         "website": episode.link,
         "mygpo_link": 'http://%s/episode/%s' % (site.domain, episode.id),
         }
+

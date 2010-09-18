@@ -16,27 +16,18 @@
 #
 
 from django.shortcuts import render_to_response
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
-from django.contrib.auth.models import User
+from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponseForbidden
 from django.template import RequestContext
-from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, EpisodeToplistEntry, Subscription, SuggestionEntry, SyncGroup, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SubscriptionMeta
+from mygpo.api.models import Device, EpisodeAction, SubscriptionAction
 from mygpo.data.models import BackendSubscription, Listener
 from mygpo.web.forms import DeviceForm, SyncForm
-from django.forms import ValidationError
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
-from datetime import datetime, date, timedelta
-from django.contrib.sites.models import Site
-from mygpo.api.sanitizing import sanitize_url
 from mygpo.log import log
-from mygpo.utils import daterange
 from mygpo.api import simple
 from mygpo.decorators import manual_gc, allowed_methods
-import re
-import random
-import string
 
 
 @manual_gc

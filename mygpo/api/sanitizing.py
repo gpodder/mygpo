@@ -1,11 +1,10 @@
-from mygpo.api.models import URLSanitizingRule, Podcast, ToplistEntry, SuggestionEntry, SubscriptionAction, SubscriptionMeta, Subscription, Episode, EpisodeAction, EpisodeToplistEntry
+from mygpo.api.models import URLSanitizingRule, Podcast, ToplistEntry, SuggestionEntry, SubscriptionAction, SubscriptionMeta, Subscription, Episode, EpisodeAction
 from mygpo.api.models.episodes import Chapter
 from mygpo.api.models.users import EpisodeFavorite
 from mygpo.data.models import BackendSubscription, Listener, HistoricPodcastData, PodcastTag
 from mygpo.log import log
 import urlparse
 import re
-import sys
 
 def sanitize_url(url, podcast=True, episode=False, rules=URLSanitizingRule.objects.all().order_by('priority')):
     url = basic_sanitizing(url)

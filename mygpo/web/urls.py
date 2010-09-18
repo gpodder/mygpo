@@ -1,7 +1,6 @@
 from django.conf.urls.defaults import *
 from registration.views import activate, register
 from registration.forms import RegistrationFormUniqueEmail
-from registration.backends import default
 from django.contrib.auth.views import logout
 from django.views.generic.simple import direct_to_template
 

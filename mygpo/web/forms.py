@@ -1,6 +1,5 @@
 from django import forms
 from django.utils.translation import ugettext as _
-from django.forms.util import ValidationError
 from mygpo.api.models import Device, DEVICE_TYPES, SyncGroup
 from mygpo.log import log
 import re

@@ -15,7 +15,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from datetime import datetime, timedelta, time
+from datetime import datetime, timedelta
 import time
 
 def daterange(from_date, to_date=datetime.now(), leap=timedelta(days=1)):

@@ -1,4 +1,4 @@
-from mygpo.api.models import Podcast, Episode
+from mygpo.api.models import Episode
 from collections import defaultdict
 import mimetypes
 

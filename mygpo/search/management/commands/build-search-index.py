@@ -1,5 +1,4 @@
 from django.core.management.base import BaseCommand
-from optparse import make_option
 from mygpo.search.models import SearchEntry
 from mygpo.api.models import ToplistEntry
 

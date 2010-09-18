@@ -1,5 +1,4 @@
 from django.core.management.base import BaseCommand
-from mygpo.data.historic import calc_podcast
 from mygpo.api.models import Podcast
 from django.contrib.auth.models import User
 from mygpo.publisher.models import PodcastPublisher

@@ -1,4 +1,4 @@
-from mygpo.api.models import Podcast, Episode, SubscriptionAction, EpisodeAction
+from mygpo.api.models import Podcast, SubscriptionAction
 from mygpo.data.models import HistoricPodcastData
 from mygpo.utils import daterange
 from datetime import date, timedelta

@@ -1,9 +1,6 @@
 from django.core.management.base import BaseCommand
 from mygpo.api.models import Podcast, Episode
 from mygpo.api.sanitizing import rewrite_podcasts, rewrite_episodes
-from mygpo.data import feeddownloader
-from optparse import make_option
-import datetime
 
 class Command(BaseCommand):
 

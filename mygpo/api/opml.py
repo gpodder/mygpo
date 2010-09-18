@@ -23,7 +23,6 @@ the web and to export a list of podcast objects to valid OPML 1.1 files.
 """
 
 import os
-import os.path
 
 import xml.dom.minidom
 import email.Utils

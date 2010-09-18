@@ -15,18 +15,14 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from django.contrib.auth.models import User
 from mygpo.api.basic_auth import require_valid_user, check_username
 from django.contrib import auth
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
+from django.http import HttpResponse
 from mygpo.api.httpresponse import JsonResponse
-from mygpo.web.models import SecurityToken
 from django.shortcuts import get_object_or_404
 from mygpo.api.models import Device
 from django.utils.translation import ugettext as _
 from datetime import datetime, timedelta
-from mygpo.log import log
-import random
 from django.views.decorators.csrf import csrf_exempt
 
 

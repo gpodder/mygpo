@@ -18,10 +18,9 @@
 from django.test import TestCase
 from django.test.client import Client
 from django.contrib.auth.models import User
-from mygpo.api.models import Device, Podcast, Subscription, SubscriptionAction, UserProfile, EpisodeAction
+from mygpo.api.models import Device, Podcast, SubscriptionAction, UserProfile
 from django.http import HttpRequest
 from mygpo.api.simple import subscriptions
-from mygpo.api.advanced import devices
 import time
 
 try:

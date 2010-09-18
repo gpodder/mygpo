@@ -16,19 +16,17 @@
 #
 
 from django.shortcuts import render_to_response
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
+from django.http import HttpResponseRedirect
 from django.template import RequestContext
-from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, Subscription
+from mygpo.api.models import Podcast, Episode, EpisodeAction, Subscription
 from mygpo.api.models.episodes import Chapter
 from mygpo.api.models.users import EpisodeFavorite
 from mygpo.web.models import SecurityToken
 from mygpo.web.utils import get_played_parts
 from mygpo.decorators import manual_gc
 from mygpo.utils import parse_time
-from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
-from datetime import datetime, date, timedelta
 from django.contrib.sites.models import Site
 import random
 import string

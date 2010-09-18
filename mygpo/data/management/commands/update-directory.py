@@ -1,5 +1,4 @@
 from django.core.management.base import BaseCommand
-from optparse import make_option
 from mygpo.api.models import Podcast, PodcastGroup
 from mygpo.data.models import DirectoryEntry
 from mygpo.data.directory import get_source_weights, get_weighted_tags, get_weighted_group_tags

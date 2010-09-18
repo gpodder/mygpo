@@ -16,23 +16,21 @@
 #
 
 from mygpo.api.basic_auth import require_valid_user, check_username
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseBadRequest
 from mygpo.api.models import Device, Podcast, SubscriptionAction, Episode, EpisodeAction, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, EPISODE_ACTION_TYPES, DEVICE_TYPES, Subscription
 from mygpo.api.models.users import EpisodeFavorite
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.api.advanced.directory import episode_data, podcast_data
 from mygpo.api.backend import get_all_subscriptions
-from django.core import serializers
 from django.shortcuts import get_object_or_404
 from time import mktime, gmtime, strftime
-from datetime import datetime, timedelta
+from datetime import datetime
 import dateutil.parser
 from mygpo.log import log
 from mygpo.utils import parse_time, parse_bool
 from mygpo.decorators import allowed_methods
 from django.db import IntegrityError
-import re
 from django.views.decorators.csrf import csrf_exempt
 
 try:

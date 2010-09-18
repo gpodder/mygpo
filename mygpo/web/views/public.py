@@ -16,17 +16,13 @@
 #
 
 from django.shortcuts import render_to_response
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
+from django.http import HttpResponseRedirect
 from django.template import RequestContext
-from mygpo.api.models import Podcast, Episode, Subscription
 from mygpo.api import backend
-from mygpo.data.models import PodcastTag, DirectoryEntry
+from mygpo.data.models import DirectoryEntry
 from mygpo.data.mimetype import CONTENT_TYPES
 from mygpo.decorators import manual_gc
 from mygpo.web import utils
-from mygpo import settings
-from django.shortcuts import get_object_or_404
-from django.db.models import Sum
 from django.contrib.sites.models import Site
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 

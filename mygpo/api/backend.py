@@ -17,9 +17,7 @@
 
 from mygpo.api.models import ToplistEntry, Podcast, Subscription, EpisodeToplistEntry
 from mygpo.data.mimetype import get_type, CONTENT_TYPES
-from django.db.models import Max
-from datetime import datetime, timedelta
-import re
+from datetime import timedelta
 
 try:
     import json

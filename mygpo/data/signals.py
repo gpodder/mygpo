@@ -1,4 +1,3 @@
-from django.db.models.signals import post_save, pre_delete
 from mygpo.data.models import DirectoryEntry
 from mygpo.data.directory import get_source_weights, get_weighted_tags, get_weighted_group_tags
 

@@ -16,6 +16,6 @@
 #
 
 from django.contrib import admin
-from mygpo.web.models import *
+from mygpo.web.models import SecurityToken
 
 admin.site.register(SecurityToken)

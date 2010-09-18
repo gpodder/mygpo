@@ -3,7 +3,6 @@ from django.template import RequestContext
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from mygpo.userfeeds.auth import require_token_auth
-from mygpo.web.models import SecurityToken
 from mygpo.userfeeds.feeds import FavoriteFeed
 
 @require_token_auth('fav-feed', 'r')

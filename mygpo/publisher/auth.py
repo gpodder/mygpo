@@ -15,8 +15,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from django.http import HttpResponse, HttpResponseRedirect
-from django.contrib.auth import authenticate, login
+from django.http import HttpResponseRedirect
 from mygpo.publisher.models import PodcastPublisher
 
 

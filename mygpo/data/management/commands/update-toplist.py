@@ -1,7 +1,6 @@
 from django.core.management.base import BaseCommand
 from optparse import make_option
-from mygpo.api.models import Podcast, PodcastGroup, ToplistEntry, Subscription, SubscriptionMeta
-from django.db.models import Count
+from mygpo.api.models import Podcast, PodcastGroup, ToplistEntry
 
 class Command(BaseCommand):
 

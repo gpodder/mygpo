@@ -16,7 +16,6 @@
 #
 
 from django.shortcuts import render_to_response
-from django.http import HttpResponseRedirect
 from django.contrib.auth import logout
 from django.template import RequestContext
 from mygpo.api.models import Podcast, Subscription, SubscriptionMeta
@@ -24,10 +23,8 @@ from mygpo.web.models import SecurityToken
 from mygpo.web.forms import UserAccountForm
 from django.forms import ValidationError
 from django.utils.translation import ugettext as _
-from mygpo.api.basic_auth import require_valid_user
 from mygpo.decorators import manual_gc, allowed_methods
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404
 from django.contrib.sites.models import Site
 
 
