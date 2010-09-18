@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
 from django.utils.translation import ugettext as _
 
-from mygpo.api.models import Podcast, Episode, EpisodeAction, Device, SubscriptionAction, Subscription, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SyncGroup
+from mygpo.api.models import Podcast, Episode, EpisodeAction, Device, SubscriptionAction, Subscription, SyncGroup
 from mygpo.web.forms import PrivacyForm, SyncForm
 from mygpo.data.models import Listener, PodcastTag
 from mygpo.decorators import manual_gc, allowed_methods
@@ -199,7 +199,7 @@ def subscribe(request, pid):
                 device = target
 
             try:
-                SubscriptionAction.objects.create(podcast=podcast, device=device, action=SUBSCRIBE_ACTION)
+                podcast.subscribe(device)
             except IntegrityError, e:
                 log('error while subscribing to podcast (device %s, podcast %s)' % (device.id, podcast.id))
 
@@ -233,7 +233,7 @@ def unsubscribe(request, pid, device_id):
     podcast = get_object_or_404(Podcast, pk=pid)
     device = Device.objects.get(pk=device_id)
     try:
-        SubscriptionAction.objects.create(podcast=podcast, device=device, action=UNSUBSCRIBE_ACTION, timestamp=datetime.now())
+        podcast.unsubscribe(device)
     except IntegrityError, e:
         log('error while unsubscribing from podcast (device %s, podcast %s)' % (device.id, podcast.id))
 

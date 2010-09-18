@@ -18,7 +18,7 @@
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from mygpo.api.opml import Importer, Exporter
-from mygpo.api.models import Subscription, Podcast, SubscriptionAction, Device, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION
+from mygpo.api.models import Subscription, Podcast, Device
 from datetime import datetime
 from django.utils.datastructures import MultiValueDictKeyError
 from django.db import IntegrityError
@@ -77,7 +77,7 @@ def upload(request):
             continue
 
         try:
-            SubscriptionAction.objects.create(podcast=p,action=SUBSCRIBE_ACTION, timestamp=datetime.now(), device=d)
+            p.subscribe(d)
         except IntegrityError, e:
             log('/upload: error while adding subscription: user: %s, podcast: %s, error: %s' % (user.id, p.id, e))
         except ValueError, ve:
@@ -86,7 +86,7 @@ def upload(request):
     for r in rem:
         p, created = Podcast.objects.get_or_create(url=r)
         try:
-            SubscriptionAction.objects.create(podcast=p, action=UNSUBSCRIBE_ACTION, timestamp=datetime.now(), device=d)
+            p.unsubscribe(d)
         except IntegrityError, e:
             log('/upload: error while removing subscription: user: %s, podcast: %s, error: %s' % (user.id, p.id, e))
 

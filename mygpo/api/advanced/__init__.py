@@ -115,14 +115,14 @@ def update_subscriptions(user, device, add, remove):
     for a in add_sanitized:
         p, p_created = Podcast.objects.get_or_create(url=a)
         try:
-            s = SubscriptionAction.objects.create(podcast=p,device=device,action=SUBSCRIBE_ACTION)
+            p.subscribe(device)
         except IntegrityError, e:
             log('can\'t add subscription %s for user %s: %s' % (a, user, e))
 
     for r in rem_sanitized:
         p, p_created = Podcast.objects.get_or_create(url=r)
         try:
-            s = SubscriptionAction.objects.create(podcast=p,device=device,action=UNSUBSCRIBE_ACTION)
+            p.unsubscribe(device)
         except IntegrityError, e:
             log('can\'t remove subscription %s for user %s: %s' % (r, user, e))
 

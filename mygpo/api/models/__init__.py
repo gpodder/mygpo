@@ -23,7 +23,7 @@ from mygpo.api.fields import SeparatedValuesField, JSONField
 import hashlib
 import re
 
-from mygpo.api.constants import EPISODE_ACTION_TYPES, DEVICE_TYPES, SUBSCRIBE_ACTION, SUBSCRIPTION_ACTION_TYPES
+from mygpo.api.constants import EPISODE_ACTION_TYPES, DEVICE_TYPES, UNSUBSCRIBE_ACTION, SUBSCRIBE_ACTION, SUBSCRIPTION_ACTION_TYPES
 from mygpo.log import log
 
 class UserProfile(models.Model):
@@ -57,6 +57,21 @@ class Podcast(models.Model):
     group = models.ForeignKey('PodcastGroup', null=True)
     group_member_name = models.CharField(max_length=20, default=None, null=True, blank=False)
     content_types = SeparatedValuesField(null=True, blank=True)
+
+
+    def subscribe(self, device):
+        """
+        Subscribe to the current Podcast on the given Device
+        """
+        SubscriptionAction.objects.create(podcast=self, action=SUBSCRIBE_ACTION, device=device)
+
+
+    def unsubscribe(self, device):
+        """
+        Unsubscribe the current Podcast from the given Device
+        """
+        SubscriptionAction.objects.create(podcast=self, action=UNSUBSCRIBE_ACTION, device=device)
+
 
     def subscriptions(self):
         """

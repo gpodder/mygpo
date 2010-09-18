@@ -17,7 +17,7 @@
 
 from mygpo.api.basic_auth import require_valid_user, check_username
 from django.http import HttpResponse, HttpResponseBadRequest
-from mygpo.api.models import Device, SubscriptionAction, Podcast, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, SuggestionEntry
+from mygpo.api.models import Device, Podcast, SuggestionEntry
 from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url
@@ -154,12 +154,12 @@ def set_subscriptions(urls, user, device_uid):
 
     for r in rem:
         p = Podcast.objects.get(url=r)
-        s = SubscriptionAction(podcast=p, device=device, action=UNSUBSCRIBE_ACTION)
+        p.unsubscribe(device)
         s.save()
 
     for n in new:
         p, created = Podcast.objects.get_or_create(url=n)
-        s = SubscriptionAction(podcast=p, action=SUBSCRIBE_ACTION, device=device)
+        p.subscribe(device)
         s.save()
 
     # Only an empty response is a successful response
