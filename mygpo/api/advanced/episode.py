@@ -131,7 +131,7 @@ def update_chapters(req, user):
 
     device = None
     if 'device' in req:
-        device, c = Device.objects.get_or_create(user=user, uid=req['device'], defaults = {'type': 'other', 'name': _('New Device')})
+        device, c = Device.objects.get_or_create(user=user, uid=req['device'])
 
     timestamp = dateutil.parser.parse(req['timestamp']) if 'timestamp' in req else datetime.now()
 

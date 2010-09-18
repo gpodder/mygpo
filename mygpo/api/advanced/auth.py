@@ -35,7 +35,7 @@ def login(request, username, device_uid):
     the device is created if it doesn't already exist
     """
 
-    d, created = Device.objects.get_or_create(user=request.user, uid=device_uid, defaults = {'type': 'other', 'name': _('New Device')})
+    d, created = Device.objects.get_or_create(user=request.user, uid=device_uid)
 
     request.session['device'] = device_uid
     request.session.set_expiry(datetime.now()+timedelta(days=365))

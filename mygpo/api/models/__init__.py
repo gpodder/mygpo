@@ -378,8 +378,8 @@ class SyncGroup(models.Model):
 class Device(models.Model):
     user = models.ForeignKey(User)
     uid = models.SlugField(max_length=50)
-    name = models.CharField(max_length=100, blank=True)
-    type = models.CharField(max_length=10, choices=DEVICE_TYPES)
+    name = models.CharField(max_length=100, blank=True, default='Default Device')
+    type = models.CharField(max_length=10, choices=DEVICE_TYPES, default='other')
     sync_group = models.ForeignKey(SyncGroup, blank=True, null=True)
     deleted = models.BooleanField(default=False)
     settings = JSONField(default={})

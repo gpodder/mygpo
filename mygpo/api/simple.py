@@ -140,8 +140,7 @@ def parse_subscription(raw_post_data, format):
 
 
 def set_subscriptions(urls, user, device_uid):
-    device, created = Device.objects.get_or_create(user=user, uid=device_uid,
-        defaults = {'type': 'other', 'name': device_uid})
+    device, created = Device.objects.get_or_create(user=user, uid=device_uid)
 
     # undelete a previously deleted device
     if device.deleted:

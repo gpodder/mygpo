@@ -71,7 +71,7 @@ def subscriptions(request, username, device_uid):
         return JsonResponse(changes)
 
     elif request.method == 'POST':
-        d, created = Device.objects.get_or_create(user=request.user, uid=device_uid, defaults = {'type': 'other', 'name': 'New Device'})
+        d, created = Device.objects.get_or_create(user=request.user, uid=device_uid)
 
         if d.deleted:
             d.deleted = False
@@ -260,7 +260,7 @@ def update_episodes(user, actions):
             raise Exception('invalid action %s' % action)
 
         if 'device' in e:
-            device, created = Device.objects.get_or_create(user=user, uid=e['device'], defaults={'name': 'Unknown', 'type': 'other'})
+            device, created = Device.objects.get_or_create(user=user, uid=e['device'])
 
             # undelete a previously deleted device
             if device.deleted:
