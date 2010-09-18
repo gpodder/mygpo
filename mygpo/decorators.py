@@ -22,8 +22,6 @@ from django.template import RequestContext
 from mygpo.web.models import SecurityToken
 from django.contrib.auth.models import User
 from django.http import HttpResponseForbidden, HttpResponseNotAllowed
-import random
-import string
 import gc
 
 def requires_token(object, action, denied_template=None):
@@ -45,8 +43,7 @@ def requires_token(object, action, denied_template=None):
         def tmp(request, username, *args, **kwargs):
 
             user = get_object_or_404(User, username=username)
-            token, c = SecurityToken.objects.get_or_create(user=user, object=object, action=action,
-                        defaults = {'token': "".join(random.sample(string.letters+string.digits, 32))})
+            token, c = SecurityToken.objects.get_or_create(user=user, object=object, action=action)
 
             u_token = request.GET.get('token', '')
 

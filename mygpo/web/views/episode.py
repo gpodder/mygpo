@@ -28,8 +28,6 @@ from mygpo.utils import parse_time
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.contrib.sites.models import Site
-import random
-import string
 
 @manual_gc
 def episode(request, id):
@@ -114,8 +112,7 @@ def list_favorites(request):
     site = Site.objects.get_current()
     episodes = [x.episode for x in EpisodeFavorite.objects.filter(user=request.user).order_by('-created')]
 
-    token, c = SecurityToken.objects.get_or_create(user=request.user, object='fav-feed', action='r', \
-        defaults={'token': "".join(random.sample(string.letters+string.digits, 8))})
+    token, c = SecurityToken.objects.get_or_create(user=request.user, object='fav-feed', action='r')
 
     from django.core.urlresolvers import reverse
     feed_url = 'http://%s/%s' % (site.domain, reverse('favorites-feed', args=[request.user.username]))
