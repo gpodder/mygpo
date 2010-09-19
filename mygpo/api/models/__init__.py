@@ -81,6 +81,11 @@ class Podcast(models.Model):
         from mygpo.data.models import Listener
         return Listener.objects.filter(podcast=self).values('user').distinct().count()
 
+    def listener_count_timespan(self, start, end):
+        return EpisodeAction.objects.filter(episode__podcast=self,
+                timestamp__range=(start, end),
+                action='play').values('user_id').distinct().count()
+
     def logo_shortname(self):
         return hashlib.sha1(self.logo_url).hexdigest()
 
@@ -140,6 +145,9 @@ class Podcast(models.Model):
     def get_similar(self):
         from mygpo.data.models import RelatedPodcast
         return [r.rel_podcast for r in RelatedPodcast.objects.filter(ref_podcast=self)]
+
+    def get_episodes(self):
+        return Episode.objects.filter(podcast=self)
 
     def __unicode__(self):
         return self.title if self.title != '' else self.url
@@ -294,19 +302,25 @@ class Episode(models.Model):
 
     def number(self):
         m = re.search('\D*(\d+)\D+', self.title)
-        return m.group(1)
+        return m.group(1) if m else ''
 
     def shortname(self):
         s = self.title
         s = s.replace(self.podcast.title, '')
         s = s.replace(self.number(), '')
-        s = re.search('\W*(.+)', s).group(1)
+        m = re.search('\W*(.+)', s)
+        s = m.group(1) if m else s
         s = s.strip()
         return s
 
     def listener_count(self):
         from mygpo.data.models import Listener
         return Listener.objects.filter(episode=self).values('user').distinct().count()
+
+    def listener_count_timespan(self, start, end):
+        return EpisodeAction.objects.filter(episode=self,
+                timestamp__range=(start, end),
+                action='play').values('user_id').distinct().count()
 
     def __unicode__(self):
         return '%s (%s)' % (self.shortname(), self.podcast)

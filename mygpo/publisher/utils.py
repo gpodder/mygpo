@@ -22,55 +22,44 @@ from mygpo.data.models import HistoricPodcastData
 from mygpo.web.utils import flatten_intervals
 from mygpo.publisher.models import PodcastPublisher
 from mygpo.api.constants import DEVICE_TYPES
-from django.db.models import Avg
+from django.db.models import Avg, Count
 from django.contrib.auth.models import User
 
 
-def listener_data(podcasts):
-    day = timedelta(1)
+def listener_data(podcasts, start_date=date(2010, 1, 1), leap=timedelta(days=1)):
+    episode_actions = EpisodeAction.objects.filter(
+            episode__podcast__in=podcasts,
+            timestamp__gte=start_date,
+            action='play').order_by('timestamp').values('timestamp')
 
-    # get start date
-    d = date(2010, 1, 1)
-    episode_actions = EpisodeAction.objects.filter(episode__podcast__in=podcasts, timestamp__gte=d, action='play').order_by('timestamp').values('timestamp')
     if len(episode_actions) == 0:
         return []
 
     start = episode_actions[0]['timestamp']
 
     # pre-calculate episode list, make it index-able by release-date
-    episodes = {}
-    for episode in Episode.objects.filter(podcast__in=podcasts):
-        if episode.timestamp:
-            episodes[episode.timestamp.date()] = episode
+    episodes = Episode.objects.filter(podcast__in=podcasts)
+    episodes = filter(lambda e: e.timestamp, episodes)
+    episodes = dict([(e.timestamp.date(), e) for e in episodes])
 
     days = []
-    for d in daterange(start):
-        next = d + timedelta(days=1)
-        listener_sum = 0
+    for d in daterange(start, leap=leap):
+        next = d + leap
 
-        # this is faster than .filter(episode__podcast__in=podcasts)
-        for p in podcasts:
-            listeners = EpisodeAction.objects.filter(episode__podcast=p, timestamp__gte=d, timestamp__lt=next, action='play').values('user_id').distinct().count()
-            listener_sum += listeners
+        get_listeners = lambda p: p.listener_count_timespan(d, next)
+        listeners = map(get_listeners, podcasts)
+        listener_sum = sum(listeners)
 
-        if d.date() in episodes:
-            episode = episodes[d.date()]
-        else:
-            episode = None
+        episode = episodes[d.date()] if d.date() in episodes else None
 
-        days.append({
-            'date': d,
-            'listeners': listener_sum,
-            'episode': episode})
+        days.append(dict(date=d, listeners=listener_sum, episode=episode))
 
     return days
 
 
-def episode_listener_data(episode):
-    d = date(2010, 1, 1)
-    leap = timedelta(days=1)
-
-    episodes = EpisodeAction.objects.filter(episode=episode, timestamp__gte=d).order_by('timestamp').values('timestamp')
+def episode_listener_data(episode, start_date=date(2010, 1, 1), leap=timedelta(days=1)):
+    episodes = EpisodeAction.objects.filter(episode=episode,
+            timestamp__gte=start_date).order_by('timestamp').values('timestamp')
     if len(episodes) == 0:
         return []
 
@@ -79,37 +68,27 @@ def episode_listener_data(episode):
     intervals = []
     for d in daterange(start, leap=leap):
         next = d + leap
-        listeners = EpisodeAction.objects.filter(episode=episode, timestamp__gte=d, timestamp__lt=next).values('user_id').distinct().count()
-        e = episode if episode.timestamp and episode.timestamp >= d and episode.timestamp <= next else None
-        intervals.append({
-            'date': d,
-            'listeners': listeners,
-            'episode': e})
+
+        listeners = episode.listener_count_timespan(d, next)
+        released_episode = episode if episode.timestamp and episode.timestamp >= d and episode.timestamp <= next else None
+        intervals.append(dict(date=d, listeners=listeners, episode=released_episode))
 
     return intervals
 
 
 def subscriber_data(podcasts):
-    data = {}
 
-    #this is fater than a subquery
-    records = []
-    for p in podcasts:
-        records.extend(HistoricPodcastData.objects.filter(podcast=p).order_by('date'))
+    records = HistoricPodcastData.objects.filter(podcast__in=podcasts).order_by('date')
 
-    for r in records:
-        if r.date.day == 1:
-            s = r.date.strftime('%y-%m')
-            val = data.get(s, 0)
-            data[s] = val + r.subscriber_count
+    include_record = lambda r: r.date.day == 1
+    records = filter(include_record, records)
 
-    list = []
-    for k, v in data.iteritems():
-        list.append({'x': k, 'y': v})
+    create_entry = lambda r: dict(x=r.date.strftime('%y-%m'), y=r.subscriber_count)
+    data = map(create_entry, records)
 
-    list.sort(key=lambda x: x['x'])
+    data.sort(key=lambda x: x['x'])
 
-    return list
+    return data
 
 
 def check_publisher_permission(user, podcast):
@@ -121,30 +100,15 @@ def check_publisher_permission(user, podcast):
 
     return False
 
-def episode_list(podcast):
-    episodes = Episode.objects.filter(podcast=podcast).order_by('-timestamp')
-    for e in episodes:
-        listeners = EpisodeAction.objects.filter(episode=e, action='play').values('user').distinct()
-        e.listeners = listeners.count()
-
-    return episodes
-
 
 def device_stats(podcasts):
-    res = {}
-    for type in DEVICE_TYPES:
-        c = 0
-
-        # this is faster than a subquery
-        for p in podcasts:
-            c += EpisodeAction.objects.filter(episode__podcast=p, device__type=type[0]).values('user_id').distinct().count()
-        if c > 0:
-            res[type[1]] = c
-
-    return res
+    l = EpisodeAction.objects.filter(episode__podcast__in=podcasts).values('device__type').annotate(count=Count('id'))
+    l = filter(lambda x: int(x['count']) > 0, l)
+    l = map(lambda x: (x['device__type'], x['count']), l)
+    return dict(l)
 
 
-def episode_heatmap(episode, max_part_num=50, min_part_length=10):
+def episode_heatmap(episode, max_part_num=30, min_part_length=10):
     """
     Generates "Heatmap Data" for the given episode
 
@@ -157,10 +121,7 @@ def episode_heatmap(episode, max_part_num=50, min_part_length=10):
 
     episode_actions = EpisodeAction.objects.filter(episode=episode, action='play')
 
-    if episode.duration:
-        duration = episode.duration
-    else:
-        duration = episode_actions.aggregate(duration=Avg('total'))['duration']
+    duration = episode.duration or episode_actions.aggregate(duration=Avg('total'))['duration']
 
     if not duration:
         return [0], 0
@@ -173,8 +134,7 @@ def episode_heatmap(episode, max_part_num=50, min_part_length=10):
 
     user_ids = [x['user'] for x in episode_actions.values('user').distinct()]
     for user_id in user_ids:
-        user = User.objects.get(id=user_id)
-        actions = episode_actions.filter(user=user, playmark__isnull=False, started__isnull=False)
+        actions = episode_actions.filter(user__id=user_id, playmark__isnull=False, started__isnull=False)
         if actions.exists():
             played_parts = flatten_intervals(actions)
             user_heatmap = played_parts_to_heatmap(played_parts, part_length, part_num)
@@ -209,7 +169,8 @@ def played_parts_to_heatmap(played_parts, part_length, part_count):
                 return parts
 
         if current_part['start'] <= (part + part_length) and current_part['end'] >= part:
-            parts[i] = 1
+            parts[i] += 1
+
     return parts
 
 

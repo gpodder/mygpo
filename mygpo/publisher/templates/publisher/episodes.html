@@ -50,8 +50,8 @@
        <td><a href="{% url episode-publisher-detail episode.id %}">{{ episode.title|default:"Unknown Episode"|striptags }}</a></td>
        <td>{{ episode.timestamp|default:""|naturalday }}</td>
        <td>
-        {% if episode.listeners %}
-         {{ episode.listeners|vertical_bar:max_listeners }}
+        {% if episode.listener_count %}
+         {{ episode.listener_count|vertical_bar:max_listeners }}
         {% endif %}
        </td>
       </tr>

@@ -23,7 +23,7 @@ class PodcastTagManager(models.Manager):
         """
         if not tags:
             tags = PodcastTag.objects.all()
-        tags = tags.values('tag').annotate(count=Count('id'))
+        tags = tags.values('tag').annotate(count=models.Count('id'))
         tags = sorted(tags, key=lambda x: x['count'], reverse=True)
         return tags
 

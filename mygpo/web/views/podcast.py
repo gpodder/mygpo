@@ -22,7 +22,7 @@ MAX_TAGS_ON_PAGE=50
 def show(request, pid):
     podcast = get_object_or_404(Podcast, pk=pid)
     episodes = episode_list(podcast, request.user)
-    max_listeners = max([x.listeners for x in episodes]) if len(episodes) else 0
+    max_listeners = max([x.listener_count() for x in episodes]) if len(episodes) else 0
     related_podcasts = [x for x in podcast.group.podcasts() if x != podcast] if podcast.group else []
 
     tags = get_tags(podcast, request.user)
@@ -137,11 +137,8 @@ def episode_list(podcast, user):
     action. The attribute is unsert if there is no episode-action for
     the episode.
     """
-    episodes = Episode.objects.filter(podcast=podcast).order_by('-timestamp')
+    episodes = podcast.get_episodes().order_by('-timestamp')
     for e in episodes:
-        listeners = Listener.objects.filter(episode=e).values('user').distinct()
-        e.listeners = listeners.count()
-
         if user.is_authenticated():
             actions = EpisodeAction.objects.filter(episode=e, user=user).order_by('-timestamp')
             if actions.count() > 0:

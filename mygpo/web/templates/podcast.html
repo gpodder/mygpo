@@ -136,8 +136,8 @@
       </td>
       <td>{{ episode.timestamp|default:""|date:"Y-m-d" }}</td>
       <td>
-       {% if episode.listeners %}
-        {{ episode.listeners|vertical_bar:max_listeners }}
+       {% if episode.listener_count %}
+        {{ episode.listener_count|vertical_bar:max_listeners }}
        {% endif %}
       </td>
      </tr>
