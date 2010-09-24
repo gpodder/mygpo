@@ -7,13 +7,13 @@ from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
 from django.utils.translation import ugettext as _
-
 from mygpo.api.models import Podcast, Episode, EpisodeAction, Device, SubscriptionAction, Subscription, SyncGroup
+from mygpo.api.sanitizing import sanitize_url
 from mygpo.web.forms import PrivacyForm, SyncForm
 from mygpo.data.models import Listener, PodcastTag
 from mygpo.decorators import manual_gc, allowed_methods
 from mygpo.utils import daterange
-
+from mygpo.log import log
 
 MAX_TAGS_ON_PAGE=50
 

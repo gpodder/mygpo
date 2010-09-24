@@ -97,6 +97,7 @@
       {% url podcast podast_id as podcast-url %}
       {%blocktrans with episode.podcast.id as podcast_id %}Your own chapters are shown in bold. If you don't want them to appear to other users, go to the <a href="{{ podcast-url }}">podcast page</a> and mark your subscription as private.{% endblocktrans %}
      {% else %}
+      {% url podcast podast_id as podcast-url %}
       {% blocktrans with episode.podcast.id as podcast_id %}The following list contains your chapters in bold and those of other users. However, yours are not shown to others, because you've marked your subscription as prive on the <a href="{{ podcast-url }}">podcast page</a>. You can change that there, if you want.{% endblocktrans %}
      {% endif %}
     {% endif %}

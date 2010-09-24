@@ -1,4 +1,6 @@
 from django.db import models
+from mygpo.search.util import tag_string
+from mygpo.data.models import PodcastTag
 from mygpo.api.models import Podcast, PodcastGroup
 import shlex
 
@@ -35,11 +37,11 @@ class SearchEntry(models.Model):
         entry = SearchEntry()
         entry.text = obj.title
         entry.obj_id = obj.id
-        entry.priority = subscriber_count or obj.get_subscriber_count()
+        entry.priority = subscriber_count or obj.subscriber_count()
 
         if isinstance(obj, Podcast):
             entry.obj_type = 'podcast'
-            podcasts = Podcast.objects.filter(podcast=obj)
+            podcasts = [obj]
         elif isinstance(obj, PodcastGroup):
             entry.obj_type = 'podcast_group'
             podcasts = Podcast.objects.filter(group=group)
