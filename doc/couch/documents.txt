@@ -1,0 +1,322 @@
+
+
+                       Document Overview
+                       ~~~~~~~~~~~~~~~~~
+
+
+This file describes the documents that will be used in the CouchDB based
+backend of the gpodder.net webservice.
+
+For each document type the models (used in the current relational backend)
+which will be replaced by it are listed.
+
+
+
+  User
+========
+
+A registered (but probably not yet activated) user and all his devices.
+
+Replaces Models
+ * User (from django)
+ * UserProfile
+ * RegistrationProfile (from django-registration)
+ * Device
+ * SyncGroup
+
+Example Document
+{
+    username:         "stefan",
+    email:            "stefan@gpodder.net",,
+    password:         "asdf$asdfasdf$asdfsdfa",
+    is_active:        False,
+    registration_key: "ad18719239817389ad",
+
+    devices: [
+        {
+            "_id":   "872348923987492834",
+            "user":  "stefan",
+            "id":    "n900",
+            "type":  "mobile",
+            "label": "N900"
+        },
+        { ... }
+    ],
+
+    synchronized: [
+        ["872348923987492834", "3498503485093495"],
+        ["9384053405", "90548903458"]
+    ]
+}
+
+
+  Podcast
+===========
+
+If a Podcast does not belong to a group, it is a document on its own.  The
+"subscriber" field contains historical subscriber counts. The "tags" field
+contains all tags that are fetched in some automated way (ie not entered by a
+user).
+
+Replaces Models
+ * Podcast
+ * HistoricPodcastData
+ * RelatedPodcast
+ * DirectoryEntry
+ * PodcastPublisher
+ * SearchEntry
+
+Example Document
+{
+    _id: "118913287192379173298"
+    name: "Cool Podcast",
+    feed_url: "http://podcast.com/mp3.xml",
+    description: "..."
+    subscriber: [(2010-09-01, 120), (2010-09-01, 130)],
+    related_podcasts: ["34059384598304850", "23480128409230482"],
+    tags: {
+        feed: [["technology", 50], ["news", 20]],
+        delicious: [["technews", 10]]
+    },
+    publishers: ["stefan"],
+    merged_ids: [ ...],
+}
+
+
+  PodcastGroup
+================
+
+Represents a group of podcast and contains all podcasts assigned to it.
+Once a Podcast is assigned to a group, its Podcast document in deleted
+and moved into the PodcastGroup.
+
+Replaces Models:
+ * Podcast
+ * PodcastGroup
+
+Example Document
+{
+    _id: "9238409283402830480",
+    name: "Cool Podcast",
+    podcasts: [
+        {
+            _id: "118913287192379173298"
+            name: "Cool Podcast",
+            group_member_name: "MP3",             # required if Podcast is member of a group
+            feed_url: "http://podcast.com/mp3.xml",
+            description: "..."
+            subscriber: [[2010-09-01, 120], [2010-09-01, 130]],
+            related_podcasts: ["34059384598304850", "23480128409230482"],
+            tags: ["technology", "news"],
+            publishers: ["stefan"],
+        },
+        { ... }
+    ],
+}
+
+
+  Episode
+===========
+
+One Episode with optional support for multiple media files (eg Audio and PDF Show Notes).
+
+Replaces Models:
+ * Episode
+ * SearchEntry
+
+Example Document
+{
+    _id:    "19384038450938450983",
+    title: "Cool Episode of Cool Podcast",
+    podcast: "118913287192379173298",
+    media_urls: ["http://podcast.com/episode1.mp3", "http://podcast.com/episode1.pdf"],
+    released: "2010-09-20 12:00",
+    tags: ["opensource", "technology"],
+    merged_ids: ["908345083045", "29380423849"],
+}
+
+
+  PodcastUserState
+====================
+
+Contains everything that a User has done with a Podcast.
+
+Replaces Models:
+ * SubscriptionAction
+ * PodcastTag
+ * SubscriptionMeta
+ * obsolete: Subscription, BackensSubscription
+
+Example Document
+{
+    _id: "3893745983453948589345",
+    user: "stefan",
+    podcast: "118913287192379173298",
+    actions:
+        [
+            {
+             action:    "subscribed",
+             timestamp: "2010-09-10",
+             device:    "872348923987492834"
+            },
+            {
+             action:    "unsubscribed",
+             timestamp: "2010-09-15",
+             device:    "872348923987492834"
+            }
+        ],
+    tags: ["technews"]
+    settings: { ... }
+}
+
+
+  UserSuggestions
+===================
+
+Contains the Podcast Suggestions and related meta-data (blacklist,
+suggestion-ratings) of a User. This is not places into PodcastUserState because
+the user did not yet interact with the Podcast directly.
+
+Replaces Models:
+ * SuggestionEntry
+ * SuggestionBlacklist
+ * Rating
+
+Example Document
+{
+    user: "stefan",
+    suggestions: [
+        "119018023981293801823",
+        "192840890284092834093"
+    ],
+    blacklist: [
+        "456045698409586045860",
+        "935937498573549739485"
+    ],
+    ratings: [
+        ["2010-09-13", -1],
+        ["2010-09-15",  1]
+    ],
+}
+
+
+  EpisodeUserState
+====================
+
+Contains everything that a User has done with an Episode.
+
+Replaces Models
+ * EpisodeAction
+ * EpisodeFavorite
+ * Chapter
+ * EpisodeSettings
+ * obsolete: Listener
+
+Example Document
+{
+    user: "stefan"
+    episode: "3893745983453948589345",
+    actions:
+        [
+            {
+             action:    "download",
+             file:      "http://podcast.com/episode-1.mp3",
+             timestamp: "2010-09-10",
+             device:    "872348923987492834"
+            },
+            {
+             action:    "play",
+             file:      "http://podcast.com/episode-1.mp3",
+             timestamp: "2010-09-15",
+             device:    "872348923987492834"
+            }
+        ],
+    tags: ["technews"],
+    chapters: [
+        {
+            from:          "02:10",
+            to:            "04:20",
+            advertisement: false,
+            label:         "interview",
+        }
+    ],
+    settings: { ... }
+}
+
+
+  Advertisement
+=================
+
+Contains an advertisement for a Podcast
+
+Replaces Models:
+ * Advertisement
+
+Example Document
+{
+    user:    "stefan",
+    podcast: "118913287192379173298",
+    start:   "2010-09-01",
+    end:     "2010-09-15"
+}
+
+
+  URLSanitizingRule
+=====================
+
+Contains a URL Sanitizing Rule.
+
+Replaces Models:
+ * URLSanitizingRule
+
+Example Document
+{
+    applies_to:   ["podcast", "episode"],
+    search:       "http://feeds2\.feedburner\.com",
+    replace_by:   "http://feeds.feedburner.com",
+    descriptions: "Replace {feeds2 => feeds}.feedburner.com",
+    priority:     100,
+}
+
+
+  PodcastToplistEntry
+=======================
+
+An entry in the podcast toplist with meta-data for filtering (eg language).
+
+Replaces Models:
+ * ToplistEntry
+
+Example Document
+{
+    podcast:     "118913287192379173298",
+    group:       "9238409283402830480",
+    language:    "en",
+    media_tpyes: ["audio", "video"],
+    subscribers: 1235,
+}
+
+
+  EpisodeToplistEntry
+=======================
+
+An entry in the episode toplist with meta-data for filtering (eg language).
+
+Replaces Models:
+ * EpisodeToplistEntry
+
+Example Document
+{
+    episode:     "19384038450938450983",
+    language:    "en",
+    media_types: ["audio"]
+    listeners:   56,
+}
+
+
+  Other Models
+================
+
+* SecurityToken: has been moved to various documents, depending on previous
+                 usage
+
