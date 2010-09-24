@@ -549,9 +549,9 @@ class EpisodeAction(models.Model):
 
 class SubscriptionManager(models.Manager):
 
-    def public_subscriptions(self, podcasts=None):
+    def public_subscriptions(self, podcasts=None, users=None):
         """
-        Returns either all public subscriptions or those for the given podcasts
+        Returns either all public subscriptions or filtered for the given podcasts and/or users
         """
 
         subscriptions = self.filter(podcast__in=podcasts) if podcasts else self.all()
@@ -566,6 +566,9 @@ class SubscriptionManager(models.Manager):
             # remove uers that have marked their subscription to this podcast as private
             private_users = SubscriptionMeta.objects.filter(podcast__in=podcasts, public=False).values('user')
             subscriptions = subscriptions.exclude(user__in=private_users)
+
+        if users:
+            subscriptions = subscriptions.filter(user__in=users)
 
         return subscriptions
 

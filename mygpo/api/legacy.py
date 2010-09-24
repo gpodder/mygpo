@@ -19,6 +19,7 @@ from django.http import HttpResponse
 from django.contrib.auth.models import User
 from mygpo.api.opml import Importer, Exporter
 from mygpo.api.models import Subscription, Podcast, Device
+from mygpo.api.backend import get_device
 from datetime import datetime
 from django.utils.datastructures import MultiValueDictKeyError
 from django.db import IntegrityError
@@ -44,23 +45,17 @@ def upload(request):
     if (not user):
         return HttpResponse('@AUTHFAIL', mimetype='text/plain')
 
-    d, created = Device.objects.get_or_create(user=user, uid=LEGACY_DEVICE_UID,
-        defaults = {'type': 'unknown', 'name': LEGACY_DEVICE_NAME})
-
-    # undelete a previously deleted device
-    if d.deleted:
-        d.deleted = False
-        d.save()
+    d = get_device(user, LEGACY_DEVICE_UID)
 
     existing = Subscription.objects.filter(user=user, device=d)
 
     existing_urls = [e.podcast.url for e in existing]
 
     i = Importer(opml)
-    podcast_urls = []
-    for p in i.items:
-        u = sanitize_url(p['url'])
-        if u != '': podcast_urls.append(u)
+
+    podcast_urls = [p['url'] for p in i.items]
+    podcast_urls = map(sanitize_url, podcast_urls)
+    podcast_urls = filter(lambda x: x, podcast_urls)
 
     new = [u for u in podcast_urls if u not in existing_urls]
     rem = [e.podcast.url for e in existing if e.podcast.url not in podcast_urls]
@@ -115,6 +110,7 @@ def getlist(request):
     opml = exporter.generate(podcasts)
 
     return HttpResponse(opml, mimetype='text/xml')
+
 
 def auth(emailaddr, password):
     if emailaddr is None or password is None:

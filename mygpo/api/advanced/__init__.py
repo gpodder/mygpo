@@ -22,7 +22,7 @@ from mygpo.api.models.users import EpisodeFavorite
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.api.advanced.directory import episode_data, podcast_data
-from mygpo.api.backend import get_all_subscriptions
+from mygpo.api.backend import get_all_subscriptions, get_device
 from django.shortcuts import get_object_or_404
 from time import mktime, gmtime, strftime
 from datetime import datetime
@@ -59,9 +59,8 @@ def subscriptions(request, username, device_uid):
     if request.method == 'GET':
         d = get_object_or_404(Device, user=request.user, uid=device_uid, deleted=False)
 
-        try:
-            since_ = request.GET['since']
-        except KeyError:
+        since_ = request.GET.get('since', None)
+        if since_ == None:
             return HttpResponseBadRequest('parameter since missing')
 
         since = datetime.fromtimestamp(float(since_))
@@ -71,11 +70,7 @@ def subscriptions(request, username, device_uid):
         return JsonResponse(changes)
 
     elif request.method == 'POST':
-        d, created = Device.objects.get_or_create(user=request.user, uid=device_uid)
-
-        if d.deleted:
-            d.deleted = False
-            d.save()
+        d = get_device(request.user, device_uid)
 
         actions = json.loads(request.raw_post_data)
         add = actions['add'] if 'add' in actions else []
@@ -102,13 +97,11 @@ def update_subscriptions(user, device, add, remove):
            raise IntegrityError('can not add and remove %s at the same time' % a)
 
     for u in add:
-        us = sanitize_url(u)
-        if u != us:  updated_urls.append( (u, us) )
+        us = sanitize_append(u, updated_urls)
         if us != '': add_sanitized.append(us)
 
     for u in remove:
-        us = sanitize_url(u)
-        if u != us:  updated_urls.append( (u, us) )
+        us = sanitize_append(u, updated_urls))
         if us != '' and us not in add_sanitized:
             rem_sanitized.append(us)
 
@@ -129,19 +122,13 @@ def update_subscriptions(user, device, add, remove):
     return updated_urls
 
 def get_subscription_changes(user, device, since, until):
-    actions = {}
-    for a in SubscriptionAction.objects.filter(device=device, timestamp__gt=since, timestamp__lte=until).order_by('timestamp'):
-        #ordered by ascending date; newer entries overwriter older ones
-        actions[a.podcast] = a
+    #ordered by ascending date; newer entries overwriter older ones
+    query = SubscriptionAction.objects.filter(device=device,
+            timestamp__gt=since, timestamp__lte=until).order_by('timestamp'):
+    actions = dict([(a.podcast, a) for a in query])
 
-    add = []
-    remove = []
-
-    for a in actions.values():
-        if a.action == SUBSCRIBE_ACTION:
-            add.append(a.podcast.url)
-        elif a.action == UNSUBSCRIBE_ACTION:
-            remove.append(a.podcast.url)
+    add = filter(lambda a: a.action == SUBSCRIBE_ACTION, actions)
+    rem = filter(lambda a: a.action == UNSUBSCRIBE_ACTION, actions)
 
     until_ = int(mktime(until.timetuple()))
     return {'add': add, 'remove': remove, 'timestamp': until_}
@@ -242,16 +229,12 @@ def update_episodes(user, actions):
     update_urls = []
 
     for e in actions:
-        u = e['podcast']
-        us = sanitize_url(u)
-        if u != us:  update_urls.append( (u, us) )
+        us = sanitize_append(e['podcast'], update_urls)
         if us == '': continue
 
         podcast, p_created = Podcast.objects.get_or_create(url=us)
 
-        eu = e['episode']
-        eus = sanitize_url(eu, podcast=False, episode=True)
-        if eu != eus: update_urls.append( (eu, eus) )
+        eus = sanitize_append(e['episode'], update_urls)
         if eus == '': continue
 
         episode, e_created = Episode.objects.get_or_create(podcast=podcast, url=eus)
@@ -260,51 +243,20 @@ def update_episodes(user, actions):
             raise Exception('invalid action %s' % action)
 
         if 'device' in e:
-            device, created = Device.objects.get_or_create(user=user, uid=e['device'])
-
-            # undelete a previously deleted device
-            if device.deleted:
-                device.deleted = False
-                device.save()
-
+            device = get_device(user, e['device'])
         else:
-            device, created = None, False
+            device = None
 
-        timestamp = dateutil.parser.parse(e['timestamp']) if 'timestamp' in e and e['timestamp'] else datetime.now()
+        timestamp = dateutil.parser.parse(e['timestamp']) if e.get('timestamp', None) else datetime.now()
 
-        # Time values for play actions and their keys in JSON
-        PLAY_ACTION_KEYS = ('position', 'started', 'total')
-        time_values = {}
-
-        for key in PLAY_ACTION_KEYS:
-            if key in e:
-                if action != 'play':
-                    # Key found, but must not be supplied (no play action!)
-                    return HttpResponseBadRequest('%s only allowed in play actions' % key)
-
-                try:
-                    time_values[key] = parse_time(e[key])
-                except ValueError:
-                    log('could not parse %s parameter (value: %s) for user %s' % (key, repr(e[key]), user))
-                    return HttpResponseBadRequest('Wrong format for %s: %s' % (key, repr(e[key])))
-            else:
-                # Value not supplied by client
-                time_values[key] = None
-
-        # Sanity check: If started or total are given, require position
-        if (time_values['started'] is not None or \
-                time_values['total'] is not None) and \
-                time_values['position'] is None:
-            return HttpResponseBadRequest('started and total require position')
-
-        # Sanity check: total and position can only appear together
-        if (time_values['total'] or time_values['started']) and \
-            not (time_values['total'] and time_values['started']):
-            return HttpResponseBadRequest('total and started parameters can only appear together')
+        time_values = check_time_values(e)
 
         try:
-            EpisodeAction.objects.create(user=user, episode=episode, device=device, action=action, timestamp=timestamp,
-                    playmark=time_values['position'], started=time_values['started'], total=time_values['total'])
+            EpisodeAction.objects.create(user=user, episode=episode,
+                    device=device, action=action, timestamp=timestamp,
+                    playmark=time_values.get('position', None),
+                    started=time_values.get('started', None),
+                    total=time_values.get('total', None))
         except Exception, e:
             log('error while adding episode action (user %s, episode %s, device %s, action %s, timestamp %s): %s' % (user, episode, device, action, timestamp, e))
 
@@ -318,13 +270,7 @@ def update_episodes(user, actions):
 # instead of "POST" requests for uploading device settings
 @allowed_methods(['POST', 'PUT'])
 def device(request, username, device_uid):
-
-    d, created = Device.objects.get_or_create(user=request.user, uid=device_uid)
-
-    #undelete a previously deleted device
-    if d.deleted:
-        d.deleted = False
-        d.save()
+    d = get_device(request.user, device_uid)
 
     data = json.loads(request.raw_post_data)
 
@@ -366,11 +312,11 @@ def devices(request, username):
 
 
 def device_data(device):
-    return {
-        'id': d.uid,
-        'caption': d.name,
-        'type': d.type,
-        'subscriptions': Subscription.objects.filter(device=d).count()
+    return dict(
+        id           = device.uid,
+        caption      = device.name,
+        type         = device.type,
+        subscription = Subscription.objects.filter(device=device).count()
     }
 
 
@@ -383,9 +329,8 @@ def updates(request, username, device_uid):
 
     device = get_object_or_404(Device, user=request.user, uid=device_uid)
 
-    try:
-        since_ = request.GET['since']
-    except KeyError:
+    since_ = request.GET.get('since', None)
+    if since_ == None:
         return HttpResponseBadRequest('parameter since missing')
 
     since = datetime.fromtimestamp(float(since_))
@@ -427,4 +372,37 @@ def favorites(request, username):
     favorites = [x.episode for x in EpisodeFavorite.objects.filter(user=request.user).order_by('-created')]
     ret = map(episode_data, favorites)
     return JsonResponse(ret)
+
+
+def sanitize_append(url, sanitized_list):
+    urls = sanitize_url(url)
+    if url != urls:
+        sanitized_list.append( (url, urls) )
+    return urls
+
+
+def check_time_values(action)
+    PLAY_ACTION_KEYS = ('position', 'started', 'total')
+
+    # Key found, but must not be supplied (no play action!)
+    if action['action'] != 'play':
+        for key in PLAY_ACTION_KEYS:
+            if key in e:
+                raise ValueError('%s only allowed in play actions' % key)
+
+    supplied_keys = filter(lambda: x: x in e, PLAY_ACTION_KEYS)
+    time_values = map(lambda x: parse_time(e[x]), supplied_keys)
+
+    # Sanity check: If started or total are given, require position
+    if (('started' in time_values) or \
+        ('total' in time_values)) and \
+            (not 'position' in time_values):
+        raise ValueError('started and total require position')
+
+    # Sanity check: total and position can only appear together
+    if (('total' in time_values) or ('started' in time_values)) and \
+        not (('total' in time_values) and ('started' in time_values)):
+        raise HttpResponseBadRequest('total and started parameters can only appear together')
+
+    return time_values
 

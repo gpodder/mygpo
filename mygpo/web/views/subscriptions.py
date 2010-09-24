@@ -34,7 +34,7 @@ def download_all(request):
 @requires_token(object='subscriptions', action='r', denied_template='user_subscriptions_denied.html')
 def for_user(request, username):
     user = get_object_or_404(User, username=username)
-    public_subscriptions = backend.get_public_subscriptions(user)
+    public_subscriptions = Subscription.objects.public_subscriptions(users=[user])
     token = SecurityToken.objects.get(object='subscriptions', action='r', user__username=username)
 
     return render_to_response('user_subscriptions.html', {
@@ -46,7 +46,7 @@ def for_user(request, username):
 @requires_token(object='subscriptions', action='r')
 def for_user_opml(request, username):
     user = get_object_or_404(User, username=username)
-    public_subscriptions = backend.get_public_subscriptions(user)
+    public_subscriptions = Subscription.objects.public_subscriptions(users=[user])
 
     response = render_to_response('user_subscriptions.opml', {
         'subscriptions': public_subscriptions,

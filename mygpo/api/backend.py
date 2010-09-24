@@ -128,26 +128,30 @@ def merge_toplists(podcast_entries, group_entries, sortkey, reverse, count=None)
 
 
 def get_random_picks(languages=None, recent_days=timedelta(days=7)):
-#    threshold = datetime.today() - recent_days
-
     all_podcasts    = Podcast.objects.all().exclude(title='').order_by('?')
     lang_podcasts   = get_podcasts_for_languages(languages, all_podcasts)
-#    recent_podcasts = lang_podcasts.annotate(latest_release=Max('episode__timestamp')).filter(latest_release__gt=threshold)
-
-#    if recent_podcasts.count() > 0:
-#        return recent_podcasts
 
     if lang_podcasts.count() > 0:
         return lang_podcasts
-
     else:
         return all_podcasts
+
 
 def get_all_subscriptions(user):
     return set([s.podcast for s in Subscription.objects.filter(user=user)])
 
-def get_public_subscriptions(user):
-    subscriptions = [s for s in Subscription.objects.filter(user=user)]
-    public_subscriptions = set([s.podcast for s in subscriptions if s.get_meta().public])
-    return public_subscriptions
+
+def get_device(user, uid, undelete=True):
+    """
+    Loads or creates the device indicated by user, uid.
+
+    If the device has been deleted and undelete=True, it is undeleted.
+    """
+    device, created = Device.objects.get_or_create(user=user, uid=uid)
+
+    if device.deleted and undelete:
+        device.deleted = False
+        device.save()
+
+    return device
 
