@@ -1,0 +1,145 @@
+
+
+                         View Overview
+                         ~~~~~~~~~~~~~
+
+
+This file describes the views that will be used in the CouchDB based backend of
+the gpodder.net webservice.
+
+For each view the use case in the application is given.
+
+
+Podcasts by ID
+~~~~~~~~~~~~~~
+ * For a Podcast, emits its id and the podcast itself.
+ * For a PodcastGroup, emits the contained podcasts with their ids.
+
+Used for accessing a Podcast by id, even after it has been added to a group
+(instead of accessing it without a view, what would not be possible for a
+Podcast within a group).
+
+
+Podcasts by Old-Id
+~~~~~~~~~~~~~~~~~~
+ * For a Podcast, emits its old_id and the podcast itself.
+ * For a PodcastGroup, emits the old_id and the podcast for all contained
+   podcasts.
+
+Used to access Podcasts by the Ids used in the RDBMS-based backend.
+
+
+Podcasts by Number of Subscribers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * For each Podcast, emits the latest number of subscribers
+ * For each PodcastGroup, emits the accumulated number of its Podcasts
+
+Represents the Podcast Toplist when accessed reverse.
+
+
+Podcasts by Tag
+~~~~~~~~~~~~~~~
+ * For each Podcast, iterates over all tags and emits
+   [tag, weight, Podcast] and the Podcast
+ * For each PodcastGroup, aggregates tags of all contained podcasts,
+   iterates over them and emits [tag, weight, PodcastGroup] and
+   the PodcastGroup
+
+Contains Podcast(Group)s per Tag ordered by Weight. Can be used to get the
+podcasts of a category, ordered by their weight.
+
+
+Categories by Weight
+~~~~~~~~~~~~~~~~~~~~
+ * For each Category, emit its Weight and the Category itself
+
+A list of Categories ordered by their weight; used to construct the navigation
+of the Podcast Directory.
+
+
+Episodes by Podcast
+~~~~~~~~~~~~~~~~~~~
+ * For each Episode, emit [Podcast, Release-Date] and the Episode
+
+Can be used to get a list of all episodes for a given podcast, ordered by their
+release date.
+
+
+Favorite Episodes by User
+~~~~~~~~~~~~~~~~~~~~~~~~~
+ * For each UserEpisodeState, emit [User, Podcast] and null, if the episode is
+   a favorite of the user.
+
+Can be used to get the list of favorite episodes for a given user.
+
+
+Users by Username
+~~~~~~~~~~~~~~~~~
+ * For each User, emit the username and the User
+
+Can be used to get a user by its username.
+
+
+Devices by User-Id
+~~~~~~~~~~~~~~~~~~
+ * For each User, iterate over all Devices and emit [User-Id, Device-ID]
+   and the device
+
+Can be used either to get a list of all devices for a given user, or to access
+a device given its user and ID.
+
+
+Subscriptions by Podcast
+~~~~~~~~~~~~~~~~~~~~~~~~
+ * For each PodcastUserState, check existing subscriptions and emit
+   [Podcast-Id, User-Id] and null.
+
+Can be used to get the subscribers for a given Podcast.
+
+
+Subscriptions by User
+~~~~~~~~~~~~~~~~~~~~~
+ * For each PodcastUserState, check existing subscriptions and emit
+   [User-Id, Podcast-Id, Device-Id] and null.
+
+Can be used to get the subscriptions for a given User. When queried with
+grouped=true, group_level=2 it returns the subscribed Podcasts.
+
+
+Suggestions by User
+~~~~~~~~~~~~~~~~~~~
+ * For each PodcastUserSuggestion, emit [User-Id, Podcast-Id] and null.
+
+Can be used to get the suggestions for a given User.
+
+
+PodcastUserState by User, Podcast
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * For each PodcastUserState, emit [User-Id, Podcast-Id].
+
+Can be used to access PodcastUserState by User-Id and Podcast-Id.
+
+
+PodcastUserState by User, Episode
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * For each EpisodeUserState, emit [User-Id, Episode-Id].
+
+ Can be used to access a EpisodeUserState by User-Id and Episode-Id.
+
+
+Sanitizing Rules by Target
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * For each URLSanitizing Rule emit [target, priority] and the rule
+   for each target (podcast, episode) the rule can be applied to
+
+Can be used to get the sanitizing rules in the intended order of application.
+
+
+Advertisement by Time
+~~~~~~~~~~~~~~~~~~~~~
+ * For each Advertisement, emit the end-date and the Advertisement.
+
+Can be used to get the Advertisement that will end next (ie the current or the
+upcoming) advertisement.
+
+
