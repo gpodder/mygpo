@@ -65,6 +65,7 @@ Replaces Models
  * DirectoryEntry
  * PodcastPublisher
  * SearchEntry
+ * ToplistEntry
 
 Example Document
 {
@@ -72,7 +73,7 @@ Example Document
     name: "Cool Podcast",
     feed_url: "http://podcast.com/mp3.xml",
     description: "..."
-    subscriber: [(2010-09-01, 120), (2010-09-01, 130)],
+    subscribers: [[2010-09-01, 120], [2010-09-01, 130]],
     related_podcasts: ["34059384598304850", "23480128409230482"],
     tags: {
         feed: [["technology", 50], ["news", 20]],
@@ -80,6 +81,7 @@ Example Document
     },
     publishers: ["stefan"],
     merged_ids: [ ...],
+    language: "en",
 }
 
 
@@ -105,7 +107,7 @@ Example Document
             group_member_name: "MP3",             # required if Podcast is member of a group
             feed_url: "http://podcast.com/mp3.xml",
             description: "..."
-            subscriber: [[2010-09-01, 120], [2010-09-01, 130]],
+            subscribers: [[2010-09-01, 120], [2010-09-01, 130]],
             related_podcasts: ["34059384598304850", "23480128409230482"],
             tags: ["technology", "news"],
             publishers: ["stefan"],
@@ -118,11 +120,14 @@ Example Document
   Episode
 ===========
 
-One Episode with optional support for multiple media files (eg Audio and PDF Show Notes).
+One Episode with optional support for multiple media files (eg Audio and PDF
+Show Notes). The fields listeners and recent_listeners are regularly
+updated with aggregated data to substitute queries based on time.
 
 Replaces Models:
  * Episode
  * SearchEntry
+ * ToplistEntry
 
 Example Document
 {
@@ -133,6 +138,10 @@ Example Document
     released: "2010-09-20 12:00",
     tags: ["opensource", "technology"],
     merged_ids: ["908345083045", "29380423849"],
+    media_types: ["audio"],
+    listeners: [["2010-09-20", 20], ["2010-09-21", 15]],
+    recent_listeners:  75,
+    language: "en"
 }
 
 
@@ -279,38 +288,19 @@ Example Document
 }
 
 
-  PodcastToplistEntry
-=======================
+  Category
+============
 
-An entry in the podcast toplist with meta-data for filtering (eg language).
+Represents a category within the Podcast Directory.
 
-Replaces Models:
- * ToplistEntry
-
-Example Document
-{
-    podcast:     "118913287192379173298",
-    group:       "9238409283402830480",
-    language:    "en",
-    media_tpyes: ["audio", "video"],
-    subscribers: 1235,
-}
-
-
-  EpisodeToplistEntry
-=======================
-
-An entry in the episode toplist with meta-data for filtering (eg language).
-
-Replaces Models:
- * EpisodeToplistEntry
+Replaces Models
+ * PodcastTag
 
 Example Document
 {
-    episode:     "19384038450938450983",
-    language:    "en",
-    media_types: ["audio"]
-    listeners:   56,
+    label:     "Technology",
+    spellings: ["technology", "tech"],
+    weight:    1200,
 }
 
 
