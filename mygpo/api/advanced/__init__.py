@@ -101,7 +101,7 @@ def update_subscriptions(user, device, add, remove):
         if us != '': add_sanitized.append(us)
 
     for u in remove:
-        us = sanitize_append(u, updated_urls))
+        us = sanitize_append(u, updated_urls)
         if us != '' and us not in add_sanitized:
             rem_sanitized.append(us)
 
@@ -124,7 +124,7 @@ def update_subscriptions(user, device, add, remove):
 def get_subscription_changes(user, device, since, until):
     #ordered by ascending date; newer entries overwriter older ones
     query = SubscriptionAction.objects.filter(device=device,
-            timestamp__gt=since, timestamp__lte=until).order_by('timestamp'):
+            timestamp__gt=since, timestamp__lte=until).order_by('timestamp')
     actions = dict([(a.podcast, a) for a in query])
 
     add = filter(lambda a: a.action == SUBSCRIBE_ACTION, actions)
@@ -317,7 +317,7 @@ def device_data(device):
         caption      = device.name,
         type         = device.type,
         subscription = Subscription.objects.filter(device=device).count()
-    }
+    )
 
 
 @csrf_exempt
@@ -381,7 +381,7 @@ def sanitize_append(url, sanitized_list):
     return urls
 
 
-def check_time_values(action)
+def check_time_values(action):
     PLAY_ACTION_KEYS = ('position', 'started', 'total')
 
     # Key found, but must not be supplied (no play action!)
@@ -390,7 +390,7 @@ def check_time_values(action)
             if key in e:
                 raise ValueError('%s only allowed in play actions' % key)
 
-    supplied_keys = filter(lambda: x: x in e, PLAY_ACTION_KEYS)
+    supplied_keys = filter(lambda x: x in e, PLAY_ACTION_KEYS)
     time_values = map(lambda x: parse_time(e[x]), supplied_keys)
 
     # Sanity check: If started or total are given, require position
