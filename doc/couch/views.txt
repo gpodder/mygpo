@@ -49,12 +49,20 @@ Contains Podcast(Group)s per Tag ordered by Weight. Can be used to get the
 podcasts of a category, ordered by their weight.
 
 
-Categories by Weight
+Categories by Weight (directory/categories)
 ~~~~~~~~~~~~~~~~~~~~
  * For each Category, emit its Weight and the Category itself
 
 A list of Categories ordered by their weight; used to construct the navigation
 of the Podcast Directory.
+
+
+Categories by Tags (directory/categories_by_tags)
+~~~~~~~~~~~~~~~~~~
+ * For each Category, emit its label and all its spellings, with
+   the Category itself
+
+Can be used to get the Category for a given Tag, or all assigned Tags.
 
 
 Episodes by Podcast

@@ -23,6 +23,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     (r'^',           include('mygpo.web.urls')),
+    (r'^',           include('mygpo.directory.urls')),
     (r'^',           include('mygpo.api.urls')),
     (r'^',           include('mygpo.userfeeds.urls')),
     (r'^search/',    include('mygpo.search.urls')),

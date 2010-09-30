@@ -40,6 +40,11 @@ DATABASES = {
     }
 }
 
+COUCHDB_DATABASES = (
+    ('mygpo.directory', 'http://127.0.0.1:5984/mygpo'),
+)
+
+
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -96,12 +101,14 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.humanize',
     'registration',
+    'couchdbkit.ext.django',
     'mygpo.api',
     'mygpo.web',
     'mygpo.publisher',
     'mygpo.data',
     'mygpo.userfeeds',
     'mygpo.search',
+    'mygpo.directory',
 )
 
 ACCOUNT_ACTIVATION_DAYS = 7

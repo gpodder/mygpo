@@ -108,9 +108,8 @@ class DirectoryEntryManager(models.Manager):
         excluded_tags = getattr(settings, 'DIRECTORY_EXCLUDED_TAGS', [])
         return filter(lambda x: not x.tag in excluded_tags, tags)
 
-    def podcasts_for_tag(self, tag):
-        return DirectoryEntry.objects.filter(tag=tag).order_by('-ranking')
-
+    def podcasts_for_category(self, tags):
+        return DirectoryEntry.objects.filter(tag__in=tags).order_by('-ranking')
 
 class DirectoryEntry(models.Model):
     podcast = models.ForeignKey(Podcast, null=True)

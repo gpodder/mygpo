@@ -46,8 +46,8 @@
 
   <div id="tagcloud">
    {% for tag in tag_cloud %}
-    <span style="font-size: {% smartwidthratio tag.entries max_entries 4 1 %}em">
-     <a href="{% url directory tag.tag %}">{{ tag.tag }}</a>
+    <span style="font-size: {% smartwidthratio tag.weight max_entries 4 1 %}em">
+     <a href="{% url directory tag.label %}">{{ tag.label }}</a>
     </span>
    {% endfor %}
   </div>

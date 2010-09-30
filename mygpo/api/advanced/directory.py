@@ -19,28 +19,24 @@ from mygpo.api.httpresponse import JsonResponse
 from django.shortcuts import get_object_or_404
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.api.models import Podcast, Episode, ToplistEntry
+from mygpo.data.models import DirectoryEntry
+from mygpo.directory.models import Category
 from django.contrib.sites.models import Site
 from django.views.decorators.csrf import csrf_exempt
 
 
 @csrf_exempt
 def top_tags(request, count):
-    tags = DirectoryEntry.objects.top_tags(int(count))
-    resp = []
-    for t in tags:
-        resp.append( {
-            'tag': t.tag,
-            'usage': t.entries
-            } )
+    tags = Category.top_categories(int(count))
+    resp = map(category_data, tags)
     return JsonResponse(resp)
 
 
 @csrf_exempt
 def tag_podcasts(request, tag, count):
-    resp = []
-    for p in DirectoryEntry.objects.podcasts_for_tag(tag)[:int(count)]:
-        resp.append( podcast_data(p.get_podcast()) )
-
+    category = Category.for_tag(tag)
+    query = DirectoryEntry.objects.podcasts_for_category(category.get_tags())[:int(count)]
+    resp = map(lambda p: podcast_data(p.get_podcast()), query)
     return JsonResponse(resp)
 
 
@@ -95,4 +91,11 @@ def episode_data(episode):
         "website": episode.link,
         "mygpo_link": 'http://%s/episode/%s' % (site.domain, episode.id),
         }
+
+
+def category_data(category):
+    return dict(
+        tag   = category.label,
+        usage = category.weight
+    )
 

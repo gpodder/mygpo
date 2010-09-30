@@ -301,6 +301,7 @@ Example Document
     label:     "Technology",
     spellings: ["technology", "tech"],
     weight:    1200,
+    updated:   "2010-09-28T08:38:03Z",
 }
 
 

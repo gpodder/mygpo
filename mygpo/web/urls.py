@@ -48,8 +48,6 @@ urlpatterns += patterns('mygpo.web.views.settings',
 )
 
 urlpatterns += patterns('mygpo.web.views.public',
- url(r'^directory/$',                                             'browse',                     name='directory-home'),
- url(r'^directory/(?P<category>[^/]+)$',                          'category',                   name='directory'),
  url(r'^toplist/$',                                               'toplist',                    name='toplist'),
  url(r'^toplist/episodes$',                                       'episode_toplist',            name='episode-toplist'),
     (r'^gpodder-examples.opml$',                                  'gpodder_example_podcasts'),
