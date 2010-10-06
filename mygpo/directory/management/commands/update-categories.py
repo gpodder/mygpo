@@ -37,8 +37,11 @@ class Command(BaseCommand):
                 if tag.tag in excluded_tags:
                     continue
 
+                label = tag.tag.strip()
+                if not label:
+                    continue
                 category = Category()
-                category.label = tag.tag
+                category.label = label
                 category.spellings = []
                 category.weight = tag.entries
 
