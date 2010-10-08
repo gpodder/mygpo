@@ -688,3 +688,6 @@ pre_delete.connect(remove_podcast_entry, sender=Podcast)
 post_save.connect(update_podcast_group_entry, sender=PodcastGroup)
 pre_delete.connect(remove_podcast_group_entry, sender=PodcastGroup)
 
+from mygpo import migrate
+post_save.connect(migrate.save_podcast_signal, sender=Podcast)
+pre_delete.connect(migrate.delete_podcast_signal, sender=Podcast)

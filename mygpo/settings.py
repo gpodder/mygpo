@@ -42,6 +42,7 @@ DATABASES = {
 
 COUCHDB_DATABASES = (
     ('mygpo.directory', 'http://127.0.0.1:5984/mygpo'),
+    ('mygpo.core',      'http://127.0.0.1:5984/mygpo'),
 )
 
 
@@ -102,6 +103,7 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'registration',
     'couchdbkit.ext.django',
+    'mygpo.core',
     'mygpo.api',
     'mygpo.web',
     'mygpo.publisher',

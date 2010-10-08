@@ -72,3 +72,71 @@ def parse_bool(val):
         return True
     return False
 
+
+def iterate_together(l1, l2, compare=lambda x, y: cmp(x, y)):
+    """
+    takes two ordered, possible sparse, lists l1 and l2 with similar items
+    (some items have a corresponding item in the other list, some don't).
+
+    It then yield tuples of corresponding items, where one element is None is
+    there is no corresponding entry in one of the lists.
+
+    Tuples where both elements are None are skipped.
+
+    compare is a method for comparing items from both lists; it defaults
+    to cmp.
+
+    >>> list(iterate_together(range(1, 3), range(1, 4, 2)))
+    [(1, 1), (2, None), (None, 3)]
+
+    >>> list(iterate_together([], []))
+    []
+
+    >>> list(iterate_together(range(1, 3), range(3, 5)))
+    [(1, None), (2, None), (None, 3), (None, 4)]
+
+    >>> list(iterate_together(range(1, 3), []))
+    [(1, None), (2, None)]
+
+    >>> list(utils.iterate_together([1, None, 3], [None, None, 3]))
+    [(1, None), (3, 3)]
+    """
+
+    l1 = iter(l1)
+    l2 = iter(l2)
+
+    def _take(it):
+        try:
+            i = it.next()
+            while i == None:
+                i = it.next()
+            return i, True
+        except StopIteration:
+            return None, False
+
+    i1, more1 = _take(l1)
+    i2, more2 = _take(l2)
+
+    while more1 or more2:
+        if not more2 or (i1 != None and compare(i1, i2) < 0):
+            yield(i1, None)
+            i1, more1 = _take(l1)
+
+        elif not more1 or (i2 != None and compare(i1, i2) > 0):
+            yield(None, i2)
+            i2, more2 = _take(l2)
+
+        elif compare(i1, i2) == 0:
+            yield(i1, i2)
+            i1, more1 = _take(l1)
+            i2, more2 = _take(l2)
+
+
+def progress(val, max_val, status_str, max_width=50):
+    print '\r',
+    print '[ %s ] %s / %s | %s' % (
+        '#'*int(float(val)/max_val*max_width) +
+        ' ' * (max_width-(int(float(val)/max_val*max_width))),
+        val,
+        max_val,
+        status_str),

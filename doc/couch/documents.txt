@@ -99,11 +99,15 @@ Replaces Models:
 Example Document
 {
     _id: "9238409283402830480",
+    oldid: 10,
     name: "Cool Podcast",
     podcasts: [
         {
-            _id: "118913287192379173298"
+            id: "118913287192379173298",
             name: "Cool Podcast",
+            group: "9238409283402830480",  # the _id of the group for
+                                           # referring to it when the the
+                                           # podcast is referred to separately
             group_member_name: "MP3",             # required if Podcast is member of a group
             feed_url: "http://podcast.com/mp3.xml",
             description: "..."

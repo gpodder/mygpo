@@ -20,13 +20,20 @@ Used for accessing a Podcast by id, even after it has been added to a group
 Podcast within a group).
 
 
-Podcasts by Old-Id
+Podcasts by Old-Id (core/podcasts_by_oldid)
 ~~~~~~~~~~~~~~~~~~
- * For a Podcast, emits its old_id and the podcast itself.
+ * For a Podcast, emits its old_id and the podcast itself if it has an oldid.
  * For a PodcastGroup, emits the old_id and the podcast for all contained
-   podcasts.
+   podcasts that have an oldid.
 
 Used to access Podcasts by the Ids used in the RDBMS-based backend.
+
+
+Podcast-Group by Old-Id (core/podcastgroups_by_oldid)
+~~~~~~~~~~~~~~~~~~~~~~~
+ * For a PodcastGroup, emits the oldid and the podcast-group if it has an oldid
+
+Used to access Podcast-Groups by the Ids used in the RDBMS-based backend.
 
 
 Podcasts by Number of Subscribers
