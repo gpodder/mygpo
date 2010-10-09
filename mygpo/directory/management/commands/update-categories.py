@@ -5,6 +5,7 @@ from django.core.management.base import BaseCommand
 from mygpo import settings
 from mygpo.directory.models import Category
 from mygpo.data.models import DirectoryEntry
+from mygpo.utils import progress
 
 
 class Command(BaseCommand):
@@ -16,6 +17,8 @@ class Command(BaseCommand):
         excluded_tags = getattr(settings, 'DIRECTORY_EXCLUDED_TAGS', [])
 
         top_tags = DirectoryEntry.objects.top_tags(None)
+        tag_count = len(top_tags)
+        n=0
         for tag in top_tags:
             label = tag.tag.strip()
 
@@ -48,3 +51,5 @@ class Command(BaseCommand):
             category.updated = start_time
             category.save()
 
+            n+=1
+            progress(n, tag_count)
