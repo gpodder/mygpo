@@ -15,7 +15,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from mygpo.api.models import ToplistEntry, Podcast, Subscription, EpisodeToplistEntry
+from mygpo.api.models import Device, ToplistEntry, Podcast, Subscription, EpisodeToplistEntry
 from mygpo.data.mimetype import get_type, CONTENT_TYPES
 from datetime import timedelta
 

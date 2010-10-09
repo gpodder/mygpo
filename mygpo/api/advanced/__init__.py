@@ -127,11 +127,14 @@ def get_subscription_changes(user, device, since, until):
             timestamp__gt=since, timestamp__lte=until).order_by('timestamp')
     actions = dict([(a.podcast, a) for a in query])
 
-    add = filter(lambda a: a.action == SUBSCRIBE_ACTION, actions)
-    rem = filter(lambda a: a.action == UNSUBSCRIBE_ACTION, actions)
+    add = filter(lambda a: a[0].action == SUBSCRIBE_ACTION, actions)
+    add = map(lambda a: a[1].url, add)
+
+    rem = filter(lambda a: a[0].action == UNSUBSCRIBE_ACTION, actions)
+    rem = map(lambda a:a[1].url, rem)
 
     until_ = int(mktime(until.timetuple()))
-    return {'add': add, 'remove': remove, 'timestamp': until_}
+    return {'add': add, 'remove': rem, 'timestamp': until_}
 
 
 @csrf_exempt
@@ -247,16 +250,16 @@ def update_episodes(user, actions):
         else:
             device = None
 
-        timestamp = dateutil.parser.parse(e['timestamp']) if e.get('timestamp', None) else datetime.now()
+        timestamp = dateutil.parser.parse(e['timestamp']) if 'timestamp' in e else datetime.now()
 
         time_values = check_time_values(e)
 
         try:
             EpisodeAction.objects.create(user=user, episode=episode,
                     device=device, action=action, timestamp=timestamp,
-                    playmark=time_values.get('position', None),
-                    started=time_values.get('started', None),
-                    total=time_values.get('total', None))
+                    playmark=time_values['position'],
+                    started=time_values['started'],
+                    total=time_values['total'])
         except Exception, e:
             log('error while adding episode action (user %s, episode %s, device %s, action %s, timestamp %s): %s' % (user, episode, device, action, timestamp, e))
 
@@ -387,11 +390,10 @@ def check_time_values(action):
     # Key found, but must not be supplied (no play action!)
     if action['action'] != 'play':
         for key in PLAY_ACTION_KEYS:
-            if key in e:
+            if key in action:
                 raise ValueError('%s only allowed in play actions' % key)
 
-    supplied_keys = filter(lambda x: x in e, PLAY_ACTION_KEYS)
-    time_values = map(lambda x: parse_time(e[x]), supplied_keys)
+    time_values = dict(map(lambda x: (x, parse_time(action[x]) if x in action else None), PLAY_ACTION_KEYS))
 
     # Sanity check: If started or total are given, require position
     if (('started' in time_values) or \
