@@ -17,13 +17,13 @@ class Command(BaseCommand):
 
         top_tags = DirectoryEntry.objects.top_tags(None)
         for tag in top_tags:
-            #print tag.tag
+            label = tag.tag.strip()
 
-            category = Category.for_tag(tag.tag)
+            category = Category.for_tag(label)
             if category:
 
                 # delete if it has been excluded after it has been created
-                if tag.tag in excluded_tags:
+                if label in excluded_tags:
                     category.delete()
                     continue
 
@@ -34,10 +34,9 @@ class Command(BaseCommand):
 
             else:
 
-                if tag.tag in excluded_tags:
+                if label in excluded_tags:
                     continue
 
-                label = tag.tag.strip()
                 if not label:
                     continue
                 category = Category()
