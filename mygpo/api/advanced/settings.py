@@ -32,7 +32,7 @@ import json
 def main(request, username, scope):
 
     models = dict(
-            account = lambda: request.get_profile(),
+            account = lambda: request.user.get_profile(),
             device  = lambda: get_object_or_404(Device, user=request.user, uid=request.GET.get('device', '')),
             podcast = lambda: SubscriptionMeta.objects.get_or_create(user=request.user,
                 podcast__url=request.GET.get('podcast', ''))[0],

@@ -1,4 +1,8 @@
+
+from django.db.models import Sum
+
 from mygpo.api.models import Podcast, EpisodeAction
+from mygpo.data.models import Listener
 from mygpo.web.models import Advertisement
 from babel import Locale, UnknownLocaleError
 from datetime import datetime
@@ -32,11 +36,11 @@ def sanitize_language_codes(langs):
     ['de']
 
     >>> sanitize_language_codes(['de-at', 'en', 'en-gb', '(asdf', 'Deutsch'])
-    ['de', 'en]
+    ['de', 'en']
     """
 
     r = '^[a-zA-Z]{2}[-_]?.*$'
-    return list(set([l[:2] for l in langs if l and re.match(r, l)]))
+    return list(set([l[:2].lower() for l in langs if l and re.match(r, l)]))
 
 
 def get_language_names(lang):
@@ -143,6 +147,18 @@ def get_sponsored_podcast(when=datetime.now):
 def get_page_list(start, total, cur, show_max):
     """
     returns a list of pages to be linked for navigation in a paginated view
+
+    >>> get_page_list(1, 100, 1, 10)
+    [1, 2, 3, 4, 5, 6, '...', 98, 99, 100]
+
+    >>> get_page_list(1, 100, 50, 10)
+    [1, '...', 48, 49, 50, 51, '...', 98, 99, 100]
+
+    >>> get_page_list(1, 100, 99, 10)
+    [1, '...', 97, 98, 99, 100]
+
+    >>> get_page_list(1, 3, 2, 10)
+    [1, 2, 3]
     """
 
     if show_max >= (total - start):
@@ -186,3 +202,9 @@ def process_lang_params(request, url):
     return sanitize_language_codes(lang)
 
 
+def get_hours_listened():
+    seconds = Listener.objects.all().aggregate(hours=Sum('episode__duration'))['hours']
+    if seconds == None:
+        return 0
+    else:
+        return seconds / (60 * 60)

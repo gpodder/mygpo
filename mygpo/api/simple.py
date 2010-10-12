@@ -154,12 +154,12 @@ def set_subscriptions(urls, user, device_uid):
     for r in rem:
         p = Podcast.objects.get(url=r)
         p.unsubscribe(device)
-        s.save()
+        p.save()
 
     for n in new:
         p, created = Podcast.objects.get_or_create(url=n)
         p.subscribe(device)
-        s.save()
+        p.save()
 
     # Only an empty response is a successful response
     return HttpResponse('', mimetype='text/plain')
@@ -207,7 +207,7 @@ def suggestions(request, count, format):
     if int(count) not in range(1,100):
         count = 100
 
-    suggestions = SuggestionEntry.objects.for_user(user)[:int(count)]
+    suggestions = SuggestionEntry.objects.for_user(request.user)[:int(count)]
     json_map = lambda p: {'url': p.url, 'title': p.title, 'description': p.description}
     title = _('gpodder.net - %(count)d Suggestions') % {'count': len(suggestions)}
     return format_podcast_list(suggestions, format, title, json_map=json_map)

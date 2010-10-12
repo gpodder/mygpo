@@ -267,6 +267,7 @@ class EpisodeToplistEntry(models.Model):
 
     class Meta:
         db_table = 'episode_toplist'
+        managed = False
 
 
 class SuggestionEntryManager(models.Manager):

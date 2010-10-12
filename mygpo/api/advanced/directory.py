@@ -59,21 +59,26 @@ def episode_info(request):
 
 def podcast_data(podcast):
     site = Site.objects.get_current()
+
     if podcast.group:
         try:
-            e = ToplistEntry.objects.get(podcast_group=podcast.group)
+            subscribers = ToplistEntry.objects.get(podcast_group=podcast.group).subscriptions
 
         # no toplist entry has been created for the group yet
         except ToplistEntry.DoesNotExist:
-            e = ToplistEntry.objects.get(podcast=podcast)
+            subscribers = ToplistEntry.objects.get(podcast=podcast).subscriptions
     else:
-        e = ToplistEntry.objects.get(podcast=podcast)
+        try:
+            subscribers = ToplistEntry.objects.get(podcast=podcast).subscriptions
+        # no toplist entry has been created for this podcast yet
+        except ToplistEntry.DoesNotExist:
+            subscribers = 0
 
     return {
         "url": podcast.url,
         "title": podcast.title,
         "description": podcast.description,
-        "subscribers": e.subscriptions,
+        "subscribers": subscribers,
         "logo_url": podcast.logo_url,
         "website": podcast.link,
         "mygpo_link": 'http://%s/podcast/%s' % (site.domain, podcast.id),

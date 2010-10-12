@@ -19,12 +19,11 @@ from django.http import HttpResponseRedirect, Http404
 from django.contrib.auth.models import User
 from django.template import RequestContext
 from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, Subscription, SuggestionEntry, UserProfile
-from mygpo.data.models import Listener, SuggestionBlacklist, PodcastTag
+from mygpo.data.models import SuggestionBlacklist, PodcastTag
 from mygpo.web.models import Rating
 from mygpo.decorators import manual_gc
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response
-from django.db.models import Sum
 from datetime import datetime, timedelta
 from django.contrib.sites.models import Site
 from mygpo.constants import PODCAST_LOGO_SIZE, PODCAST_LOGO_BIG_SIZE
@@ -49,7 +48,7 @@ def welcome(request, toplist_entries=10):
     podcasts = Podcast.objects.count()
     users = User.objects.filter(is_active=True).count()
     episodes = Episode.objects.count()
-    hours_listened = Listener.objects.all().aggregate(hours=Sum('episode__duration'))['hours'] / (60 * 60)
+    hours_listened = utils.get_hours_listened()
 
     try:
         lang = utils.process_lang_params(request, '/toplist/')
@@ -154,6 +153,7 @@ def cover_art(request, size, filename):
         raise Http404('Cover art not available')
 
 @manual_gc
+@login_required
 def history(request, len=15, device_id=None):
     if device_id:
         devices = Device.objects.filter(id=device_id)

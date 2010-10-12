@@ -30,11 +30,7 @@ def view_or_basicauth(view, request, test_func, realm = "", *args, **kwargs):
     """
     if test_func(request.user):
         # Already logged in, just return the view.
-        try:
-            return view(request, *args, **kwargs)
-        except Exception, e:
-            log(repr(e))
-            return HttpResponseBadRequest(e)
+        return view(request, *args, **kwargs)
 
     # They are not logged in. See if they provided login credentials
     # this header format is used when passing auth-headers
@@ -64,11 +60,7 @@ def view_or_basicauth(view, request, test_func, realm = "", *args, **kwargs):
                     login(request, user)
                     request.user = user
 
-                    try:
-                        return view(request, *args, **kwargs)
-                    except Exception, e:
-                        log(repr(e))
-                        return HttpResponseBadRequest(e)
+                    return view(request, *args, **kwargs)
 
     return auth_request()
 

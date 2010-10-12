@@ -19,6 +19,12 @@ from datetime import datetime, timedelta
 import time
 
 def daterange(from_date, to_date=datetime.now(), leap=timedelta(days=1)):
+    """
+    >>> from_d = datetime(2010, 01, 01)
+    >>> to_d = datetime(2010, 01, 05)
+    >>> list(daterange(from_d, to_d))
+    [datetime.datetime(2010, 1, 1, 0, 0), datetime.datetime(2010, 1, 2, 0, 0), datetime.datetime(2010, 1, 3, 0, 0), datetime.datetime(2010, 1, 4, 0, 0), datetime.datetime(2010, 1, 5, 0, 0)]
+    """
     while from_date <= to_date:
         yield from_date
         from_date = from_date + leap
@@ -46,6 +52,16 @@ def format_time(value):
         return dt.strftime('%H:%M:%S')
 
 def parse_time(value):
+    """
+    >>> parse_time(10)
+    10
+
+    >>> parse_time('05:10') #5*60+10
+    310
+
+    >>> parse_time('1:05:10') #60*60+5*60+10
+    3910
+    """
     if value is None:
         raise ValueError('None value in parse_time')
 
@@ -65,7 +81,18 @@ def parse_time(value):
 
     return int(value)
 
+
 def parse_bool(val):
+    """
+    >>> parse_bool('True')
+    True
+
+    >>> parse_bool('true')
+    True
+
+    >>> parse_bool('')
+    False
+    """
     if isinstance(val, bool):
         return val
     if val.lower() == 'true':
@@ -98,7 +125,7 @@ def iterate_together(l1, l2, compare=lambda x, y: cmp(x, y)):
     >>> list(iterate_together(range(1, 3), []))
     [(1, None), (2, None)]
 
-    >>> list(utils.iterate_together([1, None, 3], [None, None, 3]))
+    >>> list(iterate_together([1, None, 3], [None, None, 3]))
     [(1, None), (3, 3)]
     """
 

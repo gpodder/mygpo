@@ -151,6 +151,9 @@ def played_parts_to_heatmap(played_parts, part_length, part_count):
     The result is a list with part_count elements, each having a value
     of either 0 (user has not played that part) or 1 (user has at least
     partially played that part)
+
+    >>> played_parts_to_heatmap([{'start': 0, 'end': 3}, {'start': 6, 'end': 8}], 1, 10)
+    [1, 1, 1, 1, 0, 1, 1, 1, 1, 0]
     """
     parts = [0]*part_count
 
