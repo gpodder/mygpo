@@ -45,4 +45,5 @@ class Chapter(models.Model):
 
     class Meta:
         db_table = 'chapters'
+        managed = False
 

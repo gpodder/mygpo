@@ -77,3 +77,5 @@ class SearchEntry(models.Model):
         else:
             return None
 
+    class Meta:
+        managed = False

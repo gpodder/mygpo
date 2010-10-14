@@ -9,3 +9,4 @@ class PodcastPublisher(models.Model):
     class Meta:
         unique_together = ('user', 'podcast')
         db_table = 'publisher'
+        managed = False

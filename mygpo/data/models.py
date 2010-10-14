@@ -40,6 +40,7 @@ class PodcastTag(models.Model):
     class Meta:
         db_table = 'podcast_tags'
         unique_together = ('podcast', 'source', 'user', 'tag')
+        managed = False
 
 
 class HistoricPodcastData(models.Model):
@@ -50,6 +51,7 @@ class HistoricPodcastData(models.Model):
     class Meta:
         db_table = 'historic_podcast_data'
         unique_together = ('podcast', 'date')
+        managed = False
 
 
 class BackendSubscription(models.Model):
@@ -65,6 +67,7 @@ class BackendSubscription(models.Model):
     class Meta:
         unique_together = ('device', 'podcast', 'user')
         db_table = 'subscriptions'
+        managed = False
 
 
 class Listener(models.Model):
@@ -87,6 +90,7 @@ class RelatedPodcast(models.Model):
 
     class Meta:
         db_table = 'related_podcasts'
+        managed = False
 
 
 class SuggestionBlacklist(models.Model):
@@ -138,6 +142,7 @@ class DirectoryEntry(models.Model):
 
     class Meta:
         db_table = 'directory_entries'
+        managed = False
 
 
 from mygpo.data.signals import update_podcast_tag_entry

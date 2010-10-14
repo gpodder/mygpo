@@ -31,6 +31,7 @@ class Rating(models.Model):
 
     class Meta:
         db_table = 'ratings'
+        managed = False
 
     def __unicode__(self):
         return '%s rates %s as %s on %s' % (self.user, self.target, self.rating, self.timestamp)
@@ -44,6 +45,7 @@ class SecurityToken(models.Model):
 
     class Meta:
         db_table = 'security_tokens'
+        managed = False
 
     def __unicode__(self):
         return '%s %s %s: %s' % (self.user, self.object, self.action, self.token[:5])
@@ -66,6 +68,7 @@ class Advertisement(models.Model):
 
     class Meta:
         db_table = 'advertisements'
+        managed = False
 
     def __unicode__(self):
         return '%s (%s - %s)' % (self.podcast, self.start, self.end)
