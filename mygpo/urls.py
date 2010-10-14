@@ -18,9 +18,6 @@
 import os.path
 from django.conf.urls.defaults import *
 
-from django.contrib import admin
-admin.autodiscover()
-
 urlpatterns = patterns('',
     (r'^',           include('mygpo.web.urls')),
     (r'^',           include('mygpo.directory.urls')),
@@ -30,7 +27,6 @@ urlpatterns = patterns('',
     (r'^accounts/',  include('registration.urls')),
     (r'^publisher/', include('mygpo.publisher.urls')),
 
-    (r'^admin/(.*)', admin.site.urls),
     (r'^media/(?P<path>.*)$', 'django.views.static.serve',
          {'document_root': os.path.abspath('%s/../htdocs/media/' % os.path.dirname(__file__))}),
 )
