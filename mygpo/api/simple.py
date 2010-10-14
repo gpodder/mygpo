@@ -112,7 +112,11 @@ def format_podcast_list(obj_list, format, title, get_podcast=lambda x: x, json_m
 
 def get_subscriptions(user, device_uid):
     device = get_object_or_404(Device, uid=device_uid, user=user, deleted=False)
-    return [s.podcast for s in device.get_subscriptions()]
+
+    subscriptions = sorted(device.get_subscriptions(), \
+        key=lambda s: s.subscribed_since, reverse=True)
+
+    return [s.podcast for s in subscriptions]
 
 
 def parse_subscription(raw_post_data, format):

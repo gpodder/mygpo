@@ -84,5 +84,10 @@
 
   {% endif %}
 
+  <div class="info">
+   {% url device-symbian-opml device.id as opml-url %}
+   {% blocktrans %}There's a special <a href="{{ opml-url }}">OPML file for use with Nokia Podcasting on Symbian devices</a>{% endblocktrans %}
+  </div>
+
 {% endblock %}
 

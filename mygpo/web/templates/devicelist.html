@@ -80,6 +80,14 @@
 
 
    {% endif %}
+
+  <div>
+   <a href="{% url device-create %}">
+    <img src="/media/subscribe.png" class="action-button" />
+    {% trans "Create a Device" %}
+   </a>
+  </div>
+
    <div class="info"><strong>{% trans "How do I add a new device?" %}</strong> {% trans "Just upload your subscriptions with a new device using gPodder, and it will automatically show up in this list." %}</div>
 {% endblock %}
 

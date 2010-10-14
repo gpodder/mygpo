@@ -16,6 +16,7 @@
 #
 
 from django.shortcuts import render_to_response
+from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponseForbidden
 from django.template import RequestContext
 from mygpo.api.models import Device, EpisodeAction, SubscriptionAction
@@ -68,9 +69,12 @@ def show(request, device_id, error_message=None):
 
 @login_required
 @allowed_methods(['GET', 'POST'])
-def edit(request, device_id):
+def edit(request, device_id=None):
+    if device_id:
+        device = get_object_or_404(Device, id=device_id, user=request.user)
+    else:
+        device = Device(name=_('New Device'), uid=_('new-device'), user=request.user)
 
-    device = get_object_or_404(Device, id=device_id, user=request.user)
     success = False
     error_message = ''
 
@@ -84,8 +88,11 @@ def edit(request, device_id):
             try:
                 device.save()
                 success = True
+
+                if not device_id:
+                    return HttpResponseRedirect(reverse('device', args=[device.id]))
+
             except IntegrityError, ie:
-                device = Device.objects.get(pk=device_id)
                 error_message = _('You can\'t use the same Device ID for two devices.')
 
     else:
@@ -95,7 +102,8 @@ def edit(request, device_id):
             'uid' : device.uid
             })
 
-    return render_to_response('device-edit.html', {
+    template = 'device-edit.html' if device_id else 'device-create.html'
+    return render_to_response(template, {
         'device': device,
         'device_form': device_form,
         'success': success,
@@ -111,6 +119,20 @@ def opml(request, device_id):
     device = get_object_or_404(Device, id=device_id, user=request.user)
 
     response = simple.format_podcast_list(simple.get_subscriptions(request.user, device.uid), 'opml', request.user.username)
+    response['Content-Disposition'] = 'attachment; filename=%s.opml' % device.uid
+    return response
+
+
+@login_required
+def symbian_opml(request, device_id):
+    device = get_object_or_404(Device, id=device_id, user=request.user)
+
+    subscriptions = simple.get_subscriptions(request.user, device.uid)
+
+    for p in subscriptions:
+        p.description = (p.title or '') + '\n' + (p.description or '')
+
+    response = simple.format_podcast_list(subscriptions, 'opml', request.user.username)
     response['Content-Disposition'] = 'attachment; filename=%s.opml' % device.uid
     return response
 

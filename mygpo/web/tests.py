@@ -47,6 +47,7 @@ class SimpleWebTests(TestCase):
             '/toplist/episodes',
             '/gpodder-examples.opml',
             '/devices/',
+            '/devices/create',
             '/login/',
             '/logout/',
             '/']
