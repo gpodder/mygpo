@@ -113,6 +113,13 @@ INSTALLED_APPS = (
     'mygpo.directory',
 )
 
+TEST_EXCLUDE = (
+    'django',
+    'registration',
+)
+
+TEST_RUNNER='mygpo.test.MygpoTestSuiteRunner'
+
 ACCOUNT_ACTIVATION_DAYS = 7
 
 AUTHENTICATION_BACKENDS = (

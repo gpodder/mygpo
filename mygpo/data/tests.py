@@ -19,10 +19,7 @@ from django.test import TestCase
 import unittest
 import doctest
 
-import mygpo.utils
-
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(doctest.DocTestSuite(mygpo.utils))
     return suite
 

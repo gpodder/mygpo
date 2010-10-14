@@ -15,26 +15,55 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-"""
-This file demonstrates two different styles of tests (one doctest and one
-unittest). These will both pass when you run "manage.py test".
-
-Replace these with more appropriate tests for your application.
-"""
-
 from django.test import TestCase
+import unittest
+import doctest
 
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
-        """
-        Tests that 1 + 1 always equals 2.
-        """
-        self.failUnlessEqual(1 + 1, 2)
+import mygpo.web.utils
+from mygpo.test import create_auth_string
+from django.contrib.auth.models import User
 
-__test__ = {"doctest": """
-Another way to test that 1 + 1 is equal to 2.
+class SimpleWebTests(TestCase):
+    def setUp(self):
+        self.user, _ = User.objects.get_or_create(username='test')
+        self.user.set_password('pwd')
+        self.user.save()
 
->>> 1 + 1 == 2
-True
-"""}
+        self.auth_string = create_auth_string('test', 'pwd')
+        self.paramterless_pages = [
+            '/history/',
+            '/suggestions/',
+            '/tags/',
+            '/online-help/',
+            '/subscriptions/',
+            '/download/subscriptions.opml',
+            '/subscriptions/all.opml',
+            '/favorites/',
+            '/account',
+            '/account/privacy',
+            '/account/delete',
+            '/share/',
+            '/toplist/',
+            '/toplist/episodes',
+            '/gpodder-examples.opml',
+            '/devices/',
+            '/login/',
+            '/logout/',
+            '/']
+
+    def test_access_parameterless_pages(self):
+        self.client.post('/login/',
+            dict(login_username=self.user.username, pwd='pwd'))
+
+        for page in self.paramterless_pages:
+            response = self.client.get(page, follow=True)
+#                HTTP_AUTHORIZATION=self.auth_string)
+            self.assertEquals(response.status_code, 200)
+
+
+def suite():
+    suite = unittest.TestSuite()
+    suite.addTest(doctest.DocTestSuite(mygpo.web.utils))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(SimpleWebTests))
+    return suite
 

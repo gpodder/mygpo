@@ -30,7 +30,7 @@ urlpatterns = patterns('',
     (r'^accounts/',  include('registration.urls')),
     (r'^publisher/', include('mygpo.publisher.urls')),
 
-    (r'^admin/(.*)', admin.site.root),
+    (r'^admin/(.*)', admin.site.urls),
     (r'^media/(?P<path>.*)$', 'django.views.static.serve',
          {'document_root': os.path.abspath('%s/../htdocs/media/' % os.path.dirname(__file__))}),
 )
