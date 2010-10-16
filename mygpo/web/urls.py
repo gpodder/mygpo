@@ -66,6 +66,7 @@ urlpatterns += patterns('mygpo.web.views.device',
  url(r'^device/(?P<device_id>\d+)/undelete$',                     'undelete',                   name='device-undelete'),
  url(r'^device/(?P<device_id>\d+)/history$',                      'history',                    name='device-history'),
  url(r'^device/(?P<device_id>\d+)/edit$',                         'edit',                       name='device-edit'),
+ url(r'^device/(?P<device_id>\d+)/upload-opml$',                  'upload_opml',                name='device-upload-opml'),
 )
 
 urlpatterns += patterns('mygpo.web.views.users',
