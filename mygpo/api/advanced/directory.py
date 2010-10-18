@@ -35,6 +35,9 @@ def top_tags(request, count):
 @csrf_exempt
 def tag_podcasts(request, tag, count):
     category = Category.for_tag(tag)
+    if not category:
+        return JsonResponse([])
+
     query = DirectoryEntry.objects.podcasts_for_category(category.get_tags())[:int(count)]
     resp = map(lambda p: podcast_data(p.get_podcast()), query)
     return JsonResponse(resp)
