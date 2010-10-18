@@ -4,10 +4,12 @@ from django.contrib.sites.models import Site
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 
+from mygpo.utils import parse_bool
 from mygpo.decorators import manual_gc, requires_token
 from mygpo.api.models import Device, Subscription, Episode
 from mygpo.api import backend, simple
 from mygpo.web.models import SecurityToken
+from mygpo.web import utils
 
 
 @manual_gc
@@ -34,11 +36,11 @@ def download_all(request):
 @requires_token(object='subscriptions', action='r', denied_template='user_subscriptions_denied.html')
 def for_user(request, username):
     user = get_object_or_404(User, username=username)
-    public_subscriptions = Subscription.objects.public_subscriptions(users=[user])
+    subscriptions = Subscription.objects.public_subscribed_podcasts(user)
     token = SecurityToken.objects.get(object='subscriptions', action='r', user__username=username)
 
     return render_to_response('user_subscriptions.html', {
-        'subscriptions': public_subscriptions,
+        'subscriptions': subscriptions,
         'other_user': user,
         'token': token,
         }, context_instance=RequestContext(request))
@@ -46,10 +48,13 @@ def for_user(request, username):
 @requires_token(object='subscriptions', action='r')
 def for_user_opml(request, username):
     user = get_object_or_404(User, username=username)
-    public_subscriptions = Subscription.objects.public_subscriptions(users=[user])
+    subscriptions = Subscription.objects.public_subscribed_podcasts(user)
+
+    if parse_bool(request.GET.get('symbian', False)):
+        subscriptions = map(utils.symbian_opml_changes, subscriptions)
 
     response = render_to_response('user_subscriptions.opml', {
-        'subscriptions': public_subscriptions,
+        'subscriptions': subscriptions,
         'other_user': user
         }, context_instance=RequestContext(request))
     response['Content-Disposition'] = 'attachment; filename=%s-subscriptions.opml' % username

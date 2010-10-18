@@ -208,3 +208,9 @@ def get_hours_listened():
         return 0
     else:
         return seconds / (60 * 60)
+
+
+def symbian_opml_changes(podcast):
+    podcast.description = (podcast.title or '') + '\n' \
+                        + (podcast.description or '')
+    return podcast

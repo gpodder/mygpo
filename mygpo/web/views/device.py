@@ -22,6 +22,7 @@ from django.template import RequestContext
 from mygpo.api.models import Device, EpisodeAction, SubscriptionAction
 from mygpo.data.models import BackendSubscription, Listener
 from mygpo.web.forms import DeviceForm, SyncForm
+from mygpo.web import utils
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
@@ -135,9 +136,7 @@ def symbian_opml(request, device_id):
     device = get_object_or_404(Device, id=device_id, user=request.user)
 
     subscriptions = simple.get_subscriptions(request.user, device.uid)
-
-    for p in subscriptions:
-        p.description = (p.title or '') + '\n' + (p.description or '')
+    subscriptions = map(utils.symbian_opml_changes, subscriptions)
 
     response = simple.format_podcast_list(subscriptions, 'opml', request.user.username)
     response['Content-Disposition'] = 'attachment; filename=%s.opml' % device.uid

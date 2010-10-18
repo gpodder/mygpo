@@ -581,6 +581,16 @@ class SubscriptionManager(models.Manager):
         return subscriptions
 
 
+    def public_subscribed_podcasts(self, user):
+        """
+        Returns the Podcasts that the given user has subscribed to
+        and marked public
+        """
+        subscriptions = self.public_subscriptions(users=[user])
+        return list(set([s.podcast for s in subscriptions]))
+
+
+
 class Subscription(models.Model):
     device = models.ForeignKey(Device, primary_key=True)
     podcast = models.ForeignKey(Podcast)
