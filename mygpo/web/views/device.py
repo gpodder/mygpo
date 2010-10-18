@@ -115,6 +115,9 @@ def edit(request, device_id=None):
 @login_required
 def upload_opml(request, device_id):
     device = get_object_or_404(Device, id=device_id, user=request.user)
+    if not 'opml' in request.FILES:
+        return HttpResponseRedirect(reverse('device-edit', args=[device.id]))
+
     opml = request.FILES['opml'].read()
     subscriptions = simple.parse_subscription(opml, 'opml')
     simple.set_subscriptions(subscriptions, request.user, device.uid)
