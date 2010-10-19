@@ -27,7 +27,7 @@ import hashlib
 import urllib2
 import socket
 
-from mygpo import feedcore
+from mygpo.data import feedcore
 from mygpo.api import models
 from mygpo.data.models import PodcastTag
 from mygpo.utils import parse_time
