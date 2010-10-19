@@ -1,3 +1,5 @@
+from couchdbkit import Server, Document
+
 from django.db.models.signals import post_save, pre_delete
 
 from mygpo.core.models import Podcast, PodcastGroup
@@ -8,6 +10,25 @@ This module contains methods for converting objects from the old
 ORM-based backend to the CouchDB-based backend
 """
 
+
+def use_couchdb():
+    """
+    Decorator that connects to the CouchDB-Server before the decorated
+    function is called.
+    """
+    def wrapper(fn):
+        def _tmp(*args, **kwargs):
+            server = Server()
+            db = server.get_or_create_db("mygpo")
+            Document.set_db(db)
+            return fn(*args, **kwargs)
+
+        return _tmp
+
+    return wrapper
+
+
+@use_couchdb()
 def save_podcast_signal(sender, instance=False, **kwargs):
     """
     Signal-handler for creating/updating a CouchDB-based podcast when
@@ -27,6 +48,7 @@ def save_podcast_signal(sender, instance=False, **kwargs):
         log('error while updating CouchDB-Podcast: %s' % repr(e))
 
 
+@use_couchdb()
 def delete_podcast_signal(sender, instance=False, **kwargs):
     """
     Signal-handler for deleting a CouchDB-based podcast when an ORM-based

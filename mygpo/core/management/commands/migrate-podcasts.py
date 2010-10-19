@@ -4,9 +4,12 @@ from mygpo import migrate
 from mygpo.utils import iterate_together, progress
 from mygpo.api import models as oldmodels
 from mygpo.core import models as newmodels
+from mygpo.migrate import use_couchdb
+
 
 class Command(BaseCommand):
 
+    @use_couchdb()
     def handle(self, *args, **options):
         updated, deleted, created = 0, 0, 0
         max_id = oldmodels.Podcast.objects.all().order_by('-id')[0].id

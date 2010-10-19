@@ -20,8 +20,3 @@ class Category(Document):
 
     def __repr__(self):
         return '%s (+%d variants)' % (self.label, len(self.spellings))
-
-server = Server()
-db = server.get_or_create_db("mygpo")
-Document.set_db(db)
-

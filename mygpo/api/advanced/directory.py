@@ -23,9 +23,11 @@ from mygpo.data.models import DirectoryEntry
 from mygpo.directory.models import Category
 from django.contrib.sites.models import Site
 from django.views.decorators.csrf import csrf_exempt
+from mygpo.migrate import use_couchdb
 
 
 @csrf_exempt
+@use_couchdb()
 def top_tags(request, count):
     tags = Category.top_categories(int(count))
     resp = map(category_data, tags)
@@ -33,6 +35,7 @@ def top_tags(request, count):
 
 
 @csrf_exempt
+@use_couchdb()
 def tag_podcasts(request, tag, count):
     category = Category.for_tag(tag)
     if not category:
