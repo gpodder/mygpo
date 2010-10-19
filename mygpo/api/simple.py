@@ -158,12 +158,10 @@ def set_subscriptions(urls, user, device_uid):
     for r in rem:
         p = Podcast.objects.get(url=r)
         p.unsubscribe(device)
-        p.save()
 
     for n in new:
         p, created = Podcast.objects.get_or_create(url=n)
         p.subscribe(device)
-        p.save()
 
     # Only an empty response is a successful response
     return HttpResponse('', mimetype='text/plain')
