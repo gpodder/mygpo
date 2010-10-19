@@ -18,7 +18,7 @@
 from mygpo.api.basic_auth import require_valid_user, check_username
 from django.http import HttpResponseBadRequest
 from mygpo.api.httpresponse import JsonResponse
-from mygpo.exceptions import ParameterMissing
+from mygpo.api.exceptions import ParameterMissing
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.api.models import Device, Podcast, Episode
 from mygpo.api.models.episodes import Chapter

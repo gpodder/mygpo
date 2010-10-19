@@ -123,7 +123,7 @@ ACCOUNT_ACTIVATION_DAYS = 7
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
-    'mygpo.auth_backends.EmailAuthenticationBackend',
+    'mygpo.web.auth.EmailAuthenticationBackend',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -140,7 +140,7 @@ AUTH_PROFILE_MODULE = "api.UserProfile"
 
 LOGIN_URL = '/login/'
 
-CSRF_FAILURE_VIEW='mygpo.security.csrf_failure'
+CSRF_FAILURE_VIEW='mygpo.web.views.security.csrf_failure'
 
 
 # The following entries should be set in settings_prod.py
