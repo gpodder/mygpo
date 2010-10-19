@@ -47,7 +47,7 @@ def overview(request):
 @manual_gc
 @login_required
 def show(request, device_id, error_message=None):
-    device = Device.objects.get(pk=device_id, user=request.user)
+    device = get_object_or_404(Device, id=device_id, user=request.user)
 
     if device.user != request.user:
         return HttpResponseForbidden(_('You are not allowed to access this device'))
@@ -150,7 +150,7 @@ def symbian_opml(request, device_id):
 @login_required
 @allowed_methods(['POST'])
 def delete(request, device_id):
-    device = Device.objects.get(pk=device_id)
+    device = get_object_or_404(Device, id=device_id, user=request.user)
     device.deleted = True
     device.save()
 
@@ -191,7 +191,7 @@ def sync(request, device_id):
     try:
         target = form.get_target()
 
-        device = Device.objects.get(pk=device_id)
+        device = get_object_or_404(Device, id=device_id, user=request.user)
         device.sync_with(target)
 
     except ValueError, e:
@@ -204,7 +204,7 @@ def sync(request, device_id):
 @login_required
 @allowed_methods(['GET'])
 def unsync(request, device_id):
-    dev = Device.objects.get(pk=device_id)
+    dev = get_object_or_404(Device, id=device_id, user=request.user)
 
     try:
         dev.unsync()
