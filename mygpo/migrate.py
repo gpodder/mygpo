@@ -1,5 +1,7 @@
-from mygpo.core.models import Podcast, PodcastGroup
 from django.db.models.signals import post_save, pre_delete
+
+from mygpo.core.models import Podcast, PodcastGroup
+from mygpo.log import log
 
 """
 This module contains methods for converting objects from the old
@@ -14,11 +16,15 @@ def save_podcast_signal(sender, instance=False, **kwargs):
     if not instance:
         return
 
-    newp = Podcast.for_oldid(instance.id)
-    if newp:
-        update_podcast(instance, newp)
-    else:
-        create_podcast(instance)
+    try:
+        newp = Podcast.for_oldid(instance.id)
+        if newp:
+            update_podcast(instance, newp)
+        else:
+            create_podcast(instance)
+
+    except Exception, e:
+        log('error while updating CouchDB-Podcast: %s' % repr(e))
 
 
 def delete_podcast_signal(sender, instance=False, **kwargs):
@@ -29,9 +35,13 @@ def delete_podcast_signal(sender, instance=False, **kwargs):
     if not instance:
         return
 
-    newp = Podcast.for_oldid(instance.id)
-    if newp:
-        newp.delete()
+    try:
+        newp = Podcast.for_oldid(instance.id)
+        if newp:
+            newp.delete()
+
+    except Exception, e:
+        log('error while deleting CouchDB-Podcast: %s' % repr(e))
 
 
 def update_podcast(oldp, newp):
