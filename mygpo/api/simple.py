@@ -15,9 +15,11 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+from itertools import islice
 from mygpo.api.basic_auth import require_valid_user, check_username
 from django.http import HttpResponse, HttpResponseBadRequest
-from mygpo.api.models import Device, Podcast, SuggestionEntry
+from mygpo.core.models import Suggestions
+from mygpo.api.models import Device, Podcast
 from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url
@@ -27,6 +29,7 @@ from django.shortcuts import get_object_or_404
 from mygpo.search.models import SearchEntry
 from django.utils.translation import ugettext as _
 from mygpo.decorators import allowed_methods
+from mygpo.migrate import use_couchdb
 
 
 try:
@@ -205,11 +208,14 @@ def search(request, format):
 @require_valid_user
 @check_format
 @allowed_methods(['GET'])
+@use_couchdb()
 def suggestions(request, count, format):
-    if int(count) not in range(1,100):
+    count = int(count)
+    if count not in range(1,100):
         count = 100
 
-    suggestions = SuggestionEntry.objects.for_user(request.user)[:int(count)]
+    suggestion_obj = Suggestions.for_user_oldid(request.user.id)
+    suggestions = [p.get_old_obj() for p in islice(suggestion_obj.get_podcasts(), count)]
     json_map = lambda p: {'url': p.url, 'title': p.title, 'description': p.description}
     title = _('gpodder.net - %(count)d Suggestions') % {'count': len(suggestions)}
     return format_podcast_list(suggestions, format, title, json_map=json_map)

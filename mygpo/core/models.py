@@ -1,16 +1,24 @@
-from couchdbkit import Document, IntegerProperty, SchemaListProperty
+from datetime import datetime
+from couchdbkit import Document, DocumentSchema, IntegerProperty, \
+    SchemaListProperty, DateTimeProperty, StringProperty, StringListProperty
 
 class Podcast(Document):
     oldid = IntegerProperty()
 
     @classmethod
     def for_oldid(cls, oldid):
-        r = cls.view('core/podcasts_by_oldid', key=oldid)
+        r = cls.view('core/podcasts_by_oldid', key=long(oldid))
         return r.first() if r else None
 
 
     def get_id(self):
         return getattr(self, 'id', None) or self._id
+
+    def get_old_obj(self):
+        if self.oldid:
+            from mygpo.api.models import Podcast
+            return Podcast.objects.get(id=self.oldid)
+        return None
 
 
     def __repr__(self):
@@ -85,3 +93,49 @@ class PodcastGroup(Document):
             return '%s %s (%s)' % (self.__class__.__name__, self._id[:10], self.oldid)
         else:
             return '%s %s' % (self.__class__.__name__, self._id[:10])
+
+
+class Rating(DocumentSchema):
+    rating = IntegerProperty()
+    timestamp = DateTimeProperty(default=datetime.utcnow)
+
+
+class Suggestions(Document):
+    user = StringProperty()
+    user_oldid = IntegerProperty()
+    podcasts = StringListProperty()
+    blacklist = StringListProperty()
+    ratings = SchemaListProperty(Rating)
+
+    @classmethod
+    def for_user_oldid(cls, oldid):
+        r = cls.view('core/suggestions_by_user_oldid', key=oldid)
+        if r:
+            return r.first()
+        else:
+            s = Suggestions()
+            s.user_oldid = oldid
+            return s
+
+
+    def get_podcasts(self):
+        from mygpo.api.models import Subscription
+        subscriptions = [x.podcast for x in Subscription.objects.filter(user__id=self.user_oldid)]
+        subscriptions = [Podcast.for_oldid(x.id) for x in subscriptions]
+        subscriptions = [x._id for x in subscriptions if x]
+
+        for p in self.podcasts:
+            if not p in self.blacklist and not p in subscriptions:
+                podcast = Podcast.get(p)
+                if podcast:
+                    yield podcast
+
+
+    def __repr__(self):
+        if not self._id:
+            return super(Podcast, self).__repr__()
+        else:
+            return '%d Suggestions for %s (%s)' % \
+                (len(self.podcasts),
+                 self.user[:10] if self.user else self.user_oldid,
+                 self._id[:10])

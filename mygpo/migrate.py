@@ -2,7 +2,7 @@ from couchdbkit import Server, Document
 
 from django.db.models.signals import post_save, pre_delete
 
-from mygpo.core.models import Podcast, PodcastGroup
+from mygpo.core.models import Podcast, PodcastGroup, Rating
 from mygpo.log import log
 
 """
@@ -111,3 +111,26 @@ def create_podcastgroup(oldid):
     g.oldid = oldid
     g.save()
     return g
+
+
+def get_blacklist(blacklist):
+    """
+    Returns a list of Ids of all blacklisted podcasts
+    """
+    blacklisted = [b.podcast for b in blacklist]
+    blacklist_ids = []
+    for p in blacklisted:
+        newp = Podcast.for_oldid(p.id)
+        if not newp:
+            newp = create_podcast(p)
+
+        blacklist_ids.append(newp._id)
+    return blacklist_ids
+
+
+def get_ratings(ratings):
+    """
+    Returns a list of Rating-objects, based on the relational Ratings
+    """
+    conv = lambda r: Rating(rating=r.rating, timestamp=r.timestamp)
+    return map(conv, ratings)

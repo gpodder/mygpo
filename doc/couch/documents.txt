@@ -183,7 +183,7 @@ Example Document
 }
 
 
-  UserSuggestions
+  Suggestions
 ===================
 
 Contains the Podcast Suggestions and related meta-data (blacklist,
@@ -198,7 +198,7 @@ Replaces Models:
 Example Document
 {
     user: "stefan",
-    suggestions: [
+    podcasts: [
         "119018023981293801823",
         "192840890284092834093"
     ],
@@ -207,8 +207,8 @@ Example Document
         "935937498573549739485"
     ],
     ratings: [
-        ["2010-09-13", -1],
-        ["2010-09-15",  1]
+        { timestamp: "2010-09-13", rating: -1},
+        { timestamp: "2010-09-15", rating:  1}
     ],
 }
 

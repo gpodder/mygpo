@@ -1,4 +1,4 @@
-from mygpo.api.models import URLSanitizingRule, Podcast, ToplistEntry, SuggestionEntry, SubscriptionAction, SubscriptionMeta, Subscription, Episode, EpisodeAction
+from mygpo.api.models import URLSanitizingRule, Podcast, ToplistEntry, SubscriptionAction, SubscriptionMeta, Subscription, Episode, EpisodeAction
 from mygpo.api.models.episodes import Chapter
 from mygpo.api.models.users import EpisodeFavorite
 from mygpo.data.models import BackendSubscription, Listener, HistoricPodcastData, PodcastTag
@@ -264,7 +264,6 @@ def rewrite_podcasts(p_old, p_new):
     # we simply delete incorrect toplist and suggestions entries,
     # because we can't re-calculate them
     ToplistEntry.objects.filter(podcast=p_old).delete()
-    SuggestionEntry.objects.filter(podcast=p_old).delete()
     HistoricPodcastData.objects.filter(podcast=p_old).delete()
     HistoricPodcastData.objects.filter(podcast=p_new).delete()
 

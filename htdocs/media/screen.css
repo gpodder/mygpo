@@ -707,3 +707,19 @@ input.subscribe
     height: 22px;
     border: none;
 }
+
+input.blacklist
+{
+    margin: 11px 0 0 0;
+    background: url(/media/unsubscribe.png) no-repeat;
+    cursor: pointer;
+    width: 22px;
+    height: 22px;
+    border: none;
+}
+
+form.rate,
+input.rate
+{
+    display: inline;
+}

@@ -15,12 +15,13 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, Http404
 from django.contrib.auth.models import User
 from django.template import RequestContext
-from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, Subscription, SuggestionEntry, UserProfile
-from mygpo.data.models import SuggestionBlacklist, PodcastTag
-from mygpo.web.models import Rating
+from mygpo.core import models
+from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, Subscription, UserProfile
+from mygpo.data.models import PodcastTag
 from mygpo.decorators import manual_gc
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response
@@ -29,6 +30,7 @@ from django.contrib.sites.models import Site
 from mygpo.constants import PODCAST_LOGO_SIZE, PODCAST_LOGO_BIG_SIZE
 from mygpo.web import utils
 from mygpo.api import backend
+from mygpo.migrate import use_couchdb
 import os
 import Image
 import ImageDraw
@@ -178,34 +180,46 @@ def history(request, len=15, device_id=None):
     }, context_instance=RequestContext(request))
 
 
-@manual_gc
 @login_required
+@use_couchdb()
+def blacklist(request, podcast_id):
+    blacklisted_podcast = models.Podcast.for_oldid(podcast_id)
+    suggestion = models.Suggestions.for_user_oldid(request.user.id)
+    suggestion.blacklist.append(blacklisted_podcast._id)
+    suggestion.save()
+
+    p, _created = UserProfile.objects.get_or_create(user=request.user)
+    p.suggestion_up_to_date = False
+    p.save()
+
+    return HttpResponseRedirect(reverse('suggestions'))
+
+
+@login_required
+@use_couchdb()
+def rate_suggestions(request):
+    rating_val = int(request.GET.get('rate', None))
+
+    if rating_val in (1, -1):
+        suggestion = models.Suggestions.for_user_oldid(request.user.id)
+        rating = models.Rating(rating=rating_val)
+        suggestion.ratings.append(rating)
+        suggestion.save()
+        # TODO: when we use Django messaging system,
+        # add a message for successful rating here
+
+
+    return HttpResponseRedirect(reverse('suggestions'))
+
+
+@login_required
+@use_couchdb()
 def suggestions(request):
-
-    rated = False
-
-    if 'rate' in request.GET:
-        Rating.objects.create(target='suggestions', user=request.user, rating=request.GET['rate'], timestamp=datetime.now())
-        rated = True
-
-    if 'blacklist' in request.GET:
-        try:
-            blacklisted_podcast = Podcast.objects.get(id=request.GET['blacklist'])
-            SuggestionBlacklist.objects.create(user=request.user, podcast=blacklisted_podcast)
-
-            p, _created = UserProfile.objects.get_or_create(user=request.user)
-            p.suggestion_up_to_date = False
-            p.save()
-
-        except Exception, e:
-            print e
-
-
-    entries = SuggestionEntry.objects.for_user(request.user)
+    suggestion_obj = models.Suggestions.for_user_oldid(request.user.id)
+    suggestions = [p.get_old_obj() for p in suggestion_obj.get_podcasts()]
     current_site = Site.objects.get_current()
     return render_to_response('suggestions.html', {
-        'entries': entries,
-        'rated'  : rated,
+        'entries': suggestions,
         'url': current_site
     }, context_instance=RequestContext(request))
 

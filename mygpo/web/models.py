@@ -23,6 +23,7 @@ import random
 import string
 
 
+# Deprecated: only used in migration-code anymore
 class Rating(models.Model):
     target = models.CharField(max_length=15)
     user = models.ForeignKey(User)

@@ -1,8 +1,14 @@
+from optparse import make_option
+
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
-from optparse import make_option
-from mygpo.api.models import SuggestionEntry, Subscription, UserProfile
-from mygpo.data.models import RelatedPodcast, SuggestionBlacklist
+
+from mygpo.core.models import Podcast, Suggestions
+from mygpo.api import models
+from mygpo.data.models import RelatedPodcast
+from mygpo.migrate import use_couchdb, create_podcast
+from mygpo.utils import progress
+
 
 class Command(BaseCommand):
 
@@ -12,6 +18,8 @@ class Command(BaseCommand):
         make_option('--user', action='store', type='string', dest='username', default='', help="Update a specific user"),
         )
 
+
+    @use_couchdb()
     def handle(self, *args, **options):
 
         max = options.get('max')
@@ -24,18 +32,23 @@ class Command(BaseCommand):
         if options.get('username'):
             users = users.filter(username=options.get('username'))
 
-        for user in users:
-            subscribed_podcasts = set([s.podcast for s in Subscription.objects.filter(user=user)])
+        total = users.count()
+
+        for n, user in enumerate(users.iterator()):
+            suggestion = Suggestions.for_user_oldid(user.id)
+            subscribed_podcasts = set([s.podcast for s in models.Subscription.objects.filter(user=user)])
             related = RelatedPodcast.objects.filter(ref_podcast__in=subscribed_podcasts).exclude(rel_podcast__in=subscribed_podcasts)
             related_podcasts = {}
+
             for r in related:
 
                 # remove potential suggestions that are in the same group as already subscribed podcasts
-                if r.rel_podcast.group and Subscription.objects.filter(podcast__group=r.rel_podcast.group).exists():
+                if r.rel_podcast.group and models.Subscription.objects.filter(podcast__group=r.rel_podcast.group).exists():
                     continue
 
                 # don't suggest blacklisted podcasts
-                if SuggestionBlacklist.objects.filter(user=user, podcast=r.rel_podcast).exists():
+                p = Podcast.for_oldid(r.related_podcast.id)
+                if p._id in suggestion.blacklist:
                     continue
 
                 related_podcasts[r.rel_podcast] = related_podcasts.get(r.rel_podcast, 0) + r.priority
@@ -44,13 +57,20 @@ class Command(BaseCommand):
             podcast_list = [(p, podcast) for (p, podcast) in related_podcasts.iteritems()]
             podcast_list.sort(key=lambda (p, priority): priority, reverse=True)
 
-            SuggestionEntry.objects.filter(user=user).delete()
-            for (p, priority) in podcast_list[:max]:
-                SuggestionEntry.objects.create(podcast=p, priority=priority, user=user)
+            ids = []
+            for p, priority in podcast_list:
+                newp = Podcast.for_oldid(p.id)
+                if not newp:
+                    newp = create_podcast(p)
+                ids.append(newp._id)
+
+            suggestion = Suggestions.for_user_oldid(user.id)
+            suggestion.podcasts = ids
+            suggestion.save()
 
             # flag suggestions up-to-date
-            p, _created = UserProfile.objects.get_or_create(user=user)
+            p, _created = models.UserProfile.objects.get_or_create(user=user)
             p.suggestion_up_to_date = True
             p.save()
 
-
+            progress(n+1, total)

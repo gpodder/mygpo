@@ -93,6 +93,7 @@ class RelatedPodcast(models.Model):
         managed = False
 
 
+# Deprecated: only used in migration-code anymore
 class SuggestionBlacklist(models.Model):
     user = models.ForeignKey(User)
     podcast = models.ForeignKey(Podcast)

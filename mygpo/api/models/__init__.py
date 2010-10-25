@@ -274,37 +274,6 @@ class EpisodeToplistEntry(models.Model):
         managed = False
 
 
-class SuggestionEntryManager(models.Manager):
-
-    def for_user(self, user):
-        from mygpo.data.models import SuggestionBlacklist
-
-        suggestions = SuggestionEntry.objects.filter(user=user).order_by('-priority')
-
-        subscriptions = [x.podcast for x in Subscription.objects.filter(user=user)]
-        suggestions = filter(lambda x: x.podcast not in subscriptions, suggestions)
-
-        blacklist = [x.podcast for x in SuggestionBlacklist.objects.filter(user=user)]
-        suggestions = filter(lambda x: x.podcast not in blacklist, suggestions)
-
-        return suggestions
-
-
-class SuggestionEntry(models.Model):
-    podcast = models.ForeignKey(Podcast)
-    user = models.ForeignKey(User)
-    priority = models.IntegerField()
-
-    objects = SuggestionEntryManager()
-
-    def __unicode__(self):
-        return '%s (%s)' % (self.podcast, self.priority)
-
-    class Meta:
-        db_table = 'suggestion'
-        managed = False
-
-
 class Episode(models.Model):
     podcast = models.ForeignKey(Podcast)
     url = models.URLField(verify_exists=False)

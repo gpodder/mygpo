@@ -121,9 +121,9 @@ Can be used to get the subscriptions for a given User. When queried with
 grouped=true, group_level=2 it returns the subscribed Podcasts.
 
 
-Suggestions by User
+Suggestions by User (suggestions_by_user_oldid)
 ~~~~~~~~~~~~~~~~~~~
- * For each PodcastUserSuggestion, emit [User-Id, Podcast-Id] and null.
+ * For each Suggestions, emit Old-User-Id and the Suggestions object.
 
 Can be used to get the suggestions for a given User.
 

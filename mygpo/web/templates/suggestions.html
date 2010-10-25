@@ -10,10 +10,6 @@
 
 {% block content %}
 
-  {% if rated %}
-   <div class="success">Thanks for your feedback!</div>
-  {% endif %}
-
   <h1>{% trans "Suggested Podcasts" %}</h1>
 
   <p>{% blocktrans with entries|length as suggestion_count %}We've selected {{ suggestion_count }} podcasts which you might like.{% endblocktrans %}</p>
@@ -25,27 +21,34 @@
     <th style="text-align: center;">{% trans "Subscribe" %}</th>
     <th style="text-align: center;">{% trans "Not Interested" %}</th>
    </tr>
-  {% for entry in entries %}
+  {% for podcast in entries %}
    <tr>
-    <td>{{ entry.podcast|podcast_logo }}</td>
+    <td>{{ podcast|podcast_logo }}</td>
     <td>
-        <p class="title"><a href="{% url podcast entry.podcast.id %}">{{ entry.podcast|striptags }}</a></p>
-            <p class="description">{{ entry.podcast.description|striptags|truncatewords:"12" }}</p></td>
+        <p class="title"><a href="{% url podcast podcast.id %}">{{ podcast|striptags }}</a></p>
+            <p class="description">{{ podcast.description|striptags|truncatewords:"12" }}</p></td>
     <td style="text-align: center;">
-     <a href="{% url subscribe entry.podcast.id %}"><img src="/media/subscribe.png" alt="+" /></a>
+     <a href="{% url subscribe podcast.id %}"><img src="/media/subscribe.png" alt="+" /></a>
     </td>
     <td style="text-align: center;">
-     <a href="{% url suggestions %}?blacklist={{ entry.podcast.id }}">
-      <img src="/media/unsubscribe.png" alt="Not Interested" />
-     </a>
+     <form action="{% url suggestions-blacklist podcast.id %}">
+      {% csrf_token %}
+      <input class="blacklist" type="submit" value="" />
+     </form>
    </tr>
   {% endfor %}
   </table>
 
   <div class="rate">
    <strong>{% trans "Do you like our suggestions?" %}</strong>
-   <a href="{% url suggestions %}?rate=1">{% trans "Yes" %}</a>
-   <a href="{% url suggestions %}?rate=-1">{% trans "No" %}</a>
+   <form action="{% url suggestions-rate %}?rate=1" method="post" class="rate">
+    {% csrf_token %}
+    <input type="submit" value="{% trans "Yes" %}" class="rate" />
+   </form>
+   <form action="{% url suggestions-rate %}?rate=-1" method="post" class="rate">
+    {% csrf_token %}
+    <input type="submit" value="{% trans "No" %}" class="rate" />
+   </form>
   </div>
 
   <div class="info"><strong>Get your suggestions on your Client</strong>! Access <a href="{% url suggestions-opml 15 "opml" %}">http://{{ url }}{% url suggestions-opml 15 "opml" %}</a> to get 15 of our recommended podcasts.</div>
