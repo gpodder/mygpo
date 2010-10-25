@@ -26,7 +26,7 @@ from mygpo.api.models import UserProfile
 from mygpo.web.forms import RestorePasswordForm
 from django.contrib.sites.models import Site
 from django.conf import settings
-from mygpo.decorators import manual_gc, allowed_methods
+from mygpo.decorators import allowed_methods
 from django.utils.translation import ugettext as _
 from registration.models import RegistrationProfile
 import string
@@ -163,7 +163,6 @@ def restore_password(request):
     return render_to_response('password_reset.html', context_instance=RequestContext(request))
 
 
-@manual_gc
 @allowed_methods(['GET', 'POST'])
 def resend_activation(request):
     error_message = ''

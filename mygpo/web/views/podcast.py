@@ -11,7 +11,7 @@ from mygpo.api.models import Podcast, Episode, EpisodeAction, Device, Subscripti
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.web.forms import PrivacyForm, SyncForm
 from mygpo.data.models import Listener, PodcastTag
-from mygpo.decorators import manual_gc, allowed_methods
+from mygpo.decorators import allowed_methods
 from mygpo.utils import daterange
 from mygpo.log import log
 
@@ -180,7 +180,6 @@ def remove_tag(request, pid):
     return HttpResponseRedirect('/podcast/%s' % pid)
 
 
-@manual_gc
 @login_required
 @allowed_methods(['GET', 'POST'])
 def subscribe(request, pid):
@@ -221,7 +220,6 @@ def subscribe(request, pid):
     }, context_instance=RequestContext(request))
 
 
-@manual_gc
 @login_required
 def unsubscribe(request, pid, device_id):
 
@@ -240,7 +238,6 @@ def unsubscribe(request, pid, device_id):
     return HttpResponseRedirect(return_to)
 
 
-@manual_gc
 @login_required
 def subscribe_url(request):
     url = request.GET.get('url', None)

@@ -20,13 +20,11 @@ from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from mygpo.api import backend
 from mygpo.data.mimetype import CONTENT_TYPES
-from mygpo.decorators import manual_gc
 from mygpo.web import utils
 from django.contrib.sites.models import Site
 
 
 
-@manual_gc
 def toplist(request, num=100, lang=None):
 
     try:
@@ -57,7 +55,6 @@ def toplist(request, num=100, lang=None):
     }, context_instance=RequestContext(request))
 
 
-@manual_gc
 def episode_toplist(request, num=100):
 
     try:

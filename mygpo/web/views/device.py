@@ -29,10 +29,9 @@ from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
 from mygpo.log import log
 from mygpo.api import simple
-from mygpo.decorators import manual_gc, allowed_methods
+from mygpo.decorators import allowed_methods
 
 
-@manual_gc
 @login_required
 def overview(request):
     devices = Device.objects.filter(user=request.user,deleted=False).order_by('sync_group')
@@ -44,7 +43,6 @@ def overview(request):
     }, context_instance=RequestContext(request))
 
 
-@manual_gc
 @login_required
 def show(request, device_id, error_message=None):
     device = get_object_or_404(Device, id=device_id, user=request.user)
@@ -124,7 +122,6 @@ def upload_opml(request, device_id):
     return HttpResponseRedirect(reverse('device', args=[device.id]))
 
 
-@manual_gc
 @login_required
 def opml(request, device_id):
     device = get_object_or_404(Device, id=device_id, user=request.user)
@@ -146,7 +143,6 @@ def symbian_opml(request, device_id):
     return response
 
 
-@manual_gc
 @login_required
 @allowed_methods(['POST'])
 def delete(request, device_id):
@@ -169,7 +165,6 @@ def delete_permanently(request, device_id):
 
     return HttpResponseRedirect('/devices/')
 
-@manual_gc
 @login_required
 def undelete(request, device_id):
     device = get_object_or_404(Device, pk=device_id, user=request.user)
@@ -180,7 +175,6 @@ def undelete(request, device_id):
     return HttpResponseRedirect('/device/%s' % device.id)
 
 
-@manual_gc
 @login_required
 @allowed_methods(['POST'])
 def sync(request, device_id):
@@ -200,7 +194,6 @@ def sync(request, device_id):
     return HttpResponseRedirect('/device/%s' % device_id)
 
 
-@manual_gc
 @login_required
 @allowed_methods(['GET'])
 def unsync(request, device_id):

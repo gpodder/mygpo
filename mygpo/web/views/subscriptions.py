@@ -5,14 +5,13 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 
 from mygpo.utils import parse_bool
-from mygpo.decorators import manual_gc, requires_token
+from mygpo.decorators import requires_token
 from mygpo.api.models import Device, Subscription, Episode
 from mygpo.api import backend, simple
 from mygpo.web.models import SecurityToken
 from mygpo.web import utils
 
 
-@manual_gc
 @login_required
 def list(request):
     current_site = Site.objects.get_current()
@@ -23,7 +22,6 @@ def list(request):
     }, context_instance=RequestContext(request))
 
 
-@manual_gc
 @login_required
 def download_all(request):
     podcasts = backend.get_all_subscriptions(request.user)
@@ -32,7 +30,6 @@ def download_all(request):
     return response
 
 
-@manual_gc
 @requires_token(object='subscriptions', action='r', denied_template='user_subscriptions_denied.html')
 def for_user(request, username):
     user = get_object_or_404(User, username=username)
