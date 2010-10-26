@@ -15,13 +15,17 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from django.test import TestCase
 import unittest
 import doctest
 
+from django.test import TestCase
+from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
+
+from mygpo.api.models import Podcast, Episode
 import mygpo.web.utils
 from mygpo.test import create_auth_string
-from django.contrib.auth.models import User
+
 
 class SimpleWebTests(TestCase):
     def setUp(self):
@@ -29,36 +33,59 @@ class SimpleWebTests(TestCase):
         self.user.set_password('pwd')
         self.user.save()
 
+        self.podcast, _ = Podcast.objects.get_or_create(url='http://example.com/feed.xml',
+            defaults = {'title': 'Test Podcast'})
+        self.episode, _ = Episode.objects.get_or_create(url='http://example.com/episode.mp3',
+            podcast=self.podcast, defaults = {'title': 'Test Episode'})
+
         self.auth_string = create_auth_string('test', 'pwd')
-        self.paramterless_pages = [
-            '/history/',
-            '/suggestions/',
-            '/tags/',
-            '/online-help/',
-            '/subscriptions/',
-            '/download/subscriptions.opml',
-            '/subscriptions/all.opml',
-            '/favorites/',
-            '/account',
-            '/account/privacy',
-            '/account/delete',
-            '/share/',
-            '/toplist/',
-            '/toplist/episodes',
-            '/gpodder-examples.opml',
-            '/devices/',
-            '/devices/create',
-            '/login/',
-            '/logout/',
-            '/']
+
 
     def test_access_parameterless_pages(self):
-        self.client.post('/login/',
-            dict(login_username=self.user.username, pwd='pwd'))
+        pages = [
+            'history',
+            'suggestions',
+            'tags',
+            'help',
+            'subscriptions',
+            'subscriptions-opml',
+            'subscriptions-download',
+            'favorites',
+            'account',
+            'privacy',
+            'delete-account',
+            'share',
+            'toplist',
+            'episode-toplist',
+            'example-opml',
+            'devices',
+            'device-create',
+            'login',
+            'logout',
+            'home']
 
-        for page in self.paramterless_pages:
-            response = self.client.get(page, follow=True)
-#                HTTP_AUTHORIZATION=self.auth_string)
+        self.access_pages(pages, [], True)
+
+
+    def test_access_podcast_pages(self):
+        pages = ['podcast', ]
+        self.access_pages(pages, [self.podcast.id], False)
+        self.access_pages(pages, [self.podcast.id], True)
+
+
+    def test_access_episode_pages(self):
+        pages = ['episode', 'episode-fav', 'episode-fav']
+        self.access_pages(pages, [self.episode.id], False)
+        self.access_pages(pages, [self.episode.id], True)
+
+
+    def access_pages(self, pages, args, login):
+        if login:
+            self.client.post('/login/',
+                dict(login_username=self.user.username, pwd='pwd'))
+
+        for page in pages:
+            response = self.client.get(reverse(page, args=args), follow=True)
             self.assertEquals(response.status_code, 200)
 
 

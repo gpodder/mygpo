@@ -19,7 +19,7 @@ urlpatterns = patterns('mygpo.web.views',
 
 urlpatterns += patterns('mygpo.web.views.subscriptions',
  url(r'^subscriptions/$',                                         'list',          name='subscriptions'),
-    (r'^download/subscriptions\.opml$',                           'download_all'),
+ url(r'^download/subscriptions\.opml$',                           'download_all',  name='subscriptions-opml'),
  url(r'^subscriptions/all.opml$',                                 'download_all',  name='subscriptions-download'),
  url(r'^user/(?P<username>\w+)/subscriptions$',                   'for_user',      name='shared-subscriptions'),
  url(r'^user/(?P<username>\w+)/subscriptions\.opml$',             'for_user_opml', name='shared-subscriptions-opml'),
@@ -52,7 +52,7 @@ urlpatterns += patterns('mygpo.web.views.settings',
 urlpatterns += patterns('mygpo.web.views.public',
  url(r'^toplist/$',                                               'toplist',                    name='toplist'),
  url(r'^toplist/episodes$',                                       'episode_toplist',            name='episode-toplist'),
-    (r'^gpodder-examples.opml$',                                  'gpodder_example_podcasts'),
+ url(r'^gpodder-examples.opml$',                                  'gpodder_example_podcasts',   name='example-opml'),
 )
 
 urlpatterns += patterns('mygpo.web.views.device',
