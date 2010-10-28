@@ -57,7 +57,7 @@
         {{ s|episode_status_icon }}
        {% endif %}
       </td>
-      <td><a href="{% url device s.device.id %}">{{ s.device|device_icon }}&nbsp;{{ s.device.name|striptags }}</a></td>
+      <td>{% if s.device %}<a href="{% url device s.device.id %}">{{ s.device|device_icon }}&nbsp;{{ s.device.name|striptags }}</a>{% endif %}</td>
      </tr>
     {% endfor %}
    </table>
