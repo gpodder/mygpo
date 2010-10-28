@@ -127,11 +127,11 @@ def get_subscription_changes(user, device, since, until):
             timestamp__gt=since, timestamp__lte=until).order_by('timestamp')
     actions = dict([(a.podcast, a) for a in query])
 
-    add = filter(lambda a: a[0].action == SUBSCRIBE_ACTION, actions)
-    add = map(lambda a: a[1].url, add)
+    add = filter(lambda (p, a): a.action == SUBSCRIBE_ACTION, actions.items())
+    add = map(lambda (p, a): p.url, add)
 
-    rem = filter(lambda a: a[0].action == UNSUBSCRIBE_ACTION, actions)
-    rem = map(lambda a:a[1].url, rem)
+    rem = filter(lambda (p, a): a.action == UNSUBSCRIBE_ACTION, actions.items())
+    rem = map(lambda (p, a): p.url, rem)
 
     until_ = int(mktime(until.timetuple()))
     return {'add': add, 'remove': rem, 'timestamp': until_}
