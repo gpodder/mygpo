@@ -1,3 +1,4 @@
+from django.http import HttpResponseNotFound
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -36,6 +37,8 @@ def browse(request, num_categories=10, num_tags_cloud=90, podcasts_per_category=
 @use_couchdb()
 def category(request, category, page_size=20):
     category = Category.for_tag(category)
+    if not category:
+        return HttpResponseNotFound()
     entries = DirectoryEntry.objects.podcasts_for_category(category.get_tags())
 
     paginator = Paginator(entries, page_size)
