@@ -14,6 +14,7 @@ class Command(BaseCommand):
 
     option_list = BaseCommand.option_list + (
         make_option('--max', action='store', type='int', dest='max', default=15, help="Maximum number of suggested podcasts per user."),
+        make_option('--max-users', action='store', type='int', dest='max_users', default=15, help="Maximum number of users to update."),
         make_option('--outdated-only', action='store_true', dest='outdated', default=False, help="Update only users where the suggestions are not up-to-date"),
         make_option('--user', action='store', type='string', dest='username', default='', help="Update a specific user"),
         )
@@ -32,9 +33,12 @@ class Command(BaseCommand):
         if options.get('username'):
             users = users.filter(username=options.get('username'))
 
+        if options.get('max_users'):
+            users = users[:int(options.get('max_users'))]
+
         total = users.count()
 
-        for n, user in enumerate(users.iterator()):
+        for n, user in enumerate(users):
             suggestion = Suggestions.for_user_oldid(user.id)
             subscribed_podcasts = set([s.podcast for s in models.Subscription.objects.filter(user=user)])
             related = RelatedPodcast.objects.filter(ref_podcast__in=subscribed_podcasts).exclude(rel_podcast__in=subscribed_podcasts)
@@ -47,7 +51,7 @@ class Command(BaseCommand):
                     continue
 
                 # don't suggest blacklisted podcasts
-                p = Podcast.for_oldid(r.related_podcast.id)
+                p = Podcast.for_oldid(r.rel_podcast.id)
                 if p._id in suggestion.blacklist:
                     continue
 
