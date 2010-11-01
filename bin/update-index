@@ -1,7 +1,0 @@
-#!/bin/sh
-# Update the Haystack Search Index
-
-MYGPO_HOME=`dirname $0`/../
-
-(cd $MYGPO_HOME/mygpo && exec ./manage.py update_index)
-
