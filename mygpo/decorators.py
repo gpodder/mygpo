@@ -22,6 +22,7 @@ from django.template import RequestContext
 from mygpo.web.models import SecurityToken
 from django.contrib.auth.models import User
 from django.http import HttpResponseForbidden, HttpResponseNotAllowed
+import gc
 
 def requires_token(object, action, denied_template=None):
     """
@@ -60,6 +61,15 @@ def requires_token(object, action, denied_template=None):
 
         return tmp
     return decorator
+
+
+def manual_gc(view):
+    def tmp(*args, **kwargs):
+        res = view(*args, **kwargs)
+        gc.collect()
+        return res
+
+    return tmp
 
 
 def allowed_methods(methods):

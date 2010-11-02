@@ -23,11 +23,12 @@ from mygpo.web.models import SecurityToken
 from mygpo.web.forms import UserAccountForm
 from django.forms import ValidationError
 from django.utils.translation import ugettext as _
-from mygpo.decorators import allowed_methods
+from mygpo.decorators import manual_gc, allowed_methods
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
 
 
+@manual_gc
 @login_required
 @allowed_methods(['GET', 'POST'])
 def account(request):
@@ -78,6 +79,7 @@ def account(request):
     }, context_instance=RequestContext(request))
 
 
+@manual_gc
 @login_required
 @allowed_methods(['GET', 'POST'])
 def delete_account(request):
@@ -97,6 +99,7 @@ def delete_account(request):
         }, context_instance=RequestContext(request))
 
 
+@manual_gc
 @login_required
 @allowed_methods(['GET'])
 def privacy(request):
@@ -146,6 +149,7 @@ def privacy(request):
         }, context_instance=RequestContext(request))
 
 
+@manual_gc
 @login_required
 def share(request):
     site = Site.objects.get_current()
