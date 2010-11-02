@@ -24,6 +24,7 @@ from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.api.backend import get_toplist, get_all_subscriptions
+from mygpo.api.advanced.directory import podcast_data
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 from mygpo.search.models import SearchEntry
@@ -177,11 +178,16 @@ def toplist(request, count, format):
         count = 100
 
     toplist = get_toplist(count)
-    json_map = lambda t: {'url': t.get_podcast().url,
-                          'title':t.get_podcast().title,
-                          'description':t.get_podcast().description,
-                          'subscribers':t.subscriptions,
-                          'subscribers_last_week':t.oldplace}
+
+    def json_map(t):
+        p = podcast_data(t.get_podcast())
+        p.update(dict(
+            subscribers=           t.subscriptions,
+            subscribers_last_week= t.oldplace,
+            position_last_week=    t.oldplace
+        ))
+        return p
+
     title = _('gpodder.net - Top %(count)d') % {'count': len(toplist)}
     return format_podcast_list(toplist,
                                format,
@@ -200,9 +206,8 @@ def search(request, format):
 
     results = [r.get_podcast() for r in SearchEntry.objects.search(query)[:20]]
 
-    json_map = lambda p: {'url':p.url, 'title':p.title, 'description':p.description}
     title = _('gpodder.net - Search')
-    return format_podcast_list(results, format, title, json_map=json_map)
+    return format_podcast_list(results, format, title, json_map=podcast_data)
 
 
 @require_valid_user
@@ -216,8 +221,7 @@ def suggestions(request, count, format):
 
     suggestion_obj = Suggestions.for_user_oldid(request.user.id)
     suggestions = [p.get_old_obj() for p in islice(suggestion_obj.get_podcasts(), count)]
-    json_map = lambda p: {'url': p.url, 'title': p.title, 'description': p.description}
     title = _('gpodder.net - %(count)d Suggestions') % {'count': len(suggestions)}
-    return format_podcast_list(suggestions, format, title, json_map=json_map)
+    return format_podcast_list(suggestions, format, title, json_map=podcast_data)
 
 
