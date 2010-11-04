@@ -25,7 +25,7 @@ def browse(request, num_categories=10, num_tags_cloud=90, podcasts_per_category=
     tag_cloud = categories[num_categories:]
 
     tag_cloud.sort(key = lambda x: x.label.lower())
-    max_entries = max([t.weight for t in tag_cloud])
+    max_entries = max([t.weight for t in tag_cloud] + [0])
 
     return render_to_response('directory.html', {
         'categories': disp_categories,
