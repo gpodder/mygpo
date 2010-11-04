@@ -83,6 +83,7 @@ class Listener(models.Model):
         managed = False
 
 
+# Deprecated: only used in migration-code anymore
 class RelatedPodcast(models.Model):
     ref_podcast = models.ForeignKey(Podcast, related_name='ref_podcast')
     rel_podcast = models.ForeignKey(Podcast, related_name='rel_podcast')

@@ -1,8 +1,12 @@
-from django.core.management.base import BaseCommand
 from optparse import make_option
+
+from django.core.management.base import BaseCommand
+
 from mygpo.api.models import Podcast
-from mygpo.data.models import RelatedPodcast
 from mygpo.data.podcast import calc_similar_podcasts
+from mygpo.migrate import use_couchdb, get_or_migrate_podcast
+from mygpo.utils import progress
+
 
 class Command(BaseCommand):
 
@@ -11,18 +15,21 @@ class Command(BaseCommand):
         )
 
 
+    @use_couchdb()
     def handle(self, *args, **options):
 
         max_related = options.get('max')
 
         podcasts = Podcast.objects.all().order_by('id').only('id')
+        total = podcasts.count()
 
-        for podcast in podcasts.iterator():
-            print podcast.id, podcast.title
+        for (n, podcast) in enumerate(podcasts.iterator()):
 
-            l = calc_similar_podcasts(podcast)
+            l = calc_similar_podcasts(podcast)[:max_related]
+            related = [get_or_migrate_podcast(p).get_id() for (p, c) in l]
 
-            RelatedPodcast.objects.filter(ref_podcast=podcast).delete()
-            for (p, count) in l[:max_related]:
-                RelatedPodcast.objects.create(ref_podcast=podcast, rel_podcast=p, priority=count)
+            newp = get_or_migrate_podcast(podcast)
+            newp.related_podcasts = related
+            newp.save()
 
+            progress(n+1, total)

@@ -70,13 +70,27 @@ def update_podcast(oldp, newp):
     """
     Updates newp based on oldp and returns True if an update was necessary
     """
+
+    updated = False
+
     if oldp.group:
         group = get_group(oldp.group.id)
         if not newp in list(group.podcasts):
             group.add_podcast(newp)
-            return True
+            updated = True
 
-    return False
+    # Update related podcasts
+    from mygpo.data.models import RelatedPodcast
+    rel_podcast = set([r.rel_podcast for r in RelatedPodcast.objects.filter(ref_podcast=oldp)])
+    rel = list(podcasts_to_ids(rel_podcast))
+    if newp.related_podcasts != rel:
+        newp.related_podcasts = rel
+        updated = True
+
+    if updated:
+        newp.save()
+
+    return updated
 
 
 def create_podcast(oldp):
@@ -134,3 +148,15 @@ def get_ratings(ratings):
     """
     conv = lambda r: Rating(rating=r.rating, timestamp=r.timestamp)
     return map(conv, ratings)
+
+
+def podcasts_to_ids(podcasts):
+    for p in podcasts:
+        podcast = Podcast.for_oldid(p.id)
+        if not podcast:
+            podcast = create_podcast(p)
+        yield podcast.get_id()
+
+
+def get_or_migrate_podcast(oldp):
+    return Podcast.for_oldid(oldp.id) or create_podcast(oldp)

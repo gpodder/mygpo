@@ -15,6 +15,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+import collections
 from datetime import datetime, timedelta
 import time
 
@@ -167,3 +168,24 @@ def progress(val, max_val, status_str='', max_width=50):
         val,
         max_val,
         status_str),
+
+
+def set_by_frequency(l):
+    """
+    Creates a set from all items in l and returns it as a list in which the
+    items are ordered by decreasing number of occurance in the original list
+
+    >>> set_by_frequency([1, 2, 1, 2, 1, 3])
+    [1, 2, 3]
+
+    >>> set_by_frequency([1, 1, 1, 2])
+    [1, 2]
+
+    >>> set_by_frequency([])
+    []
+    """
+    d = collections.defaultdict(int)
+    for i in l:
+        d[i] += + 1
+    l = sorted(d.items(), key=lambda(i, c): c, reverse=True)
+    return [i for (i, c) in l]

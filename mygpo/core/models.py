@@ -4,6 +4,7 @@ from couchdbkit import Document, DocumentSchema, IntegerProperty, \
 
 class Podcast(Document):
     oldid = IntegerProperty()
+    related_podcasts = StringListProperty()
 
     @classmethod
     def for_oldid(cls, oldid):

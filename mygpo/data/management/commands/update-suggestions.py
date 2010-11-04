@@ -1,3 +1,4 @@
+from itertools import chain
 from optparse import make_option
 
 from django.core.management.base import BaseCommand
@@ -5,9 +6,8 @@ from django.contrib.auth.models import User
 
 from mygpo.core.models import Podcast, Suggestions
 from mygpo.api import models
-from mygpo.data.models import RelatedPodcast
-from mygpo.migrate import use_couchdb, create_podcast
-from mygpo.utils import progress
+from mygpo.migrate import use_couchdb, get_or_migrate_podcast
+from mygpo.utils import progress, set_by_frequency
 
 
 class Command(BaseCommand):
@@ -40,36 +40,15 @@ class Command(BaseCommand):
 
         for n, user in enumerate(users):
             suggestion = Suggestions.for_user_oldid(user.id)
+
             subscribed_podcasts = set([s.podcast for s in models.Subscription.objects.filter(user=user)])
-            related = RelatedPodcast.objects.filter(ref_podcast__in=subscribed_podcasts).exclude(rel_podcast__in=subscribed_podcasts)
-            related_podcasts = {}
+            subscribed_podcasts = map(get_or_migrate_podcast, subscribed_podcasts)
 
-            for r in related:
+            related = chain(*[p.related_podcasts for p in subscribed_podcasts])
+            related = filter(lambda pid: not pid in suggestion.blacklist, related)
+            related = set_by_frequency(related)
 
-                # remove potential suggestions that are in the same group as already subscribed podcasts
-                if r.rel_podcast.group and models.Subscription.objects.filter(podcast__group=r.rel_podcast.group).exists():
-                    continue
-
-                # don't suggest blacklisted podcasts
-                p = Podcast.for_oldid(r.rel_podcast.id)
-                if p._id in suggestion.blacklist:
-                    continue
-
-                related_podcasts[r.rel_podcast] = related_podcasts.get(r.rel_podcast, 0) + r.priority
-
-
-            podcast_list = [(p, podcast) for (p, podcast) in related_podcasts.iteritems()]
-            podcast_list.sort(key=lambda (p, priority): priority, reverse=True)
-
-            ids = []
-            for p, priority in podcast_list:
-                newp = Podcast.for_oldid(p.id)
-                if not newp:
-                    newp = create_podcast(p)
-                ids.append(newp._id)
-
-            suggestion = Suggestions.for_user_oldid(user.id)
-            suggestion.podcasts = ids
+            suggestion.podcasts = related
             suggestion.save()
 
             # flag suggestions up-to-date
