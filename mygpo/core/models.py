@@ -1,6 +1,5 @@
 from datetime import datetime
-from couchdbkit import Document, DocumentSchema, IntegerProperty, \
-    SchemaListProperty, DateTimeProperty, StringProperty, StringListProperty
+from couchdbkit.ext.django.schema import *
 
 class Podcast(Document):
     oldid = IntegerProperty()

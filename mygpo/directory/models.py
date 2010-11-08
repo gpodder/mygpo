@@ -1,4 +1,4 @@
-from couchdbkit import Document, StringProperty, DateTimeProperty, StringListProperty, IntegerProperty, Server
+from couchdbkit.ext.django.schema import *
 
 class Category(Document):
     label = StringProperty()

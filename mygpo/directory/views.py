@@ -6,10 +6,8 @@ from django.template import RequestContext
 from mygpo.data.models import DirectoryEntry
 from mygpo.directory.models import Category
 from mygpo.web import utils
-from mygpo.migrate import use_couchdb
 
 
-@use_couchdb()
 def browse(request, num_categories=10, num_tags_cloud=90, podcasts_per_category=10):
     total = int(num_categories) + int(num_tags_cloud)
     categories = Category.top_categories(total).all()
@@ -34,7 +32,6 @@ def browse(request, num_categories=10, num_tags_cloud=90, podcasts_per_category=
         }, context_instance=RequestContext(request))
 
 
-@use_couchdb()
 def category(request, category, page_size=20):
     category = Category.for_tag(category)
     if not category:

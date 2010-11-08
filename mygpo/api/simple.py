@@ -30,7 +30,6 @@ from django.shortcuts import get_object_or_404
 from mygpo.search.models import SearchEntry
 from django.utils.translation import ugettext as _
 from mygpo.decorators import allowed_methods
-from mygpo.migrate import use_couchdb
 
 
 try:
@@ -213,7 +212,6 @@ def search(request, format):
 @require_valid_user
 @check_format
 @allowed_methods(['GET'])
-@use_couchdb()
 def suggestions(request, count, format):
     count = int(count)
     if count not in range(1,100):

@@ -6,12 +6,10 @@ from mygpo import settings
 from mygpo.directory.models import Category
 from mygpo.data.models import DirectoryEntry
 from mygpo.utils import progress
-from mygpo.migrate import use_couchdb
 
 
 class Command(BaseCommand):
 
-    @use_couchdb()
     def handle(self, *args, **options):
 
         start_time = datetime.utcnow()

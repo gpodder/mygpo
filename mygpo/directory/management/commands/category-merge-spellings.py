@@ -4,12 +4,10 @@ from django.core.management.base import BaseCommand
 
 from mygpo.directory.models import Category
 from mygpo.data.models import DirectoryEntry
-from mygpo.migrate import use_couchdb
 
 
 class Command(BaseCommand):
 
-    @use_couchdb()
     def handle(self, *args, **options):
 
         if len(args) < 2:

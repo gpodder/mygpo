@@ -29,7 +29,6 @@ from django.contrib.sites.models import Site
 from mygpo.constants import PODCAST_LOGO_SIZE, PODCAST_LOGO_BIG_SIZE
 from mygpo.web import utils
 from mygpo.api import backend
-from mygpo.migrate import use_couchdb
 import os
 import Image
 import ImageDraw
@@ -177,7 +176,6 @@ def history(request, len=15, device_id=None):
 
 
 @login_required
-@use_couchdb()
 def blacklist(request, podcast_id):
     blacklisted_podcast = models.Podcast.for_oldid(podcast_id)
     suggestion = models.Suggestions.for_user_oldid(request.user.id)
@@ -192,7 +190,6 @@ def blacklist(request, podcast_id):
 
 
 @login_required
-@use_couchdb()
 def rate_suggestions(request):
     rating_val = int(request.GET.get('rate', None))
 
@@ -209,7 +206,6 @@ def rate_suggestions(request):
 
 
 @login_required
-@use_couchdb()
 def suggestions(request):
     suggestion_obj = models.Suggestions.for_user_oldid(request.user.id)
     suggestions = [p.get_old_obj() for p in suggestion_obj.get_podcasts()]

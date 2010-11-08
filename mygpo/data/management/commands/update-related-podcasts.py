@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 
 from mygpo.api.models import Podcast
 from mygpo.data.podcast import calc_similar_podcasts
-from mygpo.migrate import use_couchdb, get_or_migrate_podcast
+from mygpo.migrate import get_or_migrate_podcast
 from mygpo.utils import progress
 
 
@@ -15,7 +15,6 @@ class Command(BaseCommand):
         )
 
 
-    @use_couchdb()
     def handle(self, *args, **options):
 
         max_related = options.get('max')

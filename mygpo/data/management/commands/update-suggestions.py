@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 
 from mygpo.core.models import Podcast, Suggestions
 from mygpo.api import models
-from mygpo.migrate import use_couchdb, get_or_migrate_podcast
+from mygpo.migrate import get_or_migrate_podcast
 from mygpo.utils import progress, set_by_frequency
 
 
@@ -20,7 +20,6 @@ class Command(BaseCommand):
         )
 
 
-    @use_couchdb()
     def handle(self, *args, **options):
 
         max = options.get('max')

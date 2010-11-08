@@ -6,12 +6,11 @@ from mygpo.data.models import SuggestionBlacklist
 from mygpo.web import models as webmodels
 from mygpo import migrate
 from mygpo.utils import progress
-from mygpo.migrate import use_couchdb, get_blacklist, get_ratings
+from mygpo.migrate import get_blacklist, get_ratings
 
 
 class Command(BaseCommand):
 
-    @use_couchdb()
     def handle(self, *args, **options):
         updated = 0
 
