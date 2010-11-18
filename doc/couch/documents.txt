@@ -82,6 +82,11 @@ Example Document
     publishers: ["stefan"],
     merged_ids: [ ...],
     language: "en",
+    episodes:
+        {
+            19384038450938450983: { Episode },
+            20928340283040234820. { Episode },
+        }
 }
 
 
@@ -115,6 +120,7 @@ Example Document
             related_podcasts: ["34059384598304850", "23480128409230482"],
             tags: ["technology", "news"],
             publishers: ["stefan"],
+            episodes: Episode-Dict
         },
         { ... }
     ],
@@ -124,9 +130,10 @@ Example Document
   Episode
 ===========
 
-One Episode with optional support for multiple media files (eg Audio and PDF
-Show Notes). The fields listeners and recent_listeners are regularly
-updated with aggregated data to substitute queries based on time.
+An episode can not exist alone but must always be part of a Podcast. It has
+optional support for multiple media files (eg Audio and PDF Show Notes). The
+fields listeners and recent_listeners are regularly updated with aggregated
+data to substitute queries based on time.
 
 Replaces Models:
  * Episode
@@ -135,7 +142,7 @@ Replaces Models:
 
 Example Document
 {
-    _id:    "19384038450938450983",
+    id:    "19384038450938450983",
     title: "Cool Episode of Cool Podcast",
     podcast: "118913287192379173298",
     media_urls: ["http://podcast.com/episode1.mp3", "http://podcast.com/episode1.pdf"],
@@ -163,7 +170,8 @@ Replaces Models:
 Example Document
 {
     _id: "3893745983453948589345",
-    user: "stefan",
+    user: "345983045035480345809",
+    user_oldid: 4253,
     podcast: "118913287192379173298",
     actions:
         [
@@ -177,6 +185,10 @@ Example Document
              timestamp: "2010-09-15",
              device:    "872348923987492834"
             }
+        ],
+    episodes:
+        [
+            { EpisodeUserState ... }
         ],
     tags: ["technews"]
     settings: { ... }
@@ -216,7 +228,8 @@ Example Document
   EpisodeUserState
 ====================
 
-Contains everything that a User has done with an Episode.
+An EpisodeUserState can not exist alone, but must always be part of a
+PodcastUserState. It contains everything that a User has done with an Episode.
 
 Replaces Models
  * EpisodeAction
@@ -227,7 +240,6 @@ Replaces Models
 
 Example Document
 {
-    user: "stefan"
     episode: "3893745983453948589345",
     actions:
         [
@@ -244,7 +256,6 @@ Example Document
              device:    "872348923987492834"
             }
         ],
-    tags: ["technews"],
     chapters: [
         {
             from:          "02:10",

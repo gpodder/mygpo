@@ -37,4 +37,27 @@ function(newDoc, oldDoc, userCtx)
             checkChange(newDoc.podcasts[i], oldDoc.podcasts[i], "id");
         }
     }
+    else if(newDoc.doc_type == "PodcastUserState")
+    {
+        require(newDoc, "podcast");
+
+        for(i in newDoc.episodes)
+        {
+            episode = newDoc.episodes[i];
+            require(episode, "episode");
+            for(j in episode.actions)
+            {
+                require(episode.actions[j], "action");
+                require(episode.actions[j], "timestamp");
+            }
+        }
+    }
+    else if(newDoc.doc_type == "Podcast")
+    {
+        for(i in newDoc.episodes)
+        {
+            episode = newDoc.episodes[i];
+            require(episode, "urls");
+        }
+    }
 }

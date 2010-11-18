@@ -15,6 +15,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+import sys
 import collections
 from datetime import datetime, timedelta
 import time
@@ -168,6 +169,7 @@ def progress(val, max_val, status_str='', max_width=50):
         val,
         max_val,
         status_str),
+    sys.stdout.flush()
 
 
 def set_by_frequency(l):

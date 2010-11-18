@@ -2,7 +2,7 @@ from couchdbkit import Server, Document
 
 from django.db.models.signals import post_save, pre_delete
 
-from mygpo.core.models import Podcast, PodcastGroup, Rating
+from mygpo.core.models import Podcast, PodcastGroup, Rating, Episode, EpisodeAction
 from mygpo.log import log
 
 """
@@ -141,3 +141,27 @@ def podcasts_to_ids(podcasts):
 
 def get_or_migrate_podcast(oldp):
     return Podcast.for_oldid(oldp.id) or create_podcast(oldp)
+
+
+def create_episode_action(action):
+    a = EpisodeAction()
+    a.action = action.action
+    a.timestamp = action.timestamp
+    a.device_oldid = action.device.id if action.device else None
+    a.started = action.started
+    a.playmark = action.playmark
+    return a
+
+
+def get_or_migrate_episode(episode):
+    e = Episode.for_oldid(episode.id)
+    if e:
+        return e
+
+    podcast = get_or_migrate_podcast(episode.podcast)
+    e = Episode()
+    e.oldid = episode.id
+    e.urls.append(episode.url)
+    podcast.episodes[e.id] = e
+    podcast.save()
+    return e

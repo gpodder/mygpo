@@ -1,9 +1,33 @@
+import uuid
 from datetime import datetime
 from couchdbkit.ext.django.schema import *
 
-class Podcast(Document):
+
+class Episode(Document):
+    """
+    Represents an Episode. Can only be part of a Podcast
+    """
+
+    id = StringProperty(default=lambda: uuid.uuid4().hex)
     oldid = IntegerProperty()
+    urls = StringListProperty()
+
+    @classmethod
+    def for_oldid(self, oldid):
+        r = Episode.view('core/episodes_by_oldid', key=oldid, limit=1, wrap_doc=False)
+        return r.one() if r else None
+
+    def __repr__(self):
+        return 'Episode %s (in %s)' % \
+            (self.id, self._id)
+
+
+class Podcast(Document):
+    id = StringProperty()
+    oldid = IntegerProperty()
+    group = StringProperty()
     related_podcasts = StringListProperty()
+    episodes = SchemaDictProperty(Episode)
 
     @classmethod
     def for_oldid(cls, oldid):
@@ -139,3 +163,93 @@ class Suggestions(Document):
                 (len(self.podcasts),
                  self.user[:10] if self.user else self.user_oldid,
                  self._id[:10])
+
+
+class EpisodeAction(DocumentSchema):
+    """
+    One specific action to an episode. Must
+    always be part of a EpisodeUserState
+    """
+
+    action        = StringProperty(required=True)
+    timestamp     = DateTimeProperty(required=True)
+    device_oldid  = IntegerProperty()
+    started       = IntegerProperty()
+    playmark      = IntegerProperty()
+    total         = IntegerProperty()
+
+    def __eq__(self, other):
+        if not isinstance(other, EpisodeAction):
+            return False
+        vals = ('action', 'timestamp', 'device_oldid', 'started', 'playmark',
+                'total')
+        return all([getattr(self, v, None) == getattr(other, v, None) for v in vals])
+
+
+    def __repr__(self):
+        return '%s-Action on %s at %s (in %s)' % \
+            (self.action, self.device_oldid, self.timestamp, self._id)
+
+
+class EpisodeUserState(DocumentSchema):
+    """
+    Contains everything a user has done with an Episode
+    """
+
+    episode_oldid = IntegerProperty()
+    episode       = StringProperty(required=True)
+    actions       = SchemaListProperty(EpisodeAction)
+
+
+    def add_actions(self, actions):
+        self.actions += actions
+        self.actions = list(set(self.actions))
+        self.actions.sort(key=lambda x: x.timestamp)
+
+
+    def __repr__(self):
+        return 'Episode-State %s (in %s)' % \
+            (self.episode, self._id)
+
+    def __eq__(self, other):
+        if not isinstance(other, EpisodeUserState):
+            return False
+
+        return (self.episode_oldid == other.episode_oldid and \
+                self.episode == other.episode and
+                self.actions == other.actions)
+
+
+class PodcastUserState(Document):
+    """
+    Contains everything that a user has done
+    with a specific podcast and all its episodes
+    """
+
+    podcast       = StringProperty(required=True)
+    episodes      = SchemaDictProperty(EpisodeUserState)
+    user_oldid    = IntegerProperty()
+
+    @classmethod
+    def for_user_podcast(cls, user, podcast):
+        r = PodcastUserState.view('core/podcast_states_by_podcast', key=[podcast.get_id(), user.id], limit=1)
+        if r:
+            return r.first()
+        else:
+            p = PodcastUserState()
+            p.podcast = podcast.get_id()
+            p.user_oldid = user.id
+            return p
+
+
+    def get_episode(self, e_id):
+        if e_id in self.episodes:
+            return self.episodes[e_id]
+
+        e = EpisodeUserState()
+        e.episode = e_id
+        return e
+
+    def __repr__(self):
+        return 'Podcast %s for User %s (%s)' % \
+            (self.podcast, self.user_oldid, self._id)
