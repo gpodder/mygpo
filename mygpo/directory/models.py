@@ -8,12 +8,14 @@ class Category(Document):
 
     @classmethod
     def for_tag(cls, tag):
-        r = cls.view('directory/categories_by_tags', key=tag)
+        r = cls.view('directory/categories_by_tags', \
+            key=tag, include_docs=True)
         return r.first() if r else None
 
     @classmethod
     def top_categories(cls, count):
-        return cls.view('directory/categories', descending=True, limit=count)
+        return cls.view('directory/categories', \
+            descending=True, limit=count, include_docs=True)
 
     def get_tags(self):
         return self.spellings + [self.label]

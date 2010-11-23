@@ -31,7 +31,7 @@ Used to access Podcasts by the Ids used in the RDBMS-based backend.
 
 Podcast-Group by Old-Id (core/podcastgroups_by_oldid)
 ~~~~~~~~~~~~~~~~~~~~~~~
- * For a PodcastGroup, emits the oldid and the podcast-group if it has an oldid
+ * For a PodcastGroup, emits the oldid and null if it has an oldid
 
 Used to access Podcast-Groups by the Ids used in the RDBMS-based backend.
 
@@ -58,7 +58,7 @@ podcasts of a category, ordered by their weight.
 
 Categories by Weight (directory/categories)
 ~~~~~~~~~~~~~~~~~~~~
- * For each Category, emit its Weight and the Category itself
+ * For each Category, emit its Weight and null
 
 A list of Categories ordered by their weight; used to construct the navigation
 of the Podcast Directory.
@@ -66,8 +66,7 @@ of the Podcast Directory.
 
 Categories by Tags (directory/categories_by_tags)
 ~~~~~~~~~~~~~~~~~~
- * For each Category, emit its label and all its spellings, with
-   the Category itself
+ * For each Category, emit its label and all its spellings, with null.
 
 Can be used to get the Category for a given Tag, or all assigned Tags.
 
@@ -123,7 +122,7 @@ grouped=true, group_level=2 it returns the subscribed Podcasts.
 
 Suggestions by User (suggestions_by_user_oldid)
 ~~~~~~~~~~~~~~~~~~~
- * For each Suggestions, emit Old-User-Id and the Suggestions object.
+ * For each Suggestions, emit Old-User-Id and null.
 
 Can be used to get the suggestions for a given User.
 

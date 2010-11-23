@@ -94,7 +94,8 @@ class PodcastGroup(Document):
 
     @classmethod
     def for_oldid(cls, oldid):
-        r = cls.view('core/podcastgroups_by_oldid', key=oldid)
+        r = cls.view('core/podcastgroups_by_oldid', \
+            key=oldid, limit=1, include_docs=True)
         return r.first() if r else None
 
 
@@ -232,7 +233,8 @@ class PodcastUserState(Document):
 
     @classmethod
     def for_user_podcast(cls, user, podcast):
-        r = PodcastUserState.view('core/podcast_states_by_podcast', key=[podcast.get_id(), user.id], limit=1)
+        r = PodcastUserState.view('core/podcast_states_by_podcast', \
+            key=[podcast.get_id(), user.id], limit=1, include_docs=True)
         if r:
             return r.first()
         else:

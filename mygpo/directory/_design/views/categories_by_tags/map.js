@@ -5,7 +5,7 @@ function(doc)
         emit(doc.label, doc);
         for(i in doc.spellings)
         {
-            emit(doc.spellings[i], doc);
+            emit(doc.spellings[i], null);
         }
     }
 

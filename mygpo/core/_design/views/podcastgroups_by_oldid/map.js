@@ -4,7 +4,7 @@ function(doc)
     {
         if(doc.oldid)
         {
-            emit(doc.oldid, doc);
+            emit(doc.oldid, null);
         }
     }
 }
