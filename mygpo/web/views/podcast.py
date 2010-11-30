@@ -231,7 +231,7 @@ def unsubscribe(request, pid, device_id):
         raise Http404('Wrong URL')
 
     podcast = get_object_or_404(Podcast, pk=pid)
-    device = Device.objects.get(pk=device_id)
+    device = get_object_or_404(Device, pk=device_id, user=request.user)
     try:
         podcast.unsubscribe(device)
     except IntegrityError, e:

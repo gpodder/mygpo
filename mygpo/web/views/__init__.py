@@ -24,7 +24,7 @@ from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, Subscripti
 from mygpo.data.models import PodcastTag
 from mygpo.decorators import manual_gc
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render_to_response
+from django.shortcuts import get_object_or_404, render_to_response
 from datetime import datetime, timedelta
 from django.contrib.sites.models import Site
 from mygpo.constants import PODCAST_LOGO_SIZE, PODCAST_LOGO_BIG_SIZE
@@ -157,7 +157,7 @@ def cover_art(request, size, filename):
 @login_required
 def history(request, len=15, device_id=None):
     if device_id:
-        devices = Device.objects.filter(id=device_id)
+        devices = [get_object_or_404(Device, id=device_id, user=request.user)]
     else:
         devices = Device.objects.filter(user=request.user)
 
