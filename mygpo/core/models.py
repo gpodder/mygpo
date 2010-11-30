@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from couchdbkit import ResourceNotFound
 from couchdbkit.ext.django.schema import *
 
 
@@ -134,7 +135,8 @@ class Suggestions(Document):
 
     @classmethod
     def for_user_oldid(cls, oldid):
-        r = cls.view('core/suggestions_by_user_oldid', key=oldid)
+        r = cls.view('core/suggestions_by_user_oldid', key=oldid, \
+            include_docs=True)
         if r:
             return r.first()
         else:
@@ -151,14 +153,18 @@ class Suggestions(Document):
 
         for p in self.podcasts:
             if not p in self.blacklist and not p in subscriptions:
-                podcast = Podcast.get(p)
+                try:
+                    podcast = Podcast.get(p)
+                except ResourceNotFound:
+                    continue
+
                 if podcast:
                     yield podcast
 
 
     def __repr__(self):
         if not self._id:
-            return super(Podcast, self).__repr__()
+            return super(Suggestions, self).__repr__()
         else:
             return '%d Suggestions for %s (%s)' % \
                 (len(self.podcasts),
