@@ -33,15 +33,14 @@ def view_or_basicauth(view, request, test_func, realm = "", *args, **kwargs):
         return view(request, *args, **kwargs)
 
     # They are not logged in. See if they provided login credentials
-    # this header format is used when passing auth-headers
+
+    # the AUTHORIZATION header is used when passing auth-headers
     # from Aapache to fcgi
-    if 'AUTHORIZATION' in request.META:
-        auth = request.META['AUTHORIZATION']
+    auth = None
+    for h in ('AUTHORIZATION', 'HTTP_AUTHORIZATION'):
+        auth = request.META.get(h, auth)
 
-    elif 'HTTP_AUTHORIZATION' in request.META:
-        auth = request.META['HTTP_AUTHORIZATION']
-
-    else:
+    if not auth:
         return auth_request()
 
 
