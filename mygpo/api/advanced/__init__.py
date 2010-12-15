@@ -319,7 +319,7 @@ def device_data(device):
         id           = device.uid,
         caption      = device.name,
         type         = device.type,
-        subscription = Subscription.objects.filter(device=device).count()
+        subscriptions= Subscription.objects.filter(device=device).count()
     )
 
 
