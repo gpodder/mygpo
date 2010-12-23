@@ -191,3 +191,22 @@ def set_by_frequency(l):
         d[i] += + 1
     l = sorted(d.items(), key=lambda(i, c): c, reverse=True)
     return [i for (i, c) in l]
+
+
+def set_cmp(list, simplify):
+    """
+    Builds a set out of a list but uses the results of simplify to determine equality between items
+    """
+    simpl = lambda x: (simplify(x), x)
+    lst = dict(map(simpl, list))
+    return lst.values()
+
+
+def first(it):
+    """
+    returns the first not-None object or None if the iterator is exhausted
+    """
+    for x in it:
+        if x != None:
+            return x
+    return None

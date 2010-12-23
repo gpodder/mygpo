@@ -1,9 +1,9 @@
+from datetime import datetime
 from couchdbkit import Server, Document
 
-from django.db.models.signals import post_save, pre_delete
-
-from mygpo.core.models import Podcast, PodcastGroup, Rating, Episode, EpisodeAction
+from mygpo.core.models import Podcast, PodcastGroup, Rating, Episode, EpisodeAction, SubscriberData
 from mygpo.log import log
+from mygpo import utils
 
 """
 This module contains methods for converting objects from the old
@@ -51,21 +51,46 @@ def update_podcast(oldp, newp):
     """
     Updates newp based on oldp and returns True if an update was necessary
     """
-
     updated = False
-
-    if oldp.group:
-        group = get_group(oldp.group.id)
-        if not newp in list(group.podcasts):
-            group.add_podcast(newp)
-            updated = True
 
     # Update related podcasts
     from mygpo.data.models import RelatedPodcast
-    rel_podcast = set([r.rel_podcast for r in RelatedPodcast.objects.filter(ref_podcast=oldp)])
-    rel = list(podcasts_to_ids(rel_podcast))
-    if newp.related_podcasts != rel:
-        newp.related_podcasts = rel
+    if newp._id:
+        rel_podcast = set([r.rel_podcast for r in RelatedPodcast.objects.filter(ref_podcast=oldp)])
+        rel = list(podcasts_to_ids(rel_podcast))
+        if newp.related_podcasts != rel:
+            newp.related_podcasts = rel
+            updated = True
+
+    # Update Group-assignment
+    if oldp.group:
+        group = get_group(oldp.group.id)
+        if not newp in list(group.podcasts):
+            newp = group.add_podcast(newp)
+            updated = True
+
+    # Update subscriber-data
+    from mygpo.data.models import HistoricPodcastData
+    sub = HistoricPodcastData.objects.filter(podcast=oldp).order_by('date')
+    if sub.count() and len(newp.subscribers) != sub.count():
+        transf = lambda s: SubscriberData(
+            timestamp = datetime(s.date.year, s.date.month, s.date.day),
+            subscriber_count = s.subscriber_count)
+        check = lambda s: s.date.weekday() == 6
+
+        newp.subscribers = newp.subscribers + map(transf, filter(check, sub))
+        newp.subscribers = utils.set_cmp(newp.subscribers, lambda x: x.timestamp)
+        newp.subscribers = list(sorted(set(newp.subscribers), key=lambda s: s.timestamp))
+        updated = True
+
+    # Update Language
+    if newp.language != oldp.language:
+        newp.language = oldp.language
+        updated = True
+
+    # Update content types
+    if newp.content_types != oldp.content_types:
+        newp.content_types = oldp.content_types
         updated = True
 
     if updated:
@@ -74,17 +99,15 @@ def update_podcast(oldp, newp):
     return updated
 
 
-def create_podcast(oldp):
+def create_podcast(oldp, sparse=False):
     """
     Creates a (CouchDB) Podcast document from a (ORM) Podcast object
     """
     p = Podcast()
     p.oldid = oldp.id
     p.save()
-
-    if oldp.group:
-       group = get_group(oldp.group.id)
-       group.add_podcast(p)
+    if not sparse:
+        update_podcast(oldp, p)
 
     return p
 
@@ -135,7 +158,7 @@ def podcasts_to_ids(podcasts):
     for p in podcasts:
         podcast = Podcast.for_oldid(p.id)
         if not podcast:
-            podcast = create_podcast(p)
+            podcast = create_podcast(p, sparse=True)
         yield podcast.get_id()
 
 

@@ -3,6 +3,8 @@ from datetime import datetime
 from couchdbkit import ResourceNotFound
 from couchdbkit.ext.django.schema import *
 
+from mygpo import utils
+
 
 class Episode(Document):
     """
@@ -23,12 +25,27 @@ class Episode(Document):
             (self.id, self._id)
 
 
+class SubscriberData(DocumentSchema):
+    timestamp = DateTimeProperty()
+    subscriber_count = IntegerProperty()
+
+    def __eq__(self, other):
+        if not isinstance(other, SubscriberData):
+            return False
+
+        return (self.timestamp == other.timestamp) and \
+               (self.subscriber_count == other.subscriber_count)
+
+
 class Podcast(Document):
     id = StringProperty()
     oldid = IntegerProperty()
     group = StringProperty()
     related_podcasts = StringListProperty()
     episodes = SchemaDictProperty(Episode)
+    subscribers = SchemaListProperty(SubscriberData)
+    language = StringProperty()
+    content_types = StringListProperty()
 
     @classmethod
     def for_oldid(cls, oldid):
@@ -37,7 +54,20 @@ class Podcast(Document):
 
 
     def get_id(self):
-        return getattr(self, 'id', None) or self._id
+        return self.id or self._id
+
+
+    def subscriber_count(self):
+        if not self.subscribers:
+            return 0
+        return self.subscribers[-1].subscriber_count
+
+
+    def prev_subscriber_count(self):
+        if len(self.subscribers) < 2:
+            return 0
+        return self.subscribers[-2].subscriber_count
+
 
     def get_old_obj(self):
         if self.oldid:
@@ -50,9 +80,9 @@ class Podcast(Document):
         if not self._id:
             return super(Podcast, self).__repr__()
         elif self.oldid:
-            return '%s %s (%s)' % (self.__class__.__name__, self._id[:10], self.oldid)
+            return '%s %s (%s)' % (self.__class__.__name__, self.get_id(), self.oldid)
         else:
-            return '%s %s' % (self.__class__.__name__, self._id[:10])
+            return '%s %s' % (self.__class__.__name__, self.get_id())
 
 
     def save(self):
@@ -78,6 +108,11 @@ class Podcast(Document):
         else:
             super(Podcast, self).delete()
 
+    @classmethod
+    def all_podcasts_groups(cls):
+        return cls.view('core/podcasts_groups', include_docs=True,
+            classes=[Podcast, PodcastGroup]).iterator()
+
 
     def __eq__(self, other):
         if not self.get_id():
@@ -89,15 +124,24 @@ class Podcast(Document):
         return self.get_id() == other.get_id()
 
 
-
 class PodcastGroup(Document):
     podcasts = SchemaListProperty(Podcast)
+
+    def get_id(self):
+        return self._id
 
     @classmethod
     def for_oldid(cls, oldid):
         r = cls.view('core/podcastgroups_by_oldid', \
             key=oldid, limit=1, include_docs=True)
         return r.first() if r else None
+
+    def subscriber_count(self):
+        return sum([p.subscriber_count() for p in self.podcasts])
+
+
+    def prev_subscriber_count(self):
+        return sum([p.prev_subscriber_count() for p in self.podcasts])
 
 
     def add_podcast(self, podcast):
@@ -106,10 +150,15 @@ class PodcastGroup(Document):
         if not self._id:
             raise ValueError('group has to have an _id first')
 
+        podcast.delete()
         podcast.group = self._id
         self.podcasts.append(podcast)
         self.save()
-        podcast.delete()
+        return self.podcasts[-1]
+
+    def get_old_obj(self):
+        from mygpo.api.models import PodcastGroup
+        return PodcastGroup.objects.get(id=self.oldid) if self.oldid else None
 
 
     def __repr__(self):
