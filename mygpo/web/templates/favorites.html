@@ -35,10 +35,8 @@
   <h2>Favorites-Feed</h2>
    <p>
     {% url favorites-feed user.username as favorites-feed-url %}
-    {% blocktrans with user.username as username and site.domain as domain %}
-     You can access a feed containing your favorites episodes at
-     <strong><a href="{{ favorites-feed-url }}">http://{{ domain }}{{ favorites-feed-url }}</a></strong>.
-    {% endblocktrans %}
+    {% blocktrans with user.username as username and site.domain as domain %}You can access a feed containing your favorites episodes at
+     <strong><a href="{{ favorites-feed-url }}">http://{{ domain }}{{ favorites-feed-url }}</a></strong>.{% endblocktrans %}
    </p>
    <div>
     <a href="{% url subscribe-by-url %}?url=http://{{ site.domain }}{% url favorites-feed user.username %}">
@@ -49,11 +47,7 @@
    <h3>Access to your Favorites</h3>
    {% if feed_token.token %}
     <p>
-     {% blocktrans with user.username as username and feed_token.token as token %}
-      To keep your favorites private (from others and from the public pages of {{ site }}),
-      you need to use HTTP-Authentication in your client. Use username
-      <strong>{{ username }}</strong> and password <strong>{{ token }}</strong>.
-     {% endblocktrans %}
+     {% blocktrans with user.username as username and feed_token.token as token %}To keep your favorites private (from others and from the public pages of {{ site }}), you need to use HTTP-Authentication in your client. Use username <strong>{{ username }}</strong> and password <strong>{{ token }}</strong>.{% endblocktrans %}
     </p>
     <ul>
      <li><a href="{% url favorites %}?private_feed">{% trans "create a new password" %}</a></li>
