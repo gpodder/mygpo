@@ -158,11 +158,12 @@ def cover_art(request, size, filename):
 def history(request, len=15, device_id=None):
     if device_id:
         devices = [get_object_or_404(Device, id=device_id, user=request.user)]
+        episodehistory = EpisodeAction.objects.filter(device__in=devices).order_by('-timestamp')[:len]
     else:
         devices = Device.objects.filter(user=request.user)
+        episodehistory = EpisodeAction.objects.filter(user=request.user).order_by('-timestamp')[:len]
 
     history = SubscriptionAction.objects.filter(device__in=devices).order_by('-timestamp')[:len]
-    episodehistory = EpisodeAction.objects.filter(device__in=devices).order_by('-timestamp')[:len]
 
     generalhistory = []
 
