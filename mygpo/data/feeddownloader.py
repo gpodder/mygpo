@@ -192,6 +192,10 @@ def update_podcasts(fetch_queue):
                     if cover_art:
                         break
 
+            yturl = youtube.get_real_cover(podcast.link)
+            if yturl:
+                cover_art = yturl
+
             if cover_art is not None:
                 try:
                     image_sha1 = hashlib.sha1()
