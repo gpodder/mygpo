@@ -85,6 +85,22 @@
    {% endif %}
 
 
+  <div class="episode-navigation">
+   <div class="prev">
+    {% if prev %}
+     {% trans "Previous Episode: " %}<a href="{% url episode prev.id %}">{{ prev.title|striptags }}</a>
+    {% endif %}
+   </div>
+   <div class="list">
+    <a href="{% url podcast episode.podcast.id %}#episodes">{% trans "Episode-List" %}</a>
+   </div>
+   <div class="next">
+    {% if next %}
+     {% trans "Next Episode: " %}<a href="{% url episode next.id %}">{{ next.title|striptags }}</a>
+    {% endif %}
+   </div>
+  </div>
+
   <hr/>
    <h2>{% trans "Chapters" %}</h2>
 

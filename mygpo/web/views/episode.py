@@ -52,9 +52,24 @@ def episode(request, id):
         duration = episode.duration
 
     chapters = [c for c in Chapter.objects.filter(episode=episode).order_by('start') if c.is_public() or c.user == request.user]
+    if episode.timestamp:
+        prevs = Episode.objects.filter(podcast=episode.podcast,
+                timestamp__lt=episode.timestamp, title__isnull=False)\
+                .exclude(title='').order_by('-timestamp')
+        prev = prevs[0] if prevs else None
+
+        nexts = Episode.objects.filter(podcast=episode.podcast,
+                timestamp__gt=episode.timestamp, title__isnull=False)\
+                .exclude(title='').order_by('timestamp')
+        next = nexts[0] if nexts else None
+    else:
+        prev = None
+        next = None
 
     return render_to_response('episode.html', {
         'episode': episode,
+        'prev': prev,
+        'next': next,
         'history': history,
         'chapters': chapters,
         'subscription_meta': subscription_meta,

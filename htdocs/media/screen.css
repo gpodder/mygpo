@@ -723,3 +723,32 @@ input.rate
 {
     display: inline;
 }
+
+div.episode-navigation
+{
+clear: both;
+}
+
+div.episode-navigation div
+{
+    padding-top: .5em;
+    padding-bottom: .5em;
+    display: block;
+    width: 33%;
+    float: left;
+}
+
+div.episode-navigation div.list
+{
+    text-align: center;
+}
+
+div.episode-navigation div.next
+{
+    text-align: right;
+}
+
+hr
+{
+clear: both;
+}
