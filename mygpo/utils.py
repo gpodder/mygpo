@@ -46,7 +46,10 @@ def format_time(value):
     >>> format_time(10921)
     '03:02:01'
     """
-    dt = datetime.utcfromtimestamp(value)
+    try:
+        dt = datetime.utcfromtimestamp(value)
+    except ValueError:
+        return ''
 
     if dt.hour == 0:
         return dt.strftime('%M:%S')

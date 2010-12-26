@@ -99,7 +99,10 @@ def chapters(request, username):
         episode_url = request.GET['episode']
 
         since_ = request.GET.get('since', None)
-        since = datetime.fromtimestamp(float(since_)) if since_ else None
+        try:
+            since = datetime.fromtimestamp(float(since_)) if since_ else None
+        except ValueError:
+            return HttpResponseBadRequest('since-value is not a valid timestamp')
 
         podcast = Podcast.objects.get(url=sanitize_url(podcast_url))
         episode = Episode.objects.get(url=sanitize_url(episode_url, podcast=False, episode=True), podcast=podcast)

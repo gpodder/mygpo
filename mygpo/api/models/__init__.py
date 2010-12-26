@@ -511,10 +511,16 @@ class EpisodeAction(models.Model):
         return '%s %s %s' % (self.user, self.action, self.episode)
 
     def playmark_time(self):
-        return datetime.fromtimestamp(float(self.playmark))
+        try:
+            return datetime.fromtimestamp(float(self.playmark))
+        except ValueError:
+            return 0
 
     def started_time(self):
-        return datetime.fromtimestamp(float(self.started))
+        try:
+            return datetime.fromtimestamp(float(self.started))
+        except ValueError:
+            return 0
 
     class Meta:
         db_table = 'episode_log'

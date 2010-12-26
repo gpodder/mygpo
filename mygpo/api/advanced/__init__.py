@@ -62,8 +62,10 @@ def subscriptions(request, username, device_uid):
         since_ = request.GET.get('since', None)
         if since_ == None:
             return HttpResponseBadRequest('parameter since missing')
-
-        since = datetime.fromtimestamp(float(since_))
+        try:
+            since = datetime.fromtimestamp(float(since_))
+        except ValueError:
+            return HttpResponseBadRequest('since-value is not a valid timestamp')
 
         changes = get_subscription_changes(request.user, d, since, now)
 
@@ -168,7 +170,10 @@ def episodes(request, username, version=1):
         since_     = request.GET.get('since', None)
         aggregated = parse_bool(request.GET.get('aggregated', False))
 
-        since = datetime.fromtimestamp(float(since_)) if since_ else None
+        try:
+            since = datetime.fromtimestamp(float(since_)) if since_ else None
+        except ValueError:
+            return HttpResponseBadRequest('since-value is not a valid timestamp')
 
         podcast = get_object_or_404(Podcast, url=podcast_url) if podcast_url else None
         device  = get_object_or_404(Device, user=request.user,uid=device_uid, deleted=False) if device_uid else None
@@ -335,8 +340,10 @@ def updates(request, username, device_uid):
     since_ = request.GET.get('since', None)
     if since_ == None:
         return HttpResponseBadRequest('parameter since missing')
-
-    since = datetime.fromtimestamp(float(since_))
+    try:
+        since = datetime.fromtimestamp(float(since_))
+    except ValueError:
+        return HttpResponseBadRequest('since-value is not a valid timestamp')
 
     ret = get_subscription_changes(request.user, device, since, now)
 
