@@ -29,6 +29,14 @@ Podcasts by Old-Id (core/podcasts_by_oldid)
 Used to access Podcasts by the Ids used in the RDBMS-based backend.
 
 
+Podcasts and Podcast-Groups (core/podcasts_groups)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * For a Podcast that does not belong to a group, emits the Id and null
+ * For a PodcastGroup, emits the Id and null
+
+Used to retrieve all not-grouped Podcasts and all Podcast-Groups.
+
+
 Podcast-Group by Old-Id (core/podcastgroups_by_oldid)
 ~~~~~~~~~~~~~~~~~~~~~~~
  * For a PodcastGroup, emits the oldid and null if it has an oldid
@@ -36,12 +44,48 @@ Podcast-Group by Old-Id (core/podcastgroups_by_oldid)
 Used to access Podcast-Groups by the Ids used in the RDBMS-based backend.
 
 
-Podcasts by Number of Subscribers
+Podcasts by Number of Subscribers (directory/toplist)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * For each Podcast, emits the latest number of subscribers
- * For each PodcastGroup, emits the accumulated number of its Podcasts
+ * For a Podcast, emits the latest number of subscribers
+ * For a PodcastGroup, emits the accumulated number of its Podcasts and
+   the first Podcast
 
 Represents the Podcast Toplist when accessed reverse.
+
+
+Podcasts by Language and Number of Subscribers (directory/toplist_by_language)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * For a Podcast, emits [language, num-subscribers] if the podcast has
+   a language, and the Podcast itself
+ * For a PodcastGroup, emits [language, num-subscribers] for all languages that
+   occur in the group.
+
+Can be used to query the Toplist filtered by language. If the query includes
+multiple languages, the view has to be queried multiple times.
+
+
+Podcasts by Contenttype and Number of Subscribers (directory/toplist_by_contenttype)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * For a Podcast, emits [content-type, num-subscribers] for each content-type
+   and the Podcast itself
+ * For a PodcastGroup, emits [content-type, num-subscribers] for each
+   content-type that occurs in the group, and the first Podcast
+
+Can be used to query the Toplist filtered by content-type. If the query
+includes multiple content tyes, the view has to be queried multiple times.
+
+
+Podasts by Content Type, Language and Number of Subscribers (directory/toplist_by_contenttype_language)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * For a Podcast, emits [content-type, language, num-subscribers] for each
+   combination of content-type and language and the Podcast
+ * For a PodcastGroup, emits [content-type, language, num-subscribers] for each
+   combination of content-type (of the values of all contained Podcasts) and
+   the first Podcast as value
+
+Can be used to query the toplist by content-type and language. If the query
+includes multiple content types and/or multiple languages, the view has be to
+queried multiple times.
 
 
 Podcasts by Tag

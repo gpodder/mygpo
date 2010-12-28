@@ -20,7 +20,7 @@ from django.http import HttpResponseRedirect, Http404
 from django.contrib.auth.models import User
 from django.template import RequestContext
 from mygpo.core import models
-from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, SubscriptionAction, ToplistEntry, Subscription, UserProfile
+from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, SubscriptionAction, Subscription, UserProfile
 from mygpo.data.models import PodcastTag
 from mygpo.decorators import manual_gc
 from django.contrib.auth.decorators import login_required
@@ -56,12 +56,9 @@ def welcome(request, toplist_entries=10):
     except utils.UpdatedException, updated:
         lang = []
 
-    if len(lang) == 0:
-        entries = ToplistEntry.objects.all()[:toplist_entries]
-    else:
-        entries = backend.get_toplist(toplist_entries, lang)
+    entries = backend.get_toplist(toplist_entries, lang)
 
-    toplist = [e.get_podcast() for e in entries]
+    toplist = [p for (sub, oldpos, p) in entries]
     sponsored_podcast = utils.get_sponsored_podcast()
 
     return render_to_response('home.html', {

@@ -73,7 +73,7 @@ Example Document
     name: "Cool Podcast",
     feed_url: "http://podcast.com/mp3.xml",
     description: "..."
-    subscribers: [[2010-09-01, 120], [2010-09-01, 130]],
+    subscribers: [{timestamp: "2010-09-01", subscriber_count: 120}, ... },
     related_podcasts: ["34059384598304850", "23480128409230482"],
     tags: {
         feed: [["technology", 50], ["news", 20]],
@@ -82,11 +82,11 @@ Example Document
     publishers: ["stefan"],
     merged_ids: [ ...],
     language: "en",
-    episodes:
-        {
-            19384038450938450983: { Episode },
-            20928340283040234820. { Episode },
-        }
+    episodes: {
+        19384038450938450983: { Episode },
+        20928340283040234820. { Episode },
+    },
+    content_types: ["image", "audio"]
 }
 
 

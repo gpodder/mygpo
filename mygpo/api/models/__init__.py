@@ -20,6 +20,7 @@ from django.contrib.auth.models import User
 from datetime import datetime
 from django.utils.translation import ugettext as _
 from mygpo.api.fields import SeparatedValuesField, JSONField
+from mygpo import utils
 import hashlib
 import re
 
@@ -89,7 +90,7 @@ class Podcast(models.Model):
         Returns the number of public subscriptions to this podcast
         """
         subscriptions = self.subscriptions()
-        return subscriptions.values('user').distinct().count()
+        return max(0, subscriptions.values('user').distinct().count())
 
 
     def listener_count(self):
@@ -171,6 +172,10 @@ class Podcast(models.Model):
 class PodcastGroup(models.Model):
     title = models.CharField(max_length=100, blank=False)
 
+    @property
+    def logo_url(self):
+        return utils.first(p.logo_url for p in Podcast.objects.filter(group=self))
+
     def add(self, podcast, membername):
         if podcast.group == self:
             podcast.group_member_name = membername
@@ -199,7 +204,7 @@ class PodcastGroup(models.Model):
         Returns the number of public subscriptions to podcasts of this group
         """
         subscriptions = self.subscriptions()
-        return subscriptions.values('user').distinct().count()
+        return max(0, subscriptions.values('user').distinct().count())
 
 
     def __unicode__(self):
@@ -208,46 +213,6 @@ class PodcastGroup(models.Model):
     class Meta:
         db_table = 'podcast_groups'
         managed = False
-
-
-class ToplistEntryManager(models.Manager):
-
-    def get_query_set(self):
-        return super(ToplistEntryManager, self).get_query_set().order_by('-subscriptions')
-
-
-class ToplistEntry(models.Model):
-    podcast = models.ForeignKey(Podcast, null=True)
-    podcast_group = models.ForeignKey(PodcastGroup, null=True)
-    oldplace = models.IntegerField(db_column='old_place')
-    subscriptions = models.IntegerField(db_column='subscription_count')
-
-    objects = ToplistEntryManager()
-
-
-    def get_item(self):
-        if self.podcast:
-            return self.podcast
-        else:
-            return self.podcast_group
-
-    def get_podcast(self):
-        """
-        Returns a podcast which is representative for this toplist-entry
-        If the entry is a non-grouped podcast, it is returned
-        If the entry is a podcast group, one of its podcasts is returned
-        """
-        if self.podcast:
-            return self.podcast
-        else:
-            return self.podcast_group.podcasts()[0]
-
-    def __unicode__(self):
-        return '%s (%s)' % (self.podcast, self.subscriptions)
-
-    class Meta:
-        managed = False
-        db_table = 'toplist'
 
 
 class EpisodeToplistEntryManager(models.Manager):

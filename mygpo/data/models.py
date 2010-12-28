@@ -43,6 +43,7 @@ class PodcastTag(models.Model):
         managed = False
 
 
+# deprecated, only used in migration code
 class HistoricPodcastData(models.Model):
     podcast = models.ForeignKey(Podcast)
     date = models.DateField()

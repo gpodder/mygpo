@@ -44,7 +44,7 @@ class SearchEntry(models.Model):
             podcasts = [obj]
         elif isinstance(obj, PodcastGroup):
             entry.obj_type = 'podcast_group'
-            podcasts = Podcast.objects.filter(group=group)
+            podcasts = Podcast.objects.filter(group=obj)
 
         entry.tags = tag_string(PodcastTag.objects.filter(podcast__in=podcasts))
         return entry

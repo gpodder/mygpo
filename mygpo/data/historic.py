@@ -11,7 +11,7 @@ def all_podcasts():
 
 def calc_podcast(podcast):
 
-    latest_historic = HistoricPodcastData.objects.filter(podcast=podcast).order_by('-date')
+    latest_historic = HistoricPodcastData.objects.filter(podcast=podcast).only('date', 'subscriber_count').order_by('-date')
     if latest_historic.count() > 0:
         start = latest_historic[0].date + timedelta(days=1)
         prev = latest_historic[0].subscriber_count

@@ -27,14 +27,34 @@ function(newDoc, oldDoc, userCtx)
         }
     }
 
+    function checkPodcast(podcast)
+    {
+        last_timestamp = null;
+        for(var i=0, len=podcast.subscribers.length; sub=podcast.subscribers[i], i<len; i++)
+        {
+            check((last_timestamp == null) || (last_timestamp < sub.timestamp), "Subscriber Data must be sorted");
+            last_timestamp = sub.timestamp;
+        }
+    }
+
     if(newDoc.doc_type == "PodcastGroup")
     {
-        for(i in newDoc.podcasts)
+        for(var n=0, len=newDoc.podcasts.length; podcast=newDoc.podcasts[n], n<len; n++)
         {
-            require(newDoc.podcasts[i], "id");
-            require(newDoc.podcasts[i], "group");
-            check(newDoc.podcasts[i].group == newDoc._id);
-            checkChange(newDoc.podcasts[i], oldDoc.podcasts[i], "id");
+            if(oldDoc)
+            {
+                oldpodcast = oldDoc.podcasts[n];
+            }
+            else
+            {
+                oldpodcast = null;
+            }
+
+            require(podcast, "id");
+            require(podcast, "group");
+            check(podcast.group == newDoc._id);
+            checkChange(podcast, oldpodcast, "id");
+            checkPodcast(podcast);
         }
     }
     else if(newDoc.doc_type == "PodcastUserState")
@@ -54,6 +74,7 @@ function(newDoc, oldDoc, userCtx)
     }
     else if(newDoc.doc_type == "Podcast")
     {
+        checkPodcast(newDoc);
         for(i in newDoc.episodes)
         {
             episode = newDoc.episodes[i];

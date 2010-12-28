@@ -1,5 +1,8 @@
+from itertools import islice
 from django.core.management.base import BaseCommand
+from mygpo.core import models as newmodels
 from mygpo.api import models
+from mygpo.api import backend
 from mygpo.data import feeddownloader
 from optparse import make_option
 import datetime
@@ -24,8 +27,12 @@ class Command(BaseCommand):
         fetch_queue = []
 
         if options.get('toplist'):
-            for e in models.ToplistEntry.objects.all().order_by('-subscriptions')[:100]:
-                fetch_queue.append(e.podcast)
+            for subscribers, oldindex, obj in backend.get_toplist(100):
+                if isinstance(obj, models.Podcast):
+                    fetch_queue.append(obj)
+                elif isinstance(obj, models.PodcastGroup):
+                    for p in obj.podcasts():
+                        fetch_queue.append(p)
 
         if options.get('new'):
             podcasts = models.Podcast.objects.filter(episode__title='', episode__outdated=False).distinct()

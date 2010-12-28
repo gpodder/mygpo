@@ -173,12 +173,13 @@ def set_subscriptions(urls, user, device_uid):
 @check_format
 @allowed_methods(['GET'])
 def toplist(request, count, format):
-    if int(count) not in range(1,100):
+    count = int(count)
+    if count not in range(1,100):
         count = 100
 
     toplist = get_toplist(count)
 
-    def json_map(t):
+    def json_map(sub, prev_sub, oldpos, podcast):
         p = podcast_data(t.get_podcast())
         p.update(dict(
             subscribers=           t.subscriptions,
@@ -191,7 +192,7 @@ def toplist(request, count, format):
     return format_podcast_list(toplist,
                                format,
                                title,
-                               get_podcast=lambda x: x.get_podcast(),
+                               get_podcast=lambda (s, o, p): p,
                                json_map=json_map)
 
 

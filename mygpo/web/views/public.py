@@ -43,7 +43,7 @@ def toplist(request, num=100, lang=None):
 
     entries = backend.get_toplist(num, lang, set_types)
 
-    max_subscribers = max([e.subscriptions for e in entries]) if entries else 0
+    max_subscribers = max([sub for (sub, oldp, p) in entries]) if entries else 0
     current_site = Site.objects.get_current()
     all_langs = utils.get_language_names(utils.get_podcast_languages())
 

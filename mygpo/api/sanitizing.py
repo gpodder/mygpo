@@ -1,7 +1,8 @@
-from mygpo.api.models import URLSanitizingRule, Podcast, ToplistEntry, SubscriptionAction, SubscriptionMeta, Subscription, Episode, EpisodeAction
+from mygpo.core import models
+from mygpo.api.models import URLSanitizingRule, Podcast, SubscriptionAction, SubscriptionMeta, Subscription, Episode, EpisodeAction
 from mygpo.api.models.episodes import Chapter
 from mygpo.api.models.users import EpisodeFavorite
-from mygpo.data.models import BackendSubscription, Listener, HistoricPodcastData, PodcastTag
+from mygpo.data.models import BackendSubscription, Listener, PodcastTag
 from mygpo.log import log
 import urlparse
 import re
@@ -261,13 +262,9 @@ def rewrite_podcasts(p_old, p_new):
 
     log('merging podcast %s "%s" to correct podcast %s "%s"' % (p_old.id, p_old.url, p_new.id, p_new.url))
 
-    # we simply delete incorrect toplist and suggestions entries,
-    # because we can't re-calculate them
-    ToplistEntry.objects.filter(podcast=p_old).delete()
-    HistoricPodcastData.objects.filter(podcast=p_old).delete()
-    HistoricPodcastData.objects.filter(podcast=p_new).delete()
-
     rewrite_episodes(p_old, p_new)
+
+    rewrite_newpodcast(p_old, p_new)
 
     for sm in SubscriptionMeta.objects.filter(podcast=p_old):
         try:
@@ -308,6 +305,38 @@ def rewrite_podcasts(p_old, p_new):
         except Exception, e:
             log('error updating tag %s: %s, deleting.' % (tag.id, e))
             tag.delete()
+
+
+def rewrite_newpodcast(p_old, p_new):
+    p_n = models.Podcast.for_oldid(p_new.id)
+    p_o = models.Podcast.for_oldid(p_old.id)
+
+    if not p_o:
+        return
+
+
+    # merge subscriber data
+    subscribers = []
+    compare = lambda a, b: cmp(a.timestamp, b.timestamp)
+    for n, o in iterate_together(p_n.subscribers, p_o.subscribers):
+
+        # we assume that the new podcast has much more subscribers
+        # taking only count of the old podcast would look like a drop
+        if not n:
+            continue
+
+        subscribers.append(
+                models.SubscriberData(
+                    timestamp = o.timestamp,
+                    subscriber_count = n.subscriber_count + \
+                                       n.subscriber_count if n else 0\
+                )
+            )
+
+    p_n.subscribers = subscribers
+
+    p_n.save()
+    p_o.delete()
 
 
 def rewrite_episodes(p_old, p_new):

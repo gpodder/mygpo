@@ -15,15 +15,18 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+import collections
 from datetime import timedelta, date
+
+from django.db.models import Avg, Count
+from django.contrib.auth.models import User
+
 from mygpo.utils import daterange
+from mygpo.core.models import Podcast
 from mygpo.api.models import Episode, EpisodeAction
-from mygpo.data.models import HistoricPodcastData
 from mygpo.web.utils import flatten_intervals
 from mygpo.publisher.models import PodcastPublisher
 from mygpo.api.constants import DEVICE_TYPES
-from django.db.models import Avg, Count
-from django.contrib.auth.models import User
 
 
 def listener_data(podcasts, start_date=date(2010, 1, 1), leap=timedelta(days=1)):
@@ -77,18 +80,21 @@ def episode_listener_data(episode, start_date=date(2010, 1, 1), leap=timedelta(d
 
 
 def subscriber_data(podcasts):
+    coll_data = collections.defaultdict(int)
 
-    records = HistoricPodcastData.objects.filter(podcast__in=podcasts).order_by('date')
+    for p in podcasts:
+        podcast = Podcast.for_oldid(p.id)
 
-    include_record = lambda r: r.date.day == 1
-    records = filter(include_record, records)
+        create_entry = lambda r: (r.timestamp.strftime('%y-%m'), r.subscriber_count)
+        data = dict(map(create_entry, podcast.subscribers))
 
-    create_entry = lambda r: dict(x=r.date.strftime('%y-%m'), y=r.subscriber_count)
-    data = map(create_entry, records)
+        for k in data:
+            coll_data[k] += data[k]
 
-    data.sort(key=lambda x: x['x'])
+    # create a list of {'x': label, 'y': value}
+    coll_data = sorted([dict(x=a, y=b) for (a, b) in coll_data.items()], key=lambda x: x['x'])
 
-    return data
+    return coll_data
 
 
 def check_publisher_permission(user, podcast):

@@ -18,11 +18,12 @@
 from mygpo.api.httpresponse import JsonResponse
 from django.shortcuts import get_object_or_404
 from mygpo.api.sanitizing import sanitize_url
-from mygpo.api.models import Podcast, Episode, ToplistEntry
+from mygpo.api.models import Podcast, Episode
 from mygpo.data.models import DirectoryEntry
 from mygpo.directory.models import Category
 from django.contrib.sites.models import Site
 from django.views.decorators.csrf import csrf_exempt
+from mygpo.core import models
 
 
 @csrf_exempt
@@ -64,18 +65,9 @@ def podcast_data(podcast):
     site = Site.objects.get_current()
 
     if podcast.group:
-        try:
-            subscribers = ToplistEntry.objects.get(podcast_group=podcast.group).subscriptions
-
-        # no toplist entry has been created for the group yet
-        except ToplistEntry.DoesNotExist:
-            subscribers = ToplistEntry.objects.get(podcast=podcast).subscriptions
+        subscribers = models.PodcastGroup.for_oldid(podcast.group.id).subscriber_count()
     else:
-        try:
-            subscribers = ToplistEntry.objects.get(podcast=podcast).subscriptions
-        # no toplist entry has been created for this podcast yet
-        except ToplistEntry.DoesNotExist:
-            subscribers = 0
+        subscribers = models.Podcast.for_oldid(podcast.id).subscriber_count()
 
     return {
         "url": podcast.url,

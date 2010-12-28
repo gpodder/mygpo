@@ -15,8 +15,9 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from mygpo.api.models import Device, ToplistEntry, Podcast, Subscription, EpisodeToplistEntry
+from mygpo.api.models import Device, Podcast, Subscription, EpisodeToplistEntry
 from mygpo.data.mimetype import get_type, CONTENT_TYPES
+from mygpo.core import models
 from datetime import timedelta
 
 try:
@@ -53,36 +54,50 @@ def get_toplist(count, languages=None, types=None):
     if types and len(types) == len(CONTENT_TYPES):
         types = None
 
+    results = []
+
     if not languages and not types:
-        return ToplistEntry.objects.all()[:count]
-    else:
-        podcast_entries_base = ToplistEntry.objects.all()
-        group_entries_base = ToplistEntry.objects.all()
+        query = models.Podcast.view('directory/toplist', descending=True,
+            limit=count, classes=[models.Podcast, models.PodcastGroup],
+            include_docs=True)
+        results.extend(list(query))
 
-        if languages:
-            lang_regex = '^(' + '|'.join(languages) + ')'
-            podcast_entries_base = podcast_entries_base.filter(podcast__language__regex=lang_regex)
-            group_entries_base = group_entries_base.filter(podcast_group__podcast__language__regex=lang_regex).distinct()
+    elif languages and not types:
+        for lang in languages:
+            query = models.Podcast.view('directory/toplist_by_language',
+                descending=True, limit=count, endkey=[lang],
+                startkey=[lang+u'\u9999'],
+                classes=[models.Podcast, models.PodcastGroup],
+                include_docs=True)
+            results.extend(list(query))
 
-        if types:
-            type_regex = '.*(' + '|'.join(types) + ').*'
-            podcast_entries_base = podcast_entries_base.filter(podcast__content_types__regex=type_regex)
-            group_entries_base = group_entries_base.filter(podcast_group__podcast__content_types__regex=type_regex).distinct()
+    elif types and not languages:
+        for type in types:
+            query = models.Podcast.view('directory/toplist_by_contenttype',
+                descending=True, limit=count, endkey=[type],
+                startkey=[type+u'\u9999'],
+                classes=[models.Podcast, models.PodcastGroup],
+                include_docs=True)
+            results.extend(list(query))
 
+    else: #types and languages
+        for type in types:
+            for lang in languages:
+                query = models.Podcast.view('directory/toplist_by_contenttype_language', \
+                    descending=True, limit=count, \
+                    endkey=[type, lang], startkey=[type, lang+u'\9999'],
+                    classes=[models.Podcast, models.PodcastGroup],
+                    include_docs=True)
+                results.extend(list(query))
 
-        old_podcast_entries = list(podcast_entries_base.exclude(oldplace=0).order_by('oldplace')[:count])
-        old_group_entries = list(group_entries_base.exclude(oldplace=0).order_by('oldplace')[:count])
-        old_list = merge_toplists(old_podcast_entries, old_group_entries, lambda x: x.oldplace, reverse=False)
-        old_items = [e.get_item() for e in old_list]
+    results = list(set(results))
+    # sort by subscriber_count and id to ensure same order when subscriber_count is equal
+    cur  = sorted(results, key=lambda p: (p.subscriber_count(), p.get_id()),      reverse=True)[:count]
+    prev = sorted(results, key=lambda p: (p.prev_subscriber_count(), p.get_id()), reverse=True)[:count]
 
-        podcast_entries = podcast_entries_base.order_by('-subscriptions')[:count]
-        group_entries = group_entries_base.order_by('-subscriptions')[:count]
-        cur_list = merge_toplists(podcast_entries, group_entries, lambda x: x.subscriptions, reverse=True, count=count)
+    return [(p.subscriber_count(), prev.index(p) if p in prev else 0,\
+        p.get_old_obj()) for p in cur]
 
-        for x in cur_list:
-            x.oldplace = old_items.index(x.get_item())+1 if x.get_item() in old_items else 0
-
-        return cur_list
 
 def get_episode_toplist(count, languages=None, types=None):
     """Returns the first num entries of the episode toplist with the given search criteria"""
