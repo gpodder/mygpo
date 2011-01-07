@@ -1,4 +1,4 @@
-from mygpo.api.models.users import EpisodeFavorite
+from mygpo.api import backend
 
 
 class FavoriteFeed():
@@ -10,7 +10,7 @@ class FavoriteFeed():
         return '%s\'s Favorite Episodes' % self.user.username
 
     def get_episodes(self):
-        return [x.episode for x in EpisodeFavorite.objects.filter(user=self.user).order_by('-created')]
+        return backend.get_favorites(self.user)
 
     def language(self):
         """

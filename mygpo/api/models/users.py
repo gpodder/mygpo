@@ -19,6 +19,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from mygpo.api.models import Episode
 
+# Deprecated, only used in migration-code anymore
 class EpisodeFavorite(models.Model):
     user = models.ForeignKey(User)
     episode = models.ForeignKey(Episode)

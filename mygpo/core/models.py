@@ -16,9 +16,23 @@ class Episode(Document):
     urls = StringListProperty()
 
     @classmethod
+    def for_id(cls, id):
+        r = cls.view('core/episodes_by_id', key=id, limit=1, wrap_doc=False)
+        return r.one() if r else None
+
+
+    @classmethod
     def for_oldid(self, oldid):
         r = Episode.view('core/episodes_by_oldid', key=oldid, limit=1, wrap_doc=False)
         return r.one() if r else None
+
+
+    def get_old_obj(self):
+        if self.oldid:
+            from mygpo.api.models import Episode
+            return Episode.objects.get(id=self.oldid)
+        return None
+
 
     def __repr__(self):
         return 'Episode %s (in %s)' % \
@@ -67,6 +81,10 @@ class Podcast(Document):
         if len(self.subscribers) < 2:
             return 0
         return self.subscribers[-2].subscriber_count
+
+
+    def get_user_state(self, user):
+        return PodcastUserState.for_user_podcast(user, self)
 
 
     def get_old_obj(self):
@@ -247,7 +265,7 @@ class EpisodeAction(DocumentSchema):
             (self.action, self.device_oldid, self.timestamp, self._id)
 
 
-class EpisodeUserState(DocumentSchema):
+class EpisodeUserState(Document):
     """
     Contains everything a user has done with an Episode
     """
@@ -255,12 +273,21 @@ class EpisodeUserState(DocumentSchema):
     episode_oldid = IntegerProperty()
     episode       = StringProperty(required=True)
     actions       = SchemaListProperty(EpisodeAction)
+    settings      = DictProperty()
 
 
     def add_actions(self, actions):
         self.actions += actions
         self.actions = list(set(self.actions))
         self.actions.sort(key=lambda x: x.timestamp)
+
+
+    def is_favorite(self):
+        return self.settings.get('is_favorite', False)
+
+
+    def set_favorite(self, set_to=True):
+        self.settings['is_favorite'] = set_to
 
 
     def __repr__(self):
@@ -285,6 +312,7 @@ class PodcastUserState(Document):
     podcast       = StringProperty(required=True)
     episodes      = SchemaDictProperty(EpisodeUserState)
     user_oldid    = IntegerProperty()
+    settings      = DictProperty()
 
     @classmethod
     def for_user_podcast(cls, user, podcast):
@@ -305,8 +333,43 @@ class PodcastUserState(Document):
 
         e = EpisodeUserState()
         e.episode = e_id
+        self.episodes[e_id] = e
         return e
 
     def __repr__(self):
         return 'Podcast %s for User %s (%s)' % \
             (self.podcast, self.user_oldid, self._id)
+
+
+class Device(Document):
+    id       = StringProperty(default=lambda: uuid.uuid4().hex)
+    oldid    = IntegerProperty()
+    uid      = StringProperty()
+    name     = StringProperty()
+    type     = StringProperty()
+    settings = DictProperty()
+
+    @classmethod
+    def for_user_uid(cls, user, uid):
+        r = cls.view('core/devices_by_user_uid', key=[user.id, uid], limit=1)
+        return r.one() if r else None
+
+
+class User(Document):
+    oldid    = IntegerProperty()
+    settings = DictProperty()
+    devices  = SchemaListProperty(Device)
+
+
+    @classmethod
+    def for_oldid(cls, oldid):
+        r = cls.view('core/users_by_oldid', key=oldid, limit=1, include_docs=True)
+        return r.one() if r else None
+
+
+    def get_device(self, uid):
+        for device in self.devices:
+            if device.uid == uid:
+                return device
+
+        return None

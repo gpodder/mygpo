@@ -170,3 +170,14 @@ def get_device(user, uid, undelete=True):
 
     return device
 
+
+def get_favorites(user):
+    favorites = models.EpisodeUserState.view('core/favorite_episodes_by_user', key=user.id)
+
+    episodes = []
+    for res in favorites:
+        ep = models.Episode.for_id(res['value'])
+        if ep:
+            episodes.append(ep.get_old_obj())
+
+    return episodes

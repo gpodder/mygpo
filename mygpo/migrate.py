@@ -1,7 +1,7 @@
 from datetime import datetime
 from couchdbkit import Server, Document
 
-from mygpo.core.models import Podcast, PodcastGroup, Rating, Episode, EpisodeAction, SubscriberData
+from mygpo.core.models import Podcast, PodcastGroup, Rating, Episode, EpisodeAction, SubscriberData, User, Device
 from mygpo.log import log
 from mygpo import utils
 
@@ -188,3 +188,32 @@ def get_or_migrate_episode(episode):
     podcast.episodes[e.id] = e
     podcast.save()
     return e
+
+
+def get_or_migrate_user(user):
+    u = User.for_oldid(user.id)
+    if u:
+        return u
+
+    u = User()
+    u.oldid = user.id
+    u.username = user.username
+    u.save()
+    return u
+
+
+def get_or_migrate_device(device, user=None):
+    d = Device.for_user_uid(device.user, device.uid)
+    if d:
+        return d
+
+    d = Device()
+    d.oldid = device.id
+    d.uid = device.uid
+    d.name = device.name
+    d.type = device.type
+    d.deleted = device.deleted
+    u = user or get_or_migrate_user(device.user)
+    u.devices.append(d)
+    u.save()
+    return d

@@ -1,7 +1,6 @@
 from mygpo.core import models
 from mygpo.api.models import URLSanitizingRule, Podcast, SubscriptionAction, SubscriptionMeta, Subscription, Episode, EpisodeAction
 from mygpo.api.models.episodes import Chapter
-from mygpo.api.models.users import EpisodeFavorite
 from mygpo.data.models import BackendSubscription, Listener, PodcastTag
 from mygpo.log import log
 import urlparse
@@ -214,7 +213,6 @@ def maintenance(dry_run=False):
                 rewrite_episode_actions(e, su_episode)
                 rewrite_listeners(e, su_episode)
                 rewrite_chapters(e, su_episode)
-                rewrite_favorites(e, su_episode)
                 e.delete()
 
             e_merged += 1
@@ -352,8 +350,6 @@ def rewrite_episodes(p_old, p_new):
             log('listeners for episode %s (url "%s", podcast %s) updated.' % (e.id, e.url, p_old.id))
             rewrite_chapters(e, e_new)
             log('chapters for episode %s (url "%s", podcast %s) updated.' % (e.id, e.url, p_old.id))
-            rewrite_favorites(e, e_new)
-            log('favorites for episode %s (url "%s", podcast %s) updated, deleting.' % (e.id, e.url, p_old.id))
             e.delete()
 
         except Episode.DoesNotExist:
@@ -400,18 +396,6 @@ def rewrite_chapters(e_old, e_new):
         except Exception, e:
             log('error updating chapter %s: %s, deleting' % (c.id, e))
             c.delete()
-
-
-def rewrite_favorites(e_old, e_new):
-    for f in EpisodeFavorite.objects.filter(episode=e_old):
-        try:
-            log('updating favorite %s (user %s, episode %s => %s)' % (f.id, f.user.id, e_old.id, e_new.id))
-            f.episode = e_new
-            f.save()
-
-        except Exception, e:
-            log('error updating favorite %s: %s, deleting' % (f.id, e))
-            f.delete()
 
 
 def precompile_rules(rules=URLSanitizingRule.objects.all().order_by('priority')):

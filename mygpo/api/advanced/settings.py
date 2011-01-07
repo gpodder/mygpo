@@ -19,9 +19,11 @@ from mygpo.api.basic_auth import require_valid_user, check_username
 from django.http import HttpResponseBadRequest
 from mygpo.api.httpresponse import JsonResponse
 from django.shortcuts import get_object_or_404
-from mygpo.api.models import Device, SubscriptionMeta, EpisodeSettings
+from mygpo.core.models import PodcastUserState
+from mygpo.api.models import Device, Podcast, Episode
 from django.views.decorators.csrf import csrf_exempt
 from mygpo.decorators import allowed_methods
+from mygpo import migrate
 import json
 
 
@@ -31,26 +33,52 @@ import json
 @allowed_methods(['GET', 'POST'])
 def main(request, username, scope):
 
+    def user_settings(user):
+        obj = migrate.get_or_migrate_user(user)
+        return obj, obj
+
+    def device_settings(user, uid):
+        device = Device.objects.get(user=user, uid=uid)
+        user = migrate.get_or_migrate_user(user)
+        settings_obj = migrate.get_or_migrate_device(device, user)
+        return user, settings_obj
+
+    def podcast_settings(user, url):
+        old_p = Podcast.objects.get(url=url)
+        podcast = migrate.get_or_migrate_podcast(old_p)
+        obj = PodcastUserState.for_user_podcast(user, podcast)
+        return obj, obj
+
+    def episode_settings(user, url, podcast_url):
+        old_p = Podcast.objects.get(url=podcast_url)
+        old_e = Episode.objects.get(url=url, podcast=old_p)
+        episode = migrate.get_or_migrate_episode(old_e)
+        podcast = migrate.get_or_migrate_podcast(old_p)
+        podcast_state = podcast.get_user_state(request.user)
+        episode_state = podcast_state.get_episode(episode.id)
+        return podcast_state, episode_state
+
     models = dict(
-            account = lambda: request.user.get_profile(),
-            device  = lambda: get_object_or_404(Device, user=request.user, uid=request.GET.get('device', '')),
-            podcast = lambda: SubscriptionMeta.objects.get_or_create(user=request.user,
-                podcast__url=request.GET.get('podcast', ''))[0],
-            episode = lambda: EpisodeSettings.objects.get_or_create(user=request.user,
-                episode__url=request.GET.get('episode', ''), episode__podcast__url=request.GET.get('podcast', ''))[0]
+            account = lambda: user_settings   (request.user),
+            device  = lambda: device_settings (request.user, request.GET.get('device', '')),
+            podcast = lambda: podcast_settings(request.user, request.GET.get('podcast', '')),
+            episode = lambda: episode_settings(request.user, request.GET.get('episode', ''), request.GET.get('podcast', ''))
         )
 
 
     if scope not in models.keys():
-        return HttpResponseBadRequest()
+        return HttpResponseBadRequest('undefined scope %s' % scope)
 
-    obj = models[scope]()
+    base_obj, settings_obj = models[scope]()
 
     if request.method == 'GET':
-        return JsonResponse( obj.settings )
+        return JsonResponse( settings_obj.settings )
+
     elif request.method == 'POST':
         actions = json.loads(request.raw_post_data)
-        return JsonResponse( update_settings(obj, actions) )
+        ret = update_settings(settings_obj, actions)
+        base_obj.save()
+        return JsonResponse(ret)
 
 
 def update_settings(obj, actions):

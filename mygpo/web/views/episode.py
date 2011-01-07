@@ -18,13 +18,15 @@
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
+from mygpo.core import models
 from mygpo.api.models import Podcast, Episode, EpisodeAction, Subscription
 from mygpo.api.models.episodes import Chapter
-from mygpo.api.models.users import EpisodeFavorite
+from mygpo.api import backend
 from mygpo.web.models import SecurityToken
 from mygpo.web.utils import get_played_parts
 from mygpo.decorators import manual_gc
 from mygpo.utils import parse_time
+from mygpo import migrate
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.contrib.sites.models import Site
@@ -40,7 +42,12 @@ def episode(request, id):
             subscription_meta = subscription_tmp[0].get_meta()
         else:
             subscription_meta = None
-        is_fav = EpisodeFavorite.objects.filter(user=request.user, episode=episode).exists()
+
+        new_ep  = migrate.get_or_migrate_episode(episode)
+        podcast = models.Podcast.for_oldid(episode.podcast.id)
+        podcast_state = podcast.get_user_state(request.user)
+        episode_state = podcast_state.get_episode(new_ep.id)
+        is_fav = episode_state.is_favorite()
 
         played_parts, duration = get_played_parts(request.user, episode)
 
@@ -114,9 +121,16 @@ def remove_chapter(request, id, chapter_id):
 @login_required
 def toggle_favorite(request, id):
     episode = get_object_or_404(Episode, id=id)
-    fav, c = EpisodeFavorite.objects.get_or_create(user=request.user, episode=episode)
-    if not c:
-        fav.delete()
+
+    new_ep  = migrate.get_or_migrate_episode(episode)
+    podcast = migrate.get_or_migrate_podcast(episode.podcast)
+    podcast_state = podcast.get_user_state(request.user)
+    episode_state = podcast_state.get_episode(new_ep.id)
+    is_fav = episode_state.is_favorite()
+    episode_state.set_favorite(not is_fav)
+    podcast_state.episodes[new_ep.id] = episode_state
+
+    podcast_state.save()
 
     return HttpResponseRedirect('/episode/%s' % id)
 
@@ -125,7 +139,7 @@ def toggle_favorite(request, id):
 @login_required
 def list_favorites(request):
     site = Site.objects.get_current()
-    episodes = [x.episode for x in EpisodeFavorite.objects.filter(user=request.user).order_by('-created')]
+    episodes = backend.get_favorites(request.user)
 
     token, c = SecurityToken.objects.get_or_create(user=request.user, object='fav-feed', action='r')
 
