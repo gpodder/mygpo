@@ -15,6 +15,8 @@ urlpatterns = patterns('mygpo.web.views',
  url(r'^tags/',                                                   'mytags',        name='tags'),
  url(r'^online-help',                                              direct_to_template,
        {'template': 'online-help.html'},                                           name='help'),
+    (r'^developer/',                                               direct_to_template,
+       {'template': 'developer.html'}),
 )
 
 urlpatterns += patterns('mygpo.web.views.subscriptions',
