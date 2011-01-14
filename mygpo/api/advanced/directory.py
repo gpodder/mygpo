@@ -21,7 +21,7 @@ from mygpo.api.sanitizing import sanitize_url
 from mygpo.api.models import Podcast, Episode
 from mygpo.data.models import DirectoryEntry
 from mygpo.directory.models import Category
-from django.contrib.sites.models import Site
+from django.contrib.sites.models import RequestSite
 from django.views.decorators.csrf import csrf_exempt
 from mygpo.core import models
 
@@ -39,15 +39,17 @@ def tag_podcasts(request, tag, count):
     if not category:
         return JsonResponse([])
 
+    domain = RequestSite(request).domain
     query = DirectoryEntry.objects.podcasts_for_category(category.get_tags())[:int(count)]
-    resp = map(lambda p: podcast_data(p.get_podcast()), query)
+    resp = map(lambda p: podcast_data(p.get_podcast(), domain), query)
     return JsonResponse(resp)
 
 
 def podcast_info(request):
     url = sanitize_url(request.GET.get('url', ''))
     podcast = get_object_or_404(Podcast, url=url)
-    resp = podcast_data(podcast)
+    domain = RequestSite(request).domain
+    resp = podcast_data(podcast, domain)
 
     return JsonResponse(resp)
 
@@ -56,14 +58,13 @@ def episode_info(request):
     podcast_url = sanitize_url(request.GET.get('podcast', ''))
     episode_url = sanitize_url(request.GET.get('url', ''), podcast=False, episode=True)
     episode = get_object_or_404(Episode, url=episode_url, podcast__url=podcast_url)
+    domain = RequestSite(request)
 
-    resp = episode_data(episode)
+    resp = episode_data(episode, domain)
     return JsonResponse(resp)
 
 
-def podcast_data(podcast):
-    site = Site.objects.get_current()
-
+def podcast_data(podcast, domain):
     if podcast.group:
         subscribers = models.PodcastGroup.for_oldid(podcast.group.id).subscriber_count()
     else:
@@ -76,12 +77,10 @@ def podcast_data(podcast):
         "subscribers": subscribers,
         "logo_url": podcast.logo_url,
         "website": podcast.link,
-        "mygpo_link": 'http://%s/podcast/%s' % (site.domain, podcast.id),
+        "mygpo_link": 'http://%s/podcast/%s' % (domain, podcast.id),
         }
 
-def episode_data(episode):
-    site = Site.objects.get_current()
-
+def episode_data(episode, domain):
     return {
         "title": episode.title,
         "url": episode.url,
@@ -89,7 +88,7 @@ def episode_data(episode):
         "podcast_url": episode.podcast.url,
         "description": episode.description,
         "website": episode.link,
-        "mygpo_link": 'http://%s/episode/%s' % (site.domain, episode.id),
+        "mygpo_link": 'http://%s/episode/%s' % (domain, episode.id),
         }
 
 

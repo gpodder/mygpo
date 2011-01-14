@@ -22,7 +22,7 @@ from mygpo.api import backend
 from mygpo.data.mimetype import CONTENT_TYPES
 from mygpo.decorators import manual_gc
 from mygpo.web import utils
-from django.contrib.sites.models import Site
+from django.contrib.sites.models import RequestSite
 
 
 
@@ -44,7 +44,7 @@ def toplist(request, num=100, lang=None):
     entries = backend.get_toplist(num, lang, set_types)
 
     max_subscribers = max([sub for (sub, oldp, p) in entries]) if entries else 0
-    current_site = Site.objects.get_current()
+    current_site = RequestSite(request)
     all_langs = utils.get_language_names(utils.get_podcast_languages())
 
     return render_to_response('toplist.html', {
@@ -74,7 +74,7 @@ def episode_toplist(request, num=100):
 
     entries = backend.get_episode_toplist(num, lang, set_types)
 
-    current_site = Site.objects.get_current()
+    current_site = RequestSite(request)
 
     # Determine maximum listener amount (or 0 if no entries exist)
     max_listeners = max([0]+[e.listeners for e in entries])

@@ -26,7 +26,7 @@ from mygpo.decorators import manual_gc
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render_to_response
 from datetime import datetime, timedelta
-from django.contrib.sites.models import Site
+from django.contrib.sites.models import RequestSite
 from mygpo.constants import PODCAST_LOGO_SIZE, PODCAST_LOGO_BIG_SIZE
 from mygpo.web import utils
 from mygpo.api import backend
@@ -45,7 +45,7 @@ def home(request):
 
 @manual_gc
 def welcome(request, toplist_entries=10):
-    current_site = Site.objects.get_current()
+    current_site = RequestSite(request)
     podcasts = Podcast.objects.count()
     users = User.objects.filter(is_active=True).count()
     episodes = Episode.objects.count()
@@ -75,7 +75,7 @@ def welcome(request, toplist_entries=10):
 @manual_gc
 @login_required
 def dashboard(request, episode_count=10):
-    site = Site.objects.get_current()
+    site = RequestSite(request)
     devices = Device.objects.filter(user=request.user, deleted=False)
     subscribed_podcasts = set([s.podcast for s in Subscription.objects.filter(user=request.user)])
 
@@ -211,7 +211,7 @@ def rate_suggestions(request):
 def suggestions(request):
     suggestion_obj = models.Suggestions.for_user_oldid(request.user.id)
     suggestions = [p.get_old_obj() for p in suggestion_obj.get_podcasts()]
-    current_site = Site.objects.get_current()
+    current_site = RequestSite(request)
     return render_to_response('suggestions.html', {
         'entries': suggestions,
         'url': current_site

@@ -6,7 +6,7 @@ from mygpo.publisher.models import PodcastPublisher
 from mygpo.publisher.auth import require_publisher, is_publisher
 from mygpo.publisher.forms import SearchPodcastForm, EpisodeForm, PodcastForm
 from mygpo.publisher.utils import listener_data, episode_listener_data, check_publisher_permission, subscriber_data, device_stats, episode_heatmap
-from django.contrib.sites.models import Site
+from django.contrib.sites.models import RequestSite
 from mygpo.data.feeddownloader import update_podcasts
 from mygpo.decorators import requires_token, allowed_methods
 from mygpo.web.models import SecurityToken
@@ -23,7 +23,7 @@ def home(request):
             }, context_instance=RequestContext(request))
 
     else:
-        site = Site.objects.get_current()
+        site = RequestSite(request)
         return render_to_response('publisher/info.html', {
             'site': site
             }, context_instance=RequestContext(request))
@@ -67,7 +67,7 @@ def podcast(request, id):
         update_token.random_token()
         update_token.save()
 
-    site = Site.objects.get_current()
+    site = RequestSite(request)
 
     return render_to_response('publisher/podcast.html', {
         'site': site,
@@ -169,14 +169,14 @@ def episode(request, id):
 
 
 def link(request):
-    current_site = Site.objects.get_current()
+    current_site = RequestSite(request)
     return render_to_response('link.html', {
         'url': current_site
         }, context_instance=RequestContext(request))
 
 
 def advertise(request):
-    site = Site.objects.get_current()
+    site = RequestSite(request)
     return render_to_response('publisher/advertise.html', {
         'site': site
     }, context_instance=RequestContext(request))

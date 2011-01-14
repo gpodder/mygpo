@@ -18,11 +18,11 @@
 
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.contrib.sites.models import Site
+from django.contrib.sites.models import RequestSite
 from django.utils.translation import ugettext as _
 
 def csrf_failure(request, reason=""):
-    site = Site.objects.get_current()
+    site = RequestSite(request)
     return render_to_response('csrf.html', {
         'site': site,
         'method': request.method,

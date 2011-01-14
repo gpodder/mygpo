@@ -5,7 +5,7 @@ from django.db import IntegrityError
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
-from django.contrib.sites.models import Site
+from django.contrib.sites.models import RequestSite
 from django.utils.translation import ugettext as _
 from mygpo.api.models import Podcast, Episode, EpisodeAction, Device, SubscriptionAction, Subscription, SyncGroup
 from mygpo.api.sanitizing import sanitize_url
@@ -76,7 +76,7 @@ def show(request, pid):
             'success': success
         }, context_instance=RequestContext(request))
     else:
-        current_site = Site.objects.get_current()
+        current_site = RequestSite(request)
         return render_to_response('podcast.html', {
             'podcast': podcast,
             'related_podcasts': related_podcasts,

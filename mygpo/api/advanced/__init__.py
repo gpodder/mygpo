@@ -23,6 +23,7 @@ from mygpo.api.sanitizing import sanitize_url
 from mygpo.api.advanced.directory import episode_data, podcast_data
 from mygpo.api.backend import get_all_subscriptions, get_device, get_favorites
 from django.shortcuts import get_object_or_404
+from django.contrib.sites.models import RequestSite
 from time import mktime, gmtime, strftime
 from datetime import datetime
 import dateutil.parser
@@ -345,12 +346,13 @@ def updates(request, username, device_uid):
         return HttpResponseBadRequest('since-value is not a valid timestamp')
 
     ret = get_subscription_changes(request.user, device, since, now)
+    domain = RequestSite(request).domain
 
     # replace added urls with details
     podcast_details = []
     for url in ret['add']:
         podcast = Podcast.objects.get(url=url)
-        podcast_details.append(podcast_data(podcast))
+        podcast_details.append(podcast_data(podcast, domain))
 
     ret['add'] = podcast_details
 
@@ -365,7 +367,7 @@ def updates(request, username, device_uid):
 
     updates = []
     for episode, status in episode_status.iteritems():
-        t = episode_data(episode)
+        t = episode_data(episode, domain)
         t['released'] = e.timestamp.strftime('%Y-%m-%dT%H:%M:%S')
         t['status'] = status
         updates.append(t)
@@ -379,7 +381,9 @@ def updates(request, username, device_uid):
 @check_username
 def favorites(request, username):
     favorites = get_favorites(request.user)
-    ret = map(episode_data, favorites)
+    domain = RequestSite(request).domain
+    ep_data = lambda e: episode_data(e, domain)
+    ret = map(e_data, favorites)
     return JsonResponse(ret)
 
 

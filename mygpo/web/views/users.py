@@ -24,7 +24,7 @@ from django.template.defaultfilters import slugify
 from django.template import RequestContext
 from mygpo.api.models import UserProfile
 from mygpo.web.forms import RestorePasswordForm
-from django.contrib.sites.models import Site
+from django.contrib.sites.models import RequestSite
 from django.conf import settings
 from mygpo.decorators import manual_gc, allowed_methods
 from django.utils.translation import ugettext as _
@@ -48,7 +48,7 @@ def login_user(request):
             form = None
 
         return render_to_response('login.html', {
-            'url': Site.objects.get_current(),
+            'url': RequestSite(request),
             'next': request.GET.get('next', ''),
             'restore_password_form': form,
         }, context_instance=RequestContext(request))
@@ -82,7 +82,7 @@ def login_user(request):
 
     try:
          if user.get_profile().generated_id:
-             site = Site.objects.get_current()
+             site = RequestSite(request)
              return render_to_response('migrate.html', {
                   'url': site,
                   'username': user
@@ -105,7 +105,7 @@ def migrate_user(request):
         username = user.username
 
     if user.username != username:
-        current_site = Site.objects.get_current()
+        current_site = RequestSite(request)
         if User.objects.filter(username__exact=username).count() > 0:
             return render_to_response('migrate.html', {
                 'error_message': '%s is already taken' % username,
@@ -153,7 +153,7 @@ def restore_password(request):
             'error_message': error_message
         }, context_instance=RequestContext(request))
 
-    site = Site.objects.get_current()
+    site = RequestSite(request)
     pwd = "".join(random.sample(string.letters+string.digits, 8))
     subject = _('Reset password for your account on %s') % site
     message = _('Here is your new password for your account %(username)s on %(site)s: %(password)s') % {'username': user.username, 'site': site, 'password': pwd}
@@ -174,7 +174,7 @@ def resend_activation(request):
             'form': form,
         }, context_instance=RequestContext(request))
 
-    site = Site.objects.get_current()
+    site = RequestSite(request)
     form = ResendActivationForm(request.POST)
 
     try:

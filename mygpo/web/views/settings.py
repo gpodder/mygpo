@@ -25,7 +25,7 @@ from django.forms import ValidationError
 from django.utils.translation import ugettext as _
 from mygpo.decorators import manual_gc, allowed_methods
 from django.contrib.auth.decorators import login_required
-from django.contrib.sites.models import Site
+from django.contrib.sites.models import RequestSite
 
 
 @manual_gc
@@ -152,7 +152,7 @@ def privacy(request):
 @manual_gc
 @login_required
 def share(request):
-    site = Site.objects.get_current()
+    site = RequestSite(request)
     token, c = SecurityToken.objects.get_or_create(user=request.user, object='subscriptions', action='r')
 
 

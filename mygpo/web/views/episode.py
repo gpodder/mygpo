@@ -29,7 +29,7 @@ from mygpo.utils import parse_time
 from mygpo import migrate
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
-from django.contrib.sites.models import Site
+from django.contrib.sites.models import RequestSite
 
 @manual_gc
 def episode(request, id):
@@ -138,7 +138,7 @@ def toggle_favorite(request, id):
 @manual_gc
 @login_required
 def list_favorites(request):
-    site = Site.objects.get_current()
+    site = RequestSite(request)
     episodes = backend.get_favorites(request.user)
 
     token, c = SecurityToken.objects.get_or_create(user=request.user, object='fav-feed', action='r')

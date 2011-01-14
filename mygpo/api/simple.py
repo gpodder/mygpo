@@ -27,6 +27,7 @@ from mygpo.api.backend import get_toplist, get_all_subscriptions
 from mygpo.api.advanced.directory import podcast_data
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
+from django.contrib.sites.models import RequestSite
 from mygpo.search.models import SearchEntry
 from django.utils.translation import ugettext as _
 from mygpo.decorators import allowed_methods
@@ -178,9 +179,10 @@ def toplist(request, count, format):
         count = 100
 
     toplist = get_toplist(count)
+    domain = RequestSite(request).domain
 
     def json_map(sub, prev_sub, oldpos, podcast):
-        p = podcast_data(t.get_podcast())
+        p = podcast_data(t.get_podcast(), domain)
         p.update(dict(
             subscribers=           t.subscriptions,
             subscribers_last_week= t.oldplace,
@@ -207,7 +209,9 @@ def search(request, format):
     results = [r.get_podcast() for r in SearchEntry.objects.search(query)[:20]]
 
     title = _('gpodder.net - Search')
-    return format_podcast_list(results, format, title, json_map=podcast_data)
+    domain = RequestSite(request).domain
+    p_data = lambda p: podcast_data(p, domain)
+    return format_podcast_list(results, format, title, json_map=p_data)
 
 
 @require_valid_user
@@ -221,6 +225,8 @@ def suggestions(request, count, format):
     suggestion_obj = Suggestions.for_user_oldid(request.user.id)
     suggestions = [p.get_old_obj() for p in islice(suggestion_obj.get_podcasts(), count)]
     title = _('gpodder.net - %(count)d Suggestions') % {'count': len(suggestions)}
-    return format_podcast_list(suggestions, format, title, json_map=podcast_data)
+    domain = RequestSite(request).domain
+    p_data = lambda p: podcast_data(p, domain)
+    return format_podcast_list(suggestions, format, title, json_map=p_data)
 
 

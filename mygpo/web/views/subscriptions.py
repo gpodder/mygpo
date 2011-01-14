@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.contrib.sites.models import Site
+from django.contrib.sites.models import RequestSite
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 
@@ -15,7 +15,7 @@ from mygpo.web import utils
 @manual_gc
 @login_required
 def list(request):
-    current_site = Site.objects.get_current()
+    current_site = RequestSite(request)
     subscriptionlist = create_subscriptionlist(request)
     return render_to_response('subscriptions.html', {
         'subscriptionlist': subscriptionlist,
