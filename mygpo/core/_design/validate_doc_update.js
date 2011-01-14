@@ -30,10 +30,13 @@ function(newDoc, oldDoc, userCtx)
     function checkPodcast(podcast)
     {
         last_timestamp = null;
-        for(var i=0, len=podcast.subscribers.length; sub=podcast.subscribers[i], i<len; i++)
+        if(podcast.subscribers)
         {
-            check((last_timestamp == null) || (last_timestamp < sub.timestamp), "Subscriber Data must be sorted");
-            last_timestamp = sub.timestamp;
+            for(var i=0, len=podcast.subscribers.length; sub=podcast.subscribers[i], i<len; i++)
+            {
+                check((last_timestamp == null) || (last_timestamp < sub.timestamp), "Subscriber Data must be sorted");
+                last_timestamp = sub.timestamp;
+            }
         }
     }
 
