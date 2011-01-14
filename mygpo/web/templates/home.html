@@ -102,9 +102,17 @@
    <tr>
     <td>{{ podcast|podcast_logo }}
     <td>
-     <a href="{% url podcast podcast.id %}">
-      {{ podcast.title }}
-     </a>
+     {% if podcast.url %}{% comment %}PodcastGroups don't have urls{% endcomment %}
+      <a href="{% url podcast podcast.id %}">{{ podcast|striptags }}</a>
+     {% else %}
+      {{ podcast.title|striptags}}
+      (
+       {% for p in podcast.podcasts %}
+        <a href="{% url podcast p.id %}">{{ p.group_member_name|striptags }}</a>
+       {% endfor %}
+      )
+     {% endif %}
+    </td>
    </tr>
   {% endfor %}
   <tr>
