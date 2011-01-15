@@ -1,49 +1,58 @@
 
-                   Deployment instructions for my.gpodder.org
-                   ------------------------------------------
 
-Dependencies:
+                   Deployment instructions for gpodder.net
+                   ---------------------------------------
 
-  * python (>= 2.5)
+
+Please note that this deployment instructions apply to the current couchdb
+branch of mygpo/gpodder.net only. They will change once the migration to
+CouchDB has been completed.
+
+
+  Dependencies
+================
+
+When no version number is indicated, it is advisable to install the current
+development version from the repository.
+
+  * python (>= 2.6)
   * MySQL Server (>= 5.0)
-  * python-mysqldb
-  * lighttpd
-  * python-feedparser
-  * python-dateutil
-  * python-simplejson
-  * python-flup
-  * python-imaging
-  * python-pybabel
+  * CouchDB (>= 1.0, incl Patch from [1])
+  * python-mysqldb [2]
+  * lighttpd (>= 1.4.19)
+  * python-feedparser [3] or [4]
+  * python-dateutil [5]
+  * python-flup [6]
+  * python-imaging [7]
+  * python-pybabel [8]
+  * couchdbkit [9]
+  * Django (>= 1.2.2, [10])
+  * django-registration [11]
 
-It's recommended that you use the development version of the following
-libraries, as we're living on the bleeding edge here:
 
-  * django
-    svn co http://code.djangoproject.com/svn/django/trunk/ django
+  MySQL
+=========
 
-  * django-registration
-    hg clone http://bitbucket.org/ubernostrum/django-registration/
+1. Updating the Settings
 
-  * django-haystack
-    git clone git://github.com/toastdriven/django-haystack.git
+In mygpo/settings.py a skeleton database setting (DATABASES) is provided.  To
+use mygpo with a MySQL database, create settings_prod.py and overwrite the
+settings with something like
 
-  * whoosh
-    hg clone http://bitbucket.org/mchaput/whoosh/
+DATABASES = {
+    'default': {
+        'NAME': 'mygpo',
+        'ENGINE': 'django.db.backends.mysql',
+        'USER': 'mygpo',
+        'PASSWORD': '',
+    }
+}
 
-You can set up the repositories in this source tree by creating a
-"upstream" directory in which you checkout the above code bases.
+The following instructions will be based on these settings but you are free to
+adapt them.
 
-Then, you create a "lib" folder and symlink the packages from the
-"upstream" directory there:
 
-  cd lib/
-  ln -s ../upstream/django/django
-  ln -s ../upstream/whoosh/src/whoosh
-  ln -s ../upstream/django-haystack/haystack
-  ln -s ../upstream/django-registration/registration
-  cd ..
-
-1. Creating the database
+2. Creating the database
 
 In MySQL, do the following (the SUPER grant is needed for
 triggers to work in MySQL 5.0):
@@ -58,7 +67,10 @@ triggers to work in MySQL 5.0):
 Make sure that MySQL listens only on localhost, or if in
 doubt, assign a password to the "mygpo" user!
 
-2. Initialize the database
+
+3. Initializing an empty Database
+
+You can skip this step if you are importing a dump.
 
 Run in the mygpo/ subdirectory (possibly after setting the
 DB parameters in mygpo/settings.py):
@@ -78,7 +90,53 @@ server in the correct order. You should not use this script to
 upgrade the database, as data loss may occur. You have been warned.
 
 
-3. Setup the web server using lighttpd
+4. Importing a Dump
+
+A dump contains both the database structure and the data. You can import it
+with
+
+  gunzip -c <dumpfile>.sql.gz | mysql -uroot -p mygpo
+
+
+  CouchDB
+===========
+
+1. Initializing an empty Database
+
+To create the database, execute the following on the commandline
+
+  curl -X PUT http://127.0.0.1:5984/mygpo
+
+To initialize the views, execute from the mygpo-Directory
+
+  python manage.py syncdb
+
+
+2. Importing a Dump
+
+To import a CouchDB dump, execute the following from the commandline
+
+  gunzip -c <dumpfile.couch.gz> | couchdb-load http://127.0.0.1:5984/mygpo
+
+
+3. Building the Views
+
+On the first request, CouchDB will build the views. To do this before the first
+user hits the site (which is, of course, optional), execute the following
+
+  curl -X GET http://127.0.0.1:5984/mygpo/_design/core/_view/podcasts_by_url?limit=1
+  curl -X GET http://127.0.0.1:5984/mygpo/_design/directory/_view/toplist
+
+
+  Web-Server
+==============
+
+Django comes with a development webservice which you can run from the mygpo
+directory with
+
+  python manage.py runserver
+
+If you want to run a production server, you can set up lighttpd instead
 
 There is a mygpo.lighttpd.conf file shipped with the source. Please
 customize it to your needs, and then include it from your lighttpd
@@ -86,17 +144,36 @@ main configuration file, for example like this:
 
   include "/srv/mygpo/mygpo.lighttpd.conf"
 
-4. Enable lighttpd modules
-
 The modules you need to enable are: rewrite, fastcgi. On Debian,
 you can enable these using the "lighty-enable-mod" command:
 
   lighty-enable-mod rewrite fastcgi
 
-5. Restart lighttpd
-
-On Debian:
+Then restart ligghtd with
 
   /etc/init.d/lighttpd restart
 
+
+  Settings
+============
+
+Check the settings in mygpo/settings.py. If you want to change any settings,
+add them to mygpo/settings_prod.py with the correct value.
+
+
+
+  References
+==============
+
+ [1]  http://mail-archives.apache.org/mod_mbox/couchdb-dev/201010.mbox/<24594469.51751287512786814.JavaMail.jira@thor>
+ [2]  http://sourceforge.net/projects/mysql-python/
+ [3]  http://feedparser.org/
+ [4]  https://github.com/kurtmckee/feedparser/
+ [5]  http://niemeyer.net/python-dateutil
+ [6]  http://trac.saddi.com/flup
+ [7]  http://www.pythonware.com/products/pil/
+ [8]  http://babel.edgewall.org/
+ [9]  https://github.com/stefankoegl/couchdbkit
+ [10] http://www.djangoproject.com/
+ [11] https://bitbucket.org/ubernostrum/django-registration/
 
