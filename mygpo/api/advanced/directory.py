@@ -66,15 +66,19 @@ def episode_info(request):
 
 def podcast_data(podcast, domain):
     if podcast.group:
-        subscribers = models.PodcastGroup.for_oldid(podcast.group.id).subscriber_count()
+        obj = models.PodcastGroup.for_oldid(podcast.group.id)
     else:
-        subscribers = models.Podcast.for_oldid(podcast.id).subscriber_count()
+        obj = models.Podcast.for_oldid(podcast.id)
+
+    subscribers = obj.subscriber_count()
+    last_subscribers = obj.prev_subscriber_count()
 
     return {
         "url": podcast.url,
         "title": podcast.title,
         "description": podcast.description,
         "subscribers": subscribers,
+        "subscribers_last_week": last_subscribers,
         "logo_url": podcast.logo_url,
         "website": podcast.link,
         "mygpo_link": 'http://%s/podcast/%s' % (domain, podcast.id),

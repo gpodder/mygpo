@@ -18,7 +18,7 @@
 from itertools import islice
 from mygpo.api.basic_auth import require_valid_user, check_username
 from django.http import HttpResponse, HttpResponseBadRequest
-from mygpo.core.models import Suggestions
+from mygpo.core import models
 from mygpo.api.models import Device, Podcast
 from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
@@ -181,12 +181,21 @@ def toplist(request, count, format):
     toplist = get_toplist(count)
     domain = RequestSite(request).domain
 
-    def json_map(sub, prev_sub, oldpos, podcast):
-        p = podcast_data(t.get_podcast(), domain)
+    def get_podcast(t):
+        s, o, p = t
+        if isinstance(p, Podcast):
+            return p
+        else:
+            return p.podcasts()[0]
+
+    def json_map(t):
+        podcast = get_podcast(t)
+        p = podcast_data(podcast, domain)
+        newp = models.Podcast.for_oldid(podcast.id)
         p.update(dict(
-            subscribers=           t.subscriptions,
-            subscribers_last_week= t.oldplace,
-            position_last_week=    t.oldplace
+            subscribers=           newp.subscriber_count(),
+            subscribers_last_week= newp.prev_subscriber_count(),
+            position_last_week=    0
         ))
         return p
 
@@ -194,7 +203,7 @@ def toplist(request, count, format):
     return format_podcast_list(toplist,
                                format,
                                title,
-                               get_podcast=lambda (s, o, p): p,
+                               get_podcast=get_podcast,
                                json_map=json_map)
 
 
@@ -222,7 +231,7 @@ def suggestions(request, count, format):
     if count not in range(1,100):
         count = 100
 
-    suggestion_obj = Suggestions.for_user_oldid(request.user.id)
+    suggestion_obj = models.Suggestions.for_user_oldid(request.user.id)
     suggestions = [p.get_old_obj() for p in islice(suggestion_obj.get_podcasts(), count)]
     title = _('gpodder.net - %(count)d Suggestions') % {'count': len(suggestions)}
     domain = RequestSite(request).domain
