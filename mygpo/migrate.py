@@ -1,7 +1,7 @@
 from datetime import datetime
 from couchdbkit import Server, Document
 
-from mygpo.core.models import Podcast, PodcastGroup, Rating, Episode, EpisodeAction, SubscriberData, User, Device
+from mygpo.core.models import Podcast, PodcastGroup, Rating, Episode, EpisodeAction, SubscriberData, User, Device, SubscriptionAction
 from mygpo.log import log
 from mygpo import utils
 
@@ -217,3 +217,11 @@ def get_or_migrate_device(device, user=None):
     u.devices.append(d)
     u.save()
     return d
+
+
+def migrate_subscription_action(old_action):
+    action = SubscriptionAction()
+    action.timestamp = old_action.timestamp
+    action.action = 'subscribe' if old_action.action == 1 else 'unsubscribe'
+    action.device = get_or_migrate_device(old_action.device).id
+    return action

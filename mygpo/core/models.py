@@ -303,6 +303,18 @@ class EpisodeUserState(Document):
                 self.actions == other.actions)
 
 
+
+class SubscriptionAction(Document):
+    action    = StringProperty()
+    timestamp = DateTimeProperty(default=datetime.utcnow)
+    device    = StringProperty()
+
+    def __eq__(self, other):
+        return self.actions == other.action and \
+               self.timestamp == other.timestamp and \
+               self.device == other.device
+
+
 class PodcastUserState(Document):
     """
     Contains everything that a user has done
@@ -313,6 +325,8 @@ class PodcastUserState(Document):
     episodes      = SchemaDictProperty(EpisodeUserState)
     user_oldid    = IntegerProperty()
     settings      = DictProperty()
+    actions       = SchemaListProperty(SubscriptionAction)
+
 
     @classmethod
     def for_user_podcast(cls, user, podcast):
@@ -335,6 +349,18 @@ class PodcastUserState(Document):
         e.episode = e_id
         self.episodes[e_id] = e
         return e
+
+    def add_actions(self, actions):
+        self.actions += actions
+        self.actions = list(set(self.actions))
+        self.actions.sort(key=lambda x: x.timestamp)
+
+    def __eq__(self, other):
+        if other is None:
+            return False
+
+        return self.podcast == other.podcast and \
+               self.user_oldid == other.user_oldid
 
     def __repr__(self):
         return 'Podcast %s for User %s (%s)' % \
