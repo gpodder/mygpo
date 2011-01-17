@@ -382,7 +382,7 @@ def updates(request, username, device_uid):
 def favorites(request, username):
     favorites = get_favorites(request.user)
     domain = RequestSite(request).domain
-    ep_data = lambda e: episode_data(e, domain)
+    e_data = lambda e: episode_data(e, domain)
     ret = map(e_data, favorites)
     return JsonResponse(ret)
 
