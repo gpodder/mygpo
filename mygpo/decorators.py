@@ -84,3 +84,27 @@ def allowed_methods(methods):
 
     return decorator
 
+
+def repeat_on_conflict(obj_name):
+    """
+    In case of a CouchDB ResourceConflict, reloads the parameter with the
+    given name and repeats the function call until it succeeds.
+    When calling the function, the parameter that should be reloaded must be
+    given as a keyword-argument
+    """
+    from couchdbkit import ResourceConflict
+
+    def decorator(f):
+        def tmp(*args, **kwargs):
+            obj = kwargs[obj_name]
+
+            while True:
+                try:
+                    f(*args, **kwargs)
+                    break
+                except ResourceConflict:
+                    kwargs[obj_name] = obj.__class__.get(obj._id)
+
+        return tmp
+
+    return decorator
