@@ -23,7 +23,7 @@ class Command(BaseCommand):
             progress(n, total)
 
 
-    @repeat_on_conflict('entry')
+    @repeat_on_conflict(['entry'])
     def update(self, entry, started):
         try:
             p = Podcast.objects.get(id=entry.oldid)
