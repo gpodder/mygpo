@@ -12,8 +12,11 @@ class Episode(Document):
     """
 
     id = StringProperty(default=lambda: uuid.uuid4().hex)
+    merged_ids = StringListProperty()
     oldid = IntegerProperty()
     urls = StringListProperty()
+    # when accessed via a view, a podcast attribute is added
+    # that contains the id of the podcast
 
     @classmethod
     def for_id(cls, id):
@@ -39,6 +42,10 @@ class Episode(Document):
             (self.id, self._id)
 
 
+    def __eq__(self, other):
+        return self.id == other.id
+
+
 class SubscriberData(DocumentSchema):
     timestamp = DateTimeProperty()
     subscriber_count = IntegerProperty()
@@ -53,6 +60,7 @@ class SubscriberData(DocumentSchema):
 
 class Podcast(Document):
     id = StringProperty()
+    merged_ids = StringListProperty()
     oldid = IntegerProperty()
     group = StringProperty()
     related_podcasts = StringListProperty()
@@ -60,6 +68,11 @@ class Podcast(Document):
     subscribers = SchemaListProperty(SubscriberData)
     language = StringProperty()
     content_types = StringListProperty()
+
+    @classmethod
+    def for_id(cls, id):
+        r = cls.view('core/podcasts_by_id', key=id)
+        return r.first() if r else None
 
     @classmethod
     def for_oldid(cls, oldid):
@@ -85,6 +98,13 @@ class Podcast(Document):
 
     def get_user_state(self, user):
         return PodcastUserState.for_user_podcast(user, self)
+
+
+    def get_all_states(self):
+        return PodcastUserState.view('core/podcast_states_by_podcast',
+            startkey = [self.get_id(), None],
+            endkey   = [self.get_id(), '\ufff0'],
+            include_docs=True)
 
 
     def get_old_obj(self):

@@ -9,15 +9,6 @@ function(newDoc, oldDoc, userCtx)
         }
     }
 
-    function checkChange(newDoc, oldDoc, field)
-    {
-        message = field + " must not change";
-        if(newDoc && oldDoc && oldDoc[field] && (newDoc[field] != oldDoc[field]))
-        {
-            throw({forbidden: message});
-        }
-    }
-
     function check(cond, message)
     {
         message = message || "Condition check failed";
@@ -56,7 +47,6 @@ function(newDoc, oldDoc, userCtx)
             require(podcast, "id");
             require(podcast, "group");
             check(podcast.group == newDoc._id);
-            checkChange(podcast, oldpodcast, "id");
             checkPodcast(podcast);
         }
     }

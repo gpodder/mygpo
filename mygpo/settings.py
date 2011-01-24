@@ -109,6 +109,7 @@ INSTALLED_APPS = (
     'mygpo.userfeeds',
     'mygpo.search',
     'mygpo.directory',
+    'mygpo.maintenance',
 )
 
 TEST_EXCLUDE = (
