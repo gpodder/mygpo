@@ -13,6 +13,7 @@
     <outline title="Hacker Medley" text="Hacker Medley is a short podcast for curious hackers." type="rss" xmlUrl="http://hackermedley.org/feed/podcast/"/>
     <outline title="TED Talks" text="Videos from the Technology, Entertainment and Design conferences." type="rss" xmlUrl="http://feeds.feedburner.com/tedtalks_video"/>
     <outline title="Crunchtime on Soundcloud" text="Music from Crunchtime Records' artists. (gPodder 2.1 and later with Soundcloud support)" type="rss" xmlUrl="http://soundcloud.com/crunchtime"/>
+    <outline title="Music Manumit" text="music free from the bonds of slavery" type="rss" xmlUrl="http://feeds.feedburner.com/MusicManumit"/>
 </body>
 </opml>
 
