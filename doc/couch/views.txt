@@ -90,9 +90,9 @@ queried multiple times.
 
 Podcasts by Tag
 ~~~~~~~~~~~~~~~
- * For each Podcast, iterates over all tags and emits
+ * For a Podcast, iterates over all tags and emits
    [tag, weight, Podcast] and the Podcast
- * For each PodcastGroup, aggregates tags of all contained podcasts,
+ * For a PodcastGroup, aggregates tags of all contained podcasts,
    iterates over them and emits [tag, weight, PodcastGroup] and
    the PodcastGroup
 
@@ -102,7 +102,7 @@ podcasts of a category, ordered by their weight.
 
 Categories by Weight (directory/categories)
 ~~~~~~~~~~~~~~~~~~~~
- * For each Category, emit its Weight and null
+ * For a Category, emit its Weight and null
 
 A list of Categories ordered by their weight; used to construct the navigation
 of the Podcast Directory.
@@ -110,14 +110,14 @@ of the Podcast Directory.
 
 Categories by Tags (directory/categories_by_tags)
 ~~~~~~~~~~~~~~~~~~
- * For each Category, emit its label and all its spellings, with null.
+ * For a Category, emit its label and all its spellings, with null.
 
 Can be used to get the Category for a given Tag, or all assigned Tags.
 
 
 Episodes by Podcast
 ~~~~~~~~~~~~~~~~~~~
- * For each Episode, emit [Podcast, Release-Date] and the Episode
+ * For a Episode, emit [Podcast, Release-Date] and the Episode
 
 Can be used to get a list of all episodes for a given podcast, ordered by their
 release date.
@@ -125,7 +125,7 @@ release date.
 
 Favorite Episodes by User
 ~~~~~~~~~~~~~~~~~~~~~~~~~
- * For each UserEpisodeState, emit [User, Podcast] and null, if the episode is
+ * For a UserEpisodeState, emit [User, Podcast] and null, if the episode is
    a favorite of the user.
 
 Can be used to get the list of favorite episodes for a given user.
@@ -133,14 +133,14 @@ Can be used to get the list of favorite episodes for a given user.
 
 Users by Username
 ~~~~~~~~~~~~~~~~~
- * For each User, emit the username and the User
+ * For a User, emit the username and the User
 
 Can be used to get a user by its username.
 
 
 Devices by User-Id
 ~~~~~~~~~~~~~~~~~~
- * For each User, iterate over all Devices and emit [User-Id, Device-ID]
+ * For a User, iterate over all Devices and emit [User-Id, Device-ID]
    and the device
 
 Can be used either to get a list of all devices for a given user, or to access
@@ -149,7 +149,7 @@ a device given its user and ID.
 
 Subscriptions by Podcast
 ~~~~~~~~~~~~~~~~~~~~~~~~
- * For each PodcastUserState, check existing subscriptions and emit
+ * For a PodcastUserState, check existing subscriptions and emit
    [Podcast-Id, User-Id] and null.
 
 Can be used to get the subscribers for a given Podcast.
@@ -157,7 +157,7 @@ Can be used to get the subscribers for a given Podcast.
 
 Subscriptions by User
 ~~~~~~~~~~~~~~~~~~~~~
- * For each PodcastUserState, check existing subscriptions and emit
+ * For a PodcastUserState, check existing subscriptions and emit
    [User-Id, Podcast-Id, Device-Id] and null.
 
 Can be used to get the subscriptions for a given User. When queried with
@@ -166,28 +166,28 @@ grouped=true, group_level=2 it returns the subscribed Podcasts.
 
 Suggestions by User (suggestions_by_user_oldid)
 ~~~~~~~~~~~~~~~~~~~
- * For each Suggestions, emit Old-User-Id and null.
+ * For a Suggestions, emit Old-User-Id and null.
 
 Can be used to get the suggestions for a given User.
 
 
 PodcastUserState by User, Podcast
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * For each PodcastUserState, emit [User-Id, Podcast-Id].
+ * For a PodcastUserState, emit [User-Id, Podcast-Id].
 
 Can be used to access PodcastUserState by User-Id and Podcast-Id.
 
 
 PodcastUserState by User, Episode
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * For each EpisodeUserState, emit [User-Id, Episode-Id].
+ * For a EpisodeUserState, emit [User-Id, Episode-Id].
 
  Can be used to access a EpisodeUserState by User-Id and Episode-Id.
 
 
 Sanitizing Rules by Target
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
- * For each URLSanitizing Rule emit [target, priority] and the rule
+ * For a URLSanitizing Rule emit [target, priority] and the rule
    for each target (podcast, episode) the rule can be applied to
 
 Can be used to get the sanitizing rules in the intended order of application.
@@ -195,9 +195,90 @@ Can be used to get the sanitizing rules in the intended order of application.
 
 Advertisement by Time
 ~~~~~~~~~~~~~~~~~~~~~
- * For each Advertisement, emit the end-date and the Advertisement.
+ * For a Advertisement, emit the end-date and the Advertisement.
 
 Can be used to get the Advertisement that will end next (ie the current or the
 upcoming) advertisement.
 
+
+Devices by User (core/devices_by_user_uid)
+~~~~~~~~~~~~~~~
+ * For a User, emits [User-Oldid, Device-UID] for each Device
+
+Can be used to get either a all Devices of a user, or a specific device by its
+UID. The Id (property user) and Old-Id (property user_oldid) are set before
+emitting the Device.
+
+
+Episodes by Id (core/episodes_by_id)
+~~~~~~~~~~~~~~
+ * For a Podcast (PodcastGroup), iterate all Episodes and emit
+   Id and the Episode itself
+
+Can be used to get an Episode by its Id. The Podcast's Id (property podcast) is
+set before emitting the Episode.
+
+
+Episodes by Old-Id (core/episodes_by_oldid)
+~~~~~~~~~~~~~~~~~~
+ * For a Podcast (PodcastGroup), iterate all Episodes and emit
+   Old-Id and the Episode itself
+
+Can be used to get an Episode by its Old-Id. The Podcast's Id (property
+podcast) is set before emitting the Episode.
+
+
+Episodes by URL (core/episodes_by_url)
+~~~~~~~~~~~~~~~
+ * For a Podcast (PodcastGroup), iterate all Episodes and emit
+   URL and the Episode itself for each of URL
+
+Can be used to get an Episode by one of its associated files. The Podcast's Id
+(property podcast) is set before emitting the Episode.
+
+
+Favorite Episodes by User (core/favorite_episodes_by_user)
+~~~~~~~~~~~~~~~~~~~~~~~~~
+ * For a PodcastUserState, emit the User's Old-Id and the Episodes
+   Id for each Episode that is flagged as favorite
+
+Can be used to get a list of favorite episodes for a User.
+
+
+Podcasts by URL (core/podcasts_by_url)
+~~~~~~~~~~~~~~~
+ * For a Podcast (PodcastGroup) emit URL and the
+   podcast itself for each of its URLs
+
+Can be used to get a Podcast by one of its Feed-URLs.
+
+
+Podcasts and Podcast-Groups (core/podcasts_groups)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * For a Podcast or a PodcastGroup emit its Id and null
+
+Can be used to get a list of all PodcastGroups and all un-grouped Podcasts.
+
+
+Podcast-States by Podcast (core/podcast_states_by_podcast)
+~~~~~~~~~~~~~~~~~~~~~~~~~
+ * For a PodcastUserState, emit [Podcast-Id, User-Old-Id] and null
+
+Can be used to get a specific Podcast-State by specifying Podcast-Id and
+User-Old-Id, or to get all Podcast-States for a given Podcast.
+
+
+Podcast-States by User (core/podcast_states_by_user)
+~~~~~~~~~~~~~~~~~~~~~~
+ * For a PodcastUserState, emit [User-Old-Id, Podcast-Id] and null
+
+Can be used to get a specific Podcast-State by specifying User-Old-Id and
+Podcast-Id or to get all Podcast-States for a given User.
+
+
+Users by Old-Id (core/users_by_oldid)
+~~~~~~~~~~~~~~~
+ * For a User, emit its Old-Id and null
+
+Can be used to get a User by its Old-Id.
 
