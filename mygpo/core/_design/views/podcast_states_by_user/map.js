@@ -2,6 +2,6 @@ function(doc)
 {
     if(doc.doc_type == "PodcastUserState")
     {
-        emit([doc.podcast, doc.user_oldid], null);
+        emit([doc.user_oldid, doc.podcast], null);
     }
 }

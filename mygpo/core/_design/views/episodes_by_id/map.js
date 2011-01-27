@@ -5,7 +5,7 @@ function(doc)
         for(e_id in podcast.episodes)
         {
             episode = podcast.episodes[e_id];
-            episode.podcast = podcast_id
+            episode.podcast = podcast_id;
             emit(e_id, episode);
         }
     }

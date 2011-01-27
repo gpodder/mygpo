@@ -5,9 +5,9 @@ function(doc)
         for(e_id in podcast.episodes)
         {
             episode = podcast.episodes[e_id];
+            episode.podcast = podcast_id;
             for(var n=0, length=episode.urls.length; url=episode.urls[n], n<length; n++)
             {
-                episode.podcast = podcast_id
                 emit(url, episode);
             }
         }
