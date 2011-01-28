@@ -202,17 +202,27 @@ def get_or_migrate_user(user):
     return u
 
 
-def get_or_migrate_device(device, user=None):
-    d = Device.for_user_uid(device.user, device.uid)
-    if d:
-        return d
-
+def get_device(device):
     d = Device()
     d.oldid = device.id
     d.uid = device.uid
     d.name = device.name
     d.type = device.type
     d.deleted = device.deleted
+
+    import hashlib
+    m = hashlib.sha1()
+    m.update(str(device.id))
+    d.id = m.hexdigest()
+
+    return d
+
+def get_or_migrate_device(device, user=None):
+    d = Device.for_user_uid(device.user, device.uid)
+    if d:
+        return d
+
+    d = get_device(device)
     u = user or get_or_migrate_user(device.user)
     u.devices.append(d)
     u.save()
