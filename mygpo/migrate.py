@@ -4,6 +4,7 @@ from couchdbkit import Server, Document
 from mygpo.core.models import Podcast, PodcastGroup, Rating, Episode, EpisodeAction, SubscriberData, User, Device, SubscriptionAction
 from mygpo.log import log
 from mygpo import utils
+from mygpo.decorators import repeat_on_conflict
 
 """
 This module contains methods for converting objects from the old
@@ -185,8 +186,13 @@ def get_or_migrate_episode(episode):
     e = Episode()
     e.oldid = episode.id
     e.urls.append(episode.url)
-    podcast.episodes[e.id] = e
-    podcast.save()
+
+    @repeat_on_conflict(['podcast'])
+    def save(podcast, e):
+        podcast.episodes[e.id] = e
+        podcast.save()
+
+    save(podcast, e)
     return e
 
 
