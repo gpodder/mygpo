@@ -210,7 +210,12 @@ def rate_suggestions(request):
 @login_required
 def suggestions(request):
     suggestion_obj = models.Suggestions.for_user_oldid(request.user.id)
-    suggestions = [p.get_old_obj() for p in suggestion_obj.get_podcasts()]
+    suggestions = []
+    for p in suggestion_obj.get_podcasts():
+        try:
+            suggestions.append(p.get_old_obj())
+        except:
+            pass
     current_site = RequestSite(request)
     return render_to_response('suggestions.html', {
         'entries': suggestions,
