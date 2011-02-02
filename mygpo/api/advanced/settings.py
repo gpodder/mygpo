@@ -38,20 +38,20 @@ def main(request, username, scope):
         return obj, obj
 
     def device_settings(user, uid):
-        device = Device.objects.get(user=user, uid=uid)
+        device = get_object_or_404(Device, user=user, uid=uid)
         user = migrate.get_or_migrate_user(user)
         settings_obj = migrate.get_or_migrate_device(device, user)
         return user, settings_obj
 
     def podcast_settings(user, url):
-        old_p = Podcast.objects.get(url=url)
+        old_p = get_object_or_404(Podcast, url=url)
         podcast = migrate.get_or_migrate_podcast(old_p)
         obj = PodcastUserState.for_user_podcast(user, podcast)
         return obj, obj
 
     def episode_settings(user, url, podcast_url):
-        old_p = Podcast.objects.get(url=podcast_url)
-        old_e = Episode.objects.get(url=url, podcast=old_p)
+        old_p = get_object_or_404(Podcast, url=podcast_url)
+        old_e = get_object_or_404(Episode, url=url, podcast=old_p)
         episode = migrate.get_or_migrate_episode(old_e)
         podcast = migrate.get_or_migrate_podcast(old_p)
         podcast_state = podcast.get_user_state(request.user)
