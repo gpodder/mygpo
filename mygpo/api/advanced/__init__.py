@@ -368,7 +368,6 @@ def updates(request, username, device_uid):
     updates = []
     for episode, status in episode_status.iteritems():
         t = episode_data(episode, domain)
-        t['released'] = e.timestamp.strftime('%Y-%m-%dT%H:%M:%S')
         t['status'] = status
         updates.append(t)
 

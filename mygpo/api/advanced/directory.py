@@ -85,7 +85,7 @@ def podcast_data(podcast, domain):
         }
 
 def episode_data(episode, domain):
-    return {
+    data = {
         "title": episode.title,
         "url": episode.url,
         "podcast_title": episode.podcast.title,
@@ -94,6 +94,11 @@ def episode_data(episode, domain):
         "website": episode.link,
         "mygpo_link": 'http://%s/episode/%s' % (domain, episode.id),
         }
+
+    if episode.timestamp:
+        data['released'] = episode.timestamp.strftime('%Y-%m-%dT%H:%M:%S')
+
+    return data
 
 
 def category_data(category):
