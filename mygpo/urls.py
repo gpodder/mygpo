@@ -18,7 +18,24 @@
 import os.path
 from django.conf.urls.defaults import *
 
+# This URLs should be always be served, even during maintenance mode
 urlpatterns = patterns('',
+    (r'^media/(?P<path>.*)$', 'django.views.static.serve',
+        {'document_root': os.path.abspath('%s/../htdocs/media/' % os.path.dirname(__file__))}),
+)
+
+
+# Check for maintenace mode
+from mygpo import settings
+if getattr(settings, 'MAINTENANCE', False):
+    urlpatterns += patterns('mygpo.web.utils',
+        (r'', 'maintenance'),
+    )
+
+
+# URLs are still registered during maintenace mode because we need to
+# build links from them (eg login-link).
+urlpatterns += patterns('',
     (r'^',           include('mygpo.web.urls')),
     (r'^',           include('mygpo.directory.urls')),
     (r'^',           include('mygpo.api.urls')),
@@ -26,8 +43,5 @@ urlpatterns = patterns('',
     (r'^search/',    include('mygpo.search.urls')),
     (r'^accounts/',  include('registration.urls')),
     (r'^publisher/', include('mygpo.publisher.urls')),
-
-    (r'^media/(?P<path>.*)$', 'django.views.static.serve',
-         {'document_root': os.path.abspath('%s/../htdocs/media/' % os.path.dirname(__file__))}),
 )
 

@@ -1,5 +1,6 @@
 
 from django.db.models import Sum
+from django.views.decorators.cache import never_cache
 
 from mygpo.api.models import Podcast, EpisodeAction
 from mygpo.data.models import Listener
@@ -214,3 +215,14 @@ def symbian_opml_changes(podcast):
     podcast.description = (podcast.title or '') + '\n' \
                         + (podcast.description or '')
     return podcast
+
+
+@never_cache
+def maintenance(request, *args, **kwargs):
+    from django.shortcuts import render_to_response
+    from django.template import RequestContext
+
+    resp = render_to_response('maintenance.html', {},
+        context_instance=RequestContext(request))
+    resp.status_code = 503
+    return resp

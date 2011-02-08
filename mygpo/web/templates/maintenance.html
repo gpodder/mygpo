@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/"|section_menu }}{% endblock %}
+
+{% block title %}{% trans "Maintenance" %}{% endblock %}
+
+{% block content %}
+
+ <h1>{% trans "Maintenance" %}</h1>
+
+ <p>{% blocktrans %}We are currently doing some work on gpodder.net but we should back online within a few minutes. Just wait a bit and try again!{% endblocktrans %}</p>
+ {% endblock %}
+
