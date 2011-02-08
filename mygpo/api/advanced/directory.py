@@ -58,7 +58,7 @@ def episode_info(request):
     podcast_url = sanitize_url(request.GET.get('podcast', ''))
     episode_url = sanitize_url(request.GET.get('url', ''), podcast=False, episode=True)
     episode = get_object_or_404(Episode, url=episode_url, podcast__url=podcast_url)
-    domain = RequestSite(request)
+    domain = RequestSite(request).domain
 
     resp = episode_data(episode, domain)
     return JsonResponse(resp)
