@@ -48,6 +48,29 @@ def delete_podcast_signal(sender, instance=False, **kwargs):
         log('error while deleting CouchDB-Podcast: %s' % repr(e))
 
 
+def save_episode_signal(sender, instance=False, **kwargs):
+    """
+    Signal-handler for creating/updating a CouchDB-based episode when
+    an ORM-based episode has been saved
+    """
+    if not instance:
+        return
+
+    try:
+        newe = Episode.for_oldid(instance.id)
+        newp = Podcast.for_id(newe.podcast)
+
+        if newe:
+            update_episode(instance, newe, newp)
+        else:
+            create_episode(instance)
+
+    except Exception, e:
+        log('error while updating CouchDB Episode: %s' % repr(e))
+
+
+
+@repeat_on_conflict(['oldp'])
 def update_podcast(oldp, newp):
     """
     Updates newp based on oldp and returns True if an update was necessary
@@ -84,14 +107,17 @@ def update_podcast(oldp, newp):
         newp.subscribers = list(sorted(set(newp.subscribers), key=lambda s: s.timestamp))
         updated = True
 
-    # Update Language
-    if newp.language != oldp.language:
-        newp.language = oldp.language
-        updated = True
+    PROPERTIES = ('language', 'content_types', 'title',
+        'description', 'link', 'last_update', 'logo_url',
+        'author')
 
-    # Update content types
-    if newp.content_types != oldp.content_types:
-        newp.content_types = oldp.content_types
+    for p in PROPERTIES:
+        if getattr(newp, p, None) != getattr(oldp, p, None):
+            setattr(newp, p, getattr(oldp, p, None))
+            updated = True
+
+    if not oldp.url in newp.urls:
+        newp.urls.append(oldp.url)
         updated = True
 
     if updated:
@@ -176,16 +202,14 @@ def create_episode_action(action):
     a.playmark = action.playmark
     return a
 
-
-def get_or_migrate_episode(episode):
-    e = Episode.for_oldid(episode.id)
-    if e:
-        return e
-
-    podcast = get_or_migrate_podcast(episode.podcast)
+def create_episode(olde, sparse=False):
+    podcast = get_or_migrate_podcast(olde.podcast)
     e = Episode()
-    e.oldid = episode.id
-    e.urls.append(episode.url)
+    e.oldid = olde.id
+    e.urls.append(olde.url)
+
+    if not sparse:
+        update_episode(olde, e, podcast)
 
     @repeat_on_conflict(['podcast'])
     def save(podcast, e):
@@ -193,7 +217,48 @@ def get_or_migrate_episode(episode):
         podcast.save()
 
     save(podcast, e)
+
     return e
+
+
+def get_or_migrate_episode(olde):
+    return Episode.for_oldid(olde.id) or create_episode(olde)
+
+
+def update_episode(olde, newe, podcast):
+    updated = False
+
+    if not olde.url in newe.urls:
+        newe.urls.append(olde.url)
+        updated = False
+
+    PROPERTIES = ('title', 'description', 'link',
+        'author', 'duration', 'filesize', 'language',
+        'last_update', 'outdated')
+
+    for p in PROPERTIES:
+        if getattr(newe, p, None) != getattr(olde, p, None):
+            setattr(newe, p, getattr(olde, p, None))
+            updated = True
+
+
+    if newe.released != olde.timestamp:
+        newe.released = olde.timestamp
+        updated = True
+
+    if olde.mimetype and not olde.mimetype in newe.mimetypes:
+        newe.mimetypes.append(olde.mimetype)
+        updated = True
+
+    @repeat_on_conflict(['podcast'])
+    def save(podcast, newe):
+        podcast.episodes[newe.id] = newe
+        podcast.save()
+
+    if updated:
+        save(podcast, newe)
+
+    return updated
 
 
 def get_or_migrate_user(user):
@@ -208,27 +273,17 @@ def get_or_migrate_user(user):
     return u
 
 
-def get_device(device):
+def get_or_migrate_device(device, user=None):
+    d = Device.for_user_uid(device.user, device.uid)
+    if d:
+        return d
+
     d = Device()
     d.oldid = device.id
     d.uid = device.uid
     d.name = device.name
     d.type = device.type
     d.deleted = device.deleted
-
-    import hashlib
-    m = hashlib.sha1()
-    m.update(str(device.id))
-    d.id = m.hexdigest()
-
-    return d
-
-def get_or_migrate_device(device, user=None):
-    d = Device.for_user_uid(device.user, device.uid)
-    if d:
-        return d
-
-    d = get_device(device)
     u = user or get_or_migrate_user(device.user)
     u.devices.append(d)
     u.save()

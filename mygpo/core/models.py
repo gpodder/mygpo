@@ -12,6 +12,17 @@ class Episode(Document):
     """
 
     id = StringProperty(default=lambda: uuid.uuid4().hex)
+    title = StringProperty()
+    description = StringProperty()
+    link = StringProperty()
+    released = DateTimeProperty()
+    author = StringProperty()
+    duration = IntegerProperty()
+    filesize = IntegerProperty()
+    language = StringProperty()
+    last_update = DateTimeProperty()
+    outdated = BooleanProperty()
+    mimetypes = StringListProperty()
     merged_ids = StringListProperty()
     oldid = IntegerProperty()
     urls = StringListProperty()
@@ -43,6 +54,8 @@ class Episode(Document):
 
 
     def __eq__(self, other):
+        if other == None:
+            return False
         return self.id == other.id
 
 
@@ -60,9 +73,17 @@ class SubscriberData(DocumentSchema):
 
 class Podcast(Document):
     id = StringProperty()
+    title = StringProperty()
+    urls = StringListProperty()
+    description = StringProperty()
+    link = StringProperty()
+    last_update = DateTimeProperty()
+    logo_url = StringProperty()
+    author = StringProperty()
     merged_ids = StringListProperty()
     oldid = IntegerProperty()
     group = StringProperty()
+    group_member_name = StringProperty()
     related_podcasts = StringListProperty()
     episodes = SchemaDictProperty(Episode)
     subscribers = SchemaListProperty(SubscriberData)

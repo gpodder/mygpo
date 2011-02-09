@@ -19,7 +19,6 @@
 
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-from mygpo.web.models import SecurityToken
 from django.contrib.auth.models import User
 from django.http import HttpResponseForbidden, HttpResponseNotAllowed
 import gc
@@ -41,6 +40,7 @@ def requires_token(object, action, denied_template=None):
     """
     def decorator(fn):
         def tmp(request, username, *args, **kwargs):
+            from mygpo.web.models import SecurityToken
 
             user = get_object_or_404(User, username=username)
             token, c = SecurityToken.objects.get_or_create(user=user, object=object, action=action)
