@@ -89,6 +89,7 @@ class Podcast(Document):
     subscribers = SchemaListProperty(SubscriberData)
     language = StringProperty()
     content_types = StringListProperty()
+    tags = DictProperty()
 
     @classmethod
     def for_id(cls, id):
@@ -367,6 +368,7 @@ class PodcastUserState(Document):
     user_oldid    = IntegerProperty()
     settings      = DictProperty()
     actions       = SchemaListProperty(SubscriptionAction)
+    tags          = StringListProperty()
 
 
     @classmethod
