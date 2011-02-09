@@ -20,11 +20,11 @@ class Command(BaseCommand):
             podcast = migrate.get_or_migrate_podcast(tag.podcast) if (podcast is None or podcast.oldid != tag.podcast.id) else podcast
 
             if tag.source in ('feed', 'delicious'):
-                self.migrate_podcast_tag(podcast, tag)
+                self.migrate_podcast_tag(podcast=podcast, tag=tag)
 
             elif tag.source == 'user':
                 podcast_state = models.PodcastUserState.for_user_podcast(tag.user, podcast)
-                self.migrate_user_tag(podcast_state, tag)
+                self.migrate_user_tag(podcast_state=podcast_state, tag=tag)
 
             progress(n+1, total)
 

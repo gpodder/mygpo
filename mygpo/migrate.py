@@ -23,7 +23,7 @@ def save_podcast_signal(sender, instance=False, **kwargs):
     try:
         newp = Podcast.for_oldid(instance.id)
         if newp:
-            update_podcast(instance, newp)
+            update_podcast(oldp=instance, newp=newp)
         else:
             create_podcast(instance)
 
@@ -134,7 +134,7 @@ def create_podcast(oldp, sparse=False):
     p.oldid = oldp.id
     p.save()
     if not sparse:
-        update_podcast(oldp, p)
+        update_podcast(oldp=oldp, newp=p)
 
     return p
 
@@ -216,7 +216,7 @@ def create_episode(olde, sparse=False):
         podcast.episodes[e.id] = e
         podcast.save()
 
-    save(podcast, e)
+    save(podcast=podcast, e=e)
 
     return e
 
@@ -256,7 +256,7 @@ def update_episode(olde, newe, podcast):
         podcast.save()
 
     if updated:
-        save(podcast, newe)
+        save(podcast=podcast, newe=newe)
 
     return updated
 

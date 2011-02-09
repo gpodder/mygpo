@@ -190,7 +190,7 @@ def merge_podcast_states(p1, p2):
             continue
 
         if s1 == None:
-            move()
+            move(s2=s2, p1.get_id())
 
         elif s2 == None:
             continue

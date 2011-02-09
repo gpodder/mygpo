@@ -18,7 +18,7 @@ class Command(BaseCommand):
         for oldp, newp in iterate_together(oldpodcasts, newpodcasts, compare):
 
             if (oldp != None) and (newp != None):
-                updated += migrate.update_podcast(oldp, newp)
+                updated += migrate.update_podcast(oldp=oldp, newp=newp)
 
             elif oldp == None:
                 deleted += 1
