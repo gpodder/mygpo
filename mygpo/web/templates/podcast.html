@@ -5,6 +5,7 @@
 {% load podcasts %}
 {% load devices %}
 {% load charts %}
+{% load facebook %}
 
 {% load menu %}
 {% block mainmenu %}{{ "/podcast/"|main_menu }}{% endblock %}
@@ -14,6 +15,10 @@
  {% else %}
   {{ "/podcast/"|section_menu:"Unnamed Podcast" }}
  {% endif %}
+{% endblock %}
+
+{% block head %}
+ {{ podcast|opengraph_podcast }}
 {% endblock %}
 
 {% block title %}{{ podcast.title|default:"Unnamed Podcast"|striptags }}{% endblock %}
@@ -44,6 +49,8 @@
   {% if podcast.description %}
    <p class="description">{{ podcast.description|striptags }}</p>
   {% endif %}
+
+  {{ podcast|fb_like_podcast }}
 
    {% if devices %}
     <h2>{% trans "My Subscriptions" %}</h2>

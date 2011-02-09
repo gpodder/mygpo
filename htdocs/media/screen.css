@@ -752,3 +752,8 @@ hr
 {
 clear: both;
 }
+
+iframe.fb_like
+{
+    padding-bottom: .5em;
+}

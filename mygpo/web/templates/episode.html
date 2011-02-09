@@ -8,6 +8,7 @@
 {% load time %}
 {% load youtube %}
 {% load flickr %}
+{% load facebook %}
 
 {% load menu %}
 {% block mainmenu %}{{ "/podcast/"|main_menu }}{% endblock %}
@@ -27,6 +28,7 @@
   <script type="text/javascript" src="/media/js/json2.js"></script>
   <script type="text/javascript" src="/media/js/youtube-handler.js"></script>
  {% endif %}
+ {{ episode|opengraph_episode }}
 {% endblock head %}
 
 {% block title %}{{ episode.title|default:"Unnamed Episode"|striptags }} - {{ episode.podcast.title|default:"Unnamed Podcast"|striptags}}{% endblock %}
@@ -54,6 +56,8 @@
   {% if episode.description %}
    <p>{{ episode.description|remove_html_tags|linebreaksbr }}</p>
   {% endif %}
+
+  {{ episode|fb_like_episode }}
 
   {% if episode.url|is_flickr_photo %}
    {{ episode|embed_flickr_photo }}

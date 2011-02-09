@@ -102,8 +102,13 @@ class Podcast(models.Model):
                 timestamp__range=(start, end),
                 action='play').values('user_id').distinct().count()
 
-    def logo_shortname(self):
-        return hashlib.sha1(self.logo_url).hexdigest()
+    def get_logo_url(self, size):
+        if self.logo_url:
+            sha = hashlib.sha1(self.logo_url).hexdigest()
+            return '/logo/%d/%s.jpg' % (size, sha)
+        else:
+            return '/media/podcast-%d.png' % (hash(self.title) % 5, )
+
 
     def subscribe_targets(self, user):
         """
