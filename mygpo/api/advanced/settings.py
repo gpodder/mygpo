@@ -19,7 +19,7 @@ from mygpo.api.basic_auth import require_valid_user, check_username
 from django.http import HttpResponseBadRequest
 from mygpo.api.httpresponse import JsonResponse
 from django.shortcuts import get_object_or_404
-from mygpo.core.models import PodcastUserState
+from mygpo.users.models import PodcastUserState
 from mygpo.api.models import Device, Podcast, Episode
 from django.views.decorators.csrf import csrf_exempt
 from mygpo.decorators import allowed_methods

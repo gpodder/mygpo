@@ -20,6 +20,7 @@ from django.http import HttpResponseRedirect, Http404
 from django.contrib.auth.models import User
 from django.template import RequestContext
 from mygpo.core import models
+from mygpo.users.models import Rating, Suggestions
 from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, SubscriptionAction, Subscription, UserProfile
 from mygpo.data.models import PodcastTag
 from mygpo.decorators import manual_gc
@@ -180,7 +181,7 @@ def history(request, len=15, device_id=None):
 @login_required
 def blacklist(request, podcast_id):
     blacklisted_podcast = models.Podcast.for_oldid(podcast_id)
-    suggestion = models.Suggestions.for_user_oldid(request.user.id)
+    suggestion = Suggestions.for_user_oldid(request.user.id)
     suggestion.blacklist.append(blacklisted_podcast._id)
     suggestion.save()
 
@@ -196,8 +197,8 @@ def rate_suggestions(request):
     rating_val = int(request.GET.get('rate', None))
 
     if rating_val in (1, -1):
-        suggestion = models.Suggestions.for_user_oldid(request.user.id)
-        rating = models.Rating(rating=rating_val)
+        suggestion = Suggestions.for_user_oldid(request.user.id)
+        rating = Rating(rating=rating_val)
         suggestion.ratings.append(rating)
         suggestion.save()
         # TODO: when we use Django messaging system,
@@ -209,7 +210,7 @@ def rate_suggestions(request):
 
 @login_required
 def suggestions(request):
-    suggestion_obj = models.Suggestions.for_user_oldid(request.user.id)
+    suggestion_obj = Suggestions.for_user_oldid(request.user.id)
     suggestions = []
     for p in suggestion_obj.get_podcasts():
         try:

@@ -201,7 +201,7 @@ Can be used to get the Advertisement that will end next (ie the current or the
 upcoming) advertisement.
 
 
-Devices by User (core/devices_by_user_uid)
+Devices by User (users/devices_by_user_uid)
 ~~~~~~~~~~~~~~~
  * For a User, emits [User-Oldid, Device-UID] for each Device
 
@@ -237,7 +237,7 @@ Can be used to get an Episode by one of its associated files. The Podcast's Id
 (property podcast) is set before emitting the Episode.
 
 
-Favorite Episodes by User (core/favorite_episodes_by_user)
+Favorite Episodes by User (users/favorite_episodes_by_user)
 ~~~~~~~~~~~~~~~~~~~~~~~~~
  * For a PodcastUserState, emit the User's Old-Id and the Episodes
    Id for each Episode that is flagged as favorite
@@ -260,7 +260,7 @@ Podcasts and Podcast-Groups (core/podcasts_groups)
 Can be used to get a list of all PodcastGroups and all un-grouped Podcasts.
 
 
-Podcast-States by Podcast (core/podcast_states_by_podcast)
+Podcast-States by Podcast (users/podcast_states_by_podcast)
 ~~~~~~~~~~~~~~~~~~~~~~~~~
  * For a PodcastUserState, emit [Podcast-Id, User-Old-Id] and null
 
@@ -268,7 +268,7 @@ Can be used to get a specific Podcast-State by specifying Podcast-Id and
 User-Old-Id, or to get all Podcast-States for a given Podcast.
 
 
-Podcast-States by User (core/podcast_states_by_user)
+Podcast-States by User (users/podcast_states_by_user)
 ~~~~~~~~~~~~~~~~~~~~~~
  * For a PodcastUserState, emit [User-Old-Id, Podcast-Id] and null
 
@@ -276,7 +276,7 @@ Can be used to get a specific Podcast-State by specifying User-Old-Id and
 Podcast-Id or to get all Podcast-States for a given User.
 
 
-Users by Old-Id (core/users_by_oldid)
+Users by Old-Id (users/users_by_oldid)
 ~~~~~~~~~~~~~~~
  * For a User, emit its Old-Id and null
 

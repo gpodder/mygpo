@@ -4,7 +4,7 @@ from mygpo import migrate
 from mygpo.utils import progress
 from mygpo.decorators import repeat_on_conflict
 from mygpo.data.models import PodcastTag
-from mygpo.core import models
+from mygpo.users.models import PodcastUserState
 
 
 class Command(BaseCommand):
@@ -23,7 +23,7 @@ class Command(BaseCommand):
                 self.migrate_podcast_tag(podcast=podcast, tag=tag)
 
             elif tag.source == 'user':
-                podcast_state = models.PodcastUserState.for_user_podcast(tag.user, podcast)
+                podcast_state = PodcastUserState.for_user_podcast(tag.user, podcast)
                 self.migrate_user_tag(podcast_state=podcast_state, tag=tag)
 
             progress(n+1, total)

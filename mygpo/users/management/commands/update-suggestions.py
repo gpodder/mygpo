@@ -4,7 +4,8 @@ from optparse import make_option
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 
-from mygpo.core.models import Podcast, Suggestions
+from mygpo.core.models import Podcast
+from mygpo.users.models import Suggestions
 from mygpo.api import models
 from mygpo.migrate import get_or_migrate_podcast
 from mygpo.utils import progress, set_by_frequency

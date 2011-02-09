@@ -1,7 +1,8 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 
-from mygpo.core.models import Podcast, Suggestions, Rating
+from mygpo.core.models import Podcast
+from mygpo.users.models import Suggestions, Rating
 from mygpo.data.models import SuggestionBlacklist
 from mygpo.web import models as webmodels
 from mygpo import migrate

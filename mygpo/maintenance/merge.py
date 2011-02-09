@@ -1,4 +1,5 @@
-from mygpo.core.models import Podcast, PodcastUserState, Episode
+from mygpo.core.models import Podcast, Episode
+from mygpo.users.models import PodcastUserState
 from mygpo import utils
 
 
@@ -21,7 +22,7 @@ def merge_objects():
     merge_from_iterator(podcasts, similar_oldid, podcast_merge_order, total, merge_podcasts)
 
     print 'Merging Duplicate Podcast States'
-    states, total = get_view_count_iter(PodcastUserState, 'core/podcast_states_by_user')
+    states, total = get_view_count_iter(PodcastUserState, 'users/podcast_states_by_user')
     should_merge = lambda a, b: a == b
     merge_from_iterator(states, should_merge, no_merge_order, total, merge_podcast_states)
 

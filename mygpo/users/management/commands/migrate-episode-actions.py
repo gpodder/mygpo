@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from mygpo import migrate
 from mygpo.utils import progress
 from mygpo.api import models as oldmodels
-from mygpo.core import models as newmodels
+from mygpo.users.models import PodcastUserState
 
 
 class Command(BaseCommand):
@@ -38,13 +38,13 @@ class Command(BaseCommand):
             progress(n+1, total)
 
         docs = filter(lambda x: x != None, docs)
-        newmodels.PodcastUserState.save_docs(docs)
+        PodcastUserState.save_docs(docs)
         progress(n+1, total, 'saving %d documents' % len(docs))
 
 
     def migrate_for_user_podcast(self, user, podcast, actions):
         np = migrate.get_or_migrate_podcast(podcast)
-        p_state = newmodels.PodcastUserState.for_user_podcast(user, np)
+        p_state = PodcastUserState.for_user_podcast(user, np)
         episodes = list(set(actions.filter(user=user, episode__podcast=podcast).values_list('episode', flat=True)))
 
         orig_len = len(p_state.episodes)

@@ -18,6 +18,7 @@
 from mygpo.api.models import Device, Podcast, Subscription, EpisodeToplistEntry
 from mygpo.data.mimetype import get_type, CONTENT_TYPES
 from mygpo.core import models
+from mygpo.users.models import EpisodeUserState
 from datetime import timedelta
 
 try:
@@ -172,7 +173,7 @@ def get_device(user, uid, undelete=True):
 
 
 def get_favorites(user):
-    favorites = models.EpisodeUserState.view('core/favorite_episodes_by_user', key=user.id)
+    favorites = EpisodeUserState.view('users/favorite_episodes_by_user', key=user.id)
 
     episodes = []
     for res in favorites:

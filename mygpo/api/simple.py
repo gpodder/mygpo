@@ -19,6 +19,7 @@ from itertools import islice
 from mygpo.api.basic_auth import require_valid_user, check_username
 from django.http import HttpResponse, HttpResponseBadRequest
 from mygpo.core import models
+from mygpo.users.models import Suggestions
 from mygpo.api.models import Device, Podcast
 from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
@@ -231,7 +232,7 @@ def suggestions(request, count, format):
     if count not in range(1,100):
         count = 100
 
-    suggestion_obj = models.Suggestions.for_user_oldid(request.user.id)
+    suggestion_obj = Suggestions.for_user_oldid(request.user.id)
     suggestions = [p.get_old_obj() for p in islice(suggestion_obj.get_podcasts(), count)]
     title = _('gpodder.net - %(count)d Suggestions') % {'count': len(suggestions)}
     domain = RequestSite(request).domain
