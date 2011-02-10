@@ -152,6 +152,7 @@ GOOGLE_ANALYTICS_PROPERTY_ID=''
 DIRECTORY_EXCLUDED_TAGS = ()
 FLICKR_API_KEY = ''
 
+MAINTENANCE = os.path.exists('MAINTENANCE')
 
 try:
     from settings_prod import *

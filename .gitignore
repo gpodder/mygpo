@@ -3,3 +3,4 @@ htdocs/media/logo/*
 logs/*
 *.mo
 mygpo/settings_prod.py
+mygpo/MAINTENANCE_MODE
