@@ -3,7 +3,6 @@ from datetime import datetime
 from django.core.management.base import BaseCommand
 
 from mygpo.directory.models import Category
-from mygpo.data.models import DirectoryEntry
 
 
 class Command(BaseCommand):

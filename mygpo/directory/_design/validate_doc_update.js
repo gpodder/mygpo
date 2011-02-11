@@ -50,9 +50,6 @@ function(newDoc, oldDoc, userCtx)
         check(newDoc.label != "", "label must not be empty");
         checkTrimmed("label");
 
-        require("weight");
-        check(newDoc.weight >= 0, "weight must not be negative");
-
         require("updated");
 
         if (newDoc.spellings)

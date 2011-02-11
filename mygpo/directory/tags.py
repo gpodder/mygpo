@@ -16,3 +16,17 @@ def tags_for_user(user, podcast_id=None):
     for r in res:
         tags[r['key'][1]].append(r['value'])
     return tags
+
+
+def podcasts_for_tag(tag):
+    res = Podcast.view('directory/podcasts_by_tag', startkey=[tag, None], endkey=[tag, 'ZZZZZZ'], reduce=True, group=True, group_level=2)
+
+    for r in res:
+        yield (r['key'][1], r['value'])
+
+
+def all_tags():
+    res = Podcast.view('directory/podcasts_by_tag', reduce=True, group=True, group_level=2)
+
+    for r in res:
+        yield r['key'][0]

@@ -3,8 +3,9 @@ from datetime import datetime
 from django.core.management.base import BaseCommand
 
 from mygpo import settings
+from mygpo.core.models import Podcast
 from mygpo.directory.models import Category
-from mygpo.data.models import DirectoryEntry
+from mygpo.directory.tags import all_tags, podcasts_for_tag
 from mygpo.utils import progress
 
 
@@ -16,40 +17,40 @@ class Command(BaseCommand):
 
         excluded_tags = getattr(settings, 'DIRECTORY_EXCLUDED_TAGS', [])
 
-        top_tags = DirectoryEntry.objects.top_tags(None)
-        tag_count = len(top_tags)
-        n=0
-        for tag in top_tags:
-            label = tag.tag.strip()
+        for n, tag in enumerate(all_tags()):
+
+            if not isinstance(tag, basestring):
+                tag = str(tag)
+
+            label = tag.strip()
+
+            podcasts = []
+            for (p, v) in podcasts_for_tag(tag):
+                podcast = Podcast.for_id(p)
+                podcasts.append( (p, v * podcast.subscriber_count()) )
 
             category = Category.for_tag(label)
-            if category:
 
-                # delete if it has been excluded after it has been created
-                if label in excluded_tags:
-                    category.delete()
+            if not category:
+                if not label or label in excluded_tags:
                     continue
 
-                if category.updated < start_time:
-                    category.weight = tag.entries
-                else:
-                    category.weight += tag.entries
-
-            else:
-
-                if label in excluded_tags:
-                    continue
-
-                if not label:
-                    continue
                 category = Category()
                 category.label = label
                 category.spellings = []
-                category.weight = tag.entries
 
+            # delete if it has been excluded after it has been created
+            if label in excluded_tags:
+                category.delete()
+                continue
+
+            category.merge_podcasts(podcasts)
 
             category.updated = start_time
+
+            if 'weight' in category:
+                del category['weight']
+
             category.save()
 
-            n+=1
-            progress(n, tag_count)
+            progress(n % 1000, 1000, category._id)
