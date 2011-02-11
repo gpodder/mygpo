@@ -2,7 +2,13 @@ function (doc)
 {
     if (doc.doc_type == "Category")
     {
-        emit(doc.weight, null);
+        weight = 0;
+        for(n in doc.podcasts)
+        {
+            weight += doc.podcasts[n].weight;
+        }
+
+        emit(weight, null);
     }
 }
 

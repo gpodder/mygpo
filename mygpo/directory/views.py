@@ -3,7 +3,6 @@ from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 
-from mygpo.data.models import DirectoryEntry
 from mygpo.directory.models import Category
 from mygpo.web import utils
 
@@ -14,16 +13,17 @@ def browse(request, num_categories=10, num_tags_cloud=90, podcasts_per_category=
 
     disp_categories = []
     for category in categories[:num_categories]:
-        entries = DirectoryEntry.objects.podcasts_for_category(category.get_tags())[:podcasts_per_category]
+        entries = category.get_podcasts(0, podcasts_per_category)
+        podcasts = [e.get_old_obj() for e in entries]
         disp_categories.append({
             'tag': category.label,
-            'entries': entries
+            'entries': podcasts,
             })
 
     tag_cloud = categories[num_categories:]
 
     tag_cloud.sort(key = lambda x: x.label.lower())
-    max_entries = max([t.weight for t in tag_cloud] + [0])
+    max_entries = max([t.get_weight() for t in tag_cloud] + [0])
 
     return render_to_response('directory.html', {
         'categories': disp_categories,
@@ -36,9 +36,6 @@ def category(request, category, page_size=20):
     category = Category.for_tag(category)
     if not category:
         return HttpResponseNotFound()
-    entries = DirectoryEntry.objects.podcasts_for_category(category.get_tags())
-
-    paginator = Paginator(entries, page_size)
 
     # Make sure page request is an int. If not, deliver first page.
     try:
@@ -46,13 +43,11 @@ def category(request, category, page_size=20):
     except ValueError:
         page = 1
 
-    # If page request (9999) is out of range, deliver last page of results.
-    try:
-        podcasts = paginator.page(page)
-    except (EmptyPage, InvalidPage):
-        podcasts = paginator.page(paginator.num_pages)
+    entries = category.get_podcasts( (page-1) * page_size, page*page_size )
+    podcasts = [e.get_old_obj() for e in entries]
+    num_pages = len(category.podcasts) / page_size
 
-    page_list = utils.get_page_list(1, podcasts.paginator.num_pages, podcasts.number, 15)
+    page_list = utils.get_page_list(1, num_pages, page, 15)
 
     return render_to_response('category.html', {
         'entries': podcasts,

@@ -22,10 +22,10 @@
    <table class="list">
     {% for entry in cat.entries %}
      <tr>
-      <td>{{ entry.get_podcast|podcast_logo }}</td>
+      <td>{{ entry|podcast_logo }}</td>
       <td>
-       <a href="{% url podcast entry.get_podcast.id %}">
-        {{ entry.get_podcast.title }}
+       <a href="{% url podcast entry.id %}">
+        {{ entry.title }}
        </a>
      </tr>
     {% endfor %}
@@ -46,7 +46,7 @@
 
   <div id="tagcloud">
    {% for tag in tag_cloud %}
-    <span style="font-size: {% smartwidthratio tag.weight max_entries 4 1 %}em">
+    <span style="font-size: {% smartwidthratio tag.get_weight max_entries 4 1 %}em">
      <a href="{% url directory tag.label %}">{{ tag.label }}</a>
     </span>
    {% endfor %}

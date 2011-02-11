@@ -19,7 +19,6 @@ from mygpo.api.httpresponse import JsonResponse
 from django.shortcuts import get_object_or_404
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.api.models import Podcast, Episode
-from mygpo.data.models import DirectoryEntry
 from mygpo.directory.models import Category
 from django.contrib.sites.models import RequestSite
 from django.views.decorators.csrf import csrf_exempt
@@ -40,8 +39,8 @@ def tag_podcasts(request, tag, count):
         return JsonResponse([])
 
     domain = RequestSite(request).domain
-    query = DirectoryEntry.objects.podcasts_for_category(category.get_tags())[:int(count)]
-    resp = map(lambda p: podcast_data(p.get_podcast(), domain), query)
+    query = category.get_podcasts(0, count)
+    resp = map(lambda p: podcast_data(p.get_old_obj(), domain), query)
     return JsonResponse(resp)
 
 
