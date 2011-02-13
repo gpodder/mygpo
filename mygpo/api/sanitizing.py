@@ -1,7 +1,7 @@
 from mygpo.core import models
 from mygpo.api.models import URLSanitizingRule, Podcast, SubscriptionAction, SubscriptionMeta, Subscription, Episode, EpisodeAction
 from mygpo.api.models.episodes import Chapter
-from mygpo.data.models import BackendSubscription, Listener, PodcastTag
+from mygpo.data.models import BackendSubscription, Listener
 from mygpo.log import log
 import urlparse
 import re
@@ -294,15 +294,6 @@ def rewrite_podcasts(p_old, p_new):
         except Exception, e:
             log('error updating subscription %s: %s, deleting' % (sub.id, e))
             sub.delete()
-
-    for tag in PodcastTag.objects.filter(podcast=p_old):
-        try:
-            log('updating tag %s (tag %s, source %s, podcast %s => %s)' % (tag.id, tag.tag, tag.source, p_old.id, p_new.id))
-            tag.podcast = p_new
-            tag.save()
-        except Exception, e:
-            log('error updating tag %s: %s, deleting.' % (tag.id, e))
-            tag.delete()
 
 
 def rewrite_newpodcast(p_old, p_new):

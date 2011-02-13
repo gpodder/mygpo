@@ -103,6 +103,8 @@ def merge_podcasts(podcast, p):
 
             a.subscriber_count += b.subscriber_count
 
+        for src, tags in p.tags.values():
+            podcast.tags[src] = list(set(podcast.tags.get(src, []) + tags))
 
         podcast.episodes.update(p.episodes)
         merge_similar_episodes(podcast)

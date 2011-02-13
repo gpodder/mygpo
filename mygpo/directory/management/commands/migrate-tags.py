@@ -1,3 +1,4 @@
+from optparse import make_option
 from django.core.management.base import BaseCommand
 
 from mygpo import migrate
@@ -9,15 +10,29 @@ from mygpo.users.models import PodcastUserState
 
 class Command(BaseCommand):
 
+    option_list = BaseCommand.option_list + (
+        make_option('--source', action='store', type="string", dest='source', default=0, help="Source from which Podcast-Tags should be migrated."),
+    )
 
     def handle(self, *args, **options):
 
         tags = PodcastTag.objects.order_by('podcast', 'source', 'user')
+
+        src = options.get('source', None)
+        if src:
+            tags = tags.filter(source=src)
+
         total = tags.count()
 
         podcast = None
         for n, tag in enumerate(tags):
-            podcast = migrate.get_or_migrate_podcast(tag.podcast) if (podcast is None or podcast.oldid != tag.podcast.id) else podcast
+
+            try:
+                p = tag.podcast
+            except Podcast.DoesNotExist:
+                continue
+
+            podcast = migrate.get_or_migrate_podcast(p) if (podcast is None or podcast.oldid != p.id) else podcast
 
             if tag.source in ('feed', 'delicious'):
                 self.migrate_podcast_tag(podcast=podcast, tag=tag)

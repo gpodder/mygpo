@@ -10,10 +10,12 @@ from django.utils.translation import ugettext as _
 from mygpo.api.models import Podcast, Episode, EpisodeAction, Device, SubscriptionAction, Subscription, SyncGroup
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.web.forms import PrivacyForm, SyncForm
-from mygpo.data.models import Listener, PodcastTag
-from mygpo.decorators import manual_gc, allowed_methods
+from mygpo.data.models import Listener
+from mygpo.directory.tags import tags_for_user
+from mygpo.decorators import manual_gc, allowed_methods, repeat_on_conflict
 from mygpo.utils import daterange
 from mygpo.log import log
+from mygpo import migrate
 
 MAX_TAGS_ON_PAGE=50
 
@@ -89,13 +91,15 @@ def show(request, pid):
 
 def get_tags(podcast, user):
     tags = {}
-    for t in PodcastTag.objects.filter(podcast=podcast).values('tag').distinct():
-        tag_str = t['tag'].lower()
+    new_p = migrate.get_or_migrate_podcast(podcast)
+    for t in new_p.all_tags():
+        tag_str = t.lower()
         tags[tag_str] = False
 
     if not user.is_anonymous():
-        for t in PodcastTag.objects.filter(podcast=podcast, user=user).values('tag').distinct():
-            tag_str = t['tag'].lower()
+        users_tags = tags_for_user(user, new_p.get_id())
+        for t in users_tags.get(new_p.get_id(), []):
+            tag_str = t.lower()
             tags[tag_str] = True
 
     tag_list = [{'tag': key, 'is_own': value} for key, value in tags.iteritems()]
@@ -150,14 +154,21 @@ def episode_list(podcast, user):
 @login_required
 def add_tag(request, pid):
     podcast = get_object_or_404(Podcast, id=pid)
+    new_p = migrate.get_or_migrate_podcast(podcast)
+    podcast_state = new_p.get_user_state(request.user)
+
     tag_str = request.GET.get('tag', '')
     if not tag_str:
         return HttpResponseBadRequest()
 
     tags = tag_str.split(',')
-    for t in tags:
-        t = t.strip()
-        tag = PodcastTag.objects.get_or_create(podcast=podcast, tag=t, source='user', user=request.user)
+
+    @repeat_on_conflict(['state'])
+    def update(state):
+        state.add_tags(tags)
+        state.save()
+
+    update(state=podcast_state)
 
     if request.GET.get('next', '') == 'mytags':
         return HttpResponseRedirect('/tags/')
@@ -168,11 +179,19 @@ def add_tag(request, pid):
 @login_required
 def remove_tag(request, pid):
     podcast = get_object_or_404(Podcast, id=pid)
+    new_p = migrate.get_or_migrate_podcast(podcast)
+    podcast_state = new_p.get_user_state(request.user)
+
     tag_str = request.GET.get('tag', '')
     if not tag_str:
         return HttpResponseBadRequest()
 
-    PodcastTag.objects.filter(podcast=podcast, tag=tag_str, source='user', user=request.user).delete()
+    @repeat_on_conflict(['state'])
+    def update(state):
+        state.tags.remove(tag_str)
+        state.save()
+
+    update(state=podcast_state)
 
     if request.GET.get('next', '') == 'mytags':
         return HttpResponseRedirect('/tags/')

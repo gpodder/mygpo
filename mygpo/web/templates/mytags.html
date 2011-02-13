@@ -22,11 +22,7 @@
      <td><a href="{% url podcast podcast.id %}">{{ podcast|striptags}}</a></td>
      <td class="tag-list">
      {% for tag in taglist %}{% spaceless %}
-       {% if tag.is_own %}
-        <span class="own">{{ tag.tag }} <a class="remove" href="{% url remove-tag podcast.id %}?tag={{ tag.tag }}&next=mytags">X</a></span>
-       {% else %}
-        <span class="other">{{ tag.tag }}</span>
-       {% endif %}
+       <span class="own">{{ tag }} <a class="remove" href="{% url remove-tag podcast.id %}?tag={{ tag }}&next=mytags">X</a></span>
        {% if not forloop.last %}<span class="seperator">,</span>{% endif %}
       {% endspaceless %}
      {% endfor %}
@@ -50,7 +46,7 @@
     <td>{{ tag }}</td>
     <td>
      {% for podcast in podcast_list %}
-      <a href="{% url podcast podcast.podcast.id %}">{{ podcast.podcast|podcast_logo }}</a>
+      <a href="{% url podcast podcast.id %}">{{ podcast|podcast_logo }}</a>
      {% endfor %}
     </td>
    </tr>

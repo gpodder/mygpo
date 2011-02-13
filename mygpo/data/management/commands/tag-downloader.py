@@ -1,19 +1,22 @@
 from django.core.management.base import BaseCommand
+
+from mygpo import migrate
+from mygpo.decorators import repeat_on_conflict
 from mygpo.core import models as newmodels
 from mygpo.api import models
 from mygpo.api import backend
-from mygpo.data.models import PodcastTag
 from mygpo.data import delicious
 from optparse import make_option
 import time
 import urllib2
 
+SOURCE = 'delicious'
+
 class Command(BaseCommand):
 
     option_list = BaseCommand.option_list + (
         make_option('--toplist', action='store_true', dest='toplist', default=False, help="Update all entries from the Toplist."),
-	make_option('--max', action='store', dest='max', type='int', default=-1, help="Set how many feeds should be updated at maximum"),
-
+        make_option('--max', action='store', dest='max', type='int', default=-1, help="Set how many feeds should be updated at maximum"),
         make_option('--random', action='store_true', dest='random', default=False, help="Update random podcasts, best used with --max option"),
         )
 
@@ -57,11 +60,11 @@ class Command(BaseCommand):
 
             tags = delicious.get_tags(f.url)
 
-            for tag, count in tags.iteritems():
-                try:
-                    print ' %s' % tag.decode('utf-8')
-                except:
-                    pass
-                PodcastTag.objects.filter(tag=tag, podcast=p, source='delicious').delete()
-                PodcastTag.objects.create(tag=tag, podcast=p, source='delicious', weight=count)
+            self.update(podcast=p, tags=tags)
 
+
+    @repeat_on_conflict()
+    def update(self, podcast, tags):
+        np = migrate.get_or_migrate_podcast(podcast)
+        np.tags[SOURCE] = tags
+        np.save()

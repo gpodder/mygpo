@@ -27,9 +27,9 @@ import hashlib
 import urllib2
 import socket
 
+from mygpo.decorators import repeat_on_conflict
 from mygpo.data import feedcore
 from mygpo.api import models
-from mygpo.data.models import PodcastTag
 from mygpo.utils import parse_time
 from mygpo.api.sanitizing import sanitize_url, rewrite_podcasts
 from mygpo.data import youtube
@@ -115,16 +115,13 @@ def get_feed_tags(feed):
     return set(tags)
 
 
+@repeat_on_conflict()
 def update_feed_tags(podcast, tags):
     src = 'feed'
 
-    #delete all tags not found in the feed anymore
-    PodcastTag.objects.filter(podcast=podcast, source=src).exclude(tag__in=tags).delete()
-
-    #create new found tags
-    for tag in tags:
-        if not PodcastTag.objects.filter(podcast=podcast, source=src, tag=tag).exists():
-            PodcastTag.objects.get_or_create(podcast=podcast, source=src, tag=tag)
+    np = migrate.get_or_migrate_podcast(podcast)
+    np.tags[src] = tags
+    np.save()
 
 
 def get_episode_metadata(entry, url, mimetype):

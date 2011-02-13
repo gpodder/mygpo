@@ -1,7 +1,7 @@
 from django.db import models
-from mygpo.search.util import tag_string
-from mygpo.data.models import PodcastTag
 from mygpo.api.models import Podcast, PodcastGroup
+from mygpo import migrate
+from mygpo.core import models as newmodels
 import shlex
 
 
@@ -42,11 +42,13 @@ class SearchEntry(models.Model):
         if isinstance(obj, Podcast):
             entry.obj_type = 'podcast'
             podcasts = [obj]
+            new_obj = migrate.get_or_migrate_podcast(obj)
         elif isinstance(obj, PodcastGroup):
             entry.obj_type = 'podcast_group'
             podcasts = Podcast.objects.filter(group=obj)
+            new_obj = newmodels.PodcastGroup.for_oldid(obj.id)
 
-        entry.tags = tag_string(PodcastTag.objects.filter(podcast__in=podcasts))
+        entry.tags = ' '.join(new_obj.all_tags()[:200])
         return entry
 
 

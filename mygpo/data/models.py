@@ -4,38 +4,12 @@ from mygpo.api.models import Podcast, Episode, Device, PodcastGroup
 from mygpo import settings
 
 
-class PodcastTagManager(models.Manager):
-
-    def top_tags_for_podcast(self, podcast):
-        """
-        returns the most-assigned tags for the given podcast
-        """
-        tags = PodcastTag.objects.filter(podcast=podcast)
-        return self.top_tags(tags)
-
-    def top_tags(self, tags=None):
-        """
-        returns the most-assigned tags
-
-        If param tags is given, it is expected to be a PodcastTag-QuerySet.
-        The method is then restricted to this QuerySet, otherwise all tags
-        are considered
-        """
-        if not tags:
-            tags = PodcastTag.objects.all()
-        tags = tags.values('tag').annotate(count=models.Count('id'))
-        tags = sorted(tags, key=lambda x: x['count'], reverse=True)
-        return tags
-
-
 class PodcastTag(models.Model):
     tag = models.CharField(max_length=100)
     podcast = models.ForeignKey(Podcast)
     source = models.CharField(max_length=100)
     user = models.ForeignKey(User, null=True)
     weight = models.IntegerField(default=1)
-
-    objects = PodcastTagManager()
 
     class Meta:
         db_table = 'podcast_tags'
@@ -146,11 +120,3 @@ class DirectoryEntry(models.Model):
     class Meta:
         db_table = 'directory_entries'
         managed = False
-
-
-from mygpo.data.signals import update_podcast_tag_entry
-from django.db.models.signals import post_save, pre_delete
-
-post_save.connect(update_podcast_tag_entry, sender=PodcastTag)
-pre_delete.connect(update_podcast_tag_entry, sender=PodcastTag)
-

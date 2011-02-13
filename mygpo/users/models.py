@@ -174,6 +174,11 @@ class PodcastUserState(Document):
         self.actions = list(set(self.actions))
         self.actions.sort(key=lambda x: x.timestamp)
 
+
+    def add_tags(self, tags):
+        self.tags = list(set(self.tags + tags))
+
+
     def __eq__(self, other):
         if other is None:
             return False

@@ -15,14 +15,15 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+from collections import defaultdict
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, Http404
 from django.contrib.auth.models import User
 from django.template import RequestContext
 from mygpo.core import models
+from mygpo.directory import tags
 from mygpo.users.models import Rating, Suggestions
 from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, SubscriptionAction, Subscription, UserProfile
-from mygpo.data.models import PodcastTag
 from mygpo.decorators import manual_gc
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render_to_response
@@ -227,19 +228,16 @@ def suggestions(request):
 @login_required
 def mytags(request):
     tags_podcast = {}
-    tags_tag = {}
-    for tag in PodcastTag.objects.filter(user=request.user):
-        if not tag.podcast in tags_podcast:
-            tags_podcast[tag.podcast] = []
+    tags_tag = defaultdict(list)
 
-        if not tag.tag in tags_tag:
-            tags_tag[tag.tag] = []
+    for podcast, taglist in tags.tags_for_user(request.user).items():
+        old_p = models.Podcast.for_id(podcast).get_old_obj()
+        tags_podcast[old_p] = taglist
 
-        tag.is_own = True
-        tags_podcast[tag.podcast].append(tag)
-        tags_tag[tag.tag].append(tag)
+        for tag in taglist:
+            tags_tag[ tag ].append(old_p)
 
     return render_to_response('mytags.html', {
         'tags_podcast': tags_podcast,
-        'tags_tag': tags_tag,
+        'tags_tag': dict(tags_tag.items()),
     }, context_instance=RequestContext(request))
