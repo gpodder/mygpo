@@ -1,7 +1,7 @@
 from mygpo.core.models import Podcast, Episode
 from mygpo.users.models import PodcastUserState
 from mygpo import utils
-
+from mygpo.decorators import repeat_on_conflict
 
 
 def merge_objects():
@@ -87,7 +87,7 @@ def merge_podcasts(podcast, p):
     Merges p into podcast
     """
 
-    @utils.repeat_on_conflict(['podcast'])
+    @repeat_on_conflict(['podcast'])
     def do_merge(podcast):
         podcast.merged_ids       = list(set(podcast.merged_ids + [p.get_id()] + p.merged_ids))
         podcast.related_podcasts = list(set(podcast.related_podcasts + p.related_podcasts))
@@ -111,7 +111,7 @@ def merge_podcasts(podcast, p):
 
         podcast.save()
 
-    @utils.repeat_on_conflict(['p'])
+    @repeat_on_conflict(['p'])
     def do_delete(p):
         p.delete()
 
@@ -153,7 +153,7 @@ def merge_episodes(episode, e, podcast, save_podcast=False):
     if e.id in podcast.episodes:
         del podcast.episodes[e.id]
 
-    @utils.repeat_on_conflict(['podcast'])
+    @repeat_on_conflict(['podcast'])
     def save(podcast):
         podcast.save()
 
@@ -168,12 +168,12 @@ def merge_episodes(episode, e, podcast, save_podcast=False):
 
 def merge_podcast_states(p1, p2):
 
-    @utils.repeat_on_conflict(['s2'])
+    @repeat_on_conflict(['s2'])
     def move(s2, new_id):
         s2.podcast = new_id
         s2.save()
 
-    @utils.repeat_on_conflict(['s1'])
+    @repeat_on_conflict(['s1'])
     def merge(s1, s2):
         s1.settings = s2.settings.update(s1.settings)
         s1.add_actions(s2.actions)
@@ -181,7 +181,7 @@ def merge_podcast_states(p1, p2):
         merge_similar_episode_states(p1, s1)
         s1.save()
 
-    @utils.repeat_on_conflict(['s2'])
+    @repeat_on_conflict(['s2'])
     def delete(s2):
         s2.delete()
 
