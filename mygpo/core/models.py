@@ -67,6 +67,24 @@ class SubscriberData(DocumentSchema):
                (self.subscriber_count == other.subscriber_count)
 
 
+class PodcastSubscriberData(Document):
+    podcast = StringProperty()
+    subscribers = SchemaListProperty(SubscriberData)
+
+    @classmethod
+    def for_podcast(cls, id):
+        r = cls.view('core/subscribers_by_podcast', key=id, include_docs=True)
+        if r:
+            return r.first()
+
+        data = PodcastSubscriberData()
+        data.podcast = id
+        return data
+
+    def __repr__(self):
+        return 'PodcastSubscriberData for Podcast %s (%s)' % (self.podcast, self._id)
+
+
 class Podcast(Document):
     id = StringProperty()
     title = StringProperty()

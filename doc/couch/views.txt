@@ -282,3 +282,9 @@ Users by Old-Id (users/users_by_oldid)
 
 Can be used to get a User by its Old-Id.
 
+
+Subscriber Data by Podcast (core/subscribers_by_podcast)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * For a PodcastSubscriberData, emit its Podcast-Id and null
+
+Can be used to get the PodcastSubscriberData for a Podcast.

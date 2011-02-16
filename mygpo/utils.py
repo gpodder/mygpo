@@ -217,3 +217,25 @@ def first(it):
 
 def intersect(a, b):
      return list(set(a) & set(b))
+
+
+def multi_request_view(cls, view, *args, **kwargs):
+    """
+    splits up a view request into several requests, which reduces
+    the server load of the number of returned objects is large.
+
+    NOTE: As such a split request is obviously not atomical anymore, results
+    might skip some elements of contain some twice
+    """
+
+    LIMIT = 1000
+    cur = 0
+
+    while True:
+        resp = cls.view(view, *args, skip=cur, limit=LIMIT, **kwargs)
+        if resp.count() == 0:
+            break
+        for obj in resp.iterator():
+            yield obj
+
+        cur += LIMIT

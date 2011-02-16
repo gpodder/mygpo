@@ -58,6 +58,11 @@ If a Podcast does not belong to a group, it is a document on its own.  The
 contains all tags that are fetched in some automated way (ie not entered by a
 user).
 
+A Podcast contains recent subscriber data in the "subscribers" property. To
+keep the Podcast objects small, subscriber data is periodically moved to the
+podcast's PodcastSubscriberData object.
+
+
 Replaces Models
  * Podcast
  * HistoricPodcastData
@@ -123,6 +128,25 @@ Example Document
             episodes: Episode-Dict
         },
         { ... }
+    ],
+}
+
+
+  PodcastSubscriberData
+=========================
+
+Contains the older subscriber data for a Podcast. This can be used to retrieve changes in the number of subscribers of a podcast.
+
+Replaces Models:
+ * HistoricPodcastData
+
+Example Document
+{
+    podcast: "118913287192379173298",
+    subscribers: [
+        {timestamp: "2010-09-01", subscriber_count: 120},
+        {timestamp: "2010-10-01", subscriber_count: 125},
+        {timestamp: "2010-11-01", subscriber_count: 210},
     ],
 }
 
