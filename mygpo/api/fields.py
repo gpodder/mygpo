@@ -61,5 +61,5 @@ class JSONField(models.TextField):
         if value == "":
             return None
 
-        return super(JSONField, self).get_db_prep_save(json.dumps(value), connection)
+        return super(JSONField, self).get_db_prep_save(json.dumps(value), connection=connection)
 
