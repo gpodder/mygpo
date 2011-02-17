@@ -17,6 +17,8 @@ def lookup_list(dict, keys):
 
 @register.simple_tag
 def smartwidthratio(val, max_val, upper, lower):
+    if max_val == 0:
+        return 0
     return max(lower, (float(val) / max_val * upper))
 
 @register.filter
