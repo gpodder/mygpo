@@ -154,10 +154,10 @@ Example Document
   Episode
 ===========
 
-An episode can not exist alone but must always be part of a Podcast. It has
-optional support for multiple media files (eg Audio and PDF Show Notes). The
-fields listeners and recent_listeners are regularly updated with aggregated
-data to substitute queries based on time.
+An episode, in concept, belongs to a Podcast (not a PodcastGroup) but is a
+standalone document. It has optional support for multiple media files (eg Audio
+and PDF Show Notes). The fields listeners and recent_listeners are
+regularly updated with aggregated data to substitute queries based on time.
 
 Replaces Models:
  * Episode
@@ -166,7 +166,7 @@ Replaces Models:
 
 Example Document
 {
-    id:    "19384038450938450983",
+    _id:    "19384038450938450983",
     title: "Cool Episode of Cool Podcast",
     podcast: "118913287192379173298",
     media_urls: ["http://podcast.com/episode1.mp3", "http://podcast.com/episode1.pdf"],
