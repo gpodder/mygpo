@@ -27,17 +27,15 @@ def merge_objects():
     merge_from_iterator(states, should_merge, no_merge_order, total, merge_podcast_states)
 
 
-    get_episode_merge_data = lambda a, b: dict(podcast=Podcast.for_id(a.podcast), safe_podcast=True)
-
     print 'Merging Episodes by URL'
     episodes, total = get_view_count_iter(Episode, 'core/episodes_by_url')
     should_merge = lambda a, b: a.podcast == b.podcast and similar_urls(a, b)
-    merge_from_iterator(episodes, should_merge, no_merge_order, total, merge_episodes, get_episode_merge_data)
+    merge_from_iterator(episodes, should_merge, no_merge_order, total, merge_episodes)
 
     print 'Merging Episodes by Old-Id'
     episodes, total = get_view_count_iter(Episode, 'core/episodes_by_oldid')
     should_merge = lambda a, b: a.podcast == b.podcast and similar_oldid(a, b)
-    merge_from_iterator(episodes, should_merge, no_merge_order, total, merge_episodes, get_episode_merge_data)
+    merge_from_iterator(episodes, should_merge, no_merge_order, total, merge_episodes)
 
 
 def get_view_count_iter(cls, view):
@@ -46,7 +44,7 @@ def get_view_count_iter(cls, view):
     return iterator, total
 
 
-def merge_from_iterator(obj_it, should_merge, cmp, total, merge_func, get_add_merge_data=lambda a, b: {}):
+def merge_from_iterator(obj_it, should_merge, cmp, total, merge_func):
     """
     Iterates over the objects in obj_it and calls should_merge for each pair of
     objects. This implies that the objects returned by obj_it should be sorted
@@ -55,9 +53,7 @@ def merge_from_iterator(obj_it, should_merge, cmp, total, merge_func, get_add_me
     If should_merge returns True, the pair of objects is going to be merged.
     The smaller object (according to cmp) is merged into the larger one.
     merge_func performs the actual merge. It is passed the two objects to be
-    merged (first the larger, then the smaller one) and additional data from
-    get_add_merge_data (which should return a dictionary of additional
-    parameters to merge_func)
+    merged (first the larger, then the smaller one).
     """
 
     try:
@@ -69,8 +65,7 @@ def merge_from_iterator(obj_it, should_merge, cmp, total, merge_func, get_add_me
         if should_merge(p, prev):
             print 'merging %s, %s' % (p, prev)
             items = sorted([p, prev], cmp=cmp)
-            add_merge_data = get_add_merge_data(*items)
-            merge_func(*items, **add_merge_data)
+            merge_func(*items)
 
         prev = p
         utils.progress(n, total)
@@ -106,14 +101,24 @@ def merge_podcasts(podcast, p):
         for src, tags in p.tags.values():
             podcast.tags[src] = list(set(podcast.tags.get(src, []) + tags))
 
-        podcast.episodes.update(p.episodes)
-        merge_similar_episodes(podcast)
-
         podcast.save()
 
     @repeat_on_conflict(['p'])
     def do_delete(p):
         p.delete()
+
+
+    # re-assign episodes to new podcast
+    # if necessary, they will be merged later anyway
+    for e in p.get_episodes():
+        e.podcast = podcast.get_id()
+
+        @repeat_on_conflict(['e'])
+        def save_episode(e):
+            e.save()
+
+        save_episode(e=e)
+
 
     do_merge(podcast=podcast)
     merge_podcast_states(podcast, p)
@@ -137,28 +142,20 @@ def similar_oldid(o1, o2):
 ###
 
 
-def merge_similar_episodes(podcast):
-    EPISODE_SIMILARITY = (similar_urls, similar_oldid)
-
-    for e in podcast.episodes.values():
-        for e2 in podcast.episodes.values():
-            if e == e2: continue
-            if any(sim(e, e2) for sim in EPISODE_SIMILARITY):
-                merge_episodes(e, e2, podcast)
-
-
-def merge_episodes(episode, e, podcast, save_podcast=False):
+def merge_episodes(episode, e):
     episode.urls = list(set(episode.urls + e.urls))
     episode.merged_ids = list(set(episode.merged_ids + [e.id] + e.merged_ids))
-    if e.id in podcast.episodes:
-        del podcast.episodes[e.id]
 
-    @repeat_on_conflict(['podcast'])
-    def save(podcast):
-        podcast.save()
+    @repeat_on_conflict(['e'])
+    def delete(e):
+        e.delete()
 
-    if save_podcast:
-        save(podcast=podcast)
+    @repeat_on_conflict(['episode'])
+    def save(episode):
+        episode.save()
+
+    delete(e=e)
+    save(podcast=podcast)
 
 ###
 #
@@ -218,10 +215,10 @@ def merge_similar_episode_states(podcast, podcast_state):
 
 
 def find_new_episode_id(podcast, merged_id):
-    if merged_id in podcast.episodes.keys():
-        return merged_id
+    for episode in podcast.get_episodes():
+        if episode.id == merged_id:
+            return merged_id
 
-    for episode in podcast.episodes.values():
         if merged_id in episode.merged_ids:
             return episode.id
 

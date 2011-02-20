@@ -27,13 +27,13 @@ class Episode(Document):
 
     @classmethod
     def for_id(cls, id):
-        r = cls.view('core/episodes_by_id', key=id, limit=1, wrap_doc=False)
+        r = cls.view('core/episodes_by_id', key=id, limit=1, include_docs=True)
         return r.one() if r else None
 
 
     @classmethod
     def for_oldid(self, oldid):
-        r = Episode.view('core/episodes_by_oldid', key=oldid, limit=1, wrap_doc=False)
+        r = Episode.view('core/episodes_by_oldid', key=oldid, limit=1, include_docs=True)
         return r.one() if r else None
 
 
@@ -99,7 +99,6 @@ class Podcast(Document):
     group = StringProperty()
     group_member_name = StringProperty()
     related_podcasts = StringListProperty()
-    episodes = SchemaDictProperty(Episode)
     subscribers = SchemaListProperty(SubscriberData)
     language = StringProperty()
     content_types = StringListProperty()
@@ -118,6 +117,10 @@ class Podcast(Document):
 
     def get_id(self):
         return self.id or self._id
+
+
+    def get_episodes(self):
+        return list(Episode.view('core/episodes_by_podcast', key=self.get_id()))
 
 
     def subscriber_count(self):

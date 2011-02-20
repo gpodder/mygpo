@@ -68,10 +68,10 @@ function(newDoc, oldDoc, userCtx)
     else if(newDoc.doc_type == "Podcast")
     {
         checkPodcast(newDoc);
-        for(i in newDoc.episodes)
-        {
-            episode = newDoc.episodes[i];
-            require(episode, "urls");
-        }
+    }
+    else if(newDoc.doc_type == "Episode")
+    {
+        require(newDoc, "urls");
+        require(newDoc, "podcast");
     }
 }

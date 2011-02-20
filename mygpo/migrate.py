@@ -212,12 +212,8 @@ def create_episode(olde, sparse=False):
     if not sparse:
         update_episode(olde, e, podcast)
 
-    @repeat_on_conflict(['podcast'])
-    def save(podcast, e):
-        podcast.episodes[e.id] = e
-        podcast.save()
-
-    save(podcast=podcast, e=e)
+    e.podcast = podcast.get_id()
+    e.save()
 
     return e
 
@@ -251,13 +247,12 @@ def update_episode(olde, newe, podcast):
         newe.mimetypes.append(olde.mimetype)
         updated = True
 
-    @repeat_on_conflict(['podcast'])
-    def save(podcast, newe):
-        podcast.episodes[newe.id] = newe
-        podcast.save()
+    @repeat_on_conflict(['newe'])
+    def save(newe):
+        newe.save()
 
     if updated:
-        save(podcast=podcast, newe=newe)
+        save(newe=newe)
 
     return updated
 

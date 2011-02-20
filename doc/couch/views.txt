@@ -288,3 +288,10 @@ Subscriber Data by Podcast (core/subscribers_by_podcast)
  * For a PodcastSubscriberData, emit its Podcast-Id and null
 
 Can be used to get the PodcastSubscriberData for a Podcast.
+
+
+Episodes by Podcast-Id (core/episodes_by_podcast)
+~~~~~~~~~~~~~~~~~~~~~~
+ * For an Episode, emit its Podcast-Id and null
+
+Can be used to list the episodes for a Podcast
