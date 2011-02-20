@@ -23,6 +23,8 @@ class Command(BaseCommand):
                 tag = str(tag)
 
             label = tag.strip()
+            if not label:
+                continue
 
             podcasts = []
             for (p, v) in podcasts_for_tag(tag):
