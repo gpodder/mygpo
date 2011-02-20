@@ -208,11 +208,11 @@ def create_episode(olde, sparse=False):
     e = Episode()
     e.oldid = olde.id
     e.urls.append(olde.url)
+    e.podcast = podcast.get_id()
 
     if not sparse:
         update_episode(olde, e, podcast)
 
-    e.podcast = podcast.get_id()
     e.save()
 
     return e
