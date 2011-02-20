@@ -120,7 +120,7 @@ class Podcast(Document):
 
 
     def get_episodes(self):
-        return list(Episode.view('core/episodes_by_podcast', key=self.get_id()))
+        return list(Episode.view('core/episodes_by_podcast', key=self.get_id(), include_docs=True))
 
 
     def subscriber_count(self):
