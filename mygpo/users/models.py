@@ -160,6 +160,14 @@ class PodcastUserState(Document):
             return p
 
 
+    @classmethod
+    def for_user(cls, user):
+        r = PodcastUserState.view('users/podcast_states_by_user',
+            startkey=[user.id, None], endkey=[user.id, 'ZZZZ'],
+            include_docs=True)
+        return list(r)
+
+
     def get_episode(self, e_id):
         if e_id in self.episodes:
             return self.episodes[e_id]
