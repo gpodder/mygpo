@@ -26,7 +26,7 @@ def podcasts_for_tag(tag):
 
 
 def all_tags():
-    res = Podcast.view('directory/podcasts_by_tag', reduce=True, group=True, group_level=2)
+    res = Podcast.view('directory/podcasts_by_tag', reduce=True, group=True, group_level=1)
 
     for r in res:
         yield r['key'][0]
