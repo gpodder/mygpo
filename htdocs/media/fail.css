@@ -1,0 +1,25 @@
+#c {
+    position: absolute;
+    left: 50%;
+    margin-left: -200px;
+    width: 490px;
+    top: 140px;
+}
+#fail {
+    background-color: #ddd;
+    padding: 10px 50px 10px 120px;
+    border-top: 1px #aaa solid;
+    border-bottom: 2px #aaa solid;
+    font-size: 10pt;
+    font-family: sans-serif;
+}
+h1 {
+    font-size: 14pt;
+    color: #333;
+}
+#icon {
+    position: absolute;
+    top: 70px;
+    left: 50%;
+    margin-left: -340px;
+}

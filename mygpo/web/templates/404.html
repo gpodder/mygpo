@@ -1,10 +1,19 @@
-{% extends "base.html" %}
-{% load i18n %}
-
-{% block title %}{% trans "Not found" %}{% endblock %}
-
-{% block content %}
-  <h1>404 {% trans "Not found" %}</h1>
-  <p>{% trans "The requested document could not be found." %}</p>
-{% endblock %}
+<html>
+    <head>
+        <title>404 Not found (gpodder.net)</title>
+        <link rel="stylesheet" type="text/css" href="/media/fail.css" />
+    </head>
+    <body>
+        <div id="c">
+            <div id="fail">
+                <h1>404 - Not found.</h1>
+                <p>
+                The requested document was not found on this server.
+                Please try again later or contact us.
+                </p>
+            </div>
+        </div>
+        <img id="icon" src="/media/failpodder.png">
+    </body>
+</html>
 
