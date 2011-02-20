@@ -89,7 +89,7 @@ def update_podcast(oldp, newp):
 
     # Update Group-assignment
     if oldp.group:
-        group = get_group(oldp.group.id)
+        group = get_group(oldp.group)
         if not newp in list(group.podcasts):
             newp = group.add_podcast(newp)
             updated = True
@@ -110,7 +110,7 @@ def update_podcast(oldp, newp):
 
     PROPERTIES = ('language', 'content_types', 'title',
         'description', 'link', 'last_update', 'logo_url',
-        'author')
+        'author', 'group_member_name')
 
     for p in PROPERTIES:
         if getattr(newp, p, None) != getattr(oldp, p, None):
@@ -140,23 +140,36 @@ def create_podcast(oldp, sparse=False):
     return p
 
 
-def get_group(oldid):
-    group = PodcastGroup.for_oldid(oldid)
+def get_group(oldg):
+    group = PodcastGroup.for_oldid(oldg.id)
     if not group:
-        group = create_podcastgroup(oldid)
+        group = create_podcastgroup(oldg)
 
     return group
 
 
-def create_podcastgroup(oldid):
+def create_podcastgroup(oldg):
     """
     Creates a (CouchDB) PodcastGroup document from a
     (ORM) PodcastGroup object
     """
     g = PodcastGroup()
-    g.oldid = oldid
+    g.oldid = oldg.id
+    update_podcastgroup(oldg, g)
     g.save()
     return g
+
+
+
+@repeat_on_conflict(['newg'])
+def update_podcastgroup(oldg, newg):
+
+    if newg.title != oldg.title:
+        newg.title = oldg.title
+        newg.save()
+        return True
+
+    return False
 
 
 def get_blacklist(blacklist):

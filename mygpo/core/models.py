@@ -215,6 +215,7 @@ class Podcast(Document):
 
 
 class PodcastGroup(Document):
+    title    = StringProperty()
     podcasts = SchemaListProperty(Podcast)
 
     def get_id(self):

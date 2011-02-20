@@ -103,7 +103,7 @@ def repeat_on_conflict(obj_names=[], reload_f=None):
         def tmp(*args, **kwargs):
             while True:
                 try:
-                    f(*args, **kwargs)
+                    return f(*args, **kwargs)
                     break
                 except ResourceConflict:
                     for obj_name in obj_names:
