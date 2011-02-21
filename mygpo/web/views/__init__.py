@@ -60,7 +60,7 @@ def welcome(request, toplist_entries=10):
 
     entries = backend.get_toplist(toplist_entries, lang)
 
-    toplist = [p for (sub, oldpos, p) in entries]
+    toplist = [p for (oldpos, p) in entries]
     sponsored_podcast = utils.get_sponsored_podcast()
 
     return render_to_response('home.html', {

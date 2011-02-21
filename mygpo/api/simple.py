@@ -183,19 +183,18 @@ def toplist(request, count, format):
     domain = RequestSite(request).domain
 
     def get_podcast(t):
-        s, o, p = t
-        if isinstance(p, Podcast):
+        old_pos, p = t
+        if isinstance(p, models.Podcast):
             return p
         else:
-            return p.podcasts()[0]
+            return p.podcasts[0]
 
     def json_map(t):
         podcast = get_podcast(t)
         p = podcast_data(podcast, domain)
-        newp = models.Podcast.for_oldid(podcast.id)
         p.update(dict(
-            subscribers=           newp.subscriber_count(),
-            subscribers_last_week= newp.prev_subscriber_count(),
+            subscribers=           podcast.subscriber_count(),
+            subscribers_last_week= podcast.prev_subscriber_count(),
             position_last_week=    0
         ))
         return p

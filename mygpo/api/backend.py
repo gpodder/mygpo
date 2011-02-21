@@ -96,8 +96,7 @@ def get_toplist(count, languages=None, types=None):
     cur  = sorted(results, key=lambda p: (p.subscriber_count(), p.get_id()),      reverse=True)[:count]
     prev = sorted(results, key=lambda p: (p.prev_subscriber_count(), p.get_id()), reverse=True)[:count]
 
-    return [(p.subscriber_count(), prev.index(p) if p in prev else 0,\
-        p.get_old_obj()) for p in cur]
+    return [(prev.index(p) if p in prev else 0, p) for p in cur]
 
 
 def get_episode_toplist(count, languages=None, types=None):

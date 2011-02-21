@@ -27,7 +27,8 @@ class Command(BaseCommand):
         fetch_queue = []
 
         if options.get('toplist'):
-            for subscribers, oldindex, obj in backend.get_toplist(100):
+            for oldindex, obj in backend.get_toplist(100):
+                obj = obj.get_old_obj()
                 if isinstance(obj, models.Podcast):
                     fetch_queue.append(obj)
                 elif isinstance(obj, models.PodcastGroup):

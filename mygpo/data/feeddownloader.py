@@ -34,6 +34,7 @@ from mygpo.utils import parse_time
 from mygpo.api.sanitizing import sanitize_url, rewrite_podcasts
 from mygpo.data import youtube
 from mygpo.data.mimetype import get_mimetype, check_mimetype, get_podcast_types
+from mygpo import migrate
 
 socket.setdefaulttimeout(10)
 fetcher = feedcore.Fetcher(USER_AGENT)

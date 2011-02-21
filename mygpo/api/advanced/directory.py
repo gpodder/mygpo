@@ -64,7 +64,11 @@ def episode_info(request):
 
 
 def podcast_data(podcast, domain):
-    if podcast.group:
+    if isinstance(podcast, models.Podcast):
+        obj = podcast
+    elif isinstance(podcast, models.PodcastGroup):
+        obj = podcast.podcasts[0]
+    elif podcast.group:
         obj = models.PodcastGroup.for_oldid(podcast.group.id)
     else:
         obj = models.Podcast.for_oldid(podcast.id)
@@ -80,7 +84,7 @@ def podcast_data(podcast, domain):
         "subscribers_last_week": last_subscribers,
         "logo_url": podcast.logo_url,
         "website": podcast.link,
-        "mygpo_link": 'http://%s/podcast/%s' % (domain, podcast.id),
+        "mygpo_link": 'http://%s/podcast/%s' % (domain, obj.oldid),
         }
 
 def episode_data(episode, domain):

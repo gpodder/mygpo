@@ -2,8 +2,8 @@ from django.core.management.base import BaseCommand
 
 from mygpo import migrate
 from mygpo.decorators import repeat_on_conflict
-from mygpo.core import models as newmodels
-from mygpo.api import models
+from mygpo.core.models import Podcast, PodcastGroup
+from mygpo.api import models as oldmodels
 from mygpo.api import backend
 from mygpo.data import delicious
 from optparse import make_option
@@ -13,6 +13,13 @@ import urllib2
 SOURCE = 'delicious'
 
 class Command(BaseCommand):
+    """
+    Adds tags from the webservice delicious.com to podcasts
+
+    Podcasts are specified either by URL or the --toplist and --random
+    parameter. The delicious webservice is queried for the podcasts' websites.
+    The returned tags are added to the podcasts for the 'delicious' source.
+    """
 
     option_list = BaseCommand.option_list + (
         make_option('--toplist', action='store_true', dest='toplist', default=False, help="Update all entries from the Toplist."),
@@ -26,21 +33,17 @@ class Command(BaseCommand):
         fetch_queue = []
 
         if options.get('toplist'):
-            for subscribers, oldindex, obj in backend.get_toplist(100):
-                if isinstance(obj, models.Podcast):
+            for oldindex, obj in backend.get_toplist(100):
+                if isinstance(obj, Podcast):
                     fetch_queue.append(obj)
-                elif isinstance(obj, models.PodcastGroup):
-                    for p in obj.podcasts():
-                        fetch_queue.append(p)
+                elif isinstance(obj, PodcastGroup):
+                    fetch_queue.extend(obj.podcasts)
 
         if options.get('random'):
-            fetch_queue = models.Podcast.objects.all().order_by('?')
+            podcasts = oldmodels.Podcast.objects.all().order_by('?')
+            fetch_queue.extend(map(migrate.get_or_migrate_podcast, podcasts))
 
-        for url in args:
-           try:
-                fetch_queue.append(models.Podcast.objects.get(url=url))
-           except:
-                pass
+        fetch_queue.extend(filter(None, map(Podcast.for_url, args)))
 
         max = options.get('max', -1)
         if max > 0:
@@ -63,8 +66,7 @@ class Command(BaseCommand):
             self.update(podcast=p, tags=tags)
 
 
-    @repeat_on_conflict()
+    @repeat_on_conflict(['podcast'], reload_f=lambda x: Podcast.get(x.get_id()))
     def update(self, podcast, tags):
-        np = migrate.get_or_migrate_podcast(podcast)
-        np.tags[SOURCE] = tags
-        np.save()
+        podcast.tags[SOURCE] = tags
+        podcast.save()

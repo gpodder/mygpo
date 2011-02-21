@@ -30,3 +30,8 @@ def podcast_status_icon(action):
     return mark_safe(s)
 
 
+@register.filter
+def is_podcast(podcast):
+    """ Returns True if the argument is a podcast (esp not a PodcastGroup) """
+    from mygpo.core.models import Podcast
+    return isinstance(podcast, Podcast)

@@ -1,5 +1,6 @@
-import uuid
+import uuid, hashlib
 from couchdbkit.ext.django.schema import *
+from mygpo import utils
 
 
 class Episode(Document):
@@ -37,6 +38,10 @@ class Episode(Document):
             from mygpo.api.models import Episode
             return Episode.objects.get(id=self.oldid)
         return None
+
+    @property
+    def url(self):
+        return self.urls[0]
 
 
     def __repr__(self):
@@ -110,12 +115,29 @@ class Podcast(Document):
         return r.first() if r else None
 
 
+    def for_url(cls, url):
+        r = cls.view('core/podcasts_by_url', key=url)
+        return r.first() if r else None
+
+
     def get_id(self):
         return self.id or self._id
 
 
     def get_episodes(self):
         return list(Episode.view('core/episodes_by_podcast', key=self.get_id(), include_docs=True))
+
+
+    @property
+    def url(self):
+        return self.urls[0]
+
+
+    def get_logo_url(self, size):
+        if self.logo_url:
+            sha = hashlib.sha1(self.logo_url).hexdigest()
+            return '/logo/%d/%s.jpg' % (size, sha)
+        return '/media/podcast-%d.png' % (hash(self.title) % 5, )
 
 
     def subscriber_count(self):
@@ -228,6 +250,18 @@ class PodcastGroup(Document):
 
     def prev_subscriber_count(self):
         return sum([p.prev_subscriber_count() for p in self.podcasts])
+
+
+    @property
+    def logo_url(self):
+        return utils.first(p.logo_url for p in self.podcasts)
+
+
+    def get_logo_url(self, size):
+        if self.logo_url:
+            sha = hashlib.sha1(self.logo_url).hexdigest()
+            return '/logo/%d/%s.jpg' % (size, sha)
+        return '/media/podcast-%d.png' % (hash(self.title) % 5, )
 
 
     def add_podcast(self, podcast):

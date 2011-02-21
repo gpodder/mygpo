@@ -99,10 +99,10 @@
     <th>{% trans "Podcast" %}</th>
     <th>{% trans "Subscribers" %}</th>
    </tr>
-  {% for subscribers, oldpos, podcast in entries %}
+  {% for oldpos, podcast in entries %}
    <tr>
     <td class="numeric toplist-pos">
-     {% ifchanged subscribers %}
+     {% ifchanged podcast.subscriber_count %}
       {{ forloop.counter }}
      {% endifchanged %}
     </td>
@@ -119,18 +119,18 @@
      {{ podcast|podcast_logo }}
     </td>
     <td>
-     {% if podcast.url %}{% comment %}PodcastGroups don't have urls{% endcomment %}
-      <a href="{% url podcast podcast.id %}">{{ podcast|striptags }}</a>
+     {% if podcast|is_podcast %}{% comment %}PodcastGroups don't have urls{% endcomment %}
+      <a href="{% url podcast podcast.oldid %}">{{ podcast.title|striptags }}</a>
      {% else %}
       {{ podcast.title|striptags}}
       (
        {% for p in podcast.podcasts %}
-        <a href="{% url podcast p.id %}">{{ p.group_member_name|striptags }}</a>
+        <a href="{% url podcast p.oldid %}">{{ p.group_member_name|striptags }}</a>
        {% endfor %}
       )
      {% endif %}
     </td>
-    <td>{{ subscribers|vertical_bar:max_subscribers }}</td>
+    <td>{{ podcast.subscriber_count|vertical_bar:max_subscribers }}</td>
    </tr>
   {% endfor %}
   </table>

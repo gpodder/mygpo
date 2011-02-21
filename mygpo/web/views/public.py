@@ -27,37 +27,6 @@ from django.contrib.sites.models import RequestSite
 
 
 @manual_gc
-def toplist(request, num=100, lang=None):
-
-    try:
-        lang = utils.process_lang_params(request, '/toplist/')
-    except utils.UpdatedException, updated:
-        return HttpResponseRedirect('/toplist/?lang=%s' % ','.join(updated.data))
-
-    type_str = request.GET.get('types', '')
-    set_types = [t for t in type_str.split(',') if t]
-    if set_types:
-        media_types = dict([(t, t in set_types) for t in CONTENT_TYPES])
-    else:
-        media_types = dict([(t, True) for t in CONTENT_TYPES])
-
-    entries = backend.get_toplist(num, lang, set_types)
-
-    max_subscribers = max([sub for (sub, oldp, p) in entries]) if entries else 0
-    current_site = RequestSite(request)
-    all_langs = utils.get_language_names(utils.get_podcast_languages())
-
-    return render_to_response('toplist.html', {
-        'entries': entries,
-        'max_subscribers': max_subscribers,
-        'url': current_site,
-        'languages': lang,
-        'all_languages': all_langs,
-        'types': media_types,
-    }, context_instance=RequestContext(request))
-
-
-@manual_gc
 def episode_toplist(request, num=100):
 
     try:
