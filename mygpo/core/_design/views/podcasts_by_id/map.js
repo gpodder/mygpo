@@ -1,14 +1,15 @@
 function(doc)
 {
-    if(doc.doc_type == 'Podcast')
+    if(doc.doc_type == "Podcast")
     {
         emit(doc._id, doc);
     }
-    else if(doc.doc_type == 'PodcastGroup')
+    else if(doc.doc_type == "PodcastGroup")
     {
-        for(p in doc.podcasts)
+        for(n in doc.podcasts)
         {
-            emit(p.id, p);
+            podcast = doc.podcasts[n];
+            emit(podcast.id, podcast);
         }
     }
 }

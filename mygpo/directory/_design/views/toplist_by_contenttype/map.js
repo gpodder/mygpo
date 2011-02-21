@@ -38,7 +38,7 @@ function (doc)
             types.push(p.content_types);
         }
 
-        types = types.unique();
+        types = unique(types);
 
         if (sum > 0)
         {

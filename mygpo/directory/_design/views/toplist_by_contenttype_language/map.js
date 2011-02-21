@@ -41,8 +41,8 @@ function (doc)
             lang.push(p.language.slice(0, 2));
         }
 
-        types = types.unique();
-        lang = lang.unique();
+        types = unique(types);
+        lang = unique(lang);
 
         if (sum > 0)
         {
