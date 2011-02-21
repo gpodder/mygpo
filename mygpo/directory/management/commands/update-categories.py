@@ -28,7 +28,7 @@ class Command(BaseCommand):
 
             podcasts = []
             for (p, v) in podcasts_for_tag(tag):
-                podcast = Podcast.for_id(p)
+                podcast = Podcast.get(p)
                 podcasts.append( (p, v * podcast.subscriber_count()) )
 
             category = Category.for_tag(label)

@@ -56,7 +56,7 @@ class Command(BaseCommand):
                     if c: docs.add(c._id)
 
                 # Podcast
-                podcast = Podcast.for_id(p_state.podcast)
+                podcast = Podcast.get(p_state.podcast)
                 docs.add(podcast._id)
 
                 # Categories

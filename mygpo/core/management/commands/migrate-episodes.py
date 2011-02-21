@@ -31,7 +31,7 @@ class Command(BaseCommand):
         for n, (olde, newe) in enumerate(iterate_together(oldepisodes, newepisodes, compare)):
 
             if (olde != None) and (newe != None):
-                podcast = newmodels.Podcast.for_id(newe.podcast)
+                podcast = newmodels.Podcast.get(newe.podcast)
                 updated += migrate.update_episode(olde, newe, podcast)
 
             elif olde == None:

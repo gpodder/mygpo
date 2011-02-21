@@ -177,7 +177,7 @@ def get_favorites(user):
 
     episodes = []
     for res in favorites:
-        ep = models.Episode.for_id(res['value'])
+        ep = models.Episode.get(res['value'])
         if ep:
             episodes.append(ep.get_old_obj())
 

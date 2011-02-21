@@ -231,7 +231,7 @@ def mytags(request):
     tags_tag = defaultdict(list)
 
     for podcast, taglist in tags.tags_for_user(request.user).items():
-        old_p = models.Podcast.for_id(podcast).get_old_obj()
+        old_p = models.Podcast.get(podcast).get_old_obj()
         tags_podcast[old_p] = taglist
 
         for tag in taglist:

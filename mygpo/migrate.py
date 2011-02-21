@@ -59,7 +59,7 @@ def save_episode_signal(sender, instance=False, **kwargs):
 
     try:
         newe = Episode.for_oldid(instance.id)
-        newp = Podcast.for_id(newe.podcast)
+        newp = Podcast.get(newe.podcast)
 
         if newe:
             update_episode(instance, newe, newp)

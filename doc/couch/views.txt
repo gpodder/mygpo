@@ -210,15 +210,6 @@ UID. The Id (property user) and Old-Id (property user_oldid) are set before
 emitting the Device.
 
 
-Episodes by Id (core/episodes_by_id)
-~~~~~~~~~~~~~~
- * For a Podcast (PodcastGroup), iterate all Episodes and emit
-   Id and the Episode itself
-
-Can be used to get an Episode by its Id. The Podcast's Id (property podcast) is
-set before emitting the Episode.
-
-
 Episodes by Old-Id (core/episodes_by_oldid)
 ~~~~~~~~~~~~~~~~~~
  * For a Podcast (PodcastGroup), iterate all Episodes and emit

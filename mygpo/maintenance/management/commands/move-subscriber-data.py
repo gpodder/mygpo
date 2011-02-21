@@ -36,7 +36,7 @@ class Command(BaseCommand):
         data.subscribers = sorted(list(set(data.subscribers + podcast.subscribers)), key=lambda x: x.timestamp)
         data.save()
 
-    @repeat_on_conflict(['podcast'], reload_f=lambda p: Podcast.for_id(p.get_id()))
+    @repeat_on_conflict(['podcast'], reload_f=lambda p: Podcast.get(p.get_id()))
     def update_podcast(self, podcast):
         podcast.subscribers = podcast.subscribers[-2:]
         podcast.save()

@@ -25,11 +25,6 @@ class Episode(Document):
     # when accessed via a view, a podcast attribute is added
     # that contains the id of the podcast
 
-    @classmethod
-    def for_id(cls, id):
-        r = cls.view('core/episodes_by_id', key=id, limit=1, include_docs=True)
-        return r.one() if r else None
-
 
     @classmethod
     def for_oldid(self, oldid):
@@ -105,7 +100,7 @@ class Podcast(Document):
     tags = DictProperty()
 
     @classmethod
-    def for_id(cls, id):
+    def get(cls, id):
         r = cls.view('core/podcasts_by_id', key=id)
         return r.first() if r else None
 
