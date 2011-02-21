@@ -1,5 +1,4 @@
 from django.http import HttpResponseRedirect, HttpResponseNotFound
-from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.contrib.sites.models import RequestSite
@@ -50,7 +49,7 @@ def browse(request, num_categories=10, num_tags_cloud=90, podcasts_per_category=
     disp_categories = []
     for category in categories[:num_categories]:
         entries = category.get_podcasts(0, podcasts_per_category)
-        podcasts = [e.get_old_obj() for e in entries]
+        podcasts = filter(None, entries)
         disp_categories.append({
             'tag': category.label,
             'entries': podcasts,
@@ -80,7 +79,7 @@ def category(request, category, page_size=20):
         page = 1
 
     entries = category.get_podcasts( (page-1) * page_size, page*page_size )
-    podcasts = [e.get_old_obj() for e in entries]
+    podcasts = filter(None, entries)
     num_pages = len(category.podcasts) / page_size
 
     page_list = utils.get_page_list(1, num_pages, page, 15)

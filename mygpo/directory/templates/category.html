@@ -21,11 +21,11 @@
    <th></th>
    <th></th>
   </tr>
-  {% for entry in entries.object_list %}
+  {% for entry in entries %}
    <tr>
     <td>{{ entry|podcast_logo}}</td>
     <td>
-     <a href="{% url podcast entry.id %}">{{ entry.title }}</a>
+     <a href="{% url podcast entry.oldid %}">{{ entry.title }}</a>
     </td>
     <td class="description">
      {{ entry.description|truncatewords:15 }}
