@@ -28,6 +28,7 @@ import urllib2
 import socket
 
 from mygpo.decorators import repeat_on_conflict
+from mygpo import migrate
 from mygpo.data import feedcore
 from mygpo.api import models
 from mygpo.utils import parse_time
@@ -119,10 +120,16 @@ def get_feed_tags(feed):
 @repeat_on_conflict()
 def update_feed_tags(podcast, tags):
     src = 'feed'
-
     np = migrate.get_or_migrate_podcast(podcast)
     np.tags[src] = tags
-    np.save()
+    try:
+        np.save()
+    except Exception, e:
+        from couchdbkit import ResourceConflict
+        if isinstance(e, ResourceConflict):
+            raise # and retry
+
+        print >> sys.stderr, 'error saving tags for podcast %s: %s' % (np.get_id(), e)
 
 
 def get_episode_metadata(entry, url, mimetype):
@@ -194,7 +201,7 @@ def update_podcasts(fetch_queue):
             if yturl:
                 cover_art = yturl
 
-            if cover_art is not None:
+            if cover_art:
                 try:
                     image_sha1 = hashlib.sha1()
                     image_sha1.update(cover_art)
@@ -203,11 +210,12 @@ def update_podcasts(fetch_queue):
                     fp = open(filename, 'w')
                     fp.write(urllib2.urlopen(cover_art).read())
                     fp.close()
-                    print >>sys.stderr, 'LOGO @', cover_art
+                    print 'LOGO @', cover_art
                     podcast.logo_url = cover_art
                 except Exception, e:
                     podcast.logo_url = None
-                    print >>sys.stderr, 'cannot save image: %s' % e
+                    if repr(e).strip():
+                        print >> sys.stderr, 'cannot save image %s for podcast %d: %s' % (cover_art.encode('utf-8'), podcast.id, repr(e).encode('utf-8'))
 
             update_feed_tags(podcast, get_feed_tags(feed.feed))
 
