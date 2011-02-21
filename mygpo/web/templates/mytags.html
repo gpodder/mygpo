@@ -19,15 +19,15 @@
    {% for podcast, taglist in tags_podcast.items %}
     <tr>
      <td>{{ podcast|podcast_logo }}</td>
-     <td><a href="{% url podcast podcast.id %}">{{ podcast|striptags}}</a></td>
+     <td><a href="{% url podcast podcast.oldid %}">{{ podcast.display_title|striptags}}</a></td>
      <td class="tag-list">
      {% for tag in taglist %}{% spaceless %}
-       <span class="own">{{ tag }} <a class="remove" href="{% url remove-tag podcast.id %}?tag={{ tag }}&next=mytags">X</a></span>
+       <span class="own">{{ tag }} <a class="remove" href="{% url remove-tag podcast.oldid %}?tag={{ tag }}&next=mytags">X</a></span>
        {% if not forloop.last %}<span class="seperator">,</span>{% endif %}
       {% endspaceless %}
      {% endfor %}
      {% if user.is_authenticated %}
-      <form action="{% url add-tag podcast.id %}">
+      <form action="{% url add-tag podcast.oldid %}">
        <input type="text" name="tag" />
        <input type="submit" value="Add" />
        <input type="hidden" name="next" value="mytags" />
@@ -46,7 +46,7 @@
     <td>{{ tag }}</td>
     <td>
      {% for podcast in podcast_list %}
-      <a href="{% url podcast podcast.id %}">{{ podcast|podcast_logo }}</a>
+      <a href="{% url podcast podcast.oldid %}" title="{{ podcast.display_title|striptags }}">{{ podcast|podcast_logo }}</a>
      {% endfor %}
     </td>
    </tr>

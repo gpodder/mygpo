@@ -40,7 +40,7 @@ def tag_podcasts(request, tag, count):
 
     domain = RequestSite(request).domain
     query = category.get_podcasts(0, count)
-    resp = map(lambda p: podcast_data(p.get_old_obj(), domain), query)
+    resp = map(lambda p: podcast_data(p, domain), query)
     return JsonResponse(resp)
 
 

@@ -212,12 +212,7 @@ def rate_suggestions(request):
 @login_required
 def suggestions(request):
     suggestion_obj = Suggestions.for_user_oldid(request.user.id)
-    suggestions = []
-    for p in suggestion_obj.get_podcasts():
-        try:
-            suggestions.append(p.get_old_obj())
-        except:
-            pass
+    suggestions = suggestion_obj.get_podcasts()
     current_site = RequestSite(request)
     return render_to_response('suggestions.html', {
         'entries': suggestions,
@@ -230,12 +225,12 @@ def mytags(request):
     tags_podcast = {}
     tags_tag = defaultdict(list)
 
-    for podcast, taglist in tags.tags_for_user(request.user).items():
-        old_p = models.Podcast.get(podcast).get_old_obj()
-        tags_podcast[old_p] = taglist
+    for podcast_id, taglist in tags.tags_for_user(request.user).items():
+        podcast = models.Podcast.get(podcast_id)
+        tags_podcast[podcast] = taglist
 
         for tag in taglist:
-            tags_tag[ tag ].append(old_p)
+            tags_tag[ tag ].append(podcast)
 
     return render_to_response('mytags.html', {
         'tags_podcast': tags_podcast,

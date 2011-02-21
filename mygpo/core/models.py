@@ -123,6 +123,9 @@ class Podcast(Document):
     def get_id(self):
         return self.id or self._id
 
+    @property
+    def display_title(self):
+        return self.title or self.url
 
     def get_episodes(self):
         return list(Episode.view('core/episodes_by_podcast', key=self.get_id(), include_docs=True))
@@ -251,6 +254,9 @@ class PodcastGroup(Document):
     def prev_subscriber_count(self):
         return sum([p.prev_subscriber_count() for p in self.podcasts])
 
+    @property
+    def display_title(self):
+        return self.title
 
     @property
     def logo_url(self):
