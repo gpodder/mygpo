@@ -29,7 +29,7 @@ from mygpo.api.advanced.directory import podcast_data
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 from django.contrib.sites.models import RequestSite
-from mygpo.search.models import SearchEntry
+from mygpo.directory.search import search_podcasts
 from django.utils.translation import ugettext as _
 from mygpo.decorators import allowed_methods
 
@@ -84,7 +84,7 @@ def all_subscriptions(request, username, format):
     return format_podcast_list(subscriptions, format, title)
 
 
-def format_podcast_list(obj_list, format, title, get_podcast=lambda x: x, json_map=lambda x: x.url):
+def format_podcast_list(obj_list, format, title, get_podcast=None, json_map=lambda x: x.url):
     """
     Formats a list of podcasts for use in a API response
 
@@ -96,6 +96,14 @@ def format_podcast_list(obj_list, format, title, get_podcast=lambda x: x, json_m
     json_map is a function returning the contents of an object (from obj_list)
       that should be contained in the result (only used for format='json')
     """
+
+    def default_get_podcast(p):
+        if isinstance(p, models.PodcastGroup):
+            return p.podcasts[0]
+        return p
+
+    get_podcast = get_podcast or default_get_podcast
+
     if format == 'txt':
         podcasts = map(get_podcast, obj_list)
         s = '\n'.join([p.url for p in podcasts] + [''])
@@ -210,12 +218,15 @@ def toplist(request, count, format):
 @check_format
 @allowed_methods(['GET'])
 def search(request, format):
+
+    NUM_RESULTS = 20
+
     query = request.GET.get('q', '').encode('utf-8')
 
     if not query:
         return HttpResponseBadRequest('/search.opml|txt|json?q={query}')
 
-    results = [r.get_podcast() for r in SearchEntry.objects.search(query)[:20]]
+    results, total = search_podcasts(q=query, limit=NUM_RESULTS)
 
     title = _('gpodder.net - Search')
     domain = RequestSite(request).domain

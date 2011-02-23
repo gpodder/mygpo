@@ -40,7 +40,6 @@ urlpatterns += patterns('',
     (r'^',           include('mygpo.directory.urls')),
     (r'^',           include('mygpo.api.urls')),
     (r'^',           include('mygpo.userfeeds.urls')),
-    (r'^search/',    include('mygpo.search.urls')),
     (r'^accounts/',  include('registration.urls')),
     (r'^publisher/', include('mygpo.publisher.urls')),
 )

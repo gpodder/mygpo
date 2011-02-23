@@ -7,6 +7,7 @@ from mygpo.api import backend
 from mygpo.data.mimetype import CONTENT_TYPES
 from mygpo.decorators import manual_gc
 from mygpo.directory.models import Category
+from mygpo.directory.search import search_podcasts
 from mygpo.web import utils
 
 
@@ -91,3 +92,31 @@ def category(request, category, page_size=20):
         }, context_instance=RequestContext(request))
 
 
+
+RESULTS_PER_PAGE=20
+
+def search(request):
+
+    if 'q' in request.GET:
+        q = request.GET.get('q', '').encode('utf-8')
+
+        try:
+            page = int(request.GET.get('page', 1))
+        except ValueError:
+            page = 1
+
+        results, total = search_podcasts(q=q, skip=RESULTS_PER_PAGE*(page-1))
+        num_pages = total / RESULTS_PER_PAGE
+
+        page_list = utils.get_page_list(1, num_pages, page, 15)
+
+    else:
+        results = None
+        q = None
+        page_list = []
+
+    return render_to_response('search.html', {
+            'q': q,
+            'results': results,
+            'page_list': page_list,
+        }, context_instance=RequestContext(request))

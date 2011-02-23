@@ -26,25 +26,21 @@
     <th></th>
    </tr>
 
-   {% for result in results.object_list %}
+   {% for result in results %}
     <tr>
-     {% if result.obj_type == "podcast" %}
-      {% if result.get_object %}
-       <td>{{ result.get_object|podcast_logo }}</td>
+     {% if result|is_podcast %}
+       <td>{{ result|podcast_logo }}</td>
        <td>
-        <a class="podcast" href="{% url podcast result.obj_id %}">{{ result.get_object }}</a><br />
-        <span class="listlink description">{{ result.get_object.description|default:""|striptags|truncatewords:"15" }}</span>
+        <a class="podcast" href="{% url podcast result.oldid %}">{{ result.display_title }}</a><br />
+        <span class="listlink description">{{ result.description|default:""|striptags|truncatewords:"15" }}</span>
        </td>
-      {% endif %}
-     {% endif %}
-
-     {% if result.obj_type == "podcast_group" %}
-      <td>{{ result.get_object.podcasts|first|podcast_logo }}</td>
+     {% else %}
+      <td>{{ result|podcast_logo }}</td>
       <td>
-       {{result.get_object.title|striptags}}
+       {{result.display_title|striptags}}
        (
-        {% for p in result.get_object.podcasts %}
-         <a href="{% url podcast p.id %}">{{ p.group_member_name|striptags }}</a>
+        {% for p in result.podcasts %}
+         <a href="{% url podcast p.oldid %}">{{ p.group_member_name|striptags }}</a>
         {% endfor %}
        )
      {% endif %}

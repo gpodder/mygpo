@@ -110,7 +110,6 @@ INSTALLED_APPS = (
     'mygpo.publisher',
     'mygpo.data',
     'mygpo.userfeeds',
-    'mygpo.search',
     'mygpo.directory',
     'mygpo.maintenance',
 )
