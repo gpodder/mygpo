@@ -32,6 +32,10 @@ class Category(Document):
         return cls.view('directory/categories', \
             descending=True, limit=count, include_docs=True)
 
+    @property
+    def weight(self):
+        return sum([x.weight for x in self.podcasts])
+
     def merge_podcasts(self, podcasts):
         for p, w in podcasts:
 
