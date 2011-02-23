@@ -6,4 +6,5 @@ DB=`$DIR/../mygpo/print-couchdb.py`
 curl -s -X GET ${DB}/_design/core/_view/podcasts_by_id?limit=0
 curl -s -X GET ${DB}/_design/directory/_view/toplist?limit=0
 curl -s -X GET ${DB}/_design/users/_view/users_by_oldid?limit=0
+curl -s -X GET ${DB}/_design/publisher/_view/podcasts_by_publisher?limit=0
 
