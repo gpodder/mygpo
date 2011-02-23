@@ -1,8 +1,8 @@
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
+from mygpo.core import models
 from mygpo.api.models import Podcast, Episode, PodcastGroup
-from mygpo.publisher.models import PodcastPublisher
 from mygpo.publisher.auth import require_publisher, is_publisher
 from mygpo.publisher.forms import SearchPodcastForm, EpisodeForm, PodcastForm
 from mygpo.publisher.utils import listener_data, episode_listener_data, check_publisher_permission, subscriber_data, device_stats, episode_heatmap
@@ -11,11 +11,14 @@ from mygpo.data.feeddownloader import update_podcasts
 from mygpo.decorators import requires_token, allowed_methods
 from mygpo.web.models import SecurityToken
 from django.contrib.auth.models import User
+from mygpo import migrate
 
 
 def home(request):
     if is_publisher(request.user):
-        podcasts = [x.podcast for x in PodcastPublisher.objects.filter(user=request.user)]
+        u = migrate.get_or_migrate_user(request.user)
+        podcast_ids = u.published_podcasts()
+        podcasts = map(models.Podcast.get, podcast_ids)
         form = SearchPodcastForm()
         return render_to_response('publisher/home.html', {
             'podcasts': podcasts,
@@ -116,9 +119,12 @@ def update_podcast(request, id):
 @requires_token(object='published_feeds', action='update')
 def update_published_podcasts(request, username):
     user = get_object_or_404(User, username=username)
+    user = migrate.get_or_migrate_user(user)
 
-    published_podcasts = [p.podcast for p in PodcastPublisher.objects.filter(user=user)]
-    update_podcasts(published_podcasts)
+    podcast_ids = user.published_podcasts()
+    published_podcasts = map(models.Podcast.get, podcast_ids)
+    old_podcasts = [p.get_old_obj() for p in published_podcasts]
+    update_podcasts(old_podcasts)
 
     return HttpResponse('Updated:\n' + '\n'.join([p.url for p in published_podcasts]), mimetype='text/plain')
 

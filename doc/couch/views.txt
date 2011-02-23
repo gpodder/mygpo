@@ -286,3 +286,11 @@ Episodes by Podcast-Id (core/episodes_by_podcast)
  * For an Episode, emit its Podcast-Id and null
 
 Can be used to list the episodes for a Podcast
+
+
+Podcasts Published by a User (publisher/podcasts_by_publisher)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * For a Podcast (in a PodcastGroup), emits User-Id and Podcast-Id
+   for each publisher
+
+Can be used to retrieve the podcasts that are published by a user.

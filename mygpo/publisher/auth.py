@@ -16,7 +16,7 @@
 #
 
 from django.http import HttpResponseRedirect
-from mygpo.publisher.models import PodcastPublisher
+from mygpo import migrate
 
 
 def require_publisher(protected_view):
@@ -46,7 +46,8 @@ def is_publisher(user):
     if user.is_staff:
         return True
 
-    if PodcastPublisher.objects.filter(user=user).count() > 0:
+    user = migrate.get_or_migrate_user(user)
+    if user.published_podcasts():
         return True
 
     return False

@@ -231,3 +231,17 @@ class User(Document):
                 return device
 
         return None
+
+
+    def published_podcasts(self):
+        """
+        Returns a list of the Ids (or full objects) of podcasts for which the
+        user has publisher permissions
+        """
+
+        r = Podcast.view('publisher/podcasts_by_publisher', key=self._id)
+        return [x['value'] for x in r]
+
+
+    def __repr__(self):
+        return 'User %s' % self._id

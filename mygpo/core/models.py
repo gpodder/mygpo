@@ -103,6 +103,8 @@ class Podcast(Document):
     language = StringProperty()
     content_types = StringListProperty()
     tags = DictProperty()
+    publisher = StringListProperty()
+
 
     @classmethod
     def get(cls, id):
@@ -115,6 +117,7 @@ class Podcast(Document):
         return r.first() if r else None
 
 
+    @classmethod
     def for_url(cls, url):
         r = cls.view('core/podcasts_by_url', key=url)
         return r.first() if r else None

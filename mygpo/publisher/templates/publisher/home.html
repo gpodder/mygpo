@@ -21,7 +21,7 @@
   {% for s in podcasts %}
    <tr>
     <td>{{ s|podcast_logo }}</td>
-    <td><a class="listlink" href="{% url podcast-publisher-detail s.id %}">{{ s|striptags }}</a></td>
+    <td><a class="listlink" href="{% url podcast-publisher-detail s.oldid %}">{{ s.display_title|striptags }}</a></td>
    </tr>
   {% endfor %}
   </table>

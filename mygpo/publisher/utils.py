@@ -25,8 +25,8 @@ from mygpo.utils import daterange
 from mygpo.core.models import Podcast
 from mygpo.api.models import Episode, EpisodeAction
 from mygpo.web.utils import flatten_intervals
-from mygpo.publisher.models import PodcastPublisher
 from mygpo.api.constants import DEVICE_TYPES
+from mygpo import migrate
 
 
 def listener_data(podcasts, start_date=date(2010, 1, 1), leap=timedelta(days=1)):
@@ -101,7 +101,9 @@ def check_publisher_permission(user, podcast):
     if user.is_staff:
         return True
 
-    if PodcastPublisher.objects.filter(user=user, podcast=podcast).count() > 0:
+    p = migrate.get_or_migrate_podcast(podcast)
+    u = migrate.get_or_migrate_user(user)
+    if p.get_id() in user.published_podcasts():
         return True
 
     return False
@@ -216,4 +218,3 @@ def colour_repr(val, max_val, colours):
     b_step = b2 - b1
 
     return (r1 + r_step * percent, g1 + g_step * percent, b1 + b_step * percent)
-
