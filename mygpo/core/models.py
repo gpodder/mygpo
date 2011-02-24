@@ -110,6 +110,13 @@ class Podcast(Document):
         r = cls.view('core/podcasts_by_id', key=id)
         return r.first() if r else None
 
+
+    @classmethod
+    def get_multi(cls, ids):
+        r = cls.view('core/podcasts_by_id', keys=ids)
+        return list(r)
+
+
     @classmethod
     def for_oldid(cls, oldid):
         r = cls.view('core/podcasts_by_oldid', key=long(oldid))

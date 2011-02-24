@@ -56,7 +56,7 @@ class Category(Document):
 
     def get_podcasts(self, start=0, end=20):
         podcast_ids = [e.podcast for e in self.podcasts[start:end]]
-        return map(Podcast.get, podcast_ids)
+        return Podcast.get_multi(podcast_ids)
 
 
     def save(self, *args, **kwargs):

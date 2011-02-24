@@ -30,21 +30,16 @@ class Suggestions(Document):
             return s
 
 
-    def get_podcasts(self):
+    def get_podcasts(self, count=None):
         from mygpo.api.models import Subscription
         subscriptions = [x.podcast for x in Subscription.objects.filter(user__id=self.user_oldid)]
         subscriptions = [Podcast.for_oldid(x.id) for x in subscriptions]
         subscriptions = [x._id for x in subscriptions if x]
 
-        for p in self.podcasts:
-            if not p in self.blacklist and not p in subscriptions:
-                try:
-                    podcast = Podcast.get(p)
-                except ResourceNotFound:
-                    continue
-
-                if podcast:
-                    yield podcast
+        ids = filter(lambda x: not x in self.blacklist + subscriptions, self.podcasts)
+        if count:
+            ids = ids[:count]
+        return Podcast.get_multi(ids)
 
 
     def __repr__(self):

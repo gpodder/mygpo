@@ -17,7 +17,7 @@ from mygpo import migrate
 def home(request):
     if is_publisher(request.user):
         u = migrate.get_or_migrate_user(request.user)
-        podcasts = map(models.Podcast.get, u.published_objects)
+        podcasts = Podcast.get_multi(user.published_objects)
         form = SearchPodcastForm()
         return render_to_response('publisher/home.html', {
             'podcasts': podcasts,
@@ -120,8 +120,8 @@ def update_published_podcasts(request, username):
     user = get_object_or_404(User, username=username)
     user = migrate.get_or_migrate_user(user)
 
-    published_podcasts = map(models.Podcast.get, user.published_objects)
-    old_podcasts = [p.get_old_obj() for p in published_podcasts]
+    published_podcasts = models.Podcast.get_multi(user.published_objects)
+    old_podcasts = map(Podcast.get_old_obj, published_podcasts)
     update_podcasts(old_podcasts)
 
     return HttpResponse('Updated:\n' + '\n'.join([p.url for p in published_podcasts]), mimetype='text/plain')

@@ -243,7 +243,7 @@ def suggestions(request, count, format):
         count = 100
 
     suggestion_obj = Suggestions.for_user_oldid(request.user.id)
-    suggestions = list(islice(suggestion_obj.get_podcasts(), count))
+    suggestions = suggestion_obj.get_podcasts(count)
     title = _('gpodder.net - %(count)d Suggestions') % {'count': len(suggestions)}
     domain = RequestSite(request).domain
     p_data = lambda p: podcast_data(p, domain)
