@@ -59,9 +59,7 @@ def episode_toplist(request, num=100):
 
 
 def gpodder_example_podcasts(request):
-    sponsored_podcast = utils.get_sponsored_podcast()
     return render_to_response('gpodder_examples.opml', {
-       'sponsored_podcast': sponsored_podcast
     }, context_instance=RequestContext(request))
 
 

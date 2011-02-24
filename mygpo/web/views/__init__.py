@@ -61,7 +61,6 @@ def welcome(request, toplist_entries=10):
     entries = backend.get_toplist(toplist_entries, lang)
 
     toplist = [p for (oldpos, p) in entries]
-    sponsored_podcast = utils.get_sponsored_podcast()
 
     return render_to_response('home.html', {
           'podcast_count': podcasts,
@@ -70,7 +69,6 @@ def welcome(request, toplist_entries=10):
           'url': current_site,
           'hours_listened': hours_listened,
           'toplist': toplist,
-          'sponsored_podcast': sponsored_podcast,
     }, context_instance=RequestContext(request))
 
 
@@ -88,7 +86,6 @@ def dashboard(request, episode_count=10):
     lang = utils.sanitize_language_codes(lang)
 
     random_podcasts = backend.get_random_picks(lang)[:5]
-    sponsored_podcast = utils.get_sponsored_podcast()
 
     return render_to_response('dashboard.html', {
             'site': site,
@@ -96,7 +93,6 @@ def dashboard(request, episode_count=10):
             'subscribed_podcasts': subscribed_podcasts,
             'newest_episodes': newest_episodes,
             'random_podcasts': random_podcasts,
-            'sponsored_podcast': sponsored_podcast,
         }, context_instance=RequestContext(request))
 
 
