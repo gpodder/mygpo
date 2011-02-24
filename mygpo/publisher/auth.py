@@ -47,7 +47,7 @@ def is_publisher(user):
         return True
 
     user = migrate.get_or_migrate_user(user)
-    if user.published_podcasts():
+    if user.published_objects:
         return True
 
     return False

@@ -103,7 +103,6 @@ class Podcast(Document):
     language = StringProperty()
     content_types = StringListProperty()
     tags = DictProperty()
-    publisher = StringListProperty()
 
 
     @classmethod

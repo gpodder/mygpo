@@ -44,7 +44,6 @@ COUCHDB_DATABASES = (
     ('mygpo.directory', 'http://127.0.0.1:5984/mygpo'),
     ('mygpo.core',      'http://127.0.0.1:5984/mygpo'),
     ('mygpo.users',     'http://127.0.0.1:5984/mygpo'),
-    ('mygpo.publisher', 'http://127.0.0.1:5984/mygpo'),
 )
 
 

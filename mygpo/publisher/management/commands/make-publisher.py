@@ -32,18 +32,12 @@ class Command(BaseCommand):
         user = migrate.get_or_migrate_user(user)
 
 
-        for podcast_url in args[1:]:
+        urls = args[1:]
+        podcasts = map(Podcast.for_url, urls)
+        ids = map(Podcast.get_id, podcasts)
+        self.add_publisher(user=user, ids=ids)
 
-            podcast = Podcast.for_url(podcast_url)
-            if podcast is None:
-                print >> sys.stderr, 'Podcast with URL %s does not exist. skipping.' % podcast_url
-                continue
-
-            self.add_publisher(podcast=podcast, user_id=user._id)
-            print >> sys.stderr, 'Made user %s publisher for Podcast %s' % (username, podcast.get_id())
-
-
-    @repeat_on_conflict(['podcast'], reload_f=lambda x: Podcast.get(x.get_id()))
-    def add_publisher(self, podcast, user_id):
-        podcast.publisher = list(set(podcast.publisher + [user_id]))
-        podcast.save()
+    @repeat_on_conflict(['user'])
+    def add_publisher(self, user, ids):
+        user.published_objects = list(set(user.published_objects + ids))
+        user.save()

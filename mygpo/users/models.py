@@ -217,6 +217,7 @@ class User(Document):
     oldid    = IntegerProperty()
     settings = DictProperty()
     devices  = SchemaListProperty(Device)
+    published_objects = StringListProperty()
 
 
     @classmethod
@@ -231,16 +232,6 @@ class User(Document):
                 return device
 
         return None
-
-
-    def published_podcasts(self):
-        """
-        Returns a list of the Ids (or full objects) of podcasts for which the
-        user has publisher permissions
-        """
-
-        r = Podcast.view('publisher/podcasts_by_publisher', key=self._id)
-        return [x['value'] for x in r]
 
 
     def __repr__(self):

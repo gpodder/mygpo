@@ -18,13 +18,12 @@ class Command(BaseCommand):
             podcast = migrate.get_or_migrate_podcast(pub.podcast)
             user = migrate.get_or_migrate_user(pub.user)
 
-            if not user._id in podcast.publisher:
-                self.add_publisher(podcast=podcast, user_id=user._id)
+            self.add_publisher(user=user, id=podcast.get_id())
 
             progress(n+1, total)
 
 
-    @repeat_on_conflict(['podcast'], reload_f=lambda x: Podcast.get(x.get_id()))
-    def add_publisher(self, podcast, user_id):
-        podcast.publisher.append(user_id)
-        podcast.save()
+    @repeat_on_conflict(['user'])
+    def add_publisher(self, user, id):
+        user.published_objects = list(set(user.published_objects + [id]))
+        user.save()
