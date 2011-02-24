@@ -99,11 +99,11 @@ def update_subscriptions(user, device, add, remove):
            raise IntegrityError('can not add and remove %s at the same time' % a)
 
     for u in add:
-        us = sanitize_append(u, updated_urls)
+        us = sanitize_append(u, 'podcast', updated_urls)
         if us != '': add_sanitized.append(us)
 
     for u in remove:
-        us = sanitize_append(u, updated_urls)
+        us = sanitize_append(u, 'podcast', updated_urls)
         if us != '' and us not in add_sanitized:
             rem_sanitized.append(us)
 
@@ -237,12 +237,12 @@ def update_episodes(user, actions):
     update_urls = []
 
     for e in actions:
-        us = sanitize_append(e['podcast'], update_urls)
+        us = sanitize_append(e['podcast'], 'podcast', update_urls)
         if us == '': continue
 
         podcast, p_created = Podcast.objects.get_or_create(url=us)
 
-        eus = sanitize_append(e['episode'], update_urls)
+        eus = sanitize_append(e['episode'], 'episode', update_urls)
         if eus == '': continue
 
         episode, e_created = Episode.objects.get_or_create(podcast=podcast, url=eus)
@@ -386,8 +386,8 @@ def favorites(request, username):
     return JsonResponse(ret)
 
 
-def sanitize_append(url, sanitized_list):
-    urls = sanitize_url(url)
+def sanitize_append(url, obj_type, sanitized_list):
+    urls = sanitize_url(url, obj_type)
     if url != urls:
         sanitized_list.append( (url, urls) )
     return urls

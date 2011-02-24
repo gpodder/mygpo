@@ -1,14 +1,17 @@
 from mygpo.core import models
-from mygpo.api.models import URLSanitizingRule, Podcast, SubscriptionAction, SubscriptionMeta, Subscription, Episode, EpisodeAction
+from mygpo.api.models import Podcast, SubscriptionAction, SubscriptionMeta, Subscription, Episode, EpisodeAction
 from mygpo.api.models.episodes import Chapter
 from mygpo.data.models import BackendSubscription, Listener
 from mygpo.log import log
 import urlparse
 import re
 
-def sanitize_url(url, podcast=True, episode=False, rules=URLSanitizingRule.objects.all().order_by('priority')):
+
+
+def sanitize_url(url, obj_type='podcast', rules=None):
+    rules = rules or models.SanitizingRule.for_obj_type(obj_type)
     url = basic_sanitizing(url)
-    url = apply_sanitizing_rules(url, rules, podcast, episode)
+    url = apply_sanitizing_rules(url, rules)
     return url
 
 
@@ -21,26 +24,30 @@ def basic_sanitizing(url):
     r2 = urlparse.SplitResult(r.scheme, netloc, r.path, r.query, r.fragment)
     return r2.geturl()
 
-def apply_sanitizing_rules(url, rules, podcast=True, episode=False):
+def apply_sanitizing_rules(url, rules):
     """
     applies all url sanitizing rules to the given url
     setting podcast=True uses only those rules which have use_podcast set to True. 
     When passing podcast=False this check is ommitted. The same is valid
     for episode.
     """
-    if podcast: rules = [r for r in rules if r.use_podcast==True]
-    if episode: rules = [r for r in rules if r.use_episode==True]
 
     for r in rules:
+        if isinstance(r, tuple):
+            precompiled, r = r
+        else:
+            precompiled = None
+
+
         orig = url
 
-        if r.search_precompiled:
-            url = r.search_precompiled.sub(r.replace, url)
+        if precompiled:
+            url = precompiled.sub(r.replace, url)
         else:
             url = re.sub(r.search, r.replace, url)
 
         if orig != url:
-            c = getattr(r, 'hits', 0)
+            c = getattr(r, 'hits', 0) if hasattr(r, 'hits') else 0
             r.hits = c+1
 
     return url
@@ -53,16 +60,22 @@ def maintenance(dry_run=False):
 
     This will later be used to replace podcasts!
     """
+
+    podcast_rules = models.SanitizingRule.for_obj_type('podcast')
+    episode_rules = models.SanitizingRule.for_obj_type('episode')
+
+
     print 'Stats'
-    print ' * %s podcasts' % Podcast.objects.count()
-    print ' * %s episodes' % Episode.objects.count()
-    print ' * %s rules' % URLSanitizingRule.objects.count()
+    print ' * %d podcasts - %d rules' % (Podcast.objects.count(), len(podcast_rules))
+    print ' * %d episodes - %d rules' % (Episode.objects.count(), len(episode_rules))
     if dry_run:
         print ' * dry run - nothing will be written to the database'
     print
 
     print 'precompiling regular expressions'
-    rules = precompile_rules()
+
+    podcast_rules = precompile_rules(podcast_rules)
+    episode_rules = precompile_rules(episode_rules)
 
     p_unchanged = 0
     p_merged = 0
@@ -85,10 +98,12 @@ def maintenance(dry_run=False):
         count += 1
         if (count % 1000) == 0: print '% 3.2f%% (podcast id %s)' % (((count + 0.0)/total*100), p.id)
         try:
-            su = sanitize_url(p.url, rules=rules)
+            su = sanitize_url(p.url, rules=podcast_rules)
         except Exception, e:
+            raise
             log('failed to sanitize url for podcast %s: %s' % (p.id, e))
             print 'failed to sanitize url for podcast %s: %s' % (p.id, e)
+            return
             p_error += 1
             continue
 
@@ -152,8 +167,8 @@ def maintenance(dry_run=False):
     print ' * %s deleted' % p_deleted
     print ' * %s error' % p_error
     print 'Hits'
-    for r in rules:
-        print ' * %s => %s: %s' % (r.search, r.replace, getattr(r, 'hits', 0))
+    for _, r in podcast_rules:
+        print '% 30s: %d' % (r.slug, getattr(r, 'hits', 0) if hasattr(r, 'hits') else 0)
 
     count = 0
     total = Episode.objects.count()
@@ -162,7 +177,7 @@ def maintenance(dry_run=False):
         count += 1
         if (count % 10000) == 0: print '% 3.2f%% (episode id %s)' % (((count + 0.0)/total*100), e.id)
         try:
-            su = sanitize_url(e.url, rules=rules, podcast=False, episode=True)
+            su = sanitize_url(e.url, rules=episode_rules)
         except Exception, ex:
             log('failed to sanitize url for episode %s: %s' % (e.id, ex))
             print 'failed to sanitize url for episode %s: %s' % (e.id, ex)
@@ -239,8 +254,8 @@ def maintenance(dry_run=False):
     print ' * %s error' % p_error
     print
     print 'Hits'
-    for r in rules:
-        print ' * %s => %s: %s' % (r.search, r.replace, getattr(r, 'hits', 0))
+    for _, r in episode_rules:
+        print '% 30s: %d' % (r.slug, getattr(r, 'hits', 0) if hasattr(r, 'hits') else 0)
 
 
 
@@ -389,13 +404,5 @@ def rewrite_chapters(e_old, e_new):
             c.delete()
 
 
-def precompile_rules(rules=URLSanitizingRule.objects.all().order_by('priority')):
-    rules_p = []
-    for rule in rules:
-        r = re.compile(rule.search, re.UNICODE)
-        rule.search_precompile = r
-        rules_p.append( rule )
-
-    return rules_p
-
-
+def precompile_rules(rules):
+    return [( re.compile(rule.search, re.UNICODE), rule) for rule in rules]

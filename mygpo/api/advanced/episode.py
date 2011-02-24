@@ -72,7 +72,7 @@ def chapters(request, username):
             update_urls.append((podcast_url, s_podcast_url))
 
         # episode sanitizing
-        s_episode_url = sanitize_url(episode_url, podcast=False, episode=True)
+        s_episode_url = sanitize_url(episode_url, 'episode')
         if s_episode_url != episode_url:
             req['episode'] = s_episode_url
             update_urls.append((episode_url, s_episode_url))
@@ -105,7 +105,7 @@ def chapters(request, username):
             return HttpResponseBadRequest('since-value is not a valid timestamp')
 
         podcast = Podcast.objects.get(url=sanitize_url(podcast_url))
-        episode = Episode.objects.get(url=sanitize_url(episode_url, podcast=False, episode=True), podcast=podcast)
+        episode = Episode.objects.get(url=sanitize_url(episode_url, 'episode'), podcast=podcast)
         chapter_q = Chapter.objects.filter(user=request.user, episode=episode).order_by('start')
 
         if since:

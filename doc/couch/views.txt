@@ -294,3 +294,20 @@ Podcasts Published by a User (publisher/podcasts_by_publisher)
    for each publisher
 
 Can be used to retrieve the podcasts that are published by a user.
+
+
+Sanitizing Rules by Target (core/sanitizing_rules_by_target)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * For a SanitizingRule, emits Target (Object-Type), Priority and null
+
+Can be used to retrieve the sanitizing rules for a specific target (either
+'podcast' or 'episode') in order of their priority. This does not
+check, if any of the returned rules apply.
+
+
+Sanitizing Rules by Slug (core/sanitizing_rules_by_slug)
+~~~~~~~~~~~~~~~~~~~~~~~~
+ * For a SanitizingRule, emits its Slug and null
+
+Can be used to retrieve a sanitizing rule by its slug, for example for updating
+or deleting it.

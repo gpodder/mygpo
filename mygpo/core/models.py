@@ -296,3 +296,30 @@ class PodcastGroup(Document):
             return '%s %s (%s)' % (self.__class__.__name__, self._id[:10], self.oldid)
         else:
             return '%s %s' % (self.__class__.__name__, self._id[:10])
+
+
+class SanitizingRule(Document):
+    slug        = StringProperty()
+    applies_to  = StringListProperty()
+    search      = StringProperty()
+    replace     = StringProperty()
+    priority    = IntegerProperty()
+    description = StringProperty()
+
+
+    @classmethod
+    def for_obj_type(cls, obj_type):
+        r = cls.view('core/sanitizing_rules_by_target', include_docs=True,
+            startkey=[obj_type, None], endkey=[obj_type, {}])
+        return list(r)
+
+
+    @classmethod
+    def for_slug(cls, slug):
+        r = cls.view('core/sanitizing_rules_by_slug', include_docs=True,
+            key=slug)
+        return r.one() if r else None
+
+
+    def __repr__(self):
+        return 'SanitizingRule %s' % self._id

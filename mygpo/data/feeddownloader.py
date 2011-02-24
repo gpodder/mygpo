@@ -228,7 +228,7 @@ def update_podcasts(fetch_queue):
                         print 'Ignoring entry'
                         continue
 
-                    url = sanitize_url(url, podcast=False, episode=True)
+                    url = sanitize_url(url, 'episode')
                     md = get_episode_metadata(entry, url, mimetype)
                     e, created = models.Episode.objects.get_or_create(
                         podcast=podcast,

@@ -309,7 +309,7 @@ Example Document
 }
 
 
-  URLSanitizingRule
+  SanitizingRule
 =====================
 
 Contains a URL Sanitizing Rule.
@@ -319,6 +319,7 @@ Replaces Models:
 
 Example Document
 {
+    slug:         "feedburner-feeds2",
     applies_to:   ["podcast", "episode"],
     search:       "http://feeds2\.feedburner\.com",
     replace_by:   "http://feeds.feedburner.com",

@@ -601,22 +601,6 @@ class SubscriptionAction(models.Model):
         unique_together = ('device', 'podcast', 'timestamp')
 
 
-class URLSanitizingRule(models.Model):
-    use_podcast = models.BooleanField()
-    use_episode = models.BooleanField()
-    search = models.CharField(max_length=100)
-    search_precompiled = None
-    replace = models.CharField(max_length=100, null=False, blank=True)
-    priority = models.PositiveIntegerField()
-    description = models.TextField(null=False, blank=True)
-
-    class Meta:
-        db_table = 'sanitizing_rules'
-
-    def __unicode__(self):
-        return '%s -> %s' % (self.search, self.replace)
-
-
 from django.db.models.signals import post_save, pre_delete
 from mygpo import migrate
 post_save.connect(migrate.save_podcast_signal, sender=Podcast)
