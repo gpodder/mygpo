@@ -6,7 +6,7 @@ from mygpo import settings
 from mygpo.core.models import Podcast
 from mygpo.directory.models import Category
 from mygpo.directory.tags import all_tags, podcasts_for_tag
-from mygpo.utils import progress
+from mygpo import utils
 
 
 class Command(BaseCommand):
@@ -22,16 +22,16 @@ class Command(BaseCommand):
             if not isinstance(tag, basestring):
                 tag = str(tag)
 
-            label = tag.strip()
+            label = utils.remove_control_chars(tag.strip())
             if not label:
                 continue
 
-            podcasts_weights = podcasts_for_tag(tag)
+            podcasts_weights = list(podcasts_for_tag(tag))
             podcast_ids = [p for (p, v) in podcasts_weights]
             podcast_objs = Podcast.get_multi(podcast_ids)
             podcasts = []
             for (p_id, v), podcast in zip(podcasts_weights, podcast_objs):
-                podcasts.append( (p, v * podcast.subscriber_count()) )
+                podcasts.append( (p_id, v * podcast.subscriber_count()) )
 
             category = Category.for_tag(label)
 
@@ -48,6 +48,10 @@ class Command(BaseCommand):
                 category.delete()
                 continue
 
+            # we overwrite previous data
+            if category.updated != start_time:
+                category.podcasts = []
+
             category.merge_podcasts(podcasts)
 
             category.updated = start_time
@@ -57,4 +61,7 @@ class Command(BaseCommand):
 
             category.save()
 
-            progress(n % 1000, 1000, category._id)
+            try:
+                utils.progress(n % 1000, 1000, category.label.encode('utf-8'))
+            except:
+                pass

@@ -239,3 +239,13 @@ def multi_request_view(cls, view, *args, **kwargs):
             yield obj
 
         cur += LIMIT
+
+
+def remove_control_chars(s):
+    import unicodedata, re
+
+    all_chars = (unichr(i) for i in xrange(0x110000))
+    control_chars = ''.join(map(unichr, range(0,32) + range(127,160)))
+    control_char_re = re.compile('[%s]' % re.escape(control_chars))
+
+    return control_char_re.sub('', s)
