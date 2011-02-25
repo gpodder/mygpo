@@ -121,7 +121,7 @@ def update_published_podcasts(request, username):
     user = migrate.get_or_migrate_user(user)
 
     published_podcasts = models.Podcast.get_multi(user.published_objects)
-    old_podcasts = map(Podcast.get_old_obj, published_podcasts)
+    old_podcasts = map(models.Podcast.get_old_obj, published_podcasts)
     update_podcasts(old_podcasts)
 
     return HttpResponse('Updated:\n' + '\n'.join([p.url for p in published_podcasts]), mimetype='text/plain')
