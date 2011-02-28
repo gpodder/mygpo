@@ -10,7 +10,7 @@ from django.core.management.base import BaseCommand
 
 from mygpo import migrate
 from mygpo.core.models import Podcast
-from mygpo.users.models import PodcastUserState, Suggestions
+from mygpo.users.models import PodcastUserState, EpisodeUserState, Suggestions
 from mygpo.directory.models import Category
 
 
@@ -68,6 +68,12 @@ class Command(BaseCommand):
                 # Episodes
                 for episode in podcast.get_episodes():
                     docs.add(episode._id)
+
+                    # Episode States
+                    e_state = EpisodeUserState.for_user_episode(old_u.id, episode._id)
+                    if e_state:
+                        docs.add(e_state._id)
+
 
         db = Podcast.get_db()
         self.dump(docs, db)
