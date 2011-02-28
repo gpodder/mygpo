@@ -87,6 +87,14 @@ class EpisodeUserState(Document):
     episode       = StringProperty(required=True)
     actions       = SchemaListProperty(EpisodeAction)
     settings      = DictProperty()
+    user_oldid    = IntegerProperty()
+
+
+    @classmethod
+    def for_user_episode(cls, user_oldid, episode_id):
+        r = cls.view('users/episode_states_by_user_episode',
+            key=[user_oldid, episode_id], include_docs=True)
+        return r.first() if r else None
 
 
     def add_actions(self, actions):
@@ -162,15 +170,6 @@ class PodcastUserState(Document):
             include_docs=True)
         return list(r)
 
-
-    def get_episode(self, e_id):
-        if e_id in self.episodes:
-            return self.episodes[e_id]
-
-        e = EpisodeUserState()
-        e.episode = e_id
-        self.episodes[e_id] = e
-        return e
 
     def add_actions(self, actions):
         self.actions += actions

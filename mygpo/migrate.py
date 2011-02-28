@@ -2,7 +2,7 @@ from datetime import datetime
 from couchdbkit import Server, Document
 
 from mygpo.core.models import Podcast, PodcastGroup, Episode, SubscriberData
-from mygpo.users.models import Rating, EpisodeAction, User, Device, SubscriptionAction
+from mygpo.users.models import Rating, EpisodeAction, User, Device, SubscriptionAction, EpisodeUserState, PodcastUserState
 from mygpo.log import log
 from mygpo import utils
 from mygpo.decorators import repeat_on_conflict
@@ -305,3 +305,29 @@ def migrate_subscription_action(old_action):
     action.action = 'subscribe' if old_action.action == 1 else 'unsubscribe'
     action.device = get_or_migrate_device(old_action.device).id
     return action
+
+
+def get_episode_user_state(user, episode_id, podcast):
+    e_state = EpisodeUserState.for_user_episode(user.id, episode_id)
+    if e_state:
+        return e_state
+
+    p_state = PodcastUserState.for_user_podcast(user, podcast)
+    e_state = p_state.episodes.get(episode_id, None)
+
+    if e_state is None:
+        e_state = EpisodeUserState()
+        e_state.episode = episode_id
+    else:
+        @repeat_on_conflict(['p_state'])
+        def remove_episode_status(p_state):
+            del p_state.episodes[episode_id]
+            p_state.save()
+
+        remove_episode_status(p_state=p_state)
+
+    e_state.podcast = podcast.get_id()
+    e_state.user_oldid = user.id
+    e_state.save()
+
+    return e_state

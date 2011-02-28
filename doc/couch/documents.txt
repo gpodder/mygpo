@@ -210,10 +210,6 @@ Example Document
              device:    "872348923987492834"
             }
         ],
-    episodes:
-        [
-            { EpisodeUserState ... }
-        ],
     tags: ["technews"]
     settings: { ... }
 }
@@ -252,8 +248,7 @@ Example Document
   EpisodeUserState
 ====================
 
-An EpisodeUserState can not exist alone, but must always be part of a
-PodcastUserState. It contains everything that a User has done with an Episode.
+A EpisodeUserState contains everything that a User has done with an Episode.
 
 Replaces Models
  * EpisodeAction
@@ -265,6 +260,7 @@ Replaces Models
 Example Document
 {
     episode: "3893745983453948589345",
+    podcast: "118913287192379173298",
     actions:
         [
             {

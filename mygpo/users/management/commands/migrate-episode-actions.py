@@ -24,48 +24,38 @@ class Command(BaseCommand):
         max_id = options.get('max_id', oldmodels.EpisodeAction.objects.order_by('-id')[0].id)
 
         actions = oldmodels.EpisodeAction.objects.filter(id__gte=min_id, id__lte=max_id)
-        combinations = list(set(actions.values_list('user', 'episode__podcast')))
+        combinations = list(set(actions.values_list('user', 'episode')))
 
         docs = []
 
         total = len(combinations)
-        for n, (user_id, podcast_id) in enumerate(combinations):
+        for n, (user_id, episode_id) in enumerate(combinations):
             user = self.check_new(user, User, user_id)
-            podcast = self.check_new(podcast, oldmodels.Podcast, podcast_id)
+            episode = self.check_new(podcast, oldmodels.Episode, episode_id)
 
-            docs.append(self.migrate_for_user_podcast(user, podcast, actions))
+            while True:
+                try:
+                    self.migrate_for_user_episode(user, episode, actions)
+                    break
+                except:
+                    pass
 
             progress(n+1, total)
 
-        docs = filter(lambda x: x != None, docs)
-        PodcastUserState.save_docs(docs)
-        progress(n+1, total, 'saving %d documents' % len(docs))
-
-
-    def migrate_for_user_podcast(self, user, podcast, actions):
-        np = migrate.get_or_migrate_podcast(podcast)
-        p_state = PodcastUserState.for_user_podcast(user, np)
-        episodes = list(set(actions.filter(user=user, episode__podcast=podcast).values_list('episode', flat=True)))
-
-        orig_len = len(p_state.episodes)
-
-        for episode_id in episodes:
-            episode = oldmodels.Episode.objects.get(id=episode_id)
-
-            ne_id = migrate.get_or_migrate_episode(episode).id
-            e_state = p_state.get_episode(ne_id)
-            e_state.episode_oldid = episode.id
-            e_state.add_actions(self.migrate_for_user_episode(user, episode, actions))
-
-            if e_state.actions:
-                p_state.episodes[ne_id] = e_state
-
-        if p_state.episodes and len(p_state.episodes) > orig_len:
-            return p_state
-        return None
-
 
     def migrate_for_user_episode(self, user, episode, actions):
+        ne = migrate.get_or_migrate_episode(episode)
+        np = migrate.get_or_migrate_podcast(episode.podcast)
+        e_state = migrate.get_episode_user_state(user, ne._id, np)
+
+        orig_len = len(e_state.actions)
+        e_state.add_actions(self.get_actions(user, episode, actions))
+
+        if len(e_state.actions) and len(e_state.actions) > orig_len:
+            e_state.save()
+
+
+    def get_actions(self, user, episode, actions):
         actions = actions.filter(user=user, episode=episode).distinct()
         return map(migrate.create_episode_action, actions)
 
