@@ -244,13 +244,16 @@ def update_episode(olde, newe, podcast):
 
     PROPERTIES = ('title', 'description', 'link',
         'author', 'duration', 'filesize', 'language',
-        'last_update', 'outdated')
+        'last_update')
 
     for p in PROPERTIES:
         if getattr(newe, p, None) != getattr(olde, p, None):
             setattr(newe, p, getattr(olde, p, None))
             updated = True
 
+    if newe.outdated != olde.outdated:
+        newe.outdated = bool(olde.outdated)
+        updated = True
 
     if newe.released != olde.timestamp:
         newe.released = olde.timestamp
