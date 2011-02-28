@@ -103,7 +103,7 @@ def check_publisher_permission(user, podcast):
 
     p = migrate.get_or_migrate_podcast(podcast)
     u = migrate.get_or_migrate_user(user)
-    if p.get_id() in user.published_objects:
+    if p.get_id() in u.published_objects:
         return True
 
     return False

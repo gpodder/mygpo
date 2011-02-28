@@ -17,7 +17,7 @@ from mygpo import migrate
 def home(request):
     if is_publisher(request.user):
         u = migrate.get_or_migrate_user(request.user)
-        podcasts = Podcast.get_multi(user.published_objects)
+        podcasts = models.Podcast.get_multi(u.published_objects)
         form = SearchPodcastForm()
         return render_to_response('publisher/home.html', {
             'podcasts': podcasts,
