@@ -114,7 +114,7 @@ def get_feed_tags(feed):
         if tag['label']:
             tags.append(tag['label'])
 
-    return set(tags)
+    return list(set(tags))
 
 
 @repeat_on_conflict()

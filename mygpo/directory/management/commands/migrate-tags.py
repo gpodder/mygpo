@@ -48,12 +48,12 @@ class Command(BaseCommand):
     def migrate_podcast_tag(self, podcast, tag):
         if not tag.source in podcast.tags:
             podcast.tags[tag.source] = []
-        podcast.tags[tag.source].append(tag.tag)
+        podcast.tags[tag.source] = list(set(podcast.tags[tag.source] + [tag.tag]))
         podcast.save()
 
 
     @repeat_on_conflict(['podcast_state'])
     def migrate_user_tag(self, podcast_state, tag):
-        podcast_state.tags.append(tag.tag)
+        podcast_state.tags = list(set(podcast_state.tags + [tag.tag]))
         podcast_state.save()
 
