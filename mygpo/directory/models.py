@@ -46,16 +46,16 @@ class Category(Document):
         new_entries = []
 
         for e1, e2 in iterate_together(self.podcasts, podcasts, compare=cmp_entry_podcasts):
-            if e1 == None:
+            if e1 is None:
                 new_entries.append(e2)
 
-            elif e2 == None:
+            elif e2 is None:
                 pass
 
             else:
                 e1.weight = max(e1.weight, e2.weight)
 
-        self.podcasts.extend(new_entries)
+        self.podcasts = self.podcasts + new_entries
 
 
     def get_podcasts(self, start=0, end=20):

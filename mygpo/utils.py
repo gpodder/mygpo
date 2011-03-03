@@ -150,11 +150,11 @@ def iterate_together(l1, l2, compare=lambda x, y: cmp(x, y)):
     i2, more2 = _take(l2)
 
     while more1 or more2:
-        if not more2 or (i1 != None and compare(i1, i2) < 0):
+        if not more2 or (i1 is not None and compare(i1, i2) < 0):
             yield(i1, None)
             i1, more1 = _take(l1)
 
-        elif not more1 or (i2 != None and compare(i1, i2) > 0):
+        elif not more1 or (i2 is not None and compare(i1, i2) > 0):
             yield(None, i2)
             i2, more2 = _take(l2)
 
