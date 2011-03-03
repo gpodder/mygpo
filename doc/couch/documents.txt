@@ -183,7 +183,10 @@ Example Document
   PodcastUserState
 ====================
 
-Contains everything that a User has done with a Podcast.
+Contains everything that a User has done with a Podcast. The podcast is
+referenced by the "ref_url" which is the URL that was received via the API. It
+can be used in API responses so that the user receives exactly the same URL he
+has sent (the Podcast document could contain several URLs).
 
 Replaces Models:
  * SubscriptionAction
@@ -197,6 +200,7 @@ Example Document
     user: "345983045035480345809",
     user_oldid: 4253,
     podcast: "118913287192379173298",
+    ref_url: "http://example.com/podcast.xml",
     actions:
         [
             {
@@ -249,6 +253,11 @@ Example Document
 ====================
 
 A EpisodeUserState contains everything that a User has done with an Episode.
+The episode is referenced by the "ref_url" and "podcast_ref_url" which contain
+the URLs for the episode and the podcast, exactly as they have been received
+via the API. These values can also be used in API responses to refer to exactly
+the same URL as in the request (both Episode and Podcast documents can contain
+several URLs).
 
 Replaces Models
  * EpisodeAction
@@ -261,6 +270,8 @@ Example Document
 {
     episode: "3893745983453948589345",
     podcast: "118913287192379173298",
+    ref_url: "http://podcast.com/episode-1.mp3",
+    podcast_ref_url: "http://podcast.com/mp3.xml",
     actions:
         [
             {

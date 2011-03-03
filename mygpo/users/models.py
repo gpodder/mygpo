@@ -88,6 +88,8 @@ class EpisodeUserState(Document):
     actions       = SchemaListProperty(EpisodeAction)
     settings      = DictProperty()
     user_oldid    = IntegerProperty()
+    ref_url       = StringProperty(required=True)
+    podcast_ref_url = StringProperty(required=True)
 
 
     @classmethod
@@ -95,6 +97,13 @@ class EpisodeUserState(Document):
         r = cls.view('users/episode_states_by_user_episode',
             key=[user_oldid, episode_id], include_docs=True)
         return r.first() if r else None
+
+
+    @classmethod
+    def count(cls):
+        r = cls.view('users/episode_states_by_user_episode',
+            limit=0)
+        return r.total_rows
 
 
     def add_actions(self, actions):
@@ -148,6 +157,7 @@ class PodcastUserState(Document):
     settings      = DictProperty()
     actions       = SchemaListProperty(SubscriptionAction)
     tags          = StringListProperty()
+    ref_url       = StringProperty(required=True)
 
 
     @classmethod
@@ -169,6 +179,13 @@ class PodcastUserState(Document):
             startkey=[user.id, None], endkey=[user.id, 'ZZZZ'],
             include_docs=True)
         return list(r)
+
+
+    @classmethod
+    def count(cls):
+        r = PodcastUserState.view('users/podcast_states_by_user',
+            limit=0)
+        return r.total_rows
 
 
     def add_actions(self, actions):

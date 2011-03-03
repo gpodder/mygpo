@@ -39,6 +39,7 @@ class Command(BaseCommand):
     def migrate_for_user_podcast(self, user, old_podcast):
         podcast = migrate.get_or_migrate_podcast(old_podcast)
         podcast_state = podcast.get_user_state(user)
+        podcast_state.ref_url = old_podcast.url
 
         actions = models.SubscriptionAction.objects.filter(device__user=user, podcast=old_podcast).order_by('timestamp')
         for action in actions:

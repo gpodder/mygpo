@@ -46,7 +46,10 @@ class Command(BaseCommand):
     def migrate_for_user_episode(self, user, episode, actions):
         ne = migrate.get_or_migrate_episode(episode)
         np = migrate.get_or_migrate_podcast(episode.podcast)
+
         e_state = migrate.get_episode_user_state(user, ne._id, np)
+        e_state.ref_url = episode.url
+        e_state.podcast_ref_url = episode.podcast.url
 
         orig_len = len(e_state.actions)
         e_state.add_actions(self.get_actions(user, episode, actions))
