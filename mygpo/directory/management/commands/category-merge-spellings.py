@@ -49,7 +49,7 @@ Usage:
             else:
                 print " add spelling %s" % spelling
                 category.spellings = list(set(category.spellings + [new_cat.label] + new_cat.spellings))
-                category.weight += new_cat.weight
+                category.merge_podcasts(new_cat.podcasts)
                 new_cat.delete()
 
             category.updated = start_time

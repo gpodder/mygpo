@@ -140,7 +140,7 @@ def iterate_together(l1, l2, compare=lambda x, y: cmp(x, y)):
     def _take(it):
         try:
             i = it.next()
-            while i == None:
+            while i is None:
                 i = it.next()
             return i, True
         except StopIteration:

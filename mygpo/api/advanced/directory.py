@@ -107,6 +107,6 @@ def episode_data(episode, domain):
 def category_data(category):
     return dict(
         tag   = category.label,
-        usage = category.weight
+        usage = category.get_weight()
     )
 

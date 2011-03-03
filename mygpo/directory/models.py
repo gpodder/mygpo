@@ -32,26 +32,30 @@ class Category(Document):
         return cls.view('directory/categories', \
             descending=True, limit=count, include_docs=True)
 
-    @property
-    def weight(self):
-        return sum([x.weight for x in self.podcasts])
 
     def merge_podcasts(self, podcasts):
-        for p, w in podcasts:
+        """
+        Merges some entries into the current category.
+        """
 
-            updated = False
+        cmp_entry_podcasts = lambda e1, e2: cmp(e1.podcast, e2.podcast)
 
-            for e in self.podcasts:
-                if p == e.podcast:
-                    e.weight += w
-                    updated = True
-                    break
+        podcasts = sorted(podcasts, cmp=cmp_entry_podcasts)
+        self.podcasts = sorted(self.podcasts, cmp=cmp_entry_podcasts)
 
-            if not updated:
-                entry = CategoryEntry()
-                entry.podcast = p
-                entry.weight = float(w)
-                self.podcasts.append(entry)
+        new_entries = []
+
+        for e1, e2 in iterate_together(self.podcasts, podcasts, compare=cmp_entry_podcasts):
+            if e1 == None:
+                new_entries.append(e2)
+
+            elif e2 == None:
+                pass
+
+            else:
+                e1.weight = max(e1.weight, e2.weight)
+
+        self.podcasts.extend(new_entries)
 
 
     def get_podcasts(self, start=0, end=20):

@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 
 from mygpo import settings
 from mygpo.core.models import Podcast
-from mygpo.directory.models import Category
+from mygpo.directory.models import Category, CategoryEntry
 from mygpo.directory.tags import all_tags, podcasts_for_tag
 from mygpo import utils
 
@@ -31,7 +31,10 @@ class Command(BaseCommand):
             podcast_objs = Podcast.get_multi(podcast_ids)
             podcasts = []
             for (p_id, v), podcast in zip(podcasts_weights, podcast_objs):
-                podcasts.append( (p_id, v * podcast.subscriber_count()) )
+                e = CategoryEntry()
+                e.podcast = p_id
+                e.weight = float(v * podcast.subscriber_count())
+                podcasts.append(e)
 
             category = Category.for_tag(label)
 
