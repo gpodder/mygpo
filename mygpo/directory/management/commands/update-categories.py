@@ -26,14 +26,13 @@ class Command(BaseCommand):
             if not label:
                 continue
 
-            podcasts_weights = list(podcasts_for_tag(tag))
-            podcast_ids = [p for (p, v) in podcasts_weights]
+            podcast_ids, weights = utils.unzip(list(podcasts_for_tag(tag)))
             podcast_objs = Podcast.get_multi(podcast_ids)
             podcasts = []
-            for (p_id, v), podcast in zip(podcasts_weights, podcast_objs):
+            for podcast, weight in zip(podcast_objs, weights):
                 e = CategoryEntry()
-                e.podcast = p_id
-                e.weight = float(v * podcast.subscriber_count())
+                e.podcast = podcast.get_id()
+                e.weight = float(weight * podcast.subscriber_count())
                 podcasts.append(e)
 
             category = Category.for_tag(label)

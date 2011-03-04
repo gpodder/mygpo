@@ -249,3 +249,7 @@ def remove_control_chars(s):
     control_char_re = re.compile('[%s]' % re.escape(control_chars))
 
     return control_char_re.sub('', s)
+
+
+def unzip(a):
+    return tuple(map(list,zip(*a)))
