@@ -44,48 +44,40 @@ Podcast-Group by Old-Id (core/podcastgroups_by_oldid)
 Used to access Podcast-Groups by the Ids used in the RDBMS-based backend.
 
 
-Podcasts by Number of Subscribers (directory/toplist)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * For a Podcast, emits the latest number of subscribers
- * For a PodcastGroup, emits the accumulated number of its Podcasts and
-   the first Podcast
+Podcasts by Number of Subscribers and other Criteria (directory/toplist)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * For a Podcast, emits the key described below and null
+ * For a PodcastGroup, emits the key described below and null
 
-Represents the Podcast Toplist when accessed reverse.
+From a client perspective, the toplist can be queried with some (optional)
+content-type and language parameters. These are prepresented in the view as
 
-
-Podcasts by Language and Number of Subscribers (directory/toplist_by_language)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * For a Podcast, emits [language, num-subscribers] if the podcast has
-   a language, and the Podcast itself
- * For a PodcastGroup, emits [language, num-subscribers] for all languages that
-   occur in the group.
-
-Can be used to query the Toplist filtered by language. If the query includes
-multiple languages, the view has to be queried multiple times.
-
-
-Podcasts by Contenttype and Number of Subscribers (directory/toplist_by_contenttype)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * For a Podcast, emits [content-type, num-subscribers] for each content-type
-   and the Podcast itself
- * For a PodcastGroup, emits [content-type, num-subscribers] for each
-   content-type that occurs in the group, and the first Podcast
-
-Can be used to query the Toplist filtered by content-type. If the query
-includes multiple content tyes, the view has to be queried multiple times.
+ ["Podcast", "types-languages", "audio", "english", 1000]
+     |              |              |        |        |
+     |              |              |        |        \- Number of Subscribers
+     |              |              |        |
+     |              |              |        \- Language Parameter (optional)
+     |              |              |
+     |              |              \- Content-Type Parameter (optional)
+     |              |
+     |              \- Indicates which parameters follow; possible values are
+     |                 "none", "types", "languages" and "types-languages"
+     |
+     \- Indicates that this is an entry of the Podcast-and not the
+        Episode-Toplist; the actual entry could still be a PodcastGroup
 
 
-Podasts by Content Type, Language and Number of Subscribers (directory/toplist_by_contenttype_language)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * For a Podcast, emits [content-type, language, num-subscribers] for each
-   combination of content-type and language and the Podcast
- * For a PodcastGroup, emits [content-type, language, num-subscribers] for each
-   combination of content-type (of the values of all contained Podcasts) and
-   the first Podcast as value
+Each podcast (with more than 0 subscribers) will have at least one entry in the
+view. Addtionally, it will have one entry per language, one entry per
+content-type and one entry for each (language, content-type pair).
 
-Can be used to query the toplist by content-type and language. If the query
-includes multiple content types and/or multiple languages, the view has be to
-queried multiple times.
+The same applies to PodcastGroups, except that the number of subscribers is
+accumulated over all its contained podcasts. Podcasts that are part of a
+PodcastGroup don't have their own entries in the view.
+
+A client that wants to get the toplist of english audio and video podcasts
+would need two queries ("types-languages", "audio", "en") and
+("types-languages", "video", "en").
 
 
 Podcasts by Tag

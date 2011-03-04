@@ -56,27 +56,36 @@ def get_toplist(count, languages=None, types=None):
         types = None
 
     results = []
+    TYPE = 'Podcast'
 
     if not languages and not types:
-        query = models.Podcast.view('directory/toplist', descending=True,
-            limit=count, classes=[models.Podcast, models.PodcastGroup],
+        query = models.Podcast.view('directory/toplist',
+            descending=True,
+            endkey=[TYPE, 'none', 0],
+            startkey=[TYPE, 'none', 'a'],
+            limit=count,
+            classes=[models.Podcast, models.PodcastGroup],
             include_docs=True)
         results.extend(list(query))
 
     elif languages and not types:
         for lang in languages:
-            query = models.Podcast.view('directory/toplist_by_language',
-                descending=True, limit=count, endkey=[lang],
-                startkey=[lang+u'\u9999'],
+            query = models.Podcast.view('directory/toplist',
+                descending=True,
+                endkey=[TYPE, 'language', lang, 0],
+                startkey=[TYPE, 'language', lang, 'a'],
+                limit=count,
                 classes=[models.Podcast, models.PodcastGroup],
                 include_docs=True)
             results.extend(list(query))
 
     elif types and not languages:
         for type in types:
-            query = models.Podcast.view('directory/toplist_by_contenttype',
-                descending=True, limit=count, endkey=[type],
-                startkey=[type+u'\u9999'],
+            query = models.Podcast.view('directory/toplist',
+                descending=True,
+                endkey=[TYPE, 'type', type, 0],
+                startkey=[TYPE, 'type', type, 'a'],
+                limit=count,
                 classes=[models.Podcast, models.PodcastGroup],
                 include_docs=True)
             results.extend(list(query))
@@ -84,9 +93,11 @@ def get_toplist(count, languages=None, types=None):
     else: #types and languages
         for type in types:
             for lang in languages:
-                query = models.Podcast.view('directory/toplist_by_contenttype_language', \
-                    descending=True, limit=count, \
-                    endkey=[type, lang], startkey=[type, lang+u'\9999'],
+                query = models.Podcast.view('directory/toplist',
+                    descending=True,
+                    endkey=[TYPE, 'type-language', type, lang, 0],
+                    startkey=[TYPE, 'type-language', type, lang, 'a'],
+                    limit=count,
                     classes=[models.Podcast, models.PodcastGroup],
                     include_docs=True)
                 results.extend(list(query))
@@ -96,7 +107,7 @@ def get_toplist(count, languages=None, types=None):
     cur  = sorted(results, key=lambda p: (p.subscriber_count(), p.get_id()),      reverse=True)[:count]
     prev = sorted(results, key=lambda p: (p.prev_subscriber_count(), p.get_id()), reverse=True)[:count]
 
-    return [(prev.index(p) if p in prev else 0, p) for p in cur]
+    return [(prev.index(p)+1 if p in prev else 0, p) for p in cur]
 
 
 def get_episode_toplist(count, languages=None, types=None):
