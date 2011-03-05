@@ -164,9 +164,9 @@ def iterate_together(l1, l2, compare=lambda x, y: cmp(x, y)):
             i2, more2 = _take(l2)
 
 
-def progress(val, max_val, status_str='', max_width=50):
-    print '\r',
-    print '[ %s ] %s / %s | %s' % (
+def progress(val, max_val, status_str='', max_width=50, stream=sys.stdout):
+    print >> stream, '\r',
+    print >> stream, '[ %s ] %s / %s | %s' % (
         '#'*int(float(val)/max_val*max_width) +
         ' ' * (max_width-(int(float(val)/max_val*max_width))),
         val,

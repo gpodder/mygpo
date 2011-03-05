@@ -12,6 +12,7 @@ from mygpo import migrate
 from mygpo.core.models import Podcast
 from mygpo.users.models import PodcastUserState, EpisodeUserState, Suggestions
 from mygpo.directory.models import Category
+from mygpo.utils import progress
 
 
 class Command(BaseCommand):
@@ -76,6 +77,7 @@ class Command(BaseCommand):
 
 
         db = Podcast.get_db()
+        docs = sorted(docs)
         self.dump(docs, db)
 
 
@@ -84,11 +86,11 @@ class Command(BaseCommand):
         output = sys.stdout
         boundary = None
         envelope = write_multipart(output, boundary=boundary)
+        total = len(docs)
 
-        for docid in docs:
+        for n, docid in enumerate(docs):
 
             doc = db.get(docid, attachments=True)
-            print >> sys.stderr, 'Dumping document %r' % doc['_id']
             attachments = doc.pop('_attachments', {})
             jsondoc = json.encode(doc)
 
@@ -113,5 +115,7 @@ class Command(BaseCommand):
                     'Content-ID': doc['_id'],
                     'ETag': '"%s"' % doc['_rev']
                 })
+
+            progress(n+1, total, docid, stream=sys.stderr)
 
         envelope.close()
