@@ -38,6 +38,7 @@ class Rating(models.Model):
         return '%s rates %s as %s on %s' % (self.user, self.target, self.rating, self.timestamp)
 
 
+# Deprecated: only used in migration-code anymore
 class SecurityToken(models.Model):
     user = models.ForeignKey(User)
     token = models.CharField(max_length=32, blank=True, default=lambda: "".join(random.sample(string.letters+string.digits, 32)))

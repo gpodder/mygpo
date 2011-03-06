@@ -22,7 +22,6 @@ from mygpo.core import models
 from mygpo.api.models import Podcast, Episode, EpisodeAction, Subscription
 from mygpo.api.models.episodes import Chapter
 from mygpo.api import backend
-from mygpo.web.models import SecurityToken
 from mygpo.web.utils import get_played_parts
 from mygpo.decorators import manual_gc
 from mygpo.utils import parse_time
@@ -138,7 +137,7 @@ def list_favorites(request):
     site = RequestSite(request)
     episodes = backend.get_favorites(request.user)
 
-    token, c = SecurityToken.objects.get_or_create(user=request.user, object='fav-feed', action='r')
+    user = migrate.get_or_migrate_user(request.user)
 
     from django.core.urlresolvers import reverse
     feed_url = 'http://%s/%s' % (site.domain, reverse('favorites-feed', args=[request.user.username]))
@@ -149,13 +148,14 @@ def list_favorites(request):
         podcast = None
 
     if 'public_feed' in request.GET:
-        token.token = ''
-        token.save()
+        user.favorite_feeds_token = ''
+        user.save()
 
     elif 'private_feed' in request.GET:
-        token.random_token(length=8)
-        token.save()
+        user.create_new_token('favorite_feeds_token', 8)
+        user.save()
 
+    token = user.favorite_feeds_token
 
     return render_to_response('favorites.html', {
         'episodes': episodes,

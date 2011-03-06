@@ -43,7 +43,7 @@
   <p><a href="{% url podcast-publisher-update podcast.id %}">{% trans "Update from Feed" %}</a> {% trans "(this might take a few seconds)" %}</p>
 
   <div class="info">To update all of your published podcasts automatically, you can request the URL (<a href="{% url podcast-publisher-detail podcast.id %}?new_token">Create a new token</a>)<br />
-   <strong><a href="{% url publisher-update user.username %}?token={{ update_token.token }}">http://{{ site }}{% url publisher-update user.username %}?token={{ update_token.token }}</a></strong>
+   <strong><a href="{% url publisher-update user.username %}?token={{ update_token }}">http://{{ site }}{% url publisher-update user.username %}?token={{ update_token }}</a></strong>
   </div>
 
   <h2>Episodes</h2>

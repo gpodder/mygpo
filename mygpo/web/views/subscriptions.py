@@ -8,8 +8,8 @@ from mygpo.utils import parse_bool
 from mygpo.decorators import manual_gc, requires_token
 from mygpo.api.models import Device, Subscription, Episode
 from mygpo.api import backend, simple
-from mygpo.web.models import SecurityToken
 from mygpo.web import utils
+from mygpo import migrate
 
 
 @manual_gc
@@ -33,11 +33,13 @@ def download_all(request):
 
 
 @manual_gc
-@requires_token(object='subscriptions', action='r', denied_template='user_subscriptions_denied.html')
+@requires_token(token_name='subscriptions_token', denied_template='user_subscriptions_denied.html')
 def for_user(request, username):
     user = get_object_or_404(User, username=username)
+    new_user = migrate.get_or_migrate_user(user)
+
     subscriptions = Subscription.objects.public_subscribed_podcasts(user)
-    token = SecurityToken.objects.get(object='subscriptions', action='r', user__username=username)
+    token = new_user.subscriptions_token
 
     return render_to_response('user_subscriptions.html', {
         'subscriptions': subscriptions,
@@ -45,7 +47,7 @@ def for_user(request, username):
         'token': token,
         }, context_instance=RequestContext(request))
 
-@requires_token(object='subscriptions', action='r')
+@requires_token(token_name='subscriptions_token')
 def for_user_opml(request, username):
     user = get_object_or_404(User, username=username)
     subscriptions = Subscription.objects.public_subscribed_podcasts(user)

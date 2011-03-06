@@ -29,7 +29,7 @@
   </table>
 
   <div>
-   <a href="{% url shared-subscriptions-opml other_user.username %}{% if token.token %}?token={{ token.token }}{% endif %}">
+   <a href="{% url shared-subscriptions-opml other_user.username %}{% if token %}?token={{ token }}{% endif %}">
     <img src="/media/download.png" class="action-button" /> {% trans "Download Subscriptions as OPML" %}
    </a>
   </div>

@@ -17,17 +17,19 @@
 
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.contrib.auth.models import User
-from mygpo.web.models import SecurityToken
 from mygpo.log import log
+from mygpo import migrate
 
 #############################################################################
 #
-def view_or_basicauth(view, request, username, object, action, realm = "", *args, **kwargs):
+def view_or_basicauth(view, request, username, token_name, realm = "", *args, **kwargs):
 
-    token, c = SecurityToken.objects.get_or_create(user__username=username, object=object, action=action)
+    user = User.objects.get(username=username)
+    user = migrate.get_or_migrate_user(user)
+    token = getattr(user, token_name, '')
 
     # check if a token is required at all
-    if token.check(''):
+    if token == '':
         return view(request, username, *args, **kwargs)
 
     # this header format is used when passing auth-headers
@@ -57,10 +59,7 @@ def view_or_basicauth(view, request, username, object, action, realm = "", *args
                 if uname != username:
                     return auth_request()
 
-                user = User.objects.get(username=uname)
-                token, c = SecurityToken.objects.get_or_create(user=user, object=object, action=action)
-
-                if token.check(passwd):
+                if token == passwd:
                     try:
                         return view(request, uname, *args, **kwargs)
                     except Exception, e:
@@ -82,15 +81,14 @@ def auth_request(realm=''):
 
 #############################################################################
 #
-def require_token_auth(object, action):
+def require_token_auth(token_name):
     def wrapper(protected_view):
 
         def tmp(request, username, *args, **kwargs):
             return view_or_basicauth(protected_view, \
                                      request, \
                                      username, \
-                                     object, \
-                                     action, \
+                                     token_name, \
                                      '', \
                                      *args, \
                                      **kwargs)

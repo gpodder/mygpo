@@ -45,9 +45,9 @@
    </div>
 
    <h3>Access to your Favorites</h3>
-   {% if feed_token.token %}
+   {% if feed_token %}
     <p>
-     {% blocktrans with user.username as username and feed_token.token as token %}To keep your favorites private (from others and from the public pages of {{ site }}), you need to use HTTP-Authentication in your client. Use username <strong>{{ username }}</strong> and password <strong>{{ token }}</strong>.{% endblocktrans %}
+     {% blocktrans with user.username as username and feed_token as token %}To keep your favorites private (from others and from the public pages of {{ site }}), you need to use HTTP-Authentication in your client. Use username <strong>{{ username }}</strong> and password <strong>{{ token }}</strong>.{% endblocktrans %}
     </p>
     <ul>
      <li><a href="{% url favorites %}?private_feed">{% trans "create a new password" %}</a></li>

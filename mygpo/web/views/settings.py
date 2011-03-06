@@ -19,13 +19,13 @@ from django.shortcuts import render_to_response
 from django.contrib.auth import logout
 from django.template import RequestContext
 from mygpo.api.models import Podcast, Subscription, SubscriptionMeta
-from mygpo.web.models import SecurityToken
 from mygpo.web.forms import UserAccountForm
 from django.forms import ValidationError
 from django.utils.translation import ugettext as _
 from mygpo.decorators import manual_gc, allowed_methods
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
+from mygpo import migrate
 
 
 @manual_gc
@@ -153,18 +153,19 @@ def privacy(request):
 @login_required
 def share(request):
     site = RequestSite(request)
-    token, c = SecurityToken.objects.get_or_create(user=request.user, object='subscriptions', action='r')
-
+    user = migrate.get_or_migrate_user(request.user)
 
     if 'public_subscriptions' in request.GET:
-        token.token = ''
-        token.save()
+        user.subscriptions_token = ''
+        user.save()
 
     elif 'private_subscriptions' in request.GET:
-        token.random_token()
-        token.save()
+        user.create_new_token('subscriptions_token')
+        user.save()
+
+    token = user.subscriptions_token
 
     return render_to_response('share.html', {
         'site': site,
-        'token': token.token,
+        'token': token,
         }, context_instance=RequestContext(request))

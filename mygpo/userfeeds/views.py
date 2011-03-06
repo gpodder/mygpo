@@ -5,7 +5,7 @@ from django.contrib.sites.models import RequestSite
 from mygpo.userfeeds.auth import require_token_auth
 from mygpo.userfeeds.feeds import FavoriteFeed
 
-@require_token_auth('fav-feed', 'r')
+@require_token_auth('favorite_feeds_token')
 def favorite_feed(request, username):
 
     site = RequestSite(request)

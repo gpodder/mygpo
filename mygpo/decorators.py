@@ -23,12 +23,13 @@ from django.contrib.auth.models import User
 from django.http import HttpResponseForbidden, HttpResponseNotAllowed
 import gc
 
-def requires_token(object, action, denied_template=None):
+def requires_token(token_name, denied_template=None):
     """
     returns a decorator that checks if the security token in the 'token' GET
-    parameter matches the requires token for the resource. The resource is indicated by
+    parameter matches the requires token for the resource. The protected
+    resource is indicated by
     * the username parameter passed to the decorated function
-    * object and action passed to this method
+    * token_name passed to this method
 
     The decorated method is returned, if
     * no token is required for the resource
@@ -40,14 +41,14 @@ def requires_token(object, action, denied_template=None):
     """
     def decorator(fn):
         def tmp(request, username, *args, **kwargs):
-            from mygpo.web.models import SecurityToken
+            from mygpo import migrate
+            user = User.objects.get(username=username)
+            user = migrate.get_or_migrate_user(user)
 
-            user = get_object_or_404(User, username=username)
-            token, c = SecurityToken.objects.get_or_create(user=user, object=object, action=action)
-
+            token = getattr(user, token_name, '')
             u_token = request.GET.get('token', '')
 
-            if token.token == '' or token.token == u_token:
+            if token == '' or token == u_token:
                 return fn(request, username, *args, **kwargs)
 
             else:

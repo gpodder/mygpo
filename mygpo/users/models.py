@@ -224,17 +224,35 @@ class Device(Document):
         return r.one() if r else None
 
 
+def token_generator(length=32):
+    import random, string
+    return  "".join(random.sample(string.letters+string.digits, length))
+
+
 class User(Document):
     oldid    = IntegerProperty()
     settings = DictProperty()
     devices  = SchemaListProperty(Device)
     published_objects = StringListProperty()
 
+    # token for accessing subscriptions of this use
+    subscriptions_token    = StringProperty(default=token_generator)
+
+    # token for accessing the favorite-episodes feed of this user
+    favorite_feeds_token   = StringProperty(default=token_generator)
+
+    # token for automatically updating feeds published by this user
+    publisher_update_token = StringProperty(default=token_generator)
+
 
     @classmethod
     def for_oldid(cls, oldid):
         r = cls.view('users/users_by_oldid', key=oldid, limit=1, include_docs=True)
         return r.one() if r else None
+
+
+    def create_new_token(self, token_name, length=32):
+        setattr(self, token_name, token_generator(length))
 
 
     def get_device(self, uid):

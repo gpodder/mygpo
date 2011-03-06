@@ -9,7 +9,6 @@ from mygpo.publisher.utils import listener_data, episode_listener_data, check_pu
 from django.contrib.sites.models import RequestSite
 from mygpo.data.feeddownloader import update_podcasts
 from mygpo.decorators import requires_token, allowed_methods
-from mygpo.web.models import SecurityToken
 from django.contrib.auth.models import User
 from mygpo import migrate
 
@@ -63,11 +62,12 @@ def podcast(request, id):
     elif request.method == 'GET':
         form = PodcastForm(instance=p)
 
-    update_token, c = SecurityToken.objects.get_or_create(user=request.user, object='published_feeds', action='update')
-
+    user = migrate.get_or_migrate_user(request.user)
     if 'new_token' in request.GET:
-        update_token.random_token()
-        update_token.save()
+        user.create_new_token('publisher_update_token')
+        user.save()
+
+    update_token = user.publisher_update_token
 
     site = RequestSite(request)
 
@@ -115,7 +115,7 @@ def update_podcast(request, id):
     return HttpResponseRedirect('/publisher/podcast/%s' % id)
 
 
-@requires_token(object='published_feeds', action='update')
+@requires_token(token_name='publisher_update_token')
 def update_published_podcasts(request, username):
     user = get_object_or_404(User, username=username)
     user = migrate.get_or_migrate_user(user)
