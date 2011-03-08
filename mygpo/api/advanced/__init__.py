@@ -30,6 +30,7 @@ import dateutil.parser
 from mygpo.log import log
 from mygpo.utils import parse_time, parse_bool
 from mygpo.decorators import allowed_methods
+from mygpo.core.models import SanitizingRule
 from django.db import IntegrityError
 from django.views.decorators.csrf import csrf_exempt
 
@@ -94,16 +95,18 @@ def update_subscriptions(user, device, add, remove):
     add_sanitized = []
     rem_sanitized = []
 
+    podcast_sanitizing_rules = SanitizingRule.for_obj_type('podcast')
+
     for a in add:
         if a in remove:
            raise IntegrityError('can not add and remove %s at the same time' % a)
 
     for u in add:
-        us = sanitize_append(u, 'podcast', updated_urls)
+        us = sanitize_append(u, podcast_sanitizing_rules, updated_urls)
         if us != '': add_sanitized.append(us)
 
     for u in remove:
-        us = sanitize_append(u, 'podcast', updated_urls)
+        us = sanitize_append(u, podcast_sanitizing_rules, updated_urls)
         if us != '' and us not in add_sanitized:
             rem_sanitized.append(us)
 
@@ -236,13 +239,16 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
 def update_episodes(user, actions):
     update_urls = []
 
+    podcast_sanitizing_rules = SanitizingRule.for_obj_type('podcast')
+    episode_sanitizing_rules = SanitizingRule.for_obj_type('episode')
+
     for e in actions:
-        us = sanitize_append(e['podcast'], 'podcast', update_urls)
+        us = sanitize_append(e['podcast'], podcast_sanitizing_rules, update_urls)
         if us == '': continue
 
         podcast, p_created = Podcast.objects.get_or_create(url=us)
 
-        eus = sanitize_append(e['episode'], 'episode', update_urls)
+        eus = sanitize_append(e['episode'], episode_sanitizing_rules, update_urls)
         if eus == '': continue
 
         episode, e_created = Episode.objects.get_or_create(podcast=podcast, url=eus)
@@ -386,8 +392,8 @@ def favorites(request, username):
     return JsonResponse(ret)
 
 
-def sanitize_append(url, obj_type, sanitized_list):
-    urls = sanitize_url(url, obj_type)
+def sanitize_append(url, rules, sanitized_list):
+    urls = sanitize_url(url, rules=rules)
     if url != urls:
         sanitized_list.append( (url, urls) )
     return urls
