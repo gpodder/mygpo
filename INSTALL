@@ -28,6 +28,7 @@ development version from the repository.
   * couchdbkit [9]
   * Django (>= 1.2.2, [10])
   * django-registration [11]
+  * django-couchdb-utils [12]
 
 
   MySQL
@@ -176,4 +177,4 @@ add them to mygpo/settings_prod.py with the correct value.
  [9]  https://github.com/stefankoegl/couchdbkit
  [10] http://www.djangoproject.com/
  [11] https://bitbucket.org/ubernostrum/django-registration/
-
+ [12] http://github.com/stefankoegl/django-couchdb-utils/
