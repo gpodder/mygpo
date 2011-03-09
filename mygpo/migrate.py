@@ -71,7 +71,7 @@ def save_episode_signal(sender, instance=False, **kwargs):
 
 
 
-@repeat_on_conflict(['oldp'])
+@repeat_on_conflict(['newp'], reload_f=lambda x: Podcast.get(x.get_id()))
 def update_podcast(oldp, newp):
     """
     Updates newp based on oldp and returns True if an update was necessary
