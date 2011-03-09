@@ -2,6 +2,7 @@ from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.contrib.sites.models import RequestSite
+from django.views.decorators.cache import cache_page
 
 from mygpo.api import backend
 from mygpo.data.mimetype import CONTENT_TYPES
@@ -43,6 +44,7 @@ def toplist(request, num=100, lang=None):
 
 
 
+@cache_page(60 * 60 * 24)
 def browse(request, num_categories=10, num_tags_cloud=90, podcasts_per_category=10):
     total = int(num_categories) + int(num_tags_cloud)
     categories = Category.top_categories(total).all()
@@ -68,6 +70,7 @@ def browse(request, num_categories=10, num_tags_cloud=90, podcasts_per_category=
         }, context_instance=RequestContext(request))
 
 
+@cache_page(60 * 60 * 24)
 def category(request, category, page_size=20):
     category = Category.for_tag(category)
     if not category:

@@ -18,6 +18,7 @@
 from itertools import islice
 from mygpo.api.basic_auth import require_valid_user, check_username
 from django.http import HttpResponse, HttpResponseBadRequest
+from django.views.decorators.cache import cache_page
 from mygpo.core import models
 from mygpo.users.models import Suggestions
 from mygpo.api.models import Device, Podcast
@@ -182,6 +183,7 @@ def set_subscriptions(urls, user, device_uid):
 
 @check_format
 @allowed_methods(['GET'])
+@cache_page(60 * 60)
 def toplist(request, count, format):
     count = int(count)
     if count not in range(1,100):

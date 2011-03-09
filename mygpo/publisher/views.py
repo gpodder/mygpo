@@ -1,6 +1,7 @@
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
+from django.views.decorators.cache import cache_page
 from mygpo.core import models
 from mygpo.api.models import Podcast, Episode, PodcastGroup
 from mygpo.publisher.auth import require_publisher, is_publisher
@@ -8,11 +9,12 @@ from mygpo.publisher.forms import SearchPodcastForm, EpisodeForm, PodcastForm
 from mygpo.publisher.utils import listener_data, episode_listener_data, check_publisher_permission, subscriber_data, device_stats, episode_heatmap
 from django.contrib.sites.models import RequestSite
 from mygpo.data.feeddownloader import update_podcasts
-from mygpo.decorators import requires_token, allowed_methods
+from mygpo.decorators import requires_token, allowed_methods, cache_page_anonymous
 from django.contrib.auth.models import User
 from mygpo import migrate
 
 
+@cache_page_anonymous(60 * 60)
 def home(request):
     if is_publisher(request.user):
         u = migrate.get_or_migrate_user(request.user)
@@ -172,6 +174,7 @@ def episode(request, id):
         }, context_instance=RequestContext(request))
 
 
+@cache_page(60 * 60)
 def link(request):
     current_site = RequestSite(request)
     return render_to_response('link.html', {
@@ -179,6 +182,7 @@ def link(request):
         }, context_instance=RequestContext(request))
 
 
+@cache_page(60 * 60)
 def advertise(request):
     site = RequestSite(request)
     return render_to_response('publisher/advertise.html', {

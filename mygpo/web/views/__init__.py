@@ -18,6 +18,7 @@
 from collections import defaultdict
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, Http404
+from django.views.decorators.cache import cache_page
 from django.contrib.auth.models import User
 from django.template import RequestContext
 from mygpo.core import models
@@ -96,6 +97,7 @@ def dashboard(request, episode_count=10):
         }, context_instance=RequestContext(request))
 
 
+@cache_page(60 * 60 * 24)
 def cover_art(request, size, filename):
     size = int(size)
     if size not in (PODCAST_LOGO_SIZE, PODCAST_LOGO_BIG_SIZE):

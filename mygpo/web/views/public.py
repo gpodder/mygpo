@@ -18,6 +18,7 @@
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
+from django.views.decorators.cache import cache_page
 from mygpo.api import backend
 from mygpo.data.mimetype import CONTENT_TYPES
 from mygpo.decorators import manual_gc
@@ -58,6 +59,7 @@ def episode_toplist(request, num=100):
     }, context_instance=RequestContext(request))
 
 
+@cache_page(60 * 60)
 def gpodder_example_podcasts(request):
     return render_to_response('gpodder_examples.opml', {
     }, context_instance=RequestContext(request))

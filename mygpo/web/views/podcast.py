@@ -12,7 +12,7 @@ from mygpo.api.sanitizing import sanitize_url
 from mygpo.web.forms import PrivacyForm, SyncForm
 from mygpo.data.models import Listener
 from mygpo.directory.tags import tags_for_user
-from mygpo.decorators import manual_gc, allowed_methods, repeat_on_conflict
+from mygpo.decorators import manual_gc, allowed_methods, repeat_on_conflict, cache_page_anonymous
 from mygpo.utils import daterange
 from mygpo.log import log
 from mygpo import migrate
@@ -21,6 +21,7 @@ MAX_TAGS_ON_PAGE=50
 
 
 @allowed_methods(['GET', 'POST'])
+@cache_page_anonymous(60 * 60)
 def show(request, pid):
     podcast = get_object_or_404(Podcast, pk=pid)
     episodes = episode_list(podcast, request.user)

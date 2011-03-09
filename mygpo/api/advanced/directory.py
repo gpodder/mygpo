@@ -22,10 +22,12 @@ from mygpo.api.models import Podcast, Episode
 from mygpo.directory.models import Category
 from django.contrib.sites.models import RequestSite
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.cache import cache_page
 from mygpo.core import models
 
 
 @csrf_exempt
+@cache_page(60 * 60 * 24)
 def top_tags(request, count):
     tags = Category.top_categories(int(count))
     resp = map(category_data, tags)
@@ -33,6 +35,7 @@ def top_tags(request, count):
 
 
 @csrf_exempt
+@cache_page(60 * 60 * 24)
 def tag_podcasts(request, tag, count):
     category = Category.for_tag(tag)
     if not category:
@@ -44,6 +47,7 @@ def tag_podcasts(request, tag, count):
     return JsonResponse(resp)
 
 
+@cache_page(60 * 60)
 def podcast_info(request):
     url = sanitize_url(request.GET.get('url', ''))
     podcast = get_object_or_404(Podcast, url=url)
@@ -53,6 +57,7 @@ def podcast_info(request):
     return JsonResponse(resp)
 
 
+@cache_page(60 * 60)
 def episode_info(request):
     podcast_url = sanitize_url(request.GET.get('podcast', ''))
     episode_url = sanitize_url(request.GET.get('url', ''), 'episode')

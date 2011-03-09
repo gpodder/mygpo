@@ -17,6 +17,7 @@
 
 from mygpo.api.basic_auth import require_valid_user, check_username
 from django.http import HttpResponse, HttpResponseBadRequest
+from django.core.cache import cache
 from mygpo.api.models import Device, Podcast, SubscriptionAction, Episode, EpisodeAction, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, EPISODE_ACTION_TYPES, DEVICE_TYPES, Subscription
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url
@@ -95,7 +96,11 @@ def update_subscriptions(user, device, add, remove):
     add_sanitized = []
     rem_sanitized = []
 
-    podcast_sanitizing_rules = SanitizingRule.for_obj_type('podcast')
+
+    podcast_sanitizing_rules = cache.get('podcast-sanitizing-rules') or \
+        SanitizingRule.for_obj_type('podcast')
+    cache.add('podcast-sanitizing-rules', podcast_sanitizing_rules, 60 * 60)
+
 
     for a in add:
         if a in remove:
@@ -239,8 +244,15 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
 def update_episodes(user, actions):
     update_urls = []
 
-    podcast_sanitizing_rules = SanitizingRule.for_obj_type('podcast')
-    episode_sanitizing_rules = SanitizingRule.for_obj_type('episode')
+
+    podcast_sanitizing_rules = cache.get('podcast-sanitizing-rules') or \
+        SanitizingRule.for_obj_type('podcast')
+    cache.add('podcast-sanitizing-rules', podcast_sanitizing_rules, 60 * 60)
+
+    episode_sanitizing_rules = cache.get('episode-sanitizing-rules') or \
+        SanitizingRule.for_obj_type('episode')
+    cache.add('episode-sanitizing-rules', episode_sanitizing_rules, 60 * 60)
+
 
     for e in actions:
         us = sanitize_append(e['podcast'], podcast_sanitizing_rules, update_urls)
