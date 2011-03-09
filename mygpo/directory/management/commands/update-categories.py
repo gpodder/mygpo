@@ -17,7 +17,9 @@ class Command(BaseCommand):
 
         excluded_tags = getattr(settings, 'DIRECTORY_EXCLUDED_TAGS', [])
 
-        for n, tag in enumerate(all_tags()):
+        tags = args or all_tags()
+
+        for n, tag in enumerate(tags):
 
             if not isinstance(tag, basestring):
                 tag = str(tag)

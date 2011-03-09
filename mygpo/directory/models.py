@@ -50,12 +50,12 @@ class Category(Document):
                 new_entries.append(e2)
 
             elif e2 is None:
-                pass
+                new_entries.append(e1)
 
             else:
-                e1.weight = max(e1.weight, e2.weight)
+                new_entries.append( max(e1, e2) )
 
-        self.podcasts = self.podcasts + new_entries
+        self.podcasts = new_entries
 
 
     def get_podcasts(self, start=0, end=20):
