@@ -1,4 +1,4 @@
-import uuid, hashlib
+import hashlib
 from couchdbkit.ext.django.schema import *
 from mygpo import utils
 
@@ -8,7 +8,6 @@ class Episode(Document):
     Represents an Episode. Can only be part of a Podcast
     """
 
-    id = StringProperty(default=lambda: uuid.uuid4().hex)
     title = StringProperty()
     description = StringProperty()
     link = StringProperty()

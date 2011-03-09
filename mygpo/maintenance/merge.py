@@ -216,11 +216,11 @@ def merge_similar_episode_states(podcast, podcast_state):
 
 def find_new_episode_id(podcast, merged_id):
     for episode in podcast.get_episodes():
-        if episode.id == merged_id:
+        if episode._id == merged_id:
             return merged_id
 
         if merged_id in episode.merged_ids:
-            return episode.id
+            return episode._id
 
     return None
 
