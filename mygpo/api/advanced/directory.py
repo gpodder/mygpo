@@ -24,12 +24,14 @@ from django.contrib.sites.models import RequestSite
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import cache_page
 from mygpo.core import models
+from mygpo.utils import parse_range
 
 
 @csrf_exempt
 @cache_page(60 * 60 * 24)
 def top_tags(request, count):
-    tags = Category.top_categories(int(count))
+    count = parse_range(count, 1, 100, 100)
+    tags = Category.top_categories(count)
     resp = map(category_data, tags)
     return JsonResponse(resp)
 
@@ -37,6 +39,7 @@ def top_tags(request, count):
 @csrf_exempt
 @cache_page(60 * 60 * 24)
 def tag_podcasts(request, tag, count):
+    count = parse_range(count, 1, 100, 100)
     category = Category.for_tag(tag)
     if not category:
         return JsonResponse([])

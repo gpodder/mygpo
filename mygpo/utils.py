@@ -253,3 +253,35 @@ def remove_control_chars(s):
 
 def unzip(a):
     return tuple(map(list,zip(*a)))
+
+
+def parse_range(s, min, max, default=None):
+    """
+    Parses the string and returns its value. If the value is outside the given
+    range, its closest number within the range is returned
+
+    >>> parse_range('5', 0, 10)
+    5
+
+    >>> parse_range('0', 5, 10)
+    5
+
+    >>> parse_range('15',0, 10)
+    10
+
+    >>> parse_range('x', 0, 20)
+    10
+
+    >>> parse_range('x', 0, 20, 20)
+    20
+    """
+    try:
+        val = int(s)
+        if val < min:
+            return min
+        if val > max:
+            return max
+        return val
+
+    except ValueError:
+        return default if default is not None else (max-min)/2

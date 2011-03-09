@@ -33,6 +33,7 @@ from django.contrib.sites.models import RequestSite
 from mygpo.directory.search import search_podcasts
 from django.utils.translation import ugettext as _
 from mygpo.decorators import allowed_methods
+from mygpo.utils import parse_range
 
 
 try:
@@ -185,9 +186,7 @@ def set_subscriptions(urls, user, device_uid):
 @allowed_methods(['GET'])
 @cache_page(60 * 60)
 def toplist(request, count, format):
-    count = int(count)
-    if count not in range(1,100):
-        count = 100
+    count = parse_range(count, 1, 100, 100)
 
     toplist = get_toplist(count)
     domain = RequestSite(request).domain
@@ -240,9 +239,7 @@ def search(request, format):
 @check_format
 @allowed_methods(['GET'])
 def suggestions(request, count, format):
-    count = int(count)
-    if count not in range(1,100):
-        count = 100
+    count = parse_range(count, 1, 100, 100)
 
     suggestion_obj = Suggestions.for_user_oldid(request.user.id)
     suggestions = suggestion_obj.get_podcasts(count)
