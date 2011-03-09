@@ -223,9 +223,10 @@ class Podcast(Document):
         group = getattr(self, 'group', None)
         if group:
             group = PodcastGroup.get(group)
-            i = group.podcasts.index(self)
-            del group.podcasts[i]
-            group.save()
+            if self in group.podcasts:
+                i = group.podcasts.index(self)
+                del group.podcasts[i]
+                group.save()
 
         else:
             super(Podcast, self).delete()
