@@ -31,7 +31,10 @@ class Command(BaseCommand):
         total = len(combinations)
         for n, (user_id, episode_id) in enumerate(combinations):
             user = self.check_new(user, User, user_id)
-            episode = self.check_new(podcast, oldmodels.Episode, episode_id)
+            try:
+                episode = self.check_new(podcast, oldmodels.Episode, episode_id)
+            except oldmodels.Episode.DoesNotExist:
+                continue
 
             while True:
                 try:
