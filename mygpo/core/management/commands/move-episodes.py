@@ -49,7 +49,10 @@ class Command(BaseCommand):
                     e = Episode.get(episode_id)
                 except:
                     episode._id = episode_id
-                    del episode.id
+                    try:
+                        del episode.id
+                    except AttributeError:
+                        pass
                     episode.podcast = podcast.get_id()
                     episode.save()
 
@@ -62,7 +65,7 @@ class Command(BaseCommand):
             progress(n+1, total)
 
 
-    @repeat_on_conflict(['podcast'])
+    @repeat_on_conflict(['podcast'], reload_f=lambda x: Podcast.get(x.get_id()))
     def remove_podcasts(self, podcast):
         del podcast.episodes
         podcast.save()
