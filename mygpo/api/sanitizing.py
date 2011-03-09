@@ -3,6 +3,7 @@ from mygpo.api.models import Podcast, SubscriptionAction, SubscriptionMeta, Subs
 from mygpo.api.models.episodes import Chapter
 from mygpo.data.models import BackendSubscription, Listener
 from mygpo.log import log
+from mygpo.utils import iterate_together
 import urlparse
 import re
 
@@ -326,7 +327,7 @@ def rewrite_newpodcast(p_old, p_new):
 
         # we assume that the new podcast has much more subscribers
         # taking only count of the old podcast would look like a drop
-        if not n:
+        if None in (n, o):
             continue
 
         subscribers.append(
