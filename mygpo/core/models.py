@@ -49,8 +49,7 @@ class Episode(Document):
 
 
     def __repr__(self):
-        return 'Episode %s (in %s)' % \
-            (self.id, self._id)
+        return 'Episode %s' % self._id
 
 
     def __eq__(self, other):

@@ -24,7 +24,7 @@ class Command(BaseCommand):
         updated, deleted, created = 0, 0, 0
 
         oldepisodes = oldmodels.Episode.objects.filter(id__gte=min_id, id__lte=max_id)
-        newepisodes = newmodels.Episode.view('core/episodes_by_oldid', startkey=min_id, endkey=max_id).iterator()
+        newepisodes = newmodels.Episode.view('core/episodes_by_oldid', startkey=min_id, endkey=max_id, include_docs=True).iterator()
         total = oldepisodes.count()
         compare = lambda o, n: cmp(long(o.id), long(n.oldid))
 
