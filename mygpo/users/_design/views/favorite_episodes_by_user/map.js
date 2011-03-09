@@ -1,14 +1,10 @@
 function(doc)
 {
-    if(doc.doc_type == 'PodcastUserState')
+    if(doc.doc_type == 'EpisodeUserState')
     {
-        for(id in doc.episodes)
+        if (doc.settings && doc.settings.is_favorite)
         {
-            episode = doc.episodes[id];
-            if (episode.settings && episode.settings.is_favorite)
-            {
-                emit(doc.user_oldid, id);
-            }
+            emit(doc.user_oldid, doc.episode);
         }
     }
 }
