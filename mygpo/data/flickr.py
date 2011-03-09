@@ -19,7 +19,7 @@
 import re
 import json
 import urllib
-from mygpo import settings
+from django.conf import settings
 
 def get_photo_sizes(photo_id):
     api_key = settings.FLICKR_API_KEY

@@ -153,7 +153,7 @@ GOOGLE_ANALYTICS_PROPERTY_ID=''
 DIRECTORY_EXCLUDED_TAGS = ()
 FLICKR_API_KEY = ''
 
-MAINTENANCE = os.path.exists('MAINTENANCE')
+MAINTENANCE = os.path.exists(os.path.join(BASE_DIR, 'MAINTENANCE'))
 
 EMAIL_BACKEND = 'django_couchdb_utils.email.CouchDBEmailBackend'
 

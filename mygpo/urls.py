@@ -26,8 +26,8 @@ urlpatterns = patterns('',
 
 
 # Check for maintenace mode
-from mygpo import settings
-if getattr(settings, 'MAINTENANCE', False):
+from django.conf import settings
+if settings.MAINTENANCE:
     urlpatterns += patterns('mygpo.web.utils',
         (r'', 'maintenance'),
     )

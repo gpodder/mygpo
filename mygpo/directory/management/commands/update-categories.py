@@ -1,8 +1,8 @@
 from datetime import datetime
 
 from django.core.management.base import BaseCommand
+from django.conf import settings
 
-from mygpo import settings
 from mygpo.core.models import Podcast
 from mygpo.directory.models import Category, CategoryEntry
 from mygpo.directory.tags import all_tags, podcasts_for_tag
@@ -15,7 +15,7 @@ class Command(BaseCommand):
 
         start_time = datetime.utcnow()
 
-        excluded_tags = getattr(settings, 'DIRECTORY_EXCLUDED_TAGS', [])
+        excluded_tags = settings.DIRECTORY_EXCLUDED_TAGS
 
         tags = args or all_tags()
 

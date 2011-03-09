@@ -15,10 +15,10 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from mygpo import settings
+from django.conf import settings
 
 def processor(request):
-    pid = getattr(settings, 'GOOGLE_ANALYTICS_PROPERTY_ID', None)
+    pid = settings.GOOGLE_ANALYTICS_PROPERTY_ID
     if pid:
         return {'google_analytics_property_id': pid}
     else:

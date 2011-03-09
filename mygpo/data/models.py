@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 from mygpo.api.models import Podcast, Episode, Device, PodcastGroup
-from mygpo import settings
 
 
 class PodcastTag(models.Model):
