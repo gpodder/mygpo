@@ -268,15 +268,6 @@ class Episode(models.Model):
         s = s.strip()
         return s
 
-    def listener_count(self):
-        from mygpo.data.models import Listener
-        return Listener.objects.filter(episode=self).values('user').distinct().count()
-
-    def listener_count_timespan(self, start, end):
-        return EpisodeAction.objects.filter(episode=self,
-                timestamp__range=(start, end),
-                action='play').values('user_id').distinct().count()
-
     def __unicode__(self):
         return '%s (%s)' % (self.shortname(), self.podcast)
 
@@ -605,3 +596,6 @@ from django.db.models.signals import post_save, pre_delete
 from mygpo import migrate
 post_save.connect(migrate.save_podcast_signal, sender=Podcast)
 pre_delete.connect(migrate.delete_podcast_signal, sender=Podcast)
+
+post_save.connect(migrate.save_device_signal, sender=Device)
+pre_delete.connect(migrate.delete_device_signal, sender=Device)

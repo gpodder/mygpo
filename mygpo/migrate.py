@@ -49,6 +49,30 @@ def delete_podcast_signal(sender, instance=False, **kwargs):
         log('error while deleting CouchDB-Podcast: %s' % repr(e))
 
 
+
+def save_device_signal(sender, instance=False, **kwargs):
+
+    if not instance:
+        return
+
+    user = get_or_migrate_user(instance.user)
+    dev = get_or_migrate_device(instance)
+    d = update_device(instance, dev)
+    user.set_device(d)
+    user.save()
+
+
+def delete_device_signal(sender, instance=False, **kwargs):
+    if not instance:
+        return
+
+    user = get_or_migrate_user(instance.user)
+    dev = get_or_migrate_user(instance)
+    user.remove_device(dev)
+    user.save()
+
+
+
 def save_episode_signal(sender, instance=False, **kwargs):
     """
     Signal-handler for creating/updating a CouchDB-based episode when
