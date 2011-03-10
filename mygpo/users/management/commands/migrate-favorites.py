@@ -17,7 +17,7 @@ class Command(BaseCommand):
         for n, fav in enumerate(favorites):
             episode = migrate.get_or_migrate_episode(fav.episode)
             podcast = migrate.get_or_migrate_podcast(fav.episode.podcast)
-            episode_state = migrate.get_episode_user_state(fav.user, episode._id, podcast)
+            episode_state = migrate.get_episode_user_state(fav.user, episode, podcast)
 
             episode_state.set_favorite()
             episode_state.save()

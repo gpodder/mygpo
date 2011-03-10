@@ -170,6 +170,7 @@ class PodcastUserState(Document):
             p = PodcastUserState()
             p.podcast = podcast.get_id()
             p.user_oldid = user.id
+            p.ref_url = podcast.url
             return p
 
 

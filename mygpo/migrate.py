@@ -310,24 +310,31 @@ def migrate_subscription_action(old_action):
     return action
 
 
-def get_episode_user_state(user, episode_id, podcast):
-    e_state = EpisodeUserState.for_user_episode(user.id, episode_id)
-    if e_state:
-        return e_state
-
-    p_state = PodcastUserState.for_user_podcast(user, podcast)
-    e_state = p_state.episodes.get(episode_id, None)
+def get_episode_user_state(user, episode, podcast):
+    e_state = EpisodeUserState.for_user_episode(user.id, episode._id)
 
     if e_state is None:
-        e_state = EpisodeUserState()
-        e_state.episode = episode_id
-    else:
-        @repeat_on_conflict(['p_state'])
-        def remove_episode_status(p_state):
-            del p_state.episodes[episode_id]
-            p_state.save()
 
-        remove_episode_status(p_state=p_state)
+        p_state = PodcastUserState.for_user_podcast(user, podcast)
+        e_state = p_state.episodes.get(episode._id, None)
+
+        if e_state is None:
+            e_state = EpisodeUserState()
+            e_state.episode = episode._id
+        else:
+            @repeat_on_conflict(['p_state'])
+            def remove_episode_status(p_state):
+                del p_state.episodes[episode._id]
+                p_state.save()
+
+            remove_episode_status(p_state=p_state)
+
+
+    if not e_state.podcast_ref_url:
+        e_state.podcast_ref_url = podcast.url
+
+    if not e_state.ref_url:
+        e_state.ref_url = episode.url
 
     e_state.podcast = podcast.get_id()
     e_state.user_oldid = user.id

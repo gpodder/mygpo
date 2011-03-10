@@ -54,7 +54,7 @@ def main(request, username, scope):
         old_e = get_object_or_404(Episode, url=url, podcast=old_p)
         episode = migrate.get_or_migrate_episode(old_e)
         podcast = migrate.get_or_migrate_podcast(old_p)
-        episode_state = migrate.get_episode_user_state(user, episode._id, podcast)
+        episode_state = migrate.get_episode_user_state(user, episode, podcast)
         return episode_state, episode_state
 
     models = dict(

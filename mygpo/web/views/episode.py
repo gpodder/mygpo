@@ -45,7 +45,7 @@ def episode(request, id):
 
         new_ep  = migrate.get_or_migrate_episode(episode)
         podcast = models.Podcast.for_oldid(episode.podcast.id)
-        episode_state = migrate.get_episode_user_state(request.user, new_ep._id, podcast)
+        episode_state = migrate.get_episode_user_state(request.user, new_ep, podcast)
         is_fav = episode_state.is_favorite()
 
         played_parts, duration = get_played_parts(request.user, episode)
@@ -123,7 +123,7 @@ def toggle_favorite(request, id):
 
     new_ep  = migrate.get_or_migrate_episode(episode)
     podcast = migrate.get_or_migrate_podcast(episode.podcast)
-    episode_state = migrate.get_episode_user_state(request.user, new_ep._id, podcast)
+    episode_state = migrate.get_episode_user_state(request.user, new_ep, podcast)
     is_fav = episode_state.is_favorite()
     episode_state.set_favorite(not is_fav)
 
