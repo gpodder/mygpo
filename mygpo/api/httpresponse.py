@@ -21,14 +21,9 @@ from django.db.models.query import QuerySet
 from django.core.serializers.json import DjangoJSONEncoder
 
 try:
-    import json
-
-    # Python 2.5 seems to have a different json module
-    if not 'dumps' in dir(json):
-        raise ImportError
-
-except ImportError:
     import simplejson as json
+except ImportError:
+    import json
 
 
 #from http://www.djangosnippets.org/snippets/154/

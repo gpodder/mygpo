@@ -17,9 +17,14 @@
 
 
 import re
-import json
 import urllib
 from django.conf import settings
+
+try:
+    import simplejson as json
+except ImportError:
+    import json
+
 
 def get_photo_sizes(photo_id):
     api_key = settings.FLICKR_API_KEY

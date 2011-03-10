@@ -24,7 +24,11 @@ from mygpo.api.models import Device, Podcast, Episode
 from django.views.decorators.csrf import csrf_exempt
 from mygpo.decorators import allowed_methods
 from mygpo import migrate
-import json
+
+try:
+    import simplejson as json
+except ImportError:
+    import json
 
 
 @csrf_exempt

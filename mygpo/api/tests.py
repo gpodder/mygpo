@@ -18,7 +18,6 @@
 
 import unittest
 import doctest
-import json
 
 from django.test import TestCase
 from django.contrib.auth.models import User
@@ -26,6 +25,11 @@ from django.contrib.auth.models import User
 from mygpo.api.opml import Importer, Exporter
 from mygpo.api.models import Podcast, Device, Episode, UserProfile
 from mygpo.test import create_auth_string
+
+try:
+    import simplejson as json
+except ImportError:
+    import json
 
 
 class LegacyAPITests(TestCase):

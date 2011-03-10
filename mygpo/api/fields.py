@@ -1,5 +1,9 @@
 from django.db import models
-import json
+
+try:
+    import simplejson as json
+except ImportError:
+    import json
 
 class SeparatedValuesField(models.TextField):
     __metaclass__ = models.SubfieldBase

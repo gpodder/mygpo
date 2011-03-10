@@ -17,9 +17,14 @@
 
 
 import hashlib
-import json
 import urllib
 import urlparse
+
+try:
+    import simplejson as json
+except ImportError:
+    import json
+
 
 def get_tags(url):
     """

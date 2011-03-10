@@ -37,14 +37,9 @@ from mygpo.utils import parse_range
 
 
 try:
-    import json
-
-    # Python 2.5 seems to have a different json module
-    if not 'dumps' in dir(json):
-        raise ImportError
-
-except ImportError:
     import simplejson as json
+except ImportError:
+    import json
 
 
 ALLOWED_FORMATS = ('txt', 'opml', 'json')
