@@ -286,20 +286,29 @@ def get_or_migrate_user(user):
 
 
 def get_or_migrate_device(device, user=None):
-    d = Device.for_user_uid(device.user, device.uid)
-    if d:
-        return d
+    return Device.for_oldid(device.id) or create_device(device)
+
+
+def create_device(oldd, sparse=False):
+    user = get_or_migrate_user(oldd.user)
 
     d = Device()
-    d.oldid = device.id
-    d.uid = device.uid
-    d.name = device.name
-    d.type = device.type
-    d.deleted = device.deleted
-    u = user or get_or_migrate_user(device.user)
-    u.devices.append(d)
-    u.save()
+    d.oldid = oldd.id
+
+    if not sparse:
+        update_device(oldd, d)
+
+    user.devices.append(d)
+    user.save()
     return d
+
+
+def update_device(oldd, newd):
+    newd.uid = oldd.uid
+    newd.name = oldd.name
+    newd.type = oldd.type
+    newd.deleted = oldd.deleted
+    return newd
 
 
 def migrate_subscription_action(old_action):

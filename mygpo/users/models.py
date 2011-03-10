@@ -139,10 +139,17 @@ class SubscriptionAction(Document):
     timestamp = DateTimeProperty(default=datetime.utcnow)
     device    = StringProperty()
 
+
+    def __cmp__(self, other):
+        return cmp(self.timestamp, other.timestamp)
+
     def __eq__(self, other):
-        return self.actions == other.action and \
+        return self.action == other.action and \
                self.timestamp == other.timestamp and \
                self.device == other.device
+
+    def __hash__(self):
+        return hash(self.action) + hash(self.timestamp) + hash(self.device)
 
 
 class PodcastUserState(Document):
@@ -190,9 +197,8 @@ class PodcastUserState(Document):
 
 
     def add_actions(self, actions):
-        self.actions += actions
-        self.actions = list(set(self.actions))
-        self.actions.sort(key=lambda x: x.timestamp)
+        self.actions = list(set(self.actions + actions))
+        self.actions = sorted(self.actions)
 
 
     def add_tags(self, tags):
@@ -220,9 +226,9 @@ class Device(Document):
     settings = DictProperty()
 
     @classmethod
-    def for_user_uid(cls, user, uid):
-        r = cls.view('users/devices_by_user_uid', key=[user.id, uid], limit=1)
-        return r.one() if r else None
+    def for_oldid(cls, oldid):
+        r = cls.view('users/devices_by_oldid', key=oldid)
+        return r.first() if r else None
 
 
 def token_generator(length=32):
@@ -256,12 +262,43 @@ class User(Document):
         setattr(self, token_name, token_generator(length))
 
 
-    def get_device(self, uid):
+    def get_device(self, id):
         for device in self.devices:
-            if device.uid == uid:
+            if device.id == id:
                 return device
 
         return None
+
+
+    def set_device(self, device):
+        ids = [x.id for x in self.devices]
+        if not device.id in ids:
+            self.devices.append(device)
+
+        index = ids.index(device.id)
+        self.devices.pop(index)
+        self.devices.insert(index, device)
+
+
+    def remove_device(self, device):
+        ids = [x.id for x in self.devices]
+        if not device.id in ids:
+            return
+
+        index = ids.index(device.id)
+        self.devices.pop(index)
+
+
+    def get_subscriptions(self):
+        """
+        Returns a list of (podcast-id, device-id) tuples for all
+        of the users subscriptions
+        """
+
+        r = PodcastUserState.view('users/subscribed_podcasts_by_user',
+            startkey=[self.oldid, None, None],
+            endkey=[self.oldid+1, None, None])
+        return [res['key'][1:] for res in r]
 
 
     def __repr__(self):

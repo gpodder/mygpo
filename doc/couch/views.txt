@@ -303,3 +303,11 @@ Sanitizing Rules by Slug (core/sanitizing_rules_by_slug)
 
 Can be used to retrieve a sanitizing rule by its slug, for example for updating
 or deleting it.
+
+
+Podcast-Subscriptions by User (users/subscribed_podcasts_by_user)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * For a PodcastUserState, emits (User-Id, Podcast-Id, Device-Id) and null
+
+Can be used to retrieve the Podcasts a User is subscribed to, and the Devices
+on which he has a subscription.
