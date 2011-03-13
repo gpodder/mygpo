@@ -290,3 +290,7 @@ def parse_range(s, min, max, default=None):
 def get_to_dict(cls, ids):
     objs = cls.get_multi(ids)
     return dict(zip(ids, objs))
+
+
+def flatten(l):
+    return [item for sublist in l for item in sublist]
