@@ -18,7 +18,7 @@
 from mygpo.api.basic_auth import require_valid_user, check_username
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.core.cache import cache
-from mygpo.api.models import Device, Podcast, SubscriptionAction, Episode, EpisodeAction, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, EPISODE_ACTION_TYPES, DEVICE_TYPES, Subscription
+from mygpo.api.models import Device, Podcast, Episode, EpisodeAction, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, EPISODE_ACTION_TYPES, DEVICE_TYPES, Subscription
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.api.advanced.directory import episode_data, podcast_data
@@ -29,11 +29,14 @@ from time import mktime, gmtime, strftime
 from datetime import datetime
 import dateutil.parser
 from mygpo.log import log
-from mygpo.utils import parse_time, parse_bool
+from mygpo.utils import parse_time, parse_bool, get_to_dict
 from mygpo.decorators import allowed_methods
+from mygpo.core import models
 from mygpo.core.models import SanitizingRule
 from django.db import IntegrityError
 from django.views.decorators.csrf import csrf_exempt
+from mygpo.users.models import PodcastUserState
+from mygpo import migrate
 
 try:
     import simplejson as json
@@ -61,7 +64,8 @@ def subscriptions(request, username, device_uid):
         except ValueError:
             return HttpResponseBadRequest('since-value is not a valid timestamp')
 
-        changes = get_subscription_changes(request.user, d, since, now)
+        dev = migrate.get_or_migrate_device(d)
+        changes = get_subscription_changes(request.user, dev, since, now)
 
         return JsonResponse(changes)
 
@@ -123,20 +127,18 @@ def update_subscriptions(user, device, add, remove):
 
     return updated_urls
 
+
 def get_subscription_changes(user, device, since, until):
-    #ordered by ascending date; newer entries overwriter older ones
-    query = SubscriptionAction.objects.filter(device=device,
-            timestamp__gt=since, timestamp__lte=until).order_by('timestamp')
-    actions = dict([(a.podcast, a) for a in query])
+    add, rem = device.get_subscription_changes(since, until)
 
-    add = filter(lambda (p, a): a.action == SUBSCRIBE_ACTION, actions.items())
-    add = map(lambda (p, a): p.url, add)
+    podcast_ids = add + rem
+    podcasts = get_to_dict(models.Podcast, podcast_ids)
 
-    rem = filter(lambda (p, a): a.action == UNSUBSCRIBE_ACTION, actions.items())
-    rem = map(lambda (p, a): p.url, rem)
+    add_urls = [ podcasts[i].url for i in add]
+    rem_urls = [ podcasts[i].url for i in rem]
 
     until_ = int(mktime(until.timetuple()))
-    return {'add': add, 'remove': rem, 'timestamp': until_}
+    return {'add': add_urls, 'remove': rem_urls, 'timestamp': until_}
 
 
 @csrf_exempt
@@ -355,7 +357,8 @@ def updates(request, username, device_uid):
     except ValueError:
         return HttpResponseBadRequest('since-value is not a valid timestamp')
 
-    ret = get_subscription_changes(request.user, device, since, now)
+    dev = migrate.get_or_migrate_device(device)
+    ret = get_subscription_changes(request.user, dev, since, now)
     domain = RequestSite(request).domain
 
     # replace added urls with details

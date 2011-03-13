@@ -196,6 +196,14 @@ class PodcastUserState(Document):
 
 
     @classmethod
+    def for_device(cls, device_id):
+        r = PodcastUserState.view('users/podcast_states_by_device',
+            startkey=[device_id, None], endkey=[device_id, {}],
+            include_docs=True)
+        return list(r)
+
+
+    @classmethod
     def count(cls):
         r = PodcastUserState.view('users/podcast_states_by_user',
             limit=0)
@@ -216,6 +224,31 @@ class PodcastUserState(Document):
             self.disabled_devices = list(set(self.disabled_devices + [device.id]))
         elif not device.deleted and device.id in self.disabled_devices:
             self.disabled_devices.remove(device.id)
+
+
+    def get_change_between(self, device_id, since, until):
+        """
+        Returns the change of the subscription status for the given device
+        between the two timestamps.
+
+        The change is given as either 'subscribe' (the podcast has been
+        subscribed), 'unsubscribed' (the podcast has been unsubscribed) or
+        None (no change)
+        """
+
+        device_actions = filter(lambda x: x.device == device_id, self.actions)
+        before = filter(lambda x: x.timestamp <= since, device_actions)
+        after  = filter(lambda x: x.timestamp <= until, device_actions)
+
+        then = before[-1] if before else None
+        now  = after[-1]
+
+        if then is None:
+            if now.action != 'unsubscribe':
+                return now.action
+        elif then.action != now.action:
+            return now.action
+        return None
 
 
     def __eq__(self, other):
@@ -243,6 +276,26 @@ class Device(Document):
     def for_oldid(cls, oldid):
         r = cls.view('users/devices_by_oldid', key=oldid)
         return r.first() if r else None
+
+
+    def get_subscription_changes(self, since, until):
+        """
+        Returns the subscription changes for the device as two lists.
+        The first lists contains the Ids of the podcasts that have been
+        subscribed to, the second list of those that have been unsubscribed
+        from.
+        """
+
+        add, rem = [], []
+        podcast_states = PodcastUserState.for_device(self.id)
+        for p_state in podcast_states:
+            change = p_state.get_change_between(self.id, since, until)
+            if change == 'subscribe':
+                add.append( p_state.podcast )
+            elif change == 'unsubscribe':
+                rem.append( p_state.podcast )
+
+        return add, rem
 
 
 def token_generator(length=32):

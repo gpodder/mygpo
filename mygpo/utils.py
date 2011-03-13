@@ -285,3 +285,8 @@ def parse_range(s, min, max, default=None):
 
     except ValueError:
         return default if default is not None else (max-min)/2
+
+
+def get_to_dict(cls, ids):
+    objs = cls.get_multi(ids)
+    return dict(zip(ids, objs))
