@@ -25,7 +25,7 @@ from mygpo.api.models import Device, Podcast
 from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url
-from mygpo.api.backend import get_toplist, get_all_subscriptions
+from mygpo.api.backend import get_toplist
 from mygpo.api.advanced.directory import podcast_data
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
@@ -34,6 +34,7 @@ from mygpo.directory.search import search_podcasts
 from django.utils.translation import ugettext as _
 from mygpo.decorators import allowed_methods
 from mygpo.utils import parse_range
+from mygpo import migrate
 
 
 try:
@@ -76,7 +77,8 @@ def subscriptions(request, username, device_uid, format):
 @check_format
 @allowed_methods(['GET'])
 def all_subscriptions(request, username, format):
-    subscriptions = get_all_subscriptions(request.user)
+    user = migrate.get_or_migrate_user(request.user)
+    subscriptions = user.get_subscribed_podcasts()
     title = _('%(username)s\'s Subscription List') % {'username': username}
     return format_podcast_list(subscriptions, format, title)
 

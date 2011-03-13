@@ -27,7 +27,8 @@ def show_list(request):
 @manual_gc
 @login_required
 def download_all(request):
-    podcasts = backend.get_all_subscriptions(request.user)
+    user = migrate.get_or_migrate_user(request.user)
+    podcasts = user.get_subscribed_podcasts()
     response = simple.format_podcast_list(podcasts, 'opml', request.user.username)
     response['Content-Disposition'] = 'attachment; filename=all-subscriptions.opml'
     return response

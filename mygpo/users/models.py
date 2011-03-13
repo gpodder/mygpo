@@ -381,5 +381,16 @@ class User(Document):
         return [res['key'][1:] for res in r]
 
 
+    def get_subscribed_podcast_ids(self):
+        """
+        Returns the Ids of all subscribed podcasts
+        """
+        return list(set(x[0] for x in self.get_subscriptions()))
+
+
+    def get_subscribed_podcasts(self):
+        return Podcast.get_multi(self.get_subscribed_podcast_ids())
+
+
     def __repr__(self):
         return 'User %s' % self._id

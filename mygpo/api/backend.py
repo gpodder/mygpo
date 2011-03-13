@@ -15,7 +15,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from mygpo.api.models import Device, Podcast, Subscription, EpisodeToplistEntry
+from mygpo.api.models import Device, Podcast, EpisodeToplistEntry
 from mygpo.data.mimetype import get_type, CONTENT_TYPES
 from mygpo.core import models
 from mygpo.users.models import EpisodeUserState
@@ -156,10 +156,6 @@ def get_random_picks(languages=None, recent_days=timedelta(days=7)):
         return lang_podcasts
     else:
         return all_podcasts
-
-
-def get_all_subscriptions(user):
-    return set([s.podcast for s in Subscription.objects.filter(user=user)])
 
 
 def get_device(user, uid, undelete=True):

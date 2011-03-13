@@ -22,7 +22,7 @@ from mygpo.api.models import Device, Podcast, Episode, EpisodeAction, SUBSCRIBE_
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.api.advanced.directory import episode_data, podcast_data
-from mygpo.api.backend import get_all_subscriptions, get_device, get_favorites
+from mygpo.api.backend import get_device, get_favorites
 from django.shortcuts import get_object_or_404
 from django.contrib.sites.models import RequestSite
 from time import mktime, gmtime, strftime
@@ -372,7 +372,8 @@ def updates(request, username, device_uid):
 
 
     # add episode details
-    subscriptions = get_all_subscriptions(request.user)
+    user = migrate.get_or_migrate_user(request.user)
+    subscriptions = user.get_subscribed_podcasts()
     episode_status = {}
     for e in Episode.objects.filter(podcast__in=subscriptions, timestamp__gte=since).order_by('timestamp'):
         episode_status[e] = 'new'
