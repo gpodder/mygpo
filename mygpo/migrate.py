@@ -55,11 +55,16 @@ def save_device_signal(sender, instance=False, **kwargs):
     if not instance:
         return
 
-    user = get_or_migrate_user(instance.user)
     dev = get_or_migrate_device(instance)
     d = update_device(instance, dev)
+    user = get_or_migrate_user(instance.user)
     user.set_device(d)
     user.save()
+
+    podcast_states = PodcastUserState.for_user(instance.user)
+    for state in podcast_states:
+        state.set_device_state(dev)
+        state.save()
 
 
 def delete_device_signal(sender, instance=False, **kwargs):
@@ -374,3 +379,8 @@ def get_episode_user_state(user, episode, podcast):
     e_state.save()
 
     return e_state
+
+
+def get_devices(user):
+    from mygpo.api.models import Device
+    return [get_or_migrate_device(dev) for dev in Device.objects.filter(user=user)]

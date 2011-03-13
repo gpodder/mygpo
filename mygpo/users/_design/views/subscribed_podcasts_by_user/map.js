@@ -2,7 +2,8 @@ function(doc)
 {
     if(doc.doc_type == "PodcastUserState")
     {
-        subscribed_devices = []
+        subscribed_devices = [];
+
         for(n in doc.actions)
         {
             action = doc.actions[n];
@@ -21,6 +22,12 @@ function(doc)
         for(n in subscribed_devices)
         {
             device = subscribed_devices[n];
+
+            if(doc.disabled_devices && (doc.disabled_devices.indexOf(device) > -1))
+            {
+                continue;
+            }
+
             emit([doc.user_oldid, doc.podcast, device], null);
         }
     }

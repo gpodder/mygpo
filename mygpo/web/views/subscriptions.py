@@ -72,6 +72,9 @@ def create_subscriptionlist(request):
     user = migrate.get_or_migrate_user(request.user)
     subscriptions = user.get_subscriptions()
 
+    if not subscriptions:
+        return []
+
     # Load all Podcasts and Devices first to ensure that they are
     # only loaded once, not for each occurance in a Subscription
     podcast_ids, device_ids = unzip(subscriptions)

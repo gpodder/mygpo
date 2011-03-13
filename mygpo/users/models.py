@@ -165,6 +165,7 @@ class PodcastUserState(Document):
     actions       = SchemaListProperty(SubscriptionAction)
     tags          = StringListProperty()
     ref_url       = StringProperty(required=True)
+    disabled_devices = StringListProperty()
 
 
     @classmethod
@@ -178,6 +179,11 @@ class PodcastUserState(Document):
             p.podcast = podcast.get_id()
             p.user_oldid = user.id
             p.ref_url = podcast.url
+
+            from mygpo import migrate
+            for device in migrate.get_devices(user):
+                p.set_device_state(device)
+
             return p
 
 
@@ -205,6 +211,13 @@ class PodcastUserState(Document):
         self.tags = list(set(self.tags + tags))
 
 
+    def set_device_state(self, device):
+        if device.deleted:
+            self.disabled_devices = list(set(self.disabled_devices + [device.id]))
+        elif not device.deleted and device.id in self.disabled_devices:
+            self.disabled_devices.remove(device.id)
+
+
     def __eq__(self, other):
         if other is None:
             return False
@@ -224,6 +237,7 @@ class Device(Document):
     name     = StringProperty()
     type     = StringProperty()
     settings = DictProperty()
+    deleted  = BooleanProperty()
 
     @classmethod
     def for_oldid(cls, oldid):
@@ -271,22 +285,27 @@ class User(Document):
 
 
     def set_device(self, device):
-        ids = [x.id for x in self.devices]
+        devices = list(self.devices)
+        ids = [x.id for x in devices]
         if not device.id in ids:
-            self.devices.append(device)
+            devices.append(device)
+            return
 
         index = ids.index(device.id)
-        self.devices.pop(index)
-        self.devices.insert(index, device)
+        devices.pop(index)
+        devices.insert(index, device)
+        self.devices = devices
 
 
     def remove_device(self, device):
-        ids = [x.id for x in self.devices]
+        devices = list(self.devices)
+        ids = [x.id for x in devices]
         if not device.id in ids:
             return
 
         index = ids.index(device.id)
-        self.devices.pop(index)
+        devices.pop(index)
+        self.devices = devices
 
 
     def get_subscriptions(self):
