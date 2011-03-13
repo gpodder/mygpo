@@ -18,7 +18,7 @@
 from mygpo.api.basic_auth import require_valid_user, check_username
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.core.cache import cache
-from mygpo.api.models import Device, Podcast, Episode, EpisodeAction, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, EPISODE_ACTION_TYPES, DEVICE_TYPES, Subscription
+from mygpo.api.models import Device, Podcast, Episode, EpisodeAction, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, EPISODE_ACTION_TYPES, DEVICE_TYPES
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.api.advanced.directory import episode_data, podcast_data
@@ -326,6 +326,7 @@ def valid_episodeaction(type):
 @allowed_methods(['GET'])
 def devices(request, username):
     devices = Device.objects.filter(user=request.user, deleted=False)
+    devices = map(migrate.get_or_migrate_device, devices)
     devices = map(device_data, devices)
 
     return JsonResponse(devices)
@@ -336,7 +337,7 @@ def device_data(device):
         id           = device.uid,
         caption      = device.name,
         type         = device.type,
-        subscriptions= Subscription.objects.filter(device=device).count()
+        subscriptions= len(device.get_subscribed_podcasts())
     )
 
 

@@ -298,6 +298,14 @@ class Device(Document):
         return add, rem
 
 
+    def get_subscribed_podcasts(self):
+        r = self.view('users/subscribed_podcasts_by_device',
+            startkey=[self.id, None],
+            endkey=[self.id, {}])
+        return [res['key'][1] for res in r]
+
+
+
 def token_generator(length=32):
     import random, string
     return  "".join(random.sample(string.letters+string.digits, length))
