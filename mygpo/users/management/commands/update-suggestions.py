@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from mygpo.core.models import Podcast
 from mygpo.users.models import Suggestions
 from mygpo.api import models
-from mygpo.migrate import get_or_migrate_podcast
+from mygpo import migrate
 from mygpo.utils import progress, set_by_frequency
 
 
@@ -41,8 +41,8 @@ class Command(BaseCommand):
         for n, user in enumerate(users):
             suggestion = Suggestions.for_user_oldid(user.id)
 
-            subscribed_podcasts = set([s.podcast for s in models.Subscription.objects.filter(user=user)])
-            subscribed_podcasts = map(get_or_migrate_podcast, subscribed_podcasts)
+            new_user = migrate.get_or_migrate_user(user)
+            subscribed_podcasts = list(set(new_user.get_subscribed_podcasts()))
 
             related = chain(*[p.related_podcasts for p in subscribed_podcasts])
             related = filter(lambda pid: not pid in suggestion.blacklist, related)

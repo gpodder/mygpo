@@ -31,15 +31,13 @@ class Suggestions(Document):
 
 
     def get_podcasts(self, count=None):
-        from mygpo.api.models import Subscription
-        subscriptions = [x.podcast for x in Subscription.objects.filter(user__id=self.user_oldid)]
-        subscriptions = [Podcast.for_oldid(x.id) for x in subscriptions]
-        subscriptions = [x._id for x in subscriptions if x]
+        user = User.for_oldid(self.user_oldid)
+        subscriptions = user.get_subscribed_podcast_ids()
 
         ids = filter(lambda x: not x in self.blacklist + subscriptions, self.podcasts)
         if count:
             ids = ids[:count]
-        return Podcast.get_multi(ids)
+        return filter(lambda x: x.title, Podcast.get_multi(ids))
 
 
     def __repr__(self):
