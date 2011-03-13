@@ -18,7 +18,7 @@
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from mygpo.api.opml import Importer, Exporter
-from mygpo.api.models import Subscription, Podcast, Device
+from mygpo.api.models import Podcast, Device
 from mygpo.api.backend import get_device
 from datetime import datetime
 from django.utils.datastructures import MultiValueDictKeyError
@@ -46,10 +46,9 @@ def upload(request):
         return HttpResponse('@AUTHFAIL', mimetype='text/plain')
 
     d = get_device(user, LEGACY_DEVICE_UID)
+    dev = migrate.get_or_migrate_device(d)
 
-    existing = Subscription.objects.filter(user=user, device=d)
-
-    existing_urls = [e.podcast.url for e in existing]
+    existing_urls = [x.url for x in dev.get_subscribed_podcasts()]
 
     i = Importer(opml)
 
@@ -58,7 +57,7 @@ def upload(request):
     podcast_urls = filter(lambda x: x, podcast_urls)
 
     new = [u for u in podcast_urls if u not in existing_urls]
-    rem = [e.podcast.url for e in existing if e.podcast.url not in podcast_urls]
+    rem = [u for e in existing_urls if u not in podcast_urls]
 
     #remove duplicates
     new = list(set(new))

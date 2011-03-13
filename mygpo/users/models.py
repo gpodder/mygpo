@@ -298,12 +298,15 @@ class Device(Document):
         return add, rem
 
 
-    def get_subscribed_podcasts(self):
+    def get_subscribed_podcasts_ids(self):
         r = self.view('users/subscribed_podcasts_by_device',
             startkey=[self.id, None],
             endkey=[self.id, {}])
         return [res['key'][1] for res in r]
 
+
+    def get_subscribed_podcasts(self):
+        return Podcast.get_mutlti(self.get_subscribed_podcasts_ids())
 
 
 def token_generator(length=32):

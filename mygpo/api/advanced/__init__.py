@@ -337,7 +337,7 @@ def device_data(device):
         id           = device.uid,
         caption      = device.name,
         type         = device.type,
-        subscriptions= len(device.get_subscribed_podcasts())
+        subscriptions= len(device.get_subscribed_podcast_ids())
     )
 
 
