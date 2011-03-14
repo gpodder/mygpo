@@ -19,6 +19,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from mygpo.api.models import Episode, Device, Subscription
 from datetime import datetime
+from mygpo import migrate
 
 class Chapter(models.Model):
     user = models.ForeignKey(User)
@@ -34,14 +35,9 @@ class Chapter(models.Model):
         if not self.user.get_profile().public_profile:
             return False
 
-        s = Subscription.objects.filter(podcast=self.episode.podcast, user=self.user)
-        if not s.exists():
-            return True
-
-        if not s[0].get_meta().public:
-            return False
-
-        return True
+        podcast = migrate.get_or_migrate_podcast(self.episode.podcast)
+        state = podcast.get_user_state(self.user)
+        return state.settings.get('public_subscription')
 
     class Meta:
         db_table = 'chapters'
