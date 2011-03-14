@@ -17,7 +17,7 @@
 
 from django.db import models
 from django.contrib.auth.models import User
-from mygpo.api.models import Episode, Device, Subscription
+from mygpo.api.models import Episode, Device
 from datetime import datetime
 from mygpo import migrate
 
