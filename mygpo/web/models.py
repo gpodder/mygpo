@@ -59,3 +59,7 @@ class SecurityToken(models.Model):
         if self.token == '':
             return True
         return self.token == token
+
+
+class HistoryEntry(object):
+    pass

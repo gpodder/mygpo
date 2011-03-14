@@ -294,3 +294,28 @@ def get_to_dict(cls, ids):
 
 def flatten(l):
     return [item for sublist in l for item in sublist]
+
+
+def linearize(key, reverse=False, *args):
+    """
+    Linearizes a number of iterators, sorted by some comparison function
+    """
+
+    iters = [iter(i) for i in args]
+    vals = []
+    for i in iters:
+        try:
+            v = i.next()
+            vals. append( (v, i) )
+        except StopIteration:
+            continue
+
+    while vals:
+        vals = sorted(vals, key=lambda x: key(x[0]), reverse=reverse)
+        val, it = vals.pop(0)
+        yield val
+        try:
+            next_val = it.next()
+            vals.append( (next_val, it) )
+        except StopIteration:
+            pass
