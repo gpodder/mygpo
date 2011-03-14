@@ -59,7 +59,7 @@ def show(request, pid):
                        error_message = _('You can\'t use the same Device ID for two devices.')
             else:
                 privacy_form = PrivacyForm({
-                    'public': state.settings['public_subscription']
+                    'public': state.settings.get('public_subscription', True)
                 })
 
         else:
