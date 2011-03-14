@@ -1,5 +1,5 @@
 from mygpo.core import models
-from mygpo.api.models import Podcast, SubscriptionAction, SubscriptionMeta, Subscription, Episode, EpisodeAction
+from mygpo.api.models import Podcast, Episode, EpisodeAction
 from mygpo.api.models.episodes import Chapter
 from mygpo.data.models import Listener
 from mygpo.log import log
@@ -117,7 +117,7 @@ def maintenance(dry_run=False):
         if su == '':
             try:
                 if not dry_run:
-                    delete_podcast(p)
+                    p.delete()
                 p_deleted += 1
 
             except Exception, e:
@@ -149,8 +149,6 @@ def maintenance(dry_run=False):
         try:
             if not dry_run:
                 rewrite_podcasts(p, su_podcast)
-                tmp = Subscription.objects.filter(podcast=p)
-                if tmp.count() > 0: print tmp.count()
                 p.delete()
 
             p_merged += 1
@@ -260,11 +258,6 @@ def maintenance(dry_run=False):
 
 
 
-def delete_podcast(p):
-    SubscriptionAction.objects.filter(podcast=p).delete()
-    p.delete()
-
-
 def delete_episode(e):
     EpisodeAction.objects.filter(episode=e).delete()
     Listener.objects.filter(episode=e).delete()
@@ -278,28 +271,6 @@ def rewrite_podcasts(p_old, p_new):
     rewrite_episodes(p_old, p_new)
 
     rewrite_newpodcast(p_old, p_new)
-
-    for sm in SubscriptionMeta.objects.filter(podcast=p_old):
-        try:
-            sm_new = SubscriptionMeta.objects.get(user=sm.user, podcast=p_new)
-            log('subscription meta %s (user %s, podcast %s) already exists, deleting %s (user %s, podcast %s)' % (sm_new.id, sm.user.id, p_new.id, sm.id, sm.user.id, p_old.id))
-            # meta-info already exist for the correct podcast, delete the other one
-            sm.delete()
-
-        except SubscriptionMeta.DoesNotExist:
-            # meta-info for new podcast does not yet exist, update the old one
-            log('updating subscription meta %s (user %s, podcast %s => %s)' % (sm.id, sm.user, p_old.id, p_new.id))
-            sm.podcast = p_new
-            sm.save()
-
-    for sa in SubscriptionAction.objects.filter(podcast=p_old):
-        try:
-            log('updating subscription action %s (device %s, action %s, timestamp %s, podcast %s => %s)' % (sa.id, sa.device.id, sa.action, sa.timestamp, sa.podcast.id, p_new.id))
-            sa.podcast = p_new
-            sa.save()
-        except Exception, e:
-            log('error updating subscription action %s: %s, deleting' % (sa.id, e))
-            sa.delete()
 
 def rewrite_newpodcast(p_old, p_new):
     p_n = models.Podcast.for_oldid(p_new.id)
