@@ -72,7 +72,7 @@ def delete_device_signal(sender, instance=False, **kwargs):
         return
 
     user = get_or_migrate_user(instance.user)
-    dev = get_or_migrate_user(instance)
+    dev = get_or_migrate_device(instance)
     user.remove_device(dev)
     user.save()
 

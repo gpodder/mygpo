@@ -201,6 +201,14 @@ class PodcastUserState(Document):
         return list(r)
 
 
+    def remove_device(self, device):
+        """
+        Removes all actions from the podcast state that refer to the
+        given device
+        """
+        self.actions = filter(lambda a: a.device != device.id, self.actions)
+
+
     @classmethod
     def count(cls):
         r = PodcastUserState.view('users/podcast_states_by_user',

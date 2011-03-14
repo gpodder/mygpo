@@ -19,8 +19,8 @@ from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponseForbidden
 from django.template import RequestContext
-from mygpo.api.models import Device, EpisodeAction, SubscriptionAction
-from mygpo.data.models import BackendSubscription, Listener
+from mygpo.api.models import Device, EpisodeAction
+from mygpo.data.models import Listener
 from mygpo.web.forms import DeviceForm, SyncForm
 from mygpo.web import utils
 from django.utils.translation import ugettext as _
@@ -30,6 +30,8 @@ from django.db import IntegrityError
 from mygpo.log import log
 from mygpo.api import simple
 from mygpo.decorators import manual_gc, allowed_methods
+from mygpo.users.models import PodcastUserState
+from mygpo import migrate
 
 
 @manual_gc
@@ -160,10 +162,14 @@ def delete(request, device_id):
 def delete_permanently(request, device_id):
 
     device = get_object_or_404(Device, pk=device_id, user=request.user)
+    dev = migrate.get_or_migrate_device(device)
 
-    SubscriptionAction.objects.filter(device=device).delete()
+    states = PodcastUserState.for_device(dev.id)
+    for state in states:
+        state.remove_device(dev)
+        state.save()
+
     EpisodeAction.objects.filter(device=device).delete()
-    BackendSubscription.objects.filter(device=device).delete()
     Listener.objects.filter(device=device).delete()
     device.delete()
 
