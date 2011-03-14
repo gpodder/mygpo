@@ -370,27 +370,27 @@ class User(Document):
         self.devices = devices
 
 
-    def get_subscriptions(self):
+    def get_subscriptions(self, public=None):
         """
         Returns a list of (podcast-id, device-id) tuples for all
         of the users subscriptions
         """
 
         r = PodcastUserState.view('users/subscribed_podcasts_by_user',
-            startkey=[self.oldid, None, None],
-            endkey=[self.oldid+1, None, None])
-        return [res['key'][1:] for res in r]
+            startkey=[self.oldid, public, None, None],
+            endkey=[self.oldid+1, None, None, None])
+        return [res['key'][2:] for res in r]
 
 
-    def get_subscribed_podcast_ids(self):
+    def get_subscribed_podcast_ids(self, public=None):
         """
         Returns the Ids of all subscribed podcasts
         """
-        return list(set(x[0] for x in self.get_subscriptions()))
+        return list(set(x[0] for x in self.get_subscriptions(public=public)))
 
 
-    def get_subscribed_podcasts(self):
-        return Podcast.get_multi(self.get_subscribed_podcast_ids())
+    def get_subscribed_podcasts(self, public=None):
+        return Podcast.get_multi(self.get_subscribed_podcast_ids(public=public))
 
 
     def __repr__(self):

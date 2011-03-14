@@ -7,7 +7,7 @@ from django.template import RequestContext
 from mygpo.core.models import Podcast
 from mygpo.utils import parse_bool, unzip
 from mygpo.decorators import manual_gc, requires_token
-from mygpo.api.models import Device, Subscription, Episode
+from mygpo.api.models import Device, Episode
 from mygpo.api import backend, simple
 from mygpo.web import utils
 from mygpo import migrate
@@ -40,7 +40,7 @@ def for_user(request, username):
     user = get_object_or_404(User, username=username)
     new_user = migrate.get_or_migrate_user(user)
 
-    subscriptions = Subscription.objects.public_subscribed_podcasts(user)
+    subscriptions = new_user.get_subscribed_podcasts(public=True)
     token = new_user.subscriptions_token
 
     return render_to_response('user_subscriptions.html', {
@@ -52,7 +52,8 @@ def for_user(request, username):
 @requires_token(token_name='subscriptions_token')
 def for_user_opml(request, username):
     user = get_object_or_404(User, username=username)
-    subscriptions = Subscription.objects.public_subscribed_podcasts(user)
+    new_user = migrate.get_or_migrate_user(user)
+    subscriptions = new_user.get_subscribed_podcasts(public=True)
 
     if parse_bool(request.GET.get('symbian', False)):
         subscriptions = map(utils.symbian_opml_changes, subscriptions)

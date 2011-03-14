@@ -28,7 +28,17 @@ function(doc)
                 continue;
             }
 
-            emit([doc.user_oldid, doc.podcast, device], null);
+
+            if(doc.settings == null || doc.settings.public_subscription == null)
+            {
+                is_public = true;
+            }
+            else
+            {
+                is_public = doc.settings.public_subscription;
+            }
+
+            emit([doc.user_oldid, is_public, doc.podcast, device], null);
         }
     }
 }
