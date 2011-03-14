@@ -1,7 +1,7 @@
 from mygpo.core import models
 from mygpo.api.models import Podcast, SubscriptionAction, SubscriptionMeta, Subscription, Episode, EpisodeAction
 from mygpo.api.models.episodes import Chapter
-from mygpo.data.models import BackendSubscription, Listener
+from mygpo.data.models import Listener
 from mygpo.log import log
 from mygpo.utils import iterate_together
 import urlparse
@@ -262,7 +262,6 @@ def maintenance(dry_run=False):
 
 def delete_podcast(p):
     SubscriptionAction.objects.filter(podcast=p).delete()
-    BackendSubscription.objects.filter(podcast=p).delete()
     p.delete()
 
 
@@ -301,16 +300,6 @@ def rewrite_podcasts(p_old, p_new):
         except Exception, e:
             log('error updating subscription action %s: %s, deleting' % (sa.id, e))
             sa.delete()
-
-    for sub in BackendSubscription.objects.filter(podcast=p_old):
-        try:
-            log('updating subscription %s (device %s, user %s, since %s, podcast %s => %s)' % (sub.id, sub.device.id, sub.user.id, sub.subscribed_since, p_old.id, p_new.id))
-            sub.podcast = p_new
-            sub.save()
-        except Exception, e:
-            log('error updating subscription %s: %s, deleting' % (sub.id, e))
-            sub.delete()
-
 
 def rewrite_newpodcast(p_old, p_new):
     p_n = models.Podcast.for_oldid(p_new.id)
