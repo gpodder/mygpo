@@ -113,6 +113,7 @@ def update_subscriptions(user, device, add, remove):
 
     for a in add_sanitized:
         p, p_created = Podcast.objects.get_or_create(url=a)
+        p = migrate.get_or_migrate_podcast(p)
         try:
             p.subscribe(device)
         except IntegrityError, e:
@@ -120,6 +121,7 @@ def update_subscriptions(user, device, add, remove):
 
     for r in rem_sanitized:
         p, p_created = Podcast.objects.get_or_create(url=r)
+        p = migrate.get_or_migrate_podcast(p)
         try:
             p.unsubscribe(device)
         except IntegrityError, e:

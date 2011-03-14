@@ -78,7 +78,7 @@ def create_subscriptionlist(request):
         return []
 
     # Load all Podcasts and Devices first to ensure that they are
-    # only loaded once, not for each occurance in a Subscription
+    # only loaded once, not for each occurance in a subscription
     public, podcast_ids, device_ids = unzip(subscriptions)
     podcast_ids= list(set(podcast_ids))
     device_ids = list(set(device_ids))

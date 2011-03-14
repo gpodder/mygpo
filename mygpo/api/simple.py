@@ -124,11 +124,9 @@ def format_podcast_list(obj_list, format, title, get_podcast=None, json_map=lamb
 
 def get_subscriptions(user, device_uid):
     device = get_object_or_404(Device, uid=device_uid, user=user, deleted=False)
+    device = migrate.get_or_migrate_device(device)
 
-    subscriptions = sorted(device.get_subscriptions(), \
-        key=lambda s: s.subscribed_since, reverse=True)
-
-    return [s.podcast for s in subscriptions]
+    return device.get_subscribed_podcasts()
 
 
 def parse_subscription(raw_post_data, format):
@@ -169,10 +167,12 @@ def set_subscriptions(urls, user, device_uid):
 
     for r in rem:
         p = Podcast.objects.get(url=r)
+        p = migrate.get_or_migrate_podcast(p)
         p.unsubscribe(device)
 
     for n in new:
         p, created = Podcast.objects.get_or_create(url=n)
+        p = migrate.get_or_migrate_podcast(p)
         p.subscribe(device)
 
     # Only an empty response is a successful response

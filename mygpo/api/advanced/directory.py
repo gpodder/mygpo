@@ -54,6 +54,7 @@ def tag_podcasts(request, tag, count):
 def podcast_info(request):
     url = sanitize_url(request.GET.get('url', ''))
     podcast = get_object_or_404(Podcast, url=url)
+    podcast = migrate.get_or_migrate_podcast(podcast)
     domain = RequestSite(request).domain
     resp = podcast_data(podcast, domain)
 

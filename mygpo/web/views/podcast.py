@@ -38,7 +38,7 @@ def show(request, pid):
         subscribed_devices = state.get_subscribed_device_ids()
         subscribed_devices = [user.get_device(x) for x in subscribed_devices]
 
-        subscribe_targets = podcast.subscribe_targets(request.user)
+        subscribe_targets = new_podcast.subscribe_targets(request.user)
         success = False
 
         history = list(state.actions)
@@ -224,7 +224,8 @@ def subscribe(request, pid):
                 device = target
 
             try:
-                podcast.subscribe(device)
+                p = migrate.get_or_migrate_podcast(podcast)
+                p.subscribe(device)
             except IntegrityError, e:
                 log('error while subscribing to podcast (device %s, podcast %s)' % (device.id, podcast.id))
 
@@ -256,9 +257,10 @@ def unsubscribe(request, pid, device_id):
         raise Http404('Wrong URL')
 
     podcast = get_object_or_404(Podcast, pk=pid)
+    p = migrate.get_or_migrate_podcast(podcast)
     device = get_object_or_404(Device, pk=device_id, user=request.user)
     try:
-        podcast.unsubscribe(device)
+        p.unsubscribe(device)
     except IntegrityError, e:
         log('error while unsubscribing from podcast (device %s, podcast %s)' % (device.id, podcast.id))
 

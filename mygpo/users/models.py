@@ -149,6 +149,10 @@ class SubscriptionAction(Document):
     def __hash__(self):
         return hash(self.action) + hash(self.timestamp) + hash(self.device)
 
+    def __repr__(self):
+        return '<SubscriptionAction %s on %s at %s>' % (
+            self.action, self.device, self.timestamp)
+
 
 class PodcastUserState(Document):
     """
@@ -214,6 +218,20 @@ class PodcastUserState(Document):
         r = PodcastUserState.view('users/podcast_states_by_user',
             limit=0)
         return r.total_rows
+
+
+    def subscribe(self, device):
+        action = SubscriptionAction()
+        action.action = 'subscribe'
+        action.device = device.id
+        self.add_actions([action])
+
+
+    def unsubscribe(self, device):
+        action = SubscriptionAction()
+        action.action = 'unsubscribe'
+        action.device = device.id
+        self.add_actions([action])
 
 
     def add_actions(self, actions):
@@ -311,7 +329,18 @@ class Device(Document):
         return add, rem
 
 
+    def get_latest_changes(self):
+        podcast_states = PodcastUserState.for_device(self.id)
+        for p_state in podcast_states:
+            actions = filter(lambda x: x.device == self.id, reversed(p_state.actions))
+            if actions:
+                yield (p_state.podcast, actions[0])
+
+
     def get_subscribed_podcasts_ids(self):
+        from mygpo.api.models import Device
+        d = Device.objects.get(id=self.oldid)
+        d.sync()
         r = self.view('users/subscribed_podcasts_by_device',
             startkey=[self.id, None],
             endkey=[self.id, {}])
@@ -319,7 +348,8 @@ class Device(Document):
 
 
     def get_subscribed_podcasts(self):
-        return Podcast.get_mutlti(self.get_subscribed_podcasts_ids())
+        return Podcast.get_multi(self.get_subscribed_podcasts_ids())
+
 
 
 def token_generator(length=32):

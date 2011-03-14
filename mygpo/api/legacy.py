@@ -66,6 +66,7 @@ def upload(request):
     for n in new:
         try:
             p, created = Podcast.objects.get_or_create(url=n)
+            p = migrate.get_or_migrate_podcast(p)
         except IntegrityError, e:
             log('/upload: Error trying to get podcast object: %s (error: %s)' % (n, e))
             continue
@@ -79,6 +80,7 @@ def upload(request):
 
     for r in rem:
         p, created = Podcast.objects.get_or_create(url=r)
+        p = migrate.get_or_migrate_podcast(p)
         try:
             p.unsubscribe(d)
         except IntegrityError, e:
@@ -100,7 +102,8 @@ def getlist(request):
 
     # We ignore deleted devices, because the Legacy API doesn't know such a concept
 
-    podcasts = [s.podcast for s in d.get_subscriptions()]
+    dev = migrate.get_or_migrate_device(d)
+    podcasts = dev.get_subscribed_podcasts()
 
     # FIXME: Get username and set a proper title (e.g. "thp's subscription list")
     title = 'Your subscription list'

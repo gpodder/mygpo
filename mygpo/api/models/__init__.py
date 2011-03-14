@@ -61,38 +61,6 @@ class Podcast(models.Model):
     content_types = SeparatedValuesField(null=True, blank=True)
 
 
-    def subscribe(self, device):
-        """
-        Subscribe to the current Podcast on the given Device
-        """
-        SubscriptionAction.objects.create(podcast=self, action=SUBSCRIBE_ACTION, device=device)
-
-
-    def unsubscribe(self, device):
-        """
-        Unsubscribe the current Podcast from the given Device
-        """
-        SubscriptionAction.objects.create(podcast=self, action=UNSUBSCRIBE_ACTION, device=device)
-
-
-    def subscriptions(self):
-        """
-        returns all public subscriptions to this podcast
-        """
-        return Subscription.objects.public_subscriptions([self])
-
-
-    def subscription_count(self):
-        return self.subscriptions().count()
-
-    def subscriber_count(self):
-        """
-        Returns the number of public subscriptions to this podcast
-        """
-        subscriptions = self.subscriptions()
-        return max(0, subscriptions.values('user').distinct().count())
-
-
     def listener_count(self):
         from mygpo.data.models import Listener
         return Listener.objects.filter(podcast=self).values('user').distinct().count()
@@ -108,26 +76,6 @@ class Podcast(models.Model):
             return '/logo/%d/%s.jpg' % (size, sha)
         else:
             return '/media/podcast-%d.png' % (hash(self.title) % 5, )
-
-
-    def subscribe_targets(self, user):
-        """
-        returns all Devices and SyncGroups on which this podcast can be subsrbied. This excludes all
-        devices/syncgroups on which the podcast is already subscribed
-        """
-        targets = []
-
-        devices = Device.objects.filter(user=user, deleted=False)
-        for d in devices:
-            subscriptions = [x.podcast for x in d.get_subscriptions()]
-            if self in subscriptions: continue
-
-            if d.sync_group:
-                if not d.sync_group in targets: targets.append(d.sync_group)
-            else:
-                targets.append(d)
-
-        return targets
 
 
     def group_with(self, other, grouptitle, myname, othername):
@@ -194,23 +142,6 @@ class PodcastGroup(models.Model):
 
     def podcasts(self):
         return Podcast.objects.filter(group=self)
-
-    def subscriptions(self):
-        """
-        returns the public subscriptions to podcasts in the group
-        """
-        return Subscription.objects.public_subscriptions(self.podcasts())
-
-    def subscription_count(self):
-        return self.subscriptions().count()
-
-    def subscriber_count(self):
-        """
-        Returns the number of public subscriptions to podcasts of this group
-        """
-        subscriptions = self.subscriptions()
-        return max(0, subscriptions.values('user').distinct().count())
-
 
     def __unicode__(self):
         return self.title
@@ -321,16 +252,33 @@ class Device(models.Model):
     def __unicode__(self):
         return self.name if self.name else _('Unnamed Device (%s)' % self.uid)
 
-    def get_subscriptions(self):
-        self.sync()
-        return Subscription.objects.filter(device=self)
 
     def sync(self):
-        for s in self.get_sync_actions():
-            try:
-                SubscriptionAction.objects.create(device=self, podcast=s.podcast, action=s.action)
-            except Exception, e:
-                log('Error adding subscription action: %s (device %s, podcast %s, action %s)' % (str(e), repr(self), repr(s.podcast), repr(s.action)))
+        """
+        Synchronize changes from the other members in the sync-group to the device
+        """
+
+        changes = self.get_sync_actions()
+        if len(changes) == 0:
+            return
+        add = changes[0]
+        rem = changes[1]
+
+        print add
+        print rem
+        print
+
+        from mygpo.core import models
+        podcasts = utils.get_to_dict(models.Podcast, add + rem)
+
+        for podcast_id in add:
+            podcast = podcasts[podcast_id]
+            podcast.subscribe(self)
+
+        for podcast_id in rem:
+            podcast = podcasts[podcast_id]
+            podcast.unsubscribe(self)
+
 
     def sync_targets(self):
         """
@@ -347,64 +295,68 @@ class Device(models.Model):
 
     def get_sync_actions(self):
         """
-        returns the SyncGroupSubscriptionActions correspond to the
-        SubscriptionActions that need to be saved for the current device
-        to synchronize it with its SyncGroup
+        returns lists of podcasts that need to be added and removed as part
+        of a synchronization.
         """
         if self.sync_group == None:
             return []
 
+        # Collect latest changes to all podcasts within the sync-group
         devices = self.sync_group.devices().exclude(pk=self.id)
-
-        sync_actions = self.latest_actions()
+        sync_actions = {}
 
         for d in devices:
-            a = d.latest_actions()
-            for s in a.keys():
-                if not sync_actions.has_key(s):
-                    if a[s].action == SUBSCRIBE_ACTION:
-                        sync_actions[s] = a[s]
-                elif a[s].newer_than(sync_actions[s]) and (sync_actions[s].action != a[s].action):
-                    sync_actions[s] = a[s]
+            actions = d.latest_actions()
+            for podcast_id, action in actions.items():
+                if not podcast_id in sync_actions or action.timestamp > sync_actions[podcast_id].timestamp:
+                    sync_actions[podcast_id] = action
 
-        #remove actions that did not change
+
+        # Filter those that describe actual changes to the current state
+        add, rem = [], []
         current_state = self.latest_actions()
-        for podcast in current_state.keys():
-            if podcast in current_state and podcast in sync_actions and sync_actions[podcast] == current_state[podcast]:
-               del sync_actions[podcast]
 
-        return sync_actions.values()
+        for podcast_id, action in sync_actions.items():
+
+            print action
+            print current_state.get(podcast_id, '')
+            print
+
+            # Sync-Actions must be newer than current state
+            if podcast_id in current_state and \
+               action.timestamp <= current_state[podcast_id].timestamp:
+                continue
+
+            # subscribe only what hasn't been subscribed before
+            if action.action == 'subscribe' and \
+                        (podcast_id not in current_state or \
+                         current_state[podcast_id].action == 'unsubscribe'):
+                add.append(podcast_id)
+
+            # unsubscribe only what has been subscribed before
+            elif action.action == 'unsubscribe' and \
+                        podcast_id in current_state and \
+                        current_state[podcast_id].action == 'subscribe':
+                rem.append(podcast_id)
+
+        return add, rem
+
 
     def latest_actions(self):
         """
         returns the latest action for each podcast
         that has an action on this device
         """
-        #all podcasts that have an action on this device
-        podcasts = [sa.podcast for sa in SubscriptionAction.objects.filter(device=self)]
-        podcasts = list(set(podcasts)) #remove duplicates
 
-        actions = {}
-        for p in podcasts:
-            actions[p] = self.latest_action(p)
+        dev = migrate.get_or_migrate_device(self)
+        return dict(dev.get_latest_changes())
 
-        return actions
-
-    def latest_action(self, podcast):
-        """
-        returns the latest action for the given podcast on this device
-        """
-        actions = SubscriptionAction.objects.filter(podcast=podcast,device=self).order_by('-timestamp', '-id')
-        if actions.count() == 0:
-            return None
-        else:
-            return actions[0]
 
     def sync_with(self, other):
         """
         set the device to be synchronized with other, which can either be a Device or a SyncGroup.
         this method places them in the same SyncGroup. get_sync_actions() can
-        then return the SyncGroupSubscriptionActions for brining the device
+        then return the synchronization actions for brining the device
         in sync with its group
         """
         if self.user != other.user:
@@ -487,72 +439,7 @@ class EpisodeAction(models.Model):
         db_table = 'episode_log'
 
 
-class SubscriptionManager(models.Manager):
-
-    def public_subscriptions(self, podcasts=None, users=None):
-        """
-        Returns either all public subscriptions or filtered for the given podcasts and/or users
-        """
-
-        subscriptions = self.filter(podcast__in=podcasts) if podcasts else self.all()
-
-        # remove users with private profiles
-        subscriptions = subscriptions.exclude(user__userprofile__public_profile=False)
-
-        # remove inactive (eg deleted) users
-        subscriptions = subscriptions.exclude(user__is_active=False)
-
-        if podcasts:
-            # remove uers that have marked their subscription to this podcast as private
-            private_users = SubscriptionMeta.objects.filter(podcast__in=podcasts, public=False).values('user')
-            subscriptions = subscriptions.exclude(user__in=private_users)
-
-        if users:
-            subscriptions = subscriptions.filter(user__in=users)
-
-        return subscriptions
-
-
-    def public_subscribed_podcasts(self, user):
-        """
-        Returns the Podcasts that the given user has subscribed to
-        and marked public
-        """
-        subscriptions = self.public_subscriptions(users=[user])
-        return list(set([s.podcast for s in subscriptions]))
-
-
-
-class Subscription(models.Model):
-    device = models.ForeignKey(Device, primary_key=True)
-    podcast = models.ForeignKey(Podcast)
-    user = models.ForeignKey(User)
-    subscribed_since = models.DateTimeField()
-
-    objects = SubscriptionManager()
-
-    def __unicode__(self):
-        return '%s - %s on %s' % (self.device.user, self.podcast, self.device)
-
-    def get_meta(self):
-        #this is different than get_or_create because it does not necessarily create a new meta-object
-        qs = SubscriptionMeta.objects.filter(user=self.user, podcast=self.podcast)
-
-        if qs.count() == 0:
-            return SubscriptionMeta(user=self.user, podcast=self.podcast)
-        else:
-            return qs[0]
-            
-    #this method has to be overwritten, if not it tries to delete a view
-    def delete(self):
-        pass
-        
-    class Meta:
-        db_table = 'current_subscription'
-        #not available in Django 1.0 (Debian stable)
-        managed = False
-
-
+# deprecated, only used in migration code
 class SubscriptionMeta(models.Model):
     user = models.ForeignKey(User)
     podcast = models.ForeignKey(Podcast)
@@ -572,6 +459,7 @@ class SubscriptionMeta(models.Model):
         unique_together = ('user', 'podcast')
 
 
+# deprecated, only used in migration code
 class SubscriptionAction(models.Model):
     device = models.ForeignKey(Device)
     podcast = models.ForeignKey(Podcast)

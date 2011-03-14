@@ -193,7 +193,8 @@ def get_subscription_history(user, device_id=None, count=15):
 
     def action_iter(state):
         for action in reversed(state.actions):
-            yield(action, state.podcast)
+            if not device_id or dev.id == action.device:
+                yield(action, state.podcast)
 
     action_cmp_key = lambda x: x[0].timestamp
 

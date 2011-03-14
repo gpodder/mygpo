@@ -180,6 +180,46 @@ class Podcast(Document):
             include_docs=True)
 
 
+    def subscribe(self, device):
+        from mygpo import migrate
+        state = self.get_user_state(device.user)
+        device = migrate.get_or_migrate_device(device)
+        state.subscribe(device)
+        state.save()
+
+
+    def unsubscribe(self, device):
+        from mygpo import migrate
+        state = self.get_user_state(device.user)
+        device = migrate.get_or_migrate_device(device)
+        state.unsubscribe(device)
+        state.save()
+
+
+    def subscribe_targets(self, user):
+        """
+        returns all Devices and SyncGroups on which this podcast can be subsrbied. This excludes all
+        devices/syncgroups on which the podcast is already subscribed
+        """
+        targets = []
+
+        from mygpo.api.models import Device
+        from mygpo import migrate
+
+        devices = Device.objects.filter(user=user, deleted=False)
+        for d in devices:
+            dev = migrate.get_or_migrate_device(d)
+            subscriptions = dev.get_subscribed_podcasts()
+            if self in subscriptions: continue
+
+            if d.sync_group:
+                if not d.sync_group in targets: targets.append(d.sync_group)
+            else:
+                targets.append(d)
+
+        return targets
+
+
     def all_tags(self):
         """
         Returns all tags that are stored for the podcast, in decreasing order of importance
