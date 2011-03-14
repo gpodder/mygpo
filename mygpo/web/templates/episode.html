@@ -109,11 +109,11 @@
    <h2>{% trans "Chapters" %}</h2>
 
    <div class="info">
-    {% if not subscription_meta %}
+    {% if not podcast_state %}
      {% url subscribe podcast_id as subscribe-url %}
      {% blocktrans with episode.podcast.id as podcast_id %}You aren't subscribed to this podcast. Therefor your chapters are also visible to other users. If you do no want that, <a href="{{ subscribe-url }}">subscribe to the podcast</a> and mark your subscription as private.{% endblocktrans %}
     {% else %}
-     {% if subscription_meta.public %}
+     {% if podcast_state.settings.public_subscription %}
       {% url podcast podast_id as podcast-url %}
       {%blocktrans with episode.podcast.id as podcast_id %}Your own chapters are shown in bold. If you don't want them to appear to other users, go to the <a href="{{ podcast-url }}">podcast page</a> and mark your subscription as private.{% endblocktrans %}
      {% else %}
