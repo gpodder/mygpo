@@ -28,8 +28,8 @@ def device_type(device):
 
 @register.filter
 def device_icon(device, size=16):
-    icon = DEVICE_TYPE_ICONS.get(device.type, None)
-    caption = DEVICE_TYPES_DICT.get(device.type, None)
+    icon = DEVICE_TYPE_ICONS.get(device['type'], None)
+    caption = DEVICE_TYPES_DICT.get(device['type'], None)
 
     if icon is not None and caption is not None:
         caption = ugettext(caption)

@@ -7,7 +7,7 @@ from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
 from django.utils.translation import ugettext as _
-from mygpo.api.models import Podcast, Episode, EpisodeAction, Device, SubscriptionAction, SyncGroup
+from mygpo.api.models import Podcast, Episode, EpisodeAction, Device, SyncGroup
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.web.forms import PrivacyForm, SyncForm
 from mygpo.data.models import Listener
@@ -34,17 +34,17 @@ def show(request, pid):
     if request.user.is_authenticated():
         user = migrate.get_or_migrate_user(request.user)
 
-        devices = Device.objects.filter(user=request.user)
-        history = SubscriptionAction.objects.filter(podcast=podcast,device__in=devices).order_by('-timestamp')
-
         state = new_podcast.get_user_state(request.user)
         subscribed_devices = state.get_subscribed_device_ids()
-        print subscribed_devices
         subscribed_devices = [user.get_device(x) for x in subscribed_devices]
 
         subscribe_targets = podcast.subscribe_targets(request.user)
         success = False
 
+        history = list(state.actions)
+        for h in history:
+            dev = user.get_device(h.device)
+            h.device_obj = dev.to_json()
 
         if request.user.get_profile().public_profile:
             # subscription meta is valid for all subscriptions, so we get one - doesn't matter which
@@ -59,7 +59,7 @@ def show(request, pid):
                        error_message = _('You can\'t use the same Device ID for two devices.')
             else:
                 privacy_form = PrivacyForm({
-                    'public': subscriptionmeta.public
+                    'public': state.settings['public_subscription']
                 })
 
         else:
