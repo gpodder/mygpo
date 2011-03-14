@@ -249,6 +249,13 @@ class PodcastUserState(Document):
         return None
 
 
+    def get_subscribed_device_ids(self):
+        r = PodcastUserState.view('users/subscriptions_by_podcast',
+            startkey=[self.podcast, None],
+            endkey  =[self.podcast, {}])
+        return set([res['key'][1] for res in r])
+
+
     def __eq__(self, other):
         if other is None:
             return False

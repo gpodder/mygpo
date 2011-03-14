@@ -7,7 +7,7 @@ from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
 from django.utils.translation import ugettext as _
-from mygpo.api.models import Podcast, Episode, EpisodeAction, Device, SubscriptionAction, Subscription, SyncGroup
+from mygpo.api.models import Podcast, Episode, EpisodeAction, Device, SubscriptionAction, SyncGroup
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.web.forms import PrivacyForm, SyncForm
 from mygpo.data.models import Listener
@@ -24,31 +24,36 @@ MAX_TAGS_ON_PAGE=50
 @cache_page_anonymous(60 * 60)
 def show(request, pid):
     podcast = get_object_or_404(Podcast, pk=pid)
+    new_podcast = migrate.get_or_migrate_podcast(podcast)
     episodes = episode_list(podcast, request.user)
-    max_listeners = max([x.listener_count() for x in episodes]) if len(episodes) else 0
+    max_listeners = 0#max([x.listener_count() for x in episodes]) if len(episodes) else 0
     related_podcasts = [x for x in podcast.group.podcasts() if x != podcast] if podcast.group else []
 
     tags = get_tags(podcast, request.user)
 
     if request.user.is_authenticated():
+        user = migrate.get_or_migrate_user(request.user)
+
         devices = Device.objects.filter(user=request.user)
         history = SubscriptionAction.objects.filter(podcast=podcast,device__in=devices).order_by('-timestamp')
-        subscribed_devices = [s.device for s in Subscription.objects.filter(podcast=podcast,user=request.user)]
+
+        state = new_podcast.get_user_state(request.user)
+        subscribed_devices = state.get_subscribed_device_ids()
+        print subscribed_devices
+        subscribed_devices = [user.get_device(x) for x in subscribed_devices]
+
         subscribe_targets = podcast.subscribe_targets(request.user)
         success = False
 
 
-        qs = Subscription.objects.filter(podcast=podcast, user=request.user)
-        if qs.count()>0 and request.user.get_profile().public_profile:
+        if request.user.get_profile().public_profile:
             # subscription meta is valid for all subscriptions, so we get one - doesn't matter which
-            subscription = qs[0]
-            subscriptionmeta = subscription.get_meta()
             if request.method == 'POST':
                 privacy_form = PrivacyForm(request.POST)
                 if privacy_form.is_valid():
-                    subscriptionmeta.settings['public_subscription'] = privacy_form.cleaned_data['public']
+                    state.settings['public_subscription'] = privacy_form.cleaned_data['public']
                     try:
-                       subscriptionmeta.save()
+                       state.save()
                        success = True
                     except IntegrityError, ie:
                        error_message = _('You can\'t use the same Device ID for two devices.')

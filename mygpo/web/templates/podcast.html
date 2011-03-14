@@ -82,10 +82,10 @@
         <tr>
             <td>
                 {{ device|device_icon }}
-                <a href="{% url device device.id %}">{{ device|striptags }}</a>
+                <a href="{% url device device.oldid %}">{{ device.name|striptags }}</a>
             </td>
             <td style="text-align: center;">
-                <a href="{% url unsubscribe podcast.id device.id %}?return_to=/podcast/{{ podcast.id }}"><img src="/media/unsubscribe.png" alt="{% trans "Unsubscribe" %}" title="{% trans "Click here to unsubscribe" %}"/></a>
+                <a href="{% url unsubscribe podcast.id device.oldid %}?return_to=/podcast/{{ podcast.id }}"><img src="/media/unsubscribe.png" alt="{% trans "Unsubscribe" %}" title="{% trans "Click here to unsubscribe" %}"/></a>
             </td>
         </tr>
     {% endfor %}
