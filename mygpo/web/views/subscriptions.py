@@ -79,7 +79,7 @@ def create_subscriptionlist(request):
 
     # Load all Podcasts and Devices first to ensure that they are
     # only loaded once, not for each occurance in a Subscription
-    podcast_ids, device_ids = unzip(subscriptions)
+    public, podcast_ids, device_ids = unzip(subscriptions)
     podcast_ids= list(set(podcast_ids))
     device_ids = list(set(device_ids))
 
@@ -88,7 +88,7 @@ def create_subscriptionlist(request):
     devices = dict([ (id, user.get_device(id)) for id in device_ids])
 
     subscription_list = {}
-    for podcast_id, device_id in subscriptions:
+    for public, podcast_id, device_id in subscriptions:
         device = devices[device_id]
         if not podcast_id in subscription_list:
             podcast = podcasts[podcast_id]

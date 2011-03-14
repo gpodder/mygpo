@@ -379,14 +379,14 @@ class User(Document):
         r = PodcastUserState.view('users/subscribed_podcasts_by_user',
             startkey=[self.oldid, public, None, None],
             endkey=[self.oldid+1, None, None, None])
-        return [res['key'][2:] for res in r]
+        return [res['key'][1:] for res in r]
 
 
     def get_subscribed_podcast_ids(self, public=None):
         """
         Returns the Ids of all subscribed podcasts
         """
-        return list(set(x[0] for x in self.get_subscriptions(public=public)))
+        return list(set(x[1] for x in self.get_subscriptions(public=public)))
 
 
     def get_subscribed_podcasts(self, public=None):

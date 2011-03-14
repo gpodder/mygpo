@@ -18,14 +18,15 @@
 from django.shortcuts import render_to_response
 from django.contrib.auth import logout
 from django.template import RequestContext
-from mygpo.api.models import Podcast, Subscription, SubscriptionMeta
 from mygpo.web.forms import UserAccountForm
 from django.forms import ValidationError
 from django.utils.translation import ugettext as _
 from mygpo.decorators import manual_gc, allowed_methods
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
+from mygpo.core.models import Podcast
 from mygpo import migrate
+from mygpo.utils import get_to_dict
 
 
 @manual_gc
@@ -114,33 +115,23 @@ def privacy(request):
 
     if 'exclude' in request.GET:
         id = request.GET['exclude']
-        try:
-            podcast = Podcast.objects.get(pk=id)
-            sm, c = SubscriptionMeta.objects.get_or_create(user=request.user, podcast=podcast, defaults={'public': False})
-
-            if not c:
-                sm.settings['public_subscription'] = False
-                sm.save()
-
-        except Podcast.DoesNotExist:
-            pass
+        podcast = Podcast.get(id)
+        state = podcast.get_user_state(request.user)
+        state.settings['public_subscription'] = False
+        state.save()
 
     if 'include' in request.GET:
         id = request.GET['include']
-        try:
-            podcast = Podcast.objects.get(pk=id)
-            sm, c = SubscriptionMeta.objects.get_or_create(user=request.user, podcast=podcast, defaults={'public': True})
+        podcast = Podcast.get(id)
+        state = podcast.get_user_state(request.user)
+        state.settings['public_subscription'] = True
+        state.save()
 
-            if not c:
-                sm.settings['public_subscription'] = True
-                sm.save()
-
-        except Podcast.DoesNotExist:
-            pass
-
-    subscriptions = [s for s in Subscription.objects.filter(user=request.user)]
-    included_subscriptions = set([s.podcast for s in subscriptions if s.get_meta().public])
-    excluded_subscriptions = set([s.podcast for s in subscriptions if not s.get_meta().public])
+    user = migrate.get_or_migrate_user(request.user)
+    subscriptions = user.get_subscriptions()
+    podcasts = get_to_dict(Podcast, [x[1] for x in subscriptions])
+    included_subscriptions = set([podcasts[x[1]] for x in subscriptions if x[0] == True])
+    excluded_subscriptions = set([podcasts[x[1]] for x in subscriptions if x[0] == False])
 
     return render_to_response('privacy.html', {
         'public_subscriptions': request.user.get_profile().public_profile,
