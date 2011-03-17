@@ -29,6 +29,13 @@ class Command(BaseCommand):
     @repeat_on_conflict()
     def update_state(self, state, meta):
         settings = state.settings
+
+        # we previously used 'public' to store the public-subscription flag
+        # but 'public_subscription' was stated in the API description
+        if 'public' in meta.settings:
+            settings['public_subscription'] = meta.settings['public']
+            del meta.settings['public']
+
         settings.update(meta.settings)
         state.settings = settings
         state.save()
