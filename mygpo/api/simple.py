@@ -31,6 +31,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 from django.contrib.sites.models import RequestSite
 from mygpo.directory.search import search_podcasts
+from mygpo.log import log
 from django.utils.translation import ugettext as _
 from mygpo.decorators import allowed_methods
 from mygpo.utils import parse_range
@@ -168,12 +169,20 @@ def set_subscriptions(urls, user, device_uid):
     for r in rem:
         p = Podcast.objects.get(url=r)
         p = migrate.get_or_migrate_podcast(p)
-        p.unsubscribe(device)
+        try:
+            p.unsubscribe(device)
+        except Exception as e:
+            log('Simple API: %(username)s: Could not remove subscription for podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
+                {'username': user.username, 'podcast_url': r, 'device_uid': device.id, 'exception': e})
 
     for n in new:
         p, created = Podcast.objects.get_or_create(url=n)
         p = migrate.get_or_migrate_podcast(p)
-        p.subscribe(device)
+        try:
+            p.subscribe(device)
+        except Exception as e:
+            log('Simple API: %(username)s: Could not add subscription for podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
+                {'username': user.username, 'podcast_url': r, 'device_uid': device.id, 'exception': e})
 
     # Only an empty response is a successful response
     return HttpResponse('', mimetype='text/plain')

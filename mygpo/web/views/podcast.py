@@ -221,8 +221,11 @@ def subscribe(request, pid):
             try:
                 p = migrate.get_or_migrate_podcast(podcast)
                 p.subscribe(device)
-            except IntegrityError, e:
-                log('error while subscribing to podcast (device %s, podcast %s)' % (device.id, podcast.id))
+            except Exception as e:
+                log('Web: %(username)s: could not subscribe to podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
+                    {'username': request.user.username, 'podcast_url': p.url, 'device_id': device.id, 'exception': e})
+
+            device.sync()
 
             return HttpResponseRedirect('/podcast/%s' % podcast.id)
 
@@ -256,8 +259,11 @@ def unsubscribe(request, pid, device_id):
     device = get_object_or_404(Device, pk=device_id, user=request.user)
     try:
         p.unsubscribe(device)
-    except IntegrityError, e:
-        log('error while unsubscribing from podcast (device %s, podcast %s)' % (device.id, podcast.id))
+    except Exception as e:
+        log('Web: %(username)s: could not unsubscribe from podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
+            {'username': request.user.username, 'podcast_url': p.url, 'device_id': device.id, 'exception': e})
+
+    device.sync()
 
     return HttpResponseRedirect(return_to)
 

@@ -73,18 +73,18 @@ def upload(request):
 
         try:
             p.subscribe(d)
-        except IntegrityError, e:
-            log('/upload: error while adding subscription: user: %s, podcast: %s, error: %s' % (user.id, p.id, e))
-        except ValueError, ve:
-            log('/upload: error while adding subscription: user: %s, podcast: %s, error: %s' % (user.id, p.id, e))
+        except Exception as e:
+            log('Legacy API: %(username): could not subscribe to podcast %(podcast_url) on device %(device_id): %(exception)s' %
+                {'username': user.username, 'podcast_url': p.url, 'device_id': d.id, 'exception': e})
 
     for r in rem:
         p, created = Podcast.objects.get_or_create(url=r)
         p = migrate.get_or_migrate_podcast(p)
         try:
             p.unsubscribe(d)
-        except IntegrityError, e:
-            log('/upload: error while removing subscription: user: %s, podcast: %s, error: %s' % (user.id, p.id, e))
+        except Exception as e:
+            log('Legacy API: %(username): could not unsubscribe from podcast %(podcast_url) on device %(device_id): %(exception)s' %
+                {'username': user.username, 'podcast_url': p.url, 'device_id': d.id, 'exception': e})
 
     return HttpResponse('@SUCCESS', mimetype='text/plain')
 

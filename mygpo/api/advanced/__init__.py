@@ -116,16 +116,18 @@ def update_subscriptions(user, device, add, remove):
         p = migrate.get_or_migrate_podcast(p)
         try:
             p.subscribe(device)
-        except IntegrityError, e:
-            log('can\'t add subscription %s for user %s: %s' % (a, user, e))
+        except Exception as e:
+            log('Advanced API: %(username): could not subscribe to podcast %(podcast_url) on device %(device_id): %(exception)s' %
+                {'username': user.username, 'podcast_url': p.url, 'device_id': device.id, 'exception': e})
 
     for r in rem_sanitized:
         p, p_created = Podcast.objects.get_or_create(url=r)
         p = migrate.get_or_migrate_podcast(p)
         try:
             p.unsubscribe(device)
-        except IntegrityError, e:
-            log('can\'t remove subscription %s for user %s: %s' % (r, user, e))
+        except Exception as e:
+            log('Advanced API: %(username): could not unsubscribe from podcast %(podcast_url) on device %(device_id): %(exception)s' %
+                {'username': user.username, 'podcast_url': p.url, 'device_id': device.id, 'exception': e})
 
     return updated_urls
 
