@@ -260,10 +260,6 @@ class Device(models.Model):
         add = changes[0]
         rem = changes[1]
 
-        print add
-        print rem
-        print
-
         from mygpo.core import models
         podcasts = utils.get_to_dict(models.Podcast, add + rem)
 
