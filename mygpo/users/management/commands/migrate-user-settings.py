@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from mygpo import migrate
 from mygpo.decorators import repeat_on_conflict
 from mygpo.utils import progress
-from mygpo.api import models
+from mygpo.users.models import PodcastUserState
 
 
 class Command(BaseCommand):
@@ -34,8 +34,8 @@ class Command(BaseCommand):
 
             # We change the semantics of public_profile.
             # If a user had a private profile, we set all his subscriptions private
-            if not profile.settings.get('public_profile', True):
-                podcast_states = PodcastUserState.for_user(instance.user)
+            if (not profile.settings.get('public_profile', True)) or (not profile.public_profile):
+                podcast_states = PodcastUserState.for_user(user)
                 for state in podcast_states:
                     self.update_subscription_privacy(state=state)
 
