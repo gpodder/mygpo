@@ -21,7 +21,7 @@ from django.template import RequestContext
 from mygpo.web.forms import UserAccountForm
 from django.forms import ValidationError
 from django.utils.translation import ugettext as _
-from mygpo.decorators import manual_gc, allowed_methods
+from mygpo.decorators import manual_gc, allowed_methods, repeat_on_conflict
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
 from mygpo.core.models import Podcast
@@ -36,11 +36,13 @@ def account(request):
     success = False
     error_message = ''
 
+    user = migrate.get_or_migrate_user(request.user)
+
     if request.method == 'GET':
 
        form = UserAccountForm({
             'email': request.user.email,
-            'public': request.user.get_profile().public_profile
+            'public': user.settings.get('public_subscriptions', True)
             })
 
        return render_to_response('account.html', {
@@ -105,13 +107,19 @@ def delete_account(request):
 @allowed_methods(['GET'])
 def privacy(request):
 
+    site = RequestSite(request)
+    user = migrate.get_or_migrate_user(request.user)
+
+    @repeat_on_conflict(['user'])
+    def set_privacy_settings(user, is_public):
+        user.settings['public_subscriptions'] = is_public
+        user.save()
+
     if 'private_subscriptions' in request.GET:
-        request.user.get_profile().settings['public_profile'] = False
-        request.user.get_profile().save()
+        set_privacy_settings(user, False)
 
     elif 'public_subscriptions' in request.GET:
-        request.user.get_profile().settings['public_profile'] = True
-        request.user.get_profile().save()
+        set_privacy_settings(user, True)
 
     if 'exclude' in request.GET:
         id = request.GET['exclude']
@@ -134,9 +142,10 @@ def privacy(request):
     excluded_subscriptions = set([podcasts[x[1]] for x in subscriptions if x[0] == False])
 
     return render_to_response('privacy.html', {
-        'public_subscriptions': request.user.get_profile().public_profile,
+        'public_subscriptions': user.settings.get('public_subscriptions', True),
         'included_subscriptions': included_subscriptions,
         'excluded_subscriptions': excluded_subscriptions,
+        'domain': site.domain,
         }, context_instance=RequestContext(request))
 
 

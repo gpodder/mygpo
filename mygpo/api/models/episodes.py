@@ -32,12 +32,9 @@ class Chapter(models.Model):
     advertisement = models.BooleanField(default=False)
 
     def is_public(self):
-        if not self.user.get_profile().public_profile:
-            return False
-
         podcast = migrate.get_or_migrate_podcast(self.episode.podcast)
         state = podcast.get_user_state(self.user)
-        return state.settings.get('public_subscription')
+        return state.settings.get('public_subscription', True)
 
     class Meta:
         db_table = 'chapters'

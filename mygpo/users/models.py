@@ -177,12 +177,14 @@ class PodcastUserState(Document):
         if r:
             return r.first()
         else:
+            from mygpo import migrate
+            new_user = migrate.get_or_migrate_user(user)
             p = PodcastUserState()
             p.podcast = podcast.get_id()
             p.user_oldid = user.id
             p.ref_url = podcast.url
+            p.settings['public_subscription'] = new_user.settings.get('public_subscriptions', True)
 
-            from mygpo import migrate
             for device in migrate.get_devices(user):
                 p.set_device_state(device)
 

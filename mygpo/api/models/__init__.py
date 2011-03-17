@@ -39,10 +39,6 @@ class UserProfile(models.Model):
     def __unicode__(self):
         return '%s (%s, %s)' % (self.user.username, self.public_profile, self.generated_id)
 
-    def save(self, *args, **kwargs):
-        self.public_profile = self.settings.get('public_profile', True)
-        super(UserProfile, self).save(*args, **kwargs)
-
     class Meta:
         db_table = 'user'
         managed = False

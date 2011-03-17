@@ -6,55 +6,64 @@
 {% block mainmenu %}{{ "/account/"|main_menu }}{% endblock %}
 {% block sectionmenu %}{{ "/account/privacy"|section_menu }}{% endblock %}
 
-{% block title %}{% trans "Privacy settings" %}{% endblock %}
+{% block title %}{% trans "Privacy Settings" %}{% endblock %}
 
 {% block content %}
-  <h1>{% trans "Privacy settings" %}</h1>
-  
-  <p>
-   {% if public_subscriptions %}
+  <h1>{% trans "Privacy Settings" %}</h1>
 
-    {% url privacy as privacy-url %}
-    {% blocktrans %}We include anonymized data about the following subscriptions in our public statistics. You can exclude specific podcasts or <a href="{{ privacy-url }}?private_subscriptions">all at once</a>.{% endblocktrans %}
+  <p>{% blocktrans %}{{ domain }} distinguishes between public and private subscriptions.{% endblocktrans %}</p>
+  <ul>
+   <li>{% blocktrans %}<strong>Public</strong> subscriptions are not shown to anybody (unless you chose to <a href="/share/">share</a> them), but are included anonymized on our public statistics.{% endblocktrans %}</li>
+   <li>{% blocktrans %}<strong>Private</strong> subscriptions do neither show up in your list of shared podcasts, nor are considered in our statistics.{% endblocktrans %}</li>
+  </ul>
+
+  <p>
+   {% url privacy as privacy-url %}
+   {% if public_subscriptions %}
+    {% blocktrans %}New subscriptions will be public by default. Change to <a href="{{ privacy-url }}?private_subscriptions">private</a>.{% endblocktrans %}
+   {% else %}
+    {% blocktrans %}New subscriptions will be private by default. Change to <a href="{{ privacy-url }}?public_subscriptions">public</a>.{% endblocktrans %}
+   {% endif %}
+  </p>
+
+  {% if included_subscriptions %}
+    <h2>{% trans "Your Public Subscriptions" %}</h2>
     <table class="list">
      <tr>
       <th></th>
       <th>{% trans "Podcast" %}</th>
-      <th>{% trans "Mark private" %}</th>
+      <th>{% trans "Make Private" %}</th>
      </tr>
 
      {% for podcast in included_subscriptions %}
       <tr>
        <td>{{ podcast|podcast_logo }}</td>
        <td><a href="{% url podcast podcast.oldid %}">{{ podcast.display_title|striptags }}</a></td>
-       <td><a href="{% url privacy %}?exclude={{ podcast.get_id }}"><img src="/media/unsubscribe.png" alt="{% trans "Mark private" %}" /></a></td>
+       <td><a href="{% url privacy %}?exclude={{ podcast.get_id }}"><img src="/media/unsubscribe.png" alt="{% trans "Make Public" %}" /></a></td>
       </tr>
      {% endfor %}
     </table>
+  {% endif %}
+
 
     {% if excluded_subscriptions %}
-     <h3>{% trans "Already excluded" %}</h3>
+     <h2>{% trans "Your Private Subscriptions" %}</h3>
      <table class="list">
       <tr>
        <th></th>
        <th>{% trans "Podcast" %}</th>
-       <th>{% trans "Mark public" %}</th>
+       <th>{% trans "Make Public" %}</th>
       </tr>
 
       {% for podcast in excluded_subscriptions %}
        <tr>
         <td>{{ podcast|podcast_logo }}</td>
-        <td><a href="{% url podcast podcast.oldid %}">{{ podcast.title|striptags|default:"Unnamed Podcast" }}</a></td>
-        <td><a href="{% url privacy %}?include={{ podcast.get_id }}"><img src="/media/edit-undo.png" alt="{% trans "Mark private" %}" /></a></td>
+        <td><a href="{% url podcast podcast.oldid %}">{{ podcast.display_title|striptags }}</a></td>
+        <td><a href="{% url privacy %}?include={{ podcast.get_id }}"><img src="/media/edit-undo.png" alt="{% trans "Make Private" %}" /></a></td>
        </tr>
       {% endfor %}
      </table>
     {% endif %}
-   {% else %}
 
-    {% url privacy as privacy-url %}
-    {% blocktrans %}We don't include your subscriptions in our public statistics. <a href="{{ privacy-url }}?public_subscriptions">Include my data.</a>{% endblocktrans %}
-   {% endif %}
-  </p>
 {% endblock %}
 

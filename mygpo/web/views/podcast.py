@@ -46,24 +46,19 @@ def show(request, pid):
             dev = user.get_device(h.device)
             h.device_obj = dev.to_json()
 
-        if request.user.get_profile().public_profile:
-            # subscription meta is valid for all subscriptions, so we get one - doesn't matter which
-            if request.method == 'POST':
-                privacy_form = PrivacyForm(request.POST)
-                if privacy_form.is_valid():
-                    state.settings['public_subscription'] = privacy_form.cleaned_data['public']
-                    try:
-                       state.save()
-                       success = True
-                    except IntegrityError, ie:
-                       error_message = _('You can\'t use the same Device ID for two devices.')
-            else:
-                privacy_form = PrivacyForm({
-                    'public': state.settings.get('public_subscription', True)
-                })
-
+        if request.method == 'POST':
+            privacy_form = PrivacyForm(request.POST)
+            if privacy_form.is_valid():
+                state.settings['public_subscription'] = privacy_form.cleaned_data['public']
+                try:
+                   state.save()
+                   success = True
+                except IntegrityError, ie:
+                   error_message = _('You can\'t use the same Device ID for two devices.')
         else:
-            privacy_form = None
+            privacy_form = PrivacyForm({
+                'public': state.settings.get('public_subscription', True)
+            })
 
         subscribe_form = SyncForm()
         subscribe_form.set_targets(subscribe_targets, '')
