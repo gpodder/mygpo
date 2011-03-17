@@ -1,5 +1,6 @@
 import hashlib
 from couchdbkit.ext.django.schema import *
+from mygpo.decorators import repeat_on_conflict
 from mygpo import utils
 
 
@@ -180,6 +181,7 @@ class Podcast(Document):
             include_docs=True)
 
 
+    @repeat_on_conflict()
     def subscribe(self, device):
         from mygpo import migrate
         state = self.get_user_state(device.user)
@@ -188,6 +190,7 @@ class Podcast(Document):
         state.save()
 
 
+    @repeat_on_conflict()
     def unsubscribe(self, device):
         from mygpo import migrate
         state = self.get_user_state(device.user)
