@@ -15,6 +15,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+import string
 from itertools import islice
 from mygpo.api.basic_auth import require_valid_user, check_username
 from django.http import HttpResponse, HttpResponseBadRequest
@@ -42,7 +43,7 @@ except ImportError:
     import json
 
 
-ALLOWED_FORMATS = ('txt', 'opml', 'json')
+ALLOWED_FORMATS = ('txt', 'opml', 'json', 'jsonp')
 
 def check_format(fn):
     def tmp(request, format, *args, **kwargs):
@@ -63,7 +64,7 @@ def subscriptions(request, username, device_uid, format):
     if request.method == 'GET':
         title = _('%(username)s\'s Subscription List') % {'username': username}
         subscriptions = get_subscriptions(request.user, device_uid)
-        return format_podcast_list(subscriptions, format, title)
+        return format_podcast_list(subscriptions, format, title, jsonp_padding=request.GET.get('jsonp'))
 
     elif request.method in ('PUT', 'POST'):
         subscriptions = parse_subscription(request.raw_post_data, format)
@@ -81,7 +82,7 @@ def all_subscriptions(request, username, format):
     return format_podcast_list(subscriptions, format, title)
 
 
-def format_podcast_list(obj_list, format, title, get_podcast=None, json_map=lambda x: x.url):
+def format_podcast_list(obj_list, format, title, get_podcast=None, json_map=lambda x: x.url, jsonp_padding=None):
     """
     Formats a list of podcasts for use in a API response
 
@@ -115,6 +116,18 @@ def format_podcast_list(obj_list, format, title, get_podcast=None, json_map=lamb
     elif format == 'json':
         objs = map(json_map, obj_list)
         return JsonResponse(objs)
+
+    elif format == 'jsonp':
+        ALLOWED_FUNCNAME = string.letters + string.digits + '_'
+
+        if not jsonp_padding:
+            return HttpResponseBadRequest('For a JSONP response, specify the name of the callback function in the jsonp parameter')
+
+        if any(x not in ALLOWED_FUNCNAME for x in jsonp_padding):
+            return HttpResponseBadRequest('JSONP padding can only contain the characters %(char)s' % {'char': ALLOWED_FUNCNAME})
+
+        objs = map(json_map, obj_list)
+        return JsonResponse(objs, jsonp_padding=jsonp_padding)
 
     else:
         return None
@@ -208,7 +221,8 @@ def toplist(request, count, format):
                                format,
                                title,
                                get_podcast=get_podcast,
-                               json_map=json_map)
+                               json_map=json_map,
+                               jsonp_padding=request.GET.get('jsonp', ''))
 
 
 @check_format
@@ -227,7 +241,7 @@ def search(request, format):
     title = _('gpodder.net - Search')
     domain = RequestSite(request).domain
     p_data = lambda p: podcast_data(p, domain)
-    return format_podcast_list(results, format, title, json_map=p_data)
+    return format_podcast_list(results, format, title, json_map=p_data, jsonp_padding=request.GET.get('jsonp', ''))
 
 
 @require_valid_user
@@ -241,6 +255,6 @@ def suggestions(request, count, format):
     title = _('gpodder.net - %(count)d Suggestions') % {'count': len(suggestions)}
     domain = RequestSite(request).domain
     p_data = lambda p: podcast_data(p, domain)
-    return format_podcast_list(suggestions, format, title, json_map=p_data)
+    return format_podcast_list(suggestions, format, title, json_map=p_data, jsonp_padding=request.GET.get('jsonp'))
 
 
