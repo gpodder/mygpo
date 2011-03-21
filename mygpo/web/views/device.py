@@ -54,6 +54,8 @@ def show(request, device_id, error_message=None):
     if device.user != request.user:
         return HttpResponseForbidden(_('You are not allowed to access this device'))
 
+    device.sync()
+
     dev = migrate.get_or_migrate_device(device)
     subscriptions = dev.get_subscribed_podcasts()
     synced_with = list(device.sync_group.devices()) if device.sync_group else []

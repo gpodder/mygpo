@@ -34,6 +34,9 @@ def show(request, pid):
     if request.user.is_authenticated():
         user = migrate.get_or_migrate_user(request.user)
 
+        for dev in Device.objects.filter(user=request.user):
+            dev.sync()
+
         state = new_podcast.get_user_state(request.user)
         subscribed_devices = state.get_subscribed_device_ids()
         subscribed_devices = [user.get_device(x) for x in subscribed_devices]
@@ -225,8 +228,6 @@ def subscribe(request, pid):
                 log('Web: %(username)s: could not subscribe to podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
                     {'username': request.user.username, 'podcast_url': p.url, 'device_id': device.id, 'exception': e})
 
-            device.sync()
-
             return HttpResponseRedirect('/podcast/%s' % podcast.id)
 
         except ValueError, e:
@@ -262,8 +263,6 @@ def unsubscribe(request, pid, device_id):
     except Exception as e:
         log('Web: %(username)s: could not unsubscribe from podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
             {'username': request.user.username, 'podcast_url': p.url, 'device_id': device.id, 'exception': e})
-
-    device.sync()
 
     return HttpResponseRedirect(return_to)
 
