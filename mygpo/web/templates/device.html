@@ -21,16 +21,14 @@
     <tr>
      <th></th>
      <th>{% trans "Podcast" %}</th>
-     <th>{% trans "Subscribed" %}</th>
      <th>{% trans "Unsubscribe" %}</th>
     </tr>
 
-    {% for subscription in subscriptions %}
+    {% for podcast in subscriptions %}
      <tr>
-      <td>{{ subscription.podcast|podcast_logo }}</td>
-      <td><a href="{% url podcast subscription.podcast.id %}">{{ subscription.podcast|striptags }}</a></td>
-      <td><abbr title="{{subscription.subscribed_since}}">{{subscription.subscribed_since|naturalday}}</abbr></td>
-      <td style="text-align: center;"><a href="{% url unsubscribe subscription.podcast.id device.id %}?return_to=/device/{{ device.id }}"><img src="/media/unsubscribe.png" /></a></td>
+      <td>{{ podcast|podcast_logo }}</td>
+      <td><a href="{% url podcast podcast.oldid %}">{{ podcast.display_title|striptags }}</a></td>
+      <td style="text-align: center;"><a href="{% url unsubscribe podcast.oldid device.id %}?return_to=/device/{{ device.id }}"><img src="/media/unsubscribe.png" /></a></td>
      </tr>
     {% endfor %}
    </table>

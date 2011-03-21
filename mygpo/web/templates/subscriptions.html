@@ -27,7 +27,7 @@
   {% for s in subscriptionlist %}
    <tr>
     <td>{{ s.podcast|podcast_logo }}</td>
-    <td><a class="listlink" href="{% url podcast s.podcast.id %}">{{ s.podcast|striptags }}</a><br/><span class="latest_episode">
+    <td><a class="listlink" href="{% url podcast s.podcast.oldid %}">{{ s.podcast.display_title|striptags }}</a><br/><span class="latest_episode">
     {% if s.episode %}
     {% trans "Latest Episode:" %} <a href="{% url episode s.episode.id %}">{{ s.episode.title|default:"Unnamed Episode"|striptags }}</a>
       {% if s.episode.action %}

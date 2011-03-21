@@ -31,15 +31,13 @@ class Suggestions(Document):
 
 
     def get_podcasts(self, count=None):
-        from mygpo.api.models import Subscription
-        subscriptions = [x.podcast for x in Subscription.objects.filter(user__id=self.user_oldid)]
-        subscriptions = [Podcast.for_oldid(x.id) for x in subscriptions]
-        subscriptions = [x._id for x in subscriptions if x]
+        user = User.for_oldid(self.user_oldid)
+        subscriptions = user.get_subscribed_podcast_ids()
 
         ids = filter(lambda x: not x in self.blacklist + subscriptions, self.podcasts)
         if count:
             ids = ids[:count]
-        return Podcast.get_multi(ids)
+        return filter(lambda x: x.title, Podcast.get_multi(ids))
 
 
     def __repr__(self):
@@ -139,10 +137,21 @@ class SubscriptionAction(Document):
     timestamp = DateTimeProperty(default=datetime.utcnow)
     device    = StringProperty()
 
+
+    def __cmp__(self, other):
+        return cmp(self.timestamp, other.timestamp)
+
     def __eq__(self, other):
-        return self.actions == other.action and \
+        return self.action == other.action and \
                self.timestamp == other.timestamp and \
                self.device == other.device
+
+    def __hash__(self):
+        return hash(self.action) + hash(self.timestamp) + hash(self.device)
+
+    def __repr__(self):
+        return '<SubscriptionAction %s on %s at %s>' % (
+            self.action, self.device, self.timestamp)
 
 
 class PodcastUserState(Document):
@@ -158,6 +167,7 @@ class PodcastUserState(Document):
     actions       = SchemaListProperty(SubscriptionAction)
     tags          = StringListProperty()
     ref_url       = StringProperty(required=True)
+    disabled_devices = StringListProperty()
 
 
     @classmethod
@@ -167,10 +177,17 @@ class PodcastUserState(Document):
         if r:
             return r.first()
         else:
+            from mygpo import migrate
+            new_user = migrate.get_or_migrate_user(user)
             p = PodcastUserState()
             p.podcast = podcast.get_id()
             p.user_oldid = user.id
             p.ref_url = podcast.url
+            p.settings['public_subscription'] = new_user.settings.get('public_subscriptions', True)
+
+            for device in migrate.get_devices(user):
+                p.set_device_state(device)
+
             return p
 
 
@@ -183,20 +200,88 @@ class PodcastUserState(Document):
 
 
     @classmethod
+    def for_device(cls, device_id):
+        r = PodcastUserState.view('users/podcast_states_by_device',
+            startkey=[device_id, None], endkey=[device_id, {}],
+            include_docs=True)
+        return list(r)
+
+
+    def remove_device(self, device):
+        """
+        Removes all actions from the podcast state that refer to the
+        given device
+        """
+        self.actions = filter(lambda a: a.device != device.id, self.actions)
+
+
+    @classmethod
     def count(cls):
         r = PodcastUserState.view('users/podcast_states_by_user',
             limit=0)
         return r.total_rows
 
 
+    def subscribe(self, device):
+        action = SubscriptionAction()
+        action.action = 'subscribe'
+        action.device = device.id
+        self.add_actions([action])
+
+
+    def unsubscribe(self, device):
+        action = SubscriptionAction()
+        action.action = 'unsubscribe'
+        action.device = device.id
+        self.add_actions([action])
+
+
     def add_actions(self, actions):
-        self.actions += actions
-        self.actions = list(set(self.actions))
-        self.actions.sort(key=lambda x: x.timestamp)
+        self.actions = list(set(self.actions + actions))
+        self.actions = sorted(self.actions)
 
 
     def add_tags(self, tags):
         self.tags = list(set(self.tags + tags))
+
+
+    def set_device_state(self, device):
+        if device.deleted:
+            self.disabled_devices = list(set(self.disabled_devices + [device.id]))
+        elif not device.deleted and device.id in self.disabled_devices:
+            self.disabled_devices.remove(device.id)
+
+
+    def get_change_between(self, device_id, since, until):
+        """
+        Returns the change of the subscription status for the given device
+        between the two timestamps.
+
+        The change is given as either 'subscribe' (the podcast has been
+        subscribed), 'unsubscribed' (the podcast has been unsubscribed) or
+        None (no change)
+        """
+
+        device_actions = filter(lambda x: x.device == device_id, self.actions)
+        before = filter(lambda x: x.timestamp <= since, device_actions)
+        after  = filter(lambda x: x.timestamp <= until, device_actions)
+
+        then = before[-1] if before else None
+        now  = after[-1]
+
+        if then is None:
+            if now.action != 'unsubscribe':
+                return now.action
+        elif then.action != now.action:
+            return now.action
+        return None
+
+
+    def get_subscribed_device_ids(self):
+        r = PodcastUserState.view('users/subscriptions_by_podcast',
+            startkey=[self.podcast, None],
+            endkey  =[self.podcast, {}])
+        return set([res['key'][1] for res in r])
 
 
     def __eq__(self, other):
@@ -218,11 +303,55 @@ class Device(Document):
     name     = StringProperty()
     type     = StringProperty()
     settings = DictProperty()
+    deleted  = BooleanProperty()
 
     @classmethod
-    def for_user_uid(cls, user, uid):
-        r = cls.view('users/devices_by_user_uid', key=[user.id, uid], limit=1)
-        return r.one() if r else None
+    def for_oldid(cls, oldid):
+        r = cls.view('users/devices_by_oldid', key=oldid)
+        return r.first() if r else None
+
+
+    def get_subscription_changes(self, since, until):
+        """
+        Returns the subscription changes for the device as two lists.
+        The first lists contains the Ids of the podcasts that have been
+        subscribed to, the second list of those that have been unsubscribed
+        from.
+        """
+
+        add, rem = [], []
+        podcast_states = PodcastUserState.for_device(self.id)
+        for p_state in podcast_states:
+            change = p_state.get_change_between(self.id, since, until)
+            if change == 'subscribe':
+                add.append( p_state.podcast )
+            elif change == 'unsubscribe':
+                rem.append( p_state.podcast )
+
+        return add, rem
+
+
+    def get_latest_changes(self):
+        podcast_states = PodcastUserState.for_device(self.id)
+        for p_state in podcast_states:
+            actions = filter(lambda x: x.device == self.id, reversed(p_state.actions))
+            if actions:
+                yield (p_state.podcast, actions[0])
+
+
+    def get_subscribed_podcasts_ids(self):
+        from mygpo.api.models import Device
+        d = Device.objects.get(id=self.oldid)
+        d.sync()
+        r = self.view('users/subscribed_podcasts_by_device',
+            startkey=[self.id, None],
+            endkey=[self.id, {}])
+        return [res['key'][1] for res in r]
+
+
+    def get_subscribed_podcasts(self):
+        return Podcast.get_multi(self.get_subscribed_podcasts_ids())
+
 
 
 def token_generator(length=32):
@@ -256,12 +385,59 @@ class User(Document):
         setattr(self, token_name, token_generator(length))
 
 
-    def get_device(self, uid):
+    def get_device(self, id):
         for device in self.devices:
-            if device.uid == uid:
+            if device.id == id:
                 return device
 
         return None
+
+
+    def set_device(self, device):
+        devices = list(self.devices)
+        ids = [x.id for x in devices]
+        if not device.id in ids:
+            devices.append(device)
+            return
+
+        index = ids.index(device.id)
+        devices.pop(index)
+        devices.insert(index, device)
+        self.devices = devices
+
+
+    def remove_device(self, device):
+        devices = list(self.devices)
+        ids = [x.id for x in devices]
+        if not device.id in ids:
+            return
+
+        index = ids.index(device.id)
+        devices.pop(index)
+        self.devices = devices
+
+
+    def get_subscriptions(self, public=None):
+        """
+        Returns a list of (podcast-id, device-id) tuples for all
+        of the users subscriptions
+        """
+
+        r = PodcastUserState.view('users/subscribed_podcasts_by_user',
+            startkey=[self.oldid, public, None, None],
+            endkey=[self.oldid+1, None, None, None])
+        return [res['key'][1:] for res in r]
+
+
+    def get_subscribed_podcast_ids(self, public=None):
+        """
+        Returns the Ids of all subscribed podcasts
+        """
+        return list(set(x[1] for x in self.get_subscriptions(public=public)))
+
+
+    def get_subscribed_podcasts(self, public=None):
+        return Podcast.get_multi(self.get_subscribed_podcast_ids(public=public))
 
 
     def __repr__(self):

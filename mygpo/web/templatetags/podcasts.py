@@ -22,7 +22,7 @@ def podcast_logo_big(podcast):
 
 @register.filter
 def podcast_status_icon(action):
-    if action.action == 1:
+    if action.action == 'subscribe':
         s = '<img src="/media/subscribe.png" />'
     else:
         s = '<img src="/media/unsubscribe.png" />'

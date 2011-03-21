@@ -15,6 +15,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+from itertools import islice
 from collections import defaultdict
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, Http404
@@ -24,7 +25,8 @@ from django.template import RequestContext
 from mygpo.core import models
 from mygpo.directory import tags
 from mygpo.users.models import Rating, Suggestions
-from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, SubscriptionAction, Subscription, UserProfile
+from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, UserProfile
+from mygpo.users.models import PodcastUserState
 from mygpo.decorators import manual_gc
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render_to_response
@@ -33,6 +35,9 @@ from django.contrib.sites.models import RequestSite
 from mygpo.constants import PODCAST_LOGO_SIZE, PODCAST_LOGO_BIG_SIZE
 from mygpo.web import utils
 from mygpo.api import backend
+from mygpo.utils import linearize, flatten, get_to_dict
+from mygpo.web.models import HistoryEntry
+from mygpo import migrate
 import os
 import Image
 import ImageDraw
@@ -78,10 +83,13 @@ def welcome(request, toplist_entries=10):
 def dashboard(request, episode_count=10):
     site = RequestSite(request)
     devices = Device.objects.filter(user=request.user, deleted=False)
-    subscribed_podcasts = set([s.podcast for s in Subscription.objects.filter(user=request.user)])
+
+    user = migrate.get_or_migrate_user(request.user)
+    subscribed_podcasts = user.get_subscribed_podcasts()
+    subscribed_old_podcasts = [x.get_old_obj() for x in subscribed_podcasts]
 
     tomorrow = datetime.today() + timedelta(days=1)
-    newest_episodes = Episode.objects.filter(podcast__in=subscribed_podcasts).filter(timestamp__lt=tomorrow).order_by('-timestamp')[:episode_count]
+    newest_episodes = Episode.objects.filter(podcast__in=subscribed_old_podcasts).filter(timestamp__lt=tomorrow).order_by('-timestamp')[:episode_count]
 
     lang = utils.get_accepted_lang(request)
     lang = utils.sanitize_language_codes(lang)
@@ -152,29 +160,66 @@ def cover_art(request, size, filename):
 
 @manual_gc
 @login_required
-def history(request, len=15, device_id=None):
+def history(request, count=15, device_id=None):
     if device_id:
         devices = [get_object_or_404(Device, id=device_id, user=request.user)]
-        episodehistory = EpisodeAction.objects.filter(device__in=devices).order_by('-timestamp')[:len]
+        episodehistory = EpisodeAction.objects.filter(device__in=devices).order_by('-timestamp')[:count]
     else:
         devices = Device.objects.filter(user=request.user)
-        episodehistory = EpisodeAction.objects.filter(user=request.user).order_by('-timestamp')[:len]
+        episodehistory = EpisodeAction.objects.filter(user=request.user).order_by('-timestamp')[:count]
 
-    history = SubscriptionAction.objects.filter(device__in=devices).order_by('-timestamp')[:len]
+    subscription_history = get_subscription_history(request.user, device_id, count)
 
-    generalhistory = []
-
-    for row in history:
-        generalhistory.append(row)
-    for row in episodehistory:
-        generalhistory.append(row)
-
-    generalhistory.sort(key=lambda x: x.timestamp,reverse=True)
+    generalhistory = sorted(list(episodehistory) + subscription_history,
+        key=lambda x: x.timestamp,reverse=True)
 
     return render_to_response('history.html', {
         'generalhistory': generalhistory,
         'singledevice': devices[0] if device_id else None
     }, context_instance=RequestContext(request))
+
+
+def get_subscription_history(user, device_id=None, count=15):
+    """
+    Returns the subscription history either for one user or for a device.
+    """
+
+    if device_id:
+        dev = Device.objects.get(id=device_id)
+        dev = migrate.get_or_migrate_device(dev)
+        podcast_states = PodcastUserState.for_device(dev.id)
+    else:
+        podcast_states = PodcastUserState.for_user(user)
+
+    def action_iter(state):
+        for action in reversed(state.actions):
+            if not device_id or dev.id == action.device:
+                yield(action, state.podcast)
+
+    action_cmp_key = lambda x: x[0].timestamp
+
+    # create an action_iter for each PodcastUserState
+    subscription_action_lists = [action_iter(x) for x in podcast_states]
+
+    # Linearize their subscription-actions and slice to required length
+    subscription_history = list(islice(linearize(action_cmp_key, True, *subscription_action_lists), count))
+
+    # Load all podcasts that occur in the history at once
+    podcast_ids = [x[1] for x in subscription_history]
+    podcasts = get_to_dict(models.Podcast, podcast_ids)
+
+    new_user = migrate.get_or_migrate_user(user)
+
+    history = []
+    for action, podcast_id in subscription_history:
+        entry = HistoryEntry()
+        entry.timestamp = action.timestamp
+        entry.action = action.action
+        entry.podcast = podcasts[podcast_id]
+        entry.device = new_user.get_device(action.device)
+        history.append(entry)
+
+    return history
 
 
 @login_required

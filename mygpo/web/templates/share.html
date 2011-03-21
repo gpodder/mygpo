@@ -34,6 +34,9 @@
 
   <p>{% trans "Add <tt>&amp;symbian=true#.opml</tt> to the OPML URL to get an OPML file for Nokia Podcasting on Symbian devices." %}</p>
 
+  {% url privacy as privacy-url %}
+  <p>{% blocktrans %}You can configure which podcasts show up in your shared subscription list. <a href="{{ privacy-url }}">Go to Privacy-Settings</a>{% endblocktrans %}</p>
+
   <hr>
 
   <h3>{% trans "Share your Favorite Episodes" %}</h3>

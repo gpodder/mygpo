@@ -18,7 +18,7 @@
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from mygpo.api.opml import Importer, Exporter
-from mygpo.api.models import Subscription, Podcast, Device
+from mygpo.api.models import Podcast, Device
 from mygpo.api.backend import get_device
 from datetime import datetime
 from django.utils.datastructures import MultiValueDictKeyError
@@ -46,10 +46,9 @@ def upload(request):
         return HttpResponse('@AUTHFAIL', mimetype='text/plain')
 
     d = get_device(user, LEGACY_DEVICE_UID)
+    dev = migrate.get_or_migrate_device(d)
 
-    existing = Subscription.objects.filter(user=user, device=d)
-
-    existing_urls = [e.podcast.url for e in existing]
+    existing_urls = [x.url for x in dev.get_subscribed_podcasts()]
 
     i = Importer(opml)
 
@@ -58,7 +57,7 @@ def upload(request):
     podcast_urls = filter(lambda x: x, podcast_urls)
 
     new = [u for u in podcast_urls if u not in existing_urls]
-    rem = [e.podcast.url for e in existing if e.podcast.url not in podcast_urls]
+    rem = [u for e in existing_urls if u not in podcast_urls]
 
     #remove duplicates
     new = list(set(new))
@@ -67,23 +66,25 @@ def upload(request):
     for n in new:
         try:
             p, created = Podcast.objects.get_or_create(url=n)
+            p = migrate.get_or_migrate_podcast(p)
         except IntegrityError, e:
             log('/upload: Error trying to get podcast object: %s (error: %s)' % (n, e))
             continue
 
         try:
             p.subscribe(d)
-        except IntegrityError, e:
-            log('/upload: error while adding subscription: user: %s, podcast: %s, error: %s' % (user.id, p.id, e))
-        except ValueError, ve:
-            log('/upload: error while adding subscription: user: %s, podcast: %s, error: %s' % (user.id, p.id, e))
+        except Exception as e:
+            log('Legacy API: %(username): could not subscribe to podcast %(podcast_url) on device %(device_id): %(exception)s' %
+                {'username': user.username, 'podcast_url': p.url, 'device_id': d.id, 'exception': e})
 
     for r in rem:
         p, created = Podcast.objects.get_or_create(url=r)
+        p = migrate.get_or_migrate_podcast(p)
         try:
             p.unsubscribe(d)
-        except IntegrityError, e:
-            log('/upload: error while removing subscription: user: %s, podcast: %s, error: %s' % (user.id, p.id, e))
+        except Exception as e:
+            log('Legacy API: %(username): could not unsubscribe from podcast %(podcast_url) on device %(device_id): %(exception)s' %
+                {'username': user.username, 'podcast_url': p.url, 'device_id': d.id, 'exception': e})
 
     return HttpResponse('@SUCCESS', mimetype='text/plain')
 
@@ -101,7 +102,8 @@ def getlist(request):
 
     # We ignore deleted devices, because the Legacy API doesn't know such a concept
 
-    podcasts = [s.podcast for s in d.get_subscriptions()]
+    dev = migrate.get_or_migrate_device(d)
+    podcasts = dev.get_subscribed_podcasts()
 
     # FIXME: Get username and set a proper title (e.g. "thp's subscription list")
     title = 'Your subscription list'

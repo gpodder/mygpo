@@ -7,7 +7,7 @@ from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
 from django.utils.translation import ugettext as _
-from mygpo.api.models import Podcast, Episode, EpisodeAction, Device, SubscriptionAction, Subscription, SyncGroup
+from mygpo.api.models import Podcast, Episode, EpisodeAction, Device, SyncGroup
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.web.forms import PrivacyForm, SyncForm
 from mygpo.data.models import Listener
@@ -24,41 +24,44 @@ MAX_TAGS_ON_PAGE=50
 @cache_page_anonymous(60 * 60)
 def show(request, pid):
     podcast = get_object_or_404(Podcast, pk=pid)
+    new_podcast = migrate.get_or_migrate_podcast(podcast)
     episodes = episode_list(podcast, request.user)
-    max_listeners = max([x.listener_count() for x in episodes]) if len(episodes) else 0
+    max_listeners = 0#max([x.listener_count() for x in episodes]) if len(episodes) else 0
     related_podcasts = [x for x in podcast.group.podcasts() if x != podcast] if podcast.group else []
 
     tags = get_tags(podcast, request.user)
 
     if request.user.is_authenticated():
-        devices = Device.objects.filter(user=request.user)
-        history = SubscriptionAction.objects.filter(podcast=podcast,device__in=devices).order_by('-timestamp')
-        subscribed_devices = [s.device for s in Subscription.objects.filter(podcast=podcast,user=request.user)]
-        subscribe_targets = podcast.subscribe_targets(request.user)
+        user = migrate.get_or_migrate_user(request.user)
+
+        for dev in Device.objects.filter(user=request.user):
+            dev.sync()
+
+        state = new_podcast.get_user_state(request.user)
+        subscribed_devices = state.get_subscribed_device_ids()
+        subscribed_devices = [user.get_device(x) for x in subscribed_devices]
+
+        subscribe_targets = new_podcast.subscribe_targets(request.user)
         success = False
 
+        history = list(state.actions)
+        for h in history:
+            dev = user.get_device(h.device)
+            h.device_obj = dev.to_json()
 
-        qs = Subscription.objects.filter(podcast=podcast, user=request.user)
-        if qs.count()>0 and request.user.get_profile().public_profile:
-            # subscription meta is valid for all subscriptions, so we get one - doesn't matter which
-            subscription = qs[0]
-            subscriptionmeta = subscription.get_meta()
-            if request.method == 'POST':
-                privacy_form = PrivacyForm(request.POST)
-                if privacy_form.is_valid():
-                    subscriptionmeta.settings['public_subscription'] = privacy_form.cleaned_data['public']
-                    try:
-                       subscriptionmeta.save()
-                       success = True
-                    except IntegrityError, ie:
-                       error_message = _('You can\'t use the same Device ID for two devices.')
-            else:
-                privacy_form = PrivacyForm({
-                    'public': subscriptionmeta.public
-                })
-
+        if request.method == 'POST':
+            privacy_form = PrivacyForm(request.POST)
+            if privacy_form.is_valid():
+                state.settings['public_subscription'] = privacy_form.cleaned_data['public']
+                try:
+                   state.save()
+                   success = True
+                except IntegrityError, ie:
+                   error_message = _('You can\'t use the same Device ID for two devices.')
         else:
-            privacy_form = None
+            privacy_form = PrivacyForm({
+                'public': state.settings.get('public_subscription', True)
+            })
 
         subscribe_form = SyncForm()
         subscribe_form.set_targets(subscribe_targets, '')
@@ -219,9 +222,11 @@ def subscribe(request, pid):
                 device = target
 
             try:
-                podcast.subscribe(device)
-            except IntegrityError, e:
-                log('error while subscribing to podcast (device %s, podcast %s)' % (device.id, podcast.id))
+                p = migrate.get_or_migrate_podcast(podcast)
+                p.subscribe(device)
+            except Exception as e:
+                log('Web: %(username)s: could not subscribe to podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
+                    {'username': request.user.username, 'podcast_url': p.url, 'device_id': device.id, 'exception': e})
 
             return HttpResponseRedirect('/podcast/%s' % podcast.id)
 
@@ -251,11 +256,13 @@ def unsubscribe(request, pid, device_id):
         raise Http404('Wrong URL')
 
     podcast = get_object_or_404(Podcast, pk=pid)
+    p = migrate.get_or_migrate_podcast(podcast)
     device = get_object_or_404(Device, pk=device_id, user=request.user)
     try:
-        podcast.unsubscribe(device)
-    except IntegrityError, e:
-        log('error while unsubscribing from podcast (device %s, podcast %s)' % (device.id, podcast.id))
+        p.unsubscribe(device)
+    except Exception as e:
+        log('Web: %(username)s: could not unsubscribe from podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
+            {'username': request.user.username, 'podcast_url': p.url, 'device_id': device.id, 'exception': e})
 
     return HttpResponseRedirect(return_to)
 

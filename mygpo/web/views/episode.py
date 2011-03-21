@@ -19,7 +19,7 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from mygpo.core import models
-from mygpo.api.models import Podcast, Episode, EpisodeAction, Subscription
+from mygpo.api.models import Podcast, Episode, EpisodeAction
 from mygpo.api.models.episodes import Chapter
 from mygpo.api import backend
 from mygpo.web.utils import get_played_parts
@@ -37,14 +37,11 @@ def episode(request, id):
 
     if request.user.is_authenticated():
         history = EpisodeAction.objects.filter(user=request.user, episode=episode).order_by('-timestamp')
-        subscription_tmp = Subscription.objects.filter(podcast=episode.podcast, user=request.user)
-        if subscription_tmp.exists():
-            subscription_meta = subscription_tmp[0].get_meta()
-        else:
-            subscription_meta = None
+
+        podcast = migrate.get_or_migrate_podcast(episode.podcast)
+        podcast_state = podcast.get_user_state(request.user)
 
         new_ep  = migrate.get_or_migrate_episode(episode)
-        podcast = models.Podcast.for_oldid(episode.podcast.id)
         episode_state = migrate.get_episode_user_state(request.user, new_ep, podcast)
         is_fav = episode_state.is_favorite()
 
@@ -52,7 +49,7 @@ def episode(request, id):
 
     else:
         history = []
-        subscription_meta = None
+        podcast_state = None
         is_fav = False
         played_parts = None
         duration = episode.duration
@@ -78,7 +75,7 @@ def episode(request, id):
         'next': next,
         'history': history,
         'chapters': chapters,
-        'subscription_meta': subscription_meta,
+        'podcast_state': podcast_state,
         'is_favorite': is_fav,
         'played_parts': played_parts,
         'duration': duration

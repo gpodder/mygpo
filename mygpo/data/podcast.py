@@ -16,7 +16,9 @@
 #
 
 from django.contrib.auth.models import User
-from mygpo.api.models import Episode, Subscription
+from mygpo.core.models import Podcast
+from mygpo.api.models import Episode
+from mygpo.utils import flatten
 
 def avg_update_interval(podcast):
     """
@@ -41,15 +43,18 @@ def calc_similar_podcasts(podcast):
     npodcast = migrate.get_or_migrate_podcast(podcast)
     tags = npodcast.all_tags()
     users = User.objects.filter(subscription__podcast=podcast).only('id').distinct()
-    subscribed = Subscription.objects.filter(user__in=users).only('podcast')
-    podcast_list = {}
-    for s in subscribed:
-        if s.podcast == podcast:
-            continue
-        podcast_list[s.podcast] = podcast_list.get(s.podcast, 0) + 1
+    users = map(migrate.get_or_migrate_user, users)
+    subscribed_ids = [u.get_subscribed_podcast_ids() for u in users]
+    subscribed_ids = list(set(flatten(subscribed_ids)))
 
-    for p in podcast_list.iterkeys():
-        np = migrate.get_or_migrate_podcast(p)
+    podcast_list = {}
+    for id in subscribed_ids:
+        if id == npodcast.get_id():
+            continue
+        podcast_list[id] = podcast_list.get(id, 0) + 1
+
+    for id in podcast_list.iterkeys():
+        np = Podcast.get(id)
         ps_tags = np.all_tags()
         matching_tags = filter(lambda t: t in tags, ps_tags)
         podcast_list[p] = podcast_list[p] * max(len(matching_tags), 1)

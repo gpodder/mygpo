@@ -49,6 +49,35 @@ def delete_podcast_signal(sender, instance=False, **kwargs):
         log('error while deleting CouchDB-Podcast: %s' % repr(e))
 
 
+
+def save_device_signal(sender, instance=False, **kwargs):
+
+    if not instance:
+        return
+
+    dev = get_or_migrate_device(instance)
+    d = update_device(instance, dev)
+    user = get_or_migrate_user(instance.user)
+    user.set_device(d)
+    user.save()
+
+    podcast_states = PodcastUserState.for_user(instance.user)
+    for state in podcast_states:
+        state.set_device_state(dev)
+        state.save()
+
+
+def delete_device_signal(sender, instance=False, **kwargs):
+    if not instance:
+        return
+
+    user = get_or_migrate_user(instance.user)
+    dev = get_or_migrate_device(instance)
+    user.remove_device(dev)
+    user.save()
+
+
+
 def save_episode_signal(sender, instance=False, **kwargs):
     """
     Signal-handler for creating/updating a CouchDB-based episode when
@@ -286,20 +315,29 @@ def get_or_migrate_user(user):
 
 
 def get_or_migrate_device(device, user=None):
-    d = Device.for_user_uid(device.user, device.uid)
-    if d:
-        return d
+    return Device.for_oldid(device.id) or create_device(device)
+
+
+def create_device(oldd, sparse=False):
+    user = get_or_migrate_user(oldd.user)
 
     d = Device()
-    d.oldid = device.id
-    d.uid = device.uid
-    d.name = device.name
-    d.type = device.type
-    d.deleted = device.deleted
-    u = user or get_or_migrate_user(device.user)
-    u.devices.append(d)
-    u.save()
+    d.oldid = oldd.id
+
+    if not sparse:
+        update_device(oldd, d)
+
+    user.devices.append(d)
+    user.save()
     return d
+
+
+def update_device(oldd, newd):
+    newd.uid = oldd.uid
+    newd.name = oldd.name
+    newd.type = oldd.type
+    newd.deleted = oldd.deleted
+    return newd
 
 
 def migrate_subscription_action(old_action):
@@ -341,3 +379,8 @@ def get_episode_user_state(user, episode, podcast):
     e_state.save()
 
     return e_state
+
+
+def get_devices(user):
+    from mygpo.api.models import Device
+    return [get_or_migrate_device(dev) for dev in Device.objects.filter(user=user)]

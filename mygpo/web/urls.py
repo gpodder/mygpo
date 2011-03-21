@@ -20,7 +20,7 @@ urlpatterns = patterns('mygpo.web.views',
 )
 
 urlpatterns += patterns('mygpo.web.views.subscriptions',
- url(r'^subscriptions/$',                                         'list',          name='subscriptions'),
+ url(r'^subscriptions/$',                                         'show_list',     name='subscriptions'),
  url(r'^download/subscriptions\.opml$',                           'download_all',  name='subscriptions-opml'),
  url(r'^subscriptions/all.opml$',                                 'download_all',  name='subscriptions-download'),
  url(r'^user/(?P<username>\w+)/subscriptions$',                   'for_user',      name='shared-subscriptions'),

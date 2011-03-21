@@ -18,22 +18,25 @@
 from mygpo.api.basic_auth import require_valid_user, check_username
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.core.cache import cache
-from mygpo.api.models import Device, Podcast, SubscriptionAction, Episode, EpisodeAction, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, EPISODE_ACTION_TYPES, DEVICE_TYPES, Subscription
+from mygpo.api.models import Device, Podcast, Episode, EpisodeAction, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, EPISODE_ACTION_TYPES, DEVICE_TYPES
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.api.advanced.directory import episode_data, podcast_data
-from mygpo.api.backend import get_all_subscriptions, get_device, get_favorites
+from mygpo.api.backend import get_device, get_favorites
 from django.shortcuts import get_object_or_404
 from django.contrib.sites.models import RequestSite
 from time import mktime, gmtime, strftime
 from datetime import datetime
 import dateutil.parser
 from mygpo.log import log
-from mygpo.utils import parse_time, parse_bool
+from mygpo.utils import parse_time, parse_bool, get_to_dict
 from mygpo.decorators import allowed_methods
+from mygpo.core import models
 from mygpo.core.models import SanitizingRule
 from django.db import IntegrityError
 from django.views.decorators.csrf import csrf_exempt
+from mygpo.users.models import PodcastUserState
+from mygpo import migrate
 
 try:
     import simplejson as json
@@ -61,7 +64,8 @@ def subscriptions(request, username, device_uid):
         except ValueError:
             return HttpResponseBadRequest('since-value is not a valid timestamp')
 
-        changes = get_subscription_changes(request.user, d, since, now)
+        dev = migrate.get_or_migrate_device(d)
+        changes = get_subscription_changes(request.user, dev, since, now)
 
         return JsonResponse(changes)
 
@@ -109,34 +113,36 @@ def update_subscriptions(user, device, add, remove):
 
     for a in add_sanitized:
         p, p_created = Podcast.objects.get_or_create(url=a)
+        p = migrate.get_or_migrate_podcast(p)
         try:
             p.subscribe(device)
-        except IntegrityError, e:
-            log('can\'t add subscription %s for user %s: %s' % (a, user, e))
+        except Exception as e:
+            log('Advanced API: %(username): could not subscribe to podcast %(podcast_url) on device %(device_id): %(exception)s' %
+                {'username': user.username, 'podcast_url': p.url, 'device_id': device.id, 'exception': e})
 
     for r in rem_sanitized:
         p, p_created = Podcast.objects.get_or_create(url=r)
+        p = migrate.get_or_migrate_podcast(p)
         try:
             p.unsubscribe(device)
-        except IntegrityError, e:
-            log('can\'t remove subscription %s for user %s: %s' % (r, user, e))
+        except Exception as e:
+            log('Advanced API: %(username): could not unsubscribe from podcast %(podcast_url) on device %(device_id): %(exception)s' %
+                {'username': user.username, 'podcast_url': p.url, 'device_id': device.id, 'exception': e})
 
     return updated_urls
 
+
 def get_subscription_changes(user, device, since, until):
-    #ordered by ascending date; newer entries overwriter older ones
-    query = SubscriptionAction.objects.filter(device=device,
-            timestamp__gt=since, timestamp__lte=until).order_by('timestamp')
-    actions = dict([(a.podcast, a) for a in query])
+    add, rem = device.get_subscription_changes(since, until)
 
-    add = filter(lambda (p, a): a.action == SUBSCRIBE_ACTION, actions.items())
-    add = map(lambda (p, a): p.url, add)
+    podcast_ids = add + rem
+    podcasts = get_to_dict(models.Podcast, podcast_ids)
 
-    rem = filter(lambda (p, a): a.action == UNSUBSCRIBE_ACTION, actions.items())
-    rem = map(lambda (p, a): p.url, rem)
+    add_urls = [ podcasts[i].url for i in add]
+    rem_urls = [ podcasts[i].url for i in rem]
 
     until_ = int(mktime(until.timetuple()))
-    return {'add': add, 'remove': rem, 'timestamp': until_}
+    return {'add': add_urls, 'remove': rem_urls, 'timestamp': until_}
 
 
 @csrf_exempt
@@ -324,6 +330,7 @@ def valid_episodeaction(type):
 @allowed_methods(['GET'])
 def devices(request, username):
     devices = Device.objects.filter(user=request.user, deleted=False)
+    devices = map(migrate.get_or_migrate_device, devices)
     devices = map(device_data, devices)
 
     return JsonResponse(devices)
@@ -334,7 +341,7 @@ def device_data(device):
         id           = device.uid,
         caption      = device.name,
         type         = device.type,
-        subscriptions= Subscription.objects.filter(device=device).count()
+        subscriptions= len(device.get_subscribed_podcast_ids())
     )
 
 
@@ -355,7 +362,8 @@ def updates(request, username, device_uid):
     except ValueError:
         return HttpResponseBadRequest('since-value is not a valid timestamp')
 
-    ret = get_subscription_changes(request.user, device, since, now)
+    dev = migrate.get_or_migrate_device(device)
+    ret = get_subscription_changes(request.user, dev, since, now)
     domain = RequestSite(request).domain
 
     # replace added urls with details
@@ -368,7 +376,8 @@ def updates(request, username, device_uid):
 
 
     # add episode details
-    subscriptions = get_all_subscriptions(request.user)
+    user = migrate.get_or_migrate_user(request.user)
+    subscriptions = user.get_subscribed_podcasts()
     episode_status = {}
     for e in Episode.objects.filter(podcast__in=subscriptions, timestamp__gte=since).order_by('timestamp'):
         episode_status[e] = 'new'

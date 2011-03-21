@@ -13,17 +13,27 @@ class Command(BaseCommand):
 
     option_list = BaseCommand.option_list + (
         make_option('--min-id', action='store', type="int", dest='min_id', default=0, help="Id from which the migration should start."),
-        make_option('--max-id', action='store', type="int", dest='max_id', help="Id at which the migration should end."),
+        make_option('--max-id', action='store', type="int", dest='max_id', default=None, help="Id at which the migration should end."),
+        make_option('--user', action='store', type="string", dest='user', help="Migrate actions for a given user"),
     )
 
 
     def handle(self, *args, **options):
 
         user, old_podcast = None, None
-        min_id = options.get('min_id', 0)
-        max_id = options.get('max_id', models.EpisodeAction.objects.order_by('-id')[0].id)
+        min_id   = options.get('min_id', 0)
+        max_id   = options.get('max_id', models.SubscriptionAction.objects.order_by('-id')[0].id)
+        username = options.get('user', None)
 
-        actions = models.SubscriptionAction.objects.filter(id__gte=min_id, id__lte=max_id)
+        actions = models.SubscriptionAction.objects.all()
+
+        if min_id:
+            actions = actions.filter(id__gte=min_id)
+        if max_id:
+            actions = actions.filter(id__lte=max_id)
+        if username:
+            actions = actions.filter(device__user__username=username)
+
         combinations = list(set(actions.values_list('device__user', 'podcast')))
         total = len(combinations)
 
@@ -38,12 +48,13 @@ class Command(BaseCommand):
     @repeat_on_conflict()
     def migrate_for_user_podcast(self, user, old_podcast):
         podcast = migrate.get_or_migrate_podcast(old_podcast)
+        migrate.update_podcast(old_podcast, podcast)
         podcast_state = podcast.get_user_state(user)
         podcast_state.ref_url = old_podcast.url
 
         actions = models.SubscriptionAction.objects.filter(device__user=user, podcast=old_podcast).order_by('timestamp')
-        for action in actions:
-            podcast_state.add_actions([migrate.migrate_subscription_action(action)])
+        new_actions = map(migrate.migrate_subscription_action, actions)
+        podcast_state.add_actions(new_actions)
 
         podcast_state.save()
 

@@ -28,8 +28,13 @@ def device_type(device):
 
 @register.filter
 def device_icon(device, size=16):
-    icon = DEVICE_TYPE_ICONS.get(device.type, None)
-    caption = DEVICE_TYPES_DICT.get(device.type, None)
+    try:
+        device_type = device.type
+    except:
+        device_type = device['type']
+
+    icon = DEVICE_TYPE_ICONS.get(device_type, None)
+    caption = DEVICE_TYPES_DICT.get(device_type, None)
 
     if icon is not None and caption is not None:
         caption = ugettext(caption)
@@ -41,5 +46,8 @@ def device_icon(device, size=16):
 
 @register.filter
 def device_list(devices):
-    return mark_safe('<br/>'.join([ '<a href="%s">%s&nbsp;%s</a>' % (reverse(show, args=[d.id]), device_icon(d), d.name.replace(' ', '&nbsp;')) for d in devices]))
+    from mygpo.users.models import Device
+
+    get_id = lambda d: d.oldid if isinstance(d, Device) else d.id
+    return mark_safe('<br/>'.join([ '<a href="%s">%s&nbsp;%s</a>' % (reverse(show, args=[get_id(d)]), device_icon(d), d.name.replace(' ', '&nbsp;')) for d in devices]))
 
