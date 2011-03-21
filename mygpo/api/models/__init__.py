@@ -310,10 +310,6 @@ class Device(models.Model):
 
         for podcast_id, action in sync_actions.items():
 
-            print action
-            print current_state.get(podcast_id, '')
-            print
-
             # Sync-Actions must be newer than current state
             if podcast_id in current_state and \
                action.timestamp <= current_state[podcast_id].timestamp:
