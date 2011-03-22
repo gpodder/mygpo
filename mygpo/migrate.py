@@ -336,7 +336,7 @@ def update_device(oldd, newd):
     newd.uid = oldd.uid
     newd.name = oldd.name
     newd.type = oldd.type
-    newd.deleted = oldd.deleted
+    newd.deleted = bool(oldd.deleted)
     return newd
 
 
