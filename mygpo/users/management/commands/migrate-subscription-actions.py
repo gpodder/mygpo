@@ -1,5 +1,7 @@
 from optparse import make_option
 
+from restkit.errors import Unauthorized
+
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 
@@ -25,7 +27,7 @@ class Command(BaseCommand):
         max_id   = options.get('max_id', models.SubscriptionAction.objects.order_by('-id')[0].id)
         username = options.get('user', None)
 
-        actions = models.SubscriptionAction.objects.all()
+        actions = models.SubscriptionAction.objects.order_by('-id')
 
         if min_id:
             actions = actions.filter(id__gte=min_id)
@@ -34,38 +36,38 @@ class Command(BaseCommand):
         if username:
             actions = actions.filter(device__user__username=username)
 
-        combinations = list(set(actions.values_list('device__user', 'podcast')))
-        total = len(combinations)
+        total = actions.count()
 
-        for n, (user_id, podcast_id) in enumerate(combinations):
-            user = self.check_new(user, User, user_id)
-            old_podcast = self.check_new(old_podcast, models.Podcast, podcast_id)
+        for n, action in enumerate(actions):
+            try:
+                self.migrate_action(action)
+            except Unauthorized as e:
+                print 'skipping action %d: %s' % (action.id, repr(e))
 
-            self.migrate_for_user_podcast(user, old_podcast)
-            progress(n+1, total)
+            progress(n+1, total, str(action.id))
 
 
     @repeat_on_conflict()
-    def migrate_for_user_podcast(self, user, old_podcast):
-        podcast = migrate.get_or_migrate_podcast(old_podcast)
-        migrate.update_podcast(old_podcast, podcast)
-        podcast_state = podcast.get_user_state(user)
-        podcast_state.ref_url = old_podcast.url
+    def migrate_action(self, action):
+        try:
+            podcast = action.podcast
+            user = action.device.user
+        except:
+            return
 
-        actions = models.SubscriptionAction.objects.filter(device__user=user, podcast=old_podcast).order_by('timestamp')
-        new_actions = map(migrate.migrate_subscription_action, actions)
-        podcast_state.add_actions(new_actions)
+        while True:
+            try:
+                new_podcast = migrate.get_or_migrate_podcast(podcast)
+                migrate.update_podcast(podcast, new_podcast)
+                podcast_state = new_podcast.get_user_state(user)
+                podcast_state.ref_url = podcast.url
 
-        podcast_state.save()
+                new_action = migrate.migrate_subscription_action(action)
+                podcast_state.add_actions([new_action])
 
-
-    def check_new(self, obj, cls, obj_id):
-        """
-        Checks if obj is the object referred to by obj_id. If it is, the
-        object is returned. If not, the object is loaded from the database
-        (assumed to be of class cls) and returned
-        """
-        if not obj or obj.id != obj_id:
-            return cls.objects.get(id=obj_id)
-        else:
-            return obj
+                podcast_state.save()
+                break
+            except Unauthorized:
+                raise
+            except Exception as e:
+                print repr(e)
