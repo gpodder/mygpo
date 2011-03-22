@@ -4,9 +4,8 @@ from django.core.management.base import BaseCommand
 
 from couchdbkit import ResourceConflict
 
-from mygpo.core import models
-from mygpo.api.models import Podcast
-from mygpo.utils import progress
+from mygpo.core.models import Podcast, SubscriberData
+from mygpo.utils import progress, multi_request_view
 from mygpo.decorators import repeat_on_conflict
 
 
@@ -15,8 +14,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         started = datetime.now()
-        entries = models.Podcast.view('core/podcasts_by_oldid').iterator()
-        total = models.Podcast.view('core/podcasts_by_oldid', limit=1).total_rows
+        entries = multi_request_view(Podcast, 'core/podcasts_by_oldid')
+        total = Podcast.view('core/podcasts_by_oldid', limit=0).total_rows
 
         for n, entry in enumerate(entries):
             self.update(entry=entry, started=started)
@@ -25,14 +24,9 @@ class Command(BaseCommand):
 
     @repeat_on_conflict(['entry'])
     def update(self, entry, started):
-        try:
-            p = Podcast.objects.get(id=entry.oldid)
-        except Podcast.DoesNotExist:
-            return
-
-        data = models.SubscriberData(
+        data = SubscriberData(
             timestamp        = started,
-            subscriber_count = max(0, p.subscriber_count()),
+            subscriber_count = max(0, entry.subscriber_count()),
             )
         entry.subscribers.append(data)
         entry.save()
