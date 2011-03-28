@@ -174,7 +174,7 @@ def episode(request, id):
         }, context_instance=RequestContext(request))
 
 
-@cache_page(60 * 60)
+@cache_page_anonymous(60 * 60)
 def link(request):
     current_site = RequestSite(request)
     return render_to_response('link.html', {
@@ -182,7 +182,7 @@ def link(request):
         }, context_instance=RequestContext(request))
 
 
-@cache_page(60 * 60)
+@cache_page_anonymous(60 * 60)
 def advertise(request):
     site = RequestSite(request)
     return render_to_response('publisher/advertise.html', {
