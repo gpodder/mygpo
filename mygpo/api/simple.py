@@ -175,7 +175,8 @@ def set_subscriptions(urls, user, device_uid):
         device.deleted = False
         device.save()
 
-    old = [s.podcast.url for s in device.get_subscriptions()]
+    dev = migrate.get_or_migrate_device(device)
+    old = [p.url for p in dev.get_subscribed_podcasts()]
     new = [p for p in urls if p not in old]
     rem = [p for p in old if p not in urls]
 

@@ -378,10 +378,11 @@ def updates(request, username, device_uid):
     # add episode details
     user = migrate.get_or_migrate_user(request.user)
     subscriptions = user.get_subscribed_podcasts()
+    subscriptions_oldpodcasts = [p.get_old_obj() for p in subscriptions]
     episode_status = {}
-    for e in Episode.objects.filter(podcast__in=subscriptions, timestamp__gte=since).order_by('timestamp'):
+    for e in Episode.objects.filter(podcast__in=subscriptions_oldpodcasts, timestamp__gte=since).order_by('timestamp'):
         episode_status[e] = 'new'
-    for a in EpisodeAction.objects.filter(user=request.user, episode__podcast__in=subscriptions, timestamp__gte=since).order_by('timestamp'):
+    for a in EpisodeAction.objects.filter(user=request.user, episode__podcast__in=subscriptions_oldpodcasts, timestamp__gte=since).order_by('timestamp'):
         episode_status[a.episode] = a.action
 
     updates = []
