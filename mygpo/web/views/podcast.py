@@ -233,7 +233,8 @@ def subscribe(request, pid):
         except ValueError, e:
             error_message = _('Could not subscribe to the podcast: %s' % e)
 
-    targets = podcast.subscribe_targets(request.user)
+    new_podcast = migrate.get_or_migrate_podcast(podcast)
+    targets = new_podcast.subscribe_targets(request.user)
 
     form = SyncForm()
     form.set_targets(targets, _('Choose a device:'))
