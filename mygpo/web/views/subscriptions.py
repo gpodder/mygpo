@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 
 from mygpo.core.models import Podcast
-from mygpo.utils import parse_bool, unzip
+from mygpo.utils import parse_bool, unzip, get_to_dict
 from mygpo.decorators import manual_gc, requires_token
 from mygpo.api.models import Device, Episode
 from mygpo.api import backend, simple
@@ -83,8 +83,7 @@ def create_subscriptionlist(request):
     podcast_ids= list(set(podcast_ids))
     device_ids = list(set(device_ids))
 
-    pobj = Podcast.get_multi(podcast_ids)
-    podcasts = dict(zip(podcast_ids, pobj))
+    podcasts = get_to_dict(Podcast, podcast_ids)
     devices = dict([ (id, user.get_device(id)) for id in device_ids])
 
     subscription_list = {}

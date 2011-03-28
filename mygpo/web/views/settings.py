@@ -137,7 +137,8 @@ def privacy(request):
 
     user = migrate.get_or_migrate_user(request.user)
     subscriptions = user.get_subscriptions()
-    podcasts = get_to_dict(Podcast, [x[1] for x in subscriptions])
+    podcasts = get_to_dict(Podcast, list(set([x[1] for x in subscriptions])))
+
     included_subscriptions = set([podcasts[x[1]] for x in subscriptions if x[0] == True])
     excluded_subscriptions = set([podcasts[x[1]] for x in subscriptions if x[0] == False])
 
