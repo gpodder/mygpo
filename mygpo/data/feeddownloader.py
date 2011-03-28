@@ -206,7 +206,7 @@ def update_podcasts(fetch_queue):
                     image_sha1 = hashlib.sha1()
                     image_sha1.update(cover_art)
                     image_sha1 = image_sha1.hexdigest()
-                    filename = os.path.join('..', 'htdocs', 'media', 'logo', image_sha1)
+                    filename = os.path.join(os.path.dirname(os.path.abspath(__file__ )), '..', '..', 'htdocs', 'media', 'logo', image_sha1)
                     fp = open(filename, 'w')
                     fp.write(urllib2.urlopen(cover_art).read())
                     fp.close()
