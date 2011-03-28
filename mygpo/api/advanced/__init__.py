@@ -117,7 +117,7 @@ def update_subscriptions(user, device, add, remove):
         try:
             p.subscribe(device)
         except Exception as e:
-            log('Advanced API: %(username): could not subscribe to podcast %(podcast_url) on device %(device_id): %(exception)s' %
+            log('Advanced API: %(username)s: could not subscribe to podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
                 {'username': user.username, 'podcast_url': p.url, 'device_id': device.id, 'exception': e})
 
     for r in rem_sanitized:
@@ -126,7 +126,7 @@ def update_subscriptions(user, device, add, remove):
         try:
             p.unsubscribe(device)
         except Exception as e:
-            log('Advanced API: %(username): could not unsubscribe from podcast %(podcast_url) on device %(device_id): %(exception)s' %
+            log('Advanced API: %(username)s: could not unsubscribe from podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
                 {'username': user.username, 'podcast_url': p.url, 'device_id': device.id, 'exception': e})
 
     return updated_urls
