@@ -88,6 +88,7 @@ class EpisodeUserState(Document):
     user_oldid    = IntegerProperty()
     ref_url       = StringProperty(required=True)
     podcast_ref_url = StringProperty(required=True)
+    merged_ids    = StringListProperty()
 
 
     @classmethod
@@ -168,6 +169,7 @@ class PodcastUserState(Document):
     tags          = StringListProperty()
     ref_url       = StringProperty(required=True)
     disabled_devices = StringListProperty()
+    merged_ids    = StringListProperty()
 
 
     @classmethod
