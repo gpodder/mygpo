@@ -241,6 +241,10 @@ class Podcast(Document):
         return None
 
 
+    def __hash__(self):
+        return hash(self.get_id())
+
+
     def __repr__(self):
         if not self._id:
             return super(Podcast, self).__repr__()
@@ -254,6 +258,16 @@ class Podcast(Document):
         group = getattr(self, 'group', None)
         if group: #we are part of a PodcastGroup
             group = PodcastGroup.get(group)
+
+            if not self in group.podcasts:
+                # the podcast has not been added to the group correctly
+                group.add_podcast(self)
+
+            else:
+                i = group.podcasts.index(self)
+                group.podcasts[i] = self
+                group.save()
+
             i = group.podcasts.index(self)
             group.podcasts[i] = self
             group.save()
@@ -327,7 +341,8 @@ class PodcastGroup(Document):
 
 
     def add_podcast(self, podcast):
-        podcast.id = podcast._id
+        if not podcast.id:
+            podcast.id = podcast._id
 
         if not self._id:
             raise ValueError('group has to have an _id first')
