@@ -341,7 +341,7 @@ class Device(Document):
                 yield (p_state.podcast, actions[0])
 
 
-    def get_subscribed_podcasts_ids(self):
+    def get_subscribed_podcast_ids(self):
         from mygpo.api.models import Device
         d = Device.objects.get(id=self.oldid)
         d.sync()
@@ -352,7 +352,7 @@ class Device(Document):
 
 
     def get_subscribed_podcasts(self):
-        return Podcast.get_multi(self.get_subscribed_podcasts_ids())
+        return Podcast.get_multi(self.get_subscribed_podcast_ids())
 
 
 
