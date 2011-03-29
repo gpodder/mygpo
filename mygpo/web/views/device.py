@@ -29,7 +29,7 @@ from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
 from mygpo.log import log
 from mygpo.api import simple
-from mygpo.decorators import manual_gc, allowed_methods
+from mygpo.decorators import manual_gc, allowed_methods, repeat_on_conflict
 from mygpo.users.models import PodcastUserState
 from mygpo import migrate
 
@@ -167,10 +167,14 @@ def delete_permanently(request, device_id):
     device = get_object_or_404(Device, pk=device_id, user=request.user)
     dev = migrate.get_or_migrate_device(device)
 
-    states = PodcastUserState.for_device(dev.id)
-    for state in states:
+    @repeat_on_conflict(['state'])
+    def remove_device(state, dev):
         state.remove_device(dev)
         state.save()
+
+    states = PodcastUserState.for_device(dev.id)
+    for state in states:
+        remove_device(state=state, dev=dev)
 
     EpisodeAction.objects.filter(device=device).delete()
     Listener.objects.filter(device=device).delete()
