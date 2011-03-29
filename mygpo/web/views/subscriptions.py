@@ -125,7 +125,8 @@ class SubscriptionsFeed(Feed):
         return migrate.get_or_migrate_user(user)
 
     def title(self, user):
-        return _('%(username)s\'s Subscriptions') % dict(username=user.username)
+        return _('%(username)s\'s Podcast Subscriptions on %(site)s') % \
+            dict(username=user.username, site=self.site)
 
     def description(self, user):
         return _('Recent changes to %(username)s\'s podcast subscriptions on %(site)s') % \
@@ -154,12 +155,13 @@ class SubscriptionsFeed(Feed):
 
     def item_title(self, entry):
         if entry.action == 'subscribe':
-            s = _('%(username)s subscribed to %(podcast)s')
+            s = _('%(username)s subscribed to %(podcast)s (%(site)s)')
         else:
-            s = _('%(username)s unsubscribed from %(podcast)s')
+            s = _('%(username)s unsubscribed from %(podcast)s (%(site)s)')
 
         return s % dict(username=entry.user.username,
-                        podcast=entry.podcast.display_title)
+                        podcast=entry.podcast.display_title,
+                        site=self.site)
 
     def item_link(self, item):
         return reverse('podcast', args=[item.podcast.oldid])
