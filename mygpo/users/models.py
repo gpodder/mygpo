@@ -4,7 +4,7 @@ from couchdbkit import ResourceNotFound
 from couchdbkit.ext.django.schema import *
 
 from mygpo.core.models import Podcast
-from mygpo.utils import linearize
+from mygpo.utils import linearize, get_to_dict
 
 
 class Rating(DocumentSchema):
@@ -520,4 +520,22 @@ class User(Document):
 
 
 class HistoryEntry(object):
-    pass
+
+    @classmethod
+    def fetch_data(cls, user, entries):
+        """ Efficiently loads additional data for a number of entries """
+
+        # load podcast data
+        podcast_ids = [x.podcast_id for x in entries]
+        podcasts = get_to_dict(Podcast, podcast_ids)
+
+        # load device data
+        device_ids = [x.device_id for x in entries]
+        devices = dict([ (id, user.get_device(id)) for id in device_ids])
+
+        for entry in entries:
+            entry.podcast = podcasts[entry.podcast_id]
+            entry.device = devices[entry.device_id]
+            entry.user = user
+
+        return entries

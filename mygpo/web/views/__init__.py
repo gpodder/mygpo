@@ -24,7 +24,7 @@ from django.contrib.auth.models import User
 from django.template import RequestContext
 from mygpo.core import models
 from mygpo.directory import tags
-from mygpo.users.models import Rating, Suggestions
+from mygpo.users.models import Rating, Suggestions, HistoryEntry
 from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, UserProfile
 from mygpo.users.models import PodcastUserState
 from mygpo.decorators import manual_gc
@@ -35,7 +35,7 @@ from django.contrib.sites.models import RequestSite
 from mygpo.constants import PODCAST_LOGO_SIZE, PODCAST_LOGO_BIG_SIZE
 from mygpo.web import utils
 from mygpo.api import backend
-from mygpo.utils import flatten, get_to_dict
+from mygpo.utils import flatten
 from mygpo import migrate
 import os
 import Image
@@ -194,16 +194,7 @@ def get_subscription_history(user, device_id=None, count=15):
 
     subscription_history = new_user.get_subscription_history(device_id, reverse=True)
     subscription_history = list(islice(subscription_history, count))
-
-    # Load all podcasts that occur in the history at once
-    podcast_ids = [x.podcast_id for x in subscription_history]
-    podcasts = get_to_dict(models.Podcast, podcast_ids)
-
-    new_user = migrate.get_or_migrate_user(user)
-
-    for entry in subscription_history:
-        entry.podcast = podcasts[entry.podcast_id]
-        entry.device = new_user.get_device(entry.device_id)
+    subscription_history = HistoryEntry.fetch_data(new_user, subscription_history)
 
     return subscription_history
 

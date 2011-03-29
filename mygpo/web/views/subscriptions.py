@@ -13,6 +13,7 @@ from mygpo.utils import parse_bool, unzip, get_to_dict, skip_pairs
 from mygpo.decorators import manual_gc, requires_token
 from mygpo.api.models import Device, Episode
 from mygpo.api import backend, simple
+from mygpo.users.models import HistoryEntry
 from mygpo.web import utils
 from mygpo import migrate
 
@@ -138,19 +139,7 @@ class SubscriptionsFeed(Feed):
         history = user.get_global_subscription_history(public=True)
         history = skip_pairs(history)
         history = list(history)[-NUM_ITEMS:]
-
-        # load podcast and device data
-        podcast_ids = [x.podcast_id for x in history]
-        podcasts = get_to_dict(Podcast, podcast_ids)
-
-        device_ids = [x.device_id for x in history]
-        devices = dict([ (id, user.get_device(id)) for id in device_ids])
-
-        for entry in history:
-            entry.podcast = podcasts[entry.podcast_id]
-            entry.device = devices[entry.device_id]
-            entry.user = user
-
+        history = HistoryEntry.fetch_data(user, history)
         return history
 
     def author_name(self, user):
