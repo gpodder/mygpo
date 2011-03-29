@@ -13,8 +13,15 @@
   <p>{% trans "To let others know which podcasts you are listening to, you can point them to one of the following URLs." %}</p>
   {% if token %}
    <div class="info">
-    <a href="{% url shared-subscriptions user.username %}?token={{ token }}">http://{{ site.domain }}{% url shared-subscriptions user.username %}?token={{ token }}</a> ({% trans "Website" %})<br />
-    <a href="{% url shared-subscriptions-opml user.username %}?token={{ token }}">http://{{ site.domain }}{% url shared-subscriptions-opml user.username %}?token={{ token }}</a> ({% trans "Download" %})
+    <p>
+     <a href="{% url shared-subscriptions user.username %}?token={{ token }}">http://{{ site.domain }}{% url shared-subscriptions user.username %}?token={{ token }}</a> ({% trans "Website" %})
+    </p>
+    <p>
+     <a href="{% url shared-subscriptions-opml user.username %}?token={{ token }}">http://{{ site.domain }}{% url shared-subscriptions-opml user.username %}?token={{ token }}</a> ({% trans "Download" %})
+    </p>
+    <p>
+     <a href="{% url shared-subscriptions-rss user.username %}?token={{ token }}">http://{{ site.domain }}{% url shared-subscriptions-rss user.username %}?token={{ token }}</a> ({% trans "Changes-Feed" %})
+    </p>
    </div>
 
    {% url share as share-url %}
@@ -24,8 +31,15 @@
   {% else %}
 
    <div class="info">
-    <a href="{% url shared-subscriptions user.username %}">http://{{ site.domain }}{% url shared-subscriptions user.username %}</a> ({% trans "Website" %})<br />
-    <a href="{% url shared-subscriptions-opml user.username %}">http://{{ site.domain }}{% url shared-subscriptions-opml user.username %}</a> ({% trans "Download" %})<br />
+    <p>
+     <a href="{% url shared-subscriptions user.username %}">http://{{ site.domain }}{% url shared-subscriptions user.username %}</a> ({% trans "Website" %})
+    </p>
+    <p>
+     <a href="{% url shared-subscriptions-opml user.username %}">http://{{ site.domain }}{% url shared-subscriptions-opml user.username %}</a> ({% trans "Download" %})
+    </p>
+    <p>
+     <a href="{% url shared-subscriptions-rss user.username %}">http://{{ site.domain }}{% url shared-subscriptions-rss user.username %}</a> ({% trans "Changes-Feed" %})
+    </p>
    </div>
 
    {% url share as share-url %}

@@ -25,6 +25,7 @@ urlpatterns += patterns('mygpo.web.views.subscriptions',
  url(r'^subscriptions/all.opml$',                                 'download_all',  name='subscriptions-download'),
  url(r'^user/(?P<username>\w+)/subscriptions$',                   'for_user',      name='shared-subscriptions'),
  url(r'^user/(?P<username>\w+)/subscriptions\.opml$',             'for_user_opml', name='shared-subscriptions-opml'),
+ url(r'^user/(?P<username>\w+)/subscriptions/rss/$',         'subscriptions_feed', name='shared-subscriptions-rss'),
 )
 
 urlpatterns += patterns('mygpo.web.views.podcast',

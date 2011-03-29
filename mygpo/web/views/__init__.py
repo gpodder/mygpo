@@ -35,8 +35,7 @@ from django.contrib.sites.models import RequestSite
 from mygpo.constants import PODCAST_LOGO_SIZE, PODCAST_LOGO_BIG_SIZE
 from mygpo.web import utils
 from mygpo.api import backend
-from mygpo.utils import linearize, flatten, get_to_dict
-from mygpo.web.models import HistoryEntry
+from mygpo.utils import flatten, get_to_dict
 from mygpo import migrate
 import os
 import Image
@@ -184,42 +183,29 @@ def get_subscription_history(user, device_id=None, count=15):
     Returns the subscription history either for one user or for a device.
     """
 
+    new_user = migrate.get_or_migrate_user(user)
+
     if device_id:
         dev = Device.objects.get(id=device_id)
         dev = migrate.get_or_migrate_device(dev)
-        podcast_states = PodcastUserState.for_device(dev.id)
+        device_id = dev.id
     else:
-        podcast_states = PodcastUserState.for_user(user)
+        device_id = None
 
-    def action_iter(state):
-        for action in reversed(state.actions):
-            if not device_id or dev.id == action.device:
-                yield(action, state.podcast)
-
-    action_cmp_key = lambda x: x[0].timestamp
-
-    # create an action_iter for each PodcastUserState
-    subscription_action_lists = [action_iter(x) for x in podcast_states]
-
-    # Linearize their subscription-actions and slice to required length
-    subscription_history = list(islice(linearize(action_cmp_key, True, *subscription_action_lists), count))
+    subscription_history = new_user.get_subscription_history(device_id, reverse=True)
+    subscription_history = list(islice(subscription_history, count))
 
     # Load all podcasts that occur in the history at once
-    podcast_ids = [x[1] for x in subscription_history]
+    podcast_ids = [x.podcast_id for x in subscription_history]
     podcasts = get_to_dict(models.Podcast, podcast_ids)
 
     new_user = migrate.get_or_migrate_user(user)
 
-    history = []
-    for action, podcast_id in subscription_history:
-        entry = HistoryEntry()
-        entry.timestamp = action.timestamp
-        entry.action = action.action
-        entry.podcast = podcasts[podcast_id]
-        entry.device = new_user.get_device(action.device)
-        history.append(entry)
+    for entry in subscription_history:
+        entry.podcast = podcasts[entry.podcast_id]
+        entry.device = new_user.get_device(entry.device_id)
 
-    return history
+    return subscription_history
 
 
 @login_required

@@ -1,9 +1,10 @@
-import uuid
+import uuid, collections
 from datetime import datetime
 from couchdbkit import ResourceNotFound
 from couchdbkit.ext.django.schema import *
 
 from mygpo.core.models import Podcast
+from mygpo.utils import linearize
 
 
 class Rating(DocumentSchema):
@@ -195,8 +196,13 @@ class PodcastUserState(Document):
 
     @classmethod
     def for_user(cls, user):
+        return cls.for_user_oldid(user.id)
+
+
+    @classmethod
+    def for_user_oldid(cls, user_oldid):
         r = PodcastUserState.view('users/podcast_states_by_user',
-            startkey=[user.id, None], endkey=[user.id, 'ZZZZ'],
+            startkey=[user_oldid, None], endkey=[user_oldid, 'ZZZZ'],
             include_docs=True)
         return list(r)
 
@@ -284,6 +290,10 @@ class PodcastUserState(Document):
             startkey=[self.podcast, None],
             endkey  =[self.podcast, {}])
         return set([res['key'][1] for res in r])
+
+
+    def is_public(self):
+        return self.settings.get('public_subscription', True)
 
 
     def __eq__(self, other):
@@ -442,5 +452,72 @@ class User(Document):
         return Podcast.get_multi(self.get_subscribed_podcast_ids(public=public))
 
 
+    def get_subscription_history(self, device_id=None, reverse=False, public=None):
+        """ Returns chronologically ordered subscription history entries
+
+        Setting device_id restricts the actions to a certain device
+        """
+
+        def action_iter(state):
+            for action in sorted(state.actions, reverse=reverse):
+                if device_id is not None and device_id != action.device:
+                    continue
+
+                if public is not None and state.is_public() != public:
+                    continue
+
+                entry = HistoryEntry()
+                entry.timestamp = action.timestamp
+                entry.action = action.action
+                entry.podcast_id = state.podcast
+                entry.device_id = action.device
+                yield entry
+
+        if device_id is None:
+            podcast_states = PodcastUserState.for_user_oldid(self.oldid)
+        else:
+            podcast_states = PodcastUserState.for_device(device_id)
+
+        # create an action_iter for each PodcastUserState
+        subscription_action_lists = [action_iter(x) for x in podcast_states]
+
+        action_cmp_key = lambda x: x.timestamp
+
+        # Linearize their subscription-actions
+        return linearize(action_cmp_key, subscription_action_lists, reverse)
+
+
+    def get_global_subscription_history(self, public=None):
+        """ Actions that added/removed podcasts from the subscription list
+
+        Returns an iterator of all subscription actions that either
+         * added subscribed a podcast that hasn't been subscribed directly
+           before the action (but could have been subscribed) earlier
+         * removed a subscription of the podcast is not longer subscribed
+           after the action
+        """
+
+        subscriptions = collections.defaultdict(int)
+
+        for entry in self.get_subscription_history(public=public):
+            if entry.action == 'subscribe':
+                subscriptions[entry.podcast_id] += 1
+
+                # a new subscription has been added
+                if subscriptions[entry.podcast_id] == 1:
+                    yield entry
+
+            elif entry.action == 'unsubscribe':
+                subscriptions[entry.podcast_id] -= 1
+
+                # the last subscription has been removed
+                if subscriptions[entry.podcast_id] == 0:
+                    yield entry
+
+
     def __repr__(self):
         return 'User %s' % self._id
+
+
+class HistoryEntry(object):
+    pass

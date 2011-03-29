@@ -6,6 +6,10 @@
 {% block mainmenu %}{{ "/user/subscriptions/"|main_menu }}{% endblock %}
 {% block sectionmenu %}{{ "/user/subscriptions/"|section_menu:other_user.username }}{% endblock %}
 
+{% block head %}
+ <link rel="alternate" title="Subscription Changes of {{ other_user.username }}" href="{% url shared-subscriptions-rss other_user.username %}" type="application/rss+xml">
+{% endblock %}
+
 {% block title %}
  {% blocktrans with other_user.username as username%}{{ username }}'s Subscriptions{% endblocktrans %}
 {% endblock %}
@@ -31,6 +35,12 @@
   <div>
    <a href="{% url shared-subscriptions-opml other_user.username %}{% if token %}?token={{ token }}{% endif %}">
     <img src="/media/download.png" class="action-button" /> {% trans "Download Subscriptions as OPML" %}
+   </a>
+  </div>
+
+  <div>
+   <a href="{% url shared-subscriptions-rss other_user.username %}{% if token %}?token={{ token }}{% endif %}">
+    <img src="/media/feed-icon-22.png" class="action-button" /> {% trans "Subscribe to Changes" %}
    </a>
   </div>
 

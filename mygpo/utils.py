@@ -297,12 +297,12 @@ def flatten(l):
     return [item for sublist in l for item in sublist]
 
 
-def linearize(key, reverse=False, *args):
+def linearize(key, iterators, reverse=False):
     """
     Linearizes a number of iterators, sorted by some comparison function
     """
 
-    iters = [iter(i) for i in args]
+    iters = [iter(i) for i in iterators]
     vals = []
     for i in iters:
         try:
@@ -320,3 +320,48 @@ def linearize(key, reverse=False, *args):
             vals.append( (next_val, it) )
         except StopIteration:
             pass
+
+
+def skip_pairs(iterator, cmp=cmp):
+    """ Skips pairs of equal items
+
+    >>> list(skip_pairs([]))
+    []
+
+    >>> list(skip_pairs([1]))
+    [1]
+
+    >>> list(skip_pairs([1, 2, 3]))
+    [1, 2, 3]
+
+    >>> list(skip_pairs([1, 1]))
+    []
+
+    >>> list(skip_pairs([1, 2, 2]))
+    [1]
+
+    >>> list(skip_pairs([1, 2, 2, 3]))
+    [1, 3]
+
+    >>> list(skip_pairs([1, 2, 2, 2]))
+    [1, 2]
+
+    >>> list(skip_pairs([1, 2, 2, 2, 2, 3]))
+    [1, 3]
+    """
+
+    iterator = iter(iterator)
+    next = iterator.next()
+
+    while True:
+        item = next
+        try:
+            next = iterator.next()
+        except StopIteration as e:
+            yield item
+            raise e
+
+        if cmp(item, next) == 0:
+            next = iterator.next()
+        else:
+            yield item
