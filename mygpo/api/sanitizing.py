@@ -4,7 +4,6 @@ from django.core.cache import cache
 
 from mygpo.core import models
 from mygpo.api.models import Podcast, Episode, EpisodeAction
-from mygpo.data.models import Listener
 from mygpo.log import log
 from mygpo.utils import iterate_together, progress
 import urlparse
@@ -229,7 +228,6 @@ def maintenance(dry_run=False):
         try:
             if not dry_run:
                 rewrite_episode_actions(e, su_episode)
-                rewrite_listeners(e, su_episode)
                 e.delete()
 
             e_stats['merged'] += 1
@@ -256,7 +254,6 @@ def maintenance(dry_run=False):
 
 def delete_episode(e):
     EpisodeAction.objects.filter(episode=e).delete()
-    Listener.objects.filter(episode=e).delete()
     e.delete()
 
 
@@ -309,8 +306,6 @@ def rewrite_episodes(p_old, p_new):
             log('episode %s (url %s, podcast %s) already exists; updating episode actions for episode %s (url %s, podcast %s)' % (e_new.id, e.url, p_new.id, e.id, e.url, p_old.id))
             rewrite_episode_actions(e, e_new)
             log('episode actions for episode %s (url "%s", podcast %s) updated.' % (e.id, e.url, p_old.id))
-            rewrite_listeners(e, e_new)
-            log('listeners for episode %s (url "%s", podcast %s) updated.' % (e.id, e.url, p_old.id))
             e.delete()
 
         except Episode.DoesNotExist:
@@ -330,20 +325,6 @@ def rewrite_episode_actions(e_old, e_new):
         except Exception, e:
             log('error updating episode action %s: %s, deleting' % (sa.id, e))
             ea.delete()
-
-
-def rewrite_listeners(e_old, e_new):
-
-    for l in Listener.objects.filter(episode=e_old):
-        try:
-            log('updating listener %s (user %s, device %s, podcast %s, episode %s => %s)' % (l.id, l.user.id, l.device.id, l.podcast.id, e_old.id, e_new.id))
-            l.episode = e_new
-            l.podcast = e_new.podcast
-            l.save()
-
-        except Exception, e:
-            log('error updating listener %s: %s, deleting' % (l.id, e))
-            l.delete()
 
 
 def precompile_rules(rules):

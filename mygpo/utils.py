@@ -17,16 +17,23 @@
 
 import sys
 import collections
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import time
 
-def daterange(from_date, to_date=datetime.now(), leap=timedelta(days=1)):
+def daterange(from_date, to_date=None, leap=timedelta(days=1)):
     """
     >>> from_d = datetime(2010, 01, 01)
     >>> to_d = datetime(2010, 01, 05)
     >>> list(daterange(from_d, to_d))
     [datetime.datetime(2010, 1, 1, 0, 0), datetime.datetime(2010, 1, 2, 0, 0), datetime.datetime(2010, 1, 3, 0, 0), datetime.datetime(2010, 1, 4, 0, 0), datetime.datetime(2010, 1, 5, 0, 0)]
     """
+
+    if to_date is None:
+        if isinstance(from_date, datetime):
+            to_date = datetime.now()
+        else:
+            to_date = date.today()
+
     while from_date <= to_date:
         yield from_date
         from_date = from_date + leap

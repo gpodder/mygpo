@@ -56,15 +56,10 @@ class Podcast(models.Model):
     group_member_name = models.CharField(max_length=20, default=None, null=True, blank=False)
     content_types = SeparatedValuesField(null=True, blank=True)
 
-
     def listener_count(self):
-        from mygpo.data.models import Listener
-        return Listener.objects.filter(podcast=self).values('user').distinct().count()
-
-    def listener_count_timespan(self, start, end):
-        return EpisodeAction.objects.filter(episode__podcast=self,
-                timestamp__range=(start, end),
-                action='play').values('user_id').distinct().count()
+        # FIXME: remove after templates don't access this anymore
+        new_p = migrate.get_or_migrate_podcast(self)
+        return new_p.listener_count()
 
     def get_logo_url(self, size):
         if self.logo_url:
@@ -185,6 +180,11 @@ class Episode(models.Model):
     def number(self):
         m = re.search('\D*(\d+)\D+', self.title)
         return m.group(1) if m else ''
+
+    def listener_count(self):
+        # FIXME: remove after templates don't access this anymore
+        new_e = migrate.get_or_migrate_episode(self)
+        return new_e.listener_count()
 
     def shortname(self):
         s = self.title

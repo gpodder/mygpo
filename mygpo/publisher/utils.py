@@ -21,7 +21,7 @@ from datetime import timedelta, date
 from django.db.models import Avg, Count
 from django.contrib.auth.models import User
 
-from mygpo.utils import daterange
+from mygpo.utils import daterange, flatten
 from mygpo.core.models import Podcast
 from mygpo.api.models import Episode, EpisodeAction
 from mygpo.web.utils import flatten_intervals
@@ -30,61 +30,79 @@ from mygpo import migrate
 
 
 def listener_data(podcasts, start_date=date(2010, 1, 1), leap=timedelta(days=1)):
-    episode_actions = EpisodeAction.objects.filter(
-            episode__podcast__in=podcasts,
-            timestamp__gte=start_date,
-            action='play').order_by('timestamp').values('timestamp')
+    """ Returns data for the podcast listener timeseries
 
-    if len(episode_actions) == 0:
-        return []
+    An iterator with data for each day (starting from either the first released
+    episode or the earliest listen-event) is returned, where each day
+    is reresented by a dictionary
 
-    start = episode_actions[0]['timestamp']
+     * date: the day
+     * listeners: the number of listeners on that day
+     * episode: (one of) the episode(s) released on that day
+    """
 
     # pre-calculate episode list, make it index-able by release-date
-    episodes = Episode.objects.filter(podcast__in=podcasts)
-    episodes = filter(lambda e: e.timestamp, episodes)
-    episodes = dict([(e.timestamp.date(), e) for e in episodes])
+    episodes = flatten([podcast.get_episodes() for podcast in podcasts])
+    episodes = filter(lambda e: e.released, episodes)
+    episodes = dict([(e.released.date(), e) for e in episodes])
 
-    days = []
+    listeners = [ list(p.listener_count_timespan()) for p in podcasts ]
+
+    # we start either at the first episode-release or the first listen-event
+    start = min( min(episodes.keys()), min([l[0][0] for l in listeners]))
+
     for d in daterange(start, leap=leap):
-        next = d + leap
 
-        get_listeners = lambda p: p.listener_count_timespan(d, next)
-        listeners = map(get_listeners, podcasts)
-        listener_sum = sum(listeners)
+        listener_sum = 0
+        for l in listeners:
+            if not l:
+                continue
 
-        episode = episodes[d.date()] if d.date() in episodes else None
+            day, count = l[0]
+            if day == d:
+                listener_sum += count
+                l.pop(0)
 
-        days.append(dict(date=d, listeners=listener_sum, episode=episode))
+        episode = episodes[d] if d in episodes else None
 
-    return days
+        yield dict(date=d, listeners=listener_sum, episode=episode)
+
 
 
 def episode_listener_data(episode, start_date=date(2010, 1, 1), leap=timedelta(days=1)):
-    episodes = EpisodeAction.objects.filter(episode=episode,
-            timestamp__gte=start_date).order_by('timestamp').values('timestamp')
-    if len(episodes) == 0:
-        return []
+    """ Returns data for the episode listener timeseries
 
-    start = episodes[0]['timestamp']
+    An iterator with data for each day (starting from the first listen-event)
+    is returned, where each day is represented by a dictionary
 
-    intervals = []
+     * date: the day
+     * listeners: the number of listeners on that day
+     * episode: the episode, if it was released on that day, otherwise None
+    """
+
+    listeners = episode.listener_count_timespan()
+
+    # we always start at the first listen-event
+    start = listeners[0][0]
+
     for d in daterange(start, leap=leap):
         next = d + leap
 
-        listeners = episode.listener_count_timespan(d, next)
-        released_episode = episode if episode.timestamp and episode.timestamp >= d and episode.timestamp <= next else None
-        intervals.append(dict(date=d, listeners=listeners, episode=released_episode))
+        if listeners[0][0] == d:
+            l, day = listeners.pop()
+        else:
+            l = 0
 
-    return intervals
+        released = episode.timestamp and episode.timestamp >= d and episode.timestamp <= next
+        released_episode = episode if released else None
+
+        yield dict(date=d, listeners=l, episode=released_episode)
 
 
 def subscriber_data(podcasts):
     coll_data = collections.defaultdict(int)
 
-    for p in podcasts:
-        podcast = Podcast.for_oldid(p.id)
-
+    for podcast in podcasts:
         create_entry = lambda r: (r.timestamp.strftime('%y-%m'), r.subscriber_count)
         data = dict(map(create_entry, podcast.subscribers))
 

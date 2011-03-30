@@ -56,7 +56,6 @@ def welcome(request, toplist_entries=10):
     podcasts = Podcast.objects.count()
     users = User.objects.filter(is_active=True).count()
     episodes = Episode.objects.count()
-    hours_listened = utils.get_hours_listened()
 
     try:
         lang = utils.process_lang_params(request, '/toplist/')
@@ -72,7 +71,6 @@ def welcome(request, toplist_entries=10):
           'user_count': users,
           'episode_count': episodes,
           'url': current_site,
-          'hours_listened': hours_listened,
           'toplist': toplist,
     }, context_instance=RequestContext(request))
 

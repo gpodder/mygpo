@@ -1,4 +1,5 @@
 import hashlib
+from dateutil import parser
 from couchdbkit.ext.django.schema import *
 from mygpo.decorators import repeat_on_conflict
 from mygpo import utils
@@ -56,6 +57,38 @@ class Episode(Document):
 
     def __repr__(self):
         return 'Episode %s' % self._id
+
+
+    def listener_count(self, start=None, end={}):
+        """ returns the number of users that have listened to this episode """
+
+        from mygpo.users.models import EpisodeUserState
+        r = EpisodeUserState.view('users/listeners_by_episode',
+                startkey    = [self._id, start],
+                endkey      = [self._id, end],
+                reduce      = True,
+                group       = True,
+                group_level = 1
+            )
+        return r.first()['value'] if r else 0
+
+
+    def listener_count_timespan(self, start=None, end={}):
+        """ returns (date, listener-count) tuples for all days w/ listeners """
+
+        from mygpo.users.models import EpisodeUserState
+        r = EpisodeUserState.view('users/listeners_by_episode',
+                startkey    = [self._id, start],
+                endkey      = [self._id, end],
+                reduce      = True,
+                group       = True,
+                group_level = 2,
+            )
+
+        for res in r:
+            date = parser.parse(res['key'][1]).date()
+            listeners = res['value']
+            yield (date, listeners)
 
 
     def __eq__(self, other):
@@ -237,6 +270,56 @@ class Podcast(Document):
             endkey=[self.get_id(), 'ZZZZZZ'], reduce=True, group=True, group_level=2)
         tags = sorted(res.all(), key=lambda x: x['value'], reverse=True)
         return [x['key'][1] for x in tags]
+
+
+    def listener_count(self):
+        """ returns the number of users that have listened to this podcast """
+
+        from mygpo.users.models import EpisodeUserState
+        r = EpisodeUserState.view('users/listeners_by_podcast',
+                startkey    = [self.get_id(), None, None],
+                endkey      = [self.get_id(), {}, {}],
+                group       = True,
+                group_level = 1,
+                reduce      = True,
+            )
+        return r.first()['value']
+
+
+    def listener_count_timespan(self, start=None, end={}):
+        """ returns (date, listener-count) tuples for all days w/ listeners """
+
+        from mygpo.users.models import EpisodeUserState
+        r = EpisodeUserState.view('users/listeners_by_podcast',
+                startkey    = [self.get_id(), start, None],
+                endkey      = [self.get_id(), end,  {}],
+                group       = True,
+                group_level = 2,
+                reduce      = True,
+            )
+
+        for res in r:
+            date = parser.parse(res['key'][1]).date()
+            listeners = res['value']
+            yield (date, listeners)
+
+
+    def episode_listener_counts(self):
+        """ (Episode-Id, listener-count) tuples for episodes w/ listeners """
+
+        from mygpo.users.models import EpisodeUserState
+        r = EpisodeUserState.view('users/listeners_by_podcast_episode',
+                startkey    = [self.get_id(), None, None, None],
+                endkey      = [self.get_id(), {}, {}, {}],
+                group       = True,
+                group_level = 2,
+                reduce      = True,
+            )
+
+        for res in r:
+            episode   = res['key'][1]
+            listeners = res['value']
+            yield (episode, listeners)
 
 
     def get_old_obj(self):

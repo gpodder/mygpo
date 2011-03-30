@@ -10,7 +10,6 @@ from django.utils.translation import ugettext as _
 from mygpo.api.models import Podcast, Episode, EpisodeAction, Device, SyncGroup
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.web.forms import PrivacyForm, SyncForm
-from mygpo.data.models import Listener
 from mygpo.directory.tags import tags_for_user
 from mygpo.decorators import manual_gc, allowed_methods, repeat_on_conflict
 from mygpo.utils import daterange
@@ -30,8 +29,11 @@ def update_podcast_settings(state, is_public):
 def show(request, pid):
     podcast = get_object_or_404(Podcast, pk=pid)
     new_podcast = migrate.get_or_migrate_podcast(podcast)
+
     episodes = episode_list(podcast, request.user)
-    max_listeners = 0#max([x.listener_count() for x in episodes]) if len(episodes) else 0
+
+    max_listeners = max([e.listeners for e in episodes] + [0])
+
     related_podcasts = [x for x in podcast.group.podcasts() if x != podcast] if podcast.group else []
 
     tags = get_tags(podcast, request.user)
@@ -146,12 +148,22 @@ def episode_list(podcast, user):
     action. The attribute is unsert if there is no episode-action for
     the episode.
     """
+
     episodes = podcast.get_episodes().order_by('-timestamp')
+
+    new_podcast = migrate.get_or_migrate_podcast(podcast)
+    listeners = dict(new_podcast.episode_listener_counts())
+    new_episodes = dict( (e.oldid, e._id) for e in new_podcast.get_episodes() )
+
     for e in episodes:
         if user.is_authenticated():
             actions = EpisodeAction.objects.filter(episode=e, user=user).order_by('-timestamp')
             if actions.count() > 0:
                 e.action = actions[0]
+
+        e_id = new_episodes.get(e.id, None)
+        if not e_id: continue
+        e.listeners = listeners.get(e_id)
 
     return episodes
 

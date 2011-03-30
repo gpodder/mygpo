@@ -20,7 +20,6 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponseForbidden
 from django.template import RequestContext
 from mygpo.api.models import Device, EpisodeAction
-from mygpo.data.models import Listener
 from mygpo.web.forms import DeviceForm, SyncForm
 from mygpo.web import utils
 from django.utils.translation import ugettext as _
@@ -177,7 +176,6 @@ def delete_permanently(request, device_id):
         remove_device(state=state, dev=dev)
 
     EpisodeAction.objects.filter(device=device).delete()
-    Listener.objects.filter(device=device).delete()
     device.delete()
 
     return HttpResponseRedirect('/devices/')

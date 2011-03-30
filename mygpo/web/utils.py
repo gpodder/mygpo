@@ -3,7 +3,6 @@ from django.db.models import Sum
 from django.views.decorators.cache import never_cache
 
 from mygpo.api.models import Podcast, EpisodeAction
-from mygpo.data.models import Listener
 from babel import Locale, UnknownLocaleError
 from datetime import datetime
 import re
@@ -191,14 +190,6 @@ def process_lang_params(request, url):
         lang = get_accepted_lang(request)
 
     return sanitize_language_codes(lang)
-
-
-def get_hours_listened():
-    seconds = Listener.objects.all().aggregate(hours=Sum('episode__duration'))['hours']
-    if seconds == None:
-        return 0
-    else:
-        return seconds / (60 * 60)
 
 
 def symbian_opml_changes(podcast):

@@ -28,19 +28,6 @@ class HistoricPodcastData(models.Model):
         managed = False
 
 
-class Listener(models.Model):
-    device = models.ForeignKey(Device)
-    user = models.ForeignKey(User)
-    episode = models.ForeignKey(Episode)
-    podcast = models.ForeignKey(Podcast)
-    first_listened = models.DateTimeField()
-    last_listened = models.DateTimeField()
-
-    class Meta:
-        db_table = 'listeners'
-        managed = False
-
-
 # Deprecated: only used in migration-code anymore
 class RelatedPodcast(models.Model):
     ref_podcast = models.ForeignKey(Podcast, related_name='ref_podcast')

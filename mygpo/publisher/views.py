@@ -51,8 +51,10 @@ def podcast(request, id):
     if not check_publisher_permission(request.user, p):
         return HttpResponseForbidden()
 
-    timeline_data = listener_data([p])
-    subscription_data = subscriber_data([p])
+    new_p = migrate.get_or_migrate_podcast(p)
+
+    timeline_data = listener_data([new_p])
+    subscription_data = subscriber_data([new_p])
     device_data = device_stats([p])
 
     if request.method == 'POST':
@@ -91,9 +93,10 @@ def group(request, group_id):
     if not any([check_publisher_permission(request.user, p) for p in g.podcasts()]):
         return HttpResponseForbidden()
 
+    new_podcasts = [migrate.get_or_migrate_podcast(p) for p in g.podcasts()]
 
-    timeline_data = listener_data(g.podcasts())
-    subscription_data = subscriber_data(g.podcasts())
+    timeline_data = listener_data(new_podcasts)
+    subscription_data = subscriber_data(new_podcasts)
     device_data = device_stats(g.podcasts())
 
     return render_to_response('publisher/group.html', {
@@ -136,7 +139,18 @@ def episodes(request, id):
         return HttpResponseForbidden()
 
     episodes = p.get_episodes()
-    max_listeners = max([x.listener_count() for x in episodes]) if len(episodes) else 0
+
+    new_podcast = migrate.get_or_migrate_podcast(p)
+    new_episodes = dict( (e.oldid, e._id) for e in new_podcast.get_episodes() )
+
+    listeners = dict(new_podcast.episode_listener_counts())
+
+    max_listeners = max(listeners.values() + [0])
+
+    for e in episodes:
+        e_id = new_episodes.get(e.id, None)
+        if not e_id: continue
+        e.listeners = listeners.get(e_id)
 
     return render_to_response('publisher/episodes.html', {
         'podcast': p,
