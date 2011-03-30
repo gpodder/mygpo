@@ -25,7 +25,7 @@ from mygpo.users.models import Suggestions
 from mygpo.api.models import Device, Podcast
 from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
-from mygpo.api.sanitizing import sanitize_url
+from mygpo.api.sanitizing import sanitize_urls
 from mygpo.api.backend import get_toplist
 from mygpo.api.advanced.directory import podcast_data
 from django.views.decorators.csrf import csrf_exempt
@@ -161,8 +161,9 @@ def parse_subscription(raw_post_data, format):
     else:
         return []
 
-    urls = map(sanitize_url, urls)
-    urls = filter(lambda x: x, urls)
+
+    urls = sanitize_urls(urls)
+    urls = filter(None, urls)
     urls = set(urls)
     return urls
 

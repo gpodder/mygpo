@@ -17,10 +17,9 @@
 
 from mygpo.api.basic_auth import require_valid_user, check_username
 from django.http import HttpResponse, HttpResponseBadRequest
-from django.core.cache import cache
 from mygpo.api.models import Device, Podcast, Episode, EpisodeAction, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, EPISODE_ACTION_TYPES, DEVICE_TYPES
 from mygpo.api.httpresponse import JsonResponse
-from mygpo.api.sanitizing import sanitize_url
+from mygpo.api.sanitizing import sanitize_url, sanitize_urls
 from mygpo.api.advanced.directory import episode_data, podcast_data
 from mygpo.api.backend import get_device, get_favorites
 from django.shortcuts import get_object_or_404
@@ -88,30 +87,26 @@ def subscriptions(request, username, device_uid):
 
 
 def update_subscriptions(user, device, add, remove):
-    updated_urls = []
-    add_sanitized = []
-    rem_sanitized = []
-
-
-    podcast_sanitizing_rules = cache.get('podcast-sanitizing-rules') or \
-        SanitizingRule.for_obj_type('podcast')
-    cache.add('podcast-sanitizing-rules', podcast_sanitizing_rules, 60 * 60)
-
 
     for a in add:
         if a in remove:
-           raise IntegrityError('can not add and remove %s at the same time' % a)
+            raise IntegrityError('can not add and remove %s at the same time' % a)
 
-    for u in add:
-        us = sanitize_append(u, podcast_sanitizing_rules, updated_urls)
-        if us != '': add_sanitized.append(us)
+    add_s = list(sanitize_urls(add, 'podcast'))
+    rem_s = list(sanitize_urls(remove, 'podcast'))
 
-    for u in remove:
-        us = sanitize_append(u, podcast_sanitizing_rules, updated_urls)
-        if us != '' and us not in add_sanitized:
-            rem_sanitized.append(us)
+    assert len(add) == len(add_s) and len(remove) == len(rem_s)
 
-    for a in add_sanitized:
+    updated_urls = filter(lambda (a, b): a != b, zip(add + remove, add_s + rem_s))
+
+    add_s = filter(None, add_s)
+    rem_s = filter(None, rem_s)
+
+    # If two different URLs (in add and remove) have
+    # been sanitized to the same, we ignore the removal
+    rem_s = filter(lambda x: x not in add_s, rem_s)
+
+    for a in add_s:
         p, p_created = Podcast.objects.get_or_create(url=a)
         p = migrate.get_or_migrate_podcast(p)
         try:
@@ -120,7 +115,7 @@ def update_subscriptions(user, device, add, remove):
             log('Advanced API: %(username)s: could not subscribe to podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
                 {'username': user.username, 'podcast_url': p.url, 'device_id': device.id, 'exception': e})
 
-    for r in rem_sanitized:
+    for r in rem_s:
         p, p_created = Podcast.objects.get_or_create(url=r)
         p = migrate.get_or_migrate_podcast(p)
         try:
@@ -242,23 +237,13 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
 def update_episodes(user, actions):
     update_urls = []
 
-
-    podcast_sanitizing_rules = cache.get('podcast-sanitizing-rules') or \
-        SanitizingRule.for_obj_type('podcast')
-    cache.add('podcast-sanitizing-rules', podcast_sanitizing_rules, 60 * 60)
-
-    episode_sanitizing_rules = cache.get('episode-sanitizing-rules') or \
-        SanitizingRule.for_obj_type('episode')
-    cache.add('episode-sanitizing-rules', episode_sanitizing_rules, 60 * 60)
-
-
     for e in actions:
-        us = sanitize_append(e['podcast'], podcast_sanitizing_rules, update_urls)
+        us = sanitize_append(e['podcast'], 'podcast', update_urls)
         if us == '': continue
 
         podcast, p_created = Podcast.objects.get_or_create(url=us)
 
-        eus = sanitize_append(e['episode'], episode_sanitizing_rules, update_urls)
+        eus = sanitize_append(e['episode'], 'episode', update_urls)
         if eus == '': continue
 
         episode, e_created = Episode.objects.get_or_create(podcast=podcast, url=eus)
@@ -406,8 +391,8 @@ def favorites(request, username):
     return JsonResponse(ret)
 
 
-def sanitize_append(url, rules, sanitized_list):
-    urls = sanitize_url(url, rules=rules)
+def sanitize_append(url, obj_type, sanitized_list):
+    urls = sanitize_url(url, obj_type)
     if url != urls:
         sanitized_list.append( (url, urls) )
     return urls

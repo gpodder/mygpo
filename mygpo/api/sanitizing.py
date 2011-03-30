@@ -1,3 +1,5 @@
+from django.core.cache import cache
+
 from mygpo.core import models
 from mygpo.api.models import Podcast, Episode, EpisodeAction
 from mygpo.api.models.episodes import Chapter
@@ -9,11 +11,35 @@ import re
 
 
 
+def sanitize_urls(urls, obj_type='podcast', rules=None):
+    """ Apply sanitizing rules to the given URLs and return the results """
+
+    rules = get_sanitizing_rules(obj_type, rules)
+    return (sanitize_url(url, rules=rules) for url in urls)
+
+
 def sanitize_url(url, obj_type='podcast', rules=None):
-    rules = rules or models.SanitizingRule.for_obj_type(obj_type)
+    """ Apply sanitizing rules to the given URL and return the results """
+
+    rules = get_sanitizing_rules(obj_type, rules=rules)
     url = basic_sanitizing(url)
     url = apply_sanitizing_rules(url, rules)
     return url
+
+
+def get_sanitizing_rules(obj_type, rules):
+    """ Returns the sanitizing-rules from the cache or the database """
+
+    cache_name = '%s-sanitizing-rules' % obj_type
+
+    sanitizing_rules = \
+            rules or \
+            cache.get(cache_name) or \
+            models.SanitizingRule.for_obj_type(obj_type)
+
+    cache.add(cache_name, sanitizing_rules, 60 * 60)
+
+    return sanitizing_rules
 
 
 def basic_sanitizing(url):
@@ -62,8 +88,8 @@ def maintenance(dry_run=False):
     This will later be used to replace podcasts!
     """
 
-    podcast_rules = models.SanitizingRule.for_obj_type('podcast')
-    episode_rules = models.SanitizingRule.for_obj_type('episode')
+    podcast_rules = get_sanitizing_rules('podcast')
+    episode_rules = get_sanitizing_rules('episode')
 
 
     print 'Stats'

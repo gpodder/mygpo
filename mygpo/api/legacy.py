@@ -24,7 +24,7 @@ from datetime import datetime
 from django.utils.datastructures import MultiValueDictKeyError
 from django.db import IntegrityError
 from mygpo.log import log
-from mygpo.api.sanitizing import sanitize_url
+from mygpo.api.sanitizing import sanitize_urls
 from django.views.decorators.csrf import csrf_exempt
 from mygpo import migrate
 
@@ -54,7 +54,7 @@ def upload(request):
     i = Importer(opml)
 
     podcast_urls = [p['url'] for p in i.items]
-    podcast_urls = map(sanitize_url, podcast_urls)
+    podcast_urls = sanitize_urls(podcast_urls)
     podcast_urls = filter(lambda x: x, podcast_urls)
 
     new = [u for u in podcast_urls if u not in existing_urls]
