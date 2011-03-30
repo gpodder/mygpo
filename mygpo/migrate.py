@@ -393,6 +393,7 @@ def get_episode_user_state(user, episode, podcast):
         if e_state is None:
             e_state = EpisodeUserState()
             e_state.episode = episode._id
+            e_state.podcast = podcast.get_id()
         else:
             @repeat_on_conflict(['p_state'])
             def remove_episode_status(p_state):

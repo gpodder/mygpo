@@ -115,6 +115,7 @@ class EpisodeUserState(Document):
 
     episode_oldid = IntegerProperty()
     episode       = StringProperty(required=True)
+    podcast       = StringProperty()
     actions       = SchemaListProperty(EpisodeAction)
     settings      = DictProperty()
     user_oldid    = IntegerProperty()
