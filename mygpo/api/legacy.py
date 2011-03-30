@@ -26,6 +26,7 @@ from django.db import IntegrityError
 from mygpo.log import log
 from mygpo.api.sanitizing import sanitize_url
 from django.views.decorators.csrf import csrf_exempt
+from mygpo import migrate
 
 LEGACY_DEVICE_NAME = 'Legacy Device'
 LEGACY_DEVICE_UID  = 'legacy'
