@@ -21,6 +21,7 @@ from mygpo.api.models import Episode, Device
 from datetime import datetime
 from mygpo import migrate
 
+# deprecated, only used in migration code anymore
 class Chapter(models.Model):
     user = models.ForeignKey(User)
     episode = models.ForeignKey(Episode)
@@ -30,11 +31,6 @@ class Chapter(models.Model):
     end = models.IntegerField()
     label = models.CharField(max_length=50, blank=True)
     advertisement = models.BooleanField(default=False)
-
-    def is_public(self):
-        podcast = migrate.get_or_migrate_podcast(self.episode.podcast)
-        state = podcast.get_user_state(self.user)
-        return state.settings.get('public_subscription', True)
 
     class Meta:
         db_table = 'chapters'

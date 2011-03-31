@@ -5,6 +5,7 @@ from couchdbkit.ext.django.schema import *
 
 from mygpo.core.models import Podcast
 from mygpo.utils import linearize, get_to_dict
+from mygpo.decorators import repeat_on_conflict
 
 
 class Rating(DocumentSchema):
@@ -77,6 +78,36 @@ class EpisodeAction(DocumentSchema):
             (self.action, self.device_oldid, self.timestamp, self._id)
 
 
+class Chapter(Document):
+    """ A user-entered episode chapter """
+
+    device = StringProperty()
+    created = DateTimeProperty()
+    start = IntegerProperty(required=True)
+    end = IntegerProperty(required=True)
+    label = StringProperty()
+    advertisement = BooleanProperty()
+
+    @classmethod
+    def for_episode(cls, episode_id):
+        db = cls.get_db()
+        r = db.view('users/chapters_by_episode',
+                startkey = [episode_id, None],
+                endkey   = [episode_id, {}],
+                wrap_doc = False,
+            )
+
+        for res in r:
+            user = res['key'][1]
+            chapter = Chapter.wrap(res['value'])
+            yield (user, chapter)
+
+
+    def __repr__(self):
+        return '<%s %s (%d-%d)>' % (self.__class__.__name__, self.label,
+                self.start, self.end)
+
+
 class EpisodeUserState(Document):
     """
     Contains everything a user has done with an Episode
@@ -90,14 +121,30 @@ class EpisodeUserState(Document):
     ref_url       = StringProperty(required=True)
     podcast_ref_url = StringProperty(required=True)
     merged_ids    = StringListProperty()
+    chapters      = SchemaListProperty(Chapter)
 
 
     @classmethod
-    def for_user_episode(cls, user_oldid, episode_id):
+    def for_user_episode(cls, user, episode):
         r = cls.view('users/episode_states_by_user_episode',
-            key=[user_oldid, episode_id], include_docs=True)
-        return r.first() if r else None
+            key=[user.id, episode._id], include_docs=True)
 
+        if r:
+            return r.first()
+
+        else:
+            from mygpo import migrate
+            new_user = migrate.get_or_migrate_user(user)
+            podcast = Podcast.get(episode.podcast)
+
+            state = EpisodeUserState()
+            state.episode = podcast.get_id()
+            state.podcast = episode.podcast
+            state.user_oldid = user.id
+            state.ref_url = episode.url
+            state.podcast_ref_url = podcast.url
+
+            return state
 
     @classmethod
     def count(cls):
@@ -118,6 +165,30 @@ class EpisodeUserState(Document):
 
     def set_favorite(self, set_to=True):
         self.settings['is_favorite'] = set_to
+
+
+    def update_chapters(self, add=[], rem=[]):
+        """ Updates the Chapter list
+
+         * add contains the chapters to be added
+
+         * rem contains tuples of (start, end) times. Chapters that match
+           both endpoints will be removed
+        """
+
+        @repeat_on_conflict(['state'])
+        def update(state):
+            for chapter in add:
+                self.chapters.append(chapter)
+
+            for start, end in rem:
+                print 'remove: start %d, end %d' % (start, end)
+                keep = lambda c: c.start != start or c.end != end
+                self.chapters = filter(keep, self.chapters)
+
+            self.save()
+
+        update(state=self)
 
 
     def __repr__(self):

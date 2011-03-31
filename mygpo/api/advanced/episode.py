@@ -15,18 +15,19 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+import time
 from mygpo.api.basic_auth import require_valid_user, check_username
 from django.http import HttpResponseBadRequest
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.exceptions import ParameterMissing
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.api.models import Device, Podcast, Episode
-from mygpo.api.models.episodes import Chapter
-from django.utils.translation import ugettext as _
+from mygpo.users.models import Chapter
 from datetime import datetime
 from mygpo.utils import parse_time
 from mygpo.decorators import allowed_methods
 import dateutil.parser
+from mygpo import migrate
 from django.views.decorators.csrf import csrf_exempt
 
 try:
@@ -41,8 +42,8 @@ except ImportError:
 @allowed_methods(['POST', 'GET'])
 def chapters(request, username):
 
-    now = datetime.now()
-    now_ = int(mktime(now.timetuple()))
+    now = datetime.utcnow()
+    now_ = int(time.mktime(now.timetuple()))
 
     if request.method == 'POST':
         req = json.loads(request.raw_post_data)
@@ -98,20 +99,32 @@ def chapters(request, username):
 
         podcast = Podcast.objects.get(url=sanitize_url(podcast_url))
         episode = Episode.objects.get(url=sanitize_url(episode_url, 'episode'), podcast=podcast)
-        chapter_q = Chapter.objects.filter(user=request.user, episode=episode).order_by('start')
+
+        new_episode = migrate.get_or_migrate_episode(episode)
+        e_state = new_episode.get_user_state(request.user)
+
+        new_user = migrate.get_or_migrate_user(request.user)
+
+        chapterlist = sorted(e_state.chapters, key=lambda c: c.start)
 
         if since:
-            chapter_q = chapter_q.filter(timestamp__gt=since)
+            chapterlist = filter(lambda c: c.created >= since, chapters)
 
         chapters = []
-        for c in chapter_q:
+        for c in chapterlist:
+            if c.device is not None:
+                device = migrate.get_or_migrate_device(c.device)
+                device_uid = device.uid
+            else:
+                device_uid = None
+
             chapters.append({
                 'start': c.start,
                 'end':   c.end,
                 'label': c.label,
                 'advertisement': c.advertisement,
                 'timestamp': c.created,
-                'device': c.device.uid
+                'device': device_uid
                 })
 
         return JsonResponse({
@@ -124,13 +137,24 @@ def update_chapters(req, user):
     podcast, c = Podcast.objects.get_or_create(url=req['podcast'])
     episode, c = Episode.objects.get_or_create(url=req['episode'], podcast=podcast)
 
+    new_episode = migrate.get_or_migrate_episode(episode)
+    e_state = new_episode.get_user_state(request.user)
+
     device = None
     if 'device' in req:
         device, c = Device.objects.get_or_create(user=user, uid=req['device'])
 
-    timestamp = dateutil.parser.parse(req['timestamp']) if 'timestamp' in req else datetime.now()
+    timestamp = dateutil.parser.parse(req['timestamp']) if 'timestamp' in req else datetime.utcnow()
 
-    for c in req.get('chapters_add', []):
+    new_chapters = parse_new_chapters(request.user, req.get('chapters_add', []))
+    rem_chapters = parse_rem_chapters(req.get('chapters_remove', []))
+
+    e_state.update_chapters(new_chapters, rem_chapters)
+
+
+
+def parse_new_chapters(user, chapters):
+    for c in chapters:
         if not 'start' in c:
             raise ParameterMissing('start parameter missing')
         start = parse_time(c['start'])
@@ -142,19 +166,27 @@ def update_chapters(req, user):
         label = c.get('label', '')
         adv = c.get('advertisement', False)
 
+        device_uid = c.get('device', None)
+        if device_uid:
+            device = Device.objects.get(user=user, uid=device_uid)
+            new_device = migrate.get_or_migrate_device(device)
+            device_id = new_device.id
+        else:
+            device_id = None
 
-        Chapter.objects.create(
-            user=user,
-            episode=episode,
-            device=device,
-            created=timestamp,
-            start=start,
-            end=end,
-            label=label,
-            advertisement=adv)
+        chapter = Chapter()
+        chapter.device = device_id
+        chapter.created = timestamp
+        chapter.start = start
+        chapter.end = end
+        chapter.label = label
+        chapter.advertisement = adv
+
+        yield chapter
 
 
-    for c in req.get('chapters_remove', []):
+def parse_rem_chapters(chapers):
+    for c in chapters:
         if not 'start' in c:
             raise ParameterMissing('start parameter missing')
         start = parse_time(c['start'])
@@ -163,9 +195,4 @@ def update_chapters(req, user):
             raise ParameterMissing('end parameter missing')
         end = parse_time(c['end'])
 
-        Chapter.objects.filter(
-            user=user,
-            episode=episode,
-            start=start,
-            end=end).delete()
-
+        yield (start, end)

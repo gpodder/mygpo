@@ -71,8 +71,8 @@ class Command(BaseCommand):
                     docs.add(episode._id)
 
                     # Episode States
-                    e_state = EpisodeUserState.for_user_episode(old_u.id, episode._id)
-                    if e_state:
+                    e_state = episode.get_user_state(old_u)
+                    if e_state._id:
                         docs.add(e_state._id)
 
 

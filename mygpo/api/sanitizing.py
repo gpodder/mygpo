@@ -2,7 +2,6 @@ from django.core.cache import cache
 
 from mygpo.core import models
 from mygpo.api.models import Podcast, Episode, EpisodeAction
-from mygpo.api.models.episodes import Chapter
 from mygpo.data.models import Listener
 from mygpo.log import log
 from mygpo.utils import iterate_together
@@ -252,7 +251,6 @@ def maintenance(dry_run=False):
             if not dry_run:
                 rewrite_episode_actions(e, su_episode)
                 rewrite_listeners(e, su_episode)
-                rewrite_chapters(e, su_episode)
                 e.delete()
 
             e_merged += 1
@@ -341,8 +339,6 @@ def rewrite_episodes(p_old, p_new):
             log('episode actions for episode %s (url "%s", podcast %s) updated.' % (e.id, e.url, p_old.id))
             rewrite_listeners(e, e_new)
             log('listeners for episode %s (url "%s", podcast %s) updated.' % (e.id, e.url, p_old.id))
-            rewrite_chapters(e, e_new)
-            log('chapters for episode %s (url "%s", podcast %s) updated.' % (e.id, e.url, p_old.id))
             e.delete()
 
         except Episode.DoesNotExist:
@@ -376,19 +372,6 @@ def rewrite_listeners(e_old, e_new):
         except Exception, e:
             log('error updating listener %s: %s, deleting' % (l.id, e))
             l.delete()
-
-
-def rewrite_chapters(e_old, e_new):
-
-    for c in Chapter.objects.filter(episode=e_old):
-        try:
-            log('updating chapter %s (user %s, device %s, episode %s => %s)' % (c.id, c.device.id, e_old.id, e_new.id))
-            c.episode = e_new
-            c.save()
-
-        except Exception, e:
-            log('error updating chapter %s: %s, deleting' % (c.id, e))
-            c.delete()
 
 
 def precompile_rules(rules):

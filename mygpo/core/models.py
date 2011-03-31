@@ -44,10 +44,15 @@ class Episode(Document):
             return Episode.objects.get(id=self.oldid)
         return None
 
+
+    def get_user_state(self, user):
+        from mygpo.users.models import EpisodeUserState
+        return EpisodeUserState.for_user_episode(user, self)
+
+
     @property
     def url(self):
         return self.urls[0]
-
 
     def __repr__(self):
         return 'Episode %s' % self._id

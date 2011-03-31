@@ -20,7 +20,7 @@ from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from mygpo.core import models
 from mygpo.api.models import Podcast, Episode, EpisodeAction
-from mygpo.api.models.episodes import Chapter
+from mygpo.users.models import Chapter
 from mygpo.api import backend
 from mygpo.web.utils import get_played_parts
 from mygpo.decorators import manual_gc, cache_page_anonymous
@@ -34,27 +34,30 @@ from django.contrib.sites.models import RequestSite
 @cache_page_anonymous(60 * 60)
 def episode(request, id):
     episode = get_object_or_404(Episode, pk=id)
+    new_episode = migrate.get_or_migrate_episode(episode)
 
     if request.user.is_authenticated():
         history = EpisodeAction.objects.filter(user=request.user, episode=episode).order_by('-timestamp')
 
-        podcast = migrate.get_or_migrate_podcast(episode.podcast)
-        podcast_state = podcast.get_user_state(request.user)
-
         new_ep  = migrate.get_or_migrate_episode(episode)
-        episode_state = migrate.get_episode_user_state(request.user, new_ep, podcast)
+        episode_state = new_ep.get_user_state(request.user)
         is_fav = episode_state.is_favorite()
 
         played_parts, duration = get_played_parts(request.user, episode)
 
     else:
         history = []
-        podcast_state = None
         is_fav = False
         played_parts = None
         duration = episode.duration
 
-    chapters = [c for c in Chapter.objects.filter(episode=episode).order_by('start') if c.is_public() or c.user == request.user]
+
+    chapters = []
+    for user, chapter in Chapter.for_episode(new_episode._id):
+        chapter.is_own = user == request.user.id
+        chapters.append(chapter)
+
+
     if episode.timestamp:
         prevs = Episode.objects.filter(podcast=episode.podcast,
                 timestamp__lt=episode.timestamp, title__isnull=False)\
@@ -75,7 +78,6 @@ def episode(request, id):
         'next': next,
         'history': history,
         'chapters': chapters,
-        'podcast_state': podcast_state,
         'is_favorite': is_fav,
         'played_parts': played_parts,
         'duration': duration
@@ -86,6 +88,8 @@ def episode(request, id):
 @login_required
 def add_chapter(request, id):
     episode = get_object_or_404(Episode, pk=id)
+    new_episode = migrate.get_or_migrate_episode(episode)
+    e_state = new_episode.get_user_state(request.user)
 
     try:
         start = parse_time(request.POST.get('start', '0'))
@@ -98,17 +102,32 @@ def add_chapter(request, id):
         adv = 'advertisement' in request.POST
         label = request.POST.get('label')
 
-        Chapter.objects.create(user=request.user, episode=episode, start=start, end=end, advertisement=adv, label=label)
-    except:
-        pass
+    except Exception as e:
+        # FIXME: when using Django's messaging system, set error message
+
+        return HttpResponseRedirect('/episode/%s' % id)
+
+
+    chapter = Chapter()
+    chapter.start = start
+    chapter.end = end
+    chapter.advertisement = adv
+    chapter.label = label
+
+    e_state.update_chapters(add=[chapter])
 
     return HttpResponseRedirect('/episode/%s' % id)
 
 
 @manual_gc
 @login_required
-def remove_chapter(request, id, chapter_id):
-    Chapter.objects.filter(user=request.user, id=chapter_id).delete()
+def remove_chapter(request, id, start, end):
+    episode = get_object_or_404(Episode, pk=id)
+    new_episode = migrate.get_or_migrate_episode(episode)
+    e_state = new_episode.get_user_state(request.user)
+
+    remove = (int(start), int(end))
+    e_state.update_chapters(rem=[remove])
 
     return HttpResponseRedirect('/episode/%s' % id)
 

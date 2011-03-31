@@ -360,7 +360,7 @@ def migrate_subscription_action(old_action):
 
 
 def get_episode_user_state(user, episode, podcast):
-    e_state = EpisodeUserState.for_user_episode(user.id, episode._id)
+    e_state = EpisodeUserState.for_user_episode(user, episode)
 
     if e_state is None:
 
