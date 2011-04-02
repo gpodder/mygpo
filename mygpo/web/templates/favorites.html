@@ -27,7 +27,7 @@
       {% trans "Unnamed Episode" %}
      {% endif %}
      </a><br/>
-     <span class="from_podcast">{% trans "from" %} <a href="{% url podcast episode.podcast.id %}">{{ episode.podcast|striptags }}</a></td>
+     <span class="from_podcast">{% trans "from" %} {% podcast_group_link episode.podcast %}</td>
    </tr>
   {% endfor %}
   </table>
@@ -61,7 +61,7 @@
     </p>
     <ul>
      {% if podcast %}
-      <li><a href="{% url podcast podcast.id %}">public information about your favorites-feed</a></li>
+      <li><a href="{% podcast_link_target podcast %}">public information about your favorites-feed</a></li>
      {% endif %}
      <li><a href="{% url favorites %}?private_feed">{% trans "require a password for this feed" %}</a></li>
     </ul>

@@ -38,7 +38,7 @@
 
       <td>
        {% if s.podcast %}
-        <a href="{% url podcast s.podcast.oldid %}">{{ s.podcast.display_title|striptags }}</a>
+        {% podcast_group_link s.podcast %}
        {% else %}
         <a href="{% url episode s.episode.id %}">
          {% if s.episode.title %}
@@ -46,7 +46,7 @@
          {% else %}
           {% trans "Unnamed Episode" %}
          {% endif %}
-     </a><br/><span class="from_podcast">{% trans "from" %} <a href="{% url podcast s.episode.podcast.id %}">{{ s.episode.podcast|striptags }}</a></span>
+     </a><br/><span class="from_podcast">{% trans "from" %} {% podcast_group_link s.episode.podcast %}</span>
        {% endif %}
       </td>
       <td style="width: 80px;"><span title="{{ s.timestamp }}">{{ s.timestamp|date:"Y-m-d" }}</span></td>

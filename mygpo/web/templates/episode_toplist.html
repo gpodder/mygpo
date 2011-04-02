@@ -111,7 +111,7 @@
       {% trans "Unnamed Episode" %}
      {% endif %}
      </a><br/>
-     <span class="from_podcast">{% trans "from" %} <a href="{% url podcast entry.episode.podcast.id %}">{{ entry.episode.podcast|striptags }}</a></td>
+     <span class="from_podcast">{% trans "from" %} {% podcast_group_link entry.episode.podcast %}</td>
     <td>{{ entry.listeners|vertical_bar:max_listeners }}</td>
    </tr>
   {% endfor %}

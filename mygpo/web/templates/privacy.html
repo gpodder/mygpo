@@ -38,7 +38,7 @@
      {% for podcast in included_subscriptions %}
       <tr>
        <td>{{ podcast|podcast_logo }}</td>
-       <td><a href="{% url podcast podcast.oldid %}">{{ podcast.display_title|striptags }}</a></td>
+       <td>{% podcast_group_link podcast %}</td>
        <td><a href="{% url privacy %}?exclude={{ podcast.get_id }}"><img src="/media/unsubscribe.png" alt="{% trans "Make Public" %}" /></a></td>
       </tr>
      {% endfor %}
@@ -58,7 +58,7 @@
       {% for podcast in excluded_subscriptions %}
        <tr>
         <td>{{ podcast|podcast_logo }}</td>
-        <td><a href="{% url podcast podcast.oldid %}">{{ podcast.display_title|striptags }}</a></td>
+        <td>{% podcast_group_link podcast %}</td>
         <td><a href="{% url privacy %}?include={{ podcast.get_id }}"><img src="/media/edit-undo.png" alt="{% trans "Make Private" %}" /></a></td>
        </tr>
       {% endfor %}

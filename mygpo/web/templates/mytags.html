@@ -19,7 +19,7 @@
    {% for podcast, taglist in tags_podcast.items %}
     <tr>
      <td>{{ podcast|podcast_logo }}</td>
-     <td><a href="{% url podcast podcast.oldid %}">{{ podcast.display_title|striptags}}</a></td>
+     <td>{% podcast_group_link podcast %}</td>
      <td class="tag-list">
      {% for tag in taglist %}{% spaceless %}
        <span class="own">{{ tag }} <a class="remove" href="{% url remove-tag podcast.oldid %}?tag={{ tag }}&next=mytags">X</a></span>
@@ -46,7 +46,7 @@
     <td>{{ tag }}</td>
     <td>
      {% for podcast in podcast_list %}
-      <a href="{% url podcast podcast.oldid %}" title="{{ podcast.display_title|striptags }}">{{ podcast|podcast_logo }}</a>
+      {% podcast_group_link podcast %}
      {% endfor %}
     </td>
    </tr>

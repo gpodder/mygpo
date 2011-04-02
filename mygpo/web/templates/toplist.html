@@ -119,16 +119,7 @@
      {{ podcast|podcast_logo }}
     </td>
     <td>
-     {% if podcast|is_podcast %}{% comment %}PodcastGroups don't have urls{% endcomment %}
-      <a href="{% url podcast podcast.oldid %}">{{ podcast.title|striptags }}</a>
-     {% else %}
-      {{ podcast.title|striptags}}
-      (
-       {% for p in podcast.podcasts %}
-        <a href="{% url podcast p.oldid %}">{{ p.group_member_name|striptags }}</a>
-       {% endfor %}
-      )
-     {% endif %}
+     {% podcast_group_link podcast %}
     </td>
     <td>{{ podcast.subscriber_count|vertical_bar:max_subscribers }}</td>
    </tr>

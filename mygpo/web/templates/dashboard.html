@@ -54,7 +54,7 @@
    {% for podcast in random_podcasts %}
     <tr>
      <td>{{ podcast|podcast_logo }}</td>
-     <td><a href="{% url podcast podcast.id %}">{{ podcast.title|striptags }}</a></td>
+     <td>{% podcast_group_link podcast %}</td>
     </tr>
    {% endfor %}
   </table>
@@ -79,7 +79,7 @@
        {% trans "Unnamed Episode" %}
       {% endif %}
       </a><br/>
-      <span class="from_podcast">{% trans "from" %} <a href="{% url podcast episode.podcast.id %}">{{ episode.podcast|striptags }}</a>
+      <span class="from_podcast">{% trans "from" %} {% podcast_group_link episode.podcast %}
      </td>
      <td>{{ episode.timestamp|naturalday }}</td>
     </tr>

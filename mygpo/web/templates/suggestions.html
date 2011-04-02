@@ -25,7 +25,7 @@
    <tr>
     <td>{{ podcast|podcast_logo }}</td>
     <td>
-        <p class="title"><a href="{% url podcast podcast.oldid %}">{{ podcast.display_title|striptags }}</a></p>
+        <p class="title">{% podcast_group_link podcast %}</p>
             <p class="description">{{ podcast.description|striptags|truncatewords:"12" }}</p></td>
     <td style="text-align: center;">
      <a href="{% url subscribe podcast.oldid %}"><img src="/media/subscribe.png" alt="+" /></a>

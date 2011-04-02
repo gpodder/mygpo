@@ -26,7 +26,7 @@
 
   <h1>{% trans "Publisher Pages:" %} {% if episode.title %}{{ episode.title|striptags }}{% else %}{% trans "Unnamed Episode" %}{%endif%}</h1>
   <small class="description">
-      {% trans "from" %} <a href="{% url podcast episode.podcast.id %}">{{ episode.podcast }}</a>{% if episode.timestamp %}, {% trans "released" %} {{episode.timestamp}}{% endif %},
+      {% trans "from" %} {% podcast_group_link episode.podcast %}{% if episode.timestamp %}, {% trans "released" %} {{episode.timestamp}}{% endif %},
       {% trans "links" %}:
       <a href="{{episode.url}}">{% trans "download" %}</a>{% if episode.link and episode.link != episode.url %}, <a href="{{episode.link}}">{% trans "website" %}</a>
       {% endif %},

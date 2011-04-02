@@ -24,9 +24,7 @@
   {% for entry in entries %}
    <tr>
     <td>{{ entry|podcast_logo}}</td>
-    <td>
-     <a href="{% url podcast entry.oldid %}">{{ entry.title }}</a>
-    </td>
+    <td>{% podcast_group_link entry %}</td>
     <td class="description">
      {{ entry.description|truncatewords:15 }}
     </td>

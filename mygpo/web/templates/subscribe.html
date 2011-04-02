@@ -39,7 +39,7 @@
     {{ form.as_p }}
     <input type="submit" value="{% trans "Subscribe" %}" />
 </form>
-<p style="padding-top: 20px;"><a href="{% url podcast podcast.id %}">{% trans "Back to the podcast page" %}</a></p>
+<p style="padding-top: 20px;"><a href="{% podcast_link_target podcast %}">{% trans "Back to the podcast page" %}</a></p>
   {% else %}
    <p>{% trans "You can't subscribe to this podcast, because you don't have any devices (on which you don't have subscribed to the podcast already." %}</p>
 

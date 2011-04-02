@@ -41,7 +41,7 @@
    <div class="related-podcasts">
     <strong>{% trans "Also available" %}</strong>
     {% for p in related_podcasts %}
-     <a href="{% url podcast p.id %}">{{ p.group_member_name|striptags }}</a>
+     {% podcast_group_link p %}
     {% endfor %}
    </div>
   {% endif %}
@@ -60,7 +60,7 @@
       <div class="success">{% trans "Your settings have been saved." %}</div>
      {% endif %}
 
-     <form action="{% url podcast podcast.id %}" method="POST">
+     <form action="" method="POST">
          {% csrf_token %}
          <p>{{ privacy_form.public }} {{ privacy_form.public.label_tag }}</p>
          <input type="submit" value="Save" />

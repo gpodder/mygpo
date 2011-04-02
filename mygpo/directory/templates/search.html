@@ -28,22 +28,7 @@
 
    {% for result in results %}
     <tr>
-     {% if result|is_podcast %}
-       <td>{{ result|podcast_logo }}</td>
-       <td>
-        <a class="podcast" href="{% url podcast result.oldid %}">{{ result.display_title }}</a><br />
-        <span class="listlink description">{{ result.description|default:""|striptags|truncatewords:"15" }}</span>
-       </td>
-     {% else %}
-      <td>{{ result|podcast_logo }}</td>
-      <td>
-       {{result.display_title|striptags}}
-       (
-        {% for p in result.podcasts %}
-         <a href="{% url podcast p.oldid %}">{{ p.group_member_name|striptags }}</a>
-        {% endfor %}
-       )
-     {% endif %}
+     <td>{% podcast_group_link result %}</td>
     </tr>
    {% endfor %}
   </table>

@@ -35,11 +35,11 @@
 
 {% block content %}
   {% if episode.podcast.logo_url %}
-   <div id="podcastlogo"><a href="{% url podcast episode.podcast.id %}">{{ episode.podcast|podcast_logo_big }}</a></div>
+   <div id="podcastlogo"><a href="{% podcast_link_target episode.podcast %}">{{ episode.podcast|podcast_logo_big }}</a></div>
   {% endif %}
   <h1>{{ episode.title|default:"Unnamed Episode"|striptags }}</h1>
   <small class="description">
-      {% trans "from" %} <a href="{% url podcast episode.podcast.id %}">{{ episode.podcast }}</a>{% if episode.timestamp %}, {% trans "released" %} {{episode.timestamp}}{% endif %},
+      {% trans "from" %} {% podcast_group_link episode.podcast %}{% if episode.timestamp %}, {% trans "released" %} {{episode.timestamp}}{% endif %},
       {% trans "links" %}:
       <a href="{{episode.url}}">{% trans "download" %}</a>{% if episode.link and episode.link != episode.url %}, <a href="{{episode.link}}">{% trans "website" %}</a>
       {% endif %},
@@ -96,7 +96,7 @@
     {% endif %}
    </div>
    <div class="list">
-    <a href="{% url podcast episode.podcast.id %}#episodes">{% trans "Episode-List" %}</a>
+    <a href="{% podcast_link_target episode.podcast %}#episodes">{% trans "Episode-List" %}</a>
    </div>
    <div class="next">
     {% if next %}

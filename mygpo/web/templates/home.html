@@ -101,18 +101,7 @@
   {% for podcast in toplist %}
    <tr>
     <td>{{ podcast|podcast_logo }}
-    <td>
-     {% if podcast|is_podcast %}
-      <a href="{% url podcast podcast.oldid %}">{{ podcast.title|striptags }}</a>
-     {% else %}
-      {{ podcast.title|striptags}}
-      (
-       {% for p in podcast.podcasts %}
-        <a href="{% url podcast p.oldid %}">{{ p.group_member_name|striptags }}</a>
-       {% endfor %}
-      )
-     {% endif %}
-    </td>
+    <td>{% podcast_group_link podcast %}</td>
    </tr>
   {% endfor %}
   <tr>
