@@ -263,18 +263,21 @@ class Podcast(Document):
         group = getattr(self, 'group', None)
         if group: #we are part of a PodcastGroup
             group = PodcastGroup.get(group)
+            podcasts = list(group.podcasts)
 
-            if not self in group.podcasts:
+            if not self in podcasts:
                 # the podcast has not been added to the group correctly
                 group.add_podcast(self)
 
             else:
-                i = group.podcasts.index(self)
-                group.podcasts[i] = self
+                i = podcasts.index(self)
+                podcasts[i] = self
+                group.podcasts = podcasts
                 group.save()
 
-            i = group.podcasts.index(self)
-            group.podcasts[i] = self
+            i = podcasts.index(self)
+            podcasts[i] = self
+            group.podcasts = podcasts
             group.save()
 
         else:
@@ -285,9 +288,12 @@ class Podcast(Document):
         group = getattr(self, 'group', None)
         if group:
             group = PodcastGroup.get(group)
-            if self in group.podcasts:
-                i = group.podcasts.index(self)
-                del group.podcasts[i]
+            podcasts = list(group.podcasts)
+
+            if self in podcasts:
+                i = podcasts.index(self)
+                del podcasts[i]
+                group.podcasts = podcasts
                 group.save()
 
         else:
