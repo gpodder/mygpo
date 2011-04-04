@@ -358,9 +358,9 @@ class PodcastUserState(Document):
 
     def get_subscribed_device_ids(self):
         r = PodcastUserState.view('users/subscriptions_by_podcast',
-            startkey=[self.podcast, None],
-            endkey  =[self.podcast, {}])
-        return set([res['key'][1] for res in r])
+            startkey=[self.podcast, self.user_oldid, None],
+            endkey  =[self.podcast, self.user_oldid, {}])
+        return (res['key'][2] for res in r)
 
 
     def is_public(self):

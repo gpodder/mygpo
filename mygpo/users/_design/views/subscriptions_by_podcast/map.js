@@ -28,7 +28,7 @@ function(doc)
                 continue;
             }
 
-            emit([doc.podcast, device], null);
+            emit([doc.podcast, doc.user_oldid, device], null);
         }
     }
 }
