@@ -154,9 +154,9 @@ class EpisodeUserState(Document):
 
 
     def add_actions(self, actions):
-        self.actions += actions
+        self.actions = list(self.actions) + actions
         self.actions = list(set(self.actions))
-        self.actions.sort(key=lambda x: x.timestamp)
+        self.actions = sorted(self.actions, key=lambda x: x.timestamp)
 
 
     def is_favorite(self):
