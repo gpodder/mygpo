@@ -22,5 +22,5 @@ import syslog
 syslog.openlog('my.gpodder.org')
 
 def log(message):
-    syslog.syslog(message.encode('utf-8'))
+    syslog.syslog(message)
 
