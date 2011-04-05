@@ -23,7 +23,7 @@ from mygpo.api.models import Podcast, Episode, EpisodeAction
 from mygpo.users.models import Chapter
 from mygpo.api import backend
 from mygpo.web.utils import get_played_parts
-from mygpo.decorators import manual_gc, cache_page_anonymous
+from mygpo.decorators import manual_gc
 from mygpo.utils import parse_time
 from mygpo import migrate
 from django.contrib.auth.decorators import login_required
@@ -31,7 +31,6 @@ from django.shortcuts import get_object_or_404
 from django.contrib.sites.models import RequestSite
 
 @manual_gc
-@cache_page_anonymous(60 * 60)
 def episode(request, id):
     episode = get_object_or_404(Episode, pk=id)
     new_episode = migrate.get_or_migrate_episode(episode)

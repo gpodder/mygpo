@@ -114,16 +114,3 @@ def repeat_on_conflict(obj_names=[], reload_f=None):
         return tmp
 
     return decorator
-
-
-def cache_page_anonymous(cache_timeout, key_prefix=None):
-    """
-    Decorator to cache Django views only for anonymous users.
-    """
-
-    from django.utils.decorators import decorator_from_middleware_with_args
-    from django.middleware.cache import CacheMiddleware
-
-    return decorator_from_middleware_with_args(CacheMiddleware)(cache_timeout=cache_timeout,
-                                                                key_prefix=key_prefix,
-                                                                cache_anonymous_only=True)
