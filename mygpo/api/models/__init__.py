@@ -265,11 +265,19 @@ class Device(models.Model):
 
         for podcast_id in add:
             podcast = podcasts[podcast_id]
-            podcast.subscribe(self)
+            try:
+                podcast.subscribe(self)
+            except Exception as e:
+                log('Web: %(username)s: cannot sync device: %(error)s' %
+                    dict(username=request.user.username, error=repr(e)))
 
         for podcast_id in rem:
             podcast = podcasts[podcast_id]
-            podcast.unsubscribe(self)
+            try:
+                podcast.unsubscribe(self)
+            except Exception as e:
+                log('Web: %(username)s: cannot sync device: %(error)s' %
+                    dict(username=request.user.username, error=repr(e)))
 
 
     def sync_targets(self):
