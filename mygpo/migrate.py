@@ -104,15 +104,33 @@ def save_episode_signal(sender, instance=False, **kwargs):
 
     try:
         newe = Episode.for_oldid(instance.id)
-        newp = Podcast.get(newe.podcast)
 
         if newe:
-            update_episode(instance, newe, newp)
+            update_episode(instance, newe)
         else:
             create_episode(instance)
 
     except Exception, e:
         log('error while updating CouchDB Episode: %s' % repr(e))
+
+
+
+def delete_episode_signal(sender, instance=False, **kwargs):
+    """
+    Signal-handler for deleting a CouchDB-based episode when an ORM-based
+    episode is deleted
+    """
+    if not instance:
+        return
+
+    try:
+        newe = Episode.for_oldid(instance.id)
+        if newe:
+            newe.delete()
+
+    except Exception, e:
+        log('error while deleting CouchDB-Episode: %s' % repr(e))
+
 
 
 
@@ -269,7 +287,7 @@ def create_episode(olde, sparse=False):
     e.podcast = podcast.get_id()
 
     if not sparse:
-        update_episode(olde, e, podcast)
+        update_episode(olde, e)
 
     e.save()
 
@@ -280,7 +298,7 @@ def get_or_migrate_episode(olde):
     return Episode.for_oldid(olde.id) or create_episode(olde)
 
 
-def update_episode(olde, newe, podcast):
+def update_episode(olde, newe):
     updated = False
 
     if not olde.url in newe.urls:

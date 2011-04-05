@@ -478,8 +478,12 @@ class SubscriptionAction(models.Model):
 
 from django.db.models.signals import post_save, pre_delete
 from mygpo import migrate
+
 post_save.connect(migrate.save_podcast_signal, sender=Podcast)
 pre_delete.connect(migrate.delete_podcast_signal, sender=Podcast)
+
+post_save.connect(migrate.save_episode_signal, sender=Episode)
+pre_delete.connect(migrate.delete_episode_signal, sender=Episode)
 
 post_save.connect(migrate.save_device_signal, sender=Device)
 pre_delete.connect(migrate.delete_device_signal, sender=Device)
