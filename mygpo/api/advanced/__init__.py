@@ -75,6 +75,9 @@ def subscriptions(request, username, device_uid):
         add = actions['add'] if 'add' in actions else []
         rem = actions['remove'] if 'remove' in actions else []
 
+        add = filter(None, add)
+        rem = filter(None, rem)
+
         try:
             update_urls = update_subscriptions(request.user, d, add, rem)
         except IntegrityError, e:
