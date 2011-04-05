@@ -378,6 +378,9 @@ class PodcastGroup(Document):
             return '%s %s' % (self.__class__.__name__, self._id[:10])
 
 
+class SanitizingRuleStub(object):
+    pass
+
 class SanitizingRule(Document):
     slug        = StringProperty()
     applies_to  = StringListProperty()
@@ -391,7 +394,16 @@ class SanitizingRule(Document):
     def for_obj_type(cls, obj_type):
         r = cls.view('core/sanitizing_rules_by_target', include_docs=True,
             startkey=[obj_type, None], endkey=[obj_type, {}])
-        return list(r)
+
+        for rule in r:
+            obj = SanitizingRuleStub()
+            obj.slug = rule.slug
+            obj.applies_to = list(rule.applies_to)
+            obj.search = rule.search
+            obj.replace = rule.replace
+            obj.priority = rule.priority
+            obj.description = rule.description
+            yield obj
 
 
     @classmethod

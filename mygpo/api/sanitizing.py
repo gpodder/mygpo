@@ -1,10 +1,12 @@
+import collections
+
 from django.core.cache import cache
 
 from mygpo.core import models
 from mygpo.api.models import Podcast, Episode, EpisodeAction
 from mygpo.data.models import Listener
 from mygpo.log import log
-from mygpo.utils import iterate_together
+from mygpo.utils import iterate_together, progress
 import urlparse
 import re
 
@@ -26,7 +28,7 @@ def sanitize_url(url, obj_type='podcast', rules=None):
     return url
 
 
-def get_sanitizing_rules(obj_type, rules):
+def get_sanitizing_rules(obj_type, rules=None):
     """ Returns the sanitizing-rules from the cache or the database """
 
     cache_name = '%s-sanitizing-rules' % obj_type
@@ -34,9 +36,9 @@ def get_sanitizing_rules(obj_type, rules):
     sanitizing_rules = \
             rules or \
             cache.get(cache_name) or \
-            models.SanitizingRule.for_obj_type(obj_type)
+            list(models.SanitizingRule.for_obj_type(obj_type))
 
-    cache.add(cache_name, sanitizing_rules, 60 * 60)
+    cache.set(cache_name, sanitizing_rules, 60 * 60)
 
     return sanitizing_rules
 
@@ -50,6 +52,7 @@ def basic_sanitizing(url):
     r2 = urlparse.SplitResult(r.scheme, netloc, r.path, r.query, r.fragment)
     return r2.geturl()
 
+
 def apply_sanitizing_rules(url, rules):
     """
     applies all url sanitizing rules to the given url
@@ -58,23 +61,19 @@ def apply_sanitizing_rules(url, rules):
     for episode.
     """
 
-    for r in rules:
-        if isinstance(r, tuple):
-            precompiled, r = r
-        else:
-            precompiled = None
-
+    for rule in rules:
 
         orig = url
 
-        if precompiled:
-            url = precompiled.sub(r.replace, url)
+        # check for precompiled regex first
+        if hasattr(rule, 'search_re'):
+            url = rule.search_re.sub(rule.replace, url)
         else:
-            url = re.sub(r.search, r.replace, url)
+            url = re.sub(rule.search, rule.replace, url)
 
         if orig != url:
-            c = getattr(r, 'hits', 0) if hasattr(r, 'hits') else 0
-            r.hits = c+1
+            c = getattr(rule, 'hits', 0)
+            rule.hits = c+1
 
     return url
 
@@ -90,52 +89,38 @@ def maintenance(dry_run=False):
     podcast_rules = get_sanitizing_rules('podcast')
     episode_rules = get_sanitizing_rules('episode')
 
+    num_podcasts = Podcast.objects.count()
+    num_episodes = Episode.objects.count()
 
     print 'Stats'
-    print ' * %d podcasts - %d rules' % (Podcast.objects.count(), len(podcast_rules))
-    print ' * %d episodes - %d rules' % (Episode.objects.count(), len(episode_rules))
+    print ' * %d podcasts - %d rules' % (num_podcasts, len(podcast_rules))
+    print ' * %d episodes - %d rules' % (num_episodes, len(episode_rules))
     if dry_run:
         print ' * dry run - nothing will be written to the database'
     print
 
     print 'precompiling regular expressions'
 
-    podcast_rules = precompile_rules(podcast_rules)
-    episode_rules = precompile_rules(episode_rules)
+    podcast_rules = list(precompile_rules(podcast_rules))
+    episode_rules = list(precompile_rules(episode_rules))
 
-    p_unchanged = 0
-    p_merged = 0
-    p_updated = 0
-    p_deleted = 0
-    p_error = 0
-    e_unchanged = 0
-    e_merged = 0
-    e_updated = 0
-    e_deleted = 0
-    e_error = 0
+    p_stats = collections.defaultdict(int)
+    e_stats = collections.defaultdict(int)
 
-    count = 0
+    podcasts = Podcast.objects.only('id', 'url').order_by('id').iterator()
 
-    podcasts = Podcast.objects.only('id', 'url').iterator()
-    total = Podcast.objects.count()
-    duplicates = 0
-    sanitized_urls = []
-    for p in podcasts:
-        count += 1
-        if (count % 1000) == 0: print '% 3.2f%% (podcast id %s)' % (((count + 0.0)/total*100), p.id)
+    for n, p in enumerate(podcasts):
         try:
             su = sanitize_url(p.url, rules=podcast_rules)
         except Exception, e:
-            raise
             log('failed to sanitize url for podcast %s: %s' % (p.id, e))
             print 'failed to sanitize url for podcast %s: %s' % (p.id, e)
-            return
-            p_error += 1
+            p_stats['error'] += 1
             continue
 
         # nothing to do
         if su == p.url:
-            p_unchanged += 1
+            p_stats['unchanged'] += 1
             continue
 
         # invalid podcast, remove
@@ -143,12 +128,12 @@ def maintenance(dry_run=False):
             try:
                 if not dry_run:
                     p.delete()
-                p_deleted += 1
+                p_stats['deleted'] += 1
 
             except Exception, e:
                 log('failed to delete podcast %s: %s' % (p.id, e))
                 print 'failed to delete podcast %s: %s' % (p.id, e)
-                p_error += 1
+                p_stats['error'] += 1
 
             continue
 
@@ -162,12 +147,12 @@ def maintenance(dry_run=False):
                 p.url = su
                 p.save()
 
-            p_updated += 1
+            p_stats['updated'] += 1
             continue
 
         # nothing to do
         if p == su_podcast:
-            p_unchanged += 1
+            p_stats['unchanged'] += 1
             continue
 
         # last option - merge podcasts
@@ -176,41 +161,35 @@ def maintenance(dry_run=False):
                 rewrite_podcasts(p, su_podcast)
                 p.delete()
 
-            p_merged += 1
+            p_stats['merged'] += 1
 
         except Exception, e:
             log('error rewriting podcast %s: %s' % (p.id, e))
             print 'error rewriting podcast %s: %s' % (p.id, e)
-            p_error += 1
+            p_stats['error'] += 1
             continue
 
-    print 'finished %s podcasts' % count
-    print ' * %s unchanged' % p_unchanged
-    print ' * %s merged' % p_merged
-    print ' * %s updated' % p_updated
-    print ' * %s deleted' % p_deleted
-    print ' * %s error' % p_error
+        progress(n+1, num_podcasts, str(p.id))
+
+    print 'finished %s podcasts' % (n+1)
+    print '%(unchanged)d unchanged, %(merged)d merged, %(updated)d updated, %(deleted)d deleted, %(error)d error' % p_stats
     print 'Hits'
     for _, r in podcast_rules:
         print '% 30s: %d' % (r.slug, getattr(r, 'hits', 0) if hasattr(r, 'hits') else 0)
 
-    count = 0
-    total = Episode.objects.count()
-    episodes = Episode.objects.only('id', 'url').iterator()
+    episodes = Episode.objects.only('id', 'url').order_by('id').iterator()
     for e in episodes:
-        count += 1
-        if (count % 10000) == 0: print '% 3.2f%% (episode id %s)' % (((count + 0.0)/total*100), e.id)
         try:
             su = sanitize_url(e.url, rules=episode_rules)
         except Exception, ex:
             log('failed to sanitize url for episode %s: %s' % (e.id, ex))
             print 'failed to sanitize url for episode %s: %s' % (e.id, ex)
-            p_error += 1
+            e_stats['error'] += 1
             continue
 
         # nothing to do
         if su == e.url:
-            e_unchanged += 1
+            e_stats['unchanged'] += 1
             continue
 
         # invalid episode, remove
@@ -219,11 +198,11 @@ def maintenance(dry_run=False):
                 if not dry_run:
                     delete_episode(e)
 
-                e_deleted += 1
+                e_stats['deleted'] += 1
             except Exception, ex:
                 log('failed to delete episode %s: %s' % (e.id, ex))
                 print 'failed to delete episode %s: %s' % (e.id, ex)
-                e_error += 1
+                e_stats['error'] += 1
 
             continue
 
@@ -237,12 +216,12 @@ def maintenance(dry_run=False):
                 e.url = su
                 e.save()
 
-            e_updated += 1
+            e_stats['updated'] += 1
             continue
 
         # nothing to do
         if e == su_episode:
-            e_unchanged += 1
+            e_stats['unchanged'] += 1
             continue
 
 
@@ -253,28 +232,21 @@ def maintenance(dry_run=False):
                 rewrite_listeners(e, su_episode)
                 e.delete()
 
-            e_merged += 1
+            e_stats['merged'] += 1
 
         except Exception, ex:
             log('error rewriting episode %s: %s' % (e.id, ex))
             print 'error rewriting episode %s: %s' % (e.id, ex)
-            e_error += 1
+            e_stats['error'] += 1
             continue
 
+        progress(n+1, num_episodes, str(e.id))
 
-    print 'finished %s episodes' % count
-    print ' * %s unchanged' % e_unchanged
-    print ' * %s merged' % e_merged
-    print ' * %s updated' % e_updated
-    print ' * %s deleted' % e_deleted
-    print ' * %s error' % e_error
+    print 'finished %s episodes' % num_episodes
+    print '%(unchanged)d unchanged, %(merged)d merged, %(updated)d updated, %(deleted)d deleted, %(error)d error' % e_stats
     print
-    print 'finished %s podcasts' % count
-    print ' * %s unchanged' % p_unchanged
-    print ' * %s merged' % p_merged
-    print ' * %s updated' % p_updated
-    print ' * %s deleted' % p_deleted
-    print ' * %s error' % p_error
+    print 'finished %s podcasts' % num_podcasts
+    print '%(unchanged)d unchanged, %(merged)d merged, %(updated)d updated, %(deleted)d deleted, %(error)d error' % p_stats
     print
     print 'Hits'
     for _, r in episode_rules:
@@ -375,4 +347,6 @@ def rewrite_listeners(e_old, e_new):
 
 
 def precompile_rules(rules):
-    return [( re.compile(rule.search, re.UNICODE), rule) for rule in rules]
+    for rule in rules:
+        rule.search_re = re.compile(rule.search, re.UNICODE)
+        yield rule
