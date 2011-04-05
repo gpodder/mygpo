@@ -20,6 +20,12 @@ from mygpo import migrate
 MAX_TAGS_ON_PAGE=50
 
 
+@repeat_on_conflict(['state'])
+def update_podcast_settings(state, is_public):
+    state.settings['public_subscription'] = is_public
+    state.save()
+
+
 @allowed_methods(['GET', 'POST'])
 @cache_page_anonymous(60 * 60)
 def show(request, pid):
@@ -52,12 +58,8 @@ def show(request, pid):
         if request.method == 'POST':
             privacy_form = PrivacyForm(request.POST)
             if privacy_form.is_valid():
-                state.settings['public_subscription'] = privacy_form.cleaned_data['public']
-                try:
-                   state.save()
-                   success = True
-                except IntegrityError, ie:
-                   error_message = _('You can\'t use the same Device ID for two devices.')
+                update_podcast_settings(state=state, is_public=privacy_form.cleaned_data['public'])
+                success = True
         else:
             privacy_form = PrivacyForm({
                 'public': state.settings.get('public_subscription', True)
