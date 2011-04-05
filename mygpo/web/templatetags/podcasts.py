@@ -84,8 +84,7 @@ def podcast_group_link(podcast):
 def podcast_link(podcast, title=None):
     """ Returns the link for a single Podcast """
 
-    title = title or podcast.group_member_name or \
-        getattr(podcast, 'display_title', None) or podcast.title
+    title = title or getattr(podcast, 'display_title', None) or podcast.title
 
     title = strip_tags(title)
 
