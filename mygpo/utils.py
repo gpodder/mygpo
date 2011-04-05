@@ -172,7 +172,7 @@ def progress(val, max_val, status_str='', max_width=50, stream=sys.stdout):
         val,
         max_val,
         status_str),
-    sys.stdout.flush()
+    stream.flush()
 
 
 def set_by_frequency(l):
