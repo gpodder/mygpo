@@ -58,8 +58,13 @@ def save_device_signal(sender, instance=False, **kwargs):
     dev = get_or_migrate_device(instance)
     d = update_device(instance, dev)
     user = get_or_migrate_user(instance.user)
-    user.set_device(d)
-    user.save()
+
+    @repeat_on_conflict(['user'])
+    def set_device(user, device):
+        user.set_device(d)
+        user.save()
+
+    set_device(user=user, device=d)
 
     podcast_states = PodcastUserState.for_user(instance.user)
     for state in podcast_states:
