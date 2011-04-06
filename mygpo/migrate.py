@@ -277,6 +277,7 @@ def create_episode_action(action):
     a.device_oldid = action.device.id if action.device else None
     a.started = action.started
     a.playmark = action.playmark
+    a.total = action.total
     return a
 
 def create_episode(olde, sparse=False):
