@@ -1,5 +1,6 @@
 import uuid, collections
 from datetime import datetime
+from itertools import imap
 from couchdbkit import ResourceNotFound
 from couchdbkit.ext.django.schema import *
 
@@ -72,6 +73,18 @@ class EpisodeAction(DocumentSchema):
         vals = ('action', 'timestamp', 'device_oldid', 'started', 'playmark',
                 'total')
         return all([getattr(self, v, None) == getattr(other, v, None) for v in vals])
+
+
+    def to_history_entry(self):
+        entry = HistoryEntry()
+        entry.action = self.action
+        entry.timestamp = self.timestamp
+        entry.device_oldid = self.device_oldid
+        entry.device_id = self.device
+        entry.started = self.started
+        entry.playmark = self.playmark
+        entry.total = self.total
+        return entry
 
 
     @staticmethod
@@ -287,6 +300,10 @@ class EpisodeUserState(Document):
             self.save()
 
         update(state=self)
+
+
+    def get_history_entries(self):
+        return imap(EpisodeAction.to_history_entry, self.actions)
 
 
     def __repr__(self):
@@ -580,6 +597,12 @@ class User(Document):
                 return device
 
 
+    def get_device_by_oldid(self, oldid):
+        for device in self.devices:
+            if device.oldid == oldid:
+                return device
+
+
     def set_device(self, device):
         devices = list(self.devices)
         ids = [x.id for x in devices]
@@ -701,16 +724,27 @@ class HistoryEntry(object):
         """ Efficiently loads additional data for a number of entries """
 
         # load podcast data
-        podcast_ids = [x.podcast_id for x in entries]
+        podcast_ids = [getattr(x, 'podcast_id', None) for x in entries]
+        podcast_ids = filter(None, podcast_ids)
         podcasts = get_to_dict(Podcast, podcast_ids)
 
         # load device data
         device_ids = [x.device_id for x in entries]
+        device_ids = filter(None, device_ids)
         devices = dict([ (id, user.get_device(id)) for id in device_ids])
 
+        device_oldids = (getattr(x, 'device_oldid', None) for x in entries)
+        device_oldids = filter(None, device_oldids)
+        devices_oldids = dict([ (oldid, user.get_device_by_oldid(oldid)) for oldid in device_oldids])
+
         for entry in entries:
-            entry.podcast = podcasts[entry.podcast_id]
-            entry.device = devices[entry.device_id]
+            podcast_id = getattr(entry, 'podcast_id', None)
+            entry.podcast = podcasts.get(podcast_id, None)
             entry.user = user
+
+            device = devices.get(entry.device_id, None) or \
+                     devices_oldids.get(getattr(entry, 'device_oldid', None), None)
+            entry.device = device
+
 
         return entries

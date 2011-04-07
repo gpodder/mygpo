@@ -19,8 +19,8 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from mygpo.core import models
-from mygpo.api.models import Podcast, Episode, EpisodeAction
-from mygpo.users.models import Chapter
+from mygpo.api.models import Podcast, Episode
+from mygpo.users.models import Chapter, HistoryEntry
 from mygpo.api import backend
 from mygpo.web.utils import get_played_parts
 from mygpo.decorators import manual_gc
@@ -36,11 +36,15 @@ def episode(request, id):
     new_episode = migrate.get_or_migrate_episode(episode)
 
     if request.user.is_authenticated():
-        history = EpisodeAction.objects.filter(user=request.user, episode=episode).order_by('-timestamp')
+
+        user = migrate.get_or_migrate_user(request.user)
 
         new_ep  = migrate.get_or_migrate_episode(episode)
         episode_state = new_ep.get_user_state(request.user)
         is_fav = episode_state.is_favorite()
+
+        history = list(episode_state.get_history_entries())
+        HistoryEntry.fetch_data(user, history)
 
         played_parts, duration = get_played_parts(request.user, episode)
 

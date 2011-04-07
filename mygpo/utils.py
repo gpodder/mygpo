@@ -295,6 +295,9 @@ def parse_range(s, min, max, default=None):
 
 
 def get_to_dict(cls, ids):
+    if not ids:
+        return {}
+
     ids = list(set(ids))
     objs = cls.get_multi(ids)
     return dict(zip(ids, objs))

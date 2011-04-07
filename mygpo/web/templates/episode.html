@@ -171,7 +171,7 @@
      <td style="text-align: center;">{{ s|episode_status_icon }}</td>
      <td>
       {% if s.device %}
-       <a href="{% url device s.device.id %}">{{ s.device|device_icon }} {{ s.device.name|striptags }}</a>
+       <a href="{% url device s.device.oldid %}">{{ s.device|device_icon }} {{ s.device.name|striptags }}</a>
       {% endif %}
      </td>
      <td>{% if s.started %}{{s.started_time|date:"H:m:s" }} - {% endif %}
