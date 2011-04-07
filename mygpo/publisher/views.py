@@ -6,7 +6,7 @@ from mygpo.core import models
 from mygpo.api.models import Podcast, Episode, PodcastGroup
 from mygpo.publisher.auth import require_publisher, is_publisher
 from mygpo.publisher.forms import SearchPodcastForm, EpisodeForm, PodcastForm
-from mygpo.publisher.utils import listener_data, episode_listener_data, check_publisher_permission, subscriber_data, device_stats, episode_heatmap
+from mygpo.publisher.utils import listener_data, episode_listener_data, check_publisher_permission, subscriber_data, episode_heatmap
 from django.contrib.sites.models import RequestSite
 from mygpo.data.feeddownloader import update_podcasts
 from mygpo.decorators import requires_token, allowed_methods
@@ -55,7 +55,6 @@ def podcast(request, id):
 
     timeline_data = listener_data([new_p])
     subscription_data = subscriber_data([new_p])
-    device_data = device_stats([p])
 
     if request.method == 'POST':
         form = PodcastForm(request.POST, instance=p)
@@ -80,7 +79,6 @@ def podcast(request, id):
         'form': form,
         'timeline_data': timeline_data,
         'subscriber_data': subscription_data,
-        'device_data': device_data,
         'update_token': update_token,
         }, context_instance=RequestContext(request))
 
@@ -97,13 +95,11 @@ def group(request, group_id):
 
     timeline_data = listener_data(new_podcasts)
     subscription_data = subscriber_data(new_podcasts)
-    device_data = device_stats(g.podcasts())
 
     return render_to_response('publisher/group.html', {
         'group': g,
         'timeline_data': timeline_data,
         'subscriber_data': subscription_data,
-        'device_data': device_data,
         }, context_instance=RequestContext(request))
 
 

@@ -127,13 +127,6 @@ def check_publisher_permission(user, podcast):
     return False
 
 
-def device_stats(podcasts):
-    l = EpisodeAction.objects.filter(episode__podcast__in=podcasts).values('device__type').annotate(count=Count('id'))
-    l = filter(lambda x: int(x['count']) > 0, l)
-    l = map(lambda x: (x['device__type'], x['count']), l)
-    return dict(l)
-
-
 def episode_heatmap(episode, max_part_num=30, min_part_length=10):
     """
     Generates "Heatmap Data" for the given episode
