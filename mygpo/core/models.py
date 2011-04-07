@@ -24,8 +24,7 @@ class Episode(Document):
     merged_ids = StringListProperty()
     oldid = IntegerProperty()
     urls = StringListProperty()
-    # when accessed via a view, a podcast attribute is added
-    # that contains the id of the podcast
+    podcast = StringProperty(required=True)
 
 
     @classmethod
@@ -320,6 +319,22 @@ class Podcast(Document):
             episode   = res['key'][1]
             listeners = res['value']
             yield (episode, listeners)
+
+
+    def get_episode_states(self, user_oldid):
+        """ Returns the latest episode actions for the podcast's episodes """
+
+        from mygpo.users.models import EpisodeUserState
+        db = EpisodeUserState.get_db()
+
+        res = db.view('users/episode_states',
+                startkey= [user_oldid, self.get_id(), None],
+                endkey  = [user_oldid, self.get_id(), {}]
+            )
+
+        for r in res:
+            action = r['value']
+            yield action
 
 
     def get_old_obj(self):

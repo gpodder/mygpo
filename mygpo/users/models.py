@@ -59,8 +59,9 @@ class EpisodeAction(DocumentSchema):
     """
 
     action        = StringProperty(required=True)
-    timestamp     = DateTimeProperty(required=True)
+    timestamp     = DateTimeProperty(required=True, default=datetime.utcnow)
     device_oldid  = IntegerProperty()
+    device        = StringProperty()
     started       = IntegerProperty()
     playmark      = IntegerProperty()
     total         = IntegerProperty()
@@ -71,6 +72,79 @@ class EpisodeAction(DocumentSchema):
         vals = ('action', 'timestamp', 'device_oldid', 'started', 'playmark',
                 'total')
         return all([getattr(self, v, None) == getattr(other, v, None) for v in vals])
+
+
+    @staticmethod
+    def filter(user_oldid, since=None, until={}, podcast_id=None,
+               device_oldid=None):
+        """ Returns Episode Actions for the given criteria"""
+
+        since_str = since.strftime('%Y-%m-%dT%H:%M:%S') if since else None
+        until_str = until.strftime('%Y-%m-%dT%H:%M:%S') if until else {}
+
+        # further parts of the key are filled in below
+        startkey = [user_oldid, since_str, None, None]
+        endkey   = [user_oldid, until_str, {}, {}]
+
+        # additional filter that are carried out by the
+        # application, not by the database
+        add_filters = []
+
+        if isinstance(podcast_id, basestring):
+            if until is not None: # filter in database
+                startkey[2] = podcast_id
+                endkey[2]   = podcast_id
+            else:
+                add_filters.append( lambda x: x['podcast'] == podcast_id )
+
+        elif isinstance(podcast_id, list):
+            add_filters.append( lambda x: x['podcast'] in podcast_id )
+
+        elif podcast_id is not None:
+            raise ValueError('podcast_id can be either None, basestring '
+                    'or a list of basestrings')
+
+
+        if device_oldid:
+            if None not in (until, podcast_id): # filter in database
+                startkey[3] = device_oldid
+                endkey[3]   = device_oldid
+            else:
+                add_filters.append( lambda x: x['device_oldid'] == device_oldid)
+
+
+        db = EpisodeUserState.get_db()
+        res = db.view('users/episode_actions',
+                startkey = startkey,
+                endkey   = endkey
+            )
+
+        for r in res:
+            action = r['value']
+            if all( f(action) for f in add_filters):
+                yield action
+
+
+    def validate_time_values(self):
+        """ Validates allowed combinations of time-values """
+
+        PLAY_ACTION_KEYS = ('playmark', 'started', 'total')
+
+        # Key found, but must not be supplied (no play action!)
+        if self.action != 'play':
+            for key in PLAY_ACTION_KEYS:
+                if getattr(self, key, None) is not None:
+                    raise ValueError('%s only allowed in play actions' % key)
+
+        # Sanity check: If started or total are given, require playmark
+        if ((self.started is not None) or (self.total is not None)) and \
+            self.playmark is None:
+            raise ValueError('started and total require position')
+
+        # Sanity check: total and playmark can only appear together
+        if ((self.total is not None) or (self.started is not None)) and \
+           ((self.total is None)     or (self.started is None)):
+            raise ValueError('total and started can only appear together')
 
 
     def __repr__(self):
@@ -148,6 +222,28 @@ class EpisodeUserState(Document):
             return state
 
     @classmethod
+    def for_ref_urls(cls, user, podcast_url, episode_url):
+        res = cls.view('users/episode_states_by_ref_urls',
+            key = [user.id, podcast_url, episode_url], limit=1)
+        if res:
+            state = res.first()
+            state.ref_url = episode_url
+            state.podcast_ref_url = podcast_url
+            return state
+        else:
+            from mygpo.api import models as oldmodels
+            from mygpo import migrate
+
+            old_p, _ = oldmodels.Podcast.objects.get_or_create(url=podcast_url)
+            podcast = migrate.get_or_migrate_podcast(old_p)
+
+            old_e, _ = oldmodels.Episode.objects.get_or_create(podcast=old_p, url=episode_url)
+            episode = migrate.get_or_migrate_episode(old_e)
+
+            return episode.get_user_state(user)
+
+
+    @classmethod
     def count(cls):
         r = cls.view('users/episode_states_by_user_episode',
             limit=0)
@@ -155,6 +251,7 @@ class EpisodeUserState(Document):
 
 
     def add_actions(self, actions):
+        map(EpisodeAction.validate_time_values, actions)
         self.actions = list(self.actions) + actions
         self.actions = list(set(self.actions))
         self.actions = sorted(self.actions, key=lambda x: x.timestamp)
@@ -475,6 +572,12 @@ class User(Document):
                 return device
 
         return None
+
+
+    def get_device_by_uid(self, uid):
+        for device in self.devices:
+            if device.uid == uid:
+                return device
 
 
     def set_device(self, device):

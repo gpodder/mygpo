@@ -372,3 +372,15 @@ def skip_pairs(iterator, cmp=cmp):
             next = iterator.next()
         else:
             yield item
+
+
+def get_timestamp(datetime_obj):
+    """ Returns the timestamp as an int for the given datetime object
+
+    >>> get_timestamp(datetime(2011, 4, 7, 9, 30, 6))
+    1302168606
+
+    >>> get_timestamp(datetime(1970, 1, 1, 0, 0, 0))
+    0
+    """
+    return int(time.mktime(datetime_obj.timetuple()))
