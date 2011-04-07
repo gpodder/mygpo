@@ -3,7 +3,7 @@ import collections
 from django.core.cache import cache
 
 from mygpo.core import models
-from mygpo.api.models import Podcast, Episode, EpisodeAction
+from mygpo.api.models import Podcast, Episode
 from mygpo.log import log
 from mygpo.utils import iterate_together, progress
 import urlparse
@@ -195,7 +195,7 @@ def maintenance(dry_run=False):
         if su == '':
             try:
                 if not dry_run:
-                    delete_episode(e)
+                    e.delete()
 
                 e_stats['deleted'] += 1
             except Exception, ex:
@@ -227,7 +227,6 @@ def maintenance(dry_run=False):
         # last option - merge episodes
         try:
             if not dry_run:
-                rewrite_episode_actions(e, su_episode)
                 e.delete()
 
             e_stats['merged'] += 1
@@ -251,17 +250,9 @@ def maintenance(dry_run=False):
         print '% 30s: %d' % (r.slug, getattr(r, 'hits', 0) if hasattr(r, 'hits') else 0)
 
 
-
-def delete_episode(e):
-    EpisodeAction.objects.filter(episode=e).delete()
-    e.delete()
-
-
 def rewrite_podcasts(p_old, p_new):
 
     log('merging podcast %s "%s" to correct podcast %s "%s"' % (p_old.id, p_old.url, p_new.id, p_new.url))
-
-    rewrite_episodes(p_old, p_new)
 
     rewrite_newpodcast(p_old, p_new)
 
@@ -295,36 +286,6 @@ def rewrite_newpodcast(p_old, p_new):
 
     p_n.save()
     p_o.delete()
-
-
-def rewrite_episodes(p_old, p_new):
-
-    for e in Episode.objects.filter(podcast=p_old):
-        try:
-            e_new, created_ = Episode.objects.get_or_create(podcast=p_new, url=e.url)
-
-            log('episode %s (url %s, podcast %s) already exists; updating episode actions for episode %s (url %s, podcast %s)' % (e_new.id, e.url, p_new.id, e.id, e.url, p_old.id))
-            rewrite_episode_actions(e, e_new)
-            log('episode actions for episode %s (url "%s", podcast %s) updated.' % (e.id, e.url, p_old.id))
-            e.delete()
-
-        except Episode.DoesNotExist:
-            log('updating episode %s (url "%s", podcast %s => %s)' % (e.id, e.url, p_old.id, p_new.id))
-            e.podcast = p_new
-            e.save()
-
-
-def rewrite_episode_actions(e_old, e_new):
-
-    for ea in EpisodeAction.objects.filter(episode=e_old):
-        try:
-            log('updating episode action %s (user %s, timestamp %s, episode %s => %s)' % (ea.id, ea.user.id, ea.timestamp, e_old.id, e_new.id))
-            ea.epsidode = e_new
-            ea.save()
-
-        except Exception, e:
-            log('error updating episode action %s: %s, deleting' % (sa.id, e))
-            ea.delete()
 
 
 def precompile_rules(rules):
