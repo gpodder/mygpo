@@ -7,8 +7,10 @@ from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
 from django.utils.translation import ugettext as _
-from mygpo.api.models import Podcast, Episode, EpisodeAction, Device, SyncGroup
+from mygpo.api.models import Podcast, Episode, Device, SyncGroup
+from mygpo.api import models as oldmodels
 from mygpo.api.sanitizing import sanitize_url
+from mygpo.users.models import EpisodeAction, HistoryEntry
 from mygpo.web.forms import PrivacyForm, SyncForm
 from mygpo.directory.tags import tags_for_user
 from mygpo.decorators import manual_gc, allowed_methods, repeat_on_conflict
@@ -122,7 +124,7 @@ def get_tags(podcast, user):
 def listener_data(podcast):
     d = date(2010, 1, 1)
     day = timedelta(1)
-    episodes = EpisodeAction.objects.filter(episode__podcast=podcast, timestamp__gte=d).order_by('timestamp').values('timestamp')
+    episodes = oldmodels.EpisodeAction.objects.filter(episode__podcast=podcast, timestamp__gte=d).order_by('timestamp').values('timestamp')
     if len(episodes) == 0:
         return []
 
@@ -131,7 +133,7 @@ def listener_data(podcast):
     days = []
     for d in daterange(start):
         next = d + timedelta(days=1)
-        listeners = EpisodeAction.objects.filter(episode__podcast=podcast, timestamp__gte=d, timestamp__lt=next).values('user_id').distinct().count()
+        listeners = oldmodels.EpisodeAction.objects.filter(episode__podcast=podcast, timestamp__gte=d, timestamp__lt=next).values('user_id').distinct().count()
         e = Episode.objects.filter(podcast=podcast, timestamp__gte=d, timestamp__lt=next)
         episode = e[0] if e.count() > 0 else None
         days.append({
@@ -149,21 +151,38 @@ def episode_list(podcast, user):
     the episode.
     """
 
+    def make_history_entry(action):
+        entry = HistoryEntry()
+        entry.timestamp = action['timestamp']
+        entry.episode_id = action['episode_id']
+        entry.device_oldid = action['device_oldid']
+        entry.podcast_id = action['podcast_id']
+        entry.action = action['action']
+        return entry
+
     episodes = podcast.get_episodes().order_by('-timestamp')
+
+    new_user = migrate.get_or_migrate_user(user)
 
     new_podcast = migrate.get_or_migrate_podcast(podcast)
     listeners = dict(new_podcast.episode_listener_counts())
     new_episodes = dict( (e.oldid, e._id) for e in new_podcast.get_episodes() )
 
-    for e in episodes:
-        if user.is_authenticated():
-            actions = EpisodeAction.objects.filter(episode=e, user=user).order_by('-timestamp')
-            if actions.count() > 0:
-                e.action = actions[0]
+    if user.is_authenticated():
+        actions = new_podcast.get_episode_states(user.id)
+        actions = map(make_history_entry, actions)
+        HistoryEntry.fetch_data(new_user, actions)
+        episode_actions = dict( (action.episode_id, action) for action in actions)
+    else:
+        episode_actions = {}
 
+    for e in episodes:
         e_id = new_episodes.get(e.id, None)
-        if not e_id: continue
-        e.listeners = listeners.get(e_id)
+        if not e_id:
+            continue
+
+        e.listeners = listeners.get(e_id, None)
+        e.action = episode_actions.get(e_id, None)
 
     return episodes
 

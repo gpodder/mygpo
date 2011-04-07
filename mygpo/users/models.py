@@ -718,6 +718,7 @@ class User(Document):
 
 
 class HistoryEntry(object):
+    """ A class that can represent subscription and episode actions """
 
     @classmethod
     def fetch_data(cls, user, entries):
@@ -729,7 +730,7 @@ class HistoryEntry(object):
         podcasts = get_to_dict(Podcast, podcast_ids)
 
         # load device data
-        device_ids = [x.device_id for x in entries]
+        device_ids = [getattr(x, 'device_id', None) for x in entries]
         device_ids = filter(None, device_ids)
         devices = dict([ (id, user.get_device(id)) for id in device_ids])
 
@@ -742,7 +743,7 @@ class HistoryEntry(object):
             entry.podcast = podcasts.get(podcast_id, None)
             entry.user = user
 
-            device = devices.get(entry.device_id, None) or \
+            device = devices.get(getattr(entry, 'device_id', None), None) or \
                      devices_oldids.get(getattr(entry, 'device_oldid', None), None)
             entry.device = device
 
