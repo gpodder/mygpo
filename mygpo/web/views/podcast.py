@@ -8,7 +8,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
 from django.utils.translation import ugettext as _
 from mygpo.api.models import Podcast, Episode, Device, SyncGroup
-from mygpo.api import models as oldmodels
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.users.models import EpisodeAction, HistoryEntry
 from mygpo.web.forms import PrivacyForm, SyncForm
@@ -71,11 +70,9 @@ def show(request, pid):
         subscribe_form = SyncForm()
         subscribe_form.set_targets(subscribe_targets, '')
 
-        timeline_data = listener_data(podcast)
         return render_to_response('podcast.html', {
             'tags': tags,
             'history': history,
-            'timeline_data': timeline_data,
             'podcast': podcast,
             'privacy_form': privacy_form,
             'devices': subscribed_devices,
@@ -120,28 +117,6 @@ def get_tags(podcast, user):
 
     return tag_list
 
-
-def listener_data(podcast):
-    d = date(2010, 1, 1)
-    day = timedelta(1)
-    episodes = oldmodels.EpisodeAction.objects.filter(episode__podcast=podcast, timestamp__gte=d).order_by('timestamp').values('timestamp')
-    if len(episodes) == 0:
-        return []
-
-    start = episodes[0]['timestamp']
-
-    days = []
-    for d in daterange(start):
-        next = d + timedelta(days=1)
-        listeners = oldmodels.EpisodeAction.objects.filter(episode__podcast=podcast, timestamp__gte=d, timestamp__lt=next).values('user_id').distinct().count()
-        e = Episode.objects.filter(podcast=podcast, timestamp__gte=d, timestamp__lt=next)
-        episode = e[0] if e.count() > 0 else None
-        days.append({
-            'date': d,
-            'listeners': listeners,
-            'episode': episode})
-
-    return days
 
 
 def episode_list(podcast, user):
