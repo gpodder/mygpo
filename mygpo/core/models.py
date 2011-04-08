@@ -116,26 +116,70 @@ class Podcast(Document):
 
     @classmethod
     def get(cls, id):
-        r = cls.view('core/podcasts_by_id', key=id)
-        return r.first() if r else None
+        r = cls.view('core/podcasts_by_id',
+                key=id,
+                classes=[Podcast, PodcastGroup],
+                include_docs=True,
+            )
+
+        if not r:
+            return None
+
+        podcast_group = r.first()
+        return podcast_group.get_podcast_by_id(id)
 
 
     @classmethod
     def get_multi(cls, ids):
-        r = cls.view('core/podcasts_by_id', keys=ids)
-        return list(r)
+        r = cls.view('core/podcasts_by_id',
+                keys=ids,
+                classes=[Podcast, PodcastGroup],
+                include_docs=True,
+            )
+
+        if not r:
+            return None
+
+        podcasts = zip(ids, list(r))
+        return [podcast.get_podcast_by_id(id) for (id, podcast) in podcasts]
+
 
 
     @classmethod
     def for_oldid(cls, oldid):
-        r = cls.view('core/podcasts_by_oldid', key=long(oldid))
-        return r.first() if r else None
+        r = cls.view('core/podcasts_by_oldid',
+                key=long(oldid),
+                classes=[Podcast, PodcastGroup],
+                include_docs=True
+            )
+
+        if not r:
+            return None
+
+        podcast_group = r.first()
+        return podcast_group.get_podcast_by_oldid(oldid)
 
 
     @classmethod
     def for_url(cls, url):
-        r = cls.view('core/podcasts_by_url', key=url)
-        return r.first() if r else None
+        r = cls.view('core/podcasts_by_url',
+                key=url,
+                classes=[Podcast, PodcastGroup],
+                include_docs=True
+            )
+
+        if not r:
+            return None
+
+        podcast_group = r.first()
+        return podcast_group.get_podcast_by_url(url)
+
+
+
+    def get_podcast_by_id(self, _):
+        return self
+    get_podcast_by_oldid = get_podcast_by_id
+    get_podcast_by_url = get_podcast_by_id
 
 
     def get_id(self):
@@ -327,6 +371,24 @@ class PodcastGroup(Document):
         r = cls.view('core/podcastgroups_by_oldid', \
             key=oldid, limit=1, include_docs=True)
         return r.first() if r else None
+
+    def get_podcast_by_id(self, id):
+        for podcast in self.podcasts:
+            if podcast.get_id() == id:
+                return podcast
+
+
+    def get_podcast_by_oldid(self, oldid):
+        for podcast in self.podcasts:
+            if podcast.oldid == oldid:
+                return podcast
+
+
+    def get_podcast_by_url(self, url):
+        for podcast in self.podcasts:
+            if url in list(podcast.urls):
+                return podcast
+
 
     def subscriber_count(self):
         return sum([p.subscriber_count() for p in self.podcasts])
