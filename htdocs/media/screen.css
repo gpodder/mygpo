@@ -724,12 +724,12 @@ input.rate
     display: inline;
 }
 
-div.episode-navigation
+div.navigation
 {
 clear: both;
 }
 
-div.episode-navigation div
+div.navigation div
 {
     padding-top: .5em;
     padding-bottom: .5em;
@@ -738,12 +738,12 @@ div.episode-navigation div
     float: left;
 }
 
-div.episode-navigation div.list
+div.navigation div.list
 {
     text-align: center;
 }
 
-div.episode-navigation div.next
+div.navigation div.next
 {
     text-align: right;
 }

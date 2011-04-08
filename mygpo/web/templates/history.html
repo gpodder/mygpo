@@ -9,17 +9,17 @@
 {% block mainmenu %}{{ "/history/"|main_menu }}{% endblock %}
 {% block sectionmenu %}{{ "/history/"|section_menu }}{% endblock %}
 
-{% block title %}{% trans "Subscription and episode history" %}{% if singledevice %} {% trans "for" %} {{ singledevice|striptags }}{% endif %}{% endblock %}
+{% block title %}{% trans "Subscription and episode history" %}{% if device %} {% trans "for" %} {{ device.name|striptags }}{% endif %}{% endblock %}
 
 {% block content %}
-<h1>{% trans "Subscription and episode history" %}{% if singledevice %} {% trans "for" %} {{ singledevice.name|striptags }}{% endif %}</h1>
+<h1>{% trans "Subscription and episode history" %}{% if device %} {% trans "for" %} {{ device.name|striptags }}{% endif %}</h1>
 <p>{% trans "This is a list of recent subscription and episode actions for your account." %}</p>
 
-   {% if singledevice %}
-    <a href="{% url device singledevice.id %}">{% trans "Back to" %} {{ singledevice|device_icon }} {{singledevice|striptags}}</a>
+   {% if device %}
+    <a href="{% url device device.oldid %}">{% trans "Back to" %} {{ device|device_icon }} {{ device.name|striptags}}</a>
    {% endif %}
 
-   {% if not generalhistory|length_is:"0" %}
+   {% if not history|length_is:"0" %}
    <table class="list">
     <tr>
      <th></th>
@@ -28,30 +28,26 @@
      <th style="text-align: center;">{% trans "Action" %}</th>
      <th>{% trans "Device" %}</th>
     </tr>
-    {% for s in generalhistory %}
+    {% for s in history %}
      <tr>
-      {% if s.podcast %}
        <td>{{ s.podcast|podcast_logo }}</td>
-      {% else %}
-       <td>{{ s.episode.podcast|podcast_logo }}</td>
-      {% endif %}
 
       <td>
-       {% if s.podcast %}
+       {% if s.type == "Subscription" %}
         {% podcast_group_link s.podcast %}
        {% else %}
-        <a href="{% url episode s.episode.id %}">
+        <a href="{% url episode s.episode.oldid %}">
          {% if s.episode.title %}
           {{ s.episode.title|striptags }}
          {% else %}
           {% trans "Unnamed Episode" %}
          {% endif %}
-     </a><br/><span class="from_podcast">{% trans "from" %} {% podcast_group_link s.episode.podcast %}</span>
+     </a><br/><span class="from_podcast">{% trans "from" %} {% podcast_group_link s.podcast %}</span>
        {% endif %}
       </td>
       <td style="width: 80px;"><span title="{{ s.timestamp }}">{{ s.timestamp|date:"Y-m-d" }}</span></td>
       <td style="text-align: center;">
-       {% if s.podcast %}
+       {% if s.type == "Subscription" %}
         {{ s|podcast_status_icon }}
        {% else %}
         {{ s|episode_status_icon }}
@@ -71,5 +67,23 @@
    </table>
   {% endif %}
 
+
+  <div class="navigation">
+   <div class="prev">
+    {% if page > 0 %}
+     <a href="?page={{page|add:"-1"}}">{% trans "«« Later" %}</a>
+    {% endif %}
+   </div>
+   <div class="list">
+    {% if page != 0 %}
+     <a href="?page=0">{% trans "Now" %}</a>
+    {% endif %}
+   </div>
+   <div class="next">
+    {% if history %}
+     <a href="?page={{page|add:"1"}}">{% trans "Earlier »»" %}</a>
+    {% endif %}
+   </div>
+  </div>
 
 {% endblock %}

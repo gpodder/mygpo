@@ -379,6 +379,7 @@ def migrate_subscription_action(old_action):
     action.timestamp = old_action.timestamp
     action.action = 'subscribe' if old_action.action == 1 else 'unsubscribe'
     action.device = get_or_migrate_device(old_action.device).id
+    action.device_oldid = old_action.device.id
     return action
 
 

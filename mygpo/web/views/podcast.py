@@ -126,15 +126,6 @@ def episode_list(podcast, user):
     the episode.
     """
 
-    def make_history_entry(action):
-        entry = HistoryEntry()
-        entry.timestamp = action['timestamp']
-        entry.episode_id = action['episode_id']
-        entry.device_oldid = action['device_oldid']
-        entry.podcast_id = action['podcast_id']
-        entry.action = action['action']
-        return entry
-
     episodes = podcast.get_episodes().order_by('-timestamp')
 
     new_user = migrate.get_or_migrate_user(user)
@@ -145,7 +136,7 @@ def episode_list(podcast, user):
 
     if user.is_authenticated():
         actions = new_podcast.get_episode_states(user.id)
-        actions = map(make_history_entry, actions)
+        actions = map(HistoryEntry.from_action_dict, actions)
         HistoryEntry.fetch_data(new_user, actions)
         episode_actions = dict( (action.episode_id, action) for action in actions)
     else:
@@ -153,9 +144,6 @@ def episode_list(podcast, user):
 
     for e in episodes:
         e_id = new_episodes.get(e.id, None)
-        if not e_id:
-            continue
-
         e.listeners = listeners.get(e_id, None)
         e.action = episode_actions.get(e_id, None)
 

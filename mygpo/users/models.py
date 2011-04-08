@@ -1,10 +1,11 @@
 import uuid, collections
 from datetime import datetime
+import dateutil.parser
 from itertools import imap
 from couchdbkit import ResourceNotFound
 from couchdbkit.ext.django.schema import *
 
-from mygpo.core.models import Podcast
+from mygpo.core.models import Podcast, Episode
 from mygpo.utils import linearize, get_to_dict
 from mygpo.decorators import repeat_on_conflict
 
@@ -420,6 +421,7 @@ class PodcastUserState(Document):
         action = SubscriptionAction()
         action.action = 'subscribe'
         action.device = device.id
+        action.device_oldid = device.oldid
         self.add_actions([action])
 
 
@@ -427,6 +429,7 @@ class PodcastUserState(Document):
         action = SubscriptionAction()
         action.action = 'unsubscribe'
         action.device = device.id
+        action.device_oldid = device.oldid
         self.add_actions([action])
 
 
@@ -717,8 +720,69 @@ class User(Document):
         return 'User %s' % self._id
 
 
+class History(object):
+
+    def __init__(self, user, device):
+        self.user = user
+        self.device = device
+        self._db = EpisodeUserState.get_db()
+
+        if device:
+            self._view = 'users/device_history'
+            self._startkey = [self.user.oldid, device.oldid, None]
+            self._endkey   = [self.user.oldid, device.oldid, {}]
+        else:
+            self._view = 'users/history'
+            self._startkey = [self.user.oldid, None]
+            self._endkey   = [self.user.oldid, {}]
+
+
+    def __getitem__(self, key):
+
+        if isinstance(key, slice):
+            start = key.start or 0
+            length = key.stop - start
+        else:
+            start = key
+            length = 1
+
+        res = self._db.view(self._view,
+                descending = True,
+                startkey   = self._endkey,
+                endkey     = self._startkey,
+                limit      = length,
+                skip       = start,
+            )
+
+        for action in res:
+            action = action['value']
+            yield HistoryEntry.from_action_dict(action)
+
+
+
 class HistoryEntry(object):
     """ A class that can represent subscription and episode actions """
+
+
+    @classmethod
+    def from_action_dict(cls, action):
+
+        entry = HistoryEntry()
+
+        if 'timestamp' in action:
+            ts = action.pop('timestamp')
+            entry.timestamp = dateutil.parser.parse(ts)
+
+        for key, value in action.items():
+            setattr(entry, key, value)
+
+        return entry
+
+
+    @property
+    def playmark(self):
+        return getattr(self, 'position', None)
+
 
     @classmethod
     def fetch_data(cls, user, entries):
@@ -728,6 +792,11 @@ class HistoryEntry(object):
         podcast_ids = [getattr(x, 'podcast_id', None) for x in entries]
         podcast_ids = filter(None, podcast_ids)
         podcasts = get_to_dict(Podcast, podcast_ids)
+
+        # load episode data
+        episode_ids = [getattr(x, 'episode_id', None) for x in entries]
+        episode_ids = filter(None, episode_ids)
+        episodes = get_to_dict(Episode, episode_ids)
 
         # load device data
         device_ids = [getattr(x, 'device_id', None) for x in entries]
@@ -741,6 +810,9 @@ class HistoryEntry(object):
         for entry in entries:
             podcast_id = getattr(entry, 'podcast_id', None)
             entry.podcast = podcasts.get(podcast_id, None)
+
+            episode_id = getattr(entry, 'episode_id', None)
+            entry.episode = episodes.get(episode_id, None)
             entry.user = user
 
             device = devices.get(getattr(entry, 'device_id', None), None) or \

@@ -290,7 +290,7 @@ def parse_range(s, min, max, default=None):
             return max
         return val
 
-    except ValueError:
+    except (ValueError, TypeError):
         return default if default is not None else (max-min)/2
 
 
