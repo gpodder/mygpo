@@ -4,7 +4,7 @@ function(doc)
     {
         for(n in podcast.urls)
         {
-            emit(podcast.urls[n], podcast);
+            emit(podcast.urls[n], null);
         }
     }
 

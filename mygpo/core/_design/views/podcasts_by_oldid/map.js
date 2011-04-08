@@ -4,7 +4,7 @@ function (doc)
     {
         if(doc.oldid)
         {
-            emit(doc.oldid, doc);
+            emit(doc.oldid, null);
         }
     }
     else if(doc.doc_type == "PodcastGroup")
@@ -13,7 +13,7 @@ function (doc)
         {
             if(doc.podcasts[i].oldid)
             {
-                emit(doc.podcasts[i].oldid, doc.podcasts[i]);
+                emit(doc.podcasts[i].oldid, null);
             }
         }
     }
