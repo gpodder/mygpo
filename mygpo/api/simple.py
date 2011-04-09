@@ -188,7 +188,7 @@ def set_subscriptions(urls, user, device_uid):
             p.unsubscribe(device)
         except Exception as e:
             log('Simple API: %(username)s: Could not remove subscription for podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
-                {'username': user.username, 'podcast_url': r, 'device_uid': device.id, 'exception': e})
+                {'username': user.username, 'podcast_url': r, 'device_id': device.id, 'exception': e})
 
     for n in new:
         p, created = Podcast.objects.get_or_create(url=n)
@@ -197,7 +197,7 @@ def set_subscriptions(urls, user, device_uid):
             p.subscribe(device)
         except Exception as e:
             log('Simple API: %(username)s: Could not add subscription for podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
-                {'username': user.username, 'podcast_url': r, 'device_uid': device.id, 'exception': e})
+                {'username': user.username, 'podcast_url': r, 'device_id': device.id, 'exception': e})
 
     # Only an empty response is a successful response
     return HttpResponse('', mimetype='text/plain')
