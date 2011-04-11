@@ -46,7 +46,8 @@ def episode(request, id):
         history = list(episode_state.get_history_entries())
         HistoryEntry.fetch_data(user, history)
 
-        played_parts = EpisodeHeatmap(podcast.get_id(), new_episode._id, user.oldid)
+        played_parts = EpisodeHeatmap(podcast.get_id(),
+                new_episode._id, user.oldid, duration=new_episode.duration)
 
     else:
         history = []

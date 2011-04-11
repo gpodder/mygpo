@@ -179,7 +179,8 @@ def episode(request, id):
 
     timeline_data = episode_listener_data(episode)
 
-    heatmap = EpisodeHeatmap(episode.podcast, episode._id)
+    heatmap = EpisodeHeatmap(episode.podcast, episode._id,
+              duration=episode.duration)
 
     return render_to_response('publisher/episode.html', {
         'episode': e,

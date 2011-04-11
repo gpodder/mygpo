@@ -21,7 +21,8 @@ from mygpo.users.models import EpisodeUserState
 class EpisodeHeatmap(object):
     """ Information about how often certain parts of Episodes are played """
 
-    def __init__(self, podcast_id, episode_id=None, user_oldid=None):
+    def __init__(self, podcast_id, episode_id=None, user_oldid=None,
+                 duration=None):
         """ Initialize a new Episode heatmap
 
         EpisodeHeatmap(podcast_id, [episode_id, [user_oldid]]) """
@@ -39,6 +40,7 @@ class EpisodeHeatmap(object):
                     'if episode_id is not None')
 
         self.user_oldid = user_oldid
+        self.duration = duration
         self.heatmap = None
         self.borders = None
 
@@ -68,6 +70,12 @@ class EpisodeHeatmap(object):
             res = r.first()['value']
             self.heatmap = res['heatmap']
             self.borders = res['borders']
+
+            # heatmap info doesn't reach until the end of the episode
+            # so we extend it with 0 listeners
+            if self.duration > self.borders[-1]:
+                self.heatmap.append(0)
+                self.borders.append(self.duration)
 
 
     def query_if_required():
