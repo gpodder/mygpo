@@ -131,18 +131,19 @@ class Podcast(Document):
 
     @classmethod
     def get_multi(cls, ids):
-        r = cls.view('core/podcasts_by_id',
+        db = Podcast.get_db()
+        r = db.view('core/podcasts_by_id',
                 keys=ids,
-                classes=[Podcast, PodcastGroup],
                 include_docs=True,
             )
 
-        if not r:
-            return None
-
-        podcasts = zip(ids, list(r))
-        return [podcast.get_podcast_by_id(id) for (id, podcast) in podcasts]
-
+        for res in r:
+            if res['doc']['doc_type'] == 'Podcast':
+                yield Podcast.wrap(res['doc'])
+            else:
+                pg = PodcastGroup.wrap(res['doc'])
+                id = res['key']
+                yield pg.get_podcast_by_id(id)
 
 
     @classmethod
