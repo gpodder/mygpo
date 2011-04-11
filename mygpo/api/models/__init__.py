@@ -261,7 +261,7 @@ class Device(models.Model):
         rem = changes[1]
 
         from mygpo.core import models
-        podcasts = utils.get_to_dict(models.Podcast, add + rem)
+        podcasts = utils.get_to_dict(models.Podcast, add + rem, get_id=models.Podcast.get_id)
 
         for podcast_id in add:
             podcast = podcasts[podcast_id]

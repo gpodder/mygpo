@@ -88,7 +88,7 @@ def create_subscriptionlist(request):
     podcast_ids= list(set(podcast_ids))
     device_ids = list(set(device_ids))
 
-    podcasts = get_to_dict(Podcast, podcast_ids)
+    podcasts = get_to_dict(Podcast, podcast_ids, get_id=Podcast.get_id)
     devices = dict([ (id, user.get_device(id)) for id in device_ids])
 
     subscription_list = {}

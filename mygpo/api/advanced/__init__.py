@@ -134,7 +134,7 @@ def get_subscription_changes(user, device, since, until):
     add, rem = device.get_subscription_changes(since, until)
 
     podcast_ids = add + rem
-    podcasts = get_to_dict(models.Podcast, podcast_ids)
+    podcasts = get_to_dict(models.Podcast, podcast_ids, get_id=models.Podcast.get_id)
 
     add_urls = [ podcasts[i].url for i in add]
     rem_urls = [ podcasts[i].url for i in rem]

@@ -598,7 +598,7 @@ class HistoryEntry(object):
 
         # load podcast data
         podcast_ids = [x.podcast_id for x in entries]
-        podcasts = get_to_dict(Podcast, podcast_ids)
+        podcasts = get_to_dict(Podcast, podcast_ids, get_id=Podcast.get_id)
 
         # load device data
         device_ids = [x.device_id for x in entries]
