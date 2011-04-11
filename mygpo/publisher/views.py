@@ -6,7 +6,8 @@ from mygpo.core import models
 from mygpo.api.models import Podcast, Episode, PodcastGroup
 from mygpo.publisher.auth import require_publisher, is_publisher
 from mygpo.publisher.forms import SearchPodcastForm, EpisodeForm, PodcastForm
-from mygpo.publisher.utils import listener_data, episode_listener_data, check_publisher_permission, subscriber_data, episode_heatmap
+from mygpo.publisher.utils import listener_data, episode_listener_data, check_publisher_permission, subscriber_data
+from mygpo.web.heatmap import EpisodeHeatmap
 from django.contrib.sites.models import RequestSite
 from mygpo.data.feeddownloader import update_podcasts
 from mygpo.decorators import requires_token, allowed_methods
@@ -71,6 +72,8 @@ def podcast(request, id):
 
     update_token = user.publisher_update_token
 
+    heatmap = EpisodeHeatmap(new_p.get_id())
+
     site = RequestSite(request)
 
     return render_to_response('publisher/podcast.html', {
@@ -80,6 +83,7 @@ def podcast(request, id):
         'timeline_data': timeline_data,
         'subscriber_data': subscription_data,
         'update_token': update_token,
+        'heatmap': heatmap,
         }, context_instance=RequestContext(request))
 
 
@@ -171,15 +175,17 @@ def episode(request, id):
     elif request.method == 'GET':
         form = EpisodeForm(instance=e)
 
-    timeline_data = episode_listener_data(e)
-    heatmap_data, part_length = episode_heatmap(e)
+    episode = migrate.get_or_migrate_episode(e)
+
+    timeline_data = episode_listener_data(episode)
+
+    heatmap = EpisodeHeatmap(episode.podcast, episode._id)
 
     return render_to_response('publisher/episode.html', {
         'episode': e,
         'form': form,
         'timeline_data': timeline_data,
-        'heatmap_data': heatmap_data if any([x > 0 for x in heatmap_data]) else None,
-        'heatmap_part_length': part_length,
+        'heatmap': heatmap,
         }, context_instance=RequestContext(request))
 
 

@@ -24,7 +24,6 @@ from django.contrib.auth.models import User
 from mygpo.utils import daterange, flatten
 from mygpo.core.models import Podcast
 from mygpo.api.models import Episode, EpisodeAction
-from mygpo.web.utils import flatten_intervals
 from mygpo.api.constants import DEVICE_TYPES
 from mygpo import migrate
 
@@ -80,7 +79,7 @@ def episode_listener_data(episode, start_date=date(2010, 1, 1), leap=timedelta(d
      * episode: the episode, if it was released on that day, otherwise None
     """
 
-    listeners = episode.listener_count_timespan()
+    listeners = list(episode.listener_count_timespan())
 
     # we always start at the first listen-event
     start = listeners[0][0]
@@ -88,12 +87,12 @@ def episode_listener_data(episode, start_date=date(2010, 1, 1), leap=timedelta(d
     for d in daterange(start, leap=leap):
         next = d + leap
 
-        if listeners[0][0] == d:
-            l, day = listeners.pop()
+        if listeners and listeners[0] and listeners[0][0] == d:
+            day, l = listeners.pop()
         else:
             l = 0
 
-        released = episode.timestamp and episode.timestamp >= d and episode.timestamp <= next
+        released = episode.released and episode.released >= d and episode.released <= next
         released_episode = episode if released else None
 
         yield dict(date=d, listeners=l, episode=released_episode)
@@ -125,75 +124,6 @@ def check_publisher_permission(user, podcast):
         return True
 
     return False
-
-
-def episode_heatmap(episode, max_part_num=30, min_part_length=10):
-    """
-    Generates "Heatmap Data" for the given episode
-
-    The episode is split up in parts having max 'max_part_num' segments which
-    are all of the same length, minimum 'min_part_length' seconds.
-
-    For each segment, the number of users that have played it (at least
-    partially) is calculated and returned
-    """
-
-    episode_actions = EpisodeAction.objects.filter(episode=episode, action='play')
-
-    duration = episode.duration or episode_actions.aggregate(duration=Avg('total'))['duration']
-
-    if not duration:
-        return [0], 0
-
-    part_length = max(min_part_length, int(duration / max_part_num))
-
-    part_num = int(duration / part_length)
-
-    heatmap = [0]*part_num
-
-    user_ids = [x['user'] for x in episode_actions.values('user').distinct()]
-    for user_id in user_ids:
-        actions = episode_actions.filter(user__id=user_id, playmark__isnull=False, started__isnull=False)
-        if actions.exists():
-            played_parts = flatten_intervals(actions)
-            user_heatmap = played_parts_to_heatmap(played_parts, part_length, part_num)
-            heatmap = [sum(pair) for pair in zip(heatmap, user_heatmap)]
-
-    return heatmap, part_length
-
-
-def played_parts_to_heatmap(played_parts, part_length, part_count):
-    """
-    takes the (flattened) parts of an episode that a user has played, and
-    generates a heatmap data for this user.
-
-    The result is a list with part_count elements, each having a value
-    of either 0 (user has not played that part) or 1 (user has at least
-    partially played that part)
-
-    >>> played_parts_to_heatmap([{'start': 0, 'end': 3}, {'start': 6, 'end': 8}], 1, 10)
-    [1, 1, 1, 1, 0, 1, 1, 1, 1, 0]
-    """
-    parts = [0]*part_count
-
-    if not played_parts:
-        return parts
-
-    part_iter = iter(played_parts)
-    current_part = part_iter.next()
-
-    for i in range(0, part_count):
-        part = i * part_length
-        while current_part['end'] < part:
-            try:
-                current_part = part_iter.next()
-            except StopIteration:
-                return parts
-
-        if current_part['start'] <= (part + part_length) and current_part['end'] >= part:
-            parts[i] += 1
-
-    return parts
 
 
 def colour_repr(val, max_val, colours):

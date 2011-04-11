@@ -22,10 +22,10 @@ from mygpo.core import models
 from mygpo.api.models import Podcast, Episode
 from mygpo.users.models import Chapter, HistoryEntry
 from mygpo.api import backend
-from mygpo.web.utils import get_played_parts
 from mygpo.decorators import manual_gc
 from mygpo.utils import parse_time
 from mygpo import migrate
+from mygpo.web.heatmap import EpisodeHeatmap
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.contrib.sites.models import RequestSite
@@ -34,25 +34,24 @@ from django.contrib.sites.models import RequestSite
 def episode(request, id):
     episode = get_object_or_404(Episode, pk=id)
     new_episode = migrate.get_or_migrate_episode(episode)
+    podcast = migrate.get_or_migrate_podcast(episode.podcast)
 
     if request.user.is_authenticated():
 
         user = migrate.get_or_migrate_user(request.user)
 
-        new_ep  = migrate.get_or_migrate_episode(episode)
-        episode_state = new_ep.get_user_state(request.user)
+        episode_state = new_episode.get_user_state(request.user)
         is_fav = episode_state.is_favorite()
 
         history = list(episode_state.get_history_entries())
         HistoryEntry.fetch_data(user, history)
 
-        played_parts, duration = get_played_parts(request.user, episode)
+        played_parts = EpisodeHeatmap(podcast.get_id(), new_episode._id, user.oldid)
 
     else:
         history = []
         is_fav = False
         played_parts = None
-        duration = episode.duration
 
 
     chapters = []
@@ -83,7 +82,6 @@ def episode(request, id):
         'chapters': chapters,
         'is_favorite': is_fav,
         'played_parts': played_parts,
-        'duration': duration
     }, context_instance=RequestContext(request))
 
 

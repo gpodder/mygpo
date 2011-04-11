@@ -67,5 +67,15 @@
    {{ subscriber_data|bar_chart }}
   {% endif %}
 
+  {% if heatmap %}
+    <h3>Heatmap</h3>
+    <div>
+     {% trans "This diagram shows which parts of the podcast's episodes are listened the most by users." %}
+     {% trans "Red parts are often skipped, green parts never." %}
+    </div>
+    {{ heatmap|episode_heatmap_visualization }}
+  {% endif %}
+
+
 {% endblock %}
 

@@ -9,6 +9,7 @@
 {% load youtube %}
 {% load flickr %}
 {% load facebook %}
+{% load charts %}
 
 {% load menu %}
 {% block mainmenu %}{{ "/podcast/"|main_menu }}{% endblock %}
@@ -85,7 +86,7 @@
 
    {% if played_parts %}
     <h3>Already played</h3>
-    {{ played_parts|played_visualization:duration }}
+    {{ played_parts|episode_heatmap_visualization }}
    {% endif %}
 
 

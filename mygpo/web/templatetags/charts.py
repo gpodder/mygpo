@@ -1,5 +1,8 @@
 from django import template
 from django.utils.safestring import mark_safe
+from mygpo.utils import format_time
+from mygpo.publisher.utils import colour_repr
+
 
 register = template.Library()
 
@@ -73,3 +76,63 @@ def pie_chart(parts):
 
     return mark_safe(s)
 
+
+@register.filter
+def episode_heatmap_visualization(heatmap):
+    """
+    display a visual heatmap using the Google Charts API
+
+    heatmap_data is expected as an array of numbers of users that have
+    played this part part of the episode. the length of the parts is
+    indicated by step_length; the duration of the whole episode is
+    therefore approximated by len(heatmap_data) * step_length
+    """
+    label_steps = 2
+
+    max_plays = heatmap.max_plays
+
+    if max_plays == 1:
+        #              light blue       dark blue
+        colours = ( (198, 217, 253), (77, 137, 249) )
+    else:
+        #               red            yellow         green
+        colours = ( (210, 54, 28), (239, 236, 22), (15, 212, 18) )
+
+    WIDTH=760
+
+    # maximum number of labels that will be placed on the visualization
+    MAX_LABELS=20
+
+    axis_pos = []
+    axis_label = []
+    part_colours = []
+    widths = []
+    duration = max(heatmap.borders)
+
+    last_label = None
+    for start, end, plays in heatmap.sections:
+
+        if last_label is None or (end-last_label) > (duration/MAX_LABELS):
+            axis_pos.append(end)
+            axis_label.append(format_time(end))
+            last_label = end
+
+        rgb = colour_repr(plays, max_plays, colours)
+        part_colours.append('%02x%02x%02x' % rgb)
+        widths.append( end-start )
+
+    parts = [
+        'cht=bhs',                           #bar chart
+        'chco=%s' % ','.join(part_colours),  #colors
+        'chs=%dx50' % WIDTH,                 #width corresponds to length, arbitrary height
+        'chds=0,%s' % duration,              #axis scaling from 0 to maximum duration
+        'chd=t:%s' % '|'.join([repr(w) for w in widths]),  # all block have the same width
+        'chxt=x',                            #visible axes
+        'chxr=0,0,%s' % duration,            #axis range for axis 0 (x): 0 - duration
+        'chxl=0:|%s' % '|'.join(axis_label), #axis labels
+        'chxp=0,%s' % ','.join([repr(x) for x in axis_pos]),   #axis label positions
+        ]
+
+    s = '<img src="http://chart.apis.google.com/chart?%s"' % '&'.join(parts)
+
+    return mark_safe(s)
