@@ -25,6 +25,7 @@ class Episode(Document):
     oldid = IntegerProperty()
     urls = StringListProperty()
     podcast = StringProperty(required=True)
+    listeners = IntegerProperty()
 
 
     @classmethod
@@ -89,6 +90,17 @@ class Episode(Document):
             listeners = res['value']
             yield (date, listeners)
 
+
+    @classmethod
+    def count(cls):
+        r = cls.view('core/episodes_by_podcast', limit=0)
+        return r.total_rows
+
+
+    @classmethod
+    def all(cls):
+        return utils.multi_request_view(cls, 'core/episodes_by_podcast',
+                include_docs=True)
 
     def __eq__(self, other):
         if other == None:
