@@ -14,19 +14,14 @@ function(doc)
 
     if(doc.doc_type == "EpisodeUserState")
     {
-        days = [];
-
-        for(n in doc.actions)
+        for(n=doc.actions.length-1; n>=0; n--)
         {
             action = doc.actions[n];
             if(action.action == "play")
             {
                 day = action.timestamp.slice(0, 10);
-                if(!contains(days, day))
-                {
-                    emit([doc.episode, day], null);
-                    days.push(day);
-                }
+                emit([doc.episode, day], doc.user_oldid);
+                return;
             }
         }
     }

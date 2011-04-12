@@ -276,8 +276,8 @@ class Podcast(Document):
 
         from mygpo.users.models import EpisodeUserState
         r = EpisodeUserState.view('users/listeners_by_podcast',
-                startkey    = [self.get_id(), None, None],
-                endkey      = [self.get_id(), {}, {}],
+                startkey    = [self.get_id(), None],
+                endkey      = [self.get_id(), {}],
                 group       = True,
                 group_level = 1,
                 reduce      = True,
@@ -290,8 +290,8 @@ class Podcast(Document):
 
         from mygpo.users.models import EpisodeUserState
         r = EpisodeUserState.view('users/listeners_by_podcast',
-                startkey    = [self.get_id(), start, None],
-                endkey      = [self.get_id(), end,  {}],
+                startkey    = [self.get_id(), start],
+                endkey      = [self.get_id(), end],
                 group       = True,
                 group_level = 2,
                 reduce      = True,
@@ -308,8 +308,8 @@ class Podcast(Document):
 
         from mygpo.users.models import EpisodeUserState
         r = EpisodeUserState.view('users/listeners_by_podcast_episode',
-                startkey    = [self.get_id(), None, None, None],
-                endkey      = [self.get_id(), {}, {}, {}],
+                startkey    = [self.get_id(), None, None],
+                endkey      = [self.get_id(), {},   {}],
                 group       = True,
                 group_level = 2,
                 reduce      = True,
