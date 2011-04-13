@@ -26,6 +26,7 @@ class Episode(Document):
     urls = StringListProperty()
     podcast = StringProperty(required=True)
     listeners = IntegerProperty()
+    content_types = StringListProperty()
 
 
     @classmethod
