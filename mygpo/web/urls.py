@@ -31,7 +31,8 @@ urlpatterns += patterns('mygpo.web.views.subscriptions',
 )
 
 urlpatterns += patterns('mygpo.web.views.podcast',
- url(r'^podcast/(?P<pid>\w+)$',                                   'show',          name='podcast'),
+ url(r'^podcast/(?P<pid>\d+)$',                                   'show',          name='podcast'),
+ url(r'^podcast/(?P<slug>[\w-]+)/$',                              'show_slug',     name='podcast-slug'),
  url(r'^subscribe',                                               'subscribe_url', name='subscribe-by-url'),
  url(r'^podcast/(?P<pid>\w+)/subscribe$',                         'subscribe',     name='subscribe'),
  url(r'^podcast/(?P<pid>\w+)/unsubscribe/(?P<device_id>\d+)',     'unsubscribe',   name='unsubscribe'),
@@ -43,6 +44,7 @@ urlpatterns += patterns('mygpo.web.views.podcast',
 
 urlpatterns += patterns('mygpo.web.views.episode',
  url(r'^episode/(?P<id>\d+)$',                                    'episode',       name='episode'),
+ url(r'^podcast/(?P<p_slug>[\w-]+)/(?P<e_slug>[\w-]+)$',          'show_slug',     name='episode_slug'),
  url(r'^episode/(?P<id>\d+)/add-chapter$',                        'add_chapter',   name='add-chapter'),
  url(r'^episode/(?P<id>\d+)/remove-chapter/(?P<start>\d+)-(?P<end>\d+)$', 'remove_chapter',name='remove-chapter'),
  url(r'^episode/(?P<id>\d+)/toggle-favorite',                     'toggle_favorite',name='episode-fav'),

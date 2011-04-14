@@ -38,6 +38,19 @@ from django.contrib.sites.models import RequestSite
 from mygpo.api.constants import EPISODE_ACTION_TYPES
 from mygpo.decorators import repeat_on_conflict
 
+
+
+def show_slug(request, p_slug, e_slug):
+    podcast = models.Podcast.for_slug(p_slug)
+    ep = podcast.get_episode_for_slug(e_slug)
+
+    if p_slug != podcast.slug or e_slug != ep.slug:
+        target = reverse('episode_slug', args=[podcast.slug, ep.slug])
+        return HttpResponseRedirect(target)
+
+    return episode(request, ep.oldid)
+
+
 @manual_gc
 def episode(request, id):
     episode = get_object_or_404(Episode, pk=id)

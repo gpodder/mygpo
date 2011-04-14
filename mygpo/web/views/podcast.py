@@ -8,7 +8,8 @@ from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
 from django.utils.translation import ugettext as _
-from mygpo.api.models import Podcast, Episode, Device, SyncGroup
+from mygpo.core import models
+from mygpo.api.models import Podcast, Episode, EpisodeAction, Device, SyncGroup
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.users.models import EpisodeAction, HistoryEntry
 from mygpo.web.forms import PrivacyForm, SyncForm
@@ -25,6 +26,17 @@ MAX_TAGS_ON_PAGE=50
 def update_podcast_settings(state, is_public):
     state.settings['public_subscription'] = is_public
     state.save()
+
+
+@allowed_methods(['GET'])
+def show_slug(request, slug):
+    podcast = models.Podcast.for_slug(slug)
+
+    if slug != podcast.slug:
+        target = reverse('podcast_slug', args=[podcast.slug])
+        return HttpResponseRedirect(target)
+
+    return show(request, podcast.oldid)
 
 
 @allowed_methods(['GET'])
