@@ -28,6 +28,7 @@ class Episode(Document):
     listeners = IntegerProperty()
     content_types = StringListProperty()
     slug = StringProperty()
+    merged_slugs = StringListProperty()
 
 
     @classmethod
@@ -180,6 +181,7 @@ class Podcast(Document):
     content_types = StringListProperty()
     tags = DictProperty()
     slug = StringProperty()
+    merged_slugs = StringListProperty()
 
 
     @classmethod

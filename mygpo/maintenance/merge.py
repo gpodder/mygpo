@@ -92,6 +92,7 @@ def merge_podcasts(podcast, p, dry_run):
     @repeat_on_conflict(['podcast'], reload_f=lambda p: Podcast.get(p.get_id()))
     def do_merge(podcast, p):
         podcast.merged_ids       = list(set(podcast.merged_ids + [p.get_id()] + p.merged_ids))
+        podcast.merged_slugs     = list(set(podcast.merged_slugs + [p.slug] + p.merged_slugs))
         podcast.related_podcasts = list(set(podcast.related_podcasts + p.related_podcasts))
         podcast.content_types    = list(set(podcast.content_types + p.content_types))
 
@@ -158,6 +159,7 @@ def similar_oldid(o1, o2):
 def merge_episodes(episode, e, dry_run):
     episode.urls = list(set(episode.urls + e.urls))
     episode.merged_ids = list(set(episode.merged_ids + [e.id] + e.merged_ids))
+    episode.merged_slugs = list(set(episode.merged_slugs + [e.slug] + e.merged_slugs))
 
     @repeat_on_conflict(['e'])
     def delete(e):

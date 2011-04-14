@@ -6,6 +6,14 @@ function (doc)
         {
             emit([podcast.slug, podcast_id], null);
         }
+
+        if(podcast.merged_slugs)
+        {
+            for(m in podcast.merged_slugs)
+            {
+                emit([podcast.merged_slugs[m], podcast_id], null);
+            }
+        }
     }
 
     if(doc.doc_type == "Podcast")
