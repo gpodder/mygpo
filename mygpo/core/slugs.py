@@ -2,7 +2,7 @@ from itertools import count
 
 from django.template.defaultfilters import slugify
 
-from mygpo.core.models import Podcast, PodcastGroup
+from mygpo.core.models import Podcast, PodcastGroup, Episode
 
 
 class SlugGenerator(object):
@@ -76,16 +76,37 @@ class PodcastSlug(SlugGenerator):
         return base_slug
 
 
-class PodcastsMissingSlugs(object):
-    """ A collections of all podcasts missing a slug """
+class EpisodeSlug(SlugGenerator):
+    """ Generates slugs for Episodes """
 
-    def __init__(self):
-        self.db = Podcast.get_db()
+    def __init__(self, episode):
+        super(EpisodeSlug, self).__init__(episode)
+        self.podcast_id = episode.podcast
+
+
+    def _get_existing_slugs(self):
+        """ Episode slugs have to be unique within the Podcast """
+
+        db = Episode.get_db()
+        res = db.view('core/episodes_by_slug',
+                startkey = [self.podcast_id, self.base_slug],
+                endkey   = [self.podcast_id, self.base_slug + 'ZZZZZ']
+            )
+        return [r['key'][1] for r in res]
+
+
+class ObjectsMissingSlugs(object):
+    """ A collections of objects missing a slug """
+
+    def __init__(self, cls, wrapper=None):
+        self.db = cls.get_db()
+        self.doc_type = cls._doc_type
+        self.wrapper = wrapper
 
     def __len__(self):
         res = self.db.view('maintenance/missing_slugs',
-                startkey     = ['Podcast', {}],
-                endkey       = ['Podcast', None],
+                startkey     = [self.doc_type, {}],
+                endkey       = [self.doc_type, None],
                 descending   = True,
                 reduce       = True,
                 group        = True,
@@ -96,18 +117,39 @@ class PodcastsMissingSlugs(object):
 
     def __iter__(self):
         res = self.db.view('maintenance/missing_slugs',
-                startkey     = ['Podcast', {}],
-                endkey       = ['Podcast', None],
+                startkey     = [self.doc_type, {}],
+                endkey       = [self.doc_type, None],
                 descending   = True,
                 include_docs = True,
                 reduce       = False,
+                wrapper      = self.wrapper,
             )
+        return res.iterator()
 
-        for r in res:
-            doc = r['doc']
-            if doc['doc_type'] == 'Podcast':
-                yield Podcast.wrap(doc)
-            else:
-                pid = r['key'][2]
-                pg = PodcastGroup.wrap(doc)
-                yield pg.get_podcast_by_id(pid)
+
+class PodcastsMissingSlugs(ObjectsMissingSlugs):
+    """ Podcasts that don't have a slug (but could have one) """
+
+    def __init__(self):
+        super(PodcastsMissingSlugs, self).__init__(Podcast, self._podcast_wrapper)
+
+    @staticmethod
+    def _podcast_wrapper(r):
+        doc = r['doc']
+        if doc['doc_type'] == 'Podcast':
+            return Podcast.wrap(doc)
+        else:
+            pid = r['key'][2]
+            pg = PodcastGroup.wrap(doc)
+            return pg.get_podcast_by_id(pid)
+
+
+class EpisodesMissingSlugs(ObjectsMissingSlugs):
+    """ Episodes that don't have a slug (but could have one) """
+
+    def __init__(self):
+        super(EpisodesMissingSlugs, self).__init__(Episode, self._episode_wrapper)
+
+    @staticmethod
+    def _episode_wrapper(r):
+        return Episode.wrap(r['doc'])

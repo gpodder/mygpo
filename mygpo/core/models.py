@@ -27,6 +27,7 @@ class Episode(Document):
     podcast = StringProperty(required=True)
     listeners = IntegerProperty()
     content_types = StringListProperty()
+    slug = StringProperty()
 
 
     @classmethod
@@ -50,6 +51,15 @@ class Episode(Document):
     def for_oldid(self, oldid):
         r = Episode.view('core/episodes_by_oldid', key=oldid, limit=1, include_docs=True)
         return r.one() if r else None
+
+
+    @classmethod
+    def for_slug(cls, podcast_id, slug):
+        r = cls.view('core/episodes_by_slug',
+                key          = [podcast_id, slug],
+                include_docs = True
+            )
+        return r.first()
 
 
     def get_old_obj(self):
@@ -272,6 +282,10 @@ class Podcast(Document):
 
     def get_episodes(self):
         return list(Episode.view('core/episodes_by_podcast', key=self.get_id(), include_docs=True))
+
+
+    def get_episode_for_slug(self, slug):
+        return Episode.for_slug(self.get_id(), slug)
 
 
     @property
