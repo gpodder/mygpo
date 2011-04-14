@@ -169,6 +169,7 @@ class Podcast(Document):
     language = StringProperty()
     content_types = StringListProperty()
     tags = DictProperty()
+    slug = StringProperty()
 
 
     @classmethod
@@ -184,6 +185,28 @@ class Podcast(Document):
 
         podcast_group = r.first()
         return podcast_group.get_podcast_by_id(id)
+
+
+    @classmethod
+    def for_slug(cls, slug):
+        db = cls.get_db()
+        r = db.view('core/podcasts_by_slug',
+                startkey     = [slug, None],
+                endkey       = [slug, {}],
+                include_docs = True,
+            )
+
+        if not r:
+            return None
+
+        res = r.first()
+        doc = res['doc']
+        if doc['doc_type'] == 'Podcast':
+            return Podcast.wrap(doc)
+        else:
+            pid = res['key'][1]
+            pg = PodcastGroup.wrap(doc)
+            return pg.get_podcast_by_id(pid)
 
 
     @classmethod
