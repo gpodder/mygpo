@@ -88,7 +88,7 @@ def delete_device_signal(sender, instance=False, **kwargs):
         return
 
     user = get_or_migrate_user(instance.user)
-    dev = get_or_migrate_device(instance)
+    dev = get_or_migrate_device(instance, user=user)
     user.remove_device(dev)
     user.save()
 
@@ -350,11 +350,11 @@ def get_or_migrate_user(user):
 
 
 def get_or_migrate_device(device, user=None):
-    return Device.for_oldid(device.id) or create_device(device)
+    return Device.for_oldid(device.id) or create_device(device, user=user)
 
 
-def create_device(oldd, sparse=False):
-    user = get_or_migrate_user(oldd.user)
+def create_device(oldd, sparse=False, user=None):
+    user = user or get_or_migrate_user(oldd.user)
 
     d = Device()
     d.oldid = oldd.id
