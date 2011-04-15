@@ -105,36 +105,6 @@ def get_toplist(count, languages=None, types=None):
     return [(prev.index(p)+1 if p in prev else 0, p) for p in cur]
 
 
-def get_episode_toplist(count, languages=None, types=None):
-    """Returns the first num entries of the episode toplist with the given search criteria"""
-
-    # if we include all "known" types, ignore this criteria
-    # this will then include all types, also unknown ones
-    if types and len(types) == len(CONTENT_TYPES):
-        types = None
-
-    entries = EpisodeToplistEntry.objects.all()
-
-    if languages:
-        regex = '^(' + '|'.join(languages) + ')'
-        entries = entries.filter(episode__podcast__language__regex=regex)
-
-    if types:
-        # we can just use a regex here, because searching for the right "type" of an
-        # episode is more complex; we first look for all podcasts with the right type
-        # and then look through their episodes
-        type_regex = '.*(' + '|'.join(types) + ').*'
-        entries = entries.filter(episode__podcast__content_types__regex=type_regex)
-        entry_list = []
-        for e in entries:
-            if e.episode.mimetype and get_type(e.episode.mimetype) in types:
-                entry_list.append(e)
-
-            if len(entry_list) >= count:
-                break
-
-    return entries[:count]
-
 
 def merge_toplists(podcast_entries, group_entries, sortkey, reverse, count=None):
     """
