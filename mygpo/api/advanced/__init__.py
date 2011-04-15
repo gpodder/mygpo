@@ -45,6 +45,11 @@ except ImportError:
     import json
 
 
+# keys that are allowed in episode actions
+EPISODE_ACTION_KEYS = ('position', 'episode', 'action', 'device', 'timestamp',
+                       'started', 'total', 'podcast')
+
+
 @csrf_exempt
 @require_valid_user
 @check_username
@@ -216,13 +221,20 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
     def clean_data(action):
         action['podcast'] = action['podcast_url']
         action['episode'] = action['episode_url']
-        del action['podcast']
-        del action['episode']
-        del action['podcast_id']
-        del action['episode_id']
+
         if 'device_oldid' in action:
             action['device'] = devices[action['device_oldid']]
             del action['device_oldid']
+
+        # remove superfluous keys
+        for x in action.keys():
+            if x not in EPISODE_ACTION_KEYS:
+                del action[x]
+
+        # set missing keys to None
+        for x in EPISODE_ACTION_KEYS:
+            if x not in action:
+                action[x] = None
 
         return action
 
