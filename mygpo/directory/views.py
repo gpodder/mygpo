@@ -4,11 +4,10 @@ from django.template import RequestContext
 from django.contrib.sites.models import RequestSite
 from django.views.decorators.cache import cache_page
 
-from mygpo.api import backend
 from mygpo.data.mimetype import CONTENT_TYPES
 from mygpo.decorators import manual_gc
 from mygpo.directory.models import Category
-from mygpo.directory.toplist import EpisodeToplist
+from mygpo.directory.toplist import PodcastToplist, EpisodeToplist
 from mygpo.directory.search import search_podcasts
 from mygpo.web import utils
 
@@ -23,12 +22,10 @@ def toplist(request, num=100, lang=None):
 
     type_str = request.GET.get('types', '')
     set_types = [t for t in type_str.split(',') if t]
-    if set_types:
-        media_types = dict([(t, t in set_types) for t in CONTENT_TYPES])
-    else:
-        media_types = dict([(t, True) for t in CONTENT_TYPES])
+    media_types = set_types or CONTENT_TYPES
 
-    entries = backend.get_toplist(num, lang, set_types)
+    toplist = PodcastToplist(lang, media_types)
+    entries = toplist[:num]
 
     max_subscribers = max([p.subscriber_count() for (oldp, p) in entries]) if entries else 0
     current_site = RequestSite(request)
@@ -138,7 +135,7 @@ def episode_toplist(request, num=100):
 
     media_types = set_types or CONTENT_TYPES
 
-    toplist = EpisodeToplist(types=media_types, languages=lang)
+    toplist = EpisodeToplist(languages=lang, types=media_types)
     entries = toplist[:num]
 
     current_site = RequestSite(request)

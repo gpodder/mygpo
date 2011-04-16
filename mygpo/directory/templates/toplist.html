@@ -31,9 +31,9 @@
 
   <p>
    {% if languages|length_is:"0" %}
-    {% blocktrans with entries|length as count and types|filter_dict|join:", " as media_types %}These are the {{ count }} most subscribed {{ media_types }} podcasts of all languages.{% endblocktrans %}
+    {% blocktrans with entries|length as count and types|join:", " as media_types %}These are the {{ count }} most subscribed {{ media_types }} podcasts of all languages.{% endblocktrans %}
    {% else %}
-    {% blocktrans with entries|length as count and all_languages|lookup_list:languages|join:", " as lang and types|filter_dict|join:", " as media_types %}These are the {{ count }} most subscribed {{ media_types }} podcasts for the languages {{ lang }}.{% endblocktrans %}
+    {% blocktrans with entries|length as count and all_languages|lookup_list:languages|join:", " as lang and types|join:", " as media_types %}These are the {{ count }} most subscribed {{ media_types }} podcasts for the languages {{ lang }}.{% endblocktrans %}
    {% endif %}
    <a href="#" id="open-config">({% trans "change"%})</a>
   </p>
@@ -43,7 +43,7 @@
   {% if languages|length_is:"0" %}
    <div>{% trans "Currently showing all languages." %}<br />
     {% trans "Show a specific one:" %}
-    <form action="{% url toplist %}?lang={{ languages|join:"," }}&types={{ types|filter_dict|join:"," }}" method="post">
+    <form action="{% url toplist %}?lang={{ languages|join:"," }}&types={{ types|join:"," }}" method="post">
      {% csrf_token %}
      <select name="lang">
       {% for key, name in all_languages.iteritems %}
@@ -58,11 +58,11 @@
     <ul>
      {% for lang in languages %}
       <li>
-       <a href="{% url toplist %}?lang={{ languages|remove:lang|join:"," }}&types={{ types|filter_dict|join:"," }}">{{ all_languages|lookup:lang }}</a>
+       <a href="{% url toplist %}?lang={{ languages|remove:lang|join:"," }}&types={{ types|join:"," }}">{{ all_languages|lookup:lang }}</a>
       </li>
      {% endfor %}
     </ul>
-    <form action="{% url toplist %}?lang={{ languages|join:"," }}&types={{ types|filter_dict|join:"," }}" method="post">
+    <form action="{% url toplist %}?lang={{ languages|join:"," }}&types={{ types|join:"," }}" method="post">
      {% csrf_token %}
      <select name="lang">
       {% for key, name in all_languages.iteritems %}
@@ -75,18 +75,18 @@
     </form>
 
     {% url toplist as toplist-url %}
-    {% blocktrans with types|filter_dict|join:"," as type_param %}or show <a href="{{ toplist-url }}?lang=&types={{ type_param }}">all languages</a>.{% endblocktrans %}
+    {% blocktrans with types|join:"," as type_param %}or show <a href="{{ toplist-url }}?lang=&types={{ type_param }}">all languages</a>.{% endblocktrans %}
    </div>
   {% endif %}
  </div>
 
  <div class="config-toplist">
   <h3>Media Types</h3>
-  {% for type, enabled in types.iteritems %}
-   {% if enabled %}
-    <a class="activated" href="{% url toplist %}?lang={{ languages|join:"," }}&types={{ types|filter_dict|remove:type|join:"," }} ">{{ type }}</a>
+  {% for type in all_types %}
+   {% if type in types %}
+    <a class="activated" href="{% url toplist %}?lang={{ languages|join:"," }}&types={{ types|remove:type|join:"," }} ">{{ type }}</a>
    {% else %}
-    <a class="deactivated" href="{% url toplist %}?lang={{ languages|join:"," }}&types={{ types|filter_dict|append:type|join:"," }}">{{ type }}</a>
+    <a class="deactivated" href="{% url toplist %}?lang={{ languages|join:"," }}&types={{ types|append:type|join:"," }}">{{ type }}</a>
    {% endif %}
   {% endfor %}
  </div>
@@ -128,4 +128,3 @@
 
   <div class="info"><strong>Get the toplist from your Client</strong>! Access <a href="{% url toplist-opml 30 "opml" %}">http://{{ url }}{% url toplist-opml 30 "opml" %}</a> for the Top-30.</div>
 {% endblock %}
-

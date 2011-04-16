@@ -25,6 +25,7 @@ from django.contrib.auth.models import User
 from django.template import RequestContext
 from mygpo.core import models
 from mygpo.directory import tags
+from mygpo.directory.toplist import PodcastToplist
 from mygpo.users.models import Rating, Suggestions, History, HistoryEntry
 from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, UserProfile
 from mygpo.users.models import PodcastUserState
@@ -63,7 +64,8 @@ def welcome(request, toplist_entries=10):
     except utils.UpdatedException, updated:
         lang = []
 
-    entries = backend.get_toplist(toplist_entries, lang)
+    toplist = PodcastToplist(lang)
+    entries = toplist[:toplist_entries]
 
     toplist = [p for (oldpos, p) in entries]
 
