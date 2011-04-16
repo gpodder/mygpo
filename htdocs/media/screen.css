@@ -52,7 +52,7 @@ img
     background-color: white;
     padding: 5px;
     text-align: right;
-    background-image: url(logininfo-bottomleft.png);
+    background-image: url('logininfo-bottomleft.png');
     background-repeat: no-repeat;
     background-position: bottom left;
 }
@@ -157,8 +157,8 @@ ul.menu li {
 
 ul.menu.primary li.selected {
     background-color: #777;
-    background-image: url(navcaps/primary-top-left.png),
-                      url(navcaps/primary-top-right.png);
+    background-image: url('navcaps/primary-top-left.png'),
+                      url('navcaps/primary-top-right.png');
     background-position: top left, top right;
     background-repeat: no-repeat;
     text-shadow: 0px 0px 4px #333;
@@ -179,9 +179,9 @@ ul.menu.secondary li.selected {
     position: relative;
     top: 1px;
     background-color: white;
-    background-image: url(navcaps/secondary-top-left.png),
-                      url(navcaps/secondary-top-right.png),
-                      url(navcaps/secondary-bg-gradient.png);
+    background-image: url('navcaps/secondary-top-left.png'),
+                      url('navcaps/secondary-top-right.png'),
+                      url('navcaps/secondary-bg-gradient.png');
     background-position: top left, top right, top left;
     background-repeat: no-repeat, no-repeat, repeat-x;
     text-shadow: 0px 0px 4px #777;
@@ -701,7 +701,7 @@ div.tag-list
 
 input.subscribe
 {
-    background: url(/media/subscribe.png) no-repeat;
+    background: url('/media/subscribe.png') no-repeat;
     cursor: pointer;
     width: 22px;
     height: 22px;
@@ -711,7 +711,7 @@ input.subscribe
 input.blacklist
 {
     margin: 11px 0 0 0;
-    background: url(/media/unsubscribe.png) no-repeat;
+    background: url('/media/unsubscribe.png') no-repeat;
     cursor: pointer;
     width: 22px;
     height: 22px;
