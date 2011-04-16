@@ -83,7 +83,7 @@ class EpisodeAction(DocumentSchema):
         entry.device_oldid = self.device_oldid
         entry.device_id = self.device
         entry.started = self.started
-        entry.playmark = self.playmark
+        entry.position = self.playmark
         entry.total = self.total
         return entry
 
