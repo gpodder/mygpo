@@ -138,7 +138,7 @@ class EpisodeUserState(Document):
             podcast = Podcast.get(episode.podcast)
 
             state = EpisodeUserState()
-            state.episode = podcast.get_id()
+            state.episode = episode._id
             state.podcast = episode.podcast
             state.user_oldid = user.id
             state.ref_url = episode.url
