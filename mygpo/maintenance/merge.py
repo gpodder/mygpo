@@ -279,9 +279,10 @@ def find_new_episode_id(podcast, merged_id):
     return None
 
 
-def merge_episode_states(state, other_state, podcast_state):
+def merge_episode_states(state, other_state, podcast_state=None):
     state.add_actions(other_state.actions)
     state.settings.update(other_state.settings)
     state.merged_ids = list(set(state.merged_ids + [other_state._id] + other_state.merged_ids))
-    if other_state.episode in podcast_state.episodes:
+    state.chapters = list(set(state.chapters + other_state.chapters))
+    if podcast_state and (other_state.episode in podcast_state.episodes):
         del podcast_state.episodes[other_state.episode]
