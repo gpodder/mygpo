@@ -58,9 +58,13 @@ class Category(Document):
         self.podcasts = new_entries
 
 
+    def get_podcast_ids(self, start=0, end=20):
+        return [e.podcast for e in self.podcasts[start:end]]
+
+
     def get_podcasts(self, start=0, end=20):
-        podcast_ids = [e.podcast for e in self.podcasts[start:end]]
-        return Podcast.get_multi(podcast_ids)
+        return Podcast.get_multi(self.get_podcast_ids(start, end))
+
 
 
     def save(self, *args, **kwargs):

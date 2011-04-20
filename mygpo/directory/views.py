@@ -5,12 +5,14 @@ from django.contrib.sites.models import RequestSite
 from django.views.decorators.cache import cache_page
 
 from mygpo.api import backend
+from mygpo.core.models import Podcast
 from mygpo.data.mimetype import CONTENT_TYPES
 from mygpo.decorators import manual_gc
 from mygpo.directory.models import Category
 from mygpo.directory.search import search_podcasts
 from mygpo.web import utils
 from mygpo.directory.tags import TagCloud
+from mygpo.utils import flatten, get_to_dict
 
 
 @manual_gc
@@ -46,16 +48,22 @@ def toplist(request, num=100, lang=None):
 
 
 def browse(request, num_categories=10, num_tags_cloud=90, podcasts_per_category=10):
-    total = int(num_categories) + int(num_tags_cloud)
-    categories = Category.top_categories(total).all()
+    num_categories = int(num_categories)
+    num_tags_cloud = int(num_tags_cloud)
+
+    # collect Ids of top podcasts in top categories, fetch all at once
+    categories = Category.top_categories(num_categories)
+    podcast_ids = flatten(c.get_podcast_ids(0, podcasts_per_category) for c in categories)
+    podcasts = get_to_dict(Podcast, podcast_ids, get_id=Podcast.get_id)
 
     disp_categories = []
-    for category in categories[:num_categories]:
-        entries = category.get_podcasts(0, podcasts_per_category)
-        podcasts = filter(None, entries)
+    for category in categories:
+        pids = category.get_podcast_ids(0, podcasts_per_category)
+        entries = [podcasts.get(pid, None) for pid in pids]
+        entries = filter(None, entries)
         disp_categories.append({
             'tag': category.label,
-            'entries': podcasts,
+            'entries': entries,
             })
 
     tag_cloud = TagCloud(count=num_tags_cloud, skip=num_categories, sort_by_name=True)
