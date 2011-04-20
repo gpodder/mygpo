@@ -25,14 +25,15 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import cache_page
 from mygpo.core import models
 from mygpo.utils import parse_range
+from mygpo.directory.tags import TagCloud
 
 
 @csrf_exempt
 @cache_page(60 * 60 * 24)
 def top_tags(request, count):
     count = parse_range(count, 1, 100, 100)
-    tags = Category.top_categories(count)
-    resp = map(category_data, tags)
+    tag_cloud = TagCloud(count)
+    resp = map(category_data, tag_cloud.entries)
     return JsonResponse(resp)
 
 
@@ -116,6 +117,6 @@ def episode_data(episode, domain):
 def category_data(category):
     return dict(
         tag   = category.label,
-        usage = category.get_weight()
+        usage = category.weight
     )
 

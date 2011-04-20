@@ -8,7 +8,7 @@ function (doc)
             weight += doc.podcasts[n].weight;
         }
 
-        emit(weight, null);
+        emit(weight, doc.label);
     }
 }
 

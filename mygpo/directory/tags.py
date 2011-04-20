@@ -1,5 +1,8 @@
-from collections import defaultdict
+from collections import defaultdict, namedtuple
+
 from mygpo.core.models import Podcast
+from mygpo.decorators import query_if_required
+from mygpo.directory.models import Category
 
 
 # FIXME: this should be moved to User class once it is migrated to CouchDB
@@ -30,3 +33,41 @@ def all_tags():
 
     for r in res:
         yield r['key'][0]
+
+
+TagCloudEntry = namedtuple('TagCloudEntry', 'label weight')
+
+
+class TagCloud(object):
+
+    def __init__(self, count=100, skip=0, sort_by_name=False):
+        self.count = count
+        self.skip = skip
+        self._entries = None
+        self.sort_by_name = sort_by_name
+
+    def _needs_query(self):
+        return self._entries is None
+
+    def _query(self):
+        db = Category.get_db()
+        res = db.view('directory/categories', \
+            descending=True, skip=self.skip, limit=self.count)
+
+        mk_entry = lambda r: TagCloudEntry(r['value'], r['key'])
+        self._entries = map(mk_entry, res)
+
+        if self.sort_by_name:
+            self._entries.sort(key = lambda x: x.label.lower())
+
+
+    @property
+    @query_if_required()
+    def entries(self):
+        return self._entries
+
+
+    @property
+    @query_if_required()
+    def max_weight(self):
+        return max([e.weight for e in self._entries] + [0])

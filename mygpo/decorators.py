@@ -114,3 +114,22 @@ def repeat_on_conflict(obj_names=[], reload_f=None):
         return tmp
 
     return decorator
+
+
+def query_if_required():
+    """ If required, queries some resource before calling the function
+
+    The decorated method is expected to be bound and its class is
+    expected to have define the methods _needs_query() and _query().
+    """
+
+    def decorator(f):
+        def wrapper(self, *args, **kwargs):
+
+            if self._needs_query():
+                self._query()
+
+            return f(self, *args, **kwargs)
+
+        return wrapper
+    return decorator

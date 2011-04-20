@@ -10,6 +10,7 @@ from mygpo.decorators import manual_gc
 from mygpo.directory.models import Category
 from mygpo.directory.search import search_podcasts
 from mygpo.web import utils
+from mygpo.directory.tags import TagCloud
 
 
 @manual_gc
@@ -57,15 +58,11 @@ def browse(request, num_categories=10, num_tags_cloud=90, podcasts_per_category=
             'entries': podcasts,
             })
 
-    tag_cloud = categories[num_categories:]
-
-    tag_cloud.sort(key = lambda x: x.label.lower())
-    max_entries = max([t.get_weight() for t in tag_cloud] + [0])
+    tag_cloud = TagCloud(count=num_tags_cloud, skip=num_categories, sort_by_name=True)
 
     return render_to_response('directory.html', {
         'categories': disp_categories,
         'tag_cloud': tag_cloud,
-        'max_entries': max_entries,
         }, context_instance=RequestContext(request))
 
 
