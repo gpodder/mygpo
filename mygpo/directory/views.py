@@ -54,7 +54,7 @@ def browse(request, num_categories=10, num_tags_cloud=90, podcasts_per_category=
     # collect Ids of top podcasts in top categories, fetch all at once
     categories = Category.top_categories(num_categories)
     podcast_ids = flatten(c.get_podcast_ids(0, podcasts_per_category) for c in categories)
-    podcasts = get_to_dict(Podcast, podcast_ids, get_id=Podcast.get_id)
+    podcasts = get_to_dict(Podcast, podcast_ids, get_id=Podcast.get_id, use_cache=True)
 
     disp_categories = []
     for category in categories:

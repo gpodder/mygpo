@@ -20,6 +20,9 @@ import collections
 from datetime import datetime, timedelta
 import time
 
+from django.core.cache import cache
+
+
 def daterange(from_date, to_date=datetime.now(), leap=timedelta(days=1)):
     """
     >>> from_d = datetime(2010, 01, 01)
@@ -287,10 +290,25 @@ def parse_range(s, min, max, default=None):
         return default if default is not None else (max-min)/2
 
 
-def get_to_dict(cls, ids, get_id=lambda x: x._id):
+def get_to_dict(cls, ids, get_id=lambda x: x._id, use_cache=False):
     ids = list(set(ids))
-    objs = cls.get_multi(ids)
-    return dict((get_id(obj), obj) for obj in objs)
+    objs = dict()
+
+    cache_objs = []
+    if use_cache:
+        for id in ids:
+            obj = cache.get(id)
+            if obj is not None:
+                cache_objs.append(obj)
+                ids.remove(id)
+
+    db_objs = list(cls.get_multi(ids))
+
+    if use_cache:
+        for obj in db_objs:
+            cache.set(get_id(obj), obj)
+
+    return dict((get_id(obj), obj) for obj in cache_objs + db_objs)
 
 
 def flatten(l):
