@@ -26,7 +26,7 @@ from mygpo.api.models import Device, Podcast
 from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_urls
-from mygpo.api.backend import get_toplist
+from mygpo.directory.toplist import PodcastToplist
 from mygpo.api.advanced.directory import podcast_data
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
@@ -209,7 +209,8 @@ def set_subscriptions(urls, user, device_uid):
 def toplist(request, count, format):
     count = parse_range(count, 1, 100, 100)
 
-    toplist = get_toplist(count)
+    toplist = PodcastToplist()
+    entries = toplist[:count]
     domain = RequestSite(request).domain
 
     def get_podcast(t):
@@ -229,8 +230,8 @@ def toplist(request, count, format):
         ))
         return p
 
-    title = _('gpodder.net - Top %(count)d') % {'count': len(toplist)}
-    return format_podcast_list(toplist,
+    title = _('gpodder.net - Top %(count)d') % {'count': len(entries)}
+    return format_podcast_list(entries,
                                format,
                                title,
                                get_podcast=get_podcast,

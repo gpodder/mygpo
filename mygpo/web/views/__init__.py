@@ -15,6 +15,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+import sys
 from itertools import islice
 from collections import defaultdict
 from django.core.urlresolvers import reverse
@@ -24,7 +25,8 @@ from django.contrib.auth.models import User
 from django.template import RequestContext
 from mygpo.core import models
 from mygpo.directory import tags
-from mygpo.users.models import Rating, Suggestions, HistoryEntry
+from mygpo.directory.toplist import PodcastToplist
+from mygpo.users.models import Rating, Suggestions, History, HistoryEntry
 from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, UserProfile
 from mygpo.users.models import PodcastUserState
 from mygpo.decorators import manual_gc
@@ -35,7 +37,7 @@ from django.contrib.sites.models import RequestSite
 from mygpo.constants import PODCAST_LOGO_SIZE, PODCAST_LOGO_BIG_SIZE
 from mygpo.web import utils
 from mygpo.api import backend
-from mygpo.utils import flatten
+from mygpo.utils import flatten, parse_range
 from mygpo import migrate
 import os
 import Image
@@ -56,14 +58,14 @@ def welcome(request, toplist_entries=10):
     podcasts = Podcast.objects.count()
     users = User.objects.filter(is_active=True).count()
     episodes = Episode.objects.count()
-    hours_listened = utils.get_hours_listened()
 
     try:
         lang = utils.process_lang_params(request, '/toplist/')
     except utils.UpdatedException, updated:
         lang = []
 
-    entries = backend.get_toplist(toplist_entries, lang)
+    toplist = PodcastToplist(lang)
+    entries = toplist[:toplist_entries]
 
     toplist = [p for (oldpos, p) in entries]
 
@@ -72,7 +74,6 @@ def welcome(request, toplist_entries=10):
           'user_count': users,
           'episode_count': episodes,
           'url': current_site,
-          'hours_listened': hours_listened,
           'toplist': toplist,
     }, context_instance=RequestContext(request))
 
@@ -160,43 +161,29 @@ def cover_art(request, size, filename):
 @manual_gc
 @login_required
 def history(request, count=15, device_id=None):
+
+    page = parse_range(request.GET.get('page', None), 0, sys.maxint, 0)
+
+    user = migrate.get_or_migrate_user(request.user)
+
     if device_id:
-        devices = [get_object_or_404(Device, id=device_id, user=request.user)]
-        episodehistory = EpisodeAction.objects.filter(device__in=devices).order_by('-timestamp')[:count]
+        device = get_object_or_404(Device, id=device_id, user=request.user)
+        device = migrate.get_or_migrate_device(device)
     else:
-        devices = Device.objects.filter(user=request.user)
-        episodehistory = EpisodeAction.objects.filter(user=request.user).order_by('-timestamp')[:count]
+        device = None
 
-    subscription_history = get_subscription_history(request.user, device_id, count)
+    history_obj = History(user, device)
 
-    generalhistory = sorted(list(episodehistory) + subscription_history,
-        key=lambda x: x.timestamp,reverse=True)
+    start = page*count
+    end = start+count
+    entries = list(history_obj[start:end])
+    HistoryEntry.fetch_data(user, entries)
 
     return render_to_response('history.html', {
-        'generalhistory': generalhistory,
-        'singledevice': devices[0] if device_id else None
+        'history': entries,
+        'device': device,
+        'page': page,
     }, context_instance=RequestContext(request))
-
-
-def get_subscription_history(user, device_id=None, count=15):
-    """
-    Returns the subscription history either for one user or for a device.
-    """
-
-    new_user = migrate.get_or_migrate_user(user)
-
-    if device_id:
-        dev = Device.objects.get(id=device_id)
-        dev = migrate.get_or_migrate_device(dev)
-        device_id = dev.id
-    else:
-        device_id = None
-
-    subscription_history = new_user.get_subscription_history(device_id, reverse=True)
-    subscription_history = list(islice(subscription_history, count))
-    subscription_history = HistoryEntry.fetch_data(new_user, subscription_history)
-
-    return subscription_history
 
 
 @login_required

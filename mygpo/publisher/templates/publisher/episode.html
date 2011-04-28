@@ -56,9 +56,9 @@
    <div id="chart_div" style="width: 700px; height: 240px;"></div>
   {% endif %}
 
-  {% if heatmap_data %}
+  {% if heatmap %}
    <h3>Heatmap</h3>
-   {{ heatmap_data|episode_heatmap_visualization:heatmap_part_length }}
+   {{ heatmap|episode_heatmap_visualization }}
    <div>{% trans "Red parts are often skipped, green parts never." %}</div>
   {% endif %}
 

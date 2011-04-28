@@ -6,6 +6,7 @@ from mygpo.users.models import Rating, EpisodeAction, User, Device, Subscription
 from mygpo.log import log
 from mygpo import utils
 from mygpo.decorators import repeat_on_conflict
+from mygpo.data.mimetype import get_type
 
 """
 This module contains methods for converting objects from the old
@@ -327,6 +328,11 @@ def update_episode(olde, newe):
         newe.mimetypes.append(olde.mimetype)
         updated = True
 
+    content_types = filter(None, map(get_type, newe.mimetypes))
+    if newe.content_types != content_types:
+        newe.content_types = content_types
+        updated = True
+
     @repeat_on_conflict(['newe'])
     def save(newe):
         newe.save()
@@ -380,6 +386,7 @@ def migrate_subscription_action(old_action):
     action.timestamp = old_action.timestamp
     action.action = 'subscribe' if old_action.action == 1 else 'unsubscribe'
     action.device = get_or_migrate_device(old_action.device).id
+    action.device_oldid = old_action.device.id
     return action
 
 
@@ -394,6 +401,7 @@ def get_episode_user_state(user, episode, podcast):
         if e_state is None:
             e_state = EpisodeUserState()
             e_state.episode = episode._id
+            e_state.podcast = podcast.get_id()
         else:
             @repeat_on_conflict(['p_state'])
             def remove_episode_status(p_state):

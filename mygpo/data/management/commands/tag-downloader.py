@@ -4,7 +4,7 @@ from mygpo import migrate
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.api import models as oldmodels
-from mygpo.api import backend
+from mygpo.directory.toplist import PodcastToplist
 from mygpo.data import delicious
 from optparse import make_option
 import time
@@ -33,7 +33,8 @@ class Command(BaseCommand):
         fetch_queue = []
 
         if options.get('toplist'):
-            for oldindex, obj in backend.get_toplist(100):
+            toplist = PodcastToplist()
+            for oldindex, obj in toplist[:100]:
                 if isinstance(obj, Podcast):
                     fetch_queue.append(obj)
                 elif isinstance(obj, PodcastGroup):

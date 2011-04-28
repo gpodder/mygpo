@@ -6,7 +6,8 @@ from mygpo.core import models
 from mygpo.api.models import Podcast, Episode, PodcastGroup
 from mygpo.publisher.auth import require_publisher, is_publisher
 from mygpo.publisher.forms import SearchPodcastForm, EpisodeForm, PodcastForm
-from mygpo.publisher.utils import listener_data, episode_listener_data, check_publisher_permission, subscriber_data, device_stats, episode_heatmap
+from mygpo.publisher.utils import listener_data, episode_listener_data, check_publisher_permission, subscriber_data
+from mygpo.web.heatmap import EpisodeHeatmap
 from django.contrib.sites.models import RequestSite
 from mygpo.data.feeddownloader import update_podcasts
 from mygpo.decorators import requires_token, allowed_methods
@@ -51,9 +52,10 @@ def podcast(request, id):
     if not check_publisher_permission(request.user, p):
         return HttpResponseForbidden()
 
-    timeline_data = listener_data([p])
-    subscription_data = subscriber_data([p])
-    device_data = device_stats([p])
+    new_p = migrate.get_or_migrate_podcast(p)
+
+    timeline_data = listener_data([new_p])
+    subscription_data = subscriber_data([new_p])
 
     if request.method == 'POST':
         form = PodcastForm(request.POST, instance=p)
@@ -70,6 +72,8 @@ def podcast(request, id):
 
     update_token = user.publisher_update_token
 
+    heatmap = EpisodeHeatmap(new_p.get_id())
+
     site = RequestSite(request)
 
     return render_to_response('publisher/podcast.html', {
@@ -78,8 +82,8 @@ def podcast(request, id):
         'form': form,
         'timeline_data': timeline_data,
         'subscriber_data': subscription_data,
-        'device_data': device_data,
         'update_token': update_token,
+        'heatmap': heatmap,
         }, context_instance=RequestContext(request))
 
 
@@ -91,16 +95,15 @@ def group(request, group_id):
     if not any([check_publisher_permission(request.user, p) for p in g.podcasts()]):
         return HttpResponseForbidden()
 
+    new_podcasts = [migrate.get_or_migrate_podcast(p) for p in g.podcasts()]
 
-    timeline_data = listener_data(g.podcasts())
-    subscription_data = subscriber_data(g.podcasts())
-    device_data = device_stats(g.podcasts())
+    timeline_data = listener_data(new_podcasts)
+    subscription_data = subscriber_data(new_podcasts)
 
     return render_to_response('publisher/group.html', {
         'group': g,
         'timeline_data': timeline_data,
         'subscriber_data': subscription_data,
-        'device_data': device_data,
         }, context_instance=RequestContext(request))
 
 
@@ -136,7 +139,18 @@ def episodes(request, id):
         return HttpResponseForbidden()
 
     episodes = p.get_episodes()
-    max_listeners = max([x.listener_count() for x in episodes]) if len(episodes) else 0
+
+    new_podcast = migrate.get_or_migrate_podcast(p)
+    new_episodes = dict( (e.oldid, e._id) for e in new_podcast.get_episodes() )
+
+    listeners = dict(new_podcast.episode_listener_counts())
+
+    max_listeners = max(listeners.values() + [0])
+
+    for e in episodes:
+        e_id = new_episodes.get(e.id, None)
+        if not e_id: continue
+        e.listeners = listeners.get(e_id)
 
     return render_to_response('publisher/episodes.html', {
         'podcast': p,
@@ -161,15 +175,18 @@ def episode(request, id):
     elif request.method == 'GET':
         form = EpisodeForm(instance=e)
 
-    timeline_data = episode_listener_data(e)
-    heatmap_data, part_length = episode_heatmap(e)
+    episode = migrate.get_or_migrate_episode(e)
+
+    timeline_data = episode_listener_data(episode)
+
+    heatmap = EpisodeHeatmap(episode.podcast, episode._id,
+              duration=episode.duration)
 
     return render_to_response('publisher/episode.html', {
         'episode': e,
         'form': form,
         'timeline_data': timeline_data,
-        'heatmap_data': heatmap_data if any([x > 0 for x in heatmap_data]) else None,
-        'heatmap_part_length': part_length,
+        'heatmap': heatmap,
         }, context_instance=RequestContext(request))
 
 

@@ -7,10 +7,10 @@ from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
 from django.utils.translation import ugettext as _
-from mygpo.api.models import Podcast, Episode, EpisodeAction, Device, SyncGroup
+from mygpo.api.models import Podcast, Episode, Device, SyncGroup
 from mygpo.api.sanitizing import sanitize_url
+from mygpo.users.models import EpisodeAction, HistoryEntry
 from mygpo.web.forms import PrivacyForm, SyncForm
-from mygpo.data.models import Listener
 from mygpo.directory.tags import tags_for_user
 from mygpo.decorators import manual_gc, allowed_methods, repeat_on_conflict
 from mygpo.utils import daterange
@@ -30,8 +30,11 @@ def update_podcast_settings(state, is_public):
 def show(request, pid):
     podcast = get_object_or_404(Podcast, pk=pid)
     new_podcast = migrate.get_or_migrate_podcast(podcast)
+
     episodes = episode_list(podcast, request.user)
-    max_listeners = 0#max([x.listener_count() for x in episodes]) if len(episodes) else 0
+
+    max_listeners = max([e.listeners for e in episodes] + [0])
+
     related_podcasts = [x for x in podcast.group.podcasts() if x != podcast] if podcast.group else []
 
     tags = get_tags(podcast, request.user)
@@ -67,11 +70,9 @@ def show(request, pid):
         subscribe_form = SyncForm()
         subscribe_form.set_targets(subscribe_targets, '')
 
-        timeline_data = listener_data(podcast)
         return render_to_response('podcast.html', {
             'tags': tags,
             'history': history,
-            'timeline_data': timeline_data,
             'podcast': podcast,
             'privacy_form': privacy_form,
             'devices': subscribed_devices,
@@ -117,28 +118,6 @@ def get_tags(podcast, user):
     return tag_list
 
 
-def listener_data(podcast):
-    d = date(2010, 1, 1)
-    day = timedelta(1)
-    episodes = EpisodeAction.objects.filter(episode__podcast=podcast, timestamp__gte=d).order_by('timestamp').values('timestamp')
-    if len(episodes) == 0:
-        return []
-
-    start = episodes[0]['timestamp']
-
-    days = []
-    for d in daterange(start):
-        next = d + timedelta(days=1)
-        listeners = EpisodeAction.objects.filter(episode__podcast=podcast, timestamp__gte=d, timestamp__lt=next).values('user_id').distinct().count()
-        e = Episode.objects.filter(podcast=podcast, timestamp__gte=d, timestamp__lt=next)
-        episode = e[0] if e.count() > 0 else None
-        days.append({
-            'date': d,
-            'listeners': listeners,
-            'episode': episode})
-
-    return days
-
 
 def episode_list(podcast, user):
     """
@@ -146,12 +125,27 @@ def episode_list(podcast, user):
     action. The attribute is unsert if there is no episode-action for
     the episode.
     """
+
     episodes = podcast.get_episodes().order_by('-timestamp')
+
+    new_user = migrate.get_or_migrate_user(user)
+
+    new_podcast = migrate.get_or_migrate_podcast(podcast)
+    listeners = dict(new_podcast.episode_listener_counts())
+    new_episodes = dict( (e.oldid, e._id) for e in new_podcast.get_episodes() )
+
+    if user.is_authenticated():
+        actions = new_podcast.get_episode_states(user.id)
+        actions = map(HistoryEntry.from_action_dict, actions)
+        HistoryEntry.fetch_data(new_user, actions)
+        episode_actions = dict( (action.episode_id, action) for action in actions)
+    else:
+        episode_actions = {}
+
     for e in episodes:
-        if user.is_authenticated():
-            actions = EpisodeAction.objects.filter(episode=e, user=user).order_by('-timestamp')
-            if actions.count() > 0:
-                e.action = actions[0]
+        e_id = new_episodes.get(e.id, None)
+        e.listeners = listeners.get(e_id, None)
+        e.action = episode_actions.get(e_id, None)
 
     return episodes
 

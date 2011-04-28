@@ -15,32 +15,39 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+from itertools import imap, chain
+from collections import defaultdict, namedtuple
 from mygpo.api.basic_auth import require_valid_user, check_username
 from django.http import HttpResponse, HttpResponseBadRequest
-from mygpo.api.models import Device, Podcast, Episode, EpisodeAction, SUBSCRIBE_ACTION, UNSUBSCRIBE_ACTION, EPISODE_ACTION_TYPES, DEVICE_TYPES
+from mygpo.api.models import Device, Podcast, Episode, EPISODE_ACTION_TYPES, DEVICE_TYPES
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url, sanitize_urls
 from mygpo.api.advanced.directory import episode_data, podcast_data
 from mygpo.api.backend import get_device, get_favorites
 from django.shortcuts import get_object_or_404
 from django.contrib.sites.models import RequestSite
-from time import mktime, gmtime, strftime
+from time import strftime
 from datetime import datetime
 import dateutil.parser
 from mygpo.log import log
-from mygpo.utils import parse_time, parse_bool, get_to_dict
+from mygpo.utils import parse_time, parse_bool, get_to_dict, get_timestamp
 from mygpo.decorators import allowed_methods
 from mygpo.core import models
 from mygpo.core.models import SanitizingRule
 from django.db import IntegrityError
 from django.views.decorators.csrf import csrf_exempt
-from mygpo.users.models import PodcastUserState
+from mygpo.users.models import PodcastUserState, EpisodeAction, EpisodeUserState
 from mygpo import migrate
 
 try:
     import simplejson as json
 except ImportError:
     import json
+
+
+# keys that are allowed in episode actions
+EPISODE_ACTION_KEYS = ('position', 'episode', 'action', 'device', 'timestamp',
+                       'started', 'total', 'podcast')
 
 
 @csrf_exempt
@@ -50,7 +57,7 @@ except ImportError:
 def subscriptions(request, username, device_uid):
 
     now = datetime.now()
-    now_ = int(mktime(now.timetuple()))
+    now_ = get_timestamp(now)
 
     if request.method == 'GET':
         d = get_object_or_404(Device, user=request.user, uid=device_uid, deleted=False)
@@ -139,7 +146,7 @@ def get_subscription_changes(user, device, since, until):
     add_urls = [ podcasts[i].url for i in add]
     rem_urls = [ podcasts[i].url for i in rem]
 
-    until_ = int(mktime(until.timetuple()))
+    until_ = get_timestamp(until)
     return {'add': add_urls, 'remove': rem_urls, 'timestamp': until_}
 
 
@@ -151,7 +158,7 @@ def episodes(request, username, version=1):
 
     version = int(version)
     now = datetime.now()
-    now_ = int(mktime(now.timetuple()))
+    now_ = get_timestamp(now)
 
     if request.method == 'POST':
         try:
@@ -164,6 +171,7 @@ def episodes(request, username, version=1):
             update_urls = update_episodes(request.user, actions)
         except Exception, e:
             log('could not update episodes for user %s: %s' % (username, e))
+            raise
             return HttpResponseBadRequest(e)
 
         return JsonResponse({'timestamp': now_, 'update_urls': update_urls})
@@ -186,53 +194,53 @@ def episodes(request, username, version=1):
 
 
 def get_episode_changes(user, podcast, device, since, until, aggregated, version):
-    if aggregated:
-        actions = {}
-    else:
-        actions = []
-    eactions = EpisodeAction.objects.filter(user=user, timestamp__lte=until)
 
-    if podcast:
-        eactions = eactions.filter(episode__podcast=podcast)
+    new_user = migrate.get_or_migrate_user(user)
+    devices = dict( (dev.oldid, dev.uid) for dev in new_user.devices )
 
-    if device:
-        eactions = eactions.filter(device=device)
+    args = {}
+    if podcast is not None: args['podcast_id'] = podcast.get_id()
+    if device is not None:  args['device_oldid'] = device.id
 
-    if since: # we can't use None with __gt
-        eactions = eactions.filter(timestamp__gt=since)
+    actions = EpisodeAction.filter(user.id, since, until, *args)
 
     if aggregated:
-        eactions = eactions.order_by('timestamp')
+        actions = dict( (a['podcast'], a) for a in actions ).values()
 
-    for a in eactions:
-        action = {
-            'podcast': a.episode.podcast.url,
-            'episode': a.episode.url,
-            'action':  a.action,
-            'timestamp': a.timestamp.strftime('%Y-%m-%dT%H:%M:%S') #2009-12-12T09:00:00
-        }
+    if version == 1:
+        # convert position parameter for API 1 compatibility
+        def convert_position(action):
+            pos = action.get('position', None)
+            if pos is not None:
+                action['position'] = strftime('%H:%M:%S', pos)
+            return action
 
-        if a.action == 'play' and a.playmark:
-            if version == 1:
-                t = gmtime(a.playmark)
-                action['position'] = strftime('%H:%M:%S', t)
-            elif None in (a.playmark, a.started, a.total):
-                log('Ignoring broken episode action in DB: %r' % (a,))
-                continue
-            else:
-                action['position'] = int(a.playmark)
-                action['started'] = int(a.started)
-                action['total'] = int(a.total)
+        actions = imap(convert_position, actions)
 
-        if aggregated:
-            actions[a.episode] = action
-        else:
-            actions.append(action)
 
-    until_ = int(mktime(until.timetuple()))
+    def clean_data(action):
+        action['podcast'] = action['podcast_url']
+        action['episode'] = action['episode_url']
 
-    if aggregated:
-        actions = list(actions.itervalues())
+        if 'device_oldid' in action:
+            action['device'] = devices[action['device_oldid']]
+            del action['device_oldid']
+
+        # remove superfluous keys
+        for x in action.keys():
+            if x not in EPISODE_ACTION_KEYS:
+                del action[x]
+
+        # set missing keys to None
+        for x in EPISODE_ACTION_KEYS:
+            if x not in action:
+                action[x] = None
+
+        return action
+
+    actions = map(clean_data, actions)
+
+    until_ = get_timestamp(until)
 
     return {'actions': actions, 'timestamp': until_}
 
@@ -240,39 +248,53 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
 def update_episodes(user, actions):
     update_urls = []
 
-    for e in actions:
-        us = sanitize_append(e['podcast'], 'podcast', update_urls)
-        if us == '': continue
+    grouped_actions = defaultdict(list)
 
-        podcast, p_created = Podcast.objects.get_or_create(url=us)
+    # group all actions by their episode
+    for action in actions:
+        podcast_url = action['podcast']
+        podcast_url = sanitize_append(podcast_url, 'podcast', update_urls)
+        if podcast_url == '': continue
 
-        eus = sanitize_append(e['episode'], 'episode', update_urls)
-        if eus == '': continue
+        episode_url = action['episode']
+        episode_url = sanitize_append(episode_url, 'episode', update_urls)
+        if episode_url == '': continue
 
-        episode, e_created = Episode.objects.get_or_create(podcast=podcast, url=eus)
-        action  = e['action']
-        if not valid_episodeaction(action):
-            raise Exception('invalid action %s' % action)
+        new_user = migrate.get_or_migrate_user(user)
+        act = parse_episode_action(action, new_user, update_urls)
+        grouped_actions[ (podcast_url, episode_url) ].append(act)
 
-        if 'device' in e:
-            device = get_device(user, e['device'])
-        else:
-            device = None
-
-        timestamp = dateutil.parser.parse(e['timestamp']) if 'timestamp' in e else datetime.now()
-
-        time_values = check_time_values(e)
-
-        try:
-            EpisodeAction.objects.create(user=user, episode=episode,
-                    device=device, action=action, timestamp=timestamp,
-                    playmark=time_values['position'],
-                    started=time_values['started'],
-                    total=time_values['total'])
-        except Exception, e:
-            log('error while adding episode action (user %s, episode %s, device %s, action %s, timestamp %s): %s' % (user, episode, device, action, timestamp, e))
+    # load the episode state only once for every episode
+    for (p_url, e_url), action_list in grouped_actions.iteritems():
+        episode_state = EpisodeUserState.for_ref_urls(user, p_url, e_url)
+        episode_state.add_actions(action_list)
+        episode_state.save()
 
     return update_urls
+
+
+def parse_episode_action(action, user, update_urls):
+    action_str  = action.get('action', None)
+    if not valid_episodeaction(action_str):
+        raise Exception('invalid action %s' % action_str)
+
+    new_action = EpisodeAction()
+
+    new_action.action = action['action']
+
+    if action.get('device', False):
+        device = user.get_device_by_uid(action['device'])
+        new_action.device_oldid = device.oldid
+        new_action.device = device.id
+
+    if action.get('timestamp', False):
+        new_action.timestamp = dateutil.parser.parse(action['timestamp'])
+
+    new_action.started = action.get('started', None)
+    new_action.playmark = action.get('position', None)
+    new_action.total = action.get('total', None)
+
+    return new_action
 
 
 @csrf_exempt
@@ -338,7 +360,7 @@ def device_data(device):
 @check_username
 def updates(request, username, device_uid):
     now = datetime.now()
-    now_ = int(mktime(now.timetuple()))
+    now_ = get_timestamp(now)
 
     device = get_object_or_404(Device, user=request.user, uid=device_uid)
 
@@ -354,34 +376,61 @@ def updates(request, username, device_uid):
     ret = get_subscription_changes(request.user, dev, since, now)
     domain = RequestSite(request).domain
 
-    # replace added urls with details
-    podcast_details = []
-    for url in ret['add']:
-        podcast = Podcast.objects.get(url=url)
-        podcast_details.append(podcast_data(podcast, domain))
-
-    ret['add'] = podcast_details
-
-
-    # add episode details
-    user = migrate.get_or_migrate_user(request.user)
     subscriptions = dev.get_subscribed_podcasts()
-    subscriptions_oldpodcasts = [p.get_old_obj() for p in subscriptions]
-    episode_status = {}
-    for e in Episode.objects.filter(podcast__in=subscriptions_oldpodcasts, timestamp__gte=since).order_by('timestamp'):
-        episode_status[e] = 'new'
-    for a in EpisodeAction.objects.filter(user=request.user, episode__podcast__in=subscriptions_oldpodcasts, timestamp__gte=since).order_by('timestamp'):
-        episode_status[a.episode] = a.action
 
-    updates = []
-    for episode, status in episode_status.iteritems():
-        t = episode_data(episode, domain)
-        t['status'] = status
-        updates.append(t)
+    podcasts = dict( (p.url, p) for p in subscriptions )
 
-    ret['updates'] = updates
+    def prepare_podcast_data(url):
+        podcast = podcasts.get(url)
+        return podcast_data(podcast, domain)
+
+    ret['add'] = map(prepare_podcast_data, ret['add'])
+
+
+    # index subscribed podcasts by their Id for fast access
+    podcasts = dict( (p.get_id(), p) for p in subscriptions )
+
+    def prepare_episode_data(episode_status):
+        """ converts the data to primitives that converted to JSON """
+        podcast_id = episode_status.episode.podcast
+        podcast = podcasts.get(podcast_id, None)
+        t = episode_data(episode_status.episode, domain, podcast)
+        t['status'] = episode_status.status
+        return t
+
+    episode_updates = get_episode_updates(request.user, subscriptions, since)
+    ret['updates'] = map(prepare_episode_data, episode_updates)
 
     return JsonResponse(ret)
+
+
+def get_episode_updates(user, subscribed_podcasts, since):
+    """ Returns the episode updates since the timestamp """
+
+    EpisodeStatus = namedtuple('EpisodeStatus', 'episode status')
+
+    subscriptions_oldpodcasts = [p.get_old_obj() for p in subscribed_podcasts]
+
+    episode_status = {}
+    #TODO: changes this to a get_multi when episodes have been migrated
+    for e in Episode.objects.filter(podcast__in=subscriptions_oldpodcasts, timestamp__gte=since).order_by('timestamp'):
+        episode = migrate.get_or_migrate_episode(e)
+        episode_status[episode._id] = EpisodeStatus(episode, 'new')
+
+    e_actions = (p.get_episode_states(user.id) for p in subscribed_podcasts)
+    e_actions = chain.from_iterable(e_actions)
+
+    for action in e_actions:
+        e_id = action['episode_id']
+
+        if e_id in episode_status:
+            episode = episode_status[e_id].episode
+        else:
+            episode = models.Episode.get(e_id)
+
+        episode_status[e_id] = EpisodeStatus(episode, action['action'])
+
+    return episode_status.itervalues()
 
 
 @require_valid_user
@@ -399,29 +448,3 @@ def sanitize_append(url, obj_type, sanitized_list):
     if url != urls:
         sanitized_list.append( (url, urls) )
     return urls
-
-
-def check_time_values(action):
-    PLAY_ACTION_KEYS = ('position', 'started', 'total')
-
-    # Key found, but must not be supplied (no play action!)
-    if action['action'] != 'play':
-        for key in PLAY_ACTION_KEYS:
-            if key in action:
-                raise ValueError('%s only allowed in play actions' % key)
-
-    time_values = dict(map(lambda x: (x, parse_time(action[x]) if x in action else None), PLAY_ACTION_KEYS))
-
-    # Sanity check: If started or total are given, require position
-    if (('started' in time_values) or \
-        ('total' in time_values)) and \
-            (not 'position' in time_values):
-        raise ValueError('started and total require position')
-
-    # Sanity check: total and position can only appear together
-    if (('total' in time_values) or ('started' in time_values)) and \
-        not (('total' in time_values) and ('started' in time_values)):
-        raise HttpResponseBadRequest('total and started parameters can only appear together')
-
-    return time_values
-

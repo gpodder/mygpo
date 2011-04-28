@@ -32,7 +32,7 @@ class Command(BaseCommand):
 
             if (olde != None) and (newe != None):
                 podcast = newmodels.Podcast.get(newe.podcast)
-                updated += migrate.update_episode(olde, newe, podcast)
+                updated += migrate.update_episode(olde, newe)
 
             elif olde == None:
                 deleted += 1

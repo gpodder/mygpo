@@ -311,3 +311,25 @@ Podcast-Subscriptions by User (users/subscribed_podcasts_by_user)
 
 Can be used to retrieve the Podcasts a User is subscribed to, and the Devices
 on which he has a subscription.
+
+
+Episode-Actions (users/episode_actions)
+~~~~~~~~~~~~~~~
+ * For an EpisodeUserState, emit search-criteria and an episode-action object
+   for each action.
+
+The search criteria consists of the User-Id, the timestamp, the Podcast-Id and
+the Device-Id.
+
+The episode-action object is the action from the EpisodeUserState, annotated
+with information like Id and URL of episode and podcast.
+
+
+Episode States (users/episode_states)
+~~~~~~~~~~~~~~
+ * For an EpisodeUserState, emits search-criteria an an episode-action object
+   for the latest action.
+
+The search criteria consists of the User-Id, the Podcast-Id and the Episode-Id.
+
+Can be used to get the latest states of all episodes of a podcast.

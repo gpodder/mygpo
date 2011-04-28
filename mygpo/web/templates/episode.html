@@ -9,6 +9,7 @@
 {% load youtube %}
 {% load flickr %}
 {% load facebook %}
+{% load charts %}
 
 {% load menu %}
 {% block mainmenu %}{{ "/podcast/"|main_menu }}{% endblock %}
@@ -85,11 +86,11 @@
 
    {% if played_parts %}
     <h3>Already played</h3>
-    {{ played_parts|played_visualization:duration }}
+    {{ played_parts|episode_heatmap_visualization }}
    {% endif %}
 
 
-  <div class="episode-navigation">
+  <div class="navigation">
    <div class="prev">
     {% if prev %}
      {% trans "Previous Episode: " %}<a href="{% url episode prev.id %}">{{ prev.title|striptags }}</a>
@@ -171,7 +172,7 @@
      <td style="text-align: center;">{{ s|episode_status_icon }}</td>
      <td>
       {% if s.device %}
-       <a href="{% url device s.device.id %}">{{ s.device|device_icon }} {{ s.device.name|striptags }}</a>
+       <a href="{% url device s.device.oldid %}">{{ s.device|device_icon }} {{ s.device.name|striptags }}</a>
       {% endif %}
      </td>
      <td>{% if s.started %}{{s.started_time|date:"H:m:s" }} - {% endif %}

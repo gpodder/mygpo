@@ -29,9 +29,9 @@
 
   <p>
    {% if languages|length_is:"0" %}
-    {% blocktrans with entries|length as count and types|filter_dict|join:", " as media_types %}These are the {{ count }} most listened {{ media_types }} episodes of the last seven days of all languages.{% endblocktrans %}
+    {% blocktrans with entries|length as count and types|join:", " as media_types %}These are the {{ count }} most listened {{ media_types }} episodes of the last seven days of all languages.{% endblocktrans %}
    {% else %}
-    {% blocktrans with entries|length as count and all_languages|lookup_list:languages|join:", " as lang and types|filter_dict|join:", " as media_types %}The are the {{ count }} most listened {{ media_types }} episodes of the last seven days for the languages {{ lang }}.{% endblocktrans %}
+    {% blocktrans with entries|length as count and all_languages|lookup_list:languages|join:", " as lang and types|join:", " as media_types %}The are the {{ count }} most listened {{ media_types }} episodes of the last seven days for the languages {{ lang }}.{% endblocktrans %}
    {% endif %}
    <a href="#" id="open-config">({% trans "change"%})</a>
   </p>
@@ -56,11 +56,11 @@
     <ul>
      {% for lang in languages %}
       <li>
-       <a href="{% url episode-toplist %}?lang={{ languages|remove:lang|join:"," }}&types={{ types|filter_dict|join:"," }}">{{ all_languages|lookup:lang }}</a>
+       <a href="{% url episode-toplist %}?lang={{ languages|remove:lang|join:"," }}&types={{ types|join:"," }}">{{ all_languages|lookup:lang }}</a>
       </li>
      {% endfor %}
     </ul>
-    <form action="{% url episode-toplist %}?lang={{ languages|join:"," }}&types={{ types|filter_dict|join:"," }}" method="post">
+    <form action="{% url episode-toplist %}?lang={{ languages|join:"," }}&types={{ types|join:"," }}" method="post">
      {% csrf_token %}
      <select name="lang">
       {% for key, name in all_languages.iteritems %}
@@ -72,18 +72,18 @@
      <input type="submit" value="{% trans "Add" %}" />
     </form>
     {% url episode-toplist as episode-toplist-url %}
-    {% blocktrans with types|filter_dict|join:"," as type_param %}or show <a href="{{ episode-toplist-url }}?lang=&types={{ type_param }}">all languages</a>.{% endblocktrans %}
+    {% blocktrans with types|join:"," as type_param %}or show <a href="{{ episode-toplist-url }}?lang=&types={{ type_param }}">all languages</a>.{% endblocktrans %}
    </div>
   {% endif %}
  </div>
 
  <div class="config-toplist">
   <h3>Media Types</h3>
-  {% for type, enabled in types.iteritems %}
-   {% if enabled %}
-    <a class="activated" href="{% url episode-toplist %}?lang={{ languages|join:"," }}&types={{ types|filter_dict|remove:type|join:"," }} ">{{ type }}</a>
+  {% for type in all_types %}
+   {% if type in types %}
+    <a class="activated" href="{% url episode-toplist %}?lang={{ languages|join:"," }}&types={{ types|remove:type|join:"," }} ">{{ type }}</a>
    {% else %}
-    <a class="deactivated" href="{% url episode-toplist %}?lang={{ languages|join:"," }}&types={{ types|filter_dict|append:type|join:"," }}">{{ type }}</a>
+    <a class="deactivated" href="{% url episode-toplist %}?lang={{ languages|join:"," }}&types={{ types|append:type|join:"," }}">{{ type }}</a>
    {% endif %}
   {% endfor %}
  </div>
@@ -118,4 +118,3 @@
   </table>
 
 {% endblock %}
-

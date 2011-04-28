@@ -15,6 +15,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+from django.core.urlresolvers import reverse
 from mygpo.api.httpresponse import JsonResponse
 from django.shortcuts import get_object_or_404
 from mygpo.api.sanitizing import sanitize_url
@@ -53,6 +54,7 @@ def tag_podcasts(request, tag, count):
 
 @cache_page(60 * 60)
 def podcast_info(request):
+    from mygpo import migrate
     url = sanitize_url(request.GET.get('url', ''))
     podcast = get_object_or_404(Podcast, url=url)
     podcast = migrate.get_or_migrate_podcast(podcast)
@@ -97,19 +99,32 @@ def podcast_data(podcast, domain):
         "mygpo_link": 'http://%s/podcast/%s' % (domain, obj.oldid),
         }
 
-def episode_data(episode, domain):
+def episode_data(episode, domain, podcast=None):
+
+    if isinstance(episode, Episode):
+        podcast = episode.podcast
+        episode_id = episode.id
+        released = episode.timestamp
+    elif isinstance(episode, models.Episode):
+        podcast = podcast or models.Podcast.get(episode.podcast)
+        episode_id = episode.oldid
+        released = episode.released
+    else:
+        raise ValueError('episode must either be a new or old-style Episode')
+
     data = {
         "title": episode.title,
         "url": episode.url,
-        "podcast_title": episode.podcast.title,
-        "podcast_url": episode.podcast.url,
+        "podcast_title": podcast.title,
+        "podcast_url": podcast.url,
         "description": episode.description,
         "website": episode.link,
-        "mygpo_link": 'http://%s/episode/%s' % (domain, episode.id),
+        "mygpo_link": 'http://%(domain)s%(res)s' % dict(domain=domain,
+            res=reverse('episode', args=[episode_id]))
         }
 
-    if episode.timestamp:
-        data['released'] = episode.timestamp.strftime('%Y-%m-%dT%H:%M:%S')
+    if released:
+        data['released'] = released.strftime('%Y-%m-%dT%H:%M:%S')
 
     return data
 

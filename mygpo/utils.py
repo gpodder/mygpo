@@ -17,19 +17,26 @@
 
 import sys
 import collections
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import time
 
 from django.core.cache import cache
 
 
-def daterange(from_date, to_date=datetime.now(), leap=timedelta(days=1)):
+def daterange(from_date, to_date=None, leap=timedelta(days=1)):
     """
     >>> from_d = datetime(2010, 01, 01)
     >>> to_d = datetime(2010, 01, 05)
     >>> list(daterange(from_d, to_d))
     [datetime.datetime(2010, 1, 1, 0, 0), datetime.datetime(2010, 1, 2, 0, 0), datetime.datetime(2010, 1, 3, 0, 0), datetime.datetime(2010, 1, 4, 0, 0), datetime.datetime(2010, 1, 5, 0, 0)]
     """
+
+    if to_date is None:
+        if isinstance(from_date, datetime):
+            to_date = datetime.now()
+        else:
+            to_date = date.today()
+
     while from_date <= to_date:
         yield from_date
         from_date = from_date + leap
@@ -286,11 +293,12 @@ def parse_range(s, min, max, default=None):
             return max
         return val
 
-    except ValueError:
+    except (ValueError, TypeError):
         return default if default is not None else (max-min)/2
 
 
 def get_to_dict(cls, ids, get_id=lambda x: x._id, use_cache=False):
+
     ids = list(set(ids))
     objs = dict()
 
@@ -383,3 +391,15 @@ def skip_pairs(iterator, cmp=cmp):
             next = iterator.next()
         else:
             yield item
+
+
+def get_timestamp(datetime_obj):
+    """ Returns the timestamp as an int for the given datetime object
+
+    >>> get_timestamp(datetime(2011, 4, 7, 9, 30, 6))
+    1302168606
+
+    >>> get_timestamp(datetime(1970, 1, 1, 0, 0, 0))
+    0
+    """
+    return int(time.mktime(datetime_obj.timetuple()))
