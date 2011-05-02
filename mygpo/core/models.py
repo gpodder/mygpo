@@ -488,6 +488,8 @@ class PodcastGroup(Document):
         for podcast in self.podcasts:
             if podcast.get_id() == id:
                 return podcast
+            if id in podcast.merged_ids:
+                return podcast
 
 
     def get_podcast_by_oldid(self, oldid):

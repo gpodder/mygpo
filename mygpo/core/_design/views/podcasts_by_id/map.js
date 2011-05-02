@@ -1,15 +1,24 @@
 function(doc)
 {
+    function searchPodcast(podcast_id, podcast)
+    {
+        emit(podcast_id, null);
+
+        for(var n in podcast.merged_ids)
+        {
+            emit(podcast.merged_ids[n], null);
+        }
+    }
+
     if(doc.doc_type == "Podcast")
     {
-        emit(doc._id, null);
+        searchPodcast(doc._id, doc);
     }
     else if(doc.doc_type == "PodcastGroup")
     {
-        for(n in doc.podcasts)
+        for(var n in doc.podcasts)
         {
-            podcast = doc.podcasts[n];
-            emit(podcast.id, null);
+            searchPodcast(podcast.id, podcast);
         }
     }
 }
