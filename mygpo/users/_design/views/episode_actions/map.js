@@ -2,7 +2,7 @@ function(doc)
 {
     if(doc.doc_type == "EpisodeUserState")
     {
-        for(n in doc.actions)
+        for(var n in doc.actions)
         {
             action = doc.actions[n];
 

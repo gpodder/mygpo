@@ -26,7 +26,7 @@ function(doc)
         played_parts = [];
         flat_date = null;
 
-        for(n in actions)
+        for(var n in actions)
         {
             action = actions[n];
 
@@ -59,7 +59,7 @@ function(doc)
         }
 
         sections = [];
-        for(n in played_parts)
+        for(var n in played_parts)
         {
             part = played_parts[n];
             sections.push(part.start);

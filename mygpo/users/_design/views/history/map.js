@@ -50,14 +50,14 @@ function(doc)
 
     if(doc.doc_type == "EpisodeUserState")
     {
-        for(n in doc.actions)
+        for(var n in doc.actions)
         {
             processEpisodeAction(doc.actions[n]);
         }
     }
     if(doc.doc_type == "PodcastUserState")
     {
-        for(n in doc.actions)
+        for(var n in doc.actions)
         {
             processSubscriptionAction(doc.actions[n]);
         }

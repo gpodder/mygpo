@@ -4,7 +4,7 @@ function(doc)
     {
         subscribed_devices = [];
 
-        for(n in doc.actions)
+        for(var n in doc.actions)
         {
             action = doc.actions[n];
 
@@ -19,7 +19,7 @@ function(doc)
             }
         }
 
-        for(n in subscribed_devices)
+        for(var n in subscribed_devices)
         {
             device = subscribed_devices[n];
 

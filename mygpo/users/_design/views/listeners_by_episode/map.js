@@ -14,7 +14,7 @@ function(doc)
 
     if(doc.doc_type == "EpisodeUserState")
     {
-        for(n=doc.actions.length-1; n>=0; n--)
+        for(var n=doc.actions.length-1; n>=0; n--)
         {
             action = doc.actions[n];
             if(action.action == "play")
