@@ -41,7 +41,7 @@ class Suggestions(Document):
         ids = filter(lambda x: not x in self.blacklist + subscriptions, self.podcasts)
         if count:
             ids = ids[:count]
-        return filter(lambda x: x.title, Podcast.get_multi(ids))
+        return filter(lambda x: x and x.title, Podcast.get_multi(ids))
 
 
     def __repr__(self):
