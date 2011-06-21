@@ -193,8 +193,10 @@ def remove_tag(request, pid):
 
     @repeat_on_conflict(['state'])
     def update(state):
-        state.tags.remove(tag_str)
-        state.save()
+        tags = list(state.tags)
+        if tag_str in tags:
+            state.tags.remove(tag_str)
+            state.save()
 
     update(state=podcast_state)
 
