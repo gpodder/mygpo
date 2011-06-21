@@ -28,6 +28,12 @@ def update_podcast_settings(state, is_public):
 
 @allowed_methods(['GET', 'POST'])
 def show(request, pid):
+
+    try:
+        pid = int(pid)
+    except (TypeError, ValueError):
+        raise Http404
+
     podcast = get_object_or_404(Podcast, pk=pid)
     new_podcast = migrate.get_or_migrate_podcast(podcast)
 
