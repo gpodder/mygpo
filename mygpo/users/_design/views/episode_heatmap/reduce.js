@@ -42,6 +42,36 @@ function (keys, values, rereduce)
         }
     };
 
+    function mergeBorders(borders, maxBorders)
+    {
+        last = null;
+        newBorders = [];
+
+        lastBorder = borders[borders.length-1];
+        minDist = lastBorder / maxBorders;
+
+        for(var n in borders)
+        {
+            border = borders[n];
+
+            if(last == null)
+            {
+            }
+            else if (border == lastBorder)
+            {
+            }
+            else if ((border - last) < minDist)
+            {
+                continue;
+            }
+
+            newBorders.push(border);
+            last = border;
+        }
+
+        return newBorders;
+    };
+
     if (rereduce)
     {
         all_borders = [];
@@ -58,6 +88,7 @@ function (keys, values, rereduce)
     borders = flatten(all_borders);
     borders = unique(borders);
     borders.sort(sortNumerical);
+    borders = mergeBorders(borders, 50);
 
     heatmap = [];
 
