@@ -90,8 +90,13 @@ def delete_device_signal(sender, instance=False, **kwargs):
 
     user = get_or_migrate_user(instance.user)
     dev = get_or_migrate_device(instance, user=user)
-    user.remove_device(dev)
-    user.save()
+
+    @repeat_on_conflict(['user'])
+    def remove_dev(user, dev):
+        user.remove_device(dev)
+        user.save()
+
+    remove_dev(user=user, dev=dev)
 
 
 
@@ -181,8 +186,8 @@ def update_podcast(oldp, newp):
             setattr(newp, p, getattr(oldp, p, None))
             updated = True
 
-    if not oldp.url in newp.urls:
-        newp.urls.append(oldp.url)
+    if not oldp.url in list(newp.urls):
+        newp.urls = list(newp.urls) + [oldp.url]
         updated = True
 
     if updated:
@@ -368,8 +373,12 @@ def create_device(oldd, sparse=False, user=None):
     if not sparse:
         update_device(oldd, d)
 
-    user.devices.append(d)
-    user.save()
+    @repeat_on_conflict(['user'])
+    def add_device(user):
+        user.devices.append(d)
+        user.save()
+
+    add_device(user=user)
     return d
 
 
