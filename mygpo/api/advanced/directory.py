@@ -81,6 +81,7 @@ def podcast_data(podcast, domain):
         obj = podcast
     elif isinstance(podcast, models.PodcastGroup):
         obj = podcast.podcasts[0]
+        podcast = podcast.podcasts[0]
     elif podcast.group:
         obj = models.PodcastGroup.for_oldid(podcast.group.id)
     else:
