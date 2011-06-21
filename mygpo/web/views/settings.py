@@ -137,8 +137,8 @@ def privacy(request):
     subscriptions = user.get_subscriptions()
     podcasts = get_to_dict(Podcast, [x[1] for x in subscriptions], get_id=Podcast.get_id)
 
-    included_subscriptions = set([podcasts[x[1]] for x in subscriptions if x[0] == True])
-    excluded_subscriptions = set([podcasts[x[1]] for x in subscriptions if x[0] == False])
+    included_subscriptions = set(filter(None, [podcasts.get(x[1], None) for x in subscriptions if x[0] == True]))
+    excluded_subscriptions = set(filter(None, [podcasts.get(x[1], None) for x in subscriptions if x[0] == False]))
 
     return render_to_response('privacy.html', {
         'public_subscriptions': user.settings.get('public_subscriptions', True),
