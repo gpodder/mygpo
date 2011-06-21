@@ -36,13 +36,15 @@
        {% if s.type == "Subscription" %}
         {% podcast_group_link s.podcast %}
        {% else %}
-        <a href="{% url episode s.episode.oldid %}">
-         {% if s.episode.title %}
-          {{ s.episode.title|striptags }}
-         {% else %}
-          {% trans "Unnamed Episode" %}
-         {% endif %}
-     </a><br/><span class="from_podcast">{% trans "from" %} {% podcast_group_link s.podcast %}</span>
+        {% if s.episode %}
+         <a href="{% url episode s.episode.id %}">
+          {% if s.episode.title %}
+           {{ s.episode.title|striptags }}
+          {% else %}
+           {% trans "Unnamed Episode" %}
+          {% endif %}
+         </a><br/><span class="from_podcast">{% trans "from" %} {% podcast_group_link s.episode.podcast %}</span>
+        {% endif %}
        {% endif %}
       </td>
       <td style="width: 80px;"><span title="{{ s.timestamp }}">{{ s.timestamp|date:"Y-m-d" }}</span></td>
