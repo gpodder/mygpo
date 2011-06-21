@@ -44,7 +44,14 @@ def main(request, username, scope):
     def device_settings(user, uid):
         device = get_object_or_404(Device, user=user, uid=uid)
         user = migrate.get_or_migrate_user(user)
-        settings_obj = migrate.get_or_migrate_device(device, user)
+
+        # This is a reference to a separate obj
+        dev = migrate.get_or_migrate_device(device, user)
+
+        # get it from the user directly so that changes
+        # to settings_obj are reflected in user (bug 1344)
+        settings_obj = user.get_device_by_uid(uid)
+
         return user, settings_obj
 
     def podcast_settings(user, url):
