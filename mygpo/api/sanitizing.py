@@ -260,7 +260,7 @@ def rewrite_newpodcast(p_old, p_new):
     p_n = models.Podcast.for_oldid(p_new.id)
     p_o = models.Podcast.for_oldid(p_old.id)
 
-    if not p_o:
+    if Nont in (p_n, p_o):
         return
 
 
