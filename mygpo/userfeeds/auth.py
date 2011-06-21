@@ -15,7 +15,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest, Http404
 from django.contrib.auth.models import User
 from mygpo.log import log
 from mygpo import migrate
@@ -24,7 +24,11 @@ from mygpo import migrate
 #
 def view_or_basicauth(view, request, username, token_name, realm = "", *args, **kwargs):
 
-    user = User.objects.get(username=username)
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        raise Http404
+
     user = migrate.get_or_migrate_user(user)
     token = getattr(user, token_name, '')
 
