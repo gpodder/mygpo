@@ -267,20 +267,25 @@ class Device(models.Model):
         podcasts = utils.get_to_dict(models.Podcast, add + rem, get_id=models.Podcast.get_id)
 
         for podcast_id in add:
-            podcast = podcasts[podcast_id]
+            podcast = podcasts.get(podcast_id, None)
+            if podcast is None:
+                continue
             try:
                 podcast.subscribe(self)
             except Exception as e:
                 log('Web: %(username)s: cannot sync device: %(error)s' %
-                    dict(username=request.user.username, error=repr(e)))
+                    dict(username=self.user.username, error=repr(e)))
 
         for podcast_id in rem:
-            podcast = podcasts[podcast_id]
+            podcast = podcasts.get(podcast_id, None)
+            if not podcast:
+                continue
+
             try:
                 podcast.unsubscribe(self)
             except Exception as e:
                 log('Web: %(username)s: cannot sync device: %(error)s' %
-                    dict(username=request.user.username, error=repr(e)))
+                    dict(username=self.user.username, error=repr(e)))
 
 
     def sync_targets(self):
