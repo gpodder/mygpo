@@ -120,6 +120,9 @@ class PodcastGroup(models.Model):
     def logo_url(self):
         return utils.first(p.logo_url for p in Podcast.objects.filter(group=self))
 
+    def get_logo_url(self, size):
+        return utils.first(p.get_logo_url(size) for p in Podcast.objects.filter(group=self))
+
     def add(self, podcast, membername):
         if podcast.group == self:
             podcast.group_member_name = membername
