@@ -291,7 +291,7 @@ class EpisodeUserState(Document):
         @repeat_on_conflict(['state'])
         def update(state):
             for chapter in add:
-                self.chapters.append(chapter)
+                self.chapters = self.chapters + [chapter]
 
             for start, end in rem:
                 print 'remove: start %d, end %d' % (start, end)
