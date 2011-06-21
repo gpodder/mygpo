@@ -175,8 +175,8 @@
        <a href="{% url device s.device.oldid %}">{{ s.device|device_icon }} {{ s.device.name|striptags }}</a>
       {% endif %}
      </td>
-     <td>{% if s.started %}{{s.started_time|date:"H:m:s" }} - {% endif %}
-         {% if s.playmark %}{{ s.playmark_time|date:"H:m:s" }}{% endif %}
+     <td>{% if s.started or s.playmark %}{{s.started|format_time }} - {% endif %}
+         {% if s.playmark %}{{ s.playmark|format_time }}{% endif %}
      </td>
 	</tr>
    {% endfor %}
