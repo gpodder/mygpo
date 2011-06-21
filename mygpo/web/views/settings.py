@@ -110,30 +110,28 @@ def privacy(request):
     site = RequestSite(request)
     user = migrate.get_or_migrate_user(request.user)
 
-    @repeat_on_conflict(['user'])
-    def set_privacy_settings(user, is_public):
-        user.settings['public_subscriptions'] = is_public
-        user.save()
+    @repeat_on_conflict(['state'])
+    def set_privacy_settings(state, is_public):
+        state.settings['public_subscriptions'] = is_public
+        state.save()
 
     if 'private_subscriptions' in request.GET:
-        set_privacy_settings(user, False)
+        set_privacy_settings(state=user, is_public=False)
 
     elif 'public_subscriptions' in request.GET:
-        set_privacy_settings(user, True)
+        set_privacy_settings(state=user, is_public=True)
 
     if 'exclude' in request.GET:
         id = request.GET['exclude']
         podcast = Podcast.get(id)
         state = podcast.get_user_state(request.user)
-        state.settings['public_subscription'] = False
-        state.save()
+        set_privacy_settings(state=state, is_public=False)
 
     if 'include' in request.GET:
         id = request.GET['include']
         podcast = Podcast.get(id)
         state = podcast.get_user_state(request.user)
-        state.settings['public_subscription'] = True
-        state.save()
+        set_privacy_settings(state=state, is_public=True)
 
     user = migrate.get_or_migrate_user(request.user)
     subscriptions = user.get_subscriptions()
