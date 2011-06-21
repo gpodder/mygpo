@@ -182,7 +182,7 @@ def set_subscriptions(urls, user, device_uid):
     rem = [p for p in old if p not in urls]
 
     for r in rem:
-        p = Podcast.objects.get(url=r)
+        p, created = Podcast.objects.get_or_create(url=r)
         p = migrate.get_or_migrate_podcast(p)
         try:
             p.unsubscribe(device)
@@ -216,9 +216,11 @@ def toplist(request, count, format):
     def get_podcast(t):
         old_pos, p = t
         if isinstance(p, models.Podcast):
-            return p
+            podcast = p
         else:
-            return p.podcasts[0]
+            podcast = p.podcasts[0]
+        podcast.old_pos = old_pos
+        return podcast
 
     def json_map(t):
         podcast = get_podcast(t)
@@ -226,7 +228,7 @@ def toplist(request, count, format):
         p.update(dict(
             subscribers=           podcast.subscriber_count(),
             subscribers_last_week= podcast.prev_subscriber_count(),
-            position_last_week=    0
+            position_last_week=    podcast.old_pos,
         ))
         return p
 
