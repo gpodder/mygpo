@@ -44,6 +44,7 @@ class Command(BaseCommand):
             new_user = migrate.get_or_migrate_user(user)
             subscribed_podcasts = list(set(new_user.get_subscribed_podcasts()))
 
+            subscribed_podcasts = filter(None, subscribed_podcasts)
             related = chain(*[p.related_podcasts for p in subscribed_podcasts])
             related = filter(lambda pid: not pid in suggestion.blacklist, related)
             related = set_by_frequency(related)
