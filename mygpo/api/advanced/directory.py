@@ -27,6 +27,7 @@ from django.views.decorators.cache import cache_page
 from mygpo.core import models
 from mygpo.utils import parse_range
 from mygpo.directory.tags import TagCloud
+from mygpo import migrate
 
 
 @csrf_exempt
