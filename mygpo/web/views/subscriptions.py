@@ -95,7 +95,10 @@ def create_subscriptionlist(request):
     for public, podcast_id, device_id in subscriptions:
         device = devices[device_id]
         if not podcast_id in subscription_list:
-            podcast = podcasts[podcast_id]
+            podcast = podcasts.get(podcast_id, None)
+            if podcast is None:
+                continue
+
             e = Episode.objects.filter(podcast=podcast.get_old_obj(), timestamp__isnull=False).order_by('-timestamp')
             episode = e[0] if e.count() > 0 else None
             subscription_list[podcast_id] = {'podcast': podcasts[podcast_id], 'devices': [device], 'episode': episode}
@@ -141,6 +144,7 @@ class SubscriptionsFeed(Feed):
         history = skip_pairs(history)
         history = list(history)[-NUM_ITEMS:]
         history = HistoryEntry.fetch_data(user, history)
+        history = filter(lambda e:e.podcast, history)
         return history
 
     def author_name(self, user):
