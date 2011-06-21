@@ -17,7 +17,13 @@ class Command(BaseCommand):
     Compacts the database and all views, and measures the required time
     """
 
-    DESIGN_DOCS = ('core', 'users', 'directory', 'maintenance', 'django_couchdb_utils', )
+    @staticmethod
+    def get_design_docs(db):
+        prefix = '_design/'
+        prefix_len = len(prefix)
+
+        for ddoc in db.view('_all_docs', startkey='_design/', endkey='_design0'):
+            yield ddoc['key'][prefix_len:]
 
 
     def handle(self, *args, **options):
@@ -32,7 +38,7 @@ class Command(BaseCommand):
         duration = self.compact_wait(compact_db, db_is_compacting)
         print duration
 
-        for design_doc in self.DESIGN_DOCS:
+        for design_doc in self.get_design_docs(db):
             print 'Compacting %s ...' % design_doc,
             sys.stdout.flush
             compact_view = lambda: db.compact('%s' % design_doc)
@@ -45,11 +51,27 @@ class Command(BaseCommand):
     def compact_wait(compact, is_compacting, sleep_time=1, inc_factor = 2):
 
         start = datetime.utcnow()
-        compact()
 
-        while is_compacting():
-            sleep(sleep_time)
-            sleep_time *= inc_factor
+        while True:
+            try:
+                compact()
+                break
+            except Exception, e:
+                sleep(100)
+                print >> sys.stderr, e
+
+        while True:
+            try:
+                is_comp = is_compacting()
+                if is_comp:
+                    sleep(sleep_time)
+                    sleep_time *= inc_factor
+                else:
+                    break
+
+            except Exception, e:
+                sleep(100)
+                print >> sys.stderr, e
 
         end = datetime.utcnow()
 
