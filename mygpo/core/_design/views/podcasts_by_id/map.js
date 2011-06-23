@@ -18,6 +18,7 @@ function(doc)
     {
         for(var n in doc.podcasts)
         {
+            var podcast = doc.podcasts[n];
             searchPodcast(podcast.id, podcast);
         }
     }
