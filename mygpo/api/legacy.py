@@ -75,7 +75,7 @@ def upload(request):
         try:
             p.subscribe(d)
         except Exception as e:
-            log('Legacy API: %(username): could not subscribe to podcast %(podcast_url) on device %(device_id): %(exception)s' %
+            log('Legacy API: %(username)s: could not subscribe to podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
                 {'username': user.username, 'podcast_url': p.url, 'device_id': d.id, 'exception': e})
 
     for r in rem:
