@@ -30,20 +30,29 @@
     </tr>
     {% for s in history %}
      <tr>
-       <td>{{ s.podcast|podcast_logo }}</td>
+       <td>
+        {% if s.podcast %}
+         {{ s.podcast|podcast_logo }}
+        {% endif %}
+       </td>
 
       <td>
        {% if s.type == "Subscription" %}
-        {% podcast_group_link s.podcast %}
+        {% if s.podcast %}
+         {% podcast_group_link s.podcast %}
+        {% endif %}
        {% else %}
         {% if s.episode %}
-         <a href="{% url episode s.episode.id %}">
+         <a href="{% url episode s.episode.oldid %}">
           {% if s.episode.title %}
            {{ s.episode.title|striptags }}
           {% else %}
            {% trans "Unnamed Episode" %}
           {% endif %}
-         </a><br/><span class="from_podcast">{% trans "from" %} {% podcast_group_link s.episode.podcast %}</span>
+         </a><br />
+          {% if s.podcast %}
+           <span class="from_podcast">{% trans "from" %} {% podcast_group_link s.podcast %}</span>
+          {% endif %}
         {% endif %}
        {% endif %}
       </td>
