@@ -6,7 +6,6 @@ from mygpo.users.models import Rating, EpisodeAction, User, Device, Subscription
 from mygpo.log import log
 from mygpo import utils
 from mygpo.decorators import repeat_on_conflict
-from mygpo.data.mimetype import get_type
 
 """
 This module contains methods for converting objects from the old
@@ -333,6 +332,7 @@ def update_episode(olde, newe):
         newe.mimetypes.append(olde.mimetype)
         updated = True
 
+    from mygpo.data.mimetype import get_type
     content_types = filter(None, map(get_type, newe.mimetypes))
     if newe.content_types != content_types:
         newe.content_types = content_types

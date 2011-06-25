@@ -58,6 +58,7 @@ class Podcast(models.Model):
 
     def listener_count(self):
         # FIXME: remove after templates don't access this anymore
+        from mygpo import migrate
         new_p = migrate.get_or_migrate_podcast(self)
         return new_p.listener_count()
 
@@ -186,6 +187,7 @@ class Episode(models.Model):
 
     def listener_count(self):
         # FIXME: remove after templates don't access this anymore
+        from mygpo import migrate
         new_e = migrate.get_or_migrate_episode(self)
         return new_e.listener_count()
 
@@ -352,6 +354,7 @@ class Device(models.Model):
         that has an action on this device
         """
 
+        from mygpo import migrate
         dev = migrate.get_or_migrate_device(self)
         return dict(dev.get_latest_changes())
 
@@ -485,13 +488,13 @@ class SubscriptionAction(models.Model):
 
 
 from django.db.models.signals import post_save, pre_delete
-from mygpo import migrate
+from mygpo.migrate import save_podcast_signal, delete_podcast_signal, save_episode_signal, delete_episode_signal, save_device_signal, delete_device_signal
 
-post_save.connect(migrate.save_podcast_signal, sender=Podcast)
-pre_delete.connect(migrate.delete_podcast_signal, sender=Podcast)
+post_save.connect(save_podcast_signal, sender=Podcast)
+pre_delete.connect(delete_podcast_signal, sender=Podcast)
 
-post_save.connect(migrate.save_episode_signal, sender=Episode)
-pre_delete.connect(migrate.delete_episode_signal, sender=Episode)
+post_save.connect(save_episode_signal, sender=Episode)
+pre_delete.connect(delete_episode_signal, sender=Episode)
 
-post_save.connect(migrate.save_device_signal, sender=Device)
-pre_delete.connect(migrate.delete_device_signal, sender=Device)
+post_save.connect(save_device_signal, sender=Device)
+pre_delete.connect(delete_device_signal, sender=Device)
