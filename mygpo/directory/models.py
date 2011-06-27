@@ -1,3 +1,5 @@
+from django.core.cache import cache
+
 from couchdbkit.ext.django.schema import *
 
 from mygpo.core.models import Podcast
@@ -63,7 +65,16 @@ class Category(Document):
 
 
     def get_podcasts(self, start=0, end=20):
-        return Podcast.get_multi(self.get_podcast_ids(start, end))
+        cache_id = 'category-%s' % self._id
+
+        podcasts = cache.get(cache_id, [])
+
+        if len(podcasts) < end:
+            ids = self.get_podcast_ids(len(podcasts), end)
+            podcasts.extend(list(Podcast.get_multi(ids)))
+            cache.set(cache_id, podcasts)
+
+        return podcasts[start:end]
 
 
 

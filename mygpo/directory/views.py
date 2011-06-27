@@ -1,3 +1,4 @@
+from django.core.cache import cache
 from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -51,17 +52,13 @@ def browse(request, num_categories=10, num_tags_cloud=90, podcasts_per_category=
 
     # collect Ids of top podcasts in top categories, fetch all at once
     categories = Category.top_categories(num_categories)
-    podcast_ids = flatten(c.get_podcast_ids(0, podcasts_per_category) for c in categories)
-    podcasts = get_to_dict(Podcast, podcast_ids, get_id=Podcast.get_id, use_cache=True)
 
     disp_categories = []
     for category in categories:
-        pids = category.get_podcast_ids(0, podcasts_per_category)
-        entries = [podcasts.get(pid, None) for pid in pids]
-        entries = filter(None, entries)
+        podcasts = category.get_podcasts(0, podcasts_per_category)
         disp_categories.append({
             'tag': category.label,
-            'entries': entries,
+            'entries': podcasts,
             })
 
     tag_cloud = TagCloud(count=num_tags_cloud, skip=num_categories, sort_by_name=True)
