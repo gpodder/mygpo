@@ -471,6 +471,23 @@ class Podcast(Document):
         return self.get_id() == other.get_id()
 
 
+    @classmethod
+    def all_podcasts(cls):
+        from mygpo.utils import multi_request_view
+
+        db = cls.get_db()
+        for r in multi_request_view(db, 'core/podcasts_by_oldid', include_docs=True):
+            obj = r['doc']
+            if obj['doc_type'] == 'Podcast':
+                yield Podcast.wrap(obj)
+            else:
+                oldid = r[u'key']
+                pg = PodcastGroup.wrap(obj)
+                podcast = pg.get_podcast_by_oldid(oldid)
+                yield podcast
+
+
+
 class PodcastGroup(Document):
     title    = StringProperty()
     podcasts = SchemaListProperty(Podcast)
