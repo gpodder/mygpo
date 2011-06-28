@@ -28,7 +28,7 @@
      <tr>
       <td>{{ podcast|podcast_logo }}</td>
       <td>{% podcast_group_link podcast %}</td>
-      <td style="text-align: center;"><a href="{% url unsubscribe podcast.oldid device.id %}?return_to=/device/{{ device.id }}"><img src="/media/unsubscribe.png" /></a></td>
+      <td style="text-align: center;"><a href="{% podcast_link_target podcast "unsubscribe" device.id %}?return_to=/device/{{ device.id }}"><img src="/media/unsubscribe.png" /></a></td>
      </tr>
     {% endfor %}
    </table>

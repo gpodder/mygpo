@@ -6,6 +6,8 @@ from django.utils.html import strip_tags
 import hashlib
 
 from mygpo.constants import PODCAST_LOGO_SIZE, PODCAST_LOGO_BIG_SIZE
+from mygpo.web.utils import get_podcast_link_target
+
 
 register = template.Library()
 def create_podcast_logo(podcast, size):
@@ -38,24 +40,39 @@ def is_podcast(podcast):
     return isinstance(podcast, Podcast)
 
 
-@register.simple_tag
-def podcast_link_target(podcast):
-    """ Returns the link-target for a Podcast, preferring slugs over Ids
 
-    automatically distringuishes between relational Podcast objects and
-    CouchDB-based Podcasts """
 
-    from mygpo.api.models import Podcast as OldPodcast
-    from mygpo.core.models import Podcast
-    from django.core.urlresolvers import reverse
+class PodcastLinkTargetNode(template.Node):
+    """ Links to a (view of a) Podcast """
 
-    if isinstance(podcast, OldPodcast):
-        target = podcast.id
-    # we can check for slugs, CouchDB-Ids here, too
-    else:
-        target = podcast.oldid
+    def __init__(self, podcast, view_name, add_args):
+        self.podcast = template.Variable(podcast)
+        self.view_name = view_name.replace('"', '')
+        self.add_args = [template.Variable(arg) for arg in add_args]
 
-    return strip_tags(reverse('podcast', args=[target]))
+
+    def render(self, context):
+        podcast = self.podcast.resolve(context)
+        add_args = [arg.resolve(context) for arg in self.add_args]
+        return get_podcast_link_target(podcast, self.view_name, add_args)
+
+
+    @staticmethod
+    def compile(parser, token):
+        try:
+            contents  = token.split_contents()
+            tag_name  = contents[0]
+            podcast   = contents[1]
+            view_name = contents[2] if len(contents) > 2 else 'podcast'
+            add_args  = contents[3:]
+
+        except ValueError:
+            raise template.TemplateSyntaxError("%r tag requires at least one argument" % token.contents.split()[0])
+
+        return PodcastLinkTargetNode(podcast, view_name, add_args)
+
+
+register.tag('podcast_link_target', PodcastLinkTargetNode.compile)
 
 
 @register.simple_tag
@@ -89,4 +106,4 @@ def podcast_link(podcast, title=None):
     title = strip_tags(title)
 
     return '<a href="%(target)s" title="%(title)s">%(title)s</a>' % \
-        dict(target=podcast_link_target(podcast), title=title)
+        dict(target=get_podcast_link_target(podcast), title=title)

@@ -63,6 +63,25 @@ class Episode(Document):
         return r.first()
 
 
+    @classmethod
+    def for_slug_id(cls, p_slug_id, e_slug_id):
+        """ Returns the Episode for Podcast Slug/Id and Episode Slug/Id """
+
+        # The Episode-Id is unique, so take that
+        if utils.is_couchdb_id(e_slug_id):
+            return cls.get(e_slug_id)
+
+        # If we search using a slug, we need the Podcast's Id
+        if utils.is_couchdb_id(p_slug_id):
+            p_id = p_slug_id
+        else:
+            podcast = Podcast.get(p_slug_id)
+            p_id = podcast.get_id()
+
+        return cls.for_slug(p_id, e_slug_id)
+
+
+
     def get_old_obj(self):
         if self.oldid:
             from mygpo.api.models import Episode
@@ -219,6 +238,16 @@ class Podcast(Document):
             pid = res['key'][1]
             pg = PodcastGroup.wrap(doc)
             return pg.get_podcast_by_id(pid)
+
+
+    @classmethod
+    def for_slug_id(cls, slug_id):
+        """ Returns the Podcast for either an CouchDB-ID for a Slug """
+
+        if utils.is_couchdb_id(slug_id):
+            return cls.get(slug_id)
+        else:
+            return cls.for_slug(slug_id)
 
 
     @classmethod

@@ -58,7 +58,7 @@
    <h2>{% trans "Subscriptions" %}</h2>
 
   {% if not user.is_authenticated %}
-      <div class="subscribe"><a href="{% url subscribe podcast.id %}"><img src="/media/subscribe.png" style="vertical-align: middle;" alt=""/> {% trans "Subscribe to this podcast" %}</a></div>
+      <div class="subscribe"><a href="{% podcast_link_target podcast "subscribe" %}"><img src="/media/subscribe.png" style="vertical-align: middle;" alt=""/> {% trans "Subscribe to this podcast" %}</a></div>
   {% endif %}
 
   {% if devices or can_subscribe %}
@@ -71,13 +71,13 @@
                 <a href="{% url device device.oldid %}">{{ device.name|striptags }}</a>
             </td>
             <td style="text-align: center;">
-                <a href="{% url unsubscribe podcast.id device.oldid %}?return_to=/podcast/{{ podcast.id }}"><img src="/media/unsubscribe.png" alt="{% trans "Unsubscribe" %}" title="{% trans "Click here to unsubscribe" %}"/></a>
+                <a href="{% podcast_link_target podcast "unsubscribe" device.oldid %}?return_to=/podcast/{{ podcast.id }}"><img src="/media/unsubscribe.png" alt="{% trans "Unsubscribe" %}" title="{% trans "Click here to unsubscribe" %}"/></a>
             </td>
         </tr>
     {% endfor %}
         {% if can_subscribe %}
          <tr>
-          <form action="{% url subscribe podcast.id %}" method="post">
+          <form action="{% podcast_link_target podcast "subscribe" %}" method="post">
            {% csrf_token %}
            <td>{{ subscribe_form.as_p }}</td>
            <td style="text-align: center;">
@@ -99,7 +99,7 @@
      <div class="tag-list">
      {% for tag in tags %}{% spaceless %}
        {% if tag.is_own %}
-        <span class="own">{{ tag.tag }} <a class="remove" href="{% url remove-tag podcast.id %}?tag={{ tag.tag }}">X</a></span>
+        <span class="own">{{ tag.tag }} <a class="remove" href="{% podcast_link_target podcast "remove-tag" %}?tag={{ tag.tag }}">X</a></span>
        {% else %}
         <span class="other">{{ tag.tag }}</span>
        {% endif %}
@@ -161,7 +161,7 @@
      <tr>
       <td style="text-align: center; padding-left: 5px; padding-right: 5px;">{{ episode.action|episode_status_icon }}</td>
       <td style="width: 500px;">
-          <p class="title"><a href="{% url episode episode.id %}">{{ episode.title|default:"Unknown Episode"|striptags }}</a></p>
+          <p class="title">{% episode_link episode %}</p>
           <p class="description">{{ episode.description|default:""|striptags|truncatewords:"15" }}</p>
       </td>
       <td>{{ episode.timestamp|default:""|date:"Y-m-d" }}</td>

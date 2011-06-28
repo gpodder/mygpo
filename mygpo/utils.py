@@ -420,3 +420,11 @@ def is_url(string):
     """
 
     return bool(re_url.match(string))
+
+
+def is_couchdb_id(id_str):
+    import string
+    import operator
+    import functools
+    f = functools.partial(operator.contains, string.hexdigits)
+    return len(id_str) == 32 and all(map(f, id_str))

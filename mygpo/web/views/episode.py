@@ -40,17 +40,6 @@ from mygpo.decorators import repeat_on_conflict
 
 
 
-def show_slug(request, p_slug, e_slug):
-    podcast = models.Podcast.for_slug(p_slug)
-    ep = podcast.get_episode_for_slug(e_slug)
-
-    if p_slug != podcast.slug or e_slug != ep.slug:
-        target = reverse('episode_slug', args=[podcast.slug, ep.slug])
-        return HttpResponseRedirect(target)
-
-    return episode(request, ep.oldid)
-
-
 @manual_gc
 def episode(request, id):
     episode = get_object_or_404(Episode, pk=id)
@@ -242,3 +231,20 @@ def add_action(request, id):
     _add_action(action=action)
 
     return HttpResponseRedirect(reverse('episode', args=[id]))
+
+# To make all view accessible via either CouchDB-ID for Slugs
+# a decorator queries the episode and passes the Id on to the
+# regular views
+
+def slug_id_decorator(f):
+    def _decorator(request, p_slug_id, e_slug_id, *args, **kwargs):
+        episode = models.Episode.for_slug_id(p_slug_id, e_slug_id)
+        return f(request, episode.oldid, *args, **kwargs)
+
+    return _decorator
+
+
+show_slug_id            = slug_id_decorator(episode)
+add_chapter_slug_id     = slug_id_decorator(add_chapter)
+remove_chapter_slug_id  = slug_id_decorator(remove_chapter)
+toggle_favorite_slug_id = slug_id_decorator(toggle_favorite)

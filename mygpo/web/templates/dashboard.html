@@ -72,13 +72,7 @@
    {% for episode in newest_episodes %}
     <tr>
      <td>{{ episode.podcast|podcast_logo }}</td>
-     <td><a href="{% url episode episode.id %}">
-      {% if episode.title %}
-       {{ episode.title|striptags }}
-      {% else %}
-       {% trans "Unnamed Episode" %}
-      {% endif %}
-      </a><br/>
+     <td>{% episode_link episode %}<br/>
       <span class="from_podcast">{% trans "from" %} {% podcast_group_link episode.podcast %}
      </td>
      <td>{{ episode.timestamp|naturalday }}</td>

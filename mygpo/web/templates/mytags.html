@@ -22,12 +22,12 @@
      <td>{% podcast_group_link podcast %}</td>
      <td class="tag-list">
      {% for tag in taglist %}{% spaceless %}
-       <span class="own">{{ tag }} <a class="remove" href="{% url remove-tag podcast.oldid %}?tag={{ tag }}&next=mytags">X</a></span>
+       <span class="own">{{ tag }} <a class="remove" href="{% podcast_link_target podcast "remove-tag" %}?tag={{ tag }}&next=mytags">X</a></span>
        {% if not forloop.last %}<span class="seperator">,</span>{% endif %}
       {% endspaceless %}
      {% endfor %}
      {% if user.is_authenticated %}
-      <form action="{% url add-tag podcast.oldid %}">
+      <form action="{% podcast_link_target podcast "add-tag" %}">
        <input type="text" name="tag" />
        <input type="submit" value="Add" />
        <input type="hidden" name="next" value="mytags" />

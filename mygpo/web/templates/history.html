@@ -43,13 +43,7 @@
         {% endif %}
        {% else %}
         {% if s.episode %}
-         <a href="{% url episode s.episode.oldid %}">
-          {% if s.episode.title %}
-           {{ s.episode.title|striptags }}
-          {% else %}
-           {% trans "Unnamed Episode" %}
-          {% endif %}
-         </a><br />
+         {% episode_link s.episode %}
           {% if s.podcast %}
            <span class="from_podcast">{% trans "from" %} {% podcast_group_link s.podcast %}</span>
           {% endif %}
