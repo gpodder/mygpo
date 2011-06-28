@@ -1,3 +1,5 @@
+from itertools import imap as map
+
 from django.core.cache import cache
 from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render_to_response
@@ -53,18 +55,16 @@ def browse(request, num_categories=10, num_tags_cloud=90, podcasts_per_category=
     # collect Ids of top podcasts in top categories, fetch all at once
     categories = Category.top_categories(num_categories)
 
-    disp_categories = []
-    for category in categories:
-        podcasts = category.get_podcasts(0, podcasts_per_category)
-        disp_categories.append({
-            'tag': category.label,
-            'entries': podcasts,
-            })
+    def _prepare_category(category):
+        category.entries = category.get_podcasts(0, podcasts_per_category)
+        return category
+
+    categories = map(_prepare_category, categories)
 
     tag_cloud = TagCloud(count=num_tags_cloud, skip=num_categories, sort_by_name=True)
 
     return render_to_response('directory.html', {
-        'categories': disp_categories,
+        'categories': categories,
         'tag_cloud': tag_cloud,
         }, context_instance=RequestContext(request))
 

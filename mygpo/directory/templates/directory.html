@@ -18,7 +18,7 @@
   {% for cat in categories %}
 
    <div class="intro-box">
-   <h2>{{ cat.tag }}</h2>
+   <h2>{{ cat.label }}</h2>
    <table class="list">
     {% for entry in cat.entries %}
      <tr>
@@ -28,7 +28,7 @@
     {% endfor %}
     <tr>
      <td></td>
-     <td><a href="{% url directory cat.tag %}">{% trans "more..." %}</a></td>
+     <td><a href="{% url directory cat.label %}">{% trans "more..." %}</a></td>
     </tr>
    </table>
    </div>
