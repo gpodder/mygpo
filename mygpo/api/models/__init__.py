@@ -146,26 +146,6 @@ class PodcastGroup(models.Model):
         managed = False
 
 
-class EpisodeToplistEntryManager(models.Manager):
-
-    def get_query_set(self):
-        return super(EpisodeToplistEntryManager, self).get_query_set().order_by('-listeners')
-
-
-class EpisodeToplistEntry(models.Model):
-    episode = models.ForeignKey('Episode')
-    listeners = models.PositiveIntegerField()
-
-    objects = EpisodeToplistEntryManager()
-
-    def __unicode__(self):
-        return '%s (%s)' % (self.episode, self.listeners)
-
-    class Meta:
-        db_table = 'episode_toplist'
-        managed = False
-
-
 class Episode(models.Model):
     podcast = models.ForeignKey(Podcast)
     url = models.URLField(verify_exists=False)
