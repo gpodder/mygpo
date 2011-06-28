@@ -38,7 +38,13 @@ class Command(BaseCommand):
         duration = self.compact_wait(compact_db, db_is_compacting)
         print duration
 
-        for design_doc in self.get_design_docs(db):
+        # Only compact once if multiple views share one index file
+        ddocs = {}
+        for ddoc in self.get_design_docs(db):
+            sig = db.res.get('/_design/%s/_info' % ddoc).json_body['view_index']['signature']
+            ddocs[sig] = ddoc
+
+        for design_doc in ddocs.values():
             print 'Compacting %s ...' % design_doc,
             sys.stdout.flush
             compact_view = lambda: db.compact('%s' % design_doc)
