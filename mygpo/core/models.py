@@ -475,8 +475,7 @@ class Podcast(Document):
     def all_podcasts(cls):
         from mygpo.utils import multi_request_view
 
-        db = cls.get_db()
-        for r in multi_request_view(db, 'core/podcasts_by_oldid', include_docs=True):
+        for r in multi_request_view(cls, 'core/podcasts_by_oldid', wrap=False, include_docs=True):
             obj = r['doc']
             if obj['doc_type'] == 'Podcast':
                 yield Podcast.wrap(obj)

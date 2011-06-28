@@ -229,7 +229,7 @@ def intersect(a, b):
      return list(set(a) & set(b))
 
 
-def multi_request_view(cls, view, *args, **kwargs):
+def multi_request_view(cls, view, wrap=True, *args, **kwargs):
     """
     splits up a view request into several requests, which reduces
     the server load of the number of returned objects is large.
@@ -238,17 +238,38 @@ def multi_request_view(cls, view, *args, **kwargs):
     might skip some elements of contain some twice
     """
 
-    LIMIT = 1000
-    cur = 0
+    per_page = kwargs.get('limit', 1000)
+    kwargs['limit'] = per_page + 1
+    db = cls.get_db()
+    cont = True
 
-    while True:
-        resp = cls.view(view, *args, skip=cur, limit=LIMIT, **kwargs)
-        if resp.count() == 0:
-            break
-        for obj in resp.iterator():
-            yield obj
+    while cont:
 
-        cur += LIMIT
+        resp = db.view(view, *args, **kwargs)
+        cont = False
+
+        for n, obj in enumerate(resp.iterator()):
+
+            key = obj['key']
+
+            if wrap:
+                doc = cls.wrap(obj['doc'])
+                docid = doc._id
+            else:
+                docid = obj['id']
+                doc = obj
+
+            if n == per_page:
+                kwargs['startkey'] = key
+                kwargs['startkey_docid'] = docid
+                if 'skip' in kwargs:
+                    del kwargs['skip']
+
+                # we reached the end of the page, load next one
+                cont = True
+                break
+
+            yield doc
 
 
 def remove_control_chars(s):
