@@ -13,7 +13,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        start_time = datetime.utcnow()
+        # couchdbkit doesn't preserve microseconds
+        start_time = datetime.utcnow().replace(microsecond=0)
 
         excluded_tags = settings.DIRECTORY_EXCLUDED_TAGS
 
