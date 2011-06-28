@@ -19,7 +19,7 @@ from django.core.urlresolvers import reverse
 from mygpo.api.httpresponse import JsonResponse
 from django.shortcuts import get_object_or_404
 from mygpo.api.sanitizing import sanitize_url
-from mygpo.api.models import Podcast, Episode
+from mygpo.api.models import Podcast
 from mygpo.directory.models import Category
 from django.contrib.sites.models import RequestSite
 from django.views.decorators.csrf import csrf_exempt
@@ -69,7 +69,9 @@ def podcast_info(request):
 def episode_info(request):
     podcast_url = sanitize_url(request.GET.get('podcast', ''))
     episode_url = sanitize_url(request.GET.get('url', ''), 'episode')
-    episode = get_object_or_404(Episode, url=episode_url, podcast__url=podcast_url)
+
+    podcast = models.Podcast.for_url(podcast_url)
+    episode = models.Episode.for_podcast_url(podcast.get_id(), episode_url)
     domain = RequestSite(request).domain
 
     resp = episode_data(episode, domain)
@@ -110,6 +112,7 @@ def podcast_data(obj, domain, scaled_logo_size=64):
 
 def episode_data(episode, domain, podcast=None):
 
+    from mygpo.api.models import Episode
     if isinstance(episode, Episode):
         podcast = episode.podcast
         episode_id = episode.id

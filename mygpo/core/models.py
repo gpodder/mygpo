@@ -64,6 +64,15 @@ class Episode(Document):
 
 
     @classmethod
+    def for_podcast_url(cls, podcast_id, url):
+        r = cls.view('core/episodes_by_podcast_url',
+                key          = [podcast_id, url],
+                include_docs = True,
+            )
+        return r.first()
+
+
+    @classmethod
     def for_slug_id(cls, p_slug_id, e_slug_id):
         """ Returns the Episode for Podcast Slug/Id and Episode Slug/Id """
 
