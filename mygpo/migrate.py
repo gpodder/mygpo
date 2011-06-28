@@ -151,7 +151,7 @@ def update_podcast(oldp, newp):
     if newp._id:
         rel_podcast = set([r.rel_podcast for r in RelatedPodcast.objects.filter(ref_podcast=oldp)])
         rel = list(podcasts_to_ids(rel_podcast))
-        if newp.related_podcasts != rel:
+        if len(newp.related_podcasts) < len(rel):
             newp.related_podcasts = rel
             updated = True
 
