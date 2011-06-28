@@ -38,10 +38,13 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         total = Podcast.view('core/podcasts_by_oldid', limit=0).total_rows
-        podcasts = multi_request_view(Podcast, 'core/podcasts_by_id')
+        podcasts = Podcast.all_podcasts()
+        print 'deleting episodes from podcasts'
+        skipped, updated = 0, 0
 
         for n, podcast in enumerate(podcasts):
             if not 'episodes' in podcast:
+                skipped += 1
                 continue
 
             for episode_id, episode in podcast.episodes.items():
@@ -61,8 +64,9 @@ class Command(BaseCommand):
 
             if options.get('delete', False):
                 self.remove_podcasts(podcast=podcast)
+            updated += 1
 
-            progress(n+1, total)
+            progress(n+1, total, 'skipped: %d, udated %d' % (skipped, updated))
 
 
     @repeat_on_conflict(['podcast'], reload_f=lambda x: Podcast.get(x.get_id()))
