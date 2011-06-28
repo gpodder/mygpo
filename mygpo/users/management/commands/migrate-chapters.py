@@ -33,8 +33,15 @@ class Command(BaseCommand):
             n_chapter.start = chapter.start
             n_chapter.end = chapter.end
             n_chapter.label = chapter.label
-            n_chapter.advertisement = chapter.advertisement
+            n_chapter.advertisement = bool(chapter.advertisement)
             n_chapter.device = device_id
+
+            state.ref_url = chapter.episode.url
+            state.podcast_ref_url = chapter.episode.podcast.url
+
+            if not state.ref_url or not state.podcast_ref_url:
+                continue
+            state.save()
 
             state.update_chapters(add=[n_chapter])
 
