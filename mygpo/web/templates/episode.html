@@ -9,6 +9,7 @@
 {% load youtube %}
 {% load flickr %}
 {% load facebook %}
+{% load google %}
 {% load charts %}
 {% load utils %}
 
@@ -31,6 +32,7 @@
   <script type="text/javascript" src="/media/js/youtube-handler.js"></script>
  {% endif %}
  {{ episode|opengraph_episode }}
+ {% google_plus_one_head %}
 {% endblock head %}
 
 {% block title %}{{ episode.title|default:"Unnamed Episode"|striptags }} - {{ episode.podcast.title|default:"Unnamed Podcast"|striptags}}{% endblock %}
@@ -59,7 +61,10 @@
    <p>{{ episode.description|remove_html_tags|linebreaksbr }}</p>
   {% endif %}
 
-  {{ episode|fb_like_episode }}
+  <div class="share">
+   {% google_plus_one_button %}
+   {{ episode|fb_like_episode }}
+  </div>
 
   {% if episode.url|is_flickr_photo %}
    {{ episode|embed_flickr_photo }}

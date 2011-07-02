@@ -6,6 +6,7 @@
 {% load devices %}
 {% load charts %}
 {% load facebook %}
+{% load google %}
 
 {% load menu %}
 {% block mainmenu %}{{ "/podcast/"|main_menu }}{% endblock %}
@@ -19,6 +20,7 @@
 
 {% block head %}
  {{ podcast|opengraph_podcast }}
+ {% google_plus_one_head %}
 {% endblock %}
 
 {% block title %}{{ podcast.title|default:"Unnamed Podcast"|striptags }}{% endblock %}
@@ -50,7 +52,10 @@
    <p class="description">{{ podcast.description|striptags }}</p>
   {% endif %}
 
-  {{ podcast|fb_like_podcast }}
+  <div class="share" style="vertical-align: top;">
+   {% google_plus_one_button %}
+   {{ podcast|fb_like_podcast }}
+  </div>
 
    {% if devices %}
     <h2>{% trans "My Subscriptions" %}</h2>
