@@ -19,6 +19,7 @@ MENU_STRUCTURE = (
             ('/', _('Home')),
             ('/login/', _('Login')),
             ('/register/', _('Register')),
+            ('/contribute/', _('Contribute')),
             ('/developer/', _('Development')),
             ('/online-help', _('Help')),
         )),
