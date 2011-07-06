@@ -263,6 +263,14 @@ def search(request, format):
 
     query = request.GET.get('q', '').encode('utf-8')
 
+    try:
+        scale = int(request.GET.get('scale_logo', 64))
+    except (TypeError, ValueError):
+        return HttpResponseBadRequest('scale_logo has to be a numeric value')
+
+    if scale not in range(1, 257):
+        return HttpResponseBadRequest('scale_logo has to be a number from 1 to 256')
+
     if not query:
         return HttpResponseBadRequest('/search.opml|txt|json?q={query}')
 
@@ -270,7 +278,7 @@ def search(request, format):
 
     title = _('gpodder.net - Search')
     domain = RequestSite(request).domain
-    p_data = lambda p: podcast_data(p, domain)
+    p_data = lambda p: podcast_data(p, domain, scale)
     return format_podcast_list(results, format, title, json_map=p_data, jsonp_padding=request.GET.get('jsonp', ''), xml_template='search.xml', request=request, template_args=dict(query=query))
 
 

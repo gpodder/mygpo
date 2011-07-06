@@ -34,7 +34,6 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render_to_response
 from datetime import datetime, timedelta
 from django.contrib.sites.models import RequestSite
-from mygpo.constants import PODCAST_LOGO_SIZE, PODCAST_LOGO_BIG_SIZE
 from mygpo.web import utils
 from mygpo.api import backend
 from mygpo.utils import flatten, parse_range
@@ -108,8 +107,6 @@ def dashboard(request, episode_count=10):
 @cache_page(60 * 60 * 24)
 def cover_art(request, size, filename):
     size = int(size)
-    if size not in (PODCAST_LOGO_SIZE, PODCAST_LOGO_BIG_SIZE):
-        raise Http404('Wrong size')
 
     # XXX: Is there a "cleaner" way to get the root directory of the installation?
     root = os.path.join(os.path.dirname(__file__), '..', '..', '..')

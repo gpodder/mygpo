@@ -76,7 +76,7 @@ def episode_info(request):
     return JsonResponse(resp)
 
 
-def podcast_data(podcast, domain):
+def podcast_data(podcast, domain, scaled_logo_size=64):
     if isinstance(podcast, models.Podcast):
         obj = podcast
     elif isinstance(podcast, models.PodcastGroup):
@@ -90,6 +90,8 @@ def podcast_data(podcast, domain):
     subscribers = obj.subscriber_count()
     last_subscribers = obj.prev_subscriber_count()
 
+    scaled_logo_url = obj.get_logo_url(scaled_logo_size)
+
     return {
         "url": podcast.url,
         "title": podcast.title,
@@ -97,6 +99,7 @@ def podcast_data(podcast, domain):
         "subscribers": subscribers,
         "subscribers_last_week": last_subscribers,
         "logo_url": podcast.logo_url,
+        "scaled_logo_url": 'http://%s%s' % (domain, scaled_logo_url),
         "website": podcast.link,
         "mygpo_link": 'http://%s/podcast/%s' % (domain, obj.oldid),
         }
