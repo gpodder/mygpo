@@ -17,6 +17,8 @@
 
 import string
 from itertools import islice
+from django.shortcuts import render_to_response
+from django.template import RequestContext
 from mygpo.api.basic_auth import require_valid_user, check_username
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.cache import cache_page
@@ -45,7 +47,7 @@ except ImportError:
     import json
 
 
-ALLOWED_FORMATS = ('txt', 'opml', 'json', 'jsonp')
+ALLOWED_FORMATS = ('txt', 'opml', 'json', 'jsonp', 'xml')
 
 def check_format(fn):
     def tmp(request, format, *args, **kwargs):
@@ -85,7 +87,9 @@ def all_subscriptions(request, username, format):
     return format_podcast_list(subscriptions, format, title)
 
 
-def format_podcast_list(obj_list, format, title, get_podcast=None, json_map=lambda x: x.url, jsonp_padding=None):
+def format_podcast_list(obj_list, format, title, get_podcast=None,
+        json_map=lambda x: x.url, jsonp_padding=None,
+        xml_template=None, request=None, template_args={}):
     """
     Formats a list of podcasts for use in a API response
 
@@ -131,6 +135,16 @@ def format_podcast_list(obj_list, format, title, get_podcast=None, json_map=lamb
 
         objs = map(json_map, obj_list)
         return JsonResponse(objs, jsonp_padding=jsonp_padding)
+
+    elif format == 'xml':
+        if None in (xml_template, request):
+            return HttpResponseBadRequest('XML is not a valid format for this request')
+
+        podcasts = map(json_map, obj_list)
+        template_args.update({'podcasts': podcasts})
+
+        return render_to_response(xml_template, template_args, context_instance=RequestContext(request),
+                mimetype='application/xml')
 
     else:
         return None
@@ -257,7 +271,7 @@ def search(request, format):
     title = _('gpodder.net - Search')
     domain = RequestSite(request).domain
     p_data = lambda p: podcast_data(p, domain)
-    return format_podcast_list(results, format, title, json_map=p_data, jsonp_padding=request.GET.get('jsonp', ''))
+    return format_podcast_list(results, format, title, json_map=p_data, jsonp_padding=request.GET.get('jsonp', ''), xml_template='search.xml', request=request, template_args=dict(query=query))
 
 
 @require_valid_user

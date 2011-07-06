@@ -1,0 +1,14 @@
+<searchResults query="{{ query }}">
+ {% for podcast in podcasts %}
+ <podcast>
+  <title>{{ podcast.title }}</title>
+  <url>{{ podcast.url }}</url>
+  <website>{{ podcast.website }}</website>
+  <mygpo_link>{{ podcast.mygpo_link }}</mygpo_link>
+  <description>{{ podcast.description }}</description>
+  <subscribers>{{ podcast.subscribers }}</subscribers>
+  <subscribers_last_week>{{ podcast.subscribers_last_week }}</subscribers_last_week>
+  <logo_url>{{ podcast.logo_url }}</logo_url>
+ </podcast>
+ {% endfor %}
+</searchResults>
