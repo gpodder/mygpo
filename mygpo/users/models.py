@@ -166,6 +166,10 @@ class EpisodeAction(DocumentSchema):
             (self.action, self.device_oldid, self.timestamp, self._id)
 
 
+    def __hash__(self):
+        return hash(frozenset([self.action, self.timestamp, self.device_oldid, self.started, self.playmark, self.total]))
+
+
 class Chapter(Document):
     """ A user-entered episode chapter """
 
