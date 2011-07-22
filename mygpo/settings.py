@@ -155,7 +155,7 @@ FLICKR_API_KEY = ''
 
 MAINTENANCE = os.path.exists(os.path.join(BASE_DIR, 'MAINTENANCE'))
 
-EMAIL_BACKEND = 'django_couchdb_utils.email.CouchDBEmailBackend'
+EMAIL_BACKEND = 'django_couchdb_utils.email.backends.CouchDBEmailBackend'
 
 try:
     from settings_prod import *
