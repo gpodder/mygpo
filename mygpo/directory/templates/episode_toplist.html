@@ -103,15 +103,15 @@
       {{ forloop.counter }}
      {% endifchanged %}
     </td>
-    <td>{{ entry.episode.podcast|podcast_logo }}</td>
-    <td><a href="{% url episode entry.episode.id %}">
-     {% if entry.episode.title %}
-      {{ entry.episode.title|striptags }}
+    <td>{{ entry.podcast|podcast_logo }}</td>
+    <td><a href="{% url episode entry.oldid %}">
+     {% if entry.title %}
+      {{ entry.title|striptags }}
      {% else %}
       {% trans "Unnamed Episode" %}
      {% endif %}
      </a><br/>
-     <span class="from_podcast">{% trans "from" %} {% podcast_group_link entry.episode.podcast %}</td>
+     <span class="from_podcast">{% trans "from" %} {% podcast_group_link entry.podcast %}</td>
     <td>{{ entry.listeners|vertical_bar:max_listeners }}</td>
    </tr>
   {% endfor %}

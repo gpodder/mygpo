@@ -77,6 +77,16 @@ class Toplist(object):
 
 
 
+class EpisodeToplistEntry(object):
+    """ Proxy for Episode objs for setting attributes of arbitrary types """
+
+    def __init__(self, episode):
+        self.episode = episode
+
+    def __getattr__(self, attr):
+        return getattr(self.episode, attr)
+
+
 class EpisodeToplist(Toplist):
     """ Retrieves the episode toplist for a certain date """
 

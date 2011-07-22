@@ -11,7 +11,8 @@ from mygpo.core.models import Podcast
 from mygpo.data.mimetype import CONTENT_TYPES
 from mygpo.decorators import manual_gc
 from mygpo.directory.models import Category
-from mygpo.directory.toplist import PodcastToplist, EpisodeToplist
+from mygpo.directory.toplist import PodcastToplist, EpisodeToplist, \
+                                    EpisodeToplistEntry
 from mygpo.directory.search import search_podcasts
 from mygpo.web import utils
 from mygpo.directory.tags import TagCloud
@@ -138,7 +139,13 @@ def episode_toplist(request, num=100):
     media_types = set_types or CONTENT_TYPES
 
     toplist = EpisodeToplist(languages=lang, types=media_types)
-    entries = toplist[:num]
+    entries = [EpisodeToplistEntry(episode) for episode in toplist[:num]]
+
+    # load podcast objects
+    podcast_ids = [e.podcast for e in entries]
+    podcasts = get_to_dict(Podcast, podcast_ids, Podcast.get_id, True)
+    for entry in entries:
+        entry.podcast = podcasts.get(entry.podcast, None)
 
     current_site = RequestSite(request)
 
