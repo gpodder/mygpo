@@ -30,9 +30,21 @@ class Episode(Document):
 
 
     @classmethod
+    def get(cls, id):
+        r = cls.view('core/episodes_by_id',
+                key=id,
+                include_docs=True,
+            )
+        return r.first() if r else None
+
+
+    @classmethod
     def get_multi(cls, ids):
-        r = cls.view('_all_docs', include_docs=True, keys=ids)
-        return list(r)
+        return cls.view('core/episodes_by_id',
+                include_docs=True,
+                keys=ids
+            )
+
 
     @classmethod
     def for_oldid(self, oldid):
