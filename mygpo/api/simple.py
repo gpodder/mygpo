@@ -317,7 +317,7 @@ def example_podcasts(request, format):
         try:
             examples = ExamplePodcasts.get('example_podcasts')
             ids = examples.podcast_ids
-            podcasts = models.Podcast.get_multi(ids)
+            podcasts = list(models.Podcast.get_multi(ids))
             cache.set('example-podcasts', podcasts)
 
         except ResourceNotFound:
