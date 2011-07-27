@@ -54,10 +54,6 @@ urlpatterns += patterns('mygpo.web.views.settings',
  url(r'^share/$',                                                 'share',         name='share'),
 )
 
-urlpatterns += patterns('mygpo.web.views.public',
- url(r'^gpodder-examples.opml$',                                  'gpodder_example_podcasts',   name='example-opml'),
-)
-
 urlpatterns += patterns('mygpo.web.views.device',
  url(r'^devices/$',                                               'overview',                   name='devices'),
  url(r'^devices/create$',                                         'edit',                       name='device-create'),

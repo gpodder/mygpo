@@ -1,0 +1,10 @@
+http://feeds.feedburner.com/linuxoutlaws
+http://leo.am/podcasts/floss
+http://feeds.feedburner.com/Bsdtalk
+http://static.orf.at/fm4/podcast/soundpark.xml
+http://www.youtube.com/rss/user/ROCKETBOOM/videos.rss
+http://feeds.feedburner.com/ShotOfJaq
+http://hackermedley.org/feed/podcast
+http://feeds.feedburner.com/tedtalks_video
+http://soundcloud.com/crunchtime
+http://feeds.feedburner.com/MusicManumit

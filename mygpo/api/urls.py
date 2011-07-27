@@ -12,7 +12,8 @@ urlpatterns += patterns('mygpo.api.simple',
  url(r'^toplist/(?P<count>\d+)\.(?P<format>\w+)', 'toplist',                   name='toplist-opml'),
     (r'^search\.(?P<format>\w+)', 'search'),
  url(r'^suggestions/(?P<count>\d+)\.(?P<format>\w+)', 'suggestions',           name='suggestions-opml'),
-    (r'^toplist.opml$', 'toplist', {'count': 50, 'format': 'opml'}),
+    (r'^toplist\.(?P<format>\w+)$', 'toplist', {'count': 50}),
+ url(r'^gpodder-examples\.(?P<format>\w+)$', 'example_podcasts',               name='example-opml'),
 )
 
 urlpatterns += patterns('mygpo.api.advanced',

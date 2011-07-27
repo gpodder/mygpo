@@ -17,8 +17,13 @@
 
 import string
 from itertools import islice
+
+from couchdbkit.exceptions import ResourceNotFound
+
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.core.cache import cache
+
 from mygpo.api.basic_auth import require_valid_user, check_username
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.cache import cache_page
@@ -29,6 +34,7 @@ from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_urls
 from mygpo.directory.toplist import PodcastToplist
+from mygpo.directory.models import ExamplePodcasts
 from mygpo.api.advanced.directory import podcast_data
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
@@ -252,7 +258,10 @@ def toplist(request, count, format):
                                title,
                                get_podcast=get_podcast,
                                json_map=json_map,
-                               jsonp_padding=request.GET.get('jsonp', ''))
+                               jsonp_padding=request.GET.get('jsonp', ''),
+                               xml_template='toplist.xml',
+                               request=request,
+                            )
 
 
 @check_format
@@ -296,3 +305,32 @@ def suggestions(request, count, format):
     return format_podcast_list(suggestions, format, title, json_map=p_data, jsonp_padding=request.GET.get('jsonp'))
 
 
+@check_format
+@allowed_methods(['GET'])
+@cache_page(60 * 60)
+def example_podcasts(request, format):
+
+    podcasts = cache.get('example-podcasts', None)
+
+    if not podcasts:
+
+        try:
+            examples = ExamplePodcasts.get('example_podcasts')
+            ids = examples.podcast_ids
+            podcasts = models.Podcast.get_multi(ids)
+            cache.set('example-podcasts', podcasts)
+
+        except ResourceNotFound:
+            podcasts = []
+
+    title = 'gPodder Podcast Directory'
+    domain = RequestSite(request).domain
+    p_data = lambda p: podcast_data(p, domain)
+    return format_podcast_list(
+            podcasts,
+            format,
+            title,
+            json_map=p_data,
+            xml_template='examples.xml',
+            request=request,
+        )

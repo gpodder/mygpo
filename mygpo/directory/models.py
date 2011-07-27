@@ -92,3 +92,8 @@ class Category(Document):
 
     def __repr__(self):
         return '%s (+%d variants)' % (self.label, len(self.spellings))
+
+
+class ExamplePodcasts(Document):
+    podcast_ids  = StringListProperty()
+    updated      = DateTimeProperty()
