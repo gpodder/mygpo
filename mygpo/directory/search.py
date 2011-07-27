@@ -1,4 +1,7 @@
 from mygpo.core.models import Podcast, PodcastGroup
+from mygpo.utils import is_url
+from mygpo.data.feeddownloader import update_podcasts
+
 
 def search_wrapper(result):
     doc = result['doc']
@@ -11,6 +14,18 @@ def search_wrapper(result):
 
 
 def search_podcasts(q, limit=20, skip=0):
+
+    if is_url(q):
+        from mygpo.api import models
+        p, created = models.Podcast.objects.get_or_create(url=q)
+        if created:
+            update_podcasts([p])
+
+        podcast = Podcast.for_url(q)
+
+        return [podcast], 1
+
+
     db = Podcast.get_db()
 
     #FIXME current couchdbkit can't parse responses for multi-query searches

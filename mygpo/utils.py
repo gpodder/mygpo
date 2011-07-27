@@ -16,6 +16,7 @@
 #
 
 import sys
+import re
 import collections
 from datetime import datetime, timedelta, date
 import time
@@ -424,3 +425,19 @@ def get_timestamp(datetime_obj):
     0
     """
     return int(time.mktime(datetime_obj.timetuple()))
+
+
+
+re_url = re.compile('^https?://')
+
+def is_url(string):
+    """ Returns true if a string looks like an URL
+
+    >>> is_url('http://example.com/some-path/file.xml')
+    True
+
+    >>> is_url('something else')
+    False
+    """
+
+    return bool(re_url.match(string))
