@@ -113,14 +113,17 @@ def search(request):
         page_list = utils.get_page_list(1, num_pages, page, 15)
 
     else:
-        results = None
+        results = []
         q = None
         page_list = []
+
+    max_subscribers = max([p.subscriber_count() for p in results] + [0])
 
     return render_to_response('search.html', {
             'q': q,
             'results': results,
             'page_list': page_list,
+            'max_subscribers': max_subscribers,
         }, context_instance=RequestContext(request))
 
 

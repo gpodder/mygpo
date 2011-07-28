@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load podcasts %}
+{% load charts %}
 
 {% load menu %}
 {% block mainmenu %}{{ "/search/"|main_menu }}{% endblock %}
@@ -18,20 +19,24 @@
 </form>
 
  {% if q %}
-  <h3>{% trans "Results" %}</h3>
+  {% if results %}
+   <h3>{% trans "Results" %}</h3>
 
-  <table class="list">
-   <tr>
-    <th></th>
-    <th></th>
-   </tr>
-
-   {% for result in results %}
+   <table class="list">
     <tr>
-     <td>{% podcast_group_link result %}</td>
+     <th></th>
+     <th>{% trans "Podcast" %}</th>
+     <th>{% trans "Subscribers" %}</th>
     </tr>
-   {% endfor %}
-  </table>
+
+    {% for podcast in results %}
+     <tr>
+      <td>{{ podcast|podcast_logo }}</td>
+      <td>{% podcast_group_link podcast %}</td>
+      <td>{{ podcast.subscriber_count|vertical_bar:max_subscribers }}</td>
+     </tr>
+    {% endfor %}
+   </table>
 
 <div class="pagination">
 
@@ -59,6 +64,12 @@
  {% endif %}
 
 </div>
+
+  {% else %}
+
+   <div>{% trans "Nothing found" %}</div>
+
+  {% endif %}
 
  {% endif %}
 {% endblock %}
