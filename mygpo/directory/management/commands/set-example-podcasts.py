@@ -15,7 +15,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        urls = list(fileinput.input(args))
+        urls = list(map(str.strip, fileinput.input(args)))
 
         try:
             examples = ExamplePodcasts.get(EXAMPLES_DOCID)
