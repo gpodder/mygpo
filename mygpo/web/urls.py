@@ -44,6 +44,7 @@ urlpatterns += patterns('mygpo.web.views.episode',
  url(r'^episode/(?P<id>\d+)/add-chapter$',                        'add_chapter',   name='add-chapter'),
  url(r'^episode/(?P<id>\d+)/remove-chapter/(?P<start>\d+)-(?P<end>\d+)$', 'remove_chapter',name='remove-chapter'),
  url(r'^episode/(?P<id>\d+)/toggle-favorite',                     'toggle_favorite',name='episode-fav'),
+ url(r'^episode/(?P<id>\d+)/add-action',                          'add_action',    name='add-episode-action'),
  url(r'^favorites/',                                              'list_favorites',name='favorites'),
 )
 

@@ -33,6 +33,17 @@
  {% endif %}
  {{ episode|opengraph_episode }}
  {% google_plus_one_head %}
+
+ <script type="text/javascript">
+    $(document).ready(function()
+    {
+        $("#listcontent div.listblock").hide();
+        $("#listcontent h2").click(function()
+        {
+            $(this).next("#listcontent div").slideToggle(500);
+        });
+    });
+ </script>
 {% endblock head %}
 
 {% block title %}{{ episode.title|default:"Unnamed Episode"|striptags }} - {{ episode.podcast.title|default:"Unnamed Podcast"|striptags}}{% endblock %}
@@ -95,6 +106,7 @@
     {{ played_parts|episode_heatmap_visualization }}
    {% endif %}
 
+  {% endif %}
 
   <div class="navigation">
    <div class="prev">
@@ -113,8 +125,13 @@
   </div>
 
   <hr/>
+
+ <div id="listcontent">
+
+  {% if user.is_authenticated or chapters %}
    <h2>{% trans "Chapters" %}</h2>
 
+   <div id="chapters" class="listblock">
    <div class="info">
      {% blocktrans %}Your chapters are shown in bold.{% endblocktrans %}
    </div>
@@ -141,6 +158,7 @@
       </td>
      </tr>
     {% endfor %}
+    {% if user.is_authenticated %}
     <tr>
      <form action="{% url add-chapter episode.id %}" method="POST">
       {% csrf_token %}
@@ -159,11 +177,14 @@
       </td>
      </form>
     </tr>
+    {% endif %}
   </table>
+  </div>
   {% endif %}
 
-  {% if history %}
+  {% if user.is_authenticated or history %}
   <h2>{% trans "History" %}</h2>
+  <div id="history" class="listblock">
   <table class="list">
    <tr>
     <th>{% trans "Time" %}</th>
@@ -186,12 +207,43 @@
      </td>
 	</tr>
    {% endfor %}
+
+   {% if user.is_authenticated %}
+    <tr>
+     <form action="{% url add-episode-action episode.id %}" method="POST">
+      {% csrf_token %}
+      <td>
+       <input type="text" id="timestamp" name="timestamp" /></td>
+      <td>
+       <select name="action">
+        {% for action, str in actions %}
+         <option value="{{ action }}">{{ str }}</option>
+        {% endfor %}
+       </select>
+      </td>
+      <td>
+       <select name="device">
+        <option value=""></option>
+        {% for device_id, name in devices.items %}
+         <option value="{{ device_id }}">{{ name }}</option>
+        {% endfor %}
+       </select>
+      </td>
+      <td>
+       <input type="submit" value="{% trans "Add" %}" />
+      </td>
+     </form>
+    </tr>
+   {% endif %}
   </table>
+  </div>
   {% endif %}
 
   {% if not episode.title %}
    <div class="info"><strong>{% trans "Why Unnamed Episode?" %}</strong> {% trans "Because we display names after we have fetched the information form the feed -- and this may take some time. Until this is completed, the podcast will simply be called this way." %}</div>
   {% endif %}
+
+ </div>
 
 {% endblock %}
 
@@ -200,6 +252,7 @@
  <script type="text/javascript">
   $("#start").watermark("h:mm:ss", {className: 'watermark'});
   $("#end").watermark("h:mm:ss", {className: 'watermark'});
+  $("#timestamp").watermark("empty = now", {className: 'watermark'});
 
   {% if episode.url|is_youtube_video %}
    {{ episode|embed_youtube_video:user }}

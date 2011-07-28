@@ -15,12 +15,18 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+from datetime import datetime
+
+import dateutil.parser
+
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
+from django.core.urlresolvers import reverse
+
 from mygpo.core import models
 from mygpo.api.models import Podcast, Episode
-from mygpo.users.models import Chapter, HistoryEntry
+from mygpo.users.models import Chapter, HistoryEntry, EpisodeAction
 from mygpo.api import backend
 from mygpo.decorators import manual_gc
 from mygpo.utils import parse_time
@@ -29,6 +35,8 @@ from mygpo.web.heatmap import EpisodeHeatmap
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.contrib.sites.models import RequestSite
+from mygpo.api.constants import EPISODE_ACTION_TYPES
+from mygpo.decorators import repeat_on_conflict
 
 @manual_gc
 def episode(request, id):
@@ -49,10 +57,13 @@ def episode(request, id):
         played_parts = EpisodeHeatmap(podcast.get_id(),
                 new_episode._id, user.oldid, duration=new_episode.duration)
 
+        devices = dict( (d.id, d.name) for d in user.devices )
+
     else:
         history = []
         is_fav = False
         played_parts = None
+        devices = {}
 
 
     chapters = []
@@ -83,6 +94,8 @@ def episode(request, id):
         'chapters': chapters,
         'is_favorite': is_fav,
         'played_parts': played_parts,
+        'actions': EPISODE_ACTION_TYPES,
+        'devices': devices,
     }, context_instance=RequestContext(request))
 
 
@@ -158,7 +171,6 @@ def list_favorites(request):
 
     user = migrate.get_or_migrate_user(request.user)
 
-    from django.core.urlresolvers import reverse
     feed_url = 'http://%s/%s' % (site.domain, reverse('favorites-feed', args=[request.user.username]))
 
     try:
@@ -183,3 +195,37 @@ def list_favorites(request):
         'podcast': podcast,
         }, context_instance=RequestContext(request))
 
+
+def add_action(request, id):
+    episode = get_object_or_404(Episode, id=id)
+    episode = migrate.get_or_migrate_episode(episode)
+
+    user = migrate.get_or_migrate_user(request.user)
+    device = user.get_device(request.POST.get('device'))
+
+    action_str = request.POST.get('action')
+    timestamp = request.POST.get('timestamp', '')
+
+    if timestamp:
+        try:
+            timestamp = dateutil.parser.parse(timestamp)
+        except:
+            timestamp = datetime.utcnow()
+    else:
+        timestamp = datetime.utcnow()
+
+    action = EpisodeAction()
+    action.timestamp = timestamp
+    action.device_oldid = device.oldid if device else None
+    action.action = action_str
+
+    state = episode.get_user_state(request.user)
+
+    @repeat_on_conflict(['action'])
+    def _add_action(action):
+        state.add_actions([action])
+        state.save()
+
+    _add_action(action=action)
+
+    return HttpResponseRedirect(reverse('episode', args=[id]))

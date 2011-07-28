@@ -757,3 +757,8 @@ div.share
 {
     padding-bottom: .5em;
 }
+
+#listcontent h2
+{
+        cursor: pointer;
+}
