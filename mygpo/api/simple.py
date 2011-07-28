@@ -259,7 +259,7 @@ def toplist(request, count, format):
                                get_podcast=get_podcast,
                                json_map=json_map,
                                jsonp_padding=request.GET.get('jsonp', ''),
-                               xml_template='toplist.xml',
+                               xml_template='podcasts.xml',
                                request=request,
                             )
 
@@ -288,7 +288,7 @@ def search(request, format):
     title = _('gpodder.net - Search')
     domain = RequestSite(request).domain
     p_data = lambda p: podcast_data(p, domain, scale)
-    return format_podcast_list(results, format, title, json_map=p_data, jsonp_padding=request.GET.get('jsonp', ''), xml_template='search.xml', request=request, template_args=dict(query=query))
+    return format_podcast_list(results, format, title, json_map=p_data, jsonp_padding=request.GET.get('jsonp', ''), xml_template='podcasts.xml', request=request)
 
 
 @require_valid_user
@@ -331,6 +331,6 @@ def example_podcasts(request, format):
             format,
             title,
             json_map=p_data,
-            xml_template='examples.xml',
+            xml_template='podcasts.xml',
             request=request,
         )

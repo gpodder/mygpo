@@ -1,15 +1,15 @@
-<toplist>
+<podcasts>
  {% for podcast in podcasts %}
  <podcast>
-  <title>{{ podcast.title }}</title>
+  <title>{{ podcast.title|default:"" }}</title>
   <url>{{ podcast.url }}</url>
-  <website>{{ podcast.website }}</website>
+  <website>{{ podcast.website|default:"" }}</website>
   <mygpo_link>{{ podcast.mygpo_link }}</mygpo_link>
-  <description>{{ podcast.description }}</description>
+  <description>{{ podcast.description|default:"" }}</description>
   <subscribers>{{ podcast.subscribers }}</subscribers>
   <subscribers_last_week>{{ podcast.subscribers_last_week }}</subscribers_last_week>
-  <logo_url>{{ podcast.logo_url }}</logo_url>
+  <logo_url>{{ podcast.logo_url|default:"" }}</logo_url>
   <scaled_logo_url>{{ podcast.scaled_logo_url }}</scaled_logo_url>
  </podcast>
  {% endfor %}
-</toplist>
+</podcasts>
