@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+from django.http import Http404
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.contrib.auth.models import User
@@ -42,7 +43,12 @@ def requires_token(token_name, denied_template=None):
     def decorator(fn):
         def tmp(request, username, *args, **kwargs):
             from mygpo import migrate
-            user = User.objects.get(username=username)
+
+            try:
+                user = User.objects.get(username=username)
+            except User.DoesNotExist:
+                raise Http404
+
             user = migrate.get_or_migrate_user(user)
 
             token = getattr(user, token_name, '')
