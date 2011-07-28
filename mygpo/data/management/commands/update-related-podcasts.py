@@ -1,10 +1,11 @@
 from optparse import make_option
+from operator import itemgetter
 
 from django.core.management.base import BaseCommand
 
-from mygpo.api.models import Podcast
+from mygpo.decorators import repeat_on_conflict
+from mygpo.core.models import Podcast
 from mygpo.data.podcast import calc_similar_podcasts
-from mygpo.migrate import get_or_migrate_podcast
 from mygpo.utils import progress
 
 
@@ -17,18 +18,24 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
+        get_podcast = itemgetter(0)
+
         max_related = options.get('max')
 
-        podcasts = Podcast.objects.all().order_by('id').only('id')
-        total = podcasts.count()
+        podcasts = Podcast.all_podcasts()
+        total = Podcast.view('core/podcasts_by_id', limit=0).total_rows
 
-        for (n, podcast) in enumerate(podcasts.iterator()):
+        for (n, podcast) in enumerate(podcasts):
 
             l = calc_similar_podcasts(podcast)[:max_related]
-            related = [get_or_migrate_podcast(p).get_id() for (p, c) in l]
 
-            newp = get_or_migrate_podcast(podcast)
-            newp.related_podcasts = related
-            newp.save()
+            related = map(get_podcast, l)
+
+            @repeat_on_conflict(['podcast'])
+            def _update(podcast, related):
+                podcast.related_podcasts = related
+                podcast.save()
+
+            _update(podcast=podcast, related=related)
 
             progress(n+1, total)

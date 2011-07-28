@@ -17,8 +17,15 @@
 
 from django.contrib.auth.models import User
 from mygpo.core.models import Podcast
+from mygpo.users.models import PodcastUserState
 from mygpo.api.models import Episode
 from mygpo.utils import flatten
+
+try:
+    from collections import Counter
+except ImportError:
+    from mygpo.counter import Counter
+
 
 def avg_update_interval(podcast):
     """
@@ -31,7 +38,7 @@ def avg_update_interval(podcast):
     return max(1, (t2 - t1).days / c)
 
 
-def calc_similar_podcasts(podcast):
+def calc_similar_podcasts(podcast, num=20):
     """
     calculates and returns a list of podcasts that seem to be similar
     to the given one.
@@ -39,28 +46,30 @@ def calc_similar_podcasts(podcast):
     Probably an expensive operation
     """
 
-    from mygpo import migrate
-    npodcast = migrate.get_or_migrate_podcast(podcast)
-    tags = npodcast.all_tags()
-    users = User.objects.filter(subscription__podcast=podcast).only('id').distinct()
-    users = map(migrate.get_or_migrate_user, users)
-    subscribed_ids = [u.get_subscribed_podcast_ids() for u in users]
-    subscribed_ids = list(set(flatten(subscribed_ids)))
+    db = PodcastUserState.get_db()
 
-    podcast_list = {}
-    for id in subscribed_ids:
-        if id == npodcast.get_id():
-            continue
-        podcast_list[id] = podcast_list.get(id, 0) + 1
+    res = db.view('users/subscriptions_by_podcast',
+            startkey    = [podcast.get_id(), None, None],
+            endkey      = [podcast.get_id(), {}, {}],
+            group       = True,
+            group_level = 2,
+        )
 
-    for id in podcast_list.iterkeys():
-        np = Podcast.get(id)
-        ps_tags = np.all_tags()
-        matching_tags = filter(lambda t: t in tags, ps_tags)
-        podcast_list[p] = podcast_list[p] * max(len(matching_tags), 1)
+    users = (r['key'][1] for r in res)
 
-    l = list(podcast_list.iteritems())
-    l.sort(key=lambda (p, count): count, reverse=True)
-    return l
+    podcasts = Counter()
 
 
+    for user_oldid in users:
+        subscribed = db.view('users/subscribed_podcasts_by_user',
+                startkey    = [user_oldid, True, None, None],
+                endkey      = [user_oldid, True, {}, {}],
+                group       = True,
+                group_level = 3,
+            )
+        user_subscriptions = set(r['key'][2] for r in subscribed)
+        user_counter = Counter(user_subscriptions)
+        podcasts.update(user_counter)
+
+
+    return podcasts.most_common(num)
