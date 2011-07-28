@@ -47,7 +47,7 @@ def episode_status_icon(action):
             s = '<img src="/media/download.png" alt="downloaded" title="%s" />' % ('%s%s%s' % (_('This episode has been downloaded'),date_string, device_string))
         elif action.action == 'play':
             if action.playmark is not None:
-                if action.started is not None:
+                if getattr(action, 'started', None) is not None:
                     playback_info = _(' from %(start)s to %(end)s') % { \
                             'start': utils.format_time(action.started), \
                             'end': utils.format_time(action.playmark)}
