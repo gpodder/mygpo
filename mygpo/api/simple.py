@@ -233,6 +233,15 @@ def toplist(request, count, format):
     entries = toplist[:count]
     domain = RequestSite(request).domain
 
+    try:
+        scale = int(request.GET.get('scale_logo', 64))
+    except (TypeError, ValueError):
+        return HttpResponseBadRequest('scale_logo has to be a numeric value')
+
+    if scale not in range(1, 257):
+        return HttpResponseBadRequest('scale_logo has to be a number from 1 to 256')
+
+
     def get_podcast(t):
         old_pos, p = t
         if isinstance(p, models.Podcast):
@@ -244,7 +253,7 @@ def toplist(request, count, format):
 
     def json_map(t):
         podcast = get_podcast(t)
-        p = podcast_data(podcast, domain)
+        p = podcast_data(podcast, domain, scale)
         p.update(dict(
             subscribers=           podcast.subscriber_count(),
             subscribers_last_week= podcast.prev_subscriber_count(),
@@ -312,6 +321,15 @@ def example_podcasts(request, format):
 
     podcasts = cache.get('example-podcasts', None)
 
+    try:
+        scale = int(request.GET.get('scale_logo', 64))
+    except (TypeError, ValueError):
+        return HttpResponseBadRequest('scale_logo has to be a numeric value')
+
+    if scale not in range(1, 257):
+        return HttpResponseBadRequest('scale_logo has to be a number from 1 to 256')
+
+
     if not podcasts:
 
         try:
@@ -325,7 +343,7 @@ def example_podcasts(request, format):
 
     title = 'gPodder Podcast Directory'
     domain = RequestSite(request).domain
-    p_data = lambda p: podcast_data(p, domain)
+    p_data = lambda p: podcast_data(p, domain, scale)
     return format_podcast_list(
             podcasts,
             format,
