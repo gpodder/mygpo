@@ -4,11 +4,15 @@ from optparse import make_option
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 
-from mygpo.core.models import Podcast
 from mygpo.users.models import Suggestions
 from mygpo.api import models
 from mygpo import migrate
-from mygpo.utils import progress, set_by_frequency
+from mygpo.utils import progress
+
+try:
+    from collections import Counter
+except ImportError:
+    from mygpo.counter import Counter
 
 
 class Command(BaseCommand):
@@ -23,7 +27,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        max = options.get('max')
+        max_suggestions = options.get('max')
 
         users = User.objects.filter(is_active=True)
 
@@ -45,11 +49,11 @@ class Command(BaseCommand):
             subscribed_podcasts = list(set(new_user.get_subscribed_podcasts()))
 
             subscribed_podcasts = filter(None, subscribed_podcasts)
-            related = chain(*[p.related_podcasts for p in subscribed_podcasts])
+            related = chain.from_iterable([p.related_podcasts for p in subscribed_podcasts])
             related = filter(lambda pid: not pid in suggestion.blacklist, related)
-            related = set_by_frequency(related)
+            related = Counter(related)
 
-            suggestion.podcasts = related
+            suggestion.podcasts = related.most_common(max_suggestions)
             suggestion.save()
 
             # flag suggestions up-to-date
