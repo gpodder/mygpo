@@ -32,7 +32,8 @@ def search_podcasts(q, limit=20, skip=0):
     q = q.replace(',', '')
 
     res = db.search('directory/search', wrapper=search_wrapper,
-        include_docs=True, limit=limit, skip=skip, q=q)
+        include_docs=True, limit=limit, skip=skip, q=q,
+        sort='\\subscribers<int>')
 
     #FIXME: return empty results in case of search backend error
     try:
