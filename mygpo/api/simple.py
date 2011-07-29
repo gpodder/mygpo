@@ -243,11 +243,7 @@ def toplist(request, count, format):
 
 
     def get_podcast(t):
-        old_pos, p = t
-        if isinstance(p, models.Podcast):
-            podcast = p
-        else:
-            podcast = p.podcasts[0]
+        old_pos, podcast = t
         podcast.old_pos = old_pos
         return podcast
 

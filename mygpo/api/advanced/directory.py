@@ -76,16 +76,20 @@ def episode_info(request):
     return JsonResponse(resp)
 
 
-def podcast_data(podcast, domain, scaled_logo_size=64):
-    if isinstance(podcast, models.Podcast):
-        obj = podcast
-    elif isinstance(podcast, models.PodcastGroup):
-        obj = podcast.podcasts[0]
-        podcast = podcast.podcasts[0]
+def podcast_data(obj, domain, scaled_logo_size=64):
+    if obj is None:
+        raise ValueError('podcast should not be None')
+
+    if isinstance(obj, models.Podcast):
+        podcast = obj
+    elif isinstance(obj, models.PodcastGroup):
+        podcast = obj.podcasts[0]
     elif podcast.group:
-        obj = models.PodcastGroup.for_oldid(podcast.group.id)
+        obj = models.PodcastGroup.for_oldid(obj.group.id)
+        podcast = obj[0]
     else:
-        obj = models.Podcast.for_oldid(podcast.id)
+        podcast = models.Podcast.for_oldid(obj.id)
+        obj = podcast
 
     subscribers = obj.subscriber_count()
     last_subscribers = obj.prev_subscriber_count()
