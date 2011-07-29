@@ -480,8 +480,10 @@ class PodcastUserState(Document):
 
     def get_subscribed_device_ids(self):
         r = PodcastUserState.view('users/subscriptions_by_podcast',
-            startkey=[self.podcast, self.user_oldid, None],
-            endkey  =[self.podcast, self.user_oldid, {}])
+            startkey = [self.podcast, self.user_oldid, None],
+            endkey   = [self.podcast, self.user_oldid, {}],
+            reduce   = False,
+            )
         return (res['key'][2] for res in r)
 
 
@@ -641,8 +643,10 @@ class User(Document):
         """
 
         r = PodcastUserState.view('users/subscribed_podcasts_by_user',
-            startkey=[self.oldid, public, None, None],
-            endkey=[self.oldid+1, None, None, None])
+            startkey = [self.oldid, public, None, None],
+            endkey   = [self.oldid+1, None, None, None],
+            reduce   = False,
+            )
         return [res['key'][1:] for res in r]
 
 
