@@ -799,7 +799,7 @@ class HistoryEntry(object):
         # load podcast data
         podcast_ids = [getattr(x, 'podcast_id', None) for x in entries]
         podcast_ids = filter(None, podcast_ids)
-        podcasts = get_to_dict(Podcast, podcast_ids)
+        podcasts = get_to_dict(Podcast, podcast_ids, get_id=Podcast.get_id)
 
         # load episode data
         episode_ids = [getattr(x, 'episode_id', None) for x in entries]
