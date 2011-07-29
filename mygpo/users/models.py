@@ -467,6 +467,10 @@ class PodcastUserState(Document):
         before = filter(lambda x: x.timestamp <= since, device_actions)
         after  = filter(lambda x: x.timestamp <= until, device_actions)
 
+        # nothing happened, so there can be no change
+        if not after:
+            return None
+
         then = before[-1] if before else None
         now  = after[-1]
 
