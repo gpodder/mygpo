@@ -1,5 +1,6 @@
 from itertools import chain
 from optparse import make_option
+from operator import itemgetter
 
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
@@ -29,7 +30,7 @@ class Command(BaseCommand):
 
         max_suggestions = options.get('max')
 
-        users = User.objects.filter(is_active=True)
+        users = User.objects.filter(is_active=True).order_by('?')
 
         if options.get('outdated'):
             users = users.filter(userprofile__suggestion_up_to_date=False)
@@ -47,13 +48,16 @@ class Command(BaseCommand):
 
             new_user = migrate.get_or_migrate_user(user)
             subscribed_podcasts = list(set(new_user.get_subscribed_podcasts()))
+            subscribed_podcasts = filter(None, subscribed_podcasts)
 
             subscribed_podcasts = filter(None, subscribed_podcasts)
             related = chain.from_iterable([p.related_podcasts for p in subscribed_podcasts])
             related = filter(lambda pid: not pid in suggestion.blacklist, related)
             related = Counter(related)
 
-            suggestion.podcasts = related.most_common(max_suggestions)
+            get_podcast = itemgetter(0)
+            podcasts = map(get_podcast, related.most_common(max_suggestions))
+            suggestion.podcasts = podcasts
             suggestion.save()
 
             # flag suggestions up-to-date
