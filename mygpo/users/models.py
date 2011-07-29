@@ -215,6 +215,7 @@ class EpisodeUserState(Document):
     podcast_ref_url = StringProperty(required=True)
     merged_ids    = StringListProperty()
     chapters      = SchemaListProperty(Chapter)
+    podcast       = StringProperty(required=True)
 
 
     @classmethod
