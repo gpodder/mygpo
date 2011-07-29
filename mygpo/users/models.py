@@ -243,7 +243,7 @@ class EpisodeUserState(Document):
     @classmethod
     def for_ref_urls(cls, user, podcast_url, episode_url):
         res = cls.view('users/episode_states_by_ref_urls',
-            key = [user.id, podcast_url, episode_url], limit=1)
+            key = [user.id, podcast_url, episode_url], limit=1, include_docs=True)
         if res:
             state = res.first()
             state.ref_url = episode_url
