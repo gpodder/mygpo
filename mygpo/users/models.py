@@ -299,7 +299,6 @@ class EpisodeUserState(Document):
                 self.chapters = self.chapters + [chapter]
 
             for start, end in rem:
-                print 'remove: start %d, end %d' % (start, end)
                 keep = lambda c: c.start != start or c.end != end
                 self.chapters = filter(keep, self.chapters)
 
