@@ -242,11 +242,12 @@ def toplist(request, count, format):
 
     def get_podcast(t):
         old_pos, podcast = t
-        podcast.old_pos = old_pos
-        return podcast
+        return podcast.get_podcast()
 
     def json_map(t):
-        podcast = get_podcast(t)
+        old_pos, podcast = t
+        podcast.old_pos = old_pos
+
         p = podcast_data(podcast, domain, scale)
         p.update(dict(
             subscribers=           podcast.subscriber_count(),
