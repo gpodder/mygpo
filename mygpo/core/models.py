@@ -256,6 +256,10 @@ class Podcast(Document):
         return self.urls[0]
 
 
+    def get_podcast(self):
+        return self
+
+
     def get_logo_url(self, size):
         if self.logo_url:
             sha = hashlib.sha1(self.logo_url).hexdigest()
@@ -542,6 +546,13 @@ class PodcastGroup(Document):
     @property
     def display_title(self):
         return self.title
+
+
+    def get_podcast(self):
+        # return podcast with most subscribers (bug 1390)
+        return sorted(self.podcasts, key=Podcast.subscriber_count,
+                reverse=True)[0]
+
 
     @property
     def logo_url(self):

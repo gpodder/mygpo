@@ -83,7 +83,7 @@ def podcast_data(obj, domain, scaled_logo_size=64):
     if isinstance(obj, models.Podcast):
         podcast = obj
     elif isinstance(obj, models.PodcastGroup):
-        podcast = obj.podcasts[0]
+        podcast = obj.get_podcast()
     elif podcast.group:
         obj = models.PodcastGroup.for_oldid(obj.group.id)
         podcast = obj[0]

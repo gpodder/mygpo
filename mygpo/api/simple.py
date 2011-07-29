@@ -109,9 +109,7 @@ def format_podcast_list(obj_list, format, title, get_podcast=None,
     """
 
     def default_get_podcast(p):
-        if isinstance(p, models.PodcastGroup):
-            return p.podcasts[0]
-        return p
+        return p.get_podcast()
 
     get_podcast = get_podcast or default_get_podcast
 
