@@ -1,5 +1,6 @@
 from datetime import date, timedelta, datetime
 
+from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseRedirect, Http404
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404, render_to_response
@@ -26,7 +27,7 @@ def update_podcast_settings(state, is_public):
     state.save()
 
 
-@allowed_methods(['GET', 'POST'])
+@allowed_methods(['GET'])
 def show(request, pid):
 
     try:
@@ -63,15 +64,7 @@ def show(request, pid):
             dev = user.get_device(h.device)
             h.device_obj = dev.to_json()
 
-        if request.method == 'POST':
-            privacy_form = PrivacyForm(request.POST)
-            if privacy_form.is_valid():
-                update_podcast_settings(state=state, is_public=privacy_form.cleaned_data['public'])
-                success = True
-        else:
-            privacy_form = PrivacyForm({
-                'public': state.settings.get('public_subscription', True)
-            })
+        is_public = state.settings.get('public_subscription', True)
 
         subscribe_form = SyncForm()
         subscribe_form.set_targets(subscribe_targets, '')
@@ -80,7 +73,7 @@ def show(request, pid):
             'tags': tags,
             'history': history,
             'podcast': podcast,
-            'privacy_form': privacy_form,
+            'is_public': is_public,
             'devices': subscribed_devices,
             'related_podcasts': related_podcasts,
             'can_subscribe': len(subscribe_targets) > 0,
@@ -287,3 +280,18 @@ def subscribe_url(request):
     podcast, created = Podcast.objects.get_or_create(url=url)
 
     return HttpResponseRedirect('/podcast/%d/subscribe' % podcast.pk)
+
+
+@allowed_methods(['POST'])
+def set_public(request, pid, public):
+    try:
+        pid = int(pid)
+    except (TypeError, ValueError):
+        raise Http404
+
+    podcast = get_object_or_404(Podcast, pk=pid)
+    new_podcast = migrate.get_or_migrate_podcast(podcast)
+    state = new_podcast.get_user_state(request.user)
+    update_podcast_settings(state=state, is_public=public)
+
+    return HttpResponseRedirect(reverse('podcast', args=[pid]))

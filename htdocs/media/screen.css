@@ -225,7 +225,6 @@ table.list
 {
     font-size: 1em;
     border-collapse: collapse;
-    margin-bottom: 2em;
     width: 100%;
 }
 
@@ -628,8 +627,13 @@ div.come-in-box
     float: left;
 }
 
-.buttons
+button img
 {
+    margin: 0 3px -3px 0 !important;
+    padding: 0;
+    border: none;
+    width: 16px;
+    height: 16px;
 }
 
 .action-button
@@ -665,22 +669,37 @@ div.come-in-box
     padding-right: 2em;
 }
 
-#subscribed-devices-list
+.podcast-state
 {
+    clear: both;
+    overflow: hidden;
     float: left;
-    width: 45%;
-    margin-right: 3%;
+    margin-bottom: 1em;
 }
 
-div.tag-list
+.podcast-state > div
 {
-    padding-left: 2%;
-    padding-bottom: 2%;
-    margin-bottom: 1%;
-    margin-top: 1%;
     float: left;
+    margin-right: 2%;
+    margin-left: 1%;
+    width: 30%;
+}
+
+.podcast-state > div > div
+{
     background-color: #f7f7f7;
-    width: 45%;
+    width: 100%;
+    margin-bottom: -2000px;
+    padding-bottom: 2000px;
+}
+
+.podcast-state > div.tags > div,
+.podcast-state > div.share > div
+{
+    padding-top: .5em;
+    padding-left: 2%;
+    padding-right: 2%;
+    width: 96% !important;
 }
 
 .tag-list span.other
@@ -697,6 +716,12 @@ div.tag-list
 .tag-list span.own
 {
     color: black;
+}
+
+.tag-list input[type="text"]
+{
+    margin-top: .5em;
+    width: 85%;
 }
 
 input.subscribe
@@ -751,11 +776,6 @@ div.navigation div.next
 hr
 {
 clear: both;
-}
-
-div.share
-{
-    padding-bottom: .5em;
 }
 
 #listcontent h2

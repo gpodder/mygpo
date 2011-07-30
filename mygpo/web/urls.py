@@ -37,6 +37,8 @@ urlpatterns += patterns('mygpo.web.views.podcast',
  url(r'^podcast/(?P<pid>\w+)/unsubscribe/(?P<device_id>\d+)',     'unsubscribe',   name='unsubscribe'),
  url(r'^podcast/(?P<pid>\w+)/add-tag',                            'add_tag',       name='add-tag'),
  url(r'^podcast/(?P<pid>\w+)/remove-tag',                         'remove_tag',    name='remove-tag'),
+ url(r'^podcast/(?P<pid>\w+)/set-public',                         'set_public',    name='podcast-public',  kwargs={'public': True}),
+ url(r'^podcast/(?P<pid>\w+)/set-private',                        'set_public',    name='podcast-private', kwargs={'public': False}),
 )
 
 urlpatterns += patterns('mygpo.web.views.episode',
