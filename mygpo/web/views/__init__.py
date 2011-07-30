@@ -185,9 +185,10 @@ def history(request, count=15, device_id=None):
 
 @login_required
 def blacklist(request, podcast_id):
+    podcast_id = int(podcast_id)
     blacklisted_podcast = models.Podcast.for_oldid(podcast_id)
     suggestion = Suggestions.for_user_oldid(request.user.id)
-    suggestion.blacklist.append(blacklisted_podcast._id)
+    suggestion.blacklist.append(blacklisted_podcast.get_id())
     suggestion.save()
 
     p, _created = UserProfile.objects.get_or_create(user=request.user)
