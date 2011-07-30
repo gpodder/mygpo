@@ -57,7 +57,6 @@ def show(request, pid):
         subscribed_devices = [user.get_device(x) for x in subscribed_devices]
 
         subscribe_targets = new_podcast.subscribe_targets(request.user)
-        success = False
 
         history = list(state.actions)
         for h in history:
@@ -80,7 +79,6 @@ def show(request, pid):
             'subscribe_form': subscribe_form,
             'episodes': episodes,
             'max_listeners': max_listeners,
-            'success': success
         }, context_instance=RequestContext(request))
     else:
         current_site = RequestSite(request)
