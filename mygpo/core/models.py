@@ -104,6 +104,10 @@ class Episode(Document):
             yield (date, listeners)
 
 
+    def get_ids(self):
+        return [self._id] + self.merged_ids
+
+
     @classmethod
     def count(cls):
         r = cls.view('core/episodes_by_podcast', limit=0)
@@ -242,6 +246,9 @@ class Podcast(Document):
 
     def get_id(self):
         return self.id or self._id
+
+    def get_ids(self):
+        return [self.get_id()] + self.merged_ids
 
     @property
     def display_title(self):
