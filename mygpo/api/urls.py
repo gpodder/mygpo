@@ -36,4 +36,5 @@ urlpatterns += patterns('mygpo.api.advanced',
     (r'^api/2/settings/(?P<username>\w+)/(?P<scope>account|device|podcast|episode)\.json', 'settings.main'),
     (r'^api/2/favorites/(?P<username>\w+).json', 'favorites'),
 
+    (r'^api/2/sync-devices/(?P<username>\w+)\.json', 'sync.main'),
 )
