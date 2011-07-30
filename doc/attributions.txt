@@ -23,3 +23,12 @@ Author:  Matt Brett
 Web:     http://opmlicons.com/
 License: Creative Commons Attribution-ShareAlike 3.0 Unported License.
 
+File:    internet-web-browser.png
+Author:  Tango Desktop Project
+Web:     http://tango.freedesktop.org/Tango_Desktop_Project:About
+License: Public Domain
+
+File:    feed-icon.png
+Author:  FeedIcons.com
+Web:     http://www.feedicons.com/
+License: http://www.feedicons.com/guidelines/
