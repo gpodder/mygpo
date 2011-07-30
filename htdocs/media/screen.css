@@ -283,6 +283,11 @@ table.list tr.group:hover td
 {
 }
 
+.podcast_list
+{
+    margin-bottom: 1em;
+}
+
 .podcast_list p, .episode_list p
 {
     margin: 2px 0px 2px 0px;

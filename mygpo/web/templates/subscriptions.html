@@ -11,11 +11,9 @@
 {% block title %}{% trans "My Podcast Subscriptions" %}{% endblock %}
 
 {% block content %}
-<h1>{% trans "My Podcast Subscriptions" %}</h1>
+<h1>{% trans "Podcast Subscriptions" %}</h1>
 
  {% if not subscriptionlist|length_is:"0" %}
- {% url share as share-url %}
- <p>{% trans "This is a list of your podcast subscriptions." %} {% blocktrans %}You can <a href="{{ share-url }}">share</a> it with others.{% endblocktrans %}</p>
 
  <table class="list podcast_list">
   <tr>
@@ -46,7 +44,13 @@
 
   <div>
    <a href="{% url subscriptions-download %}">
-    <img src="/media/opml-icon-22x22.png" style="vertical-align: middle;" /> {% trans "Download Subscriptions as OPML" %}
+    <img src="/media/24x24/opml-icon.png" class="action-button" /> {% trans "Download Subscriptions as OPML" %}
+   </a>
+  </div>
+
+  <div>
+   <a href="{% url share %}">
+    <img src="/media/24x24/openshareicon.png" class="action-button" /> {% trans "Share" %}
    </a>
   </div>
 
