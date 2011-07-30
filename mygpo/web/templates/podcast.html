@@ -121,6 +121,7 @@
      {% google_plus_one_button %}
      {{ podcast|fb_like_podcast }}
 
+     {% if user.is_authenticated and devices %}
      {% if is_public %}
        <form action="{% url podcast-private podcast.id %}" method="POST">
          {% csrf_token %}
@@ -139,6 +140,7 @@
          </button>
        </form>
 
+     {% endif %}
      {% endif %}
     </div>
    </div>
