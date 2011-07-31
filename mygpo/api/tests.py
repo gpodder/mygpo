@@ -23,7 +23,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 
 from mygpo.api.opml import Importer, Exporter
-from mygpo.api.models import Podcast, Device, Episode, UserProfile
+from mygpo.api.models import Podcast, Device, UserProfile
 from mygpo.test import create_auth_string
 
 try:
@@ -105,7 +105,6 @@ class AdvancedAPITests(TestCase):
         self.device, _ = Device.objects.get_or_create(user=self.user, uid='dev')
         self.p1, _ = Podcast.objects.get_or_create(url='http://podcast.com/feed.xml')
         self.p2, _ = Podcast.objects.get_or_create(url='http://server.net/mp3.xml')
-        self.e1, _ = Episode.objects.get_or_create(url='http://podcast.com/e1.mp3', podcast=self.p1)
         self.auth_string = create_auth_string(self.user.username, 'pwd')
 
     def test_update_subscriptions(self):
@@ -122,17 +121,6 @@ class AdvancedAPITests(TestCase):
             (self.user.username, self.device.uid),
             dict(since=0),
             HTTP_AUTHORIZATION=self.auth_string)
-        self.assertEqual(response.status_code, 200)
-
-    def test_upload_episode_actions(self):
-        action = [dict(podcast=self.p1.url, episode=self.e1.url, action='play',
-                started=10, position=100, total=200, device=self.device.uid,
-                timestamp='2009-12-12T09:00:00')]
-        response = self.client.post('/api/2/episodes/%s.json' %
-                self.user.username,
-                json.dumps(action),
-                content_type='text/json',
-                HTTP_AUTHORIZATION=self.auth_string)
         self.assertEqual(response.status_code, 200)
 
     def test_get_episode_actions(self):
@@ -169,12 +157,6 @@ class AdvancedAPITests(TestCase):
     def test_get_podcast_data(self):
         response = self.client.get('/api/2/data/podcast.json',
             dict(url=self.p1.url))
-        self.assertEqual(response.status_code, 200)
-
-    def test_get_episode_data(self):
-        response = self.client.get('/api/2/data/episode.json',
-            dict(podcast=self.p1.url,
-            url=self.e1.url))
         self.assertEqual(response.status_code, 200)
 
     def test_get_updates_for_device(self):
