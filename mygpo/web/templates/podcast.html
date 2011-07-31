@@ -164,7 +164,7 @@
           <p class="title">{% episode_link episode %}</p>
           <p class="description">{{ episode.description|default:""|striptags|truncatewords:"15" }}</p>
       </td>
-      <td>{{ episode.timestamp|default:""|date:"Y-m-d" }}</td>
+      <td>{{ episode.released|default:""|date:"Y-m-d" }}</td>
       <td>
        {% if episode.listeners %}
         {{ episode.listeners|vertical_bar:max_listeners }}
