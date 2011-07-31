@@ -3,8 +3,9 @@ import sys
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 
+from mygpo.core.models import Episode
 from mygpo.decorators import repeat_on_conflict
-from mygpo.api.models import Episode, Podcast
+from mygpo.api.models import Podcast
 from mygpo.users.models import EpisodeUserState
 from mygpo.maintenance.merge import merge_episode_states
 from mygpo.utils import progress
@@ -25,9 +26,7 @@ class Command(BaseCommand):
 
         for n, state in enumerate(states):
                 user = User.objects.get(id=state.user_oldid)
-                old_podcast = Podcast.objects.get(url=state.podcast_ref_url)
-                old_episode = Episode.objects.get(podcast=old_podcast, url=state.ref_url)
-                episode = migrate.get_or_migrate_episode(old_episode)
+                episode = Episode.for_podcast_url(state.podcast_ref_url, state.ref_url)
                 new_state = episode.get_user_state(user)
 
                 if not new_state._id:

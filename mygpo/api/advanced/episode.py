@@ -18,10 +18,11 @@
 import time
 from mygpo.api.basic_auth import require_valid_user, check_username
 from django.http import HttpResponseBadRequest
+from mygpo.core import models
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.exceptions import ParameterMissing
 from mygpo.api.sanitizing import sanitize_url
-from mygpo.api.models import Device, Podcast, Episode
+from mygpo.api.models import Device, Podcast
 from mygpo.users.models import Chapter
 from datetime import datetime
 from mygpo.utils import parse_time
@@ -97,11 +98,16 @@ def chapters(request, username):
         except ValueError:
             return HttpResponseBadRequest('since-value is not a valid timestamp')
 
-        podcast = Podcast.objects.get(url=sanitize_url(podcast_url))
-        episode = Episode.objects.get(url=sanitize_url(episode_url, 'episode'), podcast=podcast)
+        podcast_url = sanitize_url(podcast_url)
+        episode_url = sanitize_url(episode_url, 'episode')
+        episode = models.Episode.for_podcast_url(podcast_url, episode_url)
 
-        new_episode = migrate.get_or_migrate_episode(episode)
-        e_state = new_episode.get_user_state(request.user)
+        if episode is None:
+            #TODO: check
+            raise Http404
+
+
+        e_state = episode.get_user_state(request.user)
 
         new_user = migrate.get_or_migrate_user(request.user)
 
@@ -134,11 +140,12 @@ def chapters(request, username):
 
 
 def update_chapters(req, user):
-    podcast, c = Podcast.objects.get_or_create(url=req['podcast'])
-    episode, c = Episode.objects.get_or_create(url=req['episode'], podcast=podcast)
+    podcast_url = sanitize_url(req['podcast'])
+    episode_url = sanitize_url(req['episode'], 'episode')
 
-    new_episode = migrate.get_or_migrate_episode(episode)
-    e_state = new_episode.get_user_state(request.user)
+    episode = models.Episode.for_podcast_url(podcast_url, episode_url)
+
+    e_state = episode.get_user_state(request.user)
 
     device = None
     if 'device' in req:

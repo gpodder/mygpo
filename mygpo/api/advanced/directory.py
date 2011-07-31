@@ -70,8 +70,12 @@ def episode_info(request):
     podcast_url = sanitize_url(request.GET.get('podcast', ''))
     episode_url = sanitize_url(request.GET.get('url', ''), 'episode')
 
-    podcast = models.Podcast.for_url(podcast_url)
-    episode = models.Episode.for_podcast_url(podcast.get_id(), episode_url)
+    episode = models.Episode.for_podcast_url(podcast_url, episode_url)
+
+    if episode is None:
+        # TODO
+        raise Http404()
+
     domain = RequestSite(request).domain
 
     resp = episode_data(episode, domain)

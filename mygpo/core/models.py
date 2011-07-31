@@ -64,12 +64,29 @@ class Episode(Document):
 
 
     @classmethod
-    def for_podcast_url(cls, podcast_id, url):
+    def for_podcast_url(cls, podcast_url, episode_url, create=False):
+        podcast = Podcast.for_url(podcast_url)
+        return cls.for_podcast_id_url(podcast.get_id(), episode_url, create)
+
+
+    @classmethod
+    def for_podcast_id_url(cls, podcast_id, episode_url, create=False):
         r = cls.view('core/episodes_by_podcast_url',
-                key          = [podcast_id, url],
+                key          = [podcast_id, episode_url],
                 include_docs = True,
             )
-        return r.first()
+
+        if r:
+            return r.first()
+        else:
+            if create:
+                episode = Episode()
+                episode.podcast = podcast_id
+                episode.urls = [episode_url]
+                return episode
+
+            else:
+                return None
 
 
     @classmethod

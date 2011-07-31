@@ -36,13 +36,15 @@ from mygpo.api.sanitizing import sanitize_url, rewrite_podcasts
 from mygpo.data import youtube
 from mygpo.data.mimetype import get_mimetype, check_mimetype, get_podcast_types
 from mygpo import migrate
+from mygpo.core.models import Episode
 
 socket.setdefaulttimeout(10)
 fetcher = feedcore.Fetcher(USER_AGENT)
 
 
 def mark_outdated(podcast):
-    for e in models.Episode.objects.filter(podcast=podcast):
+    podcast = migrate.get_or_migrate_podcast(podcast)
+    for e in podcast.get_episodes():
         e.outdated = True
         e.save()
 
@@ -120,10 +122,9 @@ def get_feed_tags(feed):
 @repeat_on_conflict()
 def update_feed_tags(podcast, tags):
     src = 'feed'
-    np = migrate.get_or_migrate_podcast(podcast)
-    np.tags[src] = tags
+    podcast.tags[src] = tags
     try:
-        np.save()
+        podcast.save()
     except Exception, e:
         from couchdbkit import ResourceConflict
         if isinstance(e, ResourceConflict):
@@ -138,18 +139,19 @@ def get_episode_metadata(entry, url, mimetype):
             'title': entry.get('title', entry.get('link', '')),
             'description': get_episode_summary(entry),
             'link': entry.get('link', ''),
-            'timestamp': None,
             'author': entry.get('author', entry.get('itunes_author', '')),
             'duration': get_duration(entry),
             'filesize': get_filesize(entry, url),
             'language': entry.get('language', ''),
-            'outdated': False,
-            'mimetype': mimetype,
+            'mimetypes': [mimetype],
     }
     try:
-        d['timestamp'] = datetime.datetime(*(entry.updated_parsed)[:6])
+        d['released'] = datetime.datetime(*(entry.updated_parsed)[:6])
     except:
-        d['timestamp'] = None
+        d['released'] = None
+
+    # we need to distinguish it from non-updated episodes
+    d['outdated'] = not d['title']
 
     return d
 
@@ -217,9 +219,10 @@ def update_podcasts(fetch_queue):
                     if repr(e).strip():
                         print >> sys.stderr, 'cannot save image %s for podcast %d: %s' % (cover_art.encode('utf-8'), podcast.id, repr(e).encode('utf-8'))
 
-            update_feed_tags(podcast, get_feed_tags(feed.feed))
+            new_podcast = migrate.get_or_migrate_podcast(podcast)
+            update_feed_tags(new_podcast, get_feed_tags(feed.feed))
 
-            existing_episodes = list(models.Episode.objects.filter(podcast=podcast))
+            existing_episodes = list(new_podcast.get_episodes())
 
             for entry in feed.entries:
                 try:
@@ -229,30 +232,26 @@ def update_podcasts(fetch_queue):
                         continue
 
                     url = sanitize_url(url, 'episode')
+
+                    episode = Episode.for_podcast_id_url(new_podcast.get_id(), url, create=True)
                     md = get_episode_metadata(entry, url, mimetype)
-                    e, created = models.Episode.objects.get_or_create(
-                        podcast=podcast,
-                        url=url,
-                        defaults=md)
-                    if created:
-                        print 'New episode: ', e.title.encode('utf-8', 'ignore')
-                    else:
-                        print 'Updating', e.title.encode('utf-8', 'ignore')
-                        for key in md:
-                            setattr(e, key, md[key])
 
-                    # we need to distinguish it from non-updated episodes
-                    if not e.title:
-                        e.outdated = True
-                    else:
-                        e.outdated = False
-                    e.save()
+                    changed = False
+                    for key, value in md.items():
+                        if getattr(episode, key) != value:
+                            setattr(episode, key, value)
+                            changed = True
 
-                    if e in existing_episodes:
-                        existing_episodes.remove(e)
+                    if changed:
+                        episode.save()
+                        print 'Updating Episode: %s' % episode.title.encode('utf-8', 'ignore')
 
-                except Exception, e:
+                    if episode in existing_episodes:
+                        existing_episodes.remove(episode)
+
+                except Exception as e:
                     print 'Cannot get episode:', e
+                    raise
 
             # all episodes that could not be found in the feed
             for e in existing_episodes:
@@ -260,7 +259,7 @@ def update_podcasts(fetch_queue):
                     e.outdated = True
                     e.save()
 
-            podcast.content_types = get_podcast_types(podcast)
+            podcast.content_types = get_podcast_types(new_podcast)
 
         except Exception, e:
             print >>sys.stderr, 'Exception:', e
