@@ -292,7 +292,6 @@ def subscribe_url(request):
     return HttpResponseRedirect('/podcast/%d/subscribe' % podcast.pk)
 
 
-<<<<<<< HEAD
 @allowed_methods(['POST'])
 def set_public(request, pid, public):
     try:
@@ -306,7 +305,7 @@ def set_public(request, pid, public):
     update_podcast_settings(state=state, is_public=public)
 
     return HttpResponseRedirect(reverse('podcast', args=[pid]))
-=======
+
 
 # To make all view accessible via either CouchDB-ID or Slugs
 # a decorator queries the podcast and passes the Id on to the
@@ -325,4 +324,3 @@ subscribe_slug_id   = slug_id_decorator(subscribe)
 unsubscribe_slug_id = slug_id_decorator(unsubscribe)
 add_tag_slug_id     = slug_id_decorator(add_tag)
 remove_tag_slug_id  = slug_id_decorator(remove_tag)
->>>>>>> automatically use new URLs for episode-links
