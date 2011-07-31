@@ -26,9 +26,9 @@ class Command(BaseCommand):
         oldepisodes = oldmodels.Episode.objects.filter(id__gte=min_id, id__lte=max_id)
         newepisodes = newmodels.Episode.view('core/episodes_by_oldid', startkey=min_id, endkey=max_id, include_docs=True).iterator()
         total = oldepisodes.count()
-        compare = lambda o, n: cmp(long(o.id), long(n.oldid))
+        key = lambda x: getattr(x, 'oldid', getattr(x, 'id'))
 
-        for n, (olde, newe) in enumerate(iterate_together(oldepisodes, newepisodes, compare)):
+        for n, (olde, newe) in enumerate(iterate_together([oldepisodes, newepisodes], key)):
 
             if (olde != None) and (newe != None):
                 podcast = newmodels.Podcast.get(newe.podcast)

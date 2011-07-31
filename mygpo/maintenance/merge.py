@@ -96,8 +96,8 @@ def merge_podcasts(podcast, p, dry_run):
         podcast.related_podcasts = list(set(podcast.related_podcasts + p.related_podcasts))
         podcast.content_types    = list(set(podcast.content_types + p.content_types))
 
-        cmp_subscriber_entries = lambda a, b: cmp(a.timestamp, b.timestamp)
-        for a, b in utils.iterate_together(podcast.subscribers, p.subscribers, cmp_subscriber_entries):
+        key = lambda x: x.timestamp
+        for a, b in utils.iterate_together([podcast.subscribers, p.subscribers], key):
             if a is None or b is None: continue
 
             # avoid increasing subscriber_count when merging
@@ -197,10 +197,10 @@ def merge_podcast_states_for_podcasts(p1, p2, dry_run):
         if not dry_run:
             s2.delete()
 
-    cmp_states = lambda s1, s2: cmp(s1.user_oldid, s2.user_oldid)
+    key = lambda x: x.user_oldid
     states1 = p1.get_all_states()
     states2 = p2.get_all_states()
-    for s1, s2 in utils.iterate_together(states1, states2, cmp_states):
+    for s1, s2 in utils.iterate_together([states1, states2], key):
         if s1 == s2:
             continue
 

@@ -10,7 +10,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         updated, deleted, created = 0, 0, 0
-        compare = lambda o, n: cmp(long(o.id), long(n.oldid))
+        key = lambda x: getattr(x, 'oldid', getattr(x, 'id'))
 
         oldgroups = oldmodels.PodcastGroup.objects.all().order_by('id')
         newgroups = newmodels.PodcastGroup.view('core/podcastgroups_by_oldid', include_docs=True).iterator()
@@ -20,7 +20,7 @@ class Command(BaseCommand):
         newpodcasts = newmodels.Podcast.view('core/podcasts_by_oldid').iterator()
         total += oldpodcasts.count()
 
-        for n, (oldg, newg) in enumerate(iterate_together(oldgroups.iterator(), newgroups, compare)):
+        for n, (oldg, newg) in enumerate(iterate_together([oldgroups.iterator(), newgroups], key)):
             if (oldg != None) and (newg != None):
                 updated += migrate.update_podcastgroup(oldg=oldg, newg=newg)
 
@@ -35,7 +35,7 @@ class Command(BaseCommand):
             status_str = '%d new, %d upd, %d del' % (created, updated, deleted)
             progress(n, total, status_str)
 
-        for n, (oldp, newp) in enumerate(iterate_together(oldpodcasts.iterator(), newpodcasts, compare), n):
+        for n, (oldp, newp) in enumerate(iterate_together([oldpodcasts.iterator(), newpodcasts], key), n):
 
             if (oldp != None) and (newp != None):
                 updated += migrate.update_podcast(oldp=oldp, newp=newp)

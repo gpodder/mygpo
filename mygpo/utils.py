@@ -15,6 +15,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+import operator
 import sys
 import re
 import collections
@@ -116,63 +117,85 @@ def parse_bool(val):
     return False
 
 
-def iterate_together(l1, l2, compare=lambda x, y: cmp(x, y)):
+def iterate_together(lists, key=lambda x: x, reverse=False):
     """
-    takes two ordered, possible sparse, lists l1 and l2 with similar items
-    (some items have a corresponding item in the other list, some don't).
+    takes ordered, possibly sparse, lists with similar items
+    (some items have a corresponding item in the other lists, some don't).
 
     It then yield tuples of corresponding items, where one element is None is
     there is no corresponding entry in one of the lists.
 
     Tuples where both elements are None are skipped.
 
-    compare is a method for comparing items from both lists; it defaults
-    to cmp.
+    The results of the key method are used for the comparisons.
 
-    >>> list(iterate_together(range(1, 3), range(1, 4, 2)))
+    If reverse is True, the lists are expected to be sorted in reverse order
+    and the results will also be sorted reverse
+
+    >>> list(iterate_together([range(1, 3), range(1, 4, 2)]))
     [(1, 1), (2, None), (None, 3)]
 
-    >>> list(iterate_together([], []))
+    >>> list(iterate_together([[], []]))
     []
 
-    >>> list(iterate_together(range(1, 3), range(3, 5)))
+    >>> list(iterate_together([range(1, 3), range(3, 5)]))
     [(1, None), (2, None), (None, 3), (None, 4)]
 
-    >>> list(iterate_together(range(1, 3), []))
+    >>> list(iterate_together([range(1, 3), []]))
     [(1, None), (2, None)]
 
-    >>> list(iterate_together([1, None, 3], [None, None, 3]))
+    >>> list(iterate_together([[1, None, 3], [None, None, 3]]))
     [(1, None), (3, 3)]
     """
 
-    l1 = iter(l1)
-    l2 = iter(l2)
+    Next = collections.namedtuple('Next', 'item more')
+    min_ = min if not reverse else max
+    lt_  = operator.lt if not reverse else operator.gt
+
+    lists = [iter(l) for l in lists]
 
     def _take(it):
         try:
             i = it.next()
             while i is None:
                 i = it.next()
-            return i, True
+            return Next(i, True)
         except StopIteration:
-            return None, False
+            return Next(None, False)
 
-    i1, more1 = _take(l1)
-    i2, more2 = _take(l2)
+    def new_res():
+        return [None]*len(lists)
 
-    while more1 or more2:
-        if not more2 or (i1 is not None and compare(i1, i2) < 0):
-            yield(i1, None)
-            i1, more1 = _take(l1)
+    # take first bunch of items
+    items = [_take(l) for l in lists]
 
-        elif not more1 or (i2 is not None and compare(i1, i2) > 0):
-            yield(None, i2)
-            i2, more2 = _take(l2)
+    while any(i.item is not None or i.more for i in items):
 
-        elif compare(i1, i2) == 0:
-            yield(i1, i2)
-            i1, more1 = _take(l1)
-            i2, more2 = _take(l2)
+        res = new_res()
+
+        for n, item in enumerate(items):
+
+            if item.item is None:
+                continue
+
+            if all(x is None for x in res):
+                res[n] = item.item
+                continue
+
+            min_v = min_(filter(lambda x: x is not None, res), key=key)
+
+            if key(item.item) == key(min_v):
+                res[n] = item.item
+
+            elif lt_(key(item.item), key(min_v)):
+                res = new_res()
+                res[n] = item.item
+
+        for n, x in enumerate(res):
+            if x is not None:
+                items[n] = _take(lists[n])
+
+        yield tuple(res)
 
 
 def progress(val, max_val, status_str='', max_width=50, stream=sys.stdout):

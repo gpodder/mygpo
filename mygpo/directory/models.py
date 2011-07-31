@@ -40,14 +40,14 @@ class Category(Document):
         Merges some entries into the current category.
         """
 
-        cmp_entry_podcasts = lambda e1, e2: cmp(e1.podcast, e2.podcast)
+        key = lambda e: e.podcast
 
         podcasts = sorted(podcasts, cmp=cmp_entry_podcasts)
         self.podcasts = sorted(self.podcasts, cmp=cmp_entry_podcasts)
 
         new_entries = []
 
-        for e1, e2 in iterate_together(self.podcasts, podcasts, compare=cmp_entry_podcasts):
+        for e1, e2 in iterate_together([self.podcasts, podcasts], key):
             if e1 is None:
                 new_entries.append(e2)
 

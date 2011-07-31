@@ -267,7 +267,7 @@ def rewrite_newpodcast(p_old, p_new):
     # merge subscriber data
     subscribers = []
     compare = lambda a, b: cmp(a.timestamp, b.timestamp)
-    for n, o in iterate_together(p_n.subscribers, p_o.subscribers):
+    for n, o in iterate_together([p_n.subscribers, p_o.subscribers]):
 
         # we assume that the new podcast has much more subscribers
         # taking only count of the old podcast would look like a drop
