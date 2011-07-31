@@ -8,11 +8,11 @@ from django.contrib.sites.models import RequestSite
 from django.views.decorators.cache import cache_page
 
 from mygpo.core.models import Podcast
+from mygpo.core.proxy import proxy_object
 from mygpo.data.mimetype import CONTENT_TYPES
 from mygpo.decorators import manual_gc
 from mygpo.directory.models import Category
-from mygpo.directory.toplist import PodcastToplist, EpisodeToplist, \
-                                    EpisodeToplistEntry
+from mygpo.directory.toplist import PodcastToplist, EpisodeToplist
 from mygpo.directory.search import search_podcasts
 from mygpo.web import utils
 from mygpo.directory.tags import TagCloud
@@ -142,7 +142,7 @@ def episode_toplist(request, num=100):
     media_types = set_types or CONTENT_TYPES
 
     toplist = EpisodeToplist(languages=lang, types=media_types)
-    entries = [EpisodeToplistEntry(episode) for episode in toplist[:num]]
+    entries = list(map(proxy_object, toplist[:num]))
 
     # load podcast objects
     podcast_ids = [e.podcast for e in entries]
