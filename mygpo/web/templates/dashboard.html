@@ -75,7 +75,7 @@
      <td>{% episode_link episode %}<br/>
       <span class="from_podcast">{% trans "from" %} {% podcast_group_link episode.podcast %}
      </td>
-     <td>{{ episode.timestamp|naturalday }}</td>
+     <td>{{ episode.released|naturalday }}</td>
     </tr>
    {% endfor %}
   </table>
