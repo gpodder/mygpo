@@ -532,7 +532,7 @@ class PodcastGroup(Document):
 
 
     def get_podcast_by_oldid(self, oldid):
-        for podcast in self.podcasts:
+        for podcast in list(self.podcasts):
             if podcast.oldid == oldid:
                 return podcast
 
