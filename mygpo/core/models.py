@@ -1,6 +1,9 @@
 import hashlib
+from datetime import datetime
 from dateutil import parser
+
 from couchdbkit.ext.django.schema import *
+
 from mygpo.decorators import repeat_on_conflict
 from mygpo import utils
 from mygpo.core.proxy import DocumentABCMeta
@@ -344,8 +347,24 @@ class Podcast(Document):
     def display_title(self):
         return self.title or self.url
 
-    def get_episodes(self):
-        return list(Episode.view('core/episodes_by_podcast', key=self.get_id(), include_docs=True))
+
+    def get_episodes(self, since=None, until={}, **kwargs):
+
+        if kwargs.get('descending', False):
+            since, until = until, since
+
+        if isinstance(since, datetime):
+            since = since.isoformat()
+
+        if isinstance(until, datetime):
+            until = until.isoformat()
+
+        return Episode.view('core/episodes_by_podcast',
+                startkey = [self.get_id(), since],
+                endkey   = [self.get_id(), until],
+                include_docs=True,
+                **kwargs
+            )
 
 
     def get_episode_for_slug(self, slug):
