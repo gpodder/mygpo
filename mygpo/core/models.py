@@ -582,7 +582,8 @@ class PodcastGroup(Document):
 
         podcast.delete()
         podcast.group = self._id
-        self.podcasts.append(podcast)
+        self.podcasts = sorted(self.podcasts + [podcast],
+                        key=Podcast.subscriber_count, reverse=True)
         self.save()
         return self.podcasts[-1]
 
