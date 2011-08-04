@@ -103,9 +103,6 @@ class Podcast(models.Model):
             p.group = None
             p.save()
 
-    def get_episodes(self):
-        return Episode.objects.filter(podcast=self)
-
     def __unicode__(self):
         return self.title if self.title != '' else self.url
 
