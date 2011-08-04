@@ -173,7 +173,7 @@ class Episode(Document):
     def __eq__(self, other):
         if other == None:
             return False
-        return self.id == other.id
+        return self._id == other._id
 
 
 class SubscriberData(DocumentSchema):
