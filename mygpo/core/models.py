@@ -3,12 +3,16 @@ from dateutil import parser
 from couchdbkit.ext.django.schema import *
 from mygpo.decorators import repeat_on_conflict
 from mygpo import utils
+from mygpo.core.proxy import DocumentABCMeta
+
 
 
 class Episode(Document):
     """
     Represents an Episode. Can only be part of a Podcast
     """
+
+    __metaclass__ = DocumentABCMeta
 
     title = StringProperty()
     description = StringProperty()
@@ -208,6 +212,9 @@ class PodcastSubscriberData(Document):
 
 
 class Podcast(Document):
+
+    __metaclass__ = DocumentABCMeta
+
     id = StringProperty()
     title = StringProperty()
     urls = StringListProperty()
