@@ -85,15 +85,15 @@ class Episode(Document):
 
         if r:
             return r.first()
-        else:
-            if create:
-                episode = Episode()
-                episode.podcast = podcast_id
-                episode.urls = [episode_url]
-                return episode
 
-            else:
-                return None
+        if create:
+            episode = Episode()
+            episode.podcast = podcast_id
+            episode.urls = [episode_url]
+            episode.save()
+            return episode
+
+        return None
 
 
     @classmethod
@@ -325,6 +325,7 @@ class Podcast(Document):
         if create:
             podcast = cls()
             podcast.urls = [url]
+            podcast.save()
             return podcast
 
         return None

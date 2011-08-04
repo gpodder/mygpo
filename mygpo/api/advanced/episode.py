@@ -143,7 +143,8 @@ def update_chapters(req, user):
     podcast_url = sanitize_url(req['podcast'])
     episode_url = sanitize_url(req['episode'], 'episode')
 
-    episode = models.Episode.for_podcast_url(podcast_url, episode_url)
+    episode = models.Episode.for_podcast_url(podcast_url, episode_url,
+            create=True)
 
     e_state = episode.get_user_state(request.user)
 

@@ -233,7 +233,8 @@ def update_podcasts(fetch_queue):
 
                     url = sanitize_url(url, 'episode')
 
-                    episode = Episode.for_podcast_id_url(new_podcast.get_id(), url, create=True)
+                    episode = Episode.for_podcast_id_url(new_podcast.get_id(),
+                            url, create=True)
                     md = get_episode_metadata(entry, url, mimetype)
 
                     changed = False
