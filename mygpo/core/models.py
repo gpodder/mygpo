@@ -67,7 +67,7 @@ class Episode(Document):
                 key          = [podcast_id, slug],
                 include_docs = True
             )
-        return r.first()
+        return r.first() if r else None
 
 
     @classmethod
