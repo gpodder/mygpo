@@ -369,6 +369,23 @@ class Podcast(Document):
         return episodes[0] if episodes else None
 
 
+    def get_episode_before(self, episode):
+        if not episode.released:
+            return None
+
+        prevs = self.get_episodes(until=episode.released, descending=True,
+                limit=1)
+        prev = prevs.first() if prevs else None
+
+
+    def get_episode_after(self, episode):
+        if not episode.released:
+            return None
+
+        nexts = self.get_episodes(since=episode.released, limit=1)
+        next = nexts.first() if nexts else None
+
+
     def get_episode_for_slug(self, slug):
         return Episode.for_slug(self.get_id(), slug)
 

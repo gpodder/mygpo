@@ -16,8 +16,8 @@
 {% load menu %}
 {% block mainmenu %}{{ "/podcast/"|main_menu }}{% endblock %}
 {% block sectionmenu %}
- {% if episode.podcast.title %}
-  {{ "/podcast/"|section_menu:episode.podcast.title }}
+ {% if podcast.title %}
+  {{ "/podcast/"|section_menu:podcast.title }}
  {% else %}
   {{ "/podcast/"|section_menu:"Unnamed Podcast" }}
  {% endif %}
@@ -31,7 +31,7 @@
   <script type="text/javascript" src="/media/js/json2.js"></script>
   <script type="text/javascript" src="/media/js/youtube-handler.js"></script>
  {% endif %}
- {{ episode|opengraph_episode }}
+ {% opengraph_episode episode podcast %}
  {% google_plus_one_head %}
 
  <script type="text/javascript">
@@ -46,15 +46,15 @@
  </script>
 {% endblock head %}
 
-{% block title %}{{ episode.title|default:"Unnamed Episode"|striptags }} - {{ episode.podcast.title|default:"Unnamed Podcast"|striptags}}{% endblock %}
+{% block title %}{{ episode.title|default:"Unnamed Episode"|striptags }} - {{ podcast.title|default:"Unnamed Podcast"|striptags}}{% endblock %}
 
 {% block content %}
-  {% if episode.podcast.logo_url %}
-   <div id="podcastlogo"><a href="{% podcast_link_target episode.podcast %}">{{ episode.podcast|podcast_logo_big }}</a></div>
+  {% if podcast.logo_url %}
+   <div id="podcastlogo"><a href="{% podcast_link_target podcast %}">{{ podcast|podcast_logo_big }}</a></div>
   {% endif %}
   <h1>{{ episode.title|default:"Unnamed Episode"|striptags }}</h1>
   <small class="description">
-      {% trans "from" %} {% podcast_group_link episode.podcast %}{% if episode.timestamp %}, {% trans "released" %} {{episode.timestamp}}{% endif %},
+      {% trans "from" %} {% podcast_group_link podcast %}{% if episode.timestamp %}, {% trans "released" %} {{episode.timestamp}}{% endif %},
       {% trans "links" %}:
       <a href="{{episode.url}}">{% trans "download" %}</a>{% if episode.link and episode.link != episode.url %}, <a href="{{episode.link}}">{% trans "website" %}</a>
       {% endif %},
@@ -89,13 +89,13 @@
 
    {% if is_favorite %}
     <div>
-     <a href="{% episode_link_target episode episode.podcast "episode-fav" %}">
+     <a href="{% episode_link_target episode podcast "episode-fav" %}">
       <img src="/media/fav.png" style="vertical-align: middle;" /> {% trans "Favorite" %}
      </a>
     </div>
    {% else %}
     <div>
-     <a href="{% episode_link_target episode episode.podcast "episode-fav" %}">
+     <a href="{% episode_link_target episode podcast "episode-fav" %}">
       <img src="/media/fav-add.png" style="vertical-align: middle;" /> {% trans "Add as Favorite" %}
      </a>
     </div>
@@ -115,7 +115,7 @@
     {% endif %}
    </div>
    <div class="list">
-    <a href="{% podcast_link_target episode.podcast %}#episodes">{% trans "Episode-List" %}</a>
+    <a href="{% podcast_link_target podcast %}#episodes">{% trans "Episode-List" %}</a>
    </div>
    <div class="next">
     {% if next %}
@@ -160,7 +160,7 @@
     {% endfor %}
     {% if user.is_authenticated %}
     <tr>
-     <form action="{% episode_link_target episode "add-chapter" %}" method="POST">
+     <form action="{% episode_link_target episode podcast "add-chapter" %}" method="POST">
       {% csrf_token %}
       <td>
        <input type="text" name="start" id="start" class="time" /> -
@@ -210,7 +210,7 @@
 
    {% if user.is_authenticated %}
     <tr>
-     <form action="{% url add-episode-action episode.id %}" method="POST">
+     <form action="{% episode_link_target episode podcast "add-episode-action" %}" method="POST">
       {% csrf_token %}
       <td>
        <input type="text" id="timestamp" name="timestamp" /></td>
