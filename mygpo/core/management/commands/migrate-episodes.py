@@ -12,14 +12,17 @@ class Command(BaseCommand):
 
 
     option_list = BaseCommand.option_list + (
-        make_option('--min-id', action='store', type="int", dest='min_id', default=0, help="Id from which the migration should start."),
-        make_option('--max-id', action='store', type="int", dest='max_id', help="Id at which the migration should end."),
+        make_option('--min-id', action='store', type="int", dest='min_id',
+            default=0, help="Id from which the migration should start."),
+        make_option('--max-id', action='store', type="int", dest='max_id',
+            default=None, help="Id at which the migration should end."),
     )
 
     def handle(self, *args, **options):
 
         min_id = options.get('min_id', 0)
-        max_id = options.get('max_id', oldmodels.Episode.objects.order_by('-id')[0].id)
+        max_id = options.get('max_id') or \
+                 oldmodels.Episode.objects.order_by('-id')[0].id
 
         updated, deleted, created = 0, 0, 0
 
