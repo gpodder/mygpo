@@ -3,9 +3,9 @@ from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.views.decorators.cache import cache_page
 from mygpo.core import models
-from mygpo.api.models import Podcast, Episode, PodcastGroup
+from mygpo.api.models import Podcast, PodcastGroup
 from mygpo.publisher.auth import require_publisher, is_publisher
-from mygpo.publisher.forms import SearchPodcastForm, EpisodeForm, PodcastForm
+from mygpo.publisher.forms import SearchPodcastForm, PodcastForm
 from mygpo.publisher.utils import listener_data, episode_listener_data, check_publisher_permission, subscriber_data
 from mygpo.web.heatmap import EpisodeHeatmap
 from django.contrib.sites.models import RequestSite
@@ -162,18 +162,22 @@ def episodes(request, id):
 @require_publisher
 @allowed_methods(['GET', 'POST'])
 def episode(request, id):
-    e = get_object_or_404(Episode, pk=id)
+    episode = models.Episode.for_oldid(id)
+    if episode is None:
+        #TODO: Check
+        raise Http404
 
+    # TODO: refactor
     if not check_publisher_permission(request.user, e.podcast):
         return HttpResponseForbidden()
 
     if request.method == 'POST':
-        form = EpisodeForm(request.POST, instance=e)
+        form = None #EpisodeForm(request.POST, instance=e)
         if form.is_valid():
             form.save()
 
     elif request.method == 'GET':
-        form = EpisodeForm(instance=e)
+        form = None #EpisodeForm(instance=e)
 
     episode = migrate.get_or_migrate_episode(e)
 
