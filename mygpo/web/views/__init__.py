@@ -56,7 +56,7 @@ def welcome(request, toplist_entries=10):
     current_site = RequestSite(request)
     podcasts = Podcast.objects.count()
     users = User.objects.filter(is_active=True).count()
-    episodes = Episode.objects.count()
+    episodes = models.Episode.count()
 
     try:
         lang = utils.process_lang_params(request, '/toplist/')
