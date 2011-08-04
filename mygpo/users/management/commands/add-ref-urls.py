@@ -27,8 +27,9 @@ class Command(BaseCommand):
         # Set URLs for Episode States
         for n, e_state in enumerate(e_states):
             try:
-                episode = Episode.get(e_state.episode).get_old_obj()
-                self.set_episode_urls(e_state=e_state, episode=episode)
+                episode = Episode.get(e_state.episode)
+                podcast = Podcast.get(episode.podcast)
+                self.set_episode_urls(e_state=e_state, episode=episode, podcast=podcast)
             except (oldmodels.Episode.DoesNotExist, oldmodels.Podcast.DoesNotExist):
                 pass
 
@@ -47,9 +48,9 @@ class Command(BaseCommand):
 
 
     @repeat_on_conflict(['e_state'])
-    def set_episode_urls(self, e_state, episode):
+    def set_episode_urls(self, e_state, episode, podcast):
         e_state.ref_url = episode.url
-        e_state.podcast_ref_url = episode.podcast.url
+        e_state.podcast_ref_url = podcast.url
         e_state.save()
 
     @repeat_on_conflict(['p_state'])
