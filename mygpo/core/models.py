@@ -311,19 +311,23 @@ class Podcast(Document):
 
 
     @classmethod
-    def for_url(cls, url):
+    def for_url(cls, url, create=False):
         r = cls.view('core/podcasts_by_url',
                 key=url,
                 classes=[Podcast, PodcastGroup],
                 include_docs=True
             )
 
-        if not r:
-            return None
+        if r:
+            podcast_group = r.first()
+            return podcast_group.get_podcast_by_url(url)
 
-        podcast_group = r.first()
-        return podcast_group.get_podcast_by_url(url)
+        if create:
+            podcast = cls()
+            podcast.urls = [url]
+            return podcast
 
+        return None
 
 
     def get_podcast_by_id(self, _):
