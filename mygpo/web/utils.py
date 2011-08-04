@@ -2,6 +2,7 @@
 from django.db.models import Sum
 from django.views.decorators.cache import never_cache
 from django.utils.html import strip_tags
+from django.core.urlresolvers import reverse
 
 from mygpo.api.models import Podcast, EpisodeAction
 from babel import Locale, UnknownLocaleError
@@ -151,7 +152,6 @@ def get_podcast_link_target(podcast, view_name='podcast', add_args=[]):
 
     from mygpo.api.models import Podcast as OldPodcast
     from mygpo.core.models import Podcast
-    from django.core.urlresolvers import reverse
 
     # for old-podcasts we link to its id
     if isinstance(podcast, OldPodcast):
@@ -180,16 +180,10 @@ def get_episode_link_target(episode, podcast=None, view_name='episode', add_args
     automatically distringuishes between relational Episode objects and
     CouchDB-based Episodes """
 
-    from mygpo.api.models import Episode as OldEpisode
-    from mygpo.core.models import Episode
-    from django.core.urlresolvers import reverse
-
-    # for old-podcasts there is no choice, link to oldid
-    if isinstance(episode, OldEpisode):
-        args = [episode.id]
+    from mygpo.core.models import Podcast
 
     # prefer slugs
-    elif episode.slug:
+    if episode.slug:
         if not podcast:
             podcast = Podcast.get(episode.podcast)
 
@@ -203,7 +197,10 @@ def get_episode_link_target(episode, podcast=None, view_name='episode', add_args
     # fallback: CouchDB-IDs
     else:
         if not podcast:
-            podcast = Podcast.get(episode.podcast)
+            if isinstance(episode.podcast, Podcast):
+                podcast = episode.podcast
+            elif isinstance(episode.podcast, basestring):
+                podcast = Podcast.get(episode.podcast)
 
         args = [podcast.slug or podcast.get_id(), episode._id]
         view_name = '%s-slug-id' % view_name
