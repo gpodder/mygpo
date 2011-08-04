@@ -257,8 +257,8 @@ class EpisodeUserState(Document):
             old_p, _ = oldmodels.Podcast.objects.get_or_create(url=podcast_url)
             podcast = migrate.get_or_migrate_podcast(old_p)
 
-            old_e, _ = oldmodels.Episode.objects.get_or_create(podcast=old_p, url=episode_url)
-            episode = migrate.get_or_migrate_episode(old_e)
+            episode = Episode.for_podcast_id_url(podcast.get_id(), episode_url,
+                    create=True)
 
             return episode.get_user_state(user)
 
