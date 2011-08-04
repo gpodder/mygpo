@@ -11,7 +11,7 @@ from django.http import HttpResponse
 from mygpo.core.models import Podcast
 from mygpo.utils import parse_bool, unzip, get_to_dict, skip_pairs
 from mygpo.decorators import manual_gc, requires_token
-from mygpo.api.models import Device, Episode
+from mygpo.api.models import Device
 from mygpo.api import backend, simple
 from mygpo.users.models import HistoryEntry
 from mygpo.web import utils
@@ -99,8 +99,7 @@ def create_subscriptionlist(request):
             if podcast is None:
                 continue
 
-            e = Episode.objects.filter(podcast=podcast.get_old_obj(), timestamp__isnull=False).order_by('-timestamp')
-            episode = e[0] if e.count() > 0 else None
+            episode = podcast.get_latest_episode()
             subscription_list[podcast_id] = {'podcast': podcasts[podcast_id], 'devices': [device], 'episode': episode}
         else:
             subscription_list[podcast_id]['devices'].append(device)

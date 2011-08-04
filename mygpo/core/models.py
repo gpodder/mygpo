@@ -363,6 +363,12 @@ class Podcast(Document):
             )
 
 
+    def get_latest_episode(self):
+        # since = 1 ==> has a timestamp
+        episodes = list(self.get_episodes(since=1, descending=True, limit=1))
+        return episodes[0] if episodes else None
+
+
     def get_episode_for_slug(self, slug):
         return Episode.for_slug(self.get_id(), slug)
 
