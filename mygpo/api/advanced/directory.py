@@ -116,17 +116,7 @@ def podcast_data(obj, domain, scaled_logo_size=64):
 
 def episode_data(episode, domain, podcast=None):
 
-    from mygpo.api.models import Episode
-    if isinstance(episode, Episode):
-        podcast = episode.podcast
-        episode_id = episode.id
-        released = episode.timestamp
-    elif isinstance(episode, models.Episode):
-        podcast = podcast or models.Podcast.get(episode.podcast)
-        episode_id = episode.oldid
-        released = episode.released
-    else:
-        raise ValueError('episode must either be a new or old-style Episode')
+    podcast = podcast or models.Podcast.get(episode.podcast)
 
     data = {
         "title": episode.title,
@@ -136,10 +126,10 @@ def episode_data(episode, domain, podcast=None):
         "description": episode.description,
         "website": episode.link,
         "mygpo_link": 'http://%(domain)s%(res)s' % dict(domain=domain,
-            res=reverse('episode', args=[episode_id]))
+            res=get_episode_link_target(episode, podcast))
         }
 
-    if released:
+    if episode.released:
         data['released'] = released.strftime('%Y-%m-%dT%H:%M:%S')
 
     return data

@@ -65,4 +65,4 @@ def get_favorites(user):
     favorites = EpisodeUserState.view('users/favorite_episodes_by_user', key=user.id)
     ids = [res['value'] for res in favorites]
     episodes = models.Episode.get_multi(ids)
-    return [e.get_old_obj() for e in episodes]
+    return episodes

@@ -19,7 +19,7 @@ from itertools import imap, chain
 from collections import defaultdict, namedtuple
 from mygpo.api.basic_auth import require_valid_user, check_username
 from django.http import HttpResponse, HttpResponseBadRequest
-from mygpo.api.models import Device, Podcast, Episode, EPISODE_ACTION_TYPES, DEVICE_TYPES
+from mygpo.api.models import Device, Podcast, EPISODE_ACTION_TYPES, DEVICE_TYPES
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url, sanitize_urls
 from mygpo.api.advanced.directory import episode_data, podcast_data
@@ -411,12 +411,9 @@ def get_episode_updates(user, subscribed_podcasts, since):
 
     EpisodeStatus = namedtuple('EpisodeStatus', 'episode status')
 
-    subscriptions_oldpodcasts = [p.get_old_obj() for p in subscribed_podcasts]
-
     episode_status = {}
-    #TODO: changes this to a get_multi when episodes have been migrated
-    for e in Episode.objects.filter(podcast__in=subscriptions_oldpodcasts, timestamp__gte=since).order_by('timestamp'):
-        episode = migrate.get_or_migrate_episode(e)
+    episodes = chain.from_iterable(p.get_episodes(since) for p in subscribed_podcasts)
+    for episode in episodes:
         episode_status[episode._id] = EpisodeStatus(episode, 'new')
 
     e_actions = (p.get_episode_states(user.id) for p in subscribed_podcasts)
