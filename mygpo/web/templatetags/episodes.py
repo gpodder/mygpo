@@ -3,7 +3,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.utils.html import strip_tags
 
-from mygpo.core.models import Podcast
+from mygpo.core.models import Podcast, Episode
 from mygpo import utils
 from mygpo.data.mimetype import get_type, get_mimetype
 from mygpo.web.utils import get_episode_link_target
@@ -71,8 +71,13 @@ def episode_status_icon(action):
 @register.filter
 def is_image(episode):
 
-    mimetype = get_mimetype(episode.mimetype, episode.url)
-    return get_type(mimetype) == 'image'
+    if isinstance(episode, Episode):
+        mimetypes = episode.mimetypes
+
+    else:
+        mimetypes = [get_mimetype(episode.mimetype, episode.url)]
+
+    return any(get_type(mimetype) == 'image' for mimetype in mimetypes)
 
 
 class EpisodeLinkTargetNode(template.Node):
