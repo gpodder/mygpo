@@ -114,14 +114,6 @@ class Episode(Document):
         return cls.for_slug(p_id, e_slug_id)
 
 
-
-    def get_old_obj(self):
-        if self.oldid:
-            from mygpo.api.models import Episode
-            return Episode.objects.get(id=self.oldid)
-        return None
-
-
     def get_user_state(self, user):
         from mygpo.users.models import EpisodeUserState
         return EpisodeUserState.for_user_episode(user, self)
