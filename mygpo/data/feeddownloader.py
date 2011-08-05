@@ -133,7 +133,7 @@ def update_feed_tags(podcast, tags):
         print >> sys.stderr, 'error saving tags for podcast %s: %s' % (np.get_id(), e)
 
 
-def get_episode_metadata(entry, url, mimetype):
+def get_episode_metadata(entry, url, mimetype, podcast_language):
     d = {
             'url': url,
             'title': entry.get('title', entry.get('link', '')),
@@ -142,7 +142,7 @@ def get_episode_metadata(entry, url, mimetype):
             'author': entry.get('author', entry.get('itunes_author', '')),
             'duration': get_duration(entry),
             'filesize': get_filesize(entry, url),
-            'language': entry.get('language', ''),
+            'language': entry.get('language', podcast_language),
             'mimetypes': [mimetype],
     }
     try:
@@ -235,7 +235,8 @@ def update_podcasts(fetch_queue):
 
                     episode = Episode.for_podcast_id_url(new_podcast.get_id(),
                             url, create=True)
-                    md = get_episode_metadata(entry, url, mimetype)
+                    md = get_episode_metadata(entry, url, mimetype,
+                            podcast.language)
 
                     changed = False
                     for key, value in md.items():
