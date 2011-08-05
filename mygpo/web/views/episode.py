@@ -29,22 +29,20 @@ from django.contrib.sites.models import RequestSite
 from mygpo.api.constants import EPISODE_ACTION_TYPES
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core import models
+from mygpo.core.proxy import proxy_object
 from mygpo.core.models import Episode
 from mygpo.api.models import Podcast
 from mygpo.users.models import Chapter, HistoryEntry, EpisodeAction
 from mygpo.api import backend
 from mygpo.decorators import manual_gc
-from mygpo.utils import parse_time
+from mygpo.utils import parse_time, get_to_dict
 from mygpo import migrate
 from mygpo.web.heatmap import EpisodeHeatmap
 from mygpo.web.utils import get_episode_link_target
 
 
 @manual_gc
-def episode(request, id):
-    episode = Episode.for_oldid(id)
-    if episode is None:
-        raise Http404
+def episode(request, episode):
 
     podcast = models.Podcast.get(episode.podcast)
 
@@ -95,11 +93,7 @@ def episode(request, id):
 
 @manual_gc
 @login_required
-def add_chapter(request, id):
-    episode = Episode.for_oldid(id)
-    if episode is None:
-        raise Http404
-
+def add_chapter(request, episode):
     e_state = episode.get_user_state(request.user)
 
     try:
@@ -132,11 +126,7 @@ def add_chapter(request, id):
 
 @manual_gc
 @login_required
-def remove_chapter(request, id, start, end):
-    episode = Episode.for_oldid(id)
-    if episode is None:
-        raise Http404
-
+def remove_chapter(request, episode, start, end):
     e_state = episode.get_user_state(request.user)
 
     remove = (int(start), int(end))
@@ -147,11 +137,7 @@ def remove_chapter(request, id, start, end):
 
 @manual_gc
 @login_required
-def toggle_favorite(request, id):
-    episode = Episode.for_oldid(id)
-    if episode is None:
-        raise Http404
-
+def toggle_favorite(request, episode):
     episode_state = episode.get_user_state(request.user)
     is_fav = episode_state.is_favorite()
     episode_state.set_favorite(not is_fav)
@@ -194,19 +180,7 @@ def list_favorites(request):
         }, context_instance=RequestContext(request))
 
 
-def add_action(request, id):
-
-    try:
-        episode_id = int(id)
-    except:
-        # bad request / 404
-        pass
-
-    episode = Episode.for_oldid(id)
-
-    if episode is None:
-        # 404
-        pass
+def add_action(request, episode):
 
     user = migrate.get_or_migrate_user(request.user)
     device = user.get_device(request.POST.get('device'))
@@ -245,13 +219,28 @@ def add_action(request, id):
 def slug_id_decorator(f):
     def _decorator(request, p_slug_id, e_slug_id, *args, **kwargs):
         episode = Episode.for_slug_id(p_slug_id, e_slug_id)
-        return f(request, episode.oldid, *args, **kwargs)
+        #TODO: 404
+        return f(request, episode, *args, **kwargs)
 
     return _decorator
 
+
+def oldid_decorator(f):
+    def _decorator(request, e_oldid, *args, **kwargs):
+        episode = Episode.for_oldid(e_oldid)
+        #TODO 404
+        return f(request, episode, *args, **kwargs)
+
+    return _decorator
 
 show_slug_id            = slug_id_decorator(episode)
 add_chapter_slug_id     = slug_id_decorator(add_chapter)
 remove_chapter_slug_id  = slug_id_decorator(remove_chapter)
 toggle_favorite_slug_id = slug_id_decorator(toggle_favorite)
 add_action_slug_id      = slug_id_decorator(add_action)
+
+show_oldid            = oldid_decorator(episode)
+add_chapter_oldid     = oldid_decorator(add_chapter)
+remove_chapter_oldid  = oldid_decorator(remove_chapter)
+toggle_favorite_oldid = oldid_decorator(toggle_favorite)
+add_action_oldid      = oldid_decorator(add_action)

@@ -57,6 +57,7 @@ class Episode(Document):
 
     @classmethod
     def for_oldid(self, oldid):
+        oldid = int(oldid)
         r = Episode.view('core/episodes_by_oldid', key=oldid, limit=1, include_docs=True)
         return r.one() if r else None
 
@@ -297,6 +298,7 @@ class Podcast(Document):
 
     @classmethod
     def for_oldid(cls, oldid):
+        oldid = int(oldid)
         r = cls.view('core/podcasts_by_oldid',
                 key=long(oldid),
                 classes=[Podcast, PodcastGroup],
@@ -652,6 +654,7 @@ class PodcastGroup(Document):
 
     @classmethod
     def for_oldid(cls, oldid):
+        oldid = int(oldid)
         r = cls.view('core/podcastgroups_by_oldid', \
             key=oldid, limit=1, include_docs=True)
         return r.first() if r else None
