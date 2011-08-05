@@ -19,7 +19,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         total = Podcast.view('core/podcasts_by_id', limit=0).total_rows
-        podcasts = multi_request_view(Podcast, 'core/podcasts_by_id')
+        podcasts = Podcast.all_podcasts()
 
         for n, podcast in enumerate(podcasts):
 
@@ -33,7 +33,8 @@ class Command(BaseCommand):
 
     @repeat_on_conflict(['data'])
     def update_subscriber_data(self, podcast, data):
-        data.subscribers = sorted(list(set(data.subscribers + podcast.subscribers)), key=lambda x: x.timestamp)
+        subscribers = set(data.subscribers + podcast.subscribers)
+        data.subscribers = sorted(subscribers, key=lambda x: x.timestamp)
         data.save()
 
     @repeat_on_conflict(['podcast'], reload_f=lambda p: Podcast.get(p.get_id()))
