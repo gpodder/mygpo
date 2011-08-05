@@ -54,7 +54,7 @@
   {% endif %}
   <h1>{{ episode.title|default:"Unnamed Episode"|striptags }}</h1>
   <small class="description">
-      {% trans "from" %} {% podcast_group_link podcast %}{% if episode.timestamp %}, {% trans "released" %} {{episode.timestamp}}{% endif %},
+      {% trans "from" %} {% podcast_group_link podcast %}{% if episode.released %}, {% trans "released" %} {{episode.released}}{% endif %},
       {% trans "links" %}:
       <a href="{{episode.url}}">{% trans "download" %}</a>{% if episode.link and episode.link != episode.url %}, <a href="{{episode.link}}">{% trans "website" %}</a>
       {% endif %},
