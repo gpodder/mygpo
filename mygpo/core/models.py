@@ -1,4 +1,5 @@
 import hashlib
+from datetime import datetime
 from dateutil import parser
 from couchdbkit.ext.django.schema import *
 from mygpo.decorators import repeat_on_conflict
@@ -88,6 +89,12 @@ class Episode(Document):
 
     def listener_count_timespan(self, start=None, end={}):
         """ returns (date, listener-count) tuples for all days w/ listeners """
+
+        if isinstance(start, datetime):
+            start = start.isoformat()
+
+        if isinstance(end, datetime):
+            end = end.isoformat()
 
         from mygpo.users.models import EpisodeUserState
         r = EpisodeUserState.view('users/listeners_by_episode',
@@ -368,6 +375,12 @@ class Podcast(Document):
 
     def listener_count_timespan(self, start=None, end={}):
         """ returns (date, listener-count) tuples for all days w/ listeners """
+
+        if isinstance(start, datetime):
+            start = start.isoformat()
+
+        if isinstance(end, datetime):
+            end = end.isoformat()
 
         from mygpo.users.models import EpisodeUserState
         r = EpisodeUserState.view('users/listeners_by_podcast',
