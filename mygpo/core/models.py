@@ -305,6 +305,11 @@ class Podcast(Document):
             endkey   = [self.get_id(), '\ufff0'],
             include_docs=True)
 
+    def get_all_subscriber_data(self):
+        subdata = PodcastSubscriberData.for_podcast(self.get_id())
+        return sorted(self.subscribers + subdata.subscribers,
+                key=lambda s: s.timestamp)
+
 
     @repeat_on_conflict()
     def subscribe(self, device):
