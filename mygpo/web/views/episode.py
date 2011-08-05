@@ -151,7 +151,17 @@ def toggle_favorite(request, episode):
 @login_required
 def list_favorites(request):
     site = RequestSite(request)
+
     episodes = backend.get_favorites(request.user)
+    podcast_ids = [episode.podcast for episode in episodes]
+    podcasts = get_to_dict(models.Podcast, podcast_ids, models.Podcast.get_id)
+
+    def set_podcast(episode):
+        episode = proxy_object(episode)
+        episode.podcast = podcasts.get(episode.podcast, None)
+        return episode
+
+    episodes = map(set_podcast, episodes)
 
     user = migrate.get_or_migrate_user(request.user)
 
