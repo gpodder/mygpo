@@ -16,7 +16,7 @@
 #
 
 import collections
-from datetime import timedelta, date
+from datetime import timedelta, datetime
 
 from django.db.models import Avg, Count
 from django.contrib.auth.models import User
@@ -28,7 +28,7 @@ from mygpo.api.constants import DEVICE_TYPES
 from mygpo import migrate
 
 
-def listener_data(podcasts, start_date=date(2010, 1, 1), leap=timedelta(days=1)):
+def listener_data(podcasts, start_date=datetime(2010, 1, 1), leap=timedelta(days=1)):
     """ Returns data for the podcast listener timeseries
 
     An iterator with data for each day (starting from either the first released
@@ -42,10 +42,12 @@ def listener_data(podcasts, start_date=date(2010, 1, 1), leap=timedelta(days=1))
 
     # pre-calculate episode list, make it index-able by release-date
     episodes = flatten([podcast.get_episodes() for podcast in podcasts])
-    episodes = filter(lambda e: e.released, episodes)
+
+    #TODO: start_date filter can be moved to query
+    episodes = filter(lambda e: e.released and e.released >= start_date, episodes)
     episodes = dict([(e.released.date(), e) for e in episodes])
 
-    listeners = [ list(p.listener_count_timespan()) for p in podcasts ]
+    listeners = [ list(p.listener_count_timespan(start=start_date)) for p in podcasts ]
 
     # we start either at the first episode-release or the first listen-event
     start = min( min(episodes.keys()), min([l[0][0] for l in listeners]))
@@ -68,7 +70,7 @@ def listener_data(podcasts, start_date=date(2010, 1, 1), leap=timedelta(days=1))
 
 
 
-def episode_listener_data(episode, start_date=date(2010, 1, 1), leap=timedelta(days=1)):
+def episode_listener_data(episode, start_date=datetime(2010, 1, 1), leap=timedelta(days=1)):
     """ Returns data for the episode listener timeseries
 
     An iterator with data for each day (starting from the first listen-event)
@@ -103,7 +105,7 @@ def subscriber_data(podcasts):
 
     for podcast in podcasts:
         create_entry = lambda r: (r.timestamp.strftime('%y-%m'), r.subscriber_count)
-        data = dict(map(create_entry, podcast.subscribers))
+        data = dict(map(create_entry, podcast.get_all_subscriber_data()))
 
         for k in data:
             coll_data[k] += data[k]
