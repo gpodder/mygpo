@@ -1,4 +1,5 @@
 import hashlib
+import re
 from datetime import datetime
 from dateutil import parser
 
@@ -158,6 +159,27 @@ class Episode(Document):
             date = parser.parse(res['key'][1]).date()
             listeners = res['value']
             yield (date, listeners)
+
+
+    def get_short_title(self, common_title):
+        if not self.title or not common_title:
+            return None
+
+        title = self.title.replace(common_title, '').strip()
+        title = re.sub(r'^[\W\d]+', '', title)
+        return title
+
+
+    def get_episode_number(self, common_title):
+        if not self.title or not common_title:
+            return None
+
+        title = self.title.replace(common_title, '').strip()
+        match = re.search(r'^\W*(\d+)', title)
+        if not match:
+            return None
+
+        return int(match.group(1))
 
 
     @classmethod
@@ -366,6 +388,24 @@ class Podcast(Document):
             )
 
         return iter(res)
+
+
+    def get_common_episode_title(self):
+        # We take all non-empty titles
+        titles = filter(None, (e.title for e in self.get_episodes()))
+        # get the longest common substring
+        common_title = utils.longest_substr(titles)
+
+        # but consider only the part up to the first number. Otherwise we risk
+        # removing part of the number (eg if a feed contains episodes 100-199)
+        common_title = re.search(r'^\D*', common_title).group(0)
+
+        if len(common_title.strip()) < 2:
+            return None
+
+        return common_title
+
+
 
     def get_latest_episode(self):
         # since = 1 ==> has a timestamp

@@ -79,9 +79,26 @@ class PodcastSlug(SlugGenerator):
 class EpisodeSlug(SlugGenerator):
     """ Generates slugs for Episodes """
 
-    def __init__(self, episode):
+    def __init__(self, episode, common_title):
+        self.common_title = common_title
         super(EpisodeSlug, self).__init__(episode)
         self.podcast_id = episode.podcast
+
+
+    def _get_base_slug(self, obj):
+
+        number = obj.get_episode_number(self.common_title)
+        if number:
+            return str(number)
+
+        short_title = obj.get_short_title(self.common_title)
+        if short_title:
+            return slugify(short_title)
+
+        if obj.title:
+            return slugify(obj.title)
+
+        return None
 
 
     def _get_existing_slugs(self):
