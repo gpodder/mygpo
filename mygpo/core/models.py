@@ -358,13 +358,14 @@ class Podcast(Document):
         if isinstance(until, datetime):
             until = until.isoformat()
 
-        return Episode.view('core/episodes_by_podcast',
+        res = Episode.view('core/episodes_by_podcast',
                 startkey = [self.get_id(), since],
                 endkey   = [self.get_id(), until],
                 include_docs=True,
                 **kwargs
             )
 
+        return iter(res)
 
     def get_latest_episode(self):
         # since = 1 ==> has a timestamp
@@ -378,7 +379,10 @@ class Podcast(Document):
 
         prevs = self.get_episodes(until=episode.released, descending=True,
                 limit=1)
-        prev = prevs.first() if prevs else None
+        try:
+            prev = prevs.next()
+        except StopIteration:
+            prev = None
 
 
     def get_episode_after(self, episode):
@@ -386,7 +390,11 @@ class Podcast(Document):
             return None
 
         nexts = self.get_episodes(since=episode.released, limit=1)
-        next = nexts.first() if nexts else None
+
+        try:
+            next = nexts.next()
+        except StopIteration:
+            next = None
 
 
     def get_episode_for_slug(self, slug):
