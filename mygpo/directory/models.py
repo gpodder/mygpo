@@ -42,8 +42,8 @@ class Category(Document):
 
         key = lambda e: e.podcast
 
-        podcasts = sorted(podcasts, cmp=cmp_entry_podcasts)
-        self.podcasts = sorted(self.podcasts, cmp=cmp_entry_podcasts)
+        podcasts = sorted(podcasts, key=key)
+        self.podcasts = sorted(self.podcasts, key=key)
 
         new_entries = []
 
