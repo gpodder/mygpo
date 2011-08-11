@@ -336,11 +336,24 @@ def get_to_dict(cls, ids, get_id=lambda x: x._id, use_cache=False):
 
     db_objs = list(cls.get_multi(ids))
 
+    for obj in (cache_objs + db_objs):
+
+        # get_multi returns dict {'key': _id, 'error': 'not found'}
+        # for non-existing objects
+        if isinstance(obj, dict) and 'error' in obj:
+            _id = obj['key']
+            objs[_id] = None
+            continue
+
+        ids = obj.get_ids() if hasattr(obj, 'get_ids') else [get_id(obj)]
+        for i in ids:
+            objs[i] = obj
+
     if use_cache:
         for obj in db_objs:
             cache.set(get_id(obj), obj)
 
-    return dict((get_id(obj), obj) for obj in cache_objs + db_objs)
+    return objs
 
 
 def flatten(l):

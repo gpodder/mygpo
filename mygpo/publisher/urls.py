@@ -2,7 +2,7 @@ from django.conf.urls.defaults import *
 
 urlpatterns = patterns('mygpo.publisher.views',
  url(r'^$',                             'home',                        name='publisher'),
- url(r'^(?P<username>\w+)/update',      'update_published_podcasts',   name='publisher-update'),
+ url(r'^(?P<username>[\w.-]+)/update',  'update_published_podcasts',   name='publisher-update'),
  url(r'^podcast/(?P<id>\d+)$',          'podcast',                     name='podcast-publisher-detail'),
  url(r'^podcast/(?P<id>\d+)/update$',   'update_podcast',              name='podcast-publisher-update'),
  url(r'^podcast/(?P<id>\d+)/episodes$', 'episodes',                    name='podcast-publisher-episodes'),

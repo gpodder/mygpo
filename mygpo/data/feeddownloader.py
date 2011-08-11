@@ -217,8 +217,8 @@ def update_podcasts(fetch_queue):
                     podcast.logo_url = cover_art
                 except Exception, e:
                     podcast.logo_url = None
-                    if repr(e).strip():
-                        print >> sys.stderr, 'cannot save image %s for podcast %d: %s' % (cover_art.encode('utf-8'), podcast.id, repr(e).encode('utf-8'))
+                    if str(e).strip():
+                        print >> sys.stderr, 'cannot save image %s for podcast %d: %s' % (cover_art.encode('utf-8'), podcast.id, str(e).encode('utf-8'))
 
             new_podcast = migrate.get_or_migrate_podcast(podcast)
             update_feed_tags(new_podcast, get_feed_tags(feed.feed))
