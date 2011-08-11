@@ -76,7 +76,7 @@ register.tag('podcast_link_target', PodcastLinkTargetNode.compile)
 
 
 @register.simple_tag
-def podcast_group_link(podcast):
+def podcast_group_link(podcast, title=None):
     """ Returns the link strings for Podcast and PodcastGroup objects
 
     automatically distringuishes between relational Podcast/PodcastGroup
@@ -90,7 +90,7 @@ def podcast_group_link(podcast):
     elif isinstance(podcast, PodcastGroup):
         podcasts = list(podcast.podcasts)
     else:
-        return podcast_link(podcast)
+        return podcast_link(podcast, title)
 
     links = (podcast_link(p, p.group_member_name) for p in podcasts)
     link_text = ' '.join(links)

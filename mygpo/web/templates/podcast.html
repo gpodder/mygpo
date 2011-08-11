@@ -43,7 +43,7 @@
    <div class="related-podcasts">
     <strong>{% trans "Also available" %}</strong>
     {% for p in related_podcasts %}
-     {% podcast_group_link p %}
+     {% podcast_group_link p p.group_member_name %}
     {% endfor %}
    </div>
   {% endif %}
