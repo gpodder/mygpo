@@ -109,7 +109,7 @@ class Episode(Document):
         if utils.is_couchdb_id(p_slug_id):
             p_id = p_slug_id
         else:
-            podcast = Podcast.get(p_slug_id)
+            podcast = Podcast.for_slug_id(p_slug_id)
             p_id = podcast.get_id()
 
         return cls.for_slug(p_id, e_slug_id)
