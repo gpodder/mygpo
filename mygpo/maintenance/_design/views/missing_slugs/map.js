@@ -28,7 +28,7 @@ function(doc)
             return;
         }
 
-        emit(["Episode", episode.listeners], null);
+        emit(["Episode", episode.podcast, episode.listeners], null);
     };
 
     if(doc.doc_type == "Podcast")

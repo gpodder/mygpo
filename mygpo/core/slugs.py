@@ -115,27 +115,29 @@ class EpisodeSlug(SlugGenerator):
 class ObjectsMissingSlugs(object):
     """ A collections of objects missing a slug """
 
-    def __init__(self, cls, wrapper=None):
+    def __init__(self, cls, wrapper=None, start=[None], end=[{}]):
         self.db = cls.get_db()
         self.doc_type = cls._doc_type
         self.wrapper = wrapper
+        self.start = start
+        self.end = end
 
     def __len__(self):
         res = self.db.view('maintenance/missing_slugs',
-                startkey     = [self.doc_type, {}],
-                endkey       = [self.doc_type, None],
+                startkey     = [self.doc_type] + self.end,
+                endkey       = [self.doc_type] + self.start,
                 descending   = True,
                 reduce       = True,
                 group        = True,
                 group_level  = 1,
             )
-        return res.first()['value']
+        return res.first()['value'] if res else 0
 
 
     def __iter__(self):
         res = self.db.view('maintenance/missing_slugs',
-                startkey     = [self.doc_type, {}],
-                endkey       = [self.doc_type, None],
+                startkey     = [self.doc_type] + self.end,
+                endkey       = [self.doc_type] + self.start,
                 descending   = True,
                 include_docs = True,
                 reduce       = False,
@@ -164,8 +166,16 @@ class PodcastsMissingSlugs(ObjectsMissingSlugs):
 class EpisodesMissingSlugs(ObjectsMissingSlugs):
     """ Episodes that don't have a slug (but could have one) """
 
-    def __init__(self):
-        super(EpisodesMissingSlugs, self).__init__(Episode, self._episode_wrapper)
+    def __init__(self, podcast_id=None):
+        if podcast_id:
+            start = [podcast_id, None]
+            end = [podcast_id, {}]
+        else:
+            start = [None, None]
+            end = [{}, {}]
+
+        super(EpisodesMissingSlugs, self).__init__(Episode,
+                self._episode_wrapper, start, end)
 
     @staticmethod
     def _episode_wrapper(r):

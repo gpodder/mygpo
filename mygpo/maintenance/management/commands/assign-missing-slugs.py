@@ -1,7 +1,8 @@
 from django.core.management.base import BaseCommand
 
+from mygpo.core.models import Podcast
 from mygpo.core.slugs import PodcastSlug, EpisodeSlug, \
-         PodcastsMissingSlugs, EpisodesMissingSlugs
+         PodcastsMissingSlugs, EpisodesMissingSlugs, assign_podcast_slug
 from mygpo.decorators import repeat_on_conflict
 from mygpo.utils import progress
 
@@ -14,18 +15,25 @@ class Command(BaseCommand):
         podcasts = PodcastsMissingSlugs()
         total = len(podcasts)
         for n, podcast in enumerate(podcasts):
-            slug = PodcastSlug(podcast).get_slug()
-            if slug:
-                self.update_obj(obj=podcast, slug=slug)
+            assign_podcast_slug(podcast)
             progress(n+1, total)
 
 
         episodes = EpisodesMissingSlugs()
         total = len(episodes)
+        podcast = None
+        common_title = None
+
         for n, episode in enumerate(episodes):
-            slug = EpisodeSlug(episode).get_slug()
+
+            if podcast is None or podcast.get_id() != episode.podcast:
+                podcast = Podcast.get(episode.podcast)
+                common_title = podcast.get_common_episode_title()
+
+            slug = EpisodeSlug(episode, common_title).get_slug()
             if slug:
                 self.update_obj(obj=episode, slug=slug)
+
             progress(n+1, total)
 
 
