@@ -95,6 +95,7 @@ def dashboard(request, episode_count=10):
     lang = utils.sanitize_language_codes(lang)
 
     random_podcasts = backend.get_random_picks(lang)[:5]
+    random_podcasts = map(migrate.get_or_migrate_podcast, random_podcasts)
 
     return render_to_response('dashboard.html', {
             'site': site,

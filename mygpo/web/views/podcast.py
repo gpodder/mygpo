@@ -55,7 +55,11 @@ def show(request, pid):
 
     max_listeners = max([e.listeners for e in episodes] + [0])
 
-    related_podcasts = [x for x in podcast.group.podcasts() if x != podcast] if podcast.group else []
+    if podcast.group:
+        rel_podcasts = [x for x in podcast.group.podcasts() if x != podcast]
+        rel_podcasts = map(migrate.get_or_migrate_podcast, rel_podcasts)
+    else:
+        rel_podcasts = []
 
     tags = get_tags(podcast, request.user)
 
@@ -87,7 +91,7 @@ def show(request, pid):
             'podcast': podcast,
             'is_public': is_public,
             'devices': subscribed_devices,
-            'related_podcasts': related_podcasts,
+            'related_podcasts': rel_podcasts,
             'can_subscribe': len(subscribe_targets) > 0,
             'subscribe_form': subscribe_form,
             'episodes': episodes,
