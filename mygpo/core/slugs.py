@@ -2,7 +2,35 @@ from itertools import count
 
 from django.template.defaultfilters import slugify
 
+from mygpo.decorators import repeat_on_conflict
 from mygpo.core.models import Podcast, PodcastGroup, Episode
+
+
+def assign_podcast_slug(podcast):
+    if podcast.slug:
+        return
+
+    slug = PodcastSlug(podcast).get_slug()
+    _set_slug(obj=podcast, slug=slug)
+
+
+def assign_missing_episode_slugs(podcast):
+    common_title = podcast.get_common_episode_title()
+
+    episodes = EpisodesMissingSlugs(podcast.get_id())
+
+
+    for episode in episodes:
+        slug = EpisodeSlug(episode, common_title).get_slug()
+        _set_slug(obj=episode, slug=slug)
+
+
+@repeat_on_conflict(['obj'])
+def _set_slug(obj, slug):
+    if slug:
+        obj.slug = slug
+        obj.save()
+
 
 
 class SlugGenerator(object):

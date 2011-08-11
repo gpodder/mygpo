@@ -37,6 +37,7 @@ from mygpo.data import youtube
 from mygpo.data.mimetype import get_mimetype, check_mimetype, get_podcast_types
 from mygpo import migrate
 from mygpo.core.models import Episode
+from mygpo.core.slugs import assign_missing_episode_slugs, assign_podcast_slug
 
 socket.setdefaulttimeout(10)
 fetcher = feedcore.Fetcher(USER_AGENT)
@@ -273,3 +274,6 @@ def update_podcasts(fetch_queue):
             print e
 
 
+        new_podcast = migrate.get_or_migrate_podcast(podcast)
+        assign_podcast_slug(new_podcast)
+        assign_missing_episode_slugs(new_podcast)
