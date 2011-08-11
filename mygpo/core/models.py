@@ -146,6 +146,12 @@ class Episode(Document):
     def listener_count_timespan(self, start=None, end={}):
         """ returns (date, listener-count) tuples for all days w/ listeners """
 
+        if isinstance(start, datetime):
+            start = start.isoformat()
+
+        if isinstance(end, datetime):
+            end = end.isoformat()
+
         from mygpo.users.models import EpisodeUserState
         r = EpisodeUserState.view('users/listeners_by_episode',
                 startkey    = [self._id, start],
@@ -488,6 +494,11 @@ class Podcast(Document):
             endkey   = [self.get_id(), '\ufff0'],
             include_docs=True)
 
+    def get_all_subscriber_data(self):
+        subdata = PodcastSubscriberData.for_podcast(self.get_id())
+        return sorted(self.subscribers + subdata.subscribers,
+                key=lambda s: s.timestamp)
+
 
     @repeat_on_conflict()
     def subscribe(self, device):
@@ -558,6 +569,12 @@ class Podcast(Document):
 
     def listener_count_timespan(self, start=None, end={}):
         """ returns (date, listener-count) tuples for all days w/ listeners """
+
+        if isinstance(start, datetime):
+            start = start.isoformat()
+
+        if isinstance(end, datetime):
+            end = end.isoformat()
 
         from mygpo.users.models import EpisodeUserState
         r = EpisodeUserState.view('users/listeners_by_podcast',
@@ -723,7 +740,7 @@ class PodcastGroup(Document):
 
 
     def get_podcast_by_oldid(self, oldid):
-        for podcast in self.podcasts:
+        for podcast in list(self.podcasts):
             if podcast.oldid == oldid:
                 return podcast
 
@@ -773,7 +790,8 @@ class PodcastGroup(Document):
 
         podcast.delete()
         podcast.group = self._id
-        self.podcasts.append(podcast)
+        self.podcasts = sorted(self.podcasts + [podcast],
+                        key=Podcast.subscriber_count, reverse=True)
         self.save()
         return self.podcasts[-1]
 

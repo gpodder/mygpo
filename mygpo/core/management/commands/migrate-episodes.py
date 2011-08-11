@@ -34,16 +34,18 @@ class Command(BaseCommand):
         for n, (olde, newe) in enumerate(iterate_together([oldepisodes, newepisodes], key)):
 
             if (olde != None) and (newe != None):
-                podcast = newmodels.Podcast.get(newe.podcast)
                 updated += migrate.update_episode(olde, newe)
 
             elif olde == None:
                 deleted += 1
-                newe.delete()
+                #newe.delete()
 
             elif newe == None:
-                newe = migrate.create_episode(olde)
-                created += 1
+                try:
+                    newe = migrate.create_episode(olde)
+                    created += 1
+                except oldmodels.Podcast.DoesNotExist:
+                    pass
 
             status_str = '%d new, %d upd, %d del' % (created, updated, deleted)
             progress(n, total, status_str)

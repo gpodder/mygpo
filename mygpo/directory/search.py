@@ -1,6 +1,7 @@
 from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.utils import is_url
 from mygpo.data.feeddownloader import update_podcasts
+from mygpo.api.sanitizing import sanitize_url
 
 
 def search_wrapper(result):
@@ -17,11 +18,12 @@ def search_podcasts(q, limit=20, skip=0):
 
     if is_url(q):
         from mygpo.api import models
-        p, created = models.Podcast.objects.get_or_create(url=q)
+        url = sanitize_url(q)
+        p, created = models.Podcast.objects.get_or_create(url=url)
         if created:
             update_podcasts([p])
 
-        podcast = Podcast.for_url(q)
+        podcast = Podcast.for_url(url)
 
         return [podcast], 1
 

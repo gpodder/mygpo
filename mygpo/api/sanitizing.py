@@ -48,7 +48,7 @@ def basic_sanitizing(url):
     """
     r = urlparse.urlsplit(url)
     netloc = r.netloc.lower()
-    r2 = urlparse.SplitResult(r.scheme, netloc, r.path, r.query, r.fragment)
+    r2 = urlparse.SplitResult(r.scheme, netloc, r.path, r.query, '')
     return r2.geturl()
 
 
