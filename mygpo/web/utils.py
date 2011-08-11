@@ -185,7 +185,10 @@ def get_episode_link_target(episode, podcast=None, view_name='episode', add_args
     # prefer slugs
     if episode.slug:
         if not podcast:
-            podcast = Podcast.get(episode.podcast)
+            if isinstance(episode.podcast, Podcast):
+                podcast = episode.podcast
+            else:
+                podcast = Podcast.get(episode.podcast)
 
         args = [podcast.slug or podcast.get_id(), episode.slug]
         view_name = '%s-slug-id' % view_name
