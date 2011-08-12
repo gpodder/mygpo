@@ -46,10 +46,24 @@ def listener_data(podcasts, start_date=datetime(2010, 1, 1), leap=timedelta(days
     episodes = flatten(episodes)
     episodes = dict((e.released.date(), e) for e in episodes)
 
-    listeners = [ list(p.listener_count_timespan(start=start_date)) for p in podcasts ]
+    listeners = [ list(p.listener_count_timespan(start=start_date))
+                    for p in podcasts ]
+    listeners = filter(None, listeners)
 
     # we start either at the first episode-release or the first listen-event
-    start = min( min(episodes.keys()), min([l[0][0] for l in listeners]))
+    events = []
+
+    if episodes.keys():
+        events.append(min(episodes.keys()))
+
+    if listeners:
+        print listeners
+        events.append(min([l[0][0] for l in listeners]))
+
+    if not events:
+        return
+
+    start = min(events)
 
     for d in daterange(start, leap=leap):
 
