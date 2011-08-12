@@ -23,6 +23,7 @@ from django.contrib.auth.models import User
 
 from mygpo.utils import daterange, flatten
 from mygpo.core.models import Podcast
+from mygpo.api.models import Podcast as OldPodcast
 from mygpo.api.models import Episode, EpisodeAction
 from mygpo.api.constants import DEVICE_TYPES
 from mygpo import migrate
@@ -41,11 +42,9 @@ def listener_data(podcasts, start_date=datetime(2010, 1, 1), leap=timedelta(days
     """
 
     # pre-calculate episode list, make it index-able by release-date
-    episodes = flatten([podcast.get_episodes() for podcast in podcasts])
-
-    #TODO: start_date filter can be moved to query
-    episodes = filter(lambda e: e.released and e.released >= start_date, episodes)
-    episodes = dict([(e.released.date(), e) for e in episodes])
+    episodes = (podcast.get_episodes(since=start_date) for podcast in podcasts)
+    episodes = flatten(episodes)
+    episodes = dict((e.released.date(), e) for e in episodes)
 
     listeners = [ list(p.listener_count_timespan(start=start_date)) for p in podcasts ]
 
@@ -120,12 +119,11 @@ def check_publisher_permission(user, podcast):
     if user.is_staff:
         return True
 
-    p = migrate.get_or_migrate_podcast(podcast)
-    u = migrate.get_or_migrate_user(user)
-    if p.get_id() in u.published_objects:
-        return True
+    if isinstance(podcast, OldPodcast):
+        podcast = migrate.get_or_migrate_podcast(podcast)
 
-    return False
+    u = migrate.get_or_migrate_user(user)
+    return (podcast.get_id() in u.published_objects)
 
 
 def colour_repr(val, max_val, colours):

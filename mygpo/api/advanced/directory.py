@@ -15,6 +15,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+from django.http import Http404
 from django.core.urlresolvers import reverse
 from mygpo.api.httpresponse import JsonResponse
 from django.shortcuts import get_object_or_404
@@ -73,8 +74,7 @@ def episode_info(request):
     episode = models.Episode.for_podcast_url(podcast_url, episode_url)
 
     if episode is None:
-        # TODO
-        raise Http404()
+        raise Http404
 
     domain = RequestSite(request).domain
 

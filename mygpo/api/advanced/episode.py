@@ -17,7 +17,7 @@
 
 import time
 from mygpo.api.basic_auth import require_valid_user, check_username
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, Http404
 from mygpo.core import models
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.exceptions import ParameterMissing
@@ -103,9 +103,7 @@ def chapters(request, username):
         episode = models.Episode.for_podcast_url(podcast_url, episode_url)
 
         if episode is None:
-            #TODO: check
             raise Http404
-
 
         e_state = episode.get_user_state(request.user)
 

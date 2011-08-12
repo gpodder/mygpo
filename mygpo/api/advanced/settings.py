@@ -16,7 +16,7 @@
 #
 
 from mygpo.api.basic_auth import require_valid_user, check_username
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, Http404
 from mygpo.api.httpresponse import JsonResponse
 from django.shortcuts import get_object_or_404
 from mygpo.users.models import PodcastUserState
@@ -64,7 +64,6 @@ def main(request, username, scope):
     def episode_settings(user, url, podcast_url):
         episode = Episode.for_podcast_url(podcast_url, url)
         if episode is None:
-            # TODO: check
             raise Http404
 
         episode_state = episode.get_user_state(user)

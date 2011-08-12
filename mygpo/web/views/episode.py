@@ -229,7 +229,10 @@ def add_action(request, episode):
 def slug_id_decorator(f):
     def _decorator(request, p_slug_id, e_slug_id, *args, **kwargs):
         episode = Episode.for_slug_id(p_slug_id, e_slug_id)
-        #TODO: 404
+
+        if episode is None:
+            raise Http404
+
         return f(request, episode, *args, **kwargs)
 
     return _decorator
@@ -238,7 +241,10 @@ def slug_id_decorator(f):
 def oldid_decorator(f):
     def _decorator(request, e_oldid, *args, **kwargs):
         episode = Episode.for_oldid(e_oldid)
-        #TODO 404
+
+        if episode is None:
+            raise Http404
+
         return f(request, episode, *args, **kwargs)
 
     return _decorator

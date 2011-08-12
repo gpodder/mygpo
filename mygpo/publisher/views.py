@@ -1,6 +1,7 @@
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseRedirect, \
+        HttpResponseForbidden, Http404
 from django.views.decorators.cache import cache_page
 from mygpo.core import models
 from mygpo.api.models import Podcast, PodcastGroup
@@ -164,11 +165,10 @@ def episodes(request, id):
 def episode(request, id):
     episode = models.Episode.for_oldid(id)
     if episode is None:
-        #TODO: Check
         raise Http404
 
-    # TODO: refactor
-    if not check_publisher_permission(request.user, e.podcast):
+    podcast = models.Podcast.get(episode.podcast)
+    if not check_publisher_permission(request.user, podcast):
         return HttpResponseForbidden()
 
     if request.method == 'POST':
