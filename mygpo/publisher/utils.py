@@ -96,6 +96,9 @@ def episode_listener_data(episode, start_date=datetime(2010, 1, 1), leap=timedel
 
     listeners = list(episode.listener_count_timespan())
 
+    if not listeners:
+        return
+
     # we always start at the first listen-event
     start = listeners[0][0]
 

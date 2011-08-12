@@ -18,7 +18,7 @@
 
   <h1>{% trans "Publisher Pages:" %} {% if podcast.title %}{{ podcast.title|striptags }}{% else %}{% trans "Unnamed Podcast" %}{%endif%}</h1>
 
-  <p><a href="{% url podcast-publisher-detail podcast.id %}">{% trans "Return to Podcast Page" %}</a></p>
+  <p><a href="{% url podcast-publisher-detail podcast.oldid %}">{% trans "Return to Podcast Page" %}</a></p>
 
   {% if not episodes|length_is:"0" %}
 
@@ -36,7 +36,7 @@
     {% for episode in episodes %}
      {% if not episode.title %}
       <tr>
-       <td colspan="3"><a href="{% url episode-publisher-detail episode.id %}">{{ episode.url }}</a></td>
+       <td colspan="3"><a href="{% episode_link_target episode podcast "episode-publisher-detail" %}">{{ episode.url }}</a></td>
       </tr>
      {% endif %}
     {% endfor %}
@@ -47,7 +47,7 @@
     {% for episode in episodes %}
      {% if episode.title %}
       <tr>
-       <td><a href="{% url episode-publisher-detail episode.id %}">{{ episode.title|default:"Unknown Episode"|striptags }}</a></td>
+       <td><a href="{% episode_link_target episode podcast "episode-publisher-detail" %}">{{ episode.title|default:"Unknown Episode"|striptags }}</a></td>
        <td>{{ episode.timestamp|default:""|naturalday }}</td>
        <td>
         {% if episode.listeners %}
