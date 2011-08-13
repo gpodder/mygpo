@@ -39,5 +39,5 @@ class Command(BaseCommand):
 
     @repeat_on_conflict(['obj'])
     def update_obj(self, obj, slug):
-        obj.slug = slug
+        obj.set_slug(slug)
         obj.save()

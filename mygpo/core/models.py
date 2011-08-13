@@ -419,6 +419,20 @@ class Podcast(Document):
         return common_title
 
 
+    def set_slug(slug):
+        """ Set the main slug of the Podcast """
+
+        if not isinstance(slug, basestring):
+            raise ValueError('slug must be a string')
+
+        if not slug:
+            raise ValueError('slug cannot be empty')
+
+        if self.slug:
+            self.merged_slugs.append(self.slug)
+
+        self.slug = slug
+
 
     def get_latest_episode(self):
         # since = 1 ==> has a timestamp
@@ -461,6 +475,21 @@ class Podcast(Document):
 
     def get_podcast(self):
         return self
+
+
+    def set_slug(slug):
+        """ Set the main slug of the Episode """
+
+        if not isinstance(slug, basestring):
+            raise ValueError('slug must be a string')
+
+        if not slug:
+            raise ValueError('slug cannot be empty')
+
+        if self.slug:
+            self.merged_slugs.append(self.slug)
+
+        self.slug = slug
 
 
     def get_logo_url(self, size):

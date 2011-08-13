@@ -28,7 +28,7 @@ def assign_missing_episode_slugs(podcast):
 @repeat_on_conflict(['obj'])
 def _set_slug(obj, slug):
     if slug:
-        obj.slug = slug
+        obj.set_slug(slug)
         obj.save()
 
 
