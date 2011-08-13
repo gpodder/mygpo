@@ -192,6 +192,21 @@ class Episode(Document):
         return [self._id] + self.merged_ids
 
 
+    def set_slug(self, slug):
+        """ Set the main slug of the Podcast """
+
+        if not isinstance(slug, basestring):
+            raise ValueError('slug must be a string')
+
+        if not slug:
+            raise ValueError('slug cannot be empty')
+
+        if self.slug:
+            self.merged_slugs.append(self.slug)
+
+        self.slug = slug
+
+
     @classmethod
     def count(cls):
         r = cls.view('core/episodes_by_podcast', limit=0)
@@ -419,7 +434,7 @@ class Podcast(Document):
         return common_title
 
 
-    def set_slug(slug):
+    def set_slug(self, slug):
         """ Set the main slug of the Podcast """
 
         if not isinstance(slug, basestring):
@@ -475,21 +490,6 @@ class Podcast(Document):
 
     def get_podcast(self):
         return self
-
-
-    def set_slug(slug):
-        """ Set the main slug of the Episode """
-
-        if not isinstance(slug, basestring):
-            raise ValueError('slug must be a string')
-
-        if not slug:
-            raise ValueError('slug cannot be empty')
-
-        if self.slug:
-            self.merged_slugs.append(self.slug)
-
-        self.slug = slug
 
 
     def get_logo_url(self, size):
