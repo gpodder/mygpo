@@ -22,6 +22,8 @@ function (doc)
     }
     else if(doc.doc_type == "PodcastGroup")
     {
+        searchPodcast(doc, doc._id);
+
         for(n in doc.podcasts)
         {
             searchPodcast(doc.podcasts[n], doc.podcasts[n].id);

@@ -8,10 +8,11 @@ from couchdbkit.ext.django.schema import *
 from mygpo.decorators import repeat_on_conflict
 from mygpo import utils
 from mygpo.core.proxy import DocumentABCMeta
+from mygpo.core.slugs import SlugMixin
 
 
 
-class Episode(Document):
+class Episode(Document, SlugMixin):
     """
     Represents an Episode. Can only be part of a Podcast
     """
@@ -35,8 +36,6 @@ class Episode(Document):
     podcast = StringProperty(required=True)
     listeners = IntegerProperty()
     content_types = StringListProperty()
-    slug = StringProperty()
-    merged_slugs = StringListProperty()
 
 
     @classmethod
@@ -111,6 +110,10 @@ class Episode(Document):
             p_id = p_slug_id
         else:
             podcast = Podcast.for_slug_id(p_slug_id)
+
+            if podcast is None:
+                return None
+
             p_id = podcast.get_id()
 
         return cls.for_slug(p_id, e_slug_id)
@@ -192,21 +195,6 @@ class Episode(Document):
         return [self._id] + self.merged_ids
 
 
-    def set_slug(self, slug):
-        """ Set the main slug of the Podcast """
-
-        if not isinstance(slug, basestring):
-            raise ValueError('slug must be a string')
-
-        if not slug:
-            raise ValueError('slug cannot be empty')
-
-        if self.slug:
-            self.merged_slugs.append(self.slug)
-
-        self.slug = slug
-
-
     @classmethod
     def count(cls):
         r = cls.view('core/episodes_by_podcast', limit=0)
@@ -254,7 +242,7 @@ class PodcastSubscriberData(Document):
         return 'PodcastSubscriberData for Podcast %s (%s)' % (self.podcast, self._id)
 
 
-class Podcast(Document):
+class Podcast(Document, SlugMixin):
 
     __metaclass__ = DocumentABCMeta
 
@@ -275,8 +263,6 @@ class Podcast(Document):
     language = StringProperty()
     content_types = StringListProperty()
     tags = DictProperty()
-    slug = StringProperty()
-    merged_slugs = StringListProperty()
 
 
     @classmethod
@@ -432,21 +418,6 @@ class Podcast(Document):
             return None
 
         return common_title
-
-
-    def set_slug(self, slug):
-        """ Set the main slug of the Podcast """
-
-        if not isinstance(slug, basestring):
-            raise ValueError('slug must be a string')
-
-        if not slug:
-            raise ValueError('slug cannot be empty')
-
-        if self.slug:
-            self.merged_slugs.append(self.slug)
-
-        self.slug = slug
 
 
     def get_latest_episode(self):
@@ -746,7 +717,7 @@ class Podcast(Document):
 
 
 
-class PodcastGroup(Document):
+class PodcastGroup(Document, SlugMixin):
     title    = StringProperty()
     podcasts = SchemaListProperty(Podcast)
 

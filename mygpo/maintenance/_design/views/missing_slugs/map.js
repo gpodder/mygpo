@@ -2,11 +2,6 @@ function(doc)
 {
     function searchPodcast(podcast, podcast_id)
     {
-        if(podcast.slug != null)
-        {
-            return;
-        }
-
         var subscribers;
 
         if(podcast.subscribers == null || podcast.subscribers.length == 0)
@@ -18,8 +13,13 @@ function(doc)
             subscribers = podcast.subscribers[podcast.subscribers.length-1].subscriber_count;
         }
 
-        emit(["Podcast", subscribers, podcast_id], null);
-    };
+        if(podcast.slug == null)
+        {
+            emit(["Podcast", subscribers, podcast_id], null);
+        }
+
+        return subscribers;
+    }
 
     function searchEpisode(episode)
     {
@@ -37,11 +37,18 @@ function(doc)
     }
     else if(doc.doc_type == "PodcastGroup")
     {
-        for(n in doc.podcasts)
+        var subscribers = 0;
+
+        for(var n in doc.podcasts)
         {
-            searchPodcast(doc.podcasts[n], doc.podcasts[n].id);
+            var podcast = doc.podcasts[n];
+            subscribers += searchPodcast(podcast, podcast.id);
         }
 
+        if(doc.slug == null)
+        {
+            emit(["PodcastGroup", subscribers], null);
+        }
     }
     else if(doc.doc_type == "Episode")
     {

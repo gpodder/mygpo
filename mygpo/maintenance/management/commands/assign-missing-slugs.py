@@ -1,8 +1,9 @@
 from django.core.management.base import BaseCommand
 
 from mygpo.core.models import Podcast
-from mygpo.core.slugs import PodcastSlug, EpisodeSlug, \
-         PodcastsMissingSlugs, EpisodesMissingSlugs, assign_podcast_slug
+from mygpo.core.slugs import PodcastSlug, EpisodeSlug, PodcastGroupSlug, \
+         PodcastsMissingSlugs, EpisodesMissingSlugs, \
+         PodcastGroupsMissingSlugs, assign_slug
 from mygpo.decorators import repeat_on_conflict
 from mygpo.utils import progress
 
@@ -12,10 +13,17 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
+        groups = PodcastGroupsMissingSlugs()
+        total = len(groups)
+        for n, group in enumerate(groups):
+            assign_slug(group, PodcastGroupSlug)
+            progress(n+1, total)
+
+
         podcasts = PodcastsMissingSlugs()
         total = len(podcasts)
         for n, podcast in enumerate(podcasts):
-            assign_podcast_slug(podcast)
+            assign_slug(podcast, PodcastSlug)
             progress(n+1, total)
 
 

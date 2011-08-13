@@ -1,17 +1,18 @@
 from itertools import count
 
+from couchdbkit.ext.django.schema import *
+
 from django.template.defaultfilters import slugify
 
 from mygpo.decorators import repeat_on_conflict
-from mygpo.core.models import Podcast, PodcastGroup, Episode
 
 
-def assign_podcast_slug(podcast):
-    if podcast.slug:
+def assign_slug(obj, generator):
+    if obj.slug:
         return
 
-    slug = PodcastSlug(podcast).get_slug()
-    _set_slug(obj=podcast, slug=slug)
+    slug = generator(obj).get_slug()
+    _set_slug(obj=obj, slug=slug)
 
 
 def assign_missing_episode_slugs(podcast):
@@ -76,10 +77,12 @@ class SlugGenerator(object):
 
 
 
-class PodcastSlug(SlugGenerator):
-    """ Generates slugs for Podcasts """
+class PodcastGroupSlug(SlugGenerator):
+    """ Generates slugs for Podcast Groups """
 
     def _get_existing_slugs(self):
+        from mygpo.core.models import Podcast
+
         db = Podcast.get_db()
         res = db.view('core/podcasts_by_slug',
                 startkey = [self.base_slug, None],
@@ -87,6 +90,10 @@ class PodcastSlug(SlugGenerator):
             )
         return [r['key'][0] for r in res]
 
+
+
+class PodcastSlug(PodcastGroupSlug):
+    """ Generates slugs for Podcasts """
 
     @staticmethod
     def _get_base_slug(podcast):
@@ -102,6 +109,7 @@ class PodcastSlug(SlugGenerator):
                 base_slug = '%s-%s' % (base_slug, member_slug)
 
         return base_slug
+
 
 
 class EpisodeSlug(SlugGenerator):
@@ -131,6 +139,7 @@ class EpisodeSlug(SlugGenerator):
 
     def _get_existing_slugs(self):
         """ Episode slugs have to be unique within the Podcast """
+        from mygpo.core.models import Episode
 
         db = Episode.get_db()
         res = db.view('core/episodes_by_slug',
@@ -178,10 +187,13 @@ class PodcastsMissingSlugs(ObjectsMissingSlugs):
     """ Podcasts that don't have a slug (but could have one) """
 
     def __init__(self):
+        from mygpo.core.models import Podcast
         super(PodcastsMissingSlugs, self).__init__(Podcast, self._podcast_wrapper)
 
     @staticmethod
     def _podcast_wrapper(r):
+        from mygpo.core.models import Podcast, PodcastGroup
+
         doc = r['doc']
         if doc['doc_type'] == 'Podcast':
             return Podcast.wrap(doc)
@@ -195,6 +207,8 @@ class EpisodesMissingSlugs(ObjectsMissingSlugs):
     """ Episodes that don't have a slug (but could have one) """
 
     def __init__(self, podcast_id=None):
+        from mygpo.core.models import Episode
+
         if podcast_id:
             start = [podcast_id, None]
             end = [podcast_id, {}]
@@ -207,4 +221,39 @@ class EpisodesMissingSlugs(ObjectsMissingSlugs):
 
     @staticmethod
     def _episode_wrapper(r):
+        from mygpo.core.models import Episode
+
         return Episode.wrap(r['doc'])
+
+
+class PodcastGroupsMissingSlugs(ObjectsMissingSlugs):
+    """ Podcast Groups that don't have a slug (but could have one) """
+
+    def __init__(self):
+        from mygpo.core.models import PodcastGroup
+        super(PodcastGroupsMissingSlugs, self).__init__(PodcastGroup,
+            self._group_wrapper)
+
+    @staticmethod
+    def _group_wrapper(r):
+        from mygpo.core.models import PodcastGroup
+        return PodcastGroup.wrap(r['doc'])
+
+
+class SlugMixin(DocumentSchema):
+    slug         = StringProperty()
+    merged_slugs = StringListProperty()
+
+    def set_slug(self, slug):
+        """ Set the main slug of the Podcast """
+
+        if not isinstance(slug, basestring):
+            raise ValueError('slug must be a string')
+
+        if not slug:
+            raise ValueError('slug cannot be empty')
+
+        if self.slug:
+            self.merged_slugs.append(self.slug)
+
+        self.slug = slug
