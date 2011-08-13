@@ -315,6 +315,10 @@ def set_public(request, pid, public):
 def slug_id_decorator(f):
     def _decorator(request, slug_id, *args, **kwargs):
         podcast = models.Podcast.for_slug_id(slug_id)
+
+        if podcast is None:
+            raise Http404
+
         return f(request, podcast.oldid, *args, **kwargs)
 
     return _decorator
