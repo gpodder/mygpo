@@ -11,6 +11,8 @@ from mygpo.publisher.forms import SearchPodcastForm, PodcastForm
 from mygpo.publisher.utils import listener_data, episode_listener_data, check_publisher_permission, subscriber_data
 from mygpo.web.heatmap import EpisodeHeatmap
 from mygpo.web.views.episode import oldid_decorator, slug_id_decorator
+from mygpo.web.views.podcast import \
+         slug_id_decorator as podcast_slug_id_decorator
 from django.contrib.sites.models import RequestSite
 from mygpo.data.feeddownloader import update_podcasts
 from mygpo.decorators import requires_token, allowed_methods
@@ -205,4 +207,8 @@ def advertise(request):
 
 
 episode_oldid = oldid_decorator(episode)
-episode_slug_id = slug_id_decorator(episode)
+
+episode_slug_id        = slug_id_decorator(episode)
+podcast_slug_id        = podcast_slug_id_decorator(podcast)
+episodes_slug_id       = podcast_slug_id_decorator(episodes)
+update_podcast_slug_id = podcast_slug_id_decorator(update_podcast)

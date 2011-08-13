@@ -16,7 +16,7 @@
 #
 
 import collections
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, time
 
 from django.db.models import Avg, Count
 from django.contrib.auth.models import User
@@ -57,7 +57,6 @@ def listener_data(podcasts, start_date=datetime(2010, 1, 1), leap=timedelta(days
         events.append(min(episodes.keys()))
 
     if listeners:
-        print listeners
         events.append(min([l[0][0] for l in listeners]))
 
     if not events:
@@ -94,18 +93,19 @@ def episode_listener_data(episode, start_date=datetime(2010, 1, 1), leap=timedel
      * episode: the episode, if it was released on that day, otherwise None
     """
 
-    listeners = list(episode.listener_count_timespan())
+    listeners = list(episode.listener_count_timespan(start=start_date))
 
     if not listeners:
         return
 
     # we always start at the first listen-event
     start = listeners[0][0]
+    start = datetime.combine(start, time())
 
     for d in daterange(start, leap=leap):
         next = d + leap
 
-        if listeners and listeners[0] and listeners[0][0] == d:
+        if listeners and listeners[0] and listeners[0][0] == d.date():
             day, l = listeners.pop()
         else:
             l = 0

@@ -34,7 +34,7 @@
   </small>
   <hr style="clear: none;"/>
 
-  <p><a href="{% url podcast-publisher-episodes podcast.oldid %}">{% trans "Return to the episode list" %}</a></p>
+  <p><a href="{% podcast_link_target podcast "podcast-publisher-episodes" %}">{% trans "Return to the episode list" %}</a></p>
 
   <h2>{% trans "Edit" %}</h2>
   {% if episode.outdated %}
