@@ -143,6 +143,7 @@ class PodcastGroup(models.Model):
         managed = False
 
 
+# deprecated, only used in migration code
 class Episode(models.Model):
     podcast = models.ForeignKey(Podcast)
     url = models.URLField(verify_exists=False)
@@ -161,12 +162,6 @@ class Episode(models.Model):
     def number(self):
         m = re.search('\D*(\d+)\D+', self.title)
         return m.group(1) if m else ''
-
-    def listener_count(self):
-        # FIXME: remove after templates don't access this anymore
-        from mygpo import migrate
-        new_e = migrate.get_or_migrate_episode(self)
-        return new_e.listener_count()
 
     def shortname(self):
         s = self.title
