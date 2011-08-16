@@ -431,7 +431,7 @@ def updates(request, username, device_uid):
     ret = get_subscription_changes(request.user, dev, since, now)
     domain = RequestSite(request).domain
 
-    subscriptions = dev.get_subscribed_podcasts()
+    subscriptions = list(dev.get_subscribed_podcasts())
 
     podcasts = dict( (p.url, p) for p in subscriptions )
 
