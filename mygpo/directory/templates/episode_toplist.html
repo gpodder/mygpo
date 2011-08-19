@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load podcasts %}
+{% load episodes %}
 {% load charts %}
 {% load utils %}
 
@@ -104,13 +105,7 @@
      {% endifchanged %}
     </td>
     <td>{{ entry.podcast|podcast_logo }}</td>
-    <td><a href="{% url episode entry.oldid %}">
-     {% if entry.title %}
-      {{ entry.title|striptags }}
-     {% else %}
-      {% trans "Unnamed Episode" %}
-     {% endif %}
-     </a><br/>
+    <td>{% episode_link entry %}<br/>
      <span class="from_podcast">{% trans "from" %} {% podcast_group_link entry.podcast %}</td>
     <td>{{ entry.listeners|vertical_bar:max_listeners }}</td>
    </tr>

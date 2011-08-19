@@ -18,24 +18,11 @@
 from django.contrib.auth.models import User
 from mygpo.core.models import Podcast
 from mygpo.users.models import PodcastUserState
-from mygpo.api.models import Episode
-from mygpo.utils import flatten
 
 try:
     from collections import Counter
 except ImportError:
     from mygpo.counter import Counter
-
-
-def avg_update_interval(podcast):
-    """
-    returns the average interval between episodes for a given podcast
-    """
-    unique_timestamps = Episode.objects.filter(podcast=p, timestamp__isnull=False).order_by('timestamp').values('timestamp').distinct()
-    c = unique_timestamps.count()
-    t1 = unique_timestamps[0]['timestamp']
-    t2 = unique_timestamps[c-1]['timestamp']
-    return max(1, (t2 - t1).days / c)
 
 
 def calc_similar_podcasts(podcast, num=20):

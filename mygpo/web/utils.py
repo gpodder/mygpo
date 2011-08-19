@@ -1,6 +1,8 @@
 
 from django.db.models import Sum
 from django.views.decorators.cache import never_cache
+from django.utils.html import strip_tags
+from django.core.urlresolvers import reverse
 
 from mygpo.api.models import Podcast, EpisodeAction
 from babel import Locale, UnknownLocaleError
@@ -140,3 +142,70 @@ def maintenance(request, *args, **kwargs):
         context_instance=RequestContext(request))
     resp.status_code = 503
     return resp
+
+
+def get_podcast_link_target(podcast, view_name='podcast', add_args=[]):
+    """ Returns the link-target for a Podcast, preferring slugs over Ids
+
+    automatically distringuishes between relational Podcast objects and
+    CouchDB-based Podcasts """
+
+    from mygpo.api.models import Podcast as OldPodcast
+    from mygpo.core.models import Podcast
+
+    # for old-podcasts we link to its id
+    if isinstance(podcast, OldPodcast):
+        args = [podcast.id]
+
+    # we prefer slugs
+    elif podcast.slug:
+        args = [podcast.slug]
+        view_name = '%s-slug-id' % view_name
+
+    # to keep URLs short, we use use oldids
+    elif podcast.oldid:
+        args = [podcast.oldid]
+
+    # as a fallback we use CouchDB-IDs
+    else:
+        args = [podcast.get_id()]
+        view_name = '%s-slug-id' % view_name
+
+    return reverse(view_name, args=args + add_args)
+
+
+def get_episode_link_target(episode, podcast=None, view_name='episode', add_args=[]):
+    """ Returns the link-target for an Episode, preferring slugs over Ids
+
+    automatically distringuishes between relational Episode objects and
+    CouchDB-based Episodes """
+
+    from mygpo.core.models import Podcast
+
+    # prefer slugs
+    if episode.slug:
+        if not podcast:
+            if isinstance(episode.podcast, Podcast):
+                podcast = episode.podcast
+            else:
+                podcast = Podcast.get(episode.podcast)
+
+        args = [podcast.slug or podcast.get_id(), episode.slug]
+        view_name = '%s-slug-id' % view_name
+
+    # for short URLs, prefer oldids over CouchDB-IDs
+    elif episode.oldid:
+        args = [episode.oldid]
+
+    # fallback: CouchDB-IDs
+    else:
+        if not podcast:
+            if isinstance(episode.podcast, Podcast):
+                podcast = episode.podcast
+            elif isinstance(episode.podcast, basestring):
+                podcast = Podcast.get(episode.podcast)
+
+        args = [podcast.slug or podcast.get_id(), episode._id]
+        view_name = '%s-slug-id' % view_name
+
+    return strip_tags(reverse(view_name, args=args + add_args))

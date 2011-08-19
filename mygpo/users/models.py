@@ -5,8 +5,9 @@ from itertools import imap
 from couchdbkit import ResourceNotFound
 from couchdbkit.ext.django.schema import *
 
+from mygpo.core.proxy import proxy_object
 from mygpo.core.models import Podcast, Episode
-from mygpo.utils import linearize, get_to_dict
+from mygpo.utils import linearize, get_to_dict, iterate_together
 from mygpo.decorators import repeat_on_conflict
 
 
@@ -256,8 +257,8 @@ class EpisodeUserState(Document):
             old_p, _ = oldmodels.Podcast.objects.get_or_create(url=podcast_url)
             podcast = migrate.get_or_migrate_podcast(old_p)
 
-            old_e, _ = oldmodels.Episode.objects.get_or_create(podcast=old_p, url=episode_url)
-            episode = migrate.get_or_migrate_episode(old_e)
+            episode = Episode.for_podcast_id_url(podcast.get_id(), episode_url,
+                    create=True)
 
             return episode.get_user_state(user)
 
@@ -726,6 +727,27 @@ class User(Document):
                 # the last subscription has been removed
                 if subscriptions[entry.podcast_id] == 0:
                     yield entry
+
+
+    def get_newest_episodes(self, max_date):
+        """ Returns the newest episodes of all subscribed podcasts
+
+        Episodes with release dates above max_date are discarded"""
+
+
+        podcasts = dict( (p.get_id(), p) for p in
+                self.get_subscribed_podcasts())
+
+        episodes = [p.get_episodes(until=max_date, descending=True) for p in
+                podcasts.values()]
+
+        cmp_key = lambda episode: episode.released
+
+        for res in iterate_together(episodes, key=cmp_key, reverse=True):
+            # res is a sparse tuple
+            for episode in filter(None, res):
+                podcast = podcasts.get(episode.podcast, None)
+                yield proxy_object(episode, podcast=podcast)
 
 
     def __repr__(self):

@@ -31,23 +31,38 @@ urlpatterns += patterns('mygpo.web.views.subscriptions',
 )
 
 urlpatterns += patterns('mygpo.web.views.podcast',
- url(r'^podcast/(?P<pid>\w+)$',                                   'show',          name='podcast'),
  url(r'^subscribe',                                               'subscribe_url', name='subscribe-by-url'),
+
+ url(r'^podcast/(?P<pid>\d+)$',                                   'show',          name='podcast'),
  url(r'^podcast/(?P<pid>\w+)/subscribe$',                         'subscribe',     name='subscribe'),
  url(r'^podcast/(?P<pid>\w+)/unsubscribe/(?P<device_id>\d+)',     'unsubscribe',   name='unsubscribe'),
  url(r'^podcast/(?P<pid>\w+)/add-tag',                            'add_tag',       name='add-tag'),
  url(r'^podcast/(?P<pid>\w+)/remove-tag',                         'remove_tag',    name='remove-tag'),
  url(r'^podcast/(?P<pid>\w+)/set-public',                         'set_public',    name='podcast-public',  kwargs={'public': True}),
  url(r'^podcast/(?P<pid>\w+)/set-private',                        'set_public',    name='podcast-private', kwargs={'public': False}),
+
+ url(r'^podcast/(?P<slug_id>[\w-]+)/?$',                             'show_slug_id',        name='podcast-slug-id'),
+ url(r'^podcast/(?P<slug_id>[\w-]+)/subscribe$',                     'subscribe_slug_id',   name='subscribe-slug-id'),
+ url(r'^podcast/(?P<slug_id>[\w-]+)/unsubscribe/(?P<device_id>\d+)', 'unsubscribe_slug_id', name='unsubscribe-slug-id'),
+ url(r'^podcast/(?P<slug_id>[\w-]+)/add-tag',                        'add_tag_slug_id',     name='add-tag-slug-id'),
+ url(r'^podcast/(?P<slug_id>[\w-]+)/remove-tag',                     'remove_tag_slug_id',  name='remove-tag-slug-id'),
 )
 
 urlpatterns += patterns('mygpo.web.views.episode',
- url(r'^episode/(?P<id>\d+)$',                                    'episode',       name='episode'),
- url(r'^episode/(?P<id>\d+)/add-chapter$',                        'add_chapter',   name='add-chapter'),
- url(r'^episode/(?P<id>\d+)/remove-chapter/(?P<start>\d+)-(?P<end>\d+)$', 'remove_chapter',name='remove-chapter'),
- url(r'^episode/(?P<id>\d+)/toggle-favorite',                     'toggle_favorite',name='episode-fav'),
- url(r'^episode/(?P<id>\d+)/add-action',                          'add_action',    name='add-episode-action'),
  url(r'^favorites/',                                              'list_favorites',name='favorites'),
+
+ url(r'^episode/(?P<id>\d+)$',                                    'show_oldid',           name='episode'),
+ url(r'^episode/(?P<id>\d+)/add-chapter$',                        'add_chapter_oldid',   name='add-chapter'),
+ url(r'^episode/(?P<id>\d+)/remove-chapter/(?P<start>\d+)-(?P<end>\d+)$', 'remove_chapter_oldid',name='remove-chapter'),
+ url(r'^episode/(?P<id>\d+)/toggle-favorite',                     'toggle_favorite_oldid',name='episode-fav'),
+ url(r'^episode/(?P<id>\d+)/add-action',                          'add_action_oldid',    name='add-episode-action'),
+
+ url(r'^podcast/(?P<p_slug_id>[\w-]+)/(?P<e_slug_id>[\w-]+)$',                'show_slug_id',            name='episode-slug-id'),
+ url(r'^episode/(?P<p_slug_id>[\w-]+)/(?P<e_slug_id>[\w-]+)/add-chapter$',    'add_chapter_slug_id',     name='add-chapter-slug-id'),
+ url(r'^episode/(?P<p_slug_id>[\w-]+)/(?P<e_slug_id>[\w-]+)/remove-chapter/(?P<start>\d+)-(?P<end>\d+)$',
+                                                                              'remove_chapter',          name='remove-chapter'),
+ url(r'^episode/(?P<p_slug_id>[\w-]+)/(?P<e_slug_id>[\w-]+)/toggle-favorite', 'toggle_favorite_slug_id', name='episode-fav-slug-id'),
+ url(r'^episode/(?P<p_slug_id>[\w-]+)/(?P<e_slug_id>[\w-]+)/add-action',      'add_action_slug_id',      name='add-episode-action-slug-id'),
 )
 
 urlpatterns += patterns('mygpo.web.views.settings',

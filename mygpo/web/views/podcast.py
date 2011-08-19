@@ -8,7 +8,9 @@ from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
 from django.utils.translation import ugettext as _
-from mygpo.api.models import Podcast, Episode, Device, SyncGroup
+from mygpo.core import models
+from mygpo.core.proxy import proxy_object
+from mygpo.api.models import Podcast, Episode, EpisodeAction, Device, SyncGroup
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.users.models import EpisodeAction, HistoryEntry
 from mygpo.web.forms import PrivacyForm, SyncForm
@@ -28,6 +30,17 @@ def update_podcast_settings(state, is_public):
 
 
 @allowed_methods(['GET'])
+def show_slug(request, slug):
+    podcast = models.Podcast.for_slug(slug)
+
+    if slug != podcast.slug:
+        target = reverse('podcast_slug', args=[podcast.slug])
+        return HttpResponseRedirect(target)
+
+    return show(request, podcast.oldid)
+
+
+@allowed_methods(['GET'])
 def show(request, pid):
 
     try:
@@ -38,11 +51,15 @@ def show(request, pid):
     podcast = get_object_or_404(Podcast, pk=pid)
     new_podcast = migrate.get_or_migrate_podcast(podcast)
 
-    episodes = episode_list(podcast, request.user)
+    episodes = episode_list(new_podcast, request.user)
 
     max_listeners = max([e.listeners for e in episodes] + [0])
 
-    related_podcasts = [x for x in podcast.group.podcasts() if x != podcast] if podcast.group else []
+    if podcast.group:
+        rel_podcasts = [x for x in podcast.group.podcasts() if x != podcast]
+        rel_podcasts = map(migrate.get_or_migrate_podcast, rel_podcasts)
+    else:
+        rel_podcasts = []
 
     tags = get_tags(podcast, request.user)
 
@@ -74,7 +91,7 @@ def show(request, pid):
             'podcast': podcast,
             'is_public': is_public,
             'devices': subscribed_devices,
-            'related_podcasts': related_podcasts,
+            'related_podcasts': rel_podcasts,
             'can_subscribe': len(subscribe_targets) > 0,
             'subscribe_form': subscribe_form,
             'episodes': episodes,
@@ -115,7 +132,6 @@ def get_tags(podcast, user):
     return tag_list
 
 
-
 def episode_list(podcast, user):
     """
     Returns a list of episodes, with their action-attribute set to the latest
@@ -123,28 +139,25 @@ def episode_list(podcast, user):
     the episode.
     """
 
-    episodes = podcast.get_episodes().order_by('-timestamp')
-
     new_user = migrate.get_or_migrate_user(user)
 
-    new_podcast = migrate.get_or_migrate_podcast(podcast)
-    listeners = dict(new_podcast.episode_listener_counts())
-    new_episodes = dict( (e.oldid, e._id) for e in new_podcast.get_episodes() )
+    listeners = dict(podcast.episode_listener_counts())
+    episodes = podcast.get_episodes(descending=True)
 
     if user.is_authenticated():
-        actions = new_podcast.get_episode_states(user.id)
+        actions = podcast.get_episode_states(user.id)
         actions = map(HistoryEntry.from_action_dict, actions)
         HistoryEntry.fetch_data(new_user, actions)
         episode_actions = dict( (action.episode_id, action) for action in actions)
     else:
         episode_actions = {}
 
-    for e in episodes:
-        e_id = new_episodes.get(e.id, None)
-        e.listeners = listeners.get(e_id, None)
-        e.action = episode_actions.get(e_id, None)
+    def annotate_episode(episode):
+        listener_count = listeners.get(episode._id, None)
+        action         = episode_actions.get(episode._id, None)
+        return proxy_object(episode, listeners=listener_count, action=action)
 
-    return episodes
+    return map(annotate_episode, episodes)
 
 
 @login_required
@@ -293,3 +306,26 @@ def set_public(request, pid, public):
     update_podcast_settings(state=state, is_public=public)
 
     return HttpResponseRedirect(reverse('podcast', args=[pid]))
+
+
+# To make all view accessible via either CouchDB-ID or Slugs
+# a decorator queries the podcast and passes the Id on to the
+# regular views
+
+def slug_id_decorator(f):
+    def _decorator(request, slug_id, *args, **kwargs):
+        podcast = models.Podcast.for_slug_id(slug_id)
+
+        if podcast is None:
+            raise Http404
+
+        return f(request, podcast.oldid, *args, **kwargs)
+
+    return _decorator
+
+
+show_slug_id        = slug_id_decorator(show)
+subscribe_slug_id   = slug_id_decorator(subscribe)
+unsubscribe_slug_id = slug_id_decorator(unsubscribe)
+add_tag_slug_id     = slug_id_decorator(add_tag)
+remove_tag_slug_id  = slug_id_decorator(remove_tag)

@@ -15,6 +15,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+import operator
 import sys
 import re
 import collections
@@ -116,63 +117,85 @@ def parse_bool(val):
     return False
 
 
-def iterate_together(l1, l2, compare=lambda x, y: cmp(x, y)):
+def iterate_together(lists, key=lambda x: x, reverse=False):
     """
-    takes two ordered, possible sparse, lists l1 and l2 with similar items
-    (some items have a corresponding item in the other list, some don't).
+    takes ordered, possibly sparse, lists with similar items
+    (some items have a corresponding item in the other lists, some don't).
 
     It then yield tuples of corresponding items, where one element is None is
     there is no corresponding entry in one of the lists.
 
     Tuples where both elements are None are skipped.
 
-    compare is a method for comparing items from both lists; it defaults
-    to cmp.
+    The results of the key method are used for the comparisons.
 
-    >>> list(iterate_together(range(1, 3), range(1, 4, 2)))
+    If reverse is True, the lists are expected to be sorted in reverse order
+    and the results will also be sorted reverse
+
+    >>> list(iterate_together([range(1, 3), range(1, 4, 2)]))
     [(1, 1), (2, None), (None, 3)]
 
-    >>> list(iterate_together([], []))
+    >>> list(iterate_together([[], []]))
     []
 
-    >>> list(iterate_together(range(1, 3), range(3, 5)))
+    >>> list(iterate_together([range(1, 3), range(3, 5)]))
     [(1, None), (2, None), (None, 3), (None, 4)]
 
-    >>> list(iterate_together(range(1, 3), []))
+    >>> list(iterate_together([range(1, 3), []]))
     [(1, None), (2, None)]
 
-    >>> list(iterate_together([1, None, 3], [None, None, 3]))
+    >>> list(iterate_together([[1, None, 3], [None, None, 3]]))
     [(1, None), (3, 3)]
     """
 
-    l1 = iter(l1)
-    l2 = iter(l2)
+    Next = collections.namedtuple('Next', 'item more')
+    min_ = min if not reverse else max
+    lt_  = operator.lt if not reverse else operator.gt
+
+    lists = [iter(l) for l in lists]
 
     def _take(it):
         try:
             i = it.next()
             while i is None:
                 i = it.next()
-            return i, True
+            return Next(i, True)
         except StopIteration:
-            return None, False
+            return Next(None, False)
 
-    i1, more1 = _take(l1)
-    i2, more2 = _take(l2)
+    def new_res():
+        return [None]*len(lists)
 
-    while more1 or more2:
-        if not more2 or (i1 is not None and compare(i1, i2) < 0):
-            yield(i1, None)
-            i1, more1 = _take(l1)
+    # take first bunch of items
+    items = [_take(l) for l in lists]
 
-        elif not more1 or (i2 is not None and compare(i1, i2) > 0):
-            yield(None, i2)
-            i2, more2 = _take(l2)
+    while any(i.item is not None or i.more for i in items):
 
-        elif compare(i1, i2) == 0:
-            yield(i1, i2)
-            i1, more1 = _take(l1)
-            i2, more2 = _take(l2)
+        res = new_res()
+
+        for n, item in enumerate(items):
+
+            if item.item is None:
+                continue
+
+            if all(x is None for x in res):
+                res[n] = item.item
+                continue
+
+            min_v = min_(filter(lambda x: x is not None, res), key=key)
+
+            if key(item.item) == key(min_v):
+                res[n] = item.item
+
+            elif lt_(key(item.item), key(min_v)):
+                res = new_res()
+                res[n] = item.item
+
+        for n, x in enumerate(res):
+            if x is not None:
+                items[n] = _take(lists[n])
+
+        yield tuple(res)
 
 
 def progress(val, max_val, status_str='', max_width=50, stream=sys.stdout):
@@ -209,18 +232,26 @@ def intersect(a, b):
      return list(set(a) & set(b))
 
 
-def multi_request_view(cls, view, wrap=True, *args, **kwargs):
+
+def multi_request_view(cls, view, wrap=True, auto_advance=True,
+        *args, **kwargs):
     """
     splits up a view request into several requests, which reduces
     the server load of the number of returned objects is large.
 
     NOTE: As such a split request is obviously not atomical anymore, results
     might skip some elements of contain some twice
+
+    If auto_advance is False the method will always request the same range.
+    This can be useful when the view contain unprocessed items and the caller
+    processes the items, thus removing them from the view before the next
+    request.
     """
 
     per_page = kwargs.get('limit', 1000)
     kwargs['limit'] = per_page + 1
     db = cls.get_db()
+    wrapper = kwargs.pop('wrapper', cls.wrap)
     cont = True
 
     while cont:
@@ -233,17 +264,18 @@ def multi_request_view(cls, view, wrap=True, *args, **kwargs):
             key = obj['key']
 
             if wrap:
-                doc = cls.wrap(obj['doc'])
+                doc = wrapper(obj['doc'])
                 docid = doc._id
             else:
                 docid = obj['id']
                 doc = obj
 
             if n == per_page:
-                kwargs['startkey'] = key
-                kwargs['startkey_docid'] = docid
-                if 'skip' in kwargs:
-                    del kwargs['skip']
+                if auto_advance:
+                    kwargs['startkey'] = key
+                    kwargs['startkey_docid'] = docid
+                    if 'skip' in kwargs:
+                        del kwargs['skip']
 
                 # we reached the end of the page, load next one
                 cont = True
@@ -433,3 +465,73 @@ def is_url(string):
     """
 
     return bool(re_url.match(string))
+
+
+def is_couchdb_id(id_str):
+    import string
+    import operator
+    import functools
+    f = functools.partial(operator.contains, string.hexdigits)
+    return len(id_str) == 32 and all(map(f, id_str))
+
+
+# from http://stackoverflow.com/questions/2892931/longest-common-substring-from-more-than-two-strings-python
+# this does not increase asymptotical complexity
+# but can still waste more time than it saves.
+def shortest_of(strings):
+    return min(strings, key=len)
+
+def longest_substr(strings):
+    """
+    Returns the longest common substring of the given strings
+    """
+
+    substr = ""
+    if not strings:
+        return substr
+    reference = shortest_of(strings) #strings[0]
+    length = len(reference)
+    #find a suitable slice i:j
+    for i in xrange(length):
+        #only consider strings long at least len(substr) + 1
+        for j in xrange(i + len(substr) + 1, length):
+            candidate = reference[i:j]
+            if all(candidate in text for text in strings):
+                substr = candidate
+    return substr
+
+
+
+def additional_value(it, gen_val, val_changed=lambda _: True):
+    """ Provides an additional value to the elements, calculated when needed
+
+    For the elements from the iterator, some additional value can be computed
+    by gen_val (which might be an expensive computation).
+
+    If the elements in the iterator are ordered so that some subsequent
+    elements would generate the same additional value, val_changed can be
+    provided, which receives the next element from the iterator and the
+    previous additional value. If the element would generate the same
+    additional value (val_changed returns False), its computation is skipped.
+
+    >>> # get the next full hundred higher than x
+    >>> # this will probably be an expensive calculation
+    >>> next_hundred = lambda x: x + 100-(x % 100)
+
+    >>> # returns True if h is not the value that next_hundred(x) would provide
+    >>> # this should be a relatively cheap calculation, compared to the above
+    >>> diff_hundred = lambda x, h: (h-x) < 0 or (h - x) > 100
+
+    >>> xs = [0, 50, 100, 101, 199, 200, 201]
+    >>> list(additional_value(xs, next_hundred, diff_hundred))
+    [(0, 100), (50, 100), (100, 100), (101, 200), (199, 200), (200, 200), (201, 300)]
+    """
+
+    _none = object()
+    current = _none
+
+    for x in it:
+        if current is _none or val_changed(x, current):
+            current = gen_val(x)
+
+        yield (x, current)

@@ -27,7 +27,7 @@
     <td>{{ s.podcast|podcast_logo }}</td>
     <td class="listlink">{% podcast_group_link s.podcast %}<br/><span class="latest_episode">
     {% if s.episode %}
-    {% trans "Latest Episode:" %} <a href="{% url episode s.episode.id %}">{{ s.episode.title|default:"Unnamed Episode"|striptags }}</a>
+    {% trans "Latest Episode:" %} {% episode_link s.episode %}
       {% if s.episode.action %}
           ({{ s.episode.timestamp|date:"Y-m-d" }}, {{s.episode.action|episode_status_text }})
       {% else %}

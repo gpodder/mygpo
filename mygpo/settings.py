@@ -157,6 +157,9 @@ MAINTENANCE = os.path.exists(os.path.join(BASE_DIR, 'MAINTENANCE'))
 
 EMAIL_BACKEND = 'django_couchdb_utils.email.backends.CouchDBEmailBackend'
 
+# minimum number of subscribers a podcast must have to be assigned a slug
+PODCAST_SLUG_SUBSCRIBER_LIMIT = 10
+
 try:
     from settings_prod import *
 except ImportError, e:

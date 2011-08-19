@@ -3,7 +3,7 @@ import collections
 from django.core.cache import cache
 
 from mygpo.core import models
-from mygpo.api.models import Podcast, Episode
+from mygpo.api.models import Podcast
 from mygpo.log import log
 from mygpo.utils import iterate_together, progress
 import urlparse
@@ -89,11 +89,9 @@ def maintenance(dry_run=False):
     episode_rules = get_sanitizing_rules('episode')
 
     num_podcasts = Podcast.objects.count()
-    num_episodes = Episode.objects.count()
 
     print 'Stats'
     print ' * %d podcasts - %d rules' % (num_podcasts, len(podcast_rules))
-    print ' * %d episodes - %d rules' % (num_episodes, len(episode_rules))
     if dry_run:
         print ' * dry run - nothing will be written to the database'
     print
@@ -176,79 +174,6 @@ def maintenance(dry_run=False):
     for _, r in podcast_rules:
         print '% 30s: %d' % (r.slug, getattr(r, 'hits', 0) if hasattr(r, 'hits') else 0)
 
-    episodes = Episode.objects.only('id', 'url').order_by('id').iterator()
-    for e in episodes:
-        try:
-            su = sanitize_url(e.url, rules=episode_rules)
-        except Exception, ex:
-            log('failed to sanitize url for episode %s: %s' % (e.id, ex))
-            print 'failed to sanitize url for episode %s: %s' % (e.id, ex)
-            e_stats['error'] += 1
-            continue
-
-        # nothing to do
-        if su == e.url:
-            e_stats['unchanged'] += 1
-            continue
-
-        # invalid episode, remove
-        if su == '':
-            try:
-                if not dry_run:
-                    e.delete()
-
-                e_stats['deleted'] += 1
-            except Exception, ex:
-                log('failed to delete episode %s: %s' % (e.id, ex))
-                print 'failed to delete episode %s: %s' % (e.id, ex)
-                e_stats['error'] += 1
-
-            continue
-
-        try:
-            su_episode = Episode.objects.get(url=su, podcast=e.podcast)
-
-        except Episode.DoesNotExist, ex:
-            # "target" episode does not exist, we simply change the url
-            if not dry_run:
-                log('updating episode %s - "%s" => "%s"' % (e.id, e.url, su))
-                e.url = su
-                e.save()
-
-            e_stats['updated'] += 1
-            continue
-
-        # nothing to do
-        if e == su_episode:
-            e_stats['unchanged'] += 1
-            continue
-
-
-        # last option - merge episodes
-        try:
-            if not dry_run:
-                e.delete()
-
-            e_stats['merged'] += 1
-
-        except Exception, ex:
-            log('error rewriting episode %s: %s' % (e.id, ex))
-            print 'error rewriting episode %s: %s' % (e.id, ex)
-            e_stats['error'] += 1
-            continue
-
-        progress(n+1, num_episodes, str(e.id))
-
-    print 'finished %s episodes' % num_episodes
-    print '%(unchanged)d unchanged, %(merged)d merged, %(updated)d updated, %(deleted)d deleted, %(error)d error' % e_stats
-    print
-    print 'finished %s podcasts' % num_podcasts
-    print '%(unchanged)d unchanged, %(merged)d merged, %(updated)d updated, %(deleted)d deleted, %(error)d error' % p_stats
-    print
-    print 'Hits'
-    for _, r in episode_rules:
-        print '% 30s: %d' % (r.slug, getattr(r, 'hits', 0) if hasattr(r, 'hits') else 0)
-
 
 def rewrite_podcasts(p_old, p_new):
 
@@ -267,7 +192,7 @@ def rewrite_newpodcast(p_old, p_new):
     # merge subscriber data
     subscribers = []
     compare = lambda a, b: cmp(a.timestamp, b.timestamp)
-    for n, o in iterate_together(p_n.subscribers, p_o.subscribers):
+    for n, o in iterate_together([p_n.subscribers, p_o.subscribers]):
 
         # we assume that the new podcast has much more subscribers
         # taking only count of the old podcast would look like a drop
