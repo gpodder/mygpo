@@ -490,3 +490,39 @@ def longest_substr(strings):
             if all(candidate in text for text in strings):
                 substr = candidate
     return substr
+
+
+
+def additional_value(it, gen_val, val_changed=lambda _: True):
+    """ Provides an additional value to the elements, calculated when needed
+
+    For the elements from the iterator, some additional value can be computed
+    by gen_val (which might be an expensive computation).
+
+    If the elements in the iterator are ordered so that some subsequent
+    elements would generate the same additional value, val_changed can be
+    provided, which receives the next element from the iterator and the
+    previous additional value. If the element would generate the same
+    additional value (val_changed returns False), its computation is skipped.
+
+    >>> # get the next full hundred higher than x
+    >>> # this will probably be an expensive calculation
+    >>> next_hundred = lambda x: x + 100-(x % 100)
+
+    >>> # returns True if h is not the value that next_hundred(x) would provide
+    >>> # this should be a relatively cheap calculation, compared to the above
+    >>> diff_hundred = lambda x, h: (h-x) < 0 or (h - x) > 100
+
+    >>> xs = [0, 50, 100, 101, 199, 200, 201]
+    >>> list(additional_value(xs, next_hundred, diff_hundred))
+    [(0, 100), (50, 100), (100, 100), (101, 200), (199, 200), (200, 200), (201, 300)]
+    """
+
+    _none = object()
+    current = _none
+
+    for x in it:
+        if current is _none or val_changed(x, current):
+            current = gen_val(x)
+
+        yield (x, current)
