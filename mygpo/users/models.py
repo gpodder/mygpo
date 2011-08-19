@@ -108,11 +108,11 @@ class EpisodeAction(DocumentSchema):
             if until is not None: # filter in database
                 startkey[2] = podcast_id
                 endkey[2]   = podcast_id
-            else:
-                add_filters.append( lambda x: x['podcast'] == podcast_id )
+
+            add_filters.append( lambda x: x['podcast_id'] == podcast_id )
 
         elif isinstance(podcast_id, list):
-            add_filters.append( lambda x: x['podcast'] in podcast_id )
+            add_filters.append( lambda x: x['podcast_id'] in podcast_id )
 
         elif podcast_id is not None:
             raise ValueError('podcast_id can be either None, basestring '

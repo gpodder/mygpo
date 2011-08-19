@@ -205,7 +205,7 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
     if podcast is not None: args['podcast_id'] = podcast.get_id()
     if device is not None:  args['device_oldid'] = device.id
 
-    actions = EpisodeAction.filter(user.id, since, until, *args)
+    actions = EpisodeAction.filter(user.id, since, until, **args)
 
     if version == 1:
         # convert position parameter for API 1 compatibility
