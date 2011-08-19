@@ -232,18 +232,26 @@ def intersect(a, b):
      return list(set(a) & set(b))
 
 
-def multi_request_view(cls, view, wrap=True, *args, **kwargs):
+
+def multi_request_view(cls, view, wrap=True, auto_advance=True,
+        *args, **kwargs):
     """
     splits up a view request into several requests, which reduces
     the server load of the number of returned objects is large.
 
     NOTE: As such a split request is obviously not atomical anymore, results
     might skip some elements of contain some twice
+
+    If auto_advance is False the method will always request the same range.
+    This can be useful when the view contain unprocessed items and the caller
+    processes the items, thus removing them from the view before the next
+    request.
     """
 
     per_page = kwargs.get('limit', 1000)
     kwargs['limit'] = per_page + 1
     db = cls.get_db()
+    wrapper = kwargs.pop('wrapper', cls.wrap)
     cont = True
 
     while cont:
@@ -256,17 +264,18 @@ def multi_request_view(cls, view, wrap=True, *args, **kwargs):
             key = obj['key']
 
             if wrap:
-                doc = cls.wrap(obj['doc'])
+                doc = wrapper(obj['doc'])
                 docid = doc._id
             else:
                 docid = obj['id']
                 doc = obj
 
             if n == per_page:
-                kwargs['startkey'] = key
-                kwargs['startkey_docid'] = docid
-                if 'skip' in kwargs:
-                    del kwargs['skip']
+                if auto_advance:
+                    kwargs['startkey'] = key
+                    kwargs['startkey_docid'] = docid
+                    if 'skip' in kwargs:
+                        del kwargs['skip']
 
                 # we reached the end of the page, load next one
                 cont = True

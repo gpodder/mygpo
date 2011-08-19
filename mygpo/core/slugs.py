@@ -4,6 +4,7 @@ from couchdbkit.ext.django.schema import *
 
 from django.template.defaultfilters import slugify
 
+from mygpo.utils import multi_request_view
 from mygpo.decorators import repeat_on_conflict
 
 
@@ -153,14 +154,14 @@ class ObjectsMissingSlugs(object):
     """ A collections of objects missing a slug """
 
     def __init__(self, cls, wrapper=None, start=[None], end=[{}]):
-        self.db = cls.get_db()
+        self.cls = cls
         self.doc_type = cls._doc_type
         self.wrapper = wrapper
         self.start = start
         self.end = end
 
     def __len__(self):
-        res = self.db.view('maintenance/missing_slugs',
+        res = self.cls.view('maintenance/missing_slugs',
                 startkey     = [self.doc_type] + self.end,
                 endkey       = [self.doc_type] + self.start,
                 descending   = True,
@@ -172,15 +173,16 @@ class ObjectsMissingSlugs(object):
 
 
     def __iter__(self):
-        res = self.db.view('maintenance/missing_slugs',
+
+        return multi_request_view(self.cls, 'maintenance/missing_slugs',
                 startkey     = [self.doc_type] + self.end,
                 endkey       = [self.doc_type] + self.start,
                 descending   = True,
                 include_docs = True,
                 reduce       = False,
                 wrapper      = self.wrapper,
+                auto_advance = False,
             )
-        return res.iterator()
 
 
 class PodcastsMissingSlugs(ObjectsMissingSlugs):
@@ -191,10 +193,9 @@ class PodcastsMissingSlugs(ObjectsMissingSlugs):
         super(PodcastsMissingSlugs, self).__init__(Podcast, self._podcast_wrapper)
 
     @staticmethod
-    def _podcast_wrapper(r):
+    def _podcast_wrapper(doc):
         from mygpo.core.models import Podcast, PodcastGroup
 
-        doc = r['doc']
         if doc['doc_type'] == 'Podcast':
             return Podcast.wrap(doc)
         else:
@@ -220,10 +221,10 @@ class EpisodesMissingSlugs(ObjectsMissingSlugs):
                 self._episode_wrapper, start, end)
 
     @staticmethod
-    def _episode_wrapper(r):
+    def _episode_wrapper(doc):
         from mygpo.core.models import Episode
 
-        return Episode.wrap(r['doc'])
+        return Episode.wrap(doc)
 
 
 class PodcastGroupsMissingSlugs(ObjectsMissingSlugs):
@@ -235,9 +236,9 @@ class PodcastGroupsMissingSlugs(ObjectsMissingSlugs):
             self._group_wrapper)
 
     @staticmethod
-    def _group_wrapper(r):
+    def _group_wrapper(doc):
         from mygpo.core.models import PodcastGroup
-        return PodcastGroup.wrap(r['doc'])
+        return PodcastGroup.wrap(doc)
 
 
 class SlugMixin(DocumentSchema):
