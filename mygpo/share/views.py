@@ -64,6 +64,7 @@ def lists_user(request, username):
 
     return render_to_response('lists_user.html', {
             'lists': lists,
+            'user': user,
         }, context_instance=RequestContext(request))
 
 

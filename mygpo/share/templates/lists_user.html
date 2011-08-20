@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/share/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/lists/"|section_menu }}{% endblock %}
+
+{% block title %}{% trans "Podcast Lists" %}{% endblock %}
+
+{% block content %}
+  <h1>{% blocktrans with user.username as username %}Podcast Lists by {{ username }}{% endblocktrans%}</h1>
+
+  <table class="list">
+   {% for list in lists %}
+    <tr>
+     <td><a href="{% url list-show user.username list.slug %}">{{ list.title }}</a></td>
+     <td>{% blocktrans with list.podcasts|length as num_podcasts %}{{ num_podcasts }} Podcasts{% endblocktrans %}</td>
+     <td>
+      <form action="{% url list-delete user.username list.slug %}" method="post">
+       {% csrf_token %}
+       <input type="submit" class="remove" value="" />
+      </form>
+     </td>
+    </tr>
+   {% endfor %}
+  </table>
+
+  <div class="info">
+   {% url lists-overview as create-url %}
+   {% blocktrans %}Create your own <a href="{{ create-url }}">podcast lists</a>.{% endblocktrans %}
+  </div>
+
+{% endblock %}
