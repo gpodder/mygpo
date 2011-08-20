@@ -15,11 +15,12 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+from django.http import Http404
 from django.core.urlresolvers import reverse
 from mygpo.api.httpresponse import JsonResponse
 from django.shortcuts import get_object_or_404
 from mygpo.api.sanitizing import sanitize_url
-from mygpo.api.models import Podcast, Episode
+from mygpo.api.models import Podcast
 from mygpo.directory.models import Category
 from django.contrib.sites.models import RequestSite
 from django.views.decorators.csrf import csrf_exempt
@@ -69,7 +70,12 @@ def podcast_info(request):
 def episode_info(request):
     podcast_url = sanitize_url(request.GET.get('podcast', ''))
     episode_url = sanitize_url(request.GET.get('url', ''), 'episode')
-    episode = get_object_or_404(Episode, url=episode_url, podcast__url=podcast_url)
+
+    episode = models.Episode.for_podcast_url(podcast_url, episode_url)
+
+    if episode is None:
+        raise Http404
+
     domain = RequestSite(request).domain
 
     resp = episode_data(episode, domain)
@@ -110,16 +116,7 @@ def podcast_data(obj, domain, scaled_logo_size=64):
 
 def episode_data(episode, domain, podcast=None):
 
-    if isinstance(episode, Episode):
-        podcast = episode.podcast
-        episode_id = episode.id
-        released = episode.timestamp
-    elif isinstance(episode, models.Episode):
-        podcast = podcast or models.Podcast.get(episode.podcast)
-        episode_id = episode.oldid
-        released = episode.released
-    else:
-        raise ValueError('episode must either be a new or old-style Episode')
+    podcast = podcast or models.Podcast.get(episode.podcast)
 
     data = {
         "title": episode.title,
@@ -129,10 +126,10 @@ def episode_data(episode, domain, podcast=None):
         "description": episode.description,
         "website": episode.link,
         "mygpo_link": 'http://%(domain)s%(res)s' % dict(domain=domain,
-            res=reverse('episode', args=[episode_id]))
+            res=get_episode_link_target(episode, podcast))
         }
 
-    if released:
+    if episode.released:
         data['released'] = released.strftime('%Y-%m-%dT%H:%M:%S')
 
     return data

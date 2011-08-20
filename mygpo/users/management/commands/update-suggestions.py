@@ -53,11 +53,12 @@ class Command(BaseCommand):
             subscribed_podcasts = filter(None, subscribed_podcasts)
             related = chain.from_iterable([p.related_podcasts for p in subscribed_podcasts])
             related = filter(lambda pid: not pid in suggestion.blacklist, related)
-            related = Counter(related)
 
-            get_podcast = itemgetter(0)
-            podcasts = map(get_podcast, related.most_common(max_suggestions))
-            suggestion.podcasts = podcasts
+            counter = Counter(related)
+            get_podcast_id = itemgetter(0)
+            suggested = map(get_podcast_id, counter.most_common(max_suggestions))
+            suggestion.podcasts = suggested
+
             suggestion.save()
 
             # flag suggestions up-to-date

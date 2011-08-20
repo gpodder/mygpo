@@ -787,3 +787,8 @@ clear: both;
 {
         cursor: pointer;
 }
+
+div.subscriptions select
+{
+    width: 100%;
+}

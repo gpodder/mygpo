@@ -1,14 +1,23 @@
 import hashlib
+import re
+from datetime import datetime
 from dateutil import parser
+
 from couchdbkit.ext.django.schema import *
+
 from mygpo.decorators import repeat_on_conflict
 from mygpo import utils
+from mygpo.core.proxy import DocumentABCMeta
+from mygpo.core.slugs import SlugMixin
 
 
-class Episode(Document):
+
+class Episode(Document, SlugMixin):
     """
     Represents an Episode. Can only be part of a Podcast
     """
+
+    __metaclass__ = DocumentABCMeta
 
     title = StringProperty()
     description = StringProperty()
@@ -48,15 +57,66 @@ class Episode(Document):
 
     @classmethod
     def for_oldid(self, oldid):
+        oldid = int(oldid)
         r = Episode.view('core/episodes_by_oldid', key=oldid, limit=1, include_docs=True)
         return r.one() if r else None
 
 
-    def get_old_obj(self):
-        if self.oldid:
-            from mygpo.api.models import Episode
-            return Episode.objects.get(id=self.oldid)
+    @classmethod
+    def for_slug(cls, podcast_id, slug):
+        r = cls.view('core/episodes_by_slug',
+                key          = [podcast_id, slug],
+                include_docs = True
+            )
+        return r.first() if r else None
+
+
+    @classmethod
+    def for_podcast_url(cls, podcast_url, episode_url, create=False):
+        podcast = Podcast.for_url(podcast_url)
+        return cls.for_podcast_id_url(podcast.get_id(), episode_url, create)
+
+
+    @classmethod
+    def for_podcast_id_url(cls, podcast_id, episode_url, create=False):
+        r = cls.view('core/episodes_by_podcast_url',
+                key          = [podcast_id, episode_url],
+                include_docs = True,
+            )
+
+        if r:
+            return r.first()
+
+        if create:
+            episode = Episode()
+            episode.podcast = podcast_id
+            episode.urls = [episode_url]
+            episode.save()
+            return episode
+
         return None
+
+
+    @classmethod
+    def for_slug_id(cls, p_slug_id, e_slug_id):
+        """ Returns the Episode for Podcast Slug/Id and Episode Slug/Id """
+
+        # The Episode-Id is unique, so take that
+        if utils.is_couchdb_id(e_slug_id):
+            return cls.get(e_slug_id)
+
+        # If we search using a slug, we need the Podcast's Id
+        if utils.is_couchdb_id(p_slug_id):
+            p_id = p_slug_id
+        else:
+            podcast = Podcast.for_slug_id(p_slug_id)
+
+            if podcast is None:
+                return None
+
+            p_id = podcast.get_id()
+
+        return cls.for_slug(p_id, e_slug_id)
 
 
     def get_user_state(self, user):
@@ -89,6 +149,12 @@ class Episode(Document):
     def listener_count_timespan(self, start=None, end={}):
         """ returns (date, listener-count) tuples for all days w/ listeners """
 
+        if isinstance(start, datetime):
+            start = start.isoformat()
+
+        if isinstance(end, datetime):
+            end = end.isoformat()
+
         from mygpo.users.models import EpisodeUserState
         r = EpisodeUserState.view('users/listeners_by_episode',
                 startkey    = [self._id, start],
@@ -102,6 +168,31 @@ class Episode(Document):
             date = parser.parse(res['key'][1]).date()
             listeners = res['value']
             yield (date, listeners)
+
+
+    def get_short_title(self, common_title):
+        if not self.title or not common_title:
+            return None
+
+        title = self.title.replace(common_title, '').strip()
+        title = re.sub(r'^[\W\d]+', '', title)
+        return title
+
+
+    def get_episode_number(self, common_title):
+        if not self.title or not common_title:
+            return None
+
+        title = self.title.replace(common_title, '').strip()
+        match = re.search(r'^\W*(\d+)', title)
+        if not match:
+            return None
+
+        return int(match.group(1))
+
+
+    def get_ids(self):
+        return [self._id] + self.merged_ids
 
 
     @classmethod
@@ -118,7 +209,7 @@ class Episode(Document):
     def __eq__(self, other):
         if other == None:
             return False
-        return self.id == other.id
+        return self._id == other._id
 
 
 class SubscriberData(DocumentSchema):
@@ -151,7 +242,10 @@ class PodcastSubscriberData(Document):
         return 'PodcastSubscriberData for Podcast %s (%s)' % (self.podcast, self._id)
 
 
-class Podcast(Document):
+class Podcast(Document, SlugMixin):
+
+    __metaclass__ = DocumentABCMeta
+
     id = StringProperty()
     title = StringProperty()
     urls = StringListProperty()
@@ -187,6 +281,38 @@ class Podcast(Document):
 
 
     @classmethod
+    def for_slug(cls, slug):
+        db = cls.get_db()
+        r = db.view('core/podcasts_by_slug',
+                startkey     = [slug, None],
+                endkey       = [slug, {}],
+                include_docs = True,
+            )
+
+        if not r:
+            return None
+
+        res = r.first()
+        doc = res['doc']
+        if doc['doc_type'] == 'Podcast':
+            return Podcast.wrap(doc)
+        else:
+            pid = res['key'][1]
+            pg = PodcastGroup.wrap(doc)
+            return pg.get_podcast_by_id(pid)
+
+
+    @classmethod
+    def for_slug_id(cls, slug_id):
+        """ Returns the Podcast for either an CouchDB-ID for a Slug """
+
+        if utils.is_couchdb_id(slug_id):
+            return cls.get(slug_id)
+        else:
+            return cls.for_slug(slug_id)
+
+
+    @classmethod
     def get_multi(cls, ids):
         db = Podcast.get_db()
         r = db.view('core/podcasts_by_id',
@@ -205,6 +331,7 @@ class Podcast(Document):
 
     @classmethod
     def for_oldid(cls, oldid):
+        oldid = int(oldid)
         r = cls.view('core/podcasts_by_oldid',
                 key=long(oldid),
                 classes=[Podcast, PodcastGroup],
@@ -219,19 +346,24 @@ class Podcast(Document):
 
 
     @classmethod
-    def for_url(cls, url):
+    def for_url(cls, url, create=False):
         r = cls.view('core/podcasts_by_url',
                 key=url,
                 classes=[Podcast, PodcastGroup],
                 include_docs=True
             )
 
-        if not r:
-            return None
+        if r:
+            podcast_group = r.first()
+            return podcast_group.get_podcast_by_url(url)
 
-        podcast_group = r.first()
-        return podcast_group.get_podcast_by_url(url)
+        if create:
+            podcast = cls()
+            podcast.urls = [url]
+            podcast.save()
+            return podcast
 
+        return None
 
 
     def get_podcast_by_id(self, _):
@@ -243,12 +375,83 @@ class Podcast(Document):
     def get_id(self):
         return self.id or self._id
 
+    def get_ids(self):
+        return [self.get_id()] + self.merged_ids
+
     @property
     def display_title(self):
         return self.title or self.url
 
-    def get_episodes(self):
-        return list(Episode.view('core/episodes_by_podcast', key=self.get_id(), include_docs=True))
+
+    def get_episodes(self, since=None, until={}, **kwargs):
+
+        if kwargs.get('descending', False):
+            since, until = until, since
+
+        if isinstance(since, datetime):
+            since = since.isoformat()
+
+        if isinstance(until, datetime):
+            until = until.isoformat()
+
+        res = Episode.view('core/episodes_by_podcast',
+                startkey = [self.get_id(), since],
+                endkey   = [self.get_id(), until],
+                include_docs=True,
+                **kwargs
+            )
+
+        return iter(res)
+
+
+    def get_common_episode_title(self):
+        # We take all non-empty titles
+        titles = filter(None, (e.title for e in self.get_episodes()))
+        # get the longest common substring
+        common_title = utils.longest_substr(titles)
+
+        # but consider only the part up to the first number. Otherwise we risk
+        # removing part of the number (eg if a feed contains episodes 100-199)
+        common_title = re.search(r'^\D*', common_title).group(0)
+
+        if len(common_title.strip()) < 2:
+            return None
+
+        return common_title
+
+
+    def get_latest_episode(self):
+        # since = 1 ==> has a timestamp
+        episodes = list(self.get_episodes(since=1, descending=True, limit=1))
+        return episodes[0] if episodes else None
+
+
+    def get_episode_before(self, episode):
+        if not episode.released:
+            return None
+
+        prevs = self.get_episodes(until=episode.released, descending=True,
+                limit=1)
+        try:
+            prev = prevs.next()
+        except StopIteration:
+            prev = None
+
+
+    def get_episode_after(self, episode):
+        if not episode.released:
+            return None
+
+        nexts = self.get_episodes(since=episode.released, limit=1)
+
+        try:
+            next = nexts.next()
+        except StopIteration:
+            next = None
+
+
+    def get_episode_for_slug(self, slug):
+        return Episode.for_slug(self.get_id(), slug)
 
 
     @property
@@ -290,6 +493,11 @@ class Podcast(Document):
             startkey = [self.get_id(), None],
             endkey   = [self.get_id(), '\ufff0'],
             include_docs=True)
+
+    def get_all_subscriber_data(self):
+        subdata = PodcastSubscriberData.for_podcast(self.get_id())
+        return sorted(self.subscribers + subdata.subscribers,
+                key=lambda s: s.timestamp)
 
 
     @repeat_on_conflict()
@@ -361,6 +569,12 @@ class Podcast(Document):
 
     def listener_count_timespan(self, start=None, end={}):
         """ returns (date, listener-count) tuples for all days w/ listeners """
+
+        if isinstance(start, datetime):
+            start = start.isoformat()
+
+        if isinstance(end, datetime):
+            end = end.isoformat()
 
         from mygpo.users.models import EpisodeUserState
         r = EpisodeUserState.view('users/listeners_by_podcast',
@@ -503,7 +717,7 @@ class Podcast(Document):
 
 
 
-class PodcastGroup(Document):
+class PodcastGroup(Document, SlugMixin):
     title    = StringProperty()
     podcasts = SchemaListProperty(Podcast)
 
@@ -512,6 +726,7 @@ class PodcastGroup(Document):
 
     @classmethod
     def for_oldid(cls, oldid):
+        oldid = int(oldid)
         r = cls.view('core/podcastgroups_by_oldid', \
             key=oldid, limit=1, include_docs=True)
         return r.first() if r else None
@@ -525,7 +740,7 @@ class PodcastGroup(Document):
 
 
     def get_podcast_by_oldid(self, oldid):
-        for podcast in self.podcasts:
+        for podcast in list(self.podcasts):
             if podcast.oldid == oldid:
                 return podcast
 
@@ -575,7 +790,8 @@ class PodcastGroup(Document):
 
         podcast.delete()
         podcast.group = self._id
-        self.podcasts.append(podcast)
+        self.podcasts = sorted(self.podcasts + [podcast],
+                        key=Podcast.subscriber_count, reverse=True)
         self.save()
         return self.podcasts[-1]
 

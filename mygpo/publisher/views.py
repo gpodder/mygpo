@@ -1,13 +1,18 @@
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseRedirect, \
+        HttpResponseForbidden, Http404
 from django.views.decorators.cache import cache_page
 from mygpo.core import models
-from mygpo.api.models import Podcast, Episode, PodcastGroup
+from mygpo.core.proxy import proxy_object
+from mygpo.api.models import Podcast, PodcastGroup
 from mygpo.publisher.auth import require_publisher, is_publisher
-from mygpo.publisher.forms import SearchPodcastForm, EpisodeForm, PodcastForm
+from mygpo.publisher.forms import SearchPodcastForm, PodcastForm
 from mygpo.publisher.utils import listener_data, episode_listener_data, check_publisher_permission, subscriber_data
 from mygpo.web.heatmap import EpisodeHeatmap
+from mygpo.web.views.episode import oldid_decorator, slug_id_decorator
+from mygpo.web.views.podcast import \
+         slug_id_decorator as podcast_slug_id_decorator
 from django.contrib.sites.models import RequestSite
 from mygpo.data.feeddownloader import update_podcasts
 from mygpo.decorators import requires_token, allowed_methods
@@ -138,22 +143,20 @@ def episodes(request, id):
     if not check_publisher_permission(request.user, p):
         return HttpResponseForbidden()
 
-    episodes = p.get_episodes()
-
-    new_podcast = migrate.get_or_migrate_podcast(p)
-    new_episodes = dict( (e.oldid, e._id) for e in new_podcast.get_episodes() )
-
-    listeners = dict(new_podcast.episode_listener_counts())
+    podcast = migrate.get_or_migrate_podcast(p)
+    episodes = podcast.get_episodes(descending=True)
+    listeners = dict(podcast.episode_listener_counts())
 
     max_listeners = max(listeners.values() + [0])
 
-    for e in episodes:
-        e_id = new_episodes.get(e.id, None)
-        if not e_id: continue
-        e.listeners = listeners.get(e_id)
+    def annotate_episode(episode):
+        listener_count = listeners.get(episode._id, None)
+        return proxy_object(episode, listeners=listener_count)
+
+    episodes = map(annotate_episode, episodes)
 
     return render_to_response('publisher/episodes.html', {
-        'podcast': p,
+        'podcast': podcast,
         'episodes': episodes,
         'max_listeners': max_listeners
         }, context_instance=RequestContext(request))
@@ -161,21 +164,19 @@ def episodes(request, id):
 
 @require_publisher
 @allowed_methods(['GET', 'POST'])
-def episode(request, id):
-    e = get_object_or_404(Episode, pk=id)
+def episode(request, episode):
 
-    if not check_publisher_permission(request.user, e.podcast):
+    podcast = models.Podcast.get(episode.podcast)
+    if not check_publisher_permission(request.user, podcast):
         return HttpResponseForbidden()
 
     if request.method == 'POST':
-        form = EpisodeForm(request.POST, instance=e)
-        if form.is_valid():
-            form.save()
+        form = None #EpisodeForm(request.POST, instance=e)
+        #if form.is_valid():
+        #    form.save()
 
     elif request.method == 'GET':
-        form = EpisodeForm(instance=e)
-
-    episode = migrate.get_or_migrate_episode(e)
+        form = None #EpisodeForm(instance=e)
 
     timeline_data = episode_listener_data(episode)
 
@@ -183,7 +184,8 @@ def episode(request, id):
               duration=episode.duration)
 
     return render_to_response('publisher/episode.html', {
-        'episode': e,
+        'episode': episode,
+        'podcast': podcast,
         'form': form,
         'timeline_data': timeline_data,
         'heatmap': heatmap,
@@ -203,3 +205,10 @@ def advertise(request):
         'site': site
     }, context_instance=RequestContext(request))
 
+
+episode_oldid = oldid_decorator(episode)
+
+episode_slug_id        = slug_id_decorator(episode)
+podcast_slug_id        = podcast_slug_id_decorator(podcast)
+episodes_slug_id       = podcast_slug_id_decorator(episodes)
+update_podcast_slug_id = podcast_slug_id_decorator(update_podcast)

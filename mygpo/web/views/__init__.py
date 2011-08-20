@@ -56,7 +56,7 @@ def welcome(request, toplist_entries=10):
     current_site = RequestSite(request)
     podcasts = Podcast.objects.count()
     users = User.objects.filter(is_active=True).count()
-    episodes = Episode.objects.count()
+    episodes = models.Episode.count()
 
     try:
         lang = utils.process_lang_params(request, '/toplist/')
@@ -88,12 +88,14 @@ def dashboard(request, episode_count=10):
     subscribed_old_podcasts = [x.get_old_obj() for x in subscribed_podcasts]
 
     tomorrow = datetime.today() + timedelta(days=1)
-    newest_episodes = Episode.objects.filter(podcast__in=subscribed_old_podcasts).filter(timestamp__lt=tomorrow).order_by('-timestamp')[:episode_count]
+    newest_episodes = user.get_newest_episodes(tomorrow)
+    newest_episodes = islice(newest_episodes, 0, episode_count)
 
     lang = utils.get_accepted_lang(request)
     lang = utils.sanitize_language_codes(lang)
 
     random_podcasts = backend.get_random_picks(lang)[:5]
+    random_podcasts = map(migrate.get_or_migrate_podcast, random_podcasts)
 
     return render_to_response('dashboard.html', {
             'site': site,
@@ -185,9 +187,10 @@ def history(request, count=15, device_id=None):
 
 @login_required
 def blacklist(request, podcast_id):
+    podcast_id = int(podcast_id)
     blacklisted_podcast = models.Podcast.for_oldid(podcast_id)
     suggestion = Suggestions.for_user_oldid(request.user.id)
-    suggestion.blacklist.append(blacklisted_podcast._id)
+    suggestion.blacklist.append(blacklisted_podcast.get_id())
     suggestion.save()
 
     p, _created = UserProfile.objects.get_or_create(user=request.user)

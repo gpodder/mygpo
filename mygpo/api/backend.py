@@ -15,7 +15,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from mygpo.api.models import Device, Podcast, EpisodeToplistEntry
+from mygpo.api.models import Device, Podcast
 from mygpo.data.mimetype import get_type, CONTENT_TYPES
 from mygpo.core import models
 from mygpo.users.models import EpisodeUserState
@@ -65,4 +65,4 @@ def get_favorites(user):
     favorites = EpisodeUserState.view('users/favorite_episodes_by_user', key=user.id)
     ids = [res['value'] for res in favorites]
     episodes = models.Episode.get_multi(ids)
-    return [e.get_old_obj() for e in episodes]
+    return episodes

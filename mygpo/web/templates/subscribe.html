@@ -34,7 +34,7 @@
 
    <h2>{% trans "Add a podcast" %}</h2>
   {% if can_subscribe %}
-   <form action="{% url subscribe podcast.id %}" method="post">
+   <form action="{% podcast_link_target podcast "subscribe" %}" method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="{% trans "Subscribe" %}" />

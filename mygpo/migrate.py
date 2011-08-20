@@ -292,10 +292,10 @@ def create_episode(olde, sparse=False):
     e.urls.append(olde.url)
     e.podcast = podcast.get_id()
 
-    if not sparse:
+    if sparse:
+        e.save()
+    else:
         update_episode(olde, e)
-
-    e.save()
 
     return e
 
@@ -305,47 +305,61 @@ def get_or_migrate_episode(olde):
 
 
 def update_episode(olde, newe):
-    updated = False
-
-    if not olde.url in newe.urls:
-        newe.urls.append(olde.url)
-        updated = False
-
-    PROPERTIES = ('title', 'description', 'link',
-        'author', 'duration', 'filesize', 'language',
-        'last_update')
-
-    for p in PROPERTIES:
-        if getattr(newe, p, None) != getattr(olde, p, None):
-            setattr(newe, p, getattr(olde, p, None))
-            updated = True
-
-    if newe.outdated != olde.outdated:
-        newe.outdated = bool(olde.outdated)
-        updated = True
-
-    if newe.released != olde.timestamp:
-        newe.released = olde.timestamp
-        updated = True
-
-    if olde.mimetype and not olde.mimetype in newe.mimetypes:
-        newe.mimetypes.append(olde.mimetype)
-        updated = True
-
-    from mygpo.data.mimetype import get_type
-    content_types = filter(None, map(get_type, newe.mimetypes))
-    if newe.content_types != content_types:
-        newe.content_types = content_types
-        updated = True
 
     @repeat_on_conflict(['newe'])
-    def save(newe):
-        newe.save()
+    def _update(newe):
 
-    if updated:
-        save(newe=newe)
+        updated = False
 
-    return updated
+        if not olde.url in newe.urls:
+            newe.urls.append(olde.url)
+            updated = True
+
+        PROPERTIES = ('title', 'description', 'link',
+            'author', 'duration', 'filesize', 'last_update')
+
+        for p in PROPERTIES:
+            if getattr(newe, p, None) != getattr(olde, p, None):
+                setattr(newe, p, getattr(olde, p, None))
+                updated = True
+
+        if newe.outdated != olde.outdated:
+            newe.outdated = bool(olde.outdated)
+            updated = True
+
+        if newe.released != olde.timestamp:
+            newe.released = olde.timestamp
+            updated = True
+
+        if olde.mimetype and not olde.mimetype in newe.mimetypes:
+            newe.mimetypes.append(olde.mimetype)
+            updated = True
+
+        # Language
+        try:
+            podcast = Podcast.get(newe.podcast)
+            if podcast:
+                lang = olde.language or podcast.language
+                if lang != newe.language:
+                    newe.language = lang
+                    updated = True
+
+        except:
+            pass
+
+        # Content-Types
+        from mygpo.data.mimetype import get_type
+        content_types = filter(None, map(get_type, newe.mimetypes))
+        if newe.content_types != content_types:
+            newe.content_types = content_types
+            updated = True
+
+        if updated:
+            newe.save()
+
+        return updated
+
+    return _update(newe=newe)
 
 
 def get_or_migrate_user(user):
@@ -420,15 +434,19 @@ def get_episode_user_state(user, episode, podcast):
             remove_episode_status(p_state=p_state)
 
 
-    if not e_state.podcast_ref_url:
-        e_state.podcast_ref_url = podcast.url
+    @repeat_on_conflict(['e_state'])
+    def _update(e_state):
+        if not e_state.podcast_ref_url:
+            e_state.podcast_ref_url = podcast.url
 
-    if not e_state.ref_url:
-        e_state.ref_url = episode.url
+        if not e_state.ref_url:
+            e_state.ref_url = episode.url
 
-    e_state.podcast = podcast.get_id()
-    e_state.user_oldid = user.id
-    e_state.save()
+        e_state.podcast = podcast.get_id()
+        e_state.user_oldid = user.id
+        e_state.save()
+
+    _update(e_state=e_state)
 
     return e_state
 

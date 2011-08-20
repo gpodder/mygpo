@@ -11,9 +11,11 @@ def bar_chart(parts):
     bar_space = 15
     group_space = 20
 
+    width = min(1000, ((bar_space + group_space) * (len(parts) + 1)))
+
     parts = [
         'cht=bvg',     # Vertical bar chart with grouped bars.
-        'chs=%dx100' % ((bar_space + group_space) * (len(parts) + 1)),
+        'chs=%dx100' % width,
         'chl=%s' % '|'.join([x['x'] for x in parts]),
         'chd=t:%s' % ','.join([ repr(int(x['y'])) for x in parts ]),
         'chxt=x,y', # visible axes

@@ -1,5 +1,5 @@
-from mygpo.api.models import Episode
 from collections import defaultdict
+from itertools import ifilter as filter
 import mimetypes
 
 # If 20% of the episodes of a podcast are of a given type,
@@ -16,11 +16,13 @@ def get_podcast_types(podcast):
 
     A podcast is considered to be of a given types if the ratio of episodes that are of that type equals TYPE_THRESHOLD
     """
-    episodes = Episode.objects.filter(podcast=podcast, mimetype__isnull=False)
+    has_mimetype = lambda e: e.mimetypes
+    episodes = filter(has_mimetype, podcast.get_episodes())
     types = defaultdict()
     for e in episodes:
-        t = get_type(e.mimetype)
-        types[t] = types.get(t, 0) + 1
+        for mimetype in e.mimetypes:
+            t = get_type(mimetype)
+            types[t] = types.get(t, 0) + 1
 
     max_episodes = sum(types.itervalues())
     l = list(types.iteritems())

@@ -103,9 +103,6 @@ class Podcast(models.Model):
             p.group = None
             p.save()
 
-    def get_episodes(self):
-        return Episode.objects.filter(podcast=self)
-
     def __unicode__(self):
         return self.title if self.title != '' else self.url
 
@@ -146,26 +143,7 @@ class PodcastGroup(models.Model):
         managed = False
 
 
-class EpisodeToplistEntryManager(models.Manager):
-
-    def get_query_set(self):
-        return super(EpisodeToplistEntryManager, self).get_query_set().order_by('-listeners')
-
-
-class EpisodeToplistEntry(models.Model):
-    episode = models.ForeignKey('Episode')
-    listeners = models.PositiveIntegerField()
-
-    objects = EpisodeToplistEntryManager()
-
-    def __unicode__(self):
-        return '%s (%s)' % (self.episode, self.listeners)
-
-    class Meta:
-        db_table = 'episode_toplist'
-        managed = False
-
-
+# deprecated, only used in migration code
 class Episode(models.Model):
     podcast = models.ForeignKey(Podcast)
     url = models.URLField(verify_exists=False)
@@ -184,12 +162,6 @@ class Episode(models.Model):
     def number(self):
         m = re.search('\D*(\d+)\D+', self.title)
         return m.group(1) if m else ''
-
-    def listener_count(self):
-        # FIXME: remove after templates don't access this anymore
-        from mygpo import migrate
-        new_e = migrate.get_or_migrate_episode(self)
-        return new_e.listener_count()
 
     def shortname(self):
         s = self.title

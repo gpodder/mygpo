@@ -16,19 +16,20 @@
 #
 
 import collections
-from datetime import timedelta, date
+from datetime import timedelta, datetime, time
 
 from django.db.models import Avg, Count
 from django.contrib.auth.models import User
 
 from mygpo.utils import daterange, flatten
 from mygpo.core.models import Podcast
+from mygpo.api.models import Podcast as OldPodcast
 from mygpo.api.models import Episode, EpisodeAction
 from mygpo.api.constants import DEVICE_TYPES
 from mygpo import migrate
 
 
-def listener_data(podcasts, start_date=date(2010, 1, 1), leap=timedelta(days=1)):
+def listener_data(podcasts, start_date=datetime(2010, 1, 1), leap=timedelta(days=1)):
     """ Returns data for the podcast listener timeseries
 
     An iterator with data for each day (starting from either the first released
@@ -41,14 +42,27 @@ def listener_data(podcasts, start_date=date(2010, 1, 1), leap=timedelta(days=1))
     """
 
     # pre-calculate episode list, make it index-able by release-date
-    episodes = flatten([podcast.get_episodes() for podcast in podcasts])
-    episodes = filter(lambda e: e.released, episodes)
-    episodes = dict([(e.released.date(), e) for e in episodes])
+    episodes = (podcast.get_episodes(since=start_date) for podcast in podcasts)
+    episodes = flatten(episodes)
+    episodes = dict((e.released.date(), e) for e in episodes)
 
-    listeners = [ list(p.listener_count_timespan()) for p in podcasts ]
+    listeners = [ list(p.listener_count_timespan(start=start_date))
+                    for p in podcasts ]
+    listeners = filter(None, listeners)
 
     # we start either at the first episode-release or the first listen-event
-    start = min( min(episodes.keys()), min([l[0][0] for l in listeners]))
+    events = []
+
+    if episodes.keys():
+        events.append(min(episodes.keys()))
+
+    if listeners:
+        events.append(min([l[0][0] for l in listeners]))
+
+    if not events:
+        return
+
+    start = min(events)
 
     for d in daterange(start, leap=leap):
 
@@ -68,7 +82,7 @@ def listener_data(podcasts, start_date=date(2010, 1, 1), leap=timedelta(days=1))
 
 
 
-def episode_listener_data(episode, start_date=date(2010, 1, 1), leap=timedelta(days=1)):
+def episode_listener_data(episode, start_date=datetime(2010, 1, 1), leap=timedelta(days=1)):
     """ Returns data for the episode listener timeseries
 
     An iterator with data for each day (starting from the first listen-event)
@@ -79,15 +93,19 @@ def episode_listener_data(episode, start_date=date(2010, 1, 1), leap=timedelta(d
      * episode: the episode, if it was released on that day, otherwise None
     """
 
-    listeners = list(episode.listener_count_timespan())
+    listeners = list(episode.listener_count_timespan(start=start_date))
+
+    if not listeners:
+        return
 
     # we always start at the first listen-event
     start = listeners[0][0]
+    start = datetime.combine(start, time())
 
     for d in daterange(start, leap=leap):
         next = d + leap
 
-        if listeners and listeners[0] and listeners[0][0] == d:
+        if listeners and listeners[0] and listeners[0][0] == d.date():
             day, l = listeners.pop()
         else:
             l = 0
@@ -103,7 +121,7 @@ def subscriber_data(podcasts):
 
     for podcast in podcasts:
         create_entry = lambda r: (r.timestamp.strftime('%y-%m'), r.subscriber_count)
-        data = dict(map(create_entry, podcast.subscribers))
+        data = dict(map(create_entry, podcast.get_all_subscriber_data()))
 
         for k in data:
             coll_data[k] += data[k]
@@ -118,12 +136,11 @@ def check_publisher_permission(user, podcast):
     if user.is_staff:
         return True
 
-    p = migrate.get_or_migrate_podcast(podcast)
-    u = migrate.get_or_migrate_user(user)
-    if p.get_id() in u.published_objects:
-        return True
+    if isinstance(podcast, OldPodcast):
+        podcast = migrate.get_or_migrate_podcast(podcast)
 
-    return False
+    u = migrate.get_or_migrate_user(user)
+    return (podcast.get_id() in u.published_objects)
 
 
 def colour_repr(val, max_val, colours):
