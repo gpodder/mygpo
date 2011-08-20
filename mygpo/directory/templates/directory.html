@@ -15,28 +15,37 @@
 {% block content %}
   <h1>{% trans "Podcast Directory" %}</h1>
 
-  {% for cat in categories %}
 
+  {% for c in categories %}
    <div class="intro-box">
-   <h2>{{ cat.label }}</h2>
-   <table class="list">
-    {% for entry in cat.entries %}
+    {% if c.cls == "PodcastList" %}
+     <h2>{% blocktrans with c.title as listtitle and c.username as username %}{{ listtitle }} <span class="by-user">by {{ username }}</span>{% endblocktrans %}</h2>
+    {% else %}
+     <h2>{{ c.label }}</h2>
+    {% endif %}
+
+    <table class="list">
+     {% for podcast in c.podcasts %}
+      <tr>
+       <td>{{ podcast|podcast_logo }}</td>
+       <td>{% podcast_group_link podcast %}</td>
+      </tr>
+     {% endfor %}
      <tr>
-      <td>{{ entry|podcast_logo }}</td>
-      <td>{% podcast_group_link entry %}</td>
+      <td></td>
+      <td>
+       {% if c.cls == "PodcastList" %}
+        <a href="{% url list-show c.username c.slug %}">{% trans "more..." %}</a>
+       {% else %}
+        <a href="{% url directory c.label %}">{% trans "more..." %}</a>
+       {% endif %}
      </tr>
-    {% endfor %}
-    <tr>
-     <td></td>
-     <td><a href="{% url directory cat.label %}">{% trans "more..." %}</a></td>
-    </tr>
-   </table>
+    </table>
    </div>
 
    {% if forloop.counter|divisibleby:"2" %}
     <br style="clear: both" />
    {% endif %}
-
   {% endfor %}
 
   <hr />

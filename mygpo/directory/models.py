@@ -4,6 +4,7 @@ from couchdbkit.ext.django.schema import *
 
 from mygpo.core.models import Podcast
 from mygpo.utils import iterate_together
+from mygpo.core.proxy import DocumentABCMeta
 
 
 class CategoryEntry(DocumentSchema):
@@ -18,6 +19,9 @@ class CategoryEntry(DocumentSchema):
 
 
 class Category(Document):
+
+    __metaclass__ = DocumentABCMeta
+
     label = StringProperty()
     updated = DateTimeProperty()
     spellings = StringListProperty()

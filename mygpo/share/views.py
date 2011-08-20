@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from django.contrib.sites.models import RequestSite
+from django.contrib.auth.decorators import login_required
 
 from mygpo.core.models import Podcast
 from mygpo.core.proxy import proxy_object
@@ -37,11 +38,13 @@ def list_decorator(must_own=False):
     return _tmp
 
 
+@login_required
 def search(request, username, listname):
     return directory_search(request, 'list_search.html',
             {'listname': listname})
 
 
+@login_required
 def lists_own(request):
 
     user = migrate.get_or_migrate_user(request.user)
@@ -57,7 +60,7 @@ def lists_user(request, username):
     user = get_object_or_404(User, username=username)
     user = migrate.get_or_migrate_user(user)
 
-    lists = PodcastList.for_user_slug(user._id)
+    lists = PodcastList.for_user(user._id)
 
     return render_to_response('lists_user.html', {
             'lists': lists,
@@ -94,6 +97,7 @@ def list_opml(request, plist, owner):
     return format_podcast_list(podcasts, 'opml', plist.title)
 
 
+@login_required
 def create_list(request):
     title = request.POST.get('title', None)
     slug = slugify(title)
@@ -112,8 +116,10 @@ def create_list(request):
     return HttpResponseRedirect(list_url)
 
 
+@login_required
 @list_decorator(must_own=True)
 def add_podcast(request, plist, owner, podcast_id):
+
     plist.podcasts.append(podcast_id)
     plist.save()
 
@@ -121,6 +127,7 @@ def add_podcast(request, plist, owner, podcast_id):
     return HttpResponseRedirect(list_url)
 
 
+@login_required
 @list_decorator(must_own=True)
 def remove_podcast(request, plist, owner, podcast_id):
     plist.podcasts.remove(podcast_id)
@@ -130,7 +137,21 @@ def remove_podcast(request, plist, owner, podcast_id):
     return HttpResponseRedirect(list_url)
 
 
+@login_required
 @list_decorator(must_own=True)
 def delete_list(request, plist, owner):
     plist.delete()
     return HttpResponseRedirect(reverse('lists-overview'))
+
+
+@login_required
+@list_decorator(must_own=False)
+def rate_list(request, plist, owner):
+    rating_val = int(request.GET.get('rate', None))
+    user = migrate.get_or_migrate_user(request.user)
+
+    plist.rate(rating_val, user._id)
+    plist.save()
+
+    list_url = reverse('list-show', args=[owner.username, plist.slug])
+    return HttpResponseRedirect(list_url)

@@ -44,6 +44,13 @@
  {% endfor %}
  </table>
 
+ <div class="vote">
+  <form action="{% url list-rate owner.username podcastlist.slug %}?rate=1" method="post">
+   {% csrf_token %}
+   <input type="submit" value="{% trans "Like" %}" />
+  </form>
+ </div>
+
  <div>
   <a href="{% url list-opml owner.username podcastlist.slug %}">
    <img src="/media/22x22/opml-icon.png" class="action-button" />
@@ -63,6 +70,14 @@
 
   <iframe name="results" class="results">
   </iframe>
+
+ {% endif %}
+ {% if not is_own and user.is_authenticated %}
+
+  <div class="info">
+   {% url lists-overview as create-url %}
+   {% blocktrans %}Create your own <a href="{{ create-url }}">podcast lists</a>.{% endblocktrans %}
+  </div>
 
  {% endif %}
 

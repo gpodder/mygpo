@@ -371,6 +371,11 @@ div.rate
     padding-bottom: 3em;
 }
 
+div.vote
+{
+    float: right;
+}
+
 div.devicesLeft
 {
     float:left;
@@ -804,4 +809,9 @@ iframe.results
 {
     width: 100%;
     border: none;
+}
+
+.by-user
+{
+    font-size: 50%;
 }

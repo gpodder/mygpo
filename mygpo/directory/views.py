@@ -1,4 +1,4 @@
-from itertools import imap as map
+from itertools import imap as map, islice, chain
 
 from django.core.cache import cache
 from django.http import HttpResponseRedirect, HttpResponseNotFound
@@ -17,6 +17,8 @@ from mygpo.directory.search import search_podcasts
 from mygpo.web import utils
 from mygpo.directory.tags import TagCloud
 from mygpo.utils import flatten, get_to_dict
+from mygpo.share.models import PodcastList
+from mygpo.users.models import User
 
 
 @manual_gc
@@ -49,20 +51,41 @@ def toplist(request, num=100, lang=None):
 
 
 
-def browse(request, num_categories=10, num_tags_cloud=90, podcasts_per_category=10):
+def browse(request, num_lists=4, num_categories=10, num_tags_cloud=90,
+        podcasts_per_category=10):
+
+    num_lists      = int(num_lists)
     num_categories = int(num_categories)
     num_tags_cloud = int(num_tags_cloud)
+
+    lists = islice(PodcastList.by_rating(), 0, num_lists)
+
+    def _prepare_list(l):
+        podcasts = Podcast.get_multi(l.podcasts[:podcasts_per_category])
+        user = User.get(l.user)
+        l = proxy_object(l)
+        l.podcasts = podcasts
+        l.username = user.username
+        l.cls = "PodcastList"
+        return l
+
+    lists = map(_prepare_list, lists)
+
 
     # collect Ids of top podcasts in top categories, fetch all at once
     categories = Category.top_categories(num_categories)
 
     def _prepare_category(category):
-        category.entries = category.get_podcasts(0, podcasts_per_category)
+        category = proxy_object(category)
+        category.podcasts = category.get_podcasts(0, podcasts_per_category)
+        category.cls = "Category"
         return category
 
     categories = map(_prepare_category, categories)
 
     tag_cloud = TagCloud(count=num_tags_cloud, skip=num_categories, sort_by_name=True)
+
+    categories = islice(chain(lists, categories), 0, num_categories)
 
     return render_to_response('directory.html', {
         'categories': categories,

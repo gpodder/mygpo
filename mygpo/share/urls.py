@@ -19,4 +19,6 @@ urlpatterns = patterns('mygpo.share.views',
                      'remove_podcast',            name='list-remove-podcast'),
  url(r'^user/(?P<username>[\w.-]+)/list/(?P<listname>[\w-]+)/delete$',
                      'delete_list',               name='list-delete'),
+ url(r'^user/(?P<username>[\w.-]+)/list/(?P<listname>[\w-]+)/rate$',
+                     'rate_list',                 name='list-rate'),
 )

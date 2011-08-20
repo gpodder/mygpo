@@ -26,7 +26,7 @@ from django.template import RequestContext
 from mygpo.core import models
 from mygpo.directory import tags
 from mygpo.directory.toplist import PodcastToplist
-from mygpo.users.models import Rating, Suggestions, History, HistoryEntry
+from mygpo.users.models import Suggestions, History, HistoryEntry
 from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, UserProfile
 from mygpo.users.models import PodcastUserState
 from mygpo.decorators import manual_gc
@@ -204,14 +204,14 @@ def blacklist(request, podcast_id):
 def rate_suggestions(request):
     rating_val = int(request.GET.get('rate', None))
 
-    if rating_val in (1, -1):
-        suggestion = Suggestions.for_user_oldid(request.user.id)
-        rating = Rating(rating=rating_val)
-        suggestion.ratings.append(rating)
-        suggestion.save()
-        # TODO: when we use Django messaging system,
-        # add a message for successful rating here
+    user = migrate.get_or_migrate_user(request.user)
 
+    suggestion = Suggestions.for_user_oldid(request.user.id)
+    suggestion.rate(rating_val, user._id)
+    suggestion.save()
+
+    # TODO: when we use Django messaging system,
+    # add a message for successful rating here
 
     return HttpResponseRedirect(reverse('suggestions'))
 

@@ -2,7 +2,8 @@ from datetime import datetime
 from couchdbkit import Server, Document
 
 from mygpo.core.models import Podcast, PodcastGroup, Episode, SubscriberData
-from mygpo.users.models import Rating, EpisodeAction, User, Device, SubscriptionAction, EpisodeUserState, PodcastUserState
+from mygpo.users.models import EpisodeAction, User, Device, SubscriptionAction, EpisodeUserState, PodcastUserState
+from mygpo.users.ratings import Rating
 from mygpo.log import log
 from mygpo import utils
 from mygpo.decorators import repeat_on_conflict

@@ -4,10 +4,11 @@ from couchdbkit.ext.django.schema import *
 from django.template.defaultfilters import slugify
 
 from mygpo.core.proxy import DocumentABCMeta
+from mygpo.users.models import RatingMixin
 
 
 
-class PodcastList(Document):
+class PodcastList(Document, RatingMixin):
     """ A list of Podcasts that a user creates for the purpose of sharing """
 
     __metaclass__ = DocumentABCMeta
@@ -34,6 +35,15 @@ class PodcastList(Document):
         r = cls.view('share/lists_by_user_slug',
                 startkey = [user_id, None],
                 endkey   = [user_id, {}],
+                include_docs = True,
+            )
+        return r.iterator()
+
+
+    @classmethod
+    def by_rating(cls):
+        r = cls.view('share/lists_by_rating',
+                descending   = True,
                 include_docs = True,
             )
         return r.iterator()
