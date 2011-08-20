@@ -19,7 +19,8 @@
   {% for c in categories %}
    <div class="intro-box">
     {% if c.cls == "PodcastList" %}
-     <h2>{% blocktrans with c.title as listtitle and c.username as username %}{{ listtitle }} <span class="by-user">by {{ username }}</span>{% endblocktrans %}</h2>
+     {% url lists-user c.username as user-lists-url %}
+     <h2>{% blocktrans with c.title as listtitle and c.username as username %}{{ listtitle }} <span class="by-user">by <a href="{{ user-lists-url }}">{{ username }}</a></span>{% endblocktrans %}</h2>
     {% else %}
      <h2>{{ c.label }}</h2>
     {% endif %}
