@@ -750,6 +750,13 @@ class User(Document):
                 yield proxy_object(episode, podcast=podcast)
 
 
+    def __eq__(self, other):
+        if not other:
+            return False
+
+        return self._id == other._id
+
+
     def __repr__(self):
         return 'User %s' % self._id
 

@@ -4,9 +4,11 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.contrib.auth.models import User
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
+from django.contrib.sites.models import RequestSite
 
 from mygpo.core.models import Podcast
 from mygpo.core.proxy import proxy_object
+from mygpo.api.simple import format_podcast_list
 from mygpo.share.models import PodcastList
 from mygpo import migrate
 from mygpo.directory.views import search as directory_search
@@ -64,6 +66,10 @@ def lists_user(request, username):
 
 @list_decorator(must_own=False)
 def list_show(request, plist, owner):
+
+    user = migrate.get_or_migrate_user(request.user)
+    is_own = owner == user
+
     plist = proxy_object(plist)
 
     podcasts = list(Podcast.get_multi(plist.podcasts))
@@ -71,11 +77,21 @@ def list_show(request, plist, owner):
 
     max_subscribers = max([p.subscriber_count() for p in podcasts] + [0])
 
+    site = RequestSite(request)
+
     return render_to_response('list.html', {
             'podcastlist': plist,
             'max_subscribers': max_subscribers,
             'owner': owner,
+            'domain': site.domain,
+            'is_own': is_own,
         }, context_instance=RequestContext(request))
+
+
+@list_decorator(must_own=False)
+def list_opml(request, plist, owner):
+    podcasts = list(Podcast.get_multi(plist.podcasts))
+    return format_podcast_list(podcasts, 'opml', plist.title)
 
 
 def create_list(request):

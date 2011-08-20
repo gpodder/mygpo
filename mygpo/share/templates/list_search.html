@@ -33,7 +33,7 @@
 <div class="pagination">
 
  {% if results.has_previous %}
-  <a href="{% url search %}?q={{ q }}&page={{ results.previous_page_number }}">«</a>
+  <a href="{% url list-search user.username listname %}?q={{ q }}&page={{ results.previous_page_number }}">«</a>
  {% endif %}
 
  {% for page in page_list %}
@@ -45,14 +45,14 @@
      {% if page == results.number %}
       <strong>{{ page }}</strong>
      {% else %}
-      <a href="{% url search %}?q={{ q }}&page={{ page }}">{{ page }}</a>
+      <a href="{% url list-search user.username listname %}?q={{ q }}&page={{ page }}">{{ page }}</a>
      {% endif %}
    {% endif %}
   </span>
  {% endfor %}
 
  {% if results.has_next %}
-  <a href="{% url search %}?q={{ q }}&page={{ results.next_page_number }}">»</a>
+  <a href="{% url list-search user.username listname %}?q={{ q }}&page={{ results.next_page_number }}">»</a>
  {% endif %}
 
 </div>
