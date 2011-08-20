@@ -10,6 +10,7 @@
 
 {% block content %}
   <h1>{% blocktrans with user.username as username %}Podcast Lists by {{ username }}{% endblocktrans%}</h1>
+  <hr />
 
   <table class="list">
    {% for list in lists %}

@@ -14,6 +14,7 @@
 
 {% block content %}
   <h1>{% trans "Podcast Lists" %}</h1>
+  <hr />
 
   <table class="list">
    {% for list in lists %}
@@ -30,6 +31,7 @@
    {% endfor %}
   </table>
 
+  <hr />
   <h2>{% trans "Create List" %}</h2>
   <form action="{% url list-create %}" method="post">
    {% csrf_token %}
