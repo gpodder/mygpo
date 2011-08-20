@@ -6,6 +6,11 @@ body
     margin: 0px;
 }
 
+body.embed
+{
+    background-color: white;
+}
+
 body, table, td, th
 {
     font-size: 12px;
@@ -738,7 +743,8 @@ input.subscribe
     border: none;
 }
 
-input.blacklist
+input.blacklist,
+input.remove
 {
     margin: 11px 0 0 0;
     background: url('/media/unsubscribe.png') no-repeat;
@@ -791,4 +797,11 @@ clear: both;
 div.subscriptions select
 {
     width: 100%;
+}
+
+
+iframe.results
+{
+    width: 100%;
+    border: none;
 }

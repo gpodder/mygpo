@@ -34,6 +34,7 @@ MENU_STRUCTURE = (
         )),
         (_('Share'), (
             ('/share/', _('Subscriptions')),
+            ('/lists/', _('Podcast Lists')),
         )),
         (_('Podcast Directory'), (
             ('/directory/', _('Directory')),

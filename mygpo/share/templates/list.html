@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+{% load podcasts %}
+{% load charts %}
+{% load math %}
+{% load utils %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/share/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/lists/"|section_menu }}{% endblock %}
+
+{% block title %}
+ {% blocktrans with podcastlist.title as list_title and owner.username as ownername %}"{{ list_title }}" by {{ ownername }}{% endblocktrans %}
+{% endblock %}
+
+{% block content %}
+  <h1>{% blocktrans with podcastlist.title as list_title and owner.username as ownername %}"{{ list_title }}" by {{ ownername }}{% endblocktrans %}</h1>
+
+ <table class="list">
+ {% for podcast in podcastlist.podcasts %}
+
+  <tr>
+   <td>
+    {{ podcast|podcast_logo }}
+   </td>
+   <td>
+    {% podcast_group_link podcast %}
+   </td>
+   <td>{{ podcast.subscriber_count|vertical_bar:max_subscribers }}</td>
+   <td>
+    <form action="{% url list-remove-podcast owner.username podcastlist.slug podcast.get_id %}" method="post" target="_parent">
+     {% csrf_token %}
+     <input type="submit" class="remove" value="" />
+    </form>
+   </td>
+  </tr>
+
+ {% endfor %}
+ </table>
+
+ <h2>Add Podcast</h2>
+ <form method="get" action="{% url list-search owner.username podcastlist.slug %}" class="search" target="results">
+  <input type="text" name="q" {% if q %}value="{{ q }}"{% endif %} >
+  <input type="submit" value="Search">
+ </form>
+
+ <iframe name="results" class="results">
+
+ </iframe>
+{% endblock %}

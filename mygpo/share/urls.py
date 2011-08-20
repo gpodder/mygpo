@@ -1,0 +1,20 @@
+from django.conf.urls.defaults import *
+
+urlpatterns = patterns('mygpo.share.views',
+ url(r'^lists/$',
+                     'lists_own',                 name='lists-overview'),
+ url(r'^lists/create$',
+                     'create_list',               name='list-create'),
+ url(r'^user/(?P<username>[\w.-]+)/lists/$',
+                     'lists_user',                name='lists-user'),
+ url(r'^user/(?P<username>[\w.-]+)/list/(?P<listname>[\w-]+)$',
+                     'list_show',                 name='list-show'),
+ url(r'^user/(?P<username>[\w.-]+)/list/(?P<listname>[\w-]+)/search$',
+                     'search',                    name='list-search'),
+ url(r'^user/(?P<username>[\w.-]+)/list/(?P<listname>[\w-]+)/add/(?P<podcast_id>\w+)$',
+                     'add_podcast',               name='list-add-podcast'),
+ url(r'^user/(?P<username>[\w.-]+)/list/(?P<listname>[\w-]+)/remove/(?P<podcast_id>\w+)$',
+                     'remove_podcast',            name='list-remove-podcast'),
+ url(r'^user/(?P<username>[\w.-]+)/list/(?P<listname>[\w-]+)/delete$',
+                     'delete_list',               name='list-delete'),
+)

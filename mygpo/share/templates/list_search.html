@@ -1,0 +1,66 @@
+{% extends "embed.html" %}
+
+{% load i18n %}
+{% load podcasts %}
+{% load charts %}
+
+{% block content %}
+
+  {% if results %}
+   <table class="list">
+    <tr>
+     <th></th>
+     <th>{% trans "Podcast" %}</th>
+     <th>{% trans "Subscribers" %}</th>
+     <th>{% trans "Add" %}</th>
+    </tr>
+
+    {% for podcast in results %}
+     <tr>
+      <td>{{ podcast|podcast_logo }}</td>
+      <td>{% podcast_group_link podcast %}</td>
+      <td>{{ podcast.subscriber_count|vertical_bar:max_subscribers }}</td>
+      <td>
+       <form action="{% url list-add-podcast user.username listname podcast.get_id %}" method="post" target="_parent">
+        {% csrf_token %}
+        <input type="submit" class="subscribe" value="" />
+       </form>
+      </td>
+     </tr>
+    {% endfor %}
+   </table>
+
+<div class="pagination">
+
+ {% if results.has_previous %}
+  <a href="{% url search %}?q={{ q }}&page={{ results.previous_page_number }}">«</a>
+ {% endif %}
+
+ {% for page in page_list %}
+  <span class="page-link">
+   {% if page == "..." %}
+    {{ page }}
+   {% else %}
+
+     {% if page == results.number %}
+      <strong>{{ page }}</strong>
+     {% else %}
+      <a href="{% url search %}?q={{ q }}&page={{ page }}">{{ page }}</a>
+     {% endif %}
+   {% endif %}
+  </span>
+ {% endfor %}
+
+ {% if results.has_next %}
+  <a href="{% url search %}?q={{ q }}&page={{ results.next_page_number }}">»</a>
+ {% endif %}
+
+</div>
+
+  {% else %}
+
+   <div>{% trans "Nothing found" %}</div>
+
+  {% endif %}
+
+{% endblock %}

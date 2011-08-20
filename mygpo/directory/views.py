@@ -97,7 +97,7 @@ def category(request, category, page_size=20):
 
 RESULTS_PER_PAGE=20
 
-def search(request):
+def search(request, template='search.html', args={}):
 
     if 'q' in request.GET:
         q = request.GET.get('q', '').encode('utf-8')
@@ -119,12 +119,13 @@ def search(request):
 
     max_subscribers = max([p.subscriber_count() for p in results] + [0])
 
-    return render_to_response('search.html', {
-            'q': q,
-            'results': results,
-            'page_list': page_list,
-            'max_subscribers': max_subscribers,
-        }, context_instance=RequestContext(request))
+    return render_to_response(template, dict(
+            q= q,
+            results= results,
+            page_list= page_list,
+            max_subscribers= max_subscribers,
+            **args
+            ), context_instance=RequestContext(request))
 
 
 

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+{% load podcasts %}
+{% load charts %}
+{% load math %}
+{% load utils %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/share/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/lists/"|section_menu }}{% endblock %}
+
+{% block title %}{% trans "Podcast Lists" %}{% endblock %}
+
+{% block content %}
+  <h1>{% trans "Podcast Lists" %}</h1>
+
+  <table class="list">
+   {% for list in lists %}
+    <tr>
+     <td><a href="{% url list-show user.username list.slug %}">{{ list.title }}</a></td>
+     <td>{% blocktrans with list.podcasts|length as num_podcasts %}{{ num_podcasts }} Podcasts{% endblocktrans %}</td>
+     <td>
+      <form action="{% url list-delete user.username list.slug %}" method="post">
+       {% csrf_token %}
+       <input type="submit" class="remove" value="" />
+      </form>
+     </td>
+    </tr>
+   {% endfor %}
+  </table>
+
+  <h2>{% trans "Create List" %}</h2>
+  <form action="{% url list-create %}" method="post">
+   {% csrf_token %}
+   Title: <input type="text" name="title" />
+   <button type="submit">{% trans "Create" %}</button>
+  </form>
+
+{% endblock %}
