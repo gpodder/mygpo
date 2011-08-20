@@ -1,9 +1,9 @@
 from django.conf.urls.defaults import *
 
 urlpatterns = patterns('mygpo.share.views',
- url(r'^lists/$',
+ url(r'^share/lists/$',
                      'lists_own',                 name='lists-overview'),
- url(r'^lists/create$',
+ url(r'^share/lists/create$',
                      'create_list',               name='list-create'),
  url(r'^user/(?P<username>[\w.-]+)/lists/$',
                      'lists_user',                name='lists-user'),

@@ -34,13 +34,14 @@ MENU_STRUCTURE = (
         )),
         (_('Share'), (
             ('/share/', _('Subscriptions')),
-            ('/lists/', _('Podcast Lists')),
+            ('/share/lists/', _('Podcast Lists')),
         )),
         (_('Podcast Directory'), (
             ('/directory/', _('Directory')),
             ('/toplist/', _('Toplist')),
             ('/search/', _('Search')),
             ('/toplist/episodes', _('Episodes')),
+            ('/lists/', _('Podcast Lists')),
             ('/podcast/', _('Podcast')),
             ('/user/subscriptions/', _('User subscriptions')),
         )),

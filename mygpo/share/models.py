@@ -41,12 +41,21 @@ class PodcastList(Document, RatingMixin):
 
 
     @classmethod
-    def by_rating(cls):
+    def by_rating(cls, **kwargs):
         r = cls.view('share/lists_by_rating',
                 descending   = True,
                 include_docs = True,
+                **kwargs
             )
         return r.iterator()
+
+
+    @classmethod
+    def count(cls, with_rating=True):
+        view = 'share/lists_by_rating' if with_rating else \
+               'share/lists_by_user_slug'
+
+        return cls.view(view).total_rows
 
 
     def __repr__(self):

@@ -188,3 +188,32 @@ def episode_toplist(request, num=100):
         'types': media_types,
         'all_types': CONTENT_TYPES,
     }, context_instance=RequestContext(request))
+
+
+def podcast_lists(request, page_size=20):
+
+    # Make sure page request is an int. If not, deliver first page.
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+
+    lists = PodcastList.by_rating(skip=(page-1) * page_size, limit=page_size)
+
+
+    def _prepare_list(l):
+        user = User.get(l.user)
+        l = proxy_object(l)
+        l.username = user.username
+        return l
+
+    lists = map(_prepare_list, lists)
+
+    num_pages = PodcastList.count() / page_size
+
+    page_list = utils.get_page_list(1, num_pages, page, 15)
+
+    return render_to_response('podcast_lists.html', {
+        'lists': lists,
+        'page_list': page_list,
+        }, context_instance=RequestContext(request))
