@@ -21,12 +21,18 @@
    <th>{% trans "List Name" %}</th>
    <th>{% trans "User" %}</th>
    <th>{% trans "Podcasts" %}</th>
+   <th>{% trans "Download" %}</th>
   </tr>
   {% for l in lists %}
    <tr>
     <td><a href="{% url list-show l.username l.slug %}">{{ l.title }}</a></td>
     <td><a href="{% url lists-user l.username %}">{{ l.username }}</a></td>
     <td class="numeric">{{ l.podcasts|length }}</td>
+    <td>
+     <a href="{% url list-opml l.username l.slug %}">
+      <img src="/media/22x22/opml-icon.png" />
+     </a>
+    </td>
    </tr>
   {% endfor %}
  </table>
