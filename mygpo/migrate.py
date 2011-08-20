@@ -363,6 +363,10 @@ def update_episode(olde, newe):
 
 
 def get_or_migrate_user(user):
+
+    if not user.is_authenticated():
+        return None
+
     u = User.for_oldid(user.id)
     if u:
         return u
