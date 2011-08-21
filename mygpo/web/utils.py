@@ -4,7 +4,7 @@ from django.views.decorators.cache import never_cache
 from django.utils.html import strip_tags
 from django.core.urlresolvers import reverse
 
-from mygpo.api.models import Podcast, EpisodeAction
+from mygpo.api.models import Podcast
 from babel import Locale, UnknownLocaleError
 from datetime import datetime
 import re

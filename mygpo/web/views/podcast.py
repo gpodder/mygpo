@@ -10,9 +10,9 @@ from django.contrib.sites.models import RequestSite
 from django.utils.translation import ugettext as _
 from mygpo.core import models
 from mygpo.core.proxy import proxy_object
-from mygpo.api.models import Podcast, Episode, EpisodeAction, Device, SyncGroup
+from mygpo.api.models import Podcast, Device, SyncGroup
 from mygpo.api.sanitizing import sanitize_url
-from mygpo.users.models import EpisodeAction, HistoryEntry
+from mygpo.users.models import HistoryEntry
 from mygpo.web.forms import PrivacyForm, SyncForm
 from mygpo.directory.tags import tags_for_user
 from mygpo.decorators import manual_gc, allowed_methods, repeat_on_conflict

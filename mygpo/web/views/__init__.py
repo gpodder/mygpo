@@ -27,7 +27,7 @@ from mygpo.core import models
 from mygpo.directory import tags
 from mygpo.directory.toplist import PodcastToplist
 from mygpo.users.models import Rating, Suggestions, History, HistoryEntry
-from mygpo.api.models import Podcast, Episode, Device, EpisodeAction, UserProfile
+from mygpo.api.models import Podcast, Device, UserProfile
 from mygpo.users.models import PodcastUserState
 from mygpo.decorators import manual_gc
 from django.contrib.auth.decorators import login_required

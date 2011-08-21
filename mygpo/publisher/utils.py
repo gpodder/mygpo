@@ -24,7 +24,6 @@ from django.contrib.auth.models import User
 from mygpo.utils import daterange, flatten
 from mygpo.core.models import Podcast
 from mygpo.api.models import Podcast as OldPodcast
-from mygpo.api.models import Episode, EpisodeAction
 from mygpo.api.constants import DEVICE_TYPES
 from mygpo import migrate
 
