@@ -16,7 +16,7 @@
   <h1>{% trans "Podcast Directory" %}</h1>
 
 
-  {% for c in categories %}
+  {% for c in topics %}
    <div class="intro-box">
     {% if c.cls == "PodcastList" %}
      {% url lists-user c.username as user-lists-url %}
