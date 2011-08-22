@@ -125,7 +125,7 @@ class EpisodeAction(DocumentSchema):
                 startkey[3] = device_oldid
                 endkey[3]   = device_oldid
             else:
-                add_filters.append( lambda x: x['device_oldid'] == device_oldid)
+                add_filters.append( lambda x: x.get('device_oldid', None) == device_oldid)
 
 
         db = EpisodeUserState.get_db()
