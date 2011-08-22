@@ -741,7 +741,7 @@ class User(Document):
         episodes = [p.get_episodes(until=max_date, descending=True) for p in
                 podcasts.values()]
 
-        cmp_key = lambda episode: episode.released
+        cmp_key = lambda episode: episode.released or datetime(2000, 01, 01)
 
         for res in iterate_together(episodes, key=cmp_key, reverse=True):
             # res is a sparse tuple
