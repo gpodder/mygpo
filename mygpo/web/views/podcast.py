@@ -101,7 +101,7 @@ def show(request, pid):
         current_site = RequestSite(request)
         return render_to_response('podcast.html', {
             'podcast': podcast,
-            'related_podcasts': related_podcasts,
+            'related_podcasts': rel_podcasts,
             'tags': tags,
             'url': current_site,
             'episodes': episodes,
