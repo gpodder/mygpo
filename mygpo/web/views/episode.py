@@ -239,8 +239,8 @@ def slug_id_decorator(f):
 
 
 def oldid_decorator(f):
-    def _decorator(request, e_oldid, *args, **kwargs):
-        episode = Episode.for_oldid(e_oldid)
+    def _decorator(request, id, *args, **kwargs):
+        episode = Episode.for_oldid(id)
 
         if episode is None:
             raise Http404
