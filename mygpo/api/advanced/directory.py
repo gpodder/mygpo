@@ -29,6 +29,7 @@ from mygpo.core import models
 from mygpo.utils import parse_range
 from mygpo.directory.tags import TagCloud
 from mygpo import migrate
+from mygpo.web.utils import get_episode_link_target, get_podcast_link_target
 
 
 @csrf_exempt
@@ -111,7 +112,7 @@ def podcast_data(obj, domain, scaled_logo_size=64):
         "logo_url": podcast.logo_url,
         "scaled_logo_url": 'http://%s%s' % (domain, scaled_logo_url),
         "website": podcast.link,
-        "mygpo_link": 'http://%s/podcast/%s' % (domain, obj.oldid),
+        "mygpo_link": 'http://%s%s' % (domain, get_podcast_link_target(obj)),
         }
 
 def episode_data(episode, domain, podcast=None):
@@ -130,7 +131,7 @@ def episode_data(episode, domain, podcast=None):
         }
 
     if episode.released:
-        data['released'] = released.strftime('%Y-%m-%dT%H:%M:%S')
+        data['released'] = episode.released.strftime('%Y-%m-%dT%H:%M:%S')
 
     return data
 
