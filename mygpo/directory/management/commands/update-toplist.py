@@ -1,4 +1,5 @@
 from datetime import datetime
+from optparse import make_option
 
 from django.core.management.base import BaseCommand
 
@@ -10,7 +11,14 @@ from mygpo.decorators import repeat_on_conflict
 
 class Command(BaseCommand):
 
+    option_list = BaseCommand.option_list + (
+        make_option('--silent', action='store_true', dest='silent',
+        default=False, help="Don't show any output"),
+    )
+
     def handle(self, *args, **options):
+
+        silent = options.get('silent')
 
         # couchdbkit doesn't preserve microseconds
         started = datetime.utcnow().replace(microsecond=0)
@@ -21,7 +29,9 @@ class Command(BaseCommand):
         for n, podcast in enumerate(podcasts):
             subscriber_count = self.get_subscriber_count(podcast.get_id())
             self.update(podcast=podcast, started=started, subscriber_count=subscriber_count)
-            progress(n, total)
+
+            if not silent:
+                progress(n, total)
 
 
     @repeat_on_conflict(['podcast'])
