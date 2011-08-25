@@ -16,7 +16,7 @@
 
 {% block content %}
   <h1>{{ podcastlist.title }}</h1>
-  {% url lists-user as user-lists-url %}
+  {% url lists-user owner.username as user-lists-url %}
   <small class="description">{% blocktrans with owner.username as ownername %}a podcast list by <a href="{{ user-lists-url }}">{{ ownername }}</a>{% endblocktrans %}</small>
   <hr />
 
