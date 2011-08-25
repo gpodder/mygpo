@@ -264,8 +264,8 @@ def multi_request_view(cls, view, wrap=True, auto_advance=True,
             key = obj['key']
 
             if wrap:
-                doc = wrapper(obj['doc'])
-                docid = doc._id
+                doc = wrapper(obj['doc']) if wrapper else obj['doc']
+                docid = doc._id if wrapper else obj['id']
             else:
                 docid = obj['id']
                 doc = obj

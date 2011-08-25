@@ -159,6 +159,7 @@ class ObjectsMissingSlugs(object):
         self.wrapper = wrapper
         self.start = start
         self.end = end
+        self.kwargs = {}
 
     def __len__(self):
         res = self.cls.view('maintenance/missing_slugs',
@@ -182,6 +183,7 @@ class ObjectsMissingSlugs(object):
                 reduce       = False,
                 wrapper      = self.wrapper,
                 auto_advance = False,
+                **self.kwargs
             )
 
 
@@ -191,10 +193,13 @@ class PodcastsMissingSlugs(ObjectsMissingSlugs):
     def __init__(self):
         from mygpo.core.models import Podcast
         super(PodcastsMissingSlugs, self).__init__(Podcast, self._podcast_wrapper)
+        self.kwargs = {'wrap': False}
 
     @staticmethod
-    def _podcast_wrapper(doc):
+    def _podcast_wrapper(r):
         from mygpo.core.models import Podcast, PodcastGroup
+
+        doc = r['doc']
 
         if doc['doc_type'] == 'Podcast':
             return Podcast.wrap(doc)
@@ -202,6 +207,10 @@ class PodcastsMissingSlugs(ObjectsMissingSlugs):
             pid = r['key'][2]
             pg = PodcastGroup.wrap(doc)
             return pg.get_podcast_by_id(pid)
+
+    def __iter__(self):
+        for r in super(PodcastsMissingSlugs, self).__iter__():
+            yield self._podcast_wrapper(r)
 
 
 class EpisodesMissingSlugs(ObjectsMissingSlugs):

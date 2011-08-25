@@ -13,7 +13,7 @@ function(doc)
             subscribers = podcast.subscribers[podcast.subscribers.length-1].subscriber_count;
         }
 
-        if(podcast.slug == null)
+        if((podcast.slug = null) && podcast.title)
         {
             emit(["Podcast", subscribers, podcast_id], null);
         }
@@ -24,6 +24,10 @@ function(doc)
     function searchEpisode(episode)
     {
         if(episode.slug != null)
+        {
+            return;
+        }
+        if(!episode.title)
         {
             return;
         }
