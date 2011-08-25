@@ -4,6 +4,10 @@
 {% load podcasts %}
 {% load charts %}
 
+{% block head %}
+ <base target="_parent" />
+{% endblock %}
+
 {% block content %}
 
   {% if results %}
