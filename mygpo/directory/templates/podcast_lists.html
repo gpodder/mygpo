@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+{% load podcasts %}
+{% load charts %}
+{% load math %}
+{% load utils %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/directory/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/lists/"|section_menu }}{% endblock %}
+
+{% block title %}{% trans "Podcast Lists" %}{% endblock %}
+
+{% block content %}
+ <h1>{% trans "Podcast Lists" %}</h1>
+ <hr />
+
+ <table class="list">
+  <tr>
+   <th>{% trans "List Name" %}</th>
+   <th>{% trans "User" %}</th>
+   <th>{% trans "Podcasts" %}</th>
+   <th>{% trans "Download" %}</th>
+  </tr>
+  {% for l in lists %}
+   <tr>
+    <td><a href="{% url list-show l.username l.slug %}">{{ l.title }}</a></td>
+    <td><a href="{% url lists-user l.username %}">{{ l.username }}</a></td>
+    <td class="numeric">{{ l.podcasts|length }}</td>
+    <td>
+     <a href="{% url list-opml l.username l.slug %}">
+      <img src="/media/22x22/opml-icon.png" />
+     </a>
+    </td>
+   </tr>
+  {% endfor %}
+ </table>
+
+<div class="pagination">
+
+ {% if entries.has_previous %}
+  <a href="{% url directory category %}?page={{ entries.previous_page_number }}">«</a>
+ {% endif %}
+
+ {% for page in page_list %}
+  <span class="page-link">
+   {% if page == "..." %}
+    {{ page }}
+   {% else %}
+
+     {% if page == entries.number %}
+      <strong>{{ page }}</strong>
+     {% else %}
+      <a href="{% url directory category %}?page={{ page }}">{{ page }}</a>
+     {% endif %}
+   {% endif %}
+  </span>
+ {% endfor %}
+
+ {% if entries.has_next %}
+  <a href="{% url directory category %}?page={{ entries.next_page_number }}">»</a>
+ {% endif %}
+
+</div>
+
+{% endblock %}

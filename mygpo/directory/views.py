@@ -1,4 +1,4 @@
-from itertools import imap as map
+from itertools import imap as map, islice
 
 from django.core.cache import cache
 from django.http import HttpResponseRedirect, HttpResponseNotFound
@@ -12,11 +12,14 @@ from mygpo.core.proxy import proxy_object
 from mygpo.data.mimetype import CONTENT_TYPES
 from mygpo.decorators import manual_gc
 from mygpo.directory.models import Category
+from mygpo.directory.topics import Topics
 from mygpo.directory.toplist import PodcastToplist, EpisodeToplist
 from mygpo.directory.search import search_podcasts
 from mygpo.web import utils
 from mygpo.directory.tags import TagCloud
 from mygpo.utils import flatten, get_to_dict
+from mygpo.share.models import PodcastList
+from mygpo.users.models import User
 
 
 @manual_gc
@@ -49,23 +52,20 @@ def toplist(request, num=100, lang=None):
 
 
 
-def browse(request, num_categories=10, num_tags_cloud=90, podcasts_per_category=10):
+def browse(request, num_lists=4, num_categories=10, num_tags_cloud=90,
+        podcasts_per_topic=10):
+
+    num_lists      = int(num_lists)
     num_categories = int(num_categories)
     num_tags_cloud = int(num_tags_cloud)
 
-    # collect Ids of top podcasts in top categories, fetch all at once
-    categories = Category.top_categories(num_categories)
-
-    def _prepare_category(category):
-        category.entries = category.get_podcasts(0, podcasts_per_category)
-        return category
-
-    categories = map(_prepare_category, categories)
+    topics = Topics(num_lists, num_categories, podcasts_per_topic)
+    topics = islice(topics, 0, num_categories)
 
     tag_cloud = TagCloud(count=num_tags_cloud, skip=num_categories, sort_by_name=True)
 
     return render_to_response('directory.html', {
-        'categories': categories,
+        'topics': topics,
         'tag_cloud': tag_cloud,
         }, context_instance=RequestContext(request))
 
@@ -97,7 +97,7 @@ def category(request, category, page_size=20):
 
 RESULTS_PER_PAGE=20
 
-def search(request):
+def search(request, template='search.html', args={}):
 
     if 'q' in request.GET:
         q = request.GET.get('q', '').encode('utf-8')
@@ -119,12 +119,13 @@ def search(request):
 
     max_subscribers = max([p.subscriber_count() for p in results] + [0])
 
-    return render_to_response('search.html', {
-            'q': q,
-            'results': results,
-            'page_list': page_list,
-            'max_subscribers': max_subscribers,
-        }, context_instance=RequestContext(request))
+    return render_to_response(template, dict(
+            q= q,
+            results= results,
+            page_list= page_list,
+            max_subscribers= max_subscribers,
+            **args
+            ), context_instance=RequestContext(request))
 
 
 
@@ -164,3 +165,32 @@ def episode_toplist(request, num=100):
         'types': media_types,
         'all_types': CONTENT_TYPES,
     }, context_instance=RequestContext(request))
+
+
+def podcast_lists(request, page_size=20):
+
+    # Make sure page request is an int. If not, deliver first page.
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+
+    lists = PodcastList.by_rating(skip=(page-1) * page_size, limit=page_size)
+
+
+    def _prepare_list(l):
+        user = User.get(l.user)
+        l = proxy_object(l)
+        l.username = user.username
+        return l
+
+    lists = map(_prepare_list, lists)
+
+    num_pages = PodcastList.count() / page_size
+
+    page_list = utils.get_page_list(1, num_pages, page, 15)
+
+    return render_to_response('podcast_lists.html', {
+        'lists': lists,
+        'page_list': page_list,
+        }, context_instance=RequestContext(request))

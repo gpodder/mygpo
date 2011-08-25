@@ -9,19 +9,14 @@ from mygpo.core.proxy import proxy_object
 from mygpo.core.models import Podcast, Episode
 from mygpo.utils import linearize, get_to_dict, iterate_together
 from mygpo.decorators import repeat_on_conflict
+from mygpo.users.ratings import RatingMixin
 
 
-class Rating(DocumentSchema):
-    rating = IntegerProperty()
-    timestamp = DateTimeProperty(default=datetime.utcnow)
-
-
-class Suggestions(Document):
+class Suggestions(Document, RatingMixin):
     user = StringProperty()
     user_oldid = IntegerProperty()
     podcasts = StringListProperty()
     blacklist = StringListProperty()
-    ratings = SchemaListProperty(Rating)
 
     @classmethod
     def for_user_oldid(cls, oldid):
@@ -748,6 +743,13 @@ class User(Document):
             for episode in filter(None, res):
                 podcast = podcasts.get(episode.podcast, None)
                 yield proxy_object(episode, podcast=podcast)
+
+
+    def __eq__(self, other):
+        if not other:
+            return False
+
+        return self._id == other._id
 
 
     def __repr__(self):
