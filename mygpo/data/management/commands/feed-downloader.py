@@ -37,8 +37,8 @@ class Command(BaseCommand):
                         fetch_queue.append(p)
 
         if options.get('new'):
-            podcasts = models.Podcast.objects.filter(episode__title='', episode__outdated=False).distinct()
-            fetch_queue.extend(podcasts)
+            podcasts = self.get_podcast_with_new_episodes()
+            fetch_queue.extend(list(podcasts))
 
         if options.get('random'):
             fetch_queue = models.Podcast.objects.all().order_by('?')
@@ -64,3 +64,15 @@ class Command(BaseCommand):
             print 'Updating %d podcasts...' % len(fetch_queue)
             feeddownloader.update_podcasts(fetch_queue)
 
+
+    def get_podcast_with_new_episodes(self):
+        db = newmodels.Podcast.get_db()
+        res = db.view('maintenance/episodes_need_update',
+                group_level = 1,
+                reduce      = True,
+            )
+
+        for r in res:
+            podcast_id = r['key']
+            podcast = newmodels.Podcast.get(podcast_id)
+            yield podcast.get_old_obj()
