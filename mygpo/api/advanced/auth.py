@@ -16,6 +16,7 @@
 #
 
 from mygpo.api.basic_auth import require_valid_user, check_username
+from mygpo.decorators import allowed_methods
 from django.contrib import auth
 from django.http import HttpResponse
 from datetime import datetime, timedelta
@@ -25,6 +26,7 @@ from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
 @require_valid_user
 @check_username
+@allowed_methods(['POST'])
 def login(request, username):
     """
     authenticates the user with regular http basic auth
@@ -36,6 +38,7 @@ def login(request, username):
 
 @csrf_exempt
 @check_username
+@allowed_methods(['POST'])
 def logout(request, username):
     """
     logs out the user. does nothing if he wasn't logged in
