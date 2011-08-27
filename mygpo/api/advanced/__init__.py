@@ -15,6 +15,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+from functools import partial
 from itertools import imap, chain
 from collections import defaultdict, namedtuple
 from mygpo.api.basic_auth import require_valid_user, check_username
@@ -217,39 +218,8 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
 
         actions = imap(convert_position, actions)
 
-
-    def clean_data(action):
-        action['podcast'] = action.get('podcast_url', None)
-        action['episode'] = action.get('episode_url', None)
-
-        if None in (action['podcast'], action['episode']):
-            return None
-
-        if 'device_oldid' in action:
-            device_oldid = action['device_oldid']
-            if not device_oldid in devices:
-                try:
-                    dev = Device.objects.get(id=device_oldid)
-                except Device.DoesNotExist:
-                    return None
-
-                dev = migrate.get_or_migrate_device(dev, user=new_user)
-                action['device'] = dev.uid
-            else:
-                action['device'] = devices[action['device_oldid']]
-            del action['device_oldid']
-
-        # remove superfluous keys
-        for x in action.keys():
-            if x not in EPISODE_ACTION_KEYS:
-                del action[x]
-
-        # set missing keys to None
-        for x in EPISODE_ACTION_KEYS:
-            if x not in action:
-                action[x] = None
-
-        return action
+    clean_data = partial(clean_episode_action_data,
+            user=user, devices=devices)
 
     actions = map(clean_data, actions)
     actions = filter(None, actions)
@@ -260,6 +230,46 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
     until_ = get_timestamp(until)
 
     return {'actions': actions, 'timestamp': until_}
+
+
+
+
+def clean_episode_action_data(action, user, devices):
+    action['podcast'] = action.get('podcast_url', None)
+    action['episode'] = action.get('episode_url', None)
+
+    if None in (action['podcast'], action['episode']):
+        return None
+
+    if 'device_oldid' in action:
+        device_oldid = action['device_oldid']
+        if not device_oldid in devices:
+            try:
+                dev = Device.objects.get(id=device_oldid)
+            except Device.DoesNotExist:
+                return None
+
+            dev = migrate.get_or_migrate_device(dev, user=user)
+            action['device'] = dev.uid
+        else:
+            action['device'] = devices[action['device_oldid']]
+        del action['device_oldid']
+
+    # remove superfluous keys
+    for x in action.keys():
+        if x not in EPISODE_ACTION_KEYS:
+            del action[x]
+
+    # set missing keys to None
+    for x in EPISODE_ACTION_KEYS:
+        if x not in action:
+            action[x] = None
+
+    return action
+
+
+
+
 
 
 def update_episodes(user, actions, now):
@@ -427,6 +437,8 @@ def updates(request, username, device_uid):
     except ValueError:
         return HttpResponseBadRequest('since-value is not a valid timestamp')
 
+    include_actions = parse_bool(request.GET.get('include_actions', False))
+
     dev = migrate.get_or_migrate_device(device)
     ret = get_subscription_changes(request.user, dev, since, now)
     domain = RequestSite(request).domain
@@ -450,6 +462,12 @@ def updates(request, username, device_uid):
 
     ret['add'] = map(prepare_podcast_data, ret['add'])
 
+    user = migrate.get_or_migrate_user(request.user)
+    devices = dict( (dev.oldid, dev.uid) for dev in user.devices )
+    clean_data = partial(clean_episode_action_data,
+            user=user, devices=devices)
+
+
 
     # index subscribed podcasts by their Id for fast access
     podcasts = dict( (p.get_id(), p) for p in subscriptions )
@@ -460,6 +478,11 @@ def updates(request, username, device_uid):
         podcast = podcasts.get(podcast_id, None)
         t = episode_data(episode_status.episode, domain, podcast)
         t['status'] = episode_status.status
+
+        # include latest action (bug 1419)
+        if include_actions and episode_status.action:
+            t['action'] = clean_data(episode_status.action)
+
         return t
 
     episode_updates = get_episode_updates(request.user, subscriptions, since)
@@ -471,12 +494,12 @@ def updates(request, username, device_uid):
 def get_episode_updates(user, subscribed_podcasts, since):
     """ Returns the episode updates since the timestamp """
 
-    EpisodeStatus = namedtuple('EpisodeStatus', 'episode status')
+    EpisodeStatus = namedtuple('EpisodeStatus', 'episode status action')
 
     episode_status = {}
     episodes = chain.from_iterable(p.get_episodes(since) for p in subscribed_podcasts)
     for episode in episodes:
-        episode_status[episode._id] = EpisodeStatus(episode, 'new')
+        episode_status[episode._id] = EpisodeStatus(episode, 'new', None)
 
     e_actions = (p.get_episode_states(user.id) for p in subscribed_podcasts)
     e_actions = chain.from_iterable(e_actions)
@@ -489,7 +512,7 @@ def get_episode_updates(user, subscribed_podcasts, since):
         else:
             episode = models.Episode.get(e_id)
 
-        episode_status[e_id] = EpisodeStatus(episode, action['action'])
+        episode_status[e_id] = EpisodeStatus(episode, action['action'], action)
 
     return episode_status.itervalues()
 
