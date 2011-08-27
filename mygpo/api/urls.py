@@ -35,4 +35,8 @@ urlpatterns += patterns('mygpo.api.advanced',
     (r'^api/2/settings/(?P<username>[\w.-]+)/(?P<scope>account|device|podcast|episode)\.json', 'settings.main'),
     (r'^api/2/favorites/(?P<username>[\w.-]+).json', 'favorites'),
 
+    (r'^api/2/lists/(?P<username>[\w.-]+)/create\.(?P<format>\w+)', 'lists.create'),
+    (r'^api/2/lists/(?P<username>[\w.-]+)\.json',                   'lists.get_lists'),
+ url(r'^api/2/lists/(?P<username>[\w.-]+)/list/(?P<listname>[\w-]+)\.(?P<format>\w+)', 'lists.podcast_list', name='api-get-list'),
+
 )
