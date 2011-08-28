@@ -75,4 +75,8 @@ class Command(BaseCommand):
         for r in res:
             podcast_id = r['key']
             podcast = newmodels.Podcast.get(podcast_id)
-            yield podcast.get_old_obj()
+            if podcast:
+                try:
+                    yield podcast.get_old_obj()
+                except:
+                    pass
