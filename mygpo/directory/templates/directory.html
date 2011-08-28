@@ -5,6 +5,7 @@
 {% load charts %}
 {% load math %}
 {% load utils %}
+{% load cache %}
 
 {% load menu %}
 {% block mainmenu %}{{ "/directory/"|main_menu }}{% endblock %}
@@ -16,6 +17,7 @@
   <h1>{% trans "Podcast Directory" %}</h1>
 
 
+  {% cache 3600 topics %}
   {% for c in topics %}
    <div class="intro-box">
     {% if c.cls == "PodcastList" %}
@@ -48,9 +50,11 @@
     <br style="clear: both" />
    {% endif %}
   {% endfor %}
+  {% endcache %}
 
   <hr />
 
+  {% cache 3600 tagcloud %}
   <div id="tagcloud">
    {% for tag in tag_cloud.entries %}
     <span style="font-size: {% smartwidthratio tag.weight tag_cloud.max_weight 4 1 %}em">
@@ -58,6 +62,7 @@
     </span>
    {% endfor %}
   </div>
+  {% endcache %}
 
 {% endblock %}
 
