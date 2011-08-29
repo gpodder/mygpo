@@ -146,14 +146,12 @@ def get_episode_metadata(entry, url, mimetype, podcast_language):
             'filesize': get_filesize(entry, url),
             'language': entry.get('language', podcast_language),
             'mimetypes': [mimetype],
+            'outdated': False,
     }
     try:
         d['released'] = datetime.datetime(*(entry.updated_parsed)[:6])
     except:
         d['released'] = None
-
-    # we need to distinguish it from non-updated episodes
-    d['outdated'] = not d['title']
 
     return d
 

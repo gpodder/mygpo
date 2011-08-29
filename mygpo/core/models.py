@@ -28,7 +28,7 @@ class Episode(Document, SlugMixin):
     filesize = IntegerProperty()
     language = StringProperty()
     last_update = DateTimeProperty()
-    outdated = BooleanProperty()
+    outdated = BooleanProperty(default=False)
     mimetypes = StringListProperty()
     merged_ids = StringListProperty()
     oldid = IntegerProperty()
