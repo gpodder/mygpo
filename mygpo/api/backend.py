@@ -15,9 +15,9 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from mygpo.api.models import Device, Podcast
+from mygpo.api.models import Device
 from mygpo.data.mimetype import get_type, CONTENT_TYPES
-from mygpo.core import models
+from mygpo.core.models import Podcast, Episode
 from mygpo.users.models import EpisodeUserState
 from datetime import timedelta
 
@@ -27,23 +27,16 @@ except ImportError:
     import json
 
 
-def get_podcasts_for_languages(languages=None, podcast_query=Podcast.objects.all()):
-    if not languages:
-        return Podcast.objects.all()
-
-    regex = '^(' + '|'.join(languages) + ')'
-    return podcast_query.filter(language__regex=regex)
-
-
-
-def get_random_picks(languages=None, recent_days=timedelta(days=7)):
-    all_podcasts    = Podcast.objects.all().exclude(title='').order_by('?')
-    lang_podcasts   = get_podcasts_for_languages(languages, all_podcasts)
-
-    if lang_podcasts.count() > 0:
-        return lang_podcasts
-    else:
-        return all_podcasts
+def get_random_picks(languages=None):
+    # TODO: implement
+    return Podcast.random()
+#    all_podcasts    = Podcast.objects.all().exclude(title='').order_by('?')
+#    lang_podcasts   = get_podcasts_for_languages(languages, all_podcasts)
+#
+#    if lang_podcasts.count() > 0:
+#        return lang_podcasts
+#    else:
+#        return all_podcasts
 
 
 def get_device(user, uid, undelete=True):
@@ -64,5 +57,5 @@ def get_device(user, uid, undelete=True):
 def get_favorites(user):
     favorites = EpisodeUserState.view('users/favorite_episodes_by_user', key=user.id)
     ids = [res['value'] for res in favorites]
-    episodes = models.Episode.get_multi(ids)
+    episodes = Episode.get_multi(ids)
     return episodes

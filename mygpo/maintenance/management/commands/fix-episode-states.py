@@ -5,7 +5,6 @@ from django.contrib.auth.models import User
 
 from mygpo.core.models import Episode
 from mygpo.decorators import repeat_on_conflict
-from mygpo.api.models import Podcast
 from mygpo.users.models import EpisodeUserState
 from mygpo.maintenance.merge import merge_episode_states
 from mygpo.utils import progress
@@ -33,9 +32,8 @@ class Command(BaseCommand):
                     state.delete()
                     continue
 
-                try:
-                    old_podcast = Podcast.objects.get(url=state.podcast_ref_url)
-                except Podcast.DoesNotExist:
+                podcast = Podcast.for_url(state.podcast_ref_url)
+                if not podcast:
                     state.delete()
                     continue
 

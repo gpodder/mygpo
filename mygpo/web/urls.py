@@ -33,20 +33,23 @@ urlpatterns += patterns('mygpo.web.views.subscriptions',
 urlpatterns += patterns('mygpo.web.views.podcast',
  url(r'^subscribe',                                               'subscribe_url', name='subscribe-by-url'),
 
- url(r'^podcast/(?P<pid>\d+)$',                                   'show',          name='podcast'),
- url(r'^podcast/(?P<pid>\d+)/subscribe$',                         'subscribe',     name='subscribe'),
- url(r'^podcast/(?P<pid>\d+)/unsubscribe/(?P<device_id>\d+)',     'unsubscribe',   name='unsubscribe'),
- url(r'^podcast/(?P<pid>\d+)/add-tag',                            'add_tag',       name='add-tag'),
- url(r'^podcast/(?P<pid>\d+)/remove-tag',                         'remove_tag',    name='remove-tag'),
- url(r'^podcast/(?P<pid>\d+)/set-public',                         'set_public',    name='podcast-public',  kwargs={'public': True}),
- url(r'^podcast/(?P<pid>\d+)/set-private',                        'set_public',    name='podcast-private', kwargs={'public': False}),
+ url(r'^podcast/(?P<pid>\d+)$',                                   'show_oldid',          name='podcast'),
+ url(r'^podcast/(?P<pid>\d+)/subscribe$',                         'subscribe_oldid',     name='subscribe'),
+ url(r'^podcast/(?P<pid>\d+)/unsubscribe/(?P<device_id>\d+)',     'unsubscribe_oldid',   name='unsubscribe'),
+ url(r'^podcast/(?P<pid>\d+)/add-tag',                            'add_tag_oldid',       name='add-tag'),
+ url(r'^podcast/(?P<pid>\d+)/remove-tag',                         'remove_tag_oldid',    name='remove-tag'),
+ url(r'^podcast/(?P<pid>\d+)/set-public',                         'set_public_oldid',    name='podcast-public',  kwargs={'public': True}),
+ url(r'^podcast/(?P<pid>\d+)/set-private',                        'set_public_oldid',    name='podcast-private', kwargs={'public': False}),
 
  url(r'^podcast/(?P<slug_id>[\w-]+)/?$',                             'show_slug_id',        name='podcast-slug-id'),
  url(r'^podcast/(?P<slug_id>[\w-]+)/subscribe$',                     'subscribe_slug_id',   name='subscribe-slug-id'),
  url(r'^podcast/(?P<slug_id>[\w-]+)/unsubscribe/(?P<device_id>\d+)', 'unsubscribe_slug_id', name='unsubscribe-slug-id'),
  url(r'^podcast/(?P<slug_id>[\w-]+)/add-tag',                        'add_tag_slug_id',     name='add-tag-slug-id'),
  url(r'^podcast/(?P<slug_id>[\w-]+)/remove-tag',                     'remove_tag_slug_id',  name='remove-tag-slug-id'),
-)
+ url(r'^podcast/(?P<slug_id>[\w-]+)/set-public',                     'set_public_slug_id',    name='podcast-public',  kwargs={'public': True}),
+ url(r'^podcast/(?P<slug_id>[\w-]+)/set-private',                    'set_public_slug_id',    name='podcast-private', kwargs={'public': False}),
+ )
+
 
 urlpatterns += patterns('mygpo.web.views.episode',
  url(r'^favorites/',                                              'list_favorites',name='favorites'),

@@ -22,7 +22,6 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
-from mygpo.api.models import Podcast
 import mygpo.web.utils
 from mygpo.test import create_auth_string
 
@@ -32,9 +31,6 @@ class SimpleWebTests(TestCase):
         self.user, _ = User.objects.get_or_create(username='test')
         self.user.set_password('pwd')
         self.user.save()
-
-        self.podcast, _ = Podcast.objects.get_or_create(url='http://example.com/feed.xml',
-            defaults = {'title': 'Test Podcast'})
 
         self.auth_string = create_auth_string('test', 'pwd')
 
@@ -67,8 +63,6 @@ class SimpleWebTests(TestCase):
 
     def test_access_podcast_pages(self):
         pages = ['podcast', ]
-        self.access_pages(pages, [self.podcast.id], False)
-        self.access_pages(pages, [self.podcast.id], True)
 
 
     def access_pages(self, pages, args, login):

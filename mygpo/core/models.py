@@ -2,6 +2,7 @@ import hashlib
 import re
 from datetime import datetime
 from dateutil import parser
+from random import randint
 
 from couchdbkit.ext.django.schema import *
 
@@ -366,6 +367,64 @@ class Podcast(Document, SlugMixin):
         return None
 
 
+    @classmethod
+    def random(cls):
+        """ Returns an infinite iterator of random podcasts
+
+        One query is required for each podcast that is returned"""
+
+        total = cls.view('core/podcasts_by_oldid').total_rows
+        db = cls.get_db()
+
+        while True:
+            n = randint(0, total)
+            res = db.view('core/podcasts_by_oldid',
+                    skip         = n,
+                    include_docs = True,
+                    limit        = 1
+                )
+
+            if not res:
+                continue
+
+            r = res.one()
+            obj = r['doc']
+            if obj['doc_type'] == 'Podcast':
+                yield Podcast.wrap(obj)
+
+            else:
+                oldid = r[u'key']
+                pg = PodcastGroup.wrap(obj)
+                podcast = pg.get_podcast_by_oldid(oldid)
+                yield podcast
+
+
+    @classmethod
+    def by_last_update(cls):
+        db = cls.get_db()
+        res = db.view('maintenance/podcasts_by_last_update',
+                include_docs = True,
+            )
+
+        for r in res:
+            r = res.one()
+            obj = r['doc']
+            if obj['doc_type'] == 'Podcast':
+                yield Podcast.wrap(obj)
+
+            else:
+                pid = r[u'key'][1]
+                pg = PodcastGroup.wrap(obj)
+                podcast = pg.get_podcast_by_id(pid)
+                yield podcast
+
+
+    @classmethod
+    def count(cls):
+        r = cls.view('core/podcasts_by_id', limit=0)
+        return r.total_rows
+
+
     def get_podcast_by_id(self, _):
         return self
     get_podcast_by_oldid = get_podcast_by_id
@@ -381,6 +440,11 @@ class Podcast(Document, SlugMixin):
     @property
     def display_title(self):
         return self.title or self.url
+
+
+    def group_with(*args, **kwargs):
+        # TODO: implement
+        raise NotImplemented
 
 
     def get_episodes(self, since=None, until={}, **kwargs):
@@ -625,13 +689,6 @@ class Podcast(Document, SlugMixin):
             yield action
 
 
-    def get_old_obj(self):
-        if self.oldid:
-            from mygpo.api.models import Podcast
-            return Podcast.objects.get(id=self.oldid)
-        return None
-
-
     def __hash__(self):
         return hash(self.get_id())
 
@@ -794,10 +851,6 @@ class PodcastGroup(Document, SlugMixin):
                         key=Podcast.subscriber_count, reverse=True)
         self.save()
         return self.podcasts[-1]
-
-    def get_old_obj(self):
-        from mygpo.api.models import PodcastGroup
-        return PodcastGroup.objects.get(id=self.oldid) if self.oldid else None
 
 
     def __repr__(self):

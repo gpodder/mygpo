@@ -8,15 +8,16 @@ from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
 from django.utils.translation import ugettext as _
-from mygpo.core import models
+from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.core.proxy import proxy_object
-from mygpo.api.models import Podcast, Device, SyncGroup
+from mygpo.api.models import Device, SyncGroup
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.users.models import HistoryEntry
 from mygpo.web.forms import PrivacyForm, SyncForm
 from mygpo.directory.tags import tags_for_user
 from mygpo.decorators import manual_gc, allowed_methods, repeat_on_conflict
 from mygpo.utils import daterange
+from mygpo.web.utils import get_podcast_link_target
 from mygpo.log import log
 from mygpo import migrate
 
@@ -31,7 +32,7 @@ def update_podcast_settings(state, is_public):
 
 @allowed_methods(['GET'])
 def show_slug(request, slug):
-    podcast = models.Podcast.for_slug(slug)
+    podcast = Podcast.for_slug(slug)
 
     if slug != podcast.slug:
         target = reverse('podcast_slug', args=[podcast.slug])
@@ -41,23 +42,15 @@ def show_slug(request, slug):
 
 
 @allowed_methods(['GET'])
-def show(request, pid):
+def show(request, podcast):
 
-    try:
-        pid = int(pid)
-    except (TypeError, ValueError):
-        raise Http404
-
-    podcast = get_object_or_404(Podcast, pk=pid)
-    new_podcast = migrate.get_or_migrate_podcast(podcast)
-
-    episodes = episode_list(new_podcast, request.user)
+    episodes = episode_list(podcast, request.user)
 
     max_listeners = max([e.listeners for e in episodes] + [0])
 
     if podcast.group:
-        rel_podcasts = [x for x in podcast.group.podcasts() if x != podcast]
-        rel_podcasts = map(migrate.get_or_migrate_podcast, rel_podcasts)
+        group = PodcastGroup.get(podcast.group)
+        rel_podcasts = filter(lambda x: x != podcast, group.podcasts)
     else:
         rel_podcasts = []
 
@@ -69,11 +62,11 @@ def show(request, pid):
         for dev in Device.objects.filter(user=request.user):
             dev.sync()
 
-        state = new_podcast.get_user_state(request.user)
+        state = podcast.get_user_state(request.user)
         subscribed_devices = state.get_subscribed_device_ids()
         subscribed_devices = [user.get_device(x) for x in subscribed_devices]
 
-        subscribe_targets = new_podcast.subscribe_targets(request.user)
+        subscribe_targets = podcast.subscribe_targets(request.user)
 
         history = list(state.actions)
         for h in history:
@@ -111,14 +104,13 @@ def show(request, pid):
 
 def get_tags(podcast, user):
     tags = {}
-    new_p = migrate.get_or_migrate_podcast(podcast)
-    for t in new_p.all_tags():
+    for t in podcast.all_tags():
         tag_str = t.lower()
         tags[tag_str] = False
 
     if not user.is_anonymous():
-        users_tags = tags_for_user(user, new_p.get_id())
-        for t in users_tags.get(new_p.get_id(), []):
+        users_tags = tags_for_user(user, podcast.get_id())
+        for t in users_tags.get(podcast.get_id(), []):
             tag_str = t.lower()
             tags[tag_str] = True
 
@@ -161,10 +153,8 @@ def episode_list(podcast, user):
 
 
 @login_required
-def add_tag(request, pid):
-    podcast = get_object_or_404(Podcast, id=pid)
-    new_p = migrate.get_or_migrate_podcast(podcast)
-    podcast_state = new_p.get_user_state(request.user)
+def add_tag(request, podcast):
+    podcast_state = podcast.get_user_state(request.user)
 
     tag_str = request.GET.get('tag', '')
     if not tag_str:
@@ -186,10 +176,8 @@ def add_tag(request, pid):
 
 
 @login_required
-def remove_tag(request, pid):
-    podcast = get_object_or_404(Podcast, id=pid)
-    new_p = migrate.get_or_migrate_podcast(podcast)
-    podcast_state = new_p.get_user_state(request.user)
+def remove_tag(request, podcast):
+    podcast_state = podcast.get_user_state(request.user)
 
     tag_str = request.GET.get('tag', '')
     if not tag_str:
@@ -213,8 +201,7 @@ def remove_tag(request, pid):
 @manual_gc
 @login_required
 @allowed_methods(['GET', 'POST'])
-def subscribe(request, pid):
-    podcast = get_object_or_404(Podcast, pk=pid)
+def subscribe(request, podcast):
     error_message = None
 
     if request.method == 'POST':
@@ -229,19 +216,17 @@ def subscribe(request, pid):
                 device = target
 
             try:
-                p = migrate.get_or_migrate_podcast(podcast)
-                p.subscribe(device)
+                podcast.subscribe(device)
             except Exception as e:
                 log('Web: %(username)s: could not subscribe to podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
-                    {'username': request.user.username, 'podcast_url': p.url, 'device_id': device.id, 'exception': e})
+                    {'username': request.user.username, 'podcast_url': podcast.url, 'device_id': device.id, 'exception': e})
 
-            return HttpResponseRedirect('/podcast/%s' % podcast.id)
+            return HttpResponseRedirect(get_podcast_link_target(podcast))
 
         except ValueError, e:
             error_message = _('Could not subscribe to the podcast: %s' % e)
 
-    new_podcast = migrate.get_or_migrate_podcast(podcast)
-    targets = new_podcast.subscribe_targets(request.user)
+    targets = podcast.subscribe_targets(request.user)
 
     form = SyncForm()
     form.set_targets(targets, _('Choose a device:'))
@@ -256,18 +241,16 @@ def subscribe(request, pid):
 
 @manual_gc
 @login_required
-def unsubscribe(request, pid, device_id):
+def unsubscribe(request, podcast, device_id):
 
     return_to = request.GET.get('return_to', None)
 
     if not return_to:
         raise Http404('Wrong URL')
 
-    podcast = get_object_or_404(Podcast, pk=pid)
-    p = migrate.get_or_migrate_podcast(podcast)
     device = get_object_or_404(Device, pk=device_id, user=request.user)
     try:
-        p.unsubscribe(device)
+        podcast.unsubscribe(device)
     except Exception as e:
         log('Web: %(username)s: could not unsubscribe from podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
             {'username': request.user.username, 'podcast_url': p.url, 'device_id': device.id, 'exception': e})
@@ -288,24 +271,16 @@ def subscribe_url(request):
     if url == '':
         raise Http404('Please specify a valid url')
 
-    podcast, created = Podcast.objects.get_or_create(url=url)
+    podcast = Podcast.for_url(url, create=True)
 
-    return HttpResponseRedirect('/podcast/%d/subscribe' % podcast.pk)
+    return get_podcast_link_target(podcast, 'subscribe')
 
 
 @allowed_methods(['POST'])
-def set_public(request, pid, public):
-    try:
-        pid = int(pid)
-    except (TypeError, ValueError):
-        raise Http404
-
-    podcast = get_object_or_404(Podcast, pk=pid)
-    new_podcast = migrate.get_or_migrate_podcast(podcast)
-    state = new_podcast.get_user_state(request.user)
+def set_public(request, podcast, public):
+    state = podcast.get_user_state(request.user)
     update_podcast_settings(state=state, is_public=public)
-
-    return HttpResponseRedirect(reverse('podcast', args=[pid]))
+    return get_podcast_link_target(podcast)
 
 
 # To make all view accessible via either CouchDB-ID or Slugs
@@ -314,12 +289,29 @@ def set_public(request, pid, public):
 
 def slug_id_decorator(f):
     def _decorator(request, slug_id, *args, **kwargs):
-        podcast = models.Podcast.for_slug_id(slug_id)
+        podcast = Podcast.for_slug_id(slug_id)
 
         if podcast is None:
             raise Http404
 
-        return f(request, podcast.oldid, *args, **kwargs)
+        return f(request, podcast, *args, **kwargs)
+
+    return _decorator
+
+
+def oldid_decorator(f):
+    def _decorator(request, pid, *args, **kwargs):
+        try:
+            pid = int(pid)
+        except (TypeError, ValueError):
+            raise Http404
+
+        podcast = Podcast.for_oldid(pid)
+
+        if not podcast:
+            raise Http404
+
+        return f(request, podcast, *args, **kwargs)
 
     return _decorator
 
@@ -329,3 +321,12 @@ subscribe_slug_id   = slug_id_decorator(subscribe)
 unsubscribe_slug_id = slug_id_decorator(unsubscribe)
 add_tag_slug_id     = slug_id_decorator(add_tag)
 remove_tag_slug_id  = slug_id_decorator(remove_tag)
+set_public_slug_id  = slug_id_decorator(set_public)
+
+
+show_oldid          = oldid_decorator(show)
+subscribe_oldid     = oldid_decorator(subscribe)
+unsubscribe_oldid   = oldid_decorator(unsubscribe)
+add_tag_oldid       = oldid_decorator(add_tag)
+remove_tag_oldid    = oldid_decorator(remove_tag)
+set_public_oldid    = oldid_decorator(set_public)

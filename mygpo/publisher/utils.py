@@ -23,7 +23,6 @@ from django.contrib.auth.models import User
 
 from mygpo.utils import daterange, flatten
 from mygpo.core.models import Podcast
-from mygpo.api.models import Podcast as OldPodcast
 from mygpo.api.constants import DEVICE_TYPES
 from mygpo import migrate
 
@@ -134,9 +133,6 @@ def subscriber_data(podcasts):
 def check_publisher_permission(user, podcast):
     if user.is_staff:
         return True
-
-    if isinstance(podcast, OldPodcast):
-        podcast = migrate.get_or_migrate_podcast(podcast)
 
     u = migrate.get_or_migrate_user(user)
     return (podcast.get_id() in u.published_objects)

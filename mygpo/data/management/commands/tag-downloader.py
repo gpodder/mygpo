@@ -1,6 +1,5 @@
 from django.core.management.base import BaseCommand
 
-from mygpo import migrate
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.api import models as oldmodels
@@ -41,8 +40,8 @@ class Command(BaseCommand):
                     fetch_queue.extend(obj.podcasts)
 
         if options.get('random'):
-            podcasts = oldmodels.Podcast.objects.all().order_by('?')
-            fetch_queue.extend(map(migrate.get_or_migrate_podcast, podcasts))
+            podcasts = Podcast.random()
+            fetch_queue.extend(podcasts)
 
         fetch_queue.extend(filter(None, map(Podcast.for_url, args)))
 

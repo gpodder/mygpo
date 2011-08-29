@@ -29,9 +29,9 @@ from django.contrib.sites.models import RequestSite
 from mygpo.api.constants import EPISODE_ACTION_TYPES
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core import models
+from mygpo.core.models import Podcast
 from mygpo.core.proxy import proxy_object
 from mygpo.core.models import Episode
-from mygpo.api.models import Podcast
 from mygpo.users.models import Chapter, HistoryEntry, EpisodeAction
 from mygpo.api import backend
 from mygpo.decorators import manual_gc
@@ -44,7 +44,7 @@ from mygpo.web.utils import get_episode_link_target
 @manual_gc
 def episode(request, episode):
 
-    podcast = models.Podcast.get(episode.podcast)
+    podcast = Podcast.get(episode.podcast)
 
     if not podcast:
         raise Http404
@@ -157,7 +157,7 @@ def list_favorites(request):
 
     episodes = backend.get_favorites(request.user)
     podcast_ids = [episode.podcast for episode in episodes]
-    podcasts = get_to_dict(models.Podcast, podcast_ids, models.Podcast.get_id)
+    podcasts = get_to_dict(Podcast, podcast_ids, Podcast.get_id)
 
     def set_podcast(episode):
         episode = proxy_object(episode)
@@ -170,10 +170,7 @@ def list_favorites(request):
 
     feed_url = 'http://%s/%s' % (site.domain, reverse('favorites-feed', args=[request.user.username]))
 
-    try:
-        podcast = Podcast.objects.get(url=feed_url)
-    except Podcast.DoesNotExist:
-        podcast = None
+    podcast = Podcast.for_url(feed_url)
 
     if 'public_feed' in request.GET:
         user.favorite_feeds_token = ''

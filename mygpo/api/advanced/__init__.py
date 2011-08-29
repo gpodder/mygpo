@@ -20,7 +20,7 @@ from itertools import imap, chain
 from collections import defaultdict, namedtuple
 from mygpo.api.basic_auth import require_valid_user, check_username
 from django.http import HttpResponse, HttpResponseBadRequest
-from mygpo.api.models import Device, Podcast, EPISODE_ACTION_TYPES, DEVICE_TYPES
+from mygpo.api.models import Device, EPISODE_ACTION_TYPES, DEVICE_TYPES
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url, sanitize_urls
 from mygpo.api.advanced.directory import episode_data, podcast_data
@@ -33,7 +33,7 @@ from mygpo.log import log
 from mygpo.utils import parse_time, format_time, parse_bool, get_to_dict, get_timestamp
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.core import models
-from mygpo.core.models import SanitizingRule
+from mygpo.core.models import SanitizingRule, Podcast
 from django.db import IntegrityError
 from django.views.decorators.csrf import csrf_exempt
 from mygpo.users.models import PodcastUserState, EpisodeAction, EpisodeUserState
@@ -117,8 +117,7 @@ def update_subscriptions(user, device, add, remove):
     rem_s = filter(lambda x: x not in add_s, rem_s)
 
     for a in add_s:
-        p, p_created = Podcast.objects.get_or_create(url=a)
-        p = migrate.get_or_migrate_podcast(p)
+        p = Podcast.for_url(a, create=True)
         try:
             p.subscribe(device)
         except Exception as e:
@@ -126,8 +125,7 @@ def update_subscriptions(user, device, add, remove):
                 {'username': user.username, 'podcast_url': p.url, 'device_id': device.id, 'exception': e})
 
     for r in rem_s:
-        p, p_created = Podcast.objects.get_or_create(url=r)
-        p = migrate.get_or_migrate_podcast(p)
+        p = Podcast.for_url(r, create=True)
         try:
             p.unsubscribe(device)
         except Exception as e:
@@ -141,7 +139,7 @@ def get_subscription_changes(user, device, since, until):
     add, rem = device.get_subscription_changes(since, until)
 
     podcast_ids = add + rem
-    podcasts = get_to_dict(models.Podcast, podcast_ids, get_id=models.Podcast.get_id)
+    podcasts = get_to_dict(Podcast, podcast_ids, get_id=models.Podcast.get_id)
 
     add_podcasts = filter(None, (podcasts.get(i, None) for i in add))
     rem_podcasts = filter(None, (podcasts.get(i, None) for i in rem))
@@ -189,8 +187,12 @@ def episodes(request, username, version=1):
         except ValueError:
             return HttpResponseBadRequest('since-value is not a valid timestamp')
 
-        podcast = get_object_or_404(Podcast, url=podcast_url) if podcast_url else None
-        podcast = migrate.get_or_migrate_podcast(podcast) if podcast else None
+        if podcast_url:
+            podcast = Podcast.for_url(podcast_url)
+            if not podcast:
+                raise Http404
+        else:
+            podcast = None
 
         device  = get_object_or_404(Device, user=request.user,uid=device_uid, deleted=False) if device_uid else None
 

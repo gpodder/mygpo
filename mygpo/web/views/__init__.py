@@ -24,10 +24,11 @@ from django.views.decorators.cache import cache_page
 from django.contrib.auth.models import User
 from django.template import RequestContext
 from mygpo.core import models
+from mygpo.core.models import Podcast, Episode
 from mygpo.directory import tags
 from mygpo.directory.toplist import PodcastToplist
 from mygpo.users.models import Suggestions, History, HistoryEntry
-from mygpo.api.models import Podcast, Episode, Device, UserProfile
+from mygpo.api.models import Device, UserProfile
 from mygpo.users.models import PodcastUserState
 from mygpo.decorators import manual_gc
 from django.contrib.auth.decorators import login_required
@@ -54,9 +55,9 @@ def home(request):
 @manual_gc
 def welcome(request, toplist_entries=10):
     current_site = RequestSite(request)
-    podcasts = Podcast.objects.count()
+    podcasts = Podcast.count()
     users = User.objects.filter(is_active=True).count()
-    episodes = models.Episode.count()
+    episodes = Episode.count()
 
     try:
         lang = utils.process_lang_params(request, '/toplist/')
@@ -93,8 +94,7 @@ def dashboard(request, episode_count=10):
     lang = utils.get_accepted_lang(request)
     lang = utils.sanitize_language_codes(lang)
 
-    random_podcasts = backend.get_random_picks(lang)[:5]
-    random_podcasts = map(migrate.get_or_migrate_podcast, random_podcasts)
+    random_podcasts = islice(backend.get_random_picks(lang), 0, 5)
 
     return render_to_response('dashboard.html', {
             'site': site,
@@ -187,7 +187,7 @@ def history(request, count=15, device_id=None):
 @login_required
 def blacklist(request, podcast_id):
     podcast_id = int(podcast_id)
-    blacklisted_podcast = models.Podcast.for_oldid(podcast_id)
+    blacklisted_podcast = Podcast.for_oldid(podcast_id)
     suggestion = Suggestions.for_user_oldid(request.user.id)
     suggestion.blacklist.append(blacklisted_podcast.get_id())
     suggestion.save()
@@ -232,7 +232,7 @@ def mytags(request):
     tags_tag = defaultdict(list)
 
     for podcast_id, taglist in tags.tags_for_user(request.user).items():
-        podcast = models.Podcast.get(podcast_id)
+        podcast = Podcast.get(podcast_id)
         tags_podcast[podcast] = taglist
 
         for tag in taglist:

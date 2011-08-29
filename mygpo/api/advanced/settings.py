@@ -20,11 +20,11 @@ from django.http import HttpResponseBadRequest, Http404
 from mygpo.api.httpresponse import JsonResponse
 from django.shortcuts import get_object_or_404
 from mygpo.users.models import PodcastUserState
-from mygpo.api.models import Device, Podcast
+from mygpo.api.models import Device
 from django.views.decorators.csrf import csrf_exempt
 from mygpo.decorators import allowed_methods
 from mygpo import migrate
-from mygpo.core.models import Episode
+from mygpo.core.models import Episode, Podcast
 
 try:
     import simplejson as json
@@ -56,8 +56,9 @@ def main(request, username, scope):
         return user, settings_obj
 
     def podcast_settings(user, url):
-        old_p = get_object_or_404(Podcast, url=url)
-        podcast = migrate.get_or_migrate_podcast(old_p)
+        podcast = Podcast.for_url(url)
+        if not podcast:
+            raise Http404
         obj = PodcastUserState.for_user_podcast(user, podcast)
         return obj, obj
 

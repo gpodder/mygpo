@@ -17,7 +17,6 @@
 
 from django.db import models
 from django.contrib.auth.models import User
-from mygpo.api.models import Podcast
 from datetime import datetime
 import random
 import string

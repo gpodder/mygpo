@@ -39,7 +39,7 @@ class Command(BaseCommand):
         # Set URLs for Podcast States
         for n, p_state in enumerate(p_states, n):
             try:
-                podcast = Podcast.get(p_state.podcast).get_old_obj()
+                podcast = Podcast.get(p_state.podcast)
                 self.set_podcast_url(p_state=p_state, podcast=podcast)
             except oldmodels.Podcast.DoesNotExist:
                 pass

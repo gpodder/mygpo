@@ -3,7 +3,6 @@ import collections
 from django.core.cache import cache
 
 from mygpo.core import models
-from mygpo.api.models import Podcast
 from mygpo.log import log
 from mygpo.utils import iterate_together, progress
 import urlparse
@@ -88,7 +87,7 @@ def maintenance(dry_run=False):
     podcast_rules = get_sanitizing_rules('podcast')
     episode_rules = get_sanitizing_rules('episode')
 
-    num_podcasts = Podcast.objects.count()
+    num_podcasts = models.Podcast.count()
 
     print 'Stats'
     print ' * %d podcasts - %d rules' % (num_podcasts, len(podcast_rules))

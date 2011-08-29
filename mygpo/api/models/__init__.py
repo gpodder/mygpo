@@ -56,12 +56,6 @@ class Podcast(models.Model):
     group_member_name = models.CharField(max_length=20, default=None, null=True, blank=False)
     content_types = SeparatedValuesField(null=True, blank=True)
 
-    def listener_count(self):
-        # FIXME: remove after templates don't access this anymore
-        from mygpo import migrate
-        new_p = migrate.get_or_migrate_podcast(self)
-        return new_p.listener_count()
-
     def get_logo_url(self, size):
         if self.logo_url:
             sha = hashlib.sha1(self.logo_url).hexdigest()

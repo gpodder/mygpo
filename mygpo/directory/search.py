@@ -20,11 +20,10 @@ def search_podcasts(q, limit=20, skip=0):
     if is_url(q):
         from mygpo.api import models
         url = sanitize_url(q)
-        p, created = models.Podcast.objects.get_or_create(url=url)
 
-        podcast = migrate.get_or_migrate_podcast(p)
+        podcast = Podcast.for_url(url, create=True)
 
-        if created:
+        if not podcast.title:
             update_podcasts([p])
 
         podcast = Podcast.for_url(url)

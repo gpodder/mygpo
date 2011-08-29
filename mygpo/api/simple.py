@@ -28,8 +28,9 @@ from mygpo.api.basic_auth import require_valid_user, check_username
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.cache import cache_page
 from mygpo.core import models
+from mygpo.core.models import Podcast
 from mygpo.users.models import Suggestions
-from mygpo.api.models import Device, Podcast
+from mygpo.api.models import Device
 from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_urls
@@ -200,8 +201,7 @@ def set_subscriptions(urls, user, device_uid):
     rem = [p for p in old if p not in urls]
 
     for r in rem:
-        p, created = Podcast.objects.get_or_create(url=r)
-        p = migrate.get_or_migrate_podcast(p)
+        p = Podcast.for_url(r, create=True)
         try:
             p.unsubscribe(device)
         except Exception as e:
@@ -209,8 +209,7 @@ def set_subscriptions(urls, user, device_uid):
                 {'username': user.username, 'podcast_url': r, 'device_id': device.id, 'exception': e})
 
     for n in new:
-        p, created = Podcast.objects.get_or_create(url=n)
-        p = migrate.get_or_migrate_podcast(p)
+        p = Podcast.for_url(n, create=True)
         try:
             p.subscribe(device)
         except Exception as e:
@@ -330,7 +329,7 @@ def example_podcasts(request, format):
         try:
             examples = ExamplePodcasts.get('example_podcasts')
             ids = examples.podcast_ids
-            podcasts = list(models.Podcast.get_multi(ids))
+            podcasts = list(Podcast.get_multi(ids))
             cache.set('example-podcasts', podcasts)
 
         except ResourceNotFound:

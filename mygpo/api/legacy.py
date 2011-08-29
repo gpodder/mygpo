@@ -18,7 +18,8 @@
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from mygpo.api.opml import Importer, Exporter
-from mygpo.api.models import Podcast, Device
+from mygpo.api.models import Device
+from mygpo.core.models import Podcast
 from mygpo.api.backend import get_device
 from datetime import datetime
 from django.utils.datastructures import MultiValueDictKeyError
@@ -66,8 +67,7 @@ def upload(request):
 
     for n in new:
         try:
-            p, created = Podcast.objects.get_or_create(url=n)
-            p = migrate.get_or_migrate_podcast(p)
+            p = Podcast.for_url(n, create=True)
         except IntegrityError, e:
             log('/upload: Error trying to get podcast object: %s (error: %s)' % (n, e))
             continue
@@ -79,8 +79,7 @@ def upload(request):
                 {'username': user.username, 'podcast_url': p.url, 'device_id': d.id, 'exception': e})
 
     for r in rem:
-        p, created = Podcast.objects.get_or_create(url=r)
-        p = migrate.get_or_migrate_podcast(p)
+        p = Podcast.for_url(r, create=True)
         try:
             p.unsubscribe(d)
         except Exception as e:

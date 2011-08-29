@@ -28,14 +28,11 @@ import urllib2
 import socket
 
 from mygpo.decorators import repeat_on_conflict
-from mygpo import migrate
 from mygpo.data import feedcore
-from mygpo.api import models
 from mygpo.utils import parse_time
 from mygpo.api.sanitizing import sanitize_url, rewrite_podcasts
 from mygpo.data import youtube
 from mygpo.data.mimetype import get_mimetype, check_mimetype, get_podcast_types
-from mygpo import migrate
 from mygpo.core.models import Episode
 from mygpo.core.slugs import assign_missing_episode_slugs, assign_slug, \
          PodcastSlug
@@ -45,7 +42,6 @@ fetcher = feedcore.Fetcher(USER_AGENT)
 
 
 def mark_outdated(podcast):
-    podcast = migrate.get_or_migrate_podcast(podcast)
     for e in podcast.get_episodes():
         e.outdated = True
         e.save()
@@ -132,7 +128,7 @@ def update_feed_tags(podcast, tags):
         if isinstance(e, ResourceConflict):
             raise # and retry
 
-        print >> sys.stderr, 'error saving tags for podcast %s: %s' % (np.get_id(), e)
+        print >> sys.stderr, 'error saving tags for podcast %s: %s' % (podcast.get_id(), e)
 
 
 def get_episode_metadata(entry, url, mimetype, podcast_language):
@@ -157,12 +153,8 @@ def get_episode_metadata(entry, url, mimetype, podcast_language):
 
 
 def update_podcasts(fetch_queue):
-    n=0
-    count = len(fetch_queue)
-
-    for podcast in fetch_queue:
-        n+=1
-        print '(%d/%d) %s' % (n, count, podcast.url)
+    for n, podcast in enumerate(fetch_queue):
+        print '(%d) %s' % (n, podcast.url)
 
         try:
             fetcher.fetch(podcast.url)
@@ -174,14 +166,11 @@ def update_podcasts(fetch_queue):
             print location.data
             new_url = sanitize_url(location.data)
             if new_url:
-                print new_url
-                if not models.Podcast.objects.filter(url=new_url).exists():
-                    podcast.url = new_url
-                else:
-                    p = models.Podcast.objects.get(url=new_url)
-                    rewrite_podcasts(podcast, p)
-                    podcast.delete()
-                    continue
+                print 'Redirect to %s' % new_url
+
+                # TODO: set new_location
+                p = Podcast.for_url(new_url, create=True)
+
 
         except feedcore.UpdatedFeed, updated:
             feed = updated.data
@@ -219,10 +208,9 @@ def update_podcasts(fetch_queue):
                     if str(e).strip():
                         print >> sys.stderr, 'cannot save image %s for podcast %d: %s' % (cover_art.encode('utf-8'), podcast.id, str(e).encode('utf-8'))
 
-            new_podcast = migrate.get_or_migrate_podcast(podcast)
-            update_feed_tags(new_podcast, get_feed_tags(feed.feed))
+            update_feed_tags(podcast, get_feed_tags(feed.feed))
 
-            existing_episodes = list(new_podcast.get_episodes())
+            existing_episodes = list(podcast.get_episodes())
 
             for entry in feed.entries:
                 try:
@@ -233,7 +221,7 @@ def update_podcasts(fetch_queue):
 
                     url = sanitize_url(url, 'episode')
 
-                    episode = Episode.for_podcast_id_url(new_podcast.get_id(),
+                    episode = Episode.for_podcast_id_url(podcast.get_id(),
                             url, create=True)
                     md = get_episode_metadata(entry, url, mimetype,
                             podcast.language)
@@ -261,7 +249,7 @@ def update_podcasts(fetch_queue):
                     e.outdated = True
                     e.save()
 
-            podcast.content_types = get_podcast_types(new_podcast)
+            podcast.content_types = get_podcast_types(podcast)
 
         except Exception, e:
             print >>sys.stderr, 'Exception:', e
@@ -273,6 +261,5 @@ def update_podcasts(fetch_queue):
             print e
 
 
-        new_podcast = migrate.get_or_migrate_podcast(podcast)
-        assign_slug(new_podcast, PodcastSlug)
-        assign_missing_episode_slugs(new_podcast)
+        assign_slug(podcast, PodcastSlug)
+        assign_missing_episode_slugs(podcast)

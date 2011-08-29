@@ -3,16 +3,19 @@ from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect, \
         HttpResponseForbidden, Http404
 from django.views.decorators.cache import cache_page
-from mygpo.core import models
+from django.core.urlresolvers import reverse
+
+from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.core.proxy import proxy_object
-from mygpo.api.models import Podcast, PodcastGroup
 from mygpo.publisher.auth import require_publisher, is_publisher
-from mygpo.publisher.forms import SearchPodcastForm, PodcastForm
+from mygpo.publisher.forms import SearchPodcastForm
 from mygpo.publisher.utils import listener_data, episode_listener_data, check_publisher_permission, subscriber_data
 from mygpo.web.heatmap import EpisodeHeatmap
 from mygpo.web.views.episode import oldid_decorator, slug_id_decorator
 from mygpo.web.views.podcast import \
-         slug_id_decorator as podcast_slug_id_decorator
+         slug_id_decorator as podcast_slug_id_decorator, \
+         oldid_decorator as podcast_oldid_decorator
+from mygpo.web.utils import get_podcast_link_target
 from django.contrib.sites.models import RequestSite
 from mygpo.data.feeddownloader import update_podcasts
 from mygpo.decorators import requires_token, allowed_methods
@@ -23,11 +26,11 @@ from mygpo import migrate
 def home(request):
     if is_publisher(request.user):
         u = migrate.get_or_migrate_user(request.user)
-        podcasts = models.Podcast.get_multi(u.published_objects)
+        podcasts = Podcast.get_multi(u.published_objects)
         form = SearchPodcastForm()
         return render_to_response('publisher/home.html', {
             'podcasts': podcasts,
-            'form': form
+            'form': form,
             }, context_instance=RequestContext(request))
 
     else:
@@ -42,33 +45,40 @@ def search_podcast(request):
     form = SearchPodcastForm(request.POST)
     if form.is_valid():
         url = form.cleaned_data['url']
-        p = get_object_or_404(Podcast, url=url)
 
-        return HttpResponseRedirect('/publisher/podcast/%d' % p.id)
+        podcast = Podcast.for_url(url)
+        if not podcast:
+            raise Http404
 
+        url = get_podcast_link_target(podcast, 'podcast-publisher-detail')
     else:
-        return HttpResponseRedirect('/publisher/')
+        url = reverse('publisher')
+
+    return HttpResponseRedirect(url)
+
 
 @require_publisher
 @allowed_methods(['GET', 'POST'])
-def podcast(request, id):
-    p = get_object_or_404(Podcast, pk=id)
+def podcast(request, podcast):
 
-    if not check_publisher_permission(request.user, p):
+    if not check_publisher_permission(request.user, podcast):
         return HttpResponseForbidden()
 
-    new_p = migrate.get_or_migrate_podcast(p)
+    timeline_data = listener_data([podcast])
+    subscription_data = subscriber_data([podcast])
 
-    timeline_data = listener_data([new_p])
-    subscription_data = subscriber_data([new_p])
+    if podcast.group:
+        group = PodcastGroup.get(podcast.group)
+    else:
+        group = None
 
-    if request.method == 'POST':
-        form = PodcastForm(request.POST, instance=p)
-        if form.is_valid():
-            form.save()
+#    if request.method == 'POST':
+#        form = NonePodcastForm(request.POST, instance=p)
+#        if form.is_valid():
+#            form.save()
 
-    elif request.method == 'GET':
-        form = PodcastForm(instance=p)
+#    elif request.method == 'GET':
+#        form = PodcastForm(instance=p)
 
     user = migrate.get_or_migrate_user(request.user)
     if 'new_token' in request.GET:
@@ -77,14 +87,15 @@ def podcast(request, id):
 
     update_token = user.publisher_update_token
 
-    heatmap = EpisodeHeatmap(new_p.get_id())
+    heatmap = EpisodeHeatmap(podcast.get_id())
 
     site = RequestSite(request)
 
     return render_to_response('publisher/podcast.html', {
         'site': site,
-        'podcast': p,
-        'form': form,
+        'podcast': podcast,
+        'group': group,
+        'form': None,
         'timeline_data': timeline_data,
         'subscriber_data': subscription_data,
         'update_token': update_token,
@@ -93,17 +104,16 @@ def podcast(request, id):
 
 
 @require_publisher
-def group(request, group_id):
-    g = get_object_or_404(PodcastGroup, id=group_id)
+def group(request, group):
+
+    podcasts = group.podcasts
 
     # users need to have publisher access for at least one of the group's podcasts
-    if not any([check_publisher_permission(request.user, p) for p in g.podcasts()]):
+    if not any([check_publisher_permission(request.user, p) for p in podcasts]):
         return HttpResponseForbidden()
 
-    new_podcasts = [migrate.get_or_migrate_podcast(p) for p in g.podcasts()]
-
-    timeline_data = listener_data(new_podcasts)
-    subscription_data = subscriber_data(new_podcasts)
+    timeline_data = listener_data(podcasts)
+    subscription_data = subscriber_data(podcasts)
 
     return render_to_response('publisher/group.html', {
         'group': g,
@@ -113,15 +123,15 @@ def group(request, group_id):
 
 
 @require_publisher
-def update_podcast(request, id):
-    p = get_object_or_404(Podcast, pk=id)
+def update_podcast(request, podcast):
 
-    if not check_publisher_permission(request.user, p):
+    if not check_publisher_permission(request.user, podcast):
         return HttpResponseForbidden()
 
-    update_podcasts( [p] )
+    update_podcasts( [podcast] )
 
-    return HttpResponseRedirect('/publisher/podcast/%s' % id)
+    url = get_podcast_link_target(podcast, 'podcast-publisher-detail')
+    return HttpResponseRedirect(url)
 
 
 @requires_token(token_name='publisher_update_token')
@@ -129,21 +139,18 @@ def update_published_podcasts(request, username):
     user = get_object_or_404(User, username=username)
     user = migrate.get_or_migrate_user(user)
 
-    published_podcasts = models.Podcast.get_multi(user.published_objects)
-    old_podcasts = map(models.Podcast.get_old_obj, published_podcasts)
-    update_podcasts(old_podcasts)
+    published_podcasts = Podcast.get_multi(user.published_objects)
+    update_podcasts(published_podcasts)
 
     return HttpResponse('Updated:\n' + '\n'.join([p.url for p in published_podcasts]), mimetype='text/plain')
 
 
 @require_publisher
-def episodes(request, id):
-    p = get_object_or_404(Podcast, pk=id)
+def episodes(request, podcast):
 
-    if not check_publisher_permission(request.user, p):
+    if not check_publisher_permission(request.user, podcast):
         return HttpResponseForbidden()
 
-    podcast = migrate.get_or_migrate_podcast(p)
     episodes = podcast.get_episodes(descending=True)
     listeners = dict(podcast.episode_listener_counts())
 
@@ -166,7 +173,8 @@ def episodes(request, id):
 @allowed_methods(['GET', 'POST'])
 def episode(request, episode):
 
-    podcast = models.Podcast.get(episode.podcast)
+    podcast = Podcast.get(episode.podcast)
+
     if not check_publisher_permission(request.user, podcast):
         return HttpResponseForbidden()
 
@@ -206,9 +214,44 @@ def advertise(request):
     }, context_instance=RequestContext(request))
 
 
-episode_oldid = oldid_decorator(episode)
+def group_slug_id_decorator(f):
+    def _decorator(request, slug_id, *args, **kwargs):
+        group = Group.for_slug_id(slug_id)
+
+        if podcast is None:
+            raise Http404
+
+        return f(request, group, *args, **kwargs)
+
+    return _decorator
+
+
+def group_oldid_decorator(f):
+    def _decorator(request, pid, *args, **kwargs):
+        try:
+            pid = int(pid)
+        except (TypeError, ValueError):
+            raise Http404
+
+        group = PodcastGroup.for_oldid(pid)
+
+        if not podcast:
+            raise Http404
+
+        return f(request, group, *args, **kwargs)
+
+    return _decorator
+
+
+
+episode_oldid        = oldid_decorator(episode)
+podcast_oldid        = podcast_oldid_decorator(podcast)
+update_podcast_oldid = podcast_oldid_decorator(update_podcast)
+episodes_oldid       = podcast_oldid_decorator(episodes)
+group_oldid          = group_oldid_decorator(group)
 
 episode_slug_id        = slug_id_decorator(episode)
 podcast_slug_id        = podcast_slug_id_decorator(podcast)
 episodes_slug_id       = podcast_slug_id_decorator(episodes)
 update_podcast_slug_id = podcast_slug_id_decorator(update_podcast)
+group_slug_id          = group_slug_id_decorator(group)

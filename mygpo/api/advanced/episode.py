@@ -22,7 +22,7 @@ from mygpo.core import models
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.exceptions import ParameterMissing
 from mygpo.api.sanitizing import sanitize_url
-from mygpo.api.models import Device, Podcast
+from mygpo.api.models import Device
 from mygpo.users.models import Chapter
 from datetime import datetime
 from mygpo.utils import parse_time

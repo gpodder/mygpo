@@ -66,8 +66,7 @@ def create(request, username, format):
         return HttpResponse('List already exists', status=409)
 
     urls = parse_subscription(request.raw_post_data, format)
-    podcasts = [models.Podcast.objects.get_or_create(url=url)[0] for url in urls]
-    podcasts = map(migrate.get_or_migrate_podcast, podcasts)
+    podcasts = [Podcast.for_url(url, create=True) for url in urls]
     podcast_ids = map(Podcast.get_id, podcasts)
 
     plist = PodcastList()
@@ -160,9 +159,7 @@ def update_list(request, plist, owner, format):
         return HttpResponseForbidden()
 
     urls = parse_subscription(request.raw_post_data, format)
-    podcasts = [models.Podcast.objects.get_or_create(url=url)[0] for url
-                in urls]
-    podcasts = map(migrate.get_or_migrate_podcast, podcasts)
+    podcasts = [Podcast.for_url(url, create=True) for url in urls]
     podcast_ids = map(Podcast.get_id, podcasts)
 
     @repeat_on_conflict(['podcast_ids'])

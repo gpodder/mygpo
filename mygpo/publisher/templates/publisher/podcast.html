@@ -40,19 +40,19 @@
    </table>
    <input type="submit" value="save" />
   </form>
-  <p><a href="{% url podcast-publisher-update podcast.id %}">{% trans "Update from Feed" %}</a> {% trans "(this might take a few seconds)" %}</p>
+  <p><a href="{% podcast_link_target podcast "podcast-publisher-update" %}">{% trans "Update from Feed" %}</a> {% trans "(this might take a few seconds)" %}</p>
 
-  <div class="info">To update all of your published podcasts automatically, you can request the URL (<a href="{% url podcast-publisher-detail podcast.id %}?new_token">Create a new token</a>)<br />
+  <div class="info">To update all of your published podcasts automatically, you can request the URL (<a href="{% podcast_link_target podcast "podcast-publisher-detail" %}?new_token">Create a new token</a>)<br />
    <strong><a href="{% url publisher-update user.username %}?token={{ update_token }}">http://{{ site }}{% url publisher-update user.username %}?token={{ update_token }}</a></strong>
   </div>
 
   <h2>Episodes</h2>
-  <p>View and edit <a href="{% url podcast-publisher-episodes podcast.id %}">episode</a> data.</p>
+  <p>View and edit <a href="{% podcast_link_target podcast "podcast-publisher-episodes" %}">episode</a> data.</p>
 
   <h2>Stats</h2>
 
-  {% if podcast.group %}
-   <a href="{% url group-publisher podcast.group.id %}">{% trans "Show Group Stats" %}</a>
+  {% if group %}
+   <a href="{% podcast_group_link_target group "group-publisher" %}">{% trans "Show Group Stats" %}</a>
   {% endif %}
 
   {% if timeline_data %}

@@ -4,7 +4,6 @@ from django.views.decorators.cache import never_cache
 from django.utils.html import strip_tags
 from django.core.urlresolvers import reverse
 
-from mygpo.api.models import Podcast
 from babel import Locale, UnknownLocaleError
 from datetime import datetime
 import re
@@ -20,6 +19,8 @@ def get_podcast_languages():
     of these codes is contained in ISO 639.
     """
 
+    from mygpo.api.models import Podcast
+    # TODO: implement
     langs = [x['language'] for x in Podcast.objects.values('language').distinct()]
     sane_lang = sanitize_language_codes(langs)
 
@@ -150,15 +151,10 @@ def get_podcast_link_target(podcast, view_name='podcast', add_args=[]):
     automatically distringuishes between relational Podcast objects and
     CouchDB-based Podcasts """
 
-    from mygpo.api.models import Podcast as OldPodcast
     from mygpo.core.models import Podcast
 
-    # for old-podcasts we link to its id
-    if isinstance(podcast, OldPodcast):
-        args = [podcast.id]
-
     # we prefer slugs
-    elif podcast.slug:
+    if podcast.slug:
         args = [podcast.slug]
         view_name = '%s-slug-id' % view_name
 
@@ -169,6 +165,31 @@ def get_podcast_link_target(podcast, view_name='podcast', add_args=[]):
     # as a fallback we use CouchDB-IDs
     else:
         args = [podcast.get_id()]
+        view_name = '%s-slug-id' % view_name
+
+    return reverse(view_name, args=args + add_args)
+
+
+def get_podcast_group_link_target(group, view_name, add_args=[]):
+    """ Returns the link-target for a Podcast group, preferring slugs over Ids
+
+    automatically distringuishes between relational Podcast objects and
+    CouchDB-based Podcasts """
+
+    from mygpo.core.models import PodcastGroup
+
+    # we prefer slugs
+    if group.slug:
+        args = [group.slug]
+        view_name = '%s-slug-id' % view_name
+
+    # to keep URLs short, we use use oldids
+    elif group.oldid:
+        args = [group.oldid]
+
+    # as a fallback we use CouchDB-IDs
+    else:
+        args = [group._id]
         view_name = '%s-slug-id' % view_name
 
     return reverse(view_name, args=args + add_args)

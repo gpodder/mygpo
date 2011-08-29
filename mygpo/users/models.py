@@ -245,13 +245,9 @@ class EpisodeUserState(Document):
             state.ref_url = episode_url
             state.podcast_ref_url = podcast_url
             return state
+
         else:
-            from mygpo.api import models as oldmodels
-            from mygpo import migrate
-
-            old_p, _ = oldmodels.Podcast.objects.get_or_create(url=podcast_url)
-            podcast = migrate.get_or_migrate_podcast(old_p)
-
+            podcast = Podcast.for_url(podcast_url, create=True)
             episode = Episode.for_podcast_id_url(podcast.get_id(), episode_url,
                     create=True)
 

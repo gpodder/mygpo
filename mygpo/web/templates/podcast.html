@@ -71,7 +71,7 @@
                 <a href="{% url device device.oldid %}">{{ device.name|striptags }}</a>
             </td>
             <td style="text-align: center;">
-                <a href="{% podcast_link_target podcast "unsubscribe" device.oldid %}?return_to=/podcast/{{ podcast.id }}"><img src="/media/unsubscribe.png" alt="{% trans "Unsubscribe" %}" title="{% trans "Click here to unsubscribe" %}"/></a>
+                <a href="{% podcast_link_target podcast "unsubscribe" device.oldid %}?return_to={% podcast_link_target podcast %}"><img src="/media/unsubscribe.png" alt="{% trans "Unsubscribe" %}" title="{% trans "Click here to unsubscribe" %}"/></a>
             </td>
         </tr>
     {% endfor %}

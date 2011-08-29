@@ -1,7 +1,6 @@
-from itertools import islice
+from itertools import islice, chain, imap as map
 from django.core.management.base import BaseCommand
-from mygpo.core import models as newmodels
-from mygpo.api import models
+from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.directory.toplist import PodcastToplist
 from mygpo.data import feeddownloader
 from optparse import make_option
@@ -12,57 +11,56 @@ UPDATE_LIMIT = datetime.datetime.now() - datetime.timedelta(days=15)
 class Command(BaseCommand):
 
     option_list = BaseCommand.option_list + (
-        make_option('--toplist', action='store_true', dest='toplist', default=False, help="Update all entries from the Toplist."),
-        make_option('--update-new', action='store_true', dest='new', default=False, help="Update all podcasts with new Episodes"),
-        make_option('--list-only', action='store_true', dest='list', default=False, help='Don\'t download/update anything, just list the podcasts to be updated'),
+        make_option('--toplist', action='store_true', dest='toplist',
+            default=False, help="Update all entries from the Toplist."),
 
-	make_option('--max', action='store', dest='max', type='int', default=-1, help="Set how many feeds should be updated at maximum"),
+        make_option('--update-new', action='store_true', dest='new',
+            default=False, help="Update all podcasts with new Episodes"),
 
-        make_option('--random', action='store_true', dest='random', default=False, help="Update random podcasts, best used with --max option"),
+        make_option('--list-only', action='store_true', dest='list',
+            default=False, help="Don't update anything, just list podcasts "),
+
+        make_option('--max', action='store', dest='max', type='int',
+            default=0, help="Set how many feeds should be updated at maximum"),
+
+        make_option('--random', action='store_true', dest='random',
+            default=False, help="Update random podcasts, best used with --max"),
         )
 
 
     def handle(self, *args, **options):
 
-        fetch_queue = []
+        queue = []
 
         if options.get('toplist'):
-            toplist = PodcastToplist()
-            for oldindex, obj in toplist[:100]:
-                obj = obj.get_old_obj()
-                if isinstance(obj, models.Podcast):
-                    fetch_queue.append(obj)
-                elif isinstance(obj, models.PodcastGroup):
-                    for p in obj.podcasts():
-                        fetch_queue.append(p)
+            queue = chain(queue, self.get_toplist())
 
         if options.get('new'):
-            podcasts = self.get_podcast_with_new_episodes()
-            fetch_queue.extend(list(podcasts))
+            queue = chain(queue, self.self.get_podcast_with_new_episodes())
 
         if options.get('random'):
-            fetch_queue = models.Podcast.objects.all().order_by('?')
+            queue = chain(queue, Podcast.random())
 
-        for url in args:
-           try:
-                fetch_queue.append(models.Podcast.objects.get(url=url))
-           except:
-                pass
 
-        if len(fetch_queue) == 0 and not options.get('toplist') and not options.get('new'):
-            fetch_queue = models.Podcast.objects.filter(last_update__lt=UPDATE_LIMIT).order_by('last_update')
+        get_podcast = lambda url: Podcast.for_url(url, create=True)
+        args_podcasts = map(get_podcast, args)
 
-        max = options.get('max', -1)
-        if max > 0:
-            fetch_queue = fetch_queue[:max]
+        queue = chain(queue, args_podcasts)
+
+        if not args and not options.get('toplist') and not options.get('new') \
+                    and not options.get('random'):
+           queue = chain(queue, Podcast.by_last_update())
+
+        max_podcasts = options.get('max')
+        if max_podcasts:
+            queue = islice(queue, 0, max_podcasts)
 
         if options.get('list'):
-            print '%d podcasts would be updated' % len(fetch_queue)
-            print '\n'.join([p.url for p in fetch_queue])
+            print '\n'.join([p.url for p in queue])
 
         else:
-            print 'Updating %d podcasts...' % len(fetch_queue)
-            feeddownloader.update_podcasts(fetch_queue)
+            print 'Updating podcasts...'
+            feeddownloader.update_podcasts(queue)
 
 
     def get_podcast_with_new_episodes(self):
@@ -76,7 +74,15 @@ class Command(BaseCommand):
             podcast_id = r['key']
             podcast = newmodels.Podcast.get(podcast_id)
             if podcast:
-                try:
-                    yield podcast.get_old_obj()
-                except:
-                    pass
+                yield podcast
+
+
+    def get_toplist(self):
+        toplist = PodcastToplist()
+        for oldindex, obj in toplist[:100]:
+            if isinstance(obj, Podcast):
+                yield obj
+            elif isinstance(obj, PodcastGroup):
+                for p in obj.podcasts:
+                    yield p
+

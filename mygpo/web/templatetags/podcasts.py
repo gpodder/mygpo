@@ -6,7 +6,8 @@ from django.utils.html import strip_tags
 import hashlib
 
 from mygpo.constants import PODCAST_LOGO_SIZE, PODCAST_LOGO_BIG_SIZE
-from mygpo.web.utils import get_podcast_link_target
+from mygpo.web.utils import get_podcast_link_target, \
+         get_podcast_group_link_target
 
 
 register = template.Library()
@@ -75,6 +76,40 @@ class PodcastLinkTargetNode(template.Node):
 register.tag('podcast_link_target', PodcastLinkTargetNode.compile)
 
 
+class PodcastGroupLinkTargetNode(template.Node):
+    """ Links to a (view of a) Podcast """
+
+    def __init__(self, group, view_name, add_args):
+        self.group = template.Variable(group)
+        self.view_name = view_name.replace('"', '')
+        self.add_args = [template.Variable(arg) for arg in add_args]
+
+
+    def render(self, context):
+        group = self.group.resolve(context)
+        add_args = [arg.resolve(context) for arg in self.add_args]
+        return get_podcast_group_link_target(podcast, self.view_name, add_args)
+
+
+    @staticmethod
+    def compile(parser, token):
+        try:
+            contents  = token.split_contents()
+            tag_name  = contents[0]
+            podcast   = contents[1]
+            view_name = contents[2] if len(contents) > 2 else 'podcast'
+            add_args  = contents[3:]
+
+        except ValueError:
+            raise template.TemplateSyntaxError("%r tag requires at least one argument" % token.contents.split()[0])
+
+        return PodcastLinkTargetNode(podcast, view_name, add_args)
+
+
+register.tag('podcast_group_link_target', PodcastGroupLinkTargetNode.compile)
+
+
+
 @register.simple_tag
 def podcast_group_link(podcast, title=None):
     """ Returns the link strings for Podcast and PodcastGroup objects
@@ -82,12 +117,9 @@ def podcast_group_link(podcast, title=None):
     automatically distringuishes between relational Podcast/PodcastGroup
     objects and CouchDB-based Podcast/PodcastGroup objects """
 
-    from mygpo.api.models import PodcastGroup as OldPodcastGroup
     from mygpo.core.models import PodcastGroup
 
-    if isinstance(podcast, OldPodcastGroup):
-        podcasts = podcast.podcasts()
-    elif isinstance(podcast, PodcastGroup):
+    if isinstance(podcast, PodcastGroup):
         podcasts = list(podcast.podcasts)
     else:
         return podcast_link(podcast, title)

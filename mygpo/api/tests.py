@@ -23,8 +23,10 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 
 from mygpo.api.opml import Importer, Exporter
-from mygpo.api.models import Podcast, Device, UserProfile
+from mygpo.api.models import Device, UserProfile
 from mygpo.test import create_auth_string
+
+#TODO: replace usage of old Podcast class
 
 try:
     import simplejson as json

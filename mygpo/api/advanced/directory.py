@@ -20,12 +20,12 @@ from django.core.urlresolvers import reverse
 from mygpo.api.httpresponse import JsonResponse
 from django.shortcuts import get_object_or_404
 from mygpo.api.sanitizing import sanitize_url
-from mygpo.api.models import Podcast
 from mygpo.directory.models import Category
 from django.contrib.sites.models import RequestSite
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import cache_page
 from mygpo.core import models
+from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.utils import parse_range
 from mygpo.directory.tags import TagCloud
 from mygpo import migrate
@@ -59,8 +59,9 @@ def tag_podcasts(request, tag, count):
 def podcast_info(request):
     from mygpo import migrate
     url = sanitize_url(request.GET.get('url', ''))
-    podcast = get_object_or_404(Podcast, url=url)
-    podcast = migrate.get_or_migrate_podcast(podcast)
+    podcast = Podcast.for_url(url)
+    if not podcast:
+            raise Http404
     domain = RequestSite(request).domain
     resp = podcast_data(podcast, domain)
 
@@ -87,16 +88,10 @@ def podcast_data(obj, domain, scaled_logo_size=64):
     if obj is None:
         raise ValueError('podcast should not be None')
 
-    if isinstance(obj, models.Podcast):
+    if isinstance(obj, Podcast):
         podcast = obj
-    elif isinstance(obj, models.PodcastGroup):
+    elif isinstance(obj, PodcastGroup):
         podcast = obj.get_podcast()
-    elif podcast.group:
-        obj = models.PodcastGroup.for_oldid(obj.group.id)
-        podcast = obj[0]
-    else:
-        podcast = models.Podcast.for_oldid(obj.id)
-        obj = podcast
 
     subscribers = obj.subscriber_count()
     last_subscribers = obj.prev_subscriber_count()
@@ -117,7 +112,7 @@ def podcast_data(obj, domain, scaled_logo_size=64):
 
 def episode_data(episode, domain, podcast=None):
 
-    podcast = podcast or models.Podcast.get(episode.podcast)
+    podcast = podcast or Podcast.get(episode.podcast)
 
     data = {
         "title": episode.title,
