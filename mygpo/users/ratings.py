@@ -24,5 +24,5 @@ class RatingMixin(DocumentSchema):
 
         rating = Rating(rating=rating_val, user=user_id)
         self.ratings = filter(lambda r: r.user != None, self.ratings)
-        self.ratings = filter(lambda r: r.user != user, self.ratings)
+        self.ratings = filter(lambda r: r.user != user_id, self.ratings)
         self.ratings.append(rating)
