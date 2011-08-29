@@ -4,6 +4,7 @@
 {% load episodes %}
 {% load podcasts %}
 {% load humanize %}
+{% load cache %}
 
 {% load menu %}
 {% block mainmenu %}{{ "/"|main_menu }}{% endblock %}
@@ -67,6 +68,7 @@
 
  <hr />
 
+ {% cache 3600 request.user.username %}
  {% if newest_episodes %}
  <div class="wide-box">
   <h2>{% trans "Newest Episodes" %}</h2>
@@ -83,6 +85,7 @@
   </table>
  </div>
  {% endif %}
+ {% endcache %}
 
 {% endblock %}
 
