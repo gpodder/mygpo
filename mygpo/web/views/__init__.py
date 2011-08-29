@@ -85,7 +85,6 @@ def dashboard(request, episode_count=10):
 
     user = migrate.get_or_migrate_user(request.user)
     subscribed_podcasts = user.get_subscribed_podcasts()
-    subscribed_old_podcasts = [x.get_old_obj() for x in subscribed_podcasts]
 
     tomorrow = datetime.today() + timedelta(days=1)
     newest_episodes = user.get_newest_episodes(tomorrow)
