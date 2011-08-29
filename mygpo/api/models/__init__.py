@@ -87,7 +87,7 @@ class Podcast(models.Model):
                 g.add(other, othername)
 
             else:
-                oter.group.add(self)
+                other.group.add(self, myname)
 
     def ungroup(self):
         if self.group == None:
