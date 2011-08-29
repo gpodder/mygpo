@@ -18,3 +18,11 @@ echo done
 echo -n "Touching View django_couchdb_utils ... "
 curl -s -X GET ${DB}/_design/django_couchdb_utils/_view/emails?limit=0 > /dev/null
 echo done
+
+echo -n "Touching View share ...                "
+curl -s -X GET ${DB}/_design/share/_view/lists_by_rating?limit=0 > /dev/null
+echo done
+
+echo -n "Touching View maintenance ...          "
+curl -s -X GET ${DB}/_design/maintenance/_view/missing_slugs?limit=0 > /dev/null
+echo done
