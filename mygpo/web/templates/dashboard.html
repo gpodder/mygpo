@@ -24,6 +24,7 @@
   {% url share as share-url %}
   {% url suggestions as suggestions-url %}
   {% url toplist as toplist-url %}
+  {% url lists-overview as lists-url %}
   <p>{% blocktrans with subscribed_podcasts|length as subscription_count and devices|length as device_count %}You have subscribed to <a href="{{ subscriptions-url }}">{{ subscription_count }} podcasts</a> on <a href="{{ devices-url }}">{{ device_count }} devices</a>. Now you can
    <ul>
     <li><a href="{{ share-url }}">share your subscriptions with others</a></li>
@@ -31,6 +32,7 @@
     <li><a href="{{ devices-url }}">synchronize your devices</a></li>
     <li><a href="{{ suggestions-url }}">view our suggested podcasts</a></li>
     <li><a href="{{ toplist-url }}">discover new podcasts in our toplist</a></li>
+    <li><a href="{{ lists-url }}">collect and share podcasts about your favorite topics</a></li>
    </ul>{% endblocktrans %}</p>
 
  {% endif %}
