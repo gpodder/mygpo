@@ -46,6 +46,9 @@ def episode(request, episode):
 
     podcast = models.Podcast.get(episode.podcast)
 
+    if not podcast:
+        raise Http404
+
     if request.user.is_authenticated():
 
         user = migrate.get_or_migrate_user(request.user)
