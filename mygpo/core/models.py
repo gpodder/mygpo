@@ -373,12 +373,12 @@ class Podcast(Document, SlugMixin):
 
         One query is required for each podcast that is returned"""
 
-        total = cls.view('core/podcasts_by_oldid').total_rows
+        total = cls.view('core/podcasts_by_id').total_rows
         db = cls.get_db()
 
         while True:
             n = randint(0, total)
-            res = db.view('core/podcasts_by_oldid',
+            res = db.view('core/podcasts_by_id',
                     skip         = n,
                     include_docs = True,
                     limit        = 1
@@ -393,9 +393,9 @@ class Podcast(Document, SlugMixin):
                 yield Podcast.wrap(obj)
 
             else:
-                oldid = r[u'key']
+                pid = r[u'key']
                 pg = PodcastGroup.wrap(obj)
-                podcast = pg.get_podcast_by_oldid(oldid)
+                podcast = pg.get_podcast_by_id(pid)
                 yield podcast
 
 
@@ -762,14 +762,14 @@ class Podcast(Document, SlugMixin):
     def all_podcasts(cls):
         from mygpo.utils import multi_request_view
 
-        for r in multi_request_view(cls, 'core/podcasts_by_oldid', wrap=False, include_docs=True):
+        for r in multi_request_view(cls, 'core/podcasts_by_id', wrap=False, include_docs=True):
             obj = r['doc']
             if obj['doc_type'] == 'Podcast':
                 yield Podcast.wrap(obj)
             else:
-                oldid = r[u'key']
+                pid = r[u'key']
                 pg = PodcastGroup.wrap(obj)
-                podcast = pg.get_podcast_by_oldid(oldid)
+                podcast = pg.get_podcast_by_id(pid)
                 yield podcast
 
 
