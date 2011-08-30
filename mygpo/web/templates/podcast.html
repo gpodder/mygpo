@@ -123,7 +123,7 @@
 
      {% if user.is_authenticated and devices %}
      {% if is_public %}
-       <form action="{% url podcast-private podcast.id %}" method="POST">
+       <form action="{% podcast_link_target podcast "podcast-private" %}" method="POST">
          {% csrf_token %}
          <button type="submit" class="public" name="public">
            <img src="/media/32x32/public.png" alt="" />
@@ -132,7 +132,7 @@
        </form>
 
      {% else %}
-       <form action="{% url podcast-public podcast.id %}" method="POST">
+       <form action="{% podcast_link_target podcast "podcast-public" %}" method="POST">
          {% csrf_token %}
          <button type="submit" class="private" name="private">
            <img src="/media/32x32/private.png" alt="" />
