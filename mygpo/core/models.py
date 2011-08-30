@@ -10,10 +10,11 @@ from mygpo.decorators import repeat_on_conflict
 from mygpo import utils
 from mygpo.core.proxy import DocumentABCMeta
 from mygpo.core.slugs import SlugMixin
+from mygpo.core.oldid import OldIdMixin
 
 
 
-class Episode(Document, SlugMixin):
+class Episode(Document, SlugMixin, OldIdMixin):
     """
     Represents an Episode. Can only be part of a Podcast
     """
@@ -32,7 +33,6 @@ class Episode(Document, SlugMixin):
     outdated = BooleanProperty(default=False)
     mimetypes = StringListProperty()
     merged_ids = StringListProperty()
-    oldid = IntegerProperty()
     urls = StringListProperty()
     podcast = StringProperty(required=True)
     listeners = IntegerProperty()
@@ -243,7 +243,7 @@ class PodcastSubscriberData(Document):
         return 'PodcastSubscriberData for Podcast %s (%s)' % (self.podcast, self._id)
 
 
-class Podcast(Document, SlugMixin):
+class Podcast(Document, SlugMixin, OldIdMixin):
 
     __metaclass__ = DocumentABCMeta
 
@@ -256,7 +256,6 @@ class Podcast(Document, SlugMixin):
     logo_url = StringProperty()
     author = StringProperty()
     merged_ids = StringListProperty()
-    oldid = IntegerProperty()
     group = StringProperty()
     group_member_name = StringProperty()
     related_podcasts = StringListProperty()
@@ -774,7 +773,7 @@ class Podcast(Document, SlugMixin):
 
 
 
-class PodcastGroup(Document, SlugMixin):
+class PodcastGroup(Document, SlugMixin, OldIdMixin):
     title    = StringProperty()
     podcasts = SchemaListProperty(Podcast)
 

@@ -1,20 +1,27 @@
 function (doc)
 {
+    function searchPodcast(podcast)
+    {
+        if(podcast.oldid)
+        {
+            emit(podcast.oldid, null);
+        }
+
+        for(var n in podcast.merged_oldids)
+        {
+            emit(podcast.merged_oldids[n], null);
+        }
+    }
+
     if(doc.doc_type == "Podcast")
     {
-        if(doc.oldid)
-        {
-            emit(doc.oldid, null);
-        }
+        searchPodcast(doc);
     }
     else if(doc.doc_type == "PodcastGroup")
     {
-        for(i in doc.podcasts)
+        for(var i in doc.podcasts)
         {
-            if(doc.podcasts[i].oldid)
-            {
-                emit(doc.podcasts[i].oldid, null);
-            }
+            searchPodcast(doc.podcasts[i]);
         }
     }
 }
