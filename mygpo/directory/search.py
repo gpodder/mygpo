@@ -24,7 +24,7 @@ def search_podcasts(q, limit=20, skip=0):
         podcast = Podcast.for_url(url, create=True)
 
         if not podcast.title:
-            update_podcasts([p])
+            update_podcasts([podcast])
 
         podcast = Podcast.for_url(url)
 
