@@ -1,5 +1,4 @@
 
-from django.db.models import Sum
 from django.views.decorators.cache import never_cache
 from django.utils.html import strip_tags
 from django.core.urlresolvers import reverse
@@ -8,8 +7,12 @@ from babel import Locale, UnknownLocaleError
 from datetime import datetime
 import re
 
+from mygpo.core.models import Podcast
+
+
 def get_accepted_lang(request):
     return list(set([s[:2] for s in request.META.get('HTTP_ACCEPT_LANGUAGE', '').split(',')]))
+
 
 def get_podcast_languages():
     """
@@ -19,11 +22,12 @@ def get_podcast_languages():
     of these codes is contained in ISO 639.
     """
 
-    from mygpo.api.models import Podcast
-    # TODO: implement
-    langs = [x['language'] for x in Podcast.objects.values('language').distinct()]
-    sane_lang = sanitize_language_codes(langs)
+    res = Podcast.view('core/podcasts_by_language',
+            group = True,
+        )
 
+    langs = [r['key'] for r in res]
+    sane_lang = sanitize_language_codes(langs)
     sane_lang.sort()
 
     return sane_lang
