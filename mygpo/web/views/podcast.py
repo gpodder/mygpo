@@ -280,7 +280,7 @@ def subscribe_url(request):
 def set_public(request, podcast, public):
     state = podcast.get_user_state(request.user)
     update_podcast_settings(state=state, is_public=public)
-    return get_podcast_link_target(podcast)
+    return HttpResponseRedirect(get_podcast_link_target(podcast))
 
 
 # To make all view accessible via either CouchDB-ID or Slugs
