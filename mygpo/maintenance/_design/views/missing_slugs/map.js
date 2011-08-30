@@ -13,7 +13,7 @@ function(doc)
             subscribers = podcast.subscribers[podcast.subscribers.length-1].subscriber_count;
         }
 
-        if((podcast.slug = null) && podcast.title)
+        if((podcast.slug == null) && podcast.title)
         {
             emit(["Podcast", subscribers, podcast_id], null);
         }
