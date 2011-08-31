@@ -83,6 +83,7 @@ class Episode(Document, SlugMixin, OldIdMixin):
         r = cls.view('core/episodes_by_podcast_url',
                 key          = [podcast_id, episode_url],
                 include_docs = True,
+                reduce       = False,
             )
 
         if r:
@@ -198,14 +199,15 @@ class Episode(Document, SlugMixin, OldIdMixin):
 
     @classmethod
     def count(cls):
-        r = cls.view('core/episodes_by_podcast', limit=0)
-        return r.total_rows
+        return cls.view('core/episodes_by_podcast', group=True)['value']
 
 
     @classmethod
     def all(cls):
         return utils.multi_request_view(cls, 'core/episodes_by_podcast',
-                include_docs=True)
+                reduce       = False,
+                include_docs = True
+            )
 
     def __eq__(self, other):
         if other == None:
@@ -458,14 +460,36 @@ class Podcast(Document, SlugMixin, OldIdMixin):
             until = until.isoformat()
 
         res = Episode.view('core/episodes_by_podcast',
-                startkey = [self.get_id(), since],
-                endkey   = [self.get_id(), until],
-                include_docs=True,
+                startkey     = [self.get_id(), since],
+                endkey       = [self.get_id(), until],
+                include_docs = True,
+                reduce       = False,
                 **kwargs
             )
 
         return iter(res)
 
+
+    def get_episode_count(self, since=None, until={}, **kwargs):
+
+        if kwargs.get('descending', False):
+            since, until = until, since
+
+        if isinstance(since, datetime):
+            since = since.isoformat()
+
+        if isinstance(until, datetime):
+            until = until.isoformat()
+
+        res = Episode.view('core/episodes_by_podcast',
+                startkey     = [self.get_id(), since],
+                endkey       = [self.get_id(), until],
+                reduce       = True,
+                group_level  = 1,
+                **kwargs
+            )
+
+        return res.one()['value']
 
     def get_common_episode_title(self):
         # We take all non-empty titles
