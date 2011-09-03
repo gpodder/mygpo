@@ -41,7 +41,7 @@ class UserProfile(models.Model):
 
     class Meta:
         db_table = 'user'
-        managed = False
+
 
 class Podcast(models.Model):
     url = models.URLField(unique=True, verify_exists=False)
@@ -102,7 +102,6 @@ class Podcast(models.Model):
 
     class Meta:
         db_table = 'podcast'
-        managed = False
 
 
 class PodcastGroup(models.Model):
@@ -134,7 +133,6 @@ class PodcastGroup(models.Model):
 
     class Meta:
         db_table = 'podcast_groups'
-        managed = False
 
 
 # deprecated, only used in migration code
@@ -172,7 +170,6 @@ class Episode(models.Model):
     class Meta:
         db_table = 'episode'
         unique_together = ('podcast', 'url')
-        managed = False
 
 
 class SyncGroup(models.Model):
@@ -205,7 +202,7 @@ class SyncGroup(models.Model):
 
     class Meta:
         db_table = 'sync_group'
-        managed = False
+
 
 class Device(models.Model):
     user = models.ForeignKey(User)

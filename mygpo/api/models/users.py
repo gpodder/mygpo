@@ -27,5 +27,4 @@ class EpisodeFavorite(models.Model):
     class Meta:
         db_table = 'episode_favorites'
         unique_together = ('user', 'episode')
-        managed = False
 

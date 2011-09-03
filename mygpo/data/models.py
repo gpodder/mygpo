@@ -13,7 +13,6 @@ class PodcastTag(models.Model):
     class Meta:
         db_table = 'podcast_tags'
         unique_together = ('podcast', 'source', 'user', 'tag')
-        managed = False
 
 
 # deprecated, only used in migration code
@@ -25,7 +24,6 @@ class HistoricPodcastData(models.Model):
     class Meta:
         db_table = 'historic_podcast_data'
         unique_together = ('podcast', 'date')
-        managed = False
 
 
 # Deprecated: only used in migration-code anymore
@@ -36,7 +34,6 @@ class RelatedPodcast(models.Model):
 
     class Meta:
         db_table = 'related_podcasts'
-        managed = False
 
 
 # Deprecated: only used in migration-code anymore
@@ -46,4 +43,3 @@ class SuggestionBlacklist(models.Model):
 
     class Meta:
         db_table = 'suggestion_blacklist'
-        managed = False
