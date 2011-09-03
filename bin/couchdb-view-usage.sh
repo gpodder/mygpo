@@ -1,8 +1,8 @@
 #!/bin/bash
 
 DIR=`dirname $0`
-cd $DIR/..
-DIRS=`find  mygpo -type d -wholename "*/_design/views/*"`
+cd $DIR/../mygpo
+DIRS=`find . -type d -wholename "*/_design/views/*"`
 
 for view in $DIRS; do
     view_name=`echo $view | awk '{split($0,array,"/")} END{print array[2]"/"array[5]}'`
