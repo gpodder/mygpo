@@ -51,7 +51,6 @@ class SimpleWebTests(TestCase):
             'share',
             'toplist',
             'episode-toplist',
-            'example-opml',
             'devices',
             'device-create',
             'login',
