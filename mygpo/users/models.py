@@ -201,9 +201,7 @@ class EpisodeUserState(Document):
     Contains everything a user has done with an Episode
     """
 
-    episode_oldid = IntegerProperty()
     episode       = StringProperty(required=True)
-    podcast       = StringProperty()
     actions       = SchemaListProperty(EpisodeAction)
     settings      = DictProperty()
     user_oldid    = IntegerProperty()
@@ -346,7 +344,6 @@ class PodcastUserState(Document):
     """
 
     podcast       = StringProperty(required=True)
-    episodes      = SchemaDictProperty(EpisodeUserState)
     user_oldid    = IntegerProperty()
     settings      = DictProperty()
     actions       = SchemaListProperty(SubscriptionAction)
