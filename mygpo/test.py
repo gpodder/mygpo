@@ -1,14 +1,13 @@
-from django.test.simple import DjangoTestSuiteRunner
+from couchdbkit.ext.django.testrunner import CouchDbKitTestSuiteRunner
+
 from django.conf import settings
 
 # inspired by
 # http://djangosnippets.org/snippets/2211/
 
-class MygpoTestSuiteRunner(DjangoTestSuiteRunner):
+class MygpoTestSuiteRunner(CouchDbKitTestSuiteRunner):
     """
-    Test runner that doesn't create or destroy a test database (it requires
-    a pre-setup database), and is able to skip some tests according to
-    settings.py
+    Test runner that is able to skip some tests according to settings.py
     """
 
     def __init__(self, *args, **kwargs):
@@ -28,33 +27,6 @@ class MygpoTestSuiteRunner(DjangoTestSuiteRunner):
             suite._tests = tests
         return suite
 
-
-    def setup_databases(*args, **kwargs):
-        from django.db import connections
-        old_names = []
-        mirrors = []
-        for alias in connections:
-            connection = connections[alias]
-            # If the database is a test mirror, redirect it's connection
-            # instead of creating a test database.
-            if connection.settings_dict['TEST_MIRROR']:
-                mirrors.append((alias, connection))
-                mirror_alias = connection.settings_dict['TEST_MIRROR']
-                connections._connections[alias] = connections[mirror_alias]
-            else:
-                old_names.append((connection, connection.settings_dict['NAME']))
-
-                # don't create a test-database, because we require
-                # a pre-existing one
-                connection.creation.connection.settings_dict['NAME'] = \
-                    'test_' + connection.creation.connection.settings_dict['NAME']
-                connection.creation.connection.features.confirm()
-                #connection.creation.create_test_db(self.verbosity, autoclobber=not self.interactive)
-
-        return old_names, mirrors
-
-    def teardown_databases(*args, **kwargs):
-        pass
 
 def create_auth_string(username, password):
     import base64
