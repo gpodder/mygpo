@@ -1,57 +1,131 @@
+from itertools import chain, imap
+import logging
+from functools import partial
+
 import restkit
-from mygpo.core.models import Podcast, Episode
-from mygpo.users.models import PodcastUserState
+
+from mygpo.core.models import Podcast, Episode, PodcastGroup
+from mygpo.users.models import PodcastUserState, EpisodeUserState
 from mygpo import utils
 from mygpo.decorators import repeat_on_conflict
 
 
-def merge_objects(podcasts=True, podcast_states=False, episodes=False, episode_states=False, dry_run=False):
+class IncorrectMergeException(Exception):
+    pass
+
+
+def podcast_url_wrapper(r):
+    url = r['key']
+    doc = r['doc']
+    if doc['doc_type'] == 'Podcast':
+        obj = Podcast.wrap(doc)
+    elif doc['doc_type'] == 'PodcastGroup':
+        obj = PodcastGroup.wrap(doc)
+
+    return obj.get_podcast_by_url(url)
+
+def podcast_oldid_wrapper(r):
+    oldid = r['key']
+    doc = r['doc']
+    if doc['doc_type'] == 'Podcast':
+        obj = Podcast.wrap(doc)
+    elif doc['doc_type'] == 'PodcastGroup':
+        obj = PodcastGroup.wrap(doc)
+
+    return obj.get_podcast_by_oldid(oldid)
+
+
+def merge_objects(podcasts=True, podcast_states=False, episodes=False,
+        episode_states=False, dry_run=False):
     """
-    Merges objects (podcasts, podcast states, episodes) based on different criteria
+    Merges objects (podcasts, episodes, states) based on different criteria
     """
 
     # The "smaller" podcast is merged into the "greater"
     podcast_merge_order = lambda a, b: cmp(a.subscriber_count(), b.subscriber_count())
     no_merge_order = lambda a, b: 0
 
+    merger = partial(merge_from_iterator, dry_run=dry_run,
+            progress_callback=utils.progress)
+
+
     if podcasts:
 
         print 'Merging Podcasts by URL'
-        podcasts, total = get_view_count_iter(Podcast, 'core/podcasts_by_url')
-        merge_from_iterator(podcasts, similar_urls, podcast_merge_order, total, merge_podcasts, dry_run)
+        podcasts, total = get_view_count_iter(Podcast,
+                'core/podcasts_by_url',
+                wrap = False,
+                include_docs=True)
+        podcasts = imap(podcast_url_wrapper, podcasts)
+        merger(podcasts, similar_urls, podcast_merge_order, total,
+                merge_podcasts)
+        print
+
 
         print 'Merging Podcasts by Old-Id'
-        podcasts, total = get_view_count_iter(Podcast, 'core/podcasts_by_oldid')
-        merge_from_iterator(podcasts, similar_oldid, podcast_merge_order, total, merge_podcasts, dry_run)
+        podcasts, total = get_view_count_iter(Podcast,
+                'core/podcasts_by_oldid',
+                wrap = False,
+                include_docs=True)
+        podcasts = imap(podcast_oldid_wrapper, podcasts)
+        merger(podcasts, similar_oldid, podcast_merge_order, total,
+                merge_podcasts)
+        print
 
 
     if podcast_states:
         print 'Merging Duplicate Podcast States'
-        states, total = get_view_count_iter(PodcastUserState, 'users/podcast_states_by_user')
+        states, total = get_view_count_iter(PodcastUserState,
+                'users/podcast_states_by_user',
+                include_docs=True)
         should_merge = lambda a, b: a == b
-        merge_from_iterator(states, should_merge, no_merge_order, total, merge_podcast_states, dry_run)
+        merger(states, should_merge, no_merge_order, total,
+                merge_podcast_states)
+        print
 
 
     if episodes:
         print 'Merging Episodes by URL'
-        episodes, total = get_view_count_iter(Episode, 'core/episodes_by_url', include_docs=True)
-        should_merge = lambda a, b: a.podcast == b.podcast and similar_urls(a, b)
-        merge_from_iterator(episodes, should_merge, no_merge_order, total, merge_episodes, dry_run)
+        episodes, total = get_view_count_iter(Episode,
+                'core/episodes_by_podcast_url',
+                include_docs=True)
+        should_merge = lambda a, b: a.podcast == b.podcast and \
+                similar_urls(a, b)
+        merger(episodes, should_merge, no_merge_order, total, merge_episodes)
+        print
+
+
+        print 'Merging Episodes by Old-Id'
+        episodes, total = get_view_count_iter(Episode,
+                'core/episodes_by_oldid',
+                include_docs=True)
+        should_merge = lambda a, b: a.podcast == b.podcast and \
+                similar_oldid(a, b)
+        merger(episodes, should_merge, no_merge_order, total, merge_episodes)
+        print
+
 
     if episode_states:
-        print 'Merging Episodes by Old-Id'
-        episodes, total = get_view_count_iter(Episode, 'core/episodes_by_oldid', include_docs=True)
-        should_merge = lambda a, b: a.podcast == b.podcast and similar_oldid(a, b)
-        merge_from_iterator(episodes, should_merge, no_merge_order, total, merge_episodes, dry_run)
+        print 'Merging Duplicate Episode States'
+        states, total = get_view_count_iter(EpisodeUserState,
+                'users/episode_states_by_user_episode',
+                include_docs=True)
+        should_merge = lambda a, b: (a.user_oldid, a.episode) == \
+                                    (b.user_oldid, b.episode)
+        merger(states, should_merge, no_merge_order, total,
+                merge_episode_states)
+        print
 
 
-def get_view_count_iter(cls, view):
-    iterator = utils.multi_request_view(cls, view)
+
+def get_view_count_iter(cls, view, *args, **kwargs):
+    iterator = utils.multi_request_view(cls, view, *args, **kwargs)
     total = cls.view(view, limit=0).total_rows
     return iterator, total
 
 
-def merge_from_iterator(obj_it, should_merge, cmp, total, merge_func, dry_run):
+def merge_from_iterator(obj_it, should_merge, cmp, total, merge_func,
+        dry_run=False, progress_callback=lambda *args, **kwargs: None):
     """
     Iterates over the objects in obj_it and calls should_merge for each pair of
     objects. This implies that the objects returned by obj_it should be sorted
@@ -63,6 +137,8 @@ def merge_from_iterator(obj_it, should_merge, cmp, total, merge_func, dry_run):
     merged (first the larger, then the smaller one).
     """
 
+    obj_it = iter(obj_it)
+
     try:
         prev = obj_it.next()
     except StopIteration:
@@ -70,12 +146,14 @@ def merge_from_iterator(obj_it, should_merge, cmp, total, merge_func, dry_run):
 
     for n, p in enumerate(obj_it):
         if should_merge(p, prev):
-            print 'merging %s, %s' % (p, prev)
             items = sorted([p, prev], cmp=cmp)
+            logging.info('merging {old} into {new}'.
+                    format(old=items[1], new=items[0]))
+
             merge_func(*items, dry_run=dry_run)
 
         prev = p
-        utils.progress(n, total)
+        progress_callback(n, total)
 
 
 ###
@@ -84,59 +162,93 @@ def merge_from_iterator(obj_it, should_merge, cmp, total, merge_func, dry_run):
 #
 ###
 
-def merge_podcasts(podcast, p, dry_run):
+def merge_podcasts(podcast, podcast2, dry_run=False):
     """
-    Merges p into podcast
+    Merges podcast2 into podcast
     """
 
-    @repeat_on_conflict(['podcast'], reload_f=lambda p: Podcast.get(p.get_id()))
-    def do_merge(podcast, p):
-        podcast.merged_ids       = list(set(podcast.merged_ids + [p.get_id()] + p.merged_ids))
-        podcast.merged_slugs     = list(set(podcast.merged_slugs + [p.slug] + p.merged_slugs))
-        podcast.related_podcasts = list(set(podcast.related_podcasts + p.related_podcasts))
-        podcast.content_types    = list(set(podcast.content_types + p.content_types))
+    @repeat_on_conflict(['podcast'], reload_f=lambda p:Podcast.get(p.get_id()))
+    def _do_merge(podcast, podcast2):
+
+        podcast.merged_ids = set_filter(podcast.merged_ids,
+                [podcast2.get_id()], podcast2.merged_ids)
+
+        podcast.merged_slugs = set_filter(podcast.merged_slugs,
+                [podcast2.slug], podcast2.merged_slugs)
+
+        podcast.merged_oldids = set_filter(podcast.merged_oldids,
+                [podcast2.oldid], podcast2.merged_oldids)
+
+        # the first URL in the list represents the podcast main URL
+        main_url = podcast.url
+        podcast.urls = set_filter(podcast.urls, podcast2.urls)
+        # so we insert it as the first again
+        podcast.urls.remove(main_url)
+        podcast.urls.insert(0, main_url)
+
+        # we ignore related_podcasts because
+        # * the elements should be roughly the same
+        # * element order is important but could not preserved exactly
+
+        podcast.content_types = set_filter(podcast.content_types,
+                podcast2.content_types)
 
         key = lambda x: x.timestamp
-        for a, b in utils.iterate_together([podcast.subscribers, p.subscribers], key):
+        for a, b in utils.iterate_together(
+                [podcast.subscribers, podcast2.subscribers], key):
+
             if a is None or b is None: continue
 
             # avoid increasing subscriber_count when merging
             # duplicate entries of a single podcast
-            if a.subscriber_count == b.subscriber_count: continue
+            if a.subscriber_count == b.subscriber_count:
+                continue
 
             a.subscriber_count += b.subscriber_count
 
-        for src, tags in p.tags.items():
-            podcast.tags[src] = list(set(podcast.tags.get(src, []) + tags))
+        for src, tags in podcast2.tags.items():
+            podcast.tags[src] = set_filter(podcast.tags.get(src, []), tags)
 
-        if not dry_run:
-            podcast.save()
+        podcast.save()
 
-    @repeat_on_conflict(['p'])
-    def do_delete(p):
-        if not dry_run:
-            try:
-                p.delete()
-            except Exception as e:
-                print repr(e), e
+
+    @repeat_on_conflict(['podcast2'])
+    def _do_delete(podcast2):
+        podcast2.delete()
 
 
     # re-assign episodes to new podcast
     # if necessary, they will be merged later anyway
-    for e in p.get_episodes():
-        e.podcast = podcast.get_id()
+    for e in podcast2.get_episodes():
+
+        @repeat_on_conflict(['s'])
+        def save_state(s):
+            s.podcast = podcast.get_id()
+            s.save()
+
 
         @repeat_on_conflict(['e'])
         def save_episode(e):
-            if not dry_run:
-                e.save()
+            e.podcast = podcast.get_id()
+            e.save()
+
+        for s in e.get_all_states():
+            save_state(s=s)
 
         save_episode(e=e)
 
 
-    do_merge(podcast=podcast, p=p)
-    merge_podcast_states_for_podcasts(podcast, p, dry_run=dry_run)
-    do_delete(p=p)
+    _do_merge(podcast=podcast, podcast2=podcast2)
+    merge_podcast_states_for_podcasts(podcast, podcast2, dry_run=dry_run)
+    _do_delete(podcast2=podcast2)
+
+    # Merge Episode States
+    no_merge_order = lambda a, b: 0
+    episodes = sorted(podcast.get_episodes(), key=lambda e: e.url)
+    should_merge = lambda a, b: a.podcast == b.podcast and similar_urls(a, b)
+
+    merge_from_iterator(episodes, should_merge, no_merge_order, len(episodes),
+            merge_episodes)
 
 
 def similar_urls(a, b):
@@ -156,23 +268,30 @@ def similar_oldid(o1, o2):
 ###
 
 
-def merge_episodes(episode, e, dry_run):
-    episode.urls = list(set(episode.urls + e.urls))
-    episode.merged_ids = list(set(episode.merged_ids + [e.id] + e.merged_ids))
-    episode.merged_slugs = list(set(episode.merged_slugs + [e.slug] + e.merged_slugs))
+def merge_episodes(episode, e, dry_run=False):
+
+    episode.urls = set_filter(episode.urls, e.urls)
+
+    episode.merged_ids = set_filter(episode.merged_ids, [e._id],
+            e.merged_ids)
+
+    episode.merged_slugs = set_filter(episode.merged_slugs, [e.slug],
+            e.merged_slugs)
 
     @repeat_on_conflict(['e'])
     def delete(e):
-        if not dry_run:
-            e.delete()
+        e.delete()
 
     @repeat_on_conflict(['episode'])
     def save(episode):
-        if not dry_run:
-            episode.save()
+        episode.save()
 
+    merge_episode_states_for_episodes(episode, e, dry_run)
+
+    save(episode=episode)
     delete(e=e)
-    save(podcast=podcast)
+
+
 
 ###
 #
@@ -180,79 +299,87 @@ def merge_episodes(episode, e, dry_run):
 #
 ###
 
-def merge_podcast_states_for_podcasts(p1, p2, dry_run):
+def merge_podcast_states_for_podcasts(podcast, podcast2, dry_run=False):
     """Merges the Podcast states that are associated with the two Podcasts.
 
     This should be done after two podcasts are merged
     """
 
-    @repeat_on_conflict(['s2'])
-    def move(s2, new_id):
-        s2.podcast = new_id
-        if not dry_run:
-            s2.save()
+    @repeat_on_conflict(['state2'])
+    def move(state2, new_id, new_url):
+        state2.ref_url = new_url
+        state2.podcast = new_id
+        state2.save()
 
-    @repeat_on_conflict(['s2'])
-    def delete(s2):
-        if not dry_run:
-            s2.delete()
+    @repeat_on_conflict(['state2'])
+    def _delete(state2):
+        state2.delete()
 
     key = lambda x: x.user_oldid
-    states1 = p1.get_all_states()
-    states2 = p2.get_all_states()
-    for s1, s2 in utils.iterate_together([states1, states2], key):
-        if s1 == s2:
+    states1 = podcast.get_all_states()
+    states2 = podcast2.get_all_states()
+
+    for state, state2 in utils.iterate_together([states1, states2], key):
+
+        if state == state2:
             continue
 
-        if s1 == None:
-            s2.ref_url = p1.url
-            move(s2=s2, new_id=p1.get_id())
+        if state == None:
+            _move(state2=state2, new_id=podcast.get_id(), new_url=podcast.url)
 
-        elif s2 == None:
+        elif state2 == None:
             continue
 
         else:
-            if not s1.ref_url:
-                s1.ref_url = p1.url
-            merge_podcast_states(s1, s2, dry_run=dry_run)
-            delete(s2=s2)
+            merge_podcast_states(state, state2)
+            delete(state2=state2)
 
 
-def merge_podcast_states(state1, state2, dry_run):
+def merge_podcast_states(state, state2):
     """Merges the two given podcast states"""
 
-    @repeat_on_conflict(['s1'])
-    def do_merge(s1, s2):
-        s1.settings = s2.settings.update(s1.settings)
-        s1.episodes.update(s2.episodes)
-        s1.disabled_devices = list(set(s1.disabled_devices + s2.disabled_devices))
-        s1.merged_ids = list(set(s1.merged_ids + [s2._id] + s2.merged_ids))
-        if not dry_run:
-            s1.save()
+    if state.user_oldid != state2.user_oldid:
+        raise IncorrectMergeException("states don't belong to the same user")
 
     @repeat_on_conflict(['state'])
-    def add_actions(state, actions):
+    def _do_merge(state, state2):
+
+        # overwrite settings in state2 with state's settings
+        settings = state2.settings
+        settings.update(state.settings)
+        state1.settings = settings
+
+        state.disabled_devices = set_filter(state.disabled_devices,
+                state2.disabled_devices)
+
+        state.merged_ids = set_filter(state.merged_ids, [state2._id],
+                state2.merged_ids)
+
+        state.tags = set_filter(state.tags, state2.tags)
+
+        state.save()
+
+
+    @repeat_on_conflict(['state'])
+    def _add_actions(state, actions):
         try:
             state.add_actions(actions)
             state.save()
         except restkit.Unauthorized:
+            # the merge could result in an invalid list of
+            # subscribe/unsubscribe actions -- we ignore it and
+            # just use the actions from state
             return
 
-    @repeat_on_conflict(['state'])
-    def add_action(state, action):
-        try:
-            state.add_actions([action])
-            state.save()
-        except restkit.Unauthorized:
-            return
+    @repeat_on_conflict(['state2'])
+    def _do_delete(state2):
+        state2.delete()
 
-    do_merge(s1=state1, s2=state2)
+    _do_merge(state=state, state2=state2)
 
-    add_actions(state=state1, actions=state2.actions)
+    _add_actions(state=state, actions=state2.actions)
 
-    for action in state2.actions:
-        add_action(state=state1, action=action)
-
+    _do_delete(state2=state2)
 
 
 ###
@@ -261,30 +388,66 @@ def merge_podcast_states(state1, state2, dry_run):
 #
 ###
 
-def merge_similar_episode_states(podcast, podcast_state):
-    for e in podcast_state.episodes:
-        for e2 in podcast_state.episodes:
-            if e == e2: continue
-            new_id = find_new_episode_id(podcast, e.id)
-            if new_id != e.id:
-                merge_episode_states(e, e2, podcast_state)
+
+def merge_episode_states_for_episodes(episode, episode2, dry_run=False):
+
+    @repeat_on_conflict(['state2'])
+    def move(state2, podcast_id, episode_id):
+        state2.podcast = podcast_id
+        state2.episode = episode_id
+        state2.save()
+
+    key = lambda x: x.user_oldid
+    states1 = episode.get_all_states()
+    states2 = episode2.get_all_states()
+
+    for state, state2 in utils.iterate_together([states1, states2], key):
+
+        if state == state2:
+            continue
+
+        if state == None:
+            _move(state2=state2, podcast_id=episode.podcast,
+                    episode_id=episode._id)
+
+        elif state2 == None:
+            continue
+
+        else:
+            merge_episode_states(state, state2)
 
 
-def find_new_episode_id(podcast, merged_id):
-    for episode in podcast.get_episodes():
-        if episode._id == merged_id:
-            return merged_id
 
-        if merged_id in episode.merged_ids:
-            return episode._id
+def merge_episode_states(state, state2):
+    """ Merges state2 in state """
 
-    return None
+    if state.user_oldid != state2.user_oldid:
+        raise IncorrectMergeException("states don't belong to the same user")
 
 
-def merge_episode_states(state, other_state, podcast_state=None):
-    state.add_actions(other_state.actions)
-    state.settings.update(other_state.settings)
-    state.merged_ids = filter(None, list(set(state.merged_ids + [other_state._id] + other_state.merged_ids)))
-    state.chapters = list(set(state.chapters + other_state.chapters))
-    if podcast_state and (other_state.episode in podcast_state.episodes):
-        del podcast_state.episodes[other_state.episode]
+    @repeat_on_conflict(['state'])
+    def _do_update(state, state2):
+        state.add_actions(state2.actions)
+
+        # overwrite settings in state2 with state's settings
+        settings = state2.settings
+        settings.update(state.settings)
+        state.settings = settings
+
+        merged_ids = set(state.merged_ids + [state2._id] + state2.merged_ids)
+        state.merged_ids = filter(None, merged_ids)
+
+        state.chapters = list(set(state.chapters + state2.chapters))
+
+        state.save()
+
+    @repeat_on_conflict(['state2'])
+    def _do_delete(state2):
+        state2.delete()
+
+    _do_update(state=state, state2=state2)
+    _do_delete(state2=state2)
+
+
+def set_filter(*args):
+    return filter(None, set(chain.from_iterable(args)))

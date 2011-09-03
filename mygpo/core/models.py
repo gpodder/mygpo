@@ -126,6 +126,15 @@ class Episode(Document, SlugMixin, OldIdMixin):
         return EpisodeUserState.for_user_episode(user, self)
 
 
+    def get_all_states(self):
+        from mygpo.users.models import EpisodeUserState
+        r =  EpisodeUserState.view('users/episode_states_by_podcast_episode',
+            startkey = [self.podcast, self._id, None],
+            endkey   = [self.podcast, self._id, {}],
+            include_docs=True)
+        return iter(r)
+
+
     @property
     def url(self):
         return self.urls[0]
