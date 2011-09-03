@@ -309,9 +309,8 @@ class EpisodeUserState(Document):
         if not isinstance(other, EpisodeUserState):
             return False
 
-        return (self.episode_oldid == other.episode_oldid and \
-                self.episode == other.episode and
-                self.actions == other.actions)
+        return (self.episode == other.episode and
+                self.user_oldid == other.user_oldid)
 
 
 
