@@ -13,15 +13,16 @@ class Command(BaseCommand):
         make_option('--podcast-states', action='store_true', dest='podcast_states', default=False, help="Perform merging for Podcast states"),
         make_option('--episodes',       action='store_true', dest='episodes',       default=False, help="Perform merging for Episodes"),
         make_option('--episode_states', action='store_true', dest='episode_states', default=False, help="Perform merging for Episode states"),
+        make_option('--all',            action='store_true', dest='all',            default=False, help="Perform all merges"),
     )
 
     def handle(self, *args, **options):
 
-        dry_run        = options.get('dry_run')
-        podcasts       = options.get('podcasts')
-        podcast_states = options.get('podcast_states')
-        episodes       = options.get('episodes')
-        episode_states = options.get('episode_states')
+        dry_run        = options.get('dry_run') or options.get('all')
+        podcasts       = options.get('podcasts') or options.get('all')
+        podcast_states = options.get('podcast_states') or options.get('all')
+        episodes       = options.get('episodes') or options.get('all')
+        episode_states = options.get('episode_states') or options.get('all')
 
         if not any([podcasts, podcast_states, episodes, episode_states]):
             print >> sys.stderr, 'Usage: ./manage.py merge-duplicates [--dry-run] ( --podcasts | --podcast-states | --episodes | --episode-states )+'
