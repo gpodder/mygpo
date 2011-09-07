@@ -347,7 +347,7 @@ def merge_podcast_states(state, state2):
         # overwrite settings in state2 with state's settings
         settings = state2.settings
         settings.update(state.settings)
-        state1.settings = settings
+        state.settings = settings
 
         state.disabled_devices = set_filter(state.disabled_devices,
                 state2.disabled_devices)
