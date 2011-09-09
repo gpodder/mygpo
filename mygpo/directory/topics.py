@@ -10,14 +10,17 @@ from mygpo.users.models import User
 class Topics(object):
     """ Provies topics -- either podcast lists or categories """
 
-    def __init__(self, num_lists, num_categories, podcasts_per_topic):
+    def __init__(self, num_lists, num_categories, podcasts_per_topic,
+            min_list_rating=5):
         self.num_lists = num_lists
         self.num_categories = num_categories
         self.podcasts_per_topic = podcasts_per_topic
+        self.min_list_rating = min_list_rating
 
 
     def __iter__(self):
-        lists = islice(PodcastList.by_rating(), 0, self.num_lists)
+        lists = PodcastList.by_rating(self.min_list_rating)
+        lists = islice(lists, 0, self.num_lists)
         lists = map(self._prepare_list, lists)
 
         categories = Category.top_categories(self.num_categories)
