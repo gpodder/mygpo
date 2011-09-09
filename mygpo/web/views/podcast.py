@@ -273,7 +273,7 @@ def subscribe_url(request):
 
     podcast = Podcast.for_url(url, create=True)
 
-    return get_podcast_link_target(podcast, 'subscribe')
+    return HttpResponseRedirect(get_podcast_link_target(podcast, 'subscribe'))
 
 
 @allowed_methods(['POST'])
