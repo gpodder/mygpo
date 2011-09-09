@@ -71,9 +71,13 @@ class Command(BaseCommand):
         run_status.end_seq = total
         run_status.status_counter = dict(actions)
         # and overwrite existing one (we could keep a longer log here)
-        status.runs = [run_status]
-        status.save()
 
+        @repeat_on_conflict(['status'])
+        def _update(status, run_status):
+            status.runs = [run_status]
+            status.save()
+
+        _update(status=status, run_status=run_status)
 
     @staticmethod
     def get_cmd_status():
