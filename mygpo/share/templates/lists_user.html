@@ -3,7 +3,7 @@
 {% load i18n %}
 
 {% load menu %}
-{% block mainmenu %}{{ "/share/"|main_menu }}{% endblock %}
+{% block mainmenu %}{{ "/directory/"|main_menu }}{% endblock %}
 {% block sectionmenu %}{{ "/lists/"|section_menu }}{% endblock %}
 
 {% block title %}{% trans "Podcast Lists" %}{% endblock %}
@@ -17,12 +17,6 @@
     <tr>
      <td><a href="{% url list-show user.username list.slug %}">{{ list.title }}</a></td>
      <td>{% blocktrans with list.podcasts|length as num_podcasts %}{{ num_podcasts }} Podcasts{% endblocktrans %}</td>
-     <td>
-      <form action="{% url list-delete user.username list.slug %}" method="post">
-       {% csrf_token %}
-       <input type="submit" class="remove" value="" />
-      </form>
-     </td>
     </tr>
    {% empty %}
     <tr>
