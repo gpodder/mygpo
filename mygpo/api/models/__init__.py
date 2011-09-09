@@ -354,7 +354,7 @@ class Device(models.Model):
                 g.add(other)
 
             else:
-                oter.sync_group.add(self)
+                other.sync_group.add(self)
 
     def unsync(self):
         """
