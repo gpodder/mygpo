@@ -815,3 +815,12 @@ iframe.results
 {
     font-size: 50%;
 }
+
+.new
+{
+    font-size: 80%;
+    position: relative;
+    top: -0.5em;
+    color: red;
+    text-transform: uppercase;
+}
