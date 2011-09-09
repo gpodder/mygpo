@@ -160,7 +160,7 @@ def update_podcast(oldp, newp):
     if oldp.group:
         group = get_group(oldp.group)
         if not newp in list(group.podcasts):
-            newp = group.add_podcast(newp)
+            group.add_podcast(newp, oldp.group_member_name)
             updated = True
 
     # Update subscriber-data

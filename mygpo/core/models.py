@@ -452,9 +452,33 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         return self.title or self.url
 
 
-    def group_with(*args, **kwargs):
-        # TODO: implement
-        raise NotImplemented
+    def group_with(self, other, grouptitle, myname, othername):
+
+        if self.group and (self.group == other.group):
+            # they are already grouped
+            return
+
+        group1 = PodcastGroup.get(self.group) if self.group else None
+        group2 = PodcastGroup.get(other.group) if other.group else None
+
+        if group1 and group2:
+            raise ValueError('both podcasts already are in different groups')
+
+        elif not (group1 or group2):
+            group = PodcastGroup(title=grouptitle)
+            group.save()
+            group.add_podcast(self, myname)
+            group.add_podcast(other, othername)
+            return group
+
+        elif group1:
+            group1.add_podcast(other, othername)
+            return group1
+
+        else:
+            group2.add_podcast(self, myname)
+            return group2
+
 
 
     def get_episodes(self, since=None, until={}, **kwargs):
@@ -870,19 +894,23 @@ class PodcastGroup(Document, SlugMixin, OldIdMixin):
         return '/media/podcast-%d.png' % (hash(self.title) % 5, )
 
 
-    def add_podcast(self, podcast):
-        if not podcast.id:
-            podcast.id = podcast._id
+    def add_podcast(self, podcast, member_name):
 
         if not self._id:
             raise ValueError('group has to have an _id first')
 
+        if not podcast._id:
+            raise ValueError('podcast needs to have an _id first')
+
+        if not podcast.id:
+            podcast.id = podcast._id
+
         podcast.delete()
         podcast.group = self._id
+        podcast.group_member_name = member_name
         self.podcasts = sorted(self.podcasts + [podcast],
                         key=Podcast.subscriber_count, reverse=True)
         self.save()
-        return self.podcasts[-1]
 
 
     def __repr__(self):
