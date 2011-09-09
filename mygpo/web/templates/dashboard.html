@@ -68,7 +68,7 @@
 
  <hr />
 
- {% cache 3600 request.user.username %}
+ {% cache 3600 newest_episodes user.username %}
  {% if newest_episodes %}
  <div class="wide-box">
   <h2>{% trans "Newest Episodes" %}</h2>
