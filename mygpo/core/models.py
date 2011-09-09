@@ -289,6 +289,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
     language = StringProperty()
     content_types = StringListProperty()
     tags = DictProperty()
+    restrictions = StringListProperty()
 
 
     @classmethod
