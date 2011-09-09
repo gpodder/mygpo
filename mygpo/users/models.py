@@ -716,7 +716,7 @@ class User(Document):
                     yield entry
 
 
-    def get_newest_episodes(self, max_date):
+    def get_newest_episodes(self, max_date, max_per_podcast=5):
         """ Returns the newest episodes of all subscribed podcasts
 
         Episodes with release dates above max_date are discarded"""
@@ -725,8 +725,8 @@ class User(Document):
         podcasts = dict( (p.get_id(), p) for p in
                 self.get_subscribed_podcasts())
 
-        episodes = [p.get_episodes(until=max_date, descending=True) for p in
-                podcasts.values()]
+        episodes = [p.get_episodes(until=max_date, descending=True,
+                limit=max_per_podcast) for p in podcasts.values()]
 
         cmp_key = lambda episode: episode.released or datetime(2000, 01, 01)
 
