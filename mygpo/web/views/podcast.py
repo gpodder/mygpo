@@ -173,7 +173,7 @@ def add_tag(request, podcast):
     if request.GET.get('next', '') == 'mytags':
         return HttpResponseRedirect('/tags/')
 
-    return HttpResponseRedirect('/podcast/%s' % pid)
+    return HttpResponseRedirect(get_podcast_link_target(podcast))
 
 
 @login_required
@@ -196,7 +196,7 @@ def remove_tag(request, podcast):
     if request.GET.get('next', '') == 'mytags':
         return HttpResponseRedirect('/tags/')
 
-    return HttpResponseRedirect('/podcast/%s' % pid)
+    return HttpResponseRedirect(get_podcast_link_target(podcast))
 
 
 @manual_gc

@@ -167,7 +167,7 @@ class SubscriptionsFeed(Feed):
                         site=self.site)
 
     def item_link(self, item):
-        return reverse('podcast', args=[item.podcast.oldid])
+        return utils.get_podcast_link_target(item.podcast)
 
     def item_pubdate(self, item):
         return item.timestamp

@@ -107,7 +107,7 @@
       {% endspaceless %}
      {% endfor %}
      {% if user.is_authenticated %}
-      <form action="/podcast/{{ podcast.id }}/add-tag">
+      <form action="{% podcast_link_target podcast "add-tag" %}">
        <input type="text" name="tag" />
        <input type="submit" class="subscribe" value="" />
       </form>
