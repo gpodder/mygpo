@@ -22,6 +22,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.template.defaultfilters import slugify
 from django.template import RequestContext
+from django.contrib import messages
 from mygpo.api.models import UserProfile
 from mygpo.web.forms import RestorePasswordForm
 from django.contrib.sites.models import RequestSite
@@ -58,8 +59,10 @@ def login_user(request):
     user = authenticate(username=username, password=password)
 
     if user is None:
+
+        messages.error(request, _('Wrong username or password.'))
+
         return render_to_response('login.html', {
-            'error_message': _('Wrong username or password.'),
             'next': request.POST.get('next', ''),
         }, context_instance=RequestContext(request))
 
@@ -68,13 +71,18 @@ def login_user(request):
         p, c = UserProfile.objects.get_or_create(user=user)
 
         if p.deleted:
+
+            messages.error(request, _('You have deleted your account, '
+                    'but you can register again'))
+
             return render_to_response('login.html', {
-                'error_message': _('You have deleted your account, but you can register again')
                 }, context_instance=RequestContext(request))
 
         else:
+
+            messages.error(request, _('Please activate your account first.'))
+
             return render_to_response('login.html', {
-                'error_message': _('Please activate your account first.'),
                 'activation_needed': True,
             }, context_instance=RequestContext(request))
 
@@ -107,15 +115,22 @@ def migrate_user(request):
     if user.username != username:
         current_site = RequestSite(request)
         if User.objects.filter(username__exact=username).count() > 0:
+
+            messages.error(request, _('The username "%s" is already taken') %
+                        username)
+
             return render_to_response('migrate.html', {
-                'error_message': '%s is already taken' % username,
                 'url': current_site,
                 'username': user.username
                 }, context_instance=RequestContext(request))
 
         if slugify(username) != username.lower():
+
+            messages.error(request, _('"%s" is not a valid username. '
+                        'Please use characters, numbers, underscore '
+                        'and dash only') % username)
+
             return render_to_response('migrate.html', {
-                'error_message': '%s is not a valid username. Please use characters, numbers, underscore and dash only.' % username,
                 'url': current_site,
                 'username': user.username
                 }, context_instance=RequestContext(request))
@@ -148,9 +163,9 @@ def restore_password(request):
         user = get_user(form.cleaned_data['username'], form.cleaned_data['email'])
 
     except User.DoesNotExist:
-        error_message = _('User does not exist.')
+        messages.error(request, _('User does not exist.'))
+
         return render_to_response('password_reset_failed.html', {
-            'error_message': error_message
         }, context_instance=RequestContext(request))
 
     site = RequestSite(request)
@@ -166,7 +181,6 @@ def restore_password(request):
 @manual_gc
 @allowed_methods(['GET', 'POST'])
 def resend_activation(request):
-    error_message = ''
 
     if request.method == 'GET':
         form = ResendActivationForm()
@@ -204,9 +218,10 @@ def resend_activation(request):
             raise ValueError(_('Your activation key has expired. Please try another username, or retry with the same one tomorrow.'))
 
     except ValueError, e:
+        messages.error(request, str(e))
+
         return render_to_response('registration/resend_activation.html', {
            'form': form,
-           'error_message' : e
         }, context_instance=RequestContext(request))
 
 

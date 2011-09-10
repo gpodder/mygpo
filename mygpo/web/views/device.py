@@ -19,6 +19,7 @@ from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponseForbidden
 from django.template import RequestContext
+from django.contrib import messages
 from mygpo.api.models import Device
 from mygpo.web.forms import DeviceForm, SyncForm
 from mygpo.web import utils
@@ -47,7 +48,7 @@ def overview(request):
 
 @manual_gc
 @login_required
-def show(request, device_id, error_message=None):
+def show(request, device_id):
     device = get_object_or_404(Device, id=device_id, user=request.user)
 
     if device.user != request.user:
@@ -65,7 +66,6 @@ def show(request, device_id, error_message=None):
     return render_to_response('device.html', {
         'device': device,
         'sync_form': sync_form,
-        'error_message': error_message,
         'subscriptions': subscriptions,
         'synced_with': synced_with,
         'has_sync_targets': len(device.sync_targets()) > 0
@@ -80,9 +80,6 @@ def edit(request, device_id=None):
     else:
         device = Device(name=_('New Device'), uid=_('new-device'), user=request.user)
 
-    success = False
-    error_message = ''
-
     if request.method == 'POST':
         device_form = DeviceForm(request.POST)
 
@@ -92,13 +89,14 @@ def edit(request, device_id=None):
             device.uid  = device_form.cleaned_data['uid']
             try:
                 device.save()
-                success = True
+                messages.success(request, _('Device updated'))
 
                 if not device_id:
                     return HttpResponseRedirect(reverse('device', args=[device.id]))
 
             except IntegrityError, ie:
-                error_message = _('You can\'t use the same Device ID for two devices.')
+                messages.error(request, _("You can't use the same Device "
+                           "ID for two devices."))
 
     else:
         device_form = DeviceForm({
@@ -111,8 +109,6 @@ def edit(request, device_id=None):
     return render_to_response(template, {
         'device': device,
         'device_form': device_form,
-        'success': success,
-        'error_message': error_message,
     }, context_instance=RequestContext(request))
 
 

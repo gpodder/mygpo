@@ -6,20 +6,11 @@
 {% block sectionmenu %}{{ "/account/"|section_menu }}{% endblock %}
 
 {% block title %}
- {% if success %}
-  {% trans "Accound Deleted" %}
- {% else %}
   {% trans "Delete Account" %}
- {% endif %}
 {% endblock %}
 
 {% block content %}
 
- {% if success %}
-  <h1>{% trans "Your account has been deleted" %}</h1>
-  <a href="{% url home %}">{% trans "Thanks" %}</a>
-
- {% else %}
   <h1>{% trans "Delete your Account?" %}</h1>
   <p>{% trans "Do you really want to delete your account?" %}</p>
   <form method="post" action="{% url delete-account %}">
@@ -27,5 +18,4 @@
    <input type="submit" value="{% trans "Yes, please" %}" />
   </form>
 
- {% endif %}
 {% endblock %}

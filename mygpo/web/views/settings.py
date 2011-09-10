@@ -18,6 +18,7 @@
 from django.shortcuts import render_to_response
 from django.contrib.auth import logout
 from django.template import RequestContext
+from django.contrib import messages
 from mygpo.web.forms import UserAccountForm
 from django.forms import ValidationError
 from django.utils.translation import ugettext as _
@@ -33,9 +34,6 @@ from mygpo.utils import get_to_dict
 @login_required
 @allowed_methods(['GET', 'POST'])
 def account(request):
-    success = False
-    error_message = ''
-
     user = migrate.get_or_migrate_user(request.user)
 
     if request.method == 'GET':
@@ -65,20 +63,13 @@ def account(request):
         request.user.save()
         request.user.get_profile().save()
 
-        success = True
+        messages.success(request, 'Account updated')
 
-    except ValueError, e:
-        success = False
-        error_message = e
-
-    except ValidationError, e:
-        success = False
-        error_message = e
+    except (ValueError, ValidationError) as e:
+        messages.error(request, str(e))
 
     return render_to_response('account.html', {
         'form': form,
-        'success': success,
-        'error_message': error_message
     }, context_instance=RequestContext(request))
 
 
@@ -88,7 +79,8 @@ def account(request):
 def delete_account(request):
 
     if request.method == 'GET':
-        return render_to_response('delete_account.html', context_instance=RequestContext(request))
+        return render_to_response('delete_account.html',
+                context_instance=RequestContext(request))
 
     profile = request.user.get_profile()
     profile.deleted = True
@@ -97,8 +89,8 @@ def delete_account(request):
     request.user.is_active = False
     request.user.save()
     logout(request)
-    return render_to_response('delete_account.html', {
-        'success': True
+
+    return render_to_response('deleted_account.html', {
         }, context_instance=RequestContext(request))
 
 

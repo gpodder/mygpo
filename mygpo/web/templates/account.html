@@ -10,9 +10,6 @@
 {% block content %}
   <h1>{% trans "Account settings" %}</h1>
 
- {% if success %}
-   <div class="success">{% trans "Your settings have been saved." %}</div>
- {% endif %}
   <form action="{% url account %}" method="POST">
       {% csrf_token %}
       <h3>{% trans "Contact information and password" %}</h3>

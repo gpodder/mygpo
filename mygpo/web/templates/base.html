@@ -64,10 +64,6 @@
 
    <div id="content-area">
 
-   {% if error_message %}
-    <div class="error">{{ error_message }}</div>
-   {% endif %}
-
    {% if messages %}
     {% for message in messages %}
      <div {% if message.tags %} class="{{ message.tags }}"{% endif %}>

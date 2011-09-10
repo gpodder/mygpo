@@ -8,6 +8,7 @@ from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
 from django.utils.translation import ugettext as _
+from django.contrib import messages
 from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.core.proxy import proxy_object
 from mygpo.api.models import Device, SyncGroup
@@ -202,7 +203,6 @@ def remove_tag(request, podcast):
 @login_required
 @allowed_methods(['GET', 'POST'])
 def subscribe(request, podcast):
-    error_message = None
 
     if request.method == 'POST':
         form = SyncForm(request.POST)
@@ -224,7 +224,8 @@ def subscribe(request, podcast):
             return HttpResponseRedirect(get_podcast_link_target(podcast))
 
         except ValueError, e:
-            error_message = _('Could not subscribe to the podcast: %s' % e)
+            messages.error(request, _('Could not subscribe '
+                        'to the podcast: %s' % str(e)))
 
     targets = podcast.subscribe_targets(request.user)
 
@@ -232,7 +233,6 @@ def subscribe(request, podcast):
     form.set_targets(targets, _('Choose a device:'))
 
     return render_to_response('subscribe.html', {
-        'error_message': error_message,
         'podcast': podcast,
         'can_subscribe': len(targets) > 0,
         'form': form

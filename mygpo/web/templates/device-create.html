@@ -15,9 +15,6 @@
   <hr/>
 
   <h2>{% trans "Edit" %}</h2>
-  {% if success %}
-   <div class="success">{% trans "Your settings have been saved." %}</div>
-  {% endif %}
 
   <form action="{% url device-create %}" method="POST">
    {% csrf_token %}
