@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 
 from mygpo.core.slugs import PodcastSlug, PodcastGroupSlug, \
-         PodcastsMissingSlugs,
+         PodcastsMissingSlugs, \
          PodcastGroupsMissingSlugs, assign_slug
 from mygpo.decorators import repeat_on_conflict
 from mygpo.utils import progress
