@@ -92,6 +92,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.locale.LocaleMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
 )
 
 ROOT_URLCONF = 'mygpo.urls'
@@ -100,6 +101,7 @@ TEMPLATE_DIRS = ()
 
 INSTALLED_APPS = (
     'django.contrib.contenttypes', # unused, but tests fail otherwise (?)
+    'django.contrib.messages',
     'django.contrib.auth',
     'django.contrib.sessions',
     'django.contrib.humanize',

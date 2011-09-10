@@ -68,6 +68,14 @@
     <div class="error">{{ error_message }}</div>
    {% endif %}
 
+   {% if messages %}
+    {% for message in messages %}
+     <div {% if message.tags %} class="{{ message.tags }}"{% endif %}>
+      {{ message }}
+     </div>
+    {% endfor %}
+   {% endif %}
+
    {% block content %}
     <h1>gPodder Web Service</h1>
     <p>...will go online soon...</p>

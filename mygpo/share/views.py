@@ -6,6 +6,8 @@ from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from django.contrib.sites.models import RequestSite
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.utils.translation import ugettext as _
 
 from mygpo.core.models import Podcast
 from mygpo.core.proxy import proxy_object
@@ -101,7 +103,18 @@ def list_opml(request, plist, owner):
 @login_required
 def create_list(request):
     title = request.POST.get('title', None)
+
+    if not title:
+        messages.error(request, _('You have to specify a title.'))
+        return HttpResponseRedirect(reverse('lists-overview'))
+
     slug = slugify(title)
+
+    if not slug:
+        messages.error(request, _('"{title}" is not a valid title').format(
+                    title=title))
+        return HttpResponseRedirect(reverse('lists-overview'))
+
     user = migrate.get_or_migrate_user(request.user)
 
     plist = PodcastList.for_user_slug(user._id, slug)
@@ -153,6 +166,8 @@ def rate_list(request, plist, owner):
 
     plist.rate(rating_val, user._id)
     plist.save()
+
+    messages.success(request, _('Thanks for rating!'))
 
     list_url = reverse('list-show', args=[owner.username, plist.slug])
     return HttpResponseRedirect(list_url)

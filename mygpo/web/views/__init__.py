@@ -23,6 +23,9 @@ from django.http import HttpResponseRedirect, Http404
 from django.views.decorators.cache import cache_page
 from django.contrib.auth.models import User
 from django.template import RequestContext
+from django.contrib import messages
+from django.utils.translation import ugettext as _
+
 from mygpo.core import models
 from mygpo.core.models import Podcast, Episode
 from mygpo.directory import tags
@@ -209,8 +212,7 @@ def rate_suggestions(request):
     suggestion.rate(rating_val, user._id)
     suggestion.save()
 
-    # TODO: when we use Django messaging system,
-    # add a message for successful rating here
+    messages.success(request, _('Thanks for rating!'))
 
     return HttpResponseRedirect(reverse('suggestions'))
 
