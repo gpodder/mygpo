@@ -15,6 +15,12 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+from collections import defaultdict
+from itertools import cycle
+import random
+
+from django.core.cache import cache
+
 from mygpo.api.models import Device
 from mygpo.data.mimetype import get_type, CONTENT_TYPES
 from mygpo.core.models import Podcast, Episode
@@ -28,15 +34,43 @@ except ImportError:
 
 
 def get_random_picks(languages=None):
-    # TODO: implement
-    return Podcast.random()
-#    all_podcasts    = Podcast.objects.all().exclude(title='').order_by('?')
-#    lang_podcasts   = get_podcasts_for_languages(languages, all_podcasts)
-#
-#    if lang_podcasts.count() > 0:
-#        return lang_podcasts
-#    else:
-#        return all_podcasts
+    """ Returns random podcasts for the given language """
+
+    if not languages:
+        for podcast in Podcast.random():
+            yield podcast
+
+    counts = cache.get('podcast-language-counts')
+    if not counts:
+        counts = get_podcast_count_for_language()
+        cache.set('podcast-language-counts', counts, 60*60)
+
+
+    # extract positive counts of all languages in language param
+    counts = filter(lambda (l, c): l in languages and c > 0, counts.items())
+
+    for lang, count in cycle(counts):
+        skip = random.randint(0, count-1)
+
+        for podcast in Podcast.for_language(lang, skip=skip, limit=1):
+            yield podcast
+
+
+
+def get_podcast_count_for_language():
+    """ Returns a the number of podcasts for each language """
+
+    counts = defaultdict(int)
+
+    db = Podcast.get_db()
+    r = db.view('core/podcasts_by_language',
+        reduce = True,
+        group_level = 1,
+    )
+
+    counts.update( dict( (x['key'][0], x['value']) for x in r) )
+    return counts
+
 
 
 def get_device(user, uid, undelete=True):

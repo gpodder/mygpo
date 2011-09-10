@@ -417,7 +417,30 @@ class Podcast(Document, SlugMixin, OldIdMixin):
             )
 
         for r in res:
-            r = res.one()
+            obj = r['doc']
+            if obj['doc_type'] == 'Podcast':
+                yield Podcast.wrap(obj)
+
+            else:
+                pid = r[u'key'][1]
+                pg = PodcastGroup.wrap(obj)
+                podcast = pg.get_podcast_by_id(pid)
+                yield podcast
+
+
+    @classmethod
+    def for_language(cls, language, **kwargs):
+        db = cls.get_db()
+
+        res = db.view('core/podcasts_by_language',
+                startkey     = [language, None],
+                endkey       = [language, {}],
+                include_docs = True,
+                reduce       = False,
+                **kwargs
+            )
+
+        for r in res:
             obj = r['doc']
             if obj['doc_type'] == 'Podcast':
                 yield Podcast.wrap(obj)
