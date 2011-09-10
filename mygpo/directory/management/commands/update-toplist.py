@@ -27,7 +27,7 @@ class Command(BaseCommand):
         total = Podcast.view('core/podcasts_by_oldid', limit=0).total_rows
 
         for n, podcast in enumerate(podcasts):
-            subscriber_count = self.get_subscriber_count(podcast.get_id())
+            subscriber_count = self.get_subscriber_count(podcast)
             self.update(podcast=podcast, started=started, subscriber_count=subscriber_count)
 
             if not silent:
@@ -51,13 +51,18 @@ class Command(BaseCommand):
 
 
     @staticmethod
-    def get_subscriber_count(podcast_id):
+    def get_subscriber_count(podcast):
         db = PodcastUserState.get_db()
-        x = db.view('users/subscriptions_by_podcast',
-                startkey    = [podcast_id, None],
-                endkey      = [podcast_id, {}],
-                reduce      = True,
-                group       = True,
-                group_level = 2,
-            )
-        return x.count()
+        subscriber_sum = 0
+
+        for podcast_id in podcast.get_ids():
+            x = db.view('users/subscriptions_by_podcast',
+                    startkey    = [podcast_id, None],
+                    endkey      = [podcast_id, {}],
+                    reduce      = True,
+                    group       = True,
+                    group_level = 2,
+                )
+            subscriber_sum += x.count()
+
+        return subscriber_sum
