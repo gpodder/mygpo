@@ -167,6 +167,9 @@ def merge_podcasts(podcast, podcast2, dry_run=False):
     Merges podcast2 into podcast
     """
 
+    if podcast == podcast2:
+        raise IncorrectMergeException("can't merge podcast into itself")
+
     @repeat_on_conflict(['podcast'], reload_f=lambda p:Podcast.get(p.get_id()))
     def _do_merge(podcast, podcast2):
 
@@ -270,6 +273,9 @@ def similar_oldid(o1, o2):
 
 def merge_episodes(episode, e, dry_run=False):
 
+    if episode == e:
+        raise IncorrectMergeException("can't merge episode into itself")
+
     episode.urls = set_filter(episode.urls, e.urls)
 
     episode.merged_ids = set_filter(episode.merged_ids, [e._id],
@@ -337,6 +343,9 @@ def merge_podcast_states_for_podcasts(podcast, podcast2, dry_run=False):
 
 def merge_podcast_states(state, state2):
     """Merges the two given podcast states"""
+
+    if state._id == state2._id:
+        raise IncorrectMergeException("can't merge podcast state into itself")
 
     if state.user_oldid != state2.user_oldid:
         raise IncorrectMergeException("states don't belong to the same user")
@@ -420,6 +429,9 @@ def merge_episode_states_for_episodes(episode, episode2, dry_run=False):
 
 def merge_episode_states(state, state2):
     """ Merges state2 in state """
+
+    if state._id == state2._id:
+        raise IncorrectMergeException("can't merge episode state into itself")
 
     if state.user_oldid != state2.user_oldid:
         raise IncorrectMergeException("states don't belong to the same user")
