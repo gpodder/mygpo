@@ -1,94 +1,75 @@
-from optparse import make_option
-
 from couchdbkit import Consumer
 
-from django.core.management.base import BaseCommand
-from django.contrib.auth.models import User
-
-from mygpo.core.models import Episode, Podcast
+from mygpo.maintenance.management.changescmd import ChangesCommand
+from mygpo.core.models import Episode, Podcast, MergedIdException
 from mygpo.decorators import repeat_on_conflict
 from mygpo.users.models import EpisodeUserState
-from mygpo.maintenance.merge import merge_episode_states
-from mygpo.utils import progress, multi_request_view
-from mygpo import migrate
-
-try:
-    from collections import Counter
-except ImportError:
-    from mygpo.counter import Counter
 
 
-class Command(BaseCommand):
+class Command(ChangesCommand):
     """ Fixes broken references in episode state objects """
 
 
-    option_list = BaseCommand.option_list + (
-            make_option('--since', action='store', type=int, dest='since',
-            default=0, help="Where to start the operation"),
-        )
+    def __init__(self):
+        self.podcasts = {}
+        self.episodes = {}
 
 
-    def handle(self, *args, **options):
+    def handle_obj(self, seq, obj, actions):
 
-        db = EpisodeUserState.get_db()
-        since = options.get('since')
-        total = db.info()['update_seq']
+        # Podcasts
+        if not state.podcast in self.podcasts:
 
-        states = self.get_states(db, since)
-        podcasts = {}
-        episodes = {}
-        actions = Counter()
+            try:
+                podcast = Podcast.get(state.podcast, current_id=True)
 
-        for n, state in states:
+            except MergedIdException as ex:
+                self.podcasts[state.podcast] = ex.current_id
 
-            # Podcasts
-            if not state.podcast in podcasts:
+            if podcast:
+                self.podcasts[state.podcast] = True
 
-                podcast = Podcast.get(state.podcast)
+            else:
+                if not state.podcast_ref_url:
+                    return
 
-                if podcast:
-                    podcasts[state.podcast] = True
+                actions['fetch-podcast'] += 1
+                podcast = Podcast.for_url(state.podcast_ref_url,create=True)
+                self.podcasts[state.podcast] = podcast.get_id()
 
-                else:
-                    if not state.podcast_ref_url:
-                        continue
-
-                    actions['fetch-podcast'] += 1
-                    podcast = Podcast.for_url(state.podcast_ref_url,create=True)
-                    podcasts[state.podcast] = podcast.get_id()
-
-            if isinstance(podcasts.get(state.podcast, False), basestring):
-                actions['update-podcast'] += 1
-                self.update_podcast(state=state,
-                        podcast_id=podcasts[state.podcast])
+        if isinstance(self.podcasts.get(state.podcast, False), basestring):
+            actions['update-podcast'] += 1
+            self.update_podcast(state=state,
+                    podcast_id = self.podcasts[state.podcast])
 
 
 
-            # Episodes
-            if not state.episode in episodes:
+        # Episodes
+        if not state.episode in self.episodes:
 
-                episode = Episode.get(state.episode)
+            try:
+                episode = Episode.get(state.episode, current_id=True)
 
-                if episode:
-                    episodes[state.episode] = True
+            except MergedIdException as ex:
+                self.episodes[state.episode] = ex.current_id
 
-                else:
-                    if not state.ref_url:
-                        continue
+            if episode:
+                self.episodes[state.episode] = True
 
-                    actions['fetch-episode'] += 1
-                    episode = Episode.for_podcast_id_url(state.podcast,
-                        state.ref_url, create=True)
-                    episodes[state.episode] = episode._id
+            else:
+                if not state.ref_url:
+                    return
 
-            if isinstance(episodes.get(state.episode, False), basestring):
-                actions['update-episode'] += 1
-                self.update_episode(state=state,
-                        episode_id=episodes[state.episode])
+                actions['fetch-episode'] += 1
+                episode = Episode.for_podcast_id_url(state.podcast,
+                    state.ref_url, create=True)
+                self.episodes[state.episode] = episode._id
 
+        if isinstance(self.episodes.get(state.episode, False), basestring):
+            actions['update-episode'] += 1
+            self.update_episode(state=state,
+                    episode_id = self.episodes[state.episode])
 
-            status_str = ', '.join('%s: %d' % x for x in actions.items())
-            progress(n, total, status_str)
 
 
     @repeat_on_conflict(['state'])
@@ -102,8 +83,7 @@ class Command(BaseCommand):
         state.save()
 
 
-    @staticmethod
-    def get_states(db, since=0, limit=100):
+    def get_objects(self, db, since=0, limit=100):
         consumer = Consumer(db)
 
         while True:
@@ -121,3 +101,13 @@ class Command(BaseCommand):
                 yield seq, EpisodeUserState.wrap(doc)
 
             since = resp['last_seq']
+
+
+    def get_db(self):
+        return EpisodeUserState.get_db()
+
+    def get_status_id(self):
+        return 'fix-episode-states-status'
+
+    def get_command_name(self):
+        return 'Fix-Episode-States'

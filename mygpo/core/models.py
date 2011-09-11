@@ -13,6 +13,13 @@ from mygpo.core.slugs import SlugMixin
 from mygpo.core.oldid import OldIdMixin
 
 
+class MergedIdException(Exception):
+    """ raised when an object is accessed through one of its merged_ids """
+
+    def __init__(self, obj, current_id):
+        self.obj = obj
+        self.current_id = current_id
+
 
 class Episode(Document, SlugMixin, OldIdMixin):
     """
@@ -40,12 +47,20 @@ class Episode(Document, SlugMixin, OldIdMixin):
 
 
     @classmethod
-    def get(cls, id):
+    def get(cls, id, current_id=False):
         r = cls.view('core/episodes_by_id',
                 key=id,
                 include_docs=True,
             )
-        return r.first() if r else None
+
+        if not r:
+            return None
+
+        obj = r.one()
+        if current_id and obj._id != id:
+            raise MergedIdException(obj, obj._id)
+
+        return obj
 
 
     @classmethod
@@ -277,7 +292,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
 
     @classmethod
-    def get(cls, id):
+    def get(cls, id, current_id=False):
         r = cls.view('core/podcasts_by_id',
                 key=id,
                 classes=[Podcast, PodcastGroup],
@@ -288,7 +303,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
             return None
 
         podcast_group = r.first()
-        return podcast_group.get_podcast_by_id(id)
+        return podcast_group.get_podcast_by_id(id, current_id)
 
 
     @classmethod
@@ -458,8 +473,13 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         return r.total_rows
 
 
-    def get_podcast_by_id(self, _):
+    def get_podcast_by_id(self, id, current_id=False):
+        if current_id and id != self.get_id():
+            raise MergedIdException(self, self.get_id())
+
         return self
+
+
     get_podcast_by_oldid = get_podcast_by_id
     get_podcast_by_url = get_podcast_by_id
 
@@ -867,11 +887,15 @@ class PodcastGroup(Document, SlugMixin, OldIdMixin):
             key=oldid, limit=1, include_docs=True)
         return r.first() if r else None
 
-    def get_podcast_by_id(self, id):
+    def get_podcast_by_id(self, id, current_id=False):
         for podcast in self.podcasts:
             if podcast.get_id() == id:
                 return podcast
+
             if id in podcast.merged_ids:
+                if current_id:
+                    raise MergedIdException(podcast, podcast.get_id())
+
                 return podcast
 
 

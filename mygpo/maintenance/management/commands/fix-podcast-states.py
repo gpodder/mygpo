@@ -3,7 +3,7 @@ from optparse import make_option
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 
-from mygpo.core.models import Podcast
+from mygpo.core.models import Podcast, MergedIdException
 from mygpo.decorators import repeat_on_conflict
 from mygpo.users.models import PodcastUserState
 from mygpo.maintenance.merge import merge_podcast_states
@@ -42,20 +42,26 @@ class Command(BaseCommand):
             # Podcasts
             if not state.podcast in podcasts:
 
-                podcast = Podcast.get(state.podcast)
+                try:
+                    podcast = Podcast.get(state.podcast, current_id=True)
 
-                if podcast:
-                    podcasts[state.podcast] = True
+                    if podcast:
+                        podcasts[state.podcast] = True
 
-                else:
-                    if not state.ref_url:
-                        continue
+                    else:
+                        if not state.ref_url:
+                            continue
 
-                    actions['fetch'] += 1
-                    podcast = Podcast.for_url(state.ref_url,create=True)
-                    podcasts[state.podcast] = podcast
+                        actions['fetch'] += 1
+                        podcast = Podcast.for_url(state.ref_url,create=True)
+                        podcasts[state.podcast] = podcast
+
+                except MergedIdException as ex:
+                    podcasts[state.podcast] = ex.obj
+
 
             new_p = podcasts.get(state.podcast, False)
+
             if isinstance(new_p, Podcast):
 
                 try:
