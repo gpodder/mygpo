@@ -34,7 +34,10 @@
 
  </head>
  <body>
-  <div id="body">
+
+   <div id="wrap">
+
+    <div id="main">
 
      <div id="logininfo">
          {% if user.is_authenticated %}
@@ -81,11 +84,16 @@
     </ul>
    {% endblock %}
    </div>
-   <hr>
+
+   </div>
+  </div>
+
+  <div id="footer">
    <address style="font-variant: small-caps;">
        Copyright &copy; 2009-2011 gpodder.net
    </address>
   </div>
+
 
 <!-- getsatisfaction.com feedback tab -->
 <script type="text/javascript" charset="utf-8">

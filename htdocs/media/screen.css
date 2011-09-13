@@ -1,3 +1,10 @@
+
+html,
+body
+{
+    height: 100%;
+}
+
 body 
 { 
     font-family: DeJaVu Sans, Bitstream Vera Sans, sans-serif; 
@@ -28,7 +35,7 @@ img
     border-width: 0px; 
 }
 
-#body
+#wrap
 {
     width: 800px;
     margin-left: auto;
@@ -36,6 +43,29 @@ img
     background-color: white;
     min-height: 100%;
     padding: 0px;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+#main
+{
+    overflow:auto;
+    padding-bottom: 50px; /* must be same height as the footer */
+}
+
+
+#footer
+{
+    position: relative;
+    margin-top: -50px; /* negative value of footer height */
+    height: 34px;
+    clear:both;
+    padding-top: 10px;
+    border-top: 1px #aaa dotted;
+    width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: white;
 }
 
 #logo
@@ -591,6 +621,7 @@ div.intro-box
     padding-top: 1em;
     padding-left: 5%;
     padding-bottom: 1em;
+    overflow: hidden;
 }
 
 div.wide-box
