@@ -2,6 +2,7 @@ import uuid, collections
 from datetime import datetime
 import dateutil.parser
 from itertools import imap
+
 from couchdbkit import ResourceNotFound
 from couchdbkit.ext.django.schema import *
 
@@ -10,6 +11,8 @@ from mygpo.core.models import Podcast, Episode
 from mygpo.utils import linearize, get_to_dict, iterate_together
 from mygpo.decorators import repeat_on_conflict
 from mygpo.users.ratings import RatingMixin
+from mygpo.users.sync import SyncedDevicesMixin
+from mygpo.log import log
 
 
 class Suggestions(Document, RatingMixin):
@@ -58,7 +61,7 @@ class EpisodeAction(DocumentSchema):
 
     action        = StringProperty(required=True)
     timestamp     = DateTimeProperty(required=True, default=datetime.utcnow)
-    device_oldid  = IntegerProperty()
+    device_oldid  = IntegerProperty(required=False)
     device        = StringProperty()
     started       = IntegerProperty()
     playmark      = IntegerProperty()
@@ -67,7 +70,7 @@ class EpisodeAction(DocumentSchema):
     def __eq__(self, other):
         if not isinstance(other, EpisodeAction):
             return False
-        vals = ('action', 'timestamp', 'device_oldid', 'started', 'playmark',
+        vals = ('action', 'timestamp', 'device', 'started', 'playmark',
                 'total')
         return all([getattr(self, v, None) == getattr(other, v, None) for v in vals])
 
@@ -76,7 +79,6 @@ class EpisodeAction(DocumentSchema):
         entry = HistoryEntry()
         entry.action = self.action
         entry.timestamp = self.timestamp
-        entry.device_oldid = self.device_oldid
         entry.device_id = self.device
         entry.started = self.started
         entry.position = self.playmark
@@ -86,7 +88,7 @@ class EpisodeAction(DocumentSchema):
 
     @staticmethod
     def filter(user_oldid, since=None, until={}, podcast_id=None,
-               device_oldid=None):
+               device_id=None):
         """ Returns Episode Actions for the given criteria"""
 
         since_str = since.strftime('%Y-%m-%dT%H:%M:%S') if since else None
@@ -115,12 +117,13 @@ class EpisodeAction(DocumentSchema):
                     'or a list of basestrings')
 
 
-        if device_oldid:
+        if device_id:
             if None not in (until, podcast_id): # filter in database
-                startkey[3] = device_oldid
-                endkey[3]   = device_oldid
+                startkey[3] = device_id
+                endkey[3]   = device_id
             else:
-                add_filters.append( lambda x: x.get('device_oldid', None) == device_oldid)
+                dev_filter = lambda x: x.get('device_id', None) == device_id
+                add_filters.append(dev_filter)
 
 
         db = EpisodeUserState.get_db()
@@ -159,11 +162,12 @@ class EpisodeAction(DocumentSchema):
 
     def __repr__(self):
         return '%s-Action on %s at %s (in %s)' % \
-            (self.action, self.device_oldid, self.timestamp, self._id)
+            (self.action, self.device, self.timestamp, self._id)
 
 
     def __hash__(self):
-        return hash(frozenset([self.action, self.timestamp, self.device_oldid, self.started, self.playmark, self.total]))
+        return hash(frozenset([self.action, self.timestamp, self.device,
+                    self.started, self.playmark, self.total]))
 
 
 class Chapter(Document):
@@ -413,7 +417,6 @@ class PodcastUserState(Document):
         action = SubscriptionAction()
         action.action = 'subscribe'
         action.device = device.id
-        action.device_oldid = device.oldid
         self.add_actions([action])
 
 
@@ -421,7 +424,6 @@ class PodcastUserState(Document):
         action = SubscriptionAction()
         action.action = 'unsubscribe'
         action.device = device.id
-        action.device_oldid = device.oldid
         self.add_actions([action])
 
 
@@ -502,7 +504,7 @@ class Device(Document):
     name     = StringProperty()
     type     = StringProperty()
     settings = DictProperty()
-    deleted  = BooleanProperty()
+    deleted  = BooleanProperty(default=False)
 
     @classmethod
     def for_oldid(cls, oldid):
@@ -539,12 +541,10 @@ class Device(Document):
 
 
     def get_subscribed_podcast_ids(self):
-        from mygpo.api.models import Device
-        d = Device.objects.get(id=self.oldid)
-        d.sync()
         r = self.view('users/subscribed_podcasts_by_device',
-            startkey=[self.id, None],
-            endkey=[self.id, {}])
+                startkey = [self.id, None],
+                endkey   = [self.id, {}]
+            )
         return [res['key'][1] for res in r]
 
 
@@ -552,13 +552,28 @@ class Device(Document):
         return Podcast.get_multi(self.get_subscribed_podcast_ids())
 
 
+    def __hash__(self):
+        return hash(frozenset([self.uid, self.name, self.type, self.deleted]))
+
+
+    def __eq__(self, other):
+        return self.id == other.id
+
+
+    def __repr__(self):
+        return '<{cls} {id}>'.format(cls=self.__class__.__name__, id=self.id)
+
+
+    def __str__(self):
+        return self.name
+
 
 def token_generator(length=32):
     import random, string
     return  "".join(random.sample(string.letters+string.digits, length))
 
 
-class User(Document):
+class User(Document, SyncedDevicesMixin):
     oldid    = IntegerProperty()
     settings = DictProperty()
     devices  = SchemaListProperty(Device)
@@ -582,6 +597,18 @@ class User(Document):
 
     def create_new_token(self, token_name, length=32):
         setattr(self, token_name, token_generator(length))
+
+
+    @property
+    def active_devices(self):
+        not_deleted = lambda d: not d.deleted
+        return filter(not_deleted, self.devices)
+
+
+    @property
+    def inactive_devices(self):
+        deleted = lambda d: d.deleted
+        return filter(deleted, self.devices)
 
 
     def get_device(self, id):
@@ -609,6 +636,7 @@ class User(Document):
         ids = [x.id for x in devices]
         if not device.id in ids:
             devices.append(device)
+            self.devices = devices
             return
 
         index = ids.index(device.id)
@@ -626,6 +654,7 @@ class User(Document):
         index = ids.index(device.id)
         devices.pop(index)
         self.devices = devices
+
 
 
     def get_subscriptions(self, public=None):
@@ -831,10 +860,6 @@ class HistoryEntry(object):
         device_ids = filter(None, device_ids)
         devices = dict([ (id, user.get_device(id)) for id in device_ids])
 
-        device_oldids = (getattr(x, 'device_oldid', None) for x in entries)
-        device_oldids = filter(None, device_oldids)
-        devices_oldids = dict([ (oldid, user.get_device_by_oldid(oldid)) for oldid in device_oldids])
-
         for entry in entries:
             podcast_id = getattr(entry, 'podcast_id', None)
             entry.podcast = podcasts.get(podcast_id, None)
@@ -843,8 +868,7 @@ class HistoryEntry(object):
             entry.episode = episodes.get(episode_id, None)
             entry.user = user
 
-            device = devices.get(getattr(entry, 'device_id', None), None) or \
-                     devices_oldids.get(getattr(entry, 'device_oldid', None), None)
+            device = devices.get(getattr(entry, 'device_id', None), None)
             entry.device = device
 
 

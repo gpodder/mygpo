@@ -17,10 +17,10 @@
 
 from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponseForbidden
+from django.http import HttpResponseRedirect, HttpResponseBadRequest, \
+        HttpResponseForbidden, Http404
 from django.template import RequestContext
 from django.contrib import messages
-from mygpo.api.models import Device
 from mygpo.web.forms import DeviceForm, SyncForm
 from mygpo.web import utils
 from django.utils.translation import ugettext as _
@@ -30,91 +30,162 @@ from django.db import IntegrityError
 from mygpo.log import log
 from mygpo.api import simple
 from mygpo.decorators import manual_gc, allowed_methods, repeat_on_conflict
-from mygpo.users.models import PodcastUserState
+from mygpo.users.models import PodcastUserState, Device
 from mygpo import migrate
 
 
 @manual_gc
 @login_required
 def overview(request):
-    devices = Device.objects.filter(user=request.user,deleted=False).order_by('sync_group')
-    deleted_devices = Device.objects.filter(user=request.user,deleted=True)
+
+    user = migrate.get_or_migrate_user(request.user)
+    device_groups = user.get_grouped_devices()
+
+    deleted_devices = user.inactive_devices
 
     return render_to_response('devicelist.html', {
-        'devices': devices,
+        'device_groups': device_groups,
         'deleted_devices': deleted_devices,
     }, context_instance=RequestContext(request))
 
 
+
+def device_decorator(f):
+    def _decorator(request, uid, *args, **kwargs):
+
+        user = migrate.get_or_migrate_user(request.user)
+        device = user.get_device_by_uid(uid)
+
+        if not device:
+            raise Http404
+
+        return f(request, device, *args, **kwargs)
+
+    return _decorator
+
+
+
+@device_decorator
 @manual_gc
 @login_required
-def show(request, device_id):
-    device = get_object_or_404(Device, id=device_id, user=request.user)
+def show(request, device):
 
-    if device.user != request.user:
-        return HttpResponseForbidden(_('You are not allowed to access this device'))
+    user = migrate.get_or_migrate_user(request.user)
+    user.sync_group(device)
 
-    device.sync()
+    subscriptions = list(device.get_subscribed_podcasts())
+    synced_with = user.get_synced(device)
 
-    dev = migrate.get_or_migrate_device(device)
-    subscriptions = dev.get_subscribed_podcasts()
-    synced_with = list(device.sync_group.devices()) if device.sync_group else []
-    if device in synced_with: synced_with.remove(device)
+    sync_targets = list(user.get_sync_targets(device))
     sync_form = SyncForm()
-    sync_form.set_targets(device.sync_targets(), _('Synchronize with the following devices'))
+    sync_form.set_targets(sync_targets,
+            _('Synchronize with the following devices'))
 
     return render_to_response('device.html', {
         'device': device,
         'sync_form': sync_form,
         'subscriptions': subscriptions,
         'synced_with': synced_with,
-        'has_sync_targets': len(device.sync_targets()) > 0
+        'has_sync_targets': len(sync_targets) > 0,
     }, context_instance=RequestContext(request))
 
 
 @login_required
-@allowed_methods(['GET', 'POST'])
-def edit(request, device_id=None):
-    if device_id:
-        device = get_object_or_404(Device, id=device_id, user=request.user)
-    else:
-        device = Device(name=_('New Device'), uid=_('new-device'), user=request.user)
+@allowed_methods(['POST'])
+def create(request):
+    device_form = DeviceForm(request.POST)
 
-    if request.method == 'POST':
-        device_form = DeviceForm(request.POST)
+    user = migrate.get_or_migrate_user(request.user)
 
-        if device_form.is_valid():
-            device.name = device_form.cleaned_data['name']
-            device.type = device_form.cleaned_data['type']
-            device.uid  = device_form.cleaned_data['uid']
-            try:
-                device.save()
-                messages.success(request, _('Device updated'))
+    if not device_form.is_valid():
 
-                if not device_id:
-                    return HttpResponseRedirect(reverse('device', args=[device.id]))
+        messages.error(request, _('Please fill out all fields.'))
 
-            except IntegrityError, ie:
-                messages.error(request, _("You can't use the same Device "
-                           "ID for two devices."))
+        return HttpResponseRedirect(reverse('device-edit-new'))
 
-    else:
-        device_form = DeviceForm({
-            'name': device.name,
-            'type': device.type,
-            'uid' : device.uid
-            })
 
-    template = 'device-edit.html' if device_id else 'device-create.html'
-    return render_to_response(template, {
+    device = Device()
+    device.name = device_form.cleaned_data['name']
+    device.type = device_form.cleaned_data['type']
+    device.uid  = device_form.cleaned_data['uid']
+    try:
+        user.set_device(device)
+        user.save()
+        messages.success(request, _('Device saved'))
+
+    except IntegrityError, ie:
+        messages.error(request, _("You can't use the same Device "
+                   "ID for two devices."))
+
+    return HttpResponseRedirect(reverse('device-edit', args=[device.uid]))
+
+
+
+@device_decorator
+@login_required
+@allowed_methods(['POST'])
+def update(request, device):
+    device_form = DeviceForm(request.POST)
+
+    user = migrate.get_or_migrate_user(request.user)
+
+    if device_form.is_valid():
+        device.name = device_form.cleaned_data['name']
+        device.type = device_form.cleaned_data['type']
+        device.uid  = device_form.cleaned_data['uid']
+        try:
+            user.set_device(device)
+            user.save()
+            messages.success(request, _('Device updated'))
+
+        except IntegrityError, ie:
+            messages.error(request, _("You can't use the same Device "
+                       "ID for two devices."))
+
+    return HttpResponseRedirect(reverse('device-edit', args=[device.uid]))
+
+
+@login_required
+@allowed_methods(['GET'])
+def edit_new(request):
+
+    device = Device()
+
+    device_form = DeviceForm({
+        'name': device.name,
+        'type': device.type,
+        'uid' : device.uid
+        })
+
+    return render_to_response('device-create.html', {
         'device': device,
         'device_form': device_form,
     }, context_instance=RequestContext(request))
 
 
+
+
+@device_decorator
 @login_required
-def upload_opml(request, device_id):
-    device = get_object_or_404(Device, id=device_id, user=request.user)
+@allowed_methods(['GET'])
+def edit(request, device):
+
+    device_form = DeviceForm({
+        'name': device.name,
+        'type': device.type,
+        'uid' : device.uid
+        })
+
+    return render_to_response('device-edit.html', {
+        'device': device,
+        'device_form': device_form,
+    }, context_instance=RequestContext(request))
+
+
+@device_decorator
+@login_required
+def upload_opml(request, device):
+
     if not 'opml' in request.FILES:
         return HttpResponseRedirect(reverse('device-edit', args=[device.id]))
 
@@ -124,20 +195,18 @@ def upload_opml(request, device_id):
     return HttpResponseRedirect(reverse('device', args=[device.id]))
 
 
+@device_decorator
 @manual_gc
 @login_required
-def opml(request, device_id):
-    device = get_object_or_404(Device, id=device_id, user=request.user)
-
+def opml(request, device):
     response = simple.format_podcast_list(simple.get_subscriptions(request.user, device.uid), 'opml', request.user.username)
     response['Content-Disposition'] = 'attachment; filename=%s.opml' % device.uid
     return response
 
 
+@device_decorator
 @login_required
-def symbian_opml(request, device_id):
-    device = get_object_or_404(Device, id=device_id, user=request.user)
-
+def symbian_opml(request, device):
     subscriptions = simple.get_subscriptions(request.user, device.uid)
     subscriptions = map(utils.symbian_opml_changes, subscriptions)
 
@@ -146,21 +215,19 @@ def symbian_opml(request, device_id):
     return response
 
 
+@device_decorator
 @manual_gc
 @login_required
 @allowed_methods(['POST'])
-def delete(request, device_id):
-    device = get_object_or_404(Device, id=device_id, user=request.user)
+def delete(request, device):
     device.deleted = True
     device.save()
 
     return HttpResponseRedirect('/devices/')
 
 
-def delete_permanently(request, device_id):
-
-    device = get_object_or_404(Device, pk=device_id, user=request.user)
-    dev = migrate.get_or_migrate_device(device)
+@device_decorator
+def delete_permanently(request, device):
 
     @repeat_on_conflict(['state'])
     def remove_device(state, dev):
@@ -169,55 +236,63 @@ def delete_permanently(request, device_id):
 
     states = PodcastUserState.for_device(dev.id)
     for state in states:
-        remove_device(state=state, dev=dev)
+        remove_device(state=state, dev=device)
 
     device.delete()
 
     return HttpResponseRedirect('/devices/')
 
+@device_decorator
 @manual_gc
 @login_required
-def undelete(request, device_id):
-    device = get_object_or_404(Device, pk=device_id, user=request.user)
-
+def undelete(request, device):
     device.deleted = False
     device.save()
 
     return HttpResponseRedirect('/device/%s' % device.id)
 
 
+@device_decorator
 @manual_gc
 @login_required
 @allowed_methods(['POST'])
-def sync(request, device_id):
+def sync(request, device):
+
+    user = migrate.get_or_migrate_user(request.user)
+
     form = SyncForm(request.POST)
     if not form.is_valid():
         return HttpResponseBadRequest('invalid')
 
     try:
-        target = form.get_target()
+        target_uid = form.get_target()
 
-        device = get_object_or_404(Device, id=device_id, user=request.user)
-        device.sync_with(target)
+        sync_target = user.get_device_by_uid(target_uid)
+        user.sync_devices(device, sync_target)
+        user.save()
 
     except ValueError, e:
+        raise
         log('error while syncing device %s: %s' % (device_id, e))
 
-    return HttpResponseRedirect('/device/%s' % device_id)
+    return HttpResponseRedirect(reverse('device', args=[device.uid]))
 
 
+@device_decorator
 @manual_gc
 @login_required
 @allowed_methods(['GET'])
-def unsync(request, device_id):
-    dev = get_object_or_404(Device, id=device_id, user=request.user)
+def unsync(request, device):
+    user = migrate.get_or_migrate_user(request.user)
 
     try:
-        dev.unsync()
-    except ValueError, e:
-        return show(request, device_id, e)
+        user.unsync_device(device)
+        user.save()
 
-    return HttpResponseRedirect('/device/%s' % device_id)
+    except ValueError, e:
+        messages.error(request, e)
+
+    return HttpResponseRedirect(reverse('device', args=[device.uid]))
 
 
 from mygpo.web import views

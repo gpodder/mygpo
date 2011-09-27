@@ -60,14 +60,13 @@ def show(request, podcast):
     if request.user.is_authenticated():
         user = migrate.get_or_migrate_user(request.user)
 
-        for dev in Device.objects.filter(user=request.user):
-            dev.sync()
+        user.sync_all()
 
         state = podcast.get_user_state(request.user)
         subscribed_devices = state.get_subscribed_device_ids()
         subscribed_devices = [user.get_device(x) for x in subscribed_devices]
 
-        subscribe_targets = podcast.subscribe_targets(request.user)
+        subscribe_targets = podcast.subscribe_targets(user)
 
         history = list(state.actions)
         for h in history:
@@ -204,22 +203,21 @@ def remove_tag(request, podcast):
 @allowed_methods(['GET', 'POST'])
 def subscribe(request, podcast):
 
+    user = migrate.get_or_migrate_user(request.user)
+
     if request.method == 'POST':
         form = SyncForm(request.POST)
 
         try:
-            target = form.get_target()
-
-            if isinstance(target, SyncGroup):
-                device = target.devices()[0]
-            else:
-                device = target
+            device = user.get_device_by_uid(form.get_target())
 
             try:
-                podcast.subscribe(device)
+                podcast.subscribe(request.user, device)
+
             except Exception as e:
+                raise
                 log('Web: %(username)s: could not subscribe to podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
-                    {'username': request.user.username, 'podcast_url': podcast.url, 'device_id': device.id, 'exception': e})
+                    {'username': request.user.username, 'podcast_url': podcast.url, 'device_id': device.uid, 'exception': e})
 
             return HttpResponseRedirect(get_podcast_link_target(podcast))
 
@@ -227,7 +225,7 @@ def subscribe(request, podcast):
             messages.error(request, _('Could not subscribe '
                         'to the podcast: %s' % str(e)))
 
-    targets = podcast.subscribe_targets(request.user)
+    targets = podcast.subscribe_targets(user)
 
     form = SyncForm()
     form.set_targets(targets, _('Choose a device:'))
@@ -241,17 +239,20 @@ def subscribe(request, podcast):
 
 @manual_gc
 @login_required
-def unsubscribe(request, podcast, device_id):
+def unsubscribe(request, podcast, device_uid):
 
     return_to = request.GET.get('return_to', None)
 
     if not return_to:
         raise Http404('Wrong URL')
 
-    device = get_object_or_404(Device, pk=device_id, user=request.user)
+    user = migrate.get_or_migrate_user(request.user)
+    device = user.get_device_by_uid(device_uid)
+
     try:
-        podcast.unsubscribe(device)
+        podcast.unsubscribe(request.user, device)
     except Exception as e:
+        raise
         log('Web: %(username)s: could not unsubscribe from podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
             {'username': request.user.username, 'podcast_url': podcast.url, 'device_id': device.id, 'exception': e})
 

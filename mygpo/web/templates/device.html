@@ -16,7 +16,7 @@
 
   {% if device.deleted %}<div class="info">{% trans "This device was deleted." %}</div>{% endif %}
 
-  {% if not subscriptions|length_is:"0" %}
+  {% if subscriptions %}
    <table class="list">
     <tr>
      <th></th>
@@ -28,7 +28,7 @@
      <tr>
       <td>{{ podcast|podcast_logo }}</td>
       <td>{% podcast_group_link podcast %}</td>
-      <td style="text-align: center;"><a href="{% podcast_link_target podcast "unsubscribe" device.id %}?return_to=/device/{{ device.id }}"><img src="/media/unsubscribe.png" /></a></td>
+      <td style="text-align: center;"><a href="{% podcast_link_target podcast "unsubscribe" device.uid %}?return_to=/device/{{ device.uid }}"><img src="/media/unsubscribe.png" /></a></td>
      </tr>
     {% endfor %}
    </table>
@@ -37,13 +37,13 @@
   {% endif %}
 
   <div>
-   <a href="{% url device-opml device.id %}">
+   <a href="{% url device-opml device.uid %}">
     <img src="/media/22x22/opml-icon.png" class="action-button" /> {% trans "Download Subscriptions as OPML" %}
    </a>
   </div>
 
   <div>
-   <a href="{% url device-history device.id %}">
+   <a href="{% url device-history device.uid %}">
     <img src="/media/office-calendar.png" class="action-button" />
     {% blocktrans with device.name|striptags as devicename %} Show history for {{ devicename }} {% endblocktrans %}</a>
    </a>
@@ -52,7 +52,7 @@
   {% if not device.deleted %}
 
   <div>
-   <a href="{% url device-edit device.id %}">
+   <a href="{% url device-edit device.uid %}">
     <img src="/media/preferences-system-22.png" class="action-button" />
     {% trans "Edit Device" %}
    </a>
@@ -68,12 +68,12 @@
   {% else %}
 
    <p>{% blocktrans with device.name|striptags as devicename and synced_with|device_list as synclist %}{{ devicename }} is currently synchronized with {{ synclist }}.{% endblocktrans %}</p>
-   <a href="{% url device-unsync device.id %}">{% blocktrans with device.name|striptags as devicename %}Stop synchronisation for {{ devicename }} {% endblocktrans %}</a>
+   <a href="{% url device-unsync device.uid %}">{% blocktrans with device.name|striptags as devicename %}Stop synchronisation for {{ devicename }} {% endblocktrans %}</a>
   
   {% endif %}
 
   {% if has_sync_targets %}
-   <form action="{% url device-sync device.id %}" method="POST">
+   <form action="{% url device-sync device.uid %}" method="POST">
     {% csrf_token %}
     {{ sync_form.as_p }}
     <input type="submit" value="{% trans "OK" %}" />
@@ -83,7 +83,7 @@
   {% endif %}
 
   <div class="info">
-   {% url device-symbian-opml device.id as opml-url %}
+   {% url device-symbian-opml device.uid as opml-url %}
    {% blocktrans %}There's a special <a href="{{ opml-url }}">OPML file for use with Nokia Podcasting on Symbian devices</a>{% endblocktrans %}
   </div>
 

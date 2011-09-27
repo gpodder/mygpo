@@ -18,7 +18,6 @@
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from mygpo.api.opml import Importer, Exporter
-from mygpo.api.models import Device
 from mygpo.core.models import Podcast
 from mygpo.api.backend import get_device
 from datetime import datetime
@@ -97,12 +96,8 @@ def getlist(request):
     if user is None:
         return HttpResponse('@AUTHFAIL', mimetype='text/plain')
 
-    d, created = Device.objects.get_or_create(user=user, uid=LEGACY_DEVICE_UID,
-        defaults = {'type': 'other', 'name': LEGACY_DEVICE_NAME})
-
-    # We ignore deleted devices, because the Legacy API doesn't know such a concept
-
-    dev = migrate.get_or_migrate_device(d)
+    usr = migrate.get_or_migrate_user(user)
+    dev = get_device(usr, 'legacy', undelete=True)
     podcasts = dev.get_subscribed_podcasts()
 
     # FIXME: Get username and set a proper title (e.g. "thp's subscription list")

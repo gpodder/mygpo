@@ -46,8 +46,8 @@ def device_icon(device, size=16):
 
 @register.filter
 def device_list(devices):
-    from mygpo.users.models import Device
+    links = [ '<a href="%s">%s&nbsp;%s</a>' % (reverse(show, args=[d.uid]), \
+            device_icon(d), d.name.replace(' ', '&nbsp;')) for d in devices]
 
-    get_id = lambda d: d.oldid if isinstance(d, Device) else d.id
-    return mark_safe('<br/>'.join([ '<a href="%s">%s&nbsp;%s</a>' % (reverse(show, args=[get_id(d)]), device_icon(d), d.name.replace(' ', '&nbsp;')) for d in devices]))
+    return mark_safe('<br/>'.join(links))
 

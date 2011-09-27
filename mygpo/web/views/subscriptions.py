@@ -72,11 +72,10 @@ def for_user_opml(request, username):
 
 
 def create_subscriptionlist(request):
-    #sync all devices first
-    for d in Device.objects.filter(user=request.user):
-        d.sync()
 
     user = migrate.get_or_migrate_user(request.user)
+    user.sync_all()
+
     subscriptions = user.get_subscriptions()
 
     if not subscriptions:
@@ -100,9 +99,14 @@ def create_subscriptionlist(request):
                 continue
 
             episode = podcast.get_latest_episode()
-            subscription_list[podcast_id] = {'podcast': podcasts[podcast_id], 'devices': [device], 'episode': episode}
+            subscription_list[podcast_id] = {
+                'podcast': podcasts[podcast_id],
+                'devices': [device] if device else [],
+                'episode': episode
+            }
         else:
-            subscription_list[podcast_id]['devices'].append(device)
+            if device:
+                subscription_list[podcast_id]['devices'].append(device)
 
     return subscription_list.values()
 
