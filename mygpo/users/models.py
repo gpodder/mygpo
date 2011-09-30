@@ -371,8 +371,7 @@ class PodcastUserState(Document):
             p.ref_url = podcast.url
             p.settings['public_subscription'] = new_user.settings.get('public_subscriptions', True)
 
-            for device in migrate.get_devices(user):
-                p.set_device_state(device)
+            p.set_device_state(new_user.devices)
 
             return p
 
@@ -436,11 +435,9 @@ class PodcastUserState(Document):
         self.tags = list(set(self.tags + tags))
 
 
-    def set_device_state(self, device):
-        if device.deleted:
-            self.disabled_devices = list(set(self.disabled_devices + [device.id]))
-        elif not device.deleted and device.id in self.disabled_devices:
-            self.disabled_devices.remove(device.id)
+    def set_device_state(self, devices):
+        disabled_devices = [device.id for device in devices if device.deleted]
+        self.disabled_devices = disabled_devices
 
 
     def get_change_between(self, device_id, since, until):
@@ -764,6 +761,27 @@ class User(Document, SyncedDevicesMixin):
             for episode in filter(None, res):
                 podcast = podcasts.get(episode.podcast, None)
                 yield proxy_object(episode, podcast=podcast)
+
+
+    def save(self, *args, **kwargs):
+        super(User, self).save(*args, **kwargs)
+
+        from django.contrib.auth.models import User as OldUser
+        user = OldUser.objects.get(id=self.oldid)
+        podcast_states = PodcastUserState.for_user(user)
+
+        for state in podcast_states:
+            @repeat_on_conflict(['state'])
+            def _update_state(state):
+                old_devs = set(state.disabled_devices)
+                state.set_device_state(self.devices)
+
+                if old_devs != set(state.disabled_devices):
+                    state.save()
+
+            _update_state(state=state)
+
+
 
 
     def __eq__(self, other):

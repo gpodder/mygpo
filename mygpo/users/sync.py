@@ -21,7 +21,7 @@ class SyncedDevicesMixin(DocumentSchema):
     def get_grouped_devices(self):
         """ Returns groups of synced devices and a unsynced group """
 
-        indexed_devices = dict( (dev.id, dev) for dev in self.devices )
+        indexed_devices = dict( (dev.id, dev) for dev in self.active_devices )
 
         for group in self.sync_groups:
 
@@ -87,6 +87,24 @@ class SyncedDevicesMixin(DocumentSchema):
         for n, group in enumerate(self.sync_groups):
             if device.id in group:
                 return n
+
+
+    def is_synced(self, device):
+        return self.get_device_sync_group(device) is not None
+
+
+    def get_synced(self, device):
+        """ Returns the devices that are synced with the given one """
+
+        sg = self.get_device_sync_group(device)
+
+        if sg is None:
+            return []
+
+        devices = self.get_devices_in_group(sg)
+        devices.remove(device)
+        return devices
+
 
 
     def get_sync_targets(self, device):

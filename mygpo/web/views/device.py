@@ -220,10 +220,17 @@ def symbian_opml(request, device):
 @login_required
 @allowed_methods(['POST'])
 def delete(request, device):
-    device.deleted = True
-    device.save()
 
-    return HttpResponseRedirect('/devices/')
+    user = migrate.get_or_migrate_user(request.user)
+
+    if user.is_synced(device):
+        user.unsync_device(device)
+
+    device.deleted = True
+    user.set_device(device)
+    user.save()
+
+    return HttpResponseRedirect(reverse('devices'))
 
 
 @device_decorator
@@ -240,16 +247,20 @@ def delete_permanently(request, device):
 
     device.delete()
 
-    return HttpResponseRedirect('/devices/')
+    return HttpResponseRedirect(reverse('devices'))
 
 @device_decorator
 @manual_gc
 @login_required
 def undelete(request, device):
-    device.deleted = False
-    device.save()
 
-    return HttpResponseRedirect('/device/%s' % device.id)
+    user = migrate.get_or_migrate_user(request.user)
+
+    device.deleted = False
+    user.set_device(device)
+    user.save()
+
+    return HttpResponseRedirect(reverse('device', args=[device.uid]))
 
 
 @device_decorator
