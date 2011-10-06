@@ -11,6 +11,9 @@ from mygpo.utils import linearize, get_to_dict, iterate_together
 from mygpo.decorators import repeat_on_conflict
 from mygpo.users.ratings import RatingMixin
 
+class ValidationException(ValueError):
+    pass
+
 
 class Suggestions(Document, RatingMixin):
     user = StringProperty()
@@ -58,6 +61,7 @@ class EpisodeAction(DocumentSchema):
 
     action        = StringProperty(required=True)
     timestamp     = DateTimeProperty(required=True, default=datetime.utcnow)
+    upload_timestamp = DateTimeProperty(required=True)
     device_oldid  = IntegerProperty()
     device        = StringProperty()
     started       = IntegerProperty()
@@ -144,17 +148,17 @@ class EpisodeAction(DocumentSchema):
         if self.action != 'play':
             for key in PLAY_ACTION_KEYS:
                 if getattr(self, key, None) is not None:
-                    raise ValueError('%s only allowed in play actions' % key)
+                    raise ValidationException('%s only allowed in play actions' % key)
 
         # Sanity check: If started or total are given, require playmark
         if ((self.started is not None) or (self.total is not None)) and \
             self.playmark is None:
-            raise ValueError('started and total require position')
+            raise ValidationException('started and total require position')
 
         # Sanity check: total and playmark can only appear together
         if ((self.total is not None) or (self.started is not None)) and \
            ((self.total is None)     or (self.started is None)):
-            raise ValueError('total and started can only appear together')
+            raise ValidationException('total and started can only appear together')
 
 
     def __repr__(self):
@@ -263,7 +267,7 @@ class EpisodeUserState(Document):
         map(EpisodeAction.validate_time_values, actions)
         self.actions = list(self.actions) + actions
         self.actions = list(set(self.actions))
-        self.actions = sorted(self.actions, key=lambda x: x.timestamp)
+        self.actions = sorted(self.actions, key=lambda x: x.upload_timestamp)
 
 
     def is_favorite(self):
