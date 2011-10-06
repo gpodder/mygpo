@@ -34,7 +34,8 @@ function(doc)
             action_obj["total"] = action.total;
         }
 
-        emit([doc.user_oldid, action.device_oldid, action_obj.timestamp], action_obj);
+        emit([doc.user_oldid, action.device_oldid,
+                action_obj.upload_timestamp], action_obj);
     }
 
     function processSubscriptionAction(action)
@@ -49,7 +50,8 @@ function(doc)
                 device_id:     action.device,
             }
 
-        emit([doc.user_oldid, action.device_oldid, action_obj.timestamp], action_obj);
+        emit([doc.user_oldid, action.device_oldid,
+                action_obj.upload_timestamp], action_obj);
     }
 
 
