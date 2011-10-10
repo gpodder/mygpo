@@ -19,7 +19,7 @@ class Topics(object):
 
 
     def __iter__(self):
-        lists = PodcastList.by_rating(self.min_list_rating)
+        lists = PodcastList.by_rating(endkey=self.min_list_rating)
         lists = islice(lists, 0, self.num_lists)
         lists = map(self._prepare_list, lists)
 
