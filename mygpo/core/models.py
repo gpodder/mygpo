@@ -586,8 +586,8 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
     def get_latest_episode(self):
         # since = 1 ==> has a timestamp
-        episodes = list(self.get_episodes(since=1, descending=True, limit=1))
-        return episodes[0] if episodes else None
+        episodes = self.get_episodes(since=1, descending=True, limit=1)
+        return next(episodes, None)
 
 
     def get_episode_before(self, episode):
