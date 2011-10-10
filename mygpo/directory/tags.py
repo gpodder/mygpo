@@ -37,6 +37,7 @@ def podcasts_for_tag(tag):
 
 def all_tags():
     res = multi_request_view(Podcast, 'directory/podcasts_by_tag',
+            wrap        = False,
             reduce      = True,
             group       = True,
             group_level = 1
