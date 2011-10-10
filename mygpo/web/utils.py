@@ -23,15 +23,17 @@ def get_podcast_languages():
     """
 
     res = Podcast.view('core/podcasts_by_language',
-            group = True,
+            group_level = 1,
         )
 
-    langs = [r['key'] for r in res]
+    langs = [r['key'][0] for r in res]
     sane_lang = sanitize_language_codes(langs)
     sane_lang.sort()
 
     return sane_lang
 
+
+RE_LANG = re.compile('^[a-zA-Z]{2}[-_]?.*$')
 
 def sanitize_language_codes(langs):
     """
@@ -45,8 +47,7 @@ def sanitize_language_codes(langs):
     ['de', 'en']
     """
 
-    r = '^[a-zA-Z]{2}[-_]?.*$'
-    return list(set([l[:2].lower() for l in langs if l and re.match(r, l)]))
+    return list(set([l[:2].lower() for l in langs if l and RE_LANG.match(l)]))
 
 
 def get_language_names(lang):
