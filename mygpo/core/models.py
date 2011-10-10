@@ -223,7 +223,7 @@ class Episode(Document, SlugMixin, OldIdMixin):
 
     @classmethod
     def count(cls):
-        return cls.view('core/episodes_by_podcast', group=True)['value']
+        return cls.view('core/episodes_by_podcast', reduce=True).one()['value']
 
 
     @classmethod
