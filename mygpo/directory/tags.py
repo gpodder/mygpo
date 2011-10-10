@@ -24,6 +24,7 @@ def tags_for_user(user, podcast_id=None):
 
 def podcasts_for_tag(tag):
     res = multi_request_view(Podcast, 'directory/podcasts_by_tag',
+            wrap        = False,
             startkey    = [tag, None],
             endkey      = [tag, 'ZZZZZZ'],
             reduce      = True,
