@@ -19,7 +19,8 @@ import sys
 from itertools import islice
 from collections import defaultdict
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect, \
+         Http404
 from django.views.decorators.cache import cache_page
 from django.contrib.auth.models import User
 from django.template import RequestContext
@@ -118,7 +119,7 @@ def cover_art(request, size, filename):
     filepath = os.path.join(root, 'htdocs', 'media', 'logo', filename)
 
     if os.path.exists(target):
-        return HttpResponseRedirect('/media/logo/%s/%s.jpg' % (str(size), filename))
+        return HttpResponsePermanentRedirect('/media/logo/%s/%s.jpg' % (str(size), filename))
 
     if os.path.exists(filepath):
         target_dir = os.path.dirname(target)
@@ -136,7 +137,7 @@ def cover_art(request, size, filename):
             resized = im.resize((size, size), Image.ANTIALIAS)
         except IOError:
             # raised when trying to read an interlaced PNG; we use the original instead
-            return HttpResponseRedirect('/media/logo/%s' % filename)
+            return HttpResponsePermanentRedirect('/media/logo/%s' % filename)
 
         # If it's a RGBA image, composite it onto a white background for JPEG
         if resized.mode == 'RGBA':
@@ -155,7 +156,7 @@ def cover_art(request, size, filename):
         fp.write(s)
         fp.close()
 
-        return HttpResponseRedirect('/media/logo/%s/%s.jpg' % (str(size), filename))
+        return HttpResponsePermanentRedirect('/media/logo/%s/%s.jpg' % (str(size), filename))
     else:
         raise Http404('Cover art not available')
 

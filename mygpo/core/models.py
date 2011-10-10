@@ -1,10 +1,13 @@
 import hashlib
+import os.path
 import re
 from datetime import datetime
 from dateutil import parser
 from random import randint
 
 from couchdbkit.ext.django.schema import *
+
+from django.conf import settings
 
 from mygpo.decorators import repeat_on_conflict
 from mygpo import utils
@@ -643,10 +646,19 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
 
     def get_logo_url(self, size):
-        if self.logo_url:
-            sha = hashlib.sha1(self.logo_url).hexdigest()
-            return '/logo/%d/%s.jpg' % (size, sha)
-        return '/media/podcast-%d.png' % (hash(self.title) % 5, )
+        if not self.logo_url:
+            return '/media/podcast-%d.png' % (hash(self.title) % 5, )
+
+        filename = hashlib.sha1(self.logo_url).hexdigest()
+
+        root = os.path.join(settings.BASE_DIR, '..')
+        target = os.path.join(root, 'htdocs', 'media', 'logo', str(size), filename+'.jpg')
+        filepath = os.path.join(root, 'htdocs', 'media', 'logo', filename)
+
+        if os.path.exists(target):
+            return '/media/logo/%s/%s.jpg' % (str(size), filename)
+
+        return '/logo/%d/%s.jpg' % (size, filename)
 
 
     def subscriber_count(self):

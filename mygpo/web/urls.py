@@ -6,8 +6,8 @@ from django.views.generic.simple import direct_to_template
 
 urlpatterns = patterns('mygpo.web.views',
  url(r'^$',                                                       'home',          name='home'),
-    (r'^media/logo/(?P<size>\d+)/(?P<filename>[^/]*)\.jpg$',      'cover_art'),
-    (r'^logo/(?P<size>\d+)/(?P<filename>[^/]*)\.jpg$',            'cover_art'),
+ url(r'^media/logo/(?P<size>\d+)/(?P<filename>[^/]*)\.jpg$',      'cover_art',     name='logo-filesystem'),
+ url(r'^logo/(?P<size>\d+)/(?P<filename>[^/]*)\.jpg$',            'cover_art',     name='logo-create'),
  url(r'^history/$',                                               'history',       name='history'),
  url(r'^suggestions/$',                                           'suggestions',   name='suggestions'),
  url(r'^suggestions/rate$',                                       'rate_suggestions', name='suggestions-rate'),
