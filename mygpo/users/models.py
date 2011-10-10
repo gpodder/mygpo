@@ -31,7 +31,11 @@ class Suggestions(Document, RatingMixin):
 
 
     def get_podcasts(self, count=None):
-        user = User.for_oldid(self.user_oldid)
+        from mygpo import migrate
+        from django.contrib.auth.models import User
+
+        user = User.objects.get(id=self.user_oldid)
+        user = migrate.get_or_migrate_user(user)
         subscriptions = user.get_subscribed_podcast_ids()
 
         ids = filter(lambda x: not x in self.blacklist + subscriptions, self.podcasts)
