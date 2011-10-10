@@ -215,7 +215,9 @@ def unsync(request, device_id):
     try:
         dev.unsync()
     except ValueError, e:
-        return show(request, device_id, e)
+        messages.error(request, 'Could not unsync the device: {err}'.format(
+                    err=str(e)))
+        return show(request, device_id)
 
     return HttpResponseRedirect('/device/%s' % device_id)
 
