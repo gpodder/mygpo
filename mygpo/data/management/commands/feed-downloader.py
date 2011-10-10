@@ -30,41 +30,43 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        queue = []
-
-        if options.get('toplist'):
-            queue = chain(queue, self.get_toplist())
-
-        if options.get('new'):
-            queue = chain(queue, self.self.get_podcast_with_new_episodes())
-
-        if options.get('random'):
-            queue = chain(queue, Podcast.random())
-
-
-        get_podcast = lambda url: Podcast.for_url(url, create=True)
-        args_podcasts = map(get_podcast, args)
-
-        queue = chain(queue, args_podcasts)
-
-        if not args and not options.get('toplist') and not options.get('new') \
-                    and not options.get('random'):
-           queue = chain(queue, Podcast.by_last_update())
+        queue = chain.from_iterable(self.get_podcasts(*args, **options))
 
         max_podcasts = options.get('max')
         if max_podcasts:
             queue = islice(queue, 0, max_podcasts)
 
         if options.get('list'):
-            print '\n'.join([p.url for p in queue])
+            for podcast in queue:
+                print podcast.url
 
         else:
             print 'Updating podcasts...'
             feeddownloader.update_podcasts(queue)
 
 
+    def get_podcasts(self, *args, **options):
+        if options.get('toplist'):
+            yield self.get_toplist()
+
+        if options.get('new'):
+            yield self.get_podcast_with_new_episodes()
+
+        if options.get('random'):
+            yield Podcast.random()
+
+
+        get_podcast = lambda url: Podcast.for_url(url, create=True)
+        yield map(get_podcast, args)
+
+        if not args and not options.get('toplist') and not options.get('new') \
+                    and not options.get('random'):
+           yield Podcast.by_last_update()
+
+
+
     def get_podcast_with_new_episodes(self):
-        db = newmodels.Podcast.get_db()
+        db = Podcast.get_db()
         res = db.view('maintenance/episodes_need_update',
                 group_level = 1,
                 reduce      = True,
@@ -72,7 +74,7 @@ class Command(BaseCommand):
 
         for r in res:
             podcast_id = r['key']
-            podcast = newmodels.Podcast.get(podcast_id)
+            podcast = Podcast.get(podcast_id)
             if podcast:
                 yield podcast
 

@@ -218,7 +218,7 @@ class Episode(Document, SlugMixin, OldIdMixin):
 
 
     def get_ids(self):
-        return [self._id] + self.merged_ids
+        return set([self._id] + self.merged_ids)
 
 
     @classmethod
@@ -237,6 +237,11 @@ class Episode(Document, SlugMixin, OldIdMixin):
         if other == None:
             return False
         return self._id == other._id
+
+
+    def __hash__(self):
+        return hash(self._id)
+
 
 
 class SubscriberData(DocumentSchema):
@@ -290,6 +295,9 @@ class Podcast(Document, SlugMixin, OldIdMixin):
     content_types = StringListProperty()
     tags = DictProperty()
     restrictions = StringListProperty()
+    common_episode_title = StringProperty()
+    new_location = StringProperty()
+    latest_episode_timestamp = DateTimeProperty()
 
 
     @classmethod
@@ -489,7 +497,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         return self.id or self._id
 
     def get_ids(self):
-        return [self.get_id()] + self.merged_ids
+        return set([self.get_id()] + self.merged_ids)
 
     @property
     def display_title(self):
@@ -568,9 +576,16 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
         return res.one()['value']
 
-    def get_common_episode_title(self):
+
+    def get_common_episode_title(self, num_episodes=100):
+
+        if self.common_episode_title:
+            return self.common_episode_title
+
+        episodes = self.get_episodes(descending=True, limit=num_episodes)
+
         # We take all non-empty titles
-        titles = filter(None, (e.title for e in self.get_episodes()))
+        titles = filter(None, (e.title for e in episodes))
         # get the longest common substring
         common_title = utils.longest_substr(titles)
 
