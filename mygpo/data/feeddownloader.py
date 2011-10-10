@@ -33,7 +33,8 @@ from mygpo.utils import parse_time
 from mygpo.api.sanitizing import sanitize_url, rewrite_podcasts
 from mygpo.data import youtube
 from mygpo.data.mimetype import get_mimetype, check_mimetype, get_podcast_types
-from mygpo.core.models import Episode
+from mygpo import migrate
+from mygpo.core.models import Episode, Podcast
 from mygpo.core.slugs import assign_missing_episode_slugs, assign_slug, \
          PodcastSlug
 
