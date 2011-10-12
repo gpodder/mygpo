@@ -21,10 +21,9 @@ import random
 
 from django.core.cache import cache
 
-from mygpo.api.models import Device
 from mygpo.data.mimetype import get_type, CONTENT_TYPES
 from mygpo.core.models import Podcast, Episode
-from mygpo.users.models import EpisodeUserState
+from mygpo.users.models import EpisodeUserState, Device
 from datetime import timedelta
 
 try:
@@ -79,13 +78,25 @@ def get_device(user, uid, undelete=True):
 
     If the device has been deleted and undelete=True, it is undeleted.
     """
-    device, created = Device.objects.get_or_create(user=user, uid=uid)
 
-    if device.deleted and undelete:
-        device.deleted = False
-        device.save()
+    @repeat_on_conflict(['user'])
+    def _get(user, uid, undelete):
 
-    return device
+        device = user.get_device_by_uid(uid)
+
+        if not device:
+            device = Device(uid=uid)
+            user.devices.append(device)
+            user.save()
+
+        elif device.deleted and undeleted:
+            device.deleted = False
+            user.set_device(device)
+            user.save()
+
+        return device
+
+    return _get(user=user, uid=uid, undelete=undelete)
 
 
 def get_favorites(user):

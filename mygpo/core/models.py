@@ -692,19 +692,17 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
 
     @repeat_on_conflict()
-    def subscribe(self, device):
+    def subscribe(self, user, device):
         from mygpo import migrate
-        state = self.get_user_state(device.user)
-        device = migrate.get_or_migrate_device(device)
+        state = self.get_user_state(user)
         state.subscribe(device)
         state.save()
 
 
     @repeat_on_conflict()
-    def unsubscribe(self, device):
+    def unsubscribe(self, user, device):
         from mygpo import migrate
-        state = self.get_user_state(device.user)
-        device = migrate.get_or_migrate_device(device)
+        state = self.get_user_state(user)
         state.unsubscribe(device)
         state.save()
 
@@ -716,19 +714,22 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         """
         targets = []
 
-        from mygpo.api.models import Device
-        from mygpo import migrate
+        user.sync_all()
 
-        devices = Device.objects.filter(user=user, deleted=False)
-        for d in devices:
-            dev = migrate.get_or_migrate_device(d)
-            subscriptions = dev.get_subscribed_podcasts()
-            if self in subscriptions: continue
+        for group in user.get_grouped_devices():
 
-            if d.sync_group:
-                if not d.sync_group in targets: targets.append(d.sync_group)
+            if group.is_synced:
+
+                dev = group.devices[0]
+                subscriptions = dev.get_subscribed_podcasts()
+
+                if not self in subscriptions:
+                    targets.append(group.devices)
+
             else:
-                targets.append(d)
+                for device in group.devices:
+                    if not self in device.get_subscribed_podcasts():
+                        targets.append(device)
 
         return targets
 

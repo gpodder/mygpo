@@ -20,7 +20,7 @@ from itertools import imap, chain
 from collections import defaultdict, namedtuple
 from mygpo.api.basic_auth import require_valid_user, check_username
 from django.http import HttpResponse, HttpResponseBadRequest
-from mygpo.api.models import Device, EPISODE_ACTION_TYPES, DEVICE_TYPES
+from mygpo.api.models import EPISODE_ACTION_TYPES, DEVICE_TYPES
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url, sanitize_urls
 from mygpo.api.advanced.directory import episode_data, podcast_data
@@ -59,8 +59,12 @@ def subscriptions(request, username, device_uid):
     now = datetime.now()
     now_ = get_timestamp(now)
 
+    user = migrate.get_or_migrate_user(request.user)
+
     if request.method == 'GET':
-        d = get_object_or_404(Device, user=request.user, uid=device_uid, deleted=False)
+        device = user.get_device_by_uid(device_uid)
+        if not device or device.deleted:
+            raise Http404
 
         since_ = request.GET.get('since', None)
         if since_ == None:
@@ -70,8 +74,7 @@ def subscriptions(request, username, device_uid):
         except ValueError:
             return HttpResponseBadRequest('since-value is not a valid timestamp')
 
-        dev = migrate.get_or_migrate_device(d)
-        changes = get_subscription_changes(request.user, dev, since, now)
+        changes = get_subscription_changes(request.user, device, since, now)
 
         return JsonResponse(changes)
 
@@ -194,7 +197,12 @@ def episodes(request, username, version=1):
         else:
             podcast = None
 
-        device  = get_object_or_404(Device, user=request.user,uid=device_uid, deleted=False) if device_uid else None
+        if device_uid:
+            user = migrate.get_or_migrate_user(request.user)
+            device = user.get_device_by_uid(device_uid)
+
+            if not device or device.deleted:
+                raise Http404
 
         return JsonResponse(get_episode_changes(request.user, podcast, device, since, now, aggregated, version))
 
@@ -202,11 +210,11 @@ def episodes(request, username, version=1):
 def get_episode_changes(user, podcast, device, since, until, aggregated, version):
 
     new_user = migrate.get_or_migrate_user(user)
-    devices = dict( (dev.oldid, dev.uid) for dev in new_user.devices )
+    devices = dict( (dev.id, dev.uid) for dev in new_user.devices )
 
     args = {}
     if podcast is not None: args['podcast_id'] = podcast.get_id()
-    if device is not None:  args['device_oldid'] = device.id
+    if device is not None:  args['device_id'] = device.id
 
     actions = EpisodeAction.filter(user.id, since, until, **args)
 
@@ -221,7 +229,7 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
         actions = imap(convert_position, actions)
 
     clean_data = partial(clean_episode_action_data,
-            user=user, devices=devices)
+            user=new_user, devices=devices)
 
     actions = map(clean_data, actions)
     actions = filter(None, actions)
@@ -243,19 +251,11 @@ def clean_episode_action_data(action, user, devices):
     if None in (action['podcast'], action['episode']):
         return None
 
-    if 'device_oldid' in action:
-        device_oldid = action['device_oldid']
-        if not device_oldid in devices:
-            try:
-                dev = Device.objects.get(id=device_oldid)
-            except Device.DoesNotExist:
-                return None
-
-            dev = migrate.get_or_migrate_device(dev, user=user)
-            action['device'] = dev.uid
-        else:
-            action['device'] = devices[action['device_oldid']]
-        del action['device_oldid']
+    if 'device_id' in action:
+        device_id = action['device_id']
+        device = user.get_device(device_id)
+        action['device'] = device.uid
+        del action['device_id']
 
     # remove superfluous keys
     for x in action.keys():
@@ -342,13 +342,7 @@ def parse_episode_action(action, user, update_urls, now):
     new_action.action = action['action']
 
     if action.get('device', False):
-        device = user.get_device_by_uid(action['device'])
-        if device is None:
-            from django.contrib.auth.models import User
-            user_ = User.objects.get(id=user.oldid)
-            dev, created = Device.objects.get_or_create(user=user_, uid=action['device'])
-            device = migrate.get_or_migrate_device(dev, user)
-        new_action.device_oldid = device.oldid
+        device = get_device(user, action['device'])
         new_action.device = device.id
 
     if action.get('timestamp', False):
@@ -406,10 +400,9 @@ def valid_episodeaction(type):
 @check_username
 @allowed_methods(['GET'])
 def devices(request, username):
-    devices = Device.objects.filter(user=request.user, deleted=False)
-    devices = map(migrate.get_or_migrate_device, devices)
+    user = migrate.get_or_migrate_user(requser.user)
+    devices = filter(lambda d: not d.deleted, user.devices)
     devices = map(device_data, devices)
-
     return JsonResponse(devices)
 
 
@@ -429,7 +422,10 @@ def updates(request, username, device_uid):
     now = datetime.now()
     now_ = get_timestamp(now)
 
-    device = get_object_or_404(Device, user=request.user, uid=device_uid)
+    user = migrate.get_or_migrate_user(request.user)
+    device = user.get_device_by_uid(device_uid)
+    if not device or device.deleted:
+        raise Http404
 
     since_ = request.GET.get('since', None)
     if since_ == None:
@@ -464,8 +460,7 @@ def updates(request, username, device_uid):
 
     ret['add'] = map(prepare_podcast_data, ret['add'])
 
-    user = migrate.get_or_migrate_user(request.user)
-    devices = dict( (dev.oldid, dev.uid) for dev in user.devices )
+    devices = dict( (dev.id, dev.uid) for dev in user.devices )
     clean_data = partial(clean_episode_action_data,
             user=user, devices=devices)
 

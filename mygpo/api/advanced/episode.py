@@ -22,7 +22,7 @@ from mygpo.core import models
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.exceptions import ParameterMissing
 from mygpo.api.sanitizing import sanitize_url
-from mygpo.api.models import Device
+from mygpo.api.backend import get_device
 from mygpo.users.models import Chapter
 from datetime import datetime
 from mygpo.utils import parse_time
@@ -146,13 +146,15 @@ def update_chapters(req, user):
 
     e_state = episode.get_user_state(request.user)
 
+    user = migrate.get_or_migrate_user(request.user)
+
     device = None
     if 'device' in req:
-        device, c = Device.objects.get_or_create(user=user, uid=req['device'])
+        device = get_device(user, req['device'], undelete=True)
 
     timestamp = dateutil.parser.parse(req['timestamp']) if 'timestamp' in req else datetime.utcnow()
 
-    new_chapters = parse_new_chapters(request.user, req.get('chapters_add', []))
+    new_chapters = parse_new_chapters(user, req.get('chapters_add', []))
     rem_chapters = parse_rem_chapters(req.get('chapters_remove', []))
 
     e_state.update_chapters(new_chapters, rem_chapters)
@@ -174,9 +176,7 @@ def parse_new_chapters(user, chapters):
 
         device_uid = c.get('device', None)
         if device_uid:
-            device = Device.objects.get(user=user, uid=device_uid)
-            new_device = migrate.get_or_migrate_device(device)
-            device_id = new_device.id
+            device_id = get_device(user, device_uid, undelete=True).id
         else:
             device_id = None
 

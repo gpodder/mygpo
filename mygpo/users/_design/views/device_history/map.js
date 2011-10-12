@@ -2,7 +2,7 @@ function(doc)
 {
     function processEpisodeAction(action)
     {
-        if(action.device_oldid == null)
+        if(action.device == null)
         {
             return;
         }
@@ -17,9 +17,9 @@ function(doc)
                 timestamp:     action.timestamp.slice(0, action.timestamp.length-1),
             }
 
-        if(action.device_oldid != null)
+        if(action.device != null)
         {
-            action_obj["device_oldid"] = action.device_oldid;
+            action_obj["device_id"] = action.device;
         }
         if(action.started != null)
         {
@@ -34,7 +34,7 @@ function(doc)
             action_obj["total"] = action.total;
         }
 
-        emit([doc.user_oldid, action.device_oldid, action_obj.timestamp], action_obj);
+        emit([doc.user_oldid, action.device, action_obj.timestamp], action_obj);
     }
 
     function processSubscriptionAction(action)
@@ -45,11 +45,10 @@ function(doc)
                 podcast_id:    doc.podcast,
                 action:        action.action,
                 timestamp:     action.timestamp.slice(0, action.timestamp.length-1),
-                device_oldid:  action.device_oldid,
                 device_id:     action.device,
             }
 
-        emit([doc.user_oldid, action.device_oldid, action_obj.timestamp], action_obj);
+        emit([doc.user_oldid, action.device, action_obj.timestamp], action_obj);
     }
 
 

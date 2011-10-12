@@ -54,19 +54,26 @@ class SyncForm(forms.Form):
     targets = forms.CharField()
 
     def set_targets(self, sync_targets, label=''):
-        targets = self.sync_target_choices(sync_targets)
+        targets = map(self.sync_target_choice, sync_targets)
         self.fields['targets'] = forms.ChoiceField(choices=targets, label=label)
 
-    def sync_target_choices(self, targets):
+
+    def sync_target_choice(self, target):
         """
         returns a list of tuples that can be used as choices for a ChoiceField.
-        the first item in each tuple is a letter identifying the type of the 
+        the first item in each tuple is a letter identifying the type of the
         sync-target - either d for a Device, or g for a SyncGroup. This letter
         is followed by the id of the target.
         The second item in each tuple is the string-representation of the #
         target.
         """
-        return [('%s%s' % ('d' if isinstance(t, Device) else 'g', t.id), t) for t in targets]
+
+        from mygpo.users.models import Device
+        if isinstance(target, Device):
+            return (target.uid, str(target))
+
+        elif isinstance(target, list):
+            return (target[0].uid, ', '.join(str(t) for t in target))
 
 
     def get_target(self):
@@ -79,15 +86,8 @@ class SyncForm(forms.Form):
             raise ValueError(_('No device selected'))
 
         target = self.cleaned_data['targets']
-        m = re.match('^([dg])(\d+)$', target)
-        if m == None:
-            log('invalid target %s given in SyncForm' % target)
-            raise ValueError(_('Invalid device selected: %s') % target)
+        return target
 
-        if m.group(1) == 'd':
-            return Device.objects.get(pk=m.group(2))
-        else:
-            return SyncGroup.objects.get(pk=m.group(2))
 
 class ResendActivationForm(forms.Form):
     username = forms.CharField(max_length=100, label=_('Please enter your username'), required=False)

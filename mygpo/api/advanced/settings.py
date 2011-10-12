@@ -20,7 +20,6 @@ from django.http import HttpResponseBadRequest, Http404
 from mygpo.api.httpresponse import JsonResponse
 from django.shortcuts import get_object_or_404
 from mygpo.users.models import PodcastUserState
-from mygpo.api.models import Device
 from django.views.decorators.csrf import csrf_exempt
 from mygpo.decorators import allowed_methods
 from mygpo import migrate
@@ -43,8 +42,10 @@ def main(request, username, scope):
         return obj, obj
 
     def device_settings(user, uid):
-        device = get_object_or_404(Device, user=user, uid=uid)
         user = migrate.get_or_migrate_user(user)
+        device = user.get_device_by_uid(user, uid)
+        if not device or device.deleted:
+            raise Http404
 
         # This is a reference to a separate obj
         dev = migrate.get_or_migrate_device(device, user)

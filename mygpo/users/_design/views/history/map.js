@@ -12,9 +12,9 @@ function(doc)
                 timestamp:     action.timestamp.slice(0, action.timestamp.length-1),
             }
 
-        if(action.device_oldid != null)
+        if(action.device != null)
         {
-            action_obj["device_oldid"] = action.device_oldid;
+            action_obj["device_id"] = action.device;
         }
         if(action.started != null)
         {
@@ -41,7 +41,6 @@ function(doc)
                 action:        action.action,
                 timestamp:     action.timestamp.slice(0, action.timestamp.length-1),
                 device_id:     action.device,
-                device_oldid:  action.device_oldid,
             }
 
         emit([doc.user_oldid, action_obj.timestamp], action_obj);

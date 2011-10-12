@@ -40,7 +40,7 @@ def main(request, username):
     user = migrate.get_or_migrate_user(request.user)
 
     if request.method == 'GET':
-        return JsonResponse(get_sync_status(request.user))
+        return JsonResponse(get_sync_status(user))
 
     else:
         try:
@@ -52,11 +52,11 @@ def main(request, username):
         stopsync = actions.get('stop-synchronize', [])
 
         try:
-            update_sync_status(request.user, synclist, stopsync)
+            update_sync_status(user, synclist, stopsync)
         except ValueError as e:
             return HttpResponseBadRequest(str(e))
 
-        return JsonResponse(get_sync_status())
+        return JsonResponse(get_sync_status(user))
 
 
 
@@ -66,24 +66,14 @@ def get_sync_status(user):
     sync_groups = []
     unsynced = []
 
-    devices = Device.objects.filter(user=user,deleted=False)\
-              .order_by('sync_group')
+    for group in user.get_grouped_devices():
+        uids = [device.uid for device in group.devices]
 
-    sync_group = None
-    sync_list = []
+        if group.is_synced:
+            sync_groups.append(uids)
 
-    for device in devices:
-
-        if device.sync_group != sync_group:
-            sync_list = []
-            sync_groups.append(sync_list)
-            sync_group = device.sync_group
-
-
-        if device.sync_group is not None:
-            sync_list.append(device.uid)
         else:
-            unsynced.append(device.uid)
+            unsynced = uids
 
     return {
         'synchronized': sync_groups,
@@ -106,19 +96,21 @@ def update_sync_status(user, synclist, stopsync):
 
         # Setup all devices to sync with the first in the list
         uid = devlist[0]
-        dev = get_object_or_404(Device, user=user, uid=uid)
+        dev = user.get_device_by_uid(uid)
 
         for other_uid in devlist[1:]:
-            other = get_object_or_404(Device, user=user, uid=other_uid)
-            dev.sync_with(other)
+            other = user.get_device_by_uid(other_uid)
+            user.sync_devices(dev, other)
 
 
     for uid in stopsync:
-        dev = get_object_or_404(Device, user=user, uid=uid)
+        dev = user.get_device_by_uid(uid)
         try:
-            dev.unsync()
+            user.unsync_device(dev)
         except ValueError:
             # if all devices of a sync-group are un-synced,
             # the last one will raise a ValueError, because it is no longer
             # being synced -- we just ignore it
             pass
+
+    user.save()

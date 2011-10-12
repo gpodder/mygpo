@@ -208,7 +208,7 @@ def add_action(request, episode):
 
     action = EpisodeAction()
     action.timestamp = timestamp
-    action.device_oldid = device.oldid if device else None
+    action.device = device.id if device else None
     action.action = action_str
 
     state = episode.get_user_state(request.user)
