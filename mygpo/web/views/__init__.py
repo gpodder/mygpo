@@ -42,6 +42,7 @@ from django.contrib.sites.models import RequestSite
 from mygpo.web import utils
 from mygpo.api import backend
 from mygpo.utils import flatten, parse_range
+from mygpo.cache import get_cache_or_calc
 from mygpo import migrate
 import os
 import Image
@@ -57,20 +58,19 @@ def home(request):
 
 
 @manual_gc
-def welcome(request, toplist_entries=10):
+def welcome(request):
     current_site = RequestSite(request)
-    podcasts = Podcast.count()
-    users = User.objects.filter(is_active=True).count()
-    episodes = Episode.count()
 
-    try:
-        lang = utils.process_lang_params(request, '/toplist/')
-    except utils.UpdatedException, updated:
-        lang = []
+    podcasts = get_cache_or_calc('podcast-count', timeout=60*60,
+                    calc=lambda: Podcast.count())
+    users    = get_cache_or_calc('user-count', timeout=60*60,
+                    calc=lambda: User.objects.filter(is_active=True).count())
+    episodes = get_cache_or_calc('episode-count', timeout=60*60,
+                    calc=lambda: Episode.count())
 
     lang = utils.process_lang_params(request)
 
-    toplist = [p for (oldpos, p) in entries]
+    toplist = PodcastToplist(lang)
 
     return render_to_response('home.html', {
           'podcast_count': podcasts,
