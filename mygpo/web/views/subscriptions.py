@@ -15,6 +15,7 @@ from mygpo.api.models import Device
 from mygpo.api import backend, simple
 from mygpo.users.models import HistoryEntry
 from mygpo.web import utils
+from mygpo.cache import get_cache_or_calc
 from mygpo import migrate
 
 
@@ -98,7 +99,9 @@ def create_subscriptionlist(request):
             if podcast is None:
                 continue
 
-            episode = podcast.get_latest_episode()
+            episode = get_cache_or_calc('%s-latest-episode', timeout=60*60,
+                    calc=lambda: podcast.get_latest_episode())
+
             subscription_list[podcast_id] = {
                 'podcast': podcasts[podcast_id],
                 'devices': [device] if device else [],
