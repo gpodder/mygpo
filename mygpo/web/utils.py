@@ -118,7 +118,7 @@ def get_page_list(start, total, cur, show_max):
     return ps
 
 
-def process_lang_params(request, url):
+def process_lang_params(request):
     if 'lang' in request.GET:
         lang = list(set([x for x in request.GET.get('lang').split(',') if x]))
 

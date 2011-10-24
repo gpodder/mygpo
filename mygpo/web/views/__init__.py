@@ -68,8 +68,7 @@ def welcome(request, toplist_entries=10):
     except utils.UpdatedException, updated:
         lang = []
 
-    toplist = PodcastToplist(lang)
-    entries = toplist[:toplist_entries]
+    lang = utils.process_lang_params(request)
 
     toplist = [p for (oldpos, p) in entries]
 
