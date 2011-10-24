@@ -200,7 +200,7 @@ def get_podcast_group_link_target(group, view_name, add_args=[]):
     return reverse(view_name, args=args + add_args)
 
 
-def get_episode_link_target(episode, podcast=None, view_name='episode', add_args=[]):
+def get_episode_link_target(episode, podcast, view_name='episode', add_args=[]):
     """ Returns the link-target for an Episode, preferring slugs over Ids
 
     automatically distringuishes between relational Episode objects and
@@ -210,12 +210,6 @@ def get_episode_link_target(episode, podcast=None, view_name='episode', add_args
 
     # prefer slugs
     if episode.slug:
-        if not podcast:
-            if isinstance(episode.podcast, Podcast):
-                podcast = episode.podcast
-            else:
-                podcast = Podcast.get(episode.podcast)
-
         args = [podcast.slug or podcast.get_id(), episode.slug]
         view_name = '%s-slug-id' % view_name
 

@@ -76,7 +76,7 @@
    {% for episode in newest_episodes %}
     <tr>
      <td>{{ episode.podcast|podcast_logo }}</td>
-     <td>{% episode_link episode %}<br/>
+     <td>{% episode_link episode episode.podcast %}<br/>
       <span class="from_podcast">{% trans "from" %} {% podcast_group_link episode.podcast %}
      </td>
      <td>{{ episode.released|naturalday }}</td>

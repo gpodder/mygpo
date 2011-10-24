@@ -3,7 +3,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.utils.html import strip_tags
 
-from mygpo.core.models import Podcast, Episode
+from mygpo.core.models import Episode
 from mygpo import utils
 from mygpo.data.mimetype import get_type, get_mimetype
 from mygpo.web.utils import get_episode_link_target
@@ -83,7 +83,7 @@ def is_image(episode):
 class EpisodeLinkTargetNode(template.Node):
     """ Links to a (view of a) Podcast """
 
-    def __init__(self, episode, podcast=None, view_name='episode', add_args=[]):
+    def __init__(self, episode, podcast, view_name='episode', add_args=[]):
         self.episode = template.Variable(episode)
         self.podcast = template.Variable(podcast)
         self.view_name = view_name.replace('"', '')
@@ -118,7 +118,7 @@ register.tag('episode_link_target', EpisodeLinkTargetNode.compile)
 
 
 @register.simple_tag
-def episode_link(episode, title=None):
+def episode_link(episode, podcast, title=None):
     """ Returns the link for a single Episode """
 
     title = title or getattr(episode, 'display_title', None) or \
@@ -127,4 +127,4 @@ def episode_link(episode, title=None):
     title = strip_tags(title)
 
     return '<a href="%(target)s" title="%(title)s">%(title)s</a>' % \
-        dict(target=get_episode_link_target(episode), title=title)
+        dict(target=get_episode_link_target(episode, podcast), title=title)
