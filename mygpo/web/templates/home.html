@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load cache %}
 {% load podcasts %}
 
 {% block head %}
@@ -95,12 +96,14 @@
 <div class="intro-box">
  <h3>{% trans "Podcast-Toplist" %}</h3>
  <table class="list">
-  {% for podcast in toplist %}
-   <tr>
-    <td>{{ podcast|podcast_logo }}
-    <td>{% podcast_group_link podcast %}</td>
-   </tr>
-  {% endfor %}
+  {% cache 3600 home-toplist toplist.languages %}
+   {% for oldpos, podcast in toplist|slice:":10" %}
+    <tr>
+     <td>{{ podcast|podcast_logo }}
+     <td>{% podcast_group_link podcast %}</td>
+    </tr>
+   {% endfor %}
+  {% endcache %}
   <tr>
    <td></td>
    <td><a href="{% url toplist %}">{% trans "more..." %}</a></td>

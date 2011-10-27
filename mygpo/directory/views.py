@@ -26,7 +26,7 @@ from mygpo.users.models import User
 def toplist(request, num=100, lang=None):
 
     try:
-        lang = utils.process_lang_params(request, '/toplist/')
+        lang = utils.process_lang_params(request)
     except utils.UpdatedException, updated:
         return HttpResponseRedirect('/toplist/?lang=%s' % ','.join(updated.data))
 
@@ -133,7 +133,7 @@ def search(request, template='search.html', args={}):
 def episode_toplist(request, num=100):
 
     try:
-        lang = utils.process_lang_params(request, '/toplist/episodes')
+        lang = utils.process_lang_params(request)
     except utils.UpdatedException, updated:
         return HttpResponseRedirect('/toplist/episodes?lang=%s' % ','.join(updated.data))
 

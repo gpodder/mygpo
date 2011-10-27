@@ -1,10 +1,13 @@
 import hashlib
+import os.path
 import re
 from datetime import datetime
 from dateutil import parser
 from random import randint
 
 from couchdbkit.ext.django.schema import *
+
+from django.conf import settings
 
 from mygpo.decorators import repeat_on_conflict
 from mygpo import utils
@@ -218,12 +221,12 @@ class Episode(Document, SlugMixin, OldIdMixin):
 
 
     def get_ids(self):
-        return [self._id] + self.merged_ids
+        return set([self._id] + self.merged_ids)
 
 
     @classmethod
     def count(cls):
-        return cls.view('core/episodes_by_podcast', group=True)['value']
+        return cls.view('core/episodes_by_podcast', reduce=True).one()['value']
 
 
     @classmethod
@@ -237,6 +240,11 @@ class Episode(Document, SlugMixin, OldIdMixin):
         if other == None:
             return False
         return self._id == other._id
+
+
+    def __hash__(self):
+        return hash(self._id)
+
 
 
 class SubscriberData(DocumentSchema):
@@ -290,6 +298,9 @@ class Podcast(Document, SlugMixin, OldIdMixin):
     content_types = StringListProperty()
     tags = DictProperty()
     restrictions = StringListProperty()
+    common_episode_title = StringProperty()
+    new_location = StringProperty()
+    latest_episode_timestamp = DateTimeProperty()
 
 
     @classmethod
@@ -489,7 +500,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         return self.id or self._id
 
     def get_ids(self):
-        return [self.get_id()] + self.merged_ids
+        return set([self.get_id()] + self.merged_ids)
 
     @property
     def display_title(self):
@@ -568,9 +579,16 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
         return res.one()['value']
 
-    def get_common_episode_title(self):
+
+    def get_common_episode_title(self, num_episodes=100):
+
+        if self.common_episode_title:
+            return self.common_episode_title
+
+        episodes = self.get_episodes(descending=True, limit=num_episodes)
+
         # We take all non-empty titles
-        titles = filter(None, (e.title for e in self.get_episodes()))
+        titles = filter(None, (e.title for e in episodes))
         # get the longest common substring
         common_title = utils.longest_substr(titles)
 
@@ -586,8 +604,8 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
     def get_latest_episode(self):
         # since = 1 ==> has a timestamp
-        episodes = list(self.get_episodes(since=1, descending=True, limit=1))
-        return episodes[0] if episodes else None
+        episodes = self.get_episodes(since=1, descending=True, limit=1)
+        return next(episodes, None)
 
 
     def get_episode_before(self, episode):
@@ -628,10 +646,19 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
 
     def get_logo_url(self, size):
-        if self.logo_url:
-            sha = hashlib.sha1(self.logo_url).hexdigest()
-            return '/logo/%d/%s.jpg' % (size, sha)
-        return '/media/podcast-%d.png' % (hash(self.title) % 5, )
+        if not self.logo_url:
+            return '/media/podcast-%d.png' % (hash(self.title) % 5, )
+
+        filename = hashlib.sha1(self.logo_url).hexdigest()
+
+        root = os.path.join(settings.BASE_DIR, '..')
+        target = os.path.join(root, 'htdocs', 'media', 'logo', str(size), filename+'.jpg')
+        filepath = os.path.join(root, 'htdocs', 'media', 'logo', filename)
+
+        if os.path.exists(target):
+            return '/media/logo/%s/%s.jpg' % (str(size), filename)
+
+        return '/logo/%d/%s.jpg' % (size, filename)
 
 
     def subscriber_count(self):
@@ -665,19 +692,17 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
 
     @repeat_on_conflict()
-    def subscribe(self, device):
+    def subscribe(self, user, device):
         from mygpo import migrate
-        state = self.get_user_state(device.user)
-        device = migrate.get_or_migrate_device(device)
+        state = self.get_user_state(user)
         state.subscribe(device)
         state.save()
 
 
     @repeat_on_conflict()
-    def unsubscribe(self, device):
+    def unsubscribe(self, user, device):
         from mygpo import migrate
-        state = self.get_user_state(device.user)
-        device = migrate.get_or_migrate_device(device)
+        state = self.get_user_state(user)
         state.unsubscribe(device)
         state.save()
 
@@ -689,19 +714,22 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         """
         targets = []
 
-        from mygpo.api.models import Device
-        from mygpo import migrate
+        user.sync_all()
 
-        devices = Device.objects.filter(user=user, deleted=False)
-        for d in devices:
-            dev = migrate.get_or_migrate_device(d)
-            subscriptions = dev.get_subscribed_podcasts()
-            if self in subscriptions: continue
+        for group in user.get_grouped_devices():
 
-            if d.sync_group:
-                if not d.sync_group in targets: targets.append(d.sync_group)
+            if group.is_synced:
+
+                dev = group.devices[0]
+                subscriptions = dev.get_subscribed_podcasts()
+
+                if not self in subscriptions:
+                    targets.append(group.devices)
+
             else:
-                targets.append(d)
+                for device in group.devices:
+                    if not self in device.get_subscribed_podcasts():
+                        targets.append(device)
 
         return targets
 

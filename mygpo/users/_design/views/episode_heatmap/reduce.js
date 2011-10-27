@@ -15,10 +15,10 @@ function (keys, values, rereduce)
 
     function flatten(arr)
     {
-        flattened = []
-        for(n in arr)
+        var flattened = []
+        for(var n in arr)
         {
-            for(x in arr[n])
+            for(var x in arr[n])
             {
                 flattened.push(arr[n][x]);
             }
@@ -72,10 +72,11 @@ function (keys, values, rereduce)
         return newBorders;
     };
 
+    var all_borders = [];
+
     if (rereduce)
     {
-        all_borders = [];
-        for(n in values)
+        for(var n in values)
         {
             all_borders.push(values[n].borders);
         }
@@ -85,41 +86,51 @@ function (keys, values, rereduce)
         all_borders = values;
     }
 
-    borders = flatten(all_borders);
+    var borders = flatten(all_borders);
     borders = unique(borders);
     borders.sort(sortNumerical);
     borders = mergeBorders(borders, 50);
 
-    heatmap = [];
+    var heatmap = [];
 
-    for(n=0; n<borders.length-1; n++)
+    for(var n=0; n<borders.length-1; n++)
     {
         heatmap.push(0);
     }
 
-    for(n in values)
+    for(var n in values)
     {
         j = 0;
+        var length = 0;
+        var increment = 1;
 
         if(rereduce)
         {
             length = values[n].borders.length-1;
             increment = 1;
-            function heat_val(i) { return values[n].heatmap[i]; };
         }
         else
         {
             length = values[n].length;
             increment = 2;
-            heat_val = 1;
-            function heat_val(i) { return 1; };
         }
 
 
-        for(i=0; i<length; i+=increment)
+        for(var i=0; i<length; i+=increment)
         {
-            from  = values[n][i];
-            until = values[n][i+1];
+            var from = 0;
+            var until = 0;
+
+            if(rereduce)
+            {
+                from  = values[n].borders[i];
+                until = values[n].borders[i+1];
+            }
+            else
+            {
+                from  = values[n][i];
+                until = values[n][i+1];
+            }
 
             while(borders[j] < from)
             {
@@ -128,7 +139,14 @@ function (keys, values, rereduce)
 
             while(borders[j] < until)
             {
-                heatmap[j++] += heat_val(i);
+                if(rereduce)
+                {
+                    heatmap[j++] += values[n].heatmap[i];
+                }
+                else
+                {
+                    heatmap[j++] += 1;
+                }
             }
         }
     }

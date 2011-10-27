@@ -25,12 +25,12 @@ from django.template import RequestContext
 from django.core.cache import cache
 
 from mygpo.api.basic_auth import require_valid_user, check_username
+from mygpo.api.backend import get_device
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.cache import cache_page
 from mygpo.core import models
 from mygpo.core.models import Podcast
 from mygpo.users.models import Suggestions
-from mygpo.api.models import Device
 from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_urls
@@ -156,9 +156,8 @@ def format_podcast_list(obj_list, format, title, get_podcast=None,
 
 
 def get_subscriptions(user, device_uid):
-    device = get_object_or_404(Device, uid=device_uid, user=user, deleted=False)
-    device = migrate.get_or_migrate_device(device)
-
+    user = migrate.get_or_migrate_user(user)
+    device = get_device(user, device_uid)
     return device.get_subscribed_podcasts()
 
 
@@ -188,14 +187,10 @@ def parse_subscription(raw_post_data, format):
 
 
 def set_subscriptions(urls, user, device_uid):
-    device, created = Device.objects.get_or_create(user=user, uid=device_uid)
 
-    # undelete a previously deleted device
-    if device.deleted:
-        device.deleted = False
-        device.save()
+    user = migrate.get_or_migrate_user(user)
+    dev = get_device(user, device_uid, undelete=True)
 
-    dev = migrate.get_or_migrate_device(device)
     old = [p.url for p in dev.get_subscribed_podcasts()]
     new = [p for p in urls if p not in old]
     rem = [p for p in old if p not in urls]

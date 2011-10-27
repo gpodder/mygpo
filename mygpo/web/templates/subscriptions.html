@@ -21,13 +21,13 @@
    <th>{% trans "Podcast" %}</th>
    <th>{% trans "Devices" %}</th>
   </tr>
-  
+
   {% for s in subscriptionlist %}
    <tr>
     <td>{{ s.podcast|podcast_logo }}</td>
     <td class="listlink">{% podcast_group_link s.podcast %}<br/><span class="latest_episode">
     {% if s.episode %}
-    {% trans "Latest Episode:" %} {% episode_link s.episode %}
+    {% trans "Latest Episode:" %} {% episode_link s.episode s.podcast %}
       {% if s.episode.action %}
           ({{ s.episode.timestamp|date:"Y-m-d" }}, {{s.episode.action|episode_status_text }})
       {% else %}
@@ -37,7 +37,7 @@
        {% trans "No episodes" %}
      {% endif %}
      </span></td>
-    <td>{{ s.devices|device_list }}</td>
+     <td>{{ s.devices|device_list }}</td>
    </tr>
   {% endfor %}
   </table>

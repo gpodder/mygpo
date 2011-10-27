@@ -43,7 +43,7 @@
         {% endif %}
        {% else %}
         {% if s.episode %}
-         {% episode_link s.episode %}
+         {% episode_link s.episode s.podcast %}
           {% if s.podcast %}
            <span class="from_podcast">{% trans "from" %} {% podcast_group_link s.podcast %}</span>
           {% endif %}

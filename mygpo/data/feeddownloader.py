@@ -22,10 +22,12 @@ USER_AGENT = 'mygpo crawler (+http://my.gpodder.org)'
 
 import os
 import sys
-import datetime
+from datetime import datetime, timedelta
 import hashlib
 import urllib2
 import socket
+from functools import partial
+from itertools import chain
 
 from mygpo.decorators import repeat_on_conflict
 from mygpo.data import feedcore
@@ -33,13 +35,12 @@ from mygpo.utils import parse_time
 from mygpo.api.sanitizing import sanitize_url, rewrite_podcasts
 from mygpo.data import youtube
 from mygpo.data.mimetype import get_mimetype, check_mimetype, get_podcast_types
-from mygpo.core.models import Episode
+from mygpo.core.models import Episode, Podcast
 from mygpo.core.slugs import assign_missing_episode_slugs, assign_slug, \
          PodcastSlug
 
 socket.setdefaulttimeout(10)
 fetcher = feedcore.Fetcher(USER_AGENT)
-
 
 def mark_outdated(podcast):
     for e in podcast.get_episodes():
@@ -117,20 +118,6 @@ def get_feed_tags(feed):
     return list(set(tags))
 
 
-@repeat_on_conflict()
-def update_feed_tags(podcast, tags):
-    src = 'feed'
-    podcast.tags[src] = tags
-    try:
-        podcast.save()
-    except Exception, e:
-        from couchdbkit import ResourceConflict
-        if isinstance(e, ResourceConflict):
-            raise # and retry
-
-        print >> sys.stderr, 'error saving tags for podcast %s: %s' % (podcast.get_id(), e)
-
-
 def get_episode_metadata(entry, url, mimetype, podcast_language):
     d = {
             'url': url,
@@ -142,14 +129,52 @@ def get_episode_metadata(entry, url, mimetype, podcast_language):
             'filesize': get_filesize(entry, url),
             'language': entry.get('language', podcast_language),
             'mimetypes': [mimetype],
-            'outdated': False,
     }
     try:
-        d['released'] = datetime.datetime(*(entry.updated_parsed)[:6])
+        d['released'] = datetime(*(entry.updated_parsed)[:6])
     except:
         d['released'] = None
 
+    # set outdated true if we didn't find a title (so that the
+    # feed-downloader doesn't try again infinitely
+    d['outdated'] = not d['title']
+
     return d
+
+
+def get_podcast_metadata(podcast, feed):
+
+    episodes = list(podcast.get_episodes())
+
+    return dict(
+        title = feed.feed.get('title', podcast.url),
+        link = feed.feed.get('link', podcast.url),
+        description = feed.feed.get('subtitle', podcast.description),
+        author = feed.feed.get('author', feed.feed.get('itunes_author', podcast.author)),
+        language = feed.feed.get('language', podcast.language),
+        logo_url = get_podcast_logo(podcast, feed),
+        content_types = get_podcast_types(episodes),
+        latest_episode_timestamp = get_latest_episode_timestamp(episodes),
+    )
+
+
+def get_latest_episode_timestamp(episodes):
+
+    timestamps = filter(None, [e.released for e in episodes])
+
+    if not timestamps:
+        return None
+
+    max_timestamp = max(timestamps)
+
+
+    max_future = datetime.utcnow() + timedelta(days=2)
+
+    if max_timestamp > max_future:
+        return datetime.utcnow()
+
+    return max_timestamp
+
 
 
 def update_podcasts(fetch_queue):
@@ -159,107 +184,134 @@ def update_podcasts(fetch_queue):
         try:
             fetcher.fetch(podcast.url)
 
-        except (feedcore.Offline, feedcore.InvalidFeed, feedcore.WifiLogin, feedcore.AuthenticationRequired):
+        except (feedcore.Offline, feedcore.InvalidFeed, feedcore.WifiLogin,
+                feedcore.AuthenticationRequired, socket.error, IOError):
+            print 'marking outdated'
             mark_outdated(podcast)
 
         except feedcore.NewLocation, location:
-            print location.data
+            print 'redirecting to', location.data
             new_url = sanitize_url(location.data)
             if new_url:
-                print 'Redirect to %s' % new_url
 
-                # TODO: set new_location
-                p = Podcast.for_url(new_url, create=True)
-
+                p = Podcast.for_url(new_url)
+                if not p:
+                    podcast.urls.insert(0, new_url)
+                    fetch_queue = chain([podcast], fetch_queue)
+                else:
+                    print 'podcast with new URL found, outdating old one'
+                    podcast.new_location = new_url
+                    podcast.save()
+                    mark_outdated(podcast)
 
         except feedcore.UpdatedFeed, updated:
             feed = updated.data
-            podcast.title = feed.feed.get('title', podcast.url)
-            podcast.link = feed.feed.get('link', podcast.url)
-            podcast.description = feed.feed.get('subtitle', podcast.description)
-            podcast.author = feed.feed.get('author', feed.feed.get('itunes_author', podcast.author))
-            podcast.language = feed.feed.get('language', podcast.language)
-
-            cover_art = podcast.logo_url
-            image = feed.feed.get('image', None)
-            if image is not None:
-                for key in ('href', 'url'):
-                    cover_art = getattr(image, key, None)
-                    if cover_art:
-                        break
-
-            yturl = youtube.get_real_cover(podcast.link)
-            if yturl:
-                cover_art = yturl
-
-            if cover_art:
-                try:
-                    image_sha1 = hashlib.sha1()
-                    image_sha1.update(cover_art)
-                    image_sha1 = image_sha1.hexdigest()
-                    filename = os.path.join(os.path.dirname(os.path.abspath(__file__ )), '..', '..', 'htdocs', 'media', 'logo', image_sha1)
-                    fp = open(filename, 'w')
-                    fp.write(urllib2.urlopen(cover_art).read())
-                    fp.close()
-                    print 'LOGO @', cover_art
-                    podcast.logo_url = cover_art
-                except Exception, e:
-                    podcast.logo_url = None
-                    if str(e).strip():
-                        print >> sys.stderr, 'cannot save image %s for podcast %d: %s' % (cover_art.encode('utf-8'), podcast.id, str(e).encode('utf-8'))
-
-            update_feed_tags(podcast, get_feed_tags(feed.feed))
 
             existing_episodes = list(podcast.get_episodes())
+            update_ep = partial(update_episode, podcast=podcast)
+            feed_episodes = filter(None, map(update_ep, feed.entries))
+            outdated_episodes = set(existing_episodes) - set(feed_episodes)
 
-            for entry in feed.entries:
-                try:
-                    url, mimetype = get_episode_url(entry)
-                    if url is None:
-                        print 'Ignoring entry'
-                        continue
+            # set episodes to be outdated, where necessary
+            for e in filter(lambda e: not e.outdated, outdated_episodes):
+                e.outdated = True
+                e.save()
 
-                    url = sanitize_url(url, 'episode')
 
-                    episode = Episode.for_podcast_id_url(podcast.get_id(),
-                            url, create=True)
-                    md = get_episode_metadata(entry, url, mimetype,
-                            podcast.language)
+            podcast_md = get_podcast_metadata(podcast, feed)
 
-                    changed = False
-                    for key, value in md.items():
-                        if getattr(episode, key) != value:
-                            setattr(episode, key, value)
-                            changed = True
+            changed = False
+            for key, value in podcast_md.items():
+                if getattr(podcast, key) != value:
+                    setattr(podcast, key, value)
+                    changed = True
 
-                    if changed:
-                        episode.save()
-                        print 'Updating Episode: %s' % episode.title.encode('utf-8', 'ignore')
+            tags = get_feed_tags(feed.feed)
+            if podcast.tags.get('feed', None) != tags:
+                podcast.tags['feed'] = tags
+                changed = True
 
-                    if episode in existing_episodes:
-                        existing_episodes.remove(episode)
+            if changed:
+                print 'updating podcast'
+                podcast.last_update = datetime.utcnow()
+                podcast.save()
+            else:
+                print 'podcast not updated'
 
-                except Exception as e:
-                    print 'Cannot get episode:', e
-                    raise
-
-            # all episodes that could not be found in the feed
-            for e in existing_episodes:
-                if not e.outdated:
-                    e.outdated = True
-                    e.save()
-
-            podcast.content_types = get_podcast_types(podcast)
 
         except Exception, e:
+            print podcast.url
             print >>sys.stderr, 'Exception:', e
-
-        podcast.last_update = datetime.datetime.now()
-        try:
-            podcast.save()
-        except Exception, e:
-            print e
 
 
         assign_slug(podcast, PodcastSlug)
         assign_missing_episode_slugs(podcast)
+
+
+def get_podcast_logo(podcast, feed):
+    cover_art = podcast.logo_url
+    image = feed.feed.get('image', None)
+    if image is not None:
+        for key in ('href', 'url'):
+            cover_art = getattr(image, key, None)
+            if cover_art:
+                break
+
+    if podcast.link:
+        yturl = youtube.get_real_cover(podcast.link)
+        if yturl:
+            cover_art = yturl
+
+    if cover_art:
+        try:
+            image_sha1 = hashlib.sha1()
+            image_sha1.update(cover_art)
+            image_sha1 = image_sha1.hexdigest()
+            filename = os.path.join(os.path.dirname(os.path.abspath(__file__ )), '..', '..', 'htdocs', 'media', 'logo', image_sha1)
+            fp = open(filename, 'w')
+            fp.write(urllib2.urlopen(cover_art).read())
+            fp.close()
+            print 'LOGO @', cover_art
+            return  cover_art
+
+        except Exception, e:
+            if str(e).strip():
+                try:
+                    print >> sys.stderr, \
+                        unicode('cannot save image for podcast %s: %s'
+                        % (podcast.get_id(), str(e)), errors='ignore')
+                except:
+                    print >> sys.stderr, 'cannot save podcast logo'
+
+            return None
+
+
+
+def update_episode(entry, podcast):
+    url, mimetype = get_episode_url(entry)
+
+    if url is None:
+        print 'Ignoring entry'
+        return
+
+    url = sanitize_url(url, 'episode')
+    if not url:
+        print 'Ignoring entry'
+        return
+
+    episode = Episode.for_podcast_id_url(podcast.get_id(),
+            url, create=True)
+    md = get_episode_metadata(entry, url, mimetype,
+            podcast.language)
+
+    changed = False
+    for key, value in md.items():
+        if getattr(episode, key) != value:
+            setattr(episode, key, value)
+            changed = True
+
+    if changed:
+        episode.save()
+        print 'Updating Episode: %s' % episode.title.encode('utf-8', 'ignore')
+
+    return episode

@@ -115,7 +115,7 @@
   <div class="navigation">
    <div class="prev">
     {% if prev %}
-     {% trans "Previous Episode:" %} {% episode_link prev %}
+     {% trans "Previous Episode:" %} {% episode_link prev podcast %}
     {% endif %}
    </div>
    <div class="list">
@@ -123,7 +123,7 @@
    </div>
    <div class="next">
     {% if next %}
-     {% trans "Next Episode:" %} {% episode_link next %}
+     {% trans "Next Episode:" %} {% episode_link next podcast %}
     {% endif %}
    </div>
   </div>

@@ -23,15 +23,17 @@ def get_podcast_languages():
     """
 
     res = Podcast.view('core/podcasts_by_language',
-            group = True,
+            group_level = 1,
         )
 
-    langs = [r['key'] for r in res]
+    langs = [r['key'][0] for r in res]
     sane_lang = sanitize_language_codes(langs)
     sane_lang.sort()
 
     return sane_lang
 
+
+RE_LANG = re.compile('^[a-zA-Z]{2}[-_]?.*$')
 
 def sanitize_language_codes(langs):
     """
@@ -45,8 +47,7 @@ def sanitize_language_codes(langs):
     ['de', 'en']
     """
 
-    r = '^[a-zA-Z]{2}[-_]?.*$'
-    return list(set([l[:2].lower() for l in langs if l and re.match(r, l)]))
+    return list(set([l[:2].lower() for l in langs if l and RE_LANG.match(l)]))
 
 
 def get_language_names(lang):
@@ -117,7 +118,7 @@ def get_page_list(start, total, cur, show_max):
     return ps
 
 
-def process_lang_params(request, url):
+def process_lang_params(request):
     if 'lang' in request.GET:
         lang = list(set([x for x in request.GET.get('lang').split(',') if x]))
 
@@ -199,7 +200,7 @@ def get_podcast_group_link_target(group, view_name, add_args=[]):
     return reverse(view_name, args=args + add_args)
 
 
-def get_episode_link_target(episode, podcast=None, view_name='episode', add_args=[]):
+def get_episode_link_target(episode, podcast, view_name='episode', add_args=[]):
     """ Returns the link-target for an Episode, preferring slugs over Ids
 
     automatically distringuishes between relational Episode objects and
@@ -209,12 +210,6 @@ def get_episode_link_target(episode, podcast=None, view_name='episode', add_args
 
     # prefer slugs
     if episode.slug:
-        if not podcast:
-            if isinstance(episode.podcast, Podcast):
-                podcast = episode.podcast
-            else:
-                podcast = Podcast.get(episode.podcast)
-
         args = [podcast.slug or podcast.get_id(), episode.slug]
         view_name = '%s-slug-id' % view_name
 

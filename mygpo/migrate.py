@@ -67,21 +67,6 @@ def save_device_signal(sender, instance=False, **kwargs):
 
     set_device(user=user, device=d)
 
-    podcast_states = PodcastUserState.for_user(instance.user)
-    for state in podcast_states:
-
-        @repeat_on_conflict(['state'])
-        def update_state(state):
-            if not state.ref_url:
-                podcast = Podcast.get(state.podcast)
-                if not podcast or not podcast.url:
-                    return
-                state.ref_url = podcast.url
-
-            state.set_device_state(dev)
-            state.save()
-
-        update_state(state=state)
 
 
 def delete_device_signal(sender, instance=False, **kwargs):

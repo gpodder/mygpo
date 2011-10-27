@@ -11,24 +11,27 @@ _ = lambda s: s
 
 CONTENT_TYPES = (_('image'), _('audio'), _('video'))
 
-def get_podcast_types(podcast):
+def get_podcast_types(episodes):
     """Returns the types of a podcast
 
     A podcast is considered to be of a given types if the ratio of episodes that are of that type equals TYPE_THRESHOLD
     """
     has_mimetype = lambda e: e.mimetypes
-    episodes = filter(has_mimetype, podcast.get_episodes())
+    episodes = filter(has_mimetype, episodes)
     types = defaultdict()
     for e in episodes:
         for mimetype in e.mimetypes:
             t = get_type(mimetype)
+            if not t:
+                continue
             types[t] = types.get(t, 0) + 1
 
     max_episodes = sum(types.itervalues())
     l = list(types.iteritems())
     l.sort(key=lambda x: x[1], reverse=True)
 
-    return [x[0] for x in filter(lambda x: max_episodes / float(x[1]) >= TYPE_THRESHOLD, l)]
+    return [x[0] for x in
+        filter(lambda x: max_episodes / float(x[1]) >= TYPE_THRESHOLD, l)]
 
 
 def get_type(mimetype):

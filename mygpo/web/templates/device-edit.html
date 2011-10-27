@@ -14,7 +14,7 @@
   <h1>{{ device.name|striptags }}</h1>
   <hr/>
 
-  <a href="{% url device device.id %}">{% trans "Back to" %} {{ device|device_icon }} {{device|striptags}}</a>
+  <a href="{% url device device.uid %}">{% trans "Back to" %} {{ device|device_icon }} {{device|striptags}}</a>
 
   {% if device.deleted %}<div class="info">{% trans "This device was deleted." %}</div>{% endif %}
 
@@ -23,7 +23,7 @@
 
   <h2>{% trans "Edit" %}</h2>
 
-  <form action="{% url device-edit device.id %}" method="POST">
+  <form action="{% url device-update device.uid %}" method="POST">
    {% csrf_token %}
    <table class="form">
     {{ device_form.as_table }}
@@ -38,14 +38,14 @@
 
   <h2>{% trans "Replace Subscriptions" %}</h2>
   <p>{% trans "You can replace your current subscriptions on this device by uploading an OPML file." %}</p>
-  <form method="post" action="{% url device-upload-opml device.id %}" enctype="multipart/form-data">
+  <form method="post" action="{% url device-upload-opml device.uid %}" enctype="multipart/form-data">
    {% csrf_token %}
    <input type="file" name="opml" id="opml" />
    <input type="submit" value="{% trans "Upload" %}" />
   </form>
 
   <h2>{% trans "Delete" %}</h2>
-  <form action="{% url device-delete device.id %}" method="POST">
+  <form action="{% url device-delete device.uid %}" method="POST">
    {% csrf_token %}
    <input type="submit" value="{% trans "Delete this device" %}" />
   </form>

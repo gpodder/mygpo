@@ -267,13 +267,14 @@ def multi_request_view(cls, view, wrap=True, auto_advance=True,
                 doc = wrapper(obj['doc']) if wrapper else obj['doc']
                 docid = doc._id if wrapper else obj['id']
             else:
-                docid = obj['id']
+                docid = obj.get('id', None)
                 doc = obj
 
             if n == per_page:
                 if auto_advance:
                     kwargs['startkey'] = key
-                    kwargs['startkey_docid'] = docid
+                    if docid is not None:
+                        kwargs['startkey_docid'] = docid
                     if 'skip' in kwargs:
                         del kwargs['skip']
 

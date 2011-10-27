@@ -19,7 +19,8 @@ import sys
 from itertools import islice
 from collections import defaultdict
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect, \
+         Http404
 from django.views.decorators.cache import cache_page
 from django.contrib.auth.models import User
 from django.template import RequestContext
@@ -41,6 +42,7 @@ from django.contrib.sites.models import RequestSite
 from mygpo.web import utils
 from mygpo.api import backend
 from mygpo.utils import flatten, parse_range
+from mygpo.cache import get_cache_or_calc
 from mygpo import migrate
 import os
 import Image
@@ -56,21 +58,19 @@ def home(request):
 
 
 @manual_gc
-def welcome(request, toplist_entries=10):
+def welcome(request):
     current_site = RequestSite(request)
-    podcasts = Podcast.count()
-    users = User.objects.filter(is_active=True).count()
-    episodes = Episode.count()
 
-    try:
-        lang = utils.process_lang_params(request, '/toplist/')
-    except utils.UpdatedException, updated:
-        lang = []
+    podcasts = get_cache_or_calc('podcast-count', timeout=60*60,
+                    calc=lambda: Podcast.count())
+    users    = get_cache_or_calc('user-count', timeout=60*60,
+                    calc=lambda: User.objects.filter(is_active=True).count())
+    episodes = get_cache_or_calc('episode-count', timeout=60*60,
+                    calc=lambda: Episode.count())
+
+    lang = utils.process_lang_params(request)
 
     toplist = PodcastToplist(lang)
-    entries = toplist[:toplist_entries]
-
-    toplist = [p for (oldpos, p) in entries]
 
     return render_to_response('home.html', {
           'podcast_count': podcasts,
@@ -118,7 +118,7 @@ def cover_art(request, size, filename):
     filepath = os.path.join(root, 'htdocs', 'media', 'logo', filename)
 
     if os.path.exists(target):
-        return HttpResponseRedirect('/media/logo/%s/%s.jpg' % (str(size), filename))
+        return HttpResponsePermanentRedirect('/media/logo/%s/%s.jpg' % (str(size), filename))
 
     if os.path.exists(filepath):
         target_dir = os.path.dirname(target)
@@ -136,7 +136,7 @@ def cover_art(request, size, filename):
             resized = im.resize((size, size), Image.ANTIALIAS)
         except IOError:
             # raised when trying to read an interlaced PNG; we use the original instead
-            return HttpResponseRedirect('/media/logo/%s' % filename)
+            return HttpResponsePermanentRedirect('/media/logo/%s' % filename)
 
         # If it's a RGBA image, composite it onto a white background for JPEG
         if resized.mode == 'RGBA':
@@ -155,7 +155,7 @@ def cover_art(request, size, filename):
         fp.write(s)
         fp.close()
 
-        return HttpResponseRedirect('/media/logo/%s/%s.jpg' % (str(size), filename))
+        return HttpResponsePermanentRedirect('/media/logo/%s/%s.jpg' % (str(size), filename))
     else:
         raise Http404('Cover art not available')
 
