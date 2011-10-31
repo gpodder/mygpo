@@ -17,9 +17,9 @@ LIKE_BUTTON_STR =  """<iframe class="fb_like" src="http://www.facebook.com/plugi
 # http://stackoverflow.com/questions/2160261/access-request-in-django-custom-template-tags
 # http://docs.djangoproject.com/en/dev/howto/custom-template-tags/#shortcut-for-simple-tags
 
-@register.filter
-def fb_like_episode(episode):
-    url = 'http://gpodder.net/%s' % get_episode_link_target(episode)
+@register.simple_tag
+def fb_like_episode(episode, podcast):
+    url = 'http://gpodder.net/%s' % get_episode_link_target(episode, podcast)
     s = LIKE_BUTTON_STR % dict(url=url)
     return mark_safe(s)
 

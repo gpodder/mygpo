@@ -78,7 +78,7 @@
 
   <div class="share">
    {% google_plus_one_button %}
-   {{ episode|fb_like_episode }}
+   {% fb_like_episode episode podcast %}
   </div>
 
   {% if episode.url|is_flickr_photo %}
