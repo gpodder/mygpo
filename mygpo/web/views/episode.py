@@ -56,8 +56,14 @@ def episode(request, episode):
         episode_state = episode.get_user_state(request.user)
         is_fav = episode_state.is_favorite()
 
+
+        # pre-populate data for fetch_data
+        podcasts_dict = {podcast.get_id(): podcast}
+        episodes_dict = {episode._id: episode}
+
         history = list(episode_state.get_history_entries())
-        HistoryEntry.fetch_data(user, history)
+        HistoryEntry.fetch_data(user, history,
+                podcasts=podcasts_dict, episodes=episodes_dict)
 
         played_parts = EpisodeHeatmap(podcast.get_id(),
                 episode._id, user.oldid, duration=episode.duration)
