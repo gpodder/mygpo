@@ -2,6 +2,7 @@ import uuid, collections
 from datetime import datetime
 import dateutil.parser
 from itertools import imap
+from operator import itemgetter
 
 from couchdbkit import ResourceNotFound
 from couchdbkit.ext.django.schema import *
@@ -672,6 +673,18 @@ class User(Document, SyncedDevicesMixin):
         return [res['key'][1:] for res in r]
 
 
+    def get_subscriptions_by_device(self, public=None):
+        get_dev = itemgetter(2)
+        groups = collections.defaultdict(list)
+        subscriptions = self.get_subscriptions(public=public)
+        subscriptions = sorted(subscriptions, key=get_dev)
+
+        for public, podcast_id, device_id in subscriptions:
+            groups[device_id].append(podcast_id)
+
+        return groups
+
+
     def get_subscribed_podcast_ids(self, public=None):
         """
         Returns the Ids of all subscribed podcasts
@@ -864,23 +877,28 @@ class HistoryEntry(object):
 
 
     @classmethod
-    def fetch_data(cls, user, entries):
+    def fetch_data(cls, user, entries,
+            podcasts=None, episodes=None):
         """ Efficiently loads additional data for a number of entries """
 
-        # load podcast data
-        podcast_ids = [getattr(x, 'podcast_id', None) for x in entries]
-        podcast_ids = filter(None, podcast_ids)
-        podcasts = get_to_dict(Podcast, podcast_ids, get_id=Podcast.get_id)
+        if podcasts is None:
+            # load podcast data
+            podcast_ids = [getattr(x, 'podcast_id', None) for x in entries]
+            podcast_ids = filter(None, podcast_ids)
+            podcasts = get_to_dict(Podcast, podcast_ids, get_id=Podcast.get_id)
 
-        # load episode data
-        episode_ids = [getattr(x, 'episode_id', None) for x in entries]
-        episode_ids = filter(None, episode_ids)
-        episodes = get_to_dict(Episode, episode_ids)
+        if episodes is None:
+            # load episode data
+            episode_ids = [getattr(x, 'episode_id', None) for x in entries]
+            episode_ids = filter(None, episode_ids)
+            episodes = get_to_dict(Episode, episode_ids)
 
         # load device data
+        # does not need pre-populated data because no db-access is required
         device_ids = [getattr(x, 'device_id', None) for x in entries]
         device_ids = filter(None, device_ids)
         devices = dict([ (id, user.get_device(id)) for id in device_ids])
+
 
         for entry in entries:
             podcast_id = getattr(entry, 'podcast_id', None)

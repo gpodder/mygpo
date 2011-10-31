@@ -714,21 +714,20 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         """
         targets = []
 
-        user.sync_all()
+        subscriptions_by_devices = user.get_subscriptions_by_device()
 
         for group in user.get_grouped_devices():
 
             if group.is_synced:
 
                 dev = group.devices[0]
-                subscriptions = dev.get_subscribed_podcasts()
 
-                if not self in subscriptions:
+                if not self.get_id() in subscriptions_by_devices[dev.id]:
                     targets.append(group.devices)
 
             else:
                 for device in group.devices:
-                    if not self in device.get_subscribed_podcasts():
+                    if not self.get_id() in subscriptions_by_devices[device.id]:
                         targets.append(device)
 
         return targets

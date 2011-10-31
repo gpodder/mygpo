@@ -134,12 +134,20 @@ def episode_list(podcast, user):
     new_user = migrate.get_or_migrate_user(user)
 
     listeners = dict(podcast.episode_listener_counts())
-    episodes = podcast.get_episodes(descending=True)
+    episodes = list(podcast.get_episodes(descending=True))
 
     if user.is_authenticated():
+
+        # prepare pre-populated data for HistoryEntry.fetch_data
+        podcasts_dict = {podcast.get_id(): podcast}
+        episodes_dict = dict( (episode._id, episode) for episode in episodes)
+
         actions = podcast.get_episode_states(user.id)
         actions = map(HistoryEntry.from_action_dict, actions)
-        HistoryEntry.fetch_data(new_user, actions)
+
+        HistoryEntry.fetch_data(new_user, actions,
+                podcasts=podcasts_dict, episodes=episodes_dict)
+
         episode_actions = dict( (action.episode_id, action) for action in actions)
     else:
         episode_actions = {}
@@ -224,6 +232,8 @@ def subscribe(request, podcast):
         except ValueError, e:
             messages.error(request, _('Could not subscribe '
                         'to the podcast: %s' % str(e)))
+
+    user.sync_all()
 
     targets = podcast.subscribe_targets(user)
 
