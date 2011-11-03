@@ -161,15 +161,14 @@ def cover_art(request, size, filename):
 
 @manual_gc
 @login_required
-def history(request, count=15, device_id=None):
+def history(request, count=15, uid=None):
 
     page = parse_range(request.GET.get('page', None), 0, sys.maxint, 0)
 
     user = migrate.get_or_migrate_user(request.user)
 
-    if device_id:
-        device = get_object_or_404(Device, id=device_id, user=request.user)
-        device = migrate.get_or_migrate_device(device)
+    if uid:
+        device = user.get_device_by_uid(uid)
     else:
         device = None
 
