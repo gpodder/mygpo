@@ -1,7 +1,7 @@
 
 
-                   Deployment instructions for gpodder.net
-                   ---------------------------------------
+                   Deployment instructions for mygpo
+                   ---------------------------------
 
 
 Please note that this deployment instructions apply to the current couchdb
@@ -15,24 +15,38 @@ CouchDB has been completed.
 When no version number is indicated, it is advisable to install the current
 development version from the repository.
 
-  * python (>= 2.6)
-  * MySQL Server (>= 5.0)
-  * CouchDB (>= 1.0, incl Patch from [1])
-  * python-mysqldb [2]
-  * lighttpd (>= 1.4.19)
+  * Python (>= 2.6)
+  * CouchDB (>= 1.1)
   * python-feedparser [3] or [4]
   * python-dateutil [5]
   * python-flup [6]
   * python-imaging [7]
   * python-pybabel [8]
   * couchdbkit [9]
-  * Django (>= 1.2.2, [10])
+  * Django (>= 1.3 [10])
   * django-registration [11]
   * django-couchdb-utils [12]
 
+Optional:
+  * MySQL Server (>= 5.0)
+  * python-mysqldb [2]
+  * lighttpd (>= 1.4.19)
 
-  MySQL
-=========
+
+
+  Relational Database
+=======================
+
+The relational database is being replaced by CouchDB in the "couchdb" branch.
+Currently a relational database is still required for user profile related
+data.
+
+For a production instance you might want to use MySQL, but for a test and
+development instance a SQLite database should work, too.
+
+For setting up a MySQL database you should continue with the following steps.
+For a SQLite database you can skip to step 3.
+
 
 1. Updating the Settings
 
@@ -55,18 +69,16 @@ adapt them.
 
 2. Creating the database
 
-In MySQL, do the following (the SUPER grant is needed for
-triggers to work in MySQL 5.0):
+In MySQL, do the following:
 
   CREATE DATABASE mygpo;
   GRANT ALL ON mygpo.* TO mygpo@localhost WITH GRANT OPTION;
   GRANT SUPER ON *.* TO mygpo@localhost;
   GRANT ALL ON mygpo.* TO mygpo@'%' WITH GRANT OPTION;
-  GRANT SUPER ON *.* TO mygpo@'%';
   FLUSH PRIVILEGES;
 
-Make sure that MySQL listens only on localhost, or if in
-doubt, assign a password to the "mygpo" user!
+Make sure that MySQL listens only on localhost, or if in doubt, assign a
+password to the "mygpo" user!
 
 
 3. Initializing an empty Database
@@ -80,16 +92,6 @@ DB parameters in mygpo/settings.py):
 
 When asked to create a superuser, you can say YES.
 
-Now, run every SQL-Script in the install/ subdirectory, starting
-with "create.sql" and working your way all the way through the
-update scripts (these are split because we are doing incremental
-schema updates on the production server).
-
-If you are really doing an initial installation, you can also use
-the "install.sh" script which runs all scripts on the local MySQL
-server in the correct order. You should not use this script to
-upgrade the database, as data loss may occur. You have been warned.
-
 
 4. Importing a Dump
 
@@ -99,8 +101,37 @@ with
   gunzip -c <dumpfile>.sql.gz | mysql -uroot -p mygpo
 
 
+
   CouchDB
 ===========
+
+A source distribution of CouchDB can be obtained from
+
+ http://couchdb.apache.org/downloads.html
+
+Build and installation instructions can be found at
+
+ http://wiki.apache.org/couchdb/Installation
+
+
+Non-official third-party binary distributions are available from
+
+ http://www.couchbase.com/downloads
+
+
+If you want to avoid installing a CouchDB server yourself, you can use a free
+CouchDB hosting service, for example from
+
+ http://www.iriscouch.com/service
+
+Please note, however, that hosted CouchDB services generally do not provide
+security or authentication mechanisms, so this might only be useful for
+development servers.
+
+If you don't use a local database, you need to update the COUCHDB_DATABASES
+setting (see the "Settings" section below).
+
+
 
 1. Initializing an empty Database
 
@@ -110,7 +141,7 @@ To create the database, execute the following on the commandline
 
 To initialize the views, execute from the mygpo-Directory
 
-  python manage.py syncdb
+  python manage.py sync_couchdb
 
 
 2. Importing a Dump
@@ -120,13 +151,32 @@ To import a CouchDB dump, execute the following from the commandline
   gunzip -c <dumpfile.couch.gz> | couchdb-load http://127.0.0.1:5984/mygpo
 
 
+
 3. Building the Views
 
 On the first request, CouchDB will build the views. To do this before the first
-user hits the site (which is, of course, optional), execute the following
+user hits the site (which is, of course, optional), execute
 
-  curl -X GET http://127.0.0.1:5984/mygpo/_design/core/_view/podcasts_by_url?limit=1
-  curl -X GET http://127.0.0.1:5984/mygpo/_design/directory/_view/toplist
+ bin/touch-views.sh
+
+
+
+  mygpo
+=========
+
+The source for mygpo can be obtained via git
+
+ git clone git://github.com/gpodder/mygpo.git
+ git checkout couchdb
+
+
+
+  Settings
+============
+
+Check the settings in mygpo/settings.py. If you want to change any settings,
+add them to mygpo/settings_prod.py with the correct value.
+
 
 
   Web-Server
@@ -153,13 +203,6 @@ you can enable these using the "lighty-enable-mod" command:
 Then restart ligghtd with
 
   /etc/init.d/lighttpd restart
-
-
-  Settings
-============
-
-Check the settings in mygpo/settings.py. If you want to change any settings,
-add them to mygpo/settings_prod.py with the correct value.
 
 
 
