@@ -16,7 +16,7 @@ def vertical_bar(value, max):
         left, right = '<span>'+str(value)+'</span>', ''
     else:
         left, right = '&nbsp;', '<span>'+str(value)+'</span>'
-    s = '<div class="barbg"><div class="bar" style="width: %s">%s</div>%s</div>' % (ratio, left, right)
+    s = '<div class="barbg"><div class="bar" style="width: %.2d%%">%s</div>%s</div>' % (ratio, left, right)
     return mark_safe(s)
 
 @register.filter
