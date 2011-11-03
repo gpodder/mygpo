@@ -65,7 +65,7 @@ def podcast(request, podcast):
         return HttpResponseForbidden()
 
     timeline_data = listener_data([podcast])
-    subscription_data = subscriber_data([podcast])
+    subscription_data = subscriber_data([podcast])[-20:]
 
     if podcast.group:
         group = PodcastGroup.get(podcast.group)
@@ -186,7 +186,7 @@ def episode(request, episode):
     elif request.method == 'GET':
         form = None #EpisodeForm(instance=e)
 
-    timeline_data = episode_listener_data(episode)
+    timeline_data = list(episode_listener_data(episode))
 
     heatmap = EpisodeHeatmap(episode.podcast, episode._id,
               duration=episode.duration)
