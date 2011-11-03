@@ -99,8 +99,8 @@ def create_subscriptionlist(request):
             if podcast is None:
                 continue
 
-            episode = get_cache_or_calc('%s-latest-episode', timeout=60*60,
-                    calc=lambda: podcast.get_latest_episode())
+            episode = get_cache_or_calc('%s-latest-episode' % podcast.get_id(),
+                    timeout=60*60, calc=lambda: podcast.get_latest_episode())
 
             subscription_list[podcast_id] = {
                 'podcast': podcasts[podcast_id],
