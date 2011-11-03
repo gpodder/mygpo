@@ -188,17 +188,17 @@ def parse_subscription(raw_post_data, format):
 
 def set_subscriptions(urls, user, device_uid):
 
-    user = migrate.get_or_migrate_user(user)
-    dev = get_device(user, device_uid, undelete=True)
+    new_user = migrate.get_or_migrate_user(user)
+    device = get_device(new_user, device_uid, undelete=True)
 
-    old = [p.url for p in dev.get_subscribed_podcasts()]
+    old = [p.url for p in device.get_subscribed_podcasts()]
     new = [p for p in urls if p not in old]
     rem = [p for p in old if p not in urls]
 
     for r in rem:
         p = Podcast.for_url(r, create=True)
         try:
-            p.unsubscribe(device)
+            p.unsubscribe(user, device)
         except Exception as e:
             log('Simple API: %(username)s: Could not remove subscription for podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
                 {'username': user.username, 'podcast_url': r, 'device_id': device.id, 'exception': e})
@@ -206,7 +206,7 @@ def set_subscriptions(urls, user, device_uid):
     for n in new:
         p = Podcast.for_url(n, create=True)
         try:
-            p.subscribe(device)
+            p.subscribe(user, device)
         except Exception as e:
             log('Simple API: %(username)s: Could not add subscription for podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
                 {'username': user.username, 'podcast_url': n, 'device_id': device.id, 'exception': e})

@@ -90,7 +90,7 @@ def get_device(user, uid, undelete=True):
             user.devices.append(device)
             user.save()
 
-        elif device.deleted and undeleted:
+        elif device.deleted and undelete:
             device.deleted = False
             user.set_device(device)
             user.save()

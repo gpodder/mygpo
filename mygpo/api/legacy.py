@@ -46,8 +46,8 @@ def upload(request):
     if (not user):
         return HttpResponse('@AUTHFAIL', mimetype='text/plain')
 
-    d = get_device(user, LEGACY_DEVICE_UID)
-    dev = migrate.get_or_migrate_device(d)
+    usr = migrate.get_or_migrate_user(user)
+    dev = get_device(usr, LEGACY_DEVICE_UID)
 
     existing_urls = [x.url for x in dev.get_subscribed_podcasts()]
 
@@ -72,18 +72,18 @@ def upload(request):
             continue
 
         try:
-            p.subscribe(d)
+            p.subscribe(user, dev)
         except Exception as e:
             log('Legacy API: %(username)s: could not subscribe to podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
-                {'username': user.username, 'podcast_url': p.url, 'device_id': d.id, 'exception': e})
+                {'username': user.username, 'podcast_url': p.url, 'device_id': dev.id, 'exception': e})
 
     for r in rem:
         p = Podcast.for_url(r, create=True)
         try:
-            p.unsubscribe(d)
+            p.unsubscribe(user, dev)
         except Exception as e:
             log('Legacy API: %(username): could not unsubscribe from podcast %(podcast_url) on device %(device_id): %(exception)s' %
-                {'username': user.username, 'podcast_url': p.url, 'device_id': d.id, 'exception': e})
+                {'username': user.username, 'podcast_url': p.url, 'device_id': dev.id, 'exception': e})
 
     return HttpResponse('@SUCCESS', mimetype='text/plain')
 

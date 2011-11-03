@@ -97,13 +97,13 @@ class Exporter(object):
             return node
 
         head = doc.createElement('head')
-        head.appendChild(create_node('title', self.title))
+        head.appendChild(create_node('title', self.title or ''))
         head.appendChild(create_node('dateCreated', self.created))
         opml.appendChild(head)
 
         def create_outline(channel):
             outline = doc.createElement('outline')
-            outline.setAttribute('title', channel.title)
+            outline.setAttribute('title', channel.title or '')
             outline.setAttribute('text', channel.description or '')
             outline.setAttribute('xmlUrl', channel.url)
             outline.setAttribute('type', 'rss')
