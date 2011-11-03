@@ -821,8 +821,8 @@ class History(object):
 
         if device:
             self._view = 'users/device_history'
-            self._startkey = [self.user.oldid, device.oldid, None]
-            self._endkey   = [self.user.oldid, device.oldid, {}]
+            self._startkey = [self.user.oldid, device.id, None]
+            self._endkey   = [self.user.oldid, device.id, {}]
         else:
             self._view = 'users/history'
             self._startkey = [self.user.oldid, None]
