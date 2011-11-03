@@ -241,7 +241,7 @@ def delete_permanently(request, device):
         state.remove_device(dev)
         state.save()
 
-    states = PodcastUserState.for_device(dev.id)
+    states = PodcastUserState.for_device(device.id)
     for state in states:
         remove_device(state=state, dev=device)
 
