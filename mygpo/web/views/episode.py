@@ -105,6 +105,8 @@ def episode(request, episode):
 def add_chapter(request, episode):
     e_state = episode.get_user_state(request.user)
 
+    podcast = Podcast.get(episode.podcast)
+
     try:
         start = parse_time(request.POST.get('start', '0'))
 
@@ -119,7 +121,7 @@ def add_chapter(request, episode):
     except Exception as e:
         # FIXME: when using Django's messaging system, set error message
 
-        return HttpResponseRedirect(get_episode_link_target(episode))
+        return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
 
     chapter = Chapter()
@@ -130,7 +132,7 @@ def add_chapter(request, episode):
 
     e_state.update_chapters(add=[chapter])
 
-    return HttpResponseRedirect(get_episode_link_target(episode))
+    return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
 
 @manual_gc
@@ -141,7 +143,9 @@ def remove_chapter(request, episode, start, end):
     remove = (int(start), int(end))
     e_state.update_chapters(rem=[remove])
 
-    return HttpResponseRedirect(get_episode_link_target(episode))
+    podcast = Podcast.get(episode.podcast)
+
+    return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
 
 @manual_gc
@@ -153,7 +157,9 @@ def toggle_favorite(request, episode):
 
     episode_state.save()
 
-    return HttpResponseRedirect(get_episode_link_target(episode))
+    podcast = Podcast.get(episode.podcast)
+
+    return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
 
 @manual_gc
@@ -226,7 +232,9 @@ def add_action(request, episode):
 
     _add_action(action=action)
 
-    return HttpResponseRedirect(get_episode_link_target(episode))
+    podcast = Podcast.get(episode.podcast)
+
+    return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
 # To make all view accessible via either CouchDB-ID for Slugs
 # a decorator queries the episode and passes the Id on to the
