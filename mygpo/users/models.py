@@ -759,25 +759,59 @@ class User(Document, SyncedDevicesMixin):
                     yield entry
 
 
+
     def get_newest_episodes(self, max_date, max_per_podcast=5):
         """ Returns the newest episodes of all subscribed podcasts
 
-        Episodes with release dates above max_date are discarded"""
+        Only max_per_podcast episodes per podcast are loaded. Episodes with
+        release dates above max_date are discarded.
 
+        This method returns a generator that produces the newest episodes.
 
-        podcasts = dict( (p.get_id(), p) for p in
-                self.get_subscribed_podcasts())
-
-        episodes = [p.get_episodes(until=max_date, descending=True,
-                limit=max_per_podcast) for p in podcasts.values()]
+        The number of required DB queries is equal to the number of (distinct)
+        podcasts of all consumed episodes (max: number of subscribed podcasts),
+        plus a constant number of initial queries (when the first episode is
+        consumed). """
 
         cmp_key = lambda episode: episode.released or datetime(2000, 01, 01)
 
-        for res in iterate_together(episodes, key=cmp_key, reverse=True):
-            # res is a sparse tuple
-            for episode in filter(None, res):
-                podcast = podcasts.get(episode.podcast, None)
-                yield proxy_object(episode, podcast=podcast)
+        podcasts = list(self.get_subscribed_podcasts())
+        podcasts = filter(lambda p: p.latest_episode_timestamp, podcasts)
+        podcasts = sorted(podcasts, key=lambda p: p.latest_episode_timestamp,
+                        reverse=True)
+
+        podcast_dict = dict((p.get_id(), p) for p in podcasts)
+
+        # contains the un-yielded episodes, newest first
+        episodes = []
+
+        for podcast in podcasts:
+
+            yielded_episodes = 0
+
+            for episode in episodes:
+                # determine for which episodes there won't be a new episodes
+                # that is newer; those can be yielded
+                if episode.released > podcast.latest_episode_timestamp:
+                    yield episode
+                    yielded_episodes += 1
+                else:
+                    break
+
+            # remove the episodes that have been yielded before
+            episodes = episodes[yielded_episodes:]
+
+            # fetch and merge episodes for the next podcast
+            new_episodes = list(podcast.get_episodes(until=max_date,
+                        descending=True, limit=max_per_podcast))
+            episodes = sorted(episodes+new_episodes, key=cmp_key, reverse=True)
+
+
+        # yield the remaining episodes
+        for episode in episodes:
+            podcast = podcast_dict.get(episode.podcast, None)
+            yield proxy_object(episode, podcast=podcast)
+
 
 
     def save(self, *args, **kwargs):
