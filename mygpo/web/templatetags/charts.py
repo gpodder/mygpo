@@ -133,6 +133,6 @@ def episode_heatmap_visualization(heatmap):
         'chxp=0,%s' % ','.join([repr(x) for x in axis_pos]),   #axis label positions
         ]
 
-    s = '<img src="http://chart.apis.google.com/chart?%s"' % '&'.join(parts)
+    s = '<img src="http://chart.apis.google.com/chart?%s" />' % '&'.join(parts)
 
     return mark_safe(s)
