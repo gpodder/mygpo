@@ -28,7 +28,6 @@ from datetime import datetime
 from mygpo.utils import parse_time
 from mygpo.decorators import allowed_methods
 import dateutil.parser
-from mygpo import migrate
 from django.views.decorators.csrf import csrf_exempt
 
 try:
@@ -107,8 +106,6 @@ def chapters(request, username):
 
         e_state = episode.get_user_state(request.user)
 
-        new_user = migrate.get_or_migrate_user(request.user)
-
         chapterlist = sorted(e_state.chapters, key=lambda c: c.start)
 
         if since:
@@ -117,7 +114,7 @@ def chapters(request, username):
         chapters = []
         for c in chapterlist:
             if c.device is not None:
-                device = migrate.get_or_migrate_device(c.device)
+                device = request.user.get_device(c.device)
                 device_uid = device.uid
             else:
                 device_uid = None
@@ -146,15 +143,13 @@ def update_chapters(req, user):
 
     e_state = episode.get_user_state(request.user)
 
-    user = migrate.get_or_migrate_user(request.user)
-
     device = None
     if 'device' in req:
-        device = get_device(user, req['device'], undelete=True)
+        device = get_device(request.user, req['device'], undelete=True)
 
     timestamp = dateutil.parser.parse(req['timestamp']) if 'timestamp' in req else datetime.utcnow()
 
-    new_chapters = parse_new_chapters(user, req.get('chapters_add', []))
+    new_chapters = parse_new_chapters(request.user, req.get('chapters_add', []))
     rem_chapters = parse_rem_chapters(req.get('chapters_remove', []))
 
     e_state.update_chapters(new_chapters, rem_chapters)

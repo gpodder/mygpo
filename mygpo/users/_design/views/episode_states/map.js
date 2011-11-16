@@ -36,6 +36,6 @@ function(doc)
         }
 
 
-        emit([doc.user_oldid, doc.podcast, doc.episode], action_obj);
+        emit([doc.user, doc.podcast, doc.episode], action_obj);
     }
 }

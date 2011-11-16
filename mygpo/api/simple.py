@@ -45,7 +45,6 @@ from mygpo.log import log
 from django.utils.translation import ugettext as _
 from mygpo.decorators import allowed_methods
 from mygpo.utils import parse_range
-from mygpo import migrate
 
 
 try:
@@ -88,8 +87,7 @@ def subscriptions(request, username, device_uid, format):
 @check_format
 @allowed_methods(['GET'])
 def all_subscriptions(request, username, format):
-    user = migrate.get_or_migrate_user(request.user)
-    subscriptions = user.get_subscribed_podcasts()
+    subscriptions = request.user.get_subscribed_podcasts()
     title = _('%(username)s\'s Subscription List') % {'username': username}
     return format_podcast_list(subscriptions, format, title)
 
@@ -156,7 +154,6 @@ def format_podcast_list(obj_list, format, title, get_podcast=None,
 
 
 def get_subscriptions(user, device_uid):
-    user = migrate.get_or_migrate_user(user)
     device = get_device(user, device_uid)
     return device.get_subscribed_podcasts()
 
@@ -188,8 +185,7 @@ def parse_subscription(raw_post_data, format):
 
 def set_subscriptions(urls, user, device_uid):
 
-    new_user = migrate.get_or_migrate_user(user)
-    device = get_device(new_user, device_uid, undelete=True)
+    device = get_device(user, device_uid, undelete=True)
 
     old = [p.url for p in device.get_subscribed_podcasts()]
     new = [p for p in urls if p not in old]
@@ -295,7 +291,7 @@ def search(request, format):
 def suggestions(request, count, format):
     count = parse_range(count, 1, 100, 100)
 
-    suggestion_obj = Suggestions.for_user_oldid(request.user.id)
+    suggestion_obj = Suggestions.for_user(request.user)
     suggestions = suggestion_obj.get_podcasts(count)
     title = _('gpodder.net - %(count)d Suggestions') % {'count': len(suggestions)}
     domain = RequestSite(request).domain

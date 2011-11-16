@@ -34,7 +34,7 @@ function(doc)
 
 
             emit([
-                    doc.user_oldid,
+                    doc.user,
                     action.timestamp,
                     doc.podcast,
                     doc.device,

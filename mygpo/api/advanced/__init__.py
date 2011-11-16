@@ -37,7 +37,6 @@ from mygpo.core.models import SanitizingRule, Podcast
 from django.db import IntegrityError
 from django.views.decorators.csrf import csrf_exempt
 from mygpo.users.models import PodcastUserState, EpisodeAction, EpisodeUserState
-from mygpo import migrate
 
 try:
     import simplejson as json
@@ -59,10 +58,8 @@ def subscriptions(request, username, device_uid):
     now = datetime.now()
     now_ = get_timestamp(now)
 
-    user = migrate.get_or_migrate_user(request.user)
-
     if request.method == 'GET':
-        device = user.get_device_by_uid(device_uid)
+        device = request.user.get_device_by_uid(device_uid)
         if not device or device.deleted:
             raise Http404
 
@@ -79,7 +76,7 @@ def subscriptions(request, username, device_uid):
         return JsonResponse(changes)
 
     elif request.method == 'POST':
-        d = get_device(user, device_uid)
+        d = get_device(request.user, device_uid)
 
         actions = json.loads(request.raw_post_data)
         add = actions['add'] if 'add' in actions else []
@@ -198,8 +195,7 @@ def episodes(request, username, version=1):
             podcast = None
 
         if device_uid:
-            user = migrate.get_or_migrate_user(request.user)
-            device = user.get_device_by_uid(device_uid)
+            device = request.user.get_device_by_uid(device_uid)
 
             if not device or device.deleted:
                 raise Http404
@@ -211,8 +207,7 @@ def episodes(request, username, version=1):
 
 def get_episode_changes(user, podcast, device, since, until, aggregated, version):
 
-    new_user = migrate.get_or_migrate_user(user)
-    devices = dict( (dev.id, dev.uid) for dev in new_user.devices )
+    devices = dict( (dev.id, dev.uid) for dev in request.user.devices )
 
     args = {}
     if podcast is not None: args['podcast_id'] = podcast.get_id()
@@ -231,7 +226,7 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
         actions = imap(convert_position, actions)
 
     clean_data = partial(clean_episode_action_data,
-            user=new_user, devices=devices)
+            user=user, devices=devices)
 
     actions = map(clean_data, actions)
     actions = filter(None, actions)
@@ -294,8 +289,7 @@ def update_episodes(user, actions, now):
         episode_url = sanitize_append(episode_url, 'episode', update_urls)
         if episode_url == '': continue
 
-        new_user = migrate.get_or_migrate_user(user)
-        act = parse_episode_action(action, new_user, update_urls, now)
+        act = parse_episode_action(action, user, update_urls, now)
         grouped_actions[ (podcast_url, episode_url) ].append(act)
 
     # load the episode state only once for every episode
@@ -369,8 +363,7 @@ def parse_episode_action(action, user, update_urls, now):
 # instead of "POST" requests for uploading device settings
 @allowed_methods(['POST', 'PUT'])
 def device(request, username, device_uid):
-    user = migrate.get_or_migrate_user(request.user)
-    d = get_device(user, device_uid)
+    d = get_device(request.user, device_uid)
 
     data = json.loads(request.raw_post_data)
 
@@ -388,7 +381,7 @@ def device(request, username, device_uid):
         user.set_device(device)
         user.save()
 
-    _update(user=user, device=d)
+    _update(user=request.user, device=d)
 
     return HttpResponse()
 
@@ -411,8 +404,7 @@ def valid_episodeaction(type):
 @check_username
 @allowed_methods(['GET'])
 def devices(request, username):
-    user = migrate.get_or_migrate_user(request.user)
-    devices = filter(lambda d: not d.deleted, user.devices)
+    devices = filter(lambda d: not d.deleted, request.user.devices)
     devices = map(device_data, devices)
     return JsonResponse(devices)
 
@@ -433,8 +425,7 @@ def updates(request, username, device_uid):
     now = datetime.now()
     now_ = get_timestamp(now)
 
-    user = migrate.get_or_migrate_user(request.user)
-    device = user.get_device_by_uid(device_uid)
+    device = request.user.get_device_by_uid(device_uid)
     if not device or device.deleted:
         raise Http404
 
@@ -470,9 +461,9 @@ def updates(request, username, device_uid):
 
     ret['add'] = map(prepare_podcast_data, ret['add'])
 
-    devices = dict( (dev.id, dev.uid) for dev in user.devices )
+    devices = dict( (dev.id, dev.uid) for dev in request.user.devices )
     clean_data = partial(clean_episode_action_data,
-            user=user, devices=devices)
+            user=request.user, devices=devices)
 
 
 

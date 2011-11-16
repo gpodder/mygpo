@@ -18,7 +18,6 @@
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.template.defaultfilters import slugify
 from django.template import RequestContext
@@ -29,11 +28,11 @@ from django.contrib.sites.models import RequestSite
 from django.conf import settings
 from mygpo.decorators import manual_gc, allowed_methods
 from django.utils.translation import ugettext as _
-from registration.models import RegistrationProfile
 import string
 import random
 
 
+from mygpo.users.models import User
 from mygpo.web.forms import ResendActivationForm
 from mygpo.constants import DEFAULT_LOGIN_REDIRECT
 
@@ -88,69 +87,20 @@ def login_user(request):
 
     login(request, user)
 
-    try:
-         if user.get_profile().generated_id:
-             site = RequestSite(request)
-             return render_to_response('migrate.html', {
-                  'url': site,
-                  'username': user
-             }, context_instance=RequestContext(request))
-
-    except UserProfile.DoesNotExist:
-         profile, c = UserProfile.objects.get_or_create(user=user)
-
     if 'next' in request.POST and request.POST['next'] and request.POST['next'] != '/login/':
         return HttpResponseRedirect(request.POST['next'])
 
     return HttpResponseRedirect(DEFAULT_LOGIN_REDIRECT)
 
-@login_required
-def migrate_user(request):
-    user = request.user
-    username = request.POST.get('username', user.username)
-
-    if username == '':
-        username = user.username
-
-    if user.username != username:
-        current_site = RequestSite(request)
-        if User.objects.filter(username__exact=username).count() > 0:
-
-            messages.error(request, _('The username "%s" is already taken') %
-                        username)
-
-            return render_to_response('migrate.html', {
-                'url': current_site,
-                'username': user.username
-                }, context_instance=RequestContext(request))
-
-        if slugify(username) != username.lower():
-
-            messages.error(request, _('"%s" is not a valid username. '
-                        'Please use characters, numbers, underscore '
-                        'and dash only') % username)
-
-            return render_to_response('migrate.html', {
-                'url': current_site,
-                'username': user.username
-                }, context_instance=RequestContext(request))
-
-        else:
-            user.username = username
-            user.save()
-
-    user.get_profile().generated_id = 0
-    user.get_profile().save()
-
-    return HttpResponseRedirect('/')
 
 def get_user(username, email):
     if username:
-        return User.objects.get(username=username)
+        return User.get_user(username)
+
     elif email:
-        return User.objects.get(email=email)
-    else:
-        raise User.DoesNotExist('neither username nor email provided')
+        return User.get_user_by_email(email)
+
+    return None
 
 
 @allowed_methods(['POST'])
@@ -159,10 +109,9 @@ def restore_password(request):
     if not form.is_valid():
         return HttpResponseRedirect('/login/')
 
-    try:
-        user = get_user(form.cleaned_data['username'], form.cleaned_data['email'])
+    user = get_user(form.cleaned_data['username'], form.cleaned_data['email'])
 
-    except User.DoesNotExist:
+    if not user:
         messages.error(request, _('User does not exist.'))
 
         return render_to_response('password_reset_failed.html', {
@@ -195,26 +144,20 @@ def resend_activation(request):
         if not form.is_valid():
             raise ValueError(_('Invalid Username entered'))
 
-        try:
-            user = get_user(form.cleaned_data['username'], form.cleaned_data['email'])
-        except User.DoesNotExist:
+        user = get_user(form.cleaned_data['username'], form.cleaned_data['email'])
+        if not user:
             raise ValueError(_('User does not exist.'))
 
         p, c = UserProfile.objects.get_or_create(user=user)
         if p.deleted:
             raise ValueError(_('You have deleted your account, but you can regster again.'))
 
-        try:
-            profile = RegistrationProfile.objects.get(user=user)
-        except RegistrationProfile.DoesNotExist:
-            profile = RegistrationProfile.objects.create_profile(user)
-
-        if profile.activation_key == RegistrationProfile.ACTIVATED:
+        if user.activation_key == User.ACTIVATED:
             user.is_active = True
             user.save()
             raise ValueError(_('Your account already has been activated. Go ahead and log in.'))
 
-        elif profile.activation_key_expired():
+        elif user.activation_key_expired():
             raise ValueError(_('Your activation key has expired. Please try another username, or retry with the same one tomorrow.'))
 
     except ValueError, e:
@@ -226,11 +169,10 @@ def resend_activation(request):
 
 
     try:
-        profile.send_activation_email(site)
+        user.send_activation_email(site)
 
     except AttributeError:
-        #old versions of django-registration send registration mails from RegistrationManager
-        RegistrationProfile.objects.send_activation_email(profile, site)
+        user.send_activation_email(site)
 
     return render_to_response('registration/resent_activation.html', context_instance=RequestContext(request))
 

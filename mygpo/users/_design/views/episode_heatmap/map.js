@@ -66,6 +66,6 @@ function(doc)
             sections.push(part.end);
         }
 
-        emit([doc.podcast, doc.episode, doc.user_oldid], sections);
+        emit([doc.podcast, doc.episode, doc.user], sections);
     }
 }

@@ -21,7 +21,6 @@ from django.http import HttpResponse, HttpResponseBadRequest, \
      HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from django.contrib.sites.models import RequestSite
 from django.template.defaultfilters import slugify
@@ -33,10 +32,10 @@ from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.api import models
 from mygpo.core.models import Podcast
 from mygpo.decorators import allowed_methods, repeat_on_conflict
-from mygpo import migrate
 from mygpo.api.simple import parse_subscription, format_podcast_list, \
      check_format
 from mygpo.share.views import list_decorator
+from mygpo.users.models import User
 
 
 
@@ -58,9 +57,7 @@ def create(request, username, format):
     if not slug:
         return HttpResponseBadRequest('Invalid title')
 
-    user = migrate.get_or_migrate_user(request.user)
-
-    plist = PodcastList.for_user_slug(user._id, slug)
+    plist = PodcastList.for_user_slug(request.user._id, slug)
 
     if plist:
         return HttpResponse('List already exists', status=409)
@@ -72,12 +69,12 @@ def create(request, username, format):
     plist = PodcastList()
     plist.title = title
     plist.slug = slug
-    plist.user = user._id
+    plist.user = request.user._id
     plist.podcasts = podcast_ids
     plist.save()
 
     response = HttpResponse(status=201)
-    list_url = reverse('api-get-list', args=[user.username, slug, format])
+    list_url = reverse('api-get-list', args=[request.user.username, slug, format])
     response['Location'] = list_url
 
     return response
@@ -98,8 +95,9 @@ def _get_list_data(l, username, domain):
 def get_lists(request, username):
     """ Returns a list of all podcast lists by the given user """
 
-    user = get_object_or_404(User, username=username)
-    user = migrate.get_or_migrate_user(user)
+    user = User.get_user(username)
+    if not user:
+        raise Http404
 
     lists = PodcastList.for_user(user._id)
 
@@ -152,8 +150,7 @@ def get_list(request, plist, owner, format):
 def update_list(request, plist, owner, format):
     """ Replaces the podcasts in the list and returns 204 No Content """
 
-    user = migrate.get_or_migrate_user(request.user)
-    is_own = owner == user
+    is_own = owner == request.uuser
 
     if not is_own:
         return HttpResponseForbidden()
@@ -177,8 +174,7 @@ def update_list(request, plist, owner, format):
 def delete_list(request, plist, owner, format):
     """ Delete the podcast list and returns 204 No Content """
 
-    user = migrate.get_or_migrate_user(request.user)
-    is_own = owner == user
+    is_own = owner == request.user
 
     if not is_own:
         return HttpResponseForbidden()

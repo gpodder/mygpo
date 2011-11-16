@@ -3,11 +3,9 @@ from optparse import make_option
 from operator import itemgetter
 
 from django.core.management.base import BaseCommand
-from django.contrib.auth.models import User
 
-from mygpo.users.models import Suggestions
+from mygpo.users.models import Suggestions, User
 from mygpo.api import models
-from mygpo import migrate
 from mygpo.utils import progress
 
 try:
@@ -30,7 +28,8 @@ class Command(BaseCommand):
 
         max_suggestions = options.get('max')
 
-        users = User.objects.filter(is_active=True).order_by('?')
+        users = User.all_users()
+        users = filter(lambda u: u.is_active, users)
 
         if options.get('outdated'):
             users = users.filter(userprofile__suggestion_up_to_date=False)
@@ -44,10 +43,9 @@ class Command(BaseCommand):
         total = users.count()
 
         for n, user in enumerate(users):
-            suggestion = Suggestions.for_user_oldid(user.id)
+            suggestion = Suggestions.for_user(user)
 
-            new_user = migrate.get_or_migrate_user(user)
-            subscribed_podcasts = list(set(new_user.get_subscribed_podcasts()))
+            subscribed_podcasts = list(set(user.get_subscribed_podcasts()))
             subscribed_podcasts = filter(None, subscribed_podcasts)
 
             subscribed_podcasts = filter(None, subscribed_podcasts)

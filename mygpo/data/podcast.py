@@ -15,7 +15,6 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from django.contrib.auth.models import User
 from mygpo.core.models import Podcast
 from mygpo.users.models import PodcastUserState
 
@@ -47,10 +46,10 @@ def calc_similar_podcasts(podcast, num=20):
     podcasts = Counter()
 
 
-    for user_oldid in users:
+    for user_id in users:
         subscribed = db.view('users/subscribed_podcasts_by_user',
-                startkey    = [user_oldid, True, None, None],
-                endkey      = [user_oldid, True, {}, {}],
+                startkey    = [user_id, True, None, None],
+                endkey      = [user_id, True, {}, {}],
                 group       = True,
                 group_level = 3,
             )

@@ -800,15 +800,15 @@ class Podcast(Document, SlugMixin, OldIdMixin):
             yield (episode, listeners)
 
 
-    def get_episode_states(self, user_oldid):
+    def get_episode_states(self, user_id):
         """ Returns the latest episode actions for the podcast's episodes """
 
         from mygpo.users.models import EpisodeUserState
         db = EpisodeUserState.get_db()
 
         res = db.view('users/episode_states',
-                startkey= [user_oldid, self.get_id(), None],
-                endkey  = [user_oldid, self.get_id(), {}]
+                startkey= [user_id, self.get_id(), None],
+                endkey  = [user_id, self.get_id(), {}]
             )
 
         for r in res:

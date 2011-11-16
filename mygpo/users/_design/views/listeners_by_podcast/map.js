@@ -20,7 +20,7 @@ function(doc)
             if(action.action == "play")
             {
                 day = action.timestamp.slice(0, 10);
-                emit([doc.podcast, day], doc.user_oldid);
+                emit([doc.podcast, day], doc.user);
                 return;
             }
         }

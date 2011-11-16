@@ -38,7 +38,7 @@ function(doc)
                 is_public = doc.settings.public_subscription;
             }
 
-            emit([doc.user_oldid, is_public, doc.podcast, device], null);
+            emit([doc.user, is_public, doc.podcast, device], null);
         }
     }
 }

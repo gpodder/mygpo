@@ -20,7 +20,6 @@ from mygpo.decorators import manual_gc, allowed_methods, repeat_on_conflict
 from mygpo.utils import daterange
 from mygpo.web.utils import get_podcast_link_target
 from mygpo.log import log
-from mygpo import migrate
 
 MAX_TAGS_ON_PAGE=50
 
@@ -58,19 +57,18 @@ def show(request, podcast):
     tags = get_tags(podcast, request.user)
 
     if request.user.is_authenticated():
-        user = migrate.get_or_migrate_user(request.user)
 
-        user.sync_all()
+        request.user.sync_all()
 
         state = podcast.get_user_state(request.user)
         subscribed_devices = state.get_subscribed_device_ids()
-        subscribed_devices = [user.get_device(x) for x in subscribed_devices]
+        subscribed_devices = [request.user.get_device(x) for x in subscribed_devices]
 
-        subscribe_targets = podcast.subscribe_targets(user)
+        subscribe_targets = podcast.subscribe_targets(request.user)
 
         history = list(state.actions)
         for h in history:
-            dev = user.get_device(h.device)
+            dev = request.user.get_device(h.device)
             h.device_obj = dev.to_json()
 
         is_public = state.settings.get('public_subscription', True)
@@ -131,8 +129,6 @@ def episode_list(podcast, user):
     the episode.
     """
 
-    new_user = migrate.get_or_migrate_user(user)
-
     listeners = dict(podcast.episode_listener_counts())
     episodes = list(podcast.get_episodes(descending=True))
 
@@ -145,7 +141,7 @@ def episode_list(podcast, user):
         actions = podcast.get_episode_states(user.id)
         actions = map(HistoryEntry.from_action_dict, actions)
 
-        HistoryEntry.fetch_data(new_user, actions,
+        HistoryEntry.fetch_data(user, actions,
                 podcasts=podcasts_dict, episodes=episodes_dict)
 
         episode_actions = dict( (action.episode_id, action) for action in actions)
@@ -211,13 +207,11 @@ def remove_tag(request, podcast):
 @allowed_methods(['GET', 'POST'])
 def subscribe(request, podcast):
 
-    user = migrate.get_or_migrate_user(request.user)
-
     if request.method == 'POST':
         form = SyncForm(request.POST)
 
         try:
-            device = user.get_device_by_uid(form.get_target())
+            device = request.user.get_device_by_uid(form.get_target())
 
             try:
                 podcast.subscribe(request.user, device)
@@ -233,9 +227,9 @@ def subscribe(request, podcast):
             messages.error(request, _('Could not subscribe '
                         'to the podcast: %s' % str(e)))
 
-    user.sync_all()
+    request.user.sync_all()
 
-    targets = podcast.subscribe_targets(user)
+    targets = podcast.subscribe_targets(request.user)
 
     form = SyncForm()
     form.set_targets(targets, _('Choose a device:'))
@@ -256,8 +250,7 @@ def unsubscribe(request, podcast, device_uid):
     if not return_to:
         raise Http404('Wrong URL')
 
-    user = migrate.get_or_migrate_user(request.user)
-    device = user.get_device_by_uid(device_uid)
+    device = request.user.get_device_by_uid(device_uid)
 
     try:
         podcast.unsubscribe(request.user, device)

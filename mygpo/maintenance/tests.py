@@ -19,10 +19,9 @@ from datetime import datetime
 import unittest
 
 from django.test import TestCase
-from django.contrib.auth.models import User
 
 from mygpo.core.models import Podcast, Episode
-from mygpo.users.models import EpisodeAction
+from mygpo.users.models import EpisodeAction, User
 from mygpo.maintenance.merge import merge_podcasts
 
 
@@ -42,7 +41,8 @@ class MergeTests(TestCase):
         self.episode1.save()
         self.episode2.save()
 
-        self.user, _ = User.objects.get_or_create(username='test')
+        self.user = User(username='test')
+        self.user.save()
 
 
     def test_merge_podcasts(self):

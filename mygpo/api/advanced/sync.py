@@ -22,7 +22,6 @@ from django.shortcuts import get_object_or_404
 from mygpo.api.models import Device
 from django.views.decorators.csrf import csrf_exempt
 from mygpo.decorators import allowed_methods
-from mygpo import migrate
 
 try:
     import simplejson as json
@@ -37,10 +36,8 @@ except ImportError:
 def main(request, username):
     """ API Endpoint for Device Synchronisation """
 
-    user = migrate.get_or_migrate_user(request.user)
-
     if request.method == 'GET':
-        return JsonResponse(get_sync_status(user))
+        return JsonResponse(get_sync_status(request.user))
 
     else:
         try:
@@ -52,11 +49,11 @@ def main(request, username):
         stopsync = actions.get('stop-synchronize', [])
 
         try:
-            update_sync_status(user, synclist, stopsync)
+            update_sync_status(request.user, synclist, stopsync)
         except ValueError as e:
             return HttpResponseBadRequest(str(e))
 
-        return JsonResponse(get_sync_status(user))
+        return JsonResponse(get_sync_status(request.user))
 
 
 

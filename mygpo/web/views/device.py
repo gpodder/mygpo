@@ -31,17 +31,14 @@ from mygpo.log import log
 from mygpo.api import simple
 from mygpo.decorators import manual_gc, allowed_methods, repeat_on_conflict
 from mygpo.users.models import PodcastUserState, Device
-from mygpo import migrate
 
 
 @manual_gc
 @login_required
 def overview(request):
 
-    user = migrate.get_or_migrate_user(request.user)
-    device_groups = user.get_grouped_devices()
-
-    deleted_devices = user.inactive_devices
+    device_groups = request.user.get_grouped_devices()
+    deleted_devices = request.user.inactive_devices
 
     return render_to_response('devicelist.html', {
         'device_groups': device_groups,
@@ -53,8 +50,7 @@ def overview(request):
 def device_decorator(f):
     def _decorator(request, uid, *args, **kwargs):
 
-        user = migrate.get_or_migrate_user(request.user)
-        device = user.get_device_by_uid(uid)
+        device = request.user.get_device_by_uid(uid)
 
         if not device:
             raise Http404
@@ -70,13 +66,12 @@ def device_decorator(f):
 @login_required
 def show(request, device):
 
-    user = migrate.get_or_migrate_user(request.user)
-    user.sync_group(device)
+    request.user.sync_group(device)
 
     subscriptions = list(device.get_subscribed_podcasts())
-    synced_with = user.get_synced(device)
+    synced_with = request.user.get_synced(device)
 
-    sync_targets = list(user.get_sync_targets(device))
+    sync_targets = list(request.user.get_sync_targets(device))
     sync_form = SyncForm()
     sync_form.set_targets(sync_targets,
             _('Synchronize with the following devices'))
@@ -95,8 +90,6 @@ def show(request, device):
 def create(request):
     device_form = DeviceForm(request.POST)
 
-    user = migrate.get_or_migrate_user(request.user)
-
     if not device_form.is_valid():
 
         messages.error(request, _('Please fill out all fields.'))
@@ -109,8 +102,8 @@ def create(request):
     device.type = device_form.cleaned_data['type']
     device.uid  = device_form.cleaned_data['uid']
     try:
-        user.set_device(device)
-        user.save()
+        request.user.set_device(device)
+        request.user.save()
         messages.success(request, _('Device saved'))
 
     except IntegrityError, ie:
@@ -127,15 +120,13 @@ def create(request):
 def update(request, device):
     device_form = DeviceForm(request.POST)
 
-    user = migrate.get_or_migrate_user(request.user)
-
     if device_form.is_valid():
         device.name = device_form.cleaned_data['name']
         device.type = device_form.cleaned_data['type']
         device.uid  = device_form.cleaned_data['uid']
         try:
-            user.set_device(device)
-            user.save()
+            request.user.set_device(device)
+            request.user.save()
             messages.success(request, _('Device updated'))
 
         except IntegrityError, ie:
@@ -221,14 +212,12 @@ def symbian_opml(request, device):
 @allowed_methods(['POST'])
 def delete(request, device):
 
-    user = migrate.get_or_migrate_user(request.user)
-
-    if user.is_synced(device):
-        user.unsync_device(device)
+    if request.user.is_synced(device):
+        request.user.unsync_device(device)
 
     device.deleted = True
-    user.set_device(device)
-    user.save()
+    request.user.set_device(device)
+    request.user.save()
 
     return HttpResponseRedirect(reverse('devices'))
 
@@ -254,11 +243,9 @@ def delete_permanently(request, device):
 @login_required
 def undelete(request, device):
 
-    user = migrate.get_or_migrate_user(request.user)
-
     device.deleted = False
-    user.set_device(device)
-    user.save()
+    request.user.set_device(device)
+    request.user.save()
 
     return HttpResponseRedirect(reverse('device', args=[device.uid]))
 
@@ -269,8 +256,6 @@ def undelete(request, device):
 @allowed_methods(['POST'])
 def sync(request, device):
 
-    user = migrate.get_or_migrate_user(request.user)
-
     form = SyncForm(request.POST)
     if not form.is_valid():
         return HttpResponseBadRequest('invalid')
@@ -278,9 +263,9 @@ def sync(request, device):
     try:
         target_uid = form.get_target()
 
-        sync_target = user.get_device_by_uid(target_uid)
-        user.sync_devices(device, sync_target)
-        user.save()
+        sync_target = request.user.get_device_by_uid(target_uid)
+        request.user.sync_devices(device, sync_target)
+        request.user.save()
 
     except ValueError, e:
         raise
@@ -294,11 +279,9 @@ def sync(request, device):
 @login_required
 @allowed_methods(['GET'])
 def unsync(request, device):
-    user = migrate.get_or_migrate_user(request.user)
-
     try:
-        user.unsync_device(device)
-        user.save()
+        request.user.unsync_device(device)
+        request.user.save()
 
     except ValueError, e:
         messages.error(request, 'Could not unsync the device: {err}'.format(

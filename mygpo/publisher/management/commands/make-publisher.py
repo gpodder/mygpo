@@ -1,10 +1,10 @@
 import sys
 
 from django.core.management.base import BaseCommand
-from django.contrib.auth.models import User
 
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core.models import Podcast
+from mygpo.users.models import User
 from mygpo import migrate
 
 
@@ -24,13 +24,10 @@ class Command(BaseCommand):
 
         username = args[0]
 
-        try:
-            user = User.objects.get(username=username)
-        except User.DoesNotExist:
+        user = User.get_user(username)
+        if not user:
             print >> sys.stderr, 'User %s does not exist' % username
             return
-        user = migrate.get_or_migrate_user(user)
-
 
         urls = args[1:]
         podcasts = map(Podcast.for_url, urls)

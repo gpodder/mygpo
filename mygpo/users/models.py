@@ -7,6 +7,8 @@ from operator import itemgetter
 from couchdbkit import ResourceNotFound
 from couchdbkit.ext.django.schema import *
 
+from registration_couchdb.models import User as BaseUser
+
 from mygpo.core.proxy import proxy_object
 from mygpo.core.models import Podcast, Episode
 from mygpo.utils import linearize, get_to_dict, iterate_together
@@ -17,29 +19,25 @@ from mygpo.log import log
 
 
 class Suggestions(Document, RatingMixin):
-    user = StringProperty()
+    user = StringProperty(required=True)
     user_oldid = IntegerProperty()
     podcasts = StringListProperty()
     blacklist = StringListProperty()
 
     @classmethod
-    def for_user_oldid(cls, oldid):
-        r = cls.view('users/suggestions_by_user_oldid', key=oldid, \
+    def for_user(cls, user):
+        r = cls.view('users/suggestions_by_user', key=user._id, \
             include_docs=True)
         if r:
             return r.first()
         else:
             s = Suggestions()
-            s.user_oldid = oldid
+            s.user = user._id
             return s
 
 
     def get_podcasts(self, count=None):
-        from mygpo import migrate
-        from django.contrib.auth.models import User
-
-        user = User.objects.get(id=self.user_oldid)
-        user = migrate.get_or_migrate_user(user)
+        user = User.get(self.user)
         subscriptions = user.get_subscribed_podcast_ids()
 
         ids = filter(lambda x: not x in self.blacklist + subscriptions, self.podcasts)
@@ -53,9 +51,7 @@ class Suggestions(Document, RatingMixin):
             return super(Suggestions, self).__repr__()
         else:
             return '%d Suggestions for %s (%s)' % \
-                (len(self.podcasts),
-                 self.user[:10] if self.user else self.user_oldid,
-                 self._id[:10])
+                (len(self.podcasts), self.user, self._id)
 
 
 class EpisodeAction(DocumentSchema):
@@ -92,7 +88,7 @@ class EpisodeAction(DocumentSchema):
 
 
     @staticmethod
-    def filter(user_oldid, since=None, until={}, podcast_id=None,
+    def filter(user_id, since=None, until={}, podcast_id=None,
                device_id=None):
         """ Returns Episode Actions for the given criteria"""
 
@@ -100,8 +96,8 @@ class EpisodeAction(DocumentSchema):
         until_str = until.strftime('%Y-%m-%dT%H:%M:%S') if until else {}
 
         # further parts of the key are filled in below
-        startkey = [user_oldid, since_str, None, None]
-        endkey   = [user_oldid, until_str, {}, {}]
+        startkey = [user_id, since_str, None, None]
+        endkey   = [user_id, until_str, {}, {}]
 
         # additional filter that are carried out by the
         # application, not by the database
@@ -214,6 +210,7 @@ class EpisodeUserState(Document):
     actions       = SchemaListProperty(EpisodeAction)
     settings      = DictProperty()
     user_oldid    = IntegerProperty()
+    user          = StringProperty(required=True)
     ref_url       = StringProperty(required=True)
     podcast_ref_url = StringProperty(required=True)
     merged_ids    = StringListProperty()
@@ -230,14 +227,12 @@ class EpisodeUserState(Document):
             return r.first()
 
         else:
-            from mygpo import migrate
-            new_user = migrate.get_or_migrate_user(user)
             podcast = Podcast.get(episode.podcast)
 
             state = EpisodeUserState()
             state.episode = episode._id
             state.podcast = episode.podcast
-            state.user_oldid = user.id
+            state.user = user._id
             state.ref_url = episode.url
             state.podcast_ref_url = podcast.url
 
@@ -353,6 +348,7 @@ class PodcastUserState(Document):
 
     podcast       = StringProperty(required=True)
     user_oldid    = IntegerProperty()
+    user          = StringProperty(required=True)
     settings      = DictProperty()
     actions       = SchemaListProperty(SubscriptionAction)
     tags          = StringListProperty()
@@ -368,29 +364,24 @@ class PodcastUserState(Document):
         if r:
             return r.first()
         else:
-            from mygpo import migrate
-            new_user = migrate.get_or_migrate_user(user)
             p = PodcastUserState()
             p.podcast = podcast.get_id()
-            p.user_oldid = user.id
+            p.user = user._id
             p.ref_url = podcast.url
-            p.settings['public_subscription'] = new_user.settings.get('public_subscriptions', True)
+            p.settings['public_subscription'] = user.settings.get('public_subscriptions', True)
 
-            p.set_device_state(new_user.devices)
+            p.set_device_state(user.devices)
 
             return p
 
 
     @classmethod
     def for_user(cls, user):
-        return cls.for_user_oldid(user.id)
-
-
-    @classmethod
-    def for_user_oldid(cls, user_oldid):
         r = PodcastUserState.view('users/podcast_states_by_user',
-            startkey=[user_oldid, None], endkey=[user_oldid, 'ZZZZ'],
-            include_docs=True)
+            startkey     = [user._id, None],
+            endkey       = [user._id, 'ZZZZ'],
+            include_docs = True,
+            )
         return list(r)
 
 
@@ -476,8 +467,8 @@ class PodcastUserState(Document):
 
     def get_subscribed_device_ids(self):
         r = PodcastUserState.view('users/subscriptions_by_podcast',
-            startkey = [self.podcast, self.user_oldid, None],
-            endkey   = [self.podcast, self.user_oldid, {}],
+            startkey = [self.podcast, self.user, None],
+            endkey   = [self.podcast, self.user, {}],
             reduce   = False,
             )
         return (res['key'][2] for res in r)
@@ -492,11 +483,11 @@ class PodcastUserState(Document):
             return False
 
         return self.podcast == other.podcast and \
-               self.user_oldid == other.user_oldid
+               self.user == other.user
 
     def __repr__(self):
         return 'Podcast %s for User %s (%s)' % \
-            (self.podcast, self.user_oldid, self._id)
+            (self.podcast, self.user, self._id)
 
 
 class Device(Document):
@@ -575,11 +566,13 @@ def token_generator(length=32):
     return  "".join(random.sample(string.letters+string.digits, length))
 
 
-class User(Document, SyncedDevicesMixin):
+class User(BaseUser, SyncedDevicesMixin):
     oldid    = IntegerProperty()
     settings = DictProperty()
     devices  = SchemaListProperty(Device)
     published_objects = StringListProperty()
+    deleted  = BooleanProperty(default=False)
+    suggestions_up_to_date = BooleanProperty(default=False)
 
     # token for accessing subscriptions of this use
     subscriptions_token    = StringProperty(default=token_generator)
@@ -590,6 +583,8 @@ class User(Document, SyncedDevicesMixin):
     # token for automatically updating feeds published by this user
     publisher_update_token = StringProperty(default=token_generator)
 
+    class Meta:
+        app_label = 'users'
 
     @classmethod
     def for_oldid(cls, oldid):
@@ -666,8 +661,8 @@ class User(Document, SyncedDevicesMixin):
         """
 
         r = PodcastUserState.view('users/subscribed_podcasts_by_user',
-            startkey = [self.oldid, public, None, None],
-            endkey   = [self.oldid+1, None, None, None],
+            startkey = [self._id, public, None, None],
+            endkey   = [self._id+'ZZZ', None, None, None],
             reduce   = False,
             )
         return [res['key'][1:] for res in r]
@@ -718,7 +713,7 @@ class User(Document, SyncedDevicesMixin):
                 yield entry
 
         if device_id is None:
-            podcast_states = PodcastUserState.for_user_oldid(self.oldid)
+            podcast_states = PodcastUserState.for_user(self)
         else:
             podcast_states = PodcastUserState.for_device(device_id)
 
@@ -817,10 +812,7 @@ class User(Document, SyncedDevicesMixin):
     def save(self, *args, **kwargs):
         super(User, self).save(*args, **kwargs)
 
-        from django.contrib.auth.models import User as OldUser
-        user = OldUser.objects.get(id=self.oldid)
-        podcast_states = PodcastUserState.for_user(user)
-
+        podcast_states = PodcastUserState.for_user(self)
         for state in podcast_states:
             @repeat_on_conflict(['state'])
             def _update_state(state):
@@ -855,12 +847,12 @@ class History(object):
 
         if device:
             self._view = 'users/device_history'
-            self._startkey = [self.user.oldid, device.id, None]
-            self._endkey   = [self.user.oldid, device.id, {}]
+            self._startkey = [self.user._id, device.id, None]
+            self._endkey   = [self.user._id, device.id, {}]
         else:
             self._view = 'users/history'
-            self._startkey = [self.user.oldid, None]
-            self._endkey   = [self.user.oldid, {}]
+            self._startkey = [self.user._id, None]
+            self._endkey   = [self.user._id, {}]
 
 
     def __getitem__(self, key):

@@ -5,7 +5,7 @@ function(doc)
         for(n in doc.chapters)
         {
             chapter = doc.chapters[n];
-            emit([doc.episode, doc.user_oldid], chapter);
+            emit([doc.episode, doc.user], chapter);
         }
     }
 }

@@ -21,7 +21,9 @@ class Command(BaseCommand):
             blacklist = SuggestionBlacklist.objects.filter(user=user)
             ratings = webmodels.Rating.objects.filter(user=user)
 
-            suggestion = Suggestions.for_user_oldid(user.id)
+            user = migrate.get_or_migrate_user(user)
+
+            suggestion = Suggestions.for_user(user)
             suggestion.blacklist = migrate.get_blacklist(blacklist)
             suggestion.ratings = migrate.get_ratings(ratings)
 

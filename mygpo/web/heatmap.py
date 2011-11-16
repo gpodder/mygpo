@@ -21,11 +21,11 @@ from mygpo.users.models import EpisodeUserState
 class EpisodeHeatmap(object):
     """ Information about how often certain parts of Episodes are played """
 
-    def __init__(self, podcast_id, episode_id=None, user_oldid=None,
+    def __init__(self, podcast_id, episode_id=None, user_id=None,
                  duration=None):
         """ Initialize a new Episode heatmap
 
-        EpisodeHeatmap(podcast_id, [episode_id, [user_oldid]]) """
+        EpisodeHeatmap(podcast_id, [episode_id, [user_id]]) """
 
         self.podcast_id = podcast_id
 
@@ -35,11 +35,11 @@ class EpisodeHeatmap(object):
 
         self.episode_id = episode_id
 
-        if user_oldid is not None and episode_id is None:
-            raise ValueError('user_oldid can only be used '
+        if user_id is not None and episode_id is None:
+            raise ValueError('user_id can only be used '
                     'if episode_id is not None')
 
-        self.user_oldid = user_oldid
+        self.user_id = user_id
         self.duration = duration
         self.heatmap = None
         self.borders = None
@@ -51,13 +51,13 @@ class EpisodeHeatmap(object):
         db = EpisodeUserState.get_db()
 
         group_level = len(filter(None, [self.podcast_id,
-                    self.episode_id, self.user_oldid]))
+                    self.episode_id, self.user_id]))
 
         r = db.view('users/episode_heatmap',
                 startkey    = [self.podcast_id, self.episode_id,
-                                self.user_oldid],
+                                self.user_id],
                 endkey      = [self.podcast_id, self.episode_id or {},
-                                self.user_oldid or {}],
+                                self.user_id or {}],
                 reduce      = True,
                 group       = True,
                 group_level = group_level,

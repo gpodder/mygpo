@@ -1,6 +1,8 @@
 from datetime import datetime
 from couchdbkit import Server, Document
 
+from registration.models import RegistrationProfile
+
 from mygpo.core.models import Podcast, PodcastGroup, Episode, SubscriberData
 from mygpo.users.models import EpisodeAction, User, Device, SubscriptionAction, EpisodeUserState, PodcastUserState
 from mygpo.users.ratings import Rating
@@ -353,14 +355,50 @@ def get_or_migrate_user(user):
     if not user.is_authenticated():
         return None
 
-    u = User.for_oldid(user.id)
-    if u:
-        return u
+    return User.for_oldid(user.id) or create_user(user)
 
+
+def create_user(user, sparse=False):
     u = User()
     u.oldid = user.id
     u.username = user.username
+    u.password = user.password
+    u.email = user.email
+
+    if not sparse:
+        update_device(u, user)
+
     u.save()
+    return u
+
+
+def update_user(u, user):
+    u.oldid = user.id
+    u.username = user.username
+    u.password = user.password
+    u.email = user.email
+    u.is_staff = user.is_staff
+    u.is_active = user.is_active
+    u.is_superuser = user.is_superuser
+    u.last_login = user.last_login
+    u.date_joined = user.date_joined
+
+    try:
+        p = RegistrationProfile.objects.get(user=user)
+
+        if p.activation_key == RegistrationProfile.ACTIVATED:
+            u.activation_key = None
+        else:
+            u.activation_key = p.activation_key
+
+    except RegistrationProfile.DoesNotExist:
+        u.activation_key = None
+
+    profile = user.get_profile()
+    u.deleted = profile.deleted
+    u.suggestions_up_to_date = profile.suggestion_up_to_date
+    u.settings = profile.settings
+
     return u
 
 

@@ -2,6 +2,6 @@ function(doc)
 {
     if(doc.doc_type == "Suggestions")
     {
-        emit(doc.user_oldid, null);
+        emit(doc.user, null);
     }
 }
