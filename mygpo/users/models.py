@@ -810,7 +810,8 @@ class User(Document, SyncedDevicesMixin):
                 # determine for which episodes there won't be a new episodes
                 # that is newer; those can be yielded
                 if episode.released > podcast.latest_episode_timestamp:
-                    yield episode
+                    p = podcast_dict.get(episode.podcast, None)
+                    yield proxy_object(episode, podcast=p)
                     yielded_episodes += 1
                 else:
                     break
