@@ -223,7 +223,6 @@ def subscribe(request, podcast):
                 podcast.subscribe(request.user, device)
 
             except Exception as e:
-                raise
                 log('Web: %(username)s: could not subscribe to podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
                     {'username': request.user.username, 'podcast_url': podcast.url, 'device_id': device.uid, 'exception': e})
 
