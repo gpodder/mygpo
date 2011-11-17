@@ -24,6 +24,6 @@ def bar_chart(parts):
         'chxr=1,0,%d' % maxv, # labeling for axis 1 (y) from 0 to max
         ]
 
-    s = '<img src="http://chart.apis.google.com/chart?%s"' % '&'.join(parts)
+    s = '<img src="http://chart.apis.google.com/chart?%s" />' % '&'.join(parts)
 
     return mark_safe(s)

@@ -40,8 +40,11 @@ from mygpo.users.models import PodcastUserState, EpisodeAction, EpisodeUserState
 
 try:
     import simplejson as json
+    JSONDecodeError = json.JSONDecodeError
+
 except ImportError:
     import json
+    JSONDecodeError = ValueError
 
 
 # keys that are allowed in episode actions
@@ -163,8 +166,8 @@ def episodes(request, username, version=1):
     if request.method == 'POST':
         try:
             actions = json.loads(request.raw_post_data)
-        except KeyError, e:
-            log('could not parse episode update info for user %s: %s' % (username, e))
+        except (JSONDecodeError, UnicodeDecodeError) as e:
+            log('Advanced API: could not decode episode update POST data for user %s: %s' % (username, e))
             return HttpResponseBadRequest()
 
         try:
@@ -368,6 +371,8 @@ def device(request, username, device_uid):
     data = json.loads(request.raw_post_data)
 
     if 'caption' in data:
+        if not data['caption']:
+            raise HttpResponseBadRequest('caption must not be empty')
         d.name = data['caption']
 
     if 'type' in data:

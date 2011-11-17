@@ -1,3 +1,4 @@
+import re
 import uuid, collections
 from datetime import datetime
 import dateutil.parser
@@ -9,13 +10,21 @@ from couchdbkit.ext.django.schema import *
 
 from registration_couchdb.models import User as BaseUser
 
-from mygpo.core.proxy import proxy_object
+from mygpo.core.proxy import proxy_object, DocumentABCMeta
 from mygpo.core.models import Podcast, Episode
 from mygpo.utils import linearize, get_to_dict, iterate_together
 from mygpo.decorators import repeat_on_conflict
 from mygpo.users.ratings import RatingMixin
 from mygpo.users.sync import SyncedDevicesMixin
 from mygpo.log import log
+
+
+RE_DEVICE_UID = re.compile(r'^[\w.-]+$')
+
+
+class DeviceUIDException(Exception):
+    pass
+
 
 
 class Suggestions(Document, RatingMixin):
@@ -324,6 +333,9 @@ class SubscriptionAction(Document):
     device    = StringProperty()
 
 
+    __metaclass__ = DocumentABCMeta
+
+
     def __cmp__(self, other):
         return cmp(self.timestamp, other.timestamp)
 
@@ -492,10 +504,10 @@ class PodcastUserState(Document):
 
 class Device(Document):
     id       = StringProperty(default=lambda: uuid.uuid4().hex)
-    oldid    = IntegerProperty()
-    uid      = StringProperty()
-    name     = StringProperty()
-    type     = StringProperty()
+    oldid    = IntegerProperty(required=False)
+    uid      = StringProperty(required=True)
+    name     = StringProperty(required=True, default='New Device')
+    type     = StringProperty(required=True, default='other')
     settings = DictProperty()
     deleted  = BooleanProperty(default=False)
 
@@ -629,6 +641,11 @@ class User(BaseUser, SyncedDevicesMixin):
 
 
     def set_device(self, device):
+
+        if not RE_DEVICE_UID.match(device.uid):
+            raise DeviceUIDException("'{uid} is not a valid device ID".format(
+                        uid=device.uid))
+
         devices = list(self.devices)
         ids = [x.id for x in devices]
         if not device.id in ids:
@@ -651,6 +668,9 @@ class User(BaseUser, SyncedDevicesMixin):
         index = ids.index(device.id)
         devices.pop(index)
         self.devices = devices
+
+        if self.is_synced(device):
+            self.unsync_device(device)
 
 
 
@@ -788,7 +808,8 @@ class User(BaseUser, SyncedDevicesMixin):
                 # determine for which episodes there won't be a new episodes
                 # that is newer; those can be yielded
                 if episode.released > podcast.latest_episode_timestamp:
-                    yield episode
+                    p = podcast_dict.get(episode.podcast, None)
+                    yield proxy_object(episode, podcast=p)
                     yielded_episodes += 1
                 else:
                     break
@@ -797,7 +818,7 @@ class User(BaseUser, SyncedDevicesMixin):
             episodes = episodes[yielded_episodes:]
 
             # fetch and merge episodes for the next podcast
-            new_episodes = list(podcast.get_episodes(until=max_date,
+            new_episodes = list(podcast.get_episodes(since=1, until=max_date,
                         descending=True, limit=max_per_podcast))
             episodes = sorted(episodes+new_episodes, key=cmp_key, reverse=True)
 

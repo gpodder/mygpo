@@ -30,7 +30,8 @@ from django.db import IntegrityError
 from mygpo.log import log
 from mygpo.api import simple
 from mygpo.decorators import manual_gc, allowed_methods, repeat_on_conflict
-from mygpo.users.models import PodcastUserState, Device
+from mygpo.users.models import PodcastUserState, Device, DeviceUIDException
+from mygpo import migrate
 
 
 @manual_gc
@@ -61,9 +62,9 @@ def device_decorator(f):
 
 
 
-@device_decorator
 @manual_gc
 @login_required
+@device_decorator
 def show(request, device):
 
     request.user.sync_group(device)
@@ -100,15 +101,29 @@ def create(request):
     device = Device()
     device.name = device_form.cleaned_data['name']
     device.type = device_form.cleaned_data['type']
-    device.uid  = device_form.cleaned_data['uid']
+    device.uid  = device_form.cleaned_data['uid'].replace(' ', '-')
     try:
         request.user.set_device(device)
         request.user.save()
         messages.success(request, _('Device saved'))
 
-    except IntegrityError, ie:
+    except DeviceUIDException as e:
+        messages.error(request, _(str(e)))
+
+        return render_to_response('device-create.html', {
+            'device': device,
+            'device_form': device_form,
+        }, context_instance=RequestContext(request))
+
+    except:
         messages.error(request, _("You can't use the same Device "
                    "ID for two devices."))
+
+        return render_to_response('device-create.html', {
+            'device': device,
+            'device_form': device_form,
+        }, context_instance=RequestContext(request))
+
 
     return HttpResponseRedirect(reverse('device-edit', args=[device.uid]))
 
@@ -120,20 +135,27 @@ def create(request):
 def update(request, device):
     device_form = DeviceForm(request.POST)
 
+    uid = device.uid
+
     if device_form.is_valid():
+
         device.name = device_form.cleaned_data['name']
         device.type = device_form.cleaned_data['type']
-        device.uid  = device_form.cleaned_data['uid']
+        device.uid  = device_form.cleaned_data['uid'].replace(' ', '-')
         try:
             request.user.set_device(device)
             request.user.save()
             messages.success(request, _('Device updated'))
+            uid = device.uid # accept the new UID after rest has succeeded
+
+        except DeviceUIDException as e:
+            messages.error(request, _(str(e)))
 
         except IntegrityError, ie:
             messages.error(request, _("You can't use the same Device "
                        "ID for two devices."))
 
-    return HttpResponseRedirect(reverse('device-edit', args=[device.uid]))
+    return HttpResponseRedirect(reverse('device-edit', args=[uid]))
 
 
 @login_required
@@ -222,6 +244,7 @@ def delete(request, device):
     return HttpResponseRedirect(reverse('devices'))
 
 
+@login_required
 @device_decorator
 def delete_permanently(request, device):
 
@@ -234,7 +257,9 @@ def delete_permanently(request, device):
     for state in states:
         remove_device(state=state, dev=device)
 
-    device.delete()
+    user = migrate.get_or_migrate_user(request.user)
+    user.remove_device(device)
+    user.save()
 
     return HttpResponseRedirect(reverse('devices'))
 

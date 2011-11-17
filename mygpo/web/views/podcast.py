@@ -67,9 +67,10 @@ def show(request, podcast):
         subscribe_targets = podcast.subscribe_targets(request.user)
 
         history = list(state.actions)
-        for h in history:
+        def _set_objects(h):
             dev = request.user.get_device(h.device)
-            h.device_obj = dev.to_json()
+            return proxy_object(h, device=dev)
+        history = map(_set_objects, history)
 
         is_public = state.settings.get('public_subscription', True)
 
@@ -135,7 +136,7 @@ def episode_list(podcast, user):
     if user.is_authenticated():
 
         # prepare pre-populated data for HistoryEntry.fetch_data
-        podcasts_dict = {podcast.get_id(): podcast}
+        podcasts_dict = dict( (p_id, podcast) for p_id in podcast.get_ids())
         episodes_dict = dict( (episode._id, episode) for episode in episodes)
 
         actions = podcast.get_episode_states(user.id)
@@ -217,7 +218,6 @@ def subscribe(request, podcast):
                 podcast.subscribe(request.user, device)
 
             except Exception as e:
-                raise
                 log('Web: %(username)s: could not subscribe to podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
                     {'username': request.user.username, 'podcast_url': podcast.url, 'device_id': device.uid, 'exception': e})
 
@@ -252,10 +252,12 @@ def unsubscribe(request, podcast, device_uid):
 
     device = request.user.get_device_by_uid(device_uid)
 
+    if not device:
+        raise Http404('Unknown device')
+
     try:
         podcast.unsubscribe(request.user, device)
     except Exception as e:
-        raise
         log('Web: %(username)s: could not unsubscribe from podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
             {'username': request.user.username, 'podcast_url': podcast.url, 'device_id': device.id, 'exception': e})
 
