@@ -1,3 +1,4 @@
+import re
 import uuid, collections
 from datetime import datetime
 import dateutil.parser
@@ -14,6 +15,14 @@ from mygpo.decorators import repeat_on_conflict
 from mygpo.users.ratings import RatingMixin
 from mygpo.users.sync import SyncedDevicesMixin
 from mygpo.log import log
+
+
+RE_DEVICE_UID = re.compile(r'^[\w.-]+$')
+
+
+class DeviceUIDException(Exception):
+    pass
+
 
 
 class Suggestions(Document, RatingMixin):
@@ -634,6 +643,11 @@ class User(Document, SyncedDevicesMixin):
 
 
     def set_device(self, device):
+
+        if not RE_DEVICE_UID.match(device.uid):
+            raise DeviceUIDException("'{uid} is not a valid device ID".format(
+                        uid=device.uid))
+
         devices = list(self.devices)
         ids = [x.id for x in devices]
         if not device.id in ids:
