@@ -65,9 +65,9 @@ def device_decorator(f):
 
 
 
-@device_decorator
 @manual_gc
 @login_required
+@device_decorator
 def show(request, device):
 
     user = migrate.get_or_migrate_user(request.user)
@@ -254,6 +254,7 @@ def delete(request, device):
     return HttpResponseRedirect(reverse('devices'))
 
 
+@login_required
 @device_decorator
 def delete_permanently(request, device):
 
