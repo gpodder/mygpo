@@ -671,6 +671,9 @@ class User(Document, SyncedDevicesMixin):
         devices.pop(index)
         self.devices = devices
 
+        if self.is_synced(device):
+            self.unsync_device(device)
+
 
 
     def get_subscriptions(self, public=None):
