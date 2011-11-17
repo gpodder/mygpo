@@ -140,7 +140,7 @@ def episode_list(podcast, user):
     if user.is_authenticated():
 
         # prepare pre-populated data for HistoryEntry.fetch_data
-        podcasts_dict = {podcast.get_id(): podcast}
+        podcasts_dict = dict( (p_id, podcast) for p_id in podcast.get_ids())
         episodes_dict = dict( (episode._id, episode) for episode in episodes)
 
         actions = podcast.get_episode_states(user.id)
