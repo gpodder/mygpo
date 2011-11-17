@@ -501,10 +501,10 @@ class PodcastUserState(Document):
 
 class Device(Document):
     id       = StringProperty(default=lambda: uuid.uuid4().hex)
-    oldid    = IntegerProperty()
-    uid      = StringProperty()
-    name     = StringProperty()
-    type     = StringProperty()
+    oldid    = IntegerProperty(required=False)
+    uid      = StringProperty(required=True)
+    name     = StringProperty(required=True, default='New Device')
+    type     = StringProperty(required=True, default='other')
     settings = DictProperty()
     deleted  = BooleanProperty(default=False)
 
