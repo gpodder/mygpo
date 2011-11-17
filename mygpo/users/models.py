@@ -820,7 +820,7 @@ class User(Document, SyncedDevicesMixin):
             episodes = episodes[yielded_episodes:]
 
             # fetch and merge episodes for the next podcast
-            new_episodes = list(podcast.get_episodes(until=max_date,
+            new_episodes = list(podcast.get_episodes(since=1, until=max_date,
                         descending=True, limit=max_per_podcast))
             episodes = sorted(episodes+new_episodes, key=cmp_key, reverse=True)
 
