@@ -267,7 +267,9 @@ def delete_permanently(request, device):
     for state in states:
         remove_device(state=state, dev=device)
 
-    device.delete()
+    user = migrate.get_or_migrate_user(request.user)
+    user.remove_device(device)
+    user.save()
 
     return HttpResponseRedirect(reverse('devices'))
 
