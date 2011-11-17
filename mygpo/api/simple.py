@@ -88,10 +88,23 @@ def subscriptions(request, username, device_uid, format):
 @check_format
 @allowed_methods(['GET'])
 def all_subscriptions(request, username, format):
+
+    try:
+        scale = int(request.GET.get('scale_logo', 64))
+    except (TypeError, ValueError):
+        return HttpResponseBadRequest('scale_logo has to be a numeric value')
+
+    if scale not in range(1, 257):
+        return HttpResponseBadRequest('scale_logo has to be a number from 1 to 256')
+
+
     user = migrate.get_or_migrate_user(request.user)
-    subscriptions = user.get_subscribed_podcasts()
+    subscriptions = list(user.get_subscribed_podcasts())
     title = _('%(username)s\'s Subscription List') % {'username': username}
-    return format_podcast_list(subscriptions, format, title)
+    domain = RequestSite(request).domain
+    p_data = lambda p: podcast_data(p, domain, scale)
+    return format_podcast_list(subscriptions, format, title,
+            json_map=p_data, xml_template='podcasts.xml', request=request)
 
 
 def format_podcast_list(obj_list, format, title, get_podcast=None,
