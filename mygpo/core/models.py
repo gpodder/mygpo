@@ -6,6 +6,7 @@ from dateutil import parser
 from random import randint
 
 from couchdbkit.ext.django.schema import *
+from restkit.errors import Unauthorized
 
 from django.conf import settings
 
@@ -14,6 +15,10 @@ from mygpo import utils
 from mygpo.core.proxy import DocumentABCMeta
 from mygpo.core.slugs import SlugMixin
 from mygpo.core.oldid import OldIdMixin
+
+
+class SubscriptionException(Exception):
+    pass
 
 
 class MergedIdException(Exception):
@@ -696,7 +701,10 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         from mygpo import migrate
         state = self.get_user_state(user)
         state.subscribe(device)
-        state.save()
+        try:
+            state.save()
+        except Unauthorized:
+            raise SubscriptionException
 
 
     @repeat_on_conflict()
@@ -704,7 +712,10 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         from mygpo import migrate
         state = self.get_user_state(user)
         state.unsubscribe(device)
-        state.save()
+        try:
+            state.save()
+        except Unauthorized:
+            raise SubscriptionException
 
 
     def subscribe_targets(self, user):
