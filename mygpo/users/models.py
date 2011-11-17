@@ -8,7 +8,7 @@ from operator import itemgetter
 from couchdbkit import ResourceNotFound
 from couchdbkit.ext.django.schema import *
 
-from mygpo.core.proxy import proxy_object
+from mygpo.core.proxy import proxy_object, DocumentABCMeta
 from mygpo.core.models import Podcast, Episode
 from mygpo.utils import linearize, get_to_dict, iterate_together
 from mygpo.decorators import repeat_on_conflict
@@ -336,6 +336,9 @@ class SubscriptionAction(Document):
     action    = StringProperty()
     timestamp = DateTimeProperty(default=datetime.utcnow)
     device    = StringProperty()
+
+
+    __metaclass__ = DocumentABCMeta
 
 
     def __cmp__(self, other):
