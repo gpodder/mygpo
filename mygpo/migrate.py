@@ -394,10 +394,16 @@ def update_user(u, user):
     except RegistrationProfile.DoesNotExist:
         u.activation_key = None
 
-    profile = user.get_profile()
-    u.deleted = profile.deleted
-    u.suggestions_up_to_date = profile.suggestion_up_to_date
-    u.settings = profile.settings
+    from mygpo.api.models import UserProfile
+
+    try:
+        profile = user.get_profile()
+        u.deleted = profile.deleted
+        u.suggestions_up_to_date = profile.suggestion_up_to_date
+        u.settings = profile.settings
+
+    except UserProfile.DoesNotExist:
+        pass
 
     return u
 
