@@ -259,6 +259,9 @@ def unsubscribe(request, podcast, device_uid):
     user = migrate.get_or_migrate_user(request.user)
     device = user.get_device_by_uid(device_uid)
 
+    if not device:
+        raise Http404('Unknown device')
+
     try:
         podcast.unsubscribe(request.user, device)
     except Exception as e:
