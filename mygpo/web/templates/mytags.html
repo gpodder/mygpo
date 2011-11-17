@@ -46,7 +46,7 @@
     <td>{{ tag }}</td>
     <td>
      {% for podcast in podcast_list %}
-      {% podcast_group_link podcast %}
+      <a href="{% podcast_link_target podcast %}">{{ podcast|podcast_logo }}</a>
      {% endfor %}
     </td>
    </tr>
