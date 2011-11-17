@@ -69,9 +69,10 @@ def show(request, podcast):
         subscribe_targets = podcast.subscribe_targets(user)
 
         history = list(state.actions)
-        for h in history:
+        def _set_objects(h):
             dev = user.get_device(h.device)
-            h.device_obj = dev.to_json()
+            return proxy_object(h, device=dev)
+        history = map(_set_objects, history)
 
         is_public = state.settings.get('public_subscription', True)
 

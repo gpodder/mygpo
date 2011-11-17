@@ -190,7 +190,7 @@
       <td><abbr title="{{ s.timestamp }}">{{ s.timestamp|naturalday }}</abbr></td>
       <td>{{ s|podcast_status_icon }}</td>
       <td>
-       <a href="{% url device s.device_obj.uid %}">{{ s.device_obj|device_icon }} {{ s.device_obj.name|striptags }}</a>
+       <a href="{% url device s.device.uid %}">{{ s.device|device_icon }} {{ s.device.name|striptags }}</a>
       </td>
      </tr>
     {% endfor %}
