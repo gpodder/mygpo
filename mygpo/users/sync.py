@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 
 from mygpo.core.models import Podcast, SubscriptionException
 from mygpo.utils import get_to_dict
+from mygpo.log import log
 
 
 GroupedDevices = namedtuple('GroupedDevices', 'is_synced devices')
