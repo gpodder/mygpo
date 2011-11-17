@@ -68,6 +68,7 @@ def show(request, podcast):
 
         history = list(state.actions)
         def _set_objects(h):
+            #TODO: optimize by indexing devices by id
             dev = request.user.get_device(h.device)
             return proxy_object(h, device=dev)
         history = map(_set_objects, history)
