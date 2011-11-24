@@ -97,7 +97,7 @@ def all_subscriptions(request, username, format):
         return HttpResponseBadRequest('scale_logo has to be a number from 1 to 256')
 
 
-    subscriptions = request.user.get_subscribed_podcasts())
+    subscriptions = request.user.get_subscribed_podcasts()
     title = _('%(username)s\'s Subscription List') % {'username': username}
     domain = RequestSite(request).domain
     p_data = lambda p: podcast_data(p, domain, scale)
