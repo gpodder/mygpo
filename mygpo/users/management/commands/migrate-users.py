@@ -22,6 +22,12 @@ class Command(BaseCommand):
 
             u = User.for_oldid(user.id)
             migrate.update_user(u, user)
-            u.save()
+
+            try:
+                u.save()
+            except:
+                print 'Error with user {oldid} - {newid}'.format(oldid=user.id,
+                        newid=u._id)
+                raise
 
             progress(n+1, total)
