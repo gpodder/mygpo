@@ -1,8 +1,9 @@
 from django.conf.urls.defaults import *
-from registration_couchdb.views import activate, register
-from registration_couchdb.forms import RegistrationFormUniqueEmail
 from django.contrib.auth.views import logout
 from django.views.generic.simple import direct_to_template
+
+from django_couchdb_utils.registration.views import activate, register
+from django_couchdb_utils.registration.forms import RegistrationFormUniqueEmail
 
 urlpatterns = patterns('mygpo.web.views',
  url(r'^$',                                                       'home',          name='home'),
@@ -99,11 +100,11 @@ urlpatterns += patterns('mygpo.web.views.users',
  url(r'^register/resend-activation$',                             'resend_activation',          name='resend-activation'),
  url(r'^register/restore_password$',                              'restore_password',           name='restore-password'),
  url(r'^register/$',                                               register,
-            {'backend': 'registration_couchdb.backends.default.DefaultBackend',
+            {'backend': 'django_couchdb_utils.registration.backends.default.DefaultBackend',
              'form_class': RegistrationFormUniqueEmail},                                        name='register'),
     (r'^registration_complete/$',                                  direct_to_template,
             {'template': 'registration/registration_complete.html'}),
     (r'^activate/(?P<activation_key>\w+)$',                        activate,
-            {'backend': 'registration_couchdb.backends.default.DefaultBackend'}),
+            {'backend': 'django_couchdb_utils.registration.backends.default.DefaultBackend'}),
 )
 

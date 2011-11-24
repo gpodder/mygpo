@@ -8,7 +8,7 @@ from operator import itemgetter
 from couchdbkit import ResourceNotFound
 from couchdbkit.ext.django.schema import *
 
-from registration_couchdb.models import User as BaseUser
+from django_couchdb_utils.registration.models import User as BaseUser
 
 from mygpo.core.proxy import proxy_object, DocumentABCMeta
 from mygpo.core.models import Podcast, Episode

@@ -48,7 +48,7 @@ COUCHDB_DATABASES = (
     ('mygpo.maintenance',     'http://127.0.0.1:5984/mygpo'),
     ('django_couchdb_utils_auth',     'http://127.0.0.1:5984/mygpo'),
     ('django_couchdb_utils_sessions', 'http://127.0.0.1:5984/mygpo_sessions'),
-    ('registration_couchdb', 'http://127.0.0.1:5984/mygpo'),
+    ('django_couchdb_utils_registration', 'http://127.0.0.1:5984/mygpo'),
 )
 
 
@@ -105,10 +105,10 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes', # unused, but tests fail otherwise (?)
     'django.contrib.messages',
     'django.contrib.humanize',
-    'registration_couchdb',
     'couchdbkit.ext.django',
     'django_couchdb_utils.auth',
     'django_couchdb_utils.sessions',
+    'django_couchdb_utils.registration',
     'mygpo.core',
     'mygpo.users',
     'mygpo.api',
@@ -123,7 +123,6 @@ INSTALLED_APPS = (
 
 TEST_EXCLUDE = (
     'django',
-    'registration',
     'couchdbkit',
 )
 
