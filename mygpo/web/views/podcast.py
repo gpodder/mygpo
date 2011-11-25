@@ -11,7 +11,6 @@ from django.utils.translation import ugettext as _
 from django.contrib import messages
 from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.core.proxy import proxy_object
-from mygpo.api.models import Device, SyncGroup
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.users.models import HistoryEntry
 from mygpo.web.forms import PrivacyForm, SyncForm

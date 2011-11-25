@@ -29,7 +29,6 @@ from mygpo.api.advanced.directory import podcast_data
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.share.models import PodcastList
 from mygpo.api.basic_auth import require_valid_user, check_username
-from mygpo.api import models
 from mygpo.core.models import Podcast
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.api.simple import parse_subscription, format_podcast_list, \

@@ -22,7 +22,6 @@ from django.contrib.auth.decorators import login_required
 from django.template.defaultfilters import slugify
 from django.template import RequestContext
 from django.contrib import messages
-from mygpo.api.models import UserProfile
 from mygpo.web.forms import RestorePasswordForm
 from django.contrib.sites.models import RequestSite
 from django.conf import settings
@@ -67,9 +66,7 @@ def login_user(request):
 
     if not user.is_active:
 
-        p, c = UserProfile.objects.get_or_create(user=user)
-
-        if p.deleted:
+        if user.deleted:
 
             messages.error(request, _('You have deleted your account, '
                     'but you can register again'))
@@ -148,8 +145,7 @@ def resend_activation(request):
         if not user:
             raise ValueError(_('User does not exist.'))
 
-        p, c = UserProfile.objects.get_or_create(user=user)
-        if p.deleted:
+        if user.deleted:
             raise ValueError(_('You have deleted your account, but you can regster again.'))
 
         if user.activation_key == User.ACTIVATED:

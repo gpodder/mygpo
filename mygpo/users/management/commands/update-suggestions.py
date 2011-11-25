@@ -5,7 +5,6 @@ from operator import itemgetter
 from django.core.management.base import BaseCommand
 
 from mygpo.users.models import Suggestions, User
-from mygpo.api import models
 from mygpo.utils import progress
 
 try:
@@ -60,8 +59,7 @@ class Command(BaseCommand):
             suggestion.save()
 
             # flag suggestions up-to-date
-            p, _created = models.UserProfile.objects.get_or_create(user=user)
-            p.suggestion_up_to_date = True
-            p.save()
+            user.suggestions_up_to_date = True
+            user.save()
 
             progress(n+1, total)

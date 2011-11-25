@@ -31,7 +31,6 @@ from mygpo.core.models import Podcast, Episode
 from mygpo.directory import tags
 from mygpo.directory.toplist import PodcastToplist
 from mygpo.users.models import Suggestions, History, HistoryEntry
-from mygpo.api.models import Device, UserProfile
 from mygpo.users.models import PodcastUserState, User
 from mygpo.decorators import manual_gc
 from django.contrib.auth.decorators import login_required
@@ -191,9 +190,8 @@ def blacklist(request, podcast_id):
     suggestion.blacklist.append(blacklisted_podcast.get_id())
     suggestion.save()
 
-    p, _created = UserProfile.objects.get_or_create(user=request.user)
-    p.suggestion_up_to_date = False
-    p.save()
+    request.user.suggestions_up_to_date = False
+    request.user.save()
 
     return HttpResponseRedirect(reverse('suggestions'))
 

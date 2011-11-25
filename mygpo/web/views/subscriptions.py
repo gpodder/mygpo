@@ -10,7 +10,6 @@ from django.http import HttpResponse, Http404
 from mygpo.core.models import Podcast
 from mygpo.utils import parse_bool, unzip, get_to_dict, skip_pairs
 from mygpo.decorators import manual_gc, requires_token
-from mygpo.api.models import Device
 from mygpo.api import backend, simple
 from mygpo.users.models import HistoryEntry, User
 from mygpo.web import utils

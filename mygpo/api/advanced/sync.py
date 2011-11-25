@@ -19,7 +19,6 @@ from mygpo.api.basic_auth import require_valid_user, check_username
 from django.http import HttpResponseBadRequest
 from mygpo.api.httpresponse import JsonResponse
 from django.shortcuts import get_object_or_404
-from mygpo.api.models import Device
 from django.views.decorators.csrf import csrf_exempt
 from mygpo.decorators import allowed_methods
 

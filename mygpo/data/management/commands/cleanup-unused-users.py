@@ -1,5 +1,4 @@
 from django.core.management.base import BaseCommand
-from mygpo.api.models import Device
 from mygpo.users.models import User
 
 class Command(BaseCommand):
