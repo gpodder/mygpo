@@ -31,13 +31,6 @@ ADMINS = ()
 MANAGERS = ADMINS
 
 DATABASES = {
-    'default': {
-        'NAME':     'mygpo',
-        'ENGINE':   'django.db.backends.sqlite3',
-        'USER':     '',
-        'PASSWORD': '',
-        'HOST':     '',
-    }
 }
 
 COUCHDB_DATABASES = (
