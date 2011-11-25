@@ -59,7 +59,6 @@ def account(request):
 
         request.user.email = form.cleaned_data['email']
         request.user.save()
-        request.user.get_profile().save()
 
         messages.success(request, 'Account updated')
 
@@ -80,11 +79,8 @@ def delete_account(request):
         return render_to_response('delete_account.html',
                 context_instance=RequestContext(request))
 
-    profile = request.user.get_profile()
-    profile.deleted = True
-    profile.save()
-
     request.user.is_active = False
+    request.user.deleted = True
     request.user.save()
     logout(request)
 
