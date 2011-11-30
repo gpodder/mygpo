@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 
 _ = ugettext
 
-from mygpo.api.models import DEVICE_TYPES
+from mygpo.api.constants import DEVICE_TYPES
 from mygpo.web.views.device import show
 
 register = template.Library()

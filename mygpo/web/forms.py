@@ -1,6 +1,6 @@
 from django import forms
 from django.utils.translation import ugettext as _
-from mygpo.api.models import DEVICE_TYPES
+from mygpo.api.constants import DEVICE_TYPES
 from mygpo.log import log
 from mygpo.users.models import Device
 import re
