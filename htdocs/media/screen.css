@@ -5,9 +5,9 @@ body
     height: 100%;
 }
 
-body 
-{ 
-    font-family: DeJaVu Sans, Bitstream Vera Sans, sans-serif; 
+body
+{
+    font-family: DeJaVu Sans, Bitstream Vera Sans, sans-serif;
     background-color: #333;
     padding: 0px;
     margin: 0px;
@@ -23,16 +23,16 @@ body, table, td, th
     font-size: 12px;
 }
 
-hr 
-{ 
-    border-width: 0px; 
-    border-bottom: 1px #aaa dotted; 
+hr
+{
+    border-width: 0px;
+    border-bottom: 1px #aaa dotted;
     clear: both;
 }
 
-img 
-{ 
-    border-width: 0px; 
+img
+{
+    border-width: 0px;
 }
 
 #wrap
@@ -94,7 +94,7 @@ img
 
 #navigation
 {
-    background-color: rgb(102, 102, 102); 
+    background-color: rgb(102, 102, 102);
 }
 
 a {
