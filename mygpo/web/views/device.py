@@ -53,6 +53,7 @@ def overview(request):
 
 
 def device_decorator(f):
+    @login_required
     def _decorator(request, uid, *args, **kwargs):
 
         user = migrate.get_or_migrate_user(request.user)
