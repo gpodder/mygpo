@@ -26,7 +26,9 @@ from mygpo.web import utils
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
-from django.db import IntegrityError
+
+from restkit.errors import Unauthorized
+
 from mygpo.log import log
 from mygpo.api import simple
 from mygpo.decorators import manual_gc, allowed_methods, repeat_on_conflict
@@ -159,7 +161,7 @@ def update(request, device):
         except DeviceUIDException as e:
             messages.error(request, _(str(e)))
 
-        except IntegrityError, ie:
+        except Unauthorized as u:
             messages.error(request, _("You can't use the same Device "
                        "ID for two devices."))
 
