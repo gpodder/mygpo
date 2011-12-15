@@ -766,7 +766,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
                 group_level = 1,
                 reduce      = True,
             )
-        return r.first()['value']
+        return r.first()['value'] if r else 0
 
 
     def listener_count_timespan(self, start=None, end={}):
