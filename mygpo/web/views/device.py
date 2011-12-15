@@ -247,9 +247,13 @@ def delete(request, device):
     if user.is_synced(device):
         user.unsync_device(device)
 
-    device.deleted = True
-    user.set_device(device)
-    user.save()
+    @repeat_on_conflict(['user'])
+    def _delete(user, device):
+        device.deleted = True
+        user.set_device(device)
+        user.save()
+
+    _delete(user=user, device=device)
 
     return HttpResponseRedirect(reverse('devices'))
 
@@ -268,8 +272,13 @@ def delete_permanently(request, device):
         remove_device(state=state, dev=device)
 
     user = migrate.get_or_migrate_user(request.user)
-    user.remove_device(device)
-    user.save()
+
+    @repeat_on_conflict(['user'])
+    def _remove(user, device):
+        user.remove_device(device)
+        user.save()
+
+    _remove(user=user, device=device)
 
     return HttpResponseRedirect(reverse('devices'))
 
