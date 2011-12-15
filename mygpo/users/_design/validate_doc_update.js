@@ -24,6 +24,12 @@ function(newDoc, oldDoc, userCtx)
                         " for user " + newDoc._id});
             }
 
+            if(!device.uid.match("^[\\w_.-]+$"))
+            {
+                throw({forbidden: "Invalid Device-UID " + device.uid +
+                        " for user " + newDoc._id});
+            }
+
             device_uids.push(device.uid);
         }
 
