@@ -70,10 +70,10 @@ class SyncForm(forms.Form):
 
         from mygpo.users.models import Device
         if isinstance(target, Device):
-            return (target.uid, str(target))
+            return (target.uid, target.name)
 
         elif isinstance(target, list):
-            return (target[0].uid, ', '.join(str(t) for t in target))
+            return (target[0].uid, ', '.join(d.name for d in target))
 
 
     def get_target(self):
