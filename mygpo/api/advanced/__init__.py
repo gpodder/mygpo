@@ -379,7 +379,7 @@ def device(request, username, device_uid):
 
     if 'caption' in data:
         if not data['caption']:
-            raise HttpResponseBadRequest('caption must not be empty')
+            return HttpResponseBadRequest('caption must not be empty')
         d.name = data['caption']
 
     if 'type' in data:
