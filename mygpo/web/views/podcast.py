@@ -139,10 +139,13 @@ def episode_list(podcast, user):
         podcasts_dict = dict( (p_id, podcast) for p_id in podcast.get_ids())
         episodes_dict = dict( (episode._id, episode) for episode in episodes)
 
-        actions = podcast.get_episode_states(user.id)
-        actions = map(HistoryEntry.from_action_dict, actions)
+        actions = podcast.get_episode_states(user._id)
+        actions = (HistoryEntry.from_action_dict(state, index) for (state, index) in actions)
 
-        HistoryEntry.fetch_data(user, actions,
+        # TODO: can't pass iterator to fetch_data
+        actions = list(actions)
+
+        actions = HistoryEntry.fetch_data(user, actions,
                 podcasts=podcasts_dict, episodes=episodes_dict)
 
         episode_actions = dict( (action.episode_id, action) for action in actions)

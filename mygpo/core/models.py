@@ -819,12 +819,15 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
         res = db.view('users/episode_states',
                 startkey= [user_id, self.get_id(), None],
-                endkey  = [user_id, self.get_id(), {}]
+                endkey  = [user_id, self.get_id(), {}],
+                include_docs = True,
             )
 
         for r in res:
-            action = r['value']
-            yield action
+            state_doc = r['doc']
+            index = int(r['value'])
+            state = EpisodeUserState.wrap(state_doc)
+            yield (state, index)
 
 
     def __hash__(self):

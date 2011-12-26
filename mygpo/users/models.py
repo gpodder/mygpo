@@ -891,11 +891,19 @@ class History(object):
                 endkey     = self._startkey,
                 limit      = length,
                 skip       = start,
+                include_docs = True,
             )
 
         for action in res:
-            action = action['value']
-            yield HistoryEntry.from_action_dict(action)
+            state_doc = action['doc']
+            index = int(action['value'])
+
+            if state_doc['doc_type'] == 'EpisodeUserState':
+                state = EpisodeUserState.wrap(state_doc)
+            else:
+                state = PodcastUserState.wrap(state_doc)
+
+            yield HistoryEntry.from_action_dict(state, index)
 
 
 
@@ -904,16 +912,34 @@ class HistoryEntry(object):
 
 
     @classmethod
-    def from_action_dict(cls, action):
+    def from_action_dict(cls, state, index):
 
         entry = HistoryEntry()
+        action = state.actions[index]
 
-        if 'timestamp' in action:
-            ts = action.pop('timestamp')
-            entry.timestamp = dateutil.parser.parse(ts)
+        if isinstance(state, EpisodeUserState):
+            entry.type = 'Episode'
+            entry.podcast_url = state.podcast_ref_url
+            entry.episode_url = state.ref_url
+            entry.podcast_id = state.podcast
+            entry.episode_id = state.episode
+            if action.device:
+                entry.device_id = action.device
+            if action.started:
+                entry.started = action.started
+            if action.playmark:
+                entry.position = action.playmark
+            if action.total:
+                entry.total = action.total
 
-        for key, value in action.items():
-            setattr(entry, key, value)
+        else:
+            entry.type = 'Subscription'
+            entry.podcast_url = state.ref_url
+            entry.podcast_id = state.podcast
+
+
+        entry.action = action.action
+        entry.timestamp = action.timestamp
 
         return entry
 
