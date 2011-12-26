@@ -766,7 +766,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
                 group_level = 1,
                 reduce      = True,
             )
-        return r.first()['value']
+        return r.first()['value'] if r else 0
 
 
     def listener_count_timespan(self, start=None, end={}):
@@ -925,6 +925,18 @@ class PodcastGroup(Document, SlugMixin, OldIdMixin):
         r = cls.view('core/podcastgroups_by_oldid', \
             key=oldid, limit=1, include_docs=True)
         return r.first() if r else None
+
+
+    @classmethod
+    def for_slug_id(cls, slug_id):
+        """ Returns the Podcast for either an CouchDB-ID for a Slug """
+
+        if utils.is_couchdb_id(slug_id):
+            return cls.get(slug_id)
+        else:
+            #TODO: implement
+            return cls.for_slug(slug_id)
+
 
     def get_podcast_by_id(self, id, current_id=False):
         for podcast in self.podcasts:

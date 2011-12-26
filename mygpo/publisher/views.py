@@ -110,10 +110,10 @@ def group(request, group):
         return HttpResponseForbidden()
 
     timeline_data = listener_data(podcasts)
-    subscription_data = subscriber_data(podcasts)
+    subscription_data = list(subscriber_data(podcasts))[-20:]
 
     return render_to_response('publisher/group.html', {
-        'group': g,
+        'group': group,
         'timeline_data': timeline_data,
         'subscriber_data': subscription_data,
         }, context_instance=RequestContext(request))
@@ -214,7 +214,7 @@ def advertise(request):
 
 def group_slug_id_decorator(f):
     def _decorator(request, slug_id, *args, **kwargs):
-        group = Group.for_slug_id(slug_id)
+        group = PodcastGroup.for_slug_id(slug_id)
 
         if podcast is None:
             raise Http404

@@ -26,7 +26,9 @@ from mygpo.web import utils
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
-from django.db import IntegrityError
+
+from restkit.errors import Unauthorized
+
 from mygpo.log import log
 from mygpo.api import simple
 from mygpo.decorators import manual_gc, allowed_methods, repeat_on_conflict
@@ -49,6 +51,7 @@ def overview(request):
 
 
 def device_decorator(f):
+    @login_required
     def _decorator(request, uid, *args, **kwargs):
 
         device = request.user.get_device_by_uid(uid)
@@ -151,7 +154,7 @@ def update(request, device):
         except DeviceUIDException as e:
             messages.error(request, _(str(e)))
 
-        except IntegrityError, ie:
+        except Unauthorized as u:
             messages.error(request, _("You can't use the same Device "
                        "ID for two devices."))
 
@@ -237,9 +240,13 @@ def delete(request, device):
     if request.user.is_synced(device):
         request.user.unsync_device(device)
 
-    device.deleted = True
-    request.user.set_device(device)
-    request.user.save()
+    @repeat_on_conflict(['user'])
+    def _delete(user, device):
+        device.deleted = True
+        user.set_device(device)
+        user.save()
+
+    _delete(user=request.user, device=device)
 
     return HttpResponseRedirect(reverse('devices'))
 
@@ -258,8 +265,13 @@ def delete_permanently(request, device):
         remove_device(state=state, dev=device)
 
     user = migrate.get_or_migrate_user(request.user)
-    user.remove_device(device)
-    user.save()
+
+    @repeat_on_conflict(['user'])
+    def _remove(user, device):
+        user.remove_device(device)
+        user.save()
+
+    _remove(user=user, device=device)
 
     return HttpResponseRedirect(reverse('devices'))
 
