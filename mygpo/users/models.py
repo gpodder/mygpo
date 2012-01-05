@@ -139,11 +139,14 @@ class EpisodeAction(DocumentSchema):
         db = EpisodeUserState.get_db()
         res = db.view('users/episode_actions',
                 startkey = startkey,
-                endkey   = endkey
+                endkey   = endkey,
+                include_docs = True,
             )
 
         for r in res:
-            action = r['value']
+            state = EpisodeUserState.wrap(r['doc'])
+            index = int(r['value'])
+            action = HistoryEntry.from_action_dict(state, index)
             if all( f(action) for f in add_filters):
                 yield action
 

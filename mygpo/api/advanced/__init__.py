@@ -216,7 +216,7 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
     if podcast is not None: args['podcast_id'] = podcast.get_id()
     if device is not None:  args['device_id'] = device.id
 
-    actions = EpisodeAction.filter(user.id, since, until, **args)
+    actions = EpisodeAction.filter(user._id, since, until, **args)
 
     if version == 1:
         # convert position parameter for API 1 compatibility
@@ -245,31 +245,27 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
 
 
 def clean_episode_action_data(action, user, devices):
-    action['podcast'] = action.get('podcast_url', None)
-    action['episode'] = action.get('episode_url', None)
 
-    if None in (action['podcast'], action['episode']):
+    obj = {}
+
+    for x in EPISODE_ACTION_KEYS:
+        obj[x] = getattr(action, x, None)
+
+    obj['podcast'] = action.podcast_url
+    obj['episode'] = action.episode_url
+
+    if None in (obj['podcast'], obj['episode']):
         return None
 
-    if 'device_id' in action:
-        device_id = action['device_id']
+    if hasattr(action, 'device_id'):
+        device_id = action.device_id
         device = user.get_device(device_id)
         if device:
-            action['device'] = device.uid
+            obj['device'] = device.uid
 
-        del action['device_id']
+    obj['timestamp'] = action.timestamp.isoformat()
 
-    # remove superfluous keys
-    for x in action.keys():
-        if x not in EPISODE_ACTION_KEYS:
-            del action[x]
-
-    # set missing keys to None
-    for x in EPISODE_ACTION_KEYS:
-        if x not in action:
-            action[x] = None
-
-    return action
+    return obj
 
 
 
