@@ -2,8 +2,8 @@ function(doc)
 {
     function sortByStarted(a, b)
     {
-        x = a.started;
-        y = b.started;
+        var x = a.started;
+        var y = b.started;
         return ((x < y) ? -1 : ((x > y) ? 1 : 0));
     }
 
@@ -19,16 +19,16 @@ function(doc)
             return;
         }
 
-        actions = doc.actions.slice(0); // creates a copy
+        var actions = doc.actions.slice(0); // creates a copy
         actions = actions.filter(hasTimeValues);
         actions.sort(sortByStarted);
 
-        played_parts = [];
-        flat_date = null;
+        var played_parts = [];
+        var flat_date = null;
 
         for(var n in actions)
         {
-            action = actions[n];
+            var action = actions[n];
 
             if(flat_date == null)
             {
@@ -58,10 +58,10 @@ function(doc)
             return;
         }
 
-        sections = [];
+        var sections = [];
         for(var n in played_parts)
         {
-            part = played_parts[n];
+            var part = played_parts[n];
             sections.push(part.start);
             sections.push(part.end);
         }

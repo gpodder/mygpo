@@ -2,9 +2,9 @@ function(doc)
 {
     if(doc.doc_type == "EpisodeUserState")
     {
-        for(n in doc.chapters)
+        for(var n in doc.chapters)
         {
-            chapter = doc.chapters[n];
+            var chapter = doc.chapters[n];
             emit([doc.episode, doc.user], chapter);
         }
     }

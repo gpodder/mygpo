@@ -21,7 +21,7 @@ function(doc)
             var action = doc.actions[n];
             var timestamp = action.timestamp.slice(0, action.timestamp.length-1);
 
-            emit([doc.user, action.device, action_obj.timestamp], n);
+            emit([doc.user, action.device, timestamp], n);
         }
     }
 }
