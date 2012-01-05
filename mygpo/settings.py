@@ -139,6 +139,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "mygpo.web.googleanalytics.processor",
 )
 
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
 USER_CLASS = 'mygpo.users.models.User'
 
 AUTH_PROFILE_MODULE = "api.UserProfile"
