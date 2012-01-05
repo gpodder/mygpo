@@ -210,7 +210,7 @@ def episodes(request, username, version=1):
 
 def get_episode_changes(user, podcast, device, since, until, aggregated, version):
 
-    devices = dict( (dev.id, dev.uid) for dev in request.user.devices )
+    devices = dict( (dev.id, dev.uid) for dev in user.devices )
 
     args = {}
     if podcast is not None: args['podcast_id'] = podcast.get_id()
