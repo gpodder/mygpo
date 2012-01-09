@@ -643,6 +643,13 @@ class User(BaseUser, SyncedDevicesMixin):
                 return device
 
 
+    @repeat_on_conflict(['self'])
+    def update_device(self, device):
+        """ Sets the device and saves the user """
+        self.set_device(device)
+        self.save()
+
+
     def set_device(self, device):
 
         if not RE_DEVICE_UID.match(device.uid):
