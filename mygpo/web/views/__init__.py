@@ -22,7 +22,6 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect, \
          Http404
 from django.views.decorators.cache import cache_page
-from django.contrib.auth.models import User
 from django.template import RequestContext
 from django.contrib import messages
 from django.utils.translation import ugettext as _
@@ -32,8 +31,7 @@ from mygpo.core.models import Podcast, Episode
 from mygpo.directory import tags
 from mygpo.directory.toplist import PodcastToplist
 from mygpo.users.models import Suggestions, History, HistoryEntry
-from mygpo.api.models import Device, UserProfile
-from mygpo.users.models import PodcastUserState
+from mygpo.users.models import PodcastUserState, User
 from mygpo.decorators import manual_gc
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render_to_response
@@ -43,7 +41,6 @@ from mygpo.web import utils
 from mygpo.api import backend
 from mygpo.utils import flatten, parse_range
 from mygpo.cache import get_cache_or_calc
-from mygpo import migrate
 import os
 import Image
 import ImageDraw
@@ -64,7 +61,7 @@ def welcome(request):
     podcasts = get_cache_or_calc('podcast-count', timeout=60*60,
                     calc=lambda: Podcast.count())
     users    = get_cache_or_calc('user-count', timeout=60*60,
-                    calc=lambda: User.objects.filter(is_active=True).count())
+                    calc=lambda: User.count())
     episodes = get_cache_or_calc('episode-count', timeout=60*60,
                     calc=lambda: Episode.count())
 
@@ -84,11 +81,12 @@ def welcome(request):
 @manual_gc
 @login_required
 def dashboard(request, episode_count=10):
-    site = RequestSite(request)
-    devices = Device.objects.filter(user=request.user, deleted=False)
 
-    user = migrate.get_or_migrate_user(request.user)
+    site = RequestSite(request)
+
+    user = request.user
     subscribed_podcasts = user.get_subscribed_podcasts()
+    devices = user.active_devices
 
     tomorrow = datetime.today() + timedelta(days=1)
     newest_episodes = user.get_newest_episodes(tomorrow)
@@ -165,19 +163,17 @@ def history(request, count=15, uid=None):
 
     page = parse_range(request.GET.get('page', None), 0, sys.maxint, 0)
 
-    user = migrate.get_or_migrate_user(request.user)
-
     if uid:
-        device = user.get_device_by_uid(uid)
+        device = request.user.get_device_by_uid(uid)
     else:
         device = None
 
-    history_obj = History(user, device)
+    history_obj = History(request.user, device)
 
     start = page*count
     end = start+count
     entries = list(history_obj[start:end])
-    HistoryEntry.fetch_data(user, entries)
+    HistoryEntry.fetch_data(request.user, entries)
 
     return render_to_response('history.html', {
         'history': entries,
@@ -190,13 +186,12 @@ def history(request, count=15, uid=None):
 def blacklist(request, podcast_id):
     podcast_id = int(podcast_id)
     blacklisted_podcast = Podcast.for_oldid(podcast_id)
-    suggestion = Suggestions.for_user_oldid(request.user.id)
+    suggestion = Suggestions.for_user(request.user)
     suggestion.blacklist.append(blacklisted_podcast.get_id())
     suggestion.save()
 
-    p, _created = UserProfile.objects.get_or_create(user=request.user)
-    p.suggestion_up_to_date = False
-    p.save()
+    request.user.suggestions_up_to_date = False
+    request.user.save()
 
     return HttpResponseRedirect(reverse('suggestions'))
 
@@ -205,10 +200,8 @@ def blacklist(request, podcast_id):
 def rate_suggestions(request):
     rating_val = int(request.GET.get('rate', None))
 
-    user = migrate.get_or_migrate_user(request.user)
-
-    suggestion = Suggestions.for_user_oldid(request.user.id)
-    suggestion.rate(rating_val, user._id)
+    suggestion = Suggestions.for_user(request.user)
+    suggestion.rate(rating_val, request.user._id)
     suggestion.save()
 
     messages.success(request, _('Thanks for rating!'))
@@ -218,7 +211,7 @@ def rate_suggestions(request):
 
 @login_required
 def suggestions(request):
-    suggestion_obj = Suggestions.for_user_oldid(request.user.id)
+    suggestion_obj = Suggestions.for_user(request.user)
     suggestions = suggestion_obj.get_podcasts()
     current_site = RequestSite(request)
     return render_to_response('suggestions.html', {

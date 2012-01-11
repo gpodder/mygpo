@@ -16,7 +16,7 @@
 #
 
 from django.http import HttpResponse, HttpResponseBadRequest, Http404
-from django.contrib.auth.models import User
+from mygpo.users.models import User
 from mygpo.log import log
 from mygpo import migrate
 
@@ -24,12 +24,10 @@ from mygpo import migrate
 #
 def view_or_basicauth(view, request, username, token_name, realm = "", *args, **kwargs):
 
-    try:
-        user = User.objects.get(username=username)
-    except User.DoesNotExist:
+    user = User.get(username)
+    if not user:
         raise Http404
 
-    user = migrate.get_or_migrate_user(user)
     token = getattr(user, token_name, '')
 
     # check if a token is required at all

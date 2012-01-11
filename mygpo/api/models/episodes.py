@@ -17,7 +17,6 @@
 
 from django.db import models
 from django.contrib.auth.models import User
-from mygpo.api.models import Device
 from datetime import datetime
 from mygpo import migrate
 
@@ -25,7 +24,7 @@ from mygpo import migrate
 class Chapter(models.Model):
     user = models.ForeignKey(User)
     episode = models.ForeignKey('Episode')
-    device = models.ForeignKey(Device, null=True)
+    device = models.ForeignKey('Device', null=True)
     created = models.DateTimeField(default=datetime.now)
     start = models.IntegerField()
     end = models.IntegerField()

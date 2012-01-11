@@ -19,14 +19,12 @@ from mygpo.web.utils import get_podcast_link_target
 from django.contrib.sites.models import RequestSite
 from mygpo.data.feeddownloader import update_podcasts
 from mygpo.decorators import requires_token, allowed_methods
-from django.contrib.auth.models import User
-from mygpo import migrate
+from mygpo.users.models import User
 
 
 def home(request):
     if is_publisher(request.user):
-        u = migrate.get_or_migrate_user(request.user)
-        podcasts = Podcast.get_multi(u.published_objects)
+        podcasts = Podcast.get_multi(request.user.published_objects)
         form = SearchPodcastForm()
         return render_to_response('publisher/home.html', {
             'podcasts': podcasts,
@@ -80,12 +78,11 @@ def podcast(request, podcast):
 #    elif request.method == 'GET':
 #        form = PodcastForm(instance=p)
 
-    user = migrate.get_or_migrate_user(request.user)
     if 'new_token' in request.GET:
-        user.create_new_token('publisher_update_token')
-        user.save()
+        request.user.create_new_token('publisher_update_token')
+        request.user.save()
 
-    update_token = user.publisher_update_token
+    update_token = request.user.publisher_update_token
 
     heatmap = EpisodeHeatmap(podcast.get_id())
 
@@ -136,8 +133,9 @@ def update_podcast(request, podcast):
 
 @requires_token(token_name='publisher_update_token')
 def update_published_podcasts(request, username):
-    user = get_object_or_404(User, username=username)
-    user = migrate.get_or_migrate_user(user)
+    user = User.get_user(username)
+    if not user:
+        raise Http404
 
     published_podcasts = Podcast.get_multi(user.published_objects)
     update_podcasts(published_podcasts)

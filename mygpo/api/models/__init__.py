@@ -24,7 +24,7 @@ from mygpo import utils
 import hashlib
 import re
 
-from mygpo.api.constants import EPISODE_ACTION_TYPES, DEVICE_TYPES, UNSUBSCRIBE_ACTION, SUBSCRIBE_ACTION, SUBSCRIPTION_ACTION_TYPES
+from mygpo.api.constants import EPISODE_ACTION_TYPES, DEVICE_TYPES, SUBSCRIBE_ACTION, SUBSCRIPTION_ACTION_TYPES
 from mygpo.log import log
 
 class UserProfile(models.Model):

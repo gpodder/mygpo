@@ -16,7 +16,6 @@
 #
 
 from django.http import HttpResponse
-from django.contrib.auth.models import User
 from mygpo.api.opml import Importer, Exporter
 from mygpo.core.models import Podcast
 from mygpo.api.backend import get_device
@@ -26,7 +25,7 @@ from django.db import IntegrityError
 from mygpo.log import log
 from mygpo.api.sanitizing import sanitize_urls
 from django.views.decorators.csrf import csrf_exempt
-from mygpo import migrate
+from mygpo.users.models import User
 
 LEGACY_DEVICE_NAME = 'Legacy Device'
 LEGACY_DEVICE_UID  = 'legacy'
@@ -46,8 +45,7 @@ def upload(request):
     if (not user):
         return HttpResponse('@AUTHFAIL', mimetype='text/plain')
 
-    usr = migrate.get_or_migrate_user(user)
-    dev = get_device(usr, LEGACY_DEVICE_UID)
+    dev = get_device(user, LEGACY_DEVICE_UID)
 
     existing_urls = [x.url for x in dev.get_subscribed_podcasts()]
 
@@ -96,8 +94,7 @@ def getlist(request):
     if user is None:
         return HttpResponse('@AUTHFAIL', mimetype='text/plain')
 
-    usr = migrate.get_or_migrate_user(user)
-    dev = get_device(usr, 'legacy', undelete=True)
+    dev = get_device(user, 'legacy', undelete=True)
     podcasts = dev.get_subscribed_podcasts()
 
     # FIXME: Get username and set a proper title (e.g. "thp's subscription list")
@@ -113,9 +110,8 @@ def auth(emailaddr, password):
     if emailaddr is None or password is None:
         return None
 
-    try:
-        user = User.objects.get(email__exact=emailaddr)
-    except User.DoesNotExist:
+    user = User.get_user_by_email(emailaddr)
+    if not user:
         return None
 
     if not user.check_password(password):

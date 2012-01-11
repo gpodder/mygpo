@@ -30,13 +30,13 @@ class Command(BaseCommand):
             sub_total = len(state.episodes)
             for m, (episode_id, episode_state) in enumerate(state.episodes.items()):
                 e_state = EpisodeUserState.for_user_episode(
-                    state.user_oldid, episode_id)
+                    state.user, episode_id)
 
                 if e_state:
                     continue
 
                 episode_state.podcast = state.podcast
-                episode_state.user_oldid = state.user_oldid
+                episode_state.user = state.user
                 episode_state.save()
 
                 progress(n+1, total, '(%d / %d)' % (m, sub_total))

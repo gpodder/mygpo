@@ -16,11 +16,11 @@ function(doc)
     {
         for(var n=doc.actions.length-1; n>=0; n--)
         {
-            action = doc.actions[n];
+            var action = doc.actions[n];
             if(action.action == "play")
             {
-                day = action.timestamp.slice(0, 10);
-                emit([doc.podcast, doc.episode, day], doc.user_oldid);
+                var day = action.timestamp.slice(0, 10);
+                emit([doc.podcast, doc.episode, day], doc.user);
                 return;
             }
         }

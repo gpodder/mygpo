@@ -166,7 +166,6 @@ class SyncedDevicesMixin(DocumentSchema):
         """ Applies the sync-actions to the device """
 
         add, rem = sync_actions
-        old_user = User.objects.get(id=self.oldid)
 
         podcasts = get_to_dict(Podcast, add + rem, get_id=Podcast.get_id)
 
@@ -175,7 +174,7 @@ class SyncedDevicesMixin(DocumentSchema):
             if podcast is None:
                 continue
             try:
-                podcast.subscribe(old_user, device)
+                podcast.subscribe(self, device)
             except SubscriptionException as e:
                 log('Web: %(username)s: cannot sync device: %(error)s' %
                     dict(username=self.username, error=repr(e)))
@@ -186,7 +185,7 @@ class SyncedDevicesMixin(DocumentSchema):
                 continue
 
             try:
-                podcast.unsubscribe(old_user, device)
+                podcast.unsubscribe(self, device)
             except SubscriptionException as e:
                 log('Web: %(username)s: cannot sync device: %(error)s' %
                     dict(username=self.username, error=repr(e)))

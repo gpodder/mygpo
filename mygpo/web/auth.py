@@ -15,8 +15,9 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from django.contrib.auth.models import User
 from django.contrib.auth.backends import ModelBackend
+
+from mygpo.users.models import User
 
 try:
     from django.forms.fields import email_re
@@ -26,16 +27,16 @@ except ImportError:
 class EmailAuthenticationBackend(ModelBackend):
     def authenticate(self, username=None, password=None):
         if email_re.search(username):
-            try:
-                user = User.objects.filter(email=username)[0]
-                return user if user.check_password(password) else None
-            except:
+            user = User.get_user_by_email(username)
+            if not user:
                 return None
+
+            return user if user.check_password(password) else None
         return None
 
     def get_user(self, user_id):
         try:
-            return User.objects.get(pk=user_id)
-        except User.DoesNotExist:
+            return User.get(user_id)
+        except: #TODO: which exception
             return None
 

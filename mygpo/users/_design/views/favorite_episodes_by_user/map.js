@@ -4,7 +4,7 @@ function(doc)
     {
         if (doc.settings && doc.settings.is_favorite)
         {
-            emit(doc.user_oldid, doc.episode);
+            emit(doc.user, doc.episode);
         }
     }
 }

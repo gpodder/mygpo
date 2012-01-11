@@ -1,7 +1,8 @@
 from django import forms
 from django.utils.translation import ugettext as _
-from mygpo.api.models import Device, DEVICE_TYPES, SyncGroup
+from mygpo.api.constants import DEVICE_TYPES
 from mygpo.log import log
+from mygpo.users.models import Device
 import re
 
 class UserAccountForm(forms.Form):
@@ -68,7 +69,6 @@ class SyncForm(forms.Form):
         target.
         """
 
-        from mygpo.users.models import Device
         if isinstance(target, Device):
             return (target.uid, target.name)
 

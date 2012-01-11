@@ -4,7 +4,7 @@ function (doc)
     {
         for(n in doc.tags)
         {
-            emit([doc.user_oldid, doc.podcast], doc.tags[n]);
+            emit([doc.user, doc.podcast], doc.tags[n]);
         }
     }
 }

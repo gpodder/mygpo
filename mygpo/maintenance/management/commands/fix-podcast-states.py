@@ -1,11 +1,10 @@
 from optparse import make_option
 
 from django.core.management.base import BaseCommand
-from django.contrib.auth.models import User
 
 from mygpo.core.models import Podcast, MergedIdException
 from mygpo.decorators import repeat_on_conflict
-from mygpo.users.models import PodcastUserState
+from mygpo.users.models import PodcastUserState, User
 from mygpo.maintenance.merge import merge_podcast_states
 from mygpo.utils import progress, multi_request_view
 
@@ -64,12 +63,7 @@ class Command(BaseCommand):
 
             if isinstance(new_p, Podcast):
 
-                try:
-                    user = User.objects.get(id=state.user_oldid)
-                except User.DoesNotExist:
-                    actions['missing user'] += 1
-                    state.delete()
-                    continue
+                user = User.get(state.user)
 
                 # always returns a state
                 existing_state = PodcastUserState.for_user_podcast(user, new_p)
