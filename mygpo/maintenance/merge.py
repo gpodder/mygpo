@@ -110,8 +110,8 @@ def merge_objects(podcasts=True, podcast_states=False, episodes=False,
         states, total = get_view_count_iter(EpisodeUserState,
                 'users/episode_states_by_user_episode',
                 include_docs=True)
-        should_merge = lambda a, b: (a.user_oldid, a.episode) == \
-                                    (b.user_oldid, b.episode)
+        should_merge = lambda a, b: (a.user, a.episode) == \
+                                    (b.user, b.episode)
         merger(states, should_merge, no_merge_order, total,
                 merge_episode_states)
         print
@@ -321,7 +321,7 @@ def merge_podcast_states_for_podcasts(podcast, podcast2, dry_run=False):
     def _delete(state2):
         state2.delete()
 
-    key = lambda x: x.user_oldid
+    key = lambda x: x.user
     states1 = podcast.get_all_states()
     states2 = podcast2.get_all_states()
 
@@ -347,7 +347,7 @@ def merge_podcast_states(state, state2):
     if state._id == state2._id:
         raise IncorrectMergeException("can't merge podcast state into itself")
 
-    if state.user_oldid != state2.user_oldid:
+    if state.user != state2.user:
         raise IncorrectMergeException("states don't belong to the same user")
 
     @repeat_on_conflict(['state'])
@@ -406,7 +406,7 @@ def merge_episode_states_for_episodes(episode, episode2, dry_run=False):
         state2.episode = episode_id
         state2.save()
 
-    key = lambda x: x.user_oldid
+    key = lambda x: x.user
     states1 = episode.get_all_states()
     states2 = episode2.get_all_states()
 
@@ -433,7 +433,7 @@ def merge_episode_states(state, state2):
     if state._id == state2._id:
         raise IncorrectMergeException("can't merge episode state into itself")
 
-    if state.user_oldid != state2.user_oldid:
+    if state.user != state2.user:
         raise IncorrectMergeException("states don't belong to the same user")
 
 

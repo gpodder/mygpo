@@ -18,7 +18,6 @@ def search_wrapper(result):
 def search_podcasts(q, limit=20, skip=0):
 
     if is_url(q):
-        from mygpo.api import models
         url = sanitize_url(q)
 
         podcast = Podcast.for_url(url, create=True)

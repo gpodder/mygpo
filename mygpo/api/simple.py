@@ -45,7 +45,6 @@ from mygpo.log import log
 from django.utils.translation import ugettext as _
 from mygpo.decorators import allowed_methods
 from mygpo.utils import parse_range
-from mygpo import migrate
 
 
 try:
@@ -88,10 +87,22 @@ def subscriptions(request, username, device_uid, format):
 @check_format
 @allowed_methods(['GET'])
 def all_subscriptions(request, username, format):
-    user = migrate.get_or_migrate_user(request.user)
-    subscriptions = user.get_subscribed_podcasts()
+
+    try:
+        scale = int(request.GET.get('scale_logo', 64))
+    except (TypeError, ValueError):
+        return HttpResponseBadRequest('scale_logo has to be a numeric value')
+
+    if scale not in range(1, 257):
+        return HttpResponseBadRequest('scale_logo has to be a number from 1 to 256')
+
+
+    subscriptions = request.user.get_subscribed_podcasts()
     title = _('%(username)s\'s Subscription List') % {'username': username}
-    return format_podcast_list(subscriptions, format, title)
+    domain = RequestSite(request).domain
+    p_data = lambda p: podcast_data(p, domain, scale)
+    return format_podcast_list(subscriptions, format, title,
+            json_map=p_data, xml_template='podcasts.xml', request=request)
 
 
 def format_podcast_list(obj_list, format, title, get_podcast=None,
@@ -156,7 +167,6 @@ def format_podcast_list(obj_list, format, title, get_podcast=None,
 
 
 def get_subscriptions(user, device_uid):
-    user = migrate.get_or_migrate_user(user)
     device = get_device(user, device_uid)
     return device.get_subscribed_podcasts()
 
@@ -188,17 +198,16 @@ def parse_subscription(raw_post_data, format):
 
 def set_subscriptions(urls, user, device_uid):
 
-    user = migrate.get_or_migrate_user(user)
-    dev = get_device(user, device_uid, undelete=True)
+    device = get_device(user, device_uid, undelete=True)
 
-    old = [p.url for p in dev.get_subscribed_podcasts()]
+    old = [p.url for p in device.get_subscribed_podcasts()]
     new = [p for p in urls if p not in old]
     rem = [p for p in old if p not in urls]
 
     for r in rem:
         p = Podcast.for_url(r, create=True)
         try:
-            p.unsubscribe(device)
+            p.unsubscribe(user, device)
         except Exception as e:
             log('Simple API: %(username)s: Could not remove subscription for podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
                 {'username': user.username, 'podcast_url': r, 'device_id': device.id, 'exception': e})
@@ -206,7 +215,7 @@ def set_subscriptions(urls, user, device_uid):
     for n in new:
         p = Podcast.for_url(n, create=True)
         try:
-            p.subscribe(device)
+            p.subscribe(user, device)
         except Exception as e:
             log('Simple API: %(username)s: Could not add subscription for podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
                 {'username': user.username, 'podcast_url': n, 'device_id': device.id, 'exception': e})
@@ -295,7 +304,7 @@ def search(request, format):
 def suggestions(request, count, format):
     count = parse_range(count, 1, 100, 100)
 
-    suggestion_obj = Suggestions.for_user_oldid(request.user.id)
+    suggestion_obj = Suggestions.for_user(request.user)
     suggestions = suggestion_obj.get_podcasts(count)
     title = _('gpodder.net - %(count)d Suggestions') % {'count': len(suggestions)}
     domain = RequestSite(request).domain

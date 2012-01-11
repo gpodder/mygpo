@@ -2,7 +2,6 @@ from django.core.management.base import BaseCommand
 
 from mygpo.core.models import Podcast, Episode
 from mygpo.users.models import PodcastUserState, EpisodeUserState
-from mygpo.api import models as oldmodels
 from mygpo.decorators import repeat_on_conflict
 from mygpo.utils import progress, multi_request_view
 
@@ -26,23 +25,20 @@ class Command(BaseCommand):
 
         # Set URLs for Episode States
         for n, e_state in enumerate(e_states):
-            try:
-                episode = Episode.get(e_state.episode)
-                podcast = Podcast.get(episode.podcast)
+            episode = Episode.get(e_state.episode)
+            podcast = Podcast.get(episode.podcast)
+
+            if None not in (episode, podcast):
                 self.set_episode_urls(e_state=e_state, episode=episode, podcast=podcast)
-            except (oldmodels.Episode.DoesNotExist, oldmodels.Podcast.DoesNotExist):
-                pass
 
             progress(n+1, total)
 
 
         # Set URLs for Podcast States
         for n, p_state in enumerate(p_states, n):
-            try:
-                podcast = Podcast.get(p_state.podcast)
+            podcast = Podcast.get(p_state.podcast)
+            if podcast:
                 self.set_podcast_url(p_state=p_state, podcast=podcast)
-            except oldmodels.Podcast.DoesNotExist:
-                pass
 
             progress(n+1, total)
 

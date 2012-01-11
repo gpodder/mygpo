@@ -16,7 +16,7 @@
 <p>{% trans "This is a list of recent subscription and episode actions for your account." %}</p>
 
    {% if device %}
-    <a href="{% url device device.oldid %}">{% trans "Back to" %} {{ device|device_icon }} {{ device.name|striptags}}</a>
+    <a href="{% url device device.uid %}">{% trans "Back to" %} {{ device|device_icon }} {{ device.name|striptags}}</a>
    {% endif %}
 
    {% if not history|length_is:"0" %}
@@ -45,7 +45,7 @@
         {% if s.episode %}
          {% episode_link s.episode s.podcast %}
           {% if s.podcast %}
-           <span class="from_podcast">{% trans "from" %} {% podcast_group_link s.podcast %}</span>
+           <br /><span class="from_podcast">{% trans "from" %} {% podcast_group_link s.podcast %}</span>
           {% endif %}
         {% endif %}
        {% endif %}
@@ -61,7 +61,7 @@
       <td>
        {% if s.device %}
         {% if s.device.oldid %}
-         <a href="{% url device s.device.oldid %}">{{ s.device|device_icon }}&nbsp;{{ s.device.name|striptags }}</a>
+         <a href="{% url device s.device.uid %}">{{ s.device|device_icon }}&nbsp;{{ s.device.name|striptags }}</a>
         {% else %}
          <a href="{% url device s.device.id %}">{{ s.device|device_icon }}&nbsp;{{ s.device.name|striptags }}</a>
         {% endif %}

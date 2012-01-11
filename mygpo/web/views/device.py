@@ -26,11 +26,13 @@ from mygpo.web import utils
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
-from django.db import IntegrityError
+
+from restkit.errors import Unauthorized
+
 from mygpo.log import log
 from mygpo.api import simple
 from mygpo.decorators import manual_gc, allowed_methods, repeat_on_conflict
-from mygpo.users.models import PodcastUserState, Device
+from mygpo.users.models import PodcastUserState, Device, DeviceUIDException
 from mygpo import migrate
 
 
@@ -38,10 +40,8 @@ from mygpo import migrate
 @login_required
 def overview(request):
 
-    user = migrate.get_or_migrate_user(request.user)
-    device_groups = user.get_grouped_devices()
-
-    deleted_devices = user.inactive_devices
+    device_groups = request.user.get_grouped_devices()
+    deleted_devices = request.user.inactive_devices
 
     return render_to_response('devicelist.html', {
         'device_groups': device_groups,
@@ -51,10 +51,10 @@ def overview(request):
 
 
 def device_decorator(f):
+    @login_required
     def _decorator(request, uid, *args, **kwargs):
 
-        user = migrate.get_or_migrate_user(request.user)
-        device = user.get_device_by_uid(uid)
+        device = request.user.get_device_by_uid(uid)
 
         if not device:
             raise Http404
@@ -65,18 +65,17 @@ def device_decorator(f):
 
 
 
-@device_decorator
 @manual_gc
 @login_required
+@device_decorator
 def show(request, device):
 
-    user = migrate.get_or_migrate_user(request.user)
-    user.sync_group(device)
+    request.user.sync_group(device)
 
     subscriptions = list(device.get_subscribed_podcasts())
-    synced_with = user.get_synced(device)
+    synced_with = request.user.get_synced(device)
 
-    sync_targets = list(user.get_sync_targets(device))
+    sync_targets = list(request.user.get_sync_targets(device))
     sync_form = SyncForm()
     sync_form.set_targets(sync_targets,
             _('Synchronize with the following devices'))
@@ -95,8 +94,6 @@ def show(request, device):
 def create(request):
     device_form = DeviceForm(request.POST)
 
-    user = migrate.get_or_migrate_user(request.user)
-
     if not device_form.is_valid():
 
         messages.error(request, _('Please fill out all fields.'))
@@ -107,15 +104,29 @@ def create(request):
     device = Device()
     device.name = device_form.cleaned_data['name']
     device.type = device_form.cleaned_data['type']
-    device.uid  = device_form.cleaned_data['uid']
+    device.uid  = device_form.cleaned_data['uid'].replace(' ', '-')
     try:
-        user.set_device(device)
-        user.save()
+        request.user.set_device(device)
+        request.user.save()
         messages.success(request, _('Device saved'))
 
-    except IntegrityError, ie:
+    except DeviceUIDException as e:
+        messages.error(request, _(str(e)))
+
+        return render_to_response('device-create.html', {
+            'device': device,
+            'device_form': device_form,
+        }, context_instance=RequestContext(request))
+
+    except:
         messages.error(request, _("You can't use the same Device "
                    "ID for two devices."))
+
+        return render_to_response('device-create.html', {
+            'device': device,
+            'device_form': device_form,
+        }, context_instance=RequestContext(request))
+
 
     return HttpResponseRedirect(reverse('device-edit', args=[device.uid]))
 
@@ -127,22 +138,27 @@ def create(request):
 def update(request, device):
     device_form = DeviceForm(request.POST)
 
-    user = migrate.get_or_migrate_user(request.user)
+    uid = device.uid
 
     if device_form.is_valid():
+
         device.name = device_form.cleaned_data['name']
         device.type = device_form.cleaned_data['type']
-        device.uid  = device_form.cleaned_data['uid']
+        device.uid  = device_form.cleaned_data['uid'].replace(' ', '-')
         try:
-            user.set_device(device)
-            user.save()
+            request.user.set_device(device)
+            request.user.save()
             messages.success(request, _('Device updated'))
+            uid = device.uid # accept the new UID after rest has succeeded
 
-        except IntegrityError, ie:
+        except DeviceUIDException as e:
+            messages.error(request, _(str(e)))
+
+        except Unauthorized as u:
             messages.error(request, _("You can't use the same Device "
                        "ID for two devices."))
 
-    return HttpResponseRedirect(reverse('device-edit', args=[device.uid]))
+    return HttpResponseRedirect(reverse('device-edit', args=[uid]))
 
 
 @login_required
@@ -221,18 +237,21 @@ def symbian_opml(request, device):
 @allowed_methods(['POST'])
 def delete(request, device):
 
-    user = migrate.get_or_migrate_user(request.user)
+    if request.user.is_synced(device):
+        request.user.unsync_device(device)
 
-    if user.is_synced(device):
-        user.unsync_device(device)
+    @repeat_on_conflict(['user'])
+    def _delete(user, device):
+        device.deleted = True
+        user.set_device(device)
+        user.save()
 
-    device.deleted = True
-    user.set_device(device)
-    user.save()
+    _delete(user=request.user, device=device)
 
     return HttpResponseRedirect(reverse('devices'))
 
 
+@login_required
 @device_decorator
 def delete_permanently(request, device):
 
@@ -241,11 +260,18 @@ def delete_permanently(request, device):
         state.remove_device(dev)
         state.save()
 
-    states = PodcastUserState.for_device(dev.id)
+    states = PodcastUserState.for_device(device.id)
     for state in states:
         remove_device(state=state, dev=device)
 
-    device.delete()
+    user = migrate.get_or_migrate_user(request.user)
+
+    @repeat_on_conflict(['user'])
+    def _remove(user, device):
+        user.remove_device(device)
+        user.save()
+
+    _remove(user=user, device=device)
 
     return HttpResponseRedirect(reverse('devices'))
 
@@ -254,11 +280,9 @@ def delete_permanently(request, device):
 @login_required
 def undelete(request, device):
 
-    user = migrate.get_or_migrate_user(request.user)
-
     device.deleted = False
-    user.set_device(device)
-    user.save()
+    request.user.set_device(device)
+    request.user.save()
 
     return HttpResponseRedirect(reverse('device', args=[device.uid]))
 
@@ -269,8 +293,6 @@ def undelete(request, device):
 @allowed_methods(['POST'])
 def sync(request, device):
 
-    user = migrate.get_or_migrate_user(request.user)
-
     form = SyncForm(request.POST)
     if not form.is_valid():
         return HttpResponseBadRequest('invalid')
@@ -278,9 +300,9 @@ def sync(request, device):
     try:
         target_uid = form.get_target()
 
-        sync_target = user.get_device_by_uid(target_uid)
-        user.sync_devices(device, sync_target)
-        user.save()
+        sync_target = request.user.get_device_by_uid(target_uid)
+        request.user.sync_devices(device, sync_target)
+        request.user.save()
 
     except ValueError, e:
         raise
@@ -294,11 +316,9 @@ def sync(request, device):
 @login_required
 @allowed_methods(['GET'])
 def unsync(request, device):
-    user = migrate.get_or_migrate_user(request.user)
-
     try:
-        user.unsync_device(device)
-        user.save()
+        request.user.unsync_device(device)
+        request.user.save()
 
     except ValueError, e:
         messages.error(request, 'Could not unsync the device: {err}'.format(

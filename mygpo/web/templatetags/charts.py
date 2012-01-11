@@ -16,7 +16,7 @@ def vertical_bar(value, max):
         left, right = '<span>'+str(value)+'</span>', ''
     else:
         left, right = '&nbsp;', '<span>'+str(value)+'</span>'
-    s = '<div class="barbg"><div class="bar" style="width: %s">%s</div>%s</div>' % (ratio, left, right)
+    s = '<div class="barbg"><div class="bar" style="width: %.2d%%">%s</div>%s</div>' % (ratio, left, right)
     return mark_safe(s)
 
 @register.filter
@@ -133,6 +133,6 @@ def episode_heatmap_visualization(heatmap):
         'chxp=0,%s' % ','.join([repr(x) for x in axis_pos]),   #axis label positions
         ]
 
-    s = '<img src="http://chart.apis.google.com/chart?%s"' % '&'.join(parts)
+    s = '<img src="http://chart.apis.google.com/chart?%s" />' % '&'.join(parts)
 
     return mark_safe(s)

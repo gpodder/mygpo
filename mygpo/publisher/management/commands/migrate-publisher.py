@@ -1,5 +1,4 @@
 from django.core.management.base import BaseCommand
-from django.contrib.auth.models import User
 
 from mygpo import migrate
 from mygpo.decorators import repeat_on_conflict

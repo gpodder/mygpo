@@ -22,7 +22,6 @@ from django.shortcuts import get_object_or_404
 from mygpo.users.models import PodcastUserState
 from django.views.decorators.csrf import csrf_exempt
 from mygpo.decorators import allowed_methods
-from mygpo import migrate
 from mygpo.core.models import Episode, Podcast
 
 try:
@@ -38,17 +37,12 @@ except ImportError:
 def main(request, username, scope):
 
     def user_settings(user):
-        obj = migrate.get_or_migrate_user(user)
-        return obj, obj
+        return user, user
 
     def device_settings(user, uid):
-        user = migrate.get_or_migrate_user(user)
         device = user.get_device_by_uid(user, uid)
         if not device or device.deleted:
             raise Http404
-
-        # This is a reference to a separate obj
-        dev = migrate.get_or_migrate_device(device, user)
 
         # get it from the user directly so that changes
         # to settings_obj are reflected in user (bug 1344)

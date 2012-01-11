@@ -36,7 +36,6 @@ from mygpo.users.models import Chapter, HistoryEntry, EpisodeAction
 from mygpo.api import backend
 from mygpo.decorators import manual_gc
 from mygpo.utils import parse_time, get_to_dict
-from mygpo import migrate
 from mygpo.web.heatmap import EpisodeHeatmap
 from mygpo.web.utils import get_episode_link_target
 
@@ -51,18 +50,22 @@ def episode(request, episode):
 
     if request.user.is_authenticated():
 
-        user = migrate.get_or_migrate_user(request.user)
-
         episode_state = episode.get_user_state(request.user)
         is_fav = episode_state.is_favorite()
 
+
+        # pre-populate data for fetch_data
+        podcasts_dict = {podcast.get_id(): podcast}
+        episodes_dict = {episode._id: episode}
+
         history = list(episode_state.get_history_entries())
-        HistoryEntry.fetch_data(user, history)
+        HistoryEntry.fetch_data(request.user, history,
+                podcasts=podcasts_dict, episodes=episodes_dict)
 
         played_parts = EpisodeHeatmap(podcast.get_id(),
-                episode._id, user.oldid, duration=episode.duration)
+                episode._id, request.user._id, duration=episode.duration)
 
-        devices = dict( (d.id, d.name) for d in user.devices )
+        devices = dict( (d.id, d.name) for d in request.user.devices )
 
     else:
         history = []
@@ -73,7 +76,7 @@ def episode(request, episode):
 
     chapters = []
     for user, chapter in Chapter.for_episode(episode._id):
-        chapter.is_own = user == request.user.id
+        chapter.is_own = user == request.user._id
         chapters.append(chapter)
 
 
@@ -99,6 +102,8 @@ def episode(request, episode):
 def add_chapter(request, episode):
     e_state = episode.get_user_state(request.user)
 
+    podcast = Podcast.get(episode.podcast)
+
     try:
         start = parse_time(request.POST.get('start', '0'))
 
@@ -113,7 +118,7 @@ def add_chapter(request, episode):
     except Exception as e:
         # FIXME: when using Django's messaging system, set error message
 
-        return HttpResponseRedirect(get_episode_link_target(episode))
+        return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
 
     chapter = Chapter()
@@ -124,7 +129,7 @@ def add_chapter(request, episode):
 
     e_state.update_chapters(add=[chapter])
 
-    return HttpResponseRedirect(get_episode_link_target(episode))
+    return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
 
 @manual_gc
@@ -135,7 +140,9 @@ def remove_chapter(request, episode, start, end):
     remove = (int(start), int(end))
     e_state.update_chapters(rem=[remove])
 
-    return HttpResponseRedirect(get_episode_link_target(episode))
+    podcast = Podcast.get(episode.podcast)
+
+    return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
 
 @manual_gc
@@ -147,7 +154,9 @@ def toggle_favorite(request, episode):
 
     episode_state.save()
 
-    return HttpResponseRedirect(get_episode_link_target(episode))
+    podcast = Podcast.get(episode.podcast)
+
+    return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
 
 @manual_gc
@@ -166,21 +175,19 @@ def list_favorites(request):
 
     episodes = map(set_podcast, episodes)
 
-    user = migrate.get_or_migrate_user(request.user)
-
     feed_url = 'http://%s/%s' % (site.domain, reverse('favorites-feed', args=[request.user.username]))
 
     podcast = Podcast.for_url(feed_url)
 
     if 'public_feed' in request.GET:
-        user.favorite_feeds_token = ''
-        user.save()
+        request.user.favorite_feeds_token = ''
+        request.user.save()
 
     elif 'private_feed' in request.GET:
-        user.create_new_token('favorite_feeds_token', 8)
-        user.save()
+        request.user.create_new_token('favorite_feeds_token', 8)
+        request.user.save()
 
-    token = user.favorite_feeds_token
+    token = request.user.favorite_feeds_token
 
     return render_to_response('favorites.html', {
         'episodes': episodes,
@@ -192,8 +199,7 @@ def list_favorites(request):
 
 def add_action(request, episode):
 
-    user = migrate.get_or_migrate_user(request.user)
-    device = user.get_device(request.POST.get('device'))
+    device = request.user.get_device(request.POST.get('device'))
 
     action_str = request.POST.get('action')
     timestamp = request.POST.get('timestamp', '')
@@ -220,7 +226,9 @@ def add_action(request, episode):
 
     _add_action(action=action)
 
-    return HttpResponseRedirect(get_episode_link_target(episode))
+    podcast = Podcast.get(episode.podcast)
+
+    return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
 # To make all view accessible via either CouchDB-ID for Slugs
 # a decorator queries the episode and passes the Id on to the

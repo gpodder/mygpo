@@ -25,7 +25,7 @@
   <ul>
    {% for podcast in group.podcasts %}
     <li>
-     <a href="{% url podcast-publisher-detail podcast.id %}">{{ podcast.title }} ({{ podcast.group_member_name }})</a>
+     <a href="{% podcast_link_target podcast "podcast-publisher-detail" %}">{{ podcast.title }} ({{ podcast.group_member_name }})</a>
     </li>
    {% endfor %}
   </ul>

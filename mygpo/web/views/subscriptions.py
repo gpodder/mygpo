@@ -1,22 +1,19 @@
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.contrib.sites.models import RequestSite
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.contrib.syndication.views import Feed
 from django.utils.translation import ugettext as _
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 
 from mygpo.core.models import Podcast
 from mygpo.utils import parse_bool, unzip, get_to_dict, skip_pairs
 from mygpo.decorators import manual_gc, requires_token
-from mygpo.api.models import Device
 from mygpo.api import backend, simple
-from mygpo.users.models import HistoryEntry
+from mygpo.users.models import HistoryEntry, User
 from mygpo.web import utils
 from mygpo.cache import get_cache_or_calc
-from mygpo import migrate
 
 
 @manual_gc
@@ -33,8 +30,7 @@ def show_list(request):
 @manual_gc
 @login_required
 def download_all(request):
-    user = migrate.get_or_migrate_user(request.user)
-    podcasts = user.get_subscribed_podcasts()
+    podcasts = request.user.get_subscribed_podcasts()
     response = simple.format_podcast_list(podcasts, 'opml', request.user.username)
     response['Content-Disposition'] = 'attachment; filename=all-subscriptions.opml'
     return response
@@ -43,11 +39,12 @@ def download_all(request):
 @manual_gc
 @requires_token(token_name='subscriptions_token', denied_template='user_subscriptions_denied.html')
 def for_user(request, username):
-    user = get_object_or_404(User, username=username)
-    new_user = migrate.get_or_migrate_user(user)
+    user = User.get_user(username)
+    if not user:
+        raise Http404
 
-    subscriptions = new_user.get_subscribed_podcasts(public=True)
-    token = new_user.subscriptions_token
+    subscriptions = user.get_subscribed_podcasts(public=True)
+    token = user.subscriptions_token
 
     return render_to_response('user_subscriptions.html', {
         'subscriptions': subscriptions,
@@ -57,9 +54,11 @@ def for_user(request, username):
 
 @requires_token(token_name='subscriptions_token')
 def for_user_opml(request, username):
-    user = get_object_or_404(User, username=username)
-    new_user = migrate.get_or_migrate_user(user)
-    subscriptions = new_user.get_subscribed_podcasts(public=True)
+    user = User.get_user(username)
+    if not user:
+        raise Http404
+
+    subscriptions = user.get_subscribed_podcasts(public=True)
 
     if parse_bool(request.GET.get('symbian', False)):
         subscriptions = map(utils.symbian_opml_changes, subscriptions)
@@ -74,7 +73,7 @@ def for_user_opml(request, username):
 
 def create_subscriptionlist(request):
 
-    user = migrate.get_or_migrate_user(request.user)
+    user = request.user
     user.sync_all()
 
     subscriptions = user.get_subscriptions()
@@ -99,8 +98,8 @@ def create_subscriptionlist(request):
             if podcast is None:
                 continue
 
-            episode = get_cache_or_calc('%s-latest-episode', timeout=60*60,
-                    calc=lambda: podcast.get_latest_episode())
+            episode = get_cache_or_calc('%s-latest-episode' % podcast.get_id(),
+                    timeout=60*60, calc=lambda: podcast.get_latest_episode())
 
             subscription_list[podcast_id] = {
                 'podcast': podcasts[podcast_id],
@@ -130,8 +129,7 @@ class SubscriptionsFeed(Feed):
 
     def get_object(self, request, username):
         self.site = RequestSite(request)
-        user = User.objects.get(username=username)
-        return migrate.get_or_migrate_user(user)
+        return User.get_user(username)
 
     def title(self, user):
         return _('%(username)s\'s Podcast Subscriptions on %(site)s') % \

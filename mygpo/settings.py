@@ -31,13 +31,6 @@ ADMINS = ()
 MANAGERS = ADMINS
 
 DATABASES = {
-    'default': {
-        'NAME':     'mygpo',
-        'ENGINE':   'django.db.backends.sqlite3',
-        'USER':     '',
-        'PASSWORD': '',
-        'HOST':     '',
-    }
 }
 
 COUCHDB_DATABASES = (
@@ -46,7 +39,9 @@ COUCHDB_DATABASES = (
     ('mygpo.users',     'http://127.0.0.1:5984/mygpo'),
     ('mygpo.share',     'http://127.0.0.1:5984/mygpo'),
     ('mygpo.maintenance',     'http://127.0.0.1:5984/mygpo'),
-    ('django_couchdb_utils',  'http://127.0.0.1:5984/mygpo'),
+    ('django_couchdb_utils_auth',     'http://127.0.0.1:5984/mygpo'),
+    ('django_couchdb_utils_sessions', 'http://127.0.0.1:5984/mygpo_sessions'),
+    ('django_couchdb_utils_registration', 'http://127.0.0.1:5984/mygpo'),
 )
 
 
@@ -102,12 +97,11 @@ TEMPLATE_DIRS = ()
 INSTALLED_APPS = (
     'django.contrib.contenttypes', # unused, but tests fail otherwise (?)
     'django.contrib.messages',
-    'django.contrib.auth',
-    'django.contrib.sessions',
     'django.contrib.humanize',
-    'registration',
     'couchdbkit.ext.django',
-    'django_couchdb_utils',
+    'django_couchdb_utils.auth',
+    'django_couchdb_utils.sessions',
+    'django_couchdb_utils.registration',
     'mygpo.core',
     'mygpo.users',
     'mygpo.api',
@@ -122,7 +116,6 @@ INSTALLED_APPS = (
 
 TEST_EXCLUDE = (
     'django',
-    'registration',
     'couchdbkit',
 )
 
@@ -131,9 +124,11 @@ TEST_RUNNER='mygpo.test.MygpoTestSuiteRunner'
 ACCOUNT_ACTIVATION_DAYS = 7
 
 AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',
+    'django_couchdb_utils.auth.backends.CouchDBAuthBackend',
     'mygpo.web.auth.EmailAuthenticationBackend',
 )
+
+SESSION_ENGINE = "django_couchdb_utils.sessions.couchdb"
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.auth.context_processors.auth",
@@ -144,8 +139,12 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "mygpo.web.googleanalytics.processor",
 )
 
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
+USER_CLASS = 'mygpo.users.models.User'
 
 AUTH_PROFILE_MODULE = "api.UserProfile"
+
 
 LOGIN_URL = '/login/'
 

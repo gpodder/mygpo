@@ -117,12 +117,12 @@ def episode_data(episode, domain, podcast=None):
     data = {
         "title": episode.title,
         "url": episode.url,
-        "podcast_title": podcast.title,
-        "podcast_url": podcast.url,
+        "podcast_title": podcast.title if podcast else '',
+        "podcast_url": podcast.url if podcast else '',
         "description": episode.description,
         "website": episode.link,
         "mygpo_link": 'http://%(domain)s%(res)s' % dict(domain=domain,
-            res=get_episode_link_target(episode, podcast))
+            res=get_episode_link_target(episode, podcast)) if podcast else ''
         }
 
     if episode.released:

@@ -5,12 +5,12 @@ import sys
 from couchdb import json
 from couchdb.multipart import write_multipart
 
-from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 
 from mygpo import migrate
 from mygpo.core.models import Podcast
-from mygpo.users.models import PodcastUserState, EpisodeUserState, Suggestions
+from mygpo.users.models import PodcastUserState, EpisodeUserState, \
+         Suggestions, User
 from mygpo.directory.models import Category
 from mygpo.utils import progress
 
@@ -36,19 +36,18 @@ class Command(BaseCommand):
 
         docs = set()
 
-        for user in options.get('users', []):
-            old_u = User.objects.get(username=user)
+        for username in options.get('users', []):
+            user = User.get_user(username)
 
             # User
-            new_u = migrate.get_or_migrate_user(old_u)
-            docs.add(new_u._id)
+            docs.add(user._id)
 
             # Suggestions
-            suggestions = Suggestions.for_user_oldid(old_u.id)
+            suggestions = Suggestions.for_user(user)
             docs.add(suggestions._id)
 
             # Podcast States
-            for p_state in PodcastUserState.for_user(old_u):
+            for p_state in PodcastUserState.for_user(user):
                 docs.add(p_state._id)
 
                 # Categories
@@ -71,7 +70,7 @@ class Command(BaseCommand):
                     docs.add(episode._id)
 
                     # Episode States
-                    e_state = episode.get_user_state(old_u)
+                    e_state = episode.get_user_state(user)
                     if e_state._id:
                         docs.add(e_state._id)
 

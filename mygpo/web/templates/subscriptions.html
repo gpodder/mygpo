@@ -29,9 +29,9 @@
     {% if s.episode %}
     {% trans "Latest Episode:" %} {% episode_link s.episode s.podcast %}
       {% if s.episode.action %}
-          ({{ s.episode.timestamp|date:"Y-m-d" }}, {{s.episode.action|episode_status_text }})
+          ({{ s.episode.released|date:"Y-m-d" }}, {{s.episode.action|episode_status_text }})
       {% else %}
-          ({{ s.episode.timestamp|date:"Y-m-d" }})
+          ({{ s.episode.released|date:"Y-m-d" }})
       {% endif %}
      {% else %}
        {% trans "No episodes" %}

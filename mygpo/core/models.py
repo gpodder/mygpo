@@ -6,6 +6,7 @@ from dateutil import parser
 from random import randint
 
 from couchdbkit.ext.django.schema import *
+from restkit.errors import Unauthorized
 
 from django.conf import settings
 
@@ -14,6 +15,10 @@ from mygpo import utils
 from mygpo.core.proxy import DocumentABCMeta
 from mygpo.core.slugs import SlugMixin
 from mygpo.core.oldid import OldIdMixin
+
+
+class SubscriptionException(Exception):
+    pass
 
 
 class MergedIdException(Exception):
@@ -696,7 +701,10 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         from mygpo import migrate
         state = self.get_user_state(user)
         state.subscribe(device)
-        state.save()
+        try:
+            state.save()
+        except Unauthorized:
+            raise SubscriptionException
 
 
     @repeat_on_conflict()
@@ -704,7 +712,10 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         from mygpo import migrate
         state = self.get_user_state(user)
         state.unsubscribe(device)
-        state.save()
+        try:
+            state.save()
+        except Unauthorized:
+            raise SubscriptionException
 
 
     def subscribe_targets(self, user):
@@ -714,21 +725,20 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         """
         targets = []
 
-        user.sync_all()
+        subscriptions_by_devices = user.get_subscriptions_by_device()
 
         for group in user.get_grouped_devices():
 
             if group.is_synced:
 
                 dev = group.devices[0]
-                subscriptions = dev.get_subscribed_podcasts()
 
-                if not self in subscriptions:
+                if not self.get_id() in subscriptions_by_devices[dev.id]:
                     targets.append(group.devices)
 
             else:
                 for device in group.devices:
-                    if not self in device.get_subscribed_podcasts():
+                    if not self.get_id() in subscriptions_by_devices[device.id]:
                         targets.append(device)
 
         return targets
@@ -756,7 +766,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
                 group_level = 1,
                 reduce      = True,
             )
-        return r.first()['value']
+        return r.first()['value'] if r else 0
 
 
     def listener_count_timespan(self, start=None, end={}):
@@ -801,20 +811,23 @@ class Podcast(Document, SlugMixin, OldIdMixin):
             yield (episode, listeners)
 
 
-    def get_episode_states(self, user_oldid):
+    def get_episode_states(self, user_id):
         """ Returns the latest episode actions for the podcast's episodes """
 
         from mygpo.users.models import EpisodeUserState
         db = EpisodeUserState.get_db()
 
         res = db.view('users/episode_states',
-                startkey= [user_oldid, self.get_id(), None],
-                endkey  = [user_oldid, self.get_id(), {}]
+                startkey= [user_id, self.get_id(), None],
+                endkey  = [user_id, self.get_id(), {}],
+                include_docs = True,
             )
 
         for r in res:
-            action = r['value']
-            yield action
+            state_doc = r['doc']
+            index = int(r['value'])
+            state = EpisodeUserState.wrap(state_doc)
+            yield (state, index)
 
 
     def __hash__(self):
@@ -915,6 +928,18 @@ class PodcastGroup(Document, SlugMixin, OldIdMixin):
         r = cls.view('core/podcastgroups_by_oldid', \
             key=oldid, limit=1, include_docs=True)
         return r.first() if r else None
+
+
+    @classmethod
+    def for_slug_id(cls, slug_id):
+        """ Returns the Podcast for either an CouchDB-ID for a Slug """
+
+        if utils.is_couchdb_id(slug_id):
+            return cls.get(slug_id)
+        else:
+            #TODO: implement
+            return cls.for_slug(slug_id)
+
 
     def get_podcast_by_id(self, id, current_id=False):
         for podcast in self.podcasts:

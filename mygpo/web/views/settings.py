@@ -26,7 +26,6 @@ from mygpo.decorators import manual_gc, allowed_methods, repeat_on_conflict
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
 from mygpo.core.models import Podcast
-from mygpo import migrate
 from mygpo.utils import get_to_dict
 
 
@@ -34,13 +33,12 @@ from mygpo.utils import get_to_dict
 @login_required
 @allowed_methods(['GET', 'POST'])
 def account(request):
-    user = migrate.get_or_migrate_user(request.user)
 
     if request.method == 'GET':
 
        form = UserAccountForm({
             'email': request.user.email,
-            'public': user.settings.get('public_subscriptions', True)
+            'public': request.user.settings.get('public_subscriptions', True)
             })
 
        return render_to_response('account.html', {
@@ -61,7 +59,6 @@ def account(request):
 
         request.user.email = form.cleaned_data['email']
         request.user.save()
-        request.user.get_profile().save()
 
         messages.success(request, 'Account updated')
 
@@ -82,11 +79,8 @@ def delete_account(request):
         return render_to_response('delete_account.html',
                 context_instance=RequestContext(request))
 
-    profile = request.user.get_profile()
-    profile.deleted = True
-    profile.save()
-
     request.user.is_active = False
+    request.user.deleted = True
     request.user.save()
     logout(request)
 
@@ -100,7 +94,6 @@ def delete_account(request):
 def privacy(request):
 
     site = RequestSite(request)
-    user = migrate.get_or_migrate_user(request.user)
 
     @repeat_on_conflict(['state'])
     def set_privacy_settings(state, is_public):
@@ -108,10 +101,10 @@ def privacy(request):
         state.save()
 
     if 'private_subscriptions' in request.GET:
-        set_privacy_settings(state=user, is_public=False)
+        set_privacy_settings(state=request.user, is_public=False)
 
     elif 'public_subscriptions' in request.GET:
-        set_privacy_settings(state=user, is_public=True)
+        set_privacy_settings(state=request.user, is_public=True)
 
     if 'exclude' in request.GET:
         id = request.GET['exclude']
@@ -125,15 +118,14 @@ def privacy(request):
         state = podcast.get_user_state(request.user)
         set_privacy_settings(state=state, is_public=True)
 
-    user = migrate.get_or_migrate_user(request.user)
-    subscriptions = user.get_subscriptions()
+    subscriptions = request.user.get_subscriptions()
     podcasts = get_to_dict(Podcast, [x[1] for x in subscriptions], get_id=Podcast.get_id)
 
     included_subscriptions = set(filter(None, [podcasts.get(x[1], None) for x in subscriptions if x[0] == True]))
     excluded_subscriptions = set(filter(None, [podcasts.get(x[1], None) for x in subscriptions if x[0] == False]))
 
     return render_to_response('privacy.html', {
-        'public_subscriptions': user.settings.get('public_subscriptions', True),
+        'public_subscriptions': request.user.settings.get('public_subscriptions', True),
         'included_subscriptions': included_subscriptions,
         'excluded_subscriptions': excluded_subscriptions,
         'domain': site.domain,
@@ -144,17 +136,16 @@ def privacy(request):
 @login_required
 def share(request):
     site = RequestSite(request)
-    user = migrate.get_or_migrate_user(request.user)
 
     if 'public_subscriptions' in request.GET:
-        user.subscriptions_token = ''
-        user.save()
+        request.user.subscriptions_token = ''
+        request.user.save()
 
     elif 'private_subscriptions' in request.GET:
-        user.create_new_token('subscriptions_token')
-        user.save()
+        request.user.create_new_token('subscriptions_token')
+        request.user.save()
 
-    token = user.subscriptions_token
+    token = request.user.subscriptions_token
 
     return render_to_response('share.html', {
         'site': site,

@@ -20,6 +20,7 @@ from mygpo.directory.tags import TagCloud
 from mygpo.utils import flatten, get_to_dict
 from mygpo.share.models import PodcastList
 from mygpo.users.models import User
+from mygpo.cache import get_cache_or_calc
 
 
 @manual_gc
@@ -39,7 +40,10 @@ def toplist(request, num=100, lang=None):
 
     max_subscribers = max([p.subscriber_count() for (oldp, p) in entries]) if entries else 0
     current_site = RequestSite(request)
-    all_langs = utils.get_language_names(utils.get_podcast_languages())
+
+    languages = get_cache_or_calc('podcast-languages', timeout=60*60,
+            calc=lambda: utils.get_podcast_languages())
+    all_langs = utils.get_language_names(languages)
 
     return render_to_response('toplist.html', {
         'entries': entries,
@@ -155,7 +159,11 @@ def episode_toplist(request, num=100):
 
     # Determine maximum listener amount (or 0 if no entries exist)
     max_listeners = max([0]+[e.listeners for e in entries])
-    all_langs = utils.get_language_names(utils.get_podcast_languages())
+
+    languages = get_cache_or_calc('podcast-languages', timeout=60*60,
+            calc=lambda: utils.get_podcast_languages())
+    all_langs = utils.get_language_names(languages)
+
     return render_to_response('episode_toplist.html', {
         'entries': entries,
         'max_listeners': max_listeners,

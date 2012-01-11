@@ -1,12 +1,16 @@
+import re
 import uuid, collections
 from datetime import datetime
 import dateutil.parser
 from itertools import imap
+from operator import itemgetter
 
 from couchdbkit import ResourceNotFound
 from couchdbkit.ext.django.schema import *
 
-from mygpo.core.proxy import proxy_object
+from django_couchdb_utils.registration.models import User as BaseUser
+
+from mygpo.core.proxy import proxy_object, DocumentABCMeta
 from mygpo.core.models import Podcast, Episode
 from mygpo.utils import linearize, get_to_dict, iterate_together
 from mygpo.decorators import repeat_on_conflict
@@ -18,30 +22,34 @@ class ValidationException(ValueError):
     pass
 
 
+RE_DEVICE_UID = re.compile(r'^[\w.-]+$')
+
+
+class DeviceUIDException(Exception):
+    pass
+
+
+
 class Suggestions(Document, RatingMixin):
-    user = StringProperty()
+    user = StringProperty(required=True)
     user_oldid = IntegerProperty()
     podcasts = StringListProperty()
     blacklist = StringListProperty()
 
     @classmethod
-    def for_user_oldid(cls, oldid):
-        r = cls.view('users/suggestions_by_user_oldid', key=oldid, \
+    def for_user(cls, user):
+        r = cls.view('users/suggestions_by_user', key=user._id, \
             include_docs=True)
         if r:
             return r.first()
         else:
             s = Suggestions()
-            s.user_oldid = oldid
+            s.user = user._id
             return s
 
 
     def get_podcasts(self, count=None):
-        from mygpo import migrate
-        from django.contrib.auth.models import User
-
-        user = User.objects.get(id=self.user_oldid)
-        user = migrate.get_or_migrate_user(user)
+        user = User.get(self.user)
         subscriptions = user.get_subscribed_podcast_ids()
 
         ids = filter(lambda x: not x in self.blacklist + subscriptions, self.podcasts)
@@ -55,9 +63,7 @@ class Suggestions(Document, RatingMixin):
             return super(Suggestions, self).__repr__()
         else:
             return '%d Suggestions for %s (%s)' % \
-                (len(self.podcasts),
-                 self.user[:10] if self.user else self.user_oldid,
-                 self._id[:10])
+                (len(self.podcasts), self.user, self._id)
 
 
 class EpisodeAction(DocumentSchema):
@@ -95,7 +101,7 @@ class EpisodeAction(DocumentSchema):
 
 
     @staticmethod
-    def filter(user_oldid, since=None, until={}, podcast_id=None,
+    def filter(user_id, since=None, until={}, podcast_id=None,
                device_id=None):
         """ Returns Episode Actions for the given criteria"""
 
@@ -103,8 +109,8 @@ class EpisodeAction(DocumentSchema):
         until_str = until.strftime('%Y-%m-%dT%H:%M:%S') if until else {}
 
         # further parts of the key are filled in below
-        startkey = [user_oldid, since_str, None, None]
-        endkey   = [user_oldid, until_str, {}, {}]
+        startkey = [user_id, since_str, None, None]
+        endkey   = [user_id, until_str, {}, {}]
 
         # additional filter that are carried out by the
         # application, not by the database
@@ -137,11 +143,14 @@ class EpisodeAction(DocumentSchema):
         db = EpisodeUserState.get_db()
         res = db.view('users/episode_actions',
                 startkey = startkey,
-                endkey   = endkey
+                endkey   = endkey,
+                include_docs = True,
             )
 
         for r in res:
-            action = r['value']
+            state = EpisodeUserState.wrap(r['doc'])
+            index = int(r['value'])
+            action = HistoryEntry.from_action_dict(state, index)
             if all( f(action) for f in add_filters):
                 yield action
 
@@ -217,6 +226,7 @@ class EpisodeUserState(Document):
     actions       = SchemaListProperty(EpisodeAction)
     settings      = DictProperty()
     user_oldid    = IntegerProperty()
+    user          = StringProperty(required=True)
     ref_url       = StringProperty(required=True)
     podcast_ref_url = StringProperty(required=True)
     merged_ids    = StringListProperty()
@@ -233,14 +243,12 @@ class EpisodeUserState(Document):
             return r.first()
 
         else:
-            from mygpo import migrate
-            new_user = migrate.get_or_migrate_user(user)
             podcast = Podcast.get(episode.podcast)
 
             state = EpisodeUserState()
             state.episode = episode._id
             state.podcast = episode.podcast
-            state.user_oldid = user.id
+            state.user = user._id
             state.ref_url = episode.url
             state.podcast_ref_url = podcast.url
 
@@ -332,6 +340,9 @@ class SubscriptionAction(Document):
     device    = StringProperty()
 
 
+    __metaclass__ = DocumentABCMeta
+
+
     def __cmp__(self, other):
         return cmp(self.timestamp, other.timestamp)
 
@@ -356,6 +367,7 @@ class PodcastUserState(Document):
 
     podcast       = StringProperty(required=True)
     user_oldid    = IntegerProperty()
+    user          = StringProperty(required=True)
     settings      = DictProperty()
     actions       = SchemaListProperty(SubscriptionAction)
     tags          = StringListProperty()
@@ -371,29 +383,24 @@ class PodcastUserState(Document):
         if r:
             return r.first()
         else:
-            from mygpo import migrate
-            new_user = migrate.get_or_migrate_user(user)
             p = PodcastUserState()
             p.podcast = podcast.get_id()
-            p.user_oldid = user.id
+            p.user = user._id
             p.ref_url = podcast.url
-            p.settings['public_subscription'] = new_user.settings.get('public_subscriptions', True)
+            p.settings['public_subscription'] = user.settings.get('public_subscriptions', True)
 
-            p.set_device_state(new_user.devices)
+            p.set_device_state(user.devices)
 
             return p
 
 
     @classmethod
     def for_user(cls, user):
-        return cls.for_user_oldid(user.id)
-
-
-    @classmethod
-    def for_user_oldid(cls, user_oldid):
         r = PodcastUserState.view('users/podcast_states_by_user',
-            startkey=[user_oldid, None], endkey=[user_oldid, 'ZZZZ'],
-            include_docs=True)
+            startkey     = [user._id, None],
+            endkey       = [user._id, 'ZZZZ'],
+            include_docs = True,
+            )
         return list(r)
 
 
@@ -479,8 +486,8 @@ class PodcastUserState(Document):
 
     def get_subscribed_device_ids(self):
         r = PodcastUserState.view('users/subscriptions_by_podcast',
-            startkey = [self.podcast, self.user_oldid, None],
-            endkey   = [self.podcast, self.user_oldid, {}],
+            startkey = [self.podcast, self.user, None],
+            endkey   = [self.podcast, self.user, {}],
             reduce   = False,
             )
         return (res['key'][2] for res in r)
@@ -495,19 +502,19 @@ class PodcastUserState(Document):
             return False
 
         return self.podcast == other.podcast and \
-               self.user_oldid == other.user_oldid
+               self.user == other.user
 
     def __repr__(self):
         return 'Podcast %s for User %s (%s)' % \
-            (self.podcast, self.user_oldid, self._id)
+            (self.podcast, self.user, self._id)
 
 
 class Device(Document):
     id       = StringProperty(default=lambda: uuid.uuid4().hex)
-    oldid    = IntegerProperty()
-    uid      = StringProperty()
-    name     = StringProperty()
-    type     = StringProperty()
+    oldid    = IntegerProperty(required=False)
+    uid      = StringProperty(required=True)
+    name     = StringProperty(required=True, default='New Device')
+    type     = StringProperty(required=True, default='other')
     settings = DictProperty()
     deleted  = BooleanProperty(default=False)
 
@@ -578,11 +585,13 @@ def token_generator(length=32):
     return  "".join(random.sample(string.letters+string.digits, length))
 
 
-class User(Document, SyncedDevicesMixin):
+class User(BaseUser, SyncedDevicesMixin):
     oldid    = IntegerProperty()
     settings = DictProperty()
     devices  = SchemaListProperty(Device)
     published_objects = StringListProperty()
+    deleted  = BooleanProperty(default=False)
+    suggestions_up_to_date = BooleanProperty(default=False)
 
     # token for accessing subscriptions of this use
     subscriptions_token    = StringProperty(default=token_generator)
@@ -593,6 +602,8 @@ class User(Document, SyncedDevicesMixin):
     # token for automatically updating feeds published by this user
     publisher_update_token = StringProperty(default=token_generator)
 
+    class Meta:
+        app_label = 'users'
 
     @classmethod
     def for_oldid(cls, oldid):
@@ -637,6 +648,11 @@ class User(Document, SyncedDevicesMixin):
 
 
     def set_device(self, device):
+
+        if not RE_DEVICE_UID.match(device.uid):
+            raise DeviceUIDException("'{uid} is not a valid device ID".format(
+                        uid=device.uid))
+
         devices = list(self.devices)
         ids = [x.id for x in devices]
         if not device.id in ids:
@@ -660,6 +676,9 @@ class User(Document, SyncedDevicesMixin):
         devices.pop(index)
         self.devices = devices
 
+        if self.is_synced(device):
+            self.unsync_device(device)
+
 
 
     def get_subscriptions(self, public=None):
@@ -669,11 +688,23 @@ class User(Document, SyncedDevicesMixin):
         """
 
         r = PodcastUserState.view('users/subscribed_podcasts_by_user',
-            startkey = [self.oldid, public, None, None],
-            endkey   = [self.oldid+1, None, None, None],
+            startkey = [self._id, public, None, None],
+            endkey   = [self._id+'ZZZ', None, None, None],
             reduce   = False,
             )
         return [res['key'][1:] for res in r]
+
+
+    def get_subscriptions_by_device(self, public=None):
+        get_dev = itemgetter(2)
+        groups = collections.defaultdict(list)
+        subscriptions = self.get_subscriptions(public=public)
+        subscriptions = sorted(subscriptions, key=get_dev)
+
+        for public, podcast_id, device_id in subscriptions:
+            groups[device_id].append(podcast_id)
+
+        return groups
 
 
     def get_subscribed_podcast_ids(self, public=None):
@@ -709,7 +740,7 @@ class User(Document, SyncedDevicesMixin):
                 yield entry
 
         if device_id is None:
-            podcast_states = PodcastUserState.for_user_oldid(self.oldid)
+            podcast_states = PodcastUserState.for_user(self)
         else:
             podcast_states = PodcastUserState.for_device(device_id)
 
@@ -750,34 +781,66 @@ class User(Document, SyncedDevicesMixin):
                     yield entry
 
 
+
     def get_newest_episodes(self, max_date, max_per_podcast=5):
         """ Returns the newest episodes of all subscribed podcasts
 
-        Episodes with release dates above max_date are discarded"""
+        Only max_per_podcast episodes per podcast are loaded. Episodes with
+        release dates above max_date are discarded.
 
+        This method returns a generator that produces the newest episodes.
 
-        podcasts = dict( (p.get_id(), p) for p in
-                self.get_subscribed_podcasts())
-
-        episodes = [p.get_episodes(until=max_date, descending=True,
-                limit=max_per_podcast) for p in podcasts.values()]
+        The number of required DB queries is equal to the number of (distinct)
+        podcasts of all consumed episodes (max: number of subscribed podcasts),
+        plus a constant number of initial queries (when the first episode is
+        consumed). """
 
         cmp_key = lambda episode: episode.released or datetime(2000, 01, 01)
 
-        for res in iterate_together(episodes, key=cmp_key, reverse=True):
-            # res is a sparse tuple
-            for episode in filter(None, res):
-                podcast = podcasts.get(episode.podcast, None)
-                yield proxy_object(episode, podcast=podcast)
+        podcasts = list(self.get_subscribed_podcasts())
+        podcasts = filter(lambda p: p.latest_episode_timestamp, podcasts)
+        podcasts = sorted(podcasts, key=lambda p: p.latest_episode_timestamp,
+                        reverse=True)
+
+        podcast_dict = dict((p.get_id(), p) for p in podcasts)
+
+        # contains the un-yielded episodes, newest first
+        episodes = []
+
+        for podcast in podcasts:
+
+            yielded_episodes = 0
+
+            for episode in episodes:
+                # determine for which episodes there won't be a new episodes
+                # that is newer; those can be yielded
+                if episode.released > podcast.latest_episode_timestamp:
+                    p = podcast_dict.get(episode.podcast, None)
+                    yield proxy_object(episode, podcast=p)
+                    yielded_episodes += 1
+                else:
+                    break
+
+            # remove the episodes that have been yielded before
+            episodes = episodes[yielded_episodes:]
+
+            # fetch and merge episodes for the next podcast
+            new_episodes = list(podcast.get_episodes(since=1, until=max_date,
+                        descending=True, limit=max_per_podcast))
+            episodes = sorted(episodes+new_episodes, key=cmp_key, reverse=True)
+
+
+        # yield the remaining episodes
+        for episode in episodes:
+            podcast = podcast_dict.get(episode.podcast, None)
+            yield proxy_object(episode, podcast=podcast)
+
 
 
     def save(self, *args, **kwargs):
         super(User, self).save(*args, **kwargs)
 
-        from django.contrib.auth.models import User as OldUser
-        user = OldUser.objects.get(id=self.oldid)
-        podcast_states = PodcastUserState.for_user(user)
-
+        podcast_states = PodcastUserState.for_user(self)
         for state in podcast_states:
             @repeat_on_conflict(['state'])
             def _update_state(state):
@@ -812,12 +875,12 @@ class History(object):
 
         if device:
             self._view = 'users/device_history'
-            self._startkey = [self.user.oldid, device.oldid, None]
-            self._endkey   = [self.user.oldid, device.oldid, {}]
+            self._startkey = [self.user._id, device.id, None]
+            self._endkey   = [self.user._id, device.id, {}]
         else:
             self._view = 'users/history'
-            self._startkey = [self.user.oldid, None]
-            self._endkey   = [self.user.oldid, {}]
+            self._startkey = [self.user._id, None]
+            self._endkey   = [self.user._id, {}]
 
 
     def __getitem__(self, key):
@@ -835,11 +898,19 @@ class History(object):
                 endkey     = self._startkey,
                 limit      = length,
                 skip       = start,
+                include_docs = True,
             )
 
         for action in res:
-            action = action['value']
-            yield HistoryEntry.from_action_dict(action)
+            state_doc = action['doc']
+            index = int(action['value'])
+
+            if state_doc['doc_type'] == 'EpisodeUserState':
+                state = EpisodeUserState.wrap(state_doc)
+            else:
+                state = PodcastUserState.wrap(state_doc)
+
+            yield HistoryEntry.from_action_dict(state, index)
 
 
 
@@ -848,16 +919,34 @@ class HistoryEntry(object):
 
 
     @classmethod
-    def from_action_dict(cls, action):
+    def from_action_dict(cls, state, index):
 
         entry = HistoryEntry()
+        action = state.actions[index]
 
-        if 'timestamp' in action:
-            ts = action.pop('timestamp')
-            entry.timestamp = dateutil.parser.parse(ts)
+        if isinstance(state, EpisodeUserState):
+            entry.type = 'Episode'
+            entry.podcast_url = state.podcast_ref_url
+            entry.episode_url = state.ref_url
+            entry.podcast_id = state.podcast
+            entry.episode_id = state.episode
+            if action.device:
+                entry.device_id = action.device
+            if action.started:
+                entry.started = action.started
+            if action.playmark:
+                entry.position = action.playmark
+            if action.total:
+                entry.total = action.total
 
-        for key, value in action.items():
-            setattr(entry, key, value)
+        else:
+            entry.type = 'Subscription'
+            entry.podcast_url = state.ref_url
+            entry.podcast_id = state.podcast
+
+
+        entry.action = action.action
+        entry.timestamp = action.timestamp
 
         return entry
 
@@ -868,23 +957,28 @@ class HistoryEntry(object):
 
 
     @classmethod
-    def fetch_data(cls, user, entries):
+    def fetch_data(cls, user, entries,
+            podcasts=None, episodes=None):
         """ Efficiently loads additional data for a number of entries """
 
-        # load podcast data
-        podcast_ids = [getattr(x, 'podcast_id', None) for x in entries]
-        podcast_ids = filter(None, podcast_ids)
-        podcasts = get_to_dict(Podcast, podcast_ids, get_id=Podcast.get_id)
+        if podcasts is None:
+            # load podcast data
+            podcast_ids = [getattr(x, 'podcast_id', None) for x in entries]
+            podcast_ids = filter(None, podcast_ids)
+            podcasts = get_to_dict(Podcast, podcast_ids, get_id=Podcast.get_id)
 
-        # load episode data
-        episode_ids = [getattr(x, 'episode_id', None) for x in entries]
-        episode_ids = filter(None, episode_ids)
-        episodes = get_to_dict(Episode, episode_ids)
+        if episodes is None:
+            # load episode data
+            episode_ids = [getattr(x, 'episode_id', None) for x in entries]
+            episode_ids = filter(None, episode_ids)
+            episodes = get_to_dict(Episode, episode_ids)
 
         # load device data
+        # does not need pre-populated data because no db-access is required
         device_ids = [getattr(x, 'device_id', None) for x in entries]
         device_ids = filter(None, device_ids)
         devices = dict([ (id, user.get_device(id)) for id in device_ids])
+
 
         for entry in entries:
             podcast_id = getattr(entry, 'podcast_id', None)

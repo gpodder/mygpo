@@ -20,7 +20,6 @@
 from django.http import Http404
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-from django.contrib.auth.models import User
 from django.http import HttpResponseForbidden, HttpResponseNotAllowed
 import gc
 
@@ -42,14 +41,11 @@ def requires_token(token_name, denied_template=None):
     """
     def decorator(fn):
         def tmp(request, username, *args, **kwargs):
-            from mygpo import migrate
 
-            try:
-                user = User.objects.get(username=username)
-            except User.DoesNotExist:
+            from mygpo.users.models import User
+            user = User.get_user(username)
+            if not user:
                 raise Http404
-
-            user = migrate.get_or_migrate_user(user)
 
             token = getattr(user, token_name, '')
             u_token = request.GET.get('token', '')

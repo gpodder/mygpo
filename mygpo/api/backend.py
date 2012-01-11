@@ -24,6 +24,7 @@ from django.core.cache import cache
 from mygpo.data.mimetype import get_type, CONTENT_TYPES
 from mygpo.core.models import Podcast, Episode
 from mygpo.users.models import EpisodeUserState, Device
+from mygpo.decorators import repeat_on_conflict
 from datetime import timedelta
 
 try:
@@ -89,7 +90,7 @@ def get_device(user, uid, undelete=True):
             user.devices.append(device)
             user.save()
 
-        elif device.deleted and undeleted:
+        elif device.deleted and undelete:
             device.deleted = False
             user.set_device(device)
             user.save()

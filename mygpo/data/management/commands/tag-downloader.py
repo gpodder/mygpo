@@ -2,7 +2,6 @@ from django.core.management.base import BaseCommand
 
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core.models import Podcast, PodcastGroup
-from mygpo.api import models as oldmodels
 from mygpo.directory.toplist import PodcastToplist
 from mygpo.data import delicious
 from optparse import make_option

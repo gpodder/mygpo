@@ -1,8 +1,9 @@
 from django.conf.urls.defaults import *
-from registration.views import activate, register
-from registration.forms import RegistrationFormUniqueEmail
 from django.contrib.auth.views import logout
 from django.views.generic.simple import direct_to_template
+
+from django_couchdb_utils.registration.views import activate, register
+from django_couchdb_utils.registration.forms import RegistrationFormUniqueEmail
 
 urlpatterns = patterns('mygpo.web.views',
  url(r'^$',                                                       'home',          name='home'),
@@ -35,7 +36,7 @@ urlpatterns += patterns('mygpo.web.views.podcast',
 
  url(r'^podcast/(?P<pid>\d+)$',                                   'show_oldid',          name='podcast'),
  url(r'^podcast/(?P<pid>\d+)/subscribe$',                         'subscribe_oldid',     name='subscribe'),
- url(r'^podcast/(?P<pid>\d+)/unsubscribe/(?P<device_uid>[\w-]+)',     'unsubscribe_oldid',   name='unsubscribe'),
+ url(r'^podcast/(?P<pid>\d+)/unsubscribe/(?P<device_uid>[\w.-]+)',     'unsubscribe_oldid',   name='unsubscribe'),
  url(r'^podcast/(?P<pid>\d+)/add-tag',                            'add_tag_oldid',       name='add-tag'),
  url(r'^podcast/(?P<pid>\d+)/remove-tag',                         'remove_tag_oldid',    name='remove-tag'),
  url(r'^podcast/(?P<pid>\d+)/set-public',                         'set_public_oldid',    name='podcast-public',  kwargs={'public': True}),
@@ -43,7 +44,7 @@ urlpatterns += patterns('mygpo.web.views.podcast',
 
  url(r'^podcast/(?P<slug_id>[\w-]+)/?$',                             'show_slug_id',        name='podcast-slug-id'),
  url(r'^podcast/(?P<slug_id>[\w-]+)/subscribe$',                     'subscribe_slug_id',   name='subscribe-slug-id'),
- url(r'^podcast/(?P<slug_id>[\w-]+)/unsubscribe/(?P<device_uid>[\w-]+)', 'unsubscribe_slug_id', name='unsubscribe-slug-id'),
+ url(r'^podcast/(?P<slug_id>[\w-]+)/unsubscribe/(?P<device_uid>[\w.-]+)', 'unsubscribe_slug_id', name='unsubscribe-slug-id'),
  url(r'^podcast/(?P<slug_id>[\w-]+)/add-tag',                        'add_tag_slug_id',     name='add-tag-slug-id'),
  url(r'^podcast/(?P<slug_id>[\w-]+)/remove-tag',                     'remove_tag_slug_id',  name='remove-tag-slug-id'),
  url(r'^podcast/(?P<slug_id>[\w-]+)/set-public',                     'set_public_slug_id',    name='podcast-public-slug-id',  kwargs={'public': True}),
@@ -79,32 +80,31 @@ urlpatterns += patterns('mygpo.web.views.device',
  url(r'^devices/$',                                            'overview',                   name='devices'),
  url(r'^devices/create$',                                      'edit_new',                   name='device-edit-new'),
  url(r'^devices/create-device$',                               'create',                     name='device-create'),
- url(r'^device/(?P<uid>[\w-]+)$',                              'show',                       name='device'),
- url(r'^device/(?P<uid>[\w-]+).opml$',                         'opml',                       name='device-opml'),
- url(r'^device/(?P<uid>[\w-]+)/symbian.opml$',                 'symbian_opml',               name='device-symbian-opml'),
- url(r'^device/(?P<uid>[\w-]+)/sync$',                         'sync',                       name='device-sync'),
- url(r'^device/(?P<uid>[\w-]+)/unsync$',                       'unsync',                     name='device-unsync'),
- url(r'^device/(?P<uid>[\w-]+)/delete$',                       'delete',                     name='device-delete'),
- url(r'^device/(?P<uid>[\w-]+)/remove$',                       'delete_permanently',         name='device-delete-permanently'),
- url(r'^device/(?P<uid>[\w-]+)/undelete$',                     'undelete',                   name='device-undelete'),
- url(r'^device/(?P<uid>[\w-]+)/history$',                      'history',                    name='device-history'),
- url(r'^device/(?P<uid>[\w-]+)/edit$',                         'edit',                       name='device-edit'),
- url(r'^device/(?P<uid>[\w-]+)/update$',                       'update',                     name='device-update'),
- url(r'^device/(?P<uid>[\w-]+)/upload-opml$',                  'upload_opml',                name='device-upload-opml'),
+ url(r'^device/(?P<uid>[\w.-]+)\.opml$',                        'opml',                       name='device-opml'),
+ url(r'^device/(?P<uid>[\w.-]+)$',                              'show',                       name='device'),
+ url(r'^device/(?P<uid>[\w.-]+)/symbian.opml$',                 'symbian_opml',               name='device-symbian-opml'),
+ url(r'^device/(?P<uid>[\w.-]+)/sync$',                         'sync',                       name='device-sync'),
+ url(r'^device/(?P<uid>[\w.-]+)/unsync$',                       'unsync',                     name='device-unsync'),
+ url(r'^device/(?P<uid>[\w.-]+)/delete$',                       'delete',                     name='device-delete'),
+ url(r'^device/(?P<uid>[\w.-]+)/remove$',                       'delete_permanently',         name='device-delete-permanently'),
+ url(r'^device/(?P<uid>[\w.-]+)/undelete$',                     'undelete',                   name='device-undelete'),
+ url(r'^device/(?P<uid>[\w.-]+)/history$',                      'history',                    name='device-history'),
+ url(r'^device/(?P<uid>[\w.-]+)/edit$',                         'edit',                       name='device-edit'),
+ url(r'^device/(?P<uid>[\w.-]+)/update$',                       'update',                     name='device-update'),
+ url(r'^device/(?P<uid>[\w.-]+)/upload-opml$',                  'upload_opml',                name='device-upload-opml'),
 )
 
 urlpatterns += patterns('mygpo.web.views.users',
  url(r'^login/$',                                                 'login_user',                 name='login'),
  url(r'^logout/$',                                                 logout, {'next_page': '/'},  name='logout'),
- url(r'^migrate/$',                                               'migrate_user',               name='migrate-user'),
  url(r'^register/resend-activation$',                             'resend_activation',          name='resend-activation'),
  url(r'^register/restore_password$',                              'restore_password',           name='restore-password'),
  url(r'^register/$',                                               register,
-            {'backend': 'registration.backends.default.DefaultBackend',
+            {'backend': 'django_couchdb_utils.registration.backends.default.DefaultBackend',
              'form_class': RegistrationFormUniqueEmail},                                        name='register'),
     (r'^registration_complete/$',                                  direct_to_template,
             {'template': 'registration/registration_complete.html'}),
     (r'^activate/(?P<activation_key>\w+)$',                        activate,
-            {'backend': 'registration.backends.default.DefaultBackend'}),
+            {'backend': 'django_couchdb_utils.registration.backends.default.DefaultBackend'}),
 )
 

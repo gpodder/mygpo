@@ -2,11 +2,11 @@ function(doc)
 {
     if(doc.doc_type == "PodcastUserState")
     {
-        subscribed_devices = [];
+        var subscribed_devices = [];
 
         for(var n in doc.actions)
         {
-            action = doc.actions[n];
+            var action = doc.actions[n];
 
             if(action.action == "subscribe")
             {
@@ -14,21 +14,21 @@ function(doc)
             }
             else
             {
-                index = subscribed_devices.indexOf(action.device);
+                var index = subscribed_devices.indexOf(action.device);
                 subscribed_devices.splice(index, 1);
             }
         }
 
         for(var n in subscribed_devices)
         {
-            device = subscribed_devices[n];
+            var device = subscribed_devices[n];
 
             if(doc.disabled_devices && (doc.disabled_devices.indexOf(device) > -1))
             {
                 continue;
             }
 
-            emit([doc.podcast, doc.user_oldid, device], null);
+            emit([doc.podcast, doc.user, device], null);
         }
     }
 }

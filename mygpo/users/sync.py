@@ -4,8 +4,9 @@ from couchdbkit.ext.django.schema import *
 
 from django.contrib.auth.models import User
 
-from mygpo.core.models import Podcast
+from mygpo.core.models import Podcast, SubscriptionException
 from mygpo.utils import get_to_dict
+from mygpo.log import log
 
 
 GroupedDevices = namedtuple('GroupedDevices', 'is_synced devices')
@@ -165,7 +166,6 @@ class SyncedDevicesMixin(DocumentSchema):
         """ Applies the sync-actions to the device """
 
         add, rem = sync_actions
-        old_user = User.objects.get(id=self.oldid)
 
         podcasts = get_to_dict(Podcast, add + rem, get_id=Podcast.get_id)
 
@@ -174,9 +174,8 @@ class SyncedDevicesMixin(DocumentSchema):
             if podcast is None:
                 continue
             try:
-                podcast.subscribe(old_user, device)
-            except Exception as e:
-                raise
+                podcast.subscribe(self, device)
+            except SubscriptionException as e:
                 log('Web: %(username)s: cannot sync device: %(error)s' %
                     dict(username=self.username, error=repr(e)))
 
@@ -186,9 +185,8 @@ class SyncedDevicesMixin(DocumentSchema):
                 continue
 
             try:
-                podcast.unsubscribe(old_user, device)
-            except Exception as e:
-                raise
+                podcast.unsubscribe(self, device)
+            except SubscriptionException as e:
                 log('Web: %(username)s: cannot sync device: %(error)s' %
                     dict(username=self.username, error=repr(e)))
 

@@ -1,7 +1,6 @@
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, render_to_response
-from django.contrib.auth.models import User
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from django.contrib.sites.models import RequestSite
@@ -13,7 +12,7 @@ from mygpo.core.models import Podcast
 from mygpo.core.proxy import proxy_object
 from mygpo.api.simple import format_podcast_list
 from mygpo.share.models import PodcastList
-from mygpo import migrate
+from mygpo.users.models import User
 from mygpo.directory.views import search as directory_search
 
 
@@ -21,12 +20,12 @@ def list_decorator(must_own=False):
     def _tmp(f):
         def _decorator(request, username, listname, *args, **kwargs):
 
-            user = get_object_or_404(User, username=username)
+            user = User.get_user(username)
+            if not user:
+                raise Http404
 
             if must_own and request.user != user:
                 return HttpResponseForbidden()
-
-            user = migrate.get_or_migrate_user(user)
 
             plist = PodcastList.for_user_slug(user._id, listname)
 
@@ -49,8 +48,7 @@ def search(request, username, listname):
 @login_required
 def lists_own(request):
 
-    user = migrate.get_or_migrate_user(request.user)
-    lists = PodcastList.for_user(user._id)
+    lists = PodcastList.for_user(request.user._id)
 
     return render_to_response('lists.html', {
             'lists': lists
@@ -59,8 +57,9 @@ def lists_own(request):
 
 def lists_user(request, username):
 
-    user = get_object_or_404(User, username=username)
-    user = migrate.get_or_migrate_user(user)
+    user = User.get(username)
+    if not user:
+        raise Http404
 
     lists = PodcastList.for_user(user._id)
 
@@ -73,8 +72,7 @@ def lists_user(request, username):
 @list_decorator(must_own=False)
 def list_show(request, plist, owner):
 
-    user = migrate.get_or_migrate_user(request.user)
-    is_own = owner == user
+    is_own = owner == request.user
 
     plist = proxy_object(plist)
 
@@ -115,18 +113,16 @@ def create_list(request):
                     title=title))
         return HttpResponseRedirect(reverse('lists-overview'))
 
-    user = migrate.get_or_migrate_user(request.user)
-
-    plist = PodcastList.for_user_slug(user._id, slug)
+    plist = PodcastList.for_user_slug(request.user._id, slug)
 
     if plist is None:
         plist = PodcastList()
         plist.title = title
         plist.slug = slug
-        plist.user = user._id
+        plist.user = request.user._id
         plist.save()
 
-    list_url = reverse('list-show', args=[user.username, slug])
+    list_url = reverse('list-show', args=[request.user.username, slug])
     return HttpResponseRedirect(list_url)
 
 
@@ -162,9 +158,8 @@ def delete_list(request, plist, owner):
 @list_decorator(must_own=False)
 def rate_list(request, plist, owner):
     rating_val = int(request.GET.get('rate', None))
-    user = migrate.get_or_migrate_user(request.user)
 
-    plist.rate(rating_val, user._id)
+    plist.rate(rating_val, requset.user._id)
     plist.save()
 
     messages.success(request, _('Thanks for rating!'))

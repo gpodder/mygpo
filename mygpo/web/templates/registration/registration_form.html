@@ -28,7 +28,7 @@
   <p>{% trans "After registration, you'll receive an activation email to confirm the validity of your email address." %}</p>
 
   {% url resend-activation as resend-activation-url %}
-  <p>{% blocktrans %}If it doesn't arrive, you can <a href="{{ resend-activation-url }}">resend</a> it.{% endblocktrans %}</a>
+  <p>{% blocktrans %}If it doesn't arrive, you can <a href="{{ resend-activation-url }}">resend</a> it.{% endblocktrans %}
 
 {% endif %}
 

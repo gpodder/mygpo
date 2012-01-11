@@ -19,12 +19,10 @@ import collections
 from datetime import timedelta, datetime, time
 
 from django.db.models import Avg, Count
-from django.contrib.auth.models import User
 
 from mygpo.utils import daterange, flatten
 from mygpo.core.models import Podcast
 from mygpo.api.constants import DEVICE_TYPES
-from mygpo import migrate
 
 
 def listener_data(podcasts, start_date=datetime(2010, 1, 1), leap=timedelta(days=1)):
@@ -104,7 +102,7 @@ def episode_listener_data(episode, start_date=datetime(2010, 1, 1), leap=timedel
         next = d + leap
 
         if listeners and listeners[0] and listeners[0][0] == d.date():
-            day, l = listeners.pop()
+            day, l = listeners.pop(0)
         else:
             l = 0
 
@@ -134,8 +132,7 @@ def check_publisher_permission(user, podcast):
     if user.is_staff:
         return True
 
-    u = migrate.get_or_migrate_user(user)
-    return (podcast.get_id() in u.published_objects)
+    return (podcast.get_id() in user.published_objects)
 
 
 def colour_repr(val, max_val, colours):
@@ -147,6 +144,9 @@ def colour_repr(val, max_val, colours):
     between these two colors, based on its position within this segment.
     """
     if len(colours) == 1:
+        return colours[0]
+
+    if max_val == 0:
         return colours[0]
 
     # calculate position in the gradient; defines the segment

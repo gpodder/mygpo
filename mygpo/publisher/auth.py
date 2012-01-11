@@ -16,7 +16,6 @@
 #
 
 from django.http import HttpResponseRedirect
-from mygpo import migrate
 
 
 def require_publisher(protected_view):
@@ -46,7 +45,6 @@ def is_publisher(user):
     if user.is_staff:
         return True
 
-    user = migrate.get_or_migrate_user(user)
     if user.published_objects:
         return True
 
