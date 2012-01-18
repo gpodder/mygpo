@@ -28,7 +28,6 @@ from mygpo.core import models
 from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.utils import parse_range
 from mygpo.directory.tags import TagCloud
-from mygpo import migrate
 from mygpo.web.utils import get_episode_link_target, get_podcast_link_target
 
 
@@ -57,7 +56,6 @@ def tag_podcasts(request, tag, count):
 
 @cache_page(60 * 60)
 def podcast_info(request):
-    from mygpo import migrate
     url = sanitize_url(request.GET.get('url', ''))
     podcast = Podcast.for_url(url)
     if not podcast:

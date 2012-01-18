@@ -2,7 +2,6 @@ from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.utils import is_url
 from mygpo.data.feeddownloader import update_podcasts
 from mygpo.api.sanitizing import sanitize_url
-from mygpo import migrate
 
 
 def search_wrapper(result):

@@ -290,13 +290,3 @@ class SubscriptionAction(models.Model):
     class Meta:
         db_table = 'subscription_log'
         unique_together = ('device', 'podcast', 'timestamp')
-
-
-from django.db.models.signals import post_save, pre_delete
-from mygpo.migrate import save_podcast_signal, delete_podcast_signal, save_episode_signal, delete_episode_signal, save_device_signal, delete_device_signal
-
-post_save.connect(save_podcast_signal, sender=Podcast)
-pre_delete.connect(delete_podcast_signal, sender=Podcast)
-
-post_save.connect(save_episode_signal, sender=Episode)
-pre_delete.connect(delete_episode_signal, sender=Episode)

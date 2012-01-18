@@ -5,7 +5,6 @@ from django.core.management.base import BaseCommand
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core.models import Podcast
 from mygpo.users.models import User
-from mygpo import migrate
 
 
 class Command(BaseCommand):

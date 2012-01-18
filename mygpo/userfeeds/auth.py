@@ -18,7 +18,6 @@
 from django.http import HttpResponse, HttpResponseBadRequest, Http404
 from mygpo.users.models import User
 from mygpo.log import log
-from mygpo import migrate
 
 #############################################################################
 #

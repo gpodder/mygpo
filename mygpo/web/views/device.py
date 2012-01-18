@@ -33,7 +33,6 @@ from mygpo.log import log
 from mygpo.api import simple
 from mygpo.decorators import manual_gc, allowed_methods, repeat_on_conflict
 from mygpo.users.models import PodcastUserState, Device, DeviceUIDException
-from mygpo import migrate
 
 
 @manual_gc
@@ -264,14 +263,12 @@ def delete_permanently(request, device):
     for state in states:
         remove_device(state=state, dev=device)
 
-    user = migrate.get_or_migrate_user(request.user)
-
     @repeat_on_conflict(['user'])
     def _remove(user, device):
         user.remove_device(device)
         user.save()
 
-    _remove(user=user, device=device)
+    _remove(user=request.user, device=device)
 
     return HttpResponseRedirect(reverse('devices'))
 

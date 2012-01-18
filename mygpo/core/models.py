@@ -698,7 +698,6 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
     @repeat_on_conflict()
     def subscribe(self, user, device):
-        from mygpo import migrate
         state = self.get_user_state(user)
         state.subscribe(device)
         try:
@@ -709,7 +708,6 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
     @repeat_on_conflict()
     def unsubscribe(self, user, device):
-        from mygpo import migrate
         state = self.get_user_state(user)
         state.unsubscribe(device)
         try:

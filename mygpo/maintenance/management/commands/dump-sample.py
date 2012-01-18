@@ -7,7 +7,6 @@ from couchdb.multipart import write_multipart
 
 from django.core.management.base import BaseCommand
 
-from mygpo import migrate
 from mygpo.core.models import Podcast
 from mygpo.users.models import PodcastUserState, EpisodeUserState, \
          Suggestions, User
