@@ -415,7 +415,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
         One query is required for each podcast that is returned"""
 
-        total = cls.view('core/podcasts_by_id').total_rows
+        total = cls.count()
         db = cls.get_db()
 
         while True:
