@@ -32,7 +32,6 @@ from mygpo.directory import tags
 from mygpo.directory.toplist import PodcastToplist
 from mygpo.users.models import Suggestions, History, HistoryEntry
 from mygpo.users.models import PodcastUserState, User
-from mygpo.decorators import manual_gc
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render_to_response
 from datetime import datetime, timedelta
@@ -54,7 +53,6 @@ def home(request):
         return welcome(request)
 
 
-@manual_gc
 def welcome(request):
     current_site = RequestSite(request)
 
@@ -78,7 +76,6 @@ def welcome(request):
     }, context_instance=RequestContext(request))
 
 
-@manual_gc
 @login_required
 def dashboard(request, episode_count=10):
 
@@ -157,7 +154,6 @@ def cover_art(request, size, filename):
     else:
         raise Http404('Cover art not available')
 
-@manual_gc
 @login_required
 def history(request, count=15, uid=None):
 

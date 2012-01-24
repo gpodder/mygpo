@@ -22,14 +22,13 @@ from django.contrib import messages
 from mygpo.web.forms import UserAccountForm
 from django.forms import ValidationError
 from django.utils.translation import ugettext as _
-from mygpo.decorators import manual_gc, allowed_methods, repeat_on_conflict
+from mygpo.decorators import allowed_methods, repeat_on_conflict
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
 from mygpo.core.models import Podcast
 from mygpo.utils import get_to_dict
 
 
-@manual_gc
 @login_required
 @allowed_methods(['GET', 'POST'])
 def account(request):
@@ -70,7 +69,6 @@ def account(request):
     }, context_instance=RequestContext(request))
 
 
-@manual_gc
 @login_required
 @allowed_methods(['GET', 'POST'])
 def delete_account(request):
@@ -88,7 +86,6 @@ def delete_account(request):
         }, context_instance=RequestContext(request))
 
 
-@manual_gc
 @login_required
 @allowed_methods(['GET'])
 def privacy(request):
@@ -132,7 +129,6 @@ def privacy(request):
         }, context_instance=RequestContext(request))
 
 
-@manual_gc
 @login_required
 def share(request):
     site = RequestSite(request)

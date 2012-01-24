@@ -25,7 +25,7 @@ from django.contrib import messages
 from mygpo.web.forms import RestorePasswordForm
 from django.contrib.sites.models import RequestSite
 from django.conf import settings
-from mygpo.decorators import manual_gc, allowed_methods
+from mygpo.decorators import allowed_methods
 from django.utils.translation import ugettext as _
 import string
 import random
@@ -124,7 +124,6 @@ def restore_password(request):
     return render_to_response('password_reset.html', context_instance=RequestContext(request))
 
 
-@manual_gc
 @allowed_methods(['GET', 'POST'])
 def resend_activation(request):
 

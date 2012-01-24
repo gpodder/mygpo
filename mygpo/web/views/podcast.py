@@ -15,7 +15,7 @@ from mygpo.api.sanitizing import sanitize_url
 from mygpo.users.models import HistoryEntry
 from mygpo.web.forms import PrivacyForm, SyncForm
 from mygpo.directory.tags import tags_for_user
-from mygpo.decorators import manual_gc, allowed_methods, repeat_on_conflict
+from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.utils import daterange
 from mygpo.web.utils import get_podcast_link_target
 from mygpo.log import log
@@ -206,7 +206,6 @@ def remove_tag(request, podcast):
     return HttpResponseRedirect(get_podcast_link_target(podcast))
 
 
-@manual_gc
 @login_required
 @allowed_methods(['GET', 'POST'])
 def subscribe(request, podcast):
@@ -244,7 +243,6 @@ def subscribe(request, podcast):
     }, context_instance=RequestContext(request))
 
 
-@manual_gc
 @login_required
 def unsubscribe(request, podcast, device_uid):
 
@@ -267,7 +265,6 @@ def unsubscribe(request, podcast, device_uid):
     return HttpResponseRedirect(return_to)
 
 
-@manual_gc
 @login_required
 def subscribe_url(request):
     url = request.GET.get('url', None)

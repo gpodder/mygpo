@@ -31,11 +31,10 @@ from restkit.errors import Unauthorized
 
 from mygpo.log import log
 from mygpo.api import simple
-from mygpo.decorators import manual_gc, allowed_methods, repeat_on_conflict
+from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.users.models import PodcastUserState, Device, DeviceUIDException
 
 
-@manual_gc
 @login_required
 def overview(request):
 
@@ -64,7 +63,6 @@ def device_decorator(f):
 
 
 
-@manual_gc
 @login_required
 @device_decorator
 def show(request, device):
@@ -211,7 +209,6 @@ def upload_opml(request, device):
 
 
 @device_decorator
-@manual_gc
 @login_required
 def opml(request, device):
     response = simple.format_podcast_list(simple.get_subscriptions(request.user, device.uid), 'opml', request.user.username)
@@ -231,7 +228,6 @@ def symbian_opml(request, device):
 
 
 @device_decorator
-@manual_gc
 @login_required
 @allowed_methods(['POST'])
 def delete(request, device):
@@ -273,7 +269,6 @@ def delete_permanently(request, device):
     return HttpResponseRedirect(reverse('devices'))
 
 @device_decorator
-@manual_gc
 @login_required
 def undelete(request, device):
 
@@ -285,7 +280,6 @@ def undelete(request, device):
 
 
 @device_decorator
-@manual_gc
 @login_required
 @allowed_methods(['POST'])
 def sync(request, device):
@@ -309,7 +303,6 @@ def sync(request, device):
 
 
 @device_decorator
-@manual_gc
 @login_required
 @allowed_methods(['GET'])
 def unsync(request, device):

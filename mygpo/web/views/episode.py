@@ -34,13 +34,11 @@ from mygpo.core.proxy import proxy_object
 from mygpo.core.models import Episode
 from mygpo.users.models import Chapter, HistoryEntry, EpisodeAction
 from mygpo.api import backend
-from mygpo.decorators import manual_gc
 from mygpo.utils import parse_time, get_to_dict
 from mygpo.web.heatmap import EpisodeHeatmap
 from mygpo.web.utils import get_episode_link_target
 
 
-@manual_gc
 def episode(request, episode):
 
     podcast = Podcast.get(episode.podcast)
@@ -97,7 +95,6 @@ def episode(request, episode):
     }, context_instance=RequestContext(request))
 
 
-@manual_gc
 @login_required
 def add_chapter(request, episode):
     e_state = episode.get_user_state(request.user)
@@ -132,7 +129,6 @@ def add_chapter(request, episode):
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
 
-@manual_gc
 @login_required
 def remove_chapter(request, episode, start, end):
     e_state = episode.get_user_state(request.user)
@@ -145,7 +141,6 @@ def remove_chapter(request, episode, start, end):
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
 
-@manual_gc
 @login_required
 def toggle_favorite(request, episode):
     episode_state = episode.get_user_state(request.user)
@@ -159,7 +154,6 @@ def toggle_favorite(request, episode):
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
 
-@manual_gc
 @login_required
 def list_favorites(request):
     site = RequestSite(request)

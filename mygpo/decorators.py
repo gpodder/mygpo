@@ -66,15 +66,6 @@ def requires_token(token_name, denied_template=None):
     return decorator
 
 
-def manual_gc(view):
-    def tmp(*args, **kwargs):
-        res = view(*args, **kwargs)
-        gc.collect()
-        return res
-
-    return tmp
-
-
 def allowed_methods(methods):
     def decorator(fn):
         def tmp(request, *args, **kwargs):
