@@ -29,11 +29,7 @@ from mygpo.utils import parse_time
 from mygpo.decorators import allowed_methods
 import dateutil.parser
 from django.views.decorators.csrf import csrf_exempt
-
-try:
-    import simplejson as json
-except ImportError:
-    import json
+from mygpo.json import json
 
 
 @csrf_exempt

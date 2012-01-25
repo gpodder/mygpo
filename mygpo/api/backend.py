@@ -26,11 +26,7 @@ from mygpo.core.models import Podcast, Episode
 from mygpo.users.models import EpisodeUserState, Device
 from mygpo.decorators import repeat_on_conflict
 from datetime import timedelta
-
-try:
-    import simplejson as json
-except ImportError:
-    import json
+from mygpo.json import json
 
 
 def get_random_picks(languages=None):

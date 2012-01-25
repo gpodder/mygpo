@@ -45,12 +45,7 @@ from mygpo.log import log
 from django.utils.translation import ugettext as _
 from mygpo.decorators import allowed_methods
 from mygpo.utils import parse_range
-
-
-try:
-    import simplejson as json
-except ImportError:
-    import json
+from mygpo.json import json
 
 
 ALLOWED_FORMATS = ('txt', 'opml', 'json', 'jsonp', 'xml')

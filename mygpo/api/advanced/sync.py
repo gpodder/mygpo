@@ -21,11 +21,7 @@ from mygpo.api.httpresponse import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from mygpo.decorators import allowed_methods
-
-try:
-    import simplejson as json
-except ImportError:
-    import json
+from mygpo.json import json
 
 
 @csrf_exempt

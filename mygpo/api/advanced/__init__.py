@@ -37,14 +37,7 @@ from mygpo.core.models import SanitizingRule, Podcast
 from django.db import IntegrityError
 from django.views.decorators.csrf import csrf_exempt
 from mygpo.users.models import PodcastUserState, EpisodeAction, EpisodeUserState
-
-try:
-    import simplejson as json
-    JSONDecodeError = json.JSONDecodeError
-
-except ImportError:
-    import json
-    JSONDecodeError = ValueError
+from mygpo.json import json, JSONDecodeError
 
 
 # keys that are allowed in episode actions

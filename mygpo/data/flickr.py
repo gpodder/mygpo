@@ -20,10 +20,7 @@ import re
 import urllib
 from django.conf import settings
 
-try:
-    import simplejson as json
-except ImportError:
-    import json
+from mygpo.json import json
 
 
 def get_photo_sizes(photo_id):

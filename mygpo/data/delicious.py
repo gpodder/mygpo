@@ -20,10 +20,7 @@ import hashlib
 import urllib
 import urlparse
 
-try:
-    import simplejson as json
-except ImportError:
-    import json
+from mygpo.json import json
 
 
 def get_tags(url):
