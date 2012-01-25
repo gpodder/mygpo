@@ -17,6 +17,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+from functools import wraps
+
 from django.http import Http404
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
@@ -40,6 +42,7 @@ def requires_token(token_name, denied_template=None):
     * HttpResponseForbidden is returned, if denied_template is not given
     """
     def decorator(fn):
+        @wraps(fn)
         def tmp(request, username, *args, **kwargs):
 
             from mygpo.users.models import User
@@ -68,6 +71,7 @@ def requires_token(token_name, denied_template=None):
 
 def allowed_methods(methods):
     def decorator(fn):
+        @wraps(fn)
         def tmp(request, *args, **kwargs):
             if request.method in methods:
                 return fn(request, *args, **kwargs)
@@ -94,6 +98,7 @@ def repeat_on_conflict(obj_names=[], reload_f=None):
     reload_f = reload_f or default_reload
 
     def decorator(f):
+        @wraps(f)
         def tmp(*args, **kwargs):
             while True:
                 try:
@@ -117,6 +122,7 @@ def query_if_required():
     """
 
     def decorator(f):
+        @wraps(f)
         def wrapper(self, *args, **kwargs):
 
             if self._needs_query():

@@ -1,4 +1,5 @@
 from datetime import date, timedelta, datetime
+from functools import wraps
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseRedirect, Http404
@@ -294,6 +295,7 @@ def set_public(request, podcast, public):
 # regular views
 
 def slug_id_decorator(f):
+    @wraps(f)
     def _decorator(request, slug_id, *args, **kwargs):
         podcast = Podcast.for_slug_id(slug_id)
 
@@ -306,6 +308,7 @@ def slug_id_decorator(f):
 
 
 def oldid_decorator(f):
+    @wraps(f)
     def _decorator(request, pid, *args, **kwargs):
         try:
             pid = int(pid)

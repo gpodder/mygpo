@@ -1,3 +1,5 @@
+from functools import wraps
+
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, render_to_response
@@ -18,6 +20,7 @@ from mygpo.directory.views import search as directory_search
 
 def list_decorator(must_own=False):
     def _tmp(f):
+        @wraps(f)
         def _decorator(request, username, listname, *args, **kwargs):
 
             user = User.get_user(username)

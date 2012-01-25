@@ -15,10 +15,13 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+from functools import wraps
+
 from django.http import HttpResponseRedirect
 
 
 def require_publisher(protected_view):
+    @wraps(protected_view)
     def wrapper(request, *args, **kwargs):
 
         if not request.user.is_authenticated():

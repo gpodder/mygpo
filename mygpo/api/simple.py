@@ -17,6 +17,7 @@
 
 import string
 from itertools import islice
+from functools import wraps
 
 from couchdbkit.exceptions import ResourceNotFound
 
@@ -51,6 +52,7 @@ from mygpo.json import json
 ALLOWED_FORMATS = ('txt', 'opml', 'json', 'jsonp', 'xml')
 
 def check_format(fn):
+    @wraps(fn)
     def tmp(request, format, *args, **kwargs):
         if not format in ALLOWED_FORMATS:
             return HttpResponseBadRequest('Invalid format')

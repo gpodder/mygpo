@@ -15,6 +15,8 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+from functools import wraps
+
 from mygpo.users.models import EpisodeUserState
 
 
@@ -82,6 +84,7 @@ class EpisodeHeatmap(object):
         """ If required, queries the database before calling the function """
 
         def decorator(f):
+            @wraps(f)
             def tmp(self, *args, **kwargs):
                 if None in (self.heatmap, self.borders):
                     self._query()

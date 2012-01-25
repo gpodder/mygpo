@@ -16,6 +16,7 @@
 #
 
 from datetime import datetime
+from functools import wraps
 
 import dateutil.parser
 
@@ -229,6 +230,7 @@ def add_action(request, episode):
 # regular views
 
 def slug_id_decorator(f):
+    @wraps(f)
     def _decorator(request, p_slug_id, e_slug_id, *args, **kwargs):
         episode = Episode.for_slug_id(p_slug_id, e_slug_id)
 
@@ -241,6 +243,7 @@ def slug_id_decorator(f):
 
 
 def oldid_decorator(f):
+    @wraps(f)
     def _decorator(request, id, *args, **kwargs):
         episode = Episode.for_oldid(id)
 

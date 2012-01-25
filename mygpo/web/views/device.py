@@ -15,6 +15,8 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+from functools import wraps
+
 from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, \
@@ -50,6 +52,7 @@ def overview(request):
 
 def device_decorator(f):
     @login_required
+    @wraps(f)
     def _decorator(request, uid, *args, **kwargs):
 
         device = request.user.get_device_by_uid(uid)

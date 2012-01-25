@@ -15,6 +15,8 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+from functools import wraps
+
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.contrib.auth import authenticate, login
 from mygpo.log import log
@@ -99,6 +101,7 @@ def require_valid_user(protected_view):
 
     XXX: Fix usage descriptions, ideally provide an example as doctest.
     """
+    @wraps(protected_view)
     def wrapper(request, *args, **kwargs):
         def check_valid_user(user):
             return user.is_authenticated()
@@ -117,6 +120,7 @@ def check_username(protected_view):
     decorator to check whether the username passed to the view (from the URL)
     matches the username with which the user is authenticated.
     """
+    @wraps(protected_view)
     def wrapper(request, username, *args, **kwargs):
 
         if request.user.username.lower() == username.lower():
@@ -145,6 +149,7 @@ def has_perm_or_basicauth(perm, realm = ""):
 
     """
     def view_decorator(func):
+        @wraps(func)
         def wrapper(request, *args, **kwargs):
             return view_or_basicauth(func, request,
                                      lambda u: u.has_perm(perm),
