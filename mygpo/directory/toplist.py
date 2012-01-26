@@ -123,4 +123,11 @@ class PodcastToplist(Toplist):
         # sort by subscriber_count and id to ensure same order when subscriber_count is equal
         cur  = sorted(results, key=lambda p: (p.subscriber_count(), p.get_id()),      reverse=True)
         prev = sorted(results, key=lambda p: (p.prev_subscriber_count(), p.get_id()), reverse=True)
-        return [(prev.index(p)+1 if p in prev else 0, p) for p in cur]
+
+        res = dict( (p, n) for n, p in enumerate(cur))
+
+        for old, p in enumerate(prev):
+            new = res.get(p, 0)
+            res[p] = (new, old)
+
+        return [(old+1, p) for p, (new, old) in sorted(res.items(), key=lambda i: i[1][0])]
