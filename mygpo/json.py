@@ -26,4 +26,4 @@ except:
 
         # Otherwise use json from the stdlib
         import json
-        JSONDecodeError = ValueErro
+        JSONDecodeError = ValueError
