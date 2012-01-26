@@ -259,7 +259,7 @@
   $("#timestamp").watermark("empty = now", {className: 'watermark'});
 
   {% if episode.url|is_youtube_video %}
-   {{ episode|embed_youtube_video:user }}
+   {% embed_youtube_video podcast episode user %}
   {% endif %}
 
  </script>
