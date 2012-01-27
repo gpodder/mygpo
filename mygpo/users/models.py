@@ -117,10 +117,10 @@ class EpisodeAction(DocumentSchema):
                 startkey[2] = podcast_id
                 endkey[2]   = podcast_id
 
-            add_filters.append( lambda x: x['podcast_id'] == podcast_id )
+            add_filters.append( lambda x: x.podcast_id == podcast_id )
 
         elif isinstance(podcast_id, list):
-            add_filters.append( lambda x: x['podcast_id'] in podcast_id )
+            add_filters.append( lambda x: x.podcast_id in podcast_id )
 
         elif podcast_id is not None:
             raise ValueError('podcast_id can be either None, basestring '
@@ -132,7 +132,7 @@ class EpisodeAction(DocumentSchema):
                 startkey[3] = device_id
                 endkey[3]   = device_id
             else:
-                dev_filter = lambda x: x.get('device_id', None) == device_id
+                dev_filter = lambda x: getattr(x, 'device_id', None) == device_id
                 add_filters.append(dev_filter)
 
 

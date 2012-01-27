@@ -204,9 +204,9 @@ def episodes(request, username, version=1):
 
 def convert_position(action):
     """ convert position parameter for API 1 compatibility """
-    pos = action.get('position', None)
+    pos = getattr(action, 'position', None)
     if pos is not None:
-        action['position'] = format_time(pos)
+        action.position = format_time(pos)
     return action
 
 
