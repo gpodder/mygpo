@@ -862,7 +862,8 @@ class User(BaseUser, SyncedDevicesMixin):
         if not other:
             return False
 
-        return self._id == other._id
+        # ensure that other isn't AnonymousUser
+        return other.is_authenticated() and self._id == other_id
 
 
     def __repr__(self):

@@ -75,7 +75,8 @@ def episode(request, episode):
 
     chapters = []
     for user, chapter in Chapter.for_episode(episode._id):
-        chapter.is_own = user == request.user._id
+        chapter.is_own = request.user.is_authenticated() and \
+                         user == request.user._id
         chapters.append(chapter)
 
 
