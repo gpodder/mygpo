@@ -369,7 +369,7 @@ def device(request, username, device_uid):
         d.type = data['type']
 
 
-    request.user.update_device(device)
+    request.user.update_device(d)
 
     return HttpResponse()
 
