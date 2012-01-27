@@ -162,7 +162,7 @@ def delete_list(request, plist, owner):
 def rate_list(request, plist, owner):
     rating_val = int(request.GET.get('rate', None))
 
-    plist.rate(rating_val, requset.user._id)
+    plist.rate(rating_val, request.user._id)
     plist.save()
 
     messages.success(request, _('Thanks for rating!'))
