@@ -134,12 +134,22 @@ def share(request):
     site = RequestSite(request)
 
     if 'public_subscriptions' in request.GET:
-        request.user.subscriptions_token = ''
-        request.user.save()
+        @repeat_on_conflict(['user'])
+        def _update(user):
+            user.subscriptions_token = ''
+            user.save()
 
     elif 'private_subscriptions' in request.GET:
-        request.user.create_new_token('subscriptions_token')
-        request.user.save()
+        @repeat_on_conflict(['user'])
+        def _update(user):
+            user.create_new_token('subscriptions_token')
+            user.save()
+
+    else:
+        _update = None
+
+    if _update:
+        _update(user=request.user)
 
     token = request.user.subscriptions_token
 

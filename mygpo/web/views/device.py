@@ -146,8 +146,7 @@ def update(request, device):
         device.type = device_form.cleaned_data['type']
         device.uid  = device_form.cleaned_data['uid'].replace(' ', '-')
         try:
-            request.user.set_device(device)
-            request.user.save()
+            request.user.update_device(device)
             messages.success(request, _('Device updated'))
             uid = device.uid # accept the new UID after rest has succeeded
 
@@ -276,8 +275,7 @@ def delete_permanently(request, device):
 def undelete(request, device):
 
     device.deleted = False
-    request.user.set_device(device)
-    request.user.save()
+    request.user.update_device(device)
 
     return HttpResponseRedirect(reverse('device', args=[device.uid]))
 

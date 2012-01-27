@@ -646,11 +646,15 @@ class User(BaseUser, SyncedDevicesMixin):
                 return device
 
 
-    @repeat_on_conflict(['self'])
     def update_device(self, device):
         """ Sets the device and saves the user """
-        self.set_device(device)
-        self.save()
+
+        @repeat_on_conflict(['user'])
+        def _update(user, device):
+            user.set_device(device)
+            user.save()
+
+        _update(user=self, device=device)
 
 
     def set_device(self, device):
