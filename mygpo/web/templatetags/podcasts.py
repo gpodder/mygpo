@@ -13,7 +13,7 @@ from mygpo.web.utils import get_podcast_link_target, \
 register = template.Library()
 def create_podcast_logo(podcast, size):
     size = int(size)
-    s = '<img src="%s" alt="%s" height="%d" width="%d" />' % (podcast.get_logo_url(size), _('Logo'), size, size)
+    s = '<img src="%s" alt="%s" />' % (podcast.get_logo_url(size), _('Logo'),)
     return mark_safe(s)
 
 @register.filter

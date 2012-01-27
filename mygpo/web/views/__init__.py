@@ -128,7 +128,8 @@ def cover_art(request, size, filename):
             raise Http404('Cannot open cover file')
 
         try:
-            resized = im.resize((size, size), Image.ANTIALIAS)
+            im.thumbnail((size, size), Image.ANTIALIAS)
+            resized = im
         except IOError:
             # raised when trying to read an interlaced PNG; we use the original instead
             return HttpResponsePermanentRedirect('/media/logo/%s' % filename)
