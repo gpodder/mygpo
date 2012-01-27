@@ -407,13 +407,13 @@ def device_data(device):
 
 
 
-def get_podcast_data(podcasts, url):
+def get_podcast_data(podcasts, domain, url):
     """ Gets podcast data for a URL from a dict of podcasts """
     podcast = podcasts.get(url)
     return podcast_data(podcast, domain)
 
 
-def get_episode_data(podcasts, domain, clean_action_data, episode_status):
+def get_episode_data(podcasts, domain, clean_action_data, include_actions, episode_status):
     """ Get episode data for an episode status object """
     podcast_id = episode_status.episode.podcast
     podcast = podcasts.get(podcast_id, None)
@@ -454,7 +454,7 @@ def updates(request, username, device_uid):
     subscriptions = list(device.get_subscribed_podcasts())
 
     podcasts = dict( (p.url, p) for p in subscriptions )
-    prepare_podcast_data = partial(get_podcast_data, podcasts)
+    prepare_podcast_data = partial(get_podcast_data, podcasts, domain)
 
     ret['add'] = map(prepare_podcast_data, ret['add'])
 
@@ -465,7 +465,7 @@ def updates(request, username, device_uid):
     # index subscribed podcasts by their Id for fast access
     podcasts = dict( (p.get_id(), p) for p in subscriptions )
     prepare_episode_data = partial(get_episode_data, podcasts, domain,
-            clean_action_data)
+            clean_action_data, include_actions)
 
     episode_updates = get_episode_updates(request.user, subscriptions, since)
     ret['updates'] = map(prepare_episode_data, episode_updates)
