@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
 from django.utils.translation import ugettext as _
 from django.contrib import messages
+
 from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.core.proxy import proxy_object
 from mygpo.api.sanitizing import sanitize_url
@@ -20,6 +21,7 @@ from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.utils import daterange
 from mygpo.web.utils import get_podcast_link_target
 from mygpo.log import log
+
 
 MAX_TAGS_ON_PAGE=50
 

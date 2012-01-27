@@ -18,26 +18,29 @@
 from functools import partial
 from itertools import imap, chain
 from collections import defaultdict, namedtuple
-from mygpo.api.basic_auth import require_valid_user, check_username
+from datetime import datetime
+
+import dateutil.parser
+
 from django.http import HttpResponse, HttpResponseBadRequest, Http404
+from django.shortcuts import get_object_or_404
+from django.contrib.sites.models import RequestSite
+from django.db import IntegrityError
+from django.views.decorators.csrf import csrf_exempt
+
 from mygpo.api.constants import EPISODE_ACTION_TYPES, DEVICE_TYPES
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url, sanitize_urls
 from mygpo.api.advanced.directory import episode_data, podcast_data
 from mygpo.api.backend import get_device, get_favorites
-from django.shortcuts import get_object_or_404
-from django.contrib.sites.models import RequestSite
-from datetime import datetime
-import dateutil.parser
 from mygpo.log import log
 from mygpo.utils import parse_time, format_time, parse_bool, get_to_dict, get_timestamp
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.core import models
 from mygpo.core.models import SanitizingRule, Podcast
-from django.db import IntegrityError
-from django.views.decorators.csrf import csrf_exempt
 from mygpo.users.models import PodcastUserState, EpisodeAction, EpisodeUserState
 from mygpo.json import json, JSONDecodeError
+from mygpo.api.basic_auth import require_valid_user, check_username
 
 
 # keys that are allowed in episode actions

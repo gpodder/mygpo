@@ -1,5 +1,6 @@
 from couchdbkit.ext.django.schema import *
 
+
 class CommandRunStatus(DocumentSchema):
     """ Status of a single Command run """
 

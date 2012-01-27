@@ -18,11 +18,7 @@
 import collections
 from datetime import timedelta, datetime, time
 
-from django.db.models import Avg, Count
-
 from mygpo.utils import daterange, flatten
-from mygpo.core.models import Podcast
-from mygpo.api.constants import DEVICE_TYPES
 
 
 def listener_data(podcasts, start_date=datetime(2010, 1, 1), leap=timedelta(days=1)):

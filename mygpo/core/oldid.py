@@ -1,5 +1,6 @@
 from couchdbkit.ext.django.schema import *
 
+
 class OldIdMixin(DocumentSchema):
     """ Objects that have an Old-Id from the old MySQL backend """
 

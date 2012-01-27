@@ -18,6 +18,7 @@
 
 import re
 import urllib
+
 from django.conf import settings
 
 from mygpo.json import json

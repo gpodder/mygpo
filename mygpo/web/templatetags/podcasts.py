@@ -1,9 +1,9 @@
+import hashlib
+
 from django import template
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.utils.html import strip_tags
-
-import hashlib
 
 from mygpo.constants import PODCAST_LOGO_SIZE, PODCAST_LOGO_BIG_SIZE
 from mygpo.web.utils import get_podcast_link_target, \

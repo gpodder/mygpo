@@ -15,6 +15,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+from datetime import timedelta
 from collections import defaultdict
 from itertools import cycle
 import random
@@ -25,7 +26,6 @@ from mygpo.data.mimetype import get_type, CONTENT_TYPES
 from mygpo.core.models import Podcast, Episode
 from mygpo.users.models import EpisodeUserState, Device
 from mygpo.decorators import repeat_on_conflict
-from datetime import timedelta
 from mygpo.json import json
 
 

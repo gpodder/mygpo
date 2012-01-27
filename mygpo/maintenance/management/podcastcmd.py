@@ -1,10 +1,10 @@
 from itertools import islice, chain, imap as map
+from optparse import make_option
 
 from django.core.management.base import BaseCommand
 
 from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.directory.toplist import PodcastToplist
-from optparse import make_option
 
 
 class PodcastCommand(BaseCommand):

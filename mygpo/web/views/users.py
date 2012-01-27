@@ -15,6 +15,9 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+import string
+import random
+
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate
@@ -22,18 +25,14 @@ from django.contrib.auth.decorators import login_required
 from django.template.defaultfilters import slugify
 from django.template import RequestContext
 from django.contrib import messages
-from mygpo.web.forms import RestorePasswordForm
 from django.contrib.sites.models import RequestSite
 from django.conf import settings
-from mygpo.decorators import allowed_methods, repeat_on_conflict
 from django.utils.translation import ugettext as _
 
 from couchdbkit import ResourceConflict
 
-import string
-import random
-
-
+from mygpo.decorators import allowed_methods, repeat_on_conflict
+from mygpo.web.forms import RestorePasswordForm
 from mygpo.users.models import User
 from mygpo.web.forms import ResendActivationForm
 from mygpo.constants import DEFAULT_LOGIN_REDIRECT

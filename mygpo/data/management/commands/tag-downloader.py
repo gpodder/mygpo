@@ -1,12 +1,14 @@
+import time
+import urllib2
+from optparse import make_option
+
 from django.core.management.base import BaseCommand
 
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.directory.toplist import PodcastToplist
 from mygpo.data import delicious
-from optparse import make_option
-import time
-import urllib2
+
 
 SOURCE = 'delicious'
 

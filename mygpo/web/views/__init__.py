@@ -18,6 +18,13 @@
 import sys
 from itertools import islice
 from collections import defaultdict
+import os
+import StringIO
+from datetime import datetime, timedelta
+
+import Image
+import ImageDraw
+
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect, \
          Http404
@@ -25,6 +32,9 @@ from django.views.decorators.cache import cache_page
 from django.template import RequestContext
 from django.contrib import messages
 from django.utils.translation import ugettext as _
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, render_to_response
+from django.contrib.sites.models import RequestSite
 
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core import models
@@ -33,18 +43,10 @@ from mygpo.directory import tags
 from mygpo.directory.toplist import PodcastToplist
 from mygpo.users.models import Suggestions, History, HistoryEntry
 from mygpo.users.models import PodcastUserState, User
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, render_to_response
-from datetime import datetime, timedelta
-from django.contrib.sites.models import RequestSite
 from mygpo.web import utils
 from mygpo.api import backend
 from mygpo.utils import flatten, parse_range
 from mygpo.cache import get_cache_or_calc
-import os
-import Image
-import ImageDraw
-import StringIO
 
 
 def home(request):

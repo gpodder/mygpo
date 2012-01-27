@@ -1,6 +1,8 @@
 from django import template
 from django.utils.safestring import mark_safe
+
 from mygpo.web.utils import get_page_list
+
 
 register = template.Library()
 

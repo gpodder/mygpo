@@ -16,20 +16,23 @@
 #
 
 import time
-from mygpo.api.basic_auth import require_valid_user, check_username
+from datetime import datetime
+
+import dateutil.parser
+
 from django.http import HttpResponseBadRequest, Http404
+from django.views.decorators.csrf import csrf_exempt
+
 from mygpo.core import models
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.exceptions import ParameterMissing
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.api.backend import get_device
 from mygpo.users.models import Chapter
-from datetime import datetime
 from mygpo.utils import parse_time
 from mygpo.decorators import allowed_methods
-import dateutil.parser
-from django.views.decorators.csrf import csrf_exempt
 from mygpo.json import json
+from mygpo.api.basic_auth import require_valid_user, check_username
 
 
 @csrf_exempt

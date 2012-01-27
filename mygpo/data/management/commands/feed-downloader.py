@@ -1,11 +1,11 @@
 from itertools import islice
 import traceback
+from optparse import make_option
 
 from restkit.errors import RequestFailed
 
 from mygpo.maintenance.management.podcastcmd import PodcastCommand
 from mygpo.data import feeddownloader
-from optparse import make_option
 
 
 class Command(PodcastCommand):

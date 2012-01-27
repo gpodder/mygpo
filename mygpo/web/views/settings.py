@@ -19,12 +19,13 @@ from django.shortcuts import render_to_response
 from django.contrib.auth import logout
 from django.template import RequestContext
 from django.contrib import messages
-from mygpo.web.forms import UserAccountForm
 from django.forms import ValidationError
 from django.utils.translation import ugettext as _
-from mygpo.decorators import allowed_methods, repeat_on_conflict
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
+
+from mygpo.decorators import allowed_methods, repeat_on_conflict
+from mygpo.web.forms import UserAccountForm
 from mygpo.core.models import Podcast
 from mygpo.utils import get_to_dict
 

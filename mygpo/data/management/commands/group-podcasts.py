@@ -1,5 +1,7 @@
 from django.core.management.base import BaseCommand
+
 from mygpo.core.models import Podcast
+
 
 class Command(BaseCommand):
     def handle(self, *args, **options):

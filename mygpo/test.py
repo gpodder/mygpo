@@ -2,6 +2,7 @@ from couchdbkit.ext.django.testrunner import CouchDbKitTestSuiteRunner
 
 from django.conf import settings
 
+
 # inspired by
 # http://djangosnippets.org/snippets/2211/
 

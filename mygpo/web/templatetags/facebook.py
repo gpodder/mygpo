@@ -1,11 +1,13 @@
+import hashlib
+
 from django import template
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
-import hashlib
 
 from mygpo.constants import PODCAST_LOGO_BIG_SIZE
 from mygpo.web.templatetags.podcasts import create_podcast_logo
 from mygpo.web.utils import get_episode_link_target, get_podcast_link_target
+
 
 register = template.Library()
 

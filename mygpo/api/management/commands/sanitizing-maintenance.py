@@ -1,6 +1,9 @@
-from django.core.management.base import BaseCommand
-from mygpo.api.sanitizing import maintenance
 from optparse import make_option
+
+from django.core.management.base import BaseCommand
+
+from mygpo.api.sanitizing import maintenance
+
 
 class Command(BaseCommand):
 

@@ -15,15 +15,16 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from mygpo.api.basic_auth import require_valid_user, check_username
 from django.http import HttpResponseBadRequest, Http404
-from mygpo.api.httpresponse import JsonResponse
 from django.shortcuts import get_object_or_404
-from mygpo.users.models import PodcastUserState
 from django.views.decorators.csrf import csrf_exempt
+
 from mygpo.decorators import allowed_methods
 from mygpo.core.models import Episode, Podcast
 from mygpo.json import json
+from mygpo.api.basic_auth import require_valid_user, check_username
+from mygpo.api.httpresponse import JsonResponse
+from mygpo.users.models import PodcastUserState
 
 
 @csrf_exempt

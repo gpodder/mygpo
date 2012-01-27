@@ -24,11 +24,15 @@ from couchdbkit.exceptions import ResourceNotFound
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.core.cache import cache
+from django.http import HttpResponse, HttpResponseBadRequest
+from django.views.decorators.cache import cache_page
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404
+from django.contrib.sites.models import RequestSite
+from django.utils.translation import ugettext as _
 
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.api.backend import get_device
-from django.http import HttpResponse, HttpResponseBadRequest
-from django.views.decorators.cache import cache_page
 from mygpo.core import models
 from mygpo.core.models import Podcast
 from mygpo.users.models import Suggestions
@@ -38,12 +42,8 @@ from mygpo.api.sanitizing import sanitize_urls
 from mygpo.directory.toplist import PodcastToplist
 from mygpo.directory.models import ExamplePodcasts
 from mygpo.api.advanced.directory import podcast_data
-from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import get_object_or_404
-from django.contrib.sites.models import RequestSite
 from mygpo.directory.search import search_podcasts
 from mygpo.log import log
-from django.utils.translation import ugettext as _
 from mygpo.decorators import allowed_methods
 from mygpo.utils import parse_range
 from mygpo.json import json

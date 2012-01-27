@@ -19,6 +19,7 @@ from functools import wraps
 
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.contrib.auth import authenticate
+
 from mygpo.log import log
 from mygpo.decorators import repeat_on_conflict
 

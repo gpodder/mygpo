@@ -15,12 +15,14 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from mygpo.api.basic_auth import require_valid_user, check_username
-from mygpo.decorators import allowed_methods
+from datetime import datetime, timedelta
+
 from django.contrib import auth
 from django.http import HttpResponse
-from datetime import datetime, timedelta
 from django.views.decorators.csrf import csrf_exempt
+
+from mygpo.api.basic_auth import require_valid_user, check_username
+from mygpo.decorators import allowed_methods
 
 
 @csrf_exempt

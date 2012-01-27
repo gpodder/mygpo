@@ -1,7 +1,9 @@
 from django import template
 from django.utils.safestring import mark_safe
+
 from mygpo.core.models import Podcast
 from mygpo.data import youtube
+
 
 register = template.Library()
 

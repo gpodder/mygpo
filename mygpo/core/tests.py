@@ -15,9 +15,10 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from django.test import TestCase
 import unittest
 import doctest
+
+from django.test import TestCase
 
 import mygpo.utils
 from mygpo.core.models import Podcast, PodcastGroup

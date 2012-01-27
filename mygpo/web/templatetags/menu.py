@@ -2,6 +2,7 @@ from django import template
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext
 
+
 register = template.Library()
 
 HIDDEN_URIS = (

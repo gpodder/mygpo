@@ -24,6 +24,7 @@ try:
 except ImportError:
     from django.core.validators import email_re
 
+
 class EmailAuthenticationBackend(ModelBackend):
     def authenticate(self, username=None, password=None):
         if email_re.search(username):
