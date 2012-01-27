@@ -17,7 +17,7 @@
 
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
 from django.template.defaultfilters import slugify
 from django.template import RequestContext
@@ -25,8 +25,11 @@ from django.contrib import messages
 from mygpo.web.forms import RestorePasswordForm
 from django.contrib.sites.models import RequestSite
 from django.conf import settings
-from mygpo.decorators import allowed_methods
+from mygpo.decorators import allowed_methods, repeat_on_conflict
 from django.utils.translation import ugettext as _
+
+from couchdbkit import ResourceConflict
+
 import string
 import random
 
@@ -34,6 +37,14 @@ import random
 from mygpo.users.models import User
 from mygpo.web.forms import ResendActivationForm
 from mygpo.constants import DEFAULT_LOGIN_REDIRECT
+
+
+@repeat_on_conflict(['user'])
+def login(request, user):
+    from django.contrib.auth import login
+    login(request, user)
+
+
 
 def login_user(request):
     # Do not show login page for already-logged-in users
@@ -82,7 +93,7 @@ def login_user(request):
                 'activation_needed': True,
             }, context_instance=RequestContext(request))
 
-    login(request, user)
+    login(request=request, user=user)
 
     if 'next' in request.POST and request.POST['next'] and request.POST['next'] != '/login/':
         return HttpResponseRedirect(request.POST['next'])
@@ -119,9 +130,20 @@ def restore_password(request):
     subject = _('Reset password for your account on %s') % site
     message = _('Here is your new password for your account %(username)s on %(site)s: %(password)s') % {'username': user.username, 'site': site, 'password': pwd}
     user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
-    user.set_password(pwd)
-    user.save()
+    _set_password(user=user, password=pwd)
     return render_to_response('password_reset.html', context_instance=RequestContext(request))
+
+
+@repeat_on_conflict(['user'])
+def _set_password(user, password):
+    user.set_password(password)
+    user.save()
+
+
+@repeat_on_conflict(['user'])
+def _set_active(user, is_active=True):
+    user.is_active = is_active
+    user.save()
 
 
 @allowed_methods(['GET', 'POST'])
@@ -147,9 +169,8 @@ def resend_activation(request):
         if user.deleted:
             raise ValueError(_('You have deleted your account, but you can regster again.'))
 
-        if user.activation_key == User.ACTIVATED:
-            user.is_active = True
-            user.save()
+        if user.activation_key == None:
+            _set_active(user=user, is_active=True)
             raise ValueError(_('Your account already has been activated. Go ahead and log in.'))
 
         elif user.activation_key_expired():

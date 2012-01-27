@@ -26,6 +26,7 @@ from django.template import RequestContext
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 
+from mygpo.decorators import repeat_on_conflict
 from mygpo.core import models
 from mygpo.core.models import Podcast, Episode
 from mygpo.directory import tags
@@ -183,9 +184,15 @@ def history(request, count=15, uid=None):
 def blacklist(request, podcast_id):
     podcast_id = int(podcast_id)
     blacklisted_podcast = Podcast.for_oldid(podcast_id)
+
     suggestion = Suggestions.for_user(request.user)
-    suggestion.blacklist.append(blacklisted_podcast.get_id())
-    suggestion.save()
+
+    @repeat_on_conflict(['suggestion'])
+    def _update(suggestion, podcast_id):
+        suggestion.blacklist.append(podcast_id)
+        suggestion.save()
+
+    _update(suggestion=suggestion, podcast_id=blacklisted_podcast.get_id())
 
     request.user.suggestions_up_to_date = False
     request.user.save()
