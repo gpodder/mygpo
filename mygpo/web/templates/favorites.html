@@ -22,7 +22,9 @@
    <tr>
     <td>{% if episode.podcast %}{{ episode.podcast|podcast_logo }}{% endif %}</td>
     <td>{% episode_link episode episode.podcast %}<br/>
-     <span class="from_podcast">{% trans "from" %} {% podcast_group_link episode.podcast %}</td>
+     {% if episode.podcast %}
+      <span class="from_podcast">{% trans "from" %} {% podcast_group_link episode.podcast %}</td>
+     {% endif %}
    </tr>
   {% endfor %}
   </table>
