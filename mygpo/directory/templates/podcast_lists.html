@@ -40,7 +40,7 @@
 <div class="pagination">
 
  {% if entries.has_previous %}
-  <a href="{% url directory category %}?page={{ entries.previous_page_number }}">«</a>
+  <a href="{% url podcast-lists %}?page={{ entries.previous_page_number }}">«</a>
  {% endif %}
 
  {% for page in page_list %}
@@ -52,14 +52,14 @@
      {% if page == entries.number %}
       <strong>{{ page }}</strong>
      {% else %}
-      <a href="{% url directory category %}?page={{ page }}">{{ page }}</a>
+      <a href="{% url podcast-lists %}?page={{ page }}">{{ page }}</a>
      {% endif %}
    {% endif %}
   </span>
  {% endfor %}
 
  {% if entries.has_next %}
-  <a href="{% url directory category %}?page={{ entries.next_page_number }}">»</a>
+  <a href="{% url podcast-lists %}?page={{ entries.next_page_number }}">»</a>
  {% endif %}
 
 </div>
