@@ -60,7 +60,7 @@ def lists_own(request):
 
 def lists_user(request, username):
 
-    user = User.get(username)
+    user = User.get_user(username)
     if not user:
         raise Http404
 

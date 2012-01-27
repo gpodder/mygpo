@@ -11,7 +11,7 @@ def favorite_feed(request, username):
 
     site = RequestSite(request)
 
-    user = User.get(username)
+    user = User.get_user(username)
     if not user:
         raise Http404
 

@@ -25,7 +25,7 @@ from mygpo.log import log
 #
 def view_or_basicauth(view, request, username, token_name, realm = "", *args, **kwargs):
 
-    user = User.get(username)
+    user = User.get_user(username)
     if not user:
         raise Http404
 
