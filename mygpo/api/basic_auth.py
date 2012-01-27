@@ -18,8 +18,17 @@
 from functools import wraps
 
 from django.http import HttpResponse, HttpResponseBadRequest
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate
 from mygpo.log import log
+from mygpo.decorators import repeat_on_conflict
+
+
+@repeat_on_conflict(['user'])
+def login(request, user):
+    from django.contrib.auth import login
+    login(request, user)
+
+
 
 #############################################################################
 #
@@ -58,7 +67,7 @@ def view_or_basicauth(view, request, test_func, realm = "", *args, **kwargs):
                 uname, passwd = credentials
                 user = authenticate(username=uname, password=passwd)
                 if user is not None and user.is_active:
-                    login(request, user)
+                    login(request, user=user)
                     request.user = user
 
                     return view(request, *args, **kwargs)
