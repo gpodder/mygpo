@@ -575,6 +575,9 @@ class Device(Document):
     def __str__(self):
         return self.name
 
+    def __unicode__(self):
+        return self.name
+
 
 def token_generator(length=32):
     import random, string
