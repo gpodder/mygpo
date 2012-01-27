@@ -74,6 +74,9 @@ def subscriptions(request, username, device_uid):
     elif request.method == 'POST':
         d = get_device(request.user, device_uid)
 
+        if not request.raw_post_data:
+            return HttpResponseBadRequest('POST data must not be empty')
+
         actions = json.loads(request.raw_post_data)
         add = actions['add'] if 'add' in actions else []
         rem = actions['remove'] if 'remove' in actions else []
