@@ -62,7 +62,13 @@ def view_or_basicauth(view, request, test_func, realm = "", *args, **kwargs):
 
         # NOTE: We are only support basic authentication for now.
         if auth_type.lower() == 'basic':
-            credentials = credentials.decode('base64').split(':', 1)
+            try:
+                credentials = credentials.decode('base64').split(':', 1)
+
+            except Exception as e:
+                return HttpResponseBadRequest(
+                    'Could not decode credentials: {msg}'.format(msg=str(e)))
+
             if len(credentials) == 2:
                 uname, passwd = credentials
                 user = authenticate(username=uname, password=passwd)
