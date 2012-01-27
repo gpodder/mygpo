@@ -557,7 +557,7 @@ class Device(Document):
 
 
     def get_subscribed_podcasts(self):
-        return Podcast.get_multi(self.get_subscribed_podcast_ids())
+        return set(Podcast.get_multi(self.get_subscribed_podcast_ids()))
 
 
     def __hash__(self):
@@ -718,7 +718,7 @@ class User(BaseUser, SyncedDevicesMixin):
 
 
     def get_subscribed_podcasts(self, public=None):
-        return Podcast.get_multi(self.get_subscribed_podcast_ids(public=public))
+        return set(Podcast.get_multi(self.get_subscribed_podcast_ids(public=public)))
 
 
     def get_subscription_history(self, device_id=None, reverse=False, public=None):
