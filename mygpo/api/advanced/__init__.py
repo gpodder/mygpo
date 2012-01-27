@@ -315,14 +315,6 @@ def update_episode_actions(episode_state, action_list):
     if len1 < len2:
         changed = True
 
-    if episode_state.ref_url != e_url:
-        episode_state.ref_url = e_url
-        changed = True
-
-    if episode_state.podcast_ref_url != p_url:
-        episode_state.podcast_ref_url = p_url
-        changed = True
-
     if changed:
         episode_state.save()
 
