@@ -3,11 +3,11 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext
 from django.core.urlresolvers import reverse
 
-_ = ugettext
-
 from mygpo.api.constants import DEVICE_TYPES
 from mygpo.web.views.device import show
 
+
+_ = ugettext
 register = template.Library()
 
 # Create a dictionary of device_type -> caption mappings

@@ -1,5 +1,7 @@
 from django.core.management.base import BaseCommand
+
 from mygpo.users.models import User
+
 
 class Command(BaseCommand):
 

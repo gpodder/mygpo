@@ -1,12 +1,12 @@
 import collections
+import urlparse
+import re
 
 from django.core.cache import cache
 
 from mygpo.core import models
 from mygpo.log import log
 from mygpo.utils import iterate_together, progress
-import urlparse
-import re
 
 
 
@@ -54,7 +54,7 @@ def basic_sanitizing(url):
 def apply_sanitizing_rules(url, rules):
     """
     applies all url sanitizing rules to the given url
-    setting podcast=True uses only those rules which have use_podcast set to True. 
+    setting podcast=True uses only those rules which have use_podcast set to True.
     When passing podcast=False this check is ommitted. The same is valid
     for episode.
     """

@@ -16,24 +16,13 @@
 #
 
 from django.http import HttpResponse
-from django.core.serializers import serialize
-from django.db.models.query import QuerySet
-from django.core.serializers.json import DjangoJSONEncoder
 
-try:
-    import simplejson as json
-except ImportError:
-    import json
+from mygpo.json import json
 
 
 class JsonResponse(HttpResponse):
     def __init__(self, object, jsonp_padding=None):
-        if isinstance(object, QuerySet):
-            content = serialize('json', object)
-        else:
-            content = json.dumps(
-                object, indent=2, cls=DjangoJSONEncoder,
-                ensure_ascii=True)
+        content = json.dumps(object, ensure_ascii=True)
 
         if jsonp_padding:
             content = '%(func)s(%(obj)s)' % \

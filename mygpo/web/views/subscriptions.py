@@ -9,14 +9,13 @@ from django.http import HttpResponse, Http404
 
 from mygpo.core.models import Podcast
 from mygpo.utils import parse_bool, unzip, get_to_dict, skip_pairs
-from mygpo.decorators import manual_gc, requires_token
+from mygpo.decorators import requires_token
 from mygpo.api import backend, simple
 from mygpo.users.models import HistoryEntry, User
 from mygpo.web import utils
 from mygpo.cache import get_cache_or_calc
 
 
-@manual_gc
 @login_required
 def show_list(request):
     current_site = RequestSite(request)
@@ -27,7 +26,6 @@ def show_list(request):
     }, context_instance=RequestContext(request))
 
 
-@manual_gc
 @login_required
 def download_all(request):
     podcasts = request.user.get_subscribed_podcasts()
@@ -36,7 +34,6 @@ def download_all(request):
     return response
 
 
-@manual_gc
 @requires_token(token_name='subscriptions_token', denied_template='user_subscriptions_denied.html')
 def for_user(request, username):
     user = User.get_user(username)

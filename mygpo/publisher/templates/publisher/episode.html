@@ -43,6 +43,7 @@
    <p>Please note that updates from the podcast feed will overwrite any information given here. Please save only what is not contained in the feed.</p>
   {% endif %}
 
+  {% comment %}
   <form method="post" action"">
    {% csrf_token %}
    <table>
@@ -50,6 +51,7 @@
    </table>
    <input type="submit" value="save" />
   </form>
+  {% endcomment %}
 
   {% if timeline_data %}
    <h3>Listener Timeline</h3>

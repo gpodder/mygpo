@@ -21,6 +21,7 @@ from django.template import RequestContext
 from django.contrib.sites.models import RequestSite
 from django.utils.translation import ugettext as _
 
+
 def csrf_failure(request, reason=""):
     site = RequestSite(request)
     return render_to_response('csrf.html', {

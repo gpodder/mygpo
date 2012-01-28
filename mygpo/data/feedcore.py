@@ -22,11 +22,12 @@
 # Thomas Perl <thpinfo.com>; 2009-06-11
 #
 
-import feedparser
-
 import urllib
 import urlparse
 import urllib2
+
+import feedparser
+
 
 def patch_feedparser():
     """Monkey-patch the Universal Feed Parser"""
@@ -47,14 +48,14 @@ def patch_feedparser():
             feedparser._FeedParserMixin.mapContentType = mapContentType2
     except:
         pass
-    
-    # Fix parsing of Media RSS with feedparser, as described here: 
+
+    # Fix parsing of Media RSS with feedparser, as described here:
     #   http://code.google.com/p/feedparser/issues/detail?id=100#c4
     def _start_media_content(self, attrsD):
         context = self._getContext()
         context.setdefault('media_content', [])
         context['media_content'].append(attrsD)
-        
+
     try:
         feedparser._FeedParserMixin._start_media_content = _start_media_content
     except:

@@ -13,8 +13,8 @@ def tags_for_user(user, podcast_id=None):
     For each podcast, a list of tags can be retrieved
     """
 
-    res = Podcast.view('directory/tags_by_user', startkey=[user.id, podcast_id],
-        endkey=[user.id, podcast_id or 'ZZZZZZ'])
+    res = Podcast.view('directory/tags_by_user', startkey=[user._id, podcast_id],
+        endkey=[user._id, podcast_id or 'ZZZZZZ'])
 
     tags = defaultdict(list)
     for r in res:

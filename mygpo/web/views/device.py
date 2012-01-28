@@ -15,6 +15,8 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+from functools import wraps
+
 from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, \
@@ -31,12 +33,10 @@ from restkit.errors import Unauthorized
 
 from mygpo.log import log
 from mygpo.api import simple
-from mygpo.decorators import manual_gc, allowed_methods, repeat_on_conflict
+from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.users.models import PodcastUserState, Device, DeviceUIDException
-from mygpo import migrate
 
 
-@manual_gc
 @login_required
 def overview(request):
 
@@ -52,6 +52,7 @@ def overview(request):
 
 def device_decorator(f):
     @login_required
+    @wraps(f)
     def _decorator(request, uid, *args, **kwargs):
 
         device = request.user.get_device_by_uid(uid)
@@ -65,7 +66,6 @@ def device_decorator(f):
 
 
 
-@manual_gc
 @login_required
 @device_decorator
 def show(request, device):
@@ -146,8 +146,7 @@ def update(request, device):
         device.type = device_form.cleaned_data['type']
         device.uid  = device_form.cleaned_data['uid'].replace(' ', '-')
         try:
-            request.user.set_device(device)
-            request.user.save()
+            request.user.update_device(device)
             messages.success(request, _('Device updated'))
             uid = device.uid # accept the new UID after rest has succeeded
 
@@ -212,7 +211,6 @@ def upload_opml(request, device):
 
 
 @device_decorator
-@manual_gc
 @login_required
 def opml(request, device):
     response = simple.format_podcast_list(simple.get_subscriptions(request.user, device.uid), 'opml', request.user.username)
@@ -232,7 +230,6 @@ def symbian_opml(request, device):
 
 
 @device_decorator
-@manual_gc
 @login_required
 @allowed_methods(['POST'])
 def delete(request, device):
@@ -264,31 +261,26 @@ def delete_permanently(request, device):
     for state in states:
         remove_device(state=state, dev=device)
 
-    user = migrate.get_or_migrate_user(request.user)
-
     @repeat_on_conflict(['user'])
     def _remove(user, device):
         user.remove_device(device)
         user.save()
 
-    _remove(user=user, device=device)
+    _remove(user=request.user, device=device)
 
     return HttpResponseRedirect(reverse('devices'))
 
 @device_decorator
-@manual_gc
 @login_required
 def undelete(request, device):
 
     device.deleted = False
-    request.user.set_device(device)
-    request.user.save()
+    request.user.update_device(device)
 
     return HttpResponseRedirect(reverse('device', args=[device.uid]))
 
 
 @device_decorator
-@manual_gc
 @login_required
 @allowed_methods(['POST'])
 def sync(request, device):
@@ -312,7 +304,6 @@ def sync(request, device):
 
 
 @device_decorator
-@manual_gc
 @login_required
 @allowed_methods(['GET'])
 def unsync(request, device):

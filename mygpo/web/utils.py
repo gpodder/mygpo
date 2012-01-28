@@ -1,11 +1,11 @@
+import re
+from datetime import datetime
 
 from django.views.decorators.cache import never_cache
 from django.utils.html import strip_tags
 from django.core.urlresolvers import reverse
 
 from babel import Locale, UnknownLocaleError
-from datetime import datetime
-import re
 
 from mygpo.core.models import Podcast
 

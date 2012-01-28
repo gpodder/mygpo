@@ -17,19 +17,19 @@
 
 from django.http import Http404
 from django.core.urlresolvers import reverse
-from mygpo.api.httpresponse import JsonResponse
 from django.shortcuts import get_object_or_404
-from mygpo.api.sanitizing import sanitize_url
-from mygpo.directory.models import Category
 from django.contrib.sites.models import RequestSite
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import cache_page
+
 from mygpo.core import models
 from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.utils import parse_range
 from mygpo.directory.tags import TagCloud
-from mygpo import migrate
 from mygpo.web.utils import get_episode_link_target, get_podcast_link_target
+from mygpo.api.httpresponse import JsonResponse
+from mygpo.api.sanitizing import sanitize_url
+from mygpo.directory.models import Category
 
 
 @csrf_exempt
@@ -57,7 +57,6 @@ def tag_podcasts(request, tag, count):
 
 @cache_page(60 * 60)
 def podcast_info(request):
-    from mygpo import migrate
     url = sanitize_url(request.GET.get('url', ''))
     podcast = Podcast.for_url(url)
     if not podcast:

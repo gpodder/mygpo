@@ -1,3 +1,5 @@
+from functools import wraps
+
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, render_to_response
@@ -18,6 +20,7 @@ from mygpo.directory.views import search as directory_search
 
 def list_decorator(must_own=False):
     def _tmp(f):
+        @wraps(f)
         def _decorator(request, username, listname, *args, **kwargs):
 
             user = User.get_user(username)
@@ -57,7 +60,7 @@ def lists_own(request):
 
 def lists_user(request, username):
 
-    user = User.get(username)
+    user = User.get_user(username)
     if not user:
         raise Http404
 
@@ -159,7 +162,7 @@ def delete_list(request, plist, owner):
 def rate_list(request, plist, owner):
     rating_val = int(request.GET.get('rate', None))
 
-    plist.rate(rating_val, requset.user._id)
+    plist.rate(rating_val, request.user._id)
     plist.save()
 
     messages.success(request, _('Thanks for rating!'))

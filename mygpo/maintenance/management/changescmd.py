@@ -5,6 +5,7 @@ from abc import abstractmethod
 from django.core.management.base import BaseCommand
 
 from couchdbkit.exceptions import ResourceNotFound
+from couchdbkit import Consumer
 
 from mygpo.utils import progress
 from mygpo.maintenance.models import CommandStatus, CommandRunStatus
@@ -31,14 +32,18 @@ class ChangesCommand(BaseCommand):
     )
 
 
+    def __init__(self, status_id, command_name):
+        self.status_id = status_id
+        self.command_name = command_name
+
+
     def handle(self, *args, **options):
 
-        db = self.get_db()
+        self.db = self.get_db()
 
         status = self.get_cmd_status()
         since = self.get_since(status, options)
-        objects = self.get_objects(db, since)
-        actions = Counter()
+        self.actions = Counter()
 
 
         # create unfinished command run status
@@ -49,27 +54,40 @@ class ChangesCommand(BaseCommand):
         status.runs.append(run_status)
         status.save()
 
-        total = db.info()['update_seq']
-        status_str = ''
+        if options['silent']:
+            # "disable" print_status
+            self.print_status = lambda *args, **kwargs: None
 
-        for seq, obj in objects:
-            total = db.info()['update_seq']
+        try:
+            self.process(self.db, since)
 
-            self.handle_obj(seq, obj, actions)
+        except:
+            import traceback
+            traceback.print_exc()
 
-            if not options['silent']:
-                status_str = ', '.join('%s: %d' % x for x in actions.items())
-                progress(seq, total, status_str)
+        finally:
+            # finish command run status
+            total = self.db.info()['update_seq']
+            run_status.timestamp_finished = datetime.utcnow()
+            run_status.end_seq = total
+            run_status.status_counter = dict(self.actions)
+            # and overwrite existing one (we could keep a longer log here)
+            status.runs = [run_status]
+            status.save()
 
-        progress(total, total, status_str)
 
-        # finish command run status
-        run_status.timestamp_finished = datetime.utcnow()
-        run_status.end_seq = total
-        run_status.status_counter = dict(actions)
-        # and overwrite existing one (we could keep a longer log here)
-        status.runs = [run_status]
-        status.save()
+    def callback(self, line):
+        seq = line['seq']
+        doc = line['doc']
+
+        self.handle_obj(seq, doc, self.actions)
+        self.print_status(seq, self.actions)
+
+
+    def print_status(self, seq, actions):
+        total = self.db.info()['update_seq']
+        status_str = ', '.join('%s: %d' % x for x in self.actions.items())
+        progress(seq, total, status_str)
 
 
     @abstractmethod
@@ -78,20 +96,25 @@ class ChangesCommand(BaseCommand):
 
 
     @abstractmethod
-    def get_objects(self, db, since=0, limit=1):
-        raise NotImplemented
+    def process(self, db, since):
+        consumer = Consumer(db)
+        params = self.get_query_params()
+        consumer.wait(self.callback, since=since, heartbeat=10000, **params)
 
 
     def get_cmd_status(self):
-        status_id = self.get_status_id()
         try:
-            status = CommandStatus.get(status_id)
+            status = CommandStatus.get(self.status_id)
         except ResourceNotFound:
             status = CommandStatus()
-            status.command = self.get_command_name()
-            status._id = status_id
+            status.command = self.command_name
+            status._id = self.status_id
 
         return status
+
+
+    def get_query_params(self):
+        return dict(include_docs=True)
 
 
     @staticmethod
@@ -104,13 +127,4 @@ class ChangesCommand(BaseCommand):
 
     @abstractmethod
     def get_db(self):
-        raise NotImplemented
-
-
-    @abstractmethod
-    def get_status_id(self):
-        raise NotImplemented
-
-    @abstractmethod
-    def get_command_name(self):
         raise NotImplemented

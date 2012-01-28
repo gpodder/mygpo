@@ -15,16 +15,19 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+from functools import wraps
+
 from django.http import HttpResponse, HttpResponseBadRequest, Http404
+
 from mygpo.users.models import User
 from mygpo.log import log
-from mygpo import migrate
+
 
 #############################################################################
 #
 def view_or_basicauth(view, request, username, token_name, realm = "", *args, **kwargs):
 
-    user = User.get(username)
+    user = User.get_user(username)
     if not user:
         raise Http404
 
@@ -86,6 +89,7 @@ def auth_request(realm=''):
 def require_token_auth(token_name):
     def wrapper(protected_view):
 
+        @wraps(protected_view)
         def tmp(request, username, *args, **kwargs):
             return view_or_basicauth(protected_view, \
                                      request, \

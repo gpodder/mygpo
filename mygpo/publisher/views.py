@@ -1,3 +1,5 @@
+from functools import wraps
+
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect, \
@@ -213,6 +215,7 @@ def advertise(request):
 
 
 def group_slug_id_decorator(f):
+    @wraps(f)
     def _decorator(request, slug_id, *args, **kwargs):
         group = PodcastGroup.for_slug_id(slug_id)
 
@@ -225,6 +228,7 @@ def group_slug_id_decorator(f):
 
 
 def group_oldid_decorator(f):
+    @wraps(f)
     def _decorator(request, pid, *args, **kwargs):
         try:
             pid = int(pid)

@@ -121,10 +121,10 @@ class EpisodeAction(DocumentSchema):
                 startkey[2] = podcast_id
                 endkey[2]   = podcast_id
 
-            add_filters.append( lambda x: x['podcast_id'] == podcast_id )
+            add_filters.append( lambda x: x.podcast_id == podcast_id )
 
         elif isinstance(podcast_id, list):
-            add_filters.append( lambda x: x['podcast_id'] in podcast_id )
+            add_filters.append( lambda x: x.podcast_id in podcast_id )
 
         elif podcast_id is not None:
             raise ValueError('podcast_id can be either None, basestring '
@@ -136,7 +136,7 @@ class EpisodeAction(DocumentSchema):
                 startkey[3] = device_id
                 endkey[3]   = device_id
             else:
-                dev_filter = lambda x: x.get('device_id', None) == device_id
+                dev_filter = lambda x: getattr(x, 'device_id', None) == device_id
                 add_filters.append(dev_filter)
 
 
@@ -561,7 +561,7 @@ class Device(Document):
 
 
     def get_subscribed_podcasts(self):
-        return Podcast.get_multi(self.get_subscribed_podcast_ids())
+        return set(Podcast.get_multi(self.get_subscribed_podcast_ids()))
 
 
     def __hash__(self):
@@ -577,6 +577,9 @@ class Device(Document):
 
 
     def __str__(self):
+        return self.name
+
+    def __unicode__(self):
         return self.name
 
 
@@ -647,6 +650,17 @@ class User(BaseUser, SyncedDevicesMixin):
                 return device
 
 
+    def update_device(self, device):
+        """ Sets the device and saves the user """
+
+        @repeat_on_conflict(['user'])
+        def _update(user, device):
+            user.set_device(device)
+            user.save()
+
+        _update(user=self, device=device)
+
+
     def set_device(self, device):
 
         if not RE_DEVICE_UID.match(device.uid):
@@ -715,7 +729,7 @@ class User(BaseUser, SyncedDevicesMixin):
 
 
     def get_subscribed_podcasts(self, public=None):
-        return Podcast.get_multi(self.get_subscribed_podcast_ids(public=public))
+        return set(Podcast.get_multi(self.get_subscribed_podcast_ids(public=public)))
 
 
     def get_subscription_history(self, device_id=None, reverse=False, public=None):
@@ -859,7 +873,8 @@ class User(BaseUser, SyncedDevicesMixin):
         if not other:
             return False
 
-        return self._id == other._id
+        # ensure that other isn't AnonymousUser
+        return other.is_authenticated() and self._id == other_id
 
 
     def __repr__(self):

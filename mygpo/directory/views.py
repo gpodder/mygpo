@@ -10,7 +10,6 @@ from django.views.decorators.cache import cache_page
 from mygpo.core.models import Podcast
 from mygpo.core.proxy import proxy_object
 from mygpo.data.mimetype import CONTENT_TYPES
-from mygpo.decorators import manual_gc
 from mygpo.directory.models import Category
 from mygpo.directory.topics import Topics
 from mygpo.directory.toplist import PodcastToplist, EpisodeToplist
@@ -23,7 +22,6 @@ from mygpo.users.models import User
 from mygpo.cache import get_cache_or_calc
 
 
-@manual_gc
 def toplist(request, num=100, lang=None):
 
     try:
@@ -133,7 +131,6 @@ def search(request, template='search.html', args={}):
 
 
 
-@manual_gc
 def episode_toplist(request, num=100):
 
     try:

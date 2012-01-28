@@ -32,6 +32,7 @@
   <hr style="clear: none;"/>
 
   <h2>Edit</h2>
+  {% comment %}
   <p>Please note that information updates from the podcast feed will overwrite any information given here. Please save only what is not contained in the feed.</p>
   <form method="post" action="{% podcast_link_target podcast %}">
   {% csrf_token %}
@@ -40,6 +41,7 @@
    </table>
    <input type="submit" value="save" />
   </form>
+  {% endcomment %}
   <p><a href="{% podcast_link_target podcast "podcast-publisher-update" %}">{% trans "Update from Feed" %}</a> {% trans "(this might take a few seconds)" %}</p>
 
   <div class="info">To update all of your published podcasts automatically, you can request the URL (<a href="{% podcast_link_target podcast "podcast-publisher-detail" %}?new_token">Create a new token</a>)<br />

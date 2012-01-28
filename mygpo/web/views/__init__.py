@@ -18,6 +18,13 @@
 import sys
 from itertools import islice
 from collections import defaultdict
+import os
+import StringIO
+from datetime import datetime, timedelta
+
+import Image
+import ImageDraw
+
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect, \
          Http404
@@ -25,26 +32,21 @@ from django.views.decorators.cache import cache_page
 from django.template import RequestContext
 from django.contrib import messages
 from django.utils.translation import ugettext as _
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, render_to_response
+from django.contrib.sites.models import RequestSite
 
+from mygpo.decorators import repeat_on_conflict
 from mygpo.core import models
 from mygpo.core.models import Podcast, Episode
 from mygpo.directory import tags
 from mygpo.directory.toplist import PodcastToplist
 from mygpo.users.models import Suggestions, History, HistoryEntry
 from mygpo.users.models import PodcastUserState, User
-from mygpo.decorators import manual_gc
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, render_to_response
-from datetime import datetime, timedelta
-from django.contrib.sites.models import RequestSite
 from mygpo.web import utils
 from mygpo.api import backend
 from mygpo.utils import flatten, parse_range
 from mygpo.cache import get_cache_or_calc
-import os
-import Image
-import ImageDraw
-import StringIO
 
 
 def home(request):
@@ -54,7 +56,6 @@ def home(request):
         return welcome(request)
 
 
-@manual_gc
 def welcome(request):
     current_site = RequestSite(request)
 
@@ -78,7 +79,6 @@ def welcome(request):
     }, context_instance=RequestContext(request))
 
 
-@manual_gc
 @login_required
 def dashboard(request, episode_count=10):
 
@@ -131,7 +131,8 @@ def cover_art(request, size, filename):
             raise Http404('Cannot open cover file')
 
         try:
-            resized = im.resize((size, size), Image.ANTIALIAS)
+            im.thumbnail((size, size), Image.ANTIALIAS)
+            resized = im
         except IOError:
             # raised when trying to read an interlaced PNG; we use the original instead
             return HttpResponsePermanentRedirect('/media/logo/%s' % filename)
@@ -157,7 +158,6 @@ def cover_art(request, size, filename):
     else:
         raise Http404('Cover art not available')
 
-@manual_gc
 @login_required
 def history(request, count=15, uid=None):
 
@@ -186,9 +186,15 @@ def history(request, count=15, uid=None):
 def blacklist(request, podcast_id):
     podcast_id = int(podcast_id)
     blacklisted_podcast = Podcast.for_oldid(podcast_id)
+
     suggestion = Suggestions.for_user(request.user)
-    suggestion.blacklist.append(blacklisted_podcast.get_id())
-    suggestion.save()
+
+    @repeat_on_conflict(['suggestion'])
+    def _update(suggestion, podcast_id):
+        suggestion.blacklist.append(podcast_id)
+        suggestion.save()
+
+    _update(suggestion=suggestion, podcast_id=blacklisted_podcast.get_id())
 
     request.user.suggestions_up_to_date = False
     request.user.save()

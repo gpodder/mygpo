@@ -1,5 +1,7 @@
-from django import template
 from datetime import time
+
+from django import template
+
 
 register = template.Library()
 

@@ -8,6 +8,7 @@ from mygpo import utils
 from mygpo.data.mimetype import get_type, get_mimetype
 from mygpo.web.utils import get_episode_link_target
 
+
 register = template.Library()
 
 @register.filter

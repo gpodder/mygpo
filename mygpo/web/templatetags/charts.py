@@ -1,5 +1,6 @@
 from django import template
 from django.utils.safestring import mark_safe
+
 from mygpo.utils import format_time
 from mygpo.publisher.utils import colour_repr
 

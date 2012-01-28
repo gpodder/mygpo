@@ -1,9 +1,9 @@
+import re
+from htmlentitydefs import entitydefs
 
 from django import template
 from django.utils.safestring import mark_safe
 
-import re
-from htmlentitydefs import entitydefs
 
 register = template.Library()
 

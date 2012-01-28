@@ -1,4 +1,5 @@
 from datetime import date, timedelta, datetime
+from functools import wraps
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseRedirect, Http404
@@ -9,16 +10,18 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
 from django.utils.translation import ugettext as _
 from django.contrib import messages
+
 from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.core.proxy import proxy_object
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.users.models import HistoryEntry
 from mygpo.web.forms import PrivacyForm, SyncForm
 from mygpo.directory.tags import tags_for_user
-from mygpo.decorators import manual_gc, allowed_methods, repeat_on_conflict
+from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.utils import daterange
 from mygpo.web.utils import get_podcast_link_target
 from mygpo.log import log
+
 
 MAX_TAGS_ON_PAGE=50
 
@@ -206,7 +209,6 @@ def remove_tag(request, podcast):
     return HttpResponseRedirect(get_podcast_link_target(podcast))
 
 
-@manual_gc
 @login_required
 @allowed_methods(['GET', 'POST'])
 def subscribe(request, podcast):
@@ -244,7 +246,6 @@ def subscribe(request, podcast):
     }, context_instance=RequestContext(request))
 
 
-@manual_gc
 @login_required
 def unsubscribe(request, podcast, device_uid):
 
@@ -267,7 +268,6 @@ def unsubscribe(request, podcast, device_uid):
     return HttpResponseRedirect(return_to)
 
 
-@manual_gc
 @login_required
 def subscribe_url(request):
     url = request.GET.get('url', None)
@@ -297,6 +297,7 @@ def set_public(request, podcast, public):
 # regular views
 
 def slug_id_decorator(f):
+    @wraps(f)
     def _decorator(request, slug_id, *args, **kwargs):
         podcast = Podcast.for_slug_id(slug_id)
 
@@ -309,6 +310,7 @@ def slug_id_decorator(f):
 
 
 def oldid_decorator(f):
+    @wraps(f)
     def _decorator(request, pid, *args, **kwargs):
         try:
             pid = int(pid)

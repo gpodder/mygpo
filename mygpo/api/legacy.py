@@ -15,17 +15,20 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+from datetime import datetime
+
 from django.http import HttpResponse
+from django.utils.datastructures import MultiValueDictKeyError
+from django.db import IntegrityError
+from django.views.decorators.csrf import csrf_exempt
+
+from mygpo.log import log
+from mygpo.api.sanitizing import sanitize_urls
+from mygpo.users.models import User
 from mygpo.api.opml import Importer, Exporter
 from mygpo.core.models import Podcast
 from mygpo.api.backend import get_device
-from datetime import datetime
-from django.utils.datastructures import MultiValueDictKeyError
-from django.db import IntegrityError
-from mygpo.log import log
-from mygpo.api.sanitizing import sanitize_urls
-from django.views.decorators.csrf import csrf_exempt
-from mygpo.users.models import User
+
 
 LEGACY_DEVICE_NAME = 'Legacy Device'
 LEGACY_DEVICE_UID  = 'legacy'

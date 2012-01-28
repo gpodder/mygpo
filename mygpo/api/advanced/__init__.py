@@ -18,33 +18,29 @@
 from functools import partial
 from itertools import imap, chain
 from collections import defaultdict, namedtuple
-from mygpo.api.basic_auth import require_valid_user, check_username
+from datetime import datetime
+
+import dateutil.parser
+
 from django.http import HttpResponse, HttpResponseBadRequest, Http404
+from django.shortcuts import get_object_or_404
+from django.contrib.sites.models import RequestSite
+from django.db import IntegrityError
+from django.views.decorators.csrf import csrf_exempt
+
 from mygpo.api.constants import EPISODE_ACTION_TYPES, DEVICE_TYPES
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url, sanitize_urls
 from mygpo.api.advanced.directory import episode_data, podcast_data
 from mygpo.api.backend import get_device, get_favorites
-from django.shortcuts import get_object_or_404
-from django.contrib.sites.models import RequestSite
-from datetime import datetime
-import dateutil.parser
 from mygpo.log import log
 from mygpo.utils import parse_time, format_time, parse_bool, get_to_dict, get_timestamp
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.core import models
 from mygpo.core.models import SanitizingRule, Podcast
-from django.db import IntegrityError
-from django.views.decorators.csrf import csrf_exempt
 from mygpo.users.models import PodcastUserState, EpisodeAction, EpisodeUserState
-
-try:
-    import simplejson as json
-    JSONDecodeError = json.JSONDecodeError
-
-except ImportError:
-    import json
-    JSONDecodeError = ValueError
+from mygpo.json import json, JSONDecodeError
+from mygpo.api.basic_auth import require_valid_user, check_username
 
 
 # keys that are allowed in episode actions
@@ -80,6 +76,9 @@ def subscriptions(request, username, device_uid):
 
     elif request.method == 'POST':
         d = get_device(request.user, device_uid)
+
+        if not request.raw_post_data:
+            return HttpResponseBadRequest('POST data must not be empty')
 
         actions = json.loads(request.raw_post_data)
         add = actions['add'] if 'add' in actions else []
@@ -208,6 +207,16 @@ def episodes(request, username, version=1):
         return JsonResponse(get_episode_changes(request.user, podcast, device, since, now, aggregated, version))
 
 
+
+def convert_position(action):
+    """ convert position parameter for API 1 compatibility """
+    pos = getattr(action, 'position', None)
+    if pos is not None:
+        action.position = format_time(pos)
+    return action
+
+
+
 def get_episode_changes(user, podcast, device, since, until, aggregated, version):
 
     devices = dict( (dev.id, dev.uid) for dev in user.devices )
@@ -219,13 +228,6 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
     actions = EpisodeAction.filter(user._id, since, until, **args)
 
     if version == 1:
-        # convert position parameter for API 1 compatibility
-        def convert_position(action):
-            pos = action.get('position', None)
-            if pos is not None:
-                action['position'] = format_time(pos)
-            return action
-
         actions = imap(convert_position, actions)
 
     clean_data = partial(clean_episode_action_data,
@@ -300,33 +302,29 @@ def update_episodes(user, actions, now):
             log('episode_state (%s, %s, %s): %s' % (user,
                         p_url, e_url, episode_state))
 
-
-        @repeat_on_conflict(['episode_state'])
-        def _update(episode_state):
-            changed = False
-
-            len1 = len(episode_state.actions)
-            episode_state.add_actions(action_list)
-            len2 = len(episode_state.actions)
-
-            if len1 < len2:
-                changed = True
-
-            if episode_state.ref_url != e_url:
-                episode_state.ref_url = e_url
-                changed = True
-
-            if episode_state.podcast_ref_url != p_url:
-                episode_state.podcast_ref_url = p_url
-                changed = True
-
-            if changed:
-                episode_state.save()
-
-
-        _update(episode_state=episode_state)
+        update_episode_actions(episode_state=episode_state,
+            action_list=action_list)
 
     return update_urls
+
+
+@repeat_on_conflict(['episode_state'])
+def update_episode_actions(episode_state, action_list):
+    """ Adds actions to the episode state and saves if necessary """
+
+    changed = False
+
+    len1 = len(episode_state.actions)
+    episode_state.add_actions(action_list)
+    len2 = len(episode_state.actions)
+
+    if len1 < len2:
+        changed = True
+
+    if changed:
+        episode_state.save()
+
+    return changed
 
 
 def parse_episode_action(action, user, update_urls, now):
@@ -377,12 +375,7 @@ def device(request, username, device_uid):
         d.type = data['type']
 
 
-    @repeat_on_conflict(['user'])
-    def _update(user, device):
-        user.set_device(device)
-        user.save()
-
-    _update(user=request.user, device=d)
+    request.user.update_device(d)
 
     return HttpResponse()
 
@@ -419,6 +412,27 @@ def device_data(device):
     )
 
 
+
+def get_podcast_data(podcasts, domain, url):
+    """ Gets podcast data for a URL from a dict of podcasts """
+    podcast = podcasts.get(url)
+    return podcast_data(podcast, domain)
+
+
+def get_episode_data(podcasts, domain, clean_action_data, include_actions, episode_status):
+    """ Get episode data for an episode status object """
+    podcast_id = episode_status.episode.podcast
+    podcast = podcasts.get(podcast_id, None)
+    t = episode_data(episode_status.episode, domain, podcast)
+    t['status'] = episode_status.status
+
+    # include latest action (bug 1419)
+    if include_actions and episode_status.action:
+        t['action'] = clean_action_data(episode_status.action)
+
+    return t
+
+
 @csrf_exempt
 @require_valid_user
 @check_username
@@ -446,43 +460,18 @@ def updates(request, username, device_uid):
     subscriptions = list(device.get_subscribed_podcasts())
 
     podcasts = dict( (p.url, p) for p in subscriptions )
-
-    def prepare_podcast_data(url):
-        podcast = podcasts.get(url)
-        try:
-            return podcast_data(podcast, domain)
-        except ValueError:
-            from mygpo.log import log
-            log('updates: podcast is None for url %s and dict %s' %
-                    (url, podcasts.keys()))
-            for k,v in podcasts.items():
-                log('%s - %s' % (k, v))
-
-            raise
+    prepare_podcast_data = partial(get_podcast_data, podcasts, domain)
 
     ret['add'] = map(prepare_podcast_data, ret['add'])
 
     devices = dict( (dev.id, dev.uid) for dev in request.user.devices )
-    clean_data = partial(clean_episode_action_data,
+    clean_action_data = partial(clean_episode_action_data,
             user=request.user, devices=devices)
-
-
 
     # index subscribed podcasts by their Id for fast access
     podcasts = dict( (p.get_id(), p) for p in subscriptions )
-
-    def prepare_episode_data(episode_status):
-        """ converts the data to primitives that converted to JSON """
-        podcast_id = episode_status.episode.podcast
-        podcast = podcasts.get(podcast_id, None)
-        t = episode_data(episode_status.episode, domain, podcast)
-        t['status'] = episode_status.status
-
-        # include latest action (bug 1419)
-        if include_actions and episode_status.action:
-            t['action'] = clean_data(episode_status.action)
-
-        return t
+    prepare_episode_data = partial(get_episode_data, podcasts, domain,
+            clean_action_data, include_actions)
 
     episode_updates = get_episode_updates(request.user, subscriptions, since)
     ret['updates'] = map(prepare_episode_data, episode_updates)

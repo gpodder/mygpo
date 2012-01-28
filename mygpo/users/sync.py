@@ -2,8 +2,6 @@ from collections import namedtuple
 
 from couchdbkit.ext.django.schema import *
 
-from django.contrib.auth.models import User
-
 from mygpo.core.models import Podcast, SubscriptionException
 from mygpo.utils import get_to_dict
 from mygpo.log import log
