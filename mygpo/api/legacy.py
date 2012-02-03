@@ -48,7 +48,8 @@ def upload(request):
     if (not user):
         return HttpResponse('@AUTHFAIL', mimetype='text/plain')
 
-    dev = get_device(user, LEGACY_DEVICE_UID)
+    dev = get_device(user, LEGACY_DEVICE_UID,
+            request.META.get('HTTP_USER_AGENT', ''))
 
     existing_urls = [x.url for x in dev.get_subscribed_podcasts()]
 
@@ -97,7 +98,9 @@ def getlist(request):
     if user is None:
         return HttpResponse('@AUTHFAIL', mimetype='text/plain')
 
-    dev = get_device(user, 'legacy', undelete=True)
+    dev = get_device(user, LEGACY_DEVICE_UID,
+            request.META.get('HTTP_USER_AGENT', ''),
+            undelete=True)
     podcasts = dev.get_subscribed_podcasts()
 
     # FIXME: Get username and set a proper title (e.g. "thp's subscription list")

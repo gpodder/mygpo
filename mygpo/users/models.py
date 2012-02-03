@@ -513,6 +513,7 @@ class Device(Document):
     type     = StringProperty(required=True, default='other')
     settings = DictProperty()
     deleted  = BooleanProperty(default=False)
+    user_agent = StringProperty()
 
     @classmethod
     def for_oldid(cls, oldid):

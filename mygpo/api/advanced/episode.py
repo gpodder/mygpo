@@ -144,7 +144,8 @@ def update_chapters(req, user):
 
     device = None
     if 'device' in req:
-        device = get_device(request.user, req['device'], undelete=True)
+        device = get_device(request.user, req['device'],
+                request.META.get('HTTP_USER_AGENT', ''), undelete=True)
 
     timestamp = dateutil.parser.parse(req['timestamp']) if 'timestamp' in req else datetime.utcnow()
 
@@ -170,7 +171,8 @@ def parse_new_chapters(user, chapters):
 
         device_uid = c.get('device', None)
         if device_uid:
-            device_id = get_device(user, device_uid, undelete=True).id
+            device_id = get_device(user, device_uid,
+                    request.META.get('HTTP_USER_AGENT', ''), undelete=True).id
         else:
             device_id = None
 

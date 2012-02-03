@@ -206,7 +206,7 @@ def upload_opml(request, device):
 
     opml = request.FILES['opml'].read()
     subscriptions = simple.parse_subscription(opml, 'opml')
-    simple.set_subscriptions(subscriptions, request.user, device.uid)
+    simple.set_subscriptions(subscriptions, request.user, device.uid, None)
     return HttpResponseRedirect(reverse('device', args=[device.id]))
 
 

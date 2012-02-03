@@ -75,7 +75,8 @@ def subscriptions(request, username, device_uid):
         return JsonResponse(changes)
 
     elif request.method == 'POST':
-        d = get_device(request.user, device_uid)
+        d = get_device(request.user, device_uid,
+                request.META.get('HTTP_USER_AGENT', ''))
 
         if not request.raw_post_data:
             return HttpResponseBadRequest('POST data must not be empty')
@@ -161,6 +162,7 @@ def episodes(request, username, version=1):
     version = int(version)
     now = datetime.now()
     now_ = get_timestamp(now)
+    ua_string = request.META.get('HTTP_USER_AGENT', '')
 
     if request.method == 'POST':
         try:
@@ -170,7 +172,7 @@ def episodes(request, username, version=1):
             return HttpResponseBadRequest()
 
         try:
-            update_urls = update_episodes(request.user, actions, now)
+            update_urls = update_episodes(request.user, actions, now, ua_string)
         except Exception, e:
             import traceback
             log('could not update episodes for user %s: %s %s: %s' % (username, e, traceback.format_exc(), actions))
@@ -274,7 +276,7 @@ def clean_episode_action_data(action, user, devices):
 
 
 
-def update_episodes(user, actions, now):
+def update_episodes(user, actions, now, ua_string):
     update_urls = []
 
     grouped_actions = defaultdict(list)
@@ -290,7 +292,7 @@ def update_episodes(user, actions, now):
         episode_url = sanitize_append(episode_url, 'episode', update_urls)
         if episode_url == '': continue
 
-        act = parse_episode_action(action, user, update_urls, now)
+        act = parse_episode_action(action, user, update_urls, now, ua_string)
         grouped_actions[ (podcast_url, episode_url) ].append(act)
 
     # load the episode state only once for every episode
@@ -327,7 +329,7 @@ def update_episode_actions(episode_state, action_list):
     return changed
 
 
-def parse_episode_action(action, user, update_urls, now):
+def parse_episode_action(action, user, update_urls, now, ua_string):
     action_str  = action.get('action', None)
     if not valid_episodeaction(action_str):
         raise Exception('invalid action %s' % action_str)
@@ -337,7 +339,7 @@ def parse_episode_action(action, user, update_urls, now):
     new_action.action = action['action']
 
     if action.get('device', False):
-        device = get_device(user, action['device'])
+        device = get_device(user, action['device'], ua_string)
         new_action.device = device.id
 
     if action.get('timestamp', False):
@@ -360,7 +362,8 @@ def parse_episode_action(action, user, update_urls, now):
 # instead of "POST" requests for uploading device settings
 @allowed_methods(['POST', 'PUT'])
 def device(request, username, device_uid):
-    d = get_device(request.user, device_uid)
+    d = get_device(request.user, device_uid,
+            request.META.get('HTTP_USER_AGENT', ''))
 
     data = json.loads(request.raw_post_data)
 
