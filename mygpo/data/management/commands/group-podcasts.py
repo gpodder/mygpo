@@ -16,8 +16,8 @@ class Command(BaseCommand):
         myname = args[3]
         othername = args[4]
 
-        p1 = Podcast.objects.get(url=p1_url)
-        p2 = Podcast.objects.get(url=p2_url)
+        p1 = Podcast.for_url(p1_url)
+        p2 = Podcast.for_url(p2_url)
 
         p1.group_with(p2, group_title, myname, othername)
 
