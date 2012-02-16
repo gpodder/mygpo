@@ -375,7 +375,7 @@ class PodcastUserState(Document):
     @classmethod
     def for_user_podcast(cls, user, podcast):
         r = PodcastUserState.view('users/podcast_states_by_podcast', \
-            key=[podcast.get_id(), user.id], limit=1, include_docs=True)
+            key=[podcast.get_id(), user._id], limit=1, include_docs=True)
         if r:
             return r.first()
         else:
