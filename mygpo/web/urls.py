@@ -73,7 +73,6 @@ urlpatterns += patterns('mygpo.web.views.settings',
  url(r'^account/$',                                               'account',       name='account'),
  url(r'^account/privacy$',                                        'privacy',       name='privacy'),
  url(r'^account/delete$',                                         'delete_account',name='delete-account'),
- url(r'^share/$',                                                 'share',         name='share'),
 )
 
 urlpatterns += patterns('mygpo.web.views.device',

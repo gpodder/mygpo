@@ -170,12 +170,12 @@ class Episode(Document, SlugMixin, OldIdMixin):
         """ returns the number of users that have listened to this episode """
 
         from mygpo.users.models import EpisodeUserState
-        r = EpisodeUserState.view('users/listeners_by_episode',
-                startkey    = [self._id, start],
-                endkey      = [self._id, end],
+        r = EpisodeUserState.view('users/listeners_by_podcast_episode',
+                startkey    = [self.podcast, self._id, start],
+                endkey      = [self.podcast, self._id, end],
                 reduce      = True,
                 group       = True,
-                group_level = 1
+                group_level = 2
             )
         return r.first()['value'] if r else 0
 
@@ -190,12 +190,12 @@ class Episode(Document, SlugMixin, OldIdMixin):
             end = end.isoformat()
 
         from mygpo.users.models import EpisodeUserState
-        r = EpisodeUserState.view('users/listeners_by_episode',
-                startkey    = [self._id, start],
-                endkey      = [self._id, end],
+        r = EpisodeUserState.view('users/listeners_by_podcast_episode',
+                startkey    = [self.podcast, self._id, start],
+                endkey      = [self.podcast, self._id, end],
                 reduce      = True,
                 group       = True,
-                group_level = 2,
+                group_level = 3,
             )
 
         for res in r:
@@ -309,6 +309,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
     common_episode_title = StringProperty()
     new_location = StringProperty()
     latest_episode_timestamp = DateTimeProperty()
+    episode_count = IntegerProperty()
 
 
     @classmethod

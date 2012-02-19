@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+{% load podcasts %}
+{% load episodes %}
+{% load charts %}
+{% load math %}
+{% load utils %}
+{% load gravatar %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/share/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/share/me"|section_menu:page_user.username }}{% endblock %}
+
+{% block title %}{{ page_user.username }}{% endblock %}
+
+{% block content %}
+
+  <div id="podcastlogo">{% gravatar_img page_user %}</div>
+
+  <h1>{{ page_user.username }}</h1>
+  <small class="description">
+  </small>
+  <hr style="clear: none;" />
+
+  <ul>
+   <li>Total Seconds Played: {{ seconds_played_total }}</li>
+   <li>Seconds Played Last Month: {{ seconds_played_month }}</li>
+   <li>Episodes Played: {{ num_played_episodes_total }}</li>
+   <li>Episodes Played Last Month: {{ num_played_episodes_month }}</li>
+   <li>Member Since: {% if user.date_joined %}{{ user.date_joined }}{% else %}{% trans "before we started counting" %}{% endif %}</li>
+  </ul>
+
+
+  {% if subscriptions %}
+
+   <h2>{% blocktrans with subscriptions|length as subscription_count %}{{ subscription_count }} Subscriptions{% endblocktrans %}</h2>
+   <table class="list">
+    <tr>
+     <th></th>
+     <th></th>
+     <th>{% trans "Episodes Listened" %}</th>
+    </tr>
+
+    {% for podcast in subscriptions|slice:":5" %}
+     <tr>
+      <td>{{ podcast|podcast_logo }}</td>
+      <td class="listlink">{% podcast_group_link podcast %}</td>
+      <td>{% vertical_bar podcast.episodes_listened podcast.episode_count "ratio" %}</td>
+     </tr>
+    {% endfor %}
+
+    {% if subscriptions|length > 5 %}
+     <tr>
+      <td></td>
+      <td>
+       <a href="{% url shared-subscriptions page_user.username %}">
+        {% trans "see all" %}
+       </a>
+      </td>
+     </tr>
+    {% endif %}
+
+   </table>
+
+  {% endif %}
+
+
+
+
+  {% if lists %}
+
+   <h2>{% blocktrans with lists|length as list_count %}{{ list_count }} Podcast Lists{% endblocktrans %}</h2>
+   <table class="list">
+    {% for list in lists|slice:":5" %}
+     <tr>
+      <td><a href="{% url list-show page_user.username list.slug %}">{{ list.title }}</a></td>
+      <td>{% blocktrans with list.podcasts|length as num_podcasts %}{{ num_podcasts }} Podcasts{% endblocktrans %}</td>
+     </tr>
+    {% endfor %}
+
+    {% if lists|length > 5 %}
+     <tr>
+      <td></td>
+      <td>
+       <a href="{% url lists-user page_user.username %}">
+        {% trans "see all" %}
+       </a>
+      </td>
+     </tr>
+    {% endif %}
+
+   </table>
+
+ {% endif %}
+
+
+ {% if recent_episodes %}
+
+  <h2>{% blocktrans with recent_episodes|length as num_episodes%}{{ num_episodes }} Recently Played Episodes{% endblocktrans %}</h2>
+  <table class="list">
+  {% for entry in recent_episodes %}
+   <tr>
+    <td>{{ entry.podcast|podcast_logo }}</td>
+    <td>{{ entry.episode.title }}</td>
+   </tr>
+  {% endfor %}
+
+  </table>
+
+ {% endif %}
+
+
+ {% if favorite_episodes %}
+
+  <h2>{% blocktrans with favorite_episodes|length as num_fav_episodes %}{{ num_fav_episodes }} Favorite Episodes{% endblocktrans %}</h2>
+  <table class="list">
+  {% for episode in favorite_episodes|slice:":5" %}
+   <tr>
+    <td>{% if episode.podcast %}{{ episode.podcast|podcast_logo }}{% endif %}</td>
+    <td>{% episode_link episode episode.podcast %}<br/>
+     {% if episode.podcast %}
+      <span class="from_podcast">{% trans "from" %} {% podcast_group_link episode.podcast %}</td>
+     {% endif %}
+   </tr>
+  {% endfor %}
+
+  {% if favorite_episodes|length > 5 %}
+   <tr>
+    <td></td>
+    <td>
+     <a href="{% url favorites-feed page_user.username %}">
+      {% trans "see all" %}
+     </a>
+    </td>
+   </tr>
+  {% endif %}
+
+  </table>
+
+ {% endif %}
+
+{% endblock %}

@@ -128,33 +128,3 @@ def privacy(request):
         'excluded_subscriptions': excluded_subscriptions,
         'domain': site.domain,
         }, context_instance=RequestContext(request))
-
-
-@login_required
-def share(request):
-    site = RequestSite(request)
-
-    if 'public_subscriptions' in request.GET:
-        @repeat_on_conflict(['user'])
-        def _update(user):
-            user.subscriptions_token = ''
-            user.save()
-
-    elif 'private_subscriptions' in request.GET:
-        @repeat_on_conflict(['user'])
-        def _update(user):
-            user.create_new_token('subscriptions_token')
-            user.save()
-
-    else:
-        _update = None
-
-    if _update:
-        _update(user=request.user)
-
-    token = request.user.subscriptions_token
-
-    return render_to_response('share.html', {
-        'site': site,
-        'token': token,
-        }, context_instance=RequestContext(request))

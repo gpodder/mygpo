@@ -558,7 +558,7 @@ class Device(Document):
 
 
     def get_subscribed_podcasts(self):
-        return set(Podcast.get_multi(self.get_subscribed_podcast_ids()))
+        return Podcast.get_multi(self.get_subscribed_podcast_ids())
 
 
     def __hash__(self):
@@ -602,6 +602,9 @@ class User(BaseUser, SyncedDevicesMixin):
     # token for automatically updating feeds published by this user
     publisher_update_token = StringProperty(default=token_generator)
 
+    # token for accessing the userpage of this user
+    userpage_token         = StringProperty(default=token_generator)
+
     class Meta:
         app_label = 'users'
 
@@ -625,6 +628,10 @@ class User(BaseUser, SyncedDevicesMixin):
     def inactive_devices(self):
         deleted = lambda d: d.deleted
         return filter(deleted, self.devices)
+
+
+    def get_devices_by_id(self):
+        return dict( (device.id, device) for device in self.devices)
 
 
     def get_device(self, id):
@@ -725,8 +732,37 @@ class User(BaseUser, SyncedDevicesMixin):
         return list(set(x[1] for x in self.get_subscriptions(public=public)))
 
 
-    def get_subscribed_podcasts(self, public=None):
-        return set(Podcast.get_multi(self.get_subscribed_podcast_ids(public=public)))
+    def get_subscribed_podcasts(self, public=None, sort=None):
+        podcasts = list(Podcast.get_multi(self.get_subscribed_podcast_ids(public=public)))
+
+        if sort == 'most_listened':
+            counts = dict(self.get_num_listened_episodes())
+            for podcast in podcasts:
+                c = counts.get(podcast.get_id(), 0)
+                if podcast.episode_count:
+                    podcast.percent_listened = float(podcast.episode_count) / c
+                    podcast.episodes_listened = c
+                else:
+                    podcast.percent_listened = 0
+                    podcast.episodes_listened = 0
+
+            podcasts = sorted(podcasts, key=lambda p: p.percent_listened, reverse=True)
+
+        return podcasts
+
+
+    def get_num_listened_episodes(self):
+        db = EpisodeUserState.get_db()
+        r = db.view('users/listeners_by_user_podcast',
+                startkey    = [self._id, None],
+                endkey      = [self._id, {}],
+                reduce      = True,
+                group_level = 2,
+            )
+        for obj in r:
+            count = obj['value']
+            podcast = obj['key'][1]
+            yield (podcast, count)
 
 
     def get_subscription_history(self, device_id=None, reverse=False, public=None):
@@ -846,6 +882,70 @@ class User(BaseUser, SyncedDevicesMixin):
             podcast = podcast_dict.get(episode.podcast, None)
             yield proxy_object(episode, podcast=podcast)
 
+
+    def get_latest_episodes(self, count=10):
+        """ Returns the latest episodes that the user has accessed """
+
+        startkey = [self._id, {},   {},   {}]
+        endkey   = [self._id, None, None, None]
+
+        db = EpisodeUserState.get_db()
+        res = db.view('users/episode_actions',
+                startkey     = startkey,
+                endkey       = endkey,
+                include_docs = True,
+                descending   = True,
+                limit        = count,
+            )
+
+        for action in res:
+            state_doc = action['doc']
+            index = int(action['value'])
+            state = EpisodeUserState.wrap(state_doc)
+            yield HistoryEntry.from_action_dict(state, index)
+
+
+    def get_num_played_episodes(self, since=None, until={}):
+        """ Number of played episodes in interval """
+
+        since_str = since.strftime('%Y-%m-%d') if since else None
+        until_str = until.strftime('%Y-%m-%d') if until else {}
+
+        startkey = [self._id, since_str]
+        endkey   = [self._id, until_str]
+
+        db = EpisodeUserState.get_db()
+        res = db.view('users/listeners_by_user',
+                startkey = startkey,
+                endkey   = endkey,
+                reduce   = True,
+            )
+
+        val = res.one()
+        return val['value'] if val else 0
+
+
+
+    def get_seconds_played(self, since=None, until={}):
+        """ Returns the number of seconds that the user has listened
+
+        Can be selected by timespan, podcast and episode """
+
+        since_str = since.strftime('%Y-%m-%dT%H:%M:%S') if since else None
+        until_str = until.strftime('%Y-%m-%dT%H:%M:%S') if until else {}
+
+        startkey = [self._id, since_str]
+        endkey   = [self._id, until_str]
+
+        db = EpisodeUserState.get_db()
+        res = db.view('users/times_played_by_user',
+                startkey = startkey,
+                endkey   = endkey,
+                reduce   = True,
+            )
+
+        val = res.one()
+        return val['value'] if val else 0
 
 
     def save(self, *args, **kwargs):
@@ -998,7 +1098,9 @@ class HistoryEntry(object):
 
             episode_id = getattr(entry, 'episode_id', None)
             entry.episode = episodes.get(episode_id, None)
-            entry.user = user
+
+            if hasattr(entry, 'user'):
+                entry.user = user
 
             device = devices.get(getattr(entry, 'device_id', None), None)
             entry.device = device

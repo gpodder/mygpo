@@ -31,13 +31,12 @@ from mygpo.api.constants import EPISODE_ACTION_TYPES
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core import models
 from mygpo.core.models import Podcast
-from mygpo.core.proxy import proxy_object
 from mygpo.core.models import Episode
 from mygpo.users.models import Chapter, HistoryEntry, EpisodeAction
 from mygpo.api import backend
 from mygpo.utils import parse_time, get_to_dict
 from mygpo.web.heatmap import EpisodeHeatmap
-from mygpo.web.utils import get_episode_link_target
+from mygpo.web.utils import get_episode_link_target, fetch_episode_data
 
 
 def episode(request, episode):
@@ -161,15 +160,7 @@ def list_favorites(request):
     site = RequestSite(request)
 
     episodes = backend.get_favorites(request.user)
-    podcast_ids = [episode.podcast for episode in episodes]
-    podcasts = get_to_dict(Podcast, podcast_ids, Podcast.get_id)
-
-    def set_podcast(episode):
-        episode = proxy_object(episode)
-        episode.podcast = podcasts.get(episode.podcast, None)
-        return episode
-
-    episodes = map(set_podcast, episodes)
+    episodes = fetch_episode_data(episodes)
 
     feed_url = 'http://%s/%s' % (site.domain, reverse('favorites-feed', args=[request.user.username]))
 

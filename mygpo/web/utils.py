@@ -8,6 +8,8 @@ from django.core.urlresolvers import reverse
 from babel import Locale, UnknownLocaleError
 
 from mygpo.core.models import Podcast
+from mygpo.core.proxy import proxy_object
+from mygpo.utils import get_to_dict
 
 
 def get_accepted_lang(request):
@@ -229,3 +231,15 @@ def get_episode_link_target(episode, podcast, view_name='episode', add_args=[]):
         view_name = '%s-slug-id' % view_name
 
     return strip_tags(reverse(view_name, args=args + add_args))
+
+
+def fetch_episode_data(episodes):
+    podcast_ids = [episode.podcast for episode in episodes]
+    podcasts = get_to_dict(Podcast, podcast_ids, Podcast.get_id)
+
+    def set_podcast(episode):
+        episode = proxy_object(episode)
+        episode.podcast = podcasts.get(episode.podcast, None)
+        return episode
+
+    return map(set_podcast, episodes)
