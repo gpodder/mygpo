@@ -202,12 +202,12 @@ def edit(request, device):
 def upload_opml(request, device):
 
     if not 'opml' in request.FILES:
-        return HttpResponseRedirect(reverse('device-edit', args=[device.id]))
+        return HttpResponseRedirect(reverse('device-edit', args=[device.uid]))
 
     opml = request.FILES['opml'].read()
     subscriptions = simple.parse_subscription(opml, 'opml')
-    simple.set_subscriptions(subscriptions, request.user, device.uid)
-    return HttpResponseRedirect(reverse('device', args=[device.id]))
+    simple.set_subscriptions(subscriptions, request.user, device.uid, None)
+    return HttpResponseRedirect(reverse('device', args=[device.uid]))
 
 
 @device_decorator

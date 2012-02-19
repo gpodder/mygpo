@@ -2,17 +2,15 @@ import time
 import urllib2
 from optparse import make_option
 
-from django.core.management.base import BaseCommand
-
 from mygpo.decorators import repeat_on_conflict
-from mygpo.core.models import Podcast, PodcastGroup
-from mygpo.directory.toplist import PodcastToplist
+from mygpo.core.models import Podcast
 from mygpo.data import delicious
+from mygpo.maintenance.management.podcastcmd import PodcastCommand
 
 
 SOURCE = 'delicious'
 
-class Command(BaseCommand):
+class Command(PodcastCommand):
     """
     Adds tags from the webservice delicious.com to podcasts
 
@@ -21,34 +19,9 @@ class Command(BaseCommand):
     The returned tags are added to the podcasts for the 'delicious' source.
     """
 
-    option_list = BaseCommand.option_list + (
-        make_option('--toplist', action='store_true', dest='toplist', default=False, help="Update all entries from the Toplist."),
-        make_option('--max', action='store', dest='max', type='int', default=-1, help="Set how many feeds should be updated at maximum"),
-        make_option('--random', action='store_true', dest='random', default=False, help="Update random podcasts, best used with --max option"),
-        )
-
-
     def handle(self, *args, **options):
 
-        fetch_queue = []
-
-        if options.get('toplist'):
-            toplist = PodcastToplist()
-            for oldindex, obj in toplist[:100]:
-                if isinstance(obj, Podcast):
-                    fetch_queue.append(obj)
-                elif isinstance(obj, PodcastGroup):
-                    fetch_queue.extend(obj.podcasts)
-
-        if options.get('random'):
-            podcasts = Podcast.random()
-            fetch_queue.extend(podcasts)
-
-        fetch_queue.extend(filter(None, map(Podcast.for_url, args)))
-
-        max = options.get('max', -1)
-        if max > 0:
-            fetch_queue = fetch_queue[:max]
+        fetch_queue = self.get_podcasts()
 
         for p in fetch_queue:
             if not p or not p.link:

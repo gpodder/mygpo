@@ -379,7 +379,7 @@ class PodcastUserState(Document):
     @classmethod
     def for_user_podcast(cls, user, podcast):
         r = PodcastUserState.view('users/podcast_states_by_podcast', \
-            key=[podcast.get_id(), user.id], limit=1, include_docs=True)
+            key=[podcast.get_id(), user._id], limit=1, include_docs=True)
         if r:
             return r.first()
         else:
@@ -517,6 +517,7 @@ class Device(Document):
     type     = StringProperty(required=True, default='other')
     settings = DictProperty()
     deleted  = BooleanProperty(default=False)
+    user_agent = StringProperty()
 
     @classmethod
     def for_oldid(cls, oldid):
@@ -874,7 +875,7 @@ class User(BaseUser, SyncedDevicesMixin):
             return False
 
         # ensure that other isn't AnonymousUser
-        return other.is_authenticated() and self._id == other_id
+        return other.is_authenticated() and self._id == other._id
 
 
     def __repr__(self):

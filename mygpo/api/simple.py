@@ -68,14 +68,17 @@ def check_format(fn):
 @allowed_methods(['GET', 'PUT', 'POST'])
 def subscriptions(request, username, device_uid, format):
 
+    user_agent = request.META.get('HTTP_USER_AGENT', '')
+
     if request.method == 'GET':
         title = _('%(username)s\'s Subscription List') % {'username': username}
-        subscriptions = get_subscriptions(request.user, device_uid)
+        subscriptions = get_subscriptions(request.user, device_uid, user_agent)
         return format_podcast_list(subscriptions, format, title, jsonp_padding=request.GET.get('jsonp'))
 
     elif request.method in ('PUT', 'POST'):
         subscriptions = parse_subscription(request.raw_post_data, format)
-        return set_subscriptions(subscriptions, request.user, device_uid)
+        return set_subscriptions(subscriptions, request.user, device_uid,
+                user_agent)
 
 
 @csrf_exempt
@@ -163,8 +166,8 @@ def format_podcast_list(obj_list, format, title, get_podcast=None,
         return None
 
 
-def get_subscriptions(user, device_uid):
-    device = get_device(user, device_uid)
+def get_subscriptions(user, device_uid, user_agent=None):
+    device = get_device(user, device_uid, user_agent)
     return device.get_subscribed_podcasts()
 
 
@@ -193,9 +196,9 @@ def parse_subscription(raw_post_data, format):
     return urls
 
 
-def set_subscriptions(urls, user, device_uid):
+def set_subscriptions(urls, user, device_uid, user_agent):
 
-    device = get_device(user, device_uid, undelete=True)
+    device = get_device(user, device_uid, user_agent, undelete=True)
 
     old = [p.url for p in device.get_subscribed_podcasts()]
     new = [p for p in urls if p not in old]

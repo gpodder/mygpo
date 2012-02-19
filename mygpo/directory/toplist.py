@@ -2,10 +2,14 @@ from itertools import product
 
 from datetime import date, timedelta
 
+from django.core.cache import cache
+
 from mygpo.core.models import Episode, Podcast, PodcastGroup
 from mygpo.data.mimetype import get_type, CONTENT_TYPES
 from mygpo.utils import daterange
 
+
+CACHE_SECONDS = 60*60
 
 class Toplist(object):
     """ Base class for Episode and Podcast toplists """
@@ -46,6 +50,24 @@ class Toplist(object):
 
         results = []
         for key in self._get_query_keys():
+            r = self._cache_or_query(skip, limit, key)
+            results.extend(r)
+
+        results = list(set(results))
+        results = self._sort(results)
+        return results[skip:skip+limit]
+
+
+    def _cache_or_query(self, skip, limit, key):
+        cache_str = '{cls}-{skip}-{limit}-{key}'.format(
+                skip=skip,
+                limit=limit,
+                cls=self.__class__.__name__,
+                key='-'.join(key)
+            )
+
+        res = cache.get(cache_str)
+        if not res:
             r = self.cls.view(self.view,
                     startkey     = key + [{}],
                     endkey       = key + [None],
@@ -54,11 +76,10 @@ class Toplist(object):
                     limit        = limit + skip,
                     **self.view_args
                 )
-            results.extend(list(r))
+            res = list(r)
+            cache.set(cache_str, res, CACHE_SECONDS)
 
-        results = list(set(results))
-        results = self._sort(results)
-        return results[skip:skip+limit]
+        return res
 
 
     def _sort(self, results):

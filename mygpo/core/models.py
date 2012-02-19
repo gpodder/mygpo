@@ -263,6 +263,9 @@ class SubscriberData(DocumentSchema):
         return (self.timestamp == other.timestamp) and \
                (self.subscriber_count == other.subscriber_count)
 
+    def __hash__(self):
+        return hash(frozenset([self.timestamp, self.subscriber_count]))
+
 
 class PodcastSubscriberData(Document):
     podcast = StringProperty()

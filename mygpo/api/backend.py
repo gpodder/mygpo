@@ -69,26 +69,38 @@ def get_podcast_count_for_language():
 
 
 
-def get_device(user, uid, undelete=True):
+def get_device(user, uid, user_agent, undelete=True):
     """
     Loads or creates the device indicated by user, uid.
 
     If the device has been deleted and undelete=True, it is undeleted.
     """
 
+    store_ua = user.settings.get('store_user_agent', True)
+
     @repeat_on_conflict(['user'])
     def _get(user, uid, undelete):
 
         device = user.get_device_by_uid(uid)
+        save = False
 
         if not device:
             device = Device(uid=uid)
             user.devices.append(device)
-            user.save()
+            save = True
 
         elif device.deleted and undelete:
             device.deleted = False
             user.set_device(device)
+            save = True
+
+        if store_ua and user_agent and \
+                getattr(device, 'user_agent', None) != user_agent:
+            device.user_agent = user_agent
+            user.set_device(device)
+            save = True
+
+        if save:
             user.save()
 
         return device
