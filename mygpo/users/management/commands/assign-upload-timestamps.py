@@ -14,12 +14,16 @@ class Command(ChangesCommand):
 
 
     def __init__(self):
+        super(Command, self).__init__('assign-upload-timestamps-status',
+            'Assign-Upload-Timestamps')
         self.episodes = {}
 
 
-    def handle_obj(self, seq, obj, actions):
+    def handle_obj(self, seq, doc, actions):
 
-        if all(self.has_upload_timestamp(action) for action in  obj.actions):
+        obj = EpisodeUserState.wrap(doc)
+
+        if all(self.has_upload_timestamp(action) for action in obj.actions):
             return
 
         self.update_state(state=obj)
@@ -52,32 +56,5 @@ class Command(ChangesCommand):
         state.add_actions(actions)
         state.save()
 
-
-    def get_objects(self, db, since=0, limit=100):
-        consumer = Consumer(db)
-
-        while True:
-            resp = consumer.wait_once(since=since, limit=limit,
-                    include_docs=True, filter='users/episode_states')
-
-            results = resp['results']
-
-            if not results:
-                break
-
-            for res in results:
-                doc = res['doc']
-                seq = res['seq']
-                yield seq, EpisodeUserState.wrap(doc)
-
-            since = resp['last_seq']
-
-
     def get_db(self):
         return EpisodeUserState.get_db()
-
-    def get_status_id(self):
-        return 'assign-upload-timestamps-status'
-
-    def get_command_name(self):
-        return 'Assign-Upload-Timestamps'
