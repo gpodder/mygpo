@@ -283,7 +283,7 @@ class EpisodeUserState(Document):
         map(EpisodeAction.validate_time_values, actions)
         self.actions = list(self.actions) + actions
         self.actions = list(set(self.actions))
-        self.actions = sorted(self.actions, key=lambda x: x.upload_timestamp)
+        self.actions = sorted(self.actions, key=lambda x: x.timestamp)
 
 
     def is_favorite(self):
