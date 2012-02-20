@@ -210,6 +210,7 @@ def add_action(request, episode):
 
     action = EpisodeAction()
     action.timestamp = timestamp
+    action.upload_timestamp = datetime.utcnow()
     action.device = device.id if device else None
     action.action = action_str
 
