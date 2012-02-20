@@ -37,7 +37,9 @@ class Command(ChangesCommand):
 
 
     @staticmethod
-    def set_upload_timestamp(action, default=datetime.utcnow()):
+    def set_upload_timestamp(action):
+        default = datetime.utcnow()
+
         if not action.upload_timestamp:
             action.upload_timestamp = min(action.timestamp, default)
 
