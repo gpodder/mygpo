@@ -73,8 +73,13 @@ class EpisodeAction(DocumentSchema):
     """
 
     action        = StringProperty(required=True)
+
+    # walltime of the event (assigned by the uploading client, defaults to now)
     timestamp     = DateTimeProperty(required=True, default=datetime.utcnow)
+
+    # upload time of the event
     upload_timestamp = DateTimeProperty(required=True)
+
     device_oldid  = IntegerProperty(required=False)
     device        = StringProperty()
     started       = IntegerProperty()
