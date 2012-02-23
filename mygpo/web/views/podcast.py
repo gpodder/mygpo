@@ -224,7 +224,7 @@ def subscribe(request, podcast):
 
             except Exception as e:
                 log('Web: %(username)s: could not subscribe to podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
-                    {'username': request.user.username, 'podcast_url': podcast.url, 'device_id': device.uid, 'exception': e})
+                    {'username': request.user.username, 'podcast_url': podcast.url, 'device_id': device.uid if device else '', 'exception': e})
 
             return HttpResponseRedirect(get_podcast_link_target(podcast))
 
