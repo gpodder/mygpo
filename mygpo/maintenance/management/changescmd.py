@@ -85,9 +85,13 @@ class ChangesCommand(BaseCommand):
 
 
     def print_status(self, seq, actions):
-        total = self.db.info()['update_seq']
+        counter = getattr(self, 'counter', 0)
+        if counter % 1000 == 0:
+            self.total = self.db.info()['update_seq']
+        self.counter = counter + 1
+
         status_str = ', '.join('%s: %d' % x for x in self.actions.items())
-        progress(seq, total, status_str)
+        progress(seq, self.total, status_str)
 
 
     @abstractmethod
