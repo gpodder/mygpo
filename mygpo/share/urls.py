@@ -1,5 +1,8 @@
 from django.conf.urls.defaults import *
 
+from mygpo.share.userpage import UserpageView
+
+
 urlpatterns = patterns('mygpo.share.views',
  url(r'^share/$',
                      'overview',                  name='share'),
@@ -50,6 +53,5 @@ urlpatterns = patterns('mygpo.share.views',
 )
 
 urlpatterns += patterns('mygpo.share.userpage',
- url(r'^user/(?P<username>[\w.-]+)/?$',
-                      'show',                     name='user'),
+ url(r'^user/(?P<username>[\w.-]+)/?$', UserpageView.as_view(), name='user'),
  )

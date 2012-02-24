@@ -6,6 +6,7 @@
 {% load charts %}
 {% load math %}
 {% load utils %}
+{% load time %}
 {% load gravatar %}
 
 {% load menu %}
@@ -24,15 +25,30 @@
   <hr style="clear: none;" />
 
   <ul>
-   <li>Total Seconds Played: {{ seconds_played_total }}</li>
-   <li>Seconds Played Last Month: {{ seconds_played_month }}</li>
-   <li>Episodes Played: {{ num_played_episodes_total }}</li>
-   <li>Episodes Played Last Month: {{ num_played_episodes_month }}</li>
-   <li>Member Since: {% if user.date_joined %}{{ user.date_joined }}{% else %}{% trans "before we started counting" %}{% endif %}</li>
+   <li>Total Played:
+    {% if seconds_played_total %}
+     {{ seconds_played_total|format_duration }} /
+    {% endif %}
+    {{ num_played_episodes_total }} Episodes
+   </li>
+   <li>Played Last Month:
+    {% if seconds_played_month %}
+     {{ seconds_played_month|format_duration }} /
+    {% endif %}
+    {{ num_played_episodes_month }} Episodes
+   </li>
+   <li>Member Since:
+    {% if user.date_joined %}
+     {{ user.date_joined }}
+    {% else %}
+     {% trans "before we started counting" %}
+    {% endif %}
+   </li>
   </ul>
 
+  <br style="clear: both;" />
 
-  {% if subscriptions %}
+  {% if subscriptions and not page_user.subscriptions_token %}
 
    <h2>{% blocktrans with subscriptions|length as subscription_count %}{{ subscription_count }} Subscriptions{% endblocktrans %}</h2>
    <table class="list">
@@ -99,10 +115,15 @@
 
   <h2>{% blocktrans with recent_episodes|length as num_episodes%}{{ num_episodes }} Recently Played Episodes{% endblocktrans %}</h2>
   <table class="list">
-  {% for entry in recent_episodes %}
+  {% for episode in recent_episodes %}
    <tr>
-    <td>{{ entry.podcast|podcast_logo }}</td>
-    <td>{{ entry.episode.title }}</td>
+    <td>{{ episode.podcast|podcast_logo }}</td>
+    <td>
+     {% episode_link episode episode.podcast %}<br />
+     {% if episode.podcast %}
+      <span class="from_podcast">{% trans "from" %} {% podcast_group_link episode.podcast %}</td>
+     {% endif %}
+    </td>
    </tr>
   {% endfor %}
 
@@ -111,7 +132,7 @@
  {% endif %}
 
 
- {% if favorite_episodes %}
+ {% if favorite_episodes and not page_user.favorite_feeds_token %}
 
   <h2>{% blocktrans with favorite_episodes|length as num_fav_episodes %}{{ num_fav_episodes }} Favorite Episodes{% endblocktrans %}</h2>
   <table class="list">

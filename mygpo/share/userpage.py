@@ -1,65 +1,79 @@
 from datetime import datetime, timedelta
 
-from django.core.urlresolvers import reverse
-from django.http import Http404, HttpResponseRedirect, HttpResponseForbidden
-from django.shortcuts import get_object_or_404, render_to_response
-from django.template import RequestContext
-from django.template.defaultfilters import slugify
-from django.contrib.sites.models import RequestSite
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.utils.translation import ugettext as _
+import gevent
+
+from django.shortcuts import render
+from django.views.generic.base import View
+from django.utils.decorators import method_decorator
 
 from mygpo.api import backend
-from mygpo.core.models import Podcast
-from mygpo.core.proxy import proxy_object
-from mygpo.api.simple import format_podcast_list
 from mygpo.share.models import PodcastList
 from mygpo.users.models import User
-from mygpo.directory.views import search as directory_search
 from mygpo.users.models import HistoryEntry
 from mygpo.decorators import requires_token
 from mygpo.web.utils import fetch_episode_data
+from mygpo.users.subscriptions import PodcastPercentageListenedSorter
+from mygpo.web.views import GeventView
 
 
-@requires_token(token_name='userpage_token', denied_template='userpage-denied.html')
-def show(request, username):
 
-    user = User.get_user(username)
+class UserpageView(GeventView):
+    """ Shows the profile page for a user """
 
-    # the lists that the user has created
-    lists = list(PodcastList.for_user(user._id))
+    @method_decorator(requires_token(token_name='userpage_token',
+                denied_template='userpage-denied.html'))
+    def get(self, request, username):
 
-    # A top list of podcast subscriptions
-    # - If we have episode actions, based on the # of actions, descending
-    # - If no actions exist, based on the # of devices, descending
-    subscriptions = list(user.get_subscribed_podcasts(sort='most_listened'))
+        user = User.get_user(username)
+        month_ago = datetime.today() - timedelta(days=31)
 
-    # A list of recently-listened episodes
-    recent_episodes = list(user.get_latest_episodes())
-    recent_episodes = HistoryEntry.fetch_data(user, recent_episodes)
+        context_funs = {
+            'lists': gevent.spawn(self.get_podcast_lists, user),
+            'subscriptions': gevent.spawn(self.get_subscriptions, user),
+            'recent_episodes': gevent.spawn(self.get_recent_episodes, user),
+            'seconds_played_total': gevent.spawn(self.get_seconds_played_total, user),
+            'seconds_played_month': gevent.spawn(self.get_seconds_played_since, user, month_ago),
+            'favorite_episodes': gevent.spawn(self.get_favorite_episodes, user),
+            'num_played_episodes_total': gevent.spawn(self.get_played_episodes_total, user),
+            'num_played_episodes_month': gevent.spawn(self.get_played_episodes_since, user, month_ago),
+        }
 
-    # Minutes listened this week (this month) -> based on play actions
-    seconds_played_total = user.get_seconds_played()
-    month_ago = datetime.today() - timedelta(days=31)
-    seconds_played_month = user.get_seconds_played(since=month_ago)
+        context = {'page_user': user}
+        context.update(self.get_context(context_funs))
 
-    # Favorite Episodes
-    favorite_episodes = backend.get_favorites(user)
-    favorite_episodes = fetch_episode_data(favorite_episodes)
+        return render(request, 'userpage.html', context)
 
-    # Number of played episodes
-    num_played_episodes_total = user.get_num_played_episodes()
-    num_played_episodes_month = user.get_num_played_episodes(since=month_ago)
 
-    return render_to_response('userpage.html', {
-            'page_user': user,
-            'lists': lists,
-            'subscriptions': subscriptions,
-            'recent_episodes': recent_episodes,
-            'seconds_played_total': seconds_played_total,
-            'seconds_played_month': seconds_played_month,
-            'favorite_episodes': favorite_episodes,
-            'num_played_episodes_total': num_played_episodes_total,
-            'num_played_episodes_month': num_played_episodes_month,
-        }, context_instance=RequestContext(request))
+    def get_podcast_lists(self, user):
+        return list(PodcastList.for_user(user._id))
+
+
+    def get_subscriptions(self, user):
+        subscriptions = user.get_subscribed_podcasts()
+        return PodcastPercentageListenedSorter(subscriptions, user)
+
+
+    def get_recent_episodes(self, user):
+        recent_episodes = list(user.get_latest_episodes())
+        return fetch_episode_data(recent_episodes)
+
+
+    def get_seconds_played_total(self, user):
+        return user.get_seconds_played()
+
+
+    def get_seconds_played_since(self, user, since):
+        return user.get_seconds_played(since=since)
+
+
+    def get_favorite_episodes(self, user):
+        favorite_episodes = backend.get_favorites(user)
+        return fetch_episode_data(favorite_episodes)
+
+
+    def get_played_episodes_total(self, user):
+        return user.get_num_played_episodes()
+
+
+    def get_played_episodes_since(self, user, since):
+        return user.get_num_played_episodes(since=since)

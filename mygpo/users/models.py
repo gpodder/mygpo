@@ -732,23 +732,8 @@ class User(BaseUser, SyncedDevicesMixin):
         return list(set(x[1] for x in self.get_subscriptions(public=public)))
 
 
-    def get_subscribed_podcasts(self, public=None, sort=None):
-        podcasts = list(Podcast.get_multi(self.get_subscribed_podcast_ids(public=public)))
-
-        if sort == 'most_listened':
-            counts = dict(self.get_num_listened_episodes())
-            for podcast in podcasts:
-                c = counts.get(podcast.get_id(), 0)
-                if podcast.episode_count:
-                    podcast.percent_listened = float(podcast.episode_count) / c
-                    podcast.episodes_listened = c
-                else:
-                    podcast.percent_listened = 0
-                    podcast.episodes_listened = 0
-
-            podcasts = sorted(podcasts, key=lambda p: p.percent_listened, reverse=True)
-
-        return podcasts
+    def get_subscribed_podcasts(self, public=None):
+        return list(Podcast.get_multi(self.get_subscribed_podcast_ids(public=public)))
 
 
     def get_num_listened_episodes(self):
@@ -886,23 +871,19 @@ class User(BaseUser, SyncedDevicesMixin):
     def get_latest_episodes(self, count=10):
         """ Returns the latest episodes that the user has accessed """
 
-        startkey = [self._id, {},   {},   {}]
-        endkey   = [self._id, None, None, None]
+        startkey = [self._id, {}]
+        endkey   = [self._id, None]
 
-        db = EpisodeUserState.get_db()
-        res = db.view('users/episode_actions',
+        res = Episode.view('users/listeners_by_user',
                 startkey     = startkey,
                 endkey       = endkey,
                 include_docs = True,
                 descending   = True,
                 limit        = count,
+                reduce       = False,
             )
 
-        for action in res:
-            state_doc = action['doc']
-            index = int(action['value'])
-            state = EpisodeUserState.wrap(state_doc)
-            yield HistoryEntry.from_action_dict(state, index)
+        return res
 
 
     def get_num_played_episodes(self, since=None, until={}):

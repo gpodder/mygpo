@@ -24,6 +24,7 @@ from datetime import datetime, timedelta
 
 import Image
 import ImageDraw
+import gevent
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect, \
@@ -35,6 +36,7 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render_to_response
 from django.contrib.sites.models import RequestSite
+from django.views.generic.base import View
 
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core import models
@@ -242,3 +244,20 @@ def mytags(request):
         'tags_podcast': tags_podcast,
         'tags_tag': dict(tags_tag.items()),
     }, context_instance=RequestContext(request))
+
+
+
+class GeventView(View):
+    """ View that provides parts of the context via gevent coroutines """
+
+    def get_context(self, context_funs):
+        """ returns a dictionary that can be used for a template context
+
+        context_funs is a context-key => Greenlet object mapping """
+
+        gevent.joinall(context_funs.values())
+
+        for key, gev in context_funs.items():
+            context_funs[key] = gev.get()
+
+        return context_funs
