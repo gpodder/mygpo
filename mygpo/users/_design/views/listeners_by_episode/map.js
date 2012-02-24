@@ -1,17 +1,5 @@
 function(doc)
 {
-    function contains(a, obj)
-    {
-        for(var i = 0; i < a.length; i++)
-        {
-            if(a[i] === obj)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
     if(doc.doc_type == "EpisodeUserState")
     {
         for(var n=doc.actions.length-1; n>=0; n--)
