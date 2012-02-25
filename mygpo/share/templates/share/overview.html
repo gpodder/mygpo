@@ -15,22 +15,28 @@
  <table class="list">
 
   <tr>
-   <td>Subscriptions</td>
-   <td>{% if subscriptions_token %}Private{% else %}Public{% endif%}</td>
+   <td>{% trans "Subscriptions" %}</td>
+   <td>
+    {% if subscriptions_token %}
+     {% trans "Private" %}
+    {% else %}
+     {% trans "Public" %}
+    {% endif%}
+   </td>
    <td>
     {% if subscriptions_token %}
      <form method="post" action="{% url subscriptions-public %}">
       {% csrf_token %}
-      <input type="submit" value="Make Public" />
+      <input type="submit" value="{% trans "Make Public" %}" />
      </form>
      <form method="post" action="{% url subscriptions-private %}">
       {% csrf_token %}
-      <input type="submit" value="New Token" />
+      <input type="submit" value="{% trans "New Token" %}" />
      </form>
     {% else %}
      <form method="post" action="{% url subscriptions-private %}">
       {% csrf_token %}
-      <input type="submit" value="Make Private" />
+      <input type="submit" value="{% trans "Make Private" %}" />
      </form>
     {% endif %}
    </td>
@@ -49,22 +55,28 @@
   </tr>
 
   <tr>
-   <td>User Page</td>
-   <td>{% if userpage_token %}Private{% else %}Public{% endif %}</td>
+   <td>{% trans "User Page" %}</td>
+   <td>
+    {% if userpage_token %}
+     {% trans "Private" %}
+    {% else %}
+     {% trans "Public" %}
+    {% endif %}
+   </td>
    <td>
     {% if userpage_token %}
      <form method="post" action="{% url userpage-public %}">
       {% csrf_token %}
-      <input type="submit" value="Make Public" />
+      <input type="submit" value="{% trans "Make Public" %}" />
      </form>
      <form method="post" action="{% url userpage-private %}">
       {% csrf_token %}
-      <input type="submit" value="New Token" />
+      <input type="submit" value="{% trans "New Token" %}" />
      </form>
     {% else %}
      <form method="post" action="{% url userpage-private %}">
       {% csrf_token %}
-      <input type="submit" value="Make Private" />
+      <input type="submit" value="{% trans "Make Private" %}" />
      </form>
     {% endif %}
    <td>
@@ -76,22 +88,28 @@
   </tr>
 
   <tr>
-   <td>Favorites Feed</td>
-   <td>{% if favfeed_token %}Private{% else %}Public{% endif %}</td>
+   <td>{% trans "Favorites Feed" %}</td>
+   <td>
+    {% if favfeed_token %}
+     {% trans "Private" %}
+    {% else %}
+     {% trans "Public" %}
+    {% endif %}
+   </td>
    <td>
     {% if favfeed_token %}
      <form method="post" action="{% url favfeed-public %}">
       {% csrf_token %}
-      <input type="submit" value="Make Public" />
+      <input type="submit" value="{% trans "Make Public" %}" />
      </form>
      <form method="post" action="{% url favfeed-private %}">
       {% csrf_token %}
-      <input type="submit" value="New Token" />
+      <input type="submit" value="{% trans "New Token" %}" />
      </form>
     {% else %}
      <form method="post" action="{% url favfeed-private %}">
       {% csrf_token %}
-      <input type="submit" value="Make Private" />
+      <input type="submit" value="{% trans "Make Private" %}" />
      </form>
     {% endif %}
    </td>
