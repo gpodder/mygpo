@@ -515,11 +515,6 @@ class Device(Document):
     deleted  = BooleanProperty(default=False)
     user_agent = StringProperty()
 
-    @classmethod
-    def for_oldid(cls, oldid):
-        r = cls.view('users/devices_by_oldid', key=oldid)
-        return r.first() if r else None
-
 
     def get_subscription_changes(self, since, until):
         """
@@ -604,11 +599,6 @@ class User(BaseUser, SyncedDevicesMixin):
 
     class Meta:
         app_label = 'users'
-
-    @classmethod
-    def for_oldid(cls, oldid):
-        r = cls.view('users/users_by_oldid', key=oldid, limit=1, include_docs=True)
-        return r.one() if r else None
 
 
     def create_new_token(self, token_name, length=32):
