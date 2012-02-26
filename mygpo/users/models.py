@@ -618,23 +618,19 @@ class User(BaseUser, SyncedDevicesMixin):
 
 
     def get_device(self, id):
-        for device in self.devices:
-            if device.id == id:
-                return device
 
-        return None
+        if not hasattr(self, '__device_by_id'):
+            self.__devices_by_id = dict( (d.id, d) for d in self.devices)
+
+        return self.__devices_by_id.get(id, None)
 
 
     def get_device_by_uid(self, uid):
-        for device in self.devices:
-            if device.uid == uid:
-                return device
 
+        if not hasattr(self, '__devices_by_uio'):
+            self.__devices_by_uid = dict( (d.uid, d) for d in self.devices)
 
-    def get_device_by_oldid(self, oldid):
-        for device in self.devices:
-            if device.oldid == oldid:
-                return device
+        return self.__devices_by_uid.get(uid, None)
 
 
     def update_device(self, device):
