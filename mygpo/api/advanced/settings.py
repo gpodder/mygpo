@@ -16,7 +16,6 @@
 #
 
 from django.http import HttpResponseBadRequest, Http404
-from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 

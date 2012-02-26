@@ -28,7 +28,6 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.cache import cache_page
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
-from django.shortcuts import get_object_or_404
 from django.contrib.sites.models import RequestSite
 from django.utils.translation import ugettext as _
 

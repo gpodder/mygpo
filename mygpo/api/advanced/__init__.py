@@ -23,7 +23,6 @@ from datetime import datetime
 import dateutil.parser
 
 from django.http import HttpResponse, HttpResponseBadRequest, Http404
-from django.shortcuts import get_object_or_404
 from django.contrib.sites.models import RequestSite
 from django.db import IntegrityError
 from django.views.decorators.csrf import csrf_exempt

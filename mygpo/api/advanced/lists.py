@@ -21,7 +21,6 @@ from django.http import HttpResponse, HttpResponseBadRequest, \
      HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from django.core.urlresolvers import reverse
-from django.shortcuts import get_object_or_404
 from django.contrib.sites.models import RequestSite
 from django.template.defaultfilters import slugify
 from django.views.decorators.cache import never_cache

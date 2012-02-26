@@ -29,7 +29,6 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache
-from django.shortcuts import get_object_or_404
 
 from restkit.errors import Unauthorized
 
