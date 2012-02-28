@@ -104,48 +104,38 @@ class EpisodeAction(DocumentSchema):
         since_str = since.strftime('%Y-%m-%dT%H:%M:%S') if since else None
         until_str = until.strftime('%Y-%m-%dT%H:%M:%S') if until else {}
 
-        # further parts of the key are filled in below
-        startkey = [user_id, since_str, None, None]
-        endkey   = [user_id, until_str, {}, {}]
 
-        # additional filter that are carried out by the
-        # application, not by the database
-        add_filters = []
+        if not podcast_id and not device_id:
+            view = 'users/episode_actions'
+            startkey = [user_id, since_str]
+            endkey   = [user_id, until_str]
 
-        if isinstance(podcast_id, basestring):
-            if until is not None: # filter in database
-                startkey[2] = podcast_id
-                endkey[2]   = podcast_id
+        elif podcast_id and not device_id:
+            view = 'users/episode_actions_podcast'
+            startkey = [user_id, podcast_id, since_str]
+            endkey   = [user_id, podcast_id, until_str]
 
-            add_filters.append( lambda x: x.podcast_id == podcast_id )
+        elif device_id and not podcast_id:
+            view = 'users/episode_actions_device'
+            startkey = [user_id, device_id, since_str]
+            endkey   = [user_id, device_id, until_str]
 
-        elif isinstance(podcast_id, list):
-            add_filters.append( lambda x: x.podcast_id in podcast_id )
+        else:
+            view = 'users/episode_actions_podcast_device'
+            startkey = [user_id, podcast_id, device_id, since_str]
+            endkey   = [user_id, podcast_id, device_id, until_str]
 
-        elif podcast_id is not None:
-            raise ValueError('podcast_id can be either None, basestring '
-                    'or a list of basestrings')
-
-
-        if device_id:
-            if None not in (until, podcast_id): # filter in database
-                startkey[3] = device_id
-                endkey[3]   = device_id
-            else:
-                dev_filter = lambda x: getattr(x, 'device_id', None) == device_id
-                add_filters.append(dev_filter)
-
+        print view, startkey, endkey
 
         db = EpisodeUserState.get_db()
-        res = db.view('users/episode_actions',
+        res = db.view(view,
                 startkey = startkey,
                 endkey   = endkey
             )
 
         for r in res:
             action = r['value']
-            if all( f(action) for f in add_filters):
-                yield action
+            yield action
 
 
     def validate_time_values(self):

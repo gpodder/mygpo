@@ -32,7 +32,8 @@ function(doc)
 
             emit([
                     doc.user,
-                    action_obj.timestamp
+                    action.device,
+                    action_obj.timestamp,
                 ], action_obj
             );
         }

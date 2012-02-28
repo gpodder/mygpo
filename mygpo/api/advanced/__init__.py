@@ -206,7 +206,10 @@ def episodes(request, username, version=1):
         else:
             device = None
 
-        return JsonResponse(get_episode_changes(request.user, podcast, device, since, now, aggregated, version))
+        changes = get_episode_changes(request.user, podcast, device, since,
+                now, aggregated, version)
+
+        return JsonResponse(changes)
 
 
 
@@ -224,10 +227,16 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
     devices = dict( (dev.id, dev.uid) for dev in user.devices )
 
     args = {}
-    if podcast is not None: args['podcast_id'] = podcast.get_id()
-    if device is not None:  args['device_id'] = device.id
+    if podcast is not None:
+        args['podcast_id'] = podcast.get_id()
 
-    actions = EpisodeAction.filter(user.id, since, until, **args)
+    if device is not None:
+        args['device_id'] = device.id
+
+    print user
+    print user._id
+
+    actions = EpisodeAction.filter(user._id, since, until, **args)
 
     if version == 1:
         actions = imap(convert_position, actions)
@@ -249,17 +258,15 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
 
 
 def clean_episode_action_data(action, user, devices):
-    action['podcast'] = action.get('podcast_url', None)
-    action['episode'] = action.get('episode_url', None)
 
-    if None in (action['podcast'], action['episode']):
+    if None in (action.get('podcast', None), action.get('episode', None)):
         return None
 
     if 'device_id' in action:
         device_id = action['device_id']
-        device = user.get_device(device_id)
-        if device:
-            action['device'] = device.uid
+        device_uid = devices.get(device_id)
+        if device_uid:
+            action['device'] = device_uid
 
         del action['device_id']
 
