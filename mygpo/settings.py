@@ -128,7 +128,7 @@ AUTHENTICATION_BACKENDS = (
     'mygpo.web.auth.EmailAuthenticationBackend',
 )
 
-SESSION_ENGINE = "django_couchdb_utils.sessions.couchdb"
+SESSION_ENGINE = "django_couchdb_utils.sessions.cached_couchdb"
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.auth.context_processors.auth",
