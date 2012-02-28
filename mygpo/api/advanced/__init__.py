@@ -492,18 +492,18 @@ def get_episode_updates(user, subscribed_podcasts, since):
     for episode in episodes:
         episode_status[episode._id] = EpisodeStatus(episode, 'new', None)
 
-    e_actions = (p.get_episode_states(user._id) for p in subscribed_podcasts)
+    e_actions = (p.get_episode_states(user.id) for p in subscribed_podcasts)
     e_actions = chain.from_iterable(e_actions)
 
-    for state, index in e_actions:
-        action = state.actions[index]
+    for action in e_actions:
+        e_id = action['episode_id']
 
-        if state.episode in episode_status:
-            episode = episode_status[state.episode].episode
+        if e_id in episode_status:
+            episode = episode_status[e_id].episode
         else:
-            episode = models.Episode.get(state.episode)
+            episode = models.Episode.get(e_id)
 
-        episode_status[state.episode] = EpisodeStatus(episode, action.action, action)
+        episode_status[e_id] = EpisodeStatus(episode, action['action'], action)
 
     return episode_status.itervalues()
 
