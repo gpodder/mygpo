@@ -27,6 +27,8 @@ from mygpo.web.forms import DeviceForm, SyncForm
 from mygpo.web import utils
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.vary import vary_on_cookie
+from django.views.decorators.cache import never_cache
 from django.shortcuts import get_object_or_404
 
 from restkit.errors import Unauthorized
@@ -37,6 +39,7 @@ from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.users.models import PodcastUserState, Device, DeviceUIDException
 
 
+@vary_on_cookie
 @login_required
 def overview(request):
 
@@ -52,6 +55,7 @@ def overview(request):
 
 def device_decorator(f):
     @login_required
+    @vary_on_cookie
     @wraps(f)
     def _decorator(request, uid, *args, **kwargs):
 
@@ -90,6 +94,7 @@ def show(request, device):
 
 
 @login_required
+@never_cache
 @allowed_methods(['POST'])
 def create(request):
     device_form = DeviceForm(request.POST)
@@ -161,6 +166,7 @@ def update(request, device):
 
 
 @login_required
+@vary_on_cookie
 @allowed_methods(['GET'])
 def edit_new(request):
 

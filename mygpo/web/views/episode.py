@@ -26,6 +26,8 @@ from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
+from django.views.decorators.vary import vary_on_cookie
+from django.views.decorators.cache import never_cache
 
 from mygpo.api.constants import EPISODE_ACTION_TYPES
 from mygpo.decorators import repeat_on_conflict
@@ -40,6 +42,7 @@ from mygpo.web.heatmap import EpisodeHeatmap
 from mygpo.web.utils import get_episode_link_target
 
 
+@vary_on_cookie
 def episode(request, episode):
 
     podcast = Podcast.get(episode.podcast)
@@ -97,6 +100,7 @@ def episode(request, episode):
     }, context_instance=RequestContext(request))
 
 
+@never_cache
 @login_required
 def add_chapter(request, episode):
     e_state = episode.get_user_state(request.user)
@@ -131,6 +135,7 @@ def add_chapter(request, episode):
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
 
+@never_cache
 @login_required
 def remove_chapter(request, episode, start, end):
     e_state = episode.get_user_state(request.user)
@@ -143,6 +148,7 @@ def remove_chapter(request, episode, start, end):
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
 
+@never_cache
 @login_required
 def toggle_favorite(request, episode):
     episode_state = episode.get_user_state(request.user)
@@ -156,6 +162,7 @@ def toggle_favorite(request, episode):
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
 
+@vary_on_cookie
 @login_required
 def list_favorites(request):
     site = RequestSite(request)
@@ -193,6 +200,7 @@ def list_favorites(request):
         }, context_instance=RequestContext(request))
 
 
+@never_cache
 def add_action(request, episode):
 
     device = request.user.get_device(request.POST.get('device'))

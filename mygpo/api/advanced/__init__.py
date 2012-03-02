@@ -27,6 +27,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.sites.models import RequestSite
 from django.db import IntegrityError
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.cache import never_cache
 
 from mygpo.api.constants import EPISODE_ACTION_TYPES, DEVICE_TYPES
 from mygpo.api.httpresponse import JsonResponse
@@ -51,6 +52,7 @@ EPISODE_ACTION_KEYS = ('position', 'episode', 'action', 'device', 'timestamp',
 @csrf_exempt
 @require_valid_user
 @check_username
+@never_cache
 @allowed_methods(['GET', 'POST'])
 def subscriptions(request, username, device_uid):
 
@@ -156,6 +158,7 @@ def get_subscription_changes(user, device, since, until):
 @csrf_exempt
 @require_valid_user
 @check_username
+@never_cache
 @allowed_methods(['GET', 'POST'])
 def episodes(request, username, version=1):
 
@@ -369,6 +372,7 @@ def parse_episode_action(action, user, update_urls, now, ua_string):
 @csrf_exempt
 @require_valid_user
 @check_username
+@never_cache
 # Workaround for mygpoclient 1.0: It uses "PUT" requests
 # instead of "POST" requests for uploading device settings
 @allowed_methods(['POST', 'PUT'])
@@ -410,6 +414,7 @@ def valid_episodeaction(type):
 @csrf_exempt
 @require_valid_user
 @check_username
+@never_cache
 @allowed_methods(['GET'])
 def devices(request, username):
     devices = filter(lambda d: not d.deleted, request.user.devices)
@@ -450,6 +455,7 @@ def get_episode_data(podcasts, domain, clean_action_data, include_actions, episo
 @csrf_exempt
 @require_valid_user
 @check_username
+@never_cache
 def updates(request, username, device_uid):
     now = datetime.now()
     now_ = get_timestamp(now)
@@ -521,6 +527,7 @@ def get_episode_updates(user, subscribed_podcasts, since):
 
 @require_valid_user
 @check_username
+@never_cache
 def favorites(request, username):
     favorites = get_favorites(request.user)
     domain = RequestSite(request).domain

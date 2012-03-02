@@ -20,8 +20,10 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.contrib.sites.models import RequestSite
 from django.utils.translation import ugettext as _
+from django.views.decorators.cache import never_cache
 
 
+@never_cache
 def csrf_failure(request, reason=""):
     site = RequestSite(request)
     return render_to_response('csrf.html', {

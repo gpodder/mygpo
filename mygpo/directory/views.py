@@ -6,6 +6,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.contrib.sites.models import RequestSite
 from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_cookie
 
 from mygpo.core.models import Podcast
 from mygpo.core.proxy import proxy_object
@@ -22,6 +23,7 @@ from mygpo.users.models import User
 from mygpo.cache import get_cache_or_calc
 
 
+@vary_on_cookie
 def toplist(request, num=100, lang=None):
 
     try:
@@ -54,6 +56,7 @@ def toplist(request, num=100, lang=None):
 
 
 
+@vary_on_cookie
 def browse(request, num_lists=4, num_categories=10, num_tags_cloud=90,
         podcasts_per_topic=10):
 
@@ -72,6 +75,7 @@ def browse(request, num_lists=4, num_categories=10, num_tags_cloud=90,
         }, context_instance=RequestContext(request))
 
 
+@vary_on_cookie
 def category(request, category, page_size=20):
     category = Category.for_tag(category)
     if not category:
@@ -99,6 +103,7 @@ def category(request, category, page_size=20):
 
 RESULTS_PER_PAGE=20
 
+@vary_on_cookie
 def search(request, template='search.html', args={}):
 
     if 'q' in request.GET:
@@ -130,7 +135,7 @@ def search(request, template='search.html', args={}):
             ), context_instance=RequestContext(request))
 
 
-
+@vary_on_cookie
 def episode_toplist(request, num=100):
 
     try:
@@ -172,6 +177,7 @@ def episode_toplist(request, num=100):
     }, context_instance=RequestContext(request))
 
 
+@vary_on_cookie
 def podcast_lists(request, page_size=20):
 
     # Make sure page request is an int. If not, deliver first page.

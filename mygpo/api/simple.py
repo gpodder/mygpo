@@ -27,6 +27,7 @@ from django.core.cache import cache
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.cache import cache_page
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.cache import never_cache
 from django.shortcuts import get_object_or_404
 from django.contrib.sites.models import RequestSite
 from django.utils.translation import ugettext as _
@@ -65,6 +66,7 @@ def check_format(fn):
 @require_valid_user
 @check_username
 @check_format
+@never_cache
 @allowed_methods(['GET', 'PUT', 'POST'])
 def subscriptions(request, username, device_uid, format):
 
@@ -85,6 +87,7 @@ def subscriptions(request, username, device_uid, format):
 @require_valid_user
 @check_username
 @check_format
+@never_cache
 @allowed_methods(['GET'])
 def all_subscriptions(request, username, format):
 
@@ -272,6 +275,7 @@ def toplist(request, count, format):
 
 
 @check_format
+@cache_page(60 * 60)
 @allowed_methods(['GET'])
 def search(request, format):
 
@@ -300,6 +304,7 @@ def search(request, format):
 
 @require_valid_user
 @check_format
+@never_cache
 @allowed_methods(['GET'])
 def suggestions(request, count, format):
     count = parse_range(count, 1, 100, 100)

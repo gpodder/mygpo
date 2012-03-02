@@ -18,6 +18,7 @@
 from django.http import HttpResponseBadRequest, Http404
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.cache import never_cache
 
 from mygpo.decorators import allowed_methods
 from mygpo.core.models import Episode, Podcast
@@ -30,6 +31,7 @@ from mygpo.users.models import PodcastUserState
 @csrf_exempt
 @require_valid_user
 @check_username
+@never_cache
 @allowed_methods(['GET', 'POST'])
 def main(request, username, scope):
 

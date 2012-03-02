@@ -4,7 +4,8 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect, \
         HttpResponseForbidden, Http404
-from django.views.decorators.cache import cache_page
+from django.views.decorators.cache import cache_page, never_cache
+from django.views.decorators.vary import vary_on_cookie
 from django.core.urlresolvers import reverse
 
 from mygpo.core.models import Podcast, PodcastGroup
@@ -24,6 +25,7 @@ from mygpo.decorators import requires_token, allowed_methods
 from mygpo.users.models import User
 
 
+@vary_on_cookie
 def home(request):
     if is_publisher(request.user):
         podcasts = Podcast.get_multi(request.user.published_objects)
@@ -40,6 +42,7 @@ def home(request):
             }, context_instance=RequestContext(request))
 
 
+@vary_on_cookie
 @require_publisher
 def search_podcast(request):
     form = SearchPodcastForm(request.POST)
@@ -57,6 +60,7 @@ def search_podcast(request):
     return HttpResponseRedirect(url)
 
 
+@vary_on_cookie
 @require_publisher
 @allowed_methods(['GET', 'POST'])
 def podcast(request, podcast):
@@ -102,6 +106,7 @@ def podcast(request, podcast):
         }, context_instance=RequestContext(request))
 
 
+@vary_on_cookie
 @require_publisher
 def group(request, group):
 
@@ -121,6 +126,7 @@ def group(request, group):
         }, context_instance=RequestContext(request))
 
 
+@vary_on_cookie
 @require_publisher
 def update_podcast(request, podcast):
 
@@ -133,6 +139,7 @@ def update_podcast(request, podcast):
     return HttpResponseRedirect(url)
 
 
+@never_cache
 @requires_token(token_name='publisher_update_token')
 def update_published_podcasts(request, username):
     user = User.get_user(username)
@@ -145,6 +152,7 @@ def update_published_podcasts(request, username):
     return HttpResponse('Updated:\n' + '\n'.join([p.url for p in published_podcasts]), mimetype='text/plain')
 
 
+@vary_on_cookie
 @require_publisher
 def episodes(request, podcast):
 
@@ -170,6 +178,7 @@ def episodes(request, podcast):
 
 
 @require_publisher
+@vary_on_cookie
 @allowed_methods(['GET', 'POST'])
 def episode(request, episode):
 
@@ -200,6 +209,7 @@ def episode(request, episode):
         }, context_instance=RequestContext(request))
 
 
+@vary_on_cookie
 def link(request):
     current_site = RequestSite(request)
     return render_to_response('link.html', {
@@ -207,6 +217,7 @@ def link(request):
         }, context_instance=RequestContext(request))
 
 
+@vary_on_cookie
 def advertise(request):
     site = RequestSite(request)
     return render_to_response('publisher/advertise.html', {

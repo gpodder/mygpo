@@ -35,6 +35,8 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render_to_response
 from django.contrib.sites.models import RequestSite
+from django.views.decorators.vary import vary_on_cookie
+from django.views.decorators.cache import never_cache
 
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core import models
@@ -49,6 +51,7 @@ from mygpo.utils import flatten, parse_range
 from mygpo.cache import get_cache_or_calc
 
 
+@vary_on_cookie
 def home(request):
     if request.user.is_authenticated():
         return dashboard(request)
@@ -56,6 +59,7 @@ def home(request):
         return welcome(request)
 
 
+@vary_on_cookie
 def welcome(request):
     current_site = RequestSite(request)
 
@@ -79,6 +83,7 @@ def welcome(request):
     }, context_instance=RequestContext(request))
 
 
+@vary_on_cookie
 @login_required
 def dashboard(request, episode_count=10):
 
@@ -158,6 +163,7 @@ def cover_art(request, size, filename):
     else:
         raise Http404('Cover art not available')
 
+@vary_on_cookie
 @login_required
 def history(request, count=15, uid=None):
 
@@ -182,6 +188,7 @@ def history(request, count=15, uid=None):
     }, context_instance=RequestContext(request))
 
 
+@never_cache
 @login_required
 def blacklist(request, podcast_id):
     podcast_id = int(podcast_id)
@@ -202,6 +209,7 @@ def blacklist(request, podcast_id):
     return HttpResponseRedirect(reverse('suggestions'))
 
 
+@never_cache
 @login_required
 def rate_suggestions(request):
     rating_val = int(request.GET.get('rate', None))
@@ -215,6 +223,7 @@ def rate_suggestions(request):
     return HttpResponseRedirect(reverse('suggestions'))
 
 
+@vary_on_cookie
 @login_required
 def suggestions(request):
     suggestion_obj = Suggestions.for_user(request.user)
@@ -226,6 +235,7 @@ def suggestions(request):
     }, context_instance=RequestContext(request))
 
 
+@vary_on_cookie
 @login_required
 def mytags(request):
     tags_podcast = {}

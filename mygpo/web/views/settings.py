@@ -23,6 +23,8 @@ from django.forms import ValidationError
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
+from django.views.decorators.vary import vary_on_cookie
+from django.views.decorators.cache import never_cache
 
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.web.forms import UserAccountForm
@@ -31,6 +33,7 @@ from mygpo.utils import get_to_dict
 
 
 @login_required
+@vary_on_cookie
 @allowed_methods(['GET', 'POST'])
 def account(request):
 
@@ -71,6 +74,7 @@ def account(request):
 
 
 @login_required
+@never_cache
 @allowed_methods(['GET', 'POST'])
 def delete_account(request):
 
@@ -88,6 +92,7 @@ def delete_account(request):
 
 
 @login_required
+@never_cache
 @allowed_methods(['GET'])
 def privacy(request):
 
@@ -130,6 +135,7 @@ def privacy(request):
         }, context_instance=RequestContext(request))
 
 
+@vary_on_cookie
 @login_required
 def share(request):
     site = RequestSite(request)

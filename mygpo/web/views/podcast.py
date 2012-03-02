@@ -10,6 +10,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
 from django.utils.translation import ugettext as _
 from django.contrib import messages
+from django.views.decorators.vary import vary_on_cookie
+from django.views.decorators.cache import never_cache
 
 from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.core.proxy import proxy_object
@@ -32,6 +34,7 @@ def update_podcast_settings(state, is_public):
     state.save()
 
 
+@vary_on_cookie
 @allowed_methods(['GET'])
 def show_slug(request, slug):
     podcast = Podcast.for_slug(slug)
@@ -43,6 +46,7 @@ def show_slug(request, slug):
     return show(request, podcast.oldid)
 
 
+@vary_on_cookie
 @allowed_methods(['GET'])
 def show(request, podcast):
 
@@ -160,6 +164,7 @@ def episode_list(podcast, user):
     return map(annotate_episode, episodes)
 
 
+@never_cache
 @login_required
 def add_tag(request, podcast):
     podcast_state = podcast.get_user_state(request.user)
@@ -183,6 +188,7 @@ def add_tag(request, podcast):
     return HttpResponseRedirect(get_podcast_link_target(podcast))
 
 
+@never_cache
 @login_required
 def remove_tag(request, podcast):
     podcast_state = podcast.get_user_state(request.user)
@@ -206,6 +212,7 @@ def remove_tag(request, podcast):
     return HttpResponseRedirect(get_podcast_link_target(podcast))
 
 
+@never_cache
 @login_required
 @allowed_methods(['GET', 'POST'])
 def subscribe(request, podcast):
@@ -243,6 +250,7 @@ def subscribe(request, podcast):
     }, context_instance=RequestContext(request))
 
 
+@never_cache
 @login_required
 def unsubscribe(request, podcast, device_uid):
 
@@ -265,6 +273,7 @@ def unsubscribe(request, podcast, device_uid):
     return HttpResponseRedirect(return_to)
 
 
+@never_cache
 @login_required
 def subscribe_url(request):
     url = request.GET.get('url', None)
@@ -282,6 +291,7 @@ def subscribe_url(request):
     return HttpResponseRedirect(get_podcast_link_target(podcast, 'subscribe'))
 
 
+@never_cache
 @allowed_methods(['POST'])
 def set_public(request, podcast, public):
     state = podcast.get_user_state(request.user)

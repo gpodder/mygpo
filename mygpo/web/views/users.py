@@ -28,6 +28,8 @@ from django.contrib import messages
 from django.contrib.sites.models import RequestSite
 from django.conf import settings
 from django.utils.translation import ugettext as _
+from django.views.decorators.vary import vary_on_cookie
+from django.views.decorators.cache import never_cache
 
 from couchdbkit import ResourceConflict
 
@@ -45,6 +47,7 @@ def login(request, user):
 
 
 
+@never_cache
 def login_user(request):
     # Do not show login page for already-logged-in users
     if request.user.is_authenticated():
@@ -110,6 +113,7 @@ def get_user(username, email):
     return None
 
 
+@never_cache
 @allowed_methods(['POST'])
 def restore_password(request):
     form = RestorePasswordForm(request.POST)
@@ -145,6 +149,7 @@ def _set_active(user, is_active=True):
     user.save()
 
 
+@never_cache
 @allowed_methods(['GET', 'POST'])
 def resend_activation(request):
 
