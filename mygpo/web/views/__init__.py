@@ -29,11 +29,10 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect, \
          Http404
 from django.views.decorators.cache import cache_page
-from django.template import RequestContext
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.contrib.sites.models import RequestSite
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache
@@ -74,13 +73,13 @@ def welcome(request):
 
     toplist = PodcastToplist(lang)
 
-    return render_to_response('home.html', {
+    return render(request, 'home.html', {
           'podcast_count': podcasts,
           'user_count': users,
           'episode_count': episodes,
           'url': current_site,
           'toplist': toplist,
-    }, context_instance=RequestContext(request))
+    })
 
 
 @vary_on_cookie
@@ -102,13 +101,13 @@ def dashboard(request, episode_count=10):
 
     random_podcasts = islice(backend.get_random_picks(lang), 0, 5)
 
-    return render_to_response('dashboard.html', {
+    return render(request, 'dashboard.html', {
             'site': site,
             'devices': devices,
             'subscribed_podcasts': subscribed_podcasts,
             'newest_episodes': newest_episodes,
             'random_podcasts': random_podcasts,
-        }, context_instance=RequestContext(request))
+        })
 
 
 @cache_page(60 * 60 * 24)
@@ -181,11 +180,11 @@ def history(request, count=15, uid=None):
     entries = list(history_obj[start:end])
     HistoryEntry.fetch_data(request.user, entries)
 
-    return render_to_response('history.html', {
+    return render(request, 'history.html', {
         'history': entries,
         'device': device,
         'page': page,
-    }, context_instance=RequestContext(request))
+    })
 
 
 @never_cache
@@ -229,10 +228,10 @@ def suggestions(request):
     suggestion_obj = Suggestions.for_user(request.user)
     suggestions = suggestion_obj.get_podcasts()
     current_site = RequestSite(request)
-    return render_to_response('suggestions.html', {
+    return render(request, 'suggestions.html', {
         'entries': suggestions,
         'url': current_site
-    }, context_instance=RequestContext(request))
+    })
 
 
 @vary_on_cookie
@@ -248,7 +247,7 @@ def mytags(request):
         for tag in taglist:
             tags_tag[ tag ].append(podcast)
 
-    return render_to_response('mytags.html', {
+    return render(request, 'mytags.html', {
         'tags_podcast': tags_podcast,
         'tags_tag': dict(tags_tag.items()),
-    }, context_instance=RequestContext(request))
+    })

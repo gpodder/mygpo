@@ -18,12 +18,11 @@
 import string
 import random
 
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
 from django.template.defaultfilters import slugify
-from django.template import RequestContext
 from django.contrib import messages
 from django.contrib.sites.models import RequestSite
 from django.conf import settings
@@ -59,11 +58,11 @@ def login_user(request):
         else:
             form = None
 
-        return render_to_response('login.html', {
+        return render(request, 'login.html', {
             'url': RequestSite(request),
             'next': request.GET.get('next', ''),
             'restore_password_form': form,
-        }, context_instance=RequestContext(request))
+        })
 
     username = request.POST['user']
     password = request.POST['pwd']
@@ -73,9 +72,9 @@ def login_user(request):
 
         messages.error(request, _('Wrong username or password.'))
 
-        return render_to_response('login.html', {
+        return render(request, 'login.html', {
             'next': request.POST.get('next', ''),
-        }, context_instance=RequestContext(request))
+        })
 
     if not user.is_active:
 
@@ -84,16 +83,15 @@ def login_user(request):
             messages.error(request, _('You have deleted your account, '
                     'but you can register again'))
 
-            return render_to_response('login.html', {
-                }, context_instance=RequestContext(request))
+            return render(request, 'login.html')
 
         else:
 
             messages.error(request, _('Please activate your account first.'))
 
-            return render_to_response('login.html', {
+            return render(request, 'login.html', {
                 'activation_needed': True,
-            }, context_instance=RequestContext(request))
+            })
 
     login(request=request, user=user)
 
@@ -125,8 +123,7 @@ def restore_password(request):
     if not user:
         messages.error(request, _('User does not exist.'))
 
-        return render_to_response('password_reset_failed.html', {
-        }, context_instance=RequestContext(request))
+        return render(request, 'password_reset_failed.html')
 
     site = RequestSite(request)
     pwd = "".join(random.sample(string.letters+string.digits, 8))
@@ -134,7 +131,7 @@ def restore_password(request):
     message = _('Here is your new password for your account %(username)s on %(site)s: %(password)s') % {'username': user.username, 'site': site, 'password': pwd}
     user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
     _set_password(user=user, password=pwd)
-    return render_to_response('password_reset.html', context_instance=RequestContext(request))
+    return render(request, 'password_reset.html')
 
 
 @repeat_on_conflict(['user'])
@@ -155,9 +152,9 @@ def resend_activation(request):
 
     if request.method == 'GET':
         form = ResendActivationForm()
-        return render_to_response('registration/resend_activation.html', {
+        return render(request, 'registration/resend_activation.html', {
             'form': form,
-        }, context_instance=RequestContext(request))
+        })
 
     site = RequestSite(request)
     form = ResendActivationForm(request.POST)
@@ -183,9 +180,9 @@ def resend_activation(request):
     except ValueError, e:
         messages.error(request, str(e))
 
-        return render_to_response('registration/resend_activation.html', {
+        return render(request, 'registration/resend_activation.html', {
            'form': form,
-        }, context_instance=RequestContext(request))
+        })
 
 
     try:
@@ -194,5 +191,5 @@ def resend_activation(request):
     except AttributeError:
         user.send_activation_email(site)
 
-    return render_to_response('registration/resent_activation.html', context_instance=RequestContext(request))
+    return render(request, 'registration/resent_activation.html')
 

@@ -17,11 +17,10 @@
 
 from functools import wraps
 
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, \
         HttpResponseForbidden, Http404
-from django.template import RequestContext
 from django.contrib import messages
 from mygpo.web.forms import DeviceForm, SyncForm
 from mygpo.web import utils
@@ -45,10 +44,10 @@ def overview(request):
     device_groups = request.user.get_grouped_devices()
     deleted_devices = request.user.inactive_devices
 
-    return render_to_response('devicelist.html', {
+    return render(request, 'devicelist.html', {
         'device_groups': device_groups,
         'deleted_devices': deleted_devices,
-    }, context_instance=RequestContext(request))
+    })
 
 
 
@@ -83,13 +82,13 @@ def show(request, device):
     sync_form.set_targets(sync_targets,
             _('Synchronize with the following devices'))
 
-    return render_to_response('device.html', {
+    return render(request, 'device.html', {
         'device': device,
         'sync_form': sync_form,
         'subscriptions': subscriptions,
         'synced_with': synced_with,
         'has_sync_targets': len(sync_targets) > 0,
-    }, context_instance=RequestContext(request))
+    })
 
 
 @login_required
@@ -117,19 +116,19 @@ def create(request):
     except DeviceUIDException as e:
         messages.error(request, _(str(e)))
 
-        return render_to_response('device-create.html', {
+        return render(request, 'device-create.html', {
             'device': device,
             'device_form': device_form,
-        }, context_instance=RequestContext(request))
+        })
 
     except:
         messages.error(request, _("You can't use the same Device "
                    "ID for two devices."))
 
-        return render_to_response('device-create.html', {
+        return render(request, 'device-create.html', {
             'device': device,
             'device_form': device_form,
-        }, context_instance=RequestContext(request))
+        })
 
 
     return HttpResponseRedirect(reverse('device-edit', args=[device.uid]))
@@ -177,10 +176,10 @@ def edit_new(request):
         'uid' : device.uid
         })
 
-    return render_to_response('device-create.html', {
+    return render(request, 'device-create.html', {
         'device': device,
         'device_form': device_form,
-    }, context_instance=RequestContext(request))
+    })
 
 
 
@@ -196,10 +195,10 @@ def edit(request, device):
         'uid' : device.uid
         })
 
-    return render_to_response('device-edit.html', {
+    return render(request, 'device-edit.html', {
         'device': device,
         'device_form': device_form,
-    }, context_instance=RequestContext(request))
+    })
 
 
 @device_decorator

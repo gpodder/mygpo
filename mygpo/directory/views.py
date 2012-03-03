@@ -2,8 +2,7 @@ from itertools import imap as map, islice
 
 from django.core.cache import cache
 from django.http import HttpResponseRedirect, HttpResponseNotFound
-from django.shortcuts import render_to_response
-from django.template import RequestContext
+from django.shortcuts import render
 from django.contrib.sites.models import RequestSite
 from django.views.decorators.cache import cache_page
 from django.views.decorators.vary import vary_on_cookie
@@ -45,14 +44,14 @@ def toplist(request, num=100, lang=None):
             calc=lambda: utils.get_podcast_languages())
     all_langs = utils.get_language_names(languages)
 
-    return render_to_response('toplist.html', {
+    return render(request, 'toplist.html', {
         'entries': entries,
         'max_subscribers': max_subscribers,
         'url': current_site,
         'languages': lang,
         'all_languages': all_langs,
         'types': media_types,
-    }, context_instance=RequestContext(request))
+    })
 
 
 
@@ -69,10 +68,10 @@ def browse(request, num_lists=4, num_categories=10, num_tags_cloud=90,
 
     tag_cloud = TagCloud(count=num_tags_cloud, skip=num_categories, sort_by_name=True)
 
-    return render_to_response('directory.html', {
+    return render(request, 'directory.html', {
         'topics': topics,
         'tag_cloud': tag_cloud,
-        }, context_instance=RequestContext(request))
+        })
 
 
 @vary_on_cookie
@@ -93,11 +92,11 @@ def category(request, category, page_size=20):
 
     page_list = utils.get_page_list(1, num_pages, page, 15)
 
-    return render_to_response('category.html', {
+    return render(request, 'category.html', {
         'entries': podcasts,
         'category': category.label,
         'page_list': page_list,
-        }, context_instance=RequestContext(request))
+        })
 
 
 
@@ -126,13 +125,13 @@ def search(request, template='search.html', args={}):
 
     max_subscribers = max([p.subscriber_count() for p in results] + [0])
 
-    return render_to_response(template, dict(
+    return render(request, template, dict(
             q= q,
             results= results,
             page_list= page_list,
             max_subscribers= max_subscribers,
             **args
-            ), context_instance=RequestContext(request))
+            ))
 
 
 @vary_on_cookie
@@ -166,7 +165,7 @@ def episode_toplist(request, num=100):
             calc=lambda: utils.get_podcast_languages())
     all_langs = utils.get_language_names(languages)
 
-    return render_to_response('episode_toplist.html', {
+    return render(request, 'episode_toplist.html', {
         'entries': entries,
         'max_listeners': max_listeners,
         'url': current_site,
@@ -174,7 +173,7 @@ def episode_toplist(request, num=100):
         'all_languages': all_langs,
         'types': media_types,
         'all_types': CONTENT_TYPES,
-    }, context_instance=RequestContext(request))
+    })
 
 
 @vary_on_cookie
@@ -201,7 +200,7 @@ def podcast_lists(request, page_size=20):
 
     page_list = utils.get_page_list(1, num_pages, page, 15)
 
-    return render_to_response('podcast_lists.html', {
+    return render(request, 'podcast_lists.html', {
         'lists': lists,
         'page_list': page_list,
-        }, context_instance=RequestContext(request))
+        })

@@ -15,9 +15,8 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.contrib.auth import logout
-from django.template import RequestContext
 from django.contrib import messages
 from django.forms import ValidationError
 from django.utils.translation import ugettext as _
@@ -44,9 +43,9 @@ def account(request):
             'public': request.user.settings.get('public_subscriptions', True)
             })
 
-       return render_to_response('account.html', {
+       return render(request, 'account.html', {
             'form': form,
-            }, context_instance=RequestContext(request))
+            })
 
     try:
         form = UserAccountForm(request.POST)
@@ -68,9 +67,9 @@ def account(request):
     except (ValueError, ValidationError) as e:
         messages.error(request, str(e))
 
-    return render_to_response('account.html', {
+    return render(request, 'account.html', {
         'form': form,
-    }, context_instance=RequestContext(request))
+    })
 
 
 @login_required
@@ -79,16 +78,14 @@ def account(request):
 def delete_account(request):
 
     if request.method == 'GET':
-        return render_to_response('delete_account.html',
-                context_instance=RequestContext(request))
+        return render(request, 'delete_account.html')
 
     request.user.is_active = False
     request.user.deleted = True
     request.user.save()
     logout(request)
 
-    return render_to_response('deleted_account.html', {
-        }, context_instance=RequestContext(request))
+    return render(request, 'deleted_account.html')
 
 
 @login_required
@@ -127,12 +124,12 @@ def privacy(request):
     included_subscriptions = set(filter(None, [podcasts.get(x[1], None) for x in subscriptions if x[0] == True]))
     excluded_subscriptions = set(filter(None, [podcasts.get(x[1], None) for x in subscriptions if x[0] == False]))
 
-    return render_to_response('privacy.html', {
+    return render(request, 'privacy.html', {
         'public_subscriptions': request.user.settings.get('public_subscriptions', True),
         'included_subscriptions': included_subscriptions,
         'excluded_subscriptions': excluded_subscriptions,
         'domain': site.domain,
-        }, context_instance=RequestContext(request))
+        })
 
 
 @vary_on_cookie
@@ -160,7 +157,7 @@ def share(request):
 
     token = request.user.subscriptions_token
 
-    return render_to_response('share.html', {
+    return render(request, 'share.html', {
         'site': site,
         'token': token,
-        }, context_instance=RequestContext(request))
+        })

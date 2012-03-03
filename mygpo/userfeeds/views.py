@@ -1,5 +1,4 @@
-from django.shortcuts import render_to_response
-from django.template import RequestContext
+from django.shortcuts import render
 from django.contrib.sites.models import RequestSite
 from django.http import Http404
 
@@ -19,9 +18,9 @@ def favorite_feed(request, username):
 
     feed = FavoriteFeed(user)
 
-    return render_to_response('userfeed.xml', {
+    return render(request, 'userfeed.xml', {
         'site': site,
         'feed_user': user,
         'feed': feed,
-        }, context_instance=RequestContext(request), mimetype='text/xml')
+        }, mimetype='text/xml')
 

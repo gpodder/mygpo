@@ -16,8 +16,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from django.shortcuts import render_to_response
-from django.template import RequestContext
+from django.shortcuts import render
 from django.contrib.sites.models import RequestSite
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import never_cache
@@ -26,12 +25,12 @@ from django.views.decorators.cache import never_cache
 @never_cache
 def csrf_failure(request, reason=""):
     site = RequestSite(request)
-    return render_to_response('csrf.html', {
+    return render(request, 'csrf.html', {
         'site': site,
         'method': request.method,
         'referer': request.META.get('HTTP_REFERER', _('another site')),
         'path': request.path,
         'get': request.GET,
         'post': request.POST,
-    }, context_instance=RequestContext(request))
+    })
 

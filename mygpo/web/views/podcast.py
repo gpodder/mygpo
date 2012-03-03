@@ -4,8 +4,7 @@ from functools import wraps
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseRedirect, Http404
 from django.db import IntegrityError
-from django.shortcuts import render_to_response
-from django.template import RequestContext
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
 from django.utils.translation import ugettext as _
@@ -84,7 +83,7 @@ def show(request, podcast):
         subscribe_form = SyncForm()
         subscribe_form.set_targets(subscribe_targets, '')
 
-        return render_to_response('podcast.html', {
+        return render(request, 'podcast.html', {
             'tags': tags,
             'history': history,
             'podcast': podcast,
@@ -95,17 +94,17 @@ def show(request, podcast):
             'subscribe_form': subscribe_form,
             'episodes': episodes,
             'max_listeners': max_listeners,
-        }, context_instance=RequestContext(request))
+        })
     else:
         current_site = RequestSite(request)
-        return render_to_response('podcast.html', {
+        return render(request, 'podcast.html', {
             'podcast': podcast,
             'related_podcasts': rel_podcasts,
             'tags': tags,
             'url': current_site,
             'episodes': episodes,
             'max_listeners': max_listeners,
-        }, context_instance=RequestContext(request))
+        })
 
 
 def get_tags(podcast, user):
@@ -243,11 +242,11 @@ def subscribe(request, podcast):
     form = SyncForm()
     form.set_targets(targets, _('Choose a device:'))
 
-    return render_to_response('subscribe.html', {
+    return render(request, 'subscribe.html', {
         'podcast': podcast,
         'can_subscribe': len(targets) > 0,
         'form': form
-    }, context_instance=RequestContext(request))
+    })
 
 
 @never_cache

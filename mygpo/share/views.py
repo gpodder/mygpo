@@ -2,8 +2,7 @@ from functools import wraps
 
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponseForbidden
-from django.shortcuts import render_to_response
-from django.template import RequestContext
+from django.shortcuts import render
 from django.template.defaultfilters import slugify
 from django.contrib.sites.models import RequestSite
 from django.contrib.auth.decorators import login_required
@@ -53,9 +52,9 @@ def lists_own(request):
 
     lists = PodcastList.for_user(request.user._id)
 
-    return render_to_response('lists.html', {
+    return render(request, 'lists.html', {
             'lists': lists
-        }, context_instance=RequestContext(request))
+        })
 
 
 def lists_user(request, username):
@@ -66,10 +65,10 @@ def lists_user(request, username):
 
     lists = PodcastList.for_user(user._id)
 
-    return render_to_response('lists_user.html', {
+    return render(request, 'lists_user.html', {
             'lists': lists,
             'user': user,
-        }, context_instance=RequestContext(request))
+        })
 
 
 @list_decorator(must_own=False)
@@ -86,13 +85,13 @@ def list_show(request, plist, owner):
 
     site = RequestSite(request)
 
-    return render_to_response('list.html', {
+    return render(request, 'list.html', {
             'podcastlist': plist,
             'max_subscribers': max_subscribers,
             'owner': owner,
             'domain': site.domain,
             'is_own': is_own,
-        }, context_instance=RequestContext(request))
+        })
 
 
 @list_decorator(must_own=False)

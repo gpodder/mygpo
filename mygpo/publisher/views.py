@@ -1,7 +1,6 @@
 from functools import wraps
 
-from django.shortcuts import render_to_response
-from django.template import RequestContext
+from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, \
         HttpResponseForbidden, Http404
 from django.views.decorators.cache import cache_page, never_cache
@@ -30,16 +29,16 @@ def home(request):
     if is_publisher(request.user):
         podcasts = Podcast.get_multi(request.user.published_objects)
         form = SearchPodcastForm()
-        return render_to_response('publisher/home.html', {
+        return render(request, 'publisher/home.html', {
             'podcasts': podcasts,
             'form': form,
-            }, context_instance=RequestContext(request))
+            })
 
     else:
         site = RequestSite(request)
-        return render_to_response('publisher/info.html', {
+        return render(request, 'publisher/info.html', {
             'site': site
-            }, context_instance=RequestContext(request))
+            })
 
 
 @vary_on_cookie
@@ -94,7 +93,7 @@ def podcast(request, podcast):
 
     site = RequestSite(request)
 
-    return render_to_response('publisher/podcast.html', {
+    return render(request, 'publisher/podcast.html', {
         'site': site,
         'podcast': podcast,
         'group': group,
@@ -103,7 +102,7 @@ def podcast(request, podcast):
         'subscriber_data': subscription_data,
         'update_token': update_token,
         'heatmap': heatmap,
-        }, context_instance=RequestContext(request))
+        })
 
 
 @vary_on_cookie
@@ -119,11 +118,11 @@ def group(request, group):
     timeline_data = listener_data(podcasts)
     subscription_data = list(subscriber_data(podcasts))[-20:]
 
-    return render_to_response('publisher/group.html', {
+    return render(request, 'publisher/group.html', {
         'group': group,
         'timeline_data': timeline_data,
         'subscriber_data': subscription_data,
-        }, context_instance=RequestContext(request))
+        })
 
 
 @vary_on_cookie
@@ -170,11 +169,11 @@ def episodes(request, podcast):
 
     episodes = map(annotate_episode, episodes)
 
-    return render_to_response('publisher/episodes.html', {
+    return render(request, 'publisher/episodes.html', {
         'podcast': podcast,
         'episodes': episodes,
         'max_listeners': max_listeners
-        }, context_instance=RequestContext(request))
+        })
 
 
 @require_publisher
@@ -200,29 +199,29 @@ def episode(request, episode):
     heatmap = EpisodeHeatmap(episode.podcast, episode._id,
               duration=episode.duration)
 
-    return render_to_response('publisher/episode.html', {
+    return render(request, 'publisher/episode.html', {
         'episode': episode,
         'podcast': podcast,
         'form': form,
         'timeline_data': timeline_data,
         'heatmap': heatmap,
-        }, context_instance=RequestContext(request))
+        })
 
 
 @vary_on_cookie
 def link(request):
     current_site = RequestSite(request)
-    return render_to_response('link.html', {
+    return render(request, 'link.html', {
         'url': current_site
-        }, context_instance=RequestContext(request))
+        })
 
 
 @vary_on_cookie
 def advertise(request):
     site = RequestSite(request)
-    return render_to_response('publisher/advertise.html', {
+    return render(request, 'publisher/advertise.html', {
         'site': site
-    }, context_instance=RequestContext(request))
+    })
 
 
 def group_slug_id_decorator(f):

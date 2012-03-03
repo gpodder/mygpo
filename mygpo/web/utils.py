@@ -4,6 +4,7 @@ from datetime import datetime
 from django.views.decorators.cache import never_cache
 from django.utils.html import strip_tags
 from django.core.urlresolvers import reverse
+from django.shortcuts import render
 
 from babel import Locale, UnknownLocaleError
 
@@ -141,11 +142,7 @@ def symbian_opml_changes(podcast):
 
 @never_cache
 def maintenance(request, *args, **kwargs):
-    from django.shortcuts import render_to_response
-    from django.template import RequestContext
-
-    resp = render_to_response('maintenance.html', {},
-        context_instance=RequestContext(request))
+    resp = render(request, 'maintenance.html', {})
     resp.status_code = 503
     return resp
 

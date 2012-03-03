@@ -20,8 +20,7 @@
 from functools import wraps
 
 from django.http import Http404
-from django.shortcuts import render_to_response
-from django.template import RequestContext
+from django.shortcuts import render
 from django.http import HttpResponseForbidden, HttpResponseNotAllowed
 
 
@@ -58,9 +57,9 @@ def requires_token(token_name, denied_template=None):
 
             else:
                 if denied_template:
-                    return render_to_response(denied_template, {
+                    return render(request, denied_template, {
                         'other_user': user
-                        }, context_instance=RequestContext(request))
+                        })
 
                 else:
                     return HttpResponseForbidden()

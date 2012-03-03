@@ -20,9 +20,8 @@ from functools import wraps
 
 import dateutil.parser
 
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.http import HttpResponseRedirect, Http404
-from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
@@ -86,7 +85,7 @@ def episode(request, episode):
     prev = podcast.get_episode_before(episode)
     next = podcast.get_episode_after(episode)
 
-    return render_to_response('episode.html', {
+    return render(request, 'episode.html', {
         'episode': episode,
         'podcast': podcast,
         'prev': prev,
@@ -97,7 +96,7 @@ def episode(request, episode):
         'played_parts': played_parts,
         'actions': EPISODE_ACTION_TYPES,
         'devices': devices,
-    }, context_instance=RequestContext(request))
+    })
 
 
 @never_cache
@@ -192,12 +191,12 @@ def list_favorites(request):
 
     token = request.user.favorite_feeds_token
 
-    return render_to_response('favorites.html', {
+    return render(request, 'favorites.html', {
         'episodes': episodes,
         'feed_token': token,
         'site': site,
         'podcast': podcast,
-        }, context_instance=RequestContext(request))
+        })
 
 
 @never_cache

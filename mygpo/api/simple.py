@@ -21,8 +21,7 @@ from functools import wraps
 
 from couchdbkit.exceptions import ResourceNotFound
 
-from django.shortcuts import render_to_response
-from django.template import RequestContext
+from django.shortcuts import render
 from django.core.cache import cache
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.cache import cache_page
@@ -161,7 +160,7 @@ def format_podcast_list(obj_list, format, title, get_podcast=None,
         podcasts = map(json_map, obj_list)
         template_args.update({'podcasts': podcasts})
 
-        return render_to_response(xml_template, template_args, context_instance=RequestContext(request),
+        return render(request, xml_template, template_args,
                 mimetype='application/xml')
 
     else:
