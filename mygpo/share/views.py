@@ -182,13 +182,13 @@ def overview(request):
     favfeed_url = 'http://%s/%s' % (site.domain, reverse('favorites-feed', args=[request.user.username]))
     favfeed_podcast = Podcast.for_url(favfeed_url)
 
-    return render_to_response('share/overview.html', {
+    return render(request, 'share/overview.html', {
         'site': site,
         'subscriptions_token': subscriptions_token,
         'userpage_token': userpage_token,
         'favfeed_token': favfeed_token,
         'favfeed_podcast': favfeed_podcast,
-        }, context_instance=RequestContext(request))
+        })
 
 
 @login_required
