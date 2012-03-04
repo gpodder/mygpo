@@ -26,18 +26,20 @@ from datetime import datetime, timedelta
 import hashlib
 import urllib2
 import socket
+from glob import glob
 from functools import partial
 from itertools import chain
 
 from mygpo.decorators import repeat_on_conflict
 from mygpo.data import feedcore
-from mygpo.utils import parse_time
+from mygpo.utils import parse_time, file_hash
 from mygpo.api.sanitizing import sanitize_url, rewrite_podcasts
 from mygpo.data import youtube
 from mygpo.data.mimetype import get_mimetype, check_mimetype, get_podcast_types
 from mygpo.core.models import Episode, Podcast
 from mygpo.core.slugs import assign_missing_episode_slugs, assign_slug, \
          PodcastSlug
+from mygpo.web.logo import CoverArt
 
 socket.setdefaulttimeout(10)
 fetcher = feedcore.Fetcher(USER_AGENT)
@@ -264,14 +266,36 @@ def get_podcast_logo(podcast, feed):
 
     if cover_art:
         try:
-            image_sha1 = hashlib.sha1()
-            image_sha1.update(cover_art)
-            image_sha1 = image_sha1.hexdigest()
-            filename = os.path.join(os.path.dirname(os.path.abspath(__file__ )), '..', '..', 'htdocs', 'media', 'logo', image_sha1)
-            fp = open(filename, 'w')
-            fp.write(urllib2.urlopen(cover_art).read())
-            fp.close()
+            image_sha1 = hashlib.sha1(cover_art).hexdigest()
+            prefix = CoverArt.get_prefix(image_sha1)
+
+            filename = CoverArt.get_original(prefix, image_sha1)
+            dirname = CoverArt.get_dir(filename)
+
+            # get hash of existing file
+            if os.path.exists(filename):
+                with open(filename) as f:
+                    old_hash = file_hash(f).digest()
+            else:
+                old_hash = ''
+
             print 'LOGO @', cover_art
+
+            # save new cover art
+            with open(filename, 'w') as fp:
+                fp.write(urllib2.urlopen(cover_art).read())
+
+            # get hash of new file
+            with open(filename) as f:
+                new_hash = file_hash(f).digest()
+
+            # remove thumbnails if cover changed
+            if old_hash != new_hash:
+                thumbnails = CoverArt.get_existing_thumbnails(prefix, filename)
+                print 'Removing %d thumbnails' % len(thumbnails)
+                for f in thumbnails:
+                    os.unlink(f)
+
             return  cover_art
 
         except Exception, e:

@@ -18,17 +18,10 @@
 import sys
 from itertools import islice
 from collections import defaultdict
-import os
-import StringIO
 from datetime import datetime, timedelta
 
-import Image
-import ImageDraw
-
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect, \
-         Http404
-from django.views.decorators.cache import cache_page
+from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
@@ -109,58 +102,6 @@ def dashboard(request, episode_count=10):
             'random_podcasts': random_podcasts,
         })
 
-
-@cache_page(60 * 60 * 24)
-def cover_art(request, size, filename):
-    size = int(size)
-
-    # XXX: Is there a "cleaner" way to get the root directory of the installation?
-    root = os.path.join(os.path.dirname(__file__), '..', '..', '..')
-    target = os.path.join(root, 'htdocs', 'media', 'logo', str(size), filename+'.jpg')
-    filepath = os.path.join(root, 'htdocs', 'media', 'logo', filename)
-
-    if os.path.exists(target):
-        return HttpResponsePermanentRedirect('/media/logo/%s/%s.jpg' % (str(size), filename))
-
-    if os.path.exists(filepath):
-        target_dir = os.path.dirname(target)
-        if not os.path.isdir(target_dir):
-            os.makedirs(target_dir)
-
-        try:
-            im = Image.open(filepath)
-            if im.mode not in ('RGB', 'RGBA'):
-                im = im.convert('RGB')
-        except:
-            raise Http404('Cannot open cover file')
-
-        try:
-            im.thumbnail((size, size), Image.ANTIALIAS)
-            resized = im
-        except IOError:
-            # raised when trying to read an interlaced PNG; we use the original instead
-            return HttpResponsePermanentRedirect('/media/logo/%s' % filename)
-
-        # If it's a RGBA image, composite it onto a white background for JPEG
-        if resized.mode == 'RGBA':
-            background = Image.new('RGB', resized.size)
-            draw = ImageDraw.Draw(background)
-            draw.rectangle((-1, -1, resized.size[0]+1, resized.size[1]+1), \
-                    fill=(255, 255, 255))
-            del draw
-            resized = Image.composite(resized, background, resized)
-
-        io = StringIO.StringIO()
-        resized.save(io, 'JPEG', optimize=True, progression=True, quality=80)
-        s = io.getvalue()
-
-        fp = open(target, 'wb')
-        fp.write(s)
-        fp.close()
-
-        return HttpResponsePermanentRedirect('/media/logo/%s/%s.jpg' % (str(size), filename))
-    else:
-        raise Http404('Cover art not available')
 
 @vary_on_cookie
 @login_required

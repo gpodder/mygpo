@@ -9,12 +9,14 @@ from couchdbkit.ext.django.schema import *
 from restkit.errors import Unauthorized
 
 from django.conf import settings
+from django.core.urlresolvers import reverse
 
 from mygpo.decorators import repeat_on_conflict
 from mygpo import utils
 from mygpo.core.proxy import DocumentABCMeta
 from mygpo.core.slugs import SlugMixin
 from mygpo.core.oldid import OldIdMixin
+from mygpo.web.logo import CoverArt
 
 
 class SubscriptionException(Exception):
@@ -654,19 +656,14 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
 
     def get_logo_url(self, size):
-        if not self.logo_url:
-            return '/media/podcast-%d.png' % (hash(self.title) % 5, )
+        if self.logo_url:
+            filename = hashlib.sha1(self.logo_url).hexdigest()
+        else:
+            filename = 'podcast-%d.png' % (hash(self.title) % 5, )
 
-        filename = hashlib.sha1(self.logo_url).hexdigest()
+        prefix = CoverArt.get_prefix(filename)
 
-        root = os.path.join(settings.BASE_DIR, '..')
-        target = os.path.join(root, 'htdocs', 'media', 'logo', str(size), filename+'.jpg')
-        filepath = os.path.join(root, 'htdocs', 'media', 'logo', filename)
-
-        if os.path.exists(target):
-            return '/media/logo/%s/%s.jpg' % (str(size), filename)
-
-        return '/logo/%d/%s.jpg' % (size, filename)
+        return reverse('logo', args=[size, prefix, filename])
 
 
     def subscriber_count(self):
