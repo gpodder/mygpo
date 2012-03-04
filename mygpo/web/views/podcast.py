@@ -4,12 +4,13 @@ from functools import wraps
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseRedirect, Http404
 from django.db import IntegrityError
-from django.shortcuts import get_object_or_404, render_to_response
-from django.template import RequestContext
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
 from django.utils.translation import ugettext as _
 from django.contrib import messages
+from django.views.decorators.vary import vary_on_cookie
+from django.views.decorators.cache import never_cache
 
 from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.core.proxy import proxy_object
@@ -32,6 +33,7 @@ def update_podcast_settings(state, is_public):
     state.save()
 
 
+@vary_on_cookie
 @allowed_methods(['GET'])
 def show_slug(request, slug):
     podcast = Podcast.for_slug(slug)
@@ -43,6 +45,7 @@ def show_slug(request, slug):
     return show(request, podcast.oldid)
 
 
+@vary_on_cookie
 @allowed_methods(['GET'])
 def show(request, podcast):
 
@@ -80,7 +83,7 @@ def show(request, podcast):
         subscribe_form = SyncForm()
         subscribe_form.set_targets(subscribe_targets, '')
 
-        return render_to_response('podcast.html', {
+        return render(request, 'podcast.html', {
             'tags': tags,
             'history': history,
             'podcast': podcast,
@@ -91,17 +94,17 @@ def show(request, podcast):
             'subscribe_form': subscribe_form,
             'episodes': episodes,
             'max_listeners': max_listeners,
-        }, context_instance=RequestContext(request))
+        })
     else:
         current_site = RequestSite(request)
-        return render_to_response('podcast.html', {
+        return render(request, 'podcast.html', {
             'podcast': podcast,
             'related_podcasts': rel_podcasts,
             'tags': tags,
             'url': current_site,
             'episodes': episodes,
             'max_listeners': max_listeners,
-        }, context_instance=RequestContext(request))
+        })
 
 
 def get_tags(podcast, user):
@@ -142,13 +145,10 @@ def episode_list(podcast, user):
         podcasts_dict = dict( (p_id, podcast) for p_id in podcast.get_ids())
         episodes_dict = dict( (episode._id, episode) for episode in episodes)
 
-        actions = podcast.get_episode_states(user._id)
-        actions = (HistoryEntry.from_action_dict(state, index) for (state, index) in actions)
+        actions = podcast.get_episode_states(user.id)
+        actions = map(HistoryEntry.from_action_dict, actions)
 
-        # TODO: can't pass iterator to fetch_data
-        actions = list(actions)
-
-        actions = HistoryEntry.fetch_data(user, actions,
+        HistoryEntry.fetch_data(user, actions,
                 podcasts=podcasts_dict, episodes=episodes_dict)
 
         episode_actions = dict( (action.episode_id, action) for action in actions)
@@ -163,6 +163,7 @@ def episode_list(podcast, user):
     return map(annotate_episode, episodes)
 
 
+@never_cache
 @login_required
 def add_tag(request, podcast):
     podcast_state = podcast.get_user_state(request.user)
@@ -186,6 +187,7 @@ def add_tag(request, podcast):
     return HttpResponseRedirect(get_podcast_link_target(podcast))
 
 
+@never_cache
 @login_required
 def remove_tag(request, podcast):
     podcast_state = podcast.get_user_state(request.user)
@@ -209,6 +211,7 @@ def remove_tag(request, podcast):
     return HttpResponseRedirect(get_podcast_link_target(podcast))
 
 
+@never_cache
 @login_required
 @allowed_methods(['GET', 'POST'])
 def subscribe(request, podcast):
@@ -239,13 +242,14 @@ def subscribe(request, podcast):
     form = SyncForm()
     form.set_targets(targets, _('Choose a device:'))
 
-    return render_to_response('subscribe.html', {
+    return render(request, 'subscribe.html', {
         'podcast': podcast,
         'can_subscribe': len(targets) > 0,
         'form': form
-    }, context_instance=RequestContext(request))
+    })
 
 
+@never_cache
 @login_required
 def unsubscribe(request, podcast, device_uid):
 
@@ -268,6 +272,7 @@ def unsubscribe(request, podcast, device_uid):
     return HttpResponseRedirect(return_to)
 
 
+@never_cache
 @login_required
 def subscribe_url(request):
     url = request.GET.get('url', None)
@@ -285,6 +290,7 @@ def subscribe_url(request):
     return HttpResponseRedirect(get_podcast_link_target(podcast, 'subscribe'))
 
 
+@never_cache
 @allowed_methods(['POST'])
 def set_public(request, podcast, public):
     state = podcast.get_user_state(request.user)

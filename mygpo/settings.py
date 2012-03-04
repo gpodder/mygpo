@@ -82,8 +82,10 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -128,7 +130,7 @@ AUTHENTICATION_BACKENDS = (
     'mygpo.web.auth.EmailAuthenticationBackend',
 )
 
-SESSION_ENGINE = "django_couchdb_utils.sessions.couchdb"
+SESSION_ENGINE = "django_couchdb_utils.sessions.cached_couchdb"
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.auth.context_processors.auth",

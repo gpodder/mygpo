@@ -18,25 +18,20 @@
 import sys
 from itertools import islice
 from collections import defaultdict
-import os
-import StringIO
 from datetime import datetime, timedelta
 
-import Image
-import ImageDraw
 import gevent
 
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect, \
-         Http404
-from django.views.decorators.cache import cache_page
-from django.template import RequestContext
+from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, render_to_response
+from django.shortcuts import render
 from django.contrib.sites.models import RequestSite
 from django.views.generic.base import View
+from django.views.decorators.vary import vary_on_cookie
+from django.views.decorators.cache import never_cache
 
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core import models
@@ -51,6 +46,7 @@ from mygpo.utils import flatten, parse_range
 from mygpo.cache import get_cache_or_calc
 
 
+@vary_on_cookie
 def home(request):
     if request.user.is_authenticated():
         return dashboard(request)
@@ -58,6 +54,7 @@ def home(request):
         return welcome(request)
 
 
+@vary_on_cookie
 def welcome(request):
     current_site = RequestSite(request)
 
@@ -72,15 +69,16 @@ def welcome(request):
 
     toplist = PodcastToplist(lang)
 
-    return render_to_response('home.html', {
+    return render(request, 'home.html', {
           'podcast_count': podcasts,
           'user_count': users,
           'episode_count': episodes,
           'url': current_site,
           'toplist': toplist,
-    }, context_instance=RequestContext(request))
+    })
 
 
+@vary_on_cookie
 @login_required
 def dashboard(request, episode_count=10):
 
@@ -99,67 +97,16 @@ def dashboard(request, episode_count=10):
 
     random_podcasts = islice(backend.get_random_picks(lang), 0, 5)
 
-    return render_to_response('dashboard.html', {
+    return render(request, 'dashboard.html', {
             'site': site,
             'devices': devices,
             'subscribed_podcasts': subscribed_podcasts,
             'newest_episodes': newest_episodes,
             'random_podcasts': random_podcasts,
-        }, context_instance=RequestContext(request))
+        })
 
 
-@cache_page(60 * 60 * 24)
-def cover_art(request, size, filename):
-    size = int(size)
-
-    # XXX: Is there a "cleaner" way to get the root directory of the installation?
-    root = os.path.join(os.path.dirname(__file__), '..', '..', '..')
-    target = os.path.join(root, 'htdocs', 'media', 'logo', str(size), filename+'.jpg')
-    filepath = os.path.join(root, 'htdocs', 'media', 'logo', filename)
-
-    if os.path.exists(target):
-        return HttpResponsePermanentRedirect('/media/logo/%s/%s.jpg' % (str(size), filename))
-
-    if os.path.exists(filepath):
-        target_dir = os.path.dirname(target)
-        if not os.path.isdir(target_dir):
-            os.makedirs(target_dir)
-
-        try:
-            im = Image.open(filepath)
-            if im.mode not in ('RGB', 'RGBA'):
-                im = im.convert('RGB')
-        except:
-            raise Http404('Cannot open cover file')
-
-        try:
-            im.thumbnail((size, size), Image.ANTIALIAS)
-            resized = im
-        except IOError:
-            # raised when trying to read an interlaced PNG; we use the original instead
-            return HttpResponsePermanentRedirect('/media/logo/%s' % filename)
-
-        # If it's a RGBA image, composite it onto a white background for JPEG
-        if resized.mode == 'RGBA':
-            background = Image.new('RGB', resized.size)
-            draw = ImageDraw.Draw(background)
-            draw.rectangle((-1, -1, resized.size[0]+1, resized.size[1]+1), \
-                    fill=(255, 255, 255))
-            del draw
-            resized = Image.composite(resized, background, resized)
-
-        io = StringIO.StringIO()
-        resized.save(io, 'JPEG', optimize=True, progression=True, quality=80)
-        s = io.getvalue()
-
-        fp = open(target, 'wb')
-        fp.write(s)
-        fp.close()
-
-        return HttpResponsePermanentRedirect('/media/logo/%s/%s.jpg' % (str(size), filename))
-    else:
-        raise Http404('Cover art not available')
-
+@vary_on_cookie
 @login_required
 def history(request, count=15, uid=None):
 
@@ -177,13 +124,14 @@ def history(request, count=15, uid=None):
     entries = list(history_obj[start:end])
     HistoryEntry.fetch_data(request.user, entries)
 
-    return render_to_response('history.html', {
+    return render(request, 'history.html', {
         'history': entries,
         'device': device,
         'page': page,
-    }, context_instance=RequestContext(request))
+    })
 
 
+@never_cache
 @login_required
 def blacklist(request, podcast_id):
     podcast_id = int(podcast_id)
@@ -204,6 +152,7 @@ def blacklist(request, podcast_id):
     return HttpResponseRedirect(reverse('suggestions'))
 
 
+@never_cache
 @login_required
 def rate_suggestions(request):
     rating_val = int(request.GET.get('rate', None))
@@ -217,17 +166,19 @@ def rate_suggestions(request):
     return HttpResponseRedirect(reverse('suggestions'))
 
 
+@vary_on_cookie
 @login_required
 def suggestions(request):
     suggestion_obj = Suggestions.for_user(request.user)
     suggestions = suggestion_obj.get_podcasts()
     current_site = RequestSite(request)
-    return render_to_response('suggestions.html', {
+    return render(request, 'suggestions.html', {
         'entries': suggestions,
         'url': current_site
-    }, context_instance=RequestContext(request))
+    })
 
 
+@vary_on_cookie
 @login_required
 def mytags(request):
     tags_podcast = {}
@@ -240,10 +191,10 @@ def mytags(request):
         for tag in taglist:
             tags_tag[ tag ].append(podcast)
 
-    return render_to_response('mytags.html', {
+    return render(request, 'mytags.html', {
         'tags_podcast': tags_podcast,
         'tags_tag': dict(tags_tag.items()),
-    }, context_instance=RequestContext(request))
+    })
 
 
 

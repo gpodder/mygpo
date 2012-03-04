@@ -20,12 +20,13 @@ from functools import wraps
 
 import dateutil.parser
 
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.http import HttpResponseRedirect, Http404
-from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
+from django.views.decorators.vary import vary_on_cookie
+from django.views.decorators.cache import never_cache
 
 from mygpo.api.constants import EPISODE_ACTION_TYPES
 from mygpo.decorators import repeat_on_conflict
@@ -39,6 +40,7 @@ from mygpo.web.heatmap import EpisodeHeatmap
 from mygpo.web.utils import get_episode_link_target, fetch_episode_data
 
 
+@vary_on_cookie
 def episode(request, episode):
 
     podcast = Podcast.get(episode.podcast)
@@ -82,7 +84,7 @@ def episode(request, episode):
     prev = podcast.get_episode_before(episode)
     next = podcast.get_episode_after(episode)
 
-    return render_to_response('episode.html', {
+    return render(request, 'episode.html', {
         'episode': episode,
         'podcast': podcast,
         'prev': prev,
@@ -93,9 +95,10 @@ def episode(request, episode):
         'played_parts': played_parts,
         'actions': EPISODE_ACTION_TYPES,
         'devices': devices,
-    }, context_instance=RequestContext(request))
+    })
 
 
+@never_cache
 @login_required
 def add_chapter(request, episode):
     e_state = episode.get_user_state(request.user)
@@ -130,6 +133,7 @@ def add_chapter(request, episode):
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
 
+@never_cache
 @login_required
 def remove_chapter(request, episode, start, end):
     e_state = episode.get_user_state(request.user)
@@ -142,6 +146,7 @@ def remove_chapter(request, episode, start, end):
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
 
+@never_cache
 @login_required
 def toggle_favorite(request, episode):
     episode_state = episode.get_user_state(request.user)
@@ -155,6 +160,7 @@ def toggle_favorite(request, episode):
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
 
+@vary_on_cookie
 @login_required
 def list_favorites(request):
     site = RequestSite(request)
@@ -176,14 +182,15 @@ def list_favorites(request):
 
     token = request.user.favorite_feeds_token
 
-    return render_to_response('favorites.html', {
+    return render(request, 'favorites.html', {
         'episodes': episodes,
         'feed_token': token,
         'site': site,
         'podcast': podcast,
-        }, context_instance=RequestContext(request))
+        })
 
 
+@never_cache
 def add_action(request, episode):
 
     device = request.user.get_device(request.POST.get('device'))

@@ -21,9 +21,9 @@ from django.http import HttpResponse, HttpResponseBadRequest, \
      HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from django.core.urlresolvers import reverse
-from django.shortcuts import get_object_or_404
 from django.contrib.sites.models import RequestSite
 from django.template.defaultfilters import slugify
+from django.views.decorators.cache import never_cache
 
 from mygpo.api.advanced.directory import podcast_data
 from mygpo.api.httpresponse import JsonResponse
@@ -42,6 +42,7 @@ from mygpo.users.models import User
 @require_valid_user
 @check_username
 @check_format
+@never_cache
 @allowed_methods(['POST'])
 def create(request, username, format):
     """ Creates a new podcast list and links to it in the Location header """
@@ -90,6 +91,7 @@ def _get_list_data(l, username, domain):
 
 
 @csrf_exempt
+@never_cache
 @allowed_methods(['GET'])
 def get_lists(request, username):
     """ Returns a list of all podcast lists by the given user """
@@ -111,6 +113,7 @@ def get_lists(request, username):
 
 @csrf_exempt
 @check_format
+@never_cache
 @allowed_methods(['GET', 'PUT', 'DELETE'])
 def podcast_list(request, *args, **kwargs):
 
@@ -123,6 +126,7 @@ def podcast_list(request, *args, **kwargs):
     return handlers[request.method](request, *args, **kwargs)
 
 
+@never_cache
 @list_decorator(must_own=False)
 def get_list(request, plist, owner, format):
     """ Returns the contents of the podcast list """
@@ -144,6 +148,7 @@ def get_list(request, plist, owner, format):
             xml_template='podcasts.xml', request=request)
 
 
+@never_cache
 @require_valid_user
 @list_decorator(must_own=True)
 def update_list(request, plist, owner, format):
@@ -168,6 +173,7 @@ def update_list(request, plist, owner, format):
     return HttpResponse(status=204)
 
 
+@never_cache
 @require_valid_user
 @list_decorator(must_own=True)
 def delete_list(request, plist, owner, format):

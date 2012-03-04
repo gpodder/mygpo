@@ -22,6 +22,7 @@ import dateutil.parser
 
 from django.http import HttpResponseBadRequest, Http404
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.cache import never_cache
 
 from mygpo.core import models
 from mygpo.api.httpresponse import JsonResponse
@@ -38,6 +39,7 @@ from mygpo.api.basic_auth import require_valid_user, check_username
 @csrf_exempt
 @require_valid_user
 @check_username
+@never_cache
 @allowed_methods(['POST', 'GET'])
 def chapters(request, username):
 

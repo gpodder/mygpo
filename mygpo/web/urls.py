@@ -5,10 +5,12 @@ from django.views.generic.simple import direct_to_template
 from django_couchdb_utils.registration.views import activate, register
 from django_couchdb_utils.registration.forms import RegistrationFormUniqueEmail
 
+from mygpo.web.logo import CoverArt
+
+
 urlpatterns = patterns('mygpo.web.views',
  url(r'^$',                                                       'home',          name='home'),
- url(r'^media/logo/(?P<size>\d+)/(?P<filename>[^/]*)\.jpg$',      'cover_art',     name='logo-filesystem'),
- url(r'^logo/(?P<size>\d+)/(?P<filename>[^/]*)\.jpg$',            'cover_art',     name='logo-create'),
+ url(r'^logo/(?P<size>\d+)/(?P<prefix>.{3})/(?P<filename>[^/]*)\.jpg$',      CoverArt.as_view(),     name='logo'),
  url(r'^history/$',                                               'history',       name='history'),
  url(r'^suggestions/$',                                           'suggestions',   name='suggestions'),
  url(r'^suggestions/rate$',                                       'rate_suggestions', name='suggestions-rate'),

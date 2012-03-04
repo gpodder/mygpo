@@ -17,17 +17,17 @@
 
 from functools import wraps
 
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, \
         HttpResponseForbidden, Http404
-from django.template import RequestContext
 from django.contrib import messages
 from mygpo.web.forms import DeviceForm, SyncForm
 from mygpo.web import utils
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404
+from django.views.decorators.vary import vary_on_cookie
+from django.views.decorators.cache import never_cache
 
 from restkit.errors import Unauthorized
 
@@ -37,21 +37,23 @@ from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.users.models import PodcastUserState, Device, DeviceUIDException
 
 
+@vary_on_cookie
 @login_required
 def overview(request):
 
     device_groups = request.user.get_grouped_devices()
     deleted_devices = request.user.inactive_devices
 
-    return render_to_response('devicelist.html', {
+    return render(request, 'devicelist.html', {
         'device_groups': device_groups,
         'deleted_devices': deleted_devices,
-    }, context_instance=RequestContext(request))
+    })
 
 
 
 def device_decorator(f):
     @login_required
+    @vary_on_cookie
     @wraps(f)
     def _decorator(request, uid, *args, **kwargs):
 
@@ -80,16 +82,17 @@ def show(request, device):
     sync_form.set_targets(sync_targets,
             _('Synchronize with the following devices'))
 
-    return render_to_response('device.html', {
+    return render(request, 'device.html', {
         'device': device,
         'sync_form': sync_form,
         'subscriptions': subscriptions,
         'synced_with': synced_with,
         'has_sync_targets': len(sync_targets) > 0,
-    }, context_instance=RequestContext(request))
+    })
 
 
 @login_required
+@never_cache
 @allowed_methods(['POST'])
 def create(request):
     device_form = DeviceForm(request.POST)
@@ -113,19 +116,19 @@ def create(request):
     except DeviceUIDException as e:
         messages.error(request, _(str(e)))
 
-        return render_to_response('device-create.html', {
+        return render(request, 'device-create.html', {
             'device': device,
             'device_form': device_form,
-        }, context_instance=RequestContext(request))
+        })
 
     except:
         messages.error(request, _("You can't use the same Device "
                    "ID for two devices."))
 
-        return render_to_response('device-create.html', {
+        return render(request, 'device-create.html', {
             'device': device,
             'device_form': device_form,
-        }, context_instance=RequestContext(request))
+        })
 
 
     return HttpResponseRedirect(reverse('device-edit', args=[device.uid]))
@@ -161,6 +164,7 @@ def update(request, device):
 
 
 @login_required
+@vary_on_cookie
 @allowed_methods(['GET'])
 def edit_new(request):
 
@@ -172,10 +176,10 @@ def edit_new(request):
         'uid' : device.uid
         })
 
-    return render_to_response('device-create.html', {
+    return render(request, 'device-create.html', {
         'device': device,
         'device_form': device_form,
-    }, context_instance=RequestContext(request))
+    })
 
 
 
@@ -191,10 +195,10 @@ def edit(request, device):
         'uid' : device.uid
         })
 
-    return render_to_response('device-edit.html', {
+    return render(request, 'device-edit.html', {
         'device': device,
         'device_form': device_form,
-    }, context_instance=RequestContext(request))
+    })
 
 
 @device_decorator

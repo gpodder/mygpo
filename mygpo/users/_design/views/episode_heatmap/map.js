@@ -1,22 +1,22 @@
 function(doc)
 {
-    function sortByStarted(a, b)
-    {
-        var x = a.started;
-        var y = b.started;
-        return ((x < y) ? -1 : ((x > y) ? 1 : 0));
-    }
-
-    function hasTimeValues(action)
-    {
-        return ((action != null) && (action.started != null) && (action.playmark != null));
-    }
-
     if(doc.doc_type == "EpisodeUserState")
     {
         if(doc.actions == null || doc.actions.length == 0)
         {
             return;
+        }
+
+        function sortByStarted(a, b)
+        {
+            var x = a.started;
+            var y = b.started;
+            return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+        }
+
+        function hasTimeValues(action)
+        {
+            return ((action != null) && (action.started != null) && (action.playmark != null));
         }
 
         var actions = doc.actions.slice(0); // creates a copy
