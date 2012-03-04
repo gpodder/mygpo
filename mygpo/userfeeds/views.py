@@ -22,5 +22,5 @@ def favorite_feed(request, username):
         'site': site,
         'feed_user': user,
         'feed': feed,
-        }, mimetype='text/xml')
+        }, content_type='text/xml')
 

@@ -161,7 +161,7 @@ def format_podcast_list(obj_list, format, title, get_podcast=None,
         template_args.update({'podcasts': podcasts})
 
         return render(request, xml_template, template_args,
-                mimetype='application/xml')
+                content_type='application/xml')
 
     else:
         return None
