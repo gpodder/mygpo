@@ -33,7 +33,7 @@ from django.views.decorators.cache import never_cache
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core import models
 from mygpo.core.models import Podcast, Episode
-from mygpo.directory import tags
+from mygpo.directory.tags import Tag
 from mygpo.directory.toplist import PodcastToplist
 from mygpo.users.models import Suggestions, History, HistoryEntry
 from mygpo.users.models import PodcastUserState, User
@@ -181,7 +181,7 @@ def mytags(request):
     tags_podcast = {}
     tags_tag = defaultdict(list)
 
-    for podcast_id, taglist in tags.tags_for_user(request.user).items():
+    for podcast_id, taglist in Tag.for_user(request.user).items():
         podcast = Podcast.get(podcast_id)
         tags_podcast[podcast] = taglist
 
