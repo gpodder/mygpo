@@ -1,5 +1,5 @@
 from datetime import date, timedelta, datetime
-from functools import wraps
+from functools import wraps, partial
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseRedirect, Http404
@@ -155,12 +155,15 @@ def episode_list(podcast, user):
     else:
         episode_actions = {}
 
-    def annotate_episode(episode):
-        listener_count = listeners.get(episode._id, None)
-        action         = episode_actions.get(episode._id, None)
-        return proxy_object(episode, listeners=listener_count, action=action)
-
+    annotate_episode = partial(_annotate_episode, listeners, episode_actions)
     return map(annotate_episode, episodes)
+
+
+def _annotate_episode(listeners, episode_actions, episode):
+    listener_count = listeners.pop(episode._id, None)
+    action         = episode_actions.pop(episode._id, None)
+    return proxy_object(episode, listeners=listener_count, action=action)
+
 
 
 @never_cache
