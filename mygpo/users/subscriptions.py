@@ -16,6 +16,12 @@ class PodcastSorter(object):
         return len(self.podcasts)
 
 
+    def __getitem__(self, val):
+        if self.sorted_podcasts is None:
+            self.sorted_podcasts = self._sort()
+
+        return self.sorted_podcasts.__getitem__(val)
+
     def __iter__(self):
         if self.sorted_podcasts is None:
             self.sorted_podcasts = self._sort()
@@ -44,7 +50,7 @@ class PodcastPercentageListenedSorter(PodcastSorter):
         for podcast in self.podcasts:
             c = counts.get(podcast.get_id(), 0)
             if podcast.episode_count:
-                podcast.percent_listened = float(podcast.episode_count) / c
+                podcast.percent_listened = c / float(podcast.episode_count)
                 podcast.episodes_listened = c
             else:
                 podcast.percent_listened = 0
