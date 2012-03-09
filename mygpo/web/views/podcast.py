@@ -1,5 +1,5 @@
 from datetime import date, timedelta, datetime
-from functools import wraps
+from functools import wraps, partial
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseRedirect, Http404
@@ -17,7 +17,7 @@ from mygpo.core.proxy import proxy_object
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.users.models import HistoryEntry
 from mygpo.web.forms import PrivacyForm, SyncForm
-from mygpo.directory.tags import tags_for_user
+from mygpo.directory.tags import Tag
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.utils import daterange
 from mygpo.web.utils import get_podcast_link_target
@@ -109,12 +109,12 @@ def show(request, podcast):
 
 def get_tags(podcast, user):
     tags = {}
-    for t in podcast.all_tags():
+    for t in Tag.for_podcast(podcast):
         tag_str = t.lower()
         tags[tag_str] = False
 
     if not user.is_anonymous():
-        users_tags = tags_for_user(user, podcast.get_id())
+        users_tags = Tag.for_user(user, podcast.get_id())
         for t in users_tags.get(podcast.get_id(), []):
             tag_str = t.lower()
             tags[tag_str] = True
@@ -155,12 +155,15 @@ def episode_list(podcast, user):
     else:
         episode_actions = {}
 
-    def annotate_episode(episode):
-        listener_count = listeners.get(episode._id, None)
-        action         = episode_actions.get(episode._id, None)
-        return proxy_object(episode, listeners=listener_count, action=action)
-
+    annotate_episode = partial(_annotate_episode, listeners, episode_actions)
     return map(annotate_episode, episodes)
+
+
+def _annotate_episode(listeners, episode_actions, episode):
+    listener_count = listeners.pop(episode._id, None)
+    action         = episode_actions.pop(episode._id, None)
+    return proxy_object(episode, listeners=listener_count, action=action)
+
 
 
 @never_cache

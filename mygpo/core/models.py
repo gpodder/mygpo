@@ -743,17 +743,6 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         return targets
 
 
-    def all_tags(self):
-        """
-        Returns all tags that are stored for the podcast, in decreasing order of importance
-        """
-
-        res = Podcast.view('directory/tags_by_podcast', startkey=[self.get_id(), None],
-            endkey=[self.get_id(), 'ZZZZZZ'], reduce=True, group=True, group_level=2)
-        tags = sorted(res.all(), key=lambda x: x['value'], reverse=True)
-        return [x['key'][1] for x in tags]
-
-
     def listener_count(self):
         """ returns the number of users that have listened to this podcast """
 

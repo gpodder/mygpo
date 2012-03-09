@@ -6,46 +6,75 @@ from mygpo.directory.models import Category
 from mygpo.utils import multi_request_view
 
 
-# FIXME: this should be moved to User class once it is migrated to CouchDB
-def tags_for_user(user, podcast_id=None):
-    """
-    Returns a dictionary that contains all podcasts tagged by the user as keys.
-    For each podcast, a list of tags can be retrieved
-    """
 
-    res = Podcast.view('directory/tags_by_user', startkey=[user._id, podcast_id],
-        endkey=[user._id, podcast_id or 'ZZZZZZ'])
+class Tag(object):
 
-    tags = defaultdict(list)
-    for r in res:
-        tags[r['key'][1]].append(r['value'])
-    return tags
+    def __init__(self, tag):
+        self.tag = tag
 
 
-def podcasts_for_tag(tag):
-    res = multi_request_view(Podcast, 'directory/podcasts_by_tag',
-            wrap        = False,
-            startkey    = [tag, None],
-            endkey      = [tag, 'ZZZZZZ'],
-            reduce      = True,
-            group       = True,
-            group_level = 2
-        )
+    @classmethod
+    def for_podcast(cls, podcast):
+        """ all tags for the podcast, in decreasing order of importance """
 
-    for r in res:
-        yield (r['key'][1], r['value'])
+        res = Podcast.view('directory/tags_by_podcast',
+                startkey    = [podcast.get_id(), None],
+                endkey      = [podcast.get_id(), {}],
+                reduce      = True,
+                group       = True,
+                group_level = 2,
+            )
+        tags = sorted(res, key=lambda x: x['value'], reverse=True)
+        return [x['key'][1] for x in tags]
 
 
-def all_tags():
-    res = multi_request_view(Podcast, 'directory/podcasts_by_tag',
-            wrap        = False,
-            reduce      = True,
-            group       = True,
-            group_level = 1
-        )
 
-    for r in res:
-        yield r['key'][0]
+    @classmethod
+    def for_user(cls, user, podcast_id=None):
+        """ mapping of all podcasts tagged by the user with a list of tags """
+
+        res = Podcast.view('directory/tags_by_user',
+                startkey = [user._id, podcast_id],
+                endkey   = [user._id, podcast_id or {}]
+            )
+
+        tags = defaultdict(list)
+        for r in res:
+            tags[r['key'][1]].append(r['value'])
+        return tags
+
+
+    @classmethod
+    def all(cls):
+        """ Returns all tags """
+        res = multi_request_view(Podcast, 'directory/podcasts_by_tag',
+                wrap        = False,
+                reduce      = True,
+                group       = True,
+                group_level = 1
+            )
+
+        for r in res:
+            yield r['key'][0]
+
+
+
+    def get_podcasts(self):
+        """ Returns the podcasts with the current tag """
+
+        res = multi_request_view(Podcast, 'directory/podcasts_by_tag',
+                wrap        = False,
+                startkey    = [self.tag, None],
+                endkey      = [self.tag, {}],
+                reduce      = True,
+                group       = True,
+                group_level = 2
+            )
+
+        for r in res:
+            yield (r['key'][1], r['value'])
+
+
 
 
 TagCloudEntry = namedtuple('TagCloudEntry', 'label weight')

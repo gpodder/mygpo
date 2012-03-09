@@ -5,7 +5,7 @@ from django.conf import settings
 
 from mygpo.core.models import Podcast
 from mygpo.directory.models import Category, CategoryEntry
-from mygpo.directory.tags import all_tags, podcasts_for_tag
+from mygpo.directory.tags import Tag
 from mygpo import utils
 
 
@@ -18,7 +18,7 @@ class Command(BaseCommand):
 
         excluded_tags = settings.DIRECTORY_EXCLUDED_TAGS
 
-        tags = args or all_tags()
+        tags = args or Tag.all()
 
         for n, tag in enumerate(tags):
 
@@ -29,7 +29,8 @@ class Command(BaseCommand):
             if not label:
                 continue
 
-            podcast_ids, weights = utils.unzip(list(podcasts_for_tag(tag)))
+            tag_obj = Tag(tag)
+            podcast_ids, weights = utils.unzip(list(tag_obj.get_podcasts()))
             podcast_objs = Podcast.get_multi(podcast_ids)
             podcasts = []
             for podcast, weight in zip(podcast_objs, weights):
