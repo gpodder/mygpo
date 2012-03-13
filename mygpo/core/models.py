@@ -233,14 +233,19 @@ class Episode(Document, SlugMixin, OldIdMixin):
 
     @classmethod
     def count(cls):
-        return cls.view('core/episodes_by_podcast', reduce=True).one()['value']
+        r = cls.view('core/episodes_by_podcast',
+                reduce = True,
+                stale  = 'update_after',
+            )
+        return r.one()['value']
 
 
     @classmethod
     def all(cls):
         return utils.multi_request_view(cls, 'core/episodes_by_podcast',
                 reduce       = False,
-                include_docs = True
+                include_docs = True,
+                stale        = 'update_after',
             )
 
     def __eq__(self, other):
@@ -428,7 +433,8 @@ class Podcast(Document, SlugMixin, OldIdMixin):
             res = db.view('core/podcasts_by_id',
                     skip         = n,
                     include_docs = True,
-                    limit        = 1
+                    limit        = 1,
+                    stale        = 'ok',
                 )
 
             if not res:
@@ -451,6 +457,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         db = cls.get_db()
         res = db.view('maintenance/podcasts_by_last_update',
                 include_docs = True,
+                stale        = 'update_after',
             )
 
         for r in res:
@@ -474,6 +481,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
                 endkey       = [language, {}],
                 include_docs = True,
                 reduce       = False,
+                stale        = 'update_after',
                 **kwargs
             )
 
@@ -491,7 +499,10 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
     @classmethod
     def count(cls):
-        r = cls.view('core/podcasts_by_id', limit=0)
+        r = cls.view('core/podcasts_by_id',
+                limit = 0,
+                stale = 'update_after',
+            )
         return r.total_rows
 
 
@@ -885,9 +896,13 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
     @classmethod
     def all_podcasts(cls):
-        from mygpo.utils import multi_request_view
+        res = utils.multi_request_view(cls, 'core/podcasts_by_id',
+                wrap         = False,
+                include_docs = True,
+                stale        = 'update_after',
+            )
 
-        for r in multi_request_view(cls, 'core/podcasts_by_id', wrap=False, include_docs=True):
+        for r in res:
             obj = r['doc']
             if obj['doc_type'] == 'Podcast':
                 yield Podcast.wrap(obj)

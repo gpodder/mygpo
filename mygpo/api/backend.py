@@ -62,6 +62,7 @@ def get_podcast_count_for_language():
     r = db.view('core/podcasts_by_language',
         reduce = True,
         group_level = 1,
+        stale       = 'update_after',
     )
 
     counts.update( dict( (x['key'][0], x['value']) for x in r) )

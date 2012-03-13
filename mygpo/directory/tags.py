@@ -23,6 +23,7 @@ class Tag(object):
                 reduce      = True,
                 group       = True,
                 group_level = 2,
+                stale       = 'update_after',
             )
         tags = sorted(res, key=lambda x: x['value'], reverse=True)
         return [x['key'][1] for x in tags]
@@ -93,8 +94,12 @@ class TagCloud(object):
 
     def _query(self):
         db = Category.get_db()
-        res = db.view('directory/categories', \
-            descending=True, skip=self.skip, limit=self.count)
+        res = db.view('directory/categories',
+                descending = True,
+                skip       = self.skip,
+                limit      = self.count,
+                stale      = 'update_after',
+            )
 
         mk_entry = lambda r: TagCloudEntry(r['value'], r['key'])
         self._entries = map(mk_entry, res)

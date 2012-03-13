@@ -265,7 +265,9 @@ class EpisodeUserState(Document):
     @classmethod
     def count(cls):
         r = cls.view('users/episode_states_by_user_episode',
-            limit=0)
+                limit = 0,
+                stale = 'update_after',
+            )
         return r.total_rows
 
 
@@ -413,7 +415,9 @@ class PodcastUserState(Document):
     @classmethod
     def count(cls):
         r = PodcastUserState.view('users/podcast_states_by_user',
-            limit=0)
+                limit = 0,
+                stale = 'update_after',
+            )
         return r.total_rows
 
 

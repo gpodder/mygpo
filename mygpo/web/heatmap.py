@@ -63,6 +63,7 @@ class EpisodeHeatmap(object):
                 reduce      = True,
                 group       = True,
                 group_level = group_level,
+                stale       = 'update_after',
             )
 
         if not r:
