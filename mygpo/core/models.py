@@ -571,6 +571,10 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
     def get_episode_count(self, since=None, until={}, **kwargs):
 
+        # use stored episode count for better performance
+        if getattr(self, 'episode_count', None) is not None:
+            return self.episode_count
+
         if kwargs.get('descending', False):
             since, until = until, since
 
