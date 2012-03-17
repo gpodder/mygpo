@@ -1,12 +1,13 @@
 #!/bin/bash
 
 DIR=`dirname $0`
-cd $DIR/../mygpo
-DIRS=`find . -type d -wholename "*/_design/views/*"`
+cd $DIR/../couchdb/_design
+DIRS=`find . -type d -wholename "*/views/*"`
 
+cd ../..
 for view in $DIRS; do
-    view_name=`echo $view | awk '{split($0,array,"/")} END{print array[2]"/"array[5]}'`
-    count=`git grep "$view_name" | wc -l`
+    view_name=`echo $view | awk '{split($0,array,"/")} END{print array[2]"/"array[4]}'`
+    count=`git grep "'$view_name'" | wc -l`
     if [ $count = "0" ]; then
         echo -e -n "\e[00;31m"
     fi
