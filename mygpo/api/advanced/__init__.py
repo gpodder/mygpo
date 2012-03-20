@@ -41,6 +41,7 @@ from mygpo.core.models import SanitizingRule, Podcast
 from mygpo.users.models import PodcastUserState, EpisodeAction, EpisodeUserState
 from mygpo.json import json, JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
+from mygpo.couchdb import bulk_save_retry
 
 
 # keys that are allowed in episode actions
@@ -308,38 +309,32 @@ def update_episodes(user, actions, now, ua_string):
         act = parse_episode_action(action, user, update_urls, now, ua_string)
         grouped_actions[ (podcast_url, episode_url) ].append(act)
 
-    # load the episode state only once for every episode
+    # Prepare the updates for each episode state
+    obj_funs = []
+
     for (p_url, e_url), action_list in grouped_actions.iteritems():
         episode_state = EpisodeUserState.for_ref_urls(user, p_url, e_url)
 
-        if isinstance(episode_state, dict):
-            from mygpo.log import log
-            log('episode_state (%s, %s, %s): %s' % (user,
-                        p_url, e_url, episode_state))
+        fun = partial(update_episode_actions, action_list=action_list)
+        obj_funs.append( (episode_state, fun) )
 
-        update_episode_actions(episode_state=episode_state,
-            action_list=action_list)
+    db = EpisodeUserState.get_db()
+    bulk_save_retry(db, obj_funs)
 
     return update_urls
 
 
-@repeat_on_conflict(['episode_state'])
 def update_episode_actions(episode_state, action_list):
     """ Adds actions to the episode state and saves if necessary """
 
-    changed = False
-
     len1 = len(episode_state.actions)
     episode_state.add_actions(action_list)
-    len2 = len(episode_state.actions)
 
-    if len1 < len2:
-        changed = True
+    if len(episode_state.actions) == len1:
+        return None
 
-    if changed:
-        episode_state.save()
+    return episode_state
 
-    return changed
 
 
 def parse_episode_action(action, user, update_urls, now, ua_string):
