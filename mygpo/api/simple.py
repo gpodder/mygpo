@@ -201,12 +201,12 @@ def set_subscriptions(urls, user, device_uid, user_agent):
 
     device = get_device(user, device_uid, user_agent, undelete=True)
 
-    old = [p.url for p in device.get_subscribed_podcasts()]
-    new = [p for p in urls if p not in old]
-    rem = [p for p in old if p not in urls]
+    subscriptions = dict( (p.url, p) for p in device.get_subscribed_podcasts())
+    new = [p for p in urls if p not in subscriptions.keys()]
+    rem = [p for p in subscriptions.keys() if p not in urls]
 
     for r in rem:
-        p = Podcast.for_url(r, create=True)
+        p = subscriptions.get(r, Podcast.for_url(r, create=True))
         try:
             p.unsubscribe(user, device)
         except Exception as e:
