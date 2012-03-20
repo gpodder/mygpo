@@ -702,8 +702,8 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         state.subscribe(device)
         try:
             state.save()
-        except Unauthorized:
-            raise SubscriptionException
+        except Unauthorized as ex:
+            raise SubscriptionException(ex)
 
 
     @repeat_on_conflict()
@@ -712,8 +712,8 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         state.unsubscribe(device)
         try:
             state.save()
-        except Unauthorized:
-            raise SubscriptionException
+        except Unauthorized as ex:
+            raise SubscriptionException(ex)
 
 
     def subscribe_targets(self, user):
