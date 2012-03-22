@@ -220,7 +220,7 @@ class EpisodeUserState(Document):
     @classmethod
     def for_user_episode(cls, user, episode):
         r = cls.view('users/episode_states_by_user_episode',
-            key=[user.id, episode._id], include_docs=True)
+            key=[user._id, episode._id], include_docs=True)
 
         if r:
             return r.first()
@@ -240,7 +240,7 @@ class EpisodeUserState(Document):
     @classmethod
     def for_ref_urls(cls, user, podcast_url, episode_url):
         res = cls.view('users/episode_states_by_ref_urls',
-            key = [user.id, podcast_url, episode_url], limit=1, include_docs=True)
+            key = [user._id, podcast_url, episode_url], limit=1, include_docs=True)
         if res:
             state = res.first()
             state.ref_url = episode_url
