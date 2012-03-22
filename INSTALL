@@ -1,109 +1,37 @@
+Deployment instructions for mygpo
+=================================
 
 
-                   Deployment instructions for mygpo
-                   ---------------------------------
-
-
-Please note that this deployment instructions apply to the current couchdb
-branch of mygpo/gpodder.net only. They will change once the migration to
-CouchDB has been completed.
-
-
-  Dependencies
-================
+Dependencies
+------------
 
 When no version number is indicated, it is advisable to install the current
 development version from the repository.
 
   * Python (>= 2.6)
-  * CouchDB (>= 1.1)
-  * python-feedparser [3] or [4]
-  * python-dateutil [5]
-  * python-flup [6]
-  * python-imaging [7]
-  * python-pybabel [8]
-  * couchdbkit [9]
-  * Django (>= 1.3 [10])
-  * django-registration [11]
-  * django-couchdb-utils [12]
-
-Optional:
-  * MySQL Server (>= 5.0)
-  * python-mysqldb [2]
-  * lighttpd (>= 1.4.19)
+  * [CouchDB](https://couchdb.apache.org/) (>= 1.1)
+  * [python-feedparser](https://github.com/kurtmckee/feedparser/)
+  * [python-dateutil](http://niemeyer.net/python-dateutil)
+  * [python-flup](http://trac.saddi.com/flup)
+  * [python-imaging](http://www.pythonware.com/products/pil/)
+  * [python-pybabel](http://babel.edgewall.org/)
+  * [couchdbkit](https://github.com/benoitc/couchdbkit)
+  * [Django](http://www.djangoproject.com/)
+  * [django-couchdb-utils](http://github.com/stefankoegl/django-couchdb-utils/)
 
 
 
-  Relational Database
-=======================
+mygpo
+-----
 
-The relational database is being replaced by CouchDB in the "couchdb" branch.
-Currently a relational database is still required for user profile related
-data.
+The source for mygpo can be obtained via git
 
-For a production instance you might want to use MySQL, but for a test and
-development instance a SQLite database should work, too.
-
-For setting up a MySQL database you should continue with the following steps.
-For a SQLite database you can skip to step 3.
-
-
-1. Updating the Settings
-
-In mygpo/settings.py a skeleton database setting (DATABASES) is provided.  To
-use mygpo with a MySQL database, create settings_prod.py and overwrite the
-settings with something like
-
-DATABASES = {
-    'default': {
-        'NAME': 'mygpo',
-        'ENGINE': 'django.db.backends.mysql',
-        'USER': 'mygpo',
-        'PASSWORD': '',
-    }
-}
-
-The following instructions will be based on these settings but you are free to
-adapt them.
-
-
-2. Creating the database
-
-In MySQL, do the following:
-
-  CREATE DATABASE mygpo;
-  GRANT ALL ON mygpo.* TO mygpo@localhost WITH GRANT OPTION;
-  GRANT SUPER ON *.* TO mygpo@localhost;
-  GRANT ALL ON mygpo.* TO mygpo@'%' WITH GRANT OPTION;
-  FLUSH PRIVILEGES;
-
-Make sure that MySQL listens only on localhost, or if in doubt, assign a
-password to the "mygpo" user!
-
-
-3. Initializing an empty Database
-
-You can skip this step if you are importing a dump.
-
-Run in the mygpo/ subdirectory (possibly after setting the
-DB parameters in mygpo/settings.py):
-
-  python manage.py syncdb
-
-When asked to create a superuser, you can say YES.
-
-
-4. Importing a Dump
-
-A dump contains both the database structure and the data. You can import it
-with
-
-  gunzip -c <dumpfile>.sql.gz | mysql -uroot -p mygpo
+ git clone git://github.com/gpodder/mygpo.git
 
 
 
-  CouchDB
-===========
+CouchDB
+-------
 
 A source distribution of CouchDB can be obtained from
 
@@ -112,12 +40,6 @@ A source distribution of CouchDB can be obtained from
 Build and installation instructions can be found at
 
  http://wiki.apache.org/couchdb/Installation
-
-
-Non-official third-party binary distributions are available from
-
- http://www.couchbase.com/downloads
-
 
 If you want to avoid installing a CouchDB server yourself, you can use a free
 CouchDB hosting service, for example from
@@ -139,7 +61,7 @@ To create the database, execute the following on the commandline
 
   curl -X PUT http://127.0.0.1:5984/mygpo
 
-To initialize the views, execute from the mygpo-Directory
+To initialize the views, execute from the mygpo directory
 
   python manage.py sync_couchdb
 
@@ -161,63 +83,25 @@ user hits the site (which is, of course, optional), execute
 
 
 
-  mygpo
-=========
-
-The source for mygpo can be obtained via git
-
- git clone git://github.com/gpodder/mygpo.git
- git checkout couchdb
-
-
-
-  Settings
-============
+Settings
+--------
 
 Check the settings in mygpo/settings.py. If you want to change any settings,
 add them to mygpo/settings_prod.py with the correct value.
 
 
 
-  Web-Server
-==============
+Web-Server
+----------
 
 Django comes with a development webservice which you can run from the mygpo
 directory with
 
   python manage.py runserver
 
-If you want to run a production server, you can set up lighttpd instead
+If you want to run a production server, check out 
 
-There is a mygpo.lighttpd.conf file shipped with the source. Please
-customize it to your needs, and then include it from your lighttpd
-main configuration file, for example like this:
-
-  include "/srv/mygpo/mygpo.lighttpd.conf"
-
-The modules you need to enable are: rewrite, fastcgi. On Debian,
-you can enable these using the "lighty-enable-mod" command:
-
-  lighty-enable-mod rewrite fastcgi
-
-Then restart ligghtd with
-
-  /etc/init.d/lighttpd restart
+ https://docs.djangoproject.com/en/dev/howto/deployment/
 
 
 
-  References
-==============
-
- [1]  http://mail-archives.apache.org/mod_mbox/couchdb-dev/201010.mbox/<24594469.51751287512786814.JavaMail.jira@thor>
- [2]  http://sourceforge.net/projects/mysql-python/
- [3]  http://feedparser.org/
- [4]  https://github.com/kurtmckee/feedparser/
- [5]  http://niemeyer.net/python-dateutil
- [6]  http://trac.saddi.com/flup
- [7]  http://www.pythonware.com/products/pil/
- [8]  http://babel.edgewall.org/
- [9]  https://github.com/stefankoegl/couchdbkit
- [10] http://www.djangoproject.com/
- [11] https://bitbucket.org/ubernostrum/django-registration/
- [12] http://github.com/stefankoegl/django-couchdb-utils/
