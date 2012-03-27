@@ -21,6 +21,7 @@ import re
 import collections
 from datetime import datetime, timedelta, date
 import time
+import hashlib
 
 from django.core.cache import cache
 
@@ -536,3 +537,11 @@ def additional_value(it, gen_val, val_changed=lambda _: True):
             current = gen_val(x)
 
         yield (x, current)
+
+
+def file_hash(f, h=hashlib.md5, block_size=2**20):
+    """ returns the hash of the contents of a file """
+    f_hash = h()
+    for chunk in iter(lambda: f.read(block_size), ''):
+         f_hash.update(chunk)
+    return f_hash

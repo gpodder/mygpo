@@ -32,6 +32,7 @@ function(doc)
 
             emit([
                     doc.user,
+                    doc.podcast,
                     action.upload_timestamp
                 ], action_obj
             );

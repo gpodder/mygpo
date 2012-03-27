@@ -9,12 +9,14 @@ from couchdbkit.ext.django.schema import *
 from restkit.errors import Unauthorized
 
 from django.conf import settings
+from django.core.urlresolvers import reverse
 
 from mygpo.decorators import repeat_on_conflict
 from mygpo import utils
 from mygpo.core.proxy import DocumentABCMeta
 from mygpo.core.slugs import SlugMixin
 from mygpo.core.oldid import OldIdMixin
+from mygpo.web.logo import CoverArt
 
 
 class SubscriptionException(Exception):
@@ -654,19 +656,14 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
 
     def get_logo_url(self, size):
-        if not self.logo_url:
-            return '/media/podcast-%d.png' % (hash(self.title) % 5, )
+        if self.logo_url:
+            filename = hashlib.sha1(self.logo_url).hexdigest()
+        else:
+            filename = 'podcast-%d.png' % (hash(self.title) % 5, )
 
-        filename = hashlib.sha1(self.logo_url).hexdigest()
+        prefix = CoverArt.get_prefix(filename)
 
-        root = os.path.join(settings.BASE_DIR, '..')
-        target = os.path.join(root, 'htdocs', 'media', 'logo', str(size), filename+'.jpg')
-        filepath = os.path.join(root, 'htdocs', 'media', 'logo', filename)
-
-        if os.path.exists(target):
-            return '/media/logo/%s/%s.jpg' % (str(size), filename)
-
-        return '/logo/%d/%s.jpg' % (size, filename)
+        return reverse('logo', args=[size, prefix, filename])
 
 
     def subscriber_count(self):
@@ -705,8 +702,8 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         state.subscribe(device)
         try:
             state.save()
-        except Unauthorized:
-            raise SubscriptionException
+        except Unauthorized as ex:
+            raise SubscriptionException(ex)
 
 
     @repeat_on_conflict()
@@ -715,8 +712,8 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         state.unsubscribe(device)
         try:
             state.save()
-        except Unauthorized:
-            raise SubscriptionException
+        except Unauthorized as ex:
+            raise SubscriptionException(ex)
 
 
     def subscribe_targets(self, user):
@@ -743,17 +740,6 @@ class Podcast(Document, SlugMixin, OldIdMixin):
                         targets.append(device)
 
         return targets
-
-
-    def all_tags(self):
-        """
-        Returns all tags that are stored for the podcast, in decreasing order of importance
-        """
-
-        res = Podcast.view('directory/tags_by_podcast', startkey=[self.get_id(), None],
-            endkey=[self.get_id(), 'ZZZZZZ'], reduce=True, group=True, group_level=2)
-        tags = sorted(res.all(), key=lambda x: x['value'], reverse=True)
-        return [x['key'][1] for x in tags]
 
 
     def listener_count(self):
@@ -820,15 +806,12 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
         res = db.view('users/episode_states',
                 startkey= [user_id, self.get_id(), None],
-                endkey  = [user_id, self.get_id(), {}],
-                include_docs = True,
+                endkey  = [user_id, self.get_id(), {}]
             )
 
         for r in res:
-            state_doc = r['doc']
-            index = int(r['value'])
-            state = EpisodeUserState.wrap(state_doc)
-            yield (state, index)
+            action = r['value']
+            yield action
 
 
     def __hash__(self):

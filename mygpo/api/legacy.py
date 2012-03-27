@@ -21,6 +21,7 @@ from django.http import HttpResponse
 from django.utils.datastructures import MultiValueDictKeyError
 from django.db import IntegrityError
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.cache import never_cache
 
 from mygpo.log import log
 from mygpo.api.sanitizing import sanitize_urls
@@ -33,6 +34,7 @@ from mygpo.api.backend import get_device
 LEGACY_DEVICE_NAME = 'Legacy Device'
 LEGACY_DEVICE_UID  = 'legacy'
 
+@never_cache
 @csrf_exempt
 def upload(request):
     try:
@@ -89,6 +91,7 @@ def upload(request):
 
     return HttpResponse('@SUCCESS', mimetype='text/plain')
 
+@never_cache
 @csrf_exempt
 def getlist(request):
     emailaddr = request.GET.get('username', None)

@@ -30,9 +30,12 @@ function(doc)
                 action_obj["total"] = action.total;
             }
 
+
             emit([
                     doc.user,
-                    action.upload_timestamp
+                    doc.podcast,
+                    action.device,
+                    action.upload_timestamp,
                 ], action_obj
             );
         }

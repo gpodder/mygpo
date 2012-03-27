@@ -1,11 +1,12 @@
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
-from django.shortcuts import get_object_or_404, render_to_response
-from django.template import RequestContext
+from django.shortcuts import render
 from django.contrib.syndication.views import Feed
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, Http404
+from django.views.decorators.vary import vary_on_cookie
+from django.views.decorators.cache import never_cache
 
 from mygpo.core.models import Podcast
 from mygpo.utils import parse_bool, unzip, get_to_dict, skip_pairs
@@ -16,16 +17,18 @@ from mygpo.web import utils
 from mygpo.cache import get_cache_or_calc
 
 
+@vary_on_cookie
 @login_required
 def show_list(request):
     current_site = RequestSite(request)
     subscriptionlist = create_subscriptionlist(request)
-    return render_to_response('subscriptions.html', {
+    return render(request, 'subscriptions.html', {
         'subscriptionlist': subscriptionlist,
         'url': current_site
-    }, context_instance=RequestContext(request))
+    })
 
 
+@vary_on_cookie
 @login_required
 def download_all(request):
     podcasts = request.user.get_subscribed_podcasts()
@@ -43,11 +46,11 @@ def for_user(request, username):
     subscriptions = user.get_subscribed_podcasts(public=True)
     token = user.subscriptions_token
 
-    return render_to_response('user_subscriptions.html', {
+    return render(request, 'user_subscriptions.html', {
         'subscriptions': subscriptions,
         'other_user': user,
         'token': token,
-        }, context_instance=RequestContext(request))
+        })
 
 @requires_token(token_name='subscriptions_token')
 def for_user_opml(request, username):
@@ -60,10 +63,10 @@ def for_user_opml(request, username):
     if parse_bool(request.GET.get('symbian', False)):
         subscriptions = map(utils.symbian_opml_changes, subscriptions)
 
-    response = render_to_response('user_subscriptions.opml', {
+    response = render(request, 'user_subscriptions.opml', {
         'subscriptions': subscriptions,
         'other_user': user
-        }, context_instance=RequestContext(request))
+        })
     response['Content-Disposition'] = 'attachment; filename=%s-subscriptions.opml' % username
     return response
 

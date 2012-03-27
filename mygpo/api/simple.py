@@ -21,13 +21,12 @@ from functools import wraps
 
 from couchdbkit.exceptions import ResourceNotFound
 
-from django.shortcuts import render_to_response
-from django.template import RequestContext
+from django.shortcuts import render
 from django.core.cache import cache
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.cache import cache_page
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import get_object_or_404
+from django.views.decorators.cache import never_cache
 from django.contrib.sites.models import RequestSite
 from django.utils.translation import ugettext as _
 
@@ -65,6 +64,7 @@ def check_format(fn):
 @require_valid_user
 @check_username
 @check_format
+@never_cache
 @allowed_methods(['GET', 'PUT', 'POST'])
 def subscriptions(request, username, device_uid, format):
 
@@ -85,6 +85,7 @@ def subscriptions(request, username, device_uid, format):
 @require_valid_user
 @check_username
 @check_format
+@never_cache
 @allowed_methods(['GET'])
 def all_subscriptions(request, username, format):
 
@@ -159,8 +160,8 @@ def format_podcast_list(obj_list, format, title, get_podcast=None,
         podcasts = map(json_map, obj_list)
         template_args.update({'podcasts': podcasts})
 
-        return render_to_response(xml_template, template_args, context_instance=RequestContext(request),
-                mimetype='application/xml')
+        return render(request, xml_template, template_args,
+                content_type='application/xml')
 
     else:
         return None
@@ -200,12 +201,12 @@ def set_subscriptions(urls, user, device_uid, user_agent):
 
     device = get_device(user, device_uid, user_agent, undelete=True)
 
-    old = [p.url for p in device.get_subscribed_podcasts()]
-    new = [p for p in urls if p not in old]
-    rem = [p for p in old if p not in urls]
+    subscriptions = dict( (p.url, p) for p in device.get_subscribed_podcasts())
+    new = [p for p in urls if p not in subscriptions.keys()]
+    rem = [p for p in subscriptions.keys() if p not in urls]
 
     for r in rem:
-        p = Podcast.for_url(r, create=True)
+        p = subscriptions.get(r, Podcast.for_url(r, create=True))
         try:
             p.unsubscribe(user, device)
         except Exception as e:
@@ -272,6 +273,7 @@ def toplist(request, count, format):
 
 
 @check_format
+@cache_page(60 * 60)
 @allowed_methods(['GET'])
 def search(request, format):
 
@@ -300,6 +302,7 @@ def search(request, format):
 
 @require_valid_user
 @check_format
+@never_cache
 @allowed_methods(['GET'])
 def suggestions(request, count, format):
     count = parse_range(count, 1, 100, 100)

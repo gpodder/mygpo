@@ -113,51 +113,38 @@ class EpisodeAction(DocumentSchema):
         since_str = since.strftime('%Y-%m-%dT%H:%M:%S') if since else None
         until_str = until.strftime('%Y-%m-%dT%H:%M:%S') if until else {}
 
-        # further parts of the key are filled in below
-        startkey = [user_id, since_str, None, None]
-        endkey   = [user_id, until_str, {}, {}]
 
-        # additional filter that are carried out by the
-        # application, not by the database
-        add_filters = []
+        if not podcast_id and not device_id:
+            view = 'users/episode_actions'
+            startkey = [user_id, since_str]
+            endkey   = [user_id, until_str]
 
-        if isinstance(podcast_id, basestring):
-            if until is not None: # filter in database
-                startkey[2] = podcast_id
-                endkey[2]   = podcast_id
+        elif podcast_id and not device_id:
+            view = 'users/episode_actions_podcast'
+            startkey = [user_id, podcast_id, since_str]
+            endkey   = [user_id, podcast_id, until_str]
 
-            add_filters.append( lambda x: x.podcast_id == podcast_id )
+        elif device_id and not podcast_id:
+            view = 'users/episode_actions_device'
+            startkey = [user_id, device_id, since_str]
+            endkey   = [user_id, device_id, until_str]
 
-        elif isinstance(podcast_id, list):
-            add_filters.append( lambda x: x.podcast_id in podcast_id )
+        else:
+            view = 'users/episode_actions_podcast_device'
+            startkey = [user_id, podcast_id, device_id, since_str]
+            endkey   = [user_id, podcast_id, device_id, until_str]
 
-        elif podcast_id is not None:
-            raise ValueError('podcast_id can be either None, basestring '
-                    'or a list of basestrings')
-
-
-        if device_id:
-            if None not in (until, podcast_id): # filter in database
-                startkey[3] = device_id
-                endkey[3]   = device_id
-            else:
-                dev_filter = lambda x: getattr(x, 'device_id', None) == device_id
-                add_filters.append(dev_filter)
-
+        print view, startkey, endkey
 
         db = EpisodeUserState.get_db()
-        res = db.view('users/episode_actions',
+        res = db.view(view,
                 startkey = startkey,
-                endkey   = endkey,
-                include_docs = True,
+                endkey   = endkey
             )
 
         for r in res:
-            state = EpisodeUserState.wrap(r['doc'])
-            index = int(r['value'])
-            action = HistoryEntry.from_action_dict(state, index)
-            if all( f(action) for f in add_filters):
-                yield action
+            action = r['value']
+            yield action
 
 
     def validate_time_values(self):
@@ -242,7 +229,7 @@ class EpisodeUserState(Document):
     @classmethod
     def for_user_episode(cls, user, episode):
         r = cls.view('users/episode_states_by_user_episode',
-            key=[user.id, episode._id], include_docs=True)
+            key=[user._id, episode._id], include_docs=True)
 
         if r:
             return r.first()
@@ -262,7 +249,7 @@ class EpisodeUserState(Document):
     @classmethod
     def for_ref_urls(cls, user, podcast_url, episode_url):
         res = cls.view('users/episode_states_by_ref_urls',
-            key = [user.id, podcast_url, episode_url], limit=1, include_docs=True)
+            key = [user._id, podcast_url, episode_url], limit=1, include_docs=True)
         if res:
             state = res.first()
             state.ref_url = episode_url
@@ -490,12 +477,19 @@ class PodcastUserState(Document):
 
 
     def get_subscribed_device_ids(self):
-        r = PodcastUserState.view('users/subscriptions_by_podcast',
-            startkey = [self.podcast, self.user, None],
-            endkey   = [self.podcast, self.user, {}],
-            reduce   = False,
-            )
-        return (res['key'][2] for res in r)
+        """ device Ids on which the user subscribed to the podcast """
+        devices = set()
+
+        for action in self.actions:
+            if action.action == "subscribe":
+                if not action.device in self.disabled_devices:
+                    devices.add(action.device)
+            else:
+                if action.device in devices:
+                    devices.remove(action.device)
+
+        return devices
+
 
 
     def is_public(self):
@@ -523,11 +517,6 @@ class Device(Document):
     settings = DictProperty()
     deleted  = BooleanProperty(default=False)
     user_agent = StringProperty()
-
-    @classmethod
-    def for_oldid(cls, oldid):
-        r = cls.view('users/devices_by_oldid', key=oldid)
-        return r.first() if r else None
 
 
     def get_subscription_changes(self, since, until):
@@ -614,11 +603,6 @@ class User(BaseUser, SyncedDevicesMixin):
     class Meta:
         app_label = 'users'
 
-    @classmethod
-    def for_oldid(cls, oldid):
-        r = cls.view('users/users_by_oldid', key=oldid, limit=1, include_docs=True)
-        return r.one() if r else None
-
 
     def create_new_token(self, token_name, length=32):
         setattr(self, token_name, token_generator(length))
@@ -637,23 +621,19 @@ class User(BaseUser, SyncedDevicesMixin):
 
 
     def get_device(self, id):
-        for device in self.devices:
-            if device.id == id:
-                return device
 
-        return None
+        if not hasattr(self, '__device_by_id'):
+            self.__devices_by_id = dict( (d.id, d) for d in self.devices)
+
+        return self.__devices_by_id.get(id, None)
 
 
     def get_device_by_uid(self, uid):
-        for device in self.devices:
-            if device.uid == uid:
-                return device
 
+        if not hasattr(self, '__devices_by_uio'):
+            self.__devices_by_uid = dict( (d.uid, d) for d in self.devices)
 
-    def get_device_by_oldid(self, oldid):
-        for device in self.devices:
-            if device.oldid == oldid:
-                return device
+        return self.__devices_by_uid.get(uid, None)
 
 
     def update_device(self, device):
@@ -919,19 +899,11 @@ class History(object):
                 endkey     = self._startkey,
                 limit      = length,
                 skip       = start,
-                include_docs = True,
             )
 
         for action in res:
-            state_doc = action['doc']
-            index = int(action['value'])
-
-            if state_doc['doc_type'] == 'EpisodeUserState':
-                state = EpisodeUserState.wrap(state_doc)
-            else:
-                state = PodcastUserState.wrap(state_doc)
-
-            yield HistoryEntry.from_action_dict(state, index)
+            action = action['value']
+            yield HistoryEntry.from_action_dict(action)
 
 
 
@@ -940,34 +912,16 @@ class HistoryEntry(object):
 
 
     @classmethod
-    def from_action_dict(cls, state, index):
+    def from_action_dict(cls, action):
 
         entry = HistoryEntry()
-        action = state.actions[index]
 
-        if isinstance(state, EpisodeUserState):
-            entry.type = 'Episode'
-            entry.podcast_url = state.podcast_ref_url
-            entry.episode_url = state.ref_url
-            entry.podcast_id = state.podcast
-            entry.episode_id = state.episode
-            if action.device:
-                entry.device_id = action.device
-            if action.started:
-                entry.started = action.started
-            if action.playmark:
-                entry.position = action.playmark
-            if action.total:
-                entry.total = action.total
+        if 'timestamp' in action:
+            ts = action.pop('timestamp')
+            entry.timestamp = dateutil.parser.parse(ts)
 
-        else:
-            entry.type = 'Subscription'
-            entry.podcast_url = state.ref_url
-            entry.podcast_id = state.podcast
-
-
-        entry.action = action.action
-        entry.timestamp = action.timestamp
+        for key, value in action.items():
+            setattr(entry, key, value)
 
         return entry
 

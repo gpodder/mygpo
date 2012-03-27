@@ -109,7 +109,8 @@ def get_device(user, uid, user_agent, undelete=True):
 
 
 def get_favorites(user):
-    favorites = EpisodeUserState.view('users/favorite_episodes_by_user', key=user._id)
-    ids = [res['value'] for res in favorites]
-    episodes = Episode.get_multi(ids)
-    return episodes
+    favorites = Episode.view('users/favorite_episodes_by_user',
+            key          = user._id,
+            include_docs = True,
+        )
+    return favorites
