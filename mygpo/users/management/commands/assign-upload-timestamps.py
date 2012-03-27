@@ -5,6 +5,7 @@ from couchdbkit import Consumer
 from mygpo.maintenance.management.changescmd import ChangesCommand
 from mygpo.decorators import repeat_on_conflict
 from mygpo.users.models import EpisodeUserState
+from mygpo.utils import get_timestamp
 
 
 class Command(ChangesCommand):
@@ -33,7 +34,7 @@ class Command(ChangesCommand):
 
     @staticmethod
     def has_upload_timestamp(action):
-        return bool(action.upload_timestamp)
+        return type(action.upload_timestamp) == int
 
 
     @staticmethod
@@ -41,7 +42,8 @@ class Command(ChangesCommand):
         default = datetime.utcnow()
 
         if not action.upload_timestamp:
-            action.upload_timestamp = min(action.timestamp, default)
+            upload_timestamp = min(action.timestamp, default)
+            action.upload_timestamp = get_timestamp(upload_timestamp)
 
         try:
             action.validate_time_values()
@@ -49,6 +51,11 @@ class Command(ChangesCommand):
             return None
 
         return action
+
+
+
+    def get_query_params(self):
+        return dict(include_docs=True, filter='users/episode_states')
 
 
     @repeat_on_conflict(['state'])

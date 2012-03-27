@@ -35,7 +35,7 @@ from mygpo.core.proxy import proxy_object
 from mygpo.core.models import Episode
 from mygpo.users.models import Chapter, HistoryEntry, EpisodeAction
 from mygpo.api import backend
-from mygpo.utils import parse_time, get_to_dict
+from mygpo.utils import parse_time, get_to_dict, get_timestamp
 from mygpo.web.heatmap import EpisodeHeatmap
 from mygpo.web.utils import get_episode_link_target
 
@@ -210,7 +210,7 @@ def add_action(request, episode):
 
     action = EpisodeAction()
     action.timestamp = timestamp
-    action.upload_timestamp = datetime.utcnow()
+    action.upload_timestamp = get_timestamp(datetime.utcnow())
     action.device = device.id if device else None
     action.action = action_str
 

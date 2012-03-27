@@ -187,7 +187,7 @@ def episodes(request, username, version=1):
         aggregated = parse_bool(request.GET.get('aggregated', False))
 
         try:
-            since = datetime.fromtimestamp(float(since_)) if since_ else None
+            since = int(since_) if since_ else None
         except ValueError:
             return HttpResponseBadRequest('since-value is not a valid timestamp')
 
@@ -227,7 +227,7 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
     if podcast is not None: args['podcast_id'] = podcast.get_id()
     if device is not None:  args['device_id'] = device.id
 
-    actions = EpisodeAction.filter(user._id, since, until, **args)
+    actions = EpisodeAction.filter(user._id, since, **args)
 
     if version == 1:
         actions = imap(convert_position, actions)
@@ -348,7 +348,7 @@ def parse_episode_action(action, user, update_urls, now, ua_string):
         new_action.timestamp = now
     new_action.timestamp = new_action.timestamp.replace(microsecond=0)
 
-    new_actions.upload_timestamp = now
+    new_actions.upload_timestamp = get_timestamp(now)
 
     new_action.started = action.get('started', None)
     new_action.playmark = action.get('position', None)

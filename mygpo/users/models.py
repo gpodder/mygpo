@@ -78,7 +78,7 @@ class EpisodeAction(DocumentSchema):
     timestamp     = DateTimeProperty(required=True, default=datetime.utcnow)
 
     # upload time of the event
-    upload_timestamp = DateTimeProperty(required=True)
+    upload_timestamp = IntegerProperty(required=True)
 
     device_oldid  = IntegerProperty(required=False)
     device        = StringProperty()
