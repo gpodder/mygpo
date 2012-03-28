@@ -41,7 +41,8 @@ class MergeTests(TestCase):
         self.episode1.save()
         self.episode2.save()
 
-        self.user = User(username='test')
+        self.user = User(username='test', email='test@example.com')
+        self.user.set_password('asdf')
         self.user.save()
 
 

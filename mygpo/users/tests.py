@@ -27,7 +27,8 @@ from mygpo.users.models import User, Device
 class DeviceSyncTests(unittest.TestCase):
 
     def setUp(self):
-        self.user = User()
+        self.user = User(username='test', email='t@example.com')
+        self.user.set_password('asdf')
         self.user.save()
 
 

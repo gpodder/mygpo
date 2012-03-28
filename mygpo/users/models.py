@@ -12,7 +12,7 @@ from django_couchdb_utils.registration.models import User as BaseUser
 
 from mygpo.core.proxy import proxy_object, DocumentABCMeta
 from mygpo.core.models import Podcast, Episode
-from mygpo.utils import linearize, get_to_dict, iterate_together
+from mygpo.utils import linearize, get_to_dict, iterate_together, get_timestamp
 from mygpo.decorators import repeat_on_conflict
 from mygpo.users.ratings import RatingMixin
 from mygpo.users.sync import SyncedDevicesMixin
@@ -66,6 +66,11 @@ class Suggestions(Document, RatingMixin):
                 (len(self.podcasts), self.user, self._id)
 
 
+def default_upload_timestamp():
+    ts = datetime.utcnow()
+    return get_timestamp(ts)
+
+
 class EpisodeAction(DocumentSchema):
     """
     One specific action to an episode. Must
@@ -78,7 +83,8 @@ class EpisodeAction(DocumentSchema):
     timestamp     = DateTimeProperty(required=True, default=datetime.utcnow)
 
     # upload time of the event
-    upload_timestamp = IntegerProperty(required=True)
+    upload_timestamp = IntegerProperty(required=True,
+                                       default=default_upload_timestamp)
 
     device_oldid  = IntegerProperty(required=False)
     device        = StringProperty()

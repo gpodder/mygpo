@@ -30,7 +30,11 @@ ADMINS = ()
 
 MANAGERS = ADMINS
 
+# Tests don't run without a configured database
 DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+    }
 }
 
 COUCHDB_DATABASES = (
