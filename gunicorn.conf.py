@@ -1,6 +1,8 @@
+import multiprocessing
 
-
-bind = "unix:/tmp/mygpo.sock"
-workers = 2
+bind = "127.0.0.1:8000"
+workers = multiprocessing.cpu_count() * 2 + 1
 worker_class = "gevent"
-max_requests = 10000
+
+# The maximum number of requests a worker will process before restarting.
+max_requests = 100000
