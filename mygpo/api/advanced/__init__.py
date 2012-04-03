@@ -283,8 +283,23 @@ def clean_episode_action_data(action, user, devices):
         if x not in action:
             action[x] = None
 
-    return action
+    if action['action'] != 'play':
+        if 'position' in action:
+            del action['position']
 
+        if 'total' in action:
+            del action['total']
+
+        if 'started' in action:
+            del action['started']
+
+        if 'playmark' in action:
+            del action['playmark']
+
+    else:
+        action['position'] = action.get('position', False) or 0
+
+    return action
 
 
 
