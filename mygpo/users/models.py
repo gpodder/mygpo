@@ -220,7 +220,7 @@ class EpisodeUserState(Document):
     @classmethod
     def for_user_episode(cls, user, episode):
         r = cls.view('users/episode_states_by_user_episode',
-            key=[user._id, episode._id], include_docs=True)
+            key=[user._id, episode._id], include_docs=True, limit=1)
 
         if r:
             return r.first()
