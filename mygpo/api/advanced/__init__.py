@@ -21,6 +21,7 @@ from collections import defaultdict, namedtuple
 from datetime import datetime
 
 import dateutil.parser
+import gevent
 
 from django.http import HttpResponse, HttpResponseBadRequest, Http404
 from django.contrib.sites.models import RequestSite
@@ -514,12 +515,21 @@ def get_episode_updates(user, subscribed_podcasts, since):
     EpisodeStatus = namedtuple('EpisodeStatus', 'episode status action')
 
     episode_status = {}
-    episodes = chain.from_iterable(p.get_episodes(since) for p in subscribed_podcasts)
+
+    # get episodes
+    episode_jobs = [gevent.spawn(p.get_episodes, since) for p in
+        subscribed_podcasts]
+    gevent.joinall(episode_jobs)
+    episodes = chain.from_iterable(job.get() for job in episode_jobs)
+
     for episode in episodes:
         episode_status[episode._id] = EpisodeStatus(episode, 'new', None)
 
-    e_actions = (p.get_episode_states(user.id) for p in subscribed_podcasts)
-    e_actions = chain.from_iterable(e_actions)
+    # get episode states
+    e_action_jobs = [gevent.spawn(p.get_episode_states, user._id) for p in
+        subscribed_podcasts]
+    gevent.joinall(e_action_jobs)
+    e_actions = chain.from_iterable(job.get() for job in e_action_jobs)
 
     for action in e_actions:
         e_id = action['episode_id']
