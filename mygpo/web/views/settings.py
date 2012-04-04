@@ -25,6 +25,8 @@ from django.contrib.sites.models import RequestSite
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache
 
+from django_couchdb_utils.auth.models import UsernameException, PasswordException
+
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.web.forms import UserAccountForm
 from mygpo.core.models import Podcast
@@ -60,7 +62,11 @@ def account(request):
             request.user.set_password(form.cleaned_data['password1'])
 
         request.user.email = form.cleaned_data['email']
-        request.user.save()
+
+        try:
+            request.user.save()
+        except (UsernameException, PasswordException) as ex:
+            messages.error(request, str(ex))
 
         messages.success(request, 'Account updated')
 

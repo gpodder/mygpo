@@ -974,9 +974,13 @@ class PodcastGroup(Document, SlugMixin, OldIdMixin):
 
     def get_logo_url(self, size):
         if self.logo_url:
-            sha = hashlib.sha1(self.logo_url).hexdigest()
-            return '/logo/%d/%s.jpg' % (size, sha)
-        return '/media/podcast-%d.png' % (hash(self.title) % 5, )
+            filename = hashlib.sha1(self.logo_url).hexdigest()
+        else:
+            filename = 'podcast-%d.png' % (hash(self.title) % 5, )
+
+        prefix = CoverArt.get_prefix(filename)
+
+        return reverse('logo', args=[size, prefix, filename])
 
 
     def add_podcast(self, podcast, member_name):
