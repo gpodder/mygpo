@@ -10,7 +10,7 @@ from django.contrib.sites.models import RequestSite
 from django.utils.translation import ugettext as _
 from django.contrib import messages
 from django.views.decorators.vary import vary_on_cookie
-from django.views.decorators.cache import never_cache
+from django.views.decorators.cache import never_cache, cache_control
 
 from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.core.proxy import proxy_object
@@ -34,6 +34,7 @@ def update_podcast_settings(state, is_public):
 
 
 @vary_on_cookie
+@cache_control(private=True)
 @allowed_methods(['GET'])
 def show_slug(request, slug):
     podcast = Podcast.for_slug(slug)
@@ -46,6 +47,7 @@ def show_slug(request, slug):
 
 
 @vary_on_cookie
+@cache_control(private=True)
 @allowed_methods(['GET'])
 def show(request, podcast):
 

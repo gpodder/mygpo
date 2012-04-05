@@ -27,7 +27,7 @@ from mygpo.web import utils
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.vary import vary_on_cookie
-from django.views.decorators.cache import never_cache
+from django.views.decorators.cache import never_cache, cache_control
 
 from restkit.errors import Unauthorized
 
@@ -38,6 +38,7 @@ from mygpo.users.models import PodcastUserState, Device, DeviceUIDException
 
 
 @vary_on_cookie
+@cache_control(private=True)
 @login_required
 def overview(request):
 
@@ -54,6 +55,7 @@ def overview(request):
 def device_decorator(f):
     @login_required
     @vary_on_cookie
+    @cache_control(private=True)
     @wraps(f)
     def _decorator(request, uid, *args, **kwargs):
 
@@ -165,6 +167,7 @@ def update(request, device):
 
 @login_required
 @vary_on_cookie
+@cache_control(private=True)
 @allowed_methods(['GET'])
 def edit_new(request):
 

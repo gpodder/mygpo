@@ -3,7 +3,7 @@ from functools import wraps
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, \
         HttpResponseForbidden, Http404
-from django.views.decorators.cache import cache_page, never_cache
+from django.views.decorators.cache import cache_page, never_cache, cache_control
 from django.views.decorators.vary import vary_on_cookie
 from django.core.urlresolvers import reverse
 
@@ -25,6 +25,7 @@ from mygpo.users.models import User
 
 
 @vary_on_cookie
+@cache_control(private=True)
 def home(request):
     if is_publisher(request.user):
         podcasts = Podcast.get_multi(request.user.published_objects)
@@ -42,6 +43,7 @@ def home(request):
 
 
 @vary_on_cookie
+@cache_control(private=True)
 @require_publisher
 def search_podcast(request):
     form = SearchPodcastForm(request.POST)
@@ -60,6 +62,7 @@ def search_podcast(request):
 
 
 @vary_on_cookie
+@cache_control(private=True)
 @require_publisher
 @allowed_methods(['GET', 'POST'])
 def podcast(request, podcast):
@@ -106,6 +109,7 @@ def podcast(request, podcast):
 
 
 @vary_on_cookie
+@cache_control(private=True)
 @require_publisher
 def group(request, group):
 
@@ -126,6 +130,7 @@ def group(request, group):
 
 
 @vary_on_cookie
+@cache_control(private=True)
 @require_publisher
 def update_podcast(request, podcast):
 
@@ -152,6 +157,7 @@ def update_published_podcasts(request, username):
 
 
 @vary_on_cookie
+@cache_control(private=True)
 @require_publisher
 def episodes(request, podcast):
 
@@ -178,6 +184,7 @@ def episodes(request, podcast):
 
 @require_publisher
 @vary_on_cookie
+@cache_control(private=True)
 @allowed_methods(['GET', 'POST'])
 def episode(request, episode):
 
@@ -209,6 +216,7 @@ def episode(request, episode):
 
 
 @vary_on_cookie
+@cache_control(private=True)
 def link(request):
     current_site = RequestSite(request)
     return render(request, 'link.html', {
@@ -217,6 +225,7 @@ def link(request):
 
 
 @vary_on_cookie
+@cache_control(private=True)
 def advertise(request):
     site = RequestSite(request)
     return render(request, 'publisher/advertise.html', {

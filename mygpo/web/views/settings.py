@@ -23,7 +23,7 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
 from django.views.decorators.vary import vary_on_cookie
-from django.views.decorators.cache import never_cache
+from django.views.decorators.cache import never_cache, cache_control
 
 from django_couchdb_utils.auth.models import UsernameException, PasswordException
 
@@ -35,6 +35,7 @@ from mygpo.utils import get_to_dict
 
 @login_required
 @vary_on_cookie
+@cache_control(private=True)
 @allowed_methods(['GET', 'POST'])
 def account(request):
 
@@ -139,6 +140,7 @@ def privacy(request):
 
 
 @vary_on_cookie
+@cache_control(private=True)
 @login_required
 def share(request):
     site = RequestSite(request)
