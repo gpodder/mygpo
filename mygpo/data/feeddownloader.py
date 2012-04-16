@@ -90,7 +90,7 @@ def get_duration(entry):
 
     try:
         return parse_time(str)
-    except ValueError:
+    except (ValueError, TypeError):
         return 0
 
 def get_filesize(entry, url):
