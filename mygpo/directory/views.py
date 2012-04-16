@@ -1,4 +1,5 @@
 from itertools import imap as map, islice
+from math import ceil
 
 from django.core.cache import cache
 from django.http import HttpResponseRedirect, HttpResponseNotFound
@@ -202,7 +203,7 @@ def podcast_lists(request, page_size=20):
 
     lists = map(_prepare_list, lists)
 
-    num_pages = PodcastList.count() / page_size
+    num_pages = ceil(PodcastList.count() / float(page_size))
 
     page_list = utils.get_page_list(1, num_pages, page, 15)
 
