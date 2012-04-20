@@ -20,7 +20,7 @@ from functools import wraps
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, \
-        HttpResponseForbidden, Http404
+        HttpResponseForbidden, Http404, HttpResponseNotFound
 from django.contrib import messages
 from mygpo.web.forms import DeviceForm, SyncForm
 from mygpo.web import utils
@@ -34,7 +34,8 @@ from restkit.errors import Unauthorized
 from mygpo.log import log
 from mygpo.api import simple
 from mygpo.decorators import allowed_methods, repeat_on_conflict
-from mygpo.users.models import PodcastUserState, Device, DeviceUIDException
+from mygpo.users.models import PodcastUserState, Device, DeviceUIDException, \
+     DeviceDoesNotExist
 
 
 @vary_on_cookie
@@ -59,10 +60,11 @@ def device_decorator(f):
     @wraps(f)
     def _decorator(request, uid, *args, **kwargs):
 
-        device = request.user.get_device_by_uid(uid)
+        try:
+            device = request.user.get_device_by_uid(uid, only_active=False)
 
-        if not device:
-            raise Http404
+        except DeviceDoesNotExist as e:
+            return HttpResponseNotFound(str(e))
 
         return f(request, device, *args, **kwargs)
 
@@ -296,12 +298,19 @@ def sync(request, device):
     if not form.is_valid():
         return HttpResponseBadRequest('invalid')
 
+    # TODO: remove cascaded trys
+
     try:
         target_uid = form.get_target()
 
-        sync_target = request.user.get_device_by_uid(target_uid)
-        request.user.sync_devices(device, sync_target)
-        request.user.save()
+        try:
+            sync_target = request.user.get_device_by_uid(target_uid)
+
+            request.user.sync_devices(device, sync_target)
+            request.user.save()
+
+        except DeviceDoesNotExist as e:
+            messages.error(request, str(e))
 
     except ValueError, e:
         raise

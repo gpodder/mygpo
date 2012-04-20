@@ -35,7 +35,7 @@ from mygpo.core import models
 from mygpo.core.models import Podcast, Episode
 from mygpo.directory.tags import Tag
 from mygpo.directory.toplist import PodcastToplist
-from mygpo.users.models import Suggestions, History, HistoryEntry
+from mygpo.users.models import Suggestions, History, HistoryEntry, DeviceDoesNotExist
 from mygpo.users.models import PodcastUserState, User
 from mygpo.web import utils
 from mygpo.api import backend
@@ -114,7 +114,11 @@ def history(request, count=15, uid=None):
     page = parse_range(request.GET.get('page', None), 0, sys.maxint, 0)
 
     if uid:
-        device = request.user.get_device_by_uid(uid)
+        try:
+            device = request.user.get_device_by_uid(uid, only_active=False)
+        except DeviceDoesNotExist as e:
+            messages.error(request, str(e))
+
     else:
         device = None
 

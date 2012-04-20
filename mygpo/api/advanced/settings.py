@@ -15,7 +15,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from django.http import HttpResponseBadRequest, Http404
+from django.http import HttpResponseBadRequest, Http404, HttpResponseNotFound
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 
@@ -24,7 +24,7 @@ from mygpo.core.models import Episode, Podcast
 from mygpo.json import json
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.api.httpresponse import JsonResponse
-from mygpo.users.models import PodcastUserState
+from mygpo.users.models import PodcastUserState, DeviceDoesNotExist
 
 
 @csrf_exempt
@@ -38,9 +38,7 @@ def main(request, username, scope):
         return user, user
 
     def device_settings(user, uid):
-        device = user.get_device_by_uid(user, uid)
-        if not device or device.deleted:
-            raise Http404
+        device = user.get_device_by_uid(uid)
 
         # get it from the user directly so that changes
         # to settings_obj are reflected in user (bug 1344)
@@ -74,7 +72,10 @@ def main(request, username, scope):
     if scope not in models.keys():
         return HttpResponseBadRequest('undefined scope %s' % scope)
 
-    base_obj, settings_obj = models[scope]()
+    try:
+        base_obj, settings_obj = models[scope]()
+    except DeviceDoesNotExist as e:
+        return HttpResponseNotFound(str(e))
 
     if request.method == 'GET':
         return JsonResponse( settings_obj.settings )

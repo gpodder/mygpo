@@ -81,15 +81,17 @@ def get_device(user, uid, user_agent, undelete=True):
     @repeat_on_conflict(['user'])
     def _get(user, uid, undelete):
 
-        device = user.get_device_by_uid(uid)
         save = False
 
-        if not device:
+        try:
+            device = user.get_device_by_uid(uid, only_active=False)
+
+        except DeviceDoesNotExist:
             device = Device(uid=uid)
             user.devices.append(device)
             save = True
 
-        elif device.deleted and undelete:
+        if device.deleted and undelete:
             device.deleted = False
             user.set_device(device)
             save = True
