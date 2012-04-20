@@ -29,6 +29,13 @@ class DeviceUIDException(Exception):
     pass
 
 
+class DeviceDoesNotExist(Exception):
+    pass
+
+
+class DeviceDeletedException(DeviceDoesNotExist):
+    pass
+
 
 class Suggestions(Document, RatingMixin):
     user = StringProperty(required=True)
@@ -632,12 +639,22 @@ class User(BaseUser, SyncedDevicesMixin):
         return self.__devices_by_id.get(id, None)
 
 
-    def get_device_by_uid(self, uid):
+    def get_device_by_uid(self, uid, only_active=True):
 
         if not hasattr(self, '__devices_by_uio'):
             self.__devices_by_uid = dict( (d.uid, d) for d in self.devices)
 
-        return self.__devices_by_uid.get(uid, None)
+        try:
+            device = self.__devices_by_uid.get(uid, None)
+
+            if only_active and device.deleted:
+                raise DeviceDeletedException(
+                        'Device with UID %s is deleted' % uid)
+
+            return device
+
+        except KeyError as e:
+            raise DeviceDoesNotExist('There is no device with UID %s' % uid)
 
 
     def update_device(self, device):

@@ -224,6 +224,7 @@ def subscribe(request, podcast):
     if request.method == 'POST':
         form = SyncForm(request.POST)
 
+        # TODO: remove cascaded trys
         try:
             device = request.user.get_device_by_uid(form.get_target())
 
@@ -239,6 +240,9 @@ def subscribe(request, podcast):
         except ValueError, e:
             messages.error(request, _('Could not subscribe '
                         'to the podcast: %s' % str(e)))
+
+        except DeviceDoesNotExist as e:
+            messages.error(request, str(e))
 
     request.user.sync_all()
 
@@ -263,10 +267,11 @@ def unsubscribe(request, podcast, device_uid):
     if not return_to:
         raise Http404('Wrong URL')
 
-    device = request.user.get_device_by_uid(device_uid)
+    try:
+        device = request.user.get_device_by_uid(device_uid)
 
-    if not device:
-        raise Http404('Unknown device')
+    except DeviceDoesNotExist as e:
+        messages.error(request, str(e))
 
     try:
         podcast.unsubscribe(request.user, device)

@@ -23,7 +23,7 @@ from datetime import datetime
 import dateutil.parser
 import gevent
 
-from django.http import HttpResponse, HttpResponseBadRequest, Http404
+from django.http import HttpResponse, HttpResponseBadRequest, Http404, HttpResponseNotFound
 from django.contrib.sites.models import RequestSite
 from django.db import IntegrityError
 from django.views.decorators.csrf import csrf_exempt
@@ -39,7 +39,7 @@ from mygpo.utils import parse_time, format_time, parse_bool, get_to_dict, get_ti
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.core import models
 from mygpo.core.models import SanitizingRule, Podcast
-from mygpo.users.models import PodcastUserState, EpisodeAction, EpisodeUserState
+from mygpo.users.models import PodcastUserState, EpisodeAction, EpisodeUserState, DeviceDoesNotExist
 from mygpo.json import json, JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.couchdb import bulk_save_retry
@@ -61,9 +61,11 @@ def subscriptions(request, username, device_uid):
     now_ = get_timestamp(now)
 
     if request.method == 'GET':
-        device = request.user.get_device_by_uid(device_uid)
-        if not device or device.deleted:
-            raise Http404
+
+        try:
+            device = request.user.get_device_by_uid(device_uid)
+        except DeviceDoesNotExist as e:
+            return HttpResponseNotFound(str(e))
 
         since_ = request.GET.get('since', None)
         if since_ == None:
@@ -204,10 +206,12 @@ def episodes(request, username, version=1):
             podcast = None
 
         if device_uid:
-            device = request.user.get_device_by_uid(device_uid)
 
-            if not device or device.deleted:
-                raise Http404
+            try:
+                device = request.user.get_device_by_uid(device_uid)
+            except DeviceDoesNotExist as e:
+                return HttpResponseNotFound(str(e))
+
         else:
             device = None
 
@@ -470,9 +474,10 @@ def updates(request, username, device_uid):
     now = datetime.now()
     now_ = get_timestamp(now)
 
-    device = request.user.get_device_by_uid(device_uid)
-    if not device or device.deleted:
-        raise Http404
+    try:
+        device = request.user.get_device_by_uid(device_uid)
+    except DeviceDoesNotExist as e:
+        return HttpResponseNotFound(str(e))
 
     since_ = request.GET.get('since', None)
     if since_ == None:

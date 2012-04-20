@@ -15,7 +15,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, HttpResponseNotFound
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 
@@ -23,6 +23,7 @@ from mygpo.decorators import allowed_methods
 from mygpo.json import json
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.api.httpresponse import JsonResponse
+from mygpo.users.models import DeviceDoesNotExist
 
 
 @csrf_exempt
@@ -49,6 +50,8 @@ def main(request, username):
             update_sync_status(request.user, synclist, stopsync)
         except ValueError as e:
             return HttpResponseBadRequest(str(e))
+        except DeviceDoesNotExist as e:
+            return HttpResponseNotFound(str(e))
 
         return JsonResponse(get_sync_status(request.user))
 
