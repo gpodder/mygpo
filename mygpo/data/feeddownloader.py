@@ -41,7 +41,6 @@ from mygpo.core.slugs import assign_missing_episode_slugs, assign_slug, \
          PodcastSlug
 from mygpo.web.logo import CoverArt
 
-socket.setdefaulttimeout(10)
 fetcher = feedcore.Fetcher(USER_AGENT)
 
 def mark_outdated(podcast):
@@ -184,7 +183,10 @@ def update_podcasts(fetch_queue):
         print '(%d) %s' % (n, podcast.url)
 
         try:
+            timeout = socket.getdefaulttimeout()
+            socket.setdefaulttimeout(60)
             fetcher.fetch(podcast.url)
+            socket.setdefaulttimeout(timeout)
 
         except (feedcore.Offline, feedcore.InvalidFeed, feedcore.WifiLogin,
                 feedcore.AuthenticationRequired, socket.error, IOError):
