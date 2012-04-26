@@ -649,7 +649,7 @@ class User(BaseUser, SyncedDevicesMixin):
             self.__devices_by_uid = dict( (d.uid, d) for d in self.devices)
 
         try:
-            device = self.__devices_by_uid.get(uid, None)
+            device = self.__devices_by_uid[uid]
 
             if only_active and device.deleted:
                 raise DeviceDeletedException(
