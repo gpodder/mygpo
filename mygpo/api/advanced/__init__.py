@@ -33,7 +33,8 @@ from mygpo.api.constants import EPISODE_ACTION_TYPES, DEVICE_TYPES
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url, sanitize_urls
 from mygpo.api.advanced.directory import episode_data, podcast_data
-from mygpo.api.backend import get_device, get_favorites
+from mygpo.api.backend import get_device, get_favorites, BulkSubscribe
+from mygpo.couchdb import BulkException
 from mygpo.log import log
 from mygpo.utils import parse_time, format_time, parse_bool, get_to_dict, get_timestamp
 from mygpo.decorators import allowed_methods, repeat_on_conflict
@@ -124,21 +125,24 @@ def update_subscriptions(user, device, add, remove):
     # been sanitized to the same, we ignore the removal
     rem_s = filter(lambda x: x not in add_s, rem_s)
 
+    subscriber = BulkSubscribe(user, device)
+
     for a in add_s:
-        p = Podcast.for_url(a, create=True)
-        try:
-            p.subscribe(user, device)
-        except Exception as e:
-            log('Advanced API: %(username)s: could not subscribe to podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
-                {'username': user.username, 'podcast_url': p.url, 'device_id': device.id, 'exception': e})
+        subscriber.add_action(a, 'subscribe')
 
     for r in rem_s:
-        p = Podcast.for_url(r, create=True)
-        try:
-            p.unsubscribe(user, device)
-        except Exception as e:
-            log('Advanced API: %(username)s: could not unsubscribe from podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
-                {'username': user.username, 'podcast_url': p.url, 'device_id': device.id, 'exception': e})
+        subscriber.add_action(r, 'unsubscribe')
+
+    try:
+        subscriber.execute()
+    except BulkException as be:
+        for err in be.errors:
+            log('Advanced API: %(username)s: Updating subscription for '
+                    '%(podcast_url)s on %(device_uid)s failed: '
+                    '%(rerror)s (%(reason)s)'.format(username=user.username,
+                        podcast_url=err.doc, device_uid=device.uid,
+                        error=err.error, reason=err.reason)
+                )
 
     return updated_urls
 

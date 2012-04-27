@@ -1,6 +1,15 @@
 from operator import itemgetter
+from collections import namedtuple
 
 from couchdbkit import *
+
+class BulkException(Exception):
+
+    def __init__(self, errors):
+        self.errors = errors
+
+
+BulkError = namedtuple('BulkError', 'doc error reason')
 
 
 def __default_reload(db, obj):
@@ -22,6 +31,8 @@ def bulk_save_retry(db, obj_funs, reload_f=__default_reload):
 
     If saving a document fails, it is again fetched from the database, the
     modification function is applied again and saving is retried. """
+
+    errors = []
 
     while True:
 
@@ -45,10 +56,18 @@ def bulk_save_retry(db, obj_funs, reload_f=__default_reload):
 
             new_obj_funs = []
             for res, (obj, f) in zip(ex.results, obj_funs):
-                if res.get('error', False):
+                if res.get('error', False) == 'conflict':
 
                     # reload conflicted object
                     obj = reload_f(db, obj)
                     new_obj_funs.append( (obj, f) )
 
+                elif res.get('error', False):
+                    # don't retry other errors
+                    err = BulkError(obj, res['error'], res.get('reason', None))
+                    errors.append(err)
+
             obj_funs = new_obj_funs
+
+    if errors:
+        raise BulkException(errors)
