@@ -251,6 +251,7 @@ table.list
 {
     border-collapse: collapse;
     width: 100%;
+    margin-bottom: 2em;
 }
 
 table.list tr td
@@ -258,6 +259,7 @@ table.list tr td
     padding: .3em;
     border-top: thin dotted #ccc;
     border-bottom: thin dotted #ccc;
+    vertical-align: middle;
 }
 
 table.list tr:hover td {
@@ -268,12 +270,18 @@ table.list th
 {
     text-align: left;
     padding: 5px;
+    font-weight: bold;
 }
 
 table.list th,
 table.list td
 {
     padding-right: 1em;
+}
+
+table.list td
+{
+    height: 40px;
 }
 
 table td.numeric,
@@ -310,7 +318,7 @@ table.list tr.group:hover td
     padding: 0px;
 }
 
-.podcast_list p.description, .episode_list p.description
+.podcast_list .description, .episode_list p.description
 {
     font-size: x-small;
 }
@@ -318,6 +326,14 @@ table.list tr.group:hover td
 .description
 {
     color: #666;
+}
+
+.short
+{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 65em;
 }
 
 .URL

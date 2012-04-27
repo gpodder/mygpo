@@ -46,8 +46,13 @@ def device_icon(device, size=16):
 
 @register.filter
 def device_list(devices):
-    links = [ '<a href="%s">%s&nbsp;%s</a>' % (reverse(show, args=[d.uid]), \
-            device_icon(d), d.name.replace(' ', '&nbsp;')) for d in devices]
+    links = map(device_link, devices)
+    return mark_safe(''.join(links))
 
-    return mark_safe('<br/>'.join(links))
+def device_link(device):
+    return '<a href="{link}" title="{name}">{icon}</a>'.format(
+            link = reverse(show, args=[device.uid]),
+            name = device.name,
+            icon = device_icon(device),
+        )
 
