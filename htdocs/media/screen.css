@@ -3,24 +3,15 @@ html,
 body
 {
     height: 100%;
+    font-family: DeJaVu Sans, Bitstream Vera Sans, sans-serif;
+    background-color: #E6EEF0;
+    font-size: .9em;
 }
 
-body
-{
-    font-family: DeJaVu Sans, Bitstream Vera Sans, sans-serif;
-    background-color: #333;
-    padding: 0px;
-    margin: 0px;
-}
 
 body.embed
 {
     background-color: white;
-}
-
-body, table, td, th
-{
-    font-size: 12px;
 }
 
 hr
@@ -35,49 +26,75 @@ img
     border-width: 0px;
 }
 
-#wrap
+#mainwrapper
 {
-    width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-    background-color: white;
     min-height: 100%;
-    padding: 0px;
-    margin-bottom: 0;
-    padding-bottom: 0;
 }
 
 #main
 {
-    overflow:auto;
-    padding-bottom: 50px; /* must be same height as the footer */
+    max-width: 70em;
+    margin: 0 auto 0 auto;
+    background-color: white;
+    overflow: auto;
+    padding-bottom: 7em;
+    padding-top: 2em;
+}
+
+#main > *
+{
+    max-width: 67em;
+    margin-left: 1.5em;
+    padding-right: 1.5em;
+}
+
+.wrap
+{
+    max-width: 70em;
+    margin: 0 auto 0 auto;
+}
+
+#header
+{
+    background-color: #122B51;
+}
+
+#footer .wrap > *
+{
+    padding: 1em 1em 0 1em;
 }
 
 
 #footer
 {
     position: relative;
-    margin-top: -50px; /* negative value of footer height */
-    height: 34px;
-    clear:both;
-    padding-top: 10px;
-    border-top: 1px #aaa dotted;
-    width: 800px;
+    margin-top: -7em; /* negative value of footer height */
+    height: 7em;
+    clear: both;
     margin-left: auto;
     margin-right: auto;
-    background-color: white;
+    background-color: #9FB5BD;
+    color: #396D71;
+}
+
+#footer ul,
+#footer ul li
+{
+    padding-top: 0;
+    margin-top: 0;
+    display: block;
+}
+
+#footer a
+{
+    color: #396D71;
 }
 
 #logo
 {
-	float: right;
+	float: left;
 	padding: 0px;
-	margin: 7px 10px 0px 0px;
-}
-
-#content-area
-{
-    padding: 20px;
+	margin: .5em;
 }
 
 #logininfo
@@ -90,11 +107,6 @@ img
     background-image: url('logininfo-bottomleft.png');
     background-repeat: no-repeat;
     background-position: bottom left;
-}
-
-#navigation
-{
-    background-color: rgb(102, 102, 102);
 }
 
 a {
@@ -169,10 +181,10 @@ ul.menu
 
 ul.menu.secondary
 {
-    background-color: #777;
+    background-color: #445D82;
     padding-left: 40px;
     padding-top: 20px;
-    border-top: 1px #666 solid;
+    border-top: 1px #9FB5BD solid;
 }
 
 ul.menu.primary
@@ -180,28 +192,20 @@ ul.menu.primary
     padding-top: 20px;
 }
 
-ul.menu li {
+ul.menu li
+{
     display: inline;
-    padding: 10px;
-    padding-left: 10px;
+    padding: 10px 10px 8px 10px;
     border-width: 0px;
-    text-shadow: 0px 0px 3px #333;
     position: relative;
     top: 1px;
 }
 
-ul.menu.primary li.selected {
-    background-color: #777;
-    background-image: url('navcaps/primary-top-left.png'),
-                      url('navcaps/primary-top-right.png');
-    background-position: top left, top right;
-    background-repeat: no-repeat;
-    text-shadow: 0px 0px 4px #333;
+ul.menu.primary li.selected
+{
+    color: #445D82;
 }
 
-ul.menu.primary li.selected:hover {
-    background-color: #777;
-}
 
 ul.menu.secondary li.selected a,
 ul.menu.secondary li.selected a:hover,
@@ -214,24 +218,11 @@ ul.menu.secondary li.selected {
     position: relative;
     top: 1px;
     background-color: white;
-    background-image: url('navcaps/secondary-top-left.png'),
-                      url('navcaps/secondary-top-right.png'),
-                      url('navcaps/secondary-bg-gradient.png');
-    background-position: top left, top right, top left;
-    background-repeat: no-repeat, no-repeat, repeat-x;
-    text-shadow: 0px 0px 4px #777;
+    /* round corners */
 }
 
 ul.menu.secondary li.selected:hover {
     background-color: white;
-}
-
-ul.menu li a:hover {
-    text-shadow: 0px 0px 5px black;
-}
-
-ul.menu.secondary li.selected a:hover {
-    text-shadow: 0px 0px 5px #444;
 }
 
 ul.menu li:hover a {
@@ -258,29 +249,19 @@ ul.menu li.heading:hover {
 
 table.list
 {
-    font-size: 1em;
     border-collapse: collapse;
     width: 100%;
 }
 
-table.list tr {
-    border: 1px solid white;
+table.list tr td
+{
+    padding: .3em;
+    border-top: thin dotted #ccc;
+    border-bottom: thin dotted #ccc;
 }
 
-table.list tr:nth-child(even) td {
-    background-color: #f7f7f7;
-}
-
-table.list tr:nth-child(odd) td {
-    background-color: #f0f0f0;
-}
-
-table.list tr:nth-child(even):hover td {
-    background-color: #e7e7e7;
-}
-
-table.list tr:nth-child(odd):hover td {
-    background-color: #e0e0e0;
+table.list tr:hover td {
+    background-color: #eeeeee;
 }
 
 table.list th
@@ -352,8 +333,9 @@ table.list tr.group:hover td
 
 h1, h2
 {
-    padding: 5px 0px 2px 0px;
-    margin: 0px;
+    padding: .5em 0 .4em 0;
+    margin: 0;
+    font-weight: bold;
 }
 
 h1 {
@@ -594,15 +576,6 @@ ul.square-menu li a
     bottom: -40px;
 }
 
-address
-{
-    clear: both;
-    text-align: center;
-    padding: 5px;
-    font-style: normal;
-    color: #999;
-}
-
 .own-chapter
 {
     font-weight: bold;
@@ -618,8 +591,6 @@ div.intro-box
     text-align: justify;
     float: left;
     width: 40%;
-    padding-top: 1em;
-    padding-left: 5%;
     padding-bottom: 1em;
     overflow: hidden;
 }
@@ -798,7 +769,7 @@ input.rate
 
 div.navigation
 {
-clear: both;
+    clear: both;
 }
 
 div.navigation div

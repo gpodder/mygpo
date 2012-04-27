@@ -25,6 +25,7 @@
   <title>{% block title %}{% endblock %} (gpodder.net)</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <link rel="shortcut icon" href="/favicon.png">
+  <link rel="stylesheet" href="/media/reset.css" type="text/css" />
   <link rel="stylesheet" href="/media/screen.css" type="text/css" />
   {% block head %}{% endblock %}
 
@@ -36,9 +37,15 @@
  </head>
  <body>
 
-   <div id="wrap">
+  <div id="mainwrapper">
 
-    <div id="main">
+   <div id="header">
+
+    <div class="wrap">
+
+     <h1 id="logo" style="clear: right;">
+         <img alt="gPodder.net" title="gPodder.net" src="/media/mygpo64.png"/>
+     </h1>
 
      <div id="logininfo">
          {% if user.is_authenticated %}
@@ -49,50 +56,72 @@
              <a href="{% url register %}">Register</a>
          {% endif %}
      </div>
-     <h1 id="logo" style="clear: right;">
-         <img alt="gPodder.net" title="gPodder.net" src="/media/mygpo64.png"/>
-     </h1>
 
-    <div id="navigation">
+     <div id="navigation">
       {% block mainmenu %}
         {{ "/"|main_menu }}
       {% endblock %}
-    </ul>
+     </div>
 
-    {% block sectionmenu %}
+     {% block sectionmenu %}
       <ul class="menu secondary">
         <li class="selected"><a href="">{% trans "Page" %}</a></li>
       </ul>
+     {% endblock %}
+
+    </div>
+
+   </div>
+
+   <div id="main">
+
+    {% if messages %}
+     {% for message in messages %}
+      <div {% if message.tags %} class="{{ message.tags }}"{% endif %}>
+       {{ message }}
+      </div>
+     {% endfor %}
+    {% endif %}
+
+    {% block content %}
+     <h1>gPodder Web Service</h1>
+     <p>...will go online soon...</p>
+     <ul>
+      <li><a href="http://gpodder.org/wiki/Web_Services">Wiki page</a></li>
+      <li><a href="{% url toplist %}">Toplist</a></li>
+     </ul>
     {% endblock %}
-   </div>
-
-   <div id="content-area">
-
-   {% if messages %}
-    {% for message in messages %}
-     <div {% if message.tags %} class="{{ message.tags }}"{% endif %}>
-      {{ message }}
-     </div>
-    {% endfor %}
-   {% endif %}
-
-   {% block content %}
-    <h1>gPodder Web Service</h1>
-    <p>...will go online soon...</p>
-    <ul>
-     <li><a href="http://gpodder.org/wiki/Web_Services">Wiki page</a></li>
-     <li><a href="{% url toplist %}">Toplist</a></li>
-    </ul>
-   {% endblock %}
-   </div>
 
    </div>
-  </div>
+
+  </div> <!-- mainwrapper -->
 
   <div id="footer">
-   <address style="font-variant: small-caps;">
-       Copyright &copy; 2009-2012 gpodder.net
-   </address>
+   <div class="wrap">
+    <ul>
+     <li><strong>Discover</strong>
+       <a href="">Directory</a> &middot;
+       <a href="">Top Podcasts</a> &middot;
+       <a href="">Search</a>
+     </li>
+     <li><strong>Support</strong>
+       <a href="http://flattr.com/thing/2304/gpodder-net">Flattr</a> &middot;
+       <a href="">Donate</a> &middot;
+        <a href="">Advertise</a>
+     </li>
+     <li><strong>Develop</strong>
+       <a href="">API</a> &middot;
+       <a href="">Libraries</a> &middot;
+       <a href="">Clients</a>
+     </li>
+     <li><strong>Publisher</strong>
+       <a href="">Get Access</a> &middot;
+       <a href="">Link To Us</a> &middot;
+       <a href="">Advertise</a>
+     </li>
+     <li><strong>Copyright</strong> &copy; 2009-2012 gpodder.net</li>
+    </ul>
+   </div>
   </div>
 
 
