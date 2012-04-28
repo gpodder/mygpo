@@ -17,9 +17,11 @@
 
 from datetime import timedelta
 from collections import defaultdict
-from itertools import cycle
+from itertools import cycle, islice, chain
 from functools import partial
 import random
+import gevent
+import math
 
 from django.core.cache import cache
 
@@ -32,12 +34,11 @@ from mygpo.json import json
 from mygpo.couchdb import bulk_save_retry
 
 
-def get_random_picks(languages=None):
+def get_random_picks(count, languages=None):
     """ Returns random podcasts for the given language """
 
     if not languages:
-        for podcast in Podcast.random():
-            yield podcast
+        return islice(Podcast.random(), count)
 
     counts = cache.get('podcast-language-counts')
     if not counts:
@@ -48,11 +49,16 @@ def get_random_picks(languages=None):
     # extract positive counts of all languages in language param
     counts = filter(lambda (l, c): l in languages and c > 0, counts.items())
 
-    for lang, count in cycle(counts):
-        skip = random.randint(0, count-1)
+    jobs = []
+    podcasts_per_lang = int(math.ceil(float(count) / len(counts)))
 
-        for podcast in Podcast.for_language(lang, skip=skip, limit=1):
-            yield podcast
+    for lang, lang_count in counts:
+        skip = random.randint(0, lang_count-podcasts_per_lang)
+        job = gevent.spawn(Podcast.for_language, lang, skip=skip,
+                limit=podcasts_per_lang)
+        jobs.append(job)
+
+    return islice(chain.from_iterable(job.get() for job in jobs), count)
 
 
 

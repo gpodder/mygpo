@@ -95,7 +95,7 @@ def dashboard(request, episode_count=10):
     lang = utils.get_accepted_lang(request)
     lang = utils.sanitize_language_codes(lang)
 
-    random_podcasts = islice(backend.get_random_picks(lang), 0, 5)
+    random_podcasts = backend.get_random_picks(5, lang)
 
     return render(request, 'dashboard.html', {
             'site': site,
