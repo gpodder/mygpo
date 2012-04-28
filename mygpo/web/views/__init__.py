@@ -16,7 +16,6 @@
 #
 
 import sys
-from itertools import islice
 from collections import defaultdict
 from datetime import datetime, timedelta
 
@@ -33,6 +32,7 @@ from django.views.decorators.cache import never_cache, cache_control
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core import models
 from mygpo.core.models import Podcast, Episode
+from mygpo.core.episodes import NewestEpisodes
 from mygpo.directory.tags import Tag
 from mygpo.directory.toplist import PodcastToplist
 from mygpo.users.models import Suggestions, History, HistoryEntry, DeviceDoesNotExist
@@ -89,8 +89,8 @@ def dashboard(request, episode_count=10):
     devices = user.active_devices
 
     tomorrow = datetime.today() + timedelta(days=1)
-    newest_episodes = user.get_newest_episodes(tomorrow)
-    newest_episodes = islice(newest_episodes, 0, episode_count)
+    newest_episodes = NewestEpisodes(subscribed_podcasts, tomorrow,
+            episode_count)
 
     lang = utils.get_accepted_lang(request)
     lang = utils.sanitize_language_codes(lang)
