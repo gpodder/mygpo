@@ -1,4 +1,10 @@
 
+
+
+/****************
+    General
+*****************/
+
 html,
 body
 {
@@ -25,6 +31,35 @@ img
 {
     border-width: 0px;
 }
+
+a {
+    color: #10488B;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1, h2
+{
+    padding: .5em 0 .4em 0;
+    margin: 0;
+    font-weight: bold;
+}
+
+h1 {
+    font-size: 14pt;
+}
+
+h2 {
+    font-size: 12pt;
+}
+
+
+/*******************
+    Basic Layout
+********************/
 
 #mainwrapper
 {
@@ -54,6 +89,11 @@ img
     margin: 0 auto 0 auto;
 }
 
+
+/*************
+    Header
+**************/
+
 #header
 {
     background-color: #122B51;
@@ -63,6 +103,30 @@ img
 {
     padding: 1em 1em 0 1em;
 }
+
+#logo
+{
+	float: left;
+	padding: 0px;
+	margin: .5em;
+}
+
+#logininfo
+{
+    float: right;
+    margin-top: 1px;
+    background-color: white;
+    padding: 5px;
+    text-align: right;
+    background-image: url('logininfo-bottomleft.png');
+    background-repeat: no-repeat;
+    background-position: bottom left;
+}
+
+
+/**************
+    Footer
+***************/
 
 
 #footer
@@ -90,33 +154,11 @@ img
     color: #396D71;
 }
 
-#logo
-{
-	float: left;
-	padding: 0px;
-	margin: .5em;
-}
 
-#logininfo
-{
-    float: right;
-    margin-top: 1px;
-    background-color: white;
-    padding: 5px;
-    text-align: right;
-    background-image: url('logininfo-bottomleft.png');
-    background-repeat: no-repeat;
-    background-position: bottom left;
-}
+/******************
+    Info Boxes
+*******************/
 
-a {
-    color: #10488B;
-    text-decoration: none;
-}
-
-a:hover {
-    text-decoration: underline;
-}
 
 div.error
 {
@@ -128,12 +170,6 @@ div.error
     background-repeat: no-repeat;
     background-position: 3px 50%;
     margin: .5em;
-}
-
-table.register th {
-    font-weight:normal;
-    width:150px;
-    text-align:left;
 }
 
 .success
@@ -166,10 +202,28 @@ table.register th {
 }
 
 
+/*********************
+     Registration
+**********************/
+
+table.register th {
+    font-weight:normal;
+    width:150px;
+    text-align:left;
+}
+
+
+
+
+/**********************
+   Main Navigation
+***********************/
+
 .menu a
 {
     color: #aaa;
 }
+
 
 ul.menu
 {
@@ -247,6 +301,13 @@ ul.menu li.heading:hover {
     padding-right: 10px;
 }
 
+
+
+/*******************
+   "List" Tables
+********************/
+
+
 table.list
 {
     border-collapse: collapse;
@@ -303,6 +364,12 @@ table.list tr.group:hover td
     background-color: inherit;
 }
 
+
+
+/****************************
+    Podcast List (TODO)
+*****************************/
+
 .episode_list .title
 {
 }
@@ -328,6 +395,14 @@ table.list tr.group:hover td
     color: #666;
 }
 
+div#podcastlogo
+{
+    float: right;
+    padding-left: 20px;
+    padding-bottom: 10px;
+}
+
+
 .short
 {
     white-space: nowrap;
@@ -345,21 +420,6 @@ table.list tr.group:hover td
 .URL:hover
 {
     text-decoration: underline;
-}
-
-h1, h2
-{
-    padding: .5em 0 .4em 0;
-    margin: 0;
-    font-weight: bold;
-}
-
-h1 {
-    font-size: 14pt;
-}
-
-h2 {
-    font-size: 12pt;
 }
 
 img.device_icon
@@ -424,6 +484,11 @@ div.devicesClear
 }
 
 
+
+/******************
+     Searching
+*******************/
+
 form.search input[type="text"]
 {
     width: 300px;
@@ -478,12 +543,11 @@ div.result
 {
 }
 
-div#podcastlogo
-{
-    float: right;
-    padding-left: 20px;
-    padding-bottom: 10px;
-}
+
+/***************
+   Forms
+****************/
+
 
 table.form
 {
@@ -494,6 +558,9 @@ table.form th
     font-weight: normal;
     text-align: right;
 }
+
+
+
 
 input.url
 {
@@ -675,6 +742,12 @@ button img
     padding-bottom: .5em;
 }
 
+
+/******************
+     Pagination
+*******************/
+
+
 .pagination
 {
     text-align: center;
@@ -783,6 +856,11 @@ input.rate
     display: inline;
 }
 
+
+/*************************
+    Episode Navigation
+**************************/
+
 div.navigation
 {
     clear: both;
@@ -807,10 +885,7 @@ div.navigation div.next
     text-align: right;
 }
 
-hr
-{
-clear: both;
-}
+
 
 #listcontent h2
 {
