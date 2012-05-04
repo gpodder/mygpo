@@ -237,9 +237,6 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
     if device is not None:
         args['device_id'] = device.id
 
-    print user
-    print user._id
-
     actions = EpisodeAction.filter(user._id, since, **args)
 
     if version == 1:

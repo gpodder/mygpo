@@ -140,8 +140,6 @@ class EpisodeAction(DocumentSchema):
             startkey = [user_id, podcast_id, device_id, since_str]
             endkey   = [user_id, podcast_id, device_id, until_str]
 
-        print view, startkey, endkey
-
         db = EpisodeUserState.get_db()
         res = db.view(view,
                 startkey = startkey,
