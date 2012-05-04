@@ -172,8 +172,9 @@ def episodes(request, username, version=1):
         try:
             actions = json.loads(request.raw_post_data)
         except (JSONDecodeError, UnicodeDecodeError) as e:
-            log('Advanced API: could not decode episode update POST data for user %s: %s' % (username, e))
-            return HttpResponseBadRequest()
+            msg = 'Advanced API: could not decode episode update POST data for user %s: %s' % (username, e)
+            log(msg)
+            return HttpResponseBadRequest(msg)
 
         try:
             update_urls = update_episodes(request.user, actions, now, ua_string)
