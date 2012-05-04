@@ -31,7 +31,8 @@ from django.contrib.sites.models import RequestSite
 from django.utils.translation import ugettext as _
 
 from mygpo.api.basic_auth import require_valid_user, check_username
-from mygpo.api.backend import get_device
+from mygpo.api.backend import get_device, BulkSubscribe
+from mygpo.couchdb import BulkException
 from mygpo.core import models
 from mygpo.core.models import Podcast
 from mygpo.users.models import Suggestions
@@ -201,25 +202,28 @@ def set_subscriptions(urls, user, device_uid, user_agent):
 
     device = get_device(user, device_uid, user_agent, undelete=True)
 
-    old = [p.url for p in device.get_subscribed_podcasts()]
-    new = [p for p in urls if p not in old]
-    rem = [p for p in old if p not in urls]
+    subscriptions = dict( (p.url, p) for p in device.get_subscribed_podcasts())
+    new = [p for p in urls if p not in subscriptions.keys()]
+    rem = [p for p in subscriptions.keys() if p not in urls]
+
+    subscriber = BulkSubscribe(user, device, podcasts=subscriptions)
 
     for r in rem:
-        p = Podcast.for_url(r, create=True)
-        try:
-            p.unsubscribe(user, device)
-        except Exception as e:
-            log('Simple API: %(username)s: Could not remove subscription for podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
-                {'username': user.username, 'podcast_url': r, 'device_id': device.id, 'exception': e})
+        subscriber.add_action(r, 'unsubscribe')
 
     for n in new:
-        p = Podcast.for_url(n, create=True)
-        try:
-            p.subscribe(user, device)
-        except Exception as e:
-            log('Simple API: %(username)s: Could not add subscription for podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
-                {'username': user.username, 'podcast_url': n, 'device_id': device.id, 'exception': e})
+        subscriber.add_action(n, 'subscribe')
+
+    try:
+        errors = subscriber.execute()
+    except BulkException as be:
+        for err in be.errors:
+            log('Simple API: %(username)s: Updating subscription for '
+                    '%(podcast_url)s on %(device_uid)s failed: '
+                    '%(error)s (%(reason)s)'.format(username=user.username,
+                        podcast_url=err.doc, device_uid=device.uid,
+                        error=err.error, reason=err.reason)
+                )
 
     # Only an empty response is a successful response
     return HttpResponse('', mimetype='text/plain')

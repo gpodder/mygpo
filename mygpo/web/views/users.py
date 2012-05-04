@@ -101,12 +101,12 @@ def login_user(request):
     return HttpResponseRedirect(DEFAULT_LOGIN_REDIRECT)
 
 
-def get_user(username, email):
+def get_user(username, email, is_active=None):
     if username:
-        return User.get_user(username)
+        return User.get_user(username, is_active=None)
 
     elif email:
-        return User.get_user_by_email(email)
+        return User.get_user_by_email(email, is_active=None)
 
     return None
 
@@ -118,7 +118,7 @@ def restore_password(request):
     if not form.is_valid():
         return HttpResponseRedirect('/login/')
 
-    user = get_user(form.cleaned_data['username'], form.cleaned_data['email'])
+    user = get_user(form.cleaned_data['username'], form.cleaned_data['email'], is_active=None)
 
     if not user:
         messages.error(request, _('User does not exist.'))
@@ -163,7 +163,7 @@ def resend_activation(request):
         if not form.is_valid():
             raise ValueError(_('Invalid Username entered'))
 
-        user = get_user(form.cleaned_data['username'], form.cleaned_data['email'])
+        user = get_user(form.cleaned_data['username'], form.cleaned_data['email'], is_active=None)
         if not user:
             raise ValueError(_('User does not exist.'))
 

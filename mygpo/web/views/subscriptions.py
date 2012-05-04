@@ -6,7 +6,7 @@ from django.contrib.syndication.views import Feed
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, Http404
 from django.views.decorators.vary import vary_on_cookie
-from django.views.decorators.cache import never_cache
+from django.views.decorators.cache import never_cache, cache_control
 
 from mygpo.core.models import Podcast
 from mygpo.utils import parse_bool, unzip, get_to_dict, skip_pairs
@@ -18,6 +18,7 @@ from mygpo.cache import get_cache_or_calc
 
 
 @vary_on_cookie
+@cache_control(private=True)
 @login_required
 def show_list(request):
     current_site = RequestSite(request)
@@ -29,6 +30,7 @@ def show_list(request):
 
 
 @vary_on_cookie
+@cache_control(private=True)
 @login_required
 def download_all(request):
     podcasts = request.user.get_subscribed_podcasts()

@@ -26,6 +26,13 @@ class DeviceUIDException(Exception):
     pass
 
 
+class DeviceDoesNotExist(Exception):
+    pass
+
+
+class DeviceDeletedException(DeviceDoesNotExist):
+    pass
+
 
 class Suggestions(Document, RatingMixin):
     user = StringProperty(required=True)
@@ -125,8 +132,6 @@ class EpisodeAction(DocumentSchema):
             startkey = [user_id, podcast_id, device_id, since_str]
             endkey   = [user_id, podcast_id, device_id, until_str]
 
-        print view, startkey, endkey
-
         db = EpisodeUserState.get_db()
         res = db.view(view,
                 startkey = startkey,
@@ -220,7 +225,7 @@ class EpisodeUserState(Document):
     @classmethod
     def for_user_episode(cls, user, episode):
         r = cls.view('users/episode_states_by_user_episode',
-            key=[user.id, episode._id], include_docs=True)
+            key=[user._id, episode._id], include_docs=True, limit=1)
 
         if r:
             return r.first()
@@ -240,7 +245,7 @@ class EpisodeUserState(Document):
     @classmethod
     def for_ref_urls(cls, user, podcast_url, episode_url):
         res = cls.view('users/episode_states_by_ref_urls',
-            key = [user.id, podcast_url, episode_url], limit=1, include_docs=True)
+            key = [user._id, podcast_url, episode_url], limit=1, include_docs=True)
         if res:
             state = res.first()
             state.ref_url = episode_url
@@ -258,7 +263,9 @@ class EpisodeUserState(Document):
     @classmethod
     def count(cls):
         r = cls.view('users/episode_states_by_user_episode',
-            limit=0)
+                limit = 0,
+                stale = 'update_after',
+            )
         return r.total_rows
 
 
@@ -406,7 +413,9 @@ class PodcastUserState(Document):
     @classmethod
     def count(cls):
         r = PodcastUserState.view('users/podcast_states_by_user',
-            limit=0)
+                limit = 0,
+                stale = 'update_after',
+            )
         return r.total_rows
 
 
@@ -626,12 +635,22 @@ class User(BaseUser, SyncedDevicesMixin):
         return self.__devices_by_id.get(id, None)
 
 
-    def get_device_by_uid(self, uid):
+    def get_device_by_uid(self, uid, only_active=True):
 
         if not hasattr(self, '__devices_by_uio'):
             self.__devices_by_uid = dict( (d.uid, d) for d in self.devices)
 
-        return self.__devices_by_uid.get(uid, None)
+        try:
+            device = self.__devices_by_uid[uid]
+
+            if only_active and device.deleted:
+                raise DeviceDeletedException(
+                        'Device with UID %s is deleted' % uid)
+
+            return device
+
+        except KeyError as e:
+            raise DeviceDoesNotExist('There is no device with UID %s' % uid)
 
 
     def update_device(self, device):

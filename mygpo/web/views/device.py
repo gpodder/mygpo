@@ -20,24 +20,26 @@ from functools import wraps
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, \
-        HttpResponseForbidden, Http404
+        HttpResponseForbidden, Http404, HttpResponseNotFound
 from django.contrib import messages
 from mygpo.web.forms import DeviceForm, SyncForm
 from mygpo.web import utils
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.vary import vary_on_cookie
-from django.views.decorators.cache import never_cache
+from django.views.decorators.cache import never_cache, cache_control
 
 from restkit.errors import Unauthorized
 
 from mygpo.log import log
 from mygpo.api import simple
 from mygpo.decorators import allowed_methods, repeat_on_conflict
-from mygpo.users.models import PodcastUserState, Device, DeviceUIDException
+from mygpo.users.models import PodcastUserState, Device, DeviceUIDException, \
+     DeviceDoesNotExist
 
 
 @vary_on_cookie
+@cache_control(private=True)
 @login_required
 def overview(request):
 
@@ -54,13 +56,15 @@ def overview(request):
 def device_decorator(f):
     @login_required
     @vary_on_cookie
+    @cache_control(private=True)
     @wraps(f)
     def _decorator(request, uid, *args, **kwargs):
 
-        device = request.user.get_device_by_uid(uid)
+        try:
+            device = request.user.get_device_by_uid(uid, only_active=False)
 
-        if not device:
-            raise Http404
+        except DeviceDoesNotExist as e:
+            return HttpResponseNotFound(str(e))
 
         return f(request, device, *args, **kwargs)
 
@@ -165,6 +169,7 @@ def update(request, device):
 
 @login_required
 @vary_on_cookie
+@cache_control(private=True)
 @allowed_methods(['GET'])
 def edit_new(request):
 
@@ -293,12 +298,19 @@ def sync(request, device):
     if not form.is_valid():
         return HttpResponseBadRequest('invalid')
 
+    # TODO: remove cascaded trys
+
     try:
         target_uid = form.get_target()
 
-        sync_target = request.user.get_device_by_uid(target_uid)
-        request.user.sync_devices(device, sync_target)
-        request.user.save()
+        try:
+            sync_target = request.user.get_device_by_uid(target_uid)
+
+            request.user.sync_devices(device, sync_target)
+            request.user.save()
+
+        except DeviceDoesNotExist as e:
+            messages.error(request, str(e))
 
     except ValueError, e:
         raise

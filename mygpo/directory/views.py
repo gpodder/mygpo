@@ -1,10 +1,11 @@
 from itertools import imap as map, islice
+from math import ceil
 
 from django.core.cache import cache
 from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render
 from django.contrib.sites.models import RequestSite
-from django.views.decorators.cache import cache_page
+from django.views.decorators.cache import cache_page, cache_control
 from django.views.decorators.vary import vary_on_cookie
 
 from mygpo.core.models import Podcast
@@ -23,6 +24,7 @@ from mygpo.cache import get_cache_or_calc
 
 
 @vary_on_cookie
+@cache_control(private=True)
 def toplist(request, num=100, lang=None):
 
     try:
@@ -55,6 +57,7 @@ def toplist(request, num=100, lang=None):
 
 
 
+@cache_control(private=True)
 @vary_on_cookie
 def browse(request, num_lists=4, num_categories=10, num_tags_cloud=90,
         podcasts_per_topic=10):
@@ -74,6 +77,7 @@ def browse(request, num_lists=4, num_categories=10, num_tags_cloud=90,
         })
 
 
+@cache_control(private=True)
 @vary_on_cookie
 def category(request, category, page_size=20):
     category = Category.for_tag(category)
@@ -102,6 +106,7 @@ def category(request, category, page_size=20):
 
 RESULTS_PER_PAGE=20
 
+@cache_control(private=True)
 @vary_on_cookie
 def search(request, template='search.html', args={}):
 
@@ -134,6 +139,7 @@ def search(request, template='search.html', args={}):
             ))
 
 
+@cache_control(private=True)
 @vary_on_cookie
 def episode_toplist(request, num=100):
 
@@ -176,6 +182,7 @@ def episode_toplist(request, num=100):
     })
 
 
+@cache_control(private=True)
 @vary_on_cookie
 def podcast_lists(request, page_size=20):
 
@@ -196,7 +203,7 @@ def podcast_lists(request, page_size=20):
 
     lists = map(_prepare_list, lists)
 
-    num_pages = PodcastList.count() / page_size
+    num_pages = ceil(PodcastList.count() / float(page_size))
 
     page_list = utils.get_page_list(1, num_pages, page, 15)
 

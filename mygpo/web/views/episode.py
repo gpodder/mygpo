@@ -26,7 +26,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
 from django.views.decorators.vary import vary_on_cookie
-from django.views.decorators.cache import never_cache
+from django.views.decorators.cache import never_cache, cache_control
 
 from mygpo.api.constants import EPISODE_ACTION_TYPES
 from mygpo.decorators import repeat_on_conflict
@@ -41,6 +41,7 @@ from mygpo.web.utils import get_episode_link_target, fetch_episode_data
 
 
 @vary_on_cookie
+@cache_control(private=True)
 def episode(request, episode):
 
     podcast = Podcast.get(episode.podcast)
@@ -161,6 +162,7 @@ def toggle_favorite(request, episode):
 
 
 @vary_on_cookie
+@cache_control(private=True)
 @login_required
 def list_favorites(request):
     site = RequestSite(request)

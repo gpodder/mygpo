@@ -74,6 +74,7 @@ class Toplist(object):
                     include_docs = True,
                     descending   = True,
                     limit        = limit + skip,
+                    stale        = 'update_after',
                     **self.view_args
                 )
             res = list(r)

@@ -29,14 +29,21 @@ class Category(Document):
 
     @classmethod
     def for_tag(cls, tag):
-        r = cls.view('directory/categories_by_tags', \
-            key=tag, include_docs=True)
+        r = cls.view('directory/categories_by_tags',
+                key          = tag,
+                include_docs = True,
+                stale        = 'update_after',
+            )
         return r.first() if r else None
 
     @classmethod
     def top_categories(cls, count):
-        return cls.view('directory/categories', \
-            descending=True, limit=count, include_docs=True)
+        return cls.view('directory/categories',
+                descending   = True,
+                limit        = count,
+                include_docs =True,
+                stale        = 'update_after',
+            )
 
 
     def merge_podcasts(self, podcasts):

@@ -6,6 +6,7 @@ from django.core.management.base import BaseCommand
 
 from mygpo.users.models import Suggestions, User
 from mygpo.utils import progress
+from mygpo.decorators import repeat_on_conflict
 
 try:
     from collections import Counter
@@ -27,19 +28,20 @@ class Command(BaseCommand):
 
         max_suggestions = options.get('max')
 
-        users = User.all_users()
-        users = filter(lambda u: u.is_active, users)
-
-        if options.get('outdated'):
-            users = users.filter(userprofile__suggestion_up_to_date=False)
-
         if options.get('username'):
-            users = users.filter(username=options.get('username'))
+            users = [User.get_user(options.get('username'))]
+
+        else:
+            users = User.all_users()
+            users = filter(lambda u: u.is_active, users)
+
+            if options.get('outdated'):
+                users = filter(lambda u: not u.suggestions_up_to_date, users)
 
         if options.get('max_users'):
             users = users[:int(options.get('max_users'))]
 
-        total = users.count()
+        total = len(users)
 
         for n, user in enumerate(users):
             suggestion = Suggestions.for_user(user)
@@ -58,8 +60,12 @@ class Command(BaseCommand):
 
             suggestion.save()
 
-            # flag suggestions up-to-date
-            user.suggestions_up_to_date = True
-            user.save()
+            _update_user(user=user)
 
             progress(n+1, total)
+
+
+@repeat_on_conflict(['user'])
+def _update_user(user):
+    user.suggestions_up_to_date = True
+    user.save()

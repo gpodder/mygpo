@@ -21,8 +21,9 @@ from collections import defaultdict, namedtuple
 from datetime import datetime
 
 import dateutil.parser
+import gevent
 
-from django.http import HttpResponse, HttpResponseBadRequest, Http404
+from django.http import HttpResponse, HttpResponseBadRequest, Http404, HttpResponseNotFound
 from django.contrib.sites.models import RequestSite
 from django.db import IntegrityError
 from django.views.decorators.csrf import csrf_exempt
@@ -32,15 +33,17 @@ from mygpo.api.constants import EPISODE_ACTION_TYPES, DEVICE_TYPES
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url, sanitize_urls
 from mygpo.api.advanced.directory import episode_data, podcast_data
-from mygpo.api.backend import get_device, get_favorites
+from mygpo.api.backend import get_device, get_favorites, BulkSubscribe
+from mygpo.couchdb import BulkException
 from mygpo.log import log
 from mygpo.utils import parse_time, format_time, parse_bool, get_to_dict, get_timestamp
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.core import models
 from mygpo.core.models import SanitizingRule, Podcast
-from mygpo.users.models import PodcastUserState, EpisodeAction, EpisodeUserState
+from mygpo.users.models import PodcastUserState, EpisodeAction, EpisodeUserState, DeviceDoesNotExist
 from mygpo.json import json, JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
+from mygpo.couchdb import bulk_save_retry
 
 
 # keys that are allowed in episode actions
@@ -59,9 +62,11 @@ def subscriptions(request, username, device_uid):
     now_ = get_timestamp(now)
 
     if request.method == 'GET':
-        device = request.user.get_device_by_uid(device_uid)
-        if not device or device.deleted:
-            raise Http404
+
+        try:
+            device = request.user.get_device_by_uid(device_uid)
+        except DeviceDoesNotExist as e:
+            return HttpResponseNotFound(str(e))
 
         since_ = request.GET.get('since', None)
         if since_ == None:
@@ -120,21 +125,24 @@ def update_subscriptions(user, device, add, remove):
     # been sanitized to the same, we ignore the removal
     rem_s = filter(lambda x: x not in add_s, rem_s)
 
+    subscriber = BulkSubscribe(user, device)
+
     for a in add_s:
-        p = Podcast.for_url(a, create=True)
-        try:
-            p.subscribe(user, device)
-        except Exception as e:
-            log('Advanced API: %(username)s: could not subscribe to podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
-                {'username': user.username, 'podcast_url': p.url, 'device_id': device.id, 'exception': e})
+        subscriber.add_action(a, 'subscribe')
 
     for r in rem_s:
-        p = Podcast.for_url(r, create=True)
-        try:
-            p.unsubscribe(user, device)
-        except Exception as e:
-            log('Advanced API: %(username)s: could not unsubscribe from podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
-                {'username': user.username, 'podcast_url': p.url, 'device_id': device.id, 'exception': e})
+        subscriber.add_action(r, 'unsubscribe')
+
+    try:
+        subscriber.execute()
+    except BulkException as be:
+        for err in be.errors:
+            log('Advanced API: %(username)s: Updating subscription for '
+                    '%(podcast_url)s on %(device_uid)s failed: '
+                    '%(rerror)s (%(reason)s)'.format(username=user.username,
+                        podcast_url=err.doc, device_uid=device.uid,
+                        error=err.error, reason=err.reason)
+                )
 
     return updated_urls
 
@@ -201,10 +209,12 @@ def episodes(request, username, version=1):
             podcast = None
 
         if device_uid:
-            device = request.user.get_device_by_uid(device_uid)
 
-            if not device or device.deleted:
-                raise Http404
+            try:
+                device = request.user.get_device_by_uid(device_uid)
+            except DeviceDoesNotExist as e:
+                return HttpResponseNotFound(str(e))
+
         else:
             device = None
 
@@ -234,9 +244,6 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
 
     if device is not None:
         args['device_id'] = device.id
-
-    print user
-    print user._id
 
     actions = EpisodeAction.filter(user._id, since, until, **args)
 
@@ -282,8 +289,23 @@ def clean_episode_action_data(action, user, devices):
         if x not in action:
             action[x] = None
 
-    return action
+    if action['action'] != 'play':
+        if 'position' in action:
+            del action['position']
 
+        if 'total' in action:
+            del action['total']
+
+        if 'started' in action:
+            del action['started']
+
+        if 'playmark' in action:
+            del action['playmark']
+
+    else:
+        action['position'] = action.get('position', False) or 0
+
+    return action
 
 
 
@@ -308,38 +330,32 @@ def update_episodes(user, actions, now, ua_string):
         act = parse_episode_action(action, user, update_urls, now, ua_string)
         grouped_actions[ (podcast_url, episode_url) ].append(act)
 
-    # load the episode state only once for every episode
+    # Prepare the updates for each episode state
+    obj_funs = []
+
     for (p_url, e_url), action_list in grouped_actions.iteritems():
         episode_state = EpisodeUserState.for_ref_urls(user, p_url, e_url)
 
-        if isinstance(episode_state, dict):
-            from mygpo.log import log
-            log('episode_state (%s, %s, %s): %s' % (user,
-                        p_url, e_url, episode_state))
+        fun = partial(update_episode_actions, action_list=action_list)
+        obj_funs.append( (episode_state, fun) )
 
-        update_episode_actions(episode_state=episode_state,
-            action_list=action_list)
+    db = EpisodeUserState.get_db()
+    bulk_save_retry(db, obj_funs)
 
     return update_urls
 
 
-@repeat_on_conflict(['episode_state'])
 def update_episode_actions(episode_state, action_list):
     """ Adds actions to the episode state and saves if necessary """
 
-    changed = False
-
     len1 = len(episode_state.actions)
     episode_state.add_actions(action_list)
-    len2 = len(episode_state.actions)
 
-    if len1 < len2:
-        changed = True
+    if len(episode_state.actions) == len1:
+        return None
 
-    if changed:
-        episode_state.save()
+    return episode_state
 
-    return changed
 
 
 def parse_episode_action(action, user, update_urls, now, ua_string):
@@ -459,9 +475,10 @@ def updates(request, username, device_uid):
     now = datetime.now()
     now_ = get_timestamp(now)
 
-    device = request.user.get_device_by_uid(device_uid)
-    if not device or device.deleted:
-        raise Http404
+    try:
+        device = request.user.get_device_by_uid(device_uid)
+    except DeviceDoesNotExist as e:
+        return HttpResponseNotFound(str(e))
 
     since_ = request.GET.get('since', None)
     if since_ == None:
@@ -504,12 +521,21 @@ def get_episode_updates(user, subscribed_podcasts, since):
     EpisodeStatus = namedtuple('EpisodeStatus', 'episode status action')
 
     episode_status = {}
-    episodes = chain.from_iterable(p.get_episodes(since) for p in subscribed_podcasts)
+
+    # get episodes
+    episode_jobs = [gevent.spawn(p.get_episodes, since) for p in
+        subscribed_podcasts]
+    gevent.joinall(episode_jobs)
+    episodes = chain.from_iterable(job.get() for job in episode_jobs)
+
     for episode in episodes:
         episode_status[episode._id] = EpisodeStatus(episode, 'new', None)
 
-    e_actions = (p.get_episode_states(user.id) for p in subscribed_podcasts)
-    e_actions = chain.from_iterable(e_actions)
+    # get episode states
+    e_action_jobs = [gevent.spawn(p.get_episode_states, user._id) for p in
+        subscribed_podcasts]
+    gevent.joinall(e_action_jobs)
+    e_actions = chain.from_iterable(job.get() for job in e_action_jobs)
 
     for action in e_actions:
         e_id = action['episode_id']

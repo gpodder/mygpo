@@ -18,15 +18,18 @@
 from datetime import timedelta
 from collections import defaultdict
 from itertools import cycle
+from functools import partial
 import random
 
 from django.core.cache import cache
 
 from mygpo.data.mimetype import get_type, CONTENT_TYPES
 from mygpo.core.models import Podcast, Episode
-from mygpo.users.models import EpisodeUserState, Device
+from mygpo.users.models import EpisodeUserState, Device, DeviceDoesNotExist, \
+         PodcastUserState
 from mygpo.decorators import repeat_on_conflict
 from mygpo.json import json
+from mygpo.couchdb import bulk_save_retry
 
 
 def get_random_picks(languages=None):
@@ -62,6 +65,7 @@ def get_podcast_count_for_language():
     r = db.view('core/podcasts_by_language',
         reduce = True,
         group_level = 1,
+        stale       = 'update_after',
     )
 
     counts.update( dict( (x['key'][0], x['value']) for x in r) )
@@ -81,15 +85,17 @@ def get_device(user, uid, user_agent, undelete=True):
     @repeat_on_conflict(['user'])
     def _get(user, uid, undelete):
 
-        device = user.get_device_by_uid(uid)
         save = False
 
-        if not device:
+        try:
+            device = user.get_device_by_uid(uid, only_active=False)
+
+        except DeviceDoesNotExist:
             device = Device(uid=uid)
             user.devices.append(device)
             save = True
 
-        elif device.deleted and undelete:
+        if device.deleted and undelete:
             device.deleted = False
             user.set_device(device)
             save = True
@@ -114,3 +120,60 @@ def get_favorites(user):
             include_docs = True,
         )
     return favorites
+
+
+
+class BulkSubscribe(object):
+    """ Performs bulk subscribe/unsubscribe operations """
+
+    DB = PodcastUserState.get_db()
+
+    def __init__(self, user, device, podcasts = {}, actions=None):
+        self.user = user
+        self.device = device
+        self.podcasts = podcasts
+        self.actions = actions or []
+
+        self.operations = {
+            'subscribe':   partial(self._subscribe,   device=device),
+            'unsubscribe': partial(self._unsubscribe, device=device),
+        }
+
+
+    def execute(self):
+        """ Executes all added actions in bulk """
+        obj_funs = map(self._get_obj_fun, self.actions)
+        bulk_save_retry(self.DB, obj_funs)
+
+        # prepare for another run
+        self.actions = []
+
+
+    def add_action(self, url, op):
+        """ Adds a new (un)subscribe action
+
+        url is the podcast url to subscribe to / unsubscribe from
+        op is either "subscribe" or "unsubscribe" """
+        self.actions.append( (url, op) )
+
+
+    def _get_obj_fun(self, action):
+        url, op = action
+
+        podcast = self.podcasts.get(url,
+                Podcast.for_url(url, create=True))
+
+        state = podcast.get_user_state(self.user)
+
+        fun = self.operations[op]
+        return (state, fun)
+
+
+
+    def _subscribe(self, state, device):
+        state.subscribe(device)
+        return state
+
+    def _unsubscribe(self, state, device):
+        state.unsubscribe(device)
+        return state

@@ -10,7 +10,7 @@ from django.contrib.sites.models import RequestSite
 from django.utils.translation import ugettext as _
 from django.contrib import messages
 from django.views.decorators.vary import vary_on_cookie
-from django.views.decorators.cache import never_cache
+from django.views.decorators.cache import never_cache, cache_control
 
 from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.core.proxy import proxy_object
@@ -34,6 +34,7 @@ def update_podcast_settings(state, is_public):
 
 
 @vary_on_cookie
+@cache_control(private=True)
 @allowed_methods(['GET'])
 def show_slug(request, slug):
     podcast = Podcast.for_slug(slug)
@@ -46,6 +47,7 @@ def show_slug(request, slug):
 
 
 @vary_on_cookie
+@cache_control(private=True)
 @allowed_methods(['GET'])
 def show(request, podcast):
 
@@ -222,6 +224,7 @@ def subscribe(request, podcast):
     if request.method == 'POST':
         form = SyncForm(request.POST)
 
+        # TODO: remove cascaded trys
         try:
             device = request.user.get_device_by_uid(form.get_target())
 
@@ -237,6 +240,9 @@ def subscribe(request, podcast):
         except ValueError, e:
             messages.error(request, _('Could not subscribe '
                         'to the podcast: %s' % str(e)))
+
+        except DeviceDoesNotExist as e:
+            messages.error(request, str(e))
 
     request.user.sync_all()
 
@@ -261,10 +267,11 @@ def unsubscribe(request, podcast, device_uid):
     if not return_to:
         raise Http404('Wrong URL')
 
-    device = request.user.get_device_by_uid(device_uid)
+    try:
+        device = request.user.get_device_by_uid(device_uid)
 
-    if not device:
-        raise Http404('Unknown device')
+    except DeviceDoesNotExist as e:
+        messages.error(request, str(e))
 
     try:
         podcast.unsubscribe(request.user, device)

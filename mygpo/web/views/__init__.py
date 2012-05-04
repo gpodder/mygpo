@@ -31,14 +31,14 @@ from django.shortcuts import render
 from django.contrib.sites.models import RequestSite
 from django.views.generic.base import View
 from django.views.decorators.vary import vary_on_cookie
-from django.views.decorators.cache import never_cache
+from django.views.decorators.cache import never_cache, cache_control
 
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core import models
 from mygpo.core.models import Podcast, Episode
 from mygpo.directory.tags import Tag
 from mygpo.directory.toplist import PodcastToplist
-from mygpo.users.models import Suggestions, History, HistoryEntry
+from mygpo.users.models import Suggestions, History, HistoryEntry, DeviceDoesNotExist
 from mygpo.users.models import PodcastUserState, User
 from mygpo.web import utils
 from mygpo.api import backend
@@ -47,6 +47,7 @@ from mygpo.cache import get_cache_or_calc
 
 
 @vary_on_cookie
+@cache_control(private=True)
 def home(request):
     if request.user.is_authenticated():
         return dashboard(request)
@@ -55,6 +56,7 @@ def home(request):
 
 
 @vary_on_cookie
+@cache_control(private=True)
 def welcome(request):
     current_site = RequestSite(request)
 
@@ -79,6 +81,7 @@ def welcome(request):
 
 
 @vary_on_cookie
+@cache_control(private=True)
 @login_required
 def dashboard(request, episode_count=10):
 
@@ -107,13 +110,18 @@ def dashboard(request, episode_count=10):
 
 
 @vary_on_cookie
+@cache_control(private=True)
 @login_required
 def history(request, count=15, uid=None):
 
     page = parse_range(request.GET.get('page', None), 0, sys.maxint, 0)
 
     if uid:
-        device = request.user.get_device_by_uid(uid)
+        try:
+            device = request.user.get_device_by_uid(uid, only_active=False)
+        except DeviceDoesNotExist as e:
+            messages.error(request, str(e))
+
     else:
         device = None
 
@@ -167,6 +175,7 @@ def rate_suggestions(request):
 
 
 @vary_on_cookie
+@cache_control(private=True)
 @login_required
 def suggestions(request):
     suggestion_obj = Suggestions.for_user(request.user)
@@ -179,6 +188,7 @@ def suggestions(request):
 
 
 @vary_on_cookie
+@cache_control(private=True)
 @login_required
 def mytags(request):
     tags_podcast = {}

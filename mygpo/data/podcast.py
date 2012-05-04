@@ -39,6 +39,7 @@ def calc_similar_podcasts(podcast, num=20):
             endkey      = [podcast.get_id(), {}, {}],
             group       = True,
             group_level = 2,
+            stale       = 'update_after',
         )
 
     users = (r['key'][1] for r in res)
@@ -52,6 +53,7 @@ def calc_similar_podcasts(podcast, num=20):
                 endkey      = [user_id, True, {}, {}],
                 group       = True,
                 group_level = 3,
+                stale       = 'update_after',
             )
         user_subscriptions = set(r['key'][2] for r in subscribed)
         user_counter = Counter(user_subscriptions)

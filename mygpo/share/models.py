@@ -45,6 +45,7 @@ class PodcastList(Document, RatingMixin):
         r = cls.view('share/lists_by_rating',
                 descending   = True,
                 include_docs = True,
+                stale        = 'update_after',
                 **kwargs
             )
         return r.iterator()
@@ -55,7 +56,10 @@ class PodcastList(Document, RatingMixin):
         view = 'share/lists_by_rating' if with_rating else \
                'share/lists_by_user_slug'
 
-        return cls.view(view).total_rows
+        return cls.view(view,
+                limit = 0,
+                stale = 'update_after',
+            ).total_rows
 
 
     def __repr__(self):

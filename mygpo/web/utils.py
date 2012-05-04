@@ -27,6 +27,7 @@ def get_podcast_languages():
 
     res = Podcast.view('core/podcasts_by_language',
             group_level = 1,
+            stale       = 'ok',
         )
 
     langs = [r['key'][0] for r in res]
