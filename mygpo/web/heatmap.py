@@ -55,7 +55,7 @@ class EpisodeHeatmap(object):
         group_level = len(filter(None, [self.podcast_id,
                     self.episode_id, self.user_id]))
 
-        r = db.view('users/episode_heatmap',
+        r = db.view('heatmap/by_episode',
                 startkey    = [self.podcast_id, self.episode_id,
                                 self.user_id],
                 endkey      = [self.podcast_id, self.episode_id or {},

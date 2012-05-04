@@ -85,7 +85,7 @@ class PodcastGroupSlug(SlugGenerator):
         from mygpo.core.models import Podcast
 
         db = Podcast.get_db()
-        res = db.view('core/podcasts_by_slug',
+        res = db.view('podcasts/by_slug',
                 startkey = [self.base_slug, None],
                 endkey   = [self.base_slug + 'ZZZZZ', None]
             )
@@ -143,7 +143,7 @@ class EpisodeSlug(SlugGenerator):
         from mygpo.core.models import Episode
 
         db = Episode.get_db()
-        res = db.view('core/episodes_by_slug',
+        res = db.view('episodes/by_slug',
                 startkey = [self.podcast_id, self.base_slug],
                 endkey   = [self.podcast_id, self.base_slug + 'ZZZZZ']
             )
@@ -162,7 +162,7 @@ class ObjectsMissingSlugs(object):
         self.kwargs = {}
 
     def __len__(self):
-        res = self.cls.view('maintenance/missing_slugs',
+        res = self.cls.view('slugs/missing',
                 startkey     = [self.doc_type] + self.end,
                 endkey       = [self.doc_type] + self.start,
                 descending   = True,
@@ -175,7 +175,7 @@ class ObjectsMissingSlugs(object):
 
     def __iter__(self):
 
-        return multi_request_view(self.cls, 'maintenance/missing_slugs',
+        return multi_request_view(self.cls, 'slugs/missing',
                 startkey     = [self.doc_type] + self.end,
                 endkey       = [self.doc_type] + self.start,
                 descending   = True,
