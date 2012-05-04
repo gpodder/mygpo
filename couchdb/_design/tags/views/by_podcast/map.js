@@ -2,9 +2,9 @@ function(doc)
 {
     function searchPodcast(podcast, podcast_id)
     {
-        for(source in podcast.tags)
+        for(var source in podcast.tags)
         {
-            for(n in podcast.tags[source])
+            for(var n in podcast.tags[source])
             {
                 emit([podcast_id, podcast.tags[source][n]], sourceWeight(source));
             }
@@ -13,11 +13,7 @@ function(doc)
 
     function sourceWeight(source)
     {
-        if(source == "user")
-        {
-            return 0.5;
-        }
-        else if(source == "feed")
+        if(source == "feed")
         {
             return 1;
         }
@@ -37,16 +33,9 @@ function(doc)
     }
     else if(doc.doc_type == "PodcastGroup")
     {
-        for(p in doc.podcasts)
+        for(var p in doc.podcasts)
         {
             searchPodcast(p, p.id);
-        }
-    }
-    else if(doc.doc_type == "PodcastUserState")
-    {
-        for(n in doc.tags)
-        {
-            emit([doc.podcast, doc.tags[n]], sourceWeight("user"));
         }
     }
 }

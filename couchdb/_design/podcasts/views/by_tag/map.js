@@ -13,11 +13,7 @@ function(doc)
 
     function sourceWeight(source)
     {
-        if(source == "user")
-        {
-            return 0.5;
-        }
-        else if(source == "feed")
+        if(source == "feed")
         {
             return 1;
         }
@@ -42,12 +38,4 @@ function(doc)
             searchPodcast(p, p.id);
         }
     }
-    else if(doc.doc_type == "PodcastUserState")
-    {
-        for(n in doc.tags)
-        {
-            emit([doc.tags[n], doc.podcast], sourceWeight("user"));
-        }
-    }
 }
-
