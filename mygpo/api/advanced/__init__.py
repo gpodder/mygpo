@@ -246,7 +246,7 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
     if device is not None:
         args['device_id'] = device.id
 
-    actions = EpisodeAction.filter(user._id, since, **args)
+    actions = EpisodeAction.filter(user._id, since, until, **args)
 
     if version == 1:
         actions = imap(convert_position, actions)
