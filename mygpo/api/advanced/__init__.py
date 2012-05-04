@@ -369,7 +369,7 @@ def parse_episode_action(action, user, update_urls, now, ua_string):
         new_action.timestamp = now
     new_action.timestamp = new_action.timestamp.replace(microsecond=0)
 
-    new_actions.upload_timestamp = get_timestamp(now)
+    new_action.upload_timestamp = get_timestamp(now)
 
     new_action.started = action.get('started', None)
     new_action.playmark = action.get('position', None)
