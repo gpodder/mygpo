@@ -20,6 +20,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.sites.models import RequestSite
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
 
 from mygpo.core import models
 from mygpo.core.models import Podcast, PodcastGroup
@@ -28,110 +29,70 @@ from mygpo.directory.tags import TagCloud
 from mygpo.web.utils import get_episode_link_target, get_podcast_link_target
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url
+from mygpo.api.advanced import AdvancedAPIEndpoint
+from mygpo.api.backend import podcast_data, episode_data
 from mygpo.directory.models import Category
 
 
-@csrf_exempt
-@cache_page(60 * 60 * 24)
-def top_tags(request, count):
-    count = parse_range(count, 1, 100, 100)
-    tag_cloud = TagCloud(count)
-    resp = map(category_data, tag_cloud.entries)
-    return JsonResponse(resp)
+class TopTagsEndpoint(AdvancedAPIEndpoint):
+
+    @method_decorator(cache_page(60 * 60 * 24))
+    def get(self, request, count):
+        count = parse_range(count, 1, 100, 100)
+        tag_cloud = TagCloud(count)
+        resp = map(self.category_data, tag_cloud.entries)
+        return resp
+
+    def category_data(self, category):
+        return dict(
+            tag   = category.label,
+            usage = category.weight
+        )
 
 
-@csrf_exempt
-@cache_page(60 * 60 * 24)
-def tag_podcasts(request, tag, count):
-    count = parse_range(count, 1, 100, 100)
-    category = Category.for_tag(tag)
-    if not category:
-        return JsonResponse([])
 
-    domain = RequestSite(request).domain
-    query = category.get_podcasts(0, count)
-    resp = map(lambda p: podcast_data(p, domain), query)
-    return JsonResponse(resp)
+class TopPodcastsEndpoint(AdvancedAPIEndpoint):
+
+    @method_decorator(cache_page(60 * 60 * 24))
+    def get(self, request, tag, count):
+        count = parse_range(count, 1, 100, 100)
+        category = Category.for_tag(tag)
+        if not category:
+            return []
+
+        domain = RequestSite(request).domain
+        query = category.get_podcasts(0, count)
+        resp = map(lambda p: podcast_data(p, domain), query)
+        return resp
 
 
-@cache_page(60 * 60)
-def podcast_info(request):
-    url = sanitize_url(request.GET.get('url', ''))
-    podcast = Podcast.for_url(url)
-    if not podcast:
+class PodcastInfoEndpoint(AdvancedAPIEndpoint):
+
+    @method_decorator(cache_page(60 * 60))
+    def get(self, request):
+        url = sanitize_url(request.GET.get('url', ''))
+        podcast = Podcast.for_url(url)
+        if not podcast:
             raise Http404
-    domain = RequestSite(request).domain
-    resp = podcast_data(podcast, domain)
 
-    return JsonResponse(resp)
+        domain = RequestSite(request).domain
+        resp = podcast_data(podcast, domain)
 
-
-@cache_page(60 * 60)
-def episode_info(request):
-    podcast_url = sanitize_url(request.GET.get('podcast', ''))
-    episode_url = sanitize_url(request.GET.get('url', ''), 'episode')
-
-    episode = models.Episode.for_podcast_url(podcast_url, episode_url)
-
-    if episode is None:
-        raise Http404
-
-    domain = RequestSite(request).domain
-
-    resp = episode_data(episode, domain)
-    return JsonResponse(resp)
+        return resp
 
 
-def podcast_data(obj, domain, scaled_logo_size=64):
-    if obj is None:
-        raise ValueError('podcast should not be None')
+class EpisodeInfoEndpoint(AdvancedAPIEndpoint):
 
-    if isinstance(obj, Podcast):
-        podcast = obj
-    elif isinstance(obj, PodcastGroup):
-        podcast = obj.get_podcast()
+    @method_decorator(cache_page(60 * 60))
+    def get(self, request):
+        podcast_url = sanitize_url(request.GET.get('podcast', ''))
+        episode_url = sanitize_url(request.GET.get('url', ''), 'episode')
 
-    subscribers = obj.subscriber_count()
-    last_subscribers = obj.prev_subscriber_count()
+        episode = models.Episode.for_podcast_url(podcast_url, episode_url)
 
-    scaled_logo_url = obj.get_logo_url(scaled_logo_size)
+        if episode is None:
+            raise Http404
 
-    return {
-        "url": podcast.url,
-        "title": podcast.title,
-        "description": podcast.description,
-        "subscribers": subscribers,
-        "subscribers_last_week": last_subscribers,
-        "logo_url": podcast.logo_url,
-        "scaled_logo_url": 'http://%s%s' % (domain, scaled_logo_url),
-        "website": podcast.link,
-        "mygpo_link": 'http://%s%s' % (domain, get_podcast_link_target(obj)),
-        }
-
-def episode_data(episode, domain, podcast=None):
-
-    podcast = podcast or Podcast.get(episode.podcast)
-
-    data = {
-        "title": episode.title,
-        "url": episode.url,
-        "podcast_title": podcast.title if podcast else '',
-        "podcast_url": podcast.url if podcast else '',
-        "description": episode.description,
-        "website": episode.link,
-        "mygpo_link": 'http://%(domain)s%(res)s' % dict(domain=domain,
-            res=get_episode_link_target(episode, podcast)) if podcast else ''
-        }
-
-    if episode.released:
-        data['released'] = episode.released.strftime('%Y-%m-%dT%H:%M:%S')
-
-    return data
-
-
-def category_data(category):
-    return dict(
-        tag   = category.label,
-        usage = category.weight
-    )
-
+        domain = RequestSite(request).domain
+        resp = episode_data(episode, domain)
+        return resp
