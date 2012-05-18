@@ -258,6 +258,12 @@ class Episode(Document, SlugMixin, OldIdMixin):
         return hash(self._id)
 
 
+    def __str__(self):
+        return '<{cls} {title} ({id})>'.format(cls=self.__class__.__name__,
+                title=self.title, id=self._id)
+
+    __repr__ = __str__
+
 
 class SubscriberData(DocumentSchema):
     timestamp = DateTimeProperty()
