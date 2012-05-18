@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load podcasts %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/admin/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/admin/"|section_menu:"Admin" }}{% endblock %}
+
+{% block title %}{% trans "Admin Area" %}{% endblock %}
+
+{% block content %}
+ <h1>{% trans "Merge Duplicate Podcasts" %}</h1>
+
+ <form method="post" action="{% url admin-merge-verify %}">
+  {% csrf_token %}
+  <table>
+   <tr>
+    <th>Feed URL 1</th>
+    <td><input type="text" name="feed1" /></td>
+   </tr>
+   <tr>
+    <th>Feed URL 2</th>
+    <td><input type="text" name="feed2" /></td>
+   </tr>
+   <tr>
+    <td><input type="submit" value="OK" /></td>
+   </tr>
+  </table>
+ </form>
+
+{% endblock %}
+

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load podcasts %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/admin/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/admin/"|section_menu:"Admin" }}{% endblock %}
+
+{% block title %}{% trans "Admin Area" %}{% endblock %}
+
+{% block content %}
+ <h1>{% trans "Admin Area" %}</h1>
+
+ <ul>
+  <li><a href="{% url admin-merge %}">Merge Duplicate Podcasts</a></li>
+ </ul>
+
+{% endblock %}
+
