@@ -30,7 +30,13 @@ ADMINS = ()
 
 MANAGERS = ADMINS
 
+# dummy entry.
+# not needed for production, but tests fail otherwise in Django 1.4
 DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'tmp',
+    }
 }
 
 COUCHDB_DATABASES = (
