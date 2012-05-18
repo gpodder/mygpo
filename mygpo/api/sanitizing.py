@@ -216,3 +216,10 @@ def precompile_rules(rules):
     for rule in rules:
         rule.search_re = re.compile(rule.search, re.UNICODE)
         yield rule
+
+
+def sanitize_append(url, obj_type, sanitized_list):
+    urls = sanitize_url(url, obj_type)
+    if url != urls:
+        sanitized_list.append( (url, urls) )
+    return urls

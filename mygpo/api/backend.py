@@ -123,6 +123,22 @@ def get_favorites(user):
 
 
 
+def get_subscription_change_urls(device, since, until, podcasts={}):
+    add, rem = device.get_subscription_changes(since, until)
+
+    podcast_ids = add + rem
+
+    # don't fetch existing podcasts
+    podcasts = get_to_dict(Podcast, podcast_ids, get_id=Podcast.get_id)
+
+    add_podcasts = filter(None, (podcasts.get(i, None) for i in add))
+    rem_podcasts = filter(None, (podcasts.get(i, None) for i in rem))
+    add_urls = [ podcast.url for podcast in add_podcasts]
+    rem_urls = [ podcast.url for podcast in rem_podcasts]
+
+    return add_urls, rem_urls
+
+
 class BulkSubscribe(object):
     """ Performs bulk subscribe/unsubscribe operations """
 
@@ -177,3 +193,84 @@ class BulkSubscribe(object):
     def _unsubscribe(self, state, device):
         state.unsubscribe(device)
         return state
+
+
+
+
+# keys that are allowed in episode actions
+EPISODE_ACTION_KEYS = ('position', 'episode', 'action', 'device', 'timestamp',
+                       'started', 'total', 'podcast')
+
+
+def clean_episode_action_data(action, devices):
+
+    if None in (action.get('podcast', None), action.get('episode', None)):
+        return None
+
+    if 'device_id' in action:
+        device_id = action['device_id']
+        device_uid = devices.get(device_id)
+        if device_uid:
+            action['device'] = device_uid
+
+        del action['device_id']
+
+    # remove superfluous keys
+    for x in action.keys():
+        if x not in EPISODE_ACTION_KEYS:
+            del action[x]
+
+    # set missing keys to None
+    for x in EPISODE_ACTION_KEYS:
+        if x not in action:
+            action[x] = None
+
+    return action
+
+
+def podcast_data(obj, domain, scaled_logo_size=64):
+    if obj is None:
+        raise ValueError('podcast should not be None')
+
+    if isinstance(obj, Podcast):
+        podcast = obj
+    elif isinstance(obj, PodcastGroup):
+        podcast = obj.get_podcast()
+
+    subscribers = obj.subscriber_count()
+    last_subscribers = obj.prev_subscriber_count()
+
+    scaled_logo_url = obj.get_logo_url(scaled_logo_size)
+
+    return {
+        "url": podcast.url,
+        "title": podcast.title,
+        "description": podcast.description,
+        "subscribers": subscribers,
+        "subscribers_last_week": last_subscribers,
+        "logo_url": podcast.logo_url,
+        "scaled_logo_url": 'http://%s%s' % (domain, scaled_logo_url),
+        "website": podcast.link,
+        "mygpo_link": 'http://%s%s' % (domain, get_podcast_link_target(obj)),
+        }
+
+
+def episode_data(episode, domain, podcast=None):
+
+    podcast = podcast or Podcast.get(episode.podcast)
+
+    data = {
+        "title": episode.title,
+        "url": episode.url,
+        "podcast_title": podcast.title if podcast else '',
+        "podcast_url": podcast.url if podcast else '',
+        "description": episode.description,
+        "website": episode.link,
+        "mygpo_link": 'http://%(domain)s%(res)s' % dict(domain=domain,
+            res=get_episode_link_target(episode, podcast)) if podcast else ''
+        }
+
+    if episode.released:
+        data['released'] = episode.released.strftime('%Y-%m-%dT%H:%M:%S')
+
+    return data

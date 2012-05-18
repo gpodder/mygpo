@@ -15,101 +15,98 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from django.http import HttpResponseBadRequest, HttpResponseNotFound
-from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponseBadRequest
 from django.views.decorators.cache import never_cache
+from django.utils.decorators import method_decorator
 
-from mygpo.decorators import allowed_methods
-from mygpo.json import json
 from mygpo.api.basic_auth import require_valid_user, check_username
-from mygpo.api.httpresponse import JsonResponse
-from mygpo.users.models import DeviceDoesNotExist, User
+from mygpo.users.models import User
+from mygpo.api.advanced import AdvancedAPIEndpoint
 
 
-@csrf_exempt
-@require_valid_user
-@check_username
-@never_cache
-@allowed_methods(['GET', 'POST'])
-def main(request, username):
+class SynchronizeEndpoint(AdvancedAPIEndpoint):
     """ API Endpoint for Device Synchronisation """
 
-    if request.method == 'GET':
-        return JsonResponse(get_sync_status(request.user))
+    @method_decorator(require_valid_user)
+    @method_decorator(check_username)
+    @method_decorator(never_cache)
+    def dispatch(self, *args, **kwargs):
+        return super(SynchronizeEndpoint, self).dispatch(*args, **kwargs)
 
-    else:
-        try:
-            actions = json.loads(request.raw_post_data)
-        except Exception as e:
-            return HttpResponseBadRequest(str(e))
+
+    def get(self, request):
+        return self.get_sync_status(request.user)
+
+
+    def post(self, request):
+        actions = self.get_post_data(request)
 
         synclist = actions.get('synchronize', [])
         stopsync = actions.get('stop-synchronize', [])
 
         try:
-            update_sync_status(request.user, synclist, stopsync)
+            self.update_sync_status(request.user, synclist, stopsync)
+
         except ValueError as e:
             return HttpResponseBadRequest(str(e))
-        except DeviceDoesNotExist as e:
-            return HttpResponseNotFound(str(e))
 
         # reload user to get current sync status
         user = User.get(request.user._id)
-        return JsonResponse(get_sync_status(user))
+        return get_sync_status(user)
 
 
 
-def get_sync_status(user):
-    """ Returns the current Device Sync status """
+    def get_sync_status(self, user):
+        """ Returns the current Device Sync status """
 
-    sync_groups = []
-    unsynced = []
+        sync_groups = []
+        unsynced = []
 
-    for group in user.get_grouped_devices():
-        uids = [device.uid for device in group.devices]
+        for group in user.get_grouped_devices():
+            uids = [device.uid for device in group.devices]
 
-        if group.is_synced:
-            sync_groups.append(uids)
+            if group.is_synced:
+                sync_groups.append(uids)
 
-        else:
-            unsynced = uids
+            else:
+                unsynced = uids
 
-    return {
-        'synchronized': sync_groups,
-        'not-synchronized': unsynced
-    }
-
-
-
-def update_sync_status(user, synclist, stopsync):
-    """ Updates the current Device Sync status
-
-    Synchronisation between devices can be set up and stopped.  Devices are
-    identified by their UIDs. Unknown UIDs cause errors, no new devices are
-    created. """
-
-    for devlist in synclist:
-
-        if len(devlist) <= 1:
-            raise ValueError('at least two devices are needed to sync')
-
-        # Setup all devices to sync with the first in the list
-        uid = devlist[0]
-        dev = user.get_device_by_uid(uid)
-
-        for other_uid in devlist[1:]:
-            other = user.get_device_by_uid(other_uid)
-            user.sync_devices(dev, other)
+        return {
+            'synchronized': sync_groups,
+            'not-synchronized': unsynced
+        }
 
 
-    for uid in stopsync:
-        dev = user.get_device_by_uid(uid)
-        try:
-            user.unsync_device(dev)
-        except ValueError:
-            # if all devices of a sync-group are un-synced,
-            # the last one will raise a ValueError, because it is no longer
-            # being synced -- we just ignore it
-            pass
 
-    user.save()
+    def update_sync_status(self, user, synclist, stopsync):
+        """ Updates the current Device Sync status
+
+        Synchronisation between devices can be set up and stopped.  Devices are
+        identified by their UIDs. Unknown UIDs cause errors, no new devices are
+        created. """
+
+        for devlist in synclist:
+
+            if len(devlist) <= 1:
+                raise ValueError('at least two devices are needed to sync')
+
+            # Setup all devices to sync with the first in the list
+            uid = devlist[0]
+            dev = user.get_device_by_uid(uid)
+
+            for other_uid in devlist[1:]:
+                other = user.get_device_by_uid(other_uid)
+                user.sync_devices(dev, other)
+
+
+        for uid in stopsync:
+            dev = user.get_device_by_uid(uid)
+            try:
+                user.unsync_device(dev)
+            except ValueError:
+                # if all devices of a sync-group are un-synced,
+                # the last one will raise a ValueError, because it is no longer
+                # being synced -- we just ignore it
+                pass
+
+        user.save()

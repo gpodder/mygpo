@@ -31,7 +31,7 @@ from django.contrib.sites.models import RequestSite
 from django.utils.translation import ugettext as _
 
 from mygpo.api.basic_auth import require_valid_user, check_username
-from mygpo.api.backend import get_device, BulkSubscribe
+from mygpo.api.backend import get_device, BulkSubscribe, podcast_data
 from mygpo.couchdb import BulkException
 from mygpo.core import models
 from mygpo.core.models import Podcast
@@ -41,7 +41,6 @@ from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_urls
 from mygpo.directory.toplist import PodcastToplist
 from mygpo.directory.models import ExamplePodcasts
-from mygpo.api.advanced.directory import podcast_data
 from mygpo.directory.search import search_podcasts
 from mygpo.log import log
 from mygpo.decorators import allowed_methods
