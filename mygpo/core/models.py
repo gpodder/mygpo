@@ -698,7 +698,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         from mygpo.users.models import PodcastUserState
         return PodcastUserState.view('users/podcast_states_by_podcast',
             startkey = [self.get_id(), None],
-            endkey   = [self.get_id(), '\ufff0'],
+            endkey   = [self.get_id(), {}],
             include_docs=True)
 
     def get_all_subscriber_data(self):
