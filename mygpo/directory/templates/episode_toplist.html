@@ -104,7 +104,7 @@
       {{ forloop.counter }}
      {% endifchanged %}
     </td>
-    <td>{{ entry.podcast|podcast_logo }}</td>
+    <td class="logo">{{ entry.podcast|podcast_logo }}</td>
     <td>{% episode_link entry entry.podcast %}<br/>
      <span class="from_podcast">{% trans "from" %} {% podcast_group_link entry.podcast %}</td>
     <td>{{ entry.listeners|vertical_bar:max_listeners }}</td>

@@ -26,7 +26,7 @@
 
   {% for p in subscriptions %}
    <tr>
-    <td>{{ p|podcast_logo }}</td>
+    <td class="logo">{{ p|podcast_logo }}</td>
     <td class="listlink">{% podcast_group_link p %}</td>
    </tr>
   {% endfor %}

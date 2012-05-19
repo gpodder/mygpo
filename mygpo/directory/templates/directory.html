@@ -30,7 +30,7 @@
     <table class="list">
      {% for podcast in c.podcasts %}
       <tr>
-       <td>{{ podcast|podcast_logo }}</td>
+       <td class="logo">{{ podcast|podcast_logo }}</td>
        <td>{% podcast_group_link podcast %}</td>
       </tr>
      {% endfor %}

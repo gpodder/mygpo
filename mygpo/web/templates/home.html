@@ -99,7 +99,7 @@
   {% cache 3600 home-toplist toplist.languages %}
    {% for oldpos, podcast in toplist|slice:":10" %}
     <tr>
-     <td>{{ podcast|podcast_logo }}
+     <td class="logo">{{ podcast|podcast_logo }}
      <td>{% podcast_group_link podcast %}</td>
     </tr>
    {% endfor %}

@@ -365,6 +365,10 @@ table.list tr.group:hover td
     background-color: inherit;
 }
 
+td.logo
+{
+    width: 32px;
+}
 
 
 /****************************

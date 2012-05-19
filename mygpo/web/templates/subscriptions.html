@@ -16,15 +16,10 @@
  {% if not subscriptionlist|length_is:"0" %}
 
  <table class="list podcast_list">
-  <tr>
-   <th>&nbsp;</th>
-   <th>{% trans "Podcast" %}</th>
-   <th>{% trans "Devices" %}</th>
-  </tr>
 
   {% for s in subscriptionlist %}
    <tr>
-    <td>{{ s.podcast|podcast_logo }}</td>
+    <td class="logo">{{ s.podcast|podcast_logo }}</td>
     <td>{% podcast_group_link s.podcast %}<br/><span class="latest_episode">
      {% if s.episode %}
       {% episode_link s.episode s.podcast %}

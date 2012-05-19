@@ -23,7 +23,7 @@
    </tr>
   {% for podcast in entries %}
    <tr>
-    <td>{{ podcast|podcast_logo }}</td>
+    <td class="logo">{{ podcast|podcast_logo }}</td>
     <td>
         <p class="title">{% podcast_group_link podcast %}</p>
             <p class="description">{{ podcast.description|striptags|truncatewords:"12" }}</p></td>

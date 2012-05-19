@@ -18,7 +18,7 @@
   <table class="list">
    {% for podcast, taglist in tags_podcast.items %}
     <tr>
-     <td>{{ podcast|podcast_logo }}</td>
+     <td class="logo">{{ podcast|podcast_logo }}</td>
      <td>{% podcast_group_link podcast %}</td>
      <td class="tag-list">
      {% for tag in taglist %}{% spaceless %}
@@ -44,7 +44,7 @@
   {% for tag, podcast_list in tags_tag.items %}
    <tr>
     <td>{{ tag }}</td>
-    <td>
+    <td class="logo">
      {% for podcast in podcast_list %}
       <a href="{% podcast_link_target podcast %}">{{ podcast|podcast_logo }}</a>
      {% endfor %}
