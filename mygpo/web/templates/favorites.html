@@ -36,10 +36,12 @@
     {% blocktrans with user.username as username and site.domain as domain %}You can access a feed containing your favorites episodes at
      <strong><a href="{{ favorites-feed-url }}">http://{{ domain }}{{ favorites-feed-url }}</a></strong>.{% endblocktrans %}
    </p>
-   <div>
-    <a href="{% url subscribe-by-url %}?url=http://{{ site.domain }}{% url favorites-feed user.username %}">
-     <img src="/media/subscribe.png" style="vertical-align: middle;" /> {% trans "Subscribe" %}
-    </a>
+   <div class="action-buttons">
+    <div class="button">
+     <a href="{% url subscribe-by-url %}?url=http://{{ site.domain }}{% url favorites-feed user.username %}">
+      <img src="/media/subscribe.png" style="vertical-align: middle;" /> {% trans "Subscribe" %}
+     </a>
+    </div>
    </div>
 
    <h3>Access to your Favorites</h3>
