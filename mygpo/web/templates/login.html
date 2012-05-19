@@ -8,92 +8,35 @@
 {% block title %}{% trans "Login" %}{% endblock %}
 
 {% block content %}
-  {% if restore_password_form %}
-   <form action="{% url restore-password %}" method="POST">
-       {% csrf_token %}
-       <table style="width: 400px; margin-left: auto; margin-right: auto;">
-           <tr>
-               <td colspan="2" style="text-align: center;">
-                   <h1>{% trans "Password recovery" %}</h1>
-               </td>
-           </tr>
-           <tr>
-               <td colspan="2" style="padding-bottom: 6px;">
-                   {% blocktrans %}Please enter either your username or (if you don't know that either) the e-mail address which you used to register your account. An e-mail will be sent to you.{% endblocktrans %}
-               </td>
-           </tr>
-           <tr>
-               <th style="text-align: right;">
-                   {{ restore_password_form.username.label_tag }}:
-               </th>
-               <td>{{ restore_password_form.username }}</td>
-           </tr>
-           <tr>
-               <th style="text-align: right;">
-                   {{ restore_password_form.email.label_tag }}:
-               </th>
-               <td>{{ restore_password_form.email }}</td>
-           </tr>
-           <tr>
-               <td colspan="2" style="text-align: right;">
-                   <input type="submit" value="{% trans "Send recovery e-mail" %}"/>
-               </td>
-           </tr>
-       </table>
-   </form>
-   <p><a href="{% url login %}">Back to the login page</a></p>
-  {% else %}
-    {% if next %}
-    <div class="error">
-        {% trans "You need to login to access this page." %}
-    </div>
-    {% endif %}
+
+ {% if next %}
+  <div class="error">
+   {% trans "You need to login to access this page." %}
+  </div>
+ {% endif %}
+
+
+ <h1>Login</h1>
+
+ <div class="form">
   <form action="{% url login %}" method="post">
-      {% csrf_token %}
-      <input name="next" type="hidden" value="{{ next }}" /><br />
-      <table style="margin-left: auto; margin-right: auto;">
-          <tr>
-              <td colspan="2" style="text-align: center;">
-                  <h1>{% trans "Login" %}</h1>
-              </td>
-          </tr>
-          <tr>
-              <th style="text-align: right;">{% trans "Username" %}:</th>
-              <td><input id="login_username" name="user" type="text" style="width: 200px;"/></td>
-          </tr>
-          <tr>
-              <th style="text-align: right;">{% trans "Password" %}:</th>
-              <td><input name="pwd" type="password" style="width: 200px;"/></td>
-          </tr>
-          <tr>
-              <td colspan="2" style="text-align: right;">
-                  <small><a href="{% url login %}?restore_password=1">Forgot your password?</a></small><br/>
-                  <input type="submit" value="Login" style="margin-top: 10px;"/>
-              </td>
-          </tr>
-      </table>
+
+   {% csrf_token %}
+
+   <label>Username
+   </label>
+   <input type="text" name="user" id="login_username" />
+
+   <label>Password
+    <span class="small"><a href="{% url restore-password %}">Forgot your password?</a></span>
+   </label>
+   <input type="password" name="pwd" />
+
+   <button type="submit">Login</button>
+   <div class="spacer"></div>
+
    </form>
-
-  {% endif %}
-
-  {% if activation_needed %}
-   <div class="info">
-    <strong>{% trans "Didn't receive your activation mail?" %}</strong>
-
-    {% url resend-activation as resend-activation-url %}
-    {% blocktrans %}We can try to <a href="{{ resend-activation-url }}">send it again</a>.{% endblocktrans %}
-   </div>
-  {% endif %}
-
-  {% if not restore_password_form and not activation_needed %}
-  <script type="text/javascript">
-      document.getElementById('login_username').focus();
-  </script>
-  <p style="text-align: center; padding: 20px;">
-      {% trans "Not yet a member?" %}
-      <a href="{% url register %}">{% trans "Create a new account - it's free!" %}</a>
-  </p>
-  {% endif %}
+  </div>
 
 {% endblock %}
 

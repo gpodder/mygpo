@@ -13,17 +13,39 @@
   <div class="success">{% trans "You are already registered." %}</div>
 {% else %}
   <h1>{% trans "Create a User Account" %}</h1>
-  <p>
-      {% trans "Already got an account?" %}
-      <a href="{% url login %}">{% trans "Login here" %}</a>
-  </p>
-  <form action="{% url register %}" method="POST">
-  {% csrf_token %}
-  <table class="register">
-   {{ form.as_table }}
-   <tr><th></th><td><input type="submit" value="Register" /></td></tr>
-   </table>
-  </form>
+
+  <div class="form">
+   <p>
+    {% trans "Already got an account?" %}
+    <a href="{% url login %}">{% trans "Login here" %}</a>
+   </p>
+   <form action="{% url register %}" method="POST">
+    {% csrf_token %}
+
+
+    <label>Username
+     <span class="small">Letters, digits, hypens, underscores</span>
+    </label>
+    {{ form.username }}
+
+    <label>Email Address
+     <span class="small">We won't share it with anyone</span>
+    </label>
+    {{ form.email }}
+
+    <label>Password
+     <span class="small">as secure as you like it</span>
+    </label>
+    {{ form.password1 }}
+
+    <label>Password
+     <span class="small">confirm</span>
+    </label>
+    {{ form.password2 }}
+
+    <button type="submit">{% trans "Register" %}</button>
+   </form>
+  </div>
 
   <p>{% trans "After registration, you'll receive an activation email to confirm the validity of your email address." %}</p>
 

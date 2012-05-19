@@ -23,26 +23,39 @@
 
   <h2>{% trans "Edit" %}</h2>
 
-  <form action="{% url device-update device.uid %}" method="POST">
-   {% csrf_token %}
-   <table class="form">
-    {{ device_form.as_table }}
-    <tr>
-     <td></td>
-     <td>
-      <button type="submit">{% trans "Save" %}</button>
-     </td>
-    </tr>
-   </table>
-  </form>
+  <div class="form">
+
+   <form action="{% url device-update device.uid %}" method="POST">
+    {{ device_form.non_field_errors }}
+    {% csrf_token %}
+
+    <label>Name</label>
+    {{ device_form.name }}
+
+    <label>Type</label>
+    {{ device_form.type }}
+
+    <label>Device-ID
+     <span class="small">use the same in your client</span>
+    </label>
+    {{ device_form.uid }}
+
+    <button type="submit">{% trans "Save" %}</button>
+  </div>
 
   <h2>{% trans "Replace Subscriptions" %}</h2>
-  <p>{% trans "You can replace your current subscriptions on this device by uploading an OPML file." %}</p>
-  <form method="post" action="{% url device-upload-opml device.uid %}" enctype="multipart/form-data">
-   {% csrf_token %}
-   <input type="file" name="opml" id="opml" />
-   <button type="submit">{% trans "Upload" %}</button>
-  </form>
+
+  <div class="form">
+   <form method="post" action="{% url device-upload-opml device.uid %}" enctype="multipart/form-data">
+    <p>{% trans "Replace your current subscriptions by uploading an OPML file." %}</p>
+    {% csrf_token %}
+
+    <label>OPML-File</label>
+    <input type="file" name="opml" id="opml" />
+
+    <button type="submit">{% trans "Upload" %}</button>
+   </form>
+  </div>
 
   <h2>{% trans "Delete" %}</h2>
   <form action="{% url device-delete device.uid %}" method="POST">
@@ -51,7 +64,6 @@
   </form>
   <br />
   {% endif %}
-  <div class="info">The <strong>Device ID</strong> connects your physical device with this page, so you should enter the same text on your device and here.</div>
 
 {% endblock %}
 
