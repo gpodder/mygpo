@@ -13,7 +13,6 @@
 
 {% block content %}
 <h1>{% trans "Subscription and Episode History" %}{% if device %} {% trans "for" %} {{ device.name|striptags }}{% endif %}</h1>
-<p>{% trans "This is a list of recent subscription and episode actions for your account." %}</p>
 
    {% if device %}
     <a href="{% url device device.uid %}">{% trans "Back to" %} {{ device|device_icon }} {{ device.name|striptags}}</a>
