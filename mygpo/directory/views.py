@@ -203,7 +203,7 @@ def podcast_lists(request, page_size=20):
 
     lists = map(_prepare_list, lists)
 
-    num_pages = ceil(PodcastList.count() / float(page_size))
+    num_pages = int(ceil(PodcastList.count() / float(page_size)))
 
     page_list = utils.get_page_list(1, num_pages, page, 15)
 
