@@ -59,11 +59,7 @@
       </td>
       <td>
        {% if s.device %}
-        {% if s.device.oldid %}
-         <a href="{% url device s.device.uid %}">{{ s.device|device_icon }}&nbsp;{{ s.device.name|striptags }}</a>
-        {% else %}
-         <a href="{% url device s.device.id %}">{{ s.device|device_icon }}&nbsp;{{ s.device.name|striptags }}</a>
-        {% endif %}
+        <a href="{% url device s.device.uid %}">{{ s.device|device_icon }}&nbsp;{{ s.device.name|striptags }}</a>
        {% endif %}
       </td>
      </tr>
