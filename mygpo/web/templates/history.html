@@ -20,13 +20,7 @@
 
    {% if not history|length_is:"0" %}
    <table class="list">
-    <tr>
-     <th></th>
-     <th>{% trans "Podcast/Episode" %}</th>
-     <th style="text-align: center;">{% trans "Date" %}</th>
-     <th style="text-align: center;">{% trans "Action" %}</th>
-     <th>{% trans "Device" %}</th>
-    </tr>
+
     {% for s in history %}
      <tr>
        <td class="logo">
