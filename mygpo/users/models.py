@@ -816,6 +816,10 @@ class User(BaseUser, SyncedDevicesMixin):
         return other.is_authenticated() and self._id == other._id
 
 
+    def __ne__(self, other):
+        return not(self == other)
+
+
     def __repr__(self):
         return 'User %s' % self._id
 
