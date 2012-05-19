@@ -12,29 +12,30 @@
 
   <h1>{% trans "Suggested Podcasts" %}</h1>
 
-  <p>{% blocktrans with entries|length as suggestion_count %}We've selected {{ suggestion_count }} podcasts which you might like.{% endblocktrans %}</p>
-
   <table class="list podcast_list">
-   <tr>
-    <th></th>
-    <th>{% trans "Podcast" %}</th>
-    <th style="text-align: center;">{% trans "Subscribe" %}</th>
-    <th style="text-align: center;">{% trans "Not Interested" %}</th>
-   </tr>
   {% for podcast in entries %}
    <tr>
     <td class="logo">{{ podcast|podcast_logo }}</td>
     <td>
-        <p class="title">{% podcast_group_link podcast %}</p>
-            <p class="description">{{ podcast.description|striptags|truncatewords:"12" }}</p></td>
-    <td style="text-align: center;">
-     <a href="{% podcast_link_target podcast "subscribe" %}"><img src="/media/subscribe.png" alt="+" /></a>
+     <p class="title">{% podcast_group_link podcast %}</p>
+     <p class="description">{{ podcast.description|striptags|truncatewords:"12" }}</p>
     </td>
-    <td style="text-align: center;">
+    <td>
+     <div class="button">
+      <a href="{% podcast_link_target podcast "subscribe" %}">
+       <img src="/media/subscribe.png" />{% trans "Subscribe" %}
+      </a>
+     </div>
+    </td>
+    <td>
      <form action="{% url suggestions-blacklist podcast.oldid %}">
       {% csrf_token %}
-      <input class="blacklist" type="submit" value="" />
+      <button class="blacklist" type="submit">
+       <img src="/media/unsubscribe.png" />
+       {% trans "Not Interested" %}
+      </button>
      </form>
+    </td>
    </tr>
   {% endfor %}
   </table>
@@ -43,11 +44,11 @@
    <strong>{% trans "Do you like our suggestions?" %}</strong>
    <form action="{% url suggestions-rate %}?rate=1" method="post" class="rate">
     {% csrf_token %}
-    <input type="submit" value="{% trans "Yes" %}" class="rate" />
+    <button type="submit">{% trans "Yes" %}</button>
    </form>
    <form action="{% url suggestions-rate %}?rate=-1" method="post" class="rate">
     {% csrf_token %}
-    <input type="submit" value="{% trans "No" %}" class="rate" />
+    <button type="submit">{% trans "No" %}</button>
    </form>
   </div>
 
