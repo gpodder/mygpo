@@ -41,7 +41,7 @@
   <form method="post" action="{% url device-upload-opml device.uid %}" enctype="multipart/form-data">
    {% csrf_token %}
    <input type="file" name="opml" id="opml" />
-   <input type="submit" value="{% trans "Upload" %}" />
+   <button type="submit">{% trans "Upload" %}</button>
   </form>
 
   <h2>{% trans "Delete" %}</h2>
