@@ -30,7 +30,7 @@
     <tr>
      <td></td>
      <td>
-      <input type="submit" value="Save" />
+      <button type="submit">{% trans "Save" %}</button>
      </td>
     </tr>
    </table>
@@ -47,7 +47,7 @@
   <h2>{% trans "Delete" %}</h2>
   <form action="{% url device-delete device.uid %}" method="POST">
    {% csrf_token %}
-   <input type="submit" value="{% trans "Delete this device" %}" />
+   <button type="submit">{% trans "Delete this device" %}</button>
   </form>
   <br />
   {% endif %}

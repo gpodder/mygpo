@@ -16,8 +16,9 @@
 
   {% if device.deleted %}<div class="info">{% trans "This device was deleted." %}</div>{% endif %}
 
-  {% if subscriptions %}
+  <h2>{% trans "Subscriptions" %}</h2>
    <table class="list">
+    {% if subscriptions %}
     <tr>
      <th></th>
      <th>{% trans "Podcast" %}</th>
@@ -31,32 +32,45 @@
       <td style="text-align: center;"><a href="{% podcast_link_target podcast "unsubscribe" device.uid %}?return_to=/device/{{ device.uid }}"><img src="/media/unsubscribe.png" /></a></td>
      </tr>
     {% endfor %}
-   </table>
   {% else %}
-   <p>{% trans "You don't have any podcasts subscribed on this device. Go ahead and upload some." %}</p>
+   <tr>
+    <td colspan="2">
+     {% trans "You don't have any podcasts subscribed on this device." %}
+    </td>
+   </tr>
+   </table>
   {% endif %}
 
-  <div>
-   <a href="{% url device-opml device.uid %}">
-    <img src="/media/22x22/opml-icon.png" class="action-button" /> {% trans "Download Subscriptions as OPML" %}
-   </a>
-  </div>
+  <div class="action-buttons">
 
-  <div>
+   {% if subscriptions %}
+    <div class="button">
+     <a href="{% url device-opml device.uid %}">
+      <img src="/media/22x22/opml-icon.png" /> {% trans "Download Subscriptions as OPML" %}
+     </a>
+    </div>
+   {% endif %}
+
+  <div class="button">
    <a href="{% url device-history device.uid %}">
-    <img src="/media/office-calendar.png" class="action-button" />
+    <img src="/media/office-calendar.png" />
     {% blocktrans with device.name|striptags as devicename %} Show history for {{ devicename }} {% endblocktrans %}</a>
    </a>
   </div>
 
   {% if not device.deleted %}
 
-  <div>
+  <div class="button">
    <a href="{% url device-edit device.uid %}">
-    <img src="/media/preferences-system-22.png" class="action-button" />
+    <img src="/media/preferences-system-22.png" />
     {% trans "Edit Device" %}
    </a>
   </div>
+  {% endif %}
+
+  </div>
+
+  {% if not device.deleted %}
 
   <h2>{% trans "Synchronize" %}</h2>
   <p>{% blocktrans %}If you synchronize devices, they will always have the same subscriptions. A podcast that is subscribed on one device, will automatically be added to all synchronized devices.{% endblocktrans %}</p>
@@ -69,14 +83,14 @@
 
    <p>{% blocktrans with device.name|striptags as devicename and synced_with|device_list as synclist %}{{ devicename }} is currently synchronized with {{ synclist }}.{% endblocktrans %}</p>
    <a href="{% url device-unsync device.uid %}">{% blocktrans with device.name|striptags as devicename %}Stop synchronisation for {{ devicename }} {% endblocktrans %}</a>
-  
+
   {% endif %}
 
   {% if has_sync_targets %}
    <form action="{% url device-sync device.uid %}" method="POST">
     {% csrf_token %}
     {{ sync_form.as_p }}
-    <input type="submit" value="{% trans "OK" %}" />
+    <button type="submit">{% trans "Synchronize" %}</button>
    </form>
   {% endif %}
 

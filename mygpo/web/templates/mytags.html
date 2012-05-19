@@ -29,7 +29,7 @@
      {% if user.is_authenticated %}
       <form action="{% podcast_link_target podcast "add-tag" %}">
        <input type="text" name="tag" />
-       <input type="submit" value="Add" />
+       <button type="submit">{% trans "Add" %}</button>
        <input type="hidden" name="next" value="mytags" />
       </form>
      {% endif %}

@@ -46,6 +46,7 @@ h1, h2
     padding: .5em 0 .4em 0;
     margin: 0;
     font-weight: bold;
+    clear: left;
 }
 
 h1 {
@@ -459,11 +460,6 @@ div.rate
     padding-bottom: 3em;
 }
 
-div.vote
-{
-    float: right;
-}
-
 div.devicesLeft
 {
     float:left;
@@ -727,19 +723,71 @@ div.come-in-box
     float: left;
 }
 
-button img
+
+/********************
+
+    Link Button
+
+ http://particletree.com/features/rediscovering-the-button-element/
+
+*********************/
+
+
+.button a, button
 {
-    margin: 0 3px -3px 0 !important;
-    padding: 0;
-    border: none;
-    width: 16px;
-    height: 16px;
+    /*display: block;*/
+    /* float: left; */
+    /*margin: 0 7px 0 0;*/
+    background-color: #f5f5f5;
+    border: 1px solid #dedede;
+    border-top: 1px solid #eee;
+    border-left: 1px solid #eee;
+    font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
+    font-size: 100%;
+    line-height: 130%;
+    text-decoration: none;
+    font-weight: bold;
+    color: #565656;
+    cursor: pointer;
+    padding: 5px 10px 6px 7px; /* Links */
+    /*clear: left;*/
 }
 
-.action-button
+button{
+    width:auto;
+    overflow:visible;
+    padding:4px 10px 3px 7px; /* IE6 */
+}
+
+button[type]{
+    padding:5px 10px 5px 7px; /* Firefox */
+    line-height:17px; /* Safari */
+}
+*:first-child+html button[type]{
+    padding:4px 10px 3px 7px; /* IE7 */
+}
+
+button img, div.button img{
+    margin:0 3px -3px 0 !important;
+    padding:0;
+    border:none;
+    width:16px;
+    height:16px;
+}
+
+
+.action-buttons
 {
-    vertical-align: middle;
-    padding-bottom: .5em;
+    overflow: auto;
+}
+
+.action-buttons > *
+{
+    display: block;
+    margin-top: .5em;
+    margin-bottom: .5em;
+    clear: both;
+    float: left;
 }
 
 

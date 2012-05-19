@@ -65,18 +65,20 @@
  {% endfor %}
  </table>
 
- <div class="vote">
+ <div class="action-buttons">
+
   <form action="{% url list-rate owner.username podcastlist.slug %}?rate=1" method="post">
    {% csrf_token %}
-   <input type="submit" value="{% trans "Like" %}" />
+   <button type="submit">{% trans "Vote" %}</button>
   </form>
- </div>
 
- <div>
-  <a href="{% url list-opml owner.username podcastlist.slug %}">
-   <img src="/media/22x22/opml-icon.png" class="action-button" />
-   {% trans "Download as OPML" %}
-   </a>
+  <div class="button">
+   <a href="{% url list-opml owner.username podcastlist.slug %}">
+    <img src="/media/22x22/opml-icon.png" class="action-button" />
+    {% trans "Download as OPML" %}
+    </a>
+  </div>
+
  </div>
 
  {% if is_own %}

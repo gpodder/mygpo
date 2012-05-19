@@ -33,10 +33,12 @@
        <td><a href="{% url device device.uid %}">{{ device|device_icon }}{{ device.name|striptags }}</a></td>
        <td>{{ device|device_type }}</td>
        <td>{{ device.uid|striptags }}</td>
-       <td class="buttons">
-        <a href="{% url device-edit device.uid %}">
-         <img src="/media/preferences-system.png" />
-        </a>
+       <td>
+        <div class="button">
+         <a href="{% url device-edit device.uid %}">
+          <img src="/media/preferences-system.png" />
+         </a>
+        </div>
        </td>
       </tr>
      {% endfor %}
@@ -58,17 +60,17 @@
       <td>{{ d|device_type }}</td>
       <td>{{ d.uid|striptags }}</td>
       <td>
-       <div>
-        <a href="{% url device-undelete d.uid %}">
-         <img src="/media/edit-undo.png" class="action-button" /> {% trans "Reactivate" %}
-        </a>
-       </div>
+       <form method="post" action="{% url device-undelete d.uid %}">
+        <button type="submit">
+         <img src="/media/edit-undo.png" /> {% trans "Reactivate" %}
+        </button>
+       </form>
 
-       <div>
-        <a href="{% url device-delete-permanently d.uid %}">
-         <img src="/media/unsubscribe.png" class="action-button" /> {% trans "Delete Permanently" %}
-        </a>
-       </div>
+       <form method="post" action="{% url device-delete-permanently d.uid %}">
+        <button type="submit">
+         <img src="/media/unsubscribe.png" /> {% trans "Delete Permanently" %}
+        </button>
+       </form>
       </td>
 
      </tr>

@@ -34,7 +34,7 @@
           <tr>
               <td></td>
               <td>
-                <input type="submit" value="{% trans "Update account settings" %}" />
+                <button type="submit">{% trans "Update account settings" %}</button>
               </td>
           </tr>
       </table>
@@ -43,9 +43,10 @@
   <hr>
 
   <h2>{% trans "Account-related actions" %}</h2>
-  <ul>
-      <li><a href="{% url delete-account %}">{% trans "Delete account" %}</a></li>
-  <ul>
+
+  <div class="button">
+   <a href="{% url delete-account %}">{% trans "Delete account" %}</a>
+  </div>
 
 {% endblock %}
 
