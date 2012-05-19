@@ -70,9 +70,8 @@
 
  {% cache 3600 newest_episodes user.username %}
  {% if newest_episodes %}
- <div class="wide-box">
   <h2>{% trans "Newest Episodes" %}</h2>
-  <table class="list episode_list">
+  <table class="list">
    {% for episode in newest_episodes %}
     <tr>
      <td class="logo">{{ episode.podcast|podcast_logo }}</td>
@@ -84,7 +83,6 @@
     </tr>
    {% endfor %}
   </table>
- </div>
  {% endif %}
  {% endcache %}
 
