@@ -19,17 +19,18 @@
   <h2>{% trans "Subscriptions" %}</h2>
    <table class="list">
     {% if subscriptions %}
-    <tr>
-     <th></th>
-     <th>{% trans "Podcast" %}</th>
-     <th>{% trans "Unsubscribe" %}</th>
-    </tr>
 
     {% for podcast in subscriptions %}
      <tr>
       <td class="logo">{{ podcast|podcast_logo }}</td>
       <td>{% podcast_group_link podcast %}</td>
-      <td style="text-align: center;"><a href="{% podcast_link_target podcast "unsubscribe" device.uid %}?return_to=/device/{{ device.uid }}"><img src="/media/unsubscribe.png" /></a></td>
+      <td>
+       <form method="post" action="{% podcast_link_target podcast "unsubscribe" device.uid %}?return_to=/device/{{ device.uid }}">
+        <button type="submit">
+         <img src="/media/unsubscribe.png" /> {% trans "Unsubscribe" %}
+        </button>
+       </form>
+      </td>
      </tr>
     {% endfor %}
   {% else %}
