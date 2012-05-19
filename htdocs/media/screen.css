@@ -380,22 +380,18 @@ td.logo
     Podcast List (TODO)
 *****************************/
 
-.episode_list .title
-{
-}
-
 .podcast_list
 {
     margin-bottom: 1em;
 }
 
-.podcast_list p, .episode_list p
+.podcast_list p
 {
     margin: 2px 0px 2px 0px;
     padding: 0px;
 }
 
-.podcast_list .description, .episode_list p.description
+.podcast_list .description
 {
     font-size: x-small;
 }
@@ -463,26 +459,6 @@ ul.devices li.other
     list-style-image: url('16x16/audio-x-generic.png');
 }
 
-div.devicesLeft
-{
-    float:left;
-	width: 10em;
-}
-
-div.devicesRight
-{
-    float:left;
-    margin-top:-5px;
-	width: 26px;
-	height: 26px;
-}
-
-div.devicesClear
-{
-    clear:left;
-}
-
-
 
 /******************
      Searching
@@ -536,10 +512,6 @@ div.result span.episode
 div.result span.episode a
 {
     color: black;
-}
-
-div.result
-{
 }
 
 
@@ -636,28 +608,6 @@ span.from_podcast a, span.latest_episode a {
     color: #aaa;
 }
 
-ul.square-menu
-{
-    padding: 20px;
-}
-
-ul.square-menu li
-{
-    display: block;
-    float: left;
-    width: 100px;
-    height: 100px;
-    margin: 10px;
-    background-color: #aaa;
-    text-align: center;
-}
-
-ul.square-menu li a
-{
-    position: relative;
-    bottom: -40px;
-}
-
 .own-chapter
 {
     font-weight: bold;
@@ -675,15 +625,6 @@ div.intro-box
     width: 40%;
     padding-bottom: 1em;
     overflow: hidden;
-}
-
-div.wide-box
-{
-    float: left;
-    width: 90%;
-    padding-top: 1em;
-    padding-left: 5%;
-    padding-bottom: 1em;
 }
 
 div.intro-box ul
@@ -879,31 +820,6 @@ button img, div.button img{
 {
     margin-top: .5em;
     width: 85%;
-}
-
-input.subscribe
-{
-    background: url('/media/subscribe.png') no-repeat;
-    cursor: pointer;
-    width: 22px;
-    height: 22px;
-    border: none;
-}
-
-input.remove
-{
-    margin: 11px 0 0 0;
-    background: url('/media/unsubscribe.png') no-repeat;
-    cursor: pointer;
-    width: 22px;
-    height: 22px;
-    border: none;
-}
-
-form.rate,
-input.rate
-{
-    display: inline;
 }
 
 

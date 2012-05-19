@@ -24,7 +24,9 @@
      <td>
       <form action="{% url list-delete user.username list.slug %}" method="post">
        {% csrf_token %}
-       <input type="submit" class="remove" value="" />
+       <button type="submit">
+        <img src="/media/unsubscribe.png" />
+       </button>
       </form>
      </td>
     </tr>

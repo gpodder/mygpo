@@ -71,7 +71,11 @@
                 <a href="{% url device device.uid %}">{{ device.name|striptags }}</a>
             </td>
             <td style="text-align: center;">
-                <a href="{% podcast_link_target podcast "unsubscribe" device.uid %}?return_to={% podcast_link_target podcast %}"><img src="/media/unsubscribe.png" alt="{% trans "Unsubscribe" %}" title="{% trans "Click here to unsubscribe" %}"/></a>
+             <form method="post" action="{% podcast_link_target podcast "unsubscribe" device.uid %}?return_to={% podcast_link_target podcast %}">
+              <button type="submit">
+               <img src="/media/unsubscribe.png" alt="{% trans "Unsubscribe" %}" />
+              </button>
+             </form>
             </td>
         </tr>
     {% endfor %}
@@ -81,7 +85,9 @@
            {% csrf_token %}
            <td>{{ subscribe_form.as_p }}</td>
            <td style="text-align: center;">
-            <input type="submit" class="subscribe" value="" />
+            <button type="submit">
+             <img src="/media/subscribe.png" />
+            </button>
            </td>
           </form>
          </tr>
@@ -109,7 +115,9 @@
      {% if user.is_authenticated %}
       <form action="{% podcast_link_target podcast "add-tag" %}">
        <input type="text" name="tag" />
-       <input type="submit" class="subscribe" value="" />
+       <button type="submit">
+        <img src="/media/subscribe.png" />
+       </button>
       </form>
      {% endif %}
     </div>
