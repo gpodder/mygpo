@@ -1,4 +1,5 @@
 import re
+from itertools import count
 
 from django.shortcuts import render
 from django.contrib import messages
@@ -29,52 +30,76 @@ class Overview(AdminView):
 class MergeSelect(AdminView):
     template_name = 'admin/merge-select.html'
 
+    def get(self, request):
+        num = int(request.GET.get('podcasts', 2))
+        urls = [''] * num
 
-class MergeVerify(AdminView):
+        return self.render_to_response({
+                'urls': urls,
+            })
+
+
+class MergeBase(AdminView):
+
+    def _get_podcasts(self, request):
+        podcasts = []
+        for n in count():
+            podcast_url = request.POST.get('feed%d' % n, None)
+            if podcast_url is None:
+                break
+
+            if not podcast_url:
+                continue
+
+            podcast = Podcast.for_url(podcast_url)
+
+            if not podcast:
+                raise InvalidPodcast(podcast_url)
+
+            podcasts.append(Podcast.for_url(podcast_url))
+
+        return podcasts
+
+
+class MergeVerify(MergeBase):
 
     template_name = 'admin/merge-grouping.html'
 
     def post(self, request):
 
-        podcast_url1 = request.POST['feed1']
-        podcast_url2 = request.POST['feed2']
-        podcast1 = Podcast.for_url(podcast_url1)
-        podcast2 = Podcast.for_url(podcast_url2)
+        try:
+            podcasts = self._get_podcasts(request)
 
-        if podcast1 is None:
+        except InvalidPodcast as ip:
             messages.error(request,
-                    _('No podcast with URL {url}').format(url=podcast_url1))
-            return HttpResponseRedirect(reverse('admin-merge'))
+                    _('No podcast with URL {url}').format(url=str(ip)))
 
-        if podcast2 is None:
-            messages.error(request,
-                    _('No podcast with URL {url}').format(url=podcast_url2))
-            return HttpResponseRedirect(reverse('admin-merge'))
-
-
-        grouper = PodcastGrouper(podcast1, podcast2)
+        grouper = PodcastGrouper(podcasts)
 
         get_features = lambda (e_id, e): ((e.url, e.title), e_id)
 
         num_groups = grouper.group(get_features)
 
         return self.render_to_response({
-                'podcast1': podcast1,
-                'podcast2': podcast2,
+                'podcasts': podcasts,
                 'groups': num_groups,
             })
 
 
-class MergeProcess(AdminView):
+class MergeProcess(MergeBase):
 
     RE_EPISODE = re.compile(r'episode_([0-9a-fA-F]{32})')
 
     def post(self, request):
 
-        podcast1 = Podcast.for_url(request.POST['feed1'])
-        podcast2 = Podcast.for_url(request.POST['feed2'])
+        try:
+            podcasts = self._get_podcasts(request)
 
-        grouper = PodcastGrouper(podcast1, podcast2)
+        except InvalidPodcast as ip:
+            messages.error(request,
+                    _('No podcast with URL {url}').format(url=str(ip)))
+
+        grouper = PodcastGrouper(podcasts)
 
         features = {}
         for key, feature in request.POST.items():
@@ -89,8 +114,7 @@ class MergeProcess(AdminView):
 
         if 'renew' in request.POST:
             return render(request, 'admin/merge-grouping.html', {
-                    'podcast1': podcast1,
-                    'podcast2': podcast2,
+                    'podcasts': podcasts,
                     'groups': num_groups,
                 })
 
@@ -101,7 +125,7 @@ class MergeProcess(AdminView):
 
             try:
                 # merge podcast, reassign episodes
-                pm = PodcastMerger(podcast1, podcast2, actions, num_groups)
+                pm = PodcastMerger(podcasts, actions, num_groups)
                 pm.merge()
 
             except IncorrectMergeException as ime:
@@ -110,5 +134,5 @@ class MergeProcess(AdminView):
 
             return render(request, 'admin/merge-finished.html', {
                     'actions': actions.items(),
-                    'podcast': podcast1,
+                    'podcast': podcasts,
                 })

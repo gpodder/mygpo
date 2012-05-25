@@ -12,19 +12,19 @@ class PodcastGrouper(object):
 
     DEFAULT_RELEASE = datetime(1970, 1, 1)
 
-    def __init__(self, podcast1, podcast2):
+    def __init__(self, podcasts):
 
-        if None in (podcast1, podcast2):
+        if not podcasts or (None in podcasts):
             raise ValueError('podcasts must not be None')
 
-        self.podcast1 = podcast1
-        self.podcast2 = podcast2
+        self.podcasts = podcasts
 
 
     def __get_episodes(self):
-        episodes = dict((e._id, e) for e in self.podcast1.get_episodes())
-        episodes2 = dict((e._id, e) for e in self.podcast2.get_episodes())
-        episodes.update(episodes2)
+        episodes = {}
+        for podcast in self.podcasts:
+            episodes.update(dict((e._id, e) for e in podcast.get_episodes()))
+
         return episodes
 
 

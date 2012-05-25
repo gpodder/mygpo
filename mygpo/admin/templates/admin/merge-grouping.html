@@ -10,10 +10,14 @@
 {% block title %}{% trans "Admin Area" %}{% endblock %}
 
 {% block content %}
- <h1>{% trans "Merge Duplicate Podcasts" %}</h1>
+ <h1>{% trans "Merge Podcasts and Episodes" %}</h1>
  <hr />
 
- <p>Merging {% podcast_link podcast2 %} into {% podcast_link podcast1 %}.</p>
+ <p>Merging Podcasts
+  {% for podcast in podcasts %}
+   {% podcast_link podcast %}
+  {% endfor %}
+ </p>
 
  <div class="info">
   {% trans "Episodes that have the same number will be merged. Please verify all your changes by clicking on 'Renew Groups' before starting the Merge." %}
@@ -22,37 +26,32 @@
  <form method="post" action="{% url admin-merge-process %}">
   {% csrf_token %}
 
-  <input type="hidden" name="feed1" value="{{ podcast1.url }}" />
-  <input type="hidden" name="feed2" value="{{ podcast2.url }}" />
+  {% for podcast in podcasts %}
+   <input type="hidden" name="feed{{ forloop.counter0 }}" value="{{ podcast.url }}" />
+  {% endfor %}
 
   <table>
    <tr>
     <th>#</th>
-    <th>{% podcast_link podcast1 %}</th>
-    <th>{% podcast_link podcast2 %}</th>
+    {% for podcast in podcasts %}
+     <th>{% podcast_link podcast %}</th>
+    {% endfor %}
    </tr>
 
    {% for n, episodes in groups %}
     <tr>
      <th>{{ n }}</th>
 
+     {% for podcast in podcasts %}
      <td>
       {% for episode in episodes %}
-       {% if episode.podcast == podcast1.get_id %}
+       {% if episode.podcast == podcast.get_id %}
         <input type="text" name="episode_{% get_id episode %}" value="{{ n }}" size="2"/>
-        {% episode_link episode podcast1 %}<br />
+        {% episode_link episode podcast %}<br />
        {% endif %}
       {% endfor %}
      </td>
-
-     <td>
-      {% for episode in episodes %}
-       {% if episode.podcast == podcast2.get_id %}
-        <input type="text" name="episode_{% get_id episode %}" value="{{ n }}" size="2"/>
-        {% episode_link episode podcast2 %}
-       {% endif %}
-      {% endfor %}
-     </td>
+    {% endfor %}
 
     </tr>
    {% endfor %}

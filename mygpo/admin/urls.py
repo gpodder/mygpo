@@ -1,6 +1,7 @@
 from django.conf.urls.defaults import *
 
-from mygpo.admin.views import Overview, MergeSelect, MergeVerify, MergeProcess
+from mygpo.admin.views import Overview, MergeSelect, MergeVerify, \
+         MergeProcess
 
 urlpatterns = patterns('mygpo.admin.views',
  url(r'^$',              Overview.as_view(),     name='admin-overview'),

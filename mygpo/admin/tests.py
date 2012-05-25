@@ -92,7 +92,7 @@ class SimpleTest(TestCase):
         groups = [(0, [e1]), (1, [e2, e3]), (2, [e4])]
 
         # carry out the merge
-        pm = PodcastMerger(p1, p2, actions, groups)
+        pm = PodcastMerger([p1, p2], actions, groups)
         pm.merge()
 
         e1 = Episode.get(e1._id)

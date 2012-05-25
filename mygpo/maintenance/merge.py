@@ -125,24 +125,28 @@ class PodcastMerger(object):
     """
 
 
-    def __init__(self, podcast1, podcast2, actions, groups, dry_run=False):
+    def __init__(self, podcasts, actions, groups, dry_run=False):
 
-        if podcast1 == podcast2:
-            raise IncorrectMergeException("can't merge podcast into itself")
+        for n, podcast1 in enumerate(podcasts):
+            for m, podcast2 in enumerate(podcasts):
+                if podcast1 == podcast2 and n != m:
+                    raise IncorrectMergeException("can't merge podcast into itself")
 
-        self.podcast1 = podcast1
-        self.podcast2 = podcast2
+        self.podcasts = podcasts
         self.actions = actions
         self.groups = groups
         self.dry_run = dry_run
 
 
     def merge(self):
-        self._merge_objs(podcast=self.podcast1, podcast2=self.podcast2)
-        self.merge_states(self.podcast1, self.podcast2)
-        self.merge_episodes()
-        self.reassign_episodes()
-        self._delete(podcast2=self.podcast2)
+        podcast1 = self.podcasts.pop(0)
+
+        for podcast2 in self.podcasts:
+            self._merge_objs(podcast1=podcast1, podcast2=podcast2)
+            self.merge_states(podcast1, podcast2)
+            self.merge_episodes()
+            self.reassign_episodes(podcast1, podcast2)
+            self._delete(podcast2=podcast2)
 
         self.actions['merge-podcast'] += 1
 
@@ -158,35 +162,35 @@ class PodcastMerger(object):
                 em.merge()
 
 
-    @repeat_on_conflict(['podcast', 'podcast2'])
-    def _merge_objs(self, podcast, podcast2):
+    @repeat_on_conflict(['podcast1', 'podcast2'])
+    def _merge_objs(self, podcast1, podcast2):
 
-        self.podcast1.merged_ids = set_filter(self.podcast1.merged_ids,
-                [self.podcast2.get_id()], self.podcast2.merged_ids)
+        podcast1.merged_ids = set_filter(podcast1.merged_ids,
+                [podcast2.get_id()], podcast2.merged_ids)
 
-        self.podcast1.merged_slugs = set_filter(self.podcast1.merged_slugs,
-                [self.podcast2.slug], self.podcast2.merged_slugs)
+        podcast1.merged_slugs = set_filter(podcast1.merged_slugs,
+                [podcast2.slug], podcast2.merged_slugs)
 
-        self.podcast1.merged_oldids = set_filter(self.podcast1.merged_oldids,
-                [self.podcast2.oldid], self.podcast2.merged_oldids)
+        podcast1.merged_oldids = set_filter(podcast1.merged_oldids,
+                [podcast2.oldid], podcast2.merged_oldids)
 
         # the first URL in the list represents the podcast main URL
-        main_url = self.podcast1.url
-        self.podcast1.urls = set_filter(self.podcast1.urls, self.podcast2.urls)
+        main_url = podcast1.url
+        podcast1.urls = set_filter(podcast1.urls, podcast2.urls)
         # so we insert it as the first again
-        self.podcast1.urls.remove(main_url)
-        self.podcast1.urls.insert(0, main_url)
+        podcast1.urls.remove(main_url)
+        podcast1.urls.insert(0, main_url)
 
         # we ignore related_podcasts because
         # * the elements should be roughly the same
         # * element order is important but could not preserved exactly
 
-        self.podcast1.content_types = set_filter(self.podcast1.content_types,
-                self.podcast2.content_types)
+        podcast1.content_types = set_filter(podcast1.content_types,
+                podcast2.content_types)
 
         key = lambda x: x.timestamp
         for a, b in utils.iterate_together(
-                [self.podcast1.subscribers, self.podcast2.subscribers], key):
+                [podcast1.subscribers, podcast2.subscribers], key):
 
             if a is None or b is None: continue
 
@@ -198,52 +202,52 @@ class PodcastMerger(object):
             a.subscriber_count += b.subscriber_count
 
         for src, tags in podcast2.tags.items():
-            self.podcast1.tags[src] = set_filter(self.podcast1.tags.get(src, []), tags)
+            podcast1.tags[src] = set_filter(podcast1.tags.get(src, []), tags)
 
-        self.podcast1.save()
+        podcast1.save()
 
 
     @repeat_on_conflict(['podcast2'])
     def _delete(self, podcast2):
-        self.podcast2.delete()
+        podcast2.delete()
 
 
     @repeat_on_conflict(['s'])
-    def _save_state(self, s):
-        s.podcast = self.podcast1.get_id()
+    def _save_state(self, s, podcast1):
+        s.podcast = podcast1.get_id()
         s.save()
 
 
     @repeat_on_conflict(['e'])
-    def _save_episode(self, e):
-        e.podcast = self.podcast1.get_id()
+    def _save_episode(self, e, podcast1):
+        e.podcast = podcast1.get_id()
         e.save()
 
 
 
-    def reassign_episodes(self):
+    def reassign_episodes(self, podcast1, podcast2):
         # re-assign episodes to new podcast
         # if necessary, they will be merged later anyway
-        for e in self.podcast2.get_episodes():
+        for e in podcast2.get_episodes():
             self.actions['reassign-episode'] += 1
 
             for s in e.get_all_states():
                 self.actions['reassign-episode-state'] += 1
 
-                self._save_state(s=s)
+                self._save_state(s=s, podcast1=podcast1)
 
-            self._save_episode(e=e)
+            self._save_episode(e=e, podcast1=podcast1)
 
 
-    def merge_states(self, podcast, podcast2):
+    def merge_states(self, podcast1, podcast2):
         """Merges the Podcast states that are associated with the two Podcasts.
 
         This should be done after two podcasts are merged
         """
 
         key = lambda x: x.user
-        states1 = sorted(self.podcast1.get_all_states(), key=key)
-        states2 = sorted(self.podcast2.get_all_states(), key=key)
+        states1 = sorted(podcast1.get_all_states(), key=key)
+        states2 = sorted(podcast2.get_all_states(), key=key)
 
         for state, state2 in utils.iterate_together([states1, states2], key):
 
@@ -252,8 +256,8 @@ class PodcastMerger(object):
 
             if state == None:
                 self.actions['move-podcast-state'] += 1
-                self._move_state(state2=state2, new_id=self.podcast1.get_id(),
-                        new_url=self.podcast1.url)
+                self._move_state(state2=state2, new_id=podcast1.get_id(),
+                        new_url=podcast1.url)
 
             elif state2 == None:
                 continue
