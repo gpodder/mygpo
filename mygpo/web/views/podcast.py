@@ -147,7 +147,7 @@ def episode_list(podcast, user):
         podcasts_dict = dict( (p_id, podcast) for p_id in podcast.get_ids())
         episodes_dict = dict( (episode._id, episode) for episode in episodes)
 
-        actions = podcast.get_episode_states(user.id)
+        actions = podcast.get_episode_states(user._id)
         actions = map(HistoryEntry.from_action_dict, actions)
 
         HistoryEntry.fetch_data(user, actions,
