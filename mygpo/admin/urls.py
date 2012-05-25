@@ -1,8 +1,10 @@
 from django.conf.urls.defaults import *
 
+from mygpo.admin.views import Overview, MergeSelect, MergeVerify, MergeProcess
+
 urlpatterns = patterns('mygpo.admin.views',
- url(r'^$',              'overview',          name='admin-overview'),
- url(r'^merge/$',        'merge_select',      name='admin-merge'),
- url(r'^merge/verify$',  'merge_verify',      name='admin-merge-verify'),
- url(r'^merge/process$', 'merge_process',     name='admin-merge-process'),
+ url(r'^$',              Overview.as_view(),     name='admin-overview'),
+ url(r'^merge/$',        MergeSelect.as_view(),  name='admin-merge'),
+ url(r'^merge/verify$',  MergeVerify.as_view(),  name='admin-merge-verify'),
+ url(r'^merge/process$', MergeProcess.as_view(), name='admin-merge-process'),
 )
