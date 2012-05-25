@@ -1,12 +1,16 @@
 import re
 
 from django.shortcuts import render
+from django.contrib import messages
+from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
+from django.utils.translation import ugettext as _
 
 from mygpo.admin.auth import require_staff
 from mygpo.admin.group import PodcastGrouper
 from mygpo.core.models import Podcast
 from mygpo.counter import Counter
-from mygpo.maintenance.merge import PodcastMerger
+from mygpo.maintenance.merge import PodcastMerger, IncorrectMergeException
 
 
 @require_staff
@@ -23,8 +27,21 @@ def merge_select(request):
 
 @require_staff
 def merge_verify(request):
-    podcast1 = Podcast.for_url(request.POST['feed1'])
-    podcast2 = Podcast.for_url(request.POST['feed2'])
+    podcast_url1 = request.POST['feed1']
+    podcast_url2 = request.POST['feed2']
+    podcast1 = Podcast.for_url(podcast_url1)
+    podcast2 = Podcast.for_url(podcast_url2)
+
+    if podcast1 is None:
+        messages.error(request,
+                _('No podcast with URL {url}').format(url=podcast_url1))
+        return HttpResponseRedirect(reverse('admin-merge'))
+
+    if podcast2 is None:
+        messages.error(request,
+                _('No podcast with URL {url}').format(url=podcast_url2))
+        return HttpResponseRedirect(reverse('admin-merge'))
+
 
     grouper = PodcastGrouper(podcast1, podcast2)
 
@@ -72,9 +89,13 @@ def merge_process(request):
 
         actions = Counter()
 
-        # merge podcast, reassign episodes
-        pm = PodcastMerger(podcast1, podcast2, actions, num_groups)
-        pm.merge()
+        try:
+            # merge podcast, reassign episodes
+            pm = PodcastMerger(podcast1, podcast2, actions, num_groups)
+            pm.merge()
+        except IncorrectMergeException as ime:
+            messages.error(request, str(ime))
+            return HttpResponseRedirect(reverse('admin-merge'))
 
         return render(request, 'admin/merge-finished.html', {
                 'actions': actions.items(),
