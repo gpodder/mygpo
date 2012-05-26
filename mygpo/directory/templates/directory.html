@@ -32,6 +32,13 @@
       <tr>
        <td class="logo">{{ podcast|podcast_logo }}</td>
        <td>{% podcast_group_link podcast %}</td>
+       <td class="subscribe">
+        <div class="button">
+         <a href="{% podcast_link_target podcast "subscribe" %}">
+          <img src="/media/subscribe.png" />
+         </a>
+        </div>
+       </td>
       </tr>
      {% endfor %}
      <tr>
@@ -42,6 +49,7 @@
        {% else %}
         <a href="{% url directory c.label %}">{% trans "more..." %}</a>
        {% endif %}
+      <td></td>
      </tr>
     </table>
    </div>
