@@ -34,9 +34,9 @@
        <td>{{ device|device_type }}</td>
        <td>{{ device.uid|striptags }}</td>
        <td>
-        <div class="button">
+        <div class="btn icon-edit">
          <a href="{% url device-edit device.uid %}">
-          <img src="/media/preferences-system.png" />
+          {% trans "Configure" %}
          </a>
         </div>
        </td>
@@ -48,12 +48,6 @@
    {% if deleted_devices %}
     <h2>{% trans "Deleted Devices" %}</h2>
     <table class="list">
-     <tr>
-      <th>{% trans "Name" %}</th>
-      <th>{% trans "Type" %}</th>
-      <th>{% trans "ID" %}</th>
-      <th>{% trans "Actions" %}</th>
-     </th>
     {% for d in deleted_devices %}
      <tr>
       <td><a href="{% url device d.uid %}">{{ d|device_icon }}{{ d.name|striptags }}</a></td>
@@ -61,14 +55,15 @@
       <td>{{ d.uid|striptags }}</td>
       <td>
        <form method="post" action="{% url device-undelete d.uid %}">
-        <button type="submit">
-         <img src="/media/edit-undo.png" /> {% trans "Reactivate" %}
+        <button class="btn btn-warning icon-repeat" type="submit">
+         {% trans "Reactivate" %}
         </button>
        </form>
-
+      </td>
+      <td>
        <form method="post" action="{% url device-delete-permanently d.uid %}">
-        <button type="submit">
-         <img src="/media/unsubscribe.png" /> {% trans "Delete Permanently" %}
+        <button class="btn btn-danger icon-trash" type="submit">
+         {% trans "Delete Permanently" %}
         </button>
        </form>
       </td>
@@ -81,12 +76,9 @@
    {% endif %}
 
   <div class="action-buttons">
-   <div class="button">
-    <a href="{% url device-edit-new %}">
-     <img src="/media/subscribe.png"/>
-     {% trans "Create a Device" %}
+    <a class="btn btn-success icon-plus" href="{% url device-edit-new %}">
+     {% trans "Create Device" %}
     </a>
-   </div>
   </div>
 
    <div class="info"><strong>{% trans "How do I add a new device?" %}</strong> {% trans "Just upload your subscriptions with a new device using gPodder, and it will automatically show up in this list." %}</div>

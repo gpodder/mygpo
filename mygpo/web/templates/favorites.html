@@ -37,11 +37,9 @@
      <strong><a href="{{ favorites-feed-url }}">http://{{ domain }}{{ favorites-feed-url }}</a></strong>.{% endblocktrans %}
    </p>
    <div class="action-buttons">
-    <div class="button">
-     <a href="{% url subscribe-by-url %}?url=http://{{ site.domain }}{% url favorites-feed user.username %}">
-      <img src="/media/subscribe.png" style="vertical-align: middle;" /> {% trans "Subscribe" %}
+     <a class="btn btn-success icon-ok" href="{% url subscribe-by-url %}?url=http://{{ site.domain }}{% url favorites-feed user.username %}">
+      {% trans "Subscribe" %}
      </a>
-    </div>
    </div>
 
    <h3>Access to your Favorites</h3>

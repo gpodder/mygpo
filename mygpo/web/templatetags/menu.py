@@ -71,12 +71,12 @@ def main_menu(selected):
     items = []
     for uri, caption, subpages in links:
         if selected in subpages or ('/' in subpages and not found_section):
-            items.append('<li class="selected"><a href="%s">%s</a></li>' % \
+            items.append('<li class="active"><a href="%s">%s</a></li>' % \
                     (uri, ugettext(caption)))
         else:
             items.append('<li><a href="%s">%s</a></li>' % (uri, ugettext(caption)))
 
-    s = '<ul class="menu primary">%s</ul>' % ('\n'.join(items),)
+    s = '\n'.join(items)
     return mark_safe(s)
 
 def get_section_items(selected):
@@ -91,6 +91,11 @@ def get_section_items(selected):
 
 @register.filter
 def section_menu(selected, title=None):
+
+    # TODO: we could create non-linked headers here
+    # <li class="nav-header">Sidebar</li>
+
+
     items = []
     for uri, caption in get_section_items(selected):
         if uri == selected:
@@ -99,13 +104,13 @@ def section_menu(selected, title=None):
                     title = title[:33] + '...'
                 caption = title
             if uri in HIDDEN_URIS:
-                items.append('<li class="selected">%s</li>' % ugettext(caption))
+                items.append('<li class="active">%s</li>' % ugettext(caption))
             else:
-                items.append('<li class="selected"><a href="%s">%s</a></li>' % \
+                items.append('<li class="active"><a href="%s">%s</a></li>' % \
                         (uri, ugettext(caption)))
         elif uri not in HIDDEN_URIS:
             items.append('<li><a href="%s">%s</a></li>' % (uri, ugettext(caption)))
 
-    s = '<ul class="menu secondary">%s</ul>' % ('\n'.join(items),)
+    s = '\n'.join(items)
     return mark_safe(s)
 

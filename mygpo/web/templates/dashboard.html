@@ -14,43 +14,45 @@
 
 {% block content %}
 
- <div class="intro-box">
- <h2>{% trans "Overview" %}</h2>
- {% if not subscribed_podcasts %}
-  {% url help as help-url %}
-  <p>{% blocktrans with site as sitename %}Welcome to {{ sitename }}! You can start using the site by <a href="{{ help-url }}">uploading your subscriptions</a> with a supported client. You can then manage your subscriptions online, sync your devices and discover new interesting podcasts.{% endblocktrans %}</p>
- {% else %}
-  {% url subscriptions as subscriptions-url %}
-  {% url devices as devices-url %}
-  {% url share as share-url %}
-  {% url suggestions as suggestions-url %}
-  {% url toplist as toplist-url %}
-  {% url lists-overview as lists-url %}
-  <p>{% blocktrans with subscribed_podcasts|length as subscription_count and devices|length as device_count %}You have subscribed to <a href="{{ subscriptions-url }}">{{ subscription_count }} podcasts</a> on <a href="{{ devices-url }}">{{ device_count }} devices</a>. Now you can
-   <ul>
-    <li><a href="{{ share-url }}">share your subscriptions with others</a></li>
-    <li><a href="{{ subscriptions-url }}">manage your subscriptions</a></li>
-    <li><a href="{{ devices-url }}">synchronize your devices</a></li>
-    <li><a href="{{ suggestions-url }}">view our suggested podcasts</a></li>
-    <li><a href="{{ toplist-url }}">discover new podcasts in our toplist</a></li>
-    <li><a href="{{ lists-url }}">collect and share podcasts about your favorite topics</a><span class="new">new!</span></li>
-   </ul>{% endblocktrans %}</p>
+ <div class="row-liquid">
 
- {% endif %}
+ <div class="span4">
+  <h2>{% trans "Overview" %}</h2>
+  {% if not subscribed_podcasts %}
+   {% url help as help-url %}
+   <p>{% blocktrans with site as sitename %}Welcome to {{ sitename }}! You can start using the site by <a href="{{ help-url }}">uploading your subscriptions</a> with a supported client. You can then manage your subscriptions online, sync your devices and discover new interesting podcasts.{% endblocktrans %}</p>
+  {% else %}
+   {% url subscriptions as subscriptions-url %}
+   {% url devices as devices-url %}
+   {% url share as share-url %}
+   {% url suggestions as suggestions-url %}
+   {% url toplist as toplist-url %}
+   {% url lists-overview as lists-url %}
+   <p>{% blocktrans with subscribed_podcasts|length as subscription_count and devices|length as device_count %}You have subscribed to <a href="{{ subscriptions-url }}">{{ subscription_count }} podcasts</a> on <a href="{{ devices-url }}">{{ device_count }} devices</a>. Now you can
+    <ul>
+     <li><a href="{{ share-url }}">share your subscriptions with others</a></li>
+     <li><a href="{{ subscriptions-url }}">manage your subscriptions</a></li>
+     <li><a href="{{ devices-url }}">synchronize your devices</a></li>
+     <li><a href="{{ suggestions-url }}">view our suggested podcasts</a></li>
+     <li><a href="{{ toplist-url }}">discover new podcasts in our toplist</a></li>
+     <li><a href="{{ lists-url }}">collect and share podcasts about your favorite topics</a><span class="new">new!</span></li>
+    </ul>{% endblocktrans %}</p>
 
- {% if sponsored_podcast %}
-  <div class="sponsoring-podcast">
-   <h3>{{ sponsored_podcast.title }} <small>(Supporting Podcast)</small></h3>
-   <div>{{ sponsored_podcast.podcast|podcast_logo }}</div>
-   <div style="margin-left: 40px">{{ sponsored_podcast.text|truncatewords:"20"}}</div>
-   <br style="clear: left;"/>
-   <small><a href="{% url advertise %}">advertise here</a></small>
-  </div>
- {% endif %}
+  {% endif %}
+
+  {% if sponsored_podcast %}
+   <div class="sponsoring-podcast">
+    <h3>{{ sponsored_podcast.title }} <small>(Supporting Podcast)</small></h3>
+    <div>{{ sponsored_podcast.podcast|podcast_logo }}</div>
+    <div style="margin-left: 40px">{{ sponsored_podcast.text|truncatewords:"20"}}</div>
+    <br style="clear: left;"/>
+    <small><a href="{% url advertise %}">advertise here</a></small>
+   </div>
+  {% endif %}
 
  </div>
 
- <div class="intro-box">
+ <div class="span4">
   <h2>{% trans "Random Picks" %}</h2>
 
   <table class="list">
@@ -61,30 +63,28 @@
     </tr>
    {% endfor %}
   </table>
+ </div>
 
  </div>
 
- <br style="clear: both" />
-
- <hr />
-
  {% cache 3600 newest_episodes user.username %}
- {% if newest_episodes %}
-  <h2>{% trans "Newest Episodes" %}</h2>
-  <table class="list">
-   {% for episode in newest_episodes %}
-    <tr>
-     <td class="logo">{{ episode.podcast|podcast_logo }}</td>
-     <td>
-      {% episode_link episode episode.podcast %}<br/>
-      <span class="from_podcast">{% podcast_group_link episode.podcast %}</span>
-     </td>
-     <td>{{ episode.released|naturalday }}</td>
-    </tr>
-   {% endfor %}
-  </table>
- {% endif %}
- {% endcache %}
+  <div class="span10">
+   {% if newest_episodes %}
+    <h2>{% trans "Newest Episodes" %}</h2>
+    <table class="list">
+     {% for episode in newest_episodes %}
+      <tr>
+       <td class="logo">{{ episode.podcast|podcast_logo }}</td>
+       <td>
+        {% episode_link episode episode.podcast %}<br/>
+        <span class="from_podcast">{% podcast_group_link episode.podcast %}</span>
+       </td>
+       <td>{{ episode.released|naturalday }}</td>
+      </tr>
+     {% endfor %}
+    </table>
+   {% endif %}
+  {% endcache %}
 
 {% endblock %}
 

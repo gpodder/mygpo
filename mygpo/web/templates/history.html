@@ -62,22 +62,24 @@
   {% endif %}
 
 
-  <div class="navigation">
-   <div class="prev">
+  <div class="pagination">
+   <ul>
     {% if page > 0 %}
-     <a href="?page={{page|add:"-1"}}">{% trans "«« Later" %}</a>
+     <li>
+      <a href="?page={{page|add:"-1"}}">{% trans "«« Later" %}</a>
+     </li>
     {% endif %}
-   </div>
-   <div class="list">
     {% if page != 0 %}
-     <a href="?page=0">{% trans "Now" %}</a>
+     <li>
+      <a href="?page=0">{% trans "Now" %}</a>
+     </li>
     {% endif %}
-   </div>
-   <div class="next">
     {% if history %}
-     <a href="?page={{page|add:"1"}}">{% trans "Earlier »»" %}</a>
+     <li>
+      <a href="?page={{page|add:"1"}}">{% trans "Earlier »»" %}</a>
+     </li>
     {% endif %}
-   </div>
+   </ul>
   </div>
 
 {% endblock %}

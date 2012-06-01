@@ -1,79 +1,116 @@
 {% load i18n %}
 {% load menu %}
-<!DOCTYPE HTML>
 
-<html>
- <head>
-<!--
-#
-# This file is part of my.gpodder.org.
-#
-# my.gpodder.org is free software: you can redistribute it and/or modify it
-# under the terms of the GNU Affero General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at your
-# option) any later version.
-#
-# my.gpodder.org is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
-# License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
-#
--->
-  <title>{% block title %}{% endblock %} (gpodder.net)</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <link rel="shortcut icon" href="/favicon.png">
-  <link rel="stylesheet" href="/media/reset.css" type="text/css" />
-  <link rel="stylesheet" href="/media/screen.css" type="text/css" />
-  {% block head %}{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{% block title %}{% endblock %} (gpodder.net)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-  {% if google_analytics_property_id %}
-   {% load googleanalytics %}
-   {{ google_analytics_property_id|google_analytics_async }}
-  {% endif %}
+    <!-- Le styles -->
+    <link href="/media/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+      .sidebar-nav {
+        padding: 9px 0;
+      }
+    </style>
+    <link href="/media/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/media/css/font-awesome.css" rel="stylesheet">
+    <link rel="stylesheet" href="/media/screen.css" type="text/css" />
 
- </head>
- <body>
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
 
-  <div id="mainwrapper">
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="/favicon.png">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/media/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/media/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/media/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="/media/ico/apple-touch-icon-57-precomposed.png">
 
-   <div id="header">
+    {% block head %}{% endblock %}
 
-    <div class="wrap">
+    {% if google_analytics_property_id %}
+      {% load googleanalytics %}
+      {{ google_analytics_property_id|google_analytics_async }}
+    {% endif %}
 
-     <h1 id="logo" style="clear: right;">
-         <img alt="gPodder.net" title="gPodder.net" src="/media/mygpo64.png"/>
-     </h1>
+  </head>
 
-     <div id="logininfo">
-         {% if user.is_authenticated %}
-             <strong>{{ user.username }}</strong> |
-             <a href="{% url logout %}">Logout</a>
-         {% else %}
-             <a href="{% url login %}">Login</a> |
-             <a href="{% url register %}">Register</a>
-         {% endif %}
-     </div>
+  <body>
 
-     <div id="navigation">
-      {% block mainmenu %}
-        {{ "/"|main_menu }}
-      {% endblock %}
-     </div>
-
-     {% block sectionmenu %}
-      <ul class="menu secondary">
-        <li class="selected"><a href="">{% trans "Page" %}</a></li>
-      </ul>
-     {% endblock %}
-
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/"><img src="/media/mygpo18.png" /> gpodder.net</a>
+          <div class="btn-group pull-right">
+           {% if user.is_authenticated %}
+            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+              <i class="icon-user"></i> {{ user.username }}
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a href="#">Profile</a></li>
+              <li class="divider"></li>
+              <li><a href="{% url logout %}">Sign Out</a></li>
+            </ul>
+           {% else %}
+            <a class="btn dropdown-toggle" data-toggle="dropdown" href="{% url login %}">
+              <i class="icon-user"></i>{% trans "Login" %}
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a href="{% url register %}">{% trans "Register" %}</a></li>
+            </ul>
+           {% endif %}
+          </div>
+          <div class="nav-collapse">
+            <ul class="nav">
+              {% block mainmenu %}
+               {{ "/"|main_menu }}
+              {% endblock %}
+            </ul>
+            <form class="navbar-search pull-left" method="get" action="{% url search %}">
+             {% csrf_token %}
+             <input name="q" type="text" class="search-query" placeholder="Search">
+            </form>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
     </div>
 
-   </div>
-
-   <div id="main">
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span2">
+          <div class="well sidebar-nav">
+            <ul class="nav nav-list">
+              {% block sectionmenu %}
+              {% endblock %}
+            </ul>
+          </div><!--/.well -->
+        </div><!--/span-->
+        <div class="span10">
+<!--          <div class="hero-unit">
+            <h1>Hello, world!</h1>
+            <p>This is a template for a simple marketing or informational website. It includes a large callout called the hero unit and three supporting pieces of content. Use it as a starting point to create something more unique.</p>
+            <p><a class="btn btn-primary btn-large">Learn more &raquo;</a></p>
+          </div>
+          <div class="row-fluid">
+-->
 
     {% if messages %}
      {% for message in messages %}
@@ -83,66 +120,97 @@
      {% endfor %}
     {% endif %}
 
+
     {% block content %}
-     <h1>gPodder Web Service</h1>
-     <p>...will go online soon...</p>
-     <ul>
-      <li><a href="http://gpodder.org/wiki/Web_Services">Wiki page</a></li>
-      <li><a href="{% url toplist %}">Toplist</a></li>
-     </ul>
     {% endblock %}
 
-   </div>
-
-  </div> <!-- mainwrapper -->
-
-  <div id="footer">
-   <div class="wrap">
-    <ul>
-     <li><strong>Discover</strong>
-       <a href="">Directory</a> &middot;
-       <a href="">Top Podcasts</a> &middot;
-       <a href="">Search</a>
-     </li>
-     <li><strong>Support</strong>
-       <a href="http://flattr.com/thing/2304/gpodder-net">Flattr</a> &middot;
-       <a href="">Donate</a> &middot;
-        <a href="">Advertise</a>
-     </li>
-     <li><strong>Develop</strong>
-       <a href="">API</a> &middot;
-       <a href="">Libraries</a> &middot;
-       <a href="">Clients</a>
-     </li>
-     <li><strong>Publisher</strong>
-       <a href="">Get Access</a> &middot;
-       <a href="">Link To Us</a> &middot;
-       <a href="">Advertise</a>
-     </li>
-     <li><strong>Copyright</strong> &copy; 2009-2012 gpodder.net</li>
-    </ul>
-   </div>
-  </div>
+    </div>
 
 
-<!-- getsatisfaction.com feedback tab -->
-<script type="text/javascript">
-  var is_ssl = ("https:" == document.location.protocol);
-  var asset_host = is_ssl ? "https://s3.amazonaws.com/getsatisfaction.com/" : "http://s3.amazonaws.com/getsatisfaction.com/";
-  document.write(unescape("%3Cscript src='" + asset_host + "javascripts/feedback-v2.js' type='text/javascript'%3E%3C/script%3E"));
-</script>
-<script type="text/javascript">
-  var feedback_widget_options = {};
-  feedback_widget_options.display = "overlay";
-  feedback_widget_options.company = "gpoddernet";
-  feedback_widget_options.placement = "left";
-  feedback_widget_options.color = "#222";
-  feedback_widget_options.style = "idea";
-  var feedback_widget = new GSFN.feedback_widget(feedback_widget_options);
-</script>
+      <footer class="row-fluid">
 
-{% block javascript %}{% endblock javascript %}
+       <hr />
 
- </body>
+       <div class="span3">
+       </div>
+       <div class="span1">
+       <ul>
+        <li><strong>Discover</strong>
+        <li><a href="">Directory</a></li>
+        <li><a href="">Top Podcasts</a></li>
+        <li><a href="">Search</a></li>
+       </ul>
+       </div>
+
+       <div class="span1 ">
+        <ul>
+        <li><strong>Support</strong>
+        <li><a href="http://flattr.com/thing/2304/gpodder-net">Flattr</a></li>
+        <li><a href="">Donate</a></li>
+        <li><a href="">Advertise</a></li>
+        </ul>
+       </div>
+
+       <div class="span1 ">
+        <ul>
+         <li><strong>Develop</strong>
+         <li><a href="">API</a></li>
+         <li><a href="">Libraries</a></li>
+         <li><a href="">Clients</a></li>
+        </ul>
+       </div>
+
+       <div class="span1 ">
+        <ul>
+        <li><strong>Publisher</strong>
+         <li><a href="">Get Access</a></li>
+         <li><a href="">Link To Us</a></li>
+         <li><a href="">Advertise</a></li>
+        </ul>
+       </div>
+
+       <div class="span1 ">
+        <ul>
+        <li><strong>Copyright</strong> &copy; 2009-2012 gpodder.net</li>
+       </ul>
+       </div>
+      </footer>
+
+    </div><!--/.fluid-container-->
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/media/js/jquery.js"></script>
+    <script src="/media/js/bootstrap-transition.js"></script>
+    <script src="/media/js/bootstrap-alert.js"></script>
+    <script src="/media/js/bootstrap-modal.js"></script>
+    <script src="/media/js/bootstrap-dropdown.js"></script>
+    <script src="/media/js/bootstrap-scrollspy.js"></script>
+    <script src="/media/js/bootstrap-tab.js"></script>
+    <script src="/media/js/bootstrap-tooltip.js"></script>
+    <script src="/media/js/bootstrap-popover.js"></script>
+    <script src="/media/js/bootstrap-button.js"></script>
+    <script src="/media/js/bootstrap-collapse.js"></script>
+    <script src="/media/js/bootstrap-carousel.js"></script>
+    <script src="/media/js/bootstrap-typeahead.js"></script>
+    {% block javascript %}{% endblock javascript %}
+
+    <!-- getsatisfaction.com feedback tab -- >
+    <script type="text/javascript">
+     var is_ssl = ("https:" == document.location.protocol);
+     var asset_host = is_ssl ? "https://s3.amazonaws.com/getsatisfaction.com/" : "http://s3.amazonaws.com/getsatisfaction.com/";
+     document.write(unescape("%3Cscript src='" + asset_host + "javascripts/feedback-v2.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+     var feedback_widget_options = {};
+     feedback_widget_options.display = "overlay";
+     feedback_widget_options.company = "gpoddernet";
+     feedback_widget_options.placement = "left";
+     feedback_widget_options.color = "#222";
+     feedback_widget_options.style = "idea";
+     var feedback_widget = new GSFN.feedback_widget(feedback_widget_options);
+    </script>
+
+  </body>
 </html>
-

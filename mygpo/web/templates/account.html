@@ -10,42 +10,53 @@
 {% block content %}
   <h1>{% trans "Account settings" %}</h1>
 
-  <form action="{% url account %}" method="POST">
-      {% csrf_token %}
-      <h3>{% trans "Contact information and password" %}</h3>
-      <table class="form">
-          <tr>
-              <th>{{ form.email.label_tag }}:</th>
-              <td>{{ form.email }}</td>
-          </tr>
-          <tr>
-              <th>{{ form.password_current.label_tag }}:</th>
-              <td>{{ form.password_current }}</td>
-          </tr>
-          <tr>
-              <th>{{ form.password1.label_tag }}:</th>
-              <td>{{ form.password1 }}</td>
-          </tr>
-          <tr>
-              <th>{{ form.password2.label_tag }}:</th>
-              <td>{{ form.password2 }}</td>
-          </tr>
+  <form action="{% url account %}" method="POST" class="well form-horizontal">
+   {% csrf_token %}
+   <h3>{% trans "Account Data" %}</h3>
 
-          <tr>
-              <td></td>
-              <td>
-                <button type="submit">{% trans "Update account settings" %}</button>
-              </td>
-          </tr>
-      </table>
+   <fieldset>
+
+    <div class="control-group">
+     <label class="control-label" for="input01">{{ form.email.label_tag }}</label>
+     <div class="controls">
+      {{ form.email }}
+     </div>
+    </div>
+
+    <div class="control-group">
+     <label class="control-label" for="input01">{{ form.password_current.label_tag }}</label>
+     <div class="controls">
+      {{ form.password_current }}
+     </div>
+    </div>
+
+    <div class="control-group">
+     <label class="control-label" for="input01">{{ form.password1.label_tag }}</label>
+     <div class="controls">
+      {{ form.password1 }}
+     </div>
+    </div>
+
+    <div class="control-group">
+     <label class="control-label" for="input01">{{ form.password2.label_tag }}</label>
+     <div class="controls">
+      {{ form.password2 }}
+     </div>
+    </div>
+
+    <div class="control-group">
+     <div class="controls">
+      <button type="submit">{% trans "Save" %}</button>
+     </div>
+    </div>
+
+  </fieldset>
   </form>
 
-  <hr>
+  <h2>{% trans "Delete Account" %}</h2>
 
-  <h2>{% trans "Account-related actions" %}</h2>
-
-  <div class="button">
-   <a href="{% url delete-account %}">{% trans "Delete account" %}</a>
+  <div class="well">
+   <a class="btn btn-danger" href="{% url delete-account %}">{% trans "Delete Account" %}</a>
   </div>
 
 {% endblock %}

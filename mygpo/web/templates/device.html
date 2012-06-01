@@ -25,9 +25,9 @@
       <td class="logo">{{ podcast|podcast_logo }}</td>
       <td>{% podcast_group_link podcast %}</td>
       <td>
-       <form method="post" action="{% podcast_link_target podcast "unsubscribe" device.uid %}?return_to=/device/{{ device.uid }}">
-        <button type="submit">
-         <img src="/media/unsubscribe.png" /> {% trans "Unsubscribe" %}
+       <form class="form-inline" method="post" action="{% podcast_link_target podcast "unsubscribe" device.uid %}?return_to=/device/{{ device.uid }}">
+        <button class="btn btn-danger icon-remove" type="submit">
+         {% trans "Unsubscribe" %}
         </button>
        </form>
       </td>
@@ -45,14 +45,14 @@
   <div class="action-buttons">
 
    {% if subscriptions %}
-    <div class="button">
+    <div class="btn">
      <a href="{% url device-opml device.uid %}">
       <img src="/media/22x22/opml-icon.png" /> {% trans "Download Subscriptions as OPML" %}
      </a>
     </div>
    {% endif %}
 
-  <div class="button">
+  <div class="btn">
    <a href="{% url device-history device.uid %}">
     <img src="/media/office-calendar.png" />
     {% blocktrans with device.name|striptags as devicename %} Show history for {{ devicename }} {% endblocktrans %}</a>
@@ -61,7 +61,7 @@
 
   {% if not device.deleted %}
 
-  <div class="button">
+  <div class="btn">
    <a href="{% url device-edit device.uid %}">
     <img src="/media/preferences-system-22.png" />
     {% trans "Edit Device" %}
@@ -91,7 +91,7 @@
    <form action="{% url device-sync device.uid %}" method="POST">
     {% csrf_token %}
     {{ sync_form.as_p }}
-    <button type="submit">{% trans "Synchronize" %}</button>
+    <button class="btn" type="submit">{% trans "Synchronize" %}</button>
    </form>
   {% endif %}
 

@@ -21,17 +21,14 @@
      <p class="description">{{ podcast.description|striptags|truncatewords:"12" }}</p>
     </td>
     <td>
-     <div class="button">
-      <a href="{% podcast_link_target podcast "subscribe" %}">
-       <img src="/media/subscribe.png" />{% trans "Subscribe" %}
+      <a class="btn btn-success icon-ok" href="{% podcast_link_target podcast "subscribe" %}">
+       {% trans "Subscribe" %}
       </a>
-     </div>
     </td>
     <td>
      <form action="{% url suggestions-blacklist podcast.oldid %}">
       {% csrf_token %}
-      <button class="blacklist" type="submit">
-       <img src="/media/unsubscribe.png" />
+      <button class="btn btn-danger icon-ban-circle" type="submit">
        {% trans "Not Interested" %}
       </button>
      </form>
@@ -42,13 +39,13 @@
 
   <div class="rate">
    <strong>{% trans "Do you like our suggestions?" %}</strong>
-   <form action="{% url suggestions-rate %}?rate=1" method="post" class="rate">
+   <form class="form-inline" action="{% url suggestions-rate %}?rate=1" method="post" class="rate">
     {% csrf_token %}
-    <button type="submit">{% trans "Yes" %}</button>
+    <button class="btn btn-success icon-ok" type="submit"> {% trans "Yes" %}</button>
    </form>
-   <form action="{% url suggestions-rate %}?rate=-1" method="post" class="rate">
+   <form class="form-inline" action="{% url suggestions-rate %}?rate=-1" method="post" class="rate">
     {% csrf_token %}
-    <button type="submit">{% trans "No" %}</button>
+    <button class="btn btn-danger icon-remove" type="submit"> {% trans "No" %}</button>
    </form>
   </div>
 

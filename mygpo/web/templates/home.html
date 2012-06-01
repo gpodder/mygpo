@@ -25,92 +25,58 @@
 
 {% block content %}
 
-<h1>gpodder.net &ndash; {% trans "a Podcast-Webservice" %}</h1>
-
-<div class="intro-box" id="feature-list">
- <h3><img style="vertical-align: middle;" src="/media/preferences-system.png" alt="" /> {% trans "Manage Your Podcast-Clients" %}</h3>
- <p>{% blocktrans %}With gpodder.net you can manage your podcast clients via the
-  web, subscribe to new podcasts and even synchronize gPodder on
-  your notebook and on your mobile phone.{% endblocktrans %}</p>
-
- <h3><img style="vertical-align: middle;" src="/media/emblem-favorite.png" alt="" /> {% trans "Discover New Podcasts" %}</h3>
-
- {% url directory-home as directory-home-url %}
- {% url toplist as toplist-url %}
- {% url episode-toplist as episode-toplist-url %}
- <p>{% blocktrans %}Find new interesting podcasts in our <a href="{{ directory-home-url }}">directory</a> and <a href="{{ toplist-url }}">toplist</a>, see what's <a href="{{ episode-toplist-url }}">currently listened</a> to by our users and get personalized suggestions.{% endblocktrans %}</p>
-
- <h3><img style="vertical-align: middle;" src="/media/openshareicon-16x16.png" alt="" /> {% trans "Share Interesting Podcasts" %}</h3>
- <p>{% blocktrans %}Share your podcast subscriptions and favorite episodes with other users and get recommendations by others.{% endblocktrans %}</p>
-
- <h3><img style="vertical-align: middle;" src="/media/package-x-generic.png" alt="" /> {% trans "Backup your Subscriptions" %}</h3>
- <p>{% blocktrans %}With having your subscription and listening data <em>in the cloud</em> you always have a copy ready when replacing a computer or buying a new mobile phone.{% endblocktrans %}</p>
-
- <h3><img style="vertical-align: middle;" src="/media/applications-internet.png" alt="" /> Seamless Playback on the Go</h3>
- <p>{% blocktrans %}Start listening to an episode on your PC and continue playback on your mobile phone &ndash; automatically. (coming with the next version of gPodder){% endblocktrans %}</p>
-
-</div>
-
-<div class="intro-box">
- <div class="sponsoring-podcast">
-  {% if sponsored_podcast %}
-   <h3>{{ sponsored_podcast.title }} <small>(Supporting Podcast)</small></h3>
-   {{ sponsored_podcast.podcast|podcast_logo }}
-   <div style="margin-left: 40px">{{ sponsored_podcast.text}}</div>
-   <br style="clear: left;"/>
-   <small><a href="{% url advertise %}">advertise here</a></small>
-  {% endif %}
+ <div class="hero-unit">
+  <h1>Discover Podcasts</h1>
+  <p>Discover interesting podcasts and keep your subscriptions up to date on all your devices! gpodder.net is a free service that connects your podcast player on your computer, notebook and phone.</p>
+  <p><a class="btn btn-primary btn-large" href="{% url register %}">{% trans "Register" %}</a> <a class="btn btn-primary btn-large" href="{% url login %}">{% trans "Login" %}</a></p>
  </div>
 
- <div class="come-in-box">
-  <a href="{% url register %}">{% trans "Register" %}</a>
-  {% trans "or" %}
-  <a href="{% url login %}">{% trans "Login" %}</a>
+ <div class="row-fluid">
+
+  <div class="span4">
+   <h3><img style="vertical-align: middle;" src="/media/preferences-system.png" alt="" /> {% trans "Manage Your Podcast-Clients" %}</h3>
+   <p>{% blocktrans %}With gpodder.net you can manage your podcast clients via the
+    web, subscribe to new podcasts and even synchronize gPodder on
+    your notebook and on your mobile phone.{% endblocktrans %}</p>
+  </div>
+
+  <div class="span4">
+   <h3><img style="vertical-align: middle;" src="/media/emblem-favorite.png" alt="" /> {% trans "Discover New Podcasts" %}</h3>
+   {% url directory-home as directory-home-url %}
+   {% url toplist as toplist-url %}
+   {% url episode-toplist as episode-toplist-url %}
+    <p>{% blocktrans %}Find new interesting podcasts in our <a href="{{ directory-home-url }}">directory</a> and <a href="{{ toplist-url }}">toplist</a>, see what's <a href="{{ episode-toplist-url }}">currently listened</a> to by our users and get personalized suggestions.{% endblocktrans %}</p>
+  </div>
+
+  <div class="span4">
+   <h3><img style="vertical-align: middle;" src="/media/openshareicon-16x16.png" alt="" /> {% trans "Share Interesting Podcasts" %}</h3>
+   <p>{% blocktrans %}Share your podcast subscriptions and favorite episodes with other users and get recommendations by others.{% endblocktrans %}</p>
+  </div>
+
  </div>
 
-</div>
-<br style="clear: both" />
+ <div class="row-fluid">
+
+  <div class="span4">
+   <h3><img style="vertical-align: middle;" src="/media/package-x-generic.png" alt="" /> {% trans "Backup your Subscriptions" %}</h3>
+   <p>{% blocktrans %}With having your subscription and listening data <em>in the cloud</em> you always have a copy ready when replacing a computer or buying a new mobile phone.{% endblocktrans %}</p>
+  </div>
+
+  <div class="span4">
+   <h3><img style="vertical-align: middle;" src="/media/applications-internet.png" alt="" /> Seamless Playback on the Go</h3>
+   <p>{% blocktrans %}Start listening to an episode on your PC and continue playback on your mobile phone &ndash; automatically. (coming with the next version of gPodder){% endblocktrans %}</p>
+  </div>
 
 
-<hr />
+  <div class="span4">
+   <h3>Supported Clients</h3>
+   <ul>
+    <li><a href="http://gpodder.org/">gPodder</a></li>
+    <li><a href="http://amarok.kde.org/">Amarok</a></li>
+    <li><a href="http://wiki.gpodder.org/wiki/Web_Services/Clients">more...</a></li>
+   </ul>
+  </div>
 
-<div class="intro-box">
- <h3>Supported Clients</h3>
- <ul>
-  <li><a href="http://gpodder.org/">gPodder</a></li>
-  <li><a href="http://amarok.kde.org/">Amarok</a></li>
-  <li><a href="http://wiki.gpodder.org/wiki/Web_Services/Clients">more...</a></li>
- </ul>
-
- <h3>Currently Tracking</h3>
- <ul>
-  <li>{{ podcast_count }} {% trans "podcasts" %}</li>
-  <li>{{ episode_count}} {% trans "episodes" %}</li>
-  <li>{{ user_count}} {% trans "users" %}</li>
-
- </ul>
-
-</div>
-
-
-<div class="intro-box">
- <h3>{% trans "Podcast-Toplist" %}</h3>
- <table class="list">
-  {% cache 3600 home-toplist toplist.languages %}
-   {% for oldpos, podcast in toplist|slice:":10" %}
-    <tr>
-     <td class="logo">{{ podcast|podcast_logo }}
-     <td>{% podcast_group_link podcast %}</td>
-    </tr>
-   {% endfor %}
-  {% endcache %}
-  <tr>
-   <td></td>
-   <td><a href="{% url toplist %}">{% trans "more..." %}</a></td>
-  </tr>
- </table>
-</div>
-
-<br style="clear: left;" />
+ </div>
 
 {% endblock content %}

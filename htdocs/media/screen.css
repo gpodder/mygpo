@@ -5,176 +5,17 @@
     General
 *****************/
 
-html,
-body
-{
-    height: 100%;
-    font-family: DeJaVu Sans, Bitstream Vera Sans, sans-serif;
-    background-color: #E6EEF0;
-    font-size: .9em;
-}
-
-
-body.embed
-{
-    background-color: white;
-}
-
 hr
 {
-    border-width: 0px;
-    border-bottom: 1px #aaa dotted;
     clear: both;
 }
 
-img
-{
-    border-width: 0px;
-}
-
-a {
-    color: #10488B;
-    text-decoration: none;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-h1, h2, h3
-{
-    padding: .5em 0 .4em 0;
-    margin: 0;
-    font-weight: bold;
-    clear: left;
-}
-
-h1 {
-    font-size: 14pt;
-}
-
-h2 {
-    font-size: 12pt;
-}
-
-h3
-{
-    font-size: 11pt;
-}
-
-ul
-{
-    list-style-type: disc;
-    margin-left: 0;
-    padding: .5em 0 0 2.5em;
-}
-
-strong
-{
-    font-weight: bold;
-}
-
-p
-{
-    padding: .5em 0 0 .5em;
-}
-
-
-/*******************
-    Basic Layout
-********************/
-
-#mainwrapper
-{
-    min-height: 100%;
-}
-
-#main
-{
-    max-width: 70em;
-    margin: 0 auto 0 auto;
-    background-color: white;
-    overflow: auto;
-    padding-bottom: 7em;
-    padding-top: 2em;
-}
-
-#main > *
-{
-    max-width: 67em;
-    margin-left: 1.5em;
-    padding-right: 1.5em;
-}
-
-.wrap
-{
-    max-width: 70em;
-    margin: 0 auto 0 auto;
-}
-
-
-/*************
-    Header
-**************/
-
-#header
-{
-    background-color: #122B51;
-}
-
-#footer .wrap > *
-{
-    padding: 1em 1em 0 1em;
-}
 
 #logo
 {
 	float: left;
 	padding: 0px;
 	margin: .5em;
-}
-
-#logininfo
-{
-    float: right;
-    margin-top: 1px;
-    background-color: white;
-    padding: 5px;
-    text-align: right;
-    background-image: url('logininfo-bottomleft.png');
-    background-repeat: no-repeat;
-    background-position: bottom left;
-}
-
-
-/**************
-    Footer
-***************/
-
-
-#footer
-{
-    position: relative;
-    margin-top: -7em; /* negative value of footer height */
-    height: 7em;
-    clear: both;
-    margin-left: auto;
-    margin-right: auto;
-    background-color: #9FB5BD;
-    color: #396D71;
-}
-
-#footer ul,
-#footer ul li
-{
-    padding-top: 0;
-    margin-top: 0;
-    display: block;
-}
-
-#footer a
-{
-    color: #396D71;
 }
 
 
@@ -222,106 +63,6 @@ div.error
 .info a
 {
     color: black;
-}
-
-
-/*********************
-     Registration
-**********************/
-
-table.register th {
-    font-weight:normal;
-    width:150px;
-    text-align:left;
-}
-
-
-
-
-/**********************
-   Main Navigation
-***********************/
-
-.menu a
-{
-    color: #aaa;
-}
-
-
-ul.menu
-{
-    list-style-type: none;
-    padding: 10px;
-    margin: 0px;
-    border-width: 0px;
-}
-
-ul.menu.secondary
-{
-    background-color: #445D82;
-    padding-left: 40px;
-    padding-top: 20px;
-    border-top: 1px #9FB5BD solid;
-}
-
-ul.menu.primary
-{
-    padding-top: 20px;
-}
-
-ul.menu li
-{
-    display: inline;
-    padding: 10px 10px 8px 10px;
-    border-width: 0px;
-    position: relative;
-    top: 1px;
-}
-
-ul.menu.primary li.selected
-{
-    color: #445D82;
-}
-
-
-ul.menu.secondary li.selected a,
-ul.menu.secondary li.selected a:hover,
-ul.menu.secondary li.selected a:visited,
-ul.menu.secondary li.selected:hover a {
-    color: black;
-}
-
-ul.menu.secondary li.selected {
-    position: relative;
-    top: 1px;
-    background-color: white;
-    /* round corners */
-}
-
-ul.menu.secondary li.selected:hover {
-    background-color: white;
-}
-
-ul.menu li:hover a {
-    text-decoration: none;
-}
-
-ul.menu li.selected a, ul.menu li.selected:hover a {
-    color: white;
-}
-
-ul.menu li.heading {
-    cursor: default;
-}
-
-ul.menu li.heading:hover {
-    background-color: #777;
-}
-
-.menu strong {
-    color: white;
-    padding-left: 10px;
-    padding-right: 10px;
 }
 
 
@@ -402,6 +143,11 @@ tr:hover td.subscribe div
     display: block;
 }
 
+
+table button.btn
+{
+    float: right;
+}
 
 /****************************
     Podcast List (TODO)
@@ -546,6 +292,7 @@ div.result span.episode a
    Forms
 ****************/
 
+/*
 
 div.form {
     border:solid 2px #b7ddf2;
@@ -597,6 +344,7 @@ div.form button{
     height:31px;
 }
 
+*/
 
 
 input.url
@@ -743,12 +491,13 @@ div.come-in-box
 *********************/
 
 
+/*
 .button a, button
 {
     /*display: block;*/
     /* float: left; */
     /*margin: 0 7px 0 0;*/
-    background-color: #f5f5f5;
+/*    background-color: #f5f5f5;
     border: 1px solid #dedede;
     border-top: 1px solid #eee;
     border-left: 1px solid #eee;
@@ -761,21 +510,21 @@ div.come-in-box
     cursor: pointer;
     padding: 5px 10px 6px 7px; /* Links */
     /*clear: left;*/
-}
+/*}
 
 button{
     width:auto;
     overflow:visible;
     padding:4px 10px 3px 7px; /* IE6 */
-}
+/*}
 
 button[type]{
     padding:5px 10px 5px 7px; /* Firefox */
-    line-height:17px; /* Safari */
-}
+/*    line-height:17px; /* Safari */
+/*}
 *:first-child+html button[type]{
     padding:4px 10px 3px 7px; /* IE7 */
-}
+/*}
 
 button img, div.button img{
     margin:0 3px -3px 0 !important;
@@ -799,7 +548,7 @@ button img, div.button img{
     clear: both;
     float: left;
 }
-
+*/
 
 /******************
      Pagination
@@ -882,12 +631,6 @@ button img, div.button img{
     color: black;
 }
 
-.tag-list input[type="text"]
-{
-    margin-top: .5em;
-    width: 85%;
-}
-
 
 /*************************
     Episode Navigation
@@ -948,4 +691,20 @@ iframe.results
     top: -0.5em;
     color: red;
     text-transform: uppercase;
+}
+
+
+
+/*****************
+   Footer
+*******************/
+
+footer, footer a
+{
+    color: #777;
+}
+
+footer ul
+{
+    list-style-type: none;
 }

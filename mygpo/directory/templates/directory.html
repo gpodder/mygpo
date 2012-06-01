@@ -16,10 +16,14 @@
 {% block content %}
   <h1>{% trans "Podcast Directory" %}</h1>
 
-
   {% cache 3600 topics %}
   {% for c in topics %}
-   <div class="intro-box">
+
+   {% if forloop.counter|divisibleby:"3" %}
+    <div class="row-fluid">
+   {% endif %}
+
+   <div class="span3">
     {% if c.cls == "PodcastList" %}
      {% url lists-user c.username as user-lists-url %}
      <h2>{% blocktrans with c.title as listtitle and c.username as username %}{{ listtitle }} <span class="by-user">by <a href="{{ user-lists-url }}">{{ username }}</a></span>{% endblocktrans %}</h2>
@@ -54,16 +58,17 @@
     </table>
    </div>
 
-   {% if forloop.counter|divisibleby:"2" %}
-    <br style="clear: both" />
+   {% if forloop.counter|divisibleby:"3" %}
+    </div>
    {% endif %}
+
   {% endfor %}
   {% endcache %}
 
-  <hr />
+  <hr style="clear: both;"/>
 
   {% cache 3600 tagcloud %}
-  <div id="tagcloud">
+  <div id="span10">
    {% for tag in tag_cloud.entries %}
     <span style="font-size: {% smartwidthratio tag.weight tag_cloud.max_weight 4 1 %}em">
      <a href="{% url directory tag.label %}">{{ tag.label }}</a>
