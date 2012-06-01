@@ -11,11 +11,12 @@
 {% block content %}
   <h1>{% trans "Privacy Settings" %}</h1>
 
-  <p>{% blocktrans %}{{ domain }} distinguishes between public and private subscriptions.{% endblocktrans %}</p>
+  <p>{% blocktrans %}{{ domain }} distinguishes between public and private subscriptions.{% endblocktrans %}
   <ul>
-   <li>{% blocktrans %}<strong>Public</strong> subscriptions are not shown to anybody (unless you chose to <a href="/share/">share</a> them), but are included anonymized on our public statistics.{% endblocktrans %}</li>
+   <li>{% blocktrans %}<strong>Public</strong> subscriptions are included in your <a href="/share/">shared podcasts</a> them) and ouranonymized public statistics.{% endblocktrans %}</li>
    <li>{% blocktrans %}<strong>Private</strong> subscriptions do neither show up in your list of shared podcasts, nor are considered in our statistics.{% endblocktrans %}</li>
   </ul>
+  </p>
 
   <p>
    {% if public_subscriptions %}
@@ -34,13 +35,8 @@
   </p>
 
   {% if included_subscriptions %}
-    <h2>{% trans "Your Public Subscriptions" %}</h2>
+    <h2>{% trans "Public Subscriptions" %}</h2>
     <table class="list">
-     <tr>
-      <th></th>
-      <th>{% trans "Podcast" %}</th>
-      <th>{% trans "Make Private" %}</th>
-     </tr>
 
      {% for podcast in included_subscriptions %}
       <tr>
@@ -61,13 +57,8 @@
 
 
     {% if excluded_subscriptions %}
-     <h2>{% trans "Your Private Subscriptions" %}</h3>
+     <h2>{% trans "Private Subscriptions" %}</h3>
      <table class="list">
-      <tr>
-       <th></th>
-       <th>{% trans "Podcast" %}</th>
-       <th>{% trans "Make Public" %}</th>
-      </tr>
 
       {% for podcast in excluded_subscriptions %}
        <tr>
