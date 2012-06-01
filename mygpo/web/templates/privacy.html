@@ -46,7 +46,14 @@
       <tr>
        <td class="logo">{{ podcast|podcast_logo }}</td>
        <td>{% podcast_group_link podcast %}</td>
-       <td><a href="{% url privacy %}?exclude={{ podcast.get_id }}"><img src="/media/unsubscribe.png" alt="{% trans "Make Public" %}" /></a></td>
+       <td>
+        <form method="post" action="{% url privacy_podcast_private podcast.get_id %}">
+         {% csrf_token %}
+         <button type="submit">
+          <img src="/media/unsubscribe.png">{% trans "Make Private" %}
+         </button>
+        </form>
+       </td>
       </tr>
      {% endfor %}
     </table>
@@ -66,7 +73,13 @@
        <tr>
         <td class="logo">{{ podcast|podcast_logo }}</td>
         <td>{% podcast_group_link podcast %}</td>
-        <td><a href="{% url privacy %}?include={{ podcast.get_id }}"><img src="/media/edit-undo.png" alt="{% trans "Make Private" %}" /></a></td>
+        <td>
+        <form method="post" action="{% url privacy_podcast_public podcast.get_id %}">
+         {% csrf_token %}
+         <button type="submit">
+          <img src="/media/edit-undo.png">{% trans "Make Public" %}
+         </button>
+        </form>
        </tr>
       {% endfor %}
      </table>

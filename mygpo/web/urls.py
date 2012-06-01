@@ -71,13 +71,29 @@ urlpatterns += patterns('mygpo.web.views.episode',
  url(r'^episode/(?P<p_slug_id>[\w-]+)/(?P<e_slug_id>[\w-]+)/add-action',      'add_action_slug_id',      name='add-episode-action-slug-id'),
 )
 
-from mygpo.web.views.settings import DefaultPrivacySettings
+from mygpo.web.views.settings import DefaultPrivacySettings, \
+         PodcastPrivacySettings
 
 urlpatterns += patterns('mygpo.web.views.settings',
  url(r'^account/$',                                               'account',       name='account'),
  url(r'^account/privacy$',                                        'privacy',       name='privacy'),
- url(r'^account/privacy/default-public$',                         DefaultPrivacySettings.as_view(public=True),       name='privacy_default_public'),
- url(r'^account/privacy/default-private$',                        DefaultPrivacySettings.as_view(public=False),       name='privacy_default_private'),
+
+ url(r'^account/privacy/default-public$',
+     DefaultPrivacySettings.as_view(public=True),
+     name='privacy_default_public'),
+
+ url(r'^account/privacy/default-private$',
+     DefaultPrivacySettings.as_view(public=False),
+     name='privacy_default_private'),
+
+ url(r'^account/privacy/(?P<podcast_id>[\w]+)/public$',
+     PodcastPrivacySettings.as_view(public=True),
+     name='privacy_podcast_public'),
+
+ url(r'^account/privacy/(?P<podcast_id>[\w]+)/private$',
+     PodcastPrivacySettings.as_view(public=False),
+     name='privacy_podcast_private'),
+
  url(r'^account/delete$',                                         'delete_account',name='delete-account'),
  url(r'^share/$',                                                 'share',         name='share'),
 )

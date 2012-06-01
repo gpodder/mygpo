@@ -107,14 +107,35 @@ class DefaultPrivacySettings(View):
     @method_decorator(login_required)
     @method_decorator(never_cache)
     def post(self, request):
-        self.set_privacy_settings(user=request.user, is_public=self.public)
+        self.set_privacy_settings(user=request.user)
         messages.success(request, 'Success')
         return HttpResponseRedirect(reverse('privacy'))
 
     @repeat_on_conflict(['user'])
-    def set_privacy_settings(self, user, is_public):
-        user.settings['public_subscriptions'] = is_public
+    def set_privacy_settings(self, user):
+        user.settings['public_subscriptions'] = self.public
         user.save()
+
+
+class PodcastPrivacySettings(View):
+
+    public = True
+
+    @method_decorator(login_required)
+    @method_decorator(never_cache)
+    def post(self, request, podcast_id):
+        podcast = Podcast.get(podcast_id)
+        state = podcast.get_user_state(request.user)
+        self.set_privacy_settings(state=state)
+        messages.success(request, 'Success')
+        return HttpResponseRedirect(reverse('privacy'))
+
+    @repeat_on_conflict(['state'])
+    def set_privacy_settings(self, state):
+        state.settings['public_subscription'] = self.public
+        print state
+        state.save()
+
 
 
 @login_required
@@ -122,23 +143,6 @@ class DefaultPrivacySettings(View):
 def privacy(request):
 
     site = RequestSite(request)
-
-    @repeat_on_conflict(['state'])
-    def set_privacy_settings(state, is_public):
-        state.settings['public_subscriptions'] = is_public
-        state.save()
-
-    if 'exclude' in request.GET:
-        id = request.GET['exclude']
-        podcast = Podcast.get(id)
-        state = podcast.get_user_state(request.user)
-        set_privacy_settings(state=state, is_public=False)
-
-    if 'include' in request.GET:
-        id = request.GET['include']
-        podcast = Podcast.get(id)
-        state = podcast.get_user_state(request.user)
-        set_privacy_settings(state=state, is_public=True)
 
     subscriptions = request.user.get_subscriptions()
     podcasts = get_to_dict(Podcast, [x[1] for x in subscriptions], get_id=Podcast.get_id)
