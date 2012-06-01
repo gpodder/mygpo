@@ -18,11 +18,18 @@
   </ul>
 
   <p>
-   {% url privacy as privacy-url %}
    {% if public_subscriptions %}
-    {% blocktrans %}New subscriptions will be public by default. Change to <a href="{{ privacy-url }}?private_subscriptions">private</a>.{% endblocktrans %}
+    {% trans "New subscriptions will be public by default." %}
+    <form method="post" action="{% url privacy_default_private %}">
+     {% csrf_token %}
+     <button type="submit">{% trans "Change to private" %}</button>
+    </form>
    {% else %}
-    {% blocktrans %}New subscriptions will be private by default. Change to <a href="{{ privacy-url }}?public_subscriptions">public</a>.{% endblocktrans %}
+    {% trans "New subscriptions will be private by default." %}
+    <form method="post" action="{% url privacy_default_public %}">
+     {% csrf_token %}
+     <button type="submit">{% trans "Change to public " %}</button>
+    </form>
    {% endif %}
   </p>
 

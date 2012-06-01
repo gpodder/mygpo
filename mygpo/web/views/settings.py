@@ -16,6 +16,8 @@
 #
 
 from django.shortcuts import render
+from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
 from django.contrib.auth import logout
 from django.contrib import messages
 from django.forms import ValidationError
@@ -24,6 +26,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control
+from django.utils.decorators import method_decorator
+from django.views.generic.base import View
 
 from django_couchdb_utils.auth.models import UsernameException, PasswordException
 
@@ -95,9 +99,26 @@ def delete_account(request):
     return render(request, 'deleted_account.html')
 
 
+
+class DefaultPrivacySettings(View):
+
+    public = True
+
+    @method_decorator(login_required)
+    @method_decorator(never_cache)
+    def post(self, request):
+        self.set_privacy_settings(user=request.user, is_public=self.public)
+        messages.success(request, 'Success')
+        return HttpResponseRedirect(reverse('privacy'))
+
+    @repeat_on_conflict(['user'])
+    def set_privacy_settings(self, user, is_public):
+        user.settings['public_subscriptions'] = is_public
+        user.save()
+
+
 @login_required
 @never_cache
-@allowed_methods(['GET'])
 def privacy(request):
 
     site = RequestSite(request)
@@ -106,12 +127,6 @@ def privacy(request):
     def set_privacy_settings(state, is_public):
         state.settings['public_subscriptions'] = is_public
         state.save()
-
-    if 'private_subscriptions' in request.GET:
-        set_privacy_settings(state=request.user, is_public=False)
-
-    elif 'public_subscriptions' in request.GET:
-        set_privacy_settings(state=request.user, is_public=True)
 
     if 'exclude' in request.GET:
         id = request.GET['exclude']
