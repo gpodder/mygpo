@@ -9,12 +9,12 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        users = User.view('maintenance/deleted_users',
+        users = User.view('users/deleted',
                 include_docs = True,
                 reduce       = False,
             )
 
-        total = User.view('maintenance/deleted_users',
+        total = User.view('users/deleted',
                 reduce = True,
             )
 

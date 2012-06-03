@@ -22,7 +22,7 @@ class PodcastList(Document, RatingMixin):
     @classmethod
     def for_user_slug(cls, user_id, slug):
 
-        r = cls.view('share/lists_by_user_slug',
+        r = cls.view('podcastlists/by_user_slug',
                 key          = [user_id, slug],
                 include_docs = True,
             )
@@ -32,7 +32,7 @@ class PodcastList(Document, RatingMixin):
     @classmethod
     def for_user(cls, user_id):
 
-        r = cls.view('share/lists_by_user_slug',
+        r = cls.view('podcastlists/by_user_slug',
                 startkey = [user_id, None],
                 endkey   = [user_id, {}],
                 include_docs = True,
@@ -42,7 +42,7 @@ class PodcastList(Document, RatingMixin):
 
     @classmethod
     def by_rating(cls, **kwargs):
-        r = cls.view('share/lists_by_rating',
+        r = cls.view('podcastlists/by_rating',
                 descending   = True,
                 include_docs = True,
                 stale        = 'update_after',
@@ -53,8 +53,8 @@ class PodcastList(Document, RatingMixin):
 
     @classmethod
     def count(cls, with_rating=True):
-        view = 'share/lists_by_rating' if with_rating else \
-               'share/lists_by_user_slug'
+        view = 'podcastlists/by_rating' if with_rating else \
+               'podcastlists/by_user_slug'
 
         return cls.view(view,
                 limit = 0,

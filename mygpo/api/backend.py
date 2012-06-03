@@ -62,7 +62,7 @@ def get_podcast_count_for_language():
     counts = defaultdict(int)
 
     db = Podcast.get_db()
-    r = db.view('core/podcasts_by_language',
+    r = db.view('podcasts/by_language',
         reduce = True,
         group_level = 1,
         stale       = 'update_after',
@@ -115,7 +115,7 @@ def get_device(user, uid, user_agent, undelete=True):
 
 
 def get_favorites(user):
-    favorites = Episode.view('users/favorite_episodes_by_user',
+    favorites = Episode.view('favorites/episodes_by_user',
             key          = user._id,
             include_docs = True,
         )

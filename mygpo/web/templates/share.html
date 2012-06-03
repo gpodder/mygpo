@@ -36,7 +36,7 @@
   {% url share as share-url %}
   {% if token %}
    <p>{% blocktrans %}Only those who know the exact link above can see your subscriptions, but you can <a href="{{ share-url }}?public_subscriptions">make it public</a> so everyone can see it.{% endblocktrans %}</p>
-   <p>{% blocktrans %}If you gave your link to the wrong people, you can <a href="{{ share-url }}?private_subscriptions">create a new one</a> - the old one will get invalid then.{% endblocktrans %}</p>
+   <p>{% blocktrans %}If you gave your link to the wrong people, you can <a href="{{ share-url }}?private_subscriptions">create a new one</a> - the old one will then be invalidated.{% endblocktrans %}</p>
 
   {% else %}
 
