@@ -26,131 +26,147 @@
 {% block title %}{{ podcast.title|default:"Unnamed Podcast"|striptags }}{% endblock %}
 
 {% block content %}
- {% if podcast.logo_url %}
-  <div id="podcastlogo">{{ podcast|podcast_logo_big }}</div>
- {% endif %}
 
- <h1>{% if podcast.title %}{{ podcast.title|striptags }}{% else %}{% trans "Unnamed Podcast" %}{%endif%}</h1>
- <small class="description">
-      {% trans "links" %}:
-      <a href="{{podcast.url}}">{% trans "feed" %}</a>{% if podcast.link %}, <a href="{{podcast.link}}">{% trans "website" %}</a>
-      {% endif %},
-      {% trans "stats:" %} {% blocktrans with podcast.subscriber_count as subscriber_count and podcast.listener_count as listener_count %}{{subscriber_count}} subscribers, {{listener_count}} listeners{% endblocktrans %}
- </small>
+ <div class="row-fluid">
 
-  <!--hr style="clear: none;"/-->
+  <span class="span12">
 
- {% if related_podcasts %}
-  <div class="related-podcasts">
-   <strong>{% trans "Also available" %}</strong>
-   {% for p in related_podcasts %}
-    {% podcast_group_link p p.group_member_name %}
-   {% endfor %}
-  </div>
- {% endif %}
+   {% if podcast.logo_url %}
+    <div id="podcastlogo">{{ podcast|podcast_logo_big }}</div>
+   {% endif %}
 
- {% if podcast.description %}
-  <p class="description">{{ podcast.description|striptags }}</p>
- {% endif %}
+   <h1>
+    {% if podcast.title %}
+     {{ podcast.title|striptags }}
+    {% else %}
+     {% trans "Unnamed Podcast" %}
+    {%endif%}
+   </h1>
 
+   <small class="description">
+    {% trans "links" %}:
+    <a href="{{podcast.url}}">
+     {% trans "feed" %}
+    </a>
+    {% if podcast.link %},
+     <a href="{{podcast.link}}">{% trans "website" %}</a>
+    {% endif %},
+    {% trans "stats:" %} {% blocktrans with podcast.subscriber_count as subscriber_count and podcast.listener_count as listener_count %}{{subscriber_count}} subscribers, {{listener_count}} listeners{% endblocktrans %}
+   </small>
 
-
-
- <div class="row">
-
-  <div class="span3">
-
-    <h2>{% trans "Subscriptions" %}</h2>
-
-    {% if not user.is_authenticated %}
-     <div class="subscribe"><a href="{% podcast_link_target podcast "subscribe" %}"><img src="/media/subscribe.png" style="vertical-align: middle;" alt=""/> {% trans "Subscribe to this podcast" %}</a></div>
-    {% endif %}
-
-    {% if devices or can_subscribe %}
-     <table class="list">
-       {% for device in devices %}
-        <tr>
-         <td>
-          {{ device|device_icon }}
-          <a href="{% url device device.uid %}">{{ device.name|striptags }}</a>
-         </td>
-         <td style="text-align: center;">
-          <form class="form-inline" method="post" action="{% podcast_link_target podcast "unsubscribe" device.uid %}?return_to={% podcast_link_target podcast %}">
-           <button class="btn btn-danger icon-remove" type="submit">
-           </button>
-          </form>
-         </td>
-        </tr>
-       {% endfor %}
-       {% if can_subscribe %}
-        <tr>
-         <form action="{% podcast_link_target podcast "subscribe" %}" method="post">
-          {% csrf_token %}
-          <td>{{ subscribe_form.as_p }}</td>
-          <td style="text-align: center;">
-           <button class="btn btn-success icon-ok" type="submit">
-           </button>
-          </td>
-         </form>
-        </tr>
-       {% endif %}
-      </table>
-    {% endif %}
-   </div>
-
-   <div class="span3">
-     <h2>Tags</h2>
-
-     <div class="tag-list">
-     {% for tag in tags %}{% spaceless %}
-       {% if tag.is_own %}
-        <span class="own">{{ tag.tag }} <a class="remove" href="{% podcast_link_target podcast "remove-tag" %}?tag={{ tag.tag }}">X</a></span>
-       {% else %}
-        <span class="other">{{ tag.tag }}</span>
-       {% endif %}
-       {% if not forloop.last %}<span class="seperator">,</span>{% endif %}
-      {% endspaceless %}
+   {% if related_podcasts %}
+    <div class="related-podcasts">
+     <strong>{% trans "Also available" %}</strong>
+     {% for p in related_podcasts %}
+      {% podcast_group_link p p.group_member_name %}
      {% endfor %}
-     {% if user.is_authenticated %}
-      <form class="form-inline" action="{% podcast_link_target podcast "add-tag" %}">
-       <div class="input-prepend">
-        <span class="add-on"><i class="icon-tag"></i></span><input class="" type="text" name="tag" />
-       </div>
-       <button class="btn btn-success icon-plus" type="submit">
-       </button>
-      </form>
-     {% endif %}
     </div>
-   </div>
+   {% endif %}
 
-   <div class="span3">
-    <h2>{% trans "Share" %}</h2>
-    <div>
-     {% google_plus_one_button %}
-     {{ podcast|fb_like_podcast }}
+   {% if podcast.description %}
+    <p class="description">{{ podcast.description|striptags }}</p>
+   {% endif %}
 
-     {% if user.is_authenticated and devices %}
-     {% if is_public %}
-       <form action="{% podcast_link_target podcast "podcast-private" %}" method="POST">
+  </div>
+ </div>
+
+
+ <div class="row-fluid">
+
+
+  <div class="span4">
+   <h2>{% trans "Subscriptions" %}</h2>
+   {% if not user.is_authenticated %}
+    <div class="subscribe">
+     <a href="{% podcast_link_target podcast "subscribe" %}">
+      <img src="/media/subscribe.png" style="vertical-align: middle;" alt=""/>
+      {% trans "Subscribe to this podcast" %}
+     </a>
+    </div>
+   {% endif %}
+
+   {% if devices or can_subscribe %}
+    <table class="list">
+      {% for device in devices %}
+       <tr>
+        <td>
+         {{ device|device_icon }}
+         <a href="{% url device device.uid %}">{{ device.name|striptags }}</a>
+        </td>
+        <td style="text-align: center;">
+         <form class="form-inline" method="post" action="{% podcast_link_target podcast "unsubscribe" device.uid %}?return_to={% podcast_link_target podcast %}">
+          <button class="btn btn-danger icon-remove" type="submit">
+          </button>
+         </form>
+        </td>
+       </tr>
+      {% endfor %}
+      {% if can_subscribe %}
+       <tr>
+        <form action="{% podcast_link_target podcast "subscribe" %}" method="post">
          {% csrf_token %}
-         <button type="submit" class="btn icon-eye-open" name="public">
-           {% trans "Public. Make Private" %}
-         </button>
-       </form>
+         <td>{{ subscribe_form.as_p }}</td>
+         <td style="text-align: center;">
+          <button class="btn btn-success icon-ok" type="submit">
+          </button>
+         </td>
+        </form>
+       </tr>
+      {% endif %}
+     </table>
+   {% endif %}
+  </div>
 
+  <div class="span4">
+   <h2>Tags</h2>
+
+   {% for tag in tags %}
+    {% spaceless %}
+     {% if tag.is_own %}
+      <span class="own">{{ tag.tag }} <a class="remove" href="{% podcast_link_target podcast "remove-tag" %}?tag={{ tag.tag }}">X</a></span>
      {% else %}
-       <form action="{% podcast_link_target podcast "podcast-public" %}" method="POST">
-         {% csrf_token %}
-         <button type="submit" class="btn icon-eye-close" name="private">
-           {% trans "Private. Make Public" %}
-         </button>
-       </form>
-
+       <span class="other">{{ tag.tag }}</span>
      {% endif %}
+     {% if not forloop.last %}
+      <span class="seperator">,</span>
      {% endif %}
-    </div>
-   </div>
+    {% endspaceless %}
+   {% endfor %}
 
+   {% if user.is_authenticated %}
+    <form class="form-inline" action="{% podcast_link_target podcast "add-tag" %}">
+     <div class="input-prepend">
+      <span class="add-on"><i class="icon-tag"></i></span><input class="input-small" type="text" name="tag" />
+     </div>
+     <button class="btn btn-success icon-plus" type="submit"></button>
+    </form>
+   {% endif %}
+  </div>
+
+  <div class="span4">
+   <h2>{% trans "Share" %}</h2>
+   {% google_plus_one_button %}
+   {{ podcast|fb_like_podcast }}
+
+   {% if user.is_authenticated and devices %}
+    {% if is_public %}
+     <form action="{% podcast_link_target podcast "podcast-private" %}" method="POST">
+      {% csrf_token %}
+      <button type="submit" class="btn icon-eye-open" name="public">
+       {% trans "Public. Make Private" %}
+      </button>
+     </form>
+
+    {% else %}
+     <form action="{% podcast_link_target podcast "podcast-public" %}" method="POST">
+      {% csrf_token %}
+      <button type="submit" class="btn icon-eye-close" name="private">
+       {% trans "Private. Make Public" %}
+      </button>
+     </form>
+
+    {% endif %}
+   {% endif %}
   </div>
 
 

@@ -582,6 +582,7 @@ button img, div.button img{
     padding-right: 2em;
 }
 
+/*
 .podcast-state
 {
     clear: both;
@@ -605,7 +606,8 @@ button img, div.button img{
     margin-bottom: -2000px;
     padding-bottom: 2000px;
 }
-
+*/
+/*
 .podcast-state > div.tags > div,
 .podcast-state > div.share > div
 {
@@ -614,6 +616,8 @@ button img, div.button img{
     padding-right: 2%;
     width: 96% !important;
 }
+
+*/
 
 .tag-list span.other
 {
