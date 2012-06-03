@@ -52,7 +52,7 @@ class PodcastCommand(BaseCommand):
 
     def get_podcast_with_new_episodes(self):
         db = Podcast.get_db()
-        res = db.view('maintenance/episodes_need_update',
+        res = db.view('episodes/need_update',
                 group_level = 1,
                 reduce      = True,
             )

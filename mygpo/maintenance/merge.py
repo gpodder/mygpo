@@ -53,7 +53,7 @@ def merge_objects(podcasts=True, podcast_states=False, episodes=False,
 
         print 'Merging Podcasts by URL'
         podcasts, total = get_view_count_iter(Podcast,
-                'core/podcasts_by_url',
+                'podcasts/by_url',
                 wrap = False,
                 include_docs=True)
         podcasts = imap(podcast_url_wrapper, podcasts)
@@ -64,7 +64,7 @@ def merge_objects(podcasts=True, podcast_states=False, episodes=False,
 
         print 'Merging Podcasts by Old-Id'
         podcasts, total = get_view_count_iter(Podcast,
-                'core/podcasts_by_oldid',
+                'podcasts/by_oldid',
                 wrap = False,
                 include_docs=True)
         podcasts = imap(podcast_oldid_wrapper, podcasts)
@@ -76,7 +76,7 @@ def merge_objects(podcasts=True, podcast_states=False, episodes=False,
     if podcast_states:
         print 'Merging Duplicate Podcast States'
         states, total = get_view_count_iter(PodcastUserState,
-                'users/podcast_states_by_user',
+                'podcast_states/by_user',
                 include_docs=True)
         should_merge = lambda a, b: a == b
         merger(states, should_merge, no_merge_order, total,
@@ -87,7 +87,7 @@ def merge_objects(podcasts=True, podcast_states=False, episodes=False,
     if episodes:
         print 'Merging Episodes by URL'
         episodes, total = get_view_count_iter(Episode,
-                'core/episodes_by_podcast_url',
+                'episodes/by_podcast_url',
                 include_docs=True)
         should_merge = lambda a, b: a.podcast == b.podcast and \
                 similar_urls(a, b)
@@ -97,7 +97,7 @@ def merge_objects(podcasts=True, podcast_states=False, episodes=False,
 
         print 'Merging Episodes by Old-Id'
         episodes, total = get_view_count_iter(Episode,
-                'core/episodes_by_oldid',
+                'episodes/by_oldid',
                 include_docs=True)
         should_merge = lambda a, b: a.podcast == b.podcast and \
                 similar_oldid(a, b)
@@ -108,7 +108,7 @@ def merge_objects(podcasts=True, podcast_states=False, episodes=False,
     if episode_states:
         print 'Merging Duplicate Episode States'
         states, total = get_view_count_iter(EpisodeUserState,
-                'users/episode_states_by_user_episode',
+                'episode_states/by_user_episode',
                 include_docs=True)
         should_merge = lambda a, b: (a.user, a.episode) == \
                                     (b.user, b.episode)
