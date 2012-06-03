@@ -29,7 +29,7 @@ class Category(Document):
 
     @classmethod
     def for_tag(cls, tag):
-        r = cls.view('directory/categories_by_tags',
+        r = cls.view('categories/by_tags',
                 key          = tag,
                 include_docs = True,
                 stale        = 'update_after',
@@ -38,10 +38,10 @@ class Category(Document):
 
     @classmethod
     def top_categories(cls, count):
-        return cls.view('directory/categories',
+        return cls.view('categories/by_weight',
                 descending   = True,
                 limit        = count,
-                include_docs =True,
+                include_docs = True,
                 stale        = 'update_after',
             )
 
