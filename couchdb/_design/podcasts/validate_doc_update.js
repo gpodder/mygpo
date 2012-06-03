@@ -50,28 +50,8 @@ function(newDoc, oldDoc, userCtx)
             checkPodcast(podcast);
         }
     }
-    else if(newDoc.doc_type == "PodcastUserState")
-    {
-        require(newDoc, "podcast");
-
-        for(i in newDoc.episodes)
-        {
-            episode = newDoc.episodes[i];
-            require(episode, "episode");
-            for(j in episode.actions)
-            {
-                require(episode.actions[j], "action");
-                require(episode.actions[j], "timestamp");
-            }
-        }
-    }
     else if(newDoc.doc_type == "Podcast")
     {
         checkPodcast(newDoc);
-    }
-    else if(newDoc.doc_type == "Episode")
-    {
-        require(newDoc, "urls");
-        require(newDoc, "podcast");
     }
 }

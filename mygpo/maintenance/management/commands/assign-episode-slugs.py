@@ -117,7 +117,7 @@ class Command(BaseCommand):
 
         while True:
             resp = consumer.wait_once(since=since, limit=limit, timeout=timeout,
-                   include_docs=True, filter='maintenance/slug_objects')
+                   include_docs=True, filter='slugs/slug_objects')
             results = resp['results']
 
             if not results:
