@@ -23,7 +23,7 @@ class Command(BaseCommand):
         max_related = options.get('max')
 
         podcasts = Podcast.all_podcasts()
-        total = Podcast.view('core/podcasts_by_id', limit=0).total_rows
+        total = Podcast.view('podcasts/by_id', limit=0).total_rows
 
         for (n, podcast) in enumerate(podcasts):
 

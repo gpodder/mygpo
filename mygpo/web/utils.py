@@ -23,7 +23,7 @@ def get_podcast_languages():
     of these codes is contained in ISO 639.
     """
 
-    res = Podcast.view('core/podcasts_by_language',
+    res = Podcast.view('podcasts/by_language',
             group_level = 1,
             stale       = 'ok',
         )
