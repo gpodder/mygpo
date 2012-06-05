@@ -22,7 +22,7 @@ from django.test import TestCase
 
 from mygpo.core.models import Podcast, Episode
 from mygpo.users.models import EpisodeAction, User
-from mygpo.maintenance.merge import merge_podcasts
+from mygpo.maintenance.merge import PodcastMerger
 
 
 class MergeTests(TestCase):
@@ -61,7 +61,8 @@ class MergeTests(TestCase):
         state1.save()
         state2.save()
 
-        merge_podcasts(self.podcast1, self.podcast2)
+        pm = PodcastMerger([self.podcast1, self.podcast2])
+        pm.merge()
 
         state1 = self.episode1.get_user_state(self.user)
         state2 = self.episode2.get_user_state(self.user)
