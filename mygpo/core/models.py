@@ -58,7 +58,7 @@ class Episode(Document, SlugMixin, OldIdMixin):
 
     @classmethod
     def get(cls, id, current_id=False):
-        r = cls.view('core/episodes_by_id',
+        r = cls.view('episodes/by_id',
                 key=id,
                 include_docs=True,
             )
@@ -75,7 +75,7 @@ class Episode(Document, SlugMixin, OldIdMixin):
 
     @classmethod
     def get_multi(cls, ids):
-        return cls.view('core/episodes_by_id',
+        return cls.view('episodes/by_id',
                 include_docs=True,
                 keys=ids
             )
@@ -84,13 +84,13 @@ class Episode(Document, SlugMixin, OldIdMixin):
     @classmethod
     def for_oldid(self, oldid):
         oldid = int(oldid)
-        r = Episode.view('core/episodes_by_oldid', key=oldid, limit=1, include_docs=True)
+        r = Episode.view('episodes/by_oldid', key=oldid, limit=1, include_docs=True)
         return r.one() if r else None
 
 
     @classmethod
     def for_slug(cls, podcast_id, slug):
-        r = cls.view('core/episodes_by_slug',
+        r = cls.view('episodes/by_slug',
                 key          = [podcast_id, slug],
                 include_docs = True
             )
@@ -105,7 +105,7 @@ class Episode(Document, SlugMixin, OldIdMixin):
 
     @classmethod
     def for_podcast_id_url(cls, podcast_id, episode_url, create=False):
-        r = cls.view('core/episodes_by_podcast_url',
+        r = cls.view('episodes/by_podcast_url',
                 key          = [podcast_id, episode_url],
                 include_docs = True,
                 reduce       = False,
@@ -153,7 +153,7 @@ class Episode(Document, SlugMixin, OldIdMixin):
 
     def get_all_states(self):
         from mygpo.users.models import EpisodeUserState
-        r =  EpisodeUserState.view('users/episode_states_by_podcast_episode',
+        r =  EpisodeUserState.view('episode_states/by_podcast_episode',
             startkey = [self.podcast, self._id, None],
             endkey   = [self.podcast, self._id, {}],
             include_docs=True)
@@ -172,7 +172,7 @@ class Episode(Document, SlugMixin, OldIdMixin):
         """ returns the number of users that have listened to this episode """
 
         from mygpo.users.models import EpisodeUserState
-        r = EpisodeUserState.view('users/listeners_by_episode',
+        r = EpisodeUserState.view('listeners/by_episode',
                 startkey    = [self._id, start],
                 endkey      = [self._id, end],
                 reduce      = True,
@@ -192,7 +192,7 @@ class Episode(Document, SlugMixin, OldIdMixin):
             end = end.isoformat()
 
         from mygpo.users.models import EpisodeUserState
-        r = EpisodeUserState.view('users/listeners_by_episode',
+        r = EpisodeUserState.view('listeners/by_episode',
                 startkey    = [self._id, start],
                 endkey      = [self._id, end],
                 reduce      = True,
@@ -233,7 +233,7 @@ class Episode(Document, SlugMixin, OldIdMixin):
 
     @classmethod
     def count(cls):
-        r = cls.view('core/episodes_by_podcast',
+        r = cls.view('episodes/by_podcast',
                 reduce = True,
                 stale  = 'update_after',
             )
@@ -242,7 +242,7 @@ class Episode(Document, SlugMixin, OldIdMixin):
 
     @classmethod
     def all(cls):
-        return utils.multi_request_view(cls, 'core/episodes_by_podcast',
+        return utils.multi_request_view(cls, 'episodes/by_podcast',
                 reduce       = False,
                 include_docs = True,
                 stale        = 'update_after',
@@ -286,7 +286,7 @@ class PodcastSubscriberData(Document):
 
     @classmethod
     def for_podcast(cls, id):
-        r = cls.view('core/subscribers_by_podcast', key=id, include_docs=True)
+        r = cls.view('podcasts/subscriber_data', key=id, include_docs=True)
         if r:
             return r.first()
 
@@ -326,7 +326,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
     @classmethod
     def get(cls, id, current_id=False):
-        r = cls.view('core/podcasts_by_id',
+        r = cls.view('podcasts/by_id',
                 key=id,
                 classes=[Podcast, PodcastGroup],
                 include_docs=True,
@@ -342,7 +342,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
     @classmethod
     def for_slug(cls, slug):
         db = cls.get_db()
-        r = db.view('core/podcasts_by_slug',
+        r = db.view('podcasts/by_slug',
                 startkey     = [slug, None],
                 endkey       = [slug, {}],
                 include_docs = True,
@@ -374,7 +374,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
     @classmethod
     def get_multi(cls, ids):
         db = Podcast.get_db()
-        r = db.view('core/podcasts_by_id',
+        r = db.view('podcasts/by_id',
                 keys=ids,
                 include_docs=True,
             )
@@ -391,7 +391,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
     @classmethod
     def for_oldid(cls, oldid):
         oldid = int(oldid)
-        r = cls.view('core/podcasts_by_oldid',
+        r = cls.view('podcasts/by_oldid',
                 key=long(oldid),
                 classes=[Podcast, PodcastGroup],
                 include_docs=True
@@ -406,7 +406,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
     @classmethod
     def for_url(cls, url, create=False):
-        r = cls.view('core/podcasts_by_url',
+        r = cls.view('podcasts/by_url',
                 key=url,
                 classes=[Podcast, PodcastGroup],
                 include_docs=True
@@ -436,7 +436,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
         while True:
             n = randint(0, total)
-            res = db.view('core/podcasts_by_id',
+            res = db.view('podcasts/by_id',
                     skip         = n,
                     include_docs = True,
                     limit        = 1,
@@ -461,7 +461,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
     @classmethod
     def by_last_update(cls):
         db = cls.get_db()
-        res = db.view('maintenance/podcasts_by_last_update',
+        res = db.view('podcasts/by_last_update',
                 include_docs = True,
                 stale        = 'update_after',
             )
@@ -482,7 +482,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
     def for_language(cls, language, **kwargs):
         db = cls.get_db()
 
-        res = db.view('core/podcasts_by_language',
+        res = db.view('podcasts/by_language',
                 startkey     = [language, None],
                 endkey       = [language, {}],
                 include_docs = True,
@@ -505,7 +505,8 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
     @classmethod
     def count(cls):
-        r = cls.view('core/podcasts_by_id',
+        # TODO: fix number calculation
+        r = cls.view('podcasts/by_id',
                 limit = 0,
                 stale = 'update_after',
             )
@@ -574,7 +575,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         if isinstance(until, datetime):
             until = until.isoformat()
 
-        res = Episode.view('core/episodes_by_podcast',
+        res = Episode.view('episodes/by_podcast',
                 startkey     = [self.get_id(), since],
                 endkey       = [self.get_id(), until],
                 include_docs = True,
@@ -596,7 +597,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         if isinstance(until, datetime):
             until = until.isoformat()
 
-        res = Episode.view('core/episodes_by_podcast',
+        res = Episode.view('episodes/by_podcast',
                 startkey     = [self.get_id(), since],
                 endkey       = [self.get_id(), until],
                 reduce       = True,
@@ -702,7 +703,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
     def get_all_states(self):
         from mygpo.users.models import PodcastUserState
-        return PodcastUserState.view('users/podcast_states_by_podcast',
+        return PodcastUserState.view('podcast_states/by_podcast',
             startkey = [self.get_id(), None],
             endkey   = [self.get_id(), {}],
             include_docs=True)
@@ -763,7 +764,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         """ returns the number of users that have listened to this podcast """
 
         from mygpo.users.models import EpisodeUserState
-        r = EpisodeUserState.view('users/listeners_by_podcast',
+        r = EpisodeUserState.view('listeners/by_podcast',
                 startkey    = [self.get_id(), None],
                 endkey      = [self.get_id(), {}],
                 group       = True,
@@ -783,7 +784,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
             end = end.isoformat()
 
         from mygpo.users.models import EpisodeUserState
-        r = EpisodeUserState.view('users/listeners_by_podcast',
+        r = EpisodeUserState.view('listeners/by_podcast',
                 startkey    = [self.get_id(), start],
                 endkey      = [self.get_id(), end],
                 group       = True,
@@ -801,7 +802,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         """ (Episode-Id, listener-count) tuples for episodes w/ listeners """
 
         from mygpo.users.models import EpisodeUserState
-        r = EpisodeUserState.view('users/listeners_by_podcast_episode',
+        r = EpisodeUserState.view('listeners/by_podcast_episode',
                 startkey    = [self.get_id(), None, None],
                 endkey      = [self.get_id(), {},   {}],
                 group       = True,
@@ -821,7 +822,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         from mygpo.users.models import EpisodeUserState
         db = EpisodeUserState.get_db()
 
-        res = db.view('users/episode_states',
+        res = db.view('episode_states/by_user_podcast',
                 startkey= [user_id, self.get_id(), None],
                 endkey  = [user_id, self.get_id(), {}]
             )
@@ -886,7 +887,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
     @classmethod
     def all_podcasts_groups(cls):
-        return cls.view('core/podcasts_groups', include_docs=True,
+        return cls.view('podcasts/podcasts_groups', include_docs=True,
             classes=[Podcast, PodcastGroup]).iterator()
 
 
@@ -902,7 +903,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
     @classmethod
     def all_podcasts(cls):
-        res = utils.multi_request_view(cls, 'core/podcasts_by_id',
+        res = utils.multi_request_view(cls, 'podcasts/by_id',
                 wrap         = False,
                 include_docs = True,
                 stale        = 'update_after',
@@ -930,7 +931,7 @@ class PodcastGroup(Document, SlugMixin, OldIdMixin):
     @classmethod
     def for_oldid(cls, oldid):
         oldid = int(oldid)
-        r = cls.view('core/podcastgroups_by_oldid', \
+        r = cls.view('podcasts/groups_by_oldid', \
             key=oldid, limit=1, include_docs=True)
         return r.first() if r else None
 
@@ -1046,7 +1047,7 @@ class SanitizingRule(Document):
 
     @classmethod
     def for_obj_type(cls, obj_type):
-        r = cls.view('core/sanitizing_rules_by_target', include_docs=True,
+        r = cls.view('sanitizing_rules/by_target', include_docs=True,
             startkey=[obj_type, None], endkey=[obj_type, {}])
 
         for rule in r:
@@ -1062,7 +1063,7 @@ class SanitizingRule(Document):
 
     @classmethod
     def for_slug(cls, slug):
-        r = cls.view('core/sanitizing_rules_by_slug', include_docs=True,
+        r = cls.view('sanitizing_rules/by_slug', include_docs=True,
             key=slug)
         return r.one() if r else None
 

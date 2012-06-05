@@ -41,7 +41,7 @@ class Command(ChangesCommand):
 
 
     def get_query_params(self):
-        return dict(include_docs=True, filter='directory/has_play_events')
+        return dict(include_docs=True, filter='episode_states/has_play_events')
 
 
     def get_db(self):
