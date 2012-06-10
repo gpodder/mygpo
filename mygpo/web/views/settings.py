@@ -104,7 +104,7 @@ def privacy(request):
 
     @repeat_on_conflict(['state'])
     def set_privacy_settings(state, is_public):
-        state.settings['public_subscriptions'] = is_public
+        state.settings['public_subscription'] = is_public
         state.save()
 
     if 'private_subscriptions' in request.GET:
