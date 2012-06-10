@@ -34,20 +34,28 @@
      </form>
     </td>
    </tr>
+  {% empty %}
+   <tr>
+    <td colspan="3">
+     {% trans "No Suggestions Yet" %}
+    </td>
+   </tr>
   {% endfor %}
   </table>
 
+ {% if entries %}
   <div class="rate">
    <strong>{% trans "Do you like our suggestions?" %}</strong>
    <form class="form-inline" action="{% url suggestions-rate %}?rate=1" method="post" class="rate">
     {% csrf_token %}
-    <button class="btn btn-success icon-ok" type="submit"> {% trans "Yes" %}</button>
+    <button class="btn btn-success icon-thumbs-up" type="submit"> {% trans "Yes" %}</button>
    </form>
    <form class="form-inline" action="{% url suggestions-rate %}?rate=-1" method="post" class="rate">
     {% csrf_token %}
-    <button class="btn btn-danger icon-remove" type="submit"> {% trans "No" %}</button>
+    <button class="btn btn-danger icon-thumbs-down" type="submit"> {% trans "No" %}</button>
    </form>
   </div>
+ {% endif %}
 
   <div class="info"><strong>Get your suggestions on your Client</strong>! Access <a href="{% url suggestions-opml 15 "opml" %}">http://{{ url }}{% url suggestions-opml 15 "opml" %}</a> to get 15 of our recommended podcasts.</div>
 {% endblock %}
