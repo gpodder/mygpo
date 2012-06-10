@@ -23,13 +23,17 @@
     {% trans "New subscriptions will be public by default." %}
     <form method="post" action="{% url privacy_default_private %}">
      {% csrf_token %}
-     <button type="submit">{% trans "Change to private" %}</button>
+     <button class="btn btn-warning icon-eye-close" type="submit">
+      {% trans "Change to Private" %}
+     </button>
     </form>
    {% else %}
     {% trans "New subscriptions will be private by default." %}
     <form method="post" action="{% url privacy_default_public %}">
      {% csrf_token %}
-     <button type="submit">{% trans "Change to public " %}</button>
+     <button class="btn btn-warning icon-eye-open" type="submit">
+      {% trans "Change to Public" %}
+     </button>
     </form>
    {% endif %}
   </p>
@@ -45,8 +49,8 @@
        <td>
         <form method="post" action="{% url privacy_podcast_private podcast.get_id %}">
          {% csrf_token %}
-         <button type="submit">
-          <img src="/media/unsubscribe.png">{% trans "Make Private" %}
+         <button class="btn btn-danger icon-eye-close" type="submit">
+          {% trans "Make Private" %}
          </button>
         </form>
        </td>
@@ -67,8 +71,8 @@
         <td>
         <form method="post" action="{% url privacy_podcast_public podcast.get_id %}">
          {% csrf_token %}
-         <button type="submit">
-          <img src="/media/edit-undo.png">{% trans "Make Public" %}
+         <button class="btn btn-warning icon-eye-open" type="submit">
+          {% trans "Make Public" %}
          </button>
         </form>
        </tr>
