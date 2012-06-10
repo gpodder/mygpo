@@ -5,10 +5,10 @@
 {% block mainmenu %}{{ "/account/"|main_menu }}{% endblock %}
 {% block sectionmenu %}{{ "/account/"|section_menu }}{% endblock %}
 
-{% block title %}{% trans "Account settings" %}{% endblock %}
+{% block title %}{% trans "Account Settings" %}{% endblock %}
 
 {% block content %}
-  <h1>{% trans "Account settings" %}</h1>
+  <h1>{% trans "Account Settings" %}</h1>
 
   <form action="{% url account %}" method="POST" class="well form-horizontal">
    {% csrf_token %}
@@ -46,7 +46,7 @@
 
     <div class="control-group">
      <div class="controls">
-      <button type="submit">{% trans "Save" %}</button>
+      <button class="btn btn-primary" type="submit">{% trans "Save" %}</button>
      </div>
     </div>
 
