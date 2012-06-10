@@ -13,15 +13,15 @@
 {% block content %}
 <h2>{% trans "Search" %}</h2>
 
-<form method="get" action="{% url search %}" class="search">
- <input type="text" name="q" {% if q %}value="{{ q }}"{% endif %} >
- <input type="submit" value="Search">
+<form class="form-inline" method="get" action="{% url search %}" class="search">
+ <div class="input-prepend">
+  <span class="add-on"><i class="icon-search"></i></span><input class="input-xlarge" type="text" name="q" {% if q %}value="{{ q }}"{% endif %} >
+ </div>
+ <input class="btn btn-primary" type="submit" value="Search">
 </form>
 
  {% if q %}
   {% if results %}
-   <h3>{% trans "Results" %}</h3>
-
    <table class="list">
     <tr>
      <th></th>
