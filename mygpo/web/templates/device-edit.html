@@ -23,46 +23,69 @@
 
   <h2>{% trans "Edit" %}</h2>
 
-  <div class="form">
+  <div class="well">
+   <form class="form-horizontal" action="{% url device-update device.uid %}" method="POST">
 
-   <form action="{% url device-update device.uid %}" method="POST">
     {{ device_form.non_field_errors }}
     {% csrf_token %}
 
-    <label>Name</label>
-    {{ device_form.name }}
+    <fieldset>
 
-    <label>Type</label>
-    {{ device_form.type }}
+    <div class="control-group">
+     <label class="control-label">Name</label>
+     <div class="controls">
+      {{ device_form.name }}
+     </div>
+    </div>
 
-    <label>Device-ID
-     <span class="small">use the same in your client</span>
-    </label>
-    {{ device_form.uid }}
+    <div class="control-group">
+     <label class="control-label">Type</label>
+     <div class="controls">
+      {{ device_form.type }}
+     </div>
+    </div>
 
-    <button type="submit">{% trans "Save" %}</button>
-  </div>
+    <div class="control-group">
+     <label class="control-label">Device-ID
+      <span class="small">use the same in your client</span>
+     </label>
+     <div class="controls">
+      {{ device_form.uid }}
+     </div>
+    </div>
+
+    <div class="control-group">
+     <div class="controls">
+      <button class="btn btn-primary" type="submit">{% trans "Save" %}</button>
+     </div>
+    </div>
+   </fieldset>
+  </form>
+ </div>
 
   <h2>{% trans "Replace Subscriptions" %}</h2>
 
-  <div class="form">
-   <form method="post" action="{% url device-upload-opml device.uid %}" enctype="multipart/form-data">
+   <div class="well">
+   <form class="form-inline" method="post" action="{% url device-upload-opml device.uid %}" enctype="multipart/form-data">
     <p>{% trans "Replace your current subscriptions by uploading an OPML file." %}</p>
     {% csrf_token %}
 
     <label>OPML-File</label>
     <input type="file" name="opml" id="opml" />
 
-    <button type="submit">{% trans "Upload" %}</button>
+    <button class="btn" type="submit">{% trans "Upload" %}</button>
    </form>
   </div>
 
   <h2>{% trans "Delete" %}</h2>
+  <div class="well">
   <form action="{% url device-delete device.uid %}" method="POST">
    {% csrf_token %}
-   <button type="submit">{% trans "Delete this device" %}</button>
+   <button class="btn btn-danger icon-trash" type="submit">
+    {% trans "Delete Device" %}
+   </button>
   </form>
-  <br />
+  </div>
   {% endif %}
 
 {% endblock %}

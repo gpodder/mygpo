@@ -16,6 +16,8 @@
 
   {% if device.deleted %}<div class="info">{% trans "This device was deleted." %}</div>{% endif %}
 
+
+  <div class="span8">
   <h2>{% trans "Subscriptions" %}</h2>
    <table class="list">
     {% if subscriptions %}
@@ -47,9 +49,18 @@
    {% if subscriptions %}
     <div class="btn">
      <a href="{% url device-opml device.uid %}">
-      <img src="/media/22x22/opml-icon.png" /> {% trans "Download Subscriptions as OPML" %}
+      <img src="/media/22x22/opml-icon.png" />
+      {% trans "Download Subscriptions as OPML" %}
      </a>
     </div>
+
+    <div class="btn">
+     <a href="{% url device-symbian-opml device.uid %}">
+      <img src="/media/22x22/opml-icon.png" />
+      {% trans "OPML for Nokia Podcasting on Symbian " %}
+     </a>
+    </div>
+
    {% endif %}
 
   <div class="btn">
@@ -70,6 +81,10 @@
   {% endif %}
 
   </div>
+ </div>
+
+
+ <div class="span3">
 
   {% if not device.deleted %}
 
@@ -97,10 +112,7 @@
 
   {% endif %}
 
-  <div class="info">
-   {% url device-symbian-opml device.uid as opml-url %}
-   {% blocktrans %}There's a special <a href="{{ opml-url }}">OPML file for use with Nokia Podcasting on Symbian devices</a>{% endblocktrans %}
-  </div>
+ </div>
 
 {% endblock %}
 
