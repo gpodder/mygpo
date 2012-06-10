@@ -54,8 +54,7 @@
     <td>
      <form action="{% url list-remove-podcast owner.username podcastlist.slug podcast.get_id %}" method="post" target="_parent">
       {% csrf_token %}
-      <button type="submit" >
-       <img src="/media/unsubscribe.png" />
+      <button class="btn btn-danger icon-remove" type="submit" >
       </button>
      </form>
     </td>
@@ -69,15 +68,15 @@
 
   <form action="{% url list-rate owner.username podcastlist.slug %}?rate=1" method="post">
    {% csrf_token %}
-   <button type="submit">{% trans "Vote" %}</button>
+   <button class="btn icon-thumbs-up" type="submit">
+    {% trans "Vote" %}
+   </button>
   </form>
 
-  <div class="button">
-   <a href="{% url list-opml owner.username podcastlist.slug %}">
+   <a class="btn" href="{% url list-opml owner.username podcastlist.slug %}">
     <img src="/media/22x22/opml-icon.png" class="action-button" />
     {% trans "Download as OPML" %}
     </a>
-  </div>
 
  </div>
 
@@ -86,9 +85,11 @@
   <hr />
 
   <h2>Add Podcast</h2>
-  <form method="get" action="{% url list-search owner.username podcastlist.slug %}" class="search" target="results">
-   <input type="text" name="q" {% if q %}value="{{ q }}"{% endif %} >
-   <input type="submit" value="Search">
+  <form class="form-inline" method="get" action="{% url list-search owner.username podcastlist.slug %}" class="search" target="results">
+   <div class="input-prepend">
+    <span class="add-on"><i class="icon-search"></i></span><input type="text" name="q" {% if q %}value="{{ q }}"{% endif %} >
+   </div>
+   <input class="btn" type="submit" value="Search">
   </form>
 
   <iframe name="results" class="results">

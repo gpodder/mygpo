@@ -24,8 +24,8 @@
      <td>
       <form action="{% url list-delete user.username list.slug %}" method="post">
        {% csrf_token %}
-       <button type="submit">
-        <img src="/media/unsubscribe.png" />
+       <button class="btn btn-danger icon-trash" type="submit">
+        {% trans "Delete" %}
        </button>
       </form>
      </td>
@@ -35,10 +35,10 @@
 
   <hr />
   <h2>{% trans "Create List" %}</h2>
-  <form action="{% url list-create %}" method="post">
+  <form class="form-inline" action="{% url list-create %}" method="post">
    {% csrf_token %}
    Title: <input type="text" name="title" />
-   <button type="submit">{% trans "Create" %}</button>
+   <button class="btn btn-primary" type="submit">{% trans "Create" %}</button>
   </form>
 
   <div class="info">
