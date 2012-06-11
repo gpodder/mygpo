@@ -14,34 +14,7 @@
 
  {% if tags_podcast %}
 
-  <h1>{% trans "Tagged Podcasts" %}</h1>
-  <table class="list">
-   {% for podcast, taglist in tags_podcast.items %}
-    <tr>
-     <td class="logo">{{ podcast|podcast_logo }}</td>
-     <td>{% podcast_group_link podcast %}</td>
-     <td class="tag-list">
-     {% for tag in taglist %}{% spaceless %}
-       <span class="own">{{ tag }} <a class="remove" href="{% podcast_link_target podcast "remove-tag" %}?tag={{ tag }}&next=mytags">X</a></span>
-       {% if not forloop.last %}<span class="seperator">,</span>{% endif %}
-      {% endspaceless %}
-     {% endfor %}
-     {% if user.is_authenticated %}
-      <form class="form-inline" action="{% podcast_link_target podcast "add-tag" %}">
-       <div class="input-prepend">
-        <span class="add-on"><i class="icon-tag"></i></span><input class="input-small" type="text" name="tag" />
-       </div>
-       <button type="submit">{% trans "Add" %}</button>
-       <input type="hidden" name="next" value="mytags" />
-      </form>
-     {% endif %}
-     </td>
-    </tr>
-   {% endfor %}
-  </table>
-
-
-  <h1>{% trans "All your Tags" %}</h1>
+  <h1>{% trans "My Tags" %}</h1>
   <table class="list">
   {% for tag, podcast_list in tags_tag.items %}
    <tr>
