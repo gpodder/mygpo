@@ -39,7 +39,6 @@ urlpatterns += patterns('mygpo.web.views.podcast',
  url(r'^podcast/(?P<pid>\d+)$',                                   'show_oldid',          name='podcast'),
  url(r'^podcast/(?P<pid>\d+)/subscribe$',                         'subscribe_oldid',     name='subscribe'),
  url(r'^podcast/(?P<pid>\d+)/unsubscribe/(?P<device_uid>[\w.-]+)',     'unsubscribe_oldid',   name='unsubscribe'),
- url(r'^podcast/(?P<pid>\d+)/add-tag',                            'add_tag_oldid',       name='add-tag'),
  url(r'^podcast/(?P<pid>\d+)/remove-tag',                         'remove_tag_oldid',    name='remove-tag'),
  url(r'^podcast/(?P<pid>\d+)/set-public',                         'set_public_oldid',    name='podcast-public',  kwargs={'public': True}),
  url(r'^podcast/(?P<pid>\d+)/set-private',                        'set_public_oldid',    name='podcast-private', kwargs={'public': False}),
@@ -54,8 +53,21 @@ urlpatterns += patterns('mygpo.web.views.podcast',
  )
 
 
+from mygpo.web.views.episode import FavoritesPublic
+
 urlpatterns += patterns('mygpo.web.views.episode',
- url(r'^favorites/',                                              'list_favorites',name='favorites'),
+
+ url(r'^favorites/',
+     'list_favorites',
+     name='favorites'),
+
+ url(r'^favorites/private',
+     FavoritesPublic.as_view(public=False),
+     name='favorites_private'),
+
+ url(r'^favorites/public',
+     FavoritesPublic.as_view(public=True),
+     name='favorites_public'),
 
  url(r'^episode/(?P<id>\d+)$',                                    'show_oldid',           name='episode'),
  url(r'^episode/(?P<id>\d+)/add-chapter$',                        'add_chapter_oldid',   name='add-chapter'),

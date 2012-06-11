@@ -47,20 +47,40 @@
     <p>
      {% blocktrans with user.username as username and feed_token as token %}To keep your favorites private (from others and from the public pages of {{ site }}), you need to use HTTP-Authentication in your client. Use username <strong>{{ username }}</strong> and password <strong>{{ token }}</strong>.{% endblocktrans %}
     </p>
-    <ul>
-     <li><a href="{% url favorites %}?private_feed">{% trans "create a new password" %}</a></li>
-     <li><a href="{% url favorites %}?public_feed">{% trans "don't require a password" %}</a>
-      and make my favorites visible on {{ site }}</li>
-    </ul>
+
+    <form class="form-inline" method="post" action="{% url favorites_private %}">
+     {% csrf_token %}
+     <button type="submit" class="btn btn-warning icon-eye-close">
+      {% trans "New Password" %}
+     </button>
+    </form>
+
+    <form class="form-inline" method="post" action="{% url favorites_public %}">
+     {% csrf_token %}
+     <button type="submit" class="btn btn-warning icon-eye-open">
+      {% trans "Make Public" %}
+     </button>
+    </form>
+
    {% else %}
     <p>
      {% blocktrans with site as sitename %}You've marked your favorites-feed as public and others can
       subscribe to it. It will also be indexed by {{ sitename }}.{% endblocktrans %}
     </p>
-    <ul>
      {% if podcast %}
+    <ul>
       <li><a href="{% podcast_link_target podcast %}">public information about your favorites-feed</a></li>
+     </ul>
      {% endif %}
+
+    <form class="form-inline" method="post" action="{% url favorites_private %}">
+     {% csrf_token %}
+     <button type="submit" class="btn btn-warning icon-eye-close">
+      {% trans "New Password" %}
+     </button>
+    </form>
+
+
      <li><a href="{% url favorites %}?private_feed">{% trans "require a password for this feed" %}</a></li>
     </ul>
    {% endif %}

@@ -27,6 +27,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control
+from django.views.generic.base import View
+from django.utils.decorators import method_decorator
 
 from mygpo.api.constants import EPISODE_ACTION_TYPES
 from mygpo.decorators import repeat_on_conflict
@@ -162,6 +164,30 @@ def toggle_favorite(request, episode):
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
 
+
+class FavoritesPublic(View):
+
+    public = True
+
+    @method_decorator(vary_on_cookie)
+    @method_decorator(cache_control(private=True))
+    @method_decorator(login_required)
+    def post(self, request):
+
+        if self.public:
+            request.user.favorite_feeds_token = ''
+            request.user.save()
+
+        else:
+            request.user.create_new_token('favorite_feeds_token', 8)
+            request.user.save()
+
+        token = request.user.favorite_feeds_token
+
+        return HttpResponseRedirect(reverse('favorites'))
+
+
+
 @vary_on_cookie
 @cache_control(private=True)
 @login_required
@@ -182,14 +208,6 @@ def list_favorites(request):
     feed_url = 'http://%s/%s' % (site.domain, reverse('favorites-feed', args=[request.user.username]))
 
     podcast = Podcast.for_url(feed_url)
-
-    if 'public_feed' in request.GET:
-        request.user.favorite_feeds_token = ''
-        request.user.save()
-
-    elif 'private_feed' in request.GET:
-        request.user.create_new_token('favorite_feeds_token', 8)
-        request.user.save()
 
     token = request.user.favorite_feeds_token
 
