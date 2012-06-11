@@ -11,6 +11,9 @@
 {% block title %}{% trans "Podcast Subscriptions" %}{% endblock %}
 
 {% block content %}
+
+  <div class="span12">
+
 <h1>{% trans "Podcast Subscriptions" %}</h1>
 
  {% if not subscriptionlist|length_is:"0" %}
@@ -61,5 +64,6 @@
   </form>
  </div>
 
+ </div>
 {% endblock %}
 
