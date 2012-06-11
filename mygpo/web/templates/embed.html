@@ -1,48 +1,92 @@
 {% load i18n %}
 {% load menu %}
 
-<html>
- <head>
-<!--
-#
-# This file is part of my.gpodder.org.
-#
-# my.gpodder.org is free software: you can redistribute it and/or modify it
-# under the terms of the GNU Affero General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at your
-# option) any later version.
-#
-# my.gpodder.org is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
-# License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
-#
--->
-  <title>{% block title %}{% endblock %} (gpodder.net)</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <link rel="shortcut icon" href="/favicon.png">
-  <link rel="stylesheet" href="/media/screen.css" type="text/css" />
-  {% block head %}{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{% block title %}{% endblock %} (gpodder.net)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-  {% if google_analytics_property_id %}
-   {% load googleanalytics %}
-   {{ google_analytics_property_id|google_analytics_async }}
-  {% endif %}
+    <!-- Le styles -->
+    <link href="/media/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+      .sidebar-nav {
+        padding: 9px 0;
+      }
+    </style>
+    <link href="/media/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/media/css/font-awesome.css" rel="stylesheet">
+    <link rel="stylesheet" href="/media/screen.css" type="text/css" />
 
- </head>
- <body class="embed">
-   <div id="content-area">
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
 
-   {% block content %}
-    content goes here
-   {% endblock %}
-   </div>
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="/favicon.png">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/media/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/media/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/media/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="/media/ico/apple-touch-icon-57-precomposed.png">
+
+    {% block head %}{% endblock %}
+
+    {% if google_analytics_property_id %}
+      {% load googleanalytics %}
+      {{ google_analytics_property_id|google_analytics_async }}
+    {% endif %}
+
+  </head>
+
+  <body>
+
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span12">
+
+    {% if messages %}
+     {% for message in messages %}
+      <div {% if message.tags %} class="{{ message.tags }}"{% endif %}>
+       {{ message }}
+      </div>
+     {% endfor %}
+    {% endif %}
 
 
-{% block javascript %}{% endblock javascript %}
+    {% block content %}
+    {% endblock %}
 
- </body>
+    </div>
+    </div>
+
+
+    </div><!--/.fluid-container-->
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/media/js/jquery.js"></script>
+    <script src="/media/js/bootstrap-transition.js"></script>
+    <script src="/media/js/bootstrap-alert.js"></script>
+    <script src="/media/js/bootstrap-modal.js"></script>
+    <script src="/media/js/bootstrap-dropdown.js"></script>
+    <script src="/media/js/bootstrap-scrollspy.js"></script>
+    <script src="/media/js/bootstrap-tab.js"></script>
+    <script src="/media/js/bootstrap-tooltip.js"></script>
+    <script src="/media/js/bootstrap-popover.js"></script>
+    <script src="/media/js/bootstrap-button.js"></script>
+    <script src="/media/js/bootstrap-collapse.js"></script>
+    <script src="/media/js/bootstrap-carousel.js"></script>
+    <script src="/media/js/bootstrap-typeahead.js"></script>
+    {% block javascript %}{% endblock javascript %}
+
+  </body>
 </html>
