@@ -54,13 +54,15 @@
     <td>
      <form action="{% url list-remove-podcast owner.username podcastlist.slug podcast.get_id %}" method="post" target="_parent">
       {% csrf_token %}
-      <button class="btn btn-danger icon-remove" type="submit" >
-      </button>
+      <button class="btn btn-danger icon-remove" type="submit" ></button>
      </form>
     </td>
    {% endif %}
   </tr>
-
+   {% empty %}
+  <tr>
+    <td colspan="3">{% trans "No Podcasts" %}</td>
+  </tr>
  {% endfor %}
  </table>
 
@@ -85,11 +87,11 @@
   <hr />
 
   <h2>Add Podcast</h2>
-  <form class="form-inline" method="get" action="{% url list-search owner.username podcastlist.slug %}" class="search" target="results">
+  <form method="get" action="{% url list-search owner.username podcastlist.slug %}" class="form-inline" target="results">
    <div class="input-prepend">
-    <span class="add-on"><i class="icon-search"></i></span><input type="text" name="q" {% if q %}value="{{ q }}"{% endif %} >
+    <span class="add-on"><i class="icon-search"></i></span><input type="text" class="input-xlarge" name="q" {% if q %}value="{{ q }}"{% endif %} >
    </div>
-   <input class="btn" type="submit" value="Search">
+   <input class="btn btn-primary" type="submit" value="Search">
   </form>
 
   <iframe name="results" class="results">
