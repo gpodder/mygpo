@@ -3,7 +3,7 @@ import os.path
 import re
 from datetime import datetime
 from dateutil import parser
-from random import randint
+from random import randint, random
 
 from couchdbkit.ext.django.schema import *
 from restkit.errors import Unauthorized
@@ -316,6 +316,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
     common_episode_title = StringProperty()
     new_location = StringProperty()
     latest_episode_timestamp = DateTimeProperty()
+    random_key = FloatProperty(default=random)
 
 
     @classmethod
