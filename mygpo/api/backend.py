@@ -37,28 +37,23 @@ from mygpo.couchdb import bulk_save_retry
 def get_random_picks(count, languages=None):
     """ Returns random podcasts for the given language """
 
-    if not languages:
-        return islice(Podcast.random(), count)
+    languages = languages or ['']
 
-    counts = cache.get('podcast-language-counts')
-    if not counts:
-        counts = get_podcast_count_for_language()
-        cache.set('podcast-language-counts', counts, 60*60)
+    # get one iterator for each language
+    rand_iters = [Podcast.random(lang) for lang in languages]
 
+    # cycle through them, removing those that don't yield any more results
+    while rand_iters:
+        rand_iter = rand_iters.pop(0)
 
-    # extract positive counts of all languages in language param
-    counts = filter(lambda (l, c): l in languages and c > 0, counts.items())
+        try:
+            podcast = next(rand_iter)
+            rand_iters.append(rand_iter)
+            yield podcast
 
-    jobs = []
-    podcasts_per_lang = int(math.ceil(float(count) / len(counts)))
-
-    for lang, lang_count in counts:
-        skip = random.randint(0, lang_count-podcasts_per_lang)
-        job = gevent.spawn(Podcast.for_language, lang, skip=skip,
-                limit=podcasts_per_lang)
-        jobs.append(job)
-
-    return islice(chain.from_iterable(job.get() for job in jobs), count)
+        except StopIteration:
+            # don't re-add rand_iter
+            pass
 
 
 
