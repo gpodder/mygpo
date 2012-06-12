@@ -15,46 +15,13 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from datetime import timedelta
 from collections import defaultdict
-from itertools import cycle, islice, chain
 from functools import partial
-import random
-import gevent
-import math
 
-from django.core.cache import cache
-
-from mygpo.data.mimetype import get_type, CONTENT_TYPES
 from mygpo.core.models import Podcast, Episode
-from mygpo.users.models import EpisodeUserState, Device, DeviceDoesNotExist, \
-         PodcastUserState
+from mygpo.users.models import Device, DeviceDoesNotExist, PodcastUserState
 from mygpo.decorators import repeat_on_conflict
-from mygpo.json import json
 from mygpo.couchdb import bulk_save_retry
-
-
-def get_random_picks(count, languages=None):
-    """ Returns random podcasts for the given language """
-
-    languages = languages or ['']
-
-    # get one iterator for each language
-    rand_iters = [Podcast.random(lang) for lang in languages]
-
-    # cycle through them, removing those that don't yield any more results
-    while rand_iters:
-        rand_iter = rand_iters.pop(0)
-
-        try:
-            podcast = next(rand_iter)
-            rand_iters.append(rand_iter)
-            yield podcast
-
-        except StopIteration:
-            # don't re-add rand_iter
-            pass
-
 
 
 def get_podcast_count_for_language():

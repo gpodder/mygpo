@@ -42,6 +42,7 @@ from mygpo.web import utils
 from mygpo.api import backend
 from mygpo.utils import flatten, parse_range
 from mygpo.cache import get_cache_or_calc
+from mygpo.share.models import PodcastList
 
 
 @vary_on_cookie
@@ -83,29 +84,46 @@ def welcome(request):
 @login_required
 def dashboard(request, episode_count=10):
 
+    subscribed_podcasts = list(request.user.get_subscribed_podcasts())
     site = RequestSite(request)
 
-    user = request.user
-    subscribed_podcasts = user.get_subscribed_podcasts()
-    devices = user.active_devices
+    checklist = []
+
+    if request.user.devices:
+        checklist.append('devices')
+
+    if subscribed_podcasts:
+        checklist.append('subscriptions')
+
+    if backend.get_favorites(request.user):
+        checklist.append('favorites')
+
+    if not request.user.subscriptions_token:
+        checklist.append('share')
+
+    if Tag.for_user(request.user):
+        checklist.append('tags')
+
+    if PodcastList.for_user(request.user._id):
+        checklist.append('lists')
+
+    if request.user.published_objects:
+        checklist.append('publish')
 
     tomorrow = datetime.today() + timedelta(days=1)
     newest_episodes = NewestEpisodes(subscribed_podcasts, tomorrow,
             episode_count)
 
-    lang = utils.get_accepted_lang(request)
-    lang = utils.sanitize_language_codes(lang)
-
-    # for performance reasons, we only consider the first three languages
-    lang = lang[:3]
-    random_podcasts = islice(backend.get_random_picks(lang), 0, 5)
+    random_podcast = next(Podcast.random(), None)
+    if random_podcast:
+        random_podcast = random_podcast.get_podcast()
 
     return render(request, 'dashboard.html', {
-            'site': site,
-            'devices': devices,
             'subscribed_podcasts': subscribed_podcasts,
             'newest_episodes': newest_episodes,
-            'random_podcasts': random_podcasts,
+            'random_podcast': random_podcast,
+            'checklist': checklist,
+            'site': site,
         })
 
 

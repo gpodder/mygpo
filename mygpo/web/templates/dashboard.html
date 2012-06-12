@@ -16,29 +16,49 @@
 
  <div class="row-liquid">
 
- <div class="span5">
-  <h2>{% trans "Overview" %}</h2>
-  {% if not subscribed_podcasts %}
-   {% url help as help-url %}
-   <p>{% blocktrans with site as sitename %}Welcome to {{ sitename }}! You can start using the site by <a href="{{ help-url }}">uploading your subscriptions</a> with a supported client. You can then manage your subscriptions online, sync your devices and discover new interesting podcasts.{% endblocktrans %}</p>
-  {% else %}
-   {% url subscriptions as subscriptions-url %}
-   {% url devices as devices-url %}
-   {% url share as share-url %}
-   {% url suggestions as suggestions-url %}
-   {% url toplist as toplist-url %}
-   {% url lists-overview as lists-url %}
-   <p>{% blocktrans with subscribed_podcasts|length as subscription_count and devices|length as device_count %}You have subscribed to <a href="{{ subscriptions-url }}">{{ subscription_count }} podcasts</a> on <a href="{{ devices-url }}">{{ device_count }} devices</a>. Now you can
-    <ul>
-     <li><a href="{{ share-url }}">share your subscriptions with others</a></li>
-     <li><a href="{{ subscriptions-url }}">manage your subscriptions</a></li>
-     <li><a href="{{ devices-url }}">synchronize your devices</a></li>
-     <li><a href="{{ suggestions-url }}">view our suggested podcasts</a></li>
-     <li><a href="{{ toplist-url }}">discover new podcasts in our toplist</a></li>
-     <li><a href="{{ lists-url }}">collect and share podcasts about your favorite topics</a><span class="new">new!</span></li>
-    </ul>{% endblocktrans %}</p>
+ <div class="span7">
+  <h1>{% trans "Hi, " %}{{ user.username }}</h1>
 
-  {% endif %}
+  <p><strong>{% blocktrans %}Explore {{ site }}{% endblocktrans %}</strong>
+   <ul>
+    <li class="icon-check{% if not "devices" in checklist %}-empty{% endif %}">
+     <a href="{% url devices %}">
+      {% trans "Connect your Podcast Clients" %}
+     </a>
+    </li>
+    <li class="icon-check{% if not "subscriptions" in checklist %}-empty{% endif %}">
+     <a href="{% url subscriptions %}">
+      {% trans "Subscribe to Podcasts" %}
+     </a>
+    </li>
+    <li class="icon-check{% if not "favorites" in checklist %}-empty{% endif %}">
+     <a href="{% url favorites %}">
+      {% trans "Mark your Favorite Episodes" %}
+     </a>
+    </li>
+    <li class="icon-check{% if not "share" in checklist %}-empty{% endif %}">
+     <a href="{% url share %}">
+      {% trans "Share your Subscriptions" %}
+     </a>
+    </li>
+    <li class="icon-check{% if not "tags" in checklist %}-empty{% endif %}">
+     <a href="{% url tags %}">
+      {% trans "Tag Podcasts" %}
+     </a>
+    </li>
+    <li class="icon-check{% if not "lists" in checklist %}-empty{% endif %}">
+     <a href="{% url lists-overview %}">
+      {% trans "Create Podcast Lists" %}
+     </a>
+    </li>
+    <li class="icon-check{% if not "publish" in checklist %}-empty{% endif %}">
+     <a href="{% url publisher %}">
+      {% trans "Publish your own Podcast" %}
+     </a>
+    </li>
+   </ul>
+  </p>
+
 
   {% if sponsored_podcast %}
    <div class="sponsoring-podcast">
@@ -52,24 +72,29 @@
 
  </div>
 
- <div class="span5">
-  <h2>{% trans "Random Picks" %}</h2>
+ {% if random_podcast %}
+  <div class="span5 well">
 
-  <table class="list">
-   {% for podcast in random_podcasts %}
-    <tr>
-     <td class="logo">{{ podcast|podcast_logo }}</td>
-     <td>{% podcast_group_link podcast %}</td>
-    </tr>
-   {% endfor %}
-  </table>
- </div>
+   <a href="{% podcast_link_target random_podcast %}">
+    <div id="podcastlogo">{{ random_podcast|podcast_logo_big }}</div>
+   </a>
 
+   <h3>{{ random_podcast.title }}</h3>
+
+   <p class="description">
+    {{ random_podcast.description|default:""|truncatewords:"50" }}
+   </p>
+
+   <p>
+    <a href="{% podcast_link_target random_podcast %}">{% trans "more..." %}</a>
+   </p>
+  </div>
+ {% endif %}
  </div>
 
  <div class="row-liquid">
  {% cache 3600 newest_episodes user.username %}
-  <div class="span10">
+  <div class="span12">
    {% if newest_episodes %}
     <h2>{% trans "Newest Episodes" %}</h2>
     <table class="list">
