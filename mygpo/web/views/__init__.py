@@ -18,6 +18,7 @@
 import sys
 from collections import defaultdict
 from datetime import datetime, timedelta
+from itertools import islice
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
