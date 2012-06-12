@@ -133,7 +133,6 @@ class PodcastPrivacySettings(View):
     @repeat_on_conflict(['state'])
     def set_privacy_settings(self, state):
         state.settings['public_subscription'] = self.public
-        print state
         state.save()
 
 
