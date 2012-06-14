@@ -165,29 +165,6 @@ def toggle_favorite(request, episode):
 
 
 
-class FavoritesPublic(View):
-
-    public = True
-
-    @method_decorator(vary_on_cookie)
-    @method_decorator(cache_control(private=True))
-    @method_decorator(login_required)
-    def post(self, request):
-
-        if self.public:
-            request.user.favorite_feeds_token = ''
-            request.user.save()
-
-        else:
-            request.user.create_new_token('favorite_feeds_token', 8)
-            request.user.save()
-
-        token = request.user.favorite_feeds_token
-
-        return HttpResponseRedirect(reverse('favorites'))
-
-
-
 @vary_on_cookie
 @cache_control(private=True)
 @login_required
@@ -195,7 +172,10 @@ def list_favorites(request):
     site = RequestSite(request)
 
     episodes = backend.get_favorites(request.user)
-    podcast_ids = [episode.podcast for episode in episodes]
+
+    recently_listened = request.user.get_recently_listened_episodes()
+
+    podcast_ids = [episode.podcast for episode in episodes + recently_listened]
     podcasts = get_to_dict(Podcast, podcast_ids, Podcast.get_id)
 
     def set_podcast(episode):
@@ -204,6 +184,7 @@ def list_favorites(request):
         return episode
 
     episodes = map(set_podcast, episodes)
+    recently_listened = map(set_podcast, recently_listened)
 
     feed_url = 'http://%s/%s' % (site.domain, reverse('favorites-feed', args=[request.user.username]))
 
@@ -216,6 +197,7 @@ def list_favorites(request):
         'feed_token': token,
         'site': site,
         'podcast': podcast,
+        'recently_listened': recently_listened,
         })
 
 

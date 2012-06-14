@@ -10,14 +10,11 @@
 {% block title %}{% trans "Favorite Episodes" %}{% endblock %}
 
 {% block content %}
+
+ <div class="span8">
   <h1>{% trans "Favorite Episodes" %}</h1>
 
-  {% if episodes %}
   <table class="list episode_list">
-   <tr>
-    <th></th>
-    <th></th>
-   </tr>
   {% for episode in episodes %}
    <tr>
     <td class="logo">{% if episode.podcast %}{{ episode.podcast|podcast_logo }}{% endif %}</td>
@@ -26,72 +23,50 @@
       <span class="from_podcast">{% podcast_group_link episode.podcast %}</span>
      {% endif %}
     </td>
+    <td>
+     <span class="icon-star"></span>
+    </td>
    </tr>
+  {% empty %}
+   empty here
   {% endfor %}
   </table>
 
-  <h2>Favorites-Feed</h2>
-   <p>
-    {% url favorites-feed user.username as favorites-feed-url %}
-    {% blocktrans with user.username as username and site.domain as domain %}You can access a feed containing your favorites episodes at
-     <strong><a href="{{ favorites-feed-url }}">http://{{ domain }}{{ favorites-feed-url }}</a></strong>.{% endblocktrans %}
-   </p>
-   <div class="action-buttons">
-     <a class="btn btn-success icon-ok" href="{% url subscribe-by-url %}?url=http://{{ site.domain }}{% url favorites-feed user.username %}">
-      {% trans "Subscribe" %}
-     </a>
-   </div>
+  <div class="btn-group">
+   <a class="btn" href="{% url share-favorites %}">
+    <img src="/media/24x24/openshareicon.png" />
+    Share
+   </a>
+  </div>
+ </div>
 
-   <h3>Access to your Favorites</h3>
-   {% if feed_token %}
-    <p>
-     {% blocktrans with user.username as username and feed_token as token %}To keep your favorites private (from others and from the public pages of {{ site }}), you need to use HTTP-Authentication in your client. Use username <strong>{{ username }}</strong> and password <strong>{{ token }}</strong>.{% endblocktrans %}
-    </p>
+ <div class="span4 well">
+  <h3>Recently Listened</h3>
 
-    <form class="form-inline" method="post" action="{% url favorites_private %}">
-     {% csrf_token %}
-     <button type="submit" class="btn btn-warning icon-eye-close">
-      {% trans "New Password" %}
-     </button>
-    </form>
+  <table class="list episode_list">
+  {% for episode in recently_listened %}
 
-    <form class="form-inline" method="post" action="{% url favorites_public %}">
-     {% csrf_token %}
-     <button type="submit" class="btn btn-warning icon-eye-open">
-      {% trans "Make Public" %}
-     </button>
-    </form>
-
-   {% else %}
-    <p>
-     {% blocktrans with site as sitename %}You've marked your favorites-feed as public and others can
-      subscribe to it. It will also be indexed by {{ sitename }}.{% endblocktrans %}
-    </p>
-     {% if podcast %}
-    <ul>
-      <li><a href="{% podcast_link_target podcast %}">public information about your favorites-feed</a></li>
-     </ul>
+   <tr>
+    <td class="logo">{% if episode.podcast %}{{ episode.podcast|podcast_logo }}{% endif %}</td>
+    <td>{% episode_link episode episode.podcast %}<br/>
+     {% if episode.podcast %}
+      <span class="from_podcast">{% podcast_group_link episode.podcast %}</span>
      {% endif %}
+    </td>
+    <td>
+     <form class="form-inline" action="">
+      {% if episode in episodes %}
+       <span class="icon-star"></span>
+      {% else %}
+       <span class="icon-star-empty"></span>
+      {% endif %}
+     </form>
+    </td>
+   </tr>
 
-    <form class="form-inline" method="post" action="{% url favorites_private %}">
-     {% csrf_token %}
-     <button type="submit" class="btn btn-warning icon-eye-close">
-      {% trans "New Password" %}
-     </button>
-    </form>
+  {% endfor %}
+  </table>
 
-
-     <li><a href="{% url favorites %}?private_feed">{% trans "require a password for this feed" %}</a></li>
-    </ul>
-   {% endif %}
-  {% else %}
-
-   {% url episode-toplist as episode-toplist-url %}
-   <p>{% blocktrans %}You don't have any episodes marked as favorites yet. Maybe have a look at the <a href="{{ episode-toplist-url }}">episode toplist</a>.{% endblocktrans %}</p>
-
-   <p>{% blocktrans %}Once you've selected your favorites, you can subscribe to your very own <em>Favorites-Feed</em> that contains your favorite episodes{% endblocktrans %}</p>
-
-  {% endif %}
+ </div>
 
 {% endblock %}
-

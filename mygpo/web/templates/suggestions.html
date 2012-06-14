@@ -60,3 +60,17 @@
   <div class="info"><strong>Get your suggestions on your Client</strong>! Access <a href="{% url suggestions-opml 15 "opml" %}">http://{{ url }}{% url suggestions-opml 15 "opml" %}</a> to get 15 of our recommended podcasts.</div>
 {% endblock %}
 
+
+{% block javascript %}
+
+    <script language="javascript">
+        <!--
+        function submitForm(formid)
+        {
+            document.forms[formid].submit();
+            return true;
+        }
+        -->
+    </script>
+
+{% endblock %}

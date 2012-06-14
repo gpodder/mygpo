@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load podcasts %}
+{% load episodes %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/share/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/share/favorites"|section_menu }}{% endblock %}
+
+{% block title %}{% trans "Share Favorite Episodes" %}{% endblock %}
+
+{% block content %}
+
+  <div class="span12">
+  <h1>
+   {% trans "Share Favorite Episodes" %}
+  </h1>
+
+
+  <table>
+
+   <tr>
+    <td>
+     <img src="/media/28x28/feed-icon.png" class="action-button" />
+    </td>
+    <td>
+     <a href="{% url favorites-feed user.username %}">
+      {% trans "Feed" %}
+     </a>
+    </td>
+    <td>
+     <input class="input-xxlarge" readonly="readonly" type="text" value="http://{{ user.username }}:{{feed_token}}@{{ site.domain }}{% url favorites-feed user.username %}" />
+    </td>
+   </tr>
+
+
+   <tr>
+    <td>
+     <img src="/media/22x22/internet-web-browser.png" />
+    </td>
+
+    <td>
+     {% if podcast %}
+      <a href="{% podcast_link_target podcast %}">Directory Entry</a>
+     {% else %}
+      Directory Entry
+     {% endif %}
+    </td>
+    <td>
+     {% if podcast %}
+      <input class="input-xxlarge" readonly="readonly" type="text" value="http://{{ site.domain }}{% podcast_link_target podcast %}" />
+     {% else %}
+      <a class="btn" href="{% url subscribe-by-url %}?url=http://{{ site.domain }}{% url favorites-feed user.username %}">Create</a>
+     {% endif %}
+    </td>
+   </tr>
+
+  </table>
+
+   <h2>Permissions</h2>
+   {% if feed_token %}
+    <p>
+     {% blocktrans with user.username as username and feed_token as token %}To keep your favorites private (from others and from the public pages of {{ site }}), you need to use HTTP-Authentication in your client. Use username <strong>{{ username }}</strong> and password <strong>{{ token }}</strong>.{% endblocktrans %}
+    </p>
+
+    <div class="btn-group">
+     <button type="submit" class="btn btn-warning icon-eye-close" onclick="submitForm('private');">
+      {% trans "New Password" %}
+     </button>
+     <button type="submit" class="btn btn-warning icon-eye-open" onclick="submitForm('public');">
+      {% trans "Make Public" %}
+     </button>
+    </div>
+
+
+    <form id="private" class="form-inline" method="post" action="{% url favorites_private %}">
+     {% csrf_token %}
+    </form>
+
+    <form id="public" class="form-inline" method="post" action="{% url favorites_public %}">
+     {% csrf_token %}
+    </form>
+
+
+   {% else %}
+    <p>
+     {% blocktrans with site as sitename %}You've marked your favorites-feed as public and others can
+      subscribe to it. It will also be indexed by {{ sitename }}.{% endblocktrans %}
+    </p>
+     {% if podcast %}
+    <ul>
+      <li><a href="{% podcast_link_target podcast %}">public information about your favorites-feed</a></li>
+     </ul>
+     {% endif %}
+
+    <form class="form-inline" method="post" action="{% url favorites_private %}">
+     {% csrf_token %}
+     <button type="submit" class="btn btn-warning icon-eye-close">
+      {% trans "New Password" %}
+     </button>
+    </form>
+
+    </ul>
+   {% endif %}
+
+ </div>
+
+{% endblock %}
+
+
+{% block javascript %}
+
+    <script language="javascript">
+        <!--
+        function submitForm(formid)
+        {
+            document.forms[formid].submit();
+            return true;
+        }
+        -->
+    </script>
+
+{% endblock %}

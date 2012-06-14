@@ -53,21 +53,11 @@ urlpatterns += patterns('mygpo.web.views.podcast',
  )
 
 
-from mygpo.web.views.episode import FavoritesPublic
-
 urlpatterns += patterns('mygpo.web.views.episode',
 
- url(r'^favorites/',
+ url(r'^favorites/$',
      'list_favorites',
      name='favorites'),
-
- url(r'^favorites/private',
-     FavoritesPublic.as_view(public=False),
-     name='favorites_private'),
-
- url(r'^favorites/public',
-     FavoritesPublic.as_view(public=True),
-     name='favorites_public'),
 
  url(r'^episode/(?P<id>\d+)$',                                    'show_oldid',           name='episode'),
  url(r'^episode/(?P<id>\d+)/add-chapter$',                        'add_chapter_oldid',   name='add-chapter'),

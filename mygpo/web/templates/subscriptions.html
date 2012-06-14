@@ -35,13 +35,15 @@
   {% endfor %}
   </table>
 
-  <a class="btn" href="{% url subscriptions-download %}">
-   <img src="/media/24x24/opml-icon.png" /> {% trans "Download Subscriptions as OPML" %}
-  </a>
+  <div class="btn-group">
+   <a class="btn" href="{% url subscriptions-download %}">
+    <img src="/media/24x24/opml-icon.png" /> {% trans "Download OPML" %}
+   </a>
 
-  <a class="btn" href="{% url share %}">
-   <img src="/media/24x24/openshareicon.png" /> {% trans "Share" %}
-  </a>
+   <a class="btn" href="{% url share %}">
+    <img src="/media/24x24/openshareicon.png" /> {% trans "Share" %}
+   </a>
+  </div>
 
  {% else %}
 

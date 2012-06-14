@@ -692,6 +692,15 @@ class User(BaseUser, SyncedDevicesMixin):
             self.unsync_device(device)
 
 
+    def get_recently_listened_episodes(self, count=10):
+        r = Episode.view('listeners/by_user',
+                startkey     = [self._id, {}],
+                descending   = True,
+                limit        = count,
+                include_docs = True,
+            )
+        return list(r)
+
 
     def get_subscriptions(self, public=None):
         """

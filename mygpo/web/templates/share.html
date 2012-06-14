@@ -8,55 +8,102 @@
 {% block title %}{% trans "Share Subscriptions" %}{% endblock %}
 
 {% block content %}
+
+ <div class="span12">
   <h1>{% trans "Share Subscriptions" %}</h1>
 
-  <p>{% trans "To let others know which podcasts you are listening to, you can point them to one of the following URLs." %}</p>
 
-   <div>
-    <a href="{% url shared-subscriptions user.username %}{% if token %}?token={{ token }}{% endif %}">
+  <table>
+
+   <tr>
+    <td>
      <img src="/media/22x22/internet-web-browser.png" class="action-button" />
-     {% trans "Website" %}</a>
-    <input readonly="readonly" type="text" value="http://{{ site.domain }}{% url shared-subscriptions user.username %}{% if token %}?token={{ token }}{% endif %}" />
-   </div>
+    </td>
+    <td>
+     <a href="{% url shared-subscriptions user.username %}{% if token %}?token={{ token }}{% endif %}">
+      {% trans "Website" %}
+     </a>
+    </td>
+    <td>
+     <input class="input-xxlarge" readonly="readonly" type="text" value="http://{{ site.domain }}{% url shared-subscriptions user.username %}{% if token %}?token={{ token }}{% endif %}" />
+    </td>
+   </tr>
 
-   <div>
-    <a href="{% url shared-subscriptions-opml user.username %}{% if token %}?token={{ token }}{% endif %}">
+   <tr>
+    <td>
      <img src="/media/22x22/opml-icon.png" class="action-button" />
-     {% trans "Download as OPML" %}</a>
-    <input readonly="readonly" type="text" value="http://{{ site.domain }}{% url shared-subscriptions-opml user.username %}{% if token %}?token={{ token }}{% endif %}" />
-   </div>
+    </td>
+    <td>
+     <a href="{% url shared-subscriptions-opml user.username %}{% if token %}?token={{ token }}{% endif %}">
+      {% trans "Download as OPML" %}
+     </a>
+    </td>
+    <td>
+     <input class="input-xxlarge" readonly="readonly" type="text" value="http://{{ site.domain }}{% url shared-subscriptions-opml user.username %}{% if token %}?token={{ token }}{% endif %}" />
+    </td>
+   </tr>
 
-   <div>
-    <a href="{% url shared-subscriptions-rss user.username %}{% if token %}?token={{ token }}{% endif %}">
+   <tr>
+    <td>
      <img height="22" width="22" src="/media/28x28/feed-icon.png" class="action-button" />
-     {% trans "Changes-Feed" %}</a>
-     <input readonly="readonly" type="text" value="http://{{ site.domain }}{% url shared-subscriptions-rss user.username %}{% if token %}?token={{ token }}{% endif %}" />
+    </td>
+    <td>
+     <a href="{% url shared-subscriptions-rss user.username %}{% if token %}?token={{ token }}{% endif %}">
+      {% trans "Changes-Feed" %}
+     </a>
+    </td>
+    <td>
+     <input class="input-xxlarge" readonly="readonly" type="text" value="http://{{ site.domain }}{% url shared-subscriptions-rss user.username %}{% if token %}?token={{ token }}{% endif %}" />
+    </td>
+   </tr>
+  </table>
+
+    <div class="btn-group">
+  {% if token %}
+     <button type="submit" class="btn btn-warning" onclick="submitForm('private');">
+      <i class="icon-eye-close"></i> {% trans "New Password" %}
+     </button>
+     <button type="submit" class="btn btn-warning" onclick="submitForm('public');">
+      <i class="icon-eye-open"></i> {% trans "Make Public" %}
+     </button>
+  {% else %}
+     <button type="submit" class="btn btn-warning" onclick="submitForm('private');">
+      <i class="icon-eye-close"></i> {% trans "Make Private" %}
+     </button>
+  {% endif %}
+    <a class="btn" href="{% url privacy %}">
+      <i class="icon-filter"></i> {% trans "Filter Shared Podcasts" %}
+    </a>
     </div>
 
-  {% url share as share-url %}
-  {% if token %}
-   <p>{% blocktrans %}Only those who know the exact link above can see your subscriptions, but you can <a href="{{ share-url }}?public_subscriptions">make it public</a> so everyone can see it.{% endblocktrans %}</p>
-   <p>{% blocktrans %}If you gave your link to the wrong people, you can <a href="{{ share-url }}?private_subscriptions">create a new one</a> - the old one will then be invalidated.{% endblocktrans %}</p>
+    <form id="private" class="form-inline" method="post" action="{% url private_subscriptions %}">
+     {% csrf_token %}
+    </form>
 
-  {% else %}
+    <form id="public" class="form-inline" method="post" action="{% url public_subscriptions %}">
+     {% csrf_token %}
+    </form>
 
-   <p>{% blocktrans %}You don't want everybody to see your subscriptions? <a href="{{ share-url }}?private_subscriptions">Make them private</a> so that you can give the link to people you trust.{% endblocktrans %}</p>
-  {% endif %}
 
-  <p>{% trans "Add <tt>&amp;symbian=true#.opml</tt> to the OPML URL to get an OPML file for Nokia Podcasting on Symbian devices." %}</p>
+  <div class="info">
+   {% trans "Add <tt>&amp;symbian=true#.opml</tt> to the OPML URL to get an OPML file for Nokia Podcasting on Symbian devices." %}
+  </div>
 
-  {% url privacy as privacy-url %}
-  <p>{% blocktrans %}You can configure which podcasts show up in your shared subscription list. <a href="{{ privacy-url }}">Go to Privacy-Settings</a>{% endblocktrans %}</p>
+ </div>
 
-  <hr>
-
-  <h3>{% trans "Share your Favorite Episodes" %}</h3>
-  <p>
-
-   {% url favorites as favorites-url %}
-   {% blocktrans %}You can share episodes that you have marked as favorites
-    with others. Go to the <a href="{{ favorites-url }}">favorites</a> page and
-    find out how.{% endblocktrans %}
-  </p>
 {% endblock %}
 
+
+{% block javascript %}
+
+    <script language="javascript">
+        <!--
+        function submitForm(formid)
+        {
+            document.forms[formid].submit();
+            return true;
+        }
+        -->
+    </script>
+
+{% endblock %}

@@ -87,7 +87,7 @@ def get_favorites(user):
             key          = user._id,
             include_docs = True,
         )
-    return favorites
+    return list(favorites)
 
 
 

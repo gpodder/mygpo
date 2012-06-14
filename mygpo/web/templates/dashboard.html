@@ -21,37 +21,44 @@
 
   <p><strong>{% blocktrans %}Explore {{ site }}{% endblocktrans %}</strong>
    <ul>
-    <li class="icon-check{% if not "devices" in checklist %}-empty{% endif %}">
+    <li>
+     <i class="icon-check{% if not "devices" in checklist %}-empty{% endif %}"></i>
      <a href="{% url devices %}">
       {% trans "Connect your Podcast Clients" %}
      </a>
     </li>
-    <li class="icon-check{% if not "subscriptions" in checklist %}-empty{% endif %}">
+    <li>
+     <i class="icon-check{% if not "subscriptions" in checklist %}-empty{% endif %}"></i>
      <a href="{% url subscriptions %}">
       {% trans "Subscribe to Podcasts" %}
      </a>
     </li>
-    <li class="icon-check{% if not "favorites" in checklist %}-empty{% endif %}">
+    <li>
+     <i class="icon-check{% if not "favorites" in checklist %}-empty{% endif %}"></i>
      <a href="{% url favorites %}">
       {% trans "Mark your Favorite Episodes" %}
      </a>
     </li>
-    <li class="icon-check{% if not "share" in checklist %}-empty{% endif %}">
+    <li>
+     <i class="icon-check{% if not "share" in checklist %}-empty{% endif %}"></i>
      <a href="{% url share %}">
       {% trans "Share your Subscriptions" %}
      </a>
     </li>
-    <li class="icon-check{% if not "tags" in checklist %}-empty{% endif %}">
+    <li>
+     <i class="icon-check{% if not "tags" in checklist %}-empty{% endif %}"></i>
      <a href="{% url tags %}">
       {% trans "Tag Podcasts" %}
      </a>
     </li>
-    <li class="icon-check{% if not "lists" in checklist %}-empty{% endif %}">
+    <li>
+     <i class="icon-check{% if not "lists" in checklist %}-empty{% endif %}"></i>
      <a href="{% url lists-overview %}">
       {% trans "Create Podcast Lists" %}
      </a>
     </li>
-    <li class="icon-check{% if not "publish" in checklist %}-empty{% endif %}">
+    <li>
+     <i class="icon-check{% if not "publish" in checklist %}-empty{% endif %}"></i>
      <a href="{% url publisher %}">
       {% trans "Publish your own Podcast" %}
      </a>

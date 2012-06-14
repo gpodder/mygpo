@@ -75,7 +75,7 @@
 
 
   <div class="span4 well">
-   <h2>{% trans "Subscriptions" %}</h2>
+   <h3>{% trans "Subscriptions" %}</h3>
    {% if not user.is_authenticated %}
     <div class="subscribe">
      <a href="{% podcast_link_target podcast "subscribe" %}">
@@ -95,7 +95,8 @@
         </td>
         <td style="text-align: center;">
          <form class="form-inline" method="post" action="{% podcast_link_target podcast "unsubscribe" device.uid %}?return_to={% podcast_link_target podcast %}">
-          <button class="btn btn-danger icon-remove" type="submit">
+          <button class="btn btn-danger" type="submit">
+           <i class="icon-remove"></i>
           </button>
          </form>
         </td>
@@ -107,7 +108,8 @@
          {% csrf_token %}
          <td>{{ subscribe_form.as_p }}</td>
          <td style="text-align: center;">
-          <button class="btn btn-success icon-ok" type="submit">
+          <button class="btn btn-success" type="submit">
+           <i class="icon-ok"></i>
           </button>
          </td>
         </form>
@@ -118,7 +120,7 @@
   </div>
 
   <div class="span4 well">
-   <h2>Tags</h2>
+   <h3>Tags</h3>
 
    {% for tag in tags %}
     {% spaceless %}
@@ -138,35 +140,19 @@
      <div class="input-prepend">
       <span class="add-on"><i class="icon-tag"></i></span><input class="input-small" type="text" name="tag" />
      </div>
-     <button class="btn btn-success icon-plus" type="submit"></button>
+     <button class="btn btn-success" type="submit">
+      <i class="icon-plus"></i>
+     </button>
     </form>
    {% endif %}
   </div>
 
   <div class="span4 well">
-   <h2>{% trans "Share" %}</h2>
+   <h3>{% trans "Share" %}</h3>
+
    {% google_plus_one_button %}
    {{ podcast|fb_like_podcast }}
 
-   {% if user.is_authenticated and devices %}
-    {% if is_public %}
-     <form action="{% podcast_link_target podcast "podcast-private" %}" method="POST">
-      {% csrf_token %}
-      <button type="submit" class="btn icon-eye-open" name="public">
-       {% trans "Public. Make Private" %}
-      </button>
-     </form>
-
-    {% else %}
-     <form action="{% podcast_link_target podcast "podcast-public" %}" method="POST">
-      {% csrf_token %}
-      <button type="submit" class="btn icon-eye-close" name="private">
-       {% trans "Private. Make Public" %}
-      </button>
-     </form>
-
-    {% endif %}
-   {% endif %}
   </div>
 
 
