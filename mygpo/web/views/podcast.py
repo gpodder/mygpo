@@ -111,7 +111,7 @@ def show(request, podcast):
             'related_podcasts': rel_podcasts,
             'tags': tags,
             'url': current_site,
-            'episode': episodes,
+            'episode': episode,
             'episodes': episodes,
             'max_listeners': max_listeners,
         })
