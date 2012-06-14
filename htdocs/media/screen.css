@@ -194,7 +194,8 @@ div#podcastlogo
 
 .short
 {
-    height: 1.2em;
+    display: inline-block;
+    height: 1.3em;
     overflow: hidden;
     text-overflow: ellipsis;
 }
