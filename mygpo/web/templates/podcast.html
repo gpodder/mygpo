@@ -51,7 +51,7 @@
     {% if podcast.link %},
      <a href="{{podcast.link}}">{% trans "website" %}</a>
     {% endif %},
-    {% trans "stats:" %} {% blocktrans with podcast.subscriber_count as subscriber_count and podcast.listener_count as listener_count %}{{subscriber_count}} subscribers, {{listener_count}} listeners{% endblocktrans %}
+    {% blocktrans with podcast.subscriber_count as subscriber_count and podcast.listener_count as listener_count %}{{subscriber_count}} subscribers, {{listener_count}} listeners{% endblocktrans %}
    </small>
 
    {% if related_podcasts %}
@@ -71,10 +71,60 @@
  </div>
 
 
+
  <div class="row-fluid">
 
+ <div class="span8">
 
-  <div class="span4 well">
+  {% if episode %}
+   <div class="first-episode">
+
+    <h2>{{ episode.title }} <small>{{ episode.released|naturalday }}</small></h2>
+    <div class="description">
+     {{ episode.description|default:""|striptags }}
+    </div>
+    <a href="{% episode_link_target episode podcast %}">more...</a>
+
+   </div>
+  {% endif %}
+
+  {% if episodes %}
+
+  <h3>{% trans "Older Episodes" %}</h3>
+   <table class="list episode_list" id="episodes">
+    <tr>
+     <th></th>
+     <th>{% trans "Title" %}</th>
+     <th>{% trans "Released" %}</th>
+     <th>{% trans "Listeners" %}</th>
+    </tr>
+
+    {% for episode in episodes %}
+     <tr>
+      <td>{{ episode.action|episode_status_icon }}</td>
+      <td class="short">
+          <div class="title">{% episode_link episode podcast %}</div>
+          <p class="description short">{{ episode.description|default:""|striptags }}</p>
+      </td>
+      <td>{{ episode.released|default:""|date:"Y-m-d" }}</td>
+      <td>
+       {% if episode.listeners %}
+        {{ episode.listeners|vertical_bar:max_listeners }}
+       {% endif %}
+      </td>
+     </tr>
+    {% endfor %}
+   </table>
+  {% endif %}
+
+ </div>
+
+
+ <div class="span4">
+
+  <div class="row-fluid">
+
+  <div class="well">
    <h3>{% trans "Subscriptions" %}</h3>
    {% if not user.is_authenticated %}
     <div class="subscribe">
@@ -104,7 +154,7 @@
       {% endfor %}
       {% if can_subscribe %}
        <tr>
-        <form action="{% podcast_link_target podcast "subscribe" %}" method="post">
+        <form class="form-inline" action="{% podcast_link_target podcast "subscribe" %}" method="post">
          {% csrf_token %}
          <td>{{ subscribe_form.as_p }}</td>
          <td style="text-align: center;">
@@ -119,7 +169,12 @@
    {% endif %}
   </div>
 
-  <div class="span4 well">
+  </div>
+
+
+  <div class="row-fluid">
+
+  <div class="well">
    <h3>Tags</h3>
 
    {% for tag in tags %}
@@ -147,50 +202,26 @@
    {% endif %}
   </div>
 
-  <div class="span4 well">
+  </div>
+
+  <div class="row-fluid">
+
+  <div class="well">
    <h3>{% trans "Share" %}</h3>
 
    {% google_plus_one_button %}
    {{ podcast|fb_like_podcast }}
 
   </div>
+ </div>
 
-
-  {% if episodes %}
-   <table class="list episode_list" id="episodes">
-    <tr>
-     <th></th>
-     <th>{% trans "Episode" %}</th>
-     <th>{% trans "Released" %}</th>
-     <th>{% trans "Listeners" %}</th>
-    </tr>
-
-    {% for episode in episodes %}
-     <tr>
-      <td>{{ episode.action|episode_status_icon }}</td>
-      <td>
-          <p class="title">{% episode_link episode podcast %}</p>
-          <p class="description short">{{ episode.description|default:""|striptags }}</p>
-      </td>
-      <td>{{ episode.released|default:""|date:"Y-m-d" }}</td>
-      <td>
-       {% if episode.listeners %}
-        {{ episode.listeners|vertical_bar:max_listeners }}
-       {% endif %}
-      </td>
-     </tr>
-    {% endfor %}
-   </table>
-  {% endif %}
 
   {% if history %}
-   <h2>{% trans "Subscription History" %}</h2>
+ <div class="row-fluid">
+
+  <div class="well">
+   <h3>{% trans "Subscription History" %}</h3>
    <table class="list">
-    <tr>
-     <th>{% trans "Timestamp" %}</th>
-     <th>{% trans "Action" %}</th>
-     <th>{% trans "Devices" %}</th>
-    </tr>
     {% for s in history %}
      <tr>
       <td><abbr title="{{ s.timestamp }}">{{ s.timestamp|naturalday }}</abbr></td>
@@ -201,6 +232,8 @@
      </tr>
     {% endfor %}
    </table>
+  </div>
+  </div>
   {% endif %}
 
   {% if not podcast.title %}

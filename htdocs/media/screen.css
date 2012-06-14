@@ -194,10 +194,9 @@ div#podcastlogo
 
 .short
 {
-    white-space: nowrap;
+    height: 1.2em;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 65em;
 }
 
 .URL
@@ -721,4 +720,11 @@ footer, footer a
 footer ul
 {
     list-style-type: none;
+}
+
+
+
+div.first-episode
+{
+    margin-bottom: 2em;
 }

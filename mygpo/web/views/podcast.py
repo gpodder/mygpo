@@ -55,6 +55,12 @@ def show(request, podcast):
 
     max_listeners = max([e.listeners for e in episodes] + [0])
 
+    episode = None
+
+    if episodes:
+        episode = episodes[0]
+        episodes = episodes[1:]
+
     if podcast.group:
         group = PodcastGroup.get(podcast.group)
         rel_podcasts = filter(lambda x: x != podcast, group.podcasts)
@@ -94,6 +100,7 @@ def show(request, podcast):
             'related_podcasts': rel_podcasts,
             'can_subscribe': len(subscribe_targets) > 0,
             'subscribe_form': subscribe_form,
+            'episode': episode,
             'episodes': episodes,
             'max_listeners': max_listeners,
         })
@@ -104,6 +111,7 @@ def show(request, podcast):
             'related_podcasts': rel_podcasts,
             'tags': tags,
             'url': current_site,
+            'episode': episodes,
             'episodes': episodes,
             'max_listeners': max_listeners,
         })
