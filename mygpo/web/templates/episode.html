@@ -49,12 +49,17 @@
 {% block title %}{{ episode.title|default:"Unnamed Episode"|striptags }} - {{ podcast.title|default:"Unnamed Podcast"|striptags}}{% endblock %}
 
 {% block content %}
+
+ <div class="span12">
   {% if podcast.logo_url %}
    <div id="podcastlogo"><a href="{% podcast_link_target podcast %}">{{ podcast|podcast_logo_big }}</a></div>
   {% endif %}
-  <h1>{{ episode.title|default:"Unnamed Episode"|striptags }}</h1>
+  <h1>
+   {{ episode.title|default:"Unnamed Episode"|striptags }}
+   <small>{{ episode.released|naturalday }}</small>
+  </h1>
   <small class="description">
-      {% trans "from" %} {% podcast_group_link podcast %}{% if episode.released %}, {% trans "released" %} {{episode.released}}{% endif %},
+      {% trans "from" %} {% podcast_group_link podcast %},
       {% trans "links" %}:
        {% if not episode.outdated or "hide-outdated-urls" not in podcast.restrictions %}
         <a href="{{episode.url}}">{% trans "download" %}</a>
@@ -64,7 +69,17 @@
       {% endif %},
       {% trans "stats:" %} {% blocktrans with episode.listener_count as listener_count %}{{listener_count}} listeners{% endblocktrans %}
   </small>
-  <hr style="clear: none;"/>
+
+  {% if episode.description %}
+   <p class="description">{{ episode.description|remove_html_tags|linebreaksbr }}</p>
+  {% endif %}
+
+  </div>
+
+ </div>
+
+ <div class="row-fluid">
+  <div class="span8">
 
   {% if episode.url|is_youtube_video %}
     <div id="ytapiplayer">
@@ -72,9 +87,6 @@
     </div>
   {% endif %}
 
-  {% if episode.description %}
-   <p>{{ episode.description|remove_html_tags|linebreaksbr }}</p>
-  {% endif %}
 
   <div class="share">
    {% google_plus_one_button %}
@@ -128,14 +140,17 @@
    </div>
   </div>
 
-  <hr/>
+  </div>
 
- <div id="listcontent">
+  <div class="span4">
+
 
   {% if user.is_authenticated or chapters %}
-   <h2>{% trans "Chapters" %}</h2>
+   <div class="row-fluid">
+    <div class="well">
 
-   <div id="chapters" class="listblock">
+   <h3>{% trans "Chapters" %}</h3>
+
    <div class="info">
      {% blocktrans %}Your chapters are shown in bold.{% endblocktrans %}
    </div>
@@ -164,7 +179,7 @@
     {% endfor %}
     {% if user.is_authenticated %}
     <tr>
-     <form action="{% episode_link_target episode podcast "add-chapter" %}" method="POST">
+     <form class="form-inline" action="{% episode_link_target episode podcast "add-chapter" %}" method="POST">
       {% csrf_token %}
       <td>
        <input type="text" name="start" id="start" class="time" /> -
@@ -174,21 +189,23 @@
        <input type="checkbox" name="advertisement" />
       </td>
       <td>
-       <input type="text" name="label" />
+       <input class="input-small" type="text" name="label" />
       </td>
       <td>
-       <input type="submit" value="{% trans "Add" %}" />
+       <input class="btn" type="submit" value="{% trans "Add" %}" />
       </td>
      </form>
     </tr>
     {% endif %}
   </table>
   </div>
+  </div>
   {% endif %}
 
   {% if user.is_authenticated or history %}
-  <h2>{% trans "History" %}</h2>
-  <div id="history" class="listblock">
+  <div class="row-fluid">
+  <div class="well">
+  <h3>{% trans "History" %}</h3>
   <table class="list">
    <tr>
     <th>{% trans "Time" %}</th>
@@ -217,16 +234,16 @@
      <form action="{% episode_link_target episode podcast "add-episode-action" %}" method="POST">
       {% csrf_token %}
       <td>
-       <input type="text" id="timestamp" name="timestamp" /></td>
+       <input class="input-small" type="text" id="timestamp" name="timestamp" /></td>
       <td>
-       <select name="action">
+       <select class="input-small" name="action">
         {% for action, str in actions %}
          <option value="{{ action }}">{{ str }}</option>
         {% endfor %}
        </select>
       </td>
       <td>
-       <select name="device">
+       <select class="input-small" name="device">
         <option value=""></option>
         {% for device_id, name in devices.items %}
          <option value="{{ device_id }}">{{ name }}</option>
@@ -234,18 +251,17 @@
        </select>
       </td>
       <td>
-       <input type="submit" value="{% trans "Add" %}" />
+       <input class="btn" type="submit" value="{% trans "Add" %}" />
       </td>
      </form>
     </tr>
    {% endif %}
   </table>
   </div>
+ </div>
   {% endif %}
 
-  {% if not episode.title %}
-   <div class="info"><strong>{% trans "Why Unnamed Episode?" %}</strong> {% trans "Because we display names after we have fetched the information form the feed -- and this may take some time. Until this is completed, the podcast will simply be called this way." %}</div>
-  {% endif %}
+ </div>
 
  </div>
 
