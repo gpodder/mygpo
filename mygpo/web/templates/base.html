@@ -83,11 +83,13 @@
               {% block mainmenu %}
                {{ "/"|main_menu }}
               {% endblock %}
-            </ul>
-            <form class="navbar-search pull-left" method="get" action="{% url search %}">
-             {% csrf_token %}
-             <input name="q" type="text" class="search-query" placeholder="Search">
-            </form>
+              <li>
+               <form class="navbar-search pull-left" method="get" action="{% url search %}">
+                {% csrf_token %}
+                <input name="q" type="text" class="search-query" placeholder="Search">
+               </form>
+              </li>
+             </ul>
           </div><!--/.nav-collapse -->
         </div>
       </div>
