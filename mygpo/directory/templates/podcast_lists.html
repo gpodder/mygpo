@@ -13,8 +13,17 @@
 {% block title %}{% trans "Podcast Lists" %}{% endblock %}
 
 {% block content %}
+
+ <div class="row-fluid">
+  <div class="span12">
+
  <h1>{% trans "Podcast Lists" %}</h1>
- <hr />
+
+ </div>
+</div>
+
+ <div class="row-fluid">
+  <div class="span8">
 
  <table class="list">
   <tr>
@@ -61,6 +70,17 @@
  {% if entries.has_next %}
   <a href="{% url podcast-lists %}?page={{ entries.next_page_number }}">»</a>
  {% endif %}
+
+</div>
+
+</div>
+
+<div class="span4">
+ <div class="well">
+  <h3>{% trans "Know Some Great Podcasts?" %}</h3>
+  <p>{% trans "Create a list of podcasts about a topic you like" %}</p>
+  <a class="btn btn-primary" href="{% url lists-overview %}">Go</a>
+ </div>
 
 </div>
 

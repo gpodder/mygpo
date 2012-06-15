@@ -9,9 +9,15 @@
 {% block title %}{% trans "Podcast Lists" %}{% endblock %}
 
 {% block content %}
-  <h1>{% blocktrans with user.username as username %}Podcast Lists by {{ username }}{% endblocktrans%}</h1>
-  <hr />
+ <div class="row-fluid">
+  <div class="span12">
+   <h1>{% blocktrans with user.username as username %}Podcast Lists by {{ username }}{% endblocktrans%}</h1>
+  </div>
+ </div>
 
+
+ <div class="row-fluid">
+ <div class="span8">
   <table class="list">
    {% for list in lists %}
     <tr>
@@ -26,10 +32,16 @@
     </tr>
    {% endfor %}
   </table>
+ </div>
 
-  <div class="info">
-   {% url lists-overview as create-url %}
-   {% blocktrans %}Create your own <a href="{{ create-url }}">podcast lists</a>.{% endblocktrans %}
-  </div>
+ <div class="span4">
+
+ <div class="well">
+  <h3>{% trans "Know Some Great Podcasts?" %}</h3>
+  <p>{% trans "Create a list of podcasts about a topic you like" %}</p>
+  <a class="btn btn-primary" href="{% url lists-overview %}">Go</a>
+ </div>
+
+ </div>
 
 {% endblock %}
