@@ -20,7 +20,6 @@ hr
 
 h1
 {
-    padding-bottom: .5em;
 }
 
 h2
@@ -194,7 +193,6 @@ div#podcastlogo
 
 .short
 {
-    display: inline-block;
     height: 1.3em;
     overflow: hidden;
     text-overflow: ellipsis;

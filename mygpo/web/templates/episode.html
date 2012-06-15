@@ -71,7 +71,7 @@
   </small>
 
   {% if episode.description %}
-   <p class="description">{{ episode.description|remove_html_tags|linebreaksbr }}</p>
+   <p class="description">{{ episode.description|remove_html_tags }}</p>
   {% endif %}
 
   </div>
@@ -87,11 +87,6 @@
     </div>
   {% endif %}
 
-
-  <div class="share">
-   {% google_plus_one_button %}
-   {% fb_like_episode episode podcast %}
-  </div>
 
   {% if episode.url|is_flickr_photo %}
    {{ episode|embed_flickr_photo }}
@@ -124,20 +119,22 @@
 
   {% endif %}
 
-  <div class="navigation">
-   <div class="prev">
+  <div class="pagination">
+   <ul>
     {% if prev %}
-     {% trans "Previous Episode:" %} {% episode_link prev podcast %}
+     <li>
+      {% episode_link prev podcast %}
+     </li>
     {% endif %}
-   </div>
-   <div class="list">
-    <a href="{% podcast_link_target podcast %}#episodes">{% trans "Episode-List" %}</a>
-   </div>
-   <div class="next">
+    <li>
+     <a href="{% podcast_link_target podcast %}#episodes">{% trans "Episode-List" %}</a>
+    </li>
     {% if next %}
-     {% trans "Next Episode:" %} {% episode_link next podcast %}
+     <li>
+      {% episode_link next podcast %}
+     </li>
     {% endif %}
-   </div>
+   </ul>
   </div>
 
   </div>
@@ -145,15 +142,23 @@
   <div class="span4">
 
 
+   <div class="row-fluid">
+    <div class="well">
+
+    <h3>Share</h3>
+
+   {% google_plus_one_button %}
+   {% fb_like_episode episode podcast %}
+  </div>
+  </div>
+
+
+
   {% if user.is_authenticated or chapters %}
    <div class="row-fluid">
     <div class="well">
 
    <h3>{% trans "Chapters" %}</h3>
-
-   <div class="info">
-     {% blocktrans %}Your chapters are shown in bold.{% endblocktrans %}
-   </div>
 
    <table class="list">
     <tr>

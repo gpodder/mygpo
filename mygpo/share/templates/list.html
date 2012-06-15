@@ -70,7 +70,8 @@
 
   <form action="{% url list-rate owner.username podcastlist.slug %}?rate=1" method="post">
    {% csrf_token %}
-   <button class="btn icon-thumbs-up" type="submit">
+   <button class="btn" type="submit">
+    <li class="icon-thumbs-up"></li>
     {% trans "Vote" %}
    </button>
   </form>

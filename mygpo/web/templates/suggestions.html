@@ -55,12 +55,14 @@
     <button class="btn btn-danger icon-thumbs-down" type="submit"> {% trans "No" %}</button>
    </form>
   </div>
- {% endif %}
 
  <a class="btn" href="{% url suggestions-opml 15 "opml" %}">
   <img src="/media/24x24/opml-icon.png">
    {% trans "Download OPML" %}
  </a>
+
+ {% endif %}
+
 {% endblock %}
 
 

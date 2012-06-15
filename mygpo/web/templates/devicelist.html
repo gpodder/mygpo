@@ -7,10 +7,10 @@
 {% block mainmenu %}{{ "/devices/"|main_menu }}{% endblock %}
 {% block sectionmenu %}{{ "/devices/"|section_menu }}{% endblock %}
 
-{% block title %}{% trans "My Devices" %}{% endblock %}
+{% block title %}{% trans "Managed Devices" %}{% endblock %}
 
 {% block content %}
-  <h1>{% trans "My Devices" %}</h1>
+  <h1>{% trans "Managed Devices" %}</h1>
 
    <table class="list">
     <tr>
@@ -34,11 +34,10 @@
        <td>{{ device|device_type }}</td>
        <td>{{ device.uid|striptags }}</td>
        <td>
-        <div class="btn icon-edit">
-         <a href="{% url device-edit device.uid %}">
-          {% trans "Configure" %}
-         </a>
-        </div>
+        <a class="btn" href="{% url device-edit device.uid %}">
+         <li class="icon-edit"></li>
+         {% trans "Configure" %}
+        </a>
        </td>
       </tr>
      {% endfor %}

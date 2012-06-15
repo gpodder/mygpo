@@ -48,8 +48,9 @@
 
    <tr>
     <td class="logo">{% if episode.podcast %}{{ episode.podcast|podcast_logo }}{% endif %}</td>
-    <td>{% episode_link episode episode.podcast %}<br/>
+    <td>
      {% if episode.podcast %}
+      {% episode_link episode episode.podcast %}<br/>
       <span class="from_podcast">{% podcast_group_link episode.podcast %}</span>
      {% endif %}
     </td>

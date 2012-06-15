@@ -11,14 +11,18 @@
 {% block title %}{% trans "Search" %}{% endblock %}
 
 {% block content %}
-<h2>{% trans "Search" %}</h2>
+<h1>{% trans "Search" %}</h1>
 
-<form class="form-inline" method="get" action="{% url search %}" class="search">
- <div class="input-prepend">
-  <span class="add-on"><i class="icon-search"></i></span><input class="input-xlarge" type="text" name="q" {% if q %}value="{{ q }}"{% endif %} >
- </div>
- <input class="btn btn-primary" type="submit" value="Search">
-</form>
+
+ <div class="row-fluid">
+  <div class="span8">
+
+  <form class="form-inline" method="get" action="{% url search %}" class="search">
+   <div class="input-prepend">
+    <span class="add-on"><i class="icon-search"></i></span><input class="input-xxlarge" type="text" name="q" {% if q %}value="{{ q }}"{% endif %} >
+   </div>
+   <input class="btn btn-primary" type="submit" value="Search">
+  </form>
 
  {% if q %}
   {% if results %}
@@ -72,5 +76,14 @@
   {% endif %}
 
  {% endif %}
+
+ </div>
+
+
+ <div class="span4">
+  <div class="well">
+   <h3>{% trans "Search API" %}</h3>
+  </div>
+ </div>
 {% endblock %}
 

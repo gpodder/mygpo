@@ -16,7 +16,7 @@ HIDDEN_URIS = (
 
 _ = lambda x: x
 MENU_STRUCTURE = (
-        ('gpodder.net', (
+        ('', (
             ('/', _('Home')),
             ('/login/', _('Login')),
             ('/register/', _('Register')),
@@ -24,7 +24,17 @@ MENU_STRUCTURE = (
             ('/developer/', _('Development')),
             ('/online-help', _('Help')),
         )),
-        (_('My Podcasts'), (
+        ('Podcasts', (
+            ('/directory/', _('Directory')),
+            ('/podcast/', _('Podcast')),
+            ('/search/', _('Search')),
+            ('/lists/', _('Podcast Lists')),
+            ('/user/subscriptions/', _('User subscriptions')),
+            ('', _('Toplists')),
+            ('/toplist/', _('Podcasts')),
+            ('/toplist/episodes', _('Episodes')),
+        )),
+        (_('Subscriptions'), (
             ('/subscriptions/', _('Subscriptions')),
             ('/favorites/', _('Favorite Episodes')),
             ('/tags/', _('My Tags')),
@@ -33,21 +43,11 @@ MENU_STRUCTURE = (
             ('/history/', _('History')),
             ('/suggestions/', _('Suggestions')),
         )),
-        (_('Share'), (
+        (_('Community'), (
             ('/share/', _('Subscriptions')),
             ('/share/favorites', _('Favorites')),
             ('/share/lists/', _('Podcast Lists')),
-        )),
-        (_('Podcast Directory'), (
-            ('/directory/', _('Directory')),
-            ('/toplist/', _('Toplist')),
-            ('/search/', _('Search')),
-            ('/toplist/episodes', _('Episodes')),
-            ('/lists/', _('Podcast Lists')),
-            ('/podcast/', _('Podcast')),
-            ('/user/subscriptions/', _('User subscriptions')),
-        )),
-        (_('Settings'), (
+            ('', _('Settings')),
             ('/account/', _('Account')),
             ('/account/privacy', _('Privacy')),
         )),
@@ -63,7 +63,7 @@ MENU_STRUCTURE = (
 def main_menu(selected):
     found_section = False
     links = []
-    for label, items in MENU_STRUCTURE:
+    for label, items in MENU_STRUCTURE[1:]:
         uris = [uri for uri, caption in items]
         if selected in uris:
             found_section = True
@@ -106,11 +106,19 @@ def section_menu(selected, title=None):
                 caption = title
             if uri in HIDDEN_URIS:
                 items.append('<li class="active">%s</li>' % ugettext(caption))
+            elif uri == '':
+                items.append('<li class="nav-header">%s</li>' % ugettext(caption))
             else:
                 items.append('<li class="active"><a href="%s">%s</a></li>' % \
                         (uri, ugettext(caption)))
-        elif uri not in HIDDEN_URIS:
-            items.append('<li><a href="%s">%s</a></li>' % (uri, ugettext(caption)))
+        else:
+            if uri in HIDDEN_URIS:
+                continue
+
+            if not uri:
+                items.append('<li class="nav-header">%s</li>' % ugettext(caption))
+            else:
+                items.append('<li><a href="%s">%s</a></li>' % (uri, ugettext(caption)))
 
     s = '\n'.join(items)
     return mark_safe(s)

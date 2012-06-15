@@ -14,12 +14,76 @@
 
 {% block content %}
 
- <div class="row-liquid">
+ <div class="row-fluid">
+  <div class="span12">
+   <h1>{% trans "Hi, " %}{{ user.username }}</h1>
+  </div>
+ </div>
 
- <div class="span7">
-  <h1>{% trans "Hi, " %}{{ user.username }}</h1>
+ <div class="row-fluid">
 
-  <p><strong>{% blocktrans %}Explore {{ site }}{% endblocktrans %}</strong>
+ <div class="span8">
+
+ {% cache 3600 newest_episodes user.username %}
+   {% if newest_episodes %}
+    <h2>{% trans "Newest Episodes" %}</h2>
+    <table class="list">
+     {% for episode in newest_episodes %}
+      <tr>
+       <td class="logo">{{ episode.podcast|podcast_logo }}</td>
+       <td>
+        {% episode_link episode episode.podcast %}<br/>
+        <span class="from_podcast">{% podcast_group_link episode.podcast %}</span>
+       </td>
+       <td>{{ episode.released|naturalday }}</td>
+      </tr>
+     {% endfor %}
+    </table>
+   {% endif %}
+  {% endcache %}
+
+ </div>
+
+  <div class="span4">
+
+  {% if sponsored_podcast %}
+   <div class="row-fluid">
+    <div class="well">
+     <h3>{{ sponsored_podcast.title }} <small>(Supporting Podcast)</small></h3>
+     <div>{{ sponsored_podcast.podcast|podcast_logo }}</div>
+     <div style="margin-left: 40px">{{ sponsored_podcast.text|truncatewords:"20"}}</div>
+     <br style="clear: left;"/>
+     <small><a href="{% url advertise %}">advertise here</a></small>
+    </div>
+   </div>
+  {% endif %}
+
+
+
+ {% if random_podcast %}
+   <div class="row-fluid">
+    <div class="well">
+
+   <a href="{% podcast_link_target random_podcast %}">
+    <div id="podcastlogo">{{ random_podcast|podcast_logo_medium }}</div>
+   </a>
+
+   <h3>{{ random_podcast.title }}</h3>
+
+   <p class="description">
+    {{ random_podcast.description|default:""|truncatewords:"50" }}
+   </p>
+
+   <p>
+    <a href="{% podcast_link_target random_podcast %}">{% trans "more..." %}</a>
+   </p>
+  </div>
+ </div>
+ {% endif %}
+
+ <div class="row-fluid">
+  <div class="well">
+   <h3>{% blocktrans %}Explore {{ site }}{% endblocktrans %}</h3>
    <ul>
     <li>
      <i class="icon-check{% if not "devices" in checklist %}-empty{% endif %}"></i>
@@ -66,58 +130,8 @@
    </ul>
   </p>
 
-
-  {% if sponsored_podcast %}
-   <div class="sponsoring-podcast">
-    <h3>{{ sponsored_podcast.title }} <small>(Supporting Podcast)</small></h3>
-    <div>{{ sponsored_podcast.podcast|podcast_logo }}</div>
-    <div style="margin-left: 40px">{{ sponsored_podcast.text|truncatewords:"20"}}</div>
-    <br style="clear: left;"/>
-    <small><a href="{% url advertise %}">advertise here</a></small>
-   </div>
-  {% endif %}
-
- </div>
-
- {% if random_podcast %}
-  <div class="span5 well">
-
-   <a href="{% podcast_link_target random_podcast %}">
-    <div id="podcastlogo">{{ random_podcast|podcast_logo_big }}</div>
-   </a>
-
-   <h3>{{ random_podcast.title }}</h3>
-
-   <p class="description">
-    {{ random_podcast.description|default:""|truncatewords:"50" }}
-   </p>
-
-   <p>
-    <a href="{% podcast_link_target random_podcast %}">{% trans "more..." %}</a>
-   </p>
   </div>
- {% endif %}
  </div>
-
- <div class="row-liquid">
- {% cache 3600 newest_episodes user.username %}
-  <div class="span12">
-   {% if newest_episodes %}
-    <h2>{% trans "Newest Episodes" %}</h2>
-    <table class="list">
-     {% for episode in newest_episodes %}
-      <tr>
-       <td class="logo">{{ episode.podcast|podcast_logo }}</td>
-       <td>
-        {% episode_link episode episode.podcast %}<br/>
-        <span class="from_podcast">{% podcast_group_link episode.podcast %}</span>
-       </td>
-       <td>{{ episode.released|naturalday }}</td>
-      </tr>
-     {% endfor %}
-    </table>
-   {% endif %}
-  {% endcache %}
  </div>
 
 {% endblock %}

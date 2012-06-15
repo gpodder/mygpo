@@ -635,10 +635,11 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
         prevs = self.get_episodes(until=episode.released, descending=True,
                 limit=1)
+
         try:
-            prev = prevs.next()
+            return next(prevs)
         except StopIteration:
-            prev = None
+            return None
 
 
     def get_episode_after(self, episode):
@@ -648,9 +649,9 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         nexts = self.get_episodes(since=episode.released, limit=1)
 
         try:
-            next = nexts.next()
+            return next(nexts)
         except StopIteration:
-            next = None
+            return None
 
 
     def get_episode_for_slug(self, slug):
