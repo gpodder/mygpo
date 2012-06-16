@@ -14,53 +14,29 @@ CACHE_SECONDS = 60*60
 class Toplist(object):
     """ Base class for Episode and Podcast toplists """
 
-    def __init__(self, cls, view, languages=[], types=[], view_args={}):
+    def __init__(self, cls, view, language='', view_args={}):
         self.cls       = cls
-        self.languages = languages
+        self.language  = language
         self.view      = view
         self.view_args = view_args
-
-        if len(types) == len(CONTENT_TYPES):
-            self.types = []
-        else:
-            self.types = types
 
 
     def _get_query_keys(self):
         """ Returns an iterator of query keys that are passed to the view """
-
-        if not self.languages and not self.types:
-            yield ["none"]
-
-        elif self.languages and not self.types:
-            for lang in self.languages:
-                yield ["language", lang]
-
-        elif not self.languages and self.types:
-            for type in self.types:
-                yield ["type", type]
-
-        else:
-            for typ, lang in product(self.types, self.languages):
-                yield ["type-language", typ, lang]
+        return [self.language]
 
 
-    def _query(self, skip, limit):
+    def _query(self, limit):
         """ Queries the database and returns the sorted results """
 
-        results = []
-        for key in self._get_query_keys():
-            r = self._cache_or_query(skip, limit, key)
-            results.extend(r)
-
-        results = list(set(results))
+        key = self._get_query_keys()
+        results = self._cache_or_query(limit, key)
         results = self._sort(results)
-        return results[skip:skip+limit]
+        return results[:limit]
 
 
-    def _cache_or_query(self, skip, limit, key):
-        cache_str = '{cls}-{skip}-{limit}-{key}'.format(
-                skip=skip,
+    def _cache_or_query(self, limit, key):
+        cache_str = '{cls}-{limit}-{key}'.format(
                 limit=limit,
                 cls=self.__class__.__name__,
                 key='-'.join(key)
@@ -73,7 +49,7 @@ class Toplist(object):
                     endkey       = key + [None],
                     include_docs = True,
                     descending   = True,
-                    limit        = limit + skip,
+                    limit        = limit,
                     stale        = 'update_after',
                     **self.view_args
                 )
@@ -95,16 +71,16 @@ class Toplist(object):
             start = key
             length = 1
 
-        return self._query(start, length)
+        return self._query(length)
 
 
 
 class EpisodeToplist(Toplist):
     """ Retrieves the episode toplist for a certain date """
 
-    def __init__(self, languages=[], types=[], startdate=None):
+    def __init__(self, language='', startdate=None):
         super(EpisodeToplist, self).__init__(Episode,
-                'toplist/episodes', languages, types)
+                'toplist/episodes', language)
         self.date = startdate or date.today()
 
 
@@ -117,28 +93,17 @@ class EpisodeToplist(Toplist):
         """ Returns the query keys based on instance variables """
 
         date_str = self.date.strftime('%Y-%m-%d')
-
-        for criteria in super(EpisodeToplist, self)._get_query_keys():
-            yield [date_str] + criteria
+        return [date_str] + super(EpisodeToplist, self)._get_query_keys()
 
 
 
 class PodcastToplist(Toplist):
     """ Podcast toplist based on number of subscribers """
 
-    # FIXME: podcast and episode toplist are separated now, so we could
-    # get rid of the type field
-    TYPE = 'Podcast'
-
-    def __init__(self, languages=[], types=[]):
+    def __init__(self, language=''):
         super(PodcastToplist, self).__init__(Podcast, 'toplist/podcasts',
-                languages, types,
+                language,
                 view_args=dict(classes=[Podcast, PodcastGroup]))
-
-
-    def _get_query_keys(self):
-        for criteria in super(PodcastToplist, self)._get_query_keys():
-            yield [self.TYPE] + criteria
 
 
     def _sort(self, results):

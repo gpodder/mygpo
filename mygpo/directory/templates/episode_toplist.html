@@ -26,69 +26,14 @@
 {% block title %}{% trans "Episode-Toplist" %}{% endblock %}
 
 {% block content %}
-  <h1>{% trans "Episode-Toplist" %}</h1>
-
-  <p>
-   {% if languages|length_is:"0" %}
-    {% blocktrans with entries|length as count and types|join:", " as media_types %}These are the {{ count }} most listened {{ media_types }} episodes of the last seven days of all languages.{% endblocktrans %}
-   {% else %}
-    {% blocktrans with entries|length as count and all_languages|lookup_list:languages|join:", " as lang and types|join:", " as media_types %}The are the {{ count }} most listened {{ media_types }} episodes of the last seven days for the languages {{ lang }}.{% endblocktrans %}
-   {% endif %}
-   <a href="#" id="open-config">({% trans "change"%})</a>
-  </p>
-
- <div class="config-toplist">
-  <h3>{% trans "Languages" %}</h3>
-  {% if languages|length_is:"0" %}
-   <div>{% trans "Currently showing all languages." %}<br />
-    {% trans "Show a specific one:" %}
-    <form action="{% url episode-toplist %}?lang={{ languages|join:"," }}" method="post">
-     {% csrf_token %}
-     <select name="lang">
-      {% for key, name in all_languages.iteritems %}
-       <option value="{{ key }}">{{ name }}</option>
-      {% endfor %}
-     </select>
-     <input type="submit" value="{% trans "Show" %}" />
-    </form>
-   </div>
-  {% else %}
-   <div>{% trans "Remove a language" %}
-    <ul>
-     {% for lang in languages %}
-      <li>
-       <a href="{% url episode-toplist %}?lang={{ languages|remove:lang|join:"," }}&types={{ types|join:"," }}">{{ all_languages|lookup:lang }}</a>
-      </li>
-     {% endfor %}
-    </ul>
-    <form action="{% url episode-toplist %}?lang={{ languages|join:"," }}&types={{ types|join:"," }}" method="post">
-     {% csrf_token %}
-     <select name="lang">
-      {% for key, name in all_languages.iteritems %}
-       {% if not key in languages %}
-        <option value="{{ key }}">{{ name }}</option>
-       {% endif %}
-      {% endfor %}
-     </select>
-     <input type="submit" value="{% trans "Add" %}" />
-    </form>
-    {% url episode-toplist as episode-toplist-url %}
-    {% blocktrans with types|join:"," as type_param %}or show <a href="{{ episode-toplist-url }}?lang=&types={{ type_param }}">all languages</a>.{% endblocktrans %}
-   </div>
-  {% endif %}
+ <div class="row-fluid">
+  <div class="span12">
+   <h1>{% trans "Episode-Toplist" %}</h1>
+  </div>
  </div>
 
- <div class="config-toplist">
-  <h3>Media Types</h3>
-  {% for type in all_types %}
-   {% if type in types %}
-    <a class="activated" href="{% url episode-toplist %}?lang={{ languages|join:"," }}&types={{ types|remove:type|join:"," }} ">{{ type }}</a>
-   {% else %}
-    <a class="deactivated" href="{% url episode-toplist %}?lang={{ languages|join:"," }}&types={{ types|append:type|join:"," }}">{{ type }}</a>
-   {% endif %}
-  {% endfor %}
- </div>
-
+ <div class="row-fluid">
+  <div class="span8">
 
   <table class="list episode_list">
    <tr>
@@ -111,7 +56,46 @@
     </td>
     <td>{{ entry.listeners|vertical_bar:max_listeners }}</td>
    </tr>
+  {% empty %}
+   <tr>
+    <td colspan="4">
+     {% trans "Currently not available" %}
+    </td>
+   </tr>
   {% endfor %}
   </table>
+
+ </div>
+
+
+ <div class="span4">
+
+  <div class="well">
+   <h3>{% trans "Language" %}</h3>
+    <form class="form-inline" action="{% url episode-toplist %}" method="get">
+     <select class="input-medium" name="lang">
+      {% if language == "" %}
+       <option selected="selected" value="">{% trans "all" %}</option>
+      {% else %}
+       <option value="">{% trans "all" %}</option>
+      {% endif %}
+
+      {% for key, name in all_languages.iteritems %}
+       {% if language == key %}
+        <option selected="selected" value="{{ key }}">{{ name }}</option>
+       {% else %}
+        <option value="{{ key }}">{{ name }}</option>
+       {% endif %}
+      {% endfor %}
+     </select>
+     <input class="btn btn-primary" type="submit" value="{% trans "OK" %}" />
+    </form>
+
+  </div>
+
+ </div>
+
+</div>
+
 
 {% endblock %}

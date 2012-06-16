@@ -37,6 +37,11 @@ def get_podcast_languages():
 
 RE_LANG = re.compile('^[a-zA-Z]{2}[-_]?.*$')
 
+
+def sanitize_language_code(lang):
+    return lang[:2].lower()
+
+
 def sanitize_language_codes(langs):
     """
     expects a list of language codes and returns a unique lost of the first
@@ -49,7 +54,7 @@ def sanitize_language_codes(langs):
     ['de', 'en']
     """
 
-    return list(set([l[:2].lower() for l in langs if l and RE_LANG.match(l)]))
+    return list(set([sanitize_language_code(l) for l in langs if l and RE_LANG.match(l)]))
 
 
 def get_language_names(lang):
@@ -70,11 +75,6 @@ def get_language_names(lang):
     return res
 
 
-class UpdatedException(Exception):
-    """Base exception with additional payload"""
-    def __init__(self, data):
-        Exception.__init__(self)
-        self.data = data
 
 
 def get_page_list(start, total, cur, show_max):
@@ -121,18 +121,14 @@ def get_page_list(start, total, cur, show_max):
 
 
 def process_lang_params(request):
-    if 'lang' in request.GET:
-        lang = list(set([x for x in request.GET.get('lang').split(',') if x]))
 
-    if request.method == 'POST':
-        if request.POST.get('lang'):
-            lang = list(set(lang + [request.POST.get('lang')]))
-        raise UpdatedException(lang)
+    lang = request.GET.get('lang', None)
 
-    if not 'lang' in request.GET:
-        lang = get_accepted_lang(request)
+    if lang is None:
+        langs = get_accepted_lang(request)
+        lang = next(iter(langs), '')
 
-    return sanitize_language_codes(lang)
+    return sanitize_language_code(lang)
 
 
 def symbian_opml_changes(podcast):

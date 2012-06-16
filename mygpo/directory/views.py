@@ -27,16 +27,9 @@ from mygpo.cache import get_cache_or_calc
 @cache_control(private=True)
 def toplist(request, num=100, lang=None):
 
-    try:
-        lang = utils.process_lang_params(request)
-    except utils.UpdatedException, updated:
-        return HttpResponseRedirect('/toplist/?lang=%s' % ','.join(updated.data))
+    lang = utils.process_lang_params(request)
 
-    type_str = request.GET.get('types', '')
-    set_types = [t for t in type_str.split(',') if t]
-    media_types = set_types or CONTENT_TYPES
-
-    toplist = PodcastToplist(lang, media_types)
+    toplist = PodcastToplist(lang)
     entries = toplist[:num]
 
     max_subscribers = max([p.subscriber_count() for (oldp, p) in entries]) if entries else 0
@@ -50,9 +43,8 @@ def toplist(request, num=100, lang=None):
         'entries': entries,
         'max_subscribers': max_subscribers,
         'url': current_site,
-        'languages': lang,
+        'language': lang,
         'all_languages': all_langs,
-        'types': media_types,
     })
 
 
@@ -143,17 +135,9 @@ def search(request, template='search.html', args={}):
 @vary_on_cookie
 def episode_toplist(request, num=100):
 
-    try:
-        lang = utils.process_lang_params(request)
-    except utils.UpdatedException, updated:
-        return HttpResponseRedirect('/toplist/episodes?lang=%s' % ','.join(updated.data))
+    lang = utils.process_lang_params(request)
 
-    type_str = request.GET.get('types', '')
-    set_types = filter(None, type_str.split(','))
-
-    media_types = set_types or CONTENT_TYPES
-
-    toplist = EpisodeToplist(languages=lang, types=media_types)
+    toplist = EpisodeToplist(language=lang)
     entries = list(map(proxy_object, toplist[:num]))
 
     # load podcast objects
@@ -175,10 +159,8 @@ def episode_toplist(request, num=100):
         'entries': entries,
         'max_listeners': max_listeners,
         'url': current_site,
-        'languages': lang,
+        'language': lang,
         'all_languages': all_langs,
-        'types': media_types,
-        'all_types': CONTENT_TYPES,
     })
 
 
