@@ -30,6 +30,7 @@ MENU_STRUCTURE = (
             ('/search/', _('Search')),
             ('/lists/', _('Podcast Lists')),
             ('/user/subscriptions/', _('User subscriptions')),
+            ('/suggestions/', _('Suggestions')),
             ('', _('Toplists')),
             ('/toplist/', _('Podcasts')),
             ('/toplist/episodes', _('Episodes')),
@@ -41,7 +42,6 @@ MENU_STRUCTURE = (
             ('/devices/', _('Devices')),
             ('/device/', _('Device')),
             ('/history/', _('History')),
-            ('/suggestions/', _('Suggestions')),
         )),
         (_('Community'), (
             ('/share/', _('Subscriptions')),
