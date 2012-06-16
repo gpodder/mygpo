@@ -64,11 +64,11 @@
     </p>
 
     <div class="btn-group">
-     <button type="submit" class="btn btn-warning icon-eye-close" onclick="submitForm('private');">
-      {% trans "New Password" %}
+     <button type="submit" class="btn btn-warning" onclick="submitForm('private');">
+      <i class="icon-eye-close"></i> {% trans "New Password" %}
      </button>
-     <button type="submit" class="btn btn-warning icon-eye-open" onclick="submitForm('public');">
-      {% trans "Make Public" %}
+     <button type="submit" class="btn btn-warning" onclick="submitForm('public');">
+      <i class="icon-eye-open"></i> {% trans "Make Public" %}
      </button>
     </div>
 
@@ -95,8 +95,8 @@
 
     <form class="form-inline" method="post" action="{% url favorites_private %}">
      {% csrf_token %}
-     <button type="submit" class="btn btn-warning icon-eye-close">
-      {% trans "New Password" %}
+     <button type="submit" class="btn btn-warning">
+      <i class="icon-eye-close"></i> {% trans "New Password" %}
      </button>
     </form>
 

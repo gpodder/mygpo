@@ -60,8 +60,8 @@
   {% blocktrans %}Browse the <a href="{{ toplist-url }}">toplist</a> and your <a href="{{ suggestions-url }}">personal suggestions</a>, <a href="{{ search-url }}">search</a> or simply copy and paste the podcast's URL here{% endblocktrans %}
   <form class="form-inline" method="get" action="{% url subscribe-by-url %}">
    <input class="url" name="url" type="text" />
-   <button class="btn btn-success icon-ok" type="submit">
-    {% trans "Subscribe" %}
+   <button class="btn btn-success" type="submit">
+    <i class="icon-ok"></i> {% trans "Subscribe" %}
    </button>
   </form>
  </div>
