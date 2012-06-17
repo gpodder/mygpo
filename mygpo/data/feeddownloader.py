@@ -24,7 +24,7 @@ import hashlib
 from datetime import datetime
 from itertools import chain
 
-from mygpo.core.models import Episode, Podcast
+from mygpo.core.models import Episode, Podcast, PodcastGroup
 from mygpo.core.slugs import assign_missing_episode_slugs, assign_slug, \
          PodcastSlug
 from feedservice.parse import parse_feed
@@ -48,37 +48,55 @@ class PodcastUpdater(object):
         """ Run the updates """
 
         for n, podcast in enumerate(self.queue):
-            print '(%d) %s' % (n, podcast.url)
-            self.update_podcast(podcast)
+
+            if isinstance(podcast, PodcastGroup):
+                for p in podcast.podcasts:
+                    print '(%d) %s' % (n, p.url)
+                    self.update_podcast(podcast)
+
+            else:
+                print '(%d) %s' % (n, podcast.url)
+                self.update_podcast(podcast)
 
 
     def update_podcast(self, podcast):
         parsed = parse_feed(podcast.url, process_text=convert_markdown)
+
+        if 'urls' not in parsed:
+            # TODO ?
+            return
 
         podcast = Podcast.for_url(parsed['urls'][0])
 
         # TODO: check if we changed something
         updated = True
 
-        podcast.title = parsed['title']
+        podcast.title = parsed.get('title', podcast.title)
         podcast.urls = list(set(podcast.urls + parsed['urls']))
-        podcast.descriptions = parsed['description']
-        podcast.link = parsed['link']
+        podcast.description = parsed.get('description', podcast.description)
+        podcast.link = parsed.get('link', podcast.link)
         podcast.last_update = datetime.utcnow()
-        podcast.logo_url = parsed.get('logo', None)
-        podcast.author = parsed.get('author', None)
-        podcast.language = parsed.get('language', None)
-        podcast.content_types = parsed['content_types']
-        podcast.tags['feed'] = parsed.get('tags', [])
-        podcast.common_episode_title = None #TODO
-        podcast.new_location = parsed.get('new_location', None)
-        podcast.latest_episode_timestamp = None #TODO
+        podcast.logo_url = parsed.get('logo', podcast.logo_url)
+        podcast.author = parsed.get('author', podcast.author)
+        podcast.language = parsed.get('language', podcast.language)
+        podcast.content_types = parsed.get('content_types', podcast.content_types)
+        podcast.tags['feed'] = parsed.get('tags', podcast.tags['feed'])
+        podcast.common_episode_title = parsed.get('common_episode_title', podcast.common_episode_title)
+        podcast.new_location = parsed.get('new_location', podcast.new_location)
 
 
         if podcast.new_location:
             self.mark_outdated(podcast)
 
-        self.update_episodes(podcast, parsed)
+        episodes = list(podcast.get_episodes())
+        self.update_episodes(podcast, parsed, episodes)
+
+        # latest episode timestamp
+        eps = filter(lambda e: bool(e.released), episodes)
+        eps = sorted(eps, key=lambda e: e.released)
+        if eps:
+            podcast.latest_episode_timestamp = eps[-1].released
+
 
         assign_slug(podcast, PodcastSlug)
         assign_missing_episode_slugs(podcast)
@@ -87,9 +105,9 @@ class PodcastUpdater(object):
 
 
 
-    def update_episodes(self, podcast, parsed):
+    def update_episodes(self, podcast, parsed, episodes):
 
-        existing_episodes = dict( (e.url, e) for e in podcast.get_episodes())
+        existing_episodes = dict( (e.url, e) for e in episodes)
         episodes_by_id = dict( (e._id, e) for e in existing_episodes.values())
 
         for parsed_episode in parsed['episodes']:
@@ -115,26 +133,26 @@ class PodcastUpdater(object):
                 episode.podcast = podcast.get_id()
 
 
-            episode.title = parsed_episode['title']
-            episode.description = parsed_episode['description']
-            episode.link = parsed_episode['link']
+            episode.title = parsed_episode.get('title', episode.title)
+            episode.description = parsed_episode.get('description', episode.description)
+            episode.link = parsed_episode.get('link', episode.link)
             episode.released = datetime.utcfromtimestamp(parsed_episode['released'])
-            episode.author = parsed_episode.get('author', None)
-            episode.duration = parsed_episode.get('duration', None)
+            episode.author = parsed_episode.get('author', episode.author)
+            episode.duration = parsed_episode.get('duration', episode.duration)
             episode.filesize = parsed_episode['files'][0]['filesize']
-            episode.language = parsed_episode.get('language', None)
+            episode.language = parsed_episode.get('language', episode.language)
             episode.last_update = datetime.utcnow()
             episode.mimetypes = list(set(filter(None, [f.get('mimetype') for f in parsed_episode['files']])))
 
             urls = list(chain.from_iterable(f['urls'] for f in parsed_episode['files']))
             episode.urls = list(set(episode.urls + urls))
 
-            episode.content_types = None #TODO
+            #episode.content_types = None #TODO
 
             print 'Updating Episode: %s' % episode.title
             episode.save()
 
-            episodes_by_id.pop(episode._id)
+            episodes_by_id.pop(episode._id, None)
 
 
         outdated_episodes = episodes_by_id.values()
@@ -181,6 +199,9 @@ class PodcastUpdater(object):
                     os.unlink(f)
 
             return  cover_art
+
+        except urllib2.HTTPError as e:
+            print e
 
         except Exception:
             raise
