@@ -10,7 +10,14 @@
 
 {% block content %}
 
-  <h1>{% trans "Suggested Podcasts" %}</h1>
+ <div class="row-fluid">
+  <div class="span12">
+   <h1>{% trans "Suggested Podcasts" %}</h1>
+  </div>
+ </div>
+
+ <div class="row-fluid">
+  <div class="span8">
 
   <table class="list podcast_list">
   {% for podcast in entries %}
@@ -21,15 +28,15 @@
      <p class="description">{{ podcast.description|striptags|truncatewords:"12" }}</p>
     </td>
     <td>
-      <a class="btn btn-success icon-ok" href="{% podcast_link_target podcast "subscribe" %}">
-       {% trans "Subscribe" %}
+      <a class="btn btn-success" href="{% podcast_link_target podcast "subscribe" %}">
+       <i class="icon-ok"></i> {% trans "Subscribe" %}
       </a>
     </td>
     <td>
      <form action="{% url suggestions-blacklist podcast.oldid %}">
       {% csrf_token %}
-      <button class="btn btn-danger icon-ban-circle" type="submit">
-       {% trans "Not Interested" %}
+      <button class="btn btn-danger" type="submit">
+       <i class="icon-ban-circle"></i> {% trans "No Interest" %}
       </button>
      </form>
     </td>
@@ -43,25 +50,42 @@
   {% endfor %}
   </table>
 
- {% if entries %}
-  <div class="rate">
-   <strong>{% trans "Do you like our suggestions?" %}</strong>
-   <form class="form-inline" action="{% url suggestions-rate %}?rate=1" method="post" class="rate">
-    {% csrf_token %}
-    <button class="btn btn-success icon-thumbs-up" type="submit"> {% trans "Yes" %}</button>
-   </form>
-   <form class="form-inline" action="{% url suggestions-rate %}?rate=-1" method="post" class="rate">
-    {% csrf_token %}
-    <button class="btn btn-danger icon-thumbs-down" type="submit"> {% trans "No" %}</button>
-   </form>
-  </div>
-
+  {% if entries %}
  <a class="btn" href="{% url suggestions-opml 15 "opml" %}">
   <img src="/media/24x24/opml-icon.png">
    {% trans "Download OPML" %}
  </a>
+  {% endif %}
 
+ </div>
+
+
+ {% if entries %}
+ <div class="span4 well">
+
+   <h3>{% trans "Do you Like our Suggestions?" %}</h3>
+
+   <div class="btn-group">
+    <button class="btn btn-success" type="submit" onclick="submitForm('rate_pos');">
+     <i class="icon-thumbs-up"></i> {% trans "Yes" %}
+    </button>
+    <button class="btn btn-danger" type="submit" onclick="submitForm('rate_neg');">
+     <i class="icon-thumbs-down"></i> {% trans "No" %}
+    </button>
+   </div>
+
+   <form id="rate_pos" class="form-inline" action="{% url suggestions-rate %}?rate=1" method="post" class="rate">
+    {% csrf_token %}
+   </form>
+   <form id="rate_neg" class="form-inline" action="{% url suggestions-rate %}?rate=-1" method="post" class="rate">
+    {% csrf_token %}
+   </form>
+
+
+ </div>
  {% endif %}
+
+</div>
 
 {% endblock %}
 
