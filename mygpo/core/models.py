@@ -99,7 +99,11 @@ class Episode(Document, SlugMixin, OldIdMixin):
 
     @classmethod
     def for_podcast_url(cls, podcast_url, episode_url, create=False):
-        podcast = Podcast.for_url(podcast_url)
+        podcast = Podcast.for_url(podcast_url, create=create)
+
+        if not podcast: # podcast does not exist and should not be created
+            return None
+
         return cls.for_podcast_id_url(podcast.get_id(), episode_url, create)
 
 
