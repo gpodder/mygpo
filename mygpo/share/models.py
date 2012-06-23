@@ -1,3 +1,4 @@
+from random import random
 
 from couchdbkit.ext.django.schema import *
 
@@ -17,6 +18,8 @@ class PodcastList(Document, RatingMixin):
     slug     = StringProperty(required=True)
     podcasts = StringListProperty()
     user     = StringProperty(required=True)
+    random_key = FloatProperty(default=random)
+
 
 
     @classmethod
@@ -60,6 +63,26 @@ class PodcastList(Document, RatingMixin):
                 limit = 0,
                 stale = 'update_after',
             ).total_rows
+
+
+    @classmethod
+    def random(cls, chunk_size=1):
+
+        while True:
+            rnd = random()
+            res = cls.view('podcastlists/random',
+                    startkey     = rnd,
+                    include_docs = True,
+                    limit        = chunk_size,
+                    stale        = 'ok',
+                )
+
+            if not res:
+                break
+
+            for r in res:
+                yield r
+
 
 
     def __repr__(self):

@@ -51,21 +51,38 @@ def toplist(request, num=100, lang=None):
 
 @cache_control(private=True)
 @vary_on_cookie
-def browse(request, num_lists=4, num_categories=10, num_tags_cloud=90,
-        podcasts_per_topic=10):
+def browse(request, num_categories=10, num_tags_cloud=90,
+        podcasts_per_topic=10, podcasts_per_list=5):
 
-    num_lists      = int(num_lists)
     num_categories = int(num_categories)
     num_tags_cloud = int(num_tags_cloud)
 
-    topics = Topics(num_lists, num_categories, podcasts_per_topic)
+    topics = Topics(num_categories, podcasts_per_topic)
     topics = islice(topics, 0, num_categories)
+
+    #TODO: cache
+    random_list = next(PodcastList.random(), None)
+    list_owner = None
+    if random_list:
+        random_list = proxy_object(random_list)
+        random_list.more_podcasts = max(0, len(random_list.podcasts) - podcasts_per_list)
+        random_list.podcasts = Podcast.get_multi(random_list.podcasts[:podcasts_per_list])
+        list_owner = User.get(random_list.user)
+
+    #TODO: cache
+    random_podcast = next(Podcast.random(), None)
+    if random_podcast:
+        random_podcast = random_podcast.get_podcast()
+
 
     tag_cloud = TagCloud(count=num_tags_cloud, skip=num_categories, sort_by_name=True)
 
     return render(request, 'directory.html', {
         'topics': topics,
         'tag_cloud': tag_cloud,
+        'podcastlist': random_list,
+        'podcastlistowner': list_owner,
+        'random_podcast': random_podcast,
         })
 
 
