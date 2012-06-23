@@ -255,10 +255,7 @@ class EpisodeUserState(Document):
             return state
 
         else:
-            podcast = Podcast.for_url(podcast_url, create=True)
-            episode = Episode.for_podcast_id_url(podcast.get_id(), episode_url,
-                    create=True)
-
+            episode = Episode.for_podcast_url(podcast_url, episode_url, create=True)
             return episode.get_user_state(user)
 
 
