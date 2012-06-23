@@ -9,34 +9,59 @@
 
 {% block content %}
 
- {% if next %}
-  <div class="error">
-   {% trans "You need to login to access this page." %}
+ <div class="row-fluid">
+  <div class="span12">
+   <h1>{% trans "Login" %}
   </div>
- {% endif %}
+ </div>
 
+ <div class="row-fluid">
 
- <h1>Login</h1>
+  <div class="span8">
 
- <div class="form">
-  <form action="{% url login %}" method="post">
+   <form class="form-horizontal" action="{% url login %}" method="post">
 
-   {% csrf_token %}
+    <fieldset>
+     {% csrf_token %}
 
-   <label>Username
-   </label>
-   <input type="text" name="user" id="login_username" />
+     <div class="control-group">
+      <label class="control-label">Username</label>
+      <div class="controls">
+       <input type="text" name="user" id="login_username" />
+      </div>
+     </div>
 
-   <label>Password
-    <span class="small"><a href="{% url restore-password %}">Forgot your password?</a></span>
-   </label>
-   <input type="password" name="pwd" />
+     <div class="control-group">
+      <label class="control-label">Password</label>
+      <div class="controls">
+       <input type="password" name="pwd" />
+       <p>
+        <a href="{% url restore-password %}">
+         {% trans "Forgot your password?" %}
+        </a>
+       </p>
+      </div>
+     </div>
 
-   <button type="submit">Login</button>
-   <div class="spacer"></div>
+     <div class="control-group">
+      <div class="controls">
+       <button class="btn btn-primary" type="submit">{% trans "Login" %}</button>
+      </div>
+     </div>
 
+    </fieldset>
    </form>
   </div>
+
+  {% if next %}
+   <div class="span4">
+    <div class="error">
+     {% trans "You need to login to access this page." %}
+    </div>
+   </div>
+  {% endif %}
+
+ </div>
 
 {% endblock %}
 
