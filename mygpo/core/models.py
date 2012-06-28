@@ -3,7 +3,7 @@ import os.path
 import re
 from datetime import datetime
 from dateutil import parser
-from random import randint
+from random import randint, random
 
 from couchdbkit.ext.django.schema import *
 from restkit.errors import Unauthorized
@@ -99,7 +99,11 @@ class Episode(Document, SlugMixin, OldIdMixin):
 
     @classmethod
     def for_podcast_url(cls, podcast_url, episode_url, create=False):
-        podcast = Podcast.for_url(podcast_url)
+        podcast = Podcast.for_url(podcast_url, create=create)
+
+        if not podcast: # podcast does not exist and should not be created
+            return None
+
         return cls.for_podcast_id_url(podcast.get_id(), episode_url, create)
 
 
@@ -316,6 +320,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
     common_episode_title = StringProperty()
     new_location = StringProperty()
     latest_episode_timestamp = DateTimeProperty()
+    random_key = FloatProperty(default=random)
 
 
     @classmethod
@@ -420,36 +425,34 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
 
     @classmethod
-    def random(cls):
-        """ Returns an infinite iterator of random podcasts
+    def random(cls, language='', chunk_size=5):
+        """ Returns an iterator of random podcasts
 
-        One query is required for each podcast that is returned"""
+        optionaly a language code can be specified. If given the podcasts will
+        be restricted to this language. chunk_size determines how many podcasts
+        will be fetched at once """
 
-        total = cls.count()
         db = cls.get_db()
 
         while True:
-            n = randint(0, total)
-            res = db.view('podcasts/by_id',
-                    skip         = n,
+            rnd = random()
+            res = db.view('podcasts/random',
+                    startkey     = [language, rnd],
                     include_docs = True,
-                    limit        = 1,
+                    limit        = chunk_size,
                     stale        = 'ok',
                 )
 
             if not res:
-                continue
+                break
 
-            r = res.one()
-            obj = r['doc']
-            if obj['doc_type'] == 'Podcast':
-                yield Podcast.wrap(obj)
+            for r in res:
+                obj = r['doc']
+                if obj['doc_type'] == 'Podcast':
+                    yield Podcast.wrap(obj)
 
-            else:
-                pid = r[u'key']
-                pg = PodcastGroup.wrap(obj)
-                podcast = pg.get_podcast_by_id(pid)
-                yield podcast
+                elif obj['doc_type'] == 'PodcastGroup':
+                    yield PodcastGroup.wrap(obj)
 
 
     @classmethod

@@ -148,16 +148,7 @@ def update_subscriptions(user, device, add, remove):
 
 
 def get_subscription_changes(user, device, since, until):
-    add, rem = device.get_subscription_changes(since, until)
-
-    podcast_ids = add + rem
-    podcasts = get_to_dict(Podcast, podcast_ids, get_id=models.Podcast.get_id)
-
-    add_podcasts = filter(None, (podcasts.get(i, None) for i in add))
-    rem_podcasts = filter(None, (podcasts.get(i, None) for i in rem))
-    add_urls = [ podcast.url for podcast in add_podcasts]
-    rem_urls = [ podcast.url for podcast in rem_podcasts]
-
+    add_urls, rem_urls = device.get_subscription_changes(since, until)
     until_ = get_timestamp(until)
     return {'add': add_urls, 'remove': rem_urls, 'timestamp': until_}
 

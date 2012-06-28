@@ -271,10 +271,7 @@ class EpisodeUserState(Document):
             return state
 
         else:
-            podcast = Podcast.for_url(podcast_url, create=True)
-            episode = Episode.for_podcast_id_url(podcast.get_id(), episode_url,
-                    create=True)
-
+            episode = Episode.for_podcast_url(podcast_url, episode_url, create=True)
             return episode.get_user_state(user)
 
 
@@ -550,9 +547,9 @@ class Device(Document):
         for p_state in podcast_states:
             change = p_state.get_change_between(self.id, since, until)
             if change == 'subscribe':
-                add.append( p_state.podcast )
+                add.append( p_state.ref_url )
             elif change == 'unsubscribe':
-                rem.append( p_state.podcast )
+                rem.append( p_state.ref_url )
 
         return add, rem
 
