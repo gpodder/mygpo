@@ -55,7 +55,7 @@ class Command(ChangesCommand):
 
 
     def get_query_params(self):
-        return dict(include_docs=True, filter='users/episode_states')
+        return dict(include_docs=True, filter='episode_states/episode_states')
 
 
     @repeat_on_conflict(['state'])
