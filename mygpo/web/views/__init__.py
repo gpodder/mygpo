@@ -118,12 +118,19 @@ def dashboard(request, episode_count=10):
     if random_podcast:
         random_podcast = random_podcast.get_podcast()
 
+    # we only show the "install reader" link in firefox, because we don't know
+    # yet how/if this works in other browsers.
+    # hints appreciated at https://bugs.gpodder.org/show_bug.cgi?id=58
+    show_install_reader = \
+                'firefox' in request.META.get('HTTP_USER_AGENT', '').lower()
+
     return render(request, 'dashboard.html', {
             'subscribed_podcasts': subscribed_podcasts,
             'newest_episodes': newest_episodes,
             'random_podcast': random_podcast,
             'checklist': checklist,
             'site': site,
+            'show_install_reader': show_install_reader,
         })
 
 

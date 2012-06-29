@@ -132,7 +132,34 @@
 
   </div>
  </div>
+
+ {% if show_install_reader %}
+ <div class="row-fluid">
+  <div class="span12 well">
+    <h3>{% trans "Subscribe in Your Browser" %}</h3>
+    <p>
+     {% blocktrans %}Register {{ site.domain }} as a feed reader, and subscribe to podcasts directly from your browser{% endblocktrans %}
+    </p>
+    <a class="btn btn-primary" href="#" onclick="registerHandler();">
+     {% trans "Install" %}
+    </a>
+
+  </div>
+ </div>
+ {% endif %}
+
  </div>
 
 {% endblock %}
 
+
+{% block javascript %}
+<script type="text/javascript">
+  function registerHandler()
+  {
+    navigator.registerContentHandler("application/vnd.mozilla.maybe.feed",
+        document.location.protocol + "//{{ site.domain }}/subscribe?url=%s",
+        "{{ site.domain }}");
+  }
+</script>
+{% endblock %}
