@@ -17,7 +17,7 @@
 
    <tr>
     <td>
-     <img src="/media/22x22/internet-web-browser.png" class="action-button" />
+     <i class="icon-link"></i>
     </td>
     <td>
      <a href="{% url shared-subscriptions user.username %}{% if token %}?token={{ token }}{% endif %}">
@@ -31,7 +31,7 @@
 
    <tr>
     <td>
-     <img src="/media/22x22/opml-icon.png" class="action-button" />
+     <i class="icon-download"></i>
     </td>
     <td>
      <a href="{% url shared-subscriptions-opml user.username %}{% if token %}?token={{ token }}{% endif %}">
@@ -45,7 +45,7 @@
 
    <tr>
     <td>
-     <img height="22" width="22" src="/media/28x28/feed-icon.png" class="action-button" />
+     <i class="icon-rss"></i>
     </td>
     <td>
      <a href="{% url shared-subscriptions-rss user.username %}{% if token %}?token={{ token }}{% endif %}">
