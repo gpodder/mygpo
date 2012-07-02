@@ -531,9 +531,9 @@ class Device(Document):
         for p_state in podcast_states:
             change = p_state.get_change_between(self.id, since, until)
             if change == 'subscribe':
-                add.append( p_state.podcast )
+                add.append( p_state.ref_url )
             elif change == 'unsubscribe':
-                rem.append( p_state.podcast )
+                rem.append( p_state.ref_url )
 
         return add, rem
 
