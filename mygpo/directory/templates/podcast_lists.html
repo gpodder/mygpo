@@ -38,8 +38,8 @@
     <td><a href="{% url lists-user l.username %}">{{ l.username }}</a></td>
     <td class="numeric">{{ l.podcasts|length }}</td>
     <td>
-     <a href="{% url list-opml l.username l.slug %}">
-      <img src="/media/22x22/opml-icon.png" />
+     <a class="btn" href="{% url list-opml l.username l.slug %}">
+      <i class="icon-download"></i>
      </a>
     </td>
    </tr>

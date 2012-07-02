@@ -72,13 +72,13 @@
   <form action="{% url list-rate owner.username podcastlist.slug %}?rate=1" method="post">
    {% csrf_token %}
    <button class="btn" type="submit">
-    <li class="icon-thumbs-up"></li>
+    <i class="icon-thumbs-up"></i>
     {% trans "Vote" %}
    </button>
   </form>
 
    <a class="btn" href="{% url list-opml owner.username podcastlist.slug %}">
-    <img src="/media/22x22/opml-icon.png" class="action-button" />
+    <i class="icon-download"></i>
     {% trans "Download as OPML" %}
     </a>
 
@@ -91,7 +91,7 @@
   <h2>Add Podcast</h2>
   <form method="get" action="{% url list-search owner.username podcastlist.slug %}" class="form-inline" target="results">
    <div class="input-prepend">
-    <span class="add-on"><i class="icon-search"></i></span><input type="text" class="input-xlarge" name="q" {% if q %}value="{{ q }}"{% endif %} >
+    <span class="add-on"><i class="icon-search"></i></span><input type="text" class="input-xxlarge" name="q" {% if q %}value="{{ q }}"{% endif %} >
    </div>
    <input class="btn btn-primary" type="submit" value="Search">
   </form>

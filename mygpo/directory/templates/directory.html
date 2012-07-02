@@ -45,11 +45,9 @@
        <td class="logo">{{ podcast|podcast_logo }}</td>
        <td>{% podcast_group_link podcast %}</td>
        <td class="subscribe">
-        <div class="button">
-         <a href="{% podcast_link_target podcast "subscribe" %}">
-          <img src="/media/subscribe.png" />
+         <a class="btn btn-success" href="{% podcast_link_target podcast "subscribe" %}">
+          <i class="icon-ok"></i>
          </a>
-        </div>
        </td>
       </tr>
      {% endfor %}

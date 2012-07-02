@@ -27,7 +27,9 @@
       <td>
        <form action="{% url list-add-podcast user.username listname podcast.get_id %}" method="post" target="_parent">
         {% csrf_token %}
-        <button class="btn btn-success icon-plus" type="submit"></button>
+        <button class="btn btn-success" type="submit">
+         <i class="icon-plus"></i>
+        </button>
        </form>
       </td>
      </tr>
