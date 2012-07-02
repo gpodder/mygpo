@@ -54,7 +54,7 @@
       <td>{{ d.uid|striptags }}</td>
       <td>
        <form method="post" action="{% url device-undelete d.uid %}">
-        <button class="btn btn-warning icon-repeat" type="submit">
+        <button class="btn icon-repeat" type="submit">
          {% trans "Reactivate" %}
         </button>
        </form>

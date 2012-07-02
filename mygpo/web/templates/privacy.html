@@ -23,7 +23,7 @@
     {% trans "New subscriptions will be public by default." %}
     <form method="post" action="{% url privacy_default_private %}">
      {% csrf_token %}
-     <button class="btn btn-warning" type="submit">
+     <button class="btn" type="submit">
       <i class="icon-eye-close"></i> {% trans "Change to Private" %}
      </button>
     </form>
@@ -31,7 +31,7 @@
     {% trans "New subscriptions will be private by default." %}
     <form method="post" action="{% url privacy_default_public %}">
      {% csrf_token %}
-     <button class="btn btn-warning" type="submit">
+     <button class="btn" type="submit">
       <i class="icon-eye-open"></i> {% trans "Change to Public" %}
      </button>
     </form>
@@ -71,7 +71,7 @@
         <td>
         <form method="post" action="{% url privacy_podcast_public podcast.get_id %}">
          {% csrf_token %}
-         <button class="btn btn-warning" type="submit">
+         <button class="btn" type="submit">
           <i class="icon-eye-open"></i> {% trans "Make Public" %}
          </button>
         </form>

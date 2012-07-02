@@ -60,14 +60,14 @@
 
     <div class="btn-group">
   {% if token %}
-     <button type="submit" class="btn btn-warning" onclick="submitForm('private');">
+     <button type="submit" class="btn" onclick="submitForm('private');">
       <i class="icon-eye-close"></i> {% trans "New Password" %}
      </button>
-     <button type="submit" class="btn btn-warning" onclick="submitForm('public');">
+     <button type="submit" class="btn" onclick="submitForm('public');">
       <i class="icon-eye-open"></i> {% trans "Make Public" %}
      </button>
   {% else %}
-     <button type="submit" class="btn btn-warning" onclick="submitForm('private');">
+     <button type="submit" class="btn" onclick="submitForm('private');">
       <i class="icon-eye-close"></i> {% trans "Make Private" %}
      </button>
   {% endif %}
