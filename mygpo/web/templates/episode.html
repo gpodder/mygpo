@@ -100,17 +100,13 @@
   {% if user.is_authenticated %}
 
    {% if is_favorite %}
-    <div class="button">
-     <a href="{% episode_link_target episode podcast "episode-fav" %}">
-      <img src="/media/fav.png" /> {% trans "Favorite" %}
+     <a class="btn" href="{% episode_link_target episode podcast "episode-fav" %}">
+      <i class="icon-star"></i> {% trans "Remove Favorite" %}
      </a>
-    </div>
    {% else %}
-    <div class="button">
-     <a href="{% episode_link_target episode podcast "episode-fav" %}">
-      <img src="/media/fav-add.png" /> {% trans "Add as Favorite" %}
+     <a class="btn" href="{% episode_link_target episode podcast "episode-fav" %}">
+      <i class="icon-star-empty"></i> {% trans "Favorite" %}
      </a>
-    </div>
    {% endif %}
 
    {% if played_parts %}
