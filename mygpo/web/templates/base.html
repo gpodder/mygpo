@@ -32,10 +32,6 @@
 
     <!-- Le fav and touch icons -->
     <link rel="shortcut icon" href="/favicon.png">
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/media/ico/apple-touch-icon-144-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/media/ico/apple-touch-icon-114-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/media/ico/apple-touch-icon-72-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" href="/media/ico/apple-touch-icon-57-precomposed.png">
 
     {% block head %}{% endblock %}
 
@@ -64,16 +60,17 @@
               <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-              <li><a href="#">Profile</a></li>
+              <li><a href="{% url account %}">Profile</a></li>
               <li class="divider"></li>
               <li><a href="{% url logout %}">Sign Out</a></li>
             </ul>
            {% else %}
-            <a class="btn dropdown-toggle" data-toggle="dropdown" href="{% url login %}">
-              <i class="icon-user"></i>{% trans "Login" %}
+            <a class="btn dropdown-toggle" data-toggle="dropdown" href="">
+              <i class="icon-user"></i> {% trans "Login" %}
               <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
+              <li><a href="{% url login %}">{% trans "Login" %}</a></li>
               <li><a href="{% url register %}">{% trans "Register" %}</a></li>
             </ul>
            {% endif %}
@@ -176,6 +173,9 @@
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/media/js/jquery.js"></script>
+    <script src="/media/js/bootstrap-dropdown.js"></script>
+
     {% block javascript %}{% endblock javascript %}
 
     <!-- getsatisfaction.com feedback tab -- >

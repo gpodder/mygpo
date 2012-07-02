@@ -3,20 +3,6 @@
 {% load cache %}
 {% load podcasts %}
 
-{% block head %}
- <script type="text/javascript" src="/media/js/jquery-1.4.2.min.js"></script>
- <script type="text/javascript">
-    $(document).ready(function()
-    {
-        $("#feature-list p").hide();
-        $("#feature-list h3").click(function()
-        {
-            $(this).next("#feature-list p").slideToggle(500);
-        });
-    });
- </script>
-{% endblock %}
-
 {% load menu %}
 {% block mainmenu %}{{ "/"|main_menu }}{% endblock %}
 {% block sectionmenu %}{{ "/"|section_menu }}{% endblock %}

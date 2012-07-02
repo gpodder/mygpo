@@ -9,20 +9,6 @@
 {% block mainmenu %}{{ "/toplist/episodes"|main_menu }}{% endblock %}
 {% block sectionmenu %}{{ "/toplist/episodes"|section_menu }}{% endblock %}
 
-{% block head %}
- <script type="text/javascript" src="/media/js/jquery-1.4.2.min.js"></script>
- <script type="text/javascript">
-    $(document).ready(function()
-    {
-        $(".config-toplist").hide();
-        $("#open-config").click(function()
-        {
-            $(".config-toplist").slideToggle(500);
-        });
-    });
- </script>
-{% endblock head %}
-
 {% block title %}{% trans "Episode-Toplist" %}{% endblock %}
 
 {% block content %}

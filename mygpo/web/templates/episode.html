@@ -24,8 +24,6 @@
 {% endblock %}
 
 {% block head %}
- <script type="text/javascript" src="/media/js/jquery-1.4.2.min.js"></script>
- <script type="text/javascript" src="/media/js/jquery.watermark.min.js"></script>
  {% if episode.url|is_youtube_video %}
   <script type="text/javascript" src="/media/js/swfobject.js"></script>
   <script type="text/javascript" src="/media/js/json2.js"></script>
@@ -34,16 +32,6 @@
  {% opengraph_episode episode podcast %}
  {% google_plus_one_head %}
 
- <script type="text/javascript">
-    $(document).ready(function()
-    {
-        $("#listcontent div.listblock").hide();
-        $("#listcontent h2").click(function()
-        {
-            $(this).next("#listcontent div").slideToggle(500);
-        });
-    });
- </script>
 {% endblock head %}
 
 {% block title %}{{ episode.title|default:"Unnamed Episode"|striptags }} - {{ podcast.title|default:"Unnamed Podcast"|striptags}}{% endblock %}
@@ -184,8 +172,8 @@
      <form class="form-inline" action="{% episode_link_target episode podcast "add-chapter" %}" method="POST">
       {% csrf_token %}
       <td>
-       <input type="text" name="start" id="start" class="time" /> -
-       <input type="text" name="end" id="end" class="time" />
+       <input type="text" name="start" id="start" class="time" placeholder="h:mm:ss"/> -
+       <input type="text" name="end" id="end" class="time" placeholder="h:mm:ss"/>
       </td>
       <td>
        <input type="checkbox" name="advertisement" />
@@ -236,7 +224,7 @@
      <form action="{% episode_link_target episode podcast "add-episode-action" %}" method="POST">
       {% csrf_token %}
       <td>
-       <input class="input-small" type="text" id="timestamp" name="timestamp" /></td>
+       <input class="input-small" type="text" id="timestamp" name="timestamp" placeholder="empty = now" /></td>
       <td>
        <select class="input-small" name="action">
         {% for action, str in actions %}
@@ -272,9 +260,6 @@
 
 {% block javascript %}
  <script type="text/javascript">
-  $("#start").watermark("h:mm:ss", {className: 'watermark'});
-  $("#end").watermark("h:mm:ss", {className: 'watermark'});
-  $("#timestamp").watermark("empty = now", {className: 'watermark'});
 
   {% if episode.url|is_youtube_video %}
    {% embed_youtube_video podcast episode user %}
