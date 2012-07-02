@@ -24,7 +24,6 @@
 
  <div class="span8">
 
- {% cache 3600 newest_episodes user.username %}
    {% if newest_episodes %}
     <h2>{% trans "Newest Episodes" %}</h2>
     <table class="list">
@@ -40,7 +39,6 @@
      {% endfor %}
     </table>
    {% endif %}
-  {% endcache %}
 
  </div>
 

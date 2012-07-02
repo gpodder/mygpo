@@ -33,7 +33,7 @@ from django.views.decorators.cache import never_cache, cache_control
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core import models
 from mygpo.core.models import Podcast, Episode
-from mygpo.core.episodes import NewestEpisodes
+from mygpo.core.podcasts import PodcastSet
 from mygpo.directory.tags import Tag
 from mygpo.directory.toplist import PodcastToplist
 from mygpo.users.models import Suggestions, History, HistoryEntry, DeviceDoesNotExist
@@ -59,12 +59,9 @@ def home(request):
 def welcome(request):
     current_site = RequestSite(request)
 
-    podcasts = get_cache_or_calc('podcast-count', timeout=60*60,
-                    calc=lambda: Podcast.count())
-    users    = get_cache_or_calc('user-count', timeout=60*60,
-                    calc=lambda: User.count())
-    episodes = get_cache_or_calc('episode-count', timeout=60*60,
-                    calc=lambda: Episode.count())
+    podcasts = get_cache_or_calc('podcast-count', 60*60, Podcast.count)
+    users    = get_cache_or_calc('user-count', 60*60, User.count)
+    episodes = get_cache_or_calc('episode-count', 60*60, Episode.count)
 
     lang = utils.process_lang_params(request)
 
@@ -111,7 +108,11 @@ def dashboard(request, episode_count=10):
         checklist.append('publish')
 
     tomorrow = datetime.today() + timedelta(days=1)
-    newest_episodes = NewestEpisodes(subscribed_podcasts, tomorrow,
+
+    podcasts = PodcastSet(subscribed_podcasts)
+
+    newest_episodes = get_cache_or_calc('newest-episodes-user-%s' %
+            request.user._id, 60, podcasts.get_newest_episodes, tomorrow,
             episode_count)
 
     random_podcast = next(Podcast.random(), None)

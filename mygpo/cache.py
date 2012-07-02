@@ -4,16 +4,16 @@ from django.core.cache import cache
 NOT_IN_CACHE = object()
 
 
-def get_cache_or_calc(key, calc, timeout=None, version=None, *args, **kwargs):
+def get_cache_or_calc(key, timeout, calc, *args, **kwargs):
     """ Gets the value from the cache or calculates it
 
     If the value needs to be calculated, it is stored in the cache. """
 
-    value = cache.get(key, NOT_IN_CACHE, version=version)
+    value = cache.get(key, NOT_IN_CACHE)
 
     if value is NOT_IN_CACHE:
         value = calc(*args, **kwargs)
-        cache.set(key, value, timeout=timeout, version=version)
+        cache.set(key, value, timeout=timeout)
 
     return value
 

@@ -35,8 +35,8 @@ def toplist(request, num=100, lang=None):
     max_subscribers = max([p.subscriber_count() for (oldp, p) in entries]) if entries else 0
     current_site = RequestSite(request)
 
-    languages = get_cache_or_calc('podcast-languages', timeout=60*60,
-            calc=lambda: utils.get_podcast_languages())
+    languages = get_cache_or_calc('podcast-languages', 60*60,
+            utils.get_podcast_languages)
     all_langs = utils.get_language_names(languages)
 
     return render(request, 'toplist.html', {
@@ -168,8 +168,8 @@ def episode_toplist(request, num=100):
     # Determine maximum listener amount (or 0 if no entries exist)
     max_listeners = max([0]+[e.listeners for e in entries])
 
-    languages = get_cache_or_calc('podcast-languages', timeout=60*60,
-            calc=lambda: utils.get_podcast_languages())
+    languages = get_cache_or_calc('podcast-languages', 60*60,
+            utils.get_podcast_languages)
     all_langs = utils.get_language_names(languages)
 
     return render(request, 'episode_toplist.html', {

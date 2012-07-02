@@ -6,30 +6,29 @@ from mygpo.core.models import Podcast
 from mygpo.core.proxy import proxy_object
 
 
-class NewestEpisodes(object):
-    """ Returns the newest episodes for a set of podcasts """
+class PodcastSet(set):
+    """ Represents a set of podcasts """
 
-    def __init__(self, podcasts, max_date, num_episodes, max_per_podcast=5):
-        self.podcasts = podcasts
-        self.max_date = max_date
-        self.num_episodes = num_episodes
-        self.max_per_podcast = max_per_podcast
+    def __init__(self, podcasts=None):
+        self.podcasts = podcasts or []
 
 
-    def __iter__(self):
+    def get_newest_episodes(self, max_date, num_episodes, max_per_podcast=5):
+        """ Returns the newest episodes for a set of podcasts """
+
         podcast_key = lambda p: p.latest_episode_timestamp
 
         podcasts = filter(lambda p: p.latest_episode_timestamp, self.podcasts)
         podcasts = sorted(podcasts, key=podcast_key, reverse=True)
 
         # we need at most num_episodes podcasts
-        podcasts = podcasts[:self.num_episodes]
+        podcasts = podcasts[:num_episodes]
 
         podcast_dict = dict((p.get_id(), p) for p in podcasts)
 
         jobs = [gevent.spawn(Podcast.get_episodes, podcast, since=1,
-                until=self.max_date, descending=True,
-                limit=self.max_per_podcast) for podcast in podcasts]
+                until=max_date, descending=True,
+                limit=max_per_podcast) for podcast in podcasts]
 
         gevent.joinall(jobs)
 
@@ -37,6 +36,6 @@ class NewestEpisodes(object):
 
         episodes = sorted(episodes, key=lambda e: e.released, reverse=True)
 
-        for episode in islice(episodes, self.num_episodes):
+        for episode in islice(episodes, num_episodes):
             p = podcast_dict.get(episode.podcast, None)
             yield proxy_object(episode, podcast=p)
