@@ -10,7 +10,15 @@
 {% block title %}{% trans "Managed Devices" %}{% endblock %}
 
 {% block content %}
-  <h1>{% trans "Managed Devices" %}</h1>
+
+ <div class="row-fluid">
+  <div class="span12">
+   <h1>{% trans "Managed Devices" %}</h1>
+  </div>
+ </div>
+
+ <div class="row-fluid">
+  <div class="span8">
 
    <table class="list">
     <tr>
@@ -35,7 +43,7 @@
        <td>{{ device.uid|striptags }}</td>
        <td>
         <a class="btn" href="{% url device-edit device.uid %}">
-         <li class="icon-edit"></li>
+         <i class="icon-edit"></i>
          {% trans "Configure" %}
         </a>
        </td>
@@ -54,15 +62,15 @@
       <td>{{ d.uid|striptags }}</td>
       <td>
        <form method="post" action="{% url device-undelete d.uid %}">
-        <button class="btn icon-repeat" type="submit">
-         {% trans "Reactivate" %}
+        <button class="btn" type="submit">
+         <i class="icon-repeat"></i> {% trans "Reactivate" %}
         </button>
        </form>
       </td>
       <td>
        <form method="post" action="{% url device-delete-permanently d.uid %}">
-        <button class="btn btn-danger icon-trash" type="submit">
-         {% trans "Delete Permanently" %}
+        <button class="btn btn-danger" type="submit">
+         <i class="icon-trash"></i> {% trans "Delete Permanently" %}
         </button>
        </form>
       </td>
@@ -70,9 +78,19 @@
      </tr>
     {% endfor %}
    </table>
-
-
    {% endif %}
+  </div>
+
+  <div class="span4 well">
+
+   <h3>{% trans "Adding New Devices" %}</h3>
+   <p>
+    {% trans "Just upload your subscriptions from a client, and it will automatically show up here." %}
+   </p>
+
+   <p>
+    {% trans "You can also manually create a new device." %}
+   </p>
 
   <div class="action-buttons">
     <a class="btn btn-success" href="{% url device-edit-new %}">
@@ -80,6 +98,6 @@
     </a>
   </div>
 
-   <div class="info"><strong>{% trans "How do I add a new device?" %}</strong> {% trans "Just upload your subscriptions with a new device using gPodder, and it will automatically show up in this list." %}</div>
+ </div>
 {% endblock %}
 
