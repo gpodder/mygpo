@@ -8,26 +8,50 @@
 {% block mainmenu %}{{ "/subscriptions/"|main_menu }}{% endblock %}
 {% block sectionmenu %}{{ "/devices/"|section_menu }}{% endblock %}
 
-{% block title %}{% trans "Create a Device " %}{% endblock %}
+{% block title %}{% trans "Create Device " %}{% endblock %}
 
 {% block content %}
-  <h1>{% trans "Create a Device" %}</h1>
-  <hr/>
+  <h1>{% trans "Create Device" %}</h1>
 
-  <h2>{% trans "Edit" %}</h2>
+  <div class="well">
+   <form class="form-horizontal" action="{% url device-create %}" method="POST">
 
-  <form action="{% url device-create %}" method="POST">
-   {% csrf_token %}
-   <table class="form">
-    {{ device_form.as_table }}
-    <tr>
-     <td></td>
-     <td>
-      <button type="submit">{% trans "Save" %}</button>
-     </td>
-    </tr>
-   </table>
+    {{ device_form.non_field_errors }}
+    {% csrf_token %}
+
+    <fieldset>
+
+    <div class="control-group">
+     <label class="control-label">Name</label>
+     <div class="controls">
+      {{ device_form.name }}
+     </div>
+    </div>
+
+    <div class="control-group">
+     <label class="control-label">Type</label>
+     <div class="controls">
+      {{ device_form.type }}
+     </div>
+    </div>
+
+    <div class="control-group">
+     <label class="control-label">Device-ID
+     </label>
+     <div class="controls">
+      {{ device_form.uid }}
+      <p class="help-block">use the same in your client</p>
+     </div>
+    </div>
+
+    <div class="control-group">
+     <div class="controls">
+      <button class="btn btn-primary" type="submit">{% trans "Create" %}</button>
+     </div>
+    </div>
+   </fieldset>
   </form>
+ </div>
 
     <div class="info">The <strong>Device ID</strong> connects your physical device with this page, so you should enter the same text on your device and here.</div>
 

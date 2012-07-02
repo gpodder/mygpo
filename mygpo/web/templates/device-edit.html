@@ -12,7 +12,6 @@
 
 {% block content %}
   <h1>{{ device.name|striptags }}</h1>
-  <hr/>
 
   <a href="{% url device device.uid %}">{% trans "Back to" %} {{ device|device_icon }} {{device|striptags}}</a>
 
@@ -20,10 +19,9 @@
 
   {% if not device.deleted %}
 
-
   <h2>{% trans "Edit" %}</h2>
-
   <div class="well">
+
    <form class="form-horizontal" action="{% url device-update device.uid %}" method="POST">
 
     {{ device_form.non_field_errors }}
@@ -47,31 +45,29 @@
 
     <div class="control-group">
      <label class="control-label">Device-ID
-      <span class="small">use the same in your client</span>
      </label>
      <div class="controls">
       {{ device_form.uid }}
+      <p class="help-block">use the same in your client</p>
      </div>
     </div>
 
     <div class="control-group">
      <div class="controls">
-      <button class="btn btn-primary" type="submit">{% trans "Save" %}</button>
+      <button class="btn" type="submit">{% trans "Save" %}</button>
      </div>
     </div>
    </fieldset>
   </form>
  </div>
 
-  <h2>{% trans "Replace Subscriptions" %}</h2>
-
+   <h2>{% trans "Replace Subscriptions" %}</h2>
    <div class="well">
    <form class="form-inline" method="post" action="{% url device-upload-opml device.uid %}" enctype="multipart/form-data">
     <p>{% trans "Replace your current subscriptions by uploading an OPML file." %}</p>
     {% csrf_token %}
 
-    <label>OPML-File</label>
-    <input type="file" name="opml" id="opml" />
+    <input type="file" class="input-xlarge" name="opml" id="opml" />
 
     <button class="btn" type="submit">{% trans "Upload" %}</button>
    </form>
@@ -81,8 +77,8 @@
   <div class="well">
   <form action="{% url device-delete device.uid %}" method="POST">
    {% csrf_token %}
-   <button class="btn btn-danger icon-trash" type="submit">
-    {% trans "Delete Device" %}
+   <button class="btn btn-danger" type="submit">
+    <i class="icon-trash"></i> {% trans "Delete Device" %}
    </button>
   </form>
   </div>

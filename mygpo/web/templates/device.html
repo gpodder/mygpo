@@ -11,13 +11,16 @@
 {% block title %}{% blocktrans with device.name|striptags as devicename %}Device {{ devicename }}{% endblocktrans %}{% endblock %}
 
 {% block content %}
-  <h1>{{ device.name|striptags }}</h1>
-  <hr/>
+ <div class="row-fluid">
+  <div class="span12">
+   <h1>{{ device.name|striptags }}</h1>
+  </div>
+ </div>
 
-  {% if device.deleted %}<div class="info">{% trans "This device was deleted." %}</div>{% endif %}
-
+ <div class="row-fluid">
 
   <div class="span8">
+  {% if device.deleted %}<div class="info">{% trans "This device was deleted." %}</div>{% endif %}
   <h2>{% trans "Subscriptions" %}</h2>
    <table class="list">
     {% if subscriptions %}
@@ -28,8 +31,8 @@
       <td>{% podcast_group_link podcast %}</td>
       <td>
        <form class="form-inline" method="post" action="{% podcast_link_target podcast "unsubscribe" device.uid %}?return_to=/device/{{ device.uid }}">
-        <button class="btn btn-danger icon-remove" type="submit">
-         {% trans "Unsubscribe" %}
+        <button class="btn btn-danger" type="submit">
+         <i class="icon-remove"></i> {% trans "Unsubscribe" %}
         </button>
        </form>
       </td>
@@ -44,47 +47,39 @@
   {% endif %}
   </table>
 
-  <div class="action-buttons">
+  <div class="btn-group">
 
    {% if subscriptions %}
-    <div class="btn">
-     <a href="{% url device-opml device.uid %}">
-      <img src="/media/22x22/opml-icon.png" />
-      {% trans "Download Subscriptions as OPML" %}
+     <a class="btn" href="{% url device-opml device.uid %}">
+      <i class="icon-download"></i>
+      {% trans "Download OPML" %}
      </a>
-    </div>
 
-    <div class="btn">
-     <a href="{% url device-symbian-opml device.uid %}">
-      <img src="/media/22x22/opml-icon.png" />
+     <a class="btn" href="{% url device-symbian-opml device.uid %}">
+      <i class="icon-download"></i>
       {% trans "OPML for Nokia Podcasting on Symbian " %}
      </a>
-    </div>
 
    {% endif %}
 
-  <div class="btn">
-   <a href="{% url device-history device.uid %}">
-    <img src="/media/office-calendar.png" />
-    {% blocktrans with device.name|striptags as devicename %} Show history for {{ devicename }} {% endblocktrans %}</a>
+   <a class="btn" href="{% url device-history device.uid %}">
+    <i class="icon-calendar"></i>
+    {% trans "History" %}
    </a>
-  </div>
 
   {% if not device.deleted %}
 
-  <div class="btn">
-   <a href="{% url device-edit device.uid %}">
-    <img src="/media/preferences-system-22.png" />
-    {% trans "Edit Device" %}
+   <a class="btn" href="{% url device-edit device.uid %}">
+    <i class="icon-edit"></i>
+    {% trans "Configure" %}
    </a>
-  </div>
   {% endif %}
 
   </div>
  </div>
 
 
- <div class="span3">
+ <div class="span4 well">
 
   {% if not device.deleted %}
 
