@@ -1,3 +1,5 @@
+from __future__ import division
+
 import hashlib
 import os.path
 import re
@@ -682,6 +684,14 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         return reverse('logo', args=[size, prefix, filename])
 
 
+    def subscriber_change(self):
+        prev = self.prev_subscriber_count()
+        if prev <= 0:
+            return 0
+
+        return self.subscriber_count() / prev
+
+
     def subscriber_count(self):
         if not self.subscribers:
             return 0
@@ -967,6 +977,14 @@ class PodcastGroup(Document, SlugMixin, OldIdMixin):
         for podcast in self.podcasts:
             if url in list(podcast.urls):
                 return podcast
+
+
+    def subscriber_change(self):
+        prev = self.prev_subscriber_count()
+        if not prev:
+            return 0
+
+        return self.subscriber_count() / prev
 
 
     def subscriber_count(self):

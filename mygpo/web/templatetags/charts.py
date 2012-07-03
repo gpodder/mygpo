@@ -137,3 +137,15 @@ def episode_heatmap_visualization(heatmap):
     s = '<img src="http://chart.apis.google.com/chart?%s" />' % '&'.join(parts)
 
     return mark_safe(s)
+
+
+
+@register.simple_tag
+def subscriber_change(change):
+
+    if change > 1:
+        change -= 1
+        return '+{:.1%}'.format(change)
+
+    # we don't care about negative changes
+    return ''

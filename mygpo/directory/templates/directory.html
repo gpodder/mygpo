@@ -125,8 +125,39 @@
    </div>
   {% endif %}
 
+
+  {% if podcastlist %}
+   {% with trending_podcasts|first as trending_podcast %}
+   <div class="row-fluid">
+    <div class="span12 well">
+
+     <h3><small>{% trans "Trending" %} {% subscriber_change trending_podcast.subscriber_change %}</small></h3>
+
+     <a href="{% podcast_link_target trending_podcast %}">
+      <div id="podcastlogo">{{ trending_podcast|podcast_logo_medium }}</div>
+     </a>
+
+     <h3>{{ trending_podcast.title }}</h3>
+
+     <p class="description">
+      {{ trending_podcast.description|default:""|truncatewords:"50" }}
+     </p>
+
+     <p>
+      <a href="{% podcast_link_target trending_podcast %}">{% trans "more..." %}</a>
+     </p>
+
+    </div>
+   </div>
+   {% endwith %}
+  {% endif %}
+
+
   <div class="row-fluid">
    <div class="span12 well">
+
+   <h3><small>{% trans "Random" %}</small></h3>
+
 
    <a href="{% podcast_link_target random_podcast %}">
     <div id="podcastlogo">{{ random_podcast|podcast_logo_medium }}</div>

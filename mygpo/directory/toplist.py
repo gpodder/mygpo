@@ -36,9 +36,9 @@ class Toplist(object):
 
 
     def _cache_or_query(self, limit, key):
-        cache_str = '{cls}-{limit}-{key}'.format(
+        cache_str = '{view}-{limit}-{key}'.format(
+                view=self.view,
                 limit=limit,
-                cls=self.__class__.__name__,
                 key='-'.join(key)
             )
 
@@ -118,3 +118,12 @@ class PodcastToplist(Toplist):
             res[p] = (new, old)
 
         return [(old+1, p) for p, (new, old) in sorted(res.items(), key=lambda i: i[1][0])]
+
+
+class TrendingPodcasts(Toplist):
+    """ Trending podcasts based on current / previous subscribers ratio """
+
+    def __init__(self, language=''):
+        super(TrendingPodcasts, self).__init__(Podcast, 'trending/podcasts',
+                language,
+                view_args=dict(classes=[Podcast, PodcastGroup]))

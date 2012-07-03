@@ -13,7 +13,8 @@ from mygpo.core.proxy import proxy_object
 from mygpo.data.mimetype import CONTENT_TYPES
 from mygpo.directory.models import Category
 from mygpo.directory.topics import Topics
-from mygpo.directory.toplist import PodcastToplist, EpisodeToplist
+from mygpo.directory.toplist import PodcastToplist, EpisodeToplist, \
+         TrendingPodcasts
 from mygpo.directory.search import search_podcasts
 from mygpo.web import utils
 from mygpo.directory.tags import TagCloud
@@ -52,13 +53,19 @@ def toplist(request, num=100, lang=None):
 @cache_control(private=True)
 @vary_on_cookie
 def browse(request, num_categories=10, num_tags_cloud=90,
-        podcasts_per_topic=10, podcasts_per_list=5):
+        podcasts_per_topic=10, podcasts_per_list=5, num_trending=1):
 
     num_categories = int(num_categories)
     num_tags_cloud = int(num_tags_cloud)
 
     topics = Topics(num_categories, podcasts_per_topic)
     topics = islice(topics, 0, num_categories)
+
+    lang = utils.process_lang_params(request)
+
+    #TODO: cache
+    trending = TrendingPodcasts(lang)
+    trending_podcasts = trending[:num_trending]
 
     #TODO: cache
     random_list = next(PodcastList.random(), None)
@@ -83,6 +90,7 @@ def browse(request, num_categories=10, num_tags_cloud=90,
         'podcastlist': random_list,
         'podcastlistowner': list_owner,
         'random_podcast': random_podcast,
+        'trending_podcasts': trending_podcasts,
         })
 
 
