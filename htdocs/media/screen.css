@@ -142,17 +142,6 @@ td.logo
     width: 32px;
 }
 
-td.subscribe a
-{
-    display: none;
-}
-
-tr:hover td.subscribe a
-{
-    display: block;
-}
-
-
 table button.btn
 {
     float: right;
