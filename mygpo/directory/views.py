@@ -7,17 +7,18 @@ from django.shortcuts import render
 from django.contrib.sites.models import RequestSite
 from django.views.decorators.cache import cache_page, cache_control
 from django.views.decorators.vary import vary_on_cookie
+from django.utils.decorators import method_decorator
+from django.views.generic.base import View
 
 from mygpo.core.models import Podcast
 from mygpo.core.proxy import proxy_object
 from mygpo.data.mimetype import CONTENT_TYPES
 from mygpo.directory.models import Category
-from mygpo.directory.topics import Topics
 from mygpo.directory.toplist import PodcastToplist, EpisodeToplist, \
          TrendingPodcasts
 from mygpo.directory.search import search_podcasts
 from mygpo.web import utils
-from mygpo.directory.tags import TagCloud
+from mygpo.directory.tags import Topics
 from mygpo.utils import flatten, get_to_dict
 from mygpo.share.models import PodcastList
 from mygpo.users.models import User
@@ -50,48 +51,49 @@ def toplist(request, num=100, lang=None):
 
 
 
-@cache_control(private=True)
-@vary_on_cookie
-def browse(request, num_categories=10, num_tags_cloud=90,
-        podcasts_per_topic=10, podcasts_per_list=5, num_trending=1):
 
-    num_categories = int(num_categories)
-    num_tags_cloud = int(num_tags_cloud)
+class Directory(View):
+    """ The main directory page """
 
-    topics = Topics(num_categories, podcasts_per_topic)
-    topics = islice(topics, 0, num_categories)
+    @method_decorator(cache_control(private=True))
+    @method_decorator(vary_on_cookie)
+    def get(self, request):
 
-    lang = utils.process_lang_params(request)
-
-    #TODO: cache
-    trending = TrendingPodcasts(lang)
-    trending_podcasts = trending[:num_trending]
-
-    #TODO: cache
-    random_list = next(PodcastList.random(), None)
-    list_owner = None
-    if random_list:
-        random_list = proxy_object(random_list)
-        random_list.more_podcasts = max(0, len(random_list.podcasts) - podcasts_per_list)
-        random_list.podcasts = Podcast.get_multi(random_list.podcasts[:podcasts_per_list])
-        list_owner = User.get(random_list.user)
-
-    #TODO: cache
-    random_podcast = next(Podcast.random(), None)
-    if random_podcast:
-        random_podcast = random_podcast.get_podcast()
+        return render(request, 'directory.html', {
+            'topics': self.get_topics(),
+            'podcastlist': self.get_random_list(),
+            'random_podcast': self.get_random_podcast(),
+            'trending_podcasts': self.get_trending(),
+            })
 
 
-    tag_cloud = TagCloud(count=num_tags_cloud, skip=num_categories, sort_by_name=True)
+    def get_topics(self):
+        return Topics()
 
-    return render(request, 'directory.html', {
-        'topics': topics,
-        'tag_cloud': tag_cloud,
-        'podcastlist': random_list,
-        'podcastlistowner': list_owner,
-        'random_podcast': random_podcast,
-        'trending_podcasts': trending_podcasts,
-        })
+
+    def get_trending(self, lang='', num_trending=1):
+        #TODO: cache
+        trending = TrendingPodcasts(lang)
+        return trending[:num_trending]
+
+
+    def get_random_list(self, podcasts_per_list=5):
+        #TODO: cache
+        random_list = next(PodcastList.random(), None)
+        list_owner = None
+        if random_list:
+            random_list = proxy_object(random_list)
+            random_list.more_podcasts = max(0, len(random_list.podcasts) - podcasts_per_list)
+            random_list.podcasts = Podcast.get_multi(random_list.podcasts[:podcasts_per_list])
+            random_list.user = User.get(random_list.user)
+
+        return random_list
+
+    def get_random_podcast(self):
+        #TODO: cache
+        random_podcast = next(Podcast.random(), None)
+        if random_podcast:
+            return random_podcast.get_podcast()
 
 
 @cache_control(private=True)

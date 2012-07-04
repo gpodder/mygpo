@@ -25,7 +25,7 @@
  <div class="span8">
 
   {% cache 3600 topics %}
-  {% for c in topics %}
+  {% for c in topics.categories %}
 
    {% if forloop.counter0|divisibleby:"2" %}
     <div class="row-fluid">
@@ -74,9 +74,9 @@
   <hr style="clear: both;"/>
 
   {% cache 3600 tagcloud %}
-  <div id="span10">
-   {% for tag in tag_cloud.entries %}
-    <span style="font-size: {% smartwidthratio tag.weight tag_cloud.max_weight 4 1 %}em">
+  <div id="tagcloud">
+   {% for tag in topics.tagcloud %}
+    <span style="font-size: {% smartwidthratio tag.weight topics.max_weight 4 1 %}em">
      <a href="{% url directory tag.label %}">{{ tag.label }}</a>
     </span>
    {% endfor %}
@@ -91,11 +91,11 @@
    <div class="row-fluid">
     <div class="span12 well">
      <h3>
-      <a href="{% url list-show podcastlistowner.username podcastlist.title %}">
+      <a href="{% url list-show podcastlist.user.username podcastlist.title %}">
        {{ podcastlist.title }}
       </a>
       <small>{% trans "Podcast List by" %}
-       <a href="{% url lists-user podcastlistowner.username %}">
+       <a href="{% url lists-user podcastlist.user.username %}">
         {{ podcastlistowner.username }}
        </a>
       </small>
