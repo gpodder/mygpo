@@ -243,7 +243,7 @@ class Episode(Document, SlugMixin, OldIdMixin):
                 reduce = True,
                 stale  = 'update_after',
             )
-        return r.one()['value']
+        return r.one()['value'] if r else 0
 
 
     @classmethod
