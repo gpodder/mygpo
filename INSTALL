@@ -9,29 +9,70 @@ When no version number is indicated, it is advisable to install the current
 development version from the repository.
 
   * Python (>= 2.6)
-  * [CouchDB](https://couchdb.apache.org/) (>= 1.1)
+  * [CouchDB](https://couchdb.apache.org/) (>= 1.2)
   * [python-feedparser](https://github.com/kurtmckee/feedparser/)
   * [python-dateutil](http://niemeyer.net/python-dateutil)
   * [python-flup](http://trac.saddi.com/flup)
   * [python-imaging](http://www.pythonware.com/products/pil/)
   * [python-pybabel](http://babel.edgewall.org/)
+  * [python-gevent](http://www.gevent.org/)
   * [couchdbkit](https://github.com/benoitc/couchdbkit)
   * [Django](http://www.djangoproject.com/)
   * [django-couchdb-utils](http://github.com/stefankoegl/django-couchdb-utils/)
 
 
+Basic setup
+-----------
 
-mygpo
------
+Here's how you start from scratch with a new mygpo install (assuming a
+Ubuntu 12.04 x86 install, 'should work' with other versions/archs as well).
 
-The source for mygpo can be obtained via git
+If you are on a Debian/Ubuntu system, do:
 
- git clone git://github.com/gpodder/mygpo.git
+  sudo apt-get install erlang python-feedparser python-dateutil python-flup \
+                       python-imaging python-pybabel python-restkit \
+                       python-gevent
+
+  sudo apt-get build-dep couchdb
+
+  [ install couchdb 1.2.0 from source ]
+
+Select a cozy place for the mygpo sources and clone it:
+
+  git clone git://github.com/gpodder/mygpo.git
+  cd mygpo
+
+Now install additional dependencies locally (you could also use virtualenv or
+some other fancy stuff, but for now, let's keeps things simple):
+
+  mkdir lib
+  cd lib
+
+  git clone https://github.com/benoitc/couchdbkit.git
+  mv couchdbkit couchdbkit-git
+  ln -s couchdbkit-git/couchdbkit
+
+  wget https://www.djangoproject.com/download/1.4/tarball/ -O Django-1.4.tar.gz
+  tar xvf Django-1.4.tar.gz
+  rm Django-1.4.tar.gz
+  ln -s Django-1.4/django
+
+  git clone https://github.com/stefankoegl/django-couchdb-utils.git
+  ln -s django-couchdb-utils/django_couchdb_utils
+
+That's it for the setup. Now to initialize the DB:
+
+  python manage.py sync_couchdb
+  python manage.py sync-design-docs
+
+..and here we go:
+
+  python manage.py runserver
 
 
 
-CouchDB
--------
+Additional details on couchDB
+-----------------------------
 
 A source distribution of CouchDB can be obtained from
 
@@ -74,20 +115,15 @@ To import a CouchDB dump, execute the following from the commandline
 
 
 
-3. Building the Views
-
-On the first request, CouchDB will build the views. To do this before the first
-user hits the site (which is, of course, optional), execute
-
- bin/touch-views.sh
-
-
 
 Settings
 --------
 
 Check the settings in mygpo/settings.py. If you want to change any settings,
-add them to mygpo/settings_prod.py with the correct value.
+add them to mygpo/settings_prod.py with the correct value. If you want to
+avoid warning messages on startup, simply:
+
+  touch mygpo/settings_prod.py
 
 
 
@@ -99,7 +135,7 @@ directory with
 
   python manage.py runserver
 
-If you want to run a production server, check out 
+If you want to run a production server, check out
 
  https://docs.djangoproject.com/en/dev/howto/deployment/
 
