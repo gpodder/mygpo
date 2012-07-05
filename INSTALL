@@ -97,6 +97,18 @@ that your machine is connected to. Apply common sense and ideally use only
 on trusted networks.
 
 
+Installing database dumps (if you have any, that is)
+----------------------------------------------------
+
+As easy as..
+
+  cd lib
+  hg clone https://code.google.com/p/couchdb-python/
+  cd couchdb-python
+  zcat /path/to/your.dump.gz | python couchdb/tools/load.py \
+                                      http://localhost:5984/mygpo
+
+
 Resetting the database ("start from scratch")
 ---------------------------------------------
 
