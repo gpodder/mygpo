@@ -10,8 +10,16 @@
 {% block content %}
 
  <div class="span12">
-  <h1>{% trans "Share Subscriptions" %}</h1>
 
+ <div class="row-fluid">
+  <div class="span12">
+   <h1>{% trans "Share Subscriptions" %}</h1>
+  </div>
+ </div>
+
+
+ <div class="row-fluid">
+  <div class="span8">
 
   <table>
 
@@ -84,9 +92,15 @@
      {% csrf_token %}
     </form>
 
+  </div>
 
-  <div class="info">
-   {% trans "Add <tt>&amp;symbian=true#.opml</tt> to the OPML URL to get an OPML file for Nokia Podcasting on Symbian devices." %}
+  <div class="span4 well">
+   <h3>{% trans "Nokia Podcasting" %}</h3>
+
+   <p>
+   {% trans "Add the following to the OPML URL to get an OPML file for Nokia Podcasting on Symbian devices. " %}
+    <pre>&amp;symbian=true#.opml</pre>
+   </p>
   </div>
 
  </div>

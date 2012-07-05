@@ -60,7 +60,11 @@
    <h2>Permissions</h2>
    {% if feed_token %}
     <p>
-     {% blocktrans with user.username as username and feed_token as token %}To keep your favorites private (from others and from the public pages of {{ site }}), you need to use HTTP-Authentication in your client. Use username <strong>{{ username }}</strong> and password <strong>{{ token }}</strong>.{% endblocktrans %}
+     {% blocktrans %}To keep your favorites private (from others and from the public pages of {{ site }}), you need to use HTTP-Authentication in your client. {% endblocktrans %}
+      <ul>
+       <li>{% trans "Username:" %} {{ user.username }}</li>
+       <li>{% trans "Password:" %} {{ feed_token }}</li>
+      </ul>
     </p>
 
     <div class="btn-group">
