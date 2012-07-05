@@ -60,37 +60,32 @@ class Directory(View):
     def get(self, request):
 
         return render(request, 'directory.html', {
-            'topics': self.get_topics(),
-            'podcastlist': self.get_random_list(),
-            'random_podcast': self.get_random_podcast(),
-            'trending_podcasts': self.get_trending(),
+
+            # evaluated lazyly, cached by template
+            'topics': Topics(),
+            'trending_podcasts': TrendingPodcasts(''),
+
+            # evaluated eagerly, cached here
+            'podcastlist': get_cache_or_calc('random_list', 60,
+                self.get_random_list),
+            'random_podcast': get_cache_or_calc('random_podcast', 60,
+                self.get_random_podcast),
             })
 
 
-    def get_topics(self):
-        return Topics()
-
-
-    def get_trending(self, lang='', num_trending=1):
-        #TODO: cache
-        trending = TrendingPodcasts(lang)
-        return trending[:num_trending]
-
-
     def get_random_list(self, podcasts_per_list=5):
-        #TODO: cache
         random_list = next(PodcastList.random(), None)
         list_owner = None
         if random_list:
             random_list = proxy_object(random_list)
             random_list.more_podcasts = max(0, len(random_list.podcasts) - podcasts_per_list)
-            random_list.podcasts = Podcast.get_multi(random_list.podcasts[:podcasts_per_list])
+            random_list.podcasts = list(Podcast.get_multi(random_list.podcasts[:podcasts_per_list]))
             random_list.user = User.get(random_list.user)
 
+        #TODO: this can't be cached, because proxied objects can't be pickled
         return random_list
 
     def get_random_podcast(self):
-        #TODO: cache
         random_podcast = next(Podcast.random(), None)
         if random_podcast:
             return random_podcast.get_podcast()
