@@ -20,10 +20,12 @@ hr
 
 h1
 {
+    font-size: 16pt;
 }
 
 h2
 {
+    font-size: 14pt;
     padding-top: .5em;
 }
 
@@ -716,3 +718,12 @@ div.first-episode
 {
     margin-bottom: 2em;
 }
+
+
+address
+{
+    color: #aaa;
+    text-align: center;
+    padding-top: 15px;
+}
+

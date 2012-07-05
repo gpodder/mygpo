@@ -24,7 +24,7 @@ MENU_STRUCTURE = (
             ('/developer/', _('Development')),
             ('/online-help', _('Help')),
         )),
-        ('Podcasts', (
+        (_('Discover'), (
             ('/directory/', _('Directory')),
             ('/podcast/', _('Podcast')),
             ('/search/', _('Search')),
@@ -51,7 +51,7 @@ MENU_STRUCTURE = (
             ('/account/', _('Account')),
             ('/account/privacy', _('Privacy')),
         )),
-        (_('Publisher'), (
+        (_('Publish'), (
             ('/publisher/', _('Home')),
             ('/publisher/advertise', _('Advertise')),
             ('/publisher/link/', _('Link to gpodder.net')),

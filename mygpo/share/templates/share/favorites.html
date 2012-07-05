@@ -7,13 +7,13 @@
 {% block mainmenu %}{{ "/share/"|main_menu }}{% endblock %}
 {% block sectionmenu %}{{ "/share/favorites"|section_menu }}{% endblock %}
 
-{% block title %}{% trans "Share Favorite Episodes" %}{% endblock %}
+{% block title %}{% trans "Share your favorite episodes" %}{% endblock %}
 
 {% block content %}
 
   <div class="span12">
   <h1>
-   {% trans "Share Favorite Episodes" %}
+   {% trans "Share your favorite episodes" %}
   </h1>
 
 
@@ -68,11 +68,11 @@
     </p>
 
     <div class="btn-group">
-     <button type="submit" class="btn" onclick="submitForm('private');">
-      <i class="icon-eye-close"></i> {% trans "New Password" %}
-     </button>
      <button type="submit" class="btn" onclick="submitForm('public');">
-      <i class="icon-eye-open"></i> {% trans "Make Public" %}
+      <i class="icon-eye-open"></i> {% trans "Remove password" %}
+     </button>
+     <button type="submit" class="btn" onclick="submitForm('private');">
+      <i class="icon-eye-close"></i> {% trans "Generate new password" %}
      </button>
     </div>
 
@@ -100,7 +100,7 @@
     <form class="form-inline" method="post" action="{% url favorites_private %}">
      {% csrf_token %}
      <button type="submit" class="btn">
-      <i class="icon-eye-close"></i> {% trans "New Password" %}
+      <i class="icon-eye-close"></i> {% trans "Create password" %}
      </button>
     </form>
 

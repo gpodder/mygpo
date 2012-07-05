@@ -69,6 +69,47 @@ That's it for the setup. Now to initialize the DB:
 
   python manage.py runserver
 
+Ok, so you need a user. This requires e-mails to be sent. If your machine is
+configured to send e-mail, that should work out well. If not, you can use the
+Django E-Mail File Backend to "send" mails to a local folder:
+
+  mkdir inbox
+
+Now, edit mygpo/settings_prod.py (or create it) and add the following lines:
+
+  import os.path
+
+  EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+  EMAIL_FILE_PATH = os.path.join(os.path.dirname(__file__), '..', 'inbox')
+
+
+Accessing the dev server from other devices
+-------------------------------------------
+
+Sometimes you might want to access the server from another machine than
+localhost. In that case, you have to pass an additional argument to the
+runserver command of manage.py, like this:
+
+  python manage.py runserver 0.0.0.0:8000
+
+Beware, though, that this will expose the web service to your all networks
+that your machine is connected to. Apply common sense and ideally use only
+on trusted networks.
+
+
+Resetting the database ("start from scratch")
+---------------------------------------------
+
+Delete the database:
+
+  curl -X DELETE http://127.0.0.1:5984/mygpo
+  curl -X DELETE http://127.0.0.1:5984/mygpo_sessions
+
+Recreate the design documents:
+
+  cd mygpo
+  python manage.py sync_couchdb
+  python manage.py sync-design-docs
 
 
 Additional details on couchDB
