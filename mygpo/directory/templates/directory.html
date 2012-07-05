@@ -122,7 +122,7 @@
 
 
   {% cache 3600 directory_trending %}
-  {% if podcastlist %}
+  {% if trending_podcast %}
    {% with trending_podcasts|slice:":1"|first as trending_podcast %}
    <div class="row-fluid">
     <div class="span12 well">
