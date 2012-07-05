@@ -108,6 +108,45 @@ As easy as..
   zcat /path/to/your.dump.gz | python couchdb/tools/load.py \
                                       http://localhost:5984/mygpo
 
+..when you have created a dump like this:
+
+  python manage.py dump-sample --user=[username] | gzip > my.dump.gz
+
+(where [username] is a specific user for which the data will be dumped)
+
+Updating derived data
+---------------------
+
+Certain data in the database is only calculated when you
+run special commands. This is usually done regularly on
+a production server using cron. You can also run these
+commands regularly on your development machine:
+
+  cd mygpo
+  python manage.py update-categories
+  python manage.py update-toplist
+  python manage.py update-episode-toplist
+
+  python manage.py feed-downloader
+  python manage.py feed-downloader <feed-url> [...]
+  python manage.py feed-downloader --max <max-updates>
+  python manage.py feed-downloader --random --max <max-updates>
+  python manage.py feed-downloader --toplist --max <max-updates>
+  python manage.py feed-downloader --update-new --max <max-updates>
+
+or to only do a dry run (this won't do any web requests for feeds):
+
+  python manage.py feed-downloader --list-only [other parameters]
+
+
+Maintaining publisher relationships with user accounts
+------------------------------------------------------
+
+To set a user as publisher for a given feed URL, use:
+
+  cd mygpo
+  python manage.py make-publisher <username> <feed-url> [...]
+
 
 Resetting the database ("start from scratch")
 ---------------------------------------------
