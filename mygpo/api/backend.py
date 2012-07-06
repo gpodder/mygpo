@@ -21,7 +21,7 @@ from functools import partial
 from mygpo.core.models import Podcast, Episode
 from mygpo.users.models import Device, DeviceDoesNotExist, PodcastUserState
 from mygpo.decorators import repeat_on_conflict
-from mygpo.couchdb import bulk_save_retry
+from mygpo.couch import bulk_save_retry
 
 
 def get_podcast_count_for_language():

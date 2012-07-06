@@ -2,7 +2,6 @@ from base64 import b64decode
 from optparse import make_option
 import sys
 
-from couchdb import json
 from couchdb.multipart import write_multipart
 
 from django.core.management.base import BaseCommand
@@ -12,6 +11,7 @@ from mygpo.users.models import PodcastUserState, EpisodeUserState, \
          Suggestions, User
 from mygpo.directory.models import Category
 from mygpo.utils import progress
+from mygpo.json import json
 
 
 class Command(BaseCommand):
