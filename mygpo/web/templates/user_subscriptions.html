@@ -36,15 +36,12 @@
   {% endfor %}
   </table>
 
-  <div>
-   <a href="{% url shared-subscriptions-opml other_user.username %}{% if token %}?token={{ token }}{% endif %}">
-    <img src="/media/download.png" class="action-button" /> {% trans "Download Subscriptions as OPML" %}
+  <div class="btn-group">
+   <a class="btn" href="{% url shared-subscriptions-opml other_user.username %}{% if token %}?token={{ token }}{% endif %}">
+    <i class="icon-download"></i>{% trans "Download Subscriptions as OPML" %}
    </a>
-  </div>
-
-  <div>
-   <a href="{% url shared-subscriptions-rss other_user.username %}{% if token %}?token={{ token }}{% endif %}">
-    <img src="/media/feed-icon-22.png" class="action-button" /> {% trans "Subscribe to Changes" %}
+   <a class="btn" href="{% url shared-subscriptions-rss other_user.username %}{% if token %}?token={{ token }}{% endif %}">
+    <i class="icon-rss"></i> {% trans "Subscribe to Changes" %}
    </a>
   </div>
 
@@ -54,11 +51,19 @@
 
  {% endif %}
 
- {% if user.is_authenticated %}
-  <div class="info"><strong>{% trans "Want to share your subscriptions?" %}</strong>
+{% endblock %}
 
-  {% url share as share-url %}
-  {% blocktrans %}Get your link on the <a href="{{ share-url }}">Sharing page</a>.</a>{% endblocktrans %}</div>
+
+{% block sidebar %}
+ {% if user.is_authenticated %}
+  <div class="well">
+   <h3>{% trans "Share Your Subscriptions" %}</h3>
+   <p>{% trans "Want to share your own subscriptions?" %}</p>
+
+   <a class="btn btn-primary" href="{% url share %}">
+    {% trans "Go" %}
+   </a>
+  </div>
  {% endif %}
 
 {% endblock %}
