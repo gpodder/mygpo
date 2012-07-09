@@ -11,8 +11,12 @@
 
 {% block title %}{% trans "Subscription and Episode History" %}{% if device %} {% trans "for" %} {{ device.name|striptags }}{% endif %}{% endblock %}
 
-{% block content %}
+{% block header %}
 <h1>{% trans "Subscription and Episode History" %}{% if device %} {% trans "for" %} {{ device.name|striptags }}{% endif %}</h1>
+{% endblock %}
+
+
+{% block content %}
 
    {% if device %}
     <a href="{% url device device.uid %}">{% trans "Back to" %} {{ device|device_icon }} {{ device.name|striptags}}</a>

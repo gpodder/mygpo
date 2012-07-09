@@ -14,8 +14,12 @@
  {% blocktrans with other_user.username as username%}{{ username }}'s Subscriptions{% endblocktrans %}
 {% endblock %}
 
-{% block content %}
+{% block header %}
 <h1>{% blocktrans with other_user.username as username%}{{ username }}'s Subscriptions{% endblocktrans %}</h1>
+{% endblock %}
+
+
+{% block content %}
 
  {% if not subscriptionlist|length_is:"0" %}
  <table class="list">

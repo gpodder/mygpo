@@ -10,12 +10,13 @@
 
 {% block title %}{% trans "Podcast Subscriptions" %}{% endblock %}
 
+
+{% block header %}
+ <h1>{% trans "Podcast Subscriptions" %}</h1>
+{% endblock %}
+
+
 {% block content %}
-
-  <div class="span12">
-
-<h1>{% trans "Podcast Subscriptions" %}</h1>
-
  {% if not subscriptionlist|length_is:"0" %}
 
  <table class="list podcast_list">
@@ -66,6 +67,5 @@
   </form>
  </div>
 
- </div>
 {% endblock %}
 

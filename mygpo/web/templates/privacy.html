@@ -8,8 +8,12 @@
 
 {% block title %}{% trans "Privacy Settings" %}{% endblock %}
 
-{% block content %}
+{% block header %}
   <h1>{% trans "Privacy Settings" %}</h1>
+{% endblock %}
+
+
+{% block content %}
 
   <p>{% blocktrans %}{{ domain }} distinguishes between public and private subscriptions.{% endblocktrans %}
   <ul>

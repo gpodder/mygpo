@@ -7,9 +7,11 @@
 
 {% block title %}{% trans "Account Settings" %}{% endblock %}
 
-{% block content %}
+{% block header %}
   <h1>{% trans "Account Settings" %}</h1>
+{% endblock %}
 
+{% block content %}
   <form action="{% url account %}" method="POST" class="well form-horizontal">
    {% csrf_token %}
    <h3>{% trans "Account Data" %}</h3>

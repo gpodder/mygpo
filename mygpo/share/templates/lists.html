@@ -12,16 +12,12 @@
 
 {% block title %}{% trans "Podcast Lists" %}{% endblock %}
 
-{% block content %}
-
- <div class="row-fluid">
-  <div class="span12">
+{% block header %}
    <h1>{% trans "Podcast Lists" %}</h1>
-  </div>
- </div>
+{% endblock %}
 
- <div class="row-fluid">
-  <div class="span8">
+
+{% block content %}
 
   <table class="list">
    {% for list in lists %}
@@ -39,10 +35,12 @@
     </tr>
    {% endfor %}
   </table>
- </div>
+
+{% endblock %}
 
 
- <div class="span4">
+{% block sidebar %}
+
   <div class="well">
 
   <h3>{% trans "Create List" %}</h3>
@@ -56,6 +54,5 @@
    {% blocktrans %}Podcast Lists are intended to share podcasts about certain topics and are therefore always visible to everyone.{% endblocktrans %}
   </p>
  </div>
-</div>
 
 {% endblock %}

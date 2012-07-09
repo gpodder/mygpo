@@ -12,18 +12,12 @@
 
 {% block title %}{% trans "Overview" %}{% endblock %}
 
-{% block content %}
-
- <div class="row-fluid">
-  <div class="span12">
+{% block header %}
    <h1>{% trans "Hi, " %}{{ user.username }}</h1>
-  </div>
- </div>
+{% endblock %}
 
- <div class="row-fluid">
 
- <div class="span8">
-
+{% block content %}
    {% if newest_episodes %}
     <h2>{% trans "Newest Episodes" %}</h2>
     <table class="list">
@@ -39,13 +33,10 @@
      {% endfor %}
     </table>
    {% endif %}
+{% endblock %}
 
- </div>
-
-  <div class="span4">
-
+{% block sidebar %}
   {% if sponsored_podcast %}
-   <div class="row-fluid">
     <div class="well">
      <h3>{{ sponsored_podcast.title }} <small>(Supporting Podcast)</small></h3>
      <div>{{ sponsored_podcast.podcast|podcast_logo }}</div>
@@ -53,13 +44,11 @@
      <br style="clear: left;"/>
      <small><a href="{% url advertise %}">advertise here</a></small>
     </div>
-   </div>
   {% endif %}
 
 
 
  {% if random_podcast %}
-   <div class="row-fluid">
     <div class="well">
 
    <a href="{% podcast_link_target random_podcast %}">
@@ -75,11 +64,9 @@
    <p>
     <a href="{% podcast_link_target random_podcast %}">{% trans "more..." %}</a>
    </p>
-  </div>
  </div>
  {% endif %}
 
- <div class="row-fluid">
   <div class="well">
    <h3>{% blocktrans %}Explore {{ site }}{% endblocktrans %}</h3>
    <ul>
@@ -128,12 +115,10 @@
    </ul>
   </p>
 
-  </div>
  </div>
 
  {% if show_install_reader %}
- <div class="row-fluid">
-  <div class="span12 well">
+  <div class="well">
     <h3>{% trans "Subscribe in Your Browser" %}</h3>
     <p>
      {% blocktrans %}Register {{ site.domain }} as a feed reader, and subscribe to podcasts directly from your browser{% endblocktrans %}
@@ -142,11 +127,8 @@
      {% trans "Install" %}
     </a>
 
-  </div>
  </div>
  {% endif %}
-
- </div>
 
 {% endblock %}
 

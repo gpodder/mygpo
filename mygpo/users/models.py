@@ -696,6 +696,9 @@ class User(BaseUser, SyncedDevicesMixin):
                 limit        = count,
                 include_docs = True,
             )
+        for x in r:
+            print x
+
         return list(r)
 
 

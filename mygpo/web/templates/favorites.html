@@ -9,10 +9,12 @@
 
 {% block title %}{% trans "Favorite Episodes" %}{% endblock %}
 
-{% block content %}
-
- <div class="span8">
+{% block header %}
   <h1>{% trans "Favorite Episodes" %}</h1>
+{% endblock %}
+
+
+{% block content %}
 
   <table class="list episode_list">
   {% for episode in episodes %}
@@ -37,9 +39,11 @@
     <i class="icon-share"></i> {% trans "Share" %}
    </a>
   </div>
- </div>
+{% endblock %}
 
- <div class="span4 well">
+
+{% block content %}
+ <div class="well">
   <h3>Recently Listened</h3>
 
   <table class="list episode_list">
@@ -66,7 +70,5 @@
 
   {% endfor %}
   </table>
-
- </div>
 
 {% endblock %}

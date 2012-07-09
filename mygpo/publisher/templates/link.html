@@ -7,9 +7,12 @@
 
 {% block title %}{% trans "For Podcast Authors" %}{% endblock %}
 
-{% block content %}
+{% block header %}
   <h1>{% trans "Link to" %} {{url}}</h1>
+{% endblock %}
 
+
+{% block content %}
   <p><img src="/media/author_subscribe.png" /></p>
   <p>{% blocktrans with url as sitename %}You can paste this code on your website, so users of {{ sitename }} can directly subscribe to your podcast!{% endblocktrans %}</p>
   <p>{% trans "Change the field 'YOUR_ADRESS' with the adress of your podcast." %}</p>

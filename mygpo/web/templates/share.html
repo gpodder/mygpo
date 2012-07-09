@@ -7,22 +7,13 @@
 
 {% block title %}{% trans "Share your subscriptions" %}{% endblock %}
 
-{% block content %}
-
- <div class="span12">
-
- <div class="row-fluid">
-  <div class="span12">
+{% block header %}
    <h1>{% trans "Share your subscriptions" %}</h1>
-  </div>
- </div>
+{% endblock %}
 
 
- <div class="row-fluid">
-  <div class="span12">
-
+{% block content %}
   <table>
-
    <tr>
     <td>
      <i class="icon-link"></i>
@@ -91,11 +82,6 @@
     <form id="public" class="form-inline" method="post" action="{% url public_subscriptions %}">
      {% csrf_token %}
     </form>
-
-  </div>
-
- </div>
-
 {% endblock %}
 
 

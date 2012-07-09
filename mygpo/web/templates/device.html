@@ -10,16 +10,11 @@
 
 {% block title %}{% blocktrans with device.name|striptags as devicename %}Device {{ devicename }}{% endblocktrans %}{% endblock %}
 
-{% block content %}
- <div class="row-fluid">
-  <div class="span12">
+{% block header %}
    <h1>{{ device.name|striptags }}</h1>
-  </div>
- </div>
+{% endblock %}
 
- <div class="row-fluid">
-
-  <div class="span8">
+{% block content %}
   {% if device.deleted %}<div class="info">{% trans "This device was deleted." %}</div>{% endif %}
   <h2>{% trans "Subscriptions" %}</h2>
    <table class="list">
@@ -76,10 +71,13 @@
   {% endif %}
 
   </div>
- </div>
+
+{% endblock %}
 
 
- <div class="span4 well">
+{% block sidebar %}
+
+ <div class="well">
 
   {% if not device.deleted %}
 

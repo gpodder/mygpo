@@ -8,17 +8,12 @@
 
 {% block title %}{% trans "Suggested Podcasts" %}{% endblock %}
 
-{% block content %}
-
- <div class="row-fluid">
-  <div class="span12">
+{% block header %}
    <h1>{% trans "Suggested Podcasts" %}</h1>
-  </div>
- </div>
+{% endblock %}
 
- <div class="row-fluid">
-  <div class="span8">
 
+{% block content %}
   <table class="list podcast_list">
   {% for podcast in entries %}
    <tr>
@@ -56,12 +51,11 @@
    {% trans "Download OPML" %}
  </a>
   {% endif %}
+{% endblock %}
 
- </div>
-
-
+{% block sidebar %}
  {% if entries %}
- <div class="span4 well">
+ <div class="well">
 
    <h3>{% trans "Do you Like our Suggestions?" %}</h3>
 
@@ -80,13 +74,8 @@
    <form id="rate_neg" class="form-inline" action="{% url suggestions-rate %}?rate=-1" method="post" class="rate">
     {% csrf_token %}
    </form>
-
-
  </div>
  {% endif %}
-
-</div>
-
 {% endblock %}
 
 

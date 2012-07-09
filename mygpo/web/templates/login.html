@@ -7,18 +7,12 @@
 
 {% block title %}{% trans "Login" %}{% endblock %}
 
-{% block content %}
-
- <div class="row-fluid">
-  <div class="span12">
+{% block header %}
    <h1>{% trans "Login" %}
-  </div>
- </div>
+{% endblock %}
 
- <div class="row-fluid">
 
-  <div class="span8">
-
+{% block content %}
    <form class="form-horizontal" action="{% url login %}" method="post">
 
     <fieldset>
@@ -51,17 +45,14 @@
 
     </fieldset>
    </form>
-  </div>
+{% endblock %}
 
+
+{% block sidebar %}
   {% if next %}
-   <div class="span4">
     <div class="error">
      {% trans "You need to login to access this page." %}
     </div>
-   </div>
   {% endif %}
-
- </div>
-
 {% endblock %}
 

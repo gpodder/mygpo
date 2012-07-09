@@ -28,10 +28,14 @@
  {% blocktrans with podcastlist.title as list_title and owner.username as ownername %}"{{ list_title }}" by {{ ownername }}{% endblocktrans %}
 {% endblock %}
 
-{% block content %}
+{% block header %}
   <h1>{{ podcastlist.title }}</h1>
   {% url lists-user owner.username as user-lists-url %}
   <small class="description">{% blocktrans with owner.username as ownername %}a podcast list by <a href="{{ user-lists-url }}">{{ ownername }}</a>{% endblocktrans %}</small>
+{% endblock %}
+
+
+{% block content %}
 
  <table class="list">
   <tr>
@@ -81,8 +85,6 @@
     <i class="icon-download"></i>
     {% trans "Download as OPML" %}
     </a>
-
- </div>
 
  {% if is_own %}
 

@@ -10,12 +10,12 @@
 
 {% block title %}{% trans "Search" %}{% endblock %}
 
-{% block content %}
+{% block header %}
 <h1>{% trans "Search" %}</h1>
+{% endblock %}
 
 
- <div class="row-fluid">
-  <div class="span8">
+{% block content %}
 
   <form class="form-inline" method="get" action="{% url search %}" class="search">
    <div class="input-prepend">
@@ -77,13 +77,13 @@
 
  {% endif %}
 
- </div>
+{% endblock %}
 
 
- <div class="span4">
+{% block sidebar %}
+
   <div class="well">
    <h3>{% trans "Search API" %}</h3>
-  </div>
  </div>
 {% endblock %}
 

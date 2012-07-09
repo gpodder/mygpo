@@ -8,8 +8,12 @@
 
 {% block title %}{% trans "Podcasts Published by Me" %}{% endblock %}
 
-{% block content %}
+{% block header %}
  <h1>{% trans "Podcasts Published by Me" %}</h1>
+{% endblock %}
+
+
+{% block content %}
 
  {% if not podcasts|length_is:"0" %}
  <table class="list">

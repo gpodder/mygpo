@@ -9,13 +9,14 @@
 
 {% block title %}{% trans "Share your favorite episodes" %}{% endblock %}
 
-{% block content %}
-
-  <div class="span12">
+{% block header %}
   <h1>
    {% trans "Share your favorite episodes" %}
   </h1>
+{% endblock %}
 
+
+{% block content %}
 
   <table>
 
@@ -106,8 +107,6 @@
 
     </ul>
    {% endif %}
-
- </div>
 
 {% endblock %}
 

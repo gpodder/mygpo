@@ -10,8 +10,12 @@
 
 {% block title %}{% trans "Create Device " %}{% endblock %}
 
-{% block content %}
+{% block header %}
   <h1>{% trans "Create Device" %}</h1>
+{% endblock %}
+
+
+{% block content %}
 
   <div class="well">
    <form class="form-horizontal" action="{% url device-create %}" method="POST">
@@ -53,7 +57,15 @@
   </form>
  </div>
 
-    <div class="info">The <strong>Device ID</strong> connects your physical device with this page, so you should enter the same text on your device and here.</div>
+{% endblock %}
+
+
+{% block sidebar %}
+
+ <div class="well">
+  <h3>{% trans "Device ID" %}</h3>
+  {% blocktrans %}The Device ID connects your physical device with this page, so you should enter the same text on your device and here.{% endblocktrans %}
+ </div>
 
 {% endblock %}
 

@@ -9,16 +9,11 @@
 
 {% block title %}{% trans "Managed Devices" %}{% endblock %}
 
-{% block content %}
-
- <div class="row-fluid">
-  <div class="span12">
+{% block header %}
    <h1>{% trans "Managed Devices" %}</h1>
-  </div>
- </div>
+{% endblock %}
 
- <div class="row-fluid">
-  <div class="span8">
+{% block content %}
 
    <table class="list">
     <tr>
@@ -79,9 +74,13 @@
     {% endfor %}
    </table>
    {% endif %}
-  </div>
 
-  <div class="span4 well">
+{% endblock %}
+
+
+{% block sidebar %}
+
+  <div class="well">
 
    <h3>{% trans "Adding New Devices" %}</h3>
    <p>
@@ -92,12 +91,11 @@
     {% trans "You can also manually create a new device." %}
    </p>
 
-  <div class="action-buttons">
     <a class="btn btn-success" href="{% url device-edit-new %}">
      <i class="icon-plus"></i> {% trans "Create Device" %}
     </a>
-  </div>
 
  </div>
+
 {% endblock %}
 

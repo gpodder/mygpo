@@ -7,12 +7,16 @@
 
 {% block title %}{% trans "Register" %}{% endblock %}
 
-{% block content %}
+{% block header %}
+  <h1>{% trans "Create a User Account" %}</h1>
+{% endblock %}
 
+
+{% block content %}
 {% if user.is_authenticated %}
   <div class="success">{% trans "You are already registered." %}</div>
+
 {% else %}
-  <h1>{% trans "Create a User Account" %}</h1>
 
   <div class="form">
    <p>

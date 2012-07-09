@@ -3,8 +3,11 @@
 
 {% block title %}{% trans "Unauthorized" %}{% endblock %}
 
-{% block content %}
+{% block header %}
   <h1>401 {% trans "Unauthorized" %}</h1>
-  <p>{% trans "This page is only available to registered users." %}</p>
 {% endblock %}
 
+
+{% block content %}
+  <p>{% trans "This page is only available to registered users." %}</p>
+{% endblock %}

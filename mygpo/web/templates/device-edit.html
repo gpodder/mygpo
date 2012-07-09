@@ -10,10 +10,14 @@
 
 {% block title %}{% blocktrans with device.name|striptags as devicename %}Device {{ devicename }}{% endblocktrans %}{% endblock %}
 
-{% block content %}
+{% block header %}
   <h1>{{ device.name|striptags }}</h1>
 
   <a href="{% url device device.uid %}">{% trans "Back to" %} {{ device|device_icon }} {{device|striptags}}</a>
+{% endblock %}
+
+
+{% block content %}
 
   {% if device.deleted %}<div class="info">{% trans "This device was deleted." %}</div>{% endif %}
 

@@ -11,15 +11,11 @@
 
 {% block title %}{% trans "Episode-Toplist" %}{% endblock %}
 
-{% block content %}
- <div class="row-fluid">
-  <div class="span12">
+{% block header %}
    <h1>{% trans "Episode-Toplist" %}</h1>
-  </div>
- </div>
+{% endblock %}
 
- <div class="row-fluid">
-  <div class="span8">
+{% block content %}
 
   <table class="list episode_list">
    <tr>
@@ -51,10 +47,10 @@
   {% endfor %}
   </table>
 
- </div>
+{% endblock %}
 
 
- <div class="span4">
+{% block sidebar %}
 
   <div class="well">
    <h3>{% trans "Language" %}</h3>
@@ -77,11 +73,6 @@
      <input class="btn btn-primary" type="submit" value="{% trans "OK" %}" />
     </form>
 
-  </div>
-
- </div>
-
 </div>
-
 
 {% endblock %}
