@@ -30,7 +30,7 @@
      </a>
     </td>
     <td>
-     <input class="input-xxlarge" readonly="readonly" type="text" value="http://{{ user.username }}:{{feed_token}}@{{ site.domain }}{% url favorites-feed user.username %}" />
+     <input class="input-xxlarge" readonly="readonly" type="text" value="http://{% if feed_token %}{{ user.username }}:{{feed_token}}@{% endif %}{{ site.domain }}{% url favorites-feed user.username %}" />
     </td>
    </tr>
 
