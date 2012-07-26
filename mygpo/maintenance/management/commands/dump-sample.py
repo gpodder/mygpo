@@ -2,10 +2,10 @@ from base64 import b64decode
 from optparse import make_option
 import sys
 
-from couchdb import json
 from couchdb.multipart import write_multipart
 
 from django.core.management.base import BaseCommand
+from mygpo.json import json
 
 from mygpo.core.models import Podcast
 from mygpo.users.models import PodcastUserState, EpisodeUserState, \
