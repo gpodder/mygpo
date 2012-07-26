@@ -135,6 +135,21 @@ Build and installation instructions can be found at
 
  http://wiki.apache.org/couchdb/Installation
 
+Here are some rough instructions on how to build CouchDB 1.2.0 from source
+and setting it up with a local user account:
+
+  (assuming you have downloaded and extracted the CouchDB 1.2.0 source)
+  sudo apt-get build-dep couchdb
+  export COUCHDB_HOME=~/pkg/apache-couchdb-1.2.0/
+  ./configure --prefix=$COUCHDB_HOME
+  make -j4 && make install
+  sudo useradd -d $COUCHDB_HOME/var/lib/couchdb couchdb
+  sudo chown -R couchdb: $COUCHDB_HOME
+  sudo chown -R root:couchdb $COUCHDB_HOME/etc/couchdb
+  sudo chmod 664 $COUCHDB_HOME/etc/couchdb/*.ini
+  sudo chmod 775 $COUCHDB_HOME/etc/couchdb/*.d
+
+
 If you want to avoid installing a CouchDB server yourself, you can use a free
 CouchDB hosting service, for example from
 
