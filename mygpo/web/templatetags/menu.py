@@ -22,6 +22,7 @@ MENU_STRUCTURE = (
             ('/register/', _('Register')),
             ('/contribute/', _('Contribute')),
             ('/developer/', _('Development')),
+            ('/privacy/', _('Privacy Policy')),
             ('/online-help', _('Help')),
         )),
         (_('My Podcasts'), (
