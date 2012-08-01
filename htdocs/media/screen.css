@@ -421,6 +421,38 @@ span.from_podcast a, span.latest_episode a {
     color: #aaa;
 }
 
+ul.square-menu
+{
+    padding: 20px;
+}
+
+ul.square-menu li
+{
+    display: block;
+    float: left;
+    width: 100px;
+    height: 100px;
+    margin: 10px;
+    background-color: #aaa;
+    text-align: center;
+}
+
+ul.square-menu li a
+{
+    position: relative;
+    bottom: -40px;
+}
+
+address,
+address a
+{
+    clear: both;
+    text-align: center;
+    padding: 5px;
+    font-style: normal;
+    color: #999;
+}
+
 .own-chapter
 {
     font-weight: bold;

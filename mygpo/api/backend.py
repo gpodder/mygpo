@@ -94,8 +94,6 @@ def get_favorites(user):
 class BulkSubscribe(object):
     """ Performs bulk subscribe/unsubscribe operations """
 
-    DB = PodcastUserState.get_db()
-
     def __init__(self, user, device, podcasts = {}, actions=None):
         self.user = user
         self.device = device
@@ -110,8 +108,9 @@ class BulkSubscribe(object):
 
     def execute(self):
         """ Executes all added actions in bulk """
+        db = PodcastUserState.get_db()
         obj_funs = map(self._get_obj_fun, self.actions)
-        bulk_save_retry(self.DB, obj_funs)
+        bulk_save_retry(db, obj_funs)
 
         # prepare for another run
         self.actions = []
