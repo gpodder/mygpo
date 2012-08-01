@@ -19,7 +19,7 @@
 {% block content %}
 
    {% if device %}
-    <a href="{% url device device.uid %}">{% trans "Back to" %} {{ device|device_icon }} {{ device.name|striptags}}</a>
+    <a href="{% url "device" device.uid %}">{% trans "Back to" %} {{ device|device_icon }} {{ device.name|striptags}}</a>
    {% endif %}
 
    {% if not history|length_is:"0" %}
@@ -70,7 +70,7 @@
    <ul>
     {% if page > 0 %}
      <li>
-      <a href="?page={{page|add:"-1"}}">{% trans "«« Later" %}</a>
+      <a href="?page={{page|add:"-1"}}">«« {% trans "Later" %}</a>
      </li>
     {% endif %}
     {% if page != 0 %}
@@ -80,7 +80,7 @@
     {% endif %}
     {% if history %}
      <li>
-      <a href="?page={{page|add:"1"}}">{% trans "Earlier »»" %}</a>
+      <a href="?page={{page|add:"1"}}">{% trans "Earlier" %} »»</a>
      </li>
     {% endif %}
    </ul>
