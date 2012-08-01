@@ -16,7 +16,7 @@
   <table>
    <tr>
     <td>
-     <i class="icon-link"></i>
+     <i class="icon-link icon-large"></i>
     </td>
     <td>
      <a href="{% url shared-subscriptions user.username %}{% if token %}?token={{ token }}{% endif %}">
@@ -30,7 +30,7 @@
 
    <tr>
     <td>
-     <i class="icon-download"></i>
+     <i class="icon-download icon-large"></i>
     </td>
     <td>
      <a href="{% url shared-subscriptions-opml user.username %}{% if token %}?token={{ token }}{% endif %}">
@@ -44,7 +44,7 @@
 
    <tr>
     <td>
-     <i class="icon-rss"></i>
+     <i class="icon-rss icon-large"></i>
     </td>
     <td>
      <a href="{% url shared-subscriptions-rss user.username %}{% if token %}?token={{ token }}{% endif %}">
