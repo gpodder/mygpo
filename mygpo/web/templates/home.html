@@ -17,56 +17,48 @@
 
  <div class="hero-unit">
   <h1>Discover Podcasts</h1>
-  <p>Discover interesting podcasts and keep your subscriptions up to date on all your devices! gpodder.net is a free service that connects your podcast player on your computer, notebook and phone.</p>
+  <p>Discover interesting podcasts and keep your subscriptions up to date on all your devices! gpodder.net is a <strong>free</strong> service that connects your podcast player on your computer, notebook and phone.</p>
   <p><a class="btn btn-primary btn-large" href="{% url register %}">{% trans "Register" %}</a> <a class="btn btn-primary btn-large" href="{% url login %}">{% trans "Login" %}</a></p>
  </div>
 
- <div class="row-fluid">
+{% endblock %}
 
-  <div class="span4">
+
+{% block sidebar %}
+
+  <div>
    <h3><i class="icon-edit"></i> {% trans "Manage Your Podcast-Clients" %}</h3>
-   <p>{% blocktrans %}With gpodder.net you can manage your podcast clients via the
-    web, subscribe to new podcasts and even synchronize gPodder on
-    your notebook and on your mobile phone.{% endblocktrans %}</p>
+   <p>{% blocktrans %}Manage all your podcast clients via the web{% endblocktrans %}</p>
   </div>
 
-  <div class="span4">
+  <div>
    <h3><i class="icon-star"></i> {% trans "Discover New Podcasts" %}</h3>
    {% url directory-home as directory-home-url %}
    {% url toplist as toplist-url %}
    {% url episode-toplist as episode-toplist-url %}
-    <p>{% blocktrans %}Find new interesting podcasts in our <a href="{{ directory-home-url }}">directory</a> and <a href="{{ toplist-url }}">toplist</a>, see what's <a href="{{ episode-toplist-url }}">currently listened</a> to by our users and get personalized suggestions.{% endblocktrans %}</p>
+    <p>{% blocktrans %}Discover the most popular podcasts, and those that match your interests{% endblocktrans %}</p>
   </div>
 
-  <div class="span4">
+  <div>
    <h3><i class="icon-share"></i> {% trans "Share Interesting Podcasts" %}</h3>
-   <p>{% blocktrans %}Share your podcast subscriptions and favorite episodes with other users and get recommendations by others.{% endblocktrans %}</p>
+   <p>{% blocktrans %}Share your podcasts and favorite episodes with others.{% endblocktrans %}</p>
   </div>
 
- </div>
-
- <div class="row-fluid">
-
-  <div class="span4">
+  <div>
    <h3><i class="icon-cloud"></i> {% trans "Backup your Subscriptions" %}</h3>
-   <p>{% blocktrans %}With having your subscription and listening data <em>in the cloud</em> you always have a copy ready when replacing a computer or buying a new mobile phone.{% endblocktrans %}</p>
+   <p>{% blocktrans %}All your podcast related data, backed up online.{% endblocktrans %}</p>
   </div>
 
-  <div class="span4">
+  <div>
    <h3><i class="icon-play-circle"></i> {% trans "Seamless Playback on the Go" %}</h3>
-   <p>{% blocktrans %}Start listening to an episode on your PC and continue playback on your mobile phone &ndash; automatically. (coming with the next version of gPodder){% endblocktrans %}</p>
+   <p>{% blocktrans %}Start listening to an episode on your PC and continue playback on your mobile phone.{% endblocktrans %}</p>
   </div>
 
-
-  <div class="span4">
-   <h3>Supported Clients</h3>
-   <ul>
-    <li><a href="http://gpodder.org/">gPodder</a></li>
-    <li><a href="http://amarok.kde.org/">Amarok</a></li>
-    <li><a href="http://wiki.gpodder.org/wiki/Web_Services/Clients">more...</a></li>
-   </ul>
+  <div>
+   <h3><i class="icon-ok-circle"></i> {% trans "Supported Clients" %}</h3>
+   <a href="http://gpodder.org/">gPodder</a>,
+   <a href="http://amarok.kde.org/">Amarok</a> {% trans "and" %}
+   <a href="http://wiki.gpodder.org/wiki/Web_Services/Clients">{% trans "more..." %}</a>
   </div>
 
- </div>
-
-{% endblock content %}
+{% endblock %}
