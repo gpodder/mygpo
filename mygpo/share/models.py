@@ -40,7 +40,7 @@ class PodcastList(Document, RatingMixin):
                 endkey   = [user_id, {}],
                 include_docs = True,
             )
-        return r.iterator()
+        return list(r)
 
 
     @classmethod
