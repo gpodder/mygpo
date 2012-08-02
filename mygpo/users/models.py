@@ -320,7 +320,7 @@ class EpisodeUserState(Document):
             return False
 
         return (self.episode == other.episode and
-                self.user_oldid == other.user_oldid)
+                self.user == other.user)
 
 
 
