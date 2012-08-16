@@ -4,9 +4,9 @@ function(doc)
     {
         for(var n in doc.actions)
         {
-            action = doc.actions[n];
+            var action = doc.actions[n];
 
-            action_obj = {
+            var action_obj = {
                     podcast:   doc.podcast_ref_url,
                     episode:   doc.ref_url,
                     action:    action.action,
