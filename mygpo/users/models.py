@@ -113,6 +113,8 @@ class EpisodeAction(DocumentSchema):
         since_str = since.strftime('%Y-%m-%dT%H:%M:%S') if since else None
         until_str = until.strftime('%Y-%m-%dT%H:%M:%S') if until else {}
 
+        if since_str >= until_str:
+            return
 
         if not podcast_id and not device_id:
             view = 'episode_actions/by_user'
