@@ -7,9 +7,9 @@ function(doc)
             return;
         }
 
-        action = doc.actions[doc.actions.length-1];
+        var action = doc.actions[doc.actions.length-1];
 
-        action_obj = {
+        var action_obj = {
                 podcast_url:   doc.podcast_ref_url,
                 episode_url:   doc.ref_url,
                 podcast_id:    doc.podcast,
