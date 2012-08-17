@@ -139,7 +139,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.i18n",
     "django.core.context_processors.media",
     "django.contrib.messages.context_processors.messages",
-    "mygpo.web.googleanalytics.processor",
+    "mygpo.web.google.analytics",
+    "mygpo.web.google.adsense",
 )
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
@@ -167,6 +168,11 @@ EMAIL_BACKEND = 'django_couchdb_utils.email.backends.CouchDBEmailBackend'
 
 # minimum number of subscribers a podcast must have to be assigned a slug
 PODCAST_SLUG_SUBSCRIBER_LIMIT = 10
+
+
+ADSENSE_CLIENT = ''
+ADSENSE_SLOT_BOTTOM = ''
+
 
 try:
     from settings_prod import *
