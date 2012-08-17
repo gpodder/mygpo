@@ -53,6 +53,7 @@ urlpatterns += patterns('mygpo.web.views.podcast',
  url(r'^podcast/(?P<slug_id>[\w-]+)/remove-tag',                     'remove_tag_slug_id',  name='remove-tag-slug-id'),
  url(r'^podcast/(?P<slug_id>[\w-]+)/set-public',                     'set_public_slug_id',    name='podcast-public-slug-id',  kwargs={'public': True}),
  url(r'^podcast/(?P<slug_id>[\w-]+)/set-private',                    'set_public_slug_id',    name='podcast-private-slug-id', kwargs={'public': False}),
+ url(r'^podcast/(?P<slug_id>[\w-]+)/-episodes',                      'all_episodes_slug_id', name='podcast-all-episodes-slug-id'),
  )
 
 

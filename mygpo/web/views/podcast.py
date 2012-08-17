@@ -51,7 +51,7 @@ def show_slug(request, slug):
 @allowed_methods(['GET'])
 def show(request, podcast):
 
-    episodes = episode_list(podcast, request.user)
+    episodes = episode_list(podcast, request.user, limit=20)
 
     max_listeners = max([e.listeners for e in episodes] + [0])
 
@@ -139,7 +139,7 @@ def get_tags(podcast, user):
     return tag_list
 
 
-def episode_list(podcast, user):
+def episode_list(podcast, user, limit=None):
     """
     Returns a list of episodes, with their action-attribute set to the latest
     action. The attribute is unsert if there is no episode-action for
@@ -147,7 +147,7 @@ def episode_list(podcast, user):
     """
 
     listeners = dict(podcast.episode_listener_counts())
-    episodes = list(podcast.get_episodes(descending=True))
+    episodes = list(podcast.get_episodes(descending=True, limit=limit))
 
     if user.is_authenticated():
 
@@ -167,6 +167,25 @@ def episode_list(podcast, user):
 
     annotate_episode = partial(_annotate_episode, listeners, episode_actions)
     return map(annotate_episode, episodes)
+
+
+
+def all_episodes(request, podcast):
+
+    episodes = episode_list(podcast, request.user)
+
+    max_listeners = max([e.listeners for e in episodes] + [0])
+
+    if request.user.is_authenticated():
+
+        request.user.sync_all()
+
+    return render(request, 'episodes.html', {
+        'podcast': podcast,
+        'episodes': episodes,
+        'max_listeners': max_listeners,
+    })
+
 
 
 def _annotate_episode(listeners, episode_actions, episode):
@@ -357,6 +376,7 @@ unsubscribe_slug_id = slug_id_decorator(unsubscribe)
 add_tag_slug_id     = slug_id_decorator(add_tag)
 remove_tag_slug_id  = slug_id_decorator(remove_tag)
 set_public_slug_id  = slug_id_decorator(set_public)
+all_episodes_slug_id= slug_id_decorator(all_episodes)
 
 
 show_oldid          = oldid_decorator(show)
