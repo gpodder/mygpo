@@ -40,7 +40,7 @@ from mygpo.utils import parse_time, format_time, parse_bool, get_to_dict, get_ti
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.core import models
 from mygpo.core.models import SanitizingRule, Podcast
-from mygpo.users.models import PodcastUserState, EpisodeAction,
+from mygpo.users.models import PodcastUserState, EpisodeAction, \
      EpisodeUserState, DeviceDoesNotExist, DeviceUIDException
 from mygpo.json import json, JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
