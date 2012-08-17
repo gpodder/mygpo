@@ -34,7 +34,7 @@ def search_podcasts(q, limit=20, skip=0):
     #FIXME current couchdbkit can't parse responses for multi-query searches
     q = q.replace(',', '')
 
-    res = db.search('directory/search', wrapper=search_wrapper,
+    res = db.search('podcasts/search', wrapper=search_wrapper,
         include_docs=True, limit=limit, skip=skip, q=q,
         sort='\\subscribers<int>')
 
