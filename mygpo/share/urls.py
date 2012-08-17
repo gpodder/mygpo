@@ -1,7 +1,7 @@
 from django.conf.urls.defaults import *
 
 from mygpo.share.views import ShareFavorites, FavoritesPublic, \
-         PublicSubscriptions
+         PublicSubscriptions, FavoritesFeedCreateEntry
 
 urlpatterns = patterns('mygpo.share.views',
  url(r'^share/lists/$',
@@ -47,5 +47,8 @@ urlpatterns = patterns('mygpo.share.views',
      PublicSubscriptions.as_view(public=True),
      name='public_subscriptions'),
 
+ url(r'^share/favorites/create-directory-entry',
+     FavoritesFeedCreateEntry.as_view(),
+     name='favorites-create-entry'),
 
 )

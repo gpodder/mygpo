@@ -34,6 +34,7 @@
     </td>
    </tr>
 
+   {% if not feed_token %}
 
    <tr>
     <td>
@@ -42,19 +43,24 @@
 
     <td>
      {% if podcast %}
-      <a href="{% podcast_link_target podcast %}">Directory Entry</a>
+      <a href="{% podcast_link_target podcast %}">{% trans "Directory Entry" %}</a>
      {% else %}
-      Directory Entry
+      {% trans "Directory Entry" %}
      {% endif %}
     </td>
     <td>
      {% if podcast %}
       <input class="input-xxlarge" readonly="readonly" type="text" value="http://{{ site.domain }}{% podcast_link_target podcast %}" />
      {% else %}
-      <a class="btn" href="{% url subscribe-by-url %}?url=http://{{ site.domain }}{% url favorites-feed user.username %}">Create</a>
+      <form action="{% url favorites-create-entry %}" method="post">
+       {% csrf_token %}
+       <button class="btn" type="submit">{% trans "Create" %}</button>
+      </form>
      {% endif %}
     </td>
    </tr>
+
+   {% endif %}
 
   </table>
 

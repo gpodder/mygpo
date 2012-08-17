@@ -20,6 +20,7 @@ from mygpo.share.models import PodcastList
 from mygpo.users.models import User
 from mygpo.directory.views import search as directory_search
 from mygpo.decorators import repeat_on_conflict
+from mygpo.data.feeddownloader import update_podcasts
 
 
 
@@ -209,7 +210,7 @@ class ShareFavorites(View):
 
         site = RequestSite(request)
 
-        feed_url = 'http://%s/%s' % (site.domain, reverse('favorites-feed', args=[request.user.username]))
+        feed_url = 'http://%s%s' % (site.domain, reverse('favorites-feed', args=[request.user.username]))
 
         podcast = Podcast.for_url(feed_url)
 
@@ -245,3 +246,26 @@ class PublicSubscriptions(View):
 
         user.save()
 
+
+class FavoritesFeedCreateEntry(View):
+    """ Creates a Podcast object for the user's favorites feed """
+
+    @method_decorator(vary_on_cookie)
+    @method_decorator(cache_control(private=True))
+    @method_decorator(login_required)
+    def post(self, request):
+        user = request.user
+
+        #TODO: move into FavoritesFeed class
+        site = RequestSite(request)
+        feed_url = 'http://%s%s' % (site.domain, reverse('favorites-feed', args=[user.username]))
+
+        podcast = Podcast.for_url(feed_url, create=True)
+
+        if not podcast.get_id() in user.published_objects:
+            user.published_objects.append(podcast.get_id())
+            user.save()
+
+        update_podcasts([podcast])
+
+        return HttpResponseRedirect(reverse('share-favorites'))
