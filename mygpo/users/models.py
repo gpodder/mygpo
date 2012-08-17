@@ -8,6 +8,8 @@ from operator import itemgetter
 from couchdbkit import ResourceNotFound
 from couchdbkit.ext.django.schema import *
 
+from django.core.cache import cache
+
 from django_couchdb_utils.registration.models import User as BaseUser
 
 from mygpo.core.proxy import proxy_object, DocumentABCMeta
@@ -247,12 +249,23 @@ class EpisodeUserState(Document):
 
     @classmethod
     def for_ref_urls(cls, user, podcast_url, episode_url):
+
+        import hashlib
+        cache_key = 'episode-state-%s-%s-%s' % (user._id,
+                hashlib.md5(podcast_url).hexdigest(),
+                hashlib.md5(episode_url).hexdigest())
+
+        state = cache.get(cache_key)
+        if state:
+            return state
+
         res = cls.view('episode_states/by_ref_urls',
             key = [user._id, podcast_url, episode_url], limit=1, include_docs=True)
         if res:
             state = res.first()
             state.ref_url = episode_url
             state.podcast_ref_url = podcast_url
+            cache.set(cache_key, state, 60*60)
             return state
 
         else:
