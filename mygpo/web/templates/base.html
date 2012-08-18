@@ -165,36 +165,45 @@
        <div class="span1">
        <ul>
         <li><strong>Discover</strong></li>
-        <li><a href="">Directory</a></li>
-        <li><a href="">Podcasts</a></li>
-        <li><a href="">Search</a></li>
+        <li><a href="{% url directory-home %}">Directory</a></li>
+        <li><a href="{% url toplist %}">Podcasts</a></li>
+        <li><a href="{% url search %}">Search</a></li>
        </ul>
        </div>
 
        <div class="span1">
         <ul>
-         <li><strong>Support</strong></li>
+         <li><strong>Get&nbsp;Support</strong></li>
+         <li><a href="{% url help %}">Docs</a></li>
+         <li><a href="http://wiki.gpodder.org/wiki/Mailing_List">Mailing&nbsp;List</a></li>
+         <li><a href="https://getsatisfaction.com/gpoddernet">Questions</a></li>
+        </ul>
+       </div>
+
+       <div class="span1">
+        <ul>
+         <li><strong>Support&nbsp;Us</strong></li>
          <li><a href="http://flattr.com/thing/2304/gpodder-net">Flattr</a></li>
-         <li><a href="">Donate</a></li>
-         <li><a href="">Advertise</a></li>
+         <li><a href="{% url contribute %}">Donate</a></li>
+         <li><a href="{% url advertise %}">Advertise</a></li>
         </ul>
        </div>
 
        <div class="span1">
         <ul>
          <li><strong>Develop</strong></li>
-         <li><a href="">API</a></li>
-         <li><a href="">Libraries</a></li>
-         <li><a href="">Clients</a></li>
+         <li><a href="http://wiki.gpodder.org/wiki/Web_Services/API_2">API</a></li>
+         <li><a href="http://wiki.gpodder.org/wiki/Web_Services/Libraries">Libraries</a></li>
+         <li><a href="http://wiki.gpodder.org/wiki/Web_Services/Clients">Clients</a></li>
         </ul>
        </div>
 
        <div class="span1">
         <ul>
          <li><strong>Publish</strong></li>
-         <li><a href="">Get&nbsp;Access</a></li>
-         <li><a href="">Link&nbsp;To&nbsp;Us</a></li>
-         <li><a href="">Advertise</a></li>
+         <li><a href="{% url publisher %}">Get&nbsp;Access</a></li>
+         <li><a href="{% url link-here %}">Link&nbsp;To&nbsp;Us</a></li>
+         <li><a href="{% url advertise %}">Advertise</a></li>
         </ul>
        </div>
 
