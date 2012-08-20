@@ -151,9 +151,16 @@ class UserAgentStats(AdminView):
             )
 
         useragents = Counter(dict((r['key'], r['value']) for r in res))
-        max_users = useragents.most_common(1)[0][1]
+
+        if useragents:
+            max_users = useragents.most_common(1)[0][1]
+            total = sum(useragents.values())
+        else:
+            max_users = 0
+            total = 0
 
         return self.render_to_response({
                 'useragents': useragents.most_common(),
                 'max_users': max_users,
+                'total': total,
             })
