@@ -14,6 +14,7 @@ from mygpo.admin.group import PodcastGrouper
 from mygpo.core.models import Podcast
 from mygpo.counter import Counter
 from mygpo.maintenance.merge import PodcastMerger, IncorrectMergeException
+from mygpo.users.models import User
 
 
 class AdminView(TemplateView):
@@ -136,3 +137,23 @@ class MergeProcess(MergeBase):
                     'actions': actions.items(),
                     'podcast': podcasts,
                 })
+
+
+
+class UserAgentStats(AdminView):
+    template_name = 'admin/useragents.html'
+
+    def get(self, request):
+
+        db = User.get_db()
+        res = db.view('clients/by_ua_string',
+                group_level = 1,
+            )
+
+        useragents = Counter(dict((r['key'], r['value']) for r in res))
+        max_users = useragents.most_common(1)[0][1]
+
+        return self.render_to_response({
+                'useragents': useragents.most_common(),
+                'max_users': max_users,
+            })
