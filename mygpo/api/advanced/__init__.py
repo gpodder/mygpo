@@ -40,7 +40,8 @@ from mygpo.utils import parse_time, format_time, parse_bool, get_to_dict, get_ti
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.core import models
 from mygpo.core.models import SanitizingRule, Podcast
-from mygpo.users.models import PodcastUserState, EpisodeAction, EpisodeUserState, DeviceDoesNotExist
+from mygpo.users.models import PodcastUserState, EpisodeAction, \
+     EpisodeUserState, DeviceDoesNotExist, DeviceUIDException
 from mygpo.json import json, JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.couchdb import bulk_save_retry
@@ -148,16 +149,7 @@ def update_subscriptions(user, device, add, remove):
 
 
 def get_subscription_changes(user, device, since, until):
-    add, rem = device.get_subscription_changes(since, until)
-
-    podcast_ids = add + rem
-    podcasts = get_to_dict(Podcast, podcast_ids, get_id=models.Podcast.get_id)
-
-    add_podcasts = filter(None, (podcasts.get(i, None) for i in add))
-    rem_podcasts = filter(None, (podcasts.get(i, None) for i in rem))
-    add_urls = [ podcast.url for podcast in add_podcasts]
-    rem_urls = [ podcast.url for podcast in rem_podcasts]
-
+    add_urls, rem_urls = device.get_subscription_changes(since, until)
     until_ = get_timestamp(until)
     return {'add': add_urls, 'remove': rem_urls, 'timestamp': until_}
 
@@ -183,10 +175,10 @@ def episodes(request, username, version=1):
 
         try:
             update_urls = update_episodes(request.user, actions, now, ua_string)
-        except Exception, e:
+        except DeviceUIDException as e:
             import traceback
             log('could not update episodes for user %s: %s %s: %s' % (username, e, traceback.format_exc(), actions))
-            return HttpResponseBadRequest(e)
+            return HttpResponseBadRequest(str(e))
 
         return JsonResponse({'timestamp': now_, 'update_urls': update_urls})
 

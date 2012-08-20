@@ -8,6 +8,8 @@ from operator import itemgetter
 from couchdbkit import ResourceNotFound
 from couchdbkit.ext.django.schema import *
 
+from django.core.cache import cache
+
 from django_couchdb_utils.registration.models import User as BaseUser
 
 from mygpo.core.proxy import proxy_object, DocumentABCMeta
@@ -111,6 +113,8 @@ class EpisodeAction(DocumentSchema):
         since_str = since.strftime('%Y-%m-%dT%H:%M:%S') if since else None
         until_str = until.strftime('%Y-%m-%dT%H:%M:%S') if until else {}
 
+        if since_str >= until_str:
+            return
 
         if not podcast_id and not device_id:
             view = 'episode_actions/by_user'
@@ -247,19 +251,27 @@ class EpisodeUserState(Document):
 
     @classmethod
     def for_ref_urls(cls, user, podcast_url, episode_url):
+
+        import hashlib
+        cache_key = 'episode-state-%s-%s-%s' % (user._id,
+                hashlib.md5(podcast_url).hexdigest(),
+                hashlib.md5(episode_url).hexdigest())
+
+        state = cache.get(cache_key)
+        if state:
+            return state
+
         res = cls.view('episode_states/by_ref_urls',
             key = [user._id, podcast_url, episode_url], limit=1, include_docs=True)
         if res:
             state = res.first()
             state.ref_url = episode_url
             state.podcast_ref_url = podcast_url
+            cache.set(cache_key, state, 60*60)
             return state
 
         else:
-            podcast = Podcast.for_url(podcast_url, create=True)
-            episode = Episode.for_podcast_id_url(podcast.get_id(), episode_url,
-                    create=True)
-
+            episode = Episode.for_podcast_url(podcast_url, episode_url, create=True)
             return episode.get_user_state(user)
 
 
@@ -323,7 +335,7 @@ class EpisodeUserState(Document):
             return False
 
         return (self.episode == other.episode and
-                self.user_oldid == other.user_oldid)
+                self.user == other.user)
 
 
 
@@ -535,9 +547,9 @@ class Device(Document):
         for p_state in podcast_states:
             change = p_state.get_change_between(self.id, since, until)
             if change == 'subscribe':
-                add.append( p_state.podcast )
+                add.append( p_state.ref_url )
             elif change == 'unsubscribe':
-                rem.append( p_state.podcast )
+                rem.append( p_state.ref_url )
 
         return add, rem
 

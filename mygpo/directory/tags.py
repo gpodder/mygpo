@@ -136,7 +136,7 @@ class TagCloud(object):
 
     def _query(self):
         db = Category.get_db()
-        res = db.view('categories/by_tags',
+        res = db.view('categories/by_weight',
                 descending = True,
                 skip       = self.skip,
                 limit      = self.count,
