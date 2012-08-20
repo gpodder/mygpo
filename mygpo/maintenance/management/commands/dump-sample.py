@@ -88,6 +88,9 @@ class Command(BaseCommand):
 
         for n, docid in enumerate(docs):
 
+            if not docid:
+                continue
+
             doc = db.get(docid, attachments=True)
             attachments = doc.pop('_attachments', {})
             jsondoc = json.encode(doc)
