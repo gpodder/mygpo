@@ -17,7 +17,7 @@
 
 from functools import wraps
 
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 
 
 def require_staff(protected_view):
