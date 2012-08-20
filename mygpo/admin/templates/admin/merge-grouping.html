@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load podcasts %}
+{% load episodes %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/admin/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/admin/"|section_menu:"Admin" }}{% endblock %}
+
+{% block title %}{% trans "Admin Area" %}{% endblock %}
+
+{% block content %}
+ <h1>{% trans "Merge Podcasts and Episodes" %}</h1>
+ <hr />
+
+ <p>Merging Podcasts
+  {% for podcast in podcasts %}
+   {% podcast_link podcast %}
+  {% endfor %}
+ </p>
+
+ <div class="info">
+  {% trans "Episodes that have the same number will be merged. Please verify all your changes by clicking on 'Renew Groups' before starting the Merge." %}
+ </div>
+
+ <form method="post" action="{% url admin-merge-process %}">
+  {% csrf_token %}
+
+  {% for podcast in podcasts %}
+   <input type="hidden" name="feed{{ forloop.counter0 }}" value="{{ podcast.url }}" />
+  {% endfor %}
+
+  <table>
+   <tr>
+    <th>#</th>
+    {% for podcast in podcasts %}
+     <th>{% podcast_link podcast %}</th>
+    {% endfor %}
+   </tr>
+
+   {% for n, episodes in groups %}
+    <tr>
+     <th>{{ n }}</th>
+
+     {% for podcast in podcasts %}
+     <td>
+      {% for episode in episodes %}
+       {% if episode.podcast == podcast.get_id %}
+        <input type="text" name="episode_{% get_id episode %}" value="{{ n }}" size="2"/>
+        {% episode_link episode podcast %}<br />
+       {% endif %}
+      {% endfor %}
+     </td>
+    {% endfor %}
+
+    </tr>
+   {% endfor %}
+
+   <tr>
+    <td></td>
+    <td><input type="submit" name="renew" value="Renew Groups" /></td>
+    <td><input type="submit" name="merge" value="Merge!" /></td>
+   </tr>
+
+  </table>
+ </form>
+
+
+{% endblock %}
+

@@ -115,6 +115,7 @@ INSTALLED_APPS = (
     'mygpo.directory',
     'mygpo.maintenance',
     'mygpo.share',
+    'mygpo.admin',
 )
 
 TEST_EXCLUDE = (

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load charts %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/admin/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/admin/"|section_menu:"Admin" }}{% endblock %}
+
+{% block title %}{% trans "Admin Area" %}{% endblock %}
+
+{% block content %}
+ <h1>{% trans "User-Agent Statistics" %}</h1>
+ <hr />
+
+  <table>
+   <tr>
+    <th>{% trans "User-Agent" %}</th>
+    <th>{% trans "Number of Clients" %}</th>
+   </tr>
+
+   {% for ua, clients in useragents %}
+    <tr>
+     <td>{{ ua }}</td>
+     <td>{{ clients|vertical_bar:max_users }}</td>
+    </tr>
+   {% endfor %}
+
+   <tr>
+    <th>{% trans "Total" %}</th>
+    <th>{{ total }}</th>
+   </tr>
+  </table>
+
+
+{% endblock %}
+
