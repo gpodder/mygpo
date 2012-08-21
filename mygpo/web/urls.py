@@ -22,6 +22,9 @@ urlpatterns = patterns('mygpo.web.views',
        {'template': 'developer.html'}),
  url(r'^contribute/',                                              direct_to_template,
        {'template': 'contribute.html'}),
+ url(r'^privacy/',                                              direct_to_template,
+       {'template': 'privacy_policy.html'}, name='privacy-policy'),
+
 )
 
 urlpatterns += patterns('mygpo.web.views.subscriptions',

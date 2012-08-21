@@ -8,6 +8,8 @@ from operator import itemgetter
 from couchdbkit import ResourceNotFound
 from couchdbkit.ext.django.schema import *
 
+from django.core.cache import cache
+
 from django_couchdb_utils.registration.models import User as BaseUser
 
 from mygpo.core.proxy import proxy_object, DocumentABCMeta
@@ -42,7 +44,7 @@ class Suggestions(Document, RatingMixin):
 
     @classmethod
     def for_user(cls, user):
-        r = cls.view('users/suggestions_by_user', key=user._id, \
+        r = cls.view('suggestions/by_user', key=user._id, \
             include_docs=True)
         if r:
             return r.first()
@@ -111,24 +113,26 @@ class EpisodeAction(DocumentSchema):
         since_str = since.strftime('%Y-%m-%dT%H:%M:%S') if since else None
         until_str = until.strftime('%Y-%m-%dT%H:%M:%S') if until else {}
 
+        if since_str >= until_str:
+            return
 
         if not podcast_id and not device_id:
-            view = 'users/episode_actions'
+            view = 'episode_actions/by_user'
             startkey = [user_id, since_str]
             endkey   = [user_id, until_str]
 
         elif podcast_id and not device_id:
-            view = 'users/episode_actions_podcast'
+            view = 'episode_actions/by_podcast'
             startkey = [user_id, podcast_id, since_str]
             endkey   = [user_id, podcast_id, until_str]
 
         elif device_id and not podcast_id:
-            view = 'users/episode_actions_device'
+            view = 'episode_actions/by_device'
             startkey = [user_id, device_id, since_str]
             endkey   = [user_id, device_id, until_str]
 
         else:
-            view = 'users/episode_actions_podcast_device'
+            view = 'episode_actions/by_podcast_device'
             startkey = [user_id, podcast_id, device_id, since_str]
             endkey   = [user_id, podcast_id, device_id, until_str]
 
@@ -188,7 +192,7 @@ class Chapter(Document):
     @classmethod
     def for_episode(cls, episode_id):
         db = cls.get_db()
-        r = db.view('users/chapters_by_episode',
+        r = db.view('chapters/by_episode',
                 startkey = [episode_id, None],
                 endkey   = [episode_id, {}],
                 wrap_doc = False,
@@ -224,8 +228,11 @@ class EpisodeUserState(Document):
 
     @classmethod
     def for_user_episode(cls, user, episode):
-        r = cls.view('users/episode_states_by_user_episode',
-            key=[user._id, episode._id], include_docs=True, limit=1)
+        r = cls.view('episode_states/by_user_episode',
+                key          = [user._id, episode._id],
+                include_docs = True,
+                limit        = 1,
+            )
 
         if r:
             return r.first()
@@ -244,25 +251,33 @@ class EpisodeUserState(Document):
 
     @classmethod
     def for_ref_urls(cls, user, podcast_url, episode_url):
-        res = cls.view('users/episode_states_by_ref_urls',
+
+        import hashlib
+        cache_key = 'episode-state-%s-%s-%s' % (user._id,
+                hashlib.md5(podcast_url).hexdigest(),
+                hashlib.md5(episode_url).hexdigest())
+
+        state = cache.get(cache_key)
+        if state:
+            return state
+
+        res = cls.view('episode_states/by_ref_urls',
             key = [user._id, podcast_url, episode_url], limit=1, include_docs=True)
         if res:
             state = res.first()
             state.ref_url = episode_url
             state.podcast_ref_url = podcast_url
+            cache.set(cache_key, state, 60*60)
             return state
 
         else:
-            podcast = Podcast.for_url(podcast_url, create=True)
-            episode = Episode.for_podcast_id_url(podcast.get_id(), episode_url,
-                    create=True)
-
+            episode = Episode.for_podcast_url(podcast_url, episode_url, create=True)
             return episode.get_user_state(user)
 
 
     @classmethod
     def count(cls):
-        r = cls.view('users/episode_states_by_user_episode',
+        r = cls.view('episode_states/by_user_episode',
                 limit = 0,
                 stale = 'update_after',
             )
@@ -320,7 +335,7 @@ class EpisodeUserState(Document):
             return False
 
         return (self.episode == other.episode and
-                self.user_oldid == other.user_oldid)
+                self.user == other.user)
 
 
 
@@ -368,7 +383,7 @@ class PodcastUserState(Document):
 
     @classmethod
     def for_user_podcast(cls, user, podcast):
-        r = PodcastUserState.view('users/podcast_states_by_podcast', \
+        r = PodcastUserState.view('podcast_states/by_podcast', \
             key=[podcast.get_id(), user._id], limit=1, include_docs=True)
         if r:
             return r.first()
@@ -386,7 +401,7 @@ class PodcastUserState(Document):
 
     @classmethod
     def for_user(cls, user):
-        r = PodcastUserState.view('users/podcast_states_by_user',
+        r = PodcastUserState.view('podcast_states/by_user',
             startkey     = [user._id, None],
             endkey       = [user._id, 'ZZZZ'],
             include_docs = True,
@@ -396,7 +411,7 @@ class PodcastUserState(Document):
 
     @classmethod
     def for_device(cls, device_id):
-        r = PodcastUserState.view('users/podcast_states_by_device',
+        r = PodcastUserState.view('podcast_states/by_device',
             startkey=[device_id, None], endkey=[device_id, {}],
             include_docs=True)
         return list(r)
@@ -412,7 +427,7 @@ class PodcastUserState(Document):
 
     @classmethod
     def count(cls):
-        r = PodcastUserState.view('users/podcast_states_by_user',
+        r = PodcastUserState.view('podcast_states/by_user',
                 limit = 0,
                 stale = 'update_after',
             )
@@ -532,9 +547,9 @@ class Device(Document):
         for p_state in podcast_states:
             change = p_state.get_change_between(self.id, since, until)
             if change == 'subscribe':
-                add.append( p_state.podcast )
+                add.append( p_state.ref_url )
             elif change == 'unsubscribe':
-                rem.append( p_state.podcast )
+                rem.append( p_state.ref_url )
 
         return add, rem
 
@@ -548,7 +563,7 @@ class Device(Document):
 
 
     def get_subscribed_podcast_ids(self):
-        r = self.view('users/subscribed_podcasts_by_device',
+        r = self.view('subscriptions/by_device',
                 startkey = [self.id, None],
                 endkey   = [self.id, {}]
             )
@@ -704,7 +719,7 @@ class User(BaseUser, SyncedDevicesMixin):
         of the users subscriptions
         """
 
-        r = PodcastUserState.view('users/subscribed_podcasts_by_user',
+        r = PodcastUserState.view('subscriptions/by_user',
             startkey = [self._id, public, None, None],
             endkey   = [self._id+'ZZZ', None, None, None],
             reduce   = False,
@@ -737,7 +752,7 @@ class User(BaseUser, SyncedDevicesMixin):
 
     def get_num_listened_episodes(self):
         db = EpisodeUserState.get_db()
-        r = db.view('users/listeners_by_user_podcast',
+        r = db.view('listeners/by_user_podcast',
                 startkey    = [self._id, None],
                 endkey      = [self._id, {}],
                 reduce      = True,
@@ -873,7 +888,7 @@ class User(BaseUser, SyncedDevicesMixin):
         startkey = [self._id, {}]
         endkey   = [self._id, None]
 
-        res = Episode.view('users/listeners_by_user',
+        res = Episode.view('listeners/by_user',
                 startkey     = startkey,
                 endkey       = endkey,
                 include_docs = True,
@@ -895,7 +910,7 @@ class User(BaseUser, SyncedDevicesMixin):
         endkey   = [self._id, until_str]
 
         db = EpisodeUserState.get_db()
-        res = db.view('users/listeners_by_user',
+        res = db.view('listeners/by_user',
                 startkey = startkey,
                 endkey   = endkey,
                 reduce   = True,
@@ -918,7 +933,7 @@ class User(BaseUser, SyncedDevicesMixin):
         endkey   = [self._id, until_str]
 
         db = EpisodeUserState.get_db()
-        res = db.view('users/times_played_by_user',
+        res = db.view('listeners/times_played_by_user',
                 startkey = startkey,
                 endkey   = endkey,
                 reduce   = True,
@@ -966,11 +981,11 @@ class History(object):
         self._db = EpisodeUserState.get_db()
 
         if device:
-            self._view = 'users/device_history'
+            self._view = 'history/by_device'
             self._startkey = [self.user._id, device.id, None]
             self._endkey   = [self.user._id, device.id, {}]
         else:
-            self._view = 'users/history'
+            self._view = 'history/by_user'
             self._startkey = [self.user._id, None]
             self._endkey   = [self.user._id, {}]
 

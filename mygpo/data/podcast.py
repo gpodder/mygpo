@@ -34,7 +34,7 @@ def calc_similar_podcasts(podcast, num=20):
 
     db = PodcastUserState.get_db()
 
-    res = db.view('users/subscriptions_by_podcast',
+    res = db.view('subscriptions/by_podcast',
             startkey    = [podcast.get_id(), None, None],
             endkey      = [podcast.get_id(), {}, {}],
             group       = True,
@@ -48,7 +48,7 @@ def calc_similar_podcasts(podcast, num=20):
 
 
     for user_id in users:
-        subscribed = db.view('users/subscribed_podcasts_by_user',
+        subscribed = db.view('subscriptions/by_user',
                 startkey    = [user_id, True, None, None],
                 endkey      = [user_id, True, {}, {}],
                 group       = True,

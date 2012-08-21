@@ -19,7 +19,6 @@ from datetime import timedelta
 from collections import defaultdict
 from itertools import cycle
 from functools import partial
-import random
 
 from django.core.cache import cache
 
@@ -35,24 +34,23 @@ from mygpo.couchdb import bulk_save_retry
 def get_random_picks(languages=None):
     """ Returns random podcasts for the given language """
 
-    if not languages:
-        for podcast in Podcast.random():
+    languages = languages or ['']
+
+    # get one iterator for each language
+    rand_iters = [Podcast.random(lang) for lang in languages]
+
+    # cycle through them, removing those that don't yield any more results
+    while rand_iters:
+        rand_iter = rand_iters.pop(0)
+
+        try:
+            podcast = next(rand_iter)
+            rand_iters.append(rand_iter)
             yield podcast
 
-    counts = cache.get('podcast-language-counts')
-    if not counts:
-        counts = get_podcast_count_for_language()
-        cache.set('podcast-language-counts', counts, 60*60)
-
-
-    # extract positive counts of all languages in language param
-    counts = filter(lambda (l, c): l in languages and c > 0, counts.items())
-
-    for lang, count in cycle(counts):
-        skip = random.randint(0, count-1)
-
-        for podcast in Podcast.for_language(lang, skip=skip, limit=1):
-            yield podcast
+        except StopIteration:
+            # don't re-add rand_iter
+            pass
 
 
 
@@ -62,7 +60,7 @@ def get_podcast_count_for_language():
     counts = defaultdict(int)
 
     db = Podcast.get_db()
-    r = db.view('core/podcasts_by_language',
+    r = db.view('podcasts/by_language',
         reduce = True,
         group_level = 1,
         stale       = 'update_after',
@@ -115,7 +113,7 @@ def get_device(user, uid, user_agent, undelete=True):
 
 
 def get_favorites(user):
-    favorites = Episode.view('users/favorite_episodes_by_user',
+    favorites = Episode.view('favorites/episodes_by_user',
             key          = user._id,
             include_docs = True,
         )
@@ -125,8 +123,6 @@ def get_favorites(user):
 
 class BulkSubscribe(object):
     """ Performs bulk subscribe/unsubscribe operations """
-
-    DB = PodcastUserState.get_db()
 
     def __init__(self, user, device, podcasts = {}, actions=None):
         self.user = user
@@ -142,8 +138,9 @@ class BulkSubscribe(object):
 
     def execute(self):
         """ Executes all added actions in bulk """
+        db = PodcastUserState.get_db()
         obj_funs = map(self._get_obj_fun, self.actions)
-        bulk_save_retry(self.DB, obj_funs)
+        bulk_save_retry(db, obj_funs)
 
         # prepare for another run
         self.actions = []

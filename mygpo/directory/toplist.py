@@ -104,7 +104,7 @@ class EpisodeToplist(Toplist):
 
     def __init__(self, languages=[], types=[], startdate=None):
         super(EpisodeToplist, self).__init__(Episode,
-                'directory/episode_toplist', languages, types)
+                'toplist/episodes', languages, types)
         self.date = startdate or date.today()
 
 
@@ -131,7 +131,7 @@ class PodcastToplist(Toplist):
     TYPE = 'Podcast'
 
     def __init__(self, languages=[], types=[]):
-        super(PodcastToplist, self).__init__(Podcast, 'directory/toplist',
+        super(PodcastToplist, self).__init__(Podcast, 'toplist/podcasts',
                 languages, types,
                 view_args=dict(classes=[Podcast, PodcastGroup]))
 

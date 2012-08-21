@@ -98,6 +98,8 @@ def dashboard(request, episode_count=10):
     lang = utils.get_accepted_lang(request)
     lang = utils.sanitize_language_codes(lang)
 
+    # for performance reasons, we only consider the first three languages
+    lang = lang[:3]
     random_podcasts = islice(backend.get_random_picks(lang), 0, 5)
 
     return render(request, 'dashboard.html', {

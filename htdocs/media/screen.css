@@ -595,7 +595,8 @@ ul.square-menu li a
     bottom: -40px;
 }
 
-address
+address,
+address a
 {
     clear: both;
     text-align: center;

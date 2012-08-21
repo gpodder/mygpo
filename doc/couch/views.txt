@@ -7,329 +7,214 @@
 This file describes the views that will be used in the CouchDB based backend of
 the gpodder.net webservice.
 
-For each view the use case in the application is given.
+View groups are roughly divided into those that access use-generated documents
+(e.g. PodcastUserState, EpisodeUserState) and those that don't.
 
 
-Podcasts by ID
-~~~~~~~~~~~~~~
- * For a Podcast, emits its id and the podcast itself.
- * For a PodcastGroup, emits the contained podcasts with their ids.
+Categories
+==========
 
-Used for accessing a Podcast by id, even after it has been added to a group
-(instead of accessing it without a view, what would not be possible for a
-Podcast within a group).
+Doc-Types: Category
 
+Views:
+* categories/by_tags
+* categories/by_weight
 
-Podcasts by Old-Id (core/podcasts_by_oldid)
-~~~~~~~~~~~~~~~~~~
- * For a Podcast, emits its old_id and the podcast itself if it has an oldid.
- * For a PodcastGroup, emits the old_id and the podcast for all contained
-   podcasts that have an oldid.
 
-Used to access Podcasts by the Ids used in the RDBMS-based backend.
+Chapters
+========
 
+Doc-Types: EpisodeUserState
 
-Podcasts and Podcast-Groups (core/podcasts_groups)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * For a Podcast that does not belong to a group, emits the Id and null
- * For a PodcastGroup, emits the Id and null
+Views:
+* chapters/by_episode
 
-Used to retrieve all not-grouped Podcasts and all Podcast-Groups.
 
+Episode Actions
+===============
 
-Podcast-Group by Old-Id (core/podcastgroups_by_oldid)
-~~~~~~~~~~~~~~~~~~~~~~~
- * For a PodcastGroup, emits the oldid and null if it has an oldid
+Doc-Types: EpisodeUserState
 
-Used to access Podcast-Groups by the Ids used in the RDBMS-based backend.
+Views:
+* episode_actions/by_device
+* episode_actions/by_podcast
+* episode_actions/by_podcast_device
+* episode_actions/by_user
 
 
-Podcasts by Number of Subscribers and other Criteria (directory/toplist)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * For a Podcast, emits the key described below and null
- * For a PodcastGroup, emits the key described below and null
+Episodes
+========
 
-From a client perspective, the toplist can be queried with some (optional)
-content-type and language parameters. These are prepresented in the view as
+Doc-Types: Episode
 
- ["Podcast", "types-languages", "audio", "english", 1000]
-     |              |              |        |        |
-     |              |              |        |        \- Number of Subscribers
-     |              |              |        |
-     |              |              |        \- Language Parameter (optional)
-     |              |              |
-     |              |              \- Content-Type Parameter (optional)
-     |              |
-     |              \- Indicates which parameters follow; possible values are
-     |                 "none", "types", "languages" and "types-languages"
-     |
-     \- Indicates that this is an entry of the Podcast-and not the
-        Episode-Toplist; the actual entry could still be a PodcastGroup
+Views:
+* episodes/by_id
+* episodes/by_oldid
+* episodes/by_podcast
+* episodes/by_podcast_url
+* episodes/by_slug
+* episodes/need_update
 
 
-Each podcast (with more than 0 subscribers) will have at least one entry in the
-view. Addtionally, it will have one entry per language, one entry per
-content-type and one entry for each (language, content-type pair).
+Favorites
+=========
+Doc-Types: EpisodeUserState
 
-The same applies to PodcastGroups, except that the number of subscribers is
-accumulated over all its contained podcasts. Podcasts that are part of a
-PodcastGroup don't have their own entries in the view.
+Views:
+* episodes/favorites_by_user
 
-A client that wants to get the toplist of english audio and video podcasts
-would need two queries ("types-languages", "audio", "en") and
-("types-languages", "video", "en").
 
+Episode States
+==============
 
-Podcasts by Tag
-~~~~~~~~~~~~~~~
- * For a Podcast, iterates over all tags and emits
-   [tag, weight, Podcast] and the Podcast
- * For a PodcastGroup, aggregates tags of all contained podcasts,
-   iterates over them and emits [tag, weight, PodcastGroup] and
-   the PodcastGroup
+Doc-Types: EpisodeUserState
 
-Contains Podcast(Group)s per Tag ordered by Weight. Can be used to get the
-podcasts of a category, ordered by their weight.
+Views:
+* episode_states/by_podcast_episode
+* episode_states/by_ref_urls
+* episode_states/by_user_episode
+* episode_states/by_user_podcast
 
 
-Categories by Weight (directory/categories)
-~~~~~~~~~~~~~~~~~~~~
- * For a Category, emit its Weight and null
+Heatmap
+=======
 
-A list of Categories ordered by their weight; used to construct the navigation
-of the Podcast Directory.
+Doc-Types: EpisodeUserState
 
+Views:
+* heatmap/by_episode
 
-Categories by Tags (directory/categories_by_tags)
-~~~~~~~~~~~~~~~~~~
- * For a Category, emit its label and all its spellings, with null.
 
-Can be used to get the Category for a given Tag, or all assigned Tags.
+History
+=======
 
+Doc-Types: EpisodeUserState, PodcastUserState
 
-Episodes by Podcast
-~~~~~~~~~~~~~~~~~~~
- * For a Episode, emit [Podcast, Release-Date] and the Episode
+Views:
+* history/by_device
+* history/by_user
 
-Can be used to get a list of all episodes for a given podcast, ordered by their
-release date.
 
+Listeners
+=========
 
-Favorite Episodes by User
-~~~~~~~~~~~~~~~~~~~~~~~~~
- * For a UserEpisodeState, emit [User, Podcast] and null, if the episode is
-   a favorite of the user.
+Doc-Types: EpisodeUserState
 
-Can be used to get the list of favorite episodes for a given user.
+Views:
+* listeners/by_episode
+* listeners/by_podcast
+* listeners/by_podcast_episode
 
 
-Users by Username
-~~~~~~~~~~~~~~~~~
- * For a User, emit the username and the User
+Podcast Lists
+=============
 
-Can be used to get a user by its username.
+Doc-Types: PodcastList
 
+Views:
+* podcastlists/by_rating
+* podcastlists/by_user_slug
 
-Devices by User-Id
-~~~~~~~~~~~~~~~~~~
- * For a User, iterate over all Devices and emit [User-Id, Device-ID]
-   and the device
 
-Can be used either to get a list of all devices for a given user, or to access
-a device given its user and ID.
+Podcasts
+========
 
+Doc-Types: Podcast, PodcastGroup
 
-Subscriptions by Podcast
-~~~~~~~~~~~~~~~~~~~~~~~~
- * For a PodcastUserState, check existing subscriptions and emit
-   [Podcast-Id, User-Id] and null.
+Views:
+* podcasts/by_id
+* podcasts/by_language
+* podcasts/by_last_update
+* podcasts/by_oldid
+* podcasts/by_slug
+* podcasts/by_tag
+* podcasts/by_url
+* podcasts/groups_by_oldid
+* podcasts/podcasts_groups
+* podcasts/subscriber_data
 
-Can be used to get the subscribers for a given Podcast.
 
+Podcast States
+==============
 
-Subscriptions by User
-~~~~~~~~~~~~~~~~~~~~~
- * For a PodcastUserState, check existing subscriptions and emit
-   [User-Id, Podcast-Id, Device-Id] and null.
+Doc-Types: PodcastUserState
 
-Can be used to get the subscriptions for a given User. When queried with
-grouped=true, group_level=2 it returns the subscribed Podcasts.
+Views:
+* podcast_states/by_device
 
 
-Suggestions by User (suggestions_by_user_oldid)
-~~~~~~~~~~~~~~~~~~~
- * For a Suggestions, emit Old-User-Id and null.
+Sanitizing Rules
+================
 
-Can be used to get the suggestions for a given User.
+Doc-Types: SanitizingRule
 
+Views:
+* sanitizing_rules/by_slug
+* sanitizing_rules/by_target
 
-PodcastUserState by User, Podcast
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * For a PodcastUserState, emit [User-Id, Podcast-Id].
 
-Can be used to access PodcastUserState by User-Id and Podcast-Id.
+Slugs
+=====
 
+Doc-Types: Podcast, PodcastGroup, Episode
 
-PodcastUserState by User, Episode
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * For a EpisodeUserState, emit [User-Id, Episode-Id].
+Views:
+* slugs/missing
 
- Can be used to access a EpisodeUserState by User-Id and Episode-Id.
 
 
-Sanitizing Rules by Target
-~~~~~~~~~~~~~~~~~~~~~~~~~~
- * For a URLSanitizing Rule emit [target, priority] and the rule
-   for each target (podcast, episode) the rule can be applied to
+Subscriptions
+=============
 
-Can be used to get the sanitizing rules in the intended order of application.
+Doc-Types: PodcastUserState
 
+Views:
+* subscriptions/by_device
+* subscriptions/by_podcast
+* subscriptions/by_user
 
-Advertisement by Time
-~~~~~~~~~~~~~~~~~~~~~
- * For a Advertisement, emit the end-date and the Advertisement.
 
-Can be used to get the Advertisement that will end next (ie the current or the
-upcoming) advertisement.
+Suggestions
+===========
 
+Doc-Types: Suggestions
 
-Devices by User (users/devices_by_user_uid)
-~~~~~~~~~~~~~~~
- * For a User, emits [User-Oldid, Device-UID] for each Device
+Views:
+* suggestions/by_user
 
-Can be used to get either a all Devices of a user, or a specific device by its
-UID. The Id (property user) and Old-Id (property user_oldid) are set before
-emitting the Device.
 
+Tags
+====
 
-Episodes by Old-Id (core/episodes_by_oldid)
-~~~~~~~~~~~~~~~~~~
- * For a Podcast (PodcastGroup), iterate all Episodes and emit
-   Old-Id and the Episode itself
+Doc-Types: Podcast, PodcastGroup
 
-Can be used to get an Episode by its Old-Id. The Podcast's Id (property
-podcast) is set before emitting the Episode.
+Views:
+* tags/by_podcast
+* tags/by_user
 
 
-Episodes by URL (core/episodes_by_url)
-~~~~~~~~~~~~~~~
- * For a Podcast (PodcastGroup), iterate all Episodes and emit
-   URL and the Episode itself for each of URL
+User-Tags
+=========
 
-Can be used to get an Episode by one of its associated files. The Podcast's Id
-(property podcast) is set before emitting the Episode.
+Doc-Types: PodcastUserState
+* usertags/by_podcast
+* usertags/podcasts
 
 
-Favorite Episodes by User (users/favorite_episodes_by_user)
-~~~~~~~~~~~~~~~~~~~~~~~~~
- * For a PodcastUserState, emit the User's Old-Id and the Episodes
-   Id for each Episode that is flagged as favorite
+Toplists
+========
 
-Can be used to get a list of favorite episodes for a User.
+Doc-Types: Episode, Podcast, PodcastGroup
 
+Views:
+* toplist/episodes
+* toplist/podcasts
 
-Podcasts by URL (core/podcasts_by_url)
-~~~~~~~~~~~~~~~
- * For a Podcast (PodcastGroup) emit URL and the
-   podcast itself for each of its URLs
 
-Can be used to get a Podcast by one of its Feed-URLs.
+Users
+=====
 
+Doc-Types: User
 
-Podcasts and Podcast-Groups (core/podcasts_groups)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * For a Podcast or a PodcastGroup emit its Id and null
-
-Can be used to get a list of all PodcastGroups and all un-grouped Podcasts.
-
-
-Podcast-States by Podcast (users/podcast_states_by_podcast)
-~~~~~~~~~~~~~~~~~~~~~~~~~
- * For a PodcastUserState, emit [Podcast-Id, User-Old-Id] and null
-
-Can be used to get a specific Podcast-State by specifying Podcast-Id and
-User-Old-Id, or to get all Podcast-States for a given Podcast.
-
-
-Podcast-States by User (users/podcast_states_by_user)
-~~~~~~~~~~~~~~~~~~~~~~
- * For a PodcastUserState, emit [User-Old-Id, Podcast-Id] and null
-
-Can be used to get a specific Podcast-State by specifying User-Old-Id and
-Podcast-Id or to get all Podcast-States for a given User.
-
-
-Users by Old-Id (users/users_by_oldid)
-~~~~~~~~~~~~~~~
- * For a User, emit its Old-Id and null
-
-Can be used to get a User by its Old-Id.
-
-
-Subscriber Data by Podcast (core/subscribers_by_podcast)
-~~~~~~~~~~~~~~~~~~~~~~~~~~
- * For a PodcastSubscriberData, emit its Podcast-Id and null
-
-Can be used to get the PodcastSubscriberData for a Podcast.
-
-
-Episodes by Podcast-Id (core/episodes_by_podcast)
-~~~~~~~~~~~~~~~~~~~~~~
- * For an Episode, emit its Podcast-Id and null
-
-Can be used to list the episodes for a Podcast
-
-
-Podcasts Published by a User (publisher/podcasts_by_publisher)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * For a Podcast (in a PodcastGroup), emits User-Id and Podcast-Id
-   for each publisher
-
-Can be used to retrieve the podcasts that are published by a user.
-
-
-Sanitizing Rules by Target (core/sanitizing_rules_by_target)
-~~~~~~~~~~~~~~~~~~~~~~~~~~
- * For a SanitizingRule, emits Target (Object-Type), Priority and null
-
-Can be used to retrieve the sanitizing rules for a specific target (either
-'podcast' or 'episode') in order of their priority. This does not
-check, if any of the returned rules apply.
-
-
-Sanitizing Rules by Slug (core/sanitizing_rules_by_slug)
-~~~~~~~~~~~~~~~~~~~~~~~~
- * For a SanitizingRule, emits its Slug and null
-
-Can be used to retrieve a sanitizing rule by its slug, for example for updating
-or deleting it.
-
-
-Podcast-Subscriptions by User (users/subscribed_podcasts_by_user)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * For a PodcastUserState, emits (User-Id, Podcast-Id, Device-Id) and null
-
-Can be used to retrieve the Podcasts a User is subscribed to, and the Devices
-on which he has a subscription.
-
-
-Episode-Actions (users/episode_actions)
-~~~~~~~~~~~~~~~
- * For an EpisodeUserState, emit search-criteria and an episode-action object
-   for each action.
-
-The search criteria consists of the User-Id, the timestamp, the Podcast-Id and
-the Device-Id.
-
-The episode-action object is the action from the EpisodeUserState, annotated
-with information like Id and URL of episode and podcast.
-
-
-Episode States (users/episode_states)
-~~~~~~~~~~~~~~
- * For an EpisodeUserState, emits search-criteria an an episode-action object
-   for the latest action.
-
-The search criteria consists of the User-Id, the Podcast-Id and the Episode-Id.
-
-Can be used to get the latest states of all episodes of a podcast.
+Views:
+* users/deleted

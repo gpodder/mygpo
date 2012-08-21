@@ -25,10 +25,13 @@
    </table>
   </form>
 
-  <p>{% trans "After registration, you'll receive an activation email to confirm the validity of your email address." %}</p>
+  <p>{% trans "After registration, you'll receive an activation email to confirm the validity of your email address." %}
 
   {% url resend-activation as resend-activation-url %}
-  <p>{% blocktrans %}If it doesn't arrive, you can <a href="{{ resend-activation-url }}">resend</a> it.{% endblocktrans %}
+  {% blocktrans %}If it doesn't arrive, you can <a href="{{ resend-activation-url }}">resend</a> it.{% endblocktrans %}
+
+  {% url privacy-policy as privacy-url %}
+  <p>{% blocktrans %}Further information in our <a href="{{ privacy-url }}">Privacy Policy</a>{% endblocktrans %}</p>
 
 {% endif %}
 
