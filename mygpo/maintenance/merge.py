@@ -298,7 +298,7 @@ class PodcastMerger(object):
 
 
     @repeat_on_conflict(['state2'])
-    def _move_state(state2, new_id, new_url):
+    def _move_state(self, state2, new_id, new_url):
         state2.ref_url = new_url
         state2.podcast = new_id
         state2.save()
@@ -442,7 +442,6 @@ class PodcastStateMerger(object):
             state.add_actions(actions)
             state.save()
         except restkit.Unauthorized:
-            raise
             # the merge could result in an invalid list of
             # subscribe/unsubscribe actions -- we ignore it and
             # just use the actions from state

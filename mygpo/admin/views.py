@@ -135,7 +135,7 @@ class MergeProcess(MergeBase):
 
             return render(request, 'admin/merge-finished.html', {
                     'actions': actions.items(),
-                    'podcast': podcasts,
+                    'podcast': podcasts[0],
                 })
 
 
