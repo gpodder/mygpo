@@ -15,7 +15,7 @@ from django.views.decorators.cache import never_cache, cache_control
 from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.core.proxy import proxy_object
 from mygpo.api.sanitizing import sanitize_url
-from mygpo.users.models import HistoryEntry
+from mygpo.users.models import HistoryEntry, DeviceDoesNotExist
 from mygpo.web.forms import PrivacyForm, SyncForm
 from mygpo.directory.tags import Tag
 from mygpo.decorators import allowed_methods, repeat_on_conflict
