@@ -24,11 +24,10 @@ from django.core.cache import cache
 
 from mygpo.data.mimetype import get_type, CONTENT_TYPES
 from mygpo.core.models import Podcast, Episode
-from mygpo.users.models import EpisodeUserState, Device, DeviceDoesNotExist, \
-         PodcastUserState
+from mygpo.users.models import EpisodeUserState, Device, DeviceDoesNotExist
 from mygpo.decorators import repeat_on_conflict
 from mygpo.json import json
-from mygpo.couchdb import bulk_save_retry
+from mygpo.couchdb import bulk_save_retry, get_main_database
 
 
 def get_random_picks(languages=None):
@@ -59,7 +58,7 @@ def get_podcast_count_for_language():
 
     counts = defaultdict(int)
 
-    db = Podcast.get_db()
+    db = get_main_database()
     r = db.view('podcasts/by_language',
         reduce = True,
         group_level = 1,
@@ -138,7 +137,7 @@ class BulkSubscribe(object):
 
     def execute(self):
         """ Executes all added actions in bulk """
-        db = PodcastUserState.get_db()
+        db = get_main_database()
         obj_funs = map(self._get_obj_fun, self.actions)
         bulk_save_retry(db, obj_funs)
 

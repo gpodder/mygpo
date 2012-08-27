@@ -13,12 +13,12 @@ class UserAgentStats(object):
 
     def __init__(self):
         self._useragents = None
-        self.db = User.get_db()
 
 
     def get_entries(self):
         if self._useragents is None:
-            res = self.db.view('clients/by_ua_string',
+            res = User.view('clients/by_ua_string',
+                wrap_doc    = False,
                 group_level = 1,
                 stale       = 'update_after',
             )

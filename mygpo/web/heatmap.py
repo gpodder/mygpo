@@ -17,7 +17,7 @@
 
 from functools import wraps
 
-from mygpo.users.models import EpisodeUserState
+from mygpo.couchdb import get_main_database
 
 
 class EpisodeHeatmap(object):
@@ -50,7 +50,7 @@ class EpisodeHeatmap(object):
     def _query(self):
         """ Queries the database and stores the heatmap and its borders """
 
-        db = EpisodeUserState.get_db()
+        db = get_main_database()
 
         group_level = len(filter(None, [self.podcast_id,
                     self.episode_id, self.user_id]))

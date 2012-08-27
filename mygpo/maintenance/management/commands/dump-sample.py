@@ -8,6 +8,7 @@ from django.core.management.base import BaseCommand
 from mygpo.json import json
 
 from mygpo.core.models import Podcast
+from mygpo.couchdb import get_main_database
 from mygpo.users.models import PodcastUserState, EpisodeUserState, \
          Suggestions, User
 from mygpo.directory.models import Category
@@ -74,7 +75,7 @@ class Command(BaseCommand):
                         docs.add(e_state._id)
 
 
-        db = Podcast.get_db()
+        db = get_main_database()
         docs = sorted(docs)
         self.dump(docs, db)
 

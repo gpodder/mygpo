@@ -3,7 +3,7 @@ from operator import itemgetter
 
 from mygpo.core.models import Podcast
 from mygpo.decorators import query_if_required
-from mygpo.directory.models import Category
+from mygpo.couchdb import get_main_database
 from mygpo.utils import multi_request_view
 from mygpo.counter import Counter
 
@@ -135,7 +135,7 @@ class TagCloud(object):
         return self._entries is None
 
     def _query(self):
-        db = Category.get_db()
+        db = get_main_database()
         res = db.view('categories/by_weight',
                 descending = True,
                 skip       = self.skip,

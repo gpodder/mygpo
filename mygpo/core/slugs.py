@@ -84,10 +84,10 @@ class PodcastGroupSlug(SlugGenerator):
     def _get_existing_slugs(self):
         from mygpo.core.models import Podcast
 
-        db = Podcast.get_db()
-        res = db.view('podcasts/by_slug',
+        res = Podcast.view('podcasts/by_slug',
                 startkey = [self.base_slug, None],
-                endkey   = [self.base_slug + 'ZZZZZ', None]
+                endkey   = [self.base_slug + 'ZZZZZ', None],
+                wrap_doc = False,
             )
         return [r['key'][0] for r in res]
 
@@ -142,10 +142,10 @@ class EpisodeSlug(SlugGenerator):
         """ Episode slugs have to be unique within the Podcast """
         from mygpo.core.models import Episode
 
-        db = Episode.get_db()
-        res = db.view('episodes/by_slug',
+        res = Episode.view('episodes/by_slug',
                 startkey = [self.podcast_id, self.base_slug],
-                endkey   = [self.podcast_id, self.base_slug + 'ZZZZZ']
+                endkey   = [self.podcast_id, self.base_slug + 'ZZZZZ'],
+                wrap_doc = False,
             )
         return [r['key'][1] for r in res]
 
