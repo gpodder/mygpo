@@ -1,7 +1,7 @@
 from django.conf.urls.defaults import *
 
 from mygpo.admin.views import Overview, MergeSelect, MergeVerify, \
-         MergeProcess, UserAgentStats
+         MergeProcess, ClientStatsView, ClientStatsJsonView, UserAgentStatsView
 
 urlpatterns = patterns('mygpo.admin.views',
  url(r'^$',              Overview.as_view(),     name='admin-overview'),
@@ -9,5 +9,7 @@ urlpatterns = patterns('mygpo.admin.views',
  url(r'^merge/verify$',  MergeVerify.as_view(),  name='admin-merge-verify'),
  url(r'^merge/process$', MergeProcess.as_view(), name='admin-merge-process'),
 
- url(r'^clients/user_agents$', UserAgentStats.as_view(), name='useragents'),
+ url(r'^clients$',             ClientStatsView.as_view(), name='clients'),
+ url(r'^clients\.json$',       ClientStatsJsonView.as_view(), name='clients-json'),
+ url(r'^clients/user_agents$', UserAgentStatsView.as_view(), name='useragents'),
 )
