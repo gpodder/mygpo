@@ -13,6 +13,7 @@ from django.core.urlresolvers import reverse
 
 from mygpo.decorators import repeat_on_conflict
 from mygpo import utils
+from mygpo.couchdb import get_main_database
 from mygpo.core.proxy import DocumentABCMeta
 from mygpo.core.slugs import SlugMixin
 from mygpo.core.oldid import OldIdMixin
@@ -822,11 +823,11 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         """ Returns the latest episode actions for the podcast's episodes """
 
         from mygpo.users.models import EpisodeUserState
+        db = get_main_database()
 
-        res = EpisodeUserState.view('episode_states/by_user_podcast',
+        res = db.view('episode_states/by_user_podcast',
                 startkey = [user_id, self.get_id(), None],
                 endkey   = [user_id, self.get_id(), {}],
-                wrap_doc = False,
             )
 
         for r in res:
