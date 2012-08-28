@@ -304,21 +304,13 @@ def sync(request, device):
         user.save()
 
 
-    # TODO: remove cascaded trys
-
     try:
         target_uid = form.get_target()
+        sync_target = request.user.get_device_by_uid(target_uid)
+        do_sync(user=request.user, device=device, sync_target=sync_target)
 
-        try:
-            sync_target = request.user.get_device_by_uid(target_uid)
-            do_sync(user=user, device=device, sync_target=sync_target)
-
-        except DeviceDoesNotExist as e:
-            messages.error(request, str(e))
-
-    except ValueError, e:
-        raise
-        log('error while syncing device %s: %s' % (device_id, e))
+    except DeviceDoesNotExist as e:
+        messages.error(request, str(e))
 
     return HttpResponseRedirect(reverse('device', args=[device.uid]))
 
@@ -334,7 +326,7 @@ def unsync(request, device):
         user.save()
 
     try:
-        do_unsync(user=user, device=device)
+        do_unsync(user=request.user, device=device)
 
     except ValueError, e:
         messages.error(request, 'Could not unsync the device: {err}'.format(
