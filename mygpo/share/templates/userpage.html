@@ -48,7 +48,7 @@
 
   <br style="clear: both;" />
 
-  {% if subscriptions and not page_user.subscriptions_token %}
+  {% if subscriptions and not subscriptions_token %}
 
    <h2>{% blocktrans with subscriptions|length as subscription_count %}{{ subscription_count }} Subscriptions{% endblocktrans %}</h2>
    <table class="list">
@@ -132,7 +132,7 @@
  {% endif %}
 
 
- {% if favorite_episodes and not page_user.favorite_feeds_token %}
+ {% if favorite_episodes and not favorite_feeds_token %}
 
   <h2>{% blocktrans with favorite_episodes|length as num_fav_episodes %}{{ num_fav_episodes }} Favorite Episodes{% endblocktrans %}</h2>
   <table class="list">

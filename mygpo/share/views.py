@@ -175,9 +175,9 @@ def rate_list(request, plist, owner):
 def overview(request):
     site = RequestSite(request)
 
-    subscriptions_token = request.user.subscriptions_token
-    userpage_token = request.user.userpage_token
-    favfeed_token = request.user.favorite_feeds_token
+    subscriptions_token = request.user.get_token('subscriptions_token')
+    userpage_token = request.user.get_token('userpage_token')
+    favfeed_token = request.user.get_token('favorite_feeds_token')
 
     favfeed_url = 'http://%s/%s' % (site.domain, reverse('favorites-feed', args=[request.user.username]))
     favfeed_podcast = Podcast.for_url(favfeed_url)

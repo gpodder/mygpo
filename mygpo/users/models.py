@@ -4,6 +4,8 @@ from datetime import datetime
 import dateutil.parser
 from itertools import imap
 from operator import itemgetter
+import random
+import string
 
 from couchdbkit import ResourceNotFound
 from couchdbkit.ext.django.schema import *
@@ -593,9 +595,13 @@ class Device(Document):
         return self.name
 
 
-def token_generator(length=32):
-    import random, string
-    return  "".join(random.sample(string.letters+string.digits, length))
+
+TOKEN_NAMES = ('subscriptions_token', 'favorite_feeds_token',
+        'publisher_update_token', 'userpage_token')
+
+
+class TokenException(Exception):
+    pass
 
 
 class User(BaseUser, SyncedDevicesMixin):
@@ -607,23 +613,50 @@ class User(BaseUser, SyncedDevicesMixin):
     suggestions_up_to_date = BooleanProperty(default=False)
 
     # token for accessing subscriptions of this use
-    subscriptions_token    = StringProperty(default=token_generator)
+    subscriptions_token    = StringProperty(default=None)
 
     # token for accessing the favorite-episodes feed of this user
-    favorite_feeds_token   = StringProperty(default=token_generator)
+    favorite_feeds_token   = StringProperty(default=None)
 
     # token for automatically updating feeds published by this user
-    publisher_update_token = StringProperty(default=token_generator)
+    publisher_update_token = StringProperty(default=None)
 
     # token for accessing the userpage of this user
-    userpage_token         = StringProperty(default=token_generator)
+    userpage_token         = StringProperty(default=None)
 
     class Meta:
         app_label = 'users'
 
 
     def create_new_token(self, token_name, length=32):
-        setattr(self, token_name, token_generator(length))
+        """ creates a new random token """
+
+        if token_name not in TOKEN_NAMES:
+            raise TokenException('Invalid token name %s' % token_name)
+
+        token = "".join(random.sample(string.letters+string.digits, length))
+        setattr(self, token_name, token)
+
+
+
+    def get_token(self, token_name):
+        """ returns a token, and generate those that are still missing """
+
+        generated = False
+
+        if token_name not in TOKEN_NAMES:
+            raise TokenException('Invalid token name %s' % token_name)
+
+        for tn in TOKEN_NAMES:
+            if getattr(self, tn) is None:
+                self.create_new_token(tn)
+                generated = True
+
+        if generated:
+            self.save()
+
+        return getattr(self, token_name)
+
 
 
     @property

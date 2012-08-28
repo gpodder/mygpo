@@ -38,7 +38,11 @@ class UserpageView(GeventView):
             'num_played_episodes_month': gevent.spawn(self.get_played_episodes_since, user, month_ago),
         }
 
-        context = {'page_user': user}
+        context = {
+            'page_user': user,
+            'subscriptions_token': user.get_token('subscriptions_token'),
+            'favorite_feeds_token': user.get_token('favorite_feeds_token'),
+        }
         context.update(self.get_context(context_funs))
 
         return render(request, 'userpage.html', context)

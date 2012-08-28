@@ -46,7 +46,7 @@ def for_user(request, username):
         raise Http404
 
     subscriptions = user.get_subscribed_podcasts(public=True)
-    token = user.subscriptions_token
+    token = user.get_token('subscriptions_token')
 
     return render(request, 'user_subscriptions.html', {
         'subscriptions': subscriptions,
