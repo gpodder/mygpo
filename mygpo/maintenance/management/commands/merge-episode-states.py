@@ -8,7 +8,7 @@ from mygpo.utils import progress, multi_request_view
 from mygpo.users.models import EpisodeUserState
 from mygpo.counter import Counter
 from mygpo.maintenance.merge import merge_episode_states
-from mygpo.couchdb import bulk_save_retry
+from mygpo.couchdb import bulk_save_retry, get_main_database
 
 
 class Command(BaseCommand):
@@ -25,7 +25,7 @@ class Command(BaseCommand):
         total = EpisodeUserState.view('episode_states/by_user_episode',
                 limit=0,
             ).total_rows
-        db = EpisodeUserState.get_db()
+        db = get_main_database()
 
         actions = Counter()
         actions['merged'] = 0

@@ -13,6 +13,7 @@ from django.core.urlresolvers import reverse
 
 from mygpo.decorators import repeat_on_conflict
 from mygpo import utils
+from mygpo.couchdb import get_main_database
 from mygpo.core.proxy import DocumentABCMeta
 from mygpo.core.slugs import SlugMixin
 from mygpo.core.oldid import OldIdMixin
@@ -347,11 +348,11 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
     @classmethod
     def for_slug(cls, slug):
-        db = cls.get_db()
-        r = db.view('podcasts/by_slug',
+        r = cls.view('podcasts/by_slug',
                 startkey     = [slug, None],
                 endkey       = [slug, {}],
                 include_docs = True,
+                wrap_doc     = False,
             )
 
         if not r:
@@ -379,10 +380,10 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
     @classmethod
     def get_multi(cls, ids):
-        db = Podcast.get_db()
-        r = db.view('podcasts/by_id',
-                keys=ids,
-                include_docs=True,
+        r = cls.view('podcasts/by_id',
+                keys         = ids,
+                include_docs = True,
+                wrap_doc     = False
             )
 
         for res in r:
@@ -439,15 +440,14 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         be restricted to this language. chunk_size determines how many podcasts
         will be fetched at once """
 
-        db = cls.get_db()
-
         while True:
             rnd = random()
-            res = db.view('podcasts/random',
+            res = cls.view('podcasts/random',
                     startkey     = [language, rnd],
                     include_docs = True,
                     limit        = chunk_size,
                     stale        = 'ok',
+                    wrap_doc     = False,
                 )
 
             if not res:
@@ -464,10 +464,10 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
     @classmethod
     def by_last_update(cls):
-        db = cls.get_db()
-        res = db.view('podcasts/by_last_update',
+        res = cls.view('podcasts/by_last_update',
                 include_docs = True,
                 stale        = 'update_after',
+                wrap_doc     = False,
             )
 
         for r in res:
@@ -484,14 +484,14 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
     @classmethod
     def for_language(cls, language, **kwargs):
-        db = cls.get_db()
 
-        res = db.view('podcasts/by_language',
+        res = cls.view('podcasts/by_language',
                 startkey     = [language, None],
                 endkey       = [language, {}],
                 include_docs = True,
                 reduce       = False,
                 stale        = 'update_after',
+                wrap_doc     = False,
                 **kwargs
             )
 
@@ -828,11 +828,11 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         """ Returns the latest episode actions for the podcast's episodes """
 
         from mygpo.users.models import EpisodeUserState
-        db = EpisodeUserState.get_db()
+        db = get_main_database()
 
         res = db.view('episode_states/by_user_podcast',
-                startkey= [user_id, self.get_id(), None],
-                endkey  = [user_id, self.get_id(), {}]
+                startkey = [user_id, self.get_id(), None],
+                endkey   = [user_id, self.get_id(), {}],
             )
 
         for r in res:

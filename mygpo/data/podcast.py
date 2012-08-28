@@ -16,7 +16,7 @@
 #
 
 from mygpo.core.models import Podcast
-from mygpo.users.models import PodcastUserState
+from mygpo.couchdb import get_main_database
 
 try:
     from collections import Counter
@@ -32,7 +32,7 @@ def calc_similar_podcasts(podcast, num=20):
     Probably an expensive operation
     """
 
-    db = PodcastUserState.get_db()
+    db = get_main_database()
 
     res = db.view('subscriptions/by_podcast',
             startkey    = [podcast.get_id(), None, None],

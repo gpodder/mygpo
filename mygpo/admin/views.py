@@ -15,6 +15,8 @@ from mygpo.core.models import Podcast
 from mygpo.counter import Counter
 from mygpo.maintenance.merge import PodcastMerger, IncorrectMergeException
 from mygpo.users.models import User
+from mygpo.admin.clients import UserAgentStats, ClientStats
+from mygpo.api.httpresponse import JsonResponse
 
 
 class AdminView(TemplateView):
@@ -140,27 +142,48 @@ class MergeProcess(MergeBase):
 
 
 
-class UserAgentStats(AdminView):
+class UserAgentStatsView(AdminView):
     template_name = 'admin/useragents.html'
 
     def get(self, request):
 
-        db = User.get_db()
-        res = db.view('clients/by_ua_string',
-                group_level = 1,
-            )
-
-        useragents = Counter(dict((r['key'], r['value']) for r in res))
-
-        if useragents:
-            max_users = useragents.most_common(1)[0][1]
-            total = sum(useragents.values())
-        else:
-            max_users = 0
-            total = 0
+        uas = UserAgentStats()
+        useragents = uas.get_entries()
 
         return self.render_to_response({
                 'useragents': useragents.most_common(),
-                'max_users': max_users,
-                'total': total,
+                'max_users': uas.max_users,
+                'total': uas.total_users,
             })
+
+
+class ClientStatsView(AdminView):
+    template_name = 'admin/clients.html'
+
+    def get(self, request):
+
+        cs = ClientStats()
+        clients = cs.get_entries()
+
+        return self.render_to_response({
+                'clients': clients.most_common(),
+                'max_users': cs.max_users,
+                'total': cs.total_users,
+            })
+
+
+class ClientStatsJsonView(AdminView):
+    def get(self, request):
+
+        cs = ClientStats()
+        clients = cs.get_entries()
+
+        return JsonResponse(map(self.to_dict, clients.most_common()))
+
+    def to_dict(self, res):
+        obj, count = res
+
+        if not isinstance(obj, tuple):
+            return obj, count
+
+        return obj._asdict(), count

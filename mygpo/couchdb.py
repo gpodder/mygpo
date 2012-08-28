@@ -1,6 +1,8 @@
 from operator import itemgetter
 from collections import namedtuple
 
+from django.conf import settings
+
 from couchdbkit import *
 
 class BulkException(Exception):
@@ -13,7 +15,7 @@ BulkError = namedtuple('BulkError', 'doc error reason')
 
 
 def __default_reload(db, obj):
-    _id = getattr(obj, '_id', obj.get('_id', None))
+    _id = obj._id
 
     if isinstance(obj, Document):
         return obj.__class__.get(_id)
@@ -71,3 +73,9 @@ def bulk_save_retry(db, obj_funs, reload_f=__default_reload):
 
     if errors:
         raise BulkException(errors)
+
+
+
+def get_main_database():
+    db_url = settings.COUCHDB_DATABASES[0][1]
+    return Database(db_url)

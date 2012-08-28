@@ -42,7 +42,3 @@ class Command(ChangesCommand):
 
     def get_query_params(self):
         return dict(include_docs=True, filter='episode_states/has_play_events')
-
-
-    def get_db(self):
-        return EpisodeUserState.get_db()

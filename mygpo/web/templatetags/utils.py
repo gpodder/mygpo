@@ -48,3 +48,8 @@ def format_time(time):
         return mark_safe(_format_time(time))
     except:
         return mark_safe("")
+
+
+@register.filter
+def is_tuple(obj):
+    return isinstance(obj, tuple)

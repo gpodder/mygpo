@@ -15,6 +15,7 @@ from django_couchdb_utils.registration.models import User as BaseUser
 from mygpo.core.proxy import proxy_object, DocumentABCMeta
 from mygpo.core.models import Podcast, Episode
 from mygpo.utils import linearize, get_to_dict, iterate_together
+from mygpo.couchdb import get_main_database
 from mygpo.decorators import repeat_on_conflict
 from mygpo.users.ratings import RatingMixin
 from mygpo.users.sync import SyncedDevicesMixin
@@ -136,7 +137,7 @@ class EpisodeAction(DocumentSchema):
             startkey = [user_id, podcast_id, device_id, since_str]
             endkey   = [user_id, podcast_id, device_id, until_str]
 
-        db = EpisodeUserState.get_db()
+        db = get_main_database()
         res = db.view(view,
                 startkey = startkey,
                 endkey   = endkey
@@ -191,8 +192,7 @@ class Chapter(Document):
 
     @classmethod
     def for_episode(cls, episode_id):
-        db = cls.get_db()
-        r = db.view('chapters/by_episode',
+        r = cls.view('chapters/by_episode',
                 startkey = [episode_id, None],
                 endkey   = [episode_id, {}],
                 wrap_doc = False,
@@ -978,7 +978,7 @@ class History(object):
     def __init__(self, user, device):
         self.user = user
         self.device = device
-        self._db = EpisodeUserState.get_db()
+        self._db = get_main_database()
 
         if device:
             self._view = 'history/by_device'
