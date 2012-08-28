@@ -15,7 +15,7 @@ BulkError = namedtuple('BulkError', 'doc error reason')
 
 
 def __default_reload(db, obj):
-    _id = getattr(obj, '_id', obj.get('_id', None))
+    _id = obj._id
 
     if isinstance(obj, Document):
         return obj.__class__.get(_id)
