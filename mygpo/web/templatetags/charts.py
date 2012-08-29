@@ -7,18 +7,23 @@ from mygpo.publisher.utils import colour_repr
 
 register = template.Library()
 
-@register.filter
-def vertical_bar(value, max):
-    if max == 0:
+@register.simple_tag
+def vertical_bar(value, max_value, display=None):
+    if not max_value:
         return ''
 
-    ratio = float(value) / float(max) * 100
-    if ratio > 40:
-        left, right = '<span>'+str(value)+'</span>', ''
+    if display == 'ratio':
+        value_str = '%d/%d' % (value, max_value)
     else:
-        left, right = '&nbsp;', '<span>'+str(value)+'</span>'
+        value_str = str(value)
+
+    ratio = float(value) / float(max_value) * 100
+    if ratio > 40:
+        left, right = '<span>'+ value_str +'</span>', ''
+    else:
+        left, right = '&nbsp;', '<span>'+ value_str +'</span>'
     s = '<div class="barbg"><div class="bar" style="width: %.2d%%">%s</div>%s</div>' % (ratio, left, right)
-    return mark_safe(s)
+    return s
 
 @register.filter
 def format_diff(value):

@@ -156,6 +156,7 @@ def get_podcast_metadata(podcast, feed):
         logo_url = get_podcast_logo(podcast, feed),
         content_types = get_podcast_types(episodes),
         latest_episode_timestamp = get_latest_episode_timestamp(episodes),
+        episode_count = podcast.get_episode_count()
     )
 
 
