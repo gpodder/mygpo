@@ -8,7 +8,7 @@ function(doc)
             if(action.action == "play")
             {
                 var day = action.timestamp.slice(0, 10);
-                emit([doc.user, day], {_id: doc.episode});
+                emit([doc.user, day], doc.episode);
                 return;
             }
         }

@@ -921,7 +921,8 @@ class User(BaseUser, SyncedDevicesMixin):
         startkey = [self._id, {}]
         endkey   = [self._id, None]
 
-        res = Episode.view('listeners/by_user',
+        db = get_main_database()
+        res = db.view('listeners/by_user',
                 startkey     = startkey,
                 endkey       = endkey,
                 include_docs = True,
@@ -930,7 +931,8 @@ class User(BaseUser, SyncedDevicesMixin):
                 reduce       = False,
             )
 
-        return res
+        keys = [r['value'] for r in res]
+        return Episode.get_multi(keys)
 
 
     def get_num_played_episodes(self, since=None, until={}):
