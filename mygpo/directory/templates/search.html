@@ -33,7 +33,7 @@
      <tr>
       <td>{{ podcast|podcast_logo }}</td>
       <td>{% podcast_group_link podcast %}</td>
-      <td>{{ podcast.subscriber_count|vertical_bar:max_subscribers }}</td>
+      <td>{% vertical_bar podcast.subscriber_count max_subscribers %}</td>
      </tr>
     {% endfor %}
    </table>

@@ -182,7 +182,7 @@ class Episode(Document, SlugMixin, OldIdMixin):
                 endkey      = [self._id, end],
                 reduce      = True,
                 group       = True,
-                group_level = 1
+                group_level = 2
             )
         return r.first()['value'] if r else 0
 
@@ -202,7 +202,7 @@ class Episode(Document, SlugMixin, OldIdMixin):
                 endkey      = [self._id, end],
                 reduce      = True,
                 group       = True,
-                group_level = 2,
+                group_level = 3,
             )
 
         for res in r:
@@ -327,6 +327,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
     common_episode_title = StringProperty()
     new_location = StringProperty()
     latest_episode_timestamp = DateTimeProperty()
+    episode_count = IntegerProperty()
     random_key = FloatProperty(default=random)
 
 
@@ -590,6 +591,10 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
 
     def get_episode_count(self, since=None, until={}, **kwargs):
+
+        # use stored episode count for better performance
+        if getattr(self, 'episode_count', None) is not None:
+            return self.episode_count
 
         if kwargs.get('descending', False):
             since, until = until, since
