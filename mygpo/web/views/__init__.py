@@ -98,8 +98,14 @@ def dashboard(request, episode_count=10):
     if backend.get_favorites(request.user):
         checklist.append('favorites')
 
-    if not request.user.subscriptions_token:
+    if not request.user.get_token('subscriptions_token'):
         checklist.append('share')
+
+    if not request.user.get_token('favorite_feeds_token'):
+        checklist.append('share-favorites')
+
+    if not request.user.get_token('userpage_token'):
+        checklist.append('userpage')
 
     if Tag.for_user(request.user):
         checklist.append('tags')

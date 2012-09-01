@@ -90,6 +90,16 @@
       {% trans "Share your Subscriptions" %}
      </a>
     </li>
+    <li class="icon-check{% if not "share-favorites" in checklist %}-empty{% endif %}">
+     <a href="{% url share %}">
+      {% trans "Share your Favorite Episodes" %}
+     </a>
+    </li>
+    <li class="icon-check{% if not "userpage" in checklist %}-empty{% endif %}">
+     <a href="{% url share %}">
+      {% trans "Share your Userpage" %}
+     </a>
+    </li>
     <li class="icon-check{% if not "tags" in checklist %}-empty{% endif %}">
      <a href="{% url tags %}">
       {% trans "Tag Podcasts" %}
