@@ -33,14 +33,14 @@ from django.utils.decorators import method_decorator
 from mygpo.api.constants import EPISODE_ACTION_TYPES
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core import models
-from mygpo.core.models import Podcast
 from mygpo.core.proxy import proxy_object
+from mygpo.core.models import Podcast
 from mygpo.core.models import Episode
 from mygpo.users.models import Chapter, HistoryEntry, EpisodeAction
 from mygpo.api import backend
 from mygpo.utils import parse_time, get_to_dict
 from mygpo.web.heatmap import EpisodeHeatmap
-from mygpo.web.utils import get_episode_link_target
+from mygpo.web.utils import get_episode_link_target, fetch_episode_data
 
 
 @vary_on_cookie
@@ -173,18 +173,13 @@ def list_favorites(request):
 
     episodes = backend.get_favorites(request.user)
 
-    recently_listened = request.user.get_recently_listened_episodes()
+    recently_listened = request.user.get_latest_episodes()
 
     podcast_ids = [episode.podcast for episode in episodes + recently_listened]
     podcasts = get_to_dict(Podcast, podcast_ids, Podcast.get_id)
 
-    def set_podcast(episode):
-        episode = proxy_object(episode)
-        episode.podcast = podcasts.get(episode.podcast, None)
-        return episode
-
-    episodes = map(set_podcast, episodes)
-    recently_listened = map(set_podcast, recently_listened)
+    recently_listened = fetch_episode_data(recently_listened, podcasts=podcasts)
+    episodes = fetch_episode_data(episodes, podcasts=podcasts)
 
     feed_url = 'http://%s/%s' % (site.domain, reverse('favorites-feed', args=[request.user.username]))
 

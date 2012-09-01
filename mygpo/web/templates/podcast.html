@@ -102,7 +102,7 @@
       <td>{{ episode.released|default:""|date:"Y-m-d" }}</td>
       <td>
        {% if episode.listeners %}
-        {{ episode.listeners|vertical_bar:max_listeners }}
+        {% vertical_bar episode.listeners max_listeners %}
        {% endif %}
       </td>
      </tr>

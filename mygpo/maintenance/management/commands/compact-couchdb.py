@@ -2,6 +2,7 @@ import sys
 from datetime import datetime
 from time import sleep
 from urlparse import urlparse
+from optparse import make_option
 
 from couchdbkit import Database
 from restkit import BasicAuth
@@ -19,6 +20,11 @@ class Command(BaseCommand):
     Compacts the database and all views, and measures the required time
     """
 
+    option_list = BaseCommand.option_list + (
+        make_option('--dry-run', action='store_true', dest='dryrun', default=False, help="Don't compact anything."),
+    )
+
+
     def handle(self, *args, **options):
         db_urls = set(db[1] for db in settings.COUCHDB_DATABASES)
 
@@ -32,7 +38,12 @@ class Command(BaseCommand):
         for db_url in db_urls:
             db = Database(db_url, filters=filters)
             for view_hash, name, compact, is_compacting, get_size in self.get_compacters(db):
-                duration, size_before, size_after = self.compact_wait(compact, is_compacting, get_size)
+
+                if options.get('dryrun'):
+                    duration, size_before, size_after = 0, 0, 0
+                else:
+                    duration, size_before, size_after = self.compact_wait(compact, is_compacting, get_size)
+
                 print '%-40s %17s %10s %10s %7s' % (name, duration, self.prettySize(size_before), self.prettySize(size_after), view_hash[:5])
 
 

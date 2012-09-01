@@ -12,10 +12,10 @@ from django.contrib import messages
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control
 
-from mygpo.core.models import Podcast, PodcastGroup
+from mygpo.core.models import Podcast, PodcastGroup, SubscriptionException
 from mygpo.core.proxy import proxy_object
 from mygpo.api.sanitizing import sanitize_url
-from mygpo.users.models import HistoryEntry
+from mygpo.users.models import HistoryEntry, DeviceDoesNotExist
 from mygpo.web.forms import PrivacyForm, SyncForm
 from mygpo.directory.tags import Tag
 from mygpo.decorators import allowed_methods, repeat_on_conflict
@@ -251,25 +251,15 @@ def subscribe(request, podcast):
     if request.method == 'POST':
         form = SyncForm(request.POST)
 
-        # TODO: remove cascaded trys
         try:
             device = request.user.get_device_by_uid(form.get_target())
+            podcast.subscribe(request.user, device)
 
-            try:
-                podcast.subscribe(request.user, device)
-
-            except Exception as e:
-                log('Web: %(username)s: could not subscribe to podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
-                    {'username': request.user.username, 'podcast_url': podcast.url, 'device_id': device.uid if device else '', 'exception': e})
-
-            return HttpResponseRedirect(get_podcast_link_target(podcast))
-
-        except ValueError, e:
-            messages.error(request, _('Could not subscribe '
-                        'to the podcast: %s' % str(e)))
-
-        except DeviceDoesNotExist as e:
+        except (SubscriptionException, DeviceDoesNotExist) as e:
             messages.error(request, str(e))
+
+        return HttpResponseRedirect(get_podcast_link_target(podcast))
+
 
     request.user.sync_all()
 

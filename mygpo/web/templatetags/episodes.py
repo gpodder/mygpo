@@ -129,3 +129,8 @@ def episode_link(episode, podcast, title=None):
 
     return '<a href="%(target)s" title="%(title)s">%(title)s</a>' % \
         dict(target=get_episode_link_target(episode, podcast), title=title)
+
+
+@register.simple_tag
+def get_id(obj):
+    return obj._id

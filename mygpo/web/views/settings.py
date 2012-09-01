@@ -181,7 +181,7 @@ def share(request):
     if _update:
         _update(user=request.user)
 
-    token = request.user.subscriptions_token
+    token = request.user.get_token('subscriptions_token')
 
     return render(request, 'share.html', {
         'site': site,

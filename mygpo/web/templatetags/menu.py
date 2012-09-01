@@ -12,6 +12,7 @@ HIDDEN_URIS = (
         '/device/',
         '/user/subscriptions/',
         '/publisher/podcast/',
+        '/share/me',
 )
 
 _ = lambda x: x
@@ -45,10 +46,12 @@ MENU_STRUCTURE = (
             ('/history/', _('History')),
         )),
         (_('Community'), (
-            ('/share/', _('Subscriptions')),
-            ('/share/favorites', _('Favorites')),
+            ('/share/', _('Overview')),
+            ('/share/me', _('My Userpage')),
+            ('/user/subscriptions/', _('Subscriptions')),
             ('/share/lists/', _('Podcast Lists')),
-            ('', _('Settings')),
+        )),
+        (_('Settings'), (
             ('/account/', _('Account')),
             ('/account/privacy', _('Privacy')),
         )),

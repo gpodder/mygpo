@@ -25,6 +25,8 @@ import hashlib
 
 from django.core.cache import cache
 
+from mygpo.couchdb import get_main_database
+
 
 def daterange(from_date, to_date=None, leap=timedelta(days=1)):
     """
@@ -264,7 +266,7 @@ def multi_request_view(cls, view, wrap=True, auto_advance=True,
 
     per_page = kwargs.get('limit', 1000)
     kwargs['limit'] = per_page + 1
-    db = cls.get_db()
+    db = get_main_database()
     wrapper = kwargs.pop('wrapper', cls.wrap)
     cont = True
 

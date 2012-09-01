@@ -177,7 +177,6 @@ def rate_list(request, plist, owner):
     return HttpResponseRedirect(list_url)
 
 
-
 class FavoritesPublic(View):
 
     public = True
@@ -269,3 +268,43 @@ class FavoritesFeedCreateEntry(View):
         update_podcasts([podcast])
 
         return HttpResponseRedirect(reverse('share-favorites'))
+
+
+@login_required
+def overview(request):
+    site = RequestSite(request)
+
+    subscriptions_token = request.user.get_token('subscriptions_token')
+    userpage_token = request.user.get_token('userpage_token')
+    favfeed_token = request.user.get_token('favorite_feeds_token')
+
+    favfeed_url = 'http://%s/%s' % (site.domain, reverse('favorites-feed', args=[request.user.username]))
+    favfeed_podcast = Podcast.for_url(favfeed_url)
+
+    return render(request, 'share/overview.html', {
+        'site': site,
+        'subscriptions_token': subscriptions_token,
+        'userpage_token': userpage_token,
+        'favfeed_token': favfeed_token,
+        'favfeed_podcast': favfeed_podcast,
+        })
+
+
+@login_required
+def set_token_public(request, token_name, public):
+
+    if public:
+        @repeat_on_conflict(['user'])
+        def _update(user):
+            setattr(user, token_name, '')
+            user.save()
+
+    else:
+        @repeat_on_conflict(['user'])
+        def _update(user):
+            user.create_new_token(token_name)
+            user.save()
+
+    _update(user=request.user)
+
+    return HttpResponseRedirect(reverse('share'))

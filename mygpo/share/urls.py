@@ -2,8 +2,36 @@ from django.conf.urls.defaults import *
 
 from mygpo.share.views import ShareFavorites, FavoritesPublic, \
          PublicSubscriptions, FavoritesFeedCreateEntry
+from mygpo.share.userpage import UserpageView
+
 
 urlpatterns = patterns('mygpo.share.views',
+ url(r'^share/$',
+                     'overview',                  name='share'),
+ url(r'^share/subscriptions-public$',
+                     'set_token_public',
+                     {'public': True, 'token_name': 'subscriptions_token'},
+                                                  name='subscriptions-public'),
+ url(r'^share/subscriptions-private$',
+                     'set_token_public',
+                     {'public': False, 'token_name': 'subscriptions_token'},
+                                                  name='subscriptions-private'),
+ url(r'^share/favfeed-public$',
+                     'set_token_public',
+                     {'public': True, 'token_name': 'favorite_feeds_token'},
+                                                  name='favfeed-public'),
+ url(r'^share/favfeed-private$',
+                     'set_token_public',
+                     {'public': False, 'token_name': 'favorite_feeds_token'},
+                                                  name='favfeed-private'),
+ url(r'^share/userpage-public$',
+                     'set_token_public',
+                     {'public': True, 'token_name': 'userpage_token'},
+                                                  name='userpage-public'),
+ url(r'^share/userpage-private$',
+                     'set_token_public',
+                     {'public': False, 'token_name': 'userpage_token'},
+                                                  name='userpage-private'),
  url(r'^share/lists/$',
                      'lists_own',                 name='lists-overview'),
  url(r'^share/lists/create$',
@@ -52,3 +80,7 @@ urlpatterns = patterns('mygpo.share.views',
      name='favorites-create-entry'),
 
 )
+
+urlpatterns += patterns('mygpo.share.userpage',
+ url(r'^user/(?P<username>[\w.-]+)/?$', UserpageView.as_view(), name='user'),
+ )

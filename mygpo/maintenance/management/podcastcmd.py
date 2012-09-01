@@ -5,6 +5,7 @@ from django.core.management.base import BaseCommand
 
 from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.directory.toplist import PodcastToplist
+from mygpo.couchdb import get_main_database
 
 
 class PodcastCommand(BaseCommand):
@@ -51,7 +52,7 @@ class PodcastCommand(BaseCommand):
 
 
     def get_podcast_with_new_episodes(self):
-        db = Podcast.get_db()
+        db = get_main_database()
         res = db.view('episodes/need_update',
                 group_level = 1,
                 reduce      = True,

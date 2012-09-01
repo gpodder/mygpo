@@ -20,6 +20,8 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 from itertools import islice
 
+import gevent
+
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.contrib import messages
@@ -27,6 +29,7 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.contrib.sites.models import RequestSite
+from django.views.generic.base import View
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control
 
@@ -231,3 +234,20 @@ def mytags(request):
         'tags_podcast': tags_podcast,
         'tags_tag': dict(tags_tag.items()),
     })
+
+
+
+class GeventView(View):
+    """ View that provides parts of the context via gevent coroutines """
+
+    def get_context(self, context_funs):
+        """ returns a dictionary that can be used for a template context
+
+        context_funs is a context-key => Greenlet object mapping """
+
+        gevent.joinall(context_funs.values())
+
+        for key, gev in context_funs.items():
+            context_funs[key] = gev.get()
+
+        return context_funs

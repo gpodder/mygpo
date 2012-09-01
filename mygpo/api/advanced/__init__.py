@@ -34,7 +34,7 @@ from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url, sanitize_urls
 from mygpo.api.advanced.directory import episode_data, podcast_data
 from mygpo.api.backend import get_device, get_favorites, BulkSubscribe
-from mygpo.couch import BulkException, bulk_save_retry
+from mygpo.couch import BulkException, bulk_save_retry, get_main_database
 from mygpo.log import log
 from mygpo.utils import parse_time, format_time, parse_bool, get_to_dict, get_timestamp
 from mygpo.decorators import allowed_methods, repeat_on_conflict
@@ -330,7 +330,7 @@ def update_episodes(user, actions, now, ua_string):
         fun = partial(update_episode_actions, action_list=action_list)
         obj_funs.append( (episode_state, fun) )
 
-    db = EpisodeUserState.get_db()
+    db = get_main_database()
     bulk_save_retry(db, obj_funs)
 
     return update_urls

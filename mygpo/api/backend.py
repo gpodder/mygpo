@@ -19,9 +19,35 @@ from collections import defaultdict
 from functools import partial
 
 from mygpo.core.models import Podcast, Episode
-from mygpo.users.models import Device, DeviceDoesNotExist, PodcastUserState
+from mygpo.users.models import EpisodeUserState, Device, DeviceDoesNotExist, \
+         PodcastUserState
 from mygpo.decorators import repeat_on_conflict
 from mygpo.couch import bulk_save_retry
+from mygpo.json import json
+from mygpo.couchdb import bulk_save_retry, get_main_database
+
+
+def get_random_picks(languages=None):
+    """ Returns random podcasts for the given language """
+
+    languages = languages or ['']
+
+    # get one iterator for each language
+    rand_iters = [Podcast.random(lang) for lang in languages]
+
+    # cycle through them, removing those that don't yield any more results
+    while rand_iters:
+        rand_iter = rand_iters.pop(0)
+
+        try:
+            podcast = next(rand_iter)
+            rand_iters.append(rand_iter)
+            yield podcast
+
+        except StopIteration:
+            # don't re-add rand_iter
+            pass
+
 
 
 def get_podcast_count_for_language():
@@ -29,7 +55,7 @@ def get_podcast_count_for_language():
 
     counts = defaultdict(int)
 
-    db = Podcast.get_db()
+    db = get_main_database()
     r = db.view('podcasts/by_language',
         reduce = True,
         group_level = 1,
@@ -108,7 +134,7 @@ class BulkSubscribe(object):
 
     def execute(self):
         """ Executes all added actions in bulk """
-        db = PodcastUserState.get_db()
+        db = get_main_database()
         obj_funs = map(self._get_obj_fun, self.actions)
         bulk_save_retry(db, obj_funs)
 

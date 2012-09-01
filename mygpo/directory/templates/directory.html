@@ -28,7 +28,7 @@
 
    <div class="span6">
     {% if c.cls == "PodcastList" %}
-     {% url lists-user c.username as user-lists-url %}
+     {% url user c.username as user-lists-url %}
      <h2>{% blocktrans with c.title as listtitle and c.username as username %}{{ listtitle }} <span class="by-user">by <a href="{{ user-lists-url }}">{{ username }}</a></span>{% endblocktrans %}</h2>
     {% else %}
      <h2>{{ c.label }}</h2>

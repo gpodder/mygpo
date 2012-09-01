@@ -102,7 +102,6 @@ urlpatterns += patterns('mygpo.web.views.settings',
      name='privacy_podcast_private'),
 
  url(r'^account/delete$',                                         'delete_account',name='delete-account'),
- url(r'^share/$',                                                 'share',         name='share'),
 )
 
 urlpatterns += patterns('mygpo.web.views.device',

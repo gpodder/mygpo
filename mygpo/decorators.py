@@ -49,7 +49,7 @@ def requires_token(token_name, denied_template=None):
             if not user:
                 raise Http404
 
-            token = getattr(user, token_name, '')
+            token = user.get_token(token_name)
             u_token = request.GET.get('token', '')
 
             if token == '' or token == u_token:
