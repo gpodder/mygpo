@@ -27,12 +27,11 @@
    </td>
    <td>
     <a href="{% url shared-subscriptions user.username %}{% if subscriptions_token %}?token={{ subscriptions_token }}{% endif %}">
-     <img src="/media/22x22/internet-web-browser.png" class="action-button" />
-    <a href="{% url shared-subscriptions-opml user.username %}{% if subscriptions_token %}?token={{ subscriptions_token }}{% endif %}">
-     <img src="/media/22x22/opml-icon.png" class="action-button" />
+     <img src="/media/22x22/internet-web-browser.png" class="action-button" /></a>
     <a href="{% url shared-subscriptions-rss user.username %}{% if subscriptions_token %}?token={{ subscriptions_token }}{% endif %}">
-     <img height="22" width="22" src="/media/28x28/feed-icon.png" class="action-button" />
-    </a>
+     <img height="22" width="22" src="/media/28x28/feed-icon.png" class="action-button" /></a>
+    <a href="{% url shared-subscriptions-opml user.username %}{% if subscriptions_token %}?token={{ subscriptions_token }}{% endif %}">
+     <img src="/media/22x22/opml-icon.png" class="action-button" /></a>
    </td>
    <td>
     <button class="btn btn-small btn-link {% if not subscriptions_token %}disabled{% endif %}" {% if subscriptions_token %}type="submit" onclick="submitForm('subscriptions_private');"{% endif %}>{% trans "New Token" %}</button>
@@ -66,6 +65,9 @@
     </div>
    </td>
    <td>
+    {% if favfeed_podcast %}
+     <a href="{% podcast_link_target favfeed_podcast %}"><img src="/media/22x22/internet-web-browser.png" class="action-button" /></a>
+    {% endif %}
     {% if favfeed_token %}
      <a href="https://{{ user.username }}:{{ favfeed_token }}@{{ site.domain }}{% url favorites-feed user.username %}">
       <img height="22" width="22" src="/media/28x28/feed-icon.png" class="action-button" />
@@ -74,12 +76,6 @@
      <a href="{% url favorites-feed user.username %}">
       <img height="22" width="22" src="/media/28x28/feed-icon.png" class="action-button" />
      </a>
-    {% endif %}
-    <a href="{% url subscribe-by-url %}?url=http://{{ site.domain }}{% url favorites-feed user.username %}">
-      <img height="22" width="22" src="/media/subscribe.png" class="action-button" />
-    </a>
-    {% if favfeed_podcast %}
-     <a href="{% podcast_link_target favfeed_podcast %}">Website</a>
     {% endif %}
    </td>
    <td>
