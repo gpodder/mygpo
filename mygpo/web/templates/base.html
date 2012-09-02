@@ -159,51 +159,55 @@
        <hr />
 
        <div class="span1">
-           &nbsp;
-       </div>
-
-       <div class="span1">
        <ul>
-        <li><strong>Discover</strong></li>
-        <li><a href="{% url directory-home %}">Directory</a></li>
-        <li><a href="{% url toplist %}">Podcasts</a></li>
-        <li><a href="{% url search %}">Search</a></li>
+        <li><strong>{% trans "Discover" %}</strong></li>
+        <li><a href="{% url directory-home %}">{% trans "Directory" %}</a></li>
+        <li><a href="{% url toplist %}">{% trans "Podcasts" %}</a></li>
+        <li><a href="{% url search %}">{% trans "Search" %}</a></li>
        </ul>
        </div>
 
        <div class="span1">
         <ul>
-         <li><strong>Get&nbsp;Support</strong></li>
-         <li><a href="{% url help %}">Docs</a></li>
-         <li><a href="http://wiki.gpodder.org/wiki/Mailing_List">Mailing&nbsp;List</a></li>
-         <li><a href="https://getsatisfaction.com/gpoddernet">Questions</a></li>
+         <li><strong>{% trans "Support" %}</strong></li>
+         <li><a href="{% url help %}">{% trans "Docs" %}</a></li>
+         <li><a href="http://wiki.gpodder.org/wiki/Mailing_List">{% trans "Mailing&nbsp;List" %}</a></li>
+         <li><a href="https://getsatisfaction.com/gpoddernet">{%trans "Questions" %}</a></li>
         </ul>
        </div>
 
        <div class="span1">
         <ul>
-         <li><strong>Support&nbsp;Us</strong></li>
-         <li><a href="http://flattr.com/thing/2304/gpodder-net">Flattr</a></li>
-         <li><a href="{% url contribute %}">Donate</a></li>
-         <li><a href="{% url advertise %}">Advertise</a></li>
+         <li><strong>{% trans "Support&nbsp;Us" %}</strong></li>
+         <li><a href="http://flattr.com/thing/2304/gpodder-net">{% trans "Flattr" %}</a></li>
+         <li><a href="{% url contribute %}">{% trans "Donate" %}</a></li>
+         <li><a href="{% url advertise %}">{% trans "Advertise" %}</a></li>
         </ul>
        </div>
 
        <div class="span1">
         <ul>
-         <li><strong>Develop</strong></li>
-         <li><a href="http://wiki.gpodder.org/wiki/Web_Services/API_2">API</a></li>
-         <li><a href="http://wiki.gpodder.org/wiki/Web_Services/Libraries">Libraries</a></li>
-         <li><a href="http://wiki.gpodder.org/wiki/Web_Services/Clients">Clients</a></li>
+         <li><strong>{% trans "Follow" %}</strong></li>
+         <li><a href="https://twitter.com/gpoddernet">{% trans "Twitter" %}</a></li>
+         <li><a href="http://blog.gpodder.org/">{% trans "Blog" %}</a></li>
         </ul>
        </div>
 
        <div class="span1">
         <ul>
-         <li><strong>Publish</strong></li>
-         <li><a href="{% url publisher %}">Get&nbsp;Access</a></li>
-         <li><a href="{% url link-here %}">Link&nbsp;To&nbsp;Us</a></li>
-         <li><a href="{% url advertise %}">Advertise</a></li>
+         <li><strong>{% trans "Develop" %}</strong></li>
+         <li><a href="http://wiki.gpodder.org/wiki/Web_Services/API_2">{% trans "API" %}</a></li>
+         <li><a href="http://wiki.gpodder.org/wiki/Web_Services/Libraries">{% trans "Libraries" %}</a></li>
+         <li><a href="http://wiki.gpodder.org/wiki/Web_Services/Clients">{% trans "Clients" %}</a></li>
+        </ul>
+       </div>
+
+       <div class="span1">
+        <ul>
+         <li><strong>{% trans "Publish" %}</strong></li>
+         <li><a href="{% url publisher %}">{% trans "Get&nbsp;Access" %}</a></li>
+         <li><a href="{% url link-here %}">{% trans "Link&nbsp;To&nbsp;Us" %}</a></li>
+         <li><a href="{% url advertise %}">{% trans "Advertise" %}</a></li>
         </ul>
        </div>
 
