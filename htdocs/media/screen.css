@@ -1,5 +1,14 @@
 
+/* Landscape phones and down */
+@media (min-width: 980px)
+{
 
+#inline_logo
+{
+display: none;
+}
+
+}
 
 /****************
     General
@@ -8,9 +17,10 @@
 
 #logo
 {
-	float: left;
-	padding: 0px;
-	margin: .5em;
+    position: fixed;
+    left: 20px;
+    top: -2px;
+    z-index: 4000;
 }
 
 h1
@@ -26,10 +36,9 @@ h2
     padding-top: .5em;
 }
 
-
-body
+.brand img
 {
-    font-family: 'Source Sans Pro', sans-serif;
+    display: inline;
 }
 
 
