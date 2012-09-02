@@ -30,8 +30,8 @@
      id="namedview274"
      showgrid="false"
      inkscape:zoom="1"
-     inkscape:cx="692.29034"
-     inkscape:cy="82.039792"
+     inkscape:cx="524.52964"
+     inkscape:cy="207.91222"
      inkscape:window-x="130"
      inkscape:window-y="75"
      inkscape:window-maximized="0"
@@ -54,7 +54,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -8457,4 +8457,139 @@
          x="690"
          sodipodi:role="line">gpodder.net</tspan></text>
   </g>
+  <rect
+     style="color:#000000;fill:#2ba09c;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+     id="rect4286"
+     width="42"
+     height="42"
+     x="205"
+     y="418"
+     inkscape:tile-cx="266"
+     inkscape:tile-cy="439"
+     inkscape:tile-w="42"
+     inkscape:tile-h="42"
+     inkscape:tile-x0="245"
+     inkscape:tile-y0="418"
+     inkscape:export-filename="/home/thp/src/mygpo/res/colorscheme.png"
+     inkscape:export-xdpi="90"
+     inkscape:export-ydpi="90" />
+  <rect
+     inkscape:tile-y0="418"
+     inkscape:tile-x0="245"
+     inkscape:tile-h="42"
+     inkscape:tile-w="42"
+     inkscape:tile-cy="439"
+     inkscape:tile-cx="266"
+     y="418"
+     x="251"
+     height="42"
+     width="42"
+     id="rect5080"
+     style="color:#000000;fill:#3d2a3f;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+     inkscape:export-filename="/home/thp/src/mygpo/res/colorscheme.png"
+     inkscape:export-xdpi="90"
+     inkscape:export-ydpi="90" />
+  <rect
+     style="color:#000000;fill:#a02b2b;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+     id="rect5082"
+     width="42"
+     height="42"
+     x="251"
+     y="464"
+     inkscape:tile-cx="266"
+     inkscape:tile-cy="439"
+     inkscape:tile-w="42"
+     inkscape:tile-h="42"
+     inkscape:tile-x0="245"
+     inkscape:tile-y0="418"
+     inkscape:export-filename="/home/thp/src/mygpo/res/colorscheme.png"
+     inkscape:export-xdpi="90"
+     inkscape:export-ydpi="90" />
+  <rect
+     inkscape:tile-y0="418"
+     inkscape:tile-x0="245"
+     inkscape:tile-h="42"
+     inkscape:tile-w="42"
+     inkscape:tile-cy="439"
+     inkscape:tile-cx="266"
+     y="464"
+     x="205"
+     height="42"
+     width="42"
+     id="rect5084"
+     style="color:#000000;fill:#2b78a0;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+     inkscape:export-filename="/home/thp/src/mygpo/res/colorscheme.png"
+     inkscape:export-xdpi="90"
+     inkscape:export-ydpi="90" />
+  <text
+     xml:space="preserve"
+     style="font-size:16.09589958px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Source Sans Pro;-inkscape-font-specification:Source Sans Pro"
+     x="185.34418"
+     y="413.8385"
+     id="text5103"
+     sodipodi:linespacing="125%"
+     inkscape:export-filename="/home/thp/src/mygpo/res/colorscheme.png"
+     inkscape:export-xdpi="90"
+     inkscape:export-ydpi="90"><tspan
+       sodipodi:role="line"
+       id="tspan5105"
+       x="185.34418"
+       y="413.8385">#2ba09c</tspan></text>
+  <text
+     sodipodi:linespacing="125%"
+     id="text5107"
+     y="414.3385"
+     x="254.34418"
+     style="font-size:16.09589958px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Source Sans Pro;-inkscape-font-specification:Source Sans Pro"
+     xml:space="preserve"
+     inkscape:export-filename="/home/thp/src/mygpo/res/colorscheme.png"
+     inkscape:export-xdpi="90"
+     inkscape:export-ydpi="90"><tspan
+       y="414.3385"
+       x="254.34418"
+       id="tspan5109"
+       sodipodi:role="line">#3d2a3f</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-size:16.09589958px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Source Sans Pro;-inkscape-font-specification:Source Sans Pro"
+     x="186.34418"
+     y="523.3385"
+     id="text5123"
+     sodipodi:linespacing="125%"
+     inkscape:export-filename="/home/thp/src/mygpo/res/colorscheme.png"
+     inkscape:export-xdpi="90"
+     inkscape:export-ydpi="90"><tspan
+       sodipodi:role="line"
+       id="tspan5125"
+       x="186.34418"
+       y="523.3385">#2b78a0</tspan></text>
+  <text
+     sodipodi:linespacing="125%"
+     id="text5127"
+     y="523.3385"
+     x="250.84418"
+     style="font-size:16.09589958px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Source Sans Pro;-inkscape-font-specification:Source Sans Pro"
+     xml:space="preserve"
+     inkscape:export-filename="/home/thp/src/mygpo/res/colorscheme.png"
+     inkscape:export-xdpi="90"
+     inkscape:export-ydpi="90"><tspan
+       y="523.3385"
+       x="250.84418"
+       id="tspan5129"
+       sodipodi:role="line">#a02b2b</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-size:21.30327797px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+     x="173.84134"
+     y="393.58539"
+     id="text5131"
+     sodipodi:linespacing="125%"
+     inkscape:export-filename="/home/thp/src/mygpo/res/colorscheme.png"
+     inkscape:export-xdpi="90"
+     inkscape:export-ydpi="90"><tspan
+       sodipodi:role="line"
+       id="tspan5133"
+       x="173.84134"
+       y="393.58539"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:Source Sans Pro;-inkscape-font-specification:Source Sans Pro Bold">COLOR SCHEME:</tspan></text>
 </svg>
