@@ -50,7 +50,7 @@
 {% block sidebar %}
 
   <div class="well">
-   <h3>{% trans "Language" %}</h3>
+   <h4>{% trans "Language" %}</h4>
     <form class="form-inline" action="{% url episode-toplist %}" method="get">
      <select class="input-medium" name="lang">
       {% if language == "" %}

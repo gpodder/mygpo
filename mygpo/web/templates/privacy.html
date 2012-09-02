@@ -53,7 +53,7 @@
        <td>
         <form method="post" action="{% url privacy_podcast_private podcast.get_id %}">
          {% csrf_token %}
-         <button class="btn" type="submit">
+         <button class="btn btn-small" type="submit">
           <i class="icon-eye-close"></i> {% trans "Make Private" %}
          </button>
         </form>
@@ -75,7 +75,7 @@
         <td>
         <form method="post" action="{% url privacy_podcast_public podcast.get_id %}">
          {% csrf_token %}
-         <button class="btn" type="submit">
+         <button class="btn btn-small" type="submit">
           <i class="icon-eye-open"></i> {% trans "Make Public" %}
          </button>
         </form>

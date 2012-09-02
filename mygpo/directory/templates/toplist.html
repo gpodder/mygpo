@@ -63,7 +63,7 @@
 
    <div class="well">
 
-  <h3>{% trans "Language" %}</h3>
+  <h4>{% trans "Language" %}</h4>
     <form class="form-inline" action="{% url toplist %}" method="get">
      <select class="input-medium" name="lang">
 
@@ -87,7 +87,7 @@
   </div>
 
    <div class="well">
-   <h3>{% trans "Client Access" %}</h3>
+   <h4>{% trans "Client Access" %}</h4>
 
     <p>Access <a href="{% url toplist-opml 30 "opml" %}">http://{{ url }}{% url toplist-opml 30 "opml" %}</a> for the Top-30.</p>
  </div>

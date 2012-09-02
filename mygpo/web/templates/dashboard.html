@@ -38,7 +38,7 @@
 {% block sidebar %}
   {% if sponsored_podcast %}
     <div class="well">
-     <h3>{{ sponsored_podcast.title }} <small>(Supporting Podcast)</small></h3>
+     <h4>{{ sponsored_podcast.title }} <small>(Supporting Podcast)</small></h4>
      <div>{{ sponsored_podcast.podcast|podcast_logo }}</div>
      <div style="margin-left: 40px">{{ sponsored_podcast.text|truncatewords:"20"}}</div>
      <br style="clear: left;"/>
@@ -55,7 +55,7 @@
     <div id="podcastlogo">{{ random_podcast|podcast_logo_medium }}</div>
    </a>
 
-   <h3>{{ random_podcast.title }}</h3>
+   <h4>{{ random_podcast.title }}</h4>
 
    <p class="description">
     {{ random_podcast.description|default:""|truncatewords:"50" }}
@@ -68,7 +68,7 @@
  {% endif %}
 
   <div class="well">
-   <h3>{% blocktrans %}Explore {{ site }}{% endblocktrans %}</h3>
+   <h4>{% blocktrans %}Explore {{ site }}{% endblocktrans %}</h4>
    <ul>
     <li class="icon-check{% if not "devices" in checklist %}-empty{% endif %}">
      <a href="{% url devices %}">
@@ -122,7 +122,7 @@
 
  {% if show_install_reader %}
   <div class="well">
-    <h3>{% trans "Subscribe in Your Browser" %}</h3>
+    <h4>{% trans "Subscribe in Your Browser" %}</h4>
     <p>
      {% blocktrans %}Register {{ site.domain }} as a feed reader, and subscribe to podcasts directly from your browser{% endblocktrans %}
     </p>

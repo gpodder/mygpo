@@ -126,7 +126,7 @@
 {% block sidebar %}
 
   <div class="well">
-   <h3>{% trans "Subscriptions" %}</h3>
+   <h4>{% trans "Subscriptions" %}</h4>
    {% if not user.is_authenticated %}
     <div class="subscribe">
      <a href="{% podcast_link_target podcast "subscribe" %}">
@@ -173,7 +173,7 @@
 
 
   <div class="well">
-   <h3>Tags</h3>
+   <h4>Tags</h4>
 
    {% for tag in tags %}
     {% spaceless %}
@@ -201,7 +201,7 @@
   </div>
 
   <div class="well">
-   <h3>{% trans "Share" %}</h3>
+   <h4>{% trans "Share" %}</h4>
 
    {% google_plus_one_button %}
    {{ podcast|fb_like_podcast }}
@@ -211,7 +211,7 @@
 
   {% if history %}
   <div class="well">
-   <h3>{% trans "Subscription History" %}</h3>
+   <h4>{% trans "Subscription History" %}</h4>
    <table class="list">
     {% for s in history %}
      <tr>

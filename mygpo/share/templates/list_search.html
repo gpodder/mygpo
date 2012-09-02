@@ -12,13 +12,6 @@
 
   {% if results %}
    <table class="list">
-    <tr>
-     <th></th>
-     <th>{% trans "Podcast" %}</th>
-     <th>{% trans "Subscribers" %}</th>
-     <th>{% trans "Add" %}</th>
-    </tr>
-
     {% for podcast in results %}
      <tr>
       <td class="logo">{{ podcast|podcast_logo }}</td>
@@ -27,7 +20,7 @@
       <td>
        <form action="{% url list-add-podcast user.username listname podcast.get_id %}" method="post" target="_parent">
         {% csrf_token %}
-        <button class="btn btn-success" type="submit">
+        <button class="btn btn-success btn-small" type="submit">
          <i class="icon-plus"></i>
         </button>
        </form>

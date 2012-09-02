@@ -16,17 +16,15 @@
 
 {% block header %}
 <h1>{% blocktrans with other_user.username as username%}{{ username }}'s Subscriptions{% endblocktrans %}</h1>
-{% endblock %}
-
-
-{% block content %}
-
 <small class="description">
  {% url user other_user.username as userpage-url %}
  {% blocktrans with subscriptions|length as num_subscriptions and other_user.username as username %}<a href="{{userpage-url}}">{{username}}</a> has {{num_subscriptions}} subscriptions{% endblocktrans %}
 </small>
 
-<hr />
+{% endblock %}
+
+
+{% block content %}
 
  {% if not subscriptionlist|length_is:"0" %}
  <table class="list">
@@ -60,7 +58,7 @@
 {% block sidebar %}
  {% if user.is_authenticated %}
   <div class="well">
-   <h3>{% trans "Share Your Subscriptions" %}</h3>
+   <h4>{% trans "Share Your Subscriptions" %}</h4>
    <p>{% trans "Want to share your own subscriptions?" %}</p>
 
    <a class="btn btn-primary" href="{% url share %}">
@@ -70,7 +68,7 @@
  {% endif %}
 
  <div class="well">
-  <h3>{% trans "Nokia Podcasting" %}</h3>
+  <h4>{% trans "Nokia Podcasting" %}</h4>
   <p>{% trans "Add <tt>&amp;symbian=true#.opml</tt> to the OPML URL to get an OPML file for Nokia Podcasting on Symbian devices." %}</p>
  </div>
 

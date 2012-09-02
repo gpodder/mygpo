@@ -30,7 +30,7 @@
     <td><a href="{% url user l.username %}">{{ l.username }}</a></td>
     <td class="numeric">{{ l.podcasts|length }}</td>
     <td>
-     <a class="btn" href="{% url list-opml l.username l.slug %}">
+     <a class="btn btn-small" href="{% url list-opml l.username l.slug %}">
       <i class="icon-download"></i>
      </a>
     </td>
@@ -70,7 +70,7 @@
 
 {% block sidebar %}
  <div class="well">
-  <h3>{% trans "Know Some Great Podcasts?" %}</h3>
+  <h4>{% trans "Know Some Great Podcasts?" %}</h4>
   <p>{% trans "Create a list of podcasts about a topic you like" %}</p>
   <a class="btn btn-primary" href="{% url lists-overview %}">Go</a>
  </div>

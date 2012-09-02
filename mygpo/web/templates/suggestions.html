@@ -23,14 +23,14 @@
      <p class="description">{{ podcast.description|striptags|truncatewords:"12" }}</p>
     </td>
     <td>
-      <a class="btn btn-success" href="{% podcast_link_target podcast "subscribe" %}">
+      <a class="btn btn-success btn-small" href="{% podcast_link_target podcast "subscribe" %}">
        <i class="icon-ok"></i> {% trans "Subscribe" %}
       </a>
     </td>
     <td>
-     <form action="{% url suggestions-blacklist podcast.oldid %}">
+     <form action="{% url suggestions-blacklist podcast.oldid %}" style="display: inline;" >
       {% csrf_token %}
-      <button class="btn btn-danger" type="submit">
+      <button class="btn btn-danger btn-small" type="submit">
        <i class="icon-ban-circle"></i> {% trans "No Interest" %}
       </button>
      </form>
@@ -51,31 +51,7 @@
    {% trans "Download OPML" %}
  </a>
   {% endif %}
-{% endblock %}
 
-{% block sidebar %}
- {% if entries %}
- <div class="well">
-
-   <h3>{% trans "Do you Like our Suggestions?" %}</h3>
-
-   <div class="btn-group">
-    <button class="btn" type="submit" onclick="submitForm('rate_pos');">
-     <i class="icon-thumbs-up"></i> {% trans "Yes" %}
-    </button>
-    <button class="btn" type="submit" onclick="submitForm('rate_neg');">
-     <i class="icon-thumbs-down"></i> {% trans "No" %}
-    </button>
-   </div>
-
-   <form id="rate_pos" class="form-inline" action="{% url suggestions-rate %}?rate=1" method="post" class="rate">
-    {% csrf_token %}
-   </form>
-   <form id="rate_neg" class="form-inline" action="{% url suggestions-rate %}?rate=-1" method="post" class="rate">
-    {% csrf_token %}
-   </form>
- </div>
- {% endif %}
 {% endblock %}
 
 

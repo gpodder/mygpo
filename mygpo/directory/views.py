@@ -143,12 +143,14 @@ def search(request, template='search.html', args={}):
         page_list = []
 
     max_subscribers = max([p.subscriber_count() for p in results] + [0])
+    current_site = RequestSite(request)
 
     return render(request, template, dict(
             q= q,
             results= results,
             page_list= page_list,
             max_subscribers= max_subscribers,
+            domain= current_site.domain,
             **args
             ))
 

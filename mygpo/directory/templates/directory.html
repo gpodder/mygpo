@@ -79,7 +79,7 @@
 
   {% if podcastlist %}
     <div class="well">
-     <h3>
+     <h4>
       <a href="{% url list-show podcastlist.user.username podcastlist.title %}">
        {{ podcastlist.title }}
       </a>
@@ -88,7 +88,7 @@
         {{ podcastlistowner.username }}
        </a>
       </small>
-     </h3>
+     </h4>
 
      <div>
       {% for podcast in podcastlist.podcasts %}
@@ -119,13 +119,13 @@
    {% with trending_podcasts|slice:":1"|first as trending_podcast %}
     <div class="well">
 
-     <h3><small>{% trans "Trending" %} {% subscriber_change trending_podcast.subscriber_change %}</small></h3>
+     <h4><small>{% trans "Trending" %} {% subscriber_change trending_podcast.subscriber_change %}</small></h4>
 
      <a href="{% podcast_link_target trending_podcast %}">
       <div id="podcastlogo">{{ trending_podcast|podcast_logo_medium }}</div>
      </a>
 
-     <h3>{{ trending_podcast.title }}</h3>
+     <h4>{{ trending_podcast.title }}</h4>
 
      <p class="description">
       {{ trending_podcast.description|default:""|truncatewords:"50" }}
@@ -144,14 +144,14 @@
   {% if random_podcast %}
    <div class="well">
 
-   <h3><small>{% trans "Random" %}</small></h3>
+   <h4><small>{% trans "Random" %}</small></h4>
 
 
    <a href="{% podcast_link_target random_podcast %}">
     <div id="podcastlogo">{{ random_podcast|podcast_logo_medium }}</div>
    </a>
 
-   <h3>{{ random_podcast.title }}</h3>
+   <h4>{{ random_podcast.title }}</h4>
 
    <p class="description">
     {{ random_podcast.description|default:""|truncatewords:"50" }}

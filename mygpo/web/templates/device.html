@@ -25,8 +25,8 @@
       <td class="logo">{{ podcast|podcast_logo }}</td>
       <td>{% podcast_group_link podcast %}</td>
       <td>
-       <form class="form-inline" method="post" action="{% podcast_link_target podcast "unsubscribe" device.uid %}?return_to=/device/{{ device.uid }}">
-        <button class="btn btn-danger" type="submit">
+       <form class="form-inline" method="post" action="{% podcast_link_target podcast "unsubscribe" device.uid %}?return_to=/device/{{ device.uid }}" >
+        <button class="btn btn-danger btn-small" type="submit">
          <i class="icon-remove"></i> {% trans "Unsubscribe" %}
         </button>
        </form>
@@ -81,7 +81,7 @@
 
   {% if not device.deleted %}
 
-  <h2>{% trans "Synchronize" %}</h2>
+  <h4>{% trans "Synchronize" %}</h4>
   <p>{% blocktrans %}If you synchronize devices, they will always have the same subscriptions. A podcast that is subscribed on one device, will automatically be added to all synchronized devices.{% endblocktrans %}</p>
 
   {% if synced_with|length_is:"0" %}

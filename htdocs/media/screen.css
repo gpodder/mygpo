@@ -147,6 +147,10 @@ td.logo
     width: 32px;
 }
 
+table form
+{
+    display: inline;
+}
 
 /****************************
     Podcast List (TODO)

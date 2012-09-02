@@ -19,7 +19,7 @@
 {% block content %}
 
    {% if device %}
-    <a href="{% url "device" device.uid %}">{% trans "Back to" %} {{ device|device_icon }} {{ device.name|striptags}}</a>
+    <a href="{% url device device.uid %}">{% trans "Back to" %} {{ device|device_icon }} {{ device.name|striptags}}</a>
    {% endif %}
 
    {% if not history|length_is:"0" %}

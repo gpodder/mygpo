@@ -27,12 +27,12 @@
 {% block sidebar %}
 
   <div>
-   <h3><i class="icon-edit"></i> {% trans "Manage Your Podcast-Clients" %}</h3>
+   <h4><i class="icon-edit"></i> {% trans "Manage Your Podcast-Clients" %}</h4>
    <p>{% blocktrans %}Manage all your podcast clients via the web{% endblocktrans %}</p>
   </div>
 
   <div>
-   <h3><i class="icon-star"></i> {% trans "Discover New Podcasts" %}</h3>
+   <h4><i class="icon-star"></i> {% trans "Discover New Podcasts" %}</h4>
    {% url directory-home as directory-home-url %}
    {% url toplist as toplist-url %}
    {% url episode-toplist as episode-toplist-url %}
@@ -40,22 +40,22 @@
   </div>
 
   <div>
-   <h3><i class="icon-share"></i> {% trans "Share Interesting Podcasts" %}</h3>
+   <h4><i class="icon-share"></i> {% trans "Share Interesting Podcasts" %}</h4>
    <p>{% blocktrans %}Share your podcasts and favorite episodes with others.{% endblocktrans %}</p>
   </div>
 
   <div>
-   <h3><i class="icon-cloud"></i> {% trans "Backup your Subscriptions" %}</h3>
+   <h4><i class="icon-cloud"></i> {% trans "Backup your Subscriptions" %}</h4>
    <p>{% blocktrans %}All your podcast related data, backed up online.{% endblocktrans %}</p>
   </div>
 
   <div>
-   <h3><i class="icon-play-circle"></i> {% trans "Seamless Playback on the Go" %}</h3>
+   <h4><i class="icon-play-circle"></i> {% trans "Seamless Playback on the Go" %}</h4>
    <p>{% blocktrans %}Start listening to an episode on your PC and continue playback on your mobile phone.{% endblocktrans %}</p>
   </div>
 
   <div>
-   <h3><i class="icon-ok-circle"></i> {% trans "Supported Clients" %}</h3>
+   <h4><i class="icon-ok-circle"></i> {% trans "Supported Clients" %}</h4>
    <a href="http://gpodder.org/">gPodder</a>,
    <a href="http://amarok.kde.org/">Amarok</a> {% trans "and" %}
    <a href="http://wiki.gpodder.org/wiki/Web_Services/Clients">{% trans "more..." %}</a>

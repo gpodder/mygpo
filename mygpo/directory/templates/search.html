@@ -18,10 +18,9 @@
 {% block content %}
 
   <form class="form-inline" method="get" action="{% url search %}" class="search">
-   <div class="input-prepend">
-    <span class="add-on"><i class="icon-search"></i></span><input class="input-xxlarge" type="text" name="q" {% if q %}value="{{ q }}"{% endif %} >
+   <div class="input-prepend input-append">
+    <span class="add-on"><i class="icon-search"></i></span><input class="input-xxlarge" type="text" name="q" {% if q %}value="{{ q }}"{% endif %} ><button class="btn btn-primary" type="submit">{% trans "Search" %}</button>
    </div>
-   <input class="btn btn-primary" type="submit" value="Search">
   </form>
 
  {% if q %}
@@ -83,7 +82,9 @@
 {% block sidebar %}
 
   <div class="well">
-   <h3>{% trans "Search API" %}</h3>
- </div>
+   <h4>{% trans "Search API" %}</h4>
+   <p>{% trans "Access the following address to search for <em>tech</em> podcasts." %}</p>
+   <pre>http://{{domain}}/search.opml?q=tech</pre>
+  </div>
 {% endblock %}
 
