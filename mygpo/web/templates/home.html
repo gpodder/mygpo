@@ -1,64 +1,274 @@
-{% extends "base.html" %}
 {% load i18n %}
-{% load cache %}
-{% load podcasts %}
-
 {% load menu %}
-{% block mainmenu %}{{ "/"|main_menu }}{% endblock %}
-{% block sectionmenu %}{{ "/"|section_menu }}{% endblock %}
 
-{% block title %}{% trans "welcome" %}{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{% block title %}{% endblock %} (gpodder.net)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="/media/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+      .sidebar-nav {
+        padding: 9px 0;
+      }
+    </style>
+    <link href="/media/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/media/css/font-awesome.css" rel="stylesheet">
+    <link rel="stylesheet" href="/media/screen.css" type="text/css" />
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700' rel='stylesheet' type='text/css'>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="/favicon.png">
+
+    {% block head %}{% endblock %}
+
+    {% if google_analytics_property_id %}
+      {% load googleanalytics %}
+      {{ google_analytics_property_id|google_analytics_async }}
+    {% endif %}
+
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/"><img id="inline_logo" src="/media/gpoddernet_25.png" /><span style="padding-left: 65px; padding-right: 10px;" >gpodder.net</span></span></a>
+          <div class="btn-group pull-right">
+           {% if user.is_authenticated %}
+            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+              <i class="icon-user"></i> {{ user.username }}
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a href="{% url account %}">Profile</a></li>
+              <li class="divider"></li>
+              <li><a href="{% url logout %}">Sign Out</a></li>
+            </ul>
+           {% else %}
+            <a class="btn dropdown-toggle" data-toggle="dropdown" href="">
+              <i class="icon-user"></i> {% trans "Login" %}
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a href="{% url login %}">{% trans "Login" %}</a></li>
+              <li><a href="{% url register %}">{% trans "Register" %}</a></li>
+            </ul>
+           {% endif %}
+          </div>
+          <div class="nav-collapse">
+            <ul class="nav">
+              {% block mainmenu %}
+               {{ "/"|main_menu }}
+              {% endblock %}
+             </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row-fluid">
+        <div class="span2">
+        </div><!--/span-->
+        <div class="span10">
+
+    {% if messages %}
+     {% for message in messages %}
+      <div {% if message.tags %} class="{{ message.tags }}"{% endif %}>
+       {{ message }}
+      </div>
+     {% endfor %}
+    {% endif %}
 
 
-{% block header %}
-{% endblock %}
-
-{% block content %}
-
- <div class="hero-unit">
-  <h1>Discover Podcasts</h1>
-  <p>Discover interesting podcasts and keep your subscriptions up to date on all your devices! gpodder.net is a <strong>free</strong> service that connects your podcast player on your computer, notebook and phone.</p>
-  <p><a class="btn btn-primary btn-large" href="{% url register %}">{% trans "Register" %}</a> <a class="btn btn-primary btn-large" href="{% url login %}">{% trans "Login" %}</a></p>
- </div>
-
-{% endblock %}
+    <div class="row-fluid">
+     <div class="span12">
+      {% block header %}
+       <h1>Discover and track your podcasts</h1>
+      {% endblock %}
+     </div>
+    </div>
 
 
-{% block sidebar %}
+    <div class="row-fluid">
+     <div class="span8" id="content">
+      {% block content %}
 
-  <div>
-   <h4><i class="icon-edit"></i> {% trans "Manage Your Podcast-Clients" %}</h4>
-   <p>{% blocktrans %}Manage all your podcast clients via the web{% endblocktrans %}</p>
-  </div>
+       <img style="float: right;" src="/media/gpoddernet_228.png" />
+       <p>
+        gpdder.net is a libre web service that allows you to manage your
+        podcast subscriptions and discover new content. If you use multiple
+        devices, you can synchronize subscriptions and your listening progress.
+       </p>
 
-  <div>
-   <h4><i class="icon-star"></i> {% trans "Discover New Podcasts" %}</h4>
-   {% url directory-home as directory-home-url %}
-   {% url toplist as toplist-url %}
-   {% url episode-toplist as episode-toplist-url %}
-    <p>{% blocktrans %}Discover the most popular podcasts, and those that match your interests{% endblocktrans %}</p>
-  </div>
+       <p>
+        It works best with the <a href="http://gpodder.org/">gPodder</a>
+        application, but you can also use it with
+        <a href="http://amarok.kde.org/">Amarok</a>,
+        <a href="http://wiki.gpodder.org/wiki/Web_Services/Clients">other
+        supported clients</a> or as standalone web application without
+        any client app.
+       </p>
 
-  <div>
-   <h4><i class="icon-share"></i> {% trans "Share Interesting Podcasts" %}</h4>
-   <p>{% blocktrans %}Share your podcasts and favorite episodes with others.{% endblocktrans %}</p>
-  </div>
+       <div class="well">
+        <div style="width: 12em; margin-left: auto; margin-right: auto;">
+         <a class="btn btn-primary" href="{% url login %}">{% trans "Login" %}</a>
+         <a class="btn btn-primary" href="{% url register%}">{% trans "Register" %}</a>
+        </div>
+       </div>
 
-  <div>
-   <h4><i class="icon-cloud"></i> {% trans "Backup your Subscriptions" %}</h4>
-   <p>{% blocktrans %}All your podcast related data, backed up online.{% endblocktrans %}</p>
-  </div>
+       <h3>Features</h3>
 
-  <div>
-   <h4><i class="icon-play-circle"></i> {% trans "Seamless Playback on the Go" %}</h4>
-   <p>{% blocktrans %}Start listening to an episode on your PC and continue playback on your mobile phone.{% endblocktrans %}</p>
-  </div>
+       <ul>
+        <li>Share your favorite content with others</li>
+        <li>Keep track of your playback progress</li>
+        <li>Back up your subscriptions</li>
+        <li>Discover new content, based on your listening habits</li>
+        <li>Create and share lists of related podcasts</li>
+        <li><em>For publishers:</em> Find out which parts
+         of your content are popular</li>
+       </ul>
 
-  <div>
-   <h4><i class="icon-ok-circle"></i> {% trans "Supported Clients" %}</h4>
-   <a href="http://gpodder.org/">gPodder</a>,
-   <a href="http://amarok.kde.org/">Amarok</a> {% trans "and" %}
-   <a href="http://wiki.gpodder.org/wiki/Web_Services/Clients">{% trans "more..." %}</a>
-  </div>
+     {% endblock %}
+     </div>
 
-{% endblock %}
+
+     <div class="span4" id="sidebar">
+      {% block sidebar %}
+      {% endblock %}
+     </div>
+    </div>
+
+
+      <footer class="row-fluid">
+
+ {% block ads %}
+  {% if adsense_client %}
+   <hr />
+
+   <script type="text/javascript"><!--
+    google_ad_client = "{{ adsense_client }}";
+    /* "Bottom" slot */
+    google_ad_slot = "{{ adsense_slot_bottom }}";
+    google_ad_width = 728;
+    google_ad_height = 90;
+    //-->
+   </script>
+   <script type="text/javascript"
+    src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+   </script>
+  {% endif %}
+ {% endblock %}
+
+       <hr />
+
+       <div class="span1">
+       <ul>
+        <li><strong>{% trans "Discover" %}</strong></li>
+        <li><a href="{% url directory-home %}">{% trans "Directory" %}</a></li>
+        <li><a href="{% url toplist %}">{% trans "Podcasts" %}</a></li>
+        <li><a href="{% url search %}">{% trans "Search" %}</a></li>
+       </ul>
+       </div>
+
+       <div class="span1">
+        <ul>
+         <li><strong>{% trans "Support" %}</strong></li>
+         <li><a href="{% url help %}">{% trans "Docs" %}</a></li>
+         <li><a href="http://wiki.gpodder.org/wiki/Mailing_List">{% trans "Mailing&nbsp;List" %}</a></li>
+         <li><a href="https://getsatisfaction.com/gpoddernet">{%trans "Questions" %}</a></li>
+        </ul>
+       </div>
+
+       <div class="span1">
+        <ul>
+         <li><strong>{% trans "Support&nbsp;Us" %}</strong></li>
+         <li><a href="http://flattr.com/thing/2304/gpodder-net">{% trans "Flattr" %}</a></li>
+         <li><a href="{% url contribute %}">{% trans "Donate" %}</a></li>
+         <li><a href="{% url advertise %}">{% trans "Advertise" %}</a></li>
+        </ul>
+       </div>
+
+       <div class="span1">
+        <ul>
+         <li><strong>{% trans "Follow" %}</strong></li>
+         <li><a href="https://twitter.com/gpoddernet">{% trans "Twitter" %}</a></li>
+         <li><a href="http://blog.gpodder.org/">{% trans "Blog" %}</a></li>
+         <li><a href="http://blog.gpodder.org/feeds/posts/default">{% trans "Blog&nbsp;(RSS)" %}</a></li>
+        </ul>
+       </div>
+
+       <div class="span1">
+        <ul>
+         <li><strong>{% trans "Develop" %}</strong></li>
+         <li><a href="http://wiki.gpodder.org/wiki/Web_Services/API_2">{% trans "API" %}</a></li>
+         <li><a href="http://wiki.gpodder.org/wiki/Web_Services/Libraries">{% trans "Libraries" %}</a></li>
+         <li><a href="http://wiki.gpodder.org/wiki/Web_Services/Clients">{% trans "Clients" %}</a></li>
+        </ul>
+       </div>
+
+       <div class="span1">
+        <ul>
+         <li><strong>{% trans "Publish" %}</strong></li>
+         <li><a href="{% url publisher %}">{% trans "Get&nbsp;Access" %}</a></li>
+         <li><a href="{% url link-here %}">{% trans "Link&nbsp;To&nbsp;Us" %}</a></li>
+         <li><a href="{% url advertise %}">{% trans "Advertise" %}</a></li>
+        </ul>
+       </div>
+
+      </footer>
+
+    </div><!--/.fluid-container-->
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/media/js/jquery.js"></script>
+    <script src="/media/js/bootstrap-dropdown.js"></script>
+
+    {% block javascript %}{% endblock javascript %}
+
+    <!-- getsatisfaction.com feedback tab -- >
+    <script type="text/javascript">
+     var is_ssl = ("https:" == document.location.protocol);
+     var asset_host = is_ssl ? "https://s3.amazonaws.com/getsatisfaction.com/" : "http://s3.amazonaws.com/getsatisfaction.com/";
+     document.write(unescape("%3Cscript src='" + asset_host + "javascripts/feedback-v2.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+     var feedback_widget_options = {};
+     feedback_widget_options.display = "overlay";
+     feedback_widget_options.company = "gpoddernet";
+     feedback_widget_options.placement = "left";
+     feedback_widget_options.color = "#222";
+     feedback_widget_options.style = "idea";
+     var feedback_widget = new GSFN.feedback_widget(feedback_widget_options);
+    </script>
+
+  </body>
+
+
+
+
+
+</html>
