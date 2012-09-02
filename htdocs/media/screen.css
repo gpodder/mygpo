@@ -16,12 +16,20 @@
 h1
 {
     font-size: 16pt;
+    font-family: 'Source Sans Pro', sans-serif;
+    font-weight: 700;
 }
 
 h2
 {
     font-size: 14pt;
     padding-top: .5em;
+}
+
+
+body
+{
+    font-family: 'Source Sans Pro', sans-serif;
 }
 
 
@@ -139,10 +147,6 @@ td.logo
     width: 32px;
 }
 
-table button.btn
-{
-    float: right;
-}
 
 /****************************
     Podcast List (TODO)
