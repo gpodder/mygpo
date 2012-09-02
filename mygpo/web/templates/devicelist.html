@@ -37,7 +37,7 @@
        <td>{{ device|device_type }}</td>
        <td>{{ device.uid|striptags }}</td>
        <td>
-        <a class="btn" href="{% url device-edit device.uid %}">
+        <a class="btn btn-small" href="{% url device-edit device.uid %}">
          <i class="icon-edit"></i>
          {% trans "Configure" %}
         </a>
@@ -57,14 +57,14 @@
       <td>{{ d.uid|striptags }}</td>
       <td>
        <form method="post" action="{% url device-undelete d.uid %}">
-        <button class="btn" type="submit">
+        <button class="btn btn-small" type="submit">
          <i class="icon-repeat"></i> {% trans "Reactivate" %}
         </button>
        </form>
       </td>
       <td>
        <form method="post" action="{% url device-delete-permanently d.uid %}">
-        <button class="btn btn-danger" type="submit">
+        <button class="btn btn-danger btn-small" type="submit">
          <i class="icon-trash"></i> {% trans "Delete Permanently" %}
         </button>
        </form>

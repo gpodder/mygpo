@@ -27,7 +27,7 @@
      <td>
       <form action="{% url list-delete user.username list.slug %}" method="post">
        {% csrf_token %}
-       <button class="btn btn-danger" type="submit">
+       <button class="btn btn-danger btn-small" type="submit">
         <i class="icon-trash"></i> {% trans "Delete" %}
        </button>
       </form>
@@ -43,11 +43,13 @@
 
   <div class="well">
 
-  <h3>{% trans "Create List" %}</h3>
+  <h4>{% trans "Create List" %}</h4>
   <form class="form-inline" action="{% url list-create %}" method="post">
    {% csrf_token %}
-   <input placeholder="Title" class="input-medium" type="text" name="title" />
-   <button class="btn btn-primary" type="submit">{% trans "Create" %}</button>
+   <div class="input-append">
+    <input placeholder="Title" class="input-medium" type="text" name="title" />
+    <button class="btn btn-primary" type="submit">{% trans "Create" %}</button>
+   </div>
   </form>
 
   <p>

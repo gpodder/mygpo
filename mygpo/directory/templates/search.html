@@ -84,7 +84,9 @@
   <div class="well">
    <h4>{% trans "Search API" %}</h4>
    <p>{% trans "Access the following address to search for <em>tech</em> podcasts." %}</p>
-   <pre>http://{{domain}}/search.opml?q=tech</pre>
+   <a href="/search.opml?q=tech">
+    <pre>http://{{domain}}/search.opml?q=tech</pre>
+   </a>
   </div>
 {% endblock %}
 
