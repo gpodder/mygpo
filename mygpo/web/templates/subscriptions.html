@@ -52,18 +52,23 @@
  <p>{% blocktrans with user.username|striptags as username %}{{ url }} help you to track your podcasts which you have subscribed on your devices - desktop computer, notebook, mobile devices, etc. To start using my.gpodder.org set up <a href="http://gpodder.org">gPodder</a> with your username &ndash; <strong>{{username}}</strong> &ndash; and password and upload your podcasts. They will automatically show up here.{% endblocktrans %}</p>
 
  {% endif %}
+{% endblock %}
 
- <div class="info">
-  <strong>{% trans "Subscribe to new Podcasts!" %}</strong>
+{% block sidebar %}
+
+ <div class="well">
+  <h4>{% trans "Subscribe to Podcasts" %}</h4>
   {% url toplist as toplist-url %}
   {% url search as search-url %}
   {% url suggestions as suggestions-url %}
-  {% blocktrans %}Browse the <a href="{{ toplist-url }}">toplist</a> and your <a href="{{ suggestions-url }}">personal suggestions</a>, <a href="{{ search-url }}">search</a> or simply copy and paste the podcast's URL here{% endblocktrans %}
+  {% blocktrans %}Browse the <a href="{{ toplist-url }}">toplist</a> and your <a href="{{ suggestions-url }}">personal suggestions</a>, <a href="{{ search-url }}">search</a> or paste the URL of the podcast's feed here{% endblocktrans %}
   <form class="form-inline" method="get" action="{% url subscribe-by-url %}">
-   <input class="url" name="url" type="text" />
-   <button class="btn btn-success" type="submit">
-    <i class="icon-ok"></i> {% trans "Subscribe" %}
-   </button>
+   <div class="input-append">
+    <input class="url input-large" name="url" type="text" />
+    <button class="btn btn-success" type="submit">
+     <i class="icon-plus"></i>
+    </button>
+   </div>
   </form>
  </div>
 
