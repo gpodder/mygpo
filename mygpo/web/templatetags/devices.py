@@ -62,7 +62,7 @@ def device_list(devices):
     return mark_safe(''.join(links))
 
 def device_link(device):
-    return '<a href="{link}" title="{name}">{icon}</a>'.format(
+    return u'<a href="{link}" title="{name}">{icon}</a>'.format(
             link = reverse(show, args=[device.uid]),
             name = device.name,
             icon = device_icon(device),
