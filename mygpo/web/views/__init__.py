@@ -136,7 +136,7 @@ def dashboard(request, episode_count=10):
 
     return render(request, 'dashboard.html', {
             'subscribed_podcasts': subscribed_podcasts,
-            'newest_episodes': newest_episodes,
+            'newest_episodes': list(newest_episodes),
             'random_podcast': random_podcast,
             'checklist': checklist,
             'site': site,

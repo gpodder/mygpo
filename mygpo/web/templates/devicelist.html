@@ -15,6 +15,7 @@
 
 {% block content %}
 
+ {% if device_groups %}
    <table class="list">
     <tr>
      <th>{% trans "Name" %}</th>
@@ -46,6 +47,14 @@
      {% endfor %}
     {% endfor %}
    </table>
+
+  {% else %}
+
+   <p>
+    {% blocktrans %}You don't have any devices yet. Go to the <a href="http://wiki.gpodder.org/wiki/Web_Services/Clients">clients</a> page to learn how to set up your client applications.{% endblocktrans %}
+   </p>
+
+  {% endif %}
 
    {% if deleted_devices %}
     <h2>{% trans "Deleted Devices" %}</h2>

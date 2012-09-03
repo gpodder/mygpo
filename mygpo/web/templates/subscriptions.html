@@ -48,8 +48,11 @@
 
  {% else %}
 
- <h2>{% trans "Where to start?" %}</h2>
- <p>{% blocktrans with user.username|striptags as username %}{{ url }} help you to track your podcasts which you have subscribed on your devices - desktop computer, notebook, mobile devices, etc. To start using my.gpodder.org set up <a href="http://gpodder.org">gPodder</a> with your username &ndash; <strong>{{username}}</strong> &ndash; and password and upload your podcasts. They will automatically show up here.{% endblocktrans %}</p>
+  <p>
+   {% url directory-home as directory %}
+   {% url devices as devices %}
+   {% blocktrans %}You don't have any subscriptions yet. Set up your <a href="{{ devices }}">podcast clients</a> and <a href="{{ directory }}">discover interesting podcasts</a>.{% endblocktrans %}
+  </p>
 
  {% endif %}
 {% endblock %}

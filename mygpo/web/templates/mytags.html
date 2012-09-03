@@ -36,10 +36,11 @@
 
  {% else %}
 
-  <div class="info">
+  <p>
    {% url subscriptions as subscriptions-url %}
    {% blocktrans %}You didn't tag any podcasts yet. Go to your <a href="{{ subscriptions-url }}">subscriptions</a> and tag some.{% endblocktrans %}
-  </div>
+  </p>
+
  {% endif %}
 
 {% endblock %}

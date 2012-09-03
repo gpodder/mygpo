@@ -32,6 +32,16 @@
       </tr>
      {% endfor %}
     </table>
+   {% else %}
+    <p>
+     {% blocktrans %}Welcome to {{ site }}! If this is your first visit, you should set up your <a href="http://wiki.gpodder.org/wiki/Web_Services/Clients">podcast client</a> and try to check as many <em>Explore</em> boxes as you can.{% endblocktrans %}
+    </p>
+
+    <p>
+     {% url help as help %}
+     {% blocktrans %}If you have problems, have a look at the <a href="{{ help }}">docs</a> or ask questions on the <a href="http://wiki.gpodder.org/wiki/Mailing_List">mailing list</a> or <a href="https://getsatisfaction.com/gpoddernet">forum</a>.{% endblocktrans %}
+    </p>
+
    {% endif %}
 {% endblock %}
 
@@ -70,6 +80,11 @@
   <div class="well">
    <h4>{% blocktrans %}Explore {{ site }}{% endblocktrans %}</h4>
    <ul>
+    <li class="icon-check">
+     <a href="{% url home %}">
+      {% blocktrans %}Sign up to {{ site }}{% endblocktrans %}
+     </a>
+    </li>
     <li class="icon-check{% if not "devices" in checklist %}-empty{% endif %}">
      <a href="{% url devices %}">
       {% trans "Connect your Podcast Clients" %}

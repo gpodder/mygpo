@@ -33,6 +33,10 @@
       </form>
      </td>
     </tr>
+   {% empty %}
+    <tr>
+     <td colspan="3">{% trans "You don't have any podcast lists yet." %}</td>
+    </tr>
    {% endfor %}
   </table>
 
