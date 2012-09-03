@@ -187,10 +187,13 @@ def blacklist(request, podcast_id):
         suggestion.blacklist.append(podcast_id)
         suggestion.save()
 
-    _update(suggestion=suggestion, podcast_id=blacklisted_podcast.get_id())
+    @repeat_on_conflict(['user'])
+    def _not_uptodate(user):
+        user.suggestions_up_to_date = False
+        user.save()
 
-    request.user.suggestions_up_to_date = False
-    request.user.save()
+    _update(suggestion=suggestion, podcast_id=blacklisted_podcast.get_id())
+    _not_uptodate(user=request.user)
 
     return HttpResponseRedirect(reverse('suggestions'))
 
