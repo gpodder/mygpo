@@ -9,16 +9,17 @@
 
 {% block title %}{% trans "Admin Area" %}{% endblock %}
 
-{% block content %}
+{% block header %}
  <h1>{% trans "Merge Podcasts and Episodes" %}</h1>
- <hr />
 
  <p>Merging Podcasts
   {% for podcast in podcasts %}
    {% podcast_link podcast %}
   {% endfor %}
  </p>
+{% endblock %}
 
+{% block content %}
  <div class="info">
   {% trans "Episodes that have the same number will be merged. Please verify all your changes by clicking on 'Renew Groups' before starting the Merge." %}
  </div>

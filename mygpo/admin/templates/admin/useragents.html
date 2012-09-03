@@ -8,10 +8,11 @@
 
 {% block title %}{% trans "Admin Area" %}{% endblock %}
 
-{% block content %}
+{% block header %
  <h1>{% trans "User-Agent Statistics" %}</h1>
- <hr />
+{% endblock %}
 
+{% block content %}
   <table>
    <tr>
     <th>{% trans "#" %}</th>
