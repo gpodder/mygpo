@@ -3,8 +3,11 @@
 
 {% block title %}{% trans "Bad request" %}{% endblock %}
 
-{% block content %}
+{% block header %}
   <h1>400 {% trans "Bad request" %}</h1>
+{% endblock %}
+
+{% block content %}
   <p>{% trans "There has been an error processing your request." %}</p>
 {% endblock %}
 

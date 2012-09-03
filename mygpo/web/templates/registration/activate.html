@@ -5,13 +5,20 @@
 {% block mainmenu %}{{ "/register/"|main_menu }}{% endblock %}
 {% block sectionmenu %}{{ "/register/"|section_menu }}{% endblock %}
 
+{% block header %}
+  {% if account %}
+   <h1>{% trans "Account activated" %}</h1>
+  {% else %}
+   <h1>{% trans "Account not activated" %}</h1>
+  {% endif %}
+{% endblock %}
+
+
 {% block content %}
   {% if account %}
-  <h1>{% trans "Account activated" %}</h1>
-  <p>{% trans "Your account has been activated! Enjoy using gpodder.net" %}</p>
+   <p>{% trans "Your account has been activated! Enjoy using gpodder.net" %}</p>
   {% else %}
-  <h1>{% trans "Account not activated" %}</h1>
-  <p>{% trans "Your account could not be activated successfully." %}</p>
+   <p>{% trans "Your account could not be activated successfully." %}</p>
   {% endif %}
 {% endblock %}
 

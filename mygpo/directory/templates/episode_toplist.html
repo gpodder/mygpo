@@ -9,86 +9,13 @@
 {% block mainmenu %}{{ "/toplist/episodes"|main_menu }}{% endblock %}
 {% block sectionmenu %}{{ "/toplist/episodes"|section_menu }}{% endblock %}
 
-{% block head %}
- <script type="text/javascript" src="/media/js/jquery-1.4.2.min.js"></script>
- <script type="text/javascript">
-    $(document).ready(function()
-    {
-        $(".config-toplist").hide();
-        $("#open-config").click(function()
-        {
-            $(".config-toplist").slideToggle(500);
-        });
-    });
- </script>
-{% endblock head %}
-
 {% block title %}{% trans "Episode-Toplist" %}{% endblock %}
 
+{% block header %}
+   <h1>{% trans "Episode-Toplist" %}</h1>
+{% endblock %}
+
 {% block content %}
-  <h1>{% trans "Episode-Toplist" %}</h1>
-
-  <p>
-   {% if languages|length_is:"0" %}
-    {% blocktrans with entries|length as count and types|join:", " as media_types %}These are the {{ count }} most listened {{ media_types }} episodes of the last seven days of all languages.{% endblocktrans %}
-   {% else %}
-    {% blocktrans with entries|length as count and all_languages|lookup_list:languages|join:", " as lang and types|join:", " as media_types %}The are the {{ count }} most listened {{ media_types }} episodes of the last seven days for the languages {{ lang }}.{% endblocktrans %}
-   {% endif %}
-   <a href="#" id="open-config">({% trans "change"%})</a>
-  </p>
-
- <div class="config-toplist">
-  <h3>{% trans "Languages" %}</h3>
-  {% if languages|length_is:"0" %}
-   <div>{% trans "Currently showing all languages." %}<br />
-    {% trans "Show a specific one:" %}
-    <form action="{% url episode-toplist %}?lang={{ languages|join:"," }}" method="post">
-     {% csrf_token %}
-     <select name="lang">
-      {% for key, name in all_languages.iteritems %}
-       <option value="{{ key }}">{{ name }}</option>
-      {% endfor %}
-     </select>
-     <input type="submit" value="{% trans "Show" %}" />
-    </form>
-   </div>
-  {% else %}
-   <div>{% trans "Remove a language" %}
-    <ul>
-     {% for lang in languages %}
-      <li>
-       <a href="{% url episode-toplist %}?lang={{ languages|remove:lang|join:"," }}&types={{ types|join:"," }}">{{ all_languages|lookup:lang }}</a>
-      </li>
-     {% endfor %}
-    </ul>
-    <form action="{% url episode-toplist %}?lang={{ languages|join:"," }}&types={{ types|join:"," }}" method="post">
-     {% csrf_token %}
-     <select name="lang">
-      {% for key, name in all_languages.iteritems %}
-       {% if not key in languages %}
-        <option value="{{ key }}">{{ name }}</option>
-       {% endif %}
-      {% endfor %}
-     </select>
-     <input type="submit" value="{% trans "Add" %}" />
-    </form>
-    {% url episode-toplist as episode-toplist-url %}
-    {% blocktrans with types|join:"," as type_param %}or show <a href="{{ episode-toplist-url }}?lang=&types={{ type_param }}">all languages</a>.{% endblocktrans %}
-   </div>
-  {% endif %}
- </div>
-
- <div class="config-toplist">
-  <h3>Media Types</h3>
-  {% for type in all_types %}
-   {% if type in types %}
-    <a class="activated" href="{% url episode-toplist %}?lang={{ languages|join:"," }}&types={{ types|remove:type|join:"," }} ">{{ type }}</a>
-   {% else %}
-    <a class="deactivated" href="{% url episode-toplist %}?lang={{ languages|join:"," }}&types={{ types|append:type|join:"," }}">{{ type }}</a>
-   {% endif %}
-  {% endfor %}
- </div>
-
 
   <table class="list episode_list">
    <tr>
@@ -108,8 +35,41 @@
     <td>{% episode_link entry entry.podcast %}<br/>
      <span class="from_podcast">{% trans "from" %} {% podcast_group_link entry.podcast %}</td>
     <td>{% vertical_bar entry.listeners max_listeners %}</td>
+  {% empty %}
+   <tr>
+    <td colspan="4">
+     {% trans "Currently not available" %}
+    </td>
    </tr>
   {% endfor %}
   </table>
+
+{% endblock %}
+
+
+{% block sidebar %}
+
+  <div class="well">
+   <h4>{% trans "Language" %}</h4>
+    <form class="form-inline" action="{% url episode-toplist %}" method="get">
+     <select class="input-medium" name="lang">
+      {% if language == "" %}
+       <option selected="selected" value="">{% trans "all" %}</option>
+      {% else %}
+       <option value="">{% trans "all" %}</option>
+      {% endif %}
+
+      {% for key, name in all_languages.iteritems %}
+       {% if language == key %}
+        <option selected="selected" value="{{ key }}">{{ name }}</option>
+       {% else %}
+        <option value="{{ key }}">{{ name }}</option>
+       {% endif %}
+      {% endfor %}
+     </select>
+     <input class="btn btn-primary" type="submit" value="{% trans "OK" %}" />
+    </form>
+
+</div>
 
 {% endblock %}

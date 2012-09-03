@@ -25,145 +25,79 @@
 
 {% block title %}{{ podcast.title|default:"Unnamed Podcast"|striptags }}{% endblock %}
 
-{% block content %}
-  {% if podcast.logo_url %}
-  <div id="podcastlogo">{{ podcast|podcast_logo_big }}</div>
-  {% endif %}
+{% block header %}
 
-  <h1>{% if podcast.title %}{{ podcast.title|striptags }}{% else %}{% trans "Unnamed Podcast" %}{%endif%}</h1>
-  <small class="description">
-      {% trans "links" %}:
-      <a href="{{podcast.url}}">{% trans "feed" %}</a>{% if podcast.link %}, <a href="{{podcast.link}}">{% trans "website" %}</a>
-      {% endif %},
-      {% trans "stats:" %} {% blocktrans with podcast.subscriber_count as subscriber_count and podcast.listener_count as listener_count %}{{subscriber_count}} subscribers, {{listener_count}} listeners{% endblocktrans %}
-  </small>
-  <hr style="clear: none;"/>
-
-  {% if related_podcasts %}
-   <div class="related-podcasts">
-    <strong>{% trans "Also available" %}</strong>
-    {% for p in related_podcasts %}
-     {% podcast_group_link p p.group_member_name %}
-    {% endfor %}
-   </div>
-  {% endif %}
-
-  {% if podcast.description %}
-   <p class="description">{{ podcast.description|striptags }}</p>
-  {% endif %}
-
-  <div class="podcast-state">
-
-  <div class="subscriptions">
-   <h2>{% trans "Subscriptions" %}</h2>
-
-  {% if not user.is_authenticated %}
-      <div class="subscribe"><a href="{% podcast_link_target podcast "subscribe" %}"><img src="/media/subscribe.png" style="vertical-align: middle;" alt=""/> {% trans "Subscribe to this podcast" %}</a></div>
-  {% endif %}
-
-  {% if devices or can_subscribe %}
-   <div>
-    <table class="list">
-    {% for device in devices %}
-        <tr>
-            <td>
-                {{ device|device_icon }}
-                <a href="{% url device device.uid %}">{{ device.name|striptags }}</a>
-            </td>
-            <td style="text-align: center;">
-                <a href="{% podcast_link_target podcast "unsubscribe" device.uid %}?return_to={% podcast_link_target podcast %}"><img src="/media/unsubscribe.png" alt="{% trans "Unsubscribe" %}" title="{% trans "Click here to unsubscribe" %}"/></a>
-            </td>
-        </tr>
-    {% endfor %}
-        {% if can_subscribe %}
-         <tr>
-          <form action="{% podcast_link_target podcast "subscribe" %}" method="post">
-           {% csrf_token %}
-           <td>{{ subscribe_form.as_p }}</td>
-           <td style="text-align: center;">
-            <input type="submit" class="subscribe" value="" />
-           </td>
-          </form>
-         </tr>
-        {% endif %}
-
-    </table>
-   </div>
+   {% if podcast.logo_url %}
+    <div id="podcastlogo">{{ podcast|podcast_logo_big }}</div>
    {% endif %}
 
-   </div>
+   <h1>
+    {% if podcast.title %}
+     {{ podcast.title|striptags }}
+    {% else %}
+     {% trans "Unnamed Podcast" %}
+    {%endif%}
+   </h1>
 
-   <div class="tags">
-     <h2>Tags</h2>
+   <small class="description">
+    {% trans "links" %}:
+    <a href="{{podcast.url}}">
+     {% trans "feed" %}
+    </a>
+    {% if podcast.link %},
+     <a href="{{podcast.link}}">{% trans "website" %}</a>
+    {% endif %},
+    {% blocktrans with podcast.subscriber_count as subscriber_count and podcast.listener_count as listener_count %}{{subscriber_count}} subscribers, {{listener_count}} listeners{% endblocktrans %}
+   </small>
 
-     <div class="tag-list">
-     {% for tag in tags %}{% spaceless %}
-       {% if tag.is_own %}
-        <span class="own">{{ tag.tag }} <a class="remove" href="{% podcast_link_target podcast "remove-tag" %}?tag={{ tag.tag }}">X</a></span>
-       {% else %}
-        <span class="other">{{ tag.tag }}</span>
-       {% endif %}
-       {% if not forloop.last %}<span class="seperator">,</span>{% endif %}
-      {% endspaceless %}
+   {% if related_podcasts %}
+    <div class="related-podcasts">
+     <strong>{% trans "Also available" %}</strong>
+     {% for p in related_podcasts %}
+      {% podcast_group_link p p.group_member_name %}
      {% endfor %}
-     {% if user.is_authenticated %}
-      <form action="{% podcast_link_target podcast "add-tag" %}">
-       <input type="text" name="tag" />
-       <input type="submit" class="subscribe" value="" />
-      </form>
-     {% endif %}
     </div>
-   </div>
+   {% endif %}
 
-   <div class="share">
-    <h2>{% trans "Share" %}</h2>
-    <div>
-     {% google_plus_one_button %}
-     {{ podcast|fb_like_podcast }}
+   {% if podcast.description %}
+    <p class="description">{{ podcast.description|striptags }}</p>
+   {% endif %}
 
-     {% if user.is_authenticated and devices %}
-     {% if is_public %}
-       <form action="{% podcast_link_target podcast "podcast-private" %}" method="POST">
-         {% csrf_token %}
-         <button type="submit" class="public" name="public">
-           <img src="/media/32x32/public.png" alt="" />
-           {% trans "Public. Make Private" %}
-         </button>
-       </form>
+{% endblock %}
 
-     {% else %}
-       <form action="{% podcast_link_target podcast "podcast-public" %}" method="POST">
-         {% csrf_token %}
-         <button type="submit" class="private" name="private">
-           <img src="/media/32x32/private.png" alt="" />
-           {% trans "Private. Make Public" %}
-         </button>
-       </form>
 
-     {% endif %}
-     {% endif %}
+
+{% block content %}
+
+  {% if episode %}
+   <div class="first-episode">
+
+    <h2>{{ episode.title }} <small>{{ episode.released|naturalday }}</small></h2>
+    <div class="description">
+     {{ episode.description|default:""|striptags|truncatewords:"100" }}
     </div>
+    <a href="{% episode_link_target episode podcast %}">more...</a>
+
    </div>
-
-  </div>
-
+  {% endif %}
 
   {% if episodes %}
-   <hr/>
+
+  <h3>{% trans "Older Episodes" %}</h3>
    <table class="list episode_list" id="episodes">
     <tr>
      <th></th>
-     <th>{% trans "Episode" %}</th>
+     <th>{% trans "Title" %}</th>
      <th>{% trans "Released" %}</th>
      <th>{% trans "Listeners" %}</th>
     </tr>
 
     {% for episode in episodes %}
      <tr>
-      <td style="text-align: center; padding-left: 5px; padding-right: 5px;">{{ episode.action|episode_status_icon }}</td>
-      <td style="width: 500px;">
-          <p class="title">{% episode_link episode podcast %}</p>
-          <p class="description">{{ episode.description|default:""|striptags|truncatewords:"15" }}</p>
+      <td>{{ episode.action|episode_status_icon }}</td>
+      <td class="short">
+          <div class="title">{% episode_link episode podcast %}</div>
+          <p class="description short">{{ episode.description|default:""|striptags }}</p>
       </td>
       <td>{{ episode.released|default:""|date:"Y-m-d" }}</td>
       <td>
@@ -173,18 +107,111 @@
       </td>
      </tr>
     {% endfor %}
+
+    <tr>
+     <td></td>
+     <td>
+      <a href="{% podcast_link_target podcast "podcast-all-episodes" %}">{% trans "All Episodes" %}</a>
+     </td>
+     <td></td>
+     <td></td>
+    </tr>
+
    </table>
   {% endif %}
 
+{% endblock %}
+
+
+{% block sidebar %}
+
+  <div class="well">
+   <h4>{% trans "Subscriptions" %}</h4>
+   {% if not user.is_authenticated %}
+    <div class="subscribe">
+     <a href="{% podcast_link_target podcast "subscribe" %}">
+      <img src="/media/subscribe.png" style="vertical-align: middle;" alt=""/>
+      {% trans "Subscribe to this podcast" %}
+     </a>
+    </div>
+   {% endif %}
+
+   {% if devices or can_subscribe %}
+    <table class="list">
+      {% for device in devices %}
+       <tr>
+        <td>
+         {{ device|device_icon }}
+         <a href="{% url device device.uid %}">{{ device.name|striptags }}</a>
+        </td>
+        <td style="text-align: center;">
+         <form class="form-inline" method="post" action="{% podcast_link_target podcast "unsubscribe" device.uid %}?return_to={% podcast_link_target podcast %}">
+          <button class="btn btn-danger" type="submit">
+           <i class="icon-remove"></i>
+          </button>
+         </form>
+        </td>
+       </tr>
+      {% endfor %}
+      {% if can_subscribe %}
+       <tr>
+        <form class="form-inline" action="{% podcast_link_target podcast "subscribe" %}" method="post">
+         {% csrf_token %}
+         <td>{{ subscribe_form.as_p }}</td>
+         <td style="text-align: center;">
+          <button class="btn btn-success btn-small" type="submit">
+           <i class="icon-ok"></i>
+          </button>
+         </td>
+        </form>
+       </tr>
+      {% endif %}
+     </table>
+   {% endif %}
+
+  </div>
+
+
+  <div class="well">
+   <h4>Tags</h4>
+
+   {% for tag in tags %}
+    {% spaceless %}
+     {% if tag.is_own %}
+      <span class="own">{{ tag.tag }} <a class="remove" href="{% podcast_link_target podcast "remove-tag" %}?tag={{ tag.tag }}">X</a></span>
+     {% else %}
+       <span class="other">{{ tag.tag }}</span>
+     {% endif %}
+     {% if not forloop.last %}
+      <span class="seperator">,</span>
+     {% endif %}
+    {% endspaceless %}
+   {% endfor %}
+
+   {% if user.is_authenticated %}
+    <form class="form-inline" action="{% podcast_link_target podcast "add-tag" %}">
+     <div class="input-prepend btn-append">
+      <span class="add-on"><i class="icon-tag"></i></span><input class="input-small" type="text" name="tag" /><button class="btn btn-success" type="submit">
+      <i class="icon-plus"></i>
+     </button>
+     </div>
+    </form>
+   {% endif %}
+  </div>
+
+  <div class="well">
+   <h4>{% trans "Share" %}</h4>
+
+   {% google_plus_one_button %}
+   {{ podcast|fb_like_podcast }}
+
+ </div>
+
+
   {% if history %}
-   <hr/>
-   <h2>{% trans "Subscription History" %}</h2>
+  <div class="well">
+   <h4>{% trans "Subscription History" %}</h4>
    <table class="list">
-    <tr>
-     <th>{% trans "Timestamp" %}</th>
-     <th>{% trans "Action" %}</th>
-     <th>{% trans "Devices" %}</th>
-    </tr>
     {% for s in history %}
      <tr>
       <td><abbr title="{{ s.timestamp }}">{{ s.timestamp|naturalday }}</abbr></td>
@@ -195,10 +222,7 @@
      </tr>
     {% endfor %}
    </table>
-  {% endif %}
-
-  {% if not podcast.title %}
-   <div class="info"><strong>{% trans "Why Unnamed Podcast?" %}</strong> {% trans "Because we display names after we have fetched the information form the feed -- and this may take some time. Until this is completed, the podcast will simply be called this way." %}</div>
+  </div>
   {% endif %}
 
 {% endblock %}

@@ -17,7 +17,7 @@
   {% endif %}
 {% endblock %}
 
-{% block content %}
+{% block header %}
   {% if podcast.logo_url %}
   <div id="podcastlogo">{{ podcast|podcast_logo_big }}</div>
   {% endif %}
@@ -29,8 +29,10 @@
       {% endif %},
       {% trans "stats:" %} {% blocktrans with podcast.subscriber_count as subscriber_count and podcast.listener_count as listener_count %}{{subscriber_count}} subscribers, {{listener_count}} listeners{% endblocktrans %}
   </small>
-  <hr style="clear: none;"/>
+{% endblock %}
 
+
+{% block content %}
   <h2>Edit</h2>
   {% comment %}
   <p>Please note that information updates from the podcast feed will overwrite any information given here. Please save only what is not contained in the feed.</p>
@@ -77,7 +79,6 @@
     </div>
     {{ heatmap|episode_heatmap_visualization }}
   {% endif %}
-
 
 {% endblock %}
 

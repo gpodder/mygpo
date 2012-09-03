@@ -14,7 +14,7 @@
 
 {% block title %}{% blocktrans with podcast.title|default:"Unnamed Podcast"|striptags as podcasttitle %}Subscribe to {{ podcasttitle }}{% endblocktrans %}{% endblock %}
 
-{% block content %}
+{% block header %}
   {% if podcast.logo_url %}
   <div id="podcastlogo">{{ podcast|podcast_logo_big }}</div>
   {% endif %}
@@ -30,7 +30,10 @@
   {% if podcast.description %}
    <p class="description">{{ podcast.description|striptags }}</p>
    {% endif %}
-   <hr/>
+{% endblock %}
+
+
+{% block content %}
 
    <h2>{% trans "Add a podcast" %}</h2>
   {% if can_subscribe %}

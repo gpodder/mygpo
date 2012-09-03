@@ -8,120 +8,66 @@
 
 {% block title %}{% trans "Sharing" %}{% endblock %}
 
-{% block content %}
-
+{% block header %}
  <h1>{% trans "Share" %}</h1>
+{% endblock %}
+
+
+{% block content %}
 
  <table class="list">
 
   <tr>
-   <th>{% trans "Content" %}</th>
-   <th>{% trans "Status" %}</th>
-   <th></th>
-   <th>{% trans "Links" %}</th>
-   <th>{% trans "Edit" %}</th>
-  </tr>
-
-  <tr>
-   <td>{% trans "Subscriptions" %}</td>
+   <td><i class="icon-rss icon-large"></i> {% trans "Subscriptions" %}</td>
    <td>
-    {% if subscriptions_token %}
-     {% trans "Private" %}
-    {% else %}
-     {% trans "Public" %}
-    {% endif%}
-   </td>
-   <td>
-    {% if subscriptions_token %}
-     <form method="post" action="{% url subscriptions-public %}">
-      {% csrf_token %}
-      <input type="submit" value="{% trans "Make Public" %}" />
-     </form>
-     <form method="post" action="{% url subscriptions-private %}">
-      {% csrf_token %}
-      <input type="submit" value="{% trans "New Token" %}" />
-     </form>
-    {% else %}
-     <form method="post" action="{% url subscriptions-private %}">
-      {% csrf_token %}
-      <input type="submit" value="{% trans "Make Private" %}" />
-     </form>
-    {% endif %}
+    <div class="btn-group">
+     <button class="btn btn-small {% if not subscriptions_token %}disabled btn-primary{% endif %}" onclick="submitForm('subscriptions_public');">{% trans "Public" %}</button>
+     <button class="btn btn-small {% if subscriptions_token %}disabled btn-primary{% endif %}" onclick="submitForm('subscriptions_private');">{% trans "Private" %}</button>
+    </div>
    </td>
    <td>
     <a href="{% url shared-subscriptions user.username %}{% if subscriptions_token %}?token={{ subscriptions_token }}{% endif %}">
-     <img src="/media/22x22/internet-web-browser.png" class="action-button" />
-    <a href="{% url shared-subscriptions-opml user.username %}{% if subscriptions_token %}?token={{ subscriptions_token }}{% endif %}">
-     <img src="/media/22x22/opml-icon.png" class="action-button" />
+     <img src="/media/22x22/internet-web-browser.png" class="action-button" /></a>
     <a href="{% url shared-subscriptions-rss user.username %}{% if subscriptions_token %}?token={{ subscriptions_token }}{% endif %}">
-     <img height="22" width="22" src="/media/28x28/feed-icon.png" class="action-button" />
-    </a>
+     <img height="22" width="22" src="/media/28x28/feed-icon.png" class="action-button" /></a>
+    <a href="{% url shared-subscriptions-opml user.username %}{% if subscriptions_token %}?token={{ subscriptions_token }}{% endif %}">
+     <img src="/media/22x22/opml-icon.png" class="action-button" /></a>
    </td>
    <td>
-    <a href="{%url privacy %}">Privacy Settings</a>
+    <button class="btn btn-small btn-link {% if not subscriptions_token %}disabled{% endif %}" {% if subscriptions_token %}type="submit" onclick="submitForm('subscriptions_private');"{% endif %}>{% trans "New Token" %}</button>
+    <a class="btn btn-small btn-link" href="{%url privacy %}">Privacy Settings</a>
    </td>
   </tr>
 
   <tr>
-   <td>{% trans "User Page" %}</td>
+   <td><i class="icon-user icon-large"></i> {% trans "User Page" %}</td>
    <td>
-    {% if userpage_token %}
-     {% trans "Private" %}
-    {% else %}
-     {% trans "Public" %}
-    {% endif %}
-   </td>
-   <td>
-    {% if userpage_token %}
-     <form method="post" action="{% url userpage-public %}">
-      {% csrf_token %}
-      <input type="submit" value="{% trans "Make Public" %}" />
-     </form>
-     <form method="post" action="{% url userpage-private %}">
-      {% csrf_token %}
-      <input type="submit" value="{% trans "New Token" %}" />
-     </form>
-    {% else %}
-     <form method="post" action="{% url userpage-private %}">
-      {% csrf_token %}
-      <input type="submit" value="{% trans "Make Private" %}" />
-     </form>
-    {% endif %}
+    <div class="btn-group">
+     <button class="btn btn-small {% if not userpage_token %}disabled btn-primary{% endif %}" onclick="submitForm('userpage_public');">{% trans "Public" %}</button>
+     <button class="btn btn-small {% if userpage_token %}disabled btn-primary{% endif %}" onclick="submitForm('userpage_private');">{% trans "Private" %}</button>
+    </div>
    <td>
     <a href="{% url user user.username %}{% if userpage_token %}?token={{ userpage_token }}{% endif %}">
      <img src="/media/22x22/internet-web-browser.png" class="action-button" />
     </a>
    </td>
-   <td></td>
+   <td>
+    <button class="btn btn-small btn-link {% if not userpage_token %}disabled{% endif %}" {% if userpage_token %}type="submit" onclick="submitForm('userpage_private');"{% endif %}>{% trans "New Token" %}</button>
+   </td>
   </tr>
 
   <tr>
-   <td>{% trans "Favorites Feed" %}</td>
+   <td><i class="icon-star icon-large"></i> {% trans "Favorites Feed" %}</td>
    <td>
-    {% if favfeed_token %}
-     {% trans "Private" %}
-    {% else %}
-     {% trans "Public" %}
-    {% endif %}
+    <div class="btn-group">
+     <button class="btn btn-small {% if not favfeed_token %}disabled btn-primary{% endif %}" onclick="submitForm('favfeed_public');">{% trans "Public" %}</button>
+     <button class="btn btn-small {% if favfeed_token %}disabled btn-primary{% endif %}" onclick="submitForm('favfeed_private');">{% trans "Private" %}</button>
+    </div>
    </td>
    <td>
-    {% if favfeed_token %}
-     <form method="post" action="{% url favfeed-public %}">
-      {% csrf_token %}
-      <input type="submit" value="{% trans "Make Public" %}" />
-     </form>
-     <form method="post" action="{% url favfeed-private %}">
-      {% csrf_token %}
-      <input type="submit" value="{% trans "New Token" %}" />
-     </form>
-    {% else %}
-     <form method="post" action="{% url favfeed-private %}">
-      {% csrf_token %}
-      <input type="submit" value="{% trans "Make Private" %}" />
-     </form>
+    {% if favfeed_podcast %}
+     <a href="{% podcast_link_target favfeed_podcast %}"><img src="/media/22x22/internet-web-browser.png" class="action-button" /></a>
     {% endif %}
-   </td>
-   <td>
     {% if favfeed_token %}
      <a href="https://{{ user.username }}:{{ favfeed_token }}@{{ site.domain }}{% url favorites-feed user.username %}">
       <img height="22" width="22" src="/media/28x28/feed-icon.png" class="action-button" />
@@ -131,23 +77,63 @@
       <img height="22" width="22" src="/media/28x28/feed-icon.png" class="action-button" />
      </a>
     {% endif %}
-    <a href="{% url subscribe-by-url %}?url=http://{{ site.domain }}{% url favorites-feed user.username %}">
-      <img height="22" width="22" src="/media/subscribe.png" class="action-button" />
-    </a>
-    {% if favfeed_podcast %}
-     <a href="{% podcast_link_target favfeed_podcast %}">Website</a>
-    {% endif %}
    </td>
    <td>
-    <a href="{% url favorites %}">Edit Favorites</a>
+    <button class="btn btn-small btn-link {% if not favfeed_token %}disabled{% endif %}" {% if favfeed_token %}type="submit" onclick="submitForm('favfeed_private');"{% endif %}>{% trans "New Token" %}</button>
+    <a class="btn btn-small btn-link" href="{% url favorites %}">Edit Favorites</a>
    </td>
   </tr>
 
  </table>
 
- <div class="info">
-  {% trans "Add <tt>&amp;symbian=true#.opml</tt> to the OPML URL to get an OPML file for Nokia Podcasting on Symbian devices." %}
- </div>
 
+
+ <form id="subscriptions_public" method="post" action="{% url subscriptions-public %}">
+  {% csrf_token %}
+ </form>
+
+ <form id="subscriptions_private" method="post" action="{% url subscriptions-private %}">
+  {% csrf_token %}
+ </form>
+
+ <form id="userpage_public" method="post" action="{% url userpage-public %}">
+  {% csrf_token %}
+ </form>
+
+ <form id="userpage_private" method="post" action="{% url userpage-private %}">
+  {% csrf_token %}
+ </form>
+
+ <form id="favfeed_public" method="post" action="{% url favfeed-public %}">
+  {% csrf_token %}
+ </form>
+
+ <form id="favfeed_private" method="post" action="{% url favfeed-private %}">
+  {% csrf_token %}
+ </form>
+
+{% endblock %}
+
+
+{% block javascript %}
+    <script language="javascript">
+        <!--
+        function submitForm(formid)
+        {
+            document.forms[formid].submit();
+            return true;
+        }
+        -->
+    </script>
+{% endblock %}
+
+
+
+{% block sidebar %}
+
+ <div class="well">
+  <h4>{% trans "Private Items" %}</h4>
+  <p>{% trans "Private items are protected by a special token. Only those who know the exact link can access your content" %}</p>
+ </div>
 
 {% endblock %}

@@ -45,7 +45,6 @@ def login(request, user):
     login(request, user)
 
 
-
 @never_cache
 def login_user(request):
     # Do not show login page for already-logged-in users
@@ -53,15 +52,10 @@ def login_user(request):
         return HttpResponseRedirect(DEFAULT_LOGIN_REDIRECT)
 
     if 'user' not in request.POST or 'pwd' not in request.POST:
-        if request.GET.get('restore_password', False):
-            form = RestorePasswordForm()
-        else:
-            form = None
 
         return render(request, 'login.html', {
             'url': RequestSite(request),
             'next': request.GET.get('next', ''),
-            'restore_password_form': form,
         })
 
     username = request.POST['user']
@@ -112,8 +106,15 @@ def get_user(username, email, is_active=None):
 
 
 @never_cache
-@allowed_methods(['POST'])
 def restore_password(request):
+
+    if request.method == 'GET':
+        form = RestorePasswordForm()
+        return render(request, 'restore_password.html', {
+            'form': form,
+        })
+
+
     form = RestorePasswordForm(request.POST)
     if not form.is_valid():
         return HttpResponseRedirect('/login/')

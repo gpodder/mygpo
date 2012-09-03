@@ -8,8 +8,12 @@
 
 {% block title %}{% trans "Publisher Pages" %}{% endblock %}
 
-{% block content %}
+{% block header %}
  <h1>{% trans "Publisher Services" %}</h1>
+{% endblock %}
+
+
+{% block content %}
 
  <p>{% blocktrans with site as sitename %}{{ sitename }} offers several services for podcast publishers.{% endblocktrans %}</p>
 
@@ -38,7 +42,6 @@
 
  {% url link-here as link-here-url %}
  <p>{% blocktrans with site as sitename %}If you <a href="{{ link-here-url }}">link to {{ sitename }}</a> from your website, you can make it really easy for your visitors to subscribe to your podcast - especially for users of mobile phones.{% endblocktrans %}</p>
-
 
 {% endblock %}
 

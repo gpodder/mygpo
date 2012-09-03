@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load charts %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/admin/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/admin/"|section_menu:"Admin" }}{% endblock %}
+
+{% block title %}{% trans "Admin Area" %}{% endblock %}
+
+{% block header %}
+ <h1>{% trans "Statistics" %}</h1>
+{% endblock %}
+
+{% block content %}
+  <table class="list">
+   <tr>
+    <th>{% trans "Property" %}</th>
+    <th>{% trans "Value" %}</th>
+   </tr>
+
+   {% for key, value in stats.items %}
+    <tr>
+     <td>{{ key }}</td>
+     <td>{{ value }}</td>
+    </tr>
+   {% endfor %}
+
+  </table>
+
+{% endblock %}
+

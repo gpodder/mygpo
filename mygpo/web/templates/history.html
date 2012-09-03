@@ -11,9 +11,12 @@
 
 {% block title %}{% trans "Subscription and Episode History" %}{% if device %} {% trans "for" %} {{ device.name|striptags }}{% endif %}{% endblock %}
 
-{% block content %}
+{% block header %}
 <h1>{% trans "Subscription and Episode History" %}{% if device %} {% trans "for" %} {{ device.name|striptags }}{% endif %}</h1>
-<p>{% trans "This is a list of recent subscription and episode actions for your account." %}</p>
+{% endblock %}
+
+
+{% block content %}
 
    {% if device %}
     <a href="{% url device device.uid %}">{% trans "Back to" %} {{ device|device_icon }} {{ device.name|striptags}}</a>
@@ -21,16 +24,10 @@
 
    {% if not history|length_is:"0" %}
    <table class="list">
-    <tr>
-     <th></th>
-     <th>{% trans "Podcast/Episode" %}</th>
-     <th style="text-align: center;">{% trans "Date" %}</th>
-     <th style="text-align: center;">{% trans "Action" %}</th>
-     <th>{% trans "Device" %}</th>
-    </tr>
+
     {% for s in history %}
      <tr>
-       <td>
+       <td class="logo">
         {% if s.podcast %}
          {{ s.podcast|podcast_logo }}
         {% endif %}
@@ -45,7 +42,7 @@
         {% if s.episode %}
          {% episode_link s.episode s.podcast %}
           {% if s.podcast %}
-           <br /><span class="from_podcast">{% trans "from" %} {% podcast_group_link s.podcast %}</span>
+           <br /><span class="from_podcast">{% podcast_group_link s.podcast %}</span>
           {% endif %}
         {% endif %}
        {% endif %}
@@ -60,35 +57,38 @@
       </td>
       <td>
        {% if s.device %}
-        {% if s.device.oldid %}
-         <a href="{% url device s.device.uid %}">{{ s.device|device_icon }}&nbsp;{{ s.device.name|striptags }}</a>
-        {% else %}
-         <a href="{% url device s.device.id %}">{{ s.device|device_icon }}&nbsp;{{ s.device.name|striptags }}</a>
-        {% endif %}
+        <a href="{% url device s.device.uid %}">{{ s.device|device_icon }}&nbsp;{{ s.device.name|striptags }}</a>
        {% endif %}
       </td>
      </tr>
     {% endfor %}
    </table>
+
+  {% else %}
+
+   <p>{% trans "Nothing happened yet." %}</p>
+
   {% endif %}
 
 
-  <div class="navigation">
-   <div class="prev">
+  <div class="pagination">
+   <ul>
     {% if page > 0 %}
-     <a href="?page={{page|add:"-1"}}">{% trans "«« Later" %}</a>
+     <li>
+      <a href="?page={{page|add:"-1"}}">«« {% trans "Later" %}</a>
+     </li>
     {% endif %}
-   </div>
-   <div class="list">
     {% if page != 0 %}
-     <a href="?page=0">{% trans "Now" %}</a>
+     <li>
+      <a href="?page=0">{% trans "Now" %}</a>
+     </li>
     {% endif %}
-   </div>
-   <div class="next">
     {% if history %}
-     <a href="?page={{page|add:"1"}}">{% trans "Earlier »»" %}</a>
+     <li>
+      <a href="?page={{page|add:"1"}}">{% trans "Earlier" %} »»</a>
+     </li>
     {% endif %}
-   </div>
+   </ul>
   </div>
 
 {% endblock %}

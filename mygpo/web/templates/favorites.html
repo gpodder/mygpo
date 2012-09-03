@@ -9,68 +9,66 @@
 
 {% block title %}{% trans "Favorite Episodes" %}{% endblock %}
 
-{% block content %}
+{% block header %}
   <h1>{% trans "Favorite Episodes" %}</h1>
+{% endblock %}
 
-  {% if episodes %}
+
+{% block content %}
+
   <table class="list episode_list">
-   <tr>
-    <th></th>
-    <th></th>
-   </tr>
   {% for episode in episodes %}
    <tr>
-    <td>{% if episode.podcast %}{{ episode.podcast|podcast_logo }}{% endif %}</td>
+    <td class="logo">{% if episode.podcast %}{{ episode.podcast|podcast_logo }}{% endif %}</td>
     <td>{% episode_link episode episode.podcast %}<br/>
      {% if episode.podcast %}
-      <span class="from_podcast">{% trans "from" %} {% podcast_group_link episode.podcast %}</td>
+      <span class="from_podcast">{% podcast_group_link episode.podcast %}</span>
      {% endif %}
+    </td>
+    <td>
+     <span class="icon-star"></span>
+    </td>
    </tr>
+  {% empty %}
+   empty here
   {% endfor %}
   </table>
 
-  <h2>Favorites-Feed</h2>
-   <p>
-    {% url favorites-feed user.username as favorites-feed-url %}
-    {% blocktrans with user.username as username and site.domain as domain %}You can access a feed containing your favorites episodes at
-     <strong><a href="{{ favorites-feed-url }}">http://{{ domain }}{{ favorites-feed-url }}</a></strong>.{% endblocktrans %}
-   </p>
-   <div>
-    <a href="{% url subscribe-by-url %}?url=http://{{ site.domain }}{% url favorites-feed user.username %}">
-     <img src="/media/subscribe.png" style="vertical-align: middle;" /> {% trans "Subscribe" %}
-    </a>
-   </div>
-
-   <h3>Access to your Favorites</h3>
-   {% if feed_token %}
-    <p>
-     {% blocktrans with user.username as username and feed_token as token %}To keep your favorites private (from others and from the public pages of {{ site }}), you need to use HTTP-Authentication in your client. Use username <strong>{{ username }}</strong> and password <strong>{{ token }}</strong>.{% endblocktrans %}
-    </p>
-    <ul>
-     <li><a href="{% url favorites %}?private_feed">{% trans "create a new password" %}</a></li>
-     <li><a href="{% url favorites %}?public_feed">{% trans "don't require a password" %}</a>
-      and make my favorites visible on {{ site }}</li>
-    </ul>
-   {% else %}
-    <p>
-     {% blocktrans with site as sitename %}You've marked your favorites-feed as public and others can
-      subscribe to it. It will also be indexed by {{ sitename }}.{% endblocktrans %}
-    </p>
-    <ul>
-     {% if podcast %}
-      <li><a href="{% podcast_link_target podcast %}">public information about your favorites-feed</a></li>
-     {% endif %}
-     <li><a href="{% url favorites %}?private_feed">{% trans "require a password for this feed" %}</a></li>
-    </ul>
-   {% endif %}
-  {% else %}
-
-   {% url episode-toplist as episode-toplist-url %}
-   <p>{% blocktrans %}You don't have any episodes marked as favorites yet. Maybe have a look at the <a href="{{ episode-toplist-url }}">episode toplist</a>.{% endblocktrans %}</p>
-
-   <p>{% blocktrans %}Once you've selected your favorites, you can subscribe to your very own <em>Favorites-Feed</em> that contains your favorite episodes{% endblocktrans %}</p>
-
-  {% endif %}
-
+  <div class="btn-group">
+   <a class="btn" href="{% url share-favorites %}">
+    <i class="icon-share"></i> {% trans "Share" %}
+   </a>
+  </div>
 {% endblock %}
 
+
+{% block sidebar %}
+ <div class="well">
+  <h4>Recently Listened</h4>
+
+  <table class="list episode_list">
+  {% for episode in recently_listened %}
+
+   <tr>
+    <td class="logo">{% if episode.podcast %}{{ episode.podcast|podcast_logo }}{% endif %}</td>
+    <td>
+     {% if episode.podcast %}
+      {% episode_link episode episode.podcast %}<br/>
+      <span class="from_podcast">{% podcast_group_link episode.podcast %}</span>
+     {% endif %}
+    </td>
+    <td>
+     <form class="form-inline" action="">
+      {% if episode in episodes %}
+       <span class="icon-star"></span>
+      {% else %}
+       <span class="icon-star-empty"></span>
+      {% endif %}
+     </form>
+    </td>
+   </tr>
+
+  {% endfor %}
+  </table>
+
+{% endblock %}

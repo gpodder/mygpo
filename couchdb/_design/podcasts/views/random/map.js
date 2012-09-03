@@ -2,7 +2,7 @@ function (doc)
 {
     function searchPodcast(podcast)
     {
-        if(!podcast.title)
+        if(!podcast.title.trim() || !podcast.description.trim() || !podcast.logo_url)
         {
             return;
         }

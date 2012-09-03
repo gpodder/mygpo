@@ -16,9 +16,9 @@
 #
 
 import sys
-from itertools import islice
 from collections import defaultdict
 from datetime import datetime, timedelta
+from itertools import islice
 
 import gevent
 
@@ -36,6 +36,7 @@ from django.views.decorators.cache import never_cache, cache_control
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core import models
 from mygpo.core.models import Podcast, Episode
+from mygpo.core.podcasts import PodcastSet
 from mygpo.directory.tags import Tag
 from mygpo.directory.toplist import PodcastToplist
 from mygpo.users.models import Suggestions, History, HistoryEntry, DeviceDoesNotExist
@@ -44,6 +45,7 @@ from mygpo.web import utils
 from mygpo.api import backend
 from mygpo.utils import flatten, parse_range
 from mygpo.cache import get_cache_or_calc
+from mygpo.share.models import PodcastList
 
 
 @vary_on_cookie
@@ -60,12 +62,9 @@ def home(request):
 def welcome(request):
     current_site = RequestSite(request)
 
-    podcasts = get_cache_or_calc('podcast-count', timeout=60*60,
-                    calc=lambda: Podcast.count())
-    users    = get_cache_or_calc('user-count', timeout=60*60,
-                    calc=lambda: User.count())
-    episodes = get_cache_or_calc('episode-count', timeout=60*60,
-                    calc=lambda: Episode.count())
+    podcasts = get_cache_or_calc('podcast-count', 60*60, Podcast.count)
+    users    = get_cache_or_calc('user-count', 60*60, User.count)
+    episodes = get_cache_or_calc('episode-count', 60*60, Episode.count)
 
     lang = utils.process_lang_params(request)
 
@@ -85,29 +84,63 @@ def welcome(request):
 @login_required
 def dashboard(request, episode_count=10):
 
+    subscribed_podcasts = list(request.user.get_subscribed_podcasts())
     site = RequestSite(request)
 
-    user = request.user
-    subscribed_podcasts = user.get_subscribed_podcasts()
-    devices = user.active_devices
+    checklist = []
+
+    if request.user.devices:
+        checklist.append('devices')
+
+    if subscribed_podcasts:
+        checklist.append('subscriptions')
+
+    if backend.get_favorites(request.user):
+        checklist.append('favorites')
+
+    if not request.user.get_token('subscriptions_token'):
+        checklist.append('share')
+
+    if not request.user.get_token('favorite_feeds_token'):
+        checklist.append('share-favorites')
+
+    if not request.user.get_token('userpage_token'):
+        checklist.append('userpage')
+
+    if Tag.for_user(request.user):
+        checklist.append('tags')
+
+    if PodcastList.for_user(request.user._id):
+        checklist.append('lists')
+
+    if request.user.published_objects:
+        checklist.append('publish')
 
     tomorrow = datetime.today() + timedelta(days=1)
-    newest_episodes = user.get_newest_episodes(tomorrow)
-    newest_episodes = islice(newest_episodes, 0, episode_count)
 
-    lang = utils.get_accepted_lang(request)
-    lang = utils.sanitize_language_codes(lang)
+    podcasts = PodcastSet(subscribed_podcasts)
 
-    # for performance reasons, we only consider the first three languages
-    lang = lang[:3]
-    random_podcasts = islice(backend.get_random_picks(lang), 0, 5)
+    newest_episodes = get_cache_or_calc('newest-episodes-user-%s' %
+            request.user._id, 60, podcasts.get_newest_episodes, tomorrow,
+            episode_count)
+
+    random_podcast = next(Podcast.random(), None)
+    if random_podcast:
+        random_podcast = random_podcast.get_podcast()
+
+    # we only show the "install reader" link in firefox, because we don't know
+    # yet how/if this works in other browsers.
+    # hints appreciated at https://bugs.gpodder.org/show_bug.cgi?id=58
+    show_install_reader = \
+                'firefox' in request.META.get('HTTP_USER_AGENT', '').lower()
 
     return render(request, 'dashboard.html', {
-            'site': site,
-            'devices': devices,
             'subscribed_podcasts': subscribed_podcasts,
-            'newest_episodes': newest_episodes,
-            'random_podcasts': random_podcasts,
+            'newest_episodes': list(newest_episodes),
+            'random_podcast': random_podcast,
+            'checklist': checklist,
+            'site': site,
+            'show_install_reader': show_install_reader,
         })
 
 

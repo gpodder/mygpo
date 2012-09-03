@@ -8,9 +8,11 @@
 
 {% block title %}{{ other_user.username }}{% endblock %}
 
-{% block content %}
+{% block header %}
  <h1>{{ other_user.username }}</h1>
+{% endblock %}
 
+{% block content %}
  <p>{% blocktrans with other_user.username as username %}{{ username }} didn't share his user page with you. Maybe you should contact him to get the correct link.{% endblocktrans %}</p>
 
  {% if user.is_authenticated %}

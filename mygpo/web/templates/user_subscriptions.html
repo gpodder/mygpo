@@ -14,36 +14,35 @@
  {% blocktrans with other_user.username as username%}{{ username }}'s Subscriptions{% endblocktrans %}
 {% endblock %}
 
-{% block content %}
+{% block header %}
 <h1>{% blocktrans with other_user.username as username%}{{ username }}'s Subscriptions{% endblocktrans %}</h1>
-
 <small class="description">
  {% url user other_user.username as userpage-url %}
  {% blocktrans with subscriptions|length as num_subscriptions and other_user.username as username %}<a href="{{userpage-url}}">{{username}}</a> has {{num_subscriptions}} subscriptions{% endblocktrans %}
 </small>
 
-<hr />
+{% endblock %}
+
+
+{% block content %}
 
  {% if not subscriptionlist|length_is:"0" %}
  <table class="list">
 
   {% for p in subscriptions %}
    <tr>
-    <td>{{ p|podcast_logo }}</td>
+    <td class="logo">{{ p|podcast_logo }}</td>
     <td class="listlink">{% podcast_group_link p %}</td>
    </tr>
   {% endfor %}
   </table>
 
-  <div>
-   <a href="{% url shared-subscriptions-opml other_user.username %}{% if token %}?token={{ token }}{% endif %}">
-    <img src="/media/download.png" class="action-button" /> {% trans "Download Subscriptions as OPML" %}
+  <div class="btn-group">
+   <a class="btn" href="{% url shared-subscriptions-opml other_user.username %}{% if token %}?token={{ token }}{% endif %}">
+    <i class="icon-download"></i>{% trans "Download Subscriptions as OPML" %}
    </a>
-  </div>
-
-  <div>
-   <a href="{% url shared-subscriptions-rss other_user.username %}{% if token %}?token={{ token }}{% endif %}">
-    <img src="/media/feed-icon-22.png" class="action-button" /> {% trans "Subscribe to Changes" %}
+   <a class="btn" href="{% url shared-subscriptions-rss other_user.username %}{% if token %}?token={{ token }}{% endif %}">
+    <i class="icon-rss"></i> {% trans "Subscribe to Changes" %}
    </a>
   </div>
 
@@ -53,12 +52,25 @@
 
  {% endif %}
 
- {% if user.is_authenticated %}
-  <div class="info"><strong>{% trans "Want to share your subscriptions?" %}</strong>
+{% endblock %}
 
-  {% url share as share-url %}
-  {% blocktrans %}Get your link on the <a href="{{ share-url }}">Sharing page</a>.</a>{% endblocktrans %}</div>
+
+{% block sidebar %}
+ {% if user.is_authenticated %}
+  <div class="well">
+   <h4>{% trans "Share Your Subscriptions" %}</h4>
+   <p>{% trans "Want to share your own subscriptions?" %}</p>
+
+   <a class="btn btn-primary" href="{% url share %}">
+    {% trans "Go" %}
+   </a>
+  </div>
  {% endif %}
+
+ <div class="well">
+  <h4>{% trans "Nokia Podcasting" %}</h4>
+  <p>{% trans "Add <tt>&amp;symbian=true#.opml</tt> to the OPML URL to get an OPML file for Nokia Podcasting on Symbian devices." %}</p>
+ </div>
 
 {% endblock %}
 

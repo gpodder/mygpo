@@ -34,7 +34,7 @@ from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url, sanitize_urls
 from mygpo.api.advanced.directory import episode_data, podcast_data
 from mygpo.api.backend import get_device, get_favorites, BulkSubscribe
-from mygpo.couchdb import BulkException, get_main_database
+from mygpo.couch import BulkException, bulk_save_retry, get_main_database
 from mygpo.log import log
 from mygpo.utils import parse_time, format_time, parse_bool, get_to_dict, get_timestamp
 from mygpo.decorators import allowed_methods, repeat_on_conflict
@@ -44,7 +44,6 @@ from mygpo.users.models import PodcastUserState, EpisodeAction, \
      EpisodeUserState, DeviceDoesNotExist, DeviceUIDException
 from mygpo.json import json, JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
-from mygpo.couchdb import bulk_save_retry
 
 
 # keys that are allowed in episode actions

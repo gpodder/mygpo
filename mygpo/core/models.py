@@ -1,3 +1,5 @@
+from __future__ import division
+
 import hashlib
 import os.path
 import re
@@ -242,7 +244,7 @@ class Episode(Document, SlugMixin, OldIdMixin):
                 reduce = True,
                 stale  = 'update_after',
             )
-        return r.one()['value']
+        return r.one()['value'] if r else 0
 
 
     @classmethod
@@ -650,10 +652,11 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
         prevs = self.get_episodes(until=episode.released, descending=True,
                 limit=1)
+
         try:
-            prev = prevs.next()
+            return next(prevs)
         except StopIteration:
-            prev = None
+            return None
 
 
     def get_episode_after(self, episode):
@@ -663,9 +666,9 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         nexts = self.get_episodes(since=episode.released, limit=1)
 
         try:
-            next = nexts.next()
+            return next(nexts)
         except StopIteration:
-            next = None
+            return None
 
 
     def get_episode_for_slug(self, slug):
@@ -690,6 +693,14 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         prefix = CoverArt.get_prefix(filename)
 
         return reverse('logo', args=[size, prefix, filename])
+
+
+    def subscriber_change(self):
+        prev = self.prev_subscriber_count()
+        if prev <= 0:
+            return 0
+
+        return self.subscriber_count() / prev
 
 
     def subscriber_count(self):
@@ -977,6 +988,14 @@ class PodcastGroup(Document, SlugMixin, OldIdMixin):
         for podcast in self.podcasts:
             if url in list(podcast.urls):
                 return podcast
+
+
+    def subscriber_change(self):
+        prev = self.prev_subscriber_count()
+        if not prev:
+            return 0
+
+        return self.subscriber_count() / prev
 
 
     def subscriber_count(self):

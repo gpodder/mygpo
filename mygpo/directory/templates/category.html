@@ -12,8 +12,12 @@
 
 {% block title %}{{ category }}{% endblock %}
 
-{% block content %}
+{% block header %}
  <h1>{{ category }}</h1>
+{% endblock %}
+
+
+{% block content %}
 
  <table class="list">
   <tr>
@@ -23,7 +27,7 @@
   </tr>
   {% for entry in entries %}
    <tr>
-    <td>{{ entry|podcast_logo}}</td>
+    <td class="logo">{{ entry|podcast_logo}}</td>
     <td>{% podcast_group_link entry %}</td>
     <td class="description">
      {{ entry.description|truncatewords:15 }}
