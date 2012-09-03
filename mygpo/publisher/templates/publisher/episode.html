@@ -19,7 +19,7 @@
 {% endblock %}
 
 
-{% block content %}
+{% block header %}
   {% if podcast.logo_url %}
   <div id="podcastlogo">{{ podcast|podcast_logo_big }}</div>
   {% endif %}
@@ -32,9 +32,12 @@
       {% endif %},
       {% trans "stats:" %} {% blocktrans with episode.listener_count as listener_count %}{{listener_count}} listeners{% endblocktrans %}
   </small>
-  <hr style="clear: none;"/>
 
   <p><a href="{% podcast_link_target podcast "podcast-publisher-episodes" %}">{% trans "Return to the episode list" %}</a></p>
+{% endblock %}
+
+
+{% block content %}
 
   <h2>{% trans "Edit" %}</h2>
   {% if episode.outdated %}

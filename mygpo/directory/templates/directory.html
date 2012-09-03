@@ -13,13 +13,20 @@
 
 {% block title %}{% trans "Podcast Directory" %}{% endblock %}
 
+{% block header %}
+   <h1>{% trans "Podcast Directory" %}</h1>
+{% endblock %}
+
+
 {% block content %}
-  <h1>{% trans "Podcast Directory" %}</h1>
-
-
   {% cache 3600 topics %}
-  {% for c in topics %}
-   <div class="intro-box">
+  {% for c in topics.categories %}
+
+   {% if forloop.counter0|divisibleby:"2" %}
+    <div class="row-fluid">
+   {% endif %}
+
+   <div class="span6">
     {% if c.cls == "PodcastList" %}
      {% url user c.username as user-lists-url %}
      <h2>{% blocktrans with c.title as listtitle and c.username as username %}{{ listtitle }} <span class="by-user">by <a href="{{ user-lists-url }}">{{ username }}</a></span>{% endblocktrans %}</h2>
@@ -30,7 +37,7 @@
     <table class="list">
      {% for podcast in c.podcasts %}
       <tr>
-       <td>{{ podcast|podcast_logo }}</td>
+       <td class="logo">{{ podcast|podcast_logo }}</td>
        <td>{% podcast_group_link podcast %}</td>
       </tr>
      {% endfor %}
@@ -42,27 +49,120 @@
        {% else %}
         <a href="{% url directory c.label %}">{% trans "more..." %}</a>
        {% endif %}
+      <td></td>
      </tr>
     </table>
    </div>
 
    {% if forloop.counter|divisibleby:"2" %}
-    <br style="clear: both" />
+    </div>
    {% endif %}
+
   {% endfor %}
   {% endcache %}
 
-  <hr />
+  <hr style="clear: both;"/>
 
   {% cache 3600 tagcloud %}
   <div id="tagcloud">
-   {% for tag in tag_cloud.entries %}
-    <span style="font-size: {% smartwidthratio tag.weight tag_cloud.max_weight 4 1 %}em">
+   {% for tag in topics.tagcloud %}
+    <span style="font-size: {% smartwidthratio tag.weight topics.max_weight 4 1 %}em">
      <a href="{% url directory tag.label %}">{{ tag.label }}</a>
     </span>
    {% endfor %}
   </div>
   {% endcache %}
+{% endblock %}
+
+
+{% block sidebar %}
+
+  {% if podcastlist %}
+    <div class="well">
+     <h4>
+      <a href="{% url list-show podcastlist.user.username podcastlist.title %}">
+       {{ podcastlist.title }}
+      </a>
+      <small>{% trans "Podcast List by" %}
+       <a href="{% url lists-user podcastlist.user.username %}">
+        {{ podcastlistowner.username }}
+       </a>
+      </small>
+     </h4>
+
+     <div>
+      {% for podcast in podcastlist.podcasts %}
+
+       <a href="{% podcast_link_target podcast %}">
+        {{ podcast|podcast_logo }}
+       </a>
+
+      {% endfor %}
+
+      {% if podcastlist.more_podcasts %}
+       {% blocktrans with podcastlist.more_podcasts as more %}and {{ more }} more{% endblocktrans %}
+      {% endif %}
+     </div>
+
+     <div class="btn-group">
+      <a class="btn btn-primary" href="{% url lists-overview %}">
+      {% trans "Create a Podcast List" %}
+     </a>
+     </div>
+
+   </div>
+  {% endif %}
+
+
+  {% cache 3600 directory_trending %}
+  {% if trending_podcasts %}
+   {% with trending_podcasts|slice:":1"|first as trending_podcast %}
+    <div class="well">
+
+     <h4><small>{% trans "Trending" %} {% subscriber_change trending_podcast.subscriber_change %}</small></h4>
+
+     <a href="{% podcast_link_target trending_podcast %}">
+      <div id="podcastlogo">{{ trending_podcast|podcast_logo_medium }}</div>
+     </a>
+
+     <h4>{{ trending_podcast.title }}</h4>
+
+     <p class="description">
+      {{ trending_podcast.description|default:""|truncatewords:"50" }}
+     </p>
+
+     <p>
+      <a href="{% podcast_link_target trending_podcast %}">{% trans "more..." %}</a>
+     </p>
+
+    </div>
+   {% endwith %}
+  {% endif %}
+  {% endcache %}
+
+
+  {% if random_podcast %}
+   <div class="well">
+
+   <h4><small>{% trans "Random" %}</small></h4>
+
+
+   <a href="{% podcast_link_target random_podcast %}">
+    <div id="podcastlogo">{{ random_podcast|podcast_logo_medium }}</div>
+   </a>
+
+   <h4>{{ random_podcast.title }}</h4>
+
+   <p class="description">
+    {{ random_podcast.description|default:""|truncatewords:"50" }}
+   </p>
+
+   <p>
+    <a href="{% podcast_link_target random_podcast %}">{% trans "more..." %}</a>
+   </p>
+
+   </div>
+  {% endif %}
 
 {% endblock %}
 

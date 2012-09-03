@@ -15,36 +15,15 @@
 
 {% block title %}{{ page_user.username }}{% endblock %}
 
-{% block content %}
 
+{% block header %}
   <div id="podcastlogo">{% gravatar_img page_user %}</div>
 
   <h1>{{ page_user.username }}</h1>
-  <small class="description">
-  </small>
-  <hr style="clear: none;" />
+  <small class="description"></small>
+{% endblock %}
 
-  <ul>
-   <li>{% trans "Total Played:" %}
-    {% if seconds_played_total %}
-     {{ seconds_played_total|format_duration }} /
-    {% endif %}
-    {{ num_played_episodes_total }} {% trans "Episodes" %}
-   </li>
-   <li>{% trans "Played Last Month:" %}
-    {% if seconds_played_month %}
-     {{ seconds_played_month|format_duration }} /
-    {% endif %}
-    {{ num_played_episodes_month }} {% trans "Episodes" %}
-   </li>
-   <li>{% trans "Member Since:" %}
-    {% if user.date_joined.year > 2000 %}
-     {{ user.date_joined }}
-    {% else %}
-     {% trans "before we started counting" %}
-    {% endif %}
-   </li>
-  </ul>
+{% block content %}
 
   <br style="clear: both;" />
 
@@ -160,5 +139,35 @@
   </table>
 
  {% endif %}
+
+{% endblock %}
+
+
+{% block sidebar %}
+
+ <div class="well">
+  <h3>{% trans "Stats" %}</h3>
+  <ul>
+   <li>{% trans "Total Played:" %}
+    {% if seconds_played_total %}
+     {{ seconds_played_total|format_duration }} /
+    {% endif %}
+    {{ num_played_episodes_total }} {% trans "Episodes" %}
+   </li>
+   <li>{% trans "Played Last Month:" %}
+    {% if seconds_played_month %}
+     {{ seconds_played_month|format_duration }} /
+    {% endif %}
+    {{ num_played_episodes_month }} {% trans "Episodes" %}
+   </li>
+   <li>{% trans "Member Since:" %}
+    {% if user.date_joined.year > 2000 %}
+     {{ user.date_joined }}
+    {% else %}
+     {% trans "the early days" %}
+    {% endif %}
+   </li>
+  </ul>
+ </div>
 
 {% endblock %}

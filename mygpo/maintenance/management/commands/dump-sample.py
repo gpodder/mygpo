@@ -13,6 +13,7 @@ from mygpo.users.models import PodcastUserState, EpisodeUserState, \
          Suggestions, User
 from mygpo.directory.models import Category
 from mygpo.utils import progress
+from mygpo.json import json
 
 
 class Command(BaseCommand):

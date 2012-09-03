@@ -27,10 +27,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control
+from django.views.generic.base import View
+from django.utils.decorators import method_decorator
 
 from mygpo.api.constants import EPISODE_ACTION_TYPES
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core import models
+from mygpo.core.proxy import proxy_object
 from mygpo.core.models import Podcast
 from mygpo.core.models import Episode
 from mygpo.users.models import Chapter, HistoryEntry, EpisodeAction
@@ -161,6 +164,7 @@ def toggle_favorite(request, episode):
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
 
+
 @vary_on_cookie
 @cache_control(private=True)
 @login_required
@@ -168,19 +172,18 @@ def list_favorites(request):
     site = RequestSite(request)
 
     episodes = backend.get_favorites(request.user)
-    episodes = fetch_episode_data(episodes)
+
+    recently_listened = request.user.get_latest_episodes()
+
+    podcast_ids = [episode.podcast for episode in episodes + recently_listened]
+    podcasts = get_to_dict(Podcast, podcast_ids, Podcast.get_id)
+
+    recently_listened = fetch_episode_data(recently_listened, podcasts=podcasts)
+    episodes = fetch_episode_data(episodes, podcasts=podcasts)
 
     feed_url = 'http://%s/%s' % (site.domain, reverse('favorites-feed', args=[request.user.username]))
 
     podcast = Podcast.for_url(feed_url)
-
-    if 'public_feed' in request.GET:
-        request.user.favorite_feeds_token = ''
-        request.user.save()
-
-    elif 'private_feed' in request.GET:
-        request.user.create_new_token('favorite_feeds_token', 8)
-        request.user.save()
 
     token = request.user.favorite_feeds_token
 
@@ -189,6 +192,7 @@ def list_favorites(request):
         'feed_token': token,
         'site': site,
         'podcast': podcast,
+        'recently_listened': recently_listened,
         })
 
 

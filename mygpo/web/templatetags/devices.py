@@ -27,18 +27,30 @@ def device_type(device):
     return DEVICE_TYPES_DICT.get(device.type, _('Unknown'))
 
 @register.filter
-def device_icon(device, size=16):
-    try:
-        device_type = device.type
-    except:
-        device_type = device['type']
+def device_icon(device):
 
-    icon = DEVICE_TYPE_ICONS.get(device_type, None)
-    caption = DEVICE_TYPES_DICT.get(device_type, None)
+    ua_str = (device.user_agent or '').lower()
+
+    # TODO: better client detection
+    if 'gpodder' in ua_str:
+        icon = 'gpodder.png'
+        caption = 'gPodder'
+    elif 'amarok' in ua_str:
+        icon = 'amarok.png'
+        caption = 'Amarok'
+    elif 'podax' in ua_str:
+        icon = 'podax.png'
+        caption = 'Podax'
+
+    else:
+        device_type = device.type
+        icon = DEVICE_TYPE_ICONS.get(device_type, None)
+        caption = DEVICE_TYPES_DICT.get(device_type, None)
+
 
     if icon is not None and caption is not None:
         caption = ugettext(caption)
-        html = ('<img src="/media/%(size)dx%(size)d/%(icon)s" '+
+        html = ('<img src="/media/clients/%(icon)s" '+
                 'alt="%(caption)s" class="device_icon"/>') % locals()
         return mark_safe(html)
 
@@ -46,8 +58,13 @@ def device_icon(device, size=16):
 
 @register.filter
 def device_list(devices):
-    links = [ '<a href="%s">%s&nbsp;%s</a>' % (reverse(show, args=[d.uid]), \
-            device_icon(d), d.name.replace(' ', '&nbsp;')) for d in devices]
+    links = map(device_link, devices)
+    return mark_safe(''.join(links))
 
-    return mark_safe('<br/>'.join(links))
+def device_link(device):
+    return '<a href="{link}" title="{name}">{icon}</a>'.format(
+            link = reverse(show, args=[device.uid]),
+            name = device.name,
+            icon = device_icon(device),
+        )
 

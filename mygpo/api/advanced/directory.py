@@ -24,7 +24,7 @@ from django.views.decorators.cache import cache_page
 from mygpo.core import models
 from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.utils import parse_range
-from mygpo.directory.tags import TagCloud
+from mygpo.directory.tags import Topics
 from mygpo.web.utils import get_episode_link_target, get_podcast_link_target
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url
@@ -35,8 +35,8 @@ from mygpo.directory.models import Category
 @cache_page(60 * 60 * 24)
 def top_tags(request, count):
     count = parse_range(count, 1, 100, 100)
-    tag_cloud = TagCloud(count)
-    resp = map(category_data, tag_cloud.entries)
+    tag_cloud = Topics(count, num_cat=0)
+    resp = map(category_data, tag_cloud.tagcloud)
     return JsonResponse(resp)
 
 

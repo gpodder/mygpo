@@ -1,62 +1,33 @@
 function (doc)
 {
-    function unique(arr) {
-        var a = [];
-        var l = arr.length;
-        for(var i=0; i<l; i++) {
-            for(var j=i+1; j<l; j++) {
-                if (arr[i] === arr[j])
-                    j = ++i;
-            }
-            a.push(arr[i]);
+    function getLanguage(podcast)
+    {
+        if (podcast.language)
+        {
+            return podcast.language.slice(0, 2);
         }
-        return a;
+
+        return null;
     };
 
-    function searchObject(obj, languages, types)
+    function doEmit(language, subscribers)
     {
-        if (obj.language)
+        if(subscribers <= 0)
         {
-            languages.push(obj.language.slice(0, 2));
+            return;
         }
 
-        if (obj.content_types)
+        emit(["", subscribers], null);
+
+        if(language)
         {
-            for(n in obj.content_types)
-            {
-                types.push(obj.content_types[n]);
-            }
-        }
-    };
-
-    function doEmit(toplist_type, types, languages, value)
-    {
-        if(value > 0)
-        {
-            emit([toplist_type, "none", value], null);
-
-            for(n in types)
-            {
-                emit([toplist_type, "type", types[n], value], null);
-
-                for(m in languages)
-                {
-                    emit([toplist_type, "type-language", types[n], languages[m], value], null);
-                }
-            }
-
-            for(m in languages)
-            {
-                emit([toplist_type, "language", languages[m], value], null);
-            }
+            emit([language, subscribers], null);
         }
     }
 
     if (doc.doc_type == "Podcast")
     {
-        types = [];
-        languages = []
-        searchObject(doc, languages, types);
+        var language = getLanguage(doc);
 
         if(doc.subscribers.length)
         {
@@ -67,28 +38,27 @@ function (doc)
             subscribers = 0;
         }
 
-        doEmit("Podcast", types, languages, subscribers);
+        doEmit(language, subscribers);
     }
     else if(doc.doc_type == "PodcastGroup")
     {
         var subscribers = 0;
-        var types = [];
-        var languages = []
+        var language = null;
 
-        for(n in doc.podcasts)
+        for(var n in doc.podcasts)
         {
-            podcast = doc.podcasts[n];
+            var podcast = doc.podcasts[n];
             if (podcast.subscribers.length)
             {
                 subscribers += podcast.subscribers[podcast.subscribers.length-1].subscriber_count;
             }
 
-            searchObject(podcast, languages, types);
+            if(!language)
+            {
+                language = getLanguage(podcast);
+            }
         }
 
-        types = unique(types);
-        languages = unique(languages);
-
-        doEmit("Podcast", types, languages, subscribers);
+        doEmit(language, subscribers);
     }
 }

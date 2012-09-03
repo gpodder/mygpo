@@ -17,7 +17,7 @@ HIDDEN_URIS = (
 
 _ = lambda x: x
 MENU_STRUCTURE = (
-        ('gpodder.net', (
+        ('', (
             ('/', _('Home')),
             ('/login/', _('Login')),
             ('/register/', _('Register')),
@@ -26,34 +26,36 @@ MENU_STRUCTURE = (
             ('/privacy/', _('Privacy Policy')),
             ('/online-help', _('Help')),
         )),
-        (_('My Podcasts'), (
+        (_('Discover'), (
+            ('/directory/', _('Directory')),
+            ('/podcast/', _('Podcast')),
+            ('/search/', _('Search')),
+            ('/lists/', _('Podcast Lists')),
+            ('/user/subscriptions/', _('User subscriptions')),
+            ('/suggestions/', _('Suggestions')),
+            ('', _('Toplists')),
+            ('/toplist/', _('Podcasts')),
+            ('/toplist/episodes', _('Episodes')),
+        )),
+        (_('Subscriptions'), (
             ('/subscriptions/', _('Subscriptions')),
             ('/favorites/', _('Favorite Episodes')),
             ('/tags/', _('My Tags')),
             ('/devices/', _('Devices')),
             ('/device/', _('Device')),
             ('/history/', _('History')),
-            ('/suggestions/', _('Suggestions')),
         )),
-        (_('Share'), (
+        (_('Community'), (
             ('/share/', _('Overview')),
             ('/share/me', _('My Userpage')),
             ('/user/subscriptions/', _('Subscriptions')),
             ('/share/lists/', _('Podcast Lists')),
         )),
-        (_('Podcast Directory'), (
-            ('/directory/', _('Directory')),
-            ('/toplist/', _('Toplist')),
-            ('/search/', _('Search')),
-            ('/toplist/episodes', _('Episodes')),
-            ('/lists/', _('Podcast Lists')),
-            ('/podcast/', _('Podcast')),
-        )),
         (_('Settings'), (
             ('/account/', _('Account')),
             ('/account/privacy', _('Privacy')),
         )),
-        (_('Publisher'), (
+        (_('Publish'), (
             ('/publisher/', _('Home')),
             ('/publisher/advertise', _('Advertise')),
             ('/publisher/link/', _('Link to gpodder.net')),
@@ -65,7 +67,7 @@ MENU_STRUCTURE = (
 def main_menu(selected):
     found_section = False
     links = []
-    for label, items in MENU_STRUCTURE:
+    for label, items in MENU_STRUCTURE[1:]:
         uris = [uri for uri, caption in items]
         if selected in uris:
             found_section = True
@@ -74,12 +76,12 @@ def main_menu(selected):
     items = []
     for uri, caption, subpages in links:
         if selected in subpages or ('/' in subpages and not found_section):
-            items.append('<li class="selected"><a href="%s">%s</a></li>' % \
+            items.append('<li class="active"><a href="%s">%s</a></li>' % \
                     (uri, ugettext(caption)))
         else:
             items.append('<li><a href="%s">%s</a></li>' % (uri, ugettext(caption)))
 
-    s = '<ul class="menu primary">%s</ul>' % ('\n'.join(items),)
+    s = '\n'.join(items)
     return mark_safe(s)
 
 def get_section_items(selected):
@@ -94,6 +96,11 @@ def get_section_items(selected):
 
 @register.filter
 def section_menu(selected, title=None):
+
+    # TODO: we could create non-linked headers here
+    # <li class="nav-header">Sidebar</li>
+
+
     items = []
     for uri, caption in get_section_items(selected):
         if uri == selected:
@@ -102,13 +109,21 @@ def section_menu(selected, title=None):
                     title = title[:33] + '...'
                 caption = title
             if uri in HIDDEN_URIS:
-                items.append('<li class="selected">%s</li>' % ugettext(caption))
+                items.append('<li class="active">%s</li>' % ugettext(caption))
+            elif uri == '':
+                items.append('<li class="nav-header">%s</li>' % ugettext(caption))
             else:
-                items.append('<li class="selected"><a href="%s">%s</a></li>' % \
+                items.append('<li class="active"><a href="%s">%s</a></li>' % \
                         (uri, ugettext(caption)))
-        elif uri not in HIDDEN_URIS:
-            items.append('<li><a href="%s">%s</a></li>' % (uri, ugettext(caption)))
+        else:
+            if uri in HIDDEN_URIS:
+                continue
 
-    s = '<ul class="menu secondary">%s</ul>' % ('\n'.join(items),)
+            if not uri:
+                items.append('<li class="nav-header">%s</li>' % ugettext(caption))
+            else:
+                items.append('<li><a href="%s">%s</a></li>' % (uri, ugettext(caption)))
+
+    s = '\n'.join(items)
     return mark_safe(s)
 

@@ -14,14 +14,13 @@ from django.core.cache import cache
 
 from django_couchdb_utils.registration.models import User as BaseUser
 
-from mygpo.core.proxy import proxy_object, DocumentABCMeta
+from mygpo.core.proxy import DocumentABCMeta
 from mygpo.core.models import Podcast, Episode
 from mygpo.utils import linearize, get_to_dict, iterate_together
 from mygpo.couchdb import get_main_database
 from mygpo.decorators import repeat_on_conflict
 from mygpo.users.ratings import RatingMixin
 from mygpo.users.sync import SyncedDevicesMixin
-from mygpo.log import log
 
 
 RE_DEVICE_UID = re.compile(r'^[\w.-]+$')
@@ -745,7 +744,6 @@ class User(BaseUser, SyncedDevicesMixin):
             self.unsync_device(device)
 
 
-
     def get_subscriptions(self, public=None):
         """
         Returns a list of (podcast-id, device-id) tuples for all
@@ -932,7 +930,7 @@ class User(BaseUser, SyncedDevicesMixin):
             )
 
         keys = [r['value'] for r in res]
-        return Episode.get_multi(keys)
+        return list(Episode.get_multi(keys))
 
 
     def get_num_played_episodes(self, since=None, until={}):
@@ -1002,6 +1000,10 @@ class User(BaseUser, SyncedDevicesMixin):
 
         # ensure that other isn't AnonymousUser
         return other.is_authenticated() and self._id == other._id
+
+
+    def __ne__(self, other):
+        return not(self == other)
 
 
     def __repr__(self):

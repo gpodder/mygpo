@@ -12,10 +12,11 @@
 
 {% block title %}{% trans "Podcast Lists" %}{% endblock %}
 
-{% block content %}
+{% block header %}
  <h1>{% trans "Podcast Lists" %}</h1>
- <hr />
+{% endblock %}
 
+{% block content %}
  <table class="list">
   <tr>
    <th>{% trans "List Name" %}</th>
@@ -29,8 +30,8 @@
     <td><a href="{% url user l.username %}">{{ l.username }}</a></td>
     <td class="numeric">{{ l.podcasts|length }}</td>
     <td>
-     <a href="{% url list-opml l.username l.slug %}">
-      <img src="/media/22x22/opml-icon.png" />
+     <a class="btn btn-small" href="{% url list-opml l.username l.slug %}">
+      <i class="icon-download"></i>
      </a>
     </td>
    </tr>
@@ -64,4 +65,13 @@
 
 </div>
 
+{% endblock %}
+
+
+{% block sidebar %}
+ <div class="well">
+  <h4>{% trans "Know Some Great Podcasts?" %}</h4>
+  <p>{% trans "Create a list of podcasts about a topic you like" %}</p>
+  <a class="btn btn-primary" href="{% url lists-overview %}">Go</a>
+ </div>
 {% endblock %}

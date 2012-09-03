@@ -5,35 +5,77 @@
 {% block mainmenu %}{{ "/register/"|main_menu }}{% endblock %}
 {% block sectionmenu %}{{ "/register/"|section_menu }}{% endblock %}
 
-{% block title %}{% trans "Register" %}{% endblock %}
+{% block title %}{% trans "Create Account" %}{% endblock %}
+
+{% block header %}
+ <h1>{% trans "Create Account" %}</h1>
+{% endblock %}
+
 
 {% block content %}
-
 {% if user.is_authenticated %}
+
   <div class="success">{% trans "You are already registered." %}</div>
-{% else %}
-  <h1>{% trans "Create a User Account" %}</h1>
-  <p>
-      {% trans "Already got an account?" %}
-      <a href="{% url login %}">{% trans "Login here" %}</a>
-  </p>
-  <form action="{% url register %}" method="POST">
-  {% csrf_token %}
-  <table class="register">
-   {{ form.as_table }}
-   <tr><th></th><td><input type="submit" value="Register" /></td></tr>
-   </table>
+
+ {% else %}
+
+  <form class="form-horizontal" action="{% url register %}" method="POST">
+   <fieldset>
+    {% csrf_token %}
+
+    <div class="control-group">
+     <label class="control-label">Username</label>
+     <div class="controls">
+      {{ form.username }}
+      <p class="help-block">Letters, digits, hypens, underscores</p>
+     </div>
+    </div>
+
+    <div class="control-group">
+     <label class="control-label">Email Address</label>
+     <div class="controls">
+      {{ form.email }}
+      <p class="help-block">We won't share it with anyone</p>
+     </div>
+    </div>
+
+    <div class="control-group">
+     <label class="control-label">Password</label>
+     <div class="controls">
+      {{ form.password1 }}
+      <p class="help-block">as secure as you like it</p>
+     </div>
+    </div>
+
+    <div class="control-group">
+     <label class="control-label">Password (confirm)</label>
+     <div class="controls">
+      {{ form.password2 }}
+     </div>
+    </div>
+
+    <div class="control-group">
+     <div class="controls">
+      <button class="btn btn-primary" type="submit">{% trans "Register" %}</button>
+     </div>
+    </div>
+
+   </fieldset>
   </form>
 
-  <p>{% trans "After registration, you'll receive an activation email to confirm the validity of your email address." %}
+ {% endif %}
 
+{% endblock %}
+
+
+{% block sidebar %}
+
+ <div class="well">
+  <h3>{% trans "Activation Mail" %}</h3>
+  <p>{% trans "After registration, you'll receive an activation mail to confirm the validity of your email address." %}</p>
   {% url resend-activation as resend-activation-url %}
-  {% blocktrans %}If it doesn't arrive, you can <a href="{{ resend-activation-url }}">resend</a> it.{% endblocktrans %}
-
-  {% url privacy-policy as privacy-url %}
-  <p>{% blocktrans %}Further information in our <a href="{{ privacy-url }}">Privacy Policy</a>{% endblocktrans %}</p>
-
-{% endif %}
+  <p>{% blocktrans %}If it doesn't arrive, you can <a href="{{ resend-activation-url }}">resend</a> it.{% endblocktrans %}
+ </div>
 
 {% endblock %}
 

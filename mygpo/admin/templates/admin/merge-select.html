@@ -8,9 +8,11 @@
 
 {% block title %}{% trans "Admin Area" %}{% endblock %}
 
-{% block content %}
+{% block header %}
  <h1>{% trans "Merge Podcasts and Episodes" %}</h1>
+{% endblock %}
 
+{% block content %}
  <form method="post" action="{% url admin-merge-verify %}">
   {% csrf_token %}
   <table>
