@@ -77,10 +77,11 @@
 
 {% block sidebar %}
 
-  {% if podcastlist %}
+  {% cache 3600 podcastlist %}
+  {% for podcastlist in podcastlists %}
     <div class="well">
      <h4>
-      <a href="{% url list-show podcastlist.user.username podcastlist.title %}">
+      <a href="{% url list-show podcastlist.user.username podcastlist.slug %}">
        {{ podcastlist.title }}
       </a>
       <small>{% trans "Podcast List by" %}
@@ -111,7 +112,8 @@
      </div>
 
    </div>
-  {% endif %}
+  {% endfor %}
+ {% endcache %}
 
 
   {% cache 3600 directory_trending %}
@@ -141,7 +143,8 @@
   {% endcache %}
 
 
-  {% if random_podcast %}
+  {% cache 3600 random_podcast %}
+  {% for random_podcast in random_podcasts %}
    <div class="well">
 
    <h4><small>{% trans "Random" %}</small></h4>
@@ -162,7 +165,8 @@
    </p>
 
    </div>
-  {% endif %}
+  {% endfor %}
+ {% endcache %}
 
 {% endblock %}
 

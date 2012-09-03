@@ -64,12 +64,8 @@ class Directory(View):
             # evaluated lazyly, cached by template
             'topics': Topics(),
             'trending_podcasts': TrendingPodcasts(''),
-
-            # evaluated eagerly, cached here
-            'podcastlist': get_cache_or_calc('random_list', 60,
-                self.get_random_list),
-            'random_podcast': get_cache_or_calc('random_podcast', 60,
-                self.get_random_podcast),
+            'podcastlists': self.get_random_list(),
+            'random_podcasts': self.get_random_podcast(),
             })
 
 
@@ -82,13 +78,12 @@ class Directory(View):
             random_list.podcasts = list(Podcast.get_multi(random_list.podcasts[:podcasts_per_list]))
             random_list.user = User.get(random_list.user)
 
-        #TODO: this can't be cached, because proxied objects can't be pickled
-        return random_list
+        yield random_list
 
     def get_random_podcast(self):
         random_podcast = next(Podcast.random(), None)
         if random_podcast:
-            return random_podcast.get_podcast()
+            yield random_podcast.get_podcast()
 
 
 @cache_control(private=True)
