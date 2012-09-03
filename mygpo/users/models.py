@@ -576,7 +576,7 @@ class Device(Document):
 
 
     def __hash__(self):
-        return hash(frozenset([self.uid, self.name, self.type, self.deleted]))
+        return hash(frozenset([self.id, self.uid, self.name, self.type, self.deleted]))
 
 
     def __eq__(self, other):
