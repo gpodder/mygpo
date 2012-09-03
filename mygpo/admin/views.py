@@ -11,7 +11,7 @@ from django.utils.decorators import method_decorator
 
 from mygpo.admin.auth import require_staff
 from mygpo.admin.group import PodcastGrouper
-from mygpo.core.models import Podcast
+from mygpo.core.models import Podcast, Episode
 from mygpo.counter import Counter
 from mygpo.maintenance.merge import PodcastMerger, IncorrectMergeException
 from mygpo.users.models import User
@@ -187,3 +187,30 @@ class ClientStatsJsonView(AdminView):
             return obj, count
 
         return obj._asdict(), count
+
+
+class StatsView(AdminView):
+    """ shows general stats as HTML page """
+
+    template_name = 'admin/stats.html'
+
+    def _get_stats(self):
+        return {
+            'podcasts': Podcast.count(),
+            'episodes': Episode.count(),
+            'users': User.count(),
+        }
+
+    def get(self, request):
+        stats = self._get_stats()
+        return self.render_to_response({
+            'stats': stats,
+        })
+
+
+class StatsJsonView(StatsView):
+    """ provides general stats as JSON """
+
+    def get(self, request):
+        stats = self._get_stats()
+        return JsonResponse(stats)
