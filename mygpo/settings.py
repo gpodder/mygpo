@@ -174,6 +174,9 @@ PODCAST_SLUG_SUBSCRIBER_LIMIT = 10
 ADSENSE_CLIENT = ''
 ADSENSE_SLOT_BOTTOM = ''
 
+# enabled access to staff-only areas with ?staff=<STAFF_TOKEN>
+STAFF_TOKEN = None
+
 
 try:
     from settings_prod import *
