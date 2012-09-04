@@ -150,7 +150,7 @@ def subscriber_change(change):
 
     if change > 1:
         change -= 1
-        return '+{:.1%}'.format(change)
+        return '+{0:.1%}'.format(change)
 
     # we don't care about negative changes
     return ''
