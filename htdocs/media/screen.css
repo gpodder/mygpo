@@ -41,6 +41,11 @@ h2
     display: inline;
 }
 
+.logo-group
+{
+    padding: .5em 0 1em 0;
+}
+
 
 /******************
     Info Boxes
