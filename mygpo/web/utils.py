@@ -1,4 +1,5 @@
 import re
+import string
 from datetime import datetime
 
 from django.views.decorators.cache import never_cache
@@ -14,7 +15,15 @@ from mygpo.utils import get_to_dict
 
 
 def get_accepted_lang(request):
-    return list(set([s[:2] for s in request.META.get('HTTP_ACCEPT_LANGUAGE', '').split(',')]))
+    """ returns a list of language codes accepted by the HTTP request """
+
+    lang_str = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
+    lang_str = filter(lambda c: c in string.letters+',', lang_str)
+    langs = lang_str.split(',')
+    langs = [s[:2] for s in langs]
+    langs = map(str.strip, langs)
+    langs = filter(None, langs)
+    return list(set(langs))
 
 
 def get_podcast_languages():
