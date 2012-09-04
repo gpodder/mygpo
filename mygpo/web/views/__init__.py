@@ -120,13 +120,12 @@ def dashboard(request, episode_count=10):
 
     podcasts = PodcastSet(subscribed_podcasts)
 
-    newest_episodes = get_cache_or_calc('newest-episodes-user-%s' %
-            request.user._id, 60, podcasts.get_newest_episodes, tomorrow,
-            episode_count)
+    newest_episodes = podcasts.get_newest_episodes(tomorrow, episode_count)
 
-    random_podcast = next(Podcast.random(), None)
-    if random_podcast:
-        random_podcast = random_podcast.get_podcast()
+    def get_random_podcasts():
+        random_podcast = next(Podcast.random(), None)
+        if random_podcast:
+            yield random_podcast.get_podcast()
 
     # we only show the "install reader" link in firefox, because we don't know
     # yet how/if this works in other browsers.
@@ -135,9 +134,10 @@ def dashboard(request, episode_count=10):
                 'firefox' in request.META.get('HTTP_USER_AGENT', '').lower()
 
     return render(request, 'dashboard.html', {
+            'user': request.user,
             'subscribed_podcasts': subscribed_podcasts,
             'newest_episodes': list(newest_episodes),
-            'random_podcast': random_podcast,
+            'random_podcasts': get_random_podcasts(),
             'checklist': checklist,
             'site': site,
             'show_install_reader': show_install_reader,
