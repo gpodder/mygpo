@@ -41,16 +41,20 @@
     {% endfor %}
    </table>
 
-<div class="pagination">
-
+<div class="pagination pagination-centered">
+ <ul>
  {% if results.has_previous %}
+  <li>
   <a href="{% url search %}?q={{ q }}&page={{ results.previous_page_number }}">«</a>
+  </li>
  {% endif %}
 
  {% for page in page_list %}
-  <span class="page-link">
+  <li>
    {% if page == "..." %}
+    <a href=#" class="disabled">
     {{ page }}
+    </a>
    {% else %}
 
      {% if page == results.number %}
@@ -59,13 +63,15 @@
       <a href="{% url search %}?q={{ q }}&page={{ page }}">{{ page }}</a>
      {% endif %}
    {% endif %}
-  </span>
+  </li>
  {% endfor %}
 
  {% if results.has_next %}
+  <li>
   <a href="{% url search %}?q={{ q }}&page={{ results.next_page_number }}">»</a>
+  </li>
  {% endif %}
-
+ </ul>
 </div>
 
   {% else %}
