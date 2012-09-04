@@ -193,10 +193,10 @@ class Chapter(Document):
 
     @classmethod
     def for_episode(cls, episode_id):
-        r = cls.view('chapters/by_episode',
+        db = get_main_database()
+        r = db.view('chapters/by_episode',
                 startkey = [episode_id, None],
                 endkey   = [episode_id, {}],
-                wrap_doc = False,
             )
 
         for res in r:
