@@ -17,6 +17,11 @@ function(doc)
             return;
         }
 
+        if(cur <= 10)
+        {
+            return;
+        }
+
         var change = cur / prev;
 
         /* we only emit improvements */

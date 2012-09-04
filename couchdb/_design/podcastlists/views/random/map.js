@@ -2,7 +2,7 @@ function (doc)
 {
     if(doc.doc_type == "PodcastList")
     {
-        if(!doc.podcasts)
+        if(!doc.podcasts || doc.podcasts.length < 1)
         {
             return;
         }
