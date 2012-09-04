@@ -91,9 +91,13 @@ def delete_account(request):
     if request.method == 'GET':
         return render(request, 'delete_account.html')
 
-    request.user.is_active = False
-    request.user.deleted = True
-    request.user.save()
+    @repeat_on_conflict(['user'])
+    def do_delete(user):
+        user.is_active = False
+        user.deleted = True
+        user.save()
+
+    do_delete(user=request.user)
     logout(request)
 
     return render(request, 'deleted_account.html')
