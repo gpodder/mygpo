@@ -57,15 +57,15 @@
       {% trans "stats:" %} {% blocktrans with episode.listener_count as listener_count %}{{listener_count}} listeners{% endblocktrans %}
   </small>
 
-  {% if episode.description %}
-   <p class="description">{{ episode.description|remove_html_tags }}</p>
-  {% endif %}
-
 {% endblock %}
 
 
 
 {% block content %}
+
+  {% if episode.description %}
+   <p class="description">{{ episode.description|remove_html_tags }}</p>
+  {% endif %}
 
   {% if episode.url|is_youtube_video %}
     <div id="ytapiplayer">
