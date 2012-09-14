@@ -33,9 +33,10 @@
    <p>{% trans "Go to the publisher page of any podcast by entering its feed URL" %}</p>
    <form class="form-inline" action="{% url podcast-publisher-search %}" method="post">
     {% csrf_token %}
-    <label for="id_url">URL</label>
-    <input type="text" class="input-xlarge" name="url" id="id_url" />
-    <input class="btn" type="submit" value="{% trans "Go" %}" />
+    <div class="input-prepend input-append">
+     <span class="add-on"><i class="icon-link"></i></span><input type="text" class="input-xlarge" name="url" id="id_url" />
+     <button class="btn" type="submit">{% trans "Go" %}</button>
+    </div>
    </form>
   </div>
  {% endif %}
