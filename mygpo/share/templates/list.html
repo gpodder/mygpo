@@ -100,18 +100,21 @@
   </iframe>
 
  {% endif %}
- {% if not is_own and user.is_authenticated %}
-
-  <div class="info">
-   {% url lists-overview as create-url %}
-   {% blocktrans %}Create your own <a href="{{ create-url }}">podcast lists</a>.{% endblocktrans %}
-  </div>
-
- {% endif %}
 
 {% endblock %}
 
 
+
+{% block sidebar %}
+ {% if not is_own and user.is_authenticated %}
+  <div class="well">
+   <h4>{% trans "Your own Podcast Lists" %}</h4>
+   <p>{% trans "Create and share your own podcast lists "%}</p>
+   <a class="btn btn-primary" href="{% url lists-overview %}">{% trans "Go" %}</a>
+  </div>
+
+ {% endif %}
+{% endblock %}
 
 
 {% block javascript %}
