@@ -10,7 +10,7 @@ from mygpo.web.logo import CoverArt
 
 urlpatterns = patterns('mygpo.web.views',
  url(r'^$',                                                       'home',          name='home'),
- url(r'^logo/(?P<size>\d+)/(?P<prefix>.{3})/(?P<filename>[^/]*)\.jpg$',      CoverArt.as_view(),     name='logo'),
+ url(r'^logo/(?P<size>\d+)/(?P<prefix>.{3})/(?P<filename>[^/]*)$', CoverArt.as_view(), name='logo'),
  url(r'^history/$',                                               'history',       name='history'),
  url(r'^suggestions/$',                                           'suggestions',   name='suggestions'),
  url(r'^suggestions/rate$',                                       'rate_suggestions', name='suggestions-rate'),
