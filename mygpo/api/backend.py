@@ -15,20 +15,15 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from datetime import timedelta
 from collections import defaultdict
-from itertools import cycle
 from functools import partial
 
-from django.core.cache import cache
-
-from mygpo.data.mimetype import get_type, CONTENT_TYPES
 from mygpo.core.models import Podcast, Episode
 from mygpo.users.models import EpisodeUserState, Device, DeviceDoesNotExist, \
          PodcastUserState
 from mygpo.decorators import repeat_on_conflict
+from mygpo.couch import bulk_save_retry, get_main_database
 from mygpo.json import json
-from mygpo.couchdb import bulk_save_retry
 
 
 def get_random_picks(languages=None):
@@ -59,7 +54,7 @@ def get_podcast_count_for_language():
 
     counts = defaultdict(int)
 
-    db = Podcast.get_db()
+    db = get_main_database()
     r = db.view('podcasts/by_language',
         reduce = True,
         group_level = 1,
@@ -117,14 +112,12 @@ def get_favorites(user):
             key          = user._id,
             include_docs = True,
         )
-    return favorites
+    return list(favorites)
 
 
 
 class BulkSubscribe(object):
     """ Performs bulk subscribe/unsubscribe operations """
-
-    DB = PodcastUserState.get_db()
 
     def __init__(self, user, device, podcasts = {}, actions=None):
         self.user = user
@@ -140,8 +133,9 @@ class BulkSubscribe(object):
 
     def execute(self):
         """ Executes all added actions in bulk """
+        db = get_main_database()
         obj_funs = map(self._get_obj_fun, self.actions)
-        bulk_save_retry(self.DB, obj_funs)
+        bulk_save_retry(db, obj_funs)
 
         # prepare for another run
         self.actions = []

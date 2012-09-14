@@ -104,7 +104,6 @@ class PodcastUpdater(object):
         self.save_podcast_logo(podcast.logo_url)
 
 
-
     def update_episodes(self, podcast, parsed, episodes):
 
         existing_episodes = dict( (e.url, e) for e in episodes)

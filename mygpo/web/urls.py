@@ -10,7 +10,7 @@ from mygpo.web.logo import CoverArt
 
 urlpatterns = patterns('mygpo.web.views',
  url(r'^$',                                                       'home',          name='home'),
- url(r'^logo/(?P<size>\d+)/(?P<prefix>.{3})/(?P<filename>[^/]*)\.jpg$',      CoverArt.as_view(),     name='logo'),
+ url(r'^logo/(?P<size>\d+)/(?P<prefix>.{3})/(?P<filename>[^/]*)$', CoverArt.as_view(), name='logo'),
  url(r'^history/$',                                               'history',       name='history'),
  url(r'^suggestions/$',                                           'suggestions',   name='suggestions'),
  url(r'^suggestions/rate$',                                       'rate_suggestions', name='suggestions-rate'),
@@ -21,7 +21,11 @@ urlpatterns = patterns('mygpo.web.views',
     (r'^developer/',                                               direct_to_template,
        {'template': 'developer.html'}),
  url(r'^contribute/',                                              direct_to_template,
-       {'template': 'contribute.html'}),
+       {'template': 'contribute.html'},
+       name='contribute'),
+ url(r'^privacy/',                                              direct_to_template,
+       {'template': 'privacy_policy.html'}, name='privacy-policy'),
+
 )
 
 urlpatterns += patterns('mygpo.web.views.subscriptions',
@@ -39,10 +43,11 @@ urlpatterns += patterns('mygpo.web.views.podcast',
  url(r'^podcast/(?P<pid>\d+)$',                                   'show_oldid',          name='podcast'),
  url(r'^podcast/(?P<pid>\d+)/subscribe$',                         'subscribe_oldid',     name='subscribe'),
  url(r'^podcast/(?P<pid>\d+)/unsubscribe/(?P<device_uid>[\w.-]+)',     'unsubscribe_oldid',   name='unsubscribe'),
- url(r'^podcast/(?P<pid>\d+)/add-tag',                            'add_tag_oldid',       name='add-tag'),
+ url(r'^podcast/(?P<pid>\d+)/add-tag',                            'add_tag_oldid',     name='add-tag'),
  url(r'^podcast/(?P<pid>\d+)/remove-tag',                         'remove_tag_oldid',    name='remove-tag'),
  url(r'^podcast/(?P<pid>\d+)/set-public',                         'set_public_oldid',    name='podcast-public',  kwargs={'public': True}),
  url(r'^podcast/(?P<pid>\d+)/set-private',                        'set_public_oldid',    name='podcast-private', kwargs={'public': False}),
+ url(r'^podcast/(?P<pid>\d+)/-episodes',                          'all_episodes_oldid', name='podcast-all-episodes'),
 
  url(r'^podcast/(?P<slug_id>[\w-]+)/?$',                             'show_slug_id',        name='podcast-slug-id'),
  url(r'^podcast/(?P<slug_id>[\w-]+)/subscribe$',                     'subscribe_slug_id',   name='subscribe-slug-id'),
@@ -51,11 +56,15 @@ urlpatterns += patterns('mygpo.web.views.podcast',
  url(r'^podcast/(?P<slug_id>[\w-]+)/remove-tag',                     'remove_tag_slug_id',  name='remove-tag-slug-id'),
  url(r'^podcast/(?P<slug_id>[\w-]+)/set-public',                     'set_public_slug_id',    name='podcast-public-slug-id',  kwargs={'public': True}),
  url(r'^podcast/(?P<slug_id>[\w-]+)/set-private',                    'set_public_slug_id',    name='podcast-private-slug-id', kwargs={'public': False}),
+ url(r'^podcast/(?P<slug_id>[\w-]+)/-episodes',                      'all_episodes_slug_id', name='podcast-all-episodes-slug-id'),
  )
 
 
 urlpatterns += patterns('mygpo.web.views.episode',
- url(r'^favorites/',                                              'list_favorites',name='favorites'),
+
+ url(r'^favorites/$',
+     'list_favorites',
+     name='favorites'),
 
  url(r'^episode/(?P<id>\d+)$',                                    'show_oldid',           name='episode'),
  url(r'^episode/(?P<id>\d+)/add-chapter$',                        'add_chapter_oldid',   name='add-chapter'),
@@ -71,11 +80,30 @@ urlpatterns += patterns('mygpo.web.views.episode',
  url(r'^episode/(?P<p_slug_id>[\w-]+)/(?P<e_slug_id>[\w-]+)/add-action',      'add_action_slug_id',      name='add-episode-action-slug-id'),
 )
 
+from mygpo.web.views.settings import DefaultPrivacySettings, \
+         PodcastPrivacySettings
+
 urlpatterns += patterns('mygpo.web.views.settings',
  url(r'^account/$',                                               'account',       name='account'),
  url(r'^account/privacy$',                                        'privacy',       name='privacy'),
+
+ url(r'^account/privacy/default-public$',
+     DefaultPrivacySettings.as_view(public=True),
+     name='privacy_default_public'),
+
+ url(r'^account/privacy/default-private$',
+     DefaultPrivacySettings.as_view(public=False),
+     name='privacy_default_private'),
+
+ url(r'^account/privacy/(?P<podcast_id>[\w]+)/public$',
+     PodcastPrivacySettings.as_view(public=True),
+     name='privacy_podcast_public'),
+
+ url(r'^account/privacy/(?P<podcast_id>[\w]+)/private$',
+     PodcastPrivacySettings.as_view(public=False),
+     name='privacy_podcast_private'),
+
  url(r'^account/delete$',                                         'delete_account',name='delete-account'),
- url(r'^share/$',                                                 'share',         name='share'),
 )
 
 urlpatterns += patterns('mygpo.web.views.device',

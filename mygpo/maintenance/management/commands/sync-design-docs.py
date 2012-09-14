@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from couchdbkit.loaders import FileSystemDocsLoader
 
-from mygpo.core.models import Podcast
+from mygpo.couch import get_main_database
 
 
 
@@ -14,7 +14,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         path = os.path.join(settings.BASE_DIR, '..', 'couchdb', '_design')
-        db = Podcast.get_db()
+        db = get_main_database()
         loader = FileSystemDocsLoader(path)
         loader.sync(db, verbose=True)
 

@@ -18,14 +18,14 @@ class Command(BaseCommand):
                 reduce = True,
             )
 
-        total = total['value'] if total else 0
+        total = list(total)[0]['value'] if total else 0
 
         for n, user in enumerate(users):
 
             if user.is_active or not user.deleted:
                 print 'skipping', user.username
 
-            print 'deleting', user.username
+            print 'deleting', user.username,
             user.delete()
 
             progress(n+1, total)

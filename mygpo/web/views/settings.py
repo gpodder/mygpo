@@ -16,6 +16,8 @@
 #
 
 from django.shortcuts import render
+from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
 from django.contrib.auth import logout
 from django.contrib import messages
 from django.forms import ValidationError
@@ -24,6 +26,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control
+from django.utils.decorators import method_decorator
+from django.views.generic.base import View
 
 from django_couchdb_utils.auth.models import UsernameException, PasswordException
 
@@ -87,43 +91,61 @@ def delete_account(request):
     if request.method == 'GET':
         return render(request, 'delete_account.html')
 
-    request.user.is_active = False
-    request.user.deleted = True
-    request.user.save()
+    @repeat_on_conflict(['user'])
+    def do_delete(user):
+        user.is_active = False
+        user.deleted = True
+        user.save()
+
+    do_delete(user=request.user)
     logout(request)
 
     return render(request, 'deleted_account.html')
 
 
+
+class DefaultPrivacySettings(View):
+
+    public = True
+
+    @method_decorator(login_required)
+    @method_decorator(never_cache)
+    def post(self, request):
+        self.set_privacy_settings(user=request.user)
+        messages.success(request, 'Success')
+        return HttpResponseRedirect(reverse('privacy'))
+
+    @repeat_on_conflict(['user'])
+    def set_privacy_settings(self, user):
+        user.settings['public_subscriptions'] = self.public
+        user.save()
+
+
+class PodcastPrivacySettings(View):
+
+    public = True
+
+    @method_decorator(login_required)
+    @method_decorator(never_cache)
+    def post(self, request, podcast_id):
+        podcast = Podcast.get(podcast_id)
+        state = podcast.get_user_state(request.user)
+        self.set_privacy_settings(state=state)
+        messages.success(request, 'Success')
+        return HttpResponseRedirect(reverse('privacy'))
+
+    @repeat_on_conflict(['state'])
+    def set_privacy_settings(self, state):
+        state.settings['public_subscription'] = self.public
+        state.save()
+
+
+
 @login_required
 @never_cache
-@allowed_methods(['GET'])
 def privacy(request):
 
     site = RequestSite(request)
-
-    @repeat_on_conflict(['state'])
-    def set_privacy_settings(state, is_public):
-        state.settings['public_subscription'] = is_public
-        state.save()
-
-    if 'private_subscriptions' in request.GET:
-        set_privacy_settings(state=request.user, is_public=False)
-
-    elif 'public_subscriptions' in request.GET:
-        set_privacy_settings(state=request.user, is_public=True)
-
-    if 'exclude' in request.GET:
-        id = request.GET['exclude']
-        podcast = Podcast.get(id)
-        state = podcast.get_user_state(request.user)
-        set_privacy_settings(state=state, is_public=False)
-
-    if 'include' in request.GET:
-        id = request.GET['include']
-        podcast = Podcast.get(id)
-        state = podcast.get_user_state(request.user)
-        set_privacy_settings(state=state, is_public=True)
 
     subscriptions = request.user.get_subscriptions()
     podcasts = get_to_dict(Podcast, [x[1] for x in subscriptions], get_id=Podcast.get_id)
@@ -163,7 +185,7 @@ def share(request):
     if _update:
         _update(user=request.user)
 
-    token = request.user.subscriptions_token
+    token = request.user.get_token('subscriptions_token')
 
     return render(request, 'share.html', {
         'site': site,

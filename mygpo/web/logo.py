@@ -19,6 +19,7 @@ import os.path
 import StringIO
 from datetime import datetime
 from glob import glob
+import errno
 
 import Image
 import ImageDraw
@@ -128,8 +129,13 @@ class CoverArt(View):
     @staticmethod
     def get_dir(filename):
         path = os.path.dirname(filename)
-        if not os.path.isdir(path):
+        try:
             os.makedirs(path)
+
+        except OSError as ose:
+            if ose.errno != errno.EEXIST:
+                raise
+
         return path
 
 

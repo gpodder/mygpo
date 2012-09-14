@@ -1,110 +1,56 @@
 
-html,
-body
+/* Landscape phones and down */
+@media (min-width: 980px)
 {
-    height: 100%;
-}
 
-body 
-{ 
-    font-family: DeJaVu Sans, Bitstream Vera Sans, sans-serif; 
-    background-color: #333;
-    padding: 0px;
-    margin: 0px;
-}
-
-body.embed
+#inline_logo
 {
-    background-color: white;
+display: none;
 }
 
-body, table, td, th
-{
-    font-size: 12px;
 }
 
-hr 
-{ 
-    border-width: 0px; 
-    border-bottom: 1px #aaa dotted; 
-    clear: both;
-}
+/****************
+    General
+*****************/
 
-img 
-{ 
-    border-width: 0px; 
-}
-
-#wrap
-{
-    width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-    background-color: white;
-    min-height: 100%;
-    padding: 0px;
-    margin-bottom: 0;
-    padding-bottom: 0;
-}
-
-#main
-{
-    overflow:auto;
-    padding-bottom: 50px; /* must be same height as the footer */
-}
-
-
-#footer
-{
-    position: relative;
-    margin-top: -50px; /* negative value of footer height */
-    height: 34px;
-    clear:both;
-    padding-top: 10px;
-    border-top: 1px #aaa dotted;
-    width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-    background-color: white;
-}
 
 #logo
 {
-	float: right;
-	padding: 0px;
-	margin: 7px 10px 0px 0px;
+    position: fixed;
+    left: 20px;
+    top: -2px;
+    z-index: 4000;
 }
 
-#content-area
+h1
 {
-    padding: 20px;
+    font-size: 16pt;
+    font-family: 'Source Sans Pro', sans-serif;
+    font-weight: 700;
 }
 
-#logininfo
+h2
 {
-    float: right;
-    margin-top: 1px;
-    background-color: white;
-    padding: 5px;
-    text-align: right;
-    background-image: url('logininfo-bottomleft.png');
-    background-repeat: no-repeat;
-    background-position: bottom left;
+    font-size: 14pt;
+    padding-top: .5em;
 }
 
-#navigation
+.brand img
 {
-    background-color: rgb(102, 102, 102); 
+    display: inline;
 }
 
-a {
-    color: #10488B;
-    text-decoration: none;
+.logo-group
+{
+    padding: .5em 0 1em 0;
 }
 
-a:hover {
-    text-decoration: underline;
-}
+
+/******************
+    Info Boxes
+*******************/
+
 
 div.error
 {
@@ -116,12 +62,6 @@ div.error
     background-repeat: no-repeat;
     background-position: 3px 50%;
     margin: .5em;
-}
-
-table.register th {
-    font-weight:normal;
-    width:150px;
-    text-align:left;
 }
 
 .success
@@ -154,145 +94,47 @@ table.register th {
 }
 
 
-.menu a
-{
-    color: #aaa;
-}
 
-ul.menu
-{
-    list-style-type: none;
-    padding: 10px;
-    margin: 0px;
-    border-width: 0px;
-}
+/*******************
+   "List" Tables
+********************/
 
-ul.menu.secondary
-{
-    background-color: #777;
-    padding-left: 40px;
-    padding-top: 20px;
-    border-top: 1px #666 solid;
-}
-
-ul.menu.primary
-{
-    padding-top: 20px;
-}
-
-ul.menu li {
-    display: inline;
-    padding: 10px;
-    padding-left: 10px;
-    border-width: 0px;
-    text-shadow: 0px 0px 3px #333;
-    position: relative;
-    top: 1px;
-}
-
-ul.menu.primary li.selected {
-    background-color: #777;
-    background-image: url('navcaps/primary-top-left.png'),
-                      url('navcaps/primary-top-right.png');
-    background-position: top left, top right;
-    background-repeat: no-repeat;
-    text-shadow: 0px 0px 4px #333;
-}
-
-ul.menu.primary li.selected:hover {
-    background-color: #777;
-}
-
-ul.menu.secondary li.selected a,
-ul.menu.secondary li.selected a:hover,
-ul.menu.secondary li.selected a:visited,
-ul.menu.secondary li.selected:hover a {
-    color: black;
-}
-
-ul.menu.secondary li.selected {
-    position: relative;
-    top: 1px;
-    background-color: white;
-    background-image: url('navcaps/secondary-top-left.png'),
-                      url('navcaps/secondary-top-right.png'),
-                      url('navcaps/secondary-bg-gradient.png');
-    background-position: top left, top right, top left;
-    background-repeat: no-repeat, no-repeat, repeat-x;
-    text-shadow: 0px 0px 4px #777;
-}
-
-ul.menu.secondary li.selected:hover {
-    background-color: white;
-}
-
-ul.menu li a:hover {
-    text-shadow: 0px 0px 5px black;
-}
-
-ul.menu.secondary li.selected a:hover {
-    text-shadow: 0px 0px 5px #444;
-}
-
-ul.menu li:hover a {
-    text-decoration: none;
-}
-
-ul.menu li.selected a, ul.menu li.selected:hover a {
-    color: white;
-}
-
-ul.menu li.heading {
-    cursor: default;
-}
-
-ul.menu li.heading:hover {
-    background-color: #777;
-}
-
-.menu strong {
-    color: white;
-    padding-left: 10px;
-    padding-right: 10px;
-}
 
 table.list
 {
-    font-size: 1em;
     border-collapse: collapse;
     width: 100%;
+    margin-bottom: 2em;
 }
 
-table.list tr {
-    border: 1px solid white;
+table.list tr td
+{
+    padding: .3em;
+    border-top: thin dotted #ccc;
+    border-bottom: thin dotted #ccc;
+    vertical-align: middle;
 }
 
-table.list tr:nth-child(even) td {
-    background-color: #f7f7f7;
-}
-
-table.list tr:nth-child(odd) td {
-    background-color: #f0f0f0;
-}
-
-table.list tr:nth-child(even):hover td {
-    background-color: #e7e7e7;
-}
-
-table.list tr:nth-child(odd):hover td {
-    background-color: #e0e0e0;
+table.list tr:hover td {
+    background-color: #eeeeee;
 }
 
 table.list th
 {
     text-align: left;
     padding: 5px;
+    font-weight: bold;
 }
 
 table.list th,
 table.list td
 {
     padding-right: 1em;
+}
+
+table.list td
+{
+    height: 40px;
 }
 
 table td.numeric,
@@ -314,22 +156,32 @@ table.list tr.group:hover td
     background-color: inherit;
 }
 
-.episode_list .title
+td.logo
 {
+    width: 32px;
 }
+
+table form
+{
+    display: inline;
+}
+
+/****************************
+    Podcast List (TODO)
+*****************************/
 
 .podcast_list
 {
     margin-bottom: 1em;
 }
 
-.podcast_list p, .episode_list p
+.podcast_list p
 {
     margin: 2px 0px 2px 0px;
     padding: 0px;
 }
 
-.podcast_list p.description, .episode_list p.description
+.podcast_list .description
 {
     font-size: x-small;
 }
@@ -337,6 +189,21 @@ table.list tr.group:hover td
 .description
 {
     color: #666;
+}
+
+div#podcastlogo
+{
+    float: right;
+    padding-left: 20px;
+    padding-bottom: 10px;
+}
+
+
+.short
+{
+    height: 1.3em;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .URL
@@ -348,20 +215,6 @@ table.list tr.group:hover td
 .URL:hover
 {
     text-decoration: underline;
-}
-
-h1, h2
-{
-    padding: 5px 0px 2px 0px;
-    margin: 0px;
-}
-
-h1 {
-    font-size: 14pt;
-}
-
-h2 {
-    font-size: 12pt;
 }
 
 img.device_icon
@@ -395,36 +248,10 @@ ul.devices li.other
     list-style-image: url('16x16/audio-x-generic.png');
 }
 
-div.rate
-{
-    padding-top: 2em;
-    padding-bottom: 3em;
-}
 
-div.vote
-{
-    float: right;
-}
-
-div.devicesLeft
-{
-    float:left;
-	width: 10em;
-}
-
-div.devicesRight
-{
-    float:left;
-    margin-top:-5px;
-	width: 26px;
-	height: 26px;
-}
-
-div.devicesClear
-{
-    clear:left;
-}
-
+/******************
+     Searching
+*******************/
 
 form.search input[type="text"]
 {
@@ -476,26 +303,65 @@ div.result span.episode a
     color: black;
 }
 
-div.result
-{
+
+/***************
+   Forms
+****************/
+
+/*
+
+div.form {
+    border:solid 2px #b7ddf2;
+    background:#ebf4fb;
+    width: 450px;
+    margin:0 auto;
+    padding:14px;
 }
 
-div#podcastlogo
-{
-    float: right;
-    padding-left: 20px;
-    padding-bottom: 10px;
+div.form p {
+    font-size:11px;
+    color:#666666;
+    margin-bottom:20px;
+    border-bottom:solid 1px #b7ddf2;
+    padding-bottom:10px;
 }
 
-table.form
-{
+div.form label{
+    display:block;
+    font-weight:bold;
+    text-align:right;
+    width:140px;
+    float:left;
 }
 
-table.form th
-{
-    font-weight: normal;
-    text-align: right;
+div.form .small {
+    color:#666666;
+    display:block;
+    font-size:11px;
+    font-weight:normal;
+    text-align:right;
+    width:140px;
 }
+
+div.form input,
+div.form select {
+    float:left;
+    font-size:12px;
+    padding:4px 2px;
+    border:solid 1px #aacfe4;
+    width:200px;
+    margin:2px 0 20px 10px;
+}
+
+div.form button{
+    clear:both;
+    margin-left:150px;
+    width:125px;
+    height:31px;
+}
+
+*/
+
 
 input.url
 {
@@ -594,7 +460,8 @@ ul.square-menu li a
     bottom: -40px;
 }
 
-address
+address,
+address a
 {
     clear: both;
     text-align: center;
@@ -618,19 +485,8 @@ div.intro-box
     text-align: justify;
     float: left;
     width: 40%;
-    padding-top: 1em;
-    padding-left: 5%;
     padding-bottom: 1em;
     overflow: hidden;
-}
-
-div.wide-box
-{
-    float: left;
-    width: 90%;
-    padding-top: 1em;
-    padding-left: 5%;
-    padding-bottom: 1em;
 }
 
 div.intro-box ul
@@ -673,20 +529,79 @@ div.come-in-box
     float: left;
 }
 
-button img
+
+/********************
+
+    Link Button
+
+ http://particletree.com/features/rediscovering-the-button-element/
+
+*********************/
+
+
+/*
+.button a, button
 {
-    margin: 0 3px -3px 0 !important;
-    padding: 0;
-    border: none;
-    width: 16px;
-    height: 16px;
+    /*display: block;*/
+    /* float: left; */
+    /*margin: 0 7px 0 0;*/
+/*    background-color: #f5f5f5;
+    border: 1px solid #dedede;
+    border-top: 1px solid #eee;
+    border-left: 1px solid #eee;
+    font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
+    font-size: 100%;
+    line-height: 130%;
+    text-decoration: none;
+    font-weight: bold;
+    color: #565656;
+    cursor: pointer;
+    padding: 5px 10px 6px 7px; /* Links */
+    /*clear: left;*/
+/*}
+
+button{
+    width:auto;
+    overflow:visible;
+    padding:4px 10px 3px 7px; /* IE6 */
+/*}
+
+button[type]{
+    padding:5px 10px 5px 7px; /* Firefox */
+/*    line-height:17px; /* Safari */
+/*}
+*:first-child+html button[type]{
+    padding:4px 10px 3px 7px; /* IE7 */
+/*}
+
+button img, div.button img{
+    margin:0 3px -3px 0 !important;
+    padding:0;
+    border:none;
+    width:16px;
+    height:16px;
 }
 
-.action-button
+
+.action-buttons
 {
-    vertical-align: middle;
-    padding-bottom: .5em;
+    overflow: auto;
 }
+
+.action-buttons > *
+{
+    display: block;
+    margin-top: .5em;
+    margin-bottom: .5em;
+    clear: both;
+    float: left;
+}
+*/
+
+/******************
+     Pagination
+*******************/
+
 
 .pagination
 {
@@ -715,6 +630,7 @@ button img
     padding-right: 2em;
 }
 
+/*
 .podcast-state
 {
     clear: both;
@@ -738,7 +654,8 @@ button img
     margin-bottom: -2000px;
     padding-bottom: 2000px;
 }
-
+*/
+/*
 .podcast-state > div.tags > div,
 .podcast-state > div.share > div
 {
@@ -747,6 +664,8 @@ button img
     padding-right: 2%;
     width: 96% !important;
 }
+
+*/
 
 .tag-list span.other
 {
@@ -764,41 +683,14 @@ button img
     color: black;
 }
 
-.tag-list input[type="text"]
-{
-    margin-top: .5em;
-    width: 85%;
-}
 
-input.subscribe
-{
-    background: url('/media/subscribe.png') no-repeat;
-    cursor: pointer;
-    width: 22px;
-    height: 22px;
-    border: none;
-}
-
-input.blacklist,
-input.remove
-{
-    margin: 11px 0 0 0;
-    background: url('/media/unsubscribe.png') no-repeat;
-    cursor: pointer;
-    width: 22px;
-    height: 22px;
-    border: none;
-}
-
-form.rate,
-input.rate
-{
-    display: inline;
-}
+/*************************
+    Episode Navigation
+**************************/
 
 div.navigation
 {
-clear: both;
+    clear: both;
 }
 
 div.navigation div
@@ -820,10 +712,7 @@ div.navigation div.next
     text-align: right;
 }
 
-hr
-{
-clear: both;
-}
+
 
 #listcontent h2
 {
@@ -855,3 +744,35 @@ iframe.results
     color: red;
     text-transform: uppercase;
 }
+
+
+
+/*****************
+   Footer
+*******************/
+
+footer, footer a
+{
+    color: #777;
+}
+
+footer ul
+{
+    list-style-type: none;
+}
+
+
+
+div.first-episode
+{
+    margin-bottom: 2em;
+}
+
+
+address
+{
+    color: #aaa;
+    text-align: center;
+    padding-top: 15px;
+}
+

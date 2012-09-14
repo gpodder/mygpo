@@ -3,9 +3,11 @@ from operator import itemgetter
 
 from mygpo.core.models import Podcast
 from mygpo.decorators import query_if_required
-from mygpo.directory.models import Category
+from mygpo.couch import get_main_database
 from mygpo.utils import multi_request_view
 from mygpo.counter import Counter
+from mygpo.core.proxy import proxy_object
+from mygpo.directory.models import Category
 
 
 
@@ -123,40 +125,61 @@ class Tag(object):
 TagCloudEntry = namedtuple('TagCloudEntry', 'label weight')
 
 
-class TagCloud(object):
+class Topics(object):
 
-    def __init__(self, count=100, skip=0, sort_by_name=False):
-        self.count = count
-        self.skip = skip
+    def __init__(self, total=100, num_cat=10, podcasts_per_cat=10):
+        self.total = total
+        self.num_cat = num_cat
+        self.podcasts_per_cat = podcasts_per_cat
         self._entries = None
-        self.sort_by_name = sort_by_name
+        self._tag_cloud = None
+
 
     def _needs_query(self):
         return self._entries is None
 
+
     def _query(self):
-        db = Category.get_db()
-        res = db.view('categories/by_tags',
+        db = get_main_database()
+        res = db.view('categories/by_weight',
                 descending = True,
-                skip       = self.skip,
-                limit      = self.count,
+                limit      = self.total,
                 stale      = 'update_after',
+                include_docs = True,
             )
 
-        mk_entry = lambda r: TagCloudEntry(r['value'], r['key'])
-        self._entries = map(mk_entry, res)
-
-        if self.sort_by_name:
-            self._entries.sort(key = lambda x: x.label.lower())
+        self._entries = list(res)
 
 
     @property
     @query_if_required()
-    def entries(self):
-        return self._entries
+    def tagcloud(self):
+        if not self._tag_cloud:
+            self._tag_cloud = map(self._prepare_tagcloud_entry,
+                self._entries[self.num_cat:])
+            self._tag_cloud.sort(key = lambda x: x.label.lower())
+
+        return self._tag_cloud
 
 
-    @property
+    def _prepare_tagcloud_entry(self, r):
+        return TagCloudEntry(r['value'], r['key'])
+
+
     @query_if_required()
     def max_weight(self):
-        return max([e.weight for e in self._entries] + [0])
+        return max([e.weight for e in self.tagcloud] + [0])
+
+
+    @property
+    @query_if_required()
+    def categories(self):
+        categories = map(self._prepare_category, self._entries[:self.num_cat])
+        return categories
+
+
+    def _prepare_category(self, resp):
+        category = Category.wrap(resp['doc'])
+        category = proxy_object(category)
+        category.podcasts = category.get_podcasts(0, self.podcasts_per_cat)
+        return category

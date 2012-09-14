@@ -34,6 +34,10 @@ def proxy_object(obj, **kwargs):
             return getattr(self.obj, attr)
 
 
+        def __eq__(self, other):
+            return self.obj == other.obj
+
+
     cls = obj.__class__
     cls.register(ProxyObject)
 

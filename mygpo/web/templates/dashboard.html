@@ -12,80 +12,155 @@
 
 {% block title %}{% trans "Overview" %}{% endblock %}
 
+{% block header %}
+   <h1>{% trans "Hi, " %}{{ user.username }}</h1>
+{% endblock %}
+
+
 {% block content %}
+ {% cache 600 newest_episodes user.username %}
+   {% if newest_episodes %}
+    <h2>{% trans "Newest Episodes" %}</h2>
+    <table class="list">
+     {% for episode in newest_episodes %}
+      <tr>
+       <td class="logo">{{ episode.podcast|podcast_logo }}</td>
+       <td>
+        {% episode_link episode episode.podcast %}<br/>
+        <span class="from_podcast">{% podcast_group_link episode.podcast %}</span>
+       </td>
+       <td>{{ episode.released|naturalday }}</td>
+      </tr>
+     {% endfor %}
+    </table>
+   {% else %}
+    <p>
+     {% blocktrans %}Welcome to {{ site }}! If this is your first visit, you should set up your <a href="http://wiki.gpodder.org/wiki/Web_Services/Clients">podcast client</a> and try to check as many <em>Explore</em> boxes as you can.{% endblocktrans %}
+    </p>
 
- <div class="intro-box">
- <h2>{% trans "Overview" %}</h2>
- {% if not subscribed_podcasts %}
-  {% url help as help-url %}
-  <p>{% blocktrans with site as sitename %}Welcome to {{ sitename }}! You can start using the site by <a href="{{ help-url }}">uploading your subscriptions</a> with a supported client. You can then manage your subscriptions online, sync your devices and discover new interesting podcasts.{% endblocktrans %}</p>
- {% else %}
-  {% url subscriptions as subscriptions-url %}
-  {% url devices as devices-url %}
-  {% url share as share-url %}
-  {% url suggestions as suggestions-url %}
-  {% url toplist as toplist-url %}
-  {% url lists-overview as lists-url %}
-  <p>{% blocktrans with subscribed_podcasts|length as subscription_count and devices|length as device_count %}You have subscribed to <a href="{{ subscriptions-url }}">{{ subscription_count }} podcasts</a> on <a href="{{ devices-url }}">{{ device_count }} devices</a>. Now you can
-   <ul>
-    <li><a href="{{ share-url }}">share your subscriptions with others</a></li>
-    <li><a href="{{ subscriptions-url }}">manage your subscriptions</a></li>
-    <li><a href="{{ devices-url }}">synchronize your devices</a></li>
-    <li><a href="{{ suggestions-url }}">view our suggested podcasts</a></li>
-    <li><a href="{{ toplist-url }}">discover new podcasts in our toplist</a></li>
-    <li><a href="{{ lists-url }}">collect and share podcasts about your favorite topics</a><span class="new">new!</span></li>
-   </ul>{% endblocktrans %}</p>
+    <p>
+     {% url help as help %}
+     {% blocktrans %}If you have problems, have a look at the <a href="{{ help }}">docs</a> or ask questions on the <a href="http://wiki.gpodder.org/wiki/Mailing_List">mailing list</a> or <a href="https://getsatisfaction.com/gpoddernet">forum</a>.{% endblocktrans %}
+    </p>
 
- {% endif %}
-
- {% if sponsored_podcast %}
-  <div class="sponsoring-podcast">
-   <h3>{{ sponsored_podcast.title }} <small>(Supporting Podcast)</small></h3>
-   <div>{{ sponsored_podcast.podcast|podcast_logo }}</div>
-   <div style="margin-left: 40px">{{ sponsored_podcast.text|truncatewords:"20"}}</div>
-   <br style="clear: left;"/>
-   <small><a href="{% url advertise %}">advertise here</a></small>
-  </div>
- {% endif %}
-
- </div>
-
- <div class="intro-box">
-  <h2>{% trans "Random Picks" %}</h2>
-
-  <table class="list">
-   {% for podcast in random_podcasts %}
-    <tr>
-     <td>{{ podcast|podcast_logo }}</td>
-     <td>{% podcast_group_link podcast %}</td>
-    </tr>
-   {% endfor %}
-  </table>
-
- </div>
-
- <br style="clear: both" />
-
- <hr />
-
- {% cache 3600 newest_episodes user.username %}
- {% if newest_episodes %}
- <div class="wide-box">
-  <h2>{% trans "Newest Episodes" %}</h2>
-  <table class="list episode_list">
-   {% for episode in newest_episodes %}
-    <tr>
-     <td>{{ episode.podcast|podcast_logo }}</td>
-     <td>{% episode_link episode episode.podcast %}<br/>
-      <span class="from_podcast">{% trans "from" %} {% podcast_group_link episode.podcast %}
-     </td>
-     <td>{{ episode.released|naturalday }}</td>
-    </tr>
-   {% endfor %}
-  </table>
- </div>
- {% endif %}
+   {% endif %}
  {% endcache %}
+{% endblock %}
+
+{% block sidebar %}
+  {% if sponsored_podcast %}
+    <div class="well">
+     <h4>{{ sponsored_podcast.title }} <small>(Supporting Podcast)</small></h4>
+     <div>{{ sponsored_podcast.podcast|podcast_logo }}</div>
+     <div style="margin-left: 40px">{{ sponsored_podcast.text|truncatewords:"20"}}</div>
+     <br style="clear: left;"/>
+     <small><a href="{% url advertise %}">advertise here</a></small>
+    </div>
+  {% endif %}
+
+
+ {% cache 3600 random_podcast %}
+ {% for random_podcast in random_podcasts %}
+    <div class="well">
+
+   <a href="{% podcast_link_target random_podcast %}">
+    <div id="podcastlogo">{{ random_podcast|podcast_logo_medium }}</div>
+   </a>
+
+   <h4>{{ random_podcast.title }}</h4>
+
+   <p class="description">
+    {{ random_podcast.description|default:""|truncatewords:"50" }}
+   </p>
+
+   <p>
+    <a href="{% podcast_link_target random_podcast %}">{% trans "more..." %}</a>
+   </p>
+ </div>
+ {% endfor %}
+ {% endcache %}
+
+  <div class="well">
+   <h4>{% blocktrans %}Explore {{ site }}{% endblocktrans %}</h4>
+   <ul>
+    <li class="icon-check">
+     <a href="{% url home %}">
+      {% blocktrans %}Sign up to {{ site }}{% endblocktrans %}
+     </a>
+    </li>
+    <li class="icon-check{% if not "devices" in checklist %}-empty{% endif %}">
+     <a href="{% url devices %}">
+      {% trans "Connect your Podcast Clients" %}
+     </a>
+    </li>
+    <li class="icon-check{% if not "subscriptions" in checklist %}-empty{% endif %}">
+     <a href="{% url subscriptions %}">
+      {% trans "Subscribe to Podcasts" %}
+     </a>
+    </li>
+    <li class="icon-check{% if not "favorites" in checklist %}-empty{% endif %}">
+     <a href="{% url favorites %}">
+      {% trans "Mark your Favorite Episodes" %}
+     </a>
+    </li>
+    <li class="icon-check{% if not "share" in checklist %}-empty{% endif %}">
+     <a href="{% url share %}">
+      {% trans "Share your Subscriptions" %}
+     </a>
+    </li>
+    <li class="icon-check{% if not "share-favorites" in checklist %}-empty{% endif %}">
+     <a href="{% url share %}">
+      {% trans "Share your Favorite Episodes" %}
+     </a>
+    </li>
+    <li class="icon-check{% if not "userpage" in checklist %}-empty{% endif %}">
+     <a href="{% url share %}">
+      {% trans "Share your Userpage" %}
+     </a>
+    </li>
+    <li class="icon-check{% if not "tags" in checklist %}-empty{% endif %}">
+     <a href="{% url tags %}">
+      {% trans "Tag Podcasts" %}
+     </a>
+    </li>
+    <li class="icon-check{% if not "lists" in checklist %}-empty{% endif %}">
+     <a href="{% url lists-overview %}">
+      {% trans "Create Podcast Lists" %}
+     </a>
+    </li>
+    <li class="icon-check{% if not "publish" in checklist %}-empty{% endif %}">
+     <a href="{% url publisher %}">
+      {% trans "Publish your own Podcast" %}
+     </a>
+    </li>
+   </ul>
+  </p>
+
+ </div>
+
+ {% if show_install_reader %}
+  <div class="well">
+    <h4>{% trans "Subscribe in Your Browser" %}</h4>
+    <p>
+     {% blocktrans %}Register {{ site.domain }} as a feed reader, and subscribe to podcasts directly from your browser{% endblocktrans %}
+    </p>
+    <a class="btn btn-primary" href="#" onclick="registerHandler();">
+     {% trans "Install" %}
+    </a>
+
+ </div>
+ {% endif %}
 
 {% endblock %}
 
+
+{% block javascript %}
+<script type="text/javascript">
+  function registerHandler()
+  {
+    navigator.registerContentHandler("application/vnd.mozilla.maybe.feed",
+        document.location.protocol + "//{{ site.domain }}/subscribe?url=%s",
+        "{{ site.domain }}");
+  }
+</script>
+{% endblock %}

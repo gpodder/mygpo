@@ -243,11 +243,10 @@ def symbian_opml(request, device):
 @allowed_methods(['POST'])
 def delete(request, device):
 
-    if request.user.is_synced(device):
-        request.user.unsync_device(device)
-
     @repeat_on_conflict(['user'])
     def _delete(user, device):
+        if request.user.is_synced(device):
+            request.user.unsync_device(device)
         device.deleted = True
         user.set_device(device)
         user.save()
@@ -298,23 +297,20 @@ def sync(request, device):
     if not form.is_valid():
         return HttpResponseBadRequest('invalid')
 
-    # TODO: remove cascaded trys
+
+    @repeat_on_conflict(['user'])
+    def do_sync(user, device, sync_target):
+        user.sync_devices(device, sync_target)
+        user.save()
+
 
     try:
         target_uid = form.get_target()
+        sync_target = request.user.get_device_by_uid(target_uid)
+        do_sync(user=request.user, device=device, sync_target=sync_target)
 
-        try:
-            sync_target = request.user.get_device_by_uid(target_uid)
-
-            request.user.sync_devices(device, sync_target)
-            request.user.save()
-
-        except DeviceDoesNotExist as e:
-            messages.error(request, str(e))
-
-    except ValueError, e:
-        raise
-        log('error while syncing device %s: %s' % (device_id, e))
+    except DeviceDoesNotExist as e:
+        messages.error(request, str(e))
 
     return HttpResponseRedirect(reverse('device', args=[device.uid]))
 
@@ -323,9 +319,14 @@ def sync(request, device):
 @login_required
 @allowed_methods(['GET'])
 def unsync(request, device):
+
+    @repeat_on_conflict(['user'])
+    def do_unsync(user, device):
+        user.unsync_device(device)
+        user.save()
+
     try:
-        request.user.unsync_device(device)
-        request.user.save()
+        do_unsync(user=request.user, device=device)
 
     except ValueError, e:
         messages.error(request, 'Could not unsync the device: {err}'.format(

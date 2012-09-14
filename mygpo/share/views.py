@@ -8,6 +8,10 @@ from django.contrib.sites.models import RequestSite
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils.translation import ugettext as _
+from django.views.decorators.vary import vary_on_cookie
+from django.views.decorators.cache import cache_control
+from django.views.generic.base import View
+from django.utils.decorators import method_decorator
 
 from mygpo.core.models import Podcast
 from mygpo.core.proxy import proxy_object
@@ -15,6 +19,9 @@ from mygpo.api.simple import format_podcast_list
 from mygpo.share.models import PodcastList
 from mygpo.users.models import User
 from mygpo.directory.views import search as directory_search
+from mygpo.decorators import repeat_on_conflict
+from mygpo.data.feeddownloader import update_podcasts
+
 
 
 def list_decorator(must_own=False):
@@ -168,3 +175,136 @@ def rate_list(request, plist, owner):
 
     list_url = reverse('list-show', args=[owner.username, plist.slug])
     return HttpResponseRedirect(list_url)
+
+
+class FavoritesPublic(View):
+
+    public = True
+
+    @method_decorator(vary_on_cookie)
+    @method_decorator(cache_control(private=True))
+    @method_decorator(login_required)
+    def post(self, request):
+
+        if self.public:
+            request.user.favorite_feeds_token = ''
+            request.user.save()
+
+        else:
+            request.user.create_new_token('favorite_feeds_token', 8)
+            request.user.save()
+
+        token = request.user.favorite_feeds_token
+
+        return HttpResponseRedirect(reverse('share-favorites'))
+
+
+
+class ShareFavorites(View):
+
+    @method_decorator(vary_on_cookie)
+    @method_decorator(cache_control(private=True))
+    @method_decorator(login_required)
+    def get(self, request):
+
+        site = RequestSite(request)
+
+        feed_url = 'http://%s%s' % (site.domain, reverse('favorites-feed', args=[request.user.username]))
+
+        podcast = Podcast.for_url(feed_url)
+
+        token = request.user.favorite_feeds_token
+
+        return render(request, 'share/favorites.html', {
+            'feed_token': token,
+            'site': site,
+            'podcast': podcast,
+            })
+
+
+class PublicSubscriptions(View):
+
+    public = True
+
+    @method_decorator(vary_on_cookie)
+    @method_decorator(cache_control(private=True))
+    @method_decorator(login_required)
+    def post(self, request):
+
+        self.update(request.user)
+
+        return HttpResponseRedirect(reverse('share'))
+
+
+    @repeat_on_conflict(['user'])
+    def update(self, user):
+        if self.public:
+            user.subscriptions_token = ''
+        else:
+            user.create_new_token('subscriptions_token')
+
+        user.save()
+
+
+class FavoritesFeedCreateEntry(View):
+    """ Creates a Podcast object for the user's favorites feed """
+
+    @method_decorator(vary_on_cookie)
+    @method_decorator(cache_control(private=True))
+    @method_decorator(login_required)
+    def post(self, request):
+        user = request.user
+
+        #TODO: move into FavoritesFeed class
+        site = RequestSite(request)
+        feed_url = 'http://%s%s' % (site.domain, reverse('favorites-feed', args=[user.username]))
+
+        podcast = Podcast.for_url(feed_url, create=True)
+
+        if not podcast.get_id() in user.published_objects:
+            user.published_objects.append(podcast.get_id())
+            user.save()
+
+        update_podcasts([podcast])
+
+        return HttpResponseRedirect(reverse('share-favorites'))
+
+
+@login_required
+def overview(request):
+    site = RequestSite(request)
+
+    subscriptions_token = request.user.get_token('subscriptions_token')
+    userpage_token = request.user.get_token('userpage_token')
+    favfeed_token = request.user.get_token('favorite_feeds_token')
+
+    favfeed_url = 'http://%s%s' % (site.domain, reverse('favorites-feed', args=[request.user.username]))
+    favfeed_podcast = Podcast.for_url(favfeed_url)
+
+    return render(request, 'share/overview.html', {
+        'site': site,
+        'subscriptions_token': subscriptions_token,
+        'userpage_token': userpage_token,
+        'favfeed_token': favfeed_token,
+        'favfeed_podcast': favfeed_podcast,
+        })
+
+
+@login_required
+def set_token_public(request, token_name, public):
+
+    if public:
+        @repeat_on_conflict(['user'])
+        def _update(user):
+            setattr(user, token_name, '')
+            user.save()
+
+    else:
+        @repeat_on_conflict(['user'])
+        def _update(user):
+            user.create_new_token(token_name)
+            user.save()
+
+    _update(user=request.user)
+
+    return HttpResponseRedirect(reverse('share'))

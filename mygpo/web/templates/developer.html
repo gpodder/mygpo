@@ -7,8 +7,12 @@
 
 {% block title %}{% trans "Development" %}{% endblock %}
 
-{% block content %}
+{% block header %}
   <h1>{% trans "Development" %}</h1>
+{% endblock %}
+
+
+{% block content %}
 
   <h2>{% trans "Webservice" %}</h2>
   <p>{% blocktrans %}The sourcecode of the webservice gpodder.net is released as open source under the AGPLv3 and <a href="https://github.com/gpodder/mygpo">hosted at GitHub</a>. Bugs can be reported at the <a href="https://bugs.gpodder.org/enter_bug.cgi?product=gpodder.net">gPodder Bugtracker</a>.{% endblocktrans %}</p>

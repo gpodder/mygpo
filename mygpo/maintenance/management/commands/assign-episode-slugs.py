@@ -10,6 +10,7 @@ from mygpo.core.models import Podcast, PodcastGroup, Episode
 from mygpo.core.slugs import EpisodeSlug, EpisodesMissingSlugs
 from mygpo.decorators import repeat_on_conflict
 from mygpo.utils import progress
+from mygpo.couch import get_main_database
 from mygpo.maintenance.models import CommandStatus, CommandRunStatus
 
 try:
@@ -34,7 +35,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        db = Episode.get_db()
+        db = get_main_database()
         status = self.get_cmd_status()
         since = self.get_since(status, options)
         objects = self.get_objects(db, since)

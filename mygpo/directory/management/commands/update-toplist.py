@@ -4,7 +4,7 @@ from optparse import make_option
 from django.core.management.base import BaseCommand
 
 from mygpo.core.models import Podcast, SubscriberData
-from mygpo.users.models import PodcastUserState
+from mygpo.couch import get_main_database
 from mygpo.utils import progress
 from mygpo.decorators import repeat_on_conflict
 
@@ -52,7 +52,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def get_subscriber_count(podcast):
-        db = PodcastUserState.get_db()
+        db = get_main_database()
         subscriber_sum = 0
 
         for podcast_id in podcast.get_ids():

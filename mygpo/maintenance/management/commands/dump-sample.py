@@ -2,16 +2,18 @@ from base64 import b64decode
 from optparse import make_option
 import sys
 
-from couchdb import json
 from couchdb.multipart import write_multipart
 
 from django.core.management.base import BaseCommand
+from mygpo.json import json
 
 from mygpo.core.models import Podcast
+from mygpo.couch import get_main_database
 from mygpo.users.models import PodcastUserState, EpisodeUserState, \
          Suggestions, User
 from mygpo.directory.models import Category
 from mygpo.utils import progress
+from mygpo.json import json
 
 
 class Command(BaseCommand):
@@ -74,7 +76,7 @@ class Command(BaseCommand):
                         docs.add(e_state._id)
 
 
-        db = Podcast.get_db()
+        db = get_main_database()
         docs = sorted(docs)
         self.dump(docs, db)
 
@@ -87,6 +89,9 @@ class Command(BaseCommand):
         total = len(docs)
 
         for n, docid in enumerate(docs):
+
+            if not docid:
+                continue
 
             doc = db.get(docid, attachments=True)
             attachments = doc.pop('_attachments', {})

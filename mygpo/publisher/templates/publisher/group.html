@@ -17,9 +17,11 @@
   {% endif %}
 {% endblock %}
 
-{% block content %}
-
+{% block header %}
   <h1>{% trans "Publisher Pages:" %} {{ group.title|striptags }}</h1>
+{% endblock %}
+
+{% block content %}
 
  <p>{% trans "This is a group of podcasts containing" %}
   <ul>

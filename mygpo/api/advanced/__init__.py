@@ -34,16 +34,16 @@ from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url, sanitize_urls
 from mygpo.api.advanced.directory import episode_data, podcast_data
 from mygpo.api.backend import get_device, get_favorites, BulkSubscribe
-from mygpo.couchdb import BulkException
+from mygpo.couch import BulkException, bulk_save_retry, get_main_database
 from mygpo.log import log
 from mygpo.utils import parse_time, format_time, parse_bool, get_to_dict, get_timestamp
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.core import models
 from mygpo.core.models import SanitizingRule, Podcast
-from mygpo.users.models import PodcastUserState, EpisodeAction, EpisodeUserState, DeviceDoesNotExist
+from mygpo.users.models import PodcastUserState, EpisodeAction, \
+     EpisodeUserState, DeviceDoesNotExist, DeviceUIDException
 from mygpo.json import json, JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
-from mygpo.couchdb import bulk_save_retry
 
 
 # keys that are allowed in episode actions
@@ -174,10 +174,10 @@ def episodes(request, username, version=1):
 
         try:
             update_urls = update_episodes(request.user, actions, now, ua_string)
-        except Exception, e:
+        except DeviceUIDException as e:
             import traceback
             log('could not update episodes for user %s: %s %s: %s' % (username, e, traceback.format_exc(), actions))
-            return HttpResponseBadRequest(e)
+            return HttpResponseBadRequest(str(e))
 
         return JsonResponse({'timestamp': now_, 'update_urls': update_urls})
 
@@ -330,7 +330,7 @@ def update_episodes(user, actions, now, ua_string):
         fun = partial(update_episode_actions, action_list=action_list)
         obj_funs.append( (episode_state, fun) )
 
-    db = EpisodeUserState.get_db()
+    db = get_main_database()
     bulk_save_retry(db, obj_funs)
 
     return update_urls

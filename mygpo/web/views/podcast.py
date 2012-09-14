@@ -12,10 +12,10 @@ from django.contrib import messages
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control
 
-from mygpo.core.models import Podcast, PodcastGroup
+from mygpo.core.models import Podcast, PodcastGroup, SubscriptionException
 from mygpo.core.proxy import proxy_object
 from mygpo.api.sanitizing import sanitize_url
-from mygpo.users.models import HistoryEntry
+from mygpo.users.models import HistoryEntry, DeviceDoesNotExist
 from mygpo.web.forms import PrivacyForm, SyncForm
 from mygpo.directory.tags import Tag
 from mygpo.decorators import allowed_methods, repeat_on_conflict
@@ -51,9 +51,15 @@ def show_slug(request, slug):
 @allowed_methods(['GET'])
 def show(request, podcast):
 
-    episodes = episode_list(podcast, request.user)
+    episodes = episode_list(podcast, request.user, limit=20)
 
     max_listeners = max([e.listeners for e in episodes] + [0])
+
+    episode = None
+
+    if episodes:
+        episode = episodes[0]
+        episodes = episodes[1:]
 
     if podcast.group:
         group = PodcastGroup.get(podcast.group)
@@ -94,6 +100,7 @@ def show(request, podcast):
             'related_podcasts': rel_podcasts,
             'can_subscribe': len(subscribe_targets) > 0,
             'subscribe_form': subscribe_form,
+            'episode': episode,
             'episodes': episodes,
             'max_listeners': max_listeners,
         })
@@ -104,6 +111,7 @@ def show(request, podcast):
             'related_podcasts': rel_podcasts,
             'tags': tags,
             'url': current_site,
+            'episode': episode,
             'episodes': episodes,
             'max_listeners': max_listeners,
         })
@@ -131,7 +139,7 @@ def get_tags(podcast, user):
     return tag_list
 
 
-def episode_list(podcast, user):
+def episode_list(podcast, user, limit=None):
     """
     Returns a list of episodes, with their action-attribute set to the latest
     action. The attribute is unsert if there is no episode-action for
@@ -139,7 +147,7 @@ def episode_list(podcast, user):
     """
 
     listeners = dict(podcast.episode_listener_counts())
-    episodes = list(podcast.get_episodes(descending=True))
+    episodes = list(podcast.get_episodes(descending=True, limit=limit))
 
     if user.is_authenticated():
 
@@ -159,6 +167,25 @@ def episode_list(podcast, user):
 
     annotate_episode = partial(_annotate_episode, listeners, episode_actions)
     return map(annotate_episode, episodes)
+
+
+
+def all_episodes(request, podcast):
+
+    episodes = episode_list(podcast, request.user)
+
+    max_listeners = max([e.listeners for e in episodes] + [0])
+
+    if request.user.is_authenticated():
+
+        request.user.sync_all()
+
+    return render(request, 'episodes.html', {
+        'podcast': podcast,
+        'episodes': episodes,
+        'max_listeners': max_listeners,
+    })
+
 
 
 def _annotate_episode(listeners, episode_actions, episode):
@@ -224,25 +251,15 @@ def subscribe(request, podcast):
     if request.method == 'POST':
         form = SyncForm(request.POST)
 
-        # TODO: remove cascaded trys
         try:
             device = request.user.get_device_by_uid(form.get_target())
+            podcast.subscribe(request.user, device)
 
-            try:
-                podcast.subscribe(request.user, device)
-
-            except Exception as e:
-                log('Web: %(username)s: could not subscribe to podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
-                    {'username': request.user.username, 'podcast_url': podcast.url, 'device_id': device.uid if device else '', 'exception': e})
-
-            return HttpResponseRedirect(get_podcast_link_target(podcast))
-
-        except ValueError, e:
-            messages.error(request, _('Could not subscribe '
-                        'to the podcast: %s' % str(e)))
-
-        except DeviceDoesNotExist as e:
+        except (SubscriptionException, DeviceDoesNotExist) as e:
             messages.error(request, str(e))
+
+        return HttpResponseRedirect(get_podcast_link_target(podcast))
+
 
     request.user.sync_all()
 
@@ -349,6 +366,7 @@ unsubscribe_slug_id = slug_id_decorator(unsubscribe)
 add_tag_slug_id     = slug_id_decorator(add_tag)
 remove_tag_slug_id  = slug_id_decorator(remove_tag)
 set_public_slug_id  = slug_id_decorator(set_public)
+all_episodes_slug_id= slug_id_decorator(all_episodes)
 
 
 show_oldid          = oldid_decorator(show)
@@ -357,3 +375,4 @@ unsubscribe_oldid   = oldid_decorator(unsubscribe)
 add_tag_oldid       = oldid_decorator(add_tag)
 remove_tag_oldid    = oldid_decorator(remove_tag)
 set_public_oldid    = oldid_decorator(set_public)
+all_episodes_oldid  = oldid_decorator(all_episodes)

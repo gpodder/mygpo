@@ -6,8 +6,11 @@
 {% block sectionmenu %}{{ "/register/"|section_menu }}{% endblock %}
 
 
-{% block content %}
+{% block header %}
   <h1>{% trans "Account activated" %}</h1>
+{% endblock %}
+
+{% block content %}
   <p>{% trans "Your account has been activated! Enjoy using gpodder.net" %}</p>
 {% endblock %}
 

@@ -46,7 +46,7 @@ def for_user(request, username):
         raise Http404
 
     subscriptions = user.get_subscribed_podcasts(public=True)
-    token = user.subscriptions_token
+    token = user.get_token('subscriptions_token')
 
     return render(request, 'user_subscriptions.html', {
         'subscriptions': subscriptions,
@@ -101,7 +101,7 @@ def create_subscriptionlist(request):
                 continue
 
             episode = get_cache_or_calc('%s-latest-episode' % podcast.get_id(),
-                    timeout=60*60, calc=lambda: podcast.get_latest_episode())
+                    60*60, podcast.get_latest_episode)
 
             subscription_list[podcast_id] = {
                 'podcast': podcasts[podcast_id],
@@ -118,7 +118,7 @@ def create_subscriptionlist(request):
 @requires_token(token_name='subscriptions_token')
 def subscriptions_feed(request, username):
     # Create to feed manually so we can wrap the token-authentication around it
-    f = SubscriptionsFeed()
+    f = SubscriptionsFeed(username)
     obj = f.get_object(request, username)
     feedgen = f.get_feed(obj, request)
     response = HttpResponse(mimetype=feedgen.mime_type)
@@ -128,6 +128,9 @@ def subscriptions_feed(request, username):
 
 class SubscriptionsFeed(Feed):
     """ A feed showing subscription changes for a certain user """
+
+    def __init__(self, username):
+        self.username = username
 
     def get_object(self, request, username):
         self.site = RequestSite(request)
@@ -169,7 +172,7 @@ class SubscriptionsFeed(Feed):
         else:
             s = _('%(username)s unsubscribed from %(podcast)s (%(site)s)')
 
-        return s % dict(username=entry.user.username,
+        return s % dict(username=self.username,
                         podcast=entry.podcast.display_title,
                         site=self.site)
 

@@ -77,11 +77,6 @@ MEDIA_ROOT = os.path.abspath('%s/../htdocs/media/' % os.path.dirname(__file__))
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
 MEDIA_URL = ''
 
-# URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
-# trailing slash.
-# Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = '/media/admin/'
-
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
     'django.template.loaders.app_directories.Loader',
@@ -120,6 +115,7 @@ INSTALLED_APPS = (
     'mygpo.directory',
     'mygpo.maintenance',
     'mygpo.share',
+    'mygpo.admin',
 )
 
 TEST_EXCLUDE = (
@@ -144,7 +140,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.i18n",
     "django.core.context_processors.media",
     "django.contrib.messages.context_processors.messages",
-    "mygpo.web.googleanalytics.processor",
+    "mygpo.web.google.analytics",
+    "mygpo.web.google.adsense",
 )
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
@@ -172,6 +169,14 @@ EMAIL_BACKEND = 'django_couchdb_utils.email.backends.CouchDBEmailBackend'
 
 # minimum number of subscribers a podcast must have to be assigned a slug
 PODCAST_SLUG_SUBSCRIBER_LIMIT = 10
+
+
+ADSENSE_CLIENT = ''
+ADSENSE_SLOT_BOTTOM = ''
+
+# enabled access to staff-only areas with ?staff=<STAFF_TOKEN>
+STAFF_TOKEN = None
+
 
 try:
     from settings_prod import *

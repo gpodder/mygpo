@@ -5,6 +5,16 @@ function(doc, req)
         return false;
     }
 
+    if(doc._deleted == true)
+    {
+        return false;
+    }
+
+    if(!doc.actions)
+    {
+        return false;
+    }
+
     function isPlayEvent(action)
     {
         return action.action == "play";
