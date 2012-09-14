@@ -8,7 +8,7 @@ from django.core.management.base import BaseCommand
 from mygpo.json import json
 
 from mygpo.core.models import Podcast
-from mygpo.couchdb import get_main_database
+from mygpo.couch import get_main_database
 from mygpo.users.models import PodcastUserState, EpisodeUserState, \
          Suggestions, User
 from mygpo.directory.models import Category

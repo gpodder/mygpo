@@ -10,7 +10,7 @@ from mygpo.core.models import Podcast, PodcastGroup, Episode
 from mygpo.core.slugs import EpisodeSlug, EpisodesMissingSlugs
 from mygpo.decorators import repeat_on_conflict
 from mygpo.utils import progress
-from mygpo.couchdb import get_main_database
+from mygpo.couch import get_main_database
 from mygpo.maintenance.models import CommandStatus, CommandRunStatus
 
 try:

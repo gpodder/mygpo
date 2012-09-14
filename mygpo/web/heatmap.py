@@ -17,7 +17,7 @@
 
 from functools import wraps
 
-from mygpo.couchdb import get_main_database
+from mygpo.couch import get_main_database
 
 
 class EpisodeHeatmap(object):

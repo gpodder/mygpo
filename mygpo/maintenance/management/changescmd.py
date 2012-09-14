@@ -8,7 +8,7 @@ from couchdbkit.exceptions import ResourceNotFound
 from couchdbkit import Consumer
 
 from mygpo.utils import progress
-from mygpo.couchdb import get_main_database
+from mygpo.couch import get_main_database
 from mygpo.maintenance.models import CommandStatus, CommandRunStatus
 
 try:

@@ -22,9 +22,8 @@ from mygpo.core.models import Podcast, Episode
 from mygpo.users.models import EpisodeUserState, Device, DeviceDoesNotExist, \
          PodcastUserState
 from mygpo.decorators import repeat_on_conflict
-from mygpo.couch import bulk_save_retry
+from mygpo.couch import bulk_save_retry, get_main_database
 from mygpo.json import json
-from mygpo.couchdb import bulk_save_retry, get_main_database
 
 
 def get_random_picks(languages=None):

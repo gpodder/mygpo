@@ -1,6 +1,6 @@
 from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.utils import is_url
-from mygpo.couchdb import get_main_database
+from mygpo.couch import get_main_database
 from mygpo.data.feeddownloader import update_podcasts
 from mygpo.api.sanitizing import sanitize_url
 

@@ -8,7 +8,7 @@ from mygpo.utils import progress, multi_request_view
 from mygpo.users.models import EpisodeUserState
 from mygpo.counter import Counter
 from mygpo.maintenance.merge import merge_episode_states
-from mygpo.couchdb import bulk_save_retry, get_main_database
+from mygpo.couch import bulk_save_retry, get_main_database
 
 
 class Command(BaseCommand):

@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from couchdbkit.loaders import FileSystemDocsLoader
 
-from mygpo.couchdb import get_main_database
+from mygpo.couch import get_main_database
 
 
 

@@ -4,7 +4,7 @@ from optparse import make_option
 from django.core.management.base import BaseCommand
 
 from mygpo.core.models import Podcast, SubscriberData
-from mygpo.couchdb import get_main_database
+from mygpo.couch import get_main_database
 from mygpo.utils import progress
 from mygpo.decorators import repeat_on_conflict
 

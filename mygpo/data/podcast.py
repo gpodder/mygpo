@@ -16,7 +16,7 @@
 #
 
 from mygpo.core.models import Podcast
-from mygpo.couchdb import get_main_database
+from mygpo.couch import get_main_database
 
 try:
     from collections import Counter
