@@ -20,6 +20,9 @@ def proxy_object(obj, **kwargs):
     class ProxyObject(object):
         """ Proxy for obj that can have properties of arbitrary type """
 
+        # ensure that proxied objects can be proxied again
+        __metaclass__ = DocumentABCMeta
+
         def __init__(self, obj, **kwargs):
             self.obj = obj
 
