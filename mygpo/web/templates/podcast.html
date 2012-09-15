@@ -7,6 +7,7 @@
 {% load charts %}
 {% load facebook %}
 {% load google %}
+{% load utils %}
 
 {% load menu %}
 {% block mainmenu %}{{ "/podcast/"|main_menu }}{% endblock %}
@@ -60,7 +61,7 @@
    {% endif %}
 
    {% if podcast.description %}
-    <p class="description">{{ podcast.description|striptags }}</p>
+    <div class="description">{{ podcast.description|markdown }}</div>
    {% endif %}
 
 {% endblock %}
@@ -74,7 +75,7 @@
 
     <h2>{{ episode.title }} <small>{{ episode.released|naturalday }}</small></h2>
     <div class="description">
-     {{ episode.description|default:""|striptags|truncatewords:"100" }}
+     {{ episode.description|default:""|truncatewords:"100"|markdown }}
     </div>
     <a href="{% episode_link_target episode podcast %}">more...</a>
 
@@ -97,7 +98,7 @@
       <td>{{ episode.action|episode_status_icon }}</td>
       <td class="short">
           <div class="title">{% episode_link episode podcast %}</div>
-          <p class="description short">{{ episode.description|default:""|striptags }}</p>
+          <div class="description short">{{ episode.description|default:""|truncatewords:"20"|markdown|striptags }}</div>
       </td>
       <td>{{ episode.released|default:""|date:"Y-m-d" }}</td>
       <td>

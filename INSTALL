@@ -19,6 +19,7 @@ development version from the repository.
   * [couchdbkit](https://github.com/benoitc/couchdbkit)
   * [Django](http://www.djangoproject.com/)
   * [django-couchdb-utils](http://github.com/stefankoegl/django-couchdb-utils/)
+  * [pthon-markdown2](https://github.com/trentm/python-markdown2)
 
 
 Basic setup

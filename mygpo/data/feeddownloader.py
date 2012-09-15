@@ -28,9 +28,10 @@ from mygpo.core.models import Episode, Podcast, PodcastGroup
 from mygpo.core.slugs import assign_missing_episode_slugs, assign_slug, \
          PodcastSlug
 from feedservice.parse import parse_feed
-from feedservice.parse.text import convert_markdown
-from mygpo.utils import file_hash
+from feedservice.parse.text import ConvertMarkdown
+from mygpo.utils import file_hash, split_list
 from mygpo.web.logo import CoverArt
+from mygpo.couch import get_main_database
 
 
 
@@ -42,6 +43,7 @@ class PodcastUpdater(object):
     def __init__(self, queue):
         """ Queue is an iterable of podcast objects """
         self.queue = queue
+        self.db = get_main_database()
 
 
     def update(self):
@@ -50,52 +52,72 @@ class PodcastUpdater(object):
         for n, podcast in enumerate(self.queue):
 
             if isinstance(podcast, PodcastGroup):
-                for p in podcast.podcasts:
-                    print '(%d) %s' % (n, p.url)
-                    self.update_podcast(podcast)
+                for m in range(len(podcast.podcasts)):
+                    pg = PodcastGroup.get(podcast._id)
+                    p = pg.podcasts[m]
+                    print '{:5d} {:s}'.format(n, p.url)
+                    self.update_podcast(p)
 
             else:
-                print '(%d) %s' % (n, podcast.url)
+                print '{:5d} {:s}'.format(n, podcast.url)
                 self.update_podcast(podcast)
+
+            print
 
 
     def update_podcast(self, podcast):
-        parsed = parse_feed(podcast.url, process_text=convert_markdown)
 
-        if 'urls' not in parsed:
-            # TODO ?
-            return
+        try:
+            parsed = parse_feed(podcast.url, text_processor=ConvertMarkdown())
 
-        podcast = Podcast.for_url(parsed['urls'][0])
+        except urllib2.HTTPError as e:
+            if e.code in (404, 400):
+                self.mark_outdated(podcast)
+                return
 
-        # TODO: check if we changed something
-        updated = True
+            raise
 
-        podcast.title = parsed.get('title', podcast.title)
-        podcast.urls = list(set(podcast.urls + parsed['urls']))
-        podcast.description = parsed.get('description', podcast.description)
-        podcast.link = parsed.get('link', podcast.link)
-        podcast.last_update = datetime.utcnow()
-        podcast.logo_url = parsed.get('logo', podcast.logo_url)
-        podcast.author = parsed.get('author', podcast.author)
-        podcast.language = parsed.get('language', podcast.language)
-        podcast.content_types = parsed.get('content_types', podcast.content_types)
-        podcast.tags['feed'] = parsed.get('tags', podcast.tags['feed'])
-        podcast.common_episode_title = parsed.get('common_episode_title', podcast.common_episode_title)
-        podcast.new_location = parsed.get('new_location', podcast.new_location)
+
+        podcast = Podcast.for_url(parsed.urls[0])
+        changed = False
+
+        changed |= update_a(podcast, 'title', parsed.title or podcast.title)
+        changed |= update_a(podcast, 'urls', list(set(podcast.urls + parsed.urls)))
+        changed |= update_a(podcast, 'description', parsed.description or podcast.description)
+        changed |= update_a(podcast, 'link',  parsed.link or podcast.link)
+        changed |= update_a(podcast, 'logo_url', parsed.logo or podcast.logo_url)
+        changed |= update_a(podcast, 'author', parsed.author or podcast.author)
+        changed |= update_a(podcast, 'language', parsed.language or podcast.language)
+        changed |= update_a(podcast, 'content_types', parsed.content_types or podcast.content_types)
+        changed |= update_i(podcast.tags, 'feed', parsed.tags or podcast.tags.get('feed', []))
+        changed |= update_a(podcast, 'common_episode_title', parsed.common_title or podcast.common_episode_title)
+        changed |= update_a(podcast, 'new_location', parsed.new_location or podcast.new_location)
 
 
         if podcast.new_location:
-            self.mark_outdated(podcast)
+            new_podcast = Podcast.for_url(podcast.new_location)
+            if podcast:
+                self.mark_outdated(podcast)
+                return
 
-        episodes = list(podcast.get_episodes())
-        self.update_episodes(podcast, parsed, episodes)
+            else:
+                podcast.urls.insert(0, podcast.new_location)
+                changed = True
+
+
+        episodes = self.update_episodes(podcast, parsed.episodes)
 
         # latest episode timestamp
         eps = filter(lambda e: bool(e.released), episodes)
         eps = sorted(eps, key=lambda e: e.released)
         if eps:
-            podcast.latest_episode_timestamp = eps[-1].released
+            changed |= update_a(podcast, 'latest_episode_timestamp', eps[-1].released)
+
+
+        if changed:
+            print '      saving podcast'
+            podcast.last_update = datetime.utcnow()
+            podcast.save()
 
 
         assign_slug(podcast, PodcastSlug)
@@ -104,62 +126,69 @@ class PodcastUpdater(object):
         self.save_podcast_logo(podcast.logo_url)
 
 
-    def update_episodes(self, podcast, parsed, episodes):
+    def update_episodes(self, podcast, parsed_episodes):
 
-        existing_episodes = dict( (e.url, e) for e in episodes)
-        episodes_by_id = dict( (e._id, e) for e in existing_episodes.values())
+        all_episodes = set(podcast.get_episodes())
+        remaining = list(all_episodes)
+        updated_episodes = []
 
-        for parsed_episode in parsed['episodes']:
+        for parsed_episode in parsed_episodes:
 
+            url = None
 
-            parsed_url = None
+            for f in parsed_episode.files:
+                if f.urls:
+                    url = f.urls[0]
 
-            for f in parsed_episode['files']:
-                if f['urls']:
-                    parsed_url = f['urls'][0]
-
-            if not parsed_url:
+            if not url:
                 continue
 
-            episode = existing_episodes.pop(parsed_url, None)
+            # pop matchin episodes out of the "existing" list
+            matching, remaining = split_list(remaining, lambda e: url in e.urls)
 
-            if not episode:
-                episode = Episode.for_podcast_id_url(podcast.get_id(),
-                    parsed_url, create=True)
-
-            if not episode:
-                episode = Episode()
-                episode.podcast = podcast.get_id()
-
-
-            episode.title = parsed_episode.get('title', episode.title)
-            episode.description = parsed_episode.get('description', episode.description)
-            episode.link = parsed_episode.get('link', episode.link)
-            episode.released = datetime.utcfromtimestamp(parsed_episode['released'])
-            episode.author = parsed_episode.get('author', episode.author)
-            episode.duration = parsed_episode.get('duration', episode.duration)
-            episode.filesize = parsed_episode['files'][0]['filesize']
-            episode.language = parsed_episode.get('language', episode.language)
-            episode.last_update = datetime.utcnow()
-            episode.mimetypes = list(set(filter(None, [f.get('mimetype') for f in parsed_episode['files']])))
-
-            urls = list(chain.from_iterable(f['urls'] for f in parsed_episode['files']))
-            episode.urls = list(set(episode.urls + urls))
-
-            #episode.content_types = None #TODO
-
-            print 'Updating Episode: %s' % episode.title
-            episode.save()
-
-            episodes_by_id.pop(episode._id, None)
+            if not matching:
+                new_episode = Episode.for_podcast_id_url(podcast.get_id(),
+                    url, create=True)
+                matching = [new_episode]
+                all_episodes.add(new_episode)
 
 
-        outdated_episodes = episodes_by_id.values()
+            for episode in matching:
+                changed = False
+                changed |= update_a(episode, 'title', parsed_episode.title or episode.title)
+                changed |= update_a(episode, 'description', parsed_episode.description or episode.description)
+                changed |= update_a(episode, 'content', parsed_episode.content or parsed_episode.description or episode.content)
+                changed |= update_a(episode, 'link', parsed_episode.link or episode.link)
+                changed |= update_a(episode, 'released', datetime.utcfromtimestamp(parsed_episode.released))
+                changed |= update_a(episode, 'author', parsed_episode.author or episode.author)
+                changed |= update_a(episode, 'duration', parsed_episode.duration or episode.duration)
+                changed |= update_a(episode, 'filesize', parsed_episode.files[0].filesize)
+                changed |= update_a(episode, 'language', parsed_episode.language or episode.language)
+                changed |= update_a(episode, 'mimetypes', list(set(filter(None, [f.mimetype for f in parsed_episode.files]))))
+
+                urls = list(chain.from_iterable(f.urls for f in parsed_episode.files))
+                changed |= update_a(episode, 'urls', sorted(set(episode.urls + urls), key=len))
+
+                if changed:
+                    episode.last_update = datetime.utcnow()
+                    updated_episodes.append(episode)
+
+                #episode.content_types = None #TODO
+
+
+        outdated_episodes = all_episodes - set(updated_episodes)
 
         # set episodes to be outdated, where necessary
         for e in filter(lambda e: not e.outdated, outdated_episodes):
             e.outdated = True
-            e.save()
+            updated_episodes.append(e)
+
+
+        if updated_episodes:
+            print '      Updating', len(updated_episodes), 'episodes'
+            self.db.save_docs(updated_episodes)
+
+        return all_episodes
 
 
     def save_podcast_logo(self, cover_art):
@@ -180,7 +209,7 @@ class PodcastUpdater(object):
             else:
                 old_hash = ''
 
-            print 'LOGO @', cover_art
+            print '      LOGO @', cover_art
 
             # save new cover art
             with open(filename, 'w') as fp:
@@ -193,7 +222,7 @@ class PodcastUpdater(object):
             # remove thumbnails if cover changed
             if old_hash != new_hash:
                 thumbnails = CoverArt.get_existing_thumbnails(prefix, filename)
-                print 'Removing %d thumbnails' % len(thumbnails)
+                print '      Removing %d thumbnails' % len(thumbnails)
                 for f in thumbnails:
                     os.unlink(f)
 
@@ -202,5 +231,28 @@ class PodcastUpdater(object):
         except urllib2.HTTPError as e:
             print e
 
-        except Exception:
-            raise
+        except urllib2.URLError as e:
+            print e
+
+
+    def mark_outdated(self, podcast):
+        print '      mark outdated'
+        podcast.outdated = True
+        podcast.last_update = datetime.utcnow()
+        podcast.save()
+        self.update_episodes(podcast, [])
+
+
+
+_none = object()
+
+def update_a(obj, attrib, value):
+    changed = getattr(obj, attrib, _none) != value
+    setattr(obj, attrib, value)
+    return changed
+
+
+def update_i(obj, item, value):
+    changed = obj.get(item, _none) != value
+    obj[item] = value
+    return changed
