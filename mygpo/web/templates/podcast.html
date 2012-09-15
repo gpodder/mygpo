@@ -147,7 +147,7 @@
         </td>
         <td style="text-align: center;">
          <form class="form-inline" method="post" action="{% podcast_link_target podcast "unsubscribe" device.uid %}?return_to={% podcast_link_target podcast %}">
-          <button class="btn btn-danger" type="submit">
+          <button class="btn btn-danger btn-small" type="submit">
            <i class="icon-remove"></i>
           </button>
          </form>
@@ -157,9 +157,15 @@
       {% if can_subscribe %}
        <tr>
         <form class="form-inline" action="{% podcast_link_target podcast "subscribe" %}" method="post">
-         {% csrf_token %}
-         <td>{{ subscribe_form.as_p }}</td>
-         <td style="text-align: center;">
+         <td>
+          {% csrf_token %}
+          <select name="targets" id="id_targets">
+           {% for device in subscribe_targets %}
+            <option value="{{ device.uid }}">{{ device.name }}</option>
+           {% endfor %}
+          </select>
+         </td>
+         <td>
           <button class="btn btn-success btn-small" type="submit">
            <i class="icon-ok"></i>
           </button>
