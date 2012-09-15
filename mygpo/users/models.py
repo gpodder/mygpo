@@ -14,7 +14,7 @@ from django.core.cache import cache
 
 from django_couchdb_utils.registration.models import User as BaseUser
 
-from mygpo.core.proxy import DocumentABCMeta
+from mygpo.core.proxy import DocumentABCMeta, proxy_object
 from mygpo.core.models import Podcast, Episode
 from mygpo.utils import linearize, get_to_dict, iterate_together
 from mygpo.couch import get_main_database
