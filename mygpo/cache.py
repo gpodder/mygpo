@@ -23,8 +23,10 @@ def cache_result(**cache_kwargs):
             name = f.__module__ + f.func_name
             key = create_key(name, args, kwargs)
 
+            # the timeout parameter can't be used when getting from a cache
             get_kwargs = dict(cache_kwargs)
-            get_kwargs.pop('timeout')
+            get_kwargs.pop('timeout', None)
+
             value = cache.get(key, NOT_IN_CACHE, **get_kwargs)
 
             if value is NOT_IN_CACHE:
