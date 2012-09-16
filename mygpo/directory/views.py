@@ -1,25 +1,24 @@
-from itertools import imap as map, islice
+from itertools import imap as map
 from math import ceil
 
 from django.core.cache import cache
-from django.http import HttpResponseRedirect, HttpResponseNotFound
+from django.http import HttpResponseNotFound
 from django.shortcuts import render
 from django.contrib.sites.models import RequestSite
-from django.views.decorators.cache import cache_page, cache_control
+from django.views.decorators.cache import cache_control
 from django.views.decorators.vary import vary_on_cookie
 from django.utils.decorators import method_decorator
 from django.views.generic.base import View
 
 from mygpo.core.models import Podcast
 from mygpo.core.proxy import proxy_object
-from mygpo.data.mimetype import CONTENT_TYPES
 from mygpo.directory.models import Category
 from mygpo.directory.toplist import PodcastToplist, EpisodeToplist, \
          TrendingPodcasts
 from mygpo.directory.search import search_podcasts
 from mygpo.web import utils
 from mygpo.directory.tags import Topics
-from mygpo.utils import flatten, get_to_dict
+from mygpo.utils import get_to_dict
 from mygpo.share.models import PodcastList
 from mygpo.users.models import User
 

@@ -3,7 +3,7 @@ from functools import wraps
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, \
         HttpResponseForbidden, Http404
-from django.views.decorators.cache import cache_page, never_cache, cache_control
+from django.views.decorators.cache import never_cache, cache_control
 from django.views.decorators.vary import vary_on_cookie
 from django.core.urlresolvers import reverse
 
@@ -11,7 +11,8 @@ from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.core.proxy import proxy_object
 from mygpo.publisher.auth import require_publisher, is_publisher
 from mygpo.publisher.forms import SearchPodcastForm
-from mygpo.publisher.utils import listener_data, episode_listener_data, check_publisher_permission, subscriber_data
+from mygpo.publisher.utils import listener_data, episode_listener_data, \
+         check_publisher_permission, subscriber_data
 from mygpo.web.heatmap import EpisodeHeatmap
 from mygpo.web.views.episode import oldid_decorator, slug_id_decorator
 from mygpo.web.views.podcast import \
