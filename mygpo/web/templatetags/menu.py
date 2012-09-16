@@ -98,10 +98,6 @@ def get_section_items(selected):
 @register.filter
 def section_menu(selected, title=None):
 
-    # TODO: we could create non-linked headers here
-    # <li class="nav-header">Sidebar</li>
-
-
     items = []
     for uri, caption in get_section_items(selected):
         if uri == selected:
