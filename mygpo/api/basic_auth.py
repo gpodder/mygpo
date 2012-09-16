@@ -66,7 +66,7 @@ def view_or_basicauth(view, request, test_func, realm = "", *args, **kwargs):
             try:
                 credentials = credentials.decode('base64').split(':', 1)
 
-            except Exception as e:
+            except UnicodeDecodeError as e:
                 return HttpResponseBadRequest(
                     'Could not decode credentials: {msg}'.format(msg=str(e)))
 

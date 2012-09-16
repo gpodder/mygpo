@@ -120,7 +120,7 @@ def add_chapter(request, episode):
         adv = 'advertisement' in request.POST
         label = request.POST.get('label')
 
-    except Exception as e:
+    except ValueError as e:
         # FIXME: when using Django's messaging system, set error message
 
         return HttpResponseRedirect(get_episode_link_target(episode, podcast))
@@ -209,7 +209,7 @@ def add_action(request, episode):
     if timestamp:
         try:
             timestamp = dateutil.parser.parse(timestamp)
-        except:
+        except (ValueError, AttributeError):
             timestamp = datetime.utcnow()
     else:
         timestamp = datetime.utcnow()

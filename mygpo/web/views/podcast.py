@@ -291,7 +291,7 @@ def unsubscribe(request, podcast, device_uid):
 
     try:
         podcast.unsubscribe(request.user, device)
-    except Exception as e:
+    except SubscriptionException as e:
         log('Web: %(username)s: could not unsubscribe from podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
             {'username': request.user.username, 'podcast_url': podcast.url, 'device_id': device.id, 'exception': e})
 

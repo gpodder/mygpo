@@ -67,7 +67,4 @@ class Command(BaseCommand):
 
             category.save()
 
-            try:
-                utils.progress(n % 1000, 1000, category.label.encode('utf-8'))
-            except:
-                pass
+            utils.progress(n % 1000, 1000, category.label)

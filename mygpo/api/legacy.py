@@ -27,7 +27,7 @@ from mygpo.log import log
 from mygpo.api.sanitizing import sanitize_urls
 from mygpo.users.models import User
 from mygpo.api.opml import Importer, Exporter
-from mygpo.core.models import Podcast
+from mygpo.core.models import Podcast, SubscriptionException
 from mygpo.api.backend import get_device
 
 
@@ -77,7 +77,7 @@ def upload(request):
 
         try:
             p.subscribe(user, dev)
-        except Exception as e:
+        except SubscriptionException as e:
             log('Legacy API: %(username)s: could not subscribe to podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
                 {'username': user.username, 'podcast_url': p.url, 'device_id': dev.id, 'exception': e})
 
@@ -85,7 +85,7 @@ def upload(request):
         p = Podcast.for_url(r, create=True)
         try:
             p.unsubscribe(user, dev)
-        except Exception as e:
+        except SubscriptionException as e:
             log('Legacy API: %(username): could not unsubscribe from podcast %(podcast_url) on device %(device_id): %(exception)s' %
                 {'username': user.username, 'podcast_url': p.url, 'device_id': dev.id, 'exception': e})
 

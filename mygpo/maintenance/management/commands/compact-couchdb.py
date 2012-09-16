@@ -6,6 +6,7 @@ from optparse import make_option
 
 from couchdbkit import Database
 from restkit import BasicAuth
+from restkit.errors import RequestError
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
@@ -97,7 +98,7 @@ class Command(BaseCommand):
             try:
                 compact()
                 break
-            except Exception, e:
+            except RequestError as e:
                 print >> sys.stderr, e
                 sleep(100)
 
@@ -111,7 +112,7 @@ class Command(BaseCommand):
                 else:
                     break
 
-            except Exception, e:
+            except RequestError as e:
                 print >> sys.stderr, e
                 sleep(100)
 

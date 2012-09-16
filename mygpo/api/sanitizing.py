@@ -106,13 +106,7 @@ def maintenance(dry_run=False):
     podcasts = Podcast.objects.only('id', 'url').order_by('id').iterator()
 
     for n, p in enumerate(podcasts):
-        try:
-            su = sanitize_url(p.url, rules=podcast_rules)
-        except Exception, e:
-            log('failed to sanitize url for podcast %s: %s' % (p.id, e))
-            print 'failed to sanitize url for podcast %s: %s' % (p.id, e)
-            p_stats['error'] += 1
-            continue
+        su = sanitize_url(p.url, rules=podcast_rules)
 
         # nothing to do
         if su == p.url:
@@ -121,17 +115,9 @@ def maintenance(dry_run=False):
 
         # invalid podcast, remove
         if su == '':
-            try:
-                if not dry_run:
-                    p.delete()
-                p_stats['deleted'] += 1
-
-            except Exception, e:
-                log('failed to delete podcast %s: %s' % (p.id, e))
-                print 'failed to delete podcast %s: %s' % (p.id, e)
-                p_stats['error'] += 1
-
-            continue
+            if not dry_run:
+                p.delete()
+            p_stats['deleted'] += 1
 
         try:
             su_podcast = Podcast.objects.get(url=su)
@@ -152,18 +138,11 @@ def maintenance(dry_run=False):
             continue
 
         # last option - merge podcasts
-        try:
-            if not dry_run:
-                rewrite_podcasts(p, su_podcast)
-                p.delete()
+        if not dry_run:
+            rewrite_podcasts(p, su_podcast)
+            p.delete()
 
-            p_stats['merged'] += 1
-
-        except Exception, e:
-            log('error rewriting podcast %s: %s' % (p.id, e))
-            print 'error rewriting podcast %s: %s' % (p.id, e)
-            p_stats['error'] += 1
-            continue
+        p_stats['merged'] += 1
 
         progress(n+1, num_podcasts, str(p.id))
 

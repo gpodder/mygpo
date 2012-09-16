@@ -32,7 +32,7 @@ class Command(PodcastCommand):
 
             try:
                 f = urllib2.urlopen(p.link)
-            except:
+            except urllib2.HTTPError:
                 continue
 
             tags = delicious.get_tags(f.url)

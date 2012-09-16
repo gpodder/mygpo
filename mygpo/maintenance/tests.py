@@ -76,11 +76,8 @@ class MergeTests(TestCase):
         self.podcast1.delete()
         self.episode1.delete()
 
-        try:
-            self.podcast2.delete()
-            self.episode2.delete()
-        except:
-            pass
+        self.podcast2.delete()
+        self.episode2.delete()
 
         self.user.delete()
 

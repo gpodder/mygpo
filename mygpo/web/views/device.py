@@ -125,7 +125,7 @@ def create(request):
             'device_form': device_form,
         })
 
-    except:
+    except Unauthorized:
         messages.error(request, _("You can't use the same Device "
                    "ID for two devices."))
 

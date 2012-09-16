@@ -44,10 +44,7 @@ def remove(l, item):
 @register.filter
 def format_time(time):
     from mygpo.utils import format_time as _format_time
-    try:
-        return mark_safe(_format_time(time))
-    except:
-        return mark_safe("")
+    return mark_safe(_format_time(time))
 
 
 @register.filter
