@@ -16,7 +16,7 @@ def search_wrapper(result):
     return p
 
 
-@cache_result(60*60)
+@cache_result(timeout=60*60)
 def search_podcasts(q, limit=20, skip=0):
 
     if is_url(q):
