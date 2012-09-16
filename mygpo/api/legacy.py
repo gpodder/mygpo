@@ -106,8 +106,7 @@ def getlist(request):
             undelete=True)
     podcasts = dev.get_subscribed_podcasts()
 
-    # FIXME: Get username and set a proper title (e.g. "thp's subscription list")
-    title = 'Your subscription list'
+    title = "{username}'s subscriptions".format(username=user.username)
     exporter = Exporter(title)
 
     opml = exporter.generate(podcasts)
