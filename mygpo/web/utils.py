@@ -9,6 +9,7 @@ from django.shortcuts import render
 
 from babel import Locale, UnknownLocaleError
 
+from mygpo.cache import cache_result
 from mygpo.core.models import Podcast
 from mygpo.core.proxy import proxy_object
 from mygpo.utils import get_to_dict
@@ -26,6 +27,7 @@ def get_accepted_lang(request):
     return list(set(langs))
 
 
+@cache_result()
 def get_podcast_languages():
     """
     Returns all 2-letter language codes that are used by podcasts.

@@ -44,7 +44,6 @@ from mygpo.users.models import PodcastUserState, User
 from mygpo.web import utils
 from mygpo.api import backend
 from mygpo.utils import flatten, parse_range
-from mygpo.cache import get_cache_or_calc
 from mygpo.share.models import PodcastList
 
 
@@ -62,9 +61,9 @@ def home(request):
 def welcome(request):
     current_site = RequestSite(request)
 
-    podcasts = get_cache_or_calc('podcast-count', 60*60, Podcast.count)
-    users    = get_cache_or_calc('user-count', 60*60, User.count)
-    episodes = get_cache_or_calc('episode-count', 60*60, Episode.count)
+    podcasts = Podcast.count()
+    users    = User.count()
+    episodes = Episode.count()
 
     lang = utils.process_lang_params(request)
 

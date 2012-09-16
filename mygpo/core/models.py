@@ -15,6 +15,7 @@ from django.core.urlresolvers import reverse
 
 from mygpo.decorators import repeat_on_conflict
 from mygpo import utils
+from mygpo.cache import cache_result
 from mygpo.couch import get_main_database
 from mygpo.core.proxy import DocumentABCMeta
 from mygpo.core.slugs import SlugMixin
@@ -239,6 +240,7 @@ class Episode(Document, SlugMixin, OldIdMixin):
 
 
     @classmethod
+    @cache_result(timeout=60*60)
     def count(cls):
         r = cls.view('episodes/by_podcast',
                 reduce = True,
@@ -510,6 +512,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
 
     @classmethod
+    @cache_result(timeout=60*60)
     def count(cls):
         # TODO: fix number calculation
         r = cls.view('podcasts/by_id',
@@ -640,6 +643,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         return common_title
 
 
+    @cache_result(timeout=60*60)
     def get_latest_episode(self):
         # since = 1 ==> has a timestamp
         episodes = self.get_episodes(since=1, descending=True, limit=1)

@@ -14,7 +14,6 @@ from mygpo.decorators import requires_token
 from mygpo.api import backend, simple
 from mygpo.users.models import HistoryEntry, User
 from mygpo.web import utils
-from mygpo.cache import get_cache_or_calc
 
 
 @vary_on_cookie
@@ -100,8 +99,7 @@ def create_subscriptionlist(request):
             if podcast is None:
                 continue
 
-            episode = get_cache_or_calc('%s-latest-episode' % podcast.get_id(),
-                    60*60, podcast.get_latest_episode)
+            episode = podcast.get_latest_episode()
 
             subscription_list[podcast_id] = {
                 'podcast': podcasts[podcast_id],

@@ -21,6 +21,7 @@ from mygpo.couch import get_main_database
 from mygpo.decorators import repeat_on_conflict
 from mygpo.users.ratings import RatingMixin
 from mygpo.users.sync import SyncedDevicesMixin
+from mygpo.cache import cache_result
 
 
 RE_DEVICE_UID = re.compile(r'^[\w.-]+$')
@@ -277,6 +278,7 @@ class EpisodeUserState(Document):
 
 
     @classmethod
+    @cache_result(timeout=60*60)
     def count(cls):
         r = cls.view('episode_states/by_user_episode',
                 limit = 0,

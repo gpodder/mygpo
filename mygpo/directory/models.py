@@ -5,6 +5,7 @@ from couchdbkit.ext.django.schema import *
 from mygpo.core.models import Podcast
 from mygpo.utils import iterate_together
 from mygpo.core.proxy import DocumentABCMeta
+from mygpo.cache import cache_result
 
 
 class CategoryEntry(DocumentSchema):
@@ -28,6 +29,7 @@ class Category(Document):
     podcasts = SchemaListProperty(CategoryEntry)
 
     @classmethod
+    @cache_result(timeout=60*60)
     def for_tag(cls, tag):
         r = cls.view('categories/by_tags',
                 key          = tag,
@@ -37,6 +39,7 @@ class Category(Document):
         return r.first() if r else None
 
     @classmethod
+    @cache_result(timeout=60*60)
     def top_categories(cls, count):
         return cls.view('categories/by_weight',
                 descending   = True,

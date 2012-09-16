@@ -3,6 +3,7 @@ from mygpo.utils import is_url
 from mygpo.couch import get_main_database
 from mygpo.data.feeddownloader import update_podcasts
 from mygpo.api.sanitizing import sanitize_url
+from mygpo.cache import cache_result
 
 
 def search_wrapper(result):
@@ -15,6 +16,7 @@ def search_wrapper(result):
     return p
 
 
+@cache_result(60*60)
 def search_podcasts(q, limit=20, skip=0):
 
     if is_url(q):
@@ -39,8 +41,4 @@ def search_podcasts(q, limit=20, skip=0):
         include_docs=True, limit=limit, skip=skip, q=q,
         sort='\\subscribers<int>')
 
-    #FIXME: return empty results in case of search backend error
-    try:
-        return list(res), res.total_rows
-    except:
-        return [], 0
+    return list(res), res.total_rows
