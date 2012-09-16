@@ -21,7 +21,7 @@ from mygpo.users.models import User
 from mygpo.directory.views import search as directory_search
 from mygpo.decorators import repeat_on_conflict
 from mygpo.data.feeddownloader import update_podcasts
-from mygpo.userfeeds.feeds import FavoritesFeed
+from mygpo.userfeeds.feeds import FavoriteFeed
 
 
 
@@ -209,9 +209,9 @@ class ShareFavorites(View):
     def get(self, request):
         user = request.user
 
-        favfeed = FavoritesFeed(user)
+        favfeed = FavoriteFeed(user)
         site = RequestSite(request)
-        feed_url = site.get_public_url(site.domain)
+        feed_url = favfeed.get_public_url(site.domain)
 
         podcast = Podcast.for_url(feed_url)
 
