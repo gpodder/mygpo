@@ -281,7 +281,7 @@ def overview(request):
     userpage_token = user.get_token('userpage_token')
     favfeed_token = user.get_token('favorite_feeds_token')
 
-    favfeed = FavoritesFeed(user)
+    favfeed = FavoriteFeed(user)
     favfeed_url = favfeed.get_public_url(site.domain)
     favfeed_podcast = Podcast.for_url(favfeed_url)
 

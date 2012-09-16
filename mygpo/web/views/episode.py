@@ -185,7 +185,7 @@ def list_favorites(request):
     recently_listened = fetch_episode_data(recently_listened, podcasts=podcasts)
     episodes = fetch_episode_data(episodes, podcasts=podcasts)
 
-    favfeed = FavoritesFeed(user)
+    favfeed = FavoriteFeed(user)
     feed_url = favfeed.get_public_url(site.domain)
 
     podcast = Podcast.for_url(feed_url)
