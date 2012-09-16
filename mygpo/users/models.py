@@ -46,6 +46,7 @@ class Suggestions(Document, RatingMixin):
     blacklist = StringListProperty()
 
     @classmethod
+    @cache_result(timeout=60*60)
     def for_user(cls, user):
         r = cls.view('suggestions/by_user', key=user._id, \
             include_docs=True)
@@ -429,6 +430,7 @@ class PodcastUserState(Document):
 
 
     @classmethod
+    @cache_result(timeout=60*60)
     def count(cls):
         r = PodcastUserState.view('podcast_states/by_user',
                 limit = 0,
@@ -783,6 +785,7 @@ class User(BaseUser, SyncedDevicesMixin):
         return list(Podcast.get_multi(self.get_subscribed_podcast_ids(public=public)))
 
 
+    @cache_result(timeout=60)
     def get_num_listened_episodes(self):
         db = EpisodeUserState.get_db()
         r = db.view('listeners/by_user_podcast',
@@ -915,6 +918,7 @@ class User(BaseUser, SyncedDevicesMixin):
             yield proxy_object(episode, podcast=podcast)
 
 
+    @cache_result(timeout=60)
     def get_latest_episodes(self, count=10):
         """ Returns the latest episodes that the user has accessed """
 
@@ -935,6 +939,7 @@ class User(BaseUser, SyncedDevicesMixin):
         return list(Episode.get_multi(keys))
 
 
+    @cache_result(timeout=60)
     def get_num_played_episodes(self, since=None, until={}):
         """ Number of played episodes in interval """
 
@@ -956,6 +961,7 @@ class User(BaseUser, SyncedDevicesMixin):
 
 
 
+    @cache_result(timeout=60)
     def get_seconds_played(self, since=None, until={}):
         """ Returns the number of seconds that the user has listened
 

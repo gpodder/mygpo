@@ -6,6 +6,7 @@ from django.template.defaultfilters import slugify
 
 from mygpo.core.proxy import DocumentABCMeta
 from mygpo.users.models import RatingMixin
+from mygpo.cache import cache_result
 
 
 
@@ -44,6 +45,7 @@ class PodcastList(Document, RatingMixin):
 
 
     @classmethod
+    @cache_result(timeout=60*69)
     def by_rating(cls, **kwargs):
         r = cls.view('podcastlists/by_rating',
                 descending   = True,
@@ -55,6 +57,7 @@ class PodcastList(Document, RatingMixin):
 
 
     @classmethod
+    @cache_result(timeout=60*60)
     def count(cls, with_rating=True):
         view = 'podcastlists/by_rating' if with_rating else \
                'podcastlists/by_user_slug'
