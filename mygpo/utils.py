@@ -354,11 +354,9 @@ def get_to_dict(cls, ids, get_id=lambda x: x._id, use_cache=False):
 
     cache_objs = []
     if use_cache:
-        for id in ids:
-            obj = cache.get(id)
-            if obj is not None:
-                cache_objs.append(obj)
-                ids.remove(id)
+        res = cache.get_many(ids)
+        cache_objs.extend(res.values())
+        ids = [x for x in ids if x not in res.keys()]
 
     db_objs = list(cls.get_multi(ids))
 
@@ -376,8 +374,7 @@ def get_to_dict(cls, ids, get_id=lambda x: x._id, use_cache=False):
             objs[i] = obj
 
     if use_cache:
-        for obj in db_objs:
-            cache.set(get_id(obj), obj)
+        cache.set_many(dict( (get_id(obj), obj) for obj in db_objs))
 
     return objs
 
