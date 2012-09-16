@@ -29,6 +29,8 @@ from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control
 from django.views.generic.base import View
 from django.utils.decorators import method_decorator
+from django.contrib import messages
+from django.utils.translation import ugettext as _
 
 from mygpo.api.constants import EPISODE_ACTION_TYPES
 from mygpo.decorators import repeat_on_conflict
@@ -121,7 +123,8 @@ def add_chapter(request, episode):
         label = request.POST.get('label')
 
     except ValueError as e:
-        # FIXME: when using Django's messaging system, set error message
+        messages.error(request,
+                _('Could not add Chapter: {msg}'.format(msg=str(e))))
 
         return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
