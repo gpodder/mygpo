@@ -169,11 +169,12 @@ def toggle_favorite(request, episode):
 @cache_control(private=True)
 @login_required
 def list_favorites(request):
+    user = request.user
     site = RequestSite(request)
 
-    episodes = backend.get_favorites(request.user)
+    episodes = backend.get_favorites(user)
 
-    recently_listened = request.user.get_latest_episodes()
+    recently_listened = user.get_latest_episodes()
 
     podcast_ids = [episode.podcast for episode in episodes + recently_listened]
     podcasts = get_to_dict(Podcast, podcast_ids, Podcast.get_id)
@@ -181,7 +182,8 @@ def list_favorites(request):
     recently_listened = fetch_episode_data(recently_listened, podcasts=podcasts)
     episodes = fetch_episode_data(episodes, podcasts=podcasts)
 
-    feed_url = 'http://%s/%s' % (site.domain, reverse('favorites-feed', args=[request.user.username]))
+    favfeed = FavoritesFeed(user)
+    feed_url = favfeed.get_public_url(site.domain)
 
     podcast = Podcast.for_url(feed_url)
 

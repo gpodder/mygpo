@@ -21,6 +21,7 @@ from mygpo.users.models import User
 from mygpo.directory.views import search as directory_search
 from mygpo.decorators import repeat_on_conflict
 from mygpo.data.feeddownloader import update_podcasts
+from mygpo.userfeeds.feeds import FavoritesFeed
 
 
 
@@ -206,10 +207,11 @@ class ShareFavorites(View):
     @method_decorator(cache_control(private=True))
     @method_decorator(login_required)
     def get(self, request):
+        user = request.user
 
+        favfeed = FavoritesFeed(user)
         site = RequestSite(request)
-
-        feed_url = 'http://%s%s' % (site.domain, reverse('favorites-feed', args=[request.user.username]))
+        feed_url = site.get_public_url(site.domain)
 
         podcast = Podcast.for_url(feed_url)
 
@@ -255,9 +257,9 @@ class FavoritesFeedCreateEntry(View):
     def post(self, request):
         user = request.user
 
-        #TODO: move into FavoritesFeed class
+        feed = favfeed(user)
         site = RequestSite(request)
-        feed_url = 'http://%s%s' % (site.domain, reverse('favorites-feed', args=[user.username]))
+        feed_url = feed.get_public_url(site.domain)
 
         podcast = Podcast.for_url(feed_url, create=True)
 
@@ -272,13 +274,15 @@ class FavoritesFeedCreateEntry(View):
 
 @login_required
 def overview(request):
+    user = request.user
     site = RequestSite(request)
 
-    subscriptions_token = request.user.get_token('subscriptions_token')
-    userpage_token = request.user.get_token('userpage_token')
-    favfeed_token = request.user.get_token('favorite_feeds_token')
+    subscriptions_token = user.get_token('subscriptions_token')
+    userpage_token = user.get_token('userpage_token')
+    favfeed_token = user.get_token('favorite_feeds_token')
 
-    favfeed_url = 'http://%s%s' % (site.domain, reverse('favorites-feed', args=[request.user.username]))
+    favfeed = FavoritesFeed(user)
+    favfeed_url = favfeed.get_public_url(site.domain)
     favfeed_podcast = Podcast.for_url(favfeed_url)
 
     return render(request, 'share/overview.html', {
