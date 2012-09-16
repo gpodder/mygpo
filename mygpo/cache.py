@@ -20,7 +20,8 @@ def cache_result(**cache_kwargs):
         @wraps(f)
         def _get(*args, **kwargs):
 
-            key = create_key(f.func_name, args, kwargs)
+            name = f.__module__ + f.func_name
+            key = create_key(name, args, kwargs)
 
             get_kwargs = dict(cache_kwargs)
             get_kwargs.pop('timeout')
