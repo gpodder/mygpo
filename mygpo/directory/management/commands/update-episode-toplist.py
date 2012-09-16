@@ -1,9 +1,9 @@
 from couchdbkit.exceptions import ResourceNotFound
 
-from mygpo.core.models import Episode
 from mygpo.users.models import EpisodeUserState
 from mygpo.decorators import repeat_on_conflict
 from mygpo.maintenance.management.changescmd import ChangesCommand
+from mygpo.db.couchdb.episode import episode_by_id
 
 class Command(ChangesCommand):
 
@@ -16,7 +16,7 @@ class Command(ChangesCommand):
         state = EpisodeUserState.wrap(doc)
 
         try:
-            episode = Episode.get(state.episode)
+            episode = episode_by_id(state.episode)
 
         except ResourceNotFound:
             episode = None

@@ -140,14 +140,8 @@ class EpisodeSlug(SlugGenerator):
 
     def _get_existing_slugs(self):
         """ Episode slugs have to be unique within the Podcast """
-        from mygpo.core.models import Episode
-
-        res = Episode.view('episodes/by_slug',
-                startkey = [self.podcast_id, self.base_slug],
-                endkey   = [self.podcast_id, self.base_slug + 'ZZZZZ'],
-                wrap_doc = False,
-            )
-        return [r['key'][1] for r in res]
+        from mygpo.db.couchdb.episode import episode_slugs_per_podcast
+        return episode_slugs_per_podcast(self.podcast_id, self.base_slug)
 
 
 class ObjectsMissingSlugs(object):

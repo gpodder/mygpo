@@ -29,6 +29,7 @@ from mygpo.web.utils import get_episode_link_target, get_podcast_link_target
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.directory.models import Category
+from mygpo.db.couchdb.episode import episode_for_podcast_url
 
 
 @csrf_exempt
@@ -71,7 +72,7 @@ def episode_info(request):
     podcast_url = sanitize_url(request.GET.get('podcast', ''))
     episode_url = sanitize_url(request.GET.get('url', ''), 'episode')
 
-    episode = models.Episode.for_podcast_url(podcast_url, episode_url)
+    episode = episode_for_podcast_url(podcast_url, episode_url)
 
     if episode is None:
         raise Http404

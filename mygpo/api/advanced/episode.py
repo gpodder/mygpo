@@ -34,6 +34,7 @@ from mygpo.utils import parse_time
 from mygpo.decorators import allowed_methods
 from mygpo.json import json
 from mygpo.api.basic_auth import require_valid_user, check_username
+from mygpo.db.couchdb.episode import episode_for_podcast_url
 
 
 @csrf_exempt
@@ -100,7 +101,7 @@ def chapters(request, username):
 
         podcast_url = sanitize_url(podcast_url)
         episode_url = sanitize_url(episode_url, 'episode')
-        episode = models.Episode.for_podcast_url(podcast_url, episode_url)
+        episode = episode_for_podcast_url(podcast_url, episode_url)
 
         if episode is None:
             raise Http404
@@ -139,7 +140,7 @@ def update_chapters(req, user):
     podcast_url = sanitize_url(req['podcast'])
     episode_url = sanitize_url(req['episode'], 'episode')
 
-    episode = models.Episode.for_podcast_url(podcast_url, episode_url,
+    episode = episode_for_podcast_url(podcast_url, episode_url,
             create=True)
 
     e_state = episode.get_user_state(request.user)

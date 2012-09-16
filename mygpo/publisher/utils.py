@@ -19,6 +19,7 @@ import collections
 from datetime import timedelta, datetime, time
 
 from mygpo.utils import daterange, flatten
+from mygpo.db.couchdb.episode import episodes_for_podcast
 
 
 def listener_data(podcasts, start_date=datetime(2010, 1, 1), leap=timedelta(days=1)):
@@ -34,7 +35,7 @@ def listener_data(podcasts, start_date=datetime(2010, 1, 1), leap=timedelta(days
     """
 
     # pre-calculate episode list, make it index-able by release-date
-    episodes = (podcast.get_episodes(since=start_date) for podcast in podcasts)
+    episodes = (episodes_for_podcast(podcast, since=start_date) for podcast in podcasts)
     episodes = flatten(episodes)
     episodes = dict((e.released.date(), e) for e in episodes)
 

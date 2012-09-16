@@ -33,7 +33,7 @@ from mygpo.api.constants import EPISODE_ACTION_TYPES, DEVICE_TYPES
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url, sanitize_urls
 from mygpo.api.advanced.directory import episode_data, podcast_data
-from mygpo.api.backend import get_device, get_favorites, BulkSubscribe
+from mygpo.api.backend import get_device, BulkSubscribe
 from mygpo.couch import BulkException, bulk_save_retry, get_main_database
 from mygpo.log import log
 from mygpo.utils import parse_time, format_time, parse_bool, get_to_dict, get_timestamp
@@ -44,6 +44,8 @@ from mygpo.users.models import PodcastUserState, EpisodeAction, \
      EpisodeUserState, DeviceDoesNotExist, DeviceUIDException
 from mygpo.json import json, JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
+from mygpo.db.couchdb.episode import episode_by_id, \
+         favorite_episodes_for_user, episodes_for_podcast
 
 
 # keys that are allowed in episode actions
@@ -514,7 +516,7 @@ def get_episode_updates(user, subscribed_podcasts, since):
     episode_status = {}
 
     # get episodes
-    episode_jobs = [gevent.spawn(p.get_episodes, since) for p in
+    episode_jobs = [gevent.spawn(episodes_for_podcast, p, since) for p in
         subscribed_podcasts]
     gevent.joinall(episode_jobs)
     episodes = chain.from_iterable(job.get() for job in episode_jobs)
@@ -534,7 +536,7 @@ def get_episode_updates(user, subscribed_podcasts, since):
         if e_id in episode_status:
             episode = episode_status[e_id].episode
         else:
-            episode = models.Episode.get(e_id)
+            episode = episode_by_id(e_id)
 
         episode_status[e_id] = EpisodeStatus(episode, action['action'], action)
 
@@ -545,7 +547,7 @@ def get_episode_updates(user, subscribed_podcasts, since):
 @check_username
 @never_cache
 def favorites(request, username):
-    favorites = get_favorites(request.user)
+    favorites = favorite_episodes_for_user(request.user)
     domain = RequestSite(request).domain
     e_data = lambda e: episode_data(e, domain)
     ret = map(e_data, favorites)

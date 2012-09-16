@@ -36,15 +36,18 @@ from mygpo.utils import parse_time, file_hash
 from mygpo.api.sanitizing import sanitize_url, rewrite_podcasts
 from mygpo.data import youtube
 from mygpo.data.mimetype import get_mimetype, check_mimetype, get_podcast_types
-from mygpo.core.models import Episode, Podcast
+from mygpo.core.models import Podcast
 from mygpo.core.slugs import assign_missing_episode_slugs, assign_slug, \
          PodcastSlug
 from mygpo.web.logo import CoverArt
+from mygpo.db.couchdb.episode import episode_for_podcast_id_url, \
+         episodes_for_podcast
+
 
 fetcher = feedcore.Fetcher(USER_AGENT)
 
 def mark_outdated(podcast):
-    for e in podcast.get_episodes():
+    for e in episodes_for_podcast(podcast):
         e.outdated = True
         e.save()
 
@@ -145,7 +148,7 @@ def get_episode_metadata(entry, url, mimetype, podcast_language):
 
 def get_podcast_metadata(podcast, feed):
 
-    episodes = list(podcast.get_episodes())
+    episodes = episodes_for_podcast(podcast)
 
     return dict(
         title = feed.feed.get('title', podcast.url),
@@ -212,7 +215,7 @@ def update_podcasts(fetch_queue):
         except feedcore.UpdatedFeed, updated:
             feed = updated.data
 
-            existing_episodes = list(podcast.get_episodes())
+            existing_episodes = episodes_for_podcast(podcast)
             update_ep = partial(update_episode, podcast=podcast)
             feed_episodes = filter(None, map(update_ep, feed.entries))
             outdated_episodes = set(existing_episodes) - set(feed_episodes)
@@ -326,7 +329,7 @@ def update_episode(entry, podcast):
         print 'Ignoring entry'
         return
 
-    episode = Episode.for_podcast_id_url(podcast.get_id(),
+    episode = episode_for_podcast_id_url(podcast.get_id(),
             url, create=True)
     md = get_episode_metadata(entry, url, mimetype,
             podcast.language)

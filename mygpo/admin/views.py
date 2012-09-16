@@ -11,12 +11,13 @@ from django.utils.decorators import method_decorator
 
 from mygpo.admin.auth import require_staff
 from mygpo.admin.group import PodcastGrouper
-from mygpo.core.models import Podcast, Episode
+from mygpo.core.models import Podcast
 from mygpo.counter import Counter
 from mygpo.maintenance.merge import PodcastMerger, IncorrectMergeException
 from mygpo.users.models import User
 from mygpo.admin.clients import UserAgentStats, ClientStats
 from mygpo.api.httpresponse import JsonResponse
+from mygpo.db.couchdb.episode import episode_count
 
 
 class AdminView(TemplateView):
@@ -197,7 +198,7 @@ class StatsView(AdminView):
     def _get_stats(self):
         return {
             'podcasts': Podcast.count(),
-            'episodes': Episode.count(),
+            'episodes': episode_count(),
             'users': User.count(),
         }
 

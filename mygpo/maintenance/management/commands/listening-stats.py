@@ -8,6 +8,7 @@ from mygpo.utils import progress, multi_request_view
 from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.decorators import repeat_on_conflict
 from mygpo.maintenance.management.podcastcmd import PodcastCommand
+from mygpo.db.couchdb.episode import episodes_for_podcast
 
 
 class Command(PodcastCommand):
@@ -41,7 +42,7 @@ class Command(PodcastCommand):
         # times in seconds between first download and first listen events
         i2 = []
 
-        episodes = podcast.get_episodes()
+        episodes = episodes_for_podcast(podcast)
         episodes = dict((episode._id, episode.released) for episode in episodes)
 
         for state in self.get_episode_states(podcast):

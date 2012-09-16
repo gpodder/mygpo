@@ -22,6 +22,7 @@ from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.utils import daterange
 from mygpo.web.utils import get_podcast_link_target
 from mygpo.log import log
+from mygpo.db.couchdb.episode import episodes_for_podcast
 
 
 MAX_TAGS_ON_PAGE=50
@@ -146,7 +147,7 @@ def episode_list(podcast, user, limit=None):
     """
 
     listeners = dict(podcast.episode_listener_counts())
-    episodes = list(podcast.get_episodes(descending=True, limit=limit))
+    episodes = episodes_for_podcast(podcast, descending=True, limit=limit)
 
     if user.is_authenticated():
 

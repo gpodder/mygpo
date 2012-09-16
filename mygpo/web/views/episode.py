@@ -37,12 +37,12 @@ from mygpo.decorators import repeat_on_conflict
 from mygpo.core import models
 from mygpo.core.proxy import proxy_object
 from mygpo.core.models import Podcast
-from mygpo.core.models import Episode
 from mygpo.users.models import Chapter, HistoryEntry, EpisodeAction
-from mygpo.api import backend
 from mygpo.utils import parse_time, get_to_dict
 from mygpo.web.heatmap import EpisodeHeatmap
 from mygpo.web.utils import get_episode_link_target, fetch_episode_data
+from mygpo.db.couchdb.episode import episode_for_slug_id, episode_for_oldid, \
+         favorite_episodes_for_user
 
 
 @vary_on_cookie
@@ -175,7 +175,7 @@ def list_favorites(request):
     user = request.user
     site = RequestSite(request)
 
-    episodes = backend.get_favorites(user)
+    episodes = favorite_episodes_for_user(user)
 
     recently_listened = user.get_latest_episodes()
 
@@ -242,7 +242,7 @@ def add_action(request, episode):
 def slug_id_decorator(f):
     @wraps(f)
     def _decorator(request, p_slug_id, e_slug_id, *args, **kwargs):
-        episode = Episode.for_slug_id(p_slug_id, e_slug_id)
+        episode = episode_for_slug_id(p_slug_id, e_slug_id)
 
         if episode is None:
             raise Http404
@@ -255,7 +255,7 @@ def slug_id_decorator(f):
 def oldid_decorator(f):
     @wraps(f)
     def _decorator(request, id, *args, **kwargs):
-        episode = Episode.for_oldid(id)
+        episode = episode_for_oldid(id)
 
         if episode is None:
             raise Http404

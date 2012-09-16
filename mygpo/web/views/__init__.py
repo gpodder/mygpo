@@ -35,16 +35,16 @@ from django.views.decorators.cache import never_cache, cache_control
 
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core import models
-from mygpo.core.models import Podcast, Episode
+from mygpo.core.models import Podcast
 from mygpo.core.podcasts import PodcastSet
 from mygpo.directory.tags import Tag
 from mygpo.directory.toplist import PodcastToplist
 from mygpo.users.models import Suggestions, History, HistoryEntry, DeviceDoesNotExist
 from mygpo.users.models import PodcastUserState, User
 from mygpo.web import utils
-from mygpo.api import backend
 from mygpo.utils import flatten, parse_range
 from mygpo.share.models import PodcastList
+from mygpo.db.couchdb.episode import episode_count, favorite_episodes_for_user
 
 
 @vary_on_cookie
@@ -63,7 +63,7 @@ def welcome(request):
 
     podcasts = Podcast.count()
     users    = User.count()
-    episodes = Episode.count()
+    episodes = episode_count()
 
     lang = utils.process_lang_params(request)
 
@@ -94,7 +94,7 @@ def dashboard(request, episode_count=10):
     if subscribed_podcasts:
         checklist.append('subscriptions')
 
-    if backend.get_favorites(request.user):
+    if favorite_episodes_for_user(request.user):
         checklist.append('favorites')
 
     if not request.user.get_token('subscriptions_token'):

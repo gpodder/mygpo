@@ -8,6 +8,7 @@ from mygpo.core.models import Podcast, Episode, PodcastGroup
 from mygpo.users.models import PodcastUserState, EpisodeUserState
 from mygpo import utils
 from mygpo.decorators import repeat_on_conflict
+from mygpo.db.couchdb.episode import episodes_for_podcast
 
 
 class IncorrectMergeException(Exception):
@@ -258,7 +259,7 @@ class PodcastMerger(object):
     def reassign_episodes(self, podcast1, podcast2):
         # re-assign episodes to new podcast
         # if necessary, they will be merged later anyway
-        for e in podcast2.get_episodes():
+        for e in episodes_for_podcast(podcast2):
             self.actions['reassign-episode'] += 1
 
             for s in e.get_all_states():

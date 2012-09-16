@@ -15,7 +15,7 @@ from django.core.cache import cache
 from django_couchdb_utils.registration.models import User as BaseUser
 
 from mygpo.core.proxy import DocumentABCMeta
-from mygpo.core.models import Podcast, Episode
+from mygpo.core.models import Podcast
 from mygpo.utils import linearize, get_to_dict, iterate_together
 from mygpo.couch import get_main_database
 from mygpo.decorators import repeat_on_conflict
@@ -274,7 +274,9 @@ class EpisodeUserState(Document):
             return state
 
         else:
-            episode = Episode.for_podcast_url(podcast_url, episode_url, create=True)
+            from mygpo.db.couchdb.episode import episode_for_podcast_id_url
+            episode = episode_for_podcast_id_url(podcast_url, episode_url,
+                    create=True)
             return episode.get_user_state(user)
 
 
@@ -907,8 +909,9 @@ class User(BaseUser, SyncedDevicesMixin):
             episodes = episodes[yielded_episodes:]
 
             # fetch and merge episodes for the next podcast
-            new_episodes = list(podcast.get_episodes(since=1, until=max_date,
-                        descending=True, limit=max_per_podcast))
+            from mygpo.db.couchdb.episode import episodes_for_podcast
+            new_episodes = episodes_for_podcast(podcast, since=1,
+                        until=max_date, descending=True, limit=max_per_podcast)
             episodes = sorted(episodes+new_episodes, key=cmp_key, reverse=True)
 
 
@@ -936,7 +939,7 @@ class User(BaseUser, SyncedDevicesMixin):
             )
 
         keys = [r['value'] for r in res]
-        return list(Episode.get_multi(keys))
+        return list(episodes_by_id(keys))
 
 
     @cache_result(timeout=60)
@@ -1094,10 +1097,11 @@ class HistoryEntry(object):
             podcasts = get_to_dict(Podcast, podcast_ids, get_id=Podcast.get_id)
 
         if episodes is None:
+            from mygpo.db.couchdb.episode import episodes_to_dict
             # load episode data
             episode_ids = [getattr(x, 'episode_id', None) for x in entries]
             episode_ids = filter(None, episode_ids)
-            episodes = get_to_dict(Episode, episode_ids)
+            episodes = episodes_to_dict(episode_ids)
 
         # load device data
         # does not need pre-populated data because no db-access is required

@@ -107,15 +107,6 @@ def get_device(user, uid, user_agent, undelete=True):
     return _get(user=user, uid=uid, undelete=undelete)
 
 
-def get_favorites(user):
-    favorites = Episode.view('favorites/episodes_by_user',
-            key          = user._id,
-            include_docs = True,
-        )
-    return list(favorites)
-
-
-
 class BulkSubscribe(object):
     """ Performs bulk subscribe/unsubscribe operations """
 

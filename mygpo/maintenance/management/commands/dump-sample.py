@@ -14,6 +14,7 @@ from mygpo.users.models import PodcastUserState, EpisodeUserState, \
 from mygpo.directory.models import Category
 from mygpo.utils import progress
 from mygpo.json import json
+from mygpo.db.couchdb.episode import episodes_for_podcast
 
 
 class Command(BaseCommand):
@@ -67,7 +68,7 @@ class Command(BaseCommand):
                         if c: docs.add(c._id)
 
                 # Episodes
-                for episode in podcast.get_episodes():
+                for episode in episodes_for_podcast(podcast):
                     docs.add(episode._id)
 
                     # Episode States
