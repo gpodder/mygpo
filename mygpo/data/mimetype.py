@@ -51,28 +51,9 @@ def get_type(mimetype):
             return 'audio'
         elif type == 'x-youtube':
             return 'video'
+        elif type == 'x-vimeo':
+            return 'video'
     return None
-
-def check_mimetype(mimetype):
-    """Checks if the given mimetype can be processed by mygpo
-    """
-
-    if not mimetype:
-        return False
-
-    if '/' in mimetype:
-        category, type = mimetype.split('/', 1)
-        if category in ('audio', 'video', 'image'):
-            return True
-
-        # application/ogg is a valid mime type for Ogg files
-        # but we do not want to accept all files with application category
-        if type in ('ogg', ):
-            return True
-
-        return False
-    else:
-        return False
 
 
 def get_mimetype(mimetype, url):

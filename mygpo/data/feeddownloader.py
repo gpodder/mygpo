@@ -143,8 +143,10 @@ class PodcastUpdater(object):
             if not url:
                 continue
 
+            guid = parsed_episode.guid
+
             # pop matchin episodes out of the "existing" list
-            matching, remaining = split_list(remaining, lambda e: url in e.urls)
+            matching, remaining = split_list(remaining, lambda e: (e.guid and e.guid == guid) or url in e.urls)
 
             if not matching:
                 new_episode = Episode.for_podcast_id_url(podcast.get_id(),
@@ -155,6 +157,7 @@ class PodcastUpdater(object):
 
             for episode in matching:
                 changed = False
+                changed |= update_a(episode, 'guid', parsed_episode.guid or episode.guid)
                 changed |= update_a(episode, 'title', parsed_episode.title or episode.title)
                 changed |= update_a(episode, 'description', parsed_episode.description or episode.description)
                 changed |= update_a(episode, 'content', parsed_episode.content or parsed_episode.description or episode.content)
