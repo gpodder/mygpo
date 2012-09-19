@@ -47,6 +47,7 @@ from mygpo.log import log
 from mygpo.decorators import allowed_methods
 from mygpo.utils import parse_range
 from mygpo.json import json
+from mygpo.db.couchdb.podcast import podcasts_by_id
 
 
 ALLOWED_FORMATS = ('txt', 'opml', 'json', 'jsonp', 'xml')
@@ -340,7 +341,7 @@ def example_podcasts(request, format):
         try:
             examples = ExamplePodcasts.get('example_podcasts')
             ids = examples.podcast_ids
-            podcasts = list(Podcast.get_multi(ids))
+            podcasts = podcasts_by_id(ids)
             cache.set('example-podcasts', podcasts)
 
         except ResourceNotFound:

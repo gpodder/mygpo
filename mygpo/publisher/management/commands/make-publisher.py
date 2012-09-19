@@ -5,6 +5,7 @@ from django.core.management.base import BaseCommand
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core.models import Podcast
 from mygpo.users.models import User
+from mygpo.db.couchdb.podcast import podcast_for_url
 
 
 class Command(BaseCommand):
@@ -29,7 +30,7 @@ class Command(BaseCommand):
             return
 
         urls = args[1:]
-        podcasts = map(Podcast.for_url, urls)
+        podcasts = map(podcast_for_url, urls)
         ids = map(Podcast.get_id, podcasts)
         self.add_publisher(user=user, ids=ids)
 

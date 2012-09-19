@@ -23,6 +23,8 @@ from mygpo.utils import daterange
 from mygpo.web.utils import get_podcast_link_target
 from mygpo.log import log
 from mygpo.db.couchdb.episode import episodes_for_podcast
+from mygpo.db.couchdb.podcast import podcast_for_slug, podcast_for_slug_id, \
+         podcast_for_oldid, podcast_for_url
 
 
 MAX_TAGS_ON_PAGE=50
@@ -38,7 +40,7 @@ def update_podcast_settings(state, is_public):
 @cache_control(private=True)
 @allowed_methods(['GET'])
 def show_slug(request, slug):
-    podcast = Podcast.for_slug(slug)
+    podcast = podcast_for_slug(slug)
 
     if slug != podcast.slug:
         target = reverse('podcast_slug', args=[podcast.slug])
@@ -312,7 +314,7 @@ def subscribe_url(request):
     if url == '':
         raise Http404('Please specify a valid url')
 
-    podcast = Podcast.for_url(url, create=True)
+    podcast = podcast_for_url(url, create=True)
 
     return HttpResponseRedirect(get_podcast_link_target(podcast, 'subscribe'))
 
@@ -332,7 +334,7 @@ def set_public(request, podcast, public):
 def slug_id_decorator(f):
     @wraps(f)
     def _decorator(request, slug_id, *args, **kwargs):
-        podcast = Podcast.for_slug_id(slug_id)
+        podcast = podcast_for_slug_id(slug_id)
 
         if podcast is None:
             raise Http404
@@ -350,7 +352,7 @@ def oldid_decorator(f):
         except (TypeError, ValueError):
             raise Http404
 
-        podcast = Podcast.for_oldid(pid)
+        podcast = podcast_for_oldid(pid)
 
         if not podcast:
             raise Http404

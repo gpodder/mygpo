@@ -42,6 +42,7 @@ from mygpo.core.slugs import assign_missing_episode_slugs, assign_slug, \
 from mygpo.web.logo import CoverArt
 from mygpo.db.couchdb.episode import episode_for_podcast_id_url, \
          episodes_for_podcast
+from mygpo.db.couchdb.podcast import podcast_for_url
 
 
 fetcher = feedcore.Fetcher(USER_AGENT)
@@ -202,7 +203,7 @@ def update_podcasts(fetch_queue):
             new_url = sanitize_url(location.data)
             if new_url:
 
-                p = Podcast.for_url(new_url)
+                p = podcats_for_url(new_url)
                 if not p:
                     podcast.urls.insert(0, new_url)
                     fetch_queue = chain([podcast], fetch_queue)

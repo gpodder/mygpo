@@ -7,6 +7,7 @@ from mygpo.core.models import Podcast, SubscriberData
 from mygpo.couch import get_main_database
 from mygpo.utils import progress
 from mygpo.decorators import repeat_on_conflict
+from mygpo.db.couchdb.podcast import podcast_count, all_podcasts
 
 
 class Command(BaseCommand):
@@ -23,8 +24,8 @@ class Command(BaseCommand):
         # couchdbkit doesn't preserve microseconds
         started = datetime.utcnow().replace(microsecond=0)
 
-        podcasts = Podcast.all_podcasts()
-        total = Podcast.view('podcasts/by_oldid', limit=0).total_rows
+        podcasts = all_podcasts()
+        total = podcast_count()
 
         for n, podcast in enumerate(podcasts):
             subscriber_count = self.get_subscriber_count(podcast)

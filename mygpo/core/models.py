@@ -232,192 +232,6 @@ class Podcast(Document, SlugMixin, OldIdMixin):
     random_key = FloatProperty(default=random)
 
 
-    @classmethod
-    def get(cls, id, current_id=False):
-        r = cls.view('podcasts/by_id',
-                key=id,
-                classes=[Podcast, PodcastGroup],
-                include_docs=True,
-            )
-
-        if not r:
-            return None
-
-        podcast_group = r.first()
-        return podcast_group.get_podcast_by_id(id, current_id)
-
-
-    @classmethod
-    def for_slug(cls, slug):
-        r = cls.view('podcasts/by_slug',
-                startkey     = [slug, None],
-                endkey       = [slug, {}],
-                include_docs = True,
-                wrap_doc     = False,
-            )
-
-        if not r:
-            return None
-
-        res = r.first()
-        doc = res['doc']
-        if doc['doc_type'] == 'Podcast':
-            return Podcast.wrap(doc)
-        else:
-            pid = res['key'][1]
-            pg = PodcastGroup.wrap(doc)
-            return pg.get_podcast_by_id(pid)
-
-
-    @classmethod
-    def for_slug_id(cls, slug_id):
-        """ Returns the Podcast for either an CouchDB-ID for a Slug """
-
-        if utils.is_couchdb_id(slug_id):
-            return cls.get(slug_id)
-        else:
-            return cls.for_slug(slug_id)
-
-
-    @classmethod
-    def get_multi(cls, ids):
-        r = cls.view('podcasts/by_id',
-                keys         = ids,
-                include_docs = True,
-                wrap_doc     = False
-            )
-
-        for res in r:
-            if res['doc']['doc_type'] == 'Podcast':
-                yield Podcast.wrap(res['doc'])
-            else:
-                pg = PodcastGroup.wrap(res['doc'])
-                id = res['key']
-                yield pg.get_podcast_by_id(id)
-
-
-    @classmethod
-    def for_oldid(cls, oldid):
-        oldid = int(oldid)
-        r = cls.view('podcasts/by_oldid',
-                key=long(oldid),
-                classes=[Podcast, PodcastGroup],
-                include_docs=True
-            )
-
-        if not r:
-            return None
-
-        podcast_group = r.first()
-        return podcast_group.get_podcast_by_oldid(oldid)
-
-
-    @classmethod
-    def for_url(cls, url, create=False):
-        r = cls.view('podcasts/by_url',
-                key=url,
-                classes=[Podcast, PodcastGroup],
-                include_docs=True
-            )
-
-        if r:
-            podcast_group = r.first()
-            return podcast_group.get_podcast_by_url(url)
-
-        if create:
-            podcast = cls()
-            podcast.urls = [url]
-            podcast.save()
-            return podcast
-
-        return None
-
-
-    @classmethod
-    def random(cls, language='', chunk_size=5):
-        """ Returns an iterator of random podcasts
-
-        optionaly a language code can be specified. If given the podcasts will
-        be restricted to this language. chunk_size determines how many podcasts
-        will be fetched at once """
-
-        while True:
-            rnd = random()
-            res = cls.view('podcasts/random',
-                    startkey     = [language, rnd],
-                    include_docs = True,
-                    limit        = chunk_size,
-                    stale        = 'ok',
-                    wrap_doc     = False,
-                )
-
-            if not res:
-                break
-
-            for r in res:
-                obj = r['doc']
-                if obj['doc_type'] == 'Podcast':
-                    yield Podcast.wrap(obj)
-
-                elif obj['doc_type'] == 'PodcastGroup':
-                    yield PodcastGroup.wrap(obj)
-
-
-    @classmethod
-    def by_last_update(cls):
-        res = cls.view('podcasts/by_last_update',
-                include_docs = True,
-                stale        = 'update_after',
-                wrap_doc     = False,
-            )
-
-        for r in res:
-            obj = r['doc']
-            if obj['doc_type'] == 'Podcast':
-                yield Podcast.wrap(obj)
-
-            else:
-                pid = r[u'key'][1]
-                pg = PodcastGroup.wrap(obj)
-                podcast = pg.get_podcast_by_id(pid)
-                yield podcast
-
-
-    @classmethod
-    def for_language(cls, language, **kwargs):
-
-        res = cls.view('podcasts/by_language',
-                startkey     = [language, None],
-                endkey       = [language, {}],
-                include_docs = True,
-                reduce       = False,
-                stale        = 'update_after',
-                wrap_doc     = False,
-                **kwargs
-            )
-
-        for r in res:
-            obj = r['doc']
-            if obj['doc_type'] == 'Podcast':
-                yield Podcast.wrap(obj)
-
-            else:
-                pid = r[u'key'][1]
-                pg = PodcastGroup.wrap(obj)
-                podcast = pg.get_podcast_by_id(pid)
-                yield podcast
-
-
-    @classmethod
-    @cache_result(timeout=60*60)
-    def count(cls):
-        # TODO: fix number calculation
-        r = cls.view('podcasts/by_id',
-                limit = 0,
-                stale = 'update_after',
-            )
-        return r.total_rows
-
 
     def get_podcast_by_id(self, id, current_id=False):
         if current_id and id != self.get_id():
@@ -485,7 +299,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         if self.common_episode_title:
             return self.common_episode_title
 
-        from mygpo.db.couchdb import episodes_for_podcast
+        from mygpo.db.couchdb.episode import episodes_for_podcast
         episodes = episodes_for_podcast(self, descending=True, limit=num_episodes)
 
         # We take all non-empty titles
@@ -507,36 +321,30 @@ class Podcast(Document, SlugMixin, OldIdMixin):
     def get_latest_episode(self):
         # since = 1 ==> has a timestamp
 
-        from mygpo.db.couchdb import episodes_for_podcast
+        from mygpo.db.couchdb.episode import episodes_for_podcast
         episodes = episodes_for_podcast(self, since=1, descending=True, limit=1)
-        return next(episodes, None)
+        return next(iter(episodes), None)
 
 
     def get_episode_before(self, episode):
         if not episode.released:
             return None
 
-        from mygpo.db.couchdb import episodes_for_podcast
+        from mygpo.db.couchdb.episode import episodes_for_podcast
         prevs = episodes_for_podcast(self, until=episode.released,
                 descending=True, limit=1)
 
-        try:
-            return next(prevs)
-        except StopIteration:
-            return None
+        return next(iter(prevs), None)
 
 
     def get_episode_after(self, episode):
         if not episode.released:
             return None
 
-        from mygpo.db.couchdb import episodes_for_podcast
+        from mygpo.db.couchdb.episode import episodes_for_podcast
         nexts = episodes_for_podcast(self, since=episode.released, limit=1)
 
-        try:
-            return next(nexts)
-        except StopIteration:
-            return None
+        return next(iter(nexts), None)
 
 
     @property
@@ -768,11 +576,6 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         else:
             super(Podcast, self).delete()
 
-    @classmethod
-    def all_podcasts_groups(cls):
-        return cls.view('podcasts/podcasts_groups', include_docs=True,
-            classes=[Podcast, PodcastGroup]).iterator()
-
 
     def __eq__(self, other):
         if not self.get_id():
@@ -784,25 +587,6 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         return self.get_id() == other.get_id()
 
 
-    @classmethod
-    def all_podcasts(cls):
-        res = utils.multi_request_view(cls, 'podcasts/by_id',
-                wrap         = False,
-                include_docs = True,
-                stale        = 'update_after',
-            )
-
-        for r in res:
-            obj = r['doc']
-            if obj['doc_type'] == 'Podcast':
-                yield Podcast.wrap(obj)
-            else:
-                pid = r[u'key']
-                pg = PodcastGroup.wrap(obj)
-                podcast = pg.get_podcast_by_id(pid)
-                yield podcast
-
-
 
 class PodcastGroup(Document, SlugMixin, OldIdMixin):
     title    = StringProperty()
@@ -810,13 +594,6 @@ class PodcastGroup(Document, SlugMixin, OldIdMixin):
 
     def get_id(self):
         return self._id
-
-    @classmethod
-    def for_oldid(cls, oldid):
-        oldid = int(oldid)
-        r = cls.view('podcasts/groups_by_oldid', \
-            key=oldid, limit=1, include_docs=True)
-        return r.first() if r else None
 
 
     @classmethod

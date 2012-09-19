@@ -15,6 +15,7 @@ from mygpo.directory.models import Category
 from mygpo.utils import progress
 from mygpo.json import json
 from mygpo.db.couchdb.episode import episodes_for_podcast
+from mygpo.db.couchdb.podcast import podcast_by_id
 
 
 class Command(BaseCommand):
@@ -58,7 +59,7 @@ class Command(BaseCommand):
                     if c: docs.add(c._id)
 
                 # Podcast
-                podcast = Podcast.get(p_state.podcast)
+                podcast = podcast_by_id(p_state.podcast)
                 docs.add(podcast._id)
 
                 # Categories

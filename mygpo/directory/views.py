@@ -18,9 +18,10 @@ from mygpo.directory.toplist import PodcastToplist, EpisodeToplist, \
 from mygpo.directory.search import search_podcasts
 from mygpo.web import utils
 from mygpo.directory.tags import Topics
-from mygpo.utils import get_to_dict
 from mygpo.share.models import PodcastList
 from mygpo.users.models import User
+from mygpo.db.couchdb.podcast import get_podcast_languages, podcasts_by_id, \
+         random_podcasts, podcasts_to_dict
 
 
 @vary_on_cookie
@@ -35,7 +36,7 @@ def toplist(request, num=100, lang=None):
     max_subscribers = max([p.subscriber_count() for (oldp, p) in entries]) if entries else 0
     current_site = RequestSite(request)
 
-    languages = utils.get_podcast_languages()
+    languages = get_podcast_languages()
     all_langs = utils.get_language_names(languages)
 
     return render(request, 'toplist.html', {
@@ -72,13 +73,13 @@ class Directory(View):
         if random_list:
             random_list = proxy_object(random_list)
             random_list.more_podcasts = max(0, len(random_list.podcasts) - podcasts_per_list)
-            random_list.podcasts = list(Podcast.get_multi(random_list.podcasts[:podcasts_per_list]))
+            random_list.podcasts = podcasts_by_id(random_list.podcasts[:podcasts_per_list])
             random_list.user = User.get(random_list.user)
 
         yield random_list
 
     def get_random_podcast(self):
-        random_podcast = next(Podcast.random(), None)
+        random_podcast = next(random_podcasts(), None)
         if random_podcast:
             yield random_podcast.get_podcast()
 
@@ -150,7 +151,6 @@ def search(request, template='search.html', args={}):
 @cache_control(private=True)
 @vary_on_cookie
 def episode_toplist(request, num=100):
-
     lang = utils.process_lang_params(request)
 
     toplist = EpisodeToplist(language=lang)
@@ -158,7 +158,7 @@ def episode_toplist(request, num=100):
 
     # load podcast objects
     podcast_ids = [e.podcast for e in entries]
-    podcasts = get_to_dict(Podcast, podcast_ids, Podcast.get_id, True)
+    podcasts = podcasts_to_dict(podcast_ids, True)
     for entry in entries:
         entry.podcast = podcasts.get(entry.podcast, None)
 
@@ -167,7 +167,7 @@ def episode_toplist(request, num=100):
     # Determine maximum listener amount (or 0 if no entries exist)
     max_listeners = max([0]+[e.listeners for e in entries])
 
-    languages = utils.get_podcast_languages()
+    languages = get_podcast_languages()
     all_langs = utils.get_language_names(languages)
 
     return render(request, 'episode_toplist.html', {

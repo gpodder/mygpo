@@ -30,6 +30,7 @@ from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.directory.models import Category
 from mygpo.db.couchdb.episode import episode_for_podcast_url
+from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url
 
 
 @csrf_exempt
@@ -58,7 +59,7 @@ def tag_podcasts(request, tag, count):
 @cache_page(60 * 60)
 def podcast_info(request):
     url = sanitize_url(request.GET.get('url', ''))
-    podcast = Podcast.for_url(url)
+    podcast = podcast_for_url(url)
     if not podcast:
             raise Http404
     domain = RequestSite(request).domain
@@ -111,7 +112,7 @@ def podcast_data(obj, domain, scaled_logo_size=64):
 
 def episode_data(episode, domain, podcast=None):
 
-    podcast = podcast or Podcast.get(episode.podcast)
+    podcast = podcast or podcast_by_id(episode.podcast)
 
     data = {
         "title": episode.title,

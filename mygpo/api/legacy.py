@@ -29,6 +29,7 @@ from mygpo.users.models import User
 from mygpo.api.opml import Importer, Exporter
 from mygpo.core.models import Podcast, SubscriptionException
 from mygpo.api.backend import get_device
+from mygpo.db.couchdb.podcast import podcast_for_url
 
 
 LEGACY_DEVICE_NAME = 'Legacy Device'
@@ -70,7 +71,7 @@ def upload(request):
 
     for n in new:
         try:
-            p = Podcast.for_url(n, create=True)
+            p = podcast_for_url(n, create=True)
         except IntegrityError, e:
             log('/upload: Error trying to get podcast object: %s (error: %s)' % (n, e))
             continue
@@ -82,7 +83,7 @@ def upload(request):
                 {'username': user.username, 'podcast_url': p.url, 'device_id': dev.id, 'exception': e})
 
     for r in rem:
-        p = Podcast.for_url(r, create=True)
+        p = podcast_for_url(r, create=True)
         try:
             p.unsubscribe(user, dev)
         except SubscriptionException as e:

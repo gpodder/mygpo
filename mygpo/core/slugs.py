@@ -82,14 +82,8 @@ class PodcastGroupSlug(SlugGenerator):
     """ Generates slugs for Podcast Groups """
 
     def _get_existing_slugs(self):
-        from mygpo.core.models import Podcast
-
-        res = Podcast.view('podcasts/by_slug',
-                startkey = [self.base_slug, None],
-                endkey   = [self.base_slug + 'ZZZZZ', None],
-                wrap_doc = False,
-            )
-        return [r['key'][0] for r in res]
+        from mygpo.db.couchdb.podcast import podcast_slugs
+        return podcast_slugs(self.base_slug)
 
 
 

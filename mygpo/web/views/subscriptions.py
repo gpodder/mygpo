@@ -9,11 +9,12 @@ from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control
 
 from mygpo.core.models import Podcast
-from mygpo.utils import parse_bool, unzip, get_to_dict, skip_pairs
+from mygpo.utils import parse_bool, unzip, skip_pairs
 from mygpo.decorators import requires_token
 from mygpo.api import backend, simple
 from mygpo.users.models import HistoryEntry, User
 from mygpo.web import utils
+from mygpo.db.couchdb.podcast import podcasts_to_dict
 
 
 @vary_on_cookie
@@ -73,7 +74,6 @@ def for_user_opml(request, username):
 
 
 def create_subscriptionlist(request):
-
     user = request.user
     user.sync_all()
 
@@ -88,7 +88,7 @@ def create_subscriptionlist(request):
     podcast_ids= list(set(podcast_ids))
     device_ids = list(set(device_ids))
 
-    podcasts = get_to_dict(Podcast, podcast_ids, get_id=Podcast.get_id)
+    podcasts = podcasts_to_dict(podcast_ids)
     devices = dict([ (id, user.get_device(id)) for id in device_ids])
 
     subscription_list = {}

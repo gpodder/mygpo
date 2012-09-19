@@ -36,7 +36,7 @@ from mygpo.api.advanced.directory import episode_data, podcast_data
 from mygpo.api.backend import get_device, BulkSubscribe
 from mygpo.couch import BulkException, bulk_save_retry, get_main_database
 from mygpo.log import log
-from mygpo.utils import parse_time, format_time, parse_bool, get_to_dict, get_timestamp
+from mygpo.utils import parse_time, format_time, parse_bool, get_timestamp
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.core import models
 from mygpo.core.models import SanitizingRule, Podcast
@@ -46,6 +46,7 @@ from mygpo.json import json, JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.db.couchdb.episode import episode_by_id, \
          favorite_episodes_for_user, episodes_for_podcast
+from mygpo.db.couchdb.podcast import podcast_for_url
 
 
 # keys that are allowed in episode actions
@@ -195,7 +196,7 @@ def episodes(request, username, version=1):
             return HttpResponseBadRequest('since-value is not a valid timestamp')
 
         if podcast_url:
-            podcast = Podcast.for_url(podcast_url)
+            podcast = podcast_for_url(podcast_url)
             if not podcast:
                 raise Http404
         else:

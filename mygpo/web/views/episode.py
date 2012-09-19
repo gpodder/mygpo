@@ -38,18 +38,20 @@ from mygpo.core import models
 from mygpo.core.proxy import proxy_object
 from mygpo.core.models import Podcast
 from mygpo.users.models import Chapter, HistoryEntry, EpisodeAction
-from mygpo.utils import parse_time, get_to_dict
+from mygpo.utils import parse_time
 from mygpo.web.heatmap import EpisodeHeatmap
 from mygpo.web.utils import get_episode_link_target, fetch_episode_data
 from mygpo.db.couchdb.episode import episode_for_slug_id, episode_for_oldid, \
          favorite_episodes_for_user
+from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url, \
+         podcasts_to_dict
 
 
 @vary_on_cookie
 @cache_control(private=True)
 def episode(request, episode):
 
-    podcast = Podcast.get(episode.podcast)
+    podcast = podcast_by_id(episode.podcast)
 
     if not podcast:
         raise Http404
@@ -109,7 +111,7 @@ def episode(request, episode):
 def add_chapter(request, episode):
     e_state = episode.get_user_state(request.user)
 
-    podcast = Podcast.get(episode.podcast)
+    podcast = podcast_by_id(episode.podcast)
 
     try:
         start = parse_time(request.POST.get('start', '0'))
@@ -148,7 +150,7 @@ def remove_chapter(request, episode, start, end):
     remove = (int(start), int(end))
     e_state.update_chapters(rem=[remove])
 
-    podcast = Podcast.get(episode.podcast)
+    podcast = podcast_by_id(episode.podcast)
 
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
@@ -162,7 +164,7 @@ def toggle_favorite(request, episode):
 
     episode_state.save()
 
-    podcast = Podcast.get(episode.podcast)
+    podcast = podcast_by_id(episode.podcast)
 
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
@@ -180,7 +182,7 @@ def list_favorites(request):
     recently_listened = user.get_latest_episodes()
 
     podcast_ids = [episode.podcast for episode in episodes + recently_listened]
-    podcasts = get_to_dict(Podcast, podcast_ids, Podcast.get_id)
+    podcasts = podcasts_to_dict(podcast_ids)
 
     recently_listened = fetch_episode_data(recently_listened, podcasts=podcasts)
     episodes = fetch_episode_data(episodes, podcasts=podcasts)
@@ -188,7 +190,7 @@ def list_favorites(request):
     favfeed = FavoriteFeed(user)
     feed_url = favfeed.get_public_url(site.domain)
 
-    podcast = Podcast.for_url(feed_url)
+    podcast = podcast_for_url(feed_url)
 
     token = request.user.favorite_feeds_token
 
@@ -231,7 +233,7 @@ def add_action(request, episode):
 
     _add_action(action=action)
 
-    podcast = Podcast.get(episode.podcast)
+    podcast = podcast_by_id(episode.podcast)
 
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 

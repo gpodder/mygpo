@@ -3,6 +3,7 @@ from datetime import datetime
 from mygpo.core.models import Podcast, Episode, MergedIdException
 from mygpo.cache import cache_result
 from mygpo.utils import is_couchdb_id
+from mygpo.db.couchdb.podcast import podcast_for_url, podcast_for_slug_id
 
 
 @cache_result(timeout=60*60)
@@ -51,7 +52,7 @@ def episode_for_slug(podcast_id, episode_slug):
 
 
 def episode_for_podcast_url(podcast_url, episode_url, create=False):
-    podcast = Podcast.for_url(podcast_url, create=create)
+    podcast = podcast_for_url(podcast_url, create=create)
 
     if not podcast: # podcast does not exist and should not be created
         return None
@@ -90,7 +91,7 @@ def episode_for_slug_id(p_slug_id, e_slug_id):
     if is_couchdb_id(p_slug_id):
         p_id = p_slug_id
     else:
-        podcast = Podcast.for_slug_id(p_slug_id)
+        podcast = podcast_for_slug_id(p_slug_id)
 
         if podcast is None:
             return None

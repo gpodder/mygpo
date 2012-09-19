@@ -12,6 +12,7 @@ from mygpo.decorators import repeat_on_conflict
 from mygpo.utils import progress
 from mygpo.couch import get_main_database
 from mygpo.maintenance.models import CommandStatus, CommandRunStatus
+from mygpo.db.couchdb.podcast import podcast_by_id
 
 try:
     from collections import Counter
@@ -67,7 +68,7 @@ class Command(BaseCommand):
                 if has_slug(obj):
                     continue
 
-                podcast = Podcast.get(obj.podcast)
+                podcast = podcast_by_id(obj.podcast)
                 if not podcast:
                     continue
                 podcasts = filter(has_slug, [podcast])

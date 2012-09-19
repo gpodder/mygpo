@@ -7,7 +7,8 @@ from django.core.cache import cache
 from mygpo.core import models
 from mygpo.log import log
 from mygpo.utils import iterate_together, progress
-
+from mygpo.db.couchdb.podcast import podcast_count, podcast_for_oldid, \
+        all_podcasts
 
 
 def sanitize_urls(urls, obj_type='podcast', rules=None):
@@ -87,7 +88,7 @@ def maintenance(dry_run=False):
     podcast_rules = get_sanitizing_rules('podcast')
     episode_rules = get_sanitizing_rules('episode')
 
-    num_podcasts = models.Podcast.count()
+    num_podcasts = podcast_count()
 
     print 'Stats'
     print ' * %d podcasts - %d rules' % (num_podcasts, len(podcast_rules))
@@ -103,7 +104,7 @@ def maintenance(dry_run=False):
     p_stats = collections.defaultdict(int)
     e_stats = collections.defaultdict(int)
 
-    podcasts = Podcast.objects.only('id', 'url').order_by('id').iterator()
+    podcasts = all_podcasts()
 
     for n, p in enumerate(podcasts):
         su = sanitize_url(p.url, rules=podcast_rules)
@@ -119,10 +120,9 @@ def maintenance(dry_run=False):
                 p.delete()
             p_stats['deleted'] += 1
 
-        try:
-            su_podcast = Podcast.objects.get(url=su)
+        su_podcast = podcast_for_url(url=su)
 
-        except Podcast.DoesNotExist, e:
+        if not su_podcast:
             # "target" podcast does not exist, we simply change the url
             if not dry_run:
                 log('updating podcast %s - "%s" => "%s"' % (p.id, p.url, su))
@@ -160,8 +160,8 @@ def rewrite_podcasts(p_old, p_new):
     rewrite_newpodcast(p_old, p_new)
 
 def rewrite_newpodcast(p_old, p_new):
-    p_n = models.Podcast.for_oldid(p_new.id)
-    p_o = models.Podcast.for_oldid(p_old.id)
+    p_n = podcast_for_oldid(p_new.id)
+    p_o = podcast_for_oldid(p_old.id)
 
     if None in (p_n, p_o):
         return

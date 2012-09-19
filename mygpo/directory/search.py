@@ -4,6 +4,7 @@ from mygpo.couch import get_main_database
 from mygpo.data.feeddownloader import update_podcasts
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.cache import cache_result
+from mygpo.db.couchdb.podcast import podcast_for_url
 
 
 def search_wrapper(result):
@@ -22,12 +23,12 @@ def search_podcasts(q, limit=20, skip=0):
     if is_url(q):
         url = sanitize_url(q)
 
-        podcast = Podcast.for_url(url, create=True)
+        podcast = podcast_for_url(url, create=True)
 
         if not podcast.title:
             update_podcasts([podcast])
 
-        podcast = Podcast.for_url(url)
+        podcast = podcast_for_url(url)
 
         return [podcast], 1
 

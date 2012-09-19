@@ -26,6 +26,7 @@ from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.users.models import PodcastUserState, DeviceDoesNotExist
 from mygpo.db.couchdb.episode import episode_for_podcast_url
+from mygpo.db.couchdb.podcast import podcast_for_url
 
 
 @csrf_exempt
@@ -48,7 +49,7 @@ def main(request, username, scope):
         return user, settings_obj
 
     def podcast_settings(user, url):
-        podcast = Podcast.for_url(url)
+        podcast = podcast_for_url(url)
         if not podcast:
             raise Http404
         obj = PodcastUserState.for_user_podcast(user, podcast)

@@ -7,6 +7,7 @@ from mygpo.core.models import Podcast
 from mygpo.directory.models import Category, CategoryEntry
 from mygpo.directory.tags import Tag
 from mygpo import utils
+from mygpo.db.couchdb.podcast import podcasts_by_id
 
 
 class Command(BaseCommand):
@@ -31,7 +32,7 @@ class Command(BaseCommand):
 
             tag_obj = Tag(tag)
             podcast_ids, weights = utils.unzip(list(tag_obj.get_podcasts()))
-            podcast_objs = Podcast.get_multi(podcast_ids)
+            podcast_objs = podcasts_by_id(podcast_ids)
             podcasts = []
             for podcast, weight in zip(podcast_objs, weights):
                 e = CategoryEntry()

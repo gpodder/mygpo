@@ -22,6 +22,7 @@ from mygpo.directory.views import search as directory_search
 from mygpo.decorators import repeat_on_conflict
 from mygpo.data.feeddownloader import update_podcasts
 from mygpo.userfeeds.feeds import FavoriteFeed
+from mygpo.db.couchdb.podcast import podcasts_by_id, podcast_for_url
 
 
 
@@ -86,7 +87,7 @@ def list_show(request, plist, owner):
 
     plist = proxy_object(plist)
 
-    podcasts = list(Podcast.get_multi(plist.podcasts))
+    podcasts = podcasts_by_id(plist.podcasts)
     plist.podcasts = podcasts
 
     max_subscribers = max([p.subscriber_count() for p in podcasts] + [0])
@@ -104,7 +105,7 @@ def list_show(request, plist, owner):
 
 @list_decorator(must_own=False)
 def list_opml(request, plist, owner):
-    podcasts = list(Podcast.get_multi(plist.podcasts))
+    podcasts = podcasts_by_id(plist.podcasts)
     return format_podcast_list(podcasts, 'opml', plist.title)
 
 
@@ -213,7 +214,7 @@ class ShareFavorites(View):
         site = RequestSite(request)
         feed_url = favfeed.get_public_url(site.domain)
 
-        podcast = Podcast.for_url(feed_url)
+        podcast = podcast_for_url(feed_url)
 
         token = request.user.favorite_feeds_token
 
@@ -261,7 +262,7 @@ class FavoritesFeedCreateEntry(View):
         site = RequestSite(request)
         feed_url = feed.get_public_url(site.domain)
 
-        podcast = Podcast.for_url(feed_url, create=True)
+        podcast = podcast_for_url(feed_url, create=True)
 
         if not podcast.get_id() in user.published_objects:
             user.published_objects.append(podcast.get_id())
@@ -283,7 +284,7 @@ def overview(request):
 
     favfeed = FavoriteFeed(user)
     favfeed_url = favfeed.get_public_url(site.domain)
-    favfeed_podcast = Podcast.for_url(favfeed_url)
+    favfeed_podcast = podcast_for_url(favfeed_url)
 
     return render(request, 'share/overview.html', {
         'site': site,

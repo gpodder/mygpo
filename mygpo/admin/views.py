@@ -18,6 +18,7 @@ from mygpo.users.models import User
 from mygpo.admin.clients import UserAgentStats, ClientStats
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.db.couchdb.episode import episode_count
+from mygpo.db.couchdb.podcast import podcast_count, podcast_for_url
 
 
 class AdminView(TemplateView):
@@ -55,12 +56,12 @@ class MergeBase(AdminView):
             if not podcast_url:
                 continue
 
-            podcast = Podcast.for_url(podcast_url)
+            podcast = podcast_for_url(podcast_url)
 
             if not podcast:
                 raise InvalidPodcast(podcast_url)
 
-            podcasts.append(Podcast.for_url(podcast_url))
+            podcasts.append(podcast_for_url(podcast_url))
 
         return podcasts
 
@@ -197,7 +198,7 @@ class StatsView(AdminView):
 
     def _get_stats(self):
         return {
-            'podcasts': Podcast.count(),
+            'podcasts': podcast_count(),
             'episodes': episode_count(),
             'users': User.count(),
         }

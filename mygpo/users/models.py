@@ -16,12 +16,14 @@ from django_couchdb_utils.registration.models import User as BaseUser
 
 from mygpo.core.proxy import DocumentABCMeta
 from mygpo.core.models import Podcast
-from mygpo.utils import linearize, get_to_dict, iterate_together
+from mygpo.utils import linearize, iterate_together
 from mygpo.couch import get_main_database
 from mygpo.decorators import repeat_on_conflict
 from mygpo.users.ratings import RatingMixin
 from mygpo.users.sync import SyncedDevicesMixin
 from mygpo.cache import cache_result
+from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_by_id, \
+         podcasts_to_dict
 
 
 RE_DEVICE_UID = re.compile(r'^[\w.-]+$')
@@ -65,7 +67,7 @@ class Suggestions(Document, RatingMixin):
         ids = filter(lambda x: not x in self.blacklist + subscriptions, self.podcasts)
         if count:
             ids = ids[:count]
-        return filter(lambda x: x and x.title, Podcast.get_multi(ids))
+        return filter(lambda x: x and x.title, podcasts_by_id(ids))
 
 
     def __repr__(self):
@@ -241,7 +243,7 @@ class EpisodeUserState(Document):
             return r.first()
 
         else:
-            podcast = Podcast.get(episode.podcast)
+            podcast = podcast_by_id(episode.podcast)
 
             state = EpisodeUserState()
             state.episode = episode._id
@@ -578,7 +580,7 @@ class Device(Document):
 
 
     def get_subscribed_podcasts(self):
-        return Podcast.get_multi(self.get_subscribed_podcast_ids())
+        return podcasts_by_id(self.get_subscribed_podcast_ids())
 
 
     def __hash__(self):
@@ -784,7 +786,7 @@ class User(BaseUser, SyncedDevicesMixin):
 
 
     def get_subscribed_podcasts(self, public=None):
-        return list(Podcast.get_multi(self.get_subscribed_podcast_ids(public=public)))
+        return podcasts_by_id(self.get_subscribed_podcast_ids(public=public))
 
 
     @cache_result(timeout=60)
@@ -1094,7 +1096,7 @@ class HistoryEntry(object):
             # load podcast data
             podcast_ids = [getattr(x, 'podcast_id', None) for x in entries]
             podcast_ids = filter(None, podcast_ids)
-            podcasts = get_to_dict(Podcast, podcast_ids, get_id=Podcast.get_id)
+            podcasts = podcasts_to_dict(podcast_ids)
 
         if episodes is None:
             from mygpo.db.couchdb.episode import episodes_to_dict

@@ -8,7 +8,7 @@ from mygpo.utils import multi_request_view
 from mygpo.counter import Counter
 from mygpo.core.proxy import proxy_object
 from mygpo.directory.models import Category
-
+from mygpo.db.couchdb.podcast import podcasts_for_tag
 
 
 class Tag(object):
@@ -95,30 +95,7 @@ class Tag(object):
 
         Some podcasts might be returned twice """
 
-        res = multi_request_view(Podcast, 'podcasts/by_tag',
-                wrap        = False,
-                startkey    = [self.tag, None],
-                endkey      = [self.tag, {}],
-                reduce      = True,
-                group       = True,
-                group_level = 2
-            )
-
-        for r in res:
-            yield (r['key'][1], r['value'])
-
-        res = multi_request_view(Podcast, 'usertags/podcasts',
-                wrap        = False,
-                startkey    = [self.tag, None],
-                endkey      = [self.tag, {}],
-                reduce      = True,
-                group       = True,
-                group_level = 2
-            )
-
-        for r in res:
-            yield (r['key'][1], r['value'])
-
+        return podcasts_for_tag(self.tag)
 
 
 

@@ -44,7 +44,9 @@ from mygpo.users.models import PodcastUserState, User
 from mygpo.web import utils
 from mygpo.utils import flatten, parse_range
 from mygpo.share.models import PodcastList
-from mygpo.db.couchdb.episode import episode_count, favorite_episodes_for_user
+from mygpo.db.couchdb.episode import favorite_episodes_for_user
+from mygpo.db.couchdb.podcast import podcast_by_id, \
+         podcast_for_oldid, random_podcasts
 
 
 @vary_on_cookie
@@ -61,18 +63,11 @@ def home(request):
 def welcome(request):
     current_site = RequestSite(request)
 
-    podcasts = Podcast.count()
-    users    = User.count()
-    episodes = episode_count()
-
     lang = utils.process_lang_params(request)
 
     toplist = PodcastToplist(lang)
 
     return render(request, 'home.html', {
-          'podcast_count': podcasts,
-          'user_count': users,
-          'episode_count': episodes,
           'url': current_site,
           'toplist': toplist,
     })
@@ -122,7 +117,7 @@ def dashboard(request, episode_count=10):
     newest_episodes = podcasts.get_newest_episodes(tomorrow, episode_count)
 
     def get_random_podcasts():
-        random_podcast = next(Podcast.random(), None)
+        random_podcast = next(random_podcasts(), None)
         if random_podcast:
             yield random_podcast.get_podcast()
 
@@ -177,7 +172,7 @@ def history(request, count=15, uid=None):
 @login_required
 def blacklist(request, podcast_id):
     podcast_id = int(podcast_id)
-    blacklisted_podcast = Podcast.for_oldid(podcast_id)
+    blacklisted_podcast = podcast_for_oldid(podcast_id)
 
     suggestion = Suggestions.for_user(request.user)
 
@@ -232,7 +227,7 @@ def mytags(request):
     tags_tag = defaultdict(list)
 
     for podcast_id, taglist in Tag.for_user(request.user).items():
-        podcast = Podcast.get(podcast_id)
+        podcast = podcast_by_id(podcast_id)
         tags_podcast[podcast] = taglist
 
         for tag in taglist:

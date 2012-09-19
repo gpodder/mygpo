@@ -24,13 +24,15 @@ from mygpo.data.feeddownloader import update_podcasts
 from mygpo.decorators import requires_token, allowed_methods
 from mygpo.users.models import User
 from mygpo.db.couchdb.episode import episodes_for_podcast
+from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_by_id, \
+         podcast_for_url
 
 
 @vary_on_cookie
 @cache_control(private=True)
 def home(request):
     if is_publisher(request.user):
-        podcasts = Podcast.get_multi(request.user.published_objects)
+        podcasts = podcasts_by_id(request.user.published_objects)
         form = SearchPodcastForm()
         return render(request, 'publisher/home.html', {
             'podcasts': podcasts,
@@ -52,7 +54,7 @@ def search_podcast(request):
     if form.is_valid():
         url = form.cleaned_data['url']
 
-        podcast = Podcast.for_url(url)
+        podcast = podcast_for_url(url)
         if not podcast:
             raise Http404
 
@@ -152,7 +154,7 @@ def update_published_podcasts(request, username):
     if not user:
         raise Http404
 
-    published_podcasts = Podcast.get_multi(user.published_objects)
+    published_podcasts = podcasts_by_id(user.published_objects)
     update_podcasts(published_podcasts)
 
     return HttpResponse('Updated:\n' + '\n'.join([p.url for p in published_podcasts]), mimetype='text/plain')
@@ -190,7 +192,7 @@ def episodes(request, podcast):
 @allowed_methods(['GET', 'POST'])
 def episode(request, episode):
 
-    podcast = Podcast.get(episode.podcast)
+    podcast = podcast_by_id(episode.podcast)
 
     if not check_publisher_permission(request.user, podcast):
         return HttpResponseForbidden()
