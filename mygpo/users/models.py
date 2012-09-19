@@ -389,58 +389,12 @@ class PodcastUserState(Document):
     merged_ids    = StringListProperty()
 
 
-    @classmethod
-    def for_user_podcast(cls, user, podcast):
-        r = PodcastUserState.view('podcast_states/by_podcast', \
-            key=[podcast.get_id(), user._id], limit=1, include_docs=True)
-        if r:
-            return r.first()
-        else:
-            p = PodcastUserState()
-            p.podcast = podcast.get_id()
-            p.user = user._id
-            p.ref_url = podcast.url
-            p.settings['public_subscription'] = user.settings.get('public_subscriptions', True)
-
-            p.set_device_state(user.devices)
-
-            return p
-
-
-    @classmethod
-    def for_user(cls, user):
-        r = PodcastUserState.view('podcast_states/by_user',
-            startkey     = [user._id, None],
-            endkey       = [user._id, 'ZZZZ'],
-            include_docs = True,
-            )
-        return list(r)
-
-
-    @classmethod
-    def for_device(cls, device_id):
-        r = PodcastUserState.view('podcast_states/by_device',
-            startkey=[device_id, None], endkey=[device_id, {}],
-            include_docs=True)
-        return list(r)
-
-
     def remove_device(self, device):
         """
         Removes all actions from the podcast state that refer to the
         given device
         """
         self.actions = filter(lambda a: a.device != device.id, self.actions)
-
-
-    @classmethod
-    @cache_result(timeout=60*60)
-    def count(cls):
-        r = PodcastUserState.view('podcast_states/by_user',
-                limit = 0,
-                stale = 'update_after',
-            )
-        return r.total_rows
 
 
     def subscribe(self, device):
@@ -551,8 +505,10 @@ class Device(Document):
         from.
         """
 
+        from mygpo.db.couchdb.podcast_state import podcast_states_for_device
+
         add, rem = [], []
-        podcast_states = PodcastUserState.for_device(self.id)
+        podcast_states = podcast_states_for_device(self.id)
         for p_state in podcast_states:
             change = p_state.get_change_between(self.id, since, until)
             if change == 'subscribe':
@@ -564,23 +520,19 @@ class Device(Document):
 
 
     def get_latest_changes(self):
-        podcast_states = PodcastUserState.for_device(self.id)
+
+        from mygpo.db.couchdb.podcast_state import podcast_states_for_device
+
+        podcast_states = podcast_states_for_device(self.id)
         for p_state in podcast_states:
             actions = filter(lambda x: x.device == self.id, reversed(p_state.actions))
             if actions:
                 yield (p_state.podcast, actions[0])
 
 
-    def get_subscribed_podcast_ids(self):
-        r = self.view('subscriptions/by_device',
-                startkey = [self.id, None],
-                endkey   = [self.id, {}]
-            )
-        return [res['key'][1] for res in r]
-
-
     def get_subscribed_podcasts(self):
-        return podcasts_by_id(self.get_subscribed_podcast_ids())
+        from mygpo.db.couchdb.podcast_state import subscribed_podcast_ids_by_device
+        return podcasts_by_id(subscribed_podcast_ids_by_device(self))
 
 
     def __hash__(self):
@@ -752,24 +704,11 @@ class User(BaseUser, SyncedDevicesMixin):
             self.unsync_device(device)
 
 
-    def get_subscriptions(self, public=None):
-        """
-        Returns a list of (podcast-id, device-id) tuples for all
-        of the users subscriptions
-        """
-
-        r = PodcastUserState.view('subscriptions/by_user',
-            startkey = [self._id, public, None, None],
-            endkey   = [self._id+'ZZZ', None, None, None],
-            reduce   = False,
-            )
-        return [res['key'][1:] for res in r]
-
-
     def get_subscriptions_by_device(self, public=None):
+        from mygpo.db.couchdb.podcast_state import subscriptions_by_user
         get_dev = itemgetter(2)
         groups = collections.defaultdict(list)
-        subscriptions = self.get_subscriptions(public=public)
+        subscriptions = subscriptions_by_user(self, public=public)
         subscriptions = sorted(subscriptions, key=get_dev)
 
         for public, podcast_id, device_id in subscriptions:
@@ -782,7 +721,8 @@ class User(BaseUser, SyncedDevicesMixin):
         """
         Returns the Ids of all subscribed podcasts
         """
-        return list(set(x[1] for x in self.get_subscriptions(public=public)))
+        from mygpo.db.couchdb.podcast_state import subscriptions_by_device
+        return list(set(x[1] for x in subscriptions_by_device(self, public=public)))
 
 
     def get_subscribed_podcasts(self, public=None):
@@ -810,6 +750,9 @@ class User(BaseUser, SyncedDevicesMixin):
         Setting device_id restricts the actions to a certain device
         """
 
+        from mygpo.db.couchdb.podcast_state import podcast_states_for_user, \
+            podcast_states_for_device
+
         def action_iter(state):
             for action in sorted(state.actions, reverse=reverse):
                 if device_id is not None and device_id != action.device:
@@ -826,9 +769,9 @@ class User(BaseUser, SyncedDevicesMixin):
                 yield entry
 
         if device_id is None:
-            podcast_states = PodcastUserState.for_user(self)
+            podcast_states = podcast_states_for_user(self)
         else:
-            podcast_states = PodcastUserState.for_device(device_id)
+            podcast_states = podcast_states_for_device(device_id)
 
         # create an action_iter for each PodcastUserState
         subscription_action_lists = [action_iter(x) for x in podcast_states]
@@ -990,9 +933,12 @@ class User(BaseUser, SyncedDevicesMixin):
 
 
     def save(self, *args, **kwargs):
+
+        from mygpo.db.couchdb.podcast_state import podcast_states_for_user
+
         super(User, self).save(*args, **kwargs)
 
-        podcast_states = PodcastUserState.for_user(self)
+        podcast_states = podcast_states_for_user(self)
         for state in podcast_states:
             @repeat_on_conflict(['state'])
             def _update_state(state):

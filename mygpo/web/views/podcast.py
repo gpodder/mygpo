@@ -25,6 +25,7 @@ from mygpo.log import log
 from mygpo.db.couchdb.episode import episodes_for_podcast
 from mygpo.db.couchdb.podcast import podcast_for_slug, podcast_for_slug_id, \
          podcast_for_oldid, podcast_for_url
+from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
 
 
 MAX_TAGS_ON_PAGE=50
@@ -76,7 +77,7 @@ def show(request, podcast):
 
         request.user.sync_all()
 
-        state = podcast.get_user_state(request.user)
+        state = podcast_state_for_user_podcast(request.user, podcast)
         subscribed_devices = state.get_subscribed_device_ids()
         subscribed_devices = [request.user.get_device(x) for x in subscribed_devices]
 
@@ -200,7 +201,7 @@ def _annotate_episode(listeners, episode_actions, episode):
 @never_cache
 @login_required
 def add_tag(request, podcast):
-    podcast_state = podcast.get_user_state(request.user)
+    podcast_state = podcast_state_for_user_podcast(request.user, podcast)
 
     tag_str = request.GET.get('tag', '')
     if not tag_str:
@@ -224,7 +225,7 @@ def add_tag(request, podcast):
 @never_cache
 @login_required
 def remove_tag(request, podcast):
-    podcast_state = podcast.get_user_state(request.user)
+    podcast_state = podcast_state_for_user_podcast(request.user, podcast)
 
     tag_str = request.GET.get('tag', '')
     if not tag_str:
@@ -322,7 +323,7 @@ def subscribe_url(request):
 @never_cache
 @allowed_methods(['POST'])
 def set_public(request, podcast, public):
-    state = podcast.get_user_state(request.user)
+    state = podcast_state_for_user_podcast(request.user, podcast)
     update_podcast_settings(state=state, is_public=public)
     return HttpResponseRedirect(get_podcast_link_target(podcast))
 

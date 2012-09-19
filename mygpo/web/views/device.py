@@ -36,6 +36,7 @@ from mygpo.api import simple
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.users.models import PodcastUserState, Device, DeviceUIDException, \
      DeviceDoesNotExist
+from mygpo.db.couchdb.podcast_state import podcast_states_for_device
 
 
 @vary_on_cookie
@@ -265,7 +266,7 @@ def delete_permanently(request, device):
         state.remove_device(dev)
         state.save()
 
-    states = PodcastUserState.for_device(device.id)
+    states = podcast_states_for_device(device.id)
     for state in states:
         remove_device(state=state, dev=device)
 

@@ -25,6 +25,7 @@ from mygpo.decorators import repeat_on_conflict
 from mygpo.couch import bulk_save_retry, get_main_database
 from mygpo.json import json
 from mygpo.db.couchdb.podcast import podcast_for_url, random_podcasts
+from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
 
 
 def get_random_picks(languages=None):
@@ -130,7 +131,7 @@ class BulkSubscribe(object):
         podcast = self.podcasts.get(url,
                 podcast_for_url(url, create=True))
 
-        state = podcast.get_user_state(self.user)
+        state = podcast_state_for_user_podcast(self.user, podcast)
 
         fun = self.operations[op]
         return (state, fun)

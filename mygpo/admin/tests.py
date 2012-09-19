@@ -15,6 +15,7 @@ from mygpo.counter import Counter
 from mygpo.maintenance.merge import PodcastMerger
 from mygpo.db.couchdb.episode import episode_by_id, episodes_for_podcast
 from mygpo.db.couchdb.podcast import podcast_by_id
+from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
 
 
 class SimpleTest(TestCase):
@@ -107,7 +108,7 @@ class SimpleTest(TestCase):
         self.assertEqual(len(es3.actions), 1)
 
         p1 = podcast_by_id(p1.get_id())
-        ps1 = p1.get_user_state(user)
+        ps1 = podcast_state_for_user_podcast(user, p1)
         self.assertEqual(len(ps1.get_subscribed_device_ids()), 2)
 
         self.assertEqual(len(list(episodes_for_podcast(p1))), 3)

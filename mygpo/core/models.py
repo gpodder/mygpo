@@ -387,18 +387,6 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         return self.subscribers[-2].subscriber_count
 
 
-    def get_user_state(self, user):
-        from mygpo.users.models import PodcastUserState
-        return PodcastUserState.for_user_podcast(user, self)
-
-
-    def get_all_states(self):
-        from mygpo.users.models import PodcastUserState
-        return PodcastUserState.view('podcast_states/by_podcast',
-            startkey = [self.get_id(), None],
-            endkey   = [self.get_id(), {}],
-            include_docs=True)
-
     def get_all_subscriber_data(self):
         subdata = PodcastSubscriberData.for_podcast(self.get_id())
         return sorted(self.subscribers + subdata.subscribers,
@@ -407,7 +395,8 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
     @repeat_on_conflict()
     def subscribe(self, user, device):
-        state = self.get_user_state(user)
+        from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
+        state = podcast_state_for_user_podcast(user, self)
         state.subscribe(device)
         try:
             state.save()
@@ -417,7 +406,8 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
     @repeat_on_conflict()
     def unsubscribe(self, user, device):
-        state = self.get_user_state(user)
+        from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
+        state = podcast_state_for_user_podcast(user, self)
         state.unsubscribe(device)
         try:
             state.save()

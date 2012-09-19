@@ -9,6 +9,7 @@ from mygpo.users.models import PodcastUserState, EpisodeUserState
 from mygpo import utils
 from mygpo.decorators import repeat_on_conflict
 from mygpo.db.couchdb.episode import episodes_for_podcast
+from mygpo.db.couchdb.podcast_state import all_podcast_states
 
 
 class IncorrectMergeException(Exception):
@@ -277,8 +278,8 @@ class PodcastMerger(object):
         """
 
         key = lambda x: x.user
-        states1 = sorted(podcast1.get_all_states(), key=key)
-        states2 = sorted(podcast2.get_all_states(), key=key)
+        states1 = sorted(all_podcast_states(podcast1), key=key)
+        states2 = sorted(all_podcast_states(podcast2), key=key)
 
         for state, state2 in utils.iterate_together([states1, states2], key):
 

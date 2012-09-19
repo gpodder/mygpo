@@ -16,6 +16,7 @@ from mygpo.utils import progress
 from mygpo.json import json
 from mygpo.db.couchdb.episode import episodes_for_podcast
 from mygpo.db.couchdb.podcast import podcast_by_id
+from mygpo.db.couchdb.podcast_state import podcast_states_for_user
 
 
 class Command(BaseCommand):
@@ -50,7 +51,7 @@ class Command(BaseCommand):
             docs.add(suggestions._id)
 
             # Podcast States
-            for p_state in PodcastUserState.for_user(user):
+            for p_state in podcast_states_for_user(user):
                 docs.add(p_state._id)
 
                 # Categories

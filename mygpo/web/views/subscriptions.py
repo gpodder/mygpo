@@ -15,6 +15,7 @@ from mygpo.api import backend, simple
 from mygpo.users.models import HistoryEntry, User
 from mygpo.web import utils
 from mygpo.db.couchdb.podcast import podcasts_to_dict
+from mygpo.db.couchdb.podcast_state import subscriptions_by_user
 
 
 @vary_on_cookie
@@ -77,7 +78,7 @@ def create_subscriptionlist(request):
     user = request.user
     user.sync_all()
 
-    subscriptions = user.get_subscriptions()
+    subscriptions = subscriptions_by_user(user)
 
     if not subscriptions:
         return []

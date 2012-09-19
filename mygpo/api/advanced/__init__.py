@@ -47,6 +47,7 @@ from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.db.couchdb.episode import episode_by_id, \
          favorite_episodes_for_user, episodes_for_podcast
 from mygpo.db.couchdb.podcast import podcast_for_url
+from mygpo.db.couchdb.podcast_state import subscribed_podcast_ids_by_device
 
 
 # keys that are allowed in episode actions
@@ -436,7 +437,7 @@ def device_data(device):
         id           = device.uid,
         caption      = device.name,
         type         = device.type,
-        subscriptions= len(device.get_subscribed_podcast_ids())
+        subscriptions= len(subscribed_podcast_ids_by_device(device)),
     )
 
 
