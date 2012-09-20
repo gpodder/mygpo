@@ -28,6 +28,7 @@ from mygpo.users.models import PodcastUserState, DeviceDoesNotExist
 from mygpo.db.couchdb.episode import episode_for_podcast_url
 from mygpo.db.couchdb.podcast import podcast_for_url
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
+from mygpo.db.couchdb.podcast_state import episode_state_for_user_episode
 
 
 @csrf_exempt
@@ -61,7 +62,7 @@ def main(request, username, scope):
         if episode is None:
             raise Http404
 
-        episode_state = episode.get_user_state(user)
+        episode_state = episode_state_for_user_episode(user, episode)
         return episode_state, episode_state
 
     models = dict(

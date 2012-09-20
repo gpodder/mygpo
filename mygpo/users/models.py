@@ -24,6 +24,7 @@ from mygpo.users.sync import SyncedDevicesMixin
 from mygpo.cache import cache_result
 from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_by_id, \
          podcasts_to_dict
+from mygpo.db.couchdb.episode_state import episode_state_for_user_episode
 
 
 RE_DEVICE_UID = re.compile(r'^[\w.-]+$')
@@ -231,28 +232,6 @@ class EpisodeUserState(Document):
     podcast       = StringProperty(required=True)
 
 
-    @classmethod
-    def for_user_episode(cls, user, episode):
-        r = cls.view('episode_states/by_user_episode',
-                key          = [user._id, episode._id],
-                include_docs = True,
-                limit        = 1,
-            )
-
-        if r:
-            return r.first()
-
-        else:
-            podcast = podcast_by_id(episode.podcast)
-
-            state = EpisodeUserState()
-            state.episode = episode._id
-            state.podcast = episode.podcast
-            state.user = user._id
-            state.ref_url = episode.url
-            state.podcast_ref_url = podcast.url
-
-            return state
 
     @classmethod
     def for_ref_urls(cls, user, podcast_url, episode_url):
@@ -279,7 +258,7 @@ class EpisodeUserState(Document):
             from mygpo.db.couchdb.episode import episode_for_podcast_id_url
             episode = episode_for_podcast_id_url(podcast_url, episode_url,
                     create=True)
-            return episode.get_user_state(user)
+            return episode_state_for_user_episode(user, episode)
 
 
     @classmethod
