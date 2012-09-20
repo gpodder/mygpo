@@ -87,9 +87,6 @@ def show(request, podcast):
 
         is_public = state.settings.get('public_subscription', True)
 
-        subscribe_form = SyncForm()
-        subscribe_form.set_targets(subscribe_targets, '')
-
         return render(request, 'podcast.html', {
             'tags': tags,
             'history': history,
@@ -98,7 +95,7 @@ def show(request, podcast):
             'devices': subscribed_devices,
             'related_podcasts': rel_podcasts,
             'can_subscribe': len(subscribe_targets) > 0,
-            'subscribe_form': subscribe_form,
+            'subscribe_targets': subscribe_targets,
             'episode': episode,
             'episodes': episodes,
             'max_listeners': max_listeners,

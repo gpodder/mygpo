@@ -50,3 +50,10 @@ def format_time(time):
 @register.filter
 def is_tuple(obj):
     return isinstance(obj, tuple)
+
+
+@register.filter
+def markdown(txt):
+    import markdown2
+    html = markdown2.markdown(txt)
+    return mark_safe(html)

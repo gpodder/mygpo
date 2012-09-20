@@ -1,7 +1,7 @@
 from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.utils import is_url
+from mygpo.data.feeddownloader import PodcastUpdater
 from mygpo.couch import get_main_database
-from mygpo.data.feeddownloader import update_podcasts
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.cache import cache_result
 
@@ -25,7 +25,8 @@ def search_podcasts(q, limit=20, skip=0):
         podcast = Podcast.for_url(url, create=True)
 
         if not podcast.title:
-            update_podcasts([podcast])
+            updater = PodcastUpdater([podcast])
+            updater.update()
 
         podcast = Podcast.for_url(url)
 

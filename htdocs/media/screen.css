@@ -191,6 +191,12 @@ table form
     color: #666;
 }
 
+/* don't show images in the description of the podcast page */
+.fist-episode img
+{
+    display: none;
+}
+
 div#podcastlogo
 {
     float: right;

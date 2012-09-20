@@ -20,8 +20,8 @@ from mygpo.share.models import PodcastList
 from mygpo.users.models import User
 from mygpo.directory.views import search as directory_search
 from mygpo.decorators import repeat_on_conflict
-from mygpo.data.feeddownloader import update_podcasts
 from mygpo.userfeeds.feeds import FavoriteFeed
+from mygpo.data.feeddownloader import PodcastUpdater
 
 
 
@@ -267,7 +267,8 @@ class FavoritesFeedCreateEntry(View):
             user.published_objects.append(podcast.get_id())
             user.save()
 
-        update_podcasts([podcast])
+        updater = PodcastUpdater()
+        update.update_podcast(podcast)
 
         return HttpResponseRedirect(reverse('share-favorites'))
 

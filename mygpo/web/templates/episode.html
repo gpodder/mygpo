@@ -63,8 +63,8 @@
 
 {% block content %}
 
-  {% if episode.description %}
-   <p class="description">{{ episode.description|remove_html_tags }}</p>
+  {% if episode.content or episode.description %}
+   <div class="description">{{ episode.content|default:episode.description|markdown }}</div>
   {% endif %}
 
   {% if episode.url|is_youtube_video %}
