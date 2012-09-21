@@ -192,7 +192,7 @@ table form
 }
 
 /* don't show images in the description of the podcast page */
-.fist-episode img
+.first-episode img
 {
     display: none;
 }
