@@ -7,7 +7,7 @@ from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.directory.toplist import PodcastToplist
 from mygpo.couch import get_main_database
 from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url, \
-         random_podcasts, podcasts_by_last_update
+         random_podcasts, podcasts_by_last_update, podcasts_need_update
 
 
 class PodcastCommand(BaseCommand):
@@ -38,7 +38,7 @@ class PodcastCommand(BaseCommand):
             yield self.get_toplist()
 
         if options.get('new'):
-            yield self.get_podcast_with_new_episodes()
+            yield podcasts_need_update()
 
         if options.get('random'):
             yield random_podcasts()
@@ -50,21 +50,6 @@ class PodcastCommand(BaseCommand):
         if not args and not options.get('toplist') and not options.get('new') \
                     and not options.get('random'):
            yield podcasts_by_last_update()
-
-
-
-    def get_podcast_with_new_episodes(self):
-        db = get_main_database()
-        res = db.view('episodes/need_update',
-                group_level = 1,
-                reduce      = True,
-            )
-
-        for r in res:
-            podcast_id = r['key']
-            podcast = podcast_by_id(podcast_id)
-            if podcast:
-                yield podcast
 
 
     def get_toplist(self):

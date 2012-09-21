@@ -266,6 +266,22 @@ def podcasts_to_dict(ids, use_cache=False):
     return objs
 
 
+
+def podcasts_need_update(self):
+    db = get_main_database()
+    res = db.view('episodes/need_update',
+            group_level = 1,
+            reduce      = True,
+        )
+
+    for r in res:
+        podcast_id = r['key']
+        podcast = podcast_by_id(podcast_id)
+        if podcast:
+            yield podcast
+
+
+
 def _wrap_podcast_group(res):
     if res['doc']['doc_type'] == 'Podcast':
         return Podcast.wrap(res['doc'])
