@@ -26,6 +26,7 @@ from mygpo.db.couchdb.episode import episodes_for_podcast
 from mygpo.db.couchdb.podcast import podcast_for_slug, podcast_for_slug_id, \
          podcast_for_oldid, podcast_for_url
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
+from mygpo.db.couchdb.episode_state import get_podcasts_episode_states
 
 
 MAX_TAGS_ON_PAGE=50
@@ -158,7 +159,7 @@ def episode_list(podcast, user, limit=None):
         podcasts_dict = dict( (p_id, podcast) for p_id in podcast.get_ids())
         episodes_dict = dict( (episode._id, episode) for episode in episodes)
 
-        actions = podcast.get_episode_states(user._id)
+        actions = get_podcasts_episode_states(podcast, user._id)
         actions = map(HistoryEntry.from_action_dict, actions)
 
         HistoryEntry.fetch_data(user, actions,

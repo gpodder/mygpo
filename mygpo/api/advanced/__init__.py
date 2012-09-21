@@ -48,6 +48,8 @@ from mygpo.db.couchdb.episode import episode_by_id, \
          favorite_episodes_for_user, episodes_for_podcast
 from mygpo.db.couchdb.podcast import podcast_for_url
 from mygpo.db.couchdb.podcast_state import subscribed_podcast_ids_by_device
+from mygpo.db.couchdb.episode_state import get_podcasts_episode_states, \
+         episode_state_for_ref_urls, get_episode_actions
 
 
 # keys that are allowed in episode actions
@@ -240,7 +242,7 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
     if device is not None:
         args['device_id'] = device.id
 
-    actions = EpisodeAction.filter(user._id, since, until, **args)
+    actions = get_episode_actions(user._id, since, until, **args)
 
     if version == 1:
         actions = imap(convert_position, actions)
@@ -329,7 +331,7 @@ def update_episodes(user, actions, now, ua_string):
     obj_funs = []
 
     for (p_url, e_url), action_list in grouped_actions.iteritems():
-        episode_state = EpisodeUserState.for_ref_urls(user, p_url, e_url)
+        episode_state = episode_state_for_ref_urls(user, p_url, e_url)
 
         fun = partial(update_episode_actions, action_list=action_list)
         obj_funs.append( (episode_state, fun) )
@@ -527,8 +529,8 @@ def get_episode_updates(user, subscribed_podcasts, since):
         episode_status[episode._id] = EpisodeStatus(episode, 'new', None)
 
     # get episode states
-    e_action_jobs = [gevent.spawn(p.get_episode_states, user._id) for p in
-        subscribed_podcasts]
+    e_action_jobs = [gevent.spawn(get_podcasts_episode_states(p, user._id))
+            for p in subscribed_podcasts]
     gevent.joinall(e_action_jobs)
     e_actions = chain.from_iterable(job.get() for job in e_action_jobs)
 

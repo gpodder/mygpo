@@ -47,6 +47,7 @@ from mygpo.share.models import PodcastList
 from mygpo.db.couchdb.episode import favorite_episodes_for_user
 from mygpo.db.couchdb.podcast import podcast_by_id, \
          podcast_for_oldid, random_podcasts
+from mygpo.db.couchdb.user import suggestions_for_user
 
 
 @vary_on_cookie
@@ -174,7 +175,7 @@ def blacklist(request, podcast_id):
     podcast_id = int(podcast_id)
     blacklisted_podcast = podcast_for_oldid(podcast_id)
 
-    suggestion = Suggestions.for_user(request.user)
+    suggestion = suggestions_for_user(request.user)
 
     @repeat_on_conflict(['suggestion'])
     def _update(suggestion, podcast_id):
@@ -197,7 +198,7 @@ def blacklist(request, podcast_id):
 def rate_suggestions(request):
     rating_val = int(request.GET.get('rate', None))
 
-    suggestion = Suggestions.for_user(request.user)
+    suggestion = suggestions_for_user(request.user)
     suggestion.rate(rating_val, request.user._id)
     suggestion.save()
 
@@ -210,7 +211,7 @@ def rate_suggestions(request):
 @cache_control(private=True)
 @login_required
 def suggestions(request):
-    suggestion_obj = Suggestions.for_user(request.user)
+    suggestion_obj = suggestions_for_user(request.user)
     suggestions = suggestion_obj.get_podcasts()
     current_site = RequestSite(request)
     return render(request, 'suggestions.html', {

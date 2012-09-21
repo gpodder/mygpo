@@ -14,6 +14,8 @@ from mygpo.web.utils import fetch_episode_data
 from mygpo.users.subscriptions import PodcastPercentageListenedSorter
 from mygpo.web.views import GeventView
 from mygpo.db.couchdb.episode import favorite_episodes_for_user
+from mygpo.db.couchdb.user import get_latest_episodes, \
+         get_num_played_episodes, get_seconds_played
 
 
 
@@ -58,16 +60,16 @@ class UserpageView(GeventView):
 
 
     def get_recent_episodes(self, user):
-        recent_episodes = list(user.get_latest_episodes())
+        recent_episodes = get_latest_episodes(user)
         return fetch_episode_data(recent_episodes)
 
 
     def get_seconds_played_total(self, user):
-        return user.get_seconds_played()
+        return get_seconds_played(user)
 
 
     def get_seconds_played_since(self, user, since):
-        return user.get_seconds_played(since=since)
+        return get_seconds_played(user, since=since)
 
 
     def get_favorite_episodes(self, user):
@@ -76,8 +78,8 @@ class UserpageView(GeventView):
 
 
     def get_played_episodes_total(self, user):
-        return user.get_num_played_episodes()
+        return get_num_played_episodes(user)
 
 
     def get_played_episodes_since(self, user, since):
-        return user.get_num_played_episodes(since=since)
+        return get_num_played_episodes(user, since=since)

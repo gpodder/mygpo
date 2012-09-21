@@ -35,6 +35,7 @@ from mygpo.decorators import allowed_methods
 from mygpo.json import json
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.db.couchdb.episode import episode_for_podcast_url
+from mygpo.db.couchdb.episode_state import episode_state_for_user_episode
 
 
 @csrf_exempt
@@ -106,7 +107,7 @@ def chapters(request, username):
         if episode is None:
             raise Http404
 
-        e_state = episode.get_user_state(request.user)
+        e_state = episode_state_for_user_episode(request.user, episode)
 
         chapterlist = sorted(e_state.chapters, key=lambda c: c.start)
 
@@ -143,7 +144,7 @@ def update_chapters(req, user):
     episode = episode_for_podcast_url(podcast_url, episode_url,
             create=True)
 
-    e_state = episode.get_user_state(request.user)
+    e_state = episode_state_for_user_episode(request.user, episode)
 
     device = None
     if 'device' in req:

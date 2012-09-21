@@ -48,7 +48,7 @@ from mygpo.decorators import allowed_methods
 from mygpo.utils import parse_range
 from mygpo.json import json
 from mygpo.db.couchdb.podcast import podcasts_by_id
-
+from mygpo.db.couchdb.user import suggestions_for_user
 
 ALLOWED_FORMATS = ('txt', 'opml', 'json', 'jsonp', 'xml')
 
@@ -312,7 +312,7 @@ def search(request, format):
 def suggestions(request, count, format):
     count = parse_range(count, 1, 100, 100)
 
-    suggestion_obj = Suggestions.for_user(request.user)
+    suggestion_obj = suggestions_for_user(request.user)
     suggestions = suggestion_obj.get_podcasts(count)
     title = _('gpodder.net - %(count)d Suggestions') % {'count': len(suggestions)}
     domain = RequestSite(request).domain

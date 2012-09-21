@@ -7,6 +7,7 @@ from django.core.management.base import BaseCommand
 from mygpo.users.models import Suggestions, User
 from mygpo.utils import progress
 from mygpo.decorators import repeat_on_conflict
+from mygpo.db.couchdb.user import suggestions_for_user
 
 try:
     from collections import Counter
@@ -44,7 +45,7 @@ class Command(BaseCommand):
         total = len(users)
 
         for n, user in enumerate(users):
-            suggestion = Suggestions.for_user(user)
+            suggestion = suggestions_for_user(user)
 
             subscribed_podcasts = list(set(user.get_subscribed_podcasts()))
             subscribed_podcasts = filter(None, subscribed_podcasts)

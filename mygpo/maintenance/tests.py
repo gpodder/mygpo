@@ -23,6 +23,7 @@ from django.test import TestCase
 from mygpo.core.models import Podcast, Episode
 from mygpo.users.models import EpisodeAction, User
 from mygpo.maintenance.merge import PodcastMerger
+from mygpo.db.couchdb.episode_state import episode_state_for_user_episode
 
 
 class MergeTests(TestCase):
@@ -49,8 +50,8 @@ class MergeTests(TestCase):
 
     def test_merge_podcasts(self):
 
-        state1 = self.episode1.get_user_state(self.user)
-        state2 = self.episode2.get_user_state(self.user)
+        state1 = episode_state_for_user_episode(self.user, self.episode1)
+        state2 = episode_state_for_user_episode(self.user, self.episode2)
 
         action1 = EpisodeAction(action='play', timestamp=datetime.utcnow())
         action2 = EpisodeAction(action='download', timestamp=datetime.utcnow())
@@ -64,8 +65,8 @@ class MergeTests(TestCase):
         pm = PodcastMerger([self.podcast1, self.podcast2])
         pm.merge()
 
-        state1 = self.episode1.get_user_state(self.user)
-        state2 = self.episode2.get_user_state(self.user)
+        state1 = episode_state_for_user_episode(self.user, self.episode1)
+        state2 = episode_state_for_user_episode(self.user, self.episode2)
 
         self.assertIn(action1, state1.actions)
         self.assertIn(action2, state1.actions)
