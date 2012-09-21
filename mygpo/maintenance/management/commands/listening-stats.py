@@ -9,6 +9,7 @@ from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.decorators import repeat_on_conflict
 from mygpo.maintenance.management.podcastcmd import PodcastCommand
 from mygpo.db.couchdb.episode import episodes_for_podcast
+from mygpo.db.couchdb.episode_state import all_podcast_episode_states
 
 
 class Command(PodcastCommand):
@@ -45,7 +46,7 @@ class Command(PodcastCommand):
         episodes = episodes_for_podcast(podcast)
         episodes = dict((episode._id, episode.released) for episode in episodes)
 
-        for state in self.get_episode_states(podcast):
+        for state in all_podcast_episode_states(podcast):
             ep = episodes.get(state.episode, None)
 
             dl = self.first_action(state.actions, 'download')
@@ -67,16 +68,6 @@ class Command(PodcastCommand):
         for a in actions:
             if a.action == action_type:
                 return a
-
-
-    @staticmethod
-    def get_episode_states(podcast):
-        r =  EpisodeUserState.view('users/episode_states_by_podcast_episode',
-                startkey     = [podcast.get_id(), None, None],
-                endkey       = [podcast.get_id(), {},   {}],
-                include_docs = True
-            )
-        return r
 
 
 def quantiles(data, intervals=100):
