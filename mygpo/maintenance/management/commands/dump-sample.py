@@ -11,7 +11,6 @@ from mygpo.core.models import Podcast
 from mygpo.couch import get_main_database
 from mygpo.users.models import PodcastUserState, EpisodeUserState, \
          Suggestions, User
-from mygpo.directory.models import Category
 from mygpo.utils import progress
 from mygpo.json import json
 from mygpo.db.couchdb.episode import episodes_for_podcast
@@ -19,6 +18,7 @@ from mygpo.db.couchdb.podcast import podcast_by_id
 from mygpo.db.couchdb.podcast_state import podcast_states_for_user
 from mygpo.db.couchdb.podcast_state import episode_state_for_user_episode
 from mygpo.db.couchdb.user import suggestions_for_user
+from mygpo.db.couchdb.directory import category_for_tag
 
 
 class Command(BaseCommand):
@@ -58,7 +58,7 @@ class Command(BaseCommand):
 
                 # Categories
                 for tag in p_state.tags:
-                    c = Category.for_tag(tag)
+                    c = category_for_tag(tag)
                     if c: docs.add(c._id)
 
                 # Podcast
@@ -68,7 +68,7 @@ class Command(BaseCommand):
                 # Categories
                 for s in podcast.tags:
                     for tag in podcast.tags[s]:
-                        c = Category.for_tag(tag)
+                        c = category_for_tag(tag)
                         if c: docs.add(c._id)
 
                 # Episodes

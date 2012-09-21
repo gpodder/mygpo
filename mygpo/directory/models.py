@@ -29,26 +29,6 @@ class Category(Document):
     spellings = StringListProperty()
     podcasts = SchemaListProperty(CategoryEntry)
 
-    @classmethod
-    @cache_result(timeout=60*60)
-    def for_tag(cls, tag):
-        r = cls.view('categories/by_tags',
-                key          = tag,
-                include_docs = True,
-                stale        = 'update_after',
-            )
-        return r.first() if r else None
-
-    @classmethod
-    @cache_result(timeout=60*60)
-    def top_categories(cls, count):
-        return cls.view('categories/by_weight',
-                descending   = True,
-                limit        = count,
-                include_docs = True,
-                stale        = 'update_after',
-            )
-
 
     def merge_podcasts(self, podcasts):
         """

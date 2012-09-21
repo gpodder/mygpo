@@ -8,6 +8,7 @@ from mygpo.directory.models import Category, CategoryEntry
 from mygpo.directory.tags import Tag
 from mygpo import utils
 from mygpo.db.couchdb.podcast import podcasts_by_id
+from mygpo.db.couchdb.directory import category_for_tag, all_tags
 
 
 class Command(BaseCommand):
@@ -19,7 +20,7 @@ class Command(BaseCommand):
 
         excluded_tags = settings.DIRECTORY_EXCLUDED_TAGS
 
-        tags = args or Tag.all()
+        tags = args or all_tags()
 
         for n, tag in enumerate(tags):
 
@@ -40,7 +41,7 @@ class Command(BaseCommand):
                 e.weight = float(weight * podcast.subscriber_count())
                 podcasts.append(e)
 
-            category = Category.for_tag(label)
+            category = category_for_tag(label)
 
             if not category:
                 if not label or label in excluded_tags:

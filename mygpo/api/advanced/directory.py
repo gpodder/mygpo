@@ -28,9 +28,9 @@ from mygpo.directory.tags import Topics
 from mygpo.web.utils import get_episode_link_target, get_podcast_link_target
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url
-from mygpo.directory.models import Category
 from mygpo.db.couchdb.episode import episode_for_podcast_url
 from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url
+from mygpo.db.couchdb.directory import category_for_tag
 
 
 @csrf_exempt
@@ -46,7 +46,7 @@ def top_tags(request, count):
 @cache_page(60 * 60 * 24)
 def tag_podcasts(request, tag, count):
     count = parse_range(count, 1, 100, 100)
-    category = Category.for_tag(tag)
+    category = category_for_tag(tag)
     if not category:
         return JsonResponse([])
 

@@ -3,6 +3,7 @@ from datetime import datetime
 from django.core.management.base import BaseCommand
 
 from mygpo.directory.models import Category
+from mygpo.db.couchdb.directory import category_for_tag
 
 
 class Command(BaseCommand):
@@ -23,7 +24,7 @@ Usage:
         spellings = args[1:]
 
         print "Adding new spellings for %s ..." % cat_name
-        category = Category.for_tag(cat_name)
+        category = category_for_tag(cat_name)
 
         if not category:
             print " creating new category %s" % cat_name
@@ -31,7 +32,7 @@ Usage:
             category.label = cat_name
 
         for spelling in spellings:
-            new_cat = Category.for_tag(spelling)
+            new_cat = category_for_tag(spelling)
 
             if spelling == cat_name or (spelling in category.spellings):
                 print " skipped %s: already in category" % spelling

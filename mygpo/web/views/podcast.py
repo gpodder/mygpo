@@ -17,7 +17,6 @@ from mygpo.core.proxy import proxy_object
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.users.models import HistoryEntry, DeviceDoesNotExist
 from mygpo.web.forms import PrivacyForm, SyncForm
-from mygpo.directory.tags import Tag
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.utils import daterange
 from mygpo.web.utils import get_podcast_link_target
@@ -27,6 +26,7 @@ from mygpo.db.couchdb.podcast import podcast_for_slug, podcast_for_slug_id, \
          podcast_for_oldid, podcast_for_url
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
 from mygpo.db.couchdb.episode_state import get_podcasts_episode_states
+from mygpo.db.couchdb.directory import tags_for_user, tags_for_podcast
 
 
 MAX_TAGS_ON_PAGE=50
@@ -123,12 +123,12 @@ def show(request, podcast):
 
 def get_tags(podcast, user):
     tags = {}
-    for t in Tag.for_podcast(podcast):
+    for t in tags_for_podcast(podcast):
         tag_str = t.lower()
         tags[tag_str] = False
 
     if not user.is_anonymous():
-        users_tags = Tag.for_user(user, podcast.get_id())
+        users_tags = tags_for_user(user, podcast.get_id())
         for t in users_tags.get(podcast.get_id(), []):
             tag_str = t.lower()
             tags[tag_str] = True

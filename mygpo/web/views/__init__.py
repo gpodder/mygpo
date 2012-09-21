@@ -37,7 +37,6 @@ from mygpo.decorators import repeat_on_conflict
 from mygpo.core import models
 from mygpo.core.models import Podcast
 from mygpo.core.podcasts import PodcastSet
-from mygpo.directory.tags import Tag
 from mygpo.directory.toplist import PodcastToplist
 from mygpo.users.models import Suggestions, History, HistoryEntry, DeviceDoesNotExist
 from mygpo.users.models import PodcastUserState, User
@@ -48,6 +47,7 @@ from mygpo.db.couchdb.episode import favorite_episodes_for_user
 from mygpo.db.couchdb.podcast import podcast_by_id, \
          podcast_for_oldid, random_podcasts
 from mygpo.db.couchdb.user import suggestions_for_user
+from mygpo.db.couchdb.directory import tags_for_user
 
 
 @vary_on_cookie
@@ -102,7 +102,7 @@ def dashboard(request, episode_count=10):
     if not request.user.get_token('userpage_token'):
         checklist.append('userpage')
 
-    if Tag.for_user(request.user):
+    if tags_for_user(request.user):
         checklist.append('tags')
 
     if PodcastList.for_user(request.user._id):
@@ -227,7 +227,7 @@ def mytags(request):
     tags_podcast = {}
     tags_tag = defaultdict(list)
 
-    for podcast_id, taglist in Tag.for_user(request.user).items():
+    for podcast_id, taglist in tags_for_user(request.user).items():
         podcast = podcast_by_id(podcast_id)
         tags_podcast[podcast] = taglist
 

@@ -12,7 +12,6 @@ from django.views.generic.base import View
 
 from mygpo.core.models import Podcast
 from mygpo.core.proxy import proxy_object
-from mygpo.directory.models import Category
 from mygpo.directory.toplist import PodcastToplist, EpisodeToplist, \
          TrendingPodcasts
 from mygpo.directory.search import search_podcasts
@@ -22,6 +21,7 @@ from mygpo.share.models import PodcastList
 from mygpo.users.models import User
 from mygpo.db.couchdb.podcast import get_podcast_languages, podcasts_by_id, \
          random_podcasts, podcasts_to_dict
+from mygpo.db.couchdb.directory import category_for_tag
 
 
 @vary_on_cookie
@@ -87,7 +87,7 @@ class Directory(View):
 @cache_control(private=True)
 @vary_on_cookie
 def category(request, category, page_size=20):
-    category = Category.for_tag(category)
+    category = category_for_tag(category)
     if not category:
         return HttpResponseNotFound()
 
