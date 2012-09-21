@@ -9,37 +9,24 @@ from mygpo.log import log
 from mygpo.utils import iterate_together, progress
 from mygpo.db.couchdb.podcast import podcast_count, podcast_for_oldid, \
         all_podcasts
+from mygpo.db.couchdb.common import sanitizingrules_by_obj_type
 
 
-def sanitize_urls(urls, obj_type='podcast', rules=None):
+def sanitize_urls(urls, obj_type='podcast'):
     """ Apply sanitizing rules to the given URLs and return the results """
 
-    rules = get_sanitizing_rules(obj_type, rules)
+    rules = sanitizingrules_by_obj_type(obj_type)
     return (sanitize_url(url, rules=rules) for url in urls)
 
 
-def sanitize_url(url, obj_type='podcast', rules=None):
+def sanitize_url(url, obj_type='podcast'):
     """ Apply sanitizing rules to the given URL and return the results """
 
-    rules = get_sanitizing_rules(obj_type, rules=rules)
+    rules = sanitizingrules_by_obj_type(obj_type)
     url = basic_sanitizing(url)
     url = apply_sanitizing_rules(url, rules)
     return url
 
-
-def get_sanitizing_rules(obj_type, rules=None):
-    """ Returns the sanitizing-rules from the cache or the database """
-
-    cache_name = '%s-sanitizing-rules' % obj_type
-
-    sanitizing_rules = \
-            rules or \
-            cache.get(cache_name) or \
-            list(models.SanitizingRule.for_obj_type(obj_type))
-
-    cache.set(cache_name, sanitizing_rules, 60 * 60)
-
-    return sanitizing_rules
 
 
 def basic_sanitizing(url):
@@ -85,8 +72,8 @@ def maintenance(dry_run=False):
     This will later be used to replace podcasts!
     """
 
-    podcast_rules = get_sanitizing_rules('podcast')
-    episode_rules = get_sanitizing_rules('episode')
+    podcast_rules = sanitizingrules_by_obj_type('podcast')
+    episode_rules = sanitizingrules_by_obj_type('episode')
 
     num_podcasts = podcast_count()
 

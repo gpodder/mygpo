@@ -95,14 +95,6 @@ class Episode(Document, SlugMixin, OldIdMixin):
         return set([self._id] + self.merged_ids)
 
 
-    @classmethod
-    def all(cls):
-        return utils.multi_request_view(cls, 'episodes/by_podcast',
-                reduce       = False,
-                include_docs = True,
-                stale        = 'update_after',
-            )
-
     def __eq__(self, other):
         if other == None:
             return False
@@ -554,8 +546,6 @@ class PodcastGroup(Document, SlugMixin, OldIdMixin):
             return '%s %s' % (self.__class__.__name__, self._id[:10])
 
 
-class SanitizingRuleStub(object):
-    pass
 
 class SanitizingRule(Document):
     slug        = StringProperty()
@@ -564,29 +554,6 @@ class SanitizingRule(Document):
     replace     = StringProperty()
     priority    = IntegerProperty()
     description = StringProperty()
-
-
-    @classmethod
-    def for_obj_type(cls, obj_type):
-        r = cls.view('sanitizing_rules/by_target', include_docs=True,
-            startkey=[obj_type, None], endkey=[obj_type, {}])
-
-        for rule in r:
-            obj = SanitizingRuleStub()
-            obj.slug = rule.slug
-            obj.applies_to = list(rule.applies_to)
-            obj.search = rule.search
-            obj.replace = rule.replace
-            obj.priority = rule.priority
-            obj.description = rule.description
-            yield obj
-
-
-    @classmethod
-    def for_slug(cls, slug):
-        r = cls.view('sanitizing_rules/by_slug', include_docs=True,
-            key=slug)
-        return r.one() if r else None
 
 
     def __repr__(self):
