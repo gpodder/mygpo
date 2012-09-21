@@ -37,7 +37,7 @@ class Toplist(object):
 
 
     def _cache_or_query(self, limit, key):
-        return toplist(self.cls, self.view, key, limit, self.view_args)
+        return toplist(self.cls, self.view, key, limit, **self.view_args)
 
 
     def _sort(self, results):

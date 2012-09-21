@@ -244,7 +244,7 @@ def get_duplicate_episode_states(user, episode):
             key          = [user, episode],
             include_docs = True,
         )
-    return = list(states)
+    return list(states)
 
 
 def _wrap_listener_count(res):
