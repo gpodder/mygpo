@@ -139,15 +139,6 @@ class PodcastSubscriberData(Document):
     podcast = StringProperty()
     subscribers = SchemaListProperty(SubscriberData)
 
-    @classmethod
-    def for_podcast(cls, id):
-        r = cls.view('podcasts/subscriber_data', key=id, include_docs=True)
-        if r:
-            return r.first()
-
-        data = PodcastSubscriberData()
-        data.podcast = id
-        return data
 
     def __repr__(self):
         return 'PodcastSubscriberData for Podcast %s (%s)' % (self.podcast, self._id)
@@ -335,11 +326,6 @@ class Podcast(Document, SlugMixin, OldIdMixin):
             return 0
         return self.subscribers[-2].subscriber_count
 
-
-    def get_all_subscriber_data(self):
-        subdata = PodcastSubscriberData.for_podcast(self.get_id())
-        return sorted(self.subscribers + subdata.subscribers,
-                key=lambda s: s.timestamp)
 
 
     @repeat_on_conflict()

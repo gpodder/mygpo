@@ -281,6 +281,20 @@ def podcasts_need_update(self):
             yield podcast
 
 
+def subscriberdata_for_podcast(podcast_id):
+    r = PodcastSubscriberData.view('podcasts/subscriber_data',
+            key          = podcast_id,
+            include_docs = True,
+        )
+
+    if r:
+        return r.first()
+
+    data = PodcastSubscriberData()
+    data.podcast = id
+    return data
+
+
 
 def _wrap_podcast_group(res):
     if res['doc']['doc_type'] == 'Podcast':

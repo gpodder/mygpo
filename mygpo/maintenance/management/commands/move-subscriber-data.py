@@ -1,10 +1,11 @@
 from django.core.management.base import BaseCommand
 
 from mygpo.utils import progress, multi_request_view
-from mygpo.core.models import Podcast, PodcastSubscriberData
+from mygpo.core.models import Podcast
 from mygpo.decorators import repeat_on_conflict
 from mygpo.counter import Counter
-from mygpo.db.couchdb.podcast import podcast_count, podcast_by_id, all_podcasts
+from mygpo.db.couchdb.podcast import podcast_count, podcast_by_id, \
+         all_podcasts, subscriberdata_for_podcast
 
 
 class Command(BaseCommand):
@@ -26,7 +27,7 @@ class Command(BaseCommand):
 
         for n, podcast in enumerate(podcasts):
 
-            psubscriber = PodcastSubscriberData.for_podcast(podcast.get_id())
+            psubscriber = subscriberdata_for_podcast(podcast.get_id())
 
             res = self.update_subscriber_data(podcast, data=psubscriber)
             self.update_podcast(podcast=podcast)

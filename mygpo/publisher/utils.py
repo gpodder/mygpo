@@ -19,6 +19,7 @@ import collections
 from datetime import timedelta, datetime, time
 
 from mygpo.utils import daterange, flatten
+from mygpo.db.couchdb.podcast import subscriberdata_for_podcast
 from mygpo.db.couchdb.episode import episodes_for_podcast
 from mygpo.db.couchdb.episode_state import podcast_listener_count_timespan, \
          episode_listener_count_timespan
@@ -116,7 +117,10 @@ def subscriber_data(podcasts):
 
     for podcast in podcasts:
         create_entry = lambda r: (r.timestamp.strftime('%y-%m'), r.subscriber_count)
-        data = dict(map(create_entry, podcast.get_all_subscriber_data()))
+
+        subdata = podcast.subscribers + subscriberdata_for_podcast(podcast.get_id())
+
+        data = dict(map(create_entry, subdata))
 
         for k in data:
             coll_data[k] += data[k]
