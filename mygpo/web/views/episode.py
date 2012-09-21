@@ -43,6 +43,7 @@ from mygpo.api import backend
 from mygpo.utils import parse_time, get_to_dict
 from mygpo.web.heatmap import EpisodeHeatmap
 from mygpo.web.utils import get_episode_link_target, fetch_episode_data
+from mygpo.userfeeds.feeds import FavoriteFeed
 
 
 @vary_on_cookie
