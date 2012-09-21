@@ -88,10 +88,8 @@ def episode_listener_counts(episode):
             reduce      = True,
         )
 
-    for res in r:
-        episode   = res['key'][1]
-        listeners = res['value']
-        yield (episode, listeners)
+    return map(_wrap_listeners)
+
 
 
 def get_podcasts_episode_states(podcast, user_id):
@@ -103,9 +101,7 @@ def get_podcasts_episode_states(podcast, user_id):
             endkey   = [user_id, podcast.get_id(), {}],
         )
 
-    for r in res:
-        action = r['value']
-        yield action
+    return map(lambda r: r['value'], res)
 
 
 
@@ -120,6 +116,7 @@ def episode_listener_count(episode, start=None, end={}):
             reduce      = True,
         )
     return r.first()['value'] if r else 0
+
 
 
 @cache_result(timeout=60*60)
@@ -141,6 +138,7 @@ def episode_listener_count_timespan(episode, start=None, end={}):
         )
 
     return map(_wrap_listener_count, r)
+
 
 
 def episode_state_for_ref_urls(user, podcast_url, episode_url):
@@ -209,9 +207,8 @@ def get_episode_actions(user_id, since=None, until={}, podcast_id=None,
             endkey   = endkey
         )
 
-    for r in res:
-        action = r['value']
-        yield action
+    return map(lambda r: r['value'], res)
+
 
 
 @cache_result(timeout=60*60)
@@ -230,4 +227,7 @@ def _wrap_listener_count(res):
     return (date, listeners)
 
 
-
+def _wrap_listeners(res):
+    episode   = res['key'][1]
+    listeners = res['value']
+    return (episode, listeners)
