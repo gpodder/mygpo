@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from mygpo.core.models import Podcast, Episode, MergedIdException
+from mygpo.users.models import Chapter
 from mygpo.cache import cache_result
 from mygpo.utils import is_couchdb_id
 from mygpo.db.couchdb.podcast import podcast_for_url, podcast_for_slug_id
@@ -202,3 +203,18 @@ def favorite_episodes_for_user(user):
         )
     return list(favorites)
 
+
+def chapters_for_episode(episode_id):
+    db = get_main_database()
+    r = db.view('chapters/by_episode',
+            startkey = [episode_id, None],
+            endkey   = [episode_id, {}],
+        )
+
+    return map(_wrap_chapter, r)
+
+
+def _wrap_chapter(res):
+    user = res['key'][1]
+    chapter = Chapter.wrap(res['value'])
+    return (user, chapter)

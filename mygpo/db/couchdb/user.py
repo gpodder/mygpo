@@ -1,4 +1,5 @@
 from mygpo.cache import cache_result
+from mygpo.counter import Counter
 
 
 @cache_result(timeout=60)
@@ -103,3 +104,29 @@ def suggestions_for_user(user):
         s = Suggestions()
         s.user = user._id
         return s
+
+
+@cache_result(timeout=60*60)
+def user_agent_stats():
+    res = User.view('clients/by_ua_string',
+        wrap_doc    = False,
+        group_level = 1,
+        stale       = 'update_after',
+    )
+
+    return Counter(dict((r['key'], r['value']) for r in res))
+
+
+def deleted_users():
+    users = User.view('users/deleted',
+            include_docs = True,
+            reduce       = False,
+        )
+    return list(users)
+
+
+def deleted_user_count():
+    total = User.view('users/deleted',
+            reduce = True,
+        )
+    return list(total)[0]['value'] if total else 0

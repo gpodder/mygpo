@@ -42,7 +42,7 @@ from mygpo.utils import parse_time
 from mygpo.web.heatmap import EpisodeHeatmap
 from mygpo.web.utils import get_episode_link_target, fetch_episode_data
 from mygpo.db.couchdb.episode import episode_for_slug_id, episode_for_oldid, \
-         favorite_episodes_for_user
+         favorite_episodes_for_user, chapters_for_episode
 from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url, \
          podcasts_to_dict
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode
@@ -85,7 +85,7 @@ def episode(request, episode):
 
 
     chapters = []
-    for user, chapter in Chapter.for_episode(episode._id):
+    for user, chapter in chapters_for_episode(episode._id):
         chapter.is_own = request.user.is_authenticated() and \
                          user == request.user._id
         chapters.append(chapter)

@@ -230,6 +230,22 @@ def episode_states_count():
     return r.total_rows
 
 
+def get_nth_episode_state(n):
+    first = EpisodeUserState.view('episode_states/by_user_episode',
+            skip         = n,
+            include_docs = True,
+            limit        = 1,
+        )
+    return first.one() if first else None
+
+
+def get_duplicate_episode_states(user, episode):
+    states = EpisodeUserState.view('episode_states/by_user_episode',
+            key          = [user, episode],
+            include_docs = True,
+        )
+    return = list(states)
+
 
 def _wrap_listener_count(res):
     date = parser.parse(res['key'][1]).date()

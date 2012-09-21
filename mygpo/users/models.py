@@ -142,19 +142,6 @@ class Chapter(Document):
     label = StringProperty()
     advertisement = BooleanProperty()
 
-    @classmethod
-    def for_episode(cls, episode_id):
-        db = get_main_database()
-        r = db.view('chapters/by_episode',
-                startkey = [episode_id, None],
-                endkey   = [episode_id, {}],
-            )
-
-        for res in r:
-            user = res['key'][1]
-            chapter = Chapter.wrap(res['value'])
-            yield (user, chapter)
-
 
     def __repr__(self):
         return '<%s %s (%d-%d)>' % (self.__class__.__name__, self.label,
