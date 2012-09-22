@@ -4,7 +4,7 @@ from mygpo.share.models import PodcastList
 from mygpo.cache import cache_result
 
 
-
+@cache_result(timeout=60)
 def podcastlist_for_user_slug(user_id, slug):
 
     r = PodcastList.view('podcastlists/by_user_slug',

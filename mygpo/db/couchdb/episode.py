@@ -3,7 +3,7 @@ from datetime import datetime
 from mygpo.core.models import Podcast, Episode, MergedIdException
 from mygpo.users.models import Chapter
 from mygpo.cache import cache_result
-from mygpo.utils import is_couchdb_id
+from mygpo.db.couchdb.utils import is_couchdb_id
 from mygpo.db.couchdb.podcast import podcast_for_url, podcast_for_slug_id
 
 
@@ -26,10 +26,11 @@ def episode_by_id(episode_id, current_id=False):
 
 @cache_result(timeout=60*60)
 def episodes_by_id(episode_ids):
-    return Episode.view('episodes/by_id',
+    r = Episode.view('episodes/by_id',
             include_docs = True,
             keys         = episode_ids,
         )
+    return list(r)
 
 
 @cache_result(timeout=60*60)

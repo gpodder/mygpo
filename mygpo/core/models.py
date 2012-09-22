@@ -441,17 +441,6 @@ class PodcastGroup(Document, SlugMixin, OldIdMixin):
         return self._id
 
 
-    @classmethod
-    def for_slug_id(cls, slug_id):
-        """ Returns the Podcast for either an CouchDB-ID for a Slug """
-
-        if utils.is_couchdb_id(slug_id):
-            return cls.get(slug_id)
-        else:
-            #TODO: implement
-            return cls.for_slug(slug_id)
-
-
     def get_podcast_by_id(self, id, current_id=False):
         for podcast in self.podcasts:
             if podcast.get_id() == id:

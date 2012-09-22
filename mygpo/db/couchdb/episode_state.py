@@ -66,6 +66,7 @@ def podcast_listener_count(episode):
     return r.first()['value'] if r else 0
 
 
+@cache_result(timeout=60*60)
 def podcast_listener_count_timespan(podcast, start=None, end={}):
     """ returns (date, listener-count) tuples for all days w/ listeners """
 
@@ -115,6 +116,7 @@ def get_podcasts_episode_states(podcast, user_id):
 
 
 
+@cache_result(timeout=60*60)
 def episode_listener_count(episode, start=None, end={}):
     """ returns the number of users that have listened to this episode """
 
@@ -259,6 +261,7 @@ def _wrap_listeners(res):
     return (episode, listeners)
 
 
+@cache_result(timeout=60*60)
 def get_heatmap(podcast_id, episode_id, user_id):
     db = get_main_database()
 

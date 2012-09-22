@@ -2,7 +2,7 @@ from random import random
 
 from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.cache import cache_result
-from mygpo.db.couchdb.utils import multi_request_view
+from mygpo.db.couchdb.utils import multi_request_view, is_couchdb_id
 
 
 def podcast_slugs(base_slug):
@@ -121,7 +121,6 @@ def podcast_for_slug(slug):
 def podcast_for_slug_id(slug_id):
     """ Returns the Podcast for either an CouchDB-ID for a Slug """
 
-    from mygpo.utils import is_couchdb_id
     if is_couchdb_id(slug_id):
         return podcast_by_id(slug_id)
     else:
