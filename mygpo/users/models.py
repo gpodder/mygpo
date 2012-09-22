@@ -24,6 +24,7 @@ from mygpo.users.sync import SyncedDevicesMixin
 from mygpo.cache import cache_result
 from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_by_id, \
          podcasts_to_dict
+from mygpo.db.couchdb.user import user_history, device_history
 
 
 RE_DEVICE_UID = re.compile(r'^[\w.-]+$')
@@ -770,16 +771,6 @@ class History(object):
     def __init__(self, user, device):
         self.user = user
         self.device = device
-        self._db = get_main_database()
-
-        if device:
-            self._view = 'history/by_device'
-            self._startkey = [self.user._id, device.id, None]
-            self._endkey   = [self.user._id, device.id, {}]
-        else:
-            self._view = 'history/by_user'
-            self._startkey = [self.user._id, None]
-            self._endkey   = [self.user._id, {}]
 
 
     def __getitem__(self, key):
@@ -791,17 +782,11 @@ class History(object):
             start = key
             length = 1
 
-        res = self._db.view(self._view,
-                descending = True,
-                startkey   = self._endkey,
-                endkey     = self._startkey,
-                limit      = length,
-                skip       = start,
-            )
+        if self.device:
+            return device_history(self.user, self.device, start, length)
 
-        for action in res:
-            action = action['value']
-            yield HistoryEntry.from_action_dict(action)
+        else:
+            return user_history(self.user, start, length)
 
 
 

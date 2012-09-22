@@ -2,6 +2,7 @@ from random import random
 
 from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.cache import cache_result
+from mygpo.db.couchdb.utils import multi_request_view
 
 
 def podcast_slugs(base_slug):
@@ -87,6 +88,13 @@ def podcast_by_id(podcast_id, current_id=False):
     return podcast_group.get_podcast_by_id(podcast_id, current_id)
 
 
+
+@cache_result(timeout=60*60)
+def podcastgroup_by_id(group_id):
+    return PodcastGroup.get(group_id)
+
+
+
 @cache_result(timeout=60*60)
 def podcast_for_slug(slug):
     r = Podcast.view('podcasts/by_slug',
@@ -120,6 +128,17 @@ def podcast_for_slug_id(slug_id):
         return podcast_for_slug(slug_id)
 
 
+def podcastgroup_for_slug_id(slug_id):
+    """ Returns the Podcast for either an CouchDB-ID for a Slug """
+
+    if is_couchdb_id(slug_id):
+        return PodcastGroup.get(slug_id)
+
+    else:
+        #TODO: implement
+        return cls.for_slug(slug_id)
+
+
 
 def podcasts_by_id(ids):
     r = Podcast.view('podcasts/by_id',
@@ -145,6 +164,17 @@ def podcast_for_oldid(oldid):
 
     podcast_group = r.first()
     return podcast_group.get_podcast_by_oldid(oldid)
+
+
+@cache_result(timeout=60*60)
+def podcastgroup_for_oldid(oldid):
+    r = PodcastGroup.view('podcasts/groups_by_oldid',
+            key          = long(oldid),
+            include_docs = True,
+        )
+
+    return r.one() if r else None
+
 
 
 def podcast_for_url(url, create=False):

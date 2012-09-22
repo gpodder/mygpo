@@ -257,3 +257,26 @@ def _wrap_listeners(res):
     episode   = res['key'][1]
     listeners = res['value']
     return (episode, listeners)
+
+
+def get_heatmap(podcast_id, episode_id, user_id):
+    db = get_main_database()
+
+    group_level = len(filter(None, [podcast_id, episode_id, user_id]))
+
+    r = db.view('heatmap/by_episode',
+            startkey    = [podcast_id, episode_id,       user_id],
+            endkey      = [podcast_id, episode_id or {}, user_id or {}],
+            reduce      = True,
+            group       = True,
+            group_level = group_level,
+            stale       = 'update_after',
+        )
+
+    if not r:
+        return [], []
+
+    else:
+        res = r.first()['value']
+        return res['heatmap'], res['borders']
+

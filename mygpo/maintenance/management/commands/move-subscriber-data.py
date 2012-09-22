@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from mygpo.utils import progress, multi_request_view
+from mygpo.utils import progress
 from mygpo.core.models import Podcast
 from mygpo.decorators import repeat_on_conflict
 from mygpo.counter import Counter

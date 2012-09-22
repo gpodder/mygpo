@@ -4,7 +4,7 @@ from functools import partial
 
 from django.core.management.base import BaseCommand
 
-from mygpo.utils import progress, multi_request_view
+from mygpo.utils import progress
 from mygpo.users.models import EpisodeUserState
 from mygpo.counter import Counter
 from mygpo.maintenance.merge import merge_episode_states

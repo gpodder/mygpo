@@ -7,7 +7,7 @@ from django.views.decorators.cache import never_cache, cache_control
 from django.views.decorators.vary import vary_on_cookie
 from django.core.urlresolvers import reverse
 
-from mygpo.core.models import Podcast, PodcastGroup
+from mygpo.core.models import Podcast
 from mygpo.core.proxy import proxy_object
 from mygpo.publisher.auth import require_publisher, is_publisher
 from mygpo.publisher.forms import SearchPodcastForm
@@ -25,7 +25,8 @@ from mygpo.decorators import requires_token, allowed_methods
 from mygpo.users.models import User
 from mygpo.db.couchdb.episode import episodes_for_podcast
 from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_by_id, \
-         podcast_for_url
+         podcast_for_url, podcastgroup_for_slug_id, podcastgroup_for_oldid, \
+         podcastgroup_by_id
 
 
 @vary_on_cookie
@@ -78,7 +79,7 @@ def podcast(request, podcast):
     subscription_data = subscriber_data([podcast])[-20:]
 
     if podcast.group:
-        group = PodcastGroup.get(podcast.group)
+        group = podcastgroup_by_id(podcast.group)
     else:
         group = None
 
@@ -240,7 +241,7 @@ def advertise(request):
 def group_slug_id_decorator(f):
     @wraps(f)
     def _decorator(request, slug_id, *args, **kwargs):
-        group = PodcastGroup.for_slug_id(slug_id)
+        group = podcastgroup_for_slug_id(slug_id)
 
         if podcast is None:
             raise Http404
@@ -258,7 +259,7 @@ def group_oldid_decorator(f):
         except (TypeError, ValueError):
             raise Http404
 
-        group = PodcastGroup.for_oldid(pid)
+        group = podcastgroup_for_oldid(pid)
 
         if not podcast:
             raise Http404

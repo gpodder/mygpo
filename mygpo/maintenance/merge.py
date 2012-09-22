@@ -11,6 +11,7 @@ from mygpo.decorators import repeat_on_conflict
 from mygpo.db.couchdb.episode import episodes_for_podcast
 from mygpo.db.couchdb.podcast_state import all_podcast_states
 from mygpo.db.couchdb.episode_state import all_episode_states
+from mygpo.db.couchdb.utils import multi_request_view
 
 
 class IncorrectMergeException(Exception):
@@ -112,7 +113,7 @@ def merge_objects(podcasts=True, podcast_states=False, episodes=False,
 
 
 def get_view_count_iter(cls, view, *args, **kwargs):
-    iterator = utils.multi_request_view(cls, view, *args, **kwargs)
+    iterator = multi_request_view(cls, view, *args, **kwargs)
     total = cls.view(view, limit=0).total_rows
     return iterator, total
 

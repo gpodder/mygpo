@@ -1,5 +1,6 @@
 from mygpo.core.models import SanitizingRule
 from mygpo.cache import cache_result
+from mygpo.couch import get_main_database
 
 
 class SanitizingRuleStub(object):
@@ -33,3 +34,31 @@ def sanitizingrule_for_slug(slug):
         )
 
     return r.one() if r else None
+
+
+def missing_slug_count(doc_type, start, end):
+    db = get_main_database()
+    res = db.view('slugs/missing',
+            startkey     = [doc_type] + end,
+            endkey       = [doc_type] + start,
+            descending   = True,
+            reduce       = True,
+            group        = True,
+            group_level  = 1,
+        )
+    return res.first()['value'] if res else 0
+
+
+def missing_slugs(doc_type, start, end, wrapper, **kwargs):
+
+    db = get_main_database()
+    return multi_request_view(db, 'slugs/missing',
+            startkey     = [doc_type] + end,
+            endkey       = [doc_type] + start,
+            descending   = True,
+            include_docs = True,
+            reduce       = False,
+            wrapper      = wrapper,
+            auto_advance = False,
+            **kwargs
+        )

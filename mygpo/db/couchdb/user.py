@@ -130,3 +130,37 @@ def deleted_user_count():
             reduce = True,
         )
     return list(total)[0]['value'] if total else 0
+
+
+
+@cache_result(timeout=60)
+def user_history(user, start, length):
+    db = get_main_database()
+    res = db.view('history/by_user',
+            descending = True,
+            startkey   = [user._id, None],
+            endkey     = [user._id, {}],
+            limit      = length,
+            skip       = start,
+        )
+
+    return map(_wrap_historyentry, res)
+
+
+@cache_result(timeout=60)
+def device_history(user, device, start, length):
+    db = get_main_database()
+
+    res = self._db.view('history/by_device',
+            descending = True,
+            startkey   = [user._id, device.id, None],
+            endkey     = [user._id, device.id, {}],
+            limit      = length,
+            skip       = start,
+        )
+
+    return map(_wrap_historyentry, res)
+
+
+def _wrap_historyentry(action):
+    return HistoryEntry.from_action_dict(action['action'])
