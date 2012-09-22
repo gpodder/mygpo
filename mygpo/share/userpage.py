@@ -6,7 +6,6 @@ from django.shortcuts import render
 from django.views.generic.base import View
 from django.utils.decorators import method_decorator
 
-from mygpo.share.models import PodcastList
 from mygpo.users.models import User
 from mygpo.users.models import HistoryEntry
 from mygpo.decorators import requires_token
@@ -16,6 +15,7 @@ from mygpo.web.views import GeventView
 from mygpo.db.couchdb.episode import favorite_episodes_for_user
 from mygpo.db.couchdb.user import get_latest_episodes, \
          get_num_played_episodes, get_seconds_played
+from mygpo.db.couchdb.podcastlist import podcastlists_for_user
 
 
 
@@ -51,7 +51,7 @@ class UserpageView(GeventView):
 
 
     def get_podcast_lists(self, user):
-        return list(PodcastList.for_user(user._id))
+        return podcastlists_for_user(user._id)
 
 
     def get_subscriptions(self, user):

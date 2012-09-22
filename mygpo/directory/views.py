@@ -17,11 +17,12 @@ from mygpo.directory.toplist import PodcastToplist, EpisodeToplist, \
 from mygpo.directory.search import search_podcasts
 from mygpo.web import utils
 from mygpo.directory.tags import Topics
-from mygpo.share.models import PodcastList
 from mygpo.users.models import User
 from mygpo.db.couchdb.podcast import get_podcast_languages, podcasts_by_id, \
          random_podcasts, podcasts_to_dict
 from mygpo.db.couchdb.directory import category_for_tag
+from mygpo.db.couchdb.podcastlist import random_podcastlists, \
+         podcastlist_count, podcastlists_by_rating
 
 
 @vary_on_cookie
@@ -68,7 +69,7 @@ class Directory(View):
 
 
     def get_random_list(self, podcasts_per_list=5):
-        random_list = next(PodcastList.random(), None)
+        random_list = next(random_podcastlists(), None)
         list_owner = None
         if random_list:
             random_list = proxy_object(random_list)
@@ -189,7 +190,7 @@ def podcast_lists(request, page_size=20):
     except ValueError:
         page = 1
 
-    lists = PodcastList.by_rating(skip=(page-1) * page_size, limit=page_size)
+    lists = podcastlists_by_rating(skip=(page-1) * page_size, limit=page_size)
 
 
     def _prepare_list(l):
@@ -200,7 +201,7 @@ def podcast_lists(request, page_size=20):
 
     lists = map(_prepare_list, lists)
 
-    num_pages = int(ceil(PodcastList.count() / float(page_size)))
+    num_pages = int(ceil(podcastlist_count() / float(page_size)))
 
     page_list = utils.get_page_list(1, num_pages, page, 15)
 

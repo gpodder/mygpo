@@ -42,12 +42,12 @@ from mygpo.users.models import Suggestions, History, HistoryEntry, DeviceDoesNot
 from mygpo.users.models import PodcastUserState, User
 from mygpo.web import utils
 from mygpo.utils import flatten, parse_range
-from mygpo.share.models import PodcastList
 from mygpo.db.couchdb.episode import favorite_episodes_for_user
 from mygpo.db.couchdb.podcast import podcast_by_id, \
          podcast_for_oldid, random_podcasts
 from mygpo.db.couchdb.user import suggestions_for_user
 from mygpo.db.couchdb.directory import tags_for_user
+from mygpo.db.couchdb.podcastlist import podcastlists_for_user
 
 
 @vary_on_cookie
@@ -105,7 +105,8 @@ def dashboard(request, episode_count=10):
     if tags_for_user(request.user):
         checklist.append('tags')
 
-    if PodcastList.for_user(request.user._id):
+    # TODO add podcastlist_count_for_user
+    if podcastlists_for_user(request.user._id):
         checklist.append('lists')
 
     if request.user.published_objects:

@@ -36,6 +36,8 @@ from mygpo.api.simple import parse_subscription, format_podcast_list, \
 from mygpo.share.views import list_decorator
 from mygpo.users.models import User
 from mygpo.db.couchdb.podcast import podcasts_by_id, podcast_for_url
+from mygpo.db.couchdb.podcastlist import podcastlist_for_user_slug, \
+         podcastlists_for_user
 
 
 
@@ -58,7 +60,7 @@ def create(request, username, format):
     if not slug:
         return HttpResponseBadRequest('Invalid title')
 
-    plist = PodcastList.for_user_slug(request.user._id, slug)
+    plist = podcastlist_for_user_slug(request.user._id, slug)
 
     if plist:
         return HttpResponse('List already exists', status=409)
@@ -101,7 +103,7 @@ def get_lists(request, username):
     if not user:
         raise Http404
 
-    lists = PodcastList.for_user(user._id)
+    lists = podcastlists_for_user(user._id)
 
     site = RequestSite(request)
 
