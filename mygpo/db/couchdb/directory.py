@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from mygpo.directory.models import Category
 from mygpo.couch import get_main_database
 from mygpo.cache import cache_result
@@ -34,7 +36,8 @@ def top_categories(count, wrap=True):
 def tags_for_podcast(podcast):
     """ all tags for the podcast, in decreasing order of importance """
 
-    res = Podcast.view('tags/by_podcast',
+    db = get_main_database()
+    res = db.view('tags/by_podcast',
             startkey    = [podcast.get_id(), None],
             endkey      = [podcast.get_id(), {}],
             reduce      = True,
@@ -45,7 +48,7 @@ def tags_for_podcast(podcast):
 
     tags = Counter(dict((x['key'][1], x['value']) for x in res))
 
-    res = Podcast.view('usertags/by_podcast',
+    res = db.view('usertags/by_podcast',
             startkey    = [podcast.get_id(), None],
             endkey      = [podcast.get_id(), {}],
             reduce      = True,
@@ -62,7 +65,8 @@ def tags_for_podcast(podcast):
 def tags_for_user(user, podcast_id=None):
     """ mapping of all podcasts tagged by the user with a list of tags """
 
-    res = Podcast.view('tags/by_user',
+    db = get_main_database()
+    res = db.view('tags/by_user',
             startkey = [user._id, podcast_id],
             endkey   = [user._id, podcast_id or {}]
         )
@@ -77,7 +81,8 @@ def all_tags():
     """ Returns all tags
 
     Some tags might be returned twice """
-    res = multi_request_view(Podcast, 'podcasts/by_tag',
+    db = get_main_database()
+    res = multi_request_view(db, 'podcasts/by_tag',
             wrap        = False,
             reduce      = True,
             group       = True,
@@ -87,7 +92,7 @@ def all_tags():
     for r in res:
         yield r['key'][0]
 
-    res = multi_request_view(Podcast, 'usertags/podcasts',
+    res = multi_request_view(db, 'usertags/podcasts',
             wrap        = False,
             reduce      = True,
             group       = True,
