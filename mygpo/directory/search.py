@@ -1,3 +1,5 @@
+from restkit import RequestFailed
+
 from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.utils import is_url
 from mygpo.data.feeddownloader import PodcastUpdater
@@ -38,8 +40,12 @@ def search_podcasts(q, limit=20, skip=0):
     #FIXME current couchdbkit can't parse responses for multi-query searches
     q = q.replace(',', '')
 
-    res = db.search('podcasts/search', wrapper=search_wrapper,
-        include_docs=True, limit=limit, skip=skip, q=q,
-        sort='\\subscribers<int>')
+    try:
+        res = db.search('podcasts/search', wrapper=search_wrapper,
+            include_docs=True, limit=limit, skip=skip, q=q,
+            sort='\\subscribers<int>')
 
-    return list(res), res.total_rows
+        return list(res), res.total_rows
+
+    except RequestFailed:
+        return [], 0
