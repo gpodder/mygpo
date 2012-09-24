@@ -844,10 +844,13 @@ class User(BaseUser, SyncedDevicesMixin):
                 reduce      = True,
                 group_level = 2,
             )
-        for obj in r:
+
+        def _wrap(obj):
             count = obj['value']
             podcast = obj['key'][1]
-            yield (podcast, count)
+            return (podcast, count)
+
+        return map(_wrap, r)
 
 
     def get_subscription_history(self, device_id=None, reverse=False, public=None):
