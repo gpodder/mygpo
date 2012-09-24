@@ -580,6 +580,11 @@ class Device(Document):
         return list(r)
 
 
+    def get_subscribed_podcast_ids(self):
+        states = self.get_subscribed_podcast_states()
+        return [state.podcast for state in states]
+
+
     def get_subscribed_podcasts(self):
         """ Returns all subscribed podcasts for the device
 
@@ -805,6 +810,12 @@ class User(BaseUser, SyncedDevicesMixin):
             )
 
         return set(r)
+
+
+    def get_subscribed_podcast_ids(self, public=None):
+        states = self.get_subscribed_podcast_states(public=public)
+        return [state.podcast for state in states]
+
 
 
     def get_subscribed_podcasts(self, public=None):
