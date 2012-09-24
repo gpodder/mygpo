@@ -61,7 +61,10 @@
 
  {% cache 3600 random_podcast %}
  {% for random_podcast in random_podcasts %}
-    <div class="well">
+   <div class="well">
+
+   <h4><small>{% trans "Random" %}</small></h4>
+
 
    <a href="{% podcast_link_target random_podcast %}">
     <div id="podcastlogo">{{ random_podcast|podcast_logo_medium }}</div>
@@ -76,7 +79,8 @@
    <p>
     <a href="{% podcast_link_target random_podcast %}">{% trans "more..." %}</a>
    </p>
- </div>
+
+   </div>
  {% endfor %}
  {% endcache %}
 
