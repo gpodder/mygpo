@@ -53,7 +53,7 @@ class PodcastList(Document, RatingMixin):
                 stale        = 'update_after',
                 **kwargs
             )
-        return r.iterator()
+        return list(r)
 
 
     @classmethod
