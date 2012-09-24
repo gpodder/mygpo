@@ -741,7 +741,7 @@ class User(BaseUser, SyncedDevicesMixin):
     def set_device(self, device):
 
         if not RE_DEVICE_UID.match(device.uid):
-            raise DeviceUIDException("'{uid} is not a valid device ID".format(
+            raise DeviceUIDException(u"'{uid} is not a valid device ID".format(
                         uid=device.uid))
 
         devices = list(self.devices)
