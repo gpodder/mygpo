@@ -41,7 +41,7 @@ def multi_request_view(cls, view, wrap=True, auto_advance=True,
     per_page = kwargs.get('limit', 1000)
     kwargs['limit'] = per_page + 1
     db = get_main_database()
-    wrapper = kwargs.pop('wrapper', cls.wrap)
+    wrapper = kwargs.pop('wrapper', False) or cls.wrap
     cont = True
 
     while cont:

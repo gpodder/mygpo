@@ -14,9 +14,9 @@ from django.core.cache import cache
 
 from django_couchdb_utils.registration.models import User as BaseUser
 
-from mygpo.core.proxy import DocumentABCMeta
 from mygpo.core.models import Podcast
 from mygpo.utils import linearize, iterate_together
+from mygpo.core.proxy import DocumentABCMeta, proxy_object
 from mygpo.couch import get_main_database
 from mygpo.decorators import repeat_on_conflict
 from mygpo.users.ratings import RatingMixin
@@ -405,9 +405,30 @@ class Device(Document):
                 yield (p_state.podcast, actions[0])
 
 
+    def get_subscribed_podcast_states(self):
+        r = PodcastUserState.view('subscriptions/by_device',
+                startkey     = [self.id, None],
+                endkey       = [self.id, {}],
+                include_docs = True
+            )
+        return list(r)
+
+
     def get_subscribed_podcasts(self):
-        from mygpo.db.couchdb.podcast_state import subscriptions_by_user
-        return podcasts_by_id(subscribed_podcast_ids_by_device(self))
+        """ Returns all subscribed podcasts for the device
+
+        The attribute "url" contains the URL that was used when subscribing to
+        the podcast """
+
+        states = self.get_subscribed_podcast_states()
+        podcast_ids = [state.podcast for state in states]
+        podcasts = podcasts_to_dict(podcast_ids)
+
+        for state in states:
+            podcast = proxy_object(podcasts[state.podcast], url=state.ref_url)
+            podcasts[state.podcast] = podcast
+
+        return podcasts.values()
 
 
     def __hash__(self):
@@ -592,16 +613,36 @@ class User(BaseUser, SyncedDevicesMixin):
         return groups
 
 
-    def get_subscribed_podcast_ids(self, public=None):
+    def get_subscribed_podcast_states(self, public=None):
         """
         Returns the Ids of all subscribed podcasts
         """
-        from mygpo.db.couchdb.podcast_state import subscriptions_by_user
-        return list(set(x[1] for x in subscriptions_by_user(self, public=public)))
+
+        r = PodcastUserState.view('subscriptions/by_user',
+                startkey     = [self._id, public, None, None],
+                endkey       = [self._id+'ZZZ', None, None, None],
+                reduce       = False,
+                include_docs = True
+            )
+
+        return set(r)
 
 
     def get_subscribed_podcasts(self, public=None):
-        return podcasts_by_id(self.get_subscribed_podcast_ids(public=public))
+        """ Returns all subscribed podcasts for the user
+
+        The attribute "url" contains the URL that was used when subscribing to
+        the podcast """
+
+        states = self.get_subscribed_podcast_states(public=public)
+        podcast_ids = [state.podcast for state in states]
+        podcasts = podcasts_to_dict(podcast_ids)
+
+        for state in states:
+            podcast = proxy_object(podcasts[state.podcast], url=state.ref_url)
+            podcasts[state.podcast] = podcast
+
+        return podcasts.values()
 
 
 

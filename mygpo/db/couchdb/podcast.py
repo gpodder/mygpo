@@ -337,10 +337,10 @@ def _wrap_podcast_group(res):
 def _wrap_podcast_group_key1(res):
     obj = res['doc']
     if obj['doc_type'] == 'Podcast':
-        yield Podcast.wrap(obj)
+        return Podcast.wrap(obj)
 
     else:
         pid = res[u'key'][1]
         pg = PodcastGroup.wrap(obj)
         podcast = pg.get_podcast_by_id(pid)
-        yield podcast
+        return podcast

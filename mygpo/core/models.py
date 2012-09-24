@@ -43,7 +43,9 @@ class Episode(Document, SlugMixin, OldIdMixin):
     __metaclass__ = DocumentABCMeta
 
     title = StringProperty()
-    description = StringProperty()
+    guid = StringProperty()
+    description = StringProperty(default="")
+    content = StringProperty(default="")
     link = StringProperty()
     released = DateTimeProperty()
     author = StringProperty()

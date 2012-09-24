@@ -467,3 +467,11 @@ def file_hash(f, h=hashlib.md5, block_size=2**20):
     for chunk in iter(lambda: f.read(block_size), ''):
          f_hash.update(chunk)
     return f_hash
+
+
+
+def split_list(l, prop):
+    """ split elements that satisfy a property, and those that don't """
+    match   = filter(prop, l)
+    nomatch = [x for x in l if x not in match]
+    return match, nomatch

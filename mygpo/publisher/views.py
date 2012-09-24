@@ -20,7 +20,7 @@ from mygpo.web.views.podcast import \
          oldid_decorator as podcast_oldid_decorator
 from mygpo.web.utils import get_podcast_link_target
 from django.contrib.sites.models import RequestSite
-from mygpo.data.feeddownloader import update_podcasts
+from mygpo.data.feeddownloader import PodcastUpdater
 from mygpo.decorators import requires_token, allowed_methods
 from mygpo.users.models import User
 from mygpo.db.couchdb.episode import episodes_for_podcast
@@ -142,7 +142,8 @@ def update_podcast(request, podcast):
     if not check_publisher_permission(request.user, podcast):
         return HttpResponseForbidden()
 
-    update_podcasts( [podcast] )
+    updater = PodcastUpdater( [podcast] )
+    updater.update()
 
     url = get_podcast_link_target(podcast, 'podcast-publisher-detail')
     return HttpResponseRedirect(url)
@@ -156,7 +157,8 @@ def update_published_podcasts(request, username):
         raise Http404
 
     published_podcasts = podcasts_by_id(user.published_objects)
-    update_podcasts(published_podcasts)
+    updater = PodcastUpdater(published_podcasts)
+    updater.update()
 
     return HttpResponse('Updated:\n' + '\n'.join([p.url for p in published_podcasts]), mimetype='text/plain')
 
