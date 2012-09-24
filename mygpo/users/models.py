@@ -27,6 +27,10 @@ from mygpo.cache import cache_result
 RE_DEVICE_UID = re.compile(r'^[\w.-]+$')
 
 
+class InvalidEpisodeActionAttributes(ValueError):
+    """ raised when the attribues of an episode action fail validation """
+
+
 class DeviceUIDException(Exception):
     pass
 
@@ -160,17 +164,17 @@ class EpisodeAction(DocumentSchema):
         if self.action != 'play':
             for key in PLAY_ACTION_KEYS:
                 if getattr(self, key, None) is not None:
-                    raise ValueError('%s only allowed in play actions' % key)
+                    raise InvalidEpisodeActionAttributes('%s only allowed in play actions' % key)
 
         # Sanity check: If started or total are given, require playmark
         if ((self.started is not None) or (self.total is not None)) and \
             self.playmark is None:
-            raise ValueError('started and total require position')
+            raise InvalidEpisodeActionAttributes('started and total require position')
 
         # Sanity check: total and playmark can only appear together
         if ((self.total is not None) or (self.started is not None)) and \
            ((self.total is None)     or (self.started is None)):
-            raise ValueError('total and started can only appear together')
+            raise InvalidEpisodeActionAttributes('total and started can only appear together')
 
 
     def __repr__(self):
