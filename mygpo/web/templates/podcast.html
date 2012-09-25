@@ -147,6 +147,7 @@
         </td>
         <td style="text-align: center;">
          <form class="form-inline" method="post" action="{% podcast_link_target podcast "unsubscribe" device.uid %}?return_to={% podcast_link_target podcast %}">
+          {% csrf_token %}
           <button class="btn btn-danger btn-small" type="submit">
            <i class="icon-remove"></i>
           </button>

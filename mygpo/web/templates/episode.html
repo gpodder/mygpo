@@ -64,7 +64,13 @@
 {% block content %}
 
   {% if episode.content or episode.description %}
-   <div class="description">{{ episode.content|default:episode.description|markdown }}</div>
+   <div class="description">
+    {% if episode.content %}
+     {{ episode.content|markdown }}
+    {% else %}
+     {{ episode.description|markdown }}
+    {% endif %}
+   </div>
   {% endif %}
 
   {% if episode.url|is_youtube_video %}
@@ -126,7 +132,7 @@
 
     <div class="well">
 
-    <h3>Share</h3>
+    <h4>Share</h4>
 
    {% google_plus_one_button %}
    {% fb_like_episode episode podcast %}
@@ -137,7 +143,7 @@
   {% if user.is_authenticated or chapters %}
     <div class="well">
 
-   <h3>{% trans "Chapters" %}</h3>
+   <h4>{% trans "Chapters" %}</h4>
 
    <table class="list">
     <tr>
@@ -187,7 +193,7 @@
 
   {% if user.is_authenticated or history %}
   <div class="well">
-  <h3>{% trans "History" %}</h3>
+  <h4>{% trans "History" %}</h4>
   <table class="list">
    <tr>
     <th>{% trans "Time" %}</th>

@@ -41,7 +41,8 @@ from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.core import models
 from mygpo.core.models import SanitizingRule, Podcast
 from mygpo.users.models import PodcastUserState, EpisodeAction, \
-     EpisodeUserState, DeviceDoesNotExist, DeviceUIDException
+     EpisodeUserState, DeviceDoesNotExist, DeviceUIDException, \
+     InvalidEpisodeActionAttributes
 from mygpo.json import json, JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.db.couchdb.episode import episode_by_id, \
@@ -181,6 +182,10 @@ def episodes(request, username, version=1):
         try:
             update_urls = update_episodes(request.user, actions, now, ua_string)
         except DeviceUIDException as e:
+            import traceback
+            log('could not update episodes for user %s: %s %s: %s' % (username, e, traceback.format_exc(), actions))
+            return HttpResponseBadRequest(str(e))
+        except InvalidEpisodeActionAttributes as e:
             import traceback
             log('could not update episodes for user %s: %s %s: %s' % (username, e, traceback.format_exc(), actions))
             return HttpResponseBadRequest(str(e))

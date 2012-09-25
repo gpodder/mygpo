@@ -47,6 +47,7 @@ from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url, \
          podcasts_to_dict
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode
 from mygpo.db.couchdb.user import get_latest_episodes
+from mygpo.userfeeds.feeds import FavoriteFeed
 
 
 @vary_on_cookie
