@@ -56,13 +56,14 @@ class Command(BaseCommand):
         subscriber_sum = 0
 
         for podcast_id in podcast.get_ids():
-            x = db.view('subscriptions/by_podcast',
+            x = db.view('subscribers/by_podcast',
                     startkey    = [podcast_id, None],
                     endkey      = [podcast_id, {}],
                     reduce      = True,
                     group       = True,
-                    group_level = 2,
+                    group_level = 1,
                 )
-            subscriber_sum += x.count()
+
+            subscriber_sum += x.one()['value'] if x else 0
 
         return subscriber_sum
