@@ -248,10 +248,11 @@ def subscribe(request, podcast):
         form = SyncForm(request.POST)
 
         try:
-            device = request.user.get_device_by_uid(form.get_target())
+            uid = form.get_target()
+            device = request.user.get_device_by_uid(uid)
             podcast.subscribe(request.user, device)
 
-        except (SubscriptionException, DeviceDoesNotExist) as e:
+        except (SubscriptionException, DeviceDoesNotExist, ValueError) as e:
             messages.error(request, str(e))
 
         return HttpResponseRedirect(get_podcast_link_target(podcast))
