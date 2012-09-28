@@ -45,9 +45,10 @@
 <p style="padding-top: 20px;"><a href="{% podcast_link_target podcast %}">{% trans "Back to the podcast page" %}</a></p>
   {% else %}
    <p>{% trans "You can't subscribe to this podcast, because you don't have any devices (on which you don't have subscribed to the podcast already." %}</p>
+   <a class="btn btn-success" href="{% url device-edit-new %}">
+    <i class="icon-plus"></i> {% trans "Create Device" %}
+   </a>
 
-   {% url help as help-url %}
-   <p>{% blocktrans %}If you're new here, you should start by reading our <a href="{{ help-url }}">introduction</a>.{% endblocktrans %}</p>
   {% endif %}
 
   {% if not podcast.title %}
