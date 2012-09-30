@@ -45,6 +45,7 @@ from mygpo.web import utils
 from mygpo.api import backend
 from mygpo.utils import flatten, parse_range
 from mygpo.share.models import PodcastList
+from mygpo.web.views.podcast import slug_id_decorator
 
 
 @vary_on_cookie
@@ -175,10 +176,8 @@ def history(request, count=15, uid=None):
 
 @never_cache
 @login_required
-def blacklist(request, podcast_id):
-    podcast_id = int(podcast_id)
-    blacklisted_podcast = Podcast.for_oldid(podcast_id)
-
+@slug_id_decorator
+def blacklist(request, blacklisted_podcast):
     suggestion = Suggestions.for_user(request.user)
 
     @repeat_on_conflict(['suggestion'])
