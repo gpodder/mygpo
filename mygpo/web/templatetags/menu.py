@@ -1,6 +1,8 @@
 from django import template
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext
+from django.utils.translation import ugettext_lazy as _
+
 
 
 register = template.Library()
@@ -15,7 +17,6 @@ HIDDEN_URIS = (
         '/share/me',
 )
 
-_ = lambda x: x
 MENU_STRUCTURE = (
         ('', (
             ('/', _('Home')),

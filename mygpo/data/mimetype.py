@@ -2,12 +2,13 @@ from collections import defaultdict
 from itertools import ifilter as filter
 import mimetypes
 
+from django.utils.translation import ugettext_lazy as _
+
+
 # If 20% of the episodes of a podcast are of a given type,
 # then the podcast is considered to be of that type, too
 TYPE_THRESHOLD=.2
 
-
-_ = lambda s: s
 
 CONTENT_TYPES = (_('image'), _('audio'), _('video'))
 
