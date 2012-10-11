@@ -152,8 +152,7 @@ def episode_slugs_per_podcast(podcast_id, base_slug):
     return [r['key'][1] for r in res]
 
 
-@cache_result(timeout=60*60)
-def episodes_for_podcast(podcast, since=None, until={}, **kwargs):
+def episodes_for_podcast_uncached(podcast, since=None, until={}, **kwargs):
 
     if kwargs.get('descending', False):
         since, until = until, since
@@ -173,6 +172,9 @@ def episodes_for_podcast(podcast, since=None, until={}, **kwargs):
         )
 
     return list(res)
+
+
+episodes_for_podcast = cache_result(timeout=60*60)(episodes_for_podcast_uncached)
 
 
 @cache_result(timeout=60*60)

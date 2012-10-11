@@ -31,7 +31,7 @@ from feedservice.parse.text import ConvertMarkdown
 from mygpo.utils import file_hash, split_list
 from mygpo.web.logo import CoverArt
 from mygpo.db.couchdb.episode import episode_for_podcast_id_url, \
-         episodes_for_podcast
+         episodes_for_podcast_uncached
 from mygpo.db.couchdb.podcast import podcast_for_url
 
 from mygpo.couch import get_main_database
@@ -130,7 +130,7 @@ class PodcastUpdater(object):
 
     def update_episodes(self, podcast, parsed_episodes):
 
-        all_episodes = set(episodes_for_podcast(podcast))
+        all_episodes = set(episodes_for_podcast_uncached(podcast))
         remaining = list(all_episodes)
         updated_episodes = []
 
