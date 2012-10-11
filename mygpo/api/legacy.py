@@ -19,7 +19,6 @@ from datetime import datetime
 
 from django.http import HttpResponse
 from django.utils.datastructures import MultiValueDictKeyError
-from django.db import IntegrityError
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 

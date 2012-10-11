@@ -3,7 +3,6 @@ from functools import wraps, partial
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseRedirect, Http404
-from django.db import IntegrityError
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
