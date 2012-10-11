@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from mygpo.core.models import Podcast, Episode, MergedIdException
-from mygpo.users.models import Chapter
 from mygpo.cache import cache_result
 from mygpo.db.couchdb.utils import is_couchdb_id
 from mygpo.couch import get_main_database
@@ -219,6 +218,7 @@ def chapters_for_episode(episode_id):
 
 
 def _wrap_chapter(res):
+    from mygpo.users.models import Chapter
     user = res['key'][1]
     chapter = Chapter.wrap(res['value'])
     return (user, chapter)
