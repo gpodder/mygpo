@@ -27,6 +27,7 @@ from mygpo.db.couchdb.episode import episodes_for_podcast
 from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_by_id, \
          podcast_for_url, podcastgroup_for_slug_id, podcastgroup_for_oldid, \
          podcastgroup_by_id
+from mygpo.db.couchdb.episode_state import episode_listener_counts
 
 
 @vary_on_cookie
@@ -172,7 +173,7 @@ def episodes(request, podcast):
         return HttpResponseForbidden()
 
     episodes = episodes_for_podcast(podcast, descending=True)
-    listeners = dict(podcast.episode_listener_counts())
+    listeners = dict(episode_listener_counts(podcast))
 
     max_listeners = max(listeners.values() + [0])
 

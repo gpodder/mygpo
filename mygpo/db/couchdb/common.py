@@ -16,15 +16,17 @@ def sanitizingrules_by_obj_type(obj_type):
             endkey       = [obj_type, {}],
         )
 
-    for rule in r:
-        obj = SanitizingRuleStub()
-        obj.slug = rule.slug
-        obj.applies_to = list(rule.applies_to)
-        obj.search = rule.search
-        obj.replace = rule.replace
-        obj.priority = rule.priority
-        obj.description = rule.description
-        yield obj
+    return map(_wrap_rule, r)
+
+def _wrap_rule(rule):
+    obj = SanitizingRuleStub()
+    obj.slug = rule.slug
+    obj.applies_to = list(rule.applies_to)
+    obj.search = rule.search
+    obj.replace = rule.replace
+    obj.priority = rule.priority
+    obj.description = rule.description
+    return obj
 
 
 @cache_result(timeout=60*60)

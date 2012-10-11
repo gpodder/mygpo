@@ -534,7 +534,7 @@ def get_episode_updates(user, subscribed_podcasts, since):
         episode_status[episode._id] = EpisodeStatus(episode, 'new', None)
 
     # get episode states
-    e_action_jobs = [gevent.spawn(get_podcasts_episode_states(p, user._id))
+    e_action_jobs = [gevent.spawn(get_podcasts_episode_states, p, user._id)
             for p in subscribed_podcasts]
     gevent.joinall(e_action_jobs)
     e_actions = chain.from_iterable(job.get() for job in e_action_jobs)

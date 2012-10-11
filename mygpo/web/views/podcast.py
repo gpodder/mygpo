@@ -25,7 +25,8 @@ from mygpo.db.couchdb.episode import episodes_for_podcast
 from mygpo.db.couchdb.podcast import podcast_for_slug, podcast_for_slug_id, \
          podcast_for_oldid, podcast_for_url
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
-from mygpo.db.couchdb.episode_state import get_podcasts_episode_states
+from mygpo.db.couchdb.episode_state import get_podcasts_episode_states, \
+         episode_listener_counts
 from mygpo.db.couchdb.directory import tags_for_user, tags_for_podcast
 
 
@@ -147,7 +148,7 @@ def episode_list(podcast, user, limit=None):
     the episode.
     """
 
-    listeners = dict(podcast.episode_listener_counts())
+    listeners = dict(episode_listener_counts(podcast))
     episodes = episodes_for_podcast(podcast, descending=True, limit=limit)
 
     if user.is_authenticated():

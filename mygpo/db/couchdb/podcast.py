@@ -1,5 +1,7 @@
 from random import random
 
+from django.core.cache import cache
+
 from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.cache import cache_result
 from mygpo.db.couchdb.utils import multi_request_view, is_couchdb_id
@@ -188,7 +190,7 @@ def podcast_for_url(url, create=False):
         return podcast_group.get_podcast_by_url(url)
 
     if create:
-        podcast = cls()
+        podcast = Podcast()
         podcast.urls = [url]
         podcast.save()
         return podcast

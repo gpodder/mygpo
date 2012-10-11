@@ -1,5 +1,7 @@
 from mygpo.cache import cache_result
 from mygpo.counter import Counter
+from mygpo.couch import get_main_database
+from mygpo.db.couchdb.episode import episodes_by_id
 
 
 @cache_result(timeout=60)
@@ -62,7 +64,7 @@ def get_latest_episodes(self, count=10):
         )
 
     keys = [r['value'] for r in res]
-    return list(episodes_by_id(keys))
+    return episodes_by_id(keys)
 
 
 
@@ -92,6 +94,7 @@ def get_seconds_played(self, since=None, until={}):
 
 @cache_result(timeout=60*60)
 def suggestions_for_user(user):
+    from mygpo.users.models import Suggestions
     r = Suggestions.view('suggestions/by_user',
                 key          = user._id,
                 include_docs = True,

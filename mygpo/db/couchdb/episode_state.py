@@ -1,7 +1,9 @@
 import hashlib
 
+from django.core.cache import cache
+
 from mygpo.users.models import EpisodeUserState
-from mygpo.db.couchdb.podcast import podcast_by_id
+from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url
 from mygpo.db.couchdb.episode import episode_for_podcast_id_url
 from mygpo.couch import get_main_database
 from mygpo.cache import cache_result
@@ -99,7 +101,7 @@ def episode_listener_counts(episode):
             reduce      = True,
         )
 
-    return map(_wrap_listeners)
+    return map(_wrap_listeners, r)
 
 
 
@@ -177,7 +179,8 @@ def episode_state_for_ref_urls(user, podcast_url, episode_url):
         return state
 
     else:
-        episode = episode_for_podcast_id_url(podcast_url, episode_url,
+        podcast = podcast_for_url(podcast_url, create=True)
+        episode = episode_for_podcast_id_url(podcast.get_id(), episode_url,
             create=True)
         return episode_state_for_user_episode(user, episode)
 

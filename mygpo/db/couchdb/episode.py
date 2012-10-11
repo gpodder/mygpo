@@ -4,13 +4,14 @@ from mygpo.core.models import Podcast, Episode, MergedIdException
 from mygpo.users.models import Chapter
 from mygpo.cache import cache_result
 from mygpo.db.couchdb.utils import is_couchdb_id
+from mygpo.couch import get_main_database
 from mygpo.db.couchdb.podcast import podcast_for_url, podcast_for_slug_id
 
 
 @cache_result(timeout=60*60)
 def episode_by_id(episode_id, current_id=False):
     r = Episode.view('episodes/by_id',
-            key          = episode,
+            key          = episode_id,
             include_docs = True,
         )
 

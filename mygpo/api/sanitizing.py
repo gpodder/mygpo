@@ -15,8 +15,7 @@ from mygpo.db.couchdb.common import sanitizingrules_by_obj_type
 def sanitize_urls(urls, obj_type='podcast'):
     """ Apply sanitizing rules to the given URLs and return the results """
 
-    rules = sanitizingrules_by_obj_type(obj_type)
-    return (sanitize_url(url, rules=rules) for url in urls)
+    return [sanitize_url(url, obj_type) for url in urls]
 
 
 def sanitize_url(url, obj_type='podcast'):
