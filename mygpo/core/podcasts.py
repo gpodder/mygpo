@@ -4,6 +4,7 @@ import gevent
 
 from mygpo.core.models import Podcast
 from mygpo.core.proxy import proxy_object
+from mygpo.db.couchdb.episode import episodes_for_podcast
 
 
 class PodcastSet(set):
@@ -26,7 +27,7 @@ class PodcastSet(set):
 
         podcast_dict = dict((p.get_id(), p) for p in podcasts)
 
-        jobs = [gevent.spawn(Podcast.get_episodes, podcast, since=1,
+        jobs = [gevent.spawn(episodes_for_podcast, podcast, since=1,
                 until=max_date, descending=True,
                 limit=max_per_podcast) for podcast in podcasts]
 

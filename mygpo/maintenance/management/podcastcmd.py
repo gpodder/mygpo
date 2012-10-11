@@ -6,6 +6,8 @@ from django.core.management.base import BaseCommand
 from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.directory.toplist import PodcastToplist
 from mygpo.couch import get_main_database
+from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url, \
+         random_podcasts, podcasts_by_last_update, podcasts_need_update
 
 
 class PodcastCommand(BaseCommand):
@@ -36,33 +38,18 @@ class PodcastCommand(BaseCommand):
             yield self.get_toplist()
 
         if options.get('new'):
-            yield self.get_podcast_with_new_episodes()
+            yield podcasts_need_update()
 
         if options.get('random'):
-            yield Podcast.random()
+            yield random_podcasts()
 
 
-        get_podcast = lambda url: Podcast.for_url(url, create=True)
+        get_podcast = lambda url: podcast_for_url(url, create=True)
         yield map(get_podcast, args)
 
         if not args and not options.get('toplist') and not options.get('new') \
                     and not options.get('random'):
-           yield Podcast.by_last_update()
-
-
-
-    def get_podcast_with_new_episodes(self):
-        db = get_main_database()
-        res = db.view('episodes/need_update',
-                group_level = 1,
-                reduce      = True,
-            )
-
-        for r in res:
-            podcast_id = r['key']
-            podcast = Podcast.get(podcast_id)
-            if podcast:
-                yield podcast
+           yield podcasts_by_last_update()
 
 
     def get_toplist(self):

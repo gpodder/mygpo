@@ -6,6 +6,7 @@ from mygpo.core.models import Podcast
 from mygpo.utils import iterate_together
 from mygpo.core.proxy import DocumentABCMeta
 from mygpo.cache import cache_result
+from mygpo.db.couchdb.podcast import podcasts_by_id
 
 
 class CategoryEntry(DocumentSchema):
@@ -27,26 +28,6 @@ class Category(Document):
     updated = DateTimeProperty()
     spellings = StringListProperty()
     podcasts = SchemaListProperty(CategoryEntry)
-
-    @classmethod
-    @cache_result(timeout=60*60)
-    def for_tag(cls, tag):
-        r = cls.view('categories/by_tags',
-                key          = tag,
-                include_docs = True,
-                stale        = 'update_after',
-            )
-        return r.first() if r else None
-
-    @classmethod
-    @cache_result(timeout=60*60)
-    def top_categories(cls, count):
-        return cls.view('categories/by_weight',
-                descending   = True,
-                limit        = count,
-                include_docs = True,
-                stale        = 'update_after',
-            )
 
 
     def merge_podcasts(self, podcasts):
@@ -85,7 +66,7 @@ class Category(Document):
 
         if len(podcasts) < end:
             ids = self.get_podcast_ids(len(podcasts), end)
-            podcasts.extend(list(Podcast.get_multi(ids)))
+            podcasts.extend(podcasts_by_id(ids))
             cache.set(cache_id, podcasts)
 
         return podcasts[start:end]

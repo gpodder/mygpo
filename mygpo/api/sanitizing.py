@@ -7,38 +7,26 @@ from django.core.cache import cache
 from mygpo.core import models
 from mygpo.log import log
 from mygpo.utils import iterate_together, progress
+from mygpo.db.couchdb.podcast import podcast_count, podcast_for_oldid, \
+        all_podcasts
+from mygpo.db.couchdb.common import sanitizingrules_by_obj_type
 
 
-
-def sanitize_urls(urls, obj_type='podcast', rules=None):
+def sanitize_urls(urls, obj_type='podcast'):
     """ Apply sanitizing rules to the given URLs and return the results """
 
-    rules = get_sanitizing_rules(obj_type, rules)
+    rules = sanitizingrules_by_obj_type(obj_type)
     return (sanitize_url(url, rules=rules) for url in urls)
 
 
-def sanitize_url(url, obj_type='podcast', rules=None):
+def sanitize_url(url, obj_type='podcast'):
     """ Apply sanitizing rules to the given URL and return the results """
 
-    rules = get_sanitizing_rules(obj_type, rules=rules)
+    rules = sanitizingrules_by_obj_type(obj_type)
     url = basic_sanitizing(url)
     url = apply_sanitizing_rules(url, rules)
     return url
 
-
-def get_sanitizing_rules(obj_type, rules=None):
-    """ Returns the sanitizing-rules from the cache or the database """
-
-    cache_name = '%s-sanitizing-rules' % obj_type
-
-    sanitizing_rules = \
-            rules or \
-            cache.get(cache_name) or \
-            list(models.SanitizingRule.for_obj_type(obj_type))
-
-    cache.set(cache_name, sanitizing_rules, 60 * 60)
-
-    return sanitizing_rules
 
 
 def basic_sanitizing(url):
@@ -84,10 +72,10 @@ def maintenance(dry_run=False):
     This will later be used to replace podcasts!
     """
 
-    podcast_rules = get_sanitizing_rules('podcast')
-    episode_rules = get_sanitizing_rules('episode')
+    podcast_rules = sanitizingrules_by_obj_type('podcast')
+    episode_rules = sanitizingrules_by_obj_type('episode')
 
-    num_podcasts = models.Podcast.count()
+    num_podcasts = podcast_count()
 
     print 'Stats'
     print ' * %d podcasts - %d rules' % (num_podcasts, len(podcast_rules))
@@ -103,7 +91,7 @@ def maintenance(dry_run=False):
     p_stats = collections.defaultdict(int)
     e_stats = collections.defaultdict(int)
 
-    podcasts = Podcast.objects.only('id', 'url').order_by('id').iterator()
+    podcasts = all_podcasts()
 
     for n, p in enumerate(podcasts):
         su = sanitize_url(p.url, rules=podcast_rules)
@@ -119,10 +107,9 @@ def maintenance(dry_run=False):
                 p.delete()
             p_stats['deleted'] += 1
 
-        try:
-            su_podcast = Podcast.objects.get(url=su)
+        su_podcast = podcast_for_url(url=su)
 
-        except Podcast.DoesNotExist, e:
+        if not su_podcast:
             # "target" podcast does not exist, we simply change the url
             if not dry_run:
                 log('updating podcast %s - "%s" => "%s"' % (p.id, p.url, su))
@@ -160,8 +147,8 @@ def rewrite_podcasts(p_old, p_new):
     rewrite_newpodcast(p_old, p_new)
 
 def rewrite_newpodcast(p_old, p_new):
-    p_n = models.Podcast.for_oldid(p_new.id)
-    p_o = models.Podcast.for_oldid(p_old.id)
+    p_n = podcast_for_oldid(p_new.id)
+    p_o = podcast_for_oldid(p_old.id)
 
     if None in (p_n, p_o):
         return

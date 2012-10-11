@@ -11,12 +11,14 @@ from django.utils.decorators import method_decorator
 
 from mygpo.admin.auth import require_staff
 from mygpo.admin.group import PodcastGrouper
-from mygpo.core.models import Podcast, Episode
+from mygpo.core.models import Podcast
 from mygpo.counter import Counter
 from mygpo.maintenance.merge import PodcastMerger, IncorrectMergeException
 from mygpo.users.models import User
 from mygpo.admin.clients import UserAgentStats, ClientStats
 from mygpo.api.httpresponse import JsonResponse
+from mygpo.db.couchdb.episode import episode_count
+from mygpo.db.couchdb.podcast import podcast_count, podcast_for_url
 
 
 class AdminView(TemplateView):
@@ -54,12 +56,12 @@ class MergeBase(AdminView):
             if not podcast_url:
                 continue
 
-            podcast = Podcast.for_url(podcast_url)
+            podcast = podcast_for_url(podcast_url)
 
             if not podcast:
                 raise InvalidPodcast(podcast_url)
 
-            podcasts.append(Podcast.for_url(podcast_url))
+            podcasts.append(podcast_for_url(podcast_url))
 
         return podcasts
 
@@ -196,8 +198,8 @@ class StatsView(AdminView):
 
     def _get_stats(self):
         return {
-            'podcasts': Podcast.count(),
-            'episodes': Episode.count(),
+            'podcasts': podcast_count(),
+            'episodes': episode_count(),
             'users': User.count(),
         }
 

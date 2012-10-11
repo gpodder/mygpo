@@ -17,7 +17,7 @@
 
 from functools import wraps
 
-from mygpo.couch import get_main_database
+from mygpo.db.couchdb.episode_state import get_heatmap
 
 
 class EpisodeHeatmap(object):
@@ -50,30 +50,10 @@ class EpisodeHeatmap(object):
     def _query(self):
         """ Queries the database and stores the heatmap and its borders """
 
-        db = get_main_database()
+        self.heatmap, self.borders = get_heatmap(self.podcast_id,
+                self.episode_id, self.user_id)
 
-        group_level = len(filter(None, [self.podcast_id,
-                    self.episode_id, self.user_id]))
-
-        r = db.view('heatmap/by_episode',
-                startkey    = [self.podcast_id, self.episode_id,
-                                self.user_id],
-                endkey      = [self.podcast_id, self.episode_id or {},
-                                self.user_id or {}],
-                reduce      = True,
-                group       = True,
-                group_level = group_level,
-                stale       = 'update_after',
-            )
-
-        if not r:
-            self.heatmap = []
-            self.borders = []
-        else:
-            res = r.first()['value']
-            self.heatmap = res['heatmap']
-            self.borders = res['borders']
-
+        if self.borders and self.heatmap:
             # heatmap info doesn't reach until the end of the episode
             # so we extend it with 0 listeners
             if self.duration > self.borders[-1]:

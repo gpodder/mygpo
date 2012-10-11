@@ -34,7 +34,9 @@ from django_couchdb_utils.auth.models import UsernameException, PasswordExceptio
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.web.forms import UserAccountForm
 from mygpo.core.models import Podcast
-from mygpo.utils import get_to_dict
+from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_to_dict
+from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast, \
+         subscriptions_by_user
 
 
 @login_required
@@ -128,8 +130,8 @@ class PodcastPrivacySettings(View):
     @method_decorator(login_required)
     @method_decorator(never_cache)
     def post(self, request, podcast_id):
-        podcast = Podcast.get(podcast_id)
-        state = podcast.get_user_state(request.user)
+        podcast = podcast_by_id(podcast_id)
+        state = podcast_state_for_user_podcast(request.user, podcast)
         self.set_privacy_settings(state=state)
         messages.success(request, 'Success')
         return HttpResponseRedirect(reverse('privacy'))
@@ -144,11 +146,10 @@ class PodcastPrivacySettings(View):
 @login_required
 @never_cache
 def privacy(request):
-
     site = RequestSite(request)
 
-    subscriptions = request.user.get_subscriptions()
-    podcasts = get_to_dict(Podcast, [x[1] for x in subscriptions], get_id=Podcast.get_id)
+    subscriptions = subscriptions_by_user(request.user)
+    podcasts = podcasts_to_dict([x[1] for x in subscriptions])
 
     included_subscriptions = set(filter(None, [podcasts.get(x[1], None) for x in subscriptions if x[0] == True]))
     excluded_subscriptions = set(filter(None, [podcasts.get(x[1], None) for x in subscriptions if x[0] == False]))

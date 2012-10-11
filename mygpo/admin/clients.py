@@ -3,6 +3,7 @@ from collections import namedtuple
 
 from mygpo.users.models import User
 from mygpo.counter import Counter
+from mygpo.db.couchdb.user import user_agent_stats
 
 
 Client = namedtuple('Client', 'client client_version lib lib_version os os_version')
@@ -17,13 +18,7 @@ class UserAgentStats(object):
 
     def get_entries(self):
         if self._useragents is None:
-            res = User.view('clients/by_ua_string',
-                wrap_doc    = False,
-                group_level = 1,
-                stale       = 'update_after',
-            )
-
-            self._useragents = Counter(dict((r['key'], r['value']) for r in res))
+            self._useragents = user_agent_stats()
 
         return self._useragents
 

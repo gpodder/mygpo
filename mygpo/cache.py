@@ -1,3 +1,4 @@
+from hashlib import sha1
 from django.core.cache import cache
 from functools import wraps
 
@@ -20,8 +21,7 @@ def cache_result(**cache_kwargs):
         @wraps(f)
         def _get(*args, **kwargs):
 
-            name = f.__module__ + f.func_name
-            key = create_key(name, args, kwargs)
+            key = sha1(str(f.__module__) + str(f.__name__) + str(args) + str(kwargs)).hexdigest()
 
             # the timeout parameter can't be used when getting from a cache
             get_kwargs = dict(cache_kwargs)
@@ -40,13 +40,3 @@ def cache_result(**cache_kwargs):
         return _get
 
     return _wrapper
-
-
-
-def create_key(key, args, kwargs):
-
-    args_str = '-'.join(str(hash(a)) for a in args)
-    kwargs_str = '-'.join(str(hash(i)) for i in kwargs.items())
-
-    return '{key}-{args}-{kwargs}'.format(key=key, args=hash(args_str),
-            kwargs=hash(kwargs_str))

@@ -1,6 +1,6 @@
 from django.core.urlresolvers import reverse
 
-from mygpo.api import backend
+from mygpo.db.couchdb.episode import favorite_episodes_for_user
 
 
 
@@ -13,7 +13,7 @@ class FavoriteFeed():
         return '%s\'s Favorite Episodes' % self.user.username
 
     def get_episodes(self):
-        return backend.get_favorites(self.user)
+        return favorite_episodes_for_user(self.user)
 
     def language(self):
         """

@@ -6,6 +6,7 @@ from django.core.management.base import BaseCommand
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core.models import SanitizingRule
 from mygpo.utils import progress
+from mygpo.db.couchdb.common import sanitizingrule_for_slug
 
 
 
@@ -26,7 +27,7 @@ class Command(BaseCommand):
             sections = config.sections()
 
             for n, slug in enumerate(sections):
-                rule = SanitizingRule.for_slug(slug) or SanitizingRule()
+                rule = sanitizingrule_for_slug(slug) or SanitizingRule()
 
                 self.update_rule(rule=rule, config=config, slug=slug)
 

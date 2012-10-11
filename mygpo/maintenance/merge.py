@@ -8,6 +8,10 @@ from mygpo.core.models import Podcast, Episode, PodcastGroup
 from mygpo.users.models import PodcastUserState, EpisodeUserState
 from mygpo import utils
 from mygpo.decorators import repeat_on_conflict
+from mygpo.db.couchdb.episode import episodes_for_podcast
+from mygpo.db.couchdb.podcast_state import all_podcast_states
+from mygpo.db.couchdb.episode_state import all_episode_states
+from mygpo.db.couchdb.utils import multi_request_view
 
 
 class IncorrectMergeException(Exception):
@@ -109,7 +113,7 @@ def merge_objects(podcasts=True, podcast_states=False, episodes=False,
 
 
 def get_view_count_iter(cls, view, *args, **kwargs):
-    iterator = utils.multi_request_view(cls, view, *args, **kwargs)
+    iterator = multi_request_view(cls, view, *args, **kwargs)
     total = cls.view(view, limit=0).total_rows
     return iterator, total
 
@@ -258,10 +262,10 @@ class PodcastMerger(object):
     def reassign_episodes(self, podcast1, podcast2):
         # re-assign episodes to new podcast
         # if necessary, they will be merged later anyway
-        for e in podcast2.get_episodes():
+        for e in episodes_for_podcast(podcast2):
             self.actions['reassign-episode'] += 1
 
-            for s in e.get_all_states():
+            for s in all_episode_states(e):
                 self.actions['reassign-episode-state'] += 1
 
                 self._save_state(s=s, podcast1=podcast1)
@@ -276,8 +280,8 @@ class PodcastMerger(object):
         """
 
         key = lambda x: x.user
-        states1 = sorted(podcast1.get_all_states(), key=key)
-        states2 = sorted(podcast2.get_all_states(), key=key)
+        states1 = sorted(all_podcast_states(podcast1), key=key)
+        states2 = sorted(all_podcast_states(podcast2), key=key)
 
         for state, state2 in utils.iterate_together([states1, states2], key):
 
@@ -361,8 +365,8 @@ class EpisodeMerger(object):
     def merge_states(self, episode, episode2):
 
         key = lambda x: x.user
-        states1 = sorted(self.episode1.get_all_states(), key=key)
-        states2 = sorted(self.episode2.get_all_states(), key=key)
+        states1 = sorted(all_episode_states(self.episode1), key=key)
+        states2 = sorted(all_episode_states(self.episode2), key=key)
 
         for state, state2 in utils.iterate_together([states1, states2], key):
 

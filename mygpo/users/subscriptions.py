@@ -1,3 +1,4 @@
+from mygpo.db.couchdb.user import get_num_listened_episodes
 
 
 class PodcastSorter(object):
@@ -46,7 +47,7 @@ class PodcastPercentageListenedSorter(PodcastSorter):
 
         SORT_KEY = lambda podcast: podcast.percent_listened
 
-        counts = dict(self.user.get_num_listened_episodes())
+        counts = dict(get_num_listened_episodes(self.user))
         for podcast in self.podcasts:
             c = counts.get(podcast.get_id(), 0)
             if podcast.episode_count:

@@ -6,6 +6,7 @@ from mygpo.decorators import repeat_on_conflict
 from mygpo.core.models import Podcast
 from mygpo.data import delicious
 from mygpo.maintenance.management.podcastcmd import PodcastCommand
+from mygpo.db.couchdb.podcast import podcast_by_id
 
 
 SOURCE = 'delicious'
@@ -40,7 +41,7 @@ class Command(PodcastCommand):
             self.update(podcast=p, tags=tags)
 
 
-    @repeat_on_conflict(['podcast'], reload_f=lambda x: Podcast.get(x.get_id()))
+    @repeat_on_conflict(['podcast'], reload_f=lambda x: podcast_by_id(x.get_id()))
     def update(self, podcast, tags):
         podcast.tags[SOURCE] = tags
         podcast.save()

@@ -4,8 +4,8 @@ import ConfigParser
 from django.core.management.base import BaseCommand
 
 from mygpo.decorators import repeat_on_conflict
-from mygpo.core.models import SanitizingRule
 from mygpo.utils import progress
+from mygpo.db.couchdb.common import sanitizingrule_for_slug
 
 
 
@@ -21,7 +21,7 @@ class Command(BaseCommand):
 
 
         for n, slug in enumerate(args):
-            rule = SanitizingRule.for_slug(slug)
+            rule = sanitizingrule_for_slug(slug)
 
             if rule:
                 self.delete_rule(rule=rule)

@@ -35,17 +35,20 @@ from django.views.decorators.cache import never_cache, cache_control
 
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core import models
-from mygpo.core.models import Podcast, Episode
+from mygpo.core.models import Podcast
 from mygpo.core.podcasts import PodcastSet
-from mygpo.directory.tags import Tag
 from mygpo.directory.toplist import PodcastToplist
 from mygpo.users.models import Suggestions, History, HistoryEntry, DeviceDoesNotExist
 from mygpo.users.models import PodcastUserState, User
 from mygpo.web import utils
-from mygpo.api import backend
 from mygpo.utils import flatten, parse_range
-from mygpo.share.models import PodcastList
 from mygpo.web.views.podcast import slug_id_decorator
+from mygpo.db.couchdb.episode import favorite_episodes_for_user
+from mygpo.db.couchdb.podcast import podcast_by_id, \
+         podcast_for_oldid, random_podcasts
+from mygpo.db.couchdb.user import suggestions_for_user
+from mygpo.db.couchdb.directory import tags_for_user
+from mygpo.db.couchdb.podcastlist import podcastlists_for_user
 
 
 @vary_on_cookie
@@ -62,18 +65,11 @@ def home(request):
 def welcome(request):
     current_site = RequestSite(request)
 
-    podcasts = Podcast.count()
-    users    = User.count()
-    episodes = Episode.count()
-
     lang = utils.process_lang_params(request)
 
     toplist = PodcastToplist(lang)
 
     return render(request, 'home.html', {
-          'podcast_count': podcasts,
-          'user_count': users,
-          'episode_count': episodes,
           'url': current_site,
           'toplist': toplist,
     })
@@ -95,7 +91,7 @@ def dashboard(request, episode_count=10):
     if subscribed_podcasts:
         checklist.append('subscriptions')
 
-    if backend.get_favorites(request.user):
+    if favorite_episodes_for_user(request.user):
         checklist.append('favorites')
 
     if not request.user.get_token('subscriptions_token'):
@@ -107,10 +103,11 @@ def dashboard(request, episode_count=10):
     if not request.user.get_token('userpage_token'):
         checklist.append('userpage')
 
-    if Tag.for_user(request.user):
+    if tags_for_user(request.user):
         checklist.append('tags')
 
-    if PodcastList.for_user(request.user._id):
+    # TODO add podcastlist_count_for_user
+    if podcastlists_for_user(request.user._id):
         checklist.append('lists')
 
     if request.user.published_objects:
@@ -123,7 +120,7 @@ def dashboard(request, episode_count=10):
     newest_episodes = podcasts.get_newest_episodes(tomorrow, episode_count)
 
     def get_random_podcasts():
-        random_podcast = next(Podcast.random(), None)
+        random_podcast = next(random_podcasts(), None)
         if random_podcast:
             yield random_podcast.get_podcast()
 
@@ -201,7 +198,7 @@ def blacklist(request, blacklisted_podcast):
 def rate_suggestions(request):
     rating_val = int(request.GET.get('rate', None))
 
-    suggestion = Suggestions.for_user(request.user)
+    suggestion = suggestions_for_user(request.user)
     suggestion.rate(rating_val, request.user._id)
     suggestion.save()
 
@@ -214,7 +211,7 @@ def rate_suggestions(request):
 @cache_control(private=True)
 @login_required
 def suggestions(request):
-    suggestion_obj = Suggestions.for_user(request.user)
+    suggestion_obj = suggestions_for_user(request.user)
     suggestions = suggestion_obj.get_podcasts()
     current_site = RequestSite(request)
     return render(request, 'suggestions.html', {
@@ -230,8 +227,8 @@ def mytags(request):
     tags_podcast = {}
     tags_tag = defaultdict(list)
 
-    for podcast_id, taglist in Tag.for_user(request.user).items():
-        podcast = Podcast.get(podcast_id)
+    for podcast_id, taglist in tags_for_user(request.user).items():
+        podcast = podcast_by_id(podcast_id)
         tags_podcast[podcast] = taglist
 
         for tag in taglist:

@@ -7,6 +7,8 @@ from django.template.defaultfilters import slugify
 from mygpo.core.models import Podcast
 from mygpo.directory.models import Category, CategoryEntry
 from mygpo.directory.tags import Tag
+from mygpo.db.couchdb.podcast import podcasts_by_id
+from mygpo.db.couchdb.directory import category_for_tag, all_tags
 from mygpo.utils import remove_control_chars, progress, unzip, is_url
 
 
@@ -23,7 +25,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        tags = args or Tag.all()
+        tags = args or all_tags()
 
         for n, tag in enumerate(tags):
 

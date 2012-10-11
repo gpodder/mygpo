@@ -7,7 +7,7 @@ from django.views.decorators.cache import never_cache, cache_control
 from django.views.decorators.vary import vary_on_cookie
 from django.core.urlresolvers import reverse
 
-from mygpo.core.models import Podcast, PodcastGroup
+from mygpo.core.models import Podcast
 from mygpo.core.proxy import proxy_object
 from mygpo.publisher.auth import require_publisher, is_publisher
 from mygpo.publisher.forms import SearchPodcastForm
@@ -23,13 +23,17 @@ from django.contrib.sites.models import RequestSite
 from mygpo.data.feeddownloader import PodcastUpdater
 from mygpo.decorators import requires_token, allowed_methods
 from mygpo.users.models import User
+from mygpo.db.couchdb.episode import episodes_for_podcast
+from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_by_id, \
+         podcast_for_url, podcastgroup_for_slug_id, podcastgroup_for_oldid, \
+         podcastgroup_by_id
 
 
 @vary_on_cookie
 @cache_control(private=True)
 def home(request):
     if is_publisher(request.user):
-        podcasts = Podcast.get_multi(request.user.published_objects)
+        podcasts = podcasts_by_id(request.user.published_objects)
         form = SearchPodcastForm()
         return render(request, 'publisher/home.html', {
             'podcasts': podcasts,
@@ -51,7 +55,7 @@ def search_podcast(request):
     if form.is_valid():
         url = form.cleaned_data['url']
 
-        podcast = Podcast.for_url(url)
+        podcast = podcast_for_url(url)
         if not podcast:
             raise Http404
 
@@ -75,7 +79,7 @@ def podcast(request, podcast):
     subscription_data = subscriber_data([podcast])[-20:]
 
     if podcast.group:
-        group = PodcastGroup.get(podcast.group)
+        group = podcastgroup_by_id(podcast.group)
     else:
         group = None
 
@@ -152,7 +156,7 @@ def update_published_podcasts(request, username):
     if not user:
         raise Http404
 
-    published_podcasts = Podcast.get_multi(user.published_objects)
+    published_podcasts = podcasts_by_id(user.published_objects)
     updater = PodcastUpdater(published_podcasts)
     updater.update()
 
@@ -167,7 +171,7 @@ def episodes(request, podcast):
     if not check_publisher_permission(request.user, podcast):
         return HttpResponseForbidden()
 
-    episodes = podcast.get_episodes(descending=True)
+    episodes = episodes_for_podcast(podcast, descending=True)
     listeners = dict(podcast.episode_listener_counts())
 
     max_listeners = max(listeners.values() + [0])
@@ -191,7 +195,7 @@ def episodes(request, podcast):
 @allowed_methods(['GET', 'POST'])
 def episode(request, episode):
 
-    podcast = Podcast.get(episode.podcast)
+    podcast = podcast_by_id(episode.podcast)
 
     if not check_publisher_permission(request.user, podcast):
         return HttpResponseForbidden()
@@ -239,7 +243,7 @@ def advertise(request):
 def group_slug_id_decorator(f):
     @wraps(f)
     def _decorator(request, slug_id, *args, **kwargs):
-        group = PodcastGroup.for_slug_id(slug_id)
+        group = podcastgroup_for_slug_id(slug_id)
 
         if podcast is None:
             raise Http404
@@ -257,7 +261,7 @@ def group_oldid_decorator(f):
         except (TypeError, ValueError):
             raise Http404
 
-        group = PodcastGroup.for_oldid(pid)
+        group = podcastgroup_for_oldid(pid)
 
         if not podcast:
             raise Http404

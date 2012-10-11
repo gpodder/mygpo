@@ -14,14 +14,17 @@ from django.core.cache import cache
 
 from django_couchdb_utils.registration.models import User as BaseUser
 
+from mygpo.core.models import Podcast
+from mygpo.utils import linearize, iterate_together
 from mygpo.core.proxy import DocumentABCMeta, proxy_object
-from mygpo.core.models import Podcast, Episode
-from mygpo.utils import linearize, get_to_dict, iterate_together
 from mygpo.couch import get_main_database
 from mygpo.decorators import repeat_on_conflict
 from mygpo.users.ratings import RatingMixin
 from mygpo.users.sync import SyncedDevicesMixin
 from mygpo.cache import cache_result
+from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_by_id, \
+         podcasts_to_dict
+from mygpo.db.couchdb.user import user_history, device_history
 
 
 RE_DEVICE_UID = re.compile(r'^[\w.-]+$')
@@ -49,18 +52,6 @@ class Suggestions(Document, RatingMixin):
     podcasts = StringListProperty()
     blacklist = StringListProperty()
 
-    @classmethod
-    @cache_result(timeout=60*60)
-    def for_user(cls, user):
-        r = cls.view('suggestions/by_user', key=user._id, \
-            include_docs=True)
-        if r:
-            return r.first()
-        else:
-            s = Suggestions()
-            s.user = user._id
-            return s
-
 
     def get_podcasts(self, count=None):
         user = User.get(self.user)
@@ -69,7 +60,7 @@ class Suggestions(Document, RatingMixin):
         ids = filter(lambda x: not x in self.blacklist + subscriptions, self.podcasts)
         if count:
             ids = ids[:count]
-        return filter(lambda x: x and x.title, Podcast.get_multi(ids))
+        return filter(lambda x: x and x.title, podcasts_by_id(ids))
 
 
     def __repr__(self):
@@ -112,47 +103,6 @@ class EpisodeAction(DocumentSchema):
         entry.total = self.total
         return entry
 
-
-    @staticmethod
-    def filter(user_id, since=None, until={}, podcast_id=None,
-               device_id=None):
-        """ Returns Episode Actions for the given criteria"""
-
-        since_str = since.strftime('%Y-%m-%dT%H:%M:%S') if since else None
-        until_str = until.strftime('%Y-%m-%dT%H:%M:%S') if until else {}
-
-        if since_str >= until_str:
-            return
-
-        if not podcast_id and not device_id:
-            view = 'episode_actions/by_user'
-            startkey = [user_id, since_str]
-            endkey   = [user_id, until_str]
-
-        elif podcast_id and not device_id:
-            view = 'episode_actions/by_podcast'
-            startkey = [user_id, podcast_id, since_str]
-            endkey   = [user_id, podcast_id, until_str]
-
-        elif device_id and not podcast_id:
-            view = 'episode_actions/by_device'
-            startkey = [user_id, device_id, since_str]
-            endkey   = [user_id, device_id, until_str]
-
-        else:
-            view = 'episode_actions/by_podcast_device'
-            startkey = [user_id, podcast_id, device_id, since_str]
-            endkey   = [user_id, podcast_id, device_id, until_str]
-
-        db = get_main_database()
-        res = db.view(view,
-                startkey = startkey,
-                endkey   = endkey
-            )
-
-        for r in res:
-            action = r['value']
-            yield action
 
 
     def validate_time_values(self):
@@ -197,19 +147,6 @@ class Chapter(Document):
     label = StringProperty()
     advertisement = BooleanProperty()
 
-    @classmethod
-    def for_episode(cls, episode_id):
-        db = get_main_database()
-        r = db.view('chapters/by_episode',
-                startkey = [episode_id, None],
-                endkey   = [episode_id, {}],
-            )
-
-        for res in r:
-            user = res['key'][1]
-            chapter = Chapter.wrap(res['value'])
-            yield (user, chapter)
-
 
     def __repr__(self):
         return '<%s %s (%d-%d)>' % (self.__class__.__name__, self.label,
@@ -232,64 +169,6 @@ class EpisodeUserState(Document):
     chapters      = SchemaListProperty(Chapter)
     podcast       = StringProperty(required=True)
 
-
-    @classmethod
-    def for_user_episode(cls, user, episode):
-        r = cls.view('episode_states/by_user_episode',
-                key          = [user._id, episode._id],
-                include_docs = True,
-                limit        = 1,
-            )
-
-        if r:
-            return r.first()
-
-        else:
-            podcast = Podcast.get(episode.podcast)
-
-            state = EpisodeUserState()
-            state.episode = episode._id
-            state.podcast = episode.podcast
-            state.user = user._id
-            state.ref_url = episode.url
-            state.podcast_ref_url = podcast.url
-
-            return state
-
-    @classmethod
-    def for_ref_urls(cls, user, podcast_url, episode_url):
-
-        import hashlib
-        cache_key = 'episode-state-%s-%s-%s' % (user._id,
-                hashlib.md5(podcast_url).hexdigest(),
-                hashlib.md5(episode_url).hexdigest())
-
-        state = cache.get(cache_key)
-        if state:
-            return state
-
-        res = cls.view('episode_states/by_ref_urls',
-            key = [user._id, podcast_url, episode_url], limit=1, include_docs=True)
-        if res:
-            state = res.first()
-            state.ref_url = episode_url
-            state.podcast_ref_url = podcast_url
-            cache.set(cache_key, state, 60*60)
-            return state
-
-        else:
-            episode = Episode.for_podcast_url(podcast_url, episode_url, create=True)
-            return episode.get_user_state(user)
-
-
-    @classmethod
-    @cache_result(timeout=60*60)
-    def count(cls):
-        r = cls.view('episode_states/by_user_episode',
-                limit = 0,
-                stale = 'update_after',
-            )
-        return r.total_rows
 
 
     def add_actions(self, actions):
@@ -389,58 +268,12 @@ class PodcastUserState(Document):
     merged_ids    = StringListProperty()
 
 
-    @classmethod
-    def for_user_podcast(cls, user, podcast):
-        r = PodcastUserState.view('podcast_states/by_podcast', \
-            key=[podcast.get_id(), user._id], limit=1, include_docs=True)
-        if r:
-            return r.first()
-        else:
-            p = PodcastUserState()
-            p.podcast = podcast.get_id()
-            p.user = user._id
-            p.ref_url = podcast.url
-            p.settings['public_subscription'] = user.settings.get('public_subscriptions', True)
-
-            p.set_device_state(user.devices)
-
-            return p
-
-
-    @classmethod
-    def for_user(cls, user):
-        r = PodcastUserState.view('podcast_states/by_user',
-            startkey     = [user._id, None],
-            endkey       = [user._id, 'ZZZZ'],
-            include_docs = True,
-            )
-        return list(r)
-
-
-    @classmethod
-    def for_device(cls, device_id):
-        r = PodcastUserState.view('podcast_states/by_device',
-            startkey=[device_id, None], endkey=[device_id, {}],
-            include_docs=True)
-        return list(r)
-
-
     def remove_device(self, device):
         """
         Removes all actions from the podcast state that refer to the
         given device
         """
         self.actions = filter(lambda a: a.device != device.id, self.actions)
-
-
-    @classmethod
-    @cache_result(timeout=60*60)
-    def count(cls):
-        r = PodcastUserState.view('podcast_states/by_user',
-                limit = 0,
-                stale = 'update_after',
-            )
-        return r.total_rows
 
 
     def subscribe(self, device):
@@ -551,8 +384,10 @@ class Device(Document):
         from.
         """
 
+        from mygpo.db.couchdb.podcast_state import podcast_states_for_device
+
         add, rem = [], []
-        podcast_states = PodcastUserState.for_device(self.id)
+        podcast_states = podcast_states_for_device(self.id)
         for p_state in podcast_states:
             change = p_state.get_change_between(self.id, since, until)
             if change == 'subscribe':
@@ -564,7 +399,10 @@ class Device(Document):
 
 
     def get_latest_changes(self):
-        podcast_states = PodcastUserState.for_device(self.id)
+
+        from mygpo.db.couchdb.podcast_state import podcast_states_for_device
+
+        podcast_states = podcast_states_for_device(self.id)
         for p_state in podcast_states:
             actions = filter(lambda x: x.device == self.id, reversed(p_state.actions))
             if actions:
@@ -593,7 +431,7 @@ class Device(Document):
 
         states = self.get_subscribed_podcast_states()
         podcast_ids = [state.podcast for state in states]
-        podcasts = get_to_dict(Podcast, podcast_ids, get_id=Podcast.get_id)
+        podcasts = podcasts_to_dict(podcast_ids)
 
         for state in states:
             podcast = proxy_object(podcasts[state.podcast], url=state.ref_url)
@@ -771,24 +609,11 @@ class User(BaseUser, SyncedDevicesMixin):
             self.unsync_device(device)
 
 
-    def get_subscriptions(self, public=None):
-        """
-        Returns a list of (podcast-id, device-id) tuples for all
-        of the users subscriptions
-        """
-
-        r = PodcastUserState.view('subscriptions/by_user',
-            startkey = [self._id, public, None, None],
-            endkey   = [self._id+'ZZZ', None, None, None],
-            reduce   = False,
-            )
-        return [res['key'][1:] for res in r]
-
-
     def get_subscriptions_by_device(self, public=None):
+        from mygpo.db.couchdb.podcast_state import subscriptions_by_user
         get_dev = itemgetter(2)
         groups = collections.defaultdict(list)
-        subscriptions = self.get_subscriptions(public=public)
+        subscriptions = subscriptions_by_user(self, public=public)
         subscriptions = sorted(subscriptions, key=get_dev)
 
         for public, podcast_id, device_id in subscriptions:
@@ -826,7 +651,7 @@ class User(BaseUser, SyncedDevicesMixin):
 
         states = self.get_subscribed_podcast_states(public=public)
         podcast_ids = [state.podcast for state in states]
-        podcasts = get_to_dict(Podcast, podcast_ids, get_id=Podcast.get_id)
+        podcasts = podcasts_to_dict(podcast_ids)
 
         for state in states:
             podcast = proxy_object(podcasts[state.podcast], url=state.ref_url)
@@ -835,29 +660,15 @@ class User(BaseUser, SyncedDevicesMixin):
         return podcasts.values()
 
 
-    @cache_result(timeout=60)
-    def get_num_listened_episodes(self):
-        db = EpisodeUserState.get_db()
-        r = db.view('listeners/by_user_podcast',
-                startkey    = [self._id, None],
-                endkey      = [self._id, {}],
-                reduce      = True,
-                group_level = 2,
-            )
-
-        def _wrap(obj):
-            count = obj['value']
-            podcast = obj['key'][1]
-            return (podcast, count)
-
-        return map(_wrap, r)
-
 
     def get_subscription_history(self, device_id=None, reverse=False, public=None):
         """ Returns chronologically ordered subscription history entries
 
         Setting device_id restricts the actions to a certain device
         """
+
+        from mygpo.db.couchdb.podcast_state import podcast_states_for_user, \
+            podcast_states_for_device
 
         def action_iter(state):
             for action in sorted(state.actions, reverse=reverse):
@@ -875,9 +686,9 @@ class User(BaseUser, SyncedDevicesMixin):
                 yield entry
 
         if device_id is None:
-            podcast_states = PodcastUserState.for_user(self)
+            podcast_states = podcast_states_for_user(self)
         else:
-            podcast_states = PodcastUserState.for_device(device_id)
+            podcast_states = podcast_states_for_device(device_id)
 
         # create an action_iter for each PodcastUserState
         subscription_action_lists = [action_iter(x) for x in podcast_states]
@@ -960,8 +771,9 @@ class User(BaseUser, SyncedDevicesMixin):
             episodes = episodes[yielded_episodes:]
 
             # fetch and merge episodes for the next podcast
-            new_episodes = list(podcast.get_episodes(since=1, until=max_date,
-                        descending=True, limit=max_per_podcast))
+            from mygpo.db.couchdb.episode import episodes_for_podcast
+            new_episodes = episodes_for_podcast(podcast, since=1,
+                        until=max_date, descending=True, limit=max_per_podcast)
             episodes = sorted(episodes+new_episodes, key=cmp_key, reverse=True)
 
 
@@ -971,76 +783,15 @@ class User(BaseUser, SyncedDevicesMixin):
             yield proxy_object(episode, podcast=podcast)
 
 
-    @cache_result(timeout=60)
-    def get_latest_episodes(self, count=10):
-        """ Returns the latest episodes that the user has accessed """
-
-        startkey = [self._id, {}]
-        endkey   = [self._id, None]
-
-        db = get_main_database()
-        res = db.view('listeners/by_user',
-                startkey     = startkey,
-                endkey       = endkey,
-                include_docs = True,
-                descending   = True,
-                limit        = count,
-                reduce       = False,
-            )
-
-        keys = [r['value'] for r in res]
-        return list(Episode.get_multi(keys))
-
-
-    @cache_result(timeout=60)
-    def get_num_played_episodes(self, since=None, until={}):
-        """ Number of played episodes in interval """
-
-        since_str = since.strftime('%Y-%m-%d') if since else None
-        until_str = until.strftime('%Y-%m-%d') if until else {}
-
-        startkey = [self._id, since_str]
-        endkey   = [self._id, until_str]
-
-        db = EpisodeUserState.get_db()
-        res = db.view('listeners/by_user',
-                startkey = startkey,
-                endkey   = endkey,
-                reduce   = True,
-            )
-
-        val = res.one()
-        return val['value'] if val else 0
-
-
-
-    @cache_result(timeout=60)
-    def get_seconds_played(self, since=None, until={}):
-        """ Returns the number of seconds that the user has listened
-
-        Can be selected by timespan, podcast and episode """
-
-        since_str = since.strftime('%Y-%m-%dT%H:%M:%S') if since else None
-        until_str = until.strftime('%Y-%m-%dT%H:%M:%S') if until else {}
-
-        startkey = [self._id, since_str]
-        endkey   = [self._id, until_str]
-
-        db = EpisodeUserState.get_db()
-        res = db.view('listeners/times_played_by_user',
-                startkey = startkey,
-                endkey   = endkey,
-                reduce   = True,
-            )
-
-        val = res.one()
-        return val['value'] if val else 0
 
 
     def save(self, *args, **kwargs):
+
+        from mygpo.db.couchdb.podcast_state import podcast_states_for_user
+
         super(User, self).save(*args, **kwargs)
 
-        podcast_states = PodcastUserState.for_user(self)
+        podcast_states = podcast_states_for_user(self)
         for state in podcast_states:
             @repeat_on_conflict(['state'])
             def _update_state(state):
@@ -1076,16 +827,6 @@ class History(object):
     def __init__(self, user, device):
         self.user = user
         self.device = device
-        self._db = get_main_database()
-
-        if device:
-            self._view = 'history/by_device'
-            self._startkey = [self.user._id, device.id, None]
-            self._endkey   = [self.user._id, device.id, {}]
-        else:
-            self._view = 'history/by_user'
-            self._startkey = [self.user._id, None]
-            self._endkey   = [self.user._id, {}]
 
 
     def __getitem__(self, key):
@@ -1097,17 +838,11 @@ class History(object):
             start = key
             length = 1
 
-        res = self._db.view(self._view,
-                descending = True,
-                startkey   = self._endkey,
-                endkey     = self._startkey,
-                limit      = length,
-                skip       = start,
-            )
+        if self.device:
+            return device_history(self.user, self.device, start, length)
 
-        for action in res:
-            action = action['value']
-            yield HistoryEntry.from_action_dict(action)
+        else:
+            return user_history(self.user, start, length)
 
 
 
@@ -1144,13 +879,14 @@ class HistoryEntry(object):
             # load podcast data
             podcast_ids = [getattr(x, 'podcast_id', None) for x in entries]
             podcast_ids = filter(None, podcast_ids)
-            podcasts = get_to_dict(Podcast, podcast_ids, get_id=Podcast.get_id)
+            podcasts = podcasts_to_dict(podcast_ids)
 
         if episodes is None:
+            from mygpo.db.couchdb.episode import episodes_to_dict
             # load episode data
             episode_ids = [getattr(x, 'episode_id', None) for x in entries]
             episode_ids = filter(None, episode_ids)
-            episodes = get_to_dict(Episode, episode_ids)
+            episodes = episodes_to_dict(episode_ids)
 
         # load device data
         # does not need pre-populated data because no db-access is required

@@ -12,7 +12,7 @@ from babel import Locale, UnknownLocaleError
 from mygpo.cache import cache_result
 from mygpo.core.models import Podcast
 from mygpo.core.proxy import proxy_object
-from mygpo.utils import get_to_dict
+from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_to_dict
 
 
 def get_accepted_lang(request):
@@ -25,27 +25,6 @@ def get_accepted_lang(request):
     langs = map(str.strip, langs)
     langs = filter(None, langs)
     return list(set(langs))
-
-
-@cache_result()
-def get_podcast_languages():
-    """
-    Returns all 2-letter language codes that are used by podcasts.
-
-    It filters obviously invalid strings, but does not check if any
-    of these codes is contained in ISO 639.
-    """
-
-    res = Podcast.view('podcasts/by_language',
-            group_level = 1,
-            stale       = 'ok',
-        )
-
-    langs = [r['key'][0] for r in res]
-    sane_lang = sanitize_language_codes(langs)
-    sane_lang.sort()
-
-    return sane_lang
 
 
 RE_LANG = re.compile('^[a-zA-Z]{2}[-_]?.*$')
@@ -230,7 +209,7 @@ def get_episode_link_target(episode, podcast, view_name='episode', add_args=[]):
             if isinstance(episode.podcast, Podcast):
                 podcast = episode.podcast
             elif isinstance(episode.podcast, basestring):
-                podcast = Podcast.get(episode.podcast)
+                podcast = podcast_by_id(episode.podcast)
 
         args = [podcast.slug or podcast.get_id(), episode._id]
         view_name = '%s-slug-id' % view_name
@@ -242,7 +221,7 @@ def fetch_episode_data(episodes, podcasts={}):
 
     if not podcasts:
         podcast_ids = [episode.podcast for episode in episodes]
-        podcasts = get_to_dict(Podcast, podcast_ids, Podcast.get_id)
+        podcasts = podcasts_to_dict(podcast_ids)
 
     def set_podcast(episode):
         episode = proxy_object(episode)

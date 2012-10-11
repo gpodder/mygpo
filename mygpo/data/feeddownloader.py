@@ -17,22 +17,24 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-import sys
 import os.path
 import urllib2
 import hashlib
 from datetime import datetime
 from itertools import chain
 
-from mygpo.core.models import Episode, Podcast, PodcastGroup
+from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.core.slugs import assign_missing_episode_slugs, assign_slug, \
          PodcastSlug
 from feedservice.parse import parse_feed
 from feedservice.parse.text import ConvertMarkdown
 from mygpo.utils import file_hash, split_list
 from mygpo.web.logo import CoverArt
-from mygpo.couch import get_main_database
+from mygpo.db.couchdb.episode import episode_for_podcast_id_url, \
+         episodes_for_podcast_uncached
+from mygpo.db.couchdb.podcast import podcast_for_url
 
+from mygpo.couch import get_main_database
 
 
 
@@ -78,7 +80,7 @@ class PodcastUpdater(object):
             raise
 
 
-        podcast = Podcast.for_url(parsed.urls[0])
+        podcast = podcast_for_url(parsed.urls[0])
         changed = False
 
         changed |= update_a(podcast, 'title', parsed.title or podcast.title)
@@ -128,7 +130,7 @@ class PodcastUpdater(object):
 
     def update_episodes(self, podcast, parsed_episodes):
 
-        all_episodes = set(podcast.get_episodes())
+        all_episodes = set(episodes_for_podcast_uncached(podcast))
         remaining = list(all_episodes)
         updated_episodes = []
 
@@ -149,7 +151,7 @@ class PodcastUpdater(object):
             matching, remaining = split_list(remaining, lambda e: (e.guid and e.guid == guid) or url in e.urls)
 
             if not matching:
-                new_episode = Episode.for_podcast_id_url(podcast.get_id(),
+                new_episode = episode_for_podcast_id_url(podcast.get_id(),
                     url, create=True)
                 matching = [new_episode]
                 all_episodes.add(new_episode)

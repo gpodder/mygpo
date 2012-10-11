@@ -12,15 +12,17 @@ from django.views.generic.base import View
 
 from mygpo.core.models import Podcast
 from mygpo.core.proxy import proxy_object
-from mygpo.directory.models import Category
 from mygpo.directory.toplist import PodcastToplist, EpisodeToplist, \
          TrendingPodcasts
 from mygpo.directory.search import search_podcasts
 from mygpo.web import utils
 from mygpo.directory.tags import Topics
-from mygpo.utils import get_to_dict
-from mygpo.share.models import PodcastList
 from mygpo.users.models import User
+from mygpo.db.couchdb.podcast import get_podcast_languages, podcasts_by_id, \
+         random_podcasts, podcasts_to_dict
+from mygpo.db.couchdb.directory import category_for_tag
+from mygpo.db.couchdb.podcastlist import random_podcastlists, \
+         podcastlist_count, podcastlists_by_rating
 
 
 @vary_on_cookie
@@ -35,7 +37,7 @@ def toplist(request, num=100, lang=None):
     max_subscribers = max([p.subscriber_count() for (oldp, p) in entries]) if entries else 0
     current_site = RequestSite(request)
 
-    languages = utils.get_podcast_languages()
+    languages = get_podcast_languages()
     all_langs = utils.get_language_names(languages)
 
     return render(request, 'toplist.html', {
@@ -67,18 +69,18 @@ class Directory(View):
 
 
     def get_random_list(self, podcasts_per_list=5):
-        random_list = next(PodcastList.random(), None)
+        random_list = next(random_podcastlists(), None)
         list_owner = None
         if random_list:
             random_list = proxy_object(random_list)
             random_list.more_podcasts = max(0, len(random_list.podcasts) - podcasts_per_list)
-            random_list.podcasts = list(Podcast.get_multi(random_list.podcasts[:podcasts_per_list]))
+            random_list.podcasts = podcasts_by_id(random_list.podcasts[:podcasts_per_list])
             random_list.user = User.get(random_list.user)
 
         yield random_list
 
     def get_random_podcast(self):
-        random_podcast = next(Podcast.random(), None)
+        random_podcast = next(random_podcasts(), None)
         if random_podcast:
             yield random_podcast.get_podcast()
 
@@ -86,7 +88,7 @@ class Directory(View):
 @cache_control(private=True)
 @vary_on_cookie
 def category(request, category, page_size=20):
-    category = Category.for_tag(category)
+    category = category_for_tag(category)
     if not category:
         return HttpResponseNotFound()
 
@@ -150,7 +152,6 @@ def search(request, template='search.html', args={}):
 @cache_control(private=True)
 @vary_on_cookie
 def episode_toplist(request, num=100):
-
     lang = utils.process_lang_params(request)
 
     toplist = EpisodeToplist(language=lang)
@@ -158,7 +159,7 @@ def episode_toplist(request, num=100):
 
     # load podcast objects
     podcast_ids = [e.podcast for e in entries]
-    podcasts = get_to_dict(Podcast, podcast_ids, Podcast.get_id, True)
+    podcasts = podcasts_to_dict(podcast_ids, True)
     for entry in entries:
         entry.podcast = podcasts.get(entry.podcast, None)
 
@@ -167,7 +168,7 @@ def episode_toplist(request, num=100):
     # Determine maximum listener amount (or 0 if no entries exist)
     max_listeners = max([0]+[e.listeners for e in entries])
 
-    languages = utils.get_podcast_languages()
+    languages = get_podcast_languages()
     all_langs = utils.get_language_names(languages)
 
     return render(request, 'episode_toplist.html', {
@@ -189,7 +190,7 @@ def podcast_lists(request, page_size=20):
     except ValueError:
         page = 1
 
-    lists = PodcastList.by_rating(skip=(page-1) * page_size, limit=page_size)
+    lists = podcastlists_by_rating(skip=(page-1) * page_size, limit=page_size)
 
 
     def _prepare_list(l):
@@ -200,7 +201,7 @@ def podcast_lists(request, page_size=20):
 
     lists = map(_prepare_list, lists)
 
-    num_pages = int(ceil(PodcastList.count() / float(page_size)))
+    num_pages = int(ceil(podcastlist_count() / float(page_size)))
 
     page_list = utils.get_page_list(1, num_pages, page, 15)
 

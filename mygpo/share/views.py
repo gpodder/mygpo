@@ -21,6 +21,9 @@ from mygpo.users.models import User
 from mygpo.directory.views import search as directory_search
 from mygpo.decorators import repeat_on_conflict
 from mygpo.userfeeds.feeds import FavoriteFeed
+from mygpo.db.couchdb.podcast import podcasts_by_id, podcast_for_url
+from mygpo.db.couchdb.podcastlist import podcastlist_for_user_slug, \
+         podcastlists_for_user
 from mygpo.data.feeddownloader import PodcastUpdater
 
 
@@ -37,7 +40,7 @@ def list_decorator(must_own=False):
             if must_own and request.user != user:
                 return HttpResponseForbidden()
 
-            plist = PodcastList.for_user_slug(user._id, listname)
+            plist = podcastlist_for_user_slug(user._id, listname)
 
             if plist is None:
                 raise Http404
@@ -58,7 +61,7 @@ def search(request, username, listname):
 @login_required
 def lists_own(request):
 
-    lists = PodcastList.for_user(request.user._id)
+    lists = podcastlists_for_user(request.user._id)
 
     return render(request, 'lists.html', {
             'lists': lists
@@ -71,7 +74,7 @@ def lists_user(request, username):
     if not user:
         raise Http404
 
-    lists = PodcastList.for_user(user._id)
+    lists = podcastlists_for_user(user._id)
 
     return render(request, 'lists_user.html', {
             'lists': lists,
@@ -86,7 +89,7 @@ def list_show(request, plist, owner):
 
     plist = proxy_object(plist)
 
-    podcasts = list(Podcast.get_multi(plist.podcasts))
+    podcasts = podcasts_by_id(plist.podcasts)
     plist.podcasts = podcasts
 
     max_subscribers = max([p.subscriber_count() for p in podcasts] + [0])
@@ -104,7 +107,7 @@ def list_show(request, plist, owner):
 
 @list_decorator(must_own=False)
 def list_opml(request, plist, owner):
-    podcasts = list(Podcast.get_multi(plist.podcasts))
+    podcasts = podcasts_by_id(plist.podcasts)
     return format_podcast_list(podcasts, 'opml', plist.title)
 
 
@@ -123,7 +126,7 @@ def create_list(request):
                     title=title))
         return HttpResponseRedirect(reverse('lists-overview'))
 
-    plist = PodcastList.for_user_slug(request.user._id, slug)
+    plist = podcastlist_for_user_slug(request.user._id, slug)
 
     if plist is None:
         plist = PodcastList()
@@ -213,7 +216,7 @@ class ShareFavorites(View):
         site = RequestSite(request)
         feed_url = favfeed.get_public_url(site.domain)
 
-        podcast = Podcast.for_url(feed_url)
+        podcast = podcast_for_url(feed_url)
 
         token = request.user.favorite_feeds_token
 
@@ -261,7 +264,7 @@ class FavoritesFeedCreateEntry(View):
         site = RequestSite(request)
         feed_url = feed.get_public_url(site.domain)
 
-        podcast = Podcast.for_url(feed_url, create=True)
+        podcast = podcast_for_url(feed_url, create=True)
 
         if not podcast.get_id() in user.published_objects:
             user.published_objects.append(podcast.get_id())
@@ -284,7 +287,7 @@ def overview(request):
 
     favfeed = FavoriteFeed(user)
     favfeed_url = favfeed.get_public_url(site.domain)
-    favfeed_podcast = Podcast.for_url(favfeed_url)
+    favfeed_podcast = podcast_for_url(favfeed_url)
 
     return render(request, 'share/overview.html', {
         'site': site,

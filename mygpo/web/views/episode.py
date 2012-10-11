@@ -37,12 +37,16 @@ from mygpo.decorators import repeat_on_conflict
 from mygpo.core import models
 from mygpo.core.proxy import proxy_object
 from mygpo.core.models import Podcast
-from mygpo.core.models import Episode
 from mygpo.users.models import Chapter, HistoryEntry, EpisodeAction
-from mygpo.api import backend
-from mygpo.utils import parse_time, get_to_dict
+from mygpo.utils import parse_time
 from mygpo.web.heatmap import EpisodeHeatmap
 from mygpo.web.utils import get_episode_link_target, fetch_episode_data
+from mygpo.db.couchdb.episode import episode_for_slug_id, episode_for_oldid, \
+         favorite_episodes_for_user, chapters_for_episode
+from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url, \
+         podcasts_to_dict
+from mygpo.db.couchdb.episode_state import episode_state_for_user_episode
+from mygpo.db.couchdb.user import get_latest_episodes
 from mygpo.userfeeds.feeds import FavoriteFeed
 
 
@@ -50,14 +54,14 @@ from mygpo.userfeeds.feeds import FavoriteFeed
 @cache_control(private=True)
 def episode(request, episode):
 
-    podcast = Podcast.get(episode.podcast)
+    podcast = podcast_by_id(episode.podcast)
 
     if not podcast:
         raise Http404
 
     if request.user.is_authenticated():
 
-        episode_state = episode.get_user_state(request.user)
+        episode_state = episode_state_for_user_episode(request.user, episode)
         is_fav = episode_state.is_favorite()
 
 
@@ -82,7 +86,7 @@ def episode(request, episode):
 
 
     chapters = []
-    for user, chapter in Chapter.for_episode(episode._id):
+    for user, chapter in chapters_for_episode(episode._id):
         chapter.is_own = request.user.is_authenticated() and \
                          user == request.user._id
         chapters.append(chapter)
@@ -108,9 +112,9 @@ def episode(request, episode):
 @never_cache
 @login_required
 def add_chapter(request, episode):
-    e_state = episode.get_user_state(request.user)
+    e_state = episode_state_for_user_episode(request.user, episode)
 
-    podcast = Podcast.get(episode.podcast)
+    podcast = podcast_by_id(episode.podcast)
 
     try:
         start = parse_time(request.POST.get('start', '0'))
@@ -144,12 +148,12 @@ def add_chapter(request, episode):
 @never_cache
 @login_required
 def remove_chapter(request, episode, start, end):
-    e_state = episode.get_user_state(request.user)
+    e_state = episode_state_for_user_episode(request.user, episode)
 
     remove = (int(start), int(end))
     e_state.update_chapters(rem=[remove])
 
-    podcast = Podcast.get(episode.podcast)
+    podcast = podcast_by_id(episode.podcast)
 
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
@@ -157,13 +161,13 @@ def remove_chapter(request, episode, start, end):
 @never_cache
 @login_required
 def toggle_favorite(request, episode):
-    episode_state = episode.get_user_state(request.user)
+    episode_state = episode_state_for_user_episode(request.user, episode)
     is_fav = episode_state.is_favorite()
     episode_state.set_favorite(not is_fav)
 
     episode_state.save()
 
-    podcast = Podcast.get(episode.podcast)
+    podcast = podcast_by_id(episode.podcast)
 
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
@@ -176,12 +180,12 @@ def list_favorites(request):
     user = request.user
     site = RequestSite(request)
 
-    episodes = backend.get_favorites(user)
+    episodes = favorite_episodes_for_user(user)
 
-    recently_listened = user.get_latest_episodes()
+    recently_listened = get_latest_episodes(user)
 
     podcast_ids = [episode.podcast for episode in episodes + recently_listened]
-    podcasts = get_to_dict(Podcast, podcast_ids, Podcast.get_id)
+    podcasts = podcasts_to_dict(podcast_ids)
 
     recently_listened = fetch_episode_data(recently_listened, podcasts=podcasts)
     episodes = fetch_episode_data(episodes, podcasts=podcasts)
@@ -189,7 +193,7 @@ def list_favorites(request):
     favfeed = FavoriteFeed(user)
     feed_url = favfeed.get_public_url(site.domain)
 
-    podcast = Podcast.for_url(feed_url)
+    podcast = podcast_for_url(feed_url)
 
     token = request.user.favorite_feeds_token
 
@@ -223,7 +227,7 @@ def add_action(request, episode):
     action.device = device.id if device else None
     action.action = action_str
 
-    state = episode.get_user_state(request.user)
+    state = episode_state_for_user_episode(request.user, episode)
 
     @repeat_on_conflict(['action'])
     def _add_action(action):
@@ -232,7 +236,7 @@ def add_action(request, episode):
 
     _add_action(action=action)
 
-    podcast = Podcast.get(episode.podcast)
+    podcast = podcast_by_id(episode.podcast)
 
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
@@ -243,7 +247,7 @@ def add_action(request, episode):
 def slug_id_decorator(f):
     @wraps(f)
     def _decorator(request, p_slug_id, e_slug_id, *args, **kwargs):
-        episode = Episode.for_slug_id(p_slug_id, e_slug_id)
+        episode = episode_for_slug_id(p_slug_id, e_slug_id)
 
         if episode is None:
             raise Http404
@@ -256,7 +260,7 @@ def slug_id_decorator(f):
 def oldid_decorator(f):
     @wraps(f)
     def _decorator(request, id, *args, **kwargs):
-        episode = Episode.for_oldid(id)
+        episode = episode_for_oldid(id)
 
         if episode is None:
             raise Http404
