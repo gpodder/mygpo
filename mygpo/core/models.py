@@ -16,7 +16,6 @@ from django.core.urlresolvers import reverse
 from mygpo.decorators import repeat_on_conflict
 from mygpo import utils
 from mygpo.cache import cache_result
-from mygpo.couch import get_main_database
 from mygpo.core.proxy import DocumentABCMeta
 from mygpo.core.slugs import SlugMixin
 from mygpo.core.oldid import OldIdMixin

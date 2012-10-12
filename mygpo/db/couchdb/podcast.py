@@ -4,6 +4,7 @@ from django.core.cache import cache
 
 from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.cache import cache_result
+from mygpo.couch import get_main_database
 from mygpo.db.couchdb.utils import multi_request_view, is_couchdb_id
 
 

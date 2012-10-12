@@ -17,7 +17,6 @@ from django_couchdb_utils.registration.models import User as BaseUser
 from mygpo.core.models import Podcast
 from mygpo.utils import linearize, iterate_together
 from mygpo.core.proxy import DocumentABCMeta, proxy_object
-from mygpo.couch import get_main_database
 from mygpo.decorators import repeat_on_conflict
 from mygpo.users.ratings import RatingMixin
 from mygpo.users.sync import SyncedDevicesMixin

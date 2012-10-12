@@ -3,7 +3,6 @@ from operator import itemgetter
 
 from mygpo.core.models import Podcast
 from mygpo.decorators import query_if_required
-from mygpo.couch import get_main_database
 from mygpo.counter import Counter
 from mygpo.core.proxy import proxy_object
 from mygpo.directory.models import Category

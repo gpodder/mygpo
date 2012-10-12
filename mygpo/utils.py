@@ -25,8 +25,6 @@ import hashlib
 
 from django.core.cache import cache
 
-from mygpo.couch import get_main_database
-
 
 def daterange(from_date, to_date=None, leap=timedelta(days=1)):
     """

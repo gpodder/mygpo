@@ -5,7 +5,6 @@ from django.core.management.base import BaseCommand
 
 from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.directory.toplist import PodcastToplist
-from mygpo.couch import get_main_database
 from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url, \
          random_podcasts, podcasts_by_last_update, podcasts_need_update
 
