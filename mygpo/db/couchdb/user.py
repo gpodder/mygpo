@@ -141,8 +141,8 @@ def user_history(user, start, length):
     db = get_main_database()
     res = db.view('history/by_user',
             descending = True,
-            startkey   = [user._id, None],
-            endkey     = [user._id, {}],
+            startkey   = [user._id, {}],
+            endkey     = [user._id, None],
             limit      = length,
             skip       = start,
         )
@@ -154,10 +154,10 @@ def user_history(user, start, length):
 def device_history(user, device, start, length):
     db = get_main_database()
 
-    res = self._db.view('history/by_device',
+    res = db.view('history/by_device',
             descending = True,
-            startkey   = [user._id, device.id, None],
-            endkey     = [user._id, device.id, {}],
+            startkey   = [user._id, device.id, {}],
+            endkey     = [user._id, device.id, None],
             limit      = length,
             skip       = start,
         )
@@ -166,4 +166,5 @@ def device_history(user, device, start, length):
 
 
 def _wrap_historyentry(action):
-    return HistoryEntry.from_action_dict(action['action'])
+    from mygpo.users.models import HistoryEntry
+    return HistoryEntry.from_action_dict(action['value'])

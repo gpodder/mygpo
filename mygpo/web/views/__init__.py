@@ -157,7 +157,7 @@ def history(request, count=15, uid=None):
 
     start = page*count
     end = start+count
-    entries = list(history_obj[start:end])
+    entries = history_obj[start:end]
     HistoryEntry.fetch_data(request.user, entries)
 
     return render(request, 'history.html', {
