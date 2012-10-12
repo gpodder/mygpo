@@ -1,5 +1,7 @@
 from random import random
 
+from restkit import RequestFailed
+
 from django.core.cache import cache
 
 from mygpo.core.models import Podcast, PodcastGroup
@@ -347,3 +349,36 @@ def _wrap_podcast_group_key1(res):
         pg = PodcastGroup.wrap(obj)
         podcast = pg.get_podcast_by_id(pid)
         return podcast
+
+
+
+def search_wrapper(result):
+    doc = result['doc']
+    if doc['doc_type'] == 'Podcast':
+        p = Podcast.wrap(doc)
+    elif doc['doc_type'] == 'PodcastGroup':
+        p = PodcastGroup.wrap(doc)
+    p._id = result['id']
+    return p
+
+
+@cache_result(timeout=60*60)
+def search(q, offset=0, num_results=20):
+    db = get_main_database()
+
+    #FIXME current couchdbkit can't parse responses for multi-query searches
+    q = q.replace(',', '')
+
+    try:
+        res = db.search('podcasts/search',
+                wrapper      = search_wrapper,
+                include_docs = True,
+                limit        = num_results,
+                skip         = offset,
+                q            = q,
+                sort='\\subscribers<int>')
+
+        return list(res), res.total_rows
+
+    except RequestFailed:
+        return [], 0
