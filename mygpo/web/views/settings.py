@@ -29,11 +29,11 @@ from django.views.decorators.cache import never_cache, cache_control
 from django.utils.decorators import method_decorator
 from django.views.generic.base import View
 
-from django_couchdb_utils.auth.models import UsernameException, PasswordException
+from django_couchdb_utils.auth.models import UsernameException, \
+         PasswordException
 
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.web.forms import UserAccountForm
-from mygpo.core.models import Podcast
 from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_to_dict
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast, \
          subscriptions_by_user

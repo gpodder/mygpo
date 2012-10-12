@@ -7,7 +7,6 @@ from django.views.decorators.cache import never_cache, cache_control
 from django.views.decorators.vary import vary_on_cookie
 from django.core.urlresolvers import reverse
 
-from mygpo.core.models import Podcast
 from mygpo.core.proxy import proxy_object
 from mygpo.publisher.auth import require_publisher, is_publisher
 from mygpo.publisher.forms import SearchPodcastForm

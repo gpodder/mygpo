@@ -11,7 +11,6 @@ from django.utils.decorators import method_decorator
 
 from mygpo.admin.auth import require_staff
 from mygpo.admin.group import PodcastGrouper
-from mygpo.core.models import Podcast
 from mygpo.counter import Counter
 from mygpo.maintenance.merge import PodcastMerger, IncorrectMergeException
 from mygpo.users.models import User

@@ -7,7 +7,6 @@ from operator import itemgetter
 import random
 import string
 
-from couchdbkit import ResourceNotFound
 from couchdbkit.ext.django.schema import *
 
 from django.core.cache import cache
@@ -15,14 +14,12 @@ from django.core.cache import cache
 from django_couchdb_utils.registration.models import User as BaseUser
 
 from mygpo.core.models import Podcast
-from mygpo.utils import linearize, iterate_together
+from mygpo.utils import linearize
 from mygpo.core.proxy import DocumentABCMeta, proxy_object
 from mygpo.decorators import repeat_on_conflict
 from mygpo.users.ratings import RatingMixin
 from mygpo.users.sync import SyncedDevicesMixin
-from mygpo.cache import cache_result
-from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_by_id, \
-         podcasts_to_dict
+from mygpo.db.couchdb.podcast import podcasts_by_id, podcasts_to_dict
 from mygpo.db.couchdb.user import user_history, device_history
 
 

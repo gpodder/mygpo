@@ -6,14 +6,13 @@ from django.contrib.syndication.views import Feed
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, Http404
 from django.views.decorators.vary import vary_on_cookie
-from django.views.decorators.cache import never_cache, cache_control
+from django.views.decorators.cache import cache_control
 
-from mygpo.core.models import Podcast
 from mygpo.utils import parse_bool, unzip, skip_pairs
 from mygpo.decorators import requires_token
-from mygpo.api import backend, simple
+from mygpo.api import simple
 from mygpo.users.models import HistoryEntry, User
-from mygpo.web import utils
+from mygpo.web.utils import symbian_opml_changes, get_podcast_link_target
 from mygpo.db.couchdb.podcast import podcasts_to_dict
 from mygpo.db.couchdb.podcast_state import subscriptions_by_user
 
@@ -64,7 +63,7 @@ def for_user_opml(request, username):
     subscriptions = user.get_subscribed_podcasts(public=True)
 
     if parse_bool(request.GET.get('symbian', False)):
-        subscriptions = map(utils.symbian_opml_changes, subscriptions)
+        subscriptions = map(symbian_opml_changes, subscriptions)
 
     response = render(request, 'user_subscriptions.opml', {
         'subscriptions': subscriptions,
@@ -176,7 +175,7 @@ class SubscriptionsFeed(Feed):
                         site=self.site)
 
     def item_link(self, item):
-        return utils.get_podcast_link_target(item.podcast)
+        return get_podcast_link_target(item.podcast)
 
     def item_pubdate(self, item):
         return item.timestamp

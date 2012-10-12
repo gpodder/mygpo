@@ -23,8 +23,6 @@ from datetime import datetime, timedelta, date
 import time
 import hashlib
 
-from django.core.cache import cache
-
 
 def daterange(from_date, to_date=None, leap=timedelta(days=1)):
     """

@@ -1,16 +1,12 @@
 from __future__ import division
 
 import hashlib
-import os.path
 import re
-from datetime import datetime
-from dateutil import parser
-from random import randint, random
+from random import random
 
 from couchdbkit.ext.django.schema import *
 from restkit.errors import Unauthorized
 
-from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from mygpo.decorators import repeat_on_conflict
@@ -215,16 +211,6 @@ class Podcast(Document, SlugMixin, OldIdMixin):
             group2.add_podcast(self, myname)
             return group2
 
-
-
-    def get_episode_count(self, since=None, until={}, **kwargs):
-
-        # use stored episode count for better performance
-        if getattr(self, 'episode_count', None) is not None:
-            return self.episode_count
-
-        from mygpo.db.couchdb import episode_count_for_podcast
-        return episode_count_for_podcast(self, since, until, **kwargs)
 
 
     def get_common_episode_title(self, num_episodes=100):

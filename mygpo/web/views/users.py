@@ -21,16 +21,11 @@ import random
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate
-from django.contrib.auth.decorators import login_required
-from django.template.defaultfilters import slugify
 from django.contrib import messages
 from django.contrib.sites.models import RequestSite
 from django.conf import settings
 from django.utils.translation import ugettext as _
-from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache
-
-from couchdbkit import ResourceConflict
 
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.web.forms import RestorePasswordForm

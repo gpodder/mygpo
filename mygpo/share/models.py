@@ -2,11 +2,8 @@ from random import random
 
 from couchdbkit.ext.django.schema import *
 
-from django.template.defaultfilters import slugify
-
 from mygpo.core.proxy import DocumentABCMeta
 from mygpo.users.models import RatingMixin
-from mygpo.cache import cache_result
 
 
 

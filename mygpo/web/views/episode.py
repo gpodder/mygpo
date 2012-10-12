@@ -22,21 +22,16 @@ import dateutil.parser
 
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, Http404
-from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control
-from django.views.generic.base import View
-from django.utils.decorators import method_decorator
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 
 from mygpo.api.constants import EPISODE_ACTION_TYPES
 from mygpo.decorators import repeat_on_conflict
-from mygpo.core import models
 from mygpo.core.proxy import proxy_object
-from mygpo.core.models import Podcast
 from mygpo.users.models import Chapter, HistoryEntry, EpisodeAction
 from mygpo.utils import parse_time
 from mygpo.web.heatmap import EpisodeHeatmap

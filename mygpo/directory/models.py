@@ -2,10 +2,8 @@ from django.core.cache import cache
 
 from couchdbkit.ext.django.schema import *
 
-from mygpo.core.models import Podcast
 from mygpo.utils import iterate_together
 from mygpo.core.proxy import DocumentABCMeta
-from mygpo.cache import cache_result
 from mygpo.db.couchdb.podcast import podcasts_by_id
 
 

@@ -18,7 +18,6 @@
 import sys
 from collections import defaultdict
 from datetime import datetime, timedelta
-from itertools import islice
 
 import gevent
 
@@ -34,18 +33,15 @@ from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control
 
 from mygpo.decorators import repeat_on_conflict
-from mygpo.core import models
-from mygpo.core.models import Podcast
 from mygpo.core.podcasts import PodcastSet
 from mygpo.directory.toplist import PodcastToplist
-from mygpo.users.models import Suggestions, History, HistoryEntry, DeviceDoesNotExist
-from mygpo.users.models import PodcastUserState, User
-from mygpo.web import utils
-from mygpo.utils import flatten, parse_range
+from mygpo.users.models import Suggestions, History, HistoryEntry, \
+         DeviceDoesNotExist
+from mygpo.web.utils import process_lang_params
+from mygpo.utils import parse_range
 from mygpo.web.views.podcast import slug_id_decorator
 from mygpo.db.couchdb.episode import favorite_episodes_for_user
-from mygpo.db.couchdb.podcast import podcast_by_id, \
-         podcast_for_oldid, random_podcasts
+from mygpo.db.couchdb.podcast import podcast_by_id, random_podcasts
 from mygpo.db.couchdb.user import suggestions_for_user
 from mygpo.db.couchdb.directory import tags_for_user
 from mygpo.db.couchdb.podcastlist import podcastlists_for_user
@@ -65,7 +61,7 @@ def home(request):
 def welcome(request):
     current_site = RequestSite(request)
 
-    lang = utils.process_lang_params(request)
+    lang = process_lang_params(request)
 
     toplist = PodcastToplist(lang)
 

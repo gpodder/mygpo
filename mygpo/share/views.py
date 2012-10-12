@@ -13,7 +13,6 @@ from django.views.decorators.cache import cache_control
 from django.views.generic.base import View
 from django.utils.decorators import method_decorator
 
-from mygpo.core.models import Podcast
 from mygpo.core.proxy import proxy_object
 from mygpo.api.simple import format_podcast_list
 from mygpo.share.models import PodcastList

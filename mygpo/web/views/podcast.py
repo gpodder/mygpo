@@ -1,4 +1,3 @@
-from datetime import date, timedelta, datetime
 from functools import wraps, partial
 
 from django.core.urlresolvers import reverse
@@ -11,13 +10,12 @@ from django.contrib import messages
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control
 
-from mygpo.core.models import Podcast, PodcastGroup, SubscriptionException
+from mygpo.core.models import PodcastGroup, SubscriptionException
 from mygpo.core.proxy import proxy_object
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.users.models import HistoryEntry, DeviceDoesNotExist
-from mygpo.web.forms import PrivacyForm, SyncForm
+from mygpo.web.forms import SyncForm
 from mygpo.decorators import allowed_methods, repeat_on_conflict
-from mygpo.utils import daterange
 from mygpo.web.utils import get_podcast_link_target
 from mygpo.log import log
 from mygpo.db.couchdb.episode import episodes_for_podcast

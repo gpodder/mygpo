@@ -20,10 +20,10 @@ from functools import wraps
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, \
-        HttpResponseForbidden, Http404, HttpResponseNotFound
+        HttpResponseNotFound
 from django.contrib import messages
 from mygpo.web.forms import DeviceForm, SyncForm
-from mygpo.web import utils
+from mygpo.web.utils import symbian_opml_changes
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.vary import vary_on_cookie
@@ -31,10 +31,9 @@ from django.views.decorators.cache import never_cache, cache_control
 
 from restkit.errors import Unauthorized
 
-from mygpo.log import log
 from mygpo.api import simple
 from mygpo.decorators import allowed_methods, repeat_on_conflict
-from mygpo.users.models import PodcastUserState, Device, DeviceUIDException, \
+from mygpo.users.models import Device, DeviceUIDException, \
      DeviceDoesNotExist
 from mygpo.db.couchdb.podcast_state import podcast_states_for_device
 
@@ -232,7 +231,7 @@ def opml(request, device):
 @login_required
 def symbian_opml(request, device):
     subscriptions = simple.get_subscriptions(request.user, device.uid)
-    subscriptions = map(utils.symbian_opml_changes, subscriptions)
+    subscriptions = map(symbian_opml_changes, subscriptions)
 
     response = simple.format_podcast_list(subscriptions, 'opml', request.user.username)
     response['Content-Disposition'] = 'attachment; filename=%s.opml' % device.uid
