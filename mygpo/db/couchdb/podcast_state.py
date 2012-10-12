@@ -106,7 +106,8 @@ def podcast_state_count():
 
 
 def subscribed_podcast_ids_by_device(device):
-    r = self.view('subscriptions/by_device',
+    db = get_main_database()
+    r = db.view('subscriptions/by_device',
             startkey = [device.id, None],
             endkey   = [device.id, {}]
         )
