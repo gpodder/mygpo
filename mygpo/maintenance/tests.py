@@ -23,6 +23,7 @@ from django.test import TestCase
 from mygpo.core.models import Podcast, Episode
 from mygpo.users.models import EpisodeAction, User
 from mygpo.maintenance.merge import PodcastMerger
+from mygpo.counter import Counter
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode
 
 
@@ -62,7 +63,11 @@ class MergeTests(TestCase):
         state1.save()
         state2.save()
 
-        pm = PodcastMerger([self.podcast1, self.podcast2])
+        # decide which episodes to merge
+        groups = [(0, [self.episode1, self.episode2])]
+        counter = Counter()
+
+        pm = PodcastMerger([self.podcast1, self.podcast2], counter, groups)
         pm.merge()
 
         state1 = episode_state_for_user_episode(self.user, self.episode1)
@@ -77,8 +82,8 @@ class MergeTests(TestCase):
         self.podcast1.delete()
         self.episode1.delete()
 
-        self.podcast2.delete()
-        self.episode2.delete()
+        #self.podcast2.delete()
+        #self.episode2.delete()
 
         self.user.delete()
 
