@@ -8,7 +8,7 @@ from mygpo.utils import progress
 from mygpo.users.models import EpisodeUserState
 from mygpo.counter import Counter
 from mygpo.maintenance.merge import merge_episode_states
-from mygpo.couch import bulk_save_retry, get_main_database
+from mygpo.couch import bulk_save_retry
 from mygpo.db.couchdb.episode_state import episode_states_count, \
          get_nth_episode_state, get_duplicate_episode_states
 
@@ -25,7 +25,6 @@ class Command(BaseCommand):
 
         skip = options.get('skip')
         total = episode_states_count()
-        db = get_main_database()
 
         actions = Counter()
         actions['merged'] = 0
@@ -47,7 +46,7 @@ class Command(BaseCommand):
 
                 obj_funs = [(first, updater)] + [(state, do_delete) for state in states]
 
-                bulk_save_retry(db, obj_funs)
+                bulk_save_retry(obj_funs)
 
                 merged = len(states)-1
                 actions['merged'] += merged
