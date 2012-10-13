@@ -20,7 +20,7 @@ Ubuntu 12.04 x86 install, 'should work' with other versions/archs as well).
 
 If you are on a Debian/Ubuntu system, do:
 
-  sudo apt-get install erlang python-pip
+  sudo apt-get install erlang git python-pip python-dev libevent-dev
   sudo apt-get build-dep couchdb
 
   [ install couchdb 1.2.0 from source ]
