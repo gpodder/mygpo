@@ -1290,7 +1290,7 @@ msgstr ""
 
 #: web/templates/dashboard.html:113
 msgid "Share your Favorite Episodes"
-msgstr ""
+msgstr "Teile deine Liebings-Episoden"
 
 #: web/templates/dashboard.html:118
 msgid "Share your Userpage"
@@ -2063,10 +2063,12 @@ msgid ""
 "%(username)s didn't share his subscriptions with you. Maybe you should "
 "contact him to get the correct link."
 msgstr ""
+"%(username)s hat seine Podcast-Abos nicht mit dir geteilt. Kontaktiere ihn, "
+"um den korrekten Link zu erhalten."
 
 #: web/templates/user_subscriptions_denied.html:23
 msgid "Want to share your subscriptions?"
-msgstr ""
+msgstr "Willst du deine Podcast-Abos mit anderen teilen?"
 
 #: web/templates/user_subscriptions_denied.html:23
 msgid ""
