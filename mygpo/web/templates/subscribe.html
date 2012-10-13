@@ -50,7 +50,6 @@
         {% if target|is_list %}
          {% for t in target %}
           <a href="{% url device t.uid %}">{{ t|device_icon }}{{ t.name|striptags }}</a>
-          {{ t|device_link }} {{ t.name }}
          {% endfor %}
         {% else %}
          <a href="{% url device target.uid %}">{{ target|device_icon }}{{ target.name|striptags }}</a>
