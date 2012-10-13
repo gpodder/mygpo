@@ -2034,7 +2034,7 @@ msgstr "Abonniert auf"
 #: web/templates/user_subscriptions.html:51
 #, python-format
 msgid "%(username)s doesn't have any subscriptions yet."
-msgstr ""
+msgstr "%(username)s hat noch keine Podcast-Abos."
 
 #: web/templates/user_subscriptions.html:61
 #, fuzzy
