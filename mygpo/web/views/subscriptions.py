@@ -75,8 +75,6 @@ def for_user_opml(request, username):
 
 def create_subscriptionlist(request):
     user = request.user
-    user.sync_all()
-
     subscriptions = subscriptions_by_user(user)
 
     if not subscriptions:

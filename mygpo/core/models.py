@@ -314,6 +314,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         state.subscribe(device)
         try:
             state.save()
+            user.sync_all()
         except Unauthorized as ex:
             raise SubscriptionException(ex)
 
@@ -325,6 +326,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         state.unsubscribe(device)
         try:
             state.save()
+            user.sync_all()
         except Unauthorized as ex:
             raise SubscriptionException(ex)
 

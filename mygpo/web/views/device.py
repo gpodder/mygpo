@@ -312,6 +312,8 @@ def sync(request, device):
     except DeviceDoesNotExist as e:
         messages.error(request, str(e))
 
+    request.user.sync_all()
+
     return HttpResponseRedirect(reverse('device', args=[device.uid]))
 
 

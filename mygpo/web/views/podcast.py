@@ -73,9 +73,6 @@ def show(request, podcast):
     tags = get_tags(podcast, request.user)
 
     if request.user.is_authenticated():
-
-        request.user.sync_all()
-
         state = podcast_state_for_user_podcast(request.user, podcast)
         subscribed_devices = state.get_subscribed_device_ids()
         subscribed_devices = [request.user.get_device(x) for x in subscribed_devices]
@@ -175,10 +172,6 @@ def all_episodes(request, podcast):
 
     max_listeners = max([e.listeners for e in episodes] + [0])
 
-    if request.user.is_authenticated():
-
-        request.user.sync_all()
-
     return render(request, 'episodes.html', {
         'podcast': podcast,
         'episodes': episodes,
@@ -260,9 +253,6 @@ def subscribe(request, podcast):
                 messages.error(request, str(e))
 
         return HttpResponseRedirect(get_podcast_link_target(podcast))
-
-
-    request.user.sync_all()
 
     targets = podcast.subscribe_targets(request.user)
 

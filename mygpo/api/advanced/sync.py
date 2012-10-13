@@ -113,3 +113,4 @@ def update_sync_status(user, synclist, stopsync):
             pass
 
     user.save()
+    user.sync_all()
