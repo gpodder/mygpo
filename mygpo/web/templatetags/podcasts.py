@@ -5,7 +5,8 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.utils.html import strip_tags
 
-from mygpo.constants import PODCAST_LOGO_SIZE, PODCAST_LOGO_BIG_SIZE
+from mygpo.constants import PODCAST_LOGO_SIZE, PODCAST_LOGO_BIG_SIZE, \
+         PODCAST_LOGO_MEDIUM_SIZE
 from mygpo.web.utils import get_podcast_link_target, \
          get_podcast_group_link_target
 
@@ -13,7 +14,7 @@ from mygpo.web.utils import get_podcast_link_target, \
 register = template.Library()
 def create_podcast_logo(podcast, size):
     size = int(size)
-    s = '<img src="%s" alt="%s" />' % (podcast.get_logo_url(size), _('Logo'),)
+    s = '<img src="%s" alt="" />' % (podcast.get_logo_url(size),)
     return mark_safe(s)
 
 @register.filter
@@ -23,6 +24,11 @@ def podcast_logo(podcast):
 @register.filter
 def podcast_logo_big(podcast):
     return create_podcast_logo(podcast, PODCAST_LOGO_BIG_SIZE)
+
+@register.filter
+def podcast_logo_medium(podcast):
+    return create_podcast_logo(podcast, PODCAST_LOGO_MEDIUM_SIZE)
+
 
 @register.filter
 def podcast_status_icon(action):

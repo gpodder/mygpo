@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 
 from mygpo.core.models import Podcast
+from mygpo.db.couchdb.podcast import podcast_for_url
 
 
 class Command(BaseCommand):
@@ -16,8 +17,8 @@ class Command(BaseCommand):
         myname = args[3]
         othername = args[4]
 
-        p1 = Podcast.for_url(p1_url)
-        p2 = Podcast.for_url(p2_url)
+        p1 = podcast_for_url(p1_url)
+        p2 = podcast_for_url(p2_url)
 
         p1.group_with(p2, group_title, myname, othername)
 

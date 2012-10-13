@@ -12,22 +12,17 @@
 
   {% if results %}
    <table class="list">
-    <tr>
-     <th></th>
-     <th>{% trans "Podcast" %}</th>
-     <th>{% trans "Subscribers" %}</th>
-     <th>{% trans "Add" %}</th>
-    </tr>
-
     {% for podcast in results %}
      <tr>
-      <td>{{ podcast|podcast_logo }}</td>
+      <td class="logo">{{ podcast|podcast_logo }}</td>
       <td>{% podcast_group_link podcast %}</td>
-      <td>{{ podcast.subscriber_count|vertical_bar:max_subscribers }}</td>
+      <td>{% vertical_bar podcast.subscriber_count max_subscribers %}</td>
       <td>
        <form action="{% url list-add-podcast user.username listname podcast.get_id %}" method="post" target="_parent">
         {% csrf_token %}
-        <input type="submit" class="subscribe" value="" />
+        <button class="btn btn-success btn-small" type="submit">
+         <i class="icon-plus"></i>
+        </button>
        </form>
       </td>
      </tr>

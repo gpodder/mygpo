@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load podcasts %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/admin/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/admin/"|section_menu:"Admin" }}{% endblock %}
+
+{% block title %}{% trans "Admin Area" %}{% endblock %}
+
+{% block header %}
+ <h1>{% trans "Admin Area" %}</h1>
+{% endblock %}
+
+{% block content %}
+ <ul>
+  <li><a href="{% url admin-merge %}?podcasts=2">{% trans "Merge Podcasts and Episodes" %}</a></li>
+  <li><a href="{% url clients %}">{% trans "Client Stats" %}</a> (<a href="{% url clients-json %}">{% trans "JSON" %}</a>)</li>
+  <li><a href="{% url useragents %}">{% trans "User-Agent Stats" %}</a></li>
+  <li><a href="{% url stats %}">{% trans "General Stats" %}</a> (<a href="{% url stats-json %}">{% trans "JSON" %}</a>)</li>
+ </ul>
+
+{% endblock %}
+

@@ -8,38 +8,56 @@
 
 {% block title %}{% trans "Privacy Settings" %}{% endblock %}
 
-{% block content %}
+{% block header %}
   <h1>{% trans "Privacy Settings" %}</h1>
+{% endblock %}
 
-  <p>{% blocktrans %}{{ domain }} distinguishes between public and private subscriptions.{% endblocktrans %}</p>
+
+{% block content %}
+
+  <p>{% blocktrans %}{{ domain }} distinguishes between public and private subscriptions.{% endblocktrans %}
   <ul>
-   <li>{% blocktrans %}<strong>Public</strong> subscriptions are not shown to anybody (unless you chose to <a href="/share/">share</a> them), but are included anonymized on our public statistics.{% endblocktrans %}</li>
+   <li>{% blocktrans %}<strong>Public</strong> subscriptions are included in your <a href="/share/">shared podcasts</a> them) and ouranonymized public statistics.{% endblocktrans %}</li>
    <li>{% blocktrans %}<strong>Private</strong> subscriptions do neither show up in your list of shared podcasts, nor are considered in our statistics.{% endblocktrans %}</li>
   </ul>
+  </p>
 
   <p>
-   {% url privacy as privacy-url %}
    {% if public_subscriptions %}
-    {% blocktrans %}New subscriptions will be public by default. Change to <a href="{{ privacy-url }}?private_subscriptions">private</a>.{% endblocktrans %}
+    {% trans "New subscriptions will be public by default." %}
+    <form method="post" action="{% url privacy_default_private %}">
+     {% csrf_token %}
+     <button class="btn" type="submit">
+      <i class="icon-eye-close"></i> {% trans "Change to Private" %}
+     </button>
+    </form>
    {% else %}
-    {% blocktrans %}New subscriptions will be private by default. Change to <a href="{{ privacy-url }}?public_subscriptions">public</a>.{% endblocktrans %}
+    {% trans "New subscriptions will be private by default." %}
+    <form method="post" action="{% url privacy_default_public %}">
+     {% csrf_token %}
+     <button class="btn" type="submit">
+      <i class="icon-eye-open"></i> {% trans "Change to Public" %}
+     </button>
+    </form>
    {% endif %}
   </p>
 
   {% if included_subscriptions %}
-    <h2>{% trans "Your Public Subscriptions" %}</h2>
+    <h2>{% trans "Public Subscriptions" %}</h2>
     <table class="list">
-     <tr>
-      <th></th>
-      <th>{% trans "Podcast" %}</th>
-      <th>{% trans "Make Private" %}</th>
-     </tr>
 
      {% for podcast in included_subscriptions %}
       <tr>
-       <td>{{ podcast|podcast_logo }}</td>
+       <td class="logo">{{ podcast|podcast_logo }}</td>
        <td>{% podcast_group_link podcast %}</td>
-       <td><a href="{% url privacy %}?exclude={{ podcast.get_id }}"><img src="/media/unsubscribe.png" alt="{% trans "Make Public" %}" /></a></td>
+       <td>
+        <form method="post" action="{% url privacy_podcast_private podcast.get_id %}">
+         {% csrf_token %}
+         <button class="btn btn-small" type="submit">
+          <i class="icon-eye-close"></i> {% trans "Make Private" %}
+         </button>
+        </form>
+       </td>
       </tr>
      {% endfor %}
     </table>
@@ -47,19 +65,20 @@
 
 
     {% if excluded_subscriptions %}
-     <h2>{% trans "Your Private Subscriptions" %}</h3>
+     <h2>{% trans "Private Subscriptions" %}</h3>
      <table class="list">
-      <tr>
-       <th></th>
-       <th>{% trans "Podcast" %}</th>
-       <th>{% trans "Make Public" %}</th>
-      </tr>
 
       {% for podcast in excluded_subscriptions %}
        <tr>
-        <td>{{ podcast|podcast_logo }}</td>
+        <td class="logo">{{ podcast|podcast_logo }}</td>
         <td>{% podcast_group_link podcast %}</td>
-        <td><a href="{% url privacy %}?include={{ podcast.get_id }}"><img src="/media/edit-undo.png" alt="{% trans "Make Private" %}" /></a></td>
+        <td>
+        <form method="post" action="{% url privacy_podcast_public podcast.get_id %}">
+         {% csrf_token %}
+         <button class="btn btn-small" type="submit">
+          <i class="icon-eye-open"></i> {% trans "Make Public" %}
+         </button>
+        </form>
        </tr>
       {% endfor %}
      </table>

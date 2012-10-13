@@ -15,20 +15,17 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from datetime import timedelta
 from collections import defaultdict
-from itertools import cycle
 from functools import partial
 
-from django.core.cache import cache
-
-from mygpo.data.mimetype import get_type, CONTENT_TYPES
 from mygpo.core.models import Podcast, Episode
 from mygpo.users.models import EpisodeUserState, Device, DeviceDoesNotExist, \
          PodcastUserState
 from mygpo.decorators import repeat_on_conflict
+from mygpo.couch import bulk_save_retry
 from mygpo.json import json
-from mygpo.couchdb import bulk_save_retry
+from mygpo.db.couchdb.podcast import podcast_for_url, random_podcasts
+from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
 
 
 def get_random_picks(languages=None):
@@ -37,7 +34,7 @@ def get_random_picks(languages=None):
     languages = languages or ['']
 
     # get one iterator for each language
-    rand_iters = [Podcast.random(lang) for lang in languages]
+    rand_iters = [random_podcasts(lang) for lang in languages]
 
     # cycle through them, removing those that don't yield any more results
     while rand_iters:
@@ -51,23 +48,6 @@ def get_random_picks(languages=None):
         except StopIteration:
             # don't re-add rand_iter
             pass
-
-
-
-def get_podcast_count_for_language():
-    """ Returns a the number of podcasts for each language """
-
-    counts = defaultdict(int)
-
-    db = Podcast.get_db()
-    r = db.view('podcasts/by_language',
-        reduce = True,
-        group_level = 1,
-        stale       = 'update_after',
-    )
-
-    counts.update( dict( (x['key'][0], x['value']) for x in r) )
-    return counts
 
 
 
@@ -112,19 +92,8 @@ def get_device(user, uid, user_agent, undelete=True):
     return _get(user=user, uid=uid, undelete=undelete)
 
 
-def get_favorites(user):
-    favorites = Episode.view('favorites/episodes_by_user',
-            key          = user._id,
-            include_docs = True,
-        )
-    return favorites
-
-
-
 class BulkSubscribe(object):
     """ Performs bulk subscribe/unsubscribe operations """
-
-    DB = PodcastUserState.get_db()
 
     def __init__(self, user, device, podcasts = {}, actions=None):
         self.user = user
@@ -141,7 +110,7 @@ class BulkSubscribe(object):
     def execute(self):
         """ Executes all added actions in bulk """
         obj_funs = map(self._get_obj_fun, self.actions)
-        bulk_save_retry(self.DB, obj_funs)
+        bulk_save_retry(obj_funs)
 
         # prepare for another run
         self.actions = []
@@ -159,9 +128,9 @@ class BulkSubscribe(object):
         url, op = action
 
         podcast = self.podcasts.get(url,
-                Podcast.for_url(url, create=True))
+                podcast_for_url(url, create=True))
 
-        state = podcast.get_user_state(self.user)
+        state = podcast_state_for_user_podcast(self.user, podcast)
 
         fun = self.operations[op]
         return (state, fun)

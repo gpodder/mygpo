@@ -33,17 +33,24 @@ from mygpo.api.constants import EPISODE_ACTION_TYPES, DEVICE_TYPES
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url, sanitize_urls
 from mygpo.api.advanced.directory import episode_data, podcast_data
-from mygpo.api.backend import get_device, get_favorites, BulkSubscribe
-from mygpo.couchdb import BulkException
+from mygpo.api.backend import get_device, BulkSubscribe
+from mygpo.couch import BulkException, bulk_save_retry
 from mygpo.log import log
-from mygpo.utils import parse_time, format_time, parse_bool, get_to_dict, get_timestamp
+from mygpo.utils import parse_time, format_time, parse_bool, get_timestamp
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.core import models
 from mygpo.core.models import SanitizingRule, Podcast
-from mygpo.users.models import PodcastUserState, EpisodeAction, EpisodeUserState, DeviceDoesNotExist
+from mygpo.users.models import PodcastUserState, EpisodeAction, \
+     EpisodeUserState, DeviceDoesNotExist, DeviceUIDException, \
+     InvalidEpisodeActionAttributes
 from mygpo.json import json, JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
-from mygpo.couchdb import bulk_save_retry
+from mygpo.db.couchdb.episode import episode_by_id, \
+         favorite_episodes_for_user, episodes_for_podcast
+from mygpo.db.couchdb.podcast import podcast_for_url
+from mygpo.db.couchdb.podcast_state import subscribed_podcast_ids_by_device
+from mygpo.db.couchdb.episode_state import get_podcasts_episode_states, \
+         episode_state_for_ref_urls, get_episode_actions
 
 
 # keys that are allowed in episode actions
@@ -175,10 +182,14 @@ def episodes(request, username, version=1):
 
         try:
             update_urls = update_episodes(request.user, actions, now, ua_string)
-        except Exception, e:
+        except DeviceUIDException as e:
             import traceback
             log('could not update episodes for user %s: %s %s: %s' % (username, e, traceback.format_exc(), actions))
-            return HttpResponseBadRequest(e)
+            return HttpResponseBadRequest(str(e))
+        except InvalidEpisodeActionAttributes as e:
+            import traceback
+            log('could not update episodes for user %s: %s %s: %s' % (username, e, traceback.format_exc(), actions))
+            return HttpResponseBadRequest(str(e))
 
         return JsonResponse({'timestamp': now_, 'update_urls': update_urls})
 
@@ -194,7 +205,7 @@ def episodes(request, username, version=1):
             return HttpResponseBadRequest('since-value is not a valid timestamp')
 
         if podcast_url:
-            podcast = Podcast.for_url(podcast_url)
+            podcast = podcast_for_url(podcast_url)
             if not podcast:
                 raise Http404
         else:
@@ -237,7 +248,7 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
     if device is not None:
         args['device_id'] = device.id
 
-    actions = EpisodeAction.filter(user._id, since, until, **args)
+    actions = get_episode_actions(user._id, since, until, **args)
 
     if version == 1:
         actions = imap(convert_position, actions)
@@ -326,13 +337,12 @@ def update_episodes(user, actions, now, ua_string):
     obj_funs = []
 
     for (p_url, e_url), action_list in grouped_actions.iteritems():
-        episode_state = EpisodeUserState.for_ref_urls(user, p_url, e_url)
+        episode_state = episode_state_for_ref_urls(user, p_url, e_url)
 
         fun = partial(update_episode_actions, action_list=action_list)
         obj_funs.append( (episode_state, fun) )
 
-    db = EpisodeUserState.get_db()
-    bulk_save_retry(db, obj_funs)
+    bulk_save_retry(obj_funs)
 
     return update_urls
 
@@ -436,7 +446,7 @@ def device_data(device):
         id           = device.uid,
         caption      = device.name,
         type         = device.type,
-        subscriptions= len(device.get_subscribed_podcast_ids())
+        subscriptions= len(subscribed_podcast_ids_by_device(device)),
     )
 
 
@@ -517,7 +527,7 @@ def get_episode_updates(user, subscribed_podcasts, since):
     episode_status = {}
 
     # get episodes
-    episode_jobs = [gevent.spawn(p.get_episodes, since) for p in
+    episode_jobs = [gevent.spawn(episodes_for_podcast, p, since) for p in
         subscribed_podcasts]
     gevent.joinall(episode_jobs)
     episodes = chain.from_iterable(job.get() for job in episode_jobs)
@@ -526,8 +536,8 @@ def get_episode_updates(user, subscribed_podcasts, since):
         episode_status[episode._id] = EpisodeStatus(episode, 'new', None)
 
     # get episode states
-    e_action_jobs = [gevent.spawn(p.get_episode_states, user._id) for p in
-        subscribed_podcasts]
+    e_action_jobs = [gevent.spawn(get_podcasts_episode_states, p, user._id)
+            for p in subscribed_podcasts]
     gevent.joinall(e_action_jobs)
     e_actions = chain.from_iterable(job.get() for job in e_action_jobs)
 
@@ -537,7 +547,7 @@ def get_episode_updates(user, subscribed_podcasts, since):
         if e_id in episode_status:
             episode = episode_status[e_id].episode
         else:
-            episode = models.Episode.get(e_id)
+            episode = episode_by_id(e_id)
 
         episode_status[e_id] = EpisodeStatus(episode, action['action'], action)
 
@@ -548,7 +558,7 @@ def get_episode_updates(user, subscribed_podcasts, since):
 @check_username
 @never_cache
 def favorites(request, username):
-    favorites = get_favorites(request.user)
+    favorites = favorite_episodes_for_user(request.user)
     domain = RequestSite(request).domain
     e_data = lambda e: episode_data(e, domain)
     ret = map(e_data, favorites)

@@ -1,4 +1,7 @@
-from mygpo.api import backend
+from django.core.urlresolvers import reverse
+
+from mygpo.db.couchdb.episode import favorite_episodes_for_user
+
 
 
 class FavoriteFeed():
@@ -10,7 +13,7 @@ class FavoriteFeed():
         return '%s\'s Favorite Episodes' % self.user.username
 
     def get_episodes(self):
-        return backend.get_favorites(self.user)
+        return favorite_episodes_for_user(self.user)
 
     def language(self):
         """
@@ -23,3 +26,5 @@ class FavoriteFeed():
         else:
             return ''
 
+    def get_public_url(self, domain):
+        return 'http://%s%s' % (domain, reverse('favorites-feed', args=[self.user.username]))

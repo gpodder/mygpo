@@ -37,35 +37,31 @@ class Importer(object):
         containing podcast metadata.
         """
         self.items = []
-        try:
-            doc = xml.dom.minidom.parseString(content)
+        doc = xml.dom.minidom.parseString(content)
 
-            for outline in doc.getElementsByTagName('outline'):
-                if outline.getAttribute('type') in self.VALID_TYPES and \
-                        outline.getAttribute('xmlUrl') or \
-                        outline.getAttribute('url'):
-                    channel = {
-                        'url': outline.getAttribute('xmlUrl') or \
-                               outline.getAttribute('url'),
-                        'title': outline.getAttribute('title') or \
-                                 outline.getAttribute('text') or \
-                                 outline.getAttribute('xmlUrl') or \
-                                 outline.getAttribute('url'),
-                        'description': outline.getAttribute('text') or \
-                                       outline.getAttribute('xmlUrl') or \
-                                       outline.getAttribute('url'),
-                    }
+        for outline in doc.getElementsByTagName('outline'):
+            if outline.getAttribute('type') in self.VALID_TYPES and \
+                    outline.getAttribute('xmlUrl') or \
+                    outline.getAttribute('url'):
+                channel = {
+                    'url': outline.getAttribute('xmlUrl') or \
+                           outline.getAttribute('url'),
+                    'title': outline.getAttribute('title') or \
+                             outline.getAttribute('text') or \
+                             outline.getAttribute('xmlUrl') or \
+                             outline.getAttribute('url'),
+                    'description': outline.getAttribute('text') or \
+                                   outline.getAttribute('xmlUrl') or \
+                                   outline.getAttribute('url'),
+                }
 
-                    if channel['description'] == channel['title']:
-                        channel['description'] = channel['url']
+                if channel['description'] == channel['title']:
+                    channel['description'] = channel['url']
 
-                    for attr in ('url', 'title', 'description'):
-                        channel[attr] = channel[attr].strip()
+                for attr in ('url', 'title', 'description'):
+                    channel[attr] = channel[attr].strip()
 
-                    self.items.append(channel)
-        except Exception, e:
-            # FIXME: Logging or raising the exception to the caller
-            print 'OPML read error:', e
+                self.items.append(channel)
 
 
 class Exporter(object):

@@ -7,11 +7,15 @@
 {% block mainmenu %}{{ "/devices/"|main_menu }}{% endblock %}
 {% block sectionmenu %}{{ "/devices/"|section_menu }}{% endblock %}
 
-{% block title %}{% trans "My Devices" %}{% endblock %}
+{% block title %}{% trans "Managed Devices" %}{% endblock %}
+
+{% block header %}
+   <h1>{% trans "Managed Devices" %}</h1>
+{% endblock %}
 
 {% block content %}
-  <h1>{% trans "My Devices" %}</h1>
 
+ {% if device_groups %}
    <table class="list">
     <tr>
      <th>{% trans "Name" %}</th>
@@ -33,9 +37,10 @@
        <td><a href="{% url device device.uid %}">{{ device|device_icon }}{{ device.name|striptags }}</a></td>
        <td>{{ device|device_type }}</td>
        <td>{{ device.uid|striptags }}</td>
-       <td class="buttons">
-        <a href="{% url device-edit device.uid %}">
-         <img src="/media/preferences-system.png" />
+       <td>
+        <a class="btn btn-small" href="{% url device-edit device.uid %}">
+         <i class="icon-edit"></i>
+         {% trans "Configure" %}
         </a>
        </td>
       </tr>
@@ -43,48 +48,63 @@
     {% endfor %}
    </table>
 
+  {% else %}
+
+   <p>
+    {% blocktrans %}You don't have any devices yet. Go to the <a href="http://wiki.gpodder.org/wiki/Web_Services/Clients">clients</a> page to learn how to set up your client applications.{% endblocktrans %}
+   </p>
+
+  {% endif %}
+
    {% if deleted_devices %}
     <h2>{% trans "Deleted Devices" %}</h2>
     <table class="list">
-     <tr>
-      <th>{% trans "Name" %}</th>
-      <th>{% trans "Type" %}</th>
-      <th>{% trans "ID" %}</th>
-      <th>{% trans "Actions" %}</th>
-     </th>
     {% for d in deleted_devices %}
      <tr>
       <td><a href="{% url device d.uid %}">{{ d|device_icon }}{{ d.name|striptags }}</a></td>
       <td>{{ d|device_type }}</td>
       <td>{{ d.uid|striptags }}</td>
       <td>
-       <div>
-        <a href="{% url device-undelete d.uid %}">
-         <img src="/media/edit-undo.png" class="action-button" /> {% trans "Reactivate" %}
-        </a>
-       </div>
-
-       <div>
-        <a href="{% url device-delete-permanently d.uid %}">
-         <img src="/media/unsubscribe.png" class="action-button" /> {% trans "Delete Permanently" %}
-        </a>
-       </div>
+       <form method="post" action="{% url device-undelete d.uid %}">
+        <button class="btn btn-small" type="submit">
+         <i class="icon-repeat"></i> {% trans "Reactivate" %}
+        </button>
+       </form>
+      </td>
+      <td>
+       <form method="post" action="{% url device-delete-permanently d.uid %}">
+        <button class="btn btn-danger btn-small" type="submit">
+         <i class="icon-trash"></i> {% trans "Delete Permanently" %}
+        </button>
+       </form>
       </td>
 
      </tr>
     {% endfor %}
    </table>
-
-
    {% endif %}
 
-  <div>
-   <a href="{% url device-edit-new %}">
-    <img src="/media/subscribe.png" class="action-button" />
-    {% trans "Create a Device" %}
-   </a>
-  </div>
+{% endblock %}
 
-   <div class="info"><strong>{% trans "How do I add a new device?" %}</strong> {% trans "Just upload your subscriptions with a new device using gPodder, and it will automatically show up in this list." %}</div>
+
+{% block sidebar %}
+
+  <div class="well">
+
+   <h4>{% trans "Adding New Devices" %}</h4>
+   <p>
+    {% trans "Just upload your subscriptions from a client, and it will automatically show up here." %}
+   </p>
+
+   <p>
+    {% trans "You can also manually create a new device." %}
+   </p>
+
+    <a class="btn btn-success" href="{% url device-edit-new %}">
+     <i class="icon-plus"></i> {% trans "Create Device" %}
+    </a>
+
+ </div>
+
 {% endblock %}
 

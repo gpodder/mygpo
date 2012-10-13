@@ -4,9 +4,10 @@ from optparse import make_option
 from django.core.management.base import BaseCommand
 
 from mygpo.core.models import Podcast, SubscriberData
-from mygpo.users.models import PodcastUserState
 from mygpo.utils import progress
 from mygpo.decorators import repeat_on_conflict
+from mygpo.db.couchdb.podcast import podcast_count, all_podcasts
+from mygpo.db.couchdb.podcast_state import podcast_subscriber_count
 
 
 class Command(BaseCommand):
@@ -23,11 +24,11 @@ class Command(BaseCommand):
         # couchdbkit doesn't preserve microseconds
         started = datetime.utcnow().replace(microsecond=0)
 
-        podcasts = Podcast.all_podcasts()
-        total = Podcast.view('podcasts/by_oldid', limit=0).total_rows
+        podcasts = all_podcasts()
+        total = podcast_count()
 
         for n, podcast in enumerate(podcasts):
-            subscriber_count = self.get_subscriber_count(podcast)
+            subscriber_count = podcast_subscriber_count(podcast)
             self.update(podcast=podcast, started=started, subscriber_count=subscriber_count)
 
             if not silent:
@@ -48,21 +49,3 @@ class Command(BaseCommand):
 
         podcast.subscribers = sorted(podcast.subscribers + [data], key=lambda e: e.timestamp)
         podcast.save()
-
-
-    @staticmethod
-    def get_subscriber_count(podcast):
-        db = PodcastUserState.get_db()
-        subscriber_sum = 0
-
-        for podcast_id in podcast.get_ids():
-            x = db.view('subscriptions/by_podcast',
-                    startkey    = [podcast_id, None],
-                    endkey      = [podcast_id, {}],
-                    reduce      = True,
-                    group       = True,
-                    group_level = 2,
-                )
-            subscriber_sum += x.count()
-
-        return subscriber_sum

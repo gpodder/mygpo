@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load podcasts %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/admin/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/admin/"|section_menu:"Admin" }}{% endblock %}
+
+{% block title %}{% trans "Merge Finished" %}{% endblock %}
+
+{% block header %}
+ <h1>{% trans "Merge Finished" %}</h1>
+{% endblock %}
+
+{% block content %}
+ <p>{% trans "The following actions were recorded:" %}
+  <ul>
+   {% for action, count in actions %}
+    <li>{{ action }}: {{ count }}</li>
+   {% endfor %}
+  </ul>
+ </p>
+
+ <p>{% trans "Go to podcast" %} {% podcast_group_link podcast %}</p>
+
+{% endblock %}
+

@@ -16,9 +16,10 @@
 #
 
 import sys
-from itertools import islice
 from collections import defaultdict
 from datetime import datetime, timedelta
+
+import gevent
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
@@ -27,20 +28,23 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.contrib.sites.models import RequestSite
+from django.views.generic.base import View
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control
 
 from mygpo.decorators import repeat_on_conflict
-from mygpo.core import models
-from mygpo.core.models import Podcast, Episode
-from mygpo.directory.tags import Tag
+from mygpo.core.podcasts import PodcastSet
 from mygpo.directory.toplist import PodcastToplist
-from mygpo.users.models import Suggestions, History, HistoryEntry, DeviceDoesNotExist
-from mygpo.users.models import PodcastUserState, User
-from mygpo.web import utils
-from mygpo.api import backend
-from mygpo.utils import flatten, parse_range
-from mygpo.cache import get_cache_or_calc
+from mygpo.users.models import Suggestions, History, HistoryEntry, \
+         DeviceDoesNotExist
+from mygpo.web.utils import process_lang_params
+from mygpo.utils import parse_range
+from mygpo.web.views.podcast import slug_id_decorator
+from mygpo.db.couchdb.episode import favorite_episodes_for_user
+from mygpo.db.couchdb.podcast import podcast_by_id, random_podcasts
+from mygpo.db.couchdb.user import suggestions_for_user
+from mygpo.db.couchdb.directory import tags_for_user
+from mygpo.db.couchdb.podcastlist import podcastlists_for_user
 
 
 @vary_on_cookie
@@ -57,21 +61,11 @@ def home(request):
 def welcome(request):
     current_site = RequestSite(request)
 
-    podcasts = get_cache_or_calc('podcast-count', timeout=60*60,
-                    calc=lambda: Podcast.count())
-    users    = get_cache_or_calc('user-count', timeout=60*60,
-                    calc=lambda: User.count())
-    episodes = get_cache_or_calc('episode-count', timeout=60*60,
-                    calc=lambda: Episode.count())
-
-    lang = utils.process_lang_params(request)
+    lang = process_lang_params(request)
 
     toplist = PodcastToplist(lang)
 
     return render(request, 'home.html', {
-          'podcast_count': podcasts,
-          'user_count': users,
-          'episode_count': episodes,
           'url': current_site,
           'toplist': toplist,
     })
@@ -82,29 +76,64 @@ def welcome(request):
 @login_required
 def dashboard(request, episode_count=10):
 
+    subscribed_podcasts = list(request.user.get_subscribed_podcasts())
     site = RequestSite(request)
 
-    user = request.user
-    subscribed_podcasts = user.get_subscribed_podcasts()
-    devices = user.active_devices
+    checklist = []
+
+    if request.user.devices:
+        checklist.append('devices')
+
+    if subscribed_podcasts:
+        checklist.append('subscriptions')
+
+    if favorite_episodes_for_user(request.user):
+        checklist.append('favorites')
+
+    if not request.user.get_token('subscriptions_token'):
+        checklist.append('share')
+
+    if not request.user.get_token('favorite_feeds_token'):
+        checklist.append('share-favorites')
+
+    if not request.user.get_token('userpage_token'):
+        checklist.append('userpage')
+
+    if tags_for_user(request.user):
+        checklist.append('tags')
+
+    # TODO add podcastlist_count_for_user
+    if podcastlists_for_user(request.user._id):
+        checklist.append('lists')
+
+    if request.user.published_objects:
+        checklist.append('publish')
 
     tomorrow = datetime.today() + timedelta(days=1)
-    newest_episodes = user.get_newest_episodes(tomorrow)
-    newest_episodes = islice(newest_episodes, 0, episode_count)
 
-    lang = utils.get_accepted_lang(request)
-    lang = utils.sanitize_language_codes(lang)
+    podcasts = PodcastSet(subscribed_podcasts)
 
-    # for performance reasons, we only consider the first three languages
-    lang = lang[:3]
-    random_podcasts = islice(backend.get_random_picks(lang), 0, 5)
+    newest_episodes = podcasts.get_newest_episodes(tomorrow, episode_count)
+
+    def get_random_podcasts():
+        random_podcast = next(random_podcasts(), None)
+        if random_podcast:
+            yield random_podcast.get_podcast()
+
+    # we only show the "install reader" link in firefox, because we don't know
+    # yet how/if this works in other browsers.
+    # hints appreciated at https://bugs.gpodder.org/show_bug.cgi?id=58
+    show_install_reader = \
+                'firefox' in request.META.get('HTTP_USER_AGENT', '').lower()
 
     return render(request, 'dashboard.html', {
-            'site': site,
-            'devices': devices,
+            'user': request.user,
             'subscribed_podcasts': subscribed_podcasts,
-            'newest_episodes': newest_episodes,
-            'random_podcasts': random_podcasts,
+            'newest_episodes': list(newest_episodes),
+            'random_podcasts': get_random_podcasts(),
+            'checklist': checklist,
+            'site': site,
+            'show_install_reader': show_install_reader,
         })
 
 
@@ -140,10 +169,8 @@ def history(request, count=15, uid=None):
 
 @never_cache
 @login_required
-def blacklist(request, podcast_id):
-    podcast_id = int(podcast_id)
-    blacklisted_podcast = Podcast.for_oldid(podcast_id)
-
+@slug_id_decorator
+def blacklist(request, blacklisted_podcast):
     suggestion = Suggestions.for_user(request.user)
 
     @repeat_on_conflict(['suggestion'])
@@ -151,10 +178,13 @@ def blacklist(request, podcast_id):
         suggestion.blacklist.append(podcast_id)
         suggestion.save()
 
-    _update(suggestion=suggestion, podcast_id=blacklisted_podcast.get_id())
+    @repeat_on_conflict(['user'])
+    def _not_uptodate(user):
+        user.suggestions_up_to_date = False
+        user.save()
 
-    request.user.suggestions_up_to_date = False
-    request.user.save()
+    _update(suggestion=suggestion, podcast_id=blacklisted_podcast.get_id())
+    _not_uptodate(user=request.user)
 
     return HttpResponseRedirect(reverse('suggestions'))
 
@@ -164,7 +194,7 @@ def blacklist(request, podcast_id):
 def rate_suggestions(request):
     rating_val = int(request.GET.get('rate', None))
 
-    suggestion = Suggestions.for_user(request.user)
+    suggestion = suggestions_for_user(request.user)
     suggestion.rate(rating_val, request.user._id)
     suggestion.save()
 
@@ -177,7 +207,7 @@ def rate_suggestions(request):
 @cache_control(private=True)
 @login_required
 def suggestions(request):
-    suggestion_obj = Suggestions.for_user(request.user)
+    suggestion_obj = suggestions_for_user(request.user)
     suggestions = suggestion_obj.get_podcasts()
     current_site = RequestSite(request)
     return render(request, 'suggestions.html', {
@@ -193,8 +223,8 @@ def mytags(request):
     tags_podcast = {}
     tags_tag = defaultdict(list)
 
-    for podcast_id, taglist in Tag.for_user(request.user).items():
-        podcast = Podcast.get(podcast_id)
+    for podcast_id, taglist in tags_for_user(request.user).items():
+        podcast = podcast_by_id(podcast_id)
         tags_podcast[podcast] = taglist
 
         for tag in taglist:
@@ -204,3 +234,20 @@ def mytags(request):
         'tags_podcast': tags_podcast,
         'tags_tag': dict(tags_tag.items()),
     })
+
+
+
+class GeventView(View):
+    """ View that provides parts of the context via gevent coroutines """
+
+    def get_context(self, context_funs):
+        """ returns a dictionary that can be used for a template context
+
+        context_funs is a context-key => Greenlet object mapping """
+
+        gevent.joinall(context_funs.values())
+
+        for key, gev in context_funs.items():
+            context_funs[key] = gev.get()
+
+        return context_funs

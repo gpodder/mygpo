@@ -32,7 +32,7 @@ from django.utils.translation import ugettext as _
 
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.api.backend import get_device, BulkSubscribe
-from mygpo.couchdb import BulkException
+from mygpo.couch import BulkException
 from mygpo.core import models
 from mygpo.core.models import Podcast
 from mygpo.users.models import Suggestions
@@ -47,7 +47,8 @@ from mygpo.log import log
 from mygpo.decorators import allowed_methods
 from mygpo.utils import parse_range
 from mygpo.json import json
-
+from mygpo.db.couchdb.podcast import podcasts_by_id
+from mygpo.db.couchdb.user import suggestions_for_user
 
 ALLOWED_FORMATS = ('txt', 'opml', 'json', 'jsonp', 'xml')
 
@@ -311,7 +312,7 @@ def search(request, format):
 def suggestions(request, count, format):
     count = parse_range(count, 1, 100, 100)
 
-    suggestion_obj = Suggestions.for_user(request.user)
+    suggestion_obj = suggestions_for_user(request.user)
     suggestions = suggestion_obj.get_podcasts(count)
     title = _('gpodder.net - %(count)d Suggestions') % {'count': len(suggestions)}
     domain = RequestSite(request).domain
@@ -340,7 +341,7 @@ def example_podcasts(request, format):
         try:
             examples = ExamplePodcasts.get('example_podcasts')
             ids = examples.podcast_ids
-            podcasts = list(Podcast.get_multi(ids))
+            podcasts = podcasts_by_id(ids)
             cache.set('example-podcasts', podcasts)
 
         except ResourceNotFound:

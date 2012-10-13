@@ -23,8 +23,6 @@ from datetime import datetime, timedelta, date
 import time
 import hashlib
 
-from django.core.cache import cache
-
 
 def daterange(from_date, to_date=None, leap=timedelta(days=1)):
     """
@@ -247,58 +245,6 @@ def intersect(a, b):
 
 
 
-def multi_request_view(cls, view, wrap=True, auto_advance=True,
-        *args, **kwargs):
-    """
-    splits up a view request into several requests, which reduces
-    the server load of the number of returned objects is large.
-
-    NOTE: As such a split request is obviously not atomical anymore, results
-    might skip some elements of contain some twice
-
-    If auto_advance is False the method will always request the same range.
-    This can be useful when the view contain unprocessed items and the caller
-    processes the items, thus removing them from the view before the next
-    request.
-    """
-
-    per_page = kwargs.get('limit', 1000)
-    kwargs['limit'] = per_page + 1
-    db = cls.get_db()
-    wrapper = kwargs.pop('wrapper', cls.wrap)
-    cont = True
-
-    while cont:
-
-        resp = db.view(view, *args, **kwargs)
-        cont = False
-
-        for n, obj in enumerate(resp.iterator()):
-
-            key = obj['key']
-
-            if wrap:
-                doc = wrapper(obj['doc']) if wrapper else obj['doc']
-                docid = doc._id if wrapper else obj['id']
-            else:
-                docid = obj.get('id', None)
-                doc = obj
-
-            if n == per_page:
-                if auto_advance:
-                    kwargs['startkey'] = key
-                    if docid is not None:
-                        kwargs['startkey_docid'] = docid
-                    if 'skip' in kwargs:
-                        del kwargs['skip']
-
-                # we reached the end of the page, load next one
-                cont = True
-                break
-
-            yield doc
-
-
 def remove_control_chars(s):
     import unicodedata, re
 
@@ -344,40 +290,6 @@ def parse_range(s, min, max, default=None):
     except (ValueError, TypeError):
         return default if default is not None else (max-min)/2
 
-
-def get_to_dict(cls, ids, get_id=lambda x: x._id, use_cache=False):
-
-    ids = list(set(ids))
-    objs = dict()
-
-    cache_objs = []
-    if use_cache:
-        for id in ids:
-            obj = cache.get(id)
-            if obj is not None:
-                cache_objs.append(obj)
-                ids.remove(id)
-
-    db_objs = list(cls.get_multi(ids))
-
-    for obj in (cache_objs + db_objs):
-
-        # get_multi returns dict {'key': _id, 'error': 'not found'}
-        # for non-existing objects
-        if isinstance(obj, dict) and 'error' in obj:
-            _id = obj['key']
-            objs[_id] = None
-            continue
-
-        ids = obj.get_ids() if hasattr(obj, 'get_ids') else [get_id(obj)]
-        for i in ids:
-            objs[i] = obj
-
-    if use_cache:
-        for obj in db_objs:
-            cache.set(get_id(obj), obj)
-
-    return objs
 
 
 def flatten(l):
@@ -482,13 +394,6 @@ def is_url(string):
     return bool(re_url.match(string))
 
 
-def is_couchdb_id(id_str):
-    import string
-    import operator
-    import functools
-    f = functools.partial(operator.contains, string.hexdigits)
-    return len(id_str) == 32 and all(map(f, id_str))
-
 
 # from http://stackoverflow.com/questions/2892931/longest-common-substring-from-more-than-two-strings-python
 # this does not increase asymptotical complexity
@@ -558,3 +463,11 @@ def file_hash(f, h=hashlib.md5, block_size=2**20):
     for chunk in iter(lambda: f.read(block_size), ''):
          f_hash.update(chunk)
     return f_hash
+
+
+
+def split_list(l, prop):
+    """ split elements that satisfy a property, and those that don't """
+    match   = filter(prop, l)
+    nomatch = [x for x in l if x not in match]
+    return match, nomatch

@@ -21,16 +21,11 @@ import random
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate
-from django.contrib.auth.decorators import login_required
-from django.template.defaultfilters import slugify
 from django.contrib import messages
 from django.contrib.sites.models import RequestSite
 from django.conf import settings
 from django.utils.translation import ugettext as _
-from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache
-
-from couchdbkit import ResourceConflict
 
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.web.forms import RestorePasswordForm
@@ -45,7 +40,6 @@ def login(request, user):
     login(request, user)
 
 
-
 @never_cache
 def login_user(request):
     # Do not show login page for already-logged-in users
@@ -53,15 +47,10 @@ def login_user(request):
         return HttpResponseRedirect(DEFAULT_LOGIN_REDIRECT)
 
     if 'user' not in request.POST or 'pwd' not in request.POST:
-        if request.GET.get('restore_password', False):
-            form = RestorePasswordForm()
-        else:
-            form = None
 
         return render(request, 'login.html', {
             'url': RequestSite(request),
             'next': request.GET.get('next', ''),
-            'restore_password_form': form,
         })
 
     username = request.POST['user']
@@ -112,8 +101,15 @@ def get_user(username, email, is_active=None):
 
 
 @never_cache
-@allowed_methods(['POST'])
 def restore_password(request):
+
+    if request.method == 'GET':
+        form = RestorePasswordForm()
+        return render(request, 'restore_password.html', {
+            'form': form,
+        })
+
+
     form = RestorePasswordForm(request.POST)
     if not form.is_valid():
         return HttpResponseRedirect('/login/')

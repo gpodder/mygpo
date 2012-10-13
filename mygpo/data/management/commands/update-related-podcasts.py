@@ -7,6 +7,7 @@ from mygpo.decorators import repeat_on_conflict
 from mygpo.core.models import Podcast
 from mygpo.data.podcast import calc_similar_podcasts
 from mygpo.utils import progress
+from mygpo.db.couchdb.podcast import podcast_count, all_podcasts
 
 
 class Command(BaseCommand):
@@ -22,8 +23,8 @@ class Command(BaseCommand):
 
         max_related = options.get('max')
 
-        podcasts = Podcast.all_podcasts()
-        total = Podcast.view('podcasts/by_id', limit=0).total_rows
+        podcasts = all_podcasts()
+        total = podcast_count()
 
         for (n, podcast) in enumerate(podcasts):
 

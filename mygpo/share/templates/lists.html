@@ -12,9 +12,12 @@
 
 {% block title %}{% trans "Podcast Lists" %}{% endblock %}
 
+{% block header %}
+   <h1>{% trans "Podcast Lists" %}</h1>
+{% endblock %}
+
+
 {% block content %}
-  <h1>{% trans "Podcast Lists" %}</h1>
-  <hr />
 
   <table class="list">
    {% for list in lists %}
@@ -24,23 +27,38 @@
      <td>
       <form action="{% url list-delete user.username list.slug %}" method="post">
        {% csrf_token %}
-       <input type="submit" class="remove" value="" />
+       <button class="btn btn-danger btn-small" type="submit">
+        <i class="icon-trash"></i> {% trans "Delete" %}
+       </button>
       </form>
      </td>
+    </tr>
+   {% empty %}
+    <tr>
+     <td colspan="3">{% trans "You don't have any podcast lists yet." %}</td>
     </tr>
    {% endfor %}
   </table>
 
-  <hr />
-  <h2>{% trans "Create List" %}</h2>
-  <form action="{% url list-create %}" method="post">
+{% endblock %}
+
+
+{% block sidebar %}
+
+  <div class="well">
+
+  <h4>{% trans "Create List" %}</h4>
+  <form class="form-inline" action="{% url list-create %}" method="post">
    {% csrf_token %}
-   Title: <input type="text" name="title" />
-   <button type="submit">{% trans "Create" %}</button>
+   <div class="input-append">
+    <input placeholder="Title" class="input-medium" type="text" name="title" />
+    <button class="btn btn-primary" type="submit">{% trans "Create" %}</button>
+   </div>
   </form>
 
-  <div class="info">
+  <p>
    {% blocktrans %}Podcast Lists are intended to share podcasts about certain topics and are therefore always visible to everyone.{% endblocktrans %}
-  </div>
+  </p>
+ </div>
 
 {% endblock %}

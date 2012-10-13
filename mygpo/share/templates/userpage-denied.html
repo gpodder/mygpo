@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load podcasts %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/share/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/share/"|section_menu:other_user.username }}{% endblock %}
+
+{% block title %}{{ other_user.username }}{% endblock %}
+
+{% block header %}
+ <h1>{{ other_user.username }}</h1>
+{% endblock %}
+
+{% block content %}
+ <p>{% blocktrans with other_user.username as username %}{{ username }} didn't share his user page with you. Maybe you should contact him to get the correct link.{% endblocktrans %}</p>
+
+ {% if user.is_authenticated %}
+  {% url share as share-url %}
+  <div class="info"><strong>{% trans "Want to have your own user page?" %}</strong>{% blocktrans %} Go to your <a href="{{ share-url }}">Share Page</a> to get the link.</a>{% endblocktrans %}</div>
+ {% endif %}
+
+{% endblock %}

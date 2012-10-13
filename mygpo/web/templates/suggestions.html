@@ -8,49 +8,63 @@
 
 {% block title %}{% trans "Suggested Podcasts" %}{% endblock %}
 
+{% block header %}
+   <h1>{% trans "Suggested Podcasts" %}</h1>
+{% endblock %}
+
+
 {% block content %}
-
-  <h1>{% trans "Suggested Podcasts" %}</h1>
-
-  <p>{% blocktrans with entries|length as suggestion_count %}We've selected {{ suggestion_count }} podcasts which you might like.{% endblocktrans %}</p>
-
   <table class="list podcast_list">
-   <tr>
-    <th></th>
-    <th>{% trans "Podcast" %}</th>
-    <th style="text-align: center;">{% trans "Subscribe" %}</th>
-    <th style="text-align: center;">{% trans "Not Interested" %}</th>
-   </tr>
   {% for podcast in entries %}
    <tr>
-    <td>{{ podcast|podcast_logo }}</td>
+    <td class="logo">{{ podcast|podcast_logo }}</td>
     <td>
-        <p class="title">{% podcast_group_link podcast %}</p>
-            <p class="description">{{ podcast.description|striptags|truncatewords:"12" }}</p></td>
-    <td style="text-align: center;">
-     <a href="{% podcast_link_target podcast "subscribe" %}"><img src="/media/subscribe.png" alt="+" /></a>
+     <p class="title">{% podcast_group_link podcast %}</p>
+     <p class="description">{{ podcast.description|striptags|truncatewords:"12" }}</p>
     </td>
-    <td style="text-align: center;">
-     <form action="{% url suggestions-blacklist podcast.oldid %}">
+    <td>
+      <a class="btn btn-success btn-small" href="{% podcast_link_target podcast "subscribe" %}">
+       <i class="icon-ok"></i> {% trans "Subscribe" %}
+      </a>
+    </td>
+    <td>
+     <form action="{% podcast_link_target podcast "suggestions-blacklist" %}" style="display: inline;" >
       {% csrf_token %}
-      <input class="blacklist" type="submit" value="" />
+      <button class="btn btn-danger btn-small" type="submit">
+       <i class="icon-ban-circle"></i> {% trans "No Interest" %}
+      </button>
      </form>
+    </td>
+   </tr>
+  {% empty %}
+   <tr>
+    <td colspan="3">
+     {% trans "No Suggestions Yet" %}
+    </td>
    </tr>
   {% endfor %}
   </table>
 
-  <div class="rate">
-   <strong>{% trans "Do you like our suggestions?" %}</strong>
-   <form action="{% url suggestions-rate %}?rate=1" method="post" class="rate">
-    {% csrf_token %}
-    <input type="submit" value="{% trans "Yes" %}" class="rate" />
-   </form>
-   <form action="{% url suggestions-rate %}?rate=-1" method="post" class="rate">
-    {% csrf_token %}
-    <input type="submit" value="{% trans "No" %}" class="rate" />
-   </form>
-  </div>
+  {% if entries %}
+ <a class="btn" href="{% url suggestions-opml 15 "opml" %}">
+  <i class="icon-download"></i>
+   {% trans "Download OPML" %}
+ </a>
+  {% endif %}
 
-  <div class="info"><strong>Get your suggestions on your Client</strong>! Access <a href="{% url suggestions-opml 15 "opml" %}">http://{{ url }}{% url suggestions-opml 15 "opml" %}</a> to get 15 of our recommended podcasts.</div>
 {% endblock %}
 
+
+{% block javascript %}
+
+    <script language="javascript">
+        <!--
+        function submitForm(formid)
+        {
+            document.forms[formid].submit();
+            return true;
+        }
+        -->
+    </script>
+
+{% endblock %}

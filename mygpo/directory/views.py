@@ -1,86 +1,93 @@
-from itertools import imap as map, islice
+from itertools import imap as map
 from math import ceil
 
-from django.core.cache import cache
-from django.http import HttpResponseRedirect, HttpResponseNotFound
+from django.http import HttpResponseNotFound
 from django.shortcuts import render
 from django.contrib.sites.models import RequestSite
-from django.views.decorators.cache import cache_page, cache_control
+from django.views.decorators.cache import cache_control
 from django.views.decorators.vary import vary_on_cookie
+from django.utils.decorators import method_decorator
+from django.views.generic.base import View
 
-from mygpo.core.models import Podcast
 from mygpo.core.proxy import proxy_object
-from mygpo.data.mimetype import CONTENT_TYPES
-from mygpo.directory.models import Category
-from mygpo.directory.topics import Topics
-from mygpo.directory.toplist import PodcastToplist, EpisodeToplist
+from mygpo.directory.toplist import PodcastToplist, EpisodeToplist, \
+         TrendingPodcasts
 from mygpo.directory.search import search_podcasts
-from mygpo.web import utils
-from mygpo.directory.tags import TagCloud
-from mygpo.utils import flatten, get_to_dict
-from mygpo.share.models import PodcastList
+from mygpo.web.utils import process_lang_params, get_language_names, \
+         get_page_list
+from mygpo.directory.tags import Topics
 from mygpo.users.models import User
-from mygpo.cache import get_cache_or_calc
+from mygpo.db.couchdb.podcast import get_podcast_languages, podcasts_by_id, \
+         random_podcasts, podcasts_to_dict
+from mygpo.db.couchdb.directory import category_for_tag
+from mygpo.db.couchdb.podcastlist import random_podcastlists, \
+         podcastlist_count, podcastlists_by_rating
 
 
 @vary_on_cookie
 @cache_control(private=True)
 def toplist(request, num=100, lang=None):
 
-    try:
-        lang = utils.process_lang_params(request)
-    except utils.UpdatedException, updated:
-        return HttpResponseRedirect('/toplist/?lang=%s' % ','.join(updated.data))
+    lang = process_lang_params(request)
 
-    type_str = request.GET.get('types', '')
-    set_types = [t for t in type_str.split(',') if t]
-    media_types = set_types or CONTENT_TYPES
-
-    toplist = PodcastToplist(lang, media_types)
+    toplist = PodcastToplist(lang)
     entries = toplist[:num]
 
     max_subscribers = max([p.subscriber_count() for (oldp, p) in entries]) if entries else 0
     current_site = RequestSite(request)
 
-    languages = get_cache_or_calc('podcast-languages', timeout=60*60,
-            calc=lambda: utils.get_podcast_languages())
-    all_langs = utils.get_language_names(languages)
+    languages = get_podcast_languages()
+    all_langs = get_language_names(languages)
 
     return render(request, 'toplist.html', {
         'entries': entries,
         'max_subscribers': max_subscribers,
         'url': current_site,
-        'languages': lang,
+        'language': lang,
         'all_languages': all_langs,
-        'types': media_types,
     })
 
 
 
-@cache_control(private=True)
-@vary_on_cookie
-def browse(request, num_lists=4, num_categories=10, num_tags_cloud=90,
-        podcasts_per_topic=10):
 
-    num_lists      = int(num_lists)
-    num_categories = int(num_categories)
-    num_tags_cloud = int(num_tags_cloud)
+class Directory(View):
+    """ The main directory page """
 
-    topics = Topics(num_lists, num_categories, podcasts_per_topic)
-    topics = islice(topics, 0, num_categories)
+    @method_decorator(cache_control(private=True))
+    @method_decorator(vary_on_cookie)
+    def get(self, request):
 
-    tag_cloud = TagCloud(count=num_tags_cloud, skip=num_categories, sort_by_name=True)
+        return render(request, 'directory.html', {
 
-    return render(request, 'directory.html', {
-        'topics': topics,
-        'tag_cloud': tag_cloud,
-        })
+            # evaluated lazyly, cached by template
+            'topics': Topics(),
+            'trending_podcasts': TrendingPodcasts(''),
+            'podcastlists': self.get_random_list(),
+            'random_podcasts': self.get_random_podcast(),
+            })
+
+
+    def get_random_list(self, podcasts_per_list=5):
+        random_list = next(random_podcastlists(), None)
+        list_owner = None
+        if random_list:
+            random_list = proxy_object(random_list)
+            random_list.more_podcasts = max(0, len(random_list.podcasts) - podcasts_per_list)
+            random_list.podcasts = podcasts_by_id(random_list.podcasts[:podcasts_per_list])
+            random_list.user = User.get(random_list.user)
+
+        yield random_list
+
+    def get_random_podcast(self):
+        random_podcast = next(random_podcasts(), None)
+        if random_podcast:
+            yield random_podcast.get_podcast()
 
 
 @cache_control(private=True)
 @vary_on_cookie
 def category(request, category, page_size=20):
-    category = Category.for_tag(category)
+    category = category_for_tag(category)
     if not category:
         return HttpResponseNotFound()
 
@@ -94,7 +101,7 @@ def category(request, category, page_size=20):
     podcasts = filter(None, entries)
     num_pages = len(category.podcasts) / page_size
 
-    page_list = utils.get_page_list(1, num_pages, page, 15)
+    page_list = get_page_list(1, num_pages, page, 15)
 
     return render(request, 'category.html', {
         'entries': podcasts,
@@ -121,7 +128,7 @@ def search(request, template='search.html', args={}):
         results, total = search_podcasts(q=q, skip=RESULTS_PER_PAGE*(page-1))
         num_pages = total / RESULTS_PER_PAGE
 
-        page_list = utils.get_page_list(1, num_pages, page, 15)
+        page_list = get_page_list(1, num_pages, page, 15)
 
     else:
         results = []
@@ -129,12 +136,14 @@ def search(request, template='search.html', args={}):
         page_list = []
 
     max_subscribers = max([p.subscriber_count() for p in results] + [0])
+    current_site = RequestSite(request)
 
     return render(request, template, dict(
             q= q,
             results= results,
             page_list= page_list,
             max_subscribers= max_subscribers,
+            domain= current_site.domain,
             **args
             ))
 
@@ -142,23 +151,14 @@ def search(request, template='search.html', args={}):
 @cache_control(private=True)
 @vary_on_cookie
 def episode_toplist(request, num=100):
+    lang = process_lang_params(request)
 
-    try:
-        lang = utils.process_lang_params(request)
-    except utils.UpdatedException, updated:
-        return HttpResponseRedirect('/toplist/episodes?lang=%s' % ','.join(updated.data))
-
-    type_str = request.GET.get('types', '')
-    set_types = filter(None, type_str.split(','))
-
-    media_types = set_types or CONTENT_TYPES
-
-    toplist = EpisodeToplist(languages=lang, types=media_types)
+    toplist = EpisodeToplist(language=lang)
     entries = list(map(proxy_object, toplist[:num]))
 
     # load podcast objects
     podcast_ids = [e.podcast for e in entries]
-    podcasts = get_to_dict(Podcast, podcast_ids, Podcast.get_id, True)
+    podcasts = podcasts_to_dict(podcast_ids, True)
     for entry in entries:
         entry.podcast = podcasts.get(entry.podcast, None)
 
@@ -167,18 +167,15 @@ def episode_toplist(request, num=100):
     # Determine maximum listener amount (or 0 if no entries exist)
     max_listeners = max([0]+[e.listeners for e in entries])
 
-    languages = get_cache_or_calc('podcast-languages', timeout=60*60,
-            calc=lambda: utils.get_podcast_languages())
-    all_langs = utils.get_language_names(languages)
+    languages = get_podcast_languages()
+    all_langs = get_language_names(languages)
 
     return render(request, 'episode_toplist.html', {
         'entries': entries,
         'max_listeners': max_listeners,
         'url': current_site,
-        'languages': lang,
+        'language': lang,
         'all_languages': all_langs,
-        'types': media_types,
-        'all_types': CONTENT_TYPES,
     })
 
 
@@ -192,7 +189,7 @@ def podcast_lists(request, page_size=20):
     except ValueError:
         page = 1
 
-    lists = PodcastList.by_rating(skip=(page-1) * page_size, limit=page_size)
+    lists = podcastlists_by_rating(skip=(page-1) * page_size, limit=page_size)
 
 
     def _prepare_list(l):
@@ -203,9 +200,9 @@ def podcast_lists(request, page_size=20):
 
     lists = map(_prepare_list, lists)
 
-    num_pages = ceil(PodcastList.count() / float(page_size))
+    num_pages = int(ceil(podcastlist_count() / float(page_size)))
 
-    page_list = utils.get_page_list(1, num_pages, page, 15)
+    page_list = get_page_list(1, num_pages, page, 15)
 
     return render(request, 'podcast_lists.html', {
         'lists': lists,

@@ -19,7 +19,6 @@ from datetime import datetime
 
 from django.http import HttpResponse
 from django.utils.datastructures import MultiValueDictKeyError
-from django.db import IntegrityError
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 
@@ -27,8 +26,9 @@ from mygpo.log import log
 from mygpo.api.sanitizing import sanitize_urls
 from mygpo.users.models import User
 from mygpo.api.opml import Importer, Exporter
-from mygpo.core.models import Podcast
+from mygpo.core.models import Podcast, SubscriptionException
 from mygpo.api.backend import get_device
+from mygpo.db.couchdb.podcast import podcast_for_url
 
 
 LEGACY_DEVICE_NAME = 'Legacy Device'
@@ -70,22 +70,22 @@ def upload(request):
 
     for n in new:
         try:
-            p = Podcast.for_url(n, create=True)
+            p = podcast_for_url(n, create=True)
         except IntegrityError, e:
             log('/upload: Error trying to get podcast object: %s (error: %s)' % (n, e))
             continue
 
         try:
             p.subscribe(user, dev)
-        except Exception as e:
+        except SubscriptionException as e:
             log('Legacy API: %(username)s: could not subscribe to podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
                 {'username': user.username, 'podcast_url': p.url, 'device_id': dev.id, 'exception': e})
 
     for r in rem:
-        p = Podcast.for_url(r, create=True)
+        p = podcast_for_url(r, create=True)
         try:
             p.unsubscribe(user, dev)
-        except Exception as e:
+        except SubscriptionException as e:
             log('Legacy API: %(username): could not unsubscribe from podcast %(podcast_url) on device %(device_id): %(exception)s' %
                 {'username': user.username, 'podcast_url': p.url, 'device_id': dev.id, 'exception': e})
 
@@ -106,8 +106,7 @@ def getlist(request):
             undelete=True)
     podcasts = dev.get_subscribed_podcasts()
 
-    # FIXME: Get username and set a proper title (e.g. "thp's subscription list")
-    title = 'Your subscription list'
+    title = "{username}'s subscriptions".format(username=user.username)
     exporter = Exporter(title)
 
     opml = exporter.generate(podcasts)

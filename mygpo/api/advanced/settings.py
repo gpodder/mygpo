@@ -20,11 +20,15 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 
 from mygpo.decorators import allowed_methods
-from mygpo.core.models import Episode, Podcast
+from mygpo.core.models import Podcast
 from mygpo.json import json
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.users.models import PodcastUserState, DeviceDoesNotExist
+from mygpo.db.couchdb.episode import episode_for_podcast_url
+from mygpo.db.couchdb.podcast import podcast_for_url
+from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
+from mygpo.db.couchdb.episode_state import episode_state_for_user_episode
 
 
 @csrf_exempt
@@ -47,18 +51,18 @@ def main(request, username, scope):
         return user, settings_obj
 
     def podcast_settings(user, url):
-        podcast = Podcast.for_url(url)
+        podcast = podcast_for_url(url)
         if not podcast:
             raise Http404
-        obj = PodcastUserState.for_user_podcast(user, podcast)
+        obj = podcast_state_for_user_podcast(user, podcast)
         return obj, obj
 
     def episode_settings(user, url, podcast_url):
-        episode = Episode.for_podcast_url(podcast_url, url)
+        episode = episode_for_podcast_url(podcast_url, url)
         if episode is None:
             raise Http404
 
-        episode_state = episode.get_user_state(user)
+        episode_state = episode_state_for_user_episode(user, episode)
         return episode_state, episode_state
 
     models = dict(
