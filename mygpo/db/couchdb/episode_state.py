@@ -1,4 +1,4 @@
-import hashlib
+from hashlib import sha1
 
 from django.core.cache import cache
 
@@ -11,6 +11,14 @@ from mygpo.cache import cache_result
 
 
 def episode_state_for_user_episode(user, episode):
+
+    key = 'episode-state-userid-%s-episodeid-%s' % (sha1(user._id).hexdigest(),
+            sha1(episode._id).hexdigest())
+
+    state = cache.get(key)
+    if state:
+        return state
+
     r = EpisodeUserState.view('episode_states/by_user_episode',
             key          = [user._id, episode._id],
             include_docs = True,
@@ -18,7 +26,9 @@ def episode_state_for_user_episode(user, episode):
         )
 
     if r:
-        return r.first()
+        state = r.one()
+        cache.set(key, state)
+        return state
 
     else:
         podcast = podcast_by_id(episode.podcast)
@@ -29,6 +39,7 @@ def episode_state_for_user_episode(user, episode):
         state.user = user._id
         state.ref_url = episode.url
         state.podcast_ref_url = podcast.url
+        # don't cache here, because the state is saved by the calling function
 
         return state
 
@@ -158,8 +169,8 @@ def episode_listener_count_timespan(episode, start=None, end={}):
 def episode_state_for_ref_urls(user, podcast_url, episode_url):
 
     cache_key = 'episode-state-%s-%s-%s' % (user._id,
-            hashlib.md5(podcast_url).hexdigest(),
-            hashlib.md5(episode_url).hexdigest())
+            sha1(podcast_url).hexdigest(),
+            sha1(episode_url).hexdigest())
 
     state = cache.get(cache_key)
     if state:
