@@ -10,7 +10,7 @@ msgstr ""
 "POT-Creation-Date: 2012-09-16 16:36+0000\n"
 "PO-Revision-Date: 2010-06-17 17:01-0000\n"
 "Last-Translator: Sérgio Marques <smarquespt@gmail.com>\n"
-"Language-Team: \n"
+"Language-Team: PT\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -182,28 +182,28 @@ msgstr "Subscrições de %(username)s's"
 #: api/simple.py:267
 #, python-format
 msgid "gpodder.net - Top %(count)d"
-msgstr ""
+msgstr "gpodder.net - Top %(count)d"
 
 #: api/simple.py:301
 msgid "gpodder.net - Search"
-msgstr ""
+msgstr "gpodder.net - Procura"
 
 #: api/simple.py:316
 #, python-format
 msgid "gpodder.net - %(count)d Suggestions"
-msgstr ""
+msgstr "gpodder.net - %(count)d sugestões"
 
 #: data/mimetype.py:12
 msgid "image"
-msgstr ""
+msgstr "imagem"
 
 #: data/mimetype.py:12
 msgid "audio"
-msgstr ""
+msgstr "áudio"
 
 #: data/mimetype.py:12
 msgid "video"
-msgstr ""
+msgstr "vídeo"
 
 #: directory/templates/directory.html:14 directory/templates/directory.html:17
 msgid "Podcast Directory"
@@ -400,7 +400,7 @@ msgstr "Alter o campo 'SEU_ENDEREÇO'  com o endereço do seu podcast."
 #: web/templates/base.html.py:212 web/templates/home.html:209
 #: web/templates/home.html.py:236 web/templatetags/menu.py:61
 msgid "Advertise"
-msgstr ""
+msgstr "Publicitar"
 
 #: publisher/templates/publisher/advertise.html:12
 #, fuzzy, python-format
@@ -423,7 +423,7 @@ msgstr ""
 
 #: publisher/templates/publisher/advertise.html:22
 msgid "Front Page"
-msgstr ""
+msgstr "Página inicial"
 
 #: publisher/templates/publisher/advertise.html:23
 #, python-format
@@ -446,7 +446,7 @@ msgstr ""
 
 #: publisher/templates/publisher/advertise.html:28
 msgid "Visitors"
-msgstr ""
+msgstr "Visitantes"
 
 #: publisher/templates/publisher/advertise.html:29
 msgid ""
@@ -458,7 +458,7 @@ msgstr ""
 
 #: publisher/templates/publisher/advertise.html:31
 msgid "Start your Advertisement"
-msgstr ""
+msgstr "Inicie a sua publicidade"
 
 #: publisher/templates/publisher/advertise.html:32
 #, python-format
@@ -630,7 +630,7 @@ msgstr ""
 #: publisher/templates/publisher/info.html:41
 #, python-format
 msgid "Link to %(sitename)s"
-msgstr ""
+msgstr "Ligação a %(sitename)s"
 
 #: publisher/templates/publisher/info.html:44
 #, python-format
@@ -1395,7 +1395,7 @@ msgstr ""
 
 #: web/templates/device-edit.html:76
 msgid "Upload"
-msgstr ""
+msgstr "Enviar"
 
 #: web/templates/device-edit.html:85
 #, fuzzy
@@ -1429,7 +1429,7 @@ msgstr "Histórico"
 #: web/templates/device.html:69 web/templates/devicelist.html:24
 #: web/templates/devicelist.html.py:43
 msgid "Configure"
-msgstr ""
+msgstr "Configurar"
 
 #: web/templates/device.html:84 web/templates/device.html.py:102
 msgid "Synchronize"
@@ -1625,7 +1625,7 @@ msgstr ""
 #: web/templates/mytags.html:11 web/templates/mytags.html.py:14
 #: web/templatetags/menu.py:43
 msgid "My Tags"
-msgstr ""
+msgstr "As minhas marcações"
 
 #: web/templates/mytags.html:41
 #, python-format
@@ -1664,7 +1664,7 @@ msgstr ""
 
 #: web/templates/online-help.html:23
 msgid "Nokia Podcasting on Symbian devices"
-msgstr ""
+msgstr "Nokia Podcasting nos dispositivos Symbian"
 
 #: web/templates/online-help.html:26
 msgid ""
@@ -2169,12 +2169,12 @@ msgstr "Este episódio foi transferido"
 #: web/templatetags/episodes.py:55
 #, python-format
 msgid " from %(start)s to %(end)s"
-msgstr ""
+msgstr " de %(start)s para %(end)s"
 
 #: web/templatetags/episodes.py:59
 #, python-format
 msgid " to position %s"
-msgstr ""
+msgstr " para a posição %s"
 
 #: web/templatetags/episodes.py:63
 msgid "This episode has been played"
