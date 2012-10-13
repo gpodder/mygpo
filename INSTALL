@@ -10,16 +10,6 @@ development version from the repository.
 
   * Python (>= 2.6)
   * [CouchDB](https://couchdb.apache.org/) (>= 1.2)
-  * [python-feedparser](https://github.com/kurtmckee/feedparser/)
-  * [python-dateutil](http://niemeyer.net/python-dateutil)
-  * [python-flup](http://trac.saddi.com/flup)
-  * [python-imaging](http://www.pythonware.com/products/pil/)
-  * [python-pybabel](http://babel.edgewall.org/)
-  * [python-gevent](http://www.gevent.org/)
-  * [couchdbkit](https://github.com/benoitc/couchdbkit)
-  * [Django](http://www.djangoproject.com/)
-  * [django-couchdb-utils](http://github.com/stefankoegl/django-couchdb-utils/)
-  * [pthon-markdown2](https://github.com/trentm/python-markdown2)
 
 
 Basic setup
@@ -30,10 +20,7 @@ Ubuntu 12.04 x86 install, 'should work' with other versions/archs as well).
 
 If you are on a Debian/Ubuntu system, do:
 
-  sudo apt-get install erlang python-feedparser python-dateutil python-flup \
-                       python-imaging python-pybabel python-restkit \
-                       python-gevent
-
+  sudo apt-get install erlang python-pip
   sudo apt-get build-dep couchdb
 
   [ install couchdb 1.2.0 from source ]
@@ -44,25 +31,13 @@ Select a cozy place for the mygpo sources and clone it:
   cd mygpo
 
 Now install additional dependencies locally (you could also use virtualenv or
-some other fancy stuff, but for now, let's keeps things simple):
+some other fancy stuff):
 
-  mkdir lib
-  cd lib
-
-  git clone https://github.com/benoitc/couchdbkit.git
-  mv couchdbkit couchdbkit-git
-  ln -s couchdbkit-git/couchdbkit
-
-  wget https://www.djangoproject.com/download/1.4/tarball/ -O Django-1.4.tar.gz
-  tar xvf Django-1.4.tar.gz
-  rm Django-1.4.tar.gz
-  ln -s Django-1.4/django
-
-  git clone https://github.com/stefankoegl/django-couchdb-utils.git
-  ln -s django-couchdb-utils/django_couchdb_utils
+  pip install -r requirements.txt
 
 That's it for the setup. Now to initialize the DB:
 
+  cd mygpo
   python manage.py sync_couchdb
   python manage.py sync-design-docs
 
