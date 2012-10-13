@@ -51,6 +51,9 @@ def format_time(time):
 def is_tuple(obj):
     return isinstance(obj, tuple)
 
+@register.filter
+def is_list(obj):
+    return isinstance(obj, list)
 
 @register.filter
 def markdown(txt):

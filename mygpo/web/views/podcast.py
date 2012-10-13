@@ -248,15 +248,16 @@ def remove_tag(request, podcast):
 def subscribe(request, podcast):
 
     if request.method == 'POST':
-        form = SyncForm(request.POST)
 
-        try:
-            uid = form.get_target()
-            device = request.user.get_device_by_uid(uid)
-            podcast.subscribe(request.user, device)
+        device_uids = [k for (k,v) in request.POST.items() if k==v]
 
-        except (SubscriptionException, DeviceDoesNotExist, ValueError) as e:
-            messages.error(request, str(e))
+        for uid in device_uids:
+            try:
+                device = request.user.get_device_by_uid(uid)
+                podcast.subscribe(request.user, device)
+
+            except (SubscriptionException, DeviceDoesNotExist, ValueError) as e:
+                messages.error(request, str(e))
 
         return HttpResponseRedirect(get_podcast_link_target(podcast))
 
@@ -265,13 +266,9 @@ def subscribe(request, podcast):
 
     targets = podcast.subscribe_targets(request.user)
 
-    form = SyncForm()
-    form.set_targets(targets, _('Choose a device:'))
-
     return render(request, 'subscribe.html', {
+        'targets': targets,
         'podcast': podcast,
-        'can_subscribe': len(targets) > 0,
-        'form': form
     })
 
 
