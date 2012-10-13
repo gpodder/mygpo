@@ -1,3 +1,4 @@
+from hashlib import sha1
 from random import random
 
 from restkit import RequestFailed
@@ -132,6 +133,7 @@ def podcast_for_slug_id(slug_id):
         return podcast_for_slug(slug_id)
 
 
+@cache_result(timeout=60*60)
 def podcastgroup_for_slug_id(slug_id):
     """ Returns the Podcast for either an CouchDB-ID for a Slug """
 
@@ -182,6 +184,13 @@ def podcastgroup_for_oldid(oldid):
 
 
 def podcast_for_url(url, create=False):
+
+    key = 'podcast-by-url-%s' % sha1(url).hexdigest()
+
+    podcast = cache.get(key)
+    if podcast:
+        return podcast
+
     r = Podcast.view('podcasts/by_url',
             key=url,
             classes=[Podcast, PodcastGroup],
@@ -190,12 +199,15 @@ def podcast_for_url(url, create=False):
 
     if r:
         podcast_group = r.first()
-        return podcast_group.get_podcast_by_url(url)
+        podcast = podcast_group.get_podcast_by_url(url)
+        cache.set(key, podcast)
+        return podcast
 
     if create:
         podcast = Podcast()
         podcast.urls = [url]
         podcast.save()
+        cache.set(key, podcast)
         return podcast
 
     return None
