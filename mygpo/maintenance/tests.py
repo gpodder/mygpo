@@ -71,7 +71,6 @@ class MergeTests(TestCase):
         pm.merge()
 
         state1 = episode_state_for_user_episode(self.user, self.episode1)
-        state2 = episode_state_for_user_episode(self.user, self.episode2)
 
         self.assertIn(action1, state1.actions)
         self.assertIn(action2, state1.actions)
