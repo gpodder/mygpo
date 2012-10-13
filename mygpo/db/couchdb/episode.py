@@ -1,4 +1,7 @@
+from hashlib import sha1
 from datetime import datetime
+
+from django.core.cache import cache
 
 from mygpo.core.models import Podcast, Episode, MergedIdException
 from mygpo.cache import cache_result
@@ -63,6 +66,14 @@ def episode_for_podcast_url(podcast_url, episode_url, create=False):
 
 
 def episode_for_podcast_id_url(podcast_id, episode_url, create=False):
+
+    key = 'episode-podcastid-%s-url-%s' % (sha1(podcast_id).hexdigest(),
+            sha1(episode_url).hexdigest())
+
+    episode = cache.get(key)
+    if episode:
+        return episode
+
     r = Episode.view('episodes/by_podcast_url',
             key          = [podcast_id, episode_url],
             include_docs = True,
@@ -70,18 +81,22 @@ def episode_for_podcast_id_url(podcast_id, episode_url, create=False):
         )
 
     if r:
-        return r.first()
+        episode = r.first()
+        cache.set(key, episode)
+        return episode
 
     if create:
         episode = Episode()
         episode.podcast = podcast_id
         episode.urls = [episode_url]
         episode.save()
+        cache.set(key, episode)
         return episode
 
     return None
 
 
+@cache_result(timeout=60*60)
 def episode_for_slug_id(p_slug_id, e_slug_id):
     """ Returns the Episode for Podcast Slug/Id and Episode Slug/Id """
 
