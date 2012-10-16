@@ -45,6 +45,8 @@ def episode_status_icon(action):
         date_string   = (_(' on %s') % (action.timestamp)) if action.timestamp else ''
         device_string = (_(' on %s') % (action.device.name)) if action.device else ''
 
+        # TODO: add another icon for flattr-event
+
         if action.action == 'new':
             s = '<img src="/media/new.png" alt="new" title="%s" />' % ('%s%s%s' % (_('This episode has been marked new'),date_string, device_string))
         elif action.action == 'download':

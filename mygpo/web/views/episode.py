@@ -275,3 +275,7 @@ add_chapter_oldid     = oldid_decorator(add_chapter)
 remove_chapter_oldid  = oldid_decorator(remove_chapter)
 toggle_favorite_oldid = oldid_decorator(toggle_favorite)
 add_action_oldid      = oldid_decorator(add_action)
+
+#TODO: add view for flattr action that
+# * carries out the flattring
+# * redirects to the episoe page

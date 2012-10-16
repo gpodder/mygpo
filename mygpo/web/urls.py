@@ -78,6 +78,7 @@ urlpatterns += patterns('mygpo.web.views.episode',
                                                                               'remove_chapter',          name='remove-chapter'),
  url(r'^episode/(?P<p_slug_id>[\w-]+)/(?P<e_slug_id>[\w-]+)/toggle-favorite', 'toggle_favorite_slug_id', name='episode-fav-slug-id'),
  url(r'^episode/(?P<p_slug_id>[\w-]+)/(?P<e_slug_id>[\w-]+)/add-action',      'add_action_slug_id',      name='add-episode-action-slug-id'),
+ #TODO add handler for flattr action
 )
 
 from mygpo.web.views.settings import DefaultPrivacySettings, \

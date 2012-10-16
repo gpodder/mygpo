@@ -164,11 +164,18 @@ class EpisodeUserState(Document):
     merged_ids    = StringListProperty()
     chapters      = SchemaListProperty(Chapter)
     podcast       = StringProperty(required=True)
+    # TODO: add timestamp of flattring (used as an indicator if
+    # episode has already been flattred)
 
 
 
     def add_actions(self, actions):
         map(EpisodeAction.validate_time_values, actions)
+
+        # TODO: trigger flattring if
+        # * actions contains a play event
+        # * the episode hasn't been flattred previously
+
         self.actions = list(self.actions) + actions
         self.actions = list(set(self.actions))
         self.actions = sorted(self.actions, key=lambda x: x.timestamp)
@@ -262,6 +269,10 @@ class PodcastUserState(Document):
     ref_url       = StringProperty(required=True)
     disabled_devices = StringListProperty()
     merged_ids    = StringListProperty()
+
+    # TODO: a flag for enabling auto-flattring per podcast can be stored
+    # in the settings field; would be automatically accessible through
+    # the Settings API
 
 
     def remove_device(self, device):
@@ -471,6 +482,7 @@ class User(BaseUser, SyncedDevicesMixin):
     published_objects = StringListProperty()
     deleted  = BooleanProperty(default=False)
     suggestions_up_to_date = BooleanProperty(default=False)
+    # TODO: add fields for storing flattr account info (token / enabled flag)
 
     # token for accessing subscriptions of this use
     subscriptions_token    = StringProperty(default=None)
