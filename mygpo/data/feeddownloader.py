@@ -33,6 +33,8 @@ from mygpo.web.logo import CoverArt
 from mygpo.db.couchdb.episode import episode_for_podcast_id_url, \
          episodes_for_podcast_uncached
 from mygpo.db.couchdb.podcast import podcast_for_url
+from mygpo.db.couchdb.directory import category_for_tag
+from mygpo.directory.tags import update_category
 
 from mygpo.couch import get_main_database
 
@@ -79,9 +81,15 @@ class PodcastUpdater(object):
 
             raise
 
+        if not parsed:
+            self.mark_outdated(podcast)
+            return
 
         podcast = podcast_for_url(parsed.urls[0])
         changed = False
+
+        # we need that later to decide if we can "bump" a category
+        prev_latest_episode_timestamp = podcast.latest_episode_timestamp
 
         changed |= update_a(podcast, 'title', parsed.title or podcast.title)
         changed |= update_a(podcast, 'urls', list(set(podcast.urls + parsed.urls)))
@@ -116,6 +124,8 @@ class PodcastUpdater(object):
             changed |= update_a(podcast, 'latest_episode_timestamp', eps[-1].released)
 
 
+        self.update_categories(podcast, prev_latest_episode_timestamp)
+
         if changed:
             print '      saving podcast'
             podcast.last_update = datetime.utcnow()
@@ -126,6 +136,30 @@ class PodcastUpdater(object):
         assign_missing_episode_slugs(podcast)
 
         self.save_podcast_logo(podcast.logo_url)
+
+
+    def update_categories(self, podcast, prev_timestamp, min_subscribers=5):
+        from datetime import timedelta
+
+        max_timestamp = datetime.utcnow() + timedelta(days=1)
+
+        # no episodes at all
+        if not podcast.latest_episode_timestamp:
+            return
+
+        # no new episode
+        if prev_timestamp and podcast.latest_episode_timestamp <= prev_timestamp:
+            return
+
+        # too far in the future
+        if podcast.latest_episode_timestamp > max_timestamp:
+            return
+
+        # not enough subscribers
+        if podcast.subscriber_count() < min_subscribers:
+            return
+
+        update_category(podcast)
 
 
     def update_episodes(self, podcast, parsed_episodes):
@@ -164,7 +198,7 @@ class PodcastUpdater(object):
                 changed |= update_a(episode, 'description', parsed_episode.description or episode.description)
                 changed |= update_a(episode, 'content', parsed_episode.content or parsed_episode.description or episode.content)
                 changed |= update_a(episode, 'link', parsed_episode.link or episode.link)
-                changed |= update_a(episode, 'released', datetime.utcfromtimestamp(parsed_episode.released))
+                changed |= update_a(episode, 'released', datetime.utcfromtimestamp(parsed_episode.released) if parsed_episode.released else None)
                 changed |= update_a(episode, 'author', parsed_episode.author or episode.author)
                 changed |= update_a(episode, 'duration', parsed_episode.duration or episode.duration)
                 changed |= update_a(episode, 'filesize', parsed_episode.files[0].filesize)

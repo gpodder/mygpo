@@ -66,7 +66,7 @@
   {% cache 3600 tagcloud %}
   <div id="tagcloud">
    {% for tag in topics.tagcloud %}
-    <span style="font-size: {% smartwidthratio tag.weight topics.max_weight 4 1 %}em">
+    <span style="font-size: {% smartwidthratio tag.get_weight topics.min_weight topics.max_weight 4 1 %}em">
      <a href="{% url directory tag.label %}">{{ tag.label }}</a>
     </span>
    {% endfor %}

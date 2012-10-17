@@ -18,10 +18,10 @@ def lookup_list(dict, keys):
 
 
 @register.simple_tag
-def smartwidthratio(val, max_val, upper, lower):
+def smartwidthratio(val, min_val, max_val, upper, lower):
     if max_val == 0:
         return 0
-    return max(lower, (float(val) / max_val * upper))
+    return max(lower, (float(val-min_val) / max_val * upper))
 
 @register.filter
 def page_list(cur, start, total, show_max):

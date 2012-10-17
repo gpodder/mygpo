@@ -22,10 +22,10 @@ class Category(Document):
 
     __metaclass__ = DocumentABCMeta
 
-    label = StringProperty()
-    updated = DateTimeProperty()
+    label = StringProperty(required=True)
+    updated = DateTimeProperty(required=True)
     spellings = StringListProperty()
-    podcasts = SchemaListProperty(CategoryEntry)
+    podcasts = ListProperty(CategoryEntry)
 
 
     def merge_podcasts(self, podcasts):
@@ -53,21 +53,18 @@ class Category(Document):
         self.podcasts = new_entries
 
 
-    def get_podcast_ids(self, start=0, end=20):
-        return [e.podcast for e in self.podcasts[start:end]]
-
-
     def get_podcasts(self, start=0, end=20):
-        cache_id = 'category-%s' % self._id
+        cache_id = 'category-%s-%d-%d' % (self._id, start, end)
 
-        podcasts = cache.get(cache_id, [])
+        podcasts = cache.get(cache_id)
+        if podcasts:
+            return podcasts
 
-        if len(podcasts) < end:
-            ids = self.get_podcast_ids(len(podcasts), end)
-            podcasts.extend(podcasts_by_id(ids))
-            cache.set(cache_id, podcasts)
+        ids = self.podcasts[start:end]
+        podcasts = podcasts_by_id(ids)
+        cache.set(cache_id, podcasts)
 
-        return podcasts[start:end]
+        return podcasts
 
 
 
@@ -77,7 +74,7 @@ class Category(Document):
 
 
     def get_weight(self):
-        return sum([e.weight for e in self.podcasts])
+        return len(self.podcasts)
 
 
     def get_tags(self):
