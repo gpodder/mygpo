@@ -8,7 +8,7 @@ from mygpo.core.models import Podcast
 from mygpo.decorators import query_if_required
 from mygpo.counter import Counter
 from mygpo.core.proxy import proxy_object
-from mygpo.directory.models import Category, CategoryEntry
+from mygpo.directory.models import Category
 from mygpo.db.couchdb.podcast import podcasts_for_tag
 from mygpo.db.couchdb.directory import top_categories, category_for_tag
 

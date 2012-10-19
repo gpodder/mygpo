@@ -7,17 +7,6 @@ from mygpo.core.proxy import DocumentABCMeta
 from mygpo.db.couchdb.podcast import podcasts_by_id
 
 
-class CategoryEntry(DocumentSchema):
-    podcast = StringProperty()
-    weight = FloatProperty()
-
-    def __repr__(self):
-        return 'Podcast %s in Category %s' % (self.podcast, self._id)
-
-    def __cmp__(self, other):
-        return cmp(self.weight, other.weight)
-
-
 class Category(Document):
 
     __metaclass__ = DocumentABCMeta
@@ -25,7 +14,7 @@ class Category(Document):
     label = StringProperty(required=True)
     updated = DateTimeProperty(required=True)
     spellings = StringListProperty()
-    podcasts = ListProperty(CategoryEntry)
+    podcasts = ListProperty()
 
 
     def merge_podcasts(self, podcasts):
