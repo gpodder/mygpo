@@ -16,3 +16,5 @@ from mygpo.share.models import *
 from mygpo.couch import get_main_database
 
 db = get_main_database()
+
+from django.core.cache import cache
