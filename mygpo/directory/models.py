@@ -63,7 +63,7 @@ class Category(Document):
 
 
     def get_weight(self):
-        return len(self.podcasts)
+        return getattr(self, '_weight', len(self.podcasts))
 
 
     def get_tags(self):

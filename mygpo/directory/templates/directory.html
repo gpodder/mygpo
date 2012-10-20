@@ -35,7 +35,7 @@
     {% endif %}
 
     <table class="list">
-     {% for podcast in c.podcasts %}
+     {% for podcast in c.get_podcasts %}
       <tr>
        <td class="logo">{{ podcast|podcast_logo }}</td>
        <td>{% podcast_group_link podcast %}</td>

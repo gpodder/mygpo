@@ -37,31 +37,24 @@ class Topics(object):
         self.total = total
         self.num_cat = num_cat
         self.podcasts_per_cat = podcasts_per_cat
-        self._entries = None
-        self._tag_cloud = None
+        self._categories = None
+        self._tagcloud = None
 
 
     def _needs_query(self):
-        return self._entries is None
+        return self._categories is None
 
 
     def _query(self):
-        self._entries = top_categories(self.total, wrap=False)
+        self._categories = top_categories(0, self.num_cat, True)
+        self._tagcloud = top_categories(self.num_cat, self.total-self.num_cat, False)
 
 
     @property
     @query_if_required()
     def tagcloud(self):
-        if not self._tag_cloud:
-            self._tag_cloud = map(self._prepare_tagcloud_entry,
-                self._entries[self.num_cat:])
-            self._tag_cloud.sort(key = lambda x: x.label.lower())
-
-        return self._tag_cloud
-
-
-    def _prepare_tagcloud_entry(self, resp):
-        return Category.wrap(resp['doc'])
+        self._tagcloud.sort(key = lambda x: x.label.lower())
+        return self._tagcloud
 
 
     @query_if_required()
@@ -76,8 +69,7 @@ class Topics(object):
     @property
     @query_if_required()
     def categories(self):
-        categories = map(self._prepare_category, self._entries[:self.num_cat])
-        return categories
+        return self._categories
 
 
     def _prepare_category(self, resp):

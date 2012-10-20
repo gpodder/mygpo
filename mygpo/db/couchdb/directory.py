@@ -19,20 +19,34 @@ def category_for_tag(tag):
 
 
 @cache_result(timeout=60*60)
-def top_categories(count, wrap=True):
-    if wrap:
-        src = Category
-    else:
-        src = get_main_database()
+def top_categories(offset, count, with_podcasts=False):
+    if with_podcasts:
+        r = Category.view('categories/by_update',
+                descending   = True,
+                skip         = offset,
+                limit        = count,
+                include_docs = True,
+                stale        = 'update_after'
+            )
 
-    r = src.view('categories/by_weight',
-            descending   = True,
-            limit        = count,
-            include_docs = True,
-            stale        = 'update_after',
-        )
+    else:
+        db = get_main_database()
+        r = db.view('categories/by_update',
+                descending   = True,
+                skip         = offset,
+                limit        = count,
+                stale        = 'update_after',
+                wrapper      = _category_wrapper,
+            )
+
     return list(r)
 
+
+def _category_wrapper(r):
+    c = Category()
+    c.label = r['value'][0]
+    c._weight = r['value'][1]
+    return c
 
 
 def tags_for_podcast(podcast):

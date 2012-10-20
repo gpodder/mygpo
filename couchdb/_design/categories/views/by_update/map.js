@@ -4,7 +4,7 @@ function (doc)
     {
         if(doc.updated && (doc.podcasts.length > 10))
         {
-            emit(doc.updated, null);
+            emit(doc.updated, [doc.label, doc.podcasts.length]);
         }
     }
 }
