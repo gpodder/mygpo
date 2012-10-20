@@ -313,7 +313,7 @@ def podcasts_to_dict(ids, use_cache=False):
 
 
 
-def podcasts_need_update(self):
+def podcasts_need_update():
     db = get_main_database()
     res = db.view('episodes/need_update',
             group_level = 1,
