@@ -142,8 +142,12 @@ def create_list(request):
 @list_decorator(must_own=True)
 def add_podcast(request, plist, owner, podcast_id):
 
-    plist.podcasts.append(podcast_id)
-    plist.save()
+    @repeat_on_conflict(['plist'])
+    def _add(plist, podcast_id):
+        plist.podcasts.append(podcast_id)
+        plist.save()
+
+    _add(plist=plist, podcast_id=podcast_id)
 
     list_url = reverse('list-show', args=[owner.username, plist.slug])
     return HttpResponseRedirect(list_url)
@@ -152,8 +156,13 @@ def add_podcast(request, plist, owner, podcast_id):
 @login_required
 @list_decorator(must_own=True)
 def remove_podcast(request, plist, owner, podcast_id):
-    plist.podcasts.remove(podcast_id)
-    plist.save()
+
+    @repeat_on_conflict(['plist'])
+    def _remove(plist, podcast_id):
+        plist.podcasts.remove(podcast_id)
+        plist.save()
+
+    _remove(plist=plist, podcast_id=podcast_id)
 
     list_url = reverse('list-show', args=[owner.username, plist.slug])
     return HttpResponseRedirect(list_url)
