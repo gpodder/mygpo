@@ -258,6 +258,8 @@ def delete(request, device):
             request.user.unsync_device(device)
         device.deleted = True
         user.set_device(device)
+        if user.is_synced(device):
+            user.unsync_device(device)
         user.save()
 
     _delete(user=request.user, device=device)
