@@ -205,7 +205,7 @@ def get_episode_actions(user_id, since=None, until={}, podcast_id=None,
     until_str = until.strftime('%Y-%m-%dT%H:%M:%S') if until else {}
 
     if since_str >= until_str:
-        return
+        return []
 
     if not podcast_id and not device_id:
         view = 'episode_actions/by_user'

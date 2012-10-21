@@ -111,6 +111,7 @@ def suggestions_for_user(user):
 
 @cache_result(timeout=60*60)
 def user_agent_stats():
+    from mygpo.users.models import User
     res = User.view('clients/by_ua_string',
         wrap_doc    = False,
         group_level = 1,
@@ -121,6 +122,7 @@ def user_agent_stats():
 
 
 def deleted_users():
+    from mygpo.users.models import User
     users = User.view('users/deleted',
             include_docs = True,
             reduce       = False,
