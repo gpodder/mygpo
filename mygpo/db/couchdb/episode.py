@@ -67,7 +67,6 @@ def episode_for_podcast_url(podcast_url, episode_url, create=False):
 
 def episode_for_podcast_id_url(podcast_id, episode_url, create=False):
 
-    print sha1(episode_url.encode('utf-8'))
     key = u'episode-podcastid-%s-url-%s' % (
             sha1(podcast_id.encode('utf-8')).hexdigest(),
             sha1(episode_url.encode('utf-8')).hexdigest())
