@@ -42,7 +42,7 @@ class Category(Document):
         self.podcasts = new_entries
 
 
-    def get_podcasts(self, start=0, end=20):
+    def get_podcasts(self, start=0, end=10):
         cache_id = 'category-%s-%d-%d' % (self._id, start, end)
 
         podcasts = cache.get(cache_id)
