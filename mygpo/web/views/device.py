@@ -16,6 +16,7 @@
 #
 
 from functools import wraps
+from xml.parsers.expat import ExpatError
 
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
@@ -214,8 +215,16 @@ def upload_opml(request, device):
         return HttpResponseRedirect(reverse('device-edit', args=[device.uid]))
 
     opml = request.FILES['opml'].read()
-    subscriptions = simple.parse_subscription(opml, 'opml')
-    simple.set_subscriptions(subscriptions, request.user, device.uid, None)
+
+    try:
+        subscriptions = simple.parse_subscription(opml, 'opml')
+        simple.set_subscriptions(subscriptions, request.user, device.uid, None)
+
+    except ExpatError as ee:
+        msg = _('Could not upload subscriptions: {err}').format(err=str(ee))
+        messages.error(request, msg)
+        return HttpResponseRedirect(reverse('device-edit', args=[device.uid]))
+
     return HttpResponseRedirect(reverse('device', args=[device.uid]))
 
 
