@@ -19,6 +19,7 @@
 
 import os.path
 import urllib2
+import httplib
 import hashlib
 from datetime import datetime
 from itertools import chain
@@ -28,6 +29,8 @@ from mygpo.core.slugs import assign_missing_episode_slugs, assign_slug, \
          PodcastSlug
 from feedservice.parse import parse_feed
 from feedservice.parse.text import ConvertMarkdown
+from feedservice.parse.models import ParserException
+from feedservice.parse.feed import FeedparserError
 from mygpo.utils import file_hash, split_list
 from mygpo.web.logo import CoverArt
 from mygpo.db.couchdb.episode import episode_for_podcast_id_url, \
@@ -38,7 +41,8 @@ from mygpo.directory.tags import update_category
 
 from mygpo.couch import get_main_database
 
-
+import socket
+socket.setdefaulttimeout(30)
 
 
 class PodcastUpdater(object):
@@ -59,11 +63,11 @@ class PodcastUpdater(object):
                 for m in range(len(podcast.podcasts)):
                     pg = PodcastGroup.get(podcast._id)
                     p = pg.podcasts[m]
-                    print '{:5d} {:s}'.format(n, p.url)
+                    print '{nr:5d} {url:s}'.format(nr=n, url=p.url)
                     self.update_podcast(p)
 
             else:
-                print '{:5d} {:s}'.format(n, podcast.url)
+                print '{nr:5d} {url:s}'.format(nr=n, url=podcast.url)
                 self.update_podcast(podcast)
 
             print
@@ -74,16 +78,32 @@ class PodcastUpdater(object):
         try:
             parsed = parse_feed(podcast.url, text_processor=ConvertMarkdown())
 
+            if not parsed:
+                self.mark_outdated(podcast, 'not parsed')
+                return
+
+        except ParserException as ex:
+            self.mark_outdated(podcast, str(ex))
+            return
+
+        except FeedparserError as ex:
+            self.mark_outdated(podcast, str(ex))
+            return
+
+        except httplib.InvalidURL as ex:
+            self.mark_outdated(podcast, str(ex))
+            return
+
+        except urllib2.URLError as e:
+            self.mark_outdated(podcast, str(e))
+            return
+
         except urllib2.HTTPError as e:
             if e.code in (404, 400):
-                self.mark_outdated(podcast)
+                self.mark_outdated(podcast, str(e))
                 return
 
             raise
-
-        if not parsed:
-            self.mark_outdated(podcast)
-            return
 
         podcast = podcast_for_url(parsed.urls[0])
         changed = False
@@ -106,11 +126,11 @@ class PodcastUpdater(object):
 
         if podcast.new_location:
             new_podcast = Podcast.for_url(podcast.new_location)
-            if podcast:
-                self.mark_outdated(podcast)
+            if new_podcast != podcast:
+                self.mark_outdated(podcast, 'redirected to different podcast')
                 return
 
-            else:
+            elif not new_podcast:
                 podcast.urls.insert(0, podcast.new_location)
                 changed = True
 
@@ -122,6 +142,7 @@ class PodcastUpdater(object):
         eps = sorted(eps, key=lambda e: e.released)
         if eps:
             changed |= update_a(podcast, 'latest_episode_timestamp', eps[-1].released)
+            changed |= update_a(podcast, 'episode_count', len(eps))
 
 
         self.update_categories(podcast, prev_latest_episode_timestamp)
@@ -198,7 +219,7 @@ class PodcastUpdater(object):
                 changed |= update_a(episode, 'description', parsed_episode.description or episode.description)
                 changed |= update_a(episode, 'content', parsed_episode.content or parsed_episode.description or episode.content)
                 changed |= update_a(episode, 'link', parsed_episode.link or episode.link)
-                changed |= update_a(episode, 'released', datetime.utcfromtimestamp(parsed_episode.released) if parsed_episode.released else None)
+                changed |= update_a(episode, 'released', datetime.utcfromtimestamp(parsed_episode.released) if parsed_episode.released else episode.released)
                 changed |= update_a(episode, 'author', parsed_episode.author or episode.author)
                 changed |= update_a(episode, 'duration', parsed_episode.duration or episode.duration)
                 changed |= update_a(episode, 'filesize', parsed_episode.files[0].filesize)
@@ -274,8 +295,8 @@ class PodcastUpdater(object):
             print e
 
 
-    def mark_outdated(self, podcast):
-        print '      mark outdated'
+    def mark_outdated(self, podcast, msg=''):
+        print '      mark outdated', msg
         podcast.outdated = True
         podcast.last_update = datetime.utcnow()
         podcast.save()
