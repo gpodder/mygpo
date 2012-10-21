@@ -164,17 +164,17 @@ class EpisodeUserState(Document):
     merged_ids    = StringListProperty()
     chapters      = SchemaListProperty(Chapter)
     podcast       = StringProperty(required=True)
-    # TODO: add timestamp of flattring (used as an indicator if
-    # episode has already been flattred)
+    # TODO: add a StringListProperty containing the timestamps of all
+    # successful flattrs
 
 
 
     def add_actions(self, actions):
         map(EpisodeAction.validate_time_values, actions)
 
-        # TODO: trigger flattring if
-        # * actions contains a play event
-        # * the episode hasn't been flattred previously
+        # TODO: trigger flattring if action contains a play-event
+        # TODO: add current time to list of flattr-timestamps if flattring
+        # was successful
 
         self.actions = list(self.actions) + actions
         self.actions = list(set(self.actions))

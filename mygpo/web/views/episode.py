@@ -278,4 +278,4 @@ add_action_oldid      = oldid_decorator(add_action)
 
 #TODO: add view for flattr action that
 # * carries out the flattring
-# * redirects to the episoe page
+# * redirects to the episode page
