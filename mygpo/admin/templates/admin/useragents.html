@@ -8,7 +8,7 @@
 
 {% block title %}{% trans "Admin Area" %}{% endblock %}
 
-{% block header %
+{% block header %}
  <h1>{% trans "User-Agent Statistics" %}</h1>
 {% endblock %}
 
@@ -24,7 +24,7 @@
     <tr>
      <td class="numeric">{{ forloop.counter }}</td>
      <td>{{ ua }}</td>
-     <td>{{ clients|vertical_bar:max_users }}</td>
+     <td>{% vertical_bar clients max_users %}</td>
     </tr>
    {% endfor %}
 
