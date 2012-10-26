@@ -6,6 +6,8 @@ from django.http import HttpResponse, HttpResponseRedirect, \
 from django.views.decorators.cache import never_cache, cache_control
 from django.views.decorators.vary import vary_on_cookie
 from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+from django.contrib import messages
 
 from mygpo.core.proxy import proxy_object
 from mygpo.publisher.auth import require_publisher, is_publisher
@@ -146,6 +148,7 @@ def update_podcast(request, podcast):
 def new_update_token(request, username):
     request.user.create_new_token('publisher_update_token')
     request.user.save()
+    messages.success(request, _('Publisher token updated'))
     return HttpResponseRedirect(reverse('publisher'))
 
 

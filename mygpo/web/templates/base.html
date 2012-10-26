@@ -105,15 +105,6 @@
         </div><!--/span-->
         <div class="span10">
 
-    {% if messages %}
-     {% for message in messages %}
-      <div {% if message.tags %} class="{{ message.tags }}"{% endif %}>
-       {{ message }}
-      </div>
-     {% endfor %}
-    {% endif %}
-
-
     <div class="row-fluid">
      <div class="span12">
       {% block header %}
@@ -122,6 +113,13 @@
      </div>
     </div>
 
+    {% if messages %}
+     {% for message in messages %}
+      <div {% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %}>
+       {{ message }}
+      </div>
+     {% endfor %}
+    {% endif %}
 
     <div class="row-fluid">
      <div class="span8" id="content">
