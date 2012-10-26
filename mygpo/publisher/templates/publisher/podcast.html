@@ -33,22 +33,15 @@
 
 
 {% block content %}
-  <h2>Edit</h2>
-  {% comment %}
-  <p>Please note that information updates from the podcast feed will overwrite any information given here. Please save only what is not contained in the feed.</p>
-  <form method="post" action="{% podcast_link_target podcast %}">
-  {% csrf_token %}
-   <table>
-    {{ form.as_table }}
-   </table>
-   <input type="submit" value="save" />
-  </form>
-  {% endcomment %}
-  <p><a href="{% podcast_link_target podcast "podcast-publisher-update" %}">{% trans "Update from Feed" %}</a> {% trans "(this might take a few seconds)" %}</p>
+  <h2>Podcast Data</h2>
+  <p>{% trans "The podcast information is regularly retrieved from the podcast feed" %}</p>
+  <pre><a href="{{ podcast.url }}">{{ podcast.url }}</a></pre>
+  <p>{% trans "Last update: " %}{{ podcast.last_update|naturaltime }}</p>
 
-  <div class="info">To update all of your published podcasts automatically, you can request the URL (<a href="{% podcast_link_target podcast "podcast-publisher-detail" %}?new_token">Create a new token</a>)<br />
-   <strong><a href="{% url publisher-update user.username %}?token={{ update_token }}">http://{{ site }}{% url publisher-update user.username %}?token={{ update_token }}</a></strong>
-  </div>
+  <form action="{% podcast_link_target podcast "podcast-publisher-update" %}" method="post">
+   {% csrf_token %}
+   <button class="btn" type="submit">{% trans "Update now" %}</button>
+  </form>
 
   <h2>Episodes</h2>
   <p>View and edit <a href="{% podcast_link_target podcast "podcast-publisher-episodes" %}">episode</a> data.</p>

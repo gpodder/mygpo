@@ -36,6 +36,11 @@ h2
     padding-top: .5em;
 }
 
+h3
+{
+    font-size: 12pt;
+}
+
 .brand img
 {
     display: inline;

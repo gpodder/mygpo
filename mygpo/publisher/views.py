@@ -34,10 +34,14 @@ from mygpo.db.couchdb.episode_state import episode_listener_counts
 def home(request):
     if is_publisher(request.user):
         podcasts = podcasts_by_id(request.user.published_objects)
+        site = RequestSite(request)
+        update_token = request.user.get_token('publisher_update_token')
         form = SearchPodcastForm()
         return render(request, 'publisher/home.html', {
+            'update_token': update_token,
             'podcasts': podcasts,
             'form': form,
+            'site': site,
             })
 
     else:
@@ -82,18 +86,6 @@ def podcast(request, podcast):
         group = podcastgroup_by_id(podcast.group)
     else:
         group = None
-
-#    if request.method == 'POST':
-#        form = NonePodcastForm(request.POST, instance=p)
-#        if form.is_valid():
-#            form.save()
-
-#    elif request.method == 'GET':
-#        form = PodcastForm(instance=p)
-
-    if 'new_token' in request.GET:
-        request.user.create_new_token('publisher_update_token')
-        request.user.save()
 
     update_token = request.user.publisher_update_token
 
@@ -147,6 +139,14 @@ def update_podcast(request, podcast):
 
     url = get_podcast_link_target(podcast, 'podcast-publisher-detail')
     return HttpResponseRedirect(url)
+
+
+@never_cache
+@require_publisher
+def new_update_token(request, username):
+    request.user.create_new_token('publisher_update_token')
+    request.user.save()
+    return HttpResponseRedirect(reverse('publisher'))
 
 
 @never_cache
