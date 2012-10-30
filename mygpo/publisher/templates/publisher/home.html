@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load i18n %}
 {% load podcasts %}
 
@@ -39,7 +40,7 @@
   <div class="well">
    <h2>Staff Only</h2>
    <p>{% trans "Go to the publisher page of any podcast by entering its feed URL" %}</p>
-   <form class="form-inline" action="{% url podcast-publisher-search %}" method="post">
+   <form class="form-inline" action="{% url "podcast-publisher-search" %}" method="post">
     {% csrf_token %}
     <div class="input-prepend input-append">
      <span class="add-on"><i class="icon-link"></i></span><input type="text" class="input-xlarge" name="url" id="id_url" />

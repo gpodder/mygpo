@@ -1,3 +1,4 @@
+{% load url from future %}
 {% load i18n %}
 {% load menu %}
 
@@ -61,9 +62,9 @@
               <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-              <li><a href="{% url account %}">Profile</a></li>
+              <li><a href="{% url "account" %}">Profile</a></li>
               <li class="divider"></li>
-              <li><a href="{% url logout %}">Sign Out</a></li>
+              <li><a href="{% url "logout" %}">Sign Out</a></li>
             </ul>
            {% else %}
             <a class="btn dropdown-toggle" data-toggle="dropdown" href="">
@@ -71,8 +72,8 @@
               <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-              <li><a href="{% url login %}">{% trans "Login" %}</a></li>
-              <li><a href="{% url register %}">{% trans "Register" %}</a></li>
+              <li><a href="{% url "login" %}">{% trans "Login" %}</a></li>
+              <li><a href="{% url "register" %}">{% trans "Register" %}</a></li>
             </ul>
            {% endif %}
           </div>
@@ -133,8 +134,8 @@
 
        <div class="well">
         <div style="width: 12em; margin-left: auto; margin-right: auto;">
-         <a class="btn btn-primary" href="{% url login %}">{% trans "Login" %}</a>
-         <a class="btn btn-primary" href="{% url register%}">{% trans "Register" %}</a>
+         <a class="btn btn-primary" href="{% url "login" %}">{% trans "Login" %}</a>
+         <a class="btn btn-primary" href="{% url "register" %}">{% trans "Register" %}</a>
         </div>
        </div>
 
@@ -186,16 +187,16 @@
        <div class="span1">
        <ul>
         <li><strong>{% trans "Discover" %}</strong></li>
-        <li><a href="{% url directory-home %}">{% trans "Directory" %}</a></li>
-        <li><a href="{% url toplist %}">{% trans "Podcasts" %}</a></li>
-        <li><a href="{% url search %}">{% trans "Search" %}</a></li>
+        <li><a href="{% url "directory-home" %}">{% trans "Directory" %}</a></li>
+        <li><a href="{% url "toplist" %}">{% trans "Podcasts" %}</a></li>
+        <li><a href="{% url "search" %}">{% trans "Search" %}</a></li>
        </ul>
        </div>
 
        <div class="span1">
         <ul>
          <li><strong>{% trans "Support" %}</strong></li>
-         <li><a href="{% url help %}">{% trans "Docs" %}</a></li>
+         <li><a href="{% url "help" %}">{% trans "Docs" %}</a></li>
          <li><a href="http://wiki.gpodder.org/wiki/Mailing_List">{% trans "Mailing&nbsp;List" %}</a></li>
          <li><a href="https://getsatisfaction.com/gpoddernet">{%trans "Questions" %}</a></li>
         </ul>
@@ -205,8 +206,8 @@
         <ul>
          <li><strong>{% trans "Support&nbsp;Us" %}</strong></li>
          <li><a href="http://flattr.com/thing/2304/gpodder-net">{% trans "Flattr" %}</a></li>
-         <li><a href="{% url contribute %}">{% trans "Donate" %}</a></li>
-         <li><a href="{% url advertise %}">{% trans "Advertise" %}</a></li>
+         <li><a href="{% url "contribute" %}">{% trans "Donate" %}</a></li>
+         <li><a href="{% url "advertise" %}">{% trans "Advertise" %}</a></li>
         </ul>
        </div>
 
@@ -231,9 +232,9 @@
        <div class="span1">
         <ul>
          <li><strong>{% trans "Publish" %}</strong></li>
-         <li><a href="{% url publisher %}">{% trans "Get&nbsp;Access" %}</a></li>
-         <li><a href="{% url link-here %}">{% trans "Link&nbsp;To&nbsp;Us" %}</a></li>
-         <li><a href="{% url advertise %}">{% trans "Advertise" %}</a></li>
+         <li><a href="{% url "publisher" %}">{% trans "Get&nbsp;Access" %}</a></li>
+         <li><a href="{% url "link-here" %}">{% trans "Link&nbsp;To&nbsp;Us" %}</a></li>
+         <li><a href="{% url "advertise" %}">{% trans "Advertise" %}</a></li>
         </ul>
        </div>
 

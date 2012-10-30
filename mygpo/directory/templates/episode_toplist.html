@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load i18n %}
 {% load podcasts %}
 {% load episodes %}
@@ -51,7 +52,7 @@
 
   <div class="well">
    <h4>{% trans "Language" %}</h4>
-    <form class="form-inline" action="{% url episode-toplist %}" method="get">
+    <form class="form-inline" action="{% url "episode-toplist" %}" method="get">
      <select class="input-medium" name="lang">
       {% if language == "" %}
        <option selected="selected" value="">{% trans "all" %}</option>

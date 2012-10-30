@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+{% load url from future %}
 {% load i18n %}
 {% load podcasts %}
 {% load episodes %}
@@ -49,7 +50,7 @@
      <tr>
       <td></td>
       <td colspan="2">
-       <a href="{% url shared-subscriptions page_user.username %}">
+       <a href="{% url "shared-subscriptions" page_user.username %}">
         {% trans "see all" %}
        </a>
       </td>
@@ -69,7 +70,7 @@
    <table class="list">
     {% for list in lists|slice:":5" %}
      <tr>
-      <td><a href="{% url list-show page_user.username list.slug %}">{{ list.title }}</a></td>
+      <td><a href="{% url "list-show" page_user.username list.slug %}">{{ list.title }}</a></td>
       <td>{% blocktrans with list.podcasts|length as num_podcasts %}{{ num_podcasts }} Podcasts{% endblocktrans %}</td>
      </tr>
     {% endfor %}
@@ -78,7 +79,7 @@
      <tr>
       <td></td>
       <td>
-       <a href="{% url lists-user page_user.username %}">
+       <a href="{% url "lists-user" page_user.username %}">
         {% trans "see all" %}
        </a>
       </td>
@@ -129,7 +130,7 @@
    <tr>
     <td></td>
     <td>
-     <a href="{% url favorites-feed page_user.username %}">
+     <a href="{% url "favorites-feed" page_user.username %}">
       {% trans "see all" %}
      </a>
     </td>

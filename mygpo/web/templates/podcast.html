@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load i18n %}
 {% load humanize %}
 {% load episodes %}
@@ -143,7 +144,7 @@
        <tr>
         <td>
          {{ device|device_icon }}
-         <a href="{% url device device.uid %}">{{ device.name|striptags }}</a>
+         <a href="{% url "device" device.uid %}">{{ device.name|striptags }}</a>
         </td>
         <td style="text-align: center;">
          <form class="form-inline" method="post" action="{% podcast_link_target podcast "unsubscribe" device.uid %}?return_to={% podcast_link_target podcast %}">
@@ -225,7 +226,7 @@
       <td><abbr title="{{ s.timestamp }}">{{ s.timestamp|naturalday }}</abbr></td>
       <td>{{ s|podcast_status_icon }}</td>
       <td>
-       <a href="{% url device s.device.uid %}">{{ s.device|device_icon }} {{ s.device.name|striptags }}</a>
+       <a href="{% url "device" s.device.uid %}">{{ s.device|device_icon }} {{ s.device.name|striptags }}</a>
       </td>
      </tr>
     {% endfor %}

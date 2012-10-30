@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+{% load url from future %}
 {% load i18n %}
 {% load podcasts %}
 {% load charts %}
@@ -30,7 +31,7 @@
 
 {% block header %}
   <h1>{{ podcastlist.title }}</h1>
-  {% url user owner.username as user-lists-url %}
+  {% url "user" owner.username as user-lists-url %}
   <small class="description">{% blocktrans with owner.username as ownername %}a podcast list by <a href="{{ user-lists-url }}">{{ ownername }}</a>{% endblocktrans %}</small>
 {% endblock %}
 
@@ -55,7 +56,7 @@
 
    {% if is_own %}
     <td>
-     <form action="{% url list-remove-podcast owner.username podcastlist.slug podcast.get_id %}" method="post" target="_parent">
+     <form action="{% url "list-remove-podcast" owner.username podcastlist.slug podcast.get_id %}" method="post" target="_parent">
       {% csrf_token %}
       <button class="btn btn-danger btn-small" type="submit" >
        <i class="icon-remove"></i>
@@ -72,7 +73,7 @@
  </table>
 
 
-  <form action="{% url list-rate owner.username podcastlist.slug %}?rate=1" method="post" style="display: inline;" >
+  <form action="{% url "list-rate" owner.username podcastlist.slug %}?rate=1" method="post" style="display: inline;" >
    {% csrf_token %}
    <button class="btn" type="submit">
     <i class="icon-thumbs-up"></i>
@@ -80,7 +81,7 @@
    </button>
   </form>
 
-   <a class="btn" href="{% url list-opml owner.username podcastlist.slug %}">
+   <a class="btn" href="{% url "list-opml" owner.username podcastlist.slug %}">
     <i class="icon-download"></i>
     {% trans "Download as OPML" %}
     </a>
@@ -90,7 +91,7 @@
   <hr />
 
   <h2>Add Podcast</h2>
-  <form method="get" action="{% url list-search owner.username podcastlist.slug %}" class="form-inline" target="results">
+  <form method="get" action="{% url "list-search" owner.username podcastlist.slug %}" class="form-inline" target="results">
    <div class="input-prepend input-append">
     <span class="add-on"><i class="icon-search"></i></span><input type="text" class="input-xxlarge" name="q" {% if q %}value="{{ q }}"{% endif %} ><button class="btn btn-primary" type="submit">{% trans "Search" %}</button>
    </div>
@@ -110,7 +111,7 @@
   <div class="well">
    <h4>{% trans "Your own Podcast Lists" %}</h4>
    <p>{% trans "Create and share your own podcast lists "%}</p>
-   <a class="btn btn-primary" href="{% url lists-overview %}">{% trans "Go" %}</a>
+   <a class="btn btn-primary" href="{% url "lists-overview" %}">{% trans "Go" %}</a>
   </div>
 
  {% endif %}

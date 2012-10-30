@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load i18n %}
 
 {% load menu %}
@@ -12,7 +13,7 @@
 {% endblock %}
 
 {% block content %}
-  <form action="{% url account %}" method="POST" class="well form-horizontal">
+  <form action="{% url "account" %}" method="POST" class="well form-horizontal">
    {% csrf_token %}
    <h3>{% trans "Account Data" %}</h3>
 
@@ -58,7 +59,7 @@
   <h2>{% trans "Delete Account" %}</h2>
 
   <div class="well">
-   <a class="btn btn-danger" href="{% url delete-account %}">{% trans "Delete Account" %}</a>
+   <a class="btn btn-danger" href="{% url "delete-account" %}">{% trans "Delete Account" %}</a>
   </div>
 
 {% endblock %}

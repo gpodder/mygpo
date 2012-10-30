@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+{% load url from future %}
 {% load i18n %}
 {% load podcasts %}
 {% load charts %}
@@ -28,7 +29,7 @@
 
    <div class="span6">
     {% if c.cls == "PodcastList" %}
-     {% url user c.username as user-lists-url %}
+     {% url "user" c.username as user-lists-url %}
      <h2>{% blocktrans with c.title as listtitle and c.username as username %}{{ listtitle }} <span class="by-user">by <a href="{{ user-lists-url }}">{{ username }}</a></span>{% endblocktrans %}</h2>
     {% else %}
      <h2>{{ c.label }}</h2>
@@ -45,9 +46,9 @@
       <td></td>
       <td>
        {% if c.cls == "PodcastList" %}
-        <a href="{% url list-show c.username c.slug %}">{% trans "more..." %}</a>
+        <a href="{% url "list-show" c.username c.slug %}">{% trans "more..." %}</a>
        {% else %}
-        <a href="{% url directory c.label %}">{% trans "more..." %}</a>
+        <a href="{% url "directory" c.label %}">{% trans "more..." %}</a>
        {% endif %}
       <td></td>
      </tr>
@@ -67,7 +68,7 @@
   <div id="tagcloud">
    {% for tag in topics.tagcloud %}
     <span style="font-size: {% smartwidthratio tag.get_weight topics.min_weight topics.max_weight 4 1 %}em">
-     <a href="{% url directory tag.label %}">{{ tag.label }}</a>
+     <a href="{% url "directory" tag.label %}">{{ tag.label }}</a>
     </span>
    {% endfor %}
   </div>
@@ -81,11 +82,11 @@
   {% for podcastlist in podcastlists %}
     <div class="well">
      <h4>
-      <a href="{% url list-show podcastlist.user.username podcastlist.slug %}">
+      <a href="{% url "list-show" podcastlist.user.username podcastlist.slug %}">
        {{ podcastlist.title }}
       </a>
       <small>{% trans "Podcast List by" %}
-       <a href="{% url lists-user podcastlist.user.username %}">
+       <a href="{% url "lists-user" podcastlist.user.username %}">
         {{ podcastlist.user.username }}
        </a>
       </small>
@@ -106,7 +107,7 @@
      </div>
 
      <div class="btn-group">
-      <a class="btn btn-primary" href="{% url lists-overview %}">
+      <a class="btn btn-primary" href="{% url "lists-overview" %}">
       {% trans "Create a Podcast List" %}
      </a>
      </div>

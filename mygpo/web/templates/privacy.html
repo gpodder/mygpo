@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load i18n %}
 {% load podcasts %}
 
@@ -25,7 +26,7 @@
   <p>
    {% if public_subscriptions %}
     {% trans "New subscriptions will be public by default." %}
-    <form method="post" action="{% url privacy_default_private %}">
+    <form method="post" action="{% url "privacy_default_private" %}">
      {% csrf_token %}
      <button class="btn" type="submit">
       <i class="icon-eye-close"></i> {% trans "Change to Private" %}
@@ -33,7 +34,7 @@
     </form>
    {% else %}
     {% trans "New subscriptions will be private by default." %}
-    <form method="post" action="{% url privacy_default_public %}">
+    <form method="post" action="{% url "privacy_default_public" %}">
      {% csrf_token %}
      <button class="btn" type="submit">
       <i class="icon-eye-open"></i> {% trans "Change to Public" %}
@@ -51,7 +52,7 @@
        <td class="logo">{{ podcast|podcast_logo }}</td>
        <td>{% podcast_group_link podcast %}</td>
        <td>
-        <form method="post" action="{% url privacy_podcast_private podcast.get_id %}">
+        <form method="post" action="{% url "privacy_podcast_private" podcast.get_id %}">
          {% csrf_token %}
          <button class="btn btn-small" type="submit">
           <i class="icon-eye-close"></i> {% trans "Make Private" %}
@@ -73,7 +74,7 @@
         <td class="logo">{{ podcast|podcast_logo }}</td>
         <td>{% podcast_group_link podcast %}</td>
         <td>
-        <form method="post" action="{% url privacy_podcast_public podcast.get_id %}">
+        <form method="post" action="{% url "privacy_podcast_public" podcast.get_id %}">
          {% csrf_token %}
          <button class="btn btn-small" type="submit">
           <i class="icon-eye-open"></i> {% trans "Make Public" %}
