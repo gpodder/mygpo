@@ -36,7 +36,7 @@
    </td>
    <td>
     <button class="btn btn-small btn-link {% if not subscriptions_token %}disabled{% endif %}" {% if subscriptions_token %}type="submit" onclick="submitForm('subscriptions_private');"{% endif %}>{% trans "New Token" %}</button>
-    <a class="btn btn-small btn-link" href="{%url privacy %}">Privacy Settings</a>
+    <a class="btn btn-small btn-link" href="{% url "privacy" %}">Privacy Settings</a>
    </td>
   </tr>
 
