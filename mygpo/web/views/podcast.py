@@ -242,7 +242,12 @@ def subscribe(request, podcast):
 
     if request.method == 'POST':
 
+        # multiple UIDs from the /podcast/<slug>/subscribe
         device_uids = [k for (k,v) in request.POST.items() if k==v]
+
+        # single UID from /podcast/<slug>
+        if 'targets' in request.POST:
+            device_uids.append(request.POST.get('targets'))
 
         for uid in device_uids:
             try:
