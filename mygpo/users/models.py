@@ -13,7 +13,6 @@ from django.core.cache import cache
 
 from django_couchdb_utils.registration.models import User as BaseUser
 
-from mygpo.core.models import Podcast
 from mygpo.utils import linearize, get_timestamp
 from mygpo.core.proxy import DocumentABCMeta, proxy_object
 from mygpo.decorators import repeat_on_conflict
@@ -26,7 +25,7 @@ from mygpo.db.couchdb.user import user_history, device_history
 
 RE_DEVICE_UID = re.compile(r'^[\w.-]+$')
 
-
+# TODO: derive from ValidationException?
 class InvalidEpisodeActionAttributes(ValueError):
     """ raised when the attribues of an episode action fail validation """
 
