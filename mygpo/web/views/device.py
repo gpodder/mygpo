@@ -16,14 +16,15 @@
 #
 
 from functools import wraps
+from xml.parsers.expat import ExpatError
 
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, \
-        HttpResponseForbidden, Http404, HttpResponseNotFound
+        HttpResponseNotFound
 from django.contrib import messages
 from mygpo.web.forms import DeviceForm, SyncForm
-from mygpo.web import utils
+from mygpo.web.utils import symbian_opml_changes
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.vary import vary_on_cookie
@@ -31,11 +32,11 @@ from django.views.decorators.cache import never_cache, cache_control
 
 from restkit.errors import Unauthorized
 
-from mygpo.log import log
 from mygpo.api import simple
 from mygpo.decorators import allowed_methods, repeat_on_conflict
-from mygpo.users.models import PodcastUserState, Device, DeviceUIDException, \
+from mygpo.users.models import Device, DeviceUIDException, \
      DeviceDoesNotExist
+from mygpo.db.couchdb.podcast_state import podcast_states_for_device
 
 
 @vary_on_cookie
@@ -125,7 +126,7 @@ def create(request):
             'device_form': device_form,
         })
 
-    except:
+    except Unauthorized:
         messages.error(request, _("You can't use the same Device "
                    "ID for two devices."))
 
@@ -214,8 +215,16 @@ def upload_opml(request, device):
         return HttpResponseRedirect(reverse('device-edit', args=[device.uid]))
 
     opml = request.FILES['opml'].read()
-    subscriptions = simple.parse_subscription(opml, 'opml')
-    simple.set_subscriptions(subscriptions, request.user, device.uid, None)
+
+    try:
+        subscriptions = simple.parse_subscription(opml, 'opml')
+        simple.set_subscriptions(subscriptions, request.user, device.uid, None)
+
+    except ExpatError as ee:
+        msg = _('Could not upload subscriptions: {err}').format(err=str(ee))
+        messages.error(request, msg)
+        return HttpResponseRedirect(reverse('device-edit', args=[device.uid]))
+
     return HttpResponseRedirect(reverse('device', args=[device.uid]))
 
 
@@ -231,7 +240,7 @@ def opml(request, device):
 @login_required
 def symbian_opml(request, device):
     subscriptions = simple.get_subscriptions(request.user, device.uid)
-    subscriptions = map(utils.symbian_opml_changes, subscriptions)
+    subscriptions = map(symbian_opml_changes, subscriptions)
 
     response = simple.format_podcast_list(subscriptions, 'opml', request.user.username)
     response['Content-Disposition'] = 'attachment; filename=%s.opml' % device.uid
@@ -243,13 +252,14 @@ def symbian_opml(request, device):
 @allowed_methods(['POST'])
 def delete(request, device):
 
-    if request.user.is_synced(device):
-        request.user.unsync_device(device)
-
     @repeat_on_conflict(['user'])
     def _delete(user, device):
+        if request.user.is_synced(device):
+            request.user.unsync_device(device)
         device.deleted = True
         user.set_device(device)
+        if user.is_synced(device):
+            user.unsync_device(device)
         user.save()
 
     _delete(user=request.user, device=device)
@@ -266,7 +276,7 @@ def delete_permanently(request, device):
         state.remove_device(dev)
         state.save()
 
-    states = PodcastUserState.for_device(device.id)
+    states = podcast_states_for_device(device.id)
     for state in states:
         remove_device(state=state, dev=device)
 
@@ -298,23 +308,22 @@ def sync(request, device):
     if not form.is_valid():
         return HttpResponseBadRequest('invalid')
 
-    # TODO: remove cascaded trys
+
+    @repeat_on_conflict(['user'])
+    def do_sync(user, device, sync_target):
+        user.sync_devices(device, sync_target)
+        user.save()
+
 
     try:
         target_uid = form.get_target()
+        sync_target = request.user.get_device_by_uid(target_uid)
+        do_sync(user=request.user, device=device, sync_target=sync_target)
 
-        try:
-            sync_target = request.user.get_device_by_uid(target_uid)
+    except DeviceDoesNotExist as e:
+        messages.error(request, str(e))
 
-            request.user.sync_devices(device, sync_target)
-            request.user.save()
-
-        except DeviceDoesNotExist as e:
-            messages.error(request, str(e))
-
-    except ValueError, e:
-        raise
-        log('error while syncing device %s: %s' % (device_id, e))
+    request.user.sync_all()
 
     return HttpResponseRedirect(reverse('device', args=[device.uid]))
 
@@ -323,9 +332,14 @@ def sync(request, device):
 @login_required
 @allowed_methods(['GET'])
 def unsync(request, device):
+
+    @repeat_on_conflict(['user'])
+    def do_unsync(user, device):
+        user.unsync_device(device)
+        user.save()
+
     try:
-        request.user.unsync_device(device)
-        request.user.save()
+        do_unsync(user=request.user, device=device)
 
     except ValueError, e:
         messages.error(request, 'Could not unsync the device: {err}'.format(

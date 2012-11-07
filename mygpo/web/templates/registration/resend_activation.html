@@ -1,17 +1,19 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load i18n %}
 
 {% block title %}{% trans "Resend activation e-mail" %}{% endblock %}
 
+
+{% block header %}
+ <h1>{% trans "Resend activation e-mail" %}</h1>
+{% endblock %}
+
+
 {% block content %}
-   <form action="{% url resend-activation %}" method="POST">
+   <form action="{% url "resend-activation" %}" method="POST">
        {% csrf_token %}
        <table style="width: 400px; margin-left: auto; margin-right: auto;">
-           <tr>
-               <td colspan="2" style="text-align: center;">
-                   <h1>{% trans "Resend activation e-mail" %}</h1>
-               </td>
-           </tr>
            <tr>
                <td colspan="2" style="padding-bottom: 6px;">
                    {% blocktrans %}Please enter either your username or (if you don't know that either) the e-mail address which you used to register your account. An e-mail will be sent to you.{% endblocktrans %}

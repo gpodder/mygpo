@@ -8,6 +8,7 @@ from couchdbkit.exceptions import ResourceNotFound
 from couchdbkit import Consumer
 
 from mygpo.utils import progress
+from mygpo.couch import get_main_database
 from mygpo.maintenance.models import CommandStatus, CommandRunStatus
 
 try:
@@ -60,10 +61,6 @@ class ChangesCommand(BaseCommand):
 
         try:
             self.process(self.db, since)
-
-        except:
-            import traceback
-            traceback.print_exc()
 
         finally:
             # finish command run status
@@ -131,4 +128,4 @@ class ChangesCommand(BaseCommand):
 
     @abstractmethod
     def get_db(self):
-        raise NotImplemented
+        return get_main_database()

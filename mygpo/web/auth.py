@@ -35,9 +35,5 @@ class EmailAuthenticationBackend(ModelBackend):
             return user if user.check_password(password) else None
         return None
 
-    def get_user(self, user_id):
-        try:
-            return User.get(user_id)
-        except: #TODO: which exception
-            return None
-
+    def get_user(self, username):
+        return User.get_user(username)

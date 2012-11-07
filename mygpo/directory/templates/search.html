@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 
+{% load url from future %}
 {% load i18n %}
 {% load podcasts %}
 {% load charts %}
@@ -10,18 +11,21 @@
 
 {% block title %}{% trans "Search" %}{% endblock %}
 
-{% block content %}
-<h2>{% trans "Search" %}</h2>
+{% block header %}
+<h1>{% trans "Search" %}</h1>
+{% endblock %}
 
-<form method="get" action="{% url search %}" class="search">
- <input type="text" name="q" {% if q %}value="{{ q }}"{% endif %} >
- <input type="submit" value="Search">
-</form>
+
+{% block content %}
+
+  <form class="form-inline" method="get" action="{% url "search" %}" class="search">
+   <div class="input-prepend input-append">
+    <span class="add-on"><i class="icon-search"></i></span><input class="input-xxlarge" type="text" name="q" {% if q %}value="{{ q }}"{% endif %} ><button class="btn btn-primary" type="submit">{% trans "Search" %}</button>
+   </div>
+  </form>
 
  {% if q %}
   {% if results %}
-   <h3>{% trans "Results" %}</h3>
-
    <table class="list">
     <tr>
      <th></th>
@@ -31,38 +35,44 @@
 
     {% for podcast in results %}
      <tr>
-      <td>{{ podcast|podcast_logo }}</td>
+      <td class="logo">{{ podcast|podcast_logo }}</td>
       <td>{% podcast_group_link podcast %}</td>
-      <td>{{ podcast.subscriber_count|vertical_bar:max_subscribers }}</td>
+      <td>{% vertical_bar podcast.subscriber_count max_subscribers %}</td>
      </tr>
     {% endfor %}
    </table>
 
-<div class="pagination">
-
+<div class="pagination pagination-centered">
+ <ul>
  {% if results.has_previous %}
-  <a href="{% url search %}?q={{ q }}&page={{ results.previous_page_number }}">«</a>
+  <li>
+  <a href="{% url "search" %}?q={{ q }}&page={{ results.previous_page_number }}">«</a>
+  </li>
  {% endif %}
 
  {% for page in page_list %}
-  <span class="page-link">
+  <li>
    {% if page == "..." %}
+    <a href=#" class="disabled">
     {{ page }}
+    </a>
    {% else %}
 
      {% if page == results.number %}
       <strong>{{ page }}</strong>
      {% else %}
-      <a href="{% url search %}?q={{ q }}&page={{ page }}">{{ page }}</a>
+      <a href="{% url "search" %}?q={{ q }}&page={{ page }}">{{ page }}</a>
      {% endif %}
    {% endif %}
-  </span>
+  </li>
  {% endfor %}
 
  {% if results.has_next %}
-  <a href="{% url search %}?q={{ q }}&page={{ results.next_page_number }}">»</a>
+  <li>
+  <a href="{% url "search" %}?q={{ q }}&page={{ results.next_page_number }}">»</a>
+  </li>
  {% endif %}
-
+ </ul>
 </div>
 
   {% else %}
@@ -72,5 +82,18 @@
   {% endif %}
 
  {% endif %}
+
+{% endblock %}
+
+
+{% block sidebar %}
+
+  <div class="well">
+   <h4>{% trans "Search API" %}</h4>
+   <p>{% trans "Access the following address to search for <em>tech</em> podcasts." %}</p>
+   <a href="/search.opml?q=tech">
+    <pre>http://{{domain}}/search.opml?q=tech</pre>
+   </a>
+  </div>
 {% endblock %}
 

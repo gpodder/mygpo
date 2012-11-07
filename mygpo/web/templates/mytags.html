@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load i18n %}
 {% load devices %}
 {% load episodes %}
@@ -10,36 +11,15 @@
 
 {% block title %}{% trans "My Tags" %}{% endblock %}
 
+{% block header %}
+  <h1>{% trans "My Tags" %}</h1>
+{% endblock %}
+
+
 {% block content %}
 
  {% if tags_podcast %}
 
-  <h1>{% trans "Tagged Podcasts" %}</h1>
-  <table class="list">
-   {% for podcast, taglist in tags_podcast.items %}
-    <tr>
-     <td>{{ podcast|podcast_logo }}</td>
-     <td>{% podcast_group_link podcast %}</td>
-     <td class="tag-list">
-     {% for tag in taglist %}{% spaceless %}
-       <span class="own">{{ tag }} <a class="remove" href="{% podcast_link_target podcast "remove-tag" %}?tag={{ tag }}&next=mytags">X</a></span>
-       {% if not forloop.last %}<span class="seperator">,</span>{% endif %}
-      {% endspaceless %}
-     {% endfor %}
-     {% if user.is_authenticated %}
-      <form action="{% podcast_link_target podcast "add-tag" %}">
-       <input type="text" name="tag" />
-       <input type="submit" value="Add" />
-       <input type="hidden" name="next" value="mytags" />
-      </form>
-     {% endif %}
-     </td>
-    </tr>
-   {% endfor %}
-  </table>
-
-
-  <h1>{% trans "All your Tags" %}</h1>
   <table class="list">
   {% for tag, podcast_list in tags_tag.items %}
    <tr>
@@ -57,11 +37,11 @@
 
  {% else %}
 
-  <h1>{% trans "My Tags" %}</h1>
-  <div class="info">
-   {% url subscriptions as subscriptions-url %}
+  <p>
+   {% url "subscriptions" as subscriptions-url %}
    {% blocktrans %}You didn't tag any podcasts yet. Go to your <a href="{{ subscriptions-url }}">subscriptions</a> and tag some.{% endblocktrans %}
-  </div>
+  </p>
+
  {% endif %}
 
 {% endblock %}

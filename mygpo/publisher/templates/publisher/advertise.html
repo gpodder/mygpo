@@ -8,8 +8,12 @@
 
 {% block title %}{% trans "Advertise" %}{% endblock %}
 
-{% block content %}
+{% block header %}
  <h1>{% blocktrans with site as sitename %}Advertise on {{ sitename }}{% endblocktrans %}</h1>
+{% endblock %}
+
+
+{% block content %}
 
  <p>{% blocktrans with site as sitename %}For just € 20,-- your podcast will be shown on the <strong>front page of {{ sitename }} for a week</strong>. Additionally it will be the first podcast in <strong>gPodder's list of example podcasts.</strong>{% endblocktrans %}</p>
 

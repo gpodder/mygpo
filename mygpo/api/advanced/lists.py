@@ -35,6 +35,9 @@ from mygpo.api.simple import parse_subscription, format_podcast_list, \
      check_format
 from mygpo.share.views import list_decorator
 from mygpo.users.models import User
+from mygpo.db.couchdb.podcast import podcasts_by_id, podcast_for_url
+from mygpo.db.couchdb.podcastlist import podcastlist_for_user_slug, \
+         podcastlists_for_user
 
 
 
@@ -57,13 +60,13 @@ def create(request, username, format):
     if not slug:
         return HttpResponseBadRequest('Invalid title')
 
-    plist = PodcastList.for_user_slug(request.user._id, slug)
+    plist = podcastlist_for_user_slug(request.user._id, slug)
 
     if plist:
         return HttpResponse('List already exists', status=409)
 
     urls = parse_subscription(request.raw_post_data, format)
-    podcasts = [Podcast.for_url(url, create=True) for url in urls]
+    podcasts = [podcast_for_url(url, create=True) for url in urls]
     podcast_ids = map(Podcast.get_id, podcasts)
 
     plist = PodcastList()
@@ -100,7 +103,7 @@ def get_lists(request, username):
     if not user:
         raise Http404
 
-    lists = PodcastList.for_user(user._id)
+    lists = podcastlists_for_user(user._id)
 
     site = RequestSite(request)
 
@@ -136,7 +139,7 @@ def get_list(request, plist, owner, format):
     except (TypeError, ValueError):
         return HttpResponseBadRequest('scale_logo has to be a numeric value')
 
-    podcasts = Podcast.get_multi(plist.podcasts)
+    podcasts = podcasts_by_id(plist.podcasts)
 
     domain = RequestSite(request).domain
     p_data = lambda p: podcast_data(p, domain, scale)
@@ -160,7 +163,7 @@ def update_list(request, plist, owner, format):
         return HttpResponseForbidden()
 
     urls = parse_subscription(request.raw_post_data, format)
-    podcasts = [Podcast.for_url(url, create=True) for url in urls]
+    podcasts = [podcast_for_url(url, create=True) for url in urls]
     podcast_ids = map(Podcast.get_id, podcasts)
 
     @repeat_on_conflict(['podcast_ids'])

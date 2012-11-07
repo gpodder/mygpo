@@ -10,8 +10,12 @@
  {% blocktrans with other_user.username as username%}{{ username }}'s Subscriptions{% endblocktrans %}
 {% endblock %}
 
-{% block content %}
+{% block header %}
  <h1>{% blocktrans with other_user.username as username%}{{ username }}'s Subscriptions{% endblocktrans %}</h1>
+{% endblock %}
+
+
+{% block content %}
 
  <p>{% blocktrans with other_user.username as username %}{{ username }} didn't share his subscriptions with you. Maybe you should contact him to get the correct link.{% endblocktrans %}</p>
 

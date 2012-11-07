@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+{% load url from future %}
 {% load i18n %}
 {% load podcasts %}
 {% load charts %}
@@ -12,10 +13,11 @@
 
 {% block title %}{% trans "Podcast Lists" %}{% endblock %}
 
-{% block content %}
+{% block header %}
  <h1>{% trans "Podcast Lists" %}</h1>
- <hr />
+{% endblock %}
 
+{% block content %}
  <table class="list">
   <tr>
    <th>{% trans "List Name" %}</th>
@@ -25,43 +27,59 @@
   </tr>
   {% for l in lists %}
    <tr>
-    <td><a href="{% url list-show l.username l.slug %}">{{ l.title }}</a></td>
-    <td><a href="{% url lists-user l.username %}">{{ l.username }}</a></td>
+    <td><a href="{% url "list-show" l.username l.slug %}">{{ l.title }}</a></td>
+    <td><a href="{% url "user" l.username %}">{{ l.username }}</a></td>
     <td class="numeric">{{ l.podcasts|length }}</td>
     <td>
-     <a href="{% url list-opml l.username l.slug %}">
-      <img src="/media/22x22/opml-icon.png" />
+     <a class="btn btn-small" href="{% url "list-opml" l.username l.slug %}">
+      <i class="icon-download"></i>
      </a>
     </td>
    </tr>
   {% endfor %}
  </table>
 
-<div class="pagination">
+<div class="pagination pagination-centered">
+ <ul>
 
  {% if entries.has_previous %}
-  <a href="{% url podcast-lists %}?page={{ entries.previous_page_number }}">«</a>
+  <li>
+  <a href="{% url "podcast-lists" %}?page={{ entries.previous_page_number }}">«</a>
+  </li>
  {% endif %}
 
  {% for page in page_list %}
-  <span class="page-link">
+  <li>
    {% if page == "..." %}
+    <a href="#" class="disabled">
     {{ page }}
+    </a>
    {% else %}
 
      {% if page == entries.number %}
       <strong>{{ page }}</strong>
      {% else %}
-      <a href="{% url podcast-lists %}?page={{ page }}">{{ page }}</a>
+      <a href="{% url "podcast-lists" %}?page={{ page }}">{{ page }}</a>
      {% endif %}
    {% endif %}
-  </span>
+  </li>
  {% endfor %}
 
  {% if entries.has_next %}
-  <a href="{% url podcast-lists %}?page={{ entries.next_page_number }}">»</a>
+  <li>
+  <a href="{% url "podcast-lists" %}?page={{ entries.next_page_number }}">»</a>
+  </li>
  {% endif %}
-
+ </ul>
 </div>
 
+{% endblock %}
+
+
+{% block sidebar %}
+ <div class="well">
+  <h4>{% trans "Know Some Great Podcasts?" %}</h4>
+  <p>{% trans "Create a list of podcasts about a topic you like" %}</p>
+  <a class="btn btn-primary" href="{% url "lists-overview" %}">Go</a>
+ </div>
 {% endblock %}

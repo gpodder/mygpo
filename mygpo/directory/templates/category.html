@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+{% load url from future %}
 {% load i18n %}
 {% load podcasts %}
 {% load charts %}
@@ -12,8 +13,12 @@
 
 {% block title %}{{ category }}{% endblock %}
 
-{% block content %}
+{% block header %}
  <h1>{{ category }}</h1>
+{% endblock %}
+
+
+{% block content %}
 
  <table class="list">
   <tr>
@@ -23,7 +28,7 @@
   </tr>
   {% for entry in entries %}
    <tr>
-    <td>{{ entry|podcast_logo}}</td>
+    <td class="logo">{{ entry|podcast_logo}}</td>
     <td>{% podcast_group_link entry %}</td>
     <td class="description">
      {{ entry.description|truncatewords:15 }}
@@ -32,14 +37,14 @@
   {% endfor %}
  </table>
 
-<div class="pagination">
-
+<div class="pagination pagination-centered">
+ <ul>
  {% if entries.has_previous %}
-  <a href="{% url directory category %}?page={{ entries.previous_page_number }}">«</a>
+  <li><a href="{% url "directory" category %}?page={{ entries.previous_page_number }}">«</a></li>
  {% endif %}
 
  {% for page in page_list %}
-  <span class="page-link">
+  <li>
    {% if page == "..." %}
     {{ page }}
    {% else %}
@@ -47,16 +52,18 @@
      {% if page == entries.number %}
       <strong>{{ page }}</strong>
      {% else %}
-      <a href="{% url directory category %}?page={{ page }}">{{ page }}</a>
+      <a href="{% url "directory" category %}?page={{ page }}">{{ page }}</a>
      {% endif %}
    {% endif %}
-  </span>
+  </li>
  {% endfor %}
 
  {% if entries.has_next %}
-  <a href="{% url directory category %}?page={{ entries.next_page_number }}">»</a>
+  <li>
+  <a href="{% url "directory" category %}?page={{ entries.next_page_number }}">»</a>
+  </li>
  {% endif %}
-
+ </ul>
 </div>
 
 {% endblock %}

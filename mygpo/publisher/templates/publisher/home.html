@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load i18n %}
 {% load podcasts %}
 
@@ -6,17 +7,17 @@
 {% block mainmenu %}{{ "/publisher/"|main_menu }}{% endblock %}
 {% block sectionmenu %}{{ "/publisher/"|section_menu }}{% endblock %}
 
-{% block title %}{% trans "Podcasts Published by You" %}{% endblock %}
+{% block title %}{% trans "Podcasts Published by Me" %}{% endblock %}
+
+{% block header %}
+ <h1>{% trans "Podcasts Published by Me" %}</h1>
+{% endblock %}
+
 
 {% block content %}
- <h1>{% trans "Podcasts Published by You" %}</h1>
 
  {% if not podcasts|length_is:"0" %}
  <table class="list">
-  <tr>
-   <th>&nbsp;</th>
-   <th>{% trans "Podcast" %}</th>
-  </tr>
 
   {% for s in podcasts %}
    <tr>
@@ -27,12 +28,26 @@
   </table>
  {% endif %}
 
- {% if user.is_staff %}
-  <form action="{% url podcast-publisher-search %}" method="post">
+ <h2>{% trans "Update your podcasts" %}</h2>
+ <p>{% trans "To update all of your published podcasts automatically, you can request the following URL" %}</p>
+ <pre><a href="{% url publisher-update user.username %}?token={{ update_token }}">http://{{ site }}{% url publisher-update user.username %}?token={{ update_token }}</a></pre>
+ <form action="{% url publisher-new-update-token user.username %}" method="post">
   {% csrf_token %}
-  {{ form.as_p }}
-  <input type="submit" value="{% trans "Go" %}" />
+  <button type="submit" class="btn">{% trans "Create a new token" %}</button>
  </form>
+
+ {% if user.is_staff %}
+  <div class="well">
+   <h2>Staff Only</h2>
+   <p>{% trans "Go to the publisher page of any podcast by entering its feed URL" %}</p>
+   <form class="form-inline" action="{% url "podcast-publisher-search" %}" method="post">
+    {% csrf_token %}
+    <div class="input-prepend input-append">
+     <span class="add-on"><i class="icon-link"></i></span><input type="text" class="input-xlarge" name="url" id="id_url" />
+     <button class="btn" type="submit">{% trans "Go" %}</button>
+    </div>
+   </form>
+  </div>
  {% endif %}
 
 {% endblock %}

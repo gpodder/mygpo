@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load url from future %}
+{% load i18n %}
+{% load podcasts %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/admin/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/admin/"|section_menu:"Admin" }}{% endblock %}
+
+{% block title %}{% trans "Admin Area" %}{% endblock %}
+
+{% block header %}
+ <h1>{% trans "Merge Podcasts and Episodes" %}</h1>
+{% endblock %}
+
+{% block content %}
+ <form method="post" action="{% url "admin-merge-verify" %}">
+  {% csrf_token %}
+  <table>
+   {% for url in urls %}
+    <tr>
+     <th>Feed URL {{ forloop.counter }}</th>
+     <td><input type="text" name="feed{{forloop.counter0}}" value="{{ url }}" /></td>
+    </tr>
+   {% endfor %}
+   <tr>
+    <td><input type="submit" value="OK" /></td>
+   </tr>
+  </table>
+ </form>
+
+{% endblock %}
+

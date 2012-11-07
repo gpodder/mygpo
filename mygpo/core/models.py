@@ -1,18 +1,17 @@
+from __future__ import division
+
 import hashlib
-import os.path
 import re
-from datetime import datetime
-from dateutil import parser
-from random import randint
+from random import random
 
 from couchdbkit.ext.django.schema import *
 from restkit.errors import Unauthorized
 
-from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from mygpo.decorators import repeat_on_conflict
 from mygpo import utils
+from mygpo.cache import cache_result
 from mygpo.core.proxy import DocumentABCMeta
 from mygpo.core.slugs import SlugMixin
 from mygpo.core.oldid import OldIdMixin
@@ -39,7 +38,9 @@ class Episode(Document, SlugMixin, OldIdMixin):
     __metaclass__ = DocumentABCMeta
 
     title = StringProperty()
-    description = StringProperty()
+    guid = StringProperty()
+    description = StringProperty(default="")
+    content = StringProperty(default="")
     link = StringProperty()
     released = DateTimeProperty()
     author = StringProperty()
@@ -56,109 +57,6 @@ class Episode(Document, SlugMixin, OldIdMixin):
     content_types = StringListProperty()
 
 
-    @classmethod
-    def get(cls, id, current_id=False):
-        r = cls.view('episodes/by_id',
-                key=id,
-                include_docs=True,
-            )
-
-        if not r:
-            return None
-
-        obj = r.one()
-        if current_id and obj._id != id:
-            raise MergedIdException(obj, obj._id)
-
-        return obj
-
-
-    @classmethod
-    def get_multi(cls, ids):
-        return cls.view('episodes/by_id',
-                include_docs=True,
-                keys=ids
-            )
-
-
-    @classmethod
-    def for_oldid(self, oldid):
-        oldid = int(oldid)
-        r = Episode.view('episodes/by_oldid', key=oldid, limit=1, include_docs=True)
-        return r.one() if r else None
-
-
-    @classmethod
-    def for_slug(cls, podcast_id, slug):
-        r = cls.view('episodes/by_slug',
-                key          = [podcast_id, slug],
-                include_docs = True
-            )
-        return r.first() if r else None
-
-
-    @classmethod
-    def for_podcast_url(cls, podcast_url, episode_url, create=False):
-        podcast = Podcast.for_url(podcast_url)
-        return cls.for_podcast_id_url(podcast.get_id(), episode_url, create)
-
-
-    @classmethod
-    def for_podcast_id_url(cls, podcast_id, episode_url, create=False):
-        r = cls.view('episodes/by_podcast_url',
-                key          = [podcast_id, episode_url],
-                include_docs = True,
-                reduce       = False,
-            )
-
-        if r:
-            return r.first()
-
-        if create:
-            episode = Episode()
-            episode.podcast = podcast_id
-            episode.urls = [episode_url]
-            episode.save()
-            return episode
-
-        return None
-
-
-    @classmethod
-    def for_slug_id(cls, p_slug_id, e_slug_id):
-        """ Returns the Episode for Podcast Slug/Id and Episode Slug/Id """
-
-        # The Episode-Id is unique, so take that
-        if utils.is_couchdb_id(e_slug_id):
-            return cls.get(e_slug_id)
-
-        # If we search using a slug, we need the Podcast's Id
-        if utils.is_couchdb_id(p_slug_id):
-            p_id = p_slug_id
-        else:
-            podcast = Podcast.for_slug_id(p_slug_id)
-
-            if podcast is None:
-                return None
-
-            p_id = podcast.get_id()
-
-        return cls.for_slug(p_id, e_slug_id)
-
-
-    def get_user_state(self, user):
-        from mygpo.users.models import EpisodeUserState
-        return EpisodeUserState.for_user_episode(user, self)
-
-
-    def get_all_states(self):
-        from mygpo.users.models import EpisodeUserState
-        r =  EpisodeUserState.view('episode_states/by_podcast_episode',
-            startkey = [self.podcast, self._id, None],
-            endkey   = [self.podcast, self._id, {}],
-            include_docs=True)
-        return iter(r)
-
 
     @property
     def url(self):
@@ -167,43 +65,6 @@ class Episode(Document, SlugMixin, OldIdMixin):
     def __repr__(self):
         return 'Episode %s' % self._id
 
-
-    def listener_count(self, start=None, end={}):
-        """ returns the number of users that have listened to this episode """
-
-        from mygpo.users.models import EpisodeUserState
-        r = EpisodeUserState.view('listeners/by_episode',
-                startkey    = [self._id, start],
-                endkey      = [self._id, end],
-                reduce      = True,
-                group       = True,
-                group_level = 1
-            )
-        return r.first()['value'] if r else 0
-
-
-    def listener_count_timespan(self, start=None, end={}):
-        """ returns (date, listener-count) tuples for all days w/ listeners """
-
-        if isinstance(start, datetime):
-            start = start.isoformat()
-
-        if isinstance(end, datetime):
-            end = end.isoformat()
-
-        from mygpo.users.models import EpisodeUserState
-        r = EpisodeUserState.view('listeners/by_episode',
-                startkey    = [self._id, start],
-                endkey      = [self._id, end],
-                reduce      = True,
-                group       = True,
-                group_level = 2,
-            )
-
-        for res in r:
-            date = parser.parse(res['key'][1]).date()
-            listeners = res['value']
-            yield (date, listeners)
 
 
     def get_short_title(self, common_title):
@@ -231,23 +92,6 @@ class Episode(Document, SlugMixin, OldIdMixin):
         return set([self._id] + self.merged_ids)
 
 
-    @classmethod
-    def count(cls):
-        r = cls.view('episodes/by_podcast',
-                reduce = True,
-                stale  = 'update_after',
-            )
-        return r.one()['value']
-
-
-    @classmethod
-    def all(cls):
-        return utils.multi_request_view(cls, 'episodes/by_podcast',
-                reduce       = False,
-                include_docs = True,
-                stale        = 'update_after',
-            )
-
     def __eq__(self, other):
         if other == None:
             return False
@@ -257,6 +101,12 @@ class Episode(Document, SlugMixin, OldIdMixin):
     def __hash__(self):
         return hash(self._id)
 
+
+    def __str__(self):
+        return '<{cls} {title} ({id})>'.format(cls=self.__class__.__name__,
+                title=self.title, id=self._id)
+
+    __repr__ = __str__
 
 
 class SubscriberData(DocumentSchema):
@@ -278,15 +128,6 @@ class PodcastSubscriberData(Document):
     podcast = StringProperty()
     subscribers = SchemaListProperty(SubscriberData)
 
-    @classmethod
-    def for_podcast(cls, id):
-        r = cls.view('podcasts/subscriber_data', key=id, include_docs=True)
-        if r:
-            return r.first()
-
-        data = PodcastSubscriberData()
-        data.podcast = id
-        return data
 
     def __repr__(self):
         return 'PodcastSubscriberData for Podcast %s (%s)' % (self.podcast, self._id)
@@ -316,195 +157,9 @@ class Podcast(Document, SlugMixin, OldIdMixin):
     common_episode_title = StringProperty()
     new_location = StringProperty()
     latest_episode_timestamp = DateTimeProperty()
+    episode_count = IntegerProperty()
+    random_key = FloatProperty(default=random)
 
-
-    @classmethod
-    def get(cls, id, current_id=False):
-        r = cls.view('podcasts/by_id',
-                key=id,
-                classes=[Podcast, PodcastGroup],
-                include_docs=True,
-            )
-
-        if not r:
-            return None
-
-        podcast_group = r.first()
-        return podcast_group.get_podcast_by_id(id, current_id)
-
-
-    @classmethod
-    def for_slug(cls, slug):
-        db = cls.get_db()
-        r = db.view('podcasts/by_slug',
-                startkey     = [slug, None],
-                endkey       = [slug, {}],
-                include_docs = True,
-            )
-
-        if not r:
-            return None
-
-        res = r.first()
-        doc = res['doc']
-        if doc['doc_type'] == 'Podcast':
-            return Podcast.wrap(doc)
-        else:
-            pid = res['key'][1]
-            pg = PodcastGroup.wrap(doc)
-            return pg.get_podcast_by_id(pid)
-
-
-    @classmethod
-    def for_slug_id(cls, slug_id):
-        """ Returns the Podcast for either an CouchDB-ID for a Slug """
-
-        if utils.is_couchdb_id(slug_id):
-            return cls.get(slug_id)
-        else:
-            return cls.for_slug(slug_id)
-
-
-    @classmethod
-    def get_multi(cls, ids):
-        db = Podcast.get_db()
-        r = db.view('podcasts/by_id',
-                keys=ids,
-                include_docs=True,
-            )
-
-        for res in r:
-            if res['doc']['doc_type'] == 'Podcast':
-                yield Podcast.wrap(res['doc'])
-            else:
-                pg = PodcastGroup.wrap(res['doc'])
-                id = res['key']
-                yield pg.get_podcast_by_id(id)
-
-
-    @classmethod
-    def for_oldid(cls, oldid):
-        oldid = int(oldid)
-        r = cls.view('podcasts/by_oldid',
-                key=long(oldid),
-                classes=[Podcast, PodcastGroup],
-                include_docs=True
-            )
-
-        if not r:
-            return None
-
-        podcast_group = r.first()
-        return podcast_group.get_podcast_by_oldid(oldid)
-
-
-    @classmethod
-    def for_url(cls, url, create=False):
-        r = cls.view('podcasts/by_url',
-                key=url,
-                classes=[Podcast, PodcastGroup],
-                include_docs=True
-            )
-
-        if r:
-            podcast_group = r.first()
-            return podcast_group.get_podcast_by_url(url)
-
-        if create:
-            podcast = cls()
-            podcast.urls = [url]
-            podcast.save()
-            return podcast
-
-        return None
-
-
-    @classmethod
-    def random(cls):
-        """ Returns an infinite iterator of random podcasts
-
-        One query is required for each podcast that is returned"""
-
-        total = cls.count()
-        db = cls.get_db()
-
-        while True:
-            n = randint(0, total)
-            res = db.view('podcasts/by_id',
-                    skip         = n,
-                    include_docs = True,
-                    limit        = 1,
-                    stale        = 'ok',
-                )
-
-            if not res:
-                continue
-
-            r = res.one()
-            obj = r['doc']
-            if obj['doc_type'] == 'Podcast':
-                yield Podcast.wrap(obj)
-
-            else:
-                pid = r[u'key']
-                pg = PodcastGroup.wrap(obj)
-                podcast = pg.get_podcast_by_id(pid)
-                yield podcast
-
-
-    @classmethod
-    def by_last_update(cls):
-        db = cls.get_db()
-        res = db.view('podcasts/by_last_update',
-                include_docs = True,
-                stale        = 'update_after',
-            )
-
-        for r in res:
-            obj = r['doc']
-            if obj['doc_type'] == 'Podcast':
-                yield Podcast.wrap(obj)
-
-            else:
-                pid = r[u'key'][1]
-                pg = PodcastGroup.wrap(obj)
-                podcast = pg.get_podcast_by_id(pid)
-                yield podcast
-
-
-    @classmethod
-    def for_language(cls, language, **kwargs):
-        db = cls.get_db()
-
-        res = db.view('podcasts/by_language',
-                startkey     = [language, None],
-                endkey       = [language, {}],
-                include_docs = True,
-                reduce       = False,
-                stale        = 'update_after',
-                **kwargs
-            )
-
-        for r in res:
-            obj = r['doc']
-            if obj['doc_type'] == 'Podcast':
-                yield Podcast.wrap(obj)
-
-            else:
-                pid = r[u'key'][1]
-                pg = PodcastGroup.wrap(obj)
-                podcast = pg.get_podcast_by_id(pid)
-                yield podcast
-
-
-    @classmethod
-    def count(cls):
-        # TODO: fix number calculation
-        r = cls.view('podcasts/by_id',
-                limit = 0,
-                stale = 'update_after',
-            )
-        return r.total_rows
 
 
     def get_podcast_by_id(self, id, current_id=False):
@@ -558,56 +213,13 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
 
 
-    def get_episodes(self, since=None, until={}, **kwargs):
-
-        if kwargs.get('descending', False):
-            since, until = until, since
-
-        if isinstance(since, datetime):
-            since = since.isoformat()
-
-        if isinstance(until, datetime):
-            until = until.isoformat()
-
-        res = Episode.view('episodes/by_podcast',
-                startkey     = [self.get_id(), since],
-                endkey       = [self.get_id(), until],
-                include_docs = True,
-                reduce       = False,
-                **kwargs
-            )
-
-        return iter(res)
-
-
-    def get_episode_count(self, since=None, until={}, **kwargs):
-
-        if kwargs.get('descending', False):
-            since, until = until, since
-
-        if isinstance(since, datetime):
-            since = since.isoformat()
-
-        if isinstance(until, datetime):
-            until = until.isoformat()
-
-        res = Episode.view('episodes/by_podcast',
-                startkey     = [self.get_id(), since],
-                endkey       = [self.get_id(), until],
-                reduce       = True,
-                group_level  = 1,
-                **kwargs
-            )
-
-        return res.one()['value']
-
-
     def get_common_episode_title(self, num_episodes=100):
 
         if self.common_episode_title:
             return self.common_episode_title
 
-        episodes = self.get_episodes(descending=True, limit=num_episodes)
+        from mygpo.db.couchdb.episode import episodes_for_podcast
+        episodes = episodes_for_podcast(self, descending=True, limit=num_episodes)
 
         # We take all non-empty titles
         titles = filter(None, (e.title for e in episodes))
@@ -624,38 +236,34 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         return common_title
 
 
+    @cache_result(timeout=60*60)
     def get_latest_episode(self):
         # since = 1 ==> has a timestamp
-        episodes = self.get_episodes(since=1, descending=True, limit=1)
-        return next(episodes, None)
+
+        from mygpo.db.couchdb.episode import episodes_for_podcast
+        episodes = episodes_for_podcast(self, since=1, descending=True, limit=1)
+        return next(iter(episodes), None)
 
 
     def get_episode_before(self, episode):
         if not episode.released:
             return None
 
-        prevs = self.get_episodes(until=episode.released, descending=True,
-                limit=1)
-        try:
-            prev = prevs.next()
-        except StopIteration:
-            prev = None
+        from mygpo.db.couchdb.episode import episodes_for_podcast
+        prevs = episodes_for_podcast(self, until=episode.released,
+                descending=True, limit=1)
+
+        return next(iter(prevs), None)
 
 
     def get_episode_after(self, episode):
         if not episode.released:
             return None
 
-        nexts = self.get_episodes(since=episode.released, limit=1)
+        from mygpo.db.couchdb.episode import episodes_for_podcast
+        nexts = episodes_for_podcast(self, since=episode.released, limit=1)
 
-        try:
-            next = nexts.next()
-        except StopIteration:
-            next = None
-
-
-    def get_episode_for_slug(self, slug):
-        return Episode.for_slug(self.get_id(), slug)
+        return next(iter(nexts), None)
 
 
     @property
@@ -678,6 +286,14 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         return reverse('logo', args=[size, prefix, filename])
 
 
+    def subscriber_change(self):
+        prev = self.prev_subscriber_count()
+        if prev <= 0:
+            return 0
+
+        return self.subscriber_count() / prev
+
+
     def subscriber_count(self):
         if not self.subscribers:
             return 0
@@ -690,40 +306,27 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         return self.subscribers[-2].subscriber_count
 
 
-    def get_user_state(self, user):
-        from mygpo.users.models import PodcastUserState
-        return PodcastUserState.for_user_podcast(user, self)
-
-
-    def get_all_states(self):
-        from mygpo.users.models import PodcastUserState
-        return PodcastUserState.view('podcast_states/by_podcast',
-            startkey = [self.get_id(), None],
-            endkey   = [self.get_id(), '\ufff0'],
-            include_docs=True)
-
-    def get_all_subscriber_data(self):
-        subdata = PodcastSubscriberData.for_podcast(self.get_id())
-        return sorted(self.subscribers + subdata.subscribers,
-                key=lambda s: s.timestamp)
-
 
     @repeat_on_conflict()
     def subscribe(self, user, device):
-        state = self.get_user_state(user)
+        from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
+        state = podcast_state_for_user_podcast(user, self)
         state.subscribe(device)
         try:
             state.save()
+            user.sync_all()
         except Unauthorized as ex:
             raise SubscriptionException(ex)
 
 
     @repeat_on_conflict()
     def unsubscribe(self, user, device):
-        state = self.get_user_state(user)
+        from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
+        state = podcast_state_for_user_podcast(user, self)
         state.unsubscribe(device)
         try:
             state.save()
+            user.sync_all()
         except Unauthorized as ex:
             raise SubscriptionException(ex)
 
@@ -752,78 +355,6 @@ class Podcast(Document, SlugMixin, OldIdMixin):
                         targets.append(device)
 
         return targets
-
-
-    def listener_count(self):
-        """ returns the number of users that have listened to this podcast """
-
-        from mygpo.users.models import EpisodeUserState
-        r = EpisodeUserState.view('listeners/by_podcast',
-                startkey    = [self.get_id(), None],
-                endkey      = [self.get_id(), {}],
-                group       = True,
-                group_level = 1,
-                reduce      = True,
-            )
-        return r.first()['value'] if r else 0
-
-
-    def listener_count_timespan(self, start=None, end={}):
-        """ returns (date, listener-count) tuples for all days w/ listeners """
-
-        if isinstance(start, datetime):
-            start = start.isoformat()
-
-        if isinstance(end, datetime):
-            end = end.isoformat()
-
-        from mygpo.users.models import EpisodeUserState
-        r = EpisodeUserState.view('listeners/by_podcast',
-                startkey    = [self.get_id(), start],
-                endkey      = [self.get_id(), end],
-                group       = True,
-                group_level = 2,
-                reduce      = True,
-            )
-
-        for res in r:
-            date = parser.parse(res['key'][1]).date()
-            listeners = res['value']
-            yield (date, listeners)
-
-
-    def episode_listener_counts(self):
-        """ (Episode-Id, listener-count) tuples for episodes w/ listeners """
-
-        from mygpo.users.models import EpisodeUserState
-        r = EpisodeUserState.view('listeners/by_podcast_episode',
-                startkey    = [self.get_id(), None, None],
-                endkey      = [self.get_id(), {},   {}],
-                group       = True,
-                group_level = 2,
-                reduce      = True,
-            )
-
-        for res in r:
-            episode   = res['key'][1]
-            listeners = res['value']
-            yield (episode, listeners)
-
-
-    def get_episode_states(self, user_id):
-        """ Returns the latest episode actions for the podcast's episodes """
-
-        from mygpo.users.models import EpisodeUserState
-        db = EpisodeUserState.get_db()
-
-        res = db.view('episode_states/by_user_podcast',
-                startkey= [user_id, self.get_id(), None],
-                endkey  = [user_id, self.get_id(), {}]
-            )
-
-        for r in res:
-            action = r['value']
-            yield action
 
 
     def __hash__(self):
@@ -879,11 +410,6 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         else:
             super(Podcast, self).delete()
 
-    @classmethod
-    def all_podcasts_groups(cls):
-        return cls.view('podcasts/podcasts_groups', include_docs=True,
-            classes=[Podcast, PodcastGroup]).iterator()
-
 
     def __eq__(self, other):
         if not self.get_id():
@@ -895,25 +421,6 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         return self.get_id() == other.get_id()
 
 
-    @classmethod
-    def all_podcasts(cls):
-        res = utils.multi_request_view(cls, 'podcasts/by_id',
-                wrap         = False,
-                include_docs = True,
-                stale        = 'update_after',
-            )
-
-        for r in res:
-            obj = r['doc']
-            if obj['doc_type'] == 'Podcast':
-                yield Podcast.wrap(obj)
-            else:
-                pid = r[u'key']
-                pg = PodcastGroup.wrap(obj)
-                podcast = pg.get_podcast_by_id(pid)
-                yield podcast
-
-
 
 class PodcastGroup(Document, SlugMixin, OldIdMixin):
     title    = StringProperty()
@@ -921,24 +428,6 @@ class PodcastGroup(Document, SlugMixin, OldIdMixin):
 
     def get_id(self):
         return self._id
-
-    @classmethod
-    def for_oldid(cls, oldid):
-        oldid = int(oldid)
-        r = cls.view('podcasts/groups_by_oldid', \
-            key=oldid, limit=1, include_docs=True)
-        return r.first() if r else None
-
-
-    @classmethod
-    def for_slug_id(cls, slug_id):
-        """ Returns the Podcast for either an CouchDB-ID for a Slug """
-
-        if utils.is_couchdb_id(slug_id):
-            return cls.get(slug_id)
-        else:
-            #TODO: implement
-            return cls.for_slug(slug_id)
 
 
     def get_podcast_by_id(self, id, current_id=False):
@@ -963,6 +452,14 @@ class PodcastGroup(Document, SlugMixin, OldIdMixin):
         for podcast in self.podcasts:
             if url in list(podcast.urls):
                 return podcast
+
+
+    def subscriber_change(self):
+        prev = self.prev_subscriber_count()
+        if not prev:
+            return 0
+
+        return self.subscriber_count() / prev
 
 
     def subscriber_count(self):
@@ -1027,8 +524,6 @@ class PodcastGroup(Document, SlugMixin, OldIdMixin):
             return '%s %s' % (self.__class__.__name__, self._id[:10])
 
 
-class SanitizingRuleStub(object):
-    pass
 
 class SanitizingRule(Document):
     slug        = StringProperty()
@@ -1037,29 +532,6 @@ class SanitizingRule(Document):
     replace     = StringProperty()
     priority    = IntegerProperty()
     description = StringProperty()
-
-
-    @classmethod
-    def for_obj_type(cls, obj_type):
-        r = cls.view('sanitizing_rules/by_target', include_docs=True,
-            startkey=[obj_type, None], endkey=[obj_type, {}])
-
-        for rule in r:
-            obj = SanitizingRuleStub()
-            obj.slug = rule.slug
-            obj.applies_to = list(rule.applies_to)
-            obj.search = rule.search
-            obj.replace = rule.replace
-            obj.priority = rule.priority
-            obj.description = rule.description
-            yield obj
-
-
-    @classmethod
-    def for_slug(cls, slug):
-        r = cls.view('sanitizing_rules/by_slug', include_docs=True,
-            key=slug)
-        return r.one() if r else None
 
 
     def __repr__(self):

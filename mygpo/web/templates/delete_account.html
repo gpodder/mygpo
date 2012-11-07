@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load i18n %}
 
 {% load menu %}
@@ -9,11 +10,16 @@
   {% trans "Delete Account" %}
 {% endblock %}
 
+
+{% block header %}
+  <h1>{% trans "Delete your Account?" %}</h1>
+{% endblock %}
+
+
 {% block content %}
 
-  <h1>{% trans "Delete your Account?" %}</h1>
   <p>{% trans "Do you really want to delete your account?" %}</p>
-  <form method="post" action="{% url delete-account %}">
+  <form method="post" action="{% url "delete-account" %}">
    {% csrf_token %}
    <input type="submit" value="{% trans "Yes, please" %}" />
   </form>

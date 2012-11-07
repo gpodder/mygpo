@@ -5,42 +5,28 @@ function(doc)
         return;
     }
 
-    function searchObject(obj, languages, types)
+    function getLanguage(podcast)
     {
-        if (obj.language)
+        if (podcast.language)
         {
-            languages.push(obj.language.slice(0, 2));
+            return podcast.language.slice(0, 2);
         }
 
-        if (obj.content_types)
-        {
-            for(n in obj.content_types)
-            {
-                types.push(obj.content_types[n]);
-            }
-        }
+        return null;
     };
 
-    function doEmit(date_str, types, languages, value)
+    function doEmit(date_str, language, listeners)
     {
-        if(value > 0)
+        if(listeners <= 0)
         {
-            emit([date_str, "none", value], null);
+            return;
+        }
 
-            for(n in types)
-            {
-                emit([date_str, "type", types[n], value], null);
+        emit([date_str, "", listeners], null);
 
-                for(m in languages)
-                {
-                    emit([date_str, "type-language", types[n], languages[m], value], null);
-                }
-            }
-
-            for(m in languages)
-            {
-                emit([date_str, "language", languages[m], value], null);
-            }
+        if(language)
+        {
+            emit([date_str, language, listeners], null);
         }
     };
 
@@ -55,12 +41,9 @@ function(doc)
     dateParts = dateString.split("-");
     dateParts = dateParts.map(Number);
 
-    languages = [];
-    types = [];
+    var language = getLanguage(doc);
 
-    searchObject(doc, languages, types);
-
-    for(i=0; i<toplist_period; i++)
+    for(var i=0; i<toplist_period; i++)
     {
         dateObj = new Date(dateParts[0], dateParts[1]-1, dateParts[2]+i);
         year = dateObj.getFullYear();
@@ -77,6 +60,6 @@ function(doc)
 
         dateStr = year + "-" + month + "-" + day;
 
-        doEmit(dateStr, types, languages, doc.listeners);
+        doEmit(dateStr, language, doc.listeners);
     }
 }

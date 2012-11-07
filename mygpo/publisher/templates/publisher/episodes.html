@@ -11,14 +11,20 @@
 
 {% block title %}{{ podcast.title|default:"Unnamed Podcast"|striptags }}{% endblock %}
 
-{% block content %}
+{% block header %}
   {% if podcast.logo_url %}
-  <div id="podcastlogo">{{ podcast|podcast_logo_big }}</div>
+  <div id="podcastlogo">
+   <a href="{% podcast_link_target podcast "podcast-publisher-detail" %}">
+    {{ podcast|podcast_logo_big }}
+   </a>
+  </div>
   {% endif %}
 
   <h1>{% trans "Publisher Pages:" %} {% if podcast.title %}{{ podcast.title|striptags }}{% else %}{% trans "Unnamed Podcast" %}{%endif%}</h1>
-
   <p><a href="{% podcast_link_target podcast "podcast-publisher-detail" %}">{% trans "Return to Podcast Page" %}</a></p>
+{% endblock %}
+
+{% block content %}
 
   {% if not episodes|length_is:"0" %}
 
@@ -31,6 +37,23 @@
     </tr>
 
     <tr>
+     <th colspan="3">Feed-Data Available</th>
+    </tr>
+    {% for episode in episodes %}
+     {% if episode.title %}
+      <tr>
+       <td><a href="{% episode_link_target episode podcast "episode-publisher-detail" %}">{{ episode.title|default:"Unknown Episode"|striptags }}</a></td>
+       <td>{{ episode.released|default:""|naturalday }}</td>
+       <td>
+        {% if episode.listeners %}
+         {% vertical_bar episode.listeners max_listeners %}
+        {% endif %}
+       </td>
+      </tr>
+     {% endif %}
+    {% endfor %}
+
+    <tr>
      <th colspan="3">Data Missing</th>
     </tr>
     {% for episode in episodes %}
@@ -41,24 +64,8 @@
      {% endif %}
     {% endfor %}
 
-    <tr>
-     <th colspan="3">Feed-Data Available</th>
-    </tr>
-    {% for episode in episodes %}
-     {% if episode.title %}
-      <tr>
-       <td><a href="{% episode_link_target episode podcast "episode-publisher-detail" %}">{{ episode.title|default:"Unknown Episode"|striptags }}</a></td>
-       <td>{{ episode.timestamp|default:""|naturalday }}</td>
-       <td>
-        {% if episode.listeners %}
-         {{ episode.listeners|vertical_bar:max_listeners }}
-        {% endif %}
-       </td>
-      </tr>
-     {% endif %}
-    {% endfor %}
    </table>
   {% endif %}
 
- {% endblock %}
+{% endblock %}
 

@@ -18,10 +18,10 @@ def lookup_list(dict, keys):
 
 
 @register.simple_tag
-def smartwidthratio(val, max_val, upper, lower):
+def smartwidthratio(val, min_val, max_val, upper, lower):
     if max_val == 0:
         return 0
-    return max(lower, (float(val) / max_val * upper))
+    return max(lower, (float(val-min_val) / max_val * upper))
 
 @register.filter
 def page_list(cur, start, total, show_max):
@@ -44,7 +44,19 @@ def remove(l, item):
 @register.filter
 def format_time(time):
     from mygpo.utils import format_time as _format_time
-    try:
-        return mark_safe(_format_time(time))
-    except:
-        return mark_safe("")
+    return mark_safe(_format_time(time))
+
+
+@register.filter
+def is_tuple(obj):
+    return isinstance(obj, tuple)
+
+@register.filter
+def is_list(obj):
+    return isinstance(obj, list)
+
+@register.filter
+def markdown(txt):
+    import markdown2
+    html = markdown2.markdown(txt)
+    return mark_safe(html)

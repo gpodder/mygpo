@@ -1,9 +1,11 @@
 from couchdbkit.exceptions import ResourceNotFound
 
-from mygpo.core.models import Episode
 from mygpo.users.models import EpisodeUserState
 from mygpo.decorators import repeat_on_conflict
 from mygpo.maintenance.management.changescmd import ChangesCommand
+from mygpo.db.couchdb.episode import episode_by_id
+from mygpo.db.couchdb.episode_state import episode_listener_count
+
 
 class Command(ChangesCommand):
 
@@ -16,13 +18,13 @@ class Command(ChangesCommand):
         state = EpisodeUserState.wrap(doc)
 
         try:
-            episode = Episode.get(state.episode)
+            episode = episode_by_id(state.episode)
 
         except ResourceNotFound:
             episode = None
 
         if episode:
-            listeners = episode.listener_count()
+            listeners = episode_listener_count(episode)
             updated = self.update(episode=episode, listeners=listeners)
             actions['updated'] += updated
 
@@ -42,7 +44,3 @@ class Command(ChangesCommand):
 
     def get_query_params(self):
         return dict(include_docs=True, filter='episode_states/has_play_events')
-
-
-    def get_db(self):
-        return EpisodeUserState.get_db()

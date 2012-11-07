@@ -1,6 +1,9 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load i18n %}
 {% load podcasts %}
+{% load utils %}
+{% load devices %}
 
 {% load menu %}
 {% block mainmenu %}{{ "/podcast/"|main_menu }}{% endblock %}
@@ -14,9 +17,9 @@
 
 {% block title %}{% blocktrans with podcast.title|default:"Unnamed Podcast"|striptags as podcasttitle %}Subscribe to {{ podcasttitle }}{% endblocktrans %}{% endblock %}
 
-{% block content %}
+{% block header %}
   {% if podcast.logo_url %}
-  <div id="podcastlogo">{{ podcast|podcast_logo_big }}</div>
+   <div id="podcastlogo"><a href="{% podcast_link_target podcast %}">{{ podcast|podcast_logo_big }}</a></div>
   {% endif %}
   <h1>
    {% if podcast.title %}
@@ -30,21 +33,45 @@
   {% if podcast.description %}
    <p class="description">{{ podcast.description|striptags }}</p>
    {% endif %}
-   <hr/>
+{% endblock %}
 
-   <h2>{% trans "Add a podcast" %}</h2>
-  {% if can_subscribe %}
-   <form action="{% podcast_link_target podcast "subscribe" %}" method="post">
+
+{% block content %}
+
+   <h2>{% trans "Subscribe on devices" %}</h2>
+  {% if targets|length  %}
+   <form action="{% podcast_link_target podcast "subscribe" %}" method="post" class="form-horizontal">
     {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="{% trans "Subscribe" %}" />
-</form>
-<p style="padding-top: 20px;"><a href="{% podcast_link_target podcast %}">{% trans "Back to the podcast page" %}</a></p>
+
+    <div class="control-group">
+     <div class="controls">
+      {% for target in targets %}
+       <label class="checkbox">
+        <input type="checkbox" value="{{ target|target_uid }}" name="{{ target|target_uid }}" checked="checked">
+        {% if target|is_list %}
+         {% for t in target %}
+          <a href="{% url "device" t.uid %}">{{ t|device_icon }}{{ t.name|striptags }}</a>
+         {% endfor %}
+        {% else %}
+         <a href="{% url "device" target.uid %}">{{ target|device_icon }}{{ target.name|striptags }}</a>
+        {% endif %}
+       </label>
+      {% endfor %}
+     </div>
+    </div>
+
+    <div class="control-group">
+     <div class="controls">
+      <input type="submit" value="Subscribe" />
+     </div>
+    </div>
+   </form>
   {% else %}
    <p>{% trans "You can't subscribe to this podcast, because you don't have any devices (on which you don't have subscribed to the podcast already." %}</p>
+   <a class="btn btn-success" href="{% url "device-edit-new" %}">
+    <i class="icon-plus"></i> {% trans "Create Device" %}
+   </a>
 
-   {% url help as help-url %}
-   <p>{% blocktrans %}If you're new here, you should start by reading our <a href="{{ help-url }}">introduction</a>.{% endblocktrans %}</p>
   {% endif %}
 
   {% if not podcast.title %}

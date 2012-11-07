@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load i18n %}
 {% load podcasts %}
 
@@ -8,21 +9,25 @@
 
 {% block title %}{% trans "Publisher Pages" %}{% endblock %}
 
-{% block content %}
+{% block header %}
  <h1>{% trans "Publisher Services" %}</h1>
+{% endblock %}
+
+
+{% block content %}
 
  <p>{% blocktrans with site as sitename %}{{ sitename }} offers several services for podcast publishers.{% endblocktrans %}</p>
 
  <h2>{% trans "Advertise" %}</h2>
  <p>{% blocktrans with site as sitename %}You can place your podcast on the frontpage of {{ sitename }} to promote your podcast. Users of the gPodder client will also find your podcast as the first item in the list of example podcast.{% endblocktrans %}</p>
 
- {% url advertise as advertise-url %}
+ {% url "advertise" as advertise-url %}
  <p>{% blocktrans %}You can find additional details on the <a href="{{ advertise-url }}">advertisement page</a>.{% endblocktrans %}</p>
 
  <h2>{% trans "Publisher Pages" %}</h2>
  <p>{% blocktrans with site as sitename %}On the <strong>{{ sitename }} Publisher Pages</strong> you can find valuable information about the Podcasts published by you.{% endblocktrans %}</p>
 
- {% url register as register-url %}
+ {% url "register" as register-url %}
  <p>{% blocktrans with site as sitename %}The Publisher Pages are currently in Beta, but if you are publishing a podcast listed on {{ sitename }}, feel free to apply by sending a mail with
   <ul>
    <li>your username on {{ sitename }} (<a href="{{ register-url }}">register if you don't have one</a>)</li>
@@ -31,14 +36,13 @@
   </ul>
   to <a href="mailto:stefan@gpodder.net">stefan@gpodder.net</a>.{% endblocktrans %}</p>
 
- {% url login as login-url %}
+ {% url "login" as login-url %}
  <p>{% blocktrans %}If you already are registered as a publisher, please <a href="{{ login-url }}?next=/publisher/">login</a>.{% endblocktrans %}</p>
 
  <h2>{% blocktrans with site as sitename %}Link to {{ sitename }}{% endblocktrans %}</h2>
 
- {% url link-here as link-here-url %}
+ {% url "link-here" as link-here-url %}
  <p>{% blocktrans with site as sitename %}If you <a href="{{ link-here-url }}">link to {{ sitename }}</a> from your website, you can make it really easy for your visitors to subscribe to your podcast - especially for users of mobile phones.{% endblocktrans %}</p>
-
 
 {% endblock %}
 

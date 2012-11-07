@@ -1,4 +1,5 @@
 import re
+import string
 from datetime import datetime
 
 from django.views.decorators.cache import never_cache
@@ -8,34 +9,30 @@ from django.shortcuts import render
 
 from babel import Locale, UnknownLocaleError
 
+from mygpo.cache import cache_result
 from mygpo.core.models import Podcast
+from mygpo.core.proxy import proxy_object
+from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_to_dict
 
 
 def get_accepted_lang(request):
-    return list(set([s[:2] for s in request.META.get('HTTP_ACCEPT_LANGUAGE', '').split(',')]))
+    """ returns a list of language codes accepted by the HTTP request """
 
-
-def get_podcast_languages():
-    """
-    Returns all 2-letter language codes that are used by podcasts.
-
-    It filters obviously invalid strings, but does not check if any
-    of these codes is contained in ISO 639.
-    """
-
-    res = Podcast.view('podcasts/by_language',
-            group_level = 1,
-            stale       = 'ok',
-        )
-
-    langs = [r['key'][0] for r in res]
-    sane_lang = sanitize_language_codes(langs)
-    sane_lang.sort()
-
-    return sane_lang
+    lang_str = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
+    lang_str = filter(lambda c: c in string.letters+',', lang_str)
+    langs = lang_str.split(',')
+    langs = [s[:2] for s in langs]
+    langs = map(str.strip, langs)
+    langs = filter(None, langs)
+    return list(set(langs))
 
 
 RE_LANG = re.compile('^[a-zA-Z]{2}[-_]?.*$')
+
+
+def sanitize_language_code(lang):
+    return lang[:2].lower()
+
 
 def sanitize_language_codes(langs):
     """
@@ -49,7 +46,7 @@ def sanitize_language_codes(langs):
     ['de', 'en']
     """
 
-    return list(set([l[:2].lower() for l in langs if l and RE_LANG.match(l)]))
+    return list(set([sanitize_language_code(l) for l in langs if l and RE_LANG.match(l)]))
 
 
 def get_language_names(lang):
@@ -70,11 +67,6 @@ def get_language_names(lang):
     return res
 
 
-class UpdatedException(Exception):
-    """Base exception with additional payload"""
-    def __init__(self, data):
-        Exception.__init__(self)
-        self.data = data
 
 
 def get_page_list(start, total, cur, show_max):
@@ -121,18 +113,14 @@ def get_page_list(start, total, cur, show_max):
 
 
 def process_lang_params(request):
-    if 'lang' in request.GET:
-        lang = list(set([x for x in request.GET.get('lang').split(',') if x]))
 
-    if request.method == 'POST':
-        if request.POST.get('lang'):
-            lang = list(set(lang + [request.POST.get('lang')]))
-        raise UpdatedException(lang)
+    lang = request.GET.get('lang', None)
 
-    if not 'lang' in request.GET:
-        lang = get_accepted_lang(request)
+    if lang is None:
+        langs = get_accepted_lang(request)
+        lang = next(iter(langs), '')
 
-    return sanitize_language_codes(lang)
+    return sanitize_language_code(lang)
 
 
 def symbian_opml_changes(podcast):
@@ -221,9 +209,23 @@ def get_episode_link_target(episode, podcast, view_name='episode', add_args=[]):
             if isinstance(episode.podcast, Podcast):
                 podcast = episode.podcast
             elif isinstance(episode.podcast, basestring):
-                podcast = Podcast.get(episode.podcast)
+                podcast = podcast_by_id(episode.podcast)
 
         args = [podcast.slug or podcast.get_id(), episode._id]
         view_name = '%s-slug-id' % view_name
 
     return strip_tags(reverse(view_name, args=args + add_args))
+
+
+def fetch_episode_data(episodes, podcasts={}):
+
+    if not podcasts:
+        podcast_ids = [episode.podcast for episode in episodes]
+        podcasts = podcasts_to_dict(podcast_ids)
+
+    def set_podcast(episode):
+        episode = proxy_object(episode)
+        episode.podcast = podcasts.get(episode.podcast, None)
+        return episode
+
+    return map(set_podcast, episodes)

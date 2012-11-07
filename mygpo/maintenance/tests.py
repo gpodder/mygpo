@@ -22,7 +22,9 @@ from django.test import TestCase
 
 from mygpo.core.models import Podcast, Episode
 from mygpo.users.models import EpisodeAction, User
-from mygpo.maintenance.merge import merge_podcasts
+from mygpo.maintenance.merge import PodcastMerger
+from mygpo.counter import Counter
+from mygpo.db.couchdb.episode_state import episode_state_for_user_episode
 
 
 class MergeTests(TestCase):
@@ -49,8 +51,8 @@ class MergeTests(TestCase):
 
     def test_merge_podcasts(self):
 
-        state1 = self.episode1.get_user_state(self.user)
-        state2 = self.episode2.get_user_state(self.user)
+        state1 = episode_state_for_user_episode(self.user, self.episode1)
+        state2 = episode_state_for_user_episode(self.user, self.episode2)
 
         action1 = EpisodeAction(action='play', timestamp=datetime.utcnow())
         action2 = EpisodeAction(action='download', timestamp=datetime.utcnow())
@@ -61,10 +63,14 @@ class MergeTests(TestCase):
         state1.save()
         state2.save()
 
-        merge_podcasts(self.podcast1, self.podcast2)
+        # decide which episodes to merge
+        groups = [(0, [self.episode1, self.episode2])]
+        counter = Counter()
 
-        state1 = self.episode1.get_user_state(self.user)
-        state2 = self.episode2.get_user_state(self.user)
+        pm = PodcastMerger([self.podcast1, self.podcast2], counter, groups)
+        pm.merge()
+
+        state1 = episode_state_for_user_episode(self.user, self.episode1)
 
         self.assertIn(action1, state1.actions)
         self.assertIn(action2, state1.actions)
@@ -75,11 +81,8 @@ class MergeTests(TestCase):
         self.podcast1.delete()
         self.episode1.delete()
 
-        try:
-            self.podcast2.delete()
-            self.episode2.delete()
-        except:
-            pass
+        #self.podcast2.delete()
+        #self.episode2.delete()
 
         self.user.delete()
 

@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+{% load url from future %}
 {% load i18n %}
 {% load podcasts %}
 {% load charts %}
@@ -13,24 +14,31 @@
 
 {% block title %}{% trans "Podcast Directory" %}{% endblock %}
 
+{% block header %}
+   <h1>{% trans "Podcast Directory" %}</h1>
+{% endblock %}
+
+
 {% block content %}
-  <h1>{% trans "Podcast Directory" %}</h1>
+  {% cache 60 topics %}
+  {% for c in topics.categories %}
 
+   {% if forloop.counter0|divisibleby:"2" %}
+    <div class="row-fluid">
+   {% endif %}
 
-  {% cache 3600 topics %}
-  {% for c in topics %}
-   <div class="intro-box">
+   <div class="span6">
     {% if c.cls == "PodcastList" %}
-     {% url lists-user c.username as user-lists-url %}
+     {% url "user" c.username as user-lists-url %}
      <h2>{% blocktrans with c.title as listtitle and c.username as username %}{{ listtitle }} <span class="by-user">by <a href="{{ user-lists-url }}">{{ username }}</a></span>{% endblocktrans %}</h2>
     {% else %}
      <h2>{{ c.label }}</h2>
     {% endif %}
 
     <table class="list">
-     {% for podcast in c.podcasts %}
+     {% for podcast in c.get_podcasts %}
       <tr>
-       <td>{{ podcast|podcast_logo }}</td>
+       <td class="logo">{{ podcast|podcast_logo }}</td>
        <td>{% podcast_group_link podcast %}</td>
       </tr>
      {% endfor %}
@@ -38,31 +46,128 @@
       <td></td>
       <td>
        {% if c.cls == "PodcastList" %}
-        <a href="{% url list-show c.username c.slug %}">{% trans "more..." %}</a>
+        <a href="{% url "list-show" c.username c.slug %}">{% trans "more..." %}</a>
        {% else %}
-        <a href="{% url directory c.label %}">{% trans "more..." %}</a>
+        <a href="{% url "directory" c.label %}">{% trans "more..." %}</a>
        {% endif %}
+      <td></td>
      </tr>
     </table>
    </div>
 
    {% if forloop.counter|divisibleby:"2" %}
-    <br style="clear: both" />
+    </div>
    {% endif %}
+
   {% endfor %}
   {% endcache %}
 
-  <hr />
+  <hr style="clear: both;"/>
 
-  {% cache 3600 tagcloud %}
+  {% cache 60 tagcloud %}
   <div id="tagcloud">
-   {% for tag in tag_cloud.entries %}
-    <span style="font-size: {% smartwidthratio tag.weight tag_cloud.max_weight 4 1 %}em">
-     <a href="{% url directory tag.label %}">{{ tag.label }}</a>
+   {% for tag in topics.tagcloud %}
+    <span style="font-size: {% smartwidthratio tag.get_weight topics.min_weight topics.max_weight 4 1 %}em">
+     <a href="{% url "directory" tag.label %}">{{ tag.label }}</a>
     </span>
    {% endfor %}
   </div>
   {% endcache %}
+{% endblock %}
+
+
+{% block sidebar %}
+
+  {% cache 3600 podcastlist %}
+  {% for podcastlist in podcastlists %}
+    <div class="well">
+     <h4>
+      <a href="{% url "list-show" podcastlist.user.username podcastlist.slug %}">
+       {{ podcastlist.title }}
+      </a>
+      <small>{% trans "Podcast List by" %}
+       <a href="{% url "lists-user" podcastlist.user.username %}">
+        {{ podcastlist.user.username }}
+       </a>
+      </small>
+     </h4>
+
+     <div class="logo-group">
+      {% for podcast in podcastlist.podcasts %}
+
+       <a href="{% podcast_link_target podcast %}">
+        {{ podcast|podcast_logo }}
+       </a>
+
+      {% endfor %}
+
+      {% if podcastlist.more_podcasts %}
+       {% blocktrans with podcastlist.more_podcasts as more %}and {{ more }} more{% endblocktrans %}
+      {% endif %}
+     </div>
+
+     <div class="btn-group">
+      <a class="btn btn-primary" href="{% url "lists-overview" %}">
+      {% trans "Create a Podcast List" %}
+     </a>
+     </div>
+
+   </div>
+  {% endfor %}
+ {% endcache %}
+
+
+  {% cache 3600 directory_trending %}
+  {% if trending_podcasts %}
+   {% with trending_podcasts|slice:":1"|first as trending_podcast %}
+    <div class="well">
+
+     <h4><small>{% trans "Trending" %} {% subscriber_change trending_podcast.subscriber_change %}</small></h4>
+
+     <a href="{% podcast_link_target trending_podcast %}">
+      <div id="podcastlogo">{{ trending_podcast|podcast_logo_medium }}</div>
+     </a>
+
+     <h4>{{ trending_podcast.title }}</h4>
+
+     <p class="description">
+      {{ trending_podcast.description|default:""|truncatewords:"50" }}
+     </p>
+
+     <p>
+      <a href="{% podcast_link_target trending_podcast %}">{% trans "more..." %}</a>
+     </p>
+
+    </div>
+   {% endwith %}
+  {% endif %}
+  {% endcache %}
+
+
+  {% cache 3600 random_podcast %}
+  {% for random_podcast in random_podcasts %}
+   <div class="well">
+
+   <h4><small>{% trans "Random" %}</small></h4>
+
+
+   <a href="{% podcast_link_target random_podcast %}">
+    <div id="podcastlogo">{{ random_podcast|podcast_logo_medium }}</div>
+   </a>
+
+   <h4>{{ random_podcast.title }}</h4>
+
+   <p class="description">
+    {{ random_podcast.description|default:""|truncatewords:"50" }}
+   </p>
+
+   <p>
+    <a href="{% podcast_link_target random_podcast %}">{% trans "more..." %}</a>
+   </p>
+
+   </div>
+  {% endfor %}
+ {% endcache %}
 
 {% endblock %}
 

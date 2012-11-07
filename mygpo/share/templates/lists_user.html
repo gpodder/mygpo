@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+{% load url from future %}
 {% load i18n %}
 
 {% load menu %}
@@ -8,14 +9,17 @@
 
 {% block title %}{% trans "Podcast Lists" %}{% endblock %}
 
+{% block header %}
+   <h1>{% blocktrans with user.username as username %}Podcast Lists by {{ username }}{% endblocktrans%}</h1>
+{% endblock %}
+
+
 {% block content %}
-  <h1>{% blocktrans with user.username as username %}Podcast Lists by {{ username }}{% endblocktrans%}</h1>
-  <hr />
 
   <table class="list">
    {% for list in lists %}
     <tr>
-     <td><a href="{% url list-show user.username list.slug %}">{{ list.title }}</a></td>
+     <td><a href="{% url "list-show" user.username list.slug %}">{{ list.title }}</a></td>
      <td>{% blocktrans with list.podcasts|length as num_podcasts %}{{ num_podcasts }} Podcasts{% endblocktrans %}</td>
     </tr>
    {% empty %}
@@ -26,10 +30,13 @@
     </tr>
    {% endfor %}
   </table>
+{% endblock %}
 
-  <div class="info">
-   {% url lists-overview as create-url %}
-   {% blocktrans %}Create your own <a href="{{ create-url }}">podcast lists</a>.{% endblocktrans %}
-  </div>
 
+{% block sidebar %}
+ <div class="well">
+  <h3>{% trans "Know Some Great Podcasts?" %}</h3>
+  <p>{% trans "Create a list of podcasts about a topic you like" %}</p>
+  <a class="btn btn-primary" href="{% url "lists-overview" %}">Go</a>
+ </div>
 {% endblock %}

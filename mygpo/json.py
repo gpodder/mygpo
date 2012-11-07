@@ -13,7 +13,7 @@ try:
     import ujson as json
     JSONDecodeError = ValueError
 
-except:
+except ImportError:
     print >> sys.stderr, 'ujson not found'
 
     try:
@@ -21,7 +21,7 @@ except:
         import simplejson as json
         JSONDecodeError = json.JSONDecodeError
 
-    except:
+    except ImportError:
         print >> sys.stderr, 'simplejson not found'
 
         # Otherwise use json from the stdlib

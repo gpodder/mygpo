@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load i18n %}
 
 {% load menu %}
@@ -9,9 +10,11 @@
  {% trans "Accound Deleted" %}
 {% endblock %}
 
-{% block content %}
-
+{% block header %}
   <h1>{% trans "Your account has been deleted" %}</h1>
-  <a href="{% url home %}">{% trans "Thanks" %}</a>
+{% endblock %}
 
+
+{% block content %}
+  <a href="{% url "home" %}">{% trans "Thanks" %}</a>
 {% endblock %}
