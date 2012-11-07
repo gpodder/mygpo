@@ -17,8 +17,6 @@ class Command(ChangesCommand):
     def __init__(self):
         super(Command, self).__init__('assign-upload-timestamps-status',
             'Assign-Upload-Timestamps')
-        self.episodes = {}
-
 
     def handle_obj(self, seq, doc, actions):
 
