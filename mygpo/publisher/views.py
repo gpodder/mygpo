@@ -146,6 +146,22 @@ def update_podcast(request, podcast):
     return HttpResponseRedirect(url)
 
 
+@vary_on_cookie
+@cache_control(private=True)
+@require_publisher
+def save_podcast(request, podcast):
+
+    if 'twitter' in request.POST:
+        podcast.twitter = request.POST['twitter']
+
+    podcast.save()
+    messages.success(request, _('Data updated'))
+
+    url = get_podcast_link_target(podcast, 'podcast-publisher-detail')
+    return HttpResponseRedirect(url)
+
+
+
 @never_cache
 @require_publisher
 def new_update_token(request, username):
@@ -281,6 +297,7 @@ def group_oldid_decorator(f):
 episode_oldid        = oldid_decorator(episode)
 podcast_oldid        = podcast_oldid_decorator(podcast)
 update_podcast_oldid = podcast_oldid_decorator(update_podcast)
+save_podcast_oldid   = podcast_oldid_decorator(save_podcast)
 episodes_oldid       = podcast_oldid_decorator(episodes)
 group_oldid          = group_oldid_decorator(group)
 
@@ -288,4 +305,5 @@ episode_slug_id        = slug_id_decorator(episode)
 podcast_slug_id        = podcast_slug_id_decorator(podcast)
 episodes_slug_id       = podcast_slug_id_decorator(episodes)
 update_podcast_slug_id = podcast_slug_id_decorator(update_podcast)
+save_podcast_slug_id   = podcast_slug_id_decorator(save_podcast)
 group_slug_id          = group_slug_id_decorator(group)

@@ -43,6 +43,28 @@
    <button class="btn" type="submit">{% trans "Update now" %}</button>
   </form>
 
+  <h2>Additional Data</h2>
+
+  <form class="form-horizontal" action="{% podcast_link_target podcast "podcast-publisher-save" %}" method="post">
+   {% csrf_token %}
+   <div class="control-group">
+    <label class="control-label" for="inputTwitter">
+     <i class="icon-twitter"></i> {% trans "Twitter" %}
+    </label>
+    <div class="controls">
+     <div class="input-prepend">
+      <span class="add-on">@</span>
+      <input type="text" id="inputTwitter" placeholder="username" value="{{ podcast.twitter }}">
+     </div>
+    </div>
+   </div>
+   <div class="control-group">
+    <div class="controls">
+     <button type="submit" class="btn">Save</button>
+    </div>
+   </div>
+  </form>
+
   <h2>Episodes</h2>
   <p>View and edit <a href="{% podcast_link_target podcast "podcast-publisher-episodes" %}">episode</a> data.</p>
 
