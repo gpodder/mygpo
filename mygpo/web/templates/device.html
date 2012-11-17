@@ -78,9 +78,9 @@
 
 {% block sidebar %}
 
- <div class="well">
+ {% if not device.deleted %}
 
-  {% if not device.deleted %}
+  <div class="well">
 
   <h4>{% trans "Synchronize" %}</h4>
   <p>{% blocktrans %}If you synchronize devices, they will always have the same subscriptions. A podcast that is subscribed on one device, will automatically be added to all synchronized devices.{% endblocktrans %}</p>
@@ -104,9 +104,8 @@
    </form>
   {% endif %}
 
-  {% endif %}
-
- </div>
+  </div>
+ {% endif %}
 
 {% endblock %}
 
