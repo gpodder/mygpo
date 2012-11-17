@@ -1,4 +1,5 @@
 from functools import wraps
+import urllib
 
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, \
@@ -94,6 +95,7 @@ def podcast(request, podcast):
     heatmap = EpisodeHeatmap(podcast.get_id())
 
     site = RequestSite(request)
+    feedurl_quoted = urllib.quote(podcast.url)
 
     return render(request, 'publisher/podcast.html', {
         'site': site,
@@ -104,6 +106,7 @@ def podcast(request, podcast):
         'subscriber_data': subscription_data,
         'update_token': update_token,
         'heatmap': heatmap,
+        'feedurl_quoted': feedurl_quoted,
         })
 
 

@@ -46,6 +46,12 @@
   <h2>Episodes</h2>
   <p>View and edit <a href="{% podcast_link_target podcast "podcast-publisher-episodes" %}">episode</a> data.</p>
 
+
+  <h2>{% trans "Link" %}</h2>
+   <p>{% blocktrans with url as sitename %}You can paste this code on your website, so users of {{ sitename }} can directly subscribe to your podcast.{% endblocktrans %}</p>
+   <textarea style="width: 100%;" rows="2"><a href="http://{{ site.domain }}{% url subscribe-by-url %}?url={{ feedurl_quoted }}"><img src="http://{{ site.domain }}/media/author_subscribe.png" /></a></textarea>
+   <p><a href="http://{{ site.domain }}{% url subscribe-by-url %}?url={{ feedurl_quoted }}"><img src="http://{{ site.domain }}/media/author_subscribe.png" /></a></p>
+
   <h2>Stats</h2>
 
   {% if group %}
