@@ -9,6 +9,7 @@ from mygpo.json import json
 
 from mygpo.core.models import Podcast
 from mygpo.couch import get_main_database
+from mygpo.directory.toplist import PodcastToplist
 from mygpo.users.models import PodcastUserState, EpisodeUserState, \
          Suggestions, User
 from mygpo.utils import progress
@@ -16,7 +17,7 @@ from mygpo.json import json
 from mygpo.db.couchdb.episode import episodes_for_podcast
 from mygpo.db.couchdb.podcast import podcast_by_id
 from mygpo.db.couchdb.podcast_state import podcast_states_for_user
-from mygpo.db.couchdb.podcast_state import episode_state_for_user_episode
+from mygpo.db.couchdb.episode_state import episode_state_for_user_episode
 from mygpo.db.couchdb.user import suggestions_for_user
 from mygpo.db.couchdb.directory import category_for_tag
 
@@ -33,8 +34,10 @@ class Command(BaseCommand):
 
 
     option_list = BaseCommand.option_list + (
-        make_option('--user', action='append', type="string", dest='users',
+        make_option('--user', action='append', type="string", dest='users', default=[],
             help="User for which related data should be dumped"),
+        make_option('--toplist', action='store_true', dest='toplist',
+            help="Dump toplist podcasts"),
     )
 
 
@@ -79,6 +82,19 @@ class Command(BaseCommand):
                     e_state = episode_state_for_user_episode(user, episode)
                     if e_state._id:
                         docs.add(e_state._id)
+
+        if options.get('toplist', False):
+            toplist = PodcastToplist()
+            entries = toplist[:25]
+
+            for n, podcast in entries:
+                print n, podcast
+                docs.add(podcast._id)
+
+                # Episodes
+                print podcast
+                for episode in episodes_for_podcast(podcast):
+                    docs.add(episode._id)
 
 
         db = get_main_database()
