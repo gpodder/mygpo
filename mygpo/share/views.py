@@ -268,7 +268,7 @@ class FavoritesFeedCreateEntry(View):
     def post(self, request):
         user = request.user
 
-        feed = favfeed(user)
+        feed = FavoriteFeed(user)
         site = RequestSite(request)
         feed_url = feed.get_public_url(site.domain)
 
