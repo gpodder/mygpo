@@ -125,7 +125,7 @@ class PodcastUpdater(object):
 
 
         if podcast.new_location:
-            new_podcast = Podcast.for_url(podcast.new_location)
+            new_podcast = podcast_for_url(podcast.new_location)
             if new_podcast != podcast:
                 self.mark_outdated(podcast, 'redirected to different podcast')
                 return
