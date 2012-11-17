@@ -147,6 +147,11 @@ class PodcastUpdater(object):
 
         self.update_categories(podcast, prev_latest_episode_timestamp)
 
+        # try to download the logo and reset logo_url to None on http errors
+        found = self.save_podcast_logo(podcast.logo_url)
+        if not found:
+            changed |= update_a(podcast, 'logo_url', None)
+
         if changed:
             print '      saving podcast'
             podcast.last_update = datetime.utcnow()
@@ -155,8 +160,6 @@ class PodcastUpdater(object):
 
         assign_slug(podcast, PodcastSlug)
         assign_missing_episode_slugs(podcast)
-
-        self.save_podcast_logo(podcast.logo_url)
 
 
     def update_categories(self, podcast, prev_timestamp, min_subscribers=5):
