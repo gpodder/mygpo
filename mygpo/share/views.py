@@ -278,8 +278,8 @@ class FavoritesFeedCreateEntry(View):
             user.published_objects.append(podcast.get_id())
             user.save()
 
-        updater = PodcastUpdater()
-        update.update_podcast(podcast)
+        updater = PodcastUpdater([podcast])
+        update.update()
 
         return HttpResponseRedirect(reverse('share-favorites'))
 
