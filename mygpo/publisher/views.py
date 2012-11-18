@@ -150,7 +150,8 @@ def update_podcast(request, podcast):
 @cache_control(private=True)
 @require_publisher
 def save_podcast(request, podcast):
-    update_additional_data(podcast, request.POST.get('twitter', None))
+    twitter = request.POST.get('twitter', '').replace('@', '').strip()
+    update_additional_data(podcast, twitter)
     messages.success(request, _('Data updated'))
     url = get_podcast_link_target(podcast, 'podcast-publisher-detail')
     return HttpResponseRedirect(url)
