@@ -42,6 +42,11 @@
      {{ podcast.subscriber_count }} {% trans "subscribers" %}
     {% endif %}
   </small>
+
+  <div class="description">
+   {% blocktrans with podcast.title as ptitle %}This is the publisher page of <strong>{{ ptitle }}</strong>. You can see some stats and provide additional data for the podcast page.{% endblocktrans %}
+   <a class="btn" href="{% podcast_link_target podcast %}">{% trans "Go to Podcast Page" %}</a>
+  </div>
 {% endblock %}
 
 
