@@ -28,7 +28,7 @@ from mygpo.users.models import User
 from mygpo.db.couchdb.episode import episodes_for_podcast
 from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_by_id, \
          podcast_for_url, podcastgroup_for_slug_id, podcastgroup_for_oldid, \
-         podcastgroup_by_id
+         podcastgroup_by_id, update_additional_data
 from mygpo.db.couchdb.episode_state import episode_listener_counts
 
 
@@ -150,13 +150,8 @@ def update_podcast(request, podcast):
 @cache_control(private=True)
 @require_publisher
 def save_podcast(request, podcast):
-
-    if 'twitter' in request.POST:
-        podcast.twitter = request.POST['twitter']
-
-    podcast.save()
+    update_additional_data(podcast, request.POST.get('twitter', None))
     messages.success(request, _('Data updated'))
-
     url = get_podcast_link_target(podcast, 'podcast-publisher-detail')
     return HttpResponseRedirect(url)
 

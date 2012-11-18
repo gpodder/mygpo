@@ -6,6 +6,7 @@ from restkit import RequestFailed
 from django.core.cache import cache
 
 from mygpo.core.models import Podcast, PodcastGroup, PodcastSubscriberData
+from mygpo.decorators import repeat_on_conflict
 from mygpo.cache import cache_result
 from mygpo.couch import get_main_database
 from mygpo.db.couchdb.utils import multi_request_view, is_couchdb_id
@@ -394,3 +395,12 @@ def search(q, offset=0, num_results=20):
 
     except RequestFailed:
         return [], 0
+
+
+@repeat_on_conflict(['podcast'])
+def update_additional_data(podcast, twitter):
+    podcast.twitter = twitter
+    podcast.save()
+
+    # clear the whole cache until we have a better invalidation mechanism
+    cache.clear()
