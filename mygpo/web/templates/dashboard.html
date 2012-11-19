@@ -6,6 +6,7 @@
 {% load podcasts %}
 {% load humanize %}
 {% load cache %}
+{% load utils %}
 
 {% load menu %}
 {% block mainmenu %}{{ "/"|main_menu }}{% endblock %}
@@ -30,7 +31,7 @@
         {% episode_link episode episode.podcast %}<br/>
         <span class="from_podcast">{% podcast_group_link episode.podcast %}</span>
        </td>
-       <td>{{ episode.released|naturalday }}</td>
+       <td>{{ episode.released|naturalday|nbsp }}</td>
       </tr>
      {% endfor %}
     </table>
