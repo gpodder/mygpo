@@ -229,3 +229,11 @@ def fetch_episode_data(episodes, podcasts={}):
         return episode
 
     return map(set_podcast, episodes)
+
+
+# doesn't include the '@' because it's not stored as part of a twitter handle
+TWITTER_CHARS = string.ascii_letters + string.digits + '_'
+
+def normalize_twitter(s):
+    """ normalize user input that is supposed to be a Twitter handle """
+    return "".join(i for i in s if i in TWITTER_CHARS)

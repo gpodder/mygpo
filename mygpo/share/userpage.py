@@ -5,6 +5,7 @@ import gevent
 from django.shortcuts import render
 from django.views.generic.base import View
 from django.utils.decorators import method_decorator
+from django.contrib.sites.models import RequestSite
 
 from mygpo.users.models import User
 from mygpo.users.models import HistoryEntry
@@ -28,6 +29,7 @@ class UserpageView(GeventView):
 
         user = User.get_user(username)
         month_ago = datetime.today() - timedelta(days=31)
+        site = RequestSite(request)
 
         context_funs = {
             'lists': gevent.spawn(self.get_podcast_lists, user),
@@ -42,6 +44,7 @@ class UserpageView(GeventView):
 
         context = {
             'page_user': user,
+            'site': site.domain,
             'subscriptions_token': user.get_token('subscriptions_token'),
             'favorite_feeds_token': user.get_token('favorite_feeds_token'),
         }

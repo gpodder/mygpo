@@ -20,7 +20,7 @@ from mygpo.web.views.episode import oldid_decorator, slug_id_decorator
 from mygpo.web.views.podcast import \
          slug_id_decorator as podcast_slug_id_decorator, \
          oldid_decorator as podcast_oldid_decorator
-from mygpo.web.utils import get_podcast_link_target
+from mygpo.web.utils import get_podcast_link_target, normalize_twitter
 from django.contrib.sites.models import RequestSite
 from mygpo.data.feeddownloader import PodcastUpdater
 from mygpo.decorators import requires_token, allowed_methods
@@ -150,7 +150,7 @@ def update_podcast(request, podcast):
 @cache_control(private=True)
 @require_publisher
 def save_podcast(request, podcast):
-    twitter = request.POST.get('twitter', '').replace('@', '').strip()
+    twitter = normalize_twitter(request.POST.get('twitter', ''))
     update_additional_data(podcast, twitter)
     messages.success(request, _('Data updated'))
     url = get_podcast_link_target(podcast, 'podcast-publisher-detail')

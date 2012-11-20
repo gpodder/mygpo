@@ -21,7 +21,22 @@
   <div id="podcastlogo">{% gravatar_img page_user %}</div>
 
   <h1>{{ page_user.username }}</h1>
-  <small class="description"></small>
+  <small class="description">
+   {% blocktrans %}a user on {{ site }}{% endblocktrans %}
+   {% if user.twitter %}
+    · <a href="https://twitter/{{ user.twitter }}"><i class="icon-twitter"></i></a>
+   {% endif %}
+
+  </small>
+
+  <div class="description">
+   {% if user.about %}
+    {{ user.about|markdown }}
+   {% else %}
+    {% blocktrans with user.username as username %}<strong>{{ username }} is sharing his favorite podcasts on {{ site }}.{% endblocktrans %}
+   {% endif %}
+
+  </div>
 {% endblock %}
 
 {% block content %}
@@ -145,6 +160,18 @@
 
 
 {% block sidebar %}
+
+ {% if user == page_user %}
+
+  <div class="well">
+   <h3>{% trans "That's You!" %}</h3>
+
+   <a href="{% url "account"%}" class="btn btn-primary">{% trans "Edit your profile" %}</a>
+
+  </div>
+
+ {% endif %}
+
 
  <div class="well">
   <h3>{% trans "Stats" %}</h3>
