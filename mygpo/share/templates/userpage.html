@@ -33,7 +33,7 @@
    {% if user.about %}
     {{ user.about|markdown }}
    {% else %}
-    {% blocktrans with user.username as username %}<strong>{{ username }} is sharing his favorite podcasts on {{ site }}.{% endblocktrans %}
+    {% blocktrans with page_user.username as username %}<strong>{{ username }}</strong> is sharing his favorite podcasts on {{ site }}.{% endblocktrans %}
    {% endif %}
 
   </div>
