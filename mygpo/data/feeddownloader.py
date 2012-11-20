@@ -24,6 +24,8 @@ import hashlib
 from datetime import datetime
 from itertools import chain
 
+from django.conf import settings
+
 from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.core.slugs import assign_missing_episode_slugs, assign_slug, \
          PodcastSlug
@@ -162,7 +164,7 @@ class PodcastUpdater(object):
         assign_missing_episode_slugs(podcast)
 
 
-    def update_categories(self, podcast, prev_timestamp, min_subscribers=5):
+    def update_categories(self, podcast, prev_timestamp):
         from datetime import timedelta
 
         max_timestamp = datetime.utcnow() + timedelta(days=1)
@@ -180,7 +182,7 @@ class PodcastUpdater(object):
             return
 
         # not enough subscribers
-        if podcast.subscriber_count() < min_subscribers:
+        if podcast.subscriber_count() < settings.MIN_SUBSCRIBERS_CATEGORY:
             return
 
         update_category(podcast)
