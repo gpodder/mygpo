@@ -23,15 +23,15 @@
   <h1>{{ page_user.username }}</h1>
   <small class="description">
    {% blocktrans %}a user on {{ site }}{% endblocktrans %}
-   {% if user.twitter %}
-    · <a href="https://twitter/{{ user.twitter }}"><i class="icon-twitter"></i></a>
+   {% if page_user.twitter %}
+    · <a href="https://twitter/{{ page_user.twitter }}"><i class="icon-twitter"></i></a>
    {% endif %}
 
   </small>
 
   <div class="description">
-   {% if user.about %}
-    {{ user.about|markdown }}
+   {% if page_user.about %}
+    {{ page_user.about|markdown }}
    {% else %}
     {% blocktrans with page_user.username as username %}<strong>{{ username }}</strong> is sharing his favorite podcasts on {{ site }}.{% endblocktrans %}
    {% endif %}
