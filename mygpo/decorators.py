@@ -116,6 +116,7 @@ class repeat_on_conflict(object):
             locals.update({argspec.varargs: varargs})
         if argspec.keywords is not None:
             locals.update({argspec.keywords: kwargs})
+        locals.update(kwargs)
         return locals
 
 
