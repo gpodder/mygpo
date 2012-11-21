@@ -42,6 +42,11 @@ class Category(Document):
         self.podcasts = new_entries
 
 
+    # called from within a template where we can't pass parameters
+    def get_podcasts_more(self, start=0, end=40):
+        return self.get_podcasts(start, end)
+
+
     def get_podcasts(self, start=0, end=10):
         cache_id = 'category-%s-%d-%d' % (self._id, start, end)
 
