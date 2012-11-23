@@ -44,7 +44,9 @@
   {% endif %}
   <h1>
    {{ episode.title|default:"Unnamed Episode"|striptags }}
-   <small>{{ episode.released|naturalday }}</small>
+   {% if episode.released %}
+    <small>{{ episode.released|naturalday }}</small>
+   {% endif %}
   </h1>
   <small class="description">
       {% trans "from" %} {% podcast_group_link podcast %}&middot;
