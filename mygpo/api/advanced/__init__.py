@@ -535,7 +535,8 @@ def get_episode_updates(user, subscribed_podcasts, since):
         episodes = chain.from_iterable(job.get() for job in episode_jobs)
 
     else:
-        episodes = [episodes_for_podcast(p, since) for p in subscribed_podcasts]
+        episodes = chain.from_iterable(episodes_for_podcast(p, since) for p
+                in subscribed_podcasts)
 
 
     for episode in episodes:

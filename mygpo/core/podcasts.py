@@ -40,9 +40,9 @@ class PodcastSet(set):
             episodes = chain.from_iterable(job.get() for job in jobs)
 
         else:
-            episodes = [episodes_for_podcast(podcast, since=1,
-                    until=max_date, descending=True,
-                    limit=max_per_podcast) for podcast in podcasts]
+            episodes = chain.from_iterable(episodes_for_podcast(podcast,
+                    since=1, until=max_date, descending=True,
+                    limit=max_per_podcast) for podcast in podcasts)
 
 
         episodes = sorted(episodes, key=lambda e: e.released, reverse=True)
