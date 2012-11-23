@@ -97,7 +97,7 @@
       <div class="controls">
        <div class="input-prepend">
         <span class="add-on">@</span>
-        <input type="text" id="id_twitter" name="twitter" placeholder="username" value="{{ profile_form.twitter.value }}">
+        <input type="text" id="id_twitter" name="twitter" placeholder="username" value="{{ profile_form.twitter.value|default:"" }}">
        </div>
       </div>
      </div>
