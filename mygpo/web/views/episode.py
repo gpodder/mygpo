@@ -228,12 +228,12 @@ def add_action(request, episode):
 
     state = episode_state_for_user_episode(request.user, episode)
 
-    @repeat_on_conflict(['action'])
-    def _add_action(action):
+    @repeat_on_conflict(['state'])
+    def _add_action(state, action):
         state.add_actions([action])
         state.save()
 
-    _add_action(action=action)
+    _add_action(state, action)
 
     podcast = podcast_by_id(episode.podcast)
 
