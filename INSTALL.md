@@ -8,7 +8,7 @@ Dependencies
 When no version number is indicated, it is advisable to install the current
 development version from the repository.
 
-* Python (>= 2.6)
+* Python (>= 2.6) or PyPy (tested with 2.0 beta1)
 * [CouchDB](https://couchdb.apache.org/) (>= 1.2)
 
 
