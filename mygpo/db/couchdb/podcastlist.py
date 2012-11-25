@@ -2,10 +2,19 @@ from random import random
 
 from mygpo.share.models import PodcastList
 from mygpo.cache import cache_result
+from mygpo.db import QueryParameterMissing
+
 
 
 @cache_result(timeout=60)
 def podcastlist_for_user_slug(user_id, slug):
+
+    if not user_id:
+        raise QueryParameterMissing('user_id')
+
+    if not slug:
+        raise QueryParameterMissing('slug')
+
 
     r = PodcastList.view('podcastlists/by_user_slug',
             key          = [user_id, slug],
@@ -16,6 +25,9 @@ def podcastlist_for_user_slug(user_id, slug):
 
 
 def podcastlists_for_user(user_id):
+
+    if not user_id:
+        raise QueryParameterMissing('user_id')
 
     r = PodcastList.view('podcastlists/by_user_slug',
             startkey = [user_id, None],

@@ -1,6 +1,7 @@
 from mygpo.core.models import SanitizingRule
 from mygpo.cache import cache_result
 from mygpo.couch import get_main_database
+from mygpo.db import QueryParameterMissing
 from mygpo.db.couchdb.utils import multi_request_view
 
 
@@ -10,6 +11,10 @@ class SanitizingRuleStub(object):
 
 @cache_result(timeout=60*60)
 def sanitizingrules_by_obj_type(obj_type):
+
+    if not obj_type:
+        raise QueryParameterMissing('obj_type')
+
     r = SanitizingRule.view('sanitizing_rules/by_target',
             include_docs = True,
             startkey     = [obj_type, None],
@@ -31,6 +36,10 @@ def _wrap_rule(rule):
 
 @cache_result(timeout=60*60)
 def sanitizingrule_for_slug(slug):
+
+    if not slug:
+        raise QueryParameterMissing('slug')
+
     r = SanitizingRule.view('sanitizing_rules/by_slug',
             include_docs=True,
             key=slug,
@@ -40,6 +49,17 @@ def sanitizingrule_for_slug(slug):
 
 
 def missing_slug_count(doc_type, start, end):
+
+    if not doc_type:
+        raise QueryParameterMissing('doc_type')
+
+    if not start:
+        raise QueryParameterMissing('start')
+
+    if not end:
+        raise QueryParameterMissing('end')
+
+
     db = get_main_database()
     res = db.view('slugs/missing',
             startkey     = [doc_type] + end,
@@ -53,6 +73,16 @@ def missing_slug_count(doc_type, start, end):
 
 
 def missing_slugs(doc_type, start, end, wrapper, **kwargs):
+
+    if not doc_type:
+        raise QueryParameterMissing('doc_type')
+
+    if not start:
+        raise QueryParameterMissing('start')
+
+    if not end:
+        raise QueryParameterMissing('end')
+
 
     db = get_main_database()
     return multi_request_view(db, 'slugs/missing',
