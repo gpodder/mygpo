@@ -183,6 +183,20 @@ ADSENSE_SLOT_BOTTOM = ''
 STAFF_TOKEN = None
 
 
+
+### Celery
+
+BROKER_URL='redis://localhost'
+BACKEND_URL='redis://localhost'
+
+
+# a dictionary containing celery settings from
+# http://docs.celeryproject.org/en/latest/configuration.html
+CELERY_CONF = dict(
+)
+
+
+
 try:
     from settings_prod import *
 except ImportError, e:
