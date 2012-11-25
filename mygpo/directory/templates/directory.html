@@ -80,6 +80,7 @@
 
   {% cache 3600 podcastlist %}
   {% for podcastlist in podcastlists %}
+   {% if podcastlist %}
     <div class="well">
      <h4>
       <a href="{% url "list-show" podcastlist.user.username podcastlist.slug %}">
@@ -113,6 +114,7 @@
      </div>
 
    </div>
+   {% endif %}
   {% endfor %}
  {% endcache %}
 
