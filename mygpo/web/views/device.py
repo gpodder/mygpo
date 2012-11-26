@@ -201,9 +201,19 @@ def edit(request, device):
         'uid' : device.uid
         })
 
+    synced_with = request.user.get_synced(device)
+
+    sync_targets = list(request.user.get_sync_targets(device))
+    sync_form = SyncForm()
+    sync_form.set_targets(sync_targets,
+            _('Synchronize with the following devices'))
+
     return render(request, 'device-edit.html', {
         'device': device,
         'device_form': device_form,
+        'sync_form': sync_form,
+        'synced_with': synced_with,
+        'has_sync_targets': len(sync_targets) > 0,
     })
 
 

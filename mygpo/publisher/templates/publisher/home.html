@@ -30,8 +30,8 @@
 
  <h2>{% trans "Update your podcasts" %}</h2>
  <p>{% trans "To update all of your published podcasts automatically, you can request the following URL" %}</p>
- <pre><a href="{% url publisher-update user.username %}?token={{ update_token }}">http://{{ site }}{% url publisher-update user.username %}?token={{ update_token }}</a></pre>
- <form action="{% url publisher-new-update-token user.username %}" method="post">
+ <pre><a href="{% url "publisher-update" user.username %}?token={{ update_token }}">http://{{ site }}{% url "publisher-update" user.username %}?token={{ update_token }}</a></pre>
+ <form action="{% url "publisher-new-update-token" user.username %}" method="post">
   {% csrf_token %}
   <button type="submit" class="btn">{% trans "Create a new token" %}</button>
  </form>

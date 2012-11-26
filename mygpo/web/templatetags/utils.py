@@ -60,3 +60,11 @@ def markdown(txt):
     import markdown2
     html = markdown2.markdown(txt)
     return mark_safe(html)
+
+
+@register.filter
+def nbsp(s):
+    """ collapses multiple whitespaces and replaces them with &nbsp; """
+    import re
+    s = re.sub("\s+" , "&nbsp;", s)
+    return mark_safe(s)

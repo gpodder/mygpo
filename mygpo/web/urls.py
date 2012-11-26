@@ -81,11 +81,15 @@ urlpatterns += patterns('mygpo.web.views.episode',
 )
 
 from mygpo.web.views.settings import DefaultPrivacySettings, \
-         PodcastPrivacySettings
+         PodcastPrivacySettings, ProfileView
 
 urlpatterns += patterns('mygpo.web.views.settings',
  url(r'^account/$',                                               'account',       name='account'),
  url(r'^account/privacy$',                                        'privacy',       name='privacy'),
+
+ url(r'^account/profile$',
+     ProfileView.as_view(),
+     name='profile'),
 
  url(r'^account/privacy/default-public$',
      DefaultPrivacySettings.as_view(public=True),

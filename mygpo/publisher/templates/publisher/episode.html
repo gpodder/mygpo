@@ -28,16 +28,30 @@
    </div>
   {% endif %}
 
-  <h1>{% trans "Publisher Pages:" %} {% if episode.title %}{{ episode.title|striptags }}{% else %}{% trans "Unnamed Episode" %}{%endif%}</h1>
+  <h1>{% if episode.title %}{{ episode.title|striptags }}{% else %}{% trans "Unnamed Episode" %}{%endif%} <small>{% trans "Publisher Pages" %}</small></h1>
   <small class="description">
-      {% trans "from" %} {% podcast_group_link podcast %}{% if episode.timestamp %}, {% trans "released" %} {{episode.timestamp}}{% endif %},
-      {% trans "links" %}:
-      <a href="{{episode.url}}">{% trans "download" %}</a>{% if episode.link and episode.link != episode.url %}, <a href="{{episode.link}}">{% trans "website" %}</a>
-      {% endif %},
-      {% trans "stats:" %} {% blocktrans with episode.listener_count as listener_count %}{{listener_count}} listeners{% endblocktrans %}
+      {% trans "from" %} {% podcast_group_link podcast %}&middot;
+       {% if not episode.outdated or "hide-outdated-urls" not in podcast.restrictions %}
+        <a href="{{episode.url}}" title="{% trans "Download" %}">
+         <i class="icon-download"></i>
+        </a>
+       {% endif %}
+       {% if episode.link and episode.link != episode.url %}&middot;
+        <a href="{{episode.link}}" title="{% trans "Website" %}">
+         <i class="icon-external-link"></i>
+        </a>
+      {% endif %}
+      {% if episode.listeners %}&middot;
+       {{ episode.listeners }} {% trans "listeners" %}
+      {% endif %}
   </small>
 
-  <p><a href="{% podcast_link_target podcast "podcast-publisher-episodes" %}">{% trans "Return to the episode list" %}</a></p>
+  <p>
+   <ul>
+    <li><a href="{% podcast_link_target podcast "podcast-publisher-episodes" %}">{% trans "Return to the episode list" %}</a></li>
+    <li><a href="{% podcast_link_target podcast "podcast-publisher-detail" %}">{% trans "Return to podcast page" %}</a></li>
+   </ul>
+  </p>
 {% endblock %}
 
 

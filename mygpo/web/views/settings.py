@@ -28,12 +28,14 @@ from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control
 from django.utils.decorators import method_decorator
 from django.views.generic.base import View
+from django.utils.html import strip_tags
 
 from django_couchdb_utils.auth.models import UsernameException, \
          PasswordException
 
 from mygpo.decorators import allowed_methods, repeat_on_conflict
-from mygpo.web.forms import UserAccountForm
+from mygpo.web.forms import UserAccountForm, ProfileForm
+from mygpo.web.utils import normalize_twitter
 from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_to_dict
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast, \
          subscriptions_by_user
@@ -47,6 +49,13 @@ def account(request):
 
     if request.method == 'GET':
 
+       userpage_token = request.user.get_token('userpage_token')
+
+       profile_form = ProfileForm({
+               'twitter': request.user.twitter,
+               'about':   request.user.about,
+            })
+
        form = UserAccountForm({
             'email': request.user.email,
             'public': request.user.settings.get('public_subscriptions', True)
@@ -54,6 +63,8 @@ def account(request):
 
        return render(request, 'account.html', {
             'form': form,
+            'profile_form': profile_form,
+            'userpage_token': userpage_token,
             })
 
     try:
@@ -83,6 +94,27 @@ def account(request):
     return render(request, 'account.html', {
         'form': form,
     })
+
+
+class ProfileView(View):
+    """ Updates the public profile and redirects back to the account view """
+
+    def post(self, request):
+        user = request.user
+
+        form = ProfileForm(request.POST)
+
+        if not form.is_valid():
+            raise ValueError(_('Oops! Something went wrong. Please double-check the data you entered.'))
+
+        request.user.twitter = normalize_twitter(form.cleaned_data['twitter'])
+        request.user.about = strip_tags(form.cleaned_data['about'])
+
+        request.user.save()
+        messages.success(request, _('Data updated'))
+
+        return HttpResponseRedirect(reverse('account'))
+
 
 
 @login_required

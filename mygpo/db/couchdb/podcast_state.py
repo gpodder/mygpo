@@ -1,9 +1,14 @@
 from mygpo.users.models import PodcastUserState
 from mygpo.couch import get_main_database
 from mygpo.cache import cache_result
+from mygpo.db import QueryParameterMissing
 
 
 def all_podcast_states(podcast):
+
+    if not podcast:
+        raise QueryParameterMissing('podcast')
+
     return PodcastUserState.view('podcast_states/by_podcast',
             startkey     = [podcast.get_id(), None],
             endkey       = [podcast.get_id(), {}],
@@ -13,6 +18,10 @@ def all_podcast_states(podcast):
 
 @cache_result(timeout=60*60)
 def subscribed_users(podcast):
+
+    if not podcast:
+        raise QueryParameterMissing('podcast')
+
     db = get_main_database()
 
     res = db.view('subscriptions/by_podcast',
@@ -27,6 +36,10 @@ def subscribed_users(podcast):
 
 
 def subscribed_podcast_ids_by_user_id(user_id):
+
+    if not user_id:
+        raise QueryParameterMissing('user_id')
+
     subscribed = db.view('subscriptions/by_user',
             startkey    = [user_id, True, None, None],
             endkey      = [user_id, True, {}, {}],
@@ -39,6 +52,10 @@ def subscribed_podcast_ids_by_user_id(user_id):
 
 @cache_result(timeout=60*60)
 def podcast_subscriber_count(podcast):
+
+    if not podcast:
+        raise QueryParameterMissing('podcast')
+
     db = get_main_database()
     subscriber_sum = 0
 
@@ -57,6 +74,14 @@ def podcast_subscriber_count(podcast):
 
 
 def podcast_state_for_user_podcast(user, podcast):
+
+    if not user:
+        raise QueryParameterMissing('user')
+
+    if not podcast:
+        raise QueryParameterMissing('podcast')
+
+
     r = PodcastUserState.view('podcast_states/by_podcast',
                 key          = [podcast.get_id(), user._id],
                 limit        = 1,
@@ -79,6 +104,10 @@ def podcast_state_for_user_podcast(user, podcast):
 
 
 def podcast_states_for_user(user):
+
+    if not user:
+        raise QueryParameterMissing('user')
+
     r = PodcastUserState.view('podcast_states/by_user',
             startkey     = [user._id, None],
             endkey       = [user._id, 'ZZZZ'],
@@ -88,6 +117,10 @@ def podcast_states_for_user(user):
 
 
 def podcast_states_for_device(device_id):
+
+    if not device_id:
+        raise QueryParameterMissing('device_id')
+
     r = PodcastUserState.view('podcast_states/by_device',
             startkey     = [device_id, None],
             endkey       = [device_id, {}],
@@ -106,6 +139,10 @@ def podcast_state_count():
 
 
 def subscribed_podcast_ids_by_device(device):
+
+    if not device:
+        raise QueryParameterMissing('device')
+
     db = get_main_database()
     r = db.view('subscriptions/by_device',
             startkey = [device.id, None],
@@ -119,6 +156,9 @@ def subscriptions_by_user(user, public=None):
     Returns a list of (podcast-id, device-id) tuples for all
     of the users subscriptions
     """
+
+    if not user:
+        raise QueryParameterMissing('user')
 
     r = PodcastUserState.view('subscriptions/by_user',
             startkey = [user._id, public, None, None],

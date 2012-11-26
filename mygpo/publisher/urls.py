@@ -7,6 +7,7 @@ urlpatterns = patterns('mygpo.publisher.views',
 
  url(r'^podcast/(?P<pid>\d+)$',          'podcast_oldid',              name='podcast-publisher-detail'),
  url(r'^podcast/(?P<pid>\d+)/update$',   'update_podcast_oldid',       name='podcast-publisher-update'),
+ url(r'^podcast/(?P<pid>\d+)/save$',     'save_podcast_oldid',       name='podcast-publisher-save'),
  url(r'^podcast/(?P<pid>\d+)/episodes$', 'episodes_oldid',             name='podcast-publisher-episodes'),
 
 
@@ -19,6 +20,9 @@ urlpatterns = patterns('mygpo.publisher.views',
 
  url(r'^podcast/(?P<slug_id>[\w-]+)/update$',
       'update_podcast_slug_id' ,    name='podcast-publisher-update-slug-id'),
+
+ url(r'^podcast/(?P<slug_id>[\w-]+)/save$',
+      'save_podcast_slug_id' ,    name='podcast-publisher-save-slug-id'),
 
  url(r'^podcast/(?P<slug_id>[\w-]+)/episodes$',
       'episodes_slug_id',           name='podcast-publisher-episodes-slug-id'),

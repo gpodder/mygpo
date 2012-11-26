@@ -42,27 +42,40 @@
    </h1>
 
    <small class="description">
-    {% trans "links" %}:
-    <a href="{{podcast.url}}">
-     {% trans "feed" %}
+    {% if podcast.author %}{% trans "by" %}
+     {{ podcast.author|striptags }}
+    {% endif %}
+    {% if podcast.twitter %}
+     <a href="https://twitter.com/{{ podcast.twitter|striptags }}"><i class="icon-twitter"></i></a>
+    {% endif %}&middot;
+    <a href="{{podcast.url}}" title="{% trans "Feed" %}">
+     <i class="icon-rss"></i>
     </a>
-    {% if podcast.link %},
-     <a href="{{podcast.link}}">{% trans "website" %}</a>
-    {% endif %},
-    {% blocktrans with podcast.subscriber_count as subscriber_count and podcast.listener_count as listener_count %}{{subscriber_count}} subscribers, {{listener_count}} listeners{% endblocktrans %}
+    {% if podcast.link %}&middot;
+     <a href="{{podcast.link}}" title="{% trans "Website" %}">
+      <i class="icon-external-link"></i>
+     </a>
+    {% endif %}
+    {% if podcast.subscriber_count %}&middot;
+     {{ podcast.subscriber_count }} {% trans "subscribers" %}
+    {% endif %}
    </small>
 
    {% if related_podcasts %}
     <div class="related-podcasts">
      <strong>{% trans "Also available" %}</strong>
      {% for p in related_podcasts %}
-      {% podcast_group_link p p.group_member_name %}
+      {% if p.group_member_name != podcast.group_member_name %}
+       {% podcast_group_link p p.group_member_name %}
+      {% endif %}
      {% endfor %}
     </div>
    {% endif %}
 
    {% if podcast.description %}
-    <div class="description">{{ podcast.description|markdown }}</div>
+    <div class="description">
+     {{ podcast.description|markdown }}
+    </div>
    {% endif %}
 
 {% endblock %}
