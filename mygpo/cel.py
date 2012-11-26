@@ -12,7 +12,8 @@ celery = Celery('mygpo.celery',
                 broker=settings.BROKER_URL,
                 backend=settings.BACKEND_URL,
                 include=[
-                    'mygpo.data.tasks'
+                    'mygpo.data.tasks',
+                    'mygpo.admin.tasks',
                 ])
 
 celery.conf.update(
