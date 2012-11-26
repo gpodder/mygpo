@@ -1,8 +1,11 @@
 from hashlib import sha1
+from datetime import datetime
+from dateutil import parser
 
 from django.core.cache import cache
 
 from mygpo.users.models import EpisodeUserState
+from mygpo.db import QueryParameterMissing
 from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url
 from mygpo.db.couchdb.episode import episode_for_podcast_id_url
 from mygpo.couch import get_main_database
@@ -11,6 +14,13 @@ from mygpo.cache import cache_result
 
 
 def episode_state_for_user_episode(user, episode):
+
+    if not user:
+        raise QueryParameterMissing('user')
+
+    if not episode:
+        raise QueryParameterMissing('episode')
+
 
     key = 'episode-state-userid-%s-episodeid-%s' % (sha1(user._id).hexdigest(),
             sha1(episode._id).hexdigest())
@@ -46,6 +56,10 @@ def episode_state_for_user_episode(user, episode):
 
 
 def all_episode_states(episode):
+
+    if not episode:
+        raise QueryParameterMissing('episode')
+
     r =  EpisodeUserState.view('episode_states/by_podcast_episode',
             startkey     = [episode.podcast, episode._id, None],
             endkey       = [episode.podcast, episode._id, {}],
@@ -56,6 +70,10 @@ def all_episode_states(episode):
 
 
 def all_podcast_episode_states(podcast):
+
+    if not podcast:
+        raise QueryParameterMissing('podcast')
+
     r =  EpisodeUserState.view('episode_states/by_podcast_episode',
             startkey     = [podcast.get_id(), None, None],
             endkey       = [podcast.get_id(), {},   {}],
@@ -68,6 +86,9 @@ def all_podcast_episode_states(podcast):
 @cache_result(timeout=60*60)
 def podcast_listener_count(episode):
     """ returns the number of users that have listened to this podcast """
+
+    if not episode:
+        raise QueryParameterMissing('episode')
 
     r = EpisodeUserState.view('listeners/by_podcast',
             startkey    = [episode.get_id(), None],
@@ -82,6 +103,9 @@ def podcast_listener_count(episode):
 @cache_result(timeout=60*60)
 def podcast_listener_count_timespan(podcast, start=None, end={}):
     """ returns (date, listener-count) tuples for all days w/ listeners """
+
+    if not podcast:
+        raise QueryParameterMissing('podcast')
 
     if isinstance(start, datetime):
         start = start.isoformat()
@@ -104,6 +128,10 @@ def podcast_listener_count_timespan(podcast, start=None, end={}):
 def episode_listener_counts(episode):
     """ (Episode-Id, listener-count) tuples for episodes w/ listeners """
 
+    if not episode:
+        raise QueryParameterMissing('episode')
+
+
     r = EpisodeUserState.view('listeners/by_podcast_episode',
             startkey    = [episode.get_id(), None, None],
             endkey      = [episode.get_id(), {},   {}],
@@ -119,6 +147,13 @@ def episode_listener_counts(episode):
 def get_podcasts_episode_states(podcast, user_id):
     """ Returns the latest episode actions for the podcast's episodes """
 
+    if not podcast:
+        raise QueryParameterMissing('podcast')
+
+    if not user_id:
+        raise QueryParameterMissing('user_id')
+
+
     db = get_main_database()
     res = db.view('episode_states/by_user_podcast',
             startkey = [user_id, podcast.get_id(), None],
@@ -132,6 +167,10 @@ def get_podcasts_episode_states(podcast, user_id):
 @cache_result(timeout=60*60)
 def episode_listener_count(episode, start=None, end={}):
     """ returns the number of users that have listened to this episode """
+
+    if not episode:
+        raise QueryParameterMissing('episode')
+
 
     r = EpisodeUserState.view('listeners/by_episode',
             startkey    = [episode._id, start],
@@ -147,6 +186,10 @@ def episode_listener_count(episode, start=None, end={}):
 @cache_result(timeout=60*60)
 def episode_listener_count_timespan(episode, start=None, end={}):
     """ returns (date, listener-count) tuples for all days w/ listeners """
+
+    if not episode:
+        raise QueryParameterMissing('episode')
+
 
     if isinstance(start, datetime):
         start = start.isoformat()
@@ -167,6 +210,16 @@ def episode_listener_count_timespan(episode, start=None, end={}):
 
 
 def episode_state_for_ref_urls(user, podcast_url, episode_url):
+
+    if not user:
+        raise QueryParameterMissing('user')
+
+    if not podcast_url:
+        raise QueryParameterMissing('podcast_url')
+
+    if not episode_url:
+        raise QueryParameterMissing('episode_url')
+
 
     cache_key = 'episode-state-%s-%s-%s' % (user._id,
             sha1(podcast_url).hexdigest(),
@@ -201,11 +254,15 @@ def get_episode_actions(user_id, since=None, until={}, podcast_id=None,
            device_id=None):
     """ Returns Episode Actions for the given criteria"""
 
+    if not user_id:
+        raise QueryParameterMissing('user_id')
+
+
     since_str = since.strftime('%Y-%m-%dT%H:%M:%S') if since else None
     until_str = until.strftime('%Y-%m-%dT%H:%M:%S') if until else {}
 
     if since_str >= until_str:
-        return
+        return []
 
     if not podcast_id and not device_id:
         view = 'episode_actions/by_user'
@@ -256,6 +313,13 @@ def get_nth_episode_state(n):
 
 
 def get_duplicate_episode_states(user, episode):
+
+    if not user:
+        raise QueryParameterMissing('user')
+
+    if not episode:
+        raise QueryParameterMissing('episode')
+
     states = EpisodeUserState.view('episode_states/by_user_episode',
             key          = [user, episode],
             include_docs = True,

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load i18n %}
 {% load podcasts %}
 
@@ -16,7 +17,7 @@
  <p>{% blocktrans with other_user.username as username %}{{ username }} didn't share his user page with you. Maybe you should contact him to get the correct link.{% endblocktrans %}</p>
 
  {% if user.is_authenticated %}
-  {% url share as share-url %}
+  {% url "share" as share-url %}
   <div class="info"><strong>{% trans "Want to have your own user page?" %}</strong>{% blocktrans %} Go to your <a href="{{ share-url }}">Share Page</a> to get the link.</a>{% endblocktrans %}</div>
  {% endif %}
 

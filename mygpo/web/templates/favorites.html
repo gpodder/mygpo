@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load i18n %}
 {% load podcasts %}
 {% load episodes %}
@@ -35,7 +36,7 @@
   </table>
 
   <div class="btn-group">
-   <a class="btn" href="{% url share-favorites %}">
+   <a class="btn" href="{% url "share-favorites" %}">
     <i class="icon-share"></i> {% trans "Share" %}
    </a>
   </div>

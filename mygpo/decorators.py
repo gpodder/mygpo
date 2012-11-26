@@ -18,6 +18,9 @@
 #
 
 from functools import wraps
+import inspect
+
+from couchdbkit import ResourceConflict
 
 from django.http import Http404
 from django.shortcuts import render
@@ -82,35 +85,66 @@ def allowed_methods(methods):
     return decorator
 
 
-def repeat_on_conflict(obj_names=[], reload_f=None):
-    """
-    In case of a CouchDB ResourceConflict, reloads the parameter with the
-    given name and repeats the function call until it succeeds.
-    When calling the function, the parameter that should be reloaded must be
-    given as a keyword-argument
-    """
-    from couchdbkit import ResourceConflict
+class repeat_on_conflict(object):
+    """ Repeats an update operation in case of a ResourceConflict
 
-    def default_reload(obj):
+    In case of a CouchDB ResourceConflict, reloads the parameter with the given
+    name and repeats the function call until it succeeds.  When calling the
+    function, the parameter that should be reloaded must be given as a
+    keyword-argument """
+
+    ARGSPEC = '__repeat_argspec__'
+
+    def __init__(self, obj_names=[], reload_f=None):
+        self.obj_names = obj_names
+        self.reload_f = reload_f or self.default_reload
+
+
+    def default_reload(self, obj):
         return obj.__class__.get(obj._id)
 
-    reload_f = reload_f or default_reload
 
-    def decorator(f):
+    def build_locals(self, f, args, kwargs):
+        argspec = getattr(f, self.ARGSPEC)
+        if len(args) > len(argspec.args):
+            varargs = args[len(args):]
+            args = args[:len(args)]
+        else:
+            varargs = []
+        locals = dict(zip(argspec.args, args))
+        if argspec.varargs is not None:
+            locals.update({argspec.varargs: varargs})
+        if argspec.keywords is not None:
+            locals.update({argspec.keywords: kwargs})
+        locals.update(kwargs)
+        return locals
+
+
+
+
+    def __call__(self, f):
+
+        if not hasattr(f, self.ARGSPEC):
+            argspec = inspect.getargspec(f)
+            setattr(f, self.ARGSPEC, argspec)
+
         @wraps(f)
-        def tmp(*args, **kwargs):
+        def wrapper(*args, **kwargs):
+            all_args = before = self.build_locals(f, args, kwargs)
+
+            # repeat until operation succeeds
+            # TODO: adding an upper bound might make sense
             while True:
                 try:
-                    return f(*args, **kwargs)
-                    break
+                    return f(**all_args)
+
                 except ResourceConflict:
-                    for obj_name in obj_names:
-                        obj = kwargs[obj_name]
-                        kwargs[obj_name] = reload_f(obj)
+                    for obj_name in self.obj_names:
+                        obj = all_args[obj_name]
+                        all_args[obj_name] = self.reload_f(obj)
 
-        return tmp
+        return wrapper
 
-    return decorator
 
 
 def query_if_required():

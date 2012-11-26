@@ -1,6 +1,6 @@
 from django.conf.urls.defaults import *
 
-from mygpo.directory.views import Directory
+from mygpo.directory.views import Directory, Carousel
 
 urlpatterns = patterns('mygpo.directory.views',
  url(r'^toplist/$',                                               'toplist',                    name='toplist'),
@@ -9,6 +9,11 @@ urlpatterns = patterns('mygpo.directory.views',
  url(r'^directory/$',
      Directory.as_view(),
      name='directory-home'),
+
+ url(r'^carousel/$',
+     Carousel.as_view(),
+     name='carousel-demo'),
+
 
  url(r'^directory/(?P<category>.+)$',                          'category',                   name='directory'),
  url(r'^search/$',                        'search',      name='search'),

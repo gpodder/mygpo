@@ -28,12 +28,19 @@ h1
     font-size: 16pt;
     font-family: 'Source Sans Pro', sans-serif;
     font-weight: 700;
+    margin-bottom: 0;
+    line-height: 25px;
 }
 
 h2
 {
     font-size: 14pt;
     padding-top: .5em;
+}
+
+h3
+{
+    font-size: 12pt;
 }
 
 .brand img
@@ -189,6 +196,12 @@ table form
 .description
 {
     color: #666;
+}
+
+
+div.description
+{
+    margin-top: 1em;
 }
 
 /* don't show images in the description of the podcast page */

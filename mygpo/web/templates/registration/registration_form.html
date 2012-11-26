@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load i18n %}
 
 {% load menu %}
@@ -19,7 +20,7 @@
 
  {% else %}
 
-  <form class="form-horizontal" action="{% url register %}" method="POST">
+  <form class="form-horizontal" action="{% url "register" %}" method="POST">
    <fieldset>
     {% csrf_token %}
 
@@ -73,7 +74,7 @@
  <div class="well">
   <h3>{% trans "Activation Mail" %}</h3>
   <p>{% trans "After registration, you'll receive an activation mail to confirm the validity of your email address." %}</p>
-  {% url resend-activation as resend-activation-url %}
+  {% url "resend-activation" as resend-activation-url %}
   <p>{% blocktrans %}If it doesn't arrive, you can <a href="{{ resend-activation-url }}">resend</a> it.{% endblocktrans %}
  </div>
 

@@ -1,4 +1,5 @@
 from functools import wraps
+import urllib
 
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, \
@@ -6,6 +7,8 @@ from django.http import HttpResponse, HttpResponseRedirect, \
 from django.views.decorators.cache import never_cache, cache_control
 from django.views.decorators.vary import vary_on_cookie
 from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+from django.contrib import messages
 
 from mygpo.core.proxy import proxy_object
 from mygpo.publisher.auth import require_publisher, is_publisher
@@ -17,7 +20,7 @@ from mygpo.web.views.episode import oldid_decorator, slug_id_decorator
 from mygpo.web.views.podcast import \
          slug_id_decorator as podcast_slug_id_decorator, \
          oldid_decorator as podcast_oldid_decorator
-from mygpo.web.utils import get_podcast_link_target
+from mygpo.web.utils import get_podcast_link_target, normalize_twitter
 from django.contrib.sites.models import RequestSite
 from mygpo.data.feeddownloader import PodcastUpdater
 from mygpo.decorators import requires_token, allowed_methods
@@ -25,7 +28,7 @@ from mygpo.users.models import User
 from mygpo.db.couchdb.episode import episodes_for_podcast
 from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_by_id, \
          podcast_for_url, podcastgroup_for_slug_id, podcastgroup_for_oldid, \
-         podcastgroup_by_id
+         podcastgroup_by_id, update_additional_data
 from mygpo.db.couchdb.episode_state import episode_listener_counts
 
 
@@ -34,10 +37,14 @@ from mygpo.db.couchdb.episode_state import episode_listener_counts
 def home(request):
     if is_publisher(request.user):
         podcasts = podcasts_by_id(request.user.published_objects)
+        site = RequestSite(request)
+        update_token = request.user.get_token('publisher_update_token')
         form = SearchPodcastForm()
         return render(request, 'publisher/home.html', {
+            'update_token': update_token,
             'podcasts': podcasts,
             'form': form,
+            'site': site,
             })
 
     else:
@@ -83,23 +90,12 @@ def podcast(request, podcast):
     else:
         group = None
 
-#    if request.method == 'POST':
-#        form = NonePodcastForm(request.POST, instance=p)
-#        if form.is_valid():
-#            form.save()
-
-#    elif request.method == 'GET':
-#        form = PodcastForm(instance=p)
-
-    if 'new_token' in request.GET:
-        request.user.create_new_token('publisher_update_token')
-        request.user.save()
-
     update_token = request.user.publisher_update_token
 
     heatmap = EpisodeHeatmap(podcast.get_id())
 
     site = RequestSite(request)
+    feedurl_quoted = urllib.quote(podcast.url)
 
     return render(request, 'publisher/podcast.html', {
         'site': site,
@@ -110,6 +106,7 @@ def podcast(request, podcast):
         'subscriber_data': subscription_data,
         'update_token': update_token,
         'heatmap': heatmap,
+        'feedurl_quoted': feedurl_quoted,
         })
 
 
@@ -147,6 +144,27 @@ def update_podcast(request, podcast):
 
     url = get_podcast_link_target(podcast, 'podcast-publisher-detail')
     return HttpResponseRedirect(url)
+
+
+@vary_on_cookie
+@cache_control(private=True)
+@require_publisher
+def save_podcast(request, podcast):
+    twitter = normalize_twitter(request.POST.get('twitter', ''))
+    update_additional_data(podcast, twitter)
+    messages.success(request, _('Data updated'))
+    url = get_podcast_link_target(podcast, 'podcast-publisher-detail')
+    return HttpResponseRedirect(url)
+
+
+
+@never_cache
+@require_publisher
+def new_update_token(request, username):
+    request.user.create_new_token('publisher_update_token')
+    request.user.save()
+    messages.success(request, _('Publisher token updated'))
+    return HttpResponseRedirect(reverse('publisher'))
 
 
 @never_cache
@@ -275,6 +293,7 @@ def group_oldid_decorator(f):
 episode_oldid        = oldid_decorator(episode)
 podcast_oldid        = podcast_oldid_decorator(podcast)
 update_podcast_oldid = podcast_oldid_decorator(update_podcast)
+save_podcast_oldid   = podcast_oldid_decorator(save_podcast)
 episodes_oldid       = podcast_oldid_decorator(episodes)
 group_oldid          = group_oldid_decorator(group)
 
@@ -282,4 +301,5 @@ episode_slug_id        = slug_id_decorator(episode)
 podcast_slug_id        = podcast_slug_id_decorator(podcast)
 episodes_slug_id       = podcast_slug_id_decorator(episodes)
 update_podcast_slug_id = podcast_slug_id_decorator(update_podcast)
+save_podcast_slug_id   = podcast_slug_id_decorator(save_podcast)
 group_slug_id          = group_slug_id_decorator(group)

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load i18n %}
 
 {% load menu %}
@@ -17,6 +18,6 @@
   <p>{% blocktrans with url as sitename %}You can paste this code on your website, so users of {{ sitename }} can directly subscribe to your podcast.{% endblocktrans %}</p>
   <p>{% trans "Change the field 'YOUR_ADRESS' with the adress of your podcast feed." %}</p>
   <p>
-   <textarea style="width: 100%;" rows="3"><a href="http://{{ url }}{% url subscribe-by-url %}?url=YOUR_ADRESS"><img src="http://{{ url }}/media/author_subscribe.png" /></a></textarea>
+   <textarea style="width: 100%;" rows="3"><a href="http://{{ url }}{% url "subscribe-by-url" %}?url=YOUR_ADRESS"><img src="http://{{ url }}/media/author_subscribe.png" /></a></textarea>
   </p>
 {% endblock %}

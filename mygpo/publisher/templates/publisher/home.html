@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load i18n %}
 {% load podcasts %}
 
@@ -27,11 +28,19 @@
   </table>
  {% endif %}
 
+ <h2>{% trans "Update your podcasts" %}</h2>
+ <p>{% trans "To update all of your published podcasts automatically, you can request the following URL" %}</p>
+ <pre><a href="{% url "publisher-update" user.username %}?token={{ update_token }}">http://{{ site }}{% url "publisher-update" user.username %}?token={{ update_token }}</a></pre>
+ <form action="{% url "publisher-new-update-token" user.username %}" method="post">
+  {% csrf_token %}
+  <button type="submit" class="btn">{% trans "Create a new token" %}</button>
+ </form>
+
  {% if user.is_staff %}
   <div class="well">
    <h2>Staff Only</h2>
    <p>{% trans "Go to the publisher page of any podcast by entering its feed URL" %}</p>
-   <form class="form-inline" action="{% url podcast-publisher-search %}" method="post">
+   <form class="form-inline" action="{% url "podcast-publisher-search" %}" method="post">
     {% csrf_token %}
     <div class="input-prepend input-append">
      <span class="add-on"><i class="icon-link"></i></span><input type="text" class="input-xlarge" name="url" id="id_url" />

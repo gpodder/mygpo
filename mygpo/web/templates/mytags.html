@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load i18n %}
 {% load devices %}
 {% load episodes %}
@@ -37,7 +38,7 @@
  {% else %}
 
   <p>
-   {% url subscriptions as subscriptions-url %}
+   {% url "subscriptions" as subscriptions-url %}
    {% blocktrans %}You didn't tag any podcasts yet. Go to your <a href="{{ subscriptions-url }}">subscriptions</a> and tag some.{% endblocktrans %}
   </p>
 

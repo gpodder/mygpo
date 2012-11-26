@@ -35,6 +35,12 @@ class UserAccountForm(forms.Form):
 
         return True
 
+
+class ProfileForm(forms.Form):
+    twitter = forms.CharField(label=_(u'Twitter'), required=False)
+    about   = forms.CharField(label=_(u'A few words about you'), required=False, widget=forms.Textarea, help_text='You can use Markdown')
+
+
 class DeviceForm(forms.Form):
     """
     form for editing device information by a user.

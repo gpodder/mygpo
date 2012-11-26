@@ -171,7 +171,7 @@ def history(request, count=15, uid=None):
 @login_required
 @slug_id_decorator
 def blacklist(request, blacklisted_podcast):
-    suggestion = Suggestions.for_user(request.user)
+    suggestion = suggestions_for_user(request.user)
 
     @repeat_on_conflict(['suggestion'])
     def _update(suggestion, podcast_id):

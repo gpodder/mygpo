@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load i18n %}
 
 {% load menu %}
@@ -28,13 +29,13 @@
   <h2>{% trans "Devices" %}</h2>
   <p>{% blocktrans %}Each device connected to the webservice will be identified by its <strong>Device ID</strong> which should therefore be unique (at least for your user account). <strong>Do not try to synchronize devices by using the same Device ID.</strong>{% endblocktrans %}</p>
 
-  {% url devices as devices-url %}
+  {% url "devices" as devices-url %}
   <p>{% blocktrans %}A list of your devices can be found on the <a href="{{ devices-url }}">devices page</a>.{% endblocktrans %}</p>
 
   <h3>{% trans "Synchronizing Devices" %}</h3>
   <p>{% blocktrans %}If you have at least two devices connected to the webservice, you can synchronize some of them. Open the device page for one of them, click synchronize and select the device to synchronize with. After synchronizing, the subscriptions of the devices will be merged. Adding a subscription at one device will automatically add it to the others. Same for deletions.{% endblocktrans %}</p>
 
-  {% url devices as devices-url %}
+  {% url "devices" as devices-url %}
   <p>{% blocktrans %}The <a href="{{ devices-url }}">device list</a> groups devices that are synchronized with each other.{% endblocktrans %}</p>
 
   <h3>{% trans "Episode States" %}</h3>
@@ -42,14 +43,14 @@
 
   <h2>{% trans "Privacy Settings" %}</h2>
 
-  {% url toplist as toplist-url %}
-  {% url suggestions as suggestions-url %}
-  {% url toplist as toplist-url %}
-  {% url privacy as privacy-url %}
+  {% url "toplist" as toplist-url %}
+  {% url "suggestions" as suggestions-url %}
+  {% url "toplist" as toplist-url %}
+  {% url "privacy" as privacy-url %}
   <p>{% blocktrans %}By default we include information about your subscriptions in our <a href="{{ toplist-url }}">toplist</a> and <a href="{{ suggestions-url }}">podcast suggestions</a>. <strong>We will never associate your username and/or email address with your subscriptions on public pages.</strong> You can even opt-out from our anonymized statistics at the <a href="{{ privacy-url }}">privacy page</a>. If you mark some podcasts as private, they will also not show up in your sharable subscription list.{% endblocktrans %}</p>
 
   <h2>{% trans "Sharing your Subscriptions" %}</h2>
-  {% url share as share-url %}
+  {% url "share" as share-url %}
   <p>{% blocktrans %}If you want to let others know about your which podcasts you are listening to, go to your <a href="{{ share-url }}">sharing page</a>. You can either share your private URL with your friends or make it public and share your subscriptions with the whole world.{% endblocktrans %}</p>
 
 {% endblock %}

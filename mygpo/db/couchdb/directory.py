@@ -5,11 +5,16 @@ from mygpo.directory.models import Category
 from mygpo.couch import get_main_database
 from mygpo.cache import cache_result
 from mygpo.db.couchdb.utils import multi_request_view
+from mygpo.db import QueryParameterMissing
 from mygpo.counter import Counter
 
 
 @cache_result(timeout=60*60)
 def category_for_tag(tag):
+
+    if not tag:
+        raise QueryParameterMissing('tag')
+
     r = Category.view('categories/by_tags',
             key          = tag,
             include_docs = True,
@@ -19,24 +24,50 @@ def category_for_tag(tag):
 
 
 @cache_result(timeout=60*60)
-def top_categories(count, wrap=True):
-    if wrap:
-        src = Category
-    else:
-        src = get_main_database()
+def top_categories(offset, count, with_podcasts=False):
 
-    r = src.view('categories/by_weight',
-            descending   = True,
-            limit        = count,
-            include_docs = True,
-            stale        = 'update_after',
-        )
+    if offset is None:
+        raise QueryParameterMissing('offset')
+
+    if not count:
+        raise QueryParameterMissing('count')
+
+
+    if with_podcasts:
+        r = Category.view('categories/by_update',
+                descending   = True,
+                skip         = offset,
+                limit        = count,
+                include_docs = True,
+                stale        = 'update_after'
+            )
+
+    else:
+        db = get_main_database()
+        r = db.view('categories/by_update',
+                descending   = True,
+                skip         = offset,
+                limit        = count,
+                stale        = 'update_after',
+                wrapper      = _category_wrapper,
+            )
+
     return list(r)
 
+
+def _category_wrapper(r):
+    c = Category()
+    c.label = r['value'][0]
+    c._weight = r['value'][1]
+    return c
 
 
 def tags_for_podcast(podcast):
     """ all tags for the podcast, in decreasing order of importance """
+
+    if not podcast:
+        raise QueryParameterMissing('podcast')
+
 
     db = get_main_database()
     res = db.view('tags/by_podcast',
@@ -66,6 +97,10 @@ def tags_for_podcast(podcast):
 
 def tags_for_user(user, podcast_id=None):
     """ mapping of all podcasts tagged by the user with a list of tags """
+
+    if not user:
+        raise QueryParameterMissing('user')
+
 
     db = get_main_database()
     res = db.view('tags/by_user',
@@ -107,6 +142,11 @@ def all_tags():
 
 @cache_result(timeout=60*60)
 def toplist(res_cls, view, key, limit, **view_args):
+
+    if not limit:
+        raise QueryParameterMissing('limit')
+
+
     r = res_cls.view(view,
             startkey     = key + [{}],
             endkey       = key + [None],

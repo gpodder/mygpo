@@ -482,6 +482,8 @@ class User(BaseUser, SyncedDevicesMixin):
     published_objects = StringListProperty()
     deleted  = BooleanProperty(default=False)
     suggestions_up_to_date = BooleanProperty(default=False)
+    twitter = StringProperty()
+    about   = StringProperty()
     # TODO: add fields for storing flattr account info (token / enabled flag)
 
     # token for accessing subscriptions of this use

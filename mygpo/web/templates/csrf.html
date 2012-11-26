@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load i18n %}
 
 {% load menu %}
@@ -23,7 +24,7 @@
   <input type="hidden" name="{{ key }}" value="{{ value }}" />
  {% endfor %}
  <input type="submit" value="{% trans "Yes" %}" />
- <a href="{% url home %}">{% trans "No" %}</a>
+ <a href="{% url "home" %}">{% trans "No" %}</a>
 </form>
 
 {% endblock %}

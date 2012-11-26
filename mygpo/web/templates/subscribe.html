@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load i18n %}
 {% load podcasts %}
 {% load utils %}
@@ -49,10 +50,10 @@
         <input type="checkbox" value="{{ target|target_uid }}" name="{{ target|target_uid }}" checked="checked">
         {% if target|is_list %}
          {% for t in target %}
-          <a href="{% url device t.uid %}">{{ t|device_icon }}{{ t.name|striptags }}</a>
+          <a href="{% url "device" t.uid %}">{{ t|device_icon }}{{ t.name|striptags }}</a>
          {% endfor %}
         {% else %}
-         <a href="{% url device target.uid %}">{{ target|device_icon }}{{ target.name|striptags }}</a>
+         <a href="{% url "device" target.uid %}">{{ target|device_icon }}{{ target.name|striptags }}</a>
         {% endif %}
        </label>
       {% endfor %}
@@ -67,7 +68,7 @@
    </form>
   {% else %}
    <p>{% trans "You can't subscribe to this podcast, because you don't have any devices (on which you don't have subscribed to the podcast already." %}</p>
-   <a class="btn btn-success" href="{% url device-edit-new %}">
+   <a class="btn btn-success" href="{% url "device-edit-new" %}">
     <i class="icon-plus"></i> {% trans "Create Device" %}
    </a>
 

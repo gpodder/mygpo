@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from mygpo.core.models import Podcast, SubscriberData
 from mygpo.utils import progress
 from mygpo.decorators import repeat_on_conflict
-from mygpo.db.couchdb.podcast import podcast_count, all_podcasts
+from mygpo.db.couchdb.podcast import podcast_count, all_podcasts, podcast_by_id
 from mygpo.db.couchdb.podcast_state import podcast_subscriber_count
 
 
@@ -35,17 +35,14 @@ class Command(BaseCommand):
                 progress(n, total)
 
 
-    @repeat_on_conflict(['podcast'])
-    def update(self, podcast, started, subscriber_count):
+    @repeat_on_conflict(['podcast'], reload_f=lambda p: podcast_by_id(p.get_id()))
+    def update(self, subscriber_data, podcast):
 
         # We've already updated this podcast
-        if started in [e.timestamp for e in podcast.subscribers]:
+        if subscriber_data.timestamp in [e.timestamp for e in podcast.subscribers]:
             return
 
-        data = SubscriberData(
-            timestamp        = started,
-            subscriber_count = max(0, subscriber_count),
-            )
+        podcast.subscribers = sorted(podcast.subscribers + [subscriber_data], key=lambda e: e.timestamp)
+        podcast.subscribers = podcast.subscribers[-2:]
 
-        podcast.subscribers = sorted(podcast.subscribers + [data], key=lambda e: e.timestamp)
         podcast.save()

@@ -16,6 +16,7 @@
 #
 
 from functools import wraps
+from xml.parsers.expat import ExpatError
 
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
@@ -200,9 +201,19 @@ def edit(request, device):
         'uid' : device.uid
         })
 
+    synced_with = request.user.get_synced(device)
+
+    sync_targets = list(request.user.get_sync_targets(device))
+    sync_form = SyncForm()
+    sync_form.set_targets(sync_targets,
+            _('Synchronize with the following devices'))
+
     return render(request, 'device-edit.html', {
         'device': device,
         'device_form': device_form,
+        'sync_form': sync_form,
+        'synced_with': synced_with,
+        'has_sync_targets': len(sync_targets) > 0,
     })
 
 
@@ -214,8 +225,16 @@ def upload_opml(request, device):
         return HttpResponseRedirect(reverse('device-edit', args=[device.uid]))
 
     opml = request.FILES['opml'].read()
-    subscriptions = simple.parse_subscription(opml, 'opml')
-    simple.set_subscriptions(subscriptions, request.user, device.uid, None)
+
+    try:
+        subscriptions = simple.parse_subscription(opml, 'opml')
+        simple.set_subscriptions(subscriptions, request.user, device.uid, None)
+
+    except ExpatError as ee:
+        msg = _('Could not upload subscriptions: {err}').format(err=str(ee))
+        messages.error(request, msg)
+        return HttpResponseRedirect(reverse('device-edit', args=[device.uid]))
+
     return HttpResponseRedirect(reverse('device', args=[device.uid]))
 
 
@@ -249,6 +268,8 @@ def delete(request, device):
             request.user.unsync_device(device)
         device.deleted = True
         user.set_device(device)
+        if user.is_synced(device):
+            user.unsync_device(device)
         user.save()
 
     _delete(user=request.user, device=device)

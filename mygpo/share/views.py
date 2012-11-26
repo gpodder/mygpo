@@ -142,8 +142,12 @@ def create_list(request):
 @list_decorator(must_own=True)
 def add_podcast(request, plist, owner, podcast_id):
 
-    plist.podcasts.append(podcast_id)
-    plist.save()
+    @repeat_on_conflict(['plist'])
+    def _add(plist, podcast_id):
+        plist.podcasts.append(podcast_id)
+        plist.save()
+
+    _add(plist=plist, podcast_id=podcast_id)
 
     list_url = reverse('list-show', args=[owner.username, plist.slug])
     return HttpResponseRedirect(list_url)
@@ -152,8 +156,13 @@ def add_podcast(request, plist, owner, podcast_id):
 @login_required
 @list_decorator(must_own=True)
 def remove_podcast(request, plist, owner, podcast_id):
-    plist.podcasts.remove(podcast_id)
-    plist.save()
+
+    @repeat_on_conflict(['plist'])
+    def _remove(plist, podcast_id):
+        plist.podcasts.remove(podcast_id)
+        plist.save()
+
+    _remove(plist=plist, podcast_id=podcast_id)
 
     list_url = reverse('list-show', args=[owner.username, plist.slug])
     return HttpResponseRedirect(list_url)
@@ -259,7 +268,7 @@ class FavoritesFeedCreateEntry(View):
     def post(self, request):
         user = request.user
 
-        feed = favfeed(user)
+        feed = FavoriteFeed(user)
         site = RequestSite(request)
         feed_url = feed.get_public_url(site.domain)
 
@@ -269,8 +278,8 @@ class FavoritesFeedCreateEntry(View):
             user.published_objects.append(podcast.get_id())
             user.save()
 
-        updater = PodcastUpdater()
-        update.update_podcast(podcast)
+        updater = PodcastUpdater([podcast])
+        update.update()
 
         return HttpResponseRedirect(reverse('share-favorites'))
 

@@ -5,9 +5,11 @@ from restkit import RequestFailed
 
 from django.core.cache import cache
 
-from mygpo.core.models import Podcast, PodcastGroup
+from mygpo.core.models import Podcast, PodcastGroup, PodcastSubscriberData
+from mygpo.decorators import repeat_on_conflict
 from mygpo.cache import cache_result
 from mygpo.couch import get_main_database
+from mygpo.db import QueryParameterMissing
 from mygpo.db.couchdb.utils import multi_request_view, is_couchdb_id
 
 
@@ -33,6 +35,9 @@ def podcasts_for_tag(tag):
     """ Returns the podcasts with the current tag.
 
     Some podcasts might be returned twice """
+
+    if not tag:
+        raise QueryParameterMissing('tag')
 
     res = multi_request_view(Podcast, 'podcasts/by_tag',
             wrap        = False,
@@ -81,6 +86,10 @@ def get_podcast_languages():
 
 @cache_result(timeout=60*60)
 def podcast_by_id(podcast_id, current_id=False):
+
+    if not podcast_id:
+        raise QueryParameterMissing('podcast_id')
+
     r = Podcast.view('podcasts/by_id',
             key          = podcast_id,
             classes      = [Podcast, PodcastGroup],
@@ -97,12 +106,20 @@ def podcast_by_id(podcast_id, current_id=False):
 
 @cache_result(timeout=60*60)
 def podcastgroup_by_id(group_id):
+
+    if not group_id:
+        raise QueryParameterMissing('group_id')
+
     return PodcastGroup.get(group_id)
 
 
 
 @cache_result(timeout=60*60)
 def podcast_for_slug(slug):
+
+    if not slug:
+        raise QueryParameterMissing('slug')
+
     r = Podcast.view('podcasts/by_slug',
             startkey     = [slug, None],
             endkey       = [slug, {}],
@@ -137,16 +154,26 @@ def podcast_for_slug_id(slug_id):
 def podcastgroup_for_slug_id(slug_id):
     """ Returns the Podcast for either an CouchDB-ID for a Slug """
 
+    if not slug_id:
+        raise QueryParameterMissing('slug_id')
+
     if is_couchdb_id(slug_id):
         return PodcastGroup.get(slug_id)
 
     else:
         #TODO: implement
-        return cls.for_slug(slug_id)
+        return PodcastGroup.for_slug(slug_id)
 
 
 
 def podcasts_by_id(ids):
+
+    if ids is None:
+        raise QueryParameterMissing('ids')
+
+    if not ids:
+        return []
+
     r = Podcast.view('podcasts/by_id',
             keys         = ids,
             include_docs = True,
@@ -159,6 +186,10 @@ def podcasts_by_id(ids):
 
 @cache_result(timeout=60*60)
 def podcast_for_oldid(oldid):
+
+    if not oldid:
+        raise QueryParameterMissing('oldid')
+
     r = Podcast.view('podcasts/by_oldid',
             key          = long(oldid),
             classes      = [Podcast, PodcastGroup],
@@ -174,6 +205,10 @@ def podcast_for_oldid(oldid):
 
 @cache_result(timeout=60*60)
 def podcastgroup_for_oldid(oldid):
+
+    if not oldid:
+        raise QueryParameterMissing('oldid')
+
     r = PodcastGroup.view('podcasts/groups_by_oldid',
             key          = long(oldid),
             include_docs = True,
@@ -184,6 +219,9 @@ def podcastgroup_for_oldid(oldid):
 
 
 def podcast_for_url(url, create=False):
+
+    if not url:
+        raise QueryParameterMissing('url')
 
     key = 'podcast-by-url-%s' % sha1(url).hexdigest()
 
@@ -283,6 +321,13 @@ def all_podcasts_groups(cls):
 
 def podcasts_to_dict(ids, use_cache=False):
 
+    if ids is None:
+        raise QueryParameterMissing('ids')
+
+    if not ids:
+        return dict()
+
+
     ids = list(set(ids))
     objs = dict()
 
@@ -313,7 +358,7 @@ def podcasts_to_dict(ids, use_cache=False):
 
 
 
-def podcasts_need_update(self):
+def podcasts_need_update():
     db = get_main_database()
     res = db.view('episodes/need_update',
             group_level = 1,
@@ -328,6 +373,10 @@ def podcasts_need_update(self):
 
 
 def subscriberdata_for_podcast(podcast_id):
+
+    if not podcast_id:
+        raise QueryParameterMissing('podcast_id')
+
     r = PodcastSubscriberData.view('podcasts/subscriber_data',
             key          = podcast_id,
             include_docs = True,
@@ -337,7 +386,7 @@ def subscriberdata_for_podcast(podcast_id):
         return r.first()
 
     data = PodcastSubscriberData()
-    data.podcast = id
+    data.podcast = podcast_id
     return data
 
 
@@ -376,6 +425,10 @@ def search_wrapper(result):
 
 @cache_result(timeout=60*60)
 def search(q, offset=0, num_results=20):
+
+    if not q:
+        return [], 0
+
     db = get_main_database()
 
     #FIXME current couchdbkit can't parse responses for multi-query searches
@@ -394,3 +447,12 @@ def search(q, offset=0, num_results=20):
 
     except RequestFailed:
         return [], 0
+
+
+@repeat_on_conflict(['podcast'])
+def update_additional_data(podcast, twitter):
+    podcast.twitter = twitter
+    podcast.save()
+
+    # clear the whole cache until we have a better invalidation mechanism
+    cache.clear()

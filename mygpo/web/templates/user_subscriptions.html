@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load i18n %}
 {% load podcasts %}
 
@@ -7,7 +8,7 @@
 {% block sectionmenu %}{{ "/user/subscriptions/"|section_menu:other_user.username }}{% endblock %}
 
 {% block head %}
- <link rel="alternate" title="Subscription Changes of {{ other_user.username }}" href="{% url shared-subscriptions-rss other_user.username %}" type="application/rss+xml">
+ <link rel="alternate" title="Subscription Changes of {{ other_user.username }}" href="{% url "shared-subscriptions-rss" other_user.username %}" type="application/rss+xml">
 {% endblock %}
 
 {% block title %}
@@ -17,7 +18,7 @@
 {% block header %}
 <h1>{% blocktrans with other_user.username as username%}{{ username }}'s Subscriptions{% endblocktrans %}</h1>
 <small class="description">
- {% url user other_user.username as userpage-url %}
+ {% url "user other_user.username" as userpage-url %}
  {% blocktrans with subscriptions|length as num_subscriptions and other_user.username as username %}<a href="{{userpage-url}}">{{username}}</a> has {{num_subscriptions}} subscriptions{% endblocktrans %}
 </small>
 
@@ -38,10 +39,10 @@
   </table>
 
   <div class="btn-group">
-   <a class="btn" href="{% url shared-subscriptions-opml other_user.username %}{% if token %}?token={{ token }}{% endif %}">
+   <a class="btn" href="{% url "shared-subscriptions-opml" other_user.username %}{% if token %}?token={{ token }}{% endif %}">
     <i class="icon-download"></i>{% trans "Download Subscriptions as OPML" %}
    </a>
-   <a class="btn" href="{% url shared-subscriptions-rss other_user.username %}{% if token %}?token={{ token }}{% endif %}">
+   <a class="btn" href="{% url "shared-subscriptions-rss" other_user.username %}{% if token %}?token={{ token }}{% endif %}">
     <i class="icon-rss"></i> {% trans "Subscribe to Changes" %}
    </a>
   </div>
@@ -61,7 +62,7 @@
    <h4>{% trans "Share Your Subscriptions" %}</h4>
    <p>{% trans "Want to share your own subscriptions?" %}</p>
 
-   <a class="btn btn-primary" href="{% url share %}">
+   <a class="btn btn-primary" href="{% url "share" %}">
     {% trans "Go" %}
    </a>
   </div>

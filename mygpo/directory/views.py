@@ -48,6 +48,17 @@ def toplist(request, num=100, lang=None):
     })
 
 
+class Carousel(View):
+    """ A carousel demo """
+
+    @method_decorator(cache_control(private=True))
+    @method_decorator(vary_on_cookie)
+    def get(self, request):
+
+        return render(request, 'carousel.html', {
+            # evaluated lazyly, cached by template
+            'topics': Topics(),
+            })
 
 
 class Directory(View):

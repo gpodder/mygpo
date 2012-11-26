@@ -1,5 +1,6 @@
 {% extends "embed.html" %}
 
+{% load url from future %}
 {% load i18n %}
 {% load podcasts %}
 {% load charts %}
@@ -18,7 +19,7 @@
       <td>{% podcast_group_link podcast %}</td>
       <td>{% vertical_bar podcast.subscriber_count max_subscribers %}</td>
       <td>
-       <form action="{% url list-add-podcast user.username listname podcast.get_id %}" method="post" target="_parent">
+       <form action="{% url "list-add-podcast" user.username listname podcast.get_id %}" method="post" target="_parent">
         {% csrf_token %}
         <button class="btn btn-success btn-small" type="submit">
          <i class="icon-plus"></i>
@@ -32,7 +33,7 @@
 <div class="pagination">
 
  {% if results.has_previous %}
-  <a href="{% url list-search user.username listname %}?q={{ q }}&page={{ results.previous_page_number }}">«</a>
+  <a href="{% url "list-search" user.username listname %}?q={{ q }}&page={{ results.previous_page_number }}">«</a>
  {% endif %}
 
  {% for page in page_list %}
@@ -44,14 +45,14 @@
      {% if page == results.number %}
       <strong>{{ page }}</strong>
      {% else %}
-      <a href="{% url list-search user.username listname %}?q={{ q }}&page={{ page }}">{{ page }}</a>
+      <a href="{% url "list-search" user.username listname %}?q={{ q }}&page={{ page }}">{{ page }}</a>
      {% endif %}
    {% endif %}
   </span>
  {% endfor %}
 
  {% if results.has_next %}
-  <a href="{% url list-search user.username listname %}?q={{ q }}&page={{ results.next_page_number }}">»</a>
+  <a href="{% url "list-search" user.username listname %}?q={{ q }}&page={{ results.next_page_number }}">»</a>
  {% endif %}
 
 </div>

@@ -8,6 +8,6 @@ Django
 markdown2
 simplejson
 restkit
-git+https://github.com/benoitc/couchdbkit.git#egg=couchdbkit
-git+https://github.com/stefankoegl/django-couchdb-utils.git#egg=django-couchdb-utils
+couchdbkit
+django_couchdb_utils>=0.3
 -e git+https://github.com/gpodder/mygpo-feedservice.git#egg=mygpo-feedservice

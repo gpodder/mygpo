@@ -118,7 +118,7 @@ def subscriber_data(podcasts):
     for podcast in podcasts:
         create_entry = lambda r: (r.timestamp.strftime('%y-%m'), r.subscriber_count)
 
-        subdata = podcast.subscribers + subscriberdata_for_podcast(podcast.get_id())
+        subdata = podcast.subscribers + subscriberdata_for_podcast(podcast.get_id()).subscribers
 
         data = dict(map(create_entry, subdata))
 

@@ -157,10 +157,14 @@ def remove_chapter(request, episode, start, end):
 @login_required
 def toggle_favorite(request, episode):
     episode_state = episode_state_for_user_episode(request.user, episode)
-    is_fav = episode_state.is_favorite()
-    episode_state.set_favorite(not is_fav)
 
-    episode_state.save()
+    @repeat_on_conflict(['episode_state'])
+    def _set_fav(episode_state, is_fav):
+        episode_state.set_favorite(is_fav)
+        episode_state.save()
+
+    is_fav = episode_state.is_favorite()
+    _set_fav(episode_state=episode_state, is_fav=not is_fav)
 
     podcast = podcast_by_id(episode.podcast)
 
@@ -224,12 +228,12 @@ def add_action(request, episode):
 
     state = episode_state_for_user_episode(request.user, episode)
 
-    @repeat_on_conflict(['action'])
-    def _add_action(action):
+    @repeat_on_conflict(['state'])
+    def _add_action(state, action):
         state.add_actions([action])
         state.save()
 
-    _add_action(action=action)
+    _add_action(state, action)
 
     podcast = podcast_by_id(episode.podcast)
 

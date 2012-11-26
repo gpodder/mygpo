@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load i18n %}
 
 {% load menu %}
@@ -12,54 +13,114 @@
 {% endblock %}
 
 {% block content %}
-  <form action="{% url account %}" method="POST" class="well form-horizontal">
-   {% csrf_token %}
-   <h3>{% trans "Account Data" %}</h3>
 
-   <fieldset>
+ <div class="tab-content">
+  <ul class="nav nav-tabs">
+   <li class="active">
+    <a href="#account" data-toggle="tab">Account</a>
+   </li>
+   <li>
+    <a href="#profile" data-toggle="tab">Public Profile</a>
+   </li>
+  </ul>
 
-    <div class="control-group">
-     <label class="control-label" for="input01">{{ form.email.label_tag }}</label>
-     <div class="controls">
-      {{ form.email }}
+
+  <div class="tab-pane active" id="account">
+
+   <form action="{% url "account" %}" method="POST" class="form-horizontal">
+    {% csrf_token %}
+
+    <fieldset>
+     <legend>{% trans "Account Data" %}</legend>
+
+     <div class="control-group">
+      <label class="control-label" for="input01">{{ form.email.label_tag }}</label>
+      <div class="controls">
+       {{ form.email }}
+      </div>
      </div>
-    </div>
 
-    <div class="control-group">
-     <label class="control-label" for="input01">{{ form.password_current.label_tag }}</label>
-     <div class="controls">
-      {{ form.password_current }}
+     <div class="control-group">
+      <label class="control-label" for="input01">{{ form.password_current.label_tag }}</label>
+      <div class="controls">
+       {{ form.password_current }}
+      </div>
      </div>
-    </div>
 
-    <div class="control-group">
-     <label class="control-label" for="input01">{{ form.password1.label_tag }}</label>
-     <div class="controls">
-      {{ form.password1 }}
+     <div class="control-group">
+      <label class="control-label" for="input01">{{ form.password1.label_tag }}</label>
+      <div class="controls">
+       {{ form.password1 }}
+      </div>
      </div>
-    </div>
 
-    <div class="control-group">
-     <label class="control-label" for="input01">{{ form.password2.label_tag }}</label>
-     <div class="controls">
-      {{ form.password2 }}
+     <div class="control-group">
+      <label class="control-label" for="input01">{{ form.password2.label_tag }}</label>
+      <div class="controls">
+       {{ form.password2 }}
+      </div>
      </div>
-    </div>
 
-    <div class="control-group">
-     <div class="controls">
-      <button class="btn btn-primary" type="submit">{% trans "Save" %}</button>
+     <div class="control-group">
+      <div class="controls">
+       <button class="btn btn-primary" type="submit">{% trans "Save" %}</button>
+      </div>
      </div>
-    </div>
 
-  </fieldset>
-  </form>
+   </fieldset>
+   </form>
 
-  <h2>{% trans "Delete Account" %}</h2>
+   <h2>{% trans "Delete Account" %}</h2>
 
-  <div class="well">
-   <a class="btn btn-danger" href="{% url delete-account %}">{% trans "Delete Account" %}</a>
+   <div class="well">
+    <a class="btn btn-danger" href="{% url "delete-account" %}">{% trans "Delete Account" %}</a>
+   </div>
+
   </div>
 
-{% endblock %}
+  <div class="tab-pane" id="profile">
 
+   <form action="{% url "profile" %}" method="POST" class="form-horizontal">
+    {% csrf_token %}
+    <legend>{% trans "Public profile" %}
+     <small>
+      <a href="{% url "user" user.username %}{% if userpage_token %}?token={{ userpage_token }}{% endif %}">
+       {% trans "for your userpage" %}
+      </a>
+     </small>
+    </legend>
+
+    <fieldset>
+
+     <div class="control-group">
+      <label class="control-label" for="twitter">{{ profile_form.twitter.label_tag }}</label>
+      <div class="controls">
+       <div class="input-prepend">
+        <span class="add-on">@</span>
+        <input type="text" id="id_twitter" name="twitter" placeholder="username" value="{{ profile_form.twitter.value|default:"" }}">
+       </div>
+      </div>
+     </div>
+
+     <div class="control-group">
+      <label class="control-label" for="about">{{ profile_form.about.label_tag }}
+       <span class="help-inline">{{ profile_form.about.help_text }}</span>
+      </label>
+      <div class="controls">
+       {{ profile_form.about }}
+      </div>
+     </div>
+
+     <div class="control-group">
+      <div class="controls">
+       <button class="btn btn-primary" type="submit">{% trans "Save" %}</button>
+      </div>
+     </div>
+
+   </fieldset>
+   </form>
+
+  </div>
+ </div>
+
+{% endblock %}
