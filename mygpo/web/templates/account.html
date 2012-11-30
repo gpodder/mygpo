@@ -22,6 +22,9 @@
    <li>
     <a href="#profile" data-toggle="tab">Public Profile</a>
    </li>
+   <li>
+    <a href="#flattr" data-toggle="tab">Flattr</a>
+   </li>
   </ul>
 
 
@@ -121,6 +124,50 @@
    </form>
 
   </div>
+
+
+  <div class="tab-pane" id="flattr">
+
+   <form action="{% url "flattr-settings" %}" method="POST" class="form-horizontal">
+    {% csrf_token %}
+    <legend>{% trans "Flattr" %}</legend>
+
+    <fieldset>
+
+     <div class="control-group">
+      <label class="control-label" for="token">{% trans "Authenticated" %}</label>
+      <div class="controls">
+       {% if flattr_form.token.value %}
+        {% blocktrans with flattr.get_auth_username as flattrname %}Logged in as {{ flattrname }}{% endblocktrans %}
+       {% else %}
+        <a class="btn" href="{{ flattr.get_auth_url }}">{% trans "Login" %}</a>
+       {% endif %}
+      </div>
+     </div>
+
+     <div class="control-group">
+      <label class="control-label" for="about">{{ flattr_form.enable.label_tag }}
+       <span class="help-inline">{{ flattr_form.enable.help_text }}</span>
+      </label>
+      <div class="controls">
+       {{ flattr_form.enable }}
+      </div>
+     </div>
+
+     <div class="control-group">
+      <div class="controls">
+       <button class="btn btn-primary" type="submit">{% trans "Save" %}</button>
+      </div>
+     </div>
+
+   </fieldset>
+   </form>
+
+  </div>
+
+
+
+
  </div>
 
 {% endblock %}

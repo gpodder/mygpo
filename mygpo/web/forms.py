@@ -41,6 +41,11 @@ class ProfileForm(forms.Form):
     about   = forms.CharField(label=_(u'A few words about you'), required=False, widget=forms.Textarea, help_text='You can use Markdown')
 
 
+class FlattrForm(forms.Form):
+    token = forms.CharField(required=False, label=_('Token'))
+    enable = forms.BooleanField(required=False, label=_('Auto-Flattr played episodes'))
+
+
 class DeviceForm(forms.Form):
     """
     form for editing device information by a user.

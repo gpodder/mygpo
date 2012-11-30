@@ -182,6 +182,13 @@ ADSENSE_SLOT_BOTTOM = ''
 # enabled access to staff-only areas with ?staff=<STAFF_TOKEN>
 STAFF_TOKEN = None
 
+# Flattr settings -- available after you register your app
+FLATTR_KEY = ''
+FLATTR_SECRET = ''
+
+# The User-Agent string used for outgoing HTTP requests
+USER_AGENT = 'gpodder.net (+https://github.com/gpodder/mygpo)'
+
 
 try:
     from settings_prod import *

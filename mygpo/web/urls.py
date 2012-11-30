@@ -82,7 +82,8 @@ urlpatterns += patterns('mygpo.web.views.episode',
 )
 
 from mygpo.web.views.settings import DefaultPrivacySettings, \
-         PodcastPrivacySettings, ProfileView
+         PodcastPrivacySettings, ProfileView, FlattrSettingsView, \
+         FlattrTokenView
 
 urlpatterns += patterns('mygpo.web.views.settings',
  url(r'^account/$',                                               'account',       name='account'),
@@ -91,6 +92,14 @@ urlpatterns += patterns('mygpo.web.views.settings',
  url(r'^account/profile$',
      ProfileView.as_view(),
      name='profile'),
+
+ url(r'^account/flattr$',
+     FlattrSettingsView.as_view(),
+     name='flattr-settings'),
+
+ url(r'^account/flattr/token$',
+     FlattrTokenView.as_view(),
+     name='flattr-token'),
 
  url(r'^account/privacy/default-public$',
      DefaultPrivacySettings.as_view(public=True),

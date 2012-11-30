@@ -34,11 +34,13 @@ from django_couchdb_utils.auth.models import UsernameException, \
          PasswordException
 
 from mygpo.decorators import allowed_methods, repeat_on_conflict
-from mygpo.web.forms import UserAccountForm, ProfileForm
+from mygpo.web.forms import UserAccountForm, ProfileForm, FlattrForm
 from mygpo.web.utils import normalize_twitter
+from mygpo.flattr import Flattr
 from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_to_dict
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast, \
          subscriptions_by_user
+from mygpo.db.couchdb.user import update_flattr_settings
 
 
 @login_required
@@ -49,6 +51,8 @@ def account(request):
 
     if request.method == 'GET':
 
+       site = RequestSite(request)
+       flattr = Flattr(request.user, site.domain)
        userpage_token = request.user.get_token('userpage_token')
 
        profile_form = ProfileForm({
@@ -61,9 +65,16 @@ def account(request):
             'public': request.user.settings.get('public_subscriptions', True)
             })
 
+       flattr_form = FlattrForm({
+               'enable': request.user.settings.get('auto_flattr', False),
+               'token': request.user.settings.get('flattr_token', '')
+            })
+
        return render(request, 'account.html', {
             'form': form,
             'profile_form': profile_form,
+            'flattr_form': flattr_form,
+            'flattr': flattr,
             'userpage_token': userpage_token,
             })
 
@@ -112,6 +123,46 @@ class ProfileView(View):
 
         request.user.save()
         messages.success(request, _('Data updated'))
+
+        return HttpResponseRedirect(reverse('account'))
+
+
+class FlattrSettingsView(View):
+    """ Updates Flattr settings and redirects back to the Account page """
+
+    def post(self, request):
+        user = request.user
+
+        form = FlattrForm(request.POST)
+
+        if not form.is_valid():
+            raise ValueError('asdf')
+
+        auto_flattr = form.cleaned_data.get('enable', False)
+        update_flattr_settings(user, None, auto_flattr)
+
+        return HttpResponseRedirect(reverse('account'))
+
+
+class FlattrTokenView(View):
+    """ Callback for the Flattr authentication
+
+    Updates the user's Flattr token and redirects back to the account page """
+
+    def get(self, request):
+
+        user = request.user
+        site = RequestSite(request)
+        flattr = Flattr(user, site.domain)
+
+        url = request.build_absolute_uri()
+        token = flattr.process_retrieved_code(url)
+        if token:
+            messages.success(request, _('Authentication successful'))
+            update_flattr_settings(user, token)
+
+        else:
+            messages.error(request, _('Authentication failed. Try again later'))
 
         return HttpResponseRedirect(reverse('account'))
 

@@ -109,6 +109,9 @@ def dashboard(request, episode_count=10):
     if request.user.published_objects:
         checklist.append('publish')
 
+    if request.user.settings.get('auto_flattr', False):
+        checklist.append('auto-flattr')
+
     tomorrow = datetime.today() + timedelta(days=1)
 
     podcasts = PodcastSet(subscribed_podcasts)
