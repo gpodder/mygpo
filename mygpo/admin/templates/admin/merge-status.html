@@ -6,14 +6,26 @@
 {% block mainmenu %}{{ "/admin/"|main_menu }}{% endblock %}
 {% block sectionmenu %}{{ "/admin/"|section_menu:"Admin" }}{% endblock %}
 
-{% block title %}{% trans "Merge Finished" %}{% endblock %}
+{% block head %}
+ <meta http-equiv="refresh" content="10">
+{% endblock %}
+
+{% block title %}
+ {% if ready %}
+  {% trans "Merge Finished" %}
+ {% else %}
+  {% trans "Merge Ongoing" %}
+ {% endif %}
+{% endblock %}
 
 {% block header %}
- {% if ready %}
-  <h1>{% trans "Merge Finished" %}</h1>
- {% else %}
-  <h1>{% trans "Merge Ongoing" %}
- {% endif %}
+ <h1>
+  {% if ready %}
+   {% trans "Merge Finished" %}
+  {% else %}
+   {% trans "Merge Ongoing" %}
+  {% endif %}
+ </h1>
 {% endblock %}
 
 {% block content %}
