@@ -130,6 +130,12 @@ table form
 .description
 {
     color: #666;
+    hypens: auto;
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+    -ms-hyphens: auto;
+    -o-hyphens: auto;
+    text-align: justify;
 }
 
 
