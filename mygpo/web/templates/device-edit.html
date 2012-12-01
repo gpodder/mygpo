@@ -20,7 +20,7 @@
 
 {% block content %}
 
-  {% if device.deleted %}<div class="info">{% trans "This device was deleted." %}</div>{% endif %}
+  {% if device.deleted %}<div class="alert alert-info">{% trans "This device was deleted." %}</div>{% endif %}
 
   {% if not device.deleted %}
 
