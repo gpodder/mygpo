@@ -1,4 +1,5 @@
 from mygpo.users.models import PodcastUserState
+from mygpo.users.settings import PUBLIC_SUB_PODCAST, PUBLIC_SUB_USER
 from mygpo.couch import get_main_database
 from mygpo.cache import cache_result
 from mygpo.db import QueryParameterMissing
@@ -96,7 +97,7 @@ def podcast_state_for_user_podcast(user, podcast):
         p.podcast = podcast.get_id()
         p.user = user._id
         p.ref_url = podcast.url
-        p.settings['public_subscription'] = user.settings.get('public_subscriptions', True)
+        p.settings[PUBLIC_SUB_PODCAST.name]=user.get_wksetting(PUBLIC_SUB_USER)
 
         p.set_device_state(user.devices)
 

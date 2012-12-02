@@ -2,6 +2,7 @@ from mygpo.cache import cache_result
 from mygpo.counter import Counter
 from mygpo.decorators import repeat_on_conflict
 from mygpo.couch import get_main_database
+from mygpo.users.settings import FLATTR_TOKEN, FLATTR_AUTO
 from mygpo.db import QueryParameterMissing
 from mygpo.db.couchdb.episode import episodes_by_id
 
@@ -208,10 +209,10 @@ def update_flattr_settings(user, token, enabled=None):
     """ Updates the Flattr settings of a user """
 
     if enabled is not None:
-        user.settings['auto_flattr'] = enabled
+        user.settings[FLATTR_AUTO.name] = enabled
 
     if token is not None:
-        user.settings['flattr_token'] = token
+        user.settings[FLATTR_TOKEN.name] = token
 
     user.save()
 

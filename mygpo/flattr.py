@@ -12,6 +12,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from mygpo.json import json
+from mygpo.users.settings import FLATTR_TOKEN
 from mygpo import utils
 from django.utils.translation import ugettext as _
 
@@ -50,7 +51,7 @@ class Flattr(object):
             url = utils.url_add_authentication(url, settings.FLATTR_KEY,
                     settings.FLATTR_SECRET)
         elif self.user.settings.get('flattr_token', ''):
-            headers['Authorization'] = 'Bearer ' + self.user.settings.get('flattr_token', '')
+            headers['Authorization'] = 'Bearer ' + self.user.get_wksetting(FLATTR_TOKEN)
 
         if data is not None:
             data = json.dumps(data)
@@ -74,7 +75,7 @@ class Flattr(object):
         }
 
     def has_token(self):
-        return bool(self.user.settings.get('flattr_token', False))
+        return bool(self.user.get_wksetting(FLATTR_TOKEN))
 
     def process_retrieved_code(self, url):
         url_parsed = urlparse.urlparse(url)
@@ -108,7 +109,7 @@ class Flattr(object):
             flattrs ... The number of Flattrs this thing received
             flattred ... True if this user already flattred this thing
         """
-        if not self.user.settings.get('flattr_token', ''):
+        if not self.user.get_wksetting(FLATTR_TOKEN):
             return (0, False)
 
         quote_url = urllib.quote_plus(utils.sanitize_encoding(payment_url))
@@ -118,7 +119,7 @@ class Flattr(object):
 
 
     def get_auth_username(self):
-        if not self.user.settings.get('flattr_token', ''):
+        if not self.user.get_wksetting(FLATTR_TOKEN):
             return ''
 
         data = self.request(self.USER_INFO_URL)

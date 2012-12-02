@@ -37,6 +37,8 @@ from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.web.forms import UserAccountForm, ProfileForm, FlattrForm
 from mygpo.web.utils import normalize_twitter
 from mygpo.flattr import Flattr
+from mygpo.users.settings import PUBLIC_SUB_PODCAST, PUBLIC_SUB_USER, \
+         FLATTR_TOKEN, FLATTR_AUTO
 from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_to_dict
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast, \
          subscriptions_by_user
@@ -62,12 +64,12 @@ def account(request):
 
        form = UserAccountForm({
             'email': request.user.email,
-            'public': request.user.settings.get('public_subscriptions', True)
+            'public': request.user.get_wksetting(PUBLIC_SUB_USER)
             })
 
        flattr_form = FlattrForm({
-               'enable': request.user.settings.get('auto_flattr', False),
-               'token': request.user.settings.get('flattr_token', '')
+               'enable': request.user.get_wksetting(FLATTR_AUTO),
+               'token': request.user.get_wksetting(FLATTR_TOKEN),
             })
 
        return render(request, 'account.html', {
@@ -202,7 +204,7 @@ class DefaultPrivacySettings(View):
 
     @repeat_on_conflict(['user'])
     def set_privacy_settings(self, user):
-        user.settings['public_subscriptions'] = self.public
+        user.settings[PUBLIC_SUB_USER.name] = self.public
         user.save()
 
 
@@ -221,7 +223,7 @@ class PodcastPrivacySettings(View):
 
     @repeat_on_conflict(['state'])
     def set_privacy_settings(self, state):
-        state.settings['public_subscription'] = self.public
+        state.settings[PUBLIC_SUB_PODCAST.name] = self.public
         state.save()
 
 
@@ -238,7 +240,7 @@ def privacy(request):
     excluded_subscriptions = set(filter(None, [podcasts.get(x[1], None) for x in subscriptions if x[0] == False]))
 
     return render(request, 'privacy.html', {
-        'public_subscriptions': request.user.settings.get('public_subscriptions', True),
+        'public_subscriptions': request.user.get_wksetting(PUBLIC_SUB_USER),
         'included_subscriptions': included_subscriptions,
         'excluded_subscriptions': excluded_subscriptions,
         'domain': site.domain,

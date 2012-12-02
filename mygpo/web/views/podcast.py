@@ -13,6 +13,7 @@ from django.views.decorators.cache import never_cache, cache_control
 from mygpo.core.models import PodcastGroup, SubscriptionException
 from mygpo.core.proxy import proxy_object
 from mygpo.api.sanitizing import sanitize_url
+from mygpo.users.settings import PUBLIC_SUB_PODCAST
 from mygpo.users.models import HistoryEntry, DeviceDoesNotExist
 from mygpo.web.forms import SyncForm
 from mygpo.decorators import allowed_methods, repeat_on_conflict
@@ -32,7 +33,7 @@ MAX_TAGS_ON_PAGE=50
 
 @repeat_on_conflict(['state'])
 def update_podcast_settings(state, is_public):
-    state.settings['public_subscription'] = is_public
+    state.settings[PUBLIC_SUB_PODCAST.name] = is_public
     state.save()
 
 
@@ -85,7 +86,7 @@ def show(request, podcast):
             return proxy_object(h, device=dev)
         history = map(_set_objects, history)
 
-        is_public = state.settings.get('public_subscription', True)
+        is_public = state.get_wksetting(PUBLIC_SUB_PODCAST)
 
         return render(request, 'podcast.html', {
             'tags': tags,
