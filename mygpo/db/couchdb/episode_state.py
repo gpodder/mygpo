@@ -296,7 +296,7 @@ def get_episode_actions(user_id, since=None, until={}, podcast_id=None,
 
 @cache_result(timeout=60*60)
 def episode_states_count():
-    r = cls.view('episode_states/by_user_episode',
+    r = EpisodeUserState.view('episode_states/by_user_episode',
             limit = 0,
             stale = 'update_after',
         )
