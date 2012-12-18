@@ -26,7 +26,6 @@ from itertools import chain
 
 from django.conf import settings
 
-from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.core.slugs import assign_missing_episode_slugs, assign_slug, \
          PodcastSlug
 from feedservice.parse import parse_feed
@@ -38,13 +37,20 @@ from mygpo.web.logo import CoverArt
 from mygpo.db.couchdb.episode import episode_for_podcast_id_url, \
          episodes_for_podcast_uncached
 from mygpo.db.couchdb.podcast import podcast_for_url
-from mygpo.db.couchdb.directory import category_for_tag
 from mygpo.directory.tags import update_category
-
+from mygpo.decorators import repeat_on_conflict
 from mygpo.couch import get_main_database
 
 import socket
 socket.setdefaulttimeout(30)
+
+
+class NoPodcastCreated(Exception):
+    """ raised when no podcast obj was created for a new URL """
+
+
+class NoEpisodesException(Exception):
+    """ raised when parsing something that doesn't contain any episodes """
 
 
 class PodcastUpdater(object):
@@ -59,55 +65,59 @@ class PodcastUpdater(object):
     def update(self):
         """ Run the updates """
 
-        for n, podcast in enumerate(self.queue):
+        for n, podcast_url in enumerate(self.queue):
+            print n, podcast_url
+            try:
+                self._update_podcast_url(podcast_url)
 
-            if isinstance(podcast, PodcastGroup):
-                for m in range(len(podcast.podcasts)):
-                    pg = PodcastGroup.get(podcast._id)
-                    p = pg.podcasts[m]
-                    print '{nr:5d} {url:s}'.format(nr=n, url=p.url)
-                    self.update_podcast(p)
-
-            else:
-                print '{nr:5d} {url:s}'.format(nr=n, url=podcast.url)
-                self.update_podcast(podcast)
-
+            except NoPodcastCreated as npc:
+                print 'no podcast created:', npc
             print
 
 
-    def update_podcast(self, podcast):
-
+    def _update_podcast_url(self, podcast_url):
         try:
-            parsed = parse_feed(podcast.url, text_processor=ConvertMarkdown())
+            parsed = self._fetch_feed(podcast_url)
+            self._validate_parsed(parsed)
 
-            if not parsed:
-                self.mark_outdated(podcast, 'not parsed')
-                return
+        except (ParserException, FeedparserError, httplib.InvalidURL,
+                urllib2.URLError, urllib2.HTTPError,
+                NoEpisodesException) as ex:
 
-        except ParserException as ex:
-            self.mark_outdated(podcast, str(ex))
-            return
+            # if we fail to parse the URL, we don't even create the
+            # podcast object
+            p = podcast_for_url(podcast_url, create=False)
+            if p:
+                # if it exists already, we mark it as outdated
+                self._mark_outdated(p)
 
-        except FeedparserError as ex:
-            self.mark_outdated(podcast, str(ex))
-            return
+            else:
+                raise NoPodcastCreated(ex)
 
-        except httplib.InvalidURL as ex:
-            self.mark_outdated(podcast, str(ex))
-            return
+        assert parsed, 'fetch_feed must return something'
+        p = podcast_for_url(podcast_url, create=True)
+        self._update_podcast(p, parsed)
 
-        except urllib2.URLError as e:
-            self.mark_outdated(podcast, str(e))
-            return
 
-        except urllib2.HTTPError as e:
-            if e.code in (404, 400):
-                self.mark_outdated(podcast, str(e))
-                return
+    def _fetch_feed(self, podcast_url):
+        return parse_feed(podcast_url, text_processor=ConvertMarkdown())
 
-            raise
 
-        podcast = podcast_for_url(parsed.urls[0])
+
+    def _validate_parsed(self, parsed):
+        """ validates the parsed results and raises an exception if invalid
+
+        feedparser parses pretty much everything. We reject anything that
+        doesn't look like a feed"""
+
+        if not parsed.episodes:
+            raise NoEpisodesException('no episodes found')
+
+
+    @repeat_on_conflict(['podcast'])
+    def _update_podcast(self, podcast, parsed):
+        """ updates a podcast according to new parser results """
+
         changed = False
 
         # we need that later to decide if we can "bump" a category
@@ -129,7 +139,7 @@ class PodcastUpdater(object):
         if podcast.new_location:
             new_podcast = podcast_for_url(podcast.new_location)
             if new_podcast != podcast:
-                self.mark_outdated(podcast, 'redirected to different podcast')
+                self._mark_outdated(podcast, 'redirected to different podcast')
                 return
 
             elif not new_podcast:
@@ -137,7 +147,7 @@ class PodcastUpdater(object):
                 changed = True
 
 
-        episodes = self.update_episodes(podcast, parsed.episodes)
+        episodes = self._update_episodes(podcast, parsed.episodes)
 
         # latest episode timestamp
         eps = filter(lambda e: bool(e.released), episodes)
@@ -147,15 +157,15 @@ class PodcastUpdater(object):
             changed |= update_a(podcast, 'episode_count', len(eps))
 
 
-        self.update_categories(podcast, prev_latest_episode_timestamp)
+        self._update_categories(podcast, prev_latest_episode_timestamp)
 
         # try to download the logo and reset logo_url to None on http errors
-        found = self.save_podcast_logo(podcast.logo_url)
+        found = self._save_podcast_logo(podcast.logo_url)
         if not found:
             changed |= update_a(podcast, 'logo_url', None)
 
         if changed:
-            print '      saving podcast'
+            print 'saving podcast'
             podcast.last_update = datetime.utcnow()
             podcast.save()
 
@@ -164,7 +174,9 @@ class PodcastUpdater(object):
         assign_missing_episode_slugs(podcast)
 
 
-    def update_categories(self, podcast, prev_timestamp):
+    def _update_categories(self, podcast, prev_timestamp):
+        """ checks some practical requirements and updates a category """
+
         from datetime import timedelta
 
         max_timestamp = datetime.utcnow() + timedelta(days=1)
@@ -188,7 +200,8 @@ class PodcastUpdater(object):
         update_category(podcast)
 
 
-    def update_episodes(self, podcast, parsed_episodes):
+    @repeat_on_conflict(['podcast'])
+    def _update_episodes(self, podcast, parsed_episodes):
 
         all_episodes = set(episodes_for_podcast_uncached(podcast))
         remaining = list(all_episodes)
@@ -238,8 +251,6 @@ class PodcastUpdater(object):
                     episode.last_update = datetime.utcnow()
                     updated_episodes.append(episode)
 
-                #episode.content_types = None #TODO
-
 
         outdated_episodes = all_episodes - set(updated_episodes)
 
@@ -250,13 +261,13 @@ class PodcastUpdater(object):
 
 
         if updated_episodes:
-            print '      Updating', len(updated_episodes), 'episodes'
+            print 'Updating', len(updated_episodes), 'episodes'
             self.db.save_docs(updated_episodes)
 
         return all_episodes
 
 
-    def save_podcast_logo(self, cover_art):
+    def _save_podcast_logo(self, cover_art):
         if not cover_art:
             return
 
@@ -274,7 +285,7 @@ class PodcastUpdater(object):
             else:
                 old_hash = ''
 
-            print '      LOGO @', cover_art
+            print 'LOGO @', cover_art
 
             # save new cover art
             with open(filename, 'w') as fp:
@@ -287,7 +298,7 @@ class PodcastUpdater(object):
             # remove thumbnails if cover changed
             if old_hash != new_hash:
                 thumbnails = CoverArt.get_existing_thumbnails(prefix, filename)
-                print '      Removing %d thumbnails' % len(thumbnails)
+                print 'Removing %d thumbnails' % len(thumbnails)
                 for f in thumbnails:
                     os.unlink(f)
 
@@ -300,12 +311,13 @@ class PodcastUpdater(object):
             print e
 
 
-    def mark_outdated(self, podcast, msg=''):
-        print '      mark outdated', msg
+    @repeat_on_conflict(['podcast'])
+    def _mark_outdated(self, podcast, msg=''):
+        print 'mark outdated', msg
         podcast.outdated = True
         podcast.last_update = datetime.utcnow()
         podcast.save()
-        self.update_episodes(podcast, [])
+        self._update_episodes(podcast, [])
 
 
 

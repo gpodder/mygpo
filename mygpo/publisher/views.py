@@ -139,7 +139,7 @@ def update_podcast(request, podcast):
     if not check_publisher_permission(request.user, podcast):
         return HttpResponseForbidden()
 
-    updater = PodcastUpdater( [podcast] )
+    updater = PodcastUpdater( [podcast.url] )
     updater.update()
 
     url = get_podcast_link_target(podcast, 'podcast-publisher-detail')
@@ -175,7 +175,7 @@ def update_published_podcasts(request, username):
         raise Http404
 
     published_podcasts = podcasts_by_id(user.published_objects)
-    updater = PodcastUpdater(published_podcasts)
+    updater = PodcastUpdater(podcast.url for podcast in published_podcasts)
     updater.update()
 
     return HttpResponse('Updated:\n' + '\n'.join([p.url for p in published_podcasts]), mimetype='text/plain')
