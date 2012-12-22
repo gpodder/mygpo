@@ -138,15 +138,21 @@
 
 {% block sidebar %}
 
-    <div class="well">
+ <div class="well">
 
-    <h4>Share</h4>
+  <h4>Share</h4>
 
-    {% comment %} add flattr button if the user has his flattr-settings enabled{% endcomment %}
+  {% google_plus_one_button %}
+  {% fb_like_episode episode podcast %}
 
-   {% google_plus_one_button %}
-   {% fb_like_episode episode podcast %}
-  </div>
+  {% if episode.flattr_url %}
+   <a href="{{ podcast.flattr_url }}">
+    <img src="https://api.flattr.com/button/flattr-badge-large.png"
+     alt="Flattr {{ episode.title|default:"Unnamed Episode"|striptags }}" />
+   </a>
+  {% endif %}
+
+ </div>
 
 
 

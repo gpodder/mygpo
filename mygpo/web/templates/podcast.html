@@ -226,6 +226,12 @@
 
    {% google_plus_one_button %}
    {{ podcast|fb_like_podcast }}
+   {% if podcast.flattr_url %}
+    <a href="{{ podcast.flattr_url }}">
+     <img src="https://api.flattr.com/button/flattr-badge-large.png"
+      alt="Flattr {{ podcast.title|default:"Unnamed Podcast"|striptags }}" />
+    </a>
+   {% endif %}
 
  </div>
 
