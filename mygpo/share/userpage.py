@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-import gevent
+from functools import partial
 
 from django.shortcuts import render
 from django.views.generic.base import View
@@ -32,14 +32,14 @@ class UserpageView(GeventView):
         site = RequestSite(request)
 
         context_funs = {
-            'lists': gevent.spawn(self.get_podcast_lists, user),
-            'subscriptions': gevent.spawn(self.get_subscriptions, user),
-            'recent_episodes': gevent.spawn(self.get_recent_episodes, user),
-            'seconds_played_total': gevent.spawn(self.get_seconds_played_total, user),
-            'seconds_played_month': gevent.spawn(self.get_seconds_played_since, user, month_ago),
-            'favorite_episodes': gevent.spawn(self.get_favorite_episodes, user),
-            'num_played_episodes_total': gevent.spawn(self.get_played_episodes_total, user),
-            'num_played_episodes_month': gevent.spawn(self.get_played_episodes_since, user, month_ago),
+            'lists': partial(self.get_podcast_lists, user),
+            'subscriptions': partial(self.get_subscriptions, user),
+            'recent_episodes': partial(self.get_recent_episodes, user),
+            'seconds_played_total': partial(self.get_seconds_played_total, user),
+            'seconds_played_month': partial(self.get_seconds_played_since, user, month_ago),
+            'favorite_episodes': partial(self.get_favorite_episodes, user),
+            'num_played_episodes_total': partial(self.get_played_episodes_total, user),
+            'num_played_episodes_month': partial(self.get_played_episodes_since, user, month_ago),
         }
 
         context = {

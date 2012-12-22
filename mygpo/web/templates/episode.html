@@ -72,7 +72,7 @@
 {% block content %}
 
   {% if episode.content or episode.description %}
-   <div class="description">
+   <div class="description" {% if episode.language or podcast.language %}lang="{% firstof episode.language podcast.language %}"{% endif %}>
     {% if episode.content %}
      {{ episode.content|markdown }}
     {% else %}

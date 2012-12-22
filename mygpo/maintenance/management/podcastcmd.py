@@ -34,21 +34,21 @@ class PodcastCommand(BaseCommand):
 
     def _get_podcasts(self, *args, **options):
         if options.get('toplist'):
-            yield self.get_toplist()
+            yield (p.url for p in self.get_toplist())
 
         if options.get('new'):
-            yield podcasts_need_update()
+            yield (p.url for p in podcasts_need_update())
 
         if options.get('random'):
-            yield random_podcasts()
+            yield (p.url for p in random_podcasts())
 
 
-        get_podcast = lambda url: podcast_for_url(url, create=True)
-        yield map(get_podcast, args)
+        if args:
+            yield args
 
         if not args and not options.get('toplist') and not options.get('new') \
                     and not options.get('random'):
-           yield podcasts_by_last_update()
+           yield (p.url for p in podcasts_by_last_update())
 
 
     def get_toplist(self):

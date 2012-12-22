@@ -5,17 +5,15 @@ import sys
 from couchdb.multipart import write_multipart
 
 from django.core.management.base import BaseCommand
-from mygpo.json import json
 
 from mygpo.core.models import Podcast
 from mygpo.couch import get_main_database
 from mygpo.directory.toplist import PodcastToplist
-from mygpo.users.models import PodcastUserState, EpisodeUserState, \
-         Suggestions, User
+from mygpo.users.models import User
 from mygpo.utils import progress
 from mygpo.json import json
 from mygpo.db.couchdb.episode import episodes_for_podcast
-from mygpo.db.couchdb.podcast import podcast_by_id
+from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url
 from mygpo.db.couchdb.podcast_state import podcast_states_for_user
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode
 from mygpo.db.couchdb.user import suggestions_for_user
@@ -38,6 +36,8 @@ class Command(BaseCommand):
             help="User for which related data should be dumped"),
         make_option('--toplist', action='store_true', dest='toplist',
             help="Dump toplist podcasts"),
+        make_option('--podcast', action='append', type="string", dest='podcasts', default=[],
+            help="Feed-URLs of podcasts to dump"),
     )
 
 
@@ -47,59 +47,84 @@ class Command(BaseCommand):
 
         for username in options.get('users', []):
             user = User.get_user(username)
-
-            # User
-            docs.add(user._id)
-
-            # Suggestions
-            suggestions = suggestions_for_user(user)
-            docs.add(suggestions._id)
-
-            # Podcast States
-            for p_state in podcast_states_for_user(user):
-                docs.add(p_state._id)
-
-                # Categories
-                for tag in p_state.tags:
-                    c = category_for_tag(tag)
-                    if c: docs.add(c._id)
-
-                # Podcast
-                podcast = podcast_by_id(p_state.podcast)
-                docs.add(podcast._id)
-
-                # Categories
-                for s in podcast.tags:
-                    for tag in podcast.tags[s]:
-                        c = category_for_tag(tag)
-                        if c: docs.add(c._id)
-
-                # Episodes
-                for episode in episodes_for_podcast(podcast):
-                    docs.add(episode._id)
-
-                    # Episode States
-                    e_state = episode_state_for_user_episode(user, episode)
-                    if e_state._id:
-                        docs.add(e_state._id)
+            self.add_user(user, docs)
 
         if options.get('toplist', False):
             toplist = PodcastToplist()
             entries = toplist[:25]
 
             for n, podcast in entries:
-                print n, podcast
-                docs.add(podcast._id)
+                self.add_podcast(podcast, docs)
 
-                # Episodes
-                print podcast
-                for episode in episodes_for_podcast(podcast):
-                    docs.add(episode._id)
+        for podcast_url in options.get('podcasts'):
+            podcast = podcast_for_url(podcast_url, docs)
+            if not podcast:
+                print 'podcast not found for URL', podcast_url
+            self.add_podcast(podcast, docs)
 
 
         db = get_main_database()
         docs = sorted(docs)
         self.dump(docs, db)
+
+
+    def add_user(self, user, docs):
+
+        # User
+        docs.add(user._id)
+
+        # Suggestions
+        suggestions = suggestions_for_user(user)
+        docs.add(suggestions._id)
+
+        # Podcast States
+        for p_state in podcast_states_for_user(user):
+            self.add_podcast_state(p_state, user, docs)
+
+
+    def add_podcast_state(self, p_state, user, docs):
+        docs.add(p_state._id)
+
+        # Categories
+        for tag in p_state.tags:
+            c = category_for_tag(tag)
+            if c: docs.add(c._id)
+
+        # Podcast
+        podcast = podcast_by_id(p_state.podcast)
+        self.add_podcast(podcast, docs)
+
+        # Episodes
+        for episode in episodes_for_podcast(podcast):
+            e_state = episode_state_for_user_episode(user, episode)
+            self.add_episode_state(e_state, docs)
+
+
+    def add_podcast(self, podcast, docs):
+        docs.add(podcast._id)
+
+        # if podcast is actually a PodcastGroup, we get the first podcast
+        podcast=podcast.get_podcast()
+
+        # Categories
+        for s in podcast.tags:
+            for tag in podcast.tags[s]:
+                c = category_for_tag(tag)
+                if c: docs.add(c._id)
+
+        # Episodes
+        for episode in episodes_for_podcast(podcast.get_podcast()):
+            self.add_episode(episode, docs)
+
+
+    def add_episode(self, episode, docs):
+        docs.add(episode._id)
+
+
+    def add_episode_state(self, e_state, docs):
+        if e_state._id:
+            docs.add(e_state._id)
+
 
 
     def dump(self, docs, db):
@@ -116,7 +141,7 @@ class Command(BaseCommand):
 
             doc = db.get(docid, attachments=True)
             attachments = doc.pop('_attachments', {})
-            jsondoc = json.encode(doc)
+            jsondoc = json.dumps(doc)
 
             if attachments:
                 parts = envelope.open({

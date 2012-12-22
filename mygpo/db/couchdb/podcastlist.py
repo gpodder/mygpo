@@ -1,12 +1,13 @@
 from random import random
 
+from django.core.cache import cache
+
 from mygpo.share.models import PodcastList
 from mygpo.cache import cache_result
 from mygpo.db import QueryParameterMissing
 
 
 
-@cache_result(timeout=60)
 def podcastlist_for_user_slug(user_id, slug):
 
     if not user_id:
@@ -15,12 +16,23 @@ def podcastlist_for_user_slug(user_id, slug):
     if not slug:
         raise QueryParameterMissing('slug')
 
+    key = 'plist-%s-%s' % (user_id, slug)
+
+    l = cache.get(key)
+    if l:
+        return l
 
     r = PodcastList.view('podcastlists/by_user_slug',
             key          = [user_id, slug],
             include_docs = True,
         )
-    return r.first() if r else None
+
+    if r:
+        l = r.one()
+        cache.set(key, l, 60)
+        return l
+
+    return None
 
 
 

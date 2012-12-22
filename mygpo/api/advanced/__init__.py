@@ -21,7 +21,11 @@ from collections import defaultdict, namedtuple
 from datetime import datetime
 
 import dateutil.parser
-import gevent
+
+try:
+    import gevent
+except ImportError:
+    gevent = None
 
 from django.http import HttpResponse, HttpResponseBadRequest, Http404, HttpResponseNotFound
 from django.contrib.sites.models import RequestSite
@@ -533,19 +537,32 @@ def get_episode_updates(user, subscribed_podcasts, since):
     episode_status = {}
 
     # get episodes
-    episode_jobs = [gevent.spawn(episodes_for_podcast, p, since) for p in
-        subscribed_podcasts]
-    gevent.joinall(episode_jobs)
-    episodes = chain.from_iterable(job.get() for job in episode_jobs)
+    if gevent:
+        episode_jobs = [gevent.spawn(episodes_for_podcast, p, since) for p in
+            subscribed_podcasts]
+        gevent.joinall(episode_jobs)
+        episodes = chain.from_iterable(job.get() for job in episode_jobs)
+
+    else:
+        episodes = chain.from_iterable(episodes_for_podcast(p, since) for p
+                in subscribed_podcasts)
+
 
     for episode in episodes:
         episode_status[episode._id] = EpisodeStatus(episode, 'new', None)
 
+
     # get episode states
-    e_action_jobs = [gevent.spawn(get_podcasts_episode_states, p, user._id)
-            for p in subscribed_podcasts]
-    gevent.joinall(e_action_jobs)
-    e_actions = chain.from_iterable(job.get() for job in e_action_jobs)
+    if gevent:
+        e_action_jobs = [gevent.spawn(get_podcasts_episode_states, p, user._id)
+                for p in subscribed_podcasts]
+        gevent.joinall(e_action_jobs)
+        e_actions = chain.from_iterable(job.get() for job in e_action_jobs)
+
+    else:
+        e_actions = [get_podcasts_episode_states(p, user._id) for p
+            in subscribed_podcasts]
+
 
     for action in e_actions:
         e_id = action['episode_id']

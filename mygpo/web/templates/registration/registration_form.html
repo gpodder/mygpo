@@ -16,7 +16,7 @@
 {% block content %}
 {% if user.is_authenticated %}
 
-  <div class="success">{% trans "You are already registered." %}</div>
+  <div class="alert alert-success">{% trans "You are already registered." %}</div>
 
  {% else %}
 
@@ -28,7 +28,11 @@
      <label class="control-label">Username</label>
      <div class="controls">
       {{ form.username }}
-      <p class="help-block">Letters, digits, hypens, underscores</p>
+      {% for err in form.username.errors %}
+       <span class="help-block alert alert-error">{{ err }}</span>
+      {% empty %}
+       <span class="help-block">Letters, digits, hypens, underscores</span>
+      {% endfor %}
      </div>
     </div>
 
@@ -36,7 +40,11 @@
      <label class="control-label">Email Address</label>
      <div class="controls">
       {{ form.email }}
-      <p class="help-block">We won't share it with anyone</p>
+      {% for err in form.email.errors %}
+       <span class="help-block alert alert-error">{{ err }}</span>
+      {% empty %}
+       <span class="help-block">We won't share it with anyone</span>
+      {% endfor %}
      </div>
     </div>
 
@@ -44,7 +52,9 @@
      <label class="control-label">Password</label>
      <div class="controls">
       {{ form.password1 }}
-      <p class="help-block">as secure as you like it</p>
+      {% for err in form.password1.errors %}
+       <span class="help-block alert alert-error">{{ err }}</span>
+      {% endfor %}
      </div>
     </div>
 
@@ -52,6 +62,9 @@
      <label class="control-label">Password (confirm)</label>
      <div class="controls">
       {{ form.password2 }}
+      {% for err in form.password2.errors %}
+       <span class="help-block alert alert-error">{{ err }}</span>
+      {% endfor %}
      </div>
     </div>
 

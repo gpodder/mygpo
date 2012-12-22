@@ -19,7 +19,10 @@ import sys
 from collections import defaultdict
 from datetime import datetime, timedelta
 
-import gevent
+try:
+    import gevent
+except ImportError:
+    gevent = None
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
@@ -252,9 +255,18 @@ class GeventView(View):
 
         context_funs is a context-key => Greenlet object mapping """
 
-        gevent.joinall(context_funs.values())
+        if gevent:
+            jobs = {}
+            for key, fun in context_funs.items():
+                jobs[key] = gevent.spawn(fun)
 
-        for key, gev in context_funs.items():
-            context_funs[key] = gev.get()
+            gevent.joinall(jobs.values())
+
+            for key, gev in jobs.items():
+                context_funs[key] = gev.get()
+
+        else:
+            for key, fun in context_funs.items():
+                context_funs[key] = fun()
 
         return context_funs

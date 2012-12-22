@@ -1,5 +1,5 @@
 from mygpo.utils import is_url
-from mygpo.data.feeddownloader import PodcastUpdater
+from mygpo.data.feeddownloader import PodcastUpdater, NoPodcastCreated
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.cache import cache_result
 from mygpo.db.couchdb.podcast import podcast_for_url, search
@@ -11,15 +11,22 @@ def search_podcasts(q, limit=20, skip=0):
     if is_url(q):
         url = sanitize_url(q)
 
-        podcast = podcast_for_url(url, create=True)
+        podcast = podcast_for_url(url, create=False)
 
-        if not podcast.title:
-            updater = PodcastUpdater([podcast])
-            updater.update()
+        if not podcast or not podcast.title:
+
+            updater = PodcastUpdater([url])
+
+            try:
+                updater.update()
+            except NoPodcastCreated as npc:
+                return [], 0
 
         podcast = podcast_for_url(url)
-
-        return [podcast], 1
+        if podcast:
+            return [podcast], 1
+        else:
+            return [], 0
 
 
     return search(q, skip, limit)
