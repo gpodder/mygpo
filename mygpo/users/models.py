@@ -262,10 +262,6 @@ class PodcastUserState(Document, SettingsMixin):
     disabled_devices = StringListProperty()
     merged_ids    = StringListProperty()
 
-    # TODO: a flag for enabling auto-flattring per podcast can be stored
-    # in the settings field; would be automatically accessible through
-    # the Settings API
-
 
     def remove_device(self, device):
         """
@@ -474,7 +470,6 @@ class User(BaseUser, SyncedDevicesMixin, SettingsMixin):
     suggestions_up_to_date = BooleanProperty(default=False)
     twitter = StringProperty()
     about   = StringProperty()
-    # TODO: add fields for storing flattr account info (token / enabled flag)
 
     # token for accessing subscriptions of this use
     subscriptions_token    = StringProperty(default=None)
