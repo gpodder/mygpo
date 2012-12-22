@@ -14,7 +14,7 @@ from mygpo.core.models import PodcastGroup, SubscriptionException
 from mygpo.core.proxy import proxy_object
 from mygpo.core.tasks import flattr_thing
 from mygpo.api.sanitizing import sanitize_url
-from mygpo.users.settings import PUBLIC_SUB_PODCAST
+from mygpo.users.settings import PUBLIC_SUB_PODCAST, FLATTR_TOKEN
 from mygpo.users.models import HistoryEntry, DeviceDoesNotExist, SubscriptionAction
 from mygpo.web.forms import SyncForm
 from mygpo.decorators import allowed_methods, repeat_on_conflict
@@ -89,6 +89,7 @@ def show(request, podcast):
         history = map(_set_objects, history)
 
         is_public = state.get_wksetting(PUBLIC_SUB_PODCAST)
+        can_flattr = request.user.get_wksetting(FLATTR_TOKEN) and podcast.flattr_url
 
         return render(request, 'podcast.html', {
             'tags': tags,
@@ -102,6 +103,7 @@ def show(request, podcast):
             'episode': episode,
             'episodes': episodes,
             'max_listeners': max_listeners,
+            'can_flattr': can_flattr,
         })
     else:
         current_site = RequestSite(request)
@@ -113,6 +115,7 @@ def show(request, podcast):
             'episode': episode,
             'episodes': episodes,
             'max_listeners': max_listeners,
+            'can_flattr': False,
         })
 
 

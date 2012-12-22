@@ -34,6 +34,7 @@ from mygpo.decorators import repeat_on_conflict
 from mygpo.core.proxy import proxy_object
 from mygpo.core.tasks import flattr_thing
 from mygpo.users.models import Chapter, HistoryEntry, EpisodeAction
+from mygpo.users.settings import FLATTR_TOKEN
 from mygpo.utils import parse_time
 from mygpo.web.heatmap import EpisodeHeatmap
 from mygpo.web.utils import get_episode_link_target, fetch_episode_data
@@ -74,12 +75,14 @@ def episode(request, episode):
                 episode._id, request.user._id, duration=episode.duration)
 
         devices = dict( (d.id, d.name) for d in request.user.devices )
+        can_flattr = request.user.get_wksetting(FLATTR_TOKEN) and episode.flattr_url
 
     else:
         history = []
         is_fav = False
         played_parts = None
         devices = {}
+        can_flattr = False
 
 
     chapters = []
@@ -103,6 +106,7 @@ def episode(request, episode):
         'played_parts': played_parts,
         'actions': EPISODE_ACTION_TYPES,
         'devices': devices,
+        'can_flattr': can_flattr,
     })
 
 

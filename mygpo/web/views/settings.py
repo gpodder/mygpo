@@ -126,7 +126,7 @@ class ProfileView(View):
         request.user.save()
         messages.success(request, _('Data updated'))
 
-        return HttpResponseRedirect(reverse('account'))
+        return HttpResponseRedirect(reverse('account') + '#profile')
 
 
 class FlattrSettingsView(View):
@@ -143,7 +143,16 @@ class FlattrSettingsView(View):
         auto_flattr = form.cleaned_data.get('enable', False)
         update_flattr_settings(user, None, auto_flattr)
 
-        return HttpResponseRedirect(reverse('account'))
+        return HttpResponseRedirect(reverse('account') + '#flattr')
+
+
+class FlattrLogout(View):
+    """ Removes Flattr authentication token """
+
+    def get(self, request):
+        user = request.user
+        update_flattr_settings(user, False, False)
+        return HttpResponseRedirect(reverse('account') + '#flattr')
 
 
 class FlattrTokenView(View):
@@ -166,7 +175,7 @@ class FlattrTokenView(View):
         else:
             messages.error(request, _('Authentication failed. Try again later'))
 
-        return HttpResponseRedirect(reverse('account'))
+        return HttpResponseRedirect(reverse('account') + '#flattr')
 
 
 

@@ -145,7 +145,7 @@
   {% google_plus_one_button %}
   {% fb_like_episode episode podcast %}
 
-  {% if episode.flattr_url %}
+  {% if can_flattr %}
    <a href="{% episode_link_target episode podcast "flattr-episode" %}">
     <img src="https://api.flattr.com/button/flattr-badge-large.png"
      alt="Flattr {{ episode.title|default:"Unnamed Episode"|striptags }}" />
