@@ -141,7 +141,7 @@
       <label class="control-label" for="token">{% trans "Authenticated" %}</label>
       <div class="controls">
        {% if flattr_form.token.value %}
-        {% blocktrans with flattr.get_auth_username as flattrname %}Logged in as {{ flattrname }}{% endblocktrans %}
+        {% blocktrans with flattr.get_auth_username as flattrname %}Logged in as <a href="https://flattr.com/profile/{{ flattrname }}">{{ flattrname }}</a>{% endblocktrans %}
         <a class="btn" href="{% url "flattr-logout" %}">{% trans "Logout" %}</a>
        {% else %}
         <a class="btn" href="{{ flattr.get_auth_url }}">{% trans "Login" %}</a>
