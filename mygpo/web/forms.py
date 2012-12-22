@@ -42,8 +42,17 @@ class ProfileForm(forms.Form):
 
 
 class FlattrForm(forms.Form):
+    """ Per-user Flattr settings """
+
+    # Authentication token; empty or None when not signed in
     token = forms.CharField(required=False, label=_('Token'))
-    enable = forms.BooleanField(required=False, label=_('Auto-Flattr played episodes'))
+
+    # Auto-flattring enabled
+    enable = forms.BooleanField(required=False,
+            label=_('Auto-Flattr played episodes'))
+
+    # Auto-flattr mygpo (or whatever the FLATTR_MYGPO_THING
+    # in settings_prod.py is) on every other flattr
     flattr_mygpo = forms.BooleanField(required=False, label=_('Flattr us'))
 
 

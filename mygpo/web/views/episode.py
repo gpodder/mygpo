@@ -242,8 +242,12 @@ def add_action(request, episode):
 @never_cache
 @login_required
 def flattr_episode(request, episode):
+    """ Flattrs an episode, records an event and redirects to the episode """
+
     user = request.user
     site = RequestSite(request)
+
+    # Flattr via the tasks queue, but wait for the result
     task = flattr_thing.delay(user, episode._id, site.domain, 'Episode')
     success, msg = task.get()
 

@@ -326,8 +326,12 @@ def set_public(request, podcast, public):
 @never_cache
 @login_required
 def flattr_podcast(request, podcast):
+    """ Flattrs a podcast, records an event and redirects to the podcast """
+
     user = request.user
     site = RequestSite(request)
+
+    # do flattring via the tasks queue, but wait for the result
     task = flattr_thing.delay(user, podcast.get_id(), site.domain, 'Podcast')
     success, msg = task.get()
 

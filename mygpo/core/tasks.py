@@ -46,6 +46,10 @@ def flattr_thing(user, thing_id, domain, thing_type):
 
 
 def auto_flattr_episode(user, episode_id):
+    """ Task to auto-flattr an episode
+
+    In addition to the flattring itself, it also records the event """
+
     success, msg = flattr_thing(user, episode_id, None, 'Episode')
 
     if not success:
