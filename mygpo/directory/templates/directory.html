@@ -122,6 +122,7 @@
   {% cache 3600 directory_trending %}
   {% if trending_podcasts %}
    {% with trending_podcasts|slice:":1"|first as trending_podcast %}
+    {% if trending_podcast %}
     <div class="well">
 
      <h4><small>{% trans "Trending" %} {% subscriber_change trending_podcast.subscriber_change %}</small></h4>
@@ -141,6 +142,7 @@
      </p>
 
     </div>
+    {% endif %}
    {% endwith %}
   {% endif %}
   {% endcache %}
