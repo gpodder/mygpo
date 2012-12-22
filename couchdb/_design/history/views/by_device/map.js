@@ -58,7 +58,6 @@ function(doc)
         {
             processEpisodeAction(doc.actions[n]);
         }
-        /* TODO: emit an action for every flattr-timestamp in the doc */
     }
     if(doc.doc_type == "PodcastUserState")
     {
