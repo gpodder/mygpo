@@ -14,6 +14,7 @@ celery = Celery('mygpo.celery',
                 include=[
                     'mygpo.data.tasks',
                     'mygpo.admin.tasks',
+                    'mygpo.directory.tasks',
                 ])
 
 celery.conf.update(

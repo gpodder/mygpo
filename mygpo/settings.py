@@ -193,6 +193,9 @@ BACKEND_URL='redis://localhost'
 # a dictionary containing celery settings from
 # http://docs.celeryproject.org/en/latest/configuration.html
 CELERY_CONF = dict(
+    CELERY_SEND_TASK_ERROR_EMAILS = True,
+    ADMINS=ADMINS,
+    SERVER_EMAIL = "no-reply@example.com",
 )
 
 

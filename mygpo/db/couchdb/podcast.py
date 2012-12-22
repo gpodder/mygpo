@@ -259,7 +259,8 @@ def podcasts_by_last_update():
 
 
 def all_podcasts():
-    res = utils.multi_request_view(cls, 'podcasts/by_id',
+    from mygpo.db.couchdb.utils import multi_request_view
+    res = multi_request_view(Podcast,'podcasts/by_id',
             wrap         = False,
             include_docs = True,
             stale        = 'update_after',
