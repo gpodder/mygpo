@@ -130,7 +130,10 @@
 
    <form action="{% url "flattr-settings" %}" method="POST" class="form-horizontal">
     {% csrf_token %}
-    <legend>{% trans "Flattr" %}</legend>
+    <legend>
+     {% trans "Flattr" %}
+     <small><a href="https://flattr.com/about">{% trans "What's that?" %}</a></small>
+    </legend>
 
     <fieldset>
 
