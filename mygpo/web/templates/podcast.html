@@ -227,7 +227,7 @@
    {% google_plus_one_button %}
    {{ podcast|fb_like_podcast }}
    {% if podcast.flattr_url %}
-    <a href="{{ podcast.flattr_url }}">
+    <a href="{% podcast_link_target podcast "podcast-flattr" %}">
      <img src="https://api.flattr.com/button/flattr-badge-large.png"
       alt="Flattr {{ podcast.title|default:"Unnamed Podcast"|striptags }}" />
     </a>
@@ -245,7 +245,9 @@
       <td><abbr title="{{ s.timestamp }}">{{ s.timestamp|naturalday }}</abbr></td>
       <td>{{ s|podcast_status_icon }}</td>
       <td>
-       <a href="{% url "device" s.device.uid %}">{{ s.device|device_icon }} {{ s.device.name|striptags }}</a>
+       {% if s.device %}
+        <a href="{% url "device" s.device.uid %}">{{ s.device|device_icon }} {{ s.device.name|striptags }}</a>
+       {% endif %}
       </td>
      </tr>
     {% endfor %}

@@ -147,7 +147,7 @@ class Flattr(object):
             elif status_code == 404:
                 return (False, _('Item does not exist on Flattr'))
             elif status_code == 403:
-                return (True, _('Already flattred or own item'))
+                return (False, _('Already flattred or own item'))
             else:
                 return (False, _('Invalid request'))
 

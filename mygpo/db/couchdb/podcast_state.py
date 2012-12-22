@@ -3,6 +3,7 @@ from mygpo.users.settings import PUBLIC_SUB_PODCAST, PUBLIC_SUB_USER
 from mygpo.couch import get_main_database
 from mygpo.cache import cache_result
 from mygpo.db import QueryParameterMissing
+from mygpo.decorators import repeat_on_conflict
 
 
 def all_podcast_states(podcast):
@@ -167,3 +168,9 @@ def subscriptions_by_user(user, public=None):
             reduce   = False,
         )
     return [res['key'][1:] for res in r]
+
+
+@repeat_on_conflict(['state'])
+def add_subscription_action(state, action):
+    state.add_actions([action])
+    state.save()

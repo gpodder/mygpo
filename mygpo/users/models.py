@@ -164,18 +164,11 @@ class EpisodeUserState(Document, SettingsMixin):
     merged_ids    = StringListProperty()
     chapters      = SchemaListProperty(Chapter)
     podcast       = StringProperty(required=True)
-    # TODO: add a StringListProperty containing the timestamps of all
-    # successful flattrs
 
 
 
     def add_actions(self, actions):
         map(EpisodeAction.validate_time_values, actions)
-
-        # TODO: trigger flattring if action contains a play-event
-        # TODO: add current time to list of flattr-timestamps if flattring
-        # was successful
-
         self.actions = list(self.actions) + actions
         self.actions = list(set(self.actions))
         self.actions = sorted(self.actions, key=lambda x: x.timestamp)

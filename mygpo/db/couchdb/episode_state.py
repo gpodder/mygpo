@@ -10,6 +10,7 @@ from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url
 from mygpo.db.couchdb.episode import episode_for_podcast_id_url
 from mygpo.couch import get_main_database
 from mygpo.cache import cache_result
+from mygpo.decorators import repeat_on_conflict
 
 
 
@@ -361,3 +362,8 @@ def get_heatmap(podcast_id, episode_id, user_id):
         res = r.first()['value']
         return res['heatmap'], res['borders']
 
+
+@repeat_on_conflict(['state'])
+def add_episode_actions(state, actions):
+    state.add_actions(actions)
+    state.save()
