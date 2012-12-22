@@ -2,7 +2,7 @@ from mygpo.cache import cache_result
 from mygpo.counter import Counter
 from mygpo.decorators import repeat_on_conflict
 from mygpo.couch import get_main_database
-from mygpo.users.settings import FLATTR_TOKEN, FLATTR_AUTO
+from mygpo.users.settings import FLATTR_TOKEN, FLATTR_AUTO, FLATTR_MYGPO
 from mygpo.db import QueryParameterMissing
 from mygpo.db.couchdb.episode import episodes_by_id
 
@@ -205,7 +205,7 @@ def device_history(user, device, start, length):
 
 
 @repeat_on_conflict(['user'])
-def update_flattr_settings(user, token, enabled=None):
+def update_flattr_settings(user, token, enabled=None, flattr_mygpo=False):
     """ Updates the Flattr settings of a user """
 
     if enabled is not None:
@@ -213,6 +213,9 @@ def update_flattr_settings(user, token, enabled=None):
 
     if token is not None:
         user.settings[FLATTR_TOKEN.name] = token
+
+    if flattr_mygpo is not None:
+        user.settings[FLATTR_MYGPO.name] = flattr_mygpo
 
     user.save()
 

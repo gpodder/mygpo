@@ -148,12 +148,21 @@
 
      <div class="control-group">
       <label class="control-label" for="about">{{ flattr_form.enable.label_tag }}
-       <span class="help-inline">{{ flattr_form.enable.help_text }}</span>
       </label>
       <div class="controls">
        {{ flattr_form.enable }}
       </div>
      </div>
+
+     <div class="control-group">
+      <label class="control-label" for="about">{% blocktrans with site as sitename %}Auto-Flattr {{ sitename }}{% endblocktrans %}
+      </label>
+      <div class="controls">
+       {{ flattr_form.flattr_mygpo }}
+      </div>
+     </div>
+
+
 
      <div class="control-group">
       <div class="controls">

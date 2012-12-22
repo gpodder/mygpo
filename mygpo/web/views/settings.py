@@ -38,7 +38,7 @@ from mygpo.web.forms import UserAccountForm, ProfileForm, FlattrForm
 from mygpo.web.utils import normalize_twitter
 from mygpo.flattr import Flattr
 from mygpo.users.settings import PUBLIC_SUB_PODCAST, PUBLIC_SUB_USER, \
-         FLATTR_TOKEN, FLATTR_AUTO
+         FLATTR_TOKEN, FLATTR_AUTO, FLATTR_MYGPO
 from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_to_dict
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast, \
          subscriptions_by_user
@@ -70,9 +70,11 @@ def account(request):
        flattr_form = FlattrForm({
                'enable': request.user.get_wksetting(FLATTR_AUTO),
                'token': request.user.get_wksetting(FLATTR_TOKEN),
+               'flattr_mygpo': request.user.get_wksetting(FLATTR_MYGPO),
             })
 
        return render(request, 'account.html', {
+            'site': site,
             'form': form,
             'profile_form': profile_form,
             'flattr_form': flattr_form,
@@ -141,7 +143,8 @@ class FlattrSettingsView(View):
             raise ValueError('asdf')
 
         auto_flattr = form.cleaned_data.get('enable', False)
-        update_flattr_settings(user, None, auto_flattr)
+        flattr_mygpo = form.cleaned_data.get('flattr_mygpo', False)
+        update_flattr_settings(user, None, auto_flattr, flattr_mygpo)
 
         return HttpResponseRedirect(reverse('account') + '#flattr')
 
@@ -151,7 +154,7 @@ class FlattrLogout(View):
 
     def get(self, request):
         user = request.user
-        update_flattr_settings(user, False, False)
+        update_flattr_settings(user, False, False, False)
         return HttpResponseRedirect(reverse('account') + '#flattr')
 
 

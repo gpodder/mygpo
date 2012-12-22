@@ -44,6 +44,7 @@ class ProfileForm(forms.Form):
 class FlattrForm(forms.Form):
     token = forms.CharField(required=False, label=_('Token'))
     enable = forms.BooleanField(required=False, label=_('Auto-Flattr played episodes'))
+    flattr_mygpo = forms.BooleanField(required=False, label=_('Flattr us'))
 
 
 class DeviceForm(forms.Form):

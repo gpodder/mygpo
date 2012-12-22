@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.utils.translation import ugettext as _
+from django.conf import settings
 
 from mygpo.cel import celery
 from mygpo.data.feeddownloader import PodcastUpdater
@@ -34,6 +35,9 @@ def flattr_thing(user, thing_id, domain, thing_type):
 
     try:
         success, msg = flattr.flattr_url(thing.flattr_url)
+
+        if settings.FLATTR_MYGPO_THING:
+            flattr.flattr_url(settings.FLATTR_MYGPO_THING)
 
     except Exception as ex:
         raise flattr_thing.retry(exc=ex)
