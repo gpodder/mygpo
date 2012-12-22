@@ -190,6 +190,23 @@ FLATTR_SECRET = ''
 USER_AGENT = 'gpodder.net (+https://github.com/gpodder/mygpo)'
 
 
+
+### Celery
+
+BROKER_URL='redis://localhost'
+BACKEND_URL='redis://localhost'
+
+
+# a dictionary containing celery settings from
+# http://docs.celeryproject.org/en/latest/configuration.html
+CELERY_CONF = dict(
+    CELERY_SEND_TASK_ERROR_EMAILS = True,
+    ADMINS=ADMINS,
+    SERVER_EMAIL = "no-reply@example.com",
+)
+
+
+
 try:
     from settings_prod import *
 except ImportError, e:

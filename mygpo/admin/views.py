@@ -15,10 +15,14 @@ from mygpo.counter import Counter
 from mygpo.maintenance.merge import PodcastMerger, IncorrectMergeException
 from mygpo.users.models import User
 from mygpo.admin.clients import UserAgentStats, ClientStats
+from mygpo.admin.tasks import merge_podcasts
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.db.couchdb.episode import episode_count
 from mygpo.db.couchdb.podcast import podcast_count, podcast_for_url
 
+
+class InvalidPodcast(Exception):
+    """ raised when we try to merge a podcast that doesn't exist """
 
 class AdminView(TemplateView):
 
@@ -125,21 +129,41 @@ class MergeProcess(MergeBase):
 
         elif 'merge' in request.POST:
 
-            actions = Counter()
+            podcast_ids = [p.get_id() for p in podcasts]
+            num_groups = list(num_groups)
 
-            try:
-                # merge podcast, reassign episodes
-                pm = PodcastMerger(podcasts, actions, num_groups)
-                pm.merge()
+            res = merge_podcasts.delay(podcast_ids, num_groups)
 
-            except IncorrectMergeException as ime:
-                messages.error(request, str(ime))
-                return HttpResponseRedirect(reverse('admin-merge'))
+            return HttpResponseRedirect(reverse('admin-merge-status',
+                        args=[res.task_id]))
 
-            return render(request, 'admin/merge-finished.html', {
-                    'actions': actions.items(),
-                    'podcast': podcasts[0],
-                })
+
+class MergeStatus(AdminView):
+    """ Displays the status of the merge operation """
+
+    template_name = 'admin/merge-status.html'
+
+    def get(self, request, task_id):
+        result = merge_podcasts.AsyncResult(task_id)
+
+        if not result.ready():
+            return self.render_to_response({
+                'ready': False,
+            })
+
+
+        try:
+            actions, podcast = result.get()
+
+        except IncorrectMergeException as ime:
+            messages.error(request, str(ime))
+            return HttpResponseRedirect(reverse('admin-merge'))
+
+        return render(request, 'admin/merge-status.html', {
+                'ready': True,
+                'actions': actions.items(),
+                'podcast': podcast,
+            })
 
 
 
