@@ -1,6 +1,5 @@
 feedparser
 python-dateutil
-flup
 PIL
 Babel
 Django
