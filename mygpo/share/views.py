@@ -180,8 +180,12 @@ def delete_list(request, plist, owner):
 def rate_list(request, plist, owner):
     rating_val = int(request.GET.get('rate', None))
 
-    plist.rate(rating_val, request.user._id)
-    plist.save()
+    @repeat_on_conflict(['plist'])
+    def _rate(plist, rating_val, user):
+        plist.rate(rating_val, user._id)
+        plist.save()
+
+    _rate(plist, rating_val, request.user)
 
     messages.success(request, _('Thanks for rating!'))
 
