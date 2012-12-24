@@ -279,7 +279,7 @@ class FavoritesFeedCreateEntry(View):
             user.save()
 
         updater = PodcastUpdater([feed_url])
-        update.update()
+        updater.update()
 
         return HttpResponseRedirect(reverse('share-favorites'))
 
