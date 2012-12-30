@@ -59,6 +59,12 @@ def tag_podcasts(request, tag, count):
 @cache_page(60 * 60)
 def podcast_info(request):
     url = sanitize_url(request.GET.get('url', ''))
+
+    # 404 before we query for url, because query would complain
+    # about missing param
+    if not url:
+        raise Http404
+
     podcast = podcast_for_url(url)
     if not podcast:
             raise Http404
