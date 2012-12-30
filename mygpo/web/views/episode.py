@@ -33,7 +33,7 @@ from mygpo.api.constants import EPISODE_ACTION_TYPES
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core.proxy import proxy_object
 from mygpo.users.models import Chapter, HistoryEntry, EpisodeAction
-from mygpo.utils import parse_time
+from mygpo.utils import parse_time, get_timestamp
 from mygpo.web.heatmap import EpisodeHeatmap
 from mygpo.web.utils import get_episode_link_target, fetch_episode_data
 from mygpo.db.couchdb.episode import episode_for_slug_id, episode_for_oldid, \
@@ -223,6 +223,7 @@ def add_action(request, episode):
 
     action = EpisodeAction()
     action.timestamp = timestamp
+    action.upload_timestamp = get_timestamp(datetime.utcnow())
     action.device = device.id if device else None
     action.action = action_str
 

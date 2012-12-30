@@ -34,7 +34,7 @@ function(doc)
                     doc.user,
                     doc.podcast,
                     action.device,
-                    action_obj.timestamp,
+                    action.upload_timestamp,
                 ], action_obj
             );
         }

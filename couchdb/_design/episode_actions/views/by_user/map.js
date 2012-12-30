@@ -32,7 +32,7 @@ function(doc)
 
             emit([
                     doc.user,
-                    action_obj.timestamp
+                    action.upload_timestamp
                 ], action_obj
             );
         }
