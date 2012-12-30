@@ -46,8 +46,13 @@ class Topics(object):
 
 
     def _query(self):
-        self._categories = top_categories(0, self.num_cat, True)
-        self._tagcloud = top_categories(self.num_cat, self.total-self.num_cat, False)
+        self._categories = []
+        if self.num_cat > 0:
+            self._categories = top_categories(0, self.num_cat, True)
+
+        self._tagcloud = []
+        if self.total-self.num_cat > 0:
+            self._tagcloud = top_categories(self.num_cat, self.total-self.num_cat, False)
 
 
     @property

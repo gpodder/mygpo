@@ -1,9 +1,7 @@
 feedparser
 python-dateutil
-flup
 PIL
 Babel
-gevent
 Django
 markdown2
 simplejson

@@ -26,3 +26,7 @@ class RatingMixin(DocumentSchema):
         self.ratings = filter(lambda r: r.user != None, self.ratings)
         self.ratings = filter(lambda r: r.user != user_id, self.ratings)
         self.ratings.append(rating)
+
+
+    def get_rating(self):
+        return sum(r.rating for r in self.ratings)

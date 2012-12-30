@@ -5,9 +5,7 @@ from functools import partial
 from django.core.management.base import BaseCommand
 
 from mygpo.utils import progress
-from mygpo.users.models import EpisodeUserState
 from mygpo.counter import Counter
-from mygpo.maintenance.merge import merge_episode_states
 from mygpo.couch import bulk_save_retry
 from mygpo.db.couchdb.episode_state import episode_states_count, \
          get_nth_episode_state, get_duplicate_episode_states
@@ -33,6 +31,8 @@ class Command(BaseCommand):
         for n in count(skip):
 
             first = get_nth_episode_state(n)
+            if first is None:
+                break
             states = get_duplicate_episode_states(first.user, first.episode)
 
             l1 = len(states)

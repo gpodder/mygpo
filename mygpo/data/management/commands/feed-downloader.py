@@ -7,8 +7,11 @@ from restkit.errors import RequestFailed
 from mygpo.maintenance.management.podcastcmd import PodcastCommand
 from mygpo.data.feeddownloader import PodcastUpdater
 
-from gevent import monkey
-monkey.patch_all()
+try:
+    from gevent import monkey
+    monkey.patch_all()
+except ImportError:
+    pass
 
 
 class Command(PodcastCommand):

@@ -18,7 +18,7 @@
 
  {% if user.is_authenticated %}
   {% url "share" as share-url %}
-  <div class="info"><strong>{% trans "Want to have your own user page?" %}</strong>{% blocktrans %} Go to your <a href="{{ share-url }}">Share Page</a> to get the link.</a>{% endblocktrans %}</div>
+  <div class="alert alert-info"><strong>{% trans "Want to have your own user page?" %}</strong>{% blocktrans %} Go to your <a href="{{ share-url }}">Share Page</a> to get the link.</a>{% endblocktrans %}</div>
  {% endif %}
 
 {% endblock %}
