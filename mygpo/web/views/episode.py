@@ -277,6 +277,12 @@ def slug_id_decorator(f):
         if episode is None:
             raise Http404
 
+        # redirect when Id or a merged (non-cannonical) slug is used
+        if episode.slug and episode.slug != e_slug_id:
+            podcast = podcast_by_id(episode.podcast)
+            return HttpResponseRedirect(
+                    get_episode_link_target(episode, podcast))
+
         return f(request, episode, *args, **kwargs)
 
     return _decorator
@@ -290,7 +296,9 @@ def oldid_decorator(f):
         if episode is None:
             raise Http404
 
-        return f(request, episode, *args, **kwargs)
+        # redirect to Id or slug URL
+        podcast = podcast_by_id(episode.podcast)
+        return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
     return _decorator
 

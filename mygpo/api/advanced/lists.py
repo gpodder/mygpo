@@ -24,6 +24,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.sites.models import RequestSite
 from django.template.defaultfilters import slugify
 from django.views.decorators.cache import never_cache
+from django.http import Http404
 
 from mygpo.api.advanced.directory import podcast_data
 from mygpo.api.httpresponse import JsonResponse
