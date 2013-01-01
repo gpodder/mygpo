@@ -19,6 +19,7 @@ from mygpo.share.models import PodcastList
 from mygpo.users.models import User
 from mygpo.directory.views import search as directory_search
 from mygpo.decorators import repeat_on_conflict
+from mygpo.flattr import Flattr
 from mygpo.userfeeds.feeds import FavoriteFeed
 from mygpo.db.couchdb.podcast import podcasts_by_id, podcast_for_url
 from mygpo.db.couchdb.podcastlist import podcastlist_for_user_slug, \
@@ -85,6 +86,7 @@ def lists_user(request, username):
 def list_show(request, plist, owner):
 
     is_own = owner == request.user
+    site = RequestSite(request)
 
     plist = proxy_object(plist)
 
@@ -93,12 +95,15 @@ def list_show(request, plist, owner):
 
     max_subscribers = max([p.subscriber_count() for p in podcasts] + [0])
 
-    site = RequestSite(request)
+    thing = plist.get_flattr_thing(site.domain, owner.username)
+    flattr = Flattr(owner, site.domain)
+    flattr_autosubmit = flattr.get_autosubmit_url(thing)
 
     return render(request, 'list.html', {
             'podcastlist': plist,
             'max_subscribers': max_subscribers,
             'owner': owner,
+            'flattr_autosubmit': flattr_autosubmit,
             'domain': site.domain,
             'is_own': is_own,
         })

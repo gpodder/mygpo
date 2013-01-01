@@ -7,12 +7,13 @@
 import urllib
 import urllib2
 import urlparse
+from collections import namedtuple
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from mygpo.json import json
-from mygpo.users.settings import FLATTR_TOKEN
+from mygpo.users.settings import FLATTR_TOKEN, FLATTR_USERNAME
 from mygpo import utils
 from django.utils.translation import ugettext as _
 
@@ -155,3 +156,34 @@ class Flattr(object):
             return (False, _('No internet connection'))
 
         return (True, content.get('description', _('No description')))
+
+
+    def get_autosubmit_url(self, thing):
+        """ returns the auto-submit URL for the given FlattrThing """
+
+        publish_username = self.user.get_wksetting(FLATTR_USERNAME)
+
+        if not publish_username:
+            return None
+
+        URL_TEMPLATE = 'https://flattr.com/submit/auto?user_id=%s' % (publish_username,)
+
+        if not thing.url:
+            raise ValueError('Thing must at least have an url')
+
+        optional_args = set(thing._fields) - set(['url'])
+
+        args = [('url', self.domain + thing.url)]
+        args += [(arg, getattr(thing, arg, None)) for arg in optional_args]
+        args = filter(lambda (k, v): v, args) # filter out empty arguments
+
+        args_str = urllib.urlencode(args)
+
+        autosubmit = URL_TEMPLATE + '&' + args_str
+
+        return autosubmit
+
+
+# A thing that can be flattred by other Flattr users
+FlattrThing = namedtuple('FlattrThing', 'url title description language tags ' +
+        'hidden category')

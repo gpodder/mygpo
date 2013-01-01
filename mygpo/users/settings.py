@@ -27,6 +27,9 @@ FLATTR_AUTO = WellKnownSetting('auto_flattr', False)
 # auto-flattr mygpo
 FLATTR_MYGPO = WellKnownSetting('flattr_mygpo', False)
 
+# username for flattr buttons for own content
+FLATTR_USERNAME = WellKnownSetting('flattr_username', '')
+
 # Flag to mark an episode as favorite
 FAV_FLAG = WellKnownSetting('is_favorite', False)
 

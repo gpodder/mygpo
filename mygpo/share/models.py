@@ -2,8 +2,11 @@ from random import random
 
 from couchdbkit.ext.django.schema import *
 
+from django.core.urlresolvers import reverse
+
 from mygpo.core.proxy import DocumentABCMeta
 from mygpo.users.models import RatingMixin
+from mygpo.flattr import FlattrThing
 
 
 
@@ -17,6 +20,19 @@ class PodcastList(Document, RatingMixin):
     podcasts = StringListProperty()
     user     = StringProperty(required=True)
     random_key = FloatProperty(default=random)
+
+
+    def get_flattr_thing(self, domain, username):
+        """ Returns a "Thing" which can be flattred by other Flattr users """
+        return FlattrThing(
+                url = reverse('list-show', args=[username, self.slug]),
+                title = self.title,
+                description = 'A collection of podcasts about "%s" by %s user %s' % (self.title, domain, username),
+                category = 'audio',
+                hidden = None,
+                tags = None,
+                language = None,
+            )
 
 
     def __repr__(self):

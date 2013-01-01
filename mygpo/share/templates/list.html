@@ -91,6 +91,13 @@
     {% trans "Download as OPML" %}
     </a>
 
+  {% if flattr_autosubmit %}
+   <a href="{{ flattr_autosubmit }}">
+    <img src="https://api.flattr.com/button/flattr-badge-large.png"
+     alt="{% trans "Flattr this podcast list" %}" />
+   </a>
+  {% endif %}
+
  {% if is_own %}
 
   <hr />

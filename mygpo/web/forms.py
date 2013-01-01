@@ -55,6 +55,10 @@ class FlattrForm(forms.Form):
     # in settings_prod.py is) on every other flattr
     flattr_mygpo = forms.BooleanField(required=False, label=_('Flattr us'))
 
+    # username under which own content (eg podcast lists) should be published
+    username = forms.CharField(required=False,
+            label=_('Username for own content'))
+
 
 class DeviceForm(forms.Form):
     """
