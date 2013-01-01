@@ -37,5 +37,5 @@ class Command(PodcastCommand):
         else:
             print 'Updating podcasts...'
 
-            updater = PodcastUpdater(queue)
-            updater.update()
+            updater = PodcastUpdater()
+            updater.update_queue(queue)

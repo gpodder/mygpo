@@ -1,24 +1,32 @@
 from itertools import imap as map
 from math import ceil
 
-from django.http import HttpResponseNotFound
+from django.http import HttpResponseNotFound, Http404, HttpResponseRedirect
+from django.core.urlresolvers import reverse
 from django.shortcuts import render
 from django.contrib.sites.models import RequestSite
 from django.views.decorators.cache import cache_control
 from django.views.decorators.vary import vary_on_cookie
 from django.utils.decorators import method_decorator
 from django.views.generic.base import View
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.utils.translation import ugettext as _
+
+from feedservice.parse.models import ParserException
+from feedservice.parse import FetchFeedException
 
 from mygpo.core.proxy import proxy_object
 from mygpo.directory.toplist import PodcastToplist, EpisodeToplist, \
          TrendingPodcasts
 from mygpo.directory.search import search_podcasts
 from mygpo.web.utils import process_lang_params, get_language_names, \
-         get_page_list
+         get_page_list, get_podcast_link_target
 from mygpo.directory.tags import Topics
 from mygpo.users.models import User
+from mygpo.data.feeddownloader import PodcastUpdater, NoEpisodesException
 from mygpo.db.couchdb.podcast import get_podcast_languages, podcasts_by_id, \
-         random_podcasts, podcasts_to_dict
+         random_podcasts, podcasts_to_dict, podcast_for_url
 from mygpo.db.couchdb.directory import category_for_tag
 from mygpo.db.couchdb.podcastlist import random_podcastlists, \
          podcastlist_count, podcastlists_by_rating
@@ -219,3 +227,77 @@ def podcast_lists(request, page_size=20):
         'lists': lists,
         'page_list': page_list,
         })
+
+
+
+class MissingPodcast(View):
+    """ Check if a podcast is missing """
+
+    @method_decorator(login_required)
+    def get(self, request):
+
+        site = RequestSite(request)
+
+        # check if we're doing a query
+        url = request.GET.get('q', None)
+
+        if not url:
+            podcast = None
+            can_add = False
+
+        else:
+            podcast = podcast_for_url(url)
+
+            # if the podcast does already exist, there's nothing more to do
+            if podcast:
+                can_add = False
+
+            # check if we could add a podcast for the given URL
+            else:
+                podcast = False
+                updater = PodcastUpdater()
+
+                try:
+                    can_add = updater.verify_podcast_url(url)
+
+                except (ParserException, FetchFeedException,
+                        NoEpisodesException) as ex:
+                    can_add = False
+                    messages.error(request, str(ex))
+
+        return render(request, 'missing.html', {
+                'site': site,
+                'q': url,
+                'podcast': podcast,
+                'can_add': can_add,
+            })
+
+
+class AddPodcast(View):
+    """ Add a missing podcast"""
+
+    @method_decorator(login_required)
+    @method_decorator(cache_control(private=True))
+    @method_decorator(vary_on_cookie)
+    def post(self, request):
+
+        url = request.POST.get('url', None)
+
+        if not url:
+            raise Http404
+
+        updater = PodcastUpdater()
+
+        try:
+            podcast = updater.update_podcast_url(url)
+
+            messages.success(request, _('The podcast has been added'))
+
+            return HttpResponseRedirect(get_podcast_link_target(podcast))
+
+        except (ParserException, FetchFeedException,
+                NoEpisodesException) as ex:
+            messages.error(request, str(ex))
+
+            add_page = '%s?q=%s' % (reverse('missing-podcast'), url)
+            return HttpResponseRedirect(add_page)

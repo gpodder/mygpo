@@ -139,8 +139,8 @@ def update_podcast(request, podcast):
     if not check_publisher_permission(request.user, podcast):
         return HttpResponseForbidden()
 
-    updater = PodcastUpdater( [podcast.url] )
-    updater.update()
+    updater = PodcastUpdater()
+    updater.update(podcast.url)
 
     url = get_podcast_link_target(podcast, 'podcast-publisher-detail')
     return HttpResponseRedirect(url)

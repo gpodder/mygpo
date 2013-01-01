@@ -15,10 +15,10 @@ def search_podcasts(q, limit=20, skip=0):
 
         if not podcast or not podcast.title:
 
-            updater = PodcastUpdater([url])
+            updater = PodcastUpdater()
 
             try:
-                updater.update()
+                updater.update(url)
             except NoPodcastCreated as npc:
                 return [], 0
 

@@ -28,10 +28,9 @@ from django.conf import settings
 
 from mygpo.core.slugs import assign_missing_episode_slugs, assign_slug, \
          PodcastSlug
-from feedservice.parse import parse_feed
+from feedservice.parse import parse_feed, FetchFeedException
 from feedservice.parse.text import ConvertMarkdown
 from feedservice.parse.models import ParserException
-from feedservice.parse.feed import FeedparserError
 from mygpo.utils import file_hash, split_list
 from mygpo.web.logo import CoverArt
 from mygpo.db.couchdb.episode import episode_for_podcast_id_url, \
@@ -56,34 +55,32 @@ class NoEpisodesException(Exception):
 class PodcastUpdater(object):
     """ Updates a number of podcasts with data from their feeds """
 
-    def __init__(self, queue):
+    def __init__(self):
         """ Queue is an iterable of podcast objects """
-        self.queue = queue
         self.db = get_main_database()
 
 
-    def update(self):
-        """ Run the updates """
+    def update_queue(self, queue):
+        """ Fetch data for the URLs supplied as the queue iterable """
 
-        for n, podcast_url in enumerate(self.queue):
+        for n, podcast_url in enumerate(queue):
             print n, podcast_url
             try:
-                self._update_podcast_url(podcast_url)
+                self.update(podcast_url)
 
             except NoPodcastCreated as npc:
                 print 'no podcast created:', npc
             print
 
 
-    def _update_podcast_url(self, podcast_url):
+    def update(self, podcast_url):
+        """ Update the podcast for the supplied URL """
+
         try:
             parsed = self._fetch_feed(podcast_url)
             self._validate_parsed(parsed)
 
-        except (ParserException, FeedparserError, httplib.InvalidURL,
-                urllib2.URLError, urllib2.HTTPError,
-                NoEpisodesException) as ex:
-
+        except (ParserException, FetchFeedException) as ex:
             # if we fail to parse the URL, we don't even create the
             # podcast object
             p = podcast_for_url(podcast_url, create=False)
@@ -97,6 +94,13 @@ class PodcastUpdater(object):
         assert parsed, 'fetch_feed must return something'
         p = podcast_for_url(podcast_url, create=True)
         self._update_podcast(p, parsed)
+        return p
+
+
+    def verify_podcast_url(self, podcast_url):
+        parsed = self._fetch_feed(podcast_url)
+        self._validate_parsed(parsed)
+        return True
 
 
     def _fetch_feed(self, podcast_url):
