@@ -38,7 +38,7 @@ function(newDoc, oldDoc, userCtx)
 
                 subscribed_devices.push(action.device);
             }
-            else
+            else if (action.action == "unsubscribe")
             {
                 if(index == -1)
                 {

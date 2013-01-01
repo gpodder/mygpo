@@ -138,13 +138,21 @@
 
 {% block sidebar %}
 
-    <div class="well">
+ <div class="well">
 
-    <h4>Share</h4>
+  <h4>Share</h4>
 
-   {% google_plus_one_button %}
-   {% fb_like_episode episode podcast %}
-  </div>
+  {% google_plus_one_button %}
+  {% fb_like_episode episode podcast %}
+
+  {% if can_flattr %}
+   <a href="{% episode_link_target episode podcast "flattr-episode" %}">
+    <img src="https://api.flattr.com/button/flattr-badge-large.png"
+     alt="Flattr {{ episode.title|default:"Unnamed Episode"|striptags }}" />
+   </a>
+  {% endif %}
+
+ </div>
 
 
 
@@ -180,14 +188,14 @@
      <form class="form-inline" action="{% episode_link_target episode podcast "add-chapter" %}" method="POST">
       {% csrf_token %}
       <td>
-       <input type="text" name="start" id="start" class="time" placeholder="h:mm:ss"/> -
-       <input type="text" name="end" id="end" class="time" placeholder="h:mm:ss"/>
+       <input class="input-mini" type="text" name="start" id="start" class="time" placeholder="h:mm:ss"/>
+       <input class="input-mini" type="text" name="end" id="end" class="time" placeholder="h:mm:ss"/>
       </td>
       <td>
        <input type="checkbox" name="advertisement" />
       </td>
       <td>
-       <input class="input-small" type="text" name="label" />
+       <input class="input-mini" type="text" name="label" />
       </td>
       <td>
        <input class="btn" type="submit" value="{% trans "Add" %}" />
@@ -230,16 +238,16 @@
      <form action="{% episode_link_target episode podcast "add-episode-action" %}" method="POST">
       {% csrf_token %}
       <td>
-       <input class="input-small" type="text" id="timestamp" name="timestamp" placeholder="empty = now" /></td>
+       <input class="input-mini" type="text" id="timestamp" name="timestamp" placeholder="empty = now" /></td>
       <td>
-       <select class="input-small" name="action">
+       <select class="input-mini" name="action">
         {% for action, str in actions %}
          <option value="{{ action }}">{{ str }}</option>
         {% endfor %}
        </select>
       </td>
       <td>
-       <select class="input-small" name="device">
+       <select class="input-mini" name="device">
         <option value=""></option>
         {% for device_id, name in devices.items %}
          <option value="{{ device_id }}">{{ name }}</option>

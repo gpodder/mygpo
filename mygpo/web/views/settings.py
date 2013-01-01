@@ -34,11 +34,15 @@ from django_couchdb_utils.auth.models import UsernameException, \
          PasswordException
 
 from mygpo.decorators import allowed_methods, repeat_on_conflict
-from mygpo.web.forms import UserAccountForm, ProfileForm
+from mygpo.web.forms import UserAccountForm, ProfileForm, FlattrForm
 from mygpo.web.utils import normalize_twitter
+from mygpo.flattr import Flattr
+from mygpo.users.settings import PUBLIC_SUB_PODCAST, PUBLIC_SUB_USER, \
+         FLATTR_TOKEN, FLATTR_AUTO, FLATTR_MYGPO, FLATTR_USERNAME
 from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_to_dict
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast, \
          subscriptions_by_user
+from mygpo.db.couchdb.user import update_flattr_settings
 
 
 @login_required
@@ -49,6 +53,8 @@ def account(request):
 
     if request.method == 'GET':
 
+       site = RequestSite(request)
+       flattr = Flattr(request.user, site.domain)
        userpage_token = request.user.get_token('userpage_token')
 
        profile_form = ProfileForm({
@@ -58,12 +64,22 @@ def account(request):
 
        form = UserAccountForm({
             'email': request.user.email,
-            'public': request.user.settings.get('public_subscriptions', True)
+            'public': request.user.get_wksetting(PUBLIC_SUB_USER)
+            })
+
+       flattr_form = FlattrForm({
+               'enable': request.user.get_wksetting(FLATTR_AUTO),
+               'token': request.user.get_wksetting(FLATTR_TOKEN),
+               'flattr_mygpo': request.user.get_wksetting(FLATTR_MYGPO),
+               'username': request.user.get_wksetting(FLATTR_USERNAME),
             })
 
        return render(request, 'account.html', {
+            'site': site,
             'form': form,
             'profile_form': profile_form,
+            'flattr_form': flattr_form,
+            'flattr': flattr,
             'userpage_token': userpage_token,
             })
 
@@ -113,7 +129,58 @@ class ProfileView(View):
         request.user.save()
         messages.success(request, _('Data updated'))
 
-        return HttpResponseRedirect(reverse('account'))
+        return HttpResponseRedirect(reverse('account') + '#profile')
+
+
+class FlattrSettingsView(View):
+    """ Updates Flattr settings and redirects back to the Account page """
+
+    def post(self, request):
+        user = request.user
+
+        form = FlattrForm(request.POST)
+
+        if not form.is_valid():
+            raise ValueError('asdf')
+
+        auto_flattr = form.cleaned_data.get('enable', False)
+        flattr_mygpo = form.cleaned_data.get('flattr_mygpo', False)
+        username = form.cleaned_data.get('username', '')
+        update_flattr_settings(user, None, auto_flattr, flattr_mygpo, username)
+
+        return HttpResponseRedirect(reverse('account') + '#flattr')
+
+
+class FlattrLogout(View):
+    """ Removes Flattr authentication token """
+
+    def get(self, request):
+        user = request.user
+        update_flattr_settings(user, False, False, False)
+        return HttpResponseRedirect(reverse('account') + '#flattr')
+
+
+class FlattrTokenView(View):
+    """ Callback for the Flattr authentication
+
+    Updates the user's Flattr token and redirects back to the account page """
+
+    def get(self, request):
+
+        user = request.user
+        site = RequestSite(request)
+        flattr = Flattr(user, site.domain)
+
+        url = request.build_absolute_uri()
+        token = flattr.process_retrieved_code(url)
+        if token:
+            messages.success(request, _('Authentication successful'))
+            update_flattr_settings(user, token)
+
+        else:
+            messages.error(request, _('Authentication failed. Try again later'))
+
+        return HttpResponseRedirect(reverse('account') + '#flattr')
 
 
 
@@ -151,7 +218,7 @@ class DefaultPrivacySettings(View):
 
     @repeat_on_conflict(['user'])
     def set_privacy_settings(self, user):
-        user.settings['public_subscriptions'] = self.public
+        user.settings[PUBLIC_SUB_USER.name] = self.public
         user.save()
 
 
@@ -170,7 +237,7 @@ class PodcastPrivacySettings(View):
 
     @repeat_on_conflict(['state'])
     def set_privacy_settings(self, state):
-        state.settings['public_subscription'] = self.public
+        state.settings[PUBLIC_SUB_PODCAST.name] = self.public
         state.save()
 
 
@@ -187,7 +254,7 @@ def privacy(request):
     excluded_subscriptions = set(filter(None, [podcasts.get(x[1], None) for x in subscriptions if x[0] == False]))
 
     return render(request, 'privacy.html', {
-        'public_subscriptions': request.user.settings.get('public_subscriptions', True),
+        'public_subscriptions': request.user.get_wksetting(PUBLIC_SUB_USER),
         'included_subscriptions': included_subscriptions,
         'excluded_subscriptions': excluded_subscriptions,
         'domain': site.domain,

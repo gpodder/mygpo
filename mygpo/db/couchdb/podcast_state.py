@@ -1,7 +1,9 @@
 from mygpo.users.models import PodcastUserState
+from mygpo.users.settings import PUBLIC_SUB_PODCAST, PUBLIC_SUB_USER
 from mygpo.couch import get_main_database
 from mygpo.cache import cache_result
 from mygpo.db import QueryParameterMissing
+from mygpo.decorators import repeat_on_conflict
 
 
 def all_podcast_states(podcast):
@@ -96,7 +98,7 @@ def podcast_state_for_user_podcast(user, podcast):
         p.podcast = podcast.get_id()
         p.user = user._id
         p.ref_url = podcast.url
-        p.settings['public_subscription'] = user.settings.get('public_subscriptions', True)
+        p.settings[PUBLIC_SUB_PODCAST.name]=user.get_wksetting(PUBLIC_SUB_USER)
 
         p.set_device_state(user.devices)
 
@@ -166,3 +168,9 @@ def subscriptions_by_user(user, public=None):
             reduce   = False,
         )
     return [res['key'][1:] for res in r]
+
+
+@repeat_on_conflict(['state'])
+def add_subscription_action(state, action):
+    state.add_actions([action])
+    state.save()

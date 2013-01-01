@@ -55,6 +55,7 @@ class Episode(Document, SlugMixin, OldIdMixin):
     podcast = StringProperty(required=True)
     listeners = IntegerProperty()
     content_types = StringListProperty()
+    flattr_url = StringProperty()
 
 
 
@@ -159,6 +160,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
     latest_episode_timestamp = DateTimeProperty()
     episode_count = IntegerProperty()
     random_key = FloatProperty(default=random)
+    flattr_url = StringProperty()
 
 
 
