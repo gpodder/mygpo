@@ -32,7 +32,7 @@ class Command(PodcastCommand):
 
         if options.get('list'):
             for podcast in queue:
-                print podcast.url
+                print podcast
 
         else:
             print 'Updating podcasts...'
