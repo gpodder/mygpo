@@ -226,7 +226,7 @@ def episodes(request, username, version=1):
             device = None
 
         changes = get_episode_changes(request.user, podcast, device, since,
-                now, aggregated, version)
+                now_, aggregated, version)
 
         return JsonResponse(changes)
 
@@ -266,9 +266,7 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
     if aggregated:
         actions = dict( (a['episode'], a) for a in actions ).values()
 
-    until_ = get_timestamp(until)
-
-    return {'actions': actions, 'timestamp': until_}
+    return {'actions': actions, 'timestamp': until}
 
 
 
