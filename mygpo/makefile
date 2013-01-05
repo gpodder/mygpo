@@ -12,9 +12,14 @@ test:
 unittest:
 	./manage.py test
 
+coverage:
+	coverage run --omit="/usr/*" ./manage.py test
+	coverage report -m
+	rm .coverage
+
 clean:
 	find -name "*.pyc" -exec rm '{}' \;
 
 
-.PHONY: all help test clean unittest
+.PHONY: all help test clean unittest coverage
 

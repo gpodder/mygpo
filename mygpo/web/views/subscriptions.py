@@ -6,15 +6,15 @@ from django.contrib.syndication.views import Feed
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, Http404
 from django.views.decorators.vary import vary_on_cookie
-from django.views.decorators.cache import never_cache, cache_control
+from django.views.decorators.cache import cache_control
 
-from mygpo.core.models import Podcast
-from mygpo.utils import parse_bool, unzip, get_to_dict, skip_pairs
+from mygpo.utils import parse_bool, unzip, skip_pairs
 from mygpo.decorators import requires_token
-from mygpo.api import backend, simple
+from mygpo.api import simple
 from mygpo.users.models import HistoryEntry, User
-from mygpo.web import utils
-from mygpo.cache import get_cache_or_calc
+from mygpo.web.utils import symbian_opml_changes, get_podcast_link_target
+from mygpo.db.couchdb.podcast import podcasts_to_dict
+from mygpo.db.couchdb.podcast_state import subscriptions_by_user
 
 
 @vary_on_cookie
@@ -63,7 +63,7 @@ def for_user_opml(request, username):
     subscriptions = user.get_subscribed_podcasts(public=True)
 
     if parse_bool(request.GET.get('symbian', False)):
-        subscriptions = map(utils.symbian_opml_changes, subscriptions)
+        subscriptions = map(symbian_opml_changes, subscriptions)
 
     response = render(request, 'user_subscriptions.opml', {
         'subscriptions': subscriptions,
@@ -74,11 +74,8 @@ def for_user_opml(request, username):
 
 
 def create_subscriptionlist(request):
-
     user = request.user
-    user.sync_all()
-
-    subscriptions = user.get_subscriptions()
+    subscriptions = subscriptions_by_user(user)
 
     if not subscriptions:
         return []
@@ -89,7 +86,7 @@ def create_subscriptionlist(request):
     podcast_ids= list(set(podcast_ids))
     device_ids = list(set(device_ids))
 
-    podcasts = get_to_dict(Podcast, podcast_ids, get_id=Podcast.get_id)
+    podcasts = podcasts_to_dict(podcast_ids)
     devices = dict([ (id, user.get_device(id)) for id in device_ids])
 
     subscription_list = {}
@@ -100,8 +97,7 @@ def create_subscriptionlist(request):
             if podcast is None:
                 continue
 
-            episode = get_cache_or_calc('%s-latest-episode' % podcast.get_id(),
-                    60*60, podcast.get_latest_episode)
+            episode = podcast.get_latest_episode()
 
             subscription_list[podcast_id] = {
                 'podcast': podcasts[podcast_id],
@@ -177,7 +173,7 @@ class SubscriptionsFeed(Feed):
                         site=self.site)
 
     def item_link(self, item):
-        return utils.get_podcast_link_target(item.podcast)
+        return get_podcast_link_target(item.podcast)
 
     def item_pubdate(self, item):
         return item.timestamp

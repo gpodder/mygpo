@@ -1,9 +1,7 @@
-from datetime import date, timedelta, datetime
 from functools import wraps, partial
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseRedirect, Http404
-from django.db import IntegrityError
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
@@ -12,16 +10,21 @@ from django.contrib import messages
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control
 
-from mygpo.core.models import Podcast, PodcastGroup, SubscriptionException
+from mygpo.core.models import PodcastGroup, SubscriptionException
 from mygpo.core.proxy import proxy_object
 from mygpo.api.sanitizing import sanitize_url
 from mygpo.users.models import HistoryEntry, DeviceDoesNotExist
-from mygpo.web.forms import PrivacyForm, SyncForm
-from mygpo.directory.tags import Tag
+from mygpo.web.forms import SyncForm
 from mygpo.decorators import allowed_methods, repeat_on_conflict
-from mygpo.utils import daterange
 from mygpo.web.utils import get_podcast_link_target
 from mygpo.log import log
+from mygpo.db.couchdb.episode import episodes_for_podcast
+from mygpo.db.couchdb.podcast import podcast_for_slug, podcast_for_slug_id, \
+         podcast_for_oldid, podcast_for_url
+from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
+from mygpo.db.couchdb.episode_state import get_podcasts_episode_states, \
+         episode_listener_counts
+from mygpo.db.couchdb.directory import tags_for_user, tags_for_podcast
 
 
 MAX_TAGS_ON_PAGE=50
@@ -37,7 +40,7 @@ def update_podcast_settings(state, is_public):
 @cache_control(private=True)
 @allowed_methods(['GET'])
 def show_slug(request, slug):
-    podcast = Podcast.for_slug(slug)
+    podcast = podcast_for_slug(slug)
 
     if slug != podcast.slug:
         target = reverse('podcast_slug', args=[podcast.slug])
@@ -70,10 +73,7 @@ def show(request, podcast):
     tags = get_tags(podcast, request.user)
 
     if request.user.is_authenticated():
-
-        request.user.sync_all()
-
-        state = podcast.get_user_state(request.user)
+        state = podcast_state_for_user_podcast(request.user, podcast)
         subscribed_devices = state.get_subscribed_device_ids()
         subscribed_devices = [request.user.get_device(x) for x in subscribed_devices]
 
@@ -81,15 +81,11 @@ def show(request, podcast):
 
         history = list(state.actions)
         def _set_objects(h):
-            #TODO: optimize by indexing devices by id
             dev = request.user.get_device(h.device)
             return proxy_object(h, device=dev)
         history = map(_set_objects, history)
 
         is_public = state.settings.get('public_subscription', True)
-
-        subscribe_form = SyncForm()
-        subscribe_form.set_targets(subscribe_targets, '')
 
         return render(request, 'podcast.html', {
             'tags': tags,
@@ -99,7 +95,7 @@ def show(request, podcast):
             'devices': subscribed_devices,
             'related_podcasts': rel_podcasts,
             'can_subscribe': len(subscribe_targets) > 0,
-            'subscribe_form': subscribe_form,
+            'subscribe_targets': subscribe_targets,
             'episode': episode,
             'episodes': episodes,
             'max_listeners': max_listeners,
@@ -119,12 +115,12 @@ def show(request, podcast):
 
 def get_tags(podcast, user):
     tags = {}
-    for t in Tag.for_podcast(podcast):
+    for t in tags_for_podcast(podcast):
         tag_str = t.lower()
         tags[tag_str] = False
 
     if not user.is_anonymous():
-        users_tags = Tag.for_user(user, podcast.get_id())
+        users_tags = tags_for_user(user, podcast.get_id())
         for t in users_tags.get(podcast.get_id(), []):
             tag_str = t.lower()
             tags[tag_str] = True
@@ -146,8 +142,8 @@ def episode_list(podcast, user, limit=None):
     the episode.
     """
 
-    listeners = dict(podcast.episode_listener_counts())
-    episodes = list(podcast.get_episodes(descending=True, limit=limit))
+    listeners = dict(episode_listener_counts(podcast))
+    episodes = episodes_for_podcast(podcast, descending=True, limit=limit)
 
     if user.is_authenticated():
 
@@ -155,7 +151,7 @@ def episode_list(podcast, user, limit=None):
         podcasts_dict = dict( (p_id, podcast) for p_id in podcast.get_ids())
         episodes_dict = dict( (episode._id, episode) for episode in episodes)
 
-        actions = podcast.get_episode_states(user._id)
+        actions = get_podcasts_episode_states(podcast, user._id)
         actions = map(HistoryEntry.from_action_dict, actions)
 
         HistoryEntry.fetch_data(user, actions,
@@ -176,10 +172,6 @@ def all_episodes(request, podcast):
 
     max_listeners = max([e.listeners for e in episodes] + [0])
 
-    if request.user.is_authenticated():
-
-        request.user.sync_all()
-
     return render(request, 'episodes.html', {
         'podcast': podcast,
         'episodes': episodes,
@@ -198,7 +190,7 @@ def _annotate_episode(listeners, episode_actions, episode):
 @never_cache
 @login_required
 def add_tag(request, podcast):
-    podcast_state = podcast.get_user_state(request.user)
+    podcast_state = podcast_state_for_user_podcast(request.user, podcast)
 
     tag_str = request.GET.get('tag', '')
     if not tag_str:
@@ -222,7 +214,7 @@ def add_tag(request, podcast):
 @never_cache
 @login_required
 def remove_tag(request, podcast):
-    podcast_state = podcast.get_user_state(request.user)
+    podcast_state = podcast_state_for_user_podcast(request.user, podcast)
 
     tag_str = request.GET.get('tag', '')
     if not tag_str:
@@ -249,29 +241,29 @@ def remove_tag(request, podcast):
 def subscribe(request, podcast):
 
     if request.method == 'POST':
-        form = SyncForm(request.POST)
 
-        try:
-            device = request.user.get_device_by_uid(form.get_target())
-            podcast.subscribe(request.user, device)
+        # multiple UIDs from the /podcast/<slug>/subscribe
+        device_uids = [k for (k,v) in request.POST.items() if k==v]
 
-        except (SubscriptionException, DeviceDoesNotExist) as e:
-            messages.error(request, str(e))
+        # single UID from /podcast/<slug>
+        if 'targets' in request.POST:
+            device_uids.append(request.POST.get('targets'))
+
+        for uid in device_uids:
+            try:
+                device = request.user.get_device_by_uid(uid)
+                podcast.subscribe(request.user, device)
+
+            except (SubscriptionException, DeviceDoesNotExist, ValueError) as e:
+                messages.error(request, str(e))
 
         return HttpResponseRedirect(get_podcast_link_target(podcast))
 
-
-    request.user.sync_all()
-
     targets = podcast.subscribe_targets(request.user)
 
-    form = SyncForm()
-    form.set_targets(targets, _('Choose a device:'))
-
     return render(request, 'subscribe.html', {
+        'targets': targets,
         'podcast': podcast,
-        'can_subscribe': len(targets) > 0,
-        'form': form
     })
 
 
@@ -292,7 +284,7 @@ def unsubscribe(request, podcast, device_uid):
 
     try:
         podcast.unsubscribe(request.user, device)
-    except Exception as e:
+    except SubscriptionException as e:
         log('Web: %(username)s: could not unsubscribe from podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
             {'username': request.user.username, 'podcast_url': podcast.url, 'device_id': device.id, 'exception': e})
 
@@ -312,7 +304,7 @@ def subscribe_url(request):
     if url == '':
         raise Http404('Please specify a valid url')
 
-    podcast = Podcast.for_url(url, create=True)
+    podcast = podcast_for_url(url, create=True)
 
     return HttpResponseRedirect(get_podcast_link_target(podcast, 'subscribe'))
 
@@ -320,7 +312,7 @@ def subscribe_url(request):
 @never_cache
 @allowed_methods(['POST'])
 def set_public(request, podcast, public):
-    state = podcast.get_user_state(request.user)
+    state = podcast_state_for_user_podcast(request.user, podcast)
     update_podcast_settings(state=state, is_public=public)
     return HttpResponseRedirect(get_podcast_link_target(podcast))
 
@@ -332,10 +324,14 @@ def set_public(request, podcast, public):
 def slug_id_decorator(f):
     @wraps(f)
     def _decorator(request, slug_id, *args, **kwargs):
-        podcast = Podcast.for_slug_id(slug_id)
+        podcast = podcast_for_slug_id(slug_id)
 
         if podcast is None:
             raise Http404
+
+        # redirect when Id or a merged (non-cannonical) slug is used
+        if podcast.slug and slug_id != podcast.slug:
+            return HttpResponseRedirect(get_podcast_link_target(podcast))
 
         return f(request, podcast, *args, **kwargs)
 
@@ -350,12 +346,13 @@ def oldid_decorator(f):
         except (TypeError, ValueError):
             raise Http404
 
-        podcast = Podcast.for_oldid(pid)
+        podcast = podcast_for_oldid(pid)
 
         if not podcast:
             raise Http404
 
-        return f(request, podcast, *args, **kwargs)
+        # redirect to Id or slug URL
+        return HttpResponseRedirect(get_podcast_link_target(podcast))
 
     return _decorator
 

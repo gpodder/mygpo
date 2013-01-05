@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+{% load url from future %}
 {% load i18n %}
 {% load podcasts %}
 {% load episodes %}
@@ -20,7 +21,22 @@
   <div id="podcastlogo">{% gravatar_img page_user %}</div>
 
   <h1>{{ page_user.username }}</h1>
-  <small class="description"></small>
+  <small class="description">
+   {% blocktrans %}a user on {{ site }}{% endblocktrans %}
+   {% if page_user.twitter %}
+    · <a href="https://twitter/{{ page_user.twitter }}"><i class="icon-twitter"></i></a>
+   {% endif %}
+
+  </small>
+
+  <div class="description">
+   {% if page_user.about %}
+    {{ page_user.about|markdown }}
+   {% else %}
+    {% blocktrans with page_user.username as username %}<strong>{{ username }}</strong> is sharing his favorite podcasts on {{ site }}.{% endblocktrans %}
+   {% endif %}
+
+  </div>
 {% endblock %}
 
 {% block content %}
@@ -49,7 +65,7 @@
      <tr>
       <td></td>
       <td colspan="2">
-       <a href="{% url shared-subscriptions page_user.username %}">
+       <a href="{% url "shared-subscriptions" page_user.username %}">
         {% trans "see all" %}
        </a>
       </td>
@@ -69,7 +85,7 @@
    <table class="list">
     {% for list in lists|slice:":5" %}
      <tr>
-      <td><a href="{% url list-show page_user.username list.slug %}">{{ list.title }}</a></td>
+      <td><a href="{% url "list-show" page_user.username list.slug %}">{{ list.title }}</a></td>
       <td>{% blocktrans with list.podcasts|length as num_podcasts %}{{ num_podcasts }} Podcasts{% endblocktrans %}</td>
      </tr>
     {% endfor %}
@@ -78,7 +94,7 @@
      <tr>
       <td></td>
       <td>
-       <a href="{% url lists-user page_user.username %}">
+       <a href="{% url "lists-user" page_user.username %}">
         {% trans "see all" %}
        </a>
       </td>
@@ -129,7 +145,7 @@
    <tr>
     <td></td>
     <td>
-     <a href="{% url favorites-feed page_user.username %}">
+     <a href="{% url "favorites-feed" page_user.username %}">
       {% trans "see all" %}
      </a>
     </td>
@@ -144,6 +160,18 @@
 
 
 {% block sidebar %}
+
+ {% if user == page_user %}
+
+  <div class="well">
+   <h3>{% trans "That's You!" %}</h3>
+
+   <a href="{% url "account"%}" class="btn btn-primary">{% trans "Edit your profile" %}</a>
+
+  </div>
+
+ {% endif %}
+
 
  <div class="well">
   <h3>{% trans "Stats" %}</h3>

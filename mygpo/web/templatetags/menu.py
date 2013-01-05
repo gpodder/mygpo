@@ -1,6 +1,8 @@
 from django import template
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext
+from django.utils.translation import ugettext_lazy as _
+
 
 
 register = template.Library()
@@ -15,7 +17,6 @@ HIDDEN_URIS = (
         '/share/me',
 )
 
-_ = lambda x: x
 MENU_STRUCTURE = (
         ('', (
             ('/', _('Home')),
@@ -30,6 +31,7 @@ MENU_STRUCTURE = (
             ('/directory/', _('Directory')),
             ('/podcast/', _('Podcast')),
             ('/search/', _('Search')),
+            ('/missing/', _('Missing Podcast')),
             ('/lists/', _('Podcast Lists')),
             ('/user/subscriptions/', _('User subscriptions')),
             ('/suggestions/', _('Suggestions')),
@@ -97,10 +99,6 @@ def get_section_items(selected):
 
 @register.filter
 def section_menu(selected, title=None):
-
-    # TODO: we could create non-linked headers here
-    # <li class="nav-header">Sidebar</li>
-
 
     items = []
     for uri, caption in get_section_items(selected):

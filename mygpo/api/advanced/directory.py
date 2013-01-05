@@ -28,7 +28,9 @@ from mygpo.directory.tags import Topics
 from mygpo.web.utils import get_episode_link_target, get_podcast_link_target
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url
-from mygpo.directory.models import Category
+from mygpo.db.couchdb.episode import episode_for_podcast_url
+from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url
+from mygpo.db.couchdb.directory import category_for_tag
 
 
 @csrf_exempt
@@ -44,7 +46,7 @@ def top_tags(request, count):
 @cache_page(60 * 60 * 24)
 def tag_podcasts(request, tag, count):
     count = parse_range(count, 1, 100, 100)
-    category = Category.for_tag(tag)
+    category = category_for_tag(tag)
     if not category:
         return JsonResponse([])
 
@@ -57,7 +59,13 @@ def tag_podcasts(request, tag, count):
 @cache_page(60 * 60)
 def podcast_info(request):
     url = sanitize_url(request.GET.get('url', ''))
-    podcast = Podcast.for_url(url)
+
+    # 404 before we query for url, because query would complain
+    # about missing param
+    if not url:
+        raise Http404
+
+    podcast = podcast_for_url(url)
     if not podcast:
             raise Http404
     domain = RequestSite(request).domain
@@ -71,7 +79,7 @@ def episode_info(request):
     podcast_url = sanitize_url(request.GET.get('podcast', ''))
     episode_url = sanitize_url(request.GET.get('url', ''), 'episode')
 
-    episode = models.Episode.for_podcast_url(podcast_url, episode_url)
+    episode = episode_for_podcast_url(podcast_url, episode_url)
 
     if episode is None:
         raise Http404
@@ -110,7 +118,7 @@ def podcast_data(obj, domain, scaled_logo_size=64):
 
 def episode_data(episode, domain, podcast=None):
 
-    podcast = podcast or Podcast.get(episode.podcast)
+    podcast = podcast or podcast_by_id(episode.podcast)
 
     data = {
         "title": episode.title,
@@ -132,6 +140,6 @@ def episode_data(episode, domain, podcast=None):
 def category_data(category):
     return dict(
         tag   = category.label,
-        usage = category.weight
+        usage = category.get_weight()
     )
 

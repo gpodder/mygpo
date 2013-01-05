@@ -116,6 +116,7 @@ INSTALLED_APPS = (
     'mygpo.maintenance',
     'mygpo.share',
     'mygpo.admin',
+    'mygpo.db.couchdb',
 )
 
 TEST_EXCLUDE = (
@@ -169,6 +170,10 @@ EMAIL_BACKEND = 'django_couchdb_utils.email.backends.CouchDBEmailBackend'
 
 # minimum number of subscribers a podcast must have to be assigned a slug
 PODCAST_SLUG_SUBSCRIBER_LIMIT = 10
+
+# minimum number of subscribers that a podcast needs to "push" one of its
+# categories to the top
+MIN_SUBSCRIBERS_CATEGORY=10
 
 
 ADSENSE_CLIENT = ''

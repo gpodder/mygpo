@@ -4,9 +4,10 @@ from optparse import make_option
 from django.core.management.base import BaseCommand
 
 from mygpo.core.models import Podcast, SubscriberData
-from mygpo.couch import get_main_database
 from mygpo.utils import progress
 from mygpo.decorators import repeat_on_conflict
+from mygpo.db.couchdb.podcast import podcast_count, all_podcasts, podcast_by_id
+from mygpo.db.couchdb.podcast_state import podcast_subscriber_count
 
 
 class Command(BaseCommand):
@@ -23,46 +24,25 @@ class Command(BaseCommand):
         # couchdbkit doesn't preserve microseconds
         started = datetime.utcnow().replace(microsecond=0)
 
-        podcasts = Podcast.all_podcasts()
-        total = Podcast.view('podcasts/by_oldid', limit=0).total_rows
+        podcasts = all_podcasts()
+        total = podcast_count()
 
         for n, podcast in enumerate(podcasts):
-            subscriber_count = self.get_subscriber_count(podcast)
+            subscriber_count = podcast_subscriber_count(podcast)
             self.update(podcast=podcast, started=started, subscriber_count=subscriber_count)
 
             if not silent:
                 progress(n, total)
 
 
-    @repeat_on_conflict(['podcast'])
-    def update(self, podcast, started, subscriber_count):
+    @repeat_on_conflict(['podcast'], reload_f=lambda p: podcast_by_id(p.get_id()))
+    def update(self, subscriber_data, podcast):
 
         # We've already updated this podcast
-        if started in [e.timestamp for e in podcast.subscribers]:
+        if subscriber_data.timestamp in [e.timestamp for e in podcast.subscribers]:
             return
 
-        data = SubscriberData(
-            timestamp        = started,
-            subscriber_count = max(0, subscriber_count),
-            )
+        podcast.subscribers = sorted(podcast.subscribers + [subscriber_data], key=lambda e: e.timestamp)
+        podcast.subscribers = podcast.subscribers[-2:]
 
-        podcast.subscribers = sorted(podcast.subscribers + [data], key=lambda e: e.timestamp)
         podcast.save()
-
-
-    @staticmethod
-    def get_subscriber_count(podcast):
-        db = get_main_database()
-        subscriber_sum = 0
-
-        for podcast_id in podcast.get_ids():
-            x = db.view('subscriptions/by_podcast',
-                    startkey    = [podcast_id, None],
-                    endkey      = [podcast_id, {}],
-                    reduce      = True,
-                    group       = True,
-                    group_level = 2,
-                )
-            subscriber_sum += x.count()
-
-        return subscriber_sum

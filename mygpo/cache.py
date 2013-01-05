@@ -1,25 +1,12 @@
+from hashlib import sha1
 from django.core.cache import cache
+from functools import wraps
 
 
 NOT_IN_CACHE = object()
 
 
-def get_cache_or_calc(key, timeout, calc, *args, **kwargs):
-    """ Gets the value from the cache or calculates it
-
-    If the value needs to be calculated, it is stored in the cache. """
-
-    value = cache.get(key, NOT_IN_CACHE)
-
-    if value is NOT_IN_CACHE:
-        value = calc(*args, **kwargs)
-        cache.set(key, value, timeout=timeout)
-
-    return value
-
-
-
-def cache_result(key, timeout=None, version=None):
+def cache_result(**cache_kwargs):
     """ Decorator to cache the result of a function call
 
     Usage
@@ -31,17 +18,21 @@ def cache_result(key, timeout=None, version=None):
 
     def _wrapper(f):
 
+        @wraps(f)
         def _get(*args, **kwargs):
 
-            key = create_key(key, args, kwargs)
-            key = 'a'
+            key = sha1(str(f.__module__) + str(f.__name__) + str(args) + str(kwargs)).hexdigest()
 
-            value = cache.get(key, NOT_IN_CACHE, version=version)
+            # the timeout parameter can't be used when getting from a cache
+            get_kwargs = dict(cache_kwargs)
+            get_kwargs.pop('timeout', None)
+
+            value = cache.get(key, NOT_IN_CACHE, **get_kwargs)
 
             if value is NOT_IN_CACHE:
                 value = f(*args, **kwargs)
 
-                cache.set(key, value, timeout=timeout, version=version)
+                cache.set(key, value, **cache_kwargs)
 
             return value
 
@@ -49,13 +40,3 @@ def cache_result(key, timeout=None, version=None):
         return _get
 
     return _wrapper
-
-
-
-def create_key(key, args, kwargs):
-
-    args_str = '-'.join(hash(a) for a in args)
-    kwargs_str = '-'.join(hash(i) for i in kwargs.items())
-
-    return '{key}-{args}-{kwargs}'.format(key=key, args=hash(args_str),
-            kwargs=hash(kwargs_str))

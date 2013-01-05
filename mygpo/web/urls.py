@@ -14,7 +14,7 @@ urlpatterns = patterns('mygpo.web.views',
  url(r'^history/$',                                               'history',       name='history'),
  url(r'^suggestions/$',                                           'suggestions',   name='suggestions'),
  url(r'^suggestions/rate$',                                       'rate_suggestions', name='suggestions-rate'),
- url(r'^suggestions/blacklist/(?P<podcast_id>\d+)$',              'blacklist',     name='suggestions-blacklist'),
+ url(r'^suggestions/blacklist/(?P<slug_id>[\w-]+)$',              'blacklist',     name='suggestions-blacklist-slug-id'),
  url(r'^tags/',                                                   'mytags',        name='tags'),
  url(r'^online-help',                                              direct_to_template,
        {'template': 'online-help.html'},                                           name='help'),
@@ -81,11 +81,15 @@ urlpatterns += patterns('mygpo.web.views.episode',
 )
 
 from mygpo.web.views.settings import DefaultPrivacySettings, \
-         PodcastPrivacySettings
+         PodcastPrivacySettings, ProfileView
 
 urlpatterns += patterns('mygpo.web.views.settings',
  url(r'^account/$',                                               'account',       name='account'),
  url(r'^account/privacy$',                                        'privacy',       name='privacy'),
+
+ url(r'^account/profile$',
+     ProfileView.as_view(),
+     name='profile'),
 
  url(r'^account/privacy/default-public$',
      DefaultPrivacySettings.as_view(public=True),

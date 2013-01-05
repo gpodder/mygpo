@@ -62,10 +62,6 @@ class ChangesCommand(BaseCommand):
         try:
             self.process(self.db, since)
 
-        except:
-            import traceback
-            traceback.print_exc()
-
         finally:
             # finish command run status
             total = self.db.info()['update_seq']

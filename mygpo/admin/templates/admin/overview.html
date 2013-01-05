@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load i18n %}
 {% load podcasts %}
 
@@ -14,10 +15,10 @@
 
 {% block content %}
  <ul>
-  <li><a href="{% url admin-merge %}?podcasts=2">{% trans "Merge Podcasts and Episodes" %}</a></li>
-  <li><a href="{% url clients %}">{% trans "Client Stats" %}</a> (<a href="{% url clients-json %}">{% trans "JSON" %}</a>)</li>
-  <li><a href="{% url useragents %}">{% trans "User-Agent Stats" %}</a></li>
-  <li><a href="{% url stats %}">{% trans "General Stats" %}</a> (<a href="{% url stats-json %}">{% trans "JSON" %}</a>)</li>
+  <li><a href="{% url "admin-merge" %}?podcasts=2">{% trans "Merge Podcasts and Episodes" %}</a></li>
+  <li><a href="{% url "clients" %}">{% trans "Client Stats" %}</a> (<a href="{% url "clients-json" %}">{% trans "JSON" %}</a>)</li>
+  <li><a href="{% url "useragents" %}">{% trans "User-Agent Stats" %}</a></li>
+  <li><a href="{% url "stats" %}">{% trans "General Stats" %}</a> (<a href="{% url "stats-json" %}">{% trans "JSON" %}</a>)</li>
  </ul>
 
 {% endblock %}

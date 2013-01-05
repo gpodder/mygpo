@@ -4,11 +4,11 @@ from functools import partial
 
 from django.core.management.base import BaseCommand
 
-from mygpo.utils import progress, multi_request_view
-from mygpo.users.models import EpisodeUserState
+from mygpo.utils import progress
 from mygpo.counter import Counter
-from mygpo.maintenance.merge import merge_episode_states
-from mygpo.couch import bulk_save_retry, get_main_database
+from mygpo.couch import bulk_save_retry
+from mygpo.db.couchdb.episode_state import episode_states_count, \
+         get_nth_episode_state, get_duplicate_episode_states
 
 
 class Command(BaseCommand):
@@ -22,10 +22,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         skip = options.get('skip')
-        total = EpisodeUserState.view('episode_states/by_user_episode',
-                limit=0,
-            ).total_rows
-        db = get_main_database()
+        total = episode_states_count()
 
         actions = Counter()
         actions['merged'] = 0
@@ -33,23 +30,10 @@ class Command(BaseCommand):
 
         for n in count(skip):
 
-            first = EpisodeUserState.view('episode_states/by_user_episode',
-                    skip         = n,
-                    include_docs = True,
-                    limit        = 1,
-                )
-            first = list(first)
-            if not first:
+            first = get_nth_episode_state(n)
+            if first is None:
                 break
-
-            first = first[0]
-
-
-            states = EpisodeUserState.view('episode_states/by_user_episode',
-                    key          = [first.user, first.episode],
-                    include_docs = True,
-                )
-            states = list(states)
+            states = get_duplicate_episode_states(first.user, first.episode)
 
             l1 = len(states)
             # we don't want to delete this one
@@ -62,7 +46,7 @@ class Command(BaseCommand):
 
                 obj_funs = [(first, updater)] + [(state, do_delete) for state in states]
 
-                bulk_save_retry(db, obj_funs)
+                bulk_save_retry(obj_funs)
 
                 merged = len(states)-1
                 actions['merged'] += merged

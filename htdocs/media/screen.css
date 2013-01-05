@@ -28,12 +28,19 @@ h1
     font-size: 16pt;
     font-family: 'Source Sans Pro', sans-serif;
     font-weight: 700;
+    margin-bottom: 0;
+    line-height: 25px;
 }
 
 h2
 {
     font-size: 14pt;
     padding-top: .5em;
+}
+
+h3
+{
+    font-size: 12pt;
 }
 
 .brand img
@@ -44,53 +51,6 @@ h2
 .logo-group
 {
     padding: .5em 0 1em 0;
-}
-
-
-/******************
-    Info Boxes
-*******************/
-
-
-div.error
-{
-    border-radius: 4px;
-    background-color: #fa7080;
-    border: #f5001d thin solid;
-    padding: 1em 1em 1em 45px;
-    background-image: url('dialog-error.png');
-    background-repeat: no-repeat;
-    background-position: 3px 50%;
-    margin: .5em;
-}
-
-.success
-{
-    background-color: #b7f46e;
-    border: #539800 thin solid;
-    border-radius: 4px;
-    padding: 1em 1em 1em 45px;
-    background-image: url('emblem-default.png');
-    background-repeat: no-repeat;
-    background-position: 3px 50%;
-    margin: .5em;
-}
-
-.info
-{
-    border-radius: 4px;
-    background-color: #eeeeee;
-    border: #aaaaaa thin solid;
-    padding: 1em 1em 1em 45px;
-    background-image: url('info.png');
-    background-repeat: no-repeat;
-    background-position: 3px 50%;
-    margin: .5em;
-}
-
-.info a
-{
-    color: black;
 }
 
 
@@ -166,29 +126,28 @@ table form
     display: inline;
 }
 
-/****************************
-    Podcast List (TODO)
-*****************************/
-
-.podcast_list
-{
-    margin-bottom: 1em;
-}
-
-.podcast_list p
-{
-    margin: 2px 0px 2px 0px;
-    padding: 0px;
-}
-
-.podcast_list .description
-{
-    font-size: x-small;
-}
 
 .description
 {
     color: #666;
+    hypens: auto;
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+    -ms-hyphens: auto;
+    -o-hyphens: auto;
+    text-align: justify;
+}
+
+
+div.description
+{
+    margin-top: 1em;
+}
+
+/* don't show images in the description of the podcast page */
+.first-episode img
+{
+    display: none;
 }
 
 div#podcastlogo
@@ -304,65 +263,6 @@ div.result span.episode a
 }
 
 
-/***************
-   Forms
-****************/
-
-/*
-
-div.form {
-    border:solid 2px #b7ddf2;
-    background:#ebf4fb;
-    width: 450px;
-    margin:0 auto;
-    padding:14px;
-}
-
-div.form p {
-    font-size:11px;
-    color:#666666;
-    margin-bottom:20px;
-    border-bottom:solid 1px #b7ddf2;
-    padding-bottom:10px;
-}
-
-div.form label{
-    display:block;
-    font-weight:bold;
-    text-align:right;
-    width:140px;
-    float:left;
-}
-
-div.form .small {
-    color:#666666;
-    display:block;
-    font-size:11px;
-    font-weight:normal;
-    text-align:right;
-    width:140px;
-}
-
-div.form input,
-div.form select {
-    float:left;
-    font-size:12px;
-    padding:4px 2px;
-    border:solid 1px #aacfe4;
-    width:200px;
-    margin:2px 0 20px 10px;
-}
-
-div.form button{
-    clear:both;
-    margin-left:150px;
-    width:125px;
-    height:31px;
-}
-
-*/
-
-
 input.url
 {
     width: 80%;
@@ -391,33 +291,6 @@ input.url
     width: 100%;
 }
 
-td.position
-{
-    font-size: 1.3em;
-    font-weight: bold;
-    padding-right: 0;
-    margin-right: 0;
-}
-
-td.oldposition
-{
-    font-size: .8em;
-}
-
-.pos
-{
-    color: green;
-}
-
-.neg
-{
-    color: red;
-}
-
-.new
-{
-    color: #555;
-}
 
 span.from_podcast, span.latest_episode {
     font-size: x-small;
@@ -433,42 +306,6 @@ span.from_podcast a, span.latest_episode a {
     width: 5em;
 }
 
-.watermark
-{
-    color: #aaa;
-}
-
-ul.square-menu
-{
-    padding: 20px;
-}
-
-ul.square-menu li
-{
-    display: block;
-    float: left;
-    width: 100px;
-    height: 100px;
-    margin: 10px;
-    background-color: #aaa;
-    text-align: center;
-}
-
-ul.square-menu li a
-{
-    position: relative;
-    bottom: -40px;
-}
-
-address,
-address a
-{
-    clear: both;
-    text-align: center;
-    padding: 5px;
-    font-style: normal;
-    color: #999;
-}
 
 .own-chapter
 {
@@ -480,28 +317,6 @@ div.related-podcasts
     float: right;
 }
 
-div.intro-box
-{
-    text-align: justify;
-    float: left;
-    width: 40%;
-    padding-bottom: 1em;
-    overflow: hidden;
-}
-
-div.intro-box ul
-{
-    text-align: left;
-}
-
-div.come-in-box
-{
-    padding-top: 1em;
-    padding-bottom: 1em;
-    clear: both;
-    font-size: 2em;
-    text-align: center;
-}
 
 .toplist-pos
 {
@@ -511,11 +326,6 @@ div.come-in-box
 #tagcloud
 {
     text-align: justify;
-}
-
-#feature-list h3
-{
-    cursor: pointer;
 }
 
 .sponsoring-podcast
@@ -530,200 +340,6 @@ div.come-in-box
 }
 
 
-/********************
-
-    Link Button
-
- http://particletree.com/features/rediscovering-the-button-element/
-
-*********************/
-
-
-/*
-.button a, button
-{
-    /*display: block;*/
-    /* float: left; */
-    /*margin: 0 7px 0 0;*/
-/*    background-color: #f5f5f5;
-    border: 1px solid #dedede;
-    border-top: 1px solid #eee;
-    border-left: 1px solid #eee;
-    font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
-    font-size: 100%;
-    line-height: 130%;
-    text-decoration: none;
-    font-weight: bold;
-    color: #565656;
-    cursor: pointer;
-    padding: 5px 10px 6px 7px; /* Links */
-    /*clear: left;*/
-/*}
-
-button{
-    width:auto;
-    overflow:visible;
-    padding:4px 10px 3px 7px; /* IE6 */
-/*}
-
-button[type]{
-    padding:5px 10px 5px 7px; /* Firefox */
-/*    line-height:17px; /* Safari */
-/*}
-*:first-child+html button[type]{
-    padding:4px 10px 3px 7px; /* IE7 */
-/*}
-
-button img, div.button img{
-    margin:0 3px -3px 0 !important;
-    padding:0;
-    border:none;
-    width:16px;
-    height:16px;
-}
-
-
-.action-buttons
-{
-    overflow: auto;
-}
-
-.action-buttons > *
-{
-    display: block;
-    margin-top: .5em;
-    margin-bottom: .5em;
-    clear: both;
-    float: left;
-}
-*/
-
-/******************
-     Pagination
-*******************/
-
-
-.pagination
-{
-    text-align: center;
-}
-
-.pagination
-{
-    font-size: 1.5em;
-}
-
-.pagination span
-{
-    padding: .5em .3em .5em .3em;
-}
-
-.deactivated,
-.activated:hover
-{
-    text-decoration: line-through;
-}
-
-.config-toplist
-{
-    float: left;
-    padding-right: 2em;
-}
-
-/*
-.podcast-state
-{
-    clear: both;
-    overflow: hidden;
-    float: left;
-    margin-bottom: 1em;
-}
-
-.podcast-state > div
-{
-    float: left;
-    margin-right: 2%;
-    margin-left: 1%;
-    width: 30%;
-}
-
-.podcast-state > div > div
-{
-    background-color: #f7f7f7;
-    width: 100%;
-    margin-bottom: -2000px;
-    padding-bottom: 2000px;
-}
-*/
-/*
-.podcast-state > div.tags > div,
-.podcast-state > div.share > div
-{
-    padding-top: .5em;
-    padding-left: 2%;
-    padding-right: 2%;
-    width: 96% !important;
-}
-
-*/
-
-.tag-list span.other
-{
-    color: #888;
-}
-
-.tag-list span.own a.remove
-{
-    font-size: .7em;
-    font-weight: bold;
-}
-
-.tag-list span.own
-{
-    color: black;
-}
-
-
-/*************************
-    Episode Navigation
-**************************/
-
-div.navigation
-{
-    clear: both;
-}
-
-div.navigation div
-{
-    padding-top: .5em;
-    padding-bottom: .5em;
-    display: block;
-    width: 33%;
-    float: left;
-}
-
-div.navigation div.list
-{
-    text-align: center;
-}
-
-div.navigation div.next
-{
-    text-align: right;
-}
-
-
-
-#listcontent h2
-{
-        cursor: pointer;
-}
-
-div.subscriptions select
-{
-    width: 100%;
-}
-
 
 iframe.results
 {
@@ -734,15 +350,6 @@ iframe.results
 .by-user
 {
     font-size: 50%;
-}
-
-.new
-{
-    font-size: 80%;
-    position: relative;
-    top: -0.5em;
-    color: red;
-    text-transform: uppercase;
 }
 
 
@@ -761,18 +368,7 @@ footer ul
     list-style-type: none;
 }
 
-
-
 div.first-episode
 {
     margin-bottom: 2em;
 }
-
-
-address
-{
-    color: #aaa;
-    text-align: center;
-    padding-top: 15px;
-}
-

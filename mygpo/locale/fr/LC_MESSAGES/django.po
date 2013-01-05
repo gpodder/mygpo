@@ -7,10 +7,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-03 17:08+0000\n"
+"POT-Creation-Date: 2012-09-16 16:36+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Last-Translator: Louis Carlioz Luigi <unknown@example.com>\n"
+"Language-Team: FR <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -180,28 +180,28 @@ msgstr "Historique des abonnements"
 #: api/simple.py:267
 #, python-format
 msgid "gpodder.net - Top %(count)d"
-msgstr ""
+msgstr "gpodder.net - Top %(count)d"
 
 #: api/simple.py:301
 msgid "gpodder.net - Search"
-msgstr ""
+msgstr "gpodder.net - Recherche"
 
 #: api/simple.py:316
 #, python-format
 msgid "gpodder.net - %(count)d Suggestions"
-msgstr ""
+msgstr "gpodder.net - %(count)d Suggestions"
 
 #: data/mimetype.py:12
 msgid "image"
-msgstr ""
+msgstr "image"
 
 #: data/mimetype.py:12
 msgid "audio"
-msgstr ""
+msgstr "audio"
 
 #: data/mimetype.py:12
 msgid "video"
-msgstr ""
+msgstr "vidéo"
 
 #: directory/templates/directory.html:14 directory/templates/directory.html:17
 msgid "Podcast Directory"
@@ -215,31 +215,31 @@ msgid ""
 msgstr ""
 
 #: directory/templates/directory.html:48 directory/templates/directory.html:50
-#: directory/templates/directory.html:135
-#: directory/templates/directory.html:161 web/templates/dashboard.html:75
+#: directory/templates/directory.html:137
+#: directory/templates/directory.html:164 web/templates/dashboard.html:77
 msgid "more..."
 msgstr "voir plus..."
 
-#: directory/templates/directory.html:86
+#: directory/templates/directory.html:87
 #, fuzzy
 msgid "Podcast List by"
 msgstr "Répertoire des podcasts"
 
-#: directory/templates/directory.html:103
+#: directory/templates/directory.html:104
 #, python-format
 msgid "and %(more)s more"
 msgstr ""
 
-#: directory/templates/directory.html:109
+#: directory/templates/directory.html:110
 #, fuzzy
 msgid "Create a Podcast List"
 msgstr "Podcast anonyme"
 
-#: directory/templates/directory.html:122
+#: directory/templates/directory.html:124
 msgid "Trending"
 msgstr ""
 
-#: directory/templates/directory.html:147
+#: directory/templates/directory.html:150
 #, fuzzy
 msgid "Random"
 msgstr "Sélection aléatoire"
@@ -292,7 +292,7 @@ msgstr "OK"
 #: directory/templates/podcast_lists.html:13
 #: directory/templates/podcast_lists.html:16 share/templates/lists.html:13
 #: share/templates/lists.html.py:16 share/templates/lists_user.html:9
-#: web/templatetags/menu.py:33 web/templatetags/menu.py:52
+#: web/templatetags/menu.py:33 web/templatetags/menu.py:53
 #, fuzzy
 msgid "Podcast Lists"
 msgstr "Podcast"
@@ -317,12 +317,12 @@ msgstr "Podcast"
 msgid "Download"
 msgstr "Télécharger"
 
-#: directory/templates/podcast_lists.html:73
+#: directory/templates/podcast_lists.html:80
 #: share/templates/lists_user.html:37
 msgid "Know Some Great Podcasts?"
 msgstr ""
 
-#: directory/templates/podcast_lists.html:74
+#: directory/templates/podcast_lists.html:81
 #: share/templates/lists_user.html:38
 msgid "Create a list of podcasts about a topic you like"
 msgstr ""
@@ -336,32 +336,32 @@ msgstr "Rechercher"
 
 #: directory/templates/search.html:31 directory/templates/toplist.html:25
 #: share/templates/list.html:43 web/templatetags/menu.py:31
-#: web/templatetags/menu.py:62
+#: web/templatetags/menu.py:63
 msgid "Podcast"
 msgstr "Podcast"
 
 #: directory/templates/search.html:32 directory/templates/toplist.html:26
 #: share/templates/list.html:44
 msgid "Subscribers"
-msgstr ""
+msgstr "Abonnés"
 
-#: directory/templates/search.html:73 share/templates/list_search.html:61
+#: directory/templates/search.html:79 share/templates/list_search.html:61
 #, fuzzy
 msgid "Nothing found"
 msgstr "Introuvable"
 
-#: directory/templates/search.html:85
+#: directory/templates/search.html:91
 #, fuzzy
 msgid "Search API"
 msgstr "Rechercher"
 
-#: directory/templates/search.html:86
+#: directory/templates/search.html:92
 msgid "Access the following address to search for <em>tech</em> podcasts."
 msgstr ""
 
 #: directory/templates/toplist.html:13 directory/templates/toplist.html:16
 msgid "Toplist"
-msgstr ""
+msgstr "Top"
 
 #: directory/templates/toplist.html:90
 msgid "Client Access"
@@ -396,7 +396,7 @@ msgstr "Remplacer le champ 'VOTRE_ADRESSE' par l'adresse de votre podcast."
 #: publisher/templates/publisher/advertise.html:9
 #: publisher/templates/publisher/info.html:20 web/templates/base.html:185
 #: web/templates/base.html.py:212 web/templates/home.html:209
-#: web/templates/home.html.py:236 web/templatetags/menu.py:60
+#: web/templates/home.html.py:236 web/templatetags/menu.py:61
 msgid "Advertise"
 msgstr "Promouvoir"
 
@@ -581,7 +581,7 @@ msgstr "Podcasts que vous avez publiés"
 msgid "Go to the publisher page of any podcast by entering its feed URL"
 msgstr ""
 
-#: publisher/templates/publisher/home.html:38
+#: publisher/templates/publisher/home.html:38 share/templates/list.html:113
 #: web/templates/user_subscriptions.html:65
 msgid "Go"
 msgstr "Aller"
@@ -708,15 +708,15 @@ msgid ""
 "most by users."
 msgstr ""
 
-#: share/views.py:115
+#: share/views.py:116
 msgid "You have to specify a title."
 msgstr ""
 
-#: share/views.py:121
+#: share/views.py:122
 msgid "\"{title}\" is not a valid title"
 msgstr ""
 
-#: share/views.py:174 web/views/__init__.py:207
+#: share/views.py:175 web/views/__init__.py:209
 msgid "Thanks for rating!"
 msgstr ""
 
@@ -744,12 +744,15 @@ msgstr ""
 msgid "Download as OPML"
 msgstr "Télécharger vos abonnements sous forme d'OPML"
 
-#: share/templates/list.html:107
-#, fuzzy, python-format
-msgid "Create your own <a href=\"%(create-url)s\">podcast lists</a>."
-msgstr ""
-"Nous pouvons essayer d'en <a href=\"/register/resend-activation\">envoyer un "
-"nouveau</a>."
+#: share/templates/list.html:111
+#, fuzzy
+msgid "Your own Podcast Lists"
+msgstr "Podcast"
+
+#: share/templates/list.html:112
+#, fuzzy
+msgid "Create and share your own podcast lists "
+msgstr "Podcast anonyme"
 
 #: share/templates/lists.html:26 share/templates/lists_user.html:22
 #: share/templates/userpage.html:73
@@ -907,6 +910,8 @@ msgid ""
 "You've marked your favorites-feed as public and others can\n"
 "      subscribe to it. It will also be indexed by %(sitename)s."
 msgstr ""
+"Vous avez marqué le flux de vos favoris comme public et d'autres peuvent s'y "
+"abonner. Il sera aussi indexé sur %(sitename)s ."
 
 #: share/templates/share/favorites.html:110
 #, fuzzy
@@ -920,13 +925,13 @@ msgstr "Partager"
 #: share/templates/share/overview.html:12 web/templates/favorites.html:39
 #: web/templates/podcast.html:203 web/templates/subscriptions.html:45
 msgid "Share"
-msgstr ""
+msgstr "Partager"
 
 #: share/templates/share/overview.html:21 web/templates/device.html:19
 #: web/templates/podcast.html:129 web/templatetags/menu.py:40
-#: web/templatetags/menu.py:41 web/templatetags/menu.py:51
+#: web/templatetags/menu.py:41 web/templatetags/menu.py:52
 msgid "Subscriptions"
-msgstr ""
+msgstr "Abonnements"
 
 #: share/templates/share/overview.html:24
 #: share/templates/share/overview.html:46
@@ -1074,7 +1079,7 @@ msgstr ""
 #: web/templates/base.html:165 web/templates/home.html:189
 #: web/templatetags/menu.py:30
 msgid "Directory"
-msgstr ""
+msgstr "Répertoire"
 
 #: web/templates/base.html:173 web/templates/home.html:197
 msgid "Support"
@@ -1139,7 +1144,7 @@ msgid "Clients"
 msgstr ""
 
 #: web/templates/base.html:209 web/templates/home.html:233
-#: web/templatetags/menu.py:58
+#: web/templatetags/menu.py:59
 #, fuzzy
 msgid "Publish"
 msgstr "Pages pour l'éditeur"
@@ -1227,11 +1232,11 @@ msgstr "Vue d'ensemble"
 msgid "Hi, "
 msgstr ""
 
-#: web/templates/dashboard.html:22
+#: web/templates/dashboard.html:23
 msgid "Newest Episodes"
 msgstr "Épisodes les plus récents"
 
-#: web/templates/dashboard.html:37
+#: web/templates/dashboard.html:38
 #, python-format
 msgid ""
 "Welcome to %(site)s! If this is your first visit, you should set up your <a "
@@ -1239,7 +1244,7 @@ msgid ""
 "a> and try to check as many <em>Explore</em> boxes as you can."
 msgstr ""
 
-#: web/templates/dashboard.html:42
+#: web/templates/dashboard.html:43
 #, python-format
 msgid ""
 "If you have problems, have a look at the <a href=\"%(help)s\">docs</a> or "
@@ -1248,71 +1253,71 @@ msgid ""
 "\">forum</a>."
 msgstr ""
 
-#: web/templates/dashboard.html:81
+#: web/templates/dashboard.html:84
 #, python-format
 msgid "Explore %(site)s"
 msgstr ""
 
-#: web/templates/dashboard.html:85
+#: web/templates/dashboard.html:88
 #, fuzzy, python-format
 msgid "Sign up to %(site)s"
 msgstr "Lien vers %(sitename)s"
 
-#: web/templates/dashboard.html:90
+#: web/templates/dashboard.html:93
 #, fuzzy
 msgid "Connect your Podcast Clients"
 msgstr "Gérer vos clients de podcasts"
 
-#: web/templates/dashboard.html:95 web/templates/subscriptions.html:63
+#: web/templates/dashboard.html:98 web/templates/subscriptions.html:63
 #, fuzzy
 msgid "Subscribe to Podcasts"
 msgstr "S'abonner à ce podcast"
 
-#: web/templates/dashboard.html:100
+#: web/templates/dashboard.html:103
 #, fuzzy
 msgid "Mark your Favorite Episodes"
 msgstr "Partager vos épisodes favoris"
 
-#: web/templates/dashboard.html:105
+#: web/templates/dashboard.html:108
 msgid "Share your Subscriptions"
 msgstr "Partager vos abonnements"
 
-#: web/templates/dashboard.html:110
+#: web/templates/dashboard.html:113
 msgid "Share your Favorite Episodes"
 msgstr "Partager vos épisodes favoris"
 
-#: web/templates/dashboard.html:115
+#: web/templates/dashboard.html:118
 #, fuzzy
 msgid "Share your Userpage"
 msgstr "Partager vos abonnements"
 
-#: web/templates/dashboard.html:120
+#: web/templates/dashboard.html:123
 #, fuzzy
 msgid "Tag Podcasts"
 msgstr "Podcast anonyme"
 
-#: web/templates/dashboard.html:125
+#: web/templates/dashboard.html:128
 #, fuzzy
 msgid "Create Podcast Lists"
 msgstr "Podcast anonyme"
 
-#: web/templates/dashboard.html:130
+#: web/templates/dashboard.html:133
 #, fuzzy
 msgid "Publish your own Podcast"
 msgstr "Promouvoir votre podcast"
 
-#: web/templates/dashboard.html:140
+#: web/templates/dashboard.html:143
 msgid "Subscribe in Your Browser"
 msgstr ""
 
-#: web/templates/dashboard.html:142
+#: web/templates/dashboard.html:145
 #, python-format
 msgid ""
 "Register %(site.domain)s as a feed reader, and subscribe to podcasts "
 "directly from your browser"
 msgstr ""
 
-#: web/templates/dashboard.html:145
+#: web/templates/dashboard.html:148
 msgid "Install"
 msgstr ""
 
@@ -1419,7 +1424,7 @@ msgstr ""
 
 #: web/templates/device-edit.html:76
 msgid "Upload"
-msgstr ""
+msgstr "Téléverser"
 
 #: web/templates/device-edit.html:85
 #, fuzzy
@@ -1596,7 +1601,7 @@ msgid "All Episodes"
 msgstr "Épisodes"
 
 #: web/templates/favorites.html:10 web/templates/favorites.html.py:13
-#: web/templatetags/menu.py:42
+#: web/templatetags/menu.py:42 web/templatetags/menu.py:50
 msgid "Favorite Episodes"
 msgstr "Épisodes favoris"
 
@@ -1652,7 +1657,7 @@ msgstr ""
 #: web/templates/mytags.html:11 web/templates/mytags.html.py:14
 #: web/templatetags/menu.py:43
 msgid "My Tags"
-msgstr ""
+msgstr "Mes Tags"
 
 #: web/templates/mytags.html:41
 #, python-format
@@ -1672,6 +1677,9 @@ msgid ""
 "web. You can synchronize your devices, view status information and discover "
 "new interesting podcasts online."
 msgstr ""
+"gpodder.net est un service web pour gérer vos abonnements de podcasts via le "
+"web. Vous pouvez synchroniser vos périphériques, voir le statut de vos "
+"épisodes et découvrir de nouveaux podcasts intéressants en ligne."
 
 #: web/templates/online-help.html:19
 msgid "Supported Clients"
@@ -1705,6 +1713,15 @@ msgid ""
 "subscription list</strong> to the webservice. Subsequent changes will be "
 "transmitted automatically."
 msgstr ""
+"Pour configurer gpodder pour se connecter à gpodder.net, ouvrez les "
+"préférences et entrez le <strong>nom d'utilisateur et mot de passe</strong> "
+"que vous avez utilisé lors de l'inscription au serviceweb. <strong>L'ID du "
+"périphérique</strong> est générée automatiquement à partir du nom d'hôte et "
+"sera utilisée pour identifier ce périphérique spécifique dans le service "
+"web. Ensuite <strong>permettez la synchronisation</strong> de votre liste "
+"d'abonnements. Commencez par <strong>transférer votre liste d'abonnements</"
+"strong> au service web. Les modifications ultérieures seront transmises "
+"automatiquement."
 
 #: web/templates/online-help.html:28 web/templatetags/menu.py:44
 msgid "Devices"
@@ -1717,6 +1734,10 @@ msgid ""
 "your user account). <strong>Do not try to synchronize devices by using the "
 "same Device ID.</strong>"
 msgstr ""
+"Chaque appareil connecté au service web sera identifié par son <strong>ID</"
+"strong> qui doit donc être unique (du moins pour votre compte "
+"d'utilisateur). <strong>N'essayez pas de synchroniser des périphériques en "
+"utilisant le même ID.</strong>"
 
 #: web/templates/online-help.html:32
 #, python-format
@@ -1737,6 +1758,12 @@ msgid ""
 "the subscriptions of the devices will be merged. Adding a subscription at "
 "one device will automatically add it to the others. Same for deletions."
 msgstr ""
+"Si vous avez au moins deux périphériques connectés au service web, vous "
+"pouvez synchroniser certains d'entre eux. Ouvrez la page Périphérique pour "
+"l'un d'eux, cliquez sur Synchroniser et sélectionnez le périphérique à "
+"synchroniser. Après la synchronisation, les abonnements des périphériques "
+"seront fusionnés. Ajouter un abonnement à un dispositif l'ajoutera "
+"automatiquement aux autres. Idem pour les suppressions."
 
 #: web/templates/online-help.html:38
 #, python-format
@@ -1923,6 +1950,9 @@ msgid ""
 "You can't subscribe to this podcast, because you don't have any devices (on "
 "which you don't have subscribed to the podcast already."
 msgstr ""
+"Vous ne pouvez pas vous abonner à ce podcast, parce que vous n'avez de "
+"périphérique disponible (sur lequel vous n'êtes pas déjà abonné à ce "
+"podcast).."
 
 #: web/templates/subscribe.html:50
 #, python-format
@@ -1953,7 +1983,7 @@ msgstr "Mes abonnements"
 
 #: web/templates/subscriptions.html:31
 msgid "No episodes"
-msgstr ""
+msgstr "Pas d'épisode"
 
 #: web/templates/subscriptions.html:54
 #, python-format
@@ -1973,7 +2003,7 @@ msgstr ""
 
 #: web/templates/suggestions.html:9 web/templates/suggestions.html.py:12
 msgid "Suggested Podcasts"
-msgstr ""
+msgstr "Podcasts suggérés"
 
 #: web/templates/suggestions.html:34
 msgid "No Interest"
@@ -1989,7 +2019,7 @@ msgstr ""
 #: web/templates/user_subscriptions_denied.html:14
 #, python-format
 msgid "%(username)s's Subscriptions"
-msgstr ""
+msgstr "Abonnements de %(username)s"
 
 #: web/templates/user_subscriptions.html:21
 #, python-format
@@ -2010,7 +2040,7 @@ msgstr "S'abonner à ce podcast"
 #: web/templates/user_subscriptions.html:51
 #, python-format
 msgid "%(username)s doesn't have any subscriptions yet."
-msgstr ""
+msgstr "%(username)s n'a pas encore d'abonnement."
 
 #: web/templates/user_subscriptions.html:61
 #, fuzzy
@@ -2039,25 +2069,29 @@ msgid ""
 "%(username)s didn't share his subscriptions with you. Maybe you should "
 "contact him to get the correct link."
 msgstr ""
+"%(username)s n'a pas partager ses abonnements avec vous. Peut-être devriez-"
+"vous le contacter pour obtenir le lien correct."
 
 #: web/templates/user_subscriptions_denied.html:23
 msgid "Want to share your subscriptions?"
-msgstr ""
+msgstr "Voulez-vous partager vos abonnements ?"
 
 #: web/templates/user_subscriptions_denied.html:23
 msgid ""
 "Just go to your <a href/\"/account/\">account settings</a> to get the link.</"
 "a>"
 msgstr ""
+"Rendez-vous dans les <a href/\"/account/\">paramètres de votre compte</a> "
+"pour obtenir le lien.</a>"
 
 #: web/templates/registration/activate.html:10
 #: web/templates/registration/activation_complete.html:10
 msgid "Account activated"
-msgstr ""
+msgstr "Compte activé"
 
 #: web/templates/registration/activate.html:12
 msgid "Account not activated"
-msgstr ""
+msgstr "Compte non activé"
 
 #: web/templates/registration/activate.html:19
 #: web/templates/registration/activation_complete.html:14
@@ -2067,16 +2101,18 @@ msgstr "Votre compte a été supprimé"
 
 #: web/templates/registration/activate.html:21
 msgid "Your account could not be activated successfully."
-msgstr ""
+msgstr "Votre compte n'a pas pu être activé avec succès."
 
 #: web/templates/registration/registration_complete.html:9
 msgid "Registration complete"
-msgstr ""
+msgstr "Inscription complète"
 
 #: web/templates/registration/registration_complete.html:13
 msgid ""
 "Please confirm your account using the email you should just have received."
 msgstr ""
+"Veuillez confirmer votre compte à l'aide du courrier électronique que vous "
+"venez de recevoir."
 
 #: web/templates/registration/registration_form.html:8
 #: web/templates/registration/registration_form.html:11
@@ -2086,7 +2122,7 @@ msgstr "Supprimer votre compte"
 
 #: web/templates/registration/registration_form.html:18
 msgid "You are already registered."
-msgstr ""
+msgstr "Vous êtes déjà inscrit."
 
 #: web/templates/registration/registration_form.html:74
 msgid "Activation Mail"
@@ -2108,111 +2144,111 @@ msgstr ""
 #: web/templates/registration/resend_activation.html:4
 #: web/templates/registration/resend_activation.html:8
 msgid "Resend activation e-mail"
-msgstr ""
+msgstr "Renvoyer le courrier électronique d'activation"
 
 #: web/templates/registration/resend_activation.html:35
 msgid "Send activation e-mail"
-msgstr ""
+msgstr "Envoyer le courrier électronique d'activation"
 
 #: web/templates/registration/resent_activation.html:4
 #: web/templates/registration/resent_activation.html:7
 msgid "Sent Activation Email"
-msgstr ""
+msgstr "Courrier électronique d'activation envoyé"
 
 #: web/templates/registration/resent_activation.html:11
 msgid "The activation email has been reset."
-msgstr ""
+msgstr "Le courrier électronique d'activation a été renvoyé"
 
 #: web/templatetags/devices.py:27
 msgid "Unknown"
-msgstr ""
+msgstr "Inconnu"
 
 #: web/templatetags/episodes.py:20
 msgid "New episode"
-msgstr ""
+msgstr "Nouvel épisode"
 
 #: web/templatetags/episodes.py:23
 #, python-format
 msgid "Downloaded to %s"
-msgstr ""
+msgstr "Téléchargé vers %s"
 
 #: web/templatetags/episodes.py:25
 msgid "Downloaded"
-msgstr ""
+msgstr "Téléchargé"
 
 #: web/templatetags/episodes.py:28
 #, python-format
 msgid "Played on %s"
-msgstr ""
+msgstr "Lu sur %s"
 
 #: web/templatetags/episodes.py:30
 msgid "Played"
-msgstr ""
+msgstr "Lu"
 
 #: web/templatetags/episodes.py:33
 #, python-format
 msgid "Deleted on %s"
-msgstr ""
+msgstr "Supprimé le %s"
 
 #: web/templatetags/episodes.py:35
 msgid "Deleted"
-msgstr ""
+msgstr "Supprimé"
 
 #: web/templatetags/episodes.py:37
 msgid "Unknown status"
-msgstr ""
+msgstr "Statut inconnu"
 
 #: web/templatetags/episodes.py:42
 msgid "Unplayed episode"
-msgstr ""
+msgstr "Épisode non lu"
 
 #: web/templatetags/episodes.py:45 web/templatetags/episodes.py:46
 #, python-format
 msgid " on %s"
-msgstr ""
+msgstr "le %s"
 
 #: web/templatetags/episodes.py:49
 msgid "This episode has been marked new"
-msgstr ""
+msgstr "Cet épisode a été marqué comme nouveau"
 
 #: web/templatetags/episodes.py:51
 msgid "This episode has been downloaded"
-msgstr ""
+msgstr "Cet épisode a été téléchargé"
 
 #: web/templatetags/episodes.py:55
 #, python-format
 msgid " from %(start)s to %(end)s"
-msgstr ""
+msgstr "de %(start)s à %(end)s"
 
 #: web/templatetags/episodes.py:59
 #, python-format
 msgid " to position %s"
-msgstr ""
+msgstr "jusqu'à la position %s"
 
 #: web/templatetags/episodes.py:63
 msgid "This episode has been played"
-msgstr ""
+msgstr "Cet épisode a été lu"
 
 #: web/templatetags/episodes.py:65
 msgid "This episode has been deleted"
-msgstr ""
+msgstr "Cet épisode a été supprimé"
 
 #: web/templatetags/episodes.py:126
 #, fuzzy
 msgid "Unknown Episode"
 msgstr "Épisode anonyme"
 
-#: web/templatetags/menu.py:21 web/templatetags/menu.py:59
+#: web/templatetags/menu.py:21 web/templatetags/menu.py:60
 msgid "Home"
-msgstr ""
+msgstr "Accueil"
 
 #: web/templatetags/menu.py:34
 msgid "User subscriptions"
-msgstr ""
+msgstr "Abonnement de l'utilisateur"
 
 #: web/templatetags/menu.py:35
 msgid "Suggestions"
-msgstr ""
+msgstr "Suggestions"
 
 #: web/templatetags/menu.py:36
 #, fuzzy
@@ -2223,26 +2259,26 @@ msgstr "Top des épisodes"
 msgid "Community"
 msgstr ""
 
-#: web/templatetags/menu.py:50
+#: web/templatetags/menu.py:51
 #, fuzzy
 msgid "My Userpage"
 msgstr "Nom d'utilisateur"
 
-#: web/templatetags/menu.py:54
-msgid "Settings"
-msgstr ""
-
 #: web/templatetags/menu.py:55
-msgid "Account"
-msgstr ""
+msgid "Settings"
+msgstr "Paramètres"
 
 #: web/templatetags/menu.py:56
-msgid "Privacy"
-msgstr ""
+msgid "Account"
+msgstr "Compte"
 
-#: web/templatetags/menu.py:61
+#: web/templatetags/menu.py:57
+msgid "Privacy"
+msgstr "Vie privée"
+
+#: web/templatetags/menu.py:62
 msgid "Link to gpodder.net"
-msgstr ""
+msgstr "Lien vers gpodder.net"
 
 #: web/templatetags/time.py:21
 msgid "{h}h {m}m {s}s"
@@ -2250,7 +2286,7 @@ msgstr ""
 
 #: web/views/device.py:87
 msgid "Synchronize with the following devices"
-msgstr ""
+msgstr "Synchroniser avec les périphériques suivants"
 
 #: web/views/device.py:106
 msgid "Please fill out all fields."
@@ -2264,15 +2300,21 @@ msgstr "Périphériques"
 #: web/views/device.py:129 web/views/device.py:164
 msgid "You can't use the same Device ID for two devices."
 msgstr ""
+"Vous ne pouvez pas utiliser la même ID de périphérique pour deux "
+"périphériques."
 
 #: web/views/device.py:157
 #, fuzzy
 msgid "Device updated"
 msgstr "ID du périphérique"
 
-#: web/views/podcast.py:269
-msgid "Choose a device:"
+#: web/views/episode.py:127
+msgid "Could not add Chapter: {msg}"
 msgstr ""
+
+#: web/views/podcast.py:268
+msgid "Choose a device:"
+msgstr "Choisissez un périphérique :"
 
 #: web/views/security.py:31
 msgid "another site"
@@ -2281,23 +2323,25 @@ msgstr "un autre site"
 #: web/views/settings.py:61
 msgid "Oops! Something went wrong. Please double-check the data you entered."
 msgstr ""
+"Oups ! Quelque chose s'est mal passé. Veuillez revérifier les données que "
+"vous avez entrées."
 
-#: web/views/subscriptions.py:137
+#: web/views/subscriptions.py:138
 #, fuzzy, python-format
 msgid "%(username)s's Podcast Subscriptions on %(site)s"
 msgstr "Historique des abonnements"
 
-#: web/views/subscriptions.py:141
+#: web/views/subscriptions.py:142
 #, python-format
 msgid "Recent changes to %(username)s's podcast subscriptions on %(site)s"
 msgstr ""
 
-#: web/views/subscriptions.py:168
+#: web/views/subscriptions.py:169
 #, fuzzy, python-format
 msgid "%(username)s subscribed to %(podcast)s (%(site)s)"
 msgstr "S'abonner à %(podcasttitle)s"
 
-#: web/views/subscriptions.py:170
+#: web/views/subscriptions.py:171
 #, fuzzy, python-format
 msgid "%(username)s unsubscribed from %(podcast)s (%(site)s)"
 msgstr "S'abonner à %(podcasttitle)s"
@@ -2335,21 +2379,30 @@ msgstr ""
 
 #: web/views/users.py:165
 msgid "Invalid Username entered"
-msgstr ""
+msgstr "Nom d'utilisateur entré non valable"
 
 #: web/views/users.py:172
 msgid "You have deleted your account, but you can regster again."
 msgstr ""
+"Vous avez supprimé votre compte, mais vous pouvez vous inscrire de nouveau."
 
 #: web/views/users.py:176
 msgid "Your account already has been activated. Go ahead and log in."
-msgstr ""
+msgstr "Votre compte a déjà été activé. Poursuivez en vous identifiant."
 
 #: web/views/users.py:179
 msgid ""
 "Your activation key has expired. Please try another username, or retry with "
 "the same one tomorrow."
 msgstr ""
+"Votre clé d'activation a expiré. Veuillez essayer avec un autre nom "
+"d'utilisateur, ou faites une nouvelle tentative demain avec le même nom."
+
+#, fuzzy
+#~ msgid "Create your own <a href=\"%(create-url)s\">podcast lists</a>."
+#~ msgstr ""
+#~ "Nous pouvons essayer d'en <a href=\"/register/resend-activation\">envoyer "
+#~ "un nouveau</a>."
 
 #~ msgid "Unnamed Device (%s)"
 #~ msgstr "Périphérique anonyme (%s)"
@@ -2394,10 +2447,10 @@ msgstr ""
 
 #, fuzzy
 #~ msgid ""
-#~ "Welcome to %(sitename)s! You can start using the site by <a href="
-#~ "\"%(help-url)s\">uploading your subscriptions</a> with a supported "
-#~ "client. You can then manage your subscriptions online, sync your devices "
-#~ "and discover new interesting podcasts."
+#~ "Welcome to %(sitename)s! You can start using the site by <a href=\"%(help-"
+#~ "url)s\">uploading your subscriptions</a> with a supported client. You can "
+#~ "then manage your subscriptions online, sync your devices and discover new "
+#~ "interesting podcasts."
 #~ msgstr ""
 #~ "Bienvenue sur %(sitename)s ! Vous pouvez commencer à utiliser ce site en "
 #~ "y <a href=\"/online-help\">téléchargeant vos abonnements</a> grâce à un "
@@ -2429,9 +2482,8 @@ msgstr ""
 #, fuzzy
 #~ msgid ""
 #~ "You aren't subscribed to this podcast. Therefor your chapters are also "
-#~ "visible to other users. If you do no want that, <a href="
-#~ "\"%(subscribe-url)s\">subscribe to the podcast</a> and mark your "
-#~ "subscription as private."
+#~ "visible to other users. If you do no want that, <a href=\"%(subscribe-url)"
+#~ "s\">subscribe to the podcast</a> and mark your subscription as private."
 #~ msgstr ""
 #~ "Vous n'êtes pas abonné à ce podcast. Par conséquent vos chapitres sont "
 #~ "aussi visibles des autres utilisateurs. Si vous ne le souhaitez pas, <a "

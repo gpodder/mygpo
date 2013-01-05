@@ -1,9 +1,13 @@
 from itertools import chain, islice
 
-import gevent
+try:
+    import gevent
+except ImportError:
+    gevent = None
 
 from mygpo.core.models import Podcast
 from mygpo.core.proxy import proxy_object
+from mygpo.db.couchdb.episode import episodes_for_podcast
 
 
 class PodcastSet(set):
@@ -26,13 +30,20 @@ class PodcastSet(set):
 
         podcast_dict = dict((p.get_id(), p) for p in podcasts)
 
-        jobs = [gevent.spawn(Podcast.get_episodes, podcast, since=1,
-                until=max_date, descending=True,
-                limit=max_per_podcast) for podcast in podcasts]
+        if gevent:
+            jobs = [gevent.spawn(episodes_for_podcast, podcast, since=1,
+                    until=max_date, descending=True,
+                    limit=max_per_podcast) for podcast in podcasts]
 
-        gevent.joinall(jobs)
+            gevent.joinall(jobs)
 
-        episodes = chain.from_iterable(job.get() for job in jobs)
+            episodes = chain.from_iterable(job.get() for job in jobs)
+
+        else:
+            episodes = chain.from_iterable(episodes_for_podcast(podcast,
+                    since=1, until=max_date, descending=True,
+                    limit=max_per_podcast) for podcast in podcasts)
+
 
         episodes = sorted(episodes, key=lambda e: e.released, reverse=True)
 

@@ -17,7 +17,7 @@ def vertical_bar(value, max_value, display=None):
     else:
         value_str = str(value)
 
-    ratio = float(value) / float(max_value) * 100
+    ratio = min(float(value) / float(max_value), 1) * 100
     if ratio > 40:
         left, right = '<span>'+ value_str +'</span>', ''
     else:

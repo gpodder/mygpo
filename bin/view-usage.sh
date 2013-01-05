@@ -5,4 +5,4 @@
 
 LOGFILE=$1
 
-cat $LOGFILE | awk '{print $13;}' | cut -f1 -d"?" | awk '{count[$1]++}END{for(j in count) print count[j],j}' | sort -n -r | head -n 10
+cat $LOGFILE | grep GET | awk '{print $13;}' | cut -f1 -d"?" | awk '{count[$1]++}END{for(j in count) print count[j],j}' | sort -n -r | head -n 10

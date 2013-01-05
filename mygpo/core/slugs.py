@@ -4,7 +4,6 @@ from couchdbkit.ext.django.schema import *
 
 from django.template.defaultfilters import slugify
 
-from mygpo.utils import multi_request_view
 from mygpo.decorators import repeat_on_conflict
 
 
@@ -82,14 +81,8 @@ class PodcastGroupSlug(SlugGenerator):
     """ Generates slugs for Podcast Groups """
 
     def _get_existing_slugs(self):
-        from mygpo.core.models import Podcast
-
-        res = Podcast.view('podcasts/by_slug',
-                startkey = [self.base_slug, None],
-                endkey   = [self.base_slug + 'ZZZZZ', None],
-                wrap_doc = False,
-            )
-        return [r['key'][0] for r in res]
+        from mygpo.db.couchdb.podcast import podcast_slugs
+        return podcast_slugs(self.base_slug)
 
 
 
@@ -140,14 +133,8 @@ class EpisodeSlug(SlugGenerator):
 
     def _get_existing_slugs(self):
         """ Episode slugs have to be unique within the Podcast """
-        from mygpo.core.models import Episode
-
-        res = Episode.view('episodes/by_slug',
-                startkey = [self.podcast_id, self.base_slug],
-                endkey   = [self.podcast_id, self.base_slug + 'ZZZZZ'],
-                wrap_doc = False,
-            )
-        return [r['key'][1] for r in res]
+        from mygpo.db.couchdb.episode import episode_slugs_per_podcast
+        return episode_slugs_per_podcast(self.podcast_id, self.base_slug)
 
 
 class ObjectsMissingSlugs(object):
@@ -161,30 +148,16 @@ class ObjectsMissingSlugs(object):
         self.end = end
         self.kwargs = {}
 
+
     def __len__(self):
-        res = self.cls.view('slugs/missing',
-                startkey     = [self.doc_type] + self.end,
-                endkey       = [self.doc_type] + self.start,
-                descending   = True,
-                reduce       = True,
-                group        = True,
-                group_level  = 1,
-            )
-        return res.first()['value'] if res else 0
+        from mygpo.db.couchdb.common import missing_slug_count
+        return missing_slug_count(self.doc_type, self.start, self.end)
 
 
     def __iter__(self):
+        from mygpo.db.couchdb.common import missing_slugs
+        return missing_slugs(self.doc_type, self.start, self.end, self.wrapper, **self.kwargs)
 
-        return multi_request_view(self.cls, 'slugs/missing',
-                startkey     = [self.doc_type] + self.end,
-                endkey       = [self.doc_type] + self.start,
-                descending   = True,
-                include_docs = True,
-                reduce       = False,
-                wrapper      = self.wrapper,
-                auto_advance = False,
-                **self.kwargs
-            )
 
 
 class PodcastsMissingSlugs(ObjectsMissingSlugs):

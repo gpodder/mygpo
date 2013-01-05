@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load i18n %}
 
 {% load menu %}
@@ -13,7 +14,7 @@
 
 
 {% block content %}
-   <form class="form-horizontal" action="{% url login %}" method="post">
+   <form class="form-horizontal" action="{% url "login" %}" method="post">
 
     <fieldset>
      {% csrf_token %}
@@ -30,7 +31,7 @@
       <div class="controls">
        <input type="password" name="pwd" />
        <p>
-        <a href="{% url restore-password %}">
+        <a href="{% url "restore-password" %}">
          {% trans "Forgot your password?" %}
         </a>
        </p>
@@ -40,6 +41,7 @@
      <div class="control-group">
       <div class="controls">
        <button class="btn btn-primary" type="submit">{% trans "Login" %}</button>
+       <a class="btn" href="{% url "register" %}">{% trans "Register" %}</a>
       </div>
      </div>
 
@@ -50,7 +52,7 @@
 
 {% block sidebar %}
   {% if next %}
-    <div class="error">
+    <div class="alert alert-error">
      {% trans "You need to login to access this page." %}
     </div>
   {% endif %}

@@ -13,14 +13,17 @@ from django.views.decorators.cache import cache_control
 from django.views.generic.base import View
 from django.utils.decorators import method_decorator
 
-from mygpo.core.models import Podcast
 from mygpo.core.proxy import proxy_object
 from mygpo.api.simple import format_podcast_list
 from mygpo.share.models import PodcastList
 from mygpo.users.models import User
 from mygpo.directory.views import search as directory_search
 from mygpo.decorators import repeat_on_conflict
-from mygpo.data.feeddownloader import update_podcasts
+from mygpo.userfeeds.feeds import FavoriteFeed
+from mygpo.db.couchdb.podcast import podcasts_by_id, podcast_for_url
+from mygpo.db.couchdb.podcastlist import podcastlist_for_user_slug, \
+         podcastlists_for_user
+from mygpo.data.feeddownloader import PodcastUpdater
 
 
 
@@ -36,7 +39,7 @@ def list_decorator(must_own=False):
             if must_own and request.user != user:
                 return HttpResponseForbidden()
 
-            plist = PodcastList.for_user_slug(user._id, listname)
+            plist = podcastlist_for_user_slug(user._id, listname)
 
             if plist is None:
                 raise Http404
@@ -57,7 +60,7 @@ def search(request, username, listname):
 @login_required
 def lists_own(request):
 
-    lists = PodcastList.for_user(request.user._id)
+    lists = podcastlists_for_user(request.user._id)
 
     return render(request, 'lists.html', {
             'lists': lists
@@ -70,7 +73,7 @@ def lists_user(request, username):
     if not user:
         raise Http404
 
-    lists = PodcastList.for_user(user._id)
+    lists = podcastlists_for_user(user._id)
 
     return render(request, 'lists_user.html', {
             'lists': lists,
@@ -85,7 +88,7 @@ def list_show(request, plist, owner):
 
     plist = proxy_object(plist)
 
-    podcasts = list(Podcast.get_multi(plist.podcasts))
+    podcasts = podcasts_by_id(plist.podcasts)
     plist.podcasts = podcasts
 
     max_subscribers = max([p.subscriber_count() for p in podcasts] + [0])
@@ -103,7 +106,7 @@ def list_show(request, plist, owner):
 
 @list_decorator(must_own=False)
 def list_opml(request, plist, owner):
-    podcasts = list(Podcast.get_multi(plist.podcasts))
+    podcasts = podcasts_by_id(plist.podcasts)
     return format_podcast_list(podcasts, 'opml', plist.title)
 
 
@@ -122,7 +125,7 @@ def create_list(request):
                     title=title))
         return HttpResponseRedirect(reverse('lists-overview'))
 
-    plist = PodcastList.for_user_slug(request.user._id, slug)
+    plist = podcastlist_for_user_slug(request.user._id, slug)
 
     if plist is None:
         plist = PodcastList()
@@ -139,8 +142,12 @@ def create_list(request):
 @list_decorator(must_own=True)
 def add_podcast(request, plist, owner, podcast_id):
 
-    plist.podcasts.append(podcast_id)
-    plist.save()
+    @repeat_on_conflict(['plist'])
+    def _add(plist, podcast_id):
+        plist.podcasts.append(podcast_id)
+        plist.save()
+
+    _add(plist=plist, podcast_id=podcast_id)
 
     list_url = reverse('list-show', args=[owner.username, plist.slug])
     return HttpResponseRedirect(list_url)
@@ -149,8 +156,13 @@ def add_podcast(request, plist, owner, podcast_id):
 @login_required
 @list_decorator(must_own=True)
 def remove_podcast(request, plist, owner, podcast_id):
-    plist.podcasts.remove(podcast_id)
-    plist.save()
+
+    @repeat_on_conflict(['plist'])
+    def _remove(plist, podcast_id):
+        plist.podcasts.remove(podcast_id)
+        plist.save()
+
+    _remove(plist=plist, podcast_id=podcast_id)
 
     list_url = reverse('list-show', args=[owner.username, plist.slug])
     return HttpResponseRedirect(list_url)
@@ -168,8 +180,12 @@ def delete_list(request, plist, owner):
 def rate_list(request, plist, owner):
     rating_val = int(request.GET.get('rate', None))
 
-    plist.rate(rating_val, request.user._id)
-    plist.save()
+    @repeat_on_conflict(['plist'])
+    def _rate(plist, rating_val, user):
+        plist.rate(rating_val, user._id)
+        plist.save()
+
+    _rate(plist, rating_val, request.user)
 
     messages.success(request, _('Thanks for rating!'))
 
@@ -206,12 +222,13 @@ class ShareFavorites(View):
     @method_decorator(cache_control(private=True))
     @method_decorator(login_required)
     def get(self, request):
+        user = request.user
 
+        favfeed = FavoriteFeed(user)
         site = RequestSite(request)
+        feed_url = favfeed.get_public_url(site.domain)
 
-        feed_url = 'http://%s%s' % (site.domain, reverse('favorites-feed', args=[request.user.username]))
-
-        podcast = Podcast.for_url(feed_url)
+        podcast = podcast_for_url(feed_url)
 
         token = request.user.favorite_feeds_token
 
@@ -255,31 +272,34 @@ class FavoritesFeedCreateEntry(View):
     def post(self, request):
         user = request.user
 
-        #TODO: move into FavoritesFeed class
+        feed = FavoriteFeed(user)
         site = RequestSite(request)
-        feed_url = 'http://%s%s' % (site.domain, reverse('favorites-feed', args=[user.username]))
+        feed_url = feed.get_public_url(site.domain)
 
-        podcast = Podcast.for_url(feed_url, create=True)
+        podcast = podcast_for_url(feed_url, create=True)
 
         if not podcast.get_id() in user.published_objects:
             user.published_objects.append(podcast.get_id())
             user.save()
 
-        update_podcasts([podcast])
+        updater = PodcastUpdater()
+        updater.update(feed_url)
 
         return HttpResponseRedirect(reverse('share-favorites'))
 
 
 @login_required
 def overview(request):
+    user = request.user
     site = RequestSite(request)
 
-    subscriptions_token = request.user.get_token('subscriptions_token')
-    userpage_token = request.user.get_token('userpage_token')
-    favfeed_token = request.user.get_token('favorite_feeds_token')
+    subscriptions_token = user.get_token('subscriptions_token')
+    userpage_token = user.get_token('userpage_token')
+    favfeed_token = user.get_token('favorite_feeds_token')
 
-    favfeed_url = 'http://%s%s' % (site.domain, reverse('favorites-feed', args=[request.user.username]))
-    favfeed_podcast = Podcast.for_url(favfeed_url)
+    favfeed = FavoriteFeed(user)
+    favfeed_url = favfeed.get_public_url(site.domain)
+    favfeed_podcast = podcast_for_url(favfeed_url)
 
     return render(request, 'share/overview.html', {
         'site': site,

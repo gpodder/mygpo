@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load i18n %}
 
 {% load menu %}
@@ -15,11 +16,11 @@
 {% block content %}
 {% if user.is_authenticated %}
 
-  <div class="success">{% trans "You are already registered." %}</div>
+  <div class="alert alert-success">{% trans "You are already registered." %}</div>
 
  {% else %}
 
-  <form class="form-horizontal" action="{% url register %}" method="POST">
+  <form class="form-horizontal" action="{% url "register" %}" method="POST">
    <fieldset>
     {% csrf_token %}
 
@@ -27,7 +28,11 @@
      <label class="control-label">Username</label>
      <div class="controls">
       {{ form.username }}
-      <p class="help-block">Letters, digits, hypens, underscores</p>
+      {% for err in form.username.errors %}
+       <span class="help-block alert alert-error">{{ err }}</span>
+      {% empty %}
+       <span class="help-block">Letters, digits, hypens, underscores</span>
+      {% endfor %}
      </div>
     </div>
 
@@ -35,7 +40,11 @@
      <label class="control-label">Email Address</label>
      <div class="controls">
       {{ form.email }}
-      <p class="help-block">We won't share it with anyone</p>
+      {% for err in form.email.errors %}
+       <span class="help-block alert alert-error">{{ err }}</span>
+      {% empty %}
+       <span class="help-block">We won't share it with anyone</span>
+      {% endfor %}
      </div>
     </div>
 
@@ -43,7 +52,9 @@
      <label class="control-label">Password</label>
      <div class="controls">
       {{ form.password1 }}
-      <p class="help-block">as secure as you like it</p>
+      {% for err in form.password1.errors %}
+       <span class="help-block alert alert-error">{{ err }}</span>
+      {% endfor %}
      </div>
     </div>
 
@@ -51,6 +62,9 @@
      <label class="control-label">Password (confirm)</label>
      <div class="controls">
       {{ form.password2 }}
+      {% for err in form.password2.errors %}
+       <span class="help-block alert alert-error">{{ err }}</span>
+      {% endfor %}
      </div>
     </div>
 
@@ -73,7 +87,7 @@
  <div class="well">
   <h3>{% trans "Activation Mail" %}</h3>
   <p>{% trans "After registration, you'll receive an activation mail to confirm the validity of your email address." %}</p>
-  {% url resend-activation as resend-activation-url %}
+  {% url "resend-activation" as resend-activation-url %}
   <p>{% blocktrans %}If it doesn't arrive, you can <a href="{{ resend-activation-url }}">resend</a> it.{% endblocktrans %}
  </div>
 

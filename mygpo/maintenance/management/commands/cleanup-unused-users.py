@@ -1,24 +1,16 @@
 from django.core.management.base import BaseCommand
 
 from mygpo.users.models import User
-
 from mygpo.utils import progress
+from mygpo.db.couchdb.user import deleted_users, deleted_user_count
 
 
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        users = User.view('users/deleted',
-                include_docs = True,
-                reduce       = False,
-            )
-
-        total = User.view('users/deleted',
-                reduce = True,
-            )
-
-        total = list(total)[0]['value'] if total else 0
+        users = deleted_users()
+        total = deleted_user_count()
 
         for n, user in enumerate(users):
 

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load i18n %}
 {% load podcasts %}
 {% load episodes %}
@@ -20,11 +21,11 @@
 {% endblock %}
 
 {% block content %}
- <div class="info">
+ <div class="alert alert-info">
   {% trans "Episodes that have the same number will be merged. Please verify all your changes by clicking on 'Renew Groups' before starting the Merge." %}
  </div>
 
- <form method="post" action="{% url admin-merge-process %}">
+ <form method="post" action="{% url "admin-merge-process" %}">
   {% csrf_token %}
 
   {% for podcast in podcasts %}

@@ -2,48 +2,19 @@ from django.core.cache import cache
 
 from couchdbkit.ext.django.schema import *
 
-from mygpo.core.models import Podcast
 from mygpo.utils import iterate_together
 from mygpo.core.proxy import DocumentABCMeta
-
-
-class CategoryEntry(DocumentSchema):
-    podcast = StringProperty()
-    weight = FloatProperty()
-
-    def __repr__(self):
-        return 'Podcast %s in Category %s' % (self.podcast, self._id)
-
-    def __cmp__(self, other):
-        return cmp(self.weight, other.weight)
+from mygpo.db.couchdb.podcast import podcasts_by_id
 
 
 class Category(Document):
 
     __metaclass__ = DocumentABCMeta
 
-    label = StringProperty()
-    updated = DateTimeProperty()
+    label = StringProperty(required=True)
+    updated = DateTimeProperty(required=True)
     spellings = StringListProperty()
-    podcasts = SchemaListProperty(CategoryEntry)
-
-    @classmethod
-    def for_tag(cls, tag):
-        r = cls.view('categories/by_tags',
-                key          = tag,
-                include_docs = True,
-                stale        = 'update_after',
-            )
-        return r.first() if r else None
-
-    @classmethod
-    def top_categories(cls, count):
-        return cls.view('categories/by_weight',
-                descending   = True,
-                limit        = count,
-                include_docs = True,
-                stale        = 'update_after',
-            )
+    podcasts = ListProperty()
 
 
     def merge_podcasts(self, podcasts):
@@ -71,21 +42,23 @@ class Category(Document):
         self.podcasts = new_entries
 
 
-    def get_podcast_ids(self, start=0, end=20):
-        return [e.podcast for e in self.podcasts[start:end]]
+    # called from within a template where we can't pass parameters
+    def get_podcasts_more(self, start=0, end=40):
+        return self.get_podcasts(start, end)
 
 
-    def get_podcasts(self, start=0, end=20):
-        cache_id = 'category-%s' % self._id
+    def get_podcasts(self, start=0, end=10):
+        cache_id = 'category-%s-%d-%d' % (self._id, start, end)
 
-        podcasts = cache.get(cache_id, [])
+        podcasts = cache.get(cache_id)
+        if podcasts:
+            return podcasts
 
-        if len(podcasts) < end:
-            ids = self.get_podcast_ids(len(podcasts), end)
-            podcasts.extend(list(Podcast.get_multi(ids)))
-            cache.set(cache_id, podcasts)
+        ids = self.podcasts[start:end]
+        podcasts = podcasts_by_id(ids)
+        cache.set(cache_id, podcasts)
 
-        return podcasts[start:end]
+        return podcasts
 
 
 
@@ -95,7 +68,7 @@ class Category(Document):
 
 
     def get_weight(self):
-        return sum([e.weight for e in self.podcasts])
+        return getattr(self, '_weight', len(self.podcasts))
 
 
     def get_tags(self):

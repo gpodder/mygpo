@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+{% load url from future %}
 {% load i18n %}
 {% load podcasts %}
 {% load charts %}
@@ -22,10 +23,10 @@
   <table class="list">
    {% for list in lists %}
     <tr>
-     <td><a href="{% url list-show user.username list.slug %}">{{ list.title }}</a></td>
+     <td><a href="{% url "list-show" user.username list.slug %}">{{ list.title }}</a></td>
      <td>{% blocktrans with list.podcasts|length as num_podcasts %}{{ num_podcasts }} Podcasts{% endblocktrans %}</td>
      <td>
-      <form action="{% url list-delete user.username list.slug %}" method="post">
+      <form action="{% url "list-delete" user.username list.slug %}" method="post">
        {% csrf_token %}
        <button class="btn btn-danger btn-small" type="submit">
         <i class="icon-trash"></i> {% trans "Delete" %}
@@ -48,7 +49,7 @@
   <div class="well">
 
   <h4>{% trans "Create List" %}</h4>
-  <form class="form-inline" action="{% url list-create %}" method="post">
+  <form class="form-inline" action="{% url "list-create" %}" method="post">
    {% csrf_token %}
    <div class="input-append">
     <input placeholder="Title" class="input-medium" type="text" name="title" />

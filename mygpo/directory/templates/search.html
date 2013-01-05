@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 
+{% load url from future %}
 {% load i18n %}
 {% load podcasts %}
 {% load charts %}
@@ -17,7 +18,7 @@
 
 {% block content %}
 
-  <form class="form-inline" method="get" action="{% url search %}" class="search">
+  <form class="form-inline" method="get" action="{% url "search" %}" class="search">
    <div class="input-prepend input-append">
     <span class="add-on"><i class="icon-search"></i></span><input class="input-xxlarge" type="text" name="q" {% if q %}value="{{ q }}"{% endif %} ><button class="btn btn-primary" type="submit">{% trans "Search" %}</button>
    </div>
@@ -45,7 +46,7 @@
  <ul>
  {% if results.has_previous %}
   <li>
-  <a href="{% url search %}?q={{ q }}&page={{ results.previous_page_number }}">«</a>
+  <a href="{% url "search" %}?q={{ q }}&page={{ results.previous_page_number }}">«</a>
   </li>
  {% endif %}
 
@@ -60,7 +61,7 @@
      {% if page == results.number %}
       <strong>{{ page }}</strong>
      {% else %}
-      <a href="{% url search %}?q={{ q }}&page={{ page }}">{{ page }}</a>
+      <a href="{% url "search" %}?q={{ q }}&page={{ page }}">{{ page }}</a>
      {% endif %}
    {% endif %}
   </li>
@@ -68,7 +69,7 @@
 
  {% if results.has_next %}
   <li>
-  <a href="{% url search %}?q={{ q }}&page={{ results.next_page_number }}">»</a>
+  <a href="{% url "search" %}?q={{ q }}&page={{ results.next_page_number }}">»</a>
   </li>
  {% endif %}
  </ul>

@@ -2,8 +2,6 @@ from random import random
 
 from couchdbkit.ext.django.schema import *
 
-from django.template.defaultfilters import slugify
-
 from mygpo.core.proxy import DocumentABCMeta
 from mygpo.users.models import RatingMixin
 
@@ -19,70 +17,6 @@ class PodcastList(Document, RatingMixin):
     podcasts = StringListProperty()
     user     = StringProperty(required=True)
     random_key = FloatProperty(default=random)
-
-
-
-    @classmethod
-    def for_user_slug(cls, user_id, slug):
-
-        r = cls.view('podcastlists/by_user_slug',
-                key          = [user_id, slug],
-                include_docs = True,
-            )
-        return r.first() if r else None
-
-
-    @classmethod
-    def for_user(cls, user_id):
-
-        r = cls.view('podcastlists/by_user_slug',
-                startkey = [user_id, None],
-                endkey   = [user_id, {}],
-                include_docs = True,
-            )
-        return list(r)
-
-
-    @classmethod
-    def by_rating(cls, **kwargs):
-        r = cls.view('podcastlists/by_rating',
-                descending   = True,
-                include_docs = True,
-                stale        = 'update_after',
-                **kwargs
-            )
-        return r.iterator()
-
-
-    @classmethod
-    def count(cls, with_rating=True):
-        view = 'podcastlists/by_rating' if with_rating else \
-               'podcastlists/by_user_slug'
-
-        return cls.view(view,
-                limit = 0,
-                stale = 'update_after',
-            ).total_rows
-
-
-    @classmethod
-    def random(cls, chunk_size=1):
-
-        while True:
-            rnd = random()
-            res = cls.view('podcastlists/random',
-                    startkey     = rnd,
-                    include_docs = True,
-                    limit        = chunk_size,
-                    stale        = 'ok',
-                )
-
-            if not res:
-                break
-
-            for r in res:
-                yield r
-
 
 
     def __repr__(self):

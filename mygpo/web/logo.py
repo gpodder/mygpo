@@ -69,7 +69,7 @@ class CoverArt(View):
             im = Image.open(original)
             if im.mode not in ('RGB', 'RGBA'):
                 im = im.convert('RGB')
-        except:
+        except IOError:
             raise Http404('Cannot open cover file')
 
         try:
@@ -94,8 +94,7 @@ class CoverArt(View):
 
         try:
             resized.save(io, 'JPEG', optimize=True, progression=True, quality=80)
-        except Exception as ex:
-            print ex
+        except IOError as ex:
             return self.send_file(original)
 
         s = io.getvalue()

@@ -13,6 +13,10 @@ from mygpo.users.models import User, Device, EpisodeAction
 from mygpo.core.models import Podcast, Episode
 from mygpo.counter import Counter
 from mygpo.maintenance.merge import PodcastMerger
+from mygpo.db.couchdb.episode import episode_by_id, episodes_for_podcast
+from mygpo.db.couchdb.podcast import podcast_by_id
+from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
+from mygpo.db.couchdb.episode_state import episode_state_for_user_episode
 
 
 class SimpleTest(TestCase):
@@ -75,11 +79,11 @@ class SimpleTest(TestCase):
         p1.subscribe(user, device1)
         p2.subscribe(user, device2)
 
-        s1 = e1.get_user_state(user)
+        s1 = episode_state_for_user_episode(user, e1)
         s1.add_actions([EpisodeAction(action='play')])
         s1.save()
 
-        s3 = e3.get_user_state(user)
+        s3 = episode_state_for_user_episode(user, e3)
         s3.add_actions([EpisodeAction(action='play')])
         s3.save()
 
@@ -95,17 +99,17 @@ class SimpleTest(TestCase):
         pm = PodcastMerger([p1, p2], actions, groups)
         pm.merge()
 
-        e1 = Episode.get(e1._id)
-        es1 = e1.get_user_state(user)
+        e1 = episode_by_id(e1._id)
+        es1 = episode_state_for_user_episode(user, e1)
         self.assertEqual(len(es1.actions), 1)
 
         # check if merged episode's id can still be accessed
-        e3 = Episode.get(e3_id)
-        es3 = e3.get_user_state(user)
+        e3 = episode_by_id(e3_id)
+        es3 = episode_state_for_user_episode(user, e3)
         self.assertEqual(len(es3.actions), 1)
 
-        p1 = Podcast.get(p1.get_id())
-        ps1 = p1.get_user_state(user)
+        p1 = podcast_by_id(p1.get_id())
+        ps1 = podcast_state_for_user_podcast(user, p1)
         self.assertEqual(len(ps1.get_subscribed_device_ids()), 2)
 
-        self.assertEqual(len(list(p1.get_episodes())), 3)
+        self.assertEqual(len(list(episodes_for_podcast(p1))), 3)

@@ -15,8 +15,8 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from mygpo.core.models import Podcast
-from mygpo.couch import get_main_database
+from mygpo.db.couchdb.podcast_state import subscribed_users, \
+         subscribed_podcast_ids_by_user_id
 
 try:
     from collections import Counter
@@ -32,32 +32,13 @@ def calc_similar_podcasts(podcast, num=20):
     Probably an expensive operation
     """
 
-    db = get_main_database()
-
-    res = db.view('subscriptions/by_podcast',
-            startkey    = [podcast.get_id(), None, None],
-            endkey      = [podcast.get_id(), {}, {}],
-            group       = True,
-            group_level = 2,
-            stale       = 'update_after',
-        )
-
-    users = (r['key'][1] for r in res)
+    users = subscribed_users(podcast)
 
     podcasts = Counter()
 
-
     for user_id in users:
-        subscribed = db.view('subscriptions/by_user',
-                startkey    = [user_id, True, None, None],
-                endkey      = [user_id, True, {}, {}],
-                group       = True,
-                group_level = 3,
-                stale       = 'update_after',
-            )
-        user_subscriptions = set(r['key'][2] for r in subscribed)
+        user_subscriptions = subscribed_podcast_ids_by_user_id(user_id)
         user_counter = Counter(user_subscriptions)
         podcasts.update(user_counter)
-
 
     return podcasts.most_common(num)

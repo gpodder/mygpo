@@ -65,11 +65,7 @@ def view_or_basicauth(view, request, username, token_name, realm = "", *args, **
                     return auth_request()
 
                 if token == passwd:
-                    try:
-                        return view(request, uname, *args, **kwargs)
-                    except Exception, e:
-                        log(repr(e))
-                        return HttpResponseBadRequest(e)
+                    return view(request, uname, *args, **kwargs)
 
     return auth_request()
 

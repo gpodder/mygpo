@@ -56,6 +56,15 @@ def device_icon(device):
 
     return ''
 
+
+@register.filter
+def target_uid(devices):
+    if isinstance(devices, list):
+        return devices[0].uid
+    else:
+        return devices.uid
+
+
 @register.filter
 def device_list(devices):
     links = map(device_link, devices)

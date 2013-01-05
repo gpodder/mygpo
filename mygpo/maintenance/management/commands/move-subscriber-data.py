@@ -1,9 +1,11 @@
 from django.core.management.base import BaseCommand
 
-from mygpo.utils import progress, multi_request_view
-from mygpo.core.models import Podcast, PodcastSubscriberData
+from mygpo.utils import progress
+from mygpo.core.models import Podcast
 from mygpo.decorators import repeat_on_conflict
 from mygpo.counter import Counter
+from mygpo.db.couchdb.podcast import podcast_count, podcast_by_id, \
+         all_podcasts, subscriberdata_for_podcast
 
 
 class Command(BaseCommand):
@@ -19,13 +21,13 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        total = Podcast.count()
-        podcasts = Podcast.all_podcasts()
+        total = podcast_count()
+        podcasts = all_podcasts()
         actions = Counter()
 
         for n, podcast in enumerate(podcasts):
 
-            psubscriber = PodcastSubscriberData.for_podcast(podcast.get_id())
+            psubscriber = subscriberdata_for_podcast(podcast.get_id())
 
             res = self.update_subscriber_data(podcast, data=psubscriber)
             self.update_podcast(podcast=podcast)
@@ -49,7 +51,7 @@ class Command(BaseCommand):
             return True
 
 
-    @repeat_on_conflict(['podcast'], reload_f=lambda p: Podcast.get(p.get_id()))
+    @repeat_on_conflict(['podcast'], reload_f=lambda p: podcast_by_id(p.get_id()))
     def update_podcast(self, podcast):
         if len(podcast.subscribers) > 2:
             podcast.subscribers = podcast.subscribers[-2:]

@@ -36,7 +36,7 @@
       <td>{{ client.lib_version|default:"" }}</td>
       <td>{{ client.os|default:"" }}</td>
       <td>{{ client.os_version|default:"" }}</td>
-      <td>{{ users|vertical_bar:max_users|default:"" }}</td>
+      <td>{% vertical_bar users max_users %}</td>
      {% else %}
       <td colspan="6">{{ client }}</td>
      {% endif %}

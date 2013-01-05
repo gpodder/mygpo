@@ -5,7 +5,13 @@ from optparse import make_option
 from restkit.errors import RequestFailed
 
 from mygpo.maintenance.management.podcastcmd import PodcastCommand
-from mygpo.data import feeddownloader
+from mygpo.data.feeddownloader import PodcastUpdater
+
+try:
+    from gevent import monkey
+    monkey.patch_all()
+except ImportError:
+    pass
 
 
 class Command(PodcastCommand):
@@ -31,7 +37,5 @@ class Command(PodcastCommand):
         else:
             print 'Updating podcasts...'
 
-            try:
-                feeddownloader.update_podcasts(queue)
-            except RequestFailed as ex:
-                traceback.print_exc()
+            updater = PodcastUpdater()
+            updater.update_queue(queue)

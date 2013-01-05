@@ -22,8 +22,10 @@ from mygpo.core.models import Podcast, Episode
 from mygpo.users.models import EpisodeUserState, Device, DeviceDoesNotExist, \
          PodcastUserState
 from mygpo.decorators import repeat_on_conflict
-from mygpo.couch import bulk_save_retry, get_main_database
+from mygpo.couch import bulk_save_retry
 from mygpo.json import json
+from mygpo.db.couchdb.podcast import podcast_for_url, random_podcasts
+from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
 
 
 def get_random_picks(languages=None):
@@ -32,7 +34,7 @@ def get_random_picks(languages=None):
     languages = languages or ['']
 
     # get one iterator for each language
-    rand_iters = [Podcast.random(lang) for lang in languages]
+    rand_iters = [random_podcasts(lang) for lang in languages]
 
     # cycle through them, removing those that don't yield any more results
     while rand_iters:
@@ -46,23 +48,6 @@ def get_random_picks(languages=None):
         except StopIteration:
             # don't re-add rand_iter
             pass
-
-
-
-def get_podcast_count_for_language():
-    """ Returns a the number of podcasts for each language """
-
-    counts = defaultdict(int)
-
-    db = get_main_database()
-    r = db.view('podcasts/by_language',
-        reduce = True,
-        group_level = 1,
-        stale       = 'update_after',
-    )
-
-    counts.update( dict( (x['key'][0], x['value']) for x in r) )
-    return counts
 
 
 
@@ -107,15 +92,6 @@ def get_device(user, uid, user_agent, undelete=True):
     return _get(user=user, uid=uid, undelete=undelete)
 
 
-def get_favorites(user):
-    favorites = Episode.view('favorites/episodes_by_user',
-            key          = user._id,
-            include_docs = True,
-        )
-    return list(favorites)
-
-
-
 class BulkSubscribe(object):
     """ Performs bulk subscribe/unsubscribe operations """
 
@@ -133,9 +109,8 @@ class BulkSubscribe(object):
 
     def execute(self):
         """ Executes all added actions in bulk """
-        db = get_main_database()
         obj_funs = map(self._get_obj_fun, self.actions)
-        bulk_save_retry(db, obj_funs)
+        bulk_save_retry(obj_funs)
 
         # prepare for another run
         self.actions = []
@@ -153,9 +128,9 @@ class BulkSubscribe(object):
         url, op = action
 
         podcast = self.podcasts.get(url,
-                Podcast.for_url(url, create=True))
+                podcast_for_url(url, create=True))
 
-        state = podcast.get_user_state(self.user)
+        state = podcast_state_for_user_podcast(self.user, podcast)
 
         fun = self.operations[op]
         return (state, fun)

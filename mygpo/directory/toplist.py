@@ -7,6 +7,7 @@ from django.core.cache import cache
 from mygpo.core.models import Episode, Podcast, PodcastGroup
 from mygpo.data.mimetype import get_type, CONTENT_TYPES
 from mygpo.utils import daterange
+from mygpo.db.couchdb.directory import toplist
 
 
 CACHE_SECONDS = 60*60
@@ -36,27 +37,7 @@ class Toplist(object):
 
 
     def _cache_or_query(self, limit, key):
-        cache_str = '{view}-{limit}-{key}'.format(
-                view=self.view,
-                limit=limit,
-                key='-'.join(key)
-            )
-
-        res = cache.get(cache_str)
-        if not res:
-            r = self.cls.view(self.view,
-                    startkey     = key + [{}],
-                    endkey       = key + [None],
-                    include_docs = True,
-                    descending   = True,
-                    limit        = limit,
-                    stale        = 'update_after',
-                    **self.view_args
-                )
-            res = list(r)
-            cache.set(cache_str, res, CACHE_SECONDS)
-
-        return res
+        return toplist(self.cls, self.view, key, limit, **self.view_args)
 
 
     def _sort(self, results):

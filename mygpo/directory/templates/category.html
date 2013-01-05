@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+{% load url from future %}
 {% load i18n %}
 {% load podcasts %}
 {% load charts %}
@@ -39,7 +40,7 @@
 <div class="pagination pagination-centered">
  <ul>
  {% if entries.has_previous %}
-  <li><a href="{% url directory category %}?page={{ entries.previous_page_number }}">«</a></li>
+  <li><a href="{% url "directory" category %}?page={{ entries.previous_page_number }}">«</a></li>
  {% endif %}
 
  {% for page in page_list %}
@@ -51,7 +52,7 @@
      {% if page == entries.number %}
       <strong>{{ page }}</strong>
      {% else %}
-      <a href="{% url directory category %}?page={{ page }}">{{ page }}</a>
+      <a href="{% url "directory" category %}?page={{ page }}">{{ page }}</a>
      {% endif %}
    {% endif %}
   </li>
@@ -59,7 +60,7 @@
 
  {% if entries.has_next %}
   <li>
-  <a href="{% url directory category %}?page={{ entries.next_page_number }}">»</a>
+  <a href="{% url "directory" category %}?page={{ entries.next_page_number }}">»</a>
   </li>
  {% endif %}
  </ul>

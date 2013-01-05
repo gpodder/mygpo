@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load i18n %}
 {% load podcasts %}
 
@@ -28,7 +29,7 @@
       </a>
     </td>
     <td>
-     <form action="{% url suggestions-blacklist podcast.oldid %}" style="display: inline;" >
+     <form action="{% podcast_link_target podcast "suggestions-blacklist" %}" style="display: inline;" >
       {% csrf_token %}
       <button class="btn btn-danger btn-small" type="submit">
        <i class="icon-ban-circle"></i> {% trans "No Interest" %}
@@ -46,7 +47,7 @@
   </table>
 
   {% if entries %}
- <a class="btn" href="{% url suggestions-opml 15 "opml" %}">
+ <a class="btn" href="{% url "suggestions-opml" 15 "opml" %}">
   <i class="icon-download"></i>
    {% trans "Download OPML" %}
  </a>

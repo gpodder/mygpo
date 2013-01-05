@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+{% load url from future %}
 {% load i18n %}
 {% load podcasts %}
 {% load charts %}
@@ -64,7 +65,7 @@
    <div class="well">
 
   <h4>{% trans "Language" %}</h4>
-    <form class="form-inline" action="{% url toplist %}" method="get">
+    <form class="form-inline" action="{% url "toplist" %}" method="get">
      <select class="input-medium" name="lang">
 
       {% if language == "" %}
@@ -89,7 +90,7 @@
    <div class="well">
    <h4>{% trans "Client Access" %}</h4>
 
-    <p>Access <a href="{% url toplist-opml 30 "opml" %}">http://{{ url }}{% url toplist-opml 30 "opml" %}</a> for the Top-30.</p>
+    <p>Access <a href="{% url "toplist-opml" 30 "opml" %}">http://{{ url }}{% url "toplist-opml" 30 "opml" %}</a> for the Top-30.</p>
  </div>
 
 {% endblock %}

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load i18n %}
 {% load podcasts %}
 
@@ -26,16 +27,16 @@
     </div>
    </td>
    <td>
-    <a href="{% url shared-subscriptions user.username %}{% if subscriptions_token %}?token={{ subscriptions_token }}{% endif %}">
+    <a href="{% url "shared-subscriptions" user.username %}{% if subscriptions_token %}?token={{ subscriptions_token }}{% endif %}">
      <img src="/media/22x22/internet-web-browser.png" class="action-button" /></a>
-    <a href="{% url shared-subscriptions-rss user.username %}{% if subscriptions_token %}?token={{ subscriptions_token }}{% endif %}">
+    <a href="{% url "shared-subscriptions-rss" user.username %}{% if subscriptions_token %}?token={{ subscriptions_token }}{% endif %}">
      <img height="22" width="22" src="/media/28x28/feed-icon.png" class="action-button" /></a>
-    <a href="{% url shared-subscriptions-opml user.username %}{% if subscriptions_token %}?token={{ subscriptions_token }}{% endif %}">
+    <a href="{% url "shared-subscriptions-opml" user.username %}{% if subscriptions_token %}?token={{ subscriptions_token }}{% endif %}">
      <img src="/media/22x22/opml-icon.png" class="action-button" /></a>
    </td>
    <td>
     <button class="btn btn-small btn-link {% if not subscriptions_token %}disabled{% endif %}" {% if subscriptions_token %}type="submit" onclick="submitForm('subscriptions_private');"{% endif %}>{% trans "New Token" %}</button>
-    <a class="btn btn-small btn-link" href="{%url privacy %}">Privacy Settings</a>
+    <a class="btn btn-small btn-link" href="{% url "privacy" %}">Privacy Settings</a>
    </td>
   </tr>
 
@@ -47,7 +48,7 @@
      <button class="btn btn-small {% if userpage_token %}disabled btn-primary{% endif %}" onclick="submitForm('userpage_private');">{% trans "Private" %}</button>
     </div>
    <td>
-    <a href="{% url user user.username %}{% if userpage_token %}?token={{ userpage_token }}{% endif %}">
+    <a href="{% url "user" user.username %}{% if userpage_token %}?token={{ userpage_token }}{% endif %}">
      <img src="/media/22x22/internet-web-browser.png" class="action-button" />
     </a>
    </td>
@@ -69,18 +70,18 @@
      <a href="{% podcast_link_target favfeed_podcast %}"><img src="/media/22x22/internet-web-browser.png" class="action-button" /></a>
     {% endif %}
     {% if favfeed_token %}
-     <a href="https://{{ user.username }}:{{ favfeed_token }}@{{ site.domain }}{% url favorites-feed user.username %}">
+     <a href="https://{{ user.username }}:{{ favfeed_token }}@{{ site.domain }}{% url "favorites-feed" user.username %}">
       <img height="22" width="22" src="/media/28x28/feed-icon.png" class="action-button" />
      </a>
     {% else %}
-     <a href="{% url favorites-feed user.username %}">
+     <a href="{% url "favorites-feed" user.username %}">
       <img height="22" width="22" src="/media/28x28/feed-icon.png" class="action-button" />
      </a>
     {% endif %}
    </td>
    <td>
     <button class="btn btn-small btn-link {% if not favfeed_token %}disabled{% endif %}" {% if favfeed_token %}type="submit" onclick="submitForm('favfeed_private');"{% endif %}>{% trans "New Token" %}</button>
-    <a class="btn btn-small btn-link" href="{% url favorites %}">Edit Favorites</a>
+    <a class="btn btn-small btn-link" href="{% url "favorites" %}">Edit Favorites</a>
    </td>
   </tr>
 
@@ -88,27 +89,27 @@
 
 
 
- <form id="subscriptions_public" method="post" action="{% url subscriptions-public %}">
+ <form id="subscriptions_public" method="post" action="{% url "subscriptions-public" %}">
   {% csrf_token %}
  </form>
 
- <form id="subscriptions_private" method="post" action="{% url subscriptions-private %}">
+ <form id="subscriptions_private" method="post" action="{% url "subscriptions-private" %}">
   {% csrf_token %}
  </form>
 
- <form id="userpage_public" method="post" action="{% url userpage-public %}">
+ <form id="userpage_public" method="post" action="{% url "userpage-public" %}">
   {% csrf_token %}
  </form>
 
- <form id="userpage_private" method="post" action="{% url userpage-private %}">
+ <form id="userpage_private" method="post" action="{% url "userpage-private" %}">
   {% csrf_token %}
  </form>
 
- <form id="favfeed_public" method="post" action="{% url favfeed-public %}">
+ <form id="favfeed_public" method="post" action="{% url "favfeed-public" %}">
   {% csrf_token %}
  </form>
 
- <form id="favfeed_private" method="post" action="{% url favfeed-private %}">
+ <form id="favfeed_private" method="post" action="{% url "favfeed-private" %}">
   {% csrf_token %}
  </form>
 
