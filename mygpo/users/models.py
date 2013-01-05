@@ -166,6 +166,15 @@ class EpisodeUserState(Document):
     podcast       = StringProperty(required=True)
 
 
+    @classmethod
+    def for_user(cls, user):
+        r = cls.view('episode_states/by_user_episode',
+                startkey     = [user._id, None],
+                endkey       = [user._id, {}],
+                include_docs = True,
+            )
+        return r
+
 
     def add_actions(self, actions):
         map(EpisodeAction.validate_time_values, actions)

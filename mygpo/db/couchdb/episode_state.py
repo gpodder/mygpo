@@ -13,6 +13,15 @@ from mygpo.cache import cache_result
 
 
 
+def episode_states_for_user(user):
+    r = EpisodeUserState.view('episode_states/by_user_episode',
+            startkey     = [user._id, None],
+            endkey       = [user._id, {}],
+            include_docs = True,
+        )
+    return r
+
+
 def episode_state_for_user_episode(user, episode):
 
     if not user:
