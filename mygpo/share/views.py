@@ -3,7 +3,7 @@ from functools import wraps
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponseForbidden
 from django.shortcuts import render
-from django.template.defaultfilters import slugify
+from django.utils.text import slugify
 from django.contrib.sites.models import RequestSite
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
