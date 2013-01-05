@@ -82,7 +82,7 @@ def login_user(request):
                 'activation_needed': True,
             })
 
-    login(request=request, user=user)
+    login(request, user)
 
     if 'next' in request.POST and request.POST['next'] and request.POST['next'] != '/login/':
         return HttpResponseRedirect(request.POST['next'])
@@ -126,7 +126,7 @@ def restore_password(request):
     subject = _('Reset password for your account on %s') % site
     message = _('Here is your new password for your account %(username)s on %(site)s: %(password)s') % {'username': user.username, 'site': site, 'password': pwd}
     user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
-    _set_password(user=user, password=pwd)
+    _set_password(user, pwd)
     return render(request, 'password_reset.html')
 
 

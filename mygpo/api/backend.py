@@ -51,6 +51,7 @@ def get_random_picks(languages=None):
 
 
 
+@repeat_on_conflict(['user'])
 def get_device(user, uid, user_agent, undelete=True):
     """
     Loads or creates the device indicated by user, uid.
@@ -60,36 +61,31 @@ def get_device(user, uid, user_agent, undelete=True):
 
     store_ua = user.settings.get('store_user_agent', True)
 
-    @repeat_on_conflict(['user'])
-    def _get(user, uid, undelete):
+    save = False
 
-        save = False
+    try:
+        device = user.get_device_by_uid(uid, only_active=False)
 
-        try:
-            device = user.get_device_by_uid(uid, only_active=False)
+    except DeviceDoesNotExist:
+        device = Device(uid=uid)
+        user.devices.append(device)
+        save = True
 
-        except DeviceDoesNotExist:
-            device = Device(uid=uid)
-            user.devices.append(device)
-            save = True
+    if device.deleted and undelete:
+        device.deleted = False
+        user.set_device(device)
+        save = True
 
-        if device.deleted and undelete:
-            device.deleted = False
-            user.set_device(device)
-            save = True
+    if store_ua and user_agent and \
+            getattr(device, 'user_agent', None) != user_agent:
+        device.user_agent = user_agent
+        user.set_device(device)
+        save = True
 
-        if store_ua and user_agent and \
-                getattr(device, 'user_agent', None) != user_agent:
-            device.user_agent = user_agent
-            user.set_device(device)
-            save = True
+    if save:
+        user.save()
 
-        if save:
-            user.save()
-
-        return device
-
-    return _get(user=user, uid=uid, undelete=undelete)
+    return device
 
 
 class BulkSubscribe(object):

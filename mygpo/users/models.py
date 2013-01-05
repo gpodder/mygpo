@@ -501,6 +501,7 @@ class User(BaseUser, SyncedDevicesMixin):
 
 
 
+    @repeat_on_conflict(['self'])
     def get_token(self, token_name):
         """ returns a token, and generate those that are still missing """
 
@@ -563,15 +564,11 @@ class User(BaseUser, SyncedDevicesMixin):
             raise DeviceDoesNotExist('There is no device with UID %s' % uid)
 
 
+    @repeat_on_conflict(['self'])
     def update_device(self, device):
         """ Sets the device and saves the user """
-
-        @repeat_on_conflict(['user'])
-        def _update(user, device):
-            user.set_device(device)
-            user.save()
-
-        _update(user=self, device=device)
+        self.set_device(device)
+        self.save()
 
 
     def set_device(self, device):
@@ -799,7 +796,7 @@ class User(BaseUser, SyncedDevicesMixin):
                 if old_devs != set(state.disabled_devices):
                     state.save()
 
-            _update_state(state=state)
+            _update_state(state)
 
 
 
