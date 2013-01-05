@@ -13,7 +13,6 @@ from django.core.cache import cache
 
 from django_couchdb_utils.registration.models import User as BaseUser
 
-from mygpo.core.models import Podcast
 from mygpo.utils import linearize
 from mygpo.core.proxy import DocumentABCMeta, proxy_object
 from mygpo.decorators import repeat_on_conflict
@@ -23,9 +22,10 @@ from mygpo.db.couchdb.podcast import podcasts_by_id, podcasts_to_dict
 from mygpo.db.couchdb.user import user_history, device_history
 
 
+
 RE_DEVICE_UID = re.compile(r'^[\w.-]+$')
 
-
+# TODO: derive from ValidationException?
 class InvalidEpisodeActionAttributes(ValueError):
     """ raised when the attribues of an episode action fail validation """
 
@@ -74,7 +74,13 @@ class EpisodeAction(DocumentSchema):
     """
 
     action        = StringProperty(required=True)
+
+    # walltime of the event (assigned by the uploading client, defaults to now)
     timestamp     = DateTimeProperty(required=True, default=datetime.utcnow)
+
+    # upload time of the event
+    upload_timestamp = IntegerProperty(required=True)
+
     device_oldid  = IntegerProperty(required=False)
     device        = StringProperty()
     started       = IntegerProperty()
