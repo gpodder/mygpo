@@ -439,6 +439,7 @@ def search(q, offset=0, num_results=20):
                 wrapper      = search_wrapper,
                 include_docs = True,
                 limit        = num_results,
+                stale        = 'update_after',
                 skip         = offset,
                 q            = q,
                 sort='\\subscribers<int>')
