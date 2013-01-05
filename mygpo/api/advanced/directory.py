@@ -79,6 +79,11 @@ def episode_info(request):
     podcast_url = sanitize_url(request.GET.get('podcast', ''))
     episode_url = sanitize_url(request.GET.get('url', ''), 'episode')
 
+    # 404 before we query for url, because query would complain
+    # about missing parameters
+    if not podcast_url or not episode_url:
+        raise Http404
+
     episode = episode_for_podcast_url(podcast_url, episode_url)
 
     if episode is None:
