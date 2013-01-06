@@ -471,3 +471,36 @@ def split_list(l, prop):
     match   = filter(prop, l)
     nomatch = [x for x in l if x not in match]
     return match, nomatch
+
+
+def sorted_chain(links, key, reverse=False):
+    """ Takes a list of iters can iterates over sorted elements
+
+    Each elment of links should be a tuple of (sort_key, iterator). The
+    elements of each iterator should be sorted already. sort_key should
+    indicate the key of the first element and needs to be comparable to the
+    result of key(elem).
+
+    The function returns an iterator over the globally sorted element that
+    ensures that as little iterators as possible are evaluated.  When
+    evaluating """
+
+    # mixed_list initially contains all placeholders; later evaluated
+    # elements (from the iterators) are mixed in
+    mixed_list = [(k, link, True) for k, link in links]
+
+    while mixed_list:
+        _, item, expand = mixed_list.pop(0)
+
+        # found an element (from an earlier expansion), yield it
+        if not expand:
+            yield item
+            continue
+
+        # found an iter that needs to be expanded.
+        # The iterator is fully consumed
+        new_items = [(key(i), i, False) for i in item]
+
+        # sort links (placeholders) and elements together
+        mixed_list = sorted(mixed_list + new_items, key=lambda (k, _v, _e): k,
+                reverse=reverse)
