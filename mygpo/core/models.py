@@ -252,7 +252,9 @@ class Podcast(Document, SlugMixin, OldIdMixin):
             return None
 
         from mygpo.db.couchdb.episode import episodes_for_podcast
-        nexts = episodes_for_podcast(self, since=episode.released, limit=1)
+        from datetime import timedelta
+        nexts = episodes_for_podcast(self,
+                since=episode.released + timedelta(seconds=1), limit=1)
 
         return next(iter(nexts), None)
 
