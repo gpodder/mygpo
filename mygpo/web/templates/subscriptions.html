@@ -26,10 +26,8 @@
    <tr>
     <td class="logo">{{ s.podcast|podcast_logo }}</td>
     <td>{% podcast_group_link s.podcast %}<br/><span class="latest_episode">
-     {% if s.episode %}
-      {% episode_link s.episode s.podcast %}
-     {% else %}
-      {% trans "No episodes" %}
+     {% if s.episodes %}
+      {% blocktrans with s.episodes as episode_count %}{{ episode_count }} Episodes{% endblocktrans %}
      {% endif %}
      </span></td>
      <td>{{ s.devices|device_list }}</td>

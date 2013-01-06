@@ -236,15 +236,6 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         return common_title
 
 
-    @cache_result(timeout=60*60)
-    def get_latest_episode(self):
-        # since = 1 ==> has a timestamp
-
-        from mygpo.db.couchdb.episode import episodes_for_podcast
-        episodes = episodes_for_podcast(self, since=1, descending=True, limit=1)
-        return next(iter(episodes), None)
-
-
     def get_episode_before(self, episode):
         if not episode.released:
             return None
