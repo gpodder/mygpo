@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
@@ -107,7 +109,7 @@ def create_subscriptionlist(request):
                 subscription_list[podcast_id]['devices'].append(device)
 
     subscriptions = subscription_list.values()
-    sort_key = lambda s: s['podcast'].latest_episode_timestamp or {}
+    sort_key = lambda s: s['podcast'].latest_episode_timestamp or datetime.utcnow()
     subscriptions = sorted(subscriptions, key=sort_key, reverse=True)
     return subscriptions
 
