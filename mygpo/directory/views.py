@@ -289,7 +289,7 @@ class AddPodcast(View):
         updater = PodcastUpdater()
 
         try:
-            podcast = updater.update_podcast_url(url)
+            podcast = updater.update(url)
 
             messages.success(request, _('The podcast has been added'))
 
