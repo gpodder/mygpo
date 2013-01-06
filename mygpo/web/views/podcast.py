@@ -53,8 +53,11 @@ def show_slug(request, slug):
 @cache_control(private=True)
 @allowed_methods(['GET'])
 def show(request, podcast):
+    """ Shows a podcast detail page """
 
+    current_site = RequestSite(request)
     episodes = episode_list(podcast, request.user, limit=20)
+    user = request.user
 
     max_listeners = max([e.listeners for e in episodes] + [0])
 
@@ -70,47 +73,43 @@ def show(request, podcast):
     else:
         rel_podcasts = []
 
-    tags = get_tags(podcast, request.user)
+    tags = get_tags(podcast, user)
 
-    if request.user.is_authenticated():
-        state = podcast_state_for_user_podcast(request.user, podcast)
+    if user.is_authenticated():
+        state = podcast_state_for_user_podcast(user, podcast)
         subscribed_devices = state.get_subscribed_device_ids()
-        subscribed_devices = [request.user.get_device(x) for x in subscribed_devices]
+        subscribed_devices = [user.get_device(x) for x in subscribed_devices]
 
-        subscribe_targets = podcast.subscribe_targets(request.user)
+        subscribe_targets = podcast.subscribe_targets(user)
 
         history = list(state.actions)
-        def _set_objects(h):
-            dev = request.user.get_device(h.device)
-            return proxy_object(h, device=dev)
-        history = map(_set_objects, history)
-
         is_public = state.settings.get('public_subscription', True)
 
-        return render(request, 'podcast.html', {
-            'tags': tags,
-            'history': history,
-            'podcast': podcast,
-            'is_public': is_public,
-            'devices': subscribed_devices,
-            'related_podcasts': rel_podcasts,
-            'can_subscribe': len(subscribe_targets) > 0,
-            'subscribe_targets': subscribe_targets,
-            'episode': episode,
-            'episodes': episodes,
-            'max_listeners': max_listeners,
-        })
     else:
-        current_site = RequestSite(request)
-        return render(request, 'podcast.html', {
-            'podcast': podcast,
-            'related_podcasts': rel_podcasts,
-            'tags': tags,
-            'url': current_site,
-            'episode': episode,
-            'episodes': episodes,
-            'max_listeners': max_listeners,
-        })
+        history = []
+        is_public = False
+        subscribed_devices = []
+        subscribe_targets = []
+
+    def _set_objects(h):
+        dev = user.get_device(h.device)
+        return proxy_object(h, device=dev)
+    history = map(_set_objects, history)
+
+    return render(request, 'podcast.html', {
+        'tags': tags,
+        'url': current_site,
+        'history': history,
+        'podcast': podcast,
+        'is_public': is_public,
+        'devices': subscribed_devices,
+        'related_podcasts': rel_podcasts,
+        'can_subscribe': len(subscribe_targets) > 0,
+        'subscribe_targets': subscribe_targets,
+        'episode': episode,
+        'episodes': episodes,
+        'max_listeners': max_listeners,
+    })
 
 
 def get_tags(podcast, user):
