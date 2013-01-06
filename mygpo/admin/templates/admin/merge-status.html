@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load podcasts %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/admin/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/admin/"|section_menu:"Admin" }}{% endblock %}
+
+{% block head %}
+ <meta http-equiv="refresh" content="10">
+{% endblock %}
+
+{% block title %}
+ {% if ready %}
+  {% trans "Merge Finished" %}
+ {% else %}
+  {% trans "Merge Ongoing" %}
+ {% endif %}
+{% endblock %}
+
+{% block header %}
+ <h1>
+  {% if ready %}
+   {% trans "Merge Finished" %}
+  {% else %}
+   {% trans "Merge Ongoing" %}
+  {% endif %}
+ </h1>
+{% endblock %}
+
+{% block content %}
+
+ {% if ready %}
+
+  <p>{% trans "The following actions were recorded:" %}
+   <ul>
+    {% for action, count in actions %}
+     <li>{{ action }}: {{ count }}</li>
+    {% endfor %}
+   </ul>
+  </p>
+
+  <p>{% trans "Go to podcast" %} {% podcast_group_link podcast %}</p>
+ {% else %}
+  <p>{% trans "The operation is still ongoing..." %}</p>
+
+  <a class="btn" href="">{% trans "Refresh" %}</a>
+ {% endif %}
+
+{% endblock %}
+
