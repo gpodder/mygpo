@@ -24,6 +24,7 @@ from mygpo.users.models import EpisodeUserState, Device, DeviceDoesNotExist, \
 from mygpo.decorators import repeat_on_conflict
 from mygpo.couch import bulk_save_retry
 from mygpo.json import json
+from mygpo.users.settings import STORE_UA
 from mygpo.db.couchdb.podcast import podcast_for_url, random_podcasts
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
 
@@ -59,7 +60,7 @@ def get_device(user, uid, user_agent, undelete=True):
     If the device has been deleted and undelete=True, it is undeleted.
     """
 
-    store_ua = user.settings.get('store_user_agent', True)
+    store_ua = user.get_wksetting(STORE_UA)
 
     save = False
 

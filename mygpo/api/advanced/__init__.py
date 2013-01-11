@@ -335,16 +335,25 @@ def update_episodes(user, actions, now, ua_string):
         act = parse_episode_action(action, user, update_urls, now, ua_string)
         grouped_actions[ (podcast_url, episode_url) ].append(act)
 
+
+    auto_flattr_episodes = []
+
     # Prepare the updates for each episode state
     obj_funs = []
 
     for (p_url, e_url), action_list in grouped_actions.iteritems():
         episode_state = episode_state_for_ref_urls(user, p_url, e_url)
 
+        if any(a.action == 'play' for a in actions):
+            auto_flattr_episodes.append(episode_state.episode)
+
         fun = partial(update_episode_actions, action_list=action_list)
         obj_funs.append( (episode_state, fun) )
 
     bulk_save_retry(obj_funs)
+
+    for episode_id in auto_flattr_episodes:
+        auto_flattr_episode.delay(user, episode_id)
 
     return update_urls
 

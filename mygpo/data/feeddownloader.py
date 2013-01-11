@@ -141,6 +141,7 @@ class PodcastUpdater(object):
         changed |= update_i(podcast.tags, 'feed', parsed.tags or podcast.tags.get('feed', []))
         changed |= update_a(podcast, 'common_episode_title', parsed.common_title or podcast.common_episode_title)
         changed |= update_a(podcast, 'new_location', parsed.new_location or podcast.new_location)
+        changed |= update_a(podcast, 'flattr_url', parsed.flattr)
 
 
         if podcast.new_location:
@@ -250,6 +251,7 @@ class PodcastUpdater(object):
                 changed |= update_a(episode, 'filesize', parsed_episode.files[0].filesize)
                 changed |= update_a(episode, 'language', parsed_episode.language or episode.language)
                 changed |= update_a(episode, 'mimetypes', list(set(filter(None, [f.mimetype for f in parsed_episode.files]))))
+                changed |= update_a(episode, 'flattr_url', parsed_episode.flattr)
 
                 urls = list(chain.from_iterable(f.urls for f in parsed_episode.files))
                 changed |= update_a(episode, 'urls', sorted(set(episode.urls + urls), key=len))

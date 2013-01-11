@@ -34,8 +34,10 @@ def podcast_logo_medium(podcast):
 def podcast_status_icon(action):
     if action.action == 'subscribe':
         s = '<img src="/media/subscribe.png" />'
-    else:
+    elif action.action == 'unsubscribe':
         s = '<img src="/media/unsubscribe.png" />'
+    elif action.action == 'flattr':
+        s = '<img src="https://flattr.com/_img/icons/flattr_logo_16.png" />'
 
     return mark_safe(s)
 

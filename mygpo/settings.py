@@ -183,6 +183,16 @@ ADSENSE_SLOT_BOTTOM = ''
 # enabled access to staff-only areas with ?staff=<STAFF_TOKEN>
 STAFF_TOKEN = None
 
+# Flattr settings -- available after you register your app
+FLATTR_KEY = ''
+FLATTR_SECRET = ''
+
+# Flattr thing of the webservice. Will be flattr'd when a user sets the "Auto-Flattr gpodder.net" option
+FLATTR_MYGPO_THING='https://flattr.com/submit/auto?user_id=stefankoegl&url=http://gpodder.net'
+
+# The User-Agent string used for outgoing HTTP requests
+USER_AGENT = 'gpodder.net (+https://github.com/gpodder/mygpo)'
+
 
 
 ### Celery

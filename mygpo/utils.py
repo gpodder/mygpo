@@ -22,6 +22,11 @@ import collections
 from datetime import datetime, timedelta, date
 import time
 import hashlib
+import urlparse
+import urllib
+import urllib2
+
+from django.conf import settings
 
 
 def daterange(from_date, to_date=None, leap=timedelta(days=1)):
@@ -504,3 +509,202 @@ def sorted_chain(links, key, reverse=False):
         # sort links (placeholders) and elements together
         mixed_list = sorted(mixed_list + new_items, key=lambda (k, _v, _e): k,
                 reverse=reverse)
+
+
+def url_add_authentication(url, username, password):
+    """
+    Adds authentication data (username, password) to a given
+    URL in order to construct an authenticated URL.
+
+    >>> url_add_authentication('https://host.com/', '', None)
+    'https://host.com/'
+    >>> url_add_authentication('http://example.org/', None, None)
+    'http://example.org/'
+    >>> url_add_authentication('telnet://host.com/', 'foo', 'bar')
+    'telnet://foo:bar@host.com/'
+    >>> url_add_authentication('ftp://example.org', 'billy', None)
+    'ftp://billy@example.org'
+    >>> url_add_authentication('ftp://example.org', 'billy', '')
+    'ftp://billy:@example.org'
+    >>> url_add_authentication('http://localhost/x', 'aa', 'bc')
+    'http://aa:bc@localhost/x'
+    >>> url_add_authentication('http://blubb.lan/u.html', 'i/o', 'P@ss:')
+    'http://i%2Fo:P@ss:@blubb.lan/u.html'
+    >>> url_add_authentication('http://a:b@x.org/', 'c', 'd')
+    'http://c:d@x.org/'
+    >>> url_add_authentication('http://i%2F:P%40%3A@cx.lan', 'P@x', 'i/')
+    'http://P@x:i%2F@cx.lan'
+    >>> url_add_authentication('http://x.org/', 'a b', 'c d')
+    'http://a%20b:c%20d@x.org/'
+    """
+    if username is None or username == '':
+        return url
+
+    # Relaxations of the strict quoting rules (bug 1521):
+    # 1. Accept '@' in username and password
+    # 2. Acecpt ':' in password only
+    username = urllib.quote(username, safe='@')
+
+    if password is not None:
+        password = urllib.quote(password, safe='@:')
+        auth_string = ':'.join((username, password))
+    else:
+        auth_string = username
+
+    url = url_strip_authentication(url)
+
+    url_parts = list(urlparse.urlsplit(url))
+    # url_parts[1] is the HOST part of the URL
+    url_parts[1] = '@'.join((auth_string, url_parts[1]))
+
+    return urlparse.urlunsplit(url_parts)
+
+
+def urlopen(url, headers=None, data=None):
+    """
+    An URL opener with the User-agent set to gPodder (with version)
+    """
+    username, password = username_password_from_url(url)
+    if username is not None or password is not None:
+        url = url_strip_authentication(url)
+        password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
+        password_mgr.add_password(None, url, username, password)
+        handler = urllib2.HTTPBasicAuthHandler(password_mgr)
+        opener = urllib2.build_opener(handler)
+    else:
+        opener = urllib2.build_opener()
+
+    if headers is None:
+        headers = {}
+    else:
+        headers = dict(headers)
+
+    headers.update({'User-agent': settings.USER_AGENT})
+    request = urllib2.Request(url, data=data, headers=headers)
+    return opener.open(request)
+
+
+
+def username_password_from_url(url):
+    r"""
+    Returns a tuple (username,password) containing authentication
+    data from the specified URL or (None,None) if no authentication
+    data can be found in the URL.
+
+    See Section 3.1 of RFC 1738 (http://www.ietf.org/rfc/rfc1738.txt)
+
+    >>> username_password_from_url('https://@host.com/')
+    ('', None)
+    >>> username_password_from_url('telnet://host.com/')
+    (None, None)
+    >>> username_password_from_url('ftp://foo:@host.com/')
+    ('foo', '')
+    >>> username_password_from_url('http://a:b@host.com/')
+    ('a', 'b')
+    >>> username_password_from_url(1)
+    Traceback (most recent call last):
+      ...
+    ValueError: URL has to be a string or unicode object.
+    >>> username_password_from_url(None)
+    Traceback (most recent call last):
+      ...
+    ValueError: URL has to be a string or unicode object.
+    >>> username_password_from_url('http://a@b:c@host.com/')
+    ('a@b', 'c')
+    >>> username_password_from_url('ftp://a:b:c@host.com/')
+    ('a', 'b:c')
+    >>> username_password_from_url('http://i%2Fo:P%40ss%3A@host.com/')
+    ('i/o', 'P@ss:')
+    >>> username_password_from_url('ftp://%C3%B6sterreich@host.com/')
+    ('\xc3\xb6sterreich', None)
+    >>> username_password_from_url('http://w%20x:y%20z@example.org/')
+    ('w x', 'y z')
+    >>> username_password_from_url('http://example.com/x@y:z@test.com/')
+    (None, None)
+    """
+    if type(url) not in (str, unicode):
+        raise ValueError('URL has to be a string or unicode object.')
+
+    (username, password) = (None, None)
+
+    (scheme, netloc, path, params, query, fragment) = urlparse.urlparse(url)
+
+    if '@' in netloc:
+        (authentication, netloc) = netloc.rsplit('@', 1)
+        if ':' in authentication:
+            (username, password) = authentication.split(':', 1)
+
+            # RFC1738 dictates that we should not allow ['/', '@', ':']
+            # characters in the username and password field (Section 3.1):
+            #
+            # 1. The "/" can't be in there at this point because of the way
+            #    urlparse (which we use above) works.
+            # 2. Due to gPodder bug 1521, we allow "@" in the username and
+            #    password field. We use netloc.rsplit('@', 1), which will
+            #    make sure that we split it at the last '@' in netloc.
+            # 3. The colon must be excluded (RFC2617, Section 2) in the
+            #    username, but is apparently allowed in the password. This
+            #    is handled by the authentication.split(':', 1) above, and
+            #    will cause any extraneous ':'s to be part of the password.
+
+            username = urllib.unquote(username)
+            password = urllib.unquote(password)
+        else:
+            username = urllib.unquote(authentication)
+
+    return (username, password)
+
+
+def url_strip_authentication(url):
+    """
+    Strips authentication data from an URL. Returns the URL with
+    the authentication data removed from it.
+
+    >>> url_strip_authentication('https://host.com/')
+    'https://host.com/'
+    >>> url_strip_authentication('telnet://foo:bar@host.com/')
+    'telnet://host.com/'
+    >>> url_strip_authentication('ftp://billy@example.org')
+    'ftp://example.org'
+    >>> url_strip_authentication('ftp://billy:@example.org')
+    'ftp://example.org'
+    >>> url_strip_authentication('http://aa:bc@localhost/x')
+    'http://localhost/x'
+    >>> url_strip_authentication('http://i%2Fo:P%40ss%3A@blubb.lan/u.html')
+    'http://blubb.lan/u.html'
+    >>> url_strip_authentication('http://c:d@x.org/')
+    'http://x.org/'
+    >>> url_strip_authentication('http://P%40%3A:i%2F@cx.lan')
+    'http://cx.lan'
+    >>> url_strip_authentication('http://x@x.com:s3cret@example.com/')
+    'http://example.com/'
+    """
+    url_parts = list(urlparse.urlsplit(url))
+    # url_parts[1] is the HOST part of the URL
+
+    # Remove existing authentication data
+    if '@' in url_parts[1]:
+        url_parts[1] = url_parts[1].rsplit('@', 1)[1]
+
+    return urlparse.urlunsplit(url_parts)
+
+
+def sanitize_encoding(filename):
+    r"""
+    Generate a sanitized version of a string (i.e.
+    remove invalid characters and encode in the
+    detected native language encoding).
+
+    >>> sanitize_encoding('\x80')
+    ''
+    >>> sanitize_encoding(u'unicode')
+    'unicode'
+    """
+    # The encoding problem goes away in Python 3.. hopefully!
+    if sys.version_info >= (3, 0):
+        return filename
+
+    global encoding
+    if not isinstance(filename, unicode):
+        filename = filename.decode(encoding, 'ignore')
+    return filename.encode(encoding, 'ignore')

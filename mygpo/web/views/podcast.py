@@ -12,8 +12,10 @@ from django.views.decorators.cache import never_cache, cache_control
 
 from mygpo.core.models import PodcastGroup, SubscriptionException
 from mygpo.core.proxy import proxy_object
+from mygpo.core.tasks import flattr_thing
 from mygpo.api.sanitizing import sanitize_url
-from mygpo.users.models import HistoryEntry, DeviceDoesNotExist
+from mygpo.users.settings import PUBLIC_SUB_PODCAST, FLATTR_TOKEN
+from mygpo.users.models import HistoryEntry, DeviceDoesNotExist, SubscriptionAction
 from mygpo.web.forms import SyncForm
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.web.utils import get_podcast_link_target
@@ -21,7 +23,8 @@ from mygpo.log import log
 from mygpo.db.couchdb.episode import episodes_for_podcast
 from mygpo.db.couchdb.podcast import podcast_for_slug, podcast_for_slug_id, \
          podcast_for_oldid, podcast_for_url
-from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
+from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast, \
+         add_subscription_action
 from mygpo.db.couchdb.episode_state import get_podcasts_episode_states, \
          episode_listener_counts
 from mygpo.db.couchdb.directory import tags_for_user, tags_for_podcast
@@ -32,7 +35,7 @@ MAX_TAGS_ON_PAGE=50
 
 @repeat_on_conflict(['state'])
 def update_podcast_settings(state, is_public):
-    state.settings['public_subscription'] = is_public
+    state.settings[PUBLIC_SUB_PODCAST.name] = is_public
     state.save()
 
 
@@ -84,12 +87,14 @@ def show(request, podcast):
 
         history = list(state.actions)
         is_public = state.settings.get('public_subscription', True)
+        can_flattr = request.user.get_wksetting(FLATTR_TOKEN) and podcast.flattr_url
 
     else:
         history = []
         is_public = False
         subscribed_devices = []
         subscribe_targets = []
+        can_flattr = False
 
     def _set_objects(h):
         dev = user.get_device(h.device)
@@ -109,6 +114,7 @@ def show(request, podcast):
         'episode': episode,
         'episodes': episodes,
         'max_listeners': max_listeners,
+        'can_flattr': can_flattr,
     })
 
 
@@ -316,6 +322,31 @@ def set_public(request, podcast, public):
     return HttpResponseRedirect(get_podcast_link_target(podcast))
 
 
+@never_cache
+@login_required
+def flattr_podcast(request, podcast):
+    """ Flattrs a podcast, records an event and redirects to the podcast """
+
+    user = request.user
+    site = RequestSite(request)
+
+    # do flattring via the tasks queue, but wait for the result
+    task = flattr_thing.delay(user, podcast.get_id(), site.domain, 'Podcast')
+    success, msg = task.get()
+
+    if success:
+        action = SubscriptionAction()
+        action.action = 'flattr'
+        state = podcast_state_for_user_podcast(request.user, podcast)
+        add_subscription_action(state, action)
+        messages.success(request, _("Flattr\'d"))
+
+    else:
+        messages.error(request, msg)
+
+    return HttpResponseRedirect(get_podcast_link_target(podcast))
+
+
 # To make all view accessible via either CouchDB-ID or Slugs
 # a decorator queries the podcast and passes the Id on to the
 # regular views
@@ -363,6 +394,7 @@ add_tag_slug_id     = slug_id_decorator(add_tag)
 remove_tag_slug_id  = slug_id_decorator(remove_tag)
 set_public_slug_id  = slug_id_decorator(set_public)
 all_episodes_slug_id= slug_id_decorator(all_episodes)
+flattr_podcast_slug_id=slug_id_decorator(flattr_podcast)
 
 
 show_oldid          = oldid_decorator(show)
@@ -372,3 +404,4 @@ add_tag_oldid       = oldid_decorator(add_tag)
 remove_tag_oldid    = oldid_decorator(remove_tag)
 set_public_oldid    = oldid_decorator(set_public)
 all_episodes_oldid  = oldid_decorator(all_episodes)
+flattr_podcast_oldid= oldid_decorator(flattr_podcast)

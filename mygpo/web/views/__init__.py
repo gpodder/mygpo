@@ -43,6 +43,7 @@ from mygpo.users.models import Suggestions, History, HistoryEntry, \
 from mygpo.web.utils import process_lang_params
 from mygpo.utils import parse_range
 from mygpo.web.views.podcast import slug_id_decorator
+from mygpo.users.settings import FLATTR_AUTO, FLATTR_TOKEN
 from mygpo.db.couchdb.episode import favorite_episodes_for_user
 from mygpo.db.couchdb.podcast import podcast_by_id, random_podcasts
 from mygpo.db.couchdb.user import suggestions_for_user
@@ -111,6 +112,12 @@ def dashboard(request, episode_count=10):
 
     if request.user.published_objects:
         checklist.append('publish')
+
+    if request.user.get_wksetting(FLATTR_TOKEN):
+        checklist.append('flattr')
+
+    if request.user.get_wksetting(FLATTR_AUTO):
+        checklist.append('auto-flattr')
 
     tomorrow = datetime.today() + timedelta(days=1)
 

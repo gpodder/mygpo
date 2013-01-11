@@ -18,6 +18,7 @@ from mygpo.core.proxy import DocumentABCMeta, proxy_object
 from mygpo.decorators import repeat_on_conflict
 from mygpo.users.ratings import RatingMixin
 from mygpo.users.sync import SyncedDevicesMixin
+from mygpo.users.settings import FAV_FLAG, PUBLIC_SUB_PODCAST, SettingsMixin
 from mygpo.db.couchdb.podcast import podcasts_by_id, podcasts_to_dict
 from mygpo.db.couchdb.user import user_history, device_history
 
@@ -155,14 +156,13 @@ class Chapter(Document):
                 self.start, self.end)
 
 
-class EpisodeUserState(Document):
+class EpisodeUserState(Document, SettingsMixin):
     """
     Contains everything a user has done with an Episode
     """
 
     episode       = StringProperty(required=True)
     actions       = SchemaListProperty(EpisodeAction)
-    settings      = DictProperty()
     user_oldid    = IntegerProperty()
     user          = StringProperty(required=True)
     ref_url       = StringProperty(required=True)
@@ -181,11 +181,11 @@ class EpisodeUserState(Document):
 
 
     def is_favorite(self):
-        return self.settings.get('is_favorite', False)
+        return self.get_wksetting(FAV_FLAG)
 
 
     def set_favorite(self, set_to=True):
-        self.settings['is_favorite'] = set_to
+        self.settings[FAV_FLAG.name] = set_to
 
 
     def update_chapters(self, add=[], rem=[]):
@@ -253,7 +253,7 @@ class SubscriptionAction(Document):
             self.action, self.device, self.timestamp)
 
 
-class PodcastUserState(Document):
+class PodcastUserState(Document, SettingsMixin):
     """
     Contains everything that a user has done
     with a specific podcast and all its episodes
@@ -262,7 +262,6 @@ class PodcastUserState(Document):
     podcast       = StringProperty(required=True)
     user_oldid    = IntegerProperty()
     user          = StringProperty(required=True)
-    settings      = DictProperty()
     actions       = SchemaListProperty(SubscriptionAction)
     tags          = StringListProperty()
     ref_url       = StringProperty(required=True)
@@ -352,7 +351,7 @@ class PodcastUserState(Document):
 
 
     def is_public(self):
-        return self.settings.get('public_subscription', True)
+        return self.get_wksetting(PUBLIC_SUB_PODCAST)
 
 
     def __eq__(self, other):
@@ -367,13 +366,12 @@ class PodcastUserState(Document):
             (self.podcast, self.user, self._id)
 
 
-class Device(Document):
+class Device(Document, SettingsMixin):
     id       = StringProperty(default=lambda: uuid.uuid4().hex)
     oldid    = IntegerProperty(required=False)
     uid      = StringProperty(required=True)
     name     = StringProperty(required=True, default='New Device')
     type     = StringProperty(required=True, default='other')
-    settings = DictProperty()
     deleted  = BooleanProperty(default=False)
     user_agent = StringProperty()
 
@@ -470,9 +468,8 @@ class TokenException(Exception):
     pass
 
 
-class User(BaseUser, SyncedDevicesMixin):
+class User(BaseUser, SyncedDevicesMixin, SettingsMixin):
     oldid    = IntegerProperty()
-    settings = DictProperty()
     devices  = SchemaListProperty(Device)
     published_objects = StringListProperty()
     deleted  = BooleanProperty(default=False)

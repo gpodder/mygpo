@@ -12,7 +12,7 @@ function(doc)
             {
                 subscribed_devices.push(action.device);
             }
-            else
+            else if(action.action == "unsubscribe")
             {
                 var index = subscribed_devices.indexOf(action.device);
                 subscribed_devices.splice(index, 1);
