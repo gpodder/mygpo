@@ -24,9 +24,11 @@ from mygpo.web.utils import process_lang_params, get_language_names, \
          get_page_list, get_podcast_link_target
 from mygpo.directory.tags import Topics
 from mygpo.users.models import User
+from mygpo.users.settings import FLATTR_TOKEN
 from mygpo.data.feeddownloader import PodcastUpdater, NoEpisodesException
 from mygpo.db.couchdb.podcast import get_podcast_languages, podcasts_by_id, \
-         random_podcasts, podcasts_to_dict, podcast_for_url
+         random_podcasts, podcasts_to_dict, podcast_for_url, \
+         get_flattr_podcasts, get_flattr_podcast_count
 from mygpo.db.couchdb.directory import category_for_tag
 from mygpo.db.couchdb.podcastlist import random_podcastlists, \
          podcastlist_count, podcastlists_by_rating
@@ -301,3 +303,36 @@ class AddPodcast(View):
 
             add_page = '%s?q=%s' % (reverse('missing-podcast'), url)
             return HttpResponseRedirect(add_page)
+
+
+
+class FlattrPodcastList(View):
+    """ Lists podcasts that have Flattr payment URLs """
+
+    @method_decorator(cache_control(private=True))
+    @method_decorator(vary_on_cookie)
+    def get(self, request, page_size=20):
+
+        # Make sure page request is an int. If not, deliver first page.
+        try:
+            page = int(request.GET.get('page', '1'))
+        except ValueError:
+            page = 1
+
+        podcasts = get_flattr_podcasts( (page-1) * page_size, page_size)
+        podcast_count = get_flattr_podcast_count()
+        num_pages = podcast_count / page_size
+        page_list = get_page_list(1, num_pages, page, 15)
+
+        max_subscribers = max([p.subscriber_count() for p in podcasts] + [0])
+
+        user = request.user
+        flattr_auth = user.is_authenticated() and bool(user.get_wksetting(FLATTR_TOKEN))
+
+        return render(request, 'flattr-podcasts.html', {
+            'podcasts': podcasts,
+            'page_list': page_list,
+            'current_page': page,
+            'flattr_auth': flattr_auth,
+            'max_subscribers': max_subscribers,
+            })

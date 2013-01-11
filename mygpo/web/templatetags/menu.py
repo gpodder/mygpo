@@ -33,6 +33,7 @@ MENU_STRUCTURE = (
             ('/search/', _('Search')),
             ('/missing/', _('Missing Podcast')),
             ('/lists/', _('Podcast Lists')),
+            ('/directory/+flattr', _('Flattr')),
             ('/user/subscriptions/', _('User subscriptions')),
             ('/suggestions/', _('Suggestions')),
             ('', _('Toplists')),

@@ -373,6 +373,28 @@ def podcasts_need_update():
             yield podcast
 
 
+@cache_result(timeout=60*60)
+def get_flattr_podcasts(offset=0, limit=20):
+    """ returns all podcasts that contain Flattr payment URLs """
+
+    r = Podcast.view('podcasts/flattr',
+            skip         = offset,
+            limit        = limit,
+            classes      = [Podcast, PodcastGroup],
+            include_docs = True,
+            reduce       = False,
+        )
+
+    return list(r)
+
+
+@cache_result(timeout=60*60)
+def get_flattr_podcast_count():
+    """ returns the number of podcasts that contain Flattr payment URLs """
+    r = list(Podcast.view('podcasts/flattr'))
+    return r[0]['value']
+
+
 def subscriberdata_for_podcast(podcast_id):
 
     if not podcast_id:
