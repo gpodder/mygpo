@@ -18,7 +18,7 @@ from mygpo.users.settings import PUBLIC_SUB_PODCAST, FLATTR_TOKEN
 from mygpo.users.models import HistoryEntry, DeviceDoesNotExist, SubscriptionAction
 from mygpo.web.forms import SyncForm
 from mygpo.decorators import allowed_methods, repeat_on_conflict
-from mygpo.web.utils import get_podcast_link_target
+from mygpo.web.utils import get_podcast_link_target, get_page_list
 from mygpo.log import log
 from mygpo.db.couchdb.episode import episodes_for_podcast
 from mygpo.db.couchdb.podcast import podcast_for_slug, podcast_for_slug_id, \
@@ -140,7 +140,7 @@ def get_tags(podcast, user):
     return tag_list
 
 
-def episode_list(podcast, user, limit=None):
+def episode_list(podcast, user, offset=0, limit=None):
     """
     Returns a list of episodes, with their action-attribute set to the latest
     action. The attribute is unsert if there is no episode-action for
@@ -148,7 +148,7 @@ def episode_list(podcast, user, limit=None):
     """
 
     listeners = dict(episode_listener_counts(podcast))
-    episodes = episodes_for_podcast(podcast, descending=True, limit=limit)
+    episodes = episodes_for_podcast(podcast, descending=True, skip=offset, limit=limit)
 
     if user.is_authenticated():
 
@@ -171,9 +171,18 @@ def episode_list(podcast, user, limit=None):
 
 
 
-def all_episodes(request, podcast):
+def all_episodes(request, podcast, page_size=20):
 
-    episodes = episode_list(podcast, request.user)
+    # Make sure page request is an int. If not, deliver first page.
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+
+    episodes = episode_list(podcast, request.user, (page-1) * page_size,
+            page_size)
+    num_pages = podcast.episode_count / page_size
+    page_list = get_page_list(1, num_pages, page, 15)
 
     max_listeners = max([e.listeners for e in episodes] + [0])
 
@@ -181,6 +190,8 @@ def all_episodes(request, podcast):
         'podcast': podcast,
         'episodes': episodes,
         'max_listeners': max_listeners,
+        'page_list': page_list,
+        'current_page': page,
     })
 
 

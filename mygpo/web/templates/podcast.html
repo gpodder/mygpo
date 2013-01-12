@@ -123,14 +123,16 @@
      </tr>
     {% endfor %}
 
+    {% if not podcast.episode_count or podcast.episode_count > 20 %}
     <tr>
      <td></td>
      <td>
-      <a href="{% podcast_link_target podcast "podcast-all-episodes" %}">{% trans "All Episodes" %}</a>
+      <a href="{% podcast_link_target podcast "podcast-all-episodes" %}?page=2">{% trans "All Episodes" %}</a>
      </td>
      <td></td>
      <td></td>
     </tr>
+    {% endif %}
 
    </table>
   {% endif %}
