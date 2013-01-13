@@ -149,10 +149,6 @@ def get_podcast_link_target(podcast, view_name='podcast', add_args=[]):
         args = [podcast.slug]
         view_name = '%s-slug-id' % view_name
 
-    # to keep URLs short, we use use oldids
-    elif podcast.oldid:
-        args = [podcast.oldid]
-
     # as a fallback we use CouchDB-IDs
     else:
         args = [podcast.get_id()]
