@@ -479,6 +479,10 @@ class PodcastGroup(Document, SlugMixin, OldIdMixin):
     def logo_url(self):
         return utils.first(p.logo_url for p in self.podcasts)
 
+    @logo_url.setter
+    def logo_url(self, value):
+        self.podcasts[0].logo_url = value
+
 
     def get_logo_url(self, size):
         if self.logo_url:
