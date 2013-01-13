@@ -44,9 +44,11 @@ from mygpo.utils import parse_time, format_time, parse_bool, get_timestamp
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.core import models
 from mygpo.core.models import SanitizingRule, Podcast
+from mygpo.core.tasks import auto_flattr_episode
 from mygpo.users.models import PodcastUserState, EpisodeAction, \
      EpisodeUserState, DeviceDoesNotExist, DeviceUIDException, \
      InvalidEpisodeActionAttributes
+from mygpo.users.settings import FLATTR_AUTO
 from mygpo.json import json, JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.db.couchdb.episode import episode_by_id, \
@@ -344,7 +346,7 @@ def update_episodes(user, actions, now, ua_string):
     for (p_url, e_url), action_list in grouped_actions.iteritems():
         episode_state = episode_state_for_ref_urls(user, p_url, e_url)
 
-        if any(a.action == 'play' for a in actions):
+        if any(a['action'] == 'play' for a in actions):
             auto_flattr_episodes.append(episode_state.episode)
 
         fun = partial(update_episode_actions, action_list=action_list)
@@ -352,8 +354,9 @@ def update_episodes(user, actions, now, ua_string):
 
     bulk_save_retry(obj_funs)
 
-    for episode_id in auto_flattr_episodes:
-        auto_flattr_episode.delay(user, episode_id)
+    if user.get_wksetting(FLATTR_AUTO):
+        for episode_id in auto_flattr_episodes:
+            auto_flattr_episode.delay(user, episode_id)
 
     return update_urls
 
