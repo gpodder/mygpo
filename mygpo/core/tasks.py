@@ -45,6 +45,7 @@ def flattr_thing(user, thing_id, domain, thing_type):
     return success, msg
 
 
+@celery.task(max_retries=5, default_retry_delay=60)
 def auto_flattr_episode(user, episode_id):
     """ Task to auto-flattr an episode
 
