@@ -1,5 +1,6 @@
 from itertools import islice, chain, imap as map
 from optparse import make_option
+import random
 
 from django.core.management.base import BaseCommand
 
@@ -37,7 +38,9 @@ class PodcastCommand(BaseCommand):
             yield (p.url for p in self.get_toplist())
 
         if options.get('new'):
-            yield (p.url for p in podcasts_need_update())
+            podcasts = list(podcasts_need_update())
+            random.shuffle(podcasts)
+            yield (p.url for p in podcasts)
 
         if options.get('random'):
             yield (p.url for p in random_podcasts())
