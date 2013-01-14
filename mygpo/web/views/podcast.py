@@ -181,7 +181,8 @@ def all_episodes(request, podcast, page_size=20):
 
     episodes = episode_list(podcast, request.user, (page-1) * page_size,
             page_size)
-    num_pages = podcast.episode_count / page_size
+    episodes_total = podcast.episode_count or 0
+    num_pages = episodes_total / page_size
     page_list = get_page_list(1, num_pages, page, 15)
 
     max_listeners = max([e.listeners for e in episodes] + [0])
