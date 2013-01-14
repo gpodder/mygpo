@@ -1,3 +1,5 @@
+from __future__ import division
+
 from itertools import imap as map
 from math import ceil
 
@@ -120,7 +122,7 @@ def category(request, category, page_size=20):
 
     entries = category.get_podcasts( (page-1) * page_size, page*page_size )
     podcasts = filter(None, entries)
-    num_pages = len(category.podcasts) / page_size
+    num_pages = ceil(len(category.podcasts) / page_size)
 
     page_list = get_page_list(1, num_pages, page, 15)
 
@@ -147,7 +149,7 @@ def search(request, template='search.html', args={}):
             page = 1
 
         results, total = search_podcasts(q=q, skip=RESULTS_PER_PAGE*(page-1))
-        num_pages = total / RESULTS_PER_PAGE
+        num_pages = ceil(total / RESULTS_PER_PAGE)
 
         page_list = get_page_list(1, num_pages, page, 15)
 
@@ -321,7 +323,7 @@ class FlattrPodcastList(View):
 
         podcasts = get_flattr_podcasts( (page-1) * page_size, page_size)
         podcast_count = get_flattr_podcast_count()
-        num_pages = podcast_count / page_size
+        num_pages = ceil(podcast_count / page_size)
         page_list = get_page_list(1, num_pages, page, 15)
 
         max_subscribers = max([p.subscriber_count() for p in podcasts] + [0])
