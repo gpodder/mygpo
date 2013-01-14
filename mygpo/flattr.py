@@ -41,7 +41,7 @@ class Flattr(object):
 
 
     def _get_callback(self):
-        return 'http://' + self.domain + reverse('flattr-token')
+        return 'https://' + self.domain + reverse('flattr-token')
 
 
     def request(self, url, data=None):
