@@ -110,4 +110,5 @@ def update_category(podcast):
         category.podcasts.remove(podcast.get_id())
 
     category.podcasts.insert(0, podcast.get_id())
+    category.label = category.label.strip()
     category.save()
