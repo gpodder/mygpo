@@ -158,8 +158,10 @@
       {% for device in devices %}
        <tr>
         <td>
-         {{ device|device_icon }}
-         <a href="{% url "device" device.uid %}">{{ device.name|striptags }}</a>
+         {% if device %}
+          {{ device|device_icon }}
+          <a href="{% url "device" device.uid %}">{{ device.name|striptags }}</a>
+         {% endif %}
         </td>
         <td style="text-align: center;">
          <form class="form-inline" method="post" action="{% podcast_link_target podcast "unsubscribe" device.uid %}?return_to={% podcast_link_target podcast %}">
