@@ -74,6 +74,7 @@
       </td>
       <td>
        <form method="post" action="{% url "device-delete-permanently" d.uid %}">
+        {% csrf_token %}
         <button class="btn btn-danger btn-small" type="submit">
          <i class="icon-trash"></i> {% trans "Delete Permanently" %}
         </button>
