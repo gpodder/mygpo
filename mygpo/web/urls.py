@@ -145,8 +145,15 @@ urlpatterns += patterns('mygpo.web.views.device',
  url(r'^device/(?P<uid>[\w.-]+)/upload-opml$',                  'upload_opml',                name='device-upload-opml'),
 )
 
+
+from mygpo.web.views.users import LoginView
+
 urlpatterns += patterns('mygpo.web.views.users',
- url(r'^login/$',                                                 'login_user',                 name='login'),
+
+ url(r'^login/$',
+    LoginView.as_view(),
+    name='login'),
+
  url(r'^logout/$',                                                 logout, {'next_page': '/'},  name='logout'),
  url(r'^register/resend-activation$',                             'resend_activation',          name='resend-activation'),
  url(r'^register/restore_password$',                              'restore_password',           name='restore-password'),

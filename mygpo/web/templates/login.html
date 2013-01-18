@@ -19,6 +19,8 @@
     <fieldset>
      {% csrf_token %}
 
+     <input type="hidden" name="next" value="{{ next }}" />
+
      <div class="control-group">
       <label class="control-label">Username</label>
       <div class="controls">
