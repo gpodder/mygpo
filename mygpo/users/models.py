@@ -486,6 +486,10 @@ class User(BaseUser, SyncedDevicesMixin, SettingsMixin):
     twitter = StringProperty()
     about   = StringProperty()
 
+    # the URL of the DB in which the user's documents are stored
+    # the user object is still stored in the main mygpo database
+    db_url  = StringProperty()
+
     # token for accessing subscriptions of this use
     subscriptions_token    = StringProperty(default=None)
 
