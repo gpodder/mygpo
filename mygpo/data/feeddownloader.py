@@ -38,7 +38,7 @@ from mygpo.db.couchdb.episode import episode_for_podcast_id_url, \
 from mygpo.db.couchdb.podcast import podcast_for_url
 from mygpo.directory.tags import update_category
 from mygpo.decorators import repeat_on_conflict
-from mygpo.couch import get_main_database
+from mygpo.db.couchdb import get_main_database
 
 import socket
 socket.setdefaulttimeout(300)

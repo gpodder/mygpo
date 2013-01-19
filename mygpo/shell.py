@@ -13,7 +13,7 @@ from mygpo.users.models import *
 from mygpo.directory.models import *
 from mygpo.share.models import *
 
-from mygpo.couch import get_main_database
+from mygpo.db.couchdb import get_main_database
 
 db = get_main_database()
 

@@ -1,7 +1,7 @@
 from mygpo.cache import cache_result
 from mygpo.counter import Counter
 from mygpo.decorators import repeat_on_conflict
-from mygpo.couch import get_main_database
+from mygpo.db.couchdb import get_main_database
 from mygpo.users.settings import FLATTR_TOKEN, FLATTR_AUTO, FLATTR_MYGPO, \
          FLATTR_USERNAME
 from mygpo.db import QueryParameterMissing

@@ -19,7 +19,7 @@ import operator
 import string
 import functools
 
-from mygpo.couch import get_main_database
+from mygpo.db.couchdb import get_main_database
 
 
 
