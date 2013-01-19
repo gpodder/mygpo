@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand
 from mygpo.users.models import Suggestions, User
 from mygpo.utils import progress
 from mygpo.decorators import repeat_on_conflict
-from mygpo.db.couchdb.user import suggestions_for_user
+from mygpo.db.couchdb.user import suggestions_for_user, update_suggestions
 
 try:
     from collections import Counter
@@ -57,9 +57,8 @@ class Command(BaseCommand):
             counter = Counter(related)
             get_podcast_id = itemgetter(0)
             suggested = map(get_podcast_id, counter.most_common(max_suggestions))
-            suggestion.podcasts = suggested
 
-            suggestion.save()
+            update_suggestions(user, suggestion, suggested)
 
             _update_user(user=user)
 

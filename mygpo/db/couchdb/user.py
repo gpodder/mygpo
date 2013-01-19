@@ -1,7 +1,7 @@
 from mygpo.cache import cache_result
 from mygpo.counter import Counter
 from mygpo.decorators import repeat_on_conflict
-from mygpo.db.couchdb import get_main_database
+from mygpo.db.couchdb import get_main_database, get_user_database
 from mygpo.users.settings import FLATTR_TOKEN, FLATTR_AUTO, FLATTR_MYGPO, \
          FLATTR_USERNAME
 from mygpo.db import QueryParameterMissing
@@ -119,11 +119,12 @@ def suggestions_for_user(user):
     if not user:
         raise QueryParameterMissing('user')
 
-    # TODO: use user-db
+    db = get_user_database(user)
     from mygpo.users.models import Suggestions
-    r = Suggestions.view('suggestions/by_user',
+    r = db.view('suggestions/by_user',
                 key          = user._id,
                 include_docs = True,
+                schema = Suggestions
             )
 
     if r:
@@ -133,6 +134,13 @@ def suggestions_for_user(user):
         s = Suggestions()
         s.user = user._id
         return s
+
+
+def update_suggestions(user, suggestions_obj, suggested_ids):
+    """ Updates the suggested podcasts for the given suggestions object """
+    db = get_user_database(user)
+    suggestions_obj.podcasts = suggested_ids
+    db.save_doc(suggestions_obj, batch='ok')
 
 
 @cache_result(timeout=60*60)
