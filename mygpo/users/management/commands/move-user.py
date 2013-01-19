@@ -22,6 +22,9 @@ try:
 except ImportError:
     from mygpo.counter import Counter
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 class Command(BaseCommand):
     """ Moves a user into its own database """
@@ -43,25 +46,34 @@ class Command(BaseCommand):
             db_url = args[1]
         else:
             base_db = settings.COUCHDB_DATABASES[0][1]
-            db_url = '{base}_users%2F{username}'.format(base=base_db, username=user.username)
+            db_url = '{base}_users%2F{username}'.format(base=base_db,
+                    username=user.username)
 
-        print('Migrating user', user, 'to', db_url)
+        logger.info('Migrating user %s to %s', user.username, db_url)
 
         db = Database(db_url, create=True)
 
+        logger.info('Setting up design docs in %s', db_url)
         self.setup_ddocs(db)
 
+        logger.info('Moving podcast states to %s', db_url)
         podcast_states = podcast_states_for_user(user)
         for state in podcast_states:
             self.resave_doc(db, state)
 
+        logger.info('Moving episode states to %s', db_url)
         episode_states = episode_states_for_user(user)
         for state in episode_states:
             self.resave_doc(db, state)
 
+        logger.info('Moving suggestions to %s', db_url)
         suggestions = suggestions_for_user(user)
         if suggestions:
             self.resave_doc(db, suggestions)
+
+        logger.info('Updating user %s with db-url %s', user.username, db_url)
+        user.db_url = db_url
+        user.save()
 
 
     def resave_doc(self, db, obj):
