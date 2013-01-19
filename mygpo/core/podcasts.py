@@ -1,13 +1,9 @@
 from itertools import chain, islice
 
-try:
-    import gevent
-except ImportError:
-    gevent = None
-
 from mygpo.core.models import Podcast
 from mygpo.core.proxy import proxy_object
 from mygpo.db.couchdb.episode import episodes_for_podcast
+from mygpo.utils import sorted_chain
 
 
 class PodcastSet(set):
@@ -30,23 +26,17 @@ class PodcastSet(set):
 
         podcast_dict = dict((p.get_id(), p) for p in podcasts)
 
-        if gevent:
-            jobs = [gevent.spawn(episodes_for_podcast, podcast, since=1,
-                    until=max_date, descending=True,
-                    limit=max_per_podcast) for podcast in podcasts]
+        links = [(p.latest_episode_timestamp, lazy_call(episodes_for_podcast,
+                    p, since=1, until=max_date, descending=True,
+                    limit=max_per_podcast) ) for p in podcasts]
 
-            gevent.joinall(jobs)
-
-            episodes = chain.from_iterable(job.get() for job in jobs)
-
-        else:
-            episodes = chain.from_iterable(episodes_for_podcast(podcast,
-                    since=1, until=max_date, descending=True,
-                    limit=max_per_podcast) for podcast in podcasts)
-
-
-        episodes = sorted(episodes, key=lambda e: e.released, reverse=True)
+        episodes = sorted_chain(links, lambda e: e.released, reverse=True)
 
         for episode in islice(episodes, num_episodes):
             p = podcast_dict.get(episode.podcast, None)
             yield proxy_object(episode, podcast=p)
+
+
+def lazy_call(f, *args, **kwargs):
+    for x in f(*args, **kwargs):
+        yield x

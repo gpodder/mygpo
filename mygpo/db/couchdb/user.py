@@ -1,6 +1,9 @@
 from mygpo.cache import cache_result
 from mygpo.counter import Counter
+from mygpo.decorators import repeat_on_conflict
 from mygpo.couch import get_main_database
+from mygpo.users.settings import FLATTR_TOKEN, FLATTR_AUTO, FLATTR_MYGPO, \
+         FLATTR_USERNAME
 from mygpo.db import QueryParameterMissing
 from mygpo.db.couchdb.episode import episodes_by_id
 
@@ -200,6 +203,26 @@ def device_history(user, device, start, length):
         )
 
     return map(_wrap_historyentry, res)
+
+
+@repeat_on_conflict(['user'])
+def update_flattr_settings(user, token, enabled=None, flattr_mygpo=False,
+        username=None):
+    """ Updates the Flattr settings of a user """
+
+    if enabled is not None:
+        user.settings[FLATTR_AUTO.name] = enabled
+
+    if token is not None:
+        user.settings[FLATTR_TOKEN.name] = token
+
+    if flattr_mygpo is not None:
+        user.settings[FLATTR_MYGPO.name] = flattr_mygpo
+
+    if username is not None:
+        user.settings[FLATTR_USERNAME.name] = username
+
+    user.save()
 
 
 def _wrap_historyentry(action):

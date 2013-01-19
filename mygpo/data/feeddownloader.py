@@ -41,7 +41,7 @@ from mygpo.decorators import repeat_on_conflict
 from mygpo.couch import get_main_database
 
 import socket
-socket.setdefaulttimeout(30)
+socket.setdefaulttimeout(300)
 
 
 class NoPodcastCreated(Exception):
@@ -70,6 +70,7 @@ class PodcastUpdater(object):
 
             except NoPodcastCreated as npc:
                 print 'no podcast created:', npc
+
             print
 
 
@@ -80,13 +81,15 @@ class PodcastUpdater(object):
             parsed = self._fetch_feed(podcast_url)
             self._validate_parsed(parsed)
 
-        except (ParserException, FetchFeedException) as ex:
+        except (ParserException, FetchFeedException, NoEpisodesException) as ex:
+
             # if we fail to parse the URL, we don't even create the
             # podcast object
             p = podcast_for_url(podcast_url, create=False)
             if p:
                 # if it exists already, we mark it as outdated
                 self._mark_outdated(p)
+                return
 
             else:
                 raise NoPodcastCreated(ex)
@@ -114,7 +117,7 @@ class PodcastUpdater(object):
         feedparser parses pretty much everything. We reject anything that
         doesn't look like a feed"""
 
-        if not parsed.episodes:
+        if not parsed or not parsed.episodes:
             raise NoEpisodesException('no episodes found')
 
 
@@ -138,6 +141,7 @@ class PodcastUpdater(object):
         changed |= update_i(podcast.tags, 'feed', parsed.tags or podcast.tags.get('feed', []))
         changed |= update_a(podcast, 'common_episode_title', parsed.common_title or podcast.common_episode_title)
         changed |= update_a(podcast, 'new_location', parsed.new_location or podcast.new_location)
+        changed |= update_a(podcast, 'flattr_url', parsed.flattr)
 
 
         if podcast.new_location:
@@ -247,6 +251,7 @@ class PodcastUpdater(object):
                 changed |= update_a(episode, 'filesize', parsed_episode.files[0].filesize)
                 changed |= update_a(episode, 'language', parsed_episode.language or episode.language)
                 changed |= update_a(episode, 'mimetypes', list(set(filter(None, [f.mimetype for f in parsed_episode.files]))))
+                changed |= update_a(episode, 'flattr_url', parsed_episode.flattr)
 
                 urls = list(chain.from_iterable(f.urls for f in parsed_episode.files))
                 changed |= update_a(episode, 'urls', sorted(set(episode.urls + urls), key=len))
@@ -308,10 +313,8 @@ class PodcastUpdater(object):
 
             return  cover_art
 
-        except urllib2.HTTPError as e:
-            print e
-
-        except urllib2.URLError as e:
+        except (urllib2.HTTPError, urllib2.URLError, ValueError,
+                httplib.BadStatusLine) as e:
             print e
 
 

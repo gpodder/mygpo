@@ -55,6 +55,7 @@ class Episode(Document, SlugMixin, OldIdMixin):
     podcast = StringProperty(required=True)
     listeners = IntegerProperty()
     content_types = StringListProperty()
+    flattr_url = StringProperty()
 
 
 
@@ -159,6 +160,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
     latest_episode_timestamp = DateTimeProperty()
     episode_count = IntegerProperty()
     random_key = FloatProperty(default=random)
+    flattr_url = StringProperty()
 
 
 
@@ -236,15 +238,6 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         return common_title
 
 
-    @cache_result(timeout=60*60)
-    def get_latest_episode(self):
-        # since = 1 ==> has a timestamp
-
-        from mygpo.db.couchdb.episode import episodes_for_podcast
-        episodes = episodes_for_podcast(self, since=1, descending=True, limit=1)
-        return next(iter(episodes), None)
-
-
     def get_episode_before(self, episode):
         if not episode.released:
             return None
@@ -261,7 +254,9 @@ class Podcast(Document, SlugMixin, OldIdMixin):
             return None
 
         from mygpo.db.couchdb.episode import episodes_for_podcast
-        nexts = episodes_for_podcast(self, since=episode.released, limit=1)
+        from datetime import timedelta
+        nexts = episodes_for_podcast(self,
+                since=episode.released + timedelta(seconds=1), limit=1)
 
         return next(iter(nexts), None)
 
@@ -483,6 +478,10 @@ class PodcastGroup(Document, SlugMixin, OldIdMixin):
     @property
     def logo_url(self):
         return utils.first(p.logo_url for p in self.podcasts)
+
+    @logo_url.setter
+    def logo_url(self, value):
+        self.podcasts[0].logo_url = value
 
 
     def get_logo_url(self, size):

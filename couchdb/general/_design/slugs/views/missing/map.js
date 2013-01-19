@@ -27,6 +27,10 @@ function(doc)
         {
             return;
         }
+        if(episode.outdated == true)
+        {
+            return;
+        }
         if(!episode.title)
         {
             return;

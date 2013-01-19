@@ -175,8 +175,8 @@ def update_published_podcasts(request, username):
         raise Http404
 
     published_podcasts = podcasts_by_id(user.published_objects)
-    updater = PodcastUpdater(podcast.url for podcast in published_podcasts)
-    updater.update()
+    updater = PodcastUpdater()
+    updater.update_queue(podcast.url for podcast in published_podcasts)
 
     return HttpResponse('Updated:\n' + '\n'.join([p.url for p in published_podcasts]), mimetype='text/plain')
 

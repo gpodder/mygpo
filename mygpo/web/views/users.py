@@ -26,6 +26,10 @@ from django.contrib.sites.models import RequestSite
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import never_cache
+from django.views.generic.base import View
+from django.utils.decorators import method_decorator
+from django.core.urlresolvers import reverse
+from django.utils.http import is_safe_url
 
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.web.forms import RestorePasswordForm
@@ -40,54 +44,77 @@ def login(request, user):
     login(request, user)
 
 
-@never_cache
-def login_user(request):
-    # Do not show login page for already-logged-in users
-    if request.user.is_authenticated():
-        return HttpResponseRedirect(DEFAULT_LOGIN_REDIRECT)
+class LoginView(View):
+    """ View to login a user """
 
-    if 'user' not in request.POST or 'pwd' not in request.POST:
+    def get(self, request):
+        """ Shows the login page """
+
+        # Do not show login page for already-logged-in users
+        if request.user.is_authenticated():
+            return HttpResponseRedirect(DEFAULT_LOGIN_REDIRECT)
 
         return render(request, 'login.html', {
             'url': RequestSite(request),
             'next': request.GET.get('next', ''),
         })
 
-    username = request.POST['user']
-    password = request.POST['pwd']
-    user = authenticate(username=username, password=password)
 
-    if user is None:
+    @method_decorator(never_cache)
+    def post(self, request):
+        """ Carries out the login, redirects to get if it fails """
 
-        messages.error(request, _('Wrong username or password.'))
+        # redirect target on successful login
+        next_page = request.POST.get('next', '')
 
-        return render(request, 'login.html', {
-            'next': request.POST.get('next', ''),
-        })
+        # redirect target on failed login
+        login_page = '{page}?next={next_page}'.format(page=reverse('login'),
+                next_page=next_page)
 
-    if not user.is_active:
 
-        if user.deleted:
+        username = request.POST.get('user', None)
+        if not username:
+            messages.error(request, _('Username missing'))
+            return HttpResponseRedirect(login_page)
 
-            messages.error(request, _('You have deleted your account, '
-                    'but you can register again'))
+        password = request.POST.get('pwd', None)
+        if not password:
+            messages.error(request, _('Password missing'))
+            return HttpResponseRedirect(login_page)
 
-            return render(request, 'login.html')
+        # find the user from the configured login systems, and verify pwd
+        user = authenticate(username=username, password=password)
 
-        else:
+        if not user:
+            messages.error(request, _('Wrong username or password.'))
+            return HttpResponseRedirect(login_page)
 
-            messages.error(request, _('Please activate your account first.'))
 
-            return render(request, 'login.html', {
-                'activation_needed': True,
-            })
+        if not user.is_active:
+            # if the user is not active, find the reason
+            if user.deleted:
+                messages.error(request, _('You have deleted your account, '
+                        'but you can register again'))
+                return HttpResponseRedirect(login_page)
 
-    login(request=request, user=user)
+            else:
+                messages.error(request,
+                        _('Please activate your account first.'))
+                return HttpResponseRedirect(login_page)
 
-    if 'next' in request.POST and request.POST['next'] and request.POST['next'] != '/login/':
-        return HttpResponseRedirect(request.POST['next'])
+        # set up the user's session
+        login(request, user)
 
-    return HttpResponseRedirect(DEFAULT_LOGIN_REDIRECT)
+        if next_page:
+            if is_safe_url(next_page):
+                return HttpResponseRedirect(next_page)
+
+            else:
+                # TODO: log a warning that next_page is not
+                # considered a safe redirect target
+                pass
+
+        return HttpResponseRedirect(DEFAULT_LOGIN_REDIRECT)
 
 
 def get_user(username, email, is_active=None):
@@ -126,7 +153,7 @@ def restore_password(request):
     subject = _('Reset password for your account on %s') % site
     message = _('Here is your new password for your account %(username)s on %(site)s: %(password)s') % {'username': user.username, 'site': site, 'password': pwd}
     user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
-    _set_password(user=user, password=pwd)
+    _set_password(user, pwd)
     return render(request, 'password_reset.html')
 
 

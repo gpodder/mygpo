@@ -24,6 +24,7 @@ from mygpo.users.models import EpisodeUserState, Device, DeviceDoesNotExist, \
 from mygpo.decorators import repeat_on_conflict
 from mygpo.couch import bulk_save_retry
 from mygpo.json import json
+from mygpo.users.settings import STORE_UA
 from mygpo.db.couchdb.podcast import podcast_for_url, random_podcasts
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
 
@@ -51,6 +52,7 @@ def get_random_picks(languages=None):
 
 
 
+@repeat_on_conflict(['user'])
 def get_device(user, uid, user_agent, undelete=True):
     """
     Loads or creates the device indicated by user, uid.
@@ -58,38 +60,33 @@ def get_device(user, uid, user_agent, undelete=True):
     If the device has been deleted and undelete=True, it is undeleted.
     """
 
-    store_ua = user.settings.get('store_user_agent', True)
+    store_ua = user.get_wksetting(STORE_UA)
 
-    @repeat_on_conflict(['user'])
-    def _get(user, uid, undelete):
+    save = False
 
-        save = False
+    try:
+        device = user.get_device_by_uid(uid, only_active=False)
 
-        try:
-            device = user.get_device_by_uid(uid, only_active=False)
+    except DeviceDoesNotExist:
+        device = Device(uid=uid)
+        user.devices.append(device)
+        save = True
 
-        except DeviceDoesNotExist:
-            device = Device(uid=uid)
-            user.devices.append(device)
-            save = True
+    if device.deleted and undelete:
+        device.deleted = False
+        user.set_device(device)
+        save = True
 
-        if device.deleted and undelete:
-            device.deleted = False
-            user.set_device(device)
-            save = True
+    if store_ua and user_agent and \
+            getattr(device, 'user_agent', None) != user_agent:
+        device.user_agent = user_agent
+        user.set_device(device)
+        save = True
 
-        if store_ua and user_agent and \
-                getattr(device, 'user_agent', None) != user_agent:
-            device.user_agent = user_agent
-            user.set_device(device)
-            save = True
+    if save:
+        user.save()
 
-        if save:
-            user.save()
-
-        return device
-
-    return _get(user=user, uid=uid, undelete=undelete)
+    return device
 
 
 class BulkSubscribe(object):

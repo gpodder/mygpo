@@ -10,6 +10,7 @@ from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url
 from mygpo.db.couchdb.episode import episode_for_podcast_id_url
 from mygpo.couch import get_main_database
 from mygpo.cache import cache_result
+from mygpo.decorators import repeat_on_conflict
 
 
 
@@ -266,32 +267,28 @@ def get_episode_actions(user_id, since=None, until={}, podcast_id=None,
     if not user_id:
         raise QueryParameterMissing('user_id')
 
-
-    since_str = since.strftime('%Y-%m-%dT%H:%M:%S') if since else None
-    until_str = until.strftime('%Y-%m-%dT%H:%M:%S') if until else {}
-
-    if since_str >= until_str:
+    if since >= until:
         return []
 
     if not podcast_id and not device_id:
         view = 'episode_actions/by_user'
-        startkey = [user_id, since_str]
-        endkey   = [user_id, until_str]
+        startkey = [user_id, since]
+        endkey   = [user_id, until]
 
     elif podcast_id and not device_id:
         view = 'episode_actions/by_podcast'
-        startkey = [user_id, podcast_id, since_str]
-        endkey   = [user_id, podcast_id, until_str]
+        startkey = [user_id, podcast_id, since]
+        endkey   = [user_id, podcast_id, until]
 
     elif device_id and not podcast_id:
         view = 'episode_actions/by_device'
-        startkey = [user_id, device_id, since_str]
-        endkey   = [user_id, device_id, until_str]
+        startkey = [user_id, device_id, since]
+        endkey   = [user_id, device_id, until]
 
     else:
         view = 'episode_actions/by_podcast_device'
-        startkey = [user_id, podcast_id, device_id, since_str]
-        endkey   = [user_id, podcast_id, device_id, until_str]
+        startkey = [user_id, podcast_id, device_id, since]
+        endkey   = [user_id, podcast_id, device_id, until]
 
     db = get_main_database()
     res = db.view(view,
@@ -370,3 +367,8 @@ def get_heatmap(podcast_id, episode_id, user_id):
         res = r.first()['value']
         return res['heatmap'], res['borders']
 
+
+@repeat_on_conflict(['state'])
+def add_episode_actions(state, actions):
+    state.add_actions(actions)
+    state.save()

@@ -296,7 +296,8 @@ def podcasts_by_last_update():
 
 
 def all_podcasts():
-    res = utils.multi_request_view(cls, 'podcasts/by_id',
+    from mygpo.db.couchdb.utils import multi_request_view
+    res = multi_request_view(Podcast,'podcasts/by_id',
             wrap         = False,
             include_docs = True,
             stale        = 'update_after',
@@ -372,6 +373,28 @@ def podcasts_need_update():
             yield podcast
 
 
+@cache_result(timeout=60*60)
+def get_flattr_podcasts(offset=0, limit=20):
+    """ returns all podcasts that contain Flattr payment URLs """
+
+    r = Podcast.view('podcasts/flattr',
+            skip         = offset,
+            limit        = limit,
+            classes      = [Podcast, PodcastGroup],
+            include_docs = True,
+            reduce       = False,
+        )
+
+    return list(r)
+
+
+@cache_result(timeout=60*60)
+def get_flattr_podcast_count():
+    """ returns the number of podcasts that contain Flattr payment URLs """
+    r = list(Podcast.view('podcasts/flattr'))
+    return r[0]['value']
+
+
 def subscriberdata_for_podcast(podcast_id):
 
     if not podcast_id:
@@ -439,6 +462,7 @@ def search(q, offset=0, num_results=20):
                 wrapper      = search_wrapper,
                 include_docs = True,
                 limit        = num_results,
+                stale        = 'update_after',
                 skip         = offset,
                 q            = q,
                 sort='\\subscribers<int>')

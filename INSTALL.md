@@ -223,6 +223,3 @@ directory with
 If you want to run a production server, check out
 
    https://docs.djangoproject.com/en/dev/howto/deployment/
-
-
-

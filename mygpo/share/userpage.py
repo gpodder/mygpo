@@ -9,6 +9,7 @@ from django.contrib.sites.models import RequestSite
 
 from mygpo.users.models import User
 from mygpo.users.models import HistoryEntry
+from mygpo.users.settings import FLATTR_USERNAME
 from mygpo.decorators import requires_token
 from mygpo.web.utils import fetch_episode_data
 from mygpo.users.subscriptions import PodcastPercentageListenedSorter
@@ -44,6 +45,7 @@ class UserpageView(GeventView):
 
         context = {
             'page_user': user,
+            'flattr_username': user.get_wksetting(FLATTR_USERNAME),
             'site': site.domain,
             'subscriptions_token': user.get_token('subscriptions_token'),
             'favorite_feeds_token': user.get_token('favorite_feeds_token'),

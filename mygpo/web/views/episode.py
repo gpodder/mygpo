@@ -32,15 +32,18 @@ from django.utils.translation import ugettext as _
 from mygpo.api.constants import EPISODE_ACTION_TYPES
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core.proxy import proxy_object
+from mygpo.core.tasks import flattr_thing
 from mygpo.users.models import Chapter, HistoryEntry, EpisodeAction
-from mygpo.utils import parse_time
+from mygpo.utils import parse_time, get_timestamp
+from mygpo.users.settings import FLATTR_TOKEN
 from mygpo.web.heatmap import EpisodeHeatmap
 from mygpo.web.utils import get_episode_link_target, fetch_episode_data
 from mygpo.db.couchdb.episode import episode_for_slug_id, episode_for_oldid, \
          favorite_episodes_for_user, chapters_for_episode
 from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url, \
          podcasts_to_dict
-from mygpo.db.couchdb.episode_state import episode_state_for_user_episode
+from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
+         add_episode_actions
 from mygpo.db.couchdb.user import get_latest_episodes
 from mygpo.userfeeds.feeds import FavoriteFeed
 
@@ -72,12 +75,14 @@ def episode(request, episode):
                 episode._id, request.user._id, duration=episode.duration)
 
         devices = dict( (d.id, d.name) for d in request.user.devices )
+        can_flattr = request.user.get_wksetting(FLATTR_TOKEN) and episode.flattr_url
 
     else:
         history = []
         is_fav = False
         played_parts = None
         devices = {}
+        can_flattr = False
 
 
     chapters = []
@@ -101,6 +106,7 @@ def episode(request, episode):
         'played_parts': played_parts,
         'actions': EPISODE_ACTION_TYPES,
         'devices': devices,
+        'can_flattr': can_flattr,
     })
 
 
@@ -223,21 +229,42 @@ def add_action(request, episode):
 
     action = EpisodeAction()
     action.timestamp = timestamp
+    action.upload_timestamp = get_timestamp(datetime.utcnow())
     action.device = device.id if device else None
     action.action = action_str
 
     state = episode_state_for_user_episode(request.user, episode)
-
-    @repeat_on_conflict(['state'])
-    def _add_action(state, action):
-        state.add_actions([action])
-        state.save()
-
-    _add_action(state, action)
+    add_episode_actions(state, [action])
 
     podcast = podcast_by_id(episode.podcast)
-
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
+
+
+@never_cache
+@login_required
+def flattr_episode(request, episode):
+    """ Flattrs an episode, records an event and redirects to the episode """
+
+    user = request.user
+    site = RequestSite(request)
+
+    # Flattr via the tasks queue, but wait for the result
+    task = flattr_thing.delay(user, episode._id, site.domain, 'Episode')
+    success, msg = task.get()
+
+    if success:
+        action = EpisodeAction()
+        action.action = 'flattr'
+        state = episode_state_for_user_episode(request.user, episode)
+        add_episode_actions(state, [action])
+        messages.success(request, _("Flattr\'d"))
+
+    else:
+        messages.error(request, msg)
+
+    podcast = podcast_by_id(episode.podcast)
+    return HttpResponseRedirect(get_episode_link_target(episode, podcast))
+
 
 # To make all view accessible via either CouchDB-ID for Slugs
 # a decorator queries the episode and passes the Id on to the
@@ -281,9 +308,11 @@ add_chapter_slug_id     = slug_id_decorator(add_chapter)
 remove_chapter_slug_id  = slug_id_decorator(remove_chapter)
 toggle_favorite_slug_id = slug_id_decorator(toggle_favorite)
 add_action_slug_id      = slug_id_decorator(add_action)
+flattr_episode_slug_id  = slug_id_decorator(flattr_episode)
 
 show_oldid            = oldid_decorator(episode)
 add_chapter_oldid     = oldid_decorator(add_chapter)
 remove_chapter_oldid  = oldid_decorator(remove_chapter)
 toggle_favorite_oldid = oldid_decorator(toggle_favorite)
 add_action_oldid      = oldid_decorator(add_action)
+flattr_episode_oldid  = oldid_decorator(flattr_episode)

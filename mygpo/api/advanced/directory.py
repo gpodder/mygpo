@@ -37,7 +37,7 @@ from mygpo.db.couchdb.directory import category_for_tag
 @cache_page(60 * 60 * 24)
 def top_tags(request, count):
     count = parse_range(count, 1, 100, 100)
-    tag_cloud = Topics(count, num_cat=0)
+    tag_cloud = Topics(count, num_cat=count)
     resp = map(category_data, tag_cloud.tagcloud)
     return JsonResponse(resp)
 
@@ -78,6 +78,11 @@ def podcast_info(request):
 def episode_info(request):
     podcast_url = sanitize_url(request.GET.get('podcast', ''))
     episode_url = sanitize_url(request.GET.get('url', ''), 'episode')
+
+    # 404 before we query for url, because query would complain
+    # about missing parameters
+    if not podcast_url or not episode_url:
+        raise Http404
 
     episode = episode_for_podcast_url(podcast_url, episode_url)
 

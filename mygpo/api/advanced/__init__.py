@@ -44,9 +44,11 @@ from mygpo.utils import parse_time, format_time, parse_bool, get_timestamp
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.core import models
 from mygpo.core.models import SanitizingRule, Podcast
+from mygpo.core.tasks import auto_flattr_episode
 from mygpo.users.models import PodcastUserState, EpisodeAction, \
      EpisodeUserState, DeviceDoesNotExist, DeviceUIDException, \
      InvalidEpisodeActionAttributes
+from mygpo.users.settings import FLATTR_AUTO
 from mygpo.json import json, JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.db.couchdb.episode import episode_by_id, \
@@ -180,8 +182,9 @@ def episodes(request, username, version=1):
         try:
             actions = json.loads(request.raw_post_data)
         except (JSONDecodeError, UnicodeDecodeError) as e:
-            log('Advanced API: could not decode episode update POST data for user %s: %s' % (username, e))
-            return HttpResponseBadRequest()
+            msg = 'Advanced API: could not decode episode update POST data for user %s: %s' % (username, e)
+            log(msg)
+            return HttpResponseBadRequest(msg)
 
         try:
             update_urls = update_episodes(request.user, actions, now, ua_string)
@@ -203,7 +206,7 @@ def episodes(request, username, version=1):
         aggregated = parse_bool(request.GET.get('aggregated', False))
 
         try:
-            since = datetime.fromtimestamp(float(since_)) if since_ else None
+            since = int(since_) if since_ else None
         except ValueError:
             return HttpResponseBadRequest('since-value is not a valid timestamp')
 
@@ -225,7 +228,7 @@ def episodes(request, username, version=1):
             device = None
 
         changes = get_episode_changes(request.user, podcast, device, since,
-                now, aggregated, version)
+                now_, aggregated, version)
 
         return JsonResponse(changes)
 
@@ -265,9 +268,7 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
     if aggregated:
         actions = dict( (a['episode'], a) for a in actions ).values()
 
-    until_ = get_timestamp(until)
-
-    return {'actions': actions, 'timestamp': until_}
+    return {'actions': actions, 'timestamp': until}
 
 
 
@@ -336,16 +337,26 @@ def update_episodes(user, actions, now, ua_string):
         act = parse_episode_action(action, user, update_urls, now, ua_string)
         grouped_actions[ (podcast_url, episode_url) ].append(act)
 
+
+    auto_flattr_episodes = []
+
     # Prepare the updates for each episode state
     obj_funs = []
 
     for (p_url, e_url), action_list in grouped_actions.iteritems():
         episode_state = episode_state_for_ref_urls(user, p_url, e_url)
 
+        if any(a['action'] == 'play' for a in actions):
+            auto_flattr_episodes.append(episode_state.episode)
+
         fun = partial(update_episode_actions, action_list=action_list)
         obj_funs.append( (episode_state, fun) )
 
     bulk_save_retry(obj_funs)
+
+    if user.get_wksetting(FLATTR_AUTO):
+        for episode_id in auto_flattr_episodes:
+            auto_flattr_episode.delay(user, episode_id)
 
     return update_urls
 
@@ -381,6 +392,8 @@ def parse_episode_action(action, user, update_urls, now, ua_string):
     else:
         new_action.timestamp = now
     new_action.timestamp = new_action.timestamp.replace(microsecond=0)
+
+    new_action.upload_timestamp = get_timestamp(now)
 
     new_action.started = action.get('started', None)
     new_action.playmark = action.get('position', None)

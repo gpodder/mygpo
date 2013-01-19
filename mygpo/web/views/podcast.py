@@ -12,16 +12,19 @@ from django.views.decorators.cache import never_cache, cache_control
 
 from mygpo.core.models import PodcastGroup, SubscriptionException
 from mygpo.core.proxy import proxy_object
+from mygpo.core.tasks import flattr_thing
 from mygpo.api.sanitizing import sanitize_url
-from mygpo.users.models import HistoryEntry, DeviceDoesNotExist
+from mygpo.users.settings import PUBLIC_SUB_PODCAST, FLATTR_TOKEN
+from mygpo.users.models import HistoryEntry, DeviceDoesNotExist, SubscriptionAction
 from mygpo.web.forms import SyncForm
 from mygpo.decorators import allowed_methods, repeat_on_conflict
-from mygpo.web.utils import get_podcast_link_target
+from mygpo.web.utils import get_podcast_link_target, get_page_list
 from mygpo.log import log
 from mygpo.db.couchdb.episode import episodes_for_podcast
 from mygpo.db.couchdb.podcast import podcast_for_slug, podcast_for_slug_id, \
          podcast_for_oldid, podcast_for_url
-from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
+from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast, \
+         add_subscription_action
 from mygpo.db.couchdb.episode_state import get_podcasts_episode_states, \
          episode_listener_counts
 from mygpo.db.couchdb.directory import tags_for_user, tags_for_podcast
@@ -32,7 +35,7 @@ MAX_TAGS_ON_PAGE=50
 
 @repeat_on_conflict(['state'])
 def update_podcast_settings(state, is_public):
-    state.settings['public_subscription'] = is_public
+    state.settings[PUBLIC_SUB_PODCAST.name] = is_public
     state.save()
 
 
@@ -53,8 +56,11 @@ def show_slug(request, slug):
 @cache_control(private=True)
 @allowed_methods(['GET'])
 def show(request, podcast):
+    """ Shows a podcast detail page """
 
+    current_site = RequestSite(request)
     episodes = episode_list(podcast, request.user, limit=20)
+    user = request.user
 
     max_listeners = max([e.listeners for e in episodes] + [0])
 
@@ -70,47 +76,46 @@ def show(request, podcast):
     else:
         rel_podcasts = []
 
-    tags = get_tags(podcast, request.user)
+    tags = get_tags(podcast, user)
 
-    if request.user.is_authenticated():
-        state = podcast_state_for_user_podcast(request.user, podcast)
+    if user.is_authenticated():
+        state = podcast_state_for_user_podcast(user, podcast)
         subscribed_devices = state.get_subscribed_device_ids()
-        subscribed_devices = [request.user.get_device(x) for x in subscribed_devices]
+        subscribed_devices = [user.get_device(x) for x in subscribed_devices]
 
-        subscribe_targets = podcast.subscribe_targets(request.user)
+        subscribe_targets = podcast.subscribe_targets(user)
 
         history = list(state.actions)
-        def _set_objects(h):
-            dev = request.user.get_device(h.device)
-            return proxy_object(h, device=dev)
-        history = map(_set_objects, history)
-
         is_public = state.settings.get('public_subscription', True)
+        can_flattr = request.user.get_wksetting(FLATTR_TOKEN) and podcast.flattr_url
 
-        return render(request, 'podcast.html', {
-            'tags': tags,
-            'history': history,
-            'podcast': podcast,
-            'is_public': is_public,
-            'devices': subscribed_devices,
-            'related_podcasts': rel_podcasts,
-            'can_subscribe': len(subscribe_targets) > 0,
-            'subscribe_targets': subscribe_targets,
-            'episode': episode,
-            'episodes': episodes,
-            'max_listeners': max_listeners,
-        })
     else:
-        current_site = RequestSite(request)
-        return render(request, 'podcast.html', {
-            'podcast': podcast,
-            'related_podcasts': rel_podcasts,
-            'tags': tags,
-            'url': current_site,
-            'episode': episode,
-            'episodes': episodes,
-            'max_listeners': max_listeners,
-        })
+        history = []
+        is_public = False
+        subscribed_devices = []
+        subscribe_targets = []
+        can_flattr = False
+
+    def _set_objects(h):
+        dev = user.get_device(h.device)
+        return proxy_object(h, device=dev)
+    history = map(_set_objects, history)
+
+    return render(request, 'podcast.html', {
+        'tags': tags,
+        'url': current_site,
+        'history': history,
+        'podcast': podcast,
+        'is_public': is_public,
+        'devices': subscribed_devices,
+        'related_podcasts': rel_podcasts,
+        'can_subscribe': len(subscribe_targets) > 0,
+        'subscribe_targets': subscribe_targets,
+        'episode': episode,
+        'episodes': episodes,
+        'max_listeners': max_listeners,
+        'can_flattr': can_flattr,
+    })
 
 
 def get_tags(podcast, user):
@@ -135,7 +140,7 @@ def get_tags(podcast, user):
     return tag_list
 
 
-def episode_list(podcast, user, limit=None):
+def episode_list(podcast, user, offset=0, limit=None):
     """
     Returns a list of episodes, with their action-attribute set to the latest
     action. The attribute is unsert if there is no episode-action for
@@ -143,7 +148,7 @@ def episode_list(podcast, user, limit=None):
     """
 
     listeners = dict(episode_listener_counts(podcast))
-    episodes = episodes_for_podcast(podcast, descending=True, limit=limit)
+    episodes = episodes_for_podcast(podcast, descending=True, skip=offset, limit=limit)
 
     if user.is_authenticated():
 
@@ -166,9 +171,19 @@ def episode_list(podcast, user, limit=None):
 
 
 
-def all_episodes(request, podcast):
+def all_episodes(request, podcast, page_size=20):
 
-    episodes = episode_list(podcast, request.user)
+    # Make sure page request is an int. If not, deliver first page.
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+
+    episodes = episode_list(podcast, request.user, (page-1) * page_size,
+            page_size)
+    episodes_total = podcast.episode_count or 0
+    num_pages = episodes_total / page_size
+    page_list = get_page_list(1, num_pages, page, 15)
 
     max_listeners = max([e.listeners for e in episodes] + [0])
 
@@ -176,6 +191,8 @@ def all_episodes(request, podcast):
         'podcast': podcast,
         'episodes': episodes,
         'max_listeners': max_listeners,
+        'page_list': page_list,
+        'current_page': page,
     })
 
 
@@ -317,6 +334,31 @@ def set_public(request, podcast, public):
     return HttpResponseRedirect(get_podcast_link_target(podcast))
 
 
+@never_cache
+@login_required
+def flattr_podcast(request, podcast):
+    """ Flattrs a podcast, records an event and redirects to the podcast """
+
+    user = request.user
+    site = RequestSite(request)
+
+    # do flattring via the tasks queue, but wait for the result
+    task = flattr_thing.delay(user, podcast.get_id(), site.domain, 'Podcast')
+    success, msg = task.get()
+
+    if success:
+        action = SubscriptionAction()
+        action.action = 'flattr'
+        state = podcast_state_for_user_podcast(request.user, podcast)
+        add_subscription_action(state, action)
+        messages.success(request, _("Flattr\'d"))
+
+    else:
+        messages.error(request, msg)
+
+    return HttpResponseRedirect(get_podcast_link_target(podcast))
+
+
 # To make all view accessible via either CouchDB-ID or Slugs
 # a decorator queries the podcast and passes the Id on to the
 # regular views
@@ -364,6 +406,7 @@ add_tag_slug_id     = slug_id_decorator(add_tag)
 remove_tag_slug_id  = slug_id_decorator(remove_tag)
 set_public_slug_id  = slug_id_decorator(set_public)
 all_episodes_slug_id= slug_id_decorator(all_episodes)
+flattr_podcast_slug_id=slug_id_decorator(flattr_podcast)
 
 
 show_oldid          = oldid_decorator(show)
@@ -373,3 +416,4 @@ add_tag_oldid       = oldid_decorator(add_tag)
 remove_tag_oldid    = oldid_decorator(remove_tag)
 set_public_oldid    = oldid_decorator(set_public)
 all_episodes_oldid  = oldid_decorator(all_episodes)
+flattr_podcast_oldid= oldid_decorator(flattr_podcast)

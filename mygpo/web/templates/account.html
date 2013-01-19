@@ -22,6 +22,9 @@
    <li>
     <a href="#profile" data-toggle="tab">Public Profile</a>
    </li>
+   <li>
+    <a href="#flattr" data-toggle="tab">Flattr</a>
+   </li>
   </ul>
 
 
@@ -121,6 +124,82 @@
    </form>
 
   </div>
+
+
+  <div class="tab-pane" id="flattr">
+
+   <form action="{% url "flattr-settings" %}" method="POST" class="form-horizontal">
+    {% csrf_token %}
+    <legend>
+     {% trans "Flattr" %}
+     <small><a href="https://flattr.com/about">{% trans "What's that?" %}</a></small>
+    </legend>
+
+    <fieldset>
+
+     <div class="control-group">
+      <label class="control-label" for="token">{% trans "Authenticated" %}</label>
+      <div class="controls">
+       {% if flattr_form.token.value %}
+        {% blocktrans with flattr.get_auth_username as flattrname %}Logged in as <a href="https://flattr.com/profile/{{ flattrname }}">{{ flattrname }}</a>{% endblocktrans %}
+        <a class="btn" href="{% url "flattr-logout" %}">{% trans "Logout" %}</a>
+       {% else %}
+        <a class="btn" href="{{ flattr.get_auth_url }}">{% trans "Login" %}</a>
+       {% endif %}
+      </div>
+     </div>
+
+     <div class="control-group">
+      <label class="control-label" for="about">{{ flattr_form.enable.label_tag }}
+      </label>
+      <div class="controls">
+       {{ flattr_form.enable }}
+      </div>
+     </div>
+
+     <div class="control-group">
+      <label class="control-label" for="about">{% blocktrans with site as sitename %}Auto-Flattr {{ sitename }}{% endblocktrans %}
+      </label>
+      <div class="controls">
+       {{ flattr_form.flattr_mygpo }}
+      </div>
+     </div>
+
+     <div class="control-group">
+      <label class="control-label" for="username">{% blocktrans with site as sitename %}Username for publishing own content{% endblocktrans %}
+      </label>
+      <div class="controls">
+       {{ flattr_form.username }}
+      </div>
+     </div>
+
+
+
+     <div class="control-group">
+      <div class="controls">
+       <button class="btn btn-primary" type="submit">{% trans "Save" %}</button>
+      </div>
+     </div>
+
+   </fieldset>
+   </form>
+
+  </div>
+
  </div>
+
+{% endblock %}
+
+
+{% block javascript %}
+
+ <script lang="text/javascript">
+  $(document).ready(function() {
+    var url = document.location.toString();
+    if (url.match('#')) {
+        $('.nav-tabs a[href=#'+url.split('#')[1]+']').tab('show') ;
+    }
+  });
+ </script>
 
 {% endblock %}

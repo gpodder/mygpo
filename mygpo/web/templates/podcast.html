@@ -123,14 +123,16 @@
      </tr>
     {% endfor %}
 
+    {% if not podcast.episode_count or podcast.episode_count > 20 %}
     <tr>
      <td></td>
      <td>
-      <a href="{% podcast_link_target podcast "podcast-all-episodes" %}">{% trans "All Episodes" %}</a>
+      <a href="{% podcast_link_target podcast "podcast-all-episodes" %}?page=2">{% trans "All Episodes" %}</a>
      </td>
      <td></td>
      <td></td>
     </tr>
+    {% endif %}
 
    </table>
   {% endif %}
@@ -156,8 +158,10 @@
       {% for device in devices %}
        <tr>
         <td>
-         {{ device|device_icon }}
-         <a href="{% url "device" device.uid %}">{{ device.name|striptags }}</a>
+         {% if device %}
+          {{ device|device_icon }}
+          <a href="{% url "device" device.uid %}">{{ device.name|striptags }}</a>
+         {% endif %}
         </td>
         <td style="text-align: center;">
          <form class="form-inline" method="post" action="{% podcast_link_target podcast "unsubscribe" device.uid %}?return_to={% podcast_link_target podcast %}">
@@ -226,6 +230,12 @@
 
    {% google_plus_one_button %}
    {{ podcast|fb_like_podcast }}
+   {% if can_flattr %}
+    <a href="{% podcast_link_target podcast "podcast-flattr" %}">
+     <img src="https://api.flattr.com/button/flattr-badge-large.png"
+      alt="Flattr {{ podcast.title|default:"Unnamed Podcast"|striptags }}" />
+    </a>
+   {% endif %}
 
  </div>
 
@@ -239,7 +249,9 @@
       <td><abbr title="{{ s.timestamp }}">{{ s.timestamp|naturalday }}</abbr></td>
       <td>{{ s|podcast_status_icon }}</td>
       <td>
-       <a href="{% url "device" s.device.uid %}">{{ s.device|device_icon }} {{ s.device.name|striptags }}</a>
+       {% if s.device %}
+        <a href="{% url "device" s.device.uid %}">{{ s.device|device_icon }} {{ s.device.name|striptags }}</a>
+       {% endif %}
       </td>
      </tr>
     {% endfor %}

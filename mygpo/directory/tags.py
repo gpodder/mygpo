@@ -88,6 +88,9 @@ class Topics(object):
 def update_category(podcast):
     all_tags = list(chain.from_iterable(s for s in podcast.tags.values()))
 
+    if not all_tags:
+        return
+
     random_tag = choice(all_tags)
 
     category = category_for_tag(random_tag)
@@ -107,4 +110,5 @@ def update_category(podcast):
         category.podcasts.remove(podcast.get_id())
 
     category.podcasts.insert(0, podcast.get_id())
+    category.label = category.label.strip()
     category.save()
