@@ -1,3 +1,6 @@
+from __future__ import print_function
+
+import sys
 import os.path
 
 from django.conf import settings
@@ -26,8 +29,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         if not args:
-            print 'usage!'
-            # TODO: print usage
+            print('Usage: ./manage.py <username> [<database url>]',
+                    file=sys.stderr)
             return
 
         username = args[0]
@@ -42,7 +45,7 @@ class Command(BaseCommand):
             base_db = settings.COUCHDB_DATABASES[0][1]
             db_url = '{base}_users%2F{username}'.format(base=base_db, username=user.username)
 
-        print 'Migrating user', user, 'to', db_url
+        print('Migrating user', user, 'to', db_url)
 
         db = Database(db_url, create=True)
 
