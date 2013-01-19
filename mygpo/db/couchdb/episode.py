@@ -287,6 +287,7 @@ def favorite_episodes_for_user(user):
     if not user:
         raise QueryParameterMissing('user')
 
+    # TODO: use user-db
     favorites = Episode.view('favorites/episodes_by_user',
             key          = user._id,
             include_docs = True,

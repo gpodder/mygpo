@@ -15,7 +15,6 @@ class Command(BaseCommand):
 
         for part in ('general', 'user'):
             path = os.path.join(settings.BASE_DIR, '..', 'couchdb', part, '_design')
-            db = Podcast.get_db()
             db = get_main_database()
             loader = FileSystemDocsLoader(path)
             loader.sync(db, verbose=True)

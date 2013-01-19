@@ -18,6 +18,7 @@ def all_podcast_states(podcast):
         )
 
 
+# TODO: aggregate for all users
 @cache_result(timeout=60*60)
 def subscribed_users(podcast):
 
@@ -37,11 +38,13 @@ def subscribed_users(podcast):
     users = (r['key'][1] for r in res)
 
 
+# TODO: replace user_id with user
 def subscribed_podcast_ids_by_user_id(user_id):
 
     if not user_id:
         raise QueryParameterMissing('user_id')
 
+    # TODO: use user-db
     subscribed = db.view('subscriptions/by_user',
             startkey    = [user_id, True, None, None],
             endkey      = [user_id, True, {}, {}],
@@ -83,7 +86,7 @@ def podcast_state_for_user_podcast(user, podcast):
     if not podcast:
         raise QueryParameterMissing('podcast')
 
-
+    # TODO: use user-db
     r = PodcastUserState.view('podcast_states/by_podcast',
                 key          = [podcast.get_id(), user._id],
                 limit        = 1,
@@ -110,6 +113,7 @@ def podcast_states_for_user(user):
     if not user:
         raise QueryParameterMissing('user')
 
+    # TODO: use user-db
     r = PodcastUserState.view('podcast_states/by_user',
             startkey     = [user._id, None],
             endkey       = [user._id, 'ZZZZ'],
@@ -131,6 +135,7 @@ def podcast_states_for_device(device_id):
     return list(r)
 
 
+# TODO: aggregate for all users
 @cache_result(timeout=60*60)
 def podcast_state_count():
     r = PodcastUserState.view('podcast_states/by_user',
@@ -162,6 +167,7 @@ def subscriptions_by_user(user, public=None):
     if not user:
         raise QueryParameterMissing('user')
 
+    # TODO: use user-db
     r = PodcastUserState.view('subscriptions/by_user',
             startkey = [user._id, public, None, None],
             endkey   = [user._id+'ZZZ', None, None, None],

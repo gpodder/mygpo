@@ -81,6 +81,7 @@ def tags_for_podcast(podcast):
 
     tags = Counter(dict((x['key'][1], x['value']) for x in res))
 
+    # TODO: do that for each user
     res = db.view('usertags/by_podcast',
             startkey    = [podcast.get_id(), None],
             endkey      = [podcast.get_id(), {}],
@@ -101,7 +102,7 @@ def tags_for_user(user, podcast_id=None):
     if not user:
         raise QueryParameterMissing('user')
 
-
+    # TODO: user user-db
     db = get_main_database()
     res = db.view('tags/by_user',
             startkey = [user._id, podcast_id],
@@ -129,6 +130,7 @@ def all_tags():
     for r in res:
         yield r['key'][0]
 
+    # TODO: aggregate user-tags
     res = multi_request_view(db, 'usertags/podcasts',
             wrap        = False,
             reduce      = True,

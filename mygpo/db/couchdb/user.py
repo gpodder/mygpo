@@ -14,6 +14,7 @@ def get_num_listened_episodes(user):
     if not user:
         raise QueryParameterMissing('user')
 
+    # TODO: use user-db
     db = get_main_database()
     r = db.view('listeners/by_user_podcast',
             startkey    = [user._id, None],
@@ -44,6 +45,7 @@ def get_num_played_episodes(user, since=None, until={}):
     startkey = [user._id, since_str]
     endkey   = [user._id, until_str]
 
+    # TODO: use user-db
     db = get_main_database()
     res = db.view('listeners/by_user',
             startkey = startkey,
@@ -67,6 +69,7 @@ def get_latest_episodes(user, count=10):
     startkey = [user._id, {}]
     endkey   = [user._id, None]
 
+    # TODO: use user-db
     db = get_main_database()
     res = db.view('listeners/by_user',
             startkey     = startkey,
@@ -97,6 +100,7 @@ def get_seconds_played(user, since=None, until={}):
     startkey = [user._id, since_str]
     endkey   = [user._id, until_str]
 
+    # TODO: use user-db
     db = get_main_database()
     res = db.view('listeners/times_played_by_user',
             startkey = startkey,
@@ -115,6 +119,7 @@ def suggestions_for_user(user):
     if not user:
         raise QueryParameterMissing('user')
 
+    # TODO: use user-db
     from mygpo.users.models import Suggestions
     r = Suggestions.view('suggestions/by_user',
                 key          = user._id,
@@ -132,6 +137,7 @@ def suggestions_for_user(user):
 
 @cache_result(timeout=60*60)
 def user_agent_stats():
+    # TODO: check
     from mygpo.users.models import User
     res = User.view('clients/by_ua_string',
         wrap_doc    = False,
@@ -143,6 +149,7 @@ def user_agent_stats():
 
 
 def deleted_users():
+    #TODO: check
     from mygpo.users.models import User
     users = User.view('users/deleted',
             include_docs = True,
@@ -152,6 +159,7 @@ def deleted_users():
 
 
 def deleted_user_count():
+    #TODO: check
     total = User.view('users/deleted',
             reduce = True,
         )
@@ -168,6 +176,7 @@ def user_history(user, start, length):
     if length <= 0:
         return []
 
+    #TODO: use user-db
     db = get_main_database()
     res = db.view('history/by_user',
             descending = True,
@@ -192,6 +201,7 @@ def device_history(user, device, start, length):
     if length <= 0:
         return []
 
+    #TODO: use user-db
     db = get_main_database()
 
     res = db.view('history/by_device',
@@ -222,6 +232,7 @@ def update_flattr_settings(user, token, enabled=None, flattr_mygpo=False,
     if username is not None:
         user.settings[FLATTR_USERNAME.name] = username
 
+    # TODO: use user-db
     user.save()
 
 

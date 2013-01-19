@@ -15,6 +15,7 @@ from mygpo.decorators import repeat_on_conflict
 
 
 def episode_states_for_user(user):
+    # TODO: use user-db
     r = EpisodeUserState.view('episode_states/by_user_episode',
             startkey     = [user._id, None],
             endkey       = [user._id, {}],
@@ -39,6 +40,7 @@ def episode_state_for_user_episode(user, episode):
     if state:
         return state
 
+    # TODO: use user-db
     r = EpisodeUserState.view('episode_states/by_user_episode',
             key          = [user._id, episode._id],
             include_docs = True,
@@ -154,6 +156,7 @@ def episode_listener_counts(episode):
 
 
 
+# TODO: replace user_id with user
 def get_podcasts_episode_states(podcast, user_id):
     """ Returns the latest episode actions for the podcast's episodes """
 
@@ -164,6 +167,7 @@ def get_podcasts_episode_states(podcast, user_id):
         raise QueryParameterMissing('user_id')
 
 
+    # TODO: use user-db
     db = get_main_database()
     res = db.view('episode_states/by_user_podcast',
             startkey = [user_id, podcast.get_id(), None],
@@ -182,6 +186,7 @@ def episode_listener_count(episode, start=None, end={}):
         raise QueryParameterMissing('episode')
 
 
+    # TODO: aggregate from all users
     r = EpisodeUserState.view('listeners/by_episode',
             startkey    = [episode._id, start],
             endkey      = [episode._id, end],
@@ -239,6 +244,7 @@ def episode_state_for_ref_urls(user, podcast_url, episode_url):
     if state:
         return state
 
+    # TODO: use user-db
     res = EpisodeUserState.view('episode_states/by_ref_urls',
             key   = [user._id, podcast_url, episode_url],
             limit = 1,
@@ -260,6 +266,7 @@ def episode_state_for_ref_urls(user, podcast_url, episode_url):
 
 
 
+# TODO: replace  user_id with user
 def get_episode_actions(user_id, since=None, until={}, podcast_id=None,
            device_id=None):
     """ Returns Episode Actions for the given criteria"""
@@ -290,6 +297,7 @@ def get_episode_actions(user_id, since=None, until={}, podcast_id=None,
         startkey = [user_id, podcast_id, device_id, since]
         endkey   = [user_id, podcast_id, device_id, until]
 
+    # TODO: use user-db
     db = get_main_database()
     res = db.view(view,
             startkey = startkey,
@@ -302,6 +310,7 @@ def get_episode_actions(user_id, since=None, until={}, podcast_id=None,
 
 @cache_result(timeout=60*60)
 def episode_states_count():
+    # TODO: aggregate for all users
     r = EpisodeUserState.view('episode_states/by_user_episode',
             limit = 0,
             stale = 'update_after',
@@ -310,6 +319,7 @@ def episode_states_count():
 
 
 def get_nth_episode_state(n):
+    # TODO: aggregate for all users; maybe this can even be removed completely
     first = EpisodeUserState.view('episode_states/by_user_episode',
             skip         = n,
             include_docs = True,
@@ -326,6 +336,7 @@ def get_duplicate_episode_states(user, episode):
     if not episode:
         raise QueryParameterMissing('episode')
 
+    # TODO: use user-db
     states = EpisodeUserState.view('episode_states/by_user_episode',
             key          = [user, episode],
             include_docs = True,
@@ -345,8 +356,10 @@ def _wrap_listeners(res):
     return (episode, listeners)
 
 
+#TODO: replace user_id with user
 @cache_result(timeout=60*60)
 def get_heatmap(podcast_id, episode_id, user_id):
+    # TODO: use user-db
     db = get_main_database()
 
     group_level = len(filter(None, [podcast_id, episode_id, user_id]))
