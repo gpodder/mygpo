@@ -7,7 +7,7 @@ from mygpo.core.models import Podcast, Episode, MergedIdException
 from mygpo.cache import cache_result
 from mygpo.db import QueryParameterMissing
 from mygpo.db.couchdb.utils import is_couchdb_id
-from mygpo.couch import get_main_database
+from mygpo.db.couchdb import get_main_database
 from mygpo.db.couchdb.podcast import podcast_for_url, podcast_for_slug_id
 
 

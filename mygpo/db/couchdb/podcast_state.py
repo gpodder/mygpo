@@ -1,6 +1,6 @@
 from mygpo.users.models import PodcastUserState
 from mygpo.users.settings import PUBLIC_SUB_PODCAST, PUBLIC_SUB_USER
-from mygpo.couch import get_main_database
+from mygpo.db.couchdb import get_main_database
 from mygpo.cache import cache_result
 from mygpo.db import QueryParameterMissing
 from mygpo.decorators import repeat_on_conflict

@@ -8,7 +8,7 @@ from mygpo.users.models import EpisodeUserState
 from mygpo.db import QueryParameterMissing
 from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url
 from mygpo.db.couchdb.episode import episode_for_podcast_id_url
-from mygpo.couch import get_main_database
+from mygpo.db.couchdb import get_main_database
 from mygpo.cache import cache_result
 from mygpo.decorators import repeat_on_conflict
 

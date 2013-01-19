@@ -1,6 +1,6 @@
 from mygpo.core.models import SanitizingRule
 from mygpo.cache import cache_result
-from mygpo.couch import get_main_database
+from mygpo.db.couchdb import get_main_database
 from mygpo.db import QueryParameterMissing
 from mygpo.db.couchdb.utils import multi_request_view
 

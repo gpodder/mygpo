@@ -1,8 +1,6 @@
 from operator import itemgetter
 from collections import namedtuple
 
-from django.conf import settings
-
 from couchdbkit import *
 
 class BulkException(Exception):
@@ -74,9 +72,3 @@ def bulk_save_retry(obj_funs, db=None, reload_f=__default_reload):
 
     if errors:
         raise BulkException(errors)
-
-
-
-def get_main_database():
-    db_url = settings.COUCHDB_DATABASES[0][1]
-    return Database(db_url)
