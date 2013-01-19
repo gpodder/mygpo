@@ -70,7 +70,7 @@ class Command(BaseCommand):
 
 
     def setup_ddocs(self, db):
-        path = os.path.join(settings.BASE_DIR, '..', 'couchdb', '_design')
+        path = os.path.join(settings.BASE_DIR, '..', 'couchdb', 'user', '_design',)
         loader = FileSystemDocsLoader(path)
         loader.sync(db, verbose=True)
 
