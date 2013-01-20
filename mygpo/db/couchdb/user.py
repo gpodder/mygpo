@@ -143,6 +143,15 @@ def update_suggestions(user, suggestions_obj, suggested_ids):
     db.save_doc(suggestions_obj, batch='ok')
 
 
+@repeat_on_conflict(['suggestions_obj'])
+def append_to_suggestions_blacklist(user, podcast):
+    db = get_user_database(user)
+    suggestions_obj = suggestions_for_user(user)
+    blacklisted = list(set(suggestions_obj.blacklist + [podcast.get_id()]))
+    suggestions_obj.blacklist = blacklisted
+    db.save_doc(suggestions_obj, batch='ok')
+
+
 @cache_result(timeout=60*60)
 def user_agent_stats():
     # TODO: check
