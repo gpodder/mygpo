@@ -56,7 +56,7 @@ from mygpo.db.couchdb.episode import episode_by_id, \
 from mygpo.db.couchdb.podcast import podcast_for_url
 from mygpo.db.couchdb.podcast_state import subscribed_podcast_ids_by_device
 from mygpo.db.couchdb.episode_state import get_podcasts_episode_states, \
-         episode_state_for_ref_urls, get_episode_actions
+         episode_states_for_ref_urls, get_episode_actions
 
 
 # keys that are allowed in episode actions
@@ -343,14 +343,18 @@ def update_episodes(user, actions, now, ua_string):
     # Prepare the updates for each episode state
     obj_funs = []
 
-    for (p_url, e_url), action_list in grouped_actions.iteritems():
-        episode_state = episode_state_for_ref_urls(user, p_url, e_url)
+    states = episode_states_for_ref_urls(grouped_actions.keys())
+    assert len(states) == len(grouped_actions.keys())
 
-        if any(a['action'] == 'play' for a in actions):
-            auto_flattr_episodes.append(episode_state.episode)
+    for (urls, action_list), state in zip(grouped_actions.items(), states):
+
+        assert urls == (state.ref_url, state.episode_ref_url)
+
+        if any(a['action'] == 'play' for a in action_list):
+            auto_flattr_episodes.append(state.episode)
 
         fun = partial(update_episode_actions, action_list=action_list)
-        obj_funs.append( (episode_state, fun) )
+        obj_funs.append( (state, fun) )
 
     bulk_save_retry(obj_funs)
 
