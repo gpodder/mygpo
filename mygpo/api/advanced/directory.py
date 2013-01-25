@@ -37,7 +37,7 @@ from mygpo.db.couchdb.directory import category_for_tag
 @cache_page(60 * 60 * 24)
 def top_tags(request, count):
     count = parse_range(count, 1, 100, 100)
-    tag_cloud = Topics(count, num_cat=count)
+    tag_cloud = Topics(count, num_cat=0)
     resp = map(category_data, tag_cloud.tagcloud)
     return JsonResponse(resp)
 
