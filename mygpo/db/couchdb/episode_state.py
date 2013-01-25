@@ -210,47 +210,44 @@ def episode_listener_count_timespan(episode, start=None, end={}):
 
 
 
-def episode_states_for_ref_urls(user, ref_urls):
-    """ Returns episode-states for the episodes specified by URLs
-
-    user: the user for which states should be returned
-    ref_urls: a list of (podcast_url, episode_url) tuples, specifying episodes
-    """
+def episode_state_for_ref_urls(user, podcast_url, episode_url):
 
     if not user:
         raise QueryParameterMissing('user')
 
-    if not ref_urls:
-        raise QueryParameterMissing('ref_urls')
+    if not podcast_url:
+        raise QueryParameterMissing('podcast_url')
 
-    # expand ref_urls to include the user-id
-    keys = [ [user._id, p_url, e_url] for (p_url, e_url) in ref_urls ]
+    if not episode_url:
+        raise QueryParameterMissing('episode_url')
+
+
+    cache_key = 'episode-state-%s-%s-%s' % (user._id,
+            sha1(podcast_url).hexdigest(),
+            sha1(episode_url).hexdigest())
+
+    state = cache.get(cache_key)
+    if state:
+        return state
 
     res = EpisodeUserState.view('episode_states/by_ref_urls',
-            keys         = keys,
-            limit        = len(keys),
-            include_docs = True,
+            key   = [user._id, podcast_url, episode_url],
+            limit = 1,
+            include_docs=True,
         )
 
-    states = list(res)
+    if res:
+        state = res.first()
+        state.ref_url = episode_url
+        state.podcast_ref_url = podcast_url
+        cache.set(cache_key, state, 60*60)
+        return state
 
-    for p_url, e_url in ref_urls:
-
-        state = states[0] if states else None
-
-        # response include an episode state
-        if state and (state.ref_url==p_url and state.episode_ref_url==e_url):
-            state = states.pop(0)
-            state.ref_url = episode_url
-            state.podcast_ref_url = podcast_url
-            yield state
-
-        # there is no episode state - create one
-        else:
-            podcast = podcast_for_url(p_url, create=True)
-            episode = episode_for_podcast_id_url(podcast.get_id(), e_url,
-                create=True)
-            yield episode_state_for_user_episode(user, episode)
+    else:
+        podcast = podcast_for_url(podcast_url, create=True)
+        episode = episode_for_podcast_id_url(podcast.get_id(), episode_url,
+            create=True)
+        return episode_state_for_user_episode(user, episode)
 
 
 
