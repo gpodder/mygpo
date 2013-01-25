@@ -1,6 +1,8 @@
+from restkit.errors import Unauthorized
+
 from mygpo.users.models import PodcastUserState
 from mygpo.users.settings import PUBLIC_SUB_PODCAST, PUBLIC_SUB_USER
-from mygpo.db.couchdb import get_main_database
+from mygpo.db.couchdb import get_main_database, get_user_database
 from mygpo.cache import cache_result
 from mygpo.db import QueryParameterMissing
 from mygpo.decorators import repeat_on_conflict
@@ -86,11 +88,12 @@ def podcast_state_for_user_podcast(user, podcast):
     if not podcast:
         raise QueryParameterMissing('podcast')
 
-    # TODO: use user-db
-    r = PodcastUserState.view('podcast_states/by_podcast',
+    db = get_user_database(user)
+    r = db.view('podcast_states/by_podcast',
                 key          = [podcast.get_id(), user._id],
                 limit        = 1,
                 include_docs = True,
+                schema       = PodcastUserState,
             )
 
     if r:
@@ -180,3 +183,51 @@ def subscriptions_by_user(user, public=None):
 def add_subscription_action(state, action):
     state.add_actions([action])
     state.save()
+
+
+@repeat_on_conflict()
+def add_podcast_tags(user, podcast, tags):
+    state = podcast_state_for_user_podcast(user, podcast)
+    state.add_tags(tags)
+    db = get_user_database(user)
+    db.save_doc(state)
+
+
+@repeat_on_conflict()
+def remove_podcast_tag(user, podcast, tag)
+    state = podcast_state_for_user_podcast(user, podcast)
+    tags = list(state.tags)
+    if tag_str in tags:
+        state.tags.remove(tag_str)
+        db = get_user_database(user)
+        db.save_doc(state)
+
+
+@repeat_on_conflict()
+def set_podcast_privacy(user, podcast, is_public):
+    state = podcast_state_for_user_podcast(user, podcast)
+    state.settings[PUBLIC_SUB_PODCAST.name] = is_public
+    db = get_user_database(user)
+    db.save_doc(state)
+
+
+@repeat_on_conflict()
+def subscribe_to_podcast(user, podcast, device):
+    state = podcast_state_for_user_podcast(user, self)
+    state.subscribe(device)
+    try:
+        db = get_user_database(user)
+        db.save_doc(state)
+    except Unauthorized as ex:
+        raise SubscriptionException(ex)
+
+
+@repeat_on_conflict()
+def unsubscribe_from_podcast(user, podcast, device):
+    state = podcast_state_for_user_podcast(user, self)
+    state.unsubscribe(device)
+    try:
+        db = get_user_database(user)
+        db.save_doc(state)
+    except Unauthorized as ex:
+        raise SubscriptionException(ex)
