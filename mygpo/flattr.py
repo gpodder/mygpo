@@ -173,9 +173,12 @@ class Flattr(object):
 
         optional_args = set(thing._fields) - set(['url'])
 
-        args = [('url', self.domain + thing.url)]
+        args = [(u'url', self.domain + thing.url)]
         args += [(arg, getattr(thing, arg, None)) for arg in optional_args]
         args = filter(lambda (k, v): v, args) # filter out empty arguments
+
+        # TODO: check encoding
+        args = [(k, v.encode('utf-8')) for (k, v) in args]
 
         args_str = urllib.urlencode(args)
 
