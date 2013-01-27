@@ -251,6 +251,7 @@ def flattr_episode(request, episode):
     if success:
         action = EpisodeAction()
         action.action = 'flattr'
+        action.upload_timestamp = get_timestamp(datetime.utcnow())
         state = episode_state_for_user_episode(request.user, episode)
         add_episode_actions(user, state, [action])
         messages.success(request, _("Flattr\'d"))
