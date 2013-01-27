@@ -180,9 +180,10 @@ def subscriptions_by_user(user, public=None):
 
 
 @repeat_on_conflict(['state'])
-def add_subscription_action(state, action):
+def add_subscription_action(user, state, action):
     state.add_actions([action])
-    state.save()
+    db = get_user_database(user)
+    db.save_doc(state)
 
 
 @repeat_on_conflict()

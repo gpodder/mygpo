@@ -328,7 +328,7 @@ def flattr_podcast(request, podcast):
         action = SubscriptionAction()
         action.action = 'flattr'
         state = podcast_state_for_user_podcast(request.user, podcast)
-        add_subscription_action(state, action)
+        add_subscription_action(user, state, action)
         messages.success(request, _("Flattr\'d"))
 
     else:
