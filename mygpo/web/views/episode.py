@@ -209,7 +209,8 @@ def list_favorites(request):
 @never_cache
 def add_action(request, episode):
 
-    device = request.user.get_device(request.POST.get('device'))
+    user = request.user
+    device = user.get_device(request.POST.get('device'))
 
     action_str = request.POST.get('action')
     timestamp = request.POST.get('timestamp', '')
@@ -228,8 +229,8 @@ def add_action(request, episode):
     action.device = device.id if device else None
     action.action = action_str
 
-    state = episode_state_for_user_episode(request.user, episode)
-    add_episode_actions(state, [action])
+    state = episode_state_for_user_episode(user, episode)
+    add_episode_actions(user, state, [action])
 
     podcast = podcast_by_id(episode.podcast)
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
@@ -251,7 +252,7 @@ def flattr_episode(request, episode):
         action = EpisodeAction()
         action.action = 'flattr'
         state = episode_state_for_user_episode(request.user, episode)
-        add_episode_actions(state, [action])
+        add_episode_actions(user, state, [action])
         messages.success(request, _("Flattr\'d"))
 
     else:
