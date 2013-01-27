@@ -37,8 +37,8 @@ class AdvancedAPITests(unittest.TestCase):
 
     def setUp(self):
         self.password = 'asdf'
-        self.username = 'user'
-        self.user = User(username=self.username, email='user@example.com')
+        self.username = 'user2'
+        self.user = User(username=self.username, email='user2@example.com')
         self.user.set_password(self.password)
         self.user.save()
         self.user.is_active = True

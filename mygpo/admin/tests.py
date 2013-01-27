@@ -6,11 +6,13 @@ Replace this with more appropriate tests for your application.
 """
 
 import time
+from datetime import datetime
 
 from django.test import TestCase
 
 from mygpo.users.models import User, Device, EpisodeAction
 from mygpo.core.models import Podcast, Episode
+from mygpo.utils import get_timestamp
 from mygpo.counter import Counter
 from mygpo.maintenance.merge import PodcastMerger
 from mygpo.db.couchdb.episode import episode_by_id, episodes_for_podcast
@@ -80,11 +82,13 @@ class SimpleTest(TestCase):
         p2.subscribe(user, device2)
 
         s1 = episode_state_for_user_episode(user, e1)
-        s1.add_actions([EpisodeAction(action='play')])
+        s1.add_actions([EpisodeAction(action='play',
+                    upload_timestamp=get_timestamp(datetime.utcnow()))])
         s1.save()
 
         s3 = episode_state_for_user_episode(user, e3)
-        s3.add_actions([EpisodeAction(action='play')])
+        s3.add_actions([EpisodeAction(action='play',
+                    upload_timestamp=get_timestamp(datetime.utcnow()))])
         s3.save()
 
         # we need that for later

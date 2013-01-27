@@ -197,29 +197,6 @@ class EpisodeUserState(Document, SettingsMixin):
         self.settings[FAV_FLAG.name] = set_to
 
 
-    def update_chapters(self, add=[], rem=[]):
-        """ Updates the Chapter list
-
-         * add contains the chapters to be added
-
-         * rem contains tuples of (start, end) times. Chapters that match
-           both endpoints will be removed
-        """
-
-        @repeat_on_conflict(['state'])
-        def update(state):
-            for chapter in add:
-                self.chapters = self.chapters + [chapter]
-
-            for start, end in rem:
-                keep = lambda c: c.start != start or c.end != end
-                self.chapters = filter(keep, self.chapters)
-
-            self.save()
-
-        update(state=self)
-
-
     def get_history_entries(self):
         return imap(EpisodeAction.to_history_entry, self.actions)
 
@@ -797,24 +774,9 @@ class User(BaseUser, SyncedDevicesMixin, SettingsMixin):
 
 
     def save(self, *args, **kwargs):
-
-        from mygpo.db.couchdb.podcast_state import podcast_states_for_user
-
         super(User, self).save(*args, **kwargs)
-
-        podcast_states = podcast_states_for_user(self)
-        for state in podcast_states:
-            @repeat_on_conflict(['state'])
-            def _update_state(state):
-                old_devs = set(state.disabled_devices)
-                state.set_device_state(self.devices)
-
-                if old_devs != set(state.disabled_devices):
-                    state.save()
-
-            _update_state(state)
-
-
+        from mygpo.db.couchdb.podcast_state import set_disabled_devices
+        set_disabled_devices(self)
 
 
     def __eq__(self, other):

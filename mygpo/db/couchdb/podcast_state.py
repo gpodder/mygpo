@@ -194,7 +194,7 @@ def add_podcast_tags(user, podcast, tags):
 
 
 @repeat_on_conflict()
-def remove_podcast_tag(user, podcast, tag)
+def remove_podcast_tag(user, podcast, tag):
     state = podcast_state_for_user_podcast(user, podcast)
     tags = list(state.tags)
     if tag_str in tags:
@@ -213,7 +213,7 @@ def set_podcast_privacy(user, podcast, is_public):
 
 @repeat_on_conflict()
 def subscribe_to_podcast(user, podcast, device):
-    state = podcast_state_for_user_podcast(user, self)
+    state = podcast_state_for_user_podcast(user, podcast)
     state.subscribe(device)
     try:
         db = get_user_database(user)
@@ -224,10 +224,41 @@ def subscribe_to_podcast(user, podcast, device):
 
 @repeat_on_conflict()
 def unsubscribe_from_podcast(user, podcast, device):
-    state = podcast_state_for_user_podcast(user, self)
+    state = podcast_state_for_user_podcast(user, podcast)
     state.unsubscribe(device)
     try:
         db = get_user_database(user)
         db.save_doc(state)
     except Unauthorized as ex:
         raise SubscriptionException(ex)
+
+
+# TODO: execute this in background -- could take a while
+def remove_device_from_podcast_states(user, device):
+    states = podcast_states_for_device(device.id)
+    for state in states:
+        remove_device_from_podcast_state(user, state, dev)
+
+
+@repeat_on_conflict(['state'])
+def remove_device_from_podcast_state(user, state, dev):
+    state.remove_device(dev)
+    db = get_user_database(user)
+    db.save_doc(state)
+
+
+# TODO: execute this in background -- could take a while
+def set_disabled_devices(user):
+    podcast_states = podcast_states_for_user(user)
+    for state in podcast_states:
+        set_disabled_devices_for_podcast_state(user, state)
+
+
+@repeat_on_conflict(['state'])
+def set_disabled_devices_for_podcast_state(user, state):
+    old_devs = set(state.disabled_devices)
+    state.set_device_state(user.devices)
+
+    if old_devs != set(state.disabled_devices):
+        db = get_user_database(user)
+        db.save_doc(state)

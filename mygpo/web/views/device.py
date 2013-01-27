@@ -36,7 +36,7 @@ from mygpo.api import simple
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.users.models import Device, DeviceUIDException, \
      DeviceDoesNotExist
-from mygpo.db.couchdb.podcast_state import podcast_states_for_device
+from mygpo.db.couchdb.podcast_state import remove_device_from_podcast_states
 
 
 @vary_on_cookie
@@ -281,14 +281,7 @@ def delete(request, device):
 @device_decorator
 def delete_permanently(request, device):
 
-    @repeat_on_conflict(['state'])
-    def remove_device(state, dev):
-        state.remove_device(dev)
-        state.save()
-
-    states = podcast_states_for_device(device.id)
-    for state in states:
-        remove_device(state=state, dev=device)
+    remove_device_from_podcast_states(user, device)
 
     @repeat_on_conflict(['user'])
     def _remove(user, device):

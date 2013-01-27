@@ -40,8 +40,8 @@ from mygpo.flattr import Flattr
 from mygpo.users.settings import PUBLIC_SUB_PODCAST, PUBLIC_SUB_USER, \
          FLATTR_TOKEN, FLATTR_AUTO, FLATTR_MYGPO, FLATTR_USERNAME
 from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_to_dict
-from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast, \
-         subscriptions_by_user
+from mygpo.db.couchdb.podcast_state import  subscriptions_by_user, \
+         set_podcast_privacy
 from mygpo.db.couchdb.user import update_flattr_settings
 
 
@@ -230,16 +230,9 @@ class PodcastPrivacySettings(View):
     @method_decorator(never_cache)
     def post(self, request, podcast_id):
         podcast = podcast_by_id(podcast_id)
-        state = podcast_state_for_user_podcast(request.user, podcast)
-        self.set_privacy_settings(state=state)
+        set_podcast_privacy(request.user, podcast, self.public)
         messages.success(request, 'Success')
         return HttpResponseRedirect(reverse('privacy'))
-
-    @repeat_on_conflict(['state'])
-    def set_privacy_settings(self, state):
-        state.settings[PUBLIC_SUB_PODCAST.name] = self.public
-        state.save()
-
 
 
 @login_required

@@ -8,7 +8,7 @@ from mygpo.users.models import EpisodeUserState
 from mygpo.db import QueryParameterMissing
 from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url
 from mygpo.db.couchdb.episode import episode_for_podcast_id_url
-from mygpo.db.couchdb import get_main_database
+from mygpo.db.couchdb import get_main_database, get_user_database
 from mygpo.cache import cache_result
 from mygpo.decorators import repeat_on_conflict
 
@@ -40,11 +40,12 @@ def episode_state_for_user_episode(user, episode):
     if state:
         return state
 
-    # TODO: use user-db
-    r = EpisodeUserState.view('episode_states/by_user_episode',
+    db = get_user_database(user)
+    r = db.view('episode_states/by_user_episode',
             key          = [user._id, episode._id],
             include_docs = True,
             limit        = 1,
+            schema       = EpisodeUserState,
         )
 
     if r:
@@ -385,3 +386,34 @@ def get_heatmap(podcast_id, episode_id, user_id):
 def add_episode_actions(state, actions):
     state.add_actions(actions)
     state.save()
+
+
+@repeat_on_conflict()
+def toggle_favorite(user, episode):
+    state = episode_state_for_user_episode(user, episode)
+    is_fav = state.is_favorite()
+    state.set_favorite(not is_fav)
+    db = get_user_database(user)
+    db.save_doc(state)
+
+
+
+@repeat_on_conflict(['state'])
+def update_episode_chapters(user, state, add=[], rem=[]):
+    """ Updates the Chapter list
+
+     * add contains the chapters to be added
+
+     * rem contains tuples of (start, end) times. Chapters that match
+       both endpoints will be removed
+    """
+
+    for chapter in add:
+        state.chapters = state.chapters + [chapter]
+
+    for start, end in rem:
+        keep = lambda c: c.start != start or c.end != end
+        state.chapters = filter(keep, state.chapters)
+
+    db = get_user_database(user)
+    db.save_doc(state)

@@ -689,6 +689,9 @@ def url_strip_authentication(url):
     return urlparse.urlunsplit(url_parts)
 
 
+# Native filesystem encoding detection
+encoding = sys.getfilesystemencoding()
+
 def sanitize_encoding(filename):
     r"""
     Generate a sanitized version of a string (i.e.
