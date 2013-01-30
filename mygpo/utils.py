@@ -208,8 +208,8 @@ def progress(val, max_val, status_str='', max_width=50, stream=sys.stdout):
     percentage_str = '{val:.2%}'.format(val=float(val)/max_val)
 
     # progress bar filled with #s
-    progress_str = '#'*int(float(val)/max_val*max_width) + \
-                   ' ' * (max_width-(int(float(val)/max_val*max_width)))
+    factor = min(int(float(val)/max_val*max_width), max_width)
+    progress_str = '#' * factor + ' ' * (max_width-factor)
 
     #insert percentage into bar
     percentage_start = int((max_width-len(percentage_str))/2)
