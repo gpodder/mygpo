@@ -29,7 +29,6 @@ except ImportError:
 
 from django.http import HttpResponse, HttpResponseBadRequest, Http404, HttpResponseNotFound
 from django.contrib.sites.models import RequestSite
-from django.db import IntegrityError
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 
@@ -109,7 +108,7 @@ def subscriptions(request, username, device_uid):
 
         try:
             update_urls = update_subscriptions(request.user, d, add, rem)
-        except IntegrityError, e:
+        except ValueError, e:
             return HttpResponseBadRequest(e)
 
         return JsonResponse({
@@ -122,7 +121,7 @@ def update_subscriptions(user, device, add, remove):
 
     for a in add:
         if a in remove:
-            raise IntegrityError('can not add and remove %s at the same time' % a)
+            raise ValueError('can not add and remove %s at the same time' % a)
 
     add_s = list(sanitize_urls(add, 'podcast'))
     rem_s = list(sanitize_urls(remove, 'podcast'))
