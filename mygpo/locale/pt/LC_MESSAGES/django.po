@@ -414,12 +414,17 @@ msgid ""
 "%(sitename)s for a week</strong>. Additionally it will be the first podcast "
 "in <strong>gPodder's list of example podcasts.</strong>"
 msgstr ""
+"Por apenas 20 €, o seu podcast pode ser exibido na <strong>página inicial do "
+"%(sitename)s, durante uma semana</strong>. Adicionalmente, será o primeiro "
+"podcast na <strong> lista de exemplos do gPodder</strong>"
 
 #: publisher/templates/publisher/advertise.html:20
 msgid ""
 "You can chose when your advertisement will be active, and the text that will "
 "be displayed for your podcast."
 msgstr ""
+"Pode escolher a época em que o anúncio estará ativo e o texto que será "
+"exibid."
 
 #: publisher/templates/publisher/advertise.html:22
 msgid "Front Page"
@@ -431,6 +436,8 @@ msgid ""
 "Your podcast will be displayed on the front page of %(sitename)s for both "
 "logged-in and anonymous users."
 msgstr ""
+"O seu podcast será exibido na página inicial do %(sitename)s para os "
+"utilizadores autenticados ou anónimos."
 
 #: publisher/templates/publisher/advertise.html:25
 #, fuzzy
@@ -443,6 +450,9 @@ msgid ""
 "first time. This list is loaded from the web on demand. For the time of your "
 "advertisement, your podcast will be the first in the list."
 msgstr ""
+"Ao iniciar o gPodder pela primeira vez, a aplicação mostra uma lista de "
+"exemplos de podcasts. Esta lista será carregada a partir da web. Durante o "
+"período do seu anúncio, o seu podcast será o primeiro da lista."
 
 #: publisher/templates/publisher/advertise.html:28
 msgid "Visitors"
@@ -467,6 +477,9 @@ msgid ""
 "would like to advertise on %(sitename)s or if you have any questions. "
 "Payments are done via PayPal to thp@perli.net."
 msgstr ""
+"Contacte <a href=\"mailto:stefan@gpodder.net\">stefan@gpodder.net</a> se "
+"quiser publicitar o seu podcast no %(sitename)s ou se tiver questões. Os "
+"pagamentos são feitos via paypal para thp@perli.net."
 
 #: publisher/templates/publisher/episode.html:27
 #: publisher/templates/publisher/episodes.html:19
@@ -521,7 +534,7 @@ msgstr "Editar"
 #: publisher/templates/publisher/episode.html:68
 #: publisher/templates/publisher/podcast.html:79
 msgid "Red parts are often skipped, green parts never."
-msgstr ""
+msgstr "As partes vermelhas serão ignoradas e as verdes nuca o serão."
 
 #: publisher/templates/publisher/episodes.html:19
 #: publisher/templates/publisher/podcast.html:25
@@ -582,6 +595,7 @@ msgstr "Páginas dos Publicadores"
 #, python-format
 msgid "%(sitename)s offers several services for podcast publishers."
 msgstr ""
+"O %(sitename)s disponibiliza diversos serviços para os criadores de podcasts."
 
 #: publisher/templates/publisher/info.html:21
 #, python-format
@@ -590,6 +604,9 @@ msgid ""
 "podcast. Users of the gPodder client will also find your podcast as the "
 "first item in the list of example podcast."
 msgstr ""
+"Pode colocar o seu podcast na página inicial do %(sitename)s para o "
+"promover. Os utilizadores do gPodder também irão encontrar o seu podcast "
+"como o primeiro da lista."
 
 #: publisher/templates/publisher/info.html:24
 #, python-format
@@ -597,6 +614,7 @@ msgid ""
 "You can find additional details on the <a href=\"%(advertise-url)s"
 "\">advertisement page</a>."
 msgstr ""
+"Pode obter mais detalhes <a href=\"%(advertise-url)s\">nesta página</a>."
 
 #: publisher/templates/publisher/info.html:27
 #, python-format
@@ -604,6 +622,8 @@ msgid ""
 "On the <strong>%(sitename)s Publisher Pages</strong> you can find valuable "
 "information about the Podcasts published by you."
 msgstr ""
+"Na  <strong>página de anunciantes do %(sitename)s</strong> pode encontrar "
+"diversas informações sobre os seus podcasts."
 
 #: publisher/templates/publisher/info.html:30
 #, python-format
@@ -626,6 +646,8 @@ msgid ""
 "If you already are registered as a publisher, please <a href=\"%(login-url)s?"
 "next=/publisher/\">login</a>."
 msgstr ""
+"Se já estiver registado como publicador, <a href=\"%(login-url)s?next=/"
+"publisher/\">inicie a sessão</a>."
 
 #: publisher/templates/publisher/info.html:41
 #, python-format
@@ -879,6 +901,8 @@ msgid ""
 "You've marked your favorites-feed as public and others can\n"
 "      subscribe to it. It will also be indexed by %(sitename)s."
 msgstr ""
+"Marcou a sua fonte de favoritos como pública e os outros utilizadores podem "
+"subscrever a lista. Esta também será indexada pelo %(sitename)s."
 
 #: share/templates/share/favorites.html:110
 #, fuzzy
@@ -1633,6 +1657,8 @@ msgid ""
 "You didn't tag any podcasts yet. Go to your <a href=\"%(subscriptions-url)s"
 "\">subscriptions</a> and tag some."
 msgstr ""
+"Ainda não marcour quaisquer podcasts. Aceda às <a href="
+"\"%(subscriptions-url)s\">subscrições</a> e marque algum."
 
 #: web/templates/online-help.html:8 web/templates/online-help.html.py:11
 #: web/templatetags/menu.py:27
@@ -1645,6 +1671,9 @@ msgid ""
 "web. You can synchronize your devices, view status information and discover "
 "new interesting podcasts online."
 msgstr ""
+"O gpodder.net é um serviço web que lhe permite gerir as subscrições de "
+"podcasts através da web. Pode sincronizar os seus dispositivos, ver as "
+"informações e descobrir diversos podcasts."
 
 #: web/templates/online-help.html:19
 msgid "Supported Clients"
@@ -1900,6 +1929,8 @@ msgid ""
 "You can't subscribe to this podcast, because you don't have any devices (on "
 "which you don't have subscribed to the podcast already."
 msgstr ""
+"Não pode subscrever este podcast pois não possui quaisquer dispositivos em "
+"que não tenha este podcast subscrito."
 
 #: web/templates/subscribe.html:50
 #, fuzzy, python-format
@@ -1920,6 +1951,9 @@ msgid ""
 "-- and this may take some time. Until this is completed, the podcast will "
 "simply be called this way."
 msgstr ""
+"Porque nós mostramos os nomes após obter as informações da fonte, e isto "
+"pode levar algum tempo. Até que esta fase esteja concluída, o podcast será "
+"invocado desta forma."
 
 #: web/templates/subscriptions.html:11 web/templates/subscriptions.html:15
 #, fuzzy
