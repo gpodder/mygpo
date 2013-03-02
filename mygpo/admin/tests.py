@@ -6,6 +6,7 @@ Replace this with more appropriate tests for your application.
 """
 
 import time
+from datetime import datetime
 
 from django.test import TestCase
 
@@ -17,6 +18,7 @@ from mygpo.db.couchdb.episode import episode_by_id, episodes_for_podcast
 from mygpo.db.couchdb.podcast import podcast_by_id
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode
+from mygpo.utils import get_timestamp
 
 
 class SimpleTest(TestCase):
@@ -57,8 +59,8 @@ class SimpleTest(TestCase):
         e4.save()
 
         user = User()
-        user.username = 'user'
-        user.email = 'user@example.com'
+        user.username = 'user-test_merge'
+        user.email = 'user-test_merge@example.com'
         user.set_password('secret')
 
         device1 = Device()
@@ -80,11 +82,13 @@ class SimpleTest(TestCase):
         p2.subscribe(user, device2)
 
         s1 = episode_state_for_user_episode(user, e1)
-        s1.add_actions([EpisodeAction(action='play')])
+        s1.add_actions([EpisodeAction(action='play',
+                    upload_timestamp=get_timestamp(datetime.utcnow()))])
         s1.save()
 
         s3 = episode_state_for_user_episode(user, e3)
-        s3.add_actions([EpisodeAction(action='play')])
+        s3.add_actions([EpisodeAction(action='play',
+                    upload_timestamp=get_timestamp(datetime.utcnow()))])
         s3.save()
 
         # we need that for later

@@ -24,6 +24,7 @@ from mygpo.core.models import Podcast, Episode
 from mygpo.users.models import EpisodeAction, User
 from mygpo.maintenance.merge import PodcastMerger
 from mygpo.counter import Counter
+from mygpo.utils import get_timestamp
 from mygpo.db.couchdb.podcast import podcast_by_id
 from mygpo.db.couchdb.episode import episode_by_id
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode
@@ -46,7 +47,7 @@ class MergeTests(TestCase):
         self.episode1.save()
         self.episode2.save()
 
-        self.user = User(username='test')
+        self.user = User(username='test-merge')
         self.user.email = 'test@example.com'
         self.user.set_password('secret!')
         self.user.save()
@@ -58,8 +59,12 @@ class MergeTests(TestCase):
         state1 = episode_state_for_user_episode(self.user, self.episode1)
         state2 = episode_state_for_user_episode(self.user, self.episode2)
 
-        action1 = EpisodeAction(action='play', timestamp=datetime.utcnow())
-        action2 = EpisodeAction(action='download', timestamp=datetime.utcnow())
+        action1 = EpisodeAction(action='play',
+                timestamp=datetime.utcnow(),
+                upload_timestamp=get_timestamp(datetime.utcnow()))
+        action2 = EpisodeAction(action='download',
+                timestamp=datetime.utcnow(),
+                upload_timestamp=get_timestamp(datetime.utcnow()))
 
         state1.add_actions([action1])
         state2.add_actions([action2])
@@ -122,7 +127,7 @@ class MergeGroupTests(TestCase):
 
         self.podcast2.group_with(self.podcast3, 'My Group', 'Feed1', 'Feed2')
 
-        self.user = User(username='test')
+        self.user = User(username='test-merge-group')
         self.user.email = 'test@example.com'
         self.user.set_password('secret!')
         self.user.save()
@@ -143,8 +148,12 @@ class MergeGroupTests(TestCase):
         state1 = episode_state_for_user_episode(self.user, self.episode1)
         state2 = episode_state_for_user_episode(self.user, self.episode2)
 
-        action1 = EpisodeAction(action='play', timestamp=datetime.utcnow())
-        action2 = EpisodeAction(action='download', timestamp=datetime.utcnow())
+        action1 = EpisodeAction(action='play',
+                timestamp=datetime.utcnow(),
+                upload_timestamp=get_timestamp(datetime.utcnow()))
+        action2 = EpisodeAction(action='download',
+                timestamp=datetime.utcnow(),
+                upload_timestamp=get_timestamp(datetime.utcnow()))
 
         state1.add_actions([action1])
         state2.add_actions([action2])
