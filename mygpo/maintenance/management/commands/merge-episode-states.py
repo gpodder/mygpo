@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 
 from mygpo.utils import progress
 from mygpo.counter import Counter
-from mygpo.couch import bulk_save_retry
+from mygpo.db.couchdb import bulk_save_retry
 from mygpo.db.couchdb.episode_state import episode_states_count, \
          get_nth_episode_state, get_duplicate_episode_states
 

@@ -7,11 +7,11 @@ from couchdb.multipart import write_multipart
 from django.core.management.base import BaseCommand
 
 from mygpo.core.models import Podcast
-from mygpo.couch import get_main_database
 from mygpo.directory.toplist import PodcastToplist
 from mygpo.users.models import User
 from mygpo.utils import progress
 from mygpo.json import json
+from mygpo.db.couchdb import get_main_database
 from mygpo.db.couchdb.episode import episodes_for_podcast
 from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url
 from mygpo.db.couchdb.podcast_state import podcast_states_for_user

@@ -22,10 +22,9 @@ from mygpo.core.models import Podcast, Episode
 from mygpo.users.models import EpisodeUserState, Device, DeviceDoesNotExist, \
          PodcastUserState
 from mygpo.decorators import repeat_on_conflict
-from mygpo.couch import bulk_save_retry
 from mygpo.json import json
 from mygpo.users.settings import STORE_UA
-from mygpo.db.couchdb import get_user_database
+from mygpo.db.couchdb import get_user_database, bulk_save_retry
 from mygpo.db.couchdb.podcast import podcast_for_url, random_podcasts
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
 
