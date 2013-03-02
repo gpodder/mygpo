@@ -2,7 +2,7 @@ feedparser
 python-dateutil
 PIL
 Babel
-Django
+Django>=1.5
 markdown2
 simplejson
 restkit
