@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import *
 
 urlpatterns = patterns('mygpo.publisher.views',
  url(r'^$',                             'home',                        name='publisher'),

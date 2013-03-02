@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import *
 
 from mygpo.directory.views import Directory, Carousel, MissingPodcast, \
          AddPodcast, FlattrPodcastList

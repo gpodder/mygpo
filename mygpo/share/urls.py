@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import *
 
 from mygpo.share.views import ShareFavorites, FavoritesPublic, \
          PublicSubscriptions, FavoritesFeedCreateEntry

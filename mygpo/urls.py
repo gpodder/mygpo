@@ -16,7 +16,7 @@
 #
 
 import os.path
-from django.conf.urls.defaults import *
+from django.conf.urls import *
 
 # This URLs should be always be served, even during maintenance mode
 urlpatterns = patterns('',
