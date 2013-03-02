@@ -66,7 +66,7 @@ def create(request, username, format):
     if plist:
         return HttpResponse('List already exists', status=409)
 
-    urls = parse_subscription(request.raw_post_data, format)
+    urls = parse_subscription(request.body, format)
     podcasts = [podcast_for_url(url, create=True) for url in urls]
     podcast_ids = map(Podcast.get_id, podcasts)
 
@@ -163,7 +163,7 @@ def update_list(request, plist, owner, format):
     if not is_own:
         return HttpResponseForbidden()
 
-    urls = parse_subscription(request.raw_post_data, format)
+    urls = parse_subscription(request.body, format)
     podcasts = [podcast_for_url(url, create=True) for url in urls]
     podcast_ids = map(Podcast.get_id, podcasts)
 

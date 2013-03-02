@@ -96,10 +96,10 @@ def subscriptions(request, username, device_uid):
         d = get_device(request.user, device_uid,
                 request.META.get('HTTP_USER_AGENT', ''))
 
-        if not request.raw_post_data:
+        if not request.body:
             return HttpResponseBadRequest('POST data must not be empty')
 
-        actions = json.loads(request.raw_post_data)
+        actions = json.loads(request.body)
         add = actions['add'] if 'add' in actions else []
         rem = actions['remove'] if 'remove' in actions else []
 
@@ -179,7 +179,7 @@ def episodes(request, username, version=1):
 
     if request.method == 'POST':
         try:
-            actions = json.loads(request.raw_post_data)
+            actions = json.loads(request.body)
         except (JSONDecodeError, UnicodeDecodeError) as e:
             msg = 'Advanced API: could not decode episode update POST data for user %s: %s' % (username, e)
             log(msg)
@@ -412,7 +412,7 @@ def device(request, username, device_uid):
     d = get_device(request.user, device_uid,
             request.META.get('HTTP_USER_AGENT', ''))
 
-    data = json.loads(request.raw_post_data)
+    data = json.loads(request.body)
 
     if 'caption' in data:
         if not data['caption']:

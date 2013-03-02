@@ -85,7 +85,7 @@ def main(request, username, scope):
         return JsonResponse( settings_obj.settings )
 
     elif request.method == 'POST':
-        actions = json.loads(request.raw_post_data)
+        actions = json.loads(request.body)
         ret = update_settings(settings_obj, actions)
         base_obj.save()
         return JsonResponse(ret)

@@ -49,7 +49,7 @@ def chapters(request, username):
     now_ = int(time.mktime(now.timetuple()))
 
     if request.method == 'POST':
-        req = json.loads(request.raw_post_data)
+        req = json.loads(request.body)
 
         if not 'podcast' in req:
             return HttpResponseBadRequest('Podcast URL missing')

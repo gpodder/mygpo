@@ -39,7 +39,7 @@ def main(request, username):
 
     else:
         try:
-            actions = json.loads(request.raw_post_data)
+            actions = json.loads(request.body)
         except JSONDecodeError as e:
             return HttpResponseBadRequest(str(e))
 
