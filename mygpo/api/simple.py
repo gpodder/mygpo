@@ -32,7 +32,6 @@ from django.utils.translation import ugettext as _
 
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.api.backend import get_device, BulkSubscribe
-from mygpo.couch import BulkException
 from mygpo.core import models
 from mygpo.core.models import Podcast
 from mygpo.users.models import Suggestions
@@ -47,6 +46,7 @@ from mygpo.log import log
 from mygpo.decorators import allowed_methods
 from mygpo.utils import parse_range
 from mygpo.json import json, JSONDecodeError
+from mygpo.db.couchdb import BulkException
 from mygpo.db.couchdb.podcast import podcasts_by_id
 from mygpo.db.couchdb.user import suggestions_for_user
 
