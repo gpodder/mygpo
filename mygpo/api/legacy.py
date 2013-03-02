@@ -22,13 +22,15 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 
-from mygpo.log import log
 from mygpo.api.sanitizing import sanitize_urls
 from mygpo.users.models import User
 from mygpo.api.opml import Importer, Exporter
 from mygpo.core.models import Podcast, SubscriptionException
 from mygpo.api.backend import get_device
 from mygpo.db.couchdb.podcast import podcast_for_url
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 LEGACY_DEVICE_NAME = 'Legacy Device'
@@ -74,7 +76,7 @@ def upload(request):
         try:
             p.subscribe(user, dev)
         except SubscriptionException as e:
-            log('Legacy API: %(username)s: could not subscribe to podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
+            logger.warn('Legacy API: %(username)s: could not subscribe to podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
                 {'username': user.username, 'podcast_url': p.url, 'device_id': dev.id, 'exception': e})
 
     for r in rem:
@@ -82,7 +84,7 @@ def upload(request):
         try:
             p.unsubscribe(user, dev)
         except SubscriptionException as e:
-            log('Legacy API: %(username): could not unsubscribe from podcast %(podcast_url) on device %(device_id): %(exception)s' %
+            logger.warn('Legacy API: %(username): could not unsubscribe from podcast %(podcast_url) on device %(device_id): %(exception)s' %
                 {'username': user.username, 'podcast_url': p.url, 'device_id': dev.id, 'exception': e})
 
     return HttpResponse('@SUCCESS', mimetype='text/plain')

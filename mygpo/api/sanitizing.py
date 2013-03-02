@@ -5,11 +5,13 @@ import re
 from django.core.cache import cache
 
 from mygpo.core import models
-from mygpo.log import log
 from mygpo.utils import iterate_together, progress
 from mygpo.db.couchdb.podcast import podcast_count, podcast_for_oldid, \
         all_podcasts
 from mygpo.db.couchdb.common import sanitizingrules_by_obj_type
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 def sanitize_urls(urls, obj_type='podcast'):
@@ -111,7 +113,7 @@ def maintenance(dry_run=False):
         if not su_podcast:
             # "target" podcast does not exist, we simply change the url
             if not dry_run:
-                log('updating podcast %s - "%s" => "%s"' % (p.id, p.url, su))
+                logger.info('updating podcast %s - "%s" => "%s"' % (p.id, p.url, su))
                 p.url = su
                 p.save()
 
@@ -141,7 +143,7 @@ def maintenance(dry_run=False):
 
 def rewrite_podcasts(p_old, p_new):
 
-    log('merging podcast %s "%s" to correct podcast %s "%s"' % (p_old.id, p_old.url, p_new.id, p_new.url))
+    logger.info('merging podcast %s "%s" to correct podcast %s "%s"' % (p_old.id, p_old.url, p_new.id, p_new.url))
 
     rewrite_newpodcast(p_old, p_new)
 

@@ -3,8 +3,10 @@ from collections import namedtuple
 from couchdbkit.ext.django.schema import *
 
 from mygpo.core.models import Podcast, SubscriptionException
-from mygpo.log import log
 from mygpo.db.couchdb.podcast import podcasts_to_dict
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 GroupedDevices = namedtuple('GroupedDevices', 'is_synced devices')
@@ -170,7 +172,7 @@ class SyncedDevicesMixin(DocumentSchema):
             try:
                 podcast.subscribe(self, device)
             except SubscriptionException as e:
-                log('Web: %(username)s: cannot sync device: %(error)s' %
+                logger.warn('Web: %(username)s: cannot sync device: %(error)s' %
                     dict(username=self.username, error=repr(e)))
 
         for podcast_id in rem:
@@ -181,7 +183,7 @@ class SyncedDevicesMixin(DocumentSchema):
             try:
                 podcast.unsubscribe(self, device)
             except SubscriptionException as e:
-                log('Web: %(username)s: cannot sync device: %(error)s' %
+                logger.warn('Web: %(username)s: cannot sync device: %(error)s' %
                     dict(username=self.username, error=repr(e)))
 
 

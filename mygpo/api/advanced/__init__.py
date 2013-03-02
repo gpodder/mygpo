@@ -41,7 +41,6 @@ from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url, sanitize_urls
 from mygpo.api.advanced.directory import episode_data, podcast_data
 from mygpo.api.backend import get_device, BulkSubscribe
-from mygpo.log import log
 from mygpo.utils import parse_time, format_time, parse_bool, get_timestamp
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.core import models
@@ -60,6 +59,10 @@ from mygpo.db.couchdb.podcast import podcast_for_url
 from mygpo.db.couchdb.podcast_state import subscribed_podcast_ids_by_device
 from mygpo.db.couchdb.episode_state import get_podcasts_episode_states, \
          episode_state_for_ref_urls, get_episode_actions
+
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 # keys that are allowed in episode actions
@@ -153,7 +156,7 @@ def update_subscriptions(user, device, add, remove):
         subscriber.execute()
     except BulkException as be:
         for err in be.errors:
-            log('Advanced API: %(username)s: Updating subscription for '
+            loger.error('Advanced API: %(username)s: Updating subscription for '
                     '%(podcast_url)s on %(device_uid)s failed: '
                     '%(rerror)s (%(reason)s)'.format(username=user.username,
                         podcast_url=err.doc, device_uid=device.uid,
@@ -186,7 +189,7 @@ def episodes(request, username, version=1):
             actions = json.loads(request.body)
         except (JSONDecodeError, UnicodeDecodeError) as e:
             msg = 'Advanced API: could not decode episode update POST data for user %s: %s' % (username, e)
-            log(msg)
+            logger.warn(msg)
             return HttpResponseBadRequest(msg)
 
         log('start: user %s: %d actions from %s' % (request.user._id, len(actions), ua_string))
@@ -209,13 +212,11 @@ def episodes(request, username, version=1):
         try:
             update_urls = update_episodes(request.user, actions, now, ua_string)
         except DeviceUIDException as e:
-            import traceback
-            s = u'could not update episodes for user %s: %s %s: %s' % (username, e, traceback.format_exc(), actions)
-            log(s.decode('utf-8', errors='ignore'))
+            logger.warn('invalid device UID while uploading episode actions for user %s: %s' % (username, e))
             return HttpResponseBadRequest(str(e))
+
         except InvalidEpisodeActionAttributes as e:
-            import traceback
-            log(u'could not update episodes for user %s: %s %s: %s' % (username, e, traceback.format_exc(), actions))
+            logger.warn('invalid episode action attributes while uploading episode actions for user %s: %s' % (username, e))
             return HttpResponseBadRequest(str(e))
 
         log('done:  user %s: %d actions from %s' % (request.user._id, len(actions), ua_string))
