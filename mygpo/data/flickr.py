@@ -21,7 +21,7 @@ import urllib
 
 from django.conf import settings
 
-from mygpo.json import json
+from mygpo.core.json import json
 
 
 def get_photo_sizes(photo_id):

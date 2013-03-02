@@ -10,7 +10,7 @@ from mygpo.core.models import Podcast
 from mygpo.directory.toplist import PodcastToplist
 from mygpo.users.models import User
 from mygpo.utils import progress
-from mygpo.json import json
+from mygpo.core.json import json
 from mygpo.db.couchdb import get_main_database
 from mygpo.db.couchdb.episode import episodes_for_podcast
 from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url

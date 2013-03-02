@@ -20,7 +20,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 
 from mygpo.decorators import allowed_methods
-from mygpo.json import json, JSONDecodeError
+from mygpo.core.json import json, JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.users.models import DeviceDoesNotExist, User

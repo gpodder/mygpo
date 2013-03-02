@@ -17,7 +17,7 @@
 
 from django.http import HttpResponse
 
-from mygpo.json import json
+from mygpo.core.json import json
 
 
 class JsonResponse(HttpResponse):

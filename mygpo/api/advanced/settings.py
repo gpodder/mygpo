@@ -21,7 +21,7 @@ from django.views.decorators.cache import never_cache
 
 from mygpo.decorators import allowed_methods
 from mygpo.core.models import Podcast
-from mygpo.json import json
+from mygpo.core.json import json
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.users.models import PodcastUserState, DeviceDoesNotExist

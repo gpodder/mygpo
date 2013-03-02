@@ -47,7 +47,7 @@ from mygpo.users.models import PodcastUserState, EpisodeAction, \
      EpisodeUserState, DeviceDoesNotExist, DeviceUIDException, \
      InvalidEpisodeActionAttributes
 from mygpo.users.settings import FLATTR_AUTO
-from mygpo.json import json, JSONDecodeError
+from mygpo.core.json import json, JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.db.couchdb import BulkException, bulk_save_retry
 from mygpo.db.couchdb.episode import episode_by_id, \

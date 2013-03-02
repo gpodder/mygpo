@@ -20,7 +20,7 @@ import hashlib
 import urllib
 import urlparse
 
-from mygpo.json import json
+from mygpo.core.json import json
 
 
 def get_tags(url):

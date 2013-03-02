@@ -22,7 +22,7 @@ from mygpo.core.models import Podcast, Episode
 from mygpo.users.models import EpisodeUserState, Device, DeviceDoesNotExist, \
          PodcastUserState
 from mygpo.decorators import repeat_on_conflict
-from mygpo.json import json
+from mygpo.core.json import json
 from mygpo.users.settings import STORE_UA
 from mygpo.db.couchdb import bulk_save_retry
 from mygpo.db.couchdb.podcast import podcast_for_url, random_podcasts

@@ -12,7 +12,7 @@ from collections import namedtuple
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
-from mygpo.json import json
+from mygpo.core.json import json
 from mygpo.users.settings import FLATTR_TOKEN, FLATTR_USERNAME
 from mygpo import utils
 from django.utils.translation import ugettext as _

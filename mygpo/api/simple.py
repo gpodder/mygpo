@@ -45,7 +45,7 @@ from mygpo.directory.search import search_podcasts
 from mygpo.log import log
 from mygpo.decorators import allowed_methods
 from mygpo.utils import parse_range
-from mygpo.json import json, JSONDecodeError
+from mygpo.core.json import json, JSONDecodeError
 from mygpo.db.couchdb import BulkException
 from mygpo.db.couchdb.podcast import podcasts_by_id
 from mygpo.db.couchdb.user import suggestions_for_user

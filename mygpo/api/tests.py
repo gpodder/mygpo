@@ -26,7 +26,7 @@ from django.core.urlresolvers import reverse
 from mygpo.api.advanced import episodes
 from mygpo.users.models import User
 from mygpo.test import create_auth_string
-from mygpo.json import json
+from mygpo.core.json import json
 
 
 class LegacyAPITests(unittest.TestCase):
