@@ -1,6 +1,6 @@
 from django.conf.urls import *
 from django.contrib.auth.views import logout
-from django.views.generic.simple import direct_to_template
+from django.views.generic.base import TemplateView
 
 from django_couchdb_utils.registration.views import activate, register
 from django_couchdb_utils.registration.forms import RegistrationFormUniqueEmail
@@ -16,15 +16,21 @@ urlpatterns = patterns('mygpo.web.views',
  url(r'^suggestions/rate$',                                       'rate_suggestions', name='suggestions-rate'),
  url(r'^suggestions/blacklist/(?P<slug_id>[\w-]+)$',              'blacklist',     name='suggestions-blacklist-slug-id'),
  url(r'^tags/',                                                   'mytags',        name='tags'),
- url(r'^online-help',                                              direct_to_template,
-       {'template': 'online-help.html'},                                           name='help'),
-    (r'^developer/',                                               direct_to_template,
-       {'template': 'developer.html'}),
- url(r'^contribute/',                                              direct_to_template,
-       {'template': 'contribute.html'},
-       name='contribute'),
- url(r'^privacy/',                                              direct_to_template,
-       {'template': 'privacy_policy.html'}, name='privacy-policy'),
+
+ url(r'^online-help',
+     TemplateView.as_view(template_name='online-help.html'),
+     name='help'),
+
+ url(r'^developer/',
+     TemplateView.as_view(template_name='developer.html')),
+
+ url(r'^contribute/',
+     TemplateView.as_view(template_name='contribute.html'),
+     name='contribute'),
+
+ url(r'^privacy/',
+     TemplateView.as_view(template_name='privacy_policy.html'),
+     name='privacy-policy'),
 
 )
 
@@ -160,8 +166,10 @@ urlpatterns += patterns('mygpo.web.views.users',
  url(r'^register/$',                                               register,
             {'backend': 'django_couchdb_utils.registration.backends.default.DefaultBackend',
              'form_class': RegistrationFormUniqueEmail},                                        name='register'),
-    (r'^registration_complete/$',                                  direct_to_template,
-            {'template': 'registration/registration_complete.html'}),
+
+ url(r'^registration_complete/$',
+    TemplateView.as_view(template_name='registration/registration_complete.html')),
+
     (r'^activate/(?P<activation_key>\w+)$',                        activate,
             {'backend': 'django_couchdb_utils.registration.backends.default.DefaultBackend'}),
 )
