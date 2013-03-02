@@ -2,7 +2,7 @@ from itertools import count
 
 from couchdbkit.ext.django.schema import *
 
-from django.template.defaultfilters import slugify
+from django.utils.text import slugify
 
 from mygpo.decorators import repeat_on_conflict
 
