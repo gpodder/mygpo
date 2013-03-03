@@ -36,6 +36,7 @@ from mygpo.api import simple
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.users.models import Device, DeviceUIDException, \
      DeviceDoesNotExist
+from mygpo.users.tasks import sync_user
 from mygpo.db.couchdb.podcast_state import podcast_states_for_device
 
 
@@ -333,7 +334,7 @@ def sync(request, device):
     except DeviceDoesNotExist as e:
         messages.error(request, str(e))
 
-    request.user.sync_all()
+    sync_user.delay(request.user)
 
     return HttpResponseRedirect(reverse('device', args=[device.uid]))
 

@@ -16,6 +16,7 @@ from mygpo.core.proxy import DocumentABCMeta
 from mygpo.core.slugs import SlugMixin
 from mygpo.core.oldid import OldIdMixin
 from mygpo.web.logo import CoverArt
+from mygpo.users.tasks import sync_user
 
 
 class SubscriptionException(Exception):
@@ -309,7 +310,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         state.subscribe(device)
         try:
             state.save()
-            user.sync_all()
+            sync_user.delay(user)
         except Unauthorized as ex:
             raise SubscriptionException(ex)
 
@@ -321,7 +322,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         state.unsubscribe(device)
         try:
             state.save()
-            user.sync_all()
+            sync_user.delay(user)
         except Unauthorized as ex:
             raise SubscriptionException(ex)
 

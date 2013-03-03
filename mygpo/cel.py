@@ -13,6 +13,7 @@ celery = Celery('mygpo.celery',
                 backend=settings.BACKEND_URL,
                 include=[
                     'mygpo.core.tasks',
+                    'mygpo.users.tasks',
                     'mygpo.data.tasks',
                     'mygpo.admin.tasks',
                     'mygpo.directory.tasks',

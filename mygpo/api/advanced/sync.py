@@ -24,6 +24,7 @@ from mygpo.core.json import json, JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.users.models import DeviceDoesNotExist, User
+from mygpo.users.tasks import sync_user
 
 
 @csrf_exempt
@@ -113,4 +114,5 @@ def update_sync_status(user, synclist, stopsync):
             pass
 
     user.save()
-    user.sync_all()
+
+    sync_user.delay(user)
