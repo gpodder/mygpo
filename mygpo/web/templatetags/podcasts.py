@@ -5,10 +5,13 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.utils.html import strip_tags
 
-from mygpo.constants import PODCAST_LOGO_SIZE, PODCAST_LOGO_BIG_SIZE, \
-         PODCAST_LOGO_MEDIUM_SIZE
 from mygpo.web.utils import get_podcast_link_target, \
          get_podcast_group_link_target
+
+
+PODCAST_LOGO_SIZE = 32
+PODCAST_LOGO_MEDIUM_SIZE=64
+PODCAST_LOGO_BIG_SIZE = 128
 
 
 register = template.Library()
