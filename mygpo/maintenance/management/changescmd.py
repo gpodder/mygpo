@@ -1,6 +1,7 @@
 from datetime import datetime
 from optparse import make_option
 from abc import abstractmethod
+from collections import Counter
 
 from django.core.management.base import BaseCommand
 
@@ -10,12 +11,6 @@ from couchdbkit import Consumer
 from mygpo.utils import progress
 from mygpo.db.couchdb import get_main_database
 from mygpo.maintenance.models import CommandStatus, CommandRunStatus
-
-try:
-    from collections import Counter
-except ImportError:
-    from mygpo.counter import Counter
-
 
 
 class ChangesCommand(BaseCommand):

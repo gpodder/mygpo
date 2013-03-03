@@ -7,12 +7,12 @@ Replace this with more appropriate tests for your application.
 
 import time
 from datetime import datetime
+from collections import Counter
 
 from django.test import TestCase
 
 from mygpo.users.models import User, Device, EpisodeAction
 from mygpo.core.models import Podcast, Episode
-from mygpo.counter import Counter
 from mygpo.maintenance.merge import PodcastMerger
 from mygpo.db.couchdb.episode import episode_by_id, episodes_for_podcast
 from mygpo.db.couchdb.podcast import podcast_by_id

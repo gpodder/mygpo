@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import defaultdict, Counter
 from operator import itemgetter
 
 from mygpo.directory.models import Category
@@ -6,7 +6,6 @@ from mygpo.db.couchdb import get_main_database
 from mygpo.cache import cache_result
 from mygpo.db.couchdb.utils import multi_request_view
 from mygpo.db import QueryParameterMissing
-from mygpo.counter import Counter
 
 
 @cache_result(timeout=60*60)

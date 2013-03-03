@@ -1,5 +1,6 @@
+from collections import Counter
+
 from mygpo.cache import cache_result
-from mygpo.counter import Counter
 from mygpo.decorators import repeat_on_conflict
 from mygpo.db.couchdb import get_main_database
 from mygpo.users.settings import FLATTR_TOKEN, FLATTR_AUTO, FLATTR_MYGPO, \

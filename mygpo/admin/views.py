@@ -1,5 +1,6 @@
 import re
 from itertools import count
+from collections import Counter
 
 from django.shortcuts import render
 from django.contrib import messages
@@ -11,7 +12,6 @@ from django.utils.decorators import method_decorator
 
 from mygpo.admin.auth import require_staff
 from mygpo.admin.group import PodcastGrouper
-from mygpo.counter import Counter
 from mygpo.maintenance.merge import PodcastMerger, IncorrectMergeException
 from mygpo.users.models import User
 from mygpo.admin.clients import UserAgentStats, ClientStats

@@ -1,8 +1,7 @@
 import re
-from collections import namedtuple
+from collections import namedtuple, Counter
 
 from mygpo.users.models import User
-from mygpo.counter import Counter
 from mygpo.db.couchdb.user import user_agent_stats
 
 

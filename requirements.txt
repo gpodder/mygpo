@@ -1,3 +1,4 @@
+# Python 2.7
 feedparser
 python-dateutil
 PIL

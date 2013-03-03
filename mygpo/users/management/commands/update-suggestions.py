@@ -1,6 +1,7 @@
 from itertools import chain
 from optparse import make_option
 from operator import itemgetter
+from collections import Counter
 
 from django.core.management.base import BaseCommand
 
@@ -8,11 +9,6 @@ from mygpo.users.models import Suggestions, User
 from mygpo.utils import progress
 from mygpo.decorators import repeat_on_conflict
 from mygpo.db.couchdb.user import suggestions_for_user
-
-try:
-    from collections import Counter
-except ImportError:
-    from mygpo.counter import Counter
 
 
 class Command(BaseCommand):

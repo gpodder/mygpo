@@ -1,5 +1,6 @@
 from datetime import datetime
 from optparse import make_option
+from collections import Counter
 
 from django.core.management.base import BaseCommand
 
@@ -13,11 +14,6 @@ from mygpo.utils import progress
 from mygpo.db.couchdb import get_main_database
 from mygpo.maintenance.models import CommandStatus, CommandRunStatus
 from mygpo.db.couchdb.podcast import podcast_by_id
-
-try:
-    from collections import Counter
-except ImportError:
-    from mygpo.counter import Counter
 
 
 class Command(BaseCommand):
