@@ -31,6 +31,7 @@ class ChangesCommand(BaseCommand):
     def __init__(self, status_id, command_name):
         self.status_id = status_id
         self.command_name = command_name
+        super(ChangesCommand, self).__init__()
 
 
     def handle(self, *args, **options):
