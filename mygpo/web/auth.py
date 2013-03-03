@@ -16,13 +16,9 @@
 #
 
 from django.contrib.auth.backends import ModelBackend
+from django.core.validators import email_re
 
 from mygpo.users.models import User
-
-try:
-    from django.forms.fields import email_re
-except ImportError:
-    from django.core.validators import email_re
 
 
 class EmailAuthenticationBackend(ModelBackend):
