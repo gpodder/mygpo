@@ -16,6 +16,8 @@ urlpatterns += patterns('mygpo.api.simple',
  url(r'^gpodder-examples\.(?P<format>\w+)$', 'example_podcasts',               name='example-opml'),
 )
 
+from mygpo.api.advanced import DeviceUpdates
+
 urlpatterns += patterns('mygpo.api.advanced',
     (r'^api/[12]/subscriptions/(?P<username>[\w.-]+)/(?P<device_uid>[\w.-]+)\.json', 'subscriptions'),
     (r'^api/(?P<version>[12])/episodes/(?P<username>[\w.-]+)\.json', 'episodes'),
@@ -30,7 +32,8 @@ urlpatterns += patterns('mygpo.api.advanced',
     (r'^api/2/data/episode\.json', 'directory.episode_info'),
 
     (r'^api/2/chapters/(?P<username>[\w.-]+)\.json', 'episode.chapters'),
-    (r'^api/2/updates/(?P<username>[\w.-]+)/(?P<device_uid>[\w.-]+)\.json', 'updates'),
+    (r'^api/2/updates/(?P<username>[\w.-]+)/(?P<device_uid>[\w.-]+)\.json',
+        DeviceUpdates.as_view()),
 
     (r'^api/2/settings/(?P<username>[\w.-]+)/(?P<scope>account|device|podcast|episode)\.json', 'settings.main'),
     (r'^api/2/favorites/(?P<username>[\w.-]+).json', 'favorites'),
