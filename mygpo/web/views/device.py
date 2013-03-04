@@ -120,7 +120,7 @@ def create(request):
         messages.success(request, _('Device saved'))
 
     except DeviceUIDException as e:
-        messages.error(request, _(str(e)))
+        messages.error(request, _(unicode(e)))
 
         return render(request, 'device-create.html', {
             'device': device,
