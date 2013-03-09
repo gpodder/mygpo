@@ -258,7 +258,7 @@ def podcast_for_url(url, create=False):
     if not url:
         raise QueryParameterMissing('url')
 
-    key = 'podcast-by-url-%s' % sha1(url).hexdigest()
+    key = 'podcast-by-url-%s' % sha1(url.encode('utf-8')).hexdigest()
 
     podcast = cache.get(key)
     if podcast:
