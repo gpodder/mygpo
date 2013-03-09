@@ -3,14 +3,25 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to gpodder.net's documentation!
-=======================================
+gpodder.net API Documentation
+=============================
 
-Contents:
+This site contains drafts for the gpodder.net's future API -- version 3 --
+which is not yet implemented.  The current API is documented at
+http://wiki.gpodder.org/wiki/Web_Services/API_2.
+
+Contents
+--------
 
 .. toctree::
    :maxdepth: 2
 
+   intro
+   usage
+   integration
+   reference/index
+   deprecation
+   libraries
 
 
 Indices and tables
