@@ -10,7 +10,7 @@ from django.contrib.sites.models import RequestSite
 from django.views.decorators.cache import cache_control
 from django.views.decorators.vary import vary_on_cookie
 from django.utils.decorators import method_decorator
-from django.views.generic.base import View
+from django.views.generic.base import View, TemplateView
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils.translation import ugettext as _
@@ -28,6 +28,7 @@ from mygpo.directory.tags import Topics
 from mygpo.users.models import User
 from mygpo.users.settings import FLATTR_TOKEN
 from mygpo.data.feeddownloader import PodcastUpdater, NoEpisodesException
+from mygpo.data.tasks import update_podcasts
 from mygpo.db.couchdb.podcast import get_podcast_languages, podcasts_by_id, \
          random_podcasts, podcasts_to_dict, podcast_for_url, \
          get_flattr_podcasts, get_flattr_podcast_count
@@ -290,21 +291,38 @@ class AddPodcast(View):
         if not url:
             raise Http404
 
-        updater = PodcastUpdater()
+        res = update_podcasts.delay([url])
+
+        return HttpResponseRedirect(reverse('add-podcast-status',
+                args=[res.task_id]))
+
+
+class AddPodcastStatus(TemplateView):
+    """ Status of adding a podcast """
+
+    template_name = 'directory/add-podcast-status.html'
+
+    def get(self, request, task_id):
+        result = update_podcasts.AsyncResult(task_id)
+
+        if not result.ready():
+            return self.render_to_response({
+                'ready': False,
+            })
 
         try:
-            podcast = updater.update(url)
-
-            messages.success(request, _('The podcast has been added'))
-
-            return HttpResponseRedirect(get_podcast_link_target(podcast))
+            podcasts = result.get()
+            messages.success(request, _('%d podcasts added' % len(podcasts)))
 
         except (ParserException, FetchFeedException,
                 NoEpisodesException) as ex:
             messages.error(request, str(ex))
+            podcast = None
 
-            add_page = '%s?q=%s' % (reverse('missing-podcast'), url)
-            return HttpResponseRedirect(add_page)
+        return self.render_to_response({
+                'ready': True,
+                'podcasts': podcasts,
+            })
 
 
 

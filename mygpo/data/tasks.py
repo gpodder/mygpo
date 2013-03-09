@@ -6,5 +6,5 @@ from mygpo.data.feeddownloader import PodcastUpdater
 def update_podcasts(podcast_urls):
     """ Task to update a podcast """
     updater = PodcastUpdater()
-    updater.update_queue(podcast_urls)
-    return True
+    podcasts = updater.update_queue(podcast_urls)
+    return list(podcasts)

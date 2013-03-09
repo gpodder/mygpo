@@ -66,7 +66,7 @@ class PodcastUpdater(object):
         for n, podcast_url in enumerate(queue):
             print n, podcast_url
             try:
-                self.update(podcast_url)
+                yield self.update(podcast_url)
 
             except NoPodcastCreated as npc:
                 print 'no podcast created:', npc

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+{% load podcasts %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/missing/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/missing/"|section_menu }}{% endblock %}
+
+{% block head %}
+ <meta http-equiv="refresh" content="10">
+{% endblock %}
+
+{% block title %}
+ {% if ready %}
+  {% trans "Podcast Added" %}
+ {% else %}
+  {% trans "Adding Podcast" %}
+ {% endif %}
+{% endblock %}
+
+{% block header %}
+ <h1>
+  {% if ready %}
+   {% trans "Podcast Added" %}
+  {% else %}
+   {% trans "Adding Podcast" %}
+  {% endif %}
+ </h1>
+{% endblock %}
+
+{% block content %}
+
+ {% if ready %}
+  {% for podcast in podcasts %}
+
+   <div class="result">
+    {{ podcast|podcast_logo }}
+    {% podcast_group_link podcast %}
+   </div>
+
+  {% empty %}
+
+   <p>{% trans "No podcasts could be added" %}</p>
+
+  {% endfor %}
+
+ {% else %}
+
+  <p>{% trans "The operation is still ongoing..." %}</p>
+
+  <a class="btn" href="">{% trans "Refresh" %}</a>
+ {% endif %}
+
+{% endblock %}
+

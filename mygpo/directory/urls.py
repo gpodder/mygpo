@@ -1,7 +1,7 @@
 from django.conf.urls import *
 
 from mygpo.directory.views import Directory, Carousel, MissingPodcast, \
-         AddPodcast, FlattrPodcastList
+         AddPodcast, AddPodcastStatus, FlattrPodcastList
 
 urlpatterns = patterns('mygpo.directory.views',
  url(r'^toplist/$',                                               'toplist',                    name='toplist'),
@@ -22,6 +22,10 @@ urlpatterns = patterns('mygpo.directory.views',
  url(r'^add-podcast/$',
      AddPodcast.as_view(),
      name='add-podcast'),
+
+ url(r'^add-podcast/(?P<task_id>[^/]+)$',
+     AddPodcastStatus.as_view(),
+     name='add-podcast-status'),
 
  url(r'^directory/\+flattr$',
      FlattrPodcastList.as_view(),
