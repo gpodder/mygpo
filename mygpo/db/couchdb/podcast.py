@@ -6,6 +6,7 @@ from restkit import RequestFailed
 from django.core.cache import cache
 
 from mygpo.core.models import Podcast, PodcastGroup, PodcastSubscriberData
+from mygpo.core.signals import incomplete_obj
 from mygpo.decorators import repeat_on_conflict
 from mygpo.cache import cache_result
 from mygpo.db.couchdb import get_main_database
@@ -100,7 +101,13 @@ def podcast_by_id(podcast_id, current_id=False):
         return None
 
     podcast_group = r.first()
-    return podcast_group.get_podcast_by_id(podcast_id, current_id)
+
+    podcast = podcast_group.get_podcast_by_id(podcast_id, current_id)
+
+    if podcast.needs_update:
+        incomplete_obj.send_robust(sender=podcast)
+
+    return podcast
 
 
 
@@ -110,7 +117,12 @@ def podcastgroup_by_id(group_id):
     if not group_id:
         raise QueryParameterMissing('group_id')
 
-    return PodcastGroup.get(group_id)
+    pg = PodcastGroup.get(group_id)
+
+    if pg.needs_update:
+        incomplete_obj.send_robust(sender=pg)
+
+    return pg
 
 
 
@@ -133,11 +145,16 @@ def podcast_for_slug(slug):
     res = r.first()
     doc = res['doc']
     if doc['doc_type'] == 'Podcast':
-        return Podcast.wrap(doc)
+        obj = Podcast.wrap(doc)
     else:
         pid = res['key'][1]
         pg = PodcastGroup.wrap(doc)
-        return pg.get_podcast_by_id(pid)
+        obj = pg.get_podcast_by_id(pid)
+
+    if obj.needs_update:
+        raise incomplete_obj.send_robust(sender=obj)
+
+    return obj
 
 
 @cache_result(timeout=60*60)
@@ -158,7 +175,7 @@ def podcastgroup_for_slug_id(slug_id):
         raise QueryParameterMissing('slug_id')
 
     if is_couchdb_id(slug_id):
-        return PodcastGroup.get(slug_id)
+        return podcastgroup_by_id(slug_id)
 
     else:
         #TODO: implement
@@ -180,7 +197,13 @@ def podcasts_by_id(ids):
             wrap_doc     = False
         )
 
-    return map(_wrap_podcast_group, r)
+    podcasts = map(_wrap_podcast_group, r)
+
+    for podcast in podcasts:
+        if podcast.needs_update:
+            incomplete_obj.send_robust(sender=podcast)
+
+    return podcasts
 
 
 
@@ -200,7 +223,12 @@ def podcast_for_oldid(oldid):
         return None
 
     podcast_group = r.first()
-    return podcast_group.get_podcast_by_oldid(oldid)
+    podcast = podcast_group.get_podcast_by_oldid(oldid)
+
+    if podcast.needs_update:
+        incomplete_obj.send_robust(sender=podcast)
+
+    return podcast
 
 
 @cache_result(timeout=60*60)
@@ -214,8 +242,15 @@ def podcastgroup_for_oldid(oldid):
             include_docs = True,
         )
 
-    return r.one() if r else None
+    if not r:
+        return None
 
+    pg = r.one()
+
+    if pg.needs_update:
+        incomplete_obj.send_robust(sender=pg)
+
+    return pg
 
 
 def podcast_for_url(url, create=False):
@@ -238,14 +273,19 @@ def podcast_for_url(url, create=False):
     if r:
         podcast_group = r.first()
         podcast = podcast_group.get_podcast_by_url(url)
-        cache.set(key, podcast)
+
+        if podcast.needs_update:
+            incomplete_obj.send_robust(sender=podcast)
+        else:
+            cache.set(key, podcast)
+
         return podcast
 
     if create:
         podcast = Podcast()
         podcast.urls = [url]
         podcast.save()
-        cache.set(key, podcast)
+        incomplete_obj.send_robust(sender=podcast)
         return podcast
 
     return None
@@ -274,6 +314,10 @@ def random_podcasts(language='', chunk_size=5):
             break
 
         for r in res:
+
+            # The view podcasts/random does not include incomplete podcasts,
+            # so we don't need to send any 'incomplete_obj' signals here
+
             obj = r['doc']
             if obj['doc_type'] == 'Podcast':
                 yield Podcast.wrap(obj)
@@ -290,6 +334,9 @@ def podcasts_by_last_update():
             wrap_doc     = False,
         )
 
+    # TODO: this method is only used for retrieving podcasts to update;
+    #       should we really send 'incomplete_obj' signals here?
+
     return map(_wrap_podcast_group_key1, res)
 
 
@@ -302,6 +349,9 @@ def all_podcasts():
             include_docs = True,
             stale        = 'update_after',
         )
+
+    # TODO: this method is only used for maintenance purposes; should we
+    #       really send 'incomplete_obj' signals here?
 
     for r in res:
         obj = r['doc']
@@ -366,6 +416,9 @@ def podcasts_need_update():
             reduce      = True,
         )
 
+    # TODO: this method is only used for retrieving podcasts to update;
+    #       should we really send 'incomplete_obj' signals here?
+
     for r in res:
         podcast_id = r['key']
         podcast = podcast_by_id(podcast_id)
@@ -385,7 +438,13 @@ def get_flattr_podcasts(offset=0, limit=20):
             reduce       = False,
         )
 
-    return list(r)
+    podcasts = list(r)
+
+    for podcast in podcasts:
+        if podcast.needs_update:
+            incomplete_obj.send_robust(sender=podcast)
+
+    return podcasts
 
 
 @cache_result(timeout=60*60)
@@ -467,7 +526,13 @@ def search(q, offset=0, num_results=20):
                 q            = q,
                 sort='\\subscribers<int>')
 
-        return list(res), res.total_rows
+        podcasts = list(res)
+
+        for podcast in podcasts:
+            if podcast.needs_update:
+                incomplete_obj.send_robust(sender=podcast)
+
+        return podcasts, res.total_rows
 
     except RequestFailed:
         return [], 0

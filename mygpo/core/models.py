@@ -18,6 +18,9 @@ from mygpo.core.oldid import OldIdMixin
 from mygpo.web.logo import CoverArt
 from mygpo.users.tasks import sync_user
 
+# make sure this code is executed at startup
+from mygpo.core.signals import *
+
 
 class SubscriptionException(Exception):
     pass
@@ -94,6 +97,12 @@ class Episode(Document, SlugMixin, OldIdMixin):
         return set([self._id] + self.merged_ids)
 
 
+    @property
+    def needs_update(self):
+        """ Indicates if the object requires an updated from its feed """
+        return not self.title and not self.outdated
+
+
     def __eq__(self, other):
         if other == None:
             return False
@@ -162,6 +171,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
     episode_count = IntegerProperty()
     random_key = FloatProperty(default=random)
     flattr_url = StringProperty()
+    outdated = BooleanProperty(default=False)
 
 
 
@@ -353,6 +363,12 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         return targets
 
 
+    @property
+    def needs_update(self):
+        """ Indicates if the object requires an updated from its feed """
+        return not self.title and not self.outdated
+
+
     def __hash__(self):
         return hash(self.get_id())
 
@@ -469,6 +485,13 @@ class PodcastGroup(Document, SlugMixin, OldIdMixin):
     def display_title(self):
         return self.title
 
+
+    @property
+    def needs_update(self):
+        """ Indicates if the object requires an updated from its feed """
+        # A PodcastGroup has been manually created and therefore never
+        # requires an update
+        return False
 
     def get_podcast(self):
         # return podcast with most subscribers (bug 1390)

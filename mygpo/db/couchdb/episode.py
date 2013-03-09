@@ -4,6 +4,7 @@ from datetime import datetime
 from django.core.cache import cache
 
 from mygpo.core.models import Podcast, Episode, MergedIdException
+from mygpo.core.signals import incomplete_obj
 from mygpo.cache import cache_result
 from mygpo.db import QueryParameterMissing
 from mygpo.db.couchdb.utils import is_couchdb_id
@@ -29,6 +30,9 @@ def episode_by_id(episode_id, current_id=False):
     if current_id and obj._id != episode_id:
         raise MergedIdException(obj, obj._id)
 
+    if obj.needs_update:
+        incomplete_obj.send_robust(sender=obj)
+
     return obj
 
 
@@ -45,7 +49,14 @@ def episodes_by_id(episode_ids):
             include_docs = True,
             keys         = episode_ids,
         )
-    return list(r)
+
+    episodes = list(r)
+
+    for episode in episodes:
+        if episode.needs_update:
+            incomplete_obj.send_robust(sender=episode)
+
+    return episodes
 
 
 @cache_result(timeout=60*60)
@@ -60,7 +71,16 @@ def episode_for_oldid(oldid):
             limit        = 1,
             include_docs = True,
         )
-    return r.one() if r else None
+
+    if not r:
+        return None
+
+    episode = r.one()
+
+    if episode.needs_update:
+        incomplete_obj.send_robust(sender=episode)
+
+    return episode
 
 
 @cache_result(timeout=60*60)
@@ -77,7 +97,16 @@ def episode_for_slug(podcast_id, episode_slug):
             key          = [podcast_id, episode_slug],
             include_docs = True,
         )
-    return r.first() if r else None
+
+    if not r:
+        return None
+
+    episode = r.one()
+
+    if episode.needs_update:
+        incomplete_obj.send_robust(sender=episode)
+
+    return episode
 
 
 def episode_for_podcast_url(podcast_url, episode_url, create=False):
@@ -122,7 +151,11 @@ def episode_for_podcast_id_url(podcast_id, episode_url, create=False):
 
     if r:
         episode = r.first()
-        cache.set(key, episode)
+
+        if episode.needs_update:
+            incomplete_obj.send_robust(sender=episode)
+        else:
+            cache.set(key, episode)
         return episode
 
     if create:
@@ -130,7 +163,7 @@ def episode_for_podcast_id_url(podcast_id, episode_url, create=False):
         episode.podcast = podcast_id
         episode.urls = [episode_url]
         episode.save()
-        cache.set(key, episode)
+        incomplete_obj.send_robust(sender=episode)
         return episode
 
     return None
@@ -249,7 +282,13 @@ def episodes_for_podcast_uncached(podcast, since=None, until={}, **kwargs):
             **kwargs
         )
 
-    return list(res)
+    episodes = list(res)
+
+    for episode in episodes:
+        if episode.needs_update:
+            incomplete_obj.send_robust(sender=episode)
+
+    return episodes
 
 
 episodes_for_podcast = cache_result(timeout=60*60)(episodes_for_podcast_uncached)
@@ -291,7 +330,14 @@ def favorite_episodes_for_user(user):
             key          = user._id,
             include_docs = True,
         )
-    return list(favorites)
+
+    episodes = list(favorites)
+
+    for episode in episodes:
+        if episode.needs_update:
+            incomplete_obj.send_robust(sender=episode)
+
+    return episodes
 
 
 def chapters_for_episode(episode_id):
