@@ -201,7 +201,7 @@ def resend_activation(request):
             raise ValueError(_('Your activation key has expired. Please try another username, or retry with the same one tomorrow.'))
 
     except ValueError, e:
-        messages.error(request, str(e))
+        messages.error(request, unicode(e))
 
         return render(request, 'registration/resend_activation.html', {
            'form': form,
