@@ -26,6 +26,7 @@ EPISODE_ACTION_TYPES = (
         ('play',     _('played')),
         ('delete',   _('deleted')),
         ('new',      _('marked as new')),
+        ('flattr',   _('flattr\'d')),
 )
 
 
