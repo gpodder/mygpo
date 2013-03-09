@@ -35,9 +35,7 @@ from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.web.forms import RestorePasswordForm
 from mygpo.users.models import User
 from mygpo.web.forms import ResendActivationForm
-
-
-DEFAULT_LOGIN_REDIRECT = '/'
+from mygpo.constants import DEFAULT_LOGIN_REDIRECT
 
 
 @repeat_on_conflict(['user'])
