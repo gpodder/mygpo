@@ -268,7 +268,7 @@ class MissingPodcast(View):
                 except (ParserException, FetchFeedException,
                         NoEpisodesException) as ex:
                     can_add = False
-                    messages.error(request, str(ex))
+                    messages.error(request, unicode(ex))
 
         return render(request, 'missing.html', {
                 'site': site,
