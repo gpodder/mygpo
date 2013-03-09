@@ -61,6 +61,7 @@ def auto_flattr_episode(user, episode_id):
 
     action = EpisodeAction()
     action.action = 'flattr'
+    action.upload_timestamp = get_timestamp(datetime.utcnow())
     add_episode_actions(state, [action])
 
     return True
