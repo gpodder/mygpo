@@ -152,7 +152,7 @@ def podcast_for_slug(slug):
         obj = pg.get_podcast_by_id(pid)
 
     if obj.needs_update:
-        raise incomplete_obj.send_robust(sender=obj)
+        incomplete_obj.send_robust(sender=obj)
 
     return obj
 
