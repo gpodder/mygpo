@@ -35,13 +35,17 @@ class Flattr(object):
     THING_INFO_URL_TEMPLATE = API_BASE + '/things/lookup/?url=%(url)s'
 
 
-    def __init__(self, user, domain):
+    def __init__(self, user, domain, is_secure):
         self.user = user
         self.domain = domain
+        self.is_secure = is_secure
 
 
     def _get_callback(self):
-        return 'https://' + self.domain + reverse('flattr-token')
+        return 'http{s}://{domain}{callback}'.format(
+            s='s' if self.is_secure else '',
+            domain=self.domain,
+            callback=reverse('flattr-token'))
 
 
     def request(self, url, data=None):

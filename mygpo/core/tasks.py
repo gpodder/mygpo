@@ -15,10 +15,10 @@ from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
 
 
 @celery.task(max_retries=5, default_retry_delay=60)
-def flattr_thing(user, thing_id, domain, thing_type):
+def flattr_thing(user, thing_id, domain, is_secure, thing_type):
     """ Task to flattr a thing """
 
-    flattr = Flattr(user, domain)
+    flattr = Flattr(user, domain, is_secure)
 
     if thing_type == 'Podcast':
         thing = podcast_by_id(thing_id)
@@ -51,7 +51,7 @@ def auto_flattr_episode(user, episode_id):
 
     In addition to the flattring itself, it also records the event """
 
-    success, msg = flattr_thing(user, episode_id, None, 'Episode')
+    success, msg = flattr_thing(user, episode_id, None, False, 'Episode')
 
     if not success:
         return False

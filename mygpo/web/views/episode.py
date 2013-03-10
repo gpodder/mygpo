@@ -249,7 +249,8 @@ def flattr_episode(request, episode):
     site = RequestSite(request)
 
     # Flattr via the tasks queue, but wait for the result
-    task = flattr_thing.delay(user, episode._id, site.domain, 'Episode')
+    task = flattr_thing.delay(user, episode._id, site.domain,
+            request.is_secure(), 'Episode')
     success, msg = task.get()
 
     if success:

@@ -96,7 +96,7 @@ def list_show(request, plist, owner):
     max_subscribers = max([p.subscriber_count() for p in podcasts] + [0])
 
     thing = plist.get_flattr_thing(site.domain, owner.username)
-    flattr = Flattr(owner, site.domain)
+    flattr = Flattr(owner, site.domain, request.is_secure())
     flattr_autosubmit = flattr.get_autosubmit_url(thing)
 
     return render(request, 'list.html', {

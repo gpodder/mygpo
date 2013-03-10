@@ -54,7 +54,7 @@ def account(request):
     if request.method == 'GET':
 
        site = RequestSite(request)
-       flattr = Flattr(request.user, site.domain)
+       flattr = Flattr(request.user, site.domain, request.is_secure())
        userpage_token = request.user.get_token('userpage_token')
 
        profile_form = ProfileForm({
@@ -169,7 +169,7 @@ class FlattrTokenView(View):
 
         user = request.user
         site = RequestSite(request)
-        flattr = Flattr(user, site.domain)
+        flattr = Flattr(user, site.domain, request.is_secure())
 
         url = request.build_absolute_uri()
         token = flattr.process_retrieved_code(url)
