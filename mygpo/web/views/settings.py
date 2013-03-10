@@ -42,7 +42,9 @@ from mygpo.users.settings import PUBLIC_SUB_PODCAST, PUBLIC_SUB_USER, \
 from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_to_dict
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast, \
          subscriptions_by_user
-from mygpo.db.couchdb.user import update_flattr_settings
+from mygpo.db.couchdb.user import update_flattr_settings, \
+         set_users_google_email
+
 
 
 @login_required
@@ -182,6 +184,15 @@ class FlattrTokenView(View):
 
         return HttpResponseRedirect(reverse('account') + '#flattr')
 
+
+class AccountRemoveGoogle(View):
+    """ Removes the connected Google account """
+
+    @method_decorator(login_required)
+    def post(self, request):
+        set_users_google_email(request.user, None)
+        messages.success(request, _('Your account has been disconnected'))
+        return HttpResponseRedirect(reverse('account'))
 
 
 @login_required

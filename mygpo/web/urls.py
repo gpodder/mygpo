@@ -92,7 +92,7 @@ urlpatterns += patterns('mygpo.web.views.episode',
 
 from mygpo.web.views.settings import DefaultPrivacySettings, \
          PodcastPrivacySettings, ProfileView, FlattrSettingsView, \
-         FlattrTokenView, FlattrLogout
+         FlattrTokenView, FlattrLogout, AccountRemoveGoogle
 
 urlpatterns += patterns('mygpo.web.views.settings',
  url(r'^account/$',                                               'account',       name='account'),
@@ -101,6 +101,10 @@ urlpatterns += patterns('mygpo.web.views.settings',
  url(r'^account/profile$',
      ProfileView.as_view(),
      name='profile'),
+
+ url(r'^account/google/remove$',
+     AccountRemoveGoogle.as_view(),
+     name='account-google-remove'),
 
  url(r'^account/flattr$',
      FlattrSettingsView.as_view(),
@@ -152,13 +156,21 @@ urlpatterns += patterns('mygpo.web.views.device',
 )
 
 
-from mygpo.web.views.users import LoginView
+from mygpo.web.views.users import LoginView, GoogleLogin, GoogleLoginCallback
 
 urlpatterns += patterns('mygpo.web.views.users',
 
  url(r'^login/$',
     LoginView.as_view(),
     name='login'),
+
+ url(r'^login/google$',
+     GoogleLogin.as_view(),
+     name='login-google'),
+
+ url(r'^login/oauth2callback$',
+     GoogleLoginCallback.as_view(),
+     name='login-google-callback'),
 
  url(r'^logout/$',                                                 logout, {'next_page': '/'},  name='logout'),
  url(r'^register/resend-activation$',                             'resend_activation',          name='resend-activation'),

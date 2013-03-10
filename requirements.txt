@@ -12,3 +12,4 @@ django_couchdb_utils>=0.3
 -e git+https://github.com/gpodder/mygpo-feedservice.git#egg=mygpo-feedservice
 celery
 celery-redis
+google-api-python-client

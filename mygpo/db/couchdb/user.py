@@ -229,3 +229,30 @@ def update_flattr_settings(user, token, enabled=None, flattr_mygpo=False,
 def _wrap_historyentry(action):
     from mygpo.users.models import HistoryEntry
     return HistoryEntry.from_action_dict(action['value'])
+
+
+def user_by_google_email(email):
+    """ Get a user by its connected Google account """
+
+    from mygpo.users.models import User
+    users = User.view('users/by_google_email',
+            key          = email,
+            include_docs = True,
+        )
+
+    if not users:
+        return None
+
+    return users.one()
+
+
+@repeat_on_conflict(['user'])
+def set_users_google_email(user, email):
+    """ Update the Google accoutn connected with the user """
+
+    if user.google_email == email:
+        return user
+
+    user.google_email = email
+    user.save()
+    return user

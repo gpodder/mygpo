@@ -476,6 +476,7 @@ class User(BaseUser, SyncedDevicesMixin, SettingsMixin):
     suggestions_up_to_date = BooleanProperty(default=False)
     twitter = StringProperty()
     about   = StringProperty()
+    google_email = StringProperty()
 
     # token for accessing subscriptions of this use
     subscriptions_token    = StringProperty(default=None)

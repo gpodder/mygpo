@@ -17,6 +17,9 @@
 
 from django.contrib.auth.backends import ModelBackend
 from django.core.validators import email_re
+from django.conf import settings
+from django.contrib.sites.models import RequestSite
+from django.core.urlresolvers import reverse
 
 from mygpo.users.models import User
 
@@ -33,3 +36,25 @@ class EmailAuthenticationBackend(ModelBackend):
 
     def get_user(self, username):
         return User.get_user(username)
+
+
+def get_google_oauth_flow(request):
+    """ Prepare an OAuth 2.0 flow
+
+    https://developers.google.com/api-client-library/python/guide/aaa_oauth """
+
+    from oauth2client.client import OAuth2WebServerFlow
+
+    site = RequestSite(request)
+
+    callback = 'http{s}://{domain}{callback}'.format(
+        s='s' if request.is_secure() else '',
+        domain = site.domain,
+        callback = reverse('login-google-callback'))
+
+    flow = OAuth2WebServerFlow(client_id=settings.GOOGLE_CLIENT_ID,
+            client_secret=settings.GOOGLE_CLIENT_SECRET,
+            scope='https://www.googleapis.com/auth/userinfo.email',
+            redirect_uri=callback)
+
+    return flow

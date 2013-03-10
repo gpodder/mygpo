@@ -210,6 +210,12 @@ CELERY_CONF = dict(
 )
 
 
+### Google API
+
+GOOGLE_CLIENT_ID=''
+GOOGLE_CLIENT_SECRET=''
+
+
 
 try:
     from settings_prod import *
