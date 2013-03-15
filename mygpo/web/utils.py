@@ -34,7 +34,7 @@ def sanitize_language_code(lang):
     return lang[:2].lower()
 
 
-def sanitize_language_codes(langs):
+def sanitize_language_codes(ls):
     """
     expects a list of language codes and returns a unique lost of the first
     part of all items. obviously invalid entries are skipped
@@ -46,7 +46,8 @@ def sanitize_language_codes(langs):
     ['de', 'en']
     """
 
-    return list(set([sanitize_language_code(l) for l in langs if l and RE_LANG.match(l)]))
+    ls = [sanitize_language_code(l) for l in ls if l and RE_LANG.match(l)]
+    return list(set(ls))
 
 
 def get_language_names(lang):
@@ -65,8 +66,6 @@ def get_language_names(lang):
             res[l] = locale.display_name
 
     return res
-
-
 
 
 def get_page_list(start, total, cur, show_max):
@@ -101,7 +100,8 @@ def get_page_list(start, total, cur, show_max):
     ps.append(cur)
 
     if (total - cur) > show_max / 2:
-        add = show_max / 2 - len(ps) # for the first pages, show more pages at the beginning
+        # for the first pages, show more pages at the beginning
+        add = show_max / 2 - len(ps)
         ps.extend(range(cur + 1, cur + show_max / 4 + add))
         ps.append('...')
         ps.extend(range(total - show_max / 4, total + 1))
@@ -124,8 +124,8 @@ def process_lang_params(request):
 
 
 def symbian_opml_changes(podcast):
-    podcast.description = (podcast.title or '') + '\n' \
-                        + (podcast.description or '')
+    podcast.description = (podcast.title or '') + '\n' + \
+                          (podcast.description or '')
     return podcast
 
 
@@ -182,7 +182,8 @@ def get_podcast_group_link_target(group, view_name, add_args=[]):
     return reverse(view_name, args=args + add_args)
 
 
-def get_episode_link_target(episode, podcast, view_name='episode', add_args=[]):
+def get_episode_link_target(episode, podcast, view_name='episode',
+                            add_args=[]):
     """ Returns the link-target for an Episode, preferring slugs over Ids
 
     automatically distringuishes between relational Episode objects and
@@ -229,6 +230,7 @@ def fetch_episode_data(episodes, podcasts={}):
 
 # doesn't include the '@' because it's not stored as part of a twitter handle
 TWITTER_CHARS = string.ascii_letters + string.digits + '_'
+
 
 def normalize_twitter(s):
     """ normalize user input that is supposed to be a Twitter handle """

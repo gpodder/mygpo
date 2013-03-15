@@ -49,12 +49,13 @@ def get_google_oauth_flow(request):
 
     callback = 'http{s}://{domain}{callback}'.format(
         s='s' if request.is_secure() else '',
-        domain = site.domain,
-        callback = reverse('login-google-callback'))
+        domain=site.domain,
+        callback=reverse('login-google-callback'))
 
-    flow = OAuth2WebServerFlow(client_id=settings.GOOGLE_CLIENT_ID,
-            client_secret=settings.GOOGLE_CLIENT_SECRET,
-            scope='https://www.googleapis.com/auth/userinfo.email',
-            redirect_uri=callback)
+    flow = OAuth2WebServerFlow(
+        client_id=settings.GOOGLE_CLIENT_ID,
+        client_secret=settings.GOOGLE_CLIENT_SECRET,
+        scope='https://www.googleapis.com/auth/userinfo.email',
+        redirect_uri=callback)
 
     return flow

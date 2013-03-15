@@ -33,7 +33,6 @@ class SimpleWebTests(TestCase):
 
         self.auth_string = create_auth_string('test', 'pwd')
 
-
     def test_access_parameterless_pages(self):
         pages = [
             'history',
@@ -58,15 +57,13 @@ class SimpleWebTests(TestCase):
 
         self.access_pages(pages, [], True)
 
-
     def test_access_podcast_pages(self):
         pages = ['podcast', ]
 
-
     def access_pages(self, pages, args, login):
         if login:
-            self.client.post('/login/',
-                dict(login_username=self.user.username, pwd='pwd'))
+            self.client.post('/login/', dict(
+                login_username=self.user.username, pwd='pwd'))
 
         for page in pages:
             response = self.client.get(reverse(page, args=args), follow=True)
@@ -78,4 +75,3 @@ def suite():
     suite.addTest(doctest.DocTestSuite(mygpo.web.utils))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(SimpleWebTests))
     return suite
-
