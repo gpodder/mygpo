@@ -6,6 +6,7 @@ from django.core.cache import cache
 from mygpo.core.models import Podcast, Episode, MergedIdException
 from mygpo.core.signals import incomplete_obj
 from mygpo.cache import cache_result
+from mygpo.decorators import repeat_on_conflict
 from mygpo.db import QueryParameterMissing
 from mygpo.db.couchdb.utils import is_couchdb_id
 from mygpo.db.couchdb import get_main_database
@@ -109,6 +110,36 @@ def episode_for_slug(podcast_id, episode_slug):
     return episode
 
 
+def episodes_for_slug(podcast_id, episode_slug):
+    """ returns all episodes for the given slug
+
+    this should normally only return one episode, but there might be multiple
+    due to resolved replication conflicts, etc """
+
+    if not podcast_id:
+        raise QueryParameterMissing('podcast_id')
+
+    if not episode_slug:
+        raise QueryParameterMissing('episode_slug')
+
+    r = Episode.view('episodes/by_slug',
+            key          = [podcast_id, episode_slug],
+            include_docs = True,
+        )
+
+    if not r:
+        return []
+
+    episodes = r.all()
+
+    for episode in episodes:
+        if episode.needs_update:
+            incomplete_obj.send_robust(sender=episode)
+
+    return episodes
+
+
+
 def episode_for_podcast_url(podcast_url, episode_url, create=False):
 
     if not podcast_url:
@@ -169,7 +200,6 @@ def episode_for_podcast_id_url(podcast_id, episode_url, create=False):
     return None
 
 
-@cache_result(timeout=60*60)
 def episode_for_slug_id(p_slug_id, e_slug_id):
     """ Returns the Episode for Podcast Slug/Id and Episode Slug/Id """
 
@@ -359,3 +389,17 @@ def _wrap_chapter(res):
     user = res['key'][1]
     chapter = Chapter.wrap(res['value'])
     return (user, chapter)
+
+
+@repeat_on_conflict(['episode'])
+def set_episode_slug(episode, slug):
+    """ sets slug as new main slug of the episode, moves other to merged """
+    episode.set_slug(slug)
+    episode.save()
+
+
+@repeat_on_conflict(['episode'])
+def remove_episode_slug(episode, slug):
+    """ removes slug from main and merged slugs """
+    episode.remove_slug(slug)
+    episode.save()

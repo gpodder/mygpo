@@ -30,6 +30,11 @@ urlpatterns = patterns('mygpo.publisher.views',
  url(r'^podcast/(?P<p_slug_id>[\w-]+)/(?P<e_slug_id>[\w-]+)$',
       'episode_slug_id',            name='episode-publisher-detail-slug-id'),
 
+ url(r'^podcast/(?P<p_slug_id>[\w-]+)/(?P<e_slug_id>[\w-]+)/set-slug$',
+      'update_episode_slug_slug_id', name='publisher-set-episode-slug-slug-id'),
+
+
+
  url(r'^group/(?P<group_id>\d+)$',      'group_oldid',                 name='group-publisher'),
  url(r'^group/(?P<slug_id>[\w-]+)$',    'group_slug_id',               name='group-publisher-slug-id'),
 
