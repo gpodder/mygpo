@@ -39,17 +39,34 @@ DATABASES = {
     }
 }
 
-COUCHDB_DATABASES = (
-    ('mygpo.directory', 'http://127.0.0.1:5984/mygpo'),
-    ('mygpo.core',      'http://127.0.0.1:5984/mygpo'),
-    ('mygpo.api',       'http://127.0.0.1:5984/mygpo'),
-    ('mygpo.users',     'http://127.0.0.1:5984/mygpo'),
-    ('mygpo.share',     'http://127.0.0.1:5984/mygpo'),
-    ('mygpo.maintenance',     'http://127.0.0.1:5984/mygpo'),
-    ('django_couchdb_utils_auth',     'http://127.0.0.1:5984/mygpo'),
-    ('django_couchdb_utils_sessions', 'http://127.0.0.1:5984/mygpo_sessions'),
-    ('django_couchdb_utils_registration', 'http://127.0.0.1:5984/mygpo'),
-)
+COUCHDB_DATABASES = {
+    'mygpo.directory':
+        {'URL': 'http://127.0.0.1:5984/mygpo'},
+
+    'mygpo.core':
+        {'URL': 'http://127.0.0.1:5984/mygpo'},
+
+    'mygpo.api':
+        {'URL': 'http://127.0.0.1:5984/mygpo'},
+
+    'mygpo.users':
+        {'URL': 'http://127.0.0.1:5984/mygpo'},
+
+    'mygpo.share':
+        {'URL': 'http://127.0.0.1:5984/mygpo'},
+
+    'mygpo.maintenance':
+        {'URL': 'http://127.0.0.1:5984/mygpo'},
+
+    'django_couchdb_utils_auth':
+        {'URL': 'http://127.0.0.1:5984/mygpo'},
+
+    'django_couchdb_utils_sessions':
+        {'URL': 'http://127.0.0.1:5984/mygpo_sessions'},
+
+    'django_couchdb_utils_registration':
+        {'URL': 'http://127.0.0.1:5984/mygpo'},
+}
 
 
 # Local time zone for this installation. Choices can be found here:

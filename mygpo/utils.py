@@ -15,6 +15,8 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+import subprocess
+import os
 import operator
 import sys
 import re
@@ -711,3 +713,26 @@ def sanitize_encoding(filename):
     if not isinstance(filename, unicode):
         filename = filename.decode(encoding, 'ignore')
     return filename.encode(encoding, 'ignore')
+
+
+def get_git_head():
+    """ returns the commit and message of the current git HEAD """
+
+    try:
+        pr = subprocess.Popen('/usr/bin/git log -n 1 --oneline'.split(),
+            cwd = settings.BASE_DIR,
+            stdout = subprocess.PIPE,
+            stderr = subprocess.PIPE,
+        )
+
+    except OSError:
+        return None, None
+
+    (out, err) = pr.communicate()
+    if err:
+        raise None, None
+
+    outs = out.split()
+    commit = outs[0]
+    msg = ' ' .join(outs[1:])
+    return commit, msg

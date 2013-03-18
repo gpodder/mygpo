@@ -1,7 +1,9 @@
 import re
+import socket
 from itertools import count
 from collections import Counter
 
+import django
 from django.shortcuts import render
 from django.contrib import messages
 from django.core.urlresolvers import reverse
@@ -9,6 +11,7 @@ from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext as _
 from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
+from django.conf import settings
 
 from mygpo.admin.auth import require_staff
 from mygpo.admin.group import PodcastGrouper
@@ -16,7 +19,9 @@ from mygpo.maintenance.merge import PodcastMerger, IncorrectMergeException
 from mygpo.users.models import User
 from mygpo.admin.clients import UserAgentStats, ClientStats
 from mygpo.admin.tasks import merge_podcasts
+from mygpo.utils import get_git_head
 from mygpo.api.httpresponse import JsonResponse
+from mygpo.db.couchdb import get_main_database
 from mygpo.db.couchdb.episode import episode_count
 from mygpo.db.couchdb.podcast import podcast_count, podcast_for_url
 
@@ -33,6 +38,33 @@ class AdminView(TemplateView):
 
 class Overview(AdminView):
     template_name = 'admin/overview.html'
+
+
+class HostInfo(AdminView):
+    """ shows host information for diagnosis """
+
+    template_name = 'admin/hostinfo.html'
+
+    def get(self, request):
+        commit, msg = get_git_head()
+        base_dir = settings.BASE_DIR
+        hostname = socket.gethostname()
+        django_version = django.VERSION
+
+        main_db = get_main_database()
+
+        db_tasks = main_db.server.active_tasks()
+
+        return self.render_to_response({
+            'git_commit': commit,
+            'git_msg': msg,
+            'base_dir': base_dir,
+            'hostname': hostname,
+            'django_version': django_version,
+            'main_db': main_db.uri,
+            'db_tasks': db_tasks,
+        })
+
 
 
 class MergeSelect(AdminView):
