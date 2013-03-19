@@ -21,6 +21,7 @@ from mygpo.admin.clients import UserAgentStats, ClientStats
 from mygpo.admin.tasks import merge_podcasts
 from mygpo.utils import get_git_head
 from mygpo.api.httpresponse import JsonResponse
+from mygpo.cel import celery
 from mygpo.db.couchdb import get_main_database
 from mygpo.db.couchdb.episode import episode_count
 from mygpo.db.couchdb.podcast import podcast_count, podcast_for_url
@@ -55,6 +56,9 @@ class HostInfo(AdminView):
 
         db_tasks = main_db.server.active_tasks()
 
+        i = celery.control.inspect()
+        num_celery_tasks = len(i.scheduled() or [])
+
         return self.render_to_response({
             'git_commit': commit,
             'git_msg': msg,
@@ -63,6 +67,7 @@ class HostInfo(AdminView):
             'django_version': django_version,
             'main_db': main_db.uri,
             'db_tasks': db_tasks,
+            'num_celery_tasks': num_celery_tasks,
         })
 
 
