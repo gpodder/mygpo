@@ -730,7 +730,7 @@ def get_git_head():
 
     (out, err) = pr.communicate()
     if err:
-        raise None, None
+        return None, None
 
     outs = out.split()
     commit = outs[0]
