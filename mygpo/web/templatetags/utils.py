@@ -66,5 +66,5 @@ def markdown(txt):
 def nbsp(s):
     """ collapses multiple whitespaces and replaces them with &nbsp; """
     import re
-    s = re.sub("\s+" , "&nbsp;", s)
+    s = re.sub("\s+", "&nbsp;", s)
     return mark_safe(s)

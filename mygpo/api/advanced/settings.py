@@ -66,8 +66,8 @@ def main(request, username, scope):
         return episode_state, episode_state
 
     models = dict(
-            account = lambda: user_settings   (request.user),
-            device  = lambda: device_settings (request.user, request.GET.get('device', '')),
+            account = lambda: user_settings(request.user),
+            device  = lambda: device_settings(request.user, request.GET.get('device', '')),
             podcast = lambda: podcast_settings(request.user, request.GET.get('podcast', '')),
             episode = lambda: episode_settings(request.user, request.GET.get('episode', ''), request.GET.get('podcast', ''))
         )
@@ -100,4 +100,3 @@ def update_settings(obj, actions):
             del obj.settings[key]
 
     return obj.settings
-

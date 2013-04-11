@@ -125,4 +125,3 @@ def auth(emailaddr, password):
         return None
 
     return user
-

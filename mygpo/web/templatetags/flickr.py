@@ -15,4 +15,3 @@ def embed_flickr_photo(episode):
     img = flickr.get_display_photo(episode.url)
     s = '<a href="%s" title="%s"><img src="%s" alt="%s" /></a>' % (episode.link, episode.title, img, episode.title)
     return mark_safe(s)
-

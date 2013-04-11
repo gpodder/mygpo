@@ -35,4 +35,3 @@ urlpatterns = patterns('mygpo.directory.views',
  url(r'^search/$',                        'search',      name='search'),
  url(r'^lists/$',                     'podcast_lists', name='podcast-lists'),
 )
-

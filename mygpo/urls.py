@@ -45,4 +45,3 @@ urlpatterns += patterns('',
     (r'^publisher/', include('mygpo.publisher.urls')),
     (r'^admin/',     include('mygpo.admin.urls')),
 )
-

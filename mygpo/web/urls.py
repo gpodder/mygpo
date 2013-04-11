@@ -185,4 +185,3 @@ urlpatterns += patterns('mygpo.web.views.users',
     (r'^activate/(?P<activation_key>\w+)$',                        activate,
             {'backend': 'django_couchdb_utils.registration.backends.default.DefaultBackend'}),
 )
-

@@ -196,7 +196,7 @@ def resend_activation(request):
         if user.deleted:
             raise ValueError(_('You have deleted your account, but you can regster again.'))
 
-        if user.activation_key == None:
+        if user.activation_key is None:
             _set_active(user=user, is_active=True)
             raise ValueError(_('Your account already has been activated. Go ahead and log in.'))
 

@@ -116,7 +116,7 @@ ROOT_URLCONF = 'mygpo.urls'
 TEMPLATE_DIRS = ()
 
 INSTALLED_APPS = (
-    'django.contrib.contenttypes', # unused, but tests fail otherwise (?)
+    'django.contrib.contenttypes',  # unused, but tests fail otherwise (?)
     'django.contrib.messages',
     'django.contrib.humanize',
     'couchdbkit.ext.django',
@@ -237,6 +237,5 @@ GOOGLE_CLIENT_SECRET=''
 try:
     from settings_prod import *
 except ImportError, e:
-     import sys
-     print >> sys.stderr, 'create settings_prod.py with your customized settings'
-
+    import sys
+    print >> sys.stderr, 'create settings_prod.py with your customized settings'

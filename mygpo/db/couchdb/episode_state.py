@@ -61,7 +61,7 @@ def all_episode_states(episode):
     if not episode:
         raise QueryParameterMissing('episode')
 
-    r =  EpisodeUserState.view('episode_states/by_podcast_episode',
+    r = EpisodeUserState.view('episode_states/by_podcast_episode',
             startkey     = [episode.podcast, episode._id, None],
             endkey       = [episode.podcast, episode._id, {}],
             include_docs = True,
@@ -75,7 +75,7 @@ def all_podcast_episode_states(podcast):
     if not podcast:
         raise QueryParameterMissing('podcast')
 
-    r =  EpisodeUserState.view('episode_states/by_podcast_episode',
+    r = EpisodeUserState.view('episode_states/by_podcast_episode',
             startkey     = [podcast.get_id(), None, None],
             endkey       = [podcast.get_id(), {},   {}],
             include_docs = True

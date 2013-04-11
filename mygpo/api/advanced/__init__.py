@@ -83,7 +83,7 @@ def subscriptions(request, username, device_uid):
             return HttpResponseNotFound(str(e))
 
         since_ = request.GET.get('since', None)
-        if since_ == None:
+        if since_ is None:
             return HttpResponseBadRequest('parameter since missing')
         try:
             since = datetime.fromtimestamp(float(since_))
@@ -329,11 +329,13 @@ def update_episodes(user, actions, now, ua_string):
 
         podcast_url = action['podcast']
         podcast_url = sanitize_append(podcast_url, 'podcast', update_urls)
-        if podcast_url == '': continue
+        if podcast_url == '':
+            continue
 
         episode_url = action['episode']
         episode_url = sanitize_append(episode_url, 'episode', update_urls)
-        if episode_url == '': continue
+        if episode_url == '':
+            continue
 
         act = parse_episode_action(action, user, update_urls, now, ua_string)
         grouped_actions[ (podcast_url, episode_url) ].append(act)
@@ -423,7 +425,7 @@ def device(request, username, device_uid):
 
     if 'type' in data:
         if not valid_devicetype(data['type']):
-           return HttpResponseBadRequest('invalid device type %s' % data['type'])
+            return HttpResponseBadRequest('invalid device type %s' % data['type'])
         d.type = data['type']
 
 
@@ -503,7 +505,7 @@ class DeviceUpdates(View):
             return HttpResponseNotFound(str(e))
 
         since_ = request.GET.get('since', None)
-        if since_ == None:
+        if since_ is None:
             return HttpResponseBadRequest('parameter since missing')
         try:
             since = datetime.fromtimestamp(float(since_))

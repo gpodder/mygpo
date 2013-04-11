@@ -311,7 +311,7 @@ class PodcastUpdater(object):
                 for f in thumbnails:
                     os.unlink(f)
 
-            return  cover_art
+            return cover_art
 
         except (urllib2.HTTPError, urllib2.URLError, ValueError,
                 httplib.BadStatusLine) as e:

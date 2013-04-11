@@ -23,7 +23,7 @@ class RatingMixin(DocumentSchema):
             raise ValueError('Rating must be in %s' % (ALLOWED_RATINGS, ))
 
         rating = Rating(rating=rating_val, user=user_id)
-        self.ratings = filter(lambda r: r.user != None, self.ratings)
+        self.ratings = filter(lambda r: r.user is not None, self.ratings)
         self.ratings = filter(lambda r: r.user != user_id, self.ratings)
         self.ratings.append(rating)
 

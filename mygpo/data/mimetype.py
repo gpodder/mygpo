@@ -64,4 +64,3 @@ def get_mimetype(mimetype, url):
         mimetype, _encoding = mimetypes.guess_type(url)
 
     return mimetype
-

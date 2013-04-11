@@ -104,7 +104,7 @@ class Episode(Document, SlugMixin, OldIdMixin):
 
 
     def __eq__(self, other):
-        if other == None:
+        if other is None:
             return False
         return self._id == other._id
 
@@ -383,7 +383,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
     def save(self):
         group = getattr(self, 'group', None)
-        if group: #we are part of a PodcastGroup
+        if group:  # we are part of a PodcastGroup
             group = PodcastGroup.get(group)
             podcasts = list(group.podcasts)
 
@@ -426,7 +426,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         if not self.get_id():
             return self == other
 
-        if other == None:
+        if other is None:
             return False
 
         return self.get_id() == other.get_id()

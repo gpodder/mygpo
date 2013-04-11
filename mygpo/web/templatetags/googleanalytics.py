@@ -22,4 +22,3 @@ def google_analytics_async(property_id):
     </script>""" % property_id
 
     return mark_safe(s)
-

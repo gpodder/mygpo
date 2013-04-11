@@ -172,4 +172,3 @@ def has_perm_or_basicauth(perm, realm = ""):
                                      realm, *args, **kwargs)
         return wrapper
     return view_decorator
-

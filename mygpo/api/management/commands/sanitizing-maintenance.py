@@ -15,4 +15,3 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         maintenance(options.get('dry_run'))
-

@@ -57,4 +57,3 @@ def get_display_photo(url, label='Medium'):
             return s['source']
 
     return url
-

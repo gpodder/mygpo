@@ -147,4 +147,3 @@ def category_data(category):
         tag   = category.label,
         usage = category.get_weight()
     )
-

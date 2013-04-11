@@ -242,19 +242,17 @@ def first(it):
     returns the first not-None object or None if the iterator is exhausted
     """
     for x in it:
-        if x != None:
+        if x is not None:
             return x
     return None
 
 
 def intersect(a, b):
-     return list(set(a) & set(b))
+    return list(set(a) & set(b))
 
 
 
 def remove_control_chars(s):
-    import unicodedata, re
-
     all_chars = (unichr(i) for i in xrange(0x110000))
     control_chars = ''.join(map(unichr, range(0,32) + range(127,160)))
     control_char_re = re.compile('[%s]' % re.escape(control_chars))
@@ -416,7 +414,7 @@ def longest_substr(strings):
     substr = ""
     if not strings:
         return substr
-    reference = shortest_of(strings) #strings[0]
+    reference = shortest_of(strings)
     length = len(reference)
     #find a suitable slice i:j
     for i in xrange(length):
@@ -468,7 +466,7 @@ def file_hash(f, h=hashlib.md5, block_size=2**20):
     """ returns the hash of the contents of a file """
     f_hash = h()
     for chunk in iter(lambda: f.read(block_size), ''):
-         f_hash.update(chunk)
+        f_hash.update(chunk)
     return f_hash
 
 

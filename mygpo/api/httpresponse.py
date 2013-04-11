@@ -34,4 +34,3 @@ class JsonResponse(HttpResponse):
 
         super(JsonResponse, self).__init__(
             content, content_type=content_type)
-

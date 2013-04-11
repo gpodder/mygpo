@@ -126,4 +126,3 @@ def section_menu(selected, title=None):
 
     s = '\n'.join(items)
     return mark_safe(s)
-

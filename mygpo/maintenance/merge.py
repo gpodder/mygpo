@@ -227,7 +227,8 @@ class PodcastMerger(object):
         for a, b in utils.iterate_together(
                 [podcast1.subscribers, podcast2.subscribers], key):
 
-            if a is None or b is None: continue
+            if a is None or b is None:
+                continue
 
             # avoid increasing subscriber_count when merging
             # duplicate entries of a single podcast
@@ -290,12 +291,12 @@ class PodcastMerger(object):
             if state == state2:
                 continue
 
-            if state == None:
+            if state is None:
                 self.actions['move-podcast-state'] += 1
                 self._move_state(state2=state2, new_id=podcast1.get_id(),
                         new_url=podcast1.url)
 
-            elif state2 == None:
+            elif state2 is None:
                 continue
 
             else:
@@ -375,12 +376,12 @@ class EpisodeMerger(object):
             if state == state2:
                 continue
 
-            if state == None:
+            if state is None:
                 self.actions['move-episode-state'] += 1
                 self._move(state2=state2, podcast_id=self.episode1.podcast,
                         episode_id=self.episode1._id)
 
-            elif state2 == None:
+            elif state2 is None:
                 continue
 
             else:

@@ -55,28 +55,28 @@ def account(request):
 
     if request.method == 'GET':
 
-       site = RequestSite(request)
-       flattr = Flattr(request.user, site.domain, request.is_secure())
-       userpage_token = request.user.get_token('userpage_token')
+        site = RequestSite(request)
+        flattr = Flattr(request.user, site.domain, request.is_secure())
+        userpage_token = request.user.get_token('userpage_token')
 
-       profile_form = ProfileForm({
+        profile_form = ProfileForm({
                'twitter': request.user.twitter,
                'about':   request.user.about,
             })
 
-       form = UserAccountForm({
+        form = UserAccountForm({
             'email': request.user.email,
             'public': request.user.get_wksetting(PUBLIC_SUB_USER)
             })
 
-       flattr_form = FlattrForm({
+        flattr_form = FlattrForm({
                'enable': request.user.get_wksetting(FLATTR_AUTO),
                'token': request.user.get_wksetting(FLATTR_TOKEN),
                'flattr_mygpo': request.user.get_wksetting(FLATTR_MYGPO),
                'username': request.user.get_wksetting(FLATTR_USERNAME),
             })
 
-       return render(request, 'account.html', {
+        return render(request, 'account.html', {
             'site': site,
             'form': form,
             'profile_form': profile_form,

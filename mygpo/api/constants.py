@@ -46,4 +46,3 @@ SUBSCRIPTION_ACTION_TYPES = (
         (SUBSCRIBE_ACTION, _('subscribed')),
         (UNSUBSCRIBE_ACTION, _('unsubscribed')),
 )
-

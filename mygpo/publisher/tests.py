@@ -27,4 +27,3 @@ def suite():
     suite = unittest.TestSuite()
     suite.addTest(doctest.DocTestSuite(mygpo.publisher.utils))
     return suite
-

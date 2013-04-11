@@ -17,4 +17,3 @@ class Command(BaseCommand):
         db = get_main_database()
         loader = FileSystemDocsLoader(path)
         loader.sync(db, verbose=True)
-

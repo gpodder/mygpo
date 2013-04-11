@@ -264,9 +264,9 @@ def toplist(request, count, format):
 
         p = podcast_data(podcast, domain, scale)
         p.update(dict(
-            subscribers=           podcast.subscriber_count(),
-            subscribers_last_week= podcast.prev_subscriber_count(),
-            position_last_week=    podcast.old_pos,
+            subscribers           = podcast.subscriber_count(),
+            subscribers_last_week = podcast.prev_subscriber_count(),
+            position_last_week    = podcast.old_pos,
         ))
         return p
 
