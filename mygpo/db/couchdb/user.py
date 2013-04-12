@@ -153,6 +153,7 @@ def deleted_users():
 
 
 def deleted_user_count():
+    from mygpo.users.models import User
     total = User.view('users/deleted',
             reduce = True,
         )
