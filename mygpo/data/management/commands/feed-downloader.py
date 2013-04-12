@@ -38,4 +38,5 @@ class Command(PodcastCommand):
             print 'Updating podcasts...'
 
             updater = PodcastUpdater()
-            updater.update_queue(queue)
+            for podcast in updater.update_queue(queue):
+                print podcast
