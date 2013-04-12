@@ -435,7 +435,7 @@ class PodcastStateMerger(object):
         state.disabled_devices = set_filter(None, state.disabled_devices,
                 state2.disabled_devices)
 
-        state.merged_ids = set_filter(state._id, state.merged_ids,
+        state.merged_ids = set_filter(state1._id, state.merged_ids,
                 [state2._id], state2.merged_ids)
 
         state.tags = set_filter(None, state.tags, state2.tags)
