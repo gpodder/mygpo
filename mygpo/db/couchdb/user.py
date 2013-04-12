@@ -1,5 +1,7 @@
 from collections import Counter
 
+from couchdbkit import ResourceNotFound
+
 from mygpo.cache import cache_result
 from mygpo.decorators import repeat_on_conflict
 from mygpo.db.couchdb import get_main_database
@@ -257,3 +259,11 @@ def set_users_google_email(user, email):
     user.google_email = email
     user.save()
     return user
+
+
+def get_user_by_id(user_id):
+    from mygpo.users.models import User
+    try:
+        return User.get(user_id)
+    except ResourceNotFound:
+        return None

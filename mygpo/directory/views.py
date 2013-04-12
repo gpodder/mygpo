@@ -25,10 +25,10 @@ from mygpo.directory.search import search_podcasts
 from mygpo.web.utils import process_lang_params, get_language_names, \
          get_page_list, get_podcast_link_target
 from mygpo.directory.tags import Topics
-from mygpo.users.models import User
 from mygpo.users.settings import FLATTR_TOKEN
 from mygpo.data.feeddownloader import PodcastUpdater, NoEpisodesException
 from mygpo.data.tasks import update_podcasts
+from mygpo.db.couchdb.user import get_user_by_id
 from mygpo.db.couchdb.podcast import get_podcast_languages, podcasts_by_id, \
          random_podcasts, podcasts_to_dict, podcast_for_url, \
          get_flattr_podcasts, get_flattr_podcast_count
@@ -98,7 +98,7 @@ class Directory(View):
             random_list = proxy_object(random_list)
             random_list.more_podcasts = max(0, len(random_list.podcasts) - podcasts_per_list)
             random_list.podcasts = podcasts_by_id(random_list.podcasts[:podcasts_per_list])
-            random_list.user = User.get(random_list.user)
+            random_list.user = get_user_by_id(random_list.user)
 
         yield random_list
 
@@ -217,9 +217,9 @@ def podcast_lists(request, page_size=20):
 
 
     def _prepare_list(l):
-        user = User.get(l.user)
+        user = get_user_by_id(l.user)
         l = proxy_object(l)
-        l.username = user.username
+        l.username = user.username if user else ''
         return l
 
     lists = map(_prepare_list, lists)
