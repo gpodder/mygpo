@@ -1,6 +1,16 @@
 Deprecation Information
 =======================
 
-TODO: specify deprecation rules
 
-TODO: list deprecated functionality
+
+
+Deprecation Policy
+------------------
+
+TODO: specify deprecation policy
+
+
+Deprecated Functionality
+------------------------
+
+*currently none*

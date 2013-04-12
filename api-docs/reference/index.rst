@@ -23,6 +23,7 @@ integrating gpodder.net into podcasting applications.
    general
    formats
    auth
+   user
    directory
    devices
    subscriptions

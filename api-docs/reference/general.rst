@@ -10,6 +10,8 @@ All endpoints are offered at https://api.gpodder.net/3/.
 
 Podcast is identified by its feed URL, episode is identified by its media URL.
 
+TODO: see http://developer.github.com/v3/ for relevant information!
+
 
 Status Codes
 ------------

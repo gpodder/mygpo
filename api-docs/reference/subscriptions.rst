@@ -6,14 +6,17 @@ Subscriptions API
 The subscriptions API is used to manage the podcast subscriptions of a client
 device.
 
+TODO: what to do with not-accepted (invalid) podcasts (eg feed URLs that are
+invalid URLs)?
+
 
 Resources
 ---------
 
 The Subscriptions API defines the following resources ::
 
- /<username>/subscriptions
- /<username>/device/<device-id>/subscriptions
+ /user/<username>/subscriptions
+ /user/<username>/device/<device-id>/subscriptions
 
 
 Subscription Upload
@@ -21,7 +24,7 @@ Subscription Upload
 
 Upload the subscriptions for a device ::
 
- PUT /<username>/device/<device-id>/subscriptions
+ PUT /user/<username>/device/<device-id>/subscriptions
  Content-Tpe: application/json
 
  TODO: specify body
@@ -32,21 +35,21 @@ The server can respond with the following status codes.
 When a new device has been created ::
 
  201 Created
- Link: <https://api.gpodder.net/<username>/device/<device-id>/subscription?since=0>; rel=changes
+ Link: <https://api.gpodder.net/user/<username>/device/<device-id>/subscription?since=0>; rel=changes
  ...
 
 
 When the subscriptions have been processed immediatelly ::
 
  204 No Content
- Link: <https://api.gpodder.net/<username>/device/<device-id>/subscription?since=1234>; rel=changes
+ Link: <https://api.gpodder.net/user/<username>/device/<device-id>/subscription?since=1234>; rel=changes
  ...
 
 
 When the subscriptions have been accepted for later processing ::
 
  202 Accepted
- Link: <https://api.gpodder.net/<username>/device/<device-id>/subscription?since=1234>; rel=changes
+ Link: <https://api.gpodder.net/user/<username>/device/<device-id>/subscription?since=1234>; rel=changes
  ...
  TODO: return change download address here?
 
@@ -61,11 +64,11 @@ Subscription Download
 
 Download subscriptions of a device ::
 
- GET /<username>/device/<device-id>/subscriptions
+ GET /user/<username>/device/<device-id>/subscriptions
  Content-Type: application/json
 
  200 Found
- Link: <https://api.gpodder.net/<username>/device/<device-id>/subscription?since=1234>; rel=changes
+ Link: <https://api.gpodder.net/user/<username>/device/<device-id>/subscription?since=1234>; rel=changes
  Content-Type: application/json
  Last-Modified: ...
 
@@ -77,11 +80,11 @@ Download subscriptions of a device ::
 
 Download all of the users subscriptions ::
 
- GET /<username>/subscriptions
+ GET /user/<username>/subscriptions
  Content-Type: application/json
 
  200 Found
- Link: <https://api.gpodder.net/<username>/device/<device-id>/subscription?since=1234>; rel=changes
+ Link: <https://api.gpodder.net/user/<username>/device/<device-id>/subscription?since=1234>; rel=changes
  Content-Type: application/json
  Last-Modified: ...
 
@@ -93,7 +96,7 @@ Subscription Change Upload
 
 Upload changes to the subscriptions of a device ::
 
- POST /<username>/device/<device-id>/subscriptions
+ POST /user/<username>/device/<device-id>/subscriptions
  Content-Tpe: application/json
 
  TODO: specify body...
@@ -105,11 +108,11 @@ Subscription Change Download
 
 Download changes to the subscriptions of a device ::
 
- GET /<username>/device/<device-id>/subscriptions?since=<since>
+ GET /user/<username>/device/<device-id>/subscriptions?since=<since>
  Content-Tpe: application/json
 
  200 Found
- Link: <https://api.gpodder.net/<username>/device/<device-id>/subscription?since=1234>; rel=changes
+ Link: <https://api.gpodder.net/user/<username>/device/<device-id>/subscription?since=1234>; rel=changes
  Content-Type: application/json
  Last-Modified: ...
 
