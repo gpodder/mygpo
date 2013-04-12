@@ -6,4 +6,4 @@ mygpo/settings_prod.py
 mygpo/MAINTENANCE_MODE
 
 # API Docs
-api-docs/_build
+doc/_build

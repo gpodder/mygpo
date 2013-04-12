@@ -40,7 +40,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'gpodder.net API'
+project = u'gpodder.net'
 copyright = u'2013, gpodder.net Team'
 
 # The version info for the project you're documenting, acts as replacement for
