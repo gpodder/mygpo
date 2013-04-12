@@ -25,6 +25,7 @@
    <th>{% trans "Download" %}</th>
   </tr>
   {% for l in lists %}
+   {% if l.username %}
    <tr>
     <td><a href="{% url "list-show" l.username l.slug %}">{{ l.title }}</a></td>
     <td><a href="{% url "user" l.username %}">{{ l.username }}</a></td>
@@ -35,6 +36,7 @@
      </a>
     </td>
    </tr>
+   {% endif %}
   {% endfor %}
  </table>
 
