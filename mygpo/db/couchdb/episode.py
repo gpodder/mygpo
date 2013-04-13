@@ -1,5 +1,6 @@
 from hashlib import sha1
 from datetime import datetime
+from collections import Counter
 
 from django.core.cache import cache
 
@@ -382,6 +383,19 @@ def chapters_for_episode(episode_id):
         )
 
     return map(_wrap_chapter, r)
+
+
+def filetype_stats():
+    """ Returns a filetype counter over all episodes """
+
+    db = get_main_database()
+    r = db.view('episode_stats/filetypes',
+        stale       = 'update_after',
+        reduce      = True,
+        group_level = 1,
+    )
+
+    return Counter({x['key']: x['value'] for x in r})
 
 
 def _wrap_chapter(res):

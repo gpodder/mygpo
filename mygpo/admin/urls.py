@@ -2,7 +2,8 @@ from django.conf.urls import *
 
 from mygpo.admin.views import Overview, MergeSelect, MergeVerify, \
          MergeProcess, MergeStatus, ClientStatsView, ClientStatsJsonView, \
-         UserAgentStatsView, StatsView, StatsJsonView, HostInfo
+         UserAgentStatsView, StatsView, StatsJsonView, HostInfo, \
+         FiletypeStatsView
 
 urlpatterns = patterns('mygpo.admin.views',
  url(r'^$',              Overview.as_view(),     name='admin-overview'),
@@ -21,4 +22,8 @@ urlpatterns = patterns('mygpo.admin.views',
 
  url(r'^stats$',        StatsView.as_view(), name='stats'),
  url(r'^stats\.json$',  StatsJsonView.as_view(), name='stats-json'),
+
+ url(r'^filetypes/$',
+     FiletypeStatsView.as_view(),
+     name='admin-filetypes'),
 )

@@ -15,7 +15,7 @@ function(doc)
                 /* make sure we exclude obvious non-extensions */
                 if (ext.length < 10)
                 {
-                    emit(ext, url);
+                    emit(ext.toLowerCase(), url);
                 }
             }
         }
