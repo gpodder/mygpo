@@ -8,6 +8,7 @@ from mygpo.core.models import Podcast, Episode, MergedIdException
 from mygpo.core.signals import incomplete_obj
 from mygpo.cache import cache_result
 from mygpo.decorators import repeat_on_conflict
+from mygpo.utils import get_timestamp
 from mygpo.db import QueryParameterMissing
 from mygpo.db.couchdb.utils import is_couchdb_id
 from mygpo.db.couchdb import get_main_database
