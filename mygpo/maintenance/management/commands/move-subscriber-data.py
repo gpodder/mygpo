@@ -1,9 +1,10 @@
+from collections import Counter
+
 from django.core.management.base import BaseCommand
 
 from mygpo.utils import progress
 from mygpo.core.models import Podcast
 from mygpo.decorators import repeat_on_conflict
-from mygpo.counter import Counter
 from mygpo.db.couchdb.podcast import podcast_count, podcast_by_id, \
          all_podcasts, subscriberdata_for_podcast
 

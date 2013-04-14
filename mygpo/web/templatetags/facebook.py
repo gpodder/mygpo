@@ -11,7 +11,7 @@ from mygpo.web.utils import get_episode_link_target, get_podcast_link_target
 
 register = template.Library()
 
-LIKE_BUTTON_STR =  """<iframe class="fb_like" src="http://www.facebook.com/plugins/like.php?href=%(url)s&amp;layout=button_count&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light&amp;height=21" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:450px; height:21px;" allowTransparency="true"></iframe>"""
+LIKE_BUTTON_STR = """<iframe class="fb_like" src="http://www.facebook.com/plugins/like.php?href=%(url)s&amp;layout=button_count&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light&amp;height=21" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:450px; height:21px;" allowTransparency="true"></iframe>"""
 
 #FIXME: remove hardcoded URL
 # we could convert the filter to a tag once the takes_context

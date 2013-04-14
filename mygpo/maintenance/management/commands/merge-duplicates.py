@@ -30,4 +30,3 @@ class Command(BaseCommand):
 
         merge.merge_objects(podcasts=podcasts, podcast_states=podcast_states,
                 episodes=episodes, episode_states=episode_states, dry_run=dry_run)
-

@@ -20,6 +20,7 @@ class PodcastList(Document, RatingMixin):
     podcasts = StringListProperty()
     user     = StringProperty(required=True)
     random_key = FloatProperty(default=random)
+    created_timestamp = IntegerProperty()
 
 
     def get_flattr_thing(self, domain, username):

@@ -3,8 +3,8 @@ from mygpo.data.feeddownloader import PodcastUpdater
 
 
 @celery.task
-def update_podcast(podcast):
+def update_podcasts(podcast_urls):
     """ Task to update a podcast """
-    updater = PodcastUpdater([podcast])
-    updater.update()
-    return True
+    updater = PodcastUpdater()
+    podcasts = updater.update_queue(podcast_urls)
+    return list(podcasts)

@@ -10,7 +10,7 @@ from mygpo.core.models import Podcast
 from mygpo.directory.toplist import PodcastToplist
 from mygpo.users.models import User
 from mygpo.utils import progress
-from mygpo.json import json
+from mygpo.core.json import json
 from mygpo.db.couchdb import get_main_database
 from mygpo.db.couchdb.episode import episodes_for_podcast
 from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url
@@ -88,7 +88,8 @@ class Command(BaseCommand):
         # Categories
         for tag in p_state.tags:
             c = category_for_tag(tag)
-            if c: docs.add(c._id)
+            if c:
+                docs.add(c._id)
 
         # Podcast
         podcast = podcast_by_id(p_state.podcast)
@@ -110,7 +111,8 @@ class Command(BaseCommand):
         for s in podcast.tags:
             for tag in podcast.tags[s]:
                 c = category_for_tag(tag)
-                if c: docs.add(c._id)
+                if c:
+                    docs.add(c._id)
 
         # Episodes
         for episode in episodes_for_podcast(podcast.get_podcast()):
@@ -152,7 +154,7 @@ class Command(BaseCommand):
 
                 for name, info in attachments.items():
                     content_type = info.get('content_type')
-                    if content_type is None: # CouchDB < 0.8
+                    if content_type is None:  # CouchDB < 0.8
                         content_type = info.get('content-type')
                     parts.add(content_type, b64decode(info['data']), {
                         'Content-ID': name

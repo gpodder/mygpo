@@ -45,9 +45,7 @@ def _last_modified(request, size, prefix, filename):
         return None
 
 
-
 class CoverArt(View):
-
 
     @method_decorator(last_modified(_last_modified))
     def get(self, request, size, prefix, filename):
@@ -85,15 +83,16 @@ class CoverArt(View):
         if resized.mode == 'RGBA':
             background = Image.new('RGB', resized.size)
             draw = ImageDraw.Draw(background)
-            draw.rectangle((-1, -1, resized.size[0]+1, resized.size[1]+1), \
-                    fill=(255, 255, 255))
+            draw.rectangle((-1, -1, resized.size[0]+1, resized.size[1]+1),
+                           fill=(255, 255, 255))
             del draw
             resized = Image.composite(resized, background, resized)
 
         io = StringIO.StringIO()
 
         try:
-            resized.save(io, 'JPEG', optimize=True, progression=True, quality=80)
+            resized.save(io, 'JPEG', optimize=True, progression=True,
+                         quality=80)
         except IOError as ex:
             return self.send_file(original)
 
@@ -104,7 +103,6 @@ class CoverArt(View):
         fp.close()
 
         return self.send_file(target)
-
 
     # the length of the prefix is defined here and in web/urls.py
     @staticmethod
@@ -124,7 +122,6 @@ class CoverArt(View):
     def get_original(prefix, filename):
         return os.path.join(LOGO_DIR, 'original', prefix, filename)
 
-
     @staticmethod
     def get_dir(filename):
         path = os.path.dirname(filename)
@@ -136,7 +133,6 @@ class CoverArt(View):
                 raise
 
         return path
-
 
     def send_file(self, filename):
         resp = HttpResponse(content_type='image/jpeg')

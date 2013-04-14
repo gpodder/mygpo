@@ -17,7 +17,7 @@
 
 from django.http import HttpResponse
 
-from mygpo.json import json
+from mygpo.core.json import json
 
 
 class JsonResponse(HttpResponse):
@@ -34,4 +34,3 @@ class JsonResponse(HttpResponse):
 
         super(JsonResponse, self).__init__(
             content, content_type=content_type)
-

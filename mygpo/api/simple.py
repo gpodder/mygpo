@@ -45,7 +45,7 @@ from mygpo.directory.search import search_podcasts
 from mygpo.log import log
 from mygpo.decorators import allowed_methods
 from mygpo.utils import parse_range
-from mygpo.json import json, JSONDecodeError
+from mygpo.core.json import json, JSONDecodeError
 from mygpo.db.couchdb import BulkException
 from mygpo.db.couchdb.podcast import podcasts_by_id
 from mygpo.db.couchdb.user import suggestions_for_user
@@ -79,7 +79,7 @@ def subscriptions(request, username, device_uid, format):
 
     elif request.method in ('PUT', 'POST'):
         try:
-            subscriptions = parse_subscription(request.raw_post_data, format)
+            subscriptions = parse_subscription(request.body, format)
 
         except JSONDecodeError as e:
             return HttpResponseBadRequest('Unable to parse POST data: %s' % str(e))
@@ -264,9 +264,9 @@ def toplist(request, count, format):
 
         p = podcast_data(podcast, domain, scale)
         p.update(dict(
-            subscribers=           podcast.subscriber_count(),
-            subscribers_last_week= podcast.prev_subscriber_count(),
-            position_last_week=    podcast.old_pos,
+            subscribers           = podcast.subscriber_count(),
+            subscribers_last_week = podcast.prev_subscriber_count(),
+            position_last_week    = podcast.old_pos,
         ))
         return p
 

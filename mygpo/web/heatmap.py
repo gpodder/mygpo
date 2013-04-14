@@ -32,26 +32,25 @@ class EpisodeHeatmap(object):
         self.podcast_id = podcast_id
 
         if episode_id is not None and podcast_id is None:
-            raise ValueError('episode_id can only be used '
-                    'if podcast_id is not None')
+            raise ValueError(
+                'episode_id can only be used if podcast_id is not None')
 
         self.episode_id = episode_id
 
         if user_id is not None and episode_id is None:
-            raise ValueError('user_id can only be used '
-                    'if episode_id is not None')
+            raise ValueError(
+                'user_id can only be used if episode_id is not None')
 
         self.user_id = user_id
         self.duration = duration
         self.heatmap = None
         self.borders = None
 
-
     def _query(self):
         """ Queries the database and stores the heatmap and its borders """
 
-        self.heatmap, self.borders = get_heatmap(self.podcast_id,
-                self.episode_id, self.user_id)
+        self.heatmap, self.borders = get_heatmap(
+            self.podcast_id, self.episode_id, self.user_id)
 
         if self.borders and self.heatmap:
             # heatmap info doesn't reach until the end of the episode
@@ -59,7 +58,6 @@ class EpisodeHeatmap(object):
             if self.duration > self.borders[-1]:
                 self.heatmap.append(0)
                 self.borders.append(self.duration)
-
 
     def query_if_required():
         """ If required, queries the database before calling the function """
@@ -74,14 +72,12 @@ class EpisodeHeatmap(object):
             return tmp
         return decorator
 
-
     @property
     @query_if_required()
     def max_plays(self):
         """ Returns the highest number of plays of all sections """
 
         return max(self.heatmap)
-
 
     @property
     @query_if_required()
@@ -93,7 +89,6 @@ class EpisodeHeatmap(object):
 
         for i in range(len(self.heatmap)):
             yield (self.borders[i], self.borders[i+1], self.heatmap[i])
-
 
     @query_if_required()
     def __nonzero__(self):

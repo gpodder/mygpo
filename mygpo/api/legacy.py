@@ -69,11 +69,7 @@ def upload(request):
     rem = list(set(rem))
 
     for n in new:
-        try:
-            p = podcast_for_url(n, create=True)
-        except IntegrityError, e:
-            log('/upload: Error trying to get podcast object: %s (error: %s)' % (n, e))
-            continue
+        p = podcast_for_url(n, create=True)
 
         try:
             p.subscribe(user, dev)
@@ -129,4 +125,3 @@ def auth(emailaddr, password):
         return None
 
     return user
-

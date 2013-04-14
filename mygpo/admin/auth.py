@@ -40,5 +40,3 @@ def require_staff(protected_view):
         raise Http404
 
     return wrapper
-
-

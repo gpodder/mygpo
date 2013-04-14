@@ -21,21 +21,24 @@ import random
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.sites.models import RequestSite
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import never_cache
-from django.views.generic.base import View
+from django.views.generic.base import View, TemplateView
 from django.utils.decorators import method_decorator
 from django.core.urlresolvers import reverse
 from django.utils.http import is_safe_url
+from mygpo.db.couchdb.user import user_by_google_email, set_users_google_email
 
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.web.forms import RestorePasswordForm
 from mygpo.users.models import User
 from mygpo.web.forms import ResendActivationForm
 from mygpo.constants import DEFAULT_LOGIN_REDIRECT
+from mygpo.web.auth import get_google_oauth_flow
 
 
 @repeat_on_conflict(['user'])
@@ -193,7 +196,7 @@ def resend_activation(request):
         if user.deleted:
             raise ValueError(_('You have deleted your account, but you can regster again.'))
 
-        if user.activation_key == None:
+        if user.activation_key is None:
             _set_active(user=user, is_active=True)
             raise ValueError(_('Your account already has been activated. Go ahead and log in.'))
 
@@ -201,7 +204,7 @@ def resend_activation(request):
             raise ValueError(_('Your activation key has expired. Please try another username, or retry with the same one tomorrow.'))
 
     except ValueError, e:
-        messages.error(request, str(e))
+        messages.error(request, unicode(e))
 
         return render(request, 'registration/resend_activation.html', {
            'form': form,
@@ -216,3 +219,53 @@ def resend_activation(request):
 
     return render(request, 'registration/resent_activation.html')
 
+
+
+class GoogleLogin(View):
+    """ Redirects to Google Authentication page """
+
+    def get(self, request):
+        flow = get_google_oauth_flow(request)
+        auth_uri = flow.step1_get_authorize_url()
+        return HttpResponseRedirect(auth_uri)
+
+
+class GoogleLoginCallback(TemplateView):
+    """ Logs user in, or connects user to account """
+
+    def get(self, request):
+
+        if request.GET.get('error'):
+            messages.error(request, _('Login failed.'))
+            return HttpResponseRedirect(reverse('login'))
+
+        code = request.GET.get('code')
+        if not code:
+            messages.error(request, _('Login failed.'))
+            return HttpResponseRedirect(reverse('login'))
+
+        flow = get_google_oauth_flow(request)
+        credentials = flow.step2_exchange(code)
+        email = credentials.token_response['id_token']['email']
+
+        # Connect account
+        if request.user.is_authenticated():
+            set_users_google_email(request.user, email)
+            messages.success(request, _('Your account has been connected with '
+                    '{google}. Open Settings to change this.'.format(
+                        google=email)))
+            return HttpResponseRedirect(DEFAULT_LOGIN_REDIRECT)
+
+        # Check if Google account is connected
+        user = user_by_google_email(email)
+
+        if not user:
+            # Connect account
+            messages.error(request, _('No account connected with your Google '
+                        'account %s. Please log in to connect.' % email))
+            return HttpResponseRedirect('{login}?next={connect}'.format(
+                login=reverse('login'), connect=reverse('login-google')))
+
+        # Log in user
+        login(request, user)
+        return HttpResponseRedirect(DEFAULT_LOGIN_REDIRECT)

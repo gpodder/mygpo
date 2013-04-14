@@ -12,8 +12,11 @@ import os.path
 
 filenames = []
 
+pofiles = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+        '..', '..', 'mygpo', 'locale', '*', 'LC_MESSAGES', 'django.po')
+
 process = subprocess.Popen(['git', 'status', '--porcelain'] +
-        glob.glob('../../mygpo/locale/*/LC_MESSAGES/django.po'), stdout=subprocess.PIPE)
+        glob.glob(pofiles), stdout=subprocess.PIPE)
 stdout, stderr = process.communicate()
 for line in stdout.splitlines():
     status, filename = line.strip().split()
@@ -25,7 +28,7 @@ for filename in filenames:
     translators = []
     language = None
 
-    filename = os.path.join('..', '..', filename)
+    filename = os.path.join('..', filename)
     for line in open(filename).read().splitlines():
         if line.startswith('# Translators:'):
             in_translators = True

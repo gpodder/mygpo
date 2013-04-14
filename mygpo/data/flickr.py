@@ -21,7 +21,7 @@ import urllib
 
 from django.conf import settings
 
-from mygpo.json import json
+from mygpo.core.json import json
 
 
 def get_photo_sizes(photo_id):
@@ -57,4 +57,3 @@ def get_display_photo(url, label='Medium'):
             return s['source']
 
     return url
-

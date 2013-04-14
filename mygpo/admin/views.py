@@ -1,6 +1,9 @@
 import re
+import socket
 from itertools import count
+from collections import Counter
 
+import django
 from django.shortcuts import render
 from django.contrib import messages
 from django.core.urlresolvers import reverse
@@ -8,16 +11,19 @@ from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext as _
 from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
+from django.conf import settings
 
 from mygpo.admin.auth import require_staff
 from mygpo.admin.group import PodcastGrouper
-from mygpo.counter import Counter
 from mygpo.maintenance.merge import PodcastMerger, IncorrectMergeException
 from mygpo.users.models import User
 from mygpo.admin.clients import UserAgentStats, ClientStats
 from mygpo.admin.tasks import merge_podcasts
+from mygpo.utils import get_git_head
 from mygpo.api.httpresponse import JsonResponse
-from mygpo.db.couchdb.episode import episode_count
+from mygpo.cel import celery
+from mygpo.db.couchdb import get_main_database
+from mygpo.db.couchdb.episode import episode_count, filetype_stats
 from mygpo.db.couchdb.podcast import podcast_count, podcast_for_url
 
 
@@ -33,6 +39,37 @@ class AdminView(TemplateView):
 
 class Overview(AdminView):
     template_name = 'admin/overview.html'
+
+
+class HostInfo(AdminView):
+    """ shows host information for diagnosis """
+
+    template_name = 'admin/hostinfo.html'
+
+    def get(self, request):
+        commit, msg = get_git_head()
+        base_dir = settings.BASE_DIR
+        hostname = socket.gethostname()
+        django_version = django.VERSION
+
+        main_db = get_main_database()
+
+        db_tasks = main_db.server.active_tasks()
+
+        i = celery.control.inspect()
+        num_celery_tasks = len(i.scheduled() or [])
+
+        return self.render_to_response({
+            'git_commit': commit,
+            'git_msg': msg,
+            'base_dir': base_dir,
+            'hostname': hostname,
+            'django_version': django_version,
+            'main_db': main_db.uri,
+            'db_tasks': db_tasks,
+            'num_celery_tasks': num_celery_tasks,
+        })
+
 
 
 class MergeSelect(AdminView):
@@ -239,3 +276,21 @@ class StatsJsonView(StatsView):
     def get(self, request):
         stats = self._get_stats()
         return JsonResponse(stats)
+
+
+class FiletypeStatsView(AdminView):
+
+    template_name = 'admin/filetypes.html'
+
+    def get(self, request):
+        stats = filetype_stats()
+
+        if len(stats):
+            max_num = stats.most_common(1)[0][1]
+        else:
+            max_num = 0
+
+        return self.render_to_response({
+            'max_num': max_num,
+            'stats': stats.most_common(),
+        })

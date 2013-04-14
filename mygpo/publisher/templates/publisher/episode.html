@@ -57,6 +57,27 @@
 
 {% block content %}
 
+ <h2>{% trans "URL" %}</h2>
+ <p>{% trans "You can configure the URL of this episode. Previous keys will automatically be added to the alternative keys and always redirect to the current URL." %}</p>
+
+ <form action="{% episode_link_target episode podcast "publisher-set-episode-slug" %}" method="post">
+  {% csrf_token %}
+  <pre>http{% if is_secure %}s{% endif %}://{{ domain }}/podcast/{{ podcast.slug }}/<input class="input-large" placeholder="{% get_id episode %}" type="text" value="{{ episode.slug|default:"" }}" name="slug"></input></pre>
+
+  <button class="btn" type="submit">{% trans "Save" %}</button>
+ </form>
+
+ <strong>Alternative Keys</strong>
+ <ul>
+  {% for slug in episode.merged_slugs %}
+   <li>{{ slug }}</li>
+  {% empty %}
+   <li><em>{% trans "none" %}</em></li>
+  {% endfor %}
+ </ul>
+
+
+
   <h2>{% trans "Episode data" %}</h2>
   <p>{% trans "Last update: " %} {{ episode.last_update|naturaltime }}</p>
 

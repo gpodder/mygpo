@@ -26,6 +26,7 @@ EPISODE_ACTION_TYPES = (
         ('play',     _('played')),
         ('delete',   _('deleted')),
         ('new',      _('marked as new')),
+        ('flattr',   _('flattr\'d')),
 )
 
 
@@ -45,4 +46,3 @@ SUBSCRIPTION_ACTION_TYPES = (
         (SUBSCRIBE_ACTION, _('subscribed')),
         (UNSUBSCRIBE_ACTION, _('unsubscribed')),
 )
-

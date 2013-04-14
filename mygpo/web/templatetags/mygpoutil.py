@@ -36,4 +36,3 @@ def remove_html_tags(html):
     result = re.sub('([\r\n]{2})([\r\n])+', '\\1', result)
 
     return mark_safe(result.strip())
-

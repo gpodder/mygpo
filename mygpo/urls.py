@@ -16,7 +16,7 @@
 #
 
 import os.path
-from django.conf.urls.defaults import *
+from django.conf.urls import *
 
 # This URLs should be always be served, even during maintenance mode
 urlpatterns = patterns('',
@@ -41,8 +41,7 @@ urlpatterns += patterns('',
     (r'^',           include('mygpo.api.urls')),
     (r'^',           include('mygpo.userfeeds.urls')),
     (r'^',           include('mygpo.share.urls')),
-    (r'^accounts/',  include('django_couchdb_utils.registration.urls')),
+    (r'^accounts/',  include('django_couchdb_utils.registration.backends.default.urls')),
     (r'^publisher/', include('mygpo.publisher.urls')),
     (r'^admin/',     include('mygpo.admin.urls')),
 )
-

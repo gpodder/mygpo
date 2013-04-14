@@ -37,6 +37,7 @@ from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.users.models import Device, DeviceUIDException, \
      DeviceDoesNotExist
 from mygpo.db.couchdb.podcast_state import remove_device_from_podcast_states
+from mygpo.users.tasks import sync_user
 
 
 @vary_on_cookie
@@ -119,7 +120,7 @@ def create(request):
         messages.success(request, _('Device saved'))
 
     except DeviceUIDException as e:
-        messages.error(request, _(str(e)))
+        messages.error(request, _(unicode(e)))
 
         return render(request, 'device-create.html', {
             'device': device,
@@ -156,7 +157,7 @@ def update(request, device):
         try:
             request.user.update_device(device)
             messages.success(request, _('Device updated'))
-            uid = device.uid # accept the new UID after rest has succeeded
+            uid = device.uid  # accept the new UID after rest has succeeded
 
         except DeviceUIDException as e:
             messages.error(request, _(str(e)))
@@ -179,7 +180,7 @@ def edit_new(request):
     device_form = DeviceForm({
         'name': device.name,
         'type': device.type,
-        'uid' : device.uid
+        'uid': device.uid
         })
 
     return render(request, 'device-create.html', {
@@ -198,7 +199,7 @@ def edit(request, device):
     device_form = DeviceForm({
         'name': device.name,
         'type': device.type,
-        'uid' : device.uid
+        'uid': device.uid
         })
 
     synced_with = request.user.get_synced(device)
@@ -326,7 +327,7 @@ def sync(request, device):
     except DeviceDoesNotExist as e:
         messages.error(request, str(e))
 
-    request.user.sync_all()
+    sync_user.delay(request.user)
 
     return HttpResponseRedirect(reverse('device', args=[device.uid]))
 
@@ -353,4 +354,3 @@ def unsync(request, device):
 
 from mygpo.web import views
 history = views.history
-

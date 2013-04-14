@@ -14,6 +14,10 @@ from mygpo.core.proxy import DocumentABCMeta
 from mygpo.core.slugs import SlugMixin
 from mygpo.core.oldid import OldIdMixin
 from mygpo.web.logo import CoverArt
+from mygpo.users.tasks import sync_user
+
+# make sure this code is executed at startup
+from mygpo.core.signals import *
 
 
 class SubscriptionException(Exception):
@@ -54,6 +58,7 @@ class Episode(Document, SlugMixin, OldIdMixin):
     listeners = IntegerProperty()
     content_types = StringListProperty()
     flattr_url = StringProperty()
+    created_timestamp = IntegerProperty()
 
 
 
@@ -91,8 +96,14 @@ class Episode(Document, SlugMixin, OldIdMixin):
         return set([self._id] + self.merged_ids)
 
 
+    @property
+    def needs_update(self):
+        """ Indicates if the object requires an updated from its feed """
+        return not self.title and not self.outdated
+
+
     def __eq__(self, other):
-        if other == None:
+        if other is None:
             return False
         return self._id == other._id
 
@@ -101,11 +112,10 @@ class Episode(Document, SlugMixin, OldIdMixin):
         return hash(self._id)
 
 
-    def __str__(self):
-        return '<{cls} {title} ({id})>'.format(cls=self.__class__.__name__,
+    def __unicode__(self):
+        return u'<{cls} {title} ({id})>'.format(cls=self.__class__.__name__,
                 title=self.title, id=self._id)
 
-    __repr__ = __str__
 
 
 class SubscriberData(DocumentSchema):
@@ -159,6 +169,8 @@ class Podcast(Document, SlugMixin, OldIdMixin):
     episode_count = IntegerProperty()
     random_key = FloatProperty(default=random)
     flattr_url = StringProperty()
+    outdated = BooleanProperty(default=False)
+    created_timestamp = IntegerProperty()
 
 
 
@@ -303,13 +315,13 @@ class Podcast(Document, SlugMixin, OldIdMixin):
     def subscribe(self, user, device):
         from mygpo.db.couchdb.podcast_state import subscribe_to_podcast
         subscribe_to_podcast(user, self, device)
-        user.sync_all()
+        sync_user.delay(user)
 
 
     def unsubscribe(self, user, device):
         from mygpo.db.couchdb.podcast_state import unsubscribe_from_podcast
         unsubscribe_from_podcast(user, self, device)
-        user.sync_all()
+        sync_user.delay(user)
 
 
     def subscribe_targets(self, user):
@@ -338,6 +350,12 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         return targets
 
 
+    @property
+    def needs_update(self):
+        """ Indicates if the object requires an updated from its feed """
+        return not self.title and not self.outdated
+
+
     def __hash__(self):
         return hash(self.get_id())
 
@@ -353,7 +371,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
     def save(self):
         group = getattr(self, 'group', None)
-        if group: #we are part of a PodcastGroup
+        if group:  # we are part of a PodcastGroup
             group = PodcastGroup.get(group)
             podcasts = list(group.podcasts)
 
@@ -396,7 +414,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         if not self.get_id():
             return self == other
 
-        if other == None:
+        if other is None:
             return False
 
         return self.get_id() == other.get_id()
@@ -454,6 +472,13 @@ class PodcastGroup(Document, SlugMixin, OldIdMixin):
     def display_title(self):
         return self.title
 
+
+    @property
+    def needs_update(self):
+        """ Indicates if the object requires an updated from its feed """
+        # A PodcastGroup has been manually created and therefore never
+        # requires an update
+        return False
 
     def get_podcast(self):
         # return podcast with most subscribers (bug 1390)

@@ -1,5 +1,8 @@
+from collections import Counter
+
+from couchdbkit import ResourceNotFound
+
 from mygpo.cache import cache_result
-from mygpo.counter import Counter
 from mygpo.decorators import repeat_on_conflict
 from mygpo.db.couchdb import get_main_database, get_user_database
 from mygpo.users.settings import FLATTR_TOKEN, FLATTR_AUTO, FLATTR_MYGPO, \
@@ -177,6 +180,7 @@ def deleted_users():
 
 def deleted_user_count():
     #TODO: check
+    from mygpo.users.models import User
     total = User.view('users/deleted',
             reduce = True,
         )
@@ -256,3 +260,38 @@ def update_flattr_settings(user, token, enabled=None, flattr_mygpo=False,
 def _wrap_historyentry(action):
     from mygpo.users.models import HistoryEntry
     return HistoryEntry.from_action_dict(action['value'])
+
+
+def user_by_google_email(email):
+    """ Get a user by its connected Google account """
+
+    from mygpo.users.models import User
+    users = User.view('users/by_google_email',
+            key          = email,
+            include_docs = True,
+        )
+
+    if not users:
+        return None
+
+    return users.one()
+
+
+@repeat_on_conflict(['user'])
+def set_users_google_email(user, email):
+    """ Update the Google accoutn connected with the user """
+
+    if user.google_email == email:
+        return user
+
+    user.google_email = email
+    user.save()
+    return user
+
+
+def get_user_by_id(user_id):
+    from mygpo.users.models import User
+    try:
+        return User.get(user_id)
+    except ResourceNotFound:
+        return None

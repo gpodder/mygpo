@@ -29,9 +29,10 @@ except ImportError:
 
 from django.http import HttpResponse, HttpResponseBadRequest, Http404, HttpResponseNotFound
 from django.contrib.sites.models import RequestSite
-from django.db import IntegrityError
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
+from django.utils.decorators import method_decorator
+from django.views.generic.base import View
 
 from mygpo.api.constants import EPISODE_ACTION_TYPES, DEVICE_TYPES
 from mygpo.api.httpresponse import JsonResponse
@@ -48,7 +49,7 @@ from mygpo.users.models import PodcastUserState, EpisodeAction, \
      EpisodeUserState, DeviceDoesNotExist, DeviceUIDException, \
      InvalidEpisodeActionAttributes
 from mygpo.users.settings import FLATTR_AUTO
-from mygpo.json import json, JSONDecodeError
+from mygpo.core.json import json, JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.db.couchdb import get_user_database, BulkException, bulk_save_retry
 from mygpo.db.couchdb.episode import episode_by_id, \
@@ -82,7 +83,7 @@ def subscriptions(request, username, device_uid):
             return HttpResponseNotFound(str(e))
 
         since_ = request.GET.get('since', None)
-        if since_ == None:
+        if since_ is None:
             return HttpResponseBadRequest('parameter since missing')
         try:
             since = datetime.fromtimestamp(float(since_))
@@ -97,10 +98,10 @@ def subscriptions(request, username, device_uid):
         d = get_device(request.user, device_uid,
                 request.META.get('HTTP_USER_AGENT', ''))
 
-        if not request.raw_post_data:
+        if not request.body:
             return HttpResponseBadRequest('POST data must not be empty')
 
-        actions = json.loads(request.raw_post_data)
+        actions = json.loads(request.body)
         add = actions['add'] if 'add' in actions else []
         rem = actions['remove'] if 'remove' in actions else []
 
@@ -109,7 +110,7 @@ def subscriptions(request, username, device_uid):
 
         try:
             update_urls = update_subscriptions(request.user, d, add, rem)
-        except IntegrityError, e:
+        except ValueError, e:
             return HttpResponseBadRequest(e)
 
         return JsonResponse({
@@ -122,7 +123,7 @@ def update_subscriptions(user, device, add, remove):
 
     for a in add:
         if a in remove:
-            raise IntegrityError('can not add and remove %s at the same time' % a)
+            raise ValueError('can not add and remove %s at the same time' % a)
 
     add_s = list(sanitize_urls(add, 'podcast'))
     rem_s = list(sanitize_urls(remove, 'podcast'))
@@ -180,7 +181,7 @@ def episodes(request, username, version=1):
 
     if request.method == 'POST':
         try:
-            actions = json.loads(request.raw_post_data)
+            actions = json.loads(request.body)
         except (JSONDecodeError, UnicodeDecodeError) as e:
             msg = 'Advanced API: could not decode episode update POST data for user %s: %s' % (username, e)
             log(msg)
@@ -328,11 +329,13 @@ def update_episodes(user, actions, now, ua_string):
 
         podcast_url = action['podcast']
         podcast_url = sanitize_append(podcast_url, 'podcast', update_urls)
-        if podcast_url == '': continue
+        if podcast_url == '':
+            continue
 
         episode_url = action['episode']
         episode_url = sanitize_append(episode_url, 'episode', update_urls)
-        if episode_url == '': continue
+        if episode_url == '':
+            continue
 
         act = parse_episode_action(action, user, update_urls, now, ua_string)
         grouped_actions[ (podcast_url, episode_url) ].append(act)
@@ -414,7 +417,7 @@ def device(request, username, device_uid):
     d = get_device(request.user, device_uid,
             request.META.get('HTTP_USER_AGENT', ''))
 
-    data = json.loads(request.raw_post_data)
+    data = json.loads(request.body)
 
     if 'caption' in data:
         if not data['caption']:
@@ -423,7 +426,7 @@ def device(request, username, device_uid):
 
     if 'type' in data:
         if not valid_devicetype(data['type']):
-           return HttpResponseBadRequest('invalid device type %s' % data['type'])
+            return HttpResponseBadRequest('invalid device type %s' % data['type'])
         d.type = data['type']
 
 
@@ -486,100 +489,106 @@ def get_episode_data(podcasts, domain, clean_action_data, include_actions, episo
     return t
 
 
-@csrf_exempt
-@require_valid_user
-@check_username
-@never_cache
-def updates(request, username, device_uid):
-    now = datetime.now()
-    now_ = get_timestamp(now)
 
-    try:
-        device = request.user.get_device_by_uid(device_uid)
-    except DeviceDoesNotExist as e:
-        return HttpResponseNotFound(str(e))
+class DeviceUpdates(View):
 
-    since_ = request.GET.get('since', None)
-    if since_ == None:
-        return HttpResponseBadRequest('parameter since missing')
-    try:
-        since = datetime.fromtimestamp(float(since_))
-    except ValueError:
-        return HttpResponseBadRequest('since-value is not a valid timestamp')
+    @method_decorator(csrf_exempt)
+    @method_decorator(require_valid_user)
+    @method_decorator(check_username)
+    @method_decorator(never_cache)
+    def get(self, request, username, device_uid):
+        now = datetime.now()
+        now_ = get_timestamp(now)
 
-    include_actions = parse_bool(request.GET.get('include_actions', False))
+        try:
+            device = request.user.get_device_by_uid(device_uid)
+        except DeviceDoesNotExist as e:
+            return HttpResponseNotFound(str(e))
 
-    ret = get_subscription_changes(request.user, device, since, now)
-    domain = RequestSite(request).domain
+        since_ = request.GET.get('since', None)
+        if since_ is None:
+            return HttpResponseBadRequest('parameter since missing')
+        try:
+            since = datetime.fromtimestamp(float(since_))
+        except ValueError:
+            return HttpResponseBadRequest("'since' is not a valid timestamp")
 
-    subscriptions = list(device.get_subscribed_podcasts())
+        include_actions = parse_bool(request.GET.get('include_actions', False))
 
-    podcasts = dict( (p.url, p) for p in subscriptions )
-    prepare_podcast_data = partial(get_podcast_data, podcasts, domain)
+        ret = get_subscription_changes(request.user, device, since, now)
+        domain = RequestSite(request).domain
 
-    ret['add'] = map(prepare_podcast_data, ret['add'])
+        subscriptions = list(device.get_subscribed_podcasts())
 
-    devices = dict( (dev.id, dev.uid) for dev in request.user.devices )
-    clean_action_data = partial(clean_episode_action_data,
-            user=request.user, devices=devices)
+        podcasts = dict( (p.url, p) for p in subscriptions )
+        prepare_podcast_data = partial(get_podcast_data, podcasts, domain)
 
-    # index subscribed podcasts by their Id for fast access
-    podcasts = dict( (p.get_id(), p) for p in subscriptions )
-    prepare_episode_data = partial(get_episode_data, podcasts, domain,
-            clean_action_data, include_actions)
+        ret['add'] = map(prepare_podcast_data, ret['add'])
 
-    episode_updates = get_episode_updates(request.user, subscriptions, since)
-    ret['updates'] = map(prepare_episode_data, episode_updates)
+        devices = dict( (dev.id, dev.uid) for dev in request.user.devices )
+        clean_action_data = partial(clean_episode_action_data,
+                user=request.user, devices=devices)
 
-    return JsonResponse(ret)
+        # index subscribed podcasts by their Id for fast access
+        podcasts = dict( (p.get_id(), p) for p in subscriptions )
+        prepare_episode_data = partial(get_episode_data, podcasts, domain,
+                clean_action_data, include_actions)
 
+        episode_updates = self.get_episode_updates(request.user,
+                subscriptions, since)
+        ret['updates'] = map(prepare_episode_data, episode_updates)
 
-def get_episode_updates(user, subscribed_podcasts, since):
-    """ Returns the episode updates since the timestamp """
-
-    EpisodeStatus = namedtuple('EpisodeStatus', 'episode status action')
-
-    episode_status = {}
-
-    # get episodes
-    if gevent:
-        episode_jobs = [gevent.spawn(episodes_for_podcast, p, since) for p in
-            subscribed_podcasts]
-        gevent.joinall(episode_jobs)
-        episodes = chain.from_iterable(job.get() for job in episode_jobs)
-
-    else:
-        episodes = chain.from_iterable(episodes_for_podcast(p, since) for p
-                in subscribed_podcasts)
+        return JsonResponse(ret)
 
 
-    for episode in episodes:
-        episode_status[episode._id] = EpisodeStatus(episode, 'new', None)
+    def get_episode_updates(self, user, subscribed_podcasts, since,
+            max_per_podcast=5):
+        """ Returns the episode updates since the timestamp """
 
+        EpisodeStatus = namedtuple('EpisodeStatus', 'episode status action')
 
-    # get episode states
-    if gevent:
-        e_action_jobs = [gevent.spawn(get_podcasts_episode_states, p, user._id)
-                for p in subscribed_podcasts]
-        gevent.joinall(e_action_jobs)
-        e_actions = chain.from_iterable(job.get() for job in e_action_jobs)
+        episode_status = {}
 
-    else:
-        e_actions = [get_podcasts_episode_states(p, user._id) for p
-            in subscribed_podcasts]
+        # get episodes
+        if gevent:
+            episode_jobs = [gevent.spawn(episodes_for_podcast, p, since,
+                    limit=max_per_podcast) for p in subscribed_podcasts]
+            gevent.joinall(episode_jobs)
+            episodes = chain.from_iterable(job.get() for job in episode_jobs)
 
-
-    for action in e_actions:
-        e_id = action['episode_id']
-
-        if e_id in episode_status:
-            episode = episode_status[e_id].episode
         else:
-            episode = episode_by_id(e_id)
+            episodes = chain.from_iterable(episodes_for_podcast(p, since,
+                    limit=max_per_podcast) for p in subscribed_podcasts)
 
-        episode_status[e_id] = EpisodeStatus(episode, action['action'], action)
 
-    return episode_status.itervalues()
+        for episode in episodes:
+            episode_status[episode._id] = EpisodeStatus(episode, 'new', None)
+
+
+        # get episode states
+        if gevent:
+            e_action_jobs = [gevent.spawn(get_podcasts_episode_states, p,
+                    user._id) for p in subscribed_podcasts]
+            gevent.joinall(e_action_jobs)
+            e_actions = chain.from_iterable(job.get() for job in e_action_jobs)
+
+        else:
+            e_actions = chain.from_iterable(get_podcasts_episode_states(p,
+                    user._id) for p in subscribed_podcasts)
+
+
+        for action in e_actions:
+            e_id = action['episode_id']
+
+            if e_id in episode_status:
+                episode = episode_status[e_id].episode
+            else:
+                episode = episode_by_id(e_id)
+
+            episode_status[e_id] = EpisodeStatus(episode, action['action'],
+                    action)
+
+        return episode_status.itervalues()
 
 
 @require_valid_user

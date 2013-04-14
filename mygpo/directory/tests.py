@@ -24,4 +24,3 @@ from django.test import TestCase
 def suite():
     suite = unittest.TestSuite()
     return suite
-

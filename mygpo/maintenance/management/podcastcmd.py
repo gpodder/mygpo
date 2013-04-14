@@ -51,7 +51,7 @@ class PodcastCommand(BaseCommand):
 
         if not args and not options.get('toplist') and not options.get('new') \
                     and not options.get('random'):
-           yield (p.url for p in podcasts_by_last_update())
+            yield (p.url for p in podcasts_by_last_update())
 
 
     def get_toplist(self):
@@ -62,4 +62,3 @@ class PodcastCommand(BaseCommand):
             elif isinstance(obj, PodcastGroup):
                 for p in obj.podcasts:
                     yield p
-

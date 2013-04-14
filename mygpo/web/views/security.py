@@ -33,4 +33,3 @@ def csrf_failure(request, reason=""):
         'get': request.GET,
         'post': request.POST,
     })
-

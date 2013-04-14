@@ -1,9 +1,10 @@
 from functools import wraps
+from datetime import datetime
 
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponseForbidden
 from django.shortcuts import render
-from django.template.defaultfilters import slugify
+from django.utils.text import slugify
 from django.contrib.sites.models import RequestSite
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -13,6 +14,7 @@ from django.views.decorators.cache import cache_control
 from django.views.generic.base import View
 from django.utils.decorators import method_decorator
 
+from mygpo.utils import get_timestamp
 from mygpo.core.proxy import proxy_object
 from mygpo.api.simple import format_podcast_list
 from mygpo.share.models import PodcastList
@@ -96,7 +98,7 @@ def list_show(request, plist, owner):
     max_subscribers = max([p.subscriber_count() for p in podcasts] + [0])
 
     thing = plist.get_flattr_thing(site.domain, owner.username)
-    flattr = Flattr(owner, site.domain)
+    flattr = Flattr(owner, site.domain, request.is_secure())
     flattr_autosubmit = flattr.get_autosubmit_url(thing)
 
     return render(request, 'list.html', {
@@ -134,6 +136,7 @@ def create_list(request):
 
     if plist is None:
         plist = PodcastList()
+        plist.created_timestamp = get_timestamp(datetime.utcnow())
         plist.title = title
         plist.slug = slug
         plist.user = request.user._id

@@ -67,4 +67,3 @@ def suite():
     suite.addTest(doctest.DocTestSuite(mygpo.utils))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(PodcastGroupTests))
     return suite
-

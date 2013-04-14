@@ -136,15 +136,6 @@ class SyncedDevicesMixin(DocumentSchema):
         return map(self.get_device, ids)
 
 
-    def sync_all(self):
-        """ Syncs all of the user's device groups """
-
-        for group in self.get_grouped_devices():
-            if group.is_synced:
-                device = group.devices[0]
-                self.sync_group(device)
-
-
     def sync_group(self, device):
         """ Sync the group of the device """
 

@@ -20,10 +20,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 
 from mygpo.decorators import allowed_methods
-from mygpo.json import json, JSONDecodeError
+from mygpo.core.json import json, JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.users.models import DeviceDoesNotExist, User
+from mygpo.users.tasks import sync_user
 
 
 @csrf_exempt
@@ -39,7 +40,7 @@ def main(request, username):
 
     else:
         try:
-            actions = json.loads(request.raw_post_data)
+            actions = json.loads(request.body)
         except JSONDecodeError as e:
             return HttpResponseBadRequest(str(e))
 
@@ -113,4 +114,5 @@ def update_sync_status(user, synclist, stopsync):
             pass
 
     user.save()
-    user.sync_all()
+
+    sync_user.delay(user)

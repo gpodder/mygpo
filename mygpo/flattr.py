@@ -12,7 +12,7 @@ from collections import namedtuple
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
-from mygpo.json import json
+from mygpo.core.json import json
 from mygpo.users.settings import FLATTR_TOKEN, FLATTR_USERNAME
 from mygpo import utils
 from django.utils.translation import ugettext as _
@@ -35,13 +35,17 @@ class Flattr(object):
     THING_INFO_URL_TEMPLATE = API_BASE + '/things/lookup/?url=%(url)s'
 
 
-    def __init__(self, user, domain):
+    def __init__(self, user, domain, is_secure):
         self.user = user
         self.domain = domain
+        self.is_secure = is_secure
 
 
     def _get_callback(self):
-        return 'https://' + self.domain + reverse('flattr-token')
+        return 'http{s}://{domain}{callback}'.format(
+            s='s' if self.is_secure else '',
+            domain=self.domain,
+            callback=reverse('flattr-token'))
 
 
     def request(self, url, data=None):
@@ -175,7 +179,7 @@ class Flattr(object):
 
         args = [(u'url', self.domain + thing.url)]
         args += [(arg, getattr(thing, arg, None)) for arg in optional_args]
-        args = filter(lambda (k, v): v, args) # filter out empty arguments
+        args = filter(lambda (k, v): v, args)  # filter out empty arguments
 
         # TODO: check encoding
         args = [(k, v.encode('utf-8')) for (k, v) in args]

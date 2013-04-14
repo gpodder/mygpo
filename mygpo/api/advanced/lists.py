@@ -16,16 +16,18 @@
 #
 
 from functools import partial
+from datetime import datetime
 
 from django.http import HttpResponse, HttpResponseBadRequest, \
      HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from django.core.urlresolvers import reverse
 from django.contrib.sites.models import RequestSite
-from django.template.defaultfilters import slugify
+from django.utils.text import slugify
 from django.views.decorators.cache import never_cache
 from django.http import Http404
 
+from mygpo.utils import get_timestamp
 from mygpo.api.advanced.directory import podcast_data
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.share.models import PodcastList
@@ -66,11 +68,12 @@ def create(request, username, format):
     if plist:
         return HttpResponse('List already exists', status=409)
 
-    urls = parse_subscription(request.raw_post_data, format)
+    urls = parse_subscription(request.body, format)
     podcasts = [podcast_for_url(url, create=True) for url in urls]
     podcast_ids = map(Podcast.get_id, podcasts)
 
     plist = PodcastList()
+    plist.created_timestamp = get_timestamp(datetime.utcnow())
     plist.title = title
     plist.slug = slug
     plist.user = request.user._id
@@ -163,7 +166,7 @@ def update_list(request, plist, owner, format):
     if not is_own:
         return HttpResponseForbidden()
 
-    urls = parse_subscription(request.raw_post_data, format)
+    urls = parse_subscription(request.body, format)
     podcasts = [podcast_for_url(url, create=True) for url in urls]
     podcast_ids = map(Podcast.get_id, podcasts)
 

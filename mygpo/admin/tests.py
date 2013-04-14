@@ -7,13 +7,13 @@ Replace this with more appropriate tests for your application.
 
 import time
 from datetime import datetime
+from collections import Counter
 
 from django.test import TestCase
 
 from mygpo.users.models import User, Device, EpisodeAction
 from mygpo.core.models import Podcast, Episode
 from mygpo.utils import get_timestamp
-from mygpo.counter import Counter
 from mygpo.maintenance.merge import PodcastMerger
 from mygpo.db.couchdb.episode import episode_by_id, episodes_for_podcast
 from mygpo.db.couchdb.podcast import podcast_by_id
@@ -59,8 +59,8 @@ class SimpleTest(TestCase):
         e4.save()
 
         user = User()
-        user.username = 'user'
-        user.email = 'user@example.com'
+        user.username = 'user-test_merge'
+        user.email = 'user-test_merge@example.com'
         user.set_password('secret')
 
         device1 = Device()

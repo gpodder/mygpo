@@ -52,4 +52,3 @@ def is_publisher(user):
         return True
 
     return False
-

@@ -62,7 +62,7 @@ def requires_token(token_name, denied_template=None):
                 if denied_template:
                     return render(request, denied_template, {
                         'other_user': user
-                        })
+                    })
 
                 else:
                     return HttpResponseForbidden()
@@ -99,10 +99,8 @@ class repeat_on_conflict(object):
         self.obj_names = obj_names
         self.reload_f = reload_f or self.default_reload
 
-
     def default_reload(self, obj):
         return obj.__class__.get(obj._id)
-
 
     def build_locals(self, f, args, kwargs):
         argspec = getattr(f, self.ARGSPEC)
@@ -118,9 +116,6 @@ class repeat_on_conflict(object):
             locals.update({argspec.keywords: kwargs})
         locals.update(kwargs)
         return locals
-
-
-
 
     def __call__(self, f):
 
@@ -144,7 +139,6 @@ class repeat_on_conflict(object):
                         all_args[obj_name] = self.reload_f(obj)
 
         return wrapper
-
 
 
 def query_if_required():

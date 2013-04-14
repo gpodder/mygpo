@@ -21,4 +21,3 @@ class Command(BaseCommand):
         p2 = podcast_for_url(p2_url)
 
         p1.group_with(p2, group_title, myname, othername)
-

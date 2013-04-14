@@ -1,14 +1,13 @@
 from operator import itemgetter
 from collections import namedtuple
 
-from django.conf import settings
+from couchdbkit.ext.django import loading
 
 from couchdbkit import *
 
 
 def get_main_database():
-    db_url = settings.COUCHDB_DATABASES[0][1]
-    return Database(db_url)
+    return loading.get_db('core')
 
 
 def get_user_database(user):
@@ -17,7 +16,7 @@ def get_user_database(user):
     if user.db_url:
         return Database(user.db_url)
 
-    return get_main_database()
+    return loading.get_db('core')
 
 
 class BulkException(Exception):

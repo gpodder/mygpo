@@ -113,4 +113,3 @@ class Exporter(object):
         return doc.toprettyxml(encoding='utf-8', \
                                indent='  ', \
                                newl=os.linesep)
-

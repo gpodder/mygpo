@@ -18,10 +18,10 @@ def bar_chart(parts):
         'chs=%dx100' % width,
         'chl=%s' % '|'.join([x['x'] for x in parts]),
         'chd=t:%s' % ','.join([ repr(int(x['y'])) for x in parts ]),
-        'chxt=x,y', # visible axes
+        'chxt=x,y',  # visible axes
         'chbh=%d,%d,%d' % (bar_width, bar_space, group_space),
-        'chds=0,%d' % maxv, # avis scaling from 0 to max
-        'chxr=1,0,%d' % maxv, # labeling for axis 1 (y) from 0 to max
+        'chds=0,%d' % maxv,  # avis scaling from 0 to max
+        'chxr=1,0,%d' % maxv,  # labeling for axis 1 (y) from 0 to max
         ]
 
     s = '<img src="http://chart.apis.google.com/chart?%s" />' % '&'.join(parts)

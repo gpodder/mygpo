@@ -17,6 +17,7 @@
 
 from django.conf import settings
 
+
 def analytics(request):
     pid = settings.GOOGLE_ANALYTICS_PROPERTY_ID
     if pid:

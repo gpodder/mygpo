@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load url from future %}
 {% load i18n %}
 
 {% load menu %}
@@ -44,6 +43,12 @@
       <div class="controls">
        <button class="btn btn-primary" type="submit">{% trans "Login" %}</button>
        <a class="btn" href="{% url "register" %}">{% trans "Register" %}</a>
+      </div>
+     </div>
+
+     <div class="control-group">
+      <div class="controls">
+       <a class="btn" href="{% url "login-google" %}"><i class="icon-google-plus"></i> {% trans "Login with Google" %}</a>
       </div>
      </div>
 

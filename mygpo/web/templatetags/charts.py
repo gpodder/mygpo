@@ -128,15 +128,15 @@ def episode_heatmap_visualization(heatmap):
         widths.append( end-start )
 
     parts = [
-        'cht=bhs',                           #bar chart
-        'chco=%s' % ','.join(part_colours),  #colors
-        'chs=%dx50' % WIDTH,                 #width corresponds to length, arbitrary height
-        'chds=0,%s' % duration,              #axis scaling from 0 to maximum duration
+        'cht=bhs',                            # bar chart
+        'chco=%s' % ','.join(part_colours),   # colors
+        'chs=%dx50' % WIDTH,                  # width corresponds to length, arbitrary height
+        'chds=0,%s' % duration,               # axis scaling from 0 to maximum duration
         'chd=t:%s' % '|'.join([repr(w) for w in widths]),  # all block have the same width
-        'chxt=x',                            #visible axes
-        'chxr=0,0,%s' % duration,            #axis range for axis 0 (x): 0 - duration
-        'chxl=0:|%s' % '|'.join(axis_label), #axis labels
-        'chxp=0,%s' % ','.join([repr(x) for x in axis_pos]),   #axis label positions
+        'chxt=x',                             # visible axes
+        'chxr=0,0,%s' % duration,             # axis range for axis 0 (x): 0 - duration
+        'chxl=0:|%s' % '|'.join(axis_label),  # axis labels
+        'chxp=0,%s' % ','.join([repr(x) for x in axis_pos]),   # axis label positions
         ]
 
     s = '<img src="http://chart.apis.google.com/chart?%s" />' % '&'.join(parts)

@@ -66,7 +66,7 @@ class PodcastUpdater(object):
         for n, podcast_url in enumerate(queue):
             print n, podcast_url
             try:
-                self.update(podcast_url)
+                yield self.update(podcast_url)
 
             except NoPodcastCreated as npc:
                 print 'no podcast created:', npc
@@ -311,7 +311,7 @@ class PodcastUpdater(object):
                 for f in thumbnails:
                     os.unlink(f)
 
-            return  cover_art
+            return cover_art
 
         except (urllib2.HTTPError, urllib2.URLError, ValueError,
                 httplib.BadStatusLine) as e:

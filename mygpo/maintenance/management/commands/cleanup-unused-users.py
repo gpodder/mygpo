@@ -1,6 +1,5 @@
 from django.core.management.base import BaseCommand
 
-from mygpo.users.models import User
 from mygpo.utils import progress
 from mygpo.db.couchdb.user import deleted_users, deleted_user_count
 

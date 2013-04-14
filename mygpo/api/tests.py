@@ -26,7 +26,7 @@ from django.core.urlresolvers import reverse
 from mygpo.api.advanced import episodes
 from mygpo.users.models import User
 from mygpo.test import create_auth_string
-from mygpo.json import json
+from mygpo.core.json import json
 
 
 class LegacyAPITests(unittest.TestCase):
@@ -86,6 +86,7 @@ class AdvancedAPITests(unittest.TestCase):
         extra['since'] = 0
 
         response = self.client.get(url, **extra)
+        self.assertEqual(response.status_code, 200, response.content)
         response_obj = json.loads(response.content)
         actions = response_obj['actions']
         self.assertTrue(self.compare_action_list(self.action_data, actions))
@@ -99,6 +100,7 @@ class AdvancedAPITests(unittest.TestCase):
                     found = True
 
             if not found:
+                raise ValueError('%s not found in %s' % (a1, as2))
                 return False
 
         return True
@@ -106,7 +108,7 @@ class AdvancedAPITests(unittest.TestCase):
 
     def compare_actions(self, a1, a2):
         for key, val in a1.items():
-            if a2[key] != val:
+            if a2.get(key, None) != val:
                 return False
         return True
 

@@ -40,9 +40,10 @@ from mygpo.flattr import Flattr
 from mygpo.users.settings import PUBLIC_SUB_PODCAST, PUBLIC_SUB_USER, \
          FLATTR_TOKEN, FLATTR_AUTO, FLATTR_MYGPO, FLATTR_USERNAME
 from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_to_dict
-from mygpo.db.couchdb.podcast_state import  subscriptions_by_user, \
-         set_podcast_privacy
-from mygpo.db.couchdb.user import update_flattr_settings
+from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast, \
+         subscriptions_by_user, set_podcast_privacy
+from mygpo.db.couchdb.user import update_flattr_settings, \
+         set_users_google_email
 
 
 @login_required
@@ -53,28 +54,28 @@ def account(request):
 
     if request.method == 'GET':
 
-       site = RequestSite(request)
-       flattr = Flattr(request.user, site.domain)
-       userpage_token = request.user.get_token('userpage_token')
+        site = RequestSite(request)
+        flattr = Flattr(request.user, site.domain, request.is_secure())
+        userpage_token = request.user.get_token('userpage_token')
 
-       profile_form = ProfileForm({
+        profile_form = ProfileForm({
                'twitter': request.user.twitter,
                'about':   request.user.about,
             })
 
-       form = UserAccountForm({
+        form = UserAccountForm({
             'email': request.user.email,
             'public': request.user.get_wksetting(PUBLIC_SUB_USER)
             })
 
-       flattr_form = FlattrForm({
+        flattr_form = FlattrForm({
                'enable': request.user.get_wksetting(FLATTR_AUTO),
                'token': request.user.get_wksetting(FLATTR_TOKEN),
                'flattr_mygpo': request.user.get_wksetting(FLATTR_MYGPO),
                'username': request.user.get_wksetting(FLATTR_USERNAME),
             })
 
-       return render(request, 'account.html', {
+        return render(request, 'account.html', {
             'site': site,
             'form': form,
             'profile_form': profile_form,
@@ -169,7 +170,7 @@ class FlattrTokenView(View):
 
         user = request.user
         site = RequestSite(request)
-        flattr = Flattr(user, site.domain)
+        flattr = Flattr(user, site.domain, request.is_secure())
 
         url = request.build_absolute_uri()
         token = flattr.process_retrieved_code(url)
@@ -182,6 +183,15 @@ class FlattrTokenView(View):
 
         return HttpResponseRedirect(reverse('account') + '#flattr')
 
+
+class AccountRemoveGoogle(View):
+    """ Removes the connected Google account """
+
+    @method_decorator(login_required)
+    def post(self, request):
+        set_users_google_email(request.user, None)
+        messages.success(request, _('Your account has been disconnected'))
+        return HttpResponseRedirect(reverse('account'))
 
 
 @login_required

@@ -23,4 +23,3 @@ syslog.openlog('my.gpodder.org')
 
 def log(message):
     syslog.syslog(message)
-

@@ -32,7 +32,7 @@ from mygpo.api.backend import get_device
 from mygpo.users.models import Chapter
 from mygpo.utils import parse_time
 from mygpo.decorators import allowed_methods
-from mygpo.json import json
+from mygpo.core.json import json
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.db.couchdb.episode import episode_for_podcast_url
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
@@ -50,7 +50,7 @@ def chapters(request, username):
     now_ = int(time.mktime(now.timetuple()))
 
     if request.method == 'POST':
-        req = json.loads(request.raw_post_data)
+        req = json.loads(request.body)
 
         if not 'podcast' in req:
             return HttpResponseBadRequest('Podcast URL missing')

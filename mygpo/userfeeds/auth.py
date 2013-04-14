@@ -96,6 +96,3 @@ def require_token_auth(token_name):
                                      **kwargs)
         return tmp
     return wrapper
-
-
-

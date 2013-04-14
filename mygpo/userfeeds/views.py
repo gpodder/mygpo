@@ -23,4 +23,3 @@ def favorite_feed(request, username):
         'feed_user': user,
         'feed': feed,
         }, content_type='text/xml')
-

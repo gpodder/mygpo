@@ -1,10 +1,8 @@
 import gzip
+from collections import Counter
 
 from django.core.management.base import BaseCommand
 from django.core.urlresolvers import resolve, Resolver404
-
-from mygpo.counter import Counter
-
 
 
 class Command(BaseCommand):

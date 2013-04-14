@@ -1,5 +1,6 @@
 import re
-import uuid, collections
+import uuid
+import collections
 from datetime import datetime
 import dateutil.parser
 from itertools import imap
@@ -121,12 +122,12 @@ class EpisodeAction(DocumentSchema):
 
         # Sanity check: If started or total are given, require playmark
         if ((self.started is not None) or (self.total is not None)) and \
-            self.playmark is None:
+                self.playmark is None:
             raise InvalidEpisodeActionAttributes('started and total require position')
 
         # Sanity check: total and playmark can only appear together
         if ((self.total is not None) or (self.started is not None)) and \
-           ((self.total is None)     or (self.started is None)):
+           ((self.total is None) or (self.started is None)):
             raise InvalidEpisodeActionAttributes('total and started can only appear together')
 
 
@@ -462,6 +463,7 @@ class User(BaseUser, SyncedDevicesMixin, SettingsMixin):
     suggestions_up_to_date = BooleanProperty(default=False)
     twitter = StringProperty()
     about   = StringProperty()
+    google_email = StringProperty()
 
     # the URL of the DB in which the user's documents are stored
     # the user object is still stored in the main mygpo database

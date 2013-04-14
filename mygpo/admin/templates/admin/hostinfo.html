@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load podcasts %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/admin/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/admin/"|section_menu:"Admin" }}{% endblock %}
+
+{% block title %}{% trans "Host Information" %}{% endblock %}
+
+{% block header %}
+ <h1>{% trans "Host Information" %}</h1>
+{% endblock %}
+
+{% block content %}
+
+ <table class="list">
+
+  <tr>
+   <td><strong>{% trans "mygpo Version" %}</strong></td>
+   <td>
+    {% if git_commit %}
+     <a href="https://github.com/gpodder/mygpo/commit/{{ git_commit }}">{{ git_commit }} {{ git_msg }}</a>
+    {% else %}
+     could not be determined &mdash; run <strong><tt>git show HEAD</tt></strong> in the base directory
+    {% endif %}
+   </td>
+  </tr>
+
+  <tr>
+   <td><strong>{% trans "Base Directory" %}</strong></td>
+   <td><tt>{{ base_dir }}</tt></td>
+  </tr>
+
+  <tr>
+   <td><strong>{% trans "Main Database" %}</strong></td>
+   <td><tt>{{ main_db }}</tt></td>
+  </tr>
+
+  <tr>
+   <td><strong>{% trans "Hostname" %}</strong></td>
+   <td><tt>{{ hostname }}</tt></td>
+  </tr>
+
+  <tr>
+   <td><strong>{% trans "Django Version" %}</strong></td>
+   <td><tt>{{ django_version }}</tt></td>
+  </tr>
+
+  {% for task in db_tasks %}
+   <tr>
+    <td>
+     {% if forloop.first %}
+      <strong>{% trans "Database Tasks" %}</strong>
+     {% endif %}
+    </td>
+    <td>
+     <ul>
+      {% for key, val in task.items %}
+       <li>{{ key }}: {{ val}}</li>
+      {% endfor %}
+     </ul>
+    </td>
+   </tr>
+  {% endfor %}
+
+  <tr>
+   <td><strong>{% trans "Scheduled Celery Tasks" %}</strong></td>
+   <td><tt>{{ num_celery_tasks }}</tt></td>
+  </tr>
+
+
+ </table>
+
+{% endblock %}
+

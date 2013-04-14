@@ -15,6 +15,8 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+import subprocess
+import os
 import operator
 import sys
 import re
@@ -208,8 +210,8 @@ def progress(val, max_val, status_str='', max_width=50, stream=sys.stdout):
     percentage_str = '{val:.2%}'.format(val=float(val)/max_val)
 
     # progress bar filled with #s
-    progress_str = '#'*int(float(val)/max_val*max_width) + \
-                   ' ' * (max_width-(int(float(val)/max_val*max_width)))
+    factor = min(int(float(val)/max_val*max_width), max_width)
+    progress_str = '#' * factor + ' ' * (max_width-factor)
 
     #insert percentage into bar
     percentage_start = int((max_width-len(percentage_str))/2)
@@ -240,19 +242,17 @@ def first(it):
     returns the first not-None object or None if the iterator is exhausted
     """
     for x in it:
-        if x != None:
+        if x is not None:
             return x
     return None
 
 
 def intersect(a, b):
-     return list(set(a) & set(b))
+    return list(set(a) & set(b))
 
 
 
 def remove_control_chars(s):
-    import unicodedata, re
-
     all_chars = (unichr(i) for i in xrange(0x110000))
     control_chars = ''.join(map(unichr, range(0,32) + range(127,160)))
     control_char_re = re.compile('[%s]' % re.escape(control_chars))
@@ -414,7 +414,7 @@ def longest_substr(strings):
     substr = ""
     if not strings:
         return substr
-    reference = shortest_of(strings) #strings[0]
+    reference = shortest_of(strings)
     length = len(reference)
     #find a suitable slice i:j
     for i in xrange(length):
@@ -466,7 +466,7 @@ def file_hash(f, h=hashlib.md5, block_size=2**20):
     """ returns the hash of the contents of a file """
     f_hash = h()
     for chunk in iter(lambda: f.read(block_size), ''):
-         f_hash.update(chunk)
+        f_hash.update(chunk)
     return f_hash
 
 
@@ -711,3 +711,26 @@ def sanitize_encoding(filename):
     if not isinstance(filename, unicode):
         filename = filename.decode(encoding, 'ignore')
     return filename.encode(encoding, 'ignore')
+
+
+def get_git_head():
+    """ returns the commit and message of the current git HEAD """
+
+    try:
+        pr = subprocess.Popen('/usr/bin/git log -n 1 --oneline'.split(),
+            cwd = settings.BASE_DIR,
+            stdout = subprocess.PIPE,
+            stderr = subprocess.PIPE,
+        )
+
+    except OSError:
+        return None, None
+
+    (out, err) = pr.communicate()
+    if err:
+        return None, None
+
+    outs = out.split()
+    commit = outs[0]
+    msg = ' ' .join(outs[1:])
+    return commit, msg

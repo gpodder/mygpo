@@ -1,6 +1,6 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import *
 from django.contrib.auth.views import logout
-from django.views.generic.simple import direct_to_template
+from django.views.generic.base import TemplateView
 
 from django_couchdb_utils.registration.views import activate, register
 from django_couchdb_utils.registration.forms import RegistrationFormUniqueEmail
@@ -15,15 +15,21 @@ urlpatterns = patterns('mygpo.web.views',
  url(r'^suggestions/$',                                           'suggestions',   name='suggestions'),
  url(r'^suggestions/blacklist/(?P<slug_id>[\w-]+)$',              'blacklist',     name='suggestions-blacklist-slug-id'),
  url(r'^tags/',                                                   'mytags',        name='tags'),
- url(r'^online-help',                                              direct_to_template,
-       {'template': 'online-help.html'},                                           name='help'),
-    (r'^developer/',                                               direct_to_template,
-       {'template': 'developer.html'}),
- url(r'^contribute/',                                              direct_to_template,
-       {'template': 'contribute.html'},
-       name='contribute'),
- url(r'^privacy/',                                              direct_to_template,
-       {'template': 'privacy_policy.html'}, name='privacy-policy'),
+
+ url(r'^online-help',
+     TemplateView.as_view(template_name='online-help.html'),
+     name='help'),
+
+ url(r'^developer/',
+     TemplateView.as_view(template_name='developer.html')),
+
+ url(r'^contribute/',
+     TemplateView.as_view(template_name='contribute.html'),
+     name='contribute'),
+
+ url(r'^privacy/',
+     TemplateView.as_view(template_name='privacy_policy.html'),
+     name='privacy-policy'),
 
 )
 
@@ -85,7 +91,7 @@ urlpatterns += patterns('mygpo.web.views.episode',
 
 from mygpo.web.views.settings import DefaultPrivacySettings, \
          PodcastPrivacySettings, ProfileView, FlattrSettingsView, \
-         FlattrTokenView, FlattrLogout
+         FlattrTokenView, FlattrLogout, AccountRemoveGoogle
 
 urlpatterns += patterns('mygpo.web.views.settings',
  url(r'^account/$',                                               'account',       name='account'),
@@ -94,6 +100,10 @@ urlpatterns += patterns('mygpo.web.views.settings',
  url(r'^account/profile$',
      ProfileView.as_view(),
      name='profile'),
+
+ url(r'^account/google/remove$',
+     AccountRemoveGoogle.as_view(),
+     name='account-google-remove'),
 
  url(r'^account/flattr$',
      FlattrSettingsView.as_view(),
@@ -145,7 +155,7 @@ urlpatterns += patterns('mygpo.web.views.device',
 )
 
 
-from mygpo.web.views.users import LoginView
+from mygpo.web.views.users import LoginView, GoogleLogin, GoogleLoginCallback
 
 urlpatterns += patterns('mygpo.web.views.users',
 
@@ -153,15 +163,24 @@ urlpatterns += patterns('mygpo.web.views.users',
     LoginView.as_view(),
     name='login'),
 
+ url(r'^login/google$',
+     GoogleLogin.as_view(),
+     name='login-google'),
+
+ url(r'^login/oauth2callback$',
+     GoogleLoginCallback.as_view(),
+     name='login-google-callback'),
+
  url(r'^logout/$',                                                 logout, {'next_page': '/'},  name='logout'),
  url(r'^register/resend-activation$',                             'resend_activation',          name='resend-activation'),
  url(r'^register/restore_password$',                              'restore_password',           name='restore-password'),
  url(r'^register/$',                                               register,
             {'backend': 'django_couchdb_utils.registration.backends.default.DefaultBackend',
              'form_class': RegistrationFormUniqueEmail},                                        name='register'),
-    (r'^registration_complete/$',                                  direct_to_template,
-            {'template': 'registration/registration_complete.html'}),
+
+ url(r'^registration_complete/$',
+    TemplateView.as_view(template_name='registration/registration_complete.html')),
+
     (r'^activate/(?P<activation_key>\w+)$',                        activate,
             {'backend': 'django_couchdb_utils.registration.backends.default.DefaultBackend'}),
 )
-

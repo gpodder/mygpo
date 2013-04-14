@@ -76,4 +76,3 @@ def device_link(device):
             name = device.name,
             icon = device_icon(device),
         )
-

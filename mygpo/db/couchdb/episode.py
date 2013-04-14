@@ -1,10 +1,13 @@
 from hashlib import sha1
 from datetime import datetime
+from collections import Counter
 
 from django.core.cache import cache
 
 from mygpo.core.models import Podcast, Episode, MergedIdException
+from mygpo.core.signals import incomplete_obj
 from mygpo.cache import cache_result
+from mygpo.decorators import repeat_on_conflict
 from mygpo.db import QueryParameterMissing
 from mygpo.db.couchdb.utils import is_couchdb_id
 from mygpo.db.couchdb import get_main_database
@@ -29,6 +32,9 @@ def episode_by_id(episode_id, current_id=False):
     if current_id and obj._id != episode_id:
         raise MergedIdException(obj, obj._id)
 
+    if obj.needs_update:
+        incomplete_obj.send_robust(sender=obj)
+
     return obj
 
 
@@ -45,7 +51,14 @@ def episodes_by_id(episode_ids):
             include_docs = True,
             keys         = episode_ids,
         )
-    return list(r)
+
+    episodes = list(r)
+
+    for episode in episodes:
+        if episode.needs_update:
+            incomplete_obj.send_robust(sender=episode)
+
+    return episodes
 
 
 @cache_result(timeout=60*60)
@@ -60,7 +73,16 @@ def episode_for_oldid(oldid):
             limit        = 1,
             include_docs = True,
         )
-    return r.one() if r else None
+
+    if not r:
+        return None
+
+    episode = r.one()
+
+    if episode.needs_update:
+        incomplete_obj.send_robust(sender=episode)
+
+    return episode
 
 
 @cache_result(timeout=60*60)
@@ -77,7 +99,46 @@ def episode_for_slug(podcast_id, episode_slug):
             key          = [podcast_id, episode_slug],
             include_docs = True,
         )
-    return r.first() if r else None
+
+    if not r:
+        return None
+
+    episode = r.one()
+
+    if episode.needs_update:
+        incomplete_obj.send_robust(sender=episode)
+
+    return episode
+
+
+def episodes_for_slug(podcast_id, episode_slug):
+    """ returns all episodes for the given slug
+
+    this should normally only return one episode, but there might be multiple
+    due to resolved replication conflicts, etc """
+
+    if not podcast_id:
+        raise QueryParameterMissing('podcast_id')
+
+    if not episode_slug:
+        raise QueryParameterMissing('episode_slug')
+
+    r = Episode.view('episodes/by_slug',
+            key          = [podcast_id, episode_slug],
+            include_docs = True,
+        )
+
+    if not r:
+        return []
+
+    episodes = r.all()
+
+    for episode in episodes:
+        if episode.needs_update:
+            incomplete_obj.send_robust(sender=episode)
+
+    return episodes
+
 
 
 def episode_for_podcast_url(podcast_url, episode_url, create=False):
@@ -91,7 +152,7 @@ def episode_for_podcast_url(podcast_url, episode_url, create=False):
 
     podcast = podcast_for_url(podcast_url, create=create)
 
-    if not podcast: # podcast does not exist and should not be created
+    if not podcast:  # podcast does not exist and should not be created
         return None
 
     return episode_for_podcast_id_url(podcast.get_id(), episode_url, create)
@@ -122,21 +183,25 @@ def episode_for_podcast_id_url(podcast_id, episode_url, create=False):
 
     if r:
         episode = r.first()
-        cache.set(key, episode)
+
+        if episode.needs_update:
+            incomplete_obj.send_robust(sender=episode)
+        else:
+            cache.set(key, episode)
         return episode
 
     if create:
         episode = Episode()
+        episode.created_timestamp = get_timestamp(datetime.utcnow())
         episode.podcast = podcast_id
         episode.urls = [episode_url]
         episode.save()
-        cache.set(key, episode)
+        incomplete_obj.send_robust(sender=episode)
         return episode
 
     return None
 
 
-@cache_result(timeout=60*60)
 def episode_for_slug_id(p_slug_id, e_slug_id):
     """ Returns the Episode for Podcast Slug/Id and Episode Slug/Id """
 
@@ -249,7 +314,13 @@ def episodes_for_podcast_uncached(podcast, since=None, until={}, **kwargs):
             **kwargs
         )
 
-    return list(res)
+    episodes = list(res)
+
+    for episode in episodes:
+        if episode.needs_update:
+            incomplete_obj.send_robust(sender=episode)
+
+    return episodes
 
 
 episodes_for_podcast = cache_result(timeout=60*60)(episodes_for_podcast_uncached)
@@ -292,7 +363,14 @@ def favorite_episodes_for_user(user):
             key          = user._id,
             include_docs = True,
         )
-    return list(favorites)
+
+    episodes = list(favorites)
+
+    for episode in episodes:
+        if episode.needs_update:
+            incomplete_obj.send_robust(sender=episode)
+
+    return episodes
 
 
 def chapters_for_episode(episode_id):
@@ -309,8 +387,35 @@ def chapters_for_episode(episode_id):
     return map(_wrap_chapter, r)
 
 
+def filetype_stats():
+    """ Returns a filetype counter over all episodes """
+
+    db = get_main_database()
+    r = db.view('episode_stats/filetypes',
+        stale       = 'update_after',
+        reduce      = True,
+        group_level = 1,
+    )
+
+    return Counter({x['key']: x['value'] for x in r})
+
+
 def _wrap_chapter(res):
     from mygpo.users.models import Chapter
     user = res['key'][1]
     chapter = Chapter.wrap(res['value'])
     return (user, chapter)
+
+
+@repeat_on_conflict(['episode'])
+def set_episode_slug(episode, slug):
+    """ sets slug as new main slug of the episode, moves other to merged """
+    episode.set_slug(slug)
+    episode.save()
+
+
+@repeat_on_conflict(['episode'])
+def remove_episode_slug(episode, slug):
+    """ removes slug from main and merged slugs """
+    episode.remove_slug(slug)
+    episode.save()

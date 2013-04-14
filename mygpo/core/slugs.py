@@ -2,7 +2,7 @@ from itertools import count
 
 from couchdbkit.ext.django.schema import *
 
-from django.template.defaultfilters import slugify
+from django.utils.text import slugify
 
 from mygpo.decorators import repeat_on_conflict
 
@@ -228,15 +228,22 @@ class SlugMixin(DocumentSchema):
     merged_slugs = StringListProperty()
 
     def set_slug(self, slug):
-        """ Set the main slug of the Podcast """
-
-        if not isinstance(slug, basestring):
-            raise ValueError('slug must be a string')
-
-        if not slug:
-            raise ValueError('slug cannot be empty')
+        """ Set the main slug of the object """
 
         if self.slug:
             self.merged_slugs.append(self.slug)
 
+        self.merged_slugs = list(set(self.merged_slugs) - set([slug]))
+
         self.slug = slug
+
+
+    def remove_slug(self, slug):
+        """ Removes the slug from the object """
+
+        # remove main slug
+        if self.slug == slug:
+            self.slug = None
+
+        # remove from merged slugs
+        self.merged_slugs = list(set(self.merged_slugs) - set([slug]))

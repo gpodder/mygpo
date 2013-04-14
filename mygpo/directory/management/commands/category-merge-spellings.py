@@ -55,4 +55,3 @@ Usage:
 
             category.updated = start_time
             category.save()
-

@@ -15,13 +15,10 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+from collections import Counter
+
 from mygpo.db.couchdb.podcast_state import subscribed_users, \
          subscribed_podcast_ids_by_user_id
-
-try:
-    from collections import Counter
-except ImportError:
-    from mygpo.counter import Counter
 
 
 def calc_similar_podcasts(podcast, num=20):

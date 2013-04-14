@@ -21,7 +21,7 @@ from django.views.decorators.cache import never_cache
 
 from mygpo.decorators import allowed_methods
 from mygpo.core.models import Podcast
-from mygpo.json import json
+from mygpo.core.json import json
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.users.models import PodcastUserState, DeviceDoesNotExist
@@ -66,8 +66,8 @@ def main(request, username, scope):
         return episode_state, episode_state
 
     models = dict(
-            account = lambda: user_settings   (request.user),
-            device  = lambda: device_settings (request.user, request.GET.get('device', '')),
+            account = lambda: user_settings(request.user),
+            device  = lambda: device_settings(request.user, request.GET.get('device', '')),
             podcast = lambda: podcast_settings(request.user, request.GET.get('podcast', '')),
             episode = lambda: episode_settings(request.user, request.GET.get('episode', ''), request.GET.get('podcast', ''))
         )
@@ -85,7 +85,7 @@ def main(request, username, scope):
         return JsonResponse( settings_obj.settings )
 
     elif request.method == 'POST':
-        actions = json.loads(request.raw_post_data)
+        actions = json.loads(request.body)
         ret = update_settings(settings_obj, actions)
         base_obj.save()
         return JsonResponse(ret)
@@ -100,4 +100,3 @@ def update_settings(obj, actions):
             del obj.settings[key]
 
     return obj.settings
-

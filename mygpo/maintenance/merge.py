@@ -199,18 +199,19 @@ class PodcastMerger(object):
     @repeat_on_conflict(['podcast1', 'podcast2'])
     def _merge_objs(self, podcast1, podcast2):
 
-        podcast1.merged_ids = set_filter(podcast1.merged_ids,
-                [podcast2.get_id()], podcast2.merged_ids)
+        podcast1.merged_ids = set_filter(podcast1.get_id(),
+                podcast1.merged_ids, [podcast2.get_id()], podcast2.merged_ids)
 
-        podcast1.merged_slugs = set_filter(podcast1.merged_slugs,
-                [podcast2.slug], podcast2.merged_slugs)
+        podcast1.merged_slugs = set_filter(podcast1.slug,
+                podcast1.merged_slugs, [podcast2.slug], podcast2.merged_slugs)
 
-        podcast1.merged_oldids = set_filter(podcast1.merged_oldids,
-                [podcast2.oldid], podcast2.merged_oldids)
+        podcast1.merged_oldids = set_filter(podcast1.oldid,
+                podcast1.merged_oldids, [podcast2.oldid],
+                podcast2.merged_oldids)
 
         # the first URL in the list represents the podcast main URL
         main_url = podcast1.url
-        podcast1.urls = set_filter(podcast1.urls, podcast2.urls)
+        podcast1.urls = set_filter(None, podcast1.urls, podcast2.urls)
         # so we insert it as the first again
         podcast1.urls.remove(main_url)
         podcast1.urls.insert(0, main_url)
@@ -219,14 +220,15 @@ class PodcastMerger(object):
         # * the elements should be roughly the same
         # * element order is important but could not preserved exactly
 
-        podcast1.content_types = set_filter(podcast1.content_types,
+        podcast1.content_types = set_filter(None, podcast1.content_types,
                 podcast2.content_types)
 
         key = lambda x: x.timestamp
         for a, b in utils.iterate_together(
                 [podcast1.subscribers, podcast2.subscribers], key):
 
-            if a is None or b is None: continue
+            if a is None or b is None:
+                continue
 
             # avoid increasing subscriber_count when merging
             # duplicate entries of a single podcast
@@ -236,7 +238,8 @@ class PodcastMerger(object):
             a.subscriber_count += b.subscriber_count
 
         for src, tags in podcast2.tags.items():
-            podcast1.tags[src] = set_filter(podcast1.tags.get(src, []), tags)
+            podcast1.tags[src] = set_filter(None, podcast1.tags.get(src, []),
+                    tags)
 
         podcast1.save()
 
@@ -288,12 +291,12 @@ class PodcastMerger(object):
             if state == state2:
                 continue
 
-            if state == None:
+            if state is None:
                 self.actions['move-podcast-state'] += 1
                 self._move_state(state2=state2, new_id=podcast1.get_id(),
                         new_url=podcast1.url)
 
-            elif state2 == None:
+            elif state2 is None:
                 continue
 
             else:
@@ -346,13 +349,13 @@ class EpisodeMerger(object):
     @repeat_on_conflict(['episode1'])
     def _merge_objs(self, episode1, episode2):
 
-        episode1.urls = set_filter(episode1.urls, episode2.urls)
+        episode1.urls = set_filter(None, episode1.urls, episode2.urls)
 
-        episode1.merged_ids = set_filter(episode1.merged_ids, [episode2._id],
-                episode2.merged_ids)
+        episode1.merged_ids = set_filter(episode1._id, episode1.merged_ids,
+                [episode2._id], episode2.merged_ids)
 
-        episode1.merged_slugs = set_filter(episode1.merged_slugs, [episode2.slug],
-                episode2.merged_slugs)
+        episode1.merged_slugs = set_filter(episode1.slug,
+                episode1.merged_slugs, [episode2.slug], episode2.merged_slugs)
 
         episode1.save()
 
@@ -373,12 +376,12 @@ class EpisodeMerger(object):
             if state == state2:
                 continue
 
-            if state == None:
+            if state is None:
                 self.actions['move-episode-state'] += 1
                 self._move(state2=state2, podcast_id=self.episode1.podcast,
                         episode_id=self.episode1._id)
 
-            elif state2 == None:
+            elif state2 is None:
                 continue
 
             else:
@@ -429,13 +432,13 @@ class PodcastStateMerger(object):
         settings.update(state.settings)
         state.settings = settings
 
-        state.disabled_devices = set_filter(state.disabled_devices,
+        state.disabled_devices = set_filter(None, state.disabled_devices,
                 state2.disabled_devices)
 
-        state.merged_ids = set_filter(state.merged_ids, [state2._id],
-                state2.merged_ids)
+        state.merged_ids = set_filter(state1._id, state.merged_ids,
+                [state2._id], state2.merged_ids)
 
-        state.tags = set_filter(state.tags, state2.tags)
+        state.tags = set_filter(None, state.tags, state2.tags)
 
         state.save()
 
@@ -503,5 +506,9 @@ class EpisodeStateMerger(object):
         state2.delete()
 
 
-def set_filter(*args):
-    return filter(None, set(chain.from_iterable(args)))
+def set_filter(orig, *args):
+    """ chain args, and remove falsy values and orig """
+    s = set(chain.from_iterable(args))
+    s = s - set([orig])
+    s = filter(None, s)
+    return s
