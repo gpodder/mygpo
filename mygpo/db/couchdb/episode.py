@@ -192,6 +192,7 @@ def episode_for_podcast_id_url(podcast_id, episode_url, create=False):
 
     if create:
         episode = Episode()
+        episode.created_timestamp = get_timestamp(datetime.utcnow())
         episode.podcast = podcast_id
         episode.urls = [episode_url]
         episode.save()

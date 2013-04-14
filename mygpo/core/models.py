@@ -60,6 +60,7 @@ class Episode(Document, SlugMixin, OldIdMixin):
     listeners = IntegerProperty()
     content_types = StringListProperty()
     flattr_url = StringProperty()
+    created_timestamp = IntegerProperty()
 
 
 
@@ -171,6 +172,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
     random_key = FloatProperty(default=random)
     flattr_url = StringProperty()
     outdated = BooleanProperty(default=False)
+    created_timestamp = IntegerProperty()
 
 
 

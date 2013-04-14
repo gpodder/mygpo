@@ -1,5 +1,6 @@
 from hashlib import sha1
 from random import random
+from datetime import datetime
 
 from restkit import RequestFailed
 
@@ -9,6 +10,7 @@ from mygpo.core.models import Podcast, PodcastGroup, PodcastSubscriberData
 from mygpo.core.signals import incomplete_obj
 from mygpo.decorators import repeat_on_conflict
 from mygpo.cache import cache_result
+from mygpo.utils import get_timestamp
 from mygpo.db.couchdb import get_main_database
 from mygpo.db import QueryParameterMissing
 from mygpo.db.couchdb.utils import multi_request_view, is_couchdb_id
@@ -283,6 +285,7 @@ def podcast_for_url(url, create=False):
 
     if create:
         podcast = Podcast()
+        podcast.created_timestamp = get_timestamp(datetime.utcnow())
         podcast.urls = [url]
         podcast.save()
         incomplete_obj.send_robust(sender=podcast)

@@ -16,6 +16,7 @@
 #
 
 from functools import partial
+from datetime import datetime
 
 from django.http import HttpResponse, HttpResponseBadRequest, \
      HttpResponseForbidden
@@ -26,6 +27,7 @@ from django.utils.text import slugify
 from django.views.decorators.cache import never_cache
 from django.http import Http404
 
+from mygpo.utils import get_timestamp
 from mygpo.api.advanced.directory import podcast_data
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.share.models import PodcastList
@@ -71,6 +73,7 @@ def create(request, username, format):
     podcast_ids = map(Podcast.get_id, podcasts)
 
     plist = PodcastList()
+    plist.created_timestamp = get_timestamp(datetime.utcnow())
     plist.title = title
     plist.slug = slug
     plist.user = request.user._id
