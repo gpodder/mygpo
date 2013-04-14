@@ -43,7 +43,7 @@ from mygpo.db.couchdb.episode import episode_for_slug_id, episode_for_oldid, \
 from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url, \
          podcasts_to_dict
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
-         add_episode_actions
+         add_episode_actions, toggle_favorite, update_episode_chapters
 from mygpo.db.couchdb.user import get_latest_episodes
 from mygpo.userfeeds.feeds import FavoriteFeed
 
@@ -113,7 +113,8 @@ def episode(request, episode):
 @never_cache
 @login_required
 def add_chapter(request, episode):
-    e_state = episode_state_for_user_episode(request.user, episode)
+    user = request.user
+    e_state = episode_state_for_user_episode(user, episode)
 
     podcast = podcast_by_id(episode.podcast)
 
@@ -141,7 +142,7 @@ def add_chapter(request, episode):
     chapter.advertisement = adv
     chapter.label = label
 
-    e_state.update_chapters(add=[chapter])
+    update_episode_chapters(user, e_state, add=[chapter])
 
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
@@ -149,10 +150,11 @@ def add_chapter(request, episode):
 @never_cache
 @login_required
 def remove_chapter(request, episode, start, end):
+    user = request.user
     e_state = episode_state_for_user_episode(request.user, episode)
 
     remove = (int(start), int(end))
-    e_state.update_chapters(rem=[remove])
+    update_episode_chapters(user, e_state, rem=[remove])
 
     podcast = podcast_by_id(episode.podcast)
 
@@ -162,15 +164,8 @@ def remove_chapter(request, episode, start, end):
 @never_cache
 @login_required
 def toggle_favorite(request, episode):
-    episode_state = episode_state_for_user_episode(request.user, episode)
 
-    @repeat_on_conflict(['episode_state'])
-    def _set_fav(episode_state, is_fav):
-        episode_state.set_favorite(is_fav)
-        episode_state.save()
-
-    is_fav = episode_state.is_favorite()
-    _set_fav(episode_state=episode_state, is_fav=not is_fav)
+    toggle_favorite(request.user, episode)
 
     podcast = podcast_by_id(episode.podcast)
 
@@ -214,7 +209,8 @@ def list_favorites(request):
 @never_cache
 def add_action(request, episode):
 
-    device = request.user.get_device(request.POST.get('device'))
+    user = request.user
+    device = user.get_device(request.POST.get('device'))
 
     action_str = request.POST.get('action')
     timestamp = request.POST.get('timestamp', '')
@@ -233,8 +229,8 @@ def add_action(request, episode):
     action.device = device.id if device else None
     action.action = action_str
 
-    state = episode_state_for_user_episode(request.user, episode)
-    add_episode_actions(state, [action])
+    state = episode_state_for_user_episode(user, episode)
+    add_episode_actions(user, state, [action])
 
     podcast = podcast_by_id(episode.podcast)
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
@@ -258,7 +254,7 @@ def flattr_episode(request, episode):
         action.action = 'flattr'
         action.upload_timestamp = get_timestamp(datetime.utcnow())
         state = episode_state_for_user_episode(request.user, episode)
-        add_episode_actions(state, [action])
+        add_episode_actions(user, state, [action])
         messages.success(request, _("Flattr\'d"))
 
     else:

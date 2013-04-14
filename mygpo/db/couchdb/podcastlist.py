@@ -8,6 +8,7 @@ from mygpo.db import QueryParameterMissing
 
 
 
+# TODO: replace user_id with user
 def podcastlist_for_user_slug(user_id, slug):
 
     if not user_id:
@@ -22,6 +23,7 @@ def podcastlist_for_user_slug(user_id, slug):
     if l:
         return l
 
+    # TODO: use user-db
     r = PodcastList.view('podcastlists/by_user_slug',
             key          = [user_id, slug],
             include_docs = True,
@@ -36,11 +38,13 @@ def podcastlist_for_user_slug(user_id, slug):
 
 
 
+# TODO: replace user_id with user
 def podcastlists_for_user(user_id):
 
     if not user_id:
         raise QueryParameterMissing('user_id')
 
+    # TODO: use user-db
     r = PodcastList.view('podcastlists/by_user_slug',
             startkey = [user_id, None],
             endkey   = [user_id, {}],
@@ -62,6 +66,7 @@ def podcastlists_by_rating(**kwargs):
 
 
 
+# TODO: aggregate for all users
 @cache_result(timeout=60*60)
 def podcastlist_count(with_rating=True):
     view = 'podcastlists/by_rating' if with_rating else \
@@ -74,6 +79,7 @@ def podcastlist_count(with_rating=True):
 
 
 
+# TODO: aggregate for all users
 def random_podcastlists(chunk_size=1):
 
     while True:

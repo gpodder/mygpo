@@ -13,12 +13,12 @@ from django.test import TestCase
 
 from mygpo.users.models import User, Device, EpisodeAction
 from mygpo.core.models import Podcast, Episode
+from mygpo.utils import get_timestamp
 from mygpo.maintenance.merge import PodcastMerger
 from mygpo.db.couchdb.episode import episode_by_id, episodes_for_podcast
 from mygpo.db.couchdb.podcast import podcast_by_id
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode
-from mygpo.utils import get_timestamp
 
 
 class SimpleTest(TestCase):

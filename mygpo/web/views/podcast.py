@@ -14,7 +14,7 @@ from mygpo.core.models import PodcastGroup, SubscriptionException
 from mygpo.core.proxy import proxy_object
 from mygpo.core.tasks import flattr_thing
 from mygpo.api.sanitizing import sanitize_url
-from mygpo.users.settings import PUBLIC_SUB_PODCAST, FLATTR_TOKEN
+from mygpo.users.settings import FLATTR_TOKEN
 from mygpo.users.models import HistoryEntry, DeviceDoesNotExist, SubscriptionAction
 from mygpo.web.forms import SyncForm
 from mygpo.decorators import allowed_methods, repeat_on_conflict
@@ -24,19 +24,14 @@ from mygpo.db.couchdb.episode import episodes_for_podcast
 from mygpo.db.couchdb.podcast import podcast_for_slug, podcast_for_slug_id, \
          podcast_for_oldid, podcast_for_url
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast, \
-         add_subscription_action
+         add_subscription_action, add_podcast_tags, remove_podcast_tag, \
+         set_podcast_privacy
 from mygpo.db.couchdb.episode_state import get_podcasts_episode_states, \
          episode_listener_counts
 from mygpo.db.couchdb.directory import tags_for_user, tags_for_podcast
 
 
 MAX_TAGS_ON_PAGE=50
-
-
-@repeat_on_conflict(['state'])
-def update_podcast_settings(state, is_public):
-    state.settings[PUBLIC_SUB_PODCAST.name] = is_public
-    state.save()
 
 
 @vary_on_cookie
@@ -207,20 +202,13 @@ def _annotate_episode(listeners, episode_actions, episode):
 @never_cache
 @login_required
 def add_tag(request, podcast):
-    podcast_state = podcast_state_for_user_podcast(request.user, podcast)
-
     tag_str = request.GET.get('tag', '')
     if not tag_str:
         return HttpResponseBadRequest()
 
     tags = tag_str.split(',')
 
-    @repeat_on_conflict(['state'])
-    def update(state):
-        state.add_tags(tags)
-        state.save()
-
-    update(state=podcast_state)
+    add_podcast_tags(request.user, podcast_state, tags)
 
     if request.GET.get('next', '') == 'mytags':
         return HttpResponseRedirect('/tags/')
@@ -231,20 +219,11 @@ def add_tag(request, podcast):
 @never_cache
 @login_required
 def remove_tag(request, podcast):
-    podcast_state = podcast_state_for_user_podcast(request.user, podcast)
-
     tag_str = request.GET.get('tag', '')
     if not tag_str:
         return HttpResponseBadRequest()
 
-    @repeat_on_conflict(['state'])
-    def update(state):
-        tags = list(state.tags)
-        if tag_str in tags:
-            state.tags.remove(tag_str)
-            state.save()
-
-    update(state=podcast_state)
+    remove_podcast_tag(request.user, podcast, tag_str)
 
     if request.GET.get('next', '') == 'mytags':
         return HttpResponseRedirect('/tags/')
@@ -329,8 +308,7 @@ def subscribe_url(request):
 @never_cache
 @allowed_methods(['POST'])
 def set_public(request, podcast, public):
-    state = podcast_state_for_user_podcast(request.user, podcast)
-    update_podcast_settings(state=state, is_public=public)
+    set_podcast_privacy(request.user, podcast, public)
     return HttpResponseRedirect(get_podcast_link_target(podcast))
 
 
@@ -351,7 +329,7 @@ def flattr_podcast(request, podcast):
         action = SubscriptionAction()
         action.action = 'flattr'
         state = podcast_state_for_user_podcast(request.user, podcast)
-        add_subscription_action(state, action)
+        add_subscription_action(user, state, action)
         messages.success(request, _("Flattr\'d"))
 
     else:

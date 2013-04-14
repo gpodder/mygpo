@@ -10,8 +10,13 @@ def get_main_database():
     return loading.get_db('core')
 
 
-def get_database(user=None):
-    return get_main_database()
+def get_user_database(user):
+    """ returns the database in which the user's documents are stored """
+
+    if user.db_url:
+        return Database(user.db_url)
+
+    return loading.get_db('core')
 
 
 class BulkException(Exception):

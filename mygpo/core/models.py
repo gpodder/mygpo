@@ -5,11 +5,9 @@ import re
 from random import random
 
 from couchdbkit.ext.django.schema import *
-from restkit.errors import Unauthorized
 
 from django.core.urlresolvers import reverse
 
-from mygpo.decorators import repeat_on_conflict
 from mygpo import utils
 from mygpo.cache import cache_result
 from mygpo.core.proxy import DocumentABCMeta
@@ -314,28 +312,16 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
 
 
-    @repeat_on_conflict()
     def subscribe(self, user, device):
-        from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
-        state = podcast_state_for_user_podcast(user, self)
-        state.subscribe(device)
-        try:
-            state.save()
-            sync_user.delay(user)
-        except Unauthorized as ex:
-            raise SubscriptionException(ex)
+        from mygpo.db.couchdb.podcast_state import subscribe_to_podcast
+        subscribe_to_podcast(user, self, device)
+        sync_user.delay(user)
 
 
-    @repeat_on_conflict()
     def unsubscribe(self, user, device):
-        from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
-        state = podcast_state_for_user_podcast(user, self)
-        state.unsubscribe(device)
-        try:
-            state.save()
-            sync_user.delay(user)
-        except Unauthorized as ex:
-            raise SubscriptionException(ex)
+        from mygpo.db.couchdb.podcast_state import unsubscribe_from_podcast
+        unsubscribe_from_podcast(user, self, device)
+        sync_user.delay(user)
 
 
     def subscribe_targets(self, user):

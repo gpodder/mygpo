@@ -24,10 +24,10 @@ from django.test import TestCase
 from mygpo.core.models import Podcast, Episode
 from mygpo.users.models import EpisodeAction, User
 from mygpo.maintenance.merge import PodcastMerger
-from mygpo.utils import get_timestamp
 from mygpo.db.couchdb.podcast import podcast_by_id
 from mygpo.db.couchdb.episode import episode_by_id
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode
+from mygpo.utils import get_timestamp
 
 
 class MergeTests(TestCase):
@@ -59,12 +59,10 @@ class MergeTests(TestCase):
         state1 = episode_state_for_user_episode(self.user, self.episode1)
         state2 = episode_state_for_user_episode(self.user, self.episode2)
 
-        action1 = EpisodeAction(action='play',
-                timestamp=datetime.utcnow(),
-                upload_timestamp=get_timestamp(datetime.utcnow()))
-        action2 = EpisodeAction(action='download',
-                timestamp=datetime.utcnow(),
-                upload_timestamp=get_timestamp(datetime.utcnow()))
+        action1 = EpisodeAction(action='play', timestamp=datetime.utcnow(),
+                upload_timestamp=get_timestamp(datetime.now()))
+        action2 = EpisodeAction(action='download', timestamp=datetime.utcnow(),
+                upload_timestamp=get_timestamp(datetime.now()))
 
         state1.add_actions([action1])
         state2.add_actions([action2])

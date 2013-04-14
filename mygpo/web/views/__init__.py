@@ -46,7 +46,8 @@ from mygpo.web.views.podcast import slug_id_decorator
 from mygpo.users.settings import FLATTR_AUTO, FLATTR_TOKEN
 from mygpo.db.couchdb.episode import favorite_episodes_for_user
 from mygpo.db.couchdb.podcast import podcast_by_id, random_podcasts
-from mygpo.db.couchdb.user import suggestions_for_user
+from mygpo.db.couchdb.user import suggestions_for_user, \
+         append_to_suggestions_blacklist
 from mygpo.db.couchdb.directory import tags_for_user
 from mygpo.db.couchdb.podcastlist import podcastlists_for_user
 
@@ -181,34 +182,15 @@ def history(request, count=15, uid=None):
 @login_required
 @slug_id_decorator
 def blacklist(request, blacklisted_podcast):
-    suggestion = suggestions_for_user(request.user)
-
-    @repeat_on_conflict(['suggestion'])
-    def _update(suggestion, podcast_id):
-        suggestion.blacklist.append(podcast_id)
-        suggestion.save()
+    user = request.user
 
     @repeat_on_conflict(['user'])
     def _not_uptodate(user):
         user.suggestions_up_to_date = False
         user.save()
 
-    _update(suggestion=suggestion, podcast_id=blacklisted_podcast.get_id())
-    _not_uptodate(user=request.user)
-
-    return HttpResponseRedirect(reverse('suggestions'))
-
-
-@never_cache
-@login_required
-def rate_suggestions(request):
-    rating_val = int(request.GET.get('rate', None))
-
-    suggestion = suggestions_for_user(request.user)
-    suggestion.rate(rating_val, request.user._id)
-    suggestion.save()
-
-    messages.success(request, _('Thanks for rating!'))
+    append_to_suggestions_blacklist(user, blacklisted_podcast)
+    _not_uptodate(user=user)
 
     return HttpResponseRedirect(reverse('suggestions'))
 

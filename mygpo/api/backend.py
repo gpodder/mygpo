@@ -22,9 +22,9 @@ from mygpo.core.models import Podcast, Episode
 from mygpo.users.models import EpisodeUserState, Device, DeviceDoesNotExist, \
          PodcastUserState
 from mygpo.decorators import repeat_on_conflict
+from mygpo.db.couchdb import get_user_database, bulk_save_retry
 from mygpo.core.json import json
 from mygpo.users.settings import STORE_UA
-from mygpo.db.couchdb import bulk_save_retry
 from mygpo.db.couchdb.podcast import podcast_for_url, random_podcasts
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
 
@@ -106,8 +106,9 @@ class BulkSubscribe(object):
 
     def execute(self):
         """ Executes all added actions in bulk """
+        db = get_user_database(self.user)
         obj_funs = map(self._get_obj_fun, self.actions)
-        bulk_save_retry(obj_funs)
+        bulk_save_retry(obj_funs, db)
 
         # prepare for another run
         self.actions = []

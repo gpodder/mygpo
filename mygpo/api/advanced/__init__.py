@@ -51,7 +51,7 @@ from mygpo.users.models import PodcastUserState, EpisodeAction, \
 from mygpo.users.settings import FLATTR_AUTO
 from mygpo.core.json import json, JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
-from mygpo.db.couchdb import BulkException, bulk_save_retry
+from mygpo.db.couchdb import get_user_database, BulkException, bulk_save_retry
 from mygpo.db.couchdb.episode import episode_by_id, \
          favorite_episodes_for_user, episodes_for_podcast
 from mygpo.db.couchdb.podcast import podcast_for_url
@@ -355,7 +355,8 @@ def update_episodes(user, actions, now, ua_string):
         fun = partial(update_episode_actions, action_list=action_list)
         obj_funs.append( (episode_state, fun) )
 
-    bulk_save_retry(obj_funs)
+    db = get_user_database(user)
+    bulk_save_retry(obj_funs, db)
 
     if user.get_wksetting(FLATTR_AUTO):
         for episode_id in auto_flattr_episodes:

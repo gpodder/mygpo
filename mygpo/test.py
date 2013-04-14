@@ -26,13 +26,22 @@ class MygpoTestSuiteRunner(CouchDbKitTestSuiteRunner):
 
     def setup_databases(self, **kwargs):
         ret = super(MygpoTestSuiteRunner, self).setup_databases(**kwargs)
-        path = os.path.join(settings.BASE_DIR, '..', 'couchdb', '_design')
+        path = os.path.join(settings.BASE_DIR, '..', 'couchdb', 'general', '_design')
         loader = FileSystemDocsLoader(path)
 
         db_urls = set(db_url for pkg, db_url in self.dbs)
         for db_url in db_urls:
             db = Database(db_url)
             loader.sync(db, verbose=True)
+
+        path = os.path.join(settings.BASE_DIR, '..', 'couchdb', 'user', '_design')
+        loader = FileSystemDocsLoader(path)
+
+        db_urls = set(db_url for pkg, db_url in self.dbs)
+        for db_url in db_urls:
+            db = Database(db_url)
+            loader.sync(db, verbose=True)
+
 
         return ret
 

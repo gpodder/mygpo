@@ -4,7 +4,7 @@ from couchdbkit import ResourceNotFound
 
 from mygpo.cache import cache_result
 from mygpo.decorators import repeat_on_conflict
-from mygpo.db.couchdb import get_main_database
+from mygpo.db.couchdb import get_main_database, get_user_database
 from mygpo.users.settings import FLATTR_TOKEN, FLATTR_AUTO, FLATTR_MYGPO, \
          FLATTR_USERNAME
 from mygpo.db import QueryParameterMissing
@@ -17,6 +17,7 @@ def get_num_listened_episodes(user):
     if not user:
         raise QueryParameterMissing('user')
 
+    # TODO: use user-db
     db = get_main_database()
     r = db.view('listeners/by_user_podcast',
             startkey    = [user._id, None],
@@ -47,6 +48,7 @@ def get_num_played_episodes(user, since=None, until={}):
     startkey = [user._id, since_str]
     endkey   = [user._id, until_str]
 
+    # TODO: use user-db
     db = get_main_database()
     res = db.view('listeners/by_user',
             startkey = startkey,
@@ -70,6 +72,7 @@ def get_latest_episodes(user, count=10):
     startkey = [user._id, {}]
     endkey   = [user._id, None]
 
+    # TODO: use user-db
     db = get_main_database()
     res = db.view('listeners/by_user',
             startkey     = startkey,
@@ -100,6 +103,7 @@ def get_seconds_played(user, since=None, until={}):
     startkey = [user._id, since_str]
     endkey   = [user._id, until_str]
 
+    # TODO: use user-db
     db = get_main_database()
     res = db.view('listeners/times_played_by_user',
             startkey = startkey,
@@ -118,10 +122,12 @@ def suggestions_for_user(user):
     if not user:
         raise QueryParameterMissing('user')
 
+    db = get_user_database(user)
     from mygpo.users.models import Suggestions
-    r = Suggestions.view('suggestions/by_user',
+    r = db.view('suggestions/by_user',
                 key          = user._id,
                 include_docs = True,
+                schema = Suggestions
             )
 
     if r:
@@ -133,8 +139,25 @@ def suggestions_for_user(user):
         return s
 
 
+def update_suggestions(user, suggestions_obj, suggested_ids):
+    """ Updates the suggested podcasts for the given suggestions object """
+    db = get_user_database(user)
+    suggestions_obj.podcasts = suggested_ids
+    db.save_doc(suggestions_obj, batch='ok')
+
+
+@repeat_on_conflict(['suggestions_obj'])
+def append_to_suggestions_blacklist(user, podcast):
+    db = get_user_database(user)
+    suggestions_obj = suggestions_for_user(user)
+    blacklisted = list(set(suggestions_obj.blacklist + [podcast.get_id()]))
+    suggestions_obj.blacklist = blacklisted
+    db.save_doc(suggestions_obj, batch='ok')
+
+
 @cache_result(timeout=60*60)
 def user_agent_stats():
+    # TODO: check
     from mygpo.users.models import User
     res = User.view('clients/by_ua_string',
         wrap_doc    = False,
@@ -146,6 +169,7 @@ def user_agent_stats():
 
 
 def deleted_users():
+    #TODO: check
     from mygpo.users.models import User
     users = User.view('users/deleted',
             include_docs = True,
@@ -155,6 +179,7 @@ def deleted_users():
 
 
 def deleted_user_count():
+    #TODO: check
     from mygpo.users.models import User
     total = User.view('users/deleted',
             reduce = True,
@@ -172,6 +197,7 @@ def user_history(user, start, length):
     if length <= 0:
         return []
 
+    #TODO: use user-db
     db = get_main_database()
     res = db.view('history/by_user',
             descending = True,
@@ -196,6 +222,7 @@ def device_history(user, device, start, length):
     if length <= 0:
         return []
 
+    #TODO: use user-db
     db = get_main_database()
 
     res = db.view('history/by_device',
@@ -226,6 +253,7 @@ def update_flattr_settings(user, token, enabled=None, flattr_mygpo=False,
     if username is not None:
         user.settings[FLATTR_USERNAME.name] = username
 
+    # TODO: use user-db
     user.save()
 
 

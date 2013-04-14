@@ -54,6 +54,7 @@ def podcasts_for_tag(tag):
     for r in res:
         yield (r['key'][1], r['value'])
 
+    # TODO: aggregate for all users
     res = multi_request_view(Podcast, 'usertags/podcasts',
             wrap        = False,
             startkey    = [tag, None],
