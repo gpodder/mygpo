@@ -16,5 +16,20 @@ TODO: see http://developer.github.com/v3/ for relevant information!
 Status Codes
 ------------
 
-* Maintenance
+The API uses the following status codes
+
++----------------------------+-----------------------------------------------+
+| Status Code                | Interpretation                                |
++============================+===============================================+
+| 200 OK                     | All OK                                        |
++----------------------------+-----------------------------------------------+
+| 503 Service Unavailable    | The service and/or API are under maintenance  |
++----------------------------+-----------------------------------------------+
+
 * Request not allowed (eg quota, authentication, permissions, etc)
+
+
+Responses
+---------
+
+All responses are valid JSON (unless otherwise stated).

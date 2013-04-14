@@ -22,6 +22,7 @@ integrating gpodder.net into podcasting applications.
 
    general
    formats
+   registration
    auth
    user
    directory

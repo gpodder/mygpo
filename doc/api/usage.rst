@@ -20,6 +20,9 @@ Allowed Usage
 have a quota of requests per day (UTC). The quota depends on the features
 they implement (and activate/enable by default).
 
+If there are open and closed sourced versions of a client, they need to have
+two API keys.
+
 The following table shows how the client quota is increased by implementing a
 certain feature.
 
