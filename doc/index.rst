@@ -13,6 +13,7 @@ Contents
    :maxdepth: 1
 
    api/index
+   dev/index
 
 
 Indices and tables

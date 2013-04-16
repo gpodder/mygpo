@@ -1,18 +1,16 @@
 
+CouchDB Views
+=============
 
-                         View Overview
-                         ~~~~~~~~~~~~~
-
-
-This file describes the views that will be used in the CouchDB based backend of
+This page describes the views that will be used in the CouchDB based backend of
 the gpodder.net webservice.
 
-View groups are roughly divided into those that access use-generated documents
+View groups are roughly divided into those that access user-generated documents
 (e.g. PodcastUserState, EpisodeUserState) and those that don't.
 
 
 Categories
-==========
+----------
 
 Doc-Types: Category
 
@@ -22,7 +20,7 @@ Views:
 
 
 Chapters
-========
+--------
 
 Doc-Types: EpisodeUserState
 
@@ -31,7 +29,7 @@ Views:
 
 
 Episode Actions
-===============
+---------------
 
 Doc-Types: EpisodeUserState
 
@@ -43,7 +41,7 @@ Views:
 
 
 Episodes
-========
+--------
 
 Doc-Types: Episode
 
@@ -57,7 +55,7 @@ Views:
 
 
 Favorites
-=========
+---------
 Doc-Types: EpisodeUserState
 
 Views:
@@ -65,7 +63,7 @@ Views:
 
 
 Episode States
-==============
+--------------
 
 Doc-Types: EpisodeUserState
 
@@ -77,7 +75,7 @@ Views:
 
 
 Heatmap
-=======
+-------
 
 Doc-Types: EpisodeUserState
 
@@ -86,7 +84,7 @@ Views:
 
 
 History
-=======
+-------
 
 Doc-Types: EpisodeUserState, PodcastUserState
 
@@ -96,7 +94,7 @@ Views:
 
 
 Listeners
-=========
+---------
 
 Doc-Types: EpisodeUserState
 
@@ -107,7 +105,7 @@ Views:
 
 
 Podcast Lists
-=============
+-------------
 
 Doc-Types: PodcastList
 
@@ -117,7 +115,7 @@ Views:
 
 
 Podcasts
-========
+--------
 
 Doc-Types: Podcast, PodcastGroup
 
@@ -135,7 +133,7 @@ Views:
 
 
 Podcast States
-==============
+--------------
 
 Doc-Types: PodcastUserState
 
@@ -144,7 +142,7 @@ Views:
 
 
 Sanitizing Rules
-================
+----------------
 
 Doc-Types: SanitizingRule
 
@@ -154,7 +152,7 @@ Views:
 
 
 Slugs
-=====
+-----
 
 Doc-Types: Podcast, PodcastGroup, Episode
 
@@ -164,7 +162,7 @@ Views:
 
 
 Subscriptions
-=============
+-------------
 
 Doc-Types: PodcastUserState
 
@@ -175,7 +173,7 @@ Views:
 
 
 Suggestions
-===========
+-----------
 
 Doc-Types: Suggestions
 
@@ -184,7 +182,7 @@ Views:
 
 
 Tags
-====
+----
 
 Doc-Types: Podcast, PodcastGroup
 
@@ -194,7 +192,7 @@ Views:
 
 
 User-Tags
-=========
+---------
 
 Doc-Types: PodcastUserState
 * usertags/by_podcast
@@ -202,7 +200,7 @@ Doc-Types: PodcastUserState
 
 
 Toplists
-========
+--------
 
 Doc-Types: Episode, Podcast, PodcastGroup
 
@@ -212,7 +210,7 @@ Views:
 
 
 Users
-=====
+-----
 
 Doc-Types: User
 
