@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-API Documentation
-=================
+API 3 Documentation
+===================
 
 This site contains drafts for the gpodder.net's future API -- version 3 --
 which is not yet implemented.  The current API is documented at
