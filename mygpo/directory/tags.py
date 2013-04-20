@@ -9,7 +9,8 @@ from mygpo.decorators import query_if_required
 from mygpo.core.proxy import proxy_object
 from mygpo.directory.models import Category
 from mygpo.db.couchdb.podcast import podcasts_for_tag
-from mygpo.db.couchdb.directory import top_categories, category_for_tag
+from mygpo.db.couchdb.directory import top_categories, category_for_tag, \
+         save_category
 
 
 class Tag(object):
@@ -110,4 +111,5 @@ def update_category(podcast):
 
     category.podcasts.insert(0, podcast.get_id())
     category.label = category.label.strip()
-    category.save()
+
+    save_category(category)

@@ -1,0 +1,14 @@
+{
+    "_id": "mygpo_categories",
+    "source": "mygpo",
+    "target": "mygpo_categories",
+    "create_target": true,
+    "user_ctx": {
+        "name": "username",
+        "roles": ["admin"]
+    },
+    "filter": "generic/is_type",
+    "query_params": {
+        "doc_type": "Category"
+    }
+}

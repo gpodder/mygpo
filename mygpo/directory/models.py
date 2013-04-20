@@ -61,12 +61,6 @@ class Category(Document):
         return podcasts
 
 
-
-    def save(self, *args, **kwargs):
-        self.podcasts = sorted(self.podcasts, reverse=True)
-        super(Category, self).save(*args, **kwargs)
-
-
     def get_weight(self):
         return getattr(self, '_weight', len(self.podcasts))
 

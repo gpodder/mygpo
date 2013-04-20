@@ -3,7 +3,7 @@ from datetime import datetime
 from django.core.management.base import BaseCommand
 
 from mygpo.directory.models import Category
-from mygpo.db.couchdb.directory import category_for_tag
+from mygpo.db.couchdb.directory import category_for_tag, save_category
 
 
 class Command(BaseCommand):
@@ -54,4 +54,5 @@ Usage:
                 new_cat.delete()
 
             category.updated = start_time
-            category.save()
+
+            save_category(category)

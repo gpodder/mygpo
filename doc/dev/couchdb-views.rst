@@ -5,20 +5,19 @@ CouchDB Views
 This page describes the views that will be used in the CouchDB based backend of
 the gpodder.net webservice.
 
+The views are separated into groups, based on the databases they are indexed
+on.
 
-Categories
-----------
 
-Doc-Types: Category
+General
+-------
 
-**Views**
-
-* categories/by_tags
-* categories/by_update
+This group of views is available on the general database, called ``mygpo`` by
+default.
 
 
 Chapters
---------
+^^^^^^^^
 
 Doc-Types: EpisodeUserState
 
@@ -28,7 +27,7 @@ Doc-Types: EpisodeUserState
 
 
 Clients
--------
+^^^^^^^
 
 Doc-Types: User
 
@@ -38,7 +37,7 @@ Doc-Types: User
 
 
 Episode Actions
----------------
+^^^^^^^^^^^^^^^
 
 Doc-Types: EpisodeUserState
 
@@ -51,7 +50,7 @@ Doc-Types: EpisodeUserState
 
 
 Episode States
---------------
+^^^^^^^^^^^^^^
 
 Doc-Types: EpisodeUserState
 
@@ -64,7 +63,7 @@ Doc-Types: EpisodeUserState
 
 
 Episode Statistics
-------------------
+^^^^^^^^^^^^^^^^^^
 
 Doc-Types: Episode
 
@@ -74,7 +73,7 @@ Doc-Types: Episode
 
 
 Episodes
---------
+^^^^^^^^
 
 Doc-Types: Episode
 
@@ -89,7 +88,8 @@ Doc-Types: Episode
 
 
 Favorites
----------
+^^^^^^^^^
+
 Doc-Types: EpisodeUserState
 
 **Views**
@@ -98,7 +98,7 @@ Doc-Types: EpisodeUserState
 
 
 Heatmap
--------
+^^^^^^^
 
 Doc-Types: EpisodeUserState
 
@@ -108,7 +108,7 @@ Doc-Types: EpisodeUserState
 
 
 History
--------
+^^^^^^^
 
 Doc-Types: EpisodeUserState, PodcastUserState
 
@@ -119,7 +119,7 @@ Doc-Types: EpisodeUserState, PodcastUserState
 
 
 Listeners
----------
+^^^^^^^^^
 
 Doc-Types: EpisodeUserState
 
@@ -134,7 +134,7 @@ Doc-Types: EpisodeUserState
 
 
 Podcast Lists
--------------
+^^^^^^^^^^^^^
 
 Doc-Types: PodcastList
 
@@ -146,7 +146,7 @@ Doc-Types: PodcastList
 
 
 Podcast States
---------------
+^^^^^^^^^^^^^^
 
 Doc-Types: PodcastUserState
 
@@ -158,7 +158,7 @@ Doc-Types: PodcastUserState
 
 
 Podcasts
---------
+^^^^^^^^
 
 Doc-Types: Podcast, PodcastGroup, PodcastSubscriberData
 
@@ -179,7 +179,7 @@ Doc-Types: Podcast, PodcastGroup, PodcastSubscriberData
 
 
 Sanitizing Rules
-----------------
+^^^^^^^^^^^^^^^^
 
 Doc-Types: SanitizingRule
 
@@ -190,7 +190,7 @@ Doc-Types: SanitizingRule
 
 
 Slugs
------
+^^^^^
 
 Doc-Types: Podcast, PodcastGroup, Episode
 
@@ -200,7 +200,7 @@ Doc-Types: Podcast, PodcastGroup, Episode
 
 
 Subscribers
------------
+^^^^^^^^^^^
 
 Doc-Types: PodcastUserState
 
@@ -210,7 +210,7 @@ Doc-Types: PodcastUserState
 
 
 Subscriptions
--------------
+^^^^^^^^^^^^^
 
 Doc-Types: PodcastUserState
 
@@ -222,7 +222,7 @@ Doc-Types: PodcastUserState
 
 
 Suggestions
------------
+^^^^^^^^^^^
 
 Doc-Types: Suggestions
 
@@ -232,7 +232,7 @@ Doc-Types: Suggestions
 
 
 Tags
-----
+^^^^
 
 Doc-Types: Podcast, PodcastGroup
 
@@ -243,7 +243,7 @@ Doc-Types: Podcast, PodcastGroup
 
 
 Toplists
---------
+^^^^^^^^
 
 Doc-Types: Episode, Podcast, PodcastGroup
 
@@ -254,7 +254,7 @@ Doc-Types: Episode, Podcast, PodcastGroup
 
 
 Trending
---------
+^^^^^^^^
 
 Doc-Types: Podcast, PodcastGroup
 
@@ -264,7 +264,7 @@ Doc-Types: Podcast, PodcastGroup
 
 
 Users
------
+^^^^^
 
 Doc-Types: User
 
@@ -275,9 +275,28 @@ Doc-Types: User
 
 
 User-Tags
----------
+^^^^^^^^^
 
 Doc-Types: PodcastUserState
 
 * usertags/by_podcast
 * usertags/podcasts
+
+
+
+Categories
+----------
+
+This group of views is available on the categories database, called
+``mygpo_categories`` by default.
+
+
+Categories
+^^^^^^^^^^
+
+Doc-Types: Category
+
+**Views**
+
+* categories/by_tags
+* categories/by_update

@@ -66,6 +66,20 @@ COUCHDB_DATABASES = {
 
     'django_couchdb_utils_registration':
         {'URL': 'http://127.0.0.1:5984/mygpo'},
+
+    'mygpo.categories':
+        {'URL': 'http://127.0.0.1:5984/mygpo_categories'},
+}
+
+
+# Maps design documents to databases. The keys correspond to the directories in
+# mygpo/couch/, the values are the app labels which are mapped to the actual
+# databases in COUCHDB_DATABASES. This indirect mapping is used because
+# COUCHDB_DATABASES is likely to be overwritten in settings_prod.py while
+# COUCHDB_DDOC_MAPPING is most probably not overwritten.
+COUCHDB_DDOC_MAPPING = {
+    'general':    'core',
+    'categories': 'categories',
 }
 
 

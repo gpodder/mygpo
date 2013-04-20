@@ -2,7 +2,7 @@ from collections import defaultdict, Counter
 from operator import itemgetter
 
 from mygpo.directory.models import Category
-from mygpo.db.couchdb import get_main_database
+from mygpo.db.couchdb import get_main_database, get_categories_database
 from mygpo.cache import cache_result
 from mygpo.db.couchdb.utils import multi_request_view
 from mygpo.db import QueryParameterMissing
@@ -14,10 +14,12 @@ def category_for_tag(tag):
     if not tag:
         raise QueryParameterMissing('tag')
 
-    r = Category.view('categories/by_tags',
+    db = get_categories_database()
+    r = db.view('categories/by_tags',
             key          = tag,
             include_docs = True,
             stale        = 'update_after',
+            schema       = Category
         )
     return r.first() if r else None
 
@@ -31,18 +33,19 @@ def top_categories(offset, count, with_podcasts=False):
     if not count:
         raise QueryParameterMissing('count')
 
+    db = get_categories_database()
 
     if with_podcasts:
-        r = Category.view('categories/by_update',
+        r = db.view('categories/by_update',
                 descending   = True,
                 skip         = offset,
                 limit        = count,
                 include_docs = True,
-                stale        = 'update_after'
+                stale        = 'update_after',
+                schema       = Category,
             )
 
     else:
-        db = get_main_database()
         r = db.view('categories/by_update',
                 descending   = True,
                 skip         = offset,
@@ -59,6 +62,11 @@ def _category_wrapper(r):
     c.label = r['value'][0]
     c._weight = r['value'][1]
     return c
+
+
+def save_category(category):
+    db = get_categories_database()
+    db.save_doc(category)
 
 
 def tags_for_podcast(podcast):

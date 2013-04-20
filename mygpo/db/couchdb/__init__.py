@@ -10,6 +10,11 @@ def get_main_database():
     return loading.get_db('core')
 
 
+def get_categories_database():
+    """ returns the database that contains Category documents """
+    return loading.get_db('categories')
+
+
 def get_database(user=None):
     return get_main_database()
 
