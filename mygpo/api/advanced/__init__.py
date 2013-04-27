@@ -191,13 +191,15 @@ def episodes(request, username, version=1):
             update_urls = update_episodes(request.user, actions, now, ua_string)
         except DeviceUIDException as e:
             import traceback
-            log('could not update episodes for user %s: %s %s: %s' % (username, e, traceback.format_exc(), actions))
+            s = u'could not update episodes for user %s: %s %s: %s' % (username, e, traceback.format_exc(), actions)
+            log(s.decode('utf-8', errors='ignore'))
             return HttpResponseBadRequest(str(e))
         except InvalidEpisodeActionAttributes as e:
             import traceback
-            log('could not update episodes for user %s: %s %s: %s' % (username, e, traceback.format_exc(), actions))
+            log(u'could not update episodes for user %s: %s %s: %s' % (username, e, traceback.format_exc(), actions))
             return HttpResponseBadRequest(str(e))
 
+        log('done:  user %s: %d actions from %s' % (request.user._id, len(actions), ua_string))
         return JsonResponse({'timestamp': now_, 'update_urls': update_urls})
 
     elif request.method == 'GET':
