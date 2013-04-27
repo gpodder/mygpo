@@ -34,7 +34,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 from django.utils.decorators import method_decorator
 from django.views.generic.base import View
-from django.conf import settings
+from django.conf import settings as dsettings
 
 from mygpo.api.constants import EPISODE_ACTION_TYPES, DEVICE_TYPES
 from mygpo.api.httpresponse import JsonResponse
@@ -192,8 +192,8 @@ def episodes(request, username, version=1):
         log('start: user %s: %d actions from %s' % (request.user._id, len(actions), ua_string))
 
         # handle in background
-        if len(actions) > settings.API_ACTIONS_MAX_NONBG:
-            bg_handler = settings.API_ACTIONS_BG_HANDLER
+        if len(actions) > dsettings.API_ACTIONS_MAX_NONBG:
+            bg_handler = dsettings.API_ACTIONS_BG_HANDLER
             if bg_handler is not None:
 
                 modname, funname = bg_handler.rsplit('.', 1)
