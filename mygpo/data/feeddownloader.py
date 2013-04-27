@@ -40,9 +40,6 @@ from mygpo.directory.tags import update_category
 from mygpo.decorators import repeat_on_conflict
 from mygpo.db.couchdb import get_main_database
 
-import socket
-socket.setdefaulttimeout(300)
-
 
 class NoPodcastCreated(Exception):
     """ raised when no podcast obj was created for a new URL """

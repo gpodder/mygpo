@@ -13,6 +13,9 @@ try:
 except ImportError:
     pass
 
+import socket
+socket.setdefaulttimeout(300)
+
 
 class Command(PodcastCommand):
 
