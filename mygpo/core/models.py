@@ -16,7 +16,6 @@ from mygpo.core.proxy import DocumentABCMeta
 from mygpo.core.slugs import SlugMixin
 from mygpo.core.oldid import OldIdMixin
 from mygpo.web.logo import CoverArt
-from mygpo.users.tasks import sync_user
 
 # make sure this code is executed at startup
 from mygpo.core.signals import *
@@ -321,7 +320,8 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         state.subscribe(device)
         try:
             state.save()
-            sync_user.delay(user)
+            subscription_changed.send(sender=self, user=user, device=device,
+                                      subscribed=True)
         except Unauthorized as ex:
             raise SubscriptionException(ex)
 
@@ -333,7 +333,8 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         state.unsubscribe(device)
         try:
             state.save()
-            sync_user.delay(user)
+            subscription_changed.send(sender=self, user=user, device=device,
+                                      subscribed=False)
         except Unauthorized as ex:
             raise SubscriptionException(ex)
 
