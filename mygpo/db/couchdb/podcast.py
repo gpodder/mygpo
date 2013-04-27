@@ -417,6 +417,7 @@ def podcasts_need_update():
     res = db.view('episodes/need_update',
             group_level = 1,
             reduce      = True,
+            limit       = 100,
         )
 
     # TODO: this method is only used for retrieving podcasts to update;
