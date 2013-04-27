@@ -23,6 +23,7 @@ def get_num_listened_episodes(user):
             endkey      = [user._id, {}],
             reduce      = True,
             group_level = 2,
+            stale       = 'update_after',
         )
 
     return map(_wrap_num_listened, r)
@@ -52,6 +53,7 @@ def get_num_played_episodes(user, since=None, until={}):
             startkey = startkey,
             endkey   = endkey,
             reduce   = True,
+            stale    = 'update_after',
         )
 
     val = res.one()
@@ -78,6 +80,7 @@ def get_latest_episodes(user, count=10):
             descending   = True,
             limit        = count,
             reduce       = False,
+            stale        = 'update_after',
         )
 
     keys = [r['value'] for r in res]
@@ -105,6 +108,7 @@ def get_seconds_played(user, since=None, until={}):
             startkey = startkey,
             endkey   = endkey,
             reduce   = True,
+            stale    = 'update_after',
         )
 
     val = res.one()
