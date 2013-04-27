@@ -24,9 +24,14 @@ class SyncedDevicesMixin(DocumentSchema):
 
         for group in self.sync_groups:
 
+            devices = [indexed_devices.pop(device_id, None) for device_id in group]
+            devices = filter(None, devices)
+            if not devices:
+                continue
+
             yield GroupedDevices(
                     True,
-                    [indexed_devices.pop(device_id) for device_id in group]
+                    devices
                 )
 
         # un-synced devices
