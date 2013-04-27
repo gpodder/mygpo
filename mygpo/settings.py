@@ -193,6 +193,12 @@ PODCAST_SLUG_SUBSCRIBER_LIMIT = 10
 # categories to the top
 MIN_SUBSCRIBERS_CATEGORY=10
 
+# maximum number of episode actions that the API processes immediatelly before
+# returning the response. Larger requests will be handled in background.
+# Handler can be set to None to disable
+API_ACTIONS_MAX_NONBG=100
+API_ACTIONS_BG_HANDLER='mygpo.api.tasks.episode_actions_celery_handler'
+
 
 ADSENSE_CLIENT = ''
 ADSENSE_SLOT_BOTTOM = ''

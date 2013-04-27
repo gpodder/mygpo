@@ -19,6 +19,7 @@ from functools import partial
 from itertools import imap, chain
 from collections import defaultdict, namedtuple
 from datetime import datetime
+from importlib import import_module
 
 import dateutil.parser
 
@@ -33,6 +34,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 from django.utils.decorators import method_decorator
 from django.views.generic.base import View
+from django.conf import settings
 
 from mygpo.api.constants import EPISODE_ACTION_TYPES, DEVICE_TYPES
 from mygpo.api.httpresponse import JsonResponse
@@ -186,6 +188,23 @@ def episodes(request, username, version=1):
             msg = 'Advanced API: could not decode episode update POST data for user %s: %s' % (username, e)
             log(msg)
             return HttpResponseBadRequest(msg)
+
+        log('start: user %s: %d actions from %s' % (request.user._id, len(actions), ua_string))
+
+        # handle in background
+        if len(actions) > settings.API_ACTIONS_MAX_NONBG:
+            bg_handler = settings.API_ACTIONS_BG_HANDLER
+            if bg_handler is not None:
+
+                modname, funname = bg_handler.rsplit('.', 1)
+                mod = import_module(modname)
+                fun = getattr(mod, funname)
+
+                fun(request.user, actions, now, ua_string)
+
+                # TODO: return 202 Accepted
+                return JsonResponse({'timestamp': now_, 'update_urls': []})
+
 
         try:
             update_urls = update_episodes(request.user, actions, now, ua_string)
