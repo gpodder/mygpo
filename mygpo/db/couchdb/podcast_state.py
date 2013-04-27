@@ -35,12 +35,15 @@ def subscribed_users(podcast):
         )
 
     users = (r['key'][1] for r in res)
+    return users
 
 
 def subscribed_podcast_ids_by_user_id(user_id):
 
     if not user_id:
         raise QueryParameterMissing('user_id')
+
+    db = get_main_database()
 
     subscribed = db.view('subscriptions/by_user',
             startkey    = [user_id, True, None, None],

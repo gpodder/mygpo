@@ -549,3 +549,12 @@ def update_additional_data(podcast, twitter):
 
     # clear the whole cache until we have a better invalidation mechanism
     cache.clear()
+
+
+@repeat_on_conflict(['podcast'])
+def update_related_podcasts(podcast, related):
+    if podcast.related_podcasts == related:
+        return
+
+    podcast.related_podcasts = related
+    podcast.save()
