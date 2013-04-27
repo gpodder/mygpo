@@ -298,6 +298,7 @@ def unsubscribe(request, podcast, device_uid):
 
     except DeviceDoesNotExist as e:
         messages.error(request, str(e))
+        return HttpResponseRedirect(return_to)
 
     try:
         podcast.unsubscribe(request.user, device)
