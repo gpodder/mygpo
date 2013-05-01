@@ -57,3 +57,16 @@ certain feature.
 +------------------------+---------------+----------------+
 | Settings               | unlimited     | +1000          |
 +------------------------+---------------+----------------+
+
+
+Misbehaving Clients
+-------------------
+
+Violations of rules that are given as *MUST* or *MUST NOT* are recorded. Any
+client application may accumulate 100 of such violations per day (to accomodate
+for bug fixing and debugging). Client applications that regularly
+exceed this limit will be blocked. The status (and reports) of a client
+application's violations can be viewed online. TODO: where?
+
+
+TODO: distinguish between (individual) clients and client applications.
