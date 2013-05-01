@@ -1,46 +1,84 @@
 Settings API
 ============
 
-**TODO: this has just been copied from API 2 -- this needs review**
+Clients can use the gpodder.net API to store and exchange settings. Clients can
+chose to simply store their settings on gpodder.net for online backup, or
+exchange settings with other clients. Some settings also trigger behaviour on
+the gpodder.net website.
 
-Clients can store settings and retrieve settings as key-value-pairs, which are
-attached to either account, device, podcast or episode.
-
-Keys are the names of the settings and are supposed to be strings. Values can
-be any valid JSON objects.
+Settings can be stored in several scopes. Each user has one *account* scope,
+and one *device* scope per device. Additionally settings can be stored
+per *podcast* and *episode*.
 
 
 Resources
 ---------
 
-The Settings API defines the following resources:
+The Settings API defines the following resources ::
 
-    none yet
+    /user/<username>/settings/account
+    /user/<username>/settings/device
+    /user/<username>/settings/podcast
+    /user/<username>/settings/episode
 
 
-Known Settings
---------------
+Well-Known Settings
+-------------------
 
 Although settings are primarily used to exchange settings between clients, some
 of them also trigger some behavior on the website.
 
-* Account
 
- * public_profile: when set to False, sets all podcasts to private (as on http://gpodder.net/account/privacy, currently deactivated via API)
- * store_user_agent: allow gpodder.net to store the User-Agent for each device (default: true)
- * public_subscriptions: default "public" value for subscriptions (default: true)
- * flattr_token: auth-token for a Flattr login; empty when not logged in (default: empty)
- * auto_flattr: auto-flattr episodes, only relevant when logged into Flattr account (default: false)
- * flattr_mygpo: automatically flattr gpodder.net, only relevant when logged into Flattr account (default: false)
- * flattr_username: username under which own items (eg podcast lists) are published (default: empty)
+Account scope
+^^^^^^^^^^^^^
 
-* Episode
+The following settings are well-known in the account scope.
 
- * is_favorite: flags the episode as favorite (can be done on any episode-page)
+**public_profile**
+    when set to False, sets all podcasts to private (as on
+    http://gpodder.net/account/privacy, currently deactivated via API)
 
-* Podcast
+**store_user_agent**
+    allow gpodder.net to store the User-Agent for each
+    device (default: true)
 
- * public_subscription: when set to False, sets the subscription to this podcast to private (as on http://gpodder.net/account/privacy or any podcast-page, currently deactivated via API)
+**public_subscriptions**
+    default "public" value for subscriptions (default: true)
+
+**flattr_token**
+    auth-token for a Flattr login; empty when not logged in (default: empty)
+
+**auto_flattr**
+    auto-flattr episodes, only relevant when logged into Flattr account
+    (default: false)
+
+**flattr_mygpo**
+    automatically flattr gpodder.net, only relevant when logged into Flattr
+    account (default: false)
+
+**flattr_username**
+    username under which own items (eg podcast lists) are published
+    (default: empty)
+
+
+Episode scope
+^^^^^^^^^^^^^
+
+The following settings are well-known in the episode scope.
+
+**is_favorite**
+    flags the episode as favorite (can be done on any episode-page)
+
+
+Podcast scope
+^^^^^^^^^^^^^
+
+The following settings are well-known in the podcast scope.
+
+**public_subscription**
+    when set to False, sets the subscription to this podcast to private
+    (as on http://gpodder.net/account/privacy or any podcast-page, currently
+    deactivated via API)
 
 
 Saving Settings
@@ -48,19 +86,30 @@ Saving Settings
 
 Save Settings ::
 
-    POST /api/2/settings/<username>/(account|device|podcast|episode).json?<scope-specification>
+    POST /user/<username>/settings/<scope>?<scope-specification>
 
 
-Parameters:
+* Requires authentication
 
-* scope, together with the scope-specification specifies to which object a setting is attached
 
- * podcast: Parameter: podcast=<feed-url>
- * account: no parameters needed
- * device: Parameter: device=<device-id>
- * episode: Parameters: podcast=<feed-url>&episode=<media-url>
+Parameters
+^^^^^^^^^^
 
-Requires Authentication
+**scope**
+  can be either ``account``, ``device``, ``podcast`` or ``episode``
+
+**podcast**
+  should contain the URL-encoded feed URL when ``scope`` is ``podcast`` or ``episode``
+
+**episode**
+  should contain the URL-encoded media URL when ``scope`` is ``episode``
+
+**device**
+  should contain the device Id when ``scope`` is ``device``
+
+
+Request Body
+^^^^^^^^^^^^
 
 TODO: JSON-Patch ?
 
@@ -73,6 +122,9 @@ Post-Data ::
 
 set is a dictionary of settings to add or update; remove is a list of keys that
 shall be removed from the scope.
+
+Response
+^^^^^^^^
 
 The response contains all settings that the scope has after the update has been
 carried out. ::
@@ -89,10 +141,14 @@ Get Settings
 
 Get Settings ::
 
-    GET /api/2/settings/<username>/(account|device|podcast|episode).json?<scope-specification>
+    GET /user/<username>/settings/<scope>?<scope-specification>
 
 Scope and specification as above.
 Requires Authentication
+
+
+Response
+^^^^^^^^
 
 The response contains all settings that the scope currently has ::
 
