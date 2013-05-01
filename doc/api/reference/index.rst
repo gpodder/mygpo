@@ -21,7 +21,6 @@ integrating gpodder.net into podcasting applications.
    :maxdepth: 3
 
    general
-   formats
    registration
    auth
    user
