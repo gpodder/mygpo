@@ -58,6 +58,9 @@ COUCHDB_DATABASES = {
     'mygpo.maintenance':
         {'URL': 'http://127.0.0.1:5984/mygpo'},
 
+    'mygpo.pubsub':
+        {'URL': 'http://127.0.0.1:5984/mygpo_pubsub'},
+
     'django_couchdb_utils_auth':
         {'URL': 'http://127.0.0.1:5984/mygpo'},
 
@@ -75,6 +78,7 @@ COUCHDB_DATABASES = {
 # COUCHDB_DDOC_MAPPING is most probably not overwritten.
 COUCHDB_DDOC_MAPPING = {
     'general':    'core',
+    'pubsub':     'pubsub',
 }
 
 # Local time zone for this installation. Choices can be found here:
@@ -142,6 +146,7 @@ INSTALLED_APPS = (
     'mygpo.maintenance',
     'mygpo.share',
     'mygpo.admin',
+    'mygpo.pubsub',
     'mygpo.db.couchdb',
 )
 
