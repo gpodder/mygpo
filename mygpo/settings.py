@@ -258,6 +258,11 @@ FLATTR_MYGPO_THING='https://flattr.com/submit/auto?user_id=stefankoegl&url=http:
 # The User-Agent string used for outgoing HTTP requests
 USER_AGENT = 'gpodder.net (+https://github.com/gpodder/mygpo)'
 
+# Base URL of the website that is used if the actually used parameters is not
+# available.  Request handlers, for example, can access the requested domain.
+# Code that runs in background can not do this, and therefore requires a
+# default value. This should be set to something like 'http://example.com'
+DEFAULT_BASE_URL = ''
 
 
 ### Celery

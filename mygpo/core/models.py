@@ -172,6 +172,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
     flattr_url = StringProperty()
     outdated = BooleanProperty(default=False)
     created_timestamp = IntegerProperty()
+    hub = StringProperty()
 
 
 

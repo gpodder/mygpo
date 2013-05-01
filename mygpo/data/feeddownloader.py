@@ -33,6 +33,7 @@ from feedservice.parse.text import ConvertMarkdown
 from feedservice.parse.models import ParserException
 from mygpo.utils import file_hash, split_list
 from mygpo.web.logo import CoverArt
+from mygpo.data.podcast import subscribe_at_hub
 from mygpo.db.couchdb.episode import episode_for_podcast_id_url, \
          episodes_for_podcast_uncached
 from mygpo.db.couchdb.podcast import podcast_for_url
@@ -139,6 +140,7 @@ class PodcastUpdater(object):
         changed |= update_a(podcast, 'common_episode_title', parsed.common_title or podcast.common_episode_title)
         changed |= update_a(podcast, 'new_location', parsed.new_location or podcast.new_location)
         changed |= update_a(podcast, 'flattr_url', parsed.flattr)
+        changed |= update_a(podcast, 'hub', parsed.hub)
 
 
         if podcast.new_location:
@@ -174,6 +176,8 @@ class PodcastUpdater(object):
             podcast.last_update = datetime.utcnow()
             podcast.save()
 
+
+        subscribe_at_hub(podcast)
 
         assign_slug(podcast, PodcastSlug)
         assign_missing_episode_slugs(podcast)

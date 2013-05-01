@@ -16,9 +16,15 @@
 #
 
 from collections import Counter
+import logging
+
+from django.conf import settings
 
 from mygpo.db.couchdb.podcast_state import subscribed_users, \
          subscribed_podcast_ids_by_user_id
+from mygpo import pubsub
+
+logger = logging.getLogger(__name__)
 
 
 def calc_similar_podcasts(podcast, num=20):
@@ -39,3 +45,22 @@ def calc_similar_podcasts(podcast, num=20):
         podcasts.update(user_counter)
 
     return podcasts.most_common(num)
+
+
+def subscribe_at_hub(podcast):
+    """ Tries to subscribe to the given podcast at its hub """
+
+    if not podcast.hub:
+        return
+
+    base_url = settings.DEFAULT_BASE_URL
+
+    if not base_url:
+        logger.warn('Could not subscribe to podcast {podcast} '
+                    'at hub {hub} because DEFAULT_BASE_URL is not '
+                    'set.'.format(podcast=podcast, hub=podcast.hub))
+        return
+
+    logger.info('subscribing to {podcast} at {hub}.'.format(podcast=podcast,
+                                                           hub=podcast.hub))
+    pubsub.subscribe(podcast.url, podcast.hub, base_url)
