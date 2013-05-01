@@ -87,6 +87,7 @@ Saving Settings
 Save Settings ::
 
     POST /user/<username>/settings/<scope>?<scope-specification>
+    PATCH /user/<username>/settings/<scope>?<scope-specification>
 
 
 * Requires authentication
@@ -111,23 +112,51 @@ Parameters
 Request Body
 ^^^^^^^^^^^^
 
-TODO: JSON-Patch ?
+The request body consists basically of a `JSON Patch (RFC 6902)
+<http://tools.ietf.org/html/rfc6902>`_. However there are two possible
+representations for a patch.
 
-Post-Data ::
+When the PATCH method is used, the body corresponds to the JSON Patch. ::
+
+   [
+     { "op": "test", "path": "/a/b/c", "value": "foo" },
+     { "op": "remove", "path": "/a/b/c" },
+     { "op": "add", "path": "/a/b/c", "value": [ "foo", "bar" ] },
+     { "op": "replace", "path": "/a/b/c", "value": 42 },
+     { "op": "move", "from": "/a/b/c", "path": "/a/b/d" },
+     { "op": "copy", "from": "/a/b/d", "path": "/a/b/e" }
+   ]
+
+
+When a POST request is used, a JSON object is included in the body, where the
+actual patch is provided in the *patch* attribute. ::
 
     {
-     "set": {"setting1": "value1", "setting2": "value2"},
-     "remove": ["setting3", "setting4"]
+        patch: [
+            { "op": "test", "path": "/a/b/c", "value": "foo" },
+            { "op": "remove", "path": "/a/b/c" },
+            { "op": "add", "path": "/a/b/c", "value": [ "foo", "bar" ] },
+            { "op": "replace", "path": "/a/b/c", "value": 42 },
+            { "op": "move", "from": "/a/b/c", "path": "/a/b/d" },
+            { "op": "copy", "from": "/a/b/d", "path": "/a/b/e" }
+        ]
     }
 
-set is a dictionary of settings to add or update; remove is a list of keys that
-shall be removed from the scope.
+Please refer to `RFC 6902 <http://tools.ietf.org/html/rfc6902>`_ for the
+allowed operations and exact semantics of JSON Patch. Previously unused
+settings default to the empty JSON object (``{}``).
+
 
 Response
 ^^^^^^^^
 
-The response contains all settings that the scope has after the update has been
-carried out. ::
+Status Codes:
+
+* 200 OK
+* 409 Conflict if a test operation failed
+
+A positive response contains all settings that the scope has after the update
+has been carried out. ::
 
     {
      "setting1": "value1",
