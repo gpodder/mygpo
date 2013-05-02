@@ -17,6 +17,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+import copy
 import os.path
 import urllib2
 import httplib
@@ -31,7 +32,7 @@ from mygpo.core.slugs import assign_missing_episode_slugs, assign_slug, \
 from feedservice.parse import parse_feed, FetchFeedException
 from feedservice.parse.text import ConvertMarkdown
 from feedservice.parse.models import ParserException
-from mygpo.utils import file_hash, split_list
+from mygpo.utils import file_hash, split_list, deep_eq
 from mygpo.web.logo import CoverArt
 from mygpo.data.podcast import subscribe_at_hub
 from mygpo.db.couchdb.episode import episode_for_podcast_id_url, \
@@ -123,24 +124,24 @@ class PodcastUpdater(object):
     def _update_podcast(self, podcast, parsed):
         """ updates a podcast according to new parser results """
 
-        changed = False
-
         # we need that later to decide if we can "bump" a category
         prev_latest_episode_timestamp = podcast.latest_episode_timestamp
 
-        changed |= update_a(podcast, 'title', parsed.title or podcast.title)
-        changed |= update_a(podcast, 'urls', list(set(podcast.urls + parsed.urls)))
-        changed |= update_a(podcast, 'description', parsed.description or podcast.description)
-        changed |= update_a(podcast, 'link',  parsed.link or podcast.link)
-        changed |= update_a(podcast, 'logo_url', parsed.logo or podcast.logo_url)
-        changed |= update_a(podcast, 'author', parsed.author or podcast.author)
-        changed |= update_a(podcast, 'language', parsed.language or podcast.language)
-        changed |= update_a(podcast, 'content_types', parsed.content_types or podcast.content_types)
-        changed |= update_i(podcast.tags, 'feed', parsed.tags or podcast.tags.get('feed', []))
-        changed |= update_a(podcast, 'common_episode_title', parsed.common_title or podcast.common_episode_title)
-        changed |= update_a(podcast, 'new_location', parsed.new_location or podcast.new_location)
-        changed |= update_a(podcast, 'flattr_url', parsed.flattr)
-        changed |= update_a(podcast, 'hub', parsed.hub)
+        old_json = copy.deepcopy(podcast.to_json())
+
+        podcast.title = parsed.title or podcast.title
+        podcast.urls = list(set(podcast.urls + parsed.urls))
+        podcast.description = parsed.description or podcast.description
+        podcast.link = parsed.link or podcast.link
+        podcast.logo_url = parsed.logo or podcast.logo_url
+        podcast.author = parsed.author or podcast.author
+        podcast.language = parsed.language or podcast.language
+        podcast.content_types = parsed.content_types or podcast.content_types
+        podcast.tags['feed'] = parsed.tags or podcast.tags.get('feed', [])
+        podcast.common_episode_title = parsed.common_title or podcast.common_episode_title
+        podcast.new_location = parsed.new_location or podcast.new_location
+        podcast.flattr_url = parsed.flattr or podcast.flattr_url
+        podcast.hub = parsed.hub or podcast.hub
 
 
         if podcast.new_location:
@@ -151,7 +152,6 @@ class PodcastUpdater(object):
 
             elif not new_podcast:
                 podcast.urls.insert(0, podcast.new_location)
-                changed = True
 
 
         episodes = self._update_episodes(podcast, parsed.episodes)
@@ -160,8 +160,8 @@ class PodcastUpdater(object):
         eps = filter(lambda e: bool(e.released), episodes)
         eps = sorted(eps, key=lambda e: e.released)
         if eps:
-            changed |= update_a(podcast, 'latest_episode_timestamp', eps[-1].released)
-            changed |= update_a(podcast, 'episode_count', len(eps))
+            podcast.latest_episode_timestamp = eps[-1].released
+            podcast.episode_count = len(eps)
 
 
         self._update_categories(podcast, prev_latest_episode_timestamp)
@@ -169,9 +169,9 @@ class PodcastUpdater(object):
         # try to download the logo and reset logo_url to None on http errors
         found = self._save_podcast_logo(podcast.logo_url)
         if not found:
-            changed |= update_a(podcast, 'logo_url', None)
+            podcast.logo_url = None
 
-        if changed:
+        if not deep_eq(old_json, podcast.to_json()):
             print 'saving podcast'
             podcast.last_update = datetime.utcnow()
             podcast.save()
@@ -240,24 +240,25 @@ class PodcastUpdater(object):
 
 
             for episode in matching:
-                changed = False
-                changed |= update_a(episode, 'guid', parsed_episode.guid or episode.guid)
-                changed |= update_a(episode, 'title', parsed_episode.title or episode.title)
-                changed |= update_a(episode, 'description', parsed_episode.description or episode.description)
-                changed |= update_a(episode, 'content', parsed_episode.content or parsed_episode.description or episode.content)
-                changed |= update_a(episode, 'link', parsed_episode.link or episode.link)
-                changed |= update_a(episode, 'released', datetime.utcfromtimestamp(parsed_episode.released) if parsed_episode.released else episode.released)
-                changed |= update_a(episode, 'author', parsed_episode.author or episode.author)
-                changed |= update_a(episode, 'duration', parsed_episode.duration or episode.duration)
-                changed |= update_a(episode, 'filesize', parsed_episode.files[0].filesize)
-                changed |= update_a(episode, 'language', parsed_episode.language or episode.language)
-                changed |= update_a(episode, 'mimetypes', list(set(filter(None, [f.mimetype for f in parsed_episode.files]))))
-                changed |= update_a(episode, 'flattr_url', parsed_episode.flattr)
+                old_json = copy.deepcopy(episode.to_json())
+
+                episode.guid = parsed_episode.guid or episode.guid
+                episode.title = parsed_episode.title or episode.title
+                episode.description = parsed_episode.description or episode.description
+                episode.content = parsed_episode.content or parsed_episode.description or episode.content
+                episode.link = parsed_episode.link or episode.link
+                episode.released = datetime.utcfromtimestamp(parsed_episode.released) if parsed_episode.released else episode.released
+                episode.author = parsed_episode.author or episode.author
+                episode.duration = parsed_episode.duration or episode.duration
+                episode.filesize = parsed_episode.files[0].filesize
+                episode.language = parsed_episode.language or episode.language
+                episode.mimetypes = list(set(filter(None, [f.mimetype for f in parsed_episode.files])))
+                episode.flattr_url = parsed_episode.flattr or episode.flattr_url
 
                 urls = list(chain.from_iterable(f.urls for f in parsed_episode.files))
-                changed |= update_a(episode, 'urls', sorted(set(episode.urls + urls), key=len))
+                episode.urls = sorted(set(episode.urls + urls), key=len)
 
-                if changed:
+                if not deep_eq(old_json, episode.to_json()):
                     episode.last_update = datetime.utcnow()
                     updated_episodes.append(episode)
 
@@ -326,18 +327,3 @@ class PodcastUpdater(object):
         podcast.last_update = datetime.utcnow()
         podcast.save()
         self._update_episodes(podcast, [])
-
-
-
-_none = object()
-
-def update_a(obj, attrib, value):
-    changed = getattr(obj, attrib, _none) != value
-    setattr(obj, attrib, value)
-    return changed
-
-
-def update_i(obj, item, value):
-    changed = obj.get(item, _none) != value
-    obj[item] = value
-    return changed
