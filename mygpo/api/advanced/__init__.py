@@ -192,7 +192,7 @@ def episodes(request, username, version=1):
             logger.warn(msg)
             return HttpResponseBadRequest(msg)
 
-        log('start: user %s: %d actions from %s' % (request.user._id, len(actions), ua_string))
+        logger.info('start: user %s: %d actions from %s' % (request.user._id, len(actions), ua_string))
 
         # handle in background
         if len(actions) > dsettings.API_ACTIONS_MAX_NONBG:
@@ -219,7 +219,7 @@ def episodes(request, username, version=1):
             logger.warn('invalid episode action attributes while uploading episode actions for user %s: %s' % (username, e))
             return HttpResponseBadRequest(str(e))
 
-        log('done:  user %s: %d actions from %s' % (request.user._id, len(actions), ua_string))
+        logger.info('done:  user %s: %d actions from %s' % (request.user._id, len(actions), ua_string))
         return JsonResponse({'timestamp': now_, 'update_urls': update_urls})
 
     elif request.method == 'GET':
