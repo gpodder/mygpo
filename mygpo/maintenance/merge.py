@@ -4,151 +4,15 @@ from functools import partial
 
 import restkit
 
-from mygpo.core.models import Podcast, Episode, PodcastGroup
-from mygpo.users.models import PodcastUserState, EpisodeUserState
 from mygpo import utils
 from mygpo.decorators import repeat_on_conflict
 from mygpo.db.couchdb.episode import episodes_for_podcast
 from mygpo.db.couchdb.podcast_state import all_podcast_states
 from mygpo.db.couchdb.episode_state import all_episode_states
-from mygpo.db.couchdb.utils import multi_request_view
 
 
 class IncorrectMergeException(Exception):
     pass
-
-
-def podcast_url_wrapper(r):
-    url = r['key']
-    doc = r['doc']
-    if doc['doc_type'] == 'Podcast':
-        obj = Podcast.wrap(doc)
-    elif doc['doc_type'] == 'PodcastGroup':
-        obj = PodcastGroup.wrap(doc)
-
-    return obj.get_podcast_by_url(url)
-
-
-def merge_objects(podcasts=True, podcast_states=False, episodes=False,
-        episode_states=False, dry_run=False):
-    """
-    Merges objects (podcasts, episodes, states) based on different criteria
-    """
-
-    # The "smaller" podcast is merged into the "greater"
-    podcast_merge_order = lambda a, b: cmp(a.subscriber_count(), b.subscriber_count())
-    no_merge_order = lambda a, b: 0
-
-    merger = partial(merge_from_iterator, dry_run=dry_run,
-            progress_callback=utils.progress)
-
-
-    if podcasts:
-
-        print 'Merging Podcasts by URL'
-        podcasts, total = get_view_count_iter(Podcast,
-                'podcasts/by_url',
-                wrap = False,
-                include_docs=True)
-        podcasts = map(podcast_url_wrapper, podcasts)
-        merger(podcasts, similar_urls, podcast_merge_order, total,
-                merge_podcasts)
-        print
-
-
-        print 'Merging Podcasts by Old-Id'
-        podcasts, total = get_view_count_iter(Podcast,
-                'podcasts/by_oldid',
-                wrap = False,
-                include_docs=True)
-        podcasts = imap(podcast_oldid_wrapper, podcasts)
-        merger(podcasts, similar_oldid, podcast_merge_order, total,
-                merge_podcasts)
-        print
-
-
-    if podcast_states:
-        print 'Merging Duplicate Podcast States'
-        states, total = get_view_count_iter(PodcastUserState,
-                'podcast_states/by_user',
-                include_docs=True)
-        should_merge = lambda a, b: a == b
-        merger(states, should_merge, no_merge_order, total,
-                merge_podcast_states)
-        print
-
-
-    if episodes:
-        print 'Merging Episodes by URL'
-        episodes, total = get_view_count_iter(Episode,
-                'episodes/by_podcast_url',
-                include_docs=True)
-        should_merge = lambda a, b: a.podcast == b.podcast and \
-                similar_urls(a, b)
-        merger(episodes, should_merge, no_merge_order, total, merge_episodes)
-        print
-
-
-        print 'Merging Episodes by Old-Id'
-        episodes, total = get_view_count_iter(Episode,
-                'episodes/by_oldid',
-                include_docs=True)
-        should_merge = lambda a, b: a.podcast == b.podcast and \
-                similar_oldid(a, b)
-        merger(episodes, should_merge, no_merge_order, total, merge_episodes)
-        print
-
-
-    if episode_states:
-        print 'Merging Duplicate Episode States'
-        states, total = get_view_count_iter(EpisodeUserState,
-                'episode_states/by_user_episode',
-                include_docs=True)
-        should_merge = lambda a, b: (a.user, a.episode) == \
-                                    (b.user, b.episode)
-        merger(states, should_merge, no_merge_order, total,
-                merge_episode_states)
-        print
-
-
-
-def get_view_count_iter(cls, view, *args, **kwargs):
-    iterator = multi_request_view(cls, view, *args, **kwargs)
-    total = cls.view(view, limit=0).total_rows
-    return iterator, total
-
-
-def merge_from_iterator(obj_it, should_merge, cmp, total, merge_func,
-        dry_run=False, progress_callback=lambda *args, **kwargs: None):
-    """
-    Iterates over the objects in obj_it and calls should_merge for each pair of
-    objects. This implies that the objects returned by obj_it should be sorted
-    such that potential merge-candiates appear after each other.
-
-    If should_merge returns True, the pair of objects is going to be merged.
-    The smaller object (according to cmp) is merged into the larger one.
-    merge_func performs the actual merge. It is passed the two objects to be
-    merged (first the larger, then the smaller one).
-    """
-
-    obj_it = iter(obj_it)
-
-    try:
-        prev = obj_it.next()
-    except StopIteration:
-        return
-
-    for n, p in enumerate(obj_it):
-        if should_merge(p, prev):
-            items = sorted([p, prev], cmp=cmp)
-            logging.info('merging {old} into {new}'.
-                    format(old=items[1], new=items[0]))
-
-            merge_func(*items, dry_run=dry_run)
-
-        prev = p
-        progress_callback(n, total)
-
 
 
 class PodcastMerger(object):
@@ -159,7 +23,7 @@ class PodcastMerger(object):
     """
 
 
-    def __init__(self, podcasts, actions, groups, dry_run=False):
+    def __init__(self, podcasts, actions, groups):
 
         for n, podcast1 in enumerate(podcasts):
             for m, podcast2 in enumerate(podcasts):
@@ -169,7 +33,6 @@ class PodcastMerger(object):
         self.podcasts = podcasts
         self.actions = actions
         self.groups = groups
-        self.dry_run = dry_run
 
 
     def merge(self):
@@ -316,27 +179,16 @@ class PodcastMerger(object):
 
 
 
-
-def similar_urls(a, b):
-    """ Two Podcasts/Episodes are merged, if they have the same URLs"""
-    return bool(utils.intersect(a.urls, b.urls))
-
-
-
-
-
-
 class EpisodeMerger(object):
 
 
-    def __init__(self, episode1, episode2, actions, dry_run=False):
+    def __init__(self, episode1, episode2, actions):
         if episode1 == episode2:
             raise IncorrectMergeException("can't merge episode into itself")
 
         self.episode1 = episode1
         self.episode2 = episode2
         self.actions = actions
-        self.dry_run = dry_run
 
 
     def merge(self):
@@ -403,7 +255,7 @@ class EpisodeMerger(object):
 class PodcastStateMerger(object):
     """Merges the two given podcast states"""
 
-    def __init__(self, state, state2, actions, dry_run=False):
+    def __init__(self, state, state2, actions):
 
         if state._id == state2._id:
             raise IncorrectMergeException("can't merge podcast state into itself")
@@ -414,7 +266,6 @@ class PodcastStateMerger(object):
         self.state = state
         self.state2 = state2
         self.actions = actions
-        self.dry_run = dry_run
 
 
     def merge(self):
@@ -465,7 +316,7 @@ class PodcastStateMerger(object):
 class EpisodeStateMerger(object):
     """ Merges state2 in state """
 
-    def __init__(self, state, state2, actions, dry_run=False):
+    def __init__(self, state, state2, actions):
 
         if state._id == state2._id:
             raise IncorrectMergeException("can't merge episode state into itself")
@@ -476,7 +327,6 @@ class EpisodeStateMerger(object):
         self.state = state
         self.state2 = state2
         self.actions = actions
-        self.dry_run = dry_run
 
 
     def merge(self):
