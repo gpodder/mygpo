@@ -558,3 +558,8 @@ def update_related_podcasts(podcast, related):
 
     podcast.related_podcasts = related
     podcast.save()
+
+
+@repeat_on_conflict(['podcast'])
+def delete_podcast(podcast):
+    podcast.delete()

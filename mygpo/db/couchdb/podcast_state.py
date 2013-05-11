@@ -177,3 +177,8 @@ def subscriptions_by_user(user, public=None):
 def add_subscription_action(state, action):
     state.add_actions([action])
     state.save()
+
+
+@repeat_on_conflict(['state'])
+def delete_podcast_state(state):
+    state.delete()

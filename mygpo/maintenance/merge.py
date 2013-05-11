@@ -6,8 +6,10 @@ import restkit
 
 from mygpo import utils
 from mygpo.decorators import repeat_on_conflict
+from mygpo.db.couchdb.podcast import delete_podcast
 from mygpo.db.couchdb.episode import episodes_for_podcast
-from mygpo.db.couchdb.podcast_state import all_podcast_states
+from mygpo.db.couchdb.podcast_state import all_podcast_states, \
+    delete_podcast_state
 from mygpo.db.couchdb.episode_state import all_episode_states
 
 
@@ -16,26 +18,24 @@ class IncorrectMergeException(Exception):
 
 
 class PodcastMerger(object):
-    """ Merges podcast2 into podcast
-
-    Also merges the related podcast states, and re-assignes podcast2's episodes
-    to podcast, but does neither merge their episodes nor their episode states
-    """
-
+    """ Merges podcasts and their related objects """
 
     def __init__(self, podcasts, actions, groups):
+        """ Prepares to merge podcasts[1:] into podcasts[0]  """
 
         for n, podcast1 in enumerate(podcasts):
             for m, podcast2 in enumerate(podcasts):
                 if podcast1 == podcast2 and n != m:
-                    raise IncorrectMergeException("can't merge podcast into itself")
+                    raise IncorrectMergeException(
+                        "can't merge podcast into itself")
 
         self.podcasts = podcasts
         self.actions = actions
         self.groups = groups
 
-
     def merge(self):
+        """ Carries out the actual merging """
+
         podcast1 = self.podcasts.pop(0)
 
         for podcast2 in self.podcasts:
@@ -43,34 +43,38 @@ class PodcastMerger(object):
             self.merge_states(podcast1, podcast2)
             self.merge_episodes()
             self.reassign_episodes(podcast1, podcast2)
-            self._delete(podcast2=podcast2)
+            delete_podcast(podcast2)
+            self.actions['merge-podcast'] += 1
 
-        self.actions['merge-podcast'] += 1
-
+        self.merge_episodes()
 
     def merge_episodes(self):
-        for n, episodes in self.groups:
+        """ Merges the episodes according to the groups """
 
+        for n, episodes in self.groups:
             episode = episodes.pop(0)
 
             for ep in episodes:
-
                 em = EpisodeMerger(episode, ep, self.actions)
                 em.merge()
-
 
     @repeat_on_conflict(['podcast1', 'podcast2'])
     def _merge_objs(self, podcast1, podcast2):
 
         podcast1.merged_ids = set_filter(podcast1.get_id(),
-                podcast1.merged_ids, [podcast2.get_id()], podcast2.merged_ids)
+                                         podcast1.merged_ids,
+                                         [podcast2.get_id()],
+                                         podcast2.merged_ids)
 
         podcast1.merged_slugs = set_filter(podcast1.slug,
-                podcast1.merged_slugs, [podcast2.slug], podcast2.merged_slugs)
+                                           podcast1.merged_slugs,
+                                           [podcast2.slug],
+                                           podcast2.merged_slugs)
 
         podcast1.merged_oldids = set_filter(podcast1.oldid,
-                podcast1.merged_oldids, [podcast2.oldid],
-                podcast2.merged_oldids)
+                                            podcast1.merged_oldids,
+                                            [podcast2.oldid],
+                                            podcast2.merged_oldids)
 
         # the first URL in the list represents the podcast main URL
         main_url = podcast1.url
@@ -79,51 +83,20 @@ class PodcastMerger(object):
         podcast1.urls.remove(main_url)
         podcast1.urls.insert(0, main_url)
 
-        # we ignore related_podcasts because
-        # * the elements should be roughly the same
-        # * element order is important but could not preserved exactly
-
         podcast1.content_types = set_filter(None, podcast1.content_types,
-                podcast2.content_types)
-
-        key = lambda x: x.timestamp
-        for a, b in utils.iterate_together(
-                [podcast1.subscribers, podcast2.subscribers], key):
-
-            if a is None or b is None:
-                continue
-
-            # avoid increasing subscriber_count when merging
-            # duplicate entries of a single podcast
-            if a.subscriber_count == b.subscriber_count:
-                continue
-
-            a.subscriber_count += b.subscriber_count
-
-        for src, tags in podcast2.tags.items():
-            podcast1.tags[src] = set_filter(None, podcast1.tags.get(src, []),
-                    tags)
+                                            podcast2.content_types)
 
         podcast1.save()
-
-
-    @repeat_on_conflict(['podcast2'])
-    def _delete(self, podcast2):
-        podcast2.delete()
-
 
     @repeat_on_conflict(['s'])
     def _save_state(self, s, podcast1):
         s.podcast = podcast1.get_id()
         s.save()
 
-
     @repeat_on_conflict(['e'])
     def _save_episode(self, e, podcast1):
         e.podcast = podcast1.get_id()
         e.save()
-
-
 
     def reassign_episodes(self, podcast1, podcast2):
         # re-assign episodes to new podcast
@@ -137,7 +110,6 @@ class PodcastMerger(object):
                 self._save_state(s=s, podcast1=podcast1)
 
             self._save_episode(e=e, podcast1=podcast1)
-
 
     def merge_states(self, podcast1, podcast2):
         """Merges the Podcast states that are associated with the two Podcasts.
@@ -157,7 +129,7 @@ class PodcastMerger(object):
             if state is None:
                 self.actions['move-podcast-state'] += 1
                 self._move_state(state2=state2, new_id=podcast1.get_id(),
-                        new_url=podcast1.url)
+                                 new_url=podcast1.url)
 
             elif state2 is None:
                 continue
@@ -166,21 +138,14 @@ class PodcastMerger(object):
                 psm = PodcastStateMerger(state, state2, self.actions)
                 psm.merge()
 
-
     @repeat_on_conflict(['state2'])
     def _move_state(self, state2, new_id, new_url):
         state2.ref_url = new_url
         state2.podcast = new_id
         state2.save()
 
-    @repeat_on_conflict(['state2'])
-    def _delete_state(state2):
-        state2.delete()
-
-
 
 class EpisodeMerger(object):
-
 
     def __init__(self, episode1, episode2, actions):
         if episode1 == episode2:
@@ -190,13 +155,11 @@ class EpisodeMerger(object):
         self.episode2 = episode2
         self.actions = actions
 
-
     def merge(self):
         self._merge_objs(episode1=self.episode1, episode2=self.episode2)
         self.merge_states(self.episode1, self.episode2)
         self._delete(e=self.episode2)
         self.actions['merge-episode'] += 1
-
 
     @repeat_on_conflict(['episode1'])
     def _merge_objs(self, episode1, episode2):
@@ -204,18 +167,18 @@ class EpisodeMerger(object):
         episode1.urls = set_filter(None, episode1.urls, episode2.urls)
 
         episode1.merged_ids = set_filter(episode1._id, episode1.merged_ids,
-                [episode2._id], episode2.merged_ids)
+                                         [episode2._id], episode2.merged_ids)
 
         episode1.merged_slugs = set_filter(episode1.slug,
-                episode1.merged_slugs, [episode2.slug], episode2.merged_slugs)
+                                           episode1.merged_slugs,
+                                           [episode2.slug],
+                                           episode2.merged_slugs)
 
         episode1.save()
-
 
     @repeat_on_conflict(['e'])
     def _delete(self, e):
         e.delete()
-
 
     def merge_states(self, episode, episode2):
 
@@ -231,7 +194,7 @@ class EpisodeMerger(object):
             if state is None:
                 self.actions['move-episode-state'] += 1
                 self._move(state2=state2, podcast_id=self.episode1.podcast,
-                        episode_id=self.episode1._id)
+                           episode_id=self.episode1._id)
 
             elif state2 is None:
                 continue
@@ -240,16 +203,11 @@ class EpisodeMerger(object):
                 esm = EpisodeStateMerger(state, state2, self.actions)
                 esm.merge()
 
-
     @repeat_on_conflict(['state2'])
     def _move(self, state2, podcast_id, episode_id):
         state2.podcast = podcast_id
         state2.episode = episode_id
         state2.save()
-
-
-
-
 
 
 class PodcastStateMerger(object):
@@ -258,22 +216,22 @@ class PodcastStateMerger(object):
     def __init__(self, state, state2, actions):
 
         if state._id == state2._id:
-            raise IncorrectMergeException("can't merge podcast state into itself")
+            raise IncorrectMergeException(
+                "can't merge podcast state into itself")
 
         if state.user != state2.user:
-            raise IncorrectMergeException("states don't belong to the same user")
+            raise IncorrectMergeException(
+                "states don't belong to the same user")
 
         self.state = state
         self.state2 = state2
         self.actions = actions
-
 
     def merge(self):
         self._do_merge(state=self.state, state2=self.state2)
         self._add_actions(state=self.state, actions=self.state2.actions)
         self._delete(state2=self.state2)
         self.actions['merged-podcast-state'] += 1
-
 
     @repeat_on_conflict(['state'])
     def _do_merge(self, state, state2):
@@ -284,15 +242,14 @@ class PodcastStateMerger(object):
         state.settings = settings
 
         state.disabled_devices = set_filter(None, state.disabled_devices,
-                state2.disabled_devices)
+                                            state2.disabled_devices)
 
         state.merged_ids = set_filter(state1._id, state.merged_ids,
-                [state2._id], state2.merged_ids)
+                                      [state2._id], state2.merged_ids)
 
         state.tags = set_filter(None, state.tags, state2.tags)
 
         state.save()
-
 
     @repeat_on_conflict(['state'])
     def _add_actions(self, state, actions):
@@ -310,30 +267,27 @@ class PodcastStateMerger(object):
         state2.delete()
 
 
-
-
-
 class EpisodeStateMerger(object):
     """ Merges state2 in state """
 
     def __init__(self, state, state2, actions):
 
         if state._id == state2._id:
-            raise IncorrectMergeException("can't merge episode state into itself")
+            raise IncorrectMergeException(
+                "can't merge episode state into itself")
 
         if state.user != state2.user:
-            raise IncorrectMergeException("states don't belong to the same user")
+            raise IncorrectMergeException(
+                "states don't belong to the same user")
 
         self.state = state
         self.state2 = state2
         self.actions = actions
 
-
     def merge(self):
         self._merge_obj(state=self.state, state2=self.state2)
-        self._do_delete(state2=self.state2)
+        delete_podcast_state(self.state2)
         self.actions['merge-episode-state'] += 1
-
 
     @repeat_on_conflict(['state'])
     def _merge_obj(self, state, state2):
@@ -350,10 +304,6 @@ class EpisodeStateMerger(object):
         state.chapters = list(set(state.chapters + state2.chapters))
 
         state.save()
-
-    @repeat_on_conflict(['state2'])
-    def _do_delete(self, state2):
-        state2.delete()
 
 
 def set_filter(orig, *args):
