@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-04-25 18:27+0000\n"
+"POT-Creation-Date: 2013-05-13 20:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -271,21 +271,21 @@ msgstr "abboni"
 msgid "unsubscribed"
 msgstr "Disdire"
 
-#: api/simple.py:76 api/simple.py:109
+#: api/simple.py:79 api/simple.py:112
 #, fuzzy, python-format
 msgid "%(username)s's Subscription List"
 msgstr "I tuoi abbonamenti"
 
-#: api/simple.py:273
+#: api/simple.py:276
 #, fuzzy, python-format
 msgid "gpodder.net - Top %(count)d"
 msgstr "my.gpodder.org - Top %s"
 
-#: api/simple.py:307
+#: api/simple.py:310
 msgid "gpodder.net - Search"
 msgstr ""
 
-#: api/simple.py:322
+#: api/simple.py:325
 #, fuzzy, python-format
 msgid "gpodder.net - %(count)d Suggestions"
 msgstr "my.gpodder.org - %s suggerimenti"
@@ -906,7 +906,7 @@ msgstr ""
 msgid "Update now"
 msgstr ""
 
-#: publisher/templates/publisher/podcast.html:70 web/forms.py:57
+#: publisher/templates/publisher/podcast.html:70 web/forms.py:59
 #: web/templates/base.html:191 web/templates/home.html:217
 msgid "Twitter"
 msgstr ""
@@ -960,7 +960,7 @@ msgstr ""
 msgid "\"{title}\" is not a valid title"
 msgstr ""
 
-#: share/views.py:198 web/views/__init__.py:211
+#: share/views.py:198 web/views/__init__.py:209
 msgid "Thanks for rating!"
 msgstr ""
 
@@ -1230,76 +1230,76 @@ msgid ""
 "exact link can access your content"
 msgstr ""
 
-#: web/forms.py:18 web/forms.py:172
+#: web/forms.py:20 web/forms.py:174
 #, fuzzy
 msgid "E-Mail address"
 msgstr "Il vostro indirizzo e-mail"
 
-#: web/forms.py:20
+#: web/forms.py:22
 msgid "Current password"
 msgstr ""
 
-#: web/forms.py:25
+#: web/forms.py:27
 msgid "New password"
 msgstr ""
 
-#: web/forms.py:30
+#: web/forms.py:32
 msgid "Confirm password"
 msgstr ""
 
-#: web/forms.py:61
+#: web/forms.py:63
 msgid "A few words about you"
 msgstr ""
 
-#: web/forms.py:73
+#: web/forms.py:75
 #, fuzzy
 msgid "Token"
 msgstr "Ultimo episodio"
 
-#: web/forms.py:78
+#: web/forms.py:80
 #, fuzzy
 msgid "Auto-Flattr played episodes"
 msgstr "Perchè episodi non nominati?"
 
-#: web/forms.py:82
+#: web/forms.py:84
 msgid "Flattr us"
 msgstr ""
 
-#: web/forms.py:87
+#: web/forms.py:89
 msgid "Username for own content"
 msgstr ""
 
-#: web/forms.py:94 web/templates/devicelist.html:21
+#: web/forms.py:96 web/templates/devicelist.html:21
 msgid "Name"
 msgstr "Nome"
 
-#: web/forms.py:95 web/templates/devicelist.html:22
+#: web/forms.py:97 web/templates/devicelist.html:22
 msgid "Type"
 msgstr "Tipo"
 
-#: web/forms.py:96 web/templates/device-create.html:66
+#: web/forms.py:98 web/templates/device-create.html:66
 #: web/templates/devicelist.html:23
 #, fuzzy
 msgid "Device ID"
 msgstr "Strumento tecnico"
 
-#: web/forms.py:107
+#: web/forms.py:109
 msgid "Share this subscription with other users (public)"
 msgstr ""
 
-#: web/forms.py:146
+#: web/forms.py:148
 msgid "No device selected"
 msgstr ""
 
-#: web/forms.py:155
+#: web/forms.py:157
 msgid "Please enter your username"
 msgstr ""
 
-#: web/forms.py:160
+#: web/forms.py:162
 msgid "or the email address used while registering"
 msgstr ""
 
-#: web/forms.py:167
+#: web/forms.py:169
 msgid "Username"
 msgstr ""
 
@@ -1506,7 +1506,7 @@ msgstr ""
 #: web/templates/contribute.html:16
 msgid ""
 "gpodder.net is run as a hobby project without continuous funding for "
-"servers, storange and bandwidth. We rely on contributors and donations to "
+"servers, storage and bandwidth. We rely on contributors and donations to "
 "keep the site running and improve it constantly."
 msgstr ""
 
@@ -1548,14 +1548,14 @@ msgid ""
 "It seems that %(referer)s has linked to %(site)s to get you to change some "
 "data. <strong>This will possibly change some of your data / settings!</"
 "strong>. Do you really want to continue? <strong>If in doubt, chose No.</"
-"strong>\n"
+"strong>"
 msgstr ""
 
-#: web/templates/csrf.html:25
+#: web/templates/csrf.html:24
 msgid "Yes"
 msgstr ""
 
-#: web/templates/csrf.html:26
+#: web/templates/csrf.html:25
 msgid "No"
 msgstr ""
 
@@ -2200,7 +2200,7 @@ msgstr ""
 #: web/templates/privacy.html:20
 msgid ""
 "<strong>Public</strong> subscriptions are included in your <a href=\"/share/"
-"\">shared podcasts</a> them) and ouranonymized public statistics."
+"\">shared podcasts</a> and our anonymized public statistics."
 msgstr ""
 
 #: web/templates/privacy.html:21
@@ -2631,7 +2631,7 @@ msgstr ""
 msgid "Could not add Chapter: {msg}"
 msgstr ""
 
-#: web/views/episode.py:262 web/views/podcast.py:355
+#: web/views/episode.py:262 web/views/podcast.py:358
 msgid "Flattr'd"
 msgstr ""
 
