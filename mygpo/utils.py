@@ -208,11 +208,13 @@ def iterate_together(lists, key=lambda x: x, reverse=False):
 
 def progress(val, max_val, status_str='', max_width=50, stream=sys.stdout):
 
+    factor = float(val)/max_val if max_val > 0 else 0
+
     # progress as percentage
-    percentage_str = '{val:.2%}'.format(val=float(val)/max_val)
+    percentage_str = '{val:.2%}'.format(val=factor)
 
     # progress bar filled with #s
-    factor = min(int(float(val)/max_val*max_width), max_width)
+    factor = min(int(factor*max_width), max_width)
     progress_str = '#' * factor + ' ' * (max_width-factor)
 
     #insert percentage into bar
