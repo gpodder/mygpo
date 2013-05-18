@@ -20,6 +20,7 @@ import unittest
 from collections import Counter
 
 from django.test import TestCase
+from django.test.utils import override_settings
 
 from mygpo.core.models import Podcast, Episode
 from mygpo.users.models import EpisodeAction, User
@@ -30,6 +31,7 @@ from mygpo.db.couchdb.episode import episode_by_id
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode
 
 
+@override_settings(CACHE={})
 class MergeTests(TestCase):
     """ Tests merging of two podcasts, their episodes and states """
 
