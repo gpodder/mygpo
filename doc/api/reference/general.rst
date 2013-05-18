@@ -17,6 +17,8 @@ Podcast is identified by its feed URL, episode is identified by its media URL.
 
 TODO: see http://developer.github.com/v3/ for relevant information!
 
+TODO: see `URI Templates <http://tools.ietf.org/html/rfc6570>`_
+
 
 Status Codes
 ------------
