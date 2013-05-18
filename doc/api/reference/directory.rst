@@ -5,6 +5,8 @@ Directory API
 
 The Directory API can be used to discover podcasts.
 
+TODO: report problems with podcasts (eg duplicates, missing data)
+
 
 Resources
 ---------
