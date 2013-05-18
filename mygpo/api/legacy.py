@@ -76,16 +76,16 @@ def upload(request):
         try:
             p.subscribe(user, dev)
         except SubscriptionException as e:
-            logger.warn('Legacy API: %(username)s: could not subscribe to podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
-                {'username': user.username, 'podcast_url': p.url, 'device_id': dev.id, 'exception': e})
+            logger.exception('Legacy API: %(username)s: could not subscribe to podcast %(podcast_url)s on device %(device_id)s' %
+                {'username': user.username, 'podcast_url': p.url, 'device_id': dev.id})
 
     for r in rem:
         p = podcast_for_url(r, create=True)
         try:
             p.unsubscribe(user, dev)
         except SubscriptionException as e:
-            logger.warn('Legacy API: %(username): could not unsubscribe from podcast %(podcast_url) on device %(device_id): %(exception)s' %
-                {'username': user.username, 'podcast_url': p.url, 'device_id': dev.id, 'exception': e})
+            logger.exception('Legacy API: %(username): could not unsubscribe from podcast %(podcast_url) on device %(device_id)' %
+                {'username': user.username, 'podcast_url': p.url, 'device_id': dev.id})
 
     return HttpResponse('@SUCCESS', mimetype='text/plain')
 

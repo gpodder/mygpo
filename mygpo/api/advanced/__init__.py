@@ -188,8 +188,8 @@ def episodes(request, username, version=1):
         try:
             actions = json.loads(request.body)
         except (JSONDecodeError, UnicodeDecodeError) as e:
-            msg = 'Advanced API: could not decode episode update POST data for user %s: %s' % (username, e)
-            logger.warn(msg)
+            msg = 'Advanced API: could not decode episode update POST data for user %s' % (username,)
+            logger.exception(msg)
             return HttpResponseBadRequest(msg)
 
         logger.info('start: user %s: %d actions from %s' % (request.user._id, len(actions), ua_string))
@@ -212,11 +212,11 @@ def episodes(request, username, version=1):
         try:
             update_urls = update_episodes(request.user, actions, now, ua_string)
         except DeviceUIDException as e:
-            logger.warn('invalid device UID while uploading episode actions for user %s: %s' % (username, e))
+            logger.exception('invalid device UID while uploading episode actions for user %s' % (username,))
             return HttpResponseBadRequest(str(e))
 
         except InvalidEpisodeActionAttributes as e:
-            logger.warn('invalid episode action attributes while uploading episode actions for user %s: %s' % (username, e))
+            logger.exception('invalid episode action attributes while uploading episode actions for user %s: %s' % (username,))
             return HttpResponseBadRequest(str(e))
 
         logger.info('done:  user %s: %d actions from %s' % (request.user._id, len(actions), ua_string))

@@ -305,8 +305,8 @@ def unsubscribe(request, podcast, device_uid):
     try:
         podcast.unsubscribe(request.user, device)
     except SubscriptionException as e:
-        logger.warn('Web: %(username)s: could not unsubscribe from podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
-            {'username': request.user.username, 'podcast_url': podcast.url, 'device_id': device.id, 'exception': e})
+        logger.exception('Web: %(username)s: could not unsubscribe from podcast %(podcast_url)s on device %(device_id)s' %
+            {'username': request.user.username, 'podcast_url': podcast.url, 'device_id': device.id})
 
     return HttpResponseRedirect(return_to)
 
