@@ -39,10 +39,9 @@ class PodcastMerger(object):
         podcast1 = self.podcasts.pop(0)
 
         for podcast2 in self.podcasts:
-            self._merge_objs(podcast1=podcast1, podcast2=podcast2)
             self.merge_states(podcast1, podcast2)
-            self.merge_episodes()
             self.reassign_episodes(podcast1, podcast2)
+            self._merge_objs(podcast1=podcast1, podcast2=podcast2)
             delete_podcast(podcast2)
             self.actions['merge-podcast'] += 1
 
