@@ -109,7 +109,8 @@ def subscriptions(request, username, device_uid):
         try:
             actions = json.loads(request.body)
         except (JSONDecodeError, UnicodeDecodeError, ValueError) as e:
-            msg = 'Could not decode subscription update POST data for user %s' % (username,)
+            msg = ('Could not decode subscription update POST data for ' +
+                   'user %s: %s') % (username, request.body)
             logger.exception(msg)
             return HttpResponseBadRequest(msg)
 
@@ -194,7 +195,8 @@ def episodes(request, username, version=1):
         try:
             actions = json.loads(request.body)
         except (JSONDecodeError, UnicodeDecodeError, ValueError) as e:
-            msg = 'Advanced API: could not decode episode update POST data for user %s' % (username,)
+            msg = ('Could not decode episode update POST data for ' +
+                   'user %s: %s') % (username, request.body)
             logger.exception(msg)
             return HttpResponseBadRequest(msg)
 
@@ -447,7 +449,8 @@ def device(request, username, device_uid):
     try:
         data = json.loads(request.body)
     except (JSONDecodeError, UnicodeDecodeError, ValueError) as e:
-        msg = 'Could not decode device update POST data for user %s' % (username,)
+        msg = ('Could not decode device update POST data for ' +
+               'user %s: %s') % (username, request.body)
         logger.exception(msg)
         return HttpResponseBadRequest(msg)
 
