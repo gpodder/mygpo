@@ -7,6 +7,7 @@ import django
 from django.shortcuts import render
 from django.contrib import messages
 from django.core.urlresolvers import reverse
+from django.core.cache import cache
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext as _
 from django.views.generic import TemplateView
@@ -188,6 +189,9 @@ class MergeStatus(AdminView):
                 'ready': False,
             })
 
+        # clear cache to make merge result visible
+        # TODO: what to do with multiple frontends?
+        cache.clear()
 
         try:
             actions, podcast = result.get()
