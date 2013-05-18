@@ -10,6 +10,9 @@ from mygpo.data.feeddownloader import PodcastUpdater
 import socket
 socket.setdefaulttimeout(300)
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 class Command(PodcastCommand):
 
@@ -29,11 +32,11 @@ class Command(PodcastCommand):
 
         if options.get('list'):
             for podcast in queue:
-                print podcast
+                logger.info('Podcast %s', podcast)
 
         else:
-            print 'Updating podcasts...'
+            logger.info('Updating podcasts...')
 
             updater = PodcastUpdater()
             for podcast in updater.update_queue(queue):
-                print podcast
+                logger.info('Updated podcast %s', podcast)

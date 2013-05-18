@@ -42,6 +42,9 @@ from mygpo.directory.tags import update_category
 from mygpo.decorators import repeat_on_conflict
 from mygpo.db.couchdb import get_main_database
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 class NoPodcastCreated(Exception):
     """ raised when no podcast obj was created for a new URL """
@@ -63,14 +66,12 @@ class PodcastUpdater(object):
         """ Fetch data for the URLs supplied as the queue iterable """
 
         for n, podcast_url in enumerate(queue):
-            print n, podcast_url
+            logger.info('Update %d - %s', n, podcast_url)
             try:
                 yield self.update(podcast_url)
 
             except NoPodcastCreated as npc:
-                print 'no podcast created:', npc
-
-            print
+                logger.info('No podcast created: %s', npc)
 
 
     def update(self, podcast_url):
@@ -172,7 +173,7 @@ class PodcastUpdater(object):
             podcast.logo_url = None
 
         if not deep_eq(old_json, podcast.to_json()):
-            print 'saving podcast'
+            logger.info('Saving podcast.')
             podcast.last_update = datetime.utcnow()
             podcast.save()
 
@@ -272,7 +273,7 @@ class PodcastUpdater(object):
 
 
         if updated_episodes:
-            print 'Updating', len(updated_episodes), 'episodes'
+            logger.info('Updating %d episodes', len(updated_episodes))
             self.db.save_docs(updated_episodes)
 
         return all_episodes
@@ -296,7 +297,7 @@ class PodcastUpdater(object):
             else:
                 old_hash = ''
 
-            print 'LOGO @', cover_art
+            logger.info('Logo %s', cover_art)
 
             # save new cover art
             with open(filename, 'w') as fp:
@@ -309,7 +310,7 @@ class PodcastUpdater(object):
             # remove thumbnails if cover changed
             if old_hash != new_hash:
                 thumbnails = CoverArt.get_existing_thumbnails(prefix, filename)
-                print 'Removing %d thumbnails' % len(thumbnails)
+                logger.info('Removing %d thumbnails', len(thumbnails))
                 for f in thumbnails:
                     os.unlink(f)
 
@@ -317,12 +318,12 @@ class PodcastUpdater(object):
 
         except (urllib2.HTTPError, urllib2.URLError, ValueError,
                 httplib.BadStatusLine) as e:
-            print e
+            logger.exception('Exception while updating podcast')
 
 
     @repeat_on_conflict(['podcast'])
     def _mark_outdated(self, podcast, msg=''):
-        print 'mark outdated', msg
+        logger.info('marking podcast outdated: %s', msg)
         podcast.outdated = True
         podcast.last_update = datetime.utcnow()
         podcast.save()
