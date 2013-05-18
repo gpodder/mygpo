@@ -52,6 +52,10 @@ class PodcastMerger(object):
         """ Merges the episodes according to the groups """
 
         for n, episodes in self.groups:
+
+            if not episodes:
+                continue
+
             episode = episodes.pop(0)
 
             for ep in episodes:
@@ -244,7 +248,7 @@ class PodcastStateMerger(object):
         state.disabled_devices = set_filter(None, state.disabled_devices,
                                             state2.disabled_devices)
 
-        state.merged_ids = set_filter(state1._id, state.merged_ids,
+        state.merged_ids = set_filter(state._id, state.merged_ids,
                                       [state2._id], state2.merged_ids)
 
         state.tags = set_filter(None, state.tags, state2.tags)
