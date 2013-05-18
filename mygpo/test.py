@@ -1,13 +1,12 @@
 import os.path
 
 from django.conf import settings
-from django.core.management.base import BaseCommand
 
 from couchdbkit import Database
 from couchdbkit.loaders import FileSystemDocsLoader
 from couchdbkit.ext.django.testrunner import CouchDbKitTestSuiteRunner
 
-from django.conf import settings
+from mygpo.db.couchdb.utils import sync_design_docs
 
 
 # inspired by
@@ -26,14 +25,7 @@ class MygpoTestSuiteRunner(CouchDbKitTestSuiteRunner):
 
     def setup_databases(self, **kwargs):
         ret = super(MygpoTestSuiteRunner, self).setup_databases(**kwargs)
-        path = os.path.join(settings.BASE_DIR, '..', 'couchdb', '_design')
-        loader = FileSystemDocsLoader(path)
-
-        db_urls = set(db_url for pkg, db_url in self.dbs)
-        for db_url in db_urls:
-            db = Database(db_url)
-            loader.sync(db, verbose=True)
-
+        sync_design_docs()
         return ret
 
 
