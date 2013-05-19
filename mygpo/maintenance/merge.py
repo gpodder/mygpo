@@ -7,7 +7,7 @@ import restkit
 from mygpo import utils
 from mygpo.decorators import repeat_on_conflict
 from mygpo.db.couchdb.podcast import delete_podcast
-from mygpo.db.couchdb.episode import episodes_for_podcast
+from mygpo.db.couchdb.episode import episodes_for_podcast_uncached
 from mygpo.db.couchdb.podcast_state import all_podcast_states, \
     delete_podcast_state
 from mygpo.db.couchdb.episode_state import all_episode_states
@@ -38,14 +38,14 @@ class PodcastMerger(object):
 
         podcast1 = self.podcasts.pop(0)
 
+        self.merge_episodes()
+
         for podcast2 in self.podcasts:
             self.merge_states(podcast1, podcast2)
             self.reassign_episodes(podcast1, podcast2)
             self._merge_objs(podcast1=podcast1, podcast2=podcast2)
             delete_podcast(podcast2)
             self.actions['merge-podcast'] += 1
-
-        self.merge_episodes()
 
     def merge_episodes(self):
         """ Merges the episodes according to the groups """
@@ -104,7 +104,7 @@ class PodcastMerger(object):
     def reassign_episodes(self, podcast1, podcast2):
         # re-assign episodes to new podcast
         # if necessary, they will be merged later anyway
-        for e in episodes_for_podcast(podcast2):
+        for e in episodes_for_podcast_uncached(podcast2):
             self.actions['reassign-episode'] += 1
 
             for s in all_episode_states(e):
