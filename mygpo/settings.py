@@ -208,11 +208,21 @@ LOGGING = {
             'format': '%(asctime)s %(name)s %(levelname)s %(message)s',
         },
     },
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        },
+    },
     'handlers': {
         'console':{
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'formatter': 'verbose'
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler'
         },
     },
     'loggers': {
@@ -224,8 +234,8 @@ LOGGING = {
         'mygpo': {
             'handlers': ['console'],
             'level': 'INFO',
-        }
-    }
+        },
+    },
 }
 
 # minimum number of subscribers a podcast must have to be assigned a slug
