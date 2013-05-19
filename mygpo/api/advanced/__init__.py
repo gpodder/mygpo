@@ -41,7 +41,8 @@ from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.sanitizing import sanitize_url, sanitize_urls
 from mygpo.api.advanced.directory import episode_data, podcast_data
 from mygpo.api.backend import get_device, BulkSubscribe
-from mygpo.utils import parse_time, format_time, parse_bool, get_timestamp
+from mygpo.utils import parse_time, format_time, parse_bool, get_timestamp, \
+    parse_request_body
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.core import models
 from mygpo.core.models import SanitizingRule, Podcast
@@ -50,7 +51,7 @@ from mygpo.users.models import PodcastUserState, EpisodeAction, \
      EpisodeUserState, DeviceDoesNotExist, DeviceUIDException, \
      InvalidEpisodeActionAttributes
 from mygpo.users.settings import FLATTR_AUTO
-from mygpo.core.json import json, JSONDecodeError
+from mygpo.core.json import JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.db.couchdb import BulkException, bulk_save_retry
 from mygpo.db.couchdb.episode import episode_by_id, \
@@ -107,7 +108,7 @@ def subscriptions(request, username, device_uid):
             return HttpResponseBadRequest('POST data must not be empty')
 
         try:
-            actions = json.loads(request.body)
+            actions = parse_request_body(request)
         except (JSONDecodeError, UnicodeDecodeError, ValueError) as e:
             msg = ('Could not decode subscription update POST data for ' +
                    'user %s: %s') % (username, request.body)
@@ -193,7 +194,7 @@ def episodes(request, username, version=1):
 
     if request.method == 'POST':
         try:
-            actions = json.loads(request.body)
+            actions = parse_request_body(request)
         except (JSONDecodeError, UnicodeDecodeError, ValueError) as e:
             msg = ('Could not decode episode update POST data for ' +
                    'user %s: %s') % (username, request.body)
@@ -447,7 +448,7 @@ def device(request, username, device_uid):
             request.META.get('HTTP_USER_AGENT', ''))
 
     try:
-        data = json.loads(request.body)
+        data = parse_request_body(request)
     except (JSONDecodeError, UnicodeDecodeError, ValueError) as e:
         msg = ('Could not decode device update POST data for ' +
                'user %s: %s') % (username, request.body)

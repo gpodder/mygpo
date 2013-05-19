@@ -21,7 +21,7 @@ from django.views.decorators.cache import never_cache
 
 from mygpo.decorators import allowed_methods
 from mygpo.core.models import Podcast
-from mygpo.core.json import json
+from mygpo.utils import parse_request_body
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.users.models import PodcastUserState, DeviceDoesNotExist
@@ -85,7 +85,7 @@ def main(request, username, scope):
         return JsonResponse( settings_obj.settings )
 
     elif request.method == 'POST':
-        actions = json.loads(request.body)
+        actions = parse_request_body(request)
         ret = update_settings(settings_obj, actions)
         base_obj.save()
         return JsonResponse(ret)

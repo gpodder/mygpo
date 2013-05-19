@@ -29,8 +29,11 @@ import hashlib
 import urlparse
 import urllib
 import urllib2
+import zlib
 
 from django.conf import settings
+
+from mygpo.core.json import json
 
 
 def daterange(from_date, to_date=None, leap=timedelta(days=1)):
@@ -863,3 +866,15 @@ def deep_eq(_v1, _v2, datetime_fudge=default_fudge, _assert=False):
         op = _deep_iter_eq
 
   return op(c1, c2)
+
+
+def parse_request_body(request):
+    """ returns the parsed request body, handles gzip encoding """
+
+    raw_body = request.body
+    content_enc = request.META.get('HTTP_CONTENT_ENCODING')
+
+    if content_enc == 'gzip':
+        raw_body = zlib.decompress(raw_body)
+
+    return json.loads(raw_body)

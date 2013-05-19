@@ -20,7 +20,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 
 from mygpo.decorators import allowed_methods
-from mygpo.core.json import json, JSONDecodeError
+from mygpo.core.json import JSONDecodeError
+from mygpo.utils import parse_request_body
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.users.models import DeviceDoesNotExist, User
@@ -40,7 +41,7 @@ def main(request, username):
 
     else:
         try:
-            actions = json.loads(request.body)
+            actions = parse_request_body(request)
         except JSONDecodeError as e:
             return HttpResponseBadRequest(str(e))
 
