@@ -2,6 +2,8 @@ from hashlib import sha1
 from datetime import datetime
 from collections import Counter
 
+from couchdbkit import MultipleResultsFound
+
 from django.core.cache import cache
 
 from mygpo.core.models import Podcast, Episode, MergedIdException
@@ -13,6 +15,9 @@ from mygpo.db import QueryParameterMissing
 from mygpo.db.couchdb.utils import is_couchdb_id
 from mygpo.db.couchdb import get_main_database
 from mygpo.db.couchdb.podcast import podcast_for_url, podcast_for_slug_id
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 @cache_result(timeout=60*60)
@@ -95,8 +100,9 @@ def episode_for_slug(podcast_id, episode_slug):
     if not episode_slug:
         raise QueryParameterMissing('episode_slug')
 
+    _view = 'episodes/by_slug'
 
-    r = Episode.view('episodes/by_slug',
+    r = Episode.view(_view,
             key          = [podcast_id, episode_slug],
             include_docs = True,
         )
@@ -104,7 +110,13 @@ def episode_for_slug(podcast_id, episode_slug):
     if not r:
         return None
 
-    episode = r.one()
+    try:
+        episode = r.one()
+
+    except MultipleResultsFound as ex:
+        logger.exception('Multiple results found in %s with params %s',
+            _view, r.params)
+        episode = r.first()
 
     if episode.needs_update:
         incomplete_obj.send_robust(sender=episode)
