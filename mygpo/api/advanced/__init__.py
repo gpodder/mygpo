@@ -223,7 +223,7 @@ def episodes(request, username, version=1):
         try:
             update_urls = update_episodes(request.user, actions, now, ua_string)
         except DeviceUIDException as e:
-            logger.exception('invalid device UID while uploading episode actions for user %s' % (username,))
+            logger.warn('invalid device UID while uploading episode actions for user %s', username)
             return HttpResponseBadRequest(str(e))
 
         except InvalidEpisodeActionAttributes as e:
