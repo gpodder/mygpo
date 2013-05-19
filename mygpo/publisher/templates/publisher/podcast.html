@@ -99,6 +99,29 @@
 
   {% endif %}
 
+
+  <h2>{% trans "PubSubHubbub" %}</h2>
+  <p>
+   {% blocktrans with site.domain as sitename %}If you publish your podcast feed through a <a href="https://code.google.com/p/pubsubhubbub/">PubSubHubbu</a> hub, {{ sitename }} can immediatelly update your podcast when a new episode is released.{% endblocktrans %}
+  </p>
+
+  {% if pubsubscription and pubsubscription.mode == 'subscribe' %}
+   {% if pubsubscription.verified %}
+    <div class="alert alert-success">
+     {% blocktrans with podcast.hub as hub %}Your podcast is published through <a href="{{ hub }}">{{ hub }}</a> and should update immediatelly for each new episode.{% endblocktrans %}
+    </div>
+   {% else %}
+    <div class="alert alert-warning">
+     {% blocktrans with podcast.hub as hub %}Your podcast is published through <a href="{{ hub }}">{{ hub }}</a> but our subscription has not yet been verified.{% endblocktrans %}
+    </div>
+   {% endif %}
+  {% else %}
+   <div class="alert alert-info">
+    {% blocktrans %}We did not find a hub in your podcast feed. Your feed is updated regularly, but there might be some delay until a new episode shows up on {{ sitename }}.{% endblocktrans %}
+   </div>
+  {% endif %}
+
+
   <h2>Episodes</h2>
   <p>View and edit <a href="{% podcast_link_target podcast "podcast-publisher-episodes" %}">episode</a> data.</p>
 
