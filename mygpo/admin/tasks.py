@@ -21,8 +21,8 @@ def merge_podcasts(podcast_ids, num_groups):
     actions = Counter()
 
     pm = PodcastMerger(podcasts, actions, num_groups)
-    pm.merge()
+    podcast = pm.merge()
 
     logger.info('merging result: %s', actions)
 
-    return actions, podcasts[0]
+    return actions, podcast

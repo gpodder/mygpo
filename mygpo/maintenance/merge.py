@@ -47,6 +47,8 @@ class PodcastMerger(object):
             delete_podcast(podcast2)
             self.actions['merge-podcast'] += 1
 
+        return podcast1
+
     def merge_episodes(self):
         """ Merges the episodes according to the groups """
 
