@@ -30,3 +30,4 @@ integrating gpodder.net into podcasting applications.
    events
    podcastlists
    settings
+   prepare

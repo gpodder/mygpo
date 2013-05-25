@@ -188,38 +188,8 @@ Response ::
     }
 
 
-Response is being prepared ::
-
-    203 Found / 202 See Other
-    Link: /user/<username>/events/response/<id>
-
-
-The server is preparing the result at the specified resource. The client should
-try to fetch the data from the given URLs. ::
-
-    GET /user/<username>/events/<id>
-    Content-Tpe: application/json
-
-
-A 404 might be returned before the data is ready. The client may retry after
-xxx seconds. ::
-
-    404 Not Found
-
-
-When the data is ready, 200 will be returned ::
-
-    200 OK
-    Content-Tpe: application/json
-
-    TODO: body...
-
-
-When the data is no longer available, a 410 is returned. ::
-
-    410 Gone
-
-In this case the client SHOULD retry with the previous ``since`` value.
+The server can also return a prepared response (see
+:ref:`prepared-response-api`).
 
 A successful response indicates a timeframe (between ``since`` and
 ``timestamp``) for which events have been retrieved. When using

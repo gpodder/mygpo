@@ -57,18 +57,25 @@ All responses are valid JSON (unless otherwise stated).
 Error messages
 --------------
 
-The response could look like ::
+An error response looks like ::
 
     { message: "message", errors: [...] }
 
-Errors could look like this ::
+The ``errors`` array contains objects with the following information ::
 
     {
-        resource: "",
-        field: "",
-        code: ""
+        field: "<JSON Pointer to field>",
+        code: "<error code>"
     }
 
+In ``field`` a `JSON Pointer <http://tools.ietf.org/html/rfc6901>`_ to the
+problematic field in the request is provided. The ``code`` describes the actual
+error. The following error codes are defined:
+
+* ``ìnvalid_url``: The provided values is not a valid URL.
+
+Error codes may be added on demand. Clients should therefore expect and accept
+arbitrary string values.
 
 
 Redirects
@@ -127,3 +134,21 @@ the results wrapped in a JSON function. This is typically used when browsers
 want to embed content received from the API in web pages by getting around
 cross domain issues. The response includes the same data output as the regular
 API, plus the relevant HTTP Header information.
+
+
+Resource Types
+--------------
+
+.. _podcast-type:
+
+Podcast
+^^^^^^^
+
+A podcast is represented as a JSON object containing at least an ``url``
+member. ::
+
+    {
+        url: "http://example.com/podcast.rss",
+        title: "Cool Podcast",
+        logo: "http://example.com/podcast-logo.png"
+    }
