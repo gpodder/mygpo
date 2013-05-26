@@ -1,70 +1,60 @@
+File Overview
+=============
+
 The ``mygpo`` project consists of the following files ::
 
   mygpo/
     __init__.py
-    settings.py
-    settings_prod.py
-    cache.py
-    manage.py
-    constants.py
-    flattr.py
-    utils.py
-    log.py
-    cel.py
-    urls.py
-    shell.py
-    test.py
-    decorators.py
-    print-couchdb.py
+    settings.py                                                # default settings
+    settings_prod.py                                           # "productive" settings which overwrite those in settings.py
+    cache.py                                                   # utils around Django's cache
+    manage.py                                                  # https://docs.djangoproject.com/en/dev/ref/django-admin/
+    constants.py                                               # defines some global constants
+    flattr.py                                                  # Flattr support (https://flattr.com/)
+    utils.py                                                   # utilities
+    cel.py                                                     # Celery integration (http://celeryproject.org/)
+    urls.py                                                    # Django URL dispatcher (https://docs.djangoproject.com/en/dev/topics/http/urls/)
+    shell.py                                                   # import * for commonly used methods when working in the Django shell
+    test.py                                                    # custom Django test suite runner
+    decorators.py                                              # globally used decorators
+    print-couchdb.py                                           # script to print the main CouchDB database
 
-    admin/
-      __init__.py
-      auth.py
-      tests.py
-      group.py
-      clients.py
-      models.py
-      views.py
-      urls.py
-      tasks.py
+    admin/                                                     # functionality to be used by site-admins
+      auth.py                                                  # authentication of admins
+      group.py                                                 # groups / matches episodes (eg for merging)
+      clients.py                                               # client statistics
+      views.py                                                 # Django views for the admin area (https://docs.djangoproject.com/en/dev/topics/http/views/)
+      urls.py                                                  # Django URL dispatcher for the admin area
+      tasks.py                                                 # Celery tasks
 
     maintenance/
-      __init__.py
-      tests.py
-      models.py
-      merge.py
-      management/__init__.py
-      management/changescmd.py
-      management/podcastcmd.py
-      management/commands/__init__.py
-      management/commands/sync-sanitizing-rules.py
-      management/commands/celery.py
-      management/commands/assign-podcast-slugs.py
-      management/commands/cleanup-unused-users.py
-      management/commands/assign-episode-slugs.py
-      management/commands/listening-stats.py
-      management/commands/merge-episode-states.py
-      management/commands/move-subscriber-data.py
-      management/commands/import-episode-actions.py
-      management/commands/delete-sanitizing-rules.py
+      merge.py                                                 # Merging of podcasts and related objects
+      management/changescmd.py                                 # base class for commands that use the CouchDB changes feed (https://couchdb.readthedocs.org/en/latest/changes.html)
+      management/podcastcmd.py                                 # base class for commands that operate on (multiple) podcasts
+      management/commands/celery.py                            # Celery worker
+      management/commands/assign-podcast-slugs.py              # assigns slugs to podcasts (one-time command, now unused)
+      management/commands/cleanup-unused-users.py              # removes users that have been marked as deleted
+      management/commands/assign-episode-slugs.py              # assigns slugs to episodes (one-time command, now unused)
+      management/commands/listening-stats.py                   # stats about the intervald between publishing and playing episodes
+      management/commands/merge-episode-states.py              # merges duplicates of episodes states
+      management/commands/move-subscriber-data.py              # moves subscriber data from podcasts into separate objects
+      management/commands/import-episode-actions.py            # imports episode actions from files
+      management/commands/sync-sanitizing-rules.py             # synchronizes sanitizing rules to the database
+      management/commands/delete-sanitizing-rules.py           # deletes sanitizing rules
 
-    data/
-      __init__.py
-      tests.py
-      youtube.py
-      delicious.py
-      flickr.py
-      podcast.py
-      mimetype.py
-      signals.py
-      tasks.py
-      feeddownloader.py
-      management/__init__.py
-      management/commands/__init__.py
-      management/commands/feed-downloader.py
-      management/commands/update-related-podcasts.py
-      management/commands/tag-downloader.py
-      management//commands/group-podcasts.py
+    data/                                                      # stuff related to podcast and episode data
+      youtube.py                                               # utils for accessing YouTube data
+      delicious.py                                             # utils for accessing delicious.com data
+      flickr.py                                                # utils for accessing Flickr data
+      podcast.py                                               # podcast-related utils
+      mimetype.py                                              # utils for handling mime types
+      signals.py                                               # Django Signals for podcast-related events (https://docs.djangoproject.com/en/dev/topics/signals/)
+      tasks.py                                                 # podcast-related Celery tasks
+      feeddownloader.py                                        # fetching, parsing and updating podcasts based on their feeds
+      management/commands/feed-downloader.py                   # command-wrapper around feeddownloader.py
+      management/commands/update-related-podcasts.py           # calculates and sets related podcasts for existing podcasts
+      management/commands/tag-downloader.py                    # fetches and updates tags for existing podcasts
+      management//commands/group-podcasts.py                   # group two related podcasts
 
     publisher/
       __init__.py
