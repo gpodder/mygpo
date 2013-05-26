@@ -12,6 +12,9 @@ from mygpo.db.couchdb.podcast_state import all_podcast_states, \
     delete_podcast_state
 from mygpo.db.couchdb.episode_state import all_episode_states
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 class IncorrectMergeException(Exception):
     pass
@@ -36,11 +39,15 @@ class PodcastMerger(object):
     def merge(self):
         """ Carries out the actual merging """
 
+        logger.info('Start merging of podcasts: %s', self.podcasts)
+
         podcast1 = self.podcasts.pop(0)
+        logger.info('Merge target: %s', podcast1)
 
         self.merge_episodes()
 
         for podcast2 in self.podcasts:
+            logger.info('Merging %s into target', podcast2)
             self.merge_states(podcast1, podcast2)
             self.reassign_episodes(podcast1, podcast2)
             self._merge_objs(podcast1=podcast1, podcast2=podcast2)
@@ -104,6 +111,9 @@ class PodcastMerger(object):
         e.save()
 
     def reassign_episodes(self, podcast1, podcast2):
+
+        logger.info('Re-assigning episodes of %s into %s', podcast2, podcast1)
+
         # re-assign episodes to new podcast
         # if necessary, they will be merged later anyway
         for e in episodes_for_podcast_uncached(podcast2):
@@ -125,6 +135,9 @@ class PodcastMerger(object):
         key = lambda x: x.user
         states1 = sorted(all_podcast_states(podcast1), key=key)
         states2 = sorted(all_podcast_states(podcast2), key=key)
+
+        logger.info('Merging %d podcast states of %s into %s', len(states2),
+            podcast2, podcast1)
 
         for state, state2 in utils.iterate_together([states1, states2], key):
 
@@ -161,6 +174,9 @@ class EpisodeMerger(object):
         self.actions = actions
 
     def merge(self):
+
+        logger.info('Merging episode %s into %s', self.episode2, self.episode1)
+
         self._merge_objs(episode1=self.episode1, episode2=self.episode2)
         self.merge_states(self.episode1, self.episode2)
         self._delete(e=self.episode2)
@@ -190,6 +206,9 @@ class EpisodeMerger(object):
         key = lambda x: x.user
         states1 = sorted(all_episode_states(self.episode1), key=key)
         states2 = sorted(all_episode_states(self.episode2), key=key)
+
+        logger.info('Merging %d episode states of %s into %s', len(states2),
+                        episode2, episode)
 
         for state, state2 in utils.iterate_together([states1, states2], key):
 
