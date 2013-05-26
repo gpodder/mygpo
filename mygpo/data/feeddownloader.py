@@ -318,7 +318,7 @@ class PodcastUpdater(object):
 
         except (urllib2.HTTPError, urllib2.URLError, ValueError,
                 httplib.BadStatusLine) as e:
-            logger.exception('Exception while updating podcast')
+            logger.warn('Exception while updating podcast: %s', str(e))
 
 
     @repeat_on_conflict(['podcast'])
