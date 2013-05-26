@@ -57,6 +57,9 @@ All responses are valid JSON (unless otherwise stated).
 Error messages
 --------------
 
+TODO: review `Problem Details for HTTP APIs
+<http://tools.ietf.org/html/draft-nottingham-http-problem>`_
+
 An error response looks like ::
 
     { message: "message", errors: [...] }
