@@ -29,6 +29,8 @@ from django.views.generic.base import View
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import last_modified
 
+import logging
+logger = logging.getLogger(__name__)
 
 LOGO_DIR = os.path.join(settings.BASE_DIR, '..', 'htdocs', 'media', 'logo')
 
@@ -73,8 +75,9 @@ class CoverArt(View):
             im.thumbnail((size, size), Image.ANTIALIAS)
             resized = im
         except IOError as ex:
-            print ex
             # raised when trying to read an interlaced PNG;
+            logger.warn('Could not create thumbnail: %s', str(ex))
+
             # we use the original instead
             return self.send_file(original)
 
