@@ -25,6 +25,11 @@ If you are on a Debian/Ubuntu system, do:
 
     [ install couchdb 1.2.0 from source ]
 
+For creating logo thumbnails, install libraries for the various image formats.
+They are used by the pillow library.
+
+    sudo apt-get install libjpeg-dev zlib1g-dev libpng12-dev
+
 Select a cozy place for the mygpo sources and clone it:
 
     git clone git://github.com/gpodder/mygpo.git

@@ -21,8 +21,7 @@ from datetime import datetime
 from glob import glob
 import errno
 
-import Image
-import ImageDraw
+from PIL import Image, ImageDraw
 
 from django.conf import settings
 from django.http import Http404, HttpResponse
