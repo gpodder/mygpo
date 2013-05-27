@@ -548,17 +548,3 @@ class PodcastGroup(Document, SlugMixin, OldIdMixin):
             return '%s %s (%s)' % (self.__class__.__name__, self._id[:10], self.oldid)
         else:
             return '%s %s' % (self.__class__.__name__, self._id[:10])
-
-
-
-class SanitizingRule(Document):
-    slug        = StringProperty()
-    applies_to  = StringListProperty()
-    search      = StringProperty()
-    replace     = StringProperty()
-    priority    = IntegerProperty()
-    description = StringProperty()
-
-
-    def __repr__(self):
-        return 'SanitizingRule %s' % self._id

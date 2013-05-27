@@ -1,6 +1,5 @@
-from mygpo.utils import is_url
+from mygpo.utils import is_url, normalize_feed_url
 from mygpo.data.feeddownloader import PodcastUpdater, NoPodcastCreated
-from mygpo.api.sanitizing import sanitize_url
 from mygpo.cache import cache_result
 from mygpo.db.couchdb.podcast import podcast_for_url, search
 
@@ -9,7 +8,7 @@ from mygpo.db.couchdb.podcast import podcast_for_url, search
 def search_podcasts(q, limit=20, skip=0):
 
     if is_url(q):
-        url = sanitize_url(q)
+        url = normalize_feed_url(q)
 
         podcast = podcast_for_url(url, create=False)
 

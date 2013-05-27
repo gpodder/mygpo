@@ -183,17 +183,6 @@ Doc-Types: Podcast, PodcastGroup, PodcastSubscriberData
 * `podcasts/subscriber_data <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/podcasts/views/subscriber_data>`_
 
 
-Sanitizing Rules
-^^^^^^^^^^^^^^^^
-
-Doc-Types: SanitizingRule
-
-**Views**
-
-* `sanitizing_rules/by_slug <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/sanitizing_rules/views/by_slug>`_
-* `sanitizing_rules/by_target <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/sanitizing_rules/views/by_target>`_
-
-
 Slugs
 ^^^^^
 

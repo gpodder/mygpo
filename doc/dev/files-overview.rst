@@ -39,8 +39,6 @@ The ``mygpo`` project consists of the following files ::
       management/commands/merge-episode-states.py              # merges duplicates of episodes states
       management/commands/move-subscriber-data.py              # moves subscriber data from podcasts into separate objects
       management/commands/import-episode-actions.py            # imports episode actions from files
-      management/commands/sync-sanitizing-rules.py             # synchronizes sanitizing rules to the database
-      management/commands/delete-sanitizing-rules.py           # deletes sanitizing rules
 
     data/                                                      # stuff related to podcast and episode data
       youtube.py                                               # utils for accessing YouTube data
@@ -98,7 +96,6 @@ The ``mygpo`` project consists of the following files ::
       basic_auth.py
       httpresponse.py
       simple.py
-      sanitizing.py
       tasks.py
       advanced/auth.py
       advanced/sync.py
@@ -108,7 +105,6 @@ The ``mygpo`` project consists of the following files ::
       advanced/episode.py
       advanced/directory.py
       management/commands/__init__.py
-      management/commands/sanitizing-maintenance.py
       management/__init__.py
 
     directory/

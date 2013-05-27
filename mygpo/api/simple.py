@@ -37,13 +37,12 @@ from mygpo.core.models import Podcast
 from mygpo.users.models import Suggestions
 from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
-from mygpo.api.sanitizing import sanitize_urls
 from mygpo.directory.toplist import PodcastToplist
 from mygpo.directory.models import ExamplePodcasts
 from mygpo.api.advanced.directory import podcast_data
 from mygpo.directory.search import search_podcasts
 from mygpo.decorators import allowed_methods
-from mygpo.utils import parse_range
+from mygpo.utils import parse_range, normalize_feed_url
 from mygpo.core.json import json, JSONDecodeError
 from mygpo.db.couchdb import BulkException
 from mygpo.db.couchdb.podcast import podcasts_by_id
@@ -201,7 +200,7 @@ def parse_subscription(raw_post_data, format):
         return []
 
 
-    urls = sanitize_urls(urls)
+    urls = map(normalize_feed_url, urls)
     urls = filter(None, urls)
     urls = set(urls)
     return urls

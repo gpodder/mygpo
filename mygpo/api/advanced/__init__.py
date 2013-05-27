@@ -38,14 +38,12 @@ from django.conf import settings as dsettings
 
 from mygpo.api.constants import EPISODE_ACTION_TYPES, DEVICE_TYPES
 from mygpo.api.httpresponse import JsonResponse
-from mygpo.api.sanitizing import sanitize_url, sanitize_urls
 from mygpo.api.advanced.directory import episode_data, podcast_data
 from mygpo.api.backend import get_device, BulkSubscribe
 from mygpo.utils import parse_time, format_time, parse_bool, get_timestamp, \
-    parse_request_body
+    parse_request_body, normalize_feed_url
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.core import models
-from mygpo.core.models import SanitizingRule, Podcast
 from mygpo.core.tasks import auto_flattr_episode
 from mygpo.users.models import PodcastUserState, EpisodeAction, \
      EpisodeUserState, DeviceDoesNotExist, DeviceUIDException, \
@@ -139,8 +137,8 @@ def update_subscriptions(user, device, add, remove):
         if a in remove:
             raise ValueError('can not add and remove %s at the same time' % a)
 
-    add_s = list(sanitize_urls(add, 'podcast'))
-    rem_s = list(sanitize_urls(remove, 'podcast'))
+    add_s = map(normalize_feed_url, add)
+    rem_s = map(normalize_feed_url, remove)
 
     assert len(add) == len(add_s) and len(remove) == len(rem_s)
 
@@ -361,12 +359,12 @@ def update_episodes(user, actions, now, ua_string):
     for action in actions:
 
         podcast_url = action['podcast']
-        podcast_url = sanitize_append(podcast_url, 'podcast', update_urls)
+        podcast_url = sanitize_append(podcast_url, update_urls)
         if podcast_url == '':
             continue
 
         episode_url = action['episode']
-        episode_url = sanitize_append(episode_url, 'episode', update_urls)
+        episode_url = sanitize_append(episode_url, update_urls)
         if episode_url == '':
             continue
 
@@ -641,8 +639,8 @@ def favorites(request, username):
     return JsonResponse(ret)
 
 
-def sanitize_append(url, obj_type, sanitized_list):
-    urls = sanitize_url(url, obj_type)
+def sanitize_append(url, sanitized_list):
+    urls = normalize_feed_url(url)
     if url != urls:
-        sanitized_list.append( (url, urls) )
+        sanitized_list.append( (url, urls or '') )
     return urls

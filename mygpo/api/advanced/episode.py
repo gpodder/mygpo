@@ -27,10 +27,9 @@ from django.views.decorators.cache import never_cache
 from mygpo.core import models
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.exceptions import ParameterMissing
-from mygpo.api.sanitizing import sanitize_url
 from mygpo.api.backend import get_device
 from mygpo.users.models import Chapter
-from mygpo.utils import parse_time, parse_request_body
+from mygpo.utils import parse_time, parse_request_body, normalize_feed_url
 from mygpo.decorators import allowed_methods
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.db.couchdb.episode import episode_for_podcast_url
@@ -61,16 +60,16 @@ def chapters(request, username):
         update_urls = []
 
         # podcast sanitizing
-        s_podcast_url = sanitize_url(podcast_url)
+        s_podcast_url = normalize_feed_url(podcast_url)
         if s_podcast_url != podcast_url:
             req['podcast'] = s_podcast_url
-            update_urls.append((podcast_url, s_podcast_url))
+            update_urls.append((podcast_url, s_podcast_url or ''))
 
         # episode sanitizing
-        s_episode_url = sanitize_url(episode_url, 'episode')
+        s_episode_url = normalize_feed_url(episode_url, 'episode')
         if s_episode_url != episode_url:
             req['episode'] = s_episode_url
-            update_urls.append((episode_url, s_episode_url))
+            update_urls.append((episode_url, s_episode_url or ''))
 
         if (s_podcast_url != '') and (s_episode_url != ''):
             try:
@@ -99,8 +98,8 @@ def chapters(request, username):
         except ValueError:
             return HttpResponseBadRequest('since-value is not a valid timestamp')
 
-        podcast_url = sanitize_url(podcast_url)
-        episode_url = sanitize_url(episode_url, 'episode')
+        podcast_url = normalize_feed_url(podcast_url)
+        episode_url = normalize_feed_url(episode_url)
         episode = episode_for_podcast_url(podcast_url, episode_url)
 
         if episode is None:
@@ -137,8 +136,8 @@ def chapters(request, username):
 
 
 def update_chapters(req, user):
-    podcast_url = sanitize_url(req['podcast'])
-    episode_url = sanitize_url(req['episode'], 'episode')
+    podcast_url = normalize_feed_url(req['podcast'])
+    episode_url = normalize_feed_url(req['episode'])
 
     episode = episode_for_podcast_url(podcast_url, episode_url,
             create=True)

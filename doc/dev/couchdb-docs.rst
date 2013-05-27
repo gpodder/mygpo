@@ -272,23 +272,6 @@ Example Document ::
     }
 
 
-SanitizingRule
---------------
-
-Contains a URL Sanitizing Rule.
-
-Example Document ::
-
-    {
-        slug:         "feedburner-feeds2",
-        applies_to:   ["podcast", "episode"],
-        search:       "http://feeds2\.feedburner\.com",
-        replace_by:   "http://feeds.feedburner.com",
-        descriptions: "Replace {feeds2 => feeds}.feedburner.com",
-        priority:     100,
-    }
-
-
 Category
 --------
 

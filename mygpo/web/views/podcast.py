@@ -13,7 +13,7 @@ from django.views.decorators.cache import never_cache, cache_control
 from mygpo.core.models import PodcastGroup, SubscriptionException
 from mygpo.core.proxy import proxy_object
 from mygpo.core.tasks import flattr_thing
-from mygpo.api.sanitizing import sanitize_url
+from mygpo.utils import normalize_feed_url
 from mygpo.users.settings import PUBLIC_SUB_PODCAST, FLATTR_TOKEN
 from mygpo.users.models import HistoryEntry, DeviceDoesNotExist, SubscriptionAction
 from mygpo.web.forms import SyncForm
@@ -319,9 +319,9 @@ def subscribe_url(request):
     if not url:
         raise Http404('http://my.gpodder.org/subscribe?url=http://www.example.com/podcast.xml')
 
-    url = sanitize_url(url)
+    url = normalize_feed_url(url)
 
-    if url == '':
+    if not url:
         raise Http404('Please specify a valid url')
 
     podcast = podcast_for_url(url, create=True)

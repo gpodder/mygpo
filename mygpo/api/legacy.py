@@ -22,12 +22,12 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 
-from mygpo.api.sanitizing import sanitize_urls
 from mygpo.users.models import User
 from mygpo.api.opml import Importer, Exporter
 from mygpo.core.models import Podcast, SubscriptionException
 from mygpo.api.backend import get_device
 from mygpo.db.couchdb.podcast import podcast_for_url
+from mygpo.utils import normalize_feed_url
 
 import logging
 logger = logging.getLogger(__name__)
@@ -60,8 +60,8 @@ def upload(request):
     i = Importer(opml)
 
     podcast_urls = [p['url'] for p in i.items]
-    podcast_urls = sanitize_urls(podcast_urls)
-    podcast_urls = filter(lambda x: x, podcast_urls)
+    podcast_urls = map(normalize_feed_url, podcast_urls)
+    podcast_urls = filter(None, podcast_urls)
 
     new = [u for u in podcast_urls if u not in existing_urls]
     rem = [u for e in existing_urls if u not in podcast_urls]
