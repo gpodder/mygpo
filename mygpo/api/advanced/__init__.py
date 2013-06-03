@@ -19,6 +19,7 @@ from functools import partial
 from itertools import imap, chain
 from collections import defaultdict, namedtuple
 from datetime import datetime
+from importlib import import_module
 
 import dateutil.parser
 
@@ -33,23 +34,22 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 from django.utils.decorators import method_decorator
 from django.views.generic.base import View
+from django.conf import settings as dsettings
 
 from mygpo.api.constants import EPISODE_ACTION_TYPES, DEVICE_TYPES
 from mygpo.api.httpresponse import JsonResponse
-from mygpo.api.sanitizing import sanitize_url, sanitize_urls
 from mygpo.api.advanced.directory import episode_data, podcast_data
 from mygpo.api.backend import get_device, BulkSubscribe
-from mygpo.log import log
-from mygpo.utils import parse_time, format_time, parse_bool, get_timestamp
+from mygpo.utils import parse_time, format_time, parse_bool, get_timestamp, \
+    parse_request_body, normalize_feed_url
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.core import models
-from mygpo.core.models import SanitizingRule, Podcast
 from mygpo.core.tasks import auto_flattr_episode
 from mygpo.users.models import PodcastUserState, EpisodeAction, \
      EpisodeUserState, DeviceDoesNotExist, DeviceUIDException, \
      InvalidEpisodeActionAttributes
 from mygpo.users.settings import FLATTR_AUTO
-from mygpo.core.json import json, JSONDecodeError
+from mygpo.core.json import JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.db.couchdb import BulkException, bulk_save_retry
 from mygpo.db.couchdb.episode import episode_by_id, \
@@ -58,6 +58,10 @@ from mygpo.db.couchdb.podcast import podcast_for_url
 from mygpo.db.couchdb.podcast_state import subscribed_podcast_ids_by_device
 from mygpo.db.couchdb.episode_state import get_podcasts_episode_states, \
          episode_state_for_ref_urls, get_episode_actions
+
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 # keys that are allowed in episode actions
@@ -101,7 +105,15 @@ def subscriptions(request, username, device_uid):
         if not request.body:
             return HttpResponseBadRequest('POST data must not be empty')
 
-        actions = json.loads(request.body)
+        try:
+            actions = parse_request_body(request)
+        except (JSONDecodeError, UnicodeDecodeError, ValueError) as e:
+            msg = (u'Could not decode subscription update POST data for ' +
+                   'user %s: %s') % (username,
+                   request.body.decode('ascii', errors='replace'))
+            logger.exception(msg)
+            return HttpResponseBadRequest(msg)
+
         add = actions['add'] if 'add' in actions else []
         rem = actions['remove'] if 'remove' in actions else []
 
@@ -125,8 +137,8 @@ def update_subscriptions(user, device, add, remove):
         if a in remove:
             raise ValueError('can not add and remove %s at the same time' % a)
 
-    add_s = list(sanitize_urls(add, 'podcast'))
-    rem_s = list(sanitize_urls(remove, 'podcast'))
+    add_s = map(normalize_feed_url, add)
+    rem_s = map(normalize_feed_url, remove)
 
     assert len(add) == len(add_s) and len(remove) == len(rem_s)
 
@@ -151,7 +163,7 @@ def update_subscriptions(user, device, add, remove):
         subscriber.execute()
     except BulkException as be:
         for err in be.errors:
-            log('Advanced API: %(username)s: Updating subscription for '
+            loger.error('Advanced API: %(username)s: Updating subscription for '
                     '%(podcast_url)s on %(device_uid)s failed: '
                     '%(rerror)s (%(reason)s)'.format(username=user.username,
                         podcast_url=err.doc, device_uid=device.uid,
@@ -181,23 +193,42 @@ def episodes(request, username, version=1):
 
     if request.method == 'POST':
         try:
-            actions = json.loads(request.body)
-        except (JSONDecodeError, UnicodeDecodeError) as e:
-            msg = 'Advanced API: could not decode episode update POST data for user %s: %s' % (username, e)
-            log(msg)
+            actions = parse_request_body(request)
+        except (JSONDecodeError, UnicodeDecodeError, ValueError) as e:
+            msg = ('Could not decode episode update POST data for ' +
+                   'user %s: %s') % (username,
+                   request.body.decode('ascii', errors='replace'))
+            logger.exception(msg)
             return HttpResponseBadRequest(msg)
+
+        logger.info('start: user %s: %d actions from %s' % (request.user._id, len(actions), ua_string))
+
+        # handle in background
+        if len(actions) > dsettings.API_ACTIONS_MAX_NONBG:
+            bg_handler = dsettings.API_ACTIONS_BG_HANDLER
+            if bg_handler is not None:
+
+                modname, funname = bg_handler.rsplit('.', 1)
+                mod = import_module(modname)
+                fun = getattr(mod, funname)
+
+                fun(request.user, actions, now, ua_string)
+
+                # TODO: return 202 Accepted
+                return JsonResponse({'timestamp': now_, 'update_urls': []})
+
 
         try:
             update_urls = update_episodes(request.user, actions, now, ua_string)
         except DeviceUIDException as e:
-            import traceback
-            log('could not update episodes for user %s: %s %s: %s' % (username, e, traceback.format_exc(), actions))
-            return HttpResponseBadRequest(str(e))
-        except InvalidEpisodeActionAttributes as e:
-            import traceback
-            log('could not update episodes for user %s: %s %s: %s' % (username, e, traceback.format_exc(), actions))
+            logger.warn('invalid device UID while uploading episode actions for user %s', username)
             return HttpResponseBadRequest(str(e))
 
+        except InvalidEpisodeActionAttributes as e:
+            logger.exception('invalid episode action attributes while uploading episode actions for user %s: %s' % (username,))
+            return HttpResponseBadRequest(str(e))
+
+        logger.info('done:  user %s: %d actions from %s' % (request.user._id, len(actions), ua_string))
         return JsonResponse({'timestamp': now_, 'update_urls': update_urls})
 
     elif request.method == 'GET':
@@ -328,12 +359,12 @@ def update_episodes(user, actions, now, ua_string):
     for action in actions:
 
         podcast_url = action['podcast']
-        podcast_url = sanitize_append(podcast_url, 'podcast', update_urls)
+        podcast_url = sanitize_append(podcast_url, update_urls)
         if podcast_url == '':
             continue
 
         episode_url = action['episode']
-        episode_url = sanitize_append(episode_url, 'episode', update_urls)
+        episode_url = sanitize_append(episode_url, update_urls)
         if episode_url == '':
             continue
 
@@ -416,7 +447,14 @@ def device(request, username, device_uid):
     d = get_device(request.user, device_uid,
             request.META.get('HTTP_USER_AGENT', ''))
 
-    data = json.loads(request.body)
+    try:
+        data = parse_request_body(request)
+    except (JSONDecodeError, UnicodeDecodeError, ValueError) as e:
+        msg = ('Could not decode device update POST data for ' +
+               'user %s: %s') % (username,
+               request.body.decode('ascii', errors='replace'))
+        logger.exception(msg)
+        return HttpResponseBadRequest(msg)
 
     if 'caption' in data:
         if not data['caption']:
@@ -601,8 +639,8 @@ def favorites(request, username):
     return JsonResponse(ret)
 
 
-def sanitize_append(url, obj_type, sanitized_list):
-    urls = sanitize_url(url, obj_type)
+def sanitize_append(url, sanitized_list):
+    urls = normalize_feed_url(url)
     if url != urls:
-        sanitized_list.append( (url, urls) )
+        sanitized_list.append( (url, urls or '') )
     return urls

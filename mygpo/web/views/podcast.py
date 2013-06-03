@@ -13,13 +13,12 @@ from django.views.decorators.cache import never_cache, cache_control
 from mygpo.core.models import PodcastGroup, SubscriptionException
 from mygpo.core.proxy import proxy_object
 from mygpo.core.tasks import flattr_thing
-from mygpo.api.sanitizing import sanitize_url
+from mygpo.utils import normalize_feed_url
 from mygpo.users.settings import PUBLIC_SUB_PODCAST, FLATTR_TOKEN
 from mygpo.users.models import HistoryEntry, DeviceDoesNotExist, SubscriptionAction
 from mygpo.web.forms import SyncForm
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.web.utils import get_podcast_link_target, get_page_list
-from mygpo.log import log
 from mygpo.db.couchdb.episode import episodes_for_podcast
 from mygpo.db.couchdb.podcast import podcast_for_slug, podcast_for_slug_id, \
          podcast_for_oldid, podcast_for_url
@@ -28,6 +27,9 @@ from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast, \
 from mygpo.db.couchdb.episode_state import get_podcasts_episode_states, \
          episode_listener_counts
 from mygpo.db.couchdb.directory import tags_for_user, tags_for_podcast
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 MAX_TAGS_ON_PAGE=50
@@ -298,12 +300,13 @@ def unsubscribe(request, podcast, device_uid):
 
     except DeviceDoesNotExist as e:
         messages.error(request, str(e))
+        return HttpResponseRedirect(return_to)
 
     try:
         podcast.unsubscribe(request.user, device)
     except SubscriptionException as e:
-        log('Web: %(username)s: could not unsubscribe from podcast %(podcast_url)s on device %(device_id)s: %(exception)s' %
-            {'username': request.user.username, 'podcast_url': podcast.url, 'device_id': device.id, 'exception': e})
+        logger.exception('Web: %(username)s: could not unsubscribe from podcast %(podcast_url)s on device %(device_id)s' %
+            {'username': request.user.username, 'podcast_url': podcast.url, 'device_id': device.id})
 
     return HttpResponseRedirect(return_to)
 
@@ -316,9 +319,9 @@ def subscribe_url(request):
     if not url:
         raise Http404('http://my.gpodder.org/subscribe?url=http://www.example.com/podcast.xml')
 
-    url = sanitize_url(url)
+    url = normalize_feed_url(url)
 
-    if url == '':
+    if not url:
         raise Http404('Please specify a valid url')
 
     podcast = podcast_for_url(url, create=True)

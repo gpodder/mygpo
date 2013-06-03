@@ -58,6 +58,9 @@ COUCHDB_DATABASES = {
     'mygpo.maintenance':
         {'URL': 'http://127.0.0.1:5984/mygpo'},
 
+    'mygpo.pubsub':
+        {'URL': 'http://127.0.0.1:5984/mygpo_pubsub'},
+
     'django_couchdb_utils_auth':
         {'URL': 'http://127.0.0.1:5984/mygpo'},
 
@@ -71,7 +74,6 @@ COUCHDB_DATABASES = {
         {'URL': 'http://127.0.0.1:5984/mygpo_categories'},
 }
 
-
 # Maps design documents to databases. The keys correspond to the directories in
 # mygpo/couch/, the values are the app labels which are mapped to the actual
 # databases in COUCHDB_DATABASES. This indirect mapping is used because
@@ -80,8 +82,8 @@ COUCHDB_DATABASES = {
 COUCHDB_DDOC_MAPPING = {
     'general':    'core',
     'categories': 'categories',
+    'pubsub':     'pubsub',
 }
-
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -148,6 +150,7 @@ INSTALLED_APPS = (
     'mygpo.maintenance',
     'mygpo.share',
     'mygpo.admin',
+    'mygpo.pubsub',
     'mygpo.db.couchdb',
 )
 
@@ -200,12 +203,57 @@ MAINTENANCE = os.path.exists(os.path.join(BASE_DIR, 'MAINTENANCE'))
 
 EMAIL_BACKEND = 'django_couchdb_utils.email.backends.CouchDBEmailBackend'
 
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'verbose': {
+            'format': '%(asctime)s %(name)s %(levelname)s %(message)s',
+        },
+    },
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        },
+    },
+    'handlers': {
+        'console':{
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler'
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'propagate': True,
+            'level': 'WARN',
+        },
+        'mygpo': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+    },
+}
+
 # minimum number of subscribers a podcast must have to be assigned a slug
 PODCAST_SLUG_SUBSCRIBER_LIMIT = 10
 
 # minimum number of subscribers that a podcast needs to "push" one of its
 # categories to the top
 MIN_SUBSCRIBERS_CATEGORY=10
+
+# maximum number of episode actions that the API processes immediatelly before
+# returning the response. Larger requests will be handled in background.
+# Handler can be set to None to disable
+API_ACTIONS_MAX_NONBG=100
+API_ACTIONS_BG_HANDLER='mygpo.api.tasks.episode_actions_celery_handler'
 
 
 ADSENSE_CLIENT = ''
@@ -224,6 +272,11 @@ FLATTR_MYGPO_THING='https://flattr.com/submit/auto?user_id=stefankoegl&url=http:
 # The User-Agent string used for outgoing HTTP requests
 USER_AGENT = 'gpodder.net (+https://github.com/gpodder/mygpo)'
 
+# Base URL of the website that is used if the actually used parameters is not
+# available.  Request handlers, for example, can access the requested domain.
+# Code that runs in background can not do this, and therefore requires a
+# default value. This should be set to something like 'http://example.com'
+DEFAULT_BASE_URL = ''
 
 
 ### Celery

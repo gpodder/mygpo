@@ -23,6 +23,8 @@ from mygpo.users.settings import FAV_FLAG, PUBLIC_SUB_PODCAST, SettingsMixin
 from mygpo.db.couchdb.podcast import podcasts_by_id, podcasts_to_dict
 from mygpo.db.couchdb.user import user_history, device_history
 
+# make sure this code is executed at startup
+from mygpo.users.signals import *
 
 
 RE_DEVICE_UID = re.compile(r'^[\w.-]+$')

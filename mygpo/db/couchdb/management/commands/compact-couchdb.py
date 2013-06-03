@@ -11,7 +11,6 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 
 from mygpo.decorators import repeat_on_conflict
-from mygpo.core.models import SanitizingRule
 from mygpo.utils import progress
 
 

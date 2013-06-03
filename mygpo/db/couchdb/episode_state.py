@@ -97,6 +97,7 @@ def podcast_listener_count(episode):
             group       = True,
             group_level = 1,
             reduce      = True,
+            stale       = 'update_after',
         )
     return r.first()['value'] if r else 0
 
@@ -120,6 +121,7 @@ def podcast_listener_count_timespan(podcast, start=None, end={}):
             group       = True,
             group_level = 2,
             reduce      = True,
+            stale       = 'update_after',
         )
 
     return map(_wrap_listener_count, r)
@@ -139,6 +141,7 @@ def episode_listener_counts(episode):
             group       = True,
             group_level = 2,
             reduce      = True,
+            stale       = 'update_after',
         )
 
     return map(_wrap_listeners, r)
@@ -179,6 +182,7 @@ def episode_listener_count(episode, start=None, end={}):
             group       = True,
             group_level = 2,
             reduce      = True,
+            stale       = 'update_after',
         )
     return r.first()['value'] if r else 0
 
@@ -204,6 +208,7 @@ def episode_listener_count_timespan(episode, start=None, end={}):
             group       = True,
             group_level = 3,
             reduce      = True,
+            stale       = 'update_after',
         )
 
     return map(_wrap_listener_count, r)

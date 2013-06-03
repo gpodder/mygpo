@@ -15,6 +15,8 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+import functools
+import types
 import subprocess
 import os
 import operator
@@ -27,8 +29,11 @@ import hashlib
 import urlparse
 import urllib
 import urllib2
+import zlib
 
 from django.conf import settings
+
+from mygpo.core.json import json
 
 
 def daterange(from_date, to_date=None, leap=timedelta(days=1)):
@@ -206,11 +211,13 @@ def iterate_together(lists, key=lambda x: x, reverse=False):
 
 def progress(val, max_val, status_str='', max_width=50, stream=sys.stdout):
 
+    factor = float(val)/max_val if max_val > 0 else 0
+
     # progress as percentage
-    percentage_str = '{val:.2%}'.format(val=float(val)/max_val)
+    percentage_str = '{val:.2%}'.format(val=factor)
 
     # progress bar filled with #s
-    factor = min(int(float(val)/max_val*max_width), max_width)
+    factor = min(int(factor*max_width), max_width)
     progress_str = '#' * factor + ' ' * (max_width-factor)
 
     #insert percentage into bar
@@ -734,3 +741,244 @@ def get_git_head():
     commit = outs[0]
     msg = ' ' .join(outs[1:])
     return commit, msg
+
+
+
+# https://gist.github.com/samuraisam/901117
+
+default_fudge = timedelta(seconds=0, microseconds=0, days=0)
+
+def deep_eq(_v1, _v2, datetime_fudge=default_fudge, _assert=False):
+  """
+  Tests for deep equality between two python data structures recursing
+  into sub-structures if necessary. Works with all python types including
+  iterators and generators. This function was dreampt up to test API responses
+  but could be used for anything. Be careful. With deeply nested structures
+  you may blow the stack.
+
+  Options:
+            datetime_fudge => this is a datetime.timedelta object which, when
+                              comparing dates, will accept values that differ
+                              by the number of seconds specified
+            _assert        => passing yes for this will raise an assertion error
+                              when values do not match, instead of returning
+                              false (very useful in combination with pdb)
+
+  Doctests included:
+
+  >>> x1, y1 = ({'a': 'b'}, {'a': 'b'})
+  >>> deep_eq(x1, y1)
+  True
+  >>> x2, y2 = ({'a': 'b'}, {'b': 'a'})
+  >>> deep_eq(x2, y2)
+  False
+  >>> x3, y3 = ({'a': {'b': 'c'}}, {'a': {'b': 'c'}})
+  >>> deep_eq(x3, y3)
+  True
+  >>> x4, y4 = ({'c': 't', 'a': {'b': 'c'}}, {'a': {'b': 'n'}, 'c': 't'})
+  >>> deep_eq(x4, y4)
+  False
+  >>> x5, y5 = ({'a': [1,2,3]}, {'a': [1,2,3]})
+  >>> deep_eq(x5, y5)
+  True
+  >>> x6, y6 = ({'a': [1,'b',8]}, {'a': [2,'b',8]})
+  >>> deep_eq(x6, y6)
+  False
+  >>> x7, y7 = ('a', 'a')
+  >>> deep_eq(x7, y7)
+  True
+  >>> x8, y8 = (['p','n',['asdf']], ['p','n',['asdf']])
+  >>> deep_eq(x8, y8)
+  True
+  >>> x9, y9 = (['p','n',['asdf',['omg']]], ['p', 'n', ['asdf',['nowai']]])
+  >>> deep_eq(x9, y9)
+  False
+  >>> x10, y10 = (1, 2)
+  >>> deep_eq(x10, y10)
+  False
+  >>> deep_eq((str(p) for p in xrange(10)), (str(p) for p in xrange(10)))
+  True
+  >>> str(deep_eq(range(4), range(4)))
+  'True'
+  >>> deep_eq(xrange(100), xrange(100))
+  True
+  >>> deep_eq(xrange(2), xrange(5))
+  False
+  >>> from datetime import datetime, timedelta
+  >>> d1, d2 = (datetime.now(), datetime.now() + timedelta(seconds=4))
+  >>> deep_eq(d1, d2)
+  False
+  >>> deep_eq(d1, d2, datetime_fudge=timedelta(seconds=5))
+  True
+  """
+  _deep_eq = functools.partial(deep_eq, datetime_fudge=datetime_fudge,
+                               _assert=_assert)
+
+  def _check_assert(R, a, b, reason=''):
+    if _assert and not R:
+      assert 0, "an assertion has failed in deep_eq (%s) %s != %s" % (
+        reason, str(a), str(b))
+    return R
+
+  def _deep_dict_eq(d1, d2):
+    k1, k2 = (sorted(d1.keys()), sorted(d2.keys()))
+    if k1 != k2: # keys should be exactly equal
+      return _check_assert(False, k1, k2, "keys")
+
+    return _check_assert(operator.eq(sum(_deep_eq(d1[k], d2[k])
+                                       for k in k1),
+                                     len(k1)), d1, d2, "dictionaries")
+
+  def _deep_iter_eq(l1, l2):
+    if len(l1) != len(l2):
+      return _check_assert(False, l1, l2, "lengths")
+    return _check_assert(operator.eq(sum(_deep_eq(v1, v2)
+                                      for v1, v2 in zip(l1, l2)),
+                                     len(l1)), l1, l2, "iterables")
+
+  def op(a, b):
+    _op = operator.eq
+    if type(a) == datetime and type(b) == datetime:
+      s = datetime_fudge.seconds
+      t1, t2 = (time.mktime(a.timetuple()), time.mktime(b.timetuple()))
+      l = t1 - t2
+      l = -l if l > 0 else l
+      return _check_assert((-s if s > 0 else s) <= l, a, b, "dates")
+    return _check_assert(_op(a, b), a, b, "values")
+
+  c1, c2 = (_v1, _v2)
+
+  # guard against strings because they are iterable and their
+  # elements yield iterables infinitely.
+  # I N C E P T I O N
+  for t in types.StringTypes:
+    if isinstance(_v1, t):
+      break
+  else:
+    if isinstance(_v1, types.DictType):
+      op = _deep_dict_eq
+    else:
+      try:
+        c1, c2 = (list(iter(_v1)), list(iter(_v2)))
+      except TypeError:
+        c1, c2 = _v1, _v2
+      else:
+        op = _deep_iter_eq
+
+  return op(c1, c2)
+
+
+def parse_request_body(request):
+    """ returns the parsed request body, handles gzip encoding """
+
+    raw_body = request.body
+    content_enc = request.META.get('HTTP_CONTENT_ENCODING')
+
+    if content_enc == 'gzip':
+        raw_body = zlib.decompress(raw_body)
+
+    return json.loads(raw_body)
+
+
+def normalize_feed_url(url):
+    """
+    Converts any URL to http:// or ftp:// so that it can be
+    used with "wget". If the URL cannot be converted (invalid
+    or unknown scheme), "None" is returned.
+
+    This will also normalize feed:// and itpc:// to http://.
+
+    >>> normalize_feed_url('itpc://example.org/podcast.rss')
+    'http://example.org/podcast.rss'
+
+    If no URL scheme is defined (e.g. "curry.com"), we will
+    simply assume the user intends to add a http:// feed.
+
+    >>> normalize_feed_url('curry.com')
+    'http://curry.com/'
+
+    There are even some more shortcuts for advanced users
+    and lazy typists (see the source for details).
+
+    >>> normalize_feed_url('fb:43FPodcast')
+    'http://feeds.feedburner.com/43FPodcast'
+
+    It will also take care of converting the domain name to
+    all-lowercase (because domains are not case sensitive):
+
+    >>> normalize_feed_url('http://Example.COM/')
+    'http://example.com/'
+
+    Some other minimalistic changes are also taken care of,
+    e.g. a ? with an empty query is removed:
+
+    >>> normalize_feed_url('http://example.org/test?')
+    'http://example.org/test'
+
+    Leading and trailing whitespace is removed
+
+    >>> normalize_feed_url(' http://example.com/podcast.rss ')
+    'http://example.com/podcast.rss'
+
+    HTTP Authentication is removed to protect users' privacy
+
+    >>> normalize_feed_url('http://a@b:c@host.com/')
+    'http://host.com/'
+    >>> normalize_feed_url('ftp://a:b:c@host.com/')
+    'ftp://host.com/'
+    >>> normalize_feed_url('http://i%2Fo:P%40ss%3A@host.com/')
+    'http://host.com/'
+    >>> normalize_feed_url('ftp://%C3%B6sterreich@host.com/')
+    'ftp://host.com/'
+    >>> normalize_feed_url('http://w%20x:y%20z@example.org/')
+    'http://example.org/'
+    >>> normalize_feed_url('http://example.com/x@y:z@test.com/')
+    'http://example.com/x@y:z@test.com/'
+    """
+    url = url.strip()
+    if not url or len(url) < 8:
+        return None
+
+    # This is a list of prefixes that you can use to minimize the amount of
+    # keystrokes that you have to use.
+    # Feel free to suggest other useful prefixes, and I'll add them here.
+    PREFIXES = {
+            'fb:': 'http://feeds.feedburner.com/%s',
+            'yt:': 'http://www.youtube.com/rss/user/%s/videos.rss',
+            'sc:': 'http://soundcloud.com/%s',
+            'fm4od:': 'http://onapp1.orf.at/webcam/fm4/fod/%s.xspf',
+            # YouTube playlists. To get a list of playlists per-user, use:
+            # https://gdata.youtube.com/feeds/api/users/<username>/playlists
+            'ytpl:': 'http://gdata.youtube.com/feeds/api/playlists/%s',
+    }
+
+    for prefix, expansion in PREFIXES.iteritems():
+        if url.startswith(prefix):
+            url = expansion % (url[len(prefix):],)
+            break
+
+    # Assume HTTP for URLs without scheme
+    if not '://' in url:
+        url = 'http://' + url
+
+    scheme, netloc, path, query, fragment = urlparse.urlsplit(url)
+
+    # Schemes and domain names are case insensitive
+    scheme, netloc = scheme.lower(), netloc.lower()
+
+    # Remove authentication to protect users' privacy
+    netloc = netloc.rsplit('@', 1)[-1]
+
+    # Normalize empty paths to "/"
+    if path == '':
+        path = '/'
+
+    # feed://, itpc:// and itms:// are really http://
+    if scheme in ('feed', 'itpc', 'itms'):
+        scheme = 'http'
+
+    if scheme not in ('http', 'https', 'ftp', 'file'):
+        return None
+
+    # urlunsplit might return "a slighty different, but equivalent URL"
+    return urlparse.urlunsplit((scheme, netloc, path, query, fragment))

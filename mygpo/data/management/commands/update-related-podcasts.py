@@ -7,7 +7,8 @@ from mygpo.decorators import repeat_on_conflict
 from mygpo.core.models import Podcast
 from mygpo.data.podcast import calc_similar_podcasts
 from mygpo.utils import progress
-from mygpo.db.couchdb.podcast import podcast_count, all_podcasts
+from mygpo.db.couchdb.podcast import podcast_count, all_podcasts, \
+    update_related_podcasts
 
 
 class Command(BaseCommand):
@@ -32,11 +33,6 @@ class Command(BaseCommand):
 
             related = map(get_podcast, l)
 
-            @repeat_on_conflict(['podcast'])
-            def _update(podcast, related):
-                podcast.related_podcasts = related
-                podcast.save()
-
-            _update(podcast=podcast, related=related)
+            update_related_podcasts(podcast, related)
 
             progress(n+1, total)

@@ -16,7 +16,6 @@ from mygpo.core.proxy import DocumentABCMeta
 from mygpo.core.slugs import SlugMixin
 from mygpo.core.oldid import OldIdMixin
 from mygpo.web.logo import CoverArt
-from mygpo.users.tasks import sync_user
 
 # make sure this code is executed at startup
 from mygpo.core.signals import *
@@ -173,6 +172,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
     flattr_url = StringProperty()
     outdated = BooleanProperty(default=False)
     created_timestamp = IntegerProperty()
+    hub = StringProperty()
 
 
 
@@ -321,7 +321,8 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         state.subscribe(device)
         try:
             state.save()
-            sync_user.delay(user)
+            subscription_changed.send(sender=self, user=user, device=device,
+                                      subscribed=True)
         except Unauthorized as ex:
             raise SubscriptionException(ex)
 
@@ -333,7 +334,8 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         state.unsubscribe(device)
         try:
             state.save()
-            sync_user.delay(user)
+            subscription_changed.send(sender=self, user=user, device=device,
+                                      subscribed=False)
         except Unauthorized as ex:
             raise SubscriptionException(ex)
 
@@ -546,17 +548,3 @@ class PodcastGroup(Document, SlugMixin, OldIdMixin):
             return '%s %s (%s)' % (self.__class__.__name__, self._id[:10], self.oldid)
         else:
             return '%s %s' % (self.__class__.__name__, self._id[:10])
-
-
-
-class SanitizingRule(Document):
-    slug        = StringProperty()
-    applies_to  = StringListProperty()
-    search      = StringProperty()
-    replace     = StringProperty()
-    priority    = IntegerProperty()
-    description = StringProperty()
-
-
-    def __repr__(self):
-        return 'SanitizingRule %s' % self._id

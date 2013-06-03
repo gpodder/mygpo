@@ -11,7 +11,9 @@ Resources
 
 The Podcast Lists API defines the following resources ::
 
-    none yet
+    /user/<username>/lists/create
+    /user/<username>/lists
+    /user/<username>/list/<list-name>
 
 
 Creating a Podcast List
@@ -19,8 +21,8 @@ Creating a Podcast List
 
 Create a Podcast List ::
 
-    POST /api/2/lists/<username>/create.<format>?title=<url-encoded title>
-    The list content is sent in the request body, in the format indicates by the format extension
+    POST /user/<username>/lists/create?title=<url-encoded title>
+    The list content is sent in the request body
 
     requires authenticaton
 
@@ -38,7 +40,7 @@ List the Podcast Lists of a User
 --------------------------------
 List User's Lists ::
 
-    GET /api/2/lists/<username>.json
+    GET /user/<username>/lists
 
 
 Possible Responses
@@ -57,7 +59,7 @@ Retrieve Podcast List
 
 Retrieve a Podcast List ::
 
-    GET /api/2/lists/<username>/list/<list-name>.<format>
+    GET /user/<username>/list/<list-name>
 
 
 Possible Responses
@@ -71,7 +73,7 @@ Update
 
 Update a Podcast List::
 
-    PUT /api/2/lists/<username>/list/<list-name>.<format>
+    PUT /user/<username>/list/<list-name>
 
 requires authentication
 
@@ -87,7 +89,7 @@ Delete a Podcast List
 
 Delete a Podcast List ::
 
-    DELETE /api/2/lists/<username>/list/<list-name>.<format>
+    DELETE /user/<username>/list/<list-name>
 
 requires authentication
 

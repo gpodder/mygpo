@@ -22,6 +22,7 @@ Contents
 
    api/index
    dev/index
+   Translator Documentation <http://wiki.gpodder.org/wiki/Translations>
 
 
 Indices and tables

@@ -44,4 +44,5 @@ urlpatterns += patterns('',
     (r'^accounts/',  include('django_couchdb_utils.registration.backends.default.urls')),
     (r'^publisher/', include('mygpo.publisher.urls')),
     (r'^admin/',     include('mygpo.admin.urls')),
+    (r'^pubsub/',    include('mygpo.pubsub.urls')),
 )

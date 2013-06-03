@@ -18,10 +18,9 @@ integrating gpodder.net into podcasting applications.
 **Contents**
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    general
-   formats
    registration
    auth
    user
@@ -31,3 +30,4 @@ integrating gpodder.net into podcasting applications.
    events
    podcastlists
    settings
+   prepare

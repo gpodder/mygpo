@@ -15,6 +15,10 @@ def get_categories_database():
     return loading.get_db('categories')
 
 
+def get_pubsub_database():
+    return loading.get_db('pubsub')
+
+
 def get_database(user=None):
     return get_main_database()
 

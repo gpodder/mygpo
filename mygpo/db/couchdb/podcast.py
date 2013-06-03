@@ -208,6 +208,41 @@ def podcasts_by_id(ids):
     return podcasts
 
 
+def podcasts_groups_by_id(ids):
+    """ gets podcast groups and top-level podcasts for the given ids """
+
+    if ids is None:
+        raise QueryParameterMissing('ids')
+
+    if not ids:
+        return
+
+    db = get_main_database()
+    res = db.view('_all_docs',
+            keys         = ids,
+            include_docs = True,
+            classes      = [Podcast, PodcastGroup],
+        )
+
+    for r in res:
+        doc = r['doc']
+        if doc['doc_type'] == 'Podcast':
+            obj = Podcast.wrap(doc)
+
+        elif doc['doc_type'] == 'PodcastGroup':
+            obj = PodcastGroup.wrap(doc)
+
+        else:
+            logger.error('podcasts_groups_by_id retrieved unknown doc_type '
+                '"%s" for params %s', doc['doc_type'], res.params)
+            continue
+
+        if obj.needs_update:
+            incomplete_obj.send_robust(sender=obj)
+
+        yield obj
+
+
 
 @cache_result(timeout=60*60)
 def podcast_for_oldid(oldid):
@@ -417,6 +452,7 @@ def podcasts_need_update():
     res = db.view('episodes/need_update',
             group_level = 1,
             reduce      = True,
+            limit       = 100,
         )
 
     # TODO: this method is only used for retrieving podcasts to update;
@@ -548,3 +584,17 @@ def update_additional_data(podcast, twitter):
 
     # clear the whole cache until we have a better invalidation mechanism
     cache.clear()
+
+
+@repeat_on_conflict(['podcast'])
+def update_related_podcasts(podcast, related):
+    if podcast.related_podcasts == related:
+        return
+
+    podcast.related_podcasts = related
+    podcast.save()
+
+
+@repeat_on_conflict(['podcast'])
+def delete_podcast(podcast):
+    podcast.delete()

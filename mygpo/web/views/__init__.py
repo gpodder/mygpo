@@ -40,6 +40,7 @@ from mygpo.core.podcasts import PodcastSet
 from mygpo.directory.toplist import PodcastToplist
 from mygpo.users.models import Suggestions, History, HistoryEntry, \
          DeviceDoesNotExist
+from mygpo.users.tasks import update_suggestions
 from mygpo.web.utils import process_lang_params
 from mygpo.utils import parse_range
 from mygpo.web.views.podcast import slug_id_decorator
@@ -181,20 +182,17 @@ def history(request, count=15, uid=None):
 @login_required
 @slug_id_decorator
 def blacklist(request, blacklisted_podcast):
-    suggestion = suggestions_for_user(request.user)
+    user = request.user
+
+    suggestion = suggestions_for_user(user)
 
     @repeat_on_conflict(['suggestion'])
     def _update(suggestion, podcast_id):
         suggestion.blacklist.append(podcast_id)
         suggestion.save()
 
-    @repeat_on_conflict(['user'])
-    def _not_uptodate(user):
-        user.suggestions_up_to_date = False
-        user.save()
-
     _update(suggestion=suggestion, podcast_id=blacklisted_podcast.get_id())
-    _not_uptodate(user=request.user)
+    update_suggestions.delay(user)
 
     return HttpResponseRedirect(reverse('suggestions'))
 

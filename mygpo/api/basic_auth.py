@@ -20,8 +20,11 @@ from functools import wraps
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.contrib.auth import authenticate
 
-from mygpo.log import log
 from mygpo.decorators import repeat_on_conflict
+
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 @repeat_on_conflict(['user'])
@@ -143,7 +146,8 @@ def check_username(protected_view):
             return protected_view(request, *args, username=username, **kwargs)
 
         else:
-            log('username in authentication (%s) and in requested resource (%s) don\'t match' % (request.user.username, username))
+            # TODO: raise SuspiciousOperation here?
+            logger.warn('username in authentication (%s) and in requested resource (%s) don\'t match' % (request.user.username, username))
             return HttpResponseBadRequest('username in authentication (%s) and in requested resource (%s) don\'t match' % (request.user.username, username))
 
     return wrapper

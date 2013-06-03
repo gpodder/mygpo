@@ -33,6 +33,7 @@ from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_by_id, \
          podcast_for_url, podcastgroup_for_slug_id, podcastgroup_for_oldid, \
          podcastgroup_by_id, update_additional_data
 from mygpo.db.couchdb.episode_state import episode_listener_counts
+from mygpo.db.couchdb.pubsub import subscription_for_topic
 
 
 @vary_on_cookie
@@ -97,6 +98,8 @@ def podcast(request, podcast):
 
     heatmap = EpisodeHeatmap(podcast.get_id())
 
+    pubsubscription = subscription_for_topic(podcast.url)
+
     site = RequestSite(request)
     feedurl_quoted = urllib.quote(podcast.url)
 
@@ -110,6 +113,7 @@ def podcast(request, podcast):
         'update_token': update_token,
         'heatmap': heatmap,
         'feedurl_quoted': feedurl_quoted,
+        'pubsubscription': pubsubscription,
         })
 
 

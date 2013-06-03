@@ -23,7 +23,7 @@ from mygpo.directory.views import search as directory_search
 from mygpo.decorators import repeat_on_conflict
 from mygpo.flattr import Flattr
 from mygpo.userfeeds.feeds import FavoriteFeed
-from mygpo.db.couchdb.podcast import podcasts_by_id, podcast_for_url
+from mygpo.db.couchdb.podcast import podcasts_groups_by_id, podcast_for_url
 from mygpo.db.couchdb.podcastlist import podcastlist_for_user_slug, \
          podcastlists_for_user
 from mygpo.data.feeddownloader import PodcastUpdater
@@ -92,7 +92,7 @@ def list_show(request, plist, owner):
 
     plist = proxy_object(plist)
 
-    podcasts = podcasts_by_id(plist.podcasts)
+    podcasts = list(podcasts_groups_by_id(plist.podcasts))
     plist.podcasts = podcasts
 
     max_subscribers = max([p.subscriber_count() for p in podcasts] + [0])
@@ -113,7 +113,7 @@ def list_show(request, plist, owner):
 
 @list_decorator(must_own=False)
 def list_opml(request, plist, owner):
-    podcasts = podcasts_by_id(plist.podcasts)
+    podcasts = podcasts_groups_by_id(plist.podcasts)
     return format_podcast_list(podcasts, 'opml', plist.title)
 
 

@@ -7,6 +7,7 @@ import django
 from django.shortcuts import render
 from django.contrib import messages
 from django.core.urlresolvers import reverse
+from django.core.cache import cache
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext as _
 from django.views.generic import TemplateView
@@ -23,6 +24,7 @@ from mygpo.utils import get_git_head
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.cel import celery
 from mygpo.db.couchdb import get_main_database
+from mygpo.db.couchdb.user import activate_user
 from mygpo.db.couchdb.episode import episode_count, filetype_stats
 from mygpo.db.couchdb.podcast import podcast_count, podcast_for_url
 
@@ -188,6 +190,9 @@ class MergeStatus(AdminView):
                 'ready': False,
             })
 
+        # clear cache to make merge result visible
+        # TODO: what to do with multiple frontends?
+        cache.clear()
 
         try:
             actions, podcast = result.get()
@@ -294,3 +299,40 @@ class FiletypeStatsView(AdminView):
             'max_num': max_num,
             'stats': stats.most_common(),
         })
+
+
+class ActivateUserView(AdminView):
+    """ Lets admins manually activate users """
+
+    template_name = 'admin/activate-user.html'
+
+    def get(self, request):
+        return self.render_to_response({})
+
+    def post(self, request):
+
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+
+        if not (username or email):
+            messages.error(request,
+                           _('Provide either username or email address'))
+            return HttpResponseRedirect(reverse('admin-activate-user'))
+
+        user = None
+
+        if username:
+            user = User.get_user(username, is_active=None)
+
+        if email and not user:
+            user = User.get_user_by_email(email, is_active=None)
+
+        if not user:
+            messages.error(request, _('No user found'))
+            return HttpResponseRedirect(reverse('admin-activate-user'))
+
+        activate_user(user)
+        messages.success(request,
+                         _('User {username} ({email}) activated'.format(
+                            username=user.username, email=user.email)))
+        return HttpResponseRedirect(reverse('admin-activate-user'))

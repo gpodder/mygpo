@@ -14,8 +14,7 @@
 
 {% block content %}
 
-<p>{% blocktrans %}It seems that {{ referer }} has linked to {{ site }} to get you to change some data. <strong>This will possibly change some of your data / settings!</strong>. Do you really want to continue? <strong>If in doubt, chose No.</strong>
-{% endblocktrans %}</p>
+<p>{% blocktrans %}It seems that {{ referer }} has linked to {{ site }} to get you to change some data. <strong>This will possibly change some of your data / settings!</strong>. Do you really want to continue? <strong>If in doubt, chose No.</strong>{% endblocktrans %}</p>
 
 <form method="{{ method }}" action="{{ path }}{% if get %}?{% for key, value in get.iteritems %}{{ key }}={{ value }}&{% endfor %}{% endif %}">
  {% csrf_token %}

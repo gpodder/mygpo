@@ -23,11 +23,10 @@ from django.views.decorators.cache import cache_page
 
 from mygpo.core import models
 from mygpo.core.models import Podcast, PodcastGroup
-from mygpo.utils import parse_range
+from mygpo.utils import parse_range, normalize_feed_url
 from mygpo.directory.tags import Topics
 from mygpo.web.utils import get_episode_link_target, get_podcast_link_target
 from mygpo.api.httpresponse import JsonResponse
-from mygpo.api.sanitizing import sanitize_url
 from mygpo.db.couchdb.episode import episode_for_podcast_url
 from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url
 from mygpo.db.couchdb.directory import category_for_tag
@@ -58,7 +57,7 @@ def tag_podcasts(request, tag, count):
 
 @cache_page(60 * 60)
 def podcast_info(request):
-    url = sanitize_url(request.GET.get('url', ''))
+    url = normalize_feed_url(request.GET.get('url', ''))
 
     # 404 before we query for url, because query would complain
     # about missing param
@@ -76,8 +75,8 @@ def podcast_info(request):
 
 @cache_page(60 * 60)
 def episode_info(request):
-    podcast_url = sanitize_url(request.GET.get('podcast', ''))
-    episode_url = sanitize_url(request.GET.get('url', ''), 'episode')
+    podcast_url = normalize_feed_url(request.GET.get('podcast', ''))
+    episode_url = normalize_feed_url(request.GET.get('url', ''))
 
     # 404 before we query for url, because query would complain
     # about missing parameters

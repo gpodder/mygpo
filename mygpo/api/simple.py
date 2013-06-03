@@ -37,18 +37,20 @@ from mygpo.core.models import Podcast
 from mygpo.users.models import Suggestions
 from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
-from mygpo.api.sanitizing import sanitize_urls
 from mygpo.directory.toplist import PodcastToplist
 from mygpo.directory.models import ExamplePodcasts
 from mygpo.api.advanced.directory import podcast_data
 from mygpo.directory.search import search_podcasts
-from mygpo.log import log
 from mygpo.decorators import allowed_methods
-from mygpo.utils import parse_range
+from mygpo.utils import parse_range, normalize_feed_url
 from mygpo.core.json import json, JSONDecodeError
 from mygpo.db.couchdb import BulkException
 from mygpo.db.couchdb.podcast import podcasts_by_id
 from mygpo.db.couchdb.user import suggestions_for_user
+
+import logging
+logger = logging.getLogger(__name__)
+
 
 ALLOWED_FORMATS = ('txt', 'opml', 'json', 'jsonp', 'xml')
 
@@ -198,7 +200,7 @@ def parse_subscription(raw_post_data, format):
         return []
 
 
-    urls = sanitize_urls(urls)
+    urls = map(normalize_feed_url, urls)
     urls = filter(None, urls)
     urls = set(urls)
     return urls
@@ -224,7 +226,7 @@ def set_subscriptions(urls, user, device_uid, user_agent):
         errors = subscriber.execute()
     except BulkException as be:
         for err in be.errors:
-            log('Simple API: %(username)s: Updating subscription for '
+            logger.warn('Simple API: %(username)s: Updating subscription for '
                     '%(podcast_url)s on %(device_uid)s failed: '
                     '%(error)s (%(reason)s)'.format(username=user.username,
                         podcast_url=err.doc, device_uid=device.uid,

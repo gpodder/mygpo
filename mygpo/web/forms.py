@@ -4,8 +4,10 @@ from django import forms
 from django.utils.translation import ugettext as _
 
 from mygpo.api.constants import DEVICE_TYPES
-from mygpo.log import log
 from mygpo.users.models import Device
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 class UserAccountForm(forms.Form):
@@ -142,7 +144,7 @@ class SyncForm(forms.Form):
         in the form.
         """
         if not self.is_valid():
-            log('no target given in SyncForm')
+            logger.warn('no target given in SyncForm')
             raise ValueError(_('No device selected'))
 
         target = self.cleaned_data['targets']

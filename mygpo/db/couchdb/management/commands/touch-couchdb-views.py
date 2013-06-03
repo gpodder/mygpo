@@ -10,7 +10,6 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 
 from mygpo.decorators import repeat_on_conflict
-from mygpo.core.models import SanitizingRule
 from mygpo.utils import progress
 
 
@@ -25,7 +24,7 @@ class Command(BaseCommand):
 
 
     def handle(self, *args, **options):
-        db_urls = set(db[1] for db in settings.COUCHDB_DATABASES)
+        db_urls = set(db['URL'] for db in settings.COUCHDB_DATABASES.values())
 
         filters = []
 
