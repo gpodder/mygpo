@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # This file is part of my.gpodder.org.
 #
@@ -933,11 +934,18 @@ def normalize_feed_url(url):
     >>> normalize_feed_url('http://w%20x:y%20z@example.org/')
     'http://example.org/'
     >>> normalize_feed_url('http://example.com/x@y:z@test.com/')
-    'http://example.com/x@y:z@test.com/'
+    'http://example.com/x%40y%3Az%40test.com/'
+    >>> normalize_feed_url('http://en.wikipedia.org/wiki/Ä')
+    'http://en.wikipedia.org/wiki/%C3%84'
+    >>> normalize_feed_url('http://en.wikipedia.org/w/index.php?title=Ä&action=edit')
+    'http://en.wikipedia.org/w/index.php?title=%C3%84&action=edit'
     """
     url = url.strip()
     if not url or len(url) < 8:
         return None
+
+    if isinstance(url, unicode):
+        url = url.encode('utf-8', 'ignore')
 
     # This is a list of prefixes that you can use to minimize the amount of
     # keystrokes that you have to use.
@@ -965,6 +973,10 @@ def normalize_feed_url(url):
 
     # Schemes and domain names are case insensitive
     scheme, netloc = scheme.lower(), netloc.lower()
+
+    # encode non-encoded characters
+    path = urllib.quote(path, '/%')
+    query = urllib.quote_plus(query, ':&=')
 
     # Remove authentication to protect users' privacy
     netloc = netloc.rsplit('@', 1)[-1]
