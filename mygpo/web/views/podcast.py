@@ -15,6 +15,7 @@ from mygpo.core.proxy import proxy_object
 from mygpo.core.tasks import flattr_thing
 from mygpo.utils import normalize_feed_url
 from mygpo.users.settings import PUBLIC_SUB_PODCAST, FLATTR_TOKEN
+from mygpo.publisher.utils import check_publisher_permission
 from mygpo.users.models import HistoryEntry, DeviceDoesNotExist, SubscriptionAction
 from mygpo.web.forms import SyncForm
 from mygpo.decorators import allowed_methods, repeat_on_conflict
@@ -98,6 +99,8 @@ def show(request, podcast):
         subscribe_targets = []
         can_flattr = False
 
+    is_publisher = check_publisher_permission(user, podcast)
+
     def _set_objects(h):
         dev = user.get_device(h.device)
         return proxy_object(h, device=dev)
@@ -117,6 +120,7 @@ def show(request, podcast):
         'episodes': episodes,
         'max_listeners': max_listeners,
         'can_flattr': can_flattr,
+        'is_publisher': is_publisher,
     })
 
 
@@ -181,7 +185,9 @@ def all_episodes(request, podcast, page_size=20):
     except ValueError:
         page = 1
 
-    episodes = episode_list(podcast, request.user, (page-1) * page_size,
+    user = request.user
+
+    episodes = episode_list(podcast, user, (page-1) * page_size,
             page_size)
     episodes_total = podcast.episode_count or 0
     num_pages = episodes_total / page_size
@@ -189,12 +195,15 @@ def all_episodes(request, podcast, page_size=20):
 
     max_listeners = max([e.listeners for e in episodes] + [0])
 
+    is_publisher = check_publisher_permission(user, podcast)
+
     return render(request, 'episodes.html', {
         'podcast': podcast,
         'episodes': episodes,
         'max_listeners': max_listeners,
         'page_list': page_list,
         'current_page': page,
+        'is_publisher': is_publisher,
     })
 
 

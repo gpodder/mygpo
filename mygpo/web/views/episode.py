@@ -37,6 +37,7 @@ from mygpo.users.models import Chapter, HistoryEntry, EpisodeAction
 from mygpo.utils import parse_time, get_timestamp
 from mygpo.users.settings import FLATTR_TOKEN
 from mygpo.web.heatmap import EpisodeHeatmap
+from mygpo.publisher.utils import check_publisher_permission
 from mygpo.web.utils import get_episode_link_target, fetch_episode_data
 from mygpo.db.couchdb.episode import episode_for_slug_id, episode_for_oldid, \
          favorite_episodes_for_user, chapters_for_episode
@@ -53,13 +54,14 @@ from mygpo.userfeeds.feeds import FavoriteFeed
 def episode(request, episode):
 
     podcast = podcast_by_id(episode.podcast)
+    user = request.user
 
     if not podcast:
         raise Http404
 
-    if request.user.is_authenticated():
+    if user.is_authenticated():
 
-        episode_state = episode_state_for_user_episode(request.user, episode)
+        episode_state = episode_state_for_user_episode(user, episode)
         is_fav = episode_state.is_favorite()
 
 
@@ -68,14 +70,14 @@ def episode(request, episode):
         episodes_dict = {episode._id: episode}
 
         history = list(episode_state.get_history_entries())
-        HistoryEntry.fetch_data(request.user, history,
+        HistoryEntry.fetch_data(user, history,
                 podcasts=podcasts_dict, episodes=episodes_dict)
 
         played_parts = EpisodeHeatmap(podcast.get_id(),
-                episode._id, request.user._id, duration=episode.duration)
+                episode._id, user._id, duration=episode.duration)
 
-        devices = dict( (d.id, d.name) for d in request.user.devices )
-        can_flattr = request.user.get_wksetting(FLATTR_TOKEN) and episode.flattr_url
+        devices = dict( (d.id, d.name) for d in user.devices )
+        can_flattr = user.get_wksetting(FLATTR_TOKEN) and episode.flattr_url
 
     else:
         history = []
@@ -84,11 +86,12 @@ def episode(request, episode):
         devices = {}
         can_flattr = False
 
+    is_publisher = check_publisher_permission(user, podcast)
 
     chapters = []
-    for user, chapter in chapters_for_episode(episode._id):
-        chapter.is_own = request.user.is_authenticated() and \
-                         user == request.user._id
+    for user_id, chapter in chapters_for_episode(episode._id):
+        chapter.is_own = user.is_authenticated() and \
+                         user_id == user._id
         chapters.append(chapter)
 
 
@@ -107,6 +110,7 @@ def episode(request, episode):
         'actions': EPISODE_ACTION_TYPES,
         'devices': devices,
         'can_flattr': can_flattr,
+        'is_publisher': is_publisher,
     })
 
 
