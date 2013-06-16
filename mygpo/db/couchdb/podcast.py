@@ -223,7 +223,7 @@ def podcasts_groups_by_id(ids):
         return
 
     db = get_main_database()
-    res = db.view('_all_docs',
+    res = db.view('podcasts/podcasts_groups',
             keys         = ids,
             include_docs = True,
             classes      = [Podcast, PodcastGroup],
@@ -231,6 +231,10 @@ def podcasts_groups_by_id(ids):
 
     for r in res:
         doc = r['doc']
+
+        if not doc:
+            yield None
+
         if doc['doc_type'] == 'Podcast':
             obj = Podcast.wrap(doc)
 
@@ -405,12 +409,6 @@ def all_podcasts():
             pg = PodcastGroup.wrap(obj)
             podcast = pg.get_podcast_by_id(pid)
             yield podcast
-
-
-def all_podcasts_groups(cls):
-    return cls.view('podcasts/podcasts_groups', include_docs=True,
-        classes=[Podcast, PodcastGroup]).iterator()
-
 
 
 def podcasts_to_dict(ids, use_cache=False):
