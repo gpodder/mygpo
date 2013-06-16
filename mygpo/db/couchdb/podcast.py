@@ -151,6 +151,11 @@ def podcast_for_slug(slug):
     else:
         pid = res['key'][1]
         pg = PodcastGroup.wrap(doc)
+
+        if pid == pg._id:
+            # TODO: we don't return PodcastGroups atm
+            return None
+
         obj = pg.get_podcast_by_id(pid)
 
     if obj.needs_update:
