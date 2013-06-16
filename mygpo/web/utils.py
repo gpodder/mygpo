@@ -9,7 +9,6 @@ from django.shortcuts import render
 
 from babel import Locale, UnknownLocaleError
 
-from mygpo.cache import cache_result
 from mygpo.core.models import Podcast
 from mygpo.core.proxy import proxy_object
 from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_to_dict

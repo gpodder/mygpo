@@ -129,6 +129,19 @@
 {% endblock %}
 
 
+{% block sidebar %}
+
+  {% if is_publisher %}
+   <div class="well">
+    <h4>{% trans "Publisher Pages" %}</h4>
+
+    <a class="btn" href="{% podcast_link_target podcast "podcast-publisher-episodes" %}"><i class="icon-wrench"></i> {% trans "Go" %}</a>
+   </div>
+  {% endif %}
+
+
+{% endblock %}
+
 {% block ads %}
  {% comment %}disable ads on podcast pages{% endcomment %}
 {% endblock %}

@@ -11,7 +11,6 @@ from django.core.urlresolvers import reverse
 
 from mygpo.decorators import repeat_on_conflict
 from mygpo import utils
-from mygpo.cache import cache_result
 from mygpo.core.proxy import DocumentABCMeta
 from mygpo.core.slugs import SlugMixin
 from mygpo.core.oldid import OldIdMixin
@@ -43,6 +42,7 @@ class Episode(Document, SlugMixin, OldIdMixin):
     title = StringProperty()
     guid = StringProperty()
     description = StringProperty(default="")
+    subtitle = StringProperty()
     content = StringProperty(default="")
     link = StringProperty()
     released = DateTimeProperty()
@@ -60,6 +60,7 @@ class Episode(Document, SlugMixin, OldIdMixin):
     content_types = StringListProperty()
     flattr_url = StringProperty()
     created_timestamp = IntegerProperty()
+    license = StringProperty()
 
 
 
@@ -151,6 +152,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
     title = StringProperty()
     urls = StringListProperty()
     description = StringProperty()
+    subtitle = StringProperty()
     link = StringProperty()
     last_update = DateTimeProperty()
     logo_url = StringProperty()
@@ -173,6 +175,7 @@ class Podcast(Document, SlugMixin, OldIdMixin):
     outdated = BooleanProperty(default=False)
     created_timestamp = IntegerProperty()
     hub = StringProperty()
+    license = StringProperty()
 
 
 
