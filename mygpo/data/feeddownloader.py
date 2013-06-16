@@ -133,6 +133,7 @@ class PodcastUpdater(object):
         podcast.title = parsed.title or podcast.title
         podcast.urls = list(set(podcast.urls + parsed.urls))
         podcast.description = parsed.description or podcast.description
+        podcast.subtitle = parsed.subtitle or podcast.subtitle
         podcast.link = parsed.link or podcast.link
         podcast.logo_url = parsed.logo or podcast.logo_url
         podcast.author = parsed.author or podcast.author
@@ -143,6 +144,7 @@ class PodcastUpdater(object):
         podcast.new_location = parsed.new_location or podcast.new_location
         podcast.flattr_url = parsed.flattr or podcast.flattr_url
         podcast.hub = parsed.hub or podcast.hub
+        podcast.license = parsed.license or podcast.license
 
 
         if podcast.new_location:
@@ -246,6 +248,7 @@ class PodcastUpdater(object):
                 episode.guid = parsed_episode.guid or episode.guid
                 episode.title = parsed_episode.title or episode.title
                 episode.description = parsed_episode.description or episode.description
+                episode.subtitle = parsed_episode.subtitle or episode.subtitle
                 episode.content = parsed_episode.content or parsed_episode.description or episode.content
                 episode.link = parsed_episode.link or episode.link
                 episode.released = datetime.utcfromtimestamp(parsed_episode.released) if parsed_episode.released else episode.released
@@ -255,6 +258,7 @@ class PodcastUpdater(object):
                 episode.language = parsed_episode.language or episode.language
                 episode.mimetypes = list(set(filter(None, [f.mimetype for f in parsed_episode.files])))
                 episode.flattr_url = parsed_episode.flattr or episode.flattr_url
+                episode.license = parsed_episode.license or episode.license
 
                 urls = list(chain.from_iterable(f.urls for f in parsed_episode.files))
                 episode.urls = sorted(set(episode.urls + urls), key=len)
