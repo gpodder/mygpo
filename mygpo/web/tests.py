@@ -22,16 +22,22 @@ from django.test import TestCase
 from django.core.urlresolvers import reverse
 
 import mygpo.web.utils
+from mygpo.users.models import User
 from mygpo.test import create_auth_string
 
 
 class SimpleWebTests(TestCase):
+
     def setUp(self):
-        self.user, _ = User.objects.get_or_create(username='test')
+        self.user = User(username='web-test', email='web-test@example.com')
         self.user.set_password('pwd')
         self.user.save()
 
         self.auth_string = create_auth_string('test', 'pwd')
+
+
+    def tearDown(self):
+        self.user.delete()
 
     def test_access_parameterless_pages(self):
         pages = [
