@@ -52,9 +52,7 @@
  {% for page in page_list %}
   <li>
    {% if page == "..." %}
-    <a href=#" class="disabled">
-    {{ page }}
-    </a>
+    <span>{{ page }}</span>
    {% else %}
 
      {% if page == results.number %}
