@@ -496,6 +496,34 @@ def get_flattr_podcast_count():
     return r[0]['value']
 
 
+@cache_result(timeout=60*60)
+def get_license_podcasts(offset=0, limit=20):
+    """ returns a page of podcasts w/ license information """
+
+    r = Podcast.view('podcasts/license',
+            skip = offset,
+            limit = limit,
+            classes = [Podcast, PodcastGroup],
+            include_docs = True,
+            reduce = False,
+    )
+
+    podcasts = list(r)
+
+    for podcast in podcasts:
+        if podcast.needs_update:
+            incomplete_obj.send_robust(sender=podcast)
+
+    return podcasts
+
+
+@cache_result(timeout=60*60)
+def get_license_podcast_count():
+    """ returns the number of podcasts that contain license information """
+    r = list(Podcast.view('podcasts/license'))
+    return r[0]['value']
+
+
 def subscriberdata_for_podcast(podcast_id):
 
     if not podcast_id:

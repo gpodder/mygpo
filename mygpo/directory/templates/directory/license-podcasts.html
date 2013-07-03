@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+{% load podcasts %}
+{% load charts %}
+{% load math %}
+{% load utils %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/directory/+license"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/directory/+license"|section_menu }}{% endblock %}
+
+{% block title %}{% trans "Podcasts with License Information" %}{% endblock %}
+
+{% block header %}
+   <h1>{% trans "Podcasts with License Information" %}</h1>
+{% endblock %}
+
+{% block content %}
+  <p>{% blocktrans %}These podcasts contain license information.{% endblocktrans %}</p>
+  <table class="list">
+   <tr>
+    <th></th>
+    <th>{% trans "Podcast" %}</th>
+    <th>{% trans "Subscribers" %}</th>
+   </tr>
+  {% for podcast in podcasts %}
+   {% ifchanged podcast.license|license_name %}
+    <tr>
+     <th class="group" colspan="3">
+      <a href="{{ podcast.license }}">
+       {{ podcast.license|license_name }}
+       <i class="icon-external-link"></i>
+      </a>
+     </th>
+    </tr>
+   {% endifchanged %}
+
+   <tr>
+    <td class="logo">{{ podcast|podcast_logo }}</td>
+    <td>
+     {% podcast_group_link podcast %}
+    </td>
+    <td>{% vertical_bar podcast.subscriber_count max_subscribers %}</td>
+   </tr>
+  {% empty %}
+   <tr>
+    <td colspan="5">
+     {% trans "Currently not available" %}
+    </td>
+   </tr>
+  {% endfor %}
+  </table>
+
+ <div class="pagination pagination-centered">
+  <ul>
+ {% for page in page_list %}
+  <li>
+   {% if page == "..." %}
+    <span>{{ page }}</span>
+   {% else %}
+
+     {% if page == current_page %}
+      <a href="{% url "license-podcasts" %}?page={{ page }}"><strong>{{ page }}</strong></a>
+     {% else %}
+      <a href="{% url "license-podcasts" %}?page={{ page }}">{{ page }}</a>
+     {% endif %}
+   {% endif %}
+  </li>
+ {% endfor %}
+ </ul>
+ </div>
+
+{% endblock %}

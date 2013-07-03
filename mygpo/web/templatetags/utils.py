@@ -1,7 +1,7 @@
 from django import template
 from django.utils.safestring import mark_safe
 
-from mygpo.web.utils import get_page_list
+from mygpo.web.utils import get_page_list, license_info
 
 
 register = template.Library()
@@ -68,3 +68,15 @@ def nbsp(s):
     import re
     s = re.sub("\s+", "&nbsp;", s)
     return mark_safe(s)
+
+
+@register.filter
+def license_name(license_url):
+    """ returns a "pretty" license name for a license URL """
+
+    info = license_info(license_url)
+
+    if info.name:
+        return '%s %s' % (info.name, info.version or '')
+
+    return info.url

@@ -126,6 +126,24 @@ table form
     display: inline;
 }
 
+/* used for headers above a group of table rows */
+
+table.list th.group
+{
+    background-color: #999;
+    color: white;
+    text-align: center;
+}
+
+table.list th.group a
+{
+    color: white;
+}
+
+table.list th.group i
+{
+    font-size: .7em;
+}
 
 .description
 {
