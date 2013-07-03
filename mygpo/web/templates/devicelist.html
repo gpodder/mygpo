@@ -26,9 +26,9 @@
     {% for group in device_groups %}
      <tr>
       {% if group.is_synced %}
-       <th colspan="4">{% trans "Synchronized" %}</th>
+       <th class="group" colspan="4">{% trans "Synchronized" %}</th>
       {% else %}
-       <th colspan="4">{% trans "Not Synchronized" %}</th>
+       <th class="group" colspan="4">{% trans "Not Synchronized" %}</th>
       {% endif %}
      </tr>
 
