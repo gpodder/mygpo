@@ -1,49 +1,10 @@
+{% extends "skeleton.html" %}
 {% load i18n %}
 {% load menu %}
 
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <title>{% trans "gpodder.net &mdash; discover and track your podcasts" %}</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="description" content="">
-        <meta name="author" content="">
+{% block title %}gpodder.net &mdash; discover and track your podcasts{% endblock %}
 
-        <!-- Le styles -->
-        <link href="/media/css/bootstrap.css" rel="stylesheet">
-        <style type="text/css">
-            body {
-                padding-top: 60px;
-                padding-bottom: 40px;
-            }
-            .sidebar-nav {
-                padding: 9px 0;
-            }
-        </style>
-        <link href="/media/css/bootstrap-responsive.css" rel="stylesheet">
-        <link href="/media/css/font-awesome.css" rel="stylesheet">
-        <link rel="stylesheet" href="/media/screen.css" type="text/css" />
-        <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700' rel='stylesheet' type='text/css'>
-
-        <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
-        <!--[if lt IE 9]>
-        <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-        <![endif]-->
-
-        <!-- Le fav and touch icons -->
-        <link rel="shortcut icon" href="/favicon.png">
-
-        {% block head %}{% endblock %}
-
-        {% if google_analytics_property_id %}
-        {% load googleanalytics %}
-        {{ google_analytics_property_id|google_analytics_async }}
-        {% endif %}
-
-    </head>
-
-    <body>
+{% block body %}
 
         <div class="navbar navbar-fixed-top">
             <div class="navbar-inner">
@@ -270,6 +231,4 @@
                 var feedback_widget = new GSFN.feedback_widget(feedback_widget_options);
             </script>
 
-      </body>
-
-</html>
+{% endblock %}
