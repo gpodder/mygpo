@@ -80,3 +80,10 @@ def license_name(license_url):
         return '%s %s' % (info.name, info.version or '')
 
     return info.url
+
+
+@register.filter
+def urlquote(s):
+    """ makes urllib.quote_plus available as a template filter """
+    import urllib
+    return mark_safe(urllib.quote_plus(s))

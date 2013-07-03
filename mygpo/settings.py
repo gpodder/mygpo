@@ -176,6 +176,10 @@ from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 TEMPLATE_CONTEXT_PROCESSORS += (
     "mygpo.web.google.analytics",
     "mygpo.web.google.adsense",
+
+    # required so that the request obj can be accessed from templates.
+    # this is used to direct users to previous page after login
+    'django.core.context_processors.request',
 )
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
