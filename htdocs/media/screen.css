@@ -103,6 +103,12 @@ table th.numeric
     text-align: right;
 }
 
+table.list td.empty
+{
+    text-align: center;
+    font-size: .8em;
+}
+
 table.list tr.group
 {
     font-weight: bold;
@@ -253,6 +259,11 @@ form.search input[type="submit"]
 {
     margin-top: 20px;
     display: inline;
+}
+
+form.internal
+{
+    display: none;
 }
 
 div.result img

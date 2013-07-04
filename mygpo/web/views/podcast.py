@@ -88,12 +88,12 @@ def show(request, podcast):
 
         subscribe_targets = podcast.subscribe_targets(user)
 
-        history = list(state.actions)
+        has_history = bool(state.actions)
         is_public = state.settings.get('public_subscription', True)
         can_flattr = request.user.get_wksetting(FLATTR_TOKEN) and podcast.flattr_url
 
     else:
-        history = []
+        has_history = False
         is_public = False
         subscribed_devices = []
         subscribe_targets = []
@@ -101,15 +101,10 @@ def show(request, podcast):
 
     is_publisher = check_publisher_permission(user, podcast)
 
-    def _set_objects(h):
-        dev = user.get_device(h.device)
-        return proxy_object(h, device=dev)
-    history = map(_set_objects, history)
-
     return render(request, 'podcast.html', {
         'tags': tags,
         'url': current_site,
-        'history': history,
+        'has_history': has_history,
         'podcast': podcast,
         'is_public': is_public,
         'devices': subscribed_devices,
@@ -175,6 +170,26 @@ def episode_list(podcast, user, offset=0, limit=None):
     annotate_episode = partial(_annotate_episode, listeners, episode_actions)
     return map(annotate_episode, episodes)
 
+
+
+@never_cache
+@login_required
+def history(request, podcast):
+    """ shows the subscription history of the user """
+
+    user = request.user
+    state = podcast_state_for_user_podcast(user, podcast)
+    history = list(state.actions)
+
+    def _set_objects(h):
+        dev = user.get_device(h.device)
+        return proxy_object(h, device=dev)
+    history = map(_set_objects, history)
+
+    return render(request, 'podcast-history.html', {
+        'history': history,
+        'podcast': podcast,
+    })
 
 
 def all_episodes(request, podcast, page_size=20):
@@ -420,6 +435,7 @@ remove_tag_slug_id  = slug_id_decorator(remove_tag)
 set_public_slug_id  = slug_id_decorator(set_public)
 all_episodes_slug_id= slug_id_decorator(all_episodes)
 flattr_podcast_slug_id=slug_id_decorator(flattr_podcast)
+history_podcast_slug_id= slug_id_decorator(history)
 
 
 show_oldid          = oldid_decorator(show)
@@ -430,3 +446,4 @@ remove_tag_oldid    = oldid_decorator(remove_tag)
 set_public_oldid    = oldid_decorator(set_public)
 all_episodes_oldid  = oldid_decorator(all_episodes)
 flattr_podcast_oldid= oldid_decorator(flattr_podcast)
+history_podcast_oldid= oldid_decorator(history)

@@ -55,6 +55,7 @@ urlpatterns += patterns('mygpo.web.views.podcast',
  url(r'^podcast/(?P<pid>\d+)/set-private',                        'set_public_oldid',    name='podcast-private', kwargs={'public': False}),
  url(r'^podcast/(?P<pid>\d+)/-episodes',                          'all_episodes_oldid', name='podcast-all-episodes'),
  url(r'^podcast/(?P<pid>\d+)/-flattr',                            'flattr_podcast_oldid', name='podcast-flattr'),
+ url(r'^podcast/(?P<pid>\d+)/+history',                           'history_podcast_oldid', name='podcast-history'),
 
  url(r'^podcast/(?P<slug_id>[\w-]+)/?$',                             'show_slug_id',        name='podcast-slug-id'),
  url(r'^podcast/(?P<slug_id>[\w-]+)/subscribe$',                     'subscribe_slug_id',   name='subscribe-slug-id'),
@@ -65,6 +66,7 @@ urlpatterns += patterns('mygpo.web.views.podcast',
  url(r'^podcast/(?P<slug_id>[\w-]+)/set-private',                    'set_public_slug_id',    name='podcast-private-slug-id', kwargs={'public': False}),
  url(r'^podcast/(?P<slug_id>[\w-]+)/-episodes',                      'all_episodes_slug_id', name='podcast-all-episodes-slug-id'),
  url(r'^podcast/(?P<slug_id>[\w-]+)/-flattr',                        'flattr_podcast_slug_id', name='podcast-flattr-slug-id'),
+ url(r'^podcast/(?P<slug_id>[\w-]+)/\+history',                       'history_podcast_slug_id', name='podcast-history-slug-id'),
  )
 
 

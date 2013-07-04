@@ -187,29 +187,4 @@
 
  </div>
 
-
-  {% if history %}
-  <div class="well">
-   <h4>{% trans "Subscription History" %}</h4>
-   <table class="list">
-    {% for s in history %}
-     <tr>
-      <td><abbr title="{{ s.timestamp }}">{{ s.timestamp|naturalday }}</abbr></td>
-      <td>{{ s|podcast_status_icon }}</td>
-      <td>
-       {% if s.device %}
-        <a href="{% url "device" s.device.uid %}">{{ s.device|device_icon }} {{ s.device.name|striptags }}</a>
-       {% endif %}
-      </td>
-     </tr>
-    {% endfor %}
-   </table>
-  </div>
-  {% endif %}
-
-{% endblock %}
-
-
-{% block ads %}
- {% comment %}disable ads on podcast pages{% endcomment %}
 {% endblock %}
