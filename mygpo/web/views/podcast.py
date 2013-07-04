@@ -290,7 +290,9 @@ def subscribe(request, podcast):
 
         # single UID from /podcast/<slug>
         if 'targets' in request.POST:
-            device_uids.append(request.POST.get('targets'))
+            devices = request.POST.get('targets')
+            devices = devices.split(',')
+            device_uids.extend(devices)
 
         for uid in device_uids:
             try:
@@ -308,6 +310,25 @@ def subscribe(request, podcast):
         'targets': targets,
         'podcast': podcast,
     })
+
+
+@never_cache
+@login_required
+@allowed_methods(['POST'])
+def subscribe_all(request, podcast):
+    """ subscribe all of the user's devices to the podcast """
+    user = request.user
+
+    devs = podcast.subscribe_targets(user)
+    # ungroup groups
+    devs = [dev[0] if isinstance(dev, list) else dev for dev in devs]
+
+    try:
+        podcast.subscribe(user, devs)
+    except (SubscriptionException, DeviceDoesNotExist, ValueError) as e:
+        messages.error(request, str(e))
+
+    return HttpResponseRedirect(get_podcast_link_target(podcast))
 
 
 @never_cache
@@ -333,6 +354,28 @@ def unsubscribe(request, podcast, device_uid):
             {'username': request.user.username, 'podcast_url': podcast.url, 'device_id': device.id})
 
     return HttpResponseRedirect(return_to)
+
+
+@never_cache
+@login_required
+@allowed_methods(['POST'])
+def unsubscribe_all(request, podcast):
+    """ unsubscribe all of the user's devices from the podcast """
+
+    user = request.user
+    state = podcast_state_for_user_podcast(user, podcast)
+
+    dev_ids = state.get_subscribed_device_ids()
+    devs = [user.get_device(x) for x in dev_ids]
+    # ungroup groups
+    devs = [dev[0] if isinstance(dev, list) else dev for dev in devs]
+
+    try:
+        podcast.unsubscribe(user, devs)
+    except (SubscriptionException, DeviceDoesNotExist, ValueError) as e:
+        messages.error(request, str(e))
+
+    return HttpResponseRedirect(get_podcast_link_target(podcast))
 
 
 @never_cache
@@ -429,7 +472,9 @@ def oldid_decorator(f):
 
 show_slug_id        = slug_id_decorator(show)
 subscribe_slug_id   = slug_id_decorator(subscribe)
+subscribe_all_slug_id= slug_id_decorator(subscribe_all)
 unsubscribe_slug_id = slug_id_decorator(unsubscribe)
+unsubscribe_all_slug_id= slug_id_decorator(unsubscribe_all)
 add_tag_slug_id     = slug_id_decorator(add_tag)
 remove_tag_slug_id  = slug_id_decorator(remove_tag)
 set_public_slug_id  = slug_id_decorator(set_public)
@@ -440,7 +485,9 @@ history_podcast_slug_id= slug_id_decorator(history)
 
 show_oldid          = oldid_decorator(show)
 subscribe_oldid     = oldid_decorator(subscribe)
+subscribe_all_oldid = oldid_decorator(subscribe_all)
 unsubscribe_oldid   = oldid_decorator(unsubscribe)
+unsubscribe_all_oldid= oldid_decorator(unsubscribe_all)
 add_tag_oldid       = oldid_decorator(add_tag)
 remove_tag_oldid    = oldid_decorator(remove_tag)
 set_public_oldid    = oldid_decorator(set_public)

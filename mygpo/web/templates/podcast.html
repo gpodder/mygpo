@@ -36,6 +36,124 @@
    </div>
   {% endif %}
 
+ <hr />
+
+ <div class="btn-toolbar">
+
+  {% if is_publisher %}
+   <div class="btn-group">
+    <a class="btn" href="{% podcast_link_target podcast "podcast-publisher-detail" %}">
+     <i class="icon-wrench"></i>
+     {% trans "Publisher Pages" %}
+    </a>
+   </div>
+  {% endif %}
+
+  {% if not user.is_authenticated %}
+   <div class="btn-group">
+    <a class="btn" href="{% podcast_link_target podcast "subscribe" %}">
+     <i class="icon-plus"></i>
+     {% trans "Login to Subscribe" %}
+    </a>
+   </div>
+  {% endif %}
+
+  {% if devices or can_subscribe %}
+
+   <div class="btn-group">
+    {% if can_subscribe %}
+     <button class="btn btn-primary" onclick="submitForm('subscribe+all');">
+      <i class="icon-plus-sign"></i>
+      {% trans "Subscribe" %}
+     </button>
+    {% else %}
+     <button class="btn" onclick="submitForm('unsubscribe+all');">
+      <i class="icon-remove-sign"></i>
+      {% trans "Unsubscribe" %}
+     </button>
+    {% endif %}
+    <button class="btn dropdown-toggle btn-primary" data-toggle="dropdown">
+     <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+     {% if can_subscribe %}
+      <li value="+all">
+       <a href="javascript:void(0);" onclick="submitForm('subscribe+all');">
+        <i class="icon-plus-sign"></i>
+        {% trans "Subscribe on all devices" %}
+       </a>
+       <form class="internal"
+             method="post"
+             action="{% podcast_link_target podcast "subscribe-all" %}"
+             id="subscribe+all">
+        {% csrf_token %}
+       </form>
+      </li>
+     {% endif %}
+     {% for device in subscribe_targets %}
+      <li value="{{ device.uid }}">
+       <a href="javascript:void(0);" onclick="submitForm('subscribe-{{ device|devices_uids }}');">
+        <i class="icon-plus"></i>
+        {{ device|devices_name }}
+       </a>
+       <form class="internal"
+             action="{% podcast_link_target podcast "subscribe" %}"
+             method="post"
+             id="subscribe-{{ device|devices_uids }}">
+         {% csrf_token %}
+         <input type="hidden" name="targets" value="{{ device|devices_uids }}" />
+       </form>
+      </li>
+     {% endfor %}
+     {% if can_subscribe and devices %}
+      <li class="divider"></li>
+     {% endif %}
+     {% if devices %}
+      <li value="+none">
+       <a href="javascript:void(0);" onclick="submitForm('unsubscribe+all');">
+        <i class="icon-remove-sign"></i>
+        {% trans "Unsubscribe from all devices " %}
+       </a>
+       <form class="internal"
+             method="post"
+             action="{% podcast_link_target podcast "unsubscribe-all" %}"
+             id="unsubscribe+all">
+        {% csrf_token %}
+       </form>
+      </li>
+     {% endif %}
+     {% for device in devices %}
+      <li value="{{ device.uid }}">
+       <a href="javascript:void(0);" onclick="submitForm('unsubscribe-{{ device.uid }}');">
+        <i class="icon-remove"></i>
+        {{ device|devices_name }}
+       </a>
+       <form class="internal"
+             method="post"
+             action="{% podcast_link_target podcast "unsubscribe" device.uid %}?return_to={% podcast_link_target podcast %}"
+             id="unsubscribe-{{ device.uid }}">
+        {% csrf_token %}
+       </form>
+      </li>
+     {% endfor %}
+    </ul>
+   </div>
+
+  {% endif %}
+
+
+   {% if has_history %}
+    <a class="btn" href="{% podcast_link_target podcast "podcast-history" %}">
+     <i class="icon-calendar"></i>
+     {% trans "Subscription History" %}
+    </a>
+   {% endif %}
+
+  </div>
+
+ <hr />
+
+
   {% if episodes %}
 
   <h3>{% trans "Older Episodes" %}</h3>
@@ -82,70 +200,6 @@
 
 {% block sidebar %}
 
-  {% if is_publisher %}
-   <div class="well">
-    <h4>{% trans "Publisher Pages" %}</h4>
-
-    <a class="btn" href="{% podcast_link_target podcast "podcast-publisher-detail" %}"><i class="icon-wrench"></i> {% trans "Go" %}</a>
-   </div>
-  {% endif %}
-
-  <div class="well">
-   <h4>{% trans "Subscriptions" %}</h4>
-   {% if not user.is_authenticated %}
-    <div class="subscribe">
-     <a href="{% podcast_link_target podcast "subscribe" %}">
-      <img src="/media/subscribe.png" style="vertical-align: middle;" alt=""/>
-      {% trans "Subscribe to this podcast" %}
-     </a>
-    </div>
-   {% endif %}
-
-   {% if devices or can_subscribe %}
-    <table class="list">
-      {% for device in devices %}
-       <tr>
-        <td>
-         {% if device %}
-          {{ device|device_icon }}
-          <a href="{% url "device" device.uid %}">{{ device.name|striptags }}</a>
-         {% endif %}
-        </td>
-        <td style="text-align: center;">
-         <form class="form-inline" method="post" action="{% podcast_link_target podcast "unsubscribe" device.uid %}?return_to={% podcast_link_target podcast %}">
-          {% csrf_token %}
-          <button class="btn btn-danger btn-small" type="submit">
-           <i class="icon-remove"></i>
-          </button>
-         </form>
-        </td>
-       </tr>
-      {% endfor %}
-      {% if can_subscribe %}
-       <tr>
-        <form class="form-inline" action="{% podcast_link_target podcast "subscribe" %}" method="post">
-         <td>
-          {% csrf_token %}
-          <select name="targets" id="id_targets">
-           {% for device in subscribe_targets %}
-            <option value="{{ device.uid }}">{{ device.name }}</option>
-           {% endfor %}
-          </select>
-         </td>
-         <td>
-          <button class="btn btn-success btn-small" type="submit">
-           <i class="icon-ok"></i>
-          </button>
-         </td>
-        </form>
-       </tr>
-      {% endif %}
-     </table>
-   {% endif %}
-
-  </div>
-
-
   <div class="well">
    <h4>Tags</h4>
 
@@ -186,5 +240,20 @@
    {% endif %}
 
  </div>
+
+{% endblock %}
+
+
+{% block javascript %}
+
+    <script language="javascript">
+        <!--
+        function submitForm(formid)
+        {
+            document.forms[formid].submit();
+            return true;
+        }
+        -->
+    </script>
 
 {% endblock %}
