@@ -6,9 +6,13 @@
 API 3 Documentation (draft)
 ===========================
 
-This site contains drafts for the gpodder.net's future API -- version 3 --
+*This site contains drafts for the gpodder.net's future API -- version 3 --
 which is not yet implemented.  The current API is documented at
-http://wiki.gpodder.org/wiki/Web_Services/API_2.
+http://wiki.gpodder.org/wiki/Web_Services/API_2.*
+
+The gpodder.net API allows clients to interact with gpodder.net. The API is
+provided via a REST interface, and is free of charge within certain quotas, and
+completely free for open source clients (see :ref:`usage`).
 
 Contents
 --------

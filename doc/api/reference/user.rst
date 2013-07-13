@@ -4,13 +4,16 @@ User API
 The User API can be used to retrieve public information about a user, and to
 discover user-related resources.
 
+When initiating a session, a client SHOULD query the user information, to
+discover URIs for further queries.
+
 
 Resources
 ---------
 
 The User API defines the following resources ::
 
-  /user/<username>
+  /user/{username}
 
 
 Get User Info
@@ -18,7 +21,7 @@ Get User Info
 
 Request ::
 
-    GET /user/<username>
+    GET /user/{username}
     Content-Tpe: application/json
 
 
@@ -35,7 +38,7 @@ Response::
         "flattr_username": "stefankoegl",
 
         "resources": {
-            "subscriptions": "http://api.gpodder.net/stefan/subscriptions",
+            "subscriptions": "http://api.gpodder.net/3/user/{username}/subscriptions",
             ...
         }
     }

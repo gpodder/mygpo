@@ -1,14 +1,21 @@
+.. _usage:
+
 API Usage
 =========
+
+This page describes how the gpodder.net API can be used.
 
 
 Client Registration
 -------------------
 
 Most API endpoints can only be accessed by registered clients using a client
-key. Clients can be registered for free at LINK.
+key. Clients can be registered for free at LINK. A registration needs to be
+approved before it can be used.
 
 TODO: User-Agent?
+
+TODO: how is the API Key included in requests?
 
 
 Allowed Usage
@@ -29,7 +36,9 @@ certain feature.
 +------------------------+---------------+----------------+
 | Features               | Open source   | Closed source  |
 +========================+===============+================+
-| Podcast Search         | unlimited     | unlimited      |
+| Base Quota             | unlimited     | 1000           |
++------------------------+---------------+----------------+
+| Podcast Search         | unlimited     | not counted    |
 +------------------------+---------------+----------------+
 | Podcast Toplist        | unlimited     | +1000          |
 +------------------------+---------------+----------------+
@@ -45,7 +54,7 @@ certain feature.
 +------------------------+---------------+----------------+
 | Episode Favorites      | unlimited     | +1000          |
 +------------------------+---------------+----------------+
-| Authentication         | unlimited     | unlimited      |
+| Authentication         | unlimited     | not counted    |
 +------------------------+---------------+----------------+
 | Device Sync            | unlimited     | +1000          |
 +------------------------+---------------+----------------+

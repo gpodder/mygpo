@@ -5,7 +5,7 @@ The API can be accessed via http and https. https is preferable from a security
 / privacy point of view and should be used by all clients. gpodder.net also
 seems to be blocked in China via plain http.
 
-All endpoints are offered at https://api.gpodder.net/3/.
+All endpoints are relative to https://api.gpodder.net/3/.
 
 
 * Request and Response Formats: JSON
@@ -23,8 +23,13 @@ TODO: see `URI Templates <http://tools.ietf.org/html/rfc6570>`_
 Status Codes
 ------------
 
-The following status codes can be returned for any API request. Most resources
-will, however, define additional status codes.
+The API uses HTTP status codes to inform clients about type of response. The
+semantics are used according to `their specified semantics
+<http://www.iana.org/assignments/http-status-codes/>`_.
+
+The specification of each API endpoint describes which status codes should be
+expected. In addition the following status codes can be returned for any API
+request.
 
 +----------------------------+-----------------------------------------------+
 | Status Code                | Interpretation                                |
@@ -71,11 +76,22 @@ The ``errors`` array contains objects with the following information ::
         code: "<error code>"
     }
 
-In ``field`` a `JSON Pointer <http://tools.ietf.org/html/rfc6901>`_ to the
-problematic field in the request is provided. The ``code`` describes the actual
-error. The following error codes are defined:
+The ``field`` value indicates where the error occured.
+
+* If the value starts with a ``/``, it should be interpreted as a `JSON Pointer
+  <http://tools.ietf.org/html/rfc6901>`_ to the problematic field in the
+  request body.
+
+* If the value starts with a ``?``, it is followed by the name of the parameter
+  that was responsible for the error.
+
+* The value can be null, indicating that the error was not caused by a specific
+  field.
+
+The ``code`` describes the actual error. The following error codes are defined:
 
 * ``ìnvalid_url``: The provided values is not a valid URL.
+* ``parameter_missing``: A mandatory parameter was not provided.
 
 Error codes may be added on demand. Clients should therefore expect and accept
 arbitrary string values.
@@ -155,3 +171,27 @@ member. ::
         title: "Cool Podcast",
         logo: "http://example.com/podcast-logo.png"
     }
+
+
+.. _tag-type:
+
+Tag
+^^^
+
+A tag is represented as a JSON object containing at least a ``label``
+member. ::
+
+    {
+        "label": "Technology"
+    }
+
+
+Relations
+---------
+
+`Relation types <http://tools.ietf.org/html/rfc5988#section-5.3>`_ that are
+used in the API:
+
+* ``https://api.gpodder.net/3/relation/tag-podcasts``: podcasts for a given tag
+
+TODO: should they be on domain api.gpodder.net, or just gpodder.net?
