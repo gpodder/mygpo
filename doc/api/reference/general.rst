@@ -92,6 +92,9 @@ The ``code`` describes the actual error. The following error codes are defined:
 
 * ``ìnvalid_url``: The provided values is not a valid URL.
 * ``parameter_missing``: A mandatory parameter was not provided.
+* ``duplicate_list_name``: A podcast list with the same name already exists.
+* ``user_does_not_exist``: the specified user does not exist.
+* ``podcastlist_does_not_exist``: the specified podcast list does not exist.
 
 Error codes may be added on demand. Clients should therefore expect and accept
 arbitrary string values.
