@@ -26,13 +26,7 @@
 
   {% if episode %}
    <div class="first-episode">
-
-    <h2>{{ episode.title }} <small>{{ episode.released|naturalday }}</small></h2>
-    <div class="description" {% if episode.language or podcast.language %}lang="{% firstof episode.language podcast.language %}"{% endif %}>
-     {{ episode.description|default:""|truncatewords:"100"|markdown }}
-    </div>
-    <a href="{% episode_link_target episode podcast %}">more...</a>
-
+    {% include "components/episode-box.html" with podcast=podcast episode=episode long=True only %}
    </div>
   {% endif %}
 
@@ -157,46 +151,38 @@
  <hr />
 
 
-  {% if episodes %}
+ {% if episodes %}
 
   <h3>{% trans "Older Episodes" %}</h3>
-   <table class="list episode_list" id="episodes">
-    <tr>
-     <th></th>
-     <th>{% trans "Title" %}</th>
-     <th>{% trans "Released" %}</th>
-     <th>{% trans "Listeners" %}</th>
-    </tr>
 
-    {% for episode in episodes %}
-     <tr>
-      <td>{{ episode.action|episode_status_icon }}</td>
-      <td class="short">
-          <div class="title">{% episode_link episode podcast %}</div>
-          <div class="description short">{{ episode.subtitle|default:episode.description|default:""|truncatewords:"20"|markdown|striptags }}</div>
-      </td>
-      <td>{{ episode.released|default:""|date:"Y-m-d" }}</td>
-      <td>
-       {% if episode.listeners %}
-        {% vertical_bar episode.listeners max_listeners %}
-       {% endif %}
-      </td>
-     </tr>
-    {% endfor %}
+  <div class="episodes">
 
-    {% if not podcast.episode_count or podcast.episode_count > 20 %}
-    <tr>
-     <td></td>
-     <td>
-      <a href="{% podcast_link_target podcast "podcast-all-episodes" %}?page=2">{% trans "All Episodes" %}</a>
-     </td>
-     <td></td>
-     <td></td>
-    </tr>
-    {% endif %}
+   {% for episode in episodes %}
+    {% include "components/episode-box.html" with episode=episode podcast=podcast only %}
+   {% endfor %}
 
-   </table>
-  {% endif %}
+  </div>
+
+ <div class="pagination pagination-centered">
+  <ul>
+ {% for page in page_list %}
+  <li>
+   {% if page == "..." %}
+    <span>{{ page }}</span>
+   {% else %}
+
+     {% if page == current_page %}
+      <a href="{% podcast_link_target podcast "podcast-all-episodes" %}?page={{ page }}"><strong>{{ page }}</strong></a>
+     {% else %}
+      <a href="{% podcast_link_target podcast "podcast-all-episodes" %}?page={{ page }}">{{ page }}</a>
+     {% endif %}
+   {% endif %}
+  </li>
+ {% endfor %}
+ </ul>
+ </div>
+
+ {% endif %}
 
 {% endblock %}
 

@@ -174,6 +174,17 @@ div.description
     display: none;
 }
 
+.first-episode div.description
+{
+    margin-top: .5em;
+}
+
+.first-episode h2
+{
+    margin-bottom: 0;
+    line-height: 1em;
+}
+
 div#podcastlogo
 {
     float: right;
@@ -400,4 +411,74 @@ footer ul
 div.first-episode
 {
     margin-bottom: 2em;
+}
+
+
+
+/************************
+   Episode Lists
+*************************/
+
+div.episodes div.episode
+{
+    clear: left;
+}
+
+div.episode span.title
+{
+    font-size: 1.5em;
+    font-family: 'Source Sans Pro ExtraLight';
+    font-weight: bold;
+}
+
+div.episodes div.episode
+{
+    margin: 1.5em 0 1.5em 0;
+}
+
+div.episode div.description
+{
+    font-family: 'Source Sans Pro Light';
+}
+
+div.episodes div.description
+{
+    margin-top: 0;
+    max-height: 2.9em;
+    overflow: hidden;
+    text-overflow: ellipsis; /* why doesn't this work?! */
+}
+
+
+div.episode span.number
+{
+    display: inline;
+    font-size: 1.5em;
+    font-weight: bold;
+    font-family: 'Source Sans Pro Light';
+}
+
+
+div.episode div.listeners
+{
+    width: 8em;
+    float: right;
+    font-size: .7em;
+}
+
+div.episode span.released,
+div.episode span.status
+{
+    font-size: .7em;
+    font-weight: normal;
+}
+
+div.first-episode
+{
+    margin-top: 1.5em;
+}
+
+div.first-episode div.header
+{
+    font-size: 1.5em;
 }

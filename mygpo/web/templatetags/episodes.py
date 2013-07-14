@@ -126,7 +126,8 @@ def episode_link(episode, podcast, title=None):
     """ Returns the link for a single Episode """
 
     title = title or getattr(episode, 'display_title', None) or \
-            episode.title or _('Unknown Episode')
+            episode.get_short_title(podcast.common_episode_title) or \
+            _('Unknown Episode')
 
     title = strip_tags(title)
 
@@ -137,3 +138,14 @@ def episode_link(episode, podcast, title=None):
 @register.simple_tag
 def get_id(obj):
     return obj._id
+
+
+@register.simple_tag
+def episode_number(episode, podcast):
+    num = episode.get_episode_number(podcast.common_episode_title)
+    return num or ""
+
+@register.simple_tag
+def episode_short_title(episode, podcast):
+    title = episode.get_short_title(podcast.common_episode_title)
+    return title or ""
