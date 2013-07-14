@@ -62,7 +62,8 @@ def show(request, podcast):
     """ Shows a podcast detail page """
 
     current_site = RequestSite(request)
-    episodes = episode_list(podcast, request.user, limit=20)
+    num_episodes = 20
+    episodes = episode_list(podcast, request.user, limit=num_episodes)
     user = request.user
 
     max_listeners = max([e.listeners for e in episodes] + [0])
@@ -101,6 +102,10 @@ def show(request, podcast):
 
     is_publisher = check_publisher_permission(user, podcast)
 
+    episodes_total = podcast.episode_count or 0
+    num_pages = episodes_total / num_episodes
+    page_list = get_page_list(1, num_pages, 1, 15)
+
     return render(request, 'podcast.html', {
         'tags': tags,
         'url': current_site,
@@ -116,6 +121,8 @@ def show(request, podcast):
         'max_listeners': max_listeners,
         'can_flattr': can_flattr,
         'is_publisher': is_publisher,
+        'page_list': page_list,
+        'current_page': 1,
     })
 
 
