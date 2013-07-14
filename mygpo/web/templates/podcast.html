@@ -66,15 +66,18 @@
       <i class="icon-plus-sign"></i>
       {% trans "Subscribe" %}
      </button>
+     <button class="btn dropdown-toggle btn-primary" data-toggle="dropdown">
+      <span class="caret"></span>
+     </button>
     {% else %}
      <button class="btn" onclick="submitForm('unsubscribe+all');">
       <i class="icon-remove-sign"></i>
       {% trans "Unsubscribe" %}
      </button>
+     <button class="btn dropdown-toggle" data-toggle="dropdown">
+      <span class="caret"></span>
+     </button>
     {% endif %}
-    <button class="btn dropdown-toggle btn-primary" data-toggle="dropdown">
-     <span class="caret"></span>
-    </button>
     <ul class="dropdown-menu">
      {% if can_subscribe %}
       <li value="+all">
