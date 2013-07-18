@@ -12,18 +12,18 @@
 
 {% block title %}
  {% if ready %}
-  {% trans "Merge Finished" %}
+  {% trans "Operation Finished" %}
  {% else %}
-  {% trans "Merge Ongoing" %}
+  {% trans "Operation Ongoing" %}
  {% endif %}
 {% endblock %}
 
 {% block header %}
  <h1>
   {% if ready %}
-   {% trans "Merge Finished" %}
+   {% trans "Operation Finished" %}
   {% else %}
-   {% trans "Merge Ongoing" %}
+   {% trans "Operation Ongoing" %}
   {% endif %}
  </h1>
 {% endblock %}
@@ -36,6 +36,8 @@
    <ul>
     {% for action, count in actions %}
      <li>{{ action }}: {{ count }}</li>
+    {% empty %}
+     <li><em>{% trans "none" %}</em></li>
     {% endfor %}
    </ul>
   </p>

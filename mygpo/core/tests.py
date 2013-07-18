@@ -21,7 +21,8 @@ import doctest
 from django.test import TestCase
 
 import mygpo.utils
-from mygpo.core.models import Podcast, PodcastGroup
+from mygpo.core.slugs import get_duplicate_slugs
+from mygpo.core.models import Podcast, PodcastGroup, Episode
 
 
 class PodcastGroupTests(unittest.TestCase):
@@ -62,8 +63,32 @@ class PodcastGroupTests(unittest.TestCase):
 
 
 
+class UnifySlugTests(unittest.TestCase):
+
+    def test_unify(self):
+
+        from mygpo.core.models import Episode
+        a = Episode(_id='a', slug='1')
+        b = Episode(_id='b', merged_slugs=['1'])
+        c = Episode(_id='c', merged_slugs=['1'])
+
+        dups_list = list(get_duplicate_slugs([a, b, c]))
+
+        # only one duplicate slug is reported
+        self.assertEquals(len(dups_list), 1)
+
+        slug, dups = dups_list[0]
+
+        self.assertEquals(slug, '1')
+        self.assertEquals(len(dups), 2)
+        self.assertEquals(dups[0], b)
+        self.assertEquals(dups[1], c)
+        self.assertEquals(dups, [b, c])
+
+
 def suite():
     suite = unittest.TestSuite()
     suite.addTest(doctest.DocTestSuite(mygpo.utils))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(PodcastGroupTests))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(UnifySlugTests))
     return suite

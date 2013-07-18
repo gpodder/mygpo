@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from itertools import count
 
 from couchdbkit.ext.django.schema import *
@@ -5,6 +7,7 @@ from couchdbkit.ext.django.schema import *
 from django.utils.text import slugify
 
 from mygpo.decorators import repeat_on_conflict
+from mygpo.utils import partition
 
 
 def assign_slug(obj, generator):
@@ -38,8 +41,8 @@ class SlugGenerator(object):
     """ Generates a unique slug for an object """
 
 
-    def __init__(self, obj):
-        if obj.slug:
+    def __init__(self, obj, override_existing=False):
+        if obj.slug and not override_existing:
             raise ValueError('%(obj)s already has slug %(slug)s' % \
                 dict(obj=obj, slug=obj.slug))
 
@@ -109,9 +112,9 @@ class PodcastSlug(PodcastGroupSlug):
 class EpisodeSlug(SlugGenerator):
     """ Generates slugs for Episodes """
 
-    def __init__(self, episode, common_title):
+    def __init__(self, episode, common_title, override_existing=False):
         self.common_title = common_title
-        super(EpisodeSlug, self).__init__(episode)
+        super(EpisodeSlug, self).__init__(episode, override_existing)
         self.podcast_id = episode.podcast
 
 
@@ -247,3 +250,41 @@ class SlugMixin(DocumentSchema):
 
         # remove from merged slugs
         self.merged_slugs = list(set(self.merged_slugs) - set([slug]))
+
+
+def get_duplicate_slugs(episodes):
+    """ Finds duplicate slugs and yields (slug, duplicates) pairs for each slug
+
+    Such a pair is only yielded for each slug that actually has a duplicate.
+    The "duplicates" list does not contain the selected "winner" of a set of
+    duplicates. """
+
+    # we build a dict of {slug: [episode1, episode2, ...], ...}
+    # for each slug all episodes are given that use this slug
+    slugs = defaultdict(list)
+
+    for episode in episodes:
+        all_slugs = filter(None, [episode.slug] + episode.merged_slugs)
+        for slug in all_slugs:
+            slugs[slug].append(episode)
+
+    # filter out unique slugs
+    dups = {s: eps for (s, eps) in slugs.items() if len(eps) > 1}
+
+    for slug, episodes in dups.items():
+        merged, main = partition(episodes, lambda e: e.slug == slug)
+
+        main, merged = list(main), list(merged)
+
+        # we want to determine exactly one winner, the rest is in "merged"
+        if len(main) == 1:
+            winner = main[0]
+
+        if len(main) < 1:
+            winner = merged.pop()
+
+        if len(main) > 1:
+            winner, merged = main[0], main[1:] + merged
+
+        # for every loser, remove the slug
+        yield slug, merged

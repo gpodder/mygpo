@@ -16,6 +16,7 @@
  <ul class="icons">
   <li><i class="icon-stethoscope"></i> <a href="{% url "admin-hostinfo" %}">{% trans "Host Information" %}</a></li>
   <li><i class="icon-resize-small"></i> <a href="{% url "admin-merge" %}?podcasts=2">{% trans "Merge Podcasts and Episodes" %}</a></li>
+  <li><i class="icon-resize-small"></i> <a href="{% url "admin-unify-slugs-select" %}">{% trans "Unify Duplicate Slugs" %}</a></li>
   <li><i class="icon-bar-chart"></i> <a href="{% url "clients" %}">{% trans "Client Stats" %}</a> (<a href="{% url "clients-json" %}">{% trans "JSON" %}</a>)</li>
   <li><i class="icon-bar-chart"></i> <a href="{% url "useragents" %}">{% trans "User-Agent Stats" %}</a></li>
   <li><i class="icon-bar-chart"></i> <a href="{% url "admin-filetypes" %}">{% trans "File Type Stats" %}</a></li>
