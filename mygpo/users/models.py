@@ -785,29 +785,6 @@ class User(BaseUser, SyncedDevicesMixin, SettingsMixin):
             yield proxy_object(episode, podcast=podcast)
 
 
-
-
-    def save(self, *args, **kwargs):
-
-        from mygpo.db.couchdb.podcast_state import podcast_states_for_user
-
-        super(User, self).save(*args, **kwargs)
-
-        podcast_states = podcast_states_for_user(self)
-        for state in podcast_states:
-            @repeat_on_conflict(['state'])
-            def _update_state(state):
-                old_devs = set(state.disabled_devices)
-                state.set_device_state(self.devices)
-
-                if old_devs != set(state.disabled_devices):
-                    state.save()
-
-            _update_state(state)
-
-
-
-
     def __eq__(self, other):
         if not other:
             return False
