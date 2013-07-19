@@ -184,9 +184,6 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 USER_CLASS = 'mygpo.users.models.User'
 
-AUTH_PROFILE_MODULE = "api.UserProfile"
-
-
 LOGIN_URL = '/login/'
 
 CSRF_FAILURE_VIEW='mygpo.web.views.security.csrf_failure'
