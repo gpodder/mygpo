@@ -12,6 +12,7 @@
 {% load google %}
 {% load charts %}
 {% load utils %}
+{% load static %}
 
 {% load menu %}
 {% block mainmenu %}{{ "/podcast/"|main_menu }}{% endblock %}
@@ -25,9 +26,9 @@
 
 {% block head %}
  {% if episode.url|is_youtube_video %}
-  <script type="text/javascript" src="/media/js/swfobject.js"></script>
-  <script type="text/javascript" src="/media/js/json2.js"></script>
-  <script type="text/javascript" src="/media/js/youtube-handler.js"></script>
+  <script type="text/javascript" src="{% static "js/swfobject.js" %}"></script>
+  <script type="text/javascript" src="{% static "js/json2.js" %}"></script>
+  <script type="text/javascript" src="{% static "js/youtube-handler.js" %}"></script>
  {% endif %}
  {% opengraph_episode episode podcast %}
  {% google_plus_one_head %}
@@ -185,7 +186,7 @@
       <td>
        {% if chapter.is_own %}
         <a href="{% episode_link_target episode "remove-chapter" chapter.start chapter.end %}">
-         <img src="/media/unsubscribe.png" alt="{% trans "Remove" %}" />
+         <img src="{% static "unsubscribe.png" %}" alt="{% trans "Remove" %}" />
         </a>
        {% endif %}
       </td>

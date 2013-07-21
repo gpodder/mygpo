@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load podcasts %}
-
+{% load static %}
 {% load menu %}
 {% block mainmenu %}{{ "/share/"|main_menu }}{% endblock %}
 {% block sectionmenu %}{{ "/share/"|section_menu }}{% endblock %}
@@ -27,11 +27,11 @@
    </td>
    <td>
     <a href="{% url "shared-subscriptions" user.username %}{% if subscriptions_token %}?token={{ subscriptions_token }}{% endif %}">
-     <img src="/media/22x22/internet-web-browser.png" class="action-button" /></a>
+     <img src="{% static "22x22/internet-web-browser.png" %}" class="action-button" /></a>
     <a href="{% url "shared-subscriptions-rss" user.username %}{% if subscriptions_token %}?token={{ subscriptions_token }}{% endif %}">
-     <img height="22" width="22" src="/media/28x28/feed-icon.png" class="action-button" /></a>
+     <img height="22" width="22" src="{% static "28x28/feed-icon.png" %}" class="action-button" /></a>
     <a href="{% url "shared-subscriptions-opml" user.username %}{% if subscriptions_token %}?token={{ subscriptions_token }}{% endif %}">
-     <img src="/media/22x22/opml-icon.png" class="action-button" /></a>
+     <img src="{% static "22x22/opml-icon.png" %}" class="action-button" /></a>
    </td>
    <td>
     <button class="btn btn-small btn-link {% if not subscriptions_token %}disabled{% endif %}" {% if subscriptions_token %}type="submit" onclick="submitForm('subscriptions_private');"{% endif %}>{% trans "New Token" %}</button>
@@ -48,7 +48,7 @@
     </div>
    <td>
     <a href="{% url "user" user.username %}{% if userpage_token %}?token={{ userpage_token }}{% endif %}">
-     <img src="/media/22x22/internet-web-browser.png" class="action-button" />
+     <img src="{% static "22x22/internet-web-browser.png" %}" class="action-button" />
     </a>
    </td>
    <td>
@@ -66,15 +66,15 @@
    </td>
    <td>
     {% if favfeed_podcast %}
-     <a href="{% podcast_link_target favfeed_podcast %}"><img src="/media/22x22/internet-web-browser.png" class="action-button" /></a>
+     <a href="{% podcast_link_target favfeed_podcast %}"><img src="{% static "22x22/internet-web-browser.png" %}" class="action-button" /></a>
     {% endif %}
     {% if favfeed_token %}
      <a href="https://{{ user.username }}:{{ favfeed_token }}@{{ site.domain }}{% url "favorites-feed" user.username %}">
-      <img height="22" width="22" src="/media/28x28/feed-icon.png" class="action-button" />
+      <img height="22" width="22" src="{% static "28x28/feed-icon.png" %}" class="action-button" />
      </a>
     {% else %}
      <a href="{% url "favorites-feed" user.username %}">
-      <img height="22" width="22" src="/media/28x28/feed-icon.png" class="action-button" />
+      <img height="22" width="22" src="{% static "28x28/feed-icon.png" %}" class="action-button" />
      </a>
     {% endif %}
    </td>

@@ -1,5 +1,6 @@
 from django import template
 from django.utils.safestring import mark_safe
+from django.contrib.staticfiles.storage import staticfiles_storage
 
 from mygpo.utils import format_time
 from mygpo.publisher.utils import colour_repr
@@ -28,9 +29,11 @@ def vertical_bar(value, max_value, display=None):
 @register.filter
 def format_diff(value):
     if value > 1:
-        s = '<img src="/media/better.png" title="+%s">' % value
+        s = '<img src="%s" title="+%s">' % \
+            (staticfiles_storage.url('better.png'), value)
     elif value < -1:
-        s = '<img src="/media/worse.png" title="%s">' % value
+        s = '<img src="%s" title="%s">' % \
+            (staticfiles_storage.url('worse.png'), value)
     else:
         s = ''
 

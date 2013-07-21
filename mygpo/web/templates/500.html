@@ -1,7 +1,9 @@
+{% load static %}
+
 <html>
     <head>
         <title>500 Internal server error (gpodder.net)</title>
-        <link rel="stylesheet" type="text/css" href="/media/fail.css" />
+        <link rel="stylesheet" type="text/css" href="{% static "fail.css" %}" />
     </head>
     <body>
         <div id="c">
@@ -13,7 +15,7 @@
                 </p>
             </div>
         </div>
-        <img id="icon" src="/media/failpodder.png">
+        <img id="icon" src="{% static "failpodder.png" %}">
     </body>
 </html>
 

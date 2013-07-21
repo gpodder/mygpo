@@ -103,7 +103,7 @@ SITE_ID = 1
 USE_I18N = True
 
 STATIC_ROOT = 'staticfiles'
-STATIC_URL = '/static/'
+STATIC_URL = '/media/'
 
 STATICFILES_DIRS = (
     os.path.abspath(os.path.join(BASE_DIR, '..', 'htdocs', 'media')),
