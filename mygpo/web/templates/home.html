@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load menu %}
+{% load static %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -11,7 +12,7 @@
         <meta name="author" content="">
 
         <!-- Le styles -->
-        <link href="/media/css/bootstrap.css" rel="stylesheet">
+        <link href="{% static "css/bootstrap.css" %}" rel="stylesheet">
         <style type="text/css">
             body {
                 padding-top: 60px;
@@ -21,9 +22,9 @@
                 padding: 9px 0;
             }
         </style>
-        <link href="/media/css/bootstrap-responsive.css" rel="stylesheet">
-        <link href="/media/css/font-awesome.css" rel="stylesheet">
-        <link rel="stylesheet" href="/media/screen.css" type="text/css" />
+        <link href="{% static "css/bootstrap-responsive.css" %}" rel="stylesheet">
+        <link href="{% static "css/font-awesome.css" %}" rel="stylesheet">
+        <link rel="stylesheet" href="{% static "screen.css" %}" type="text/css" />
         <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700' rel='stylesheet' type='text/css'>
 
         <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -53,7 +54,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </a>
-                    <a class="brand" href="/"><img id="inline_logo" src="/media/gpoddernet_25.png" alt="gpodder.net" /><span style="padding-left: 65px; padding-right: 10px;" >gpodder.net</span></a>
+                    <a class="brand" href="/"><img id="inline_logo" src="{% static "gpoddernet_25.png" %}" alt="gpodder.net" /><span style="padding-left: 65px; padding-right: 10px;" >gpodder.net</span></a>
                 <div class="btn-group pull-right">
                     {% if user.is_authenticated %}
                     <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
@@ -116,7 +117,7 @@
                     <div class="span8" id="content">
                         {% block content %}
 
-                        <img style="float: right;" src="/media/gpoddernet_228.png" alt="gpodder.net" />
+                        <img style="float: right;" src="{% static "gpoddernet_228.png" %}" alt="gpodder.net" />
                         <p>
                         gpodder.net is a libre web service that allows you to manage your
                         podcast subscriptions and discover new content. If you use multiple
@@ -249,8 +250,8 @@
             <!-- Le javascript
             ================================================== -->
             <!-- Placed at the end of the document so the pages load faster -->
-            <script src="/media/js/jquery.js"></script>
-            <script src="/media/js/bootstrap-dropdown.js"></script>
+            <script src="{% static "js/jquery.js" %}"></script>
+            <script src="{% static "js/bootstrap-dropdown.js" %}"></script>
 
             {% block javascript %}{% endblock javascript %}
 

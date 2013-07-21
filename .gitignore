@@ -10,3 +10,6 @@ doc/_build
 
 # vim swap files
 *.swp
+
+# static files copied by the collectstatic command
+mygpo/staticfiles/
