@@ -15,9 +15,9 @@ Resources
 
 The Events API defines the following resources ::
 
-    /user/<username>/events
-    /user/<username>/events/response/<id>
-    /user/<username>/events/device/<device-id>
+    /user/{username}/events
+    /user/{username}/events/response/{id}
+    /user/{username}/events/device/{device_id}
 
 
 Event Data
@@ -80,7 +80,7 @@ Request
 
 To initiate an upload, the following request should be issued. ::
 
-    POST /user/<username>/events
+    POST /user/{username}/events
     Content-Tpe: application/json
 
     {
@@ -150,7 +150,7 @@ server maintains a timestamp per device).
 
 **Explicit Timestamp:** retrieve all events after a specific timestamp. ::
 
-    GET /user/<username>/events?since=<timestamp>
+    GET /user/{username}/events{?since}
 
 Parameters
 
@@ -160,7 +160,7 @@ Parameters
 **Implicit Timestamp:** retrieve all events that the current device has not yet
 seen. The timestamp of is stored on the server side. ::
 
-    GET /user/<username>/device/<device-id>/events
+    GET /user/{username}/device/{device_id}/events
 
 Parameters
 
