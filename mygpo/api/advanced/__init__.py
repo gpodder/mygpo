@@ -16,48 +16,39 @@
 #
 
 from functools import partial
-from itertools import imap, chain
+from itertools import imap
 from collections import defaultdict, namedtuple
 from datetime import datetime
 from importlib import import_module
 
 import dateutil.parser
 
-try:
-    import gevent
-except ImportError:
-    gevent = None
-
 from django.http import HttpResponse, HttpResponseBadRequest, Http404, HttpResponseNotFound
 from django.contrib.sites.models import RequestSite
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
-from django.utils.decorators import method_decorator
-from django.views.generic.base import View
 from django.conf import settings as dsettings
 
 from mygpo.api.constants import EPISODE_ACTION_TYPES, DEVICE_TYPES
 from mygpo.api.httpresponse import JsonResponse
-from mygpo.api.advanced.directory import episode_data, podcast_data
+from mygpo.api.advanced.directory import episode_data
 from mygpo.api.backend import get_device, BulkSubscribe
-from mygpo.utils import parse_time, format_time, parse_bool, get_timestamp, \
+from mygpo.utils import format_time, parse_bool, get_timestamp, \
     parse_request_body, normalize_feed_url
-from mygpo.decorators import allowed_methods, repeat_on_conflict
-from mygpo.core import models
+from mygpo.decorators import allowed_methods
 from mygpo.core.tasks import auto_flattr_episode
-from mygpo.users.models import PodcastUserState, EpisodeAction, \
-     EpisodeUserState, DeviceDoesNotExist, DeviceUIDException, \
+from mygpo.users.models import EpisodeAction, \
+     DeviceDoesNotExist, DeviceUIDException, \
      InvalidEpisodeActionAttributes
 from mygpo.users.settings import FLATTR_AUTO
 from mygpo.core.json import JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.db.couchdb import BulkException, bulk_save_retry
-from mygpo.db.couchdb.episode import episode_by_id, \
-         favorite_episodes_for_user, episodes_for_podcast
+from mygpo.db.couchdb.episode import favorite_episodes_for_user
 from mygpo.db.couchdb.podcast import podcast_for_url
 from mygpo.db.couchdb.podcast_state import subscribed_podcast_ids_by_device
-from mygpo.db.couchdb.episode_state import get_podcasts_episode_states, \
-         episode_state_for_ref_urls, get_episode_actions
+from mygpo.db.couchdb.episode_state import episode_state_for_ref_urls, \
+    get_episode_actions
 
 
 import logging
@@ -503,129 +494,6 @@ def device_data(device):
         type         = device.type,
         subscriptions= len(subscribed_podcast_ids_by_device(device)),
     )
-
-
-
-def get_podcast_data(podcasts, domain, url):
-    """ Gets podcast data for a URL from a dict of podcasts """
-    podcast = podcasts.get(url)
-    return podcast_data(podcast, domain)
-
-
-def get_episode_data(podcasts, domain, clean_action_data, include_actions, episode_status):
-    """ Get episode data for an episode status object """
-    podcast_id = episode_status.episode.podcast
-    podcast = podcasts.get(podcast_id, None)
-    t = episode_data(episode_status.episode, domain, podcast)
-    t['status'] = episode_status.status
-
-    # include latest action (bug 1419)
-    if include_actions and episode_status.action:
-        t['action'] = clean_action_data(episode_status.action)
-
-    return t
-
-
-
-class DeviceUpdates(View):
-
-    @method_decorator(csrf_exempt)
-    @method_decorator(require_valid_user)
-    @method_decorator(check_username)
-    @method_decorator(never_cache)
-    def get(self, request, username, device_uid):
-        now = datetime.now()
-        now_ = get_timestamp(now)
-
-        try:
-            device = request.user.get_device_by_uid(device_uid)
-        except DeviceDoesNotExist as e:
-            return HttpResponseNotFound(str(e))
-
-        since_ = request.GET.get('since', None)
-        if since_ is None:
-            return HttpResponseBadRequest('parameter since missing')
-        try:
-            since = datetime.fromtimestamp(float(since_))
-        except ValueError:
-            return HttpResponseBadRequest("'since' is not a valid timestamp")
-
-        include_actions = parse_bool(request.GET.get('include_actions', False))
-
-        ret = get_subscription_changes(request.user, device, since, now)
-        domain = RequestSite(request).domain
-
-        subscriptions = list(device.get_subscribed_podcasts())
-
-        podcasts = dict( (p.url, p) for p in subscriptions )
-        prepare_podcast_data = partial(get_podcast_data, podcasts, domain)
-
-        ret['add'] = map(prepare_podcast_data, ret['add'])
-
-        devices = dict( (dev.id, dev.uid) for dev in request.user.devices )
-        clean_action_data = partial(clean_episode_action_data,
-                user=request.user, devices=devices)
-
-        # index subscribed podcasts by their Id for fast access
-        podcasts = dict( (p.get_id(), p) for p in subscriptions )
-        prepare_episode_data = partial(get_episode_data, podcasts, domain,
-                clean_action_data, include_actions)
-
-        episode_updates = self.get_episode_updates(request.user,
-                subscriptions, since)
-        ret['updates'] = map(prepare_episode_data, episode_updates)
-
-        return JsonResponse(ret)
-
-
-    def get_episode_updates(self, user, subscribed_podcasts, since,
-            max_per_podcast=5):
-        """ Returns the episode updates since the timestamp """
-
-        EpisodeStatus = namedtuple('EpisodeStatus', 'episode status action')
-
-        episode_status = {}
-
-        # get episodes
-        if gevent:
-            episode_jobs = [gevent.spawn(episodes_for_podcast, p, since,
-                    limit=max_per_podcast) for p in subscribed_podcasts]
-            gevent.joinall(episode_jobs)
-            episodes = chain.from_iterable(job.get() for job in episode_jobs)
-
-        else:
-            episodes = chain.from_iterable(episodes_for_podcast(p, since,
-                    limit=max_per_podcast) for p in subscribed_podcasts)
-
-
-        for episode in episodes:
-            episode_status[episode._id] = EpisodeStatus(episode, 'new', None)
-
-
-        # get episode states
-        if gevent:
-            e_action_jobs = [gevent.spawn(get_podcasts_episode_states, p,
-                    user._id) for p in subscribed_podcasts]
-            gevent.joinall(e_action_jobs)
-            e_actions = chain.from_iterable(job.get() for job in e_action_jobs)
-
-        else:
-            e_actions = chain.from_iterable(get_podcasts_episode_states(p,
-                    user._id) for p in subscribed_podcasts)
-
-
-        for action in e_actions:
-            e_id = action['episode_id']
-
-            if e_id in episode_status:
-                episode = episode_status[e_id].episode
-            else:
-                episode = episode_by_id(e_id)
-
-            episode_status[e_id] = EpisodeStatus(episode, action['action'],
-                    action)
-
-        return episode_status.itervalues()
 
 
 @require_valid_user
