@@ -12,8 +12,8 @@ Resources
 
 The Subscriptions API defines the following resources ::
 
- /user/<username>/subscriptions
- /user/<username>/device/<device-id>/subscriptions
+ /user/{username}/subscriptions
+ /user/{username}/device/{deviceid}/subscriptions
 
 
 Subscription Upload
@@ -29,7 +29,7 @@ Request
 The client sends an object containing all current subscriptions for the
 device. ::
 
- PUT /user/<username>/device/<device-id>/subscriptions
+ PUT /user/{username}/device/{deviceid}/subscriptions
  Content-Type: application/json
 
  {
@@ -52,7 +52,7 @@ retrieve changes to the subscriptions since the respective response (see
 If a new device has been created ::
 
  201 Created
- Link: <https://api.gpodder.net/user/<username>/device/<device-id>/subscription?since=0>; rel=changes
+ Link: <https://api.gpodder.net/user/{username}/device/{deviceid}/subscription?since=0>; rel=changes
 
  no body
 
@@ -60,7 +60,7 @@ If a new device has been created ::
 If the subscriptions have been processed immediatelly ::
 
  204 No Content
- Link: <https://api.gpodder.net/user/<username>/device/<device-id>/subscription?since=1234>; rel=changes
+ Link: <https://api.gpodder.net/user/{username}/device/{deviceid}/subscription?since=1234>; rel=changes
 
  no body
 
@@ -103,13 +103,13 @@ Request
 
 Download subscriptions of a device ::
 
- GET /user/<username>/device/<device-id>/subscriptions
+ GET /user/{username}/device/{deviceid}/subscriptions
  Content-Type: application/json
 
 
 Download all of the user's subscriptions ::
 
- GET /user/<username>/subscriptions
+ GET /user/{username}/subscriptions
  Content-Type: application/json
 
 
@@ -119,7 +119,7 @@ Response
 The podcasts correspond to the :ref:`podcast-type` type. ::
 
  200 OK
- Link: <https://api.gpodder.net/user/<username>/device/<device-id>/subscription?since=1234>; rel=changes
+ Link: <https://api.gpodder.net/user/{username}/device/{deviceid}/subscription?since=1234>; rel=changes
  Content-Type: application/json
 
  {
@@ -144,7 +144,7 @@ Request
 
 A client can send which podcasts have been subscribed and unsubscribed. ::
 
- POST /user/<username>/device/<device-id>/subscriptions
+ POST /user/{username}/device/{deviceid}/subscriptions
  Content-Tpe: application/json
 
  {
@@ -157,7 +157,8 @@ A client can send which podcasts have been subscribed and unsubscribed. ::
  }
 
 A client MUST NOT upload a change set where both ``subscribe`` and
-``unsubscribe`` are empty.
+``unsubscribe`` are empty, or where the same podcast is given in both
+``subscribe`` and ``unsubscribe``.
 
 
 Response
@@ -195,7 +196,7 @@ Request
 
 The client makes the following request. ::
 
- GET /user/<username>/device/<device-id>/subscriptions?since=<since>
+ GET /user/{username}/device/{deviceid}/subscriptions{?since}
  Content-Tpe: application/json
 
 
@@ -207,7 +208,7 @@ The server can response with any of the following status codes.
 The changes are returned immediatelly. ::
 
  200 OK
- Link: <https://api.gpodder.net/user/<username>/device/<device-id>/subscription?since=1234>; rel=changes
+ Link: <https://api.gpodder.net/user/{username}/device/{deviceid}/subscription?since=1234>; rel=changes
  Content-Type: application/json
 
  {

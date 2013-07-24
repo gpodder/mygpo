@@ -7,7 +7,9 @@
 {% block sectionmenu %}{{ "/admin/"|section_menu:"Admin" }}{% endblock %}
 
 {% block head %}
- <meta http-equiv="refresh" content="10">
+ {% if not ready %}
+  <meta http-equiv="refresh" content="10">
+ {% endif %}
 {% endblock %}
 
 {% block title %}

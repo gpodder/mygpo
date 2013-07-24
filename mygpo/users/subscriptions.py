@@ -1,4 +1,6 @@
+from mygpo.core.proxy import proxy_object
 from mygpo.db.couchdb.user import get_num_listened_episodes
+from mygpo.db.couchdb.podcast import podcasts_to_dict
 
 
 class PodcastSorter(object):
@@ -58,3 +60,30 @@ class PodcastPercentageListenedSorter(PodcastSorter):
                 podcast.episodes_listened = 0
 
         return sorted(self.podcasts, key=SORT_KEY, reverse=True)
+
+
+def subscription_changes(device_id, podcast_states, since, until):
+    """ returns subscription changes for the device and podcast states """
+
+    add, rem = [], []
+    for p_state in podcast_states:
+        change = p_state.get_change_between(device_id, since, until)
+        if change == 'subscribe':
+            add.append( p_state.ref_url )
+        elif change == 'unsubscribe':
+            rem.append( p_state.ref_url )
+
+    return add, rem
+
+
+def podcasts_for_states(podcast_states):
+    """ returns the podcasts corresponding to the podcast states """
+
+    podcast_ids = [state.podcast for state in podcast_states]
+    podcasts = podcasts_to_dict(podcast_ids)
+
+    for state in podcast_states:
+        podcast = proxy_object(podcasts[state.podcast], url=state.ref_url)
+        podcasts[state.podcast] = podcast
+
+    return podcasts.values()

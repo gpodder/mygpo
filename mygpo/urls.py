@@ -17,11 +17,14 @@
 
 import os.path
 from django.conf.urls import *
+from django.conf import settings
+
+# strip the leading "/"
+static_prefix = settings.STATIC_URL[1:]
 
 # This URLs should be always be served, even during maintenance mode
 urlpatterns = patterns('',
-    (r'^media/(?P<path>.*)$', 'django.views.static.serve',
-        {'document_root': os.path.abspath('%s/../htdocs/media/' % os.path.dirname(__file__))}),
+    (r'^%s(?P<path>.*)$' % static_prefix, 'django.contrib.staticfiles.views.serve')
 )
 
 

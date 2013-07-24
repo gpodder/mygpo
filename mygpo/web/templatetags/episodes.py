@@ -2,6 +2,7 @@ from django import template
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.utils.html import strip_tags
+from django.contrib.staticfiles.storage import staticfiles_storage
 
 from mygpo.core.models import Episode
 from mygpo import utils
@@ -39,7 +40,8 @@ def episode_status_text(episode):
 @register.filter
 def episode_status_icon(action):
     if not action or not action.action:
-        s = '<img src="/media/nothing.png" alt="nothing" title="%s" />' % _('Unplayed episode')
+        s = '<img src="%s" alt="nothing" title="%s" />' % \
+            (staticfiles_storage.url('nothing.png'), _('Unplayed episode'))
 
     else:
         date_string   = (_(' on %s') % (action.timestamp)) if action.timestamp else ''
@@ -49,9 +51,9 @@ def episode_status_icon(action):
             s = '<img src="https://flattr.com/_img/icons/flattr_logo_16.png" alt="flattr" title="%s" />' % (_("The episode has been flattr'd"),)
 
         elif action.action == 'new':
-            s = '<img src="/media/new.png" alt="new" title="%s" />' % ('%s%s%s' % (_('This episode has been marked new'),date_string, device_string))
+            s = '<img src="%s" alt="new" title="%s" />' % (staticfiles_storage.url('new.png'), '%s%s%s' % (_('This episode has been marked new'),date_string, device_string))
         elif action.action == 'download':
-            s = '<img src="/media/download.png" alt="downloaded" title="%s" />' % ('%s%s%s' % (_('This episode has been downloaded'),date_string, device_string))
+            s = '<img src="%s" alt="downloaded" title="%s" />' % (staticfiles_storage.url('download.png'), '%s%s%s' % (_('This episode has been downloaded'),date_string, device_string))
         elif action.action == 'play':
             if action.playmark is not None:
                 if getattr(action, 'started', None) is not None:
@@ -63,9 +65,9 @@ def episode_status_icon(action):
                             utils.format_time(action.playmark),)
             else:
                 playback_info = ''
-            s = '<img src="/media/playback.png" alt="played" title="%s" />' % ('%s%s%s%s' % (_('This episode has been played'),date_string, device_string, playback_info))
+            s = '<img src="%s" alt="played" title="%s" />' % (staticfiles_storage.url('playback.png'), '%s%s%s%s' % (_('This episode has been played'),date_string, device_string, playback_info))
         elif action.action == 'delete':
-            s = '<img src="/media/delete.png" alt="deleted" title="%s"/>' % ('%s%s%s' % (_('This episode has been deleted'),date_string, device_string))
+            s = '<img src="%s" alt="deleted" title="%s"/>' % (staticfiles_storage.url('delete.png'), '%s%s%s' % (_('This episode has been deleted'),date_string, device_string))
         else:
             return action.action  # this is not marked safe by intention
 

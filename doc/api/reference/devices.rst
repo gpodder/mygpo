@@ -26,8 +26,8 @@ Resources
 
 The Devices API defines the following resources ::
 
-    /user/<username>/devices
-    /user/<username>/device/<device-id>
+    /user/{username}/devices
+    /user/{username}/device/{device_id}
 
 
 Retrieve Device List
@@ -35,7 +35,7 @@ Retrieve Device List
 
 Retrieve the list of existing devices ::
 
-    GET /user/<username>/devices
+    GET /user/{username}/devices
     Content-Type: application/json
 
     200 OK
@@ -59,7 +59,7 @@ Get Device Information
 
 Retrieve information about a specific device ::
 
-    GET /user/<username>/device/<device-id>
+    GET /user/{username}/device/{device_id}
     Content-Type: application/json
 
     200 OK
@@ -80,7 +80,7 @@ Update Device Information
 
 Update the information of a device ::
 
-    POST /user/<username>/device/<device-id>
+    POST /user/{username}/device/{device_id}
     Content-Type: application/json
 
     TODO response: return device information

@@ -102,14 +102,12 @@ SITE_ID = 1
 # to load the internationalization machinery.
 USE_I18N = True
 
-# Absolute path to the directory that holds media.
-# Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = os.path.abspath('%s/../htdocs/media/' % os.path.dirname(__file__))
+STATIC_ROOT = 'staticfiles'
+STATIC_URL = '/media/'
 
-# URL that handles the media served from MEDIA_ROOT. Make sure to use a
-# trailing slash if there is a path component (optional in other cases).
-# Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = ''
+STATICFILES_DIRS = (
+    os.path.abspath(os.path.join(BASE_DIR, '..', 'htdocs', 'media')),
+)
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -135,6 +133,7 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',  # unused, but tests fail otherwise (?)
     'django.contrib.messages',
     'django.contrib.humanize',
+    'django.contrib.staticfiles',
     'couchdbkit.ext.django',
     'django_couchdb_utils.auth',
     'django_couchdb_utils.sessions',
@@ -183,9 +182,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 USER_CLASS = 'mygpo.users.models.User'
-
-AUTH_PROFILE_MODULE = "api.UserProfile"
-
 
 LOGIN_URL = '/login/'
 
