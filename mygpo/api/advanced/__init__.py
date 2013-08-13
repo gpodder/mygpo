@@ -216,7 +216,7 @@ def episodes(request, username, version=1):
             return HttpResponseBadRequest(str(e))
 
         except InvalidEpisodeActionAttributes as e:
-            logger.exception('invalid episode action attributes while uploading episode actions for user %s: %s' % (username,))
+            logger.exception('invalid episode action attributes while uploading episode actions for user %s' % (username,))
             return HttpResponseBadRequest(str(e))
 
         logger.info('done:  user %s: %d actions from %s' % (request.user._id, len(actions), ua_string))
