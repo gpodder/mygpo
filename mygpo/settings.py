@@ -72,6 +72,9 @@ COUCHDB_DATABASES = {
 
     'mygpo.categories':
         {'URL': 'http://127.0.0.1:5984/mygpo_categories'},
+
+    'mygpo.userdata':
+        {'URL': 'http://127.0.0.1:5984/mygpo_userdata'},
 }
 
 # Maps design documents to databases. The keys correspond to the directories in
@@ -83,6 +86,7 @@ COUCHDB_DDOC_MAPPING = {
     'general':    'core',
     'categories': 'categories',
     'pubsub':     'pubsub',
+    'userdata':   'userdata',
 }
 
 # Local time zone for this installation. Choices can be found here:
