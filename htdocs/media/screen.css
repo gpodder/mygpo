@@ -509,7 +509,7 @@ div.first-episode div.episode div.header a
 .sidebar-nav
 {
     text-align: right;
-    border-right: thin solid #222;
+    border-right: thin solid #2ba09c;
     margin-right: 1em;
 }
 
@@ -522,7 +522,7 @@ div.first-episode div.episode div.header a
 .nav-list > .active > a:hover,
 .nav-list > .active > a:focus {
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
-  background-color: #222;
+  background-color: #2ba09c;
   color: #eee;
 }
 
