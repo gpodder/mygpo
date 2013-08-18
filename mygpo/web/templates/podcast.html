@@ -5,8 +5,6 @@
 {% load podcasts %}
 {% load devices %}
 {% load charts %}
-{% load facebook %}
-{% load google %}
 {% load utils %}
 
 {% load menu %}
@@ -146,6 +144,14 @@
     </a>
    {% endif %}
 
+   {% if can_flattr %}
+    <a class="btn" href="{% podcast_link_target podcast "podcast-flattr" %}">
+     <img src="https://flattr.com/_img/icons/flattr_logo_16.png"
+      alt="Flattr {{ podcast.title|default:"Unnamed Podcast"|striptags }}" />
+     {% trans "Flattr" %}
+    </a>
+   {% endif %}
+
   </div>
 
  <hr />
@@ -215,20 +221,6 @@
     </form>
    {% endif %}
   </div>
-
-  <div class="well">
-   <h4>{% trans "Share" %}</h4>
-
-   {% google_plus_one_button %}
-   {{ podcast|fb_like_podcast }}
-   {% if can_flattr %}
-    <a href="{% podcast_link_target podcast "podcast-flattr" %}">
-     <img src="https://api.flattr.com/button/flattr-badge-large.png"
-      alt="Flattr {{ podcast.title|default:"Unnamed Podcast"|striptags }}" />
-    </a>
-   {% endif %}
-
- </div>
 
 {% endblock %}
 
