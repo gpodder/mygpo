@@ -112,9 +112,9 @@ def section_menu(selected, title=None):
                     title = title[:33] + '...'
                 caption = title
             if uri in HIDDEN_URIS:
-                items.append('<li class="active">%s</li>' % ugettext(caption))
+                items.append('<li class="active"><a href="">%s</a></li>' % ugettext(caption))
             elif uri == '':
-                items.append('<li class="nav-header">%s</li>' % ugettext(caption))
+                items.append('<li class="nav-header"><a href="">%s</a></li>' % ugettext(caption))
             else:
                 items.append('<li class="active"><a href="%s">%s</a></li>' % \
                         (uri, ugettext(caption)))
