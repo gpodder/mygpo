@@ -62,12 +62,17 @@
 
    {% if related_podcasts %}
     <div class="related-podcasts">
-     <strong>{% trans "Also available" %}</strong>
-     {% for p in related_podcasts %}
-      {% if p.group_member_name != podcast.group_member_name %}
-       {% podcast_group_link p p.group_member_name %}
-      {% endif %}
-     {% endfor %}
+     <form class="form-inline">
+      <select class="input-mini" id="relatedpodcasts">
+       {% for p in related_podcasts %}
+        {% if p.group_member_name == podcast.group_member_name %}
+         <option value="{% podcast_link_target p %}" selected="selected">{{ p.group_member_name }}</option>
+        {% else %}
+         <option value="{% podcast_link_target p %}">{{ p.group_member_name }}</option>
+        {% endif %}
+       {% endfor %}
+      </select>
+     </form>
     </div>
    {% endif %}
 
@@ -82,4 +87,16 @@
 
 {% block ads %}
  {% comment %}disable ads on podcast pages{% endcomment %}
+{% endblock %}
+
+{% block javascript2 %}
+    <script type="text/javascript">
+        $(document).ready(function()
+        {
+            $("#relatedpodcasts").change(function()
+            {
+                window.location.href = $("#relatedpodcasts option:selected").val();
+            });
+        });
+    </script>
 {% endblock %}
