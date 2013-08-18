@@ -8,8 +8,6 @@
 {% load time %}
 {% load youtube %}
 {% load flickr %}
-{% load facebook %}
-{% load google %}
 {% load charts %}
 {% load utils %}
 
@@ -29,12 +27,13 @@
   <script type="text/javascript" src="/media/js/json2.js"></script>
   <script type="text/javascript" src="/media/js/youtube-handler.js"></script>
  {% endif %}
- {% opengraph_episode episode podcast %}
- {% google_plus_one_head %}
 
 {% endblock head %}
 
-{% block title %}{{ episode.title|default:"Unnamed Episode"|striptags }} - {{ podcast.title|default:"Unnamed Podcast"|striptags}}{% endblock %}
+{% block title %}
+ {{ episode.title|default:"Unnamed Episode"|striptags }} -
+ {{ podcast.title|default:"Unnamed Podcast"|striptags}}
+{% endblock %}
 
 {% block header %}
 
@@ -64,11 +63,57 @@
       {% endif %}
   </small>
 
+
+  {% if episode.summary or episode.description %}
+   <div class="summary">
+    {{ episode.summary|default:episode.description|truncatewords:100|markdown }}
+   </div>
+  {% endif %}
+
 {% endblock %}
 
 
 
 {% block content %}
+
+  <hr />
+
+ <div class="btn-toolbar">
+
+  {% if is_publisher %}
+   <a class="btn" href="{% episode_link_target episode podcast "episode-publisher-detail" %}"><i class="icon-wrench"></i> {% trans "Publisher Pages" %}</a>
+  {% endif %}
+
+  {% if user.is_authenticated %}
+   {% if is_favorite %}
+     <a class="btn" href="{% episode_link_target episode podcast "episode-fav" %}">
+      <i class="icon-star"></i> {% trans "Remove Favorite" %}
+     </a>
+   {% else %}
+     <a class="btn" href="{% episode_link_target episode podcast "episode-fav" %}">
+      <i class="icon-star-empty"></i> {% trans "Favorite" %}
+     </a>
+   {% endif %}
+  {% endif %}
+
+   {% if has_history %}
+    <a class="btn" href="{% episode_link_target episode podcast "episode-history" %}">
+     <i class="icon-calendar"></i>
+     {% trans "Episode History" %}
+    </a>
+   {% endif %}
+
+  {% if can_flattr %}
+   <a class="btn" href="{% episode_link_target episode podcast "flattr-episode" %}">
+    <img src="https://flattr.com/_img/icons/flattr_logo_16.png"
+     alt="Flattr {{ episode.title|default:"Unnamed Episode"|striptags }}" />
+     {% trans "Flattr" %}
+   </a>
+  {% endif %}
+
+ </div>
+
+ <hr />
 
   {% if episode.content or episode.description %}
    <div class="description" {% if episode.language or podcast.language %}lang="{% firstof episode.language podcast.language %}"{% endif %}>
@@ -97,16 +142,6 @@
 
   {% if user.is_authenticated %}
 
-   {% if is_favorite %}
-     <a class="btn" href="{% episode_link_target episode podcast "episode-fav" %}">
-      <i class="icon-star"></i> {% trans "Remove Favorite" %}
-     </a>
-   {% else %}
-     <a class="btn" href="{% episode_link_target episode podcast "episode-fav" %}">
-      <i class="icon-star-empty"></i> {% trans "Favorite" %}
-     </a>
-   {% endif %}
-
    {% if played_parts %}
     <h3>Already played</h3>
     {{ played_parts|episode_heatmap_visualization }}
@@ -114,7 +149,7 @@
 
   {% endif %}
 
-  <div class="pagination">
+  <div class="pagination pagination-centered">
    <ul>
     {% if prev %}
      <li>
@@ -136,32 +171,6 @@
 
 
 {% block sidebar %}
-
-  {% if is_publisher %}
-   <div class="well">
-    <h4>{% trans "Publisher Pages" %}</h4>
-
-    <a class="btn" href="{% episode_link_target episode podcast "episode-publisher-detail" %}"><i class="icon-wrench"></i> {% trans "Go" %}</a>
-   </div>
-  {% endif %}
-
-
- <div class="well">
-
-  <h4>Share</h4>
-
-  {% google_plus_one_button %}
-  {% fb_like_episode episode podcast %}
-
-  {% if can_flattr %}
-   <a href="{% episode_link_target episode podcast "flattr-episode" %}">
-    <img src="https://api.flattr.com/button/flattr-badge-large.png"
-     alt="Flattr {{ episode.title|default:"Unnamed Episode"|striptags }}" />
-   </a>
-  {% endif %}
-
- </div>
-
 
 
   {% if user.is_authenticated or chapters %}
@@ -213,63 +222,6 @@
     {% endif %}
   </table>
   </div>
-  {% endif %}
-
-  {% if user.is_authenticated or history %}
-  <div class="well">
-  <h4>{% trans "History" %}</h4>
-  <table class="list">
-   <tr>
-    <th>{% trans "Time" %}</th>
-    <th>{% trans "Action" %}</th>
-    <th>{% trans "Device" %}</th>
-    <th></th>
-   </tr>
-
-   {% for s in history %}
-    <tr>
-     <td><abbr title="{{ s.timestamp }}">{{ s.timestamp|naturalday }}</abbr></td>
-     <td style="text-align: center;">{{ s|episode_status_icon }}</td>
-     <td>
-      {% if s.device %}
-       <a href="{% url "device" s.device.uid %}">{{ s.device|device_icon }} {{ s.device.name|striptags }}</a>
-      {% endif %}
-     </td>
-     <td>{% if s.started or s.playmark %}{{s.started|format_time }} - {% endif %}
-         {% if s.playmark %}{{ s.playmark|format_time }}{% endif %}
-     </td>
-	</tr>
-   {% endfor %}
-
-   {% if user.is_authenticated %}
-    <tr>
-     <form action="{% episode_link_target episode podcast "add-episode-action" %}" method="POST">
-      {% csrf_token %}
-      <td>
-       <input class="input-mini" type="text" id="timestamp" name="timestamp" placeholder="empty = now" /></td>
-      <td>
-       <select class="input-mini" name="action">
-        {% for action, str in actions %}
-         <option value="{{ action }}">{{ str }}</option>
-        {% endfor %}
-       </select>
-      </td>
-      <td>
-       <select class="input-mini" name="device">
-        <option value=""></option>
-        {% for device_id, name in devices.items %}
-         <option value="{{ device_id }}">{{ name }}</option>
-        {% endfor %}
-       </select>
-      </td>
-      <td>
-       <input class="btn" type="submit" value="{% trans "Add" %}" />
-      </td>
-     </form>
-    </tr>
-   {% endif %}
-  </table>
- </div>
   {% endif %}
 
 {% endblock %}

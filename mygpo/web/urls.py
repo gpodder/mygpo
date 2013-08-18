@@ -86,6 +86,7 @@ urlpatterns += patterns('mygpo.web.views.episode',
  url(r'^episode/(?P<id>\d+)/toggle-favorite',                     'toggle_favorite_oldid',name='episode-fav'),
  url(r'^episode/(?P<id>\d+)/add-action',                          'add_action_oldid',    name='add-episode-action'),
  url(r'^episode/(?P<id>\d+)/-flattr',                             'flattr_episode_oldid',    name='flattr-episode'),
+ url(r'^episode/(?P<id>\d+)/\+history',                            'episode_history_oldid',    name='episode-history'),
 
  url(r'^podcast/(?P<p_slug_id>[\w-]+)/(?P<e_slug_id>[\w-]+)$',                'show_slug_id',            name='episode-slug-id'),
  url(r'^episode/(?P<p_slug_id>[\w-]+)/(?P<e_slug_id>[\w-]+)/add-chapter$',    'add_chapter_slug_id',     name='add-chapter-slug-id'),
@@ -94,6 +95,7 @@ urlpatterns += patterns('mygpo.web.views.episode',
  url(r'^episode/(?P<p_slug_id>[\w-]+)/(?P<e_slug_id>[\w-]+)/toggle-favorite', 'toggle_favorite_slug_id', name='episode-fav-slug-id'),
  url(r'^episode/(?P<p_slug_id>[\w-]+)/(?P<e_slug_id>[\w-]+)/add-action',      'add_action_slug_id',      name='add-episode-action-slug-id'),
  url(r'^podcast/(?P<p_slug_id>[\w-]+)/(?P<e_slug_id>[\w-]+)/-flattr',         'flattr_episode_slug_id',  name='flattr-episode-slug-id'),
+ url(r'^podcast/(?P<p_slug_id>[\w-]+)/(?P<e_slug_id>[\w-]+)/\+history',         'episode_history_slug_id',name='episode-history-slug-id'),
 )
 
 from mygpo.web.views.settings import DefaultPrivacySettings, \

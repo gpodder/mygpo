@@ -155,9 +155,10 @@ table.list th.group i
     font-size: .7em;
 }
 
-.description
+.description,
+.summary
 {
-    color: #666;
+    color: #222;
     hypens: auto;
     -webkit-hyphens: auto;
     -moz-hyphens: auto;
@@ -167,9 +168,15 @@ table.list th.group i
 }
 
 
-div.description
+div.description,
+div.summary
 {
     margin-top: 1em;
+}
+
+.summary img
+{
+    display: none;
 }
 
 /* don't show images in the description of the podcast page */

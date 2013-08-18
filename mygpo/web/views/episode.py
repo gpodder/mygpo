@@ -69,9 +69,7 @@ def episode(request, episode):
         podcasts_dict = {podcast.get_id(): podcast}
         episodes_dict = {episode._id: episode}
 
-        history = list(episode_state.get_history_entries())
-        HistoryEntry.fetch_data(user, history,
-                podcasts=podcasts_dict, episodes=episodes_dict)
+        has_history = bool(list(episode_state.get_history_entries()))
 
         played_parts = EpisodeHeatmap(podcast.get_id(),
                 episode._id, user._id, duration=episode.duration)
@@ -80,7 +78,7 @@ def episode(request, episode):
         can_flattr = user.get_wksetting(FLATTR_TOKEN) and episode.flattr_url
 
     else:
-        history = []
+        has_history = False
         is_fav = False
         played_parts = None
         devices = {}
@@ -103,7 +101,7 @@ def episode(request, episode):
         'podcast': podcast,
         'prev': prev,
         'next': next,
-        'history': history,
+        'has_history': has_history,
         'chapters': chapters,
         'is_favorite': is_fav,
         'played_parts': played_parts,
@@ -112,6 +110,37 @@ def episode(request, episode):
         'can_flattr': can_flattr,
         'is_publisher': is_publisher,
     })
+
+
+@never_cache
+@login_required
+@vary_on_cookie
+@cache_control(private=True)
+def history(request, episode):
+    """ shows the history of the episode """
+
+    user = request.user
+    podcast = podcast_by_id(episode.podcast)
+    episode_state = episode_state_for_user_episode(user, episode)
+
+    # pre-populate data for fetch_data
+    podcasts_dict = {podcast.get_id(): podcast}
+    episodes_dict = {episode._id: episode}
+
+    history = list(episode_state.get_history_entries())
+    HistoryEntry.fetch_data(user, history,
+            podcasts=podcasts_dict, episodes=episodes_dict)
+
+    devices = dict( (d.id, d.name) for d in user.devices )
+
+    return render(request, 'episode-history.html', {
+        'episode': episode,
+        'podcast': podcast,
+        'history': history,
+        'actions': EPISODE_ACTION_TYPES,
+        'devices': devices,
+    })
+
 
 
 @never_cache
@@ -315,6 +344,7 @@ remove_chapter_slug_id  = slug_id_decorator(remove_chapter)
 toggle_favorite_slug_id = slug_id_decorator(toggle_favorite)
 add_action_slug_id      = slug_id_decorator(add_action)
 flattr_episode_slug_id  = slug_id_decorator(flattr_episode)
+episode_history_slug_id = slug_id_decorator(history)
 
 show_oldid            = oldid_decorator(episode)
 add_chapter_oldid     = oldid_decorator(add_chapter)
@@ -322,3 +352,4 @@ remove_chapter_oldid  = oldid_decorator(remove_chapter)
 toggle_favorite_oldid = oldid_decorator(toggle_favorite)
 add_action_oldid      = oldid_decorator(add_action)
 flattr_episode_oldid  = oldid_decorator(flattr_episode)
+episode_history_oldid = oldid_decorator(history)
