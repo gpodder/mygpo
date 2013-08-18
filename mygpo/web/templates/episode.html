@@ -170,63 +170,6 @@
 {% endblock %}
 
 
-{% block sidebar %}
-
-
-  {% if user.is_authenticated or chapters %}
-    <div class="well">
-
-   <h4>{% trans "Chapters" %}</h4>
-
-   <table class="list">
-    <tr>
-     <th></th>
-     <th>{% trans "Ad?" %}</th>
-     <th>{% trans "Label" %}</th>
-     <th></td>
-    </tr>
-
-    {% for chapter in chapters %}
-     <tr {% if chapter.is_own %}class="own-chapter"{% endif %} >
-      <td>{{ chapter.start|sec_to_time|time:"H:i:s" }}{% if chapter.start != chapter.end %} - {{ chapter.end|sec_to_time|time:"H:i:s" }}{% endif %}</td>
-      <td>{% if chapter.advertisement %}Yes{% endif %}</td>
-      <td>{{ chapter.label }}</strong>
-      <td>
-       {% if chapter.is_own %}
-        <a href="{% episode_link_target episode "remove-chapter" chapter.start chapter.end %}">
-         <img src="/media/unsubscribe.png" alt="{% trans "Remove" %}" />
-        </a>
-       {% endif %}
-      </td>
-     </tr>
-    {% endfor %}
-    {% if user.is_authenticated %}
-    <tr>
-     <form class="form-inline" action="{% episode_link_target episode podcast "add-chapter" %}" method="POST">
-      {% csrf_token %}
-      <td>
-       <input class="input-mini" type="text" name="start" id="start" class="time" placeholder="h:mm:ss"/>
-       <input class="input-mini" type="text" name="end" id="end" class="time" placeholder="h:mm:ss"/>
-      </td>
-      <td>
-       <input type="checkbox" name="advertisement" />
-      </td>
-      <td>
-       <input class="input-mini" type="text" name="label" />
-      </td>
-      <td>
-       <input class="btn" type="submit" value="{% trans "Add" %}" />
-      </td>
-     </form>
-    </tr>
-    {% endif %}
-  </table>
-  </div>
-  {% endif %}
-
-{% endblock %}
-
-
 {% block javascript %}
  <script type="text/javascript">
 

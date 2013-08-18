@@ -40,7 +40,7 @@ from mygpo.web.heatmap import EpisodeHeatmap
 from mygpo.publisher.utils import check_publisher_permission
 from mygpo.web.utils import get_episode_link_target, fetch_episode_data
 from mygpo.db.couchdb.episode import episode_for_slug_id, episode_for_oldid, \
-         favorite_episodes_for_user, chapters_for_episode
+         favorite_episodes_for_user
 from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url, \
          podcasts_to_dict
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
@@ -86,13 +86,6 @@ def episode(request, episode):
 
     is_publisher = check_publisher_permission(user, podcast)
 
-    chapters = []
-    for user_id, chapter in chapters_for_episode(episode._id):
-        chapter.is_own = user.is_authenticated() and \
-                         user_id == user._id
-        chapters.append(chapter)
-
-
     prev = podcast.get_episode_before(episode)
     next = podcast.get_episode_after(episode)
 
@@ -102,7 +95,6 @@ def episode(request, episode):
         'prev': prev,
         'next': next,
         'has_history': has_history,
-        'chapters': chapters,
         'is_favorite': is_fav,
         'played_parts': played_parts,
         'actions': EPISODE_ACTION_TYPES,
@@ -140,56 +132,6 @@ def history(request, episode):
         'actions': EPISODE_ACTION_TYPES,
         'devices': devices,
     })
-
-
-
-@never_cache
-@login_required
-def add_chapter(request, episode):
-    e_state = episode_state_for_user_episode(request.user, episode)
-
-    podcast = podcast_by_id(episode.podcast)
-
-    try:
-        start = parse_time(request.POST.get('start', '0'))
-
-        if request.POST.get('end', '0'):
-            end = parse_time(request.POST.get('end', '0'))
-        else:
-            end = start
-
-        adv = 'advertisement' in request.POST
-        label = request.POST.get('label')
-
-    except ValueError as e:
-        messages.error(request,
-                _('Could not add Chapter: {msg}'.format(msg=str(e))))
-
-        return HttpResponseRedirect(get_episode_link_target(episode, podcast))
-
-
-    chapter = Chapter()
-    chapter.start = start
-    chapter.end = end
-    chapter.advertisement = adv
-    chapter.label = label
-
-    e_state.update_chapters(add=[chapter])
-
-    return HttpResponseRedirect(get_episode_link_target(episode, podcast))
-
-
-@never_cache
-@login_required
-def remove_chapter(request, episode, start, end):
-    e_state = episode_state_for_user_episode(request.user, episode)
-
-    remove = (int(start), int(end))
-    e_state.update_chapters(rem=[remove])
-
-    podcast = podcast_by_id(episode.podcast)
-
-    return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
 
 @never_cache
@@ -339,16 +281,12 @@ def oldid_decorator(f):
     return _decorator
 
 show_slug_id            = slug_id_decorator(episode)
-add_chapter_slug_id     = slug_id_decorator(add_chapter)
-remove_chapter_slug_id  = slug_id_decorator(remove_chapter)
 toggle_favorite_slug_id = slug_id_decorator(toggle_favorite)
 add_action_slug_id      = slug_id_decorator(add_action)
 flattr_episode_slug_id  = slug_id_decorator(flattr_episode)
 episode_history_slug_id = slug_id_decorator(history)
 
 show_oldid            = oldid_decorator(episode)
-add_chapter_oldid     = oldid_decorator(add_chapter)
-remove_chapter_oldid  = oldid_decorator(remove_chapter)
 toggle_favorite_oldid = oldid_decorator(toggle_favorite)
 add_action_oldid      = oldid_decorator(add_action)
 flattr_episode_oldid  = oldid_decorator(flattr_episode)
