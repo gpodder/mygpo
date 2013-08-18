@@ -19,6 +19,7 @@ from mygpo.core.proxy import DocumentABCMeta, proxy_object
 from mygpo.decorators import repeat_on_conflict
 from mygpo.users.ratings import RatingMixin
 from mygpo.users.sync import SyncedDevicesMixin
+from mygpo.users.subscriptions import subscription_changes, podcasts_for_states
 from mygpo.users.settings import FAV_FLAG, PUBLIC_SUB_PODCAST, SettingsMixin
 from mygpo.db.couchdb.podcast import podcasts_by_id, podcasts_to_dict
 from mygpo.db.couchdb.user import user_history, device_history
@@ -352,6 +353,19 @@ class PodcastUserState(Document, SettingsMixin):
         return devices
 
 
+    def is_subscribed_on(self, device):
+        """ checks if the podcast is subscribed on the given device """
+
+        for action in reversed(self.actions):
+            if not action.device == device.id:
+                continue
+
+            # we only need to check the latest action for the device
+            return (action.action == 'subscribe')
+
+        # we haven't found any matching action
+        return False
+
 
     def is_public(self):
         return self.get_wksetting(PUBLIC_SUB_PODCAST)
@@ -388,17 +402,8 @@ class Device(Document, SettingsMixin):
         """
 
         from mygpo.db.couchdb.podcast_state import podcast_states_for_device
-
-        add, rem = [], []
         podcast_states = podcast_states_for_device(self.id)
-        for p_state in podcast_states:
-            change = p_state.get_change_between(self.id, since, until)
-            if change == 'subscribe':
-                add.append( p_state.ref_url )
-            elif change == 'unsubscribe':
-                rem.append( p_state.ref_url )
-
-        return add, rem
+        return subscription_changes(self.id, podcast_states, since, until)
 
 
     def get_latest_changes(self):
@@ -433,14 +438,7 @@ class Device(Document, SettingsMixin):
         the podcast """
 
         states = self.get_subscribed_podcast_states()
-        podcast_ids = [state.podcast for state in states]
-        podcasts = podcasts_to_dict(podcast_ids)
-
-        for state in states:
-            podcast = proxy_object(podcasts[state.podcast], url=state.ref_url)
-            podcasts[state.podcast] = podcast
-
-        return podcasts.values()
+        return podcasts_for_states(states)
 
 
     def __hash__(self):
@@ -783,29 +781,6 @@ class User(BaseUser, SyncedDevicesMixin, SettingsMixin):
         for episode in episodes:
             podcast = podcast_dict.get(episode.podcast, None)
             yield proxy_object(episode, podcast=podcast)
-
-
-
-
-    def save(self, *args, **kwargs):
-
-        from mygpo.db.couchdb.podcast_state import podcast_states_for_user
-
-        super(User, self).save(*args, **kwargs)
-
-        podcast_states = podcast_states_for_user(self)
-        for state in podcast_states:
-            @repeat_on_conflict(['state'])
-            def _update_state(state):
-                old_devs = set(state.disabled_devices)
-                state.set_device_state(self.devices)
-
-                if old_devs != set(state.disabled_devices):
-                    state.save()
-
-            _update_state(state)
-
-
 
 
     def __eq__(self, other):

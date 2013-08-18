@@ -36,8 +36,9 @@ from mygpo.api import simple
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.users.models import Device, DeviceUIDException, \
      DeviceDoesNotExist
-from mygpo.users.tasks import sync_user
+from mygpo.users.tasks import sync_user, set_device_task_state
 from mygpo.db.couchdb.podcast_state import podcast_states_for_device
+from mygpo.db.couchdb.user import set_device_deleted, unsync_device
 
 
 @vary_on_cookie
@@ -262,19 +263,10 @@ def symbian_opml(request, device):
 @login_required
 @allowed_methods(['POST'])
 def delete(request, device):
-
-    @repeat_on_conflict(['user'])
-    def _delete(user, device):
-        if request.user.is_synced(device):
-            request.user.unsync_device(device)
-        device.deleted = True
-        user.set_device(device)
-        if user.is_synced(device):
-            user.unsync_device(device)
-        user.save()
-
-    _delete(user=request.user, device=device)
-
+    user = request.user
+    unsync_device(user, device)
+    set_device_deleted(user, device, True)
+    set_device_task_state.delay(user)
     return HttpResponseRedirect(reverse('devices'))
 
 
@@ -303,10 +295,9 @@ def delete_permanently(request, device):
 @device_decorator
 @login_required
 def undelete(request, device):
-
-    device.deleted = False
-    request.user.update_device(device)
-
+    user = request.user
+    set_device_deleted(user, device, False)
+    set_device_task_state.delay(user)
     return HttpResponseRedirect(reverse('device', args=[device.uid]))
 
 

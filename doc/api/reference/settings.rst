@@ -16,10 +16,10 @@ Resources
 
 The Settings API defines the following resources ::
 
-    /user/<username>/settings/account
-    /user/<username>/settings/device
-    /user/<username>/settings/podcast
-    /user/<username>/settings/episode
+    /user/{username}/settings/account
+    /user/{username}/settings/device
+    /user/{username}/settings/podcast
+    /user/{username}/settings/episode
 
 
 Well-Known Settings
@@ -86,8 +86,8 @@ Saving Settings
 
 Save Settings ::
 
-    POST /user/<username>/settings/<scope>?<scope-specification>
-    PATCH /user/<username>/settings/<scope>?<scope-specification>
+    POST /user/{username}/settings/{scope}{?scope_specification}
+    PATCH /user/{username}/settings/{scope}{?scope_specification}
 
 
 * Requires authentication
@@ -170,7 +170,7 @@ Get Settings
 
 Get Settings ::
 
-    GET /user/<username>/settings/<scope>?<scope-specification>
+    GET /user/{username}/settings/{scope}{?scope_specification}
 
 Scope and specification as above.
 Requires Authentication

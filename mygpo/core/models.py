@@ -479,7 +479,7 @@ class PodcastGroup(Document, SlugMixin, OldIdMixin):
 
     def get_podcast_by_oldid(self, oldid):
         for podcast in list(self.podcasts):
-            if podcast.oldid == oldid:
+            if podcast.oldid == oldid or oldid in podcast.merged_oldids:
                 return podcast
 
 

@@ -5,7 +5,7 @@ from collections import Counter
 from couchdbkit import ResourceConflict
 
 from mygpo.cel import celery
-from mygpo.db.couchdb.user import suggestions_for_user
+from mygpo.db.couchdb.user import suggestions_for_user, update_device_state
 
 
 @celery.task(max_retries=5, default_retry_delay=60)
@@ -45,3 +45,12 @@ def update_suggestions(user, max_suggestions=15):
 
     except ResourceConflict as ex:
         raise update_suggestions.retry(exc=ex)
+
+
+@celery.task(max_retries=5, default_retry_delay=60)
+def set_device_task_state(user):
+    """ updates the device states of a user in all his/her podcast states """
+    from mygpo.db.couchdb.podcast_state import podcast_states_for_user
+    podcast_states = podcast_states_for_user(user)
+    for state in podcast_states:
+        update_device_state(state, user.devices)

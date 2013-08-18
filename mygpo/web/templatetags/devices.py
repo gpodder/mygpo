@@ -1,8 +1,11 @@
+import os.path
+
 from django import template
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext
 from django.core.urlresolvers import reverse
 from django.utils.html import strip_tags
+from django.contrib.staticfiles.storage import staticfiles_storage
 
 from mygpo.api.constants import DEVICE_TYPES
 from mygpo.web.views.device import show
@@ -51,8 +54,9 @@ def device_icon(device):
 
     if icon is not None and caption is not None:
         caption = ugettext(caption)
-        html = ('<img src="/media/clients/%(icon)s" '+
-                'alt="%(caption)s" class="device_icon"/>') % locals()
+        html = '<img src="%(icon)s" alt="%(caption)s" class="device_icon"/>' \
+            % dict(icon=staticfiles_storage.url(os.path.join('clients', icon)),
+                   caption=caption)
         return mark_safe(html)
 
     return ''

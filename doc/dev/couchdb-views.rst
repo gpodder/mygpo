@@ -15,16 +15,6 @@ This group of views is available on the general database, called ``mygpo`` by
 default.
 
 
-Chapters
-^^^^^^^^
-
-Doc-Types: EpisodeUserState
-
-**Views**
-
-* `chapters/by_episode <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/chapters/views/by_episode>`_
-
-
 Clients
 ^^^^^^^
 
@@ -33,32 +23,6 @@ Doc-Types: User
 **Views**
 
 * `clients/by_ua_string <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/clients/views/by_ua_string>`_
-
-
-Episode Actions
-^^^^^^^^^^^^^^^
-
-Doc-Types: EpisodeUserState
-
-**Views**
-
-* `episode_actions/by_device <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/episode_actions/views/by_device>`_
-* `episode_actions/by_podcast_device <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/episode_actions/views/by_podcast_device>`_
-* `episode_actions/by_podcast <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/episode_actions/views/by_podcast>`_
-* `episode_actions/by_user <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/episode_actions/views/by_user>`_
-
-
-Episode States
-^^^^^^^^^^^^^^
-
-Doc-Types: EpisodeUserState
-
-**Views**
-
-* `episode_states/by_podcast_episode <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/episode_states/views/by_podcast_episode>`_
-* `episode_states/by_ref_urls <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/episode_states/views/by_ref_urls>`_
-* `episode_states/by_user_episode <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/episode_states/views/by_user_episode>`_
-* `episode_states/by_user_podcast <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/episode_states/views/by_user_podcast>`_
 
 
 Episode Statistics
@@ -86,52 +50,6 @@ Doc-Types: Episode
 * `episodes/need_update <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/episodes/views/need_update>`_
 
 
-Favorites
-^^^^^^^^^
-
-Doc-Types: EpisodeUserState
-
-**Views**
-
-* `episodes/favorites_by_user <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/favorites/views/episodes_by_user>`_
-
-
-Heatmap
-^^^^^^^
-
-Doc-Types: EpisodeUserState
-
-**Views**
-
-* `heatmap/by_episode <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/heatmap/views/by_episode>`_
-
-
-History
-^^^^^^^
-
-Doc-Types: EpisodeUserState, PodcastUserState
-
-**Views**
-
-* `history/by_device <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/history/views/by_device>`_
-* `history/by_user <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/history/views/by_user>`_
-
-
-Listeners
-^^^^^^^^^
-
-Doc-Types: EpisodeUserState
-
-**Views**
-
-* `listeners/by_episode <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/listeners/views/by_episode>`_
-* `listeners/by_podcast_episode <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/listeners/views/by_podcast_episode>`_
-* `listeners/by_podcast <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/listeners/views/by_podcast>`_
-* `listeners/by_user <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/listeners/views/by_user>`_
-* `listeners/by_user_podcast <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/listeners/views/by_user_podcast>`_
-* `listeners/times_played_by_user <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/listeners/views/times_played_by_user>`_
-
-
 Podcast Lists
 ^^^^^^^^^^^^^
 
@@ -142,18 +60,6 @@ Doc-Types: PodcastList
 * `podcastlists/by_rating <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/podcastlists/views/by_rating>`_
 * `podcastlists/by_user_slug <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/podcastlists/views/by_user_slug>`_
 * `podcastlists/random <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/podcastlists/views/random>`_
-
-
-Podcast States
-^^^^^^^^^^^^^^
-
-Doc-Types: PodcastUserState
-
-**Views**
-
-* `podcast_states/by_device <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/podcast_states/views/by_device>`_
-* `podcast_states/by_podcast <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/podcast_states/views/by_podcast>`_
-* `podcast_states/by_user <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/podcast_states/views/by_user>`_
 
 
 Podcasts
@@ -185,28 +91,6 @@ Doc-Types: Podcast, PodcastGroup, Episode
 **Views**
 
 * `slugs/missing <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/slugs/views/missing>`_
-
-
-Subscribers
-^^^^^^^^^^^
-
-Doc-Types: PodcastUserState
-
-**Views**
-
-* `subscribers/by_podcast <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/subscribers/views/by_podcast>`_
-
-
-Subscriptions
-^^^^^^^^^^^^^
-
-Doc-Types: PodcastUserState
-
-**Views**
-
-* `subscriptions/by_device <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/subscriptions/views/by_device>`_
-* `subscriptions/by_podcast <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/subscriptions/views/by_podcast>`_
-* `subscriptions/by_user <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/subscriptions/views/by_user>`_
 
 
 Suggestions
@@ -262,6 +146,128 @@ Doc-Types: User
 * `users/deleted <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/users/views/deleted>`_
 
 
+Userdata
+--------
+
+This group of views is available in the *userdata* database, called
+``mygpo_userdata`` by default.
+
+Chapters
+^^^^^^^^
+
+Doc-Types: EpisodeUserState
+
+**Views**
+
+* `chapters/by_episode <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/chapters/views/by_episode>`_
+
+
+Episode Actions
+^^^^^^^^^^^^^^^
+
+Doc-Types: EpisodeUserState
+
+**Views**
+
+* `episode_actions/by_device <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/episode_actions/views/by_device>`_
+* `episode_actions/by_podcast_device <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/episode_actions/views/by_podcast_device>`_
+* `episode_actions/by_podcast <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/episode_actions/views/by_podcast>`_
+* `episode_actions/by_user <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/episode_actions/views/by_user>`_
+
+
+Episode States
+^^^^^^^^^^^^^^
+
+Doc-Types: EpisodeUserState
+
+**Views**
+
+* `episode_states/by_podcast_episode <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/episode_states/views/by_podcast_episode>`_
+* `episode_states/by_ref_urls <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/episode_states/views/by_ref_urls>`_
+* `episode_states/by_user_episode <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/episode_states/views/by_user_episode>`_
+* `episode_states/by_user_podcast <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/episode_states/views/by_user_podcast>`_
+
+
+Favorites
+^^^^^^^^^
+
+Doc-Types: EpisodeUserState
+
+**Views**
+
+* `episodes/favorites_by_user <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/favorites/views/episodes_by_user>`_
+
+
+Heatmap
+^^^^^^^
+
+Doc-Types: EpisodeUserState
+
+**Views**
+
+* `heatmap/by_episode <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/heatmap/views/by_episode>`_
+
+
+History
+^^^^^^^
+
+Doc-Types: EpisodeUserState, PodcastUserState
+
+**Views**
+
+* `history/by_device <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/history/views/by_device>`_
+* `history/by_user <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/history/views/by_user>`_
+
+
+Listeners
+^^^^^^^^^
+
+Doc-Types: EpisodeUserState
+
+**Views**
+
+* `listeners/by_episode <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/listeners/views/by_episode>`_
+* `listeners/by_podcast_episode <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/listeners/views/by_podcast_episode>`_
+* `listeners/by_podcast <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/listeners/views/by_podcast>`_
+* `listeners/by_user <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/listeners/views/by_user>`_
+* `listeners/by_user_podcast <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/listeners/views/by_user_podcast>`_
+* `listeners/times_played_by_user <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/listeners/views/times_played_by_user>`_
+
+
+Podcast States
+^^^^^^^^^^^^^^
+
+Doc-Types: PodcastUserState
+
+**Views**
+
+* `podcast_states/by_device <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/podcast_states/views/by_device>`_
+* `podcast_states/by_podcast <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/podcast_states/views/by_podcast>`_
+* `podcast_states/by_user <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/podcast_states/views/by_user>`_
+
+
+Subscribers
+^^^^^^^^^^^
+
+Doc-Types: PodcastUserState
+
+**Views**
+
+* `subscribers/by_podcast <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/subscribers/views/by_podcast>`_
+
+
+Subscriptions
+^^^^^^^^^^^^^
+
+Doc-Types: PodcastUserState
+
+**Views**
+
+* `subscriptions/by_device <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/subscriptions/views/by_device>`_
+* `subscriptions/by_podcast <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/subscriptions/views/by_podcast>`_
+* `subscriptions/by_user <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/subscriptions/views/by_user>`_
+
+
 User-Tags
 ^^^^^^^^^
 
@@ -271,6 +277,7 @@ Doc-Types: PodcastUserState
 
 * `usertags/by_podcast <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/usertags/views/by_podcast>`_
 * `usertags/podcasts <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/usertags/views/podcasts>`_
+
 
 
 

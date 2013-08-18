@@ -1,6 +1,7 @@
 {% extends "skeleton.html" %}
 {% load i18n %}
 {% load menu %}
+{% load static %}
 
 {% block title %}gpodder.net &mdash; discover and track your podcasts{% endblock %}
 
@@ -14,7 +15,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </a>
-                    <a class="brand" href="/"><img id="inline_logo" src="/media/gpoddernet_25.png" alt="gpodder.net" /><span style="padding-left: 65px; padding-right: 10px;" >gpodder.net</span></a>
+                    <a class="brand" href="/"><img id="inline_logo" src="{% static "gpoddernet_25.png" %}" alt="gpodder.net" /><span style="padding-left: 65px; padding-right: 10px;" >gpodder.net</span></a>
                 <div class="btn-group pull-right">
                     {% if user.is_authenticated %}
                     <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
@@ -77,7 +78,7 @@
                     <div class="span8" id="content">
                         {% block content %}
 
-                        <img style="float: right;" src="/media/gpoddernet_228.png" alt="gpodder.net" />
+                        <img style="float: right;" src="{% static "gpoddernet_228.png" %}" alt="gpodder.net" />
                         <p>
                         gpodder.net is a libre web service that allows you to manage your
                         podcast subscriptions and discover new content. If you use multiple
@@ -210,8 +211,8 @@
             <!-- Le javascript
             ================================================== -->
             <!-- Placed at the end of the document so the pages load faster -->
-            <script src="/media/js/jquery.js"></script>
-            <script src="/media/js/bootstrap-dropdown.js"></script>
+            <script src="{% static "js/jquery.js" %}"></script>
+            <script src="{% static "js/bootstrap-dropdown.js" %}"></script>
 
             {% block javascript %}{% endblock javascript %}
 

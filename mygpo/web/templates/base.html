@@ -1,6 +1,7 @@
 {% extends "skeleton.html" %}
 {% load i18n %}
 {% load menu %}
+{% load static %}
 {% load utils %}
 
 
@@ -8,7 +9,7 @@
 
         <div id="logo">
             <a href="/">
-                <img class="visible-desktop" src="/media/gpoddernet_64.png" alt="gpodder.net" />
+                <img class="visible-desktop" src="{% static "gpoddernet_64.png" %}" alt="gpodder.net" />
             </a>
         </div>
 
@@ -20,7 +21,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </a>
-                    <a class="brand" href="/"><img id="inline_logo" src="/media/gpoddernet_25.png" alt="gpodder.net" /><span style="padding-left: 65px; padding-right: 10px;" >gpodder.net</span></a>
+                    <a class="brand" href="/"><img id="inline_logo" src="{% static "gpoddernet_25.png" %}" alt="gpodder.net" /><span style="padding-left: 65px; padding-right: 10px;" >gpodder.net</span></a>
                     <div class="btn-group pull-right">
                         {% if user.is_authenticated %}
                         <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
@@ -184,8 +185,8 @@
         <!-- Le javascript
         ================================================== -->
         <!-- Placed at the end of the document so the pages load faster -->
-        <script src="/media/js/jquery.js"></script>
-        <script src="/media/js/bootstrap.js"></script>
+        <script src="{% static "js/jquery.js" %}"></script>
+        <script src="{% static "js/bootstrap.js" %}"></script>
 
         {% block javascript %}{% endblock javascript %}
         {% block javascript2 %}{% endblock javascript2 %}

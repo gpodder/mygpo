@@ -4,6 +4,7 @@ from django import template
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.utils.html import strip_tags
+from django.contrib.staticfiles.storage import staticfiles_storage
 
 from mygpo.constants import PODCAST_LOGO_SIZE, PODCAST_LOGO_BIG_SIZE, \
          PODCAST_LOGO_MEDIUM_SIZE
@@ -33,9 +34,9 @@ def podcast_logo_medium(podcast):
 @register.filter
 def podcast_status_icon(action):
     if action.action == 'subscribe':
-        s = '<img src="/media/subscribe.png" />'
+        s = '<img src="%s" />' % (staticfiles_storage.url('subscribe.png'),)
     elif action.action == 'unsubscribe':
-        s = '<img src="/media/unsubscribe.png" />'
+        s = '<img src="%s" />' % (staticfiles_storage.url('unsubscribe.png'),)
     elif action.action == 'flattr':
         s = '<img src="https://flattr.com/_img/icons/flattr_logo_16.png" />'
 

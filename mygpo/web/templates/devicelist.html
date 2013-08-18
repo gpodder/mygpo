@@ -66,6 +66,7 @@
       <td>{{ d.uid|striptags }}</td>
       <td>
        <form method="post" action="{% url "device-undelete" d.uid %}">
+        {% csrf_token %}
         <button class="btn btn-small" type="submit">
          <i class="icon-repeat"></i> {% trans "Reactivate" %}
         </button>

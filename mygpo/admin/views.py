@@ -19,7 +19,7 @@ from mygpo.admin.group import PodcastGrouper
 from mygpo.maintenance.merge import PodcastMerger, IncorrectMergeException
 from mygpo.users.models import User
 from mygpo.admin.clients import UserAgentStats, ClientStats
-from mygpo.admin.tasks import merge_podcasts
+from mygpo.admin.tasks import merge_podcasts, unify_slugs
 from mygpo.utils import get_git_head
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.cel import celery
@@ -180,7 +180,7 @@ class MergeProcess(MergeBase):
 class MergeStatus(AdminView):
     """ Displays the status of the merge operation """
 
-    template_name = 'admin/merge-status.html'
+    template_name = 'admin/task-status.html'
 
     def get(self, request, task_id):
         result = merge_podcasts.AsyncResult(task_id)
@@ -201,7 +201,7 @@ class MergeStatus(AdminView):
             messages.error(request, str(ime))
             return HttpResponseRedirect(reverse('admin-merge'))
 
-        return render(request, 'admin/merge-status.html', {
+        return self.render_to_response({
                 'ready': True,
                 'actions': actions.items(),
                 'podcast': podcast,
@@ -336,3 +336,52 @@ class ActivateUserView(AdminView):
                          _('User {username} ({email}) activated'.format(
                             username=user.username, email=user.email)))
         return HttpResponseRedirect(reverse('admin-activate-user'))
+
+
+
+class UnifyDuplicateSlugsSelect(AdminView):
+    """ select a podcast for which to unify slugs """
+    template_name = 'admin/unify-slugs-select.html'
+
+
+class UnifyDuplicateSlugs(AdminView):
+    """ start slug-unification task """
+
+    def post(self, request):
+        podcast_url = request.POST.get('feed')
+        podcast = podcast_for_url(podcast_url)
+
+        if not podcast:
+            messages.error(request, _('Podcast with URL "%s" does not exist' %
+                                      (podcast_url,)))
+            return HttpResponseRedirect(reverse('admin-unify-slugs-select'))
+
+        res = unify_slugs.delay(podcast)
+        return HttpResponseRedirect(reverse('admin-unify-slugs-status',
+                    args=[res.task_id]))
+
+
+class UnifySlugsStatus(AdminView):
+    """ Displays the status of the unify-slugs operation """
+
+    template_name = 'admin/task-status.html'
+
+    def get(self, request, task_id):
+        result = merge_podcasts.AsyncResult(task_id)
+
+        if not result.ready():
+            return self.render_to_response({
+                'ready': False,
+            })
+
+        # clear cache to make merge result visible
+        # TODO: what to do with multiple frontends?
+        cache.clear()
+
+        actions, podcast = result.get()
+
+        return self.render_to_response({
+            'ready': True,
+            'actions': actions.items(),
+            'podcast': podcast,
+        })

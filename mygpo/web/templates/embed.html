@@ -1,6 +1,7 @@
 {% extends "skeleton.html" %}
 {% load i18n %}
 {% load menu %}
+{% load static %}
 
 {% block body %}
 
@@ -29,7 +30,7 @@
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="/media/js/jquery.js"></script>
+    <script src="{% static "js/jquery.js" %}"></script>
     {% block javascript %}{% endblock javascript %}
 
 {% endblock %}

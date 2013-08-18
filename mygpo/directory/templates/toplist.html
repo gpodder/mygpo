@@ -5,6 +5,7 @@
 {% load charts %}
 {% load math %}
 {% load utils %}
+{% load static %}
 
 {% load menu %}
 {% block mainmenu %}{{ "/toplist/"|main_menu }}{% endblock %}
@@ -38,7 +39,7 @@
        {{ oldpos|subtract:forloop.counter|format_diff }}
       {% endif %}
      {% else %}
-      <img src="/media/charts-new.png" alt="new">
+      <img src="{% static "charts-new.png" %}" alt="new">
      {% endif %}
     </td>
     <td class="logo">{{ podcast|podcast_logo }}</td>

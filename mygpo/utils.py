@@ -24,6 +24,7 @@ import operator
 import sys
 import re
 import collections
+import itertools
 from datetime import datetime, timedelta, date
 import time
 import hashlib
@@ -994,3 +995,9 @@ def normalize_feed_url(url):
 
     # urlunsplit might return "a slighty different, but equivalent URL"
     return urlparse.urlunsplit((scheme, netloc, path, query, fragment))
+
+
+def partition(items, predicate=bool):
+    a, b = itertools.tee((predicate(item), item) for item in items)
+    return ((item for pred, item in a if not pred),
+            (item for pred, item in b if pred))
