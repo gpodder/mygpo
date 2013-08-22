@@ -535,3 +535,68 @@ div.first-episode div.episode div.header a
 {
     display: inline-block;
 }
+
+
+div.podcasts
+{
+    padding-top: 2em;
+}
+
+
+div.podcasts div.podcast
+{
+    overflow: hidden;
+    margin-bottom: 2em;
+    padding: .2em;
+}
+
+
+div.podcasts div.podcast div.logo
+{
+    float: left;
+    padding-right: .5em;
+}
+
+div.podcasts div.podcast div.actions
+{
+    float: right;
+    padding-left: .5em;
+    display: box;
+}
+
+div.podcasts div.podcast div.title
+{
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+div.podcasts div.podcast div.title a
+{
+    font-family: 'Source Sans Pro Light';
+    font-size: 1.9em;
+}
+
+div.podcasts div.podcast div.description
+{
+    text-overflow: ellipsis;
+    overflow: hidden;
+    margin-top: .5em;
+    height: 7em;
+}
+
+div.podcasts div.podcast div.actions a.btn,
+div.podcasts div.podcast div.actions button.btn
+
+{
+    display: none;
+    margin-bottom: 1em;
+    box-flex: 1;
+
+}
+
+div.podcasts div.podcast:hover div.actions a.btn,
+div.podcasts div.podcast:hover div.actions button.btn
+{
+    display: block;
+}
