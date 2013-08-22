@@ -1,43 +1,14 @@
-{% extends "base.html" %}
+{% extends "podcast-base.html" %}
 {% load i18n %}
 {% load podcasts %}
 {% load utils %}
 {% load devices %}
 
-{% load menu %}
-{% block mainmenu %}{{ "/podcast/"|main_menu }}{% endblock %}
-{% block sectionmenu %}
- {% if podcast.title %}
-  {{ "/podcast/"|section_menu:podcast.title }}
- {% else %}
-  {{ "/podcast/"|section_menu:"Unnamed Podcast" }}
- {% endif %}
-{% endblock %}
-
 {% block title %}{% blocktrans with podcast.title|default:"Unnamed Podcast"|striptags as podcasttitle %}Subscribe to {{ podcasttitle }}{% endblocktrans %}{% endblock %}
-
-{% block header %}
-  {% if podcast.logo_url %}
-   <div id="podcastlogo"><a href="{% podcast_link_target podcast %}">{{ podcast|podcast_logo_big }}</a></div>
-  {% endif %}
-  <h1>
-   {% if podcast.title %}
-    {% blocktrans with podcast.title|striptags as podcasttitle %}Subscribe to {{podcasttitle }}{% endblocktrans %}
-   {% else %}
-    {% trans "Subscribe to this podcast" %}
-   {% endif %}
-  </h1>
-  <a href="{{ podcast.url }}" class="URL">{{ podcast.url }}</a>
-
-  {% if podcast.description %}
-   <p class="description">{{ podcast.description|striptags }}</p>
-   {% endif %}
-{% endblock %}
-
 
 {% block content %}
 
-   <h2>{% trans "Subscribe on devices" %}</h2>
+  <h2>{% trans "Subscribe" %}</h2>
   {% if targets|length  %}
    <form action="{% podcast_link_target podcast "subscribe" %}" method="post" class="form-horizontal">
     {% csrf_token %}
@@ -59,10 +30,11 @@
      </div>
     </div>
 
-    <div class="control-group">
-     <div class="controls">
-      <input type="submit" value="Subscribe" />
-     </div>
+    <div class="form-actions">
+     <button class="btn" type="submit">
+      <i class="icon-plus"></i>
+      {% trans "Subscribe" %}
+     </button>
     </div>
    </form>
   {% else %}
