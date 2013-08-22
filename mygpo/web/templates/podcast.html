@@ -152,6 +152,11 @@
     </a>
    {% endif %}
 
+   <a href="javascript:void(0);" onclick="$('#tag-box').toggle();" class="btn">
+    <i class="icon-tag"></i>
+    {% trans "Tags" %}
+   </a>
+
    {% if debug %}
     <a class="btn" href="http://127.0.0.1:5984/_utils/document.html?mygpo/{% get_id podcast %}">
      <i class="icon-cogs"></i>
@@ -159,6 +164,36 @@
     </a>
    {% endif %}
 
+  </div>
+
+  <div id="tag-box">
+   <hr />
+
+   <i class="icon-tag"></i>
+   <strong>{% trans "Tags" %}: </strong>
+
+   {% for tag in tags %}
+    {% spaceless %}
+     {% if tag.is_own %}
+      <span class="own">{{ tag.tag }} <a class="remove" href="{% podcast_link_target podcast "remove-tag" %}?tag={{ tag.tag }}">X</a></span>
+     {% else %}
+       <span class="other">{{ tag.tag }}</span>
+     {% endif %}
+     {% if not forloop.last %}
+      <span class="seperator">,</span>
+     {% endif %}
+    {% endspaceless %}
+   {% endfor %}
+
+   {% if user.is_authenticated %}
+    <form class="form-inline" action="{% podcast_link_target podcast "add-tag" %}">
+     <div class="input-prepend btn-append">
+      <span class="add-on"><i class="icon-tag"></i></span><input class="input-small" type="text" name="tag" /><button class="btn btn-success" type="submit">
+      <i class="icon-plus"></i>
+     </button>
+     </div>
+    </form>
+   {% endif %}
   </div>
 
  <hr />
@@ -200,38 +235,6 @@
 {% endblock %}
 
 
-{% block sidebar %}
-
-  <div class="well">
-   <h4>Tags</h4>
-
-   {% for tag in tags %}
-    {% spaceless %}
-     {% if tag.is_own %}
-      <span class="own">{{ tag.tag }} <a class="remove" href="{% podcast_link_target podcast "remove-tag" %}?tag={{ tag.tag }}">X</a></span>
-     {% else %}
-       <span class="other">{{ tag.tag }}</span>
-     {% endif %}
-     {% if not forloop.last %}
-      <span class="seperator">,</span>
-     {% endif %}
-    {% endspaceless %}
-   {% endfor %}
-
-   {% if user.is_authenticated %}
-    <form class="form-inline" action="{% podcast_link_target podcast "add-tag" %}">
-     <div class="input-prepend btn-append">
-      <span class="add-on"><i class="icon-tag"></i></span><input class="input-small" type="text" name="tag" /><button class="btn btn-success" type="submit">
-      <i class="icon-plus"></i>
-     </button>
-     </div>
-    </form>
-   {% endif %}
-  </div>
-
-{% endblock %}
-
-
 {% block javascript %}
 
     <script language="javascript">
@@ -241,6 +244,11 @@
             document.forms[formid].submit();
             return true;
         }
+
+        {% if not has_tagged %}
+          // done in JS so that box is always visible if JS is disabled
+          $('#tag-box').toggle();
+        {% endif %}
         -->
     </script>
 

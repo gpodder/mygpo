@@ -80,7 +80,7 @@ def show(request, podcast):
     else:
         rel_podcasts = []
 
-    tags = get_tags(podcast, user)
+    tags, has_tagged = get_tags(podcast, user)
 
     if user.is_authenticated():
         state = podcast_state_for_user_podcast(user, podcast)
@@ -108,6 +108,7 @@ def show(request, podcast):
 
     return render(request, 'podcast.html', {
         'tags': tags,
+        'has_tagged': has_tagged,
         'url': current_site,
         'has_history': has_history,
         'podcast': podcast,
@@ -145,7 +146,9 @@ def get_tags(podcast, user):
         tag_list = filter(lambda x: x['is_own'], tag_list)
         tag_list.append({'tag': '...', 'is_own': False})
 
-    return tag_list
+    has_own = any(t['is_own'] for t in tag_list)
+
+    return tag_list, has_own
 
 
 def episode_list(podcast, user, offset=0, limit=None):

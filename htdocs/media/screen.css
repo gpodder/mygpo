@@ -531,3 +531,7 @@ div.first-episode div.episode div.header a
     padding-top: 1em;
 }
 
+#tag-box form
+{
+    display: inline-block;
+}
