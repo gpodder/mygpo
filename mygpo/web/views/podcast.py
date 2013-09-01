@@ -24,7 +24,7 @@ from mygpo.db.couchdb.episode import episodes_for_podcast
 from mygpo.db.couchdb.podcast import podcast_for_slug, podcast_for_slug_id, \
          podcast_for_oldid, podcast_for_url
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast, \
-         add_subscription_action
+         add_subscription_action, add_podcast_tags, remove_podcast_tags
 from mygpo.db.couchdb.episode_state import get_podcasts_episode_states, \
          episode_listener_counts
 from mygpo.db.couchdb.directory import tags_for_user, tags_for_podcast
@@ -225,13 +225,7 @@ def add_tag(request, podcast):
         return HttpResponseBadRequest()
 
     tags = tag_str.split(',')
-
-    @repeat_on_conflict(['state'])
-    def update(state):
-        state.add_tags(tags)
-        state.save()
-
-    update(state=podcast_state)
+    add_podcast_tags(podcast_state, tags)
 
     if request.GET.get('next', '') == 'mytags':
         return HttpResponseRedirect('/tags/')
@@ -248,14 +242,7 @@ def remove_tag(request, podcast):
     if not tag_str:
         return HttpResponseBadRequest()
 
-    @repeat_on_conflict(['state'])
-    def update(state):
-        tags = list(state.tags)
-        if tag_str in tags:
-            state.tags.remove(tag_str)
-            state.save()
-
-    update(state=podcast_state)
+    remove_podcast_tags(podcast_stage, tag_str)
 
     if request.GET.get('next', '') == 'mytags':
         return HttpResponseRedirect('/tags/')

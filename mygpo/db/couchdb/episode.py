@@ -433,3 +433,10 @@ def remove_episode_slug(episode, slug):
     """ removes slug from main and merged slugs """
     episode.remove_slug(slug)
     episode.save()
+
+
+@repeat_on_conflict(['episode_state'])
+def set_episode_favorite(episode_state, is_fav):
+    udb = get_userdata_database()
+    episode_state.set_favorite(is_fav)
+    udb.save_doc(episode_state)

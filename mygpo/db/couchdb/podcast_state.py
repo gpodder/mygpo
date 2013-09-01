@@ -197,3 +197,18 @@ def add_subscription_action(state, action):
 @repeat_on_conflict(['state'])
 def delete_podcast_state(state):
     state.delete()
+
+
+@repeat_on_conflict(['state'])
+def add_podcast_tags(state, tags):
+    udb = get_userdata_database()
+    state.add_tags(tags)
+    udb.save_doc(state)
+
+@repeat_on_conflict(['state'])
+def remove_podcast_tags(state):
+    if tag_str not in state.tags:
+        return
+    udb = get_userdata_database()
+    state.tags.remove(tag_str)
+    udb.save_doc(state)

@@ -40,7 +40,8 @@ from mygpo.web.heatmap import EpisodeHeatmap
 from mygpo.publisher.utils import check_publisher_permission
 from mygpo.web.utils import get_episode_link_target, fetch_episode_data
 from mygpo.db.couchdb.episode import episode_for_slug_id, episode_for_oldid, \
-         favorite_episodes_for_user, chapters_for_episode
+         favorite_episodes_for_user, chapters_for_episode, \
+         set_episode_favorite
 from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url, \
          podcasts_to_dict
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
@@ -168,13 +169,8 @@ def remove_chapter(request, episode, start, end):
 def toggle_favorite(request, episode):
     episode_state = episode_state_for_user_episode(request.user, episode)
 
-    @repeat_on_conflict(['episode_state'])
-    def _set_fav(episode_state, is_fav):
-        episode_state.set_favorite(is_fav)
-        episode_state.save()
-
     is_fav = episode_state.is_favorite()
-    _set_fav(episode_state=episode_state, is_fav=not is_fav)
+    set_episode_favorite(episode_state, not is_fav)
 
     podcast = podcast_by_id(episode.podcast)
 
