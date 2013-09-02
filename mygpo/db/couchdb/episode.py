@@ -13,7 +13,7 @@ from mygpo.decorators import repeat_on_conflict
 from mygpo.utils import get_timestamp
 from mygpo.db import QueryParameterMissing
 from mygpo.db.couchdb.utils import is_couchdb_id
-from mygpo.db.couchdb import get_main_database
+from mygpo.db.couchdb import get_main_database, get_userdata_database
 from mygpo.db.couchdb.podcast import podcast_for_url, podcast_for_slug_id
 
 import logging
@@ -371,9 +371,11 @@ def favorite_episodes_for_user(user):
     if not user:
         raise QueryParameterMissing('user')
 
-    favorites = Episode.view('favorites/episodes_by_user',
+    udb = get_userdata_database()
+    favorites = udb.view('favorites/episodes_by_user',
             key          = user._id,
             include_docs = True,
+            wrapper      = Episode,
         )
 
     episodes = list(favorites)
@@ -390,8 +392,8 @@ def chapters_for_episode(episode_id):
     if not episode_id:
         raise QueryParameterMissing('episode_id')
 
-    db = get_main_database()
-    r = db.view('chapters/by_episode',
+    udb = get_userdata_database()
+    r = udb.view('chapters/by_episode',
             startkey = [episode_id, None],
             endkey   = [episode_id, {}],
         )

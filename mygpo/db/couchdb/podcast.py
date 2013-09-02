@@ -11,7 +11,7 @@ from mygpo.core.signals import incomplete_obj
 from mygpo.decorators import repeat_on_conflict
 from mygpo.cache import cache_result
 from mygpo.utils import get_timestamp
-from mygpo.db.couchdb import get_main_database
+from mygpo.db.couchdb import get_main_database, get_userdata_database
 from mygpo.db import QueryParameterMissing
 from mygpo.db.couchdb.utils import multi_request_view, is_couchdb_id
 
@@ -54,7 +54,8 @@ def podcasts_for_tag(tag):
     for r in res:
         yield (r['key'][1], r['value'])
 
-    res = multi_request_view(Podcast, 'usertags/podcasts',
+    udb = get_userdata_database()
+    res = multi_request_view(udb, 'usertags/podcasts',
             wrap        = False,
             startkey    = [tag, None],
             endkey      = [tag, {}],

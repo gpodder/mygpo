@@ -38,8 +38,11 @@ from mygpo.db.couchdb.episode_state import episode_state_for_user_episode
 @allowed_methods(['GET', 'POST'])
 def main(request, username, scope):
 
+    db = get_main_database()
+    udb = get_userdata_database()
+
     def user_settings(user):
-        return user, user
+        return user, user, db
 
     def device_settings(user, uid):
         device = user.get_device_by_uid(uid)
@@ -48,14 +51,14 @@ def main(request, username, scope):
         # to settings_obj are reflected in user (bug 1344)
         settings_obj = user.get_device_by_uid(uid)
 
-        return user, settings_obj
+        return user, settings_obj, db
 
     def podcast_settings(user, url):
         podcast = podcast_for_url(url)
         if not podcast:
             raise Http404
         obj = podcast_state_for_user_podcast(user, podcast)
-        return obj, obj
+        return obj, obj, udb
 
     def episode_settings(user, url, podcast_url):
         episode = episode_for_podcast_url(podcast_url, url)
@@ -63,7 +66,7 @@ def main(request, username, scope):
             raise Http404
 
         episode_state = episode_state_for_user_episode(user, episode)
-        return episode_state, episode_state
+        return episode_state, episode_state, udb
 
     models = dict(
             account = lambda: user_settings(request.user),
@@ -77,7 +80,7 @@ def main(request, username, scope):
         return HttpResponseBadRequest('undefined scope %s' % scope)
 
     try:
-        base_obj, settings_obj = models[scope]()
+        base_obj, settings_obj, db = models[scope]()
     except DeviceDoesNotExist as e:
         return HttpResponseNotFound(str(e))
 
@@ -87,7 +90,7 @@ def main(request, username, scope):
     elif request.method == 'POST':
         actions = parse_request_body(request)
         ret = update_settings(settings_obj, actions)
-        base_obj.save()
+        db.save_doc(base_obj)
         return JsonResponse(ret)
 
 

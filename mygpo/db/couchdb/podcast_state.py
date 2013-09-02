@@ -1,6 +1,6 @@
 from mygpo.users.models import PodcastUserState
 from mygpo.users.settings import PUBLIC_SUB_PODCAST, PUBLIC_SUB_USER
-from mygpo.db.couchdb import get_main_database
+from mygpo.db.couchdb import get_userdata_database
 from mygpo.cache import cache_result
 from mygpo.db import QueryParameterMissing
 from mygpo.decorators import repeat_on_conflict
@@ -11,10 +11,13 @@ def all_podcast_states(podcast):
     if not podcast:
         raise QueryParameterMissing('podcast')
 
-    return PodcastUserState.view('podcast_states/by_podcast',
+    udb = get_userdata_database()
+
+    return udb.view('podcast_states/by_podcast',
             startkey     = [podcast.get_id(), None],
             endkey       = [podcast.get_id(), {}],
             include_docs = True,
+            wrapper      = PodcastUserState,
         )
 
 
@@ -24,9 +27,9 @@ def subscribed_users(podcast):
     if not podcast:
         raise QueryParameterMissing('podcast')
 
-    db = get_main_database()
+    udb = get_userdata_database()
 
-    res = db.view('subscriptions/by_podcast',
+    res = udb.view('subscriptions/by_podcast',
             startkey    = [podcast.get_id(), None, None],
             endkey      = [podcast.get_id(), {}, {}],
             group       = True,
@@ -43,9 +46,9 @@ def subscribed_podcast_ids_by_user_id(user_id):
     if not user_id:
         raise QueryParameterMissing('user_id')
 
-    db = get_main_database()
+    udb = get_userdata_database()
 
-    subscribed = db.view('subscriptions/by_user',
+    subscribed = udb.view('subscriptions/by_user',
             startkey    = [user_id, True, None, None],
             endkey      = [user_id, True, {}, {}],
             group       = True,
@@ -61,11 +64,11 @@ def podcast_subscriber_count(podcast):
     if not podcast:
         raise QueryParameterMissing('podcast')
 
-    db = get_main_database()
+    udb = get_userdata_database()
     subscriber_sum = 0
 
     for podcast_id in podcast.get_ids():
-        x = db.view('subscribers/by_podcast',
+        x = udb.view('subscribers/by_podcast',
                 startkey    = [podcast_id, None],
                 endkey      = [podcast_id, {}],
                 reduce      = True,
@@ -86,11 +89,13 @@ def podcast_state_for_user_podcast(user, podcast):
     if not podcast:
         raise QueryParameterMissing('podcast')
 
+    udb = get_userdata_database()
 
-    r = PodcastUserState.view('podcast_states/by_podcast',
+    r = udb.view('podcast_states/by_podcast',
                 key          = [podcast.get_id(), user._id],
                 limit        = 1,
                 include_docs = True,
+                wrapper      = PodcastUserState,
             )
 
     if r:
@@ -113,10 +118,13 @@ def podcast_states_for_user(user):
     if not user:
         raise QueryParameterMissing('user')
 
-    r = PodcastUserState.view('podcast_states/by_user',
+    udb = get_userdata_database()
+
+    r = udb.view('podcast_states/by_user',
             startkey     = [user._id, None],
             endkey       = [user._id, 'ZZZZ'],
             include_docs = True,
+            wrapper      = PodcastUserState,
         )
     return list(r)
 
@@ -126,17 +134,21 @@ def podcast_states_for_device(device_id):
     if not device_id:
         raise QueryParameterMissing('device_id')
 
-    r = PodcastUserState.view('podcast_states/by_device',
+    udb = get_userdata_database()
+
+    r = udb.view('podcast_states/by_device',
             startkey     = [device_id, None],
             endkey       = [device_id, {}],
             include_docs = True,
+            wrapper      = PodcastUserState,
         )
     return list(r)
 
 
 @cache_result(timeout=60*60)
 def podcast_state_count():
-    r = PodcastUserState.view('podcast_states/by_user',
+    udb = get_userdata_database()
+    r = udb.view('podcast_states/by_user',
             limit = 0,
             stale = 'update_after',
         )
@@ -148,8 +160,8 @@ def subscribed_podcast_ids_by_device(device):
     if not device:
         raise QueryParameterMissing('device')
 
-    db = get_main_database()
-    r = db.view('subscriptions/by_device',
+    udb = get_userdata_database()
+    r = udb.view('subscriptions/by_device',
             startkey = [device.id, None],
             endkey   = [device.id, {}]
         )
@@ -165,10 +177,13 @@ def subscriptions_by_user(user, public=None):
     if not user:
         raise QueryParameterMissing('user')
 
-    r = PodcastUserState.view('subscriptions/by_user',
+    udb = get_userdata_database()
+
+    r = udb.view('subscriptions/by_user',
             startkey = [user._id, public, None, None],
             endkey   = [user._id+'ZZZ', None, None, None],
             reduce   = False,
+            wrapper  = PodcastUserState,
         )
     return [res['key'][1:] for res in r]
 
