@@ -381,5 +381,6 @@ def get_heatmap(podcast_id, episode_id, user_id):
 
 @repeat_on_conflict(['state'])
 def add_episode_actions(state, actions):
+    udb = get_userdata_database()
     state.add_actions(actions)
-    state.save()
+    udb.save_doc(state)

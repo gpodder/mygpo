@@ -190,8 +190,9 @@ def subscriptions_by_user(user, public=None):
 
 @repeat_on_conflict(['state'])
 def add_subscription_action(state, action):
+    udb = get_userdata_database()
     state.add_actions([action])
-    state.save()
+    udb.save_doc(state)
 
 
 @repeat_on_conflict(['state'])
@@ -211,4 +212,30 @@ def remove_podcast_tags(state):
         return
     udb = get_userdata_database()
     state.tags.remove(tag_str)
+    udb.save_doc(state)
+
+
+@repeat_on_conflict(['state'])
+def set_podcast_privacy_settings(state, is_public):
+    udb = get_userdata_database()
+    state.settings[PUBLIC_SUB_PODCAST.name] = is_public
+    udb.save_doc(state)
+
+
+@repeat_on_conflict(['state'])
+def remove_device_from_podcast_state(state, dev):
+    udb = get_userdata_database()
+    state.remove_device(dev)
+    udb.save_doc(state)
+
+@repeat_on_conflict(['state'])
+def subscribe_on_device(state, device):
+    state.subscribe(device)
+    udb = get_userdata_database()
+    udb.save_doc(state)
+
+@repeat_on_conflict(['state'])
+def unsubscribe_on_device(state, device):
+    state.unsubscribe(device)
+    udb = get_userdata_database()
     udb.save_doc(state)

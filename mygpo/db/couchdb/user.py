@@ -294,7 +294,8 @@ def update_device_state(state, devices):
     state.set_device_state(devices)
 
     if old_devs != set(state.disabled_devices):
-        state.save()
+        udb = get_userdata_database()
+        udb.save_doc(state)
 
 
 @repeat_on_conflict(['user'])
