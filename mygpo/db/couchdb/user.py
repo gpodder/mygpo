@@ -17,7 +17,7 @@ def get_num_listened_episodes(user):
     if not user:
         raise QueryParameterMissing('user')
 
-    udb = get_main_database()
+    udb = get_userdata_database()
     r = udb.view('listeners/by_user_podcast',
             startkey    = [user._id, None],
             endkey      = [user._id, {}],
