@@ -35,7 +35,7 @@ def episode_state_for_user_episode(user, episode):
             key          = [user._id, episode._id],
             include_docs = True,
             limit        = 1,
-            wrapper      = EpisodeUserState,
+            schema       = EpisodeUserState,
         )
 
     if r:
@@ -68,7 +68,7 @@ def all_episode_states(episode):
             startkey     = [episode.podcast, episode._id, None],
             endkey       = [episode.podcast, episode._id, {}],
             include_docs = True,
-            wrapper      = EpisodeUserState,
+            schema       = EpisodeUserState,
         )
     return list(r)
 
@@ -84,7 +84,7 @@ def all_podcast_episode_states(podcast):
             startkey     = [podcast.get_id(), None, None],
             endkey       = [podcast.get_id(), {},   {}],
             include_docs = True,
-            wrapper      = EpisodeUserState,
+            schema       = EpisodeUserState,
         )
     return list(r)
 
@@ -248,7 +248,7 @@ def episode_state_for_ref_urls(user, podcast_url, episode_url):
             key   = [user._id, podcast_url, episode_url],
             limit = 1,
             include_docs=True,
-            wrapper     = EpisodeUserState,
+            schema      = EpisodeUserState,
         )
 
     if res:
@@ -322,7 +322,7 @@ def get_nth_episode_state(n):
             skip         = n,
             include_docs = True,
             limit        = 1,
-            wrapper      = EpisodeUserState,
+            schema       = EpisodeUserState,
         )
     return first.one() if first else None
 
@@ -339,7 +339,7 @@ def get_duplicate_episode_states(user, episode):
     states = udb.view('episode_states/by_user_episode',
             key          = [user, episode],
             include_docs = True,
-            wrapper      = EpisodeUserState,
+            schema       = EpisodeUserState,
         )
     return list(states)
 

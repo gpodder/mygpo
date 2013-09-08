@@ -375,7 +375,7 @@ def favorite_episodes_for_user(user):
     favorites = udb.view('favorites/episodes_by_user',
             key          = user._id,
             include_docs = True,
-            wrapper      = Episode,
+            schema       = Episode,
         )
 
     episodes = list(favorites)

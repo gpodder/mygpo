@@ -17,7 +17,7 @@ def all_podcast_states(podcast):
             startkey     = [podcast.get_id(), None],
             endkey       = [podcast.get_id(), {}],
             include_docs = True,
-            wrapper      = PodcastUserState,
+            schema       = PodcastUserState,
         )
 
 
@@ -95,7 +95,7 @@ def podcast_state_for_user_podcast(user, podcast):
                 key          = [podcast.get_id(), user._id],
                 limit        = 1,
                 include_docs = True,
-                wrapper      = PodcastUserState,
+                schema       = PodcastUserState,
             )
 
     if r:
@@ -124,7 +124,7 @@ def podcast_states_for_user(user):
             startkey     = [user._id, None],
             endkey       = [user._id, 'ZZZZ'],
             include_docs = True,
-            wrapper      = PodcastUserState,
+            schema       = PodcastUserState,
         )
     return list(r)
 
@@ -140,7 +140,7 @@ def podcast_states_for_device(device_id):
             startkey     = [device_id, None],
             endkey       = [device_id, {}],
             include_docs = True,
-            wrapper      = PodcastUserState,
+            schema       = PodcastUserState,
         )
     return list(r)
 
@@ -183,7 +183,7 @@ def subscriptions_by_user(user, public=None):
             startkey = [user._id, public, None, None],
             endkey   = [user._id+'ZZZ', None, None, None],
             reduce   = False,
-            wrapper  = PodcastUserState,
+            schema   = PodcastUserState,
         )
     return [res['key'][1:] for res in r]
 
