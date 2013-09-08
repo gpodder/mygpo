@@ -26,9 +26,10 @@ def episode_state_for_user_episode(user, episode):
     key = 'episode-state-userid-%s-episodeid-%s' % (sha1(user._id).hexdigest(),
             sha1(episode._id).hexdigest())
 
-    state = cache.get(key)
-    if state:
-        return state
+#   Disabled as cache invalidation does not work properly
+#   state = cache.get(key)
+#   if state:
+#       return state
 
     udb = get_userdata_database()
     r = udb.view('episode_states/by_user_episode',

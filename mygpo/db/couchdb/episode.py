@@ -184,9 +184,10 @@ def episode_for_podcast_id_url(podcast_id, episode_url, create=False):
             sha1(podcast_id.encode('utf-8')).hexdigest(),
             sha1(episode_url.encode('utf-8')).hexdigest())
 
-    episode = cache.get(key)
-    if episode:
-        return episode
+#   Disabled as cache invalidation is not working properly
+#   episode = cache.get(key)
+#   if episode:
+#       return episode
 
     r = Episode.view('episodes/by_podcast_url',
             key          = [podcast_id, episode_url],
