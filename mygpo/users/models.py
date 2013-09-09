@@ -417,17 +417,9 @@ class Device(Document, SettingsMixin):
                 yield (p_state.podcast, actions[0])
 
 
-    def get_subscribed_podcast_states(self):
-        r = PodcastUserState.view('subscriptions/by_device',
-                startkey     = [self.id, None],
-                endkey       = [self.id, {}],
-                include_docs = True
-            )
-        return list(r)
-
-
     def get_subscribed_podcast_ids(self):
-        states = self.get_subscribed_podcast_states()
+        from mygpo.db.couchdb.podcast_state import get_subscribed_podcast_states_by_device
+        states = get_subscribed_podcast_states_by_device(self)
         return [state.podcast for state in states]
 
 
@@ -437,7 +429,8 @@ class Device(Document, SettingsMixin):
         The attribute "url" contains the URL that was used when subscribing to
         the podcast """
 
-        states = self.get_subscribed_podcast_states()
+        from mygpo.db.couchdb.podcast_state import get_subscribed_podcast_states_by_device
+        states = get_subscribed_podcast_states_by_device(self)
         return podcasts_for_states(states)
 
 
@@ -621,24 +614,9 @@ class User(BaseUser, SyncedDevicesMixin, SettingsMixin):
 
         return groups
 
-
-    def get_subscribed_podcast_states(self, public=None):
-        """
-        Returns the Ids of all subscribed podcasts
-        """
-
-        r = PodcastUserState.view('subscriptions/by_user',
-                startkey     = [self._id, public, None, None],
-                endkey       = [self._id+'ZZZ', None, None, None],
-                reduce       = False,
-                include_docs = True
-            )
-
-        return set(r)
-
-
     def get_subscribed_podcast_ids(self, public=None):
-        states = self.get_subscribed_podcast_states(public=public)
+        from mygpo.db.couchdb.podcast_state import get_subscribed_podcast_states_by_user
+        states = get_subscribed_podcast_states_by_user(self, public)
         return [state.podcast for state in states]
 
 
@@ -649,7 +627,8 @@ class User(BaseUser, SyncedDevicesMixin, SettingsMixin):
         The attribute "url" contains the URL that was used when subscribing to
         the podcast """
 
-        states = self.get_subscribed_podcast_states(public=public)
+        from mygpo.db.couchdb.podcast_state import get_subscribed_podcast_states_by_user
+        states = get_subscribed_podcast_states_by_user(self, public)
         podcast_ids = [state.podcast for state in states]
         podcasts = podcasts_to_dict(podcast_ids)
 

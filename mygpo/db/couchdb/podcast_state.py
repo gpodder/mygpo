@@ -239,3 +239,31 @@ def unsubscribe_on_device(state, device):
     state.unsubscribe(device)
     udb = get_userdata_database()
     udb.save_doc(state)
+
+
+def get_subscribed_podcast_states_by_device(device):
+    udb = get_userdata_database()
+    r = udb.view('subscriptions/by_device',
+            startkey     = [device.id, None],
+            endkey       = [device.id, {}],
+            include_docs = True,
+            schema       = PodcastUserState,
+        )
+    return list(r)
+
+
+def get_subscribed_podcast_states_by_user(user, public=None):
+    """
+    Returns the Ids of all subscribed podcasts
+    """
+
+    udb = get_userdata_database()
+    r = udb.view('subscriptions/by_user',
+            startkey     = [user._id, public, None, None],
+            endkey       = [user._id, {}, {}, {}],
+            reduce       = False,
+            include_docs = True,
+            schema       = PodcastUserState,
+        )
+
+    return set(r)
