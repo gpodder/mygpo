@@ -5,6 +5,7 @@ amqp==1.0.13
 anyjson==0.3.3
 argparse==1.2.1
 billiard==2.7.3.32
+celery==3.0.23
 celery-with-redis==3.0
 couchdbkit==0.6.5
 distribute==0.6.34
