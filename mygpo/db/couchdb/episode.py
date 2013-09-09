@@ -367,25 +367,22 @@ def episode_count_for_podcast(podcast, since=None, until={}, **kwargs):
     return res.one()['value']
 
 
-def favorite_episodes_for_user(user):
+def favorite_episode_ids_for_user(user):
 
     if not user:
         raise QueryParameterMissing('user')
 
     udb = get_userdata_database()
     favorites = udb.view('favorites/episodes_by_user',
-            key          = user._id,
-            include_docs = True,
-            schema       = Episode,
+            key = user._id,
         )
 
-    episodes = list(favorites)
+    return set(x['value']['_id'] for x in favorites)
 
-    for episode in episodes:
-        if episode.needs_update:
-            incomplete_obj.send_robust(sender=episode)
 
-    return episodes
+def favorite_episodes_for_user(user):
+    episode_ids = favorite_episode_ids_for_user(user)
+    return episodes_by_id(episode_ids)
 
 
 def chapters_for_episode(episode_id):
