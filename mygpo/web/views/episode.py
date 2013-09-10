@@ -45,7 +45,7 @@ from mygpo.db.couchdb.episode import episode_for_slug_id, episode_for_oldid, \
 from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url, \
          podcasts_to_dict
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
-         add_episode_actions
+         add_episode_actions, update_episode_chapters
 from mygpo.db.couchdb.user import get_latest_episodes
 from mygpo.userfeeds.feeds import FavoriteFeed
 
@@ -146,7 +146,7 @@ def add_chapter(request, episode):
     chapter.advertisement = adv
     chapter.label = label
 
-    e_state.update_chapters(add=[chapter])
+    update_episode_chapters(e_state, add=[chapter])
 
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
@@ -157,7 +157,7 @@ def remove_chapter(request, episode, start, end):
     e_state = episode_state_for_user_episode(request.user, episode)
 
     remove = (int(start), int(end))
-    e_state.update_chapters(rem=[remove])
+    update_episode_chapters(e_state, rem=[remove])
 
     podcast = podcast_by_id(episode.podcast)
 

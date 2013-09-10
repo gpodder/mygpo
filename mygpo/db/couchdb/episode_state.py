@@ -420,3 +420,23 @@ def merge_episode_states(state, state2):
 def delete_episode_state(state):
     udb = get_userdata_database()
     udb.delete_doc(state)
+
+
+@repeat_on_conflict(['episode_state'])
+def update_episode_chapters(episode_state, add=[], rem=[]):
+    """ Updates the Chapter list
+
+     * add contains the chapters to be added
+
+     * rem contains tuples of (start, end) times. Chapters that match
+       both endpoints will be removed
+    """
+
+    for chapter in add:
+        episode_state.chapters = episode_state.chapters + [chapter]
+
+    for start, end in rem:
+        keep = lambda c: c.start != start or c.end != end
+        episode_state.chapters = filter(keep, episode_state.chapters)
+
+    episode_state.save()
