@@ -49,6 +49,7 @@ from mygpo.db.couchdb.podcast import podcast_for_url
 from mygpo.db.couchdb.podcast_state import subscribed_podcast_ids_by_device
 from mygpo.db.couchdb.episode_state import episode_state_for_ref_urls, \
     get_episode_actions
+from mygpo.db.couchdb.user import set_device
 
 
 import logging
@@ -458,7 +459,7 @@ def device(request, username, device_uid):
         d.type = data['type']
 
 
-    request.user.update_device(d)
+    set_device(request.user, d)
 
     return HttpResponse()
 

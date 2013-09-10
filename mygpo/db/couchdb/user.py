@@ -303,3 +303,9 @@ def unsync_device(user, device):
     if user.is_synced(device):
         user.unsync_device(device)
         user.save()
+
+
+@repeat_on_conflict(['user'])
+def set_device(user, device):
+    user.set_device(device)
+    user.save()
