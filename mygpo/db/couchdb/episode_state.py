@@ -385,3 +385,38 @@ def add_episode_actions(state, actions):
     udb = get_userdata_database()
     state.add_actions(actions)
     udb.save_doc(state)
+
+
+@repeat_on_conflict(['state'])
+def update_episode_state_object(state, podcast_id, episode_id=None):
+    state.podcast = podcast_id
+
+    if episode_id is not None:
+        state.episode = episode_id
+
+    udb = get_userdata_database()
+    udb.save_doc(state)
+
+
+@repeat_on_conflict(['state'])
+def merge_episode_states(state, state2):
+    state.add_actions(state2.actions)
+
+    # overwrite settings in state2 with state's settings
+    settings = state2.settings
+    settings.update(state.settings)
+    state.settings = settings
+
+    merged_ids = set(state.merged_ids + [state2._id] + state2.merged_ids)
+    state.merged_ids = filter(None, merged_ids)
+
+    state.chapters = list(set(state.chapters + state2.chapters))
+
+    udb = get_userdata_database()
+    udb.save_doc(state)
+
+
+@repeat_on_conflict(['state'])
+def delete_episode_state(state):
+    udb = get_userdata_database()
+    udb.delete_doc(state)

@@ -197,7 +197,8 @@ def add_subscription_action(state, action):
 
 @repeat_on_conflict(['state'])
 def delete_podcast_state(state):
-    state.delete()
+    udb = get_userdata_database()
+    udb.delete_doc(state)
 
 
 @repeat_on_conflict(['state'])
@@ -237,6 +238,33 @@ def subscribe_on_device(state, device):
 @repeat_on_conflict(['state'])
 def unsubscribe_on_device(state, device):
     state.unsubscribe(device)
+    udb = get_userdata_database()
+    udb.save_doc(state)
+
+
+@repeat_on_conflict(['state'])
+def update_podcast_state_podcast(state, new_id, new_url):
+    state.ref_url = new_url
+    state.podcast = new_id
+    udb = get_userdata_database()
+    udb.save_doc(state)
+
+
+@repeat_on_conflict(['state'])
+def merge_podcast_states(self, state, state2):
+    # overwrite settings in state2 with state's settings
+    settings = state2.settings
+    settings.update(state.settings)
+    state.settings = settings
+
+    state.disabled_devices = set_filter(None, state.disabled_devices,
+                                        state2.disabled_devices)
+
+    state.merged_ids = set_filter(state._id, state.merged_ids,
+                                  [state2._id], state2.merged_ids)
+
+    state.tags = set_filter(None, state.tags, state2.tags)
+
     udb = get_userdata_database()
     udb.save_doc(state)
 
