@@ -48,6 +48,8 @@ The following contains useful information for integrating gpodder.net into a
 podcast application.
 
 
+.. _device-integration:
+
 Device
 ^^^^^^
 
