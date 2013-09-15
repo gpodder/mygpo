@@ -11,7 +11,8 @@ from mygpo.db.couchdb.episode import episodes_for_podcast_uncached
 from mygpo.db.couchdb.podcast_state import all_podcast_states, \
     delete_podcast_state, update_podcast_state_podcast, merge_podcast_states
 from mygpo.db.couchdb.episode_state import all_episode_states, \
-    update_episode_state_object, add_episode_actions, delete_episode_state
+    update_episode_state_object, add_episode_actions, delete_episode_state, \
+    merge_episode_states
 
 import logging
 logger = logging.getLogger(__name__)
@@ -237,7 +238,6 @@ class PodcastStateMerger(object):
 
     def merge(self):
         merge_podcast_states(self.state, self.state2)
-        self._do_merge(state=self.state, state2=self.state2)
         self._add_actions(state=self.state, actions=self.state2.actions)
         delete_podcast_state(self.state2)
         self.actions['merged-podcast-state'] += 1

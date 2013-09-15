@@ -28,7 +28,8 @@ from mygpo.maintenance.merge import PodcastMerger
 from mygpo.utils import get_timestamp
 from mygpo.db.couchdb.podcast import podcast_by_id
 from mygpo.db.couchdb.episode import episode_by_id
-from mygpo.db.couchdb.episode_state import episode_state_for_user_episode
+from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
+    add_episode_actions
 
 
 @override_settings(CACHE={})
@@ -68,11 +69,8 @@ class MergeTests(TestCase):
                 timestamp=datetime.utcnow(),
                 upload_timestamp=get_timestamp(datetime.utcnow()))
 
-        state1.add_actions([action1])
-        state2.add_actions([action2])
-
-        state1.save()
-        state2.save()
+        add_episode_actions(state1, [action1])
+        add_episode_actions(state2, [action2])
 
         # copy of the object
         episode2 = episode_by_id(self.episode2._id)
@@ -157,11 +155,8 @@ class MergeGroupTests(TestCase):
                 timestamp=datetime.utcnow(),
                 upload_timestamp=get_timestamp(datetime.utcnow()))
 
-        state1.add_actions([action1])
-        state2.add_actions([action2])
-
-        state1.save()
-        state2.save()
+        add_episode_actions(state1, [action1])
+        add_episode_actions(state2, [action2])
 
         # copy of the object
         episode2 = episode_by_id(self.episode2._id)

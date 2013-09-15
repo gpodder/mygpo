@@ -6,7 +6,7 @@ from collections import Counter
 from django.core.management.base import BaseCommand
 
 from mygpo.utils import progress
-from mygpo.db.couchdb import bulk_save_retry
+from mygpo.db.couchdb import bulk_save_retry, get_userdata_database
 from mygpo.db.couchdb.episode_state import episode_states_count, \
          get_nth_episode_state, get_duplicate_episode_states
 
@@ -46,7 +46,8 @@ class Command(BaseCommand):
 
                 obj_funs = [(first, updater)] + [(state, do_delete) for state in states]
 
-                bulk_save_retry(obj_funs)
+                udb = get_userdata_database()
+                bulk_save_retry(obj_funs, udb)
 
                 merged = len(states)-1
                 actions['merged'] += merged
