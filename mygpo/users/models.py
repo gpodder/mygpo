@@ -22,7 +22,8 @@ from mygpo.users.sync import SyncedDevicesMixin
 from mygpo.users.subscriptions import subscription_changes, podcasts_for_states
 from mygpo.users.settings import FAV_FLAG, PUBLIC_SUB_PODCAST, SettingsMixin
 from mygpo.db.couchdb.podcast import podcasts_by_id, podcasts_to_dict
-from mygpo.db.couchdb.user import user_history, device_history
+from mygpo.db.couchdb.user import user_history, device_history, \
+    create_missing_user_tokens
 
 # make sure this code is executed at startup
 from mygpo.users.signals import *
@@ -485,13 +486,7 @@ class User(BaseUser, SyncedDevicesMixin, SettingsMixin):
         if token_name not in TOKEN_NAMES:
             raise TokenException('Invalid token name %s' % token_name)
 
-        for tn in TOKEN_NAMES:
-            if getattr(self, tn) is None:
-                self.create_new_token(tn)
-                generated = True
-
-        if generated:
-            self.save()
+        create_missing_user_tokens(self)
 
         return getattr(self, token_name)
 

@@ -309,3 +309,15 @@ def unsync_device(user, device):
 def set_device(user, device):
     user.set_device(device)
     user.save()
+
+
+@repeat_on_conflict(['user'])
+def create_missing_user_tokens(user):
+    from mygpo.users.models import TOKEN_NAMES
+    for tn in TOKEN_NAMES:
+        if getattr(self, tn) is None:
+            user.create_new_token(tn)
+            generated = True
+
+    if generated:
+        user.save()
