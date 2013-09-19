@@ -313,9 +313,12 @@ def set_device(user, device):
 
 @repeat_on_conflict(['user'])
 def create_missing_user_tokens(user):
+
+    generated = False
+
     from mygpo.users.models import TOKEN_NAMES
     for tn in TOKEN_NAMES:
-        if getattr(self, tn) is None:
+        if getattr(user, tn) is None:
             user.create_new_token(tn)
             generated = True
 
