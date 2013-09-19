@@ -182,10 +182,10 @@
      <tr {% if chapter.is_own %}class="own-chapter"{% endif %} >
       <td>{{ chapter.start|sec_to_time|time:"H:i:s" }}{% if chapter.start != chapter.end %} - {{ chapter.end|sec_to_time|time:"H:i:s" }}{% endif %}</td>
       <td>{% if chapter.advertisement %}Yes{% endif %}</td>
-      <td>{{ chapter.label }}</strong>
+      <td><strong>{{ chapter.label }}</strong></td>
       <td>
        {% if chapter.is_own %}
-        <a href="{% episode_link_target episode "remove-chapter" chapter.start chapter.end %}">
+        <a href="{% episode_link_target episode podcast "remove-chapter" chapter.start chapter.end %}">
          <img src="{% static "unsubscribe.png" %}" alt="{% trans "Remove" %}" />
         </a>
        {% endif %}
