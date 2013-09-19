@@ -416,6 +416,8 @@ def _wrap_chapter(res):
     from mygpo.users.models import Chapter
     user = res['key'][1]
     chapter = Chapter.wrap(res['value'])
+    udb = get_userdata_database()
+    chapter.set_db(udb)
     return (user, chapter)
 
 

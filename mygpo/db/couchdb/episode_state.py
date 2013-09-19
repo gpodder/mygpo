@@ -41,6 +41,7 @@ def episode_state_for_user_episode(user, episode):
 
     if r:
         state = r.one()
+        state.set_db(udb)
         cache.set(key, state)
         return state
 
@@ -71,7 +72,13 @@ def all_episode_states(episode):
             include_docs = True,
             schema       = EpisodeUserState,
         )
-    return list(r)
+
+    states = list(r)
+
+    for state in states:
+        state.set_db(udb)
+
+    return states
 
 
 
@@ -87,7 +94,13 @@ def all_podcast_episode_states(podcast):
             include_docs = True,
             schema       = EpisodeUserState,
         )
-    return list(r)
+
+    states = list(r)
+
+    for state in states:
+        state.set_db(udb)
+
+    return states
 
 
 
@@ -256,6 +269,7 @@ def episode_state_for_ref_urls(user, podcast_url, episode_url):
         state = res.first()
         state.ref_url = episode_url
         state.podcast_ref_url = podcast_url
+        state.set_db(udb)
         cache.set(cache_key, state, 60*60)
         return state
 
@@ -325,7 +339,14 @@ def get_nth_episode_state(n):
             limit        = 1,
             schema       = EpisodeUserState,
         )
-    return first.one() if first else None
+
+    if first:
+        state = first.one()
+        state.set_db(udb)
+        return state
+
+    else:
+        return None
 
 
 def get_duplicate_episode_states(user, episode):
@@ -337,12 +358,18 @@ def get_duplicate_episode_states(user, episode):
         raise QueryParameterMissing('episode')
 
     udb = get_userdata_database()
-    states = udb.view('episode_states/by_user_episode',
+    r = udb.view('episode_states/by_user_episode',
             key          = [user, episode],
             include_docs = True,
             schema       = EpisodeUserState,
         )
-    return list(states)
+
+    states = list(r)
+
+    for state in states:
+        state.set_db(udb)
+
+    return states
 
 
 def _wrap_listener_count(res):

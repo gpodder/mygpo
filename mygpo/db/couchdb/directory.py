@@ -22,7 +22,14 @@ def category_for_tag(tag):
             stale        = 'update_after',
             schema       = Category
         )
-    return r.first() if r else None
+
+    if r:
+        cat = r.first()
+        cat.set_db(db)
+        return cat
+
+    else:
+        return None
 
 
 @cache_result(timeout=60*60)
@@ -55,7 +62,12 @@ def top_categories(offset, count, with_podcasts=False):
                 wrapper      = _category_wrapper,
             )
 
-    return list(r)
+    categories = list(r)
+
+    for cat in categories:
+        cat.set_db(db)
+
+    return categories
 
 
 def _category_wrapper(r):

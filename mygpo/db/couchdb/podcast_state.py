@@ -13,12 +13,19 @@ def all_podcast_states(podcast):
 
     udb = get_userdata_database()
 
-    return udb.view('podcast_states/by_podcast',
+    r = udb.view('podcast_states/by_podcast',
             startkey     = [podcast.get_id(), None],
             endkey       = [podcast.get_id(), {}],
             include_docs = True,
             schema       = PodcastUserState,
         )
+
+    states = list(r)
+
+    for state in states:
+        state.set_db(udb)
+
+    return states
 
 
 @cache_result(timeout=60*60)
@@ -99,7 +106,9 @@ def podcast_state_for_user_podcast(user, podcast):
             )
 
     if r:
-        return r.first()
+        state = r.first()
+        state.set_db(udb)
+        return state
 
     else:
         p = PodcastUserState()
@@ -126,7 +135,12 @@ def podcast_states_for_user(user):
             include_docs = True,
             schema       = PodcastUserState,
         )
-    return list(r)
+
+    states = list(r)
+    for state in states:
+        state.set_db(udb)
+
+    return states
 
 
 def podcast_states_for_device(device_id):
@@ -142,7 +156,13 @@ def podcast_states_for_device(device_id):
             include_docs = True,
             schema       = PodcastUserState,
         )
-    return list(r)
+
+    states = list(r)
+
+    for state in states:
+        state.set_db(udb)
+
+    return states
 
 
 @cache_result(timeout=60*60)
@@ -283,7 +303,13 @@ def get_subscribed_podcast_states_by_device(device):
             include_docs = True,
             schema       = PodcastUserState,
         )
-    return list(r)
+
+    states = list(r)
+
+    for state in states:
+        state.set_db(udb)
+
+    return states
 
 
 def get_subscribed_podcast_states_by_user(user, public=None):
@@ -300,4 +326,9 @@ def get_subscribed_podcast_states_by_user(user, public=None):
             schema       = PodcastUserState,
         )
 
-    return set(r)
+    states = list(r)
+
+    for state in states:
+        state.set_db(udb)
+
+    return states
