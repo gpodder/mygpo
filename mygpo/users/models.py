@@ -22,7 +22,8 @@ from mygpo.users.sync import SyncedDevicesMixin
 from mygpo.users.subscriptions import subscription_changes, podcasts_for_states
 from mygpo.users.settings import FAV_FLAG, PUBLIC_SUB_PODCAST, SettingsMixin
 from mygpo.db.couchdb.podcast import podcasts_by_id, podcasts_to_dict
-from mygpo.db.couchdb.user import user_history, device_history
+from mygpo.db.couchdb.user import user_history, device_history, \
+    create_missing_user_tokens
 
 # make sure this code is executed at startup
 from mygpo.users.signals import *
@@ -190,29 +191,6 @@ class EpisodeUserState(Document, SettingsMixin):
 
     def set_favorite(self, set_to=True):
         self.settings[FAV_FLAG.name] = set_to
-
-
-    def update_chapters(self, add=[], rem=[]):
-        """ Updates the Chapter list
-
-         * add contains the chapters to be added
-
-         * rem contains tuples of (start, end) times. Chapters that match
-           both endpoints will be removed
-        """
-
-        @repeat_on_conflict(['state'])
-        def update(state):
-            for chapter in add:
-                self.chapters = self.chapters + [chapter]
-
-            for start, end in rem:
-                keep = lambda c: c.start != start or c.end != end
-                self.chapters = filter(keep, self.chapters)
-
-            self.save()
-
-        update(state=self)
 
 
     def get_history_entries(self):
@@ -417,17 +395,9 @@ class Device(Document, SettingsMixin):
                 yield (p_state.podcast, actions[0])
 
 
-    def get_subscribed_podcast_states(self):
-        r = PodcastUserState.view('subscriptions/by_device',
-                startkey     = [self.id, None],
-                endkey       = [self.id, {}],
-                include_docs = True
-            )
-        return list(r)
-
-
     def get_subscribed_podcast_ids(self):
-        states = self.get_subscribed_podcast_states()
+        from mygpo.db.couchdb.podcast_state import get_subscribed_podcast_states_by_device
+        states = get_subscribed_podcast_states_by_device(self)
         return [state.podcast for state in states]
 
 
@@ -437,7 +407,8 @@ class Device(Document, SettingsMixin):
         The attribute "url" contains the URL that was used when subscribing to
         the podcast """
 
-        states = self.get_subscribed_podcast_states()
+        from mygpo.db.couchdb.podcast_state import get_subscribed_podcast_states_by_device
+        states = get_subscribed_podcast_states_by_device(self)
         return podcasts_for_states(states)
 
 
@@ -515,13 +486,7 @@ class User(BaseUser, SyncedDevicesMixin, SettingsMixin):
         if token_name not in TOKEN_NAMES:
             raise TokenException('Invalid token name %s' % token_name)
 
-        for tn in TOKEN_NAMES:
-            if getattr(self, tn) is None:
-                self.create_new_token(tn)
-                generated = True
-
-        if generated:
-            self.save()
+        create_missing_user_tokens(self)
 
         return getattr(self, token_name)
 
@@ -569,13 +534,6 @@ class User(BaseUser, SyncedDevicesMixin, SettingsMixin):
             raise DeviceDoesNotExist('There is no device with UID %s' % uid)
 
 
-    @repeat_on_conflict(['self'])
-    def update_device(self, device):
-        """ Sets the device and saves the user """
-        self.set_device(device)
-        self.save()
-
-
     def set_device(self, device):
 
         if not RE_DEVICE_UID.match(device.uid):
@@ -621,24 +579,9 @@ class User(BaseUser, SyncedDevicesMixin, SettingsMixin):
 
         return groups
 
-
-    def get_subscribed_podcast_states(self, public=None):
-        """
-        Returns the Ids of all subscribed podcasts
-        """
-
-        r = PodcastUserState.view('subscriptions/by_user',
-                startkey     = [self._id, public, None, None],
-                endkey       = [self._id+'ZZZ', None, None, None],
-                reduce       = False,
-                include_docs = True
-            )
-
-        return set(r)
-
-
     def get_subscribed_podcast_ids(self, public=None):
-        states = self.get_subscribed_podcast_states(public=public)
+        from mygpo.db.couchdb.podcast_state import get_subscribed_podcast_states_by_user
+        states = get_subscribed_podcast_states_by_user(self, public)
         return [state.podcast for state in states]
 
 
@@ -649,7 +592,8 @@ class User(BaseUser, SyncedDevicesMixin, SettingsMixin):
         The attribute "url" contains the URL that was used when subscribing to
         the podcast """
 
-        states = self.get_subscribed_podcast_states(public=public)
+        from mygpo.db.couchdb.podcast_state import get_subscribed_podcast_states_by_user
+        states = get_subscribed_podcast_states_by_user(self, public)
         podcast_ids = [state.podcast for state in states]
         podcasts = podcasts_to_dict(podcast_ids)
 

@@ -33,7 +33,8 @@ from mygpo.utils import parse_time, parse_request_body, normalize_feed_url
 from mygpo.decorators import allowed_methods
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.db.couchdb.episode import episode_for_podcast_url
-from mygpo.db.couchdb.episode_state import episode_state_for_user_episode
+from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
+    update_episode_chapters
 
 
 @csrf_exempt
@@ -154,7 +155,7 @@ def update_chapters(req, user):
     new_chapters = parse_new_chapters(request.user, req.get('chapters_add', []))
     rem_chapters = parse_rem_chapters(req.get('chapters_remove', []))
 
-    e_state.update_chapters(new_chapters, rem_chapters)
+    update_episode_chapters(e_state, new_chapters, rem_chapters)
 
 
 

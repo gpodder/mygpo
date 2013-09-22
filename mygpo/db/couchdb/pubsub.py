@@ -15,7 +15,9 @@ def subscription_for_topic(topic):
         )
 
     if r:
-        return r.one()
+        sub = r.one()
+        sub.set_db(db)
+        return sub
 
     else:
         return None

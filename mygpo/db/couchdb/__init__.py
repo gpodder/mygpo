@@ -19,6 +19,9 @@ def get_pubsub_database():
     return loading.get_db('pubsub')
 
 
+def get_userdata_database():
+    return loading.get_db('userdata')
+
 def get_database(user=None):
     return get_main_database()
 

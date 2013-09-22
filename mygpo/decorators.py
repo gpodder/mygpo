@@ -100,6 +100,10 @@ class repeat_on_conflict(object):
         self.reload_f = reload_f or self.default_reload
 
     def default_reload(self, obj):
+        # if the object knows its DB, use this one
+        if obj._db:
+            return obj._db.get(obj._id)
+        # otherwise the class' default DB is used
         return obj.__class__.get(obj._id)
 
     def build_locals(self, f, args, kwargs):

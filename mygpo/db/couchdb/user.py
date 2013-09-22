@@ -4,7 +4,7 @@ from couchdbkit import ResourceNotFound
 
 from mygpo.cache import cache_result
 from mygpo.decorators import repeat_on_conflict
-from mygpo.db.couchdb import get_main_database
+from mygpo.db.couchdb import get_main_database, get_userdata_database
 from mygpo.users.settings import FLATTR_TOKEN, FLATTR_AUTO, FLATTR_MYGPO, \
          FLATTR_USERNAME
 from mygpo.db import QueryParameterMissing
@@ -17,8 +17,8 @@ def get_num_listened_episodes(user):
     if not user:
         raise QueryParameterMissing('user')
 
-    db = get_main_database()
-    r = db.view('listeners/by_user_podcast',
+    udb = get_userdata_database()
+    r = udb.view('listeners/by_user_podcast',
             startkey    = [user._id, None],
             endkey      = [user._id, {}],
             reduce      = True,
@@ -48,8 +48,8 @@ def get_num_played_episodes(user, since=None, until={}):
     startkey = [user._id, since_str]
     endkey   = [user._id, until_str]
 
-    db = get_main_database()
-    res = db.view('listeners/by_user',
+    udb = get_userdata_database()
+    res = udb.view('listeners/by_user',
             startkey = startkey,
             endkey   = endkey,
             reduce   = True,
@@ -72,8 +72,8 @@ def get_latest_episodes(user, count=10):
     startkey = [user._id, {}]
     endkey   = [user._id, None]
 
-    db = get_main_database()
-    res = db.view('listeners/by_user',
+    udb = get_userdata_database()
+    res = udb.view('listeners/by_user',
             startkey     = startkey,
             endkey       = endkey,
             include_docs = True,
@@ -103,8 +103,8 @@ def get_seconds_played(user, since=None, until={}):
     startkey = [user._id, since_str]
     endkey   = [user._id, until_str]
 
-    db = get_main_database()
-    res = db.view('listeners/times_played_by_user',
+    udb = get_userdata_database()
+    res = udb.view('listeners/times_played_by_user',
             startkey = startkey,
             endkey   = endkey,
             reduce   = True,
@@ -176,8 +176,8 @@ def user_history(user, start, length):
     if length <= 0:
         return []
 
-    db = get_main_database()
-    res = db.view('history/by_user',
+    udb = get_userdata_database()
+    res = udb.view('history/by_user',
             descending = True,
             startkey   = [user._id, {}],
             endkey     = [user._id, None],
@@ -200,9 +200,9 @@ def device_history(user, device, start, length):
     if length <= 0:
         return []
 
-    db = get_main_database()
+    udb = get_userdata_database()
 
-    res = db.view('history/by_device',
+    res = udb.view('history/by_device',
             descending = True,
             startkey   = [user._id, device.id, {}],
             endkey     = [user._id, device.id, None],
@@ -294,11 +294,33 @@ def update_device_state(state, devices):
     state.set_device_state(devices)
 
     if old_devs != set(state.disabled_devices):
-        state.save()
+        udb = get_userdata_database()
+        udb.save_doc(state)
 
 
 @repeat_on_conflict(['user'])
 def unsync_device(user, device):
     if user.is_synced(device):
         user.unsync_device(device)
+        user.save()
+
+
+@repeat_on_conflict(['user'])
+def set_device(user, device):
+    user.set_device(device)
+    user.save()
+
+
+@repeat_on_conflict(['user'])
+def create_missing_user_tokens(user):
+
+    generated = False
+
+    from mygpo.users.models import TOKEN_NAMES
+    for tn in TOKEN_NAMES:
+        if getattr(user, tn) is None:
+            user.create_new_token(tn)
+            generated = True
+
+    if generated:
         user.save()
