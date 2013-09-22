@@ -9,8 +9,10 @@ from mygpo.decorators import repeat_on_conflict
 from mygpo.db.couchdb.podcast import delete_podcast
 from mygpo.db.couchdb.episode import episodes_for_podcast_uncached
 from mygpo.db.couchdb.podcast_state import all_podcast_states, \
-    delete_podcast_state
-from mygpo.db.couchdb.episode_state import all_episode_states
+    delete_podcast_state, update_podcast_state_podcast, merge_podcast_states
+from mygpo.db.couchdb.episode_state import all_episode_states, \
+    update_episode_state_object, add_episode_actions, delete_episode_state, \
+    merge_episode_states
 
 import logging
 logger = logging.getLogger(__name__)
@@ -100,11 +102,6 @@ class PodcastMerger(object):
 
         podcast1.save()
 
-    @repeat_on_conflict(['s'])
-    def _save_state(self, s, podcast1):
-        s.podcast = podcast1.get_id()
-        s.save()
-
     @repeat_on_conflict(['e'])
     def _save_episode(self, e, podcast1):
         e.podcast = podcast1.get_id()
@@ -122,7 +119,7 @@ class PodcastMerger(object):
             for s in all_episode_states(e):
                 self.actions['reassign-episode-state'] += 1
 
-                self._save_state(s=s, podcast1=podcast1)
+                update_episode_state_object(s, podcast1.get_id())
 
             self._save_episode(e=e, podcast1=podcast1)
 
@@ -146,8 +143,8 @@ class PodcastMerger(object):
 
             if state is None:
                 self.actions['move-podcast-state'] += 1
-                self._move_state(state2=state2, new_id=podcast1.get_id(),
-                                 new_url=podcast1.url)
+                update_podcast_state_podcast(state2, podcast1.get_id(),
+                    podcast1.url)
 
             elif state2 is None:
                 continue
@@ -155,12 +152,6 @@ class PodcastMerger(object):
             else:
                 psm = PodcastStateMerger(state, state2, self.actions)
                 psm.merge()
-
-    @repeat_on_conflict(['state2'])
-    def _move_state(self, state2, new_id, new_url):
-        state2.ref_url = new_url
-        state2.podcast = new_id
-        state2.save()
 
 
 class EpisodeMerger(object):
@@ -217,8 +208,8 @@ class EpisodeMerger(object):
 
             if state is None:
                 self.actions['move-episode-state'] += 1
-                self._move(state2=state2, podcast_id=self.episode1.podcast,
-                           episode_id=self.episode1._id)
+                update_episode_state_object(state2, self.episode1.podcast,
+                    self.episode1._id)
 
             elif state2 is None:
                 continue
@@ -226,12 +217,6 @@ class EpisodeMerger(object):
             else:
                 esm = EpisodeStateMerger(state, state2, self.actions)
                 esm.merge()
-
-    @repeat_on_conflict(['state2'])
-    def _move(self, state2, podcast_id, episode_id):
-        state2.podcast = podcast_id
-        state2.episode = episode_id
-        state2.save()
 
 
 class PodcastStateMerger(object):
@@ -252,43 +237,20 @@ class PodcastStateMerger(object):
         self.actions = actions
 
     def merge(self):
-        self._do_merge(state=self.state, state2=self.state2)
+        merge_podcast_states(self.state, self.state2)
         self._add_actions(state=self.state, actions=self.state2.actions)
-        self._delete(state2=self.state2)
+        delete_podcast_state(self.state2)
         self.actions['merged-podcast-state'] += 1
 
-    @repeat_on_conflict(['state'])
-    def _do_merge(self, state, state2):
 
-        # overwrite settings in state2 with state's settings
-        settings = state2.settings
-        settings.update(state.settings)
-        state.settings = settings
-
-        state.disabled_devices = set_filter(None, state.disabled_devices,
-                                            state2.disabled_devices)
-
-        state.merged_ids = set_filter(state._id, state.merged_ids,
-                                      [state2._id], state2.merged_ids)
-
-        state.tags = set_filter(None, state.tags, state2.tags)
-
-        state.save()
-
-    @repeat_on_conflict(['state'])
     def _add_actions(self, state, actions):
         try:
-            state.add_actions(actions)
-            state.save()
+            add_episode_actions(state, actions)
         except restkit.Unauthorized:
             # the merge could result in an invalid list of
             # subscribe/unsubscribe actions -- we ignore it and
             # just use the actions from state
             return
-
-    @repeat_on_conflict(['state2'])
-    def _delete(self, state2):
-        state2.delete()
 
 
 class EpisodeStateMerger(object):
@@ -309,25 +271,9 @@ class EpisodeStateMerger(object):
         self.actions = actions
 
     def merge(self):
-        self._merge_obj(state=self.state, state2=self.state2)
-        delete_podcast_state(self.state2)
+        merge_episode_states(self.state, self.state2)
+        delete_episode_state(self.state2)
         self.actions['merge-episode-state'] += 1
-
-    @repeat_on_conflict(['state'])
-    def _merge_obj(self, state, state2):
-        state.add_actions(state2.actions)
-
-        # overwrite settings in state2 with state's settings
-        settings = state2.settings
-        settings.update(state.settings)
-        state.settings = settings
-
-        merged_ids = set(state.merged_ids + [state2._id] + state2.merged_ids)
-        state.merged_ids = filter(None, merged_ids)
-
-        state.chapters = list(set(state.chapters + state2.chapters))
-
-        state.save()
 
 
 def set_filter(orig, *args):

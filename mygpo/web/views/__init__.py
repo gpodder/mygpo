@@ -45,7 +45,7 @@ from mygpo.web.utils import process_lang_params
 from mygpo.utils import parse_range
 from mygpo.web.views.podcast import slug_id_decorator
 from mygpo.users.settings import FLATTR_AUTO, FLATTR_TOKEN
-from mygpo.db.couchdb.episode import favorite_episodes_for_user
+from mygpo.db.couchdb.episode import favorite_episode_ids_for_user
 from mygpo.db.couchdb.podcast import podcast_by_id, random_podcasts
 from mygpo.db.couchdb.user import suggestions_for_user
 from mygpo.db.couchdb.directory import tags_for_user
@@ -92,7 +92,7 @@ def dashboard(request, episode_count=10):
     if subscribed_podcasts:
         checklist.append('subscriptions')
 
-    if favorite_episodes_for_user(request.user):
+    if favorite_episode_ids_for_user(request.user):
         checklist.append('favorites')
 
     if not request.user.get_token('subscriptions_token'):

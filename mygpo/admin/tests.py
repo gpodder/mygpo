@@ -17,7 +17,8 @@ from mygpo.maintenance.merge import PodcastMerger
 from mygpo.db.couchdb.episode import episode_by_id, episodes_for_podcast
 from mygpo.db.couchdb.podcast import podcast_by_id
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
-from mygpo.db.couchdb.episode_state import episode_state_for_user_episode
+from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
+    add_episode_actions
 from mygpo.utils import get_timestamp
 
 
@@ -82,14 +83,12 @@ class SimpleTest(TestCase):
         p2.subscribe(user, device2)
 
         s1 = episode_state_for_user_episode(user, e1)
-        s1.add_actions([EpisodeAction(action='play',
+        add_episode_actions(s1, [EpisodeAction(action='play',
                     upload_timestamp=get_timestamp(datetime.utcnow()))])
-        s1.save()
 
         s3 = episode_state_for_user_episode(user, e3)
-        s3.add_actions([EpisodeAction(action='play',
+        add_episode_actions(s3, [EpisodeAction(action='play',
                     upload_timestamp=get_timestamp(datetime.utcnow()))])
-        s3.save()
 
         # we need that for later
         e3_id = e3._id

@@ -43,12 +43,14 @@ from mygpo.users.models import EpisodeAction, \
 from mygpo.users.settings import FLATTR_AUTO
 from mygpo.core.json import JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
-from mygpo.db.couchdb import BulkException, bulk_save_retry
+from mygpo.db.couchdb import BulkException, bulk_save_retry, \
+    get_userdata_database
 from mygpo.db.couchdb.episode import favorite_episodes_for_user
 from mygpo.db.couchdb.podcast import podcast_for_url
 from mygpo.db.couchdb.podcast_state import subscribed_podcast_ids_by_device
 from mygpo.db.couchdb.episode_state import episode_state_for_ref_urls, \
     get_episode_actions
+from mygpo.db.couchdb.user import set_device
 
 
 import logging
@@ -377,7 +379,8 @@ def update_episodes(user, actions, now, ua_string):
         fun = partial(update_episode_actions, action_list=action_list)
         obj_funs.append( (episode_state, fun) )
 
-    bulk_save_retry(obj_funs)
+    udb = get_userdata_database()
+    bulk_save_retry(obj_funs, udb)
 
     if user.get_wksetting(FLATTR_AUTO):
         for episode_id in auto_flattr_episodes:
@@ -458,7 +461,7 @@ def device(request, username, device_uid):
         d.type = data['type']
 
 
-    request.user.update_device(d)
+    set_device(request.user, d)
 
     return HttpResponse()
 

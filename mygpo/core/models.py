@@ -319,11 +319,11 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
     @repeat_on_conflict()
     def subscribe(self, user, device):
-        from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
+        from mygpo.db.couchdb.podcast_state import subscribe_on_device, \
+            podcast_state_for_user_podcast
         state = podcast_state_for_user_podcast(user, self)
-        state.subscribe(device)
         try:
-            state.save()
+            subscribe_on_device(state, device)
             subscription_changed.send(sender=self, user=user, device=device,
                                       subscribed=True)
         except Unauthorized as ex:
@@ -332,11 +332,11 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
     @repeat_on_conflict()
     def unsubscribe(self, user, device):
-        from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
+        from mygpo.db.couchdb.podcast_state import unsubscribe_on_device, \
+            podcast_state_for_user_podcast
         state = podcast_state_for_user_podcast(user, self)
-        state.unsubscribe(device)
         try:
-            state.save()
+            unsubscribe_on_device(state, device)
             subscription_changed.send(sender=self, user=user, device=device,
                                       subscribed=False)
         except Unauthorized as ex:

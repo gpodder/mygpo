@@ -140,7 +140,6 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'couchdbkit.ext.django',
     'django_couchdb_utils.auth',
-    'django_couchdb_utils.sessions',
     'django_couchdb_utils.registration',
     'mygpo.core',
     'mygpo.users',

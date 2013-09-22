@@ -2,7 +2,8 @@ from collections import defaultdict, Counter
 from operator import itemgetter
 
 from mygpo.directory.models import Category
-from mygpo.db.couchdb import get_main_database, get_categories_database
+from mygpo.db.couchdb import get_main_database, get_categories_database, \
+    get_userdata_database
 from mygpo.cache import cache_result
 from mygpo.db.couchdb.utils import multi_request_view
 from mygpo.db import QueryParameterMissing
@@ -21,7 +22,14 @@ def category_for_tag(tag):
             stale        = 'update_after',
             schema       = Category
         )
-    return r.first() if r else None
+
+    if r:
+        cat = r.first()
+        cat.set_db(db)
+        return cat
+
+    else:
+        return None
 
 
 @cache_result(timeout=60*60)
@@ -54,7 +62,12 @@ def top_categories(offset, count, with_podcasts=False):
                 wrapper      = _category_wrapper,
             )
 
-    return list(r)
+    categories = list(r)
+
+    for cat in categories:
+        cat.set_db(db)
+
+    return categories
 
 
 def _category_wrapper(r):
@@ -88,7 +101,8 @@ def tags_for_podcast(podcast):
 
     tags = Counter(dict((x['key'][1], x['value']) for x in res))
 
-    res = db.view('usertags/by_podcast',
+    udb = get_userdata_database()
+    res = udb.view('usertags/by_podcast',
             startkey    = [podcast.get_id(), None],
             endkey      = [podcast.get_id(), {}],
             reduce      = True,
@@ -136,7 +150,8 @@ def all_tags():
     for r in res:
         yield r['key'][0]
 
-    res = multi_request_view(db, 'usertags/podcasts',
+    udb = get_userdata_database()
+    res = multi_request_view(udb, 'usertags/podcasts',
             wrap        = False,
             reduce      = True,
             group       = True,

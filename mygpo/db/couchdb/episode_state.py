@@ -8,7 +8,7 @@ from mygpo.users.models import EpisodeUserState
 from mygpo.db import QueryParameterMissing
 from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url
 from mygpo.db.couchdb.episode import episode_for_podcast_id_url
-from mygpo.db.couchdb import get_main_database
+from mygpo.db.couchdb import get_main_database, get_userdata_database
 from mygpo.cache import cache_result
 from mygpo.decorators import repeat_on_conflict
 
@@ -26,18 +26,22 @@ def episode_state_for_user_episode(user, episode):
     key = 'episode-state-userid-%s-episodeid-%s' % (sha1(user._id).hexdigest(),
             sha1(episode._id).hexdigest())
 
-    state = cache.get(key)
-    if state:
-        return state
+#   Disabled as cache invalidation does not work properly
+#   state = cache.get(key)
+#   if state:
+#       return state
 
-    r = EpisodeUserState.view('episode_states/by_user_episode',
+    udb = get_userdata_database()
+    r = udb.view('episode_states/by_user_episode',
             key          = [user._id, episode._id],
             include_docs = True,
             limit        = 1,
+            schema       = EpisodeUserState,
         )
 
     if r:
         state = r.one()
+        state.set_db(udb)
         cache.set(key, state)
         return state
 
@@ -61,12 +65,20 @@ def all_episode_states(episode):
     if not episode:
         raise QueryParameterMissing('episode')
 
-    r = EpisodeUserState.view('episode_states/by_podcast_episode',
+    udb = get_userdata_database()
+    r = udb.view('episode_states/by_podcast_episode',
             startkey     = [episode.podcast, episode._id, None],
             endkey       = [episode.podcast, episode._id, {}],
             include_docs = True,
+            schema       = EpisodeUserState,
         )
-    return list(r)
+
+    states = list(r)
+
+    for state in states:
+        state.set_db(udb)
+
+    return states
 
 
 
@@ -75,12 +87,20 @@ def all_podcast_episode_states(podcast):
     if not podcast:
         raise QueryParameterMissing('podcast')
 
-    r = EpisodeUserState.view('episode_states/by_podcast_episode',
+    udb = get_userdata_database()
+    r = udb.view('episode_states/by_podcast_episode',
             startkey     = [podcast.get_id(), None, None],
             endkey       = [podcast.get_id(), {},   {}],
-            include_docs = True
+            include_docs = True,
+            schema       = EpisodeUserState,
         )
-    return list(r)
+
+    states = list(r)
+
+    for state in states:
+        state.set_db(udb)
+
+    return states
 
 
 
@@ -91,7 +111,8 @@ def podcast_listener_count(episode):
     if not episode:
         raise QueryParameterMissing('episode')
 
-    r = EpisodeUserState.view('listeners/by_podcast',
+    udb = get_userdata_database()
+    r = udb.view('listeners/by_podcast',
             startkey    = [episode.get_id(), None],
             endkey      = [episode.get_id(), {}],
             group       = True,
@@ -115,7 +136,8 @@ def podcast_listener_count_timespan(podcast, start=None, end={}):
     if isinstance(end, datetime):
         end = end.isoformat()
 
-    r = EpisodeUserState.view('listeners/by_podcast',
+    udb = get_userdata_database()
+    r = udb.view('listeners/by_podcast',
             startkey    = [podcast.get_id(), start],
             endkey      = [podcast.get_id(), end],
             group       = True,
@@ -134,8 +156,8 @@ def episode_listener_counts(episode):
     if not episode:
         raise QueryParameterMissing('episode')
 
-
-    r = EpisodeUserState.view('listeners/by_podcast_episode',
+    udb = get_userdata_database()
+    r = udb.view('listeners/by_podcast_episode',
             startkey    = [episode.get_id(), None, None],
             endkey      = [episode.get_id(), {},   {}],
             group       = True,
@@ -157,9 +179,8 @@ def get_podcasts_episode_states(podcast, user_id):
     if not user_id:
         raise QueryParameterMissing('user_id')
 
-
-    db = get_main_database()
-    res = db.view('episode_states/by_user_podcast',
+    udb = get_userdata_database()
+    res = udb.view('episode_states/by_user_podcast',
             startkey = [user_id, podcast.get_id(), None],
             endkey   = [user_id, podcast.get_id(), {}],
         )
@@ -175,8 +196,8 @@ def episode_listener_count(episode, start=None, end={}):
     if not episode:
         raise QueryParameterMissing('episode')
 
-
-    r = EpisodeUserState.view('listeners/by_episode',
+    udb = get_userdata_database()
+    r = udb.view('listeners/by_episode',
             startkey    = [episode._id, start],
             endkey      = [episode._id, end],
             group       = True,
@@ -202,7 +223,8 @@ def episode_listener_count_timespan(episode, start=None, end={}):
     if isinstance(end, datetime):
         end = end.isoformat()
 
-    r = EpisodeUserState.view('listeners/by_episode',
+    udb = get_userdata_database()
+    r = udb.view('listeners/by_episode',
             startkey    = [episode._id, start],
             endkey      = [episode._id, end],
             group       = True,
@@ -235,16 +257,19 @@ def episode_state_for_ref_urls(user, podcast_url, episode_url):
     if state:
         return state
 
-    res = EpisodeUserState.view('episode_states/by_ref_urls',
+    udb = get_userdata_database()
+    res = udb.view('episode_states/by_ref_urls',
             key   = [user._id, podcast_url, episode_url],
             limit = 1,
             include_docs=True,
+            schema      = EpisodeUserState,
         )
 
     if res:
         state = res.first()
         state.ref_url = episode_url
         state.podcast_ref_url = podcast_url
+        state.set_db(udb)
         cache.set(cache_key, state, 60*60)
         return state
 
@@ -286,8 +311,8 @@ def get_episode_actions(user_id, since=None, until={}, podcast_id=None,
         startkey = [user_id, podcast_id, device_id, since]
         endkey   = [user_id, podcast_id, device_id, until]
 
-    db = get_main_database()
-    res = db.view(view,
+    udb = get_userdata_database()
+    res = udb.view(view,
             startkey = startkey,
             endkey   = endkey
         )
@@ -298,7 +323,8 @@ def get_episode_actions(user_id, since=None, until={}, podcast_id=None,
 
 @cache_result(timeout=60*60)
 def episode_states_count():
-    r = EpisodeUserState.view('episode_states/by_user_episode',
+    udb = get_userdata_database()
+    r = udb.view('episode_states/by_user_episode',
             limit = 0,
             stale = 'update_after',
         )
@@ -306,12 +332,21 @@ def episode_states_count():
 
 
 def get_nth_episode_state(n):
-    first = EpisodeUserState.view('episode_states/by_user_episode',
+    udb = get_userdata_database()
+    first = udb.view('episode_states/by_user_episode',
             skip         = n,
             include_docs = True,
             limit        = 1,
+            schema       = EpisodeUserState,
         )
-    return first.one() if first else None
+
+    if first:
+        state = first.one()
+        state.set_db(udb)
+        return state
+
+    else:
+        return None
 
 
 def get_duplicate_episode_states(user, episode):
@@ -322,11 +357,19 @@ def get_duplicate_episode_states(user, episode):
     if not episode:
         raise QueryParameterMissing('episode')
 
-    states = EpisodeUserState.view('episode_states/by_user_episode',
+    udb = get_userdata_database()
+    r = udb.view('episode_states/by_user_episode',
             key          = [user, episode],
             include_docs = True,
+            schema       = EpisodeUserState,
         )
-    return list(states)
+
+    states = list(r)
+
+    for state in states:
+        state.set_db(udb)
+
+    return states
 
 
 def _wrap_listener_count(res):
@@ -343,11 +386,11 @@ def _wrap_listeners(res):
 
 @cache_result(timeout=60*60)
 def get_heatmap(podcast_id, episode_id, user_id):
-    db = get_main_database()
+    udb = get_userdata_database()
 
     group_level = len(filter(None, [podcast_id, episode_id, user_id]))
 
-    r = db.view('heatmap/by_episode',
+    r = udb.view('heatmap/by_episode',
             startkey    = [podcast_id, episode_id,       user_id],
             endkey      = [podcast_id, episode_id or {}, user_id or {}],
             reduce      = True,
@@ -366,5 +409,61 @@ def get_heatmap(podcast_id, episode_id, user_id):
 
 @repeat_on_conflict(['state'])
 def add_episode_actions(state, actions):
+    udb = get_userdata_database()
     state.add_actions(actions)
-    state.save()
+    udb.save_doc(state)
+
+
+@repeat_on_conflict(['state'])
+def update_episode_state_object(state, podcast_id, episode_id=None):
+    state.podcast = podcast_id
+
+    if episode_id is not None:
+        state.episode = episode_id
+
+    udb = get_userdata_database()
+    udb.save_doc(state)
+
+
+@repeat_on_conflict(['state'])
+def merge_episode_states(state, state2):
+    state.add_actions(state2.actions)
+
+    # overwrite settings in state2 with state's settings
+    settings = state2.settings
+    settings.update(state.settings)
+    state.settings = settings
+
+    merged_ids = set(state.merged_ids + [state2._id] + state2.merged_ids)
+    state.merged_ids = filter(None, merged_ids)
+
+    state.chapters = list(set(state.chapters + state2.chapters))
+
+    udb = get_userdata_database()
+    udb.save_doc(state)
+
+
+@repeat_on_conflict(['state'])
+def delete_episode_state(state):
+    udb = get_userdata_database()
+    udb.delete_doc(state)
+
+
+@repeat_on_conflict(['episode_state'])
+def update_episode_chapters(episode_state, add=[], rem=[]):
+    """ Updates the Chapter list
+
+     * add contains the chapters to be added
+
+     * rem contains tuples of (start, end) times. Chapters that match
+       both endpoints will be removed
+    """
+
+    for chapter in add:
+        episode_state.chapters = episode_state.chapters + [chapter]
+
+    for start, end in rem:
+        keep = lambda c: c.start != start or c.end != end
+        episode_state.chapters = filter(keep, episode_state.chapters)
+
+    episode_state.save()

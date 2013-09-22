@@ -37,8 +37,9 @@ from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.users.models import Device, DeviceUIDException, \
      DeviceDoesNotExist
 from mygpo.users.tasks import sync_user, set_device_task_state
-from mygpo.db.couchdb.podcast_state import podcast_states_for_device
-from mygpo.db.couchdb.user import set_device_deleted, unsync_device
+from mygpo.db.couchdb.podcast_state import podcast_states_for_device, \
+         remove_device_from_podcast_state
+from mygpo.db.couchdb.user import set_device_deleted, unsync_device, set_device
 
 
 @vary_on_cookie
@@ -116,8 +117,7 @@ def create(request):
     device.type = device_form.cleaned_data['type']
     device.uid  = device_form.cleaned_data['uid'].replace(' ', '-')
     try:
-        request.user.set_device(device)
-        request.user.save()
+        set_device(request.user, device)
         messages.success(request, _('Device saved'))
 
     except DeviceUIDException as e:
@@ -156,7 +156,7 @@ def update(request, device):
         device.type = device_form.cleaned_data['type']
         device.uid  = device_form.cleaned_data['uid'].replace(' ', '-')
         try:
-            request.user.update_device(device)
+            set_device(request.user, device)
             messages.success(request, _('Device updated'))
             uid = device.uid  # accept the new UID after rest has succeeded
 
@@ -274,14 +274,9 @@ def delete(request, device):
 @device_decorator
 def delete_permanently(request, device):
 
-    @repeat_on_conflict(['state'])
-    def remove_device(state, dev):
-        state.remove_device(dev)
-        state.save()
-
     states = podcast_states_for_device(device.id)
     for state in states:
-        remove_device(state=state, dev=device)
+        remove_device_from_podcast_state(state, device)
 
     @repeat_on_conflict(['user'])
     def _remove(user, device):
