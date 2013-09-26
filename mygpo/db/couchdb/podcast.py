@@ -522,7 +522,7 @@ def get_license_podcasts(offset=0, limit=20):
 def get_license_podcast_count():
     """ returns the number of podcasts that contain license information """
     r = list(Podcast.view('podcasts/license'))
-    return r[0]['value']
+    return r[0]['value'] if r else 0
 
 
 def subscriberdata_for_podcast(podcast_id):
