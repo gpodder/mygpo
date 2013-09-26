@@ -24,7 +24,8 @@ from mygpo.db.couchdb.episode import episodes_for_podcast
 from mygpo.db.couchdb.podcast import podcast_for_slug, podcast_for_slug_id, \
          podcast_for_oldid, podcast_for_url
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast, \
-         add_subscription_action
+         add_subscription_action, add_podcast_tags, remove_podcast_tags, \
+         set_podcast_privacy_settings
 from mygpo.db.couchdb.episode_state import get_podcasts_episode_states, \
          episode_listener_counts
 from mygpo.db.couchdb.directory import tags_for_user, tags_for_podcast
@@ -34,12 +35,6 @@ logger = logging.getLogger(__name__)
 
 
 MAX_TAGS_ON_PAGE=50
-
-
-@repeat_on_conflict(['state'])
-def update_podcast_settings(state, is_public):
-    state.settings[PUBLIC_SUB_PODCAST.name] = is_public
-    state.save()
 
 
 @vary_on_cookie
@@ -250,13 +245,7 @@ def add_tag(request, podcast):
         return HttpResponseBadRequest()
 
     tags = tag_str.split(',')
-
-    @repeat_on_conflict(['state'])
-    def update(state):
-        state.add_tags(tags)
-        state.save()
-
-    update(state=podcast_state)
+    add_podcast_tags(podcast_state, tags)
 
     if request.GET.get('next', '') == 'mytags':
         return HttpResponseRedirect('/tags/')
@@ -273,14 +262,7 @@ def remove_tag(request, podcast):
     if not tag_str:
         return HttpResponseBadRequest()
 
-    @repeat_on_conflict(['state'])
-    def update(state):
-        tags = list(state.tags)
-        if tag_str in tags:
-            state.tags.remove(tag_str)
-            state.save()
-
-    update(state=podcast_state)
+    remove_podcast_tags(podcast_stage, tag_str)
 
     if request.GET.get('next', '') == 'mytags':
         return HttpResponseRedirect('/tags/')
@@ -410,7 +392,7 @@ def subscribe_url(request):
 @allowed_methods(['POST'])
 def set_public(request, podcast, public):
     state = podcast_state_for_user_podcast(request.user, podcast)
-    update_podcast_settings(state=state, is_public=public)
+    set_podcast_privacy_settings(state, public)
     return HttpResponseRedirect(get_podcast_link_target(podcast))
 
 

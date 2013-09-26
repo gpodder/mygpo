@@ -13,3 +13,6 @@ doc/_build
 
 # static files copied by the collectstatic command
 mygpo/staticfiles/
+
+# virtualenv
+venv

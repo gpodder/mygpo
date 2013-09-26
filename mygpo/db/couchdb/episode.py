@@ -13,7 +13,7 @@ from mygpo.decorators import repeat_on_conflict
 from mygpo.utils import get_timestamp
 from mygpo.db import QueryParameterMissing
 from mygpo.db.couchdb.utils import is_couchdb_id
-from mygpo.db.couchdb import get_main_database
+from mygpo.db.couchdb import get_main_database, get_userdata_database
 from mygpo.db.couchdb.podcast import podcast_for_url, podcast_for_slug_id
 
 import logging
@@ -184,9 +184,10 @@ def episode_for_podcast_id_url(podcast_id, episode_url, create=False):
             sha1(podcast_id.encode('utf-8')).hexdigest(),
             sha1(episode_url.encode('utf-8')).hexdigest())
 
-    episode = cache.get(key)
-    if episode:
-        return episode
+#   Disabled as cache invalidation is not working properly
+#   episode = cache.get(key)
+#   if episode:
+#       return episode
 
     r = Episode.view('episodes/by_podcast_url',
             key          = [podcast_id, episode_url],
@@ -366,23 +367,22 @@ def episode_count_for_podcast(podcast, since=None, until={}, **kwargs):
     return res.one()['value']
 
 
-def favorite_episodes_for_user(user):
+def favorite_episode_ids_for_user(user):
 
     if not user:
         raise QueryParameterMissing('user')
 
-    favorites = Episode.view('favorites/episodes_by_user',
-            key          = user._id,
-            include_docs = True,
+    udb = get_userdata_database()
+    favorites = udb.view('favorites/episodes_by_user',
+            key = user._id,
         )
 
-    episodes = list(favorites)
+    return set(x['value']['_id'] for x in favorites)
 
-    for episode in episodes:
-        if episode.needs_update:
-            incomplete_obj.send_robust(sender=episode)
 
-    return episodes
+def favorite_episodes_for_user(user):
+    episode_ids = favorite_episode_ids_for_user(user)
+    return episodes_by_id(episode_ids)
 
 
 def chapters_for_episode(episode_id):
@@ -390,8 +390,8 @@ def chapters_for_episode(episode_id):
     if not episode_id:
         raise QueryParameterMissing('episode_id')
 
-    db = get_main_database()
-    r = db.view('chapters/by_episode',
+    udb = get_userdata_database()
+    r = udb.view('chapters/by_episode',
             startkey = [episode_id, None],
             endkey   = [episode_id, {}],
         )
@@ -416,6 +416,8 @@ def _wrap_chapter(res):
     from mygpo.users.models import Chapter
     user = res['key'][1]
     chapter = Chapter.wrap(res['value'])
+    udb = get_userdata_database()
+    chapter.set_db(udb)
     return (user, chapter)
 
 
@@ -431,3 +433,10 @@ def remove_episode_slug(episode, slug):
     """ removes slug from main and merged slugs """
     episode.remove_slug(slug)
     episode.save()
+
+
+@repeat_on_conflict(['episode_state'])
+def set_episode_favorite(episode_state, is_fav):
+    udb = get_userdata_database()
+    episode_state.set_favorite(is_fav)
+    udb.save_doc(episode_state)

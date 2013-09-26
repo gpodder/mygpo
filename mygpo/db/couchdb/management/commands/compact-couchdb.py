@@ -1,7 +1,6 @@
 import sys
 from datetime import datetime
 from time import sleep
-from urlparse import urlparse
 from optparse import make_option
 
 from couchdbkit import Database
@@ -9,10 +8,6 @@ from restkit import BasicAuth
 from restkit.errors import RequestError
 from django.core.management.base import BaseCommand
 from django.conf import settings
-
-from mygpo.decorators import repeat_on_conflict
-from mygpo.utils import progress
-
 
 
 class Command(BaseCommand):

@@ -31,9 +31,11 @@ def get_photo_sizes(photo_id):
     resp = urllib.urlopen(request).read()
 
     extract_re = '^jsonFlickrApi\((.*)\)$'
-    resp_content = re.match(extract_re, resp).group(1)
+    m = re.match(extract_re, resp)
+    if not m:
+        return []
 
-    resp_obj = json.loads(resp_content)
+    resp_obj = json.loads(m.group(1))
 
     try:
         return resp_obj['sizes']['size']

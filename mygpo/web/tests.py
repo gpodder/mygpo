@@ -28,15 +28,16 @@ from mygpo.test import create_auth_string
 
 class SimpleWebTests(TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(self):
         self.user = User(username='web-test', email='web-test@example.com')
         self.user.set_password('pwd')
         self.user.save()
 
         self.auth_string = create_auth_string('test', 'pwd')
 
-
-    def tearDown(self):
+    @classmethod
+    def tearDownClass(self):
         self.user.delete()
 
     def test_access_parameterless_pages(self):

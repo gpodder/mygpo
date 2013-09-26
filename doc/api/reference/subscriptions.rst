@@ -15,12 +15,18 @@ The Subscriptions API defines the following resources ::
  /user/{username}/subscriptions
  /user/{username}/device/{deviceid}/subscriptions
 
+The first resource represents the summary of subscriptions over all devices. It
+can not be modified directly.
+
+The second resource represents the subscriptions of a single
+:ref:`device-integration`.
+
 
 Subscription Upload
 -------------------
 
-Clients can upload the podcast subscriptions for a device to replace any
-existing subscriptions.
+Clients can upload the podcast subscriptions for a :ref:`device-integration` to
+replace its existing subscriptions.
 
 
 Request
@@ -95,7 +101,8 @@ request will be rejected. ::
 Subscription Download
 ---------------------
 
-Clients can download the current subscriptions of a device.
+Clients can download the current subscriptions either of a single
+:ref:`device-integration` or over all of the user's devices.
 
 
 Request
@@ -135,8 +142,8 @@ The changes link is not provided if all subscriptions of a user are requested.
 Subscription Change Upload
 --------------------------
 
-Clients can update the current subscriptions of a device by reporting
-subscribed and unsubscribed podcasts.
+Clients can update the current subscriptions of a :ref:`device-integration` by
+reporting subscribed and unsubscribed podcasts.
 
 
 Request
@@ -188,7 +195,7 @@ No response body is provided in this case, as it is not yet known.
 Subscription Change Download
 ----------------------------
 
-Download changes to the subscriptions of a device.
+Download changes to the subscriptions of a :ref:`device-integration`.
 
 
 Request
@@ -222,3 +229,27 @@ The changes are returned immediatelly. ::
 
 The server can also return a prepared response (see
 :ref:`prepared-response-api`).
+
+
+Integration Recommendations
+---------------------------
+
+This section describes how the API can be accessed for common use cases.
+
+* On first startup a client CAN retrieve the list of all the user's
+  subscriptions to offer as suggestions.
+
+* On first startup a client SHOULD generate a unique :ref:`device-integration`
+  Id for managing its own subscriptions in subsequent API calls.
+
+* A client which has been somehow "reset" can re-use an existing device ID and
+  restore its subscriptions from there. It SHOULD NOT share the same device ID
+  with another installation which is still used.
+
+* A client SHOULD either use the combination of Subscription Upload and
+  Download endpoints, or the Subscription Change endpoints to keep its
+  subscriptions up to date.
+
+* When retrieving subscriptions or subscription changes, a client SHOULD use
+  the URL in the ``Link`` header with ``rel=changes`` (if present) to retrieve
+  subsequent changes to the resource.

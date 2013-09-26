@@ -44,7 +44,7 @@ class Command(BaseCommand):
                     continue
 
                 view_name = ddoc['views'].keys()[0]
-                print 'touching %s %s/%s' % (sig[:5], ddoc_name, view_name),
+                print 'touching %s %s %s/%s' % (db_url, sig[:5], ddoc_name, view_name),
                 self.touch_view(db, ddoc_name, view_name)
                 print
 
