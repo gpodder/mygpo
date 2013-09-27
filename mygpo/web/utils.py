@@ -6,6 +6,7 @@ from django.views.decorators.cache import never_cache
 from django.utils.html import strip_tags
 from django.core.urlresolvers import reverse
 from django.shortcuts import render
+from django.http import Http404
 
 from babel import Locale, UnknownLocaleError
 
@@ -234,3 +235,9 @@ TWITTER_CHARS = string.ascii_letters + string.digits + '_'
 def normalize_twitter(s):
     """ normalize user input that is supposed to be a Twitter handle """
     return "".join(i for i in s if i in TWITTER_CHARS)
+
+
+def check_restrictions(obj):
+    """ checks for known restrictions of the object """
+    if "hide" in obj.restrictions:
+        raise Http404
