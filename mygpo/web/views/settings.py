@@ -33,6 +33,7 @@ from django.utils.html import strip_tags
 from django_couchdb_utils.auth.models import UsernameException, \
          PasswordException
 
+from mygpo.core.podcasts import PODCAST_SORT
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.web.forms import UserAccountForm, ProfileForm, FlattrForm
 from mygpo.web.utils import normalize_twitter
@@ -224,7 +225,6 @@ class DefaultPrivacySettings(View):
     @method_decorator(never_cache)
     def post(self, request):
         self.set_privacy_settings(user=request.user)
-        messages.success(request, 'Success')
         return HttpResponseRedirect(reverse('privacy'))
 
     @repeat_on_conflict(['user'])
@@ -243,8 +243,6 @@ class PodcastPrivacySettings(View):
         podcast = podcast_by_id(podcast_id)
         state = podcast_state_for_user_podcast(request.user, podcast)
         set_podcast_privacy_settings(state, self.public)
-        self.set_privacy_settings(state=state)
-        messages.success(request, 'Success')
         return HttpResponseRedirect(reverse('privacy'))
 
 
@@ -256,13 +254,12 @@ def privacy(request):
     subscriptions = subscriptions_by_user(request.user)
     podcasts = podcasts_to_dict([x[1] for x in subscriptions])
 
-    included_subscriptions = set(filter(None, [podcasts.get(x[1], None) for x in subscriptions if x[0] == True]))
-    excluded_subscriptions = set(filter(None, [podcasts.get(x[1], None) for x in subscriptions if x[0] == False]))
+    subs = set((podcasts.get(x[1], None), not x[0]) for x in subscriptions)
+    subs = sorted(subs, key=lambda (p, _): PODCAST_SORT(p))
 
     return render(request, 'privacy.html', {
-        'public_subscriptions': request.user.get_wksetting(PUBLIC_SUB_USER),
-        'included_subscriptions': included_subscriptions,
-        'excluded_subscriptions': excluded_subscriptions,
+        'private_subscriptions': not request.user.get_wksetting(PUBLIC_SUB_USER),
+        'subscriptions': subs,
         'domain': site.domain,
         })
 
