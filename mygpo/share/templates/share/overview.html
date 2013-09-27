@@ -20,10 +20,7 @@
   <tr>
    <td><i class="icon-rss icon-large"></i> {% trans "Subscriptions" %}</td>
    <td>
-    <div class="btn-group">
-     <button class="btn btn-small {% if not subscriptions_token %}disabled btn-primary{% endif %}" onclick="submitForm('subscriptions_public');">{% trans "Public" %}</button>
-     <button class="btn btn-small {% if subscriptions_token %}disabled btn-primary{% endif %}" onclick="submitForm('subscriptions_private');">{% trans "Private" %}</button>
-    </div>
+    {% include "share/components/private-toggle.html" with private=subscriptions_token public_action="subscriptions_public" private_action="subscriptions_private" %}
    </td>
    <td>
     <a href="{% url "shared-subscriptions" user.username %}{% if subscriptions_token %}?token={{ subscriptions_token }}{% endif %}">
@@ -42,10 +39,7 @@
   <tr>
    <td><i class="icon-user icon-large"></i> {% trans "User Page" %}</td>
    <td>
-    <div class="btn-group">
-     <button class="btn btn-small {% if not userpage_token %}disabled btn-primary{% endif %}" onclick="submitForm('userpage_public');">{% trans "Public" %}</button>
-     <button class="btn btn-small {% if userpage_token %}disabled btn-primary{% endif %}" onclick="submitForm('userpage_private');">{% trans "Private" %}</button>
-    </div>
+    {% include "share/components/private-toggle.html" with private=userpage_token public_action="userpage_public" private_action="userpage_private" %}
    <td>
     <a href="{% url "user" user.username %}{% if userpage_token %}?token={{ userpage_token }}{% endif %}">
      <img src="{% static "22x22/internet-web-browser.png" %}" class="action-button" />
@@ -59,10 +53,7 @@
   <tr>
    <td><i class="icon-star icon-large"></i> {% trans "Favorites Feed" %}</td>
    <td>
-    <div class="btn-group">
-     <button class="btn btn-small {% if not favfeed_token %}disabled btn-primary{% endif %}" onclick="submitForm('favfeed_public');">{% trans "Public" %}</button>
-     <button class="btn btn-small {% if favfeed_token %}disabled btn-primary{% endif %}" onclick="submitForm('favfeed_private');">{% trans "Private" %}</button>
-    </div>
+    {% include "share/components/private-toggle.html" with private=favfeed_token public_action="favfeed_public" private_action="favfeed_private" %}
    </td>
    <td>
     {% if favfeed_podcast %}
