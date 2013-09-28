@@ -163,22 +163,22 @@
    {% if devices or can_subscribe %}
     <table class="list">
       {% for device in devices %}
-       <tr>
-        <td>
-         {% if device %}
+       {% if device %}
+        <tr>
+         <td>
           {{ device|device_icon }}
           <a href="{% url "device" device.uid %}">{{ device.name|striptags }}</a>
-         {% endif %}
-        </td>
-        <td style="text-align: center;">
-         <form class="form-inline" method="post" action="{% podcast_link_target podcast "unsubscribe" device.uid %}?return_to={% podcast_link_target podcast %}">
-          {% csrf_token %}
-          <button class="btn btn-danger btn-small" type="submit">
-           <i class="icon-remove"></i>
-          </button>
-         </form>
-        </td>
-       </tr>
+         </td>
+         <td style="text-align: center;">
+          <form class="form-inline" method="post" action="{% podcast_link_target podcast "unsubscribe" device.uid %}?return_to={% podcast_link_target podcast %}">
+           {% csrf_token %}
+           <button class="btn btn-danger btn-small" type="submit">
+            <i class="icon-remove"></i>
+           </button>
+          </form>
+         </td>
+        </tr>
+       {% endif %}
       {% endfor %}
       {% if can_subscribe %}
        <tr>
@@ -187,7 +187,9 @@
           {% csrf_token %}
           <select name="targets" id="id_targets">
            {% for device in subscribe_targets %}
-            <option value="{{ device.uid }}">{{ device.name }}</option>
+            {% if device %}
+             <option value="{{ device.uid }}">{{ device.name }}</option>
+            {% endif %}
            {% endfor %}
           </select>
          </td>
