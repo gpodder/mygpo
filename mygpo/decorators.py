@@ -102,7 +102,8 @@ class repeat_on_conflict(object):
     def default_reload(self, obj):
         # if the object knows its DB, use this one
         if obj._db:
-            return obj._db.get(obj._id)
+            doc = obj._db.get(obj._id)
+            return obj.__class__.wrap(doc)
         # otherwise the class' default DB is used
         return obj.__class__.get(obj._id)
 
