@@ -36,17 +36,13 @@ BulkError = namedtuple('BulkError', 'doc error reason')
 
 
 def __default_reload(db, obj):
-    _id = obj._id
-
-    if isinstance(obj, Document):
-        return obj.__class__.get(_id)
-    else:
-        return db[_id]
+    doc = db[obj._id]
+    return obj.__class__.wrap(doc)
 
 
 __get_obj = itemgetter(0)
 
-def bulk_save_retry(obj_funs, db=None, reload_f=__default_reload):
+def bulk_save_retry(obj_funs, db, reload_f=__default_reload):
     """ Saves multiple documents and retries failed ones
 
     Objects to be saved are passed as (obj, mod_f), where obj is the CouchDB
@@ -55,7 +51,6 @@ def bulk_save_retry(obj_funs, db=None, reload_f=__default_reload):
     If saving a document fails, it is again fetched from the database, the
     modification function is applied again and saving is retried. """
 
-    db = db or get_main_database()
     errors = []
 
     while True:
