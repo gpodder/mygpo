@@ -37,7 +37,7 @@ from mygpo.web.logo import CoverArt
 from mygpo.data.podcast import subscribe_at_hub
 from mygpo.db.couchdb.episode import episode_for_podcast_id_url, \
          episodes_for_podcast_uncached
-from mygpo.db.couchdb.podcast import podcast_for_url
+from mygpo.db.couchdb.podcast import podcast_for_url, podcast_by_id_uncached
 from mygpo.directory.tags import update_category
 from mygpo.decorators import repeat_on_conflict
 from mygpo.db.couchdb import get_main_database
@@ -121,7 +121,7 @@ class PodcastUpdater(object):
             raise NoEpisodesException('no episodes found')
 
 
-    @repeat_on_conflict(['podcast'])
+    @repeat_on_conflict(['podcast'], reload_f=podcast_by_id_uncached)
     def _update_podcast(self, podcast, parsed):
         """ updates a podcast according to new parser results """
 

@@ -88,8 +88,7 @@ def get_podcast_languages():
     return sane_lang
 
 
-@cache_result(timeout=60*60)
-def podcast_by_id(podcast_id, current_id=False):
+def podcast_by_id_uncached(podcast_id, current_id=False):
 
     if not podcast_id:
         raise QueryParameterMissing('podcast_id')
@@ -112,6 +111,8 @@ def podcast_by_id(podcast_id, current_id=False):
 
     return podcast
 
+
+podcast_by_id = cache_result(timeout=60*60)(podcast_by_id_uncached)
 
 
 @cache_result(timeout=60*60)
