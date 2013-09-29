@@ -583,7 +583,7 @@ def search(q, offset=0, num_results=20):
 
 
 def reload_podcast(podcast):
-    return podcast_by_id_uncached(p.get_id())
+    return podcast_by_id_uncached(podcast.get_id())
 
 
 @repeat_on_conflict(['podcast'], reload_f=reload_podcast)
