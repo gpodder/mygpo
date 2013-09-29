@@ -121,15 +121,19 @@ class MergeVerify(MergeBase):
         try:
             podcasts = self._get_podcasts(request)
 
+            grouper = PodcastGrouper(podcasts)
+
+            get_features = lambda (e_id, e): ((e.url, e.title), e_id)
+
+            num_groups = grouper.group(get_features)
+
+
         except InvalidPodcast as ip:
             messages.error(request,
                     _('No podcast with URL {url}').format(url=str(ip)))
 
-        grouper = PodcastGrouper(podcasts)
-
-        get_features = lambda (e_id, e): ((e.url, e.title), e_id)
-
-        num_groups = grouper.group(get_features)
+            podcasts = []
+            num_groups = []
 
         return self.render_to_response({
                 'podcasts': podcasts,
