@@ -26,6 +26,7 @@ from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.utils import parse_range, normalize_feed_url
 from mygpo.directory.tags import Topics
 from mygpo.web.utils import get_episode_link_target, get_podcast_link_target
+from mygpo.decorators import cors_origin
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.db.couchdb.episode import episode_for_podcast_url
 from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url
@@ -34,6 +35,7 @@ from mygpo.db.couchdb.directory import category_for_tag
 
 @csrf_exempt
 @cache_page(60 * 60 * 24)
+@cors_origin()
 def top_tags(request, count):
     count = parse_range(count, 1, 100, 100)
     tag_cloud = Topics(count, num_cat=0)
@@ -43,6 +45,7 @@ def top_tags(request, count):
 
 @csrf_exempt
 @cache_page(60 * 60 * 24)
+@cors_origin()
 def tag_podcasts(request, tag, count):
     count = parse_range(count, 1, 100, 100)
     category = category_for_tag(tag)
@@ -56,6 +59,7 @@ def tag_podcasts(request, tag, count):
 
 
 @cache_page(60 * 60)
+@cors_origin()
 def podcast_info(request):
     url = normalize_feed_url(request.GET.get('url', ''))
 
@@ -74,6 +78,7 @@ def podcast_info(request):
 
 
 @cache_page(60 * 60)
+@cors_origin()
 def episode_info(request):
     podcast_url = normalize_feed_url(request.GET.get('podcast', ''))
     episode_url = normalize_feed_url(request.GET.get('url', ''))

@@ -41,7 +41,7 @@ from mygpo.directory.toplist import PodcastToplist
 from mygpo.directory.models import ExamplePodcasts
 from mygpo.api.advanced.directory import podcast_data
 from mygpo.directory.search import search_podcasts
-from mygpo.decorators import allowed_methods
+from mygpo.decorators import allowed_methods, cors_origin
 from mygpo.utils import parse_range, normalize_feed_url
 from mygpo.core.json import json, JSONDecodeError
 from mygpo.db.couchdb import BulkException
@@ -70,6 +70,7 @@ def check_format(fn):
 @check_format
 @never_cache
 @allowed_methods(['GET', 'PUT', 'POST'])
+@cors_origin()
 def subscriptions(request, username, device_uid, format):
 
     user_agent = request.META.get('HTTP_USER_AGENT', '')
@@ -96,6 +97,7 @@ def subscriptions(request, username, device_uid, format):
 @check_format
 @never_cache
 @allowed_methods(['GET'])
+@cors_origin()
 def all_subscriptions(request, username, format):
 
     try:
@@ -240,6 +242,7 @@ def set_subscriptions(urls, user, device_uid, user_agent):
 @check_format
 @allowed_methods(['GET'])
 @cache_page(60 * 60)
+@cors_origin()
 def toplist(request, count, format):
     count = parse_range(count, 1, 100, 100)
 
@@ -287,6 +290,7 @@ def toplist(request, count, format):
 @check_format
 @cache_page(60 * 60)
 @allowed_methods(['GET'])
+@cors_origin()
 def search(request, format):
 
     NUM_RESULTS = 20
@@ -316,6 +320,7 @@ def search(request, format):
 @check_format
 @never_cache
 @allowed_methods(['GET'])
+@cors_origin()
 def suggestions(request, count, format):
     count = parse_range(count, 1, 100, 100)
 
@@ -330,6 +335,7 @@ def suggestions(request, count, format):
 @check_format
 @allowed_methods(['GET'])
 @cache_page(60 * 60)
+@cors_origin()
 def example_podcasts(request, format):
 
     podcasts = cache.get('example-podcasts', None)

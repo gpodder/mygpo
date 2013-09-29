@@ -30,7 +30,7 @@ from mygpo.api.exceptions import ParameterMissing
 from mygpo.api.backend import get_device
 from mygpo.users.models import Chapter
 from mygpo.utils import parse_time, parse_request_body, normalize_feed_url
-from mygpo.decorators import allowed_methods
+from mygpo.decorators import allowed_methods, cors_origin
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.db.couchdb.episode import episode_for_podcast_url
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
@@ -42,6 +42,7 @@ from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
 @check_username
 @never_cache
 @allowed_methods(['POST', 'GET'])
+@cors_origin()
 def chapters(request, username):
 
     now = datetime.utcnow()

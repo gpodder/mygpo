@@ -33,7 +33,7 @@ from mygpo.api.httpresponse import JsonResponse
 from mygpo.share.models import PodcastList
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.core.models import Podcast
-from mygpo.decorators import allowed_methods, repeat_on_conflict
+from mygpo.decorators import allowed_methods, repeat_on_conflict, cors_origin
 from mygpo.api.simple import parse_subscription, format_podcast_list, \
      check_format
 from mygpo.share.views import list_decorator
@@ -50,6 +50,7 @@ from mygpo.db.couchdb.podcastlist import podcastlist_for_user_slug, \
 @check_format
 @never_cache
 @allowed_methods(['POST'])
+@cors_origin()
 def create(request, username, format):
     """ Creates a new podcast list and links to it in the Location header """
 
@@ -100,6 +101,7 @@ def _get_list_data(l, username, domain):
 @csrf_exempt
 @never_cache
 @allowed_methods(['GET'])
+@cors_origin()
 def get_lists(request, username):
     """ Returns a list of all podcast lists by the given user """
 
@@ -122,6 +124,7 @@ def get_lists(request, username):
 @check_format
 @never_cache
 @allowed_methods(['GET', 'PUT', 'DELETE'])
+@cors_origin()
 def podcast_list(request, *args, **kwargs):
 
     handlers = dict(
@@ -135,6 +138,7 @@ def podcast_list(request, *args, **kwargs):
 
 @never_cache
 @list_decorator(must_own=False)
+@cors_origin()
 def get_list(request, plist, owner, format):
     """ Returns the contents of the podcast list """
 
@@ -158,6 +162,7 @@ def get_list(request, plist, owner, format):
 @never_cache
 @require_valid_user
 @list_decorator(must_own=True)
+@cors_origin()
 def update_list(request, plist, owner, format):
     """ Replaces the podcasts in the list and returns 204 No Content """
 
@@ -183,6 +188,7 @@ def update_list(request, plist, owner, format):
 @never_cache
 @require_valid_user
 @list_decorator(must_own=True)
+@cors_origin()
 def delete_list(request, plist, owner, format):
     """ Delete the podcast list and returns 204 No Content """
 

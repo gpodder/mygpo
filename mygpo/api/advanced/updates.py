@@ -37,6 +37,7 @@ from mygpo.utils import parse_bool, get_timestamp
 from mygpo.users.models import DeviceDoesNotExist
 from mygpo.users.subscriptions import subscription_changes, podcasts_for_states
 from mygpo.api.basic_auth import require_valid_user, check_username
+from mygpo.decorators import cors_origin
 from mygpo.db.couchdb.episode import episodes_for_podcast
 from mygpo.db.couchdb.episode_state import get_podcasts_episode_states
 from mygpo.db.couchdb.podcast_state import podcast_states_for_device
@@ -57,6 +58,7 @@ class DeviceUpdates(View):
     @method_decorator(require_valid_user)
     @method_decorator(check_username)
     @method_decorator(never_cache)
+    @method_decorator(cors_origin)
     def get(self, request, username, device_uid):
 
         now = datetime.now()
