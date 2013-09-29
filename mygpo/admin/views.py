@@ -1,6 +1,6 @@
 import re
 import socket
-from itertools import count
+from itertools import count, chain
 from collections import Counter
 
 import django
@@ -59,7 +59,11 @@ class HostInfo(AdminView):
         db_tasks = main_db.server.active_tasks()
 
         i = celery.control.inspect()
-        num_celery_tasks = len(i.scheduled() or [])
+        scheduled = i.scheduled()
+        if not scheduled:
+            num_celery_tasks = None
+        else:
+            num_celery_tasks = sum(len(node) for node in scheduled.values())
 
         return self.render_to_response({
             'git_commit': commit,
