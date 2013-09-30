@@ -123,8 +123,8 @@ def tags_for_user(user, podcast_id=None):
         raise QueryParameterMissing('user')
 
 
-    db = get_main_database()
-    res = db.view('tags/by_user',
+    udb = get_userdata_database()
+    res = udb.view('usertags/by_user',
             startkey = [user._id, podcast_id],
             endkey   = [user._id, podcast_id or {}]
         )
