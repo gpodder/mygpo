@@ -58,7 +58,7 @@ class DeviceUpdates(View):
     @method_decorator(require_valid_user)
     @method_decorator(check_username)
     @method_decorator(never_cache)
-    @method_decorator(cors_origin)
+    @method_decorator(cors_origin())
     def get(self, request, username, device_uid):
 
         now = datetime.now()
