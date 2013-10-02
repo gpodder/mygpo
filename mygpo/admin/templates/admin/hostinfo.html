@@ -44,16 +44,22 @@
 
   <tr>
    <td><strong>{% trans "Django Version" %}</strong></td>
-   <td><tt>{{ django_version }}</tt></td>
+   <td><tt>{{ django_version|join:"." }}</tt></td>
+  </tr>
+
+  <tr>
+   <td><strong>{% trans "Scheduled Celery Tasks" %}</strong></td>
+   <td><tt>{{ num_celery_tasks }}</tt></td>
+  </tr>
+
+  <tr>
+   <td><strong>{% trans "Database Tasks" %}</strong></td>
+   <td>{{ db_tasks|length }}</td>
   </tr>
 
   {% for task in db_tasks %}
    <tr>
-    <td>
-     {% if forloop.first %}
-      <strong>{% trans "Database Tasks" %}</strong>
-     {% endif %}
-    </td>
+    <td></td>
     <td>
      <ul>
       {% for key, val in task.items %}
@@ -63,11 +69,6 @@
     </td>
    </tr>
   {% endfor %}
-
-  <tr>
-   <td><strong>{% trans "Scheduled Celery Tasks" %}</strong></td>
-   <td><tt>{{ num_celery_tasks }}</tt></td>
-  </tr>
 
 
  </table>

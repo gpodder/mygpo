@@ -19,7 +19,8 @@ from mygpo.publisher.utils import check_publisher_permission
 from mygpo.users.models import HistoryEntry, DeviceDoesNotExist, SubscriptionAction
 from mygpo.web.forms import SyncForm
 from mygpo.decorators import allowed_methods, repeat_on_conflict
-from mygpo.web.utils import get_podcast_link_target, get_page_list
+from mygpo.web.utils import get_podcast_link_target, get_page_list, \
+    check_restrictions
 from mygpo.db.couchdb.episode import episodes_for_podcast
 from mygpo.db.couchdb.podcast import podcast_for_slug, podcast_for_slug_id, \
          podcast_for_oldid, podcast_for_url
@@ -55,6 +56,8 @@ def show_slug(request, slug):
 @allowed_methods(['GET'])
 def show(request, podcast):
     """ Shows a podcast detail page """
+
+    check_restrictions(podcast)
 
     current_site = RequestSite(request)
     num_episodes = 20

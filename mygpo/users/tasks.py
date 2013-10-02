@@ -4,8 +4,12 @@ from collections import Counter
 
 from couchdbkit import ResourceConflict
 
+from mygpo.core.models import SubscriptionException
 from mygpo.cel import celery
 from mygpo.db.couchdb.user import suggestions_for_user, update_device_state
+
+from celery.utils.log import get_task_logger
+logger = get_task_logger(__name__)
 
 
 @celery.task(max_retries=5, default_retry_delay=60)
@@ -13,9 +17,20 @@ def sync_user(user):
     """ Syncs all of the user's device groups """
 
     for group in user.get_grouped_devices():
-        if group.is_synced:
+        if not group.is_synced:
+            continue
+
+        try:
             device = group.devices[0]
             user.sync_group(device)
+
+        except SubscriptionException:
+            # no need to retry on SubscriptionException
+            pass
+
+        except Exception as e:
+            logger.exception('retrying task')
+            raise sync_user.retry()
 
 
 @celery.task(max_retries=5, default_retry_delay=60)

@@ -5,8 +5,8 @@ from django.core.management.base import BaseCommand
 from mygpo.utils import progress
 from mygpo.core.models import Podcast
 from mygpo.decorators import repeat_on_conflict
-from mygpo.db.couchdb.podcast import podcast_count, podcast_by_id, \
-         all_podcasts, subscriberdata_for_podcast
+from mygpo.db.couchdb.podcast import podcast_count, all_podcasts, \
+    subscriberdata_for_podcast, reload_podcast
 
 
 class Command(BaseCommand):
@@ -52,7 +52,7 @@ class Command(BaseCommand):
             return True
 
 
-    @repeat_on_conflict(['podcast'], reload_f=lambda p: podcast_by_id(p.get_id()))
+    @repeat_on_conflict(['podcast'], reload_f=reload_podcast)
     def update_podcast(self, podcast):
         if len(podcast.subscribers) > 2:
             podcast.subscribers = podcast.subscribers[-2:]

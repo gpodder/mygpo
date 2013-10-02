@@ -1,6 +1,6 @@
 import re
 import socket
-from itertools import count
+from itertools import count, chain
 from collections import Counter
 
 import django
@@ -59,7 +59,11 @@ class HostInfo(AdminView):
         db_tasks = main_db.server.active_tasks()
 
         i = celery.control.inspect()
-        num_celery_tasks = len(i.scheduled() or [])
+        scheduled = i.scheduled()
+        if not scheduled:
+            num_celery_tasks = None
+        else:
+            num_celery_tasks = sum(len(node) for node in scheduled.values())
 
         return self.render_to_response({
             'git_commit': commit,
@@ -117,15 +121,19 @@ class MergeVerify(MergeBase):
         try:
             podcasts = self._get_podcasts(request)
 
+            grouper = PodcastGrouper(podcasts)
+
+            get_features = lambda (e_id, e): ((e.url, e.title), e_id)
+
+            num_groups = grouper.group(get_features)
+
+
         except InvalidPodcast as ip:
             messages.error(request,
                     _('No podcast with URL {url}').format(url=str(ip)))
 
-        grouper = PodcastGrouper(podcasts)
-
-        get_features = lambda (e_id, e): ((e.url, e.title), e_id)
-
-        num_groups = grouper.group(get_features)
+            podcasts = []
+            num_groups = []
 
         return self.render_to_response({
                 'podcasts': podcasts,

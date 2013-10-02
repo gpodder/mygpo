@@ -88,8 +88,7 @@ def get_podcast_languages():
     return sane_lang
 
 
-@cache_result(timeout=60*60)
-def podcast_by_id(podcast_id, current_id=False):
+def podcast_by_id_uncached(podcast_id, current_id=False):
 
     if not podcast_id:
         raise QueryParameterMissing('podcast_id')
@@ -112,6 +111,8 @@ def podcast_by_id(podcast_id, current_id=False):
 
     return podcast
 
+
+podcast_by_id = cache_result(timeout=60*60)(podcast_by_id_uncached)
 
 
 @cache_result(timeout=60*60)
@@ -609,7 +610,11 @@ def search(q, offset=0, num_results=20):
         return [], 0
 
 
-@repeat_on_conflict(['podcast'])
+def reload_podcast(podcast):
+    return podcast_by_id_uncached(podcast.get_id())
+
+
+@repeat_on_conflict(['podcast'], reload_f=reload_podcast)
 def update_additional_data(podcast, twitter):
     podcast.twitter = twitter
     podcast.save()
@@ -618,7 +623,7 @@ def update_additional_data(podcast, twitter):
     cache.clear()
 
 
-@repeat_on_conflict(['podcast'])
+@repeat_on_conflict(['podcast'], reload_f=reload_podcast)
 def update_related_podcasts(podcast, related):
     if podcast.related_podcasts == related:
         return
@@ -627,6 +632,6 @@ def update_related_podcasts(podcast, related):
     podcast.save()
 
 
-@repeat_on_conflict(['podcast'])
+@repeat_on_conflict(['podcast'], reload_f=reload_podcast)
 def delete_podcast(podcast):
     podcast.delete()

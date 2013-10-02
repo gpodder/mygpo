@@ -19,7 +19,7 @@ from django.http import HttpResponseBadRequest, HttpResponseNotFound
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 
-from mygpo.decorators import allowed_methods
+from mygpo.decorators import allowed_methods, cors_origin
 from mygpo.core.json import JSONDecodeError
 from mygpo.utils import parse_request_body
 from mygpo.api.basic_auth import require_valid_user, check_username
@@ -33,6 +33,7 @@ from mygpo.users.tasks import sync_user
 @check_username
 @never_cache
 @allowed_methods(['GET', 'POST'])
+@cors_origin()
 def main(request, username):
     """ API Endpoint for Device Synchronisation """
 

@@ -102,7 +102,8 @@ class repeat_on_conflict(object):
     def default_reload(self, obj):
         # if the object knows its DB, use this one
         if obj._db:
-            return obj._db.get(obj._id)
+            doc = obj._db.get(obj._id)
+            return obj.__class__.wrap(doc)
         # otherwise the class' default DB is used
         return obj.__class__.get(obj._id)
 
@@ -160,6 +161,20 @@ def query_if_required():
                 self._query()
 
             return f(self, *args, **kwargs)
+
+        return wrapper
+    return decorator
+
+
+def cors_origin(allowed_origin='*'):
+    """ Adds an Access-Control-Allow-Origin header to the response """
+
+    def decorator(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            resp = f(*args, **kwargs)
+            resp['Access-Control-Allow-Origin'] = allowed_origin
+            return resp
 
         return wrapper
     return decorator

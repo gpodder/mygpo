@@ -1,0 +1,18 @@
+{% comment %}
+ A button group that is used to toggle between a private and public setting
+{% endcomment %}
+
+{% load i18n %}
+
+<div class="btn-group">
+ <button
+   class="btn btn-small {% if not private %}disabled btn-primary{% endif %}"
+   onclick="submitForm('{{ public_action }}{{ param }}');">
+    {% trans "Public" %}
+ </button>
+ <button
+   class="btn btn-small {% if private %}disabled btn-primary{% endif %}"
+   onclick="submitForm('{{ private_action }}{{ param }}');">
+    {% trans "Private" %}
+ </button>
+</div>

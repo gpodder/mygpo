@@ -111,7 +111,6 @@ Doc-Types: Podcast, PodcastGroup
 **Views**
 
 * `tags/by_podcast <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/tags/views/by_podcast>`_
-* `tags/by_user <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/tags/views/by_user>`_
 
 
 Toplists
@@ -276,6 +275,7 @@ Doc-Types: PodcastUserState
 **Views**
 
 * `usertags/by_podcast <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/usertags/views/by_podcast>`_
+* `usertags/by_user <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/usertags/views/by_user>`_
 * `usertags/podcasts <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/usertags/views/podcasts>`_
 
 

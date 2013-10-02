@@ -6,6 +6,10 @@ from mygpo.db.couchdb.episode import episodes_for_podcast
 from mygpo.utils import sorted_chain
 
 
+# the default sort order for podcasts
+PODCAST_SORT=lambda p: p.display_title
+
+
 class PodcastSet(set):
     """ Represents a set of podcasts """
 

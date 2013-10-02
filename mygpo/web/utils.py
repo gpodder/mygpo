@@ -7,6 +7,7 @@ from django.views.decorators.cache import never_cache
 from django.utils.html import strip_tags
 from django.core.urlresolvers import reverse
 from django.shortcuts import render
+from django.http import Http404
 
 from babel import Locale, UnknownLocaleError
 
@@ -280,3 +281,9 @@ def license_info(license_url):
         return LicenseInfo('Public Domain', None, license_url)
 
     return LicenseInfo(None, None, license_url)
+
+
+def check_restrictions(obj):
+    """ checks for known restrictions of the object """
+    if "hide" in obj.restrictions:
+        raise Http404

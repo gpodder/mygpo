@@ -38,7 +38,8 @@ from mygpo.utils import parse_time, get_timestamp
 from mygpo.users.settings import FLATTR_TOKEN
 from mygpo.web.heatmap import EpisodeHeatmap
 from mygpo.publisher.utils import check_publisher_permission
-from mygpo.web.utils import get_episode_link_target, fetch_episode_data
+from mygpo.web.utils import get_episode_link_target, fetch_episode_data, \
+    check_restrictions
 from mygpo.db.couchdb.episode import episode_for_slug_id, episode_for_oldid, \
          favorite_episodes_for_user, chapters_for_episode, \
          set_episode_favorite
@@ -55,6 +56,9 @@ from mygpo.userfeeds.feeds import FavoriteFeed
 def episode(request, episode):
 
     podcast = podcast_by_id(episode.podcast)
+
+    check_restrictions(podcast)
+
     user = request.user
 
     if not podcast:

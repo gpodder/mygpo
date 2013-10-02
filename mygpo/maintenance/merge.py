@@ -6,7 +6,7 @@ import restkit
 
 from mygpo import utils
 from mygpo.decorators import repeat_on_conflict
-from mygpo.db.couchdb.podcast import delete_podcast
+from mygpo.db.couchdb.podcast import delete_podcast, reload_podcast
 from mygpo.db.couchdb.episode import episodes_for_podcast_uncached
 from mygpo.db.couchdb.podcast_state import all_podcast_states, \
     delete_podcast_state, update_podcast_state_podcast, merge_podcast_states
@@ -72,7 +72,7 @@ class PodcastMerger(object):
                 em = EpisodeMerger(episode, ep, self.actions)
                 em.merge()
 
-    @repeat_on_conflict(['podcast1', 'podcast2'])
+    @repeat_on_conflict(['podcast1', 'podcast2'], reload_f=reload_podcast)
     def _merge_objs(self, podcast1, podcast2):
 
         podcast1.merged_ids = set_filter(podcast1.get_id(),

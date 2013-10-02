@@ -22,25 +22,47 @@
   </ul>
   </p>
 
-  <p>
-   {% if public_subscriptions %}
-    {% trans "New subscriptions will be public by default." %}
-    <form method="post" action="{% url "privacy_default_private" %}">
-     {% csrf_token %}
-     <button class="btn" type="submit">
-      <i class="icon-eye-close"></i> {% trans "Change to Private" %}
-     </button>
-    </form>
-   {% else %}
-    {% trans "New subscriptions will be private by default." %}
-    <form method="post" action="{% url "privacy_default_public" %}">
-     {% csrf_token %}
-     <button class="btn" type="submit">
-      <i class="icon-eye-open"></i> {% trans "Change to Public" %}
-     </button>
-    </form>
-   {% endif %}
-  </p>
+  <h2>{% trans "Subscriptions" %}</h2>
+  <table class="list">
+   <tr>
+    <td class="logo"></td>
+    <td>{% trans "Default for new subscriptions" %}</td>
+    <td>
+     <form name="default_public"
+           method="post"
+           action="{% url "privacy_default_public" %}">
+      {% csrf_token %}
+     </form>
+     <form name="default_private"
+           method="post"
+           action="{% url "privacy_default_private" %}">
+      {% csrf_token %}
+     </form>
+     {% include "share/components/private-toggle.html" with private=private_subscriptions public_action="default_public" private_action="default_private" %}
+    </td>
+   </tr>
+
+   {% for podcast, private in subscriptions %}
+    <tr>
+     <td class="logo">{{ podcast|podcast_logo }}</td>
+     <td>{% podcast_group_link podcast %}</td>
+     <td>
+      <form name="podcast_private_{{ podcast.get_id }}"
+            method="post"
+            action="{% url "privacy_podcast_private" podcast.get_id %}">
+       {% csrf_token %}
+      </form>
+      <form name="podcast_public_{{ podcast.get_id }}"
+            method="post"
+            action="{% url "privacy_podcast_public" podcast.get_id %}">
+       {% csrf_token %}
+      </form>
+      {% include "share/components/private-toggle.html" with private=private public_action="podcast_public_" private_action="podcast_private_" param=podcast.get_id %}
+     </td>
+    </tr>
+   {% endfor %}
+  </table>
+
 
   {% if included_subscriptions %}
     <h2>{% trans "Public Subscriptions" %}</h2>
@@ -86,3 +108,16 @@
 
 {% endblock %}
 
+
+
+{% block javascript %}
+    <script language="javascript">
+        <!--
+        function submitForm(formid)
+        {
+            document.forms[formid].submit();
+            return true;
+        }
+        -->
+    </script>
+{% endblock %}

@@ -35,7 +35,7 @@ from mygpo.api.advanced.directory import episode_data
 from mygpo.api.backend import get_device, BulkSubscribe
 from mygpo.utils import format_time, parse_bool, get_timestamp, \
     parse_request_body, normalize_feed_url
-from mygpo.decorators import allowed_methods
+from mygpo.decorators import allowed_methods, cors_origin
 from mygpo.core.tasks import auto_flattr_episode
 from mygpo.users.models import EpisodeAction, \
      DeviceDoesNotExist, DeviceUIDException, \
@@ -67,6 +67,7 @@ EPISODE_ACTION_KEYS = ('position', 'episode', 'action', 'device', 'timestamp',
 @check_username
 @never_cache
 @allowed_methods(['GET', 'POST'])
+@cors_origin()
 def subscriptions(request, username, device_uid):
 
     now = datetime.now()
@@ -177,6 +178,7 @@ def get_subscription_changes(user, device, since, until):
 @check_username
 @never_cache
 @allowed_methods(['GET', 'POST'])
+@cors_origin()
 def episodes(request, username, version=1):
 
     version = int(version)
@@ -437,6 +439,7 @@ def parse_episode_action(action, user, update_urls, now, ua_string):
 # Workaround for mygpoclient 1.0: It uses "PUT" requests
 # instead of "POST" requests for uploading device settings
 @allowed_methods(['POST', 'PUT'])
+@cors_origin()
 def device(request, username, device_uid):
     d = get_device(request.user, device_uid,
             request.META.get('HTTP_USER_AGENT', ''))
@@ -484,6 +487,7 @@ def valid_episodeaction(type):
 @check_username
 @never_cache
 @allowed_methods(['GET'])
+@cors_origin()
 def devices(request, username):
     devices = filter(lambda d: not d.deleted, request.user.devices)
     devices = map(device_data, devices)
@@ -502,6 +506,7 @@ def device_data(device):
 @require_valid_user
 @check_username
 @never_cache
+@cors_origin()
 def favorites(request, username):
     favorites = favorite_episodes_for_user(request.user)
     domain = RequestSite(request).domain

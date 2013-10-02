@@ -19,7 +19,7 @@ from django.http import HttpResponseBadRequest, Http404, HttpResponseNotFound
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 
-from mygpo.decorators import allowed_methods
+from mygpo.decorators import allowed_methods, cors_origin
 from mygpo.core.models import Podcast
 from mygpo.utils import parse_request_body
 from mygpo.api.basic_auth import require_valid_user, check_username
@@ -36,6 +36,7 @@ from mygpo.db.couchdb.episode_state import episode_state_for_user_episode
 @check_username
 @never_cache
 @allowed_methods(['GET', 'POST'])
+@cors_origin()
 def main(request, username, scope):
 
     db = get_main_database()
