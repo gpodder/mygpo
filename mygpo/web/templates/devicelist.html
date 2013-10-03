@@ -15,7 +15,9 @@
 
 {% block content %}
 
- {% if device_groups %}
+ <form class="form-horizontal" action="{% url "device-create" %}" method="POST">
+  {% csrf_token %}
+
    <table class="list">
     <tr>
      <th>{% trans "Name" %}</th>
@@ -45,16 +47,28 @@
        </td>
       </tr>
      {% endfor %}
+    {% empty %}
+     <tr>
+      <td colspan="4">
+       {% blocktrans %}You don't have any devices yet. Go to the <a href="http://wiki.gpodder.org/wiki/Web_Services/Clients">clients</a> page to learn how to set up your client applications.{% endblocktrans %}
+      </td>
+     </tr>
     {% endfor %}
+    <tr>
+     <td>{{ device_form.name }}</td>
+     <td>{{ device_form.type }}</td>
+     <td>{{ device_form.uid }}</td>
+     <td>
+      <button class="btn btn-success btn-small" type="submit">
+       <i class="icon-plus"></i>
+       {% trans "Create" %}
+      </button>
+     </td>
+    </tr>
    </table>
 
-  {% else %}
+ </form>
 
-   <p>
-    {% blocktrans %}You don't have any devices yet. Go to the <a href="http://wiki.gpodder.org/wiki/Web_Services/Clients">clients</a> page to learn how to set up your client applications.{% endblocktrans %}
-   </p>
-
-  {% endif %}
 
    {% if deleted_devices %}
     <h2>{% trans "Deleted Devices" %}</h2>
@@ -87,26 +101,3 @@
    {% endif %}
 
 {% endblock %}
-
-
-{% block sidebar %}
-
-  <div class="well">
-
-   <h4>{% trans "Adding New Devices" %}</h4>
-   <p>
-    {% trans "Just upload your subscriptions from a client, and it will automatically show up here." %}
-   </p>
-
-   <p>
-    {% trans "You can also manually create a new device." %}
-   </p>
-
-    <a class="btn btn-success" href="{% url "device-edit-new" %}">
-     <i class="icon-plus"></i> {% trans "Create Device" %}
-    </a>
-
- </div>
-
-{% endblock %}
-

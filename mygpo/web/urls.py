@@ -142,7 +142,6 @@ urlpatterns += patterns('mygpo.web.views.settings',
 
 urlpatterns += patterns('mygpo.web.views.device',
  url(r'^devices/$',                                            'overview',                   name='devices'),
- url(r'^devices/create$',                                      'edit_new',                   name='device-edit-new'),
  url(r'^devices/create-device$',                               'create',                     name='device-create'),
  url(r'^device/(?P<uid>[\w.-]+)\.opml$',                        'opml',                       name='device-opml'),
  url(r'^device/(?P<uid>[\w.-]+)$',                              'show',                       name='device'),

@@ -93,9 +93,18 @@ class DeviceForm(forms.Form):
     """
     form for editing device information by a user.
     """
-    name = forms.CharField(max_length=100, label=_('Name'))
-    type = forms.ChoiceField(choices=DEVICE_TYPES, label=_('Type'))
-    uid = forms.CharField(max_length=50, label=_('Device ID'))
+    name = forms.CharField(max_length=100, label=_('Name'),
+                widget=forms.TextInput(attrs={
+                    'class': 'input input-medium',
+                    'placeholder': 'Device Name',
+                }))
+    type = forms.ChoiceField(choices=DEVICE_TYPES, label=_('Type'),
+                widget=forms.Select(attrs={'class': 'input input-small'}))
+    uid = forms.CharField(max_length=50, label=_('Device ID'),
+                widget=forms.TextInput(attrs={
+                    'class': 'input input-small',
+                    'placeholder': _('ID on device'),
+                }))
 
 
 class PrivacyForm(forms.Form):
