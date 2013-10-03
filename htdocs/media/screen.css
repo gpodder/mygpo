@@ -604,3 +604,11 @@ div.podcasts div.podcast:hover div.actions button.btn
 {
     display: block;
 }
+
+/* http://stackoverflow.com/a/18330040/693140 */
+.nav > li.disabled.nav-header > a {
+    cursor: default;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}

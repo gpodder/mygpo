@@ -23,10 +23,10 @@
   {% for c in topics.categories %}
 
    {% if forloop.counter0|divisibleby:"2" %}
-    <div class="row-fluid">
+    <div class="row">
    {% endif %}
 
-   <div class="span6">
+   <div class="col-md-6">
     {% if c.cls == "PodcastList" %}
      {% url "user" c.username as user-lists-url %}
      <h2>{% blocktrans with c.title as listtitle and c.username as username %}{{ listtitle }} <span class="by-user">by <a href="{{ user-lists-url }}">{{ username }}</a></span>{% endblocktrans %}</h2>

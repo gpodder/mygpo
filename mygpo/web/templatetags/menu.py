@@ -114,7 +114,7 @@ def section_menu(selected, title=None):
             if uri in HIDDEN_URIS:
                 items.append('<li class="active"><a href="">%s</a></li>' % ugettext(caption))
             elif uri == '':
-                items.append('<li class="nav-header"><a href="">%s</a></li>' % ugettext(caption))
+                items.append('<li class="disabled nav-header"><a href="">%s</a></li>' % ugettext(caption))
             else:
                 items.append('<li class="active"><a href="%s">%s</a></li>' % \
                         (uri, ugettext(caption)))
@@ -123,7 +123,7 @@ def section_menu(selected, title=None):
                 continue
 
             if not uri:
-                items.append('<li class="nav-header">%s</li>' % ugettext(caption))
+                items.append('<li class="disabled nav-header"><a>%s</a></li>' % ugettext(caption))
             else:
                 items.append('<li><a href="%s">%s</a></li>' % (uri, ugettext(caption)))
 
