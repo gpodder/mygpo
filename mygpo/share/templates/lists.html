@@ -19,6 +19,9 @@
 
 {% block content %}
 
+ <form class="form-inline" action="{% url "list-create" %}" method="post">
+  {% csrf_token %}
+
   <table class="list">
    {% for list in lists %}
     <tr>
@@ -38,27 +41,20 @@
      <td colspan="3">{% trans "You don't have any podcast lists yet." %}</td>
     </tr>
    {% endfor %}
+   <tr>
+    <td>
+     <input placeholder="Title" class="input-medium" type="text" name="title" />
+    </td>
+    <td></td>
+    <td>
+     <button class="btn btn-success btn-small" type="submit">{% trans "Create" %}</button>
+    </td>
+   </tr>
   </table>
+ </form>
 
-{% endblock %}
-
-
-{% block sidebar %}
-
-  <div class="well">
-
-  <h4>{% trans "Create List" %}</h4>
-  <form class="form-inline" action="{% url "list-create" %}" method="post">
-   {% csrf_token %}
-   <div class="input-append">
-    <input placeholder="Title" class="input-medium" type="text" name="title" />
-    <button class="btn btn-primary" type="submit">{% trans "Create" %}</button>
-   </div>
-  </form>
-
-  <p>
-   {% blocktrans %}Podcast Lists are intended to share podcasts about certain topics and are therefore always visible to everyone.{% endblocktrans %}
-  </p>
+ <div class="alert alert-info">
+  {% blocktrans %}Podcast Lists are intended to share podcasts about certain topics and are therefore always visible to everyone.{% endblocktrans %}
  </div>
 
 {% endblock %}
