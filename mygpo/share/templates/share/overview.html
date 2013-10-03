@@ -80,6 +80,9 @@
 
  </table>
 
+ <div class="alert alert-info">
+  {% trans "Private items are protected by a special token. Only those who know the exact link can access your content" %}
+ </div>
 
 
  <form id="subscriptions_public" method="post" action="{% url "subscriptions-public" %}">
@@ -119,15 +122,4 @@
         }
         -->
     </script>
-{% endblock %}
-
-
-
-{% block sidebar %}
-
- <div class="well">
-  <h4>{% trans "Private Items" %}</h4>
-  <p>{% trans "Private items are protected by a special token. Only those who know the exact link can access your content" %}</p>
- </div>
-
 {% endblock %}
