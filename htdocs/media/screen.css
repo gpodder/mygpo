@@ -82,6 +82,10 @@ table.list tr:hover td {
     background-color: #eeeeee;
 }
 
+table.list tr.nohighlight:hover td {
+    background-color: inherit;
+}
+
 table.list th
 {
     text-align: left;

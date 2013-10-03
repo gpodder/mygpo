@@ -17,7 +17,6 @@
 
 
 {% block content %}
- {% if not subscriptionlist|length_is:"0" %}
 
  <table class="list podcast_list">
 
@@ -31,47 +30,34 @@
      </span></td>
      <td>{{ s.devices|device_list }}</td>
    </tr>
+  {% empty %}
+   <tr class="nohighlight">
+    <td colspan="3">
+     {% url "directory-home" as directory %}
+     {% url "devices" as devices %}
+     {% blocktrans %}You don't have any subscriptions yet. Set up your <a href="{{ devices }}">podcast clients</a> and <a href="{{ directory }}">discover interesting podcasts</a>.{% endblocktrans %}
+    </td>
+   </tr>
   {% endfor %}
-  </table>
+  <tr class="nohighlight">
+   <td colspan="3">
+    <form class="form-inline" method="get" action="{% url "search" %}" class="search">
+     <div class="input-prepend input-append">
+      <span class="add-on"><i class="icon-search"></i></span><input class="input-xxlarge" type="text" name="q" {% if q %}value="{{ q }}"{% endif %} placeholder="{% trans "Search term or feed URL" %}"><button class="btn btn-primary" type="submit">{% trans "Search" %}</button>
+     </div>
+    </form>
+   </td>
+  </tr>
+ </table>
 
-  <div class="btn-group">
-   <a class="btn" href="{% url "subscriptions-download" %}">
-    <i class="icon-download"></i> {% trans "Download OPML" %}
-   </a>
+ <div class="btn-group">
+  <a class="btn" href="{% url "subscriptions-download" %}">
+   <i class="icon-download"></i> {% trans "Download OPML" %}
+  </a>
 
-   <a class="btn" href="{% url "share" %}">
-    <i class="icon-share"></i> {% trans "Share" %}
-   </a>
-  </div>
-
- {% else %}
-
-  <p>
-   {% url "directory-home" as directory %}
-   {% url "devices" as devices %}
-   {% blocktrans %}You don't have any subscriptions yet. Set up your <a href="{{ devices }}">podcast clients</a> and <a href="{{ directory }}">discover interesting podcasts</a>.{% endblocktrans %}
-  </p>
-
- {% endif %}
-{% endblock %}
-
-{% block sidebar %}
-
- <div class="well">
-  <h4>{% trans "Subscribe to Podcasts" %}</h4>
-  {% url "toplist" as toplist-url %}
-  {% url "search" as search-url %}
-  {% url "suggestions" as suggestions-url %}
-  {% blocktrans %}Browse the <a href="{{ toplist-url }}">toplist</a> and your <a href="{{ suggestions-url }}">personal suggestions</a>, <a href="{{ search-url }}">search</a> or paste the URL of the podcast's feed here{% endblocktrans %}
-  <form class="form-inline" method="get" action="{% url "subscribe-by-url" %}">
-   <div class="input-append">
-    <input class="url input-large" name="url" type="text" />
-    <button class="btn btn-success" type="submit">
-     <i class="icon-plus"></i>
-    </button>
-   </div>
-  </form>
+  <a class="btn" href="{% url "share" %}">
+   <i class="icon-share"></i> {% trans "Share" %}
+  </a>
  </div>
 
 {% endblock %}
-
