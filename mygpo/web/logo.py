@@ -24,7 +24,7 @@ import errno
 from PIL import Image, ImageDraw
 
 from django.conf import settings
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseNotFound
 from django.views.generic.base import View
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import last_modified
@@ -137,8 +137,12 @@ class CoverArt(View):
         return path
 
     def send_file(self, filename):
+        try:
+            f = open(filename)
+        except IOError:
+            return HttpResponseNotFound()
+
         resp = HttpResponse(content_type='image/jpeg')
         resp.status_code = 200
-        f = open(filename)
         resp.write(f.read())
         return resp
