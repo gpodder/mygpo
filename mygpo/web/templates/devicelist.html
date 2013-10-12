@@ -54,12 +54,12 @@
       </td>
      </tr>
     {% endfor %}
-    <tr>
+    <tr class="nohighlight">
      <td>{{ device_form.name }}</td>
      <td>{{ device_form.type }}</td>
      <td>{{ device_form.uid }}</td>
      <td>
-      <button class="btn btn-success btn-small" type="submit">
+      <button class="btn btn-success btn-sm" type="submit">
        <i class="icon-plus"></i>
        {% trans "Create" %}
       </button>
@@ -81,7 +81,7 @@
       <td>
        <form method="post" action="{% url "device-undelete" d.uid %}">
         {% csrf_token %}
-        <button class="btn btn-small" type="submit">
+        <button class="btn btn-default btn-sm" type="submit">
          <i class="icon-repeat"></i> {% trans "Reactivate" %}
         </button>
        </form>
@@ -89,7 +89,7 @@
       <td>
        <form method="post" action="{% url "device-delete-permanently" d.uid %}">
         {% csrf_token %}
-        <button class="btn btn-danger btn-small" type="submit">
+        <button class="btn btn-danger btn-sm" type="submit">
          <i class="icon-trash"></i> {% trans "Delete Permanently" %}
         </button>
        </form>

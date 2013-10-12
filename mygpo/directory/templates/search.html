@@ -45,8 +45,7 @@
     {% endfor %}
    </table>
 
-<div class="pagination pagination-centered">
- <ul>
+ <ul class="pagination">
  {% if results.has_previous %}
   <li>
   <a href="{% url "search" %}?q={{ q }}&page={{ results.previous_page_number }}">«</a>
@@ -74,7 +73,6 @@
   </li>
  {% endif %}
  </ul>
-</div>
 
   {% else %}
 

@@ -27,12 +27,12 @@
     </div>
 
     <div class="actions">
-      <a class="btn btn-success btn-small" href="{% podcast_link_target podcast "subscribe" %}">
+      <a class="btn btn-success btn-sm" href="{% podcast_link_target podcast "subscribe" %}">
        <i class="icon-ok"></i>&nbsp;{% trans "Subscribe" %}
       </a>
      <form action="{% podcast_link_target podcast "suggestions-blacklist" %}">
       {% csrf_token %}
-      <button class="btn btn-danger btn-small" type="submit">
+      <button class="btn btn-danger btn-sm" type="submit">
        <i class="icon-ban-circle"></i>&nbsp;{% trans "No Interest" %}
       </button>
      </form>

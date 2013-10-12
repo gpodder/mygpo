@@ -30,7 +30,7 @@
      <td>
       <form action="{% url "list-delete" user.username list.slug %}" method="post">
        {% csrf_token %}
-       <button class="btn btn-danger btn-small" type="submit">
+       <button class="btn btn-danger btn-sm" type="submit">
         <i class="icon-trash"></i> {% trans "Delete" %}
        </button>
       </form>
@@ -47,7 +47,7 @@
     </td>
     <td></td>
     <td>
-     <button class="btn btn-success btn-small" type="submit">
+     <button class="btn btn-success btn-sm" type="submit">
       <i class="icon-plus"></i>
       {% trans "Create" %}
      </button>

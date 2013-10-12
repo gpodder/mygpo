@@ -617,3 +617,8 @@ div.podcasts div.podcast:hover div.actions button.btn
 {
     padding-top: 1em;
 }
+
+.centered {
+    float: none;
+    margin: 0 auto;
+}

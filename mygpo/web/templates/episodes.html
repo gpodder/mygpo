@@ -22,7 +22,7 @@
 
   <div class="btn-toolbar">
    <div class="btn-group">
-    <a class="btn" href="{% podcast_link_target podcast "podcast-publisher-detail" %}">
+    <a class="btn btn-default" href="{% podcast_link_target podcast "podcast-publisher-detail" %}">
      <i class="icon-wrench"></i>
      {% trans "Publisher Pages" %}
     </a>
@@ -44,8 +44,7 @@
 
  {% endif %}
 
- <div class="pagination pagination-centered">
-  <ul>
+  <ul class="pagination">
  {% for page in page_list %}
   <li>
    {% if page == "..." %}
@@ -61,7 +60,6 @@
   </li>
  {% endfor %}
  </ul>
- </div>
 
 
 {% endblock %}

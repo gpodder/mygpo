@@ -6,12 +6,12 @@
 
 <div class="btn-group">
  <button
-   class="btn btn-small {% if not private %}disabled btn-primary{% endif %}"
+   class="btn btn-sm {% if not private %}disabled btn-primary{% else %}btn-default{% endif %}"
    onclick="submitForm('{{ public_action }}{{ param }}');">
     {% trans "Public" %}
  </button>
  <button
-   class="btn btn-small {% if private %}disabled btn-primary{% endif %}"
+   class="btn btn-sm {% if private %}disabled btn-primary{% else %}btn-default{% endif %}"
    onclick="submitForm('{{ private_action }}{{ param }}');">
     {% trans "Private" %}
  </button>
