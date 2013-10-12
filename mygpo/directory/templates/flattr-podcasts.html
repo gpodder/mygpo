@@ -41,8 +41,7 @@
   {% endfor %}
   </table>
 
- <div class="pagination pagination-centered">
-  <ul>
+  <ul class="pagination">
  {% for page in page_list %}
   <li>
    {% if page == "..." %}
@@ -58,7 +57,6 @@
   </li>
  {% endfor %}
  </ul>
- </div>
 
 {% endblock %}
 

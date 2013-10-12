@@ -17,20 +17,32 @@ class UserAccountForm(forms.Form):
     if one of the three password fields is set, a password change is assumed
     and the current and new passwords are checked.
     """
-    email = forms.EmailField(label=_('E-Mail address'))
+    email = forms.EmailField(
+        label=_('E-Mail address'),
+        widget=forms.TextInput(attrs={
+            'class': 'input input-sm form-control',
+        }),
+        required=True)
+
     password_current = forms.CharField(
         label=_(u'Current password'),
-        widget=forms.PasswordInput(render_value=False),
+        widget=forms.PasswordInput(render_value=False, attrs={
+            'class': 'input input-sm form-control',
+        }),
         required=False)
 
     password1 = forms.CharField(
         label=_(u'New password'),
-        widget=forms.PasswordInput(render_value=False),
+        widget=forms.PasswordInput(render_value=False, attrs={
+            'class': 'input input-sm form-control',
+        }),
         required=False)
 
     password2 = forms.CharField(
         label=_(u'Confirm password'),
-        widget=forms.PasswordInput(render_value=False),
+        widget=forms.PasswordInput(render_value=False, attrs={
+            'class': 'input input-sm form-control',
+        }),
         required=False)
 
     def is_valid(self):
@@ -57,13 +69,20 @@ class UserAccountForm(forms.Form):
 class ProfileForm(forms.Form):
     twitter = forms.CharField(
         label=_(u'Twitter'),
-        required=False)
+        widget=forms.TextInput(attrs={
+            'class': 'input input-sm form-control',
+        }),
+        required=False,
+    )
 
     about = forms.CharField(
         label=_(u'A few words about you'),
         required=False,
-        widget=forms.Textarea,
-        help_text='You can use Markdown')
+        widget=forms.Textarea(attrs={
+            'class': 'input input-sm form-control',
+        }),
+        help_text='You can use Markdown',
+    )
 
 
 class FlattrForm(forms.Form):
@@ -77,16 +96,31 @@ class FlattrForm(forms.Form):
     # Auto-flattring enabled
     enable = forms.BooleanField(
         required=False,
-        label=_('Auto-Flattr played episodes'))
+        label=_('Auto-Flattr played episodes'),
+        widget=forms.CheckboxInput(attrs={
+            'class': 'input input-sm form-control',
+        }),
+    )
 
     # Auto-flattr mygpo (or whatever the FLATTR_MYGPO_THING
     # in settings_prod.py is) on every other flattr
-    flattr_mygpo = forms.BooleanField(required=False, label=_('Flattr us'))
+    flattr_mygpo = forms.BooleanField(
+        required=False,
+        label=_('Flattr us'),
+        widget=forms.CheckboxInput(attrs={
+            'class': 'input input-sm form-control',
+        }),
+    )
 
     # username under which own content (eg podcast lists) should be published
     username = forms.CharField(
         required=False,
-        label=_('Username for own content'))
+        label=_('Username for own content'),
+        widget=forms.TextInput(attrs={
+            'class': 'input input-sm form-control',
+            'placeholder': 'Device Name',
+        }),
+    )
 
 
 class DeviceForm(forms.Form):
@@ -95,14 +129,16 @@ class DeviceForm(forms.Form):
     """
     name = forms.CharField(max_length=100, label=_('Name'),
                 widget=forms.TextInput(attrs={
-                    'class': 'input input-medium',
+                    'class': 'input input-sm form-control',
                     'placeholder': 'Device Name',
                 }))
     type = forms.ChoiceField(choices=DEVICE_TYPES, label=_('Type'),
-                widget=forms.Select(attrs={'class': 'input input-small'}))
+                widget=forms.Select(attrs={
+                    'class': 'input input-sm form-control',
+                }))
     uid = forms.CharField(max_length=50, label=_('Device ID'),
                 widget=forms.TextInput(attrs={
-                    'class': 'input input-small',
+                    'class': 'input input-sm form-control',
                     'placeholder': _('ID on device'),
                 }))
 
@@ -123,7 +159,11 @@ class SyncForm(forms.Form):
     Form that is used to select either a single devices or a device group.
     """
 
-    targets = forms.CharField()
+    targets = forms.CharField(
+            widget = forms.Select(attrs={
+                'class': 'input input-sm form-control',
+            }),
+        )
 
     def set_targets(self, sync_targets, label=''):
         targets = map(self.sync_target_choice, sync_targets)

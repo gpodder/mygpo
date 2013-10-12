@@ -46,25 +46,30 @@
       {% endif %}
   </small>
 
-  <p>
-   <ul>
-    <li><a href="{% podcast_link_target podcast "podcast-publisher-episodes" %}">{% trans "Return to the episode list" %}</a></li>
-    <li><a href="{% podcast_link_target podcast "podcast-publisher-detail" %}">{% trans "Return to podcast page" %}</a></li>
-   </ul>
-  </p>
 {% endblock %}
 
 
 {% block content %}
 
+  <div class="btn-group">
+   <a class="btn btn-default" href="{% podcast_link_target podcast "podcast-publisher-episodes" %}">{% trans "Episode List" %}</a>
+   <a class="btn btn-default" href="{% podcast_link_target podcast "podcast-publisher-detail" %}">{% trans "Podcast Page" %}</a>
+  </div>
+
+
  <h2>{% trans "URL" %}</h2>
  <p>{% trans "You can configure the URL of this episode. Previous keys will automatically be added to the alternative keys and always redirect to the current URL." %}</p>
 
- <form action="{% episode_link_target episode podcast "publisher-set-episode-slug" %}" method="post">
+ <form class="form-inline" action="{% episode_link_target episode podcast "publisher-set-episode-slug" %}" method="post">
   {% csrf_token %}
-  <pre>http{% if is_secure %}s{% endif %}://{{ domain }}/podcast/{{ podcast.slug }}/<input class="input-large" placeholder="{% get_id episode %}" type="text" value="{{ episode.slug|default:"" }}" name="slug"></input></pre>
+  <div class="form-group">
+   <label for="slug">
+    http{% if is_secure %}s{% endif %}://{{ domain }}/podcast/{{ podcast.slug }}/
+   </label>
+   <input class="input-sm" placeholder="{% get_id episode %}" type="text" value="{{ episode.slug|default:"" }}" name="slug"></input>
+  </div>
 
-  <button class="btn" type="submit">{% trans "Save" %}</button>
+  <button class="btn btn-default" type="submit">{% trans "Save" %}</button>
  </form>
 
  <strong>Alternative Keys</strong>

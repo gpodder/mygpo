@@ -13,70 +13,79 @@
 
 {% block content %}
 
- <div class="tab-content">
-  <ul class="nav nav-tabs">
-   <li class="active">
-    <a href="#account" data-toggle="tab">Account</a>
-   </li>
-   <li>
-    <a href="#profile" data-toggle="tab">Public Profile</a>
-   </li>
-   <li>
-    <a href="#flattr" data-toggle="tab">Flattr</a>
-   </li>
-  </ul>
+ <ul class="nav nav-tabs" id="accountTab">
+  <li class="active">
+   <a href="#account" data-toggle="tab">Account</a>
+  </li>
+  <li>
+   <a href="#services" data-toggle="tab">Connected Services</a>
+  </li>
+  <li>
+   <a href="#profile" data-toggle="tab">Public Profile</a>
+  </li>
+  <li>
+   <a href="#flattr" data-toggle="tab">Flattr</a>
+  </li>
+ </ul>
 
+ <div class="tab-content">
 
   <div class="tab-pane active" id="account">
 
-   <form action="{% url "account" %}" method="POST" class="form-horizontal">
+   <form role="form" action="{% url "account" %}" method="POST" class="form-horizontal">
     {% csrf_token %}
 
-    <fieldset>
-     <legend>{% trans "Account Data" %}</legend>
-
-     <div class="control-group">
-      <label class="control-label" for="input01">{{ form.email.label_tag }}</label>
-      <div class="controls">
-       {{ form.email }}
-      </div>
+    <div class="form-group">
+     <label class="col-lg-3 control-label" for="input01">{{ form.email.label_tag }}</label>
+     <div class="col-lg-9">
+      {{ form.email }}
      </div>
+    </div>
 
-     <div class="control-group">
-      <label class="control-label" for="input01">{{ form.password_current.label_tag }}</label>
-      <div class="controls">
-       {{ form.password_current }}
-      </div>
+    <div class="form-group">
+     <label class="col-lg-3 control-label" for="input01">{{ form.password_current.label_tag }}</label>
+     <div class="col-lg-9">
+      {{ form.password_current }}
      </div>
+    </div>
 
-     <div class="control-group">
-      <label class="control-label" for="input01">{{ form.password1.label_tag }}</label>
-      <div class="controls">
-       {{ form.password1 }}
-      </div>
+    <div class="form-group">
+     <label class="col-lg-3 control-label" for="input01">{{ form.password1.label_tag }}</label>
+     <div class="col-lg-9">
+      {{ form.password1 }}
      </div>
+    </div>
 
-     <div class="control-group">
-      <label class="control-label" for="input01">{{ form.password2.label_tag }}</label>
-      <div class="controls">
-       {{ form.password2 }}
-      </div>
+    <div class="form-group">
+     <label class="col-lg-3 control-label" for="input01">{{ form.password2.label_tag }}</label>
+     <div class="col-lg-9">
+      {{ form.password2 }}
      </div>
+    </div>
 
-     <div class="control-group">
-      <div class="controls">
-       <button class="btn btn-primary" type="submit">{% trans "Save" %}</button>
-      </div>
+    <div class="form-group">
+     <div class="col-lg-offset-3 col-lg-9">
+      <button class="btn btn-primary" type="submit">{% trans "Save" %}</button>
      </div>
+    </div>
 
-   </fieldset>
    </form>
 
+   <div class="panel panel-danger">
+    <div class="panel-heading">
+     <h2 class="panel-title">{% trans "Delete Account" %}</h2>
+    </div>
+    <div class="panel-body">
+     <a class="btn btn-danger" href="{% url "delete-account" %}">{% trans "Delete Account" %}</a>
+    </div>
+   </div>
 
-   <h2>{% trans "Connected Services" %}</h2>
+  </div> <!-- pane end -->
+
+
+  <div class="tab-pane" id="services">
 
    <table class="list">
-
     <tr>
      <td><strong>{% trans "Google" %}</strong></td>
      <td>
@@ -84,10 +93,10 @@
        {% blocktrans with user.google_email as gmail %}Connected with {{ gmail }}{% endblocktrans %}
        <form method="post" action="{% url "account-google-remove" %}">
         {% csrf_token %}
-        <button class="btn" type="submit">{% trans "Disconnect" %}</button>
+        <button class="btn btn-default" type="submit">{% trans "Disconnect" %}</button>
        </form>
       {% else %}
-       <a class="btn" href="{% url "login-google" %}">{% trans "Connect" %}</a>
+       <a class="btn btn-default" href="{% url "login-google" %}">{% trans "Connect" %}</a>
       {% endif %}
      </td>
     </tr>
@@ -97,65 +106,58 @@
      <td>
       {% if flattr_form.token.value %}
        {% blocktrans with flattr.get_auth_username as flattrname %}Connected with <a href="https://flattr.com/profile/{{ flattrname }}">{{ flattrname }}</a>{% endblocktrans %}
-       <a class="btn" href="{% url "flattr-logout" %}">{% trans "Disconnect" %}</a>
+       <a class="btn btn-default" href="{% url "flattr-logout" %}">{% trans "Disconnect" %}</a>
       {% else %}
-       <a class="btn" href="{{ flattr.get_auth_url }}">{% trans "Connect" %}</a>
+       <a class="btn btn-default" href="{{ flattr.get_auth_url }}">{% trans "Connect" %}</a>
       {% endif %}
      </td>
     </tr>
 
    </table>
 
+  </div> <!-- pane end -->
 
-
-   <h2>{% trans "Delete Account" %}</h2>
-
-   <div class="well">
-    <a class="btn btn-danger" href="{% url "delete-account" %}">{% trans "Delete Account" %}</a>
-   </div>
-
-  </div>
 
   <div class="tab-pane" id="profile">
 
-   <form action="{% url "profile" %}" method="POST" class="form-horizontal">
+   <form role="form" action="{% url "profile" %}" method="POST" class="form-horizontal">
     {% csrf_token %}
-    <legend>{% trans "Public profile" %}
-     <small>
-      <a href="{% url "user" user.username %}{% if userpage_token %}?token={{ userpage_token }}{% endif %}">
-       {% trans "for your userpage" %}
-      </a>
-     </small>
-    </legend>
 
-    <fieldset>
-
-     <div class="control-group">
-      <label class="control-label" for="twitter">{{ profile_form.twitter.label_tag }}</label>
-      <div class="controls">
-       <div class="input-prepend">
-        <span class="add-on">@</span>
-        <input type="text" id="id_twitter" name="twitter" placeholder="username" value="{{ profile_form.twitter.value|default:"" }}">
-       </div>
-      </div>
+    <div class="form-group">
+     <label class="col-lg-3 control-label">{% trans "Username" %}</label>
+     <div class="col-lg-9">
+      <p class="form-control-static">
+       <a href="{% url "user" user.username %}{% if userpage_token %}?token={{ userpage_token }}{% endif %}">
+        {{ user.username }}
+       </a>
+      </p>
      </div>
+    </div>
 
-     <div class="control-group">
-      <label class="control-label" for="about">{{ profile_form.about.label_tag }}
-       <span class="help-inline">{{ profile_form.about.help_text }}</span>
-      </label>
-      <div class="controls">
-       {{ profile_form.about }}
-      </div>
+    <div class="form-group">
+     <label class="col-lg-3 control-label" for="twitter">{{ profile_form.twitter.label_tag }}</label>
+     <div class="col-lg-9 input-group">
+      <span class="input-group-addon">@</span>
+      <input class="form-control" type="text" id="id_twitter" name="twitter" placeholder="username" value="{{ profile_form.twitter.value|default:"" }}">
      </div>
+    </div>
 
-     <div class="control-group">
-      <div class="controls">
-       <button class="btn btn-primary" type="submit">{% trans "Save" %}</button>
-      </div>
+    <div class="form-group">
+     <label class="col-lg-3 control-label" for="about">{{ profile_form.about.label_tag }}</label>
+     <div class="col-lg-9">
+      {{ profile_form.about }}
      </div>
+     <div class="col-lg-offset-3 col-lg-9">
+      <span class=" help-block">{{ profile_form.about.help_text }}</span>
+     </div>
+    </div>
 
-   </fieldset>
+    <div class="control-group">
+     <div class="col-lg-offset-3 col-lg-9">
+      <button class="btn btn-primary" type="submit">{% trans "Save" %}</button>
+     </div>
+    </div>
+
    </form>
 
   </div>
@@ -165,61 +167,56 @@
 
    <form action="{% url "flattr-settings" %}" method="POST" class="form-horizontal">
     {% csrf_token %}
-    <legend>
-     {% trans "Flattr" %}
-     <small><a href="https://flattr.com/about">{% trans "What's that?" %}</a></small>
-    </legend>
 
-    <fieldset>
 
-     <div class="control-group">
-      <label class="control-label" for="token">{% trans "Flattr User" %}</label>
-      <div class="controls">
-       {% if flattr_form.token.value %}
-        {% blocktrans with flattr.get_auth_username as flattrname %}Connected with <a href="https://flattr.com/profile/{{ flattrname }}">{{ flattrname }}</a>{% endblocktrans %}
-        <a class="btn" href="{% url "flattr-logout" %}">{% trans "Disconnect" %}</a>
-       {% else %}
-        <a class="btn" href="{{ flattr.get_auth_url }}">{% trans "Connect" %}</a>
-       {% endif %}
-      </div>
+    <div class="form-group">
+     <label for="token" class="col-lg-3 control-label">{% trans "Flattr User" %}</label>
+     <div class="col-lg-9">
+      {% if flattr_form.token.value %}
+       {% blocktrans with flattr.get_auth_username as flattrname %}Connected with <a href="https://flattr.com/profile/{{ flattrname }}">{{ flattrname }}</a>{% endblocktrans %}
+       <a class="btn btn-default" href="{% url "flattr-logout" %}">{% trans "Disconnect" %}</a>
+      {% else %}
+       <a class="btn btn-default" href="{{ flattr.get_auth_url }}">{% trans "Connect" %}</a>
+      {% endif %}
      </div>
+    </div>
 
-     <div class="control-group">
-      <label class="control-label" for="about">{{ flattr_form.enable.label_tag }}
-      </label>
-      <div class="controls">
-       {{ flattr_form.enable }}
-      </div>
+    <div class="form-group">
+     <label class="col-lg-3 control-label" for="about">
+      {{ flattr_form.enable.label_tag }}
+     </label>
+     <div class="col-lg-9">
+      {{ flattr_form.enable }}
      </div>
+    </div>
 
-     <div class="control-group">
-      <label class="control-label" for="about">{% blocktrans with site as sitename %}Auto-Flattr {{ sitename }}{% endblocktrans %}
-      </label>
-      <div class="controls">
-       {{ flattr_form.flattr_mygpo }}
-      </div>
+    <div class="form-group">
+     <label class="col-lg-3 control-label" for="about">
+      {% blocktrans with site as sitename %}Auto-Flattr {{ sitename }}{% endblocktrans %}
+     </label>
+     <div class="col-lg-9">
+      {{ flattr_form.flattr_mygpo }}
      </div>
+    </div>
 
-     <div class="control-group">
-      <label class="control-label" for="username">{% blocktrans with site as sitename %}Username for publishing own content{% endblocktrans %}
-      </label>
-      <div class="controls">
-       {{ flattr_form.username }}
-      </div>
+    <div class="form-group">
+     <label class="col-lg-3 control-label" for="username">
+      {% blocktrans with site as sitename %}Username for publishing own content{% endblocktrans %}
+     </label>
+     <div class="col-lg-9">
+      {{ flattr_form.username }}
      </div>
+    </div>
 
-
-
-     <div class="control-group">
-      <div class="controls">
-       <button class="btn btn-primary" type="submit">{% trans "Save" %}</button>
-      </div>
+    <div class="form-group">
+     <div class="col-lg-offset-3 col-lg-9">
+      <button class="btn btn-primary" type="submit">{% trans "Save" %}</button>
      </div>
+    </div>
 
-   </fieldset>
    </form>
 
-  </div>
+  </div> <!-- pane end -->
 
  </div>
 

@@ -41,13 +41,16 @@
      <td colspan="3">{% trans "You don't have any podcast lists yet." %}</td>
     </tr>
    {% endfor %}
-   <tr>
+   <tr class="nohighlight">
     <td>
-     <input placeholder="Title" class="input-medium" type="text" name="title" />
+     <input placeholder="Title" class="form-control input-md" type="text" name="title" />
     </td>
     <td></td>
     <td>
-     <button class="btn btn-success btn-small" type="submit">{% trans "Create" %}</button>
+     <button class="btn btn-success btn-small" type="submit">
+      <i class="icon-plus"></i>
+      {% trans "Create" %}
+     </button>
     </td>
    </tr>
   </table>

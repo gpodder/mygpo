@@ -30,7 +30,7 @@
      </a>
     </td>
     <td>
-     <input class="input-xxlarge" readonly="readonly" type="text" value="http://{% if feed_token %}{{ user.username }}:{{feed_token}}@{% endif %}{{ site.domain }}{% url "favorites-feed" user.username %}" />
+     <input class="form-control" readonly="readonly" type="text" value="http://{% if feed_token %}{{ user.username }}:{{feed_token}}@{% endif %}{{ site.domain }}{% url "favorites-feed" user.username %}" />
     </td>
    </tr>
 
@@ -50,11 +50,11 @@
     </td>
     <td>
      {% if podcast %}
-      <input class="input-xxlarge" readonly="readonly" type="text" value="http://{{ site.domain }}{% podcast_link_target podcast %}" />
+      <input class="form-control" readonly="readonly" type="text" value="http://{{ site.domain }}{% podcast_link_target podcast %}" />
      {% else %}
       <form action="{% url "favorites-create-entry" %}" method="post">
        {% csrf_token %}
-       <button class="btn" type="submit">{% trans "Create" %}</button>
+       <button class="btn btn-default" type="submit">{% trans "Create" %}</button>
       </form>
      {% endif %}
     </td>
@@ -75,10 +75,10 @@
     </p>
 
     <div class="btn-group">
-     <button type="submit" class="btn" onclick="submitForm('public');">
+     <button type="submit" class="btn btn-default" onclick="submitForm('public');">
       <i class="icon-eye-open"></i> {% trans "Remove password" %}
      </button>
-     <button type="submit" class="btn" onclick="submitForm('private');">
+     <button type="submit" class="btn btn-default" onclick="submitForm('private');">
       <i class="icon-eye-close"></i> {% trans "Generate new password" %}
      </button>
     </div>
@@ -106,7 +106,7 @@
 
     <form class="form-inline" method="post" action="{% url "favorites_private" %}">
      {% csrf_token %}
-     <button type="submit" class="btn">
+     <button type="submit" class="btn btn-default">
       <i class="icon-eye-close"></i> {% trans "Create password" %}
      </button>
     </form>

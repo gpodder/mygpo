@@ -34,7 +34,7 @@
 
   {% if is_publisher %}
    <div class="btn-group">
-    <a class="btn" href="{% podcast_link_target podcast "podcast-publisher-detail" %}">
+    <a class="btn btn-default" href="{% podcast_link_target podcast "podcast-publisher-detail" %}">
      <i class="icon-wrench"></i>
      {% trans "Publisher Pages" %}
     </a>
@@ -43,7 +43,7 @@
 
   {% if not user.is_authenticated %}
    <div class="btn-group">
-    <a class="btn" href="{% podcast_link_target podcast "subscribe" %}">
+    <a class="btn btn-default" href="{% podcast_link_target podcast "subscribe" %}">
      <i class="icon-plus"></i>
      {% trans "Login to Subscribe" %}
     </a>
@@ -62,11 +62,11 @@
       <span class="caret"></span>
      </button>
     {% else %}
-     <button class="btn" onclick="submitForm('unsubscribe+all');">
+     <button class="btn btn-default" onclick="submitForm('unsubscribe+all');">
       <i class="icon-remove-sign"></i>
       {% trans "Unsubscribe" %}
      </button>
-     <button class="btn dropdown-toggle" data-toggle="dropdown">
+     <button class="btn dropdown-toggle btn-default" data-toggle="dropdown">
       <span class="caret"></span>
      </button>
     {% endif %}
@@ -138,27 +138,27 @@
 
 
    {% if has_history %}
-    <a class="btn" href="{% podcast_link_target podcast "podcast-history" %}">
+    <a class="btn btn-default" href="{% podcast_link_target podcast "podcast-history" %}">
      <i class="icon-calendar"></i>
      {% trans "Subscription History" %}
     </a>
    {% endif %}
 
    {% if can_flattr %}
-    <a class="btn" href="{% podcast_link_target podcast "podcast-flattr" %}">
+    <a class="btn btn-default" href="{% podcast_link_target podcast "podcast-flattr" %}">
      <img src="https://flattr.com/_img/icons/flattr_logo_16.png"
       alt="Flattr {{ podcast.title|default:"Unnamed Podcast"|striptags }}" />
      {% trans "Flattr" %}
     </a>
    {% endif %}
 
-   <a href="javascript:void(0);" onclick="$('#tag-box').toggle();" class="btn">
+   <a href="javascript:void(0);" onclick="$('#tag-box').toggle();" class="btn btn-default">
     <i class="icon-tag"></i>
     {% trans "Tags" %}
    </a>
 
    {% if debug %}
-    <a class="btn" href="http://127.0.0.1:5984/_utils/document.html?mygpo/{% get_id podcast %}">
+    <a class="btn btn-default" href="http://127.0.0.1:5984/_utils/document.html?mygpo/{% get_id podcast %}">
      <i class="icon-cogs"></i>
      Futon
     </a>
@@ -187,10 +187,14 @@
 
    {% if user.is_authenticated %}
     <form class="form-inline" action="{% podcast_link_target podcast "add-tag" %}">
-     <div class="input-prepend btn-append">
-      <span class="add-on"><i class="icon-tag"></i></span><input class="input-small" type="text" name="tag" /><button class="btn btn-success" type="submit">
-      <i class="icon-plus"></i>
-     </button>
+     <div class="input-group">
+      <span class="input-group-addon input-sm"><i class="icon-tag"></i></span>
+      <input class="input-sm form-control" type="text" name="tag" />
+      <span class="input-group-btn">
+       <button class="btn btn-success btn-sm" type="submit">
+        <i class="icon-plus"></i>
+       </button>
+      </span>
      </div>
     </form>
    {% endif %}
@@ -211,8 +215,7 @@
 
   </div>
 
- <div class="pagination pagination-centered">
-  <ul>
+  <ul class="pagination">
  {% for page in page_list %}
   <li>
    {% if page == "..." %}
@@ -228,7 +231,6 @@
   </li>
  {% endfor %}
  </ul>
- </div>
 
  {% endif %}
 

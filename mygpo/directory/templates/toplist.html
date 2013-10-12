@@ -66,7 +66,10 @@
 
   <h4>{% trans "Language" %}</h4>
     <form class="form-inline" action="{% url "toplist" %}" method="get">
-     <select class="input-medium" name="lang">
+
+     <div class="form-group">
+      <label class="sr-only" for="lang">{% trans "Language" %}</label>
+      <select class="form-control input-md" name="lang">
 
       {% if language == "" %}
        <option selected="selected" value="">{% trans "all" %}</option>
@@ -83,7 +86,8 @@
        {% endif %}
       {% endfor %}
      </select>
-     <input class="btn btn-primary" type="submit" value="{% trans "OK" %}" />
+    </div>
+     <button class="btn btn-primary btn-md" type="submit">{% trans "OK" %}</button>
     </form>
   </div>
 

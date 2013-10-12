@@ -18,8 +18,12 @@
 {% block content %}
 
   <form class="form-inline" method="get" action="{% url "search" %}" class="search">
-   <div class="input-prepend input-append">
-    <span class="add-on"><i class="icon-search"></i></span><input class="input-xxlarge" type="text" name="q" {% if q %}value="{{ q }}"{% endif %} placeholder="{% trans "Search term or feed URL" %}" autofocus="autofocus"><button class="btn btn-primary" type="submit">{% trans "Search" %}</button>
+   <div class="input-group">
+    <span class="input-group-addon"><i class="icon-search"></i></span>
+    <input class="form-control" type="text" name="q" {% if q %}value="{{ q }}"{% endif %} placeholder="{% trans "Search term or feed URL" %}" autofocus="autofocus">
+    <span class="input-group-btn">
+     <button class="btn btn-primary" type="submit">{% trans "Search" %}</button>
+    </span>
    </div>
   </form>
 

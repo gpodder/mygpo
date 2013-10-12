@@ -82,30 +82,30 @@
  <div class="btn-toolbar">
 
   {% if is_publisher %}
-   <a class="btn" href="{% episode_link_target episode podcast "episode-publisher-detail" %}"><i class="icon-wrench"></i> {% trans "Publisher Pages" %}</a>
+   <a class="btn btn-default" href="{% episode_link_target episode podcast "episode-publisher-detail" %}"><i class="icon-wrench"></i> {% trans "Publisher Pages" %}</a>
   {% endif %}
 
   {% if user.is_authenticated %}
    {% if is_favorite %}
-     <a class="btn" href="{% episode_link_target episode podcast "episode-fav" %}">
+     <a class="btn btn-default" href="{% episode_link_target episode podcast "episode-fav" %}">
       <i class="icon-star"></i> {% trans "Remove Favorite" %}
      </a>
    {% else %}
-     <a class="btn" href="{% episode_link_target episode podcast "episode-fav" %}">
+     <a class="btn btn-default" href="{% episode_link_target episode podcast "episode-fav" %}">
       <i class="icon-star-empty"></i> {% trans "Favorite" %}
      </a>
    {% endif %}
   {% endif %}
 
    {% if has_history %}
-    <a class="btn" href="{% episode_link_target episode podcast "episode-history" %}">
+    <a class="btn btn-default" href="{% episode_link_target episode podcast "episode-history" %}">
      <i class="icon-calendar"></i>
      {% trans "Episode History" %}
     </a>
    {% endif %}
 
   {% if can_flattr %}
-   <a class="btn" href="{% episode_link_target episode podcast "flattr-episode" %}">
+   <a class="btn btn-default" href="{% episode_link_target episode podcast "flattr-episode" %}">
     <img src="https://flattr.com/_img/icons/flattr_logo_16.png"
      alt="Flattr {{ episode.title|default:"Unnamed Episode"|striptags }}" />
      {% trans "Flattr" %}
@@ -113,7 +113,7 @@
   {% endif %}
 
   {% if debug %}
-   <a class="btn" href="http://127.0.0.1:5984/_utils/document.html?mygpo/{% get_id episode %}">
+   <a class="btn btn-default" href="http://127.0.0.1:5984/_utils/document.html?mygpo/{% get_id episode %}">
     <i class="icon-cogs"></i>
     Futon
    </a>
@@ -158,8 +158,7 @@
 
   {% endif %}
 
-  <div class="pagination pagination-centered">
-   <ul>
+   <ul class="pagination">
     {% if prev %}
      <li>
       {% episode_link prev podcast %}
@@ -174,7 +173,6 @@
      </li>
     {% endif %}
    </ul>
-  </div>
 
 {% endblock %}
 

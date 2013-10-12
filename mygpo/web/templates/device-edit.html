@@ -23,67 +23,67 @@
 
   {% if not device.deleted %}
 
-  <div class="well">
-   <h2>{% trans "Edit" %}</h2>
-   <form class="form-horizontal" action="{% url "device-update" device.uid %}" method="POST">
+  <div class="panel panel-default">
+   <div class="panel-heading">
+    <h2 class="panel-title">{% trans "Edit" %}</h2>
+   </div>
+   <div class="panel-body">
+    <form class="form" action="{% url "device-update" device.uid %}" method="POST">
 
     {{ device_form.non_field_errors }}
     {% csrf_token %}
 
-    <fieldset>
-
-    <div class="control-group">
+    <div class="form-group">
      <label class="control-label">Name</label>
-     <div class="controls">
       {{ device_form.name }}
-     </div>
     </div>
 
-    <div class="control-group">
+    <div class="form-group">
      <label class="control-label">Type</label>
-     <div class="controls">
       {{ device_form.type }}
-     </div>
     </div>
 
-    <div class="control-group">
+    <div class="form-group">
      <label class="control-label">Device-ID
      </label>
-     <div class="controls">
       {{ device_form.uid }}
-      <p class="help-block">use the same in your client</p>
-     </div>
+      <span class="help-block">use the same in your client</span>
     </div>
 
-    <div class="control-group">
-     <div class="controls">
-      <button class="btn" type="submit">{% trans "Save" %}</button>
-     </div>
-    </div>
-   </fieldset>
+   <button class="btn btn-default" type="submit">{% trans "Save" %}</button>
   </form>
  </div>
+ </div>
 
-  <div class="well">
-   <h2>{% trans "Replace Subscriptions" %}</h2>
-   <form class="form-inline" method="post" action="{% url "device-upload-opml" device.uid %}" enctype="multipart/form-data">
-    <p>{% trans "Replace your current subscriptions by uploading an OPML file." %}</p>
-    {% csrf_token %}
 
-    <input type="file" class="input-xlarge" name="opml" id="opml" />
+  <div class="panel panel-default">
+   <div class="panel-heading">
+    <h2 class="panel-title">{% trans "Replace Subscriptions" %}</h2>
+   </div>
+   <div class="panel-body">
+    <form class="form-inline" method="post" action="{% url "device-upload-opml" device.uid %}" enctype="multipart/form-data">
+     <p>{% trans "Replace your current subscriptions by uploading an OPML file." %}</p>
+     {% csrf_token %}
 
-    <button class="btn" type="submit">{% trans "Upload" %}</button>
-   </form>
+     <input type="file" class="input-xlarge" name="opml" id="opml" />
+
+     <button class="btn" type="submit">{% trans "Upload" %}</button>
+    </form>
+   </div>
   </div>
 
- <div class="well">
-  <h2>{% trans "Delete" %}</h2>
-  <form action="{% url "device-delete" device.uid %}" method="POST">
-   {% csrf_token %}
-   <button class="btn btn-danger" type="submit">
-    <i class="icon-trash"></i> {% trans "Delete Device" %}
-   </button>
-  </form>
+  <div class="panel panel-danger">
+   <div class="panel-heading">
+    <h2 class="panel-title">{% trans "Delete" %}</h2>
+   </div>
+   <div class="panel-body">
+    <form action="{% url "device-delete" device.uid %}" method="POST">
+     {% csrf_token %}
+     <button class="btn btn-danger" type="submit">
+      <i class="icon-trash"></i> {% trans "Delete Device" %}
+     </button>
+    </form>
+   </div>
   </div>
   {% endif %}
 

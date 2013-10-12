@@ -15,7 +15,7 @@
 
 {% block content %}
 
- <form class="form-horizontal" action="{% url "device-create" %}" method="POST">
+ <form class="form-inline" action="{% url "device-create" %}" method="POST">
   {% csrf_token %}
 
    <table class="list">
@@ -40,7 +40,7 @@
        <td>{{ device|device_type }}</td>
        <td>{{ device.uid|striptags }}</td>
        <td>
-        <a class="btn btn-small" href="{% url "device-edit" device.uid %}">
+        <a class="btn btn-default btn-sm" href="{% url "device-edit" device.uid %}">
          <i class="icon-edit"></i>
          {% trans "Configure" %}
         </a>
