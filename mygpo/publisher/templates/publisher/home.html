@@ -15,6 +15,27 @@
 
 {% block content %}
 
+ {% if user.is_staff %}
+  <div class="panel panel-default">
+   <div class="panel-heading">
+    <h2 class="panel-title">{% trans "Staff only" %}</h2>
+   </div>
+   <div class="panel-body">
+    <p>{% trans "Go to the publisher page of any podcast by entering its feed URL" %}</p>
+    <form class="form-inline" action="{% url "podcast-publisher-search" %}" method="post">
+     {% csrf_token %}
+     <div class="input-group">
+      <span class="input-group-addon"><i class="icon-link"></i></span>
+      <input class="form-control" type="text" name="url" id="id_url" {% if q %}value="{{ q }}"{% endif %} placeholder="{% trans "http://" %}" autofocus="autofocus">
+      <span class="input-group-btn">
+       <button class="btn btn-primary" type="submit">{% trans "Go" %}</button>
+      </span>
+     </div>
+    </form>
+   </div>
+  </div>
+ {% endif %}
+
  {% if not podcasts|length_is:"0" %}
 
   <div class="panel panel-default">
@@ -49,27 +70,6 @@
     </form>
    </div>
   </div>
-
- {% if user.is_staff %}
-  <div class="panel panel-default">
-   <div class="panel-heading">
-    <h2 class="panel-title">{% trans "Staff only" %}</h2>
-   </div>
-   <div class="panel-body">
-    <p>{% trans "Go to the publisher page of any podcast by entering its feed URL" %}</p>
-    <form class="form-inline" action="{% url "podcast-publisher-search" %}" method="post">
-     {% csrf_token %}
-     <div class="input-group">
-      <span class="input-group-addon"><i class="icon-link"></i></span>
-      <input class="form-control" type="text" name="url" id="id_url" {% if q %}value="{{ q }}"{% endif %} placeholder="{% trans "http://" %}" autofocus="autofocus">
-      <span class="input-group-btn">
-       <button class="btn btn-primary" type="submit">{% trans "Go" %}</button>
-      </span>
-     </div>
-    </form>
-   </div>
-  </div>
- {% endif %}
 
 {% endblock %}
 
