@@ -16,12 +16,6 @@ def podcastlist_for_user_slug(user_id, slug):
     if not slug:
         raise QueryParameterMissing('slug')
 
-    key = 'plist-%s-%s' % (user_id, slug)
-
-    l = cache.get(key)
-    if l:
-        return l
-
     r = PodcastList.view('podcastlists/by_user_slug',
             key          = [user_id, slug],
             include_docs = True,
@@ -29,7 +23,6 @@ def podcastlist_for_user_slug(user_id, slug):
 
     if r:
         l = r.one()
-        cache.set(key, l, 60)
         return l
 
     return None
