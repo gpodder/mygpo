@@ -4,7 +4,9 @@ from django.core.cache import cache
 
 from mygpo.share.models import PodcastList
 from mygpo.cache import cache_result
+from mygpo.decorators import repeat_on_conflict
 from mygpo.db import QueryParameterMissing
+from mygpo.db.couchdb.podcast import podcast_by_id
 
 
 
@@ -83,3 +85,29 @@ def random_podcastlists(chunk_size=1):
 
         for r in res:
             yield r
+
+
+@repeat_on_conflict(['plist'])
+def add_podcast_to_podcastlist(plist, podcast_id):
+    plist.podcasts.append(podcast_id)
+    plist.save()
+
+
+@repeat_on_conflict(['plist'])
+def remove_podcast_from_podcastlist(plist, podcast_id):
+
+    if podcast_id in plist.podcasts:
+        plist.podcasts.remove(podcast_id)
+
+    if not podcast_id in plist.podcasts:
+        # the podcast might be there with another id
+        podcast = podcast_by_id(podcast_id)
+        for podcast_id in podcast.get_ids():
+            if podcast_id in plist.podcasts:
+                plist.podcasts.remove(podcast_id)
+
+    plist.save()
+
+@repeat_on_conflict(['plist'])
+def delete_podcastlist(plist):
+    plist.delete()
