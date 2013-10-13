@@ -228,7 +228,6 @@ def podcasts_groups_by_id(ids):
     res = db.view('podcasts/podcasts_groups',
             keys         = ids,
             include_docs = True,
-            classes      = [Podcast, PodcastGroup],
         )
 
     for r in res:
