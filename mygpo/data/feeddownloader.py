@@ -36,12 +36,12 @@ from mygpo.utils import file_hash, split_list, deep_eq
 from mygpo.web.logo import CoverArt
 from mygpo.data.podcast import subscribe_at_hub
 from mygpo.db.couchdb.episode import episode_for_podcast_id_url, \
-         episodes_for_podcast_uncached
+         episodes_for_podcast_uncached, episodes_for_podcast_current
 from mygpo.db.couchdb.podcast import podcast_for_url, podcast_by_id_uncached, \
     reload_podcast
 from mygpo.directory.tags import update_category
 from mygpo.decorators import repeat_on_conflict
-from mygpo.db.couchdb import get_main_database
+from mygpo.db.couchdb import get_main_database, bulk_save_retry
 
 import logging
 logger = logging.getLogger(__name__)
@@ -213,75 +213,39 @@ class PodcastUpdater(object):
         update_category(podcast)
 
 
-    @repeat_on_conflict(['podcast'], reload_f=reload_podcast)
     def _update_episodes(self, podcast, parsed_episodes):
 
-        all_episodes = set(episodes_for_podcast_uncached(podcast))
-        remaining = list(all_episodes)
-        updated_episodes = []
+        pid = podcast.get_id()
 
-        for parsed_episode in parsed_episodes:
+        # list of (obj, fun) where fun is the function to update obj
+        changes = []
 
-            url = None
+        for n, parsed in enumerate(parsed_episodes):
 
-            for f in parsed_episode.files:
-                if f.urls:
-                    url = f.urls[0]
-
+            url = get_episode_url(parsed)
             if not url:
+                logger.info('Skipping episode %d for missing URL', n)
                 continue
 
-            guid = parsed_episode.guid
+            episode = episode_for_podcast_id_url(pid, url, create=True)
 
-            # pop matchin episodes out of the "existing" list
-            matching, remaining = split_list(remaining, lambda e: (e.guid and e.guid == guid) or url in e.urls)
+            update_episode = get_episode_update_function(parsed, episode)
+            changes.append((episode, update_episode))
 
-            if not matching:
-                new_episode = episode_for_podcast_id_url(podcast.get_id(),
-                    url, create=True)
-                matching = [new_episode]
-                all_episodes.add(new_episode)
+        # determine which episodes have been found
+        updated_episodes = [e for (e, f) in changes]
+        logging.info('Updating %d episodes with new data', len(updated_episodes))
 
+        # and mark the remaining ones outdated
+        current_episodes = set(episodes_for_podcast_current(podcast, limit=100))
+        outdated_episodes = current_episodes - set(updated_episodes)
+        logging.info('Marking %d episodes as outdated', len(outdated_episodes))
+        changes.extend((e, mark_outdated) for e in outdated_episodes)
 
-            for episode in matching:
-                old_json = copy.deepcopy(episode.to_json())
+        logging.info('Saving %d changes', len(changes))
+        bulk_save_retry(changes, self.db)
 
-                episode.guid = parsed_episode.guid or episode.guid
-                episode.title = parsed_episode.title or episode.title
-                episode.description = parsed_episode.description or episode.description
-                episode.subtitle = parsed_episode.subtitle or episode.subtitle
-                episode.content = parsed_episode.content or parsed_episode.description or episode.content
-                episode.link = parsed_episode.link or episode.link
-                episode.released = datetime.utcfromtimestamp(parsed_episode.released) if parsed_episode.released else episode.released
-                episode.author = parsed_episode.author or episode.author
-                episode.duration = parsed_episode.duration or episode.duration
-                episode.filesize = parsed_episode.files[0].filesize
-                episode.language = parsed_episode.language or episode.language
-                episode.mimetypes = list(set(filter(None, [f.mimetype for f in parsed_episode.files])))
-                episode.flattr_url = parsed_episode.flattr or episode.flattr_url
-                episode.license = parsed_episode.license or episode.license
-
-                urls = list(chain.from_iterable(f.urls for f in parsed_episode.files))
-                episode.urls = sorted(set(episode.urls + urls), key=len)
-
-                if not deep_eq(old_json, episode.to_json()):
-                    episode.last_update = datetime.utcnow()
-                    updated_episodes.append(episode)
-
-
-        outdated_episodes = all_episodes - set(updated_episodes)
-
-        # set episodes to be outdated, where necessary
-        for e in filter(lambda e: not e.outdated, outdated_episodes):
-            e.outdated = True
-            updated_episodes.append(e)
-
-
-        if updated_episodes:
-            logger.info('Updating %d episodes', len(updated_episodes))
-            self.db.save_docs(updated_episodes)
-
-        return all_episodes
+        return updated_episodes
 
 
     def _save_podcast_logo(self, cover_art):
@@ -333,3 +297,58 @@ class PodcastUpdater(object):
         podcast.last_update = datetime.utcnow()
         podcast.save()
         self._update_episodes(podcast, [])
+
+
+def get_episode_url(parsed_episode):
+    """ returns the URL of a parsed episode """
+    for f in parsed_episode.files:
+        if f.urls:
+            return f.urls[0]
+    return None
+
+
+def get_episode_update_function(parsed_episode, episode):
+    """ returns an update function that can be passed to bulk_save_retry """
+
+    def update_episode(episode):
+        """ updates "episode" with the data from "parsed_episode" """
+
+        # copy the json so we can determine if there have been any changes
+        old_json = copy.deepcopy(episode.to_json())
+
+        episode.guid = parsed_episode.guid or episode.guid
+        episode.title = parsed_episode.title or episode.title
+        episode.description = parsed_episode.description or episode.description
+        episode.subtitle = parsed_episode.subtitle or episode.subtitle
+        episode.content = parsed_episode.content or parsed_episode.description or episode.content
+        episode.link = parsed_episode.link or episode.link
+        episode.released = datetime.utcfromtimestamp(parsed_episode.released) if parsed_episode.released else episode.released
+        episode.author = parsed_episode.author or episode.author
+        episode.duration = parsed_episode.duration or episode.duration
+        episode.filesize = parsed_episode.files[0].filesize
+        episode.language = parsed_episode.language or episode.language
+        episode.mimetypes = list(set(filter(None, [f.mimetype for f in parsed_episode.files])))
+        episode.flattr_url = parsed_episode.flattr or episode.flattr_url
+        episode.license = parsed_episode.license or episode.license
+
+        urls = list(chain.from_iterable(f.urls for f in parsed_episode.files))
+        episode.urls = sorted(set(episode.urls + urls), key=len)
+
+        # if nothing changed we return None to indicate no required action
+        if deep_eq(old_json, episode.to_json()):
+            return None
+
+        # set the last_update only if there have been changed above
+        episode.last_update = datetime.utcnow()
+        return episode
+
+    return update_episode
+
+def mark_outdated(obj):
+    """ marks obj outdated if its not already """
+    if obj.outdated:
+        return None
+
+    obj.outdated = True
+    obj.last_update = datetime.utcnow()
+    return obj
