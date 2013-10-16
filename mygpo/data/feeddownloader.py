@@ -90,7 +90,7 @@ class PodcastUpdater(object):
                 # if it exists already, we mark it as outdated
                 self._mark_outdated(p, 'error while fetching feed: %s' %
                     str(ex))
-                return
+                return p
 
             else:
                 raise NoPodcastCreated(ex)
