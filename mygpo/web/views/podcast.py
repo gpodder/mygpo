@@ -240,7 +240,7 @@ def remove_tag(request, podcast):
     if not tag_str:
         return HttpResponseBadRequest()
 
-    remove_podcast_tags(podcast_stage, tag_str)
+    remove_podcast_tags(podcast_state, tag_str)
 
     if request.GET.get('next', '') == 'mytags':
         return HttpResponseRedirect('/tags/')
