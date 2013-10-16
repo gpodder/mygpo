@@ -9,6 +9,7 @@ celery==3.0.23
 celery-with-redis==3.0
 couchdbkit==0.6.5
 distribute==0.6.34
+django-celery==3.0.23
 django-couchdb-utils==0.4
 django-redis-sessions==0.4.0
 feedparser==5.1.3
