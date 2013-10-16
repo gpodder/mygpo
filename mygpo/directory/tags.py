@@ -5,12 +5,12 @@ from random import choice
 from itertools import chain
 
 from mygpo.core.models import Podcast
-from mygpo.decorators import query_if_required
+from mygpo.decorators import query_if_required, repeat_on_conflict
 from mygpo.core.proxy import proxy_object
 from mygpo.directory.models import Category
 from mygpo.db.couchdb.podcast import podcasts_for_tag
-from mygpo.db.couchdb.directory import top_categories, category_for_tag, \
-         save_category
+from mygpo.db.couchdb.directory import top_categories, save_category, \
+         category_for_tag_uncached
 
 
 class Tag(object):
@@ -85,6 +85,7 @@ class Topics(object):
 
 
 
+@repeat_on_conflict()
 def update_category(podcast):
     all_tags = list(chain.from_iterable(s for s in podcast.tags.values()))
 
@@ -93,7 +94,7 @@ def update_category(podcast):
 
     random_tag = choice(all_tags)
 
-    category = category_for_tag(random_tag)
+    category = category_for_tag_uncached(random_tag)
     if not category:
         category = Category(label=random_tag)
 

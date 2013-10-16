@@ -9,8 +9,7 @@ from mygpo.db.couchdb.utils import multi_request_view
 from mygpo.db import QueryParameterMissing
 
 
-@cache_result(timeout=60*60)
-def category_for_tag(tag):
+def category_for_tag_uncached(tag):
 
     if not tag:
         raise QueryParameterMissing('tag')
@@ -30,6 +29,9 @@ def category_for_tag(tag):
 
     else:
         return None
+
+
+category_for_tag = cache_result(timeout=60*60)(category_for_tag_uncached)
 
 
 @cache_result(timeout=60*60)

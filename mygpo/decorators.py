@@ -26,6 +26,9 @@ from django.http import Http404
 from django.shortcuts import render
 from django.http import HttpResponseForbidden, HttpResponseNotAllowed
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 def requires_token(token_name, denied_template=None):
     """
@@ -138,7 +141,8 @@ class repeat_on_conflict(object):
                 try:
                     return f(**all_args)
 
-                except ResourceConflict:
+                except ResourceConflict as e:
+                    logger.info('retrying %s, reloading %s', f, self.obj_names)
                     for obj_name in self.obj_names:
                         obj = all_args[obj_name]
                         all_args[obj_name] = self.reload_f(obj)

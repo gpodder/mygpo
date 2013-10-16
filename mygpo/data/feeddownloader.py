@@ -32,13 +32,12 @@ from mygpo.core.slugs import assign_missing_episode_slugs, assign_slug, \
 from feedservice.parse import parse_feed, FetchFeedException
 from feedservice.parse.text import ConvertMarkdown
 from feedservice.parse.models import ParserException
-from mygpo.utils import file_hash, split_list, deep_eq
+from mygpo.utils import file_hash, deep_eq
 from mygpo.web.logo import CoverArt
 from mygpo.data.podcast import subscribe_at_hub
 from mygpo.db.couchdb.episode import episode_for_podcast_id_url, \
-         episodes_for_podcast_uncached, episodes_for_podcast_current
-from mygpo.db.couchdb.podcast import podcast_for_url, podcast_by_id_uncached, \
-    reload_podcast
+         episodes_for_podcast_current
+from mygpo.db.couchdb.podcast import podcast_for_url, reload_podcast
 from mygpo.directory.tags import update_category
 from mygpo.decorators import repeat_on_conflict
 from mygpo.db.couchdb import get_main_database, bulk_save_retry
@@ -66,7 +65,7 @@ class PodcastUpdater(object):
     def update_queue(self, queue):
         """ Fetch data for the URLs supplied as the queue iterable """
 
-        for n, podcast_url in enumerate(queue):
+        for n, podcast_url in enumerate(queue, 1):
             logger.info('Update %d - %s', n, podcast_url)
             try:
                 yield self.update(podcast_url)
@@ -89,7 +88,8 @@ class PodcastUpdater(object):
             p = podcast_for_url(podcast_url, create=False)
             if p:
                 # if it exists already, we mark it as outdated
-                self._mark_outdated(p)
+                self._mark_outdated(p, 'error while fetching feed: %s' %
+                    str(ex))
                 return
 
             else:
@@ -97,7 +97,8 @@ class PodcastUpdater(object):
 
         assert parsed, 'fetch_feed must return something'
         p = podcast_for_url(podcast_url, create=True)
-        self._update_podcast(p, parsed)
+        episodes = self._update_episodes(p, parsed.episodes)
+        self._update_podcast(p, parsed, episodes)
         return p
 
 
@@ -123,7 +124,7 @@ class PodcastUpdater(object):
 
 
     @repeat_on_conflict(['podcast'], reload_f=reload_podcast)
-    def _update_podcast(self, podcast, parsed):
+    def _update_podcast(self, podcast, parsed, episodes):
         """ updates a podcast according to new parser results """
 
         # we need that later to decide if we can "bump" a category
@@ -158,7 +159,7 @@ class PodcastUpdater(object):
                 podcast.urls.insert(0, podcast.new_location)
 
 
-        episodes = self._update_episodes(podcast, parsed.episodes)
+        logger.info('Retrieved %d episodes in total', len(episodes))
 
         # latest episode timestamp
         eps = filter(lambda e: bool(e.released), episodes)
@@ -219,14 +220,16 @@ class PodcastUpdater(object):
 
         # list of (obj, fun) where fun is the function to update obj
         changes = []
+        logger.info('Parsed %d episodes', len(parsed_episodes))
 
-        for n, parsed in enumerate(parsed_episodes):
+        for n, parsed in enumerate(parsed_episodes, 1):
 
             url = get_episode_url(parsed)
             if not url:
                 logger.info('Skipping episode %d for missing URL', n)
                 continue
 
+            logger.info('Updating episode %d / %d', n, len(parsed_episodes))
             episode = episode_for_podcast_id_url(pid, url, create=True)
 
             update_episode = get_episode_update_function(parsed, episode)

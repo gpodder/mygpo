@@ -5,6 +5,9 @@ from couchdbkit.ext.django import loading
 
 from couchdbkit import *
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 def get_main_database():
     return loading.get_db('core')
@@ -89,4 +92,5 @@ def bulk_save_retry(obj_funs, db, reload_f=__default_reload):
             obj_funs = new_obj_funs
 
     if errors:
+        logger.warn('Errors at bulk-save: %s', errors)
         raise BulkException(errors)
