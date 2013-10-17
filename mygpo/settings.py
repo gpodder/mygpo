@@ -141,6 +141,7 @@ INSTALLED_APPS = (
     'couchdbkit.ext.django',
     'django_couchdb_utils.auth',
     'django_couchdb_utils.registration',
+    'djcelery',
     'mygpo.core',
     'mygpo.users',
     'mygpo.api',
@@ -289,6 +290,8 @@ DEFAULT_BASE_URL = ''
 BROKER_URL='redis://localhost'
 BACKEND_URL='redis://localhost'
 
+import djcelery
+djcelery.setup_loader()
 
 # a dictionary containing celery settings from
 # http://docs.celeryproject.org/en/latest/configuration.html

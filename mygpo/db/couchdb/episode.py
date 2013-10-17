@@ -305,6 +305,28 @@ def episode_slugs_per_podcast(podcast_id, base_slug):
     return [r['key'][1] for r in res]
 
 
+def episodes_for_podcast_current(podcast, limit=None):
+
+    if not podcast:
+        raise QueryParameterMissing('podcast')
+
+    res = Episode.view('episodes/by_podcast_current',
+            startkey     = podcast.get_id(),
+            endkey       = podcast.get_id(),
+            include_docs = True,
+            limit        = limit,
+        )
+
+    episodes = list(res)
+
+    for episode in episodes:
+        if episode.needs_update:
+            incomplete_obj.send_robust(sender=episode)
+
+    return episodes
+
+
+
 def episodes_for_podcast_uncached(podcast, since=None, until={}, **kwargs):
 
     if not podcast:

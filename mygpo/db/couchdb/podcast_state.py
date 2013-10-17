@@ -228,7 +228,7 @@ def add_podcast_tags(state, tags):
     udb.save_doc(state)
 
 @repeat_on_conflict(['state'])
-def remove_podcast_tags(state):
+def remove_podcast_tags(state, tag_str):
     if tag_str not in state.tags:
         return
     udb = get_userdata_database()
