@@ -201,8 +201,6 @@ FLICKR_API_KEY = ''
 
 MAINTENANCE = os.path.exists(os.path.join(BASE_DIR, 'MAINTENANCE'))
 
-EMAIL_BACKEND = 'django_couchdb_utils.email.backends.CouchDBEmailBackend'
-
 
 LOGGING = {
     'version': 1,
