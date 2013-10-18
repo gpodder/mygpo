@@ -10,7 +10,7 @@ import os
 
 celery = Celery('mygpo.celery',
                 broker=settings.BROKER_URL,
-                backend=settings.BACKEND_URL,
+                backend=settings.CELERY_RESULT_BACKEND,
                 include=[
                     'mygpo.core.tasks',
                     'mygpo.api.tasks',
