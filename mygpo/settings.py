@@ -282,7 +282,7 @@ DEFAULT_BASE_URL = ''
 ### Celery
 
 BROKER_URL='redis://localhost'
-BACKEND_URL='redis://localhost'
+CELERY_RESULT_BACKEND='redis://localhost'
 
 import djcelery
 djcelery.setup_loader()
