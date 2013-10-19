@@ -41,7 +41,7 @@ def format_diff(value):
 
 @register.filter
 def timeline(data):
-    s = '<script type="text/javascript" src="http://www.google.com/jsapi"></script>\n'
+    s = '<script type="text/javascript" src="//www.google.com/jsapi"></script>\n'
     s += '<script type="text/javascript">\n'
     s += 'google.load("visualization", "1", {"packages":["annotatedtimeline"]});\n'
     s += 'google.setOnLoadCallback(drawChart);\n'
