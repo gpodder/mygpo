@@ -505,6 +505,10 @@ class PodcastGroup(Document, SlugMixin, OldIdMixin):
     def display_title(self):
         return self.title
 
+    @property
+    def license(self):
+        return utils.first(p.license for p in self.podcasts)
+
 
     @property
     def needs_update(self):
