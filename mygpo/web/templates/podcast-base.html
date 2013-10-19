@@ -54,6 +54,12 @@
      <a href="{{podcast.link}}" title="{% trans "Website" %}">
       <i class="icon-external-link"></i>
      </a>
+    {% endif %}&middot;
+    {% if podcast.license %}
+     <a href="{{ podcast.license }}">
+      <i class="icon-legal"></i>
+      {{ podcast.license|license_name }}
+     </a>
     {% endif %}
     {% if podcast.subscriber_count %}&middot;
      {{ podcast.subscriber_count }} {% trans "subscribers" %}
