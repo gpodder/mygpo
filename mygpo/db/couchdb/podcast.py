@@ -1,6 +1,7 @@
 from hashlib import sha1
 from random import random
 from datetime import datetime
+from collections import Counter
 
 from restkit import RequestFailed
 
@@ -498,8 +499,12 @@ def get_flattr_podcast_count():
 
 
 @cache_result(timeout=60*60)
-def get_license_podcasts(offset=0, limit=20):
+def get_license_podcasts(offset=0, limit=20, license_url=None):
     """ returns a page of podcasts w/ license information """
+
+    kwargs = {}
+    if license_url:
+        kwargs['key'] = license_url
 
     r = Podcast.view('podcasts/license',
             skip = offset,
@@ -507,6 +512,7 @@ def get_license_podcasts(offset=0, limit=20):
             classes = [Podcast, PodcastGroup],
             include_docs = True,
             reduce = False,
+            **kwargs
     )
 
     podcasts = list(r)
@@ -519,10 +525,28 @@ def get_license_podcasts(offset=0, limit=20):
 
 
 @cache_result(timeout=60*60)
-def get_license_podcast_count():
+def get_license_podcast_count(license_url=None):
     """ returns the number of podcasts that contain license information """
-    r = list(Podcast.view('podcasts/license'))
+
+    kwargs = {}
+    if license_url:
+        kwargs['key'] = license_url
+
+    r = list(Podcast.view('podcasts/license', **kwargs))
+
     return r[0]['value'] if r else 0
+
+
+@cache_result(timeout=60*60)
+def get_podcast_licenses():
+    """ returns the licenses that are assigned to podcasts """
+    db = get_main_database()
+    r = db.view('podcasts/license',
+            reduce = True,
+            group_level = 1,
+    )
+
+    return Counter({ x['key']: x['value'] for x in r })
 
 
 def subscriberdata_for_podcast(podcast_id):

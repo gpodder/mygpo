@@ -32,7 +32,7 @@ from mygpo.db.couchdb.user import get_user_by_id
 from mygpo.db.couchdb.podcast import get_podcast_languages, podcasts_by_id, \
          random_podcasts, podcasts_to_dict, podcast_for_url, \
          get_flattr_podcasts, get_flattr_podcast_count, get_license_podcasts, \
-         get_license_podcast_count
+         get_license_podcast_count, get_podcast_licenses
 from mygpo.db.couchdb.directory import category_for_tag
 from mygpo.db.couchdb.podcastlist import random_podcastlists, \
          podcastlist_count, podcastlists_by_rating
@@ -331,18 +331,19 @@ class PodcastListView(TemplateView):
 
     @method_decorator(cache_control(private=True))
     @method_decorator(vary_on_cookie)
-    def get(self, request, page_size=20):
+    def get(self, request, page_size=20, **kwargs):
 
         page = self.get_page(request)
-        podcasts = self.get_podcasts( (page-1) * page_size, page_size)
-        podcast_count = self.get_podcast_count()
+        podcasts = self.get_podcasts( (page-1) * page_size, page_size, **kwargs)
+        podcast_count = self.get_podcast_count(**kwargs)
 
-        context = {
+        context = kwargs
+        context.update({
             'podcasts': podcasts,
             'page_list': self.get_page_list(page, page_size, podcast_count),
             'current_page': page,
             'max_subscribers': self.get_max_subscribers(podcasts),
-        }
+        })
 
         context.update(self.other_context(request))
 
@@ -357,7 +358,7 @@ class PodcastListView(TemplateView):
         """ must return the total number of podcasts """
         raise NotImplemented
 
-    def other_context(self, request):
+    def other_context(self, request, **kwargs):
         """ can return a dict of additional context data """
         return {}
 
@@ -392,8 +393,20 @@ class FlattrPodcastList(PodcastListView):
 
 
 class LicensePodcastList(PodcastListView):
-    """ Lists podcasts that have license information """
+    """ Lists podcasts with a given license """
 
     template_name = 'directory/license-podcasts.html'
     get_podcasts = staticmethod(get_license_podcasts)
     get_podcast_count = staticmethod(get_license_podcast_count)
+
+
+class LicenseList(TemplateView):
+    """ Lists all podcast licenses """
+
+    template_name = 'directory/licenses.html'
+
+    def get(self, request):
+        context = {
+            'licenses': get_podcast_licenses().most_common(),
+        }
+        return self.render_to_response(context)
