@@ -462,3 +462,16 @@ def set_episode_favorite(episode_state, is_fav):
     udb = get_userdata_database()
     episode_state.set_favorite(is_fav)
     udb.save_doc(episode_state)
+
+
+@repeat_on_conflict(['episode'])
+def set_episode_listeners(episode, listeners):
+
+    if episode.listeners == listeners:
+        return False
+
+    episode.listeners = listeners
+
+    db = get_main_database()
+    db.save_doc(episode)
+    return True
