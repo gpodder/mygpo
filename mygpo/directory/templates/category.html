@@ -36,8 +36,7 @@
   {% endfor %}
  </table>
 
-<div class="pagination pagination-centered">
- <ul>
+ <ul class="pagination">
  {% if entries.has_previous %}
   <li><a href="{% url "directory" category %}?page={{ entries.previous_page_number }}">«</a></li>
  {% endif %}
@@ -63,7 +62,6 @@
   </li>
  {% endif %}
  </ul>
-</div>
 
 {% endblock %}
 

@@ -62,7 +62,7 @@
     <td>
      <form action="{% url "list-remove-podcast" owner.username podcastlist.slug podcast.get_id %}" method="post" target="_parent">
       {% csrf_token %}
-      <button class="btn btn-danger btn-small" type="submit" >
+      <button class="btn btn-danger btn-sm" type="submit" >
        <i class="icon-remove"></i>
       </button>
      </form>
@@ -79,13 +79,13 @@
 
   <form action="{% url "list-rate" owner.username podcastlist.slug %}?rate=1" method="post" style="display: inline;" >
    {% csrf_token %}
-   <button class="btn" type="submit">
+   <button class="btn btn-default" type="submit">
     <i class="icon-thumbs-up"></i>
     {% trans "Vote" %}
    </button>
   </form>
 
-   <a class="btn" href="{% url "list-opml" owner.username podcastlist.slug %}">
+   <a class="btn btn-default" href="{% url "list-opml" owner.username podcastlist.slug %}">
     <i class="icon-download"></i>
     {% trans "Download as OPML" %}
     </a>
@@ -102,9 +102,14 @@
   <hr />
 
   <h2>Add Podcast</h2>
+
   <form method="get" action="{% url "list-search" owner.username podcastlist.slug %}" class="form-inline" target="results">
-   <div class="input-prepend input-append">
-    <span class="add-on"><i class="icon-search"></i></span><input type="text" class="input-xxlarge" name="q" {% if q %}value="{{ q }}"{% endif %} ><button class="btn btn-primary" type="submit">{% trans "Search" %}</button>
+   <div class="input-group">
+    <span class="input-group-addon"><i class="icon-search"></i></span>
+    <input class="form-control" type="text" name="q" {% if q %}value="{{ q }}"{% endif %} placeholder="{% trans "Search term or feed URL" %}" autofocus="autofocus">
+    <span class="input-group-btn">
+     <button class="btn btn-primary" type="submit">{% trans "Search" %}</button>
+    </span>
    </div>
   </form>
 

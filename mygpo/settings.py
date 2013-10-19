@@ -173,14 +173,20 @@ AUTHENTICATION_BACKENDS = (
 
 SESSION_ENGINE = "django_couchdb_utils.sessions.cached_couchdb"
 
-TEMPLATE_CONTEXT_PROCESSORS = (
-    "django.contrib.auth.context_processors.auth",
-    "django.core.context_processors.debug",
-    "django.core.context_processors.i18n",
-    "django.core.context_processors.media",
-    "django.contrib.messages.context_processors.messages",
+
+from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
+
+TEMPLATE_CONTEXT_PROCESSORS += (
     "mygpo.web.google.analytics",
     "mygpo.web.google.adsense",
+
+    # make the debug variable available in templates
+    # https://docs.djangoproject.com/en/dev/ref/templates/api/#django-core-context-processors-debug
+    "django.core.context_processors.debug",
+
+    # required so that the request obj can be accessed from templates.
+    # this is used to direct users to previous page after login
+    'django.core.context_processors.request',
 )
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'

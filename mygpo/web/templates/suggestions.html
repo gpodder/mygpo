@@ -14,36 +14,39 @@
 
 
 {% block content %}
-  <table class="list podcast_list">
+
+ <div class="podcasts">
+
   {% for podcast in entries %}
-   <tr>
-    <td class="logo">{{ podcast|podcast_logo }}</td>
-    <td>
-     <p class="title">{% podcast_group_link podcast %}</p>
-     <p class="description">{{ podcast.description|striptags|truncatewords:"12" }}</p>
-    </td>
-    <td>
-      <a class="btn btn-success btn-small" href="{% podcast_link_target podcast "subscribe" %}">
-       <i class="icon-ok"></i> {% trans "Subscribe" %}
+   <div class="podcast">
+
+    <div class="logo">{{ podcast|podcast_logo_big }}</div>
+
+    <div class="title">
+     {% podcast_group_link podcast %}
+    </div>
+
+    <div class="actions">
+      <a class="btn btn-success btn-sm" href="{% podcast_link_target podcast "subscribe" %}">
+       <i class="icon-ok"></i>&nbsp;{% trans "Subscribe" %}
       </a>
-    </td>
-    <td>
-     <form action="{% podcast_link_target podcast "suggestions-blacklist" %}" style="display: inline;" >
+     <form action="{% podcast_link_target podcast "suggestions-blacklist" %}">
       {% csrf_token %}
-      <button class="btn btn-danger btn-small" type="submit">
-       <i class="icon-ban-circle"></i> {% trans "No Interest" %}
+      <button class="btn btn-danger btn-sm" type="submit">
+       <i class="icon-ban-circle"></i>&nbsp;{% trans "No Interest" %}
       </button>
      </form>
-    </td>
-   </tr>
+    </div>
+
+    <div class="description">
+      {{ podcast.description|truncatewords:100 }}
+    </div>
+
+   </div>
   {% empty %}
-   <tr>
-    <td colspan="3">
-     {% trans "No Suggestions Yet" %}
-    </td>
-   </tr>
+    <p>{% trans "No Suggestions Yet" %}</p>
   {% endfor %}
-  </table>
+  </div>
 
   {% if entries %}
  <a class="btn" href="{% url "suggestions-opml" 15 "opml" %}">

@@ -70,25 +70,28 @@
 
   {% endif %}
 
-
-  <div class="pagination">
-   <ul>
-    {% if page > 0 %}
-     <li>
+   <ul class="pagination">
+    <li>
+     {% if page > 0 %}
       <a href="?page={{page|add:"-1"}}">«« {% trans "Later" %}</a>
-     </li>
-    {% endif %}
-    {% if page != 0 %}
-     <li>
+     {% else %}
+      <span>«« {% trans "Later" %}</span>
+     {% endif %}
+    </li>
+    <li>
+     {% if page != 0 %}
       <a href="?page=0">{% trans "Now" %}</a>
-     </li>
-    {% endif %}
-    {% if history %}
-     <li>
+     {% else %}
+      <span>{% trans "Now" %}</span>
+     {% endif %}
+    </li>
+    <li>
+     {% if history %}
       <a href="?page={{page|add:"1"}}">{% trans "Earlier" %} »»</a>
-     </li>
-    {% endif %}
+     {% else %}
+      <span>{% trans "Earlier" %} »»</span>
+     {% endif %}
+    </li>
    </ul>
-  </div>
 
 {% endblock %}

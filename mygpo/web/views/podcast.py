@@ -60,7 +60,8 @@ def show(request, podcast):
     check_restrictions(podcast)
 
     current_site = RequestSite(request)
-    episodes = episode_list(podcast, request.user, limit=20)
+    num_episodes = 20
+    episodes = episode_list(podcast, request.user, limit=num_episodes)
     user = request.user
 
     max_listeners = max([e.listeners for e in episodes] + [0])
@@ -77,7 +78,7 @@ def show(request, podcast):
     else:
         rel_podcasts = []
 
-    tags = get_tags(podcast, user)
+    tags, has_tagged = get_tags(podcast, user)
 
     if user.is_authenticated():
         state = podcast_state_for_user_podcast(user, podcast)
@@ -86,12 +87,12 @@ def show(request, podcast):
 
         subscribe_targets = podcast.subscribe_targets(user)
 
-        history = list(state.actions)
+        has_history = bool(state.actions)
         is_public = state.settings.get('public_subscription', True)
         can_flattr = request.user.get_wksetting(FLATTR_TOKEN) and podcast.flattr_url
 
     else:
-        history = []
+        has_history = False
         is_public = False
         subscribed_devices = []
         subscribe_targets = []
@@ -99,15 +100,15 @@ def show(request, podcast):
 
     is_publisher = check_publisher_permission(user, podcast)
 
-    def _set_objects(h):
-        dev = user.get_device(h.device)
-        return proxy_object(h, device=dev)
-    history = map(_set_objects, history)
+    episodes_total = podcast.episode_count or 0
+    num_pages = episodes_total / num_episodes
+    page_list = get_page_list(1, num_pages, 1, 15)
 
     return render(request, 'podcast.html', {
         'tags': tags,
+        'has_tagged': has_tagged,
         'url': current_site,
-        'history': history,
+        'has_history': has_history,
         'podcast': podcast,
         'is_public': is_public,
         'devices': subscribed_devices,
@@ -119,6 +120,8 @@ def show(request, podcast):
         'max_listeners': max_listeners,
         'can_flattr': can_flattr,
         'is_publisher': is_publisher,
+        'page_list': page_list,
+        'current_page': 1,
     })
 
 
@@ -141,7 +144,9 @@ def get_tags(podcast, user):
         tag_list = filter(lambda x: x['is_own'], tag_list)
         tag_list.append({'tag': '...', 'is_own': False})
 
-    return tag_list
+    has_own = any(t['is_own'] for t in tag_list)
+
+    return tag_list, has_own
 
 
 def episode_list(podcast, user, offset=0, limit=None):
@@ -173,6 +178,26 @@ def episode_list(podcast, user, offset=0, limit=None):
     annotate_episode = partial(_annotate_episode, listeners, episode_actions)
     return map(annotate_episode, episodes)
 
+
+
+@never_cache
+@login_required
+def history(request, podcast):
+    """ shows the subscription history of the user """
+
+    user = request.user
+    state = podcast_state_for_user_podcast(user, podcast)
+    history = list(state.actions)
+
+    def _set_objects(h):
+        dev = user.get_device(h.device)
+        return proxy_object(h, device=dev)
+    history = map(_set_objects, history)
+
+    return render(request, 'podcast-history.html', {
+        'history': history,
+        'podcast': podcast,
+    })
 
 
 def all_episodes(request, podcast, page_size=20):
@@ -260,7 +285,9 @@ def subscribe(request, podcast):
 
         # single UID from /podcast/<slug>
         if 'targets' in request.POST:
-            device_uids.append(request.POST.get('targets'))
+            devices = request.POST.get('targets')
+            devices = devices.split(',')
+            device_uids.extend(devices)
 
         for uid in device_uids:
             try:
@@ -278,6 +305,25 @@ def subscribe(request, podcast):
         'targets': targets,
         'podcast': podcast,
     })
+
+
+@never_cache
+@login_required
+@allowed_methods(['POST'])
+def subscribe_all(request, podcast):
+    """ subscribe all of the user's devices to the podcast """
+    user = request.user
+
+    devs = podcast.subscribe_targets(user)
+    # ungroup groups
+    devs = [dev[0] if isinstance(dev, list) else dev for dev in devs]
+
+    try:
+        podcast.subscribe(user, devs)
+    except (SubscriptionException, DeviceDoesNotExist, ValueError) as e:
+        messages.error(request, str(e))
+
+    return HttpResponseRedirect(get_podcast_link_target(podcast))
 
 
 @never_cache
@@ -303,6 +349,28 @@ def unsubscribe(request, podcast, device_uid):
             {'username': request.user.username, 'podcast_url': podcast.url, 'device_id': device.id})
 
     return HttpResponseRedirect(return_to)
+
+
+@never_cache
+@login_required
+@allowed_methods(['POST'])
+def unsubscribe_all(request, podcast):
+    """ unsubscribe all of the user's devices from the podcast """
+
+    user = request.user
+    state = podcast_state_for_user_podcast(user, podcast)
+
+    dev_ids = state.get_subscribed_device_ids()
+    devs = [user.get_device(x) for x in dev_ids]
+    # ungroup groups
+    devs = [dev[0] if isinstance(dev, list) else dev for dev in devs]
+
+    try:
+        podcast.unsubscribe(user, devs)
+    except (SubscriptionException, DeviceDoesNotExist, ValueError) as e:
+        messages.error(request, str(e))
+
+    return HttpResponseRedirect(get_podcast_link_target(podcast))
 
 
 @never_cache
@@ -399,19 +467,25 @@ def oldid_decorator(f):
 
 show_slug_id        = slug_id_decorator(show)
 subscribe_slug_id   = slug_id_decorator(subscribe)
+subscribe_all_slug_id= slug_id_decorator(subscribe_all)
 unsubscribe_slug_id = slug_id_decorator(unsubscribe)
+unsubscribe_all_slug_id= slug_id_decorator(unsubscribe_all)
 add_tag_slug_id     = slug_id_decorator(add_tag)
 remove_tag_slug_id  = slug_id_decorator(remove_tag)
 set_public_slug_id  = slug_id_decorator(set_public)
 all_episodes_slug_id= slug_id_decorator(all_episodes)
 flattr_podcast_slug_id=slug_id_decorator(flattr_podcast)
+history_podcast_slug_id= slug_id_decorator(history)
 
 
 show_oldid          = oldid_decorator(show)
 subscribe_oldid     = oldid_decorator(subscribe)
+subscribe_all_oldid = oldid_decorator(subscribe_all)
 unsubscribe_oldid   = oldid_decorator(unsubscribe)
+unsubscribe_all_oldid= oldid_decorator(unsubscribe_all)
 add_tag_oldid       = oldid_decorator(add_tag)
 remove_tag_oldid    = oldid_decorator(remove_tag)
 set_public_oldid    = oldid_decorator(set_public)
 all_episodes_oldid  = oldid_decorator(all_episodes)
 flattr_podcast_oldid= oldid_decorator(flattr_podcast)
+history_podcast_oldid= oldid_decorator(history)

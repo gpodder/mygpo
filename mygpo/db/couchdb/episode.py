@@ -403,7 +403,7 @@ def favorite_episode_ids_for_user(user):
 
 
 def favorite_episodes_for_user(user):
-    episode_ids = favorite_episode_ids_for_user(user)
+    episode_ids = list(favorite_episode_ids_for_user(user))
     return episodes_by_id(episode_ids)
 
 
