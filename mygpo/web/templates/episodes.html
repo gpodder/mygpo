@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "podcast-base.html" %}
 {% load i18n %}
 {% load humanize %}
 {% load episodes %}
@@ -15,99 +15,36 @@
  {% endif %}
 {% endblock %}
 
-{% block title %}{{ podcast.title|default:"Unnamed Podcast"|striptags }}{% endblock %}
-
-{% block header %}
-
-   {% if podcast.logo_url %}
-    <div id="podcastlogo">
-     <a href="{% podcast_link_target podcast %}">
-      {{ podcast|podcast_logo_big }}
-     </a>
-    </div>
-   {% endif %}
-
-   <h1>
-    {% if podcast.title %}
-     {{ podcast.title|striptags }}
-    {% else %}
-     {% trans "Unnamed Podcast" %}
-    {%endif%}
-   </h1>
-
-   <small class="description">
-    {% trans "links" %}:
-    <a href="{{podcast.url}}">
-     {% trans "feed" %}
-    </a>
-    {% if podcast.link %},
-     <a href="{{podcast.link}}">{% trans "website" %}</a>
-    {% endif %},
-    {% blocktrans with podcast.subscriber_count as subscriber_count and podcast.listener_count as listener_count %}{{subscriber_count}} subscribers, {{listener_count}} listeners{% endblocktrans %}
-   </small>
-
-   {% if related_podcasts %}
-    <div class="related-podcasts">
-     <strong>{% trans "Also available" %}</strong>
-     {% for p in related_podcasts %}
-      {% podcast_group_link p p.group_member_name %}
-     {% endfor %}
-    </div>
-   {% endif %}
-
-   {% if podcast.description %}
-    <p class="description">{{ podcast.description|striptags }}</p>
-   {% endif %}
-
-{% endblock %}
-
-
-
 {% block content %}
 
-  {% if episode %}
-   <div class="first-episode">
+ {% if is_publisher %}
+  <hr />
 
-    <h2>{{ episode.title }} <small>{{ episode.released|naturalday }}</small></h2>
-    <div class="description">
-     {{ episode.description|default:""|striptags|truncatewords:"100" }}
-    </div>
-    <a href="{% episode_link_target episode podcast %}">more...</a>
-
+  <div class="btn-toolbar">
+   <div class="btn-group">
+    <a class="btn btn-default" href="{% podcast_link_target podcast "podcast-publisher-detail" %}">
+     <i class="icon-wrench"></i>
+     {% trans "Publisher Pages" %}
+    </a>
    </div>
-  {% endif %}
+  </div>
 
-  {% if episodes %}
+  <hr />
+ {% endif %}
 
-  <h3>{% trans "All Episodes" %}</h3>
-   <table class="list episode_list" id="episodes">
-    <tr>
-     <th></th>
-     <th>{% trans "Title" %}</th>
-     <th>{% trans "Released" %}</th>
-     <th>{% trans "Listeners" %}</th>
-    </tr>
+ {% if episodes %}
 
-    {% for episode in episodes %}
-     <tr>
-      <td>{{ episode.action|episode_status_icon }}</td>
-      <td class="short">
-          <div class="title">{% episode_link episode podcast %}</div>
-          <p class="description short">{{ episode.description|default:""|striptags }}</p>
-      </td>
-      <td>{{ episode.released|default:""|date:"Y-m-d" }}</td>
-      <td>
-       {% if episode.listeners %}
-        {% vertical_bar episode.listeners max_listeners %}
-       {% endif %}
-      </td>
-     </tr>
-    {% endfor %}
-   </table>
-  {% endif %}
+  <div class="episodes">
 
- <div class="pagination pagination-centered">
-  <ul>
+   {% for episode in episodes %}
+    {% include "components/episode-box.html" with podcast=podcast episode=episode only %}
+   {% endfor %}
+
+  </div>
+
+ {% endif %}
+
+  <ul class="pagination">
  {% for page in page_list %}
   <li>
    {% if page == "..." %}
@@ -123,25 +60,6 @@
   </li>
  {% endfor %}
  </ul>
- </div>
 
 
-{% endblock %}
-
-
-{% block sidebar %}
-
-  {% if is_publisher %}
-   <div class="well">
-    <h4>{% trans "Publisher Pages" %}</h4>
-
-    <a class="btn" href="{% podcast_link_target podcast "podcast-publisher-episodes" %}"><i class="icon-wrench"></i> {% trans "Go" %}</a>
-   </div>
-  {% endif %}
-
-
-{% endblock %}
-
-{% block ads %}
- {% comment %}disable ads on podcast pages{% endcomment %}
 {% endblock %}

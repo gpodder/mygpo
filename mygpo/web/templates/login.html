@@ -8,60 +8,45 @@
 {% block title %}{% trans "Login" %}{% endblock %}
 
 {% block header %}
-   <h1>{% trans "Login" %}
+   <h1>{% trans "Login" %}</h1>
+
+  {% if next %}
+    <div class="alert alert-warning">
+     {% trans "You need to login to access this page." %}
+    </div>
+  {% endif %}
+
 {% endblock %}
 
 
 {% block content %}
-   <form class="form-horizontal" action="{% url "login" %}" method="post">
 
-    <fieldset>
+   <form role="form" class="col-lg-offset-3 col-lg-6" action="{% url "login" %}" method="post">
+
      {% csrf_token %}
 
      <input type="hidden" name="next" value="{{ next }}" />
 
-     <div class="control-group">
+     <div class="form-group">
       <label class="control-label">Username</label>
-      <div class="controls">
-       <input type="text" name="user" id="login_username" autofocus="autofocus" />
-      </div>
+      <input class="form-control" type="text" name="user" id="login_username" autofocus="autofocus" />
      </div>
 
-     <div class="control-group">
+     <div class="form-group">
       <label class="control-label">Password</label>
-      <div class="controls">
-       <input type="password" name="pwd" />
-       <p>
-        <a href="{% url "restore-password" %}">
-         {% trans "Forgot your password?" %}
-        </a>
-       </p>
-      </div>
+      <input class="form-control" type="password" name="pwd" />
+      <span class="help-block">
+       <a href="{% url "restore-password" %}">
+        {% trans "Forgot your password?" %}
+       </a>
+      </span>
      </div>
 
-     <div class="control-group">
-      <div class="controls">
+     <div class="form-group">
        <button class="btn btn-primary" type="submit">{% trans "Login" %}</button>
-       <a class="btn" href="{% url "register" %}">{% trans "Register" %}</a>
-      </div>
+       <a class="btn btn-default" href="{% url "login-google" %}"><i class="icon-google-plus"></i> {% trans "Login with Google" %}</a>
+       <a class="btn btn-default" href="{% url "register" %}">{% trans "Register" %}</a>
      </div>
 
-     <div class="control-group">
-      <div class="controls">
-       <a class="btn" href="{% url "login-google" %}"><i class="icon-google-plus"></i> {% trans "Login with Google" %}</a>
-      </div>
-     </div>
-
-    </fieldset>
    </form>
 {% endblock %}
-
-
-{% block sidebar %}
-  {% if next %}
-    <div class="alert alert-error">
-     {% trans "You need to login to access this page." %}
-    </div>
-  {% endif %}
-{% endblock %}
-

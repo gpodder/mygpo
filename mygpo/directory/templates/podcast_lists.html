@@ -31,7 +31,7 @@
     <td><a href="{% url "user" l.username %}">{{ l.username }}</a></td>
     <td class="numeric">{{ l.podcasts|length }}</td>
     <td>
-     <a class="btn btn-small" href="{% url "list-opml" l.username l.slug %}">
+     <a class="btn btn-default btn-sm" href="{% url "list-opml" l.username l.slug %}">
       <i class="icon-download"></i>
      </a>
     </td>
@@ -40,8 +40,7 @@
   {% endfor %}
  </table>
 
-<div class="pagination pagination-centered">
- <ul>
+ <ul class="pagination">
 
  {% if entries.has_previous %}
   <li>
@@ -70,7 +69,6 @@
   </li>
  {% endif %}
  </ul>
-</div>
 
 {% endblock %}
 

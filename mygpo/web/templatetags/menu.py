@@ -22,6 +22,7 @@ MENU_STRUCTURE = (
             ('/', _('Home')),
             ('/login/', _('Login')),
             ('/register/', _('Register')),
+            ('', _('Docs')),
             ('/contribute/', _('Contribute')),
             ('/developer/', _('Development')),
             ('/privacy/', _('Privacy Policy')),
@@ -33,9 +34,11 @@ MENU_STRUCTURE = (
             ('/search/', _('Search')),
             ('/missing/', _('Missing Podcast')),
             ('/lists/', _('Podcast Lists')),
-            ('/directory/+flattr', _('Flattr')),
             ('/user/subscriptions/', _('User subscriptions')),
             ('/suggestions/', _('Suggestions')),
+            ('', _('Features')),
+            ('/directory/+flattr', _('Flattr')),
+            ('/directory/+license', _('License')),
             ('', _('Toplists')),
             ('/toplist/', _('Podcasts')),
             ('/toplist/episodes', _('Episodes')),
@@ -109,9 +112,9 @@ def section_menu(selected, title=None):
                     title = title[:33] + '...'
                 caption = title
             if uri in HIDDEN_URIS:
-                items.append('<li class="active">%s</li>' % ugettext(caption))
+                items.append('<li class="active"><a href="">%s</a></li>' % ugettext(caption))
             elif uri == '':
-                items.append('<li class="nav-header">%s</li>' % ugettext(caption))
+                items.append('<li class="disabled nav-header"><a href="">%s</a></li>' % ugettext(caption))
             else:
                 items.append('<li class="active"><a href="%s">%s</a></li>' % \
                         (uri, ugettext(caption)))
@@ -120,7 +123,7 @@ def section_menu(selected, title=None):
                 continue
 
             if not uri:
-                items.append('<li class="nav-header">%s</li>' % ugettext(caption))
+                items.append('<li class="disabled nav-header"><a>%s</a></li>' % ugettext(caption))
             else:
                 items.append('<li><a href="%s">%s</a></li>' % (uri, ugettext(caption)))
 

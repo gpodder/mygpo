@@ -50,9 +50,18 @@ def overview(request):
     device_groups = request.user.get_grouped_devices()
     deleted_devices = request.user.inactive_devices
 
+    # create a "default" device
+    device = Device()
+    device_form = DeviceForm({
+        'name': device.name,
+        'type': device.type,
+        'uid': device.uid
+        })
+
     return render(request, 'devicelist.html', {
         'device_groups': device_groups,
         'deleted_devices': deleted_devices,
+        'device_form': device_form,
     })
 
 
@@ -106,11 +115,8 @@ def create(request):
     device_form = DeviceForm(request.POST)
 
     if not device_form.is_valid():
-
         messages.error(request, _('Please fill out all fields.'))
-
-        return HttpResponseRedirect(reverse('device-edit-new'))
-
+        return HttpResponseRedirect(reverse('devices'))
 
     device = Device()
     device.name = device_form.cleaned_data['name']
@@ -122,21 +128,12 @@ def create(request):
 
     except DeviceUIDException as e:
         messages.error(request, _(unicode(e)))
-
-        return render(request, 'device-create.html', {
-            'device': device,
-            'device_form': device_form,
-        })
+        return HttpResponseRedirect(reverse('devices'))
 
     except Unauthorized:
         messages.error(request, _("You can't use the same Device "
                    "ID for two devices."))
-
-        return render(request, 'device-create.html', {
-            'device': device,
-            'device_form': device_form,
-        })
-
+        return HttpResponseRedirect(reverse('devices'))
 
     return HttpResponseRedirect(reverse('device-edit', args=[device.uid]))
 
@@ -168,28 +165,6 @@ def update(request, device):
                        "ID for two devices."))
 
     return HttpResponseRedirect(reverse('device-edit', args=[uid]))
-
-
-@login_required
-@vary_on_cookie
-@cache_control(private=True)
-@allowed_methods(['GET'])
-def edit_new(request):
-
-    device = Device()
-
-    device_form = DeviceForm({
-        'name': device.name,
-        'type': device.type,
-        'uid': device.uid
-        })
-
-    return render(request, 'device-create.html', {
-        'device': device,
-        'device_form': device_form,
-    })
-
-
 
 
 @device_decorator

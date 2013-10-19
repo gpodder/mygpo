@@ -74,9 +74,7 @@ def episode(request, episode):
         podcasts_dict = {podcast.get_id(): podcast}
         episodes_dict = {episode._id: episode}
 
-        history = list(episode_state.get_history_entries())
-        HistoryEntry.fetch_data(user, history,
-                podcasts=podcasts_dict, episodes=episodes_dict)
+        has_history = bool(list(episode_state.get_history_entries()))
 
         played_parts = EpisodeHeatmap(podcast.get_id(),
                 episode._id, user._id, duration=episode.duration)
@@ -85,20 +83,13 @@ def episode(request, episode):
         can_flattr = user.get_wksetting(FLATTR_TOKEN) and episode.flattr_url
 
     else:
-        history = []
+        has_history = False
         is_fav = False
         played_parts = None
         devices = {}
         can_flattr = False
 
     is_publisher = check_publisher_permission(user, podcast)
-
-    chapters = []
-    for user_id, chapter in chapters_for_episode(episode._id):
-        chapter.is_own = user.is_authenticated() and \
-                         user_id == user._id
-        chapters.append(chapter)
-
 
     prev = podcast.get_episode_before(episode)
     next = podcast.get_episode_after(episode)
@@ -108,8 +99,7 @@ def episode(request, episode):
         'podcast': podcast,
         'prev': prev,
         'next': next,
-        'history': history,
-        'chapters': chapters,
+        'has_history': has_history,
         'is_favorite': is_fav,
         'played_parts': played_parts,
         'actions': EPISODE_ACTION_TYPES,
@@ -121,51 +111,32 @@ def episode(request, episode):
 
 @never_cache
 @login_required
-def add_chapter(request, episode):
-    e_state = episode_state_for_user_episode(request.user, episode)
+@vary_on_cookie
+@cache_control(private=True)
+def history(request, episode):
+    """ shows the history of the episode """
 
+    user = request.user
     podcast = podcast_by_id(episode.podcast)
+    episode_state = episode_state_for_user_episode(user, episode)
 
-    try:
-        start = parse_time(request.POST.get('start', '0'))
+    # pre-populate data for fetch_data
+    podcasts_dict = {podcast.get_id(): podcast}
+    episodes_dict = {episode._id: episode}
 
-        if request.POST.get('end', '0'):
-            end = parse_time(request.POST.get('end', '0'))
-        else:
-            end = start
+    history = list(episode_state.get_history_entries())
+    HistoryEntry.fetch_data(user, history,
+            podcasts=podcasts_dict, episodes=episodes_dict)
 
-        adv = 'advertisement' in request.POST
-        label = request.POST.get('label')
+    devices = dict( (d.id, d.name) for d in user.devices )
 
-    except ValueError as e:
-        messages.error(request,
-                _('Could not add Chapter: {msg}'.format(msg=str(e))))
-
-        return HttpResponseRedirect(get_episode_link_target(episode, podcast))
-
-
-    chapter = Chapter()
-    chapter.start = start
-    chapter.end = end
-    chapter.advertisement = adv
-    chapter.label = label
-
-    update_episode_chapters(e_state, add=[chapter])
-
-    return HttpResponseRedirect(get_episode_link_target(episode, podcast))
-
-
-@never_cache
-@login_required
-def remove_chapter(request, episode, start, end):
-    e_state = episode_state_for_user_episode(request.user, episode)
-
-    remove = (int(start), int(end))
-    update_episode_chapters(e_state, rem=[remove])
-
-    podcast = podcast_by_id(episode.podcast)
-
-    return HttpResponseRedirect(get_episode_link_target(episode, podcast))
+    return render(request, 'episode-history.html', {
+        'episode': episode,
+        'podcast': podcast,
+        'history': history,
+        'actions': EPISODE_ACTION_TYPES,
+        'devices': devices,
+    })
 
 
 @never_cache
@@ -310,15 +281,13 @@ def oldid_decorator(f):
     return _decorator
 
 show_slug_id            = slug_id_decorator(episode)
-add_chapter_slug_id     = slug_id_decorator(add_chapter)
-remove_chapter_slug_id  = slug_id_decorator(remove_chapter)
 toggle_favorite_slug_id = slug_id_decorator(toggle_favorite)
 add_action_slug_id      = slug_id_decorator(add_action)
 flattr_episode_slug_id  = slug_id_decorator(flattr_episode)
+episode_history_slug_id = slug_id_decorator(history)
 
 show_oldid            = oldid_decorator(episode)
-add_chapter_oldid     = oldid_decorator(add_chapter)
-remove_chapter_oldid  = oldid_decorator(remove_chapter)
 toggle_favorite_oldid = oldid_decorator(toggle_favorite)
 add_action_oldid      = oldid_decorator(add_action)
 flattr_episode_oldid  = oldid_decorator(flattr_episode)
+episode_history_oldid = oldid_decorator(history)

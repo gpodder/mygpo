@@ -319,28 +319,42 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
     @repeat_on_conflict()
     def subscribe(self, user, device):
+        """ subscribes user to the current podcast on one or more devices """
         from mygpo.db.couchdb.podcast_state import subscribe_on_device, \
             podcast_state_for_user_podcast
         state = podcast_state_for_user_podcast(user, self)
-        try:
-            subscribe_on_device(state, device)
-            subscription_changed.send(sender=self, user=user, device=device,
-                                      subscribed=True)
-        except Unauthorized as ex:
-            raise SubscriptionException(ex)
+
+        # accept devices, and also lists and tuples of devices
+        devices = device if isinstance(device, (list, tuple)) else [device]
+
+        for device in devices:
+
+            try:
+                subscribe_on_device(state, device)
+                subscription_changed.send(sender=self, user=user,
+                                          device=device, subscribed=True)
+            except Unauthorized as ex:
+                raise SubscriptionException(ex)
 
 
     @repeat_on_conflict()
     def unsubscribe(self, user, device):
+        """ unsubscribes user from the current podcast on one or more devices """
         from mygpo.db.couchdb.podcast_state import unsubscribe_on_device, \
             podcast_state_for_user_podcast
         state = podcast_state_for_user_podcast(user, self)
-        try:
-            unsubscribe_on_device(state, device)
-            subscription_changed.send(sender=self, user=user, device=device,
-                                      subscribed=False)
-        except Unauthorized as ex:
-            raise SubscriptionException(ex)
+
+        # accept devices, and also lists and tuples of devices
+        devices = device if isinstance(device, (list, tuple)) else [device]
+
+        for device in devices:
+
+            try:
+                unsubscribe_on_device(state, device)
+                subscription_changed.send(sender=self, user=user, device=device,
+                                          subscribed=False)
+            except Unauthorized as ex:
+                raise SubscriptionException(ex)
 
 
     def subscribe_targets(self, user):

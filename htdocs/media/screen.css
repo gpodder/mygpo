@@ -14,6 +14,10 @@ display: none;
     General
 *****************/
 
+body
+{
+    font-family: 'Source Sans Pro';
+}
 
 #logo
 {
@@ -23,13 +27,12 @@ display: none;
     z-index: 4000;
 }
 
-h1
+body h1
 {
-    font-size: 16pt;
-    font-family: 'Source Sans Pro', sans-serif;
-    font-weight: 700;
+    font-size: 3em;
+    font-family: 'Source Sans Pro ExtraLight', sans-serif;
+    font-weight: normal;
     margin-bottom: 0;
-    line-height: 25px;
 }
 
 h2
@@ -79,6 +82,10 @@ table.list tr:hover td {
     background-color: #eeeeee;
 }
 
+table.list tr.nohighlight:hover td {
+    background-color: inherit;
+}
+
 table.list th
 {
     text-align: left;
@@ -101,6 +108,12 @@ table td.numeric,
 table th.numeric
 {
     text-align: right;
+}
+
+table.list td.empty
+{
+    text-align: center;
+    font-size: .8em;
 }
 
 table.list tr.group
@@ -126,10 +139,29 @@ table form
     display: inline;
 }
 
+/* used for headers above a group of table rows */
 
-.description
+table.list th.group
 {
-    color: #666;
+    background-color: #999;
+    color: white;
+    text-align: center;
+}
+
+table.list th.group a
+{
+    color: white;
+}
+
+table.list th.group i
+{
+    font-size: .7em;
+}
+
+.description,
+.summary
+{
+    color: #222;
     hypens: auto;
     -webkit-hyphens: auto;
     -moz-hyphens: auto;
@@ -139,15 +171,32 @@ table form
 }
 
 
-div.description
+div.description,
+div.summary
 {
     margin-top: 1em;
+}
+
+.summary img
+{
+    display: none;
 }
 
 /* don't show images in the description of the podcast page */
 .first-episode img
 {
     display: none;
+}
+
+.first-episode div.description
+{
+    margin-top: .5em;
+}
+
+.first-episode h2
+{
+    margin-bottom: 0;
+    line-height: 1em;
 }
 
 div#podcastlogo
@@ -237,6 +286,11 @@ form.search input[type="submit"]
     display: inline;
 }
 
+form.internal
+{
+    display: none;
+}
+
 div.result img
 {
     float: left;
@@ -270,7 +324,7 @@ input.url
 
 .bar
 {
-    background-color: #333;
+    background-color: #777;
     color: white;
     float: left;
     text-align: left;
@@ -371,4 +425,200 @@ footer ul
 div.first-episode
 {
     margin-bottom: 2em;
+}
+
+
+
+/************************
+   Episode Lists
+*************************/
+
+div.episodes div.episode
+{
+    clear: left;
+}
+
+div.episode span.title
+{
+    font-size: 1.5em;
+    font-family: 'Source Sans Pro ExtraLight';
+    font-weight: bold;
+}
+
+div.episodes div.episode
+{
+    margin: 1.5em 0 1.5em 0;
+}
+
+div.episode div.description
+{
+    font-family: 'Source Sans Pro Light';
+}
+
+div.episodes div.description
+{
+    margin-top: 0;
+    max-height: 2.9em;
+    overflow: hidden;
+    text-overflow: ellipsis; /* why doesn't this work?! */
+}
+
+
+div.episode span.number
+{
+    display: inline;
+    font-size: 1.5em;
+    font-weight: bold;
+    font-family: 'Source Sans Pro Light';
+}
+
+
+div.episode div.listeners
+{
+    width: 8em;
+    float: right;
+    font-size: .7em;
+}
+
+div.episode span.released,
+div.episode span.status
+{
+    font-size: .7em;
+    font-weight: normal;
+}
+
+div.first-episode
+{
+    margin-top: 1.5em;
+}
+
+div.first-episode div.header
+{
+    font-size: 1.5em;
+}
+
+/*
+div.first-episode div.episode div.header a
+{
+    text-decoration: none;
+    color: black;
+}
+*/
+
+
+
+
+/* Sidebar Navigation */
+
+.sidebar-nav
+{
+    text-align: right;
+    border-right: thin solid #222;
+    margin-right: 1em;
+}
+
+.sidebar-nav a
+{
+    color: #222;
+}
+
+.nav-list > .active > a,
+.nav-list > .active > a:hover,
+.nav-list > .active > a:focus {
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+  background-color: #888;
+  color: #eee;
+}
+
+#content
+{
+    padding-top: 1em;
+}
+
+#tag-box form
+{
+    display: inline-block;
+}
+
+
+div.podcasts
+{
+    padding-top: 2em;
+}
+
+
+div.podcasts div.podcast
+{
+    overflow: hidden;
+    margin-bottom: 2em;
+    padding: .2em;
+}
+
+
+div.podcasts div.podcast div.logo
+{
+    float: left;
+    padding-right: .5em;
+}
+
+div.podcasts div.podcast div.actions
+{
+    float: right;
+    padding-left: .5em;
+    display: box;
+}
+
+div.podcasts div.podcast div.title
+{
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+div.podcasts div.podcast div.title a
+{
+    font-family: 'Source Sans Pro Light';
+    font-size: 1.9em;
+}
+
+div.podcasts div.podcast div.description
+{
+    text-overflow: ellipsis;
+    overflow: hidden;
+    margin-top: .5em;
+    height: 7em;
+}
+
+div.podcasts div.podcast div.actions a.btn,
+div.podcasts div.podcast div.actions button.btn
+
+{
+    display: none;
+    margin-bottom: 1em;
+    box-flex: 1;
+
+}
+
+div.podcasts div.podcast:hover div.actions a.btn,
+div.podcasts div.podcast:hover div.actions button.btn
+{
+    display: block;
+}
+
+/* http://stackoverflow.com/a/18330040/693140 */
+.nav > li.disabled.nav-header > a {
+    cursor: default;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.tab-pane
+{
+    padding-top: 1em;
+}
+
+.centered {
+    float: none;
+    margin: 0 auto;
 }

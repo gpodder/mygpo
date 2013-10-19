@@ -1,5 +1,6 @@
 import re
 import string
+import collections
 from datetime import datetime
 
 from django.views.decorators.cache import never_cache
@@ -235,6 +236,51 @@ TWITTER_CHARS = string.ascii_letters + string.digits + '_'
 def normalize_twitter(s):
     """ normalize user input that is supposed to be a Twitter handle """
     return "".join(i for i in s if i in TWITTER_CHARS)
+
+
+CCLICENSE = re.compile(r'http://(www\.)?creativecommons.org/licenses/([a-z-]+)/([0-9.]+)?/?')
+CCPUBLICDOMAIN = re.compile(r'http://(www\.)?creativecommons.org/licenses/publicdomain/?')
+LicenseInfo = collections.namedtuple('LicenseInfo', 'name version url')
+
+def license_info(license_url):
+    """ Extracts license information from the license URL
+
+    >>> i = license_info('http://creativecommons.org/licenses/by/3.0/')
+    >>> i.name
+    'CC BY'
+    >>> i.version
+    '3.0'
+    >>> i.url
+    'http://creativecommons.org/licenses/by/3.0/'
+
+    >>> iwww = license_info('http://www.creativecommons.org/licenses/by/3.0/')
+    >>> i.name == iwww.name and i.version == iwww.version
+    True
+
+    >>> i = license_info('http://www.creativecommons.org/licenses/publicdomain')
+    >>> i.name
+    'Public Domain'
+    >>> i.version is None
+    True
+
+    >>> i = license_info('http://example.com/my-own-license')
+    >>> i.name is None
+    True
+    >>> i.version is None
+    True
+    >>> i.url
+    'http://example.com/my-own-license'
+    """
+    m = CCLICENSE.match(license_url)
+    if m:
+        _, name, version = m.groups()
+        return LicenseInfo('CC %s' % name.upper(), version, license_url)
+
+    m = CCPUBLICDOMAIN.match(license_url)
+    if m:
+        return LicenseInfo('Public Domain', None, license_url)
+
+    return LicenseInfo(None, None, license_url)
 
 
 def check_restrictions(obj):

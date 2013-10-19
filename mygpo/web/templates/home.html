@@ -1,61 +1,31 @@
+{% extends "skeleton.html" %}
 {% load i18n %}
 {% load menu %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <title>{% trans "gpodder.net &mdash; discover and track your podcasts" %}</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="description" content="">
-        <meta name="author" content="">
+{% block title %}gpodder.net &mdash; discover and track your podcasts{% endblock %}
 
-        <!-- Le styles -->
-        <link href="{% static "css/bootstrap.css" %}" rel="stylesheet">
-        <style type="text/css">
-            body {
-                padding-top: 60px;
-                padding-bottom: 40px;
-            }
-            .sidebar-nav {
-                padding: 9px 0;
-            }
-        </style>
-        <link href="{% static "css/bootstrap-responsive.css" %}" rel="stylesheet">
-        <link href="{% static "css/font-awesome.css" %}" rel="stylesheet">
-        <link rel="stylesheet" href="{% static "screen.css" %}" type="text/css" />
-        <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700' rel='stylesheet' type='text/css'>
+{% block body %}
 
-        <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
-        <!--[if lt IE 9]>
-        <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-        <![endif]-->
-
-        <!-- Le fav and touch icons -->
-        <link rel="shortcut icon" href="/favicon.png">
-
-        {% block head %}{% endblock %}
-
-        {% if google_analytics_property_id %}
-        {% load googleanalytics %}
-        {{ google_analytics_property_id|google_analytics_async }}
-        {% endif %}
-
-    </head>
-
-    <body>
-
-        <div class="navbar navbar-fixed-top">
-            <div class="navbar-inner">
-                <div class="container">
-                    <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <div class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="btn navbar-btn" data-toggle="collapse" data-target=".navbar-collapse">
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </a>
-                    <a class="brand" href="/"><img id="inline_logo" src="{% static "gpoddernet_25.png" %}" alt="gpodder.net" /><span style="padding-left: 65px; padding-right: 10px;" >gpodder.net</span></a>
-                <div class="btn-group pull-right">
+                    <a class="navbar-brand" href="/"><img id="inline_logo" src="{% static "gpoddernet_25.png" %}" alt="gpodder.net" /><span style="padding-left: 65px; padding-right: 10px;" >gpodder.net</span></a>
+                </div>
+                <div class="navbar-collapse collapse">
+                        <ul class="nav navbar-nav">
+                            {% block mainmenu %}
+                            {{ "/"|main_menu }}
+                            {% endblock %}
+                        </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+                     <li class="dropdown">
                     {% if user.is_authenticated %}
                     <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
                         <i class="icon-user"></i> {{ user.username }}
@@ -77,23 +47,17 @@
                         <li><a href="{% url "register" %}">{% trans "Register" %}</a></li>
                     </ul>
                     {% endif %}
-                </div>
-                <div class="nav-collapse">
-                    <ul class="nav">
-                        {% block mainmenu %}
-                        {{ "/"|main_menu }}
-                        {% endblock %}
-                    </ul>
-                </div><!--/.nav-collapse -->
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
 
     <div class="container">
-        <div class="row-fluid">
-            <div class="span2">
+        <div class="row">
+            <div class="col-md-2">
             </div><!--/span-->
-            <div class="span10">
+            <div class="col-md-10">
 
                 {% if messages %}
                 {% for message in messages %}
@@ -104,8 +68,8 @@
                 {% endif %}
 
 
-                <div class="row-fluid">
-                    <div class="span12">
+                <div class="row">
+                    <div class="col-md-12">
                         {% block header %}
                         <h1>Discover and track your podcasts</h1>
                         {% endblock %}
@@ -113,8 +77,8 @@
                 </div>
 
 
-                <div class="row-fluid">
-                    <div class="span8" id="content">
+                <div class="row">
+                    <div class="col-md-8" id="content">
                         {% block content %}
 
                         <img style="float: right;" src="{% static "gpoddernet_228.png" %}" alt="gpodder.net" />
@@ -156,14 +120,14 @@
                     </div>
 
 
-                    <div class="span4" id="sidebar">
+                    <div class="col-md-4" id="sidebar">
                         {% block sidebar %}
                         {% endblock %}
                     </div>
                 </div>
 
 
-                <footer class="row-fluid">
+                <footer class="row">
 
                  {% block ads %}
                   {% if adsense_client %}
@@ -184,7 +148,7 @@
 
                         <hr />
 
-                        <div class="span1">
+                        <div class="col-md-1">
                             <ul>
                                 <li><strong>{% trans "Discover" %}</strong></li>
                                 <li><a href="{% url "directory-home" %}">{% trans "Directory" %}</a></li>
@@ -193,7 +157,7 @@
                             </ul>
                         </div>
 
-                        <div class="span1">
+                        <div class="col-md-1">
                             <ul>
                                 <li><strong>{% trans "Support" %}</strong></li>
                                 <li><a href="{% url "help" %}">{% trans "Docs" %}</a></li>
@@ -202,7 +166,7 @@
                             </ul>
                         </div>
 
-                        <div class="span1">
+                        <div class="col-md-1">
                             <ul>
                                 <li><strong>{% trans "Support&nbsp;Us" %}</strong></li>
                                 <li><a href="http://flattr.com/thing/2304/gpodder-net">{% trans "Flattr" %}</a></li>
@@ -211,7 +175,7 @@
                             </ul>
                         </div>
 
-                        <div class="span1">
+                        <div class="col-md-1">
                             <ul>
                                 <li><strong>{% trans "Follow" %}</strong></li>
                                 <li><a href="https://twitter.com/gpoddernet">{% trans "Twitter" %}</a></li>
@@ -220,7 +184,7 @@
                             </ul>
                         </div>
 
-                        <div class="span1">
+                        <div class="col-md-1">
                             <ul>
                                 <li><strong>{% trans "Develop" %}</strong></li>
                                 <li><a href="http://wiki.gpodder.org/wiki/Web_Services/API_2">{% trans "API" %}</a></li>
@@ -229,7 +193,7 @@
                             </ul>
                         </div>
 
-                        <div class="span1">
+                        <div class="col-md-1">
                             <ul>
                                 <li><strong>{% trans "Publish" %}</strong></li>
                                 <li><a href="{% url "publisher" %}">{% trans "Get&nbsp;Access" %}</a></li>
@@ -270,6 +234,4 @@
                 var feedback_widget = new GSFN.feedback_widget(feedback_widget_options);
             </script>
 
-      </body>
-
-</html>
+{% endblock %}

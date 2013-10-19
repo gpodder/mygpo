@@ -26,7 +26,7 @@
       <td>{% podcast_group_link podcast %}</td>
       <td>
        <form class="form-inline" method="post" action="{% podcast_link_target podcast "unsubscribe" device.uid %}?return_to=/device/{{ device.uid }}" >
-        <button class="btn btn-danger btn-small" type="submit">
+        <button class="btn btn-danger btn-sm" type="submit">
          <i class="icon-remove"></i> {% trans "Unsubscribe" %}
         </button>
        </form>
@@ -45,26 +45,26 @@
   <div class="btn-group">
 
    {% if subscriptions %}
-     <a class="btn" href="{% url "device-opml" device.uid %}">
+     <a class="btn btn-default" href="{% url "device-opml" device.uid %}">
       <i class="icon-download"></i>
       {% trans "Download OPML" %}
      </a>
 
-     <a class="btn" href="{% url "device-symbian-opml" device.uid %}">
+     <a class="btn btn-default" href="{% url "device-symbian-opml" device.uid %}">
       <i class="icon-download"></i>
       {% trans "OPML for Nokia Podcasting on Symbian " %}
      </a>
 
    {% endif %}
 
-   <a class="btn" href="{% url "device-history" device.uid %}">
+   <a class="btn btn-default" href="{% url "device-history" device.uid %}">
     <i class="icon-calendar"></i>
     {% trans "History" %}
    </a>
 
   {% if not device.deleted %}
 
-   <a class="btn" href="{% url "device-edit" device.uid %}">
+   <a class="btn btn-default" href="{% url "device-edit" device.uid %}">
     <i class="icon-edit"></i>
     {% trans "Configure" %}
    </a>
@@ -99,7 +99,7 @@
    <form action="{% url "device-sync" device.uid %}" method="POST">
     {% csrf_token %}
     {{ sync_form.as_p }}
-    <button class="btn" type="submit">{% trans "Synchronize" %}</button>
+    <button class="btn btn-default" type="submit">{% trans "Synchronize" %}</button>
    </form>
   {% endif %}
 

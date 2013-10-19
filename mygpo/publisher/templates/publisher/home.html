@@ -9,45 +9,67 @@
 {% block title %}{% trans "Podcasts Published by Me" %}{% endblock %}
 
 {% block header %}
- <h1>{% trans "Podcasts Published by Me" %}</h1>
+ <h1>{% trans "Publisher Area" %}</h1>
 {% endblock %}
 
 
 {% block content %}
 
- {% if not podcasts|length_is:"0" %}
- <table class="list">
-
-  {% for s in podcasts %}
-   <tr>
-    <td>{{ s|podcast_logo }}</td>
-    <td><a class="listlink" href="{% podcast_link_target s "podcast-publisher-detail" %}">{{ s.display_title|striptags }}</a></td>
-   </tr>
-  {% endfor %}
-  </table>
- {% endif %}
-
- <h2>{% trans "Update your podcasts" %}</h2>
- <p>{% trans "To update all of your published podcasts automatically, you can request the following URL" %}</p>
- <pre><a href="{% url "publisher-update" user.username %}?token={{ update_token }}">http://{{ site }}{% url "publisher-update" user.username %}?token={{ update_token }}</a></pre>
- <form action="{% url "publisher-new-update-token" user.username %}" method="post">
-  {% csrf_token %}
-  <button type="submit" class="btn">{% trans "Create a new token" %}</button>
- </form>
-
  {% if user.is_staff %}
-  <div class="well">
-   <h2>Staff Only</h2>
-   <p>{% trans "Go to the publisher page of any podcast by entering its feed URL" %}</p>
-   <form class="form-inline" action="{% url "podcast-publisher-search" %}" method="post">
-    {% csrf_token %}
-    <div class="input-prepend input-append">
-     <span class="add-on"><i class="icon-link"></i></span><input type="text" class="input-xlarge" name="url" id="id_url" />
-     <button class="btn" type="submit">{% trans "Go" %}</button>
-    </div>
-   </form>
+  <div class="panel panel-default">
+   <div class="panel-heading">
+    <h2 class="panel-title">{% trans "Staff only" %}</h2>
+   </div>
+   <div class="panel-body">
+    <p>{% trans "Go to the publisher page of any podcast by entering its feed URL" %}</p>
+    <form class="form-inline" action="{% url "podcast-publisher-search" %}" method="post">
+     {% csrf_token %}
+     <div class="input-group">
+      <span class="input-group-addon"><i class="icon-link"></i></span>
+      <input class="form-control" type="text" name="url" id="id_url" {% if q %}value="{{ q }}"{% endif %} placeholder="{% trans "http://" %}" autofocus="autofocus">
+      <span class="input-group-btn">
+       <button class="btn btn-primary" type="submit">{% trans "Go" %}</button>
+      </span>
+     </div>
+    </form>
+   </div>
   </div>
  {% endif %}
+
+ {% if not podcasts|length_is:"0" %}
+
+  <div class="panel panel-default">
+   <div class="panel-heading">
+    <h2 class="panel-title">{% trans "Published Podcasts" %}</h2>
+   </div>
+   <div class="panel-body">
+    <p>{% trans "You have publisher permissions for the following podcasts." %}</p>
+    <table class="table">
+     {% for s in podcasts %}
+      <tr>
+       <td>{{ s|podcast_logo }}</td>
+       <td><a class="listlink" href="{% podcast_link_target s "podcast-publisher-detail" %}">{{ s.display_title|striptags }}</a></td>
+      </tr>
+     {% endfor %}
+    </table>
+   </div>
+  </div>
+ {% endif %}
+
+
+  <div class="panel panel-default">
+   <div class="panel-heading">
+    <h2 class="panel-title">{% trans "Update podcasts" %}</h2>
+   </div>
+   <div class="panel-body">
+    <p>{% trans "To update all of your published podcasts automatically, you can request the following URL" %}</p>
+    <pre><a href="{% url "publisher-update" user.username %}?token={{ update_token }}">http://{{ site }}{% url "publisher-update" user.username %}?token={{ update_token }}</a></pre>
+    <form action="{% url "publisher-new-update-token" user.username %}" method="post">
+     {% csrf_token %}
+     <button type="submit" class="btn btn-default">{% trans "Create a new token" %}</button>
+    </form>
+   </div>
+  </div>
 
 {% endblock %}
 

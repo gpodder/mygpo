@@ -31,7 +31,8 @@ from mygpo.data.tasks import update_podcasts
 from mygpo.db.couchdb.user import get_user_by_id
 from mygpo.db.couchdb.podcast import get_podcast_languages, podcasts_by_id, \
          random_podcasts, podcasts_to_dict, podcast_for_url, \
-         get_flattr_podcasts, get_flattr_podcast_count
+         get_flattr_podcasts, get_flattr_podcast_count, get_license_podcasts, \
+         get_license_podcast_count
 from mygpo.db.couchdb.directory import category_for_tag
 from mygpo.db.couchdb.podcastlist import random_podcastlists, \
          podcastlist_count, podcastlists_by_rating
@@ -325,34 +326,74 @@ class AddPodcastStatus(TemplateView):
             })
 
 
-
-class FlattrPodcastList(View):
-    """ Lists podcasts that have Flattr payment URLs """
+class PodcastListView(TemplateView):
+    """ A generic podcast list view """
 
     @method_decorator(cache_control(private=True))
     @method_decorator(vary_on_cookie)
     def get(self, request, page_size=20):
 
+        page = self.get_page(request)
+        podcasts = self.get_podcasts( (page-1) * page_size, page_size)
+        podcast_count = self.get_podcast_count()
+
+        context = {
+            'podcasts': podcasts,
+            'page_list': self.get_page_list(page, page_size, podcast_count),
+            'current_page': page,
+            'max_subscribers': self.get_max_subscribers(podcasts),
+        }
+
+        context.update(self.other_context(request))
+
+        return self.render_to_response(context)
+
+
+    def get_podcasts(self, offset, limit):
+        """ must return a list of podcasts """
+        raise NotImplemented
+
+    def get_podcast_count():
+        """ must return the total number of podcasts """
+        raise NotImplemented
+
+    def other_context(self, request):
+        """ can return a dict of additional context data """
+        return {}
+
+    def get_page(self, request):
         # Make sure page request is an int. If not, deliver first page.
         try:
-            page = int(request.GET.get('page', '1'))
+            return int(request.GET.get('page', '1'))
         except ValueError:
-            page = 1
+            return 1
 
-        podcasts = get_flattr_podcasts( (page-1) * page_size, page_size)
-        podcast_count = get_flattr_podcast_count()
+    def get_page_list(self, page, page_size, podcast_count):
         num_pages = int(ceil(podcast_count / page_size))
-        page_list = get_page_list(1, num_pages, page, 15)
+        return get_page_list(1, num_pages, page, 15)
 
-        max_subscribers = max([p.subscriber_count() for p in podcasts] + [0])
+    def get_max_subscribers(self, podcasts):
+        return max([p.subscriber_count() for p in podcasts] + [0])
 
+
+class FlattrPodcastList(PodcastListView):
+    """ Lists podcasts that have Flattr payment URLs """
+
+    template_name = 'flattr-podcasts.html'
+    get_podcasts = staticmethod(get_flattr_podcasts)
+    get_podcast_count = staticmethod(get_flattr_podcast_count)
+
+    def other_context(self, request):
         user = request.user
-        flattr_auth = user.is_authenticated() and bool(user.get_wksetting(FLATTR_TOKEN))
+        return {
+            'flattr_auth': user.is_authenticated() and
+                           bool(user.get_wksetting(FLATTR_TOKEN))
+        }
 
-        return render(request, 'flattr-podcasts.html', {
-            'podcasts': podcasts,
-            'page_list': page_list,
-            'current_page': page,
-            'flattr_auth': flattr_auth,
-            'max_subscribers': max_subscribers,
-            })
+
+class LicensePodcastList(PodcastListView):
+    """ Lists podcasts that have license information """
+
+    template_name = 'directory/license-podcasts.html'
+    get_podcasts = staticmethod(get_license_podcasts)
+    get_podcast_count = staticmethod(get_license_podcast_count)

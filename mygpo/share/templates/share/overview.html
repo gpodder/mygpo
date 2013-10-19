@@ -31,8 +31,8 @@
      <img src="{% static "22x22/opml-icon.png" %}" class="action-button" /></a>
    </td>
    <td>
-    <button class="btn btn-small btn-link {% if not subscriptions_token %}disabled{% endif %}" {% if subscriptions_token %}type="submit" onclick="submitForm('subscriptions_private');"{% endif %}>{% trans "New Token" %}</button>
-    <a class="btn btn-small btn-link" href="{% url "privacy" %}">Privacy Settings</a>
+    <button class="btn btn-sm btn-link {% if not subscriptions_token %}disabled{% endif %}" {% if subscriptions_token %}type="submit" onclick="submitForm('subscriptions_private');"{% endif %}>{% trans "New Token" %}</button>
+    <a class="btn btn-sm btn-link" href="{% url "privacy" %}">Privacy Settings</a>
    </td>
   </tr>
 
@@ -46,8 +46,8 @@
     </a>
    </td>
    <td>
-    <button class="btn btn-small btn-link {% if not userpage_token %}disabled{% endif %}" {% if userpage_token %}type="submit" onclick="submitForm('userpage_private');"{% endif %}>{% trans "New Token" %}</button>
-    <a class="btn btn-small btn-link" href="{% url "account" %}#profile">
+    <button class="btn btn-sm btn-link {% if not userpage_token %}disabled{% endif %}" {% if userpage_token %}type="submit" onclick="submitForm('userpage_private');"{% endif %}>{% trans "New Token" %}</button>
+    <a class="btn btn-sm btn-link" href="{% url "account" %}#profile">
      {% trans "Settings" %}
     </a>
    </td>
@@ -73,13 +73,16 @@
     {% endif %}
    </td>
    <td>
-    <button class="btn btn-small btn-link {% if not favfeed_token %}disabled{% endif %}" {% if favfeed_token %}type="submit" onclick="submitForm('favfeed_private');"{% endif %}>{% trans "New Token" %}</button>
-    <a class="btn btn-small btn-link" href="{% url "favorites" %}">Edit Favorites</a>
+    <button class="btn btn-sm btn-link {% if not favfeed_token %}disabled{% endif %}" {% if favfeed_token %}type="submit" onclick="submitForm('favfeed_private');"{% endif %}>{% trans "New Token" %}</button>
+    <a class="btn btn-sm btn-link" href="{% url "favorites" %}">Edit Favorites</a>
    </td>
   </tr>
 
  </table>
 
+ <div class="alert alert-info">
+  {% trans "Private items are protected by a special token. Only those who know the exact link can access your content" %}
+ </div>
 
 
  <form id="subscriptions_public" method="post" action="{% url "subscriptions-public" %}">
@@ -119,15 +122,4 @@
         }
         -->
     </script>
-{% endblock %}
-
-
-
-{% block sidebar %}
-
- <div class="well">
-  <h4>{% trans "Private Items" %}</h4>
-  <p>{% trans "Private items are protected by a special token. Only those who know the exact link can access your content" %}</p>
- </div>
-
 {% endblock %}

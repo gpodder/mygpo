@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load podcasts %}
+{% load facebook %}
+{% load google %}
+{% load utils %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/podcast/"|main_menu }}{% endblock %}
+{% block sectionmenu %}
+ {% if podcast.title %}
+  {{ "/podcast/"|section_menu:podcast.title }}
+ {% else %}
+  {{ "/podcast/"|section_menu:"Unnamed Podcast" }}
+ {% endif %}
+{% endblock %}
+
+{% block head %}
+ {{ podcast|opengraph_podcast }}
+ {% google_plus_one_head %}
+{% endblock %}
+
+{% block title %}{{ podcast.title|default:"Unnamed Podcast"|striptags }}{% endblock %}
+
+{% block header %}
+
+   {% if podcast.logo_url %}
+    <div id="podcastlogo">
+     <a href="{% podcast_link_target podcast %}">
+      {{ podcast|podcast_logo_big }}
+     </a>
+    </div>
+   {% endif %}
+
+   <h1>
+    {% if podcast.title %}
+     {{ podcast.title|striptags }}
+    {% else %}
+     {% trans "Unnamed Podcast" %}
+    {%endif%}
+   </h1>
+
+   <small class="description">
+    {% if podcast.author %}{% trans "by" %}
+     {{ podcast.author|striptags }}
+    {% endif %}
+    {% if podcast.twitter %}
+     <a href="https://twitter.com/{{ podcast.twitter|striptags }}"><i class="icon-twitter"></i></a>
+    {% endif %}&middot;
+    <a href="{{podcast.url}}" title="{% trans "Feed" %}">
+     <i class="icon-rss"></i>
+    </a>
+    {% if podcast.link %}&middot;
+     <a href="{{podcast.link}}" title="{% trans "Website" %}">
+      <i class="icon-external-link"></i>
+     </a>
+    {% endif %}
+    {% if podcast.subscriber_count %}&middot;
+     {{ podcast.subscriber_count }} {% trans "subscribers" %}
+    {% endif %}
+   </small>
+
+   {% if related_podcasts %}
+    <div class="related-podcasts">
+     <form class="form-inline">
+      <select class="input-mini" id="relatedpodcasts">
+       {% for p in related_podcasts %}
+        {% if p.group_member_name == podcast.group_member_name %}
+         <option value="{% podcast_link_target p %}" selected="selected">{{ p.group_member_name }}</option>
+        {% else %}
+         <option value="{% podcast_link_target p %}">{{ p.group_member_name }}</option>
+        {% endif %}
+       {% endfor %}
+      </select>
+     </form>
+    </div>
+   {% endif %}
+
+   {% if podcast.description %}
+    <div class="description" {% if podcast.language %}lang="{{ podcast.language }}"{% endif %}>
+     {{ podcast.description|markdown }}
+    </div>
+   {% endif %}
+
+{% endblock %}
+
+
+{% block ads %}
+ {% comment %}disable ads on podcast pages{% endcomment %}
+{% endblock %}
+
+{% block javascript2 %}
+    <script type="text/javascript">
+        $(document).ready(function()
+        {
+            $("#relatedpodcasts").change(function()
+            {
+                window.location.href = $("#relatedpodcasts option:selected").val();
+            });
+        });
+    </script>
+{% endblock %}

@@ -4,6 +4,7 @@ from django import template
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext
 from django.core.urlresolvers import reverse
+from django.utils.html import strip_tags
 from django.contrib.staticfiles.storage import staticfiles_storage
 
 from mygpo.api.constants import DEVICE_TYPES
@@ -80,3 +81,23 @@ def device_link(device):
             name = device.name,
             icon = device_icon(device),
         )
+
+
+@register.filter
+def device_name(device):
+    """ returns the name of a single device """
+    return strip_tags(device.name or device.uid)
+
+
+@register.filter
+def devices_name(devices):
+    """ returns the name of a single device, or of a list of devices """
+    devices = devices if isinstance(devices, (list, tuple)) else [devices]
+    return ', '.join(device_name(device) for device in devices)
+
+
+@register.filter
+def devices_uids(devices):
+    """ returns a comma-separated list of UIDs of one or more devices """
+    devices = devices if isinstance(devices, (list, tuple)) else [devices]
+    return ','.join(device.uid for device in devices)

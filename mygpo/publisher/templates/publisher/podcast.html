@@ -45,7 +45,7 @@
 
   <div class="description">
    {% blocktrans with podcast.title as ptitle %}This is the publisher page of <strong>{{ ptitle }}</strong>. You can see some stats and provide additional data for the podcast page.{% endblocktrans %}
-   <a class="btn" href="{% podcast_link_target podcast %}">{% trans "Go to Podcast Page" %}</a>
+   <a class="btn btn-default" href="{% podcast_link_target podcast %}">{% trans "Go to Podcast Page" %}</a>
   </div>
 {% endblock %}
 
@@ -56,122 +56,132 @@
   <pre><a href="{{ podcast.url }}">{{ podcast.url }}</a></pre>
   <p>{% trans "Last update: " %}{{ podcast.last_update|naturaltime }}</p>
 
-  <form action="{% podcast_link_target podcast "podcast-publisher-update" %}" method="post">
+  <form class="form-inline" action="{% podcast_link_target podcast "podcast-publisher-update" %}" method="post">
    {% csrf_token %}
-   <button class="btn" type="submit">{% trans "Update now" %}</button>
+   <button class="btn btn-default" type="submit">{% trans "Update now" %}</button>
   </form>
+
 
   <h2>Additional Data</h2>
 
   <form class="form-horizontal" action="{% podcast_link_target podcast "podcast-publisher-save" %}" method="post">
    {% csrf_token %}
-   <div class="control-group">
-    <label class="control-label" for="inputTwitter">
+
+   <div class="form-group">
+    <label class="col-lg-2 control-label" for="inputTwitter">
      <i class="icon-twitter"></i> {% trans "Twitter" %}
     </label>
-    <div class="controls">
-     <div class="input-prepend">
-      <span class="add-on">@</span>
-      <input type="text" id="inputTwitter" name="twitter" placeholder="username" value="{{ podcast.twitter }}">
-     </div>
+
+    <div class="input-group col-lg-10">
+      <span class="input-group-addon">@</span>
+      <input type="text" class="form-control" id="inputTwitter" name="twitter" placeholder="username" value="{{ podcast.twitter }}">
     </div>
    </div>
-   <div class="control-group">
-    <div class="controls">
-     <button type="submit" class="btn">Save</button>
+
+
+   <div class="form-group">
+    <div class="col-lg-offset-2 col-lg-10">
+     <button type="submit" class="btn btn-default">{% trans "Save" %}</button>
     </div>
    </div>
+
   </form>
 
-  <div class="accordion" id="accordion-check">
    <h2>{% trans "Feed Check" %}</h2>
-   <div class="accordion-group">
 
-    <div class="accordion-heading">
-     <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion-check" href="#collapseFlattr">
-      <i class="icon-check{% if not podcast.flattr_url %}-empty{% endif %}"></i>
-      {% trans "Flattr" %}
-     </a>
-    </div>
-
-    <div id="collapseFlattr" class="accordion-body collapse">
-     <div class="accordion-inner">
-      <p>
-       {% blocktrans with site.domain as sitename %}{{ sitename }} supports <a href="https://flattr.com/">Flattr</a>. When you provide <a href="http://developers.flattr.net/feed/">payment URLs</a> in your podcast feed, your listeners can support you financially by flattring your content.{% endblocktrans %}
-      </p>
-      {% if podcast.flattr_url %}
-       <div class="alert alert-success">
-        {% blocktrans %} We discovered payment URLs in your pdocast feed. Your listeners can automatically flattr your content!{% endblocktrans %}
-       </div>
-      {% else %}
-       <div class="alert alert-warning">
-        {% blocktrans %}We did not find <a href="http://developers.flattr.net/feed/">payment URLs</a> in your pdocast feed. Add them so your listeners can support you!</a>{% endblocktrans %}
-       </div>
-      {% endif %}
+   <div class="panel-group" id="accordion">
+    <div class="panel panel-default">
+     <div class="panel-heading">
+      <h4 class="panel-title">
+       <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseFlattr">
+        <i class="icon-check{% if not podcast.flattr_url %}-empty{% endif %}"></i>
+         {% trans "Flattr" %}
+       </a>
+      </h4>
      </div>
-    </div>
 
-
-    <div class="accordion-heading">
-     <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion-check" href="#collapsePubSub">
-      <i class="icon-check{% if not pubsubscription %}-empty{% endif %}"></i>
-      {% trans "PubSubHubbub" %}
-     </a>
-    </div>
-
-
-    <div id="collapsePubSub" class="accordion-body collapse">
-     <div class="accordion-inner">
-      <p>
-       {% blocktrans with site.domain as sitename %}If you publish your podcast feed through a <a href="https://code.google.com/p/pubsubhubbub/">PubSubHubbu</a> hub, {{ sitename }} can immediatelly update your podcast when a new episode is released.{% endblocktrans %}
-      </p>
-      {% if pubsubscription and pubsubscription.mode == 'subscribe' %}
-       {% if pubsubscription.verified %}
+     <div id="collapseFlattr" class="panel-collapse collapse in">
+      <div class="panel-body">
+       <p>
+        {% blocktrans with site.domain as sitename %}{{ sitename }} supports <a href="https://flattr.com/">Flattr</a>. When you provide <a href="http://developers.flattr.net/feed/">payment URLs</a> in your podcast feed, your listeners can support you financially by flattring your content.{% endblocktrans %}
+       </p>
+       {% if podcast.flattr_url %}
         <div class="alert alert-success">
-         {% blocktrans with podcast.hub as hub %}Your podcast is published through <a href="{{ hub }}">{{ hub }}</a> and should update immediatelly for each new episode.{% endblocktrans %}
+         {% blocktrans %} We discovered payment URLs in your pdocast feed. Your listeners can automatically flattr your content!{% endblocktrans %}
         </div>
        {% else %}
         <div class="alert alert-warning">
-         {% blocktrans with podcast.hub as hub %}Your podcast is published through <a href="{{ hub }}">{{ hub }}</a> but our subscription has not yet been verified.{% endblocktrans %}
+         {% blocktrans %}We did not find <a href="http://developers.flattr.net/feed/">payment URLs</a> in your pdocast feed. Add them so your listeners can support you!</a>{% endblocktrans %}
         </div>
        {% endif %}
-      {% else %}
-       <div class="alert alert-warning">
-        {% blocktrans %}We did not find a hub in your podcast feed. Your feed is updated regularly, but there might be some delay until a new episode shows up on {{ sitename }}.{% endblocktrans %}
-       </div>
-      {% endif %}
+      </div>
      </div>
     </div>
 
+    <div class="panel panel-default">
+     <div class="panel-heading">
+      <h4 class="panel-title">
+       <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion-check" href="#collapsePubSub">
+        <i class="icon-check{% if not pubsubscription %}-empty{% endif %}"></i>
+        {% trans "PubSubHubbub" %}
+       </a>
+      </h4>
+     </div>
 
-    <div class="accordion-heading">
-     <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion-check" href="#collapseLicense">
-      <i class="icon-check{% if not podcast.license %}-empty{% endif %}"></i>
-      {% trans "License Information" %}
-     </a>
-    </div>
 
-
-    <div id="collapseLicense" class="accordion-body collapse">
-     <div class="accordion-inner">
-      <p>
-       {% blocktrans with site.domain as sitename %}You should include license information in your feed so that users and {{ sitename }} can know, under which conditions your content can be used.{% endblocktrans %}
-      </p>
-      {% if podcast.license %}
-       <div class="alert alert-success">
-        {% blocktrans with podcast.license as license %}We found the following license in your podcast: <a href="{{ license }}">{{ license }}</a>{% endblocktrans %}
-       </div>
-      {% else %}
-       <div class="alert alert-warning">
-        {% blocktrans %}We did not find a license in your podcast feed. Refer to <a href="https://github.com/gpodder/podcast-feed-best-practice/blob/master/podcast-feed-best-practice.md#license"> gPodder Podcast Feed Best Practice</a> on how to include license information.{% endblocktrans %}
-       </div>
-      {% endif %}
+     <div id="collapsePubSub" class="panel-collapse collapse">
+      <div class="panel-body">
+       <p>
+        {% blocktrans with site.domain as sitename %}If you publish your podcast feed through a <a href="https://code.google.com/p/pubsubhubbub/">PubSubHubbu</a> hub, {{ sitename }} can immediatelly update your podcast when a new episode is released.{% endblocktrans %}
+       </p>
+       {% if pubsubscription and pubsubscription.mode == 'subscribe' %}
+        {% if pubsubscription.verified %}
+         <div class="alert alert-success">
+          {% blocktrans with podcast.hub as hub %}Your podcast is published through <a href="{{ hub }}">{{ hub }}</a> and should update immediatelly for each new episode.{% endblocktrans %}
+         </div>
+        {% else %}
+         <div class="alert alert-warning">
+          {% blocktrans with podcast.hub as hub %}Your podcast is published through <a href="{{ hub }}">{{ hub }}</a> but our subscription has not yet been verified.{% endblocktrans %}
+         </div>
+        {% endif %}
+       {% else %}
+        <div class="alert alert-warning">
+         {% blocktrans %}We did not find a hub in your podcast feed. Your feed is updated regularly, but there might be some delay until a new episode shows up on {{ sitename }}.{% endblocktrans %}
+        </div>
+       {% endif %}
+      </div>
      </div>
     </div>
 
+    <div class="panel panel-default">
+     <div class="panel-heading">
+      <h4 class="panel-title">
+       <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion-check" href="#collapseLicense">
+        <i class="icon-check{% if not podcast.license %}-empty{% endif %}"></i>
+         {% trans "License Information" %}
+       </a>
+      </h4>
+     </div>
+
+     <div id="collapseLicense" class="panel-collapse collapse">
+      <div class="panel-body">
+       <p>
+        {% blocktrans with site.domain as sitename %}You should include license information in your feed so that users and {{ sitename }} can know, under which conditions your content can be used.{% endblocktrans %}
+       </p>
+       {% if podcast.license %}
+        <div class="alert alert-success">
+         {% blocktrans with podcast.license as license %}We found the following license in your podcast: <a href="{{ license }}">{{ license }}</a>{% endblocktrans %}
+        </div>
+       {% else %}
+        <div class="alert alert-warning">
+         {% blocktrans %}We did not find a license in your podcast feed. Refer to <a href="https://github.com/gpodder/podcast-feed-best-practice/blob/master/podcast-feed-best-practice.md#license"> gPodder Podcast Feed Best Practice</a> on how to include license information.{% endblocktrans %}
+        </div>
+       {% endif %}
+      </div>
+     </div>
+    </div>
 
    </div>
-  </div>
 
 
   <h2>Episodes</h2>
