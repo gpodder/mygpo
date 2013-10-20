@@ -95,7 +95,8 @@
  {% comment %}disable ads on podcast pages{% endcomment %}
 {% endblock %}
 
-{% block javascript2 %}
+{% block javascript %}
+    {{ block.super }}
     <script type="text/javascript">
         $(document).ready(function()
         {
