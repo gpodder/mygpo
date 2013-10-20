@@ -6,7 +6,11 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>{% block title %}{% endblock %} (gpodder.net)</title>
+        <title>
+         {% block titletag %}
+          {% block title %}{% endblock %} &mdash; gpodder.net
+         {% endblock %}
+        </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="">
         <meta name="author" content="">
