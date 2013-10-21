@@ -232,7 +232,8 @@ class PodcastUpdater(object):
             logger.info('Updating episode %d / %d', n, len(parsed_episodes))
             episode = episode_for_podcast_id_url(pid, url, create=True)
 
-            update_episode = get_episode_update_function(parsed, episode)
+            update_episode = get_episode_update_function(parsed, episode,
+                                                         podcast)
             changes.append((episode, update_episode))
 
         # determine which episodes have been found
@@ -310,7 +311,7 @@ def get_episode_url(parsed_episode):
     return None
 
 
-def get_episode_update_function(parsed_episode, episode):
+def get_episode_update_function(parsed_episode, episode, podcast):
     """ returns an update function that can be passed to bulk_save_retry """
 
     def update_episode(episode):
@@ -329,7 +330,8 @@ def get_episode_update_function(parsed_episode, episode):
         episode.author = parsed_episode.author or episode.author
         episode.duration = parsed_episode.duration or episode.duration
         episode.filesize = parsed_episode.files[0].filesize
-        episode.language = parsed_episode.language or episode.language
+        episode.language = parsed_episode.language or episode.language or \
+                                                      podcast.language
         episode.mimetypes = list(set(filter(None, [f.mimetype for f in parsed_episode.files])))
         episode.flattr_url = parsed_episode.flattr or episode.flattr_url
         episode.license = parsed_episode.license or episode.license
