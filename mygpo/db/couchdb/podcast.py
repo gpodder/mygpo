@@ -4,6 +4,7 @@ from datetime import datetime
 from collections import Counter
 
 from restkit import RequestFailed
+from couchdbkit import MultipleResultsFound
 
 from django.core.cache import cache
 
@@ -16,6 +17,9 @@ from mygpo.db.couchdb import get_main_database, get_userdata_database, \
     lucene_query
 from mygpo.db import QueryParameterMissing
 from mygpo.db.couchdb.utils import multi_request_view, is_couchdb_id
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 def podcast_slugs(base_slug):
@@ -313,14 +317,21 @@ def podcast_for_url(url, create=False):
     if podcast:
         return podcast
 
-    r = Podcast.view('podcasts/by_url',
+    _view = 'podcasts/by_url'
+    r = Podcast.view(_view,
             key=url,
             classes=[Podcast, PodcastGroup],
             include_docs=True
         )
 
     if r:
-        podcast_group = r.first()
+        try:
+            podcast_group = r.one()
+        except MultipleResultsFound as ex:
+            logger.exception('Multiple results found in %s with params %s',
+                             _view, r.params)
+            podcast_group = r.first()
+
         podcast = podcast_group.get_podcast_by_url(url)
 
         if podcast.needs_update:
