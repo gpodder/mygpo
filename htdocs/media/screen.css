@@ -16,7 +16,7 @@ display: none;
 
 body
 {
-    font-family: 'Source Sans Pro';
+    font-family: 'Source Sans Pro', sans-serif;
 }
 
 #logo
@@ -30,8 +30,8 @@ body
 body h1
 {
     font-size: 3em;
-    font-family: 'Source Sans Pro ExtraLight', sans-serif;
-    font-weight: normal;
+    font-family: 'Source Sans Pro';
+    font-weight: 200;
     margin-bottom: 0;
 }
 
@@ -441,8 +441,8 @@ div.episodes div.episode
 div.episode span.title
 {
     font-size: 1.5em;
-    font-family: 'Source Sans Pro ExtraLight';
-    font-weight: bold;
+    font-family: 'Source Sans Pro';
+    font-weight: 200;
 }
 
 div.episodes div.episode
@@ -452,7 +452,8 @@ div.episodes div.episode
 
 div.episode div.description
 {
-    font-family: 'Source Sans Pro Light';
+    font-family: 'Source Sans Pro';
+    font-weight: 300;
 }
 
 div.episodes div.description
@@ -468,8 +469,8 @@ div.episode span.number
 {
     display: inline;
     font-size: 1.5em;
-    font-weight: bold;
-    font-family: 'Source Sans Pro Light';
+    font-weight: 300;
+    font-family: 'Source Sans Pro';
 }
 
 
@@ -577,7 +578,8 @@ div.podcasts div.podcast div.title
 
 div.podcasts div.podcast div.title a
 {
-    font-family: 'Source Sans Pro Light';
+    font-family: 'Source Sans Pro';
+    font-weight: 300;
     font-size: 1.9em;
 }
 
