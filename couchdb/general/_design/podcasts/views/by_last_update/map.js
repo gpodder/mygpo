@@ -13,7 +13,7 @@ function(doc)
     {
         for(var n in doc.podcasts)
         {
-            podcast = doc.podcasts[n];
+            var podcast = doc.podcasts[n];
             searchPodcast(podcast, podcast.id);
         }
     }
