@@ -259,7 +259,7 @@ def podcasts_groups_by_id(ids):
 @cache_result(timeout=60*60)
 def podcast_for_oldid(oldid):
 
-    if not oldid:
+    if oldid is None:
         raise QueryParameterMissing('oldid')
 
     r = Podcast.view('podcasts/by_oldid',
