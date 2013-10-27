@@ -86,4 +86,6 @@ def license_name(license_url):
 def urlquote(s):
     """ makes urllib.quote_plus available as a template filter """
     import urllib
+    if isinstance(s, unicode):
+        s = s.encode('utf-8')
     return mark_safe(urllib.quote_plus(s))
