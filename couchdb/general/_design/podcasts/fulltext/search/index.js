@@ -13,16 +13,17 @@ function(doc)
     function searchPodcast(podcast, num_subscribers)
     {
         var d = new Document();
-        d.add(podcast.title);
 
-        for(var n in podcast.urls)
+        var boost = 0;
+
+        if(num_subscribers > 0)
         {
-            d.add(podcast.urls[n]);
+            /* Boost documents w/ more subscribers up to 1000 ^= .5 boost */
+            boost = Math.min(.5, num_subscribers / 2000);
         }
-        d.add(podcast.description);
 
-        d.add(num_subscribers, {"field":"subscribers", "type": "int"});
-
+        d.add(podcast.title, {"field": "title", "boost": 1.6+boost});
+        d.add(podcast.description, {"field": "description", "boost": 1+boost});
         return d;
     }
 

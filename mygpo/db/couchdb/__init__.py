@@ -1,3 +1,6 @@
+import itertools
+import shlex
+
 from operator import itemgetter
 from collections import namedtuple
 
@@ -94,3 +97,26 @@ def bulk_save_retry(obj_funs, db, reload_f=__default_reload):
     if errors:
         logger.warn('Errors at bulk-save: %s', errors)
         raise BulkException(errors)
+
+
+def lucene_query(fields, query_str):
+    """ returns a Lucene query string for the given fields and query string
+
+    >>> lucene_query(['title'], 'podcast show')
+    title:"podcast" OR title:"show"
+
+    >>> lucene_query(['a', 'b'], '"x y"')
+    a:"x y" OR b:"x y" asdfasdf
+    """
+
+    # split by whitespace, preserve quoted substrings
+    keywords = shlex.split(query_str)
+
+    # search all keywords in all fields
+    criteria = itertools.product(fields, keywords)
+
+    # build query str for each criterion
+    criteria_str = ['{field}:"{q}"'.format(field=f, q=q) for f, q in criteria]
+
+    # combine all with OR
+    return ' OR '.join(criteria_str)

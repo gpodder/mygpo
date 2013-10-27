@@ -12,7 +12,8 @@ from mygpo.core.signals import incomplete_obj
 from mygpo.decorators import repeat_on_conflict
 from mygpo.cache import cache_result
 from mygpo.utils import get_timestamp
-from mygpo.db.couchdb import get_main_database, get_userdata_database
+from mygpo.db.couchdb import get_main_database, get_userdata_database, \
+    lucene_query
 from mygpo.db import QueryParameterMissing
 from mygpo.db.couchdb.utils import multi_request_view, is_couchdb_id
 
@@ -608,8 +609,8 @@ def search(q, offset=0, num_results=20):
 
     db = get_main_database()
 
-    #FIXME current couchdbkit can't parse responses for multi-query searches
-    q = q.replace(',', '')
+    FIELDS = ['title', 'description']
+    q = lucene_query(FIELDS, q)
 
     try:
         res = db.search('podcasts/search',
@@ -619,7 +620,7 @@ def search(q, offset=0, num_results=20):
                 stale        = 'update_after',
                 skip         = offset,
                 q            = q,
-                sort='\\subscribers<int>')
+            )
 
         podcasts = list(res)
 
