@@ -38,7 +38,7 @@ from mygpo.utils import file_hash, deep_eq
 from mygpo.web.logo import CoverArt
 from mygpo.data.podcast import subscribe_at_hub
 from mygpo.db.couchdb.episode import episode_for_podcast_id_url, \
-         episodes_for_podcast_current
+         episodes_for_podcast_current, episode_count_for_podcast
 from mygpo.db.couchdb.podcast import podcast_for_url, reload_podcast
 from mygpo.directory.tags import update_category
 from mygpo.decorators import repeat_on_conflict
@@ -171,7 +171,8 @@ class PodcastUpdater(object):
 
         if eps:
             podcast.latest_episode_timestamp = eps[-1].released
-            podcast.episode_count = len(eps)
+
+        podcast.episode_count = episode_count_for_podcast(podcast)
 
 
         self._update_categories(podcast, prev_latest_episode_timestamp)
