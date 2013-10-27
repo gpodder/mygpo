@@ -20,6 +20,16 @@ from mygpo.web.logo import CoverArt
 from mygpo.core.signals import *
 
 
+# default podcast update interval in hours
+DEFAULT_UPDATE_INTERVAL = 7 * 24
+
+# minium podcast update interval in hours
+MIN_UPDATE_INTERVAL = 5
+
+# every podcast should be updated at least once a month
+MAX_UPDATE_INTERVAL = 24 * 30
+
+
 class SubscriptionException(Exception):
     pass
 
@@ -177,6 +187,8 @@ class Podcast(Document, SlugMixin, OldIdMixin):
     hub = StringProperty()
     license = StringProperty()
 
+    # avg time between podcast updates (eg new episodes) in hours
+    update_interval = IntegerProperty(default=DEFAULT_UPDATE_INTERVAL)
 
 
     def get_podcast_by_id(self, id, current_id=False):

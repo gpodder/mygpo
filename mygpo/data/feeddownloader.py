@@ -29,6 +29,8 @@ from django.conf import settings
 
 from mygpo.core.slugs import assign_missing_episode_slugs, assign_slug, \
          PodcastSlug
+from mygpo.core.models import DEFAULT_UPDATE_INTERVAL, MIN_UPDATE_INTERVAL, \
+    MAX_UPDATE_INTERVAL
 from feedservice.parse import parse_feed, FetchFeedException
 from feedservice.parse.text import ConvertMarkdown
 from feedservice.parse.models import ParserException
@@ -164,6 +166,9 @@ class PodcastUpdater(object):
         # latest episode timestamp
         eps = filter(lambda e: bool(e.released), episodes)
         eps = sorted(eps, key=lambda e: e.released)
+
+        podcast.update_interval = get_update_interval(eps)
+
         if eps:
             podcast.latest_episode_timestamp = eps[-1].released
             podcast.episode_count = len(eps)
@@ -357,3 +362,29 @@ def mark_outdated(obj):
     obj.outdated = True
     obj.last_update = datetime.utcnow()
     return obj
+
+
+def get_update_interval(episodes):
+    """ calculates the avg interval between new episodes """
+
+    count = len(episodes)
+    if count <= 1:
+        logger.info('%d episodes, using default interval of %dh',
+            count, DEFAULT_UPDATE_INTERVAL)
+        return DEFAULT_UPDATE_INTERVAL
+
+    earliest = episodes[0]
+    latest   = episodes[-1]
+
+    timespan_s = (latest.released - earliest.released).total_seconds()
+    timespan_h = timespan_s / 60 / 60
+
+    interval = int(timespan_h / count)
+    logger.info('%d episodes in %d days => %dh interval', count,
+        timespan_h / 24, interval)
+
+    # place interval between {MIN,MAX}_UPDATE_INTERVAL
+    interval = max(interval, MIN_UPDATE_INTERVAL)
+    interval = min(interval, MAX_UPDATE_INTERVAL)
+
+    return interval

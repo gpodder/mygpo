@@ -1,6 +1,6 @@
 from itertools import chain, islice
 
-from mygpo.core.models import Podcast
+from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.core.proxy import proxy_object
 from mygpo.db.couchdb.episode import episodes_for_podcast
 from mygpo.utils import sorted_chain
@@ -44,3 +44,15 @@ class PodcastSet(set):
 def lazy_call(f, *args, **kwargs):
     for x in f(*args, **kwargs):
         yield x
+
+
+def individual_podcasts(pg):
+    """ returns individual podcasts for an iter of Podcast(Group) objects """
+
+    for p in pg:
+        if isinstance(p, Podcast):
+            yield p
+
+        elif isinstance(p, PodcastGroup):
+            for x in p.podcasts:
+                yield x

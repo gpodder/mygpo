@@ -391,6 +391,22 @@ def podcasts_by_last_update(limit=100):
     return map(_wrap_podcast_group_key1, res)
 
 
+def podcasts_by_next_update(limit=100):
+    """ Returns the podcasts that are due for an update next """
+
+    res = Podcast.view('podcasts/by_next_update',
+            include_docs = True,
+            stale        = 'update_after',
+            wrap_doc     = False,
+            limit        = limit,
+        )
+
+    # TODO: this method is only used for retrieving podcasts to update;
+    #       should we really send 'incomplete_obj' signals here?
+
+    return map(_wrap_podcast_group_key1, res)
+
+
 
 
 def all_podcasts():
@@ -454,12 +470,12 @@ def podcasts_to_dict(ids, use_cache=False):
 
 
 
-def podcasts_need_update():
+def podcasts_need_update(limit=100):
     db = get_main_database()
     res = db.view('episodes/need_update',
             group_level = 1,
             reduce      = True,
-            limit       = 100,
+            limit       = limit,
         )
 
     # TODO: this method is only used for retrieving podcasts to update;
