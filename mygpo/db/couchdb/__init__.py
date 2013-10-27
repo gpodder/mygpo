@@ -109,8 +109,14 @@ def lucene_query(fields, query_str):
     a:"x y" OR b:"x y" asdfasdf
     """
 
-    # split by whitespace, preserve quoted substrings
-    keywords = shlex.split(query_str)
+    try:
+        # split by whitespace, preserve quoted substrings
+        keywords = shlex.split(query_str)
+
+    except ValueError:
+        # No closing quotation
+        query_str = query_str.replace('"', '').replace("'", '')
+        keywords = shlex.split(query_str)
 
     # search all keywords in all fields
     criteria = itertools.product(fields, keywords)
