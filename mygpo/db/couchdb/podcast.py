@@ -377,11 +377,12 @@ def random_podcasts(language='', chunk_size=5):
 
 
 
-def podcasts_by_last_update():
+def podcasts_by_last_update(limit=100):
     res = Podcast.view('podcasts/by_last_update',
             include_docs = True,
             stale        = 'update_after',
             wrap_doc     = False,
+            limit        = limit,
         )
 
     # TODO: this method is only used for retrieving podcasts to update;
