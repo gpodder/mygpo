@@ -598,7 +598,11 @@ class User(BaseUser, SyncedDevicesMixin, SettingsMixin):
         podcasts = podcasts_to_dict(podcast_ids)
 
         for state in states:
-            podcast = proxy_object(podcasts[state.podcast], url=state.ref_url)
+            podcast = podcasts.get(state.podcast, None)
+            if podcast is None:
+                continue
+
+            podcast = proxy_object(podcast, url=state.ref_url)
             podcasts[state.podcast] = podcast
 
         return podcasts.values()
