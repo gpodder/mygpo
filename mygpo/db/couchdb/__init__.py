@@ -1,12 +1,12 @@
 import itertools
-import shlex
 
 from operator import itemgetter
 from collections import namedtuple
 
 from couchdbkit.ext.django import loading
-
 from couchdbkit import *
+
+from mygpo.utils import split_quoted
 
 import logging
 logger = logging.getLogger(__name__)
@@ -103,20 +103,13 @@ def lucene_query(fields, query_str):
     """ returns a Lucene query string for the given fields and query string
 
     >>> lucene_query(['title'], 'podcast show')
-    title:"podcast" OR title:"show"
+    'title:"podcast" OR title:"show"'
 
     >>> lucene_query(['a', 'b'], '"x y"')
-    a:"x y" OR b:"x y" asdfasdf
+    'a:"x y" OR b:"x y"'
     """
 
-    try:
-        # split by whitespace, preserve quoted substrings
-        keywords = shlex.split(query_str)
-
-    except ValueError:
-        # No closing quotation
-        query_str = query_str.replace('"', '').replace("'", '')
-        keywords = shlex.split(query_str)
+    keywords = split_quoted(query_str)
 
     # search all keywords in all fields
     criteria = itertools.product(fields, keywords)

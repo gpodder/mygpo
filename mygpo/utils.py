@@ -32,6 +32,7 @@ import urlparse
 import urllib
 import urllib2
 import zlib
+import shlex
 
 from django.conf import settings
 
@@ -1001,3 +1002,30 @@ def partition(items, predicate=bool):
     a, b = itertools.tee((predicate(item), item) for item in items)
     return ((item for pred, item in a if not pred),
             (item for pred, item in b if pred))
+
+
+def split_quoted(s):
+    """ Splits a quoted string
+
+    >>> split_quoted('some "quoted text"') == ['some', 'quoted text']
+    True
+
+    >>> split_quoted('"quoted text') == ['quoted', 'text']
+    True
+
+    # 4 quotes here are 2 in the doctest is one in the actual string
+    >>> split_quoted('text\\\\') == ['text']
+    True
+    """
+
+    try:
+        # split by whitespace, preserve quoted substrings
+        keywords = shlex.split(s)
+
+    except ValueError:
+        # No closing quotation (eg '"text')
+        # No escaped character (eg '\')
+        s = s.replace('"', '').replace("'", '').replace('\\', '')
+        keywords = shlex.split(s)
+
+    return keywords
