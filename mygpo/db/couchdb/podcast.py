@@ -422,14 +422,14 @@ def podcasts_by_next_update(limit=100):
     res = Podcast.view('podcasts/by_next_update',
             include_docs = True,
             stale        = 'update_after',
-            wrap_doc     = False,
             limit        = limit,
+            classes      = [Podcast, PodcastGroup],
         )
 
     # TODO: this method is only used for retrieving podcasts to update;
     #       should we really send 'incomplete_obj' signals here?
 
-    return map(_wrap_podcast_group_key1, res)
+    return list(res)
 
 
 
