@@ -26,7 +26,8 @@ from mygpo.cel import celery
 from mygpo.db.couchdb import get_main_database
 from mygpo.db.couchdb.user import activate_user
 from mygpo.db.couchdb.episode import episode_count, filetype_stats
-from mygpo.db.couchdb.podcast import podcast_count, podcast_for_url
+from mygpo.db.couchdb.podcast import podcast_count, podcast_for_url, \
+    podcast_duplicates_for_url
 
 
 class InvalidPodcast(Exception):
@@ -102,12 +103,14 @@ class MergeBase(AdminView):
             if not podcast_url:
                 continue
 
-            podcast = podcast_for_url(podcast_url)
+            ps = podcast_duplicates_for_url(podcast_url)
 
-            if not podcast:
+            if not ps:
                 raise InvalidPodcast(podcast_url)
 
-            podcasts.append(podcast_for_url(podcast_url))
+            for p in ps:
+                if p not in podcasts:
+                    podcasts.append(p)
 
         return podcasts
 

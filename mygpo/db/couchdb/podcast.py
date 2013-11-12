@@ -352,6 +352,20 @@ def podcast_for_url(url, create=False):
     return None
 
 
+def podcast_duplicates_for_url(url):
+
+    if not url:
+        raise QueryParameterMissing('url')
+
+    _view = 'podcasts/by_url'
+    r = Podcast.view(_view,
+            key          = url,
+            classes      = [Podcast, PodcastGroup],
+            include_docs = True,
+        )
+
+    for pg in r:
+        yield pg.get_podcast_by_url(url)
 
 
 def random_podcasts(language='', chunk_size=5):

@@ -32,7 +32,7 @@ class PodcastMerger(object):
             for m, podcast2 in enumerate(podcasts):
                 if podcast1 == podcast2 and n != m:
                     raise IncorrectMergeException(
-                        "can't merge podcast into itself")
+                        "can't merge podcast %s into itself %s" % (podcast1.get_id(), podcast2.get_id()))
 
         self.podcasts = podcasts
         self.actions = actions
