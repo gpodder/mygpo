@@ -56,7 +56,7 @@ class PodcastCommand(BaseCommand):
 
         if options.get('next'):
             podcasts = podcasts_by_next_update(limit=max_podcasts)
-            yield (p.url for p in podcasts)
+            yield (p.url for p in individual_podcasts(podcasts))
 
 
         if args:
