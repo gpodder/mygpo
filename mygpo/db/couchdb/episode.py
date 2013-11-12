@@ -386,7 +386,7 @@ def episode_count_for_podcast(podcast, since=None, until={}, **kwargs):
             **kwargs
         )
 
-    return res.one()['value']
+    return res.one()['value'] if res else 0
 
 
 def favorite_episode_ids_for_user(user):
