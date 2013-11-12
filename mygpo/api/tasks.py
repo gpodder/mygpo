@@ -1,9 +1,14 @@
+from celery.utils.log import get_task_logger
+
 from mygpo.cel import celery
 from mygpo.api.advanced import update_episodes
+
+logger = get_task_logger(__name__)
 
 
 @celery.task(max_retries=5, default_retry_delay=60)
 def import_episode_actions(user, actions, upload_ts, ua_string):
+    logger.info('Importing %d tasks for user %s', len(actions), user)
     update_episodes(user, actions, upload_ts, ua_string)
 
 # celery-based handler for episode-actions
