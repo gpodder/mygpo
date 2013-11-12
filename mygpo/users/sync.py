@@ -193,7 +193,7 @@ class SyncedDevicesMixin(DocumentSchema):
         The state is represented by the latest actions for each podcast """
 
         device_ids = self.sync_groups[group_index]
-        devices = [self.get_device(device_id) for device_id in device_ids]
+        devices = self.get_devices(device_ids)
 
         state = {}
 

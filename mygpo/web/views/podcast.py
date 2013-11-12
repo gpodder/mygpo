@@ -83,7 +83,7 @@ def show(request, podcast):
     if user.is_authenticated():
         state = podcast_state_for_user_podcast(user, podcast)
         subscribed_devices = state.get_subscribed_device_ids()
-        subscribed_devices = [user.get_device(x) for x in subscribed_devices]
+        subscribed_devices = user.get_devices(subscribed_devices)
 
         subscribe_targets = podcast.subscribe_targets(user)
 
@@ -361,7 +361,7 @@ def unsubscribe_all(request, podcast):
     state = podcast_state_for_user_podcast(user, podcast)
 
     dev_ids = state.get_subscribed_device_ids()
-    devs = [user.get_device(x) for x in dev_ids]
+    devs = user.get_devices(dev_ids)
     # ungroup groups
     devs = [dev[0] if isinstance(dev, list) else dev for dev in devs]
 

@@ -504,16 +504,27 @@ class User(BaseUser, SyncedDevicesMixin, SettingsMixin):
         return filter(deleted, self.devices)
 
 
-    def get_devices_by_id(self):
-        return dict( (device.id, device) for device in self.devices)
+    def get_devices_by_id(self, device_ids=None):
+        """ Returns a dict of {devices_id: device} """
+        if device_ids is None:
+            # return all devices
+            devices = self.devices
+        else:
+            devices = self.get_devices(device_ids)
+
+        return {device.id: device for device in devices}
 
 
     def get_device(self, id):
 
         if not hasattr(self, '__device_by_id'):
-            self.__devices_by_id = dict( (d.id, d) for d in self.devices)
+            self.__devices_by_id = self.get_devices_by_id()
 
         return self.__devices_by_id.get(id, None)
+
+
+    def get_devices(self, ids):
+        return filter(None, (self.get_device(dev_id) for dev_id in ids))
 
 
     def get_device_by_uid(self, uid, only_active=True):
