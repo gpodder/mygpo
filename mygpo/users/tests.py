@@ -17,11 +17,18 @@
 
 import unittest
 import doctest
+from collections import Counter
 
 from django.test import TestCase
+from django.test.utils import override_settings
 
 import mygpo.utils
+from mygpo.core.models import Podcast
+from mygpo.maintenance.merge import PodcastMerger
+from mygpo.api.backend import get_device
 from mygpo.users.models import User, Device
+from mygpo.db.couchdb.podcast import podcast_for_url
+from mygpo.db.couchdb.podcast_state import subscribed_podcast_ids_by_user_id
 
 
 class DeviceSyncTests(unittest.TestCase):
@@ -68,7 +75,48 @@ class DeviceSyncTests(unittest.TestCase):
         self.assertEquals(target, dev2)
 
 
+@override_settings(CACHE={})
+class UnsubscribeMergeTests(TestCase):
+    """ Test if merged podcasts can be properly unsubscribed
+
+    TODO: this test fails intermittently """
+
+    P2_URL = 'http://test.org/podcast/'
+
+    def setUp(self):
+        self.podcast1 = Podcast(urls=['http://example.com/feed.rss'])
+        self.podcast2 = Podcast(urls=[self.P2_URL])
+        self.podcast1.save()
+        self.podcast2.save()
+
+        self.user = User(username='test-merge')
+        self.user.email = 'test@example.com'
+        self.user.set_password('secret!')
+        self.user.save()
+
+        self.device = get_device(self.user, 'dev', '')
+
+    def test_merge_podcasts(self):
+        self.podcast2.subscribe(self.user, self.device)
+
+        # merge podcast2 into podcast1
+        pm = PodcastMerger([self.podcast1, self.podcast2], Counter(), [])
+        pm.merge()
+
+        # get podcast for URL of podcast2 and unsubscribe from it
+        p = podcast_for_url(self.P2_URL)
+        p.unsubscribe(self.user, self.device)
+
+        subscriptions = subscribed_podcast_ids_by_user_id(self.user._id)
+        self.assertEqual(0, len(subscriptions))
+
+    def cleanUp(self):
+        self.podcast1.delete()
+        self.user.delete()
+
+
 def suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(DeviceSyncTests))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(UnsubscribeMergeTests))
     return suite
