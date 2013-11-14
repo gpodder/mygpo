@@ -105,7 +105,7 @@ def subscriptions(request, username, device_uid):
             msg = (u'Could not decode subscription update POST data for ' +
                    'user %s: %s') % (username,
                    request.body.decode('ascii', errors='replace'))
-            logger.exception(msg)
+            logger.warn(msg, exc_info=True)
             return HttpResponseBadRequest(msg)
 
         add = actions['add'] if 'add' in actions else []
@@ -193,7 +193,7 @@ def episodes(request, username, version=1):
             msg = ('Could not decode episode update POST data for ' +
                    'user %s: %s') % (username,
                    request.body.decode('ascii', errors='replace'))
-            logger.exception(msg)
+            logger.warn(msg, exc_info=True)
             return HttpResponseBadRequest(msg)
 
         logger.info('start: user %s: %d actions from %s' % (request.user._id, len(actions), ua_string))
@@ -220,7 +220,8 @@ def episodes(request, username, version=1):
             return HttpResponseBadRequest(str(e))
 
         except InvalidEpisodeActionAttributes as e:
-            logger.exception('invalid episode action attributes while uploading episode actions for user %s' % (username,))
+            msg = 'invalid episode action attributes while uploading episode actions for user %s' % (username,)
+            logger.warn(msg, exc_info=True)
             return HttpResponseBadRequest(str(e))
 
         logger.info('done:  user %s: %d actions from %s' % (request.user._id, len(actions), ua_string))
@@ -450,7 +451,7 @@ def device(request, username, device_uid):
         msg = ('Could not decode device update POST data for ' +
                'user %s: %s') % (username,
                request.body.decode('ascii', errors='replace'))
-        logger.exception(msg)
+        logger.warn(msg, exc_info=True)
         return HttpResponseBadRequest(msg)
 
     if 'caption' in data:
