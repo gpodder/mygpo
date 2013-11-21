@@ -72,7 +72,7 @@ def subscribe(feedurl, huburl, base_url, mode='subscribe'):
     if resp:
         status = resp.code
         if status != 204:
-            logger.error('received incorrect status %d' % status)
+            logger.warn('received incorrect status %d' % status)
             raise SubscriptionError('Subscription has not been accepted by '
                                     'the Hub')
 
