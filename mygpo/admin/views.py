@@ -177,7 +177,7 @@ class MergeProcess(MergeBase):
                 episode_id = m.group(1)
                 features[episode_id] = feature
 
-        get_features = lambda (e_id, e): (features[e_id], e_id)
+        get_features = lambda (e_id, e): (features.get(e_id, e_id), e_id)
 
         num_groups = grouper.group(get_features)
 
