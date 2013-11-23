@@ -6,14 +6,14 @@ help:
 	@echo 'make unittest        run unittests'
 
 test:
-	./manage.py syncdb
-	./manage.py runserver
+	python manage.py syncdb
+	python manage.py runserver
 
 unittest:
-	./manage.py test
+	python manage.py test
 
 coverage:
-	coverage run --omit="/usr/*" ./manage.py test
+	coverage run --omit="/usr/*" manage.py test
 	coverage report -m
 	rm .coverage
 
