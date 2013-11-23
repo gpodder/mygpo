@@ -110,7 +110,7 @@ class UnsubscribeMergeTests(TestCase):
         subscriptions = subscribed_podcast_ids_by_user_id(self.user._id)
         self.assertEqual(0, len(subscriptions))
 
-    def cleanUp(self):
+    def tearDown(self):
         self.podcast1.delete()
         self.user.delete()
 
