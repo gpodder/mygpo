@@ -37,6 +37,7 @@ from feedservice.parse.models import ParserException
 from mygpo.utils import file_hash, deep_eq
 from mygpo.web.logo import CoverArt
 from mygpo.data.podcast import subscribe_at_hub
+from mygpo.pubsub.models import SubscriptionError
 from mygpo.db.couchdb.episode import episode_for_podcast_id_url, \
          episodes_for_podcast_current, episode_count_for_podcast
 from mygpo.db.couchdb.podcast import podcast_for_url, reload_podcast
@@ -188,7 +189,10 @@ class PodcastUpdater(object):
             podcast.save()
 
 
-        subscribe_at_hub(podcast)
+        try:
+            subscribe_at_hub(podcast)
+        except SubscriptionError as se:
+            logger.warn('subscribing to hub failed: %s', str(se))
 
         assign_slug(podcast, PodcastSlug)
         assign_missing_episode_slugs(podcast)
