@@ -16,3 +16,6 @@ mygpo/staticfiles/
 
 # virtualenv
 venv
+
+# test coverage
+.coverage
