@@ -3,6 +3,7 @@ from __future__ import division
 import hashlib
 import re
 from random import random
+from datetime import timedelta
 
 from couchdbkit.ext.django.schema import *
 from restkit.errors import Unauthorized
@@ -112,7 +113,6 @@ class Episode(Document, SlugMixin, OldIdMixin):
     def needs_update(self):
         """ Indicates if the object requires an updated from its feed """
         return not self.title and not self.outdated
-
 
     def __eq__(self, other):
         if other is None:
@@ -281,7 +281,6 @@ class Podcast(Document, SlugMixin, OldIdMixin):
             return None
 
         from mygpo.db.couchdb.episode import episodes_for_podcast
-        from datetime import timedelta
         nexts = episodes_for_podcast(self,
                 since=episode.released + timedelta(seconds=1), limit=1)
 
@@ -400,6 +399,9 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         """ Indicates if the object requires an updated from its feed """
         return not self.title and not self.outdated
 
+    @property
+    def next_update(self):
+        return self.last_update + timedelta(hours=self.update_interval)
 
     def __hash__(self):
         return hash(self.get_id())

@@ -2,6 +2,7 @@ import re
 import socket
 from itertools import count, chain
 from collections import Counter
+from datetime import datetime
 
 import django
 from django.shortcuts import render
@@ -27,7 +28,7 @@ from mygpo.db.couchdb import get_main_database
 from mygpo.db.couchdb.user import activate_user
 from mygpo.db.couchdb.episode import episode_count, filetype_stats
 from mygpo.db.couchdb.podcast import podcast_count, podcast_for_url, \
-    podcast_duplicates_for_url
+    podcast_duplicates_for_url, podcasts_by_next_update
 
 
 class InvalidPodcast(Exception):
@@ -66,6 +67,8 @@ class HostInfo(AdminView):
         else:
             num_celery_tasks = sum(len(node) for node in scheduled.values())
 
+        feed_queue_status = self._get_feed_queue_status()
+
         return self.render_to_response({
             'git_commit': commit,
             'git_msg': msg,
@@ -75,8 +78,16 @@ class HostInfo(AdminView):
             'main_db': main_db.uri,
             'db_tasks': db_tasks,
             'num_celery_tasks': num_celery_tasks,
+            'feed_queue_status': feed_queue_status,
         })
 
+    def _get_feed_queue_status(self):
+        now = datetime.utcnow()
+        next_podcast = podcasts_by_next_update(limit=1)[0]
+
+        delta = (next_podcast.next_update - now)
+        delta_mins = delta.total_seconds() / 60
+        return delta_mins
 
 
 class MergeSelect(AdminView):

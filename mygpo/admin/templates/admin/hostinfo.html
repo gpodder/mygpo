@@ -48,6 +48,17 @@
   </tr>
 
   <tr>
+   <td><strong>{% trans  "Feed Update Queue" %}</strong></td>
+   <td>
+    {% if feed_queue_status >= 0 %}
+     {{ feed_queue_status|floatformat:0 }} {% trans "min ahead" %}
+    {% else %}
+     {{ feed_queue_status|floatformat:0 }} {% trans "min behind" %}
+    {% endif %}
+   </td>
+  </tr>
+
+  <tr>
    <td><strong>{% trans "Scheduled Celery Tasks" %}</strong></td>
    <td><tt>{{ num_celery_tasks }}</tt></td>
   </tr>
