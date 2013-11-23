@@ -23,7 +23,7 @@ import urllib2
 import httplib
 import hashlib
 from datetime import datetime
-from itertools import chain
+from itertools import chain, islice
 
 from django.conf import settings
 
@@ -34,6 +34,7 @@ from mygpo.core.models import DEFAULT_UPDATE_INTERVAL, MIN_UPDATE_INTERVAL, \
 from feedservice.parse import parse_feed, FetchFeedException
 from feedservice.parse.text import ConvertMarkdown
 from feedservice.parse.models import ParserException
+from feedservice.parse.vimeo import VimeoError
 from mygpo.utils import file_hash, deep_eq
 from mygpo.web.logo import CoverArt
 from mygpo.data.podcast import subscribe_at_hub
@@ -48,6 +49,7 @@ from mygpo.db.couchdb import get_main_database, bulk_save_retry
 import logging
 logger = logging.getLogger(__name__)
 
+MAX_EPISODES_UPDATE=200
 
 class NoPodcastCreated(Exception):
     """ raised when no podcast obj was created for a new URL """
@@ -84,7 +86,13 @@ class PodcastUpdater(object):
             parsed = self._fetch_feed(podcast_url)
             self._validate_parsed(parsed)
 
-        except (ParserException, FetchFeedException, NoEpisodesException) as ex:
+        except (ParserException, FetchFeedException, NoEpisodesException,
+                VimeoError, ValueError) as ex:
+            #TODO: catch valueError (for invalid Ipv6 in feedservice)
+
+            if isinstance(ex, VimeoError):
+                logger.exception('Problem when updating Vimeo feed %s',
+                                 podcast_url)
 
             # if we fail to parse the URL, we don't even create the
             # podcast object
@@ -183,10 +191,11 @@ class PodcastUpdater(object):
         if not found:
             podcast.logo_url = None
 
-        if not deep_eq(old_json, podcast.to_json()):
-            logger.info('Saving podcast.')
-            podcast.last_update = datetime.utcnow()
-            podcast.save()
+        # The podcast is always saved (not just when there are changes) because
+        # we need to record the last update
+        logger.info('Saving podcast.')
+        podcast.last_update = datetime.utcnow()
+        podcast.save()
 
 
         try:
@@ -230,9 +239,11 @@ class PodcastUpdater(object):
 
         # list of (obj, fun) where fun is the function to update obj
         changes = []
-        logger.info('Parsed %d episodes', len(parsed_episodes))
+        episodes_to_update = list(islice(parsed_episodes, 0, MAX_EPISODES_UPDATE))
+        logger.info('Parsed %d (%d) episodes', len(parsed_episodes),
+                    len(episodes_to_update))
 
-        for n, parsed in enumerate(parsed_episodes, 1):
+        for n, parsed in enumerate(episodes_to_update, 1):
 
             url = get_episode_url(parsed)
             if not url:
@@ -248,15 +259,15 @@ class PodcastUpdater(object):
 
         # determine which episodes have been found
         updated_episodes = [e for (e, f) in changes]
-        logging.info('Updating %d episodes with new data', len(updated_episodes))
+        logger.info('Updating %d episodes with new data', len(updated_episodes))
 
         # and mark the remaining ones outdated
-        current_episodes = set(episodes_for_podcast_current(podcast, limit=100))
+        current_episodes = set(episodes_for_podcast_current(podcast, limit=500))
         outdated_episodes = current_episodes - set(updated_episodes)
-        logging.info('Marking %d episodes as outdated', len(outdated_episodes))
+        logger.info('Marking %d episodes as outdated', len(outdated_episodes))
         changes.extend((e, mark_outdated) for e in outdated_episodes)
 
-        logging.info('Saving %d changes', len(changes))
+        logger.info('Saving %d changes', len(changes))
         bulk_save_retry(changes, self.db)
 
         return updated_episodes
@@ -301,7 +312,7 @@ class PodcastUpdater(object):
 
         except (urllib2.HTTPError, urllib2.URLError, ValueError,
                 httplib.BadStatusLine) as e:
-            logger.warn('Exception while updating podcast: %s', str(e))
+            logger.warn('Exception while updating podcast logo: %s', str(e))
 
 
     @repeat_on_conflict(['podcast'], reload_f=reload_podcast)
@@ -331,7 +342,6 @@ def get_episode_update_function(parsed_episode, episode, podcast):
         old_json = copy.deepcopy(episode.to_json())
 
         episode.guid = parsed_episode.guid or episode.guid
-        episode.title = parsed_episode.title or episode.title
         episode.description = parsed_episode.description or episode.description
         episode.subtitle = parsed_episode.subtitle or episode.subtitle
         episode.content = parsed_episode.content or parsed_episode.description or episode.content
@@ -348,6 +358,9 @@ def get_episode_update_function(parsed_episode, episode, podcast):
 
         urls = list(chain.from_iterable(f.urls for f in parsed_episode.files))
         episode.urls = sorted(set(episode.urls + urls), key=len)
+
+        episode.title = parsed_episode.title or episode.title or \
+                        file_basename_no_extension(episode.url)
 
         # if nothing changed we return None to indicate no required action
         if deep_eq(old_json, episode.to_json()):
@@ -373,15 +386,15 @@ def get_update_interval(episodes):
     """ calculates the avg interval between new episodes """
 
     count = len(episodes)
-    if count <= 1:
-        logger.info('%d episodes, using default interval of %dh',
-            count, DEFAULT_UPDATE_INTERVAL)
+    if not count:
+        logger.info('no episodes, using default interval of %dh',
+            DEFAULT_UPDATE_INTERVAL)
         return DEFAULT_UPDATE_INTERVAL
 
     earliest = episodes[0]
-    latest   = episodes[-1]
+    now = datetime.utcnow()
 
-    timespan_s = (latest.released - earliest.released).total_seconds()
+    timespan_s = (now - earliest.released).total_seconds()
     timespan_h = timespan_s / 60 / 60
 
     interval = int(timespan_h / count)
@@ -393,3 +406,17 @@ def get_update_interval(episodes):
     interval = min(interval, MAX_UPDATE_INTERVAL)
 
     return interval
+
+
+def file_basename_no_extension(filename):
+    """ Returns filename without extension
+
+    >>> file_basename_no_extension('/home/me/file.txt')
+    'file'
+
+    >>> file_basename_no_extension('file')
+    'file'
+    """
+    base = os.path.basename(filename)
+    name, extension = os.path.splitext(base)
+    return name
