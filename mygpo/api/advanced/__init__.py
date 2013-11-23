@@ -17,7 +17,7 @@
 
 from functools import partial
 from itertools import imap
-from collections import defaultdict, namedtuple
+from collections import defaultdict
 from datetime import datetime
 from importlib import import_module
 
