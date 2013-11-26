@@ -31,14 +31,19 @@ from django.views.generic.base import View, TemplateView
 from django.utils.decorators import method_decorator
 from django.core.urlresolvers import reverse
 from django.utils.http import is_safe_url
-from mygpo.db.couchdb.user import user_by_google_email, set_users_google_email
 
+from oauth2client.client import FlowExchangeError
+
+from mygpo.db.couchdb.user import user_by_google_email, set_users_google_email
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.web.forms import RestorePasswordForm
 from mygpo.users.models import User
 from mygpo.web.forms import ResendActivationForm
 from mygpo.constants import DEFAULT_LOGIN_REDIRECT
 from mygpo.web.auth import get_google_oauth_flow
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 @repeat_on_conflict(['user'])
@@ -245,7 +250,14 @@ class GoogleLoginCallback(TemplateView):
             return HttpResponseRedirect(reverse('login'))
 
         flow = get_google_oauth_flow(request)
-        credentials = flow.step2_exchange(code)
+
+        try:
+            credentials = flow.step2_exchange(code)
+        except FlowExchangeError:
+            messages.error(_('Login with Google is currently not possible.'))
+            logger.exception('Login with Google failed')
+            return HttpResponseRedirect(reverse('login'))
+
         email = credentials.token_response['id_token']['email']
 
         # Connect account
