@@ -93,7 +93,7 @@ def create_subscriptionlist(request):
 
     subscription_list = {}
     for public, podcast_id, device_id in subscriptions:
-        device = devices[device_id]
+        device = devices.get(device_id)
         if not podcast_id in subscription_list:
             podcast = podcasts.get(podcast_id, None)
             if podcast is None:
