@@ -1,5 +1,6 @@
 from mygpo.pubsub.models import Subscription
 from mygpo.db.couchdb import get_pubsub_database
+from mygpo.decorators import repeat_on_conflict
 
 
 def subscription_for_topic(topic):
@@ -21,3 +22,11 @@ def subscription_for_topic(topic):
 
     else:
         return None
+
+
+@repeat_on_conflict(['subscription'])
+def set_subscription_verified(subscription):
+    """ marks the pubsub subscription as verified """
+    pdb = get_pubsub_database()
+    subscription.verified = True
+    pdb.save_doc(subscription)

@@ -15,7 +15,8 @@ from couchdbkit.ext.django import *
 from feedservice import urlstore
 from mygpo.pubsub.models import SubscriptionError, Subscription
 from mygpo.pubsub.signals import subscription_updated
-from mygpo.db.couchdb.pubsub import subscription_for_topic
+from mygpo.db.couchdb.pubsub import subscription_for_topic, \
+    set_subscription_verified
 
 logger = logging.getLogger(__name__)
 
@@ -59,8 +60,7 @@ class SubscribeView(View):
                 subscribe.verify_token)
             return HttpResponseNotFound()
 
-        subscription.verified = True
-        subscription.save()
+        set_subscription_verified(subscription)
 
         logger.info('subscription confirmed')
         return HttpResponse(challenge)
