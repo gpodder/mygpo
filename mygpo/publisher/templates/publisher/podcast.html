@@ -6,6 +6,7 @@
 {% load pcharts %}
 {% load static %}
 {% load menu %}
+{% load utils %}
 {% block mainmenu %}{{ "/publisher/"|main_menu }}{% endblock %}
 {% block sectionmenu %}{{ "/publisher/podcast/"|section_menu:podcast.title }}{% endblock %}
 
@@ -54,7 +55,13 @@
   <h2>Podcast Data</h2>
   <p>{% trans "The podcast information is regularly retrieved from the podcast feed" %}</p>
   <pre><a href="{{ podcast.url }}">{{ podcast.url }}</a></pre>
-  <p>{% trans "Last update: " %}{{ podcast.last_update|naturaltime }}</p>
+
+  <h3>{% trans "Timing" %}</h3>
+  <ul>
+   <li>{% trans "Last update:" %} {{ podcast.last_update|naturaltime }}</li>
+   <li>{% trans "Update interval:" %} {{ podcast.update_interval|hours_to_str }}</li>
+   <li>{% trans "Next update:" %} {{ podcast.next_update|naturaltime }}</li>
+  </ul>
 
   <form class="form-inline" action="{% podcast_link_target podcast "podcast-publisher-update" %}" method="post">
    {% csrf_token %}

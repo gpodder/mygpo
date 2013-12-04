@@ -1,7 +1,7 @@
 from django import template
 from django.utils.safestring import mark_safe
 
-from mygpo.web.utils import get_page_list, license_info
+from mygpo.web.utils import get_page_list, license_info, hours_to_str
 
 
 register = template.Library()
@@ -89,3 +89,6 @@ def urlquote(s):
     if isinstance(s, unicode):
         s = s.encode('utf-8')
     return mark_safe(urllib.quote_plus(s))
+
+
+hours_to_str = register.filter(hours_to_str)

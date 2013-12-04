@@ -3,6 +3,7 @@ import string
 import collections
 from datetime import datetime
 
+from django.utils.translation import ungettext
 from django.views.decorators.cache import never_cache
 from django.utils.html import strip_tags
 from django.core.urlresolvers import reverse
@@ -287,3 +288,43 @@ def check_restrictions(obj):
     """ checks for known restrictions of the object """
     if "hide" in obj.restrictions:
         raise Http404
+
+
+def hours_to_str(hours_total):
+    """ returns a human-readable string representation of some hours
+
+    >>> hours_to_str(1)
+    u'1 hour'
+
+    >>> hours_to_str(5)
+    u'5 hours'
+
+    >>> hours_to_str(100)
+    u'4 days, 4 hours'
+
+    >>> hours_to_str(960)
+    u'5 weeks, 5 days'
+
+    >>> hours_to_str(961)
+    u'5 weeks, 5 days, 1 hour'
+    """
+
+    weeks = hours_total / 24 / 7
+    days = hours_total / 24 % 7
+    hours = hours_total % 24
+
+    strs = []
+
+    if weeks:
+        strs.append(ungettext('%(weeks)d week', '%(weeks)d weeks', weeks) %
+            { 'weeks': weeks})
+
+    if days:
+        strs.append(ungettext('%(days)d day', '%(days)d days', days) %
+            { 'days': days})
+
+    if hours:
+        strs.append(ungettext('%(hours)d hour', '%(hours)d hours', hours) %
+            { 'hours': hours})
+
+    return ', '.join(strs)
