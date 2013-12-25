@@ -50,7 +50,7 @@ COUCHDB_DATABASES = {
         {'URL': 'http://127.0.0.1:5984/mygpo'},
 
     'mygpo.users':
-        {'URL': 'http://127.0.0.1:5984/mygpo'},
+        {'URL': 'http://127.0.0.1:5984/mygpo_users'},
 
     'mygpo.share':
         {'URL': 'http://127.0.0.1:5984/mygpo'},
@@ -62,13 +62,13 @@ COUCHDB_DATABASES = {
         {'URL': 'http://127.0.0.1:5984/mygpo_pubsub'},
 
     'django_couchdb_utils_auth':
-        {'URL': 'http://127.0.0.1:5984/mygpo'},
+        {'URL': 'http://127.0.0.1:5984/mygpo_users'},
 
     'django_couchdb_utils_sessions':
         {'URL': 'http://127.0.0.1:5984/mygpo_sessions'},
 
     'django_couchdb_utils_registration':
-        {'URL': 'http://127.0.0.1:5984/mygpo'},
+        {'URL': 'http://127.0.0.1:5984/mygpo_users'},
 
     'mygpo.categories':
         {'URL': 'http://127.0.0.1:5984/mygpo_categories'},
@@ -87,6 +87,7 @@ COUCHDB_DDOC_MAPPING = {
     'categories': 'categories',
     'pubsub':     'pubsub',
     'userdata':   'userdata',
+    'users':      'users',
 }
 
 # Local time zone for this installation. Choices can be found here:
