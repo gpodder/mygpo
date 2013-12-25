@@ -18,7 +18,7 @@
    {% for url in urls %}
     <div class="form-group">
      <label for="feed{{forloop.counter0}}">Feed URL {{ forloop.counter }}</label>
-     <input type="text" class="form-control" name="feed{{ forloop.counter0 }}" id="feed{{ forloop.counter0 }}" placeholder="" value="{{ url }}">
+     <input type="text" class="form-control" name="feed{{ forloop.counter0 }}" id="feed{{ forloop.counter0 }}" placeholder="" value="{{ url }}" {% if forloop.first %}autofocus="autofocus"{% endif %}>
     </div>
    {% endfor %}
     <input class="btn btn-default" type="submit" value="OK" />
