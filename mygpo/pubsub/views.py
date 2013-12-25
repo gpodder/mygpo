@@ -57,7 +57,7 @@ class SubscribeView(View):
 
         if subscription.verify_token != verify_token:
             logger.warn('invalid verify_token, %s expected' %
-                subscribe.verify_token)
+                subscription.verify_token)
             return HttpResponseNotFound()
 
         set_subscription_verified(subscription)
