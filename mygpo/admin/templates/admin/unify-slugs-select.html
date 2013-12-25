@@ -13,17 +13,15 @@
 {% endblock %}
 
 {% block content %}
- <form method="post" action="{% url "admin-unify-slugs" %}">
+ <form method="post" class="form-inline" action="{% url "admin-unify-slugs" %}" role="form">
   {% csrf_token %}
-  <table>
-    <tr>
-     <th>Feed URL</th>
-     <td><input type="text" name="feed" value="" /></td>
-    </tr>
-   <tr>
-    <td><input type="submit" value="OK" /></td>
-   </tr>
-  </table>
+  <div class="input-group">
+   <span class="input-group-addon"><i class="icon-link"></i></span>
+   <input type="text" class="form-control" name="feed" id="feed" value="" placeholder="Feed URL">
+   <span class="input-group-btn">
+    <button class="btn btn-primary" type="submit">{% trans "OK" %}</button>
+   </span>
+  </div>
  </form>
 
 {% endblock %}
