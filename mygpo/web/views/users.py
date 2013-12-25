@@ -254,7 +254,7 @@ class GoogleLoginCallback(TemplateView):
         try:
             credentials = flow.step2_exchange(code)
         except FlowExchangeError:
-            messages.error(_('Login with Google is currently not possible.'))
+            messages.error(request, _('Login with Google is currently not possible.'))
             logger.exception('Login with Google failed')
             return HttpResponseRedirect(reverse('login'))
 
