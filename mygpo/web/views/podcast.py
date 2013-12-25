@@ -57,7 +57,7 @@ def show_slug(request, slug):
 def show(request, podcast):
     """ Shows a podcast detail page """
 
-    check_restrictions(podcast)
+    podcast = check_restrictions(podcast)
 
     current_site = RequestSite(request)
     num_episodes = 20

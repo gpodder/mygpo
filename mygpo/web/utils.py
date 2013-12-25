@@ -289,6 +289,11 @@ def check_restrictions(obj):
     if "hide" in obj.restrictions:
         raise Http404
 
+    if "hide-author" in obj.restrictions:
+        obj.author = None
+
+    return obj
+
 
 def hours_to_str(hours_total):
     """ returns a human-readable string representation of some hours

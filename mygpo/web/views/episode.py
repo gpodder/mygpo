@@ -57,7 +57,7 @@ def episode(request, episode):
 
     podcast = podcast_by_id(episode.podcast)
 
-    check_restrictions(podcast)
+    podcast = check_restrictions(podcast)
 
     user = request.user
 
