@@ -123,9 +123,11 @@ def suggestions_for_user(user):
         raise QueryParameterMissing('user')
 
     from mygpo.users.models import Suggestions
-    r = Suggestions.view('suggestions/by_user',
+    db = get_main_database()
+    r = db.view('suggestions/by_user',
                 key          = user._id,
                 include_docs = True,
+                schema       = Suggestions,
             )
 
     if r:
