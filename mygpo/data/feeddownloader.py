@@ -24,6 +24,7 @@ import httplib
 import hashlib
 from datetime import datetime
 from itertools import chain, islice
+import socket
 
 from django.conf import settings
 
@@ -87,7 +88,7 @@ class PodcastUpdater(object):
             self._validate_parsed(parsed)
 
         except (ParserException, FetchFeedException, NoEpisodesException,
-                VimeoError, ValueError) as ex:
+                VimeoError, ValueError, socket.error) as ex:
             #TODO: catch valueError (for invalid Ipv6 in feedservice)
 
             if isinstance(ex, VimeoError):
@@ -311,7 +312,7 @@ class PodcastUpdater(object):
             return cover_art
 
         except (urllib2.HTTPError, urllib2.URLError, ValueError,
-                httplib.BadStatusLine) as e:
+                httplib.BadStatusLine, socket.error) as e:
             logger.warn('Exception while updating podcast logo: %s', str(e))
 
 
