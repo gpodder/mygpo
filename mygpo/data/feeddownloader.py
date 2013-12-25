@@ -121,7 +121,11 @@ class PodcastUpdater(object):
 
 
     def _fetch_feed(self, podcast_url):
+        import socket
+        t = socket.getdefaulttimeout()
+        socket.setdefaulttimeout(10)
         return parse_feed(podcast_url, text_processor=ConvertMarkdown())
+        socket.setdefaulttimeout(t)
 
 
 
