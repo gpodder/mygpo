@@ -24,7 +24,8 @@ class Command(BaseCommand):
 
 
     def handle(self, *args, **options):
-        db_urls = set(db['URL'] for db in settings.COUCHDB_DATABASES.values())
+        db_urls = set(args or
+            [db['URL'] for db in settings.COUCHDB_DATABASES.values()])
 
         filters = []
 
