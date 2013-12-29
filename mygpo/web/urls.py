@@ -1,6 +1,6 @@
 from django.conf.urls import *
 from django.contrib.auth.views import logout
-from django.views.generic.base import TemplateView
+from django.views.generic.base import TemplateView, RedirectView
 
 from django_couchdb_utils.registration.views import activate, register
 from django_couchdb_utils.registration.forms import RegistrationFormUniqueEmail
@@ -18,7 +18,8 @@ urlpatterns = patterns('mygpo.web.views',
  url(r'^tags/',                                                   'mytags',        name='tags'),
 
  url(r'^online-help',
-     TemplateView.as_view(template_name='online-help.html'),
+     RedirectView.as_view(
+         url='http://gpoddernet.readthedocs.org/en/latest/user/index.html'),
      name='help'),
 
  url(r'^developer/',
