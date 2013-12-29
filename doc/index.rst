@@ -20,6 +20,8 @@ Contents
 .. toctree::
    :maxdepth: 1
 
+   user/index
+   publisher/index
    api/index
    dev/index
    Translator Documentation <http://wiki.gpodder.org/wiki/Translations>
