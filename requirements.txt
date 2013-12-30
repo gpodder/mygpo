@@ -8,6 +8,7 @@ billiard==2.7.3.32
 celery==3.0.23
 celery-with-redis==3.0
 -e git+https://github.com/benoitc/couchdbkit.git@81070d350438076d76e712b70a1b8c0cdc2e51e7#egg=couchdbkit-dev
+coverage==3.7.1
 distribute==0.6.34
 django-celery==3.0.23
 django-couchdb-utils==0.5
