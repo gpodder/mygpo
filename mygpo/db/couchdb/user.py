@@ -4,7 +4,8 @@ from couchdbkit import ResourceNotFound
 
 from mygpo.cache import cache_result
 from mygpo.decorators import repeat_on_conflict
-from mygpo.db.couchdb import get_main_database, get_userdata_database
+from mygpo.db.couchdb import get_main_database, get_userdata_database, \
+    get_single_result
 from mygpo.users.settings import FLATTR_TOKEN, FLATTR_AUTO, FLATTR_MYGPO, \
          FLATTR_USERNAME
 from mygpo.db import QueryParameterMissing
@@ -49,14 +50,13 @@ def get_num_played_episodes(user, since=None, until={}):
     endkey   = [user._id, until_str]
 
     udb = get_userdata_database()
-    res = udb.view('listeners/by_user',
+    val = get_single_result(udb, 'listeners/by_user',
             startkey = startkey,
             endkey   = endkey,
             reduce   = True,
             stale    = 'update_after',
         )
 
-    val = res.one()
     return val['value'] if val else 0
 
 
@@ -104,14 +104,13 @@ def get_seconds_played(user, since=None, until={}):
     endkey   = [user._id, until_str]
 
     udb = get_userdata_database()
-    res = udb.view('listeners/times_played_by_user',
+    val = get_single_result(udb, 'listeners/times_played_by_user',
             startkey = startkey,
             endkey   = endkey,
             reduce   = True,
             stale    = 'update_after',
         )
 
-    val = res.one()
     return val['value'] if val else 0
 
 
@@ -124,19 +123,17 @@ def suggestions_for_user(user):
 
     from mygpo.users.models import Suggestions
     db = get_main_database()
-    r = db.view('suggestions/by_user',
+    s = get_single_result(db, 'suggestions/by_user',
                 key          = user._id,
                 include_docs = True,
                 schema       = Suggestions,
             )
 
-    if r:
-        return r.first()
-
-    else:
+    if not s:
         s = Suggestions()
         s.user = user._id
-        return s
+
+    return s
 
 
 @cache_result(timeout=60*60)

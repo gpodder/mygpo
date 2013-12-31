@@ -16,6 +16,7 @@ from mygpo.utils import get_timestamp
 from mygpo.db.couchdb import get_main_database, get_userdata_database, \
     lucene_query
 from mygpo.db import QueryParameterMissing
+from mygpo.db.couchdb import get_main_database, get_single_result
 from mygpo.db.couchdb.utils import multi_request_view, is_couchdb_id
 
 import logging
@@ -99,18 +100,15 @@ def podcast_by_id_uncached(podcast_id, current_id=False):
     if not podcast_id:
         raise QueryParameterMissing('podcast_id')
 
-    r = Podcast.view('podcasts/by_id',
+    db = get_main_database()
+    podcast = get_single_result(db, 'podcasts/by_id',
             key          = podcast_id,
-            classes      = [Podcast, PodcastGroup],
             include_docs = True,
+            wrapper      = _wrap_podcast_group_key1,
         )
 
-    if not r:
+    if not podcast:
         return None
-
-    podcast_group = r.first()
-
-    podcast = podcast_group.get_podcast_by_id(podcast_id, current_id)
 
     if podcast.needs_update:
         incomplete_obj.send_robust(sender=podcast)
@@ -142,29 +140,16 @@ def podcast_for_slug(slug):
     if not slug:
         raise QueryParameterMissing('slug')
 
-    r = Podcast.view('podcasts/by_slug',
+    db = get_main_database()
+    obj = get_single_result(db, 'podcasts/by_slug',
             startkey     = [slug, None],
             endkey       = [slug, {}],
             include_docs = True,
-            wrap_doc     = False,
+            wrapper      = _wrap_podcast_group_key1,
         )
 
-    if not r:
+    if not obj:
         return None
-
-    res = r.first()
-    doc = res['doc']
-    if doc['doc_type'] == 'Podcast':
-        obj = Podcast.wrap(doc)
-    else:
-        pid = res['key'][1]
-        pg = PodcastGroup.wrap(doc)
-
-        if pid == pg._id:
-            # TODO: we don't return PodcastGroups atm
-            return None
-
-        obj = pg.get_podcast_by_id(pid)
 
     if obj.needs_update:
         incomplete_obj.send_robust(sender=obj)
@@ -237,20 +222,10 @@ def podcasts_groups_by_id(ids):
         )
 
     for r in res:
-        doc = r['doc']
+        obj = _wrap_pg(r)
 
-        if not doc:
+        if not obj:
             yield None
-
-        if doc['doc_type'] == 'Podcast':
-            obj = Podcast.wrap(doc)
-
-        elif doc['doc_type'] == 'PodcastGroup':
-            obj = PodcastGroup.wrap(doc)
-
-        else:
-            logger.error('podcasts_groups_by_id retrieved unknown doc_type '
-                '"%s" for params %s', doc['doc_type'], res.params)
             continue
 
         if obj.needs_update:
@@ -266,17 +241,15 @@ def podcast_for_oldid(oldid):
     if oldid is None:
         raise QueryParameterMissing('oldid')
 
-    r = Podcast.view('podcasts/by_oldid',
+    db = get_main_database()
+    podcast = get_single_result(db, 'podcasts/by_oldid',
             key          = long(oldid),
-            classes      = [Podcast, PodcastGroup],
             include_docs = True,
+            wrapper      = _wrap_podcast_group_key1,
         )
 
-    if not r:
+    if not podcast:
         return None
-
-    podcast_group = r.first()
-    podcast = podcast_group.get_podcast_by_oldid(oldid)
 
     if podcast.needs_update:
         incomplete_obj.send_robust(sender=podcast)
@@ -290,15 +263,15 @@ def podcastgroup_for_oldid(oldid):
     if not oldid:
         raise QueryParameterMissing('oldid')
 
-    r = PodcastGroup.view('podcasts/groups_by_oldid',
+    db = get_main_database()
+    pg = get_single_result(db, 'podcasts/groups_by_oldid',
             key          = long(oldid),
             include_docs = True,
+            schema       = PodcastGroup,
         )
 
-    if not r:
+    if not pg:
         return None
-
-    pg = r.one()
 
     if pg.needs_update:
         incomplete_obj.send_robust(sender=pg)
@@ -317,21 +290,14 @@ def podcast_for_url(url, create=False):
     if podcast:
         return podcast
 
-    _view = 'podcasts/by_url'
-    r = Podcast.view(_view,
-            key=url,
-            classes=[Podcast, PodcastGroup],
-            include_docs=True
+    db = get_main_database()
+    podcast_group = get_single_result(db, 'podcasts/by_url',
+            key          = url,
+            include_docs = True,
+            wrapper      = _wrap_pg,
         )
 
-    if r:
-        try:
-            podcast_group = r.one()
-        except MultipleResultsFound as ex:
-            logger.exception('Multiple results found in %s with params %s',
-                             _view, r.params)
-            podcast_group = r.first()
-
+    if podcast_group:
         podcast = podcast_group.get_podcast_by_url(url)
 
         if podcast.needs_update:
@@ -350,6 +316,23 @@ def podcast_for_url(url, create=False):
         return podcast
 
     return None
+
+
+def _wrap_pg(doc):
+
+    doc = doc['doc']
+
+    if not doc:
+        return None
+
+    if doc['doc_type'] == 'Podcast':
+        return Podcast.wrap(doc)
+
+    elif doc['doc_type'] == 'PodcastGroup':
+        return PodcastGroup.wrap(doc)
+
+    else:
+        logger.error('received unknown doc_type "%s"', doc['doc_type'])
 
 
 def podcast_duplicates_for_url(url):
@@ -389,17 +372,9 @@ def random_podcasts(language='', chunk_size=5):
             break
 
         for r in res:
-
             # The view podcasts/random does not include incomplete podcasts,
             # so we don't need to send any 'incomplete_obj' signals here
-
-            obj = r['doc']
-            if obj['doc_type'] == 'Podcast':
-                yield Podcast.wrap(obj)
-
-            elif obj['doc_type'] == 'PodcastGroup':
-                yield PodcastGroup.wrap(obj)
-
+            yield _wrap_pg(r)
 
 
 def podcasts_by_last_update(limit=100):
@@ -537,8 +512,9 @@ def get_flattr_podcasts(offset=0, limit=20):
 @cache_result(timeout=60*60)
 def get_flattr_podcast_count():
     """ returns the number of podcasts that contain Flattr payment URLs """
-    r = list(Podcast.view('podcasts/flattr'))
-    return r[0]['value']
+    db = get_main_database()
+    r = get_single_result(db, 'podcasts/flattr')
+    return r['value']
 
 
 @cache_result(timeout=60*60)
@@ -575,9 +551,10 @@ def get_license_podcast_count(license_url=None):
     if license_url:
         kwargs['key'] = license_url
 
-    r = list(Podcast.view('podcasts/license', **kwargs))
+    db = get_main_database()
+    r = get_single_result(db, 'podcasts/license', **kwargs)
 
-    return r[0]['value'] if r else 0
+    return r['value'] if r else 0
 
 
 @cache_result(timeout=60*60)
@@ -597,16 +574,17 @@ def subscriberdata_for_podcast(podcast_id):
     if not podcast_id:
         raise QueryParameterMissing('podcast_id')
 
-    r = PodcastSubscriberData.view('podcasts/subscriber_data',
+    db = get_main_database()
+    data = get_single_result(db, 'podcasts/subscriber_data',
             key          = podcast_id,
             include_docs = True,
+            schema       = PodcastSubscriberData,
         )
 
-    if r:
-        return r.first()
+    if not data:
+        data = PodcastSubscriberData()
+        data.podcast = podcast_id
 
-    data = PodcastSubscriberData()
-    data.podcast = podcast_id
     return data
 
 

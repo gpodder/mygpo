@@ -3,7 +3,7 @@ from operator import itemgetter
 
 from mygpo.directory.models import Category
 from mygpo.db.couchdb import get_main_database, get_categories_database, \
-    get_userdata_database
+    get_userdata_database, get_single_result
 from mygpo.cache import cache_result
 from mygpo.db.couchdb.utils import multi_request_view
 from mygpo.db import QueryParameterMissing
@@ -15,20 +15,14 @@ def category_for_tag_uncached(tag):
         raise QueryParameterMissing('tag')
 
     db = get_categories_database()
-    r = db.view('categories/by_tags',
+    cat = get_single_result(db, 'categories/by_tags',
             key          = tag,
             include_docs = True,
             stale        = 'update_after',
             schema       = Category
         )
 
-    if r:
-        cat = r.first()
-        cat.set_db(db)
-        return cat
-
-    else:
-        return None
+    return cat
 
 
 category_for_tag = cache_result(timeout=60*60)(category_for_tag_uncached)

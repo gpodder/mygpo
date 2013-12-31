@@ -1,6 +1,6 @@
 from mygpo.users.models import PodcastUserState
 from mygpo.users.settings import PUBLIC_SUB_PODCAST, PUBLIC_SUB_USER
-from mygpo.db.couchdb import get_userdata_database
+from mygpo.db.couchdb import get_userdata_database, get_single_result
 from mygpo.cache import cache_result
 from mygpo.db import QueryParameterMissing
 from mygpo.decorators import repeat_on_conflict
@@ -75,7 +75,7 @@ def podcast_subscriber_count(podcast):
     subscriber_sum = 0
 
     for podcast_id in podcast.get_ids():
-        x = udb.view('subscribers/by_podcast',
+        x = get_single_result(udb, 'subscribers/by_podcast',
                 startkey    = [podcast_id, None],
                 endkey      = [podcast_id, {}],
                 reduce      = True,
@@ -83,7 +83,7 @@ def podcast_subscriber_count(podcast):
                 group_level = 1,
             )
 
-        subscriber_sum += x.one()['value'] if x else 0
+        subscriber_sum += x['value'] if x else 0
 
     return subscriber_sum
 
@@ -98,19 +98,14 @@ def podcast_state_for_user_podcast(user, podcast):
 
     udb = get_userdata_database()
 
-    r = udb.view('podcast_states/by_podcast',
+    p = get_single_result(udb, 'podcast_states/by_podcast',
                 key          = [podcast.get_id(), user._id],
                 limit        = 1,
                 include_docs = True,
                 schema       = PodcastUserState,
             )
 
-    if r:
-        state = r.first()
-        state.set_db(udb)
-        return state
-
-    else:
+    if not p:
         p = PodcastUserState()
         p.podcast = podcast.get_id()
         p.user = user._id
@@ -119,7 +114,7 @@ def podcast_state_for_user_podcast(user, podcast):
 
         p.set_device_state(user.devices)
 
-        return p
+    return p
 
 
 def podcast_states_for_user(user):

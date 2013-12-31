@@ -6,6 +6,7 @@ from mygpo.share.models import PodcastList
 from mygpo.cache import cache_result
 from mygpo.decorators import repeat_on_conflict
 from mygpo.db import QueryParameterMissing
+from mygpo.db.couchdb import  get_main_database, get_single_result
 from mygpo.db.couchdb.podcast import podcast_by_id
 
 
@@ -18,16 +19,14 @@ def podcastlist_for_user_slug(user_id, slug):
     if not slug:
         raise QueryParameterMissing('slug')
 
-    r = PodcastList.view('podcastlists/by_user_slug',
+    db = get_main_database()
+    l = get_single_result(db, 'podcastlists/by_user_slug',
             key          = [user_id, slug],
             include_docs = True,
+            schema       = PodcastList,
         )
 
-    if r:
-        l = r.one()
-        return l
-
-    return None
+    return l
 
 
 

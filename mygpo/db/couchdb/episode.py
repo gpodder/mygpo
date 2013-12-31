@@ -13,7 +13,8 @@ from mygpo.decorators import repeat_on_conflict
 from mygpo.utils import get_timestamp
 from mygpo.db import QueryParameterMissing
 from mygpo.db.couchdb.utils import is_couchdb_id
-from mygpo.db.couchdb import get_main_database, get_userdata_database
+from mygpo.db.couchdb import get_main_database, get_userdata_database, \
+    get_single_result
 from mygpo.db.couchdb.podcast import podcast_for_url, podcast_for_slug_id
 
 import logging
@@ -26,22 +27,24 @@ def episode_by_id(episode_id, current_id=False):
     if not episode_id:
         raise QueryParameterMissing('episode_id')
 
-    r = Episode.view('episodes/by_id',
+    db = get_main_database()
+
+    episode = get_single_result(db, 'episodes/by_id',
             key          = episode_id,
             include_docs = True,
+            schema       = Episode,
         )
 
-    if not r:
+    if not episode:
         return None
 
-    obj = r.one()
-    if current_id and obj._id != episode_id:
-        raise MergedIdException(obj, obj._id)
+    if current_id and episode._id != episode_id:
+        raise MergedIdException(episode, episode._id)
 
-    if obj.needs_update:
-        incomplete_obj.send_robust(sender=obj)
+    if episode.needs_update:
+        incomplete_obj.send_robust(sender=episode)
 
-    return obj
+    return episode
 
 
 @cache_result(timeout=60*60)
@@ -74,16 +77,16 @@ def episode_for_oldid(oldid):
         raise QueryParameterMissing('oldid')
 
     oldid = int(oldid)
-    r = Episode.view('episodes/by_oldid',
+    db = get_main_database()
+    episode = get_single_result(db, 'episodes/by_oldid',
             key          = oldid,
             limit        = 1,
             include_docs = True,
+            schema       = Episode,
         )
 
-    if not r:
+    if not episode:
         return None
-
-    episode = r.one()
 
     if episode.needs_update:
         incomplete_obj.send_robust(sender=episode)
@@ -100,23 +103,15 @@ def episode_for_slug(podcast_id, episode_slug):
     if not episode_slug:
         raise QueryParameterMissing('episode_slug')
 
-    _view = 'episodes/by_slug'
-
-    r = Episode.view(_view,
+    db = get_main_database()
+    episode = get_single_result(db, 'episodes/by_slug',
             key          = [podcast_id, episode_slug],
             include_docs = True,
+            schema       = Episode,
         )
 
-    if not r:
+    if not episode:
         return None
-
-    try:
-        episode = r.one()
-
-    except MultipleResultsFound as ex:
-        logger.exception('Multiple results found in %s with params %s',
-            _view, r.params)
-        episode = r.first()
 
     if episode.needs_update:
         incomplete_obj.send_robust(sender=episode)
@@ -189,15 +184,15 @@ def episode_for_podcast_id_url(podcast_id, episode_url, create=False):
 #   if episode:
 #       return episode
 
-    r = Episode.view('episodes/by_podcast_url',
+    db = get_main_database()
+    episode = get_single_result(db, 'episodes/by_podcast_url',
             key          = [podcast_id, episode_url],
             include_docs = True,
             reduce       = False,
+            schema       = Episode,
         )
 
-    if r:
-        episode = r.first()
-
+    if episode:
         if episode.needs_update:
             incomplete_obj.send_robust(sender=episode)
         else:
@@ -246,11 +241,12 @@ def episode_for_slug_id(p_slug_id, e_slug_id):
 
 @cache_result(timeout=60*60)
 def episode_count():
-    r = Episode.view('episodes/by_podcast',
+    db = get_main_database()
+    r = get_single_result(db, 'episodes/by_podcast',
             reduce = True,
             stale  = 'update_after',
         )
-    return r.one()['value'] if r else 0
+    return r['value'] if r else 0
 
 
 def episodes_to_dict(ids, use_cache=False):
@@ -378,7 +374,8 @@ def episode_count_for_podcast(podcast, since=None, until={}, **kwargs):
     if isinstance(until, datetime):
         until = until.isoformat()
 
-    res = Episode.view('episodes/by_podcast',
+    db = get_main_database()
+    res = get_single_result(db, 'episodes/by_podcast',
             startkey     = [podcast.get_id(), since],
             endkey       = [podcast.get_id(), until],
             reduce       = True,
@@ -386,7 +383,7 @@ def episode_count_for_podcast(podcast, since=None, until={}, **kwargs):
             **kwargs
         )
 
-    return res.one()['value'] if res else 0
+    return res['value'] if res else 0
 
 
 def favorite_episode_ids_for_user(user):

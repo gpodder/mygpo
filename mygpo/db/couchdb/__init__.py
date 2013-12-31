@@ -4,6 +4,7 @@ from operator import itemgetter
 from collections import namedtuple
 
 from couchdbkit.ext.django import loading
+from couchdbkit import MultipleResultsFound
 from couchdbkit import *
 
 from mygpo.utils import split_quoted
@@ -119,3 +120,32 @@ def lucene_query(fields, query_str):
 
     # combine all with OR
     return ' OR '.join(criteria_str)
+
+
+def get_single_result(db, view, **query_args):
+    """ return a single CouchDB view result
+
+    Logs an error if multiple results are returned, and uses the first result.
+    This can happen as CouchDB can not guarantee uniqueness of attributes other
+    than _id. If no result are fetched, None is returned. """
+
+    r = db.view(view, **query_args)
+
+    if not r:
+        return None
+
+    try:
+        result = r.one()
+
+    except MultipleResultsFound as ex:
+        logger.exception('Multiple results found in %s with params %s',
+                         view, query_args)
+        # use the first result as fallback
+        result = r.first()
+
+    # we can only set the db if the result has been
+    # wrapped (depending on query_args)
+    if hasattr(result, 'set_db'):
+        result.set_db(db)
+
+    return result

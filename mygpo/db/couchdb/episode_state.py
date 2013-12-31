@@ -8,7 +8,8 @@ from mygpo.users.models import EpisodeUserState
 from mygpo.db import QueryParameterMissing
 from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url
 from mygpo.db.couchdb.episode import episode_for_podcast_id_url
-from mygpo.db.couchdb import get_main_database, get_userdata_database
+from mygpo.db.couchdb import get_main_database, get_userdata_database, \
+     get_single_result
 from mygpo.cache import cache_result
 from mygpo.decorators import repeat_on_conflict
 
@@ -32,16 +33,14 @@ def episode_state_for_user_episode(user, episode):
 #       return state
 
     udb = get_userdata_database()
-    r = udb.view('episode_states/by_user_episode',
+    state = get_single_result(udb, 'episode_states/by_user_episode',
             key          = [user._id, episode._id],
             include_docs = True,
             limit        = 1,
             schema       = EpisodeUserState,
         )
 
-    if r:
-        state = r.one()
-        state.set_db(udb)
+    if state:
         cache.set(key, state)
         return state
 
@@ -112,7 +111,7 @@ def podcast_listener_count(episode):
         raise QueryParameterMissing('episode')
 
     udb = get_userdata_database()
-    r = udb.view('listeners/by_podcast',
+    r = get_single_result(udb, 'listeners/by_podcast',
             startkey    = [episode.get_id(), None],
             endkey      = [episode.get_id(), {}],
             group       = True,
@@ -120,7 +119,7 @@ def podcast_listener_count(episode):
             reduce      = True,
             stale       = 'update_after',
         )
-    return r.first()['value'] if r else 0
+    return r['value'] if r else 0
 
 
 @cache_result(timeout=60*60)
@@ -197,7 +196,7 @@ def episode_listener_count(episode, start=None, end={}):
         raise QueryParameterMissing('episode')
 
     udb = get_userdata_database()
-    r = udb.view('listeners/by_episode',
+    r = get_single_result(udb, 'listeners/by_episode',
             startkey    = [episode._id, start],
             endkey      = [episode._id, end],
             group       = True,
@@ -205,7 +204,7 @@ def episode_listener_count(episode, start=None, end={}):
             reduce      = True,
             stale       = 'update_after',
         )
-    return r.first()['value'] if r else 0
+    return r['value'] if r else 0
 
 
 
@@ -258,18 +257,16 @@ def episode_state_for_ref_urls(user, podcast_url, episode_url):
         return state
 
     udb = get_userdata_database()
-    res = udb.view('episode_states/by_ref_urls',
+    state = get_single_result(udb, 'episode_states/by_ref_urls',
             key   = [user._id, podcast_url, episode_url],
             limit = 1,
             include_docs=True,
             schema      = EpisodeUserState,
         )
 
-    if res:
-        state = res.first()
+    if state:
         state.ref_url = episode_url
         state.podcast_ref_url = podcast_url
-        state.set_db(udb)
         cache.set(cache_key, state, 60*60)
         return state
 
@@ -333,20 +330,14 @@ def episode_states_count():
 
 def get_nth_episode_state(n):
     udb = get_userdata_database()
-    first = udb.view('episode_states/by_user_episode',
+    state = get_single_result(udb, 'episode_states/by_user_episode',
             skip         = n,
             include_docs = True,
             limit        = 1,
             schema       = EpisodeUserState,
         )
 
-    if first:
-        state = first.one()
-        state.set_db(udb)
-        return state
-
-    else:
-        return None
+    return state
 
 
 def get_duplicate_episode_states(user, episode):

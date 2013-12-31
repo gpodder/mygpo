@@ -1,5 +1,5 @@
 from mygpo.db.couchdb import get_main_database
-from mygpo.db import QueryParameterMissing
+from mygpo.db import QueryParameterMissing, get_single_result
 from mygpo.db.couchdb.utils import multi_request_view
 
 
@@ -16,7 +16,7 @@ def missing_slug_count(doc_type, start, end):
 
 
     db = get_main_database()
-    res = db.view('slugs/missing',
+    res = get_single_result(db, 'slugs/missing',
             startkey     = [doc_type] + end,
             endkey       = [doc_type] + start,
             descending   = True,
@@ -24,7 +24,7 @@ def missing_slug_count(doc_type, start, end):
             group        = True,
             group_level  = 1,
         )
-    return res.first()['value'] if res else 0
+    return res['value'] if res else 0
 
 
 def missing_slugs(doc_type, start, end, wrapper, **kwargs):
