@@ -12,7 +12,6 @@ from django.views.decorators.csrf import csrf_exempt
 
 from couchdbkit.ext.django import *
 
-from feedservice import urlstore
 from mygpo.pubsub.models import SubscriptionError, Subscription
 from mygpo.pubsub.signals import subscription_updated
 from mygpo.db.couchdb.pubsub import subscription_for_topic, \
