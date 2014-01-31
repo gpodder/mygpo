@@ -45,7 +45,6 @@ class SimpleWebTests(TestCase):
             'history',
             'suggestions',
             'tags',
-            'help',
             'subscriptions',
             'subscriptions-opml',
             'subscriptions-download',
