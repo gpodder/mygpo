@@ -104,7 +104,7 @@ def podcast_by_id_uncached(podcast_id, current_id=False):
     podcast = get_single_result(db, 'podcasts/by_id',
             key          = podcast_id,
             include_docs = True,
-            wrapper      = _wrap_podcast_group_key1,
+            wrapper      = _wrap_podcast_group,
         )
 
     if not podcast:
