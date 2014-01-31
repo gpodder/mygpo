@@ -307,6 +307,10 @@ GOOGLE_CLIENT_ID=''
 GOOGLE_CLIENT_SECRET=''
 
 
+import sys
+if 'test' in sys.argv:
+    SECRET_KEY = 'test'
+
 
 try:
     from settings_prod import *
