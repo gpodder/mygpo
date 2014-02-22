@@ -174,6 +174,11 @@ AUTHENTICATION_BACKENDS = (
 
 SESSION_ENGINE = "django_couchdb_utils.sessions.cached_couchdb"
 
+# TODO: use (default) JSON serializer for security
+# this would currently fail as we're (de)serializing datetime objects
+# https://docs.djangoproject.com/en/1.5/topics/http/sessions/#session-serialization
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+
 
 from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 
