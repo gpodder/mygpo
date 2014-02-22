@@ -88,7 +88,7 @@ class PodcastUpdater(object):
             self._validate_parsed(parsed)
 
         except (ParserException, FetchFeedException, NoEpisodesException,
-                VimeoError, ValueError, socket.error) as ex:
+                VimeoError, ValueError, socket.error, urllib2.HTTPError) as ex:
             #TODO: catch valueError (for invalid Ipv6 in feedservice)
 
             if isinstance(ex, VimeoError):
