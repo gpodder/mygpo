@@ -1,9 +1,10 @@
 from mygpo.db.couchdb import get_main_database
-from mygpo.db import QueryParameterMissing, get_single_result
+from mygpo.db import QueryParameterMissing
 from mygpo.db.couchdb.utils import multi_request_view
 
 
 def missing_slug_count(doc_type, start, end):
+    from mygpo.db import get_single_result
 
     if not doc_type:
         raise QueryParameterMissing('doc_type')
