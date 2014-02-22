@@ -316,7 +316,7 @@ class PodcastUpdater(object):
             return cover_art
 
         except (urllib2.HTTPError, urllib2.URLError, ValueError,
-                httplib.BadStatusLine, socket.error) as e:
+                httplib.BadStatusLine, socket.error, IOError) as e:
             logger.warn('Exception while updating podcast logo: %s', str(e))
 
 
