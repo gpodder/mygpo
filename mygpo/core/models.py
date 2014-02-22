@@ -252,6 +252,11 @@ class Podcast(Document, SlugMixin, OldIdMixin):
 
         # We take all non-empty titles
         titles = filter(None, (e.title for e in episodes))
+
+        # there can not be a "common" title of a single title
+        if len(titles) < 2:
+            return None
+
         # get the longest common substring
         common_title = utils.longest_substr(titles)
 
