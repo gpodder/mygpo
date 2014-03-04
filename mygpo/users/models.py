@@ -616,7 +616,7 @@ class User(BaseUser, SyncedDevicesMixin, SettingsMixin):
             podcast = proxy_object(podcast, url=state.ref_url)
             podcasts[state.podcast] = podcast
 
-        return podcasts.values()
+        return set(podcasts.values())
 
 
 

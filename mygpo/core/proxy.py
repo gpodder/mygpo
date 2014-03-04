@@ -35,7 +35,15 @@ def proxy_object(obj, **kwargs):
 
 
         def __eq__(self, other):
-            return self.obj == other.obj
+            # if "other" is of the same type as proxied obj, compare directly
+            if isinstance(other, type(self.obj)):
+                return self.obj == other
+
+            else:
+                return self.obj == other.obj
+
+        def __hash__(self):
+            return hash(self.obj)
 
 
     cls = obj.__class__
