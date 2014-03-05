@@ -25,7 +25,7 @@ function(doc)
 
     if(doc.doc_type == "PodcastGroup")
     {
-        for(var n=0; n<doc.podcasts.length; n++)
+        for(var n in doc.podcasts)
         {
             var p = doc.podcasts[n];
             checkPodcast(p, p.id);

@@ -2,9 +2,9 @@ function(doc)
 {
     function searchPodcast(podcast, podcast_id)
     {
-        for(source in podcast.tags)
+        for(var source in podcast.tags)
         {
-            for(n in podcast.tags[source])
+            for(var n in podcast.tags[source])
             {
                 emit([podcast.tags[source][n], podcast_id], sourceWeight(source));
             }
@@ -33,9 +33,10 @@ function(doc)
     }
     else if(doc.doc_type == "PodcastGroup")
     {
-        for(p in doc.podcasts)
+        for(var n in doc.podcasts)
         {
-            searchPodcast(p, p.id);
+            var podcast = doc.podcasts[n];
+            searchPodcast(podcast, podcast.id);
         }
     }
 }

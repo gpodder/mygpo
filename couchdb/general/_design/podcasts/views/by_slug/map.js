@@ -9,9 +9,9 @@ function (doc)
 
         if(podcast.merged_slugs)
         {
-            for(m in podcast.merged_slugs)
+            for(var n in podcast.merged_slugs)
             {
-                emit([podcast.merged_slugs[m], podcast_id], null);
+                emit([podcast.merged_slugs[n], podcast_id], null);
             }
         }
     }
@@ -24,9 +24,10 @@ function (doc)
     {
         searchPodcast(doc, doc._id);
 
-        for(n in doc.podcasts)
+        for(var n in doc.podcasts)
         {
-            searchPodcast(doc.podcasts[n], doc.podcasts[n].id);
+            var podcast = doc.podcasts[n];
+            searchPodcast(podcast, podcast.id);
         }
     }
 }

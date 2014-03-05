@@ -2,7 +2,7 @@ function(doc)
 {
     function searchPodcast(podcast)
     {
-        for(n in podcast.urls)
+        for(var n in podcast.urls)
         {
             emit(podcast.urls[n], null);
         }
@@ -14,7 +14,7 @@ function(doc)
     }
     else if(doc.doc_type == 'PodcastGroup')
     {
-        for(n in doc.podcasts)
+        for(var n in doc.podcasts)
         {
             podcast = doc.podcasts[n];
             searchPodcast(podcast);
