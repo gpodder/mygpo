@@ -92,3 +92,7 @@ def urlquote(s):
 
 
 hours_to_str = register.filter(hours_to_str)
+
+@register.simple_tag
+def protocol(request):
+    return 'http{s}://'.format(s='s' if request.is_secure() else '')

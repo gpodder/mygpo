@@ -10,7 +10,10 @@ from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.core.cache import cache
 from django.http import HttpResponseRedirect
+from django.template.loader import render_to_string
+from django.template import RequestContext
 from django.utils.translation import ugettext as _
+from django.contrib.sites.models import RequestSite
 from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.conf import settings
@@ -25,7 +28,7 @@ from mygpo.utils import get_git_head
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.cel import celery
 from mygpo.db.couchdb import get_main_database
-from mygpo.db.couchdb.user import activate_user
+from mygpo.db.couchdb.user import activate_user, add_published_objs
 from mygpo.db.couchdb.episode import episode_count, filetype_stats
 from mygpo.db.couchdb.podcast import podcast_count, podcast_for_url, \
     podcast_duplicates_for_url, podcasts_by_next_update
@@ -407,3 +410,66 @@ class UnifySlugsStatus(AdminView):
             'actions': actions.items(),
             'podcast': podcast,
         })
+
+
+class MakePublisherInput(AdminView):
+    """ Get all information necessary for making someone publisher """
+
+    template_name = 'admin/make-publisher-input.html'
+
+
+class MakePublisher(AdminView):
+    """ Assign publisher permissions """
+
+    template_name = 'admin/make-publisher-result.html'
+
+    def post(self, request):
+        username = request.POST.get('username')
+        user = User.get_user(username)
+        if user is None:
+            messages.error(request, 'User "{username}" not found'.format(username=username))
+            return HttpResponseRedirect(reverse('admin-make-publisher-input'))
+
+        feeds = request.POST.get('feeds')
+        feeds = feeds.split()
+        podcasts = set()
+
+        for feed in feeds:
+            podcast = podcast_for_url(feed)
+
+            if podcast is None:
+                messages.warning(request, 'Podcast with URL {feed} not found'.format(feed=feed))
+                continue
+
+            podcasts.add(podcast)
+
+        self.set_publisher(request, user, podcasts)
+        self.send_mail(request, user, podcasts)
+        return HttpResponseRedirect(reverse('admin-make-publisher-result'))
+
+    def set_publisher(self, request, user, podcasts):
+        podcast_ids = set(p.get_id() for p in podcasts)
+        add_published_objs(user, podcast_ids)
+        messages.success(request, 'Set publisher permissions for {count} podcasts'.format(count=len(podcast_ids)))
+
+    def send_mail(self, request, user, podcasts):
+        site = RequestSite(request)
+        msg = render_to_string('admin/make-publisher-mail.txt', {
+                'user': user,
+                'podcasts': podcasts,
+                'support_url': settings.SUPPORT_URL,
+                'site': site,
+            },
+            context_instance=RequestContext(request))
+        subj = get_email_subject(site, _('Publisher Permissions'))
+
+        user.email_user(subj, msg)
+        messages.success(request, 'Sent email to user "{username}"'.format(username=user.username))
+
+
+class MakePublisherResult(AdminView):
+    template_name = 'make-publisher-result.html'
+
+
+def get_email_subject(site, txt):
+    return '[{domain}] {txt}'.format(domain=site.domain, txt=txt)

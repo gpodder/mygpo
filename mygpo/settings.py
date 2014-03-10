@@ -311,6 +311,9 @@ CELERY_CONF = dict(
 GOOGLE_CLIENT_ID=''
 GOOGLE_CLIENT_SECRET=''
 
+# URL where users of the site can get support
+SUPPORT_URL=''
+
 
 import sys
 if 'test' in sys.argv:

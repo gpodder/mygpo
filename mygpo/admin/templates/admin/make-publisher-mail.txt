@@ -1,0 +1,22 @@
+{% load i18n %}{% load podcasts %}{% load utils %}
+{% blocktrans with user.username as username %}Hi {{ username }},{% endblocktrans %}
+
+{% trans "You have been assigned as a publisher for the following podcasts:" %}
+
+{% for podcast in podcasts %}
+* {{ podcast.title }}
+  {% protocol request %}{{ site.domain }}{% podcast_link_target podcast %}
+{% endfor %}
+
+{% trans "You can now access the publisher pages at" %}
+
+ {% protocol request %}{{ site.domain}}{% url "publisher" %}
+
+{% blocktrans with site.domain as domain %}There you can get statistics, insights and additional control over your podcast at {{ domain }}.{% endblocktrans %}
+
+{% if support_url %}{% blocktrans with support_url as url %}If you have any questions, please visit {{ url }}{% endblocktrans %}{% endif %}
+
+
+Best regards,
+
+-- the {{ site.domain }} team

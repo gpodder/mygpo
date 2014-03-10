@@ -6,6 +6,7 @@ from mygpo.decorators import repeat_on_conflict
 from mygpo.core.models import Podcast
 from mygpo.users.models import User
 from mygpo.db.couchdb.podcast import podcast_for_url
+from mygpo.db.couchdb.user import add_published_objs
 
 
 class Command(BaseCommand):
@@ -32,9 +33,4 @@ class Command(BaseCommand):
         urls = args[1:]
         podcasts = map(podcast_for_url, urls)
         ids = map(Podcast.get_id, podcasts)
-        self.add_publisher(user=user, ids=ids)
-
-    @repeat_on_conflict(['user'])
-    def add_publisher(self, user, ids):
-        user.published_objects = list(set(user.published_objects + ids))
-        user.save()
+        add_published_objs(user, ids)

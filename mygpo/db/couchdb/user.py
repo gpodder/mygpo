@@ -323,3 +323,9 @@ def create_missing_user_tokens(user):
 
     if generated:
         user.save()
+
+@repeat_on_conflict(['user'])
+def add_published_objs(user, ids):
+    """ Adds published objects to the user """
+    user.published_objects = list(set(user.published_objects + list(ids)))
+    user.save()

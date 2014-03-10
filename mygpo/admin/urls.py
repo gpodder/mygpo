@@ -4,7 +4,8 @@ from mygpo.admin.views import Overview, MergeSelect, MergeVerify, \
          MergeProcess, MergeStatus, ClientStatsView, ClientStatsJsonView, \
          UserAgentStatsView, StatsView, StatsJsonView, HostInfo, \
          FiletypeStatsView, ActivateUserView, UnifyDuplicateSlugsSelect, \
-         UnifyDuplicateSlugs, UnifySlugsStatus
+         UnifyDuplicateSlugs, UnifySlugsStatus, MakePublisherInput, \
+         MakePublisher, MakePublisherResult
 
 urlpatterns = patterns('mygpo.admin.views',
  url(r'^$',              Overview.as_view(),     name='admin-overview'),
@@ -43,4 +44,17 @@ urlpatterns = patterns('mygpo.admin.views',
  url(r'^unify-slugs/status/(?P<task_id>[^/]+)$',
      UnifySlugsStatus.as_view(),
      name='admin-unify-slugs-status'),
+
+ url(r'^make-publisher/input$',
+     MakePublisherInput.as_view(),
+     name='admin-make-publisher-input'),
+
+ url(r'^make-publisher/process$',
+     MakePublisher.as_view(),
+     name='admin-make-publisher'),
+
+ url(r'^make-publisher/result$',
+     MakePublisher.as_view(),
+     name='admin-make-publisher-result'),
+
 )
