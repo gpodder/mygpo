@@ -36,11 +36,11 @@ def proxy_object(obj, **kwargs):
 
         def __eq__(self, other):
             # if "other" is of the same type as proxied obj, compare directly
-            if isinstance(other, type(self.obj)):
-                return self.obj == other
+            if isinstance(other, ProxyObject):
+                return self.obj == other.obj
 
             else:
-                return self.obj == other.obj
+                return self.obj == other
 
         def __hash__(self):
             return hash(self.obj)
