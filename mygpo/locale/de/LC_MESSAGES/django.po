@@ -283,7 +283,7 @@ msgstr "my.gpodder.org - Top %s"
 
 #: api/simple.py:310
 msgid "gpodder.net - Search"
-msgstr ""
+msgstr "gpodder.net - Suche"
 
 #: api/simple.py:325
 #, fuzzy, python-format
@@ -302,15 +302,15 @@ msgstr "Kein Logo verfügbar"
 
 #: data/mimetype.py:13
 msgid "image"
-msgstr ""
+msgstr "bild"
 
 #: data/mimetype.py:13
 msgid "audio"
-msgstr ""
+msgstr "audio"
 
 #: data/mimetype.py:13
 msgid "video"
-msgstr ""
+msgstr "video"
 
 #: directory/views.py:315
 #, fuzzy, python-format
@@ -1233,7 +1233,7 @@ msgstr "Aktuelles Passwort"
 
 #: share/templates/share/overview.html:9
 msgid "Sharing"
-msgstr ""
+msgstr "Teilen"
 
 #: share/templates/share/overview.html:12 web/templates/favorites.html:39
 #: web/templates/podcast.html:228 web/templates/subscriptions.html:43
@@ -1675,7 +1675,7 @@ msgstr "Lieblings-Episoden"
 
 #: web/templates/dashboard.html:113
 msgid "Share your Subscriptions"
-msgstr ""
+msgstr "Teile deine Abos"
 
 #: web/templates/dashboard.html:118
 msgid "Share your Favorite Episodes"
@@ -1831,7 +1831,7 @@ msgstr ""
 
 #: web/templates/device-edit.html:75
 msgid "Upload"
-msgstr ""
+msgstr "Hochladen"
 
 #: web/templates/device-edit.html:84
 #, fuzzy
@@ -2076,7 +2076,7 @@ msgstr ""
 #: web/templates/mytags.html:11 web/templates/mytags.html.py:14
 #: web/templatetags/menu.py:46
 msgid "My Tags"
-msgstr ""
+msgstr "Meine Tags"
 
 #: web/templates/mytags.html:41
 #, python-format
@@ -2084,6 +2084,8 @@ msgid ""
 "You didn't tag any podcasts yet. Go to your <a href=\"%(subscriptions-url)s"
 "\">subscriptions</a> and tag some."
 msgstr ""
+"Sie haben nicht alle Podcasts getagt. Gehen Sie zu Ihren<a href="
+"\"%(subscriptions-url)s\">abonnements</a> und tagen sie einige."
 
 #: web/templates/online-help.html:8 web/templates/online-help.html.py:11
 #: web/templatetags/menu.py:28
@@ -2118,7 +2120,7 @@ msgstr ""
 
 #: web/templates/online-help.html:23
 msgid "Nokia Podcasting on Symbian devices"
-msgstr ""
+msgstr "Nokia Podcasting auf Symbian geräte"
 
 #: web/templates/online-help.html:26
 msgid ""
@@ -2174,6 +2176,12 @@ msgid ""
 "the subscriptions of the devices will be merged. Adding a subscription at "
 "one device will automatically add it to the others. Same for deletions."
 msgstr ""
+"Wenn Sie mindestens zwei Geräte, die an den Webservice haben, können Sie "
+"synchronisieren einige von ihnen. Öffnen Sie das Gerät Seite für einen von "
+"ihnen , klicken Sie synchronisieren und wählen Sie das Gerät zu "
+"synchronisieren Nach der Synchronisierung werden die Abonnements der Geräte "
+"zusammengeführt werden. Hinzufügen einer Zeichnung zu einem Gerät wird "
+"automatisch fügen Sie es den anderen. Das Gleiche gilt für Löschungen "
 
 #: web/templates/online-help.html:38
 #, python-format
@@ -2181,6 +2189,8 @@ msgid ""
 "The <a href=\"%(devices-url)s\">device list</a> groups devices that are "
 "synchronized with each other."
 msgstr ""
+"Die <a href=\"%(devices-url)s\">geräte-liste</a> ordnet Geräte, die "
+"miteinander synchronisiert werden."
 
 #: web/templates/online-help.html:40
 msgid "Episode States"
@@ -2191,6 +2201,8 @@ msgid ""
 "Episode states (such as played, downloaded, etc) are synchronized across all "
 "devices."
 msgstr ""
+"Episoden (wie z. B. gespielt, heruntergeladene, etc.) werden auf allen "
+"Geräten synchronisiert. "
 
 #: web/templates/online-help.html:43 web/templates/privacy.html:9
 #: web/templates/privacy.html.py:12
@@ -2208,6 +2220,14 @@ msgid ""
 "\">privacy page</a>. If you mark some podcasts as private, they will also "
 "not show up in your sharable subscription list."
 msgstr ""
+"Standardmäßig fügen wir Informationen über Ihre Abonnements in unsere <a "
+"href=\"%(toplist-url)s\">Topliste</a> und <a href=\"%(suggestions-url)s"
+"\">Podcast Anregungen</a>. <strong> Wir werden nie Ihren Benutzernamen und/"
+"oder e-Mail-Adresse Ihres Abonnements auf öffentlichen Seiten "
+"veröffentlichen.</strong> Sie können sogar opt-Out aus unserer "
+"anonymisierten Statistiken auf der <a href=\"%(privacy-url)s"
+"\">Datenschutzseite.</a>. Wenn Sie einige Podcasts als privat markieren, "
+"werden sie in Ihrer freigebbar Abonnementliste auch nicht auftauchen. "
 
 #: web/templates/online-help.html:51
 msgid "Sharing your Subscriptions"
@@ -2221,6 +2241,10 @@ msgid ""
 "share your private URL with your friends or make it public and share your "
 "subscriptions with the whole world."
 msgstr ""
+"Wenn Sie andere wissen lassen über Ihre Podcasts, um Ihre <a href="
+"\"%(share-url)s\">Sharing Seite</a> gehen werden wollen . Sie können "
+"entweder Ihre eigenen URL mit deinen Freunden oder öffentlich machen und "
+"teilen Sie Ihre Abonnements mit der ganzen Welt."
 
 #: web/templates/password_reset.html:4
 msgid "Password reset"
@@ -2247,7 +2271,7 @@ msgstr "Das Passwort konnte nicht zurückgesetzt werden,"
 
 #: web/templates/password_reset_failed.html:12
 msgid "Unfortunately we were not able to reset your password."
-msgstr ""
+msgstr "Leider waren wir nicht in der Lage, Ihr Passwort zurückzusetzen."
 
 #: web/templates/podcast.html:100
 #, fuzzy
@@ -2352,6 +2376,9 @@ msgid ""
 "You can't subscribe to this podcast, because you don't have any devices (on "
 "which you don't have subscribed to the podcast already."
 msgstr ""
+"Sie können nicht diesen Podcast abonnieren, denn Sie haben noch keine "
+"Geräte  (auf denen Sie nicht mit dem Podcast haben den Newsletter bereits "
+"abonniert haben."
 
 #: web/templates/subscribe.html:77
 msgid "Why Unnamed Podcast?"
@@ -2479,6 +2506,7 @@ msgid ""
 "Just go to your <a href/\"/account/\">account settings</a> to get the link.</"
 "a>"
 msgstr ""
+"Sie einfach zu Ihrem Kontoeinstellungen gehen , um den Link zu bekommen. "
 
 #: web/templates/registration/activate.html:10
 #: web/templates/registration/activation_complete.html:10
@@ -2518,7 +2546,7 @@ msgstr "Erstelle ein Benutzer-Konto"
 
 #: web/templates/registration/registration_form.html:18
 msgid "You are already registered."
-msgstr ""
+msgstr "Sie sind bereits registriert. "
 
 #: web/templates/registration/registration_form.html:87
 #, fuzzy
@@ -2554,11 +2582,11 @@ msgstr "Aktivierungs-Email gesendet"
 
 #: web/templates/registration/resent_activation.html:11
 msgid "The activation email has been reset."
-msgstr ""
+msgstr "Die Aktivierungs E-Mail wurde zurückgesetzt."
 
 #: web/templatetags/devices.py:27
 msgid "Unknown"
-msgstr ""
+msgstr "Unbekannt"
 
 #: web/templatetags/episodes.py:20
 msgid "New episode"
@@ -2567,7 +2595,7 @@ msgstr "Neue Episode"
 #: web/templatetags/episodes.py:23
 #, python-format
 msgid "Downloaded to %s"
-msgstr ""
+msgstr "Heruntergeladen in %s"
 
 #: web/templatetags/episodes.py:25
 msgid "Downloaded"
@@ -2576,7 +2604,7 @@ msgstr "Heruntergeladen"
 #: web/templatetags/episodes.py:28
 #, python-format
 msgid "Played on %s"
-msgstr ""
+msgstr "Abgespielt in %s"
 
 #: web/templatetags/episodes.py:30
 msgid "Played"
@@ -2585,7 +2613,7 @@ msgstr "Abgespielt"
 #: web/templatetags/episodes.py:33
 #, python-format
 msgid "Deleted on %s"
-msgstr ""
+msgstr "Gelöscht in %s"
 
 #: web/templatetags/episodes.py:35
 msgid "Deleted"
@@ -2593,11 +2621,11 @@ msgstr "Gelöscht"
 
 #: web/templatetags/episodes.py:37
 msgid "Unknown status"
-msgstr ""
+msgstr "Unbekannter Status"
 
 #: web/templatetags/episodes.py:42
 msgid "Unplayed episode"
-msgstr ""
+msgstr "Namenlose Episode"
 
 #: web/templatetags/episodes.py:45 web/templatetags/episodes.py:46
 #, python-format
@@ -2620,12 +2648,12 @@ msgstr "Diese Episode wurde heruntergeladen"
 #: web/templatetags/episodes.py:58
 #, python-format
 msgid " from %(start)s to %(end)s"
-msgstr ""
+msgstr "vom %(start)s zum %(end)s"
 
 #: web/templatetags/episodes.py:62
 #, python-format
 msgid " to position %s"
-msgstr ""
+msgstr "in position %s"
 
 #: web/templatetags/episodes.py:66
 msgid "This episode has been played"
@@ -2646,7 +2674,7 @@ msgstr "Home"
 
 #: web/templatetags/menu.py:37
 msgid "User subscriptions"
-msgstr ""
+msgstr "Benutzer-Abonnements"
 
 #: web/templatetags/menu.py:38
 msgid "Suggestions"
@@ -2672,7 +2700,7 @@ msgstr "Einstellungen"
 
 #: web/templatetags/menu.py:60
 msgid "Privacy"
-msgstr ""
+msgstr "Privatsphäre "
 
 #: web/templatetags/menu.py:65
 msgid "Link to gpodder.net"
@@ -2697,7 +2725,7 @@ msgstr "Geräte"
 
 #: web/views/device.py:131 web/views/device.py:166
 msgid "You can't use the same Device ID for two devices."
-msgstr ""
+msgstr "Sie können nicht das gleiche Device ID für zwei Geräte benutzen. "
 
 #: web/views/device.py:159
 #, fuzzy
@@ -2723,6 +2751,8 @@ msgstr "eine andere Seite"
 #: web/views/settings.py:92 web/views/settings.py:126
 msgid "Oops! Something went wrong. Please double-check the data you entered."
 msgstr ""
+"Oops! Irgendetwas ist schiefgegangen. Bitte überprüfen Sie die eingegebenen "
+"Daten. "
 
 #: web/views/settings.py:179
 msgid "Authentication successful"
@@ -2799,21 +2829,23 @@ msgstr ""
 
 #: web/views/users.py:190
 msgid "Invalid Username entered"
-msgstr ""
+msgstr "Invalid Username eingegeben "
 
 #: web/views/users.py:197
 msgid "You have deleted your account, but you can regster again."
-msgstr ""
+msgstr "Ihr Account wurde gelöscht, aber Sie können sich wieder neu anmelden"
 
 #: web/views/users.py:201
 msgid "Your account already has been activated. Go ahead and log in."
-msgstr ""
+msgstr "Dein Konto wurde aktiviert! Viel Spaß mit my.gpodder.org"
 
 #: web/views/users.py:204
 msgid ""
 "Your activation key has expired. Please try another username, or retry with "
 "the same one tomorrow."
 msgstr ""
+"Ihren Aktivierungsschlüssel ist abgelaufen. Bitte versuchen Sie einen "
+"anderen Benutzernamen, oder wiederholen Sie mit dem gleichen Morgen."
 
 #: web/views/users.py:239 web/views/users.py:244
 #, fuzzy
