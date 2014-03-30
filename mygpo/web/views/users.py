@@ -199,7 +199,7 @@ def resend_activation(request):
             raise ValueError(_('User does not exist.'))
 
         if user.deleted:
-            raise ValueError(_('You have deleted your account, but you can regster again.'))
+            raise ValueError(_('You have deleted your account, but you can register again.'))
 
         if user.activation_key is None:
             _set_active(user=user, is_active=True)
