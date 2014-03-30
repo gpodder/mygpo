@@ -13,7 +13,7 @@ import os.path
 filenames = []
 
 pofiles = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-        '..', '..', 'mygpo', 'locale', '*', 'LC_MESSAGES', 'django.po')
+        '..', '..', '..', 'mygpo', 'locale', '*', 'LC_MESSAGES', 'django.po')
 
 process = subprocess.Popen(['git', 'status', '--porcelain'] +
         glob.glob(pofiles), stdout=subprocess.PIPE)
@@ -28,7 +28,7 @@ for filename in filenames:
     translators = []
     language = None
 
-    filename = os.path.join('..', filename)
+    filename = os.path.join('..', '..', filename)
     for line in open(filename).read().splitlines():
         if line.startswith('# Translators:'):
             in_translators = True
