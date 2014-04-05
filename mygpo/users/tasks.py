@@ -7,6 +7,7 @@ from couchdbkit import ResourceConflict
 from mygpo.core.models import SubscriptionException
 from mygpo.cel import celery
 from mygpo.db.couchdb.user import suggestions_for_user, update_device_state
+from mygpo.decorators import repeat_on_conflict
 
 from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
@@ -34,6 +35,7 @@ def sync_user(user):
 
 
 @celery.task(max_retries=5, default_retry_delay=60)
+@repeat_on_conflict(['user'])
 def update_suggestions(user, max_suggestions=15):
     """ updates the suggestions of a user """
 
@@ -54,12 +56,8 @@ def update_suggestions(user, max_suggestions=15):
     suggested = map(get_podcast_id, counter.most_common(max_suggestions))
     suggestion.podcasts = suggested
 
-    try:
-        # update suggestions object
-        suggestion.save()
-
-    except ResourceConflict as ex:
-        raise update_suggestions.retry(exc=ex)
+    # update suggestions object
+    suggestion.save()
 
 
 @celery.task(max_retries=5, default_retry_delay=60)
