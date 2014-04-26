@@ -74,7 +74,7 @@ def format_time(value):
     """
     try:
         dt = datetime.utcfromtimestamp(value)
-    except ValueError:
+    except (ValueError, TypeError):
         return ''
 
     if dt.hour == 0:
