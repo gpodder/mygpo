@@ -5,7 +5,7 @@ from couchdbkit import ResourceNotFound
 from mygpo.cache import cache_result
 from mygpo.decorators import repeat_on_conflict
 from mygpo.db.couchdb import get_main_database, get_userdata_database, \
-    get_single_result
+    get_single_result, get_suggestions_database
 from mygpo.users.settings import FLATTR_TOKEN, FLATTR_AUTO, FLATTR_MYGPO, \
          FLATTR_USERNAME
 from mygpo.db import QueryParameterMissing
@@ -122,8 +122,8 @@ def suggestions_for_user(user):
         raise QueryParameterMissing('user')
 
     from mygpo.users.models import Suggestions
-    db = get_main_database()
-    s = get_single_result(db, 'suggestions/by_user',
+    sdb = get_suggestions_database()
+    s = get_single_result(sdb, 'suggestions/by_user',
                 key          = user._id,
                 include_docs = True,
                 schema       = Suggestions,
@@ -134,6 +134,30 @@ def suggestions_for_user(user):
         s.user = user._id
 
     return s
+
+
+@repeat_on_conflict(['suggestions'])
+def update_suggestions(suggestions, podcast_ids):
+    """ Updates the suggestions object with new suggested podcasts """
+
+    if suggestions.podcasts == podcast_ids:
+        return
+
+    sdb = get_suggestions_database()
+    suggestions.podcasts = podcast_ids
+    sdb.save_doc(suggestions)
+
+
+@repeat_on_conflict(['suggestions'])
+def blacklist_suggested_podcast(suggestions, podcast_id):
+    """ Adds a podcast to the list of unwanted suggestions """
+
+    if podcast_id in suggestions.blacklist:
+        return
+
+    sdb = get_suggestions_database()
+    suggestions.blacklist.append(podcast_id)
+    sdb.save_doc(suggestions)
 
 
 @cache_result(timeout=60*60)

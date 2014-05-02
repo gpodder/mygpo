@@ -38,8 +38,7 @@ from django.views.decorators.cache import never_cache, cache_control
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core.podcasts import PodcastSet
 from mygpo.directory.toplist import PodcastToplist
-from mygpo.users.models import Suggestions, History, HistoryEntry, \
-         DeviceDoesNotExist
+from mygpo.users.models import History, HistoryEntry, DeviceDoesNotExist
 from mygpo.users.tasks import update_suggestions
 from mygpo.web.utils import process_lang_params
 from mygpo.utils import parse_range
@@ -47,7 +46,8 @@ from mygpo.web.views.podcast import slug_id_decorator
 from mygpo.users.settings import FLATTR_AUTO, FLATTR_TOKEN
 from mygpo.db.couchdb.episode import favorite_episode_ids_for_user
 from mygpo.db.couchdb.podcast import podcast_by_id, random_podcasts
-from mygpo.db.couchdb.user import suggestions_for_user
+from mygpo.db.couchdb.user import (suggestions_for_user,
+    blacklist_suggested_podcast)
 from mygpo.db.couchdb.directory import tags_for_user
 from mygpo.db.couchdb.podcastlist import podcastlists_for_user
 
@@ -183,17 +183,9 @@ def history(request, count=15, uid=None):
 @slug_id_decorator
 def blacklist(request, blacklisted_podcast):
     user = request.user
-
     suggestion = suggestions_for_user(user)
-
-    @repeat_on_conflict(['suggestion'])
-    def _update(suggestion, podcast_id):
-        suggestion.blacklist.append(podcast_id)
-        suggestion.save()
-
-    _update(suggestion=suggestion, podcast_id=blacklisted_podcast.get_id())
+    blacklist_suggested_podcast(suggestion, blacklisted_podcast.get_id())
     update_suggestions.delay(user)
-
     return HttpResponseRedirect(reverse('suggestions'))
 
 

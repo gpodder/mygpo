@@ -34,7 +34,6 @@ from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.api.backend import get_device, BulkSubscribe
 from mygpo.core import models
 from mygpo.core.models import Podcast
-from mygpo.users.models import Suggestions
 from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.directory.toplist import PodcastToplist
