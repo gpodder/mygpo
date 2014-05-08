@@ -8,7 +8,7 @@ services:
  - redis-server
 
 install:
- - pip install -r requirements.txt
+ - pip install -r requirements.txt --allow-external argparse
 
 script:
   python manage.py test
