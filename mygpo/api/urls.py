@@ -16,11 +16,14 @@ urlpatterns += patterns('mygpo.api.simple',
  url(r'^gpodder-examples\.(?P<format>\w+)$', 'example_podcasts',               name='example-opml'),
 )
 
+from mygpo.api.advanced import SubscriptionsAPI
 from mygpo.api.advanced.updates import DeviceUpdates
 
 urlpatterns += patterns('mygpo.api.advanced',
-    (r'^api/[12]/subscriptions/(?P<username>[\w.-]+)/(?P<device_uid>[\w.-]+)\.json', 'subscriptions'),
-    (r'^api/(?P<version>[12])/episodes/(?P<username>[\w.-]+)\.json', 'episodes'),
+ url(r'^api/(?P<version>[12])/subscriptions/(?P<username>[\w.-]+)/(?P<device_uid>[\w.-]+)\.json',
+     SubscriptionsAPI.as_view(), name='subscriptions-api'),
+
+ url(r'^api/(?P<version>[12])/episodes/(?P<username>[\w.-]+)\.json', 'episodes'),
     (r'^api/[12]/devices/(?P<username>[\w.-]+)/(?P<device_uid>[\w.-]+)\.json', 'device'),
     (r'^api/[12]/devices/(?P<username>[\w.-]+)\.json', 'devices'),
 

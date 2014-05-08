@@ -23,23 +23,26 @@ from importlib import import_module
 
 import dateutil.parser
 
-from django.http import HttpResponse, HttpResponseBadRequest, Http404, HttpResponseNotFound
+from django.http import (HttpResponse, HttpResponseBadRequest, Http404,
+                         HttpResponseNotFound, )
 from django.contrib.sites.models import RequestSite
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 from django.conf import settings as dsettings
+from django.utils.decorators import method_decorator
+from django.views.generic.base import View
 
 from mygpo.api.constants import EPISODE_ACTION_TYPES, DEVICE_TYPES
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.advanced.directory import episode_data
 from mygpo.api.backend import get_device, BulkSubscribe
 from mygpo.utils import format_time, parse_bool, get_timestamp, \
-    parse_request_body, normalize_feed_url
+    parse_request_body, normalize_feed_url, intersect
 from mygpo.decorators import allowed_methods, cors_origin
 from mygpo.core.tasks import auto_flattr_episode
-from mygpo.users.models import EpisodeAction, \
-     DeviceDoesNotExist, DeviceUIDException, \
-     InvalidEpisodeActionAttributes
+from mygpo.users.models import (EpisodeAction, DeviceDoesNotExist,
+                                DeviceUIDException,
+                                InvalidEpisodeActionAttributes, )
 from mygpo.users.settings import FLATTR_AUTO
 from mygpo.core.json import JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
@@ -57,120 +60,149 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+class RequestException(Exception):
+    """ Raised if the request is malfored or otherwise invalid """
+
+
 # keys that are allowed in episode actions
 EPISODE_ACTION_KEYS = ('position', 'episode', 'action', 'device', 'timestamp',
                        'started', 'total', 'podcast')
 
 
-@csrf_exempt
-@require_valid_user
-@check_username
-@never_cache
-@allowed_methods(['GET', 'POST'])
-@cors_origin()
-def subscriptions(request, username, device_uid):
+class APIView(View):
 
-    now = datetime.now()
-    now_ = get_timestamp(now)
-
-    if request.method == 'GET':
-
+    @method_decorator(csrf_exempt)
+    @method_decorator(require_valid_user)
+    @method_decorator(check_username)
+    @method_decorator(never_cache)
+    @method_decorator(cors_origin())
+    def dispatch(self, *args, **kwargs):
+        """ Dispatches request and does generic error handling """
         try:
-            device = request.user.get_device_by_uid(device_uid)
+            return super(APIView, self).dispatch(*args, **kwargs)
+
         except DeviceDoesNotExist as e:
             return HttpResponseNotFound(str(e))
 
-        since_ = request.GET.get('since', None)
-        if since_ is None:
-            return HttpResponseBadRequest('parameter since missing')
-        try:
-            since = datetime.fromtimestamp(float(since_))
-        except ValueError:
-            return HttpResponseBadRequest('since-value is not a valid timestamp')
+        except RequestException as e:
+            return HttpResponseBadRequest(str(e))
 
-        changes = get_subscription_changes(request.user, device, since, now)
-
-        return JsonResponse(changes)
-
-    elif request.method == 'POST':
-        d = get_device(request.user, device_uid,
-                request.META.get('HTTP_USER_AGENT', ''))
+    def parsed_body(self, request):
+        """ Returns the object parsed from the JSON request body """
 
         if not request.body:
-            return HttpResponseBadRequest('POST data must not be empty')
+            raise RequestException('POST data must not be empty')
 
         try:
-            actions = parse_request_body(request)
+            # TODO: implementation of parse_request_body can be moved here
+            # after all views using it have been refactored
+            return parse_request_body(request)
         except (JSONDecodeError, UnicodeDecodeError, ValueError) as e:
-            msg = (u'Could not decode subscription update POST data for ' +
-                   'user %s: %s') % (username,
-                   request.body.decode('ascii', errors='replace'))
+            msg = u'Could not decode request body for user {}: {}'.format(
+                username, request.body.decode('ascii', errors='replace'))
             logger.warn(msg, exc_info=True)
-            return HttpResponseBadRequest(msg)
+            raise RequestException(msg)
 
-        add = actions['add'] if 'add' in actions else []
-        rem = actions['remove'] if 'remove' in actions else []
+    def get_since(self, request):
+        """ Returns parsed "since" GET parameter """
+        since_ = request.GET.get('since', None)
 
-        add = filter(None, add)
-        rem = filter(None, rem)
+        if since_ is None:
+            raise RequestException("parameter 'since' missing")
 
         try:
-            update_urls = update_subscriptions(request.user, d, add, rem)
-        except ValueError, e:
-            return HttpResponseBadRequest(e)
+            since = datetime.fromtimestamp(int(since_))
+        except ValueError:
+            raise RequestException("'since' is not a valid timestamp")
+
+        if since_ < 0:
+            raise RequestException("'since' must be a non-negative number")
+
+        return since
+
+
+class SubscriptionsAPI(APIView):
+    """ API for sending and retrieving podcast subscription updates """
+
+    def get(self, request, version, username, device_uid):
+        """ Client retrieves subscription updates """
+        now = datetime.utcnow()
+        device = request.user.get_device_by_uid(device_uid)
+        since = self.get_since(request)
+        add, rem, until = self.get_changes(device, since, now)
+        return JsonResponse({
+            'add': add,
+            'remove': rem,
+            'timestamp': until
+        })
+
+    def post(self, request, version, username, device_uid):
+        """ Client sends subscription updates """
+        now = get_timestamp(datetime.utcnow())
+
+        d = get_device(request.user, device_uid,
+                       request.META.get('HTTP_USER_AGENT', ''))
+
+        actions = self.parsed_body(request)
+
+        add = filter(None, actions.get('add', []))
+        rem = filter(None, actions.get('remove', []))
+
+        update_urls = self.update_subscriptions(request.user, d, add, rem)
 
         return JsonResponse({
-            'timestamp': now_,
+            'timestamp': now,
             'update_urls': update_urls,
-            })
+        })
 
+    def update_subscriptions(self, user, device, add, remove):
 
-def update_subscriptions(user, device, add, remove):
+        conflicts = intersect(add, remove)
+        if conflicts:
+            msg = "can not add and remove '{}' at the same time".format(
+                str(conflicts))
+            raise RequestException(msg)
 
-    for a in add:
-        if a in remove:
-            raise ValueError('can not add and remove %s at the same time' % a)
+        add_s = map(normalize_feed_url, add)
+        rem_s = map(normalize_feed_url, remove)
 
-    add_s = map(normalize_feed_url, add)
-    rem_s = map(normalize_feed_url, remove)
+        assert len(add) == len(add_s) and len(remove) == len(rem_s)
 
-    assert len(add) == len(add_s) and len(remove) == len(rem_s)
+        pairs = zip(add + remove, add_s + rem_s)
+        updated_urls = filter(lambda (a, b): a != b, pairs)
 
-    updated_urls = filter(lambda (a, b): a != b, zip(add + remove, add_s + rem_s))
+        add_s = filter(None, add_s)
+        rem_s = filter(None, rem_s)
 
-    add_s = filter(None, add_s)
-    rem_s = filter(None, rem_s)
+        # If two different URLs (in add and remove) have
+        # been sanitized to the same, we ignore the removal
+        rem_s = filter(lambda x: x not in add_s, rem_s)
 
-    # If two different URLs (in add and remove) have
-    # been sanitized to the same, we ignore the removal
-    rem_s = filter(lambda x: x not in add_s, rem_s)
+        subscriber = BulkSubscribe(user, device)
 
-    subscriber = BulkSubscribe(user, device)
+        for a in add_s:
+            subscriber.add_action(a, 'subscribe')
 
-    for a in add_s:
-        subscriber.add_action(a, 'subscribe')
+        for r in rem_s:
+            subscriber.add_action(r, 'unsubscribe')
 
-    for r in rem_s:
-        subscriber.add_action(r, 'unsubscribe')
+        try:
+            subscriber.execute()
+        except BulkException as be:
+            for err in be.errors:
+                msg = 'Advanced API: {user}: Updating subscription for ' \
+                      '{podcast} on {device} failed: {err} {reason}'.format(
+                          user=user.username, podcast=err.doc,
+                          device=device.uid, err=err.error, reason=err.reason)
+                loger.error(msg)
 
-    try:
-        subscriber.execute()
-    except BulkException as be:
-        for err in be.errors:
-            loger.error('Advanced API: %(username)s: Updating subscription for '
-                    '%(podcast_url)s on %(device_uid)s failed: '
-                    '%(rerror)s (%(reason)s)'.format(username=user.username,
-                        podcast_url=err.doc, device_uid=device.uid,
-                        error=err.error, reason=err.reason)
-                )
+        return updated_urls
 
-    return updated_urls
-
-
-def get_subscription_changes(user, device, since, until):
-    add_urls, rem_urls = device.get_subscription_changes(since, until)
-    until_ = get_timestamp(until)
-    return {'add': add_urls, 'remove': rem_urls, 'timestamp': until_}
+    def get_changes(self, device, since, until):
+        """ Returns subscription changes for the given device """
+        add_urls, rem_urls = device.get_subscription_changes(since, until)
+        until_ = get_timestamp(until)
+        return (add_urls, rem_urls, until_)
 
 
 @csrf_exempt
