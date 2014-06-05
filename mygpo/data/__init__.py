@@ -1,3 +1,1 @@
-# make sure those are executed on startup
-
-import mygpo.data.signals
+default_app_config = 'mygpo.data.apps.DataAppConfig'
