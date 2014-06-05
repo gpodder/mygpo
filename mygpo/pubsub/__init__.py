@@ -8,11 +8,7 @@ import urllib
 import urllib2
 import logging
 
-from couchdbkit.ext.django import *
 from django.core.urlresolvers import reverse
-
-from mygpo.pubsub.models import Subscription, SubscriptionError
-from mygpo.db.couchdb.pubsub import subscription_for_topic
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +16,9 @@ logger = logging.getLogger(__name__)
 def subscribe(feedurl, huburl, base_url, mode='subscribe'):
     """ Subscribe to the feed at a Hub """
 
+    from mygpo.pubsub.models import Subscription, SubscriptionError
+    from mygpo.db.couchdb.pubsub import subscription_for_topic
+    from couchdbkit.ext.django import *
     logger.info('subscribing for {feed} at {hub}'.format(feed=feedurl,
                                                              hub=huburl))
     verify = 'sync'
