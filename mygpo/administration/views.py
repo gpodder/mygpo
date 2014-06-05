@@ -18,12 +18,12 @@ from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.conf import settings
 
-from mygpo.admin.auth import require_staff
-from mygpo.admin.group import PodcastGrouper
+from mygpo.administration.auth import require_staff
+from mygpo.administration.group import PodcastGrouper
 from mygpo.maintenance.merge import PodcastMerger, IncorrectMergeException
 from mygpo.users.models import User
-from mygpo.admin.clients import UserAgentStats, ClientStats
-from mygpo.admin.tasks import merge_podcasts, unify_slugs
+from mygpo.administration.clients import UserAgentStats, ClientStats
+from mygpo.administration.tasks import merge_podcasts, unify_slugs
 from mygpo.utils import get_git_head
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.cel import celery

@@ -1,6 +1,6 @@
 from django.conf.urls import *
 
-from mygpo.admin.views import Overview, MergeSelect, MergeVerify, \
+from mygpo.administration.views import Overview, MergeSelect, MergeVerify, \
          MergeProcess, MergeStatus, ClientStatsView, ClientStatsJsonView, \
          UserAgentStatsView, StatsView, StatsJsonView, HostInfo, \
          FiletypeStatsView, ActivateUserView, UnifyDuplicateSlugsSelect, \

@@ -16,7 +16,7 @@ celery = Celery('mygpo.celery',
                     'mygpo.api.tasks',
                     'mygpo.users.tasks',
                     'mygpo.data.tasks',
-                    'mygpo.admin.tasks',
+                    'mygpo.administration.tasks',
                     'mygpo.directory.tasks',
                 ])
 

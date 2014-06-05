@@ -157,7 +157,7 @@ INSTALLED_APPS = (
     'mygpo.directory',
     'mygpo.maintenance',
     'mygpo.share',
-    'mygpo.admin',
+    'mygpo.administration',
     'mygpo.pubsub',
     'mygpo.db.couchdb',
 )
