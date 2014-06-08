@@ -30,12 +30,14 @@ ADMINS = ()
 
 MANAGERS = ADMINS
 
-# dummy entry.
-# not needed for production, but tests fail otherwise in Django 1.4
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'tmp',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'mygpo',
+        'USER': 'mygpo',
+        'PASSWORD': 'mygpo',
+        'HOST': '',
+        'PORT': '',
     }
 }
 
@@ -148,6 +150,7 @@ INSTALLED_APPS = (
     'django_couchdb_utils.registration',
     'djcelery',
     'mygpo.core',
+    'mygpo.podcasts',
     'mygpo.users',
     'mygpo.api',
     'mygpo.web',
