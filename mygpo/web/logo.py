@@ -20,9 +20,11 @@ import StringIO
 from datetime import datetime
 from glob import glob
 import errno
+import hashlib
 
 from PIL import Image, ImageDraw
 
+from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.http import Http404, HttpResponse, HttpResponseNotFound
 from django.views.generic.base import View
@@ -146,3 +148,16 @@ class CoverArt(View):
         resp.status_code = 200
         resp.write(f.read())
         return resp
+
+
+def get_logo_url(podcast, size):
+    """ Return the logo URL for the podcast """
+
+    if podcast.logo_url:
+        filename = hashlib.sha1(podcast.logo_url).hexdigest()
+    else:
+        filename = 'podcast-%d.png' % (hash(podcast.title) % 5, )
+
+    prefix = CoverArt.get_prefix(filename)
+
+    return reverse('logo', args=[size, prefix, filename])

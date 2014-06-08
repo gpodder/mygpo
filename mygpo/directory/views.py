@@ -19,6 +19,7 @@ from feedservice.parse.models import ParserException
 from feedservice.parse import FetchFeedException
 
 from mygpo.core.proxy import proxy_object
+from mygpo.podcasts.models import Podcast
 from mygpo.directory.toplist import PodcastToplist, EpisodeToplist, \
          TrendingPodcasts
 from mygpo.directory.search import search_podcasts
@@ -30,7 +31,7 @@ from mygpo.data.feeddownloader import PodcastUpdater, NoEpisodesException
 from mygpo.data.tasks import update_podcasts
 from mygpo.db.couchdb.user import get_user_by_id
 from mygpo.db.couchdb.podcast import get_podcast_languages, podcasts_by_id, \
-         random_podcasts, podcasts_to_dict, podcast_for_url, \
+         podcasts_to_dict, podcast_for_url, \
          get_flattr_podcasts, get_flattr_podcast_count, get_license_podcasts, \
          get_license_podcast_count, get_podcast_licenses
 from mygpo.db.couchdb.directory import category_for_tag
@@ -88,7 +89,7 @@ class Directory(View):
             'topics': Topics(),
             'trending_podcasts': TrendingPodcasts(''),
             'podcastlists': self.get_random_list(),
-            'random_podcasts': self.get_random_podcast(),
+            'random_podcast': Podcast.objects.random().first(),
             })
 
 
@@ -102,11 +103,6 @@ class Directory(View):
             random_list.user = get_user_by_id(random_list.user)
 
         yield random_list
-
-    def get_random_podcast(self):
-        random_podcast = next(random_podcasts(), None)
-        if random_podcast:
-            yield random_podcast.get_podcast()
 
 
 @cache_control(private=True)

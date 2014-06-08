@@ -37,6 +37,7 @@ from django.views.decorators.cache import never_cache, cache_control
 
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core.podcasts import PodcastSet
+from mygpo.podcasts.models import Podcast
 from mygpo.directory.toplist import PodcastToplist
 from mygpo.users.models import History, HistoryEntry, DeviceDoesNotExist
 from mygpo.users.tasks import update_suggestions
@@ -45,7 +46,7 @@ from mygpo.utils import parse_range
 from mygpo.web.views.podcast import slug_id_decorator
 from mygpo.users.settings import FLATTR_AUTO, FLATTR_TOKEN
 from mygpo.db.couchdb.episode import favorite_episode_ids_for_user
-from mygpo.db.couchdb.podcast import podcast_by_id, random_podcasts
+from mygpo.db.couchdb.podcast import podcast_by_id
 from mygpo.db.couchdb.user import (suggestions_for_user,
     blacklist_suggested_podcast)
 from mygpo.db.couchdb.directory import tags_for_user
@@ -126,11 +127,6 @@ def dashboard(request, episode_count=10):
 
     newest_episodes = podcasts.get_newest_episodes(tomorrow, episode_count)
 
-    def get_random_podcasts():
-        random_podcast = next(random_podcasts(), None)
-        if random_podcast:
-            yield random_podcast.get_podcast()
-
     # we only show the "install reader" link in firefox, because we don't know
     # yet how/if this works in other browsers.
     # hints appreciated at https://bugs.gpodder.org/show_bug.cgi?id=58
@@ -141,7 +137,7 @@ def dashboard(request, episode_count=10):
             'user': request.user,
             'subscribed_podcasts': subscribed_podcasts,
             'newest_episodes': list(newest_episodes),
-            'random_podcasts': get_random_podcasts(),
+            'random_podcast': Podcast.objects.random().first(),
             'checklist': checklist,
             'site': site,
             'show_install_reader': show_install_reader,

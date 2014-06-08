@@ -26,6 +26,7 @@ from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.utils import parse_range, normalize_feed_url
 from mygpo.directory.tags import Topics
 from mygpo.web.utils import get_episode_link_target, get_podcast_link_target
+from mygpo.web.logo import get_logo_url
 from mygpo.decorators import cors_origin
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.db.couchdb.episode import episode_for_podcast_url
@@ -107,7 +108,7 @@ def podcast_data(obj, domain, scaled_logo_size=64):
     subscribers = obj.subscriber_count()
     last_subscribers = obj.prev_subscriber_count()
 
-    scaled_logo_url = obj.get_logo_url(scaled_logo_size)
+    scaled_logo_url = get_logo_url(obj, scaled_logo_size)
 
     return {
         "url": podcast.url,

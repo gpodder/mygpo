@@ -5,9 +5,10 @@ import random
 from django.core.management.base import BaseCommand
 
 from mygpo.core.podcasts import individual_podcasts
+from mygpo.podcasts.models import Podcast
 from mygpo.directory.toplist import PodcastToplist
 from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url, \
-         random_podcasts, podcasts_by_last_update, podcasts_need_update, \
+         podcasts_by_last_update, podcasts_need_update, \
          podcasts_by_next_update
 
 
@@ -50,8 +51,7 @@ class PodcastCommand(BaseCommand):
             yield (p.url for p in podcasts)
 
         if options.get('random'):
-            # no need to pass "max" to random_podcasts, it uses chunked queries
-            podcasts = random_podcasts()
+            podcasts = Podcast.objects.random()
             yield (p.url for p in individual_podcasts(podcasts))
 
         if options.get('next'):

@@ -1,5 +1,4 @@
 from hashlib import sha1
-from random import random
 from datetime import datetime
 from collections import Counter
 
@@ -349,32 +348,6 @@ def podcast_duplicates_for_url(url):
 
     for pg in r:
         yield pg.get_podcast_by_url(url)
-
-
-def random_podcasts(language='', chunk_size=5):
-    """ Returns an iterator of random podcasts
-
-    optionaly a language code can be specified. If given the podcasts will
-    be restricted to this language. chunk_size determines how many podcasts
-    will be fetched at once """
-
-    while True:
-        rnd = random()
-        res = Podcast.view('podcasts/random',
-                startkey     = [language, rnd],
-                include_docs = True,
-                limit        = chunk_size,
-                stale        = 'ok',
-                wrap_doc     = False,
-            )
-
-        if not res:
-            break
-
-        for r in res:
-            # The view podcasts/random does not include incomplete podcasts,
-            # so we don't need to send any 'incomplete_obj' signals here
-            yield _wrap_pg(r)
 
 
 def podcasts_by_last_update(limit=100):

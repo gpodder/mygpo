@@ -18,7 +18,8 @@ class UUIDModel(models.Model):
 class TitleModel(models.Model):
     """ Model that has a title """
 
-    title = models.CharField(max_length=1000, null=False, blank=True)
+    title = models.CharField(max_length=1000, null=False, blank=True,
+                             db_index=True)
     subtitle = models.CharField(max_length=1000, null=False, blank=True)
 
     class Meta:
@@ -133,6 +134,16 @@ class SlugsMixin(models.Model):
     class Meta:
         abstract = True
 
+    @property
+    def slug(self):
+        """ The main slug of the podcast
+
+        TODO: should be retrieved from a (materialized) view """
+        slug = self.slugs.first()
+        if slug is None:
+            return None
+        return slug.slug
+
 
 class MergedUUIDsMixin(models.Model):
     """ Methods for working with MergedUUID objects """
@@ -169,6 +180,17 @@ class PodcastGroup(UUIDModel, TitleModel):
     """ Groups multiple podcasts together """
 
 
+class PodcastQuerySet(models.QuerySet):
+    """ Custom queries for Podcasts """
+
+    def random(self):
+        """ Random podcasts
+
+        Excludes podcasts with missing title to guarantee some
+        minimum quality of the results """
+        return self.exclude(title='').order_by('?')
+
+
 class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
         LanguageModel, LastUpdateModel, UpdateInfoModel, LicenseModel,
         FlattrModel, ContentTypesModel, MergedIdsModel, OutdatedModel,
@@ -190,6 +212,8 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
     episode_count = models.PositiveIntegerField()
     hub = models.URLField(null=True)
     twitter = models.CharField(max_length=15, null=True, blank=False)
+
+    objects = PodcastQuerySet.as_manager()
 
     def __str__(self):
         return self.title.encode('ascii', errors='replace')

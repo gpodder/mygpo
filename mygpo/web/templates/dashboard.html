@@ -60,8 +60,7 @@
   {% endif %}
 
 
- {% cache 3600 random_podcast %}
- {% for random_podcast in random_podcasts %}
+ {% cache 3600 random_podcast_box %}
    <div class="well">
 
    <h4><small>{% trans "Random" %}</small></h4>
@@ -82,7 +81,6 @@
    </p>
 
    </div>
- {% endfor %}
  {% endcache %}
 
   <div class="well">

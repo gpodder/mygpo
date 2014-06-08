@@ -1,6 +1,5 @@
 from __future__ import division
 
-import hashlib
 import re
 from random import random
 from datetime import timedelta
@@ -8,14 +7,11 @@ from datetime import timedelta
 from couchdbkit.ext.django.schema import *
 from restkit.errors import Unauthorized
 
-from django.core.urlresolvers import reverse
-
 from mygpo.decorators import repeat_on_conflict
 from mygpo import utils
 from mygpo.core.proxy import DocumentABCMeta
 from mygpo.core.slugs import SlugMixin
 from mygpo.core.oldid import OldIdMixin
-from mygpo.web.logo import CoverArt
 
 # make sure this code is executed at startup
 from mygpo.core.signals import *
@@ -301,17 +297,6 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         return self
 
 
-    def get_logo_url(self, size):
-        if self.logo_url:
-            filename = hashlib.sha1(self.logo_url).hexdigest()
-        else:
-            filename = 'podcast-%d.png' % (hash(self.title) % 5, )
-
-        prefix = CoverArt.get_prefix(filename)
-
-        return reverse('logo', args=[size, prefix, filename])
-
-
     def subscriber_change(self):
         prev = self.prev_subscriber_count()
         if prev <= 0:
@@ -549,17 +534,6 @@ class PodcastGroup(Document, SlugMixin, OldIdMixin):
     @logo_url.setter
     def logo_url(self, value):
         self.podcasts[0].logo_url = value
-
-
-    def get_logo_url(self, size):
-        if self.logo_url:
-            filename = hashlib.sha1(self.logo_url).hexdigest()
-        else:
-            filename = 'podcast-%d.png' % (hash(self.title) % 5, )
-
-        prefix = CoverArt.get_prefix(filename)
-
-        return reverse('logo', args=[size, prefix, filename])
 
 
     def add_podcast(self, podcast, member_name):

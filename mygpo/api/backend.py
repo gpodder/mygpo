@@ -18,38 +18,15 @@
 from collections import defaultdict
 from functools import partial
 
-from mygpo.core.models import Podcast, Episode
+from mygpo.podcasts.models import Podcast
 from mygpo.users.models import EpisodeUserState, Device, DeviceDoesNotExist, \
          PodcastUserState
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core.json import json
 from mygpo.users.settings import STORE_UA
 from mygpo.db.couchdb import bulk_save_retry, get_userdata_database
-from mygpo.db.couchdb.podcast import podcast_for_url, random_podcasts
+from mygpo.db.couchdb.podcast import podcast_for_url
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
-
-
-def get_random_picks(languages=None):
-    """ Returns random podcasts for the given language """
-
-    languages = languages or ['']
-
-    # get one iterator for each language
-    rand_iters = [random_podcasts(lang) for lang in languages]
-
-    # cycle through them, removing those that don't yield any more results
-    while rand_iters:
-        rand_iter = rand_iters.pop(0)
-
-        try:
-            podcast = next(rand_iter)
-            rand_iters.append(rand_iter)
-            yield podcast
-
-        except StopIteration:
-            # don't re-add rand_iter
-            pass
-
 
 
 @repeat_on_conflict(['user'])
