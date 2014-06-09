@@ -16,7 +16,8 @@
 #
 
 import os.path
-from django.conf.urls import *
+from django.conf.urls import include, url, patterns
+from django.contrib import admin
 from django.conf import settings
 
 # strip the leading "/"
@@ -48,4 +49,5 @@ urlpatterns += patterns('',
     (r'^publisher/', include('mygpo.publisher.urls')),
     (r'^administration/', include('mygpo.administration.urls')),
     (r'^pubsub/',    include('mygpo.pubsub.urls')),
+ url(r'^admin/',     include(admin.site.urls)),
 )

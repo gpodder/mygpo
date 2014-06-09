@@ -138,10 +138,12 @@ TEMPLATE_DIRS = ()
 INSTALLED_APPS = (
     'django.contrib.contenttypes',  # unused, but tests fail otherwise (?)
     'django.contrib.messages',
+    'django.contrib.admin',
     'django.contrib.humanize',
+    'django.contrib.auth',
+    'django.contrib.sessions',
     'django.contrib.staticfiles',
     'couchdbkit.ext.django',
-    'django_couchdb_utils.auth',
     'django_couchdb_utils.registration',
     'djcelery',
     'mygpo.core',
@@ -172,6 +174,7 @@ ACCOUNT_ACTIVATION_DAYS = 7
 AUTHENTICATION_BACKENDS = (
     'django_couchdb_utils.auth.backends.CouchDBAuthBackend',
     'mygpo.web.auth.EmailAuthenticationBackend',
+    'django.contrib.auth.backends.ModelBackend',
 )
 
 SESSION_ENGINE = "django_couchdb_utils.sessions.cached_couchdb"
