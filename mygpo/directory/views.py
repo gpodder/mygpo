@@ -57,9 +57,9 @@ class ToplistView(TemplateView):
         of these codes is contained in ISO 639. """
 
         query = Podcast.objects.exclude(language__isnull=True)
-        query = query.only('language').distinct('language')
+        query = query.distinct('language').values('language')
 
-        langs = [o.language for o in query]
+        langs = [o['language'] for o in query]
         langs = sorted(sanitize_language_codes(langs))
 
         return get_language_names(langs)
