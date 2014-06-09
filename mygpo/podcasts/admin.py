@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.contrib import admin
 from django.contrib.contenttypes.admin import GenericTabularInline
 from mygpo.podcasts.models import Podcast, Episode, URL, Slug, Tag, MergedUUID
