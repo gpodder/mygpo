@@ -215,7 +215,7 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
     common_episode_title = models.CharField(max_length=50, null=False, blank=True)
     new_location = models.URLField(max_length=1000, null=True, blank=False)
     latest_episode_timestamp = models.DateTimeField(null=True)
-    episode_count = models.PositiveIntegerField()
+    episode_count = models.PositiveIntegerField(default=0)
     hub = models.URLField(null=True)
     twitter = models.CharField(max_length=15, null=True, blank=False)
 
