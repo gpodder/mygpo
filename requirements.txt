@@ -5,7 +5,7 @@ amqp==1.4.4
 anyjson==0.3.3
 argparse==1.2.1
 billiard==3.3.0.16
--e git+https://github.com/benoitc/couchdbkit.git@81070d350438076d76e712b70a1b8c0cdc2e51e7#egg=couchdbkit-dev
+-e git+https://github.com/stefankoegl/couchdbkit.git@7593bca76f76097394840a96031ce7a297b18b34#egg=couchdbkit-dev
 celery==3.1.10
 coverage==3.7.1
 setuptools==3.4.1
