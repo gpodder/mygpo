@@ -57,14 +57,14 @@
       <label class="sr-only" for="lang">{% trans "Language" %}</label>
       <select class="form-control input-md" name="lang">
 
-      {% if language == "" %}
+      {% if view.language == "" %}
        <option selected="selected" value="">{% trans "all" %}</option>
       {% else %}
        <option value="">{% trans "all" %}</option>
       {% endif %}
 
-      {% for key, name in all_languages.iteritems %}
-       {% if language == key %}
+      {% for key, name in view.all_languages.iteritems %}
+       {% if view.language == key %}
         <option selected="selected" value="{{ key }}">{{ name }}</option>
        {% else %}
         <option value="{{ key }}">{{ name }}</option>

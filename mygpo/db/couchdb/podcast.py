@@ -66,26 +66,6 @@ def podcasts_for_tag(tag):
         yield (r['key'][1], r['value'])
 
 
-@cache_result(timeout=60*60)
-def get_podcast_languages():
-    """ Returns all 2-letter language codes that are used by podcasts.
-
-    It filters obviously invalid strings, but does not check if any
-    of these codes is contained in ISO 639. """
-
-    from mygpo.web.utils import sanitize_language_codes
-
-    res = Podcast.view('podcasts/by_language',
-            group_level = 1,
-            stale       = 'ok',
-        )
-
-    langs = [r['key'][0] for r in res]
-    sane_lang = sanitize_language_codes(langs)
-    sane_lang.sort()
-    return sane_lang
-
-
 def podcast_by_id_uncached(podcast_id, current_id=False):
 
     if not podcast_id:

@@ -49,7 +49,8 @@ class LinkModel(models.Model):
 class LanguageModel(models.Model):
     """ Model that has a language """
 
-    language = models.CharField(max_length=10, null=True, blank=False)
+    language = models.CharField(max_length=10, null=True, blank=False,
+                                db_index=True)
 
     class Meta:
         abstract = True

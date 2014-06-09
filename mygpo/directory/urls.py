@@ -2,11 +2,16 @@ from django.conf.urls import *
 
 from mygpo.directory.views import Directory, Carousel, MissingPodcast, \
          AddPodcast, AddPodcastStatus, FlattrPodcastList, LicensePodcastList, \
-         LicenseList
+         LicenseList, PodcastToplistView, EpisodeToplistView
 
 urlpatterns = patterns('mygpo.directory.views',
- url(r'^toplist/$',                                               'toplist',                    name='toplist'),
- url(r'^toplist/episodes$',                                       'episode_toplist',            name='episode-toplist'),
+ url(r'^toplist/$',
+     PodcastToplistView.as_view(),
+     name='toplist'),
+
+ url(r'^toplist/episodes$',
+     EpisodeToplistView.as_view(),
+     name='episode-toplist'),
 
  url(r'^directory/$',
      Directory.as_view(),

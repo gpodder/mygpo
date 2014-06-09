@@ -24,13 +24,13 @@ from mygpo.directory.toplist import PodcastToplist, EpisodeToplist, \
          TrendingPodcasts
 from mygpo.directory.search import search_podcasts
 from mygpo.web.utils import process_lang_params, get_language_names, \
-         get_page_list, get_podcast_link_target
+         get_page_list, get_podcast_link_target, sanitize_language_codes
 from mygpo.directory.tags import Topics
 from mygpo.users.settings import FLATTR_TOKEN
 from mygpo.data.feeddownloader import PodcastUpdater, NoEpisodesException
 from mygpo.data.tasks import update_podcasts
 from mygpo.db.couchdb.user import get_user_by_id
-from mygpo.db.couchdb.podcast import get_podcast_languages, podcasts_by_id, \
+from mygpo.db.couchdb.podcast import podcasts_by_id, \
          podcasts_to_dict, podcast_for_url, \
          get_flattr_podcasts, get_flattr_podcast_count, get_license_podcasts, \
          get_license_podcast_count, get_podcast_licenses
@@ -39,28 +39,78 @@ from mygpo.db.couchdb.podcastlist import random_podcastlists, \
          podcastlist_count, podcastlists_by_rating
 
 
-@vary_on_cookie
-@cache_control(private=True)
-def toplist(request, num=100, lang=None):
+class ToplistView(TemplateView):
+    """ Generic Top List view """
 
-    lang = process_lang_params(request)
+    @method_decorator(vary_on_cookie)
+    @method_decorator(cache_control(private=True))
+    def dispatch(self, *args, **kwargs):
+        """ Only used for applying decorators """
+        return super(ToplistView, self).dispatch(*args, **kwargs)
 
-    toplist = PodcastToplist(lang)
-    entries = toplist[:num]
+    def all_languages(self):
+        """ Returns all 2-letter language codes that are used by podcasts.
 
-    max_subscribers = max([p.subscriber_count() for (oldp, p) in entries]) if entries else 0
-    current_site = RequestSite(request)
+        It filters obviously invalid strings, but does not check if any
+        of these codes is contained in ISO 639. """
 
-    languages = get_podcast_languages()
-    all_langs = get_language_names(languages)
+        query = Podcast.objects.exclude(language__isnull=True)
+        query = query.only('language').distinct('language')
 
-    return render(request, 'toplist.html', {
-        'entries': entries,
-        'max_subscribers': max_subscribers,
-        'url': current_site,
-        'language': lang,
-        'all_languages': all_langs,
-    })
+        langs = [o.language for o in query]
+        langs = sorted(sanitize_language_codes(langs))
+
+        return get_language_names(langs)
+
+    def language(self):
+        """ Currently selected language """
+        return process_lang_params(self.request)
+
+    def site(self):
+        """ Current site for constructing absolute links """
+        return RequestSite(self.request)
+
+
+class PodcastToplistView(ToplistView):
+    """ Most subscribed podcasts """
+
+    template_name = 'toplist.html'
+
+    def get_context_data(self, num=100):
+        context = super(PodcastToplistView, self).get_context_data()
+
+        toplist = PodcastToplist(self.language())
+        entries = toplist[:num]
+        context['entries'] = entries
+
+        context['max_subscribers'] = max([0] + [p.subscriber_count() for (oldp, p) in entries])
+
+        return context
+
+
+class EpisodeToplistView(ToplistView):
+    """ Most listened-to episodes """
+
+    template_name = 'episode_toplist.html'
+
+    def get_context_data(self, num=100):
+        context = super(EpisodeToplistView, self).get_context_data()
+
+        toplist = EpisodeToplist(language=self.language())
+        entries = list(map(proxy_object, toplist[:num]))
+
+        # load podcast objects
+        podcast_ids = [e.podcast for e in entries]
+        podcasts = podcasts_to_dict(podcast_ids, True)
+        for entry in entries:
+            entry.podcast = podcasts.get(entry.podcast, None)
+
+        context['entries'] = entries
+
+        # Determine maximum listener amount (or 0 if no entries exist)
+        context['max_listeners'] = max([0]+[e.listeners for e in entries])
+
+        return context
 
 
 class Carousel(View):
@@ -168,36 +218,6 @@ def search(request, template='search.html', args={}):
             **args
             ))
 
-
-@cache_control(private=True)
-@vary_on_cookie
-def episode_toplist(request, num=100):
-    lang = process_lang_params(request)
-
-    toplist = EpisodeToplist(language=lang)
-    entries = list(map(proxy_object, toplist[:num]))
-
-    # load podcast objects
-    podcast_ids = [e.podcast for e in entries]
-    podcasts = podcasts_to_dict(podcast_ids, True)
-    for entry in entries:
-        entry.podcast = podcasts.get(entry.podcast, None)
-
-    current_site = RequestSite(request)
-
-    # Determine maximum listener amount (or 0 if no entries exist)
-    max_listeners = max([0]+[e.listeners for e in entries])
-
-    languages = get_podcast_languages()
-    all_langs = get_language_names(languages)
-
-    return render(request, 'episode_toplist.html', {
-        'entries': entries,
-        'max_listeners': max_listeners,
-        'url': current_site,
-        'language': lang,
-        'all_languages': all_langs,
-    })
 
 
 @cache_control(private=True)
