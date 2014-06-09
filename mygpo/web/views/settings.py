@@ -30,7 +30,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic.base import View
 from django.utils.html import strip_tags
 
-from django_couchdb_utils.auth.models import UsernameException, \
+from django_couchdb_utils.couchauth.models import UsernameException, \
          PasswordException
 
 from mygpo.core.podcasts import PODCAST_SORT

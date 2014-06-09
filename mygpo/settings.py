@@ -144,6 +144,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.staticfiles',
     'couchdbkit.ext.django',
+    'django_couchdb_utils.couchauth',
     'django_couchdb_utils.registration',
     'djcelery',
     'mygpo.core',
@@ -172,7 +173,7 @@ TEST_RUNNER='mygpo.test.MygpoTestSuiteRunner'
 ACCOUNT_ACTIVATION_DAYS = 7
 
 AUTHENTICATION_BACKENDS = (
-    'django_couchdb_utils.auth.backends.CouchDBAuthBackend',
+    'django_couchdb_utils.couchauth.backends.CouchDBAuthBackend',
     'mygpo.web.auth.EmailAuthenticationBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
