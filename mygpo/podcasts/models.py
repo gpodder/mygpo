@@ -330,7 +330,7 @@ class Slug(OrderedModel, ScopedModel):
     See also :class:`SlugsMixin`
     """
 
-    slug = models.SlugField()
+    slug = models.SlugField(max_length=150)
 
     # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
     content_type = models.ForeignKey(ContentType)
