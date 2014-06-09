@@ -243,6 +243,9 @@ class Episode(UUIDModel, TitleModel, DescriptionModel, LinkModel,
     podcast = models.ForeignKey(Podcast)
     listeners = models.PositiveIntegerField(null=True)
 
+    class Meta:
+        ordering = ['-released']
+
     def __str__(self):
         return self.title.encode('ascii', errors='replace')
 
@@ -282,6 +285,9 @@ class URL(OrderedModel, ScopedModel):
             # object have the same order key
             ('content_type', 'object_id', 'order'),
         )
+
+        verbose_name = 'URL'
+        verbose_name_plural = 'URLs'
 
 
 class Tag(models.Model):
@@ -363,3 +369,7 @@ class MergedUUID(models.Model):
     content_type = models.ForeignKey(ContentType)
     object_id = UUIDField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
+
+    class Meta:
+        verbose_name = 'Merged UUID'
+        verbose_name_plural = 'Merged UUIDs'
