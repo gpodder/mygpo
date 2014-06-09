@@ -32,14 +32,6 @@ def podcast_slugs(base_slug):
 
 
 @cache_result(timeout=60*60)
-def podcast_count():
-    return Podcast.view('podcasts/by_id',
-            limit = 0,
-            stale = 'update_after',
-        ).total_rows
-
-
-@cache_result(timeout=60*60)
 def podcasts_for_tag(tag):
     """ Returns the podcasts with the current tag.
 

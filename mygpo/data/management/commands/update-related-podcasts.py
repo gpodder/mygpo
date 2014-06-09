@@ -3,12 +3,10 @@ from operator import itemgetter
 
 from django.core.management.base import BaseCommand
 
-from mygpo.decorators import repeat_on_conflict
-from mygpo.core.models import Podcast
+from mygpo.podcasts.models import Podcast
 from mygpo.data.podcast import calc_similar_podcasts
 from mygpo.utils import progress
-from mygpo.db.couchdb.podcast import podcast_count, all_podcasts, \
-    update_related_podcasts
+from mygpo.db.couchdb.podcast import all_podcasts, update_related_podcasts
 
 
 class Command(BaseCommand):
@@ -25,7 +23,7 @@ class Command(BaseCommand):
         max_related = options.get('max')
 
         podcasts = all_podcasts()
-        total = podcast_count()
+        total = Podcast.objects.count()
 
         for (n, podcast) in enumerate(podcasts):
 

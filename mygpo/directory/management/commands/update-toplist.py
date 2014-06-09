@@ -2,8 +2,9 @@ from optparse import make_option
 
 from django.core.management.base import BaseCommand
 
+from mygpo.podcasts.models import Podcast
 from mygpo.utils import progress
-from mygpo.db.couchdb.podcast import podcast_count, all_podcasts
+from mygpo.db.couchdb.podcast import all_podcasts
 from mygpo.directory.tasks import update_podcast_subscribers
 
 
@@ -20,7 +21,7 @@ class Command(BaseCommand):
         silent = options.get('silent')
 
         podcasts = all_podcasts()
-        total = podcast_count()
+        total = Podcast.objects.count()
 
         for n, podcast in enumerate(podcasts):
             update_podcast_subscribers.delay(podcast.get_id())

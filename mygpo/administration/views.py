@@ -18,6 +18,7 @@ from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.conf import settings
 
+from mygpo.podcasts.models import Podcast
 from mygpo.administration.auth import require_staff
 from mygpo.administration.group import PodcastGrouper
 from mygpo.maintenance.merge import PodcastMerger, IncorrectMergeException
@@ -30,7 +31,7 @@ from mygpo.cel import celery
 from mygpo.db.couchdb import get_main_database
 from mygpo.db.couchdb.user import activate_user, add_published_objs
 from mygpo.db.couchdb.episode import episode_count, filetype_stats
-from mygpo.db.couchdb.podcast import podcast_count, podcast_for_url, \
+from mygpo.db.couchdb.podcast import podcast_for_url, \
     podcast_duplicates_for_url, podcasts_by_next_update
 
 
@@ -288,7 +289,7 @@ class StatsView(AdminView):
 
     def _get_stats(self):
         return {
-            'podcasts': podcast_count(),
+            'podcasts': Podcast.objects.count(),
             'episodes': episode_count(),
             'users': User.count(),
         }
