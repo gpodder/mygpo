@@ -56,8 +56,12 @@ class LanguageModel(models.Model):
 
 
 class LastUpdateModel(models.Model):
+    """ Model with timestamp of last update from its source """
 
-    last_update = models.DateTimeField()
+    # date and time at which the model has last been updated from its source
+    # (eg a podcast feed). None means that the object has been created as a
+    # stub, without information from the source.
+    last_update = models.DateTimeField(null=True)
 
     class Meta:
         abstract = True
