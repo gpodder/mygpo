@@ -17,6 +17,7 @@
 #
 
 import os.path
+import dj_database_url
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -31,14 +32,8 @@ ADMINS = ()
 MANAGERS = ADMINS
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'mygpo',
-        'USER': 'mygpo',
-        'PASSWORD': 'mygpo',
-        'HOST': '',
-        'PORT': '',
-    }
+    'default': dj_database_url.config(
+                default='postgres://mygpo:mygpo@localhost/mygpo'),
 }
 
 COUCHDB_DATABASES = {

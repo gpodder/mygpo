@@ -10,5 +10,11 @@ services:
 install:
  - pip install -r requirements.txt --allow-external argparse
 
+before_script:
+  - psql -c 'create database mygpo_test;' -U postgres
+
 script:
   python manage.py test
+
+env:
+ - DATABASE_URL="postgres://postgres@localhost/mygpo_test"
