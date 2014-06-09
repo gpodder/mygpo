@@ -351,30 +351,6 @@ def podcasts_by_next_update(limit=100):
     return list(res)
 
 
-
-
-def all_podcasts():
-    from mygpo.db.couchdb.utils import multi_request_view
-    res = multi_request_view(Podcast,'podcasts/by_id',
-            wrap         = False,
-            include_docs = True,
-            stale        = 'update_after',
-        )
-
-    # TODO: this method is only used for maintenance purposes; should we
-    #       really send 'incomplete_obj' signals here?
-
-    for r in res:
-        obj = r['doc']
-        if obj['doc_type'] == 'Podcast':
-            yield Podcast.wrap(obj)
-        else:
-            pid = r[u'key']
-            pg = PodcastGroup.wrap(obj)
-            podcast = pg.get_podcast_by_id(pid)
-            yield podcast
-
-
 def podcasts_to_dict(ids, use_cache=False):
 
     if ids is None:
