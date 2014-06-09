@@ -23,7 +23,7 @@
     <th>{% trans "License" %}</th>
     <th class="numeric">{% trans "Podcasts" %}</th>
    </tr>
-  {% for license, count in licenses %}
+  {% for license, count in view.licenses %}
     <tr>
      <td>
       <a href="{% url "license-podcasts-url" license|urlencode %}">

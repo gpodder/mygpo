@@ -1,6 +1,5 @@
 from hashlib import sha1
 from datetime import datetime
-from collections import Counter
 
 from restkit import RequestFailed
 from couchdbkit import MultipleResultsFound
@@ -500,18 +499,6 @@ def get_license_podcast_count(license_url=None):
     r = get_single_result(db, 'podcasts/license', **kwargs)
 
     return r['value'] if r else 0
-
-
-@cache_result(timeout=60*60)
-def get_podcast_licenses():
-    """ returns the licenses that are assigned to podcasts """
-    db = get_main_database()
-    r = db.view('podcasts/license',
-            reduce = True,
-            group_level = 1,
-    )
-
-    return Counter({ x['key']: x['value'] for x in r })
 
 
 def subscriberdata_for_podcast(podcast_id):

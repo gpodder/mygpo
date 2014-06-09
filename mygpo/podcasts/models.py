@@ -82,7 +82,8 @@ class UpdateInfoModel(models.Model):
 
 class LicenseModel(models.Model):
     # URL to a license (usually Creative Commons)
-    license = models.CharField(max_length=100, null=True, blank=False)
+    license = models.CharField(max_length=100, null=True, blank=False,
+                               db_index=True)
 
     class Meta:
         abstract = True

@@ -2,10 +2,12 @@ from __future__ import division
 
 from itertools import imap as map
 from math import ceil
+from collections import Counter
 
 from django.http import HttpResponseNotFound, Http404, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.shortcuts import render
+from django.db.models import Count
 from django.contrib.sites.models import RequestSite
 from django.views.decorators.cache import cache_control
 from django.views.decorators.vary import vary_on_cookie
@@ -33,7 +35,7 @@ from mygpo.db.couchdb.user import get_user_by_id
 from mygpo.db.couchdb.podcast import podcasts_by_id, \
          podcasts_to_dict, podcast_for_url, \
          get_flattr_podcasts, get_flattr_podcast_count, get_license_podcasts, \
-         get_license_podcast_count, get_podcast_licenses
+         get_license_podcast_count
 from mygpo.db.couchdb.directory import category_for_tag
 from mygpo.db.couchdb.podcastlist import random_podcastlists, \
          podcastlist_count, podcastlists_by_rating
@@ -421,8 +423,9 @@ class LicenseList(TemplateView):
 
     template_name = 'directory/licenses.html'
 
-    def get(self, request):
-        context = {
-            'licenses': get_podcast_licenses().most_common(),
-        }
-        return self.render_to_response(context)
+    def licenses(self):
+        """ Returns all podcast licenses """
+        query = Podcast.objects.exclude(license__isnull=True)
+        values = query.values("license").annotate(Count("id")).order_by()
+
+        return Counter({l['license']: l['id__count'] for l in values})
