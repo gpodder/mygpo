@@ -26,7 +26,7 @@
   {% for license, count in view.licenses %}
     <tr>
      <td>
-      <a href="{% url "license-podcasts-url" license|urlencode %}">
+      <a href="{% url "license-podcasts-url" license %}">
        {{ license|license_name }}
       </a>
       <a href="{{ license }}">

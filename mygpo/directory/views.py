@@ -11,6 +11,7 @@ from django.db.models import Count
 from django.contrib.sites.models import RequestSite
 from django.views.decorators.cache import cache_control
 from django.views.decorators.vary import vary_on_cookie
+from django.views.generic import ListView
 from django.utils.decorators import method_decorator
 from django.views.generic.base import View, TemplateView
 from django.contrib.auth.decorators import login_required
@@ -33,9 +34,7 @@ from mygpo.data.feeddownloader import PodcastUpdater, NoEpisodesException
 from mygpo.data.tasks import update_podcasts
 from mygpo.db.couchdb.user import get_user_by_id
 from mygpo.db.couchdb.podcast import podcasts_by_id, \
-         podcasts_to_dict, podcast_for_url, \
-         get_flattr_podcasts, get_flattr_podcast_count, get_license_podcasts, \
-         get_license_podcast_count
+         podcasts_to_dict, podcast_for_url
 from mygpo.db.couchdb.directory import category_for_tag
 from mygpo.db.couchdb.podcastlist import random_podcastlists, \
          podcastlist_count, podcastlists_by_rating
@@ -344,54 +343,41 @@ class AddPodcastStatus(TemplateView):
             })
 
 
-class PodcastListView(TemplateView):
+class PodcastListView(ListView):
     """ A generic podcast list view """
 
-    @method_decorator(cache_control(private=True))
+    paginate_by = 15
+    context_object_name = 'podcasts'
+
     @method_decorator(vary_on_cookie)
-    def get(self, request, page_size=20, **kwargs):
+    @method_decorator(cache_control(private=True))
+    def dispatch(self, *args, **kwargs):
+        """ Only used for applying decorators """
+        return super(PodcastListView, self).dispatch(*args, **kwargs)
 
-        page = self.get_page(request)
-        podcasts = self.get_podcasts( (page-1) * page_size, page_size, **kwargs)
-        podcast_count = self.get_podcast_count(**kwargs)
+    @property
+    def _page(self):
+        """ The current page
 
-        context = kwargs
-        context.update({
-            'podcasts': podcasts,
-            'page_list': self.get_page_list(page, page_size, podcast_count),
-            'current_page': page,
-            'max_subscribers': self.get_max_subscribers(podcasts),
-        })
+        There seems to be no other pre-defined method for getting the current
+        page, see
+        https://docs.djangoproject.com/en/dev/ref/class-based-views/mixins-multiple-object/#multipleobjectmixin
+        """
+        return self.get_context_data()['page_obj']
 
-        context.update(self.other_context(request))
+    def page_list(self, page_size=15):
+        """ Return a list of pages, eg [1, 2, 3, '...', 6, 7, 8] """
+        page = self._page
+        return get_page_list(1,
+                             page.paginator.num_pages,
+                             page.number,
+                             page.paginator.per_page,
+                            )
 
-        return self.render_to_response(context)
-
-
-    def get_podcasts(self, offset, limit):
-        """ must return a list of podcasts """
-        raise NotImplemented
-
-    def get_podcast_count():
-        """ must return the total number of podcasts """
-        raise NotImplemented
-
-    def other_context(self, request, **kwargs):
-        """ can return a dict of additional context data """
-        return {}
-
-    def get_page(self, request):
-        # Make sure page request is an int. If not, deliver first page.
-        try:
-            return int(request.GET.get('page', '1'))
-        except ValueError:
-            return 1
-
-    def get_page_list(self, page, page_size, podcast_count):
-        num_pages = int(ceil(podcast_count / page_size))
-        return get_page_list(1, num_pages, page, 15)
-
-    def get_max_subscribers(self, podcasts):
+    def max_subscribers(self):
+        """ Maximum subscribers of the podcasts on this page """
+        page = self._page
+        podcasts = page.object_list
         return max([p.subscriber_count() for p in podcasts] + [0])
 
 
@@ -399,23 +385,29 @@ class FlattrPodcastList(PodcastListView):
     """ Lists podcasts that have Flattr payment URLs """
 
     template_name = 'flattr-podcasts.html'
-    get_podcasts = staticmethod(get_flattr_podcasts)
-    get_podcast_count = staticmethod(get_flattr_podcast_count)
 
-    def other_context(self, request):
-        user = request.user
-        return {
-            'flattr_auth': user.is_authenticated() and
-                           bool(user.get_wksetting(FLATTR_TOKEN))
-        }
+    def get_queryset(self):
+        return Podcast.objects.flattr()
+
+    def get_context_data(self, num=100):
+        context = super(FlattrPodcastList, self).get_context_data()
+        context['flattr_auth'] = (self.request.user.is_authenticated()
+                   #  and bool(self.request.user.get_wksetting(FLATTR_TOKEN))
+                        )
+        return context
 
 
 class LicensePodcastList(PodcastListView):
     """ Lists podcasts with a given license """
 
     template_name = 'directory/license-podcasts.html'
-    get_podcasts = staticmethod(get_license_podcasts)
-    get_podcast_count = staticmethod(get_license_podcast_count)
+
+    def get_queryset(self):
+        return Podcast.objects.license(self.license_url)
+
+    @property
+    def license_url(self):
+        return self.kwargs['license_url']
 
 
 class LicenseList(TemplateView):
@@ -428,4 +420,5 @@ class LicenseList(TemplateView):
         query = Podcast.objects.exclude(license__isnull=True)
         values = query.values("license").annotate(Count("id")).order_by()
 
-        return Counter({l['license']: l['id__count'] for l in values})
+        counter = Counter({l['license']: l['id__count'] for l in values})
+        return counter.most_common()

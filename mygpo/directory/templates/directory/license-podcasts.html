@@ -10,10 +10,10 @@
 {% block mainmenu %}{{ "/directory/+license"|main_menu }}{% endblock %}
 {% block sectionmenu %}{{ "/directory/+license"|section_menu }}{% endblock %}
 
-{% block title %}{% blocktrans with license_url|license_name as licensename %}Podcasts with License {{ licensename }}{% endblocktrans %}{% endblock %}
+{% block title %}{% blocktrans with view.license_url|license_name as licensename %}Podcasts with License {{ licensename }}{% endblocktrans %}{% endblock %}
 
 {% block header %}
-   <h1>{% blocktrans with license_url|license_name as licensename %}Podcasts with License {{ licensename }}{% endblocktrans %}</h1>
+   <h1>{% blocktrans with view.license_url|license_name as licensename %}Podcasts with License {{ licensename }}{% endblocktrans %}</h1>
 {% endblock %}
 
 {% block content %}
@@ -24,7 +24,7 @@
     {% trans "License overview" %}
    </a>
 
-   <a class="btn btn-default" href="{{ license_url }}">
+   <a class="btn btn-default" href="{{ view.license_url }}">
     <i class="icon-external-link"></i>
     {% trans "View License" %}
    </a>
@@ -42,7 +42,7 @@
     <td>
      {% podcast_group_link podcast %}
     </td>
-    <td>{% vertical_bar podcast.subscriber_count max_subscribers %}</td>
+    <td>{% vertical_bar podcast.subscriber_count view.max_subscribers %}</td>
    </tr>
   {% empty %}
    <tr>
@@ -54,16 +54,16 @@
   </table>
 
   <ul class="pagination">
- {% for page in page_list %}
+ {% for page in view.page_list %}
   <li>
    {% if page == "..." %}
     <span>{{ page }}</span>
    {% else %}
 
      {% if page == current_page %}
-      <a href="{% url "license-podcasts-url" license_url|urlencode %}?page={{ page }}"><strong>{{ page }}</strong></a>
+      <a href="{% url "license-podcasts-url" view.license_url %}?page={{ page }}"><strong>{{ page }}</strong></a>
      {% else %}
-      <a href="{% url "license-podcasts-url" license_url|urlencode %}?page={{ page }}">{{ page }}</a>
+      <a href="{% url "license-podcasts-url" view.license_url %}?page={{ page }}">{{ page }}</a>
      {% endif %}
    {% endif %}
   </li>

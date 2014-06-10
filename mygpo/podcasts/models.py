@@ -91,7 +91,8 @@ class LicenseModel(models.Model):
 
 class FlattrModel(models.Model):
     # A Flattr payment URL
-    flattr_url = models.URLField(null=True, blank=False, max_length=1000)
+    flattr_url = models.URLField(null=True, blank=False, max_length=1000,
+                                 db_index=True)
 
     class Meta:
         abstract = True
@@ -198,6 +199,18 @@ class PodcastQuerySet(models.QuerySet):
         minimum quality of the results """
         return self.exclude(title='').order_by('?')
 
+    def flattr(self):
+        """ Podcasts providing Flattr information """
+        return self.exclude(flattr_url__isnull=True)
+
+    def license(self, license_url=None):
+        """ Podcasts with any / the given license """
+        if license_url:
+            return self.filter(license=license_url)
+        else:
+            return self.exclude(license__isnull=True)
+
+
 
 class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
         LanguageModel, LastUpdateModel, UpdateInfoModel, LicenseModel,
@@ -222,6 +235,10 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
     twitter = models.CharField(max_length=15, null=True, blank=False)
 
     objects = PodcastQuerySet.as_manager()
+
+    def subscriber_count(self):
+        # TODO: implement
+        return 0
 
     def __str__(self):
         return self.title.encode('ascii', errors='replace')

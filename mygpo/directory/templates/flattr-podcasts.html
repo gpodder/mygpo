@@ -30,7 +30,7 @@
     <td>
      {% podcast_group_link podcast %}
     </td>
-    <td>{% vertical_bar podcast.subscriber_count max_subscribers %}</td>
+    <td>{% vertical_bar podcast.subscriber_count view.max_subscribers %}</td>
    </tr>
   {% empty %}
    <tr>
@@ -42,7 +42,7 @@
   </table>
 
   <ul class="pagination">
- {% for page in page_list %}
+ {% for page in view.page_list %}
   <li>
    {% if page == "..." %}
     <span>{{ page }}</span>
