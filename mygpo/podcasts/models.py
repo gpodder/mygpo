@@ -277,7 +277,7 @@ class ScopedModel(models.Model):
     # A slug / URL is unique within a scope; no two podcasts can have the same
     # URL (scope None), and no two episdoes of the same podcast (scope =
     # podcast-ID) can have the same URL
-    scope = UUIDField(null=True)
+    scope = UUIDField(null=True, db_index=True)
 
     class Meta:
         abstract = True
@@ -349,7 +349,7 @@ class Slug(OrderedModel, ScopedModel):
     See also :class:`SlugsMixin`
     """
 
-    slug = models.SlugField(max_length=150)
+    slug = models.SlugField(max_length=150, db_index=True)
 
     # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
     content_type = models.ForeignKey(ContentType)

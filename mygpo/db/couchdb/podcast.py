@@ -21,15 +21,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def podcast_slugs(base_slug):
-    res = Podcast.view('podcasts/by_slug',
-            startkey = [base_slug, None],
-            endkey   = [base_slug + 'ZZZZZ', None],
-            wrap_doc = False,
-        )
-    return [r['key'][0] for r in res]
-
-
 @cache_result(timeout=60*60)
 def podcasts_for_tag(tag):
     """ Returns the podcasts with the current tag.

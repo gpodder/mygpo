@@ -6,6 +6,7 @@ from couchdbkit.ext.django.schema import *
 
 from django.utils.text import slugify
 
+from mygpo.podcasts.models import Slug
 from mygpo.decorators import repeat_on_conflict
 from mygpo.utils import partition
 
@@ -84,8 +85,9 @@ class PodcastGroupSlug(SlugGenerator):
     """ Generates slugs for Podcast Groups """
 
     def _get_existing_slugs(self):
-        from mygpo.db.couchdb.podcast import podcast_slugs
-        return podcast_slugs(self.base_slug)
+        query = Slug.objects.filter(scope__isnull=True,
+                                    slug__startswith=self.base_slug)
+        return [s['slug'] for s in query]
 
 
 
@@ -136,8 +138,9 @@ class EpisodeSlug(SlugGenerator):
 
     def _get_existing_slugs(self):
         """ Episode slugs have to be unique within the Podcast """
-        from mygpo.db.couchdb.episode import episode_slugs_per_podcast
-        return episode_slugs_per_podcast(self.podcast_id, self.base_slug)
+        query = Slug.objects.filter(scope=self.podcast_id,
+                                    slug__startswith=self.base_slug)
+        return [s['slug'] for s in query]
 
 
 class ObjectsMissingSlugs(object):

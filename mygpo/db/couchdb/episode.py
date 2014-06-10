@@ -287,20 +287,6 @@ def episodes_to_dict(ids, use_cache=False):
     return objs
 
 
-def episode_slugs_per_podcast(podcast_id, base_slug):
-
-    if not podcast_id:
-        raise QueryParameterMissing('podcast_id')
-
-
-    res = Episode.view('episodes/by_slug',
-            startkey = [podcast_id, base_slug],
-            endkey   = [podcast_id, base_slug + 'ZZZZZ'],
-            wrap_doc = False,
-        )
-    return [r['key'][1] for r in res]
-
-
 def episodes_for_podcast_current(podcast, limit=None):
 
     if not podcast:
