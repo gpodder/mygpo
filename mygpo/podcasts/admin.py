@@ -1,8 +1,29 @@
 from __future__ import unicode_literals
 
+from django.core.urlresolvers import reverse
+from django.utils.html import format_html
+from django.utils.translation import ugettext as _
 from django.contrib import admin
 from django.contrib.contenttypes.admin import GenericTabularInline
-from mygpo.podcasts.models import Podcast, Episode, URL, Slug, Tag, MergedUUID
+from mygpo.podcasts.models import (Podcast, Episode, URL, Slug, Tag,
+    MergedUUID, PodcastGroup)
+
+
+class AdminLinkInline(admin.TabularInline):
+    """ TabularInline that adds an Admin link for the inlined model """
+
+    def admin_link(self, instance):
+        """ Link to the admin page """
+
+        if not instance.pk:
+            return ''
+
+        url = reverse('admin:%s_%s_change' % (instance._meta.app_label,
+                                              instance._meta.module_name),
+                      args=(instance.pk,))
+        return format_html('<a href="{}">{}</a>', url, _('Edit'))
+
+    readonly_fields = ('admin_link',)
 
 
 @admin.register(URL)
@@ -26,6 +47,20 @@ class TagInline(GenericTabularInline):
 
 class MergedUUIDInline(GenericTabularInline):
     model = MergedUUID
+
+
+class PodcastInline(AdminLinkInline):
+    model = Podcast
+
+    fields = ('id', 'title', 'group_member_name', 'admin_link')
+
+    readonly_fields = ('id', ) + AdminLinkInline.readonly_fields
+
+    can_delete = False
+
+    def has_add_permission(self, request):
+        """ Podcasts must be created and then added to the group """
+        return False
 
 
 @admin.register(Podcast)
@@ -131,3 +166,17 @@ class EpisodeAdmin(admin.ModelAdmin):
 
     def main_url(self, episode):
         return episode.urls.first().url
+
+
+@admin.register(PodcastGroup)
+class PodcastGroupAdmin(admin.ModelAdmin):
+    """ Admin page for podcast groups """
+
+    # configuration for the list view
+    list_display = ('title', )
+
+    search_fields = ('title', )
+
+    inlines = [
+        PodcastInline,
+    ]
