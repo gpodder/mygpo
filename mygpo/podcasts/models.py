@@ -113,7 +113,7 @@ class MergedIdsModel(models.Model):
 
 
 class OutdatedModel(models.Model):
-    outdated = models.BooleanField(default=False)
+    outdated = models.BooleanField(default=False, db_index=True)
 
     class Meta:
         abstract = True
@@ -253,7 +253,7 @@ class Episode(UUIDModel, TitleModel, DescriptionModel, LinkModel,
         AuthorModel, UrlsMixin, SlugsMixin, MergedUUIDsMixin):
     """ An episode """
 
-    guid = models.CharField(max_length=50, null=True)
+    guid = models.CharField(max_length=200, null=True)
     content = models.TextField()
     released = models.DateTimeField(null=True)
     duration = models.PositiveIntegerField(null=True)
