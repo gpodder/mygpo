@@ -191,7 +191,7 @@ class OrderedModel(models.Model):
         ordering = ['order']
 
 
-class PodcastGroup(UUIDModel, TitleModel):
+class PodcastGroup(UUIDModel, TitleModel, SlugsMixin):
     """ Groups multiple podcasts together """
 
 
