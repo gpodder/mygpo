@@ -93,6 +93,7 @@ def migrate_podcast(p):
         'restrictions': ','.join(p.restrictions),
         'twitter': getattr(p, 'twitter', None),
         'group_member_name': p.group_member_name,
+        'update_interval': p.update_interval,
     })
 
     update_urls(p, p2, None)

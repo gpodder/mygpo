@@ -8,6 +8,16 @@ from django.contrib.contenttypes import generic
 from uuidfield import UUIDField
 
 
+# default podcast update interval in hours
+DEFAULT_UPDATE_INTERVAL = 7 * 24
+
+# minium podcast update interval in hours
+MIN_UPDATE_INTERVAL = 5
+
+# every podcast should be updated at least once a month
+MAX_UPDATE_INTERVAL = 24 * 30
+
+
 class UUIDModel(models.Model):
     """ Models that have an UUID as primary key """
 
@@ -239,6 +249,8 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
     episode_count = models.PositiveIntegerField(default=0)
     hub = models.URLField(null=True)
     twitter = models.CharField(max_length=15, null=True, blank=False)
+    update_interval = models.PositiveSmallIntegerField(null=False,
+        default=DEFAULT_UPDATE_INTERVAL)
 
     objects = PodcastQuerySet.as_manager()
 
