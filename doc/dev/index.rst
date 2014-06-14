@@ -30,3 +30,4 @@ Contents
     couchdb-docs
     couchdb-views
     python3
+    postgres-setup
