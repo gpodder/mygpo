@@ -233,7 +233,7 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
 
     #subscribers = SchemaListProperty(SubscriberData)
     restrictions = models.CharField(max_length=20, null=True, blank=True)
-    common_episode_title = models.CharField(max_length=50, null=False, blank=True)
+    common_episode_title = models.CharField(max_length=100, null=False, blank=True)
     new_location = models.URLField(max_length=1000, null=True, blank=False)
     latest_episode_timestamp = models.DateTimeField(null=True)
     episode_count = models.PositiveIntegerField(default=0)
