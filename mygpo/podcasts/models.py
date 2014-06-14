@@ -126,7 +126,7 @@ class OutdatedModel(models.Model):
 
 
 class AuthorModel(models.Model):
-    author = models.CharField(max_length=150, null=True, blank=True)
+    author = models.CharField(max_length=250, null=True, blank=True)
 
     class Meta:
         abstract = True
