@@ -36,7 +36,7 @@ def migrate_episode(e):
 
     e2, created = Episode.objects.update_or_create(id=e._id, defaults = {
         'title': e.title or '',
-        'subtitle': to_maxlength(Episode, 'subtitle', e.subtitle or ''),
+        'subtitle': e.subtitle or '',
         'guid': e.guid,
         'description': e.description or '',
         'content': e.content or '',
