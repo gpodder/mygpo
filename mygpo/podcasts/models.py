@@ -24,6 +24,12 @@ class TitleModel(models.Model):
                              db_index=True)
     subtitle = models.CharField(max_length=1000, null=False, blank=True)
 
+    def __str__(self):
+        return self.title.encode('ascii', errors='replace')
+
+    def __unicode(self):
+        return self.title
+
     class Meta:
         abstract = True
 
@@ -240,12 +246,6 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
         # TODO: implement
         return 0
 
-    def __str__(self):
-        return self.title.encode('ascii', errors='replace')
-
-    def __unicode(self):
-        return self.title
-
 
 class Episode(UUIDModel, TitleModel, DescriptionModel, LinkModel,
         LanguageModel, LastUpdateModel, UpdateInfoModel, LicenseModel,
@@ -264,12 +264,6 @@ class Episode(UUIDModel, TitleModel, DescriptionModel, LinkModel,
 
     class Meta:
         ordering = ['-released']
-
-    def __str__(self):
-        return self.title.encode('ascii', errors='replace')
-
-    def __unicode__(self):
-        return self.title
 
 
 class ScopedModel(models.Model):
