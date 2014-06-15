@@ -46,21 +46,6 @@ podcast_by_id = cache_result(timeout=60*60)(podcast_by_id_uncached)
 
 
 @cache_result(timeout=60*60)
-def podcastgroup_by_id(group_id):
-
-    if not group_id:
-        raise QueryParameterMissing('group_id')
-
-    pg = PodcastGroup.get(group_id)
-
-    if pg.needs_update:
-        incomplete_obj.send_robust(sender=pg)
-
-    return pg
-
-
-
-@cache_result(timeout=60*60)
 def podcast_for_slug(slug):
 
     if not slug:

@@ -10,7 +10,9 @@ from django.views.decorators.vary import vary_on_cookie
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.contrib import messages
+from django.shortcuts import get_object_or_404
 
+from mygpo.podcasts.models import PodcastGroup
 from mygpo.core.proxy import proxy_object
 from mygpo.publisher.auth import require_publisher, is_publisher
 from mygpo.publisher.forms import SearchPodcastForm
@@ -30,7 +32,7 @@ from mygpo.users.models import User
 from mygpo.db.couchdb.episode import episodes_for_podcast, episodes_for_slug, \
     set_episode_slug, remove_episode_slug
 from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_by_id, \
-         podcast_for_url, podcastgroup_by_id, update_additional_data
+         podcast_for_url, update_additional_data
 from mygpo.db.couchdb.episode_state import episode_listener_counts
 from mygpo.db.couchdb.pubsub import subscription_for_topic
 
@@ -88,11 +90,6 @@ def podcast(request, podcast):
     timeline_data = listener_data([podcast])
     subscription_data = subscriber_data([podcast])[-20:]
 
-    if podcast.group:
-        group = podcastgroup_by_id(podcast.group)
-    else:
-        group = None
-
     update_token = request.user.publisher_update_token
 
     heatmap = EpisodeHeatmap(podcast.get_id())
@@ -105,7 +102,7 @@ def podcast(request, podcast):
     return render(request, 'publisher/podcast.html', {
         'site': site,
         'podcast': podcast,
-        'group': group,
+        'group': podcast.group,
         'form': None,
         'timeline_data': timeline_data,
         'subscriber_data': subscription_data,
@@ -299,14 +296,10 @@ def advertise(request):
     })
 
 
-def group_slug_id_decorator(f):
+def group_id_decorator(f):
     @wraps(f)
     def _decorator(request, slug_id, *args, **kwargs):
-        group = podcastgroup_by_id(slug_id)
-
-        if group is None:
-            raise Http404
-
+        group = get_object_or_404(PodcastGroup, pk=slug_id)
         return f(request, group, *args, **kwargs)
 
     return _decorator
@@ -324,4 +317,4 @@ podcast_slug_id        = podcast_slug_id_decorator(podcast)
 episodes_slug_id       = podcast_slug_id_decorator(episodes)
 update_podcast_slug_id = podcast_slug_id_decorator(update_podcast)
 save_podcast_slug_id   = podcast_slug_id_decorator(save_podcast)
-group_slug_id          = group_slug_id_decorator(group)
+group_slug_id          = group_id_decorator(group)
