@@ -128,22 +128,6 @@ def podcast_for_slug_id(slug_id):
         return podcast_for_slug(slug_id)
 
 
-@cache_result(timeout=60*60)
-def podcastgroup_for_slug_id(slug_id):
-    """ Returns the Podcast for either an CouchDB-ID for a Slug """
-
-    if not slug_id:
-        raise QueryParameterMissing('slug_id')
-
-    if is_couchdb_id(slug_id):
-        return podcastgroup_by_id(slug_id)
-
-    else:
-        #TODO: implement
-        return PodcastGroup.for_slug(slug_id)
-
-
-
 def podcasts_by_id(ids):
 
     if ids is None:
