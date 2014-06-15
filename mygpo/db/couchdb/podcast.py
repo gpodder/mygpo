@@ -380,25 +380,6 @@ def podcasts_to_dict(ids, use_cache=False):
     return objs
 
 
-
-def podcasts_need_update(limit=100):
-    db = get_main_database()
-    res = db.view('episodes/need_update',
-            group_level = 1,
-            reduce      = True,
-            limit       = limit,
-        )
-
-    # TODO: this method is only used for retrieving podcasts to update;
-    #       should we really send 'incomplete_obj' signals here?
-
-    for r in res:
-        podcast_id = r['key']
-        podcast = podcast_by_id(podcast_id)
-        if podcast:
-            yield podcast
-
-
 def subscriberdata_for_podcast(podcast_id):
 
     if not podcast_id:

@@ -8,8 +8,7 @@ from mygpo.core.podcasts import individual_podcasts
 from mygpo.podcasts.models import Podcast
 from mygpo.directory.toplist import PodcastToplist
 from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url, \
-         podcasts_by_last_update, podcasts_need_update, \
-         podcasts_by_next_update
+         podcasts_by_last_update, podcasts_by_next_update
 
 
 class PodcastCommand(BaseCommand):
@@ -46,7 +45,9 @@ class PodcastCommand(BaseCommand):
             yield (p.url for p in self.get_toplist(max_podcasts))
 
         if options.get('new'):
-            podcasts = list(podcasts_need_update(limit=max_podcasts))
+            query = Podcast.objects.filter(episode__title__isnull=True,
+                                           episode__outdated=False)
+            podcasts = query.distinct('id')[:max_podcasts]
             random.shuffle(podcasts)
             yield (p.url for p in podcasts)
 
