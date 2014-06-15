@@ -22,7 +22,7 @@ from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.web.utils import get_podcast_link_target, get_page_list, \
     check_restrictions
 from mygpo.db.couchdb.episode import episodes_for_podcast
-from mygpo.db.couchdb.podcast import podcast_for_slug, podcast_for_slug_id, \
+from mygpo.db.couchdb.podcast import podcast_for_slug_id, \
          podcast_for_oldid, podcast_for_url
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast, \
          add_subscription_action, add_podcast_tags, remove_podcast_tags, \
@@ -36,19 +36,6 @@ logger = logging.getLogger(__name__)
 
 
 MAX_TAGS_ON_PAGE=50
-
-
-@vary_on_cookie
-@cache_control(private=True)
-@allowed_methods(['GET'])
-def show_slug(request, slug):
-    podcast = podcast_for_slug(slug)
-
-    if slug != podcast.slug:
-        target = reverse('podcast_slug', args=[podcast.slug])
-        return HttpResponseRedirect(target)
-
-    return show(request, podcast.oldid)
 
 
 @vary_on_cookie
