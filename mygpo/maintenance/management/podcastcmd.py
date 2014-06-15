@@ -7,8 +7,7 @@ from django.core.management.base import BaseCommand
 from mygpo.core.podcasts import individual_podcasts
 from mygpo.podcasts.models import Podcast
 from mygpo.directory.toplist import PodcastToplist
-from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url, \
-         podcasts_by_last_update, podcasts_by_next_update
+from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url
 
 
 class PodcastCommand(BaseCommand):
@@ -56,8 +55,8 @@ class PodcastCommand(BaseCommand):
             yield (p.url for p in individual_podcasts(podcasts))
 
         if options.get('next'):
-            podcasts = podcasts_by_next_update(limit=max_podcasts)
-            yield (p.url for p in individual_podcasts(podcasts))
+            podcasts = Podcast.objects.order_by_next_update()[:max_podcasts]
+            yield (p.url for p in podcasts)
 
 
         if args:
@@ -65,8 +64,9 @@ class PodcastCommand(BaseCommand):
 
         if not args and not options.get('toplist') and not options.get('new') \
                     and not options.get('random')  and not options.get('next'):
-            podcasts = podcasts_by_last_update(limit=max_podcasts)
-            yield (p.url for p in podcasts_by_last_update())
+            query = Podcast.objects.order_by('last_update')
+            podcasts = query.select_related('urls')[:max_podcasts]
+            yield (p.url for p in podcasts)
 
 
     def get_toplist(self, max_podcasts=100):

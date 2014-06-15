@@ -290,36 +290,6 @@ def podcast_duplicates_for_url(url):
         yield pg.get_podcast_by_url(url)
 
 
-def podcasts_by_last_update(limit=100):
-    res = Podcast.view('podcasts/by_last_update',
-            include_docs = True,
-            stale        = 'update_after',
-            wrap_doc     = False,
-            limit        = limit,
-        )
-
-    # TODO: this method is only used for retrieving podcasts to update;
-    #       should we really send 'incomplete_obj' signals here?
-
-    return map(_wrap_podcast_group_key1, res)
-
-
-def podcasts_by_next_update(limit=100):
-    """ Returns the podcasts that are due for an update next """
-
-    res = Podcast.view('podcasts/by_next_update',
-            include_docs = True,
-            stale        = 'update_after',
-            limit        = limit,
-            classes      = [Podcast, PodcastGroup],
-        )
-
-    # TODO: this method is only used for retrieving podcasts to update;
-    #       should we really send 'incomplete_obj' signals here?
-
-    return list(res)
-
-
 def podcasts_to_dict(ids, use_cache=False):
 
     if ids is None:

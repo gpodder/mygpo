@@ -228,6 +228,11 @@ class PodcastQuerySet(models.QuerySet):
         else:
             return self.exclude(license__isnull=True)
 
+    def order_by_next_update(self):
+        """ Sort podcasts by next scheduled update """
+        NEXTUPDATE = "last_update + (update_interval || ' hours')::INTERVAL"
+        q = self.extra(select={'next_update': NEXTUPDATE})
+        return q.order_by('next_update')
 
 
 class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,

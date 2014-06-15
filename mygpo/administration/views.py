@@ -32,7 +32,7 @@ from mygpo.db.couchdb import get_main_database
 from mygpo.db.couchdb.user import activate_user, add_published_objs
 from mygpo.db.couchdb.episode import episode_count, filetype_stats
 from mygpo.db.couchdb.podcast import podcast_for_url, \
-    podcast_duplicates_for_url, podcasts_by_next_update
+    podcast_duplicates_for_url
 
 
 class InvalidPodcast(Exception):
@@ -87,7 +87,7 @@ class HostInfo(AdminView):
 
     def _get_feed_queue_status(self):
         now = datetime.utcnow()
-        next_podcast = podcasts_by_next_update(limit=1)[0]
+        next_podcast = Podcast.objects.order_by_next_update().first()
 
         delta = (next_podcast.next_update - now)
         delta_mins = delta.total_seconds() / 60
