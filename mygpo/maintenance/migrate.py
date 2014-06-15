@@ -27,9 +27,7 @@ def to_maxlength(cls, field, val):
 
 def migrate_episode(e):
 
-    podcast, created = Podcast.objects.get_or_create(id=e.podcast, defaults={
-        'created': datetime.utcnow(),
-    })
+    podcast, created = Podcast.objects.get_or_create(id=e.podcast)
 
     if created:
         logger.info('Created stub for podcast %s', e.podcast)

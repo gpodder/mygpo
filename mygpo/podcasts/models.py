@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+from datetime import datetime
+
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation
@@ -89,7 +91,7 @@ class UpdateInfoModel(models.Model):
     # this does not use "auto_now_add=True" so that data
     # can be migrated with its creation timestamp intact; it can be
     # switched on after the migration is complete
-    created = models.DateTimeField()
+    created = models.DateTimeField(default=datetime.utcnow)
     modified = models.DateTimeField(auto_now=True)
 
     class Meta:
