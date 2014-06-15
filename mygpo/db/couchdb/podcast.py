@@ -274,22 +274,6 @@ def _wrap_pg(doc):
         logger.error('received unknown doc_type "%s"', doc['doc_type'])
 
 
-def podcast_duplicates_for_url(url):
-
-    if not url:
-        raise QueryParameterMissing('url')
-
-    _view = 'podcasts/by_url'
-    r = Podcast.view(_view,
-            key          = url,
-            classes      = [Podcast, PodcastGroup],
-            include_docs = True,
-        )
-
-    for pg in r:
-        yield pg.get_podcast_by_url(url)
-
-
 def podcasts_to_dict(ids, use_cache=False):
 
     if ids is None:
