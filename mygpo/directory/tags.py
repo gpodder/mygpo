@@ -4,31 +4,11 @@ from datetime import datetime
 from random import choice
 from itertools import chain
 
-from mygpo.core.models import Podcast
 from mygpo.decorators import query_if_required, repeat_on_conflict
 from mygpo.core.proxy import proxy_object
 from mygpo.directory.models import Category
-from mygpo.db.couchdb.podcast import podcasts_for_tag
 from mygpo.db.couchdb.directory import top_categories, save_category, \
          category_for_tag_uncached
-
-
-class Tag(object):
-
-    def __init__(self, tag):
-        self.tag = tag
-
-
-    def get_podcasts(self):
-        """ Returns the podcasts with the current tag.
-
-        Some podcasts might be returned twice """
-
-        return podcasts_for_tag(self.tag)
-
-
-
-TagCloudEntry = namedtuple('TagCloudEntry', 'label weight')
 
 
 class Topics(object):

@@ -21,41 +21,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-@cache_result(timeout=60*60)
-def podcasts_for_tag(tag):
-    """ Returns the podcasts with the current tag.
-
-    Some podcasts might be returned twice """
-
-    if not tag:
-        raise QueryParameterMissing('tag')
-
-    res = multi_request_view(Podcast, 'podcasts/by_tag',
-            wrap        = False,
-            startkey    = [tag, None],
-            endkey      = [tag, {}],
-            reduce      = True,
-            group       = True,
-            group_level = 2
-        )
-
-    for r in res:
-        yield (r['key'][1], r['value'])
-
-    udb = get_userdata_database()
-    res = multi_request_view(udb, 'usertags/podcasts',
-            wrap        = False,
-            startkey    = [tag, None],
-            endkey      = [tag, {}],
-            reduce      = True,
-            group       = True,
-            group_level = 2
-        )
-
-    for r in res:
-        yield (r['key'][1], r['value'])
-
-
 def podcast_by_id_uncached(podcast_id, current_id=False):
 
     if not podcast_id:
