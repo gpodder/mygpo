@@ -152,45 +152,6 @@ def podcast_for_oldid(oldid):
     return podcast
 
 
-def podcast_for_url(url, create=False):
-
-    if not url:
-        raise QueryParameterMissing('url')
-
-    key = 'podcast-by-url-%s' % sha1(url.encode('utf-8')).hexdigest()
-
-    podcast = cache.get(key)
-    if podcast:
-        return podcast
-
-    db = get_main_database()
-    podcast_group = get_single_result(db, 'podcasts/by_url',
-            key          = url,
-            include_docs = True,
-            wrapper      = _wrap_pg,
-        )
-
-    if podcast_group:
-        podcast = podcast_group.get_podcast_by_url(url)
-
-        if podcast.needs_update:
-            incomplete_obj.send_robust(sender=podcast)
-        else:
-            cache.set(key, podcast)
-
-        return podcast
-
-    if create:
-        podcast = Podcast()
-        podcast.created_timestamp = get_timestamp(datetime.utcnow())
-        podcast.urls = [url]
-        podcast.save()
-        incomplete_obj.send_robust(sender=podcast)
-        return podcast
-
-    return None
-
-
 def _wrap_pg(doc):
 
     doc = doc['doc']

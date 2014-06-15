@@ -161,6 +161,7 @@ class SyncedDevicesMixin(DocumentSchema):
     def apply_sync_actions(self, device, sync_actions):
         """ Applies the sync-actions to the device """
 
+        from mygpo.db.couchdb.podcast_state import subscribe, unsubscribe
         add, rem = sync_actions
 
         podcasts = podcasts_to_dict(add + rem)
@@ -170,7 +171,7 @@ class SyncedDevicesMixin(DocumentSchema):
             if podcast is None:
                 continue
             try:
-                podcast.subscribe(self, device)
+                subscribe(podcast, self, device)
             except SubscriptionException as e:
                 logger.warn('Web: %(username)s: cannot sync device: %(error)s' %
                     dict(username=self.username, error=repr(e)))
@@ -181,7 +182,7 @@ class SyncedDevicesMixin(DocumentSchema):
                 continue
 
             try:
-                podcast.unsubscribe(self, device)
+                unsubscribe(podcast, self, device)
             except SubscriptionException as e:
                 logger.warn('Web: %(username)s: cannot sync device: %(error)s' %
                     dict(username=self.username, error=repr(e)))

@@ -25,7 +25,6 @@ from mygpo.decorators import repeat_on_conflict
 from mygpo.core.json import json
 from mygpo.users.settings import STORE_UA
 from mygpo.db.couchdb import bulk_save_retry, get_userdata_database
-from mygpo.db.couchdb.podcast import podcast_for_url
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
 
 
@@ -103,7 +102,7 @@ class BulkSubscribe(object):
         url, op = action
 
         podcast = self.podcasts.get(url,
-                podcast_for_url(url, create=True))
+                Podcast.objects.get_or_create_for_url(url))
 
         state = podcast_state_for_user_podcast(self.user, podcast)
 

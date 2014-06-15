@@ -22,7 +22,8 @@ from collections import Counter
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from mygpo.core.models import Podcast, Episode
+from mygpo.podcasts.models import Podcast
+from mygpo.core.models import Episode
 from mygpo.users.models import EpisodeAction, User
 from mygpo.maintenance.merge import PodcastMerger
 from mygpo.utils import get_timestamp
@@ -37,10 +38,8 @@ class MergeTests(TestCase):
     """ Tests merging of two podcasts, their episodes and states """
 
     def setUp(self):
-        self.podcast1 = Podcast(urls=['http://example.com/feed.rss'])
-        self.podcast2 = Podcast(urls=['http://test.org/podcast/'])
-        self.podcast1.save()
-        self.podcast2.save()
+        self.podcast1 = Podcast.objects.get_or_create_for_url('http://example.com/feed.rss')
+        self.podcast2 = Podcast.objects.get_or_create_for_url('http://test.org/podcast/')
 
         self.episode1 = Episode(podcast=self.podcast1.get_id(),
                 urls = ['http://example.com/episode1.mp3'])
@@ -94,10 +93,6 @@ class MergeTests(TestCase):
     def tearDown(self):
         self.podcast1.delete()
         self.episode1.delete()
-
-        #self.podcast2.delete()
-        #self.episode2.delete()
-
         self.user.delete()
 
 
@@ -106,12 +101,9 @@ class MergeGroupTests(TestCase):
     """ Tests merging of two podcasts, one of which is part of a group """
 
     def setUp(self):
-        self.podcast1 = Podcast(urls=['http://example.com/feed.rss'])
-        self.podcast2 = Podcast(urls=['http://test.org/podcast/'])
-        self.podcast3 = Podcast(urls=['http://test.org/feed/'])
-        self.podcast1.save()
-        self.podcast2.save()
-        self.podcast3.save()
+        self.podcast1 = Podcast.objects.get_or_create_for_url('http://example.com/feed.rss')
+        self.podcast2 = Podcast.objects.get_or_create_for_url('http://test.org/podcast/')
+        self.podcast3 = Podcast.objects.get_or_create_for_url('http://test.org/feed/')
 
         self.episode1 = Episode(podcast=self.podcast1.get_id(),
                 urls = ['http://example.com/episode1.mp3'])
@@ -135,14 +127,12 @@ class MergeGroupTests(TestCase):
 
     def test_merge_podcasts(self):
 
-        podcast1 = podcast_by_id(self.podcast1.get_id())
-        podcast2 = podcast_by_id(self.podcast2.get_id())
-        podcast3 = podcast_by_id(self.podcast3.get_id())
+        podcast1 = Podcast.objects.get(pk=self.podcast1.pk)
+        podcast2 = Podcast.objects.get(pk=self.podcast2.pk)
+        podcast3 = Podcast.objects.get(pk=self.podcast3.pk)
 
         # assert that the podcasts are actually grouped
-        self.assertEqual(podcast2._id, podcast3._id)
-        self.assertNotEqual(podcast2.get_id(), podcast2._id)
-        self.assertNotEqual(podcast3.get_id(), podcast3._id)
+        self.assertEqual(podcast2.group, podcast3.group)
 
         # Create additional data that will be merged
         state1 = episode_state_for_user_episode(self.user, self.episode1)

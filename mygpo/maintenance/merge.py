@@ -4,6 +4,7 @@ from functools import partial
 
 import restkit
 
+from mygpo.podcasts.models import MergedUUID
 from mygpo import utils
 from mygpo.decorators import repeat_on_conflict
 from mygpo.db.couchdb.podcast import delete_podcast, reload_podcast
@@ -75,30 +76,29 @@ class PodcastMerger(object):
     @repeat_on_conflict(['podcast1', 'podcast2'], reload_f=reload_podcast)
     def _merge_objs(self, podcast1, podcast2):
 
-        podcast1.merged_ids = set_filter(podcast1.get_id(),
-                                         podcast1.merged_ids,
-                                         [podcast2.get_id()],
-                                         podcast2.merged_ids)
+        # Reassign all IDs of podcast2 to podcast1
+        MergedUUID.objects.create(uuid=podcast2.id, content_object=podcast1)
+        for m in podcast2.merged_uuids.all():
+            m.content_object = podcast1
+            m.save()
 
-        podcast1.merged_slugs = set_filter(podcast1.slug,
-                                           podcast1.merged_slugs,
-                                           [podcast2.slug],
-                                           podcast2.merged_slugs)
+        # Reassign all Slugs of podcast2 to podcast1
+        max_order = max([0] + [s.order for s in podcast1.slugs.all()])
+        for n, slug in enumerate(podcast2.slugs.all(), max_order+1):
+            slug.content_object = podcast1
+            slug.order = n
+            slug.save()
 
-        podcast1.merged_oldids = set_filter(podcast1.oldid,
-                                            podcast1.merged_oldids,
-                                            [podcast2.oldid],
-                                            podcast2.merged_oldids)
+        # Reassign all URLs of podcast2 to podcast1
+        max_order = max([0] + [u.order for u in podcast1.urls.all()])
 
-        # the first URL in the list represents the podcast main URL
-        main_url = podcast1.url
-        podcast1.urls = set_filter(None, podcast1.urls, podcast2.urls)
-        # so we insert it as the first again
-        podcast1.urls.remove(main_url)
-        podcast1.urls.insert(0, main_url)
+        for n, url in enumerate(podcast2.urls.all(), max_order+1):
+            url.content_object = podcast1
+            url.order = n
+            url.save()
 
-        podcast1.content_types = set_filter(None, podcast1.content_types,
-                                            podcast2.content_types)
+        podcast1.content_types = ','.join(podcast1.content_types.split(',') +
+                                          podcast2.content_types.split(','))
 
         podcast1.save()
 

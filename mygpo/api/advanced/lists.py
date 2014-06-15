@@ -26,19 +26,21 @@ from django.contrib.sites.models import RequestSite
 from django.utils.text import slugify
 from django.views.decorators.cache import never_cache
 from django.http import Http404
+from django.shortcuts import get_object_or_404
 
+from mygpo.podcasts.models import Podcast
 from mygpo.utils import get_timestamp
 from mygpo.api.advanced.directory import podcast_data
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.share.models import PodcastList
 from mygpo.api.basic_auth import require_valid_user, check_username
-from mygpo.core.models import Podcast
+from mygpo.core.models import Podcast as P
 from mygpo.decorators import allowed_methods, repeat_on_conflict, cors_origin
 from mygpo.api.simple import parse_subscription, format_podcast_list, \
      check_format
 from mygpo.share.views import list_decorator
 from mygpo.users.models import User
-from mygpo.db.couchdb.podcast import podcasts_by_id, podcast_for_url
+from mygpo.db.couchdb.podcast import podcasts_by_id
 from mygpo.db.couchdb.podcastlist import podcastlist_for_user_slug, \
          podcastlists_for_user
 
@@ -70,8 +72,8 @@ def create(request, username, format):
         return HttpResponse('List already exists', status=409)
 
     urls = parse_subscription(request.body, format)
-    podcasts = [podcast_for_url(url, create=True) for url in urls]
-    podcast_ids = map(Podcast.get_id, podcasts)
+    podcasts = [Podcast.objects.get_or_create_for_url(url) for url in urls]
+    podcast_ids = map(P.get_id, podcasts)
 
     plist = PodcastList()
     plist.created_timestamp = get_timestamp(datetime.utcnow())
@@ -172,8 +174,8 @@ def update_list(request, plist, owner, format):
         return HttpResponseForbidden()
 
     urls = parse_subscription(request.body, format)
-    podcasts = [podcast_for_url(url, create=True) for url in urls]
-    podcast_ids = map(Podcast.get_id, podcasts)
+    podcasts = [Podcast.objects.get_or_create_for_url(url) for url in urls]
+    podcast_ids = map(P.get_id, podcasts)
 
     @repeat_on_conflict(['podcast_ids'])
     def _update(plist, podcast_ids):

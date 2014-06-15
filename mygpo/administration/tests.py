@@ -11,12 +11,14 @@ from collections import Counter
 
 from django.test import TestCase
 
+from mygpo.podcasts.models import Podcast
 from mygpo.users.models import User, Device, EpisodeAction
-from mygpo.core.models import Podcast, Episode
+from mygpo.core.models import Episode
 from mygpo.maintenance.merge import PodcastMerger
 from mygpo.db.couchdb.episode import episode_by_id, episodes_for_podcast
 from mygpo.db.couchdb.podcast import podcast_by_id
-from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
+from mygpo.db.couchdb.podcast_state import (podcast_state_for_user_podcast,
+    subscribe, unsubscribe, )
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
     add_episode_actions
 from mygpo.utils import get_timestamp
@@ -26,14 +28,8 @@ class SimpleTest(TestCase):
 
     def test_merge(self):
 
-        p1 = Podcast()
-        p1.urls = ['http://example.com/podcast1.rss']
-        p1.save()
-
-        p2 = Podcast()
-        p2.urls = ['http://example.com/podcast2.rss']
-        p2.save()
-
+        p1 = Podcast.objects.get_or_create_for_url('http://example.com/podcast1.rss')
+        p2 = Podcast.objects.get_or_create_for_url('http://example.com/podcast2.rss')
 
         e1 = Episode()
         e1.title = 'Episode 1'
@@ -75,12 +71,12 @@ class SimpleTest(TestCase):
         user.save()
 
 
-        p1.subscribe(user, device1)
+        subscribe(p1, user, device1)
         time.sleep(1)
-        p1.unsubscribe(user, device1)
+        unsubscribe(p1, user, device1)
         time.sleep(1)
-        p1.subscribe(user, device1)
-        p2.subscribe(user, device2)
+        subscribe(p1, user, device1)
+        subscribe(p2, user, device2)
 
         s1 = episode_state_for_user_episode(user, e1)
         add_episode_actions(s1, [EpisodeAction(action='play',
@@ -111,7 +107,7 @@ class SimpleTest(TestCase):
         es3 = episode_state_for_user_episode(user, e3)
         self.assertEqual(len(es3.actions), 1)
 
-        p1 = podcast_by_id(p1.get_id())
+        p1 = Podcast.objects.get(pk=p1.get_id())
         ps1 = podcast_state_for_user_podcast(user, p1)
         self.assertEqual(len(ps1.get_subscribed_device_ids()), 2)
 

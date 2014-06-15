@@ -22,45 +22,7 @@ from django.test import TestCase
 
 import mygpo.utils
 from mygpo.core.slugs import get_duplicate_slugs
-from mygpo.core.models import Podcast, PodcastGroup, Episode
-
-
-class PodcastGroupTests(unittest.TestCase):
-
-    def test_group(self):
-        self.podcast1 = Podcast(urls=['http://example1.com'])
-        self.podcast1.save()
-
-        self.podcast2 = Podcast(urls=['http://example2.com'])
-        self.podcast2.save()
-
-        group = self.podcast1.group_with(self.podcast2, 'My Group', 'p1', 'p2')
-
-        self.assertIn(self.podcast1, group.podcasts)
-        self.assertIn(self.podcast2, group.podcasts)
-        self.assertEquals(len(group.podcasts), 2)
-        self.assertEquals(group.title, 'My Group')
-        self.assertEquals(self.podcast1.group_member_name, 'p1')
-        self.assertEquals(self.podcast2.group_member_name, 'p2')
-
-        # add to group
-        self.podcast3 = Podcast(urls=['http://example3.com'])
-        self.podcast3.save()
-
-        group = self.podcast1.group_with(self.podcast3, 'My Group', 'p1', 'p3')
-
-        self.assertIn(self.podcast3, group.podcasts)
-        self.assertEquals(self.podcast3.group_member_name, 'p3')
-
-        # add group to podcast
-        self.podcast4 = Podcast(urls=['http://example4.com'])
-        self.podcast4.save()
-
-        group = self.podcast4.group_with(self.podcast1, 'My Group', 'p4', 'p1')
-
-        self.assertIn(self.podcast4, group.podcasts)
-        self.assertEquals(self.podcast4.group_member_name, 'p4')
-
+from mygpo.core.models import Episode
 
 
 class UnifySlugTests(unittest.TestCase):
@@ -89,6 +51,5 @@ class UnifySlugTests(unittest.TestCase):
 def suite():
     suite = unittest.TestSuite()
     suite.addTest(doctest.DocTestSuite(mygpo.utils))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(PodcastGroupTests))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(UnifySlugTests))
     return suite

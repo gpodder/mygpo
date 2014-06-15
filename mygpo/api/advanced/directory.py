@@ -20,9 +20,10 @@ from django.core.urlresolvers import reverse
 from django.contrib.sites.models import RequestSite
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import cache_page
+from django.shortcuts import get_object_or_404
 
 from mygpo.core import models
-from mygpo.core.models import Podcast, PodcastGroup
+from mygpo.podcasts.models import Podcast
 from mygpo.utils import parse_range, normalize_feed_url
 from mygpo.directory.tags import Topics
 from mygpo.web.utils import get_episode_link_target, get_podcast_link_target
@@ -30,7 +31,7 @@ from mygpo.web.logo import get_logo_url
 from mygpo.decorators import cors_origin
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.db.couchdb.episode import episode_for_podcast_url
-from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url
+from mygpo.db.couchdb.podcast import podcast_by_id
 from mygpo.db.couchdb.directory import category_for_tag
 
 
@@ -69,9 +70,7 @@ def podcast_info(request):
     if not url:
         raise Http404
 
-    podcast = podcast_for_url(url)
-    if not podcast:
-            raise Http404
+    podcast = get_object_or_404(Podcast, urls__url=url)
     domain = RequestSite(request).domain
     resp = podcast_data(podcast, domain)
 

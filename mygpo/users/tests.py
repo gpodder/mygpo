@@ -23,12 +23,12 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 import mygpo.utils
-from mygpo.core.models import Podcast
+from mygpo.podcasts.models import Podcast
 from mygpo.maintenance.merge import PodcastMerger
 from mygpo.api.backend import get_device
 from mygpo.users.models import User, Device
-from mygpo.db.couchdb.podcast import podcast_for_url
-from mygpo.db.couchdb.podcast_state import subscribed_podcast_ids_by_user_id
+from mygpo.db.couchdb.podcast_state import (subscribed_podcast_ids_by_user_id,
+    subscribe, unsubscribe, )
 
 
 class DeviceSyncTests(unittest.TestCase):
@@ -84,10 +84,8 @@ class UnsubscribeMergeTests(TestCase):
     P2_URL = 'http://test.org/podcast/'
 
     def setUp(self):
-        self.podcast1 = Podcast(urls=['http://example.com/feed.rss'])
-        self.podcast2 = Podcast(urls=[self.P2_URL])
-        self.podcast1.save()
-        self.podcast2.save()
+        self.podcast1 = Podcast.objects.get_or_create_for_url('http://example.com/feed.rss')
+        self.podcast2 = Podcast.objects.get_or_create_for_url(self.P2_URL)
 
         self.user = User(username='test-merge')
         self.user.email = 'test@example.com'
@@ -97,7 +95,7 @@ class UnsubscribeMergeTests(TestCase):
         self.device = get_device(self.user, 'dev', '')
 
     def test_merge_podcasts(self):
-        self.podcast2.subscribe(self.user, self.device)
+        subscribe(self.podcast2, self.user, self.device)
 
         # merge podcast2 into podcast1
         pm = PodcastMerger([self.podcast1, self.podcast2], Counter(), [])
@@ -110,8 +108,8 @@ class UnsubscribeMergeTests(TestCase):
         time.sleep(2)
 
         # get podcast for URL of podcast2 and unsubscribe from it
-        p = podcast_for_url(self.P2_URL)
-        p.unsubscribe(self.user, self.device)
+        p = Podcast.objects.get(urls__url=self.P2_URL)
+        unsubscribe(p, self.user, self.device)
 
         subscriptions = subscribed_podcast_ids_by_user_id(self.user._id)
         self.assertEqual(0, len(subscriptions))

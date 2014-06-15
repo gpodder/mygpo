@@ -29,7 +29,9 @@ from django.contrib.sites.models import RequestSite
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 from django.conf import settings as dsettings
+from django.shortcuts import get_object_or_404
 
+from mygpo.podcasts.models import Podcast
 from mygpo.api.constants import EPISODE_ACTION_TYPES, DEVICE_TYPES
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.advanced.directory import episode_data
@@ -46,7 +48,6 @@ from mygpo.core.json import JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.db.couchdb import bulk_save_retry, get_userdata_database
 from mygpo.db.couchdb.episode import favorite_episodes_for_user
-from mygpo.db.couchdb.podcast import podcast_for_url
 from mygpo.db.couchdb.podcast_state import subscribed_podcast_ids_by_device
 from mygpo.db.couchdb.episode_state import episode_state_for_ref_urls, \
     get_episode_actions
@@ -132,9 +133,7 @@ def episodes(request, username, version=1):
             return HttpResponseBadRequest('since-value is not a valid timestamp')
 
         if podcast_url:
-            podcast = podcast_for_url(podcast_url)
-            if not podcast:
-                raise Http404
+            podcast = get_object_or_404(Podcast, urls__url=podcast_url)
         else:
             podcast = None
 

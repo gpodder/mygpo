@@ -24,6 +24,10 @@ from django.test import TestCase
 from mygpo.podcasts.models import Podcast
 
 
+def create_podcast(**kwargs):
+    return Podcast.objects.create(id=uuid.uuid1().hex, **kwargs)
+
+
 class PodcastTests(unittest.TestCase):
     """ Test podcasts and their properties """
 
@@ -33,10 +37,7 @@ class PodcastTests(unittest.TestCase):
         update_interval = 123  # hours
 
         # create an "old" podcast with update-information
-        Podcast.objects.create(id=uuid.uuid1().hex,
-                               last_update=last_update,
-                               update_interval=update_interval,
-                               )
+        create_podcast(last_update=last_update, update_interval=update_interval)
 
         # the podcast should be the next to be updated
         p = Podcast.objects.order_by_next_update().first()
@@ -46,6 +47,48 @@ class PodcastTests(unittest.TestCase):
                          last_update + timedelta(hours=update_interval))
 
 
+    def test_get_or_create_for_url(self):
+        """ Test that get_or_create_for_url returns existing Podcast """
+        URL = 'http://example.com/get_or_create.rss'
+        p1 = Podcast.objects.get_or_create_for_url(URL)
+        p2 = Podcast.objects.get_or_create_for_url(URL)
+        self.assertEqual(p1.pk, p2.pk)
+
+
+class PodcastGroupTests(unittest.TestCase):
+    """ Test grouping of podcasts """
+
+    def test_group(self):
+        self.podcast1 = create_podcast()
+        self.podcast2 = create_podcast()
+
+        group = self.podcast1.group_with(self.podcast2, 'My Group', 'p1', 'p2')
+
+        self.assertIn(self.podcast1, group.podcast_set.all())
+        self.assertIn(self.podcast2, group.podcast_set.all())
+        self.assertEquals(len(group.podcast_set.all()), 2)
+        self.assertEquals(group.title, 'My Group')
+        self.assertEquals(self.podcast1.group_member_name, 'p1')
+        self.assertEquals(self.podcast2.group_member_name, 'p2')
+
+        # add to group
+        self.podcast3 = create_podcast()
+
+        group = self.podcast1.group_with(self.podcast3, 'My Group', 'p1', 'p3')
+
+        self.assertIn(self.podcast3, group.podcast_set.all())
+        self.assertEquals(self.podcast3.group_member_name, 'p3')
+
+        # add group to podcast
+        self.podcast4 = create_podcast()
+
+        group = self.podcast4.group_with(self.podcast1, 'My Group', 'p4', 'p1')
+
+        self.assertIn(self.podcast4, group.podcast_set.all())
+        self.assertEquals(self.podcast4.group_member_name, 'p4')
+
+
 def load_tests(loader, tests, ignore):
     tests.addTest(unittest.TestLoader().loadTestsFromTestCase(PodcastTests))
+    tests.addTest(unittest.TestLoader().loadTestsFromTestCase(PodcastGroupTests))
     return tests

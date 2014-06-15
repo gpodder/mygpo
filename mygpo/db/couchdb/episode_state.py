@@ -4,9 +4,10 @@ from dateutil import parser
 
 from django.core.cache import cache
 
+from mygpo.podcasts.models import Podcast
 from mygpo.users.models import EpisodeUserState
 from mygpo.db import QueryParameterMissing
-from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url
+from mygpo.db.couchdb.podcast import podcast_by_id
 from mygpo.db.couchdb.episode import episode_for_podcast_id_url
 from mygpo.db.couchdb import get_main_database, get_userdata_database, \
      get_single_result
@@ -45,7 +46,7 @@ def episode_state_for_user_episode(user, episode):
         return state
 
     else:
-        podcast = podcast_by_id(episode.podcast)
+        podcast = Podcast.objects.get_by_any_id(episode.podcast)
 
         state = EpisodeUserState()
         state.episode = episode._id
@@ -271,7 +272,7 @@ def episode_state_for_ref_urls(user, podcast_url, episode_url):
         return state
 
     else:
-        podcast = podcast_for_url(podcast_url, create=True)
+        podcast = Podcast.objects.get_or_create_for_url(podcast_url)
         episode = episode_for_podcast_id_url(podcast.get_id(), episode_url,
             create=True)
         return episode_state_for_user_episode(user, episode)

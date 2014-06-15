@@ -28,6 +28,7 @@ import socket
 
 from django.conf import settings
 
+from mygpo.podcasts.models import Podcast
 from mygpo.core.slugs import assign_missing_episode_slugs, assign_slug, \
          PodcastSlug
 from mygpo.core.models import DEFAULT_UPDATE_INTERVAL, MIN_UPDATE_INTERVAL, \
@@ -42,7 +43,7 @@ from mygpo.data.podcast import subscribe_at_hub
 from mygpo.pubsub.models import SubscriptionError
 from mygpo.db.couchdb.episode import episode_for_podcast_id_url, \
          episodes_for_podcast_current, episode_count_for_podcast
-from mygpo.db.couchdb.podcast import podcast_for_url, reload_podcast
+from mygpo.db.couchdb.podcast import reload_podcast
 from mygpo.directory.tags import update_category
 from mygpo.decorators import repeat_on_conflict
 from mygpo.db.couchdb import get_main_database, bulk_save_retry
@@ -97,18 +98,18 @@ class PodcastUpdater(object):
 
             # if we fail to parse the URL, we don't even create the
             # podcast object
-            p = podcast_for_url(podcast_url, create=False)
-            if p:
+            try:
+                p = Podcast.objects.get(urls__url=podcast_url)
                 # if it exists already, we mark it as outdated
                 self._mark_outdated(p, 'error while fetching feed: %s' %
                     str(ex))
                 return p
 
-            else:
+            except Podcast.DoesNotExist:
                 raise NoPodcastCreated(ex)
 
         assert parsed, 'fetch_feed must return something'
-        p = podcast_for_url(podcast_url, create=True)
+        p = Podcast.objects.get_or_create_for_url(podcast_url)
         episodes = self._update_episodes(p, parsed.episodes)
         self._update_podcast(p, parsed, episodes)
         return p
@@ -166,12 +167,12 @@ class PodcastUpdater(object):
 
 
         if podcast.new_location:
-            new_podcast = podcast_for_url(podcast.new_location)
-            if new_podcast != podcast:
-                self._mark_outdated(podcast, 'redirected to different podcast')
-                return
-
-            elif not new_podcast:
+            try:
+                new_podcast = Podcast.objects.get(urls__url=podcast.new_location)
+                if new_podcast != podcast:
+                    self._mark_outdated(podcast, 'redirected to different podcast')
+                    return
+            except Podcast.DoesNotExist:
                 podcast.urls.insert(0, podcast.new_location)
 
 

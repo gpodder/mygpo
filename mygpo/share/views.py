@@ -14,6 +14,7 @@ from django.views.decorators.cache import cache_control
 from django.views.generic.base import View
 from django.utils.decorators import method_decorator
 
+from mygpo.podcasts.models import Podcast
 from mygpo.utils import get_timestamp
 from mygpo.core.proxy import proxy_object
 from mygpo.api.simple import format_podcast_list
@@ -23,7 +24,7 @@ from mygpo.directory.views import search as directory_search
 from mygpo.decorators import repeat_on_conflict
 from mygpo.flattr import Flattr
 from mygpo.userfeeds.feeds import FavoriteFeed
-from mygpo.db.couchdb.podcast import podcasts_groups_by_id, podcast_for_url
+from mygpo.db.couchdb.podcast import podcasts_groups_by_id
 from mygpo.db.couchdb.podcastlist import podcastlist_for_user_slug, \
          podcastlists_for_user, add_podcast_to_podcastlist, \
          remove_podcast_from_podcastlist, delete_podcastlist
@@ -223,7 +224,7 @@ class ShareFavorites(View):
         site = RequestSite(request)
         feed_url = favfeed.get_public_url(site.domain)
 
-        podcast = podcast_for_url(feed_url)
+        podcast = Podcast.objects.filter(urls__url=feed_url).first()
 
         token = request.user.favorite_feeds_token
 
@@ -271,7 +272,7 @@ class FavoritesFeedCreateEntry(View):
         site = RequestSite(request)
         feed_url = feed.get_public_url(site.domain)
 
-        podcast = podcast_for_url(feed_url, create=True)
+        podcast = Podcast.objects.get_or_create_for_url(feed_url)
 
         if not podcast.get_id() in user.published_objects:
             user.published_objects.append(podcast.get_id())
@@ -294,7 +295,7 @@ def overview(request):
 
     favfeed = FavoriteFeed(user)
     favfeed_url = favfeed.get_public_url(site.domain)
-    favfeed_podcast = podcast_for_url(favfeed_url)
+    favfeed_podcast = Podcast.objects.filter(urls__url=favfeed_url).first()
 
     return render(request, 'share/overview.html', {
         'site': site,

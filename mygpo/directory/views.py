@@ -33,8 +33,7 @@ from mygpo.users.settings import FLATTR_TOKEN
 from mygpo.data.feeddownloader import PodcastUpdater, NoEpisodesException
 from mygpo.data.tasks import update_podcasts
 from mygpo.db.couchdb.user import get_user_by_id
-from mygpo.db.couchdb.podcast import podcasts_by_id, \
-         podcasts_to_dict, podcast_for_url
+from mygpo.db.couchdb.podcast import podcasts_by_id, podcasts_to_dict
 from mygpo.db.couchdb.directory import category_for_tag
 from mygpo.db.couchdb.podcastlist import random_podcastlists, \
          podcastlist_count, podcastlists_by_rating
@@ -269,14 +268,12 @@ class MissingPodcast(View):
             can_add = False
 
         else:
-            podcast = podcast_for_url(url)
-
-            # if the podcast does already exist, there's nothing more to do
-            if podcast:
+            try:
+                podcast = Podcast.objects.get(urls__url=url)
                 can_add = False
 
-            # check if we could add a podcast for the given URL
-            else:
+            except Podcast.DoesNotExist:
+                # check if we could add a podcast for the given URL
                 podcast = False
                 updater = PodcastUpdater()
 

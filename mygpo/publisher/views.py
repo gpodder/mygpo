@@ -12,7 +12,7 @@ from django.utils.translation import ugettext as _
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
 
-from mygpo.podcasts.models import PodcastGroup
+from mygpo.podcasts.models import PodcastGroup, Podcast
 from mygpo.core.proxy import proxy_object
 from mygpo.publisher.auth import require_publisher, is_publisher
 from mygpo.publisher.forms import SearchPodcastForm
@@ -32,7 +32,7 @@ from mygpo.users.models import User
 from mygpo.db.couchdb.episode import episodes_for_podcast, episodes_for_slug, \
     set_episode_slug, remove_episode_slug
 from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_by_id, \
-         podcast_for_url, update_additional_data
+    update_additional_data
 from mygpo.db.couchdb.episode_state import episode_listener_counts
 from mygpo.db.couchdb.pubsub import subscription_for_topic
 
@@ -65,12 +65,8 @@ def home(request):
 def search_podcast(request):
     form = SearchPodcastForm(request.POST)
     if form.is_valid():
-        url = form.cleaned_data['url']
-
-        podcast = podcast_for_url(url)
-        if not podcast:
-            raise Http404
-
+        podcast_url = form.cleaned_data['url']
+        podcast = get_objet_or_404(Podcast, urls__url=podcast_url)
         url = get_podcast_link_target(podcast, 'podcast-publisher-detail')
     else:
         url = reverse('publisher')

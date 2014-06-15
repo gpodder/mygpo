@@ -5,9 +5,8 @@ from django.core.management.base import BaseCommand
 
 from couchdbkit.exceptions import ResourceNotFound
 
-from mygpo.core.models import Podcast
+from mygpo.podcasts.models import Podcast
 from mygpo.directory.models import ExamplePodcasts
-from mygpo.db.couchdb.podcast import podcast_for_url
 
 
 EXAMPLES_DOCID = 'example_podcasts'
@@ -24,7 +23,7 @@ class Command(BaseCommand):
             examples = ExamplePodcasts()
             examples._id = EXAMPLES_DOCID
 
-        podcasts = filter(None, [podcast_for_url(url) for url in urls])
-        examples.podcast_ids = [podcast.get_id() for podcast in podcasts]
+        podcasts = Podcast.objects.filter(urls__url__in=urls)
+        examples.podcast_ids = [podcast.id for podcast in podcasts]
         examples.updated = datetime.utcnow()
         examples.save()

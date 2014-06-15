@@ -29,6 +29,7 @@ from django.views.decorators.cache import never_cache, cache_control
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 
+from mygpo.podcasts.models import Podcast
 from mygpo.api.constants import EPISODE_ACTION_TYPES
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core.proxy import proxy_object
@@ -43,8 +44,7 @@ from mygpo.web.utils import get_episode_link_target, fetch_episode_data, \
 from mygpo.db.couchdb.episode import episode_for_slug_id, episode_for_oldid, \
          favorite_episodes_for_user, chapters_for_episode, \
          set_episode_favorite
-from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url, \
-         podcasts_to_dict
+from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_to_dict
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
          add_episode_actions, update_episode_chapters
 from mygpo.db.couchdb.user import get_latest_episodes
@@ -173,7 +173,7 @@ def list_favorites(request):
     favfeed = FavoriteFeed(user)
     feed_url = favfeed.get_public_url(site.domain)
 
-    podcast = podcast_for_url(feed_url)
+    podcast = Podcast.objects.filter(urls__url=feed_url).first()
 
     token = request.user.favorite_feeds_token
 

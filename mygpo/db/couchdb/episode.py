@@ -6,7 +6,8 @@ from couchdbkit import MultipleResultsFound
 
 from django.core.cache import cache
 
-from mygpo.core.models import Podcast, Episode, MergedIdException
+from mygpo.podcasts.models import Podcast
+from mygpo.core.models import Episode, MergedIdException
 from mygpo.core.signals import incomplete_obj
 from mygpo.cache import cache_result
 from mygpo.decorators import repeat_on_conflict
@@ -15,7 +16,7 @@ from mygpo.db import QueryParameterMissing
 from mygpo.db.couchdb.utils import is_couchdb_id
 from mygpo.db.couchdb import get_main_database, get_userdata_database, \
     get_single_result
-from mygpo.db.couchdb.podcast import podcast_for_url, podcast_for_slug_id
+from mygpo.db.couchdb.podcast import podcast_for_slug_id
 
 import logging
 logger = logging.getLogger(__name__)
@@ -158,12 +159,17 @@ def episode_for_podcast_url(podcast_url, episode_url, create=False):
         raise QueryParameterMissing('episode_url')
 
 
-    podcast = podcast_for_url(podcast_url, create=create)
+    if create:
+        podcast = Podcast.objects.get_or_create_for_url(podcast_url)
 
-    if not podcast:  # podcast does not exist and should not be created
-        return None
+    else:
+        try:
+            podcast = Podcast.objects.get(urls__url=podcast_url)
+        except Podcast.DoesNotExist:
+            # podcast does not exist and should not be created
+            return None
 
-    return episode_for_podcast_id_url(podcast.get_id(), episode_url, create)
+    return episode_for_podcast_id_url(podcast.id, episode_url, create)
 
 
 def episode_for_podcast_id_url(podcast_id, episode_url, create=False):

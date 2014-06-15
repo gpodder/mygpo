@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control
 
+from mygpo.podcasts.models import Podcast
 from mygpo.core.models import PodcastGroup, SubscriptionException
 from mygpo.core.proxy import proxy_object
 from mygpo.core.tasks import flattr_thing
@@ -22,11 +23,10 @@ from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.web.utils import get_podcast_link_target, get_page_list, \
     check_restrictions
 from mygpo.db.couchdb.episode import episodes_for_podcast
-from mygpo.db.couchdb.podcast import podcast_for_slug_id, \
-         podcast_for_oldid, podcast_for_url
+from mygpo.db.couchdb.podcast import podcast_for_slug_id, podcast_for_oldid
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast, \
          add_subscription_action, add_podcast_tags, remove_podcast_tags, \
-         set_podcast_privacy_settings
+         set_podcast_privacy_settings, subscribe, unsubscribe
 from mygpo.db.couchdb.episode_state import get_podcasts_episode_states, \
          episode_listener_counts
 from mygpo.db.couchdb.directory import tags_for_user, tags_for_podcast
@@ -279,7 +279,7 @@ def subscribe(request, podcast):
         for uid in device_uids:
             try:
                 device = request.user.get_device_by_uid(uid)
-                podcast.subscribe(request.user, device)
+                subscribe(podcast, request.user, device)
 
             except (SubscriptionException, DeviceDoesNotExist, ValueError) as e:
                 messages.error(request, str(e))
@@ -306,7 +306,7 @@ def subscribe_all(request, podcast):
     devs = [dev[0] if isinstance(dev, list) else dev for dev in devs]
 
     try:
-        podcast.subscribe(user, devs)
+        subscribe(podcast, user, devs)
     except (SubscriptionException, DeviceDoesNotExist, ValueError) as e:
         messages.error(request, str(e))
 
@@ -330,7 +330,7 @@ def unsubscribe(request, podcast, device_uid):
         return HttpResponseRedirect(return_to)
 
     try:
-        podcast.unsubscribe(request.user, device)
+        unsubscribe(podcast, request.user, device)
     except SubscriptionException as e:
         logger.exception('Web: %(username)s: could not unsubscribe from podcast %(podcast_url)s on device %(device_id)s' %
             {'username': request.user.username, 'podcast_url': podcast.url, 'device_id': device.id})
@@ -353,7 +353,7 @@ def unsubscribe_all(request, podcast):
     devs = [dev[0] if isinstance(dev, list) else dev for dev in devs]
 
     try:
-        podcast.unsubscribe(user, devs)
+        unsubscribe(podcast, user, devs)
     except (SubscriptionException, DeviceDoesNotExist, ValueError) as e:
         messages.error(request, str(e))
 
@@ -373,7 +373,7 @@ def subscribe_url(request):
     if not url:
         raise Http404('Please specify a valid url')
 
-    podcast = podcast_for_url(url, create=True)
+    podcast = Podcasts.objects.get_or_create_for_url(url)
 
     return HttpResponseRedirect(get_podcast_link_target(podcast, 'subscribe'))
 

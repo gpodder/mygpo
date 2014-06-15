@@ -327,3 +327,41 @@ def get_subscribed_podcast_states_by_user(user, public=None):
         state.set_db(udb)
 
     return states
+
+
+@repeat_on_conflict()
+def subscribe(podcast, user, device):
+    """ subscribes user to the current podcast on one or more devices """
+    from mygpo.core.signals import subscription_changed
+    state = podcast_state_for_user_podcast(user, podcast)
+
+    # accept devices, and also lists and tuples of devices
+    devices = device if isinstance(device, (list, tuple)) else [device]
+
+    for device in devices:
+
+        try:
+            subscribe_on_device(state, device)
+            subscription_changed.send(sender=podcast, user=user,
+                                      device=device, subscribed=True)
+        except Unauthorized as ex:
+            raise SubscriptionException(ex)
+
+
+@repeat_on_conflict()
+def unsubscribe(podcast, user, device):
+    """ unsubscribes user from the current podcast on one or more devices """
+    from mygpo.core.signals import subscription_changed
+    state = podcast_state_for_user_podcast(user, podcast)
+
+    # accept devices, and also lists and tuples of devices
+    devices = device if isinstance(device, (list, tuple)) else [device]
+
+    for device in devices:
+
+        try:
+            unsubscribe_on_device(state, device)
+            subscription_changed.send(sender=podcast, user=user, device=device,
+                                      subscribed=False)
+        except Unauthorized as ex:
+            raise SubscriptionException(ex)

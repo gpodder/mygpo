@@ -209,35 +209,6 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         return self.title or self.url
 
 
-    def group_with(self, other, grouptitle, myname, othername):
-
-        if self.group and (self.group == other.group):
-            # they are already grouped
-            return
-
-        group1 = PodcastGroup.get(self.group) if self.group else None
-        group2 = PodcastGroup.get(other.group) if other.group else None
-
-        if group1 and group2:
-            raise ValueError('both podcasts already are in different groups')
-
-        elif not (group1 or group2):
-            group = PodcastGroup(title=grouptitle)
-            group.save()
-            group.add_podcast(self, myname)
-            group.add_podcast(other, othername)
-            return group
-
-        elif group1:
-            group1.add_podcast(other, othername)
-            return group1
-
-        else:
-            group2.add_podcast(self, myname)
-            return group2
-
-
-
     def get_common_episode_title(self, num_episodes=100):
 
         if self.common_episode_title:
@@ -315,47 +286,6 @@ class Podcast(Document, SlugMixin, OldIdMixin):
         if len(self.subscribers) < 2:
             return 0
         return self.subscribers[-2].subscriber_count
-
-
-
-    @repeat_on_conflict()
-    def subscribe(self, user, device):
-        """ subscribes user to the current podcast on one or more devices """
-        from mygpo.db.couchdb.podcast_state import subscribe_on_device, \
-            podcast_state_for_user_podcast
-        state = podcast_state_for_user_podcast(user, self)
-
-        # accept devices, and also lists and tuples of devices
-        devices = device if isinstance(device, (list, tuple)) else [device]
-
-        for device in devices:
-
-            try:
-                subscribe_on_device(state, device)
-                subscription_changed.send(sender=self, user=user,
-                                          device=device, subscribed=True)
-            except Unauthorized as ex:
-                raise SubscriptionException(ex)
-
-
-    @repeat_on_conflict()
-    def unsubscribe(self, user, device):
-        """ unsubscribes user from the current podcast on one or more devices """
-        from mygpo.db.couchdb.podcast_state import unsubscribe_on_device, \
-            podcast_state_for_user_podcast
-        state = podcast_state_for_user_podcast(user, self)
-
-        # accept devices, and also lists and tuples of devices
-        devices = device if isinstance(device, (list, tuple)) else [device]
-
-        for device in devices:
-
-            try:
-                unsubscribe_on_device(state, device)
-                subscription_changed.send(sender=self, user=user, device=device,
-                                          subscribed=False)
-            except Unauthorized as ex:
-                raise SubscriptionException(ex)
 
 
     def subscribe_targets(self, user):

@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand
 from mygpo.core.podcasts import individual_podcasts
 from mygpo.podcasts.models import Podcast
 from mygpo.directory.toplist import PodcastToplist
-from mygpo.db.couchdb.podcast import podcast_by_id, podcast_for_url
+from mygpo.db.couchdb.podcast import podcast_by_id
 
 
 class PodcastCommand(BaseCommand):

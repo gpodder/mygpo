@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from datetime import datetime
 
-from django.db import models
+from django.db import models, transaction
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes import generic
@@ -152,6 +152,14 @@ class UrlsMixin(models.Model):
     class Meta:
         abstract = True
 
+    @property
+    def url(self):
+        """ The main URL of the model """
+        url = self.urls.first()
+        if url is None:
+            return None
+        return url.url
+
 
 class SlugsMixin(models.Model):
     """ Methods for working with Slug objects """
@@ -234,6 +242,31 @@ class PodcastQuerySet(models.QuerySet):
         q = self.extra(select={'next_update': NEXTUPDATE})
         return q.order_by('next_update')
 
+    @transaction.atomic
+    def get_or_create_for_url(self, url):
+        # TODO: where to specify how uuid is created?
+        import uuid
+        podcast, created = self.get_or_create(urls__url=url,
+                                              defaults={
+                                                'id': uuid.uuid1().hex,
+                                              })
+
+        if created:
+            url = URL.objects.create(url=url,
+                                     order=0,
+                                     scope=None,
+                                     content_object=podcast,
+                                    )
+        return podcast
+
+    def get_by_any_id(self, id):
+        """ Find a Podcast by its own ID or by a merged ID """
+        # TODO: should this be done in the model?
+        try:
+            return self.get(id=id)
+        except self.model.DoesNotExist:
+            return self.get(merged_uuids__uuid=id)
+
 
 class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
         LanguageModel, LastUpdateModel, UpdateInfoModel, LicenseModel,
@@ -264,6 +297,52 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
     def subscriber_count(self):
         # TODO: implement
         return 0
+
+    # TODO: remove after migration
+    def get_id(self):
+        return self.id.hex
+
+    def group_with(self, other, grouptitle, myname, othername):
+        """ Group the podcast with another one """
+        # TODO: move to PodcastGroup?
+
+        if bool(self.group) and (self.group == other.group):
+            # they are already grouped
+            return
+
+        group1 = self.group
+        group2 = other.group
+
+        if group1 and group2:
+            raise ValueError('both podcasts already are in different groups')
+
+        elif not (group1 or group2):
+            # Form a new group
+            import uuid
+            group = PodcastGroup.objects.create(id=uuid.uuid1(), title=grouptitle)
+            self.group_member_name = myname
+            self.group = group
+            self.save()
+
+            other.group_member_name = othername
+            other.group = group
+            other.save()
+
+            return group
+
+        elif group1:
+            # add other to self's group
+            other.group_member_name = othername
+            other.group = group1
+            other.save()
+            return group1
+
+        else:
+            # add self to other's group
+            self.group_member_name = myname
+            self.group = group2
+            self.save()
+            return group2
 
 
 class Episode(UUIDModel, TitleModel, DescriptionModel, LinkModel,

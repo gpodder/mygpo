@@ -18,16 +18,16 @@
 from django.http import HttpResponseBadRequest, Http404, HttpResponseNotFound
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
+from django.shortcuts import get_object_or_404
 
 from mygpo.decorators import allowed_methods, cors_origin
-from mygpo.core.models import Podcast
+from mygpo.podcasts.models import Podcast
 from mygpo.utils import parse_request_body
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.users.models import PodcastUserState, DeviceDoesNotExist
 from mygpo.db.couchdb import get_main_database, get_userdata_database
 from mygpo.db.couchdb.episode import episode_for_podcast_url
-from mygpo.db.couchdb.podcast import podcast_for_url
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode
 
@@ -56,9 +56,7 @@ def main(request, username, scope):
         return user, settings_obj, db
 
     def podcast_settings(user, url):
-        podcast = podcast_for_url(url)
-        if not podcast:
-            raise Http404
+        podcast = get_object_or_404(Podcast, urls__url=url)
         obj = podcast_state_for_user_podcast(user, podcast)
         return obj, obj, udb
 

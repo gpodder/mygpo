@@ -31,7 +31,6 @@ from mygpo.cel import celery
 from mygpo.db.couchdb import get_main_database
 from mygpo.db.couchdb.user import activate_user, add_published_objs
 from mygpo.db.couchdb.episode import episode_count, filetype_stats
-from mygpo.db.couchdb.podcast import podcast_for_url
 
 
 class InvalidPodcast(Exception):
@@ -117,11 +116,7 @@ class MergeBase(AdminView):
             if not podcast_url:
                 continue
 
-            p = podcast_for_url(podcast_url)
-
-            if not p:
-                raise InvalidPodcast(podcast_url)
-
+            p = Podcast.objects.get(urls__url=podcast_url)
             podcasts.append(p)
 
         return podcasts
@@ -372,9 +367,10 @@ class UnifyDuplicateSlugs(AdminView):
 
     def post(self, request):
         podcast_url = request.POST.get('feed')
-        podcast = podcast_for_url(podcast_url)
 
-        if not podcast:
+        try:
+            podcast = Podcast.objects.get(urls__url=podcast_url)
+        except Podcast.DoesNotExist:
             messages.error(request, _('Podcast with URL "%s" does not exist' %
                                       (podcast_url,)))
             return HttpResponseRedirect(reverse('admin-unify-slugs-select'))
@@ -433,9 +429,9 @@ class MakePublisher(AdminView):
         podcasts = set()
 
         for feed in feeds:
-            podcast = podcast_for_url(feed)
-
-            if podcast is None:
+            try:
+                podcast = Podcast.objects.get(urls__url=feed)
+            except Podcast.DoesNotExist:
                 messages.warning(request, 'Podcast with URL {feed} not found'.format(feed=feed))
                 continue
 
