@@ -218,28 +218,6 @@ def podcast_for_oldid(oldid):
     return podcast
 
 
-@cache_result(timeout=60*60)
-def podcastgroup_for_oldid(oldid):
-
-    if not oldid:
-        raise QueryParameterMissing('oldid')
-
-    db = get_main_database()
-    pg = get_single_result(db, 'podcasts/groups_by_oldid',
-            key          = long(oldid),
-            include_docs = True,
-            schema       = PodcastGroup,
-        )
-
-    if not pg:
-        return None
-
-    if pg.needs_update:
-        incomplete_obj.send_robust(sender=pg)
-
-    return pg
-
-
 def podcast_for_url(url, create=False):
 
     if not url:

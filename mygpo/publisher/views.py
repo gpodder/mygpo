@@ -30,7 +30,7 @@ from mygpo.users.models import User
 from mygpo.db.couchdb.episode import episodes_for_podcast, episodes_for_slug, \
     set_episode_slug, remove_episode_slug
 from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_by_id, \
-         podcast_for_url, podcastgroup_for_slug_id, podcastgroup_for_oldid, \
+         podcast_for_url, podcastgroup_for_slug_id, \
          podcastgroup_by_id, update_additional_data
 from mygpo.db.couchdb.episode_state import episode_listener_counts
 from mygpo.db.couchdb.pubsub import subscription_for_topic
@@ -313,31 +313,11 @@ def group_slug_id_decorator(f):
     return _decorator
 
 
-def group_oldid_decorator(f):
-    @wraps(f)
-    def _decorator(request, pid, *args, **kwargs):
-        try:
-            pid = int(pid)
-        except (TypeError, ValueError):
-            raise Http404
-
-        group = podcastgroup_for_oldid(pid)
-
-        if not podcast:
-            raise Http404
-
-        return f(request, group, *args, **kwargs)
-
-    return _decorator
-
-
-
 episode_oldid        = oldid_decorator(episode)
 podcast_oldid        = podcast_oldid_decorator(podcast)
 update_podcast_oldid = podcast_oldid_decorator(update_podcast)
 save_podcast_oldid   = podcast_oldid_decorator(save_podcast)
 episodes_oldid       = podcast_oldid_decorator(episodes)
-group_oldid          = group_oldid_decorator(group)
 
 episode_slug_id        = slug_id_decorator(episode)
 update_episode_slug_slug_id = slug_id_decorator(update_episode_slug)

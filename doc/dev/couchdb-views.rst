@@ -76,7 +76,6 @@ Doc-Types: Podcast, PodcastGroup, PodcastSubscriberData
 * `podcasts/by_slug <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/podcasts/views/by_slug>`_
 * `podcasts/by_tag <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/podcasts/views/by_tag>`_
 * `podcasts/by_url <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/podcasts/views/by_url>`_
-* `podcasts/groups_by_oldid <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/podcasts/views/groups_by_oldid>`_
 * `podcasts/podcasts_groups <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/podcasts/views/podcasts_groups>`_
 * `podcasts/subscriber_data <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/podcasts/views/subscriber_data>`_
 

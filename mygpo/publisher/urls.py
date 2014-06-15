@@ -35,7 +35,6 @@ urlpatterns = patterns('mygpo.publisher.views',
 
 
 
- url(r'^group/(?P<group_id>\d+)$',      'group_oldid',                 name='group-publisher'),
  url(r'^group/(?P<slug_id>[\w-]+)$',    'group_slug_id',               name='group-publisher-slug-id'),
 
 
