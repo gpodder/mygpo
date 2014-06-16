@@ -1,12 +1,12 @@
 from __future__ import unicode_literals
 
-from django.core.urlresolvers import reverse
 from django.utils.html import format_html
 from django.utils.translation import ugettext as _
 from django.contrib import admin
 from django.contrib.contenttypes.admin import GenericTabularInline
 from mygpo.podcasts.models import (Podcast, Episode, URL, Slug, Tag,
     MergedUUID, PodcastGroup)
+from mygpo.utils import edit_link
 
 
 class AdminLinkInline(admin.TabularInline):
@@ -18,9 +18,7 @@ class AdminLinkInline(admin.TabularInline):
         if not instance.pk:
             return ''
 
-        url = reverse('admin:%s_%s_change' % (instance._meta.app_label,
-                                              instance._meta.module_name),
-                      args=(instance.pk,))
+        url = edit_link(instance)
         return format_html('<a href="{}">{}</a>', url, _('Edit'))
 
     readonly_fields = ('admin_link',)

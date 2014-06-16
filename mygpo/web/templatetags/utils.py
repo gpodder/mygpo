@@ -2,6 +2,7 @@ from django import template
 from django.utils.safestring import mark_safe
 
 from mygpo.web.utils import get_page_list, license_info, hours_to_str
+from mygpo.utils import edit_link
 
 
 register = template.Library()
@@ -96,3 +97,6 @@ hours_to_str = register.filter(hours_to_str)
 @register.simple_tag
 def protocol(request):
     return 'http{s}://'.format(s='s' if request.is_secure() else '')
+
+
+edit_link = register.simple_tag(edit_link)

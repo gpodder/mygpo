@@ -158,9 +158,8 @@
    </a>
 
    {% if debug %}
-    <a class="btn btn-default" href="http://127.0.0.1:5984/_utils/document.html?mygpo/{% get_id podcast %}">
-     <i class="icon-cogs"></i>
-     Futon
+    <a class="btn btn-default" href="{% edit_link podcast %}">
+     <i class="icon-cogs"></i>Admin
     </a>
    {% endif %}
 

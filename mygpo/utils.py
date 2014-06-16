@@ -35,6 +35,7 @@ import zlib
 import shlex
 
 from django.conf import settings
+from django.core.urlresolvers import reverse
 
 from mygpo.core.json import json
 
@@ -1029,3 +1030,10 @@ def split_quoted(s):
         keywords = shlex.split(s)
 
     return keywords
+
+
+def edit_link(obj):
+    """ Return the link to the Django Admin Edit page """
+    return reverse('admin:%s_%s_change' % (obj._meta.app_label,
+                                           obj._meta.module_name),
+                   args=(obj.pk,))
