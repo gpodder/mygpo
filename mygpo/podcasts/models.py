@@ -214,6 +214,11 @@ class OrderedModel(models.Model):
 class PodcastGroup(UUIDModel, TitleModel, SlugsMixin):
     """ Groups multiple podcasts together """
 
+    @property
+    def scope(self):
+        """ A podcast group is always in the global scope """
+        return ''
+
 
 class PodcastQuerySet(models.QuerySet):
     """ Custom queries for Podcasts """
@@ -254,7 +259,7 @@ class PodcastQuerySet(models.QuerySet):
         if created:
             url = URL.objects.create(url=url,
                                      order=0,
-                                     scope=None,
+                                     scope='',
                                      content_object=podcast,
                                     )
         return podcast
@@ -345,6 +350,12 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
             return group2
 
 
+    @property
+    def scope(self):
+        """ A podcast is always in the global scope """
+        return ''
+
+
 class Episode(UUIDModel, TitleModel, DescriptionModel, LinkModel,
         LanguageModel, LastUpdateModel, UpdateInfoModel, LicenseModel,
         FlattrModel, ContentTypesModel, MergedIdsModel, OutdatedModel,
@@ -363,13 +374,23 @@ class Episode(UUIDModel, TitleModel, DescriptionModel, LinkModel,
     class Meta:
         ordering = ['-released']
 
+    @property
+    def scope(self):
+        """ An episode's scope is its podcast """
+        return self.podcast_id.hex
+
 
 class ScopedModel(models.Model):
+    """ A model that belongs to some scope, usually for limited uniqueness
+
+    scope does not allow null values, because null is not equal to null in SQL.
+    It could therefore not be used in unique constraints. """
 
     # A slug / URL is unique within a scope; no two podcasts can have the same
-    # URL (scope None), and no two episdoes of the same podcast (scope =
+    # URL (scope ''), and no two episdoes of the same podcast (scope =
     # podcast-ID) can have the same URL
-    scope = UUIDField(null=True, db_index=True)
+    scope = models.CharField(max_length=32, null=False, blank=True,
+                             db_index=True)
 
     class Meta:
         abstract = True

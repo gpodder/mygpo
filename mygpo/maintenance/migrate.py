@@ -55,8 +55,8 @@ def migrate_episode(e):
         'podcast': podcast,
     })
 
-    update_urls(e, e2, None)
-    update_slugs(e, e2, None)
+    update_urls(e, e2)
+    update_slugs(e, e2)
     update_ids(e, e2)
 
 
@@ -94,8 +94,8 @@ def migrate_podcast(p):
         'update_interval': p.update_interval,
     })
 
-    update_urls(p, p2, None)
-    update_slugs(p, p2, None)
+    update_urls(p, p2)
+    update_slugs(p, p2)
     update_tags(p, p2)
     update_ids(p, p2)
 
@@ -120,7 +120,7 @@ def migrate_podcastgroup(g):
 
 
 
-def update_urls(old, new, scope):
+def update_urls(old, new):
 
     with transaction.atomic():
         existing_urls = {u.url: u for u in new.urls.all()}
@@ -134,7 +134,7 @@ def update_urls(old, new, scope):
                     URL.objects.create(url=to_maxlength(URL, 'url', url),
                                        content_object=new,
                                        order=n,
-                                       scope=scope,
+                                       scope=new.scope,
                                     )
                 except IntegrityError as ie:
                     logger.warn('Could not create URL for %s: %s', new, ie)
@@ -147,7 +147,7 @@ def update_urls(old, new, scope):
 
 
 @transaction.atomic
-def update_slugs(old, new, scope):
+def update_slugs(old, new):
 
     existing_slugs = {s.slug: s for s in new.slugs.all()}
     logger.info('%d existing slugs', len(existing_slugs))
@@ -177,7 +177,7 @@ def update_slugs(old, new, scope):
                 Slug.objects.create(slug=to_maxlength(Slug, 'slug', slug),
                                     content_object=new,
                                     order=n,
-                                    scope=scope,
+                                    scope=new.scope,
                                 )
             except IntegrityError as ie:
                 logger.warn('Could not create Slug for %s: %s', new, ie)
