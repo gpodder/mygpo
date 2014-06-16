@@ -286,10 +286,12 @@ def license_info(license_url):
 
 def check_restrictions(obj):
     """ checks for known restrictions of the object """
-    if "hide" in obj.restrictions:
+
+    restrictions = obj.restrictions.split(',')
+    if "hide" in restrictions:
         raise Http404
 
-    if "hide-author" in obj.restrictions:
+    if "hide-author" in restrictions:
         obj.author = None
 
     return obj

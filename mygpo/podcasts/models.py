@@ -287,7 +287,8 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
     related_podcasts = models.ManyToManyField('self', symmetrical=True)
 
     #subscribers = SchemaListProperty(SubscriberData)
-    restrictions = models.CharField(max_length=20, null=True, blank=True)
+    restrictions = models.CharField(max_length=20, null=False, blank=True,
+                                    default='')
     common_episode_title = models.CharField(max_length=100, null=False, blank=True)
     new_location = models.URLField(max_length=1000, null=True, blank=False)
     latest_episode_timestamp = models.DateTimeField(null=True)
