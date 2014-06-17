@@ -46,36 +46,14 @@ podcast_by_id = cache_result(timeout=60*60)(podcast_by_id_uncached)
 
 
 @cache_result(timeout=60*60)
-def podcast_for_slug(slug):
-
-    if not slug:
-        raise QueryParameterMissing('slug')
-
-    db = get_main_database()
-    obj = get_single_result(db, 'podcasts/by_slug',
-            startkey     = [slug, None],
-            endkey       = [slug, {}],
-            include_docs = True,
-            wrapper      = _wrap_podcast_group_key1,
-        )
-
-    if not obj:
-        return None
-
-    if obj.needs_update:
-        incomplete_obj.send_robust(sender=obj)
-
-    return obj
-
-
-@cache_result(timeout=60*60)
 def podcast_for_slug_id(slug_id):
     """ Returns the Podcast for either an CouchDB-ID for a Slug """
 
     if is_couchdb_id(slug_id):
         return podcast_by_id(slug_id)
     else:
-        return podcast_for_slug(slug_id)
+        from mygpo.podcasts.models import Podcast
+        return Podcast.objects.filter(slugs__slug=slug_id)
 
 
 def podcasts_by_id(ids):
