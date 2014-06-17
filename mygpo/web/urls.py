@@ -47,31 +47,108 @@ urlpatterns += patterns('mygpo.web.views.subscriptions',
 urlpatterns += patterns('mygpo.web.views.podcast',
  url(r'^subscribe',                                               'subscribe_url', name='subscribe-by-url'),
 
- url(r'^podcast/(?P<pid>\d+)$',                                   'show_oldid',          name='podcast'),
- url(r'^podcast/(?P<pid>\d+)/subscribe$',                         'subscribe_oldid',     name='subscribe'),
- url(r'^podcast/(?P<pid>\d+)/subscribe/\+all$',                    'subscribe_all_oldid',     name='subscribe-all'),
- url(r'^podcast/(?P<pid>\d+)/unsubscribe/(?P<device_uid>[\w.-]+)',     'unsubscribe_oldid',   name='unsubscribe'),
- url(r'^podcast/(?P<pid>\d+)/unsubscribe/\+all$',                    'unsubscribe_all_oldid',     name='unsubscribe-all'),
- url(r'^podcast/(?P<pid>\d+)/add-tag',                            'add_tag_oldid',     name='add-tag'),
- url(r'^podcast/(?P<pid>\d+)/remove-tag',                         'remove_tag_oldid',    name='remove-tag'),
- url(r'^podcast/(?P<pid>\d+)/set-public',                         'set_public_oldid',    name='podcast-public',  kwargs={'public': True}),
- url(r'^podcast/(?P<pid>\d+)/set-private',                        'set_public_oldid',    name='podcast-private', kwargs={'public': False}),
- url(r'^podcast/(?P<pid>\d+)/-episodes',                          'all_episodes_oldid', name='podcast-all-episodes'),
- url(r'^podcast/(?P<pid>\d+)/-flattr',                            'flattr_podcast_oldid', name='podcast-flattr'),
- url(r'^podcast/(?P<pid>\d+)/\+history',                           'history_podcast_oldid', name='podcast-history'),
+ # Podcast Views with UUIDs
+ url(r'^podcast/(?P<podcast_id>[0-9a-f]{32})/?$',
+     'show_id',
+     name='podcast-id'),
 
- url(r'^podcast/(?P<slug_id>[\w-]+)/?$',                             'show_slug_id',        name='podcast-slug-id'),
- url(r'^podcast/(?P<slug_id>[\w-]+)/subscribe$',                     'subscribe_slug_id',   name='subscribe-slug-id'),
- url(r'^podcast/(?P<slug_id>[\w-]+)/subscribe/\+all$',               'subscribe_all_slug_id',   name='subscribe-all-slug-id'),
- url(r'^podcast/(?P<slug_id>[\w-]+)/unsubscribe/(?P<device_uid>[\w.-]+)', 'unsubscribe_slug_id', name='unsubscribe-slug-id'),
- url(r'^podcast/(?P<slug_id>[\w-]+)/unsubscribe/\+all$',               'unsubscribe_all_slug_id',   name='unsubscribe-all-slug-id'),
- url(r'^podcast/(?P<slug_id>[\w-]+)/add-tag',                        'add_tag_slug_id',     name='add-tag-slug-id'),
- url(r'^podcast/(?P<slug_id>[\w-]+)/remove-tag',                     'remove_tag_slug_id',  name='remove-tag-slug-id'),
- url(r'^podcast/(?P<slug_id>[\w-]+)/set-public',                     'set_public_slug_id',    name='podcast-public-slug-id',  kwargs={'public': True}),
- url(r'^podcast/(?P<slug_id>[\w-]+)/set-private',                    'set_public_slug_id',    name='podcast-private-slug-id', kwargs={'public': False}),
- url(r'^podcast/(?P<slug_id>[\w-]+)/-episodes',                      'all_episodes_slug_id', name='podcast-all-episodes-slug-id'),
- url(r'^podcast/(?P<slug_id>[\w-]+)/-flattr',                        'flattr_podcast_slug_id', name='podcast-flattr-slug-id'),
- url(r'^podcast/(?P<slug_id>[\w-]+)/\+history',                       'history_podcast_slug_id', name='podcast-history-slug-id'),
+ url(r'^podcast/(?P<podcast_id>[0-9a-f]{32})/subscribe$',
+     'subscribe_id',
+     name='subscribe-id'),
+
+ url(r'^podcast/(?P<podcast_id>[0-9a-f]{32})/subscribe/\+all$',
+     'subscribe_all_id',
+     name='subscribe-all-id'),
+
+ url(r'^podcast/(?P<podcast_id>[0-9a-f]{32})/unsubscribe/(?P<device_uid>[\w.-]+)',
+     'unsubscribe_id',
+     name='unsubscribe-id'),
+
+ url(r'^podcast/(?P<podcast_id>[0-9a-f]{32})/unsubscribe/\+all$',
+     'unsubscribe_all_id',
+     name='unsubscribe-all-id'),
+
+ url(r'^podcast/(?P<podcast_id>[0-9a-f]{32)/add-tag',
+     'add_tag_id',
+     name='add-tag-id'),
+
+ url(r'^podcast/(?P<podcast_id>[0-9a-f]{32})/remove-tag',
+     'remove_tag_id',
+     name='remove-tag-id'),
+
+ url(r'^podcast/(?P<podcast_id>[0-9a-f]{32})/set-public',
+     'set_public_id',
+     name='podcast-public-id',
+     kwargs={'public': True}),
+
+ url(r'^podcast/(?P<podcast_id>[0-9a-f]{32})/set-private',
+     'set_public_id',
+     name='podcast-private-id',
+     kwargs={'public': False}),
+
+ url(r'^podcast/(?P<podcast_id>[0-9a-f]{32})/-episodes',
+     'all_episodes_id',
+     name='podcast-all-episodes-id'),
+
+ url(r'^podcast/(?P<podcast_id>[0-9a-f]{32})/-flattr',
+     'flattr_podcast_id',
+     name='podcast-flattr-id'),
+
+ url(r'^podcast/(?P<podcast_id>[0-9a-f]{32})/\+history',
+     'history_podcast_id',
+     name='podcast-history-id'),
+
+
+ # Podcast Views with Slugs
+ url(r'^podcast/(?P<slug>[\w-]+)/?$',
+     'show_slug',
+     name='podcast-slug'),
+
+ url(r'^podcast/(?P<slug>[\w-]+)/subscribe$',
+     'subscribe_slug',
+     name='subscribe-slug'),
+
+ url(r'^podcast/(?P<slug>[\w-]+)/subscribe/\+all$',
+     'subscribe_all_slug',
+     name='subscribe-all-slug'),
+
+ url(r'^podcast/(?P<slug>[\w-]+)/unsubscribe/(?P<device_uid>[\w.-]+)',
+     'unsubscribe_slug',
+     name='unsubscribe-slug'),
+
+ url(r'^podcast/(?P<slug>[\w-]+)/unsubscribe/\+all$',
+     'unsubscribe_all_slug',
+     name='unsubscribe-all-slug'),
+
+ url(r'^podcast/(?P<slug>[\w-]+)/add-tag',
+     'add_tag_slug',
+     name='add-tag-slug'),
+
+ url(r'^podcast/(?P<slug>[\w-]+)/remove-tag',
+     'remove_tag_slug',
+     name='remove-tag-slug'),
+
+ url(r'^podcast/(?P<slug>[\w-]+)/set-public',
+     'set_public_slug',
+     name='podcast-public-slug',
+     kwargs={'public': True}),
+
+ url(r'^podcast/(?P<slug>[\w-]+)/set-private',
+     'set_public_slug',
+     name='podcast-private-slug',
+     kwargs={'public': False}),
+
+ url(r'^podcast/(?P<slug>[\w-]+)/-episodes',
+     'all_episodes_slug',
+     name='podcast-all-episodes-slug'),
+
+ url(r'^podcast/(?P<slug>[\w-]+)/-flattr',
+     'flattr_podcast_slug',
+     name='podcast-flattr-slug'),
+
+ url(r'^podcast/(?P<slug>[\w-]+)/\+history',
+     'history_podcast_slug',
+     name='podcast-history-slug'),
  )
 
 
@@ -81,17 +158,47 @@ urlpatterns += patterns('mygpo.web.views.episode',
      'list_favorites',
      name='favorites'),
 
- url(r'^episode/(?P<id>\d+)$',                                    'show_oldid',           name='episode'),
- url(r'^episode/(?P<id>\d+)/toggle-favorite',                     'toggle_favorite_oldid',name='episode-fav'),
- url(r'^episode/(?P<id>\d+)/add-action',                          'add_action_oldid',    name='add-episode-action'),
- url(r'^episode/(?P<id>\d+)/-flattr',                             'flattr_episode_oldid',    name='flattr-episode'),
- url(r'^episode/(?P<id>\d+)/\+history',                            'episode_history_oldid',    name='episode-history'),
+ # Episodes for UUIDs
+ url(r'^podcast/(?P<p_id>[0-9a-f]{32})/(?P<e_id>[0-9a-f]{32})$',
+     'show_id',
+     name='episode-id'),
 
- url(r'^podcast/(?P<p_slug_id>[\w-]+)/(?P<e_slug_id>[\w-]+)$',                'show_slug_id',            name='episode-slug-id'),
- url(r'^episode/(?P<p_slug_id>[\w-]+)/(?P<e_slug_id>[\w-]+)/toggle-favorite', 'toggle_favorite_slug_id', name='episode-fav-slug-id'),
- url(r'^episode/(?P<p_slug_id>[\w-]+)/(?P<e_slug_id>[\w-]+)/add-action',      'add_action_slug_id',      name='add-episode-action-slug-id'),
- url(r'^podcast/(?P<p_slug_id>[\w-]+)/(?P<e_slug_id>[\w-]+)/-flattr',         'flattr_episode_slug_id',  name='flattr-episode-slug-id'),
- url(r'^podcast/(?P<p_slug_id>[\w-]+)/(?P<e_slug_id>[\w-]+)/\+history',         'episode_history_slug_id',name='episode-history-slug-id'),
+ url(r'^podcast/(?P<p_id>[0-9a-f]{32})/(?P<e_id>[0-9a-f]{32})/toggle-favorite',
+     'toggle_favorite_id',
+     name='episode-fav-id'),
+
+ url(r'^podcast/(?P<p_id>[0-9a-f]{32})/(?P<e_id>[0-9a-f]{32})/add-action',
+     'add_action_id',
+     name='add-episode-action-id'),
+
+ url(r'^podcast/(?P<p_id>[0-9a-f]{32})/(?P<e_id>[0-9a-f]{32})/-flattr',
+     'flattr_episode_id',
+     name='flattr-episode-id'),
+
+ url(r'^podcast/(?P<p_id>[0-9a-f]{32})/(?P<e_id>[0-9a-f]{32})/\+history',
+     'episode_history_id',
+     name='episode-history-id'),
+
+
+ # Episodes for Slugs
+ url(r'^podcast/(?P<p_slug>[\w-]+)/(?P<e_slug>[\w-]+)$',
+     'show_slug',
+     name='episode-slug'),
+
+ url(r'^podcast/(?P<p_slug>[\w-]+)/(?P<e_slug>[\w-]+)/toggle-favorite',
+     'toggle_favorite_slug',
+     name='episode-fav-slug'),
+
+ url(r'^podcast/(?P<p_slug>[\w-]+)/(?P<e_slug>[\w-]+)/add-action',
+     'add_action_slug',
+     name='add-episode-action-slug'),
+
+ url(r'^podcast/(?P<p_slug>[\w-]+)/(?P<e_slug>[\w-]+)/-flattr',
+     'flattr_episode_slug',  name='flattr-episode-slug'),
+
+ url(r'^podcast/(?P<p_slug>[\w-]+)/(?P<e_slug>[\w-]+)/\+history',
+     'episode_history_slug',
+     name='episode-history-slug'),
 )
 
 from mygpo.web.views.settings import DefaultPrivacySettings, \

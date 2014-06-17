@@ -9,6 +9,7 @@ from django.utils.translation import ugettext as _
 from django.contrib import messages
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control
+from django.shortcuts import get_object_or_404
 
 from mygpo.podcasts.models import Podcast
 from mygpo.core.models import PodcastGroup, SubscriptionException
@@ -23,7 +24,6 @@ from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.web.utils import get_podcast_link_target, get_page_list, \
     check_restrictions
 from mygpo.db.couchdb.episode import episodes_for_podcast
-from mygpo.db.couchdb.podcast import podcast_for_slug_id, podcast_for_oldid
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast, \
          add_subscription_action, add_podcast_tags, remove_podcast_tags, \
          set_podcast_privacy_settings, subscribe, unsubscribe
@@ -144,12 +144,12 @@ def episode_list(podcast, user, offset=0, limit=None):
     """
 
     listeners = dict(episode_listener_counts(podcast))
-    episodes = episodes_for_podcast(podcast, descending=True, skip=offset, limit=limit)
+    episodes = podcast.episode_set.all()[offset:limit]
 
     if user.is_authenticated():
 
         # prepare pre-populated data for HistoryEntry.fetch_data
-        podcasts_dict = dict( (p_id, podcast) for p_id in podcast.get_ids())
+        podcasts_dict = {podcast.get_id(): podcast}
         episodes_dict = dict( (episode._id, episode) for episode in episodes)
 
         actions = get_podcasts_episode_states(podcast, user._id)
@@ -219,9 +219,9 @@ def all_episodes(request, podcast, page_size=20):
 
 
 def _annotate_episode(listeners, episode_actions, episode):
-    listener_count = listeners.pop(episode._id, None)
-    action         = episode_actions.pop(episode._id, None)
-    return proxy_object(episode, listeners=listener_count, action=action)
+    episode.listener_count = listeners.pop(episode.get_id(), None)
+    episode.action = episode_actions.pop(episode.get_id(), None)
+    return episode
 
 
 
@@ -412,20 +412,18 @@ def flattr_podcast(request, podcast):
     return HttpResponseRedirect(get_podcast_link_target(podcast))
 
 
-# To make all view accessible via either CouchDB-ID or Slugs
+# To make all view accessible via either IDs or Slugs
 # a decorator queries the podcast and passes the Id on to the
 # regular views
 
-def slug_id_decorator(f):
+def slug_decorator(f):
     @wraps(f)
-    def _decorator(request, slug_id, *args, **kwargs):
-        podcast = podcast_for_slug_id(slug_id)
+    def _decorator(request, slug, *args, **kwargs):
 
-        if podcast is None:
-            raise Http404
+        podcast = get_object_or_404(Podcast, slugs__slug=slug)
 
-        # redirect when Id or a merged (non-cannonical) slug is used
-        if podcast.slug and slug_id != podcast.slug:
+        # redirect when a non-cannonical slug is used
+        if slug != podcast.slug:
             return HttpResponseRedirect(get_podcast_link_target(podcast))
 
         return f(request, podcast, *args, **kwargs)
@@ -433,46 +431,43 @@ def slug_id_decorator(f):
     return _decorator
 
 
-def oldid_decorator(f):
+def id_decorator(f):
     @wraps(f)
-    def _decorator(request, pid, *args, **kwargs):
+    def _decorator(request, podcast_id, *args, **kwargs):
+
         try:
-            pid = int(pid)
-        except (TypeError, ValueError):
-            raise Http404
+            podcast = Podcast.objects.get(id=podcast_id)
+            return f(request, podcast, *args, **kwargs)
+            # TODO: redirect to Slug URL?
 
-        podcast = podcast_for_oldid(pid)
-
-        if not podcast:
-            raise Http404
-
-        # redirect to Id or slug URL
-        return HttpResponseRedirect(get_podcast_link_target(podcast))
+        except Podcast.DoesNotExist:
+            podcast = get_object_or_404(Podcast, merged_uuids__uuid=podcast_id)
+            return HttpResponseRedirect(get_podcast_link_target(podcast))
 
     return _decorator
 
 
-show_slug_id        = slug_id_decorator(show)
-subscribe_slug_id   = slug_id_decorator(subscribe)
-subscribe_all_slug_id= slug_id_decorator(subscribe_all)
-unsubscribe_slug_id = slug_id_decorator(unsubscribe)
-unsubscribe_all_slug_id= slug_id_decorator(unsubscribe_all)
-add_tag_slug_id     = slug_id_decorator(add_tag)
-remove_tag_slug_id  = slug_id_decorator(remove_tag)
-set_public_slug_id  = slug_id_decorator(set_public)
-all_episodes_slug_id= slug_id_decorator(all_episodes)
-flattr_podcast_slug_id=slug_id_decorator(flattr_podcast)
-history_podcast_slug_id= slug_id_decorator(history)
+show_slug            = slug_decorator(show)
+subscribe_slug       = slug_decorator(subscribe)
+subscribe_all_slug   = slug_decorator(subscribe_all)
+unsubscribe_slug     = slug_decorator(unsubscribe)
+unsubscribe_all_slug = slug_decorator(unsubscribe_all)
+add_tag_slug         = slug_decorator(add_tag)
+remove_tag_slug      = slug_decorator(remove_tag)
+set_public_slug      = slug_decorator(set_public)
+all_episodes_slug    = slug_decorator(all_episodes)
+flattr_podcast_slug  = slug_decorator(flattr_podcast)
+history_podcast_slug = slug_decorator(history)
 
 
-show_oldid          = oldid_decorator(show)
-subscribe_oldid     = oldid_decorator(subscribe)
-subscribe_all_oldid = oldid_decorator(subscribe_all)
-unsubscribe_oldid   = oldid_decorator(unsubscribe)
-unsubscribe_all_oldid= oldid_decorator(unsubscribe_all)
-add_tag_oldid       = oldid_decorator(add_tag)
-remove_tag_oldid    = oldid_decorator(remove_tag)
-set_public_oldid    = oldid_decorator(set_public)
-all_episodes_oldid  = oldid_decorator(all_episodes)
-flattr_podcast_oldid= oldid_decorator(flattr_podcast)
-history_podcast_oldid= oldid_decorator(history)
+show_id            = id_decorator(show)
+subscribe_id       = id_decorator(subscribe)
+subscribe_all_id   = id_decorator(subscribe_all)
+unsubscribe_id     = id_decorator(unsubscribe)
+unsubscribe_all_id = id_decorator(unsubscribe_all)
+add_tag_id         = id_decorator(add_tag)
+remove_tag_id      = id_decorator(remove_tag)
+set_public_id      = id_decorator(set_public)
+all_episodes_id    = id_decorator(all_episodes)
+flattr_podcast_id  = id_decorator(flattr_podcast)
+history_podcast_id = id_decorator(history)

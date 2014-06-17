@@ -16,7 +16,6 @@ from mygpo.db import QueryParameterMissing
 from mygpo.db.couchdb.utils import is_couchdb_id
 from mygpo.db.couchdb import get_main_database, get_userdata_database, \
     get_single_result
-from mygpo.db.couchdb.podcast import podcast_for_slug_id
 
 import logging
 logger = logging.getLogger(__name__)
@@ -69,85 +68,6 @@ def episodes_by_id(episode_ids):
             incomplete_obj.send_robust(sender=episode)
 
     return episodes
-
-
-@cache_result(timeout=60*60)
-def episode_for_oldid(oldid):
-
-    if not oldid:
-        raise QueryParameterMissing('oldid')
-
-    oldid = int(oldid)
-    db = get_main_database()
-    episode = get_single_result(db, 'episodes/by_oldid',
-            key          = oldid,
-            limit        = 1,
-            include_docs = True,
-            schema       = Episode,
-        )
-
-    if not episode:
-        return None
-
-    if episode.needs_update:
-        incomplete_obj.send_robust(sender=episode)
-
-    return episode
-
-
-@cache_result(timeout=60*60)
-def episode_for_slug(podcast_id, episode_slug):
-
-    if not podcast_id:
-        raise QueryParameterMissing('podcast_id')
-
-    if not episode_slug:
-        raise QueryParameterMissing('episode_slug')
-
-    db = get_main_database()
-    episode = get_single_result(db, 'episodes/by_slug',
-            key          = [podcast_id, episode_slug],
-            include_docs = True,
-            schema       = Episode,
-        )
-
-    if not episode:
-        return None
-
-    if episode.needs_update:
-        incomplete_obj.send_robust(sender=episode)
-
-    return episode
-
-
-def episodes_for_slug(podcast_id, episode_slug):
-    """ returns all episodes for the given slug
-
-    this should normally only return one episode, but there might be multiple
-    due to resolved replication conflicts, etc """
-
-    if not podcast_id:
-        raise QueryParameterMissing('podcast_id')
-
-    if not episode_slug:
-        raise QueryParameterMissing('episode_slug')
-
-    r = Episode.view('episodes/by_slug',
-            key          = [podcast_id, episode_slug],
-            include_docs = True,
-        )
-
-    if not r:
-        return []
-
-    episodes = r.all()
-
-    for episode in episodes:
-        if episode.needs_update:
-            incomplete_obj.send_robust(sender=episode)
-
-    return episodes
-
 
 
 def episode_for_podcast_url(podcast_url, episode_url, create=False):
@@ -215,34 +135,6 @@ def episode_for_podcast_id_url(podcast_id, episode_url, create=False):
         return episode
 
     return None
-
-
-def episode_for_slug_id(p_slug_id, e_slug_id):
-    """ Returns the Episode for Podcast Slug/Id and Episode Slug/Id """
-
-    if not p_slug_id:
-        raise QueryParameterMissing('p_slug_id')
-
-    if not e_slug_id:
-        raise QueryParameterMissing('e_slug_id')
-
-
-    # The Episode-Id is unique, so take that
-    if is_couchdb_id(e_slug_id):
-        return episode_by_id(e_slug_id)
-
-    # If we search using a slug, we need the Podcast's Id
-    if is_couchdb_id(p_slug_id):
-        p_id = p_slug_id
-    else:
-        podcast = podcast_for_slug_id(p_slug_id)
-
-        if podcast is None:
-            return None
-
-        p_id = podcast.get_id()
-
-    return episode_for_slug(p_id, e_slug_id)
 
 
 @cache_result(timeout=60*60)

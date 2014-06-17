@@ -149,12 +149,12 @@ def get_podcast_link_target(podcast, view_name='podcast', add_args=[]):
     # we prefer slugs
     if podcast.slug:
         args = [podcast.slug]
-        view_name = '%s-slug-id' % view_name
+        view_name = '%s-slug' % view_name
 
-    # as a fallback we use CouchDB-IDs
+    # as a fallback we use UUIDs
     else:
         args = [podcast.get_id()]
-        view_name = '%s-slug-id' % view_name
+        view_name = '%s-id' % view_name
 
     return reverse(view_name, args=args + add_args)
 
@@ -195,23 +195,14 @@ def get_episode_link_target(episode, podcast, view_name='episode',
 
     # prefer slugs
     if episode.slug:
-        args = [podcast.slug or podcast.get_id(), episode.slug]
-        view_name = '%s-slug-id' % view_name
+        args = [podcast.slug, episode.slug]
+        view_name = '%s-slug' % view_name
 
-    # for short URLs, prefer oldids over CouchDB-IDs
-    elif episode.oldid:
-        args = [episode.oldid]
-
-    # fallback: CouchDB-IDs
+    # fallback: UUIDs
     else:
-        if not podcast:
-            if isinstance(episode.podcast, Podcast):
-                podcast = episode.podcast
-            elif isinstance(episode.podcast, basestring):
-                podcast = podcast_by_id(episode.podcast)
-
-        args = [podcast.slug or podcast.get_id(), episode._id]
-        view_name = '%s-slug-id' % view_name
+        podcast = podcast or episode.podcast
+        args = [podcast.get_id(), episode.get_id()]
+        view_name = '%s-id' % view_name
 
     return strip_tags(reverse(view_name, args=args + add_args))
 

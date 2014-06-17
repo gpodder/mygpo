@@ -28,6 +28,10 @@ class UUIDModel(models.Model):
     class Meta:
         abstract = True
 
+    def get_id(self):
+        """ String representation of the ID """
+        return self.id.hex
+
 
 class TitleModel(models.Model):
     """ Model that has a title """
@@ -304,10 +308,6 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
         # TODO: implement
         return 0
 
-    # TODO: remove after migration
-    def get_id(self):
-        return self.id.hex
-
     def group_with(self, other, grouptitle, myname, othername):
         """ Group the podcast with another one """
         # TODO: move to PodcastGroup?
@@ -379,6 +379,28 @@ class Episode(UUIDModel, TitleModel, DescriptionModel, LinkModel,
     def scope(self):
         """ An episode's scope is its podcast """
         return self.podcast_id.hex
+
+    def get_short_title(self, common_title):
+        """ Title when used within the podcast's context """
+        if not self.title or not common_title:
+            return None
+
+        title = self.title.replace(common_title, '').strip()
+        title = re.sub(r'^[\W\d]+', '', title)
+        return title
+
+
+    def get_episode_number(self, common_title):
+        """ Number of the episode """
+        if not self.title or not common_title:
+            return None
+
+        title = self.title.replace(common_title, '').strip()
+        match = re.search(r'^\W*(\d+)', title)
+        if not match:
+            return None
+
+        return int(match.group(1))
 
 
 class ScopedModel(models.Model):

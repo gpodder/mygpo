@@ -29,7 +29,7 @@ from django.views.decorators.cache import never_cache, cache_control
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 
-from mygpo.podcasts.models import Podcast
+from mygpo.podcasts.models import Podcast, Episode
 from mygpo.api.constants import EPISODE_ACTION_TYPES
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core.proxy import proxy_object
@@ -41,9 +41,8 @@ from mygpo.web.heatmap import EpisodeHeatmap
 from mygpo.publisher.utils import check_publisher_permission
 from mygpo.web.utils import get_episode_link_target, fetch_episode_data, \
     check_restrictions
-from mygpo.db.couchdb.episode import episode_for_slug_id, episode_for_oldid, \
-         favorite_episodes_for_user, chapters_for_episode, \
-         set_episode_favorite
+from mygpo.db.couchdb.episode import favorite_episodes_for_user, \
+         chapters_for_episode, set_episode_favorite
 from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_to_dict
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
          add_episode_actions, update_episode_chapters
@@ -55,7 +54,7 @@ from mygpo.userfeeds.feeds import FavoriteFeed
 @cache_control(private=True)
 def episode(request, episode):
 
-    podcast = podcast_by_id(episode.podcast)
+    podcast = episode.podcast
 
     podcast = check_restrictions(podcast)
 
@@ -91,8 +90,8 @@ def episode(request, episode):
 
     is_publisher = check_publisher_permission(user, podcast)
 
-    prev = podcast.get_episode_before(episode)
-    next = podcast.get_episode_after(episode)
+    prev = None #podcast.get_episode_before(episode)
+    next = None #podcast.get_episode_after(episode)
 
     return render(request, 'episode.html', {
         'episode': episode,
@@ -247,10 +246,32 @@ def flattr_episode(request, episode):
 # a decorator queries the episode and passes the Id on to the
 # regular views
 
-def slug_id_decorator(f):
+def slug_decorator(f):
     @wraps(f)
-    def _decorator(request, p_slug_id, e_slug_id, *args, **kwargs):
-        episode = episode_for_slug_id(p_slug_id, e_slug_id)
+    def _decorator(request, p_slug, e_slug, *args, **kwargs):
+
+        query = Episode.objects.filter(slugs__slug=e_slug,
+                                       podcast__slugs__slug=p_slug)
+        episode = query.select_related('podcast').get()
+
+        # redirect when Id or a merged (non-cannonical) slug is used
+        if episode.slug and episode.slug != e_slug:
+            podcast = podcast_by_id(episode.podcast)
+            return HttpResponseRedirect(
+                    get_episode_link_target(episode, podcast))
+
+        return f(request, episode, *args, **kwargs)
+
+    return _decorator
+
+
+def id_decorator(f):
+    @wraps(f)
+    def _decorator(request, p_id, e_id, *args, **kwargs):
+
+        query = Episode.objects.filter(id=e_id,
+                                       podcast_id=p_id)
+        episode = query.selected_related('podcast').get()
 
         if episode is None:
             raise Http404
@@ -266,28 +287,15 @@ def slug_id_decorator(f):
     return _decorator
 
 
-def oldid_decorator(f):
-    @wraps(f)
-    def _decorator(request, id, *args, **kwargs):
-        episode = episode_for_oldid(id)
 
-        if episode is None:
-            raise Http404
+show_slug            = slug_decorator(episode)
+toggle_favorite_slug = slug_decorator(toggle_favorite)
+add_action_slug      = slug_decorator(add_action)
+flattr_episode_slug  = slug_decorator(flattr_episode)
+episode_history_slug = slug_decorator(history)
 
-        # redirect to Id or slug URL
-        podcast = podcast_by_id(episode.podcast)
-        return HttpResponseRedirect(get_episode_link_target(episode, podcast))
-
-    return _decorator
-
-show_slug_id            = slug_id_decorator(episode)
-toggle_favorite_slug_id = slug_id_decorator(toggle_favorite)
-add_action_slug_id      = slug_id_decorator(add_action)
-flattr_episode_slug_id  = slug_id_decorator(flattr_episode)
-episode_history_slug_id = slug_id_decorator(history)
-
-show_oldid            = oldid_decorator(episode)
-toggle_favorite_oldid = oldid_decorator(toggle_favorite)
-add_action_oldid      = oldid_decorator(add_action)
-flattr_episode_oldid  = oldid_decorator(flattr_episode)
-episode_history_oldid = oldid_decorator(history)
+show_id            = id_decorator(episode)
+toggle_favorite_id = id_decorator(toggle_favorite)
+add_action_id      = id_decorator(add_action)
+flattr_episode_id  = id_decorator(flattr_episode)
+episode_history_id = id_decorator(history)

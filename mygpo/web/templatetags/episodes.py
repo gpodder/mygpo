@@ -76,13 +76,7 @@ def episode_status_icon(action):
 
 @register.filter
 def is_image(episode):
-
-    if isinstance(episode, Episode):
-        mimetypes = episode.mimetypes
-
-    else:
-        mimetypes = [get_mimetype(episode.mimetype, episode.url)]
-
+    mimetypes = episode.mimetypes.split(',')
     return any(get_type(mimetype) == 'image' for mimetype in mimetypes)
 
 

@@ -19,20 +19,17 @@ from mygpo.publisher.forms import SearchPodcastForm
 from mygpo.publisher.utils import listener_data, episode_listener_data, \
          check_publisher_permission, subscriber_data
 from mygpo.web.heatmap import EpisodeHeatmap
-from mygpo.web.views.episode import oldid_decorator, slug_id_decorator
-from mygpo.web.views.podcast import \
-         slug_id_decorator as podcast_slug_id_decorator, \
-         oldid_decorator as podcast_oldid_decorator
+from mygpo.web.views.episode import slug_decorator as episode_slug_decorator
+from mygpo.web.views.podcast import slug_decorator as podcast_slug_decorator
 from mygpo.web.utils import get_podcast_link_target, normalize_twitter, \
      get_episode_link_target
 from django.contrib.sites.models import RequestSite
 from mygpo.data.tasks import update_podcasts
 from mygpo.decorators import requires_token, allowed_methods
 from mygpo.users.models import User
-from mygpo.db.couchdb.episode import episodes_for_podcast, episodes_for_slug, \
+from mygpo.db.couchdb.episode import episodes_for_podcast, \
     set_episode_slug, remove_episode_slug
-from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_by_id, \
-    update_additional_data
+from mygpo.db.couchdb.podcast import podcasts_by_id, update_additional_data
 from mygpo.db.couchdb.episode_state import episode_listener_counts
 from mygpo.db.couchdb.pubsub import subscription_for_topic
 
@@ -211,7 +208,7 @@ def episodes(request, podcast):
 def episode(request, episode):
 
     site = RequestSite(request)
-    podcast = podcast_by_id(episode.podcast)
+    podcast = episode.podcast
 
     if not check_publisher_permission(request.user, podcast):
         return HttpResponseForbidden()
@@ -247,11 +244,12 @@ def update_episode_slug(request, episode):
     """ sets a new "main" slug, and moves the existing to the merged slugs """
 
     new_slug = request.POST.get('slug')
-    podcast = podcast_by_id(episode.podcast)
+    podcast = episode.podcast
 
     if new_slug:
         # remove the new slug from other episodes (of the same podcast)
-        other_episodes = episodes_for_slug(podcast.get_id(), new_slug)
+        other_episodes = Episode.objects.filter(podcast=podcast,
+                                                slugs__slug=new_slug)
 
         for other_episode in other_episodes:
 
@@ -301,16 +299,10 @@ def group_id_decorator(f):
     return _decorator
 
 
-episode_oldid        = oldid_decorator(episode)
-podcast_oldid        = podcast_oldid_decorator(podcast)
-update_podcast_oldid = podcast_oldid_decorator(update_podcast)
-save_podcast_oldid   = podcast_oldid_decorator(save_podcast)
-episodes_oldid       = podcast_oldid_decorator(episodes)
-
-episode_slug_id        = slug_id_decorator(episode)
-update_episode_slug_slug_id = slug_id_decorator(update_episode_slug)
-podcast_slug_id        = podcast_slug_id_decorator(podcast)
-episodes_slug_id       = podcast_slug_id_decorator(episodes)
-update_podcast_slug_id = podcast_slug_id_decorator(update_podcast)
-save_podcast_slug_id   = podcast_slug_id_decorator(save_podcast)
-group_slug_id          = group_id_decorator(group)
+episode_slug             = episode_slug_decorator(episode)
+update_episode_slug_slug = episode_slug_decorator(update_episode_slug)
+podcast_slug             = podcast_slug_decorator(podcast)
+episodes_slug            = podcast_slug_decorator(episodes)
+update_podcast_slug      = podcast_slug_decorator(update_podcast)
+save_podcast_slug        = podcast_slug_decorator(save_podcast)
+group_slug               = group_id_decorator(group)

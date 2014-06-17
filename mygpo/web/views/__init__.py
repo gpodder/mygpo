@@ -43,7 +43,7 @@ from mygpo.users.models import History, HistoryEntry, DeviceDoesNotExist
 from mygpo.users.tasks import update_suggestions
 from mygpo.web.utils import process_lang_params
 from mygpo.utils import parse_range
-from mygpo.web.views.podcast import slug_id_decorator
+#from mygpo.web.views.podcast import slug_id_decorator
 from mygpo.users.settings import FLATTR_AUTO, FLATTR_TOKEN
 from mygpo.db.couchdb.episode import favorite_episode_ids_for_user
 from mygpo.db.couchdb.podcast import podcast_by_id
@@ -176,7 +176,7 @@ def history(request, count=15, uid=None):
 
 @never_cache
 @login_required
-@slug_id_decorator
+#@slug_id_decorator
 def blacklist(request, blacklisted_podcast):
     user = request.user
     suggestion = suggestions_for_user(user)

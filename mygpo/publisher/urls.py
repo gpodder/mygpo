@@ -5,37 +5,27 @@ urlpatterns = patterns('mygpo.publisher.views',
  url(r'^(?P<username>[\w.-]+)/update$', 'update_published_podcasts',   name='publisher-update'),
  url(r'^(?P<username>[\w.-]+)/update-token', 'new_update_token',       name='publisher-new-update-token'),
 
- url(r'^podcast/(?P<pid>\d+)$',          'podcast_oldid',              name='podcast-publisher-detail'),
- url(r'^podcast/(?P<pid>\d+)/update$',   'update_podcast_oldid',       name='podcast-publisher-update'),
- url(r'^podcast/(?P<pid>\d+)/save$',     'save_podcast_oldid',       name='podcast-publisher-save'),
- url(r'^podcast/(?P<pid>\d+)/episodes$', 'episodes_oldid',             name='podcast-publisher-episodes'),
-
-
- url(r'^episode/(?P<id>\d+)$',
-      'episode_oldid',               name='episode-publisher-detail'),
-
-
  url(r'^podcast/(?P<slug_id>[\w-]+)/$',
-      'podcast_slug_id',            name='podcast-publisher-detail-slug-id'),
+      'podcast_slug',            name='podcast-publisher-detail-slug'),
 
  url(r'^podcast/(?P<slug_id>[\w-]+)/update$',
-      'update_podcast_slug_id',    name='podcast-publisher-update-slug-id'),
+      'update_podcast_slug',    name='podcast-publisher-update-slug'),
 
  url(r'^podcast/(?P<slug_id>[\w-]+)/save$',
-      'save_podcast_slug_id',    name='podcast-publisher-save-slug-id'),
+      'save_podcast_slug',    name='podcast-publisher-save-slug'),
 
  url(r'^podcast/(?P<slug_id>[\w-]+)/episodes$',
-      'episodes_slug_id',           name='podcast-publisher-episodes-slug-id'),
+      'episodes_slug',           name='podcast-publisher-episodes-slug'),
 
  url(r'^podcast/(?P<p_slug_id>[\w-]+)/(?P<e_slug_id>[\w-]+)$',
-      'episode_slug_id',            name='episode-publisher-detail-slug-id'),
+      'episode_slug',            name='episode-publisher-detail-slug'),
 
  url(r'^podcast/(?P<p_slug_id>[\w-]+)/(?P<e_slug_id>[\w-]+)/set-slug$',
-      'update_episode_slug_slug_id', name='publisher-set-episode-slug-slug-id'),
+      'update_episode_slug_slug', name='publisher-set-episode-slug-slug'),
 
 
 
- url(r'^group/(?P<slug_id>[\w-]+)$',    'group_slug_id',               name='group-publisher-slug-id'),
+ url(r'^group/(?P<slug_id>[\w-]+)$',    'group_slug',               name='group-publisher-slug'),
 
 
  url(r'^podcast/search$',               'search_podcast',              name='podcast-publisher-search'),

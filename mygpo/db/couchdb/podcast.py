@@ -45,17 +45,6 @@ def podcast_by_id_uncached(podcast_id, current_id=False):
 podcast_by_id = cache_result(timeout=60*60)(podcast_by_id_uncached)
 
 
-@cache_result(timeout=60*60)
-def podcast_for_slug_id(slug_id):
-    """ Returns the Podcast for either an CouchDB-ID for a Slug """
-
-    if is_couchdb_id(slug_id):
-        return podcast_by_id(slug_id)
-    else:
-        from mygpo.podcasts.models import Podcast
-        return Podcast.objects.filter(slugs__slug=slug_id)
-
-
 def podcasts_by_id(ids):
 
     if ids is None:
@@ -105,29 +94,6 @@ def podcasts_groups_by_id(ids):
             incomplete_obj.send_robust(sender=obj)
 
         yield obj
-
-
-
-@cache_result(timeout=60*60)
-def podcast_for_oldid(oldid):
-
-    if oldid is None:
-        raise QueryParameterMissing('oldid')
-
-    db = get_main_database()
-    podcast = get_single_result(db, 'podcasts/by_oldid',
-            key          = long(oldid),
-            include_docs = True,
-            wrapper      = _wrap_podcast_group_key1,
-        )
-
-    if not podcast:
-        return None
-
-    if podcast.needs_update:
-        incomplete_obj.send_robust(sender=podcast)
-
-    return podcast
 
 
 def _wrap_pg(doc):
@@ -212,19 +178,6 @@ def _wrap_podcast_group(res):
         pg = PodcastGroup.wrap(res['doc'])
         id = res['key']
         return pg.get_podcast_by_id(id)
-
-
-def _wrap_podcast_group_key1(res):
-    obj = res['doc']
-    if obj['doc_type'] == 'Podcast':
-        return Podcast.wrap(obj)
-
-    else:
-        pid = res[u'key'][1]
-        pg = PodcastGroup.wrap(obj)
-        podcast = pg.get_podcast_by_id(pid)
-        return podcast
-
 
 
 def search_wrapper(result):
