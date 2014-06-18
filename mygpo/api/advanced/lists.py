@@ -40,7 +40,6 @@ from mygpo.api.simple import parse_subscription, format_podcast_list, \
      check_format
 from mygpo.share.views import list_decorator
 from mygpo.users.models import User
-from mygpo.db.couchdb.podcast import podcasts_by_id
 from mygpo.db.couchdb.podcastlist import podcastlist_for_user_slug, \
          podcastlists_for_user
 
@@ -149,7 +148,7 @@ def get_list(request, plist, owner, format):
     except (TypeError, ValueError):
         return HttpResponseBadRequest('scale_logo has to be a numeric value')
 
-    podcasts = podcasts_by_id(plist.podcasts)
+    podcasts = Podcast.objects.filter(id__in=plist.podcasts)
 
     domain = RequestSite(request).domain
     p_data = lambda p: podcast_data(p, domain, scale)

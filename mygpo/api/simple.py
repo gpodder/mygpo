@@ -33,7 +33,7 @@ from django.utils.translation import ugettext as _
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.api.backend import get_device, BulkSubscribe
 from mygpo.core import models
-from mygpo.core.models import Podcast
+from mygpo.podcasts.models import Podcast
 from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.directory.toplist import PodcastToplist
@@ -44,7 +44,6 @@ from mygpo.decorators import allowed_methods, cors_origin
 from mygpo.utils import parse_range, normalize_feed_url
 from mygpo.core.json import json, JSONDecodeError
 from mygpo.db.couchdb import BulkException
-from mygpo.db.couchdb.podcast import podcasts_by_id
 from mygpo.db.couchdb.user import suggestions_for_user
 
 import logging
@@ -353,7 +352,7 @@ def example_podcasts(request, format):
         try:
             examples = ExamplePodcasts.get('example_podcasts')
             ids = examples.podcast_ids
-            podcasts = podcasts_by_id(ids)
+            podcasts = Podcasts.objects.filter(id__in=ids)
             cache.set('example-podcasts', podcasts)
 
         except ResourceNotFound:

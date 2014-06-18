@@ -1,9 +1,9 @@
 from collections import Counter
 
+from mygpo.podcasts.models import Podcast
 from mygpo.cel import celery
 from mygpo.core.slugs import get_duplicate_slugs, EpisodeSlug
 from mygpo.maintenance.merge import PodcastMerger
-from mygpo.db.couchdb.podcast import podcasts_by_id
 from mygpo.db.couchdb.episode import episodes_for_podcast_uncached
 
 from celery.utils.log import get_task_logger
@@ -16,7 +16,7 @@ def merge_podcasts(podcast_ids, num_groups):
 
     logger.info('merging podcast ids %s', podcast_ids)
 
-    podcasts = podcasts_by_id(podcast_ids)
+    podcasts = Podcast.objects.filter(id__in=podcast_ids)
 
     logger.info('merging podcasts %s', podcasts)
 

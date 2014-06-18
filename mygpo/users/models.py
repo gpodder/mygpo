@@ -21,7 +21,7 @@ from mygpo.users.ratings import RatingMixin
 from mygpo.users.sync import SyncedDevicesMixin
 from mygpo.users.subscriptions import subscription_changes, podcasts_for_states
 from mygpo.users.settings import FAV_FLAG, PUBLIC_SUB_PODCAST, SettingsMixin
-from mygpo.db.couchdb.podcast import podcasts_by_id, podcasts_to_dict
+from mygpo.db.couchdb.podcast import podcasts_to_dict
 from mygpo.db.couchdb.user import user_history, device_history, \
     create_missing_user_tokens
 
@@ -62,7 +62,7 @@ class Suggestions(Document, RatingMixin):
         ids = filter(lambda x: not x in self.blacklist + subscriptions, self.podcasts)
         if count:
             ids = ids[:count]
-        return filter(lambda x: x and x.title, podcasts_by_id(ids))
+        return filter(lambda x: x and x.title, Podcast.objects.filter(id__in=ids))
 
 
     def __repr__(self):

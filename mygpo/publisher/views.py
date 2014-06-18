@@ -29,7 +29,7 @@ from mygpo.decorators import requires_token, allowed_methods
 from mygpo.users.models import User
 from mygpo.db.couchdb.episode import episodes_for_podcast, \
     set_episode_slug, remove_episode_slug
-from mygpo.db.couchdb.podcast import podcasts_by_id, update_additional_data
+from mygpo.db.couchdb.podcast import update_additional_data
 from mygpo.db.couchdb.episode_state import episode_listener_counts
 from mygpo.db.couchdb.pubsub import subscription_for_topic
 
@@ -38,7 +38,7 @@ from mygpo.db.couchdb.pubsub import subscription_for_topic
 @cache_control(private=True)
 def home(request):
     if is_publisher(request.user):
-        podcasts = podcasts_by_id(request.user.published_objects)
+        podcasts = Podcasts.objects.filter(id__in=request.user.published_objects)
         site = RequestSite(request)
         update_token = request.user.get_token('publisher_update_token')
         form = SearchPodcastForm()
@@ -170,7 +170,7 @@ def update_published_podcasts(request, username):
     if not user:
         raise Http404
 
-    published_podcasts = podcasts_by_id(user.published_objects)
+    published_podcasts = Podcast.objects.filter(id__in=user.published_objects)
     update_podcasts.delay([podcast.url for podcast in published_podcasts])
     return HttpResponse('Updated:\n' + '\n'.join([p.url for p in published_podcasts]), mimetype='text/plain')
 

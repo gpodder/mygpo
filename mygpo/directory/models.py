@@ -2,9 +2,9 @@ from django.core.cache import cache
 
 from couchdbkit.ext.django.schema import *
 
+from mygpo.podcasts.models import Podcast
 from mygpo.utils import iterate_together
 from mygpo.core.proxy import DocumentABCMeta
-from mygpo.db.couchdb.podcast import podcasts_by_id
 
 
 class Category(Document):
@@ -55,7 +55,7 @@ class Category(Document):
             return podcasts
 
         ids = self.podcasts[start:end]
-        podcasts = podcasts_by_id(ids)
+        podcasts = Podcast.objects.filter(id__in=ids)
         cache.set(cache_id, podcasts)
 
         return podcasts

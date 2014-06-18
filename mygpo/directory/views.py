@@ -33,7 +33,7 @@ from mygpo.users.settings import FLATTR_TOKEN
 from mygpo.data.feeddownloader import PodcastUpdater, NoEpisodesException
 from mygpo.data.tasks import update_podcasts
 from mygpo.db.couchdb.user import get_user_by_id
-from mygpo.db.couchdb.podcast import podcasts_by_id, podcasts_to_dict
+from mygpo.db.couchdb.podcast import podcasts_to_dict
 from mygpo.db.couchdb.directory import category_for_tag
 from mygpo.db.couchdb.podcastlist import random_podcastlists, \
          podcastlist_count, podcastlists_by_rating
@@ -149,7 +149,7 @@ class Directory(View):
         if random_list:
             random_list = proxy_object(random_list)
             random_list.more_podcasts = max(0, len(random_list.podcasts) - podcasts_per_list)
-            random_list.podcasts = podcasts_by_id(random_list.podcasts[:podcasts_per_list])
+            random_list.podcasts = Podcast.objects.filter(id__in=random_list.podcasts[:podcasts_per_list])
             random_list.user = get_user_by_id(random_list.user)
 
         yield random_list

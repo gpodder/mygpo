@@ -21,29 +21,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def podcasts_by_id(ids):
-
-    if ids is None:
-        raise QueryParameterMissing('ids')
-
-    if not ids:
-        return []
-
-    r = Podcast.view('podcasts/by_id',
-            keys         = ids,
-            include_docs = True,
-            wrap_doc     = False
-        )
-
-    podcasts = map(_wrap_podcast_group, r)
-
-    for podcast in podcasts:
-        if podcast.needs_update:
-            incomplete_obj.send_robust(sender=podcast)
-
-    return podcasts
-
-
 def podcasts_groups_by_id(ids):
     """ gets podcast groups and top-level podcasts for the given ids """
 
@@ -107,7 +84,8 @@ def podcasts_to_dict(ids, use_cache=False):
         cache_objs.extend(res.values())
         ids = [x for x in ids if x not in res.keys()]
 
-    db_objs = podcasts_by_id(ids)
+    from mygpo.podcasts.models import Podcast
+    db_objs = Podcast.objects.filter(id__in=ids)
 
     for obj in (cache_objs + db_objs):
 
