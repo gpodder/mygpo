@@ -9,8 +9,8 @@ from mygpo.podcasts.models import (Podcast, Episode, URL, Slug, Tag,
 from mygpo.utils import edit_link
 
 
-class AdminLinkInline(admin.TabularInline):
-    """ TabularInline that adds an Admin link for the inlined model """
+class AdminLinkMixin(object):
+    """ Adds an Admin link """
 
     def admin_link(self, instance):
         """ Link to the admin page """
@@ -24,6 +24,14 @@ class AdminLinkInline(admin.TabularInline):
     readonly_fields = ('admin_link',)
 
 
+class AdminLinkInline(AdminLinkMixin, admin.TabularInline):
+    """ TabularInline that adds an Admin link for the inlined model """
+
+
+class GenericAdminLinkInline(AdminLinkMixin, GenericTabularInline):
+    """ TabularInline that adds an Admin link for the inlined model """
+
+
 @admin.register(URL)
 class URLAdmin(admin.ModelAdmin):
     model = URL
@@ -31,8 +39,9 @@ class URLAdmin(admin.ModelAdmin):
     list_filter = ('content_type', )
 
 
-class URLInline(GenericTabularInline):
+class URLInline(GenericAdminLinkInline):
     model = URL
+    fields = ('order', 'url', 'admin_link', )
 
 
 class SlugInline(GenericTabularInline):
