@@ -24,7 +24,6 @@ from mygpo.directory.views import search as directory_search
 from mygpo.decorators import repeat_on_conflict
 from mygpo.flattr import Flattr
 from mygpo.userfeeds.feeds import FavoriteFeed
-from mygpo.db.couchdb.podcast import podcasts_groups_by_id
 from mygpo.db.couchdb.podcastlist import podcastlist_for_user_slug, \
          podcastlists_for_user, add_podcast_to_podcastlist, \
          remove_podcast_from_podcastlist, delete_podcastlist
@@ -94,7 +93,7 @@ def list_show(request, plist, owner):
 
     plist = proxy_object(plist)
 
-    podcasts = list(podcasts_groups_by_id(plist.podcasts))
+    podcasts = get_podcasts_groups(plist.podcasts)
     plist.podcasts = podcasts
 
     max_subscribers = max([p.subscriber_count() for p in podcasts] + [0])
@@ -115,7 +114,7 @@ def list_show(request, plist, owner):
 
 @list_decorator(must_own=False)
 def list_opml(request, plist, owner):
-    podcasts = podcasts_groups_by_id(plist.podcasts)
+    podcasts = get_podcasts_groups(plist.podcasts)
     return format_podcast_list(podcasts, 'opml', plist.title)
 
 
@@ -324,3 +323,11 @@ def set_token_public(request, token_name, public):
     _update(user=request.user)
 
     return HttpResponseRedirect(reverse('share'))
+
+
+def get_podcasts_groups(ids):
+    # this could be optimized by using a View
+    groups = PodcastGroup.objects.filter(id__in=ids)
+    podcasts = PodcastGroup.objects.filter(id__in_ids)
+    # TODO: bring in right order, according to IDs
+    return list(groups) + list(podcasts)

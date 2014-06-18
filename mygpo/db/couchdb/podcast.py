@@ -21,51 +21,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def podcasts_groups_by_id(ids):
-    """ gets podcast groups and top-level podcasts for the given ids """
-
-    if ids is None:
-        raise QueryParameterMissing('ids')
-
-    if not ids:
-        return
-
-    db = get_main_database()
-    res = db.view('podcasts/podcasts_groups',
-            keys         = ids,
-            include_docs = True,
-        )
-
-    for r in res:
-        obj = _wrap_pg(r)
-
-        if not obj:
-            yield None
-            continue
-
-        if obj.needs_update:
-            incomplete_obj.send_robust(sender=obj)
-
-        yield obj
-
-
-def _wrap_pg(doc):
-
-    doc = doc['doc']
-
-    if not doc:
-        return None
-
-    if doc['doc_type'] == 'Podcast':
-        return Podcast.wrap(doc)
-
-    elif doc['doc_type'] == 'PodcastGroup':
-        return PodcastGroup.wrap(doc)
-
-    else:
-        logger.error('received unknown doc_type "%s"', doc['doc_type'])
-
-
 def podcasts_to_dict(ids, use_cache=False):
 
     if ids is None:
@@ -122,16 +77,6 @@ def subscriberdata_for_podcast(podcast_id):
         data.podcast = podcast_id
 
     return data
-
-
-
-def _wrap_podcast_group(res):
-    if res['doc']['doc_type'] == 'Podcast':
-        return Podcast.wrap(res['doc'])
-    else:
-        pg = PodcastGroup.wrap(res['doc'])
-        id = res['key']
-        return pg.get_podcast_by_id(id)
 
 
 def search_wrapper(result):
