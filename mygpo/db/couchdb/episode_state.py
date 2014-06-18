@@ -7,7 +7,6 @@ from django.core.cache import cache
 from mygpo.podcasts.models import Podcast
 from mygpo.users.models import EpisodeUserState
 from mygpo.db import QueryParameterMissing
-from mygpo.db.couchdb.podcast import podcast_by_id
 from mygpo.db.couchdb.episode import episode_for_podcast_id_url
 from mygpo.db.couchdb import get_main_database, get_userdata_database, \
      get_single_result

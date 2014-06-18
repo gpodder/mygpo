@@ -13,7 +13,6 @@ from mygpo.decorators import repeat_on_conflict
 from mygpo.utils import progress
 from mygpo.db.couchdb import get_main_database
 from mygpo.maintenance.models import CommandStatus, CommandRunStatus
-from mygpo.db.couchdb.podcast import podcast_by_id
 
 
 class Command(BaseCommand):
@@ -64,9 +63,7 @@ class Command(BaseCommand):
                 if has_slug(obj):
                     continue
 
-                podcast = podcast_by_id(obj.podcast)
-                if not podcast:
-                    continue
+                podcast = episode.podcast
                 podcasts = filter(has_slug, [podcast])
 
             updated = self.handle_podcasts(podcasts)

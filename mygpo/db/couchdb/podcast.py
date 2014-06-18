@@ -21,30 +21,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def podcast_by_id_uncached(podcast_id, current_id=False):
-
-    if not podcast_id:
-        raise QueryParameterMissing('podcast_id')
-
-    db = get_main_database()
-    podcast = get_single_result(db, 'podcasts/by_id',
-            key          = podcast_id,
-            include_docs = True,
-            wrapper      = _wrap_podcast_group,
-        )
-
-    if not podcast:
-        return None
-
-    if podcast.needs_update:
-        incomplete_obj.send_robust(sender=podcast)
-
-    return podcast
-
-
-podcast_by_id = cache_result(timeout=60*60)(podcast_by_id_uncached)
-
-
 def podcasts_by_id(ids):
 
     if ids is None:
@@ -223,11 +199,6 @@ def search(q, offset=0, num_results=20):
         return [], 0
 
 
-def reload_podcast(podcast):
-    return podcast_by_id_uncached(podcast.get_id())
-
-
-@repeat_on_conflict(['podcast'], reload_f=reload_podcast)
 def update_additional_data(podcast, twitter):
     podcast.twitter = twitter
     podcast.save()
@@ -236,7 +207,6 @@ def update_additional_data(podcast, twitter):
     cache.clear()
 
 
-@repeat_on_conflict(['podcast'], reload_f=reload_podcast)
 def update_related_podcasts(podcast, related):
     if podcast.related_podcasts == related:
         return
@@ -245,6 +215,5 @@ def update_related_podcasts(podcast, related):
     podcast.save()
 
 
-@repeat_on_conflict(['podcast'], reload_f=reload_podcast)
 def delete_podcast(podcast):
     podcast.delete()

@@ -1,9 +1,9 @@
 from datetime import datetime
 
+from mygpo.podcasts.models import Podcast
 from mygpo.core.models import SubscriberData
 from mygpo.cel import celery
 from mygpo.data.feeddownloader import PodcastUpdater
-from mygpo.db.couchdb.podcast import podcast_by_id, subscriberdata_for_podcast
 from mygpo.db.couchdb.podcast_state import podcast_subscriber_count
 
 
@@ -12,7 +12,7 @@ def update_podcast_subscribers(podcast_id):
     """ Updates the subscriber count of a podcast """
 
     try:
-        podcast = podcast_by_id(podcast_id)
+        podcast = Podcast.objects.get(id=podcast_id)
 
         # calculate current number of subscribers
         subscriber_count = podcast_subscriber_count(podcast)

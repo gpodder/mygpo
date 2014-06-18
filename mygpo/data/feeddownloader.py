@@ -43,7 +43,6 @@ from mygpo.data.podcast import subscribe_at_hub
 from mygpo.pubsub.models import SubscriptionError
 from mygpo.db.couchdb.episode import episode_for_podcast_id_url, \
          episodes_for_podcast_current, episode_count_for_podcast
-from mygpo.db.couchdb.podcast import reload_podcast
 from mygpo.directory.tags import update_category
 from mygpo.decorators import repeat_on_conflict
 from mygpo.db.couchdb import get_main_database, bulk_save_retry
@@ -140,7 +139,6 @@ class PodcastUpdater(object):
             raise NoEpisodesException('no episodes found')
 
 
-    @repeat_on_conflict(['podcast'], reload_f=reload_podcast)
     def _update_podcast(self, podcast, parsed, episodes):
         """ updates a podcast according to new parser results """
 
@@ -321,7 +319,6 @@ class PodcastUpdater(object):
             logger.warn('Exception while updating podcast logo: %s', str(e))
 
 
-    @repeat_on_conflict(['podcast'], reload_f=reload_podcast)
     def _mark_outdated(self, podcast, msg=''):
         logger.info('marking podcast outdated: %s', msg)
         podcast.outdated = True

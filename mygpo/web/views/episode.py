@@ -43,7 +43,7 @@ from mygpo.web.utils import get_episode_link_target, fetch_episode_data, \
     check_restrictions
 from mygpo.db.couchdb.episode import favorite_episodes_for_user, \
          chapters_for_episode, set_episode_favorite
-from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_to_dict
+from mygpo.db.couchdb.podcast import podcasts_to_dict
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
          add_episode_actions, update_episode_chapters
 from mygpo.db.couchdb.user import get_latest_episodes
@@ -116,7 +116,7 @@ def history(request, episode):
     """ shows the history of the episode """
 
     user = request.user
-    podcast = podcast_by_id(episode.podcast)
+    podcast = episode.podcast
     episode_state = episode_state_for_user_episode(user, episode)
 
     # pre-populate data for fetch_data
@@ -146,7 +146,7 @@ def toggle_favorite(request, episode):
     is_fav = episode_state.is_favorite()
     set_episode_favorite(episode_state, not is_fav)
 
-    podcast = podcast_by_id(episode.podcast)
+    podcast = episode.podcast
 
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
@@ -210,7 +210,7 @@ def add_action(request, episode):
     state = episode_state_for_user_episode(request.user, episode)
     add_episode_actions(state, [action])
 
-    podcast = podcast_by_id(episode.podcast)
+    podcast = episode.podcast
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
 
@@ -238,7 +238,7 @@ def flattr_episode(request, episode):
     else:
         messages.error(request, msg)
 
-    podcast = podcast_by_id(episode.podcast)
+    podcast = episode.podcast
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
 
@@ -256,7 +256,7 @@ def slug_decorator(f):
 
         # redirect when Id or a merged (non-cannonical) slug is used
         if episode.slug and episode.slug != e_slug:
-            podcast = podcast_by_id(episode.podcast)
+            podcast = episode.podcast
             return HttpResponseRedirect(
                     get_episode_link_target(episode, podcast))
 
@@ -278,7 +278,7 @@ def id_decorator(f):
 
         # redirect when Id or a merged (non-cannonical) slug is used
         if episode.slug and episode.slug != e_slug_id:
-            podcast = podcast_by_id(episode.podcast)
+            podcast = episode.podcast
             return HttpResponseRedirect(
                     get_episode_link_target(episode, podcast))
 

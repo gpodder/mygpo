@@ -31,7 +31,6 @@ from mygpo.web.logo import get_logo_url
 from mygpo.decorators import cors_origin
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.db.couchdb.episode import episode_for_podcast_url
-from mygpo.db.couchdb.podcast import podcast_by_id
 from mygpo.db.couchdb.directory import category_for_tag
 
 
@@ -123,7 +122,7 @@ def podcast_data(obj, domain, scaled_logo_size=64):
 
 def episode_data(episode, domain, podcast=None):
 
-    podcast = podcast or podcast_by_id(episode.podcast)
+    podcast = podcast or episode.podcast
 
     data = {
         "title": episode.title,

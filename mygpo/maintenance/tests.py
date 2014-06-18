@@ -27,7 +27,6 @@ from mygpo.core.models import Episode
 from mygpo.users.models import EpisodeAction, User
 from mygpo.maintenance.merge import PodcastMerger
 from mygpo.utils import get_timestamp
-from mygpo.db.couchdb.podcast import podcast_by_id
 from mygpo.db.couchdb.episode import episode_by_id
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
     add_episode_actions

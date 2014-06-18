@@ -3,13 +3,12 @@ from datetime import datetime
 from django.utils.translation import ugettext as _
 from django.conf import settings
 
+from mygpo.podcasts.models import Podcast, Episode
 from mygpo.cel import celery
 from mygpo.data.feeddownloader import PodcastUpdater
 from mygpo.utils import get_timestamp
 from mygpo.users.models import EpisodeAction
 from mygpo.flattr import Flattr
-from mygpo.db.couchdb.podcast import podcast_by_id
-from mygpo.db.couchdb.episode import episode_by_id
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
          add_episode_actions
 
@@ -21,10 +20,10 @@ def flattr_thing(user, thing_id, domain, is_secure, thing_type):
     flattr = Flattr(user, domain, is_secure)
 
     if thing_type == 'Podcast':
-        thing = podcast_by_id(thing_id)
+        thing = Podcast.objects.get(id=thing_id)
 
     elif thing_type == 'Episode':
-        thing = episode_by_id(thing_id)
+        thing = Episode.objects.get(id=thing_id)
 
     else:
         raise NotImplemented(_("Can't flattr a '%s'") % thing_type)
@@ -56,7 +55,7 @@ def auto_flattr_episode(user, episode_id):
     if not success:
         return False
 
-    episode = episode_by_id(episode_id)
+    episode = Episode.objects.get(id=episode_id)
     state = episode_state_for_user_episode(user, episode)
 
     action = EpisodeAction()

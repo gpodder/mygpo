@@ -33,6 +33,7 @@ from django.utils.html import strip_tags
 from django_couchdb_utils.couchauth.models import UsernameException, \
          PasswordException
 
+from mygpo.podcasts.models import Podcast
 from mygpo.core.podcasts import PODCAST_SORT
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.web.forms import UserAccountForm, ProfileForm, FlattrForm
@@ -40,7 +41,7 @@ from mygpo.web.utils import normalize_twitter
 from mygpo.flattr import Flattr
 from mygpo.users.settings import PUBLIC_SUB_USER, \
          FLATTR_TOKEN, FLATTR_AUTO, FLATTR_MYGPO, FLATTR_USERNAME
-from mygpo.db.couchdb.podcast import podcast_by_id, podcasts_to_dict
+from mygpo.db.couchdb.podcast import podcasts_to_dict
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast, \
          subscriptions_by_user, set_podcast_privacy_settings
 from mygpo.db.couchdb.user import update_flattr_settings, \
@@ -240,7 +241,7 @@ class PodcastPrivacySettings(View):
     @method_decorator(login_required)
     @method_decorator(never_cache)
     def post(self, request, podcast_id):
-        podcast = podcast_by_id(podcast_id)
+        podcast = Podcast.objects.get(id=podcast_id)
         state = podcast_state_for_user_podcast(request.user, podcast)
         set_podcast_privacy_settings(state, self.public)
         return HttpResponseRedirect(reverse('privacy'))
