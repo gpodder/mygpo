@@ -351,6 +351,58 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
             return group2
 
 
+    def subscribe_targets(self, user):
+        """
+        returns all Devices and SyncGroups on which this podcast can be subsrbied. This excludes all
+        devices/syncgroups on which the podcast is already subscribed
+        """
+        targets = []
+
+        subscriptions_by_devices = user.get_subscriptions_by_device()
+
+        for group in user.get_grouped_devices():
+
+            if group.is_synced:
+
+                dev = group.devices[0]
+
+                if not self.get_id() in subscriptions_by_devices[dev.id]:
+                    targets.append(group.devices)
+
+            else:
+                for device in group.devices:
+                    if not self.get_id() in subscriptions_by_devices[device.id]:
+                        targets.append(device)
+
+        return targets
+
+
+    def get_common_episode_title(self, num_episodes=100):
+
+        if self.common_episode_title:
+            return self.common_episode_title
+
+        episodes = self.episode_set.all()[:num_episodes]
+
+        # We take all non-empty titles
+        titles = filter(None, (e.title for e in episodes))
+
+        # there can not be a "common" title of a single title
+        if len(titles) < 2:
+            return None
+
+        # get the longest common substring
+        common_title = utils.longest_substr(titles)
+
+        # but consider only the part up to the first number. Otherwise we risk
+        # removing part of the number (eg if a feed contains episodes 100-199)
+        common_title = re.search(r'^\D*', common_title).group(0)
+
+        if len(common_title.strip()) < 2:
+            return None
+
+        return common_title
+
     @property
     def scope(self):
         """ A podcast is always in the global scope """
