@@ -328,6 +328,6 @@ def set_token_public(request, token_name, public):
 def get_podcasts_groups(ids):
     # this could be optimized by using a View
     groups = PodcastGroup.objects.filter(id__in=ids)
-    podcasts = PodcastGroup.objects.filter(id__in_ids)
+    podcasts = PodcastGroup.objects.filter(id__in=ids)
     # TODO: bring in right order, according to IDs
     return list(groups) + list(podcasts)
