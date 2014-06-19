@@ -425,7 +425,7 @@ class Episode(UUIDModel, TitleModel, DescriptionModel, LinkModel,
 
     guid = models.CharField(max_length=200, null=True)
     content = models.TextField()
-    released = models.DateTimeField(null=True)
+    released = models.DateTimeField(null=True, db_index=True)
     duration = models.PositiveIntegerField(null=True)
     filesize = models.BigIntegerField(null=True)
     mimetypes = models.CharField(max_length=100)
