@@ -162,6 +162,14 @@ INSTALLED_APPS = (
     'mygpo.db.couchdb',
 )
 
+try:
+    import debug_toolbar
+    INSTALLED_APPS += ('debug_toolbar.apps.DebugToolbarConfig', )
+
+except ImportError:
+    pass
+
+
 TEST_EXCLUDE = (
     'django',
     'couchdbkit',
