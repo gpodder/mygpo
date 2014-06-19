@@ -144,7 +144,8 @@ def episode_list(podcast, user, offset=0, limit=None):
     """
 
     listeners = dict(episode_listener_counts(podcast))
-    episodes = podcast.episode_set.all()[offset:limit]
+    episodes = podcast.episode_set.all()
+    episodes = episodes.prefetch_related('slugs')[offset:limit]
 
     if user.is_authenticated():
 
@@ -420,7 +421,8 @@ def slug_decorator(f):
     @wraps(f)
     def _decorator(request, slug, *args, **kwargs):
 
-        podcast = get_object_or_404(Podcast, slugs__slug=slug)
+        podcast = Podcast.objects.filter(slugs__slug=slug)
+        podcast = podcast.prefetch_related('slugs', 'urls').get()
 
         # redirect when a non-cannonical slug is used
         if slug != podcast.slug:

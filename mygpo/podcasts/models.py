@@ -159,10 +159,13 @@ class UrlsMixin(models.Model):
     @property
     def url(self):
         """ The main URL of the model """
-        url = self.urls.first()
-        if url is None:
-            return None
-        return url.url
+        # We could also use self.urls.first() here, but this would result in a
+        # different query and would render a .prefetch_related('urls') useless
+        # The assumption is that we will never have loads of URLS, so
+        # fetching all won't hurt
+        urls = list(self.urls.all())
+        return urls[0].url if urls else None
+
 
 
 class SlugsMixin(models.Model):
@@ -178,10 +181,15 @@ class SlugsMixin(models.Model):
         """ The main slug of the podcast
 
         TODO: should be retrieved from a (materialized) view """
-        slug = self.slugs.first()
-        if slug is None:
-            return None
-        return slug.slug
+
+        # We could also use self.slugs.first() here, but this would result in a
+        # different query and would render a .prefetch_related('slugs') useless
+        # The assumption is that we will never have loads of slugs, so
+        # fetching all won't hurt
+        slugs = list(self.slugs.all())
+        return slugs[0].slug if slugs else None
+
+
 
 
 class MergedUUIDsMixin(models.Model):
