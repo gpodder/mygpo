@@ -14,7 +14,7 @@ from django.views.decorators.cache import cache_control
 from django.views.generic.base import View
 from django.utils.decorators import method_decorator
 
-from mygpo.podcasts.models import Podcast
+from mygpo.podcasts.models import Podcast, PodcastGroup
 from mygpo.utils import get_timestamp
 from mygpo.core.proxy import proxy_object
 from mygpo.api.simple import format_podcast_list
