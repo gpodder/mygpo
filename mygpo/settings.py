@@ -143,7 +143,6 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.sessions',
     'django.contrib.staticfiles',
-    'couchdbkit.ext.django',
     'django_couchdb_utils.couchauth',
     'django_couchdb_utils.registration',
     'djcelery',
