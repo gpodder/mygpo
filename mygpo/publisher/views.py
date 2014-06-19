@@ -29,7 +29,6 @@ from mygpo.decorators import requires_token, allowed_methods
 from mygpo.users.models import User
 from mygpo.db.couchdb.episode import episodes_for_podcast, \
     set_episode_slug, remove_episode_slug
-from mygpo.db.couchdb.podcast import update_additional_data
 from mygpo.db.couchdb.episode_state import episode_listener_counts
 from mygpo.db.couchdb.pubsub import subscription_for_topic
 
@@ -147,7 +146,8 @@ def update_podcast(request, podcast):
 @require_publisher
 def save_podcast(request, podcast):
     twitter = normalize_twitter(request.POST.get('twitter', ''))
-    update_additional_data(podcast, twitter)
+    podcast.twitter = twitter
+    podcast.save()
     messages.success(request, _('Data updated'))
     url = get_podcast_link_target(podcast, 'podcast-publisher-detail')
     return HttpResponseRedirect(url)

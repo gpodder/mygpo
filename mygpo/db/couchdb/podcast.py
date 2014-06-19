@@ -120,23 +120,3 @@ def search(q, offset=0, num_results=20):
 
     except RequestFailed:
         return [], 0
-
-
-def update_additional_data(podcast, twitter):
-    podcast.twitter = twitter
-    podcast.save()
-
-    # clear the whole cache until we have a better invalidation mechanism
-    cache.clear()
-
-
-def update_related_podcasts(podcast, related):
-    if podcast.related_podcasts == related:
-        return
-
-    podcast.related_podcasts = related
-    podcast.save()
-
-
-def delete_podcast(podcast):
-    podcast.delete()

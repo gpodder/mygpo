@@ -6,7 +6,6 @@ from django.core.management.base import BaseCommand
 from mygpo.podcasts.models import Podcast
 from mygpo.data.podcast import calc_similar_podcasts
 from mygpo.utils import progress
-from mygpo.db.couchdb.podcast import update_related_podcasts
 
 
 class Command(BaseCommand):
@@ -31,6 +30,6 @@ class Command(BaseCommand):
 
             related = map(get_podcast, l)
 
-            update_related_podcasts(podcast, related)
+            podcast.related_podcasts.add(related)
 
             progress(n+1, total)
