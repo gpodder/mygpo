@@ -8,6 +8,7 @@ import json
 from datetime import datetime
 from mygpo.podcasts.models import (Podcast, Episode, URL, Slug, Tag,
     MergedUUID, PodcastGroup, )
+from mygpo.db.couchdb.podcast_state import podcast_subscriber_count
 
 import logging
 logger = logging.getLogger(__name__)
@@ -92,6 +93,7 @@ def migrate_podcast(p):
         'twitter': getattr(p, 'twitter', None),
         'group_member_name': p.group_member_name,
         'update_interval': p.update_interval,
+        'subscribers': podcast_subscriber_count(p),
     })
 
     update_urls(p, p2)

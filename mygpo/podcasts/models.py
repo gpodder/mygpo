@@ -290,7 +290,7 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
     # if p1 is related to p2, p2 is also related to p1
     related_podcasts = models.ManyToManyField('self', symmetrical=True)
 
-    #subscribers = SchemaListProperty(SubscriberData)
+    subscribers = models.PositiveIntegerField(default=0)
     restrictions = models.CharField(max_length=20, null=False, blank=True,
                                     default='')
     common_episode_title = models.CharField(max_length=100, null=False, blank=True)
