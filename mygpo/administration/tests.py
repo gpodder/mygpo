@@ -11,11 +11,9 @@ from collections import Counter
 
 from django.test import TestCase
 
-from mygpo.podcasts.models import Podcast
+from mygpo.podcasts.models import Podcast, Episode
 from mygpo.users.models import User, Device, EpisodeAction
-from mygpo.core.models import Episode
 from mygpo.maintenance.merge import PodcastMerger
-from mygpo.db.couchdb.episode import episode_by_id, episodes_for_podcast
 from mygpo.db.couchdb.podcast_state import (podcast_state_for_user_podcast,
     subscribe, unsubscribe, )
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
@@ -30,28 +28,20 @@ class SimpleTest(TestCase):
         p1 = Podcast.objects.get_or_create_for_url('http://example.com/podcast1.rss')
         p2 = Podcast.objects.get_or_create_for_url('http://example.com/podcast2.rss')
 
-        e1 = Episode()
+        e1 = Episode.objects.get_or_create_for_url(p1, 'http://example.com/podcast1/e1.mp3')
         e1.title = 'Episode 1'
-        e1.podcast = p1.get_id()
-        e1.urls = ['http://example.com/podcast1/e1.mp3']
         e1.save()
 
-        e2 = Episode()
+        e2 = Episode.objects.get_or_create_for_url(p2, 'http://example.com/podcast1/e2.mp3')
         e2.title = 'Episode 2'
-        e2.podcast = p1.get_id()
-        e2.urls = ['http://example.com/podcast1/e2.mp3']
         e2.save()
 
-        e3 = Episode()
+        e3 = Episode.objects.get_or_create_for_url(p2, 'http://example.com/podcast2/e2.mp3')
         e3.title = 'Episode 3'
-        e3.podcast = p2.get_id()
-        e3.urls = ['http://example.com/podcast2/e2.mp3']
         e3.save()
 
-        e4 = Episode()
+        e4 = Episode.objects.get_or_create_for_url(p2, 'http://example.com/podcast2/e3.mp3')
         e4.title = 'Episode 4'
-        e4.podcast = p2.get_id()
-        e4.urls = ['http://example.com/podcast2/e3.mp3']
         e4.save()
 
         user = User()
@@ -86,7 +76,7 @@ class SimpleTest(TestCase):
                     upload_timestamp=get_timestamp(datetime.utcnow()))])
 
         # we need that for later
-        e3_id = e3._id
+        e3_id = e3.pk
 
         actions = Counter()
 
@@ -97,12 +87,12 @@ class SimpleTest(TestCase):
         pm = PodcastMerger([p1, p2], actions, groups)
         pm.merge()
 
-        e1 = episode_by_id(e1._id)
+        e1 = Episode.objects.get(pk=e1.pk)
         es1 = episode_state_for_user_episode(user, e1)
         self.assertEqual(len(es1.actions), 1)
 
         # check if merged episode's id can still be accessed
-        e3 = episode_by_id(e3_id)
+        e3 = Episode.objects.filter(podcast=p1).get_by_any_id(e3_id)
         es3 = episode_state_for_user_episode(user, e3)
         self.assertEqual(len(es3.actions), 1)
 
@@ -110,4 +100,5 @@ class SimpleTest(TestCase):
         ps1 = podcast_state_for_user_podcast(user, p1)
         self.assertEqual(len(ps1.get_subscribed_device_ids()), 2)
 
-        self.assertEqual(len(list(episodes_for_podcast(p1))), 3)
+        episodes = p1.episode_set.all()
+        self.assertEqual(len(episodes), 3)

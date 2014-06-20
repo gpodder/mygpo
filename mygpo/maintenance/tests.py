@@ -19,40 +19,46 @@ from datetime import datetime
 import unittest
 from collections import Counter
 
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
 from django.test.utils import override_settings
 
-from mygpo.podcasts.models import Podcast
-from mygpo.core.models import Episode
+from mygpo.podcasts.models import Podcast, Episode
 from mygpo.users.models import EpisodeAction, User
 from mygpo.maintenance.merge import PodcastMerger
 from mygpo.utils import get_timestamp
-from mygpo.db.couchdb.episode import episode_by_id
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
     add_episode_actions
 
 
 @override_settings(CACHE={})
-class MergeTests(TestCase):
+class MergeTests(TransactionTestCase):
     """ Tests merging of two podcasts, their episodes and states """
 
     def setUp(self):
-        self.podcast1 = Podcast.objects.get_or_create_for_url('http://example.com/feed.rss')
-        self.podcast2 = Podcast.objects.get_or_create_for_url('http://test.org/podcast/')
+        self.podcast1 = Podcast.objects.get_or_create_for_url(
+            'http://example.com/merge-test-feed.rss',
+            defaults={'title': 'Podcast 1'},
+        )
+        self.podcast2 = Podcast.objects.get_or_create_for_url(
+            'http://merge-test.org/podcast/',
+            defaults={'title': 'Podcast 2'},
+        )
 
-        self.episode1 = Episode(podcast=self.podcast1.get_id(),
-                urls = ['http://example.com/episode1.mp3'])
-        self.episode2 = Episode(podcast=self.podcast2.get_id(),
-                urls = ['http://example.com/episode1.mp3'])
-
-        self.episode1.save()
-        self.episode2.save()
+        self.episode1 = Episode.objects.get_or_create_for_url(
+            self.podcast1, 'http://example.com/merge-test-episode1.mp3',
+            defaults={
+                'title': 'Episode 1 A',
+            })
+        self.episode2 = Episode.objects.get_or_create_for_url(
+            self.podcast2, 'http://example.com/merge-test-episode1.mp3',
+            defaults={
+                'title': 'Episode 1 B',
+            })
 
         self.user = User(username='test-merge')
-        self.user.email = 'test@example.com'
+        self.user.email = 'test-merge-tests@example.com'
         self.user.set_password('secret!')
         self.user.save()
-
 
     def test_merge_podcasts(self):
 
@@ -61,17 +67,16 @@ class MergeTests(TestCase):
         state2 = episode_state_for_user_episode(self.user, self.episode2)
 
         action1 = EpisodeAction(action='play',
-                timestamp=datetime.utcnow(),
-                upload_timestamp=get_timestamp(datetime.utcnow()))
+                                timestamp=datetime.utcnow(),
+                                upload_timestamp=get_timestamp(
+                                    datetime.utcnow()))
         action2 = EpisodeAction(action='download',
-                timestamp=datetime.utcnow(),
-                upload_timestamp=get_timestamp(datetime.utcnow()))
+                                timestamp=datetime.utcnow(),
+                                upload_timestamp=get_timestamp(
+                                    datetime.utcnow()))
 
         add_episode_actions(state1, [action1])
         add_episode_actions(state2, [action2])
-
-        # copy of the object
-        episode2 = episode_by_id(self.episode2._id)
 
         # decide which episodes to merge
         groups = [(0, [self.episode1, self.episode2])]
@@ -81,51 +86,67 @@ class MergeTests(TestCase):
         pm.merge()
 
         state1 = episode_state_for_user_episode(self.user, self.episode1)
-        state2 = episode_state_for_user_episode(self.user, episode2)
 
+        # both actions must be present in state1
         self.assertIn(action1, state1.actions)
         self.assertIn(action2, state1.actions)
-        self.assertEqual(state2._id, None)
-
-
 
     def tearDown(self):
-        self.podcast1.delete()
         self.episode1.delete()
+        self.podcast1.delete()
         self.user.delete()
 
 
-
-class MergeGroupTests(TestCase):
+class MergeGroupTests(TransactionTestCase):
     """ Tests merging of two podcasts, one of which is part of a group """
 
     def setUp(self):
-        self.podcast1 = Podcast.objects.get_or_create_for_url('http://example.com/feed.rss')
-        self.podcast2 = Podcast.objects.get_or_create_for_url('http://test.org/podcast/')
-        self.podcast3 = Podcast.objects.get_or_create_for_url('http://test.org/feed/')
+        self.podcast1 = Podcast.objects.get_or_create_for_url(
+            'http://example.com/group-merge-feed.rss',
+            defaults={
+                'title': 'Podcast 1',
+            },
+        )
+        self.podcast2 = Podcast.objects.get_or_create_for_url(
+            'http://test.org/group-merge-podcast/',
+            defaults={
+                'title': 'Podcast 2',
+            },
+        )
+        self.podcast3 = Podcast.objects.get_or_create_for_url(
+            'http://group-test.org/feed/',
+            defaults={
+                'title': 'Podcast 3',
+            },
+        )
 
-        self.episode1 = Episode(podcast=self.podcast1.get_id(),
-                urls = ['http://example.com/episode1.mp3'])
-        self.episode2 = Episode(podcast=self.podcast2.get_id(),
-                urls = ['http://example.com/episode1.mp3'])
-        self.episode3 = Episode(podcast=self.podcast3.get_id(),
-                urls = ['http://example.com/media.mp3'])
-
-
-        self.episode1.save()
-        self.episode2.save()
-        self.episode3.save()
+        self.episode1 = Episode.objects.get_or_create_for_url(
+            self.podcast1, 'http://example.com/group-merge-episode1.mp3',
+            defaults={
+                'title': 'Episode 1 A',
+            },
+        )
+        self.episode2 = Episode.objects.get_or_create_for_url(
+            self.podcast2, 'http://example.com/group-merge-episode1.mp3',
+            defaults={
+                'title': 'Episode 1 B',
+            },
+        )
+        self.episode3 = Episode.objects.get_or_create_for_url(
+            self.podcast3, 'http://example.com/group-merge-media.mp3',
+            defaults={
+                'title': 'Episode 2',
+            },
+        )
 
         self.podcast2.group_with(self.podcast3, 'My Group', 'Feed1', 'Feed2')
 
         self.user = User(username='test-merge-group')
-        self.user.email = 'test@example.com'
+        self.user.email = 'test-merge-group-tests@example.com'
         self.user.set_password('secret!')
         self.user.save()
 
-
     def test_merge_podcasts(self):
-
         podcast1 = Podcast.objects.get(pk=self.podcast1.pk)
         podcast2 = Podcast.objects.get(pk=self.podcast2.pk)
         podcast3 = Podcast.objects.get(pk=self.podcast3.pk)
@@ -138,47 +159,41 @@ class MergeGroupTests(TestCase):
         state2 = episode_state_for_user_episode(self.user, self.episode2)
 
         action1 = EpisodeAction(action='play',
-                timestamp=datetime.utcnow(),
-                upload_timestamp=get_timestamp(datetime.utcnow()))
+                                timestamp=datetime.utcnow(),
+                                upload_timestamp=get_timestamp(
+                                    datetime.utcnow()))
         action2 = EpisodeAction(action='download',
-                timestamp=datetime.utcnow(),
-                upload_timestamp=get_timestamp(datetime.utcnow()))
+                                timestamp=datetime.utcnow(),
+                                upload_timestamp=get_timestamp(
+                                    datetime.utcnow()))
 
         add_episode_actions(state1, [action1])
         add_episode_actions(state2, [action2])
-
-        # copy of the object
-        episode2 = episode_by_id(self.episode2._id)
 
         # decide which episodes to merge
         groups = [(0, [self.episode1, self.episode2])]
         counter = Counter()
 
+        episode2_id = self.episode2.id
+
         pm = PodcastMerger([podcast2, podcast1], counter, groups)
         pm.merge()
 
         state1 = episode_state_for_user_episode(self.user, self.episode1)
-        state2 = episode_state_for_user_episode(self.user, episode2)
 
         self.assertIn(action1, state1.actions)
         self.assertIn(action2, state1.actions)
-        self.assertEqual(state2._id, None)
 
-        episode1 = episode_by_id(self.episode1._id)
+        episode1 = Episode.objects.get(pk=self.episode1.pk)
 
         # episode2 has been merged into episode1, so it must contain its
         # merged _id
-        self.assertEqual(episode1.merged_ids, [episode2._id])
-
-
+        self.assertEqual([x.uuid for x in episode1.merged_uuids.all()],
+                         [episode2_id])
 
     def tearDown(self):
-        self.podcast2.delete()
         self.episode1.delete()
-
-        #self.podcast2.delete()
-        #self.episode2.delete()
-
+        self.podcast2.delete()
         self.user.delete()
 
 

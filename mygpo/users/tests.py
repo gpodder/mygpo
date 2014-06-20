@@ -74,6 +74,9 @@ class DeviceSyncTests(unittest.TestCase):
         target = targets.next()
         self.assertEquals(target, dev2)
 
+    def tearDown(self):
+        self.user.delete()
+
 
 @override_settings(CACHE={})
 class UnsubscribeMergeTests(TestCase):

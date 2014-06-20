@@ -299,13 +299,13 @@ class PodcastQuerySet(models.QuerySet):
         return q.order_by('next_update')
 
     @transaction.atomic
-    def get_or_create_for_url(self, url):
+    def get_or_create_for_url(self, url, defaults={}):
         # TODO: where to specify how uuid is created?
         import uuid
-        podcast, created = self.get_or_create(urls__url=url,
-                                              defaults={
-                                                'id': uuid.uuid1().hex,
-                                              })
+        defaults.update({
+            'id': uuid.uuid1().hex,
+        })
+        podcast, created = self.get_or_create(urls__url=url, defaults=defaults)
 
         if created:
             url = URL.objects.create(url=url,
@@ -331,7 +331,8 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
     """ A Podcast """
 
     logo_url = models.URLField(null=True, max_length=1000)
-    group = models.ForeignKey(PodcastGroup, null=True)
+    group = models.ForeignKey(PodcastGroup, null=True,
+                              on_delete=models.PROTECT)
     group_member_name = models.CharField(max_length=30, null=True, blank=False)
 
     # if p1 is related to p2, p2 is also related to p1
@@ -460,14 +461,16 @@ class EpisodeQuerySet(models.QuerySet):
     """ Custom queries for Episodes """
 
     @transaction.atomic
-    def get_or_create_for_url(self, podcast, url):
+    def get_or_create_for_url(self, podcast, url, defaults={}):
         # TODO: where to specify how uuid is created?
         import uuid
+        defaults.update({
+            'id': uuid.uuid1().hex,
+        })
         episode, created = self.get_or_create(podcast=podcast,
                                               urls__url=url,
-                                              defaults={
-                                                'id': uuid.uuid1().hex,
-                                              })
+                                              defaults=defaults,
+                                             )
 
         if created:
             url = URL.objects.create(url=url,
@@ -476,6 +479,14 @@ class EpisodeQuerySet(models.QuerySet):
                                      content_object=episode,
                                     )
         return episode
+
+    def get_by_any_id(self, id):
+        """ Find am Episode by its own ID or by a merged ID """
+        # TODO: should this be done in the model?
+        try:
+            return self.get(id=id)
+        except self.model.DoesNotExist:
+            return self.get(merged_uuids__uuid=id)
 
 
 class Episode(UUIDModel, TitleModel, DescriptionModel, LinkModel,
@@ -490,7 +501,7 @@ class Episode(UUIDModel, TitleModel, DescriptionModel, LinkModel,
     duration = models.PositiveIntegerField(null=True)
     filesize = models.BigIntegerField(null=True)
     mimetypes = models.CharField(max_length=100)
-    podcast = models.ForeignKey(Podcast)
+    podcast = models.ForeignKey(Podcast, on_delete=models.PROTECT)
     listeners = models.PositiveIntegerField(null=True)
 
     objects = EpisodeQuerySet.as_manager()
@@ -550,7 +561,7 @@ class URL(OrderedModel, ScopedModel):
     url = models.URLField(max_length=2048)
 
     # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
     object_id = UUIDField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
 
@@ -589,7 +600,7 @@ class Tag(models.Model):
     #user = models.ForeignKey(null=True)
 
     # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
     object_id = UUIDField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
 
@@ -611,7 +622,7 @@ class Slug(OrderedModel, ScopedModel):
     slug = models.SlugField(max_length=150, db_index=True)
 
     # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
     object_id = UUIDField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
 
@@ -644,7 +655,7 @@ class MergedUUID(models.Model):
     uuid = UUIDField(unique=True)
 
     # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
     object_id = UUIDField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
 

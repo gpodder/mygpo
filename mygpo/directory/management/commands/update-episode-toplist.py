@@ -1,7 +1,8 @@
 from mygpo.users.models import EpisodeUserState
+from mygpo.podcasts.models import Episode
 from mygpo.maintenance.management.changescmd import ChangesCommand
 from mygpo.db.couchdb import get_userdata_database
-from mygpo.db.couchdb.episode import episode_by_id, set_episode_listeners
+from mygpo.db.couchdb.episode import set_episode_listeners
 from mygpo.db.couchdb.episode_state import episode_listener_count
 
 
@@ -14,7 +15,7 @@ class Command(ChangesCommand):
     def handle_obj(self, seq, doc, actions):
         state = EpisodeUserState.wrap(doc)
 
-        episode = episode_by_id(state.episode)
+        episode = Episode.objects.get(id=state.episode)
 
         if not episode:
             actions['missing'] += 1

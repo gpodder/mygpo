@@ -124,31 +124,41 @@ def migrate_podcastgroup(g):
 
 def update_urls(old, new):
 
+    existing_urls = {u.url: u for u in new.urls.all()}
+    logger.info('%d existing URLs', len(existing_urls))
+
+    new_urls = old.urls
+    logger.info('%d new URLs', len(new_urls))
+
     with transaction.atomic():
-        existing_urls = {u.url: u for u in new.urls.all()}
-        for n, url in enumerate(old.urls):
+        max_order = max([s.order for s in existing_urls.values()] + [len(new_urls)])
+        logger.info('Renumbering URLs starting from %d', max_order)
+        for n, url in enumerate(existing_urls.values(), max_order+1):
+            url.order = n
+            url.save()
+
+    logger.info('%d existing URLs', len(existing_urls))
+    for n, url in enumerate(new_urls):
+        try:
+            u = existing_urls.pop(url)
+            u.order = n
+            u.save()
+        except KeyError:
             try:
-                u = existing_urls.pop(url)
-                u.order = n
-                u.save()
-            except KeyError:
-                try:
-                    URL.objects.create(url=to_maxlength(URL, 'url', url),
-                                       content_object=new,
-                                       order=n,
-                                       scope=new.scope,
-                                    )
-                except IntegrityError as ie:
-                    logger.warn('Could not create URL for %s: %s', new, ie)
+                URL.objects.create(url=to_maxlength(URL, 'url', url),
+                                   content_object=new,
+                                   order=n,
+                                   scope=new.scope,
+                                )
+            except IntegrityError as ie:
+                logger.warn('Could not create URL for %s: %s', new, ie)
 
     with transaction.atomic():
         delete = [u.pk for u in existing_urls.values()]
-
         logger.info('Deleting %d URLs', len(delete))
         URL.objects.filter(id__in=delete).delete()
 
 
-@transaction.atomic
 def update_slugs(old, new):
 
     existing_slugs = {s.slug: s for s in new.slugs.all()}
@@ -159,11 +169,12 @@ def update_slugs(old, new):
     new_slugs = map(slugify, new_slugs)
     logger.info('%d new slugs', len(new_slugs))
 
-    max_order = max([s.order for s in existing_slugs.values()] + [len(new_slugs)])
-    logger.info('Renumbering slugs starting from %d', max_order)
-    for n, slug in enumerate(existing_slugs.values(), max_order+1):
-        slug.order = n
-        slug.save()
+    with transaction.atomic():
+        max_order = max([s.order for s in existing_slugs.values()] + [len(new_slugs)])
+        logger.info('Renumbering slugs starting from %d', max_order)
+        for n, slug in enumerate(existing_slugs.values(), max_order+1):
+            slug.order = n
+            slug.save()
 
     logger.info('%d existing slugs', len(existing_slugs))
 
@@ -184,10 +195,10 @@ def update_slugs(old, new):
             except IntegrityError as ie:
                 logger.warn('Could not create Slug for %s: %s', new, ie)
 
-
-
-    delete = [s.pk for s in existing_slugs.values()]
-    Slug.objects.filter(id__in=delete).delete()
+    with transaction.atomic():
+        delete = [s.pk for s in existing_slugs.values()]
+        logger.info('Deleting %d slugs', len(delete))
+        Slug.objects.filter(id__in=delete).delete()
 
 
 @transaction.atomic

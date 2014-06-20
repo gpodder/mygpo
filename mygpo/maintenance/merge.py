@@ -4,10 +4,11 @@ from functools import partial
 
 import restkit
 
+from django.db import IntegrityError
+
 from mygpo.podcasts.models import MergedUUID
 from mygpo import utils
 from mygpo.decorators import repeat_on_conflict
-from mygpo.db.couchdb.episode import episodes_for_podcast_uncached
 from mygpo.db.couchdb.podcast_state import all_podcast_states, \
     delete_podcast_state, update_podcast_state_podcast, merge_podcast_states
 from mygpo.db.couchdb.episode_state import all_episode_states, \
@@ -41,18 +42,19 @@ class PodcastMerger(object):
     def merge(self):
         """ Carries out the actual merging """
 
-        logger.info('Start merging of podcasts: %s', self.podcasts)
+        logger.info('Start merging of podcasts: %r', self.podcasts)
 
         podcast1 = self.podcasts.pop(0)
-        logger.info('Merge target: %s', podcast1)
+        logger.info('Merge target: %r', podcast1)
 
         self.merge_episodes()
 
         for podcast2 in self.podcasts:
-            logger.info('Merging %s into target', podcast2)
+            logger.info('Merging %r into target', podcast2)
             self.merge_states(podcast1, podcast2)
             self.reassign_episodes(podcast1, podcast2)
             self._merge_objs(podcast1=podcast1, podcast2=podcast2)
+            logger.info('Deleting %r', podcast2)
             podcast2.delete()
             self.actions['merge-podcast'] += 1
 
@@ -62,56 +64,30 @@ class PodcastMerger(object):
         """ Merges the episodes according to the groups """
 
         for n, episodes in self.groups:
-
             if not episodes:
                 continue
 
             episode = episodes.pop(0)
-
             for ep in episodes:
                 em = EpisodeMerger(episode, ep, self.actions)
                 em.merge()
 
     def _merge_objs(self, podcast1, podcast2):
-
-        # Reassign all IDs of podcast2 to podcast1
-        MergedUUID.objects.create(uuid=podcast2.id, content_object=podcast1)
-        for m in podcast2.merged_uuids.all():
-            m.content_object = podcast1
-            m.save()
-
-        # Reassign all Slugs of podcast2 to podcast1
-        max_order = max([0] + [s.order for s in podcast1.slugs.all()])
-        for n, slug in enumerate(podcast2.slugs.all(), max_order+1):
-            slug.content_object = podcast1
-            slug.order = n
-            slug.save()
-
-        # Reassign all URLs of podcast2 to podcast1
-        max_order = max([0] + [u.order for u in podcast1.urls.all()])
-
-        for n, url in enumerate(podcast2.urls.all(), max_order+1):
-            url.content_object = podcast1
-            url.order = n
-            url.save()
-
+        reassign_merged_uuids(podcast1, podcast2)
+        reassign_slugs(podcast1, podcast2)
+        reassign_urls(podcast1, podcast2)
         podcast1.content_types = ','.join(podcast1.content_types.split(',') +
                                           podcast2.content_types.split(','))
-
         podcast1.save()
 
-    @repeat_on_conflict(['e'])
-    def _save_episode(self, e, podcast1):
-        e.podcast = podcast1.get_id()
-        e.save()
 
     def reassign_episodes(self, podcast1, podcast2):
 
-        logger.info('Re-assigning episodes of %s into %s', podcast2, podcast1)
+        logger.info('Re-assigning episodes of %r into %r', podcast2, podcast1)
 
         # re-assign episodes to new podcast
         # if necessary, they will be merged later anyway
-        for e in episodes_for_podcast_uncached(podcast2):
+        for e in podcast2.episode_set.all():
             self.actions['reassign-episode'] += 1
 
             for s in all_episode_states(e):
@@ -119,7 +95,9 @@ class PodcastMerger(object):
 
                 update_episode_state_object(s, podcast1.get_id())
 
-            self._save_episode(e=e, podcast1=podcast1)
+            # TODO: change scopes?
+            e.podcast = podcast1
+            e.save()
 
     def merge_states(self, podcast1, podcast2):
         """Merges the Podcast states that are associated with the two Podcasts.
@@ -131,7 +109,7 @@ class PodcastMerger(object):
         states1 = sorted(all_podcast_states(podcast1), key=key)
         states2 = sorted(all_podcast_states(podcast2), key=key)
 
-        logger.info('Merging %d podcast states of %s into %s', len(states2),
+        logger.info('Merging %d podcast states of %r into %r', len(states2),
             podcast2, podcast1)
 
         for state, state2 in utils.iterate_together([states1, states2], key):
@@ -153,8 +131,11 @@ class PodcastMerger(object):
 
 
 class EpisodeMerger(object):
+    """ Merges two episodes """
 
     def __init__(self, episode1, episode2, actions):
+        """ episode2 will be merged into episode1 """
+
         if episode1 == episode2:
             raise IncorrectMergeException("can't merge episode into itself")
 
@@ -163,51 +144,36 @@ class EpisodeMerger(object):
         self.actions = actions
 
     def merge(self):
-
-        logger.info('Merging episode %s into %s', self.episode2, self.episode1)
-
+        logger.info('Merging episode %r into %r', self.episode2, self.episode1)
         self._merge_objs(episode1=self.episode1, episode2=self.episode2)
         self.merge_states(self.episode1, self.episode2)
-        self._delete(e=self.episode2)
+        logger.info('Deleting %r', self.episode2)
+        self.episode2.delete()
         self.actions['merge-episode'] += 1
 
-    @repeat_on_conflict(['episode1'])
     def _merge_objs(self, episode1, episode2):
+        reassign_urls(episode1, episode2)
+        reassign_merged_uuids(episode1, episode2)
+        reassign_slugs(episode1, episode2)
 
-        episode1.urls = set_filter(None, episode1.urls, episode2.urls)
-
-        episode1.merged_ids = set_filter(episode1._id, episode1.merged_ids,
-                                         [episode2._id], episode2.merged_ids)
-
-        episode1.merged_slugs = set_filter(episode1.slug,
-                                           episode1.merged_slugs,
-                                           [episode2.slug],
-                                           episode2.merged_slugs)
-
-        episode1.save()
-
-    @repeat_on_conflict(['e'])
-    def _delete(self, e):
-        e.delete()
 
     def merge_states(self, episode, episode2):
-
         key = lambda x: x.user
         states1 = sorted(all_episode_states(self.episode1), key=key)
         states2 = sorted(all_episode_states(self.episode2), key=key)
 
-        logger.info('Merging %d episode states of %s into %s', len(states2),
+        logger.info('Merging %d episode states of %r into %r', len(states2),
                         episode2, episode)
 
         for state, state2 in utils.iterate_together([states1, states2], key):
-
             if state == state2:
                 continue
 
             if state is None:
                 self.actions['move-episode-state'] += 1
-                update_episode_state_object(state2, self.episode1.podcast,
-                    self.episode1._id)
+                update_episode_state_object(state2,
+                    self.episode1.podcast.get_id(),
+                    self.episode1.get_id())
 
             elif state2 is None:
                 continue
@@ -274,9 +240,36 @@ class EpisodeStateMerger(object):
         self.actions['merge-episode-state'] += 1
 
 
-def set_filter(orig, *args):
-    """ chain args, and remove falsy values and orig """
-    s = set(chain.from_iterable(args))
-    s = s - set([orig])
-    s = filter(None, s)
-    return s
+def reassign_urls(obj1, obj2):
+    # Reassign all URLs of obj2 to obj1
+    max_order = max([0] + [u.order for u in obj1.urls.all()])
+
+    for n, url in enumerate(obj2.urls.all(), max_order+1):
+        url.content_object = obj1
+        url.order = n
+        url.scope = obj1.scope
+        try:
+            url.save()
+        except IntegrityError as ie:
+            logger.warn('Moving URL failed: %s. Deleting.', str(ie))
+            url.delete()
+
+def reassign_merged_uuids(obj1, obj2):
+    # Reassign all IDs of obj2 to obj1
+    MergedUUID.objects.create(uuid=obj2.id, content_object=obj1)
+    for m in obj2.merged_uuids.all():
+        m.content_object = obj1
+        m.save()
+
+def reassign_slugs(obj1, obj2):
+    # Reassign all Slugs of obj2 to obj1
+    max_order = max([0] + [s.order for s in obj1.slugs.all()])
+    for n, slug in enumerate(obj2.slugs.all(), max_order+1):
+        slug.content_object = obj1
+        slug.order = n
+        slug.scope = obj1.scope
+        try:
+            slug.save()
+        except IntegrityError as ie:
+            logger.warn('Moving Slug failed: %s. Deleting', str(ie))
+            slug.delete()
