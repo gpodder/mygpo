@@ -2,7 +2,6 @@ from itertools import chain, islice
 
 from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.core.proxy import proxy_object
-from mygpo.db.couchdb.episode import episodes_for_podcast
 from mygpo.utils import sorted_chain
 
 
@@ -30,11 +29,11 @@ class PodcastSet(set):
 
         podcast_dict = dict((p.get_id(), p) for p in podcasts)
 
-        links = [(p.latest_episode_timestamp, lazy_call(episodes_for_podcast,
-                    p, since=1, until=max_date, descending=True,
-                    limit=max_per_podcast) ) for p in podcasts]
-
-        episodes = sorted_chain(links, lambda e: e.released, reverse=True)
+        # TODO: max_per_podcast
+        episodes = Episode.objects.filter(podcast__in=podcasts,
+                                          released__isnull=False,
+                                          released__lt=max_date,
+                                         )
 
         for episode in islice(episodes, num_episodes):
             p = podcast_dict.get(episode.podcast, None)

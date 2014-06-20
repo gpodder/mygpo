@@ -208,28 +208,6 @@ class Podcast(Document, SlugMixin, OldIdMixin):
     def display_title(self):
         return self.title or self.url
 
-    def get_episode_before(self, episode):
-        if not episode.released:
-            return None
-
-        from mygpo.db.couchdb.episode import episodes_for_podcast
-        prevs = episodes_for_podcast(self, until=episode.released,
-                descending=True, limit=1)
-
-        return next(iter(prevs), None)
-
-
-    def get_episode_after(self, episode):
-        if not episode.released:
-            return None
-
-        from mygpo.db.couchdb.episode import episodes_for_podcast
-        nexts = episodes_for_podcast(self,
-                since=episode.released + timedelta(seconds=1), limit=1)
-
-        return next(iter(nexts), None)
-
-
     @property
     def url(self):
         return self.urls[0]

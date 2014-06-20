@@ -1,8 +1,6 @@
 from datetime import datetime
 from collections import defaultdict
 
-from mygpo.db.couchdb.episode import episodes_for_podcast
-
 
 DEFAULT_RELEASE = datetime(1970, 1, 1)
 _SORT_KEY = lambda eps: eps[0].released or DEFAULT_RELEASE
@@ -25,7 +23,7 @@ class PodcastGrouper(object):
     def __get_episodes(self):
         episodes = {}
         for podcast in self.podcasts:
-            episodes.update(dict((e._id, e) for e in episodes_for_podcast(podcast)))
+            episodes.update(dict((e._id, e) for e in podcast.episode_set.all()))
 
         return episodes
 

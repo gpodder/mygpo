@@ -451,6 +451,17 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
 
         return common_title
 
+
+    def get_episode_before(self, episode):
+        if not episode.released:
+            return None
+        return self.episode_set.filter(released__lt=episode.released).latest()
+
+    def get_episode_after(self, episode):
+        if not episode.released:
+            return None
+        return self.episode_set.filter(released__gt=episode.released).first()
+
     @property
     def scope(self):
         """ A podcast is always in the global scope """

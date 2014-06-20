@@ -38,7 +38,6 @@ from mygpo.users.models import DeviceDoesNotExist
 from mygpo.users.subscriptions import subscription_changes, podcasts_for_states
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.decorators import cors_origin
-from mygpo.db.couchdb.episode import episodes_for_podcast
 from mygpo.db.couchdb.episode_state import get_podcasts_episode_states
 from mygpo.db.couchdb.podcast_state import podcast_states_for_device
 
@@ -127,25 +126,11 @@ class DeviceUpdates(View):
             max_per_podcast=5):
         """ Returns the episode updates since the timestamp """
 
-        if gevent:
-            # DB: get max_per_podcast episodes for each subscribed podcast
-            episode_jobs = [gevent.spawn(episodes_for_podcast, p, since,
-                    limit=max_per_podcast) for p in subscribed_podcasts]
-            gevent.joinall(episode_jobs)
-            episodes = chain.from_iterable(job.get() for job in episode_jobs)
+        episodes = Episode.objects.filter(podcast__in=subscribed_podcasts,
+                                          release__gt=since)[:max_per_podcast]
 
-            # DB: get all episode states for all subscribed podcasts
-            e_action_jobs = [gevent.spawn(get_podcasts_episode_states, p,
-                    user._id) for p in subscribed_podcasts]
-            gevent.joinall(e_action_jobs)
-            e_actions = chain.from_iterable(job.get() for job in e_action_jobs)
-
-        else:
-            episodes = chain.from_iterable(episodes_for_podcast(p, since,
-                    limit=max_per_podcast) for p in subscribed_podcasts)
-
-            e_actions = chain.from_iterable(get_podcasts_episode_states(p,
-                    user._id) for p in subscribed_podcasts)
+        e_actions = chain.from_iterable(get_podcasts_episode_states(p,
+                user._id) for p in subscribed_podcasts)
 
         # TODO: get_podcasts_episode_states could be optimized by returning
         # only actions within some time frame

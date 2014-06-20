@@ -730,9 +730,8 @@ class User(BaseUser, SyncedDevicesMixin, SettingsMixin):
             episodes = episodes[yielded_episodes:]
 
             # fetch and merge episodes for the next podcast
-            from mygpo.db.couchdb.episode import episodes_for_podcast
-            new_episodes = episodes_for_podcast(podcast, since=1,
-                        until=max_date, descending=True, limit=max_per_podcast)
+            # TODO: max_per_podcast
+            new_episodes = podcast.episode_set.filter(release__isnull=False, released__lt=max_date)[:max_per_podcast]
             episodes = sorted(episodes+new_episodes, key=cmp_key, reverse=True)
 
 

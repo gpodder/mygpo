@@ -9,7 +9,6 @@ from mygpo.db.couchdb import get_main_database, get_userdata_database, \
 from mygpo.users.settings import FLATTR_TOKEN, FLATTR_AUTO, FLATTR_MYGPO, \
          FLATTR_USERNAME
 from mygpo.db import QueryParameterMissing
-from mygpo.db.couchdb.episode import episodes_by_id
 
 
 @cache_result(timeout=60)
@@ -63,7 +62,7 @@ def get_num_played_episodes(user, since=None, until={}):
 
 
 @cache_result(timeout=60)
-def get_latest_episodes(user, count=10):
+def get_latest_episode_ids(user, count=10):
     """ Returns the latest episodes that the user has accessed """
 
     if not user:
@@ -83,8 +82,7 @@ def get_latest_episodes(user, count=10):
             stale        = 'update_after',
         )
 
-    keys = [r['value'] for r in res]
-    return episodes_by_id(keys)
+    return [r['value'] for r in res]
 
 
 

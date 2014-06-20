@@ -27,8 +27,7 @@ from django.contrib.sites.models import RequestSite
 from mygpo.data.tasks import update_podcasts
 from mygpo.decorators import requires_token, allowed_methods
 from mygpo.users.models import User
-from mygpo.db.couchdb.episode import episodes_for_podcast, \
-    set_episode_slug, remove_episode_slug
+from mygpo.db.couchdb.episode import set_episode_slug, remove_episode_slug
 from mygpo.db.couchdb.episode_state import episode_listener_counts
 from mygpo.db.couchdb.pubsub import subscription_for_topic
 
@@ -183,7 +182,7 @@ def episodes(request, podcast):
     if not check_publisher_permission(request.user, podcast):
         return HttpResponseForbidden()
 
-    episodes = episodes_for_podcast(podcast, descending=True)
+    episodes = podcast.episode_set().all()
     listeners = dict(episode_listener_counts(podcast))
 
     max_listeners = max(listeners.values() + [0])

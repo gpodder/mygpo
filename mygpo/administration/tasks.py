@@ -4,7 +4,6 @@ from mygpo.podcasts.models import Podcast
 from mygpo.cel import celery
 from mygpo.core.slugs import get_duplicate_slugs, EpisodeSlug
 from mygpo.maintenance.merge import PodcastMerger
-from mygpo.db.couchdb.episode import episodes_for_podcast_uncached
 
 from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
@@ -35,7 +34,7 @@ def unify_slugs(podcast):
     """ Removes duplicate slugs of a podcast's episodes """
 
     logger.warn('unifying slugs for podcast %s', podcast)
-    episodes = episodes_for_podcast_uncached(podcast)
+    episodes = podcast.episode_set.all()
     logger.info('found %d episodes', len(episodes))
 
     common_title = podcast.get_common_episode_title()

@@ -46,7 +46,7 @@ from mygpo.db.couchdb.episode_state import favorite_episode_ids_for_user, \
 from mygpo.db.couchdb.podcast import podcasts_to_dict
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
          add_episode_actions, update_episode_chapters
-from mygpo.db.couchdb.user import get_latest_episodes
+from mygpo.db.couchdb.user import get_latest_episode_ids
 from mygpo.userfeeds.feeds import FavoriteFeed
 
 
@@ -162,7 +162,8 @@ def list_favorites(request):
     favorite_ids = favorite_episode_ids_for_user(user)
     favorites = Episode.objects.get(id__in=favorite_ids)
 
-    recently_listened = get_latest_episodes(user)
+    recently_listened_ids = get_latest_episode_ids(user)
+    recently_listened = Episode.objects.filter(id__in=recently_listened_ids)
 
     podcast_ids = [episode.podcast for episode in episodes + recently_listened]
     podcasts = podcasts_to_dict(podcast_ids)

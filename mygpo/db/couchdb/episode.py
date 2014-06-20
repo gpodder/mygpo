@@ -17,55 +17,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-@cache_result(timeout=60*60)
-def episode_by_id(episode_id, current_id=False):
-
-    if not episode_id:
-        raise QueryParameterMissing('episode_id')
-
-    db = get_main_database()
-
-    episode = get_single_result(db, 'episodes/by_id',
-            key          = episode_id,
-            include_docs = True,
-            schema       = Episode,
-        )
-
-    if not episode:
-        return None
-
-    if current_id and episode._id != episode_id:
-        raise MergedIdException(episode, episode._id)
-
-    if episode.needs_update:
-        incomplete_obj.send_robust(sender=episode)
-
-    return episode
-
-
-@cache_result(timeout=60*60)
-def episodes_by_id(episode_ids):
-
-    if episode_ids is None:
-        raise QueryParameterMissing('episode_ids')
-
-    if not episode_ids:
-        return []
-
-    r = Episode.view('episodes/by_id',
-            include_docs = True,
-            keys         = episode_ids,
-        )
-
-    episodes = list(r)
-
-    for episode in episodes:
-        if episode.needs_update:
-            incomplete_obj.send_robust(sender=episode)
-
-    return episodes
-
-
 def episode_for_podcast_url(podcast_url, episode_url, create=False):
 
     if not podcast_url:
@@ -106,7 +57,7 @@ def episodes_to_dict(ids, use_cache=False):
         cache_objs.extend(res.values())
         ids = [x for x in ids if x not in res.keys()]
 
-    db_objs = list(episodes_by_id(ids))
+    db_objs = Episode.objects.filter(id__in=ids)
 
     for obj in (cache_objs + db_objs):
 
@@ -124,41 +75,6 @@ def episodes_to_dict(ids, use_cache=False):
         cache.set_many(dict( (obj._id, obj) for obj in db_objs))
 
     return objs
-
-
-def episodes_for_podcast_uncached(podcast, since=None, until={}, **kwargs):
-
-    if not podcast:
-        raise QueryParameterMissing('podcast')
-
-
-    if kwargs.get('descending', False):
-        since, until = until, since
-
-    if isinstance(since, datetime):
-        since = since.isoformat()
-
-    if isinstance(until, datetime):
-        until = until.isoformat()
-
-    res = Episode.view('episodes/by_podcast',
-            startkey     = [podcast.get_id(), since],
-            endkey       = [podcast.get_id(), until],
-            include_docs = True,
-            reduce       = False,
-            **kwargs
-        )
-
-    episodes = list(res)
-
-    for episode in episodes:
-        if episode.needs_update:
-            incomplete_obj.send_robust(sender=episode)
-
-    return episodes
-
-
-episodes_for_podcast = cache_result(timeout=60*60)(episodes_for_podcast_uncached)
 
 
 def filetype_stats():

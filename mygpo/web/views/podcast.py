@@ -23,7 +23,6 @@ from mygpo.web.forms import SyncForm
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.web.utils import get_podcast_link_target, get_page_list, \
     check_restrictions
-from mygpo.db.couchdb.episode import episodes_for_podcast
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast, \
          add_subscription_action, add_podcast_tags, remove_podcast_tags, \
          set_podcast_privacy_settings, subscribe, unsubscribe
