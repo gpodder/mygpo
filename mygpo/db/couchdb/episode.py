@@ -137,16 +137,6 @@ def episode_for_podcast_id_url(podcast_id, episode_url, create=False):
     return None
 
 
-@cache_result(timeout=60*60)
-def episode_count():
-    db = get_main_database()
-    r = get_single_result(db, 'episodes/by_podcast',
-            reduce = True,
-            stale  = 'update_after',
-        )
-    return r['value'] if r else 0
-
-
 def episodes_to_dict(ids, use_cache=False):
 
     if ids is None:
