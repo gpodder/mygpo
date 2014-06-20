@@ -92,21 +92,36 @@ class PodcastPageTests(TestCase):
             episode = Episode.objects.create(id=uuid.uuid1().hex,
                                              podcast=podcast,
                                             )
-            slug = Slug.objects.create(content_object=episode, order=0,
-                                       scope=podcast.scope, slug=str(n))
+            # we only need (the last) one
+            self.episode_slug = Slug.objects.create(content_object=episode,
+                                                    order=0,
+                                                    scope=podcast.scope,
+                                                    slug=str(n),
+                                                    )
 
-        self.slug = Slug.objects.create(content_object=podcast, order=n,
-                                        scope=podcast.scope, slug='podcast')
+        self.podcast_slug = Slug.objects.create(content_object=podcast,
+                                                order=n, scope=podcast.scope,
+                                                slug='podcast')
 
-    def test_queries(self):
+    def test_podcast_queries(self):
         """ Test that the expected number of queries is executed """
-        url = reverse('podcast-slug', args=(self.slug.slug, ))
+        url = reverse('podcast-slug', args=(self.podcast_slug.slug, ))
+        # the number of queries must be independent of the number of episodes
+        self._check_queries_anon_page(url, 5)
+
+
+    def test_episode_queries(self):
+        """ Test that the expected number of queries is executed """
+        url = reverse('episode-slug', args=(self.podcast_slug.slug,
+                                            self.episode_slug.slug))
+        self._check_queries_anon_page(url, 5)
+
+    def _check_queries_anon_page(self, url, num_queries):
         request = self.factory.get(url)
         request.user = AnonymousUser()
         view = resolve(url)
 
-        # the number of queries must be independent of the number of episodes
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(num_queries):
             response = view.func(request, *view.args, **view.kwargs)
 
 

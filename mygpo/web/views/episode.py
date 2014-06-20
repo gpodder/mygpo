@@ -252,7 +252,8 @@ def slug_decorator(f):
 
         query = Episode.objects.filter(slugs__slug=e_slug,
                                        podcast__slugs__slug=p_slug)
-        episode = query.select_related('podcast').get()
+        episode = query.prefetch_related('urls', 'slugs', 'podcast',
+                                         'podcast__slugs').get()
 
         # redirect when Id or a merged (non-cannonical) slug is used
         if episode.slug and episode.slug != e_slug:
