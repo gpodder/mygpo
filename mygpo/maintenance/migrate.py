@@ -36,7 +36,7 @@ def migrate_episode(e):
     e2, created = Episode.objects.update_or_create(id=e._id, defaults = {
         'title': e.title or '',
         'subtitle': e.subtitle or '',
-        'guid': e.guid,
+        'guid': to_maxlength(Episode, 'guid', e.guid) if e.guid is not None else None,
         'description': e.description or '',
         'content': e.content or '',
         'link': e.link,
@@ -116,7 +116,7 @@ def migrate_podcastgroup(g):
         p2.group = g2
         p2.save()
 
-    update_slugs(g, g2, None)
+    update_slugs(g, g2)
 
     return g2
 
