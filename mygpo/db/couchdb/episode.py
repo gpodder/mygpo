@@ -175,28 +175,6 @@ def episodes_to_dict(ids, use_cache=False):
     return objs
 
 
-def episodes_for_podcast_current(podcast, limit=None):
-
-    if not podcast:
-        raise QueryParameterMissing('podcast')
-
-    res = Episode.view('episodes/by_podcast_current',
-            startkey     = podcast.get_id(),
-            endkey       = podcast.get_id(),
-            include_docs = True,
-            limit        = limit,
-        )
-
-    episodes = list(res)
-
-    for episode in episodes:
-        if episode.needs_update:
-            incomplete_obj.send_robust(sender=episode)
-
-    return episodes
-
-
-
 def episodes_for_podcast_uncached(podcast, since=None, until={}, **kwargs):
 
     if not podcast:
@@ -230,34 +208,6 @@ def episodes_for_podcast_uncached(podcast, since=None, until={}, **kwargs):
 
 
 episodes_for_podcast = cache_result(timeout=60*60)(episodes_for_podcast_uncached)
-
-
-@cache_result(timeout=60*60)
-def episode_count_for_podcast(podcast, since=None, until={}, **kwargs):
-
-    if not podcast:
-        raise QueryParameterMissing('podcast')
-
-
-    if kwargs.get('descending', False):
-        since, until = until, since
-
-    if isinstance(since, datetime):
-        since = since.isoformat()
-
-    if isinstance(until, datetime):
-        until = until.isoformat()
-
-    db = get_main_database()
-    res = get_single_result(db, 'episodes/by_podcast',
-            startkey     = [podcast.get_id(), since],
-            endkey       = [podcast.get_id(), until],
-            reduce       = True,
-            group_level  = 1,
-            **kwargs
-        )
-
-    return res['value'] if res else 0
 
 
 def favorite_episode_ids_for_user(user):
