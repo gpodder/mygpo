@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import re
 from datetime import datetime
 
 from django.db import models, transaction
@@ -166,6 +167,25 @@ class UrlsMixin(models.Model):
         urls = list(self.urls.all())
         return urls[0].url if urls else None
 
+    def add_missing_urls(self, new_urls):
+        """ Adds missing URLS from new_urls
+
+        The order of existing URLs is not changed  """
+        existing_urls = self.urls.all()
+        next_order = max([-1] + [u.order for u in existing_urls]) + 1
+        existing_urls = [u.url for u in existing_urls]
+
+        for url in new_urls:
+            if url in existing_urls:
+                continue
+
+            URL.objects.create(url=url,
+                               order=next_order,
+                               scope=self.scope,
+                               content_object=obj,
+                               )
+
+            next_order += 1
 
 
 class SlugsMixin(models.Model):
@@ -189,6 +209,25 @@ class SlugsMixin(models.Model):
         slugs = list(self.slugs.all())
         return slugs[0].slug if slugs else None
 
+
+    def add_slug(self, slug):
+
+        if not slug:
+            raise ValueError("'%s' is not a valid slug" % slug)
+
+        existing_slugs = self.slugs.all()
+
+        # check if slug already exists
+        if slug in [s.slug for s in existing_slugs]:
+            return
+
+        max_order = max([-1] + [s.order for s in existing_slugs])
+        next_order = max_order + 1
+        Slug.objects.create(scope=self.scope,
+                            slug=slug,
+                            content_object=self,
+                            order=next_order,
+                            )
 
 
 
@@ -417,6 +456,28 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
         return ''
 
 
+class EpisodeQuerySet(models.QuerySet):
+    """ Custom queries for Episodes """
+
+    @transaction.atomic
+    def get_or_create_for_url(self, podcast, url):
+        # TODO: where to specify how uuid is created?
+        import uuid
+        episode, created = self.get_or_create(podcast=podcast,
+                                              urls__url=url,
+                                              defaults={
+                                                'id': uuid.uuid1().hex,
+                                              })
+
+        if created:
+            url = URL.objects.create(url=url,
+                                     order=0,
+                                     scope=podcast.get_id(),
+                                     content_object=episode,
+                                    )
+        return episode
+
+
 class Episode(UUIDModel, TitleModel, DescriptionModel, LinkModel,
         LanguageModel, LastUpdateModel, UpdateInfoModel, LicenseModel,
         FlattrModel, ContentTypesModel, MergedIdsModel, OutdatedModel,
@@ -431,6 +492,8 @@ class Episode(UUIDModel, TitleModel, DescriptionModel, LinkModel,
     mimetypes = models.CharField(max_length=100)
     podcast = models.ForeignKey(Podcast)
     listeners = models.PositiveIntegerField(null=True)
+
+    objects = EpisodeQuerySet.as_manager()
 
     class Meta:
         ordering = ['-released']
