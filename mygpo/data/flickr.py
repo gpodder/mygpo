@@ -49,6 +49,8 @@ def get_photo_id(url):
 
 
 def is_flickr_image(url):
+    if url is None:
+        return False
     return re.search('flickr\.com.*\.(jpg|jpeg|png|gif)', url)
 
 def get_display_photo(url, label='Medium'):
