@@ -88,51 +88,6 @@ def episode_for_podcast_url(podcast_url, episode_url, create=False):
     return episode_for_podcast_id_url(podcast.id, episode_url, create)
 
 
-def episode_for_podcast_id_url(podcast_id, episode_url, create=False):
-
-    if not podcast_id:
-        raise QueryParameterMissing('podcast_id')
-
-    if not episode_url:
-        raise QueryParameterMissing('episode_url')
-
-
-    key = u'episode-podcastid-%s-url-%s' % (
-            sha1(podcast_id.encode('utf-8')).hexdigest(),
-            sha1(episode_url.encode('utf-8')).hexdigest())
-
-#   Disabled as cache invalidation is not working properly
-#   episode = cache.get(key)
-#   if episode:
-#       return episode
-
-    db = get_main_database()
-    episode = get_single_result(db, 'episodes/by_podcast_url',
-            key          = [podcast_id, episode_url],
-            include_docs = True,
-            reduce       = False,
-            schema       = Episode,
-        )
-
-    if episode:
-        if episode.needs_update:
-            incomplete_obj.send_robust(sender=episode)
-        else:
-            cache.set(key, episode)
-        return episode
-
-    if create:
-        episode = Episode()
-        episode.created_timestamp = get_timestamp(datetime.utcnow())
-        episode.podcast = podcast_id
-        episode.urls = [episode_url]
-        episode.save()
-        incomplete_obj.send_robust(sender=episode)
-        return episode
-
-    return None
-
-
 def episodes_to_dict(ids, use_cache=False):
 
     if ids is None:

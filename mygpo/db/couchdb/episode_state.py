@@ -4,10 +4,9 @@ from dateutil import parser
 
 from django.core.cache import cache
 
-from mygpo.podcasts.models import Podcast
+from mygpo.podcasts.models import Podcast, Episode
 from mygpo.users.models import EpisodeUserState
 from mygpo.db import QueryParameterMissing
-from mygpo.db.couchdb.episode import episode_for_podcast_id_url
 from mygpo.db.couchdb import get_main_database, get_userdata_database, \
      get_single_result
 from mygpo.cache import cache_result
@@ -23,9 +22,12 @@ def episode_state_for_user_episode(user, episode):
     if not episode:
         raise QueryParameterMissing('episode')
 
-
+    if hasattr(episode, '_id'):
+        episode_id = episode._id
+    else:
+        episode_id = episode.get_id()
     key = 'episode-state-userid-%s-episodeid-%s' % (sha1(user._id).hexdigest(),
-            sha1(episode._id).hexdigest())
+            sha1(episode_id).hexdigest())
 
 #   Disabled as cache invalidation does not work properly
 #   state = cache.get(key)
@@ -34,7 +36,7 @@ def episode_state_for_user_episode(user, episode):
 
     udb = get_userdata_database()
     state = get_single_result(udb, 'episode_states/by_user_episode',
-            key          = [user._id, episode._id],
+            key          = [user._id, episode_id],
             include_docs = True,
             limit        = 1,
             schema       = EpisodeUserState,
@@ -45,11 +47,14 @@ def episode_state_for_user_episode(user, episode):
         return state
 
     else:
-        podcast = Podcast.objects.get_by_any_id(episode.podcast)
+        if isinstance(episode.podcast, unicode):
+            podcast = Podcast.objects.get_by_any_id(episode.podcast)
+        else:
+            podcast = episode.podcast
 
         state = EpisodeUserState()
-        state.episode = episode._id
-        state.podcast = episode.podcast
+        state.episode = episode_id
+        state.podcast = podcast.get_id()
         state.user = user._id
         state.ref_url = episode.url
         state.podcast_ref_url = podcast.url
@@ -64,10 +69,20 @@ def all_episode_states(episode):
     if not episode:
         raise QueryParameterMissing('episode')
 
+    if isinstance(episode.podcast, unicode):
+        podcast_id = episode.podcast
+    else:
+        podcast_id = episode.podcast.get_id()
+
+    if hasattr(episode, '_id'):
+        episode_id = episode._id
+    else:
+        episode_id = episode.get_id()
+
     udb = get_userdata_database()
     r = udb.view('episode_states/by_podcast_episode',
-            startkey     = [episode.podcast, episode._id, None],
-            endkey       = [episode.podcast, episode._id, {}],
+            startkey     = [podcast_id, episode_id, None],
+            endkey       = [podcast_id, episode_id, {}],
             include_docs = True,
             schema       = EpisodeUserState,
         )
@@ -197,8 +212,8 @@ def episode_listener_count(episode, start=None, end={}):
 
     udb = get_userdata_database()
     r = get_single_result(udb, 'listeners/by_episode',
-            startkey    = [episode._id, start],
-            endkey      = [episode._id, end],
+            startkey    = [episode.id, start],
+            endkey      = [episode.id, end],
             group       = True,
             group_level = 2,
             reduce      = True,
@@ -272,8 +287,7 @@ def episode_state_for_ref_urls(user, podcast_url, episode_url):
 
     else:
         podcast = Podcast.objects.get_or_create_for_url(podcast_url)
-        episode = episode_for_podcast_id_url(podcast.get_id(), episode_url,
-            create=True)
+        episode = Episode.objects.get_or_create_for_url(podcast, episode_url)
         return episode_state_for_user_episode(user, episode)
 
 
