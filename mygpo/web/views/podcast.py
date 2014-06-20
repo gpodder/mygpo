@@ -151,7 +151,7 @@ def episode_list(podcast, user, offset=0, limit=None):
 
         # prepare pre-populated data for HistoryEntry.fetch_data
         podcasts_dict = {podcast.get_id(): podcast}
-        episodes_dict = dict( (episode._id, episode) for episode in episodes)
+        episodes_dict = dict( (episode.id, episode) for episode in episodes)
 
         actions = get_podcasts_episode_states(podcast, user._id)
         actions = map(HistoryEntry.from_action_dict, actions)
