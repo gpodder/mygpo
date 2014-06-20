@@ -83,7 +83,7 @@ def migrate_podcast(p):
         'outdated': p.outdated,
         'author': p.author,
         'logo_url': p.logo_url,
-        'common_episode_title': p.common_episode_title or '',
+        'common_episode_title': to_maxlength(Podcast, 'common_episode_title', p.common_episode_title or ''),
         'new_location': p.new_location,
         'latest_episode_timestamp': p.latest_episode_timestamp,
         'episode_count': p.episode_count or 0,
@@ -206,7 +206,7 @@ def update_tags(old, new):
     # TODO: delete?
     for tag in old.tags.get('feed', []):
         t, created = Tag.objects.get_or_create(
-            tag=to_maxlength(Tag, 'tag', tag),
+            tag=to_maxlength(Tag, 'tag', unicode(tag)),
             source=Tag.FEED,
             content_type=ContentType.objects.get_for_model(new),
             object_id=new.pk,
