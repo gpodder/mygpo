@@ -458,3 +458,46 @@ def update_episode_chapters(episode_state, add=[], rem=[]):
         episode_state.chapters = filter(keep, episode_state.chapters)
 
     episode_state.save()
+
+
+def favorite_episode_ids_for_user(user):
+
+    if not user:
+        raise QueryParameterMissing('user')
+
+    udb = get_userdata_database()
+    favorites = udb.view('favorites/episodes_by_user',
+            key = user._id,
+        )
+
+    return set(x['value']['_id'] for x in favorites)
+
+
+def chapters_for_episode(episode_id):
+
+    if not episode_id:
+        raise QueryParameterMissing('episode_id')
+
+    udb = get_userdata_database()
+    r = udb.view('chapters/by_episode',
+            startkey = [episode_id, None],
+            endkey   = [episode_id, {}],
+        )
+
+    return map(_wrap_chapter, r)
+
+
+def _wrap_chapter(res):
+    from mygpo.users.models import Chapter
+    user = res['key'][1]
+    chapter = Chapter.wrap(res['value'])
+    udb = get_userdata_database()
+    chapter.set_db(udb)
+    return (user, chapter)
+
+
+@repeat_on_conflict(['episode_state'])
+def set_episode_favorite(episode_state, is_fav):
+    udb = get_userdata_database()
+    episode_state.set_favorite(is_fav)
+    udb.save_doc(episode_state)

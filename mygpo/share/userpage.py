@@ -7,6 +7,7 @@ from django.views.generic.base import View
 from django.utils.decorators import method_decorator
 from django.contrib.sites.models import RequestSite
 
+from mygpo.podcasts.models import Episode
 from mygpo.users.models import User
 from mygpo.users.models import HistoryEntry
 from mygpo.users.settings import FLATTR_USERNAME
@@ -14,7 +15,7 @@ from mygpo.decorators import requires_token
 from mygpo.web.utils import fetch_episode_data
 from mygpo.users.subscriptions import PodcastPercentageListenedSorter
 from mygpo.web.views import GeventView
-from mygpo.db.couchdb.episode import favorite_episodes_for_user
+from mygpo.db.couchdb.episode_state import favorite_episode_ids_for_user
 from mygpo.db.couchdb.user import get_latest_episodes, \
          get_num_played_episodes, get_seconds_played
 from mygpo.db.couchdb.podcastlist import podcastlists_for_user
@@ -78,8 +79,9 @@ class UserpageView(GeventView):
 
 
     def get_favorite_episodes(self, user):
-        favorite_episodes = favorite_episodes_for_user(user)
-        return fetch_episode_data(favorite_episodes)
+        favorite_ids = favorite_episode_ids_for_user(user)
+        favorites = Episode.objects.get(id__in=favorite_ids)
+        return fetch_episode_data(favorites)
 
 
     def get_played_episodes_total(self, user):

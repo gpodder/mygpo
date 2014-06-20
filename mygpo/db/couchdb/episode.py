@@ -2,8 +2,6 @@ from hashlib import sha1
 from datetime import datetime
 from collections import Counter
 
-from couchdbkit import MultipleResultsFound
-
 from django.core.cache import cache
 
 from mygpo.podcasts.models import Podcast
@@ -13,9 +11,7 @@ from mygpo.cache import cache_result
 from mygpo.decorators import repeat_on_conflict
 from mygpo.utils import get_timestamp
 from mygpo.db import QueryParameterMissing
-from mygpo.db.couchdb.utils import is_couchdb_id
-from mygpo.db.couchdb import get_main_database, get_userdata_database, \
-    get_single_result
+from mygpo.db.couchdb import get_main_database, get_single_result
 
 import logging
 logger = logging.getLogger(__name__)
@@ -210,36 +206,9 @@ def episodes_for_podcast_uncached(podcast, since=None, until={}, **kwargs):
 episodes_for_podcast = cache_result(timeout=60*60)(episodes_for_podcast_uncached)
 
 
-def favorite_episode_ids_for_user(user):
-
-    if not user:
-        raise QueryParameterMissing('user')
-
-    udb = get_userdata_database()
-    favorites = udb.view('favorites/episodes_by_user',
-            key = user._id,
-        )
-
-    return set(x['value']['_id'] for x in favorites)
-
-
 def favorite_episodes_for_user(user):
     episode_ids = list(favorite_episode_ids_for_user(user))
     return episodes_by_id(episode_ids)
-
-
-def chapters_for_episode(episode_id):
-
-    if not episode_id:
-        raise QueryParameterMissing('episode_id')
-
-    udb = get_userdata_database()
-    r = udb.view('chapters/by_episode',
-            startkey = [episode_id, None],
-            endkey   = [episode_id, {}],
-        )
-
-    return map(_wrap_chapter, r)
 
 
 def filetype_stats():
@@ -255,15 +224,6 @@ def filetype_stats():
     return Counter({x['key']: x['value'] for x in r})
 
 
-def _wrap_chapter(res):
-    from mygpo.users.models import Chapter
-    user = res['key'][1]
-    chapter = Chapter.wrap(res['value'])
-    udb = get_userdata_database()
-    chapter.set_db(udb)
-    return (user, chapter)
-
-
 @repeat_on_conflict(['episode'])
 def set_episode_slug(episode, slug):
     """ sets slug as new main slug of the episode, moves other to merged """
@@ -276,13 +236,6 @@ def remove_episode_slug(episode, slug):
     """ removes slug from main and merged slugs """
     episode.remove_slug(slug)
     episode.save()
-
-
-@repeat_on_conflict(['episode_state'])
-def set_episode_favorite(episode_state, is_fav):
-    udb = get_userdata_database()
-    episode_state.set_favorite(is_fav)
-    udb.save_doc(episode_state)
 
 
 @repeat_on_conflict(['episode'])

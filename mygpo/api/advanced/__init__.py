@@ -31,7 +31,7 @@ from django.views.decorators.cache import never_cache
 from django.conf import settings as dsettings
 from django.shortcuts import get_object_or_404
 
-from mygpo.podcasts.models import Podcast
+from mygpo.podcasts.models import Podcast, Episode
 from mygpo.api.constants import EPISODE_ACTION_TYPES, DEVICE_TYPES
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.advanced.directory import episode_data
@@ -47,7 +47,8 @@ from mygpo.users.settings import FLATTR_AUTO
 from mygpo.core.json import JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.db.couchdb import bulk_save_retry, get_userdata_database
-from mygpo.db.couchdb.episode import favorite_episodes_for_user
+from mygpo.db.couchdb.episode_state import favorite_episode_ids_for_user
+
 from mygpo.db.couchdb.podcast_state import subscribed_podcast_ids_by_device
 from mygpo.db.couchdb.episode_state import episode_state_for_ref_urls, \
     get_episode_actions
@@ -401,7 +402,8 @@ def device_data(device):
 @never_cache
 @cors_origin()
 def favorites(request, username):
-    favorites = favorite_episodes_for_user(request.user)
+    favorite_ids = favorite_episode_ids_for_user(request.user)
+    favorites = Episode.objects.get(id__in=favorite_ids)
     domain = RequestSite(request).domain
     e_data = lambda e: episode_data(e, domain)
     ret = map(e_data, favorites)

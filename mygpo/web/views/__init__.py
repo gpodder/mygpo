@@ -45,7 +45,7 @@ from mygpo.web.utils import process_lang_params
 from mygpo.utils import parse_range
 #from mygpo.web.views.podcast import slug_id_decorator
 from mygpo.users.settings import FLATTR_AUTO, FLATTR_TOKEN
-from mygpo.db.couchdb.episode import favorite_episode_ids_for_user
+from mygpo.db.couchdb.episode_state import favorite_episode_ids_for_user
 from mygpo.db.couchdb.user import (suggestions_for_user,
     blacklist_suggested_podcast)
 from mygpo.db.couchdb.directory import tags_for_user
