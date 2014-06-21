@@ -21,13 +21,12 @@ from django.views.decorators.cache import never_cache
 from django.shortcuts import get_object_or_404
 
 from mygpo.decorators import allowed_methods, cors_origin
-from mygpo.podcasts.models import Podcast
+from mygpo.podcasts.models import Podcast, Episode
 from mygpo.utils import parse_request_body
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.users.models import PodcastUserState, DeviceDoesNotExist
 from mygpo.db.couchdb import get_main_database, get_userdata_database
-from mygpo.db.couchdb.episode import episode_for_podcast_url
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode
 
@@ -61,8 +60,10 @@ def main(request, username, scope):
         return obj, obj, udb
 
     def episode_settings(user, url, podcast_url):
-        episode = episode_for_podcast_url(podcast_url, url)
-        if episode is None:
+        try:
+            episode = Episode.objects.filter(podcast__urls__url=podcast_url,
+                                             urls__url=url).get()
+        except Episode.DoesNotExist:
             raise Http404
 
         episode_state = episode_state_for_user_episode(user, episode)

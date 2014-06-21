@@ -20,14 +20,12 @@ import doctest
 import uuid
 
 from django.test import TestCase
-from django.core.urlresolvers import reverse, resolve
-from django.test.client import RequestFactory
-from django.contrib.auth.models import AnonymousUser
+from django.core.urlresolvers import reverse
 
 from mygpo.podcasts.models import Podcast, Episode, Slug
 import mygpo.web.utils
 from mygpo.users.models import User
-from mygpo.test import create_auth_string
+from mygpo.test import create_auth_string, anon_request
 
 
 class SimpleWebTests(TestCase):
@@ -84,8 +82,6 @@ class PodcastPageTests(TestCase):
     """ Test the podcast page """
 
     def setUp(self):
-        self.factory = RequestFactory()
-
         # create a podcast and some episodes
         podcast = Podcast.objects.create(id=uuid.uuid1().hex)
         for n in range(20):
@@ -107,22 +103,17 @@ class PodcastPageTests(TestCase):
         """ Test that the expected number of queries is executed """
         url = reverse('podcast-slug', args=(self.podcast_slug.slug, ))
         # the number of queries must be independent of the number of episodes
-        self._check_queries_anon_page(url, 5)
 
+        with self.assertNumQueries(5):
+            anon_request(url)
 
     def test_episode_queries(self):
         """ Test that the expected number of queries is executed """
         url = reverse('episode-slug', args=(self.podcast_slug.slug,
                                             self.episode_slug.slug))
-        self._check_queries_anon_page(url, 5)
 
-    def _check_queries_anon_page(self, url, num_queries):
-        request = self.factory.get(url)
-        request.user = AnonymousUser()
-        view = resolve(url)
-
-        with self.assertNumQueries(num_queries):
-            response = view.func(request, *view.args, **view.kwargs)
+        with self.assertNumQueries(5):
+            anon_request(url)
 
 
 def suite():

@@ -32,7 +32,6 @@ from mygpo.users.models import Chapter
 from mygpo.utils import parse_time, parse_request_body, normalize_feed_url
 from mygpo.decorators import allowed_methods, cors_origin
 from mygpo.api.basic_auth import require_valid_user, check_username
-from mygpo.db.couchdb.episode import episode_for_podcast_url
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
     update_episode_chapters
 
@@ -102,9 +101,11 @@ def chapters(request, username):
 
         podcast_url = normalize_feed_url(podcast_url)
         episode_url = normalize_feed_url(episode_url)
-        episode = episode_for_podcast_url(podcast_url, episode_url)
 
-        if episode is None:
+        try:
+            episode = Episode.objects.filter(podcast__urls__url=podcast_url,
+                                             urls__url=episode_url).get()
+        except Episode.DoesNotExist:
             raise Http404
 
         e_state = episode_state_for_user_episode(request.user, episode)
@@ -141,8 +142,8 @@ def update_chapters(req, user):
     podcast_url = normalize_feed_url(req['podcast'])
     episode_url = normalize_feed_url(req['episode'])
 
-    episode = episode_for_podcast_url(podcast_url, episode_url,
-            create=True)
+    podcast = Podcast.objects.get_or_create_for_url(podcast_url)
+    episode = Episode.objects.get_or_create_for_url(podcast, episode_url)
 
     e_state = episode_state_for_user_episode(request.user, episode)
 

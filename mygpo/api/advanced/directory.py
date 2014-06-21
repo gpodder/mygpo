@@ -22,15 +22,13 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import cache_page
 from django.shortcuts import get_object_or_404
 
-from mygpo.core import models
-from mygpo.podcasts.models import Podcast
+from mygpo.podcasts.models import Podcast, Episode
 from mygpo.utils import parse_range, normalize_feed_url
 from mygpo.directory.tags import Topics
 from mygpo.web.utils import get_episode_link_target, get_podcast_link_target
 from mygpo.web.logo import get_logo_url
 from mygpo.decorators import cors_origin
 from mygpo.api.httpresponse import JsonResponse
-from mygpo.db.couchdb.episode import episode_for_podcast_url
 from mygpo.db.couchdb.directory import category_for_tag
 
 
@@ -87,9 +85,11 @@ def episode_info(request):
     if not podcast_url or not episode_url:
         raise Http404
 
-    episode = episode_for_podcast_url(podcast_url, episode_url)
-
-    if episode is None:
+    try:
+        query = Episode.objects.filter(podcast__urls__url=podcast_url,
+                                       urls__url=episode_url)
+        episode = query.select_related('podcast').get()
+    except Episode.DoesNotExist:
         raise Http404
 
     domain = RequestSite(request).domain

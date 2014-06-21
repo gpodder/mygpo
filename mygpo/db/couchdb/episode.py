@@ -17,28 +17,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def episode_for_podcast_url(podcast_url, episode_url, create=False):
-
-    if not podcast_url:
-        raise QueryParameterMissing('podcast_url')
-
-    if not episode_url:
-        raise QueryParameterMissing('episode_url')
-
-
-    if create:
-        podcast = Podcast.objects.get_or_create_for_url(podcast_url)
-
-    else:
-        try:
-            podcast = Podcast.objects.get(urls__url=podcast_url)
-        except Podcast.DoesNotExist:
-            # podcast does not exist and should not be created
-            return None
-
-    return episode_for_podcast_id_url(podcast.id, episode_url, create)
-
-
 def episodes_to_dict(ids, use_cache=False):
 
     if ids is None:

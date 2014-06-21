@@ -32,7 +32,7 @@ urlpatterns += patterns('mygpo.api.advanced',
     (r'^api/2/tags/(?P<count>\d+)\.json', 'directory.top_tags'),
     (r'^api/2/tag/(?P<tag>[^/]+)/(?P<count>\d+)\.json', 'directory.tag_podcasts'),
     (r'^api/2/data/podcast\.json', 'directory.podcast_info'),
-    (r'^api/2/data/episode\.json', 'directory.episode_info'),
+ url(r'^api/2/data/episode\.json', 'directory.episode_info', name='api-episode-info'),
 
     (r'^api/2/chapters/(?P<username>[\w.-]+)\.json', 'episode.chapters'),
     (r'^api/2/updates/(?P<username>[\w.-]+)/(?P<device_uid>[\w.-]+)\.json',

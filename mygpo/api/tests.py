@@ -19,14 +19,17 @@ from __future__ import unicode_literals
 
 import unittest
 import doctest
+from urllib import urlencode
 from copy import deepcopy
 
 from django.test.client import Client
+from django.test import TestCase
 from django.core.urlresolvers import reverse
 
+from mygpo.podcasts.models import Podcast, Episode
 from mygpo.api.advanced import episodes
 from mygpo.users.models import User
-from mygpo.test import create_auth_string
+from mygpo.test import create_auth_string, anon_request
 from mygpo.core.json import json
 
 
@@ -34,7 +37,7 @@ class AdvancedAPITests(unittest.TestCase):
 
     def setUp(self):
         self.password = 'asdf'
-        self.username = 'user'
+        self.username = 'adv-api-user'
         self.user = User(username=self.username, email='user@example.com')
         self.user.set_password(self.password)
         self.user.save()
@@ -110,7 +113,7 @@ class SubscriptionAPITests(unittest.TestCase):
 
     def setUp(self):
         self.password = 'asdf'
-        self.username = 'user'
+        self.username = 'subscription-api-user'
         self.device_uid = 'test-device'
         self.user = User(username=self.username, email='user@example.com')
         self.user.set_password(self.password)
@@ -158,9 +161,39 @@ class SubscriptionAPITests(unittest.TestCase):
         self.assertEqual(response.status_code, 401, response.content)
 
 
+class DirectoryTest(TestCase):
+    """ Test Directory API """
+
+    def setUp(self):
+        self.podcast = Podcast.objects.get_or_create_for_url(
+            'http://example.com/directory-podcast.xml',
+            defaults = {
+                'title': 'My Podcast',
+            },
+        )
+        self.episode = Episode.objects.get_or_create_for_url(
+            self.podcast,
+            'http://example.com/directory-podcast/1.mp3',
+            defaults = {
+                'title': 'My Episode',
+            },
+        )
+
+    def test_episode_info(self):
+        """ Test that the expected number of queries is executed """
+        url = reverse('api-episode-info') + '?' + urlencode(
+            (('podcast', self.podcast.url), ('url', self.episode.url)))
+
+        with self.assertNumQueries(4):
+            resp = anon_request(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+
 def suite():
     tl = unittest.TestLoader()
     suite = unittest.TestSuite()
     suite.addTest(tl.loadTestsFromTestCase(AdvancedAPITests))
     suite.addTest(tl.loadTestsFromTestCase(SubscriptionAPITests))
+    suite.addTest(tl.loadTestsFromTestCase(DirectoryTest))
     return suite
