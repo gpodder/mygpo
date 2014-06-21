@@ -3,7 +3,7 @@ from django.conf.urls import *
 from mygpo.administration.views import Overview, MergeSelect, MergeVerify, \
          MergeProcess, MergeStatus, ClientStatsView, ClientStatsJsonView, \
          UserAgentStatsView, StatsView, StatsJsonView, HostInfo, \
-         FiletypeStatsView, ActivateUserView, UnifyDuplicateSlugsSelect, \
+         ActivateUserView, UnifyDuplicateSlugsSelect, \
          UnifyDuplicateSlugs, UnifySlugsStatus, MakePublisherInput, \
          MakePublisher, MakePublisherResult
 
@@ -24,10 +24,6 @@ urlpatterns = patterns('mygpo.admin.views',
 
  url(r'^stats$',        StatsView.as_view(), name='stats'),
  url(r'^stats\.json$',  StatsJsonView.as_view(), name='stats-json'),
-
- url(r'^filetypes/$',
-     FiletypeStatsView.as_view(),
-     name='admin-filetypes'),
 
  url(r'^activate-user/$',
      ActivateUserView.as_view(),

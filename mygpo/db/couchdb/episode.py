@@ -77,19 +77,6 @@ def episodes_to_dict(ids, use_cache=False):
     return objs
 
 
-def filetype_stats():
-    """ Returns a filetype counter over all episodes """
-
-    db = get_main_database()
-    r = db.view('episode_stats/filetypes',
-        stale       = 'update_after',
-        reduce      = True,
-        group_level = 1,
-    )
-
-    return Counter({x['key']: x['value'] for x in r})
-
-
 @repeat_on_conflict(['episode'])
 def set_episode_slug(episode, slug):
     """ sets slug as new main slug of the episode, moves other to merged """

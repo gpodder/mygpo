@@ -30,7 +30,6 @@ from mygpo.api.httpresponse import JsonResponse
 from mygpo.cel import celery
 from mygpo.db.couchdb import get_main_database
 from mygpo.db.couchdb.user import activate_user, add_published_objs
-from mygpo.db.couchdb.episode import filetype_stats
 
 
 class InvalidPodcast(Exception):
@@ -299,24 +298,6 @@ class StatsJsonView(StatsView):
     def get(self, request):
         stats = self._get_stats()
         return JsonResponse(stats)
-
-
-class FiletypeStatsView(AdminView):
-
-    template_name = 'admin/filetypes.html'
-
-    def get(self, request):
-        stats = filetype_stats()
-
-        if len(stats):
-            max_num = stats.most_common(1)[0][1]
-        else:
-            max_num = 0
-
-        return self.render_to_response({
-            'max_num': max_num,
-            'stats': stats.most_common(),
-        })
 
 
 class ActivateUserView(AdminView):
