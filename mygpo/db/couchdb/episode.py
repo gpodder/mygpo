@@ -53,30 +53,3 @@ def episodes_to_dict(ids, use_cache=False):
         cache.set_many(dict( (obj._id, obj) for obj in db_objs))
 
     return objs
-
-
-@repeat_on_conflict(['episode'])
-def set_episode_slug(episode, slug):
-    """ sets slug as new main slug of the episode, moves other to merged """
-    episode.set_slug(slug)
-    episode.save()
-
-
-@repeat_on_conflict(['episode'])
-def remove_episode_slug(episode, slug):
-    """ removes slug from main and merged slugs """
-    episode.remove_slug(slug)
-    episode.save()
-
-
-@repeat_on_conflict(['episode'])
-def set_episode_listeners(episode, listeners):
-
-    if episode.listeners == listeners:
-        return False
-
-    episode.listeners = listeners
-
-    db = get_main_database()
-    db.save_doc(episode)
-    return True

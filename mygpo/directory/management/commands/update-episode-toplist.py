@@ -2,7 +2,6 @@ from mygpo.users.models import EpisodeUserState
 from mygpo.podcasts.models import Episode
 from mygpo.maintenance.management.changescmd import ChangesCommand
 from mygpo.db.couchdb import get_userdata_database
-from mygpo.db.couchdb.episode import set_episode_listeners
 from mygpo.db.couchdb.episode_state import episode_listener_count
 
 
@@ -22,7 +21,8 @@ class Command(ChangesCommand):
             return
 
         listeners = episode_listener_count(episode)
-        updated = set_episode_listeners(episode, listeners)
+        episode.listeners = listeners
+        episode.save()
         actions['updated'] += int(updated)
 
 

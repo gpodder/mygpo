@@ -160,45 +160,12 @@ def update_urls(old, new):
 
 
 def update_slugs(old, new):
-
-    existing_slugs = {s.slug: s for s in new.slugs.all()}
-    logger.info('%d existing slugs', len(existing_slugs))
-
-    new_slugs = filter(None, [old.slug] + old.merged_slugs + [old.oldid] + old.merged_oldids)
+    new_slugs = filter(None, [old.slug] + old.merged_slugs +
+                             [old.oldid] + old.merged_oldids)
     new_slugs = map(unicode, new_slugs)
     new_slugs = map(slugify, new_slugs)
-    logger.info('%d new slugs', len(new_slugs))
-
-    with transaction.atomic():
-        max_order = max([s.order for s in existing_slugs.values()] + [len(new_slugs)])
-        logger.info('Renumbering slugs starting from %d', max_order)
-        for n, slug in enumerate(existing_slugs.values(), max_order+1):
-            slug.order = n
-            slug.save()
-
-    logger.info('%d existing slugs', len(existing_slugs))
-
-    for n, slug in enumerate(new_slugs):
-        try:
-            s = existing_slugs.pop(slug)
-            logger.info('Updating new slug %d: %s', n, slug)
-            s.order = n
-            s.save()
-        except KeyError:
-            logger.info('Creating new slug %d: %s', n, slug)
-            try:
-                Slug.objects.create(slug=to_maxlength(Slug, 'slug', slug),
-                                    content_object=new,
-                                    order=n,
-                                    scope=new.scope,
-                                )
-            except IntegrityError as ie:
-                logger.warn('Could not create Slug for %s: %s', new, ie)
-
-    with transaction.atomic():
-        delete = [s.pk for s in existing_slugs.values()]
-        logger.info('Deleting %d slugs', len(delete))
-        Slug.objects.filter(id__in=delete).delete()
+    new_slugs = map(lambda s: to_maxlength(Slug, 'slug', s), new_slugs)
+    new.set_slugs(new_slugs)
 
 
 @transaction.atomic

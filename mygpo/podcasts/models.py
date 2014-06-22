@@ -3,12 +3,15 @@ from __future__ import unicode_literals
 import re
 from datetime import datetime
 
-from django.db import models, transaction
+from django.db import models, transaction, IntegrityError
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes import generic
 
 from uuidfield import UUIDField
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 # default podcast update interval in hours
@@ -211,6 +214,7 @@ class SlugsMixin(models.Model):
 
 
     def add_slug(self, slug):
+        """ Adds a (non-cannonical) slug """
 
         if not slug:
             raise ValueError("'%s' is not a valid slug" % slug)
@@ -228,6 +232,64 @@ class SlugsMixin(models.Model):
                             content_object=self,
                             order=next_order,
                             )
+
+    def set_slug(self, slug):
+        """ Sets the canonical slug """
+
+        slugs = [s.slug for s in self.slugs.all()]
+        if slug in slugs:
+            slugs.remove(slug)
+
+        slugs.insert(0, slug)
+        self.set_slugs(slugs)
+
+
+    def remove_slug(self, slug):
+        """ Removes a slug """
+        Slug.objects.filter(slug=new_slug, content_object=self).delete()
+
+
+    def set_slugs(self, slugs):
+        """ Update the object's slugs to the given list
+
+        'slugs' should be a list of strings. Slugs that do not exist are
+        created.  Existing slugs that are not in the 'slugs' list are
+        deleted. """
+        existing = {s.slug: s for s in self.slugs.all()}
+        logger.info('%d existing slugs', len(existing))
+
+        logger.info('%d new slugs', len(slugs))
+
+        with transaction.atomic():
+            max_order = max([s.order for s in existing.values()] + [len(slugs)])
+            logger.info('Renumbering slugs starting from %d', max_order+1)
+            for n, slug in enumerate(existing.values(), max_order+1):
+                slug.order = n
+                slug.save()
+
+        logger.info('%d existing slugs', len(existing))
+
+        for n, slug in enumerate(slugs):
+            try:
+                s = existing.pop(slug)
+                logger.info('Updating new slug %d: %s', n, slug)
+                s.order = n
+                s.save()
+            except KeyError:
+                logger.info('Creating new slug %d: %s', n, slug)
+                try:
+                    Slug.objects.create(slug=slug,
+                                        content_object=self,
+                                        order=n,
+                                        scope=self.scope,
+                                       )
+                except IntegrityError as ie:
+                    logger.warn('Could not create Slug for %s: %s', self, ie)
+
+        with transaction.atomic():
+            delete = [s.pk for s in existing.values()]
+            logger.info('Deleting %d slugs', len(delete))
+            Slug.objects.filter(id__in=delete).delete()
 
 
 

@@ -27,7 +27,6 @@ from django.contrib.sites.models import RequestSite
 from mygpo.data.tasks import update_podcasts
 from mygpo.decorators import requires_token, allowed_methods
 from mygpo.users.models import User
-from mygpo.db.couchdb.episode import set_episode_slug, remove_episode_slug
 from mygpo.db.couchdb.episode_state import episode_listener_counts
 from mygpo.db.couchdb.pubsub import subscription_for_topic
 
@@ -255,13 +254,13 @@ def update_episode_slug(request, episode):
             if other_episode == episode:
                 continue
 
-            remove_episode_slug(other_episode, new_slug)
+            other_episode.remove_slug(new_slug)
             messages.warning(request,
                 _(u'Removed slug {slug} from {episode}'.format(
                     slug=new_slug, episode=other_episode.title))
             )
 
-    set_episode_slug(episode, new_slug)
+    episode.set_slug(new_slug)
 
     # TODO: we should use better cache invalidation
     cache.clear()
