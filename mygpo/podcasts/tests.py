@@ -88,7 +88,36 @@ class PodcastGroupTests(unittest.TestCase):
         self.assertEquals(self.podcast4.group_member_name, 'p4')
 
 
+class SlugTests(TestCase):
+    """ Test various slug functionality """
+
+    def test_update_slugs(self):
+
+        # this is the current number of queries when writing the test; this has
+        # not been optimized in any particular way, it should just be used to
+        # alert when something changes
+        with self.assertNumQueries(23):
+            podcast = create_podcast()
+
+            # set the canonical slug
+            podcast.set_slug('podcast-1')
+            self.assertEquals(podcast.slug, 'podcast-1')
+
+            # set a new list of slugs
+            podcast.set_slugs(['podcast-2', 'podcast-1'])
+            self.assertEquals(podcast.slug, 'podcast-2')
+
+            # remove the canonical slug
+            podcast.remove_slug('podcast-2')
+            self.assertEquals(podcast.slug, 'podcast-1')
+
+            # add a non-canonical slug
+            podcast.add_slug('podcast-3')
+            self.assertEquals(podcast.slug, 'podcast-1')
+
+
 def load_tests(loader, tests, ignore):
     tests.addTest(unittest.TestLoader().loadTestsFromTestCase(PodcastTests))
     tests.addTest(unittest.TestLoader().loadTestsFromTestCase(PodcastGroupTests))
+    tests.addTest(unittest.TestLoader().loadTestsFromTestCase(SlugTests))
     return tests

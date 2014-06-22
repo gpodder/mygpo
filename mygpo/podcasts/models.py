@@ -210,7 +210,9 @@ class SlugsMixin(models.Model):
         # The assumption is that we will never have loads of slugs, so
         # fetching all won't hurt
         slugs = list(self.slugs.all())
-        return slugs[0].slug if slugs else None
+        slug = slugs[0].slug if slugs else None
+        logger.debug('Found slugs %r, picking %r', slugs, slug)
+        return slug
 
 
     def add_slug(self, slug):
@@ -246,7 +248,11 @@ class SlugsMixin(models.Model):
 
     def remove_slug(self, slug):
         """ Removes a slug """
-        Slug.objects.filter(slug=new_slug, content_object=self).delete()
+        Slug.objects.filter(
+                slug=slug,
+                content_type=ContentType.objects.get_for_model(self),
+                object_id=self.id,
+            ).delete()
 
 
     def set_slugs(self, slugs):
@@ -638,7 +644,7 @@ class URL(OrderedModel, ScopedModel):
     object_id = UUIDField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         unique_together = (
             # a URL is unique per scope
             ('url', 'scope'),
@@ -699,7 +705,7 @@ class Slug(OrderedModel, ScopedModel):
     object_id = UUIDField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         unique_together = (
             # a slug is unique per type; eg a podcast can have the same slug
             # as an episode, but no two podcasts can have the same slug
