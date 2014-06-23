@@ -817,11 +817,11 @@ class HistoryEntry(object):
             podcasts = podcasts_to_dict(podcast_ids)
 
         if episodes is None:
-            from mygpo.db.couchdb.episode import episodes_to_dict
             # load episode data
             episode_ids = [getattr(x, 'episode_id', None) for x in entries]
             episode_ids = filter(None, episode_ids)
-            episodes = episodes_to_dict(episode_ids)
+            episodes = Episode.objects.filter(id__in=episode_ids)
+            episodes = {episode.id: episode for episode in episodes}
 
         # load device data
         # does not need pre-populated data because no db-access is required
