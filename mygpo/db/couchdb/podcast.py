@@ -60,25 +60,6 @@ def podcasts_to_dict(ids, use_cache=False):
     return objs
 
 
-def subscriberdata_for_podcast(podcast_id):
-
-    if not podcast_id:
-        raise QueryParameterMissing('podcast_id')
-
-    db = get_main_database()
-    data = get_single_result(db, 'podcasts/subscriber_data',
-            key          = podcast_id,
-            include_docs = True,
-            schema       = PodcastSubscriberData,
-        )
-
-    if not data:
-        data = PodcastSubscriberData()
-        data.podcast = podcast_id
-
-    return data
-
-
 def search_wrapper(result):
     doc = result['doc']
     if doc['doc_type'] == 'Podcast':
