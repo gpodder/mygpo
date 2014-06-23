@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import re
 from datetime import datetime
 
-from django.db import models, transaction, IntegrityError
+from django.db import models, connection, transaction, IntegrityError
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes import generic
@@ -150,6 +150,22 @@ class AuthorModel(models.Model):
 
     class Meta:
         abstract = True
+
+
+class GenericManager(models.Manager):
+    """ Generic manager methods """
+
+    def count_fast(self):
+        """ Fast approximate count of all model instances
+
+        PostgreSQL is slow when counting records without an index. This is a
+        workaround which only gives approximate results. see:
+        http://wiki.postgresql.org/wiki/Slow_Counting """
+        cursor = connection.cursor()
+        cursor.execute("select reltuples from pg_class where relname='%s';" %
+                       self.model._meta.db_table)
+        row = cursor.fetchone()
+        return int(row[0])
 
 
 class UrlsMixin(models.Model):
@@ -380,7 +396,7 @@ class PodcastQuerySet(MergedUUIDQuerySet):
         return q.order_by('next_update')
 
 
-class PodcastManager(models.Manager):
+class PodcastManager(GenericManager):
     """ Manager for the Podcast model """
 
     def get_queryset(self):
@@ -553,7 +569,7 @@ class EpisodeQuerySet(MergedUUIDQuerySet):
     pass
 
 
-class EpisodeManager(models.Manager):
+class EpisodeManager(GenericManager):
     """ Custom queries for Episodes """
 
     def get_queryset(self):

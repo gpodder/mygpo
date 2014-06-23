@@ -20,7 +20,7 @@ class Command(BaseCommand):
         silent = options.get('silent')
 
         podcasts = Podcast.objects.all()
-        total = podcasts.count()
+        total = podcasts.count_fast()
 
         for n, podcast in enumerate(podcasts):
             update_podcast_subscribers.delay(podcast.get_id())

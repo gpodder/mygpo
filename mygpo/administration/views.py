@@ -280,8 +280,8 @@ class StatsView(AdminView):
 
     def _get_stats(self):
         return {
-            'podcasts': Podcast.objects.count(),
-            'episodes': Episode.objects.count(),
+            'podcasts': Podcast.objects.count_fast(),
+            'episodes': Episode.objects.count_fast(),
             'users': User.count(),
         }
 

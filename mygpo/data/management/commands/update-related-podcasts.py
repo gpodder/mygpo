@@ -22,7 +22,7 @@ class Command(BaseCommand):
         max_related = options.get('max')
 
         podcasts = Podcast.objects.all()
-        total = Podcast.objects.count()
+        total = Podcast.objects.count_fast()
 
         for (n, podcast) in enumerate(podcasts):
 
