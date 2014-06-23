@@ -308,6 +308,19 @@ class MergedUUIDsMixin(models.Model):
     class Meta:
         abstract = True
 
+
+class MergedUUIDQuerySet(models.QuerySet):
+    """ QuerySet for Models inheriting from MergedUUID """
+
+    def get_by_any_id(self, id):
+        """ Find am Episode by its own ID or by a merged ID """
+        # TODO: should this be done in the model?
+        try:
+            return self.get(id=id)
+        except self.model.DoesNotExist:
+            return self.get(merged_uuids__uuid=id)
+
+
 class TagsMixin(models.Model):
     """ Methods for working with Tag objects """
 
@@ -339,7 +352,7 @@ class PodcastGroup(UUIDModel, TitleModel, SlugsMixin):
         return ''
 
 
-class PodcastQuerySet(models.QuerySet):
+class PodcastQuerySet(MergedUUIDQuerySet):
     """ Custom queries for Podcasts """
 
     def random(self):
@@ -366,6 +379,13 @@ class PodcastQuerySet(models.QuerySet):
         q = self.extra(select={'next_update': NEXTUPDATE})
         return q.order_by('next_update')
 
+
+class PodcastManager(models.Manager):
+    """ Manager for the Podcast model """
+
+    def get_queryset(self):
+        return PodcastQuerySet(self.model, using=self._db)
+
     @transaction.atomic
     def get_or_create_for_url(self, url, defaults={}):
         # TODO: where to specify how uuid is created?
@@ -382,14 +402,6 @@ class PodcastQuerySet(models.QuerySet):
                                      content_object=podcast,
                                     )
         return podcast
-
-    def get_by_any_id(self, id):
-        """ Find a Podcast by its own ID or by a merged ID """
-        # TODO: should this be done in the model?
-        try:
-            return self.get(id=id)
-        except self.model.DoesNotExist:
-            return self.get(merged_uuids__uuid=id)
 
 
 class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
@@ -418,7 +430,7 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
     update_interval = models.PositiveSmallIntegerField(null=False,
         default=DEFAULT_UPDATE_INTERVAL)
 
-    objects = PodcastQuerySet.as_manager()
+    objects = PodcastManager()
 
     def subscriber_count(self):
         # TODO: implement
@@ -536,8 +548,16 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
         return ''
 
 
-class EpisodeQuerySet(models.QuerySet):
+class EpisodeQuerySet(MergedUUIDQuerySet):
+    """ QuerySet for Episodes """
+    pass
+
+
+class EpisodeManager(models.Manager):
     """ Custom queries for Episodes """
+
+    def get_queryset(self):
+        return EpisodeQuerySet(self.model, using=self._db)
 
     @transaction.atomic
     def get_or_create_for_url(self, podcast, url, defaults={}):
@@ -559,15 +579,6 @@ class EpisodeQuerySet(models.QuerySet):
                                     )
         return episode
 
-    def get_by_any_id(self, id):
-        """ Find am Episode by its own ID or by a merged ID """
-        # TODO: should this be done in the model?
-        try:
-            return self.get(id=id)
-        except self.model.DoesNotExist:
-            return self.get(merged_uuids__uuid=id)
-
-
 class Episode(UUIDModel, TitleModel, DescriptionModel, LinkModel,
         LanguageModel, LastUpdateModel, UpdateInfoModel, LicenseModel,
         FlattrModel, ContentTypesModel, MergedIdsModel, OutdatedModel,
@@ -583,7 +594,7 @@ class Episode(UUIDModel, TitleModel, DescriptionModel, LinkModel,
     podcast = models.ForeignKey(Podcast, on_delete=models.PROTECT)
     listeners = models.PositiveIntegerField(null=True)
 
-    objects = EpisodeQuerySet.as_manager()
+    objects = EpisodeManager()
 
     class Meta:
         ordering = ['-released']

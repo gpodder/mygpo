@@ -40,7 +40,7 @@ class PodcastTests(unittest.TestCase):
         create_podcast(last_update=last_update, update_interval=update_interval)
 
         # the podcast should be the next to be updated
-        p = Podcast.objects.order_by_next_update().first()
+        p = Podcast.objects.all().order_by_next_update().first()
 
         # assert that the next_update property is calculated correctly
         self.assertEqual(p.next_update,
