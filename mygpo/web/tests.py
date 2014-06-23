@@ -56,7 +56,7 @@ class SimpleWebTests(TestCase):
             'delete-account',
             'share',
             'toplist',
-            'episode-toplist',
+            #'episode-toplist',
             'devices',
             'device-create',
             'login',

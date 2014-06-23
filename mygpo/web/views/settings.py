@@ -41,7 +41,6 @@ from mygpo.web.utils import normalize_twitter
 from mygpo.flattr import Flattr
 from mygpo.users.settings import PUBLIC_SUB_USER, \
          FLATTR_TOKEN, FLATTR_AUTO, FLATTR_MYGPO, FLATTR_USERNAME
-from mygpo.db.couchdb.podcast import podcasts_to_dict
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast, \
          subscriptions_by_user, set_podcast_privacy_settings
 from mygpo.db.couchdb.user import update_flattr_settings, \
@@ -253,7 +252,8 @@ def privacy(request):
     site = RequestSite(request)
 
     subscriptions = subscriptions_by_user(request.user)
-    podcasts = podcasts_to_dict([x[1] for x in subscriptions])
+    podcasts = Podcast.objects.filter(id__in=[x[1] for x in subscriptions])
+    podcasts = {podcast.id: podcast for podcast in podcast}
 
     subs = set((podcasts.get(x[1], None), not x[0]) for x in subscriptions)
     subs = sorted(subs, key=lambda (p, _): PODCAST_SORT(p))

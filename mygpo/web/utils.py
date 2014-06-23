@@ -12,9 +12,8 @@ from django.http import Http404
 
 from babel import Locale, UnknownLocaleError
 
-from mygpo.core.models import Podcast
+from mygpo.podcasts.models import Podcast
 from mygpo.core.proxy import proxy_object
-from mygpo.db.couchdb.podcast import podcasts_to_dict
 
 
 def get_accepted_lang(request):
@@ -144,8 +143,6 @@ def get_podcast_link_target(podcast, view_name='podcast', add_args=[]):
     automatically distringuishes between relational Podcast objects and
     CouchDB-based Podcasts """
 
-    from mygpo.core.models import Podcast
-
     # we prefer slugs
     if podcast.slug:
         args = [podcast.slug]
@@ -191,8 +188,6 @@ def get_episode_link_target(episode, podcast, view_name='episode',
     automatically distringuishes between relational Episode objects and
     CouchDB-based Episodes """
 
-    from mygpo.core.models import Podcast
-
     # prefer slugs
     if episode.slug:
         args = [podcast.slug, episode.slug]
@@ -211,7 +206,8 @@ def fetch_episode_data(episodes, podcasts={}):
 
     if not podcasts:
         podcast_ids = [episode.podcast for episode in episodes]
-        podcasts = podcasts_to_dict(podcast_ids)
+        podcasts = Podcast.objects.filter(id__in=podcast_ids)
+        podcasts = {podcast.id: podcast for podcast in podcasts}
 
     def set_podcast(episode):
         episode = proxy_object(episode)

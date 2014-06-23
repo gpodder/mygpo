@@ -33,7 +33,6 @@ from mygpo.users.settings import FLATTR_TOKEN
 from mygpo.data.feeddownloader import PodcastUpdater, NoEpisodesException
 from mygpo.data.tasks import update_podcasts
 from mygpo.db.couchdb.user import get_user_by_id
-from mygpo.db.couchdb.podcast import podcasts_to_dict
 from mygpo.db.couchdb.directory import category_for_tag
 from mygpo.db.couchdb.podcastlist import random_podcastlists, \
          podcastlist_count, podcastlists_by_rating
@@ -101,7 +100,8 @@ class EpisodeToplistView(ToplistView):
 
         # load podcast objects
         podcast_ids = [e.podcast for e in entries]
-        podcasts = podcasts_to_dict(podcast_ids, True)
+        podcasts = Podcast.objects.get(id__in=podcast_ids)
+        podcasts = {podcast.id: podcast for podcast in podcasts}
         for entry in entries:
             entry.podcast = podcasts.get(entry.podcast, None)
 

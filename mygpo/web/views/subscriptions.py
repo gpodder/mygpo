@@ -10,12 +10,12 @@ from django.http import HttpResponse, Http404
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import cache_control
 
+from mygpo.podcasts.models import Podcast
 from mygpo.utils import parse_bool, unzip, skip_pairs
 from mygpo.decorators import requires_token
 from mygpo.api import simple
 from mygpo.users.models import HistoryEntry, User
 from mygpo.web.utils import symbian_opml_changes, get_podcast_link_target
-from mygpo.db.couchdb.podcast import podcasts_to_dict
 from mygpo.db.couchdb.podcast_state import subscriptions_by_user
 
 
@@ -88,7 +88,8 @@ def create_subscriptionlist(request):
     podcast_ids= list(set(podcast_ids))
     device_ids = list(set(device_ids))
 
-    podcasts = podcasts_to_dict(podcast_ids)
+    podcasts = Podcast.objects.filter(id__in=podcast_ids)
+    podcasts = {podcast.id: podcast for podcast in podcasts}
     devices = user.get_devices_by_id(device_ids)
 
     subscription_list = {}

@@ -14,6 +14,7 @@ from django.core.cache import cache
 
 from django_couchdb_utils.registration.models import User as BaseUser
 
+from mygpo.podcasts.models import Podcast
 from mygpo.utils import linearize
 from mygpo.core.proxy import DocumentABCMeta, proxy_object
 from mygpo.decorators import repeat_on_conflict
@@ -21,7 +22,6 @@ from mygpo.users.ratings import RatingMixin
 from mygpo.users.sync import SyncedDevicesMixin
 from mygpo.users.subscriptions import subscription_changes, podcasts_for_states
 from mygpo.users.settings import FAV_FLAG, PUBLIC_SUB_PODCAST, SettingsMixin
-from mygpo.db.couchdb.podcast import podcasts_to_dict
 from mygpo.db.couchdb.user import user_history, device_history, \
     create_missing_user_tokens
 
@@ -606,7 +606,8 @@ class User(BaseUser, SyncedDevicesMixin, SettingsMixin):
         from mygpo.db.couchdb.podcast_state import get_subscribed_podcast_states_by_user
         states = get_subscribed_podcast_states_by_user(self, public)
         podcast_ids = [state.podcast for state in states]
-        podcasts = podcasts_to_dict(podcast_ids)
+        podcasts = Podcast.objects.get(id__in=podcast_ids)
+        podcasts = {podcast.id: podcast for podcast in podcasts}
 
         for state in states:
             podcast = podcasts.get(state.podcast, None)
@@ -814,7 +815,8 @@ class HistoryEntry(object):
             # load podcast data
             podcast_ids = [getattr(x, 'podcast_id', None) for x in entries]
             podcast_ids = filter(None, podcast_ids)
-            podcasts = podcasts_to_dict(podcast_ids)
+            podcasts = Podcast.objects.filter(id__in=podcast_ids)
+            podcasts = {podcast.id: podcast for podcast in podcasts}
 
         if episodes is None:
             # load episode data

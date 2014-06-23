@@ -3,7 +3,6 @@ from collections import namedtuple
 from couchdbkit.ext.django.schema import *
 
 from mygpo.core.models import Podcast, SubscriptionException
-from mygpo.db.couchdb.podcast import podcasts_to_dict
 
 import logging
 logger = logging.getLogger(__name__)
@@ -164,7 +163,8 @@ class SyncedDevicesMixin(DocumentSchema):
         from mygpo.db.couchdb.podcast_state import subscribe, unsubscribe
         add, rem = sync_actions
 
-        podcasts = podcasts_to_dict(add + rem)
+        podcasts = Podcast.objects.filter(id__in=(add+rem))
+        podcasts = {podcast.id: podcast for podcast in podcasts}
 
         for podcast_id in add:
             podcast = podcasts.get(podcast_id, None)

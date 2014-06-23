@@ -21,45 +21,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def podcasts_to_dict(ids, use_cache=False):
-
-    if ids is None:
-        raise QueryParameterMissing('ids')
-
-    if not ids:
-        return dict()
-
-
-    ids = list(set(ids))
-    objs = dict()
-
-    cache_objs = []
-    if use_cache:
-        res = cache.get_many(ids)
-        cache_objs.extend(res.values())
-        ids = [x for x in ids if x not in res.keys()]
-
-    from mygpo.podcasts.models import Podcast
-    db_objs = Podcast.objects.filter(id__in=ids)
-
-    for obj in (cache_objs + db_objs):
-
-        # get_multi returns dict {'key': _id, 'error': 'not found'}
-        # for non-existing objects
-        if isinstance(obj, dict) and 'error' in obj:
-            _id = obj['key']
-            objs[_id] = None
-            continue
-
-        for i in obj.get_ids():
-            objs[i] = obj
-
-    if use_cache:
-        cache.set_many(dict( (obj.get_id(), obj) for obj in db_objs))
-
-    return objs
-
-
 def search_wrapper(result):
     doc = result['doc']
     if doc['doc_type'] == 'Podcast':
