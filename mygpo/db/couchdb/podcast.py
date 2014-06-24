@@ -1,24 +1,9 @@
-from hashlib import sha1
-from datetime import datetime
-
 from restkit import RequestFailed
-from couchdbkit import MultipleResultsFound
 
-from django.core.cache import cache
-
-from mygpo.core.models import Podcast, PodcastGroup, PodcastSubscriberData
+from mygpo.core.models import Podcast, PodcastGroup
 from mygpo.core.signals import incomplete_obj
-from mygpo.decorators import repeat_on_conflict
 from mygpo.cache import cache_result
-from mygpo.utils import get_timestamp
-from mygpo.db.couchdb import get_main_database, get_userdata_database, \
-    lucene_query
-from mygpo.db import QueryParameterMissing
-from mygpo.db.couchdb import get_main_database, get_single_result
-from mygpo.db.couchdb.utils import multi_request_view, is_couchdb_id
-
-import logging
-logger = logging.getLogger(__name__)
+from mygpo.db.couchdb import get_main_database, lucene_query
 
 
 def search_wrapper(result):
