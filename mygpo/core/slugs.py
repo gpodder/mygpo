@@ -11,31 +11,15 @@ from mygpo.decorators import repeat_on_conflict
 from mygpo.utils import partition
 
 
-def assign_slug(obj, generator):
-    if obj.slug:
-        return
-
-    slug = generator(obj).get_slug()
-    _set_slug(obj=obj, slug=slug)
-
-
+# TODO: move to feed-downloader?
 def assign_missing_episode_slugs(podcast):
     common_title = podcast.get_common_episode_title()
 
-    episodes = EpisodesMissingSlugs(podcast.get_id())
-
+    episodes = Episode.objects.filter(podcast=podcast, slug__isnull=True)
 
     for episode in episodes:
         slug = EpisodeSlug(episode, common_title).get_slug()
-        _set_slug(obj=episode, slug=slug)
-
-
-@repeat_on_conflict(['obj'])
-def _set_slug(obj, slug):
-    if slug:
-        obj.set_slug(slug)
-        obj.save()
-
+        episode.set_slug(slug)
 
 
 class SlugGenerator(object):
@@ -141,92 +125,6 @@ class EpisodeSlug(SlugGenerator):
         query = Slug.objects.filter(scope=self.podcast_id,
                                     slug__startswith=self.base_slug)
         return [s['slug'] for s in query]
-
-
-class ObjectsMissingSlugs(object):
-    """ A collections of objects missing a slug """
-
-    def __init__(self, cls, wrapper=None, start=[None], end=[{}]):
-        self.cls = cls
-        self.doc_type = cls._doc_type
-        self.wrapper = wrapper
-        self.start = start
-        self.end = end
-        self.kwargs = {}
-
-
-    def __len__(self):
-        from mygpo.db.couchdb.common import missing_slug_count
-        return missing_slug_count(self.doc_type, self.start, self.end)
-
-
-    def __iter__(self):
-        from mygpo.db.couchdb.common import missing_slugs
-        return missing_slugs(self.doc_type, self.start, self.end, self.wrapper, **self.kwargs)
-
-
-
-class PodcastsMissingSlugs(ObjectsMissingSlugs):
-    """ Podcasts that don't have a slug (but could have one) """
-
-    def __init__(self):
-        from mygpo.core.models import Podcast
-        super(PodcastsMissingSlugs, self).__init__(Podcast, self._podcast_wrapper)
-        self.kwargs = {'wrap': False}
-
-    @staticmethod
-    def _podcast_wrapper(r):
-        from mygpo.core.models import Podcast, PodcastGroup
-
-        doc = r['doc']
-
-        if doc['doc_type'] == 'Podcast':
-            return Podcast.wrap(doc)
-        else:
-            pid = r['key'][2]
-            pg = PodcastGroup.wrap(doc)
-            return pg.get_podcast_by_id(pid)
-
-    def __iter__(self):
-        for r in super(PodcastsMissingSlugs, self).__iter__():
-            yield self._podcast_wrapper(r)
-
-
-class EpisodesMissingSlugs(ObjectsMissingSlugs):
-    """ Episodes that don't have a slug (but could have one) """
-
-    def __init__(self, podcast_id=None):
-        from mygpo.core.models import Episode
-
-        if podcast_id:
-            start = [podcast_id, None]
-            end = [podcast_id, {}]
-        else:
-            start = [None, None]
-            end = [{}, {}]
-
-        super(EpisodesMissingSlugs, self).__init__(Episode,
-                self._episode_wrapper, start, end)
-
-    @staticmethod
-    def _episode_wrapper(doc):
-        from mygpo.core.models import Episode
-
-        return Episode.wrap(doc)
-
-
-class PodcastGroupsMissingSlugs(ObjectsMissingSlugs):
-    """ Podcast Groups that don't have a slug (but could have one) """
-
-    def __init__(self):
-        from mygpo.core.models import PodcastGroup
-        super(PodcastGroupsMissingSlugs, self).__init__(PodcastGroup,
-            self._group_wrapper)
-
-    @staticmethod
-    def _group_wrapper(doc):
-        from mygpo.core.models import PodcastGroup
-        return PodcastGroup.wrap(doc)
 
 
 class SlugMixin(DocumentSchema):

@@ -47,16 +47,6 @@ Doc-Types: Podcast, PodcastGroup, PodcastSubscriberData
 * `podcasts/by_tag <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/podcasts/views/by_tag>`_
 
 
-Slugs
-^^^^^
-
-Doc-Types: Podcast, PodcastGroup, Episode
-
-**Views**
-
-* `slugs/missing <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/slugs/views/missing>`_
-
-
 Suggestions
 ^^^^^^^^^^^
 
