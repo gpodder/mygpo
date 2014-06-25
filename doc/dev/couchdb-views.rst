@@ -25,29 +25,6 @@ Doc-Types: User
 * `clients/by_ua_string <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/clients/views/by_ua_string>`_
 
 
-Episode Statistics
-^^^^^^^^^^^^^^^^^^
-
-Doc-Types: Episode
-
-**Views**
-
-* `episode_stats/filetypes <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/episode_stats/views/filetypes>`_
-
-
-Episodes
-^^^^^^^^
-
-Doc-Types: Episode
-
-**Views**
-
-* `episodes/by_id <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/episodes/views/by_id>`_
-* `episodes/by_podcast <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/episodes/views/by_podcast>`_
-* `episodes/by_podcast_url <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/episodes/views/by_podcast_url>`_
-* `episodes/need_update <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/episodes/views/need_update>`_
-
-
 Podcast Lists
 ^^^^^^^^^^^^^
 
@@ -67,13 +44,7 @@ Doc-Types: Podcast, PodcastGroup, PodcastSubscriberData
 
 **Views**
 
-* `podcasts/by_id <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/podcasts/views/by_id>`_
-* `podcasts/by_language <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/podcasts/views/by_language>`_
-* `podcasts/by_slug <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/podcasts/views/by_slug>`_
 * `podcasts/by_tag <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/podcasts/views/by_tag>`_
-* `podcasts/by_url <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/podcasts/views/by_url>`_
-* `podcasts/podcasts_groups <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/podcasts/views/podcasts_groups>`_
-* `podcasts/subscriber_data <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/podcasts/views/subscriber_data>`_
 
 
 Slugs
