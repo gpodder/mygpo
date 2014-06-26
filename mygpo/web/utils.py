@@ -162,8 +162,6 @@ def get_podcast_group_link_target(group, view_name, add_args=[]):
     automatically distringuishes between relational Podcast objects and
     CouchDB-based Podcasts """
 
-    from mygpo.core.models import PodcastGroup
-
     # we prefer slugs
     if group.slug:
         args = [group.slug]
