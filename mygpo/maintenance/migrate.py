@@ -39,14 +39,14 @@ def migrate_episode(e):
         logger.info('Created stub for podcast %s', e.podcast)
 
     e2, created = Episode.objects.update_or_create(id=e._id, defaults = {
-        'title': e.title or '',
+        'title': to_maxlength(Episode, 'title', e.title or ''),
         'subtitle': e.subtitle or '',
         'guid': to_maxlength(Episode, 'guid', e.guid) if e.guid is not None else None,
         'description': e.description or '',
         'content': e.content or '',
-        'link': e.link,
+        'link': to_maxlength(Episode, 'link', e.link) if e.link is not None else None,
         'released': e.released,
-        'author': e.author,
+        'author': to_maxlength(Episode, 'author', e.author) if e.author is not None else None,
         'duration': max(0, e.duration) if e.duration is not None else None,
         'filesize': max(0, e.filesize) if e.filesize is not None else None,
         'language': to_maxlength(Episode, 'language', e.language) if e.language is not None else None,
@@ -86,7 +86,7 @@ def migrate_podcast(p):
         'license': p.license,
         'flattr_url': to_maxlength(Podcast, 'flattr_url', p.flattr_url) if p.flattr_url else None,
         'outdated': p.outdated,
-        'author': p.author,
+        'author': to_maxlength(Podcast, 'author', p.author) if p.author is not None else None,
         'logo_url': p.logo_url,
         'common_episode_title': to_maxlength(Podcast, 'common_episode_title', p.common_episode_title or ''),
         'new_location': p.new_location,
