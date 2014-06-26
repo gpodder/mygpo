@@ -3,9 +3,8 @@ from django.conf.urls import *
 from mygpo.administration.views import Overview, MergeSelect, MergeVerify, \
          MergeProcess, MergeStatus, ClientStatsView, ClientStatsJsonView, \
          UserAgentStatsView, StatsView, StatsJsonView, HostInfo, \
-         ActivateUserView, UnifyDuplicateSlugsSelect, \
-         UnifyDuplicateSlugs, UnifySlugsStatus, MakePublisherInput, \
-         MakePublisher, MakePublisherResult
+         ActivateUserView, MakePublisherInput, MakePublisher, \
+         MakePublisherResult
 
 urlpatterns = patterns('mygpo.admin.views',
  url(r'^$',              Overview.as_view(),     name='admin-overview'),
@@ -28,18 +27,6 @@ urlpatterns = patterns('mygpo.admin.views',
  url(r'^activate-user/$',
      ActivateUserView.as_view(),
      name='admin-activate-user'),
-
- url(r'^unify-slugs/select$',
-     UnifyDuplicateSlugsSelect.as_view(),
-     name='admin-unify-slugs-select'),
-
- url(r'^unify-slugs/$',
-     UnifyDuplicateSlugs.as_view(),
-     name='admin-unify-slugs'),
-
- url(r'^unify-slugs/status/(?P<task_id>[^/]+)$',
-     UnifySlugsStatus.as_view(),
-     name='admin-unify-slugs-status'),
 
  url(r'^make-publisher/input$',
      MakePublisherInput.as_view(),

@@ -24,7 +24,7 @@ from mygpo.administration.group import PodcastGrouper
 from mygpo.maintenance.merge import PodcastMerger, IncorrectMergeException
 from mygpo.users.models import User
 from mygpo.administration.clients import UserAgentStats, ClientStats
-from mygpo.administration.tasks import merge_podcasts, unify_slugs
+from mygpo.administration.tasks import merge_podcasts
 from mygpo.utils import get_git_head
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.cel import celery
@@ -336,55 +336,6 @@ class ActivateUserView(AdminView):
                             username=user.username, email=user.email)))
         return HttpResponseRedirect(reverse('admin-activate-user'))
 
-
-
-class UnifyDuplicateSlugsSelect(AdminView):
-    """ select a podcast for which to unify slugs """
-    template_name = 'admin/unify-slugs-select.html'
-
-
-class UnifyDuplicateSlugs(AdminView):
-    """ start slug-unification task """
-
-    def post(self, request):
-        podcast_url = request.POST.get('feed')
-
-        try:
-            podcast = Podcast.objects.get(urls__url=podcast_url)
-        except Podcast.DoesNotExist:
-            messages.error(request, _('Podcast with URL "%s" does not exist' %
-                                      (podcast_url,)))
-            return HttpResponseRedirect(reverse('admin-unify-slugs-select'))
-
-        res = unify_slugs.delay(podcast)
-        return HttpResponseRedirect(reverse('admin-unify-slugs-status',
-                    args=[res.task_id]))
-
-
-class UnifySlugsStatus(AdminView):
-    """ Displays the status of the unify-slugs operation """
-
-    template_name = 'admin/task-status.html'
-
-    def get(self, request, task_id):
-        result = merge_podcasts.AsyncResult(task_id)
-
-        if not result.ready():
-            return self.render_to_response({
-                'ready': False,
-            })
-
-        # clear cache to make merge result visible
-        # TODO: what to do with multiple frontends?
-        cache.clear()
-
-        actions, podcast = result.get()
-
-        return self.render_to_response({
-            'ready': True,
-            'actions': actions.items(),
-            'podcast': podcast,
-        })
 
 
 class MakePublisherInput(AdminView):
