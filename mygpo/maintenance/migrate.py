@@ -156,7 +156,7 @@ def update_urls(old, new):
                                    scope=new.scope,
                                 )
             except IntegrityError as ie:
-                logger.warn('Could not create URL for %s: %s', new, ie)
+                logger.warn('Could not create URL for %s: %s', new, str(ie).decode('ascii', errors='replace'))
 
     with transaction.atomic():
         delete = [u.pk for u in existing_urls.values()]
