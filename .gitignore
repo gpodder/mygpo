@@ -19,3 +19,6 @@ venv
 
 # test coverage
 .coverage
+
+# envdirs
+envs
