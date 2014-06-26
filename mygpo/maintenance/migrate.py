@@ -47,7 +47,7 @@ def migrate_episode(e):
         'language': to_maxlength(Episode, 'language', e.language) if e.language is not None else None,
         'last_update': e.last_update,
         'outdated': e.outdated,
-        'mimetypes': ','.join(e.mimetypes),
+        'mimetypes': to_maxlength(Episode, 'mimetypes', ','.join(e.mimetypes)),
         'listeners': max(0, e.listeners) if e.listeners is not None else None,
         'content_types': ','.join(e.content_types),
         'flattr_url': to_maxlength(Episode, 'flattr_url', e.flattr_url) if e.flattr_url else None,

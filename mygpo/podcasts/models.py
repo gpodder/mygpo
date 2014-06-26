@@ -606,7 +606,7 @@ class Episode(UUIDModel, TitleModel, DescriptionModel, LinkModel,
     released = models.DateTimeField(null=True, db_index=True)
     duration = models.PositiveIntegerField(null=True)
     filesize = models.BigIntegerField(null=True)
-    mimetypes = models.CharField(max_length=100)
+    mimetypes = models.CharField(max_length=200)
     podcast = models.ForeignKey(Podcast, on_delete=models.PROTECT)
     listeners = models.PositiveIntegerField(null=True)
 
