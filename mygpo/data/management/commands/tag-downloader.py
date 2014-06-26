@@ -3,7 +3,6 @@ import urllib2
 from optparse import make_option
 
 from mygpo.decorators import repeat_on_conflict
-from mygpo.core.models import Podcast
 from mygpo.data import delicious
 from mygpo.maintenance.management.podcastcmd import PodcastCommand
 

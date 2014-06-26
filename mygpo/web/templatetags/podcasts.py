@@ -47,7 +47,7 @@ def podcast_status_icon(action):
 @register.filter
 def is_podcast(podcast):
     """ Returns True if the argument is a podcast (esp not a PodcastGroup) """
-    from mygpo.core.models import Podcast
+    from mygpo.podcasts.models import Podcast
     return isinstance(podcast, Podcast)
 
 
@@ -127,7 +127,7 @@ def podcast_group_link(podcast, title=None):
     automatically distringuishes between relational Podcast/PodcastGroup
     objects and CouchDB-based Podcast/PodcastGroup objects """
 
-    from mygpo.core.models import PodcastGroup
+    from mygpo.podcasts.models import PodcastGroup
 
     if isinstance(podcast, PodcastGroup):
         podcasts = list(podcast.podcasts)

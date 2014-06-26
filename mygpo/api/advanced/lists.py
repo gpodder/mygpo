@@ -34,7 +34,6 @@ from mygpo.api.advanced.directory import podcast_data
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.share.models import PodcastList
 from mygpo.api.basic_auth import require_valid_user, check_username
-from mygpo.core.models import Podcast as P
 from mygpo.decorators import allowed_methods, repeat_on_conflict, cors_origin
 from mygpo.api.simple import parse_subscription, format_podcast_list, \
      check_format
@@ -72,7 +71,7 @@ def create(request, username, format):
 
     urls = parse_subscription(request.body, format)
     podcasts = [Podcast.objects.get_or_create_for_url(url) for url in urls]
-    podcast_ids = map(P.get_id, podcasts)
+    podcast_ids = [podcast.id.hex for podcast in podcasts]
 
     plist = PodcastList()
     plist.created_timestamp = get_timestamp(datetime.utcnow())
@@ -174,7 +173,7 @@ def update_list(request, plist, owner, format):
 
     urls = parse_subscription(request.body, format)
     podcasts = [Podcast.objects.get_or_create_for_url(url) for url in urls]
-    podcast_ids = map(P.get_id, podcasts)
+    podcast_ids = [podcast.id.hex for podcast in podcasts]
 
     @repeat_on_conflict(['podcast_ids'])
     def _update(plist, podcast_ids):

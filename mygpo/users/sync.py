@@ -2,7 +2,8 @@ from collections import namedtuple
 
 from couchdbkit.ext.django.schema import *
 
-from mygpo.core.models import Podcast, SubscriptionException
+from mygpo.podcasts.models import Podcast
+from mygpo.core.models import SubscriptionException
 
 import logging
 logger = logging.getLogger(__name__)

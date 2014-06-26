@@ -8,7 +8,7 @@
 # to get all relevant classes, and an instantiated db object.
 #
 
-from mygpo.core.models import *
+from mygpo.podcasts.models import *
 from mygpo.users.models import *
 from mygpo.directory.models import *
 from mygpo.share.models import *

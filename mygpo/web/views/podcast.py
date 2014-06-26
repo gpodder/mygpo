@@ -11,8 +11,8 @@ from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control
 from django.shortcuts import get_object_or_404
 
-from mygpo.podcasts.models import Podcast
-from mygpo.core.models import PodcastGroup, SubscriptionException
+from mygpo.podcasts.models import Podcast, PodcastGroup
+from mygpo.core.models import SubscriptionException
 from mygpo.core.proxy import proxy_object
 from mygpo.core.tasks import flattr_thing
 from mygpo.utils import normalize_feed_url
@@ -59,7 +59,7 @@ def show(request, podcast):
         episodes = episodes[1:]
 
     if podcast.group:
-        group = PodcastGroup.get(podcast.group)
+        group = podcast.group
         rel_podcasts = filter(lambda x: x != podcast, group.podcasts)
     else:
         rel_podcasts = []

@@ -4,7 +4,6 @@ from django.utils.translation import ugettext as _
 from django.utils.html import strip_tags
 from django.contrib.staticfiles.storage import staticfiles_storage
 
-from mygpo.core.models import Episode
 from mygpo import utils
 from mygpo.data.mimetype import get_type, get_mimetype
 from mygpo.web.utils import get_episode_link_target
