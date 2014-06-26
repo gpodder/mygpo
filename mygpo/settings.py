@@ -148,6 +148,7 @@ INSTALLED_APPS = (
     'djcelery',
     'mygpo.core',
     'mygpo.podcasts',
+    'mygpo.search',
     'mygpo.users',
     'mygpo.api',
     'mygpo.web',
@@ -326,6 +327,12 @@ GOOGLE_CLIENT_SECRET=''
 
 # URL where users of the site can get support
 SUPPORT_URL=''
+
+
+# Elasticsearch settings
+
+ELASTICSEARCH_SERVER = os.getenv('ELASTICSEARCH_SERVER', '127.0.0.1:9200')
+ELASTICSEARCH_INDEX = os.getenv('ELASTICSEARCH_INDEX', 'mygpo')
 
 
 import sys
