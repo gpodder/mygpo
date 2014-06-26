@@ -1,6 +1,6 @@
 from itertools import chain, islice
 
-from mygpo.core.models import Podcast, PodcastGroup
+from mygpo.podcasts.models import Podcast, PodcastGroup
 from mygpo.core.proxy import proxy_object
 from mygpo.utils import sorted_chain
 
@@ -53,5 +53,5 @@ def individual_podcasts(pg):
             yield p
 
         elif isinstance(p, PodcastGroup):
-            for x in p.podcasts:
+            for x in p.podcast_set.all():
                 yield x
