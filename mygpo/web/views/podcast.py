@@ -12,7 +12,7 @@ from django.views.decorators.cache import never_cache, cache_control
 from django.shortcuts import get_object_or_404
 
 from mygpo.podcasts.models import Podcast, PodcastGroup
-from mygpo.core.models import SubscriptionException
+from mygpo.users.models import SubscriptionException
 from mygpo.core.proxy import proxy_object
 from mygpo.core.tasks import flattr_thing
 from mygpo.utils import normalize_feed_url

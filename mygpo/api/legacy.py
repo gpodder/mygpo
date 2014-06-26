@@ -25,7 +25,7 @@ from django.views.decorators.cache import never_cache
 from mygpo.podcasts.models import Podcast
 from mygpo.users.models import User
 from mygpo.api.opml import Importer, Exporter
-from mygpo.core.models import SubscriptionException
+from mygpo.users.models import SubscriptionException
 from mygpo.api.backend import get_device
 from mygpo.utils import normalize_feed_url
 from mygpo.db.couchdb.podcast_state import subscribe, unsubscribe

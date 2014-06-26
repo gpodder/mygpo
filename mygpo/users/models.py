@@ -36,6 +36,10 @@ class InvalidEpisodeActionAttributes(ValueError):
     """ raised when the attribues of an episode action fail validation """
 
 
+class SubscriptionException(Exception):
+    """ raised when a subscription can not be modified """
+
+
 class DeviceUIDException(Exception):
     pass
 

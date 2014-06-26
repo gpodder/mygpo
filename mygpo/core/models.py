@@ -27,10 +27,6 @@ MIN_UPDATE_INTERVAL = 5
 MAX_UPDATE_INTERVAL = 24 * 30
 
 
-class SubscriptionException(Exception):
-    pass
-
-
 class MergedIdException(Exception):
     """ raised when an object is accessed through one of its merged_ids """
 

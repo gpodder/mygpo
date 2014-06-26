@@ -4,7 +4,6 @@ from collections import Counter
 
 from couchdbkit import ResourceConflict
 
-from mygpo.core.models import SubscriptionException
 from mygpo.cel import celery
 from mygpo.db.couchdb.user import (suggestions_for_user, update_device_state,
     update_suggestions, )
@@ -17,6 +16,7 @@ logger = get_task_logger(__name__)
 @celery.task(max_retries=5, default_retry_delay=60)
 def sync_user(user):
     """ Syncs all of the user's device groups """
+    from mygpo.users.models import SubscriptionException
 
     for group in user.get_grouped_devices():
         if not group.is_synced:
