@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from mygpo.core.models import Podcast as P, Episode as E, PodcastGroup as G
 from django.contrib.contenttypes.models import ContentType
-from django.db import transaction, IntegrityError
+from django.db import transaction, IntegrityError, DataError
 from django.utils.text import slugify
 import json
 from datetime import datetime
@@ -28,7 +28,12 @@ def to_maxlength(cls, field, val):
 
 def migrate_episode(e):
 
-    podcast, created = Podcast.objects.get_or_create(id=e.podcast)
+    try:
+        podcast, created = Podcast.objects.get_or_create(id=e.podcast)
+    except DataError:
+        # some Episodes have an ID equal to the podcast's URL (not ID)
+        logger.exception('Error while getting/creating podcast stub')
+        return
 
     if created:
         logger.info('Created stub for podcast %s', e.podcast)
