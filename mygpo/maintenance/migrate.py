@@ -209,6 +209,8 @@ MIGRATIONS = {
     'PodcastSubscriberData': (None, None),
     'EmailMessage': (None, None),
     'ExamplePodcasts': (None, None),
+    'CommandStatus': (None, None),
+    'User': (None, None),
 }
 
 def migrate_change(c):
@@ -218,6 +220,7 @@ def migrate_change(c):
     cls, migrate = MIGRATIONS[doctype]
 
     if cls is None:
+        logger.warn("Skipping '%s'", doctype)
         return
 
     obj = cls.wrap(c['doc'])
