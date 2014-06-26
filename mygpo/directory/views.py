@@ -23,7 +23,7 @@ from feedservice.parse import FetchFeedException
 
 from mygpo.core.proxy import proxy_object
 from mygpo.podcasts.models import Podcast
-from mygpo.directory.search import search_podcasts
+from mygpo.search.index import search_podcasts
 from mygpo.web.utils import process_lang_params, get_language_names, \
          get_page_list, get_podcast_link_target, sanitize_language_codes
 from mygpo.directory.tags import Topics
@@ -191,8 +191,10 @@ def search(request, template='search.html', args={}):
         except ValueError:
             page = 1
 
-        results, total = search_podcasts(q=q, skip=RESULTS_PER_PAGE*(page-1))
-        num_pages = int(ceil(total / RESULTS_PER_PAGE))
+        start = RESULTS_PER_PAGE*(page-1)
+        results = search_podcasts(q)
+        num_pages = int(ceil(results.total / RESULTS_PER_PAGE))
+        results = results[start:start+RESULTS_PER_PAGE]
 
         page_list = get_page_list(1, num_pages, page, 15)
 
@@ -201,7 +203,8 @@ def search(request, template='search.html', args={}):
         q = None
         page_list = []
 
-    max_subscribers = max([p.subscriber_count() for p in results] + [0])
+    max_subscribers = max([p.subscribers for p in results] + [0])
+
     current_site = RequestSite(request)
 
     return render(request, template, dict(

@@ -1,22 +1,39 @@
 
 """ Contains code for indexing other objects """
 
-from pyes import ES
+from pyes import ES, QueryStringQuery, FunctionScoreQuery
 from pyes.exceptions import IndexAlreadyExistsException
 
 from django.conf import settings
+
+from mygpo.search.json import podcast_to_json
+from mygpo.search.models import PodcastResult
 
 import logging
 logger = logging.getLogger(__name__)
 
 
+def get_connection():
+    """ Create a connection from Django settings """
+    conn = ES(settings.ELASTICSEARCH_SERVER,
+              timeout=settings.ELASTICSEARCH_TIMEOUT)
+    return conn
+
+
 def index_podcast(sender, **kwargs):
-    print kwargs
+    """ Indexes a podcast """
+
+    conn = get_connection()
+    podcast = kwargs['instance']
+
+    document = podcast_to_json(podcast)
+    conn.index(document, settings.ELASTICSEARCH_INDEX,
+               'podcast', podcast.id.hex)
 
 
 def create_index():
     """ Creates the Elasticsearch index """
-    conn = ES(settings.ELASTICSEARCH_SERVER)
+    conn = get_connection()
 
     logger.info('Creating index %s' % settings.ELASTICSEARCH_INDEX)
     try:
@@ -25,3 +42,29 @@ def create_index():
     except IndexAlreadyExistsException as ex:
         logger.info(str(ex))
 
+
+def search_podcasts(query):
+    """ Search for podcasts according to 'query' """
+    conn = ES(settings.ELASTICSEARCH_SERVER)
+
+    # we have some "optimal" number of subscribers (eg the max)
+    # the farther we get from there, the lower the score
+    decay = FunctionScoreQuery.DecayFunction(
+            decay_function='gauss',
+            field='subscribers',
+            origin=2000,
+            scale=1000,
+            decay=.3,
+        )
+    # workaround for https://github.com/aparo/pyes/pull/418
+    decay._internal_name = 'gauss'
+
+    q = FunctionScoreQuery(
+        query=QueryStringQuery(query),
+        functions=[decay],
+        boost_mode=FunctionScoreQuery.BoostModes.MULTIPLY,
+    )
+    results = conn.search(query=q, indices=settings.ELASTICSEARCH_INDEX,
+                          doc_types='podcast',
+                          model=lambda conn, doc: PodcastResult.from_doc(doc))
+    return results

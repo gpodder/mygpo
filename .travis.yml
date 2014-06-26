@@ -6,6 +6,7 @@ python:
 services:
  - couchdb
  - redis-server
+ - elasticsearch
 
 install:
  - pip install -r requirements.txt --allow-external argparse

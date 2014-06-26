@@ -38,7 +38,7 @@ from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.directory.models import ExamplePodcasts
 from mygpo.api.advanced.directory import podcast_data
-from mygpo.directory.search import search_podcasts
+from mygpo.search.index import search_podcasts
 from mygpo.decorators import allowed_methods, cors_origin
 from mygpo.utils import parse_range, normalize_feed_url
 from mygpo.core.json import json, JSONDecodeError
@@ -130,7 +130,7 @@ def format_podcast_list(obj_list, format, title, get_podcast=None,
     """
 
     def default_get_podcast(p):
-        return p.get_podcast()
+        return p
 
     get_podcast = get_podcast or default_get_podcast
 
@@ -304,7 +304,7 @@ def search(request, format):
     if not query:
         return HttpResponseBadRequest('/search.opml|txt|json?q={query}')
 
-    results, total = search_podcasts(q=query, limit=NUM_RESULTS)
+    results = search_podcasts(query)[:NUM_RESULTS]
 
     title = _('gpodder.net - Search')
     domain = RequestSite(request).domain
