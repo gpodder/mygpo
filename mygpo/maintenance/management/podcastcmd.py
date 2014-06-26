@@ -6,7 +6,6 @@ from django.core.management.base import BaseCommand
 
 from mygpo.core.podcasts import individual_podcasts
 from mygpo.podcasts.models import Podcast
-from mygpo.directory.toplist import PodcastToplist
 
 
 class PodcastCommand(BaseCommand):
@@ -69,5 +68,5 @@ class PodcastCommand(BaseCommand):
 
 
     def get_toplist(self, max_podcasts=100):
-        toplist = PodcastToplist()
+        toplist = Podcast.objects.all().toplist()
         return individual_podcasts(p for i, p in toplist[:max_podcasts])

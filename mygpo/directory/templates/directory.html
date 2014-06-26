@@ -117,36 +117,6 @@
   {% endfor %}
  {% endcache %}
 
-
-  {% cache 3600 directory_trending %}
-  {% if trending_podcasts %}
-   {% with trending_podcasts|slice:":1"|first as trending_podcast %}
-    {% if trending_podcast %}
-    <div class="well">
-
-     <h4><small>{% trans "Trending" %} {% subscriber_change trending_podcast.subscriber_change %}</small></h4>
-
-     <a href="{% podcast_link_target trending_podcast %}">
-      <div id="podcastlogo">{{ trending_podcast|podcast_logo_medium }}</div>
-     </a>
-
-     <h4>{{ trending_podcast.title }}</h4>
-
-     <p class="description">
-      {{ trending_podcast.description|default:""|truncatewords:"50" }}
-     </p>
-
-     <p>
-      <a href="{% podcast_link_target trending_podcast %}">{% trans "more..." %}</a>
-     </p>
-
-    </div>
-    {% endif %}
-   {% endwith %}
-  {% endif %}
-  {% endcache %}
-
-
   {% cache 3600 random_podcast_box %}
    <div class="well">
 

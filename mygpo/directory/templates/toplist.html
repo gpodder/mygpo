@@ -26,7 +26,7 @@
     <th>{% trans "Podcast" %}</th>
     <th>{% trans "Subscribers" %}</th>
    </tr>
-  {% for oldpos, podcast in entries %}
+  {% for podcast in entries %}
    <tr>
     <td class="numeric toplist-pos">
      {% ifchanged podcast.subscriber_count %}
@@ -34,13 +34,6 @@
      {% endifchanged %}
     </td>
     <td class="oldposition">
-     {% if oldpos %}
-      {% if oldpos|subtract:forloop.counter %}
-       {{ oldpos|subtract:forloop.counter|format_diff }}
-      {% endif %}
-     {% else %}
-      <img src="{% static "charts-new.png" %}" alt="new">
-     {% endif %}
     </td>
     <td class="logo">{{ podcast|podcast_logo }}</td>
     <td>

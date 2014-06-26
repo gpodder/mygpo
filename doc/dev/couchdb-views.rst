@@ -67,27 +67,6 @@ Doc-Types: Podcast, PodcastGroup
 * `tags/by_podcast <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/tags/views/by_podcast>`_
 
 
-Toplists
-^^^^^^^^
-
-Doc-Types: Episode, Podcast, PodcastGroup
-
-**Views**
-
-* `toplist/episodes <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/toplist/views/episodes>`_
-* `toplist/podcasts <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/toplist/views/podcasts>`_
-
-
-Trending
-^^^^^^^^
-
-Doc-Types: Podcast, PodcastGroup
-
-**Views**
-
-* `trending/podcasts <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/trending/views/podcasts>`_
-
-
 Users
 ^^^^^
 

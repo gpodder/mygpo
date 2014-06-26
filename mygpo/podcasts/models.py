@@ -395,6 +395,13 @@ class PodcastQuerySet(MergedUUIDQuerySet):
         q = self.extra(select={'next_update': NEXTUPDATE})
         return q.order_by('next_update')
 
+    def toplist(self, language=None):
+        toplist = self
+        if language:
+            toplist = toplist.filter(language=language)
+
+        return toplist.order_by('-subscribers')
+
 
 class PodcastManager(GenericManager):
     """ Manager for the Podcast model """
@@ -566,7 +573,13 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
 
 class EpisodeQuerySet(MergedUUIDQuerySet):
     """ QuerySet for Episodes """
-    pass
+
+    def toplist(self, language=None):
+        toplist = self
+        if language:
+            toplist = toplist.filter(language=language)
+
+        return toplist.order_by('-listeners')
 
 
 class EpisodeManager(GenericManager):

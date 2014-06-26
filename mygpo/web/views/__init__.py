@@ -38,7 +38,6 @@ from django.views.decorators.cache import never_cache, cache_control
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core.podcasts import PodcastSet
 from mygpo.podcasts.models import Podcast
-from mygpo.directory.toplist import PodcastToplist
 from mygpo.users.models import History, HistoryEntry, DeviceDoesNotExist
 from mygpo.users.tasks import update_suggestions
 from mygpo.web.utils import process_lang_params
@@ -68,7 +67,7 @@ def welcome(request):
 
     lang = process_lang_params(request)
 
-    toplist = PodcastToplist(lang)
+    toplist = Podcast.objects.all().toplist(lang)
 
     return render(request, 'home.html', {
           'url': current_site,

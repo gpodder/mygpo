@@ -23,8 +23,6 @@ from feedservice.parse import FetchFeedException
 
 from mygpo.core.proxy import proxy_object
 from mygpo.podcasts.models import Podcast
-from mygpo.directory.toplist import PodcastToplist, EpisodeToplist, \
-         TrendingPodcasts
 from mygpo.directory.search import search_podcasts
 from mygpo.web.utils import process_lang_params, get_language_names, \
          get_page_list, get_podcast_link_target, sanitize_language_codes
@@ -78,11 +76,10 @@ class PodcastToplistView(ToplistView):
     def get_context_data(self, num=100):
         context = super(PodcastToplistView, self).get_context_data()
 
-        toplist = PodcastToplist(self.language())
-        entries = toplist[:num]
+        entries = Podcast.objects.all().toplist(self.language())[:num]
         context['entries'] = entries
 
-        context['max_subscribers'] = max([0] + [p.subscriber_count() for (oldp, p) in entries])
+        context['max_subscribers'] = max([0] + [p.subscriber_count() for p in entries])
 
         return context
 
@@ -95,8 +92,7 @@ class EpisodeToplistView(ToplistView):
     def get_context_data(self, num=100):
         context = super(EpisodeToplistView, self).get_context_data()
 
-        toplist = EpisodeToplist(language=self.language())
-        entries = list(map(proxy_object, toplist[:num]))
+        entries = Episode.objects.all().toplist(self.language())[:num]
 
         # load podcast objects
         podcast_ids = [e.podcast for e in entries]
@@ -137,7 +133,6 @@ class Directory(View):
 
             # evaluated lazyly, cached by template
             'topics': Topics(),
-            'trending_podcasts': TrendingPodcasts(''),
             'podcastlists': self.get_random_list(),
             'random_podcast': Podcast.objects.random().first(),
             })

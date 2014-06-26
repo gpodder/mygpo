@@ -36,7 +36,6 @@ from mygpo.core import models
 from mygpo.podcasts.models import Podcast
 from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
-from mygpo.directory.toplist import PodcastToplist
 from mygpo.directory.models import ExamplePodcasts
 from mygpo.api.advanced.directory import podcast_data
 from mygpo.directory.search import search_podcasts
@@ -244,8 +243,7 @@ def set_subscriptions(urls, user, device_uid, user_agent):
 def toplist(request, count, format):
     count = parse_range(count, 1, 100, 100)
 
-    toplist = PodcastToplist()
-    entries = toplist[:count]
+    entries = Podcast.objects.all().toplist()[:count]
     domain = RequestSite(request).domain
 
     try:

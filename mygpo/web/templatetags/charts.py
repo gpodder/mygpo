@@ -27,19 +27,6 @@ def vertical_bar(value, max_value, display=None):
     return s
 
 @register.filter
-def format_diff(value):
-    if value > 1:
-        s = '<img src="%s" title="+%s">' % \
-            (staticfiles_storage.url('better.png'), value)
-    elif value < -1:
-        s = '<img src="%s" title="%s">' % \
-            (staticfiles_storage.url('worse.png'), value)
-    else:
-        s = ''
-
-    return mark_safe(s)
-
-@register.filter
 def timeline(data):
     s = '<script type="text/javascript" src="//www.google.com/jsapi"></script>\n'
     s += '<script type="text/javascript">\n'
