@@ -137,13 +137,13 @@ def format_podcast_list(obj_list, format, title, get_podcast=None,
     if format == 'txt':
         podcasts = map(get_podcast, obj_list)
         s = '\n'.join([p.url for p in podcasts] + [''])
-        return HttpResponse(s, mimetype='text/plain')
+        return HttpResponse(s, content_type='text/plain')
 
     elif format == 'opml':
         podcasts = map(get_podcast, obj_list)
         exporter = Exporter(title)
         opml = exporter.generate(podcasts)
-        return HttpResponse(opml, mimetype='text/xml')
+        return HttpResponse(opml, content_type='text/xml')
 
     elif format == 'json':
         objs = map(json_map, obj_list)
@@ -233,7 +233,7 @@ def set_subscriptions(urls, user, device_uid, user_agent):
                 )
 
     # Only an empty response is a successful response
-    return HttpResponse('', mimetype='text/plain')
+    return HttpResponse('', content_type='text/plain')
 
 
 @check_format
