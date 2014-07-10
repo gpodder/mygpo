@@ -2,7 +2,7 @@
 """ Contains code for indexing other objects """
 
 from pyes import ES, QueryStringQuery, FunctionScoreQuery
-from pyes.exceptions import IndexAlreadyExistsException
+from pyes.exceptions import IndexAlreadyExistsException, NoServerAvailable
 
 from django.conf import settings
 
@@ -25,10 +25,15 @@ def index_podcast(sender, **kwargs):
 
     conn = get_connection()
     podcast = kwargs['instance']
+    logger.info('Indexing podcast %s', podcast)
 
     document = podcast_to_json(podcast)
-    conn.index(document, settings.ELASTICSEARCH_INDEX,
-               'podcast', podcast.id.hex)
+
+    try:
+        conn.index(document, settings.ELASTICSEARCH_INDEX,
+                   'podcast', podcast.id.hex)
+    except NoServerAvailable:
+        logger.exception('Indexing podcast failed')
 
 
 def create_index():
