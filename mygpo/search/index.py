@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 def get_connection():
     """ Create a connection from Django settings """
-    conn = ES(settings.ELASTICSEARCH_SERVER,
+    conn = ES([settings.ELASTICSEARCH_SERVER],
               timeout=settings.ELASTICSEARCH_TIMEOUT)
     return conn
 
