@@ -610,7 +610,7 @@ class User(BaseUser, SyncedDevicesMixin, SettingsMixin):
         from mygpo.db.couchdb.podcast_state import get_subscribed_podcast_states_by_user
         states = get_subscribed_podcast_states_by_user(self, public)
         podcast_ids = [state.podcast for state in states]
-        podcasts = Podcast.objects.get(id__in=podcast_ids)
+        podcasts = Podcast.objects.filter(id__in=podcast_ids)
         podcasts = {podcast.id: podcast for podcast in podcasts}
 
         for state in states:
