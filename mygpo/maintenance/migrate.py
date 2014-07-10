@@ -95,7 +95,7 @@ def migrate_podcast(p):
         'hub': p.hub,
         'content_types': ','.join(p.content_types),
         'restrictions': ','.join(p.restrictions),
-        'twitter': getattr(p, 'twitter', None),
+        'twitter': to_maxlength(Podcast, 'twitter', getattr(p, 'twitter', None)) if getattr(p, 'twitter', None) else None,
         'group_member_name': p.group_member_name,
         'update_interval': p.update_interval,
         'subscribers': podcast_subscriber_count(p),
