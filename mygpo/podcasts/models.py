@@ -376,7 +376,14 @@ class PodcastQuerySet(MergedUUIDQuerySet):
 
         Excludes podcasts with missing title to guarantee some
         minimum quality of the results """
-        return self.exclude(title='').order_by('?')
+
+        # Using PostgreSQL's RANDOM() is very expensive, so we're generating a
+        # random uuid and query podcasts with a higher ID
+        # This returns podcasts in order of their ID, but the assumption is
+        # that usually only one podcast will be required anyway
+        import uuid
+        ruuid = uuid.uuid1()
+        return self.exclude(title='').filter(id__gt=ruuid)
 
     def flattr(self):
         """ Podcasts providing Flattr information """

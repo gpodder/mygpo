@@ -49,7 +49,7 @@ class PodcastCommand(BaseCommand):
             yield (p.url for p in podcasts)
 
         if options.get('random'):
-            podcasts = Podcast.objects.random()
+            podcasts = random_podcasts()
             yield (p.url for p in individual_podcasts(podcasts))
 
         if options.get('next'):
@@ -70,3 +70,8 @@ class PodcastCommand(BaseCommand):
     def get_toplist(self, max_podcasts=100):
         toplist = Podcast.objects.all().toplist()
         return individual_podcasts(p for i, p in toplist[:max_podcasts])
+
+
+def random_podcasts():
+    while True:
+        yield Podcast.objects.all().random().first()

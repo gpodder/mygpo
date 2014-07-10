@@ -133,11 +133,13 @@ def dashboard(request, episode_count=10):
     show_install_reader = \
                 'firefox' in request.META.get('HTTP_USER_AGENT', '').lower()
 
+    random_podcast = Podcast.objects.all().random().prefetch_related('slugs').first()
+
     return render(request, 'dashboard.html', {
             'user': request.user,
             'subscribed_podcasts': subscribed_podcasts,
             'newest_episodes': list(newest_episodes),
-            'random_podcast': Podcast.objects.random().first(),
+            'random_podcast': random_podcast,
             'checklist': checklist,
             'site': site,
             'show_install_reader': show_install_reader,
