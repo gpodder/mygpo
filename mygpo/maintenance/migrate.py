@@ -211,11 +211,18 @@ MIGRATIONS = {
     'ExamplePodcasts': (None, None),
     'CommandStatus': (None, None),
     'User': (None, None),
+    'Suggestions': (None, None),
 }
 
 def migrate_change(c):
     logger.info('Migrate seq %s', c['seq'])
-    doctype = c['doc']['doc_type']
+    doc = c['doc']
+
+    if not 'doc_type' in doc:
+        logger.warn('Document contains no doc_type: %r', doc)
+        return
+
+    doctype = doc['doc_type']
 
     cls, migrate = MIGRATIONS[doctype]
 
@@ -223,7 +230,7 @@ def migrate_change(c):
         logger.warn("Skipping '%s'", doctype)
         return
 
-    obj = cls.wrap(c['doc'])
+    obj = cls.wrap(doc)
     migrate(obj)
 
 
