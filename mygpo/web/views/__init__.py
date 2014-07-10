@@ -36,8 +36,7 @@ from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control
 
 from mygpo.decorators import repeat_on_conflict
-from mygpo.core.podcasts import PodcastSet
-from mygpo.podcasts.models import Podcast
+from mygpo.podcasts.models import Podcast, Episode
 from mygpo.users.models import History, HistoryEntry, DeviceDoesNotExist
 from mygpo.users.tasks import update_suggestions
 from mygpo.web.utils import process_lang_params
@@ -121,9 +120,12 @@ def dashboard(request, episode_count=10):
 
     tomorrow = datetime.today() + timedelta(days=1)
 
-    podcasts = PodcastSet(subscribed_podcasts)
+    newest_episodes = Episode.objects.filter(podcast__in=subscribed_podcasts,
+                                             released__lt=tomorrow).\
+                                      prefetch_related('podcast', 'slugs',
+                                                       'podcast__slugs').\
+                                      order_by('-released')[:episode_count]
 
-    newest_episodes = podcasts.get_newest_episodes(tomorrow, episode_count)
 
     # we only show the "install reader" link in firefox, because we don't know
     # yet how/if this works in other browsers.
