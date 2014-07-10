@@ -122,7 +122,8 @@ def dashboard(request, episode_count=10):
 
     newest_episodes = Episode.objects.filter(podcast__in=subscribed_podcasts,
                                              released__lt=tomorrow).\
-                                      prefetch_related('podcast', 'slugs',
+                                      select_related('podcast').\
+                                      prefetch_related('slugs',
                                                        'podcast__slugs').\
                                       order_by('-released')[:episode_count]
 
