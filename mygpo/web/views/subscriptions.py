@@ -121,7 +121,7 @@ def subscriptions_feed(request, username):
     f = SubscriptionsFeed(username)
     obj = f.get_object(request, username)
     feedgen = f.get_feed(obj, request)
-    response = HttpResponse(mimetype=feedgen.mime_type)
+    response = HttpResponse(content_type=feedgen.mime_type)
     feedgen.write(response, 'utf-8')
     return response
 
