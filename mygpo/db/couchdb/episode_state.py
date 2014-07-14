@@ -414,6 +414,8 @@ def get_heatmap(podcast_id, episode_id, user_id):
             group_level = group_level,
             stale       = 'update_after',
         )
+    # TODO: Heatmap not available during transition to Django ORM
+    r = False
 
     if not r:
         return [], []
