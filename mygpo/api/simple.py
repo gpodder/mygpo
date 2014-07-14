@@ -260,15 +260,8 @@ def toplist(request, count, format):
         return podcast.get_podcast()
 
     def json_map(t):
-        old_pos, podcast = t
-        podcast.old_pos = old_pos
-
+        podcast = t
         p = podcast_data(podcast, domain, scale)
-        p.update(dict(
-            subscribers           = podcast.subscriber_count(),
-            subscribers_last_week = podcast.prev_subscriber_count(),
-            position_last_week    = podcast.old_pos,
-        ))
         return p
 
     title = _('gpodder.net - Top %(count)d') % {'count': len(entries)}

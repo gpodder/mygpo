@@ -30,6 +30,7 @@ from django.views.decorators.cache import never_cache
 from django.utils.decorators import method_decorator
 from django.views.generic.base import View
 
+from mygpo.podcasts.models import Episode
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.advanced import clean_episode_action_data
 from mygpo.api.advanced.directory import episode_data, podcast_data
@@ -127,7 +128,7 @@ class DeviceUpdates(View):
         """ Returns the episode updates since the timestamp """
 
         episodes = Episode.objects.filter(podcast__in=subscribed_podcasts,
-                                          release__gt=since)[:max_per_podcast]
+                                          released__gt=since)[:max_per_podcast]
 
         e_actions = chain.from_iterable(get_podcasts_episode_states(p,
                 user._id) for p in subscribed_podcasts)
@@ -135,7 +136,7 @@ class DeviceUpdates(View):
         # TODO: get_podcasts_episode_states could be optimized by returning
         # only actions within some time frame
 
-        e_status = { e._id: EpisodeStatus(e, 'new', None) for e in episodes}
+        e_status = { e.id.hex: EpisodeStatus(e, 'new', None) for e in episodes}
 
         for action in e_actions:
             e_id = action['episode_id']

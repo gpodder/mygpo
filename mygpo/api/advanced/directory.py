@@ -102,9 +102,9 @@ def podcast_data(obj, domain, scaled_logo_size=64):
     if obj is None:
         raise ValueError('podcast should not be None')
 
-    podcast = obj.get_podcast()
-    subscribers = obj.subscriber_count()
-    last_subscribers = obj.prev_subscriber_count()
+    podcast = obj
+    subscribers = podcast.subscribers
+    last_subscribers = podcast.subscribers
 
     scaled_logo_url = get_logo_url(obj, scaled_logo_size)
 
