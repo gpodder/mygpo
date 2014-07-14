@@ -293,14 +293,18 @@ def episode_state_for_ref_urls(user, podcast_url, episode_url):
 
 
 def get_episode_actions(user_id, since=None, until={}, podcast_id=None,
-           device_id=None):
-    """ Returns Episode Actions for the given criteria"""
+           device_id=None, limit=1000):
+    """ Returns Episode Actions for the given criteria
+
+    There is an upper limit on how many actions will be returned; until is the
+    timestamp of the last episode action.
+    """
 
     if not user_id:
         raise QueryParameterMissing('user_id')
 
     if since >= until:
-        return []
+        return [], until
 
     if not podcast_id and not device_id:
         view = 'episode_actions/by_user'
@@ -325,10 +329,17 @@ def get_episode_actions(user_id, since=None, until={}, podcast_id=None,
     udb = get_userdata_database()
     res = udb.view(view,
             startkey = startkey,
-            endkey   = endkey
+            endkey   = endkey,
+            limit    = limit,
         )
 
-    return map(lambda r: r['value'], res)
+    results = list(res)
+    actions = map(lambda r: r['value'], results)
+    if actions:
+        # the upload_timestamp is always the last part of the key
+        until = results[-1]['key'][-1]
+
+    return actions, until
 
 
 
