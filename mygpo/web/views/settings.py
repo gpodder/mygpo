@@ -252,8 +252,9 @@ def privacy(request):
     site = RequestSite(request)
 
     subscriptions = subscriptions_by_user(request.user)
-    podcasts = Podcast.objects.filter(id__in=[x[1] for x in subscriptions])
-    podcasts = {podcast.id: podcast for podcast in podcast}
+    podcast_ids = [x[1] for x in subscriptions]
+    podcasts = Podcast.objects.filter(id__in=podcast_ids).prefetch_related('slugs')
+    podcasts = {podcast.id.hex: podcast for podcast in podcasts}
 
     subs = set((podcasts.get(x[1], None), not x[0]) for x in subscriptions)
     subs = sorted(subs, key=lambda (p, _): PODCAST_SORT(p))

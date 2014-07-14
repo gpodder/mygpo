@@ -11,7 +11,7 @@ from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control
 from django.shortcuts import get_object_or_404
 
-from mygpo.podcasts.models import Podcast, PodcastGroup
+from mygpo.podcasts.models import Podcast, PodcastGroup, Episode
 from mygpo.users.models import SubscriptionException
 from mygpo.core.proxy import proxy_object
 from mygpo.core.tasks import flattr_thing
@@ -25,7 +25,8 @@ from mygpo.web.utils import get_podcast_link_target, get_page_list, \
     check_restrictions
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast, \
          add_subscription_action, add_podcast_tags, remove_podcast_tags, \
-         set_podcast_privacy_settings, subscribe, unsubscribe
+         set_podcast_privacy_settings, subscribe as subscribe_podcast, \
+         unsubscribe as unsubscribe_podcast
 from mygpo.db.couchdb.episode_state import get_podcasts_episode_states, \
          episode_listener_counts
 from mygpo.db.couchdb.directory import tags_for_user, tags_for_podcast
@@ -60,7 +61,7 @@ def show(request, podcast):
 
     if podcast.group:
         group = podcast.group
-        rel_podcasts = filter(lambda x: x != podcast, group.podcasts)
+        rel_podcasts = group.podcast_set.exclude(pk=podcast.pk)
     else:
         rel_podcasts = []
 
@@ -143,7 +144,7 @@ def episode_list(podcast, user, offset=0, limit=None):
     """
 
     listeners = dict(episode_listener_counts(podcast))
-    episodes = podcast.episode_set.all()
+    episodes = Episode.objects.filter(podcast=podcast).all().by_released()
     episodes = episodes.prefetch_related('slugs')[offset:limit]
 
     if user.is_authenticated():
@@ -197,8 +198,7 @@ def all_episodes(request, podcast, page_size=20):
 
     user = request.user
 
-    episodes = episode_list(podcast, user, (page-1) * page_size,
-            page_size)
+    episodes = episode_list(podcast, user, (page-1) * page_size, page_size)
     episodes_total = podcast.episode_count or 0
     num_pages = episodes_total / page_size
     page_list = get_page_list(1, num_pages, page, 15)
@@ -279,7 +279,7 @@ def subscribe(request, podcast):
         for uid in device_uids:
             try:
                 device = request.user.get_device_by_uid(uid)
-                subscribe(podcast, request.user, device)
+                subscribe_podcast(podcast, request.user, device)
 
             except (SubscriptionException, DeviceDoesNotExist, ValueError) as e:
                 messages.error(request, str(e))
@@ -306,7 +306,7 @@ def subscribe_all(request, podcast):
     devs = [dev[0] if isinstance(dev, list) else dev for dev in devs]
 
     try:
-        subscribe(podcast, user, devs)
+        subscribe_podcast(podcast, user, devs)
     except (SubscriptionException, DeviceDoesNotExist, ValueError) as e:
         messages.error(request, str(e))
 
@@ -330,7 +330,7 @@ def unsubscribe(request, podcast, device_uid):
         return HttpResponseRedirect(return_to)
 
     try:
-        unsubscribe(podcast, request.user, device)
+        unsubscribe_podcast(podcast, request.user, device)
     except SubscriptionException as e:
         logger.exception('Web: %(username)s: could not unsubscribe from podcast %(podcast_url)s on device %(device_id)s' %
             {'username': request.user.username, 'podcast_url': podcast.url, 'device_id': device.id})
@@ -353,7 +353,7 @@ def unsubscribe_all(request, podcast):
     devs = [dev[0] if isinstance(dev, list) else dev for dev in devs]
 
     try:
-        unsubscribe(podcast, user, devs)
+        unsubscribe_podcast(podcast, user, devs)
     except (SubscriptionException, DeviceDoesNotExist, ValueError) as e:
         messages.error(request, str(e))
 
@@ -420,8 +420,11 @@ def slug_decorator(f):
     @wraps(f)
     def _decorator(request, slug, *args, **kwargs):
 
-        podcast = Podcast.objects.filter(slugs__slug=slug)
-        podcast = podcast.prefetch_related('slugs', 'urls').get()
+        try:
+            podcast = Podcast.objects.filter(slugs__slug=slug)
+            podcast = podcast.prefetch_related('slugs', 'urls').get()
+        except Podcast.DoesNotExist:
+            raise Http404
 
         # redirect when a non-cannonical slug is used
         if slug != podcast.slug:
@@ -437,9 +440,14 @@ def id_decorator(f):
     def _decorator(request, podcast_id, *args, **kwargs):
 
         try:
-            podcast = Podcast.objects.get(id=podcast_id)
+            podcast = Podcast.objects.filter(id=podcast_id)
+            podcast = podcast.prefetch_related('slugs', 'urls').get()
+
+            # if the podcast has a slug, redirect to its canonical URL
+            if podcast.slug:
+                return HttpResponseRedirect(get_podcast_link_target(podcast))
+
             return f(request, podcast, *args, **kwargs)
-            # TODO: redirect to Slug URL?
 
         except Podcast.DoesNotExist:
             podcast = get_object_or_404(Podcast, merged_uuids__uuid=podcast_id)

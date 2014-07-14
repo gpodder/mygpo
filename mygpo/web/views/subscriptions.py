@@ -89,7 +89,7 @@ def create_subscriptionlist(request):
     device_ids = list(set(device_ids))
 
     podcasts = Podcast.objects.filter(id__in=podcast_ids)
-    podcasts = {podcast.id: podcast for podcast in podcasts}
+    podcasts = {podcast.id.hex: podcast for podcast in podcasts}
     devices = user.get_devices_by_id(device_ids)
 
     subscription_list = {}

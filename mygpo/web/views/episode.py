@@ -39,8 +39,7 @@ from mygpo.utils import parse_time, get_timestamp
 from mygpo.users.settings import FLATTR_TOKEN
 from mygpo.web.heatmap import EpisodeHeatmap
 from mygpo.publisher.utils import check_publisher_permission
-from mygpo.web.utils import get_episode_link_target, fetch_episode_data, \
-    check_restrictions
+from mygpo.web.utils import get_episode_link_target, check_restrictions
 from mygpo.db.couchdb.episode_state import favorite_episode_ids_for_user, \
          chapters_for_episode, set_episode_favorite
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
@@ -70,12 +69,12 @@ def episode(request, episode):
 
         # pre-populate data for fetch_data
         podcasts_dict = {podcast.get_id(): podcast}
-        episodes_dict = {episode._id: episode}
+        episodes_dict = {episode.id.hex: episode}
 
         has_history = bool(list(episode_state.get_history_entries()))
 
         played_parts = EpisodeHeatmap(podcast.get_id(),
-                episode._id, user._id, duration=episode.duration)
+                episode.id, user._id, duration=episode.duration)
 
         devices = dict( (d.id, d.name) for d in user.devices )
         can_flattr = user.get_wksetting(FLATTR_TOKEN) and episode.flattr_url
@@ -159,17 +158,15 @@ def list_favorites(request):
     site = RequestSite(request)
 
     favorite_ids = favorite_episode_ids_for_user(user)
-    favorites = Episode.objects.get(id__in=favorite_ids)
+    favorites = Episode.objects.filter(id__in=favorite_ids)\
+                               .select_related('podcast')\
+                               .prefetch_related('slugs', 'podcast__slugs')
 
     recently_listened_ids = get_latest_episode_ids(user)
-    recently_listened = Episode.objects.filter(id__in=recently_listened_ids)
-
-    podcast_ids = [episode.podcast for episode in episodes + recently_listened]
-    podcasts = Podcast.objects.filter(id__in=podcast_ids)
-    podcasts = {podcast.id: podcast for podcast in podcasts}
-
-    recently_listened = fetch_episode_data(recently_listened, podcasts=podcasts)
-    episodes = fetch_episode_data(episodes, podcasts=podcasts)
+    recently_listened = Episode.objects.filter(id__in=recently_listened_ids)\
+                                       .select_related('podcast')\
+                                       .prefetch_related('slugs',
+                                                         'podcast__slugs')
 
     favfeed = FavoriteFeed(user)
     feed_url = favfeed.get_public_url(site.domain)
@@ -254,8 +251,12 @@ def slug_decorator(f):
 
         query = Episode.objects.filter(slugs__slug=e_slug,
                                        podcast__slugs__slug=p_slug)
-        episode = query.prefetch_related('urls', 'slugs', 'podcast',
-                                         'podcast__slugs').get()
+
+        try:
+            episode = query.prefetch_related('urls', 'slugs', 'podcast',
+                                             'podcast__slugs').get()
+        except Episode.DoesNotExist:
+            raise Http404
 
         # redirect when Id or a merged (non-cannonical) slug is used
         if episode.slug and episode.slug != e_slug:
@@ -274,7 +275,7 @@ def id_decorator(f):
 
         query = Episode.objects.filter(id=e_id,
                                        podcast_id=p_id)
-        episode = query.selected_related('podcast').get()
+        episode = query.select_related('podcast').get()
 
         if episode is None:
             raise Http404

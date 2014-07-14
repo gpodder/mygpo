@@ -203,8 +203,7 @@ def get_episode_link_target(episode, podcast, view_name='episode',
 def fetch_episode_data(episodes, podcasts={}):
 
     if not podcasts:
-        podcast_ids = [episode.podcast for episode in episodes]
-        podcasts = Podcast.objects.filter(id__in=podcast_ids)
+        podcasts = [episode.podcast for episode in episodes]
         podcasts = {podcast.id: podcast for podcast in podcasts}
 
     def set_podcast(episode):

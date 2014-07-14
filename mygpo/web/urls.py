@@ -14,7 +14,7 @@ urlpatterns = patterns('mygpo.web.views',
  url(r'^history/$',                                               'history',       name='history'),
  url(r'^suggestions/$',                                           'suggestions',   name='suggestions'),
  url(r'^suggestions/rate$',                                       'rate_suggestions', name='suggestions-rate'),
- url(r'^suggestions/blacklist/(?P<slug_id>[\w-]+)$',              'blacklist',     name='suggestions-blacklist-slug-id'),
+ url(r'^suggestions/blacklist/(?P<slug>[\w-]+)$',                 'blacklist',     name='suggestions-blacklist-slug'),
  url(r'^tags/',                                                   'mytags',        name='tags'),
 
  url(r'^online-help',
