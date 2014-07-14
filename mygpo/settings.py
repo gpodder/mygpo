@@ -16,6 +16,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+import sys
 import os.path
 import dj_database_url
 
