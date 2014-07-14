@@ -59,7 +59,7 @@ def is_list(obj):
 @register.filter
 def markdown(txt):
     import markdown2
-    html = markdown2.markdown(txt)
+    html = markdown2.markdown(txt, extras={'nofollow': True})
     return mark_safe(html)
 
 
