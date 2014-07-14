@@ -14,7 +14,7 @@ from django.core.cache import cache
 
 from django_couchdb_utils.registration.models import User as BaseUser
 
-from mygpo.podcasts.models import Podcast
+from mygpo.podcasts.models import Podcast, Episode
 from mygpo.utils import linearize
 from mygpo.core.proxy import DocumentABCMeta, proxy_object
 from mygpo.decorators import repeat_on_conflict
@@ -66,7 +66,9 @@ class Suggestions(Document, RatingMixin):
         ids = filter(lambda x: not x in self.blacklist + subscriptions, self.podcasts)
         if count:
             ids = ids[:count]
-        return filter(lambda x: x and x.title, Podcast.objects.filter(id__in=ids))
+
+        podcasts = Podcast.objects.filter(id__in=ids).prefetch_related('slugs')
+        return filter(lambda x: x and x.title, podcasts)
 
 
     def __repr__(self):
@@ -736,7 +738,9 @@ class User(BaseUser, SyncedDevicesMixin, SettingsMixin):
 
             # fetch and merge episodes for the next podcast
             # TODO: max_per_podcast
-            new_episodes = podcast.episode_set.filter(release__isnull=False, released__lt=max_date)[:max_per_podcast]
+            new_episodes = podcast.episode_set.filter(release__isnull=False,
+                                                      released__lt=max_date)
+            new_episodes = new_episodes[:max_per_podcast]
             episodes = sorted(episodes+new_episodes, key=cmp_key, reverse=True)
 
 
@@ -819,15 +823,19 @@ class HistoryEntry(object):
             # load podcast data
             podcast_ids = [getattr(x, 'podcast_id', None) for x in entries]
             podcast_ids = filter(None, podcast_ids)
-            podcasts = Podcast.objects.filter(id__in=podcast_ids)
-            podcasts = {podcast.id: podcast for podcast in podcasts}
+            podcasts = Podcast.objects.filter(id__in=podcast_ids)\
+                                      .prefetch_related('slugs')
+            podcasts = {podcast.id.hex: podcast for podcast in podcasts}
 
         if episodes is None:
             # load episode data
             episode_ids = [getattr(x, 'episode_id', None) for x in entries]
             episode_ids = filter(None, episode_ids)
-            episodes = Episode.objects.filter(id__in=episode_ids)
-            episodes = {episode.id: episode for episode in episodes}
+            episodes = Episode.objects.filter(id__in=episode_ids)\
+                                      .select_related('podcast')\
+                                      .prefetch_related('slugs',
+                                                        'podcast__slugs')
+            episodes = {episode.id.hex: episode for episode in episodes}
 
         # load device data
         # does not need pre-populated data because no db-access is required

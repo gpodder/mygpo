@@ -1,5 +1,4 @@
 from mygpo.podcasts.models import Podcast
-from mygpo.core.proxy import proxy_object
 from mygpo.db.couchdb.user import get_num_listened_episodes
 
 
@@ -81,10 +80,5 @@ def podcasts_for_states(podcast_states):
 
     podcast_ids = [state.podcast for state in podcast_states]
     podcasts = Podcast.objects.filter(id__in=podcast_ids)
-    podcasts = {podcast.id: podcast for podcast in podcasts}
-
-    for state in podcast_states:
-        podcast = proxy_object(podcasts[state.podcast], url=state.ref_url)
-        podcasts[state.podcast] = podcast
-
+    podcasts = {podcast.id.hex: podcast for podcast in podcasts}
     return podcasts.values()
