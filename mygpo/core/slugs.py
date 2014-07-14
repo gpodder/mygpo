@@ -15,7 +15,7 @@ from mygpo.utils import partition
 def assign_missing_episode_slugs(podcast):
     common_title = podcast.get_common_episode_title()
 
-    episodes = Episode.objects.filter(podcast=podcast, slug__isnull=True)
+    episodes = Episode.objects.filter(podcast=podcast, slugs__isnull=True)
 
     for episode in episodes:
         slug = EpisodeSlug(episode, common_title).get_slug()
