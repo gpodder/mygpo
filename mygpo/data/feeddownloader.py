@@ -195,7 +195,8 @@ class PodcastUpdater(object):
 
         if not podcast.slug:
             slug = PodcastSlug(podcast).get_slug()
-            podcast.add_slug(slug)
+            if slug:
+                podcast.add_slug(slug)
 
         assign_missing_episode_slugs(podcast)
 
