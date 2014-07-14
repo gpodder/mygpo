@@ -6,7 +6,7 @@ from couchdbkit.ext.django.schema import *
 
 from django.utils.text import slugify
 
-from mygpo.podcasts.models import Slug
+from mygpo.podcasts.models import Slug, Episode
 from mygpo.decorators import repeat_on_conflict
 from mygpo.utils import partition
 
