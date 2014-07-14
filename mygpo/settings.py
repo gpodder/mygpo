@@ -168,7 +168,7 @@ try:
     INSTALLED_APPS += ('debug_toolbar.apps.DebugToolbarConfig', )
 
 except ImportError:
-    pass
+    print >> sys.stderr, 'Could not load django-debug-toolbar'
 
 
 TEST_EXCLUDE = (
