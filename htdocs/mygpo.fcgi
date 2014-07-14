@@ -1,1 +1,0 @@
-../mygpo.fcgi
