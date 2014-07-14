@@ -96,7 +96,7 @@ class SlugTests(TestCase):
         # this is the current number of queries when writing the test; this has
         # not been optimized in any particular way, it should just be used to
         # alert when something changes
-        with self.assertNumQueries(24):
+        with self.assertNumQueries(25):
             podcast = create_podcast()
 
             # set the canonical slug
