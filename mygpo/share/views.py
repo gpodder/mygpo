@@ -29,6 +29,8 @@ from mygpo.db.couchdb.podcastlist import podcastlist_for_user_slug, \
          remove_podcast_from_podcastlist, delete_podcastlist
 from mygpo.data.feeddownloader import PodcastUpdater
 
+import logging
+logger = logging.getLogger(__name__)
 
 
 def list_decorator(must_own=False):
@@ -327,7 +329,8 @@ def set_token_public(request, token_name, public):
 
 def get_podcasts_groups(ids):
     # this could be optimized by using a View
+    logger.info('Getting podcasts and groups for IDs %r', ids)
     groups = PodcastGroup.objects.filter(id__in=ids)
-    podcasts = PodcastGroup.objects.filter(id__in=ids)
+    podcasts = Podcast.objects.filter(id__in=ids)
     # TODO: bring in right order, according to IDs
     return list(groups) + list(podcasts)

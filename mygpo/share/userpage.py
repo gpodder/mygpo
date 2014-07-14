@@ -12,7 +12,6 @@ from mygpo.users.models import User
 from mygpo.users.models import HistoryEntry
 from mygpo.users.settings import FLATTR_USERNAME
 from mygpo.decorators import requires_token
-from mygpo.web.utils import fetch_episode_data
 from mygpo.users.subscriptions import PodcastPercentageListenedSorter
 from mygpo.web.views import GeventView
 from mygpo.db.couchdb.episode_state import favorite_episode_ids_for_user
@@ -67,8 +66,11 @@ class UserpageView(GeventView):
 
     def get_recent_episodes(self, user):
         recent_episode_ids = get_latest_episode_ids(user)
-        recent_episodes = Episode.objects.filter(id__in=recent_episode_ids)
-        return fetch_episode_data(recent_episodes)
+        recent_episodes = Episode.objects.filter(id__in=recent_episode_ids)\
+                                         .select_related('podcast')\
+                                         .prefetch_related('slugs',
+                                                           'podcast__slugs')
+        return recent_episodes
 
 
     def get_seconds_played_total(self, user):
@@ -81,8 +83,10 @@ class UserpageView(GeventView):
 
     def get_favorite_episodes(self, user):
         favorite_ids = favorite_episode_ids_for_user(user)
-        favorites = Episode.objects.get(id__in=favorite_ids)
-        return fetch_episode_data(favorites)
+        favorites = Episode.objects.filter(id__in=favorite_ids)\
+                                   .select_related('podcast')\
+                                   .prefetch_related('slugs', 'podcast__slugs')
+        return favorites
 
 
     def get_played_episodes_total(self, user):
