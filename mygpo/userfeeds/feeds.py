@@ -15,7 +15,8 @@ class FavoriteFeed():
 
     def get_episodes(self):
         favorite_ids = favorite_episode_ids_for_user(self.user)
-        return Episode.objects.get(id__in=favorite_ids)
+        return Episode.objects.filter(id__in=favorite_ids)\
+                              .select_related('podcast')
 
     def language(self):
         """
