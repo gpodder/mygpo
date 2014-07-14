@@ -579,6 +579,11 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
         """ A podcast is always in the global scope """
         return ''
 
+    @property
+    def display_title(self):
+        # TODO
+        return self.title
+
 
 class EpisodeQuerySet(MergedUUIDQuerySet):
     """ QuerySet for Episodes """
