@@ -50,25 +50,16 @@ def create_index():
 
 def search_podcasts(query):
     """ Search for podcasts according to 'query' """
-    conn = ES(settings.ELASTICSEARCH_SERVER)
+    conn = get_connection()
 
-    # we have some "optimal" number of subscribers (eg the max)
-    # the farther we get from there, the lower the score
-    decay = FunctionScoreQuery.DecayFunction(
-            decay_function='gauss',
-            field='subscribers',
-            origin=2000,
-            scale=1000,
-            decay=.3,
-        )
-    # workaround for https://github.com/aparo/pyes/pull/418
-    decay._internal_name = 'gauss'
-
-    q = FunctionScoreQuery(
-        query=QueryStringQuery(query),
-        functions=[decay],
-        boost_mode=FunctionScoreQuery.BoostModes.MULTIPLY,
-    )
+    q = {
+        "custom_score" : {
+            "query" : {
+                 'query_string': {'query': query}
+            },
+            "script" : "_score * (doc.subscribers.doubleValue / 4000)"
+        }
+    }
     results = conn.search(query=q, indices=settings.ELASTICSEARCH_INDEX,
                           doc_types='podcast',
                           model=lambda conn, doc: PodcastResult.from_doc(doc))
