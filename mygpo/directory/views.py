@@ -22,7 +22,7 @@ from feedservice.parse.models import ParserException
 from feedservice.parse import FetchFeedException
 
 from mygpo.core.proxy import proxy_object
-from mygpo.podcasts.models import Podcast
+from mygpo.podcasts.models import Podcast, Episode
 from mygpo.search.index import search_podcasts
 from mygpo.web.utils import process_lang_params, get_language_names, \
          get_page_list, get_podcast_link_target, sanitize_language_codes
@@ -76,7 +76,9 @@ class PodcastToplistView(ToplistView):
     def get_context_data(self, num=100):
         context = super(PodcastToplistView, self).get_context_data()
 
-        entries = Podcast.objects.all().toplist(self.language())[:num]
+        entries = Podcast.objects.all()\
+                                 .prefetch_related('slugs')\
+                                 .toplist(self.language())[:num]
         context['entries'] = entries
 
         context['max_subscribers'] = max([0] + [p.subscriber_count() for p in entries])
@@ -92,15 +94,10 @@ class EpisodeToplistView(ToplistView):
     def get_context_data(self, num=100):
         context = super(EpisodeToplistView, self).get_context_data()
 
-        entries = Episode.objects.all().toplist(self.language())[:num]
-
-        # load podcast objects
-        podcast_ids = [e.podcast for e in entries]
-        podcasts = Podcast.objects.get(id__in=podcast_ids)
-        podcasts = {podcast.id: podcast for podcast in podcasts}
-        for entry in entries:
-            entry.podcast = podcasts.get(entry.podcast, None)
-
+        entries = Episode.objects.all()\
+                                 .select_related('podcast')\
+                                 .prefetch_related('slugs', 'podcast__slugs')\
+                                 .toplist(self.language())[:num]
         context['entries'] = entries
 
         # Determine maximum listener amount (or 0 if no entries exist)
@@ -134,7 +131,7 @@ class Directory(View):
             # evaluated lazyly, cached by template
             'topics': Topics(),
             'podcastlists': self.get_random_list(),
-            'random_podcast': Podcast.objects.random().first(),
+            'random_podcast': Podcast.objects.all().random().first(),
             })
 
 
@@ -142,9 +139,10 @@ class Directory(View):
         random_list = next(random_podcastlists(), None)
         list_owner = None
         if random_list:
+            podcast_ids = random_list.podcasts[:podcasts_per_list]
             random_list = proxy_object(random_list)
             random_list.more_podcasts = max(0, len(random_list.podcasts) - podcasts_per_list)
-            random_list.podcasts = Podcast.objects.filter(id__in=random_list.podcasts[:podcasts_per_list])
+            random_list.podcasts = Podcast.objects.filter(id__in=podcast_ids)
             random_list.user = get_user_by_id(random_list.user)
 
         yield random_list
@@ -382,7 +380,7 @@ class FlattrPodcastList(PodcastListView):
     template_name = 'flattr-podcasts.html'
 
     def get_queryset(self):
-        return Podcast.objects.flattr()
+        return Podcast.objects.all().flattr()
 
     def get_context_data(self, num=100):
         context = super(FlattrPodcastList, self).get_context_data()
@@ -398,7 +396,7 @@ class LicensePodcastList(PodcastListView):
     template_name = 'directory/license-podcasts.html'
 
     def get_queryset(self):
-        return Podcast.objects.license(self.license_url)
+        return Podcast.objects.all().license(self.license_url)
 
     @property
     def license_url(self):
