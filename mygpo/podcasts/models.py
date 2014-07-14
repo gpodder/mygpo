@@ -10,6 +10,8 @@ from django.contrib.contenttypes import generic
 
 from uuidfield import UUIDField
 
+from mygpo import utils
+
 import logging
 logger = logging.getLogger(__name__)
 
