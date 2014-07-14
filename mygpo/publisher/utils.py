@@ -18,6 +18,7 @@
 import collections
 from datetime import timedelta, datetime, time
 
+from mygpo.podcasts.models import Episode
 from mygpo.utils import daterange, flatten
 from mygpo.db.couchdb.episode_state import podcast_listener_count_timespan, \
          episode_listener_count_timespan
@@ -36,7 +37,7 @@ def listener_data(podcasts, start_date=datetime(2010, 1, 1), leap=timedelta(days
     """
 
     # pre-calculate episode list, make it index-able by release-date
-    episodes = Episode.objects.filter(podcast__in=podcasts, release__gt=start_date)
+    episodes = Episode.objects.filter(podcast__in=podcasts, released__gt=start_date)
     episodes = dict((e.released.date(), e) for e in episodes)
 
     listeners = [ podcast_listener_count_timespan(p, start=start_date)
@@ -86,6 +87,10 @@ def episode_listener_data(episode, start_date=datetime(2010, 1, 1), leap=timedel
      * episode: the episode, if it was released on that day, otherwise None
     """
 
+    # TODO
+
+    return
+
     listeners = episode_listener_count_timespan(episode, start=start_date)
 
     if not listeners:
@@ -111,6 +116,10 @@ def episode_listener_data(episode, start_date=datetime(2010, 1, 1), leap=timedel
 
 def subscriber_data(podcasts):
     coll_data = collections.defaultdict(int)
+
+    # TODO
+
+    return []
 
     # TODO. rewrite
     for podcast in podcasts:

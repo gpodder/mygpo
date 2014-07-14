@@ -66,7 +66,7 @@
    <label for="slug">
     http{% if is_secure %}s{% endif %}://{{ domain }}/podcast/{{ podcast.slug }}/
    </label>
-   <input class="input-sm" placeholder="{% get_id episode %}" type="text" value="{{ episode.slug|default:"" }}" name="slug"></input>
+   <input class="input-sm" placeholder="{{ episode.id }}" type="text" value="{{ episode.slug|default:"" }}" name="slug"></input>
   </div>
 
   <button class="btn btn-default" type="submit">{% trans "Save" %}</button>

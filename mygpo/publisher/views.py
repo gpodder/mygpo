@@ -12,15 +12,17 @@ from django.utils.translation import ugettext as _
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
 
-from mygpo.podcasts.models import PodcastGroup, Podcast
+from mygpo.podcasts.models import PodcastGroup, Podcast, Episode
 from mygpo.core.proxy import proxy_object
 from mygpo.publisher.auth import require_publisher, is_publisher
 from mygpo.publisher.forms import SearchPodcastForm
 from mygpo.publisher.utils import listener_data, episode_listener_data, \
          check_publisher_permission, subscriber_data
 from mygpo.web.heatmap import EpisodeHeatmap
-from mygpo.web.views.episode import slug_decorator as episode_slug_decorator
-from mygpo.web.views.podcast import slug_decorator as podcast_slug_decorator
+from mygpo.web.views.episode import (slug_decorator as episode_slug_decorator,
+    id_decorator as episode_id_decorator)
+from mygpo.web.views.podcast import (slug_decorator as podcast_slug_decorator,
+    id_decorator as podcast_id_decorator)
 from mygpo.web.utils import get_podcast_link_target, normalize_twitter, \
      get_episode_link_target
 from django.contrib.sites.models import RequestSite
@@ -35,7 +37,7 @@ from mygpo.db.couchdb.pubsub import subscription_for_topic
 @cache_control(private=True)
 def home(request):
     if is_publisher(request.user):
-        podcasts = Podcasts.objects.filter(id__in=request.user.published_objects)
+        podcasts = Podcast.objects.filter(id__in=request.user.published_objects).prefetch_related('slugs')
         site = RequestSite(request)
         update_token = request.user.get_token('publisher_update_token')
         form = SearchPodcastForm()
@@ -181,16 +183,9 @@ def episodes(request, podcast):
     if not check_publisher_permission(request.user, podcast):
         return HttpResponseForbidden()
 
-    episodes = podcast.episode_set().all()
-    listeners = dict(episode_listener_counts(podcast))
+    episodes = Episode.objects.filter(podcast=podcast).select_related('podcast').prefetch_related('slugs', 'podcast__slugs')
 
-    max_listeners = max(listeners.values() + [0])
-
-    def annotate_episode(episode):
-        listener_count = listeners.get(episode._id, None)
-        return proxy_object(episode, listeners=listener_count)
-
-    episodes = map(annotate_episode, episodes)
+    max_listeners = max([e.listeners for e in episodes] + [0])
 
     return render(request, 'publisher/episodes.html', {
         'podcast': podcast,
@@ -221,7 +216,7 @@ def episode(request, episode):
 
     timeline_data = list(episode_listener_data(episode))
 
-    heatmap = EpisodeHeatmap(episode.podcast, episode._id,
+    heatmap = EpisodeHeatmap(episode.podcast, episode.id,
               duration=episode.duration)
 
     return render(request, 'publisher/episode.html', {
@@ -290,7 +285,7 @@ def advertise(request):
 
 def group_id_decorator(f):
     @wraps(f)
-    def _decorator(request, slug_id, *args, **kwargs):
+    def _decorator(request, pg_slug, *args, **kwargs):
         group = get_object_or_404(PodcastGroup, pk=slug_id)
         return f(request, group, *args, **kwargs)
 
@@ -303,4 +298,12 @@ podcast_slug             = podcast_slug_decorator(podcast)
 episodes_slug            = podcast_slug_decorator(episodes)
 update_podcast_slug      = podcast_slug_decorator(update_podcast)
 save_podcast_slug        = podcast_slug_decorator(save_podcast)
+
+episode_id             = episode_id_decorator(episode)
+update_episode_slug_id = episode_id_decorator(update_episode_slug)
+podcast_id             = podcast_id_decorator(podcast)
+episodes_id            = podcast_id_decorator(episodes)
+update_podcast_id      = podcast_id_decorator(update_podcast)
+save_podcast_id        = podcast_id_decorator(save_podcast)
+
 group_slug               = group_id_decorator(group)
