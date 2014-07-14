@@ -256,8 +256,7 @@ def toplist(request, count, format):
 
 
     def get_podcast(t):
-        old_pos, podcast = t
-        return podcast.get_podcast()
+        return t
 
     def json_map(t):
         podcast = t
