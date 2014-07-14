@@ -341,6 +341,8 @@ if 'test' in sys.argv:
     SECRET_KEY = 'test'
 
 
+INTERNAL_IPS = os.getenv('INTERNAL_IPS', '').split()
+
 try:
     from settings_prod import *
 except ImportError, e:
