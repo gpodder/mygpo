@@ -53,7 +53,7 @@ class PodcastCommand(BaseCommand):
             yield (p.url for p in individual_podcasts(podcasts))
 
         if options.get('next'):
-            podcasts = Podcast.objects.order_by_next_update()[:max_podcasts]
+            podcasts = Podcast.objects.all().order_by_next_update()[:max_podcasts]
             yield (p.url for p in podcasts)
 
 
