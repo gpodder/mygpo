@@ -4,7 +4,7 @@ from collections import Counter
 
 from couchdbkit import ResourceConflict
 
-from mygpo.cel import celery
+from mygpo.celery import celery
 from mygpo.db.couchdb.user import (suggestions_for_user, update_device_state,
     update_suggestions, )
 from mygpo.decorators import repeat_on_conflict

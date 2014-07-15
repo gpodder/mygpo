@@ -1,5 +1,5 @@
 from mygpo.podcasts.models import Podcast
-from mygpo.cel import celery
+from mygpo.celery import celery
 from mygpo.db.couchdb.podcast_state import podcast_subscriber_count
 
 

@@ -1,7 +1,7 @@
 from collections import Counter
 
 from mygpo.podcasts.models import Podcast
-from mygpo.cel import celery
+from mygpo.celery import celery
 from mygpo.maintenance.merge import PodcastMerger
 
 from celery.utils.log import get_task_logger

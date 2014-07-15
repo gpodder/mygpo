@@ -1,6 +1,6 @@
 from celery.utils.log import get_task_logger
 
-from mygpo.cel import celery
+from mygpo.celery import celery
 from mygpo.api.advanced import update_episodes
 
 logger = get_task_logger(__name__)

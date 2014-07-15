@@ -139,7 +139,6 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django_couchdb_utils.couchauth',
     'django_couchdb_utils.registration',
-    'djcelery',
     'mygpo.core',
     'mygpo.podcasts',
     'mygpo.search',
@@ -159,7 +158,7 @@ INSTALLED_APPS = (
 
 try:
     import debug_toolbar
-    INSTALLED_APPS += ('debug_toolbar.apps.DebugToolbarConfig', )
+    INSTALLED_APPS += ('debug_toolbar', )
 
 except ImportError:
     print >> sys.stderr, 'Could not load django-debug-toolbar'
@@ -302,16 +301,9 @@ DEFAULT_BASE_URL = ''
 BROKER_URL='redis://localhost'
 CELERY_RESULT_BACKEND='redis://localhost'
 
-import djcelery
-djcelery.setup_loader()
-
-# a dictionary containing celery settings from
-# http://docs.celeryproject.org/en/latest/configuration.html
-CELERY_CONF = dict(
-    CELERY_SEND_TASK_ERROR_EMAILS = True,
-    ADMINS=ADMINS,
-    SERVER_EMAIL = "no-reply@example.com",
-)
+CELERY_SEND_TASK_ERROR_EMAILS = True,
+ADMINS=ADMINS,
+SERVER_EMAIL = "no-reply@example.com",
 
 
 ### Google API

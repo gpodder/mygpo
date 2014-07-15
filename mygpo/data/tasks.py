@@ -1,4 +1,4 @@
-from mygpo.cel import celery
+from mygpo.celery import celery
 from mygpo.data.feeddownloader import PodcastUpdater
 
 

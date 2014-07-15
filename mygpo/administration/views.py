@@ -27,7 +27,7 @@ from mygpo.administration.clients import UserAgentStats, ClientStats
 from mygpo.administration.tasks import merge_podcasts
 from mygpo.utils import get_git_head
 from mygpo.api.httpresponse import JsonResponse
-from mygpo.cel import celery
+from mygpo.celery import celery
 from mygpo.db.couchdb import get_userdata_database
 from mygpo.db.couchdb.user import activate_user, add_published_objs
 

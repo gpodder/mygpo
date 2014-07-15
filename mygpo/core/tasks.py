@@ -4,7 +4,7 @@ from django.utils.translation import ugettext as _
 from django.conf import settings
 
 from mygpo.podcasts.models import Podcast, Episode
-from mygpo.cel import celery
+from mygpo.celery import celery
 from mygpo.data.feeddownloader import PodcastUpdater
 from mygpo.utils import get_timestamp
 from mygpo.users.models import EpisodeAction
