@@ -39,28 +39,19 @@ DATABASES = {
 
 COUCHDB_DATABASES = {
     'mygpo.directory':
-        {'URL': 'http://127.0.0.1:5984/mygpo'},
-
-    'mygpo.core':
-        {'URL': 'http://127.0.0.1:5984/mygpo'},
-
-    'mygpo.api':
-        {'URL': 'http://127.0.0.1:5984/mygpo'},
+        {'URL': 'http://127.0.0.1:5984/mygpo_categories'},
 
     'mygpo.users':
         {'URL': 'http://127.0.0.1:5984/mygpo_users'},
-
-    'mygpo.share':
-        {'URL': 'http://127.0.0.1:5984/mygpo'},
-
-    'mygpo.maintenance':
-        {'URL': 'http://127.0.0.1:5984/mygpo'},
 
     'mygpo.pubsub':
         {'URL': 'http://127.0.0.1:5984/mygpo_pubsub'},
 
     'mygpo.suggestions':
         {'URL': 'http://127.0.0.1:5984/mygpo_suggestions'},
+
+    'mygpo.share':
+        {'URL': 'http://127.0.0.1:5984/mygpo_podcastlists'},
 
     'mygpo.podcastlists':
         {'URL': 'http://127.0.0.1:5984/mygpo_podcastlists'},
@@ -87,7 +78,6 @@ COUCHDB_DATABASES = {
 # COUCHDB_DATABASES is likely to be overwritten in settings_prod.py while
 # COUCHDB_DDOC_MAPPING is most probably not overwritten.
 COUCHDB_DDOC_MAPPING = {
-    'general':    'core',
     'categories': 'categories',
     'pubsub':     'pubsub',
     'userdata':   'userdata',

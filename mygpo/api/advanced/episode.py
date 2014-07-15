@@ -24,7 +24,6 @@ from django.http import HttpResponseBadRequest, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 
-from mygpo.core import models
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.exceptions import ParameterMissing
 from mygpo.api.backend import get_device
