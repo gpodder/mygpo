@@ -37,16 +37,6 @@ Doc-Types: PodcastList
 * `podcastlists/random <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/podcastlists/views/random>`_
 
 
-Podcasts
-^^^^^^^^
-
-Doc-Types: Podcast, PodcastGroup, PodcastSubscriberData
-
-**Views**
-
-* `podcasts/by_tag <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/podcasts/views/by_tag>`_
-
-
 Suggestions
 ^^^^^^^^^^^
 

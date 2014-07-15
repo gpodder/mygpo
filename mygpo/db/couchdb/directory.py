@@ -131,33 +131,6 @@ def tags_for_user(user, podcast_id=None):
     return tags
 
 
-def all_tags():
-    """ Returns all tags
-
-    Some tags might be returned twice """
-    db = get_main_database()
-    res = multi_request_view(db, 'podcasts/by_tag',
-            wrap        = False,
-            reduce      = True,
-            group       = True,
-            group_level = 1
-        )
-
-    for r in res:
-        yield r['key'][0]
-
-    udb = get_userdata_database()
-    res = multi_request_view(udb, 'usertags/podcasts',
-            wrap        = False,
-            reduce      = True,
-            group       = True,
-            group_level = 1
-        )
-
-    for r in res:
-        yield r['key'][0]
-
-
 @cache_result(timeout=60*60)
 def toplist(res_cls, view, key, limit, **view_args):
 
