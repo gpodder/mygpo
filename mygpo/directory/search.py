@@ -1,12 +1,10 @@
 from mygpo.podcasts.models import Podcast
 from mygpo.utils import is_url, normalize_feed_url
 from mygpo.data.feeddownloader import PodcastUpdater, NoPodcastCreated
-from mygpo.cache import cache_result
-from mygpo.db.couchdb.podcast import search
+from mygpo.search.index import search_podcasts as search
 
 
-@cache_result(timeout=60*60)
-def search_podcasts(q, limit=20, skip=0):
+def search_podcasts(q):
 
     if is_url(q):
         url = normalize_feed_url(q)
@@ -23,13 +21,12 @@ def search_podcasts(q, limit=20, skip=0):
             try:
                 updater.update(url)
             except NoPodcastCreated as npc:
-                return [], 0
+                return []
 
         try:
             podcast = Podcast.objects.get(urls__url=url)
-            return [podcast], 1
+            return [podcast]
         except Podcast.DoesNotExist:
-            return [], 0
+            return []
 
-
-    return search(q, skip, limit)
+    return search(q)
