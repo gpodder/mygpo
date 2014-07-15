@@ -1,36 +1,23 @@
 Babel==1.3
-Pillow==2.3.1
+Pillow==2.5.1
 https://www.djangoproject.com/download/1.7c1/tarball/
-amqp==1.4.4
-anyjson==0.3.3
-argparse==1.2.1
-billiard==3.3.0.16
+celery==3.1.13
 -e git+https://github.com/stefankoegl/couchdbkit.git@7593bca76f76097394840a96031ce7a297b18b34#egg=couchdbkit-dev
-celery==3.1.10
 coverage==3.7.1
 dj-database-url==0.3.0
-setuptools==3.4.1
-django-celery==3.1.9
--e git+https://github.com/stefankoegl/django-couchdb-utils.git@ae9dd2cc4fa689ba3553b25ba7b15c53795dcb84#egg=django-couchdb-utils-dev
+-e git+https://github.com/stefankoegl/django-couchdb-utils.git@ae9dd2cc4fa689ba3553b25ba7b15c53795dcb84#egg=django_couchdb_utils-dev
 django-redis-sessions==0.4.0
 django-uuidfield==0.5.0
 feedparser==5.1.3
 -e git+https://github.com/gpodder/mygpo-feedservice.git@56a3a3b3974a563f72705f0b28bd446645eaf6aa#egg=feedservice-dev
-gunicorn==18.0
-html2text==3.200.3
-http-parser==0.8.3
-httplib2==0.8
-kombu==3.0.14
+gunicorn==19.0.0
+html2text==2014.7.3
 markdown2==2.2.1
 oauth2client==1.2
-psycopg2==2.5.2
+psycopg2==2.5.3
+pyes==0.99.2
 python-dateutil==2.2
 python-memcached==1.53
-pytz==2014.2
-redis==2.9.1
+redis==2.10.1
 restkit==4.2.2
-six==1.6.1
-socketpool==0.5.3
 ujson==1.33
-wsgiref==0.1.2
-pyes
