@@ -5,7 +5,6 @@ from mygpo.directory.models import Category
 from mygpo.db.couchdb import get_main_database, get_categories_database, \
     get_userdata_database, get_single_result
 from mygpo.cache import cache_result
-from mygpo.db.couchdb.utils import multi_request_view
 from mygpo.db import QueryParameterMissing
 
 
