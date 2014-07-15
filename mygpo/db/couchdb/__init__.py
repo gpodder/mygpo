@@ -13,10 +13,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def get_main_database():
-    return loading.get_db('core')
-
-
 def get_categories_database():
     """ returns the database that contains Category documents """
     return loading.get_db('categories')
@@ -36,10 +32,6 @@ def get_suggestions_database():
 
 def get_podcastlists_database():
     return loading.get_db('podcastlists')
-
-
-def get_database(user=None):
-    return get_main_database()
 
 
 class BulkException(Exception):

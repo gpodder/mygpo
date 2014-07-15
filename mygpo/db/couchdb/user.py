@@ -4,7 +4,7 @@ from couchdbkit import ResourceNotFound
 
 from mygpo.cache import cache_result
 from mygpo.decorators import repeat_on_conflict
-from mygpo.db.couchdb import get_main_database, get_userdata_database, \
+from mygpo.db.couchdb import get_userdata_database, \
     get_single_result, get_suggestions_database
 from mygpo.users.settings import FLATTR_TOKEN, FLATTR_AUTO, FLATTR_MYGPO, \
          FLATTR_USERNAME

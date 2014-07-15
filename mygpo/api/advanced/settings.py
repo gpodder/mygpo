@@ -26,7 +26,7 @@ from mygpo.utils import parse_request_body
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.users.models import PodcastUserState, DeviceDoesNotExist
-from mygpo.db.couchdb import get_main_database, get_userdata_database
+from mygpo.db.couchdb import get_userdata_database
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode
 
@@ -39,11 +39,10 @@ from mygpo.db.couchdb.episode_state import episode_state_for_user_episode
 @cors_origin()
 def main(request, username, scope):
 
-    db = get_main_database()
     udb = get_userdata_database()
 
     def user_settings(user):
-        return user, user, db
+        return user, user, None
 
     def device_settings(user, uid):
         device = user.get_device_by_uid(uid)
@@ -52,7 +51,7 @@ def main(request, username, scope):
         # to settings_obj are reflected in user (bug 1344)
         settings_obj = user.get_device_by_uid(uid)
 
-        return user, settings_obj, db
+        return user, settings_obj, None
 
     def podcast_settings(user, url):
         podcast = get_object_or_404(Podcast, urls__url=url)

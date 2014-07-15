@@ -2,7 +2,7 @@ from collections import defaultdict, Counter
 from operator import itemgetter
 
 from mygpo.directory.models import Category
-from mygpo.db.couchdb import get_main_database, get_categories_database, \
+from mygpo.db.couchdb import get_categories_database, \
     get_userdata_database, get_single_result
 from mygpo.cache import cache_result
 from mygpo.db import QueryParameterMissing
