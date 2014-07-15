@@ -15,7 +15,6 @@ from django.views.generic.base import View
 from django.utils.decorators import method_decorator
 
 from mygpo.podcasts.models import Podcast, PodcastGroup
-from mygpo.utils import get_timestamp
 from mygpo.core.proxy import proxy_object
 from mygpo.api.simple import format_podcast_list
 from mygpo.share.models import PodcastList
@@ -26,7 +25,8 @@ from mygpo.flattr import Flattr
 from mygpo.userfeeds.feeds import FavoriteFeed
 from mygpo.db.couchdb.podcastlist import podcastlist_for_user_slug, \
          podcastlists_for_user, add_podcast_to_podcastlist, \
-         remove_podcast_from_podcastlist, delete_podcastlist
+         remove_podcast_from_podcastlist, delete_podcastlist, \
+         create_podcast_list
 from mygpo.data.feeddownloader import PodcastUpdater
 
 import logging
@@ -138,12 +138,7 @@ def create_list(request):
     plist = podcastlist_for_user_slug(request.user._id, slug)
 
     if plist is None:
-        plist = PodcastList()
-        plist.created_timestamp = get_timestamp(datetime.utcnow())
-        plist.title = title
-        plist.slug = slug
-        plist.user = request.user._id
-        plist.save()
+        create_podcast_list(title, slug, request.user._id, datetime.utcnow())
 
     list_url = reverse('list-show', args=[request.user.username, slug])
     return HttpResponseRedirect(list_url)

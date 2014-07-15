@@ -62,6 +62,9 @@ COUCHDB_DATABASES = {
     'mygpo.suggestions':
         {'URL': 'http://127.0.0.1:5984/mygpo_suggestions'},
 
+    'mygpo.podcastlists':
+        {'URL': 'http://127.0.0.1:5984/mygpo_podcastlists'},
+
     'django_couchdb_utils_auth':
         {'URL': 'http://127.0.0.1:5984/mygpo_users'},
 

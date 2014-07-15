@@ -34,6 +34,10 @@ def get_suggestions_database():
     return loading.get_db('suggestions')
 
 
+def get_podcastlists_database():
+    return loading.get_db('podcastlists')
+
+
 def get_database(user=None):
     return get_main_database()
 
