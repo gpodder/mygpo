@@ -84,18 +84,8 @@ def tags_for_podcast(podcast):
     if not podcast:
         raise QueryParameterMissing('podcast')
 
-
-    db = get_main_database()
-    res = db.view('tags/by_podcast',
-            startkey    = [podcast.get_id(), None],
-            endkey      = [podcast.get_id(), {}],
-            reduce      = True,
-            group       = True,
-            group_level = 2,
-            stale       = 'update_after',
-        )
-
-    tags = Counter(dict((x['key'][1], x['value']) for x in res))
+    tags = podcast.tags.all()
+    tags = Counter(t.tag for t in tags)
 
     udb = get_userdata_database()
     res = udb.view('usertags/by_podcast',

@@ -47,16 +47,6 @@ Doc-Types: Suggestions
 * `suggestions/by_user <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/suggestions/views/by_user>`_
 
 
-Tags
-^^^^
-
-Doc-Types: Podcast, PodcastGroup
-
-**Views**
-
-* `tags/by_podcast <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/tags/views/by_podcast>`_
-
-
 Users
 ^^^^^
 

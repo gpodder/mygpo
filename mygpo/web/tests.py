@@ -104,7 +104,7 @@ class PodcastPageTests(TestCase):
         url = reverse('podcast-slug', args=(self.podcast_slug.slug, ))
         # the number of queries must be independent of the number of episodes
 
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(6):
             anon_request(url)
 
     def test_episode_queries(self):
