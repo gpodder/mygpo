@@ -68,7 +68,7 @@ urlpatterns += patterns('mygpo.web.views.podcast',
      'unsubscribe_all_id',
      name='unsubscribe-all-id'),
 
- url(r'^podcast/(?P<podcast_id>[0-9a-f]{32)/add-tag',
+ url(r'^podcast/(?P<podcast_id>[0-9a-f]{32})/add-tag',
      'add_tag_id',
      name='add-tag-id'),
 
