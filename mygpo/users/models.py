@@ -9,11 +9,15 @@ import random
 import string
 
 from couchdbkit.ext.django.schema import *
+from uuidfield import UUIDField
 
+from django.conf import settings
 from django.core.cache import cache
+from django.db import models
 
 from django_couchdb_utils.registration.models import User as BaseUser
 
+from mygpo.core.models import TwitterModel
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.utils import linearize
 from mygpo.core.proxy import DocumentABCMeta, proxy_object
@@ -50,6 +54,39 @@ class DeviceDoesNotExist(Exception):
 
 class DeviceDeletedException(DeviceDoesNotExist):
     pass
+
+
+
+class UserProfile(TwitterModel):
+    """ Additional information stored for a User """
+
+    # the user to which this profile belongs
+    user = models.OneToOneField(settings.AUTH_USER_MODEL,
+                                related_name='profile')
+
+    # the CouchDB _id of the user
+    uuid = UUIDField(unique=True)
+
+    # if False, suggestions should be updated
+    suggestions_up_to_date = models.BooleanField(default=False)
+
+    # text the user entered about himeself
+    about = models.TextField(blank=True)
+
+    # Google email address for OAuth login
+    google_email = models.CharField(max_length=100, null=True)
+
+    # token for accessing subscriptions of this use
+    subscriptions_token = models.CharField(max_length=32, null=True)
+
+    # token for accessing the favorite-episodes feed of this user
+    favorite_feeds_token = models.CharField(max_length=32, null=True)
+
+    # token for automatically updating feeds published by this user
+    publisher_update_token = models.CharField(max_length=32, null=True)
+
+    # token for accessing the userpage of this user
+    userpage_token = models.CharField(max_length=32, null=True)
 
 
 class Suggestions(Document, RatingMixin):

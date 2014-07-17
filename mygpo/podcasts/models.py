@@ -11,6 +11,7 @@ from django.contrib.contenttypes import generic
 from uuidfield import UUIDField
 
 from mygpo import utils
+from mygpo.core.models import TwitterModel
 
 import logging
 logger = logging.getLogger(__name__)
@@ -439,7 +440,8 @@ class PodcastManager(GenericManager):
 class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
         LanguageModel, LastUpdateModel, UpdateInfoModel, LicenseModel,
         FlattrModel, ContentTypesModel, MergedIdsModel, OutdatedModel,
-        AuthorModel, UrlsMixin, SlugsMixin, TagsMixin, MergedUUIDsMixin):
+        AuthorModel, UrlsMixin, SlugsMixin, TagsMixin, MergedUUIDsMixin,
+        TwitterModel, ):
     """ A Podcast """
 
     logo_url = models.URLField(null=True, max_length=1000)
@@ -458,7 +460,6 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
     latest_episode_timestamp = models.DateTimeField(null=True)
     episode_count = models.PositiveIntegerField(default=0)
     hub = models.URLField(null=True)
-    twitter = models.CharField(max_length=15, null=True, blank=False)
     update_interval = models.PositiveSmallIntegerField(null=False,
         default=DEFAULT_UPDATE_INTERVAL)
 
