@@ -53,11 +53,14 @@ def search_podcasts(query):
     conn = get_connection()
 
     q = {
-        "custom_score" : {
+        "function_score" : {
+            "boost_mode": 'replace',
             "query" : {
                  'query_string': {'query': query}
             },
-            "script" : "_score * (doc.subscribers.doubleValue / 4000)"
+            "script_score" : {
+               'script': "_score * (doc.subscribers.value / 4000)"
+            }
         }
     }
     results = conn.search(query=q, indices=settings.ELASTICSEARCH_INDEX,
