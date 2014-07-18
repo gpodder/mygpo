@@ -204,7 +204,7 @@ class UrlsMixin(models.Model):
             URL.objects.create(url=url,
                                order=next_order,
                                scope=self.scope,
-                               content_object=obj,
+                               content_object=self,
                                )
 
             next_order += 1
