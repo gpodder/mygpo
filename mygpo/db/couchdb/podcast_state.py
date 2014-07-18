@@ -1,3 +1,5 @@
+from restkit.errors import Unauthorized
+
 from mygpo.users.models import PodcastUserState, SubscriptionException
 from mygpo.users.settings import PUBLIC_SUB_PODCAST, PUBLIC_SUB_USER
 from mygpo.db.couchdb import get_userdata_database, get_single_result
