@@ -145,7 +145,7 @@ def episode_list(podcast, user, offset=0, limit=None):
 
     listeners = dict(episode_listener_counts(podcast))
     episodes = Episode.objects.filter(podcast=podcast).all().by_released()
-    episodes = episodes.prefetch_related('slugs')[offset:offset+limit]
+    episodes = list(episodes.prefetch_related('slugs')[offset:offset+limit])
 
     if user.is_authenticated():
 
