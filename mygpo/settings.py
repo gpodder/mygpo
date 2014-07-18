@@ -179,7 +179,7 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
-SESSION_ENGINE = "django_couchdb_utils.sessions.cached_couchdb"
+SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 
 # TODO: use (default) JSON serializer for security
 # this would currently fail as we're (de)serializing datetime objects
