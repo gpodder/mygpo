@@ -19,7 +19,8 @@ def assign_missing_episode_slugs(podcast):
 
     for episode in episodes:
         slug = EpisodeSlug(episode, common_title).get_slug()
-        episode.set_slug(slug)
+        if slug:
+            episode.set_slug(slug)
 
 
 class SlugGenerator(object):
