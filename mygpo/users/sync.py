@@ -11,35 +11,36 @@ logger = logging.getLogger(__name__)
 GroupedDevices = namedtuple('GroupedDevices', 'is_synced devices')
 
 
+def get_grouped_devices(user):
+    """ Returns groups of synced devices and a unsynced group """
+
+    from mygpo.users.models import Client
+    clients = Client.objects.filter(user=user, deleted=False)\
+                            .order_by('-sync_group')
+
+    last_group = object()
+    group = None
+
+    for client in clients:
+        # check if we have just found a new group
+        if last_group != client.sync_group:
+            if group != None:
+                yield group
+
+            group = GroupedDevices(client.sync_group is not None, [])
+
+        last_group = client.sync_group
+        group.devices.append(client)
+
+    # yield remaining group
+    yield group
+
 
 class SyncedDevicesMixin(DocumentSchema):
     """ Contains the device-syncing functionality of a user """
 
     sync_groups = ListProperty()
 
-
-    def get_grouped_devices(self):
-        """ Returns groups of synced devices and a unsynced group """
-
-        indexed_devices = dict( (dev.id, dev) for dev in self.active_devices )
-
-        for group in self.sync_groups:
-
-            devices = [indexed_devices.pop(device_id, None) for device_id in group]
-            devices = filter(None, devices)
-            if not devices:
-                continue
-
-            yield GroupedDevices(
-                    True,
-                    devices
-                )
-
-        # un-synced devices
-        yield GroupedDevices(
-                False,
-                indexed_devices.values()
-            )
 
 
     def sync_devices(self, device1, device2):

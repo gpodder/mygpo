@@ -11,19 +11,23 @@ import string
 from couchdbkit.ext.django.schema import *
 from uuidfield import UUIDField
 
+from django.db import transaction, models
+from django.contrib.auth.models import User as DjangoUser
+from django.contrib.auth import get_user_model
+from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.core.cache import cache
-from django.db import models
 
 from django_couchdb_utils.registration.models import User as BaseUser
 
-from mygpo.core.models import TwitterModel
+from mygpo.core.models import (TwitterModel, UUIDModel, SettingsModel,
+    GenericManager, )
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.utils import linearize
 from mygpo.core.proxy import DocumentABCMeta, proxy_object
 from mygpo.decorators import repeat_on_conflict
 from mygpo.users.ratings import RatingMixin
-from mygpo.users.sync import SyncedDevicesMixin
+from mygpo.users.sync import SyncedDevicesMixin, get_grouped_devices
 from mygpo.users.subscriptions import subscription_changes, podcasts_for_states
 from mygpo.users.settings import FAV_FLAG, PUBLIC_SUB_PODCAST, SettingsMixin
 from mygpo.db.couchdb.user import user_history, device_history, \
@@ -57,7 +61,19 @@ class DeviceDeletedException(DeviceDoesNotExist):
 
 
 
-class UserProfile(TwitterModel):
+class UserProxyManager(GenericManager):
+    """ Manager for the UserProxy model """
+
+
+class UserProxy(DjangoUser):
+
+    objects = UserProxyManager()
+
+    class Meta:
+        proxy = True
+
+
+class UserProfile(TwitterModel, SettingsModel):
     """ Additional information stored for a User """
 
     # the user to which this profile belongs
@@ -88,6 +104,21 @@ class UserProfile(TwitterModel):
     # token for accessing the userpage of this user
     userpage_token = models.CharField(max_length=32, null=True)
 
+    # key for activating the user
+    activation_key = models.CharField(max_length=40, null=True)
+
+    def get_token(self, token_name):
+        """ returns a token, and generate those that are still missing """
+
+        generated = False
+
+        if token_name not in TOKEN_NAMES:
+            raise TokenException('Invalid token name %s' % token_name)
+
+        create_missing_user_tokens(self)
+
+        return getattr(self, token_name)
+
 
 class Suggestions(Document, RatingMixin):
     user = StringProperty(required=True)
@@ -97,7 +128,8 @@ class Suggestions(Document, RatingMixin):
 
 
     def get_podcasts(self, count=None):
-        user = User.get(self.user)
+        User = get_user_model()
+        user = User.objects.get(profile__uuid=self.user)
         subscriptions = user.get_subscribed_podcast_ids()
 
         ids = filter(lambda x: not x in self.blacklist + subscriptions, self.podcasts)
@@ -305,14 +337,14 @@ class PodcastUserState(Document, SettingsMixin):
     def subscribe(self, device):
         action = SubscriptionAction()
         action.action = 'subscribe'
-        action.device = device.id
+        action.device = device.id.hex
         self.add_actions([action])
 
 
     def unsubscribe(self, device):
         action = SubscriptionAction()
         action.action = 'unsubscribe'
-        action.device = device.id
+        action.device = device.id.hex
         self.add_actions([action])
 
 
@@ -404,15 +436,110 @@ class PodcastUserState(Document, SettingsMixin):
             (self.podcast, self.user, self._id)
 
 
-class Device(Document, SettingsMixin):
-    id       = StringProperty(default=lambda: uuid.uuid4().hex)
-    oldid    = IntegerProperty(required=False)
-    uid      = StringProperty(required=True)
-    name     = StringProperty(required=True, default='New Device')
-    type     = StringProperty(required=True, default='other')
-    deleted  = BooleanProperty(default=False)
-    user_agent = StringProperty()
+class SyncGroup(models.Model):
+    """ A group of Clients """
 
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+
+
+class Client(UUIDModel):
+    """ A client application """
+
+    DESKTOP = 'desktop'
+    LAPTOP = 'laptop'
+    MOBILE = 'mobile'
+    SERVER = 'server'
+    TABLET = 'tablet'
+    OTHER = 'other'
+
+    TYPES = (
+        (DESKTOP, _('Desktop')),
+        (LAPTOP, _('Laptop')),
+        (MOBILE, _('Cell phone')),
+        (SERVER, _('Server')),
+        (TABLET, _('Tablet')),
+        (OTHER, _('Other')),
+    )
+
+    # User-assigned ID; must be unique for the user
+    uid = models.CharField(max_length=64)
+
+    # the user to which the Client belongs
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+
+    # User-assigned name
+    name = models.CharField(max_length=100, default='New Device')
+
+    # one of several predefined types
+    type = models.CharField(max_length=max(len(k) for k, v in TYPES),
+                            choices=TYPES, default=OTHER)
+
+    # indicates if the user has deleted the client
+    deleted = models.BooleanField(default=False)
+
+    # user-agent string from which the Client was last accessed (for writing)
+    user_agent = models.CharField(max_length=300, null=True, blank=True)
+
+    sync_group = models.ForeignKey(SyncGroup, null=True)
+
+    class Meta:
+        unique_together = (
+            ('user', 'uid'),
+        )
+
+    @transaction.atomic
+    def sync_with(self, other):
+        """ Puts two devices in a common sync group"""
+
+        if self.user != other.user:
+            raise ValueError('the devices do not belong to the user')
+
+        if self.sync_group is not None and \
+           other.sync_group is not None and \
+           self.sync_group != other.sync_group:
+            # merge sync_groups
+            ogroup = other.sync_group
+            Client.objects.filter(sync_group=ogroup)\
+                          .update(sync_group=self.sync_group)
+            ogroup.delete()
+
+        elif self.sync_group is None and \
+             other.sync_group is None:
+            sg = SyncGroup.objects.create(user=self.user)
+            other.sync_group = sg
+            other.save()
+            self.sync_group = sg
+            self.save()
+
+        elif self.sync_group is not None:
+            self.sync_group = other.sync_group
+            self.save()
+
+        elif other.sync_group is not None:
+            other.sync_group = self.sync_group
+            other.save()
+
+    def get_sync_targets(self):
+        """ Returns the devices and groups with which the device can be synced
+
+        Groups are represented as lists of devices """
+
+        sg = self.sync_group
+
+        for group in get_grouped_devices(self.user):
+
+            if self in group.devices:
+                # the device's group can't be a sync-target
+                continue
+
+            elif group.is_synced:
+                yield group.devices
+
+            else:
+                # every unsynced device is a sync-target
+                for dev in group.devices:
+                    if not dev == self:
+                        yield dev
 
     def get_subscription_changes(self, since, until):
         """
@@ -423,36 +550,50 @@ class Device(Document, SettingsMixin):
         """
 
         from mygpo.db.couchdb.podcast_state import podcast_states_for_device
-        podcast_states = podcast_states_for_device(self.id)
-        return subscription_changes(self.id, podcast_states, since, until)
-
+        podcast_states = podcast_states_for_device(self.id.hex)
+        return subscription_changes(self.id.hex, podcast_states, since, until)
 
     def get_latest_changes(self):
-
         from mygpo.db.couchdb.podcast_state import podcast_states_for_device
-
-        podcast_states = podcast_states_for_device(self.id)
+        podcast_states = podcast_states_for_device(self.id.hex)
         for p_state in podcast_states:
-            actions = filter(lambda x: x.device == self.id, reversed(p_state.actions))
+            actions = filter(lambda x: x.device == self.id.hex, reversed(p_state.actions))
             if actions:
                 yield (p_state.podcast, actions[0])
-
 
     def get_subscribed_podcast_ids(self):
         from mygpo.db.couchdb.podcast_state import get_subscribed_podcast_states_by_device
         states = get_subscribed_podcast_states_by_device(self)
         return [state.podcast for state in states]
 
-
     def get_subscribed_podcasts(self):
         """ Returns all subscribed podcasts for the device
 
         The attribute "url" contains the URL that was used when subscribing to
         the podcast """
-
         from mygpo.db.couchdb.podcast_state import get_subscribed_podcast_states_by_device
         states = get_subscribed_podcast_states_by_device(self)
         return podcasts_for_states(states)
+
+
+
+    def __str__(self):
+        return '{} ({})'.format(self.name.encode('ascii', errors='replace'),
+                                self.uid.encode('ascii', errors='replace'))
+
+    def __unicode__(self):
+        return u'{} ({})'.format(self.name, self.uid)
+
+
+class Device(Document, SettingsMixin):
+    id       = StringProperty(default=lambda: uuid.uuid4().hex)
+    oldid    = IntegerProperty(required=False)
+    uid      = StringProperty(required=True)
+    name     = StringProperty(required=True, default='New Device')
+    type     = StringProperty(required=True, default='other')
+    deleted  = BooleanProperty(default=False)
+    user_agent = StringProperty()
+
 
 
     def __hash__(self):
@@ -465,13 +606,6 @@ class Device(Document, SettingsMixin):
 
     def __repr__(self):
         return '<{cls} {id}>'.format(cls=self.__class__.__name__, id=self.id)
-
-
-    def __str__(self):
-        return self.name
-
-    def __unicode__(self):
-        return self.name
 
 
 
@@ -517,23 +651,6 @@ class User(BaseUser, SyncedDevicesMixin, SettingsMixin):
 
         token = "".join(random.sample(string.letters+string.digits, length))
         setattr(self, token_name, token)
-
-
-
-    @repeat_on_conflict(['self'])
-    def get_token(self, token_name):
-        """ returns a token, and generate those that are still missing """
-
-        generated = False
-
-        if token_name not in TOKEN_NAMES:
-            raise TokenException('Invalid token name %s' % token_name)
-
-        create_missing_user_tokens(self)
-
-        return getattr(self, token_name)
-
-
 
     @property
     def active_devices(self):
@@ -637,30 +754,6 @@ class User(BaseUser, SyncedDevicesMixin, SettingsMixin):
         from mygpo.db.couchdb.podcast_state import get_subscribed_podcast_states_by_user
         states = get_subscribed_podcast_states_by_user(self, public)
         return [state.podcast for state in states]
-
-
-
-    def get_subscribed_podcasts(self, public=None):
-        """ Returns all subscribed podcasts for the user
-
-        The attribute "url" contains the URL that was used when subscribing to
-        the podcast """
-
-        from mygpo.db.couchdb.podcast_state import get_subscribed_podcast_states_by_user
-        states = get_subscribed_podcast_states_by_user(self, public)
-        podcast_ids = [state.podcast for state in states]
-        podcasts = Podcast.objects.filter(id__in=podcast_ids)
-        podcasts = {podcast.id: podcast for podcast in podcasts}
-
-        for state in states:
-            podcast = podcasts.get(state.podcast, None)
-            if podcast is None:
-                continue
-
-            podcast = proxy_object(podcast, url=state.ref_url)
-            podcasts[state.podcast] = podcast
-
-        return set(podcasts.values())
 
 
 
@@ -878,7 +971,7 @@ class HistoryEntry(object):
         # does not need pre-populated data because no db-access is required
         device_ids = [getattr(x, 'device_id', None) for x in entries]
         device_ids = filter(None, device_ids)
-        devices = dict([ (id, user.get_device(id)) for id in device_ids])
+        devices = {client.id.hex: client for client in user.client_set.all()}
 
 
         for entry in entries:
@@ -896,3 +989,14 @@ class HistoryEntry(object):
 
 
         return entries
+
+
+def create_missing_profile(sender, **kwargs):
+    """ Creates a UserProfile if a User doesn't have one """
+    user = kwargs['instance']
+
+    if not hasattr(user, 'profile'):
+        # TODO: remove uuid column once migration from CouchDB is complete
+        import uuid
+        profile = UserProfile.objects.create(user=user, uuid=uuid.uuid1())
+        user.profile = profile

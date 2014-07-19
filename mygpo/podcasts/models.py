@@ -11,7 +11,7 @@ from django.contrib.contenttypes import generic
 from uuidfield import UUIDField
 
 from mygpo import utils
-from mygpo.core.models import TwitterModel
+from mygpo.core.models import TwitterModel, UUIDModel, GenericManager
 
 import logging
 logger = logging.getLogger(__name__)
@@ -25,19 +25,6 @@ MIN_UPDATE_INTERVAL = 5
 
 # every podcast should be updated at least once a month
 MAX_UPDATE_INTERVAL = 24 * 30
-
-
-class UUIDModel(models.Model):
-    """ Models that have an UUID as primary key """
-
-    id = UUIDField(primary_key=True)
-
-    class Meta:
-        abstract = True
-
-    def get_id(self):
-        """ String representation of the ID """
-        return self.id.hex
 
 
 class TitleModel(models.Model):
@@ -153,22 +140,6 @@ class AuthorModel(models.Model):
 
     class Meta:
         abstract = True
-
-
-class GenericManager(models.Manager):
-    """ Generic manager methods """
-
-    def count_fast(self):
-        """ Fast approximate count of all model instances
-
-        PostgreSQL is slow when counting records without an index. This is a
-        workaround which only gives approximate results. see:
-        http://wiki.postgresql.org/wiki/Slow_Counting """
-        cursor = connection.cursor()
-        cursor.execute("select reltuples from pg_class where relname='%s';" %
-                       self.model._meta.db_table)
-        row = cursor.fetchone()
-        return int(row[0])
 
 
 class UrlsMixin(models.Model):
@@ -521,7 +492,8 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
 
         subscriptions_by_devices = user.get_subscriptions_by_device()
 
-        for group in user.get_grouped_devices():
+        from mygpo.users.sync import get_grouped_devices
+        for group in get_grouped_devices(user):
 
             if group.is_synced:
 

@@ -9,3 +9,8 @@ from mygpo.podcasts.models import Podcast
 class PublishedPodcast(models.Model):
     publisher = models.ForeignKey(settings.AUTH_USER_MODEL)
     podcast = models.ForeignKey(Podcast)
+
+    class Meta:
+        unique_together = (
+            ('publisher', 'podcast'),
+        )
