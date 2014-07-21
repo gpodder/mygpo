@@ -110,8 +110,8 @@ def tags_for_user(user, podcast_id=None):
 
     udb = get_userdata_database()
     res = udb.view('usertags/by_user',
-            startkey = [user._id, podcast_id],
-            endkey   = [user._id, podcast_id or {}]
+            startkey = [user.profile.uuid.hex, podcast_id],
+            endkey   = [user.profile.uuid.hex, podcast_id or {}]
         )
 
     tags = defaultdict(list)

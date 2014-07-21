@@ -3,8 +3,7 @@ import re
 from django import forms
 from django.utils.translation import ugettext as _
 
-from mygpo.api.constants import DEVICE_TYPES
-from mygpo.users.models import Device
+from mygpo.users.models import Client
 
 import logging
 logger = logging.getLogger(__name__)
@@ -132,7 +131,7 @@ class DeviceForm(forms.Form):
                     'class': 'input input-sm form-control',
                     'placeholder': 'Device Name',
                 }))
-    type = forms.ChoiceField(choices=DEVICE_TYPES, label=_('Type'),
+    type = forms.ChoiceField(choices=Client.TYPES, label=_('Type'),
                 widget=forms.Select(attrs={
                     'class': 'input input-sm form-control',
                 }))

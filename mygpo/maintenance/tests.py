@@ -21,9 +21,10 @@ from collections import Counter
 
 from django.test import TestCase, TransactionTestCase
 from django.test.utils import override_settings
+from django.contrib.auth import get_user_model
 
 from mygpo.podcasts.models import Podcast, Episode
-from mygpo.users.models import EpisodeAction, User
+from mygpo.users.models import EpisodeAction
 from mygpo.maintenance.merge import PodcastMerger
 from mygpo.utils import get_timestamp
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
@@ -55,6 +56,7 @@ class MergeTests(TransactionTestCase):
                 'title': 'Episode 1 B',
             })
 
+        User = get_user_model()
         self.user = User(username='test-merge')
         self.user.email = 'test-merge-tests@example.com'
         self.user.set_password('secret!')
@@ -141,6 +143,7 @@ class MergeGroupTests(TransactionTestCase):
 
         self.podcast2.group_with(self.podcast3, 'My Group', 'Feed1', 'Feed2')
 
+        User = get_user_model()
         self.user = User(username='test-merge-group')
         self.user.email = 'test-merge-group-tests@example.com'
         self.user.set_password('secret!')

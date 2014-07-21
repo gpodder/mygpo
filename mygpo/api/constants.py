@@ -30,15 +30,6 @@ EPISODE_ACTION_TYPES = (
 )
 
 
-DEVICE_TYPES = (
-        ('desktop', _('Desktop')),
-        ('laptop', _('Laptop')),
-        ('mobile', _('Cell phone')),
-        ('server', _('Server')),
-        ('other', _('Other')),
-)
-
-
 SUBSCRIBE_ACTION = 1
 UNSUBSCRIBE_ACTION = -1
 

@@ -20,9 +20,8 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.contrib.sites.models import RequestSite
+from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
-
-from mygpo.users.models import User
 
 
 class EmailAuthenticationBackend(ModelBackend):
@@ -30,8 +29,10 @@ class EmailAuthenticationBackend(ModelBackend):
         try:
             validate_email(username)
 
-            user = User.get_user_by_email(username)
-            if not user:
+            User = get_user_model()
+            try:
+                user = User.objects.get(email=username)
+            except User.DoesNotExist:
                 return None
 
             return user if user.check_password(password) else None
@@ -40,7 +41,8 @@ class EmailAuthenticationBackend(ModelBackend):
             return None
 
     def get_user(self, username):
-        return User.get_user(username)
+        User = get_user_model()
+        return User.objects.get(username=username)
 
 
 def get_google_oauth_flow(request):

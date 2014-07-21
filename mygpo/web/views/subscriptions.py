@@ -15,6 +15,7 @@ from mygpo.utils import parse_bool, unzip, skip_pairs
 from mygpo.decorators import requires_token
 from mygpo.api import simple
 from mygpo.users.models import HistoryEntry, User
+from mygpo.users.subscriptions import get_subscribed_podcasts
 from mygpo.web.utils import symbian_opml_changes, get_podcast_link_target
 from mygpo.db.couchdb.podcast_state import subscriptions_by_user
 
@@ -35,7 +36,7 @@ def show_list(request):
 @cache_control(private=True)
 @login_required
 def download_all(request):
-    podcasts = request.user.get_subscribed_podcasts()
+    podcasts = get_subscribed_podcasts(request.user)
     response = simple.format_podcast_list(podcasts, 'opml', request.user.username)
     response['Content-Disposition'] = 'attachment; filename=all-subscriptions.opml'
     return response
@@ -48,7 +49,7 @@ def for_user(request, username):
         raise Http404
 
     subscriptions = user.get_subscribed_podcasts(public=True)
-    token = user.get_token('subscriptions_token')
+    token = user.profile.get_token('subscriptions_token')
 
     return render(request, 'user_subscriptions.html', {
         'subscriptions': subscriptions,
@@ -90,7 +91,7 @@ def create_subscriptionlist(request):
 
     podcasts = Podcast.objects.filter(id__in=podcast_ids)
     podcasts = {podcast.id.hex: podcast for podcast in podcasts}
-    devices = user.get_devices_by_id(device_ids)
+    devices = {client.id.hex: client for client in user.client_set.all()}
 
     subscription_list = {}
     for public, podcast_id, device_id in subscriptions:

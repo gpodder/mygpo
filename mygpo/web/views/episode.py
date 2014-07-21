@@ -173,7 +173,7 @@ def list_favorites(request):
 
     podcast = Podcast.objects.filter(urls__url=feed_url).first()
 
-    token = request.user.favorite_feeds_token
+    token = request.user.profile.favorite_feeds_token
 
     return render(request, 'favorites.html', {
         'episodes': favorites,

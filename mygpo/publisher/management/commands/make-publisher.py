@@ -1,10 +1,10 @@
 import sys
 
 from django.core.management.base import BaseCommand
+from django.contrib.auth import get_user_model
 
 from mygpo.decorators import repeat_on_conflict
 from mygpo.podcasts.models import Podcast
-from mygpo.users.models import User
 from mygpo.db.couchdb.user import add_published_objs
 
 
@@ -24,7 +24,8 @@ class Command(BaseCommand):
 
         username = args[0]
 
-        user = User.get_user(username)
+        User = get_user_model()
+        user = User.objects.get(username=username)
         if not user:
             print >> sys.stderr, 'User %s does not exist' % username
             return

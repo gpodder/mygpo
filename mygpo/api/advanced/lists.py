@@ -23,6 +23,7 @@ from django.http import HttpResponse, HttpResponseBadRequest, \
 from django.views.decorators.csrf import csrf_exempt
 from django.core.urlresolvers import reverse
 from django.contrib.sites.models import RequestSite
+from django.contrib.auth import get_user_model
 from django.utils.text import slugify
 from django.views.decorators.cache import never_cache
 from django.http import Http404
@@ -38,7 +39,6 @@ from mygpo.decorators import allowed_methods, repeat_on_conflict, cors_origin
 from mygpo.api.simple import parse_subscription, format_podcast_list, \
      check_format
 from mygpo.share.views import list_decorator
-from mygpo.users.models import User
 from mygpo.db.couchdb.podcastlist import podcastlist_for_user_slug, \
          podcastlists_for_user
 
@@ -105,7 +105,8 @@ def _get_list_data(l, username, domain):
 def get_lists(request, username):
     """ Returns a list of all podcast lists by the given user """
 
-    user = User.get_user(username)
+    User = get_user_model()
+    user = User.objects.get(username=username)
     if not user:
         raise Http404
 

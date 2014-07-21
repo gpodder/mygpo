@@ -10,6 +10,7 @@ from django.views.decorators.vary import vary_on_cookie
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
 from mygpo.podcasts.models import PodcastGroup, Podcast, Episode
@@ -28,7 +29,6 @@ from mygpo.web.utils import get_podcast_link_target, normalize_twitter, \
 from django.contrib.sites.models import RequestSite
 from mygpo.data.tasks import update_podcasts
 from mygpo.decorators import requires_token, allowed_methods
-from mygpo.users.models import User
 from mygpo.db.couchdb.episode_state import episode_listener_counts
 from mygpo.db.couchdb.pubsub import subscription_for_topic
 
@@ -37,9 +37,10 @@ from mygpo.db.couchdb.pubsub import subscription_for_topic
 @cache_control(private=True)
 def home(request):
     if is_publisher(request.user):
-        podcasts = Podcast.objects.filter(id__in=request.user.published_objects).prefetch_related('slugs')
+        podcasts = Podcast.objects.filter(publishedpodcast__publisher=request.user)\
+                                  .prefetch_related('slugs')
         site = RequestSite(request)
-        update_token = request.user.get_token('publisher_update_token')
+        update_token = request.user.profile.get_token('publisher_update_token')
         form = SearchPodcastForm()
         return render(request, 'publisher/home.html', {
             'update_token': update_token,
@@ -166,10 +167,8 @@ def new_update_token(request, username):
 @never_cache
 @requires_token(token_name='publisher_update_token')
 def update_published_podcasts(request, username):
-    user = User.get_user(username)
-    if not user:
-        raise Http404
-
+    User = get_user_model()
+    user = get_object_or_404(User, username=username)
     published_podcasts = Podcast.objects.filter(id__in=user.published_objects)
     update_podcasts.delay([podcast.url for podcast in published_podcasts])
     return HttpResponse('Updated:\n' + '\n'.join([p.url for p in published_podcasts]), mimetype='text/plain')

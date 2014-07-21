@@ -5,14 +5,16 @@ when you run "manage.py test".
 Replace this with more appropriate tests for your application.
 """
 
+import uuid
 import time
 from datetime import datetime
 from collections import Counter
 
 from django.test import TestCase
+from django.contrib.auth import get_user_model
 
 from mygpo.podcasts.models import Podcast, Episode
-from mygpo.users.models import User, Device, EpisodeAction
+from mygpo.users.models import Client, EpisodeAction
 from mygpo.maintenance.merge import PodcastMerger
 from mygpo.db.couchdb.podcast_state import (podcast_state_for_user_podcast,
     subscribe, unsubscribe, )
@@ -44,21 +46,15 @@ class SimpleTest(TestCase):
         e4.title = 'Episode 4'
         e4.save()
 
+        User = get_user_model()
         user = User()
         user.username = 'user-test_merge'
         user.email = 'user-test_merge@example.com'
         user.set_password('secret')
-
-        device1 = Device()
-        device1.uid = 'dev1'
-
-        device2 = Device()
-        device2.uid = 'dev2'
-
-        user.devices.append(device1)
-        user.devices.append(device2)
         user.save()
 
+        device1 = Client.objects.create(user=user, uid='dev1', id=uuid.uuid1())
+        device2 = Client.objects.create(user=user, uid='dev2', id=uuid.uuid1())
 
         subscribe(p1, user, device1)
         time.sleep(1)

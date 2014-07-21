@@ -6,11 +6,12 @@ from django.shortcuts import render
 from django.views.generic.base import View
 from django.utils.decorators import method_decorator
 from django.contrib.sites.models import RequestSite
+from django.contrib.auth import get_user_model
 
 from mygpo.podcasts.models import Episode
-from mygpo.users.models import User
 from mygpo.users.models import HistoryEntry
 from mygpo.users.settings import FLATTR_USERNAME
+from mygpo.users.subscriptions import get_subscribed_podcasts
 from mygpo.decorators import requires_token
 from mygpo.users.subscriptions import PodcastPercentageListenedSorter
 from mygpo.web.views import GeventView
@@ -28,7 +29,8 @@ class UserpageView(GeventView):
                 denied_template='userpage-denied.html'))
     def get(self, request, username):
 
-        user = User.get_user(username)
+        User = get_user_model()
+        user = User.objects.get(username=username)
         month_ago = datetime.today() - timedelta(days=31)
         site = RequestSite(request)
 
@@ -45,10 +47,10 @@ class UserpageView(GeventView):
 
         context = {
             'page_user': user,
-            'flattr_username': user.get_wksetting(FLATTR_USERNAME),
+            'flattr_username': user.profile.get_wksetting(FLATTR_USERNAME),
             'site': site.domain,
-            'subscriptions_token': user.get_token('subscriptions_token'),
-            'favorite_feeds_token': user.get_token('favorite_feeds_token'),
+            'subscriptions_token': user.profile.get_token('subscriptions_token'),
+            'favorite_feeds_token': user.profile.get_token('favorite_feeds_token'),
         }
         context.update(self.get_context(context_funs))
 
@@ -56,11 +58,11 @@ class UserpageView(GeventView):
 
 
     def get_podcast_lists(self, user):
-        return podcastlists_for_user(user._id)
+        return podcastlists_for_user(user.profile.uuid.hex)
 
 
     def get_subscriptions(self, user):
-        subscriptions = user.get_subscribed_podcasts()
+        subscriptions = get_subscribed_podcasts(user)
         return PodcastPercentageListenedSorter(subscriptions, user)
 
 

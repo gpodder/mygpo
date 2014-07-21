@@ -23,8 +23,9 @@ import inspect
 from couchdbkit import ResourceConflict
 
 from django.http import Http404
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseForbidden, HttpResponseNotAllowed
+from django.contrib.auth import get_user_model
 
 import logging
 logger = logging.getLogger(__name__)
@@ -50,12 +51,9 @@ def requires_token(token_name, denied_template=None):
         @wraps(fn)
         def tmp(request, username, *args, **kwargs):
 
-            from mygpo.users.models import User
-            user = User.get_user(username)
-            if not user:
-                raise Http404
-
-            token = user.get_token(token_name)
+            User = get_user_model()
+            user = get_object_or_404(User, username=username)
+            token = user.profile.get_token(token_name)
             u_token = request.GET.get('token', '')
 
             if token == '' or token == u_token:

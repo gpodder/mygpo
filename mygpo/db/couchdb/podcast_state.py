@@ -101,7 +101,7 @@ def podcast_state_for_user_podcast(user, podcast):
     udb = get_userdata_database()
 
     p = get_single_result(udb, 'podcast_states/by_podcast',
-                key          = [podcast.get_id(), user._id],
+                key          = [podcast.get_id(), user.profile.uuid.hex],
                 limit        = 1,
                 include_docs = True,
                 schema       = PodcastUserState,
@@ -110,11 +110,11 @@ def podcast_state_for_user_podcast(user, podcast):
     if not p:
         p = PodcastUserState()
         p.podcast = podcast.get_id()
-        p.user = user._id
+        p.user = user.profile.uuid.hex
         p.ref_url = podcast.url
-        p.settings[PUBLIC_SUB_PODCAST.name]=user.get_wksetting(PUBLIC_SUB_USER)
+        p.settings[PUBLIC_SUB_PODCAST.name]=user.profile.get_wksetting(PUBLIC_SUB_USER)
 
-        p.set_device_state(user.devices)
+        p.set_device_state(user.client_set.all())
 
     return p
 
@@ -127,8 +127,8 @@ def podcast_states_for_user(user):
     udb = get_userdata_database()
 
     r = udb.view('podcast_states/by_user',
-            startkey     = [user._id, None],
-            endkey       = [user._id, 'ZZZZ'],
+            startkey     = [user.profile.uuid.hex, None],
+            endkey       = [user.profile.uuid.hex, 'ZZZZ'],
             include_docs = True,
             schema       = PodcastUserState,
         )
@@ -197,8 +197,8 @@ def subscriptions_by_user(user, public=None):
     udb = get_userdata_database()
 
     r = udb.view('subscriptions/by_user',
-            startkey = [user._id, public, None, None],
-            endkey   = [user._id+'ZZZ', None, None, None],
+            startkey = [user.profile.uuid.hex, public, None, None],
+            endkey   = [user.profile.uuid.hex+'ZZZ', None, None, None],
             reduce   = False,
             schema   = PodcastUserState,
         )
@@ -309,15 +309,15 @@ def get_subscribed_podcast_states_by_device(device):
     return states
 
 
-def get_subscribed_podcast_states_by_user(user, public=None):
+def get_subscribed_podcast_states_by_user(user_id, public=None):
     """
     Returns the Ids of all subscribed podcasts
     """
 
     udb = get_userdata_database()
     r = udb.view('subscriptions/by_user',
-            startkey     = [user._id, public, None, None],
-            endkey       = [user._id, {}, {}, {}],
+            startkey     = [user_id, public, None, None],
+            endkey       = [user_id, {}, {}, {}],
             reduce       = False,
             include_docs = True,
             schema       = PodcastUserState,

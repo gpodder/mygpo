@@ -18,17 +18,16 @@
 from functools import wraps
 
 from django.http import HttpResponse, HttpResponseBadRequest, Http404
-
-from mygpo.users.models import User
+from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
 
 
 #############################################################################
 #
 def view_or_basicauth(view, request, username, token_name, realm = "", *args, **kwargs):
 
-    user = User.get_user(username)
-    if not user:
-        raise Http404
+    User = get_user_model()
+    user = get_object_or_404(User, username=username)
 
     token = getattr(user, token_name, '')
 

@@ -39,10 +39,12 @@ from mygpo.decorators import repeat_on_conflict
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.users.models import History, HistoryEntry, DeviceDoesNotExist
 from mygpo.users.tasks import update_suggestions
+from mygpo.users.subscriptions import get_subscribed_podcasts
 from mygpo.web.utils import process_lang_params
 from mygpo.utils import parse_range
 #from mygpo.web.views.podcast import slug_id_decorator
 from mygpo.users.settings import FLATTR_AUTO, FLATTR_TOKEN
+from mygpo.publisher.models import PublishedPodcast
 from mygpo.db.couchdb.episode_state import favorite_episode_ids_for_user
 from mygpo.db.couchdb.user import (suggestions_for_user,
     blacklist_suggested_podcast)
@@ -79,12 +81,12 @@ def welcome(request):
 @login_required
 def dashboard(request, episode_count=10):
 
-    subscribed_podcasts = list(request.user.get_subscribed_podcasts())
+    subscribed_podcasts = list(get_subscribed_podcasts(request.user))
     site = RequestSite(request)
 
     checklist = []
 
-    if request.user.devices:
+    if request.user.client_set.count():
         checklist.append('devices')
 
     if subscribed_podcasts:
@@ -93,29 +95,29 @@ def dashboard(request, episode_count=10):
     if favorite_episode_ids_for_user(request.user):
         checklist.append('favorites')
 
-    if not request.user.get_token('subscriptions_token'):
+    if not request.user.profile.get_token('subscriptions_token'):
         checklist.append('share')
 
-    if not request.user.get_token('favorite_feeds_token'):
+    if not request.user.profile.get_token('favorite_feeds_token'):
         checklist.append('share-favorites')
 
-    if not request.user.get_token('userpage_token'):
+    if not request.user.profile.get_token('userpage_token'):
         checklist.append('userpage')
 
     if tags_for_user(request.user):
         checklist.append('tags')
 
     # TODO add podcastlist_count_for_user
-    if podcastlists_for_user(request.user._id):
+    if podcastlists_for_user(request.user.profile.uuid.hex):
         checklist.append('lists')
 
-    if request.user.published_objects:
+    if PublishedPodcast.objects.filter(publisher=request.user).exists():
         checklist.append('publish')
 
-    if request.user.get_wksetting(FLATTR_TOKEN):
+    if request.user.profile.get_wksetting(FLATTR_TOKEN):
         checklist.append('flattr')
 
-    if request.user.get_wksetting(FLATTR_AUTO):
+    if request.user.profile.get_wksetting(FLATTR_AUTO):
         checklist.append('auto-flattr')
 
     tomorrow = datetime.today() + timedelta(days=1)

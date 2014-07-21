@@ -34,9 +34,9 @@ from restkit.errors import Unauthorized
 
 from mygpo.api import simple
 from mygpo.decorators import allowed_methods, repeat_on_conflict
-from mygpo.users.models import Device, DeviceUIDException, \
-     DeviceDoesNotExist
+from mygpo.users.models import DeviceUIDException, Client
 from mygpo.users.tasks import sync_user, set_device_task_state
+from mygpo.users.sync import get_grouped_devices
 from mygpo.db.couchdb.podcast_state import podcast_states_for_device, \
          remove_device_from_podcast_state
 from mygpo.db.couchdb.user import set_device_deleted, unsync_device, set_device
@@ -47,11 +47,11 @@ from mygpo.db.couchdb.user import set_device_deleted, unsync_device, set_device
 @login_required
 def overview(request):
 
-    device_groups = request.user.get_grouped_devices()
-    deleted_devices = request.user.inactive_devices
+    device_groups = get_grouped_devices(request.user)
+    deleted_devices = Client.objects.filter(user=request.user, deleted=True)
 
     # create a "default" device
-    device = Device()
+    device = Client()
     device_form = DeviceForm({
         'name': device.name,
         'type': device.type,
@@ -74,9 +74,9 @@ def device_decorator(f):
     def _decorator(request, uid, *args, **kwargs):
 
         try:
-            device = request.user.get_device_by_uid(uid, only_active=False)
+            device = Client.objects.get(user=request.user, uid=uid)
 
-        except DeviceDoesNotExist as e:
+        except Client.DoesNotExist as e:
             return HttpResponseNotFound(str(e))
 
         return f(request, device, *args, **kwargs)
@@ -118,7 +118,7 @@ def create(request):
         messages.error(request, _('Please fill out all fields.'))
         return HttpResponseRedirect(reverse('devices'))
 
-    device = Device()
+    device = Client()
     device.name = device_form.cleaned_data['name']
     device.type = device_form.cleaned_data['type']
     device.uid  = device_form.cleaned_data['uid'].replace(' ', '-')
@@ -280,19 +280,12 @@ def sync(request, device):
     if not form.is_valid():
         return HttpResponseBadRequest('invalid')
 
-
-    @repeat_on_conflict(['user'])
-    def do_sync(user, device, sync_target):
-        user.sync_devices(device, sync_target)
-        user.save()
-
-
     try:
         target_uid = form.get_target()
         sync_target = request.user.get_device_by_uid(target_uid)
-        do_sync(user=request.user, device=device, sync_target=sync_target)
+        device.sync_with(sync_target)
 
-    except DeviceDoesNotExist as e:
+    except Client.DoesNotExist as e:
         messages.error(request, str(e))
 
     sync_user.delay(request.user)

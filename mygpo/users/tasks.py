@@ -8,6 +8,7 @@ from mygpo.celery import celery
 from mygpo.db.couchdb.user import (suggestions_for_user, update_device_state,
     update_suggestions, )
 from mygpo.decorators import repeat_on_conflict
+from mygpo.users.sync import get_grouped_devices
 
 from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
@@ -18,7 +19,7 @@ def sync_user(user):
     """ Syncs all of the user's device groups """
     from mygpo.users.models import SubscriptionException
 
-    for group in user.get_grouped_devices():
+    for group in get_grouped_devices(user):
         if not group.is_synced:
             continue
 

@@ -15,18 +15,21 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+import uuid
 import unittest
 import doctest
 from collections import Counter
 
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.contrib.auth import get_user_model
 
 import mygpo.utils
 from mygpo.podcasts.models import Podcast
 from mygpo.maintenance.merge import PodcastMerger
 from mygpo.api.backend import get_device
-from mygpo.users.models import User, Device
+from mygpo.users.models import Client, SyncGroup
+from mygpo.users.sync import get_grouped_devices
 from mygpo.db.couchdb.podcast_state import (subscribed_podcast_ids_by_user_id,
     subscribe, unsubscribe, )
 
@@ -34,6 +37,7 @@ from mygpo.db.couchdb.podcast_state import (subscribed_podcast_ids_by_user_id,
 class DeviceSyncTests(unittest.TestCase):
 
     def setUp(self):
+        User = get_user_model()
         self.user = User(username='test')
         self.user.email = 'test@invalid.com'
         self.user.set_password('secret!')
@@ -41,36 +45,31 @@ class DeviceSyncTests(unittest.TestCase):
 
 
     def test_group(self):
-        dev1 = Device(uid='d1')
-        self.user.devices.append(dev1)
+        dev1 = Client.objects.create(id=uuid.uuid1(), user=self.user, uid='d1')
+        dev2 = Client.objects.create(id=uuid.uuid1(), user=self.user, uid='d2')
 
-        dev2 = Device(uid='d2')
-        self.user.devices.append(dev2)
-
-        group = self.user.get_grouped_devices().next()
+        group = get_grouped_devices(self.user).next()
         self.assertEquals(group.is_synced, False)
         self.assertIn(dev1, group.devices)
         self.assertIn(dev2, group.devices)
 
 
-        dev3 = Device(uid='d3')
-        self.user.devices.append(dev3)
+        dev3 = Client.objects.create(id=uuid.uuid1(), user=self.user, uid='d3')
 
-        self.user.sync_devices(dev1, dev3)
+        dev1.sync_with(dev3)
 
-        groups = self.user.get_grouped_devices()
-        g1 = groups.next()
-
-        self.assertEquals(g1.is_synced, True)
-        self.assertIn(dev1, g1.devices)
-        self.assertIn(dev3, g1.devices)
+        groups = get_grouped_devices(self.user)
 
         g2 = groups.next()
         self.assertEquals(g2.is_synced, False)
         self.assertIn(dev2, g2.devices)
 
+        g1 = groups.next()
+        self.assertEquals(g1.is_synced, True)
+        self.assertIn(dev1, g1.devices)
+        self.assertIn(dev3, g1.devices)
 
-        targets = self.user.get_sync_targets(dev1)
+        targets = dev1.get_sync_targets()
         target = targets.next()
         self.assertEquals(target, dev2)
 
@@ -90,6 +89,7 @@ class UnsubscribeMergeTests(TestCase):
         self.podcast1 = Podcast.objects.get_or_create_for_url('http://example.com/feed.rss')
         self.podcast2 = Podcast.objects.get_or_create_for_url(self.P2_URL)
 
+        User = get_user_model()
         self.user = User(username='test-merge')
         self.user.email = 'test@example.com'
         self.user.set_password('secret!')
@@ -114,7 +114,7 @@ class UnsubscribeMergeTests(TestCase):
         p = Podcast.objects.get(urls__url=self.P2_URL)
         unsubscribe(p, self.user, self.device)
 
-        subscriptions = subscribed_podcast_ids_by_user_id(self.user._id)
+        subscriptions = subscribed_podcast_ids_by_user_id(self.user.profile.uuid.hex)
         self.assertEqual(0, len(subscriptions))
 
     def tearDown(self):

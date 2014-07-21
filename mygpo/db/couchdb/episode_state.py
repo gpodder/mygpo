@@ -25,7 +25,7 @@ def episode_state_for_user_episode(user, episode):
         episode_id = episode._id
     else:
         episode_id = episode.get_id()
-    key = 'episode-state-userid-%s-episodeid-%s' % (sha1(user._id).hexdigest(),
+    key = 'episode-state-userid-%s-episodeid-%s' % (sha1(user.profile.uuid.hex).hexdigest(),
             sha1(episode_id).hexdigest())
 
 #   Disabled as cache invalidation does not work properly
@@ -35,7 +35,7 @@ def episode_state_for_user_episode(user, episode):
 
     udb = get_userdata_database()
     state = get_single_result(udb, 'episode_states/by_user_episode',
-            key          = [user._id, episode_id],
+            key          = [user.profile.uuid.hex, episode_id],
             include_docs = True,
             limit        = 1,
             schema       = EpisodeUserState,
@@ -54,7 +54,7 @@ def episode_state_for_user_episode(user, episode):
         state = EpisodeUserState()
         state.episode = episode_id
         state.podcast = podcast.get_id()
-        state.user = user._id
+        state.user = user.profile.uuid.hex
         state.ref_url = episode.url
         state.podcast_ref_url = podcast.url
         # don't cache here, because the state is saved by the calling function
@@ -262,7 +262,7 @@ def episode_state_for_ref_urls(user, podcast_url, episode_url):
         raise QueryParameterMissing('episode_url')
 
 
-    cache_key = 'episode-state-%s-%s-%s' % (user._id,
+    cache_key = 'episode-state-%s-%s-%s' % (user.profile.uuid.hex,
             sha1(podcast_url).hexdigest(),
             sha1(episode_url).hexdigest())
 
@@ -272,7 +272,7 @@ def episode_state_for_ref_urls(user, podcast_url, episode_url):
 
     udb = get_userdata_database()
     state = get_single_result(udb, 'episode_states/by_ref_urls',
-            key   = [user._id, podcast_url, episode_url],
+            key   = [user.profile.uuid.hex, podcast_url, episode_url],
             limit = 1,
             include_docs=True,
             schema      = EpisodeUserState,
@@ -493,7 +493,7 @@ def favorite_episode_ids_for_user(user):
 
     udb = get_userdata_database()
     favorites = udb.view('favorites/episodes_by_user',
-            key = user._id,
+            key = user.profile.uuid.hex,
         )
 
     return set(x['value']['_id'] for x in favorites)

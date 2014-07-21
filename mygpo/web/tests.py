@@ -21,10 +21,10 @@ import uuid
 
 from django.test import TestCase
 from django.core.urlresolvers import reverse
+from django.contrib.auth import get_user_model
 
 from mygpo.podcasts.models import Podcast, Episode, Slug
 import mygpo.web.utils
-from mygpo.users.models import User
 from mygpo.test import create_auth_string, anon_request
 
 
@@ -32,6 +32,7 @@ class SimpleWebTests(TestCase):
 
     @classmethod
     def setUpClass(self):
+        User = get_user_model()
         self.user = User(username='web-test', email='web-test@example.com')
         self.user.set_password('pwd')
         self.user.save()

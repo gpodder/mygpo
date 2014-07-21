@@ -25,10 +25,10 @@ from copy import deepcopy
 from django.test.client import Client
 from django.test import TestCase
 from django.core.urlresolvers import reverse
+from django.contrib.auth import get_user_model
 
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.api.advanced import episodes
-from mygpo.users.models import User
 from mygpo.test import create_auth_string, anon_request
 from mygpo.core.json import json
 
@@ -36,6 +36,7 @@ from mygpo.core.json import json
 class AdvancedAPITests(unittest.TestCase):
 
     def setUp(self):
+        User = get_user_model()
         self.password = 'asdf'
         self.username = 'adv-api-user'
         self.user = User(username=self.username, email='user@example.com')
@@ -112,6 +113,7 @@ class SubscriptionAPITests(unittest.TestCase):
     """ Tests the Subscription API """
 
     def setUp(self):
+        User = get_user_model()
         self.password = 'asdf'
         self.username = 'subscription-api-user'
         self.device_uid = 'test-device'

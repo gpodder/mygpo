@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from django.utils.html import strip_tags
 from django.contrib.staticfiles.storage import staticfiles_storage
 
-from mygpo.api.constants import DEVICE_TYPES
+from mygpo.users.models import Client
 from mygpo.web.views.device import show
 
 
@@ -15,7 +15,7 @@ _ = ugettext
 register = template.Library()
 
 # Create a dictionary of device_type -> caption mappings
-DEVICE_TYPES_DICT = dict(DEVICE_TYPES)
+DEVICE_TYPES_DICT = dict(Client.TYPES)
 
 # This dictionary maps device types to their icon files
 DEVICE_TYPE_ICONS = {

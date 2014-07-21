@@ -20,7 +20,7 @@ import random
 
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.sites.models import RequestSite
@@ -37,7 +37,6 @@ from oauth2client.client import FlowExchangeError
 from mygpo.db.couchdb.user import user_by_google_email, set_users_google_email
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.web.forms import RestorePasswordForm
-from mygpo.users.models import User
 from mygpo.web.forms import ResendActivationForm
 from mygpo.constants import DEFAULT_LOGIN_REDIRECT
 from mygpo.web.auth import get_google_oauth_flow
@@ -126,11 +125,12 @@ class LoginView(View):
 
 
 def get_user(username, email, is_active=None):
+    User = get_user_model()
     if username:
-        return User.get_user(username, is_active=None)
+        return User.objects.get(username=username)
 
     elif email:
-        return User.get_user_by_email(email, is_active=None)
+        return User.objects.get(email=email)
 
     return None
 

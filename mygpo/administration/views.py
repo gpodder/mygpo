@@ -14,6 +14,7 @@ from django.template.loader import render_to_string
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
 from django.contrib.sites.models import RequestSite
+from django.contrib.auth import get_user_model
 from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.conf import settings
@@ -22,10 +23,10 @@ from mygpo.podcasts.models import Podcast, Episode
 from mygpo.administration.auth import require_staff
 from mygpo.administration.group import PodcastGrouper
 from mygpo.maintenance.merge import PodcastMerger, IncorrectMergeException
-from mygpo.users.models import User
 from mygpo.administration.clients import UserAgentStats, ClientStats
 from mygpo.administration.tasks import merge_podcasts
 from mygpo.utils import get_git_head
+from mygpo.users.models import UserProxy
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.celery import celery
 from mygpo.db.couchdb import get_userdata_database
@@ -282,7 +283,7 @@ class StatsView(AdminView):
         return {
             'podcasts': Podcast.objects.count_fast(),
             'episodes': Episode.objects.count_fast(),
-            'users': User.count(),
+            'users': UserProxy.objects.count_fast(),
         }
 
     def get(self, request):
@@ -310,6 +311,7 @@ class ActivateUserView(AdminView):
 
     def post(self, request):
 
+        User = get_user_model()
         username = request.POST.get('username')
         email = request.POST.get('email')
 
@@ -321,10 +323,10 @@ class ActivateUserView(AdminView):
         user = None
 
         if username:
-            user = User.get_user(username, is_active=None)
+            user = User.objects.get(username=username)
 
         if email and not user:
-            user = User.get_user_by_email(email, is_active=None)
+            user = User.objects.get(email=email)
 
         if not user:
             messages.error(request, _('No user found'))
@@ -351,7 +353,7 @@ class MakePublisher(AdminView):
 
     def post(self, request):
         username = request.POST.get('username')
-        user = User.get_user(username)
+        user = User.objects.get(username=username)
         if user is None:
             messages.error(request, 'User "{username}" not found'.format(username=username))
             return HttpResponseRedirect(reverse('admin-make-publisher-input'))

@@ -7,6 +7,7 @@ from django.shortcuts import render
 from django.utils.text import slugify
 from django.contrib.sites.models import RequestSite
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 from django.views.decorators.vary import vary_on_cookie
@@ -18,7 +19,6 @@ from mygpo.podcasts.models import Podcast, PodcastGroup
 from mygpo.core.proxy import proxy_object
 from mygpo.api.simple import format_podcast_list
 from mygpo.share.models import PodcastList
-from mygpo.users.models import User
 from mygpo.directory.views import search as directory_search
 from mygpo.decorators import repeat_on_conflict
 from mygpo.flattr import Flattr
@@ -38,14 +38,15 @@ def list_decorator(must_own=False):
         @wraps(f)
         def _decorator(request, username, listname, *args, **kwargs):
 
-            user = User.get_user(username)
+            User = get_user_model()
+            user = User.objects.get(username=username)
             if not user:
                 raise Http404
 
             if must_own and request.user != user:
                 return HttpResponseForbidden()
 
-            plist = podcastlist_for_user_slug(user._id, listname)
+            plist = podcastlist_for_user_slug(user.profile.uuid.hex, listname)
 
             if plist is None:
                 raise Http404
@@ -75,7 +76,8 @@ def lists_own(request):
 
 def lists_user(request, username):
 
-    user = User.get_user(username)
+    User = get_user_model()
+    user = User.objects.get(username=username)
     if not user:
         raise Http404
 
@@ -285,9 +287,9 @@ def overview(request):
     user = request.user
     site = RequestSite(request)
 
-    subscriptions_token = user.get_token('subscriptions_token')
-    userpage_token = user.get_token('userpage_token')
-    favfeed_token = user.get_token('favorite_feeds_token')
+    subscriptions_token = user.profile.get_token('subscriptions_token')
+    userpage_token = user.profile.get_token('userpage_token')
+    favfeed_token = user.profile.get_token('favorite_feeds_token')
 
     favfeed = FavoriteFeed(user)
     favfeed_url = favfeed.get_public_url(site.domain)

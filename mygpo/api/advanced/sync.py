@@ -26,6 +26,7 @@ from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.users.models import DeviceDoesNotExist, User
 from mygpo.users.tasks import sync_user
+from mygpo.users.sync import get_grouped_devices
 
 
 @csrf_exempt
@@ -68,7 +69,7 @@ def get_sync_status(user):
     sync_groups = []
     unsynced = []
 
-    for group in user.get_grouped_devices():
+    for group in get_grouped_devices(user):
         uids = [device.uid for device in group.devices]
 
         if group.is_synced:

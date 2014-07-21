@@ -28,7 +28,7 @@ from mygpo.api.backend import get_device, BulkSubscribe
 from mygpo.utils import get_timestamp, \
     parse_request_body, normalize_feed_url, intersect
 from mygpo.decorators import cors_origin
-from mygpo.users.models import DeviceDoesNotExist
+from mygpo.users.models import DeviceDoesNotExist, Client
 from mygpo.core.json import JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.db.couchdb import BulkException
@@ -100,7 +100,7 @@ class SubscriptionsAPI(APIView):
     def get(self, request, version, username, device_uid):
         """ Client retrieves subscription updates """
         now = datetime.utcnow()
-        device = request.user.get_device_by_uid(device_uid)
+        device = Client.objects.get(user=request.user, uid=device_uid)
         since = self.get_since(request)
         add, rem, until = self.get_changes(device, since, now)
         return JsonResponse({

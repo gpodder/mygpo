@@ -55,6 +55,11 @@ class Category(Document):
             return podcasts
 
         ids = self.podcasts[start:end]
+
+        # TODO: this should not be needed anymore after migration
+        if ids and not isinstance(ids[0], unicode):
+            return []
+
         podcasts = Podcast.objects.filter(id__in=ids)
         cache.set(cache_id, podcasts)
 

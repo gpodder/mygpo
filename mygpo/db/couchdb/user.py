@@ -2,6 +2,9 @@ from collections import Counter
 
 from couchdbkit import ResourceNotFound
 
+from django.db.models import Count
+from django.contrib.auth import get_user_model
+
 from mygpo.cache import cache_result
 from mygpo.decorators import repeat_on_conflict
 from mygpo.db.couchdb import get_userdata_database, \
@@ -19,8 +22,8 @@ def get_num_listened_episodes(user):
 
     udb = get_userdata_database()
     r = udb.view('listeners/by_user_podcast',
-            startkey    = [user._id, None],
-            endkey      = [user._id, {}],
+            startkey    = [user.profile.uuid.hex, None],
+            endkey      = [user.profile.uuid.hex, {}],
             reduce      = True,
             group_level = 2,
             stale       = 'update_after',
@@ -45,8 +48,8 @@ def get_num_played_episodes(user, since=None, until={}):
     since_str = since.strftime('%Y-%m-%d') if since else None
     until_str = until.strftime('%Y-%m-%d') if until else {}
 
-    startkey = [user._id, since_str]
-    endkey   = [user._id, until_str]
+    startkey = [user.profile.uuid.hex, since_str]
+    endkey   = [user.profile.uuid.hex, until_str]
 
     udb = get_userdata_database()
     val = get_single_result(udb, 'listeners/by_user',
@@ -68,8 +71,8 @@ def get_latest_episode_ids(user, count=10):
     if not user:
         raise QueryParameterMissing('user')
 
-    startkey = [user._id, {}]
-    endkey   = [user._id, None]
+    startkey = [user.profile.uuid.hex, {}]
+    endkey   = [user.profile.uuid.hex, None]
 
     udb = get_userdata_database()
     res = udb.view('listeners/by_user',
@@ -98,8 +101,8 @@ def get_seconds_played(user, since=None, until={}):
     since_str = since.strftime('%Y-%m-%dT%H:%M:%S') if since else None
     until_str = until.strftime('%Y-%m-%dT%H:%M:%S') if until else {}
 
-    startkey = [user._id, since_str]
-    endkey   = [user._id, until_str]
+    startkey = [user.profile.uuid.hex, since_str]
+    endkey   = [user.profile.uuid.hex, until_str]
 
     udb = get_userdata_database()
     val = get_single_result(udb, 'listeners/times_played_by_user',
@@ -122,14 +125,14 @@ def suggestions_for_user(user):
     from mygpo.users.models import Suggestions
     sdb = get_suggestions_database()
     s = get_single_result(sdb, 'suggestions/by_user',
-                key          = user._id,
+                key          = user.profile.uuid.hex,
                 include_docs = True,
                 schema       = Suggestions,
             )
 
     if not s:
         s = Suggestions()
-        s.user = user._id
+        s.user = user.profile.uuid.hex
 
     return s
 
@@ -160,32 +163,9 @@ def blacklist_suggested_podcast(suggestions, podcast_id):
 
 @cache_result(timeout=60*60)
 def user_agent_stats():
-    from mygpo.users.models import User
-    res = User.view('clients/by_ua_string',
-        wrap_doc    = False,
-        group_level = 1,
-        stale       = 'update_after',
-    )
-
-    return Counter(dict((r['key'], r['value']) for r in res))
-
-
-def deleted_users():
-    from mygpo.users.models import User
-    users = User.view('users/deleted',
-            include_docs = True,
-            reduce       = False,
-        )
-    return list(users)
-
-
-def deleted_user_count():
-    from mygpo.users.models import User
-    total = User.view('users/deleted',
-            reduce = True,
-        )
-    return list(total)[0]['value'] if total else 0
-
+    from mygpo.users.models import Client
+    result = Client.objects.values('user_agent').annotate(Count('user_agent'))
+    return Counter({x['user_agent']: x['user_agent__count'] for x in result})
 
 
 @cache_result(timeout=60)
@@ -200,8 +180,8 @@ def user_history(user, start, length):
     udb = get_userdata_database()
     res = udb.view('history/by_user',
             descending = True,
-            startkey   = [user._id, {}],
-            endkey     = [user._id, None],
+            startkey   = [user.profile.uuid.hex, {}],
+            endkey     = [user.profile.uuid.hex, None],
             limit      = length,
             skip       = start,
         )
@@ -225,8 +205,8 @@ def device_history(user, device, start, length):
 
     res = udb.view('history/by_device',
             descending = True,
-            startkey   = [user._id, device.id, {}],
-            endkey     = [user._id, device.id, None],
+            startkey   = [user.profile.uuid.hex, device.id, {}],
+            endkey     = [user.profile.uuid.hex, device.id, None],
             limit      = length,
             skip       = start,
         )
@@ -261,17 +241,11 @@ def _wrap_historyentry(action):
 
 def user_by_google_email(email):
     """ Get a user by its connected Google account """
-
-    from mygpo.users.models import User
-    users = User.view('users/by_google_email',
-            key          = email,
-            include_docs = True,
-        )
-
-    if not users:
+    User = get_user_model()
+    try:
+        return User.objects.get(profile__google_email=email)
+    except User.DoesNotExist:
         return None
-
-    return users.one()
 
 
 @repeat_on_conflict(['user'])
@@ -287,10 +261,10 @@ def set_users_google_email(user, email):
 
 
 def get_user_by_id(user_id):
-    from mygpo.users.models import User
+    User = get_user_model()
     try:
-        return User.get(user_id)
-    except ResourceNotFound:
+        User.objects.get(profile__uuid=user_id)
+    except User.DoesNotExist:
         return None
 
 

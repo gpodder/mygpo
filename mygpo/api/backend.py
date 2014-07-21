@@ -17,6 +17,7 @@
 
 from collections import defaultdict
 from functools import partial
+import uuid
 
 from mygpo.podcasts.models import Podcast
 from mygpo.users.models import EpisodeUserState, Device, DeviceDoesNotExist, \
@@ -24,11 +25,11 @@ from mygpo.users.models import EpisodeUserState, Device, DeviceDoesNotExist, \
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core.json import json
 from mygpo.users.settings import STORE_UA
+from mygpo.users.models import Client
 from mygpo.db.couchdb import bulk_save_retry, get_userdata_database
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
 
 
-@repeat_on_conflict(['user'])
 def get_device(user, uid, user_agent, undelete=True):
     """
     Loads or creates the device indicated by user, uid.
@@ -36,33 +37,26 @@ def get_device(user, uid, user_agent, undelete=True):
     If the device has been deleted and undelete=True, it is undeleted.
     """
 
-    store_ua = user.get_wksetting(STORE_UA)
+    store_ua = user.profile.get_wksetting(STORE_UA)
 
     save = False
 
-    try:
-        device = user.get_device_by_uid(uid, only_active=False)
+    client, created = Client.objects.update_or_create(user=user, uid=uid,
+                        defaults = {
+                            'id': uuid.uuid1()
+                        })
 
-    except DeviceDoesNotExist:
-        device = Device(uid=uid)
-        user.devices.append(device)
+    if client.deleted and undelete:
+        client.deleted = False
         save = True
 
-    if device.deleted and undelete:
-        device.deleted = False
-        user.set_device(device)
-        save = True
-
-    if store_ua and user_agent and \
-            getattr(device, 'user_agent', None) != user_agent:
-        device.user_agent = user_agent
-        user.set_device(device)
-        save = True
+    if store_ua and user_agent and client.user_agent != user_agent:
+        client.user_agent = user_agent
 
     if save:
-        user.save()
+        client.save()
 
-    return device
+    return client
 
 
 class BulkSubscribe(object):

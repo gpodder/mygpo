@@ -82,3 +82,27 @@ def podcasts_for_states(podcast_states):
     podcasts = Podcast.objects.filter(id__in=podcast_ids)
     podcasts = {podcast.id.hex: podcast for podcast in podcasts}
     return podcasts.values()
+
+
+
+def get_subscribed_podcasts(user, public=None):
+    """ Returns all subscribed podcasts for the user
+
+    The attribute "url" contains the URL that was used when subscribing to
+    the podcast """
+
+    from mygpo.db.couchdb.podcast_state import get_subscribed_podcast_states_by_user
+    states = get_subscribed_podcast_states_by_user(user.profile.uuid.hex, public)
+    podcast_ids = [state.podcast for state in states]
+    podcasts = Podcast.objects.filter(id__in=podcast_ids)
+    podcasts = {podcast.id: podcast for podcast in podcasts}
+
+    for state in states:
+        podcast = podcasts.get(state.podcast, None)
+        if podcast is None:
+            continue
+
+        podcast = proxy_object(podcast, url=state.ref_url)
+        podcasts[state.podcast] = podcast
+
+    return set(podcasts.values())

@@ -21,6 +21,5 @@ Not OK
 
 Unknown
 -------
-* django_couchdb_utils
 * mygpo-feedservice
 * celery-redis

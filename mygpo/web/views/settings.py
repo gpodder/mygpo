@@ -30,9 +30,6 @@ from django.utils.decorators import method_decorator
 from django.views.generic.base import View
 from django.utils.html import strip_tags
 
-from django_couchdb_utils.couchauth.models import UsernameException, \
-         PasswordException
-
 from mygpo.podcasts.models import Podcast
 from mygpo.core.podcasts import PODCAST_SORT
 from mygpo.decorators import allowed_methods, repeat_on_conflict
@@ -58,23 +55,23 @@ def account(request):
 
         site = RequestSite(request)
         flattr = Flattr(request.user, site.domain, request.is_secure())
-        userpage_token = request.user.get_token('userpage_token')
+        userpage_token = request.user.profile.get_token('userpage_token')
 
         profile_form = ProfileForm({
-               'twitter': request.user.twitter,
-               'about':   request.user.about,
+               'twitter': request.user.profile.twitter,
+               'about':   request.user.profile.about,
             })
 
         form = UserAccountForm({
             'email': request.user.email,
-            'public': request.user.get_wksetting(PUBLIC_SUB_USER)
+            'public': request.user.profile.get_wksetting(PUBLIC_SUB_USER)
             })
 
         flattr_form = FlattrForm({
-               'enable': request.user.get_wksetting(FLATTR_AUTO),
-               'token': request.user.get_wksetting(FLATTR_TOKEN),
-               'flattr_mygpo': request.user.get_wksetting(FLATTR_MYGPO),
-               'username': request.user.get_wksetting(FLATTR_USERNAME),
+               'enable': request.user.profile.get_wksetting(FLATTR_AUTO),
+               'token': request.user.profile.get_wksetting(FLATTR_TOKEN),
+               'flattr_mygpo': request.user.profile.get_wksetting(FLATTR_MYGPO),
+               'username': request.user.profile.get_wksetting(FLATTR_USERNAME),
             })
 
         return render(request, 'account.html', {
@@ -102,7 +99,8 @@ def account(request):
 
         try:
             request.user.save()
-        except (UsernameException, PasswordException) as ex:
+        except Exception as ex:
+            # TODO: which exception?
             messages.error(request, str(ex))
 
         messages.success(request, 'Account updated')
@@ -290,7 +288,7 @@ def share(request):
     if _update:
         _update(user=request.user)
 
-    token = request.user.get_token('subscriptions_token')
+    token = request.user.profile.get_token('subscriptions_token')
 
     return render(request, 'share.html', {
         'site': site,

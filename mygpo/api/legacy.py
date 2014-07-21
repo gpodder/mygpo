@@ -21,9 +21,9 @@ from django.http import HttpResponse
 from django.utils.datastructures import MultiValueDictKeyError
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
+from django.contrib.auth import get_user_model
 
 from mygpo.podcasts.models import Podcast
-from mygpo.users.models import User
 from mygpo.api.opml import Importer, Exporter
 from mygpo.users.models import SubscriptionException
 from mygpo.api.backend import get_device
@@ -117,8 +117,10 @@ def auth(emailaddr, password):
     if emailaddr is None or password is None:
         return None
 
-    user = User.get_user_by_email(emailaddr)
-    if not user:
+    User = get_user_model()
+    try:
+        user = User.objects.get(email=emailaddr)
+    except User.DoesNotExist:
         return None
 
     if not user.check_password(password):

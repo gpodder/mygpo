@@ -32,7 +32,7 @@ from django.conf import settings as dsettings
 from django.shortcuts import get_object_or_404
 
 from mygpo.podcasts.models import Podcast, Episode
-from mygpo.api.constants import EPISODE_ACTION_TYPES, DEVICE_TYPES
+from mygpo.api.constants import EPISODE_ACTION_TYPES
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.advanced.directory import episode_data
 from mygpo.api.backend import get_device
@@ -40,7 +40,7 @@ from mygpo.utils import format_time, parse_bool, get_timestamp, \
     parse_request_body, normalize_feed_url
 from mygpo.decorators import allowed_methods, cors_origin
 from mygpo.core.tasks import auto_flattr_episode
-from mygpo.users.models import (EpisodeAction, DeviceDoesNotExist,
+from mygpo.users.models import (EpisodeAction, DeviceDoesNotExist, Client,
                                 DeviceUIDException,
                                 InvalidEpisodeActionAttributes, )
 from mygpo.users.settings import FLATTR_AUTO
@@ -91,7 +91,7 @@ def episodes(request, username, version=1):
             logger.warn(msg, exc_info=True)
             return HttpResponseBadRequest(msg)
 
-        logger.info('start: user %s: %d actions from %s' % (request.user._id, len(actions), ua_string))
+        logger.info('start: user %s: %d actions from %s' % (request.user, len(actions), ua_string))
 
         # handle in background
         if len(actions) > dsettings.API_ACTIONS_MAX_NONBG:
@@ -119,7 +119,7 @@ def episodes(request, username, version=1):
             logger.warn(msg, exc_info=True)
             return HttpResponseBadRequest(str(e))
 
-        logger.info('done:  user %s: %d actions from %s' % (request.user._id, len(actions), ua_string))
+        logger.info('done:  user %s: %d actions from %s' % (request.user, len(actions), ua_string))
         return JsonResponse({'timestamp': now_, 'update_urls': update_urls})
 
     elif request.method == 'GET':
@@ -166,16 +166,16 @@ def convert_position(action):
 
 def get_episode_changes(user, podcast, device, since, until, aggregated, version):
 
-    devices = dict( (dev.id, dev.uid) for dev in user.devices )
+    devices = {client.id.hex: client.uid for client in user.client_set.all()}
 
     args = {}
     if podcast is not None:
         args['podcast_id'] = podcast.get_id()
 
     if device is not None:
-        args['device_id'] = device.id
+        args['device_id'] = device.id.hex
 
-    actions, until = get_episode_actions(user._id, since, until, **args)
+    actions, until = get_episode_actions(user.profile.uuid.hex, since, until, **args)
 
     if version == 1:
         actions = imap(convert_position, actions)
@@ -278,7 +278,7 @@ def update_episodes(user, actions, now, ua_string):
     udb = get_userdata_database()
     bulk_save_retry(obj_funs, udb)
 
-    if user.get_wksetting(FLATTR_AUTO):
+    if user.profile.get_wksetting(FLATTR_AUTO):
         for episode_id in auto_flattr_episodes:
             auto_flattr_episode.delay(user, episode_id)
 
@@ -309,7 +309,7 @@ def parse_episode_action(action, user, update_urls, now, ua_string):
 
     if action.get('device', False):
         device = get_device(user, action['device'], ua_string)
-        new_action.device = device.id
+        new_action.device = device.id.hex
 
     if action.get('timestamp', False):
         new_action.timestamp = dateutil.parser.parse(action['timestamp'])
@@ -364,7 +364,7 @@ def device(request, username, device_uid):
 
 
 def valid_devicetype(type):
-    for t in DEVICE_TYPES:
+    for t in Client.TYPES:
         if t[0] == type:
             return True
     return False

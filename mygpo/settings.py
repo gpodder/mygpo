@@ -59,9 +59,6 @@ COUCHDB_DATABASES = {
     'django_couchdb_utils_auth':
         {'URL': 'http://127.0.0.1:5984/mygpo_users'},
 
-    'django_couchdb_utils_sessions':
-        {'URL': 'http://127.0.0.1:5984/mygpo_sessions'},
-
     'django_couchdb_utils_registration':
         {'URL': 'http://127.0.0.1:5984/mygpo_users'},
 
@@ -137,7 +134,6 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.sessions',
     'django.contrib.staticfiles',
-    'django_couchdb_utils.couchauth',
     'django_couchdb_utils.registration',
     'mygpo.core',
     'mygpo.podcasts',
@@ -174,9 +170,8 @@ TEST_RUNNER='mygpo.test.MygpoTestSuiteRunner'
 ACCOUNT_ACTIVATION_DAYS = 7
 
 AUTHENTICATION_BACKENDS = (
-    'django_couchdb_utils.couchauth.backends.CouchDBAuthBackend',
-    'mygpo.web.auth.EmailAuthenticationBackend',
     'django.contrib.auth.backends.ModelBackend',
+    'mygpo.web.auth.EmailAuthenticationBackend',
 )
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
