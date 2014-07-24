@@ -27,6 +27,7 @@ from django.contrib.sites.models import RequestSite
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import never_cache
+from django.template.loader import render_to_string
 from django.views.generic.base import View, TemplateView
 from django.utils.decorators import method_decorator
 from django.core.urlresolvers import reverse
@@ -35,17 +36,19 @@ from django.utils.http import is_safe_url
 from oauth2client.client import FlowExchangeError
 
 from mygpo.db.couchdb.user import user_by_google_email, set_users_google_email
-from mygpo.decorators import allowed_methods, repeat_on_conflict
+from mygpo.decorators import allowed_methods
 from mygpo.web.forms import RestorePasswordForm
 from mygpo.web.forms import ResendActivationForm
 from mygpo.constants import DEFAULT_LOGIN_REDIRECT
 from mygpo.web.auth import get_google_oauth_flow
+from mygpo.users.models import UserProxy
+from mygpo.users.views.registration import send_activation_email
+from mygpo.utils import random_token
 
 import logging
 logger = logging.getLogger(__name__)
 
 
-@repeat_on_conflict(['user'])
 def login(request, user):
     from django.contrib.auth import login
     login(request, user)
@@ -98,16 +101,10 @@ class LoginView(View):
 
 
         if not user.is_active:
-            # if the user is not active, find the reason
-            if user.deleted:
-                messages.error(request, _('You have deleted your account, '
-                        'but you can register again'))
-                return HttpResponseRedirect(login_page)
-
-            else:
-                messages.error(request,
-                        _('Please activate your account first.'))
-                return HttpResponseRedirect(login_page)
+            send_activation_email(user, request)
+            messages.error(request, _('Please activate your account first. '
+                'We have just re-sent your activation email'))
+            return HttpResponseRedirect(login_page)
 
         # set up the user's session
         login(request, user)
@@ -124,17 +121,6 @@ class LoginView(View):
         return HttpResponseRedirect(DEFAULT_LOGIN_REDIRECT)
 
 
-def get_user(username, email, is_active=None):
-    User = get_user_model()
-    if username:
-        return User.objects.get(username=username)
-
-    elif email:
-        return User.objects.get(email=email)
-
-    return None
-
-
 @never_cache
 def restore_password(request):
 
@@ -149,81 +135,34 @@ def restore_password(request):
     if not form.is_valid():
         return HttpResponseRedirect('/login/')
 
-    user = get_user(form.cleaned_data['username'], form.cleaned_data['email'], is_active=None)
+    try:
+        user = UserProxy.objects.all().by_username_or_email(
+                form.cleaned_data['username'],
+                form.cleaned_data['email']
+            )
 
-    if not user:
+    except UserProxy.DoesNotExist:
         messages.error(request, _('User does not exist.'))
-
         return render(request, 'password_reset_failed.html')
 
+    if not user.is_active:
+        send_activation_email(user, request)
+        messages.error(request, _('Please activate your account first. '
+            'We have just re-sent your activation email'))
+        return HttpResponseRedirect(reverse('login'))
+
     site = RequestSite(request)
-    pwd = "".join(random.sample(string.letters+string.digits, 8))
-    subject = _('Reset password for your account on %s') % site
-    message = _('Here is your new password for your account %(username)s on %(site)s: %(password)s') % {'username': user.username, 'site': site, 'password': pwd}
-    user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
-    _set_password(user, pwd)
+    pwd = random_token(length=16)
+    user.set_password(pwd)
+    user.save()
+    subject = render_to_string('reset-pwd-subj.txt', {'site': site}).strip()
+    message = render_to_string('reset-pwd-msg.txt', {
+        'username': user.username,
+        'site': site,
+        'password': pwd,
+    })
+    user.email_user(subject, message)
     return render(request, 'password_reset.html')
-
-
-@repeat_on_conflict(['user'])
-def _set_password(user, password):
-    user.set_password(password)
-    user.save()
-
-
-@repeat_on_conflict(['user'])
-def _set_active(user, is_active=True):
-    user.is_active = is_active
-    user.save()
-
-
-@never_cache
-@allowed_methods(['GET', 'POST'])
-def resend_activation(request):
-
-    if request.method == 'GET':
-        form = ResendActivationForm()
-        return render(request, 'registration/resend_activation.html', {
-            'form': form,
-        })
-
-    site = RequestSite(request)
-    form = ResendActivationForm(request.POST)
-
-    try:
-        if not form.is_valid():
-            raise ValueError(_('Invalid Username entered'))
-
-        user = get_user(form.cleaned_data['username'], form.cleaned_data['email'], is_active=None)
-        if not user:
-            raise ValueError(_('User does not exist.'))
-
-        if user.deleted:
-            raise ValueError(_('You have deleted your account, but you can register again.'))
-
-        if user.activation_key is None:
-            _set_active(user=user, is_active=True)
-            raise ValueError(_('Your account already has been activated. Go ahead and log in.'))
-
-        elif user.activation_key_expired():
-            raise ValueError(_('Your activation key has expired. Please try another username, or retry with the same one tomorrow.'))
-
-    except ValueError, e:
-        messages.error(request, unicode(e))
-
-        return render(request, 'registration/resend_activation.html', {
-           'form': form,
-        })
-
-
-    try:
-        user.send_activation_email(site)
-
-    except AttributeError:
-        user.send_activation_email(site)
-
-    return render(request, 'registration/resent_activation.html')
-
 
 
 class GoogleLogin(View):

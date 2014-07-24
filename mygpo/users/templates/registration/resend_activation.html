@@ -12,27 +12,29 @@
 {% block content %}
    <form action="{% url "resend-activation" %}" method="POST">
        {% csrf_token %}
-       <table style="width: 400px; margin-left: auto; margin-right: auto;">
+       <table>
            <tr>
-               <td colspan="2" style="padding-bottom: 6px;">
+               <td colspan="2">
                    {% blocktrans %}Please enter either your username or (if you don't know that either) the e-mail address which you used to register your account. An e-mail will be sent to you.{% endblocktrans %}
                </td>
            </tr>
            <tr>
-               <th style="text-align: right;">
-                   {{ form.username.label_tag }}:
+               <th>
+                   {{ form.username.label_tag }}
                </th>
                <td>{{ form.username }}</td>
            </tr>
            <tr>
-               <th style="text-align: right;">
-                   {{ form.email.label_tag }}:
+               <th>
+                   {{ form.email.label_tag }}
                </th>
                <td>{{ form.email }}</td>
            </tr>
            <tr>
-               <td colspan="2" style="text-align: right;">
-                   <input type="submit" value="{% trans "Send activation e-mail" %}"/>
+               <td colspan="2">
+                   <button type="submit">
+                    {% trans "Send activation e-mail" %}
+                   </button>
                </td>
            </tr>
        </table>

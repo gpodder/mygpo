@@ -12,6 +12,7 @@ from couchdbkit.ext.django.schema import *
 from uuidfield import UUIDField
 
 from django.db import transaction, models
+from django.db.models import Q
 from django.contrib.auth.models import User as DjangoUser
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
@@ -61,8 +62,30 @@ class DeviceDeletedException(DeviceDoesNotExist):
 
 
 
+class UserProxyQuerySet(models.QuerySet):
+
+    def by_username_or_email(self, username, email):
+        """ Queries for a User by username or email """
+        q = Q()
+
+        if username:
+            q |= Q(username=username)
+
+        elif email:
+            q |= Q(email=email)
+
+        if q:
+            return self.get(q)
+        else:
+            return self.none()
+
+
 class UserProxyManager(GenericManager):
     """ Manager for the UserProxy model """
+
+    def get_queryset(self):
+        return UserProxyQuerySet(self.model, using=self._db)
+
 
 
 class UserProxy(DjangoUser):

@@ -10,6 +10,8 @@ import logging
 
 from django.core.urlresolvers import reverse
 
+from mygpo.utils import random_token
+
 logger = logging.getLogger(__name__)
 
 
@@ -81,9 +83,3 @@ def callback_url(feedurl, base_url):
     param = urllib.urlencode([('url', feedurl)])
     return '{base}{callback}?{param}'.format(base=base_url, callback=callback,
                                              param=param)
-
-
-def random_token(length=32):
-    import random
-    import string
-    return "".join(random.sample(string.letters+string.digits, length))

@@ -135,6 +135,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.staticfiles',
     'django_couchdb_utils.registration',
+    'djcelery',
     'mygpo.core',
     'mygpo.podcasts',
     'mygpo.search',
@@ -316,6 +317,9 @@ ELASTICSEARCH_SERVER = os.getenv('ELASTICSEARCH_SERVER', '127.0.0.1:9200')
 ELASTICSEARCH_INDEX = os.getenv('ELASTICSEARCH_INDEX', 'mygpo')
 ELASTICSEARCH_TIMEOUT = float(os.getenv('ELASTICSEARCH_TIMEOUT', '2'))
 
+# time for how long an activation is valid; after that, an unactivated user
+# will be deleted
+ACTIVATION_VALID_DAYS = int(os.getenv('ACTIVATION_VALID_DAYS', 10))
 
 import sys
 if 'test' in sys.argv:

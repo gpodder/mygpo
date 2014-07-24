@@ -2,9 +2,6 @@ from django.conf.urls import *
 from django.contrib.auth.views import logout
 from django.views.generic.base import TemplateView, RedirectView
 
-from django_couchdb_utils.registration.views import activate, register
-from django_couchdb_utils.registration.forms import RegistrationFormUniqueEmail
-
 from mygpo.web.logo import CoverArt
 
 
@@ -270,6 +267,10 @@ from mygpo.web.views.users import LoginView, GoogleLogin, GoogleLoginCallback
 
 urlpatterns += patterns('mygpo.web.views.users',
 
+ url(r'^register/restore_password$',
+    'restore_password',
+    name='restore-password'),
+
  url(r'^login/$',
     LoginView.as_view(),
     name='login'),
@@ -283,15 +284,4 @@ urlpatterns += patterns('mygpo.web.views.users',
      name='login-google-callback'),
 
  url(r'^logout/$',                                                 logout, {'next_page': '/'},  name='logout'),
- url(r'^register/resend-activation$',                             'resend_activation',          name='resend-activation'),
- url(r'^register/restore_password$',                              'restore_password',           name='restore-password'),
- url(r'^register/$',                                               register,
-            {'backend': 'django_couchdb_utils.registration.backends.default.DefaultBackend',
-             'form_class': RegistrationFormUniqueEmail},                                        name='register'),
-
- url(r'^registration_complete/$',
-    TemplateView.as_view(template_name='registration/registration_complete.html')),
-
-    (r'^activate/(?P<activation_key>\w+)$',                        activate,
-            {'backend': 'django_couchdb_utils.registration.backends.default.DefaultBackend'}),
 )

@@ -1,8 +1,12 @@
+from datetime import datetime, timedelta
 from itertools import chain
 from operator import itemgetter
 from collections import Counter
 
-from couchdbkit import ResourceConflict
+from celery.decorators import periodic_task
+
+from django.contrib.auth import get_user_model
+from django.conf import settings
 
 from mygpo.celery import celery
 from mygpo.db.couchdb.user import (suggestions_for_user, update_device_state,
@@ -65,3 +69,17 @@ def set_device_task_state(user):
     podcast_states = podcast_states_for_user(user)
     for state in podcast_states:
         update_device_state(state, user.devices)
+
+
+@periodic_task(run_every=timedelta(minutes=1))
+def remove_unactivated_users():
+    """ Remove users that have not been activated """
+    User = get_user_model()
+    valid_days = settings.ACTIVATION_VALID_DAYS
+    remove_before = datetime.now() - timedelta(days=valid_days)
+    logger.warn('Removing unactivated users before %s', remove_before)
+
+    users = User.objects.filter(is_active=False, date_joined__lt=remove_before)
+    logger.warn('Removing %d unactivated users', users.count())
+
+    users.delete()
