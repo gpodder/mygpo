@@ -40,8 +40,7 @@ from mygpo.users.settings import PUBLIC_SUB_USER, \
          FLATTR_TOKEN, FLATTR_AUTO, FLATTR_MYGPO, FLATTR_USERNAME
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast, \
          subscriptions_by_user, set_podcast_privacy_settings
-from mygpo.db.couchdb.user import update_flattr_settings, \
-         set_users_google_email
+from mygpo.db.couchdb.user import set_users_google_email
 
 
 
@@ -147,7 +146,11 @@ class FlattrSettingsView(View):
         auto_flattr = form.cleaned_data.get('enable', False)
         flattr_mygpo = form.cleaned_data.get('flattr_mygpo', False)
         username = form.cleaned_data.get('username', '')
-        update_flattr_settings(user, None, auto_flattr, flattr_mygpo, username)
+
+        user.settings[FLATTR_AUTO.name] = auto_flattr
+        user.settings[FLATTR_MYGPO.name] = flattr_mygpo
+        user.settings[FLATTR_USERNAME.name] = username
+        user.save()
 
         return HttpResponseRedirect(reverse('account') + '#flattr')
 
@@ -157,7 +160,10 @@ class FlattrLogout(View):
 
     def get(self, request):
         user = request.user
-        update_flattr_settings(user, False, False, False)
+        user.settings[FLATTR_AUTO.name] = False
+        user.settings[FLATTR_TOKEN.name] = False
+        user.settings[FLATTR_MYGPO.name] = False
+        user.save()
         return HttpResponseRedirect(reverse('account') + '#flattr')
 
 
@@ -176,7 +182,8 @@ class FlattrTokenView(View):
         token = flattr.process_retrieved_code(url)
         if token:
             messages.success(request, _('Authentication successful'))
-            update_flattr_settings(user, token)
+            user.settings[FLATTR_TOKEN.name] = token
+            user.save()
 
         else:
             messages.error(request, _('Authentication failed. Try again later'))
