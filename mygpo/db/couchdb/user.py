@@ -161,13 +161,6 @@ def blacklist_suggested_podcast(suggestions, podcast_id):
     sdb.save_doc(suggestions)
 
 
-@cache_result(timeout=60*60)
-def user_agent_stats():
-    from mygpo.users.models import Client
-    result = Client.objects.values('user_agent').annotate(Count('user_agent'))
-    return Counter({x['user_agent']: x['user_agent__count'] for x in result})
-
-
 @cache_result(timeout=60)
 def user_history(user, start, length):
 

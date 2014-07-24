@@ -1,7 +1,7 @@
 import re
 from collections import namedtuple, Counter
 
-from mygpo.db.couchdb.user import user_agent_stats
+from mygpo.users.models import Client
 
 
 Client = namedtuple('Client', 'client client_version lib lib_version os os_version')
@@ -13,13 +13,14 @@ class UserAgentStats(object):
     def __init__(self):
         self._useragents = None
 
-
     def get_entries(self):
         if self._useragents is None:
-            self._useragents = user_agent_stats()
+            result = Client.objects.values('user_agent')\
+                                   .annotate(Count('user_agent'))
+            result = {x['user_agent']: x['user_agent__count'] for x in result}
+            self._useragents = Counter(result)
 
         return self._useragents
-
 
     @property
     def max_users(self):
