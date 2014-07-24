@@ -27,10 +27,11 @@ from mygpo.administration.clients import UserAgentStats, ClientStats
 from mygpo.administration.tasks import merge_podcasts
 from mygpo.utils import get_git_head
 from mygpo.users.models import UserProxy
+from mygpo.publisher.models import PublishedPodcast
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.celery import celery
 from mygpo.db.couchdb import get_userdata_database
-from mygpo.db.couchdb.user import activate_user, add_published_objs
+from mygpo.db.couchdb.user import activate_user
 
 
 class InvalidPodcast(Exception):
@@ -376,9 +377,13 @@ class MakePublisher(AdminView):
         return HttpResponseRedirect(reverse('admin-make-publisher-result'))
 
     def set_publisher(self, request, user, podcasts):
-        podcast_ids = set(p.get_id() for p in podcasts)
-        add_published_objs(user, podcast_ids)
-        messages.success(request, 'Set publisher permissions for {count} podcasts'.format(count=len(podcast_ids)))
+        created, existed = 0, 0
+        created, existed = PublishedPodcast.objects.publish_podcasts(user,
+                                                                     podcasts)
+        messages.success(request,
+                         'Set publisher permissions for {created} podcasts; '
+                         '{existed} already existed'.format(created=created,
+                                                            existed=existed))
 
     def send_mail(self, request, user, podcasts):
         site = RequestSite(request)

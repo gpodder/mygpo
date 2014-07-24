@@ -3,9 +3,8 @@ import sys
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 
-from mygpo.decorators import repeat_on_conflict
 from mygpo.podcasts.models import Podcast
-from mygpo.db.couchdb.user import add_published_objs
+from mygpo.publisher.models import PublishedPodcast
 
 
 class Command(BaseCommand):
@@ -32,5 +31,4 @@ class Command(BaseCommand):
 
         urls = args[1:]
         podcasts = Podcast.objects.filter(urls__url__in=urls)
-        ids = [podcast.id for podcast in podcasts]
-        add_published_objs(user, ids)
+        PublishedPodcast.objects.get_or_create(user, podcasts)
