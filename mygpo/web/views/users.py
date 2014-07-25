@@ -35,7 +35,6 @@ from django.utils.http import is_safe_url
 
 from oauth2client.client import FlowExchangeError
 
-from mygpo.db.couchdb.user import user_by_google_email, set_users_google_email
 from mygpo.decorators import allowed_methods
 from mygpo.web.forms import RestorePasswordForm
 from mygpo.web.forms import ResendActivationForm
@@ -201,16 +200,19 @@ class GoogleLoginCallback(TemplateView):
 
         # Connect account
         if request.user.is_authenticated():
-            set_users_google_email(request.user, email)
+            request.user.google_email = email
+            request.user.save()
             messages.success(request, _('Your account has been connected with '
                     '{google}. Open Settings to change this.'.format(
                         google=email)))
             return HttpResponseRedirect(DEFAULT_LOGIN_REDIRECT)
 
         # Check if Google account is connected
-        user = user_by_google_email(email)
+        User = get_user_model()
+        try:
+            user = User.objects.get(profile__google_email=email)
 
-        if not user:
+        except User.DoesNotExist:
             # Connect account
             messages.error(request, _('No account connected with your Google '
                         'account %s. Please log in to connect.' % email))

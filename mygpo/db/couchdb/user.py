@@ -210,27 +210,6 @@ def _wrap_historyentry(action):
     return HistoryEntry.from_action_dict(action['value'])
 
 
-def user_by_google_email(email):
-    """ Get a user by its connected Google account """
-    User = get_user_model()
-    try:
-        return User.objects.get(profile__google_email=email)
-    except User.DoesNotExist:
-        return None
-
-
-@repeat_on_conflict(['user'])
-def set_users_google_email(user, email):
-    """ Update the Google accoutn connected with the user """
-
-    if user.google_email == email:
-        return user
-
-    user.google_email = email
-    user.save()
-    return user
-
-
 @repeat_on_conflict(['user'])
 def set_device_deleted(user, device, is_deleted):
     device.deleted = is_deleted

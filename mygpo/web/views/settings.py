@@ -40,8 +40,6 @@ from mygpo.users.settings import PUBLIC_SUB_USER, \
          FLATTR_TOKEN, FLATTR_AUTO, FLATTR_MYGPO, FLATTR_USERNAME
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast, \
          subscriptions_by_user, set_podcast_privacy_settings
-from mygpo.db.couchdb.user import set_users_google_email
-
 
 
 @login_required
@@ -196,7 +194,8 @@ class AccountRemoveGoogle(View):
 
     @method_decorator(login_required)
     def post(self, request):
-        set_users_google_email(request.user, None)
+        request.user.google_email = None
+        request.user.save()
         messages.success(request, _('Your account has been disconnected'))
         return HttpResponseRedirect(reverse('account'))
 
