@@ -218,18 +218,3 @@ def update_device_state(state, devices):
     if old_devs != set(state.disabled_devices):
         udb = get_userdata_database()
         udb.save_doc(state)
-
-
-@repeat_on_conflict(['user'])
-def create_missing_user_tokens(user):
-
-    generated = False
-
-    from mygpo.users.models import TOKEN_NAMES
-    for tn in TOKEN_NAMES:
-        if getattr(user, tn) is None:
-            user.create_new_token(tn)
-            generated = True
-
-    if generated:
-        user.save()

@@ -26,14 +26,13 @@ from django_couchdb_utils.registration.models import User as BaseUser
 from mygpo.core.models import (TwitterModel, UUIDModel, SettingsModel,
     GenericManager, )
 from mygpo.podcasts.models import Podcast, Episode
-from mygpo.utils import linearize
+from mygpo.utils import linearize, random_token
 from mygpo.core.proxy import DocumentABCMeta, proxy_object
 from mygpo.decorators import repeat_on_conflict
 from mygpo.users.ratings import RatingMixin
 from mygpo.users.subscriptions import subscription_changes, podcasts_for_states
 from mygpo.users.settings import FAV_FLAG, PUBLIC_SUB_PODCAST, SettingsMixin
-from mygpo.db.couchdb.user import user_history, device_history, \
-    create_missing_user_tokens
+from mygpo.db.couchdb.user import user_history, device_history
 
 # make sure this code is executed at startup
 from mygpo.users.signals import *
@@ -162,29 +161,29 @@ class UserProfile(TwitterModel, SettingsModel):
     google_email = models.CharField(max_length=100, null=True)
 
     # token for accessing subscriptions of this use
-    subscriptions_token = models.CharField(max_length=32, null=True)
+    subscriptions_token = models.CharField(max_length=32, null=True,
+                                           default=random_token)
 
     # token for accessing the favorite-episodes feed of this user
-    favorite_feeds_token = models.CharField(max_length=32, null=True)
+    favorite_feeds_token = models.CharField(max_length=32, null=True,
+                                            default=random_token)
 
     # token for automatically updating feeds published by this user
-    publisher_update_token = models.CharField(max_length=32, null=True)
+    publisher_update_token = models.CharField(max_length=32, null=True,
+                                              default=random_token)
 
     # token for accessing the userpage of this user
-    userpage_token = models.CharField(max_length=32, null=True)
+    userpage_token = models.CharField(max_length=32, null=True,
+                                      default=random_token)
 
     # key for activating the user
     activation_key = models.CharField(max_length=40, null=True)
 
     def get_token(self, token_name):
-        """ returns a token, and generate those that are still missing """
-
-        generated = False
+        """ returns a token """
 
         if token_name not in TOKEN_NAMES:
             raise TokenException('Invalid token name %s' % token_name)
-
-        create_missing_user_tokens(self)
 
         return getattr(self, token_name)
 
