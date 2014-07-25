@@ -35,9 +35,8 @@ from restkit.errors import Unauthorized
 
 from mygpo.api import simple
 from mygpo.decorators import allowed_methods, repeat_on_conflict
-from mygpo.users.models import Client
+from mygpo.users.models import Client, UserProxy
 from mygpo.users.tasks import sync_user, set_device_task_state
-from mygpo.users.sync import get_grouped_devices
 from mygpo.db.couchdb.podcast_state import podcast_states_for_device, \
          remove_device_from_podcast_state
 
@@ -47,7 +46,8 @@ from mygpo.db.couchdb.podcast_state import podcast_states_for_device, \
 @login_required
 def overview(request):
 
-    device_groups = get_grouped_devices(request.user)
+    user = UserProxy(request.user)
+    device_groups = user.get_grouped_devices()
     deleted_devices = Client.objects.filter(user=request.user, deleted=True)
 
     # create a "default" device
@@ -88,8 +88,6 @@ def device_decorator(f):
 @login_required
 @device_decorator
 def show(request, device):
-
-    request.user.sync_group(device)
 
     subscriptions = list(device.get_subscribed_podcasts())
     synced_with = request.user.get_synced(device)

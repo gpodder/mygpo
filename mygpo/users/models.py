@@ -30,7 +30,6 @@ from mygpo.utils import linearize
 from mygpo.core.proxy import DocumentABCMeta, proxy_object
 from mygpo.decorators import repeat_on_conflict
 from mygpo.users.ratings import RatingMixin
-from mygpo.users.sync import SyncedDevicesMixin, get_grouped_devices
 from mygpo.users.subscriptions import subscription_changes, podcasts_for_states
 from mygpo.users.settings import FAV_FLAG, PUBLIC_SUB_PODCAST, SettingsMixin
 from mygpo.db.couchdb.user import user_history, device_history, \
@@ -38,6 +37,9 @@ from mygpo.db.couchdb.user import user_history, device_history, \
 
 # make sure this code is executed at startup
 from mygpo.users.signals import *
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 RE_DEVICE_UID = re.compile(r'^[\w.-]+$')
@@ -57,6 +59,9 @@ class DeviceDoesNotExist(Exception):
 
 class DeviceDeletedException(DeviceDoesNotExist):
     pass
+
+
+GroupedDevices = collections.namedtuple('GroupedDevices', 'is_synced devices')
 
 
 class UIDValidator(RegexValidator):
@@ -90,6 +95,9 @@ class UserProxyManager(GenericManager):
     def get_queryset(self):
         return UserProxyQuerySet(self.model, using=self._db)
 
+    def from_user(self, user):
+        """ Get the UserProxy corresponding for the given User """
+        return self.get(pk=user.pk)
 
 
 class UserProxy(DjangoUser):
@@ -110,6 +118,28 @@ class UserProxy(DjangoUser):
         messages.success(request, _('Your user has been activated. '
                                     'You can log in now.'))
 
+    def get_grouped_devices(self):
+        """ Returns groups of synced devices and a unsynced group """
+
+        clients = Client.objects.filter(user=self, deleted=False)\
+                                .order_by('-sync_group')
+
+        last_group = object()
+        group = None
+
+        for client in clients:
+            # check if we have just found a new group
+            if last_group != client.sync_group:
+                if group != None:
+                    yield group
+
+                group = GroupedDevices(client.sync_group is not None, [])
+
+            last_group = client.sync_group
+            group.devices.append(client)
+
+        # yield remaining group
+        yield group
 
 
 class UserProfile(TwitterModel, SettingsModel):
@@ -480,6 +510,63 @@ class SyncGroup(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
 
+    def sync(self):
+        """ Sync the group, ie bring all members up-to-date """
+
+        group_state = self.get_group_state()
+
+        for device in SyncGroup.objects.filter(sync_group=self):
+            sync_actions = self.get_sync_actions(device, group_state)
+            device.apply_sync_actions(sync_actions)
+
+    def get_group_state(self):
+        """ Returns the group's subscription state
+
+        The state is represented by the latest actions for each podcast """
+
+        devices = Client.objects.filter(sync_group=self)
+        state = {}
+
+        for d in devices:
+            actions = dict(d.get_latest_changes())
+            for podcast_id, action in actions.items():
+                if not podcast_id in state or \
+                        action.timestamp > state[podcast_id].timestamp:
+                    state[podcast_id] = action
+
+        return state
+
+    def get_sync_actions(self, device, group_state):
+        """ Get the actions required to bring the device to the group's state
+
+        After applying the actions the device reflects the group's state """
+
+        # Filter those that describe actual changes to the current state
+        add, rem = [], []
+        current_state = dict(device.get_latest_changes())
+
+        for podcast_id, action in group_state.items():
+
+            # Sync-Actions must be newer than current state
+            if podcast_id in current_state and \
+               action.timestamp <= current_state[podcast_id].timestamp:
+                continue
+
+            # subscribe only what hasn't been subscribed before
+            if action.action == 'subscribe' and \
+                        (podcast_id not in current_state or \
+                         current_state[podcast_id].action == 'unsubscribe'):
+                add.append(podcast_id)
+
+            # unsubscribe only what has been subscribed before
+            elif action.action == 'unsubscribe' and \
+                        podcast_id in current_state and \
+                        current_state[podcast_id].action == 'subscribe':
+                rem.append(podcast_id)
+
+        return add, rem
+
+
 
 class Client(UUIDModel):
     """ A client application """
@@ -584,7 +671,8 @@ class Client(UUIDModel):
 
         sg = self.sync_group
 
-        for group in get_grouped_devices(self.user):
+        user = UserProxy.objects.from_user(self.user)
+        for group in user.get_grouped_devices():
 
             if self in group.devices:
                 # the device's group can't be a sync-target
@@ -598,6 +686,37 @@ class Client(UUIDModel):
                 for dev in group.devices:
                     if not dev == self:
                         yield dev
+
+    def apply_sync_actions(self, sync_actions):
+        """ Applies the sync-actions to the client """
+
+        from mygpo.db.couchdb.podcast_state import subscribe, unsubscribe
+        from mygpo.users.models import SubscriptionException
+        add, rem = sync_actions
+
+        podcasts = Podcast.objects.filter(id__in=(add+rem))
+        podcasts = {podcast.id: podcast for podcast in podcasts}
+
+        for podcast_id in add:
+            podcast = podcasts.get(podcast_id, None)
+            if podcast is None:
+                continue
+            try:
+                subscribe(podcast, self.user, self)
+            except SubscriptionException as e:
+                logger.warn('Web: %(username)s: cannot sync device: %(error)s' %
+                    dict(username=self.user.username, error=repr(e)))
+
+        for podcast_id in rem:
+            podcast = podcasts.get(podcast_id, None)
+            if not podcast:
+                continue
+
+            try:
+                unsubscribe(podcast, self.user, self)
+            except SubscriptionException as e:
+                logger.warn('Web: %(username)s: cannot sync device: %(error)s' %
+                    dict(username=self.user.username, error=repr(e)))
 
     def get_subscription_changes(self, since, until):
         """
@@ -675,7 +794,7 @@ class TokenException(Exception):
     pass
 
 
-class User(BaseUser, SyncedDevicesMixin, SettingsMixin):
+class User(BaseUser, SettingsMixin):
     oldid    = IntegerProperty()
     devices  = SchemaListProperty(Device)
     published_objects = StringListProperty()

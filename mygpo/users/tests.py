@@ -28,8 +28,7 @@ import mygpo.utils
 from mygpo.podcasts.models import Podcast
 from mygpo.maintenance.merge import PodcastMerger
 from mygpo.api.backend import get_device
-from mygpo.users.models import Client, SyncGroup
-from mygpo.users.sync import get_grouped_devices
+from mygpo.users.models import Client, SyncGroup, UserProxy
 from mygpo.db.couchdb.podcast_state import (subscribed_podcast_ids_by_user_id,
     subscribe, unsubscribe, )
 
@@ -37,8 +36,7 @@ from mygpo.db.couchdb.podcast_state import (subscribed_podcast_ids_by_user_id,
 class DeviceSyncTests(unittest.TestCase):
 
     def setUp(self):
-        User = get_user_model()
-        self.user = User(username='test')
+        self.user = UserProxy(username='test')
         self.user.email = 'test@invalid.com'
         self.user.set_password('secret!')
         self.user.save()
@@ -48,7 +46,7 @@ class DeviceSyncTests(unittest.TestCase):
         dev1 = Client.objects.create(id=uuid.uuid1(), user=self.user, uid='d1')
         dev2 = Client.objects.create(id=uuid.uuid1(), user=self.user, uid='d2')
 
-        group = get_grouped_devices(self.user).next()
+        group = self.user.get_grouped_devices().next()
         self.assertEquals(group.is_synced, False)
         self.assertIn(dev1, group.devices)
         self.assertIn(dev2, group.devices)
@@ -58,7 +56,7 @@ class DeviceSyncTests(unittest.TestCase):
 
         dev1.sync_with(dev3)
 
-        groups = get_grouped_devices(self.user)
+        groups = self.user.get_grouped_devices()
 
         g2 = groups.next()
         self.assertEquals(g2.is_synced, False)

@@ -492,8 +492,8 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
 
         subscriptions_by_devices = user.get_subscriptions_by_device()
 
-        from mygpo.users.sync import get_grouped_devices
-        for group in get_grouped_devices(user):
+        user = UserProxy(user)
+        for group in user.get_grouped_devices():
 
             if group.is_synced:
 

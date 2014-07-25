@@ -12,7 +12,6 @@ from mygpo.celery import celery
 from mygpo.db.couchdb.user import (suggestions_for_user, update_device_state,
     update_suggestions, )
 from mygpo.decorators import repeat_on_conflict
-from mygpo.users.sync import get_grouped_devices
 
 from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
@@ -20,16 +19,14 @@ logger = get_task_logger(__name__)
 
 @celery.task(max_retries=5, default_retry_delay=60)
 def sync_user(user):
-    """ Syncs all of the user's device groups """
+    """ Syncs all of the user's sync groups """
     from mygpo.users.models import SubscriptionException
 
-    for group in get_grouped_devices(user):
-        if not group.is_synced:
-            continue
+    groups = SyncGroup.objects.filter(user=user)
+    for group in groups:
 
         try:
-            device = group.devices[0]
-            user.sync_group(device)
+            group.sync()
 
         except SubscriptionException:
             # no need to retry on SubscriptionException

@@ -24,9 +24,8 @@ from mygpo.core.json import JSONDecodeError
 from mygpo.utils import parse_request_body
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.api.httpresponse import JsonResponse
-from mygpo.users.models import DeviceDoesNotExist, User
+from mygpo.users.models import DeviceDoesNotExist, UserProxy
 from mygpo.users.tasks import sync_user
-from mygpo.users.sync import get_grouped_devices
 
 
 @csrf_exempt
@@ -57,8 +56,6 @@ def main(request, username):
         except DeviceDoesNotExist as e:
             return HttpResponseNotFound(str(e))
 
-        # reload user to get current sync status
-        user = User.get(request.user._id)
         return JsonResponse(get_sync_status(user))
 
 
@@ -69,7 +66,8 @@ def get_sync_status(user):
     sync_groups = []
     unsynced = []
 
-    for group in get_grouped_devices(user):
+    user = UserProxy(user)
+    for group in user.get_grouped_devices():
         uids = [device.uid for device in group.devices]
 
         if group.is_synced:
