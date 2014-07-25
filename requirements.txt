@@ -21,3 +21,4 @@ python-memcached==1.53
 redis==2.10.1
 restkit==4.2.2
 ujson==1.33
+django-celery==3.1.10
