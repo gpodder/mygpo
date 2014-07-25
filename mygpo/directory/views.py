@@ -17,6 +17,7 @@ from django.views.generic.base import View, TemplateView
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils.translation import ugettext as _
+from django.contrib.auth import get_user_model
 
 from feedservice.parse.models import ParserException
 from feedservice.parse import FetchFeedException
@@ -30,7 +31,6 @@ from mygpo.directory.tags import Topics
 from mygpo.users.settings import FLATTR_TOKEN
 from mygpo.data.feeddownloader import PodcastUpdater, NoEpisodesException
 from mygpo.data.tasks import update_podcasts
-from mygpo.db.couchdb.user import get_user_by_id
 from mygpo.db.couchdb.directory import category_for_tag
 from mygpo.db.couchdb.podcastlist import random_podcastlists, \
          podcastlist_count, podcastlists_by_rating
@@ -136,6 +136,7 @@ class Directory(View):
 
 
     def get_random_list(self, podcasts_per_list=5):
+        User = get_user_model()
         random_list = next(random_podcastlists(), None)
         list_owner = None
         if random_list:
@@ -143,7 +144,7 @@ class Directory(View):
             random_list = proxy_object(random_list)
             random_list.more_podcasts = max(0, len(random_list.podcasts) - podcasts_per_list)
             random_list.podcasts = Podcast.objects.filter(id__in=podcast_ids)
-            random_list.user = get_user_by_id(random_list.user)
+            random_list.user = User.objects.get(profile__uuid=random_list.user)
 
         yield random_list
 
@@ -231,7 +232,8 @@ def podcast_lists(request, page_size=20):
 
 
     def _prepare_list(l):
-        user = get_user_by_id(l.user)
+        User = get_user_model()
+        user = User.objects.get(profile__uuid=l.user)
         l = proxy_object(l)
         l.username = user.username if user else ''
         return l

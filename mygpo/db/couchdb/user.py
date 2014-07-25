@@ -231,14 +231,6 @@ def set_users_google_email(user, email):
     return user
 
 
-def get_user_by_id(user_id):
-    User = get_user_model()
-    try:
-        User.objects.get(profile__uuid=user_id)
-    except User.DoesNotExist:
-        return None
-
-
 @repeat_on_conflict(['user'])
 def set_device_deleted(user, device, is_deleted):
     device.deleted = is_deleted
