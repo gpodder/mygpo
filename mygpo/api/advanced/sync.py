@@ -103,13 +103,13 @@ def update_sync_status(user, synclist, stopsync):
 
         for other_uid in devlist[1:]:
             other = user.get_device_by_uid(other_uid)
-            user.sync_devices(dev, other)
+            dev.sync_with(other)
 
 
     for uid in stopsync:
         dev = user.get_device_by_uid(uid)
         try:
-            user.unsync_device(dev)
+            dev.stop_sync()
         except ValueError:
             # if all devices of a sync-group are un-synced,
             # the last one will raise a ValueError, because it is no longer

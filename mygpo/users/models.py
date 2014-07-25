@@ -558,6 +558,25 @@ class Client(UUIDModel):
             other.sync_group = self.sync_group
             other.save()
 
+    def stop_sync():
+        """ Stop synchronisation with other clients """
+        sg = self.sync_group
+
+        logger.info('Stopping synchronisation of %r', self)
+        self.sync_group = None
+        self.save()
+
+        clients = Client.objects.filter(sync_group=sg)
+        logger.info('%d other clients remaining in sync group', len(clients))
+
+        if len(clients) < 2:
+            logger.info('Deleting sync group %r', sg)
+            for client in clients:
+                client.sync_group = None
+                client.save()
+
+            sg.delete()
+
     def get_sync_targets(self):
         """ Returns the devices and groups with which the device can be synced
 
@@ -755,8 +774,7 @@ class User(BaseUser, SyncedDevicesMixin, SettingsMixin):
         self.devices = devices
 
         if self.is_synced(device):
-            self.unsync_device(device)
-
+            device.stop_sync()
 
     def get_subscriptions_by_device(self, public=None):
         from mygpo.db.couchdb.podcast_state import subscriptions_by_user

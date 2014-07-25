@@ -41,100 +41,12 @@ class SyncedDevicesMixin(DocumentSchema):
 
     sync_groups = ListProperty()
 
-
-
-    def sync_devices(self, device1, device2):
-        """ Puts two devices in a common sync group"""
-
-        devices = set([device1, device2])
-        if not devices.issubset(set(self.devices)):
-            raise ValueError('the devices do not belong to the user')
-
-        sg1 = self.get_device_sync_group(device1)
-        sg2 = self.get_device_sync_group(device2)
-
-        if sg1 is not None and sg2 is not None:
-            # merge sync_groups
-            self.sync_groups[sg1].extend(self.sync_groups[sg2])
-            self.sync_groups.pop(sg2)
-
-        elif sg1 is None and sg2 is None:
-            self.sync_groups.append([device1.id, device2.id])
-
-        elif sg1 is not None:
-            self.sync_groups[sg1].append(device2.id)
-
-        elif sg2 is not None:
-            self.sync_groups[sg2].append(device1.id)
-
-
-    def unsync_device(self, device):
-        """ Removts the device from its sync-group
-
-        Raises a ValueError if the device is not synced """
-
-        sg = self.get_device_sync_group(device)
-
-        if sg is None:
-            raise ValueError('the device is not synced')
-
-        group = self.sync_groups[sg]
-
-        if len(group) <= 2:
-            self.sync_groups.pop(sg)
-
-        else:
-            group.remove(device.id)
-
-
     def get_device_sync_group(self, device):
         """ Returns the sync-group Id of the device """
 
         for n, group in enumerate(self.sync_groups):
             if device.id in group:
                 return n
-
-
-    def is_synced(self, device):
-        return self.get_device_sync_group(device) is not None
-
-
-    def get_synced(self, device):
-        """ Returns the devices that are synced with the given one """
-
-        sg = self.get_device_sync_group(device)
-
-        if sg is None:
-            return []
-
-        devices = self.get_devices_in_group(sg)
-        devices.remove(device)
-        return devices
-
-
-
-    def get_sync_targets(self, device):
-        """ Returns the devices and groups with which the device can be synced
-
-        Groups are represented as lists of devices """
-
-        sg = self.get_device_sync_group(device)
-
-        for n, group in enumerate(self.get_grouped_devices()):
-
-            if sg == n:
-                # the device's group can't be a sync-target
-                continue
-
-            elif group.is_synced:
-                yield group.devices
-
-            else:
-                # every unsynced device is a sync-target
-                for dev in group.devices:
-                    if not dev == device:
-                        yield dev
-
 
     def get_devices_in_group(self, sg):
         """ Returns the devices in the group with the given Id """

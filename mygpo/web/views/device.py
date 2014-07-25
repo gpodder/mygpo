@@ -40,7 +40,6 @@ from mygpo.users.tasks import sync_user, set_device_task_state
 from mygpo.users.sync import get_grouped_devices
 from mygpo.db.couchdb.podcast_state import podcast_states_for_device, \
          remove_device_from_podcast_state
-from mygpo.db.couchdb.user import unsync_device
 
 
 @vary_on_cookie
@@ -95,7 +94,7 @@ def show(request, device):
     subscriptions = list(device.get_subscribed_podcasts())
     synced_with = request.user.get_synced(device)
 
-    sync_targets = list(request.user.get_sync_targets(device))
+    sync_targets = device.get_sync_targets()
     sync_form = SyncForm()
     sync_form.set_targets(sync_targets,
             _('Synchronize with the following devices'))
@@ -181,7 +180,7 @@ def edit(request, device):
 
     synced_with = request.user.get_synced(device)
 
-    sync_targets = list(request.user.get_sync_targets(device))
+    sync_targets = device.get_sync_targets()
     sync_form = SyncForm()
     sync_form.set_targets(sync_targets,
             _('Synchronize with the following devices'))
@@ -240,7 +239,7 @@ def symbian_opml(request, device):
 @allowed_methods(['POST'])
 def delete(request, device):
     user = request.user
-    unsync_device(user, device)
+    device.stop_sync()
     device.deleted = True
     device.save()
     set_device_task_state.delay(user)
@@ -303,7 +302,7 @@ def unsync(request, device):
 
     @repeat_on_conflict(['user'])
     def do_unsync(user, device):
-        user.unsync_device(device)
+        device.stop_sync()
         user.save()
 
     try:

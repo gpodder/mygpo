@@ -221,13 +221,6 @@ def update_device_state(state, devices):
 
 
 @repeat_on_conflict(['user'])
-def unsync_device(user, device):
-    if user.is_synced(device):
-        user.unsync_device(device)
-        user.save()
-
-
-@repeat_on_conflict(['user'])
 def create_missing_user_tokens(user):
 
     generated = False
