@@ -95,6 +95,18 @@ class UserProxy(DjangoUser):
     class Meta:
         proxy = True
 
+    @transaction.atomic
+    def activate(self):
+        self.is_active = True
+        self.save()
+
+        self.profile.activation_key = None
+        self.profile.save()
+
+        messages.success(request, _('Your user has been activated. '
+                                    'You can log in now.'))
+
+
 
 class UserProfile(TwitterModel, SettingsModel):
     """ Additional information stored for a User """

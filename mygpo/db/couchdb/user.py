@@ -240,14 +240,6 @@ def get_user_by_id(user_id):
 
 
 @repeat_on_conflict(['user'])
-def activate_user(user):
-    """ activates a user so that he is able to login """
-    user.is_active = True
-    user.activation_key = None
-    user.save()
-
-
-@repeat_on_conflict(['user'])
 def set_device_deleted(user, device, is_deleted):
     device.deleted = is_deleted
     user.set_device(device)

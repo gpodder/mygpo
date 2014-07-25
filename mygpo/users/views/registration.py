@@ -9,7 +9,6 @@ from django.template.loader import render_to_string
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.views.generic import TemplateView
 from django.views.generic.base import View
-from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.contrib.sites.shortcuts import get_current_site
 
@@ -82,26 +81,19 @@ class ActivationView(TemplateView):
         User = get_user_model()
 
         try:
-            user = User.objects.get(profile__activation_key=activation_key,
-                                    is_active=False)
-        except User.DoesNotExist:
+            user = UserProxy.objects.get(
+                profile__activation_key=activation_key,
+                is_active=False,
+            )
+        except UserProxy.DoesNotExist:
             messages.error(request, _('The activation link is either not '
                                       'valid or has already expired.'))
             return super(ActivationView, self).get(request, activation_key)
 
-        self.activate_user(user)
-        return HttpResponseRedirect(reverse('login'))
-
-    @transaction.atomic
-    def activate_user(self, user):
-        user.is_active = True
-        user.save()
-
-        user.profile.activation_key = None
-        user.profile.save()
-
+        user.activate()
         messages.success(request, _('Your user has been activated. '
                                     'You can log in now.'))
+        return HttpResponseRedirect(reverse('login'))
 
 
 class ResendActivationForm(forms.Form):

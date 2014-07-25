@@ -14,7 +14,6 @@ from django.template.loader import render_to_string
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
 from django.contrib.sites.models import RequestSite
-from django.contrib.auth import get_user_model
 from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.conf import settings
@@ -31,7 +30,6 @@ from mygpo.publisher.models import PublishedPodcast
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.celery import celery
 from mygpo.db.couchdb import get_userdata_database
-from mygpo.db.couchdb.user import activate_user
 
 
 class InvalidPodcast(Exception):
@@ -312,7 +310,6 @@ class ActivateUserView(AdminView):
 
     def post(self, request):
 
-        User = get_user_model()
         username = request.POST.get('username')
         email = request.POST.get('email')
 
@@ -321,19 +318,13 @@ class ActivateUserView(AdminView):
                            _('Provide either username or email address'))
             return HttpResponseRedirect(reverse('admin-activate-user'))
 
-        user = None
-
-        if username:
-            user = User.objects.get(username=username)
-
-        if email and not user:
-            user = User.objects.get(email=email)
-
-        if not user:
+        try:
+            user = UserProxy.objects.by_username_or_email(username, email)
+        except UserProxy.DoesNotExist:
             messages.error(request, _('No user found'))
             return HttpResponseRedirect(reverse('admin-activate-user'))
 
-        activate_user(user)
+        user.activate()
         messages.success(request,
                          _('User {username} ({email}) activated'.format(
                             username=user.username, email=user.email)))
