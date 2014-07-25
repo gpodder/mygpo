@@ -210,13 +210,6 @@ def _wrap_historyentry(action):
     return HistoryEntry.from_action_dict(action['value'])
 
 
-@repeat_on_conflict(['user'])
-def set_device_deleted(user, device, is_deleted):
-    device.deleted = is_deleted
-    user.set_device(device)
-    user.save()
-
-
 @repeat_on_conflict(['state'])
 def update_device_state(state, devices):
     old_devs = set(state.disabled_devices)

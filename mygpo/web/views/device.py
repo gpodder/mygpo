@@ -39,7 +39,7 @@ from mygpo.users.tasks import sync_user, set_device_task_state
 from mygpo.users.sync import get_grouped_devices
 from mygpo.db.couchdb.podcast_state import podcast_states_for_device, \
          remove_device_from_podcast_state
-from mygpo.db.couchdb.user import set_device_deleted, unsync_device, set_device
+from mygpo.db.couchdb.user import unsync_device, set_device
 
 
 @vary_on_cookie
@@ -240,7 +240,8 @@ def symbian_opml(request, device):
 def delete(request, device):
     user = request.user
     unsync_device(user, device)
-    set_device_deleted(user, device, True)
+    device.deleted = True
+    device.save()
     set_device_task_state.delay(user)
     return HttpResponseRedirect(reverse('devices'))
 
@@ -266,7 +267,8 @@ def delete_permanently(request, device):
 @login_required
 def undelete(request, device):
     user = request.user
-    set_device_deleted(user, device, False)
+    device.deleted = False
+    device.save()
     set_device_task_state.delay(user)
     return HttpResponseRedirect(reverse('device', args=[device.uid]))
 
