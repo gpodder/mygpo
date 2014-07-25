@@ -25,6 +25,7 @@ import dateutil.parser
 
 from django.http import (HttpResponse, HttpResponseBadRequest, Http404,
                          HttpResponseNotFound, )
+from django.core.exceptions import ValidationError
 from django.contrib.sites.models import RequestSite
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
@@ -41,7 +42,6 @@ from mygpo.utils import format_time, parse_bool, get_timestamp, \
 from mygpo.decorators import allowed_methods, cors_origin
 from mygpo.core.tasks import auto_flattr_episode
 from mygpo.users.models import (EpisodeAction, DeviceDoesNotExist, Client,
-                                DeviceUIDException,
                                 InvalidEpisodeActionAttributes, )
 from mygpo.users.settings import FLATTR_AUTO
 from mygpo.core.json import JSONDecodeError
@@ -52,7 +52,6 @@ from mygpo.db.couchdb.episode_state import favorite_episode_ids_for_user
 from mygpo.db.couchdb.podcast_state import subscribed_podcast_ids_by_device
 from mygpo.db.couchdb.episode_state import episode_state_for_ref_urls, \
     get_episode_actions
-from mygpo.db.couchdb.user import set_device
 
 
 import logging
@@ -110,8 +109,8 @@ def episodes(request, username, version=1):
 
         try:
             update_urls = update_episodes(request.user, actions, now, ua_string)
-        except DeviceUIDException as e:
-            logger.warn('invalid device UID while uploading episode actions for user %s', username)
+        except ValidationError as e:
+            logger.warn(u'Validation Error while uploading episode actions for user %s: %s', username, unicode(e))
             return HttpResponseBadRequest(str(e))
 
         except InvalidEpisodeActionAttributes as e:
@@ -357,9 +356,7 @@ def device(request, username, device_uid):
             return HttpResponseBadRequest('invalid device type %s' % data['type'])
         d.type = data['type']
 
-
-    set_device(request.user, d)
-
+    d.save()
     return HttpResponse()
 
 

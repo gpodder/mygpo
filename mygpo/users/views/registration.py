@@ -10,6 +10,7 @@ from django.core.urlresolvers import reverse, reverse_lazy
 from django.views.generic import TemplateView
 from django.views.generic.base import View
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.sites.shortcuts import get_current_site
 
 from mygpo.utils import random_token

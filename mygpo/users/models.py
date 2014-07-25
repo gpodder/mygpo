@@ -11,6 +11,8 @@ import string
 from couchdbkit.ext.django.schema import *
 from uuidfield import UUIDField
 
+from django.core.exceptions import ValidationError
+from django.core.validators import RegexValidator
 from django.db import transaction, models
 from django.db.models import Q
 from django.contrib.auth.models import User as DjangoUser
@@ -49,10 +51,6 @@ class SubscriptionException(Exception):
     """ raised when a subscription can not be modified """
 
 
-class DeviceUIDException(Exception):
-    pass
-
-
 class DeviceDoesNotExist(Exception):
     pass
 
@@ -60,6 +58,12 @@ class DeviceDoesNotExist(Exception):
 class DeviceDeletedException(DeviceDoesNotExist):
     pass
 
+
+class UIDValidator(RegexValidator):
+    """ Validates that the Device UID conforms to the given regex """
+    regex = RE_DEVICE_UID
+    message = 'Invalid Device ID'
+    code='invalid-uid'
 
 
 class UserProxyQuerySet(models.QuerySet):
@@ -497,7 +501,7 @@ class Client(UUIDModel):
     )
 
     # User-assigned ID; must be unique for the user
-    uid = models.CharField(max_length=64)
+    uid = models.CharField(max_length=64, validators=[UIDValidator()])
 
     # the user to which the Client belongs
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
@@ -738,25 +742,6 @@ class User(BaseUser, SyncedDevicesMixin, SettingsMixin):
 
         except KeyError as e:
             raise DeviceDoesNotExist('There is no device with UID %s' % uid)
-
-
-    def set_device(self, device):
-
-        if not RE_DEVICE_UID.match(device.uid):
-            raise DeviceUIDException(u"'{uid} is not a valid device ID".format(
-                        uid=device.uid))
-
-        devices = list(self.devices)
-        ids = [x.id for x in devices]
-        if not device.id in ids:
-            devices.append(device)
-            self.devices = devices
-            return
-
-        index = ids.index(device.id)
-        devices.pop(index)
-        devices.insert(index, device)
-        self.devices = devices
 
 
     def remove_device(self, device):

@@ -20,6 +20,7 @@ from xml.parsers.expat import ExpatError
 
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ValidationError
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, \
         HttpResponseNotFound
 from django.contrib import messages
@@ -34,12 +35,12 @@ from restkit.errors import Unauthorized
 
 from mygpo.api import simple
 from mygpo.decorators import allowed_methods, repeat_on_conflict
-from mygpo.users.models import DeviceUIDException, Client
+from mygpo.users.models import Client
 from mygpo.users.tasks import sync_user, set_device_task_state
 from mygpo.users.sync import get_grouped_devices
 from mygpo.db.couchdb.podcast_state import podcast_states_for_device, \
          remove_device_from_podcast_state
-from mygpo.db.couchdb.user import unsync_device, set_device
+from mygpo.db.couchdb.user import unsync_device
 
 
 @vary_on_cookie
@@ -118,15 +119,15 @@ def create(request):
         messages.error(request, _('Please fill out all fields.'))
         return HttpResponseRedirect(reverse('devices'))
 
-    device = Client()
-    device.name = device_form.cleaned_data['name']
-    device.type = device_form.cleaned_data['type']
-    device.uid  = device_form.cleaned_data['uid'].replace(' ', '-')
     try:
-        set_device(request.user, device)
+        device = Client()
+        device.name = device_form.cleaned_data['name']
+        device.type = device_form.cleaned_data['type']
+        device.uid  = device_form.cleaned_data['uid'].replace(' ', '-')
+        device.save()
         messages.success(request, _('Device saved'))
 
-    except DeviceUIDException as e:
+    except ValidationError as e:
         messages.error(request, _(unicode(e)))
         return HttpResponseRedirect(reverse('devices'))
 
@@ -149,15 +150,15 @@ def update(request, device):
 
     if device_form.is_valid():
 
-        device.name = device_form.cleaned_data['name']
-        device.type = device_form.cleaned_data['type']
-        device.uid  = device_form.cleaned_data['uid'].replace(' ', '-')
         try:
-            set_device(request.user, device)
+            device.name = device_form.cleaned_data['name']
+            device.type = device_form.cleaned_data['type']
+            device.uid  = device_form.cleaned_data['uid'].replace(' ', '-')
+            device.save()
             messages.success(request, _('Device updated'))
             uid = device.uid  # accept the new UID after rest has succeeded
 
-        except DeviceUIDException as e:
+        except ValidationError as e:
             messages.error(request, _(str(e)))
 
         except Unauthorized as u:

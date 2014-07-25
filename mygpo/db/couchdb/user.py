@@ -228,12 +228,6 @@ def unsync_device(user, device):
 
 
 @repeat_on_conflict(['user'])
-def set_device(user, device):
-    user.set_device(device)
-    user.save()
-
-
-@repeat_on_conflict(['user'])
 def create_missing_user_tokens(user):
 
     generated = False
