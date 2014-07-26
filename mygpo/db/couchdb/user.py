@@ -1,10 +1,3 @@
-from collections import Counter
-
-from couchdbkit import ResourceNotFound
-
-from django.db.models import Count
-from django.contrib.auth import get_user_model
-
 from mygpo.cache import cache_result
 from mygpo.decorators import repeat_on_conflict
 from mygpo.db.couchdb import get_userdata_database, \
