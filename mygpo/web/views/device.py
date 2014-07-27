@@ -15,6 +15,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+import uuid
 from functools import wraps
 from xml.parsers.expat import ExpatError
 
@@ -46,7 +47,7 @@ from mygpo.db.couchdb.podcast_state import podcast_states_for_device, \
 @login_required
 def overview(request):
 
-    user = UserProxy(request.user)
+    user = UserProxy.objects.from_user(request.user)
     device_groups = user.get_grouped_devices()
     deleted_devices = Client.objects.filter(user=request.user, deleted=True)
 
@@ -59,8 +60,8 @@ def overview(request):
         })
 
     return render(request, 'devicelist.html', {
-        'device_groups': device_groups,
-        'deleted_devices': deleted_devices,
+        'device_groups': list(device_groups),
+        'deleted_devices': list(deleted_devices),
         'device_form': device_form,
     })
 
@@ -90,9 +91,9 @@ def device_decorator(f):
 def show(request, device):
 
     subscriptions = list(device.get_subscribed_podcasts())
-    synced_with = request.user.get_synced(device)
+    synced_with = device.synced_with()
 
-    sync_targets = device.get_sync_targets()
+    sync_targets = list(device.get_sync_targets())
     sync_form = SyncForm()
     sync_form.set_targets(sync_targets,
             _('Synchronize with the following devices'))
@@ -118,6 +119,8 @@ def create(request):
 
     try:
         device = Client()
+        device.user = request.user
+        device.id = uuid.uuid1()
         device.name = device_form.cleaned_data['name']
         device.type = device_form.cleaned_data['type']
         device.uid  = device_form.cleaned_data['uid'].replace(' ', '-')
@@ -176,9 +179,9 @@ def edit(request, device):
         'uid': device.uid
         })
 
-    synced_with = request.user.get_synced(device)
+    synced_with = device.synced_with()
 
-    sync_targets = device.get_sync_targets()
+    sync_targets = list(device.get_sync_targets())
     sync_form = SyncForm()
     sync_form.set_targets(sync_targets,
             _('Synchronize with the following devices'))
@@ -248,17 +251,11 @@ def delete(request, device):
 @device_decorator
 def delete_permanently(request, device):
 
-    states = podcast_states_for_device(device.id)
+    states = podcast_states_for_device(device.id.hex)
     for state in states:
         remove_device_from_podcast_state(state, device)
 
-    @repeat_on_conflict(['user'])
-    def _remove(user, device):
-        user.remove_device(device)
-        user.save()
-
-    _remove(user=request.user, device=device)
-
+    device.delete()
     return HttpResponseRedirect(reverse('devices'))
 
 @device_decorator
@@ -282,7 +279,7 @@ def sync(request, device):
 
     try:
         target_uid = form.get_target()
-        sync_target = request.user.get_device_by_uid(target_uid)
+        sync_target = request.user.client_set.get(uid=target_uid)
         device.sync_with(sync_target)
 
     except Client.DoesNotExist as e:

@@ -3,7 +3,7 @@ from datetime import datetime
 
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponseForbidden
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.utils.text import slugify
 from django.contrib.sites.models import RequestSite
 from django.contrib.auth.decorators import login_required
@@ -39,9 +39,7 @@ def list_decorator(must_own=False):
         def _decorator(request, username, listname, *args, **kwargs):
 
             User = get_user_model()
-            user = User.objects.get(username=username)
-            if not user:
-                raise Http404
+            user = get_object_or_404(User, username=username)
 
             if must_own and request.user != user:
                 return HttpResponseForbidden()
@@ -67,7 +65,7 @@ def search(request, username, listname):
 @login_required
 def lists_own(request):
 
-    lists = podcastlists_for_user(request.user._id)
+    lists = podcastlists_for_user(request.user.profile.uuid.hex)
 
     return render(request, 'lists.html', {
             'lists': lists
@@ -77,11 +75,8 @@ def lists_own(request):
 def lists_user(request, username):
 
     User = get_user_model()
-    user = User.objects.get(username=username)
-    if not user:
-        raise Http404
-
-    lists = podcastlists_for_user(user._id)
+    user = get_object_or_404(User, username=username)
+    lists = podcastlists_for_user(user.profile.uuid.hex)
 
     return render(request, 'lists_user.html', {
             'lists': lists,
@@ -137,10 +132,10 @@ def create_list(request):
                     title=title))
         return HttpResponseRedirect(reverse('lists-overview'))
 
-    plist = podcastlist_for_user_slug(request.user._id, slug)
+    plist = podcastlist_for_user_slug(request.user.profile.uuid.hex, slug)
 
     if plist is None:
-        create_podcast_list(title, slug, request.user._id, datetime.utcnow())
+        create_podcast_list(title, slug, request.user.profile.uuid.hex, datetime.utcnow())
 
     list_url = reverse('list-show', args=[request.user.username, slug])
     return HttpResponseRedirect(list_url)
@@ -176,7 +171,7 @@ def rate_list(request, plist, owner):
 
     @repeat_on_conflict(['plist'])
     def _rate(plist, rating_val, user):
-        plist.rate(rating_val, user._id)
+        plist.rate(rating_val, user.profile.uuid.hex)
         plist.save()
 
     _rate(plist, rating_val, request.user)
@@ -224,7 +219,7 @@ class ShareFavorites(View):
 
         podcast = Podcast.objects.filter(urls__url=feed_url).first()
 
-        token = request.user.favorite_feeds_token
+        token = user.profile.favorite_feeds_token
 
         return render(request, 'share/favorites.html', {
             'feed_token': token,

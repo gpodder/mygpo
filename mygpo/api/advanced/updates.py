@@ -35,7 +35,7 @@ from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.advanced import clean_episode_action_data
 from mygpo.api.advanced.directory import episode_data, podcast_data
 from mygpo.utils import parse_bool, get_timestamp
-from mygpo.users.models import DeviceDoesNotExist
+from mygpo.users.models import Client
 from mygpo.users.subscriptions import subscription_changes, podcasts_for_states
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.decorators import cors_origin
@@ -67,8 +67,8 @@ class DeviceUpdates(View):
         user = request.user
 
         try:
-            device = user.get_device_by_uid(device_uid)
-        except DeviceDoesNotExist as e:
+            device = user.client_set.get(uid=device_uid)
+        except Client.DoesNotExist as e:
             return HttpResponseNotFound(str(e))
 
         try:
@@ -97,25 +97,29 @@ class DeviceUpdates(View):
         """ gets new, removed and current subscriptions """
 
         # DB: get all podcast states for the device
-        podcast_states = podcast_states_for_device(device.id)
+        podcast_states = podcast_states_for_device(device.id.hex)
 
-        add, rem = subscription_changes(device.id, podcast_states, since, now)
+        add, rem = subscription_changes(device.id.hex, podcast_states, since, now)
 
         subscriptions = filter(lambda s: s.is_subscribed_on(device), podcast_states)
         # DB get podcast objects for the subscribed podcasts
         subscriptions = podcasts_for_states(subscriptions)
 
-        podcasts = dict( (p.url, p) for p in subscriptions )
+        podcasts = {}
+        for podcast in subscriptions:
+            for url in podcast.urls.all():
+                podcasts[url.url] = podcast
+
         add = [podcast_data(podcasts.get(url), domain) for url in add ]
 
         return add, rem, subscriptions
 
 
     def get_episode_changes(self, user, subscriptions, domain, include_actions, since):
-        devices = dict( (dev.id, dev.uid) for dev in user.devices )
+        devices = {dev.id.hex: dev.uid for dev in user.client_set.all()}
 
         # index subscribed podcasts by their Id for fast access
-        podcasts = dict( (p.get_id(), p) for p in subscriptions )
+        podcasts = {p.get_id(): p for p in subscriptions}
 
         episode_updates = self.get_episode_updates(user, subscriptions, since)
 
@@ -131,7 +135,7 @@ class DeviceUpdates(View):
                                           released__gt=since)[:max_per_podcast]
 
         e_actions = chain.from_iterable(get_podcasts_episode_states(p,
-                user._id) for p in subscribed_podcasts)
+                user.profile.uuid.hex) for p in subscribed_podcasts)
 
         # TODO: get_podcasts_episode_states could be optimized by returning
         # only actions within some time frame

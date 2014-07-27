@@ -220,5 +220,8 @@ class GoogleLoginCallback(TemplateView):
                 login=reverse('login'), connect=reverse('login-google')))
 
         # Log in user
+        # TODO: this should probably be replaced with a call to authenticate()
+        # http://stackoverflow.com/questions/6034763/django-attributeerror-user-object-has-no-attribute-backend-but-it-does
+        user.backend='django.contrib.auth.backends.ModelBackend'
         login(request, user)
         return HttpResponseRedirect(DEFAULT_LOGIN_REDIRECT)

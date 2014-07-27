@@ -22,6 +22,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 from django.utils.decorators import method_decorator
 from django.views.generic.base import View
+from django.shortcuts import get_object_or_404
 
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.backend import get_device, BulkSubscribe
@@ -100,7 +101,7 @@ class SubscriptionsAPI(APIView):
     def get(self, request, version, username, device_uid):
         """ Client retrieves subscription updates """
         now = datetime.utcnow()
-        device = Client.objects.get(user=request.user, uid=device_uid)
+        device = get_object_or_404(Client, user=request.user, uid=device_uid)
         since = self.get_since(request)
         add, rem, until = self.get_changes(device, since, now)
         return JsonResponse({

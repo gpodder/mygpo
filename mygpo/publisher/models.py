@@ -13,8 +13,9 @@ class PublishedPodcastManager(models.Manager):
     """ Manager for the PublishedPodcast model """
 
     def publish_podcasts(self, user, podcasts):
+        existed, created = 0, 0
         for podcast in podcasts:
-            pp, created = PublishedPodcast.objects.get_or_create(
+            pp, _ = PublishedPodcast.objects.get_or_create(
                 publisher=user,
                 podcast=podcast,
             )

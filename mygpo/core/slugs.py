@@ -32,6 +32,7 @@ class SlugGenerator(object):
             raise ValueError('%(obj)s already has slug %(slug)s' % \
                 dict(obj=obj, slug=obj.slug))
 
+        self.obj = obj
         self.base_slug = self._get_base_slug(obj)
 
 
@@ -64,16 +65,16 @@ class SlugGenerator(object):
                 # slugify returns SafeUnicode, we need a plain string
                 return str(tmp_slug)
 
+    def _get_existing_slugs(self):
+        query = Slug.objects.filter(scope=self.obj.scope,
+                                    slug__startswith=self.base_slug)
+        return [s.slug for s in query]
 
 
 class PodcastGroupSlug(SlugGenerator):
     """ Generates slugs for Podcast Groups """
 
-    def _get_existing_slugs(self):
-        query = Slug.objects.filter(scope__isnull=True,
-                                    slug__startswith=self.base_slug)
-        return [s['slug'] for s in query]
-
+    pass
 
 
 class PodcastSlug(PodcastGroupSlug):
@@ -119,13 +120,6 @@ class EpisodeSlug(SlugGenerator):
             return slugify(obj.title)
 
         return None
-
-
-    def _get_existing_slugs(self):
-        """ Episode slugs have to be unique within the Podcast """
-        query = Slug.objects.filter(scope=self.podcast_id,
-                                    slug__startswith=self.base_slug)
-        return [s['slug'] for s in query]
 
 
 class SlugMixin(DocumentSchema):

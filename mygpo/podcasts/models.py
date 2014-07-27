@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import re
 from datetime import datetime
 
-from django.db import models, connection, transaction, IntegrityError
+from django.db import models, transaction, IntegrityError
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes import generic
@@ -341,6 +341,9 @@ class PodcastGroup(UUIDModel, TitleModel, SlugsMixin):
         """ A podcast group is always in the global scope """
         return ''
 
+    def subscriber_count(self):
+        # this could be done directly in the DB
+        return sum([p.subscriber_count() for p in self.podcast_set.all()] + [0])
 
 class PodcastQuerySet(MergedUUIDQuerySet):
     """ Custom queries for Podcasts """
@@ -397,6 +400,8 @@ class PodcastManager(GenericManager):
         defaults.update({
             'id': uuid.uuid1().hex,
         })
+
+        url = utils.to_maxlength(URL, 'url', url)
         podcast, created = self.get_or_create(urls__url=url, defaults=defaults)
 
         if created:
@@ -438,7 +443,7 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
 
     def subscriber_count(self):
         # TODO: implement
-        return 0
+        return self.subscribers
 
     def group_with(self, other, grouptitle, myname, othername):
         """ Group the podcast with another one """
@@ -490,9 +495,11 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
         """
         targets = []
 
-        subscriptions_by_devices = user.get_subscriptions_by_device()
+        from mygpo.users.subscriptions import get_subscriptions_by_device
+        from mygpo.users.models import UserProxy
+        subscriptions_by_devices = get_subscriptions_by_device(user)
 
-        user = UserProxy(user)
+        user = UserProxy.objects.from_user(user)
         for group in user.get_grouped_devices():
 
             if group.is_synced:

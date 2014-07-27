@@ -65,7 +65,7 @@ def set_device_task_state(user):
     from mygpo.db.couchdb.podcast_state import podcast_states_for_user
     podcast_states = podcast_states_for_user(user)
     for state in podcast_states:
-        update_device_state(state, user.devices)
+        update_device_state(state, user.client_set.all())
 
 
 @periodic_task(run_every=timedelta(minutes=1))

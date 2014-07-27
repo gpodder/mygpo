@@ -74,10 +74,10 @@ def episode(request, episode):
         has_history = bool(list(episode_state.get_history_entries()))
 
         played_parts = EpisodeHeatmap(podcast.get_id(),
-                episode.id, user._id, duration=episode.duration)
+                episode.id, user.profile.uuid.hex, duration=episode.duration)
 
-        devices = dict( (d.id, d.name) for d in user.devices )
-        can_flattr = user.get_wksetting(FLATTR_TOKEN) and episode.flattr_url
+        devices = {c.id.hex: c for c in user.client_set.all()}
+        can_flattr = user.profile.get_wksetting(FLATTR_TOKEN) and episode.flattr_url
 
     else:
         has_history = False
@@ -125,7 +125,7 @@ def history(request, episode):
     HistoryEntry.fetch_data(user, history,
             podcasts=podcasts_dict, episodes=episodes_dict)
 
-    devices = dict( (d.id, d.name) for d in user.devices )
+    devices = {c.id.hex: c.name for c in user.client_set.all()}
 
     return render(request, 'episode-history.html', {
         'episode': episode,
@@ -273,15 +273,16 @@ def id_decorator(f):
     @wraps(f)
     def _decorator(request, p_id, e_id, *args, **kwargs):
 
-        query = Episode.objects.filter(id=e_id,
-                                       podcast_id=p_id)
-        episode = query.select_related('podcast').get()
+        try:
+            query = Episode.objects.filter(id=e_id,
+                                           podcast_id=p_id)
+            episode = query.select_related('podcast').get()
 
-        if episode is None:
+        except Episode.DoesNotExist:
             raise Http404
 
         # redirect when Id or a merged (non-cannonical) slug is used
-        if episode.slug and episode.slug != e_slug_id:
+        if episode.slug and episode.slug != e_id:
             podcast = episode.podcast
             return HttpResponseRedirect(
                     get_episode_link_target(episode, podcast))

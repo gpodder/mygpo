@@ -6,7 +6,7 @@ import json
 
 from uuidfield import UUIDField
 
-from django.db import models
+from django.db import models, connection
 
 
 class UUIDModel(models.Model):
@@ -47,6 +47,11 @@ class SettingsModel(models.Model):
     def get_setting(self, name, default):
         settings = json.loads(self.settings)
         return settings.get(name, default)
+
+    def set_setting(self, name, value):
+        settings = json.loads(self.settings)
+        settings[name] = value
+        self.settings = json.dumps(settings)
 
 
 class GenericManager(models.Manager):

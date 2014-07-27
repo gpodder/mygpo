@@ -19,6 +19,8 @@ from functools import wraps
 
 from django.http import HttpResponseRedirect
 
+from mygpo.publisher.models import PublishedPodcast
+
 
 def require_publisher(protected_view):
     @wraps(protected_view)
@@ -48,7 +50,7 @@ def is_publisher(user):
     if user.is_staff:
         return True
 
-    if user.published_objects:
+    if PublishedPodcast.objects.filter(publisher=user).exists():
         return True
 
     return False

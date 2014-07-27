@@ -64,7 +64,7 @@ def create(request, username, format):
     if not slug:
         return HttpResponseBadRequest('Invalid title')
 
-    plist = podcastlist_for_user_slug(request.user._id, slug)
+    plist = podcastlist_for_user_slug(request.user.profile.uuid.hex, slug)
 
     if plist:
         return HttpResponse('List already exists', status=409)
@@ -77,7 +77,7 @@ def create(request, username, format):
     plist.created_timestamp = get_timestamp(datetime.utcnow())
     plist.title = title
     plist.slug = slug
-    plist.user = request.user._id
+    plist.user = request.user.profile.uuid.hex
     plist.podcasts = podcast_ids
     plist.save()
 
@@ -110,7 +110,7 @@ def get_lists(request, username):
     if not user:
         raise Http404
 
-    lists = podcastlists_for_user(user._id)
+    lists = podcastlists_for_user(user.profile.uuid.hex)
 
     site = RequestSite(request)
 

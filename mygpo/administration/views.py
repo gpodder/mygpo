@@ -17,6 +17,7 @@ from django.contrib.sites.models import RequestSite
 from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.conf import settings
+from django.contrib.auth import get_user_model
 
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.administration.auth import require_staff
@@ -344,6 +345,7 @@ class MakePublisher(AdminView):
     template_name = 'admin/make-publisher-result.html'
 
     def post(self, request):
+        User = get_user_model()
         username = request.POST.get('username')
         user = User.objects.get(username=username)
         if user is None:
@@ -368,7 +370,6 @@ class MakePublisher(AdminView):
         return HttpResponseRedirect(reverse('admin-make-publisher-result'))
 
     def set_publisher(self, request, user, podcasts):
-        created, existed = 0, 0
         created, existed = PublishedPodcast.objects.publish_podcasts(user,
                                                                      podcasts)
         messages.success(request,

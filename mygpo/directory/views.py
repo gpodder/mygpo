@@ -144,7 +144,11 @@ class Directory(View):
             random_list = proxy_object(random_list)
             random_list.more_podcasts = max(0, len(random_list.podcasts) - podcasts_per_list)
             random_list.podcasts = Podcast.objects.filter(id__in=podcast_ids)
-            random_list.user = User.objects.get(profile__uuid=random_list.user)
+
+            try:
+                random_list.user = User.objects.get(profile__uuid=random_list.user)
+            except User.DoesNotExist:
+                return
 
         yield random_list
 
@@ -233,12 +237,16 @@ def podcast_lists(request, page_size=20):
 
     def _prepare_list(l):
         User = get_user_model()
-        user = User.objects.get(profile__uuid=l.user)
+        try:
+            user = User.objects.get(profile__uuid=l.user)
+        except User.DoesNotExist:
+            return None
+
         l = proxy_object(l)
         l.username = user.username if user else ''
         return l
 
-    lists = map(_prepare_list, lists)
+    lists = filter(None, map(_prepare_list, lists))
 
     num_pages = int(ceil(podcastlist_count() / float(page_size)))
 

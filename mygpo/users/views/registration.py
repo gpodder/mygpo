@@ -123,17 +123,18 @@ class ResendActivationView(FormView):
         """ called whene the form was POSTed and its contents were valid """
 
         try:
-            user = UserProxy.objects.all.by_username_or_email(
+            user = UserProxy.objects.all().by_username_or_email(
                 form.cleaned_data['username'],
                 form.cleaned_data['email'],
             )
 
-        except User.DoesNotExist:
-            messages.error(request, _('User does not exist.'))
+        except UserProxy.DoesNotExist:
+            messages.error(self.request, _('User does not exist.'))
+            return HttpResponseRedirect(reverse('resend-activation'))
 
         if user.profile.activation_key is None:
-            messages.success(request, _('Your account already has been '
-                                        'activated. Go ahead and log in.'))
+            messages.success(self.request, _('Your account already has been '
+                                             'activated. Go ahead and log in.'))
 
         send_activation_email(user, self.request)
         return super(ResendActivationView, self).form_valid(form)

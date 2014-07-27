@@ -66,7 +66,7 @@ def get_sync_status(user):
     sync_groups = []
     unsynced = []
 
-    user = UserProxy(user)
+    user = UserProxy.objects.from_user(user)
     for group in user.get_grouped_devices():
         uids = [device.uid for device in group.devices]
 

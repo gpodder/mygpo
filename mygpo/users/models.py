@@ -4,7 +4,6 @@ import collections
 from datetime import datetime
 import dateutil.parser
 from itertools import imap
-from operator import itemgetter
 import random
 import string
 
@@ -20,17 +19,19 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.core.cache import cache
+from django.contrib import messages
 
 from django_couchdb_utils.registration.models import User as BaseUser
 
 from mygpo.core.models import (TwitterModel, UUIDModel, SettingsModel,
     GenericManager, )
 from mygpo.podcasts.models import Podcast, Episode
-from mygpo.utils import linearize, random_token
+from mygpo.utils import random_token
 from mygpo.core.proxy import DocumentABCMeta, proxy_object
 from mygpo.decorators import repeat_on_conflict
 from mygpo.users.ratings import RatingMixin
-from mygpo.users.subscriptions import subscription_changes, podcasts_for_states
+from mygpo.users.subscriptions import (subscription_changes,
+    podcasts_for_states, get_subscribed_podcast_ids)
 from mygpo.users.settings import FAV_FLAG, PUBLIC_SUB_PODCAST, SettingsMixin
 from mygpo.db.couchdb.user import user_history, device_history
 
@@ -114,8 +115,6 @@ class UserProxy(DjangoUser):
         self.profile.activation_key = None
         self.profile.save()
 
-        messages.success(request, _('Your user has been activated. '
-                                    'You can log in now.'))
 
     def get_grouped_devices(self):
         """ Returns groups of synced devices and a unsynced group """
@@ -138,7 +137,8 @@ class UserProxy(DjangoUser):
             group.devices.append(client)
 
         # yield remaining group
-        yield group
+        if group != None:
+            yield group
 
 
 class UserProfile(TwitterModel, SettingsModel):
@@ -198,7 +198,9 @@ class Suggestions(Document, RatingMixin):
     def get_podcasts(self, count=None):
         User = get_user_model()
         user = User.objects.get(profile__uuid=self.user)
-        subscriptions = user.get_subscribed_podcast_ids()
+        # TODO: re-include later on
+        #subscriptions = get_subscribed_podcast_ids(user)
+        subscriptions = []
 
         ids = filter(lambda x: not x in self.blacklist + subscriptions, self.podcasts)
         if count:
@@ -427,7 +429,7 @@ class PodcastUserState(Document, SettingsMixin):
 
     def set_device_state(self, devices):
         disabled_devices = [device.id for device in devices if device.deleted]
-        self.disabled_devices = disabled_devices
+        #self.disabled_devices = disabled_devices
 
 
     def get_change_between(self, device_id, since, until):
@@ -478,7 +480,7 @@ class PodcastUserState(Document, SettingsMixin):
         """ checks if the podcast is subscribed on the given device """
 
         for action in reversed(self.actions):
-            if not action.device == device.id:
+            if not action.device == device.id.hex:
                 continue
 
             # we only need to check the latest action for the device
@@ -644,7 +646,7 @@ class Client(UUIDModel):
             other.sync_group = self.sync_group
             other.save()
 
-    def stop_sync():
+    def stop_sync(self):
         """ Stop synchronisation with other clients """
         sg = self.sync_group
 
@@ -751,7 +753,12 @@ class Client(UUIDModel):
         states = get_subscribed_podcast_states_by_device(self)
         return podcasts_for_states(states)
 
+    def synced_with(self):
+        if not self.sync_group:
+            return []
 
+        return Client.objects.filter(sync_group=self.sync_group)\
+                             .exclude(pk=self.pk)
 
     def __str__(self):
         return '{} ({})'.format(self.name.encode('ascii', errors='replace'),
@@ -893,92 +900,6 @@ class User(BaseUser, SettingsMixin):
 
         if self.is_synced(device):
             device.stop_sync()
-
-    def get_subscriptions_by_device(self, public=None):
-        from mygpo.db.couchdb.podcast_state import subscriptions_by_user
-        get_dev = itemgetter(2)
-        groups = collections.defaultdict(list)
-        subscriptions = subscriptions_by_user(self, public=public)
-        subscriptions = sorted(subscriptions, key=get_dev)
-
-        for public, podcast_id, device_id in subscriptions:
-            groups[device_id].append(podcast_id)
-
-        return groups
-
-    def get_subscribed_podcast_ids(self, public=None):
-        from mygpo.db.couchdb.podcast_state import get_subscribed_podcast_states_by_user
-        states = get_subscribed_podcast_states_by_user(self, public)
-        return [state.podcast for state in states]
-
-
-
-    def get_subscription_history(self, device_id=None, reverse=False, public=None):
-        """ Returns chronologically ordered subscription history entries
-
-        Setting device_id restricts the actions to a certain device
-        """
-
-        from mygpo.db.couchdb.podcast_state import podcast_states_for_user, \
-            podcast_states_for_device
-
-        def action_iter(state):
-            for action in sorted(state.actions, reverse=reverse):
-                if device_id is not None and device_id != action.device:
-                    continue
-
-                if public is not None and state.is_public() != public:
-                    continue
-
-                entry = HistoryEntry()
-                entry.timestamp = action.timestamp
-                entry.action = action.action
-                entry.podcast_id = state.podcast
-                entry.device_id = action.device
-                yield entry
-
-        if device_id is None:
-            podcast_states = podcast_states_for_user(self)
-        else:
-            podcast_states = podcast_states_for_device(device_id)
-
-        # create an action_iter for each PodcastUserState
-        subscription_action_lists = [action_iter(x) for x in podcast_states]
-
-        action_cmp_key = lambda x: x.timestamp
-
-        # Linearize their subscription-actions
-        return linearize(action_cmp_key, subscription_action_lists, reverse)
-
-
-    def get_global_subscription_history(self, public=None):
-        """ Actions that added/removed podcasts from the subscription list
-
-        Returns an iterator of all subscription actions that either
-         * added subscribed a podcast that hasn't been subscribed directly
-           before the action (but could have been subscribed) earlier
-         * removed a subscription of the podcast is not longer subscribed
-           after the action
-        """
-
-        subscriptions = collections.defaultdict(int)
-
-        for entry in self.get_subscription_history(public=public):
-            if entry.action == 'subscribe':
-                subscriptions[entry.podcast_id] += 1
-
-                # a new subscription has been added
-                if subscriptions[entry.podcast_id] == 1:
-                    yield entry
-
-            elif entry.action == 'unsubscribe':
-                subscriptions[entry.podcast_id] -= 1
-
-                # the last subscription has been removed
-                if subscriptions[entry.podcast_id] == 0:
-                    yield entry
-
-
 
     def get_newest_episodes(self, max_date, max_per_podcast=5):
         """ Returns the newest episodes of all subscribed podcasts

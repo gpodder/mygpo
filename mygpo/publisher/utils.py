@@ -20,6 +20,7 @@ from datetime import timedelta, datetime, time
 
 from mygpo.podcasts.models import Episode
 from mygpo.utils import daterange, flatten
+from mygpo.publisher.models import PublishedPodcast
 from mygpo.db.couchdb.episode_state import podcast_listener_count_timespan, \
          episode_listener_count_timespan
 
@@ -147,7 +148,7 @@ def check_publisher_permission(user, podcast):
     if user.is_staff:
         return True
 
-    return (podcast.get_id() in user.published_objects)
+    return PublishedPodcast.objects.filter(publisher=user, podcast=podcast).exists()
 
 
 def colour_repr(val, max_val, colours):

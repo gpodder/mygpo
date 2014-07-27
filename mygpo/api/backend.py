@@ -41,7 +41,7 @@ def get_device(user, uid, user_agent, undelete=True):
 
     save = False
 
-    client, created = Client.objects.update_or_create(user=user, uid=uid,
+    client, created = Client.objects.get_or_create(user=user, uid=uid,
                         defaults = {
                             'id': uuid.uuid1()
                         })

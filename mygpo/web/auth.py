@@ -42,7 +42,10 @@ class EmailAuthenticationBackend(ModelBackend):
 
     def get_user(self, username):
         User = get_user_model()
-        return User.objects.get(username=username)
+        try:
+            return User.objects.get(username=username)
+        except User.DoesNotExist:
+            return None
 
 
 def get_google_oauth_flow(request):

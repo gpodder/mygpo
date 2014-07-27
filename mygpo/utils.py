@@ -39,6 +39,9 @@ from django.core.urlresolvers import reverse
 
 from mygpo.core.json import json
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 def daterange(from_date, to_date=None, leap=timedelta(days=1)):
     """
@@ -1043,3 +1046,15 @@ def random_token(length=32):
     import random
     import string
     return "".join(random.sample(string.letters+string.digits, length))
+
+
+def to_maxlength(cls, field, val):
+    """ Cut val to the maximum length of cls's field """
+    max_length = cls._meta.get_field(field).max_length
+    orig_length = len(val)
+    if orig_length > max_length:
+        val = val[:max_length]
+        logger.warn('%s.%s length reduced from %d to %d',
+                    cls.__name__, field, orig_length, max_length)
+
+    return val

@@ -41,7 +41,7 @@ from mygpo.utils import format_time, parse_bool, get_timestamp, \
     parse_request_body, normalize_feed_url
 from mygpo.decorators import allowed_methods, cors_origin
 from mygpo.core.tasks import auto_flattr_episode
-from mygpo.users.models import (EpisodeAction, DeviceDoesNotExist, Client,
+from mygpo.users.models import (EpisodeAction, Client,
                                 InvalidEpisodeActionAttributes, )
 from mygpo.users.settings import FLATTR_AUTO
 from mygpo.core.json import JSONDecodeError
@@ -140,8 +140,9 @@ def episodes(request, username, version=1):
         if device_uid:
 
             try:
-                device = request.user.get_device_by_uid(device_uid)
-            except DeviceDoesNotExist as e:
+                user = request.user
+                device = user.client_set.get(uid=device_uid)
+            except Client.DoesNotExist as e:
                 return HttpResponseNotFound(str(e))
 
         else:
@@ -380,7 +381,8 @@ def valid_episodeaction(type):
 @allowed_methods(['GET'])
 @cors_origin()
 def devices(request, username):
-    devices = filter(lambda d: not d.deleted, request.user.devices)
+    user = request.user
+    devices = user.client_set.filter(deleted=False)
     devices = map(device_data, devices)
     return JsonResponse(devices)
 

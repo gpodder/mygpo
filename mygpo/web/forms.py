@@ -180,7 +180,7 @@ class SyncForm(forms.Form):
         target.
         """
 
-        if isinstance(target, Device):
+        if isinstance(target, Client):
             return (target.uid, target.name)
 
         elif isinstance(target, list):

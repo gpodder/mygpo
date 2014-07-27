@@ -3,19 +3,21 @@ from datetime import datetime
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib.syndication.views import Feed
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, Http404
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import cache_control
+from django.contrib.auth import get_user_model
 
 from mygpo.podcasts.models import Podcast
 from mygpo.utils import parse_bool, unzip, skip_pairs
 from mygpo.decorators import requires_token
 from mygpo.api import simple
-from mygpo.users.models import HistoryEntry, User
-from mygpo.users.subscriptions import get_subscribed_podcasts
+from mygpo.users.models import HistoryEntry
+from mygpo.users.subscriptions import (get_subscribed_podcasts,
+    get_global_subscription_history)
 from mygpo.web.utils import symbian_opml_changes, get_podcast_link_target
 from mygpo.db.couchdb.podcast_state import subscriptions_by_user
 
@@ -44,11 +46,9 @@ def download_all(request):
 
 @requires_token(token_name='subscriptions_token', denied_template='user_subscriptions_denied.html')
 def for_user(request, username):
-    user = User.get_user(username)
-    if not user:
-        raise Http404
-
-    subscriptions = user.get_subscribed_podcasts(public=True)
+    User = get_user_model()
+    user = get_object_or_404(User, username=username)
+    subscriptions = get_subscribed_podcasts(user, public=True)
     token = user.profile.get_token('subscriptions_token')
 
     return render(request, 'user_subscriptions.html', {
@@ -59,11 +59,9 @@ def for_user(request, username):
 
 @requires_token(token_name='subscriptions_token')
 def for_user_opml(request, username):
-    user = User.get_user(username)
-    if not user:
-        raise Http404
-
-    subscriptions = user.get_subscribed_podcasts(public=True)
+    User = get_user_model()
+    user = get_object_or_404(User, username=username)
+    subscriptions = get_subscribed_podcasts(user, public=True)
 
     if parse_bool(request.GET.get('symbian', False)):
         subscriptions = map(symbian_opml_changes, subscriptions)
@@ -135,7 +133,9 @@ class SubscriptionsFeed(Feed):
 
     def get_object(self, request, username):
         self.site = RequestSite(request)
-        return User.get_user(username)
+        User = get_user_model()
+        user = get_object_or_404(User, username=username)
+        return user
 
     def title(self, user):
         return _('%(username)s\'s Podcast Subscriptions on %(site)s') % \
@@ -150,7 +150,7 @@ class SubscriptionsFeed(Feed):
 
     def items(self, user):
         NUM_ITEMS = 20
-        history = user.get_global_subscription_history(public=True)
+        history = get_global_subscription_history(user, public=True)
         history = skip_pairs(history)
         history = list(history)[-NUM_ITEMS:]
         history = HistoryEntry.fetch_data(user, history)

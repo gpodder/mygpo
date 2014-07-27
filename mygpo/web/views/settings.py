@@ -228,13 +228,10 @@ class DefaultPrivacySettings(View):
     @method_decorator(login_required)
     @method_decorator(never_cache)
     def post(self, request):
-        self.set_privacy_settings(user=request.user)
+        profile = request.user.profile
+        profile.set_setting(PUBLIC_SUB_USER.name, self.public)
+        profile.save()
         return HttpResponseRedirect(reverse('privacy'))
-
-    @repeat_on_conflict(['user'])
-    def set_privacy_settings(self, user):
-        user.settings[PUBLIC_SUB_USER.name] = self.public
-        user.save()
 
 
 class PodcastPrivacySettings(View):
@@ -264,7 +261,7 @@ def privacy(request):
     subs = sorted(subs, key=lambda (p, _): PODCAST_SORT(p))
 
     return render(request, 'privacy.html', {
-        'private_subscriptions': not request.user.get_wksetting(PUBLIC_SUB_USER),
+        'private_subscriptions': not request.user.profile.get_wksetting(PUBLIC_SUB_USER),
         'subscriptions': subs,
         'domain': site.domain,
         })

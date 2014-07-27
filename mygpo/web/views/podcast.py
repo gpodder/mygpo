@@ -18,7 +18,7 @@ from mygpo.core.tasks import flattr_thing
 from mygpo.utils import normalize_feed_url
 from mygpo.users.settings import PUBLIC_SUB_PODCAST, FLATTR_TOKEN
 from mygpo.publisher.utils import check_publisher_permission
-from mygpo.users.models import HistoryEntry, DeviceDoesNotExist, SubscriptionAction
+from mygpo.users.models import HistoryEntry, SubscriptionAction, Client
 from mygpo.web.forms import SyncForm
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.web.utils import get_podcast_link_target, get_page_list, \
@@ -70,13 +70,13 @@ def show(request, podcast):
     if user.is_authenticated():
         state = podcast_state_for_user_podcast(user, podcast)
         subscribed_devices = state.get_subscribed_device_ids()
-        subscribed_devices = user.get_devices(subscribed_devices)
+        subscribed_devices = user.client_set.filter(id__in=subscribed_devices)
 
         subscribe_targets = podcast.subscribe_targets(user)
 
         has_history = bool(state.actions)
         is_public = state.settings.get('public_subscription', True)
-        can_flattr = request.user.get_wksetting(FLATTR_TOKEN) and podcast.flattr_url
+        can_flattr = user.profile.get_wksetting(FLATTR_TOKEN) and podcast.flattr_url
 
     else:
         has_history = False
@@ -153,7 +153,7 @@ def episode_list(podcast, user, offset=0, limit=None):
         podcasts_dict = {podcast.get_id(): podcast}
         episodes_dict = dict( (episode.id, episode) for episode in episodes)
 
-        actions = get_podcasts_episode_states(podcast, user._id)
+        actions = get_podcasts_episode_states(podcast, user.profile.uuid.hex)
         actions = map(HistoryEntry.from_action_dict, actions)
 
         HistoryEntry.fetch_data(user, actions,
@@ -178,7 +178,7 @@ def history(request, podcast):
     history = list(state.actions)
 
     def _set_objects(h):
-        dev = user.get_device(h.device)
+        dev = user.client_set.get(id=h.device)
         return proxy_object(h, device=dev)
     history = map(_set_objects, history)
 
@@ -278,10 +278,10 @@ def subscribe(request, podcast):
 
         for uid in device_uids:
             try:
-                device = request.user.get_device_by_uid(uid)
+                device = request.user.client_set.get(uid=uid)
                 subscribe_podcast(podcast, request.user, device)
 
-            except (SubscriptionException, DeviceDoesNotExist, ValueError) as e:
+            except (SubscriptionException, Client.DoesNotExist, ValueError) as e:
                 messages.error(request, str(e))
 
         return HttpResponseRedirect(get_podcast_link_target(podcast))
@@ -307,7 +307,7 @@ def subscribe_all(request, podcast):
 
     try:
         subscribe_podcast(podcast, user, devs)
-    except (SubscriptionException, DeviceDoesNotExist, ValueError) as e:
+    except (SubscriptionException, Client.DoesNotExist, ValueError) as e:
         messages.error(request, str(e))
 
     return HttpResponseRedirect(get_podcast_link_target(podcast))
@@ -322,15 +322,16 @@ def unsubscribe(request, podcast, device_uid):
     if not return_to:
         raise Http404('Wrong URL')
 
+    user = request.user
     try:
-        device = request.user.get_device_by_uid(device_uid)
+        device = user.client_set.get(uid=device_uid)
 
-    except DeviceDoesNotExist as e:
+    except Client.DoesNotExist as e:
         messages.error(request, str(e))
         return HttpResponseRedirect(return_to)
 
     try:
-        unsubscribe_podcast(podcast, request.user, device)
+        unsubscribe_podcast(podcast, user, device)
     except SubscriptionException as e:
         logger.exception('Web: %(username)s: could not unsubscribe from podcast %(podcast_url)s on device %(device_id)s' %
             {'username': request.user.username, 'podcast_url': podcast.url, 'device_id': device.id})
@@ -348,13 +349,13 @@ def unsubscribe_all(request, podcast):
     state = podcast_state_for_user_podcast(user, podcast)
 
     dev_ids = state.get_subscribed_device_ids()
-    devs = user.get_devices(dev_ids)
+    devs = user.client_set.filter(id__in=dev_ids)
     # ungroup groups
     devs = [dev[0] if isinstance(dev, list) else dev for dev in devs]
 
     try:
         unsubscribe_podcast(podcast, user, devs)
-    except (SubscriptionException, DeviceDoesNotExist, ValueError) as e:
+    except (SubscriptionException, Client.DoesNotExist, ValueError) as e:
         messages.error(request, str(e))
 
     return HttpResponseRedirect(get_podcast_link_target(podcast))
@@ -373,7 +374,7 @@ def subscribe_url(request):
     if not url:
         raise Http404('Please specify a valid url')
 
-    podcast = Podcasts.objects.get_or_create_for_url(url)
+    podcast = Podcast.objects.get_or_create_for_url(url)
 
     return HttpResponseRedirect(get_podcast_link_target(podcast, 'subscribe'))
 

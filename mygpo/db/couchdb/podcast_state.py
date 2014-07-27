@@ -179,8 +179,8 @@ def subscribed_podcast_ids_by_device(device):
 
     udb = get_userdata_database()
     r = udb.view('subscriptions/by_device',
-            startkey = [device.id, None],
-            endkey   = [device.id, {}]
+            startkey = [device.id.hex, None],
+            endkey   = [device.id.hex, {}]
         )
     return [res['key'][1] for res in r]
 
@@ -295,8 +295,8 @@ def merge_podcast_states(state, state2):
 def get_subscribed_podcast_states_by_device(device):
     udb = get_userdata_database()
     r = udb.view('subscriptions/by_device',
-            startkey     = [device.id, None],
-            endkey       = [device.id, {}],
+            startkey     = [device.id.hex, None],
+            endkey       = [device.id.hex, {}],
             include_docs = True,
             schema       = PodcastUserState,
         )

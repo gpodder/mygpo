@@ -37,7 +37,7 @@ from django.views.decorators.cache import never_cache, cache_control
 
 from mygpo.decorators import repeat_on_conflict
 from mygpo.podcasts.models import Podcast, Episode
-from mygpo.users.models import History, HistoryEntry, DeviceDoesNotExist
+from mygpo.users.models import History, HistoryEntry, Client
 from mygpo.users.tasks import update_suggestions
 from mygpo.users.subscriptions import get_subscribed_podcasts
 from mygpo.web.utils import process_lang_params
@@ -155,11 +155,12 @@ def dashboard(request, episode_count=10):
 def history(request, count=15, uid=None):
 
     page = parse_range(request.GET.get('page', None), 0, sys.maxint, 0)
+    user = request.user
 
     if uid:
         try:
-            device = request.user.get_device_by_uid(uid, only_active=False)
-        except DeviceDoesNotExist as e:
+            device = user.client_set.get(uid=uid)
+        except Client.DoesNotExist as e:
             messages.error(request, str(e))
 
     else:
@@ -170,7 +171,7 @@ def history(request, count=15, uid=None):
     start = page*count
     end = start+count
     entries = history_obj[start:end]
-    HistoryEntry.fetch_data(request.user, entries)
+    HistoryEntry.fetch_data(user, entries)
 
     return render(request, 'history.html', {
         'history': entries,
@@ -196,7 +197,7 @@ def rate_suggestions(request):
     rating_val = int(request.GET.get('rate', None))
 
     suggestion = suggestions_for_user(request.user)
-    suggestion.rate(rating_val, request.user._id)
+    suggestion.rate(rating_val, request.user.profile.uuid.hex)
     suggestion.save()
 
     messages.success(request, _('Thanks for rating!'))

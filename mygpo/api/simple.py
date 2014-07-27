@@ -37,6 +37,7 @@ from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.directory.models import ExamplePodcasts
 from mygpo.api.advanced.directory import podcast_data
+from mygpo.users.subscriptions import get_subscribed_podcasts
 from mygpo.directory.search import search_podcasts
 from mygpo.decorators import allowed_methods, cors_origin
 from mygpo.utils import parse_range, normalize_feed_url
@@ -105,7 +106,7 @@ def all_subscriptions(request, username, format):
         return HttpResponseBadRequest('scale_logo has to be a number from 1 to 256')
 
 
-    subscriptions = request.user.get_subscribed_podcasts()
+    subscriptions = get_subscribed_podcasts(request.user)
     title = _('%(username)s\'s Subscription List') % {'username': username}
     domain = RequestSite(request).domain
     p_data = lambda p: podcast_data(p, domain, scale)
