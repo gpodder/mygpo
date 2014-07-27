@@ -78,9 +78,9 @@ def migrate_user(u):
             }
         )
 
-    logger.info('Migrading %d sync groups', len(u.sync_groups))
+    logger.info('Migrading %d sync groups', len(getattr(u, 'sync_groups', [])))
     groups = list(SyncGroup.objects.filter(user=user))
-    for group_ids in u.sync_groups:
+    for group_ids in getattr(u, 'sync_groups', []):
         try:
             group = groups.pop()
         except IndexError:
