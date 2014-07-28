@@ -56,7 +56,7 @@ def search_podcasts(query):
         "function_score" : {
             "boost_mode": 'replace',
             "query" : {
-                 'query_string': {'query': query}
+                 'simple_query_string': {'query': query}
             },
             "script_score" : {
                'script': "_score * (doc.subscribers.value / 4000)"
