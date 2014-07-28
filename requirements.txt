@@ -5,7 +5,6 @@ celery==3.1.13
 -e git+https://github.com/stefankoegl/couchdbkit.git@7593bca76f76097394840a96031ce7a297b18b34#egg=couchdbkit-dev
 coverage==3.7.1
 dj-database-url==0.3.0
--e git+https://github.com/stefankoegl/django-couchdb-utils.git@ae9dd2cc4fa689ba3553b25ba7b15c53795dcb84#egg=django_couchdb_utils-dev
 django-redis-sessions==0.4.0
 django-uuidfield==0.5.0
 feedparser==5.1.3
