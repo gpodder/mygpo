@@ -34,8 +34,9 @@ class PublishedPodcastManager(models.Manager):
 
 
 class PublishedPodcast(models.Model):
-    publisher = models.ForeignKey(settings.AUTH_USER_MODEL)
-    podcast = models.ForeignKey(Podcast)
+    publisher = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                  on_delete=models.CASCADE)
+    podcast = models.ForeignKey(Podcast, on_delete=models.CASCADE)
 
     class Meta:
         unique_together = (

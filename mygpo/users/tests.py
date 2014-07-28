@@ -72,6 +72,7 @@ class DeviceSyncTests(unittest.TestCase):
         self.assertEquals(target, dev2)
 
     def tearDown(self):
+        Client.objects.filter(user=self.user).delete()
         self.user.delete()
 
 

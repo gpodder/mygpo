@@ -509,7 +509,8 @@ class PodcastUserState(Document, SettingsMixin):
 class SyncGroup(models.Model):
     """ A group of Clients """
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE)
 
     def sync(self):
         """ Sync the group, ie bring all members up-to-date """
@@ -592,7 +593,8 @@ class Client(UUIDModel):
     uid = models.CharField(max_length=64, validators=[UIDValidator()])
 
     # the user to which the Client belongs
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE)
 
     # User-assigned name
     name = models.CharField(max_length=100, default='New Device')
@@ -607,7 +609,8 @@ class Client(UUIDModel):
     # user-agent string from which the Client was last accessed (for writing)
     user_agent = models.CharField(max_length=300, null=True, blank=True)
 
-    sync_group = models.ForeignKey(SyncGroup, null=True)
+    sync_group = models.ForeignKey(SyncGroup, null=True,
+                                   on_delete=models.PROTECT)
 
     class Meta:
         unique_together = (
