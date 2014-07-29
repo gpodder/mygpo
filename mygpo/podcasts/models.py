@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import re
 from datetime import datetime
 
+from django.conf import settings
 from django.db import models, transaction, IntegrityError
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation
@@ -11,7 +12,8 @@ from django.contrib.contenttypes import generic
 from uuidfield import UUIDField
 
 from mygpo import utils
-from mygpo.core.models import TwitterModel, UUIDModel, GenericManager
+from mygpo.core.models import (TwitterModel, UUIDModel, GenericManager,
+    UpdateInfoModel)
 
 import logging
 logger = logging.getLogger(__name__)
@@ -79,18 +81,6 @@ class LastUpdateModel(models.Model):
     # (eg a podcast feed). None means that the object has been created as a
     # stub, without information from the source.
     last_update = models.DateTimeField(null=True)
-
-    class Meta:
-        abstract = True
-
-
-class UpdateInfoModel(models.Model):
-
-    # this does not use "auto_now_add=True" so that data
-    # can be migrated with its creation timestamp intact; it can be
-    # switched on after the migration is complete
-    created = models.DateTimeField(default=datetime.utcnow)
-    modified = models.DateTimeField(auto_now=True)
 
     class Meta:
         abstract = True
@@ -720,8 +710,14 @@ class Tag(models.Model):
     )
 
     tag = models.SlugField()
+
+    # indicates where the tag came from
     source = models.PositiveSmallIntegerField(choices=SOURCE_CHOICES)
-    #user = models.ForeignKey(null=True)
+
+    # the user that created the tag (if it was created by a user,
+    # null otherwise)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True,
+                             on_delete=models.CASCADE)
 
     # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
     content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
@@ -731,8 +727,7 @@ class Tag(models.Model):
     class Meta:
         unique_together = (
             # a tag can only be assigned once from one source to one item
-            # TODO: add user to tuple
-            ('tag', 'source', 'content_type', 'object_id'),
+            ('tag', 'source', 'user', 'content_type', 'object_id'),
         )
 
 

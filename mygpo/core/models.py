@@ -68,3 +68,22 @@ class GenericManager(models.Manager):
                        self.model._meta.db_table)
         row = cursor.fetchone()
         return int(row[0])
+
+
+class UpdateInfoModel(models.Model):
+    """ Model that keeps track of when it was created and updated """
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
+class DeleteableModel(models.Model):
+    """ A model that can be marked as deleted """
+
+    # indicates that the object has been deleted
+    deleted = models.BooleanField(default=False)
+
+    class Meta:
+        abstract = True

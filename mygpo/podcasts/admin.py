@@ -187,3 +187,14 @@ class PodcastGroupAdmin(admin.ModelAdmin):
     inlines = [
         PodcastInline,
     ]
+
+
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    """ Admin page for tags """
+
+    list_display = ('tag', 'content_object', 'source', 'user', )
+
+    list_select_related = ('user', )
+
+    list_filter = ('source', )

@@ -3,11 +3,14 @@ from __future__ import unicode_literals
 import json
 from datetime import datetime
 
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User
 
-from mygpo.users.models import User as U, UserProfile, Client, SyncGroup
+from mygpo.podcasts.models import Tag
+from mygpo.users.models import UserProfile, Client, SyncGroup, PodcastUserState
+from mygpo.subscriptions.models import Subscription, PodcastConfig
+from mygpo.history.models import HistoryEntry
 from mygpo.podcasts.models import Podcast
-from mygpo.publisher.models import PublishedPodcast
 
 import logging
 logger = logging.getLogger(__name__)
@@ -25,87 +28,122 @@ def to_maxlength(cls, field, val):
     return val
 
 
-def migrate_user(u):
+def migrate_pstate(state):
+    """ migrate a podcast state """
 
-    # no need in migrating already deleted users
-    if u.deleted:
+    try:
+        user = User.objects.get(profile__uuid=state.user)
+    except User.DoesNotExist:
+        logger.warn("User with ID '{id}' does not exist".format(
+            id=state.user))
         return
 
-    user, created = User.objects.update_or_create(username=u.username,
-        defaults = {
-            'email': u.email,
-            'is_active': u.is_active,
-            'is_staff': u.is_staff,
-            'is_superuser': u.is_superuser,
-            'last_login': u.last_login or datetime(1970, 01, 01),
-            'date_joined': u.date_joined,
-            'password': u.password,
+    try:
+        podcast = Podcast.objects.all().get_by_any_id(state.podcast)
+    except Podcast.DoesNotExist:
+        logger.warn("Podcast with ID '{id}' does not exist".format(
+            id=state.podcast))
+        return
+
+    logger.info('Updating podcast state for user {user} and podcast {podcast}'
+                .format(user=user, podcast=podcast))
+
+    # move all tags
+    for tag in state.tags:
+        ctype = ContentType.objects.get_for_model(podcast)
+        tag, created = Tag.objects.get_or_create(tag=tag,
+                                                 source=Tag.USER,
+                                                 user=user,
+                                                 content_type=ctype,
+                                                 object_id=podcast.id
+                                                 )
+        if created:
+            logger.info("Created tag '{}' for user {} and podcast {}",
+                        tag, user, podcast)
+
+    # create all history entries
+    history = HistoryEntry.objects.filter(user=user, podcast=podcast)
+    for action in state.actions:
+        timestamp = action.timestamp
+        client = user.client_set.get(id=action.device)
+        action = action.action
+        he_data = {
+            'timestamp': timestamp,
+            'podcast': podcast,
+            'user': user,
+            'client': client,
+            'action': action,
         }
-    )
+        he, created = HistoryEntry.objects.get_or_create(**he_data)
 
-    profile = user.profile
-    profile.uuid = u._id
-    profile.suggestions_up_to_date = u.suggestions_up_to_date
-    profile.about = u.about or ''
-    profile.google_email = u.google_email
-    profile.subscriptions_token = u.subscriptions_token
-    profile.favorite_feeds_token = u.favorite_feeds_token
-    profile.publisher_update_token = u.publisher_update_token
-    profile.userpage_token = u.userpage_token
-    profile.twitter = to_maxlength(UserProfile, 'twitter', u.twitter) if u.twitter is not None else None
-    profile.activation_key = u.activation_key
-    profile.settings = json.dumps(u.settings)
-    profile.save()
+        if created:
+            logger.info('History Entry created: {user} {action} {podcast} '
+                        'on {client} @ {timestamp}'.format(**he_data))
 
-    for podcast_id in u.published_objects:
-        try:
-            podcast = Podcast.objects.all().get_by_any_id(podcast_id)
-        except Podcast.DoesNotExist:
-            logger.warn("Podcast with ID '%s' does not exist", podcast_id)
-            continue
+    # check which clients are currently subscribed
+    subscribed_devices = get_subscribed_devices(state)
+    subscribed_ids = subscribed_devices.keys()
+    subscribed_clients = user.client_set.filter(id__in=subscribed_ids)
+    unsubscribed_clients = user.client_set.exclude(id__in=subscribed_ids)
 
-        PublishedPodcast.objects.get_or_create(publisher=user, podcast=podcast)
+    # create subscriptions for subscribed clients
+    for client in subscribed_clients:
+        ts = subscribed_devices[client.id.hex]
+        sub_data = {
+            'user': user,
+            'client': client,
+            'podcast': podcast,
+            'ref_url': state.ref_url,
+            'created': ts,
+            'modified': ts,
+            'deleted': client.id.hex in state.disabled_devices,
+        }
+        subscription, created = Subscription.objects.get_or_create(**sub_data)
 
-    for device in u.devices:
-        client = Client.objects.get_or_create(user=user,
-                                              uid=device.uid,
+        if created:
+            logger.info('Subscription created: {user} subscribed to {podcast} '
+                'on {client} @ {created}'.format(**sub_data))
+
+    # delete all other subscriptions
+    Subscription.objects.filter(user=user, podcast=podcast,
+                                client__in=unsubscribed_clients).delete()
+
+    # only create the PodcastConfig obj if there are any settings
+    if state.settings:
+        logger.info('Updating {num} settings'.format(num=len(state.settings)))
+        PodcastConfig.objects.update_or_create(user=user, podcast=podcast,
             defaults = {
-                'id': device.id,
-                'name': device.name,
-                'type': device.type,
-                'deleted': device.deleted,
-                'user_agent': device.user_agent,
+                'settings': json.dumps(state.settings),
             }
         )
 
-    logger.info('Migrading %d sync groups', len(getattr(u, 'sync_groups', [])))
-    groups = list(SyncGroup.objects.filter(user=user))
-    for group_ids in getattr(u, 'sync_groups', []):
-        try:
-            group = groups.pop()
-        except IndexError:
-            group = SyncGroup.objects.create(user=user)
 
-        # remove all clients from the group
-        Client.objects.filter(sync_group=group).update(sync_group=None)
+def get_subscribed_devices(state):
+    """ device Ids on which the user subscribed to the podcast """
+    devices = {}
 
-        for client_id in group_ids:
-            client = Client.objects.get(id=client_id)
-            assert client.user == user
-            client.sync_group = group
-            client.save()
+    for action in state.actions:
+        if action.action == "subscribe":
+            if not action.device in state.disabled_devices:
+                devices[action.device] = action.timestamp
+        else:
+            if action.device in devices:
+                devices.pop(action.device)
 
-    SyncGroup.objects.filter(pk__in=[g.pk for g in groups]).delete()
+    return devices
+
 
 
 from couchdbkit import Database
-db = Database('http://127.0.0.1:6984/mygpo_users')
+db = Database('http://127.0.0.1:5984/mygpo_userdata_copy')
 from couchdbkit.changes import ChangesStream, fold, foreach
 
 
 MIGRATIONS = {
-    'User': (U, migrate_user),
+    'PodcastUserState': (PodcastUserState, migrate_pstate),
+    'User': (None, None),
     'Suggestions': (None, None),
+    'EpisodeUserState': (None, None),
 }
 
 def migrate_change(c):

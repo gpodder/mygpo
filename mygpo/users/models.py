@@ -22,7 +22,7 @@ from django.core.cache import cache
 from django.contrib import messages
 
 from mygpo.core.models import (TwitterModel, UUIDModel, SettingsModel,
-    GenericManager, )
+    GenericManager, DeleteableModel, )
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.utils import random_token
 from mygpo.core.proxy import DocumentABCMeta, proxy_object
@@ -568,7 +568,7 @@ class SyncGroup(models.Model):
 
 
 
-class Client(UUIDModel):
+class Client(UUIDModel, DeleteableModel):
     """ A client application """
 
     DESKTOP = 'desktop'
@@ -600,9 +600,6 @@ class Client(UUIDModel):
     # one of several predefined types
     type = models.CharField(max_length=max(len(k) for k, v in TYPES),
                             choices=TYPES, default=OTHER)
-
-    # indicates if the user has deleted the client
-    deleted = models.BooleanField(default=False)
 
     # user-agent string from which the Client was last accessed (for writing)
     user_agent = models.CharField(max_length=300, null=True, blank=True)
