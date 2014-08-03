@@ -24,12 +24,16 @@ class HistoryEntry(models.Model):
     podcast = models.ForeignKey(Podcast, db_index=True,
                                 on_delete=models.CASCADE)
 
+    # the episode which was involved in the event
+    episode = models.ForeignKey(Episode, db_index=True, null=True,
+                                on_delete=models.CASCADE)
+
     # the user which caused / triggered the event
     user = models.ForeignKey(settings.AUTH_USER_MODEL, db_index=True,
                              on_delete=models.CASCADE)
 
     # the client on / for which the event happened
-    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    client = models.ForeignKey(Client, null=True, on_delete=models.CASCADE)
 
     # the action that happened
     action = models.CharField(
@@ -43,6 +47,6 @@ class HistoryEntry(models.Model):
             ['user', 'podcast'],
         ]
 
-        ordering = ['timestamp']
+        ordering = ['-timestamp']
 
         verbose_name_plural = "History Entries"
