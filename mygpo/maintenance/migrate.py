@@ -65,7 +65,12 @@ def migrate_pstate(state):
     history = HistoryEntry.objects.filter(user=user, podcast=podcast)
     for action in state.actions:
         timestamp = action.timestamp
-        client = user.client_set.get(id=action.device)
+        try:
+            client = user.client_set.get(id=action.device)
+        except Client.DoesNotExist:
+            logger.warn("Client '{cid}' does not exist; skipping".format(
+                cid=action.device))
+            continue
         action = action.action
         he_data = {
             'timestamp': timestamp,
@@ -93,16 +98,26 @@ def migrate_pstate(state):
             'user': user,
             'client': client,
             'podcast': podcast,
+        }
+        defaults = {
             'ref_url': state.ref_url,
             'created': ts,
             'modified': ts,
             'deleted': client.id.hex in state.disabled_devices,
         }
-        subscription, created = Subscription.objects.get_or_create(**sub_data)
+        subscription, created = Subscription.objects.get_or_create(
+            defaults, **sub_data)
 
         if created:
+            sub_data.update(defaults)
             logger.info('Subscription created: {user} subscribed to {podcast} '
                 'on {client} @ {created}'.format(**sub_data))
+
+        else:
+            subscription.modified = ts
+            subscription.deleted = client.id.hex in state.disabled_devices
+            subscription.ref_url = state.ref_url
+            subscription.save()
 
     # delete all other subscriptions
     Subscription.objects.filter(user=user, podcast=podcast,
@@ -135,7 +150,7 @@ def get_subscribed_devices(state):
 
 
 from couchdbkit import Database
-db = Database('http://127.0.0.1:5984/mygpo_userdata_copy')
+db = Database('http://127.0.0.1:6984/mygpo_userdata_copy')
 from couchdbkit.changes import ChangesStream, fold, foreach
 
 
