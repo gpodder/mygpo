@@ -29,7 +29,7 @@ from mygpo.api.backend import get_device, BulkSubscribe
 from mygpo.utils import get_timestamp, \
     parse_request_body, normalize_feed_url, intersect
 from mygpo.decorators import cors_origin
-from mygpo.users.models import DeviceDoesNotExist, Client
+from mygpo.users.models import Client
 from mygpo.core.json import JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.db.couchdb import BulkException
@@ -55,7 +55,7 @@ class APIView(View):
         try:
             return super(APIView, self).dispatch(*args, **kwargs)
 
-        except DeviceDoesNotExist as e:
+        except Client.DoesNotExist as e:
             return HttpResponseNotFound(str(e))
 
         except RequestException as e:

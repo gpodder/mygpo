@@ -24,7 +24,7 @@ from mygpo.core.json import JSONDecodeError
 from mygpo.utils import parse_request_body
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.api.httpresponse import JsonResponse
-from mygpo.users.models import DeviceDoesNotExist, UserProxy
+from mygpo.users.models import Client, UserProxy
 from mygpo.users.tasks import sync_user
 
 
@@ -53,7 +53,7 @@ def main(request, username):
             update_sync_status(request.user, synclist, stopsync)
         except ValueError as e:
             return HttpResponseBadRequest(str(e))
-        except DeviceDoesNotExist as e:
+        except Client.DoesNotExist as e:
             return HttpResponseNotFound(str(e))
 
         return JsonResponse(get_sync_status(user))

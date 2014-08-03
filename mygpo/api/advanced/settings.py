@@ -25,7 +25,7 @@ from mygpo.podcasts.models import Podcast, Episode
 from mygpo.utils import parse_request_body
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.api.httpresponse import JsonResponse
-from mygpo.users.models import PodcastUserState, DeviceDoesNotExist
+from mygpo.users.models import PodcastUserState, Client
 from mygpo.db.couchdb import get_userdata_database
 from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode
@@ -81,7 +81,7 @@ def main(request, username, scope):
 
     try:
         base_obj, settings_obj, db = models[scope]()
-    except DeviceDoesNotExist as e:
+    except Client.DoesNotExist as e:
         return HttpResponseNotFound(str(e))
 
     if request.method == 'GET':

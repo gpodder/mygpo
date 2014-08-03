@@ -20,8 +20,6 @@ from functools import partial
 import uuid
 
 from mygpo.podcasts.models import Podcast
-from mygpo.users.models import EpisodeUserState, Device, DeviceDoesNotExist, \
-         PodcastUserState
 from mygpo.decorators import repeat_on_conflict
 from mygpo.core.json import json
 from mygpo.users.settings import STORE_UA

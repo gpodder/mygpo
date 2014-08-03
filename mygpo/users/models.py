@@ -51,14 +51,6 @@ class SubscriptionException(Exception):
     """ raised when a subscription can not be modified """
 
 
-class DeviceDoesNotExist(Exception):
-    pass
-
-
-class DeviceDeletedException(DeviceDoesNotExist):
-    pass
-
-
 GroupedDevices = collections.namedtuple('GroupedDevices', 'is_synced devices')
 
 
@@ -764,30 +756,6 @@ class Client(UUIDModel, DeleteableModel):
 
     def __unicode__(self):
         return u'{} ({})'.format(self.name, self.uid)
-
-
-class Device(Document, SettingsMixin):
-    id       = StringProperty(default=lambda: uuid.uuid4().hex)
-    oldid    = IntegerProperty(required=False)
-    uid      = StringProperty(required=True)
-    name     = StringProperty(required=True, default='New Device')
-    type     = StringProperty(required=True, default='other')
-    deleted  = BooleanProperty(default=False)
-    user_agent = StringProperty()
-
-
-
-    def __hash__(self):
-        return hash(frozenset([self.id, self.uid, self.name, self.type, self.deleted]))
-
-
-    def __eq__(self, other):
-        return self.id == other.id
-
-
-    def __repr__(self):
-        return '<{cls} {id}>'.format(cls=self.__class__.__name__, id=self.id)
-
 
 
 TOKEN_NAMES = ('subscriptions_token', 'favorite_feeds_token',
