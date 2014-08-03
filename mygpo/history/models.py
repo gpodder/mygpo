@@ -10,9 +10,11 @@ class HistoryEntry(models.Model):
 
     SUBSCRIBE = 'subscribe'
     UNSUBSCRIBE = 'unsubscribe'
+    FLATTR = 'flattr'
     PODCAST_ACTIONS = (
         (SUBSCRIBE, 'subscribed'),
         (UNSUBSCRIBE, 'unsubscribed'),
+        (FLATTR, 'flattr\'d'),
     )
 
     # the timestamp at which the event happened
