@@ -65,3 +65,8 @@ class PodcastConfig(SettingsModel, UpdateInfoModel):
     # the podcast for which the config is stored
     podcast = models.ForeignKey(Podcast, db_index=True,
                                 on_delete=models.PROTECT)
+
+    class Meta:
+        unique_together = [
+            ['user', 'podcast'],
+        ]
