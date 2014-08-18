@@ -189,8 +189,8 @@ def device_history(user, device, start, length):
 
     res = udb.view('history/by_device',
             descending = True,
-            startkey   = [user.profile.uuid.hex, device.id, {}],
-            endkey     = [user.profile.uuid.hex, device.id, None],
+            startkey   = [user.profile.uuid.hex, device.id.hex, {}],
+            endkey     = [user.profile.uuid.hex, device.id.hex, None],
             limit      = length,
             skip       = start,
         )

@@ -100,7 +100,7 @@ class DeviceUpdates(View):
         history = get_subscription_history(user, device, since, now)
         add, rem = subscription_diff(history)
 
-        subscriptions = [sp.podcast for sp in device.get_subscribed_podcasts()]
+        subscriptions = device.get_subscribed_podcasts()
 
         add = [podcast_data(p, domain) for url in add]
         rem = [p.url for p in rem]
