@@ -8,7 +8,6 @@ from mygpo.web.logo import CoverArt
 urlpatterns = patterns('mygpo.web.views',
  url(r'^$',                                                       'home',          name='home'),
  url(r'^logo/(?P<size>\d+)/(?P<prefix>.{3})/(?P<filename>[^/]*)$', CoverArt.as_view(), name='logo'),
- url(r'^history/$',                                               'history',       name='history'),
  url(r'^suggestions/$',                                           'suggestions',   name='suggestions'),
  url(r'^suggestions/rate$',                                       'rate_suggestions', name='suggestions-rate'),
  url(r'^suggestions/blacklist/(?P<slug>[\w-]+)$',                 'blacklist',     name='suggestions-blacklist-slug'),
@@ -33,12 +32,8 @@ urlpatterns = patterns('mygpo.web.views',
 )
 
 urlpatterns += patterns('mygpo.web.views.subscriptions',
- url(r'^subscriptions/$',                                         'show_list',     name='subscriptions'),
- url(r'^download/subscriptions\.opml$',                           'download_all',  name='subscriptions-opml'),
- url(r'^subscriptions/all.opml$',                                 'download_all',  name='subscriptions-download'),
  url(r'^user/(?P<username>[\w.-]+)/subscriptions$',                   'for_user',      name='shared-subscriptions'),
  url(r'^user/(?P<username>[\w.-]+)/subscriptions\.opml$',             'for_user_opml', name='shared-subscriptions-opml'),
- url(r'^user/(?P<username>[\w.-]+)/subscriptions/rss/$',         'subscriptions_feed', name='shared-subscriptions-rss'),
 )
 
 urlpatterns += patterns('mygpo.web.views.podcast',
@@ -91,10 +86,6 @@ urlpatterns += patterns('mygpo.web.views.podcast',
      'flattr_podcast_id',
      name='podcast-flattr-id'),
 
- url(r'^podcast/(?P<podcast_id>[0-9a-f]{32})/\+history',
-     'history_podcast_id',
-     name='podcast-history-id'),
-
 
  # Podcast Views with Slugs
  url(r'^podcast/(?P<slug>[\w-]+)/?$',
@@ -142,10 +133,6 @@ urlpatterns += patterns('mygpo.web.views.podcast',
  url(r'^podcast/(?P<slug>[\w-]+)/-flattr',
      'flattr_podcast_slug',
      name='podcast-flattr-slug'),
-
- url(r'^podcast/(?P<slug>[\w-]+)/\+history',
-     'history_podcast_slug',
-     name='podcast-history-slug'),
  )
 
 
@@ -256,7 +243,6 @@ urlpatterns += patterns('mygpo.web.views.device',
  url(r'^device/(?P<uid>[\w.-]+)/delete$',                       'delete',                     name='device-delete'),
  url(r'^device/(?P<uid>[\w.-]+)/remove$',                       'delete_permanently',         name='device-delete-permanently'),
  url(r'^device/(?P<uid>[\w.-]+)/undelete$',                     'undelete',                   name='device-undelete'),
- url(r'^device/(?P<uid>[\w.-]+)/history$',                      'history',                    name='device-history'),
  url(r'^device/(?P<uid>[\w.-]+)/edit$',                         'edit',                       name='device-edit'),
  url(r'^device/(?P<uid>[\w.-]+)/update$',                       'update',                     name='device-update'),
  url(r'^device/(?P<uid>[\w.-]+)/upload-opml$',                  'upload_opml',                name='device-upload-opml'),

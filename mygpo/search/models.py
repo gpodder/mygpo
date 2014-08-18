@@ -1,5 +1,8 @@
 """ Wrappers for the results of a search """
 
+from __future__ import unicode_literals
+
+
 class PodcastResult(object):
     """ Wrapper for a Podcast search result """
 

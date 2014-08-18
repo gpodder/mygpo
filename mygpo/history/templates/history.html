@@ -9,17 +9,17 @@
 {% block mainmenu %}{{ "/history/"|main_menu }}{% endblock %}
 {% block sectionmenu %}{{ "/history/"|section_menu }}{% endblock %}
 
-{% block title %}{% trans "Subscription and Episode History" %}{% if device %} {% trans "for" %} {{ device.name|striptags }}{% endif %}{% endblock %}
+{% block title %}{% trans "Subscription and Episode History" %}{% if client %} {% trans "for" %} {{ client.name|striptags }}{% endif %}{% endblock %}
 
 {% block header %}
-<h1>{% trans "Subscription and Episode History" %}{% if device %} {% trans "for" %} {{ device.name|striptags }}{% endif %}</h1>
+<h1>{% trans "Subscription and Episode History" %}{% if client %} {% trans "for" %} {{ client.name|striptags }}{% endif %}</h1>
 {% endblock %}
 
 
 {% block content %}
 
-   {% if device %}
-    <a href="{% url "device" device.uid %}">{% trans "Back to" %} {{ device|device_icon }} {{ device.name|striptags}}</a>
+   {% if client %}
+    <a href="{% url "device" client.uid %}">{% trans "Back to" %} {{ client|device_icon }} {{ client.name|striptags}}</a>
    {% endif %}
 
    {% if not history|length_is:"0" %}
@@ -34,17 +34,14 @@
        </td>
 
       <td>
-       {% if s.type == "Subscription" %}
-        {% if s.podcast %}
-         {% podcast_group_link s.podcast %}
-        {% endif %}
-       {% else %}
-        {% if s.episode %}
-         {% episode_link s.episode s.podcast %}
-          {% if s.podcast %}
-           <br /><span class="from_podcast">{% podcast_group_link s.podcast %}</span>
-          {% endif %}
-        {% endif %}
+       {% if s.podcast %}
+        {% podcast_group_link s.podcast %}
+       {% endif %}
+       {% if s.episode %}
+        {% episode_link s.episode s.podcast %}
+         {% if s.podcast %}
+          <br /><span class="from_podcast">{% podcast_group_link s.podcast %}</span>
+         {% endif %}
        {% endif %}
       </td>
       <td style="width: 80px;"><span title="{{ s.timestamp }}">{{ s.timestamp|date:"Y-m-d" }}</span></td>
@@ -56,8 +53,8 @@
        {% endif %}
       </td>
       <td>
-       {% if s.device %}
-        <a href="{% url "device" s.device.uid %}">{{ s.device|device_icon }}&nbsp;{{ s.device.name|striptags }}</a>
+       {% if s.client %}
+        <a href="{% url "device" s.client.uid %}">{{ s.client|device_icon }}&nbsp;{{ s.client.name|striptags }}</a>
        {% endif %}
       </td>
      </tr>

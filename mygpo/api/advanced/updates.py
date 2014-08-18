@@ -40,7 +40,6 @@ from mygpo.users.subscriptions import subscription_changes, podcasts_for_states
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.decorators import cors_origin
 from mygpo.db.couchdb.episode_state import get_podcasts_episode_states
-from mygpo.db.couchdb.podcast_state import podcast_states_for_device
 
 from collections import namedtuple
 EpisodeStatus = namedtuple('EpisodeStatus', 'episode status action')
@@ -80,8 +79,9 @@ class DeviceUpdates(View):
 
         domain = RequestSite(request).domain
 
-        add, rem, subscriptions = self.get_subscription_changes(device, since,
-                                                                now, domain)
+        add, rem, subscriptions = self.get_subscription_changes(user, device,
+                                                                since, now,
+                                                                domain)
         updates = self.get_episode_changes(user, subscriptions, domain,
                                            include_actions, since)
 
@@ -93,24 +93,16 @@ class DeviceUpdates(View):
         })
 
 
-    def get_subscription_changes(self, device, since, now, domain):
+    def get_subscription_changes(self, user, device, since, now, domain):
         """ gets new, removed and current subscriptions """
 
-        # DB: get all podcast states for the device
-        podcast_states = podcast_states_for_device(device.id.hex)
+        history = get_subscription_history(user, device, since, now)
+        add, rem = subscription_diff(history)
 
-        add, rem = subscription_changes(device.id.hex, podcast_states, since, now)
+        subscriptions = [sp.podcast for sp in device.get_subscribed_podcasts()]
 
-        subscriptions = filter(lambda s: s.is_subscribed_on(device), podcast_states)
-        # DB get podcast objects for the subscribed podcasts
-        subscriptions = podcasts_for_states(subscriptions)
-
-        podcasts = {}
-        for podcast in subscriptions:
-            for url in podcast.urls.all():
-                podcasts[url.url] = podcast
-
-        add = [podcast_data(podcasts.get(url), domain) for url in add ]
+        add = [podcast_data(p, domain) for url in add]
+        rem = [p.url for p in rem]
 
         return add, rem, subscriptions
 

@@ -44,7 +44,7 @@ def episode_status_icon(action):
 
     else:
         date_string   = (_(' on %s') % (action.timestamp)) if action.timestamp else ''
-        device_string = (_(' on %s') % (action.device.name)) if action.device else ''
+        device_string = (_(' on %s') % (action.client.name)) if action.client else ''
 
         if action.action == 'flattr':
             s = '<img src="https://flattr.com/_img/icons/flattr_logo_16.png" alt="flattr" title="%s" />' % (_("The episode has been flattr'd"),)

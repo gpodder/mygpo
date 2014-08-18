@@ -28,7 +28,7 @@ from mygpo.api.opml import Importer, Exporter
 from mygpo.users.models import SubscriptionException
 from mygpo.api.backend import get_device
 from mygpo.utils import normalize_feed_url
-from mygpo.db.couchdb.podcast_state import subscribe, unsubscribe
+from mygpo.subscriptions import subscribe, unsubscribe
 
 import logging
 logger = logging.getLogger(__name__)
@@ -73,20 +73,11 @@ def upload(request):
 
     for n in new:
         p = Podcast.objects.get_or_create_for_url(n)
-
-        try:
-            subscribe(p, user, dev)
-        except SubscriptionException as e:
-            logger.exception('Legacy API: %(username)s: could not subscribe to podcast %(podcast_url)s on device %(device_id)s' %
-                {'username': user.username, 'podcast_url': p.url, 'device_id': dev.id})
+        subscribe(p, user, dev)
 
     for r in rem:
         p = Podcast.objects.get_or_create_for_url(r)
-        try:
-            unsubscribe(p, user, dev)
-        except SubscriptionException as e:
-            logger.exception('Legacy API: %(username): could not unsubscribe from podcast %(podcast_url) on device %(device_id)' %
-                {'username': user.username, 'podcast_url': p.url, 'device_id': dev.id})
+        unsubscribe(p, user, dev)
 
     return HttpResponse('@SUCCESS', mimetype='text/plain')
 

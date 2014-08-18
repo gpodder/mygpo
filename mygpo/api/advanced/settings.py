@@ -27,7 +27,6 @@ from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.users.models import PodcastUserState, Client
 from mygpo.db.couchdb import get_userdata_database
-from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode
 
 
@@ -55,8 +54,8 @@ def main(request, username, scope):
 
     def podcast_settings(user, url):
         podcast = get_object_or_404(Podcast, urls__url=url)
-        obj = podcast_state_for_user_podcast(user, podcast)
-        return obj, obj, udb
+        # TODO: fix
+        return None, None, None
 
     def episode_settings(user, url, podcast_url):
         try:

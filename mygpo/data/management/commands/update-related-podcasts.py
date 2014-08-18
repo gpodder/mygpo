@@ -30,6 +30,7 @@ class Command(BaseCommand):
 
             related = map(get_podcast, l)
 
-            podcast.related_podcasts.add(related)
+            for p in related:
+                podcast.related_podcasts.add(p)
 
             progress(n+1, total)

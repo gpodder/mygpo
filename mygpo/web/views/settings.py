@@ -32,14 +32,13 @@ from django.utils.html import strip_tags
 
 from mygpo.podcasts.models import Podcast
 from mygpo.core.podcasts import PODCAST_SORT
+from mygpo.subscriptions.models import PodcastConfig
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.web.forms import UserAccountForm, ProfileForm, FlattrForm
 from mygpo.web.utils import normalize_twitter
 from mygpo.flattr import Flattr
-from mygpo.users.settings import PUBLIC_SUB_USER, \
+from mygpo.users.settings import PUBLIC_SUB_USER, PUBLIC_SUB_PODCAST, \
          FLATTR_TOKEN, FLATTR_AUTO, FLATTR_MYGPO, FLATTR_USERNAME
-from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast, \
-         subscriptions_by_user, set_podcast_privacy_settings
 
 
 @login_required
@@ -242,8 +241,14 @@ class PodcastPrivacySettings(View):
     @method_decorator(never_cache)
     def post(self, request, podcast_id):
         podcast = Podcast.objects.get(id=podcast_id)
-        state = podcast_state_for_user_podcast(request.user, podcast)
-        set_podcast_privacy_settings(state, self.public)
+
+        config, created = PodcastConfig.objects.get_or_create(
+            user=request.user,
+            podcast=podcast,
+        )
+
+        config.set_wksetting(PUBLIC_SUB_PODCAST, self.public)
+        config.save()
         return HttpResponseRedirect(reverse('privacy'))
 
 
@@ -251,18 +256,23 @@ class PodcastPrivacySettings(View):
 @never_cache
 def privacy(request):
     site = RequestSite(request)
+    user = request.user
 
-    subscriptions = subscriptions_by_user(request.user)
-    podcast_ids = [x[1] for x in subscriptions]
-    podcasts = Podcast.objects.filter(id__in=podcast_ids).prefetch_related('slugs')
-    podcasts = {podcast.id.hex: podcast for podcast in podcasts}
+    podcasts = Podcast.objects.filter(subscription__user=user)\
+                              .distinct()
+    private = PodcastConfig.objects.get_private_podcasts(user)
 
-    subs = set((podcasts.get(x[1], None), not x[0]) for x in subscriptions)
-    subs = sorted(subs, key=lambda (p, _): PODCAST_SORT(p))
+    subscriptions = []
+    for podcast in podcasts:
+
+        subscriptions.append( (podcast, podcast in private) )
+
+#subs = set((podcasts.get(x[1], None), not x[0]) for x in subscriptions)
+#subs = sorted(subs, key=lambda (p, _): PODCAST_SORT(p))
 
     return render(request, 'privacy.html', {
         'private_subscriptions': not request.user.profile.get_wksetting(PUBLIC_SUB_USER),
-        'subscriptions': subs,
+        'subscriptions': subscriptions,
         'domain': site.domain,
         })
 

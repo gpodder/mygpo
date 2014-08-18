@@ -16,8 +16,7 @@ from django.contrib.auth import get_user_model
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.users.models import Client, EpisodeAction
 from mygpo.maintenance.merge import PodcastMerger
-from mygpo.db.couchdb.podcast_state import (podcast_state_for_user_podcast,
-    subscribe, unsubscribe, )
+from mygpo.subscriptions import subscribe, unsubscribe
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
     add_episode_actions
 from mygpo.utils import get_timestamp
@@ -93,8 +92,8 @@ class SimpleTest(TestCase):
         self.assertEqual(len(es3.actions), 1)
 
         p1 = Podcast.objects.get(pk=p1.get_id())
-        ps1 = podcast_state_for_user_podcast(user, p1)
-        self.assertEqual(len(ps1.get_subscribed_device_ids()), 2)
+        subscribed_clients = Client.objects.filter(subscription__podcast=p1)
+        self.assertEqual(len(subscribed_clients), 2)
 
         episodes = p1.episode_set.all()
         self.assertEqual(len(episodes), 3)

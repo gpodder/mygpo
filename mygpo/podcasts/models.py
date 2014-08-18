@@ -477,36 +477,6 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
             self.save()
             return group2
 
-
-    def subscribe_targets(self, user):
-        """
-        returns all Devices and SyncGroups on which this podcast can be subsrbied. This excludes all
-        devices/syncgroups on which the podcast is already subscribed
-        """
-        targets = []
-
-        from mygpo.users.subscriptions import get_subscriptions_by_device
-        from mygpo.users.models import UserProxy
-        subscriptions_by_devices = get_subscriptions_by_device(user)
-
-        user = UserProxy.objects.from_user(user)
-        for group in user.get_grouped_devices():
-
-            if group.is_synced:
-
-                dev = group.devices[0]
-
-                if not self.get_id() in subscriptions_by_devices[dev.id]:
-                    targets.append(group.devices)
-
-            else:
-                for device in group.devices:
-                    if not self.get_id() in subscriptions_by_devices[device.id]:
-                        targets.append(device)
-
-        return targets
-
-
     def get_common_episode_title(self, num_episodes=100):
 
         if self.common_episode_title:
@@ -598,7 +568,7 @@ class EpisodeManager(GenericManager):
         if created:
             url = URL.objects.create(url=url,
                                      order=0,
-                                     scope=podcast.get_id(),
+                                     scope=episode.scope,
                                      content_object=episode,
                                     )
         return episode
@@ -666,6 +636,11 @@ class ScopedModel(models.Model):
     class Meta:
         abstract = True
 
+    def get_default_scope(self):
+        """ Returns the default scope of the object """
+        raise NotImplementedError('{cls} should implement get_default_scope'
+            .format(cls=self.__class__.__name__))
+
 
 class URL(OrderedModel, ScopedModel):
     """ Podcasts and Episodes can have multiple URLs
@@ -691,6 +666,9 @@ class URL(OrderedModel, ScopedModel):
 
         verbose_name = 'URL'
         verbose_name_plural = 'URLs'
+
+    def get_default_scope(self):
+        return self.content_object.scope
 
 
 class Tag(models.Model):

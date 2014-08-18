@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.db import models
 from django.conf import settings
 
@@ -19,6 +21,7 @@ class HistoryEntry(models.Model):
 
     # the timestamp at which the event happened
     timestamp = models.DateTimeField()
+
 
     # the podcast which was involved in the event
     podcast = models.ForeignKey(Podcast, db_index=True,

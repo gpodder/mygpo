@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from random import random
 
 from couchdbkit.ext.django.schema import *

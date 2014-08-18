@@ -15,17 +15,10 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from collections import defaultdict
-from functools import partial
 import uuid
 
-from mygpo.podcasts.models import Podcast
-from mygpo.decorators import repeat_on_conflict
-from mygpo.core.json import json
 from mygpo.users.settings import STORE_UA
 from mygpo.users.models import Client
-from mygpo.db.couchdb import bulk_save_retry, get_userdata_database
-from mygpo.db.couchdb.podcast_state import podcast_state_for_user_podcast
 
 
 def get_device(user, uid, user_agent, undelete=True):
@@ -55,58 +48,3 @@ def get_device(user, uid, user_agent, undelete=True):
         client.save()
 
     return client
-
-
-class BulkSubscribe(object):
-    """ Performs bulk subscribe/unsubscribe operations """
-
-    def __init__(self, user, device, podcasts = {}, actions=None):
-        self.user = user
-        self.device = device
-        self.podcasts = podcasts
-        self.actions = actions or []
-
-        self.operations = {
-            'subscribe':   partial(self._subscribe,   device=device),
-            'unsubscribe': partial(self._unsubscribe, device=device),
-        }
-
-
-    def execute(self):
-        """ Executes all added actions in bulk """
-        obj_funs = map(self._get_obj_fun, self.actions)
-        udb = get_userdata_database()
-        bulk_save_retry(obj_funs, udb)
-
-        # prepare for another run
-        self.actions = []
-
-
-    def add_action(self, url, op):
-        """ Adds a new (un)subscribe action
-
-        url is the podcast url to subscribe to / unsubscribe from
-        op is either "subscribe" or "unsubscribe" """
-        self.actions.append( (url, op) )
-
-
-    def _get_obj_fun(self, action):
-        url, op = action
-
-        podcast = self.podcasts.get(url,
-                Podcast.objects.get_or_create_for_url(url))
-
-        state = podcast_state_for_user_podcast(self.user, podcast)
-
-        fun = self.operations[op]
-        return (state, fun)
-
-
-
-    def _subscribe(self, state, device):
-        state.subscribe(device)
-        return state
-
-    def _unsubscribe(self, state, device):
-        state.unsubscribe(device)
-        return state

@@ -16,33 +16,51 @@
 #
 
 from collections import Counter
+import random
 import logging
 
 from django.conf import settings
 
-from mygpo.db.couchdb.podcast_state import subscribed_users, \
-         subscribed_podcast_ids_by_user_id
+from mygpo.podcasts.models import Podcast
+from mygpo.subscriptions.models import Subscription
 from mygpo import pubsub
 
 logger = logging.getLogger(__name__)
 
 
-def calc_similar_podcasts(podcast, num=20):
-    """
-    calculates and returns a list of podcasts that seem to be similar
-    to the given one.
+def calc_similar_podcasts(podcast, num=20, user_sample=100):
+    """ Get a list of podcasts that seem to be similar to the given one.
 
-    Probably an expensive operation
-    """
+    The similarity is based on similar subscriptions; for performance
+    reasons, only a sample of subscribers is considered """
 
-    users = subscribed_users(podcast)
+    logger.info('Calculating podcasts similar to {podcast}'.format(
+        podcast=podcast))
 
+    # get all users that subscribe to this podcast
+    user_ids = Subscription.objects.filter(podcast=podcast)\
+                                   .order_by('user')\
+                                   .distinct('user')\
+                                   .values_list('user', flat=True)
+    logger.info('Found {num_subscribers} subscribers, taking a sample '
+        'of {sample_size}'.format(num_subscribers=len(user_ids),
+                                  sample_size=user_sample))
+
+    # take a random sample of ``user_sample`` subscribers
+    user_ids = list(user_ids)  # evaluate ValuesQuerySet
+    random.shuffle(user_ids)
+    user_ids = user_ids[:user_sample]
+
+    # get other podcasts that the user sample subscribes to
     podcasts = Counter()
-
-    for user_id in users:
-        user_subscriptions = subscribed_podcast_ids_by_user_id(user_id)
-        user_counter = Counter(user_subscriptions)
-        podcasts.update(user_counter)
+    for user_id in user_ids:
+        subscriptions = Podcast.objects\
+            .filter(subscription__user__id__in=user_ids)\
+            .distinct()\
+            .exclude(pk=podcast.pk)
+        podcasts.update(Counter(subscriptions))
+    logger.info('Found {num_podcasts}, returning top {num_results}'.format(
+        num_podcasts=len(podcasts), num_results=num))
 
     return podcasts.most_common(num)
 

@@ -33,6 +33,7 @@ from django.conf import settings as dsettings
 from django.shortcuts import get_object_or_404
 
 from mygpo.podcasts.models import Podcast, Episode
+from mygpo.subscriptions.models import Subscription
 from mygpo.api.constants import EPISODE_ACTION_TYPES
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.advanced.directory import episode_data
@@ -49,7 +50,6 @@ from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.db.couchdb import bulk_save_retry, get_userdata_database
 from mygpo.db.couchdb.episode_state import favorite_episode_ids_for_user
 
-from mygpo.db.couchdb.podcast_state import subscribed_podcast_ids_by_device
 from mygpo.db.couchdb.episode_state import episode_state_for_ref_urls, \
     get_episode_actions
 
@@ -382,17 +382,18 @@ def valid_episodeaction(type):
 @cors_origin()
 def devices(request, username):
     user = request.user
-    devices = user.client_set.filter(deleted=False)
-    devices = map(device_data, devices)
-    return JsonResponse(devices)
+    clients = user.client_set.filter(deleted=False)
+    client_data = [get_client_data(user, client) for client in clients]
+    return JsonResponse(client_data)
 
 
-def device_data(device):
+def get_client_data(user, client):
     return dict(
-        id           = device.uid,
-        caption      = device.name,
-        type         = device.type,
-        subscriptions= len(subscribed_podcast_ids_by_device(device)),
+        id           = client.uid,
+        caption      = client.name,
+        type         = client.type,
+        subscriptions= Subscription.objects.filter(user=user, client=client)\
+                                           .count(),
     )
 
 

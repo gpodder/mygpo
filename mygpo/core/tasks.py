@@ -5,6 +5,7 @@ from django.conf import settings
 
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.celery import celery
+from mygpo.history.models import HistoryEntry
 from mygpo.data.feeddownloader import PodcastUpdater
 from mygpo.utils import get_timestamp
 from mygpo.users.models import EpisodeAction
@@ -21,9 +22,11 @@ def flattr_thing(user, thing_id, domain, is_secure, thing_type):
 
     if thing_type == 'Podcast':
         thing = Podcast.objects.get(id=thing_id)
+        episode, podcast = None, thing
 
     elif thing_type == 'Episode':
-        thing = Episode.objects.get(id=thing_id)
+        thing = Episode.objects.get(id=thing_id).select_related('podcast')
+        episode, podcast = thing, thing.podcast
 
     else:
         raise NotImplemented(_("Can't flattr a '%s'") % thing_type)
@@ -40,6 +43,17 @@ def flattr_thing(user, thing_id, domain, is_secure, thing_type):
 
     except Exception as ex:
         raise flattr_thing.retry(exc=ex)
+
+    if success:
+        HistoryEntry.objects.create(
+            timestamp=datetime.utcnow(),
+            podcast=podcast,
+            episode=episode,
+            user=user,
+            client=None,
+            action=HistoryEntry.FLATTR,
+        )
+
 
     return success, msg
 

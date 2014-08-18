@@ -25,14 +25,14 @@ from django.views.generic.base import View
 from django.shortcuts import get_object_or_404
 
 from mygpo.api.httpresponse import JsonResponse
-from mygpo.api.backend import get_device, BulkSubscribe
+from mygpo.api.backend import get_device
 from mygpo.utils import get_timestamp, \
     parse_request_body, normalize_feed_url, intersect
 from mygpo.decorators import cors_origin
 from mygpo.users.models import Client
 from mygpo.core.json import JSONDecodeError
+from mygpo.subscriptions import subscribe, unsubscribe
 from mygpo.api.basic_auth import require_valid_user, check_username
-from mygpo.db.couchdb import BulkException
 
 
 import logging
@@ -101,9 +101,10 @@ class SubscriptionsAPI(APIView):
     def get(self, request, version, username, device_uid):
         """ Client retrieves subscription updates """
         now = datetime.utcnow()
-        device = get_object_or_404(Client, user=request.user, uid=device_uid)
+        user = request.user
+        device = get_object_or_404(Client, user=user, uid=device_uid)
         since = self.get_since(request)
-        add, rem, until = self.get_changes(device, since, now)
+        add, rem, until = self.get_changes(user, device, since, now)
         return JsonResponse({
             'add': add,
             'remove': rem,
@@ -152,28 +153,23 @@ class SubscriptionsAPI(APIView):
         # been sanitized to the same, we ignore the removal
         rem_s = filter(lambda x: x not in add_s, rem_s)
 
-        subscriber = BulkSubscribe(user, device)
+        for add_url in add_s:
+            podcast = Podcast.objects.get_or_create_for_url(add_url)
+            subscribe(podcast, user, device, add_url)
 
-        for a in add_s:
-            subscriber.add_action(a, 'subscribe')
-
-        for r in rem_s:
-            subscriber.add_action(r, 'unsubscribe')
-
-        try:
-            subscriber.execute()
-        except BulkException as be:
-            for err in be.errors:
-                msg = 'Advanced API: {user}: Updating subscription for ' \
-                      '{podcast} on {device} failed: {err} {reason}'.format(
-                          user=user.username, podcast=err.doc,
-                          device=device.uid, err=err.error, reason=err.reason)
-                loger.error(msg)
+        remove_podcasts = Podcast.objects.filter(urls__url__in=rem_s)
+        for podcast in remove_podcasts:
+            unsubscribe(podcast, user, device)
 
         return updated_urls
 
-    def get_changes(self, device, since, until):
+    def get_changes(self, user, device, since, until):
         """ Returns subscription changes for the given device """
-        add_urls, rem_urls = device.get_subscription_changes(since, until)
+        history = get_subscription_history(user, device, since, until)
+        add, rem = subscription_diff(history)
         until_ = get_timestamp(until)
+
+        # TODO: we'd need to get the ref_urls here somehow
+        add_urls = [p.url for p in add]
+        rem_urls = [p.url for p in rem]
         return (add_urls, rem_urls, until_)

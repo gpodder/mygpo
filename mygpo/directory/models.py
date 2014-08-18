@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.core.cache import cache
 
 from couchdbkit.ext.django.schema import *

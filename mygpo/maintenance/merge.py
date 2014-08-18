@@ -6,7 +6,7 @@ import restkit
 
 from django.db import IntegrityError
 
-from mygpo.podcasts.models import MergedUUID
+from mygpo.podcasts.models import MergedUUID, ScopedModel, OrderedModel
 from mygpo import utils
 from mygpo.decorators import repeat_on_conflict
 from mygpo.db.couchdb.podcast_state import all_podcast_states, \
@@ -273,3 +273,68 @@ def reassign_slugs(obj1, obj2):
         except IntegrityError as ie:
             logger.warn('Moving Slug failed: %s. Deleting', str(ie))
             slug.delete()
+
+
+
+def merge(obj1, obj2):
+    """ Merges obj2 into obj1 """
+
+    if type(obj1) != type(obj2):
+        raise ValueError('Only two objects of the same type can be merged')
+
+    if obj1 == obj2:
+        raise ValueError('Cannot merge an object with itself')
+
+    # first we need to move all objects that point to obj2 over to obj1
+    # relations can either be "direct" relations or generic ones
+
+    # we iterate over all models that relate to obj2 (eg an Episode refers to
+    # a Podcast)
+    for rel_obj in obj2._meta.get_all_related_objects():
+
+        # we can access the relating objects from obj2, eg a Podcast has a
+        # episode_set
+        accessor_name = rel_obj.get_accessor_name()
+
+        # then we need to update the relating obj's relating field (eg
+        # Episode.podcast) to obj1
+        rel_field = rel_obj.field.name
+
+        objs = getattr(obj2, accessor_name).all()
+        for obj in objs:
+
+            if isinstance(obj, ScopedModel):
+                obj.scope = obj.get_default_scope()
+
+            if isinstance(obj, OrderedModel):
+                obj1_objs = getattr(obj1, accessor_name).all()
+                obj.order = max([o.order for o in obj1_objs] + [-1]) + 1
+
+            logger.info("Setting {obj}'s {field} to {obj1}".format(obj=obj,
+                field=rel_field, obj1=obj1))
+            setattr(obj, rel_field, obj1)
+            obj.save()
+
+        # TODO: update scope, ordered models, etc
+
+    for vf in obj2._meta.virtual_fields:
+        accessor_name = vf.get_attname()
+        fk_field, target_field = vf.resolve_related_fields()[0]
+
+        objs = getattr(obj2, accessor_name).all()
+        for obj in objs:
+
+            if isinstance(obj, ScopedModel):
+                obj.scope = obj.get_default_scope()
+
+            if isinstance(obj, OrderedModel):
+                obj1_objs = getattr(obj1, accessor_name).all()
+                obj.order = max([o.order for o in obj1_objs] + [-1]) + 1
+
+            obj1_id = getattr(obj1, target_field.name)
+            logger.info("Setting {obj}'s {field} to {obj1}".format(obj=obj,
+                field=fk_field, obj1=obj1_id))
+            setattr(obj, fk_field.name, obj1_id)
+            obj.save()
+
+    obj2.delete()

@@ -29,19 +29,19 @@
  {% if not subscriptionlist|length_is:"0" %}
  <table class="list">
 
-  {% for p in subscriptions %}
+  {% for sp in subscriptions %}
    <tr>
-    <td class="logo">{{ p|podcast_logo }}</td>
-    <td class="listlink">{% podcast_group_link p %}</td>
+    <td class="logo">{{ sp.podcast|podcast_logo }}</td>
+    <td class="listlink">{% podcast_group_link sp.podcast %}</td>
    </tr>
   {% endfor %}
   </table>
 
   <div class="btn-group">
-   <a class="btn" href="{% url "shared-subscriptions-opml" other_user.username %}{% if token %}?token={{ token }}{% endif %}">
-    <i class="icon-download"></i>{% trans "Download Subscriptions as OPML" %}
+   <a class="btn btn-default" href="{% url "shared-subscriptions-opml" other_user.username %}{% if token %}?token={{ token }}{% endif %}">
+    <i class="icon-download"></i> {% trans "Download Subscriptions as OPML" %}
    </a>
-   <a class="btn" href="{% url "shared-subscriptions-rss" other_user.username %}{% if token %}?token={{ token }}{% endif %}">
+   <a class="btn btn-default" href="{% url "shared-subscriptions-rss" other_user.username %}{% if token %}?token={{ token }}{% endif %}">
     <i class="icon-rss"></i> {% trans "Subscribe to Changes" %}
    </a>
   </div>

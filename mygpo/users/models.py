@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import re
 import uuid
 import collections
@@ -28,13 +30,9 @@ from mygpo.utils import random_token
 from mygpo.core.proxy import DocumentABCMeta, proxy_object
 from mygpo.decorators import repeat_on_conflict
 from mygpo.users.ratings import RatingMixin
-from mygpo.users.subscriptions import (subscription_changes,
-    podcasts_for_states, get_subscribed_podcast_ids)
+from mygpo.users.subscriptions import subscription_changes
 from mygpo.users.settings import FAV_FLAG, PUBLIC_SUB_PODCAST, SettingsMixin
 from mygpo.db.couchdb.user import user_history, device_history
-
-# make sure this code is executed at startup
-from mygpo.users.signals import *
 
 import logging
 logger = logging.getLogger(__name__)
@@ -186,11 +184,11 @@ class Suggestions(Document, RatingMixin):
 
 
     def get_podcasts(self, count=None):
+        from mygpo.subscriptions import get_subscribed_podcasts
         User = get_user_model()
         user = User.objects.get(profile__uuid=self.user)
-        # TODO: re-include later on
-        #subscriptions = get_subscribed_podcast_ids(user)
-        subscriptions = []
+        subscriptions = [sp.podcast.id.hex for sp in
+                         get_subscribed_podcasts(user)]
 
         ids = filter(lambda x: not x in self.blacklist + subscriptions, self.podcasts)
         if count:
@@ -505,59 +503,22 @@ class SyncGroup(models.Model):
     def sync(self):
         """ Sync the group, ie bring all members up-to-date """
 
-        group_state = self.get_group_state()
+        # get all subscribed podcasts
+        podcasts = set(self.get_subscribed_podcasts())
 
-        for device in SyncGroup.objects.filter(sync_group=self):
-            sync_actions = self.get_sync_actions(device, group_state)
-            device.apply_sync_actions(sync_actions)
+        # bring each client up to date, it it is subscribed to all podcasts
+        for client in self.client_set.all():
+            missing_podcasts = self.get_missing_podcasts(client, podcasts)
+            for podcast in missing_podcasts:
+                subscribe(podcast, self.user, client)
 
-    def get_group_state(self):
-        """ Returns the group's subscription state
+    def get_subscribed_podcasts(self):
+        return Podcast.objects.filter(subscription__device__sync_group=self)
 
-        The state is represented by the latest actions for each podcast """
-
-        devices = Client.objects.filter(sync_group=self)
-        state = {}
-
-        for d in devices:
-            actions = dict(d.get_latest_changes())
-            for podcast_id, action in actions.items():
-                if not podcast_id in state or \
-                        action.timestamp > state[podcast_id].timestamp:
-                    state[podcast_id] = action
-
-        return state
-
-    def get_sync_actions(self, device, group_state):
-        """ Get the actions required to bring the device to the group's state
-
-        After applying the actions the device reflects the group's state """
-
-        # Filter those that describe actual changes to the current state
-        add, rem = [], []
-        current_state = dict(device.get_latest_changes())
-
-        for podcast_id, action in group_state.items():
-
-            # Sync-Actions must be newer than current state
-            if podcast_id in current_state and \
-               action.timestamp <= current_state[podcast_id].timestamp:
-                continue
-
-            # subscribe only what hasn't been subscribed before
-            if action.action == 'subscribe' and \
-                        (podcast_id not in current_state or \
-                         current_state[podcast_id].action == 'unsubscribe'):
-                add.append(podcast_id)
-
-            # unsubscribe only what has been subscribed before
-            elif action.action == 'unsubscribe' and \
-                        podcast_id in current_state and \
-                        current_state[podcast_id].action == 'subscribe':
-                rem.append(podcast_id)
-
-        return add, rem
-
+    def get_missing_podcasts(self, client, all_podcasts):
+        """ the podcasts required to bring the device to the group's state """
+        client_podcasts = set(client.get_subscribed_podcasts())
+        return all_podcasts.difference(client_podcasts)
 
 
 class Client(UUIDModel, DeleteableModel):
@@ -678,70 +639,12 @@ class Client(UUIDModel, DeleteableModel):
                     if not dev == self:
                         yield dev
 
-    def apply_sync_actions(self, sync_actions):
-        """ Applies the sync-actions to the client """
-
-        from mygpo.db.couchdb.podcast_state import subscribe, unsubscribe
-        from mygpo.users.models import SubscriptionException
-        add, rem = sync_actions
-
-        podcasts = Podcast.objects.filter(id__in=(add+rem))
-        podcasts = {podcast.id: podcast for podcast in podcasts}
-
-        for podcast_id in add:
-            podcast = podcasts.get(podcast_id, None)
-            if podcast is None:
-                continue
-            try:
-                subscribe(podcast, self.user, self)
-            except SubscriptionException as e:
-                logger.warn('Web: %(username)s: cannot sync device: %(error)s' %
-                    dict(username=self.user.username, error=repr(e)))
-
-        for podcast_id in rem:
-            podcast = podcasts.get(podcast_id, None)
-            if not podcast:
-                continue
-
-            try:
-                unsubscribe(podcast, self.user, self)
-            except SubscriptionException as e:
-                logger.warn('Web: %(username)s: cannot sync device: %(error)s' %
-                    dict(username=self.user.username, error=repr(e)))
-
-    def get_subscription_changes(self, since, until):
-        """
-        Returns the subscription changes for the device as two lists.
-        The first lists contains the Ids of the podcasts that have been
-        subscribed to, the second list of those that have been unsubscribed
-        from.
-        """
-
-        from mygpo.db.couchdb.podcast_state import podcast_states_for_device
-        podcast_states = podcast_states_for_device(self.id.hex)
-        return subscription_changes(self.id.hex, podcast_states, since, until)
-
-    def get_latest_changes(self):
-        from mygpo.db.couchdb.podcast_state import podcast_states_for_device
-        podcast_states = podcast_states_for_device(self.id.hex)
-        for p_state in podcast_states:
-            actions = filter(lambda x: x.device == self.id.hex, reversed(p_state.actions))
-            if actions:
-                yield (p_state.podcast, actions[0])
-
-    def get_subscribed_podcast_ids(self):
-        from mygpo.db.couchdb.podcast_state import get_subscribed_podcast_states_by_device
-        states = get_subscribed_podcast_states_by_device(self)
-        return [state.podcast for state in states]
-
     def get_subscribed_podcasts(self):
         """ Returns all subscribed podcasts for the device
 
         The attribute "url" contains the URL that was used when subscribing to
         the podcast """
-        from mygpo.db.couchdb.podcast_state import get_subscribed_podcast_states_by_device
-        states = get_subscribed_podcast_states_by_device(self)
-        return podcasts_for_states(states)
+        return Podcast.objects.filter(subscription__client=self)
 
     def synced_with(self):
         if not self.sync_group:

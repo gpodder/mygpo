@@ -1,4 +1,4 @@
-from mygpo.core.signals import subscription_changed
+from mygpo.subscriptions.signals import subscription_changed
 from mygpo.users.tasks import sync_user, update_suggestions
 
 

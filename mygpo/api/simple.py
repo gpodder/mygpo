@@ -31,18 +31,17 @@ from django.contrib.sites.models import RequestSite
 from django.utils.translation import ugettext as _
 
 from mygpo.api.basic_auth import require_valid_user, check_username
-from mygpo.api.backend import get_device, BulkSubscribe
+from mygpo.api.backend import get_device
 from mygpo.podcasts.models import Podcast
 from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.directory.models import ExamplePodcasts
 from mygpo.api.advanced.directory import podcast_data
-from mygpo.users.subscriptions import get_subscribed_podcasts
+from mygpo.subscriptions import get_subscribed_podcasts, subscribe, unsubscribe
 from mygpo.directory.search import search_podcasts
 from mygpo.decorators import allowed_methods, cors_origin
 from mygpo.utils import parse_range, normalize_feed_url
 from mygpo.core.json import json, JSONDecodeError
-from mygpo.db.couchdb import BulkException
 from mygpo.db.couchdb.user import suggestions_for_user
 
 import logging
@@ -213,24 +212,13 @@ def set_subscriptions(urls, user, device_uid, user_agent):
     new = [p for p in urls if p not in subscriptions.keys()]
     rem = [p for p in subscriptions.keys() if p not in urls]
 
-    subscriber = BulkSubscribe(user, device, podcasts=subscriptions)
+    remove_podcasts = Podcast.objects.filter(urls__url__in=rem)
+    for podcast in remove_podcasts:
+        unsubscribe(podcast, user, device)
 
-    for r in rem:
-        subscriber.add_action(r, 'unsubscribe')
-
-    for n in new:
-        subscriber.add_action(n, 'subscribe')
-
-    try:
-        errors = subscriber.execute()
-    except BulkException as be:
-        for err in be.errors:
-            logger.warn('Simple API: %(username)s: Updating subscription for '
-                    '%(podcast_url)s on %(device_uid)s failed: '
-                    '%(error)s (%(reason)s)'.format(username=user.username,
-                        podcast_url=err.doc, device_uid=device.uid,
-                        error=err.error, reason=err.reason)
-                )
+    for url in new:
+        podcast = Podcast.objects.get_or_create_for_url(url)
+        subscribe(podcast, user, device, url)
 
     # Only an empty response is a successful response
     return HttpResponse('', content_type='text/plain')

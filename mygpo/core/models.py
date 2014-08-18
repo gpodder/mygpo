@@ -1,12 +1,15 @@
 """ This module contains abstract models that are used in multiple apps """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import json
 
 from uuidfield import UUIDField
 
 from django.db import models, connection
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 class UUIDModel(models.Model):
@@ -41,8 +44,22 @@ class SettingsModel(models.Model):
 
     def get_wksetting(self, setting):
         """ returns the value of a well-known setting """
-        settings = json.loads(self.settings)
+        try:
+            settings = json.loads(self.settings)
+        except ValueError as ex:
+            logger.warn('Decoding settings failed: {msg}'.format(msg=str(ex)))
+            return None
+
         return settings.get(setting.name, setting.default)
+
+    def set_wksetting(self, setting, value):
+        try:
+            settings = json.loads(self.settings)
+        except ValueError as ex:
+            logger.warn('Decoding settings failed: {msg}'.format(msg=str(ex)))
+            settings = {}
+        settings[setting.name] = value
+        self.settings = json.dumps(settings)
 
     def get_setting(self, name, default):
         settings = json.loads(self.settings)

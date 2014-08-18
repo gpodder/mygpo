@@ -36,10 +36,10 @@ from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control
 
 from mygpo.decorators import repeat_on_conflict
-from mygpo.podcasts.models import Podcast, Episode
+from mygpo.podcasts.models import Podcast, Episode, Tag
 from mygpo.users.models import History, HistoryEntry, Client
 from mygpo.users.tasks import update_suggestions
-from mygpo.users.subscriptions import get_subscribed_podcasts
+from mygpo.subscriptions import get_subscribed_podcasts
 from mygpo.web.utils import process_lang_params
 from mygpo.utils import parse_range
 #from mygpo.web.views.podcast import slug_id_decorator
@@ -81,7 +81,9 @@ def welcome(request):
 @login_required
 def dashboard(request, episode_count=10):
 
-    subscribed_podcasts = list(get_subscribed_podcasts(request.user))
+    subscribed_podcasts = get_subscribed_podcasts(request.user)
+    subscribed_podcasts = [sp.podcast for sp in subscribed_podcasts]
+
     site = RequestSite(request)
 
     checklist = []
@@ -149,37 +151,6 @@ def dashboard(request, episode_count=10):
         })
 
 
-@vary_on_cookie
-@cache_control(private=True)
-@login_required
-def history(request, count=15, uid=None):
-
-    page = parse_range(request.GET.get('page', None), 0, sys.maxint, 0)
-    user = request.user
-
-    if uid:
-        try:
-            device = user.client_set.get(uid=uid)
-        except Client.DoesNotExist as e:
-            messages.error(request, str(e))
-
-    else:
-        device = None
-
-    history_obj = History(request.user, device)
-
-    start = page*count
-    end = start+count
-    entries = history_obj[start:end]
-    HistoryEntry.fetch_data(user, entries)
-
-    return render(request, 'history.html', {
-        'history': entries,
-        'device': device,
-        'page': page,
-    })
-
-
 @never_cache
 @login_required
 #@slug_id_decorator
@@ -222,18 +193,15 @@ def suggestions(request):
 @cache_control(private=True)
 @login_required
 def mytags(request):
-    tags_podcast = {}
     tags_tag = defaultdict(list)
 
-    for podcast_id, taglist in tags_for_user(request.user).items():
-        podcast = Podcast.objects.get(id=podcast_id)
-        tags_podcast[podcast] = taglist
+    user = request.user
 
-        for tag in taglist:
-            tags_tag[ tag ].append(podcast)
+    tags = Tag.objects.filter(source=Tag.USER, user=user).order_by('tag')
+    for tag in tags:
+        tags_tag[tag.tag].append(tag.content_object)
 
     return render(request, 'mytags.html', {
-        'tags_podcast': tags_podcast,
         'tags_tag': dict(tags_tag.items()),
     })
 

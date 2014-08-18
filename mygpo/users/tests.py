@@ -29,8 +29,7 @@ from mygpo.podcasts.models import Podcast
 from mygpo.maintenance.merge import PodcastMerger
 from mygpo.api.backend import get_device
 from mygpo.users.models import Client, SyncGroup, UserProxy
-from mygpo.db.couchdb.podcast_state import (subscribed_podcast_ids_by_user_id,
-    subscribe, unsubscribe, )
+from mygpo.subscriptions import subscribe, unsubscribe
 
 
 class DeviceSyncTests(unittest.TestCase):
@@ -113,7 +112,7 @@ class UnsubscribeMergeTests(TestCase):
         p = Podcast.objects.get(urls__url=self.P2_URL)
         unsubscribe(p, self.user, self.device)
 
-        subscriptions = subscribed_podcast_ids_by_user_id(self.user.profile.uuid.hex)
+        subscriptions = Podcast.objects.filter(subscription__user=self.user)
         self.assertEqual(0, len(subscriptions))
 
     def tearDown(self):

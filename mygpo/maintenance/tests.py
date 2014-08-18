@@ -15,6 +15,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+import uuid
 from datetime import datetime
 import unittest
 from collections import Counter
@@ -25,10 +26,41 @@ from django.contrib.auth import get_user_model
 
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.users.models import EpisodeAction
-from mygpo.maintenance.merge import PodcastMerger
+from mygpo.maintenance.merge import PodcastMerger, merge
 from mygpo.utils import get_timestamp
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
     add_episode_actions
+
+
+def u():
+    return uuid.uuid1()
+
+
+class SimpleMergeTests(TestCase):
+
+    def setUp(self):
+        self.podcast1 = Podcast.objects.get_or_create_for_url(
+            'http://example.com/simple-merge-test-feed.rss',
+            defaults={'title': 'Podcast 1'},
+        )
+        self.podcast2 = Podcast.objects.get_or_create_for_url(
+            'http://simple-merge-test.org/podcast/',
+            defaults={'title': 'Podcast 2'},
+        )
+
+        self.episode1 = Episode.objects.get_or_create_for_url(
+            self.podcast1, 'http://example.com/simple-merge-test-episode1.mp3',
+            defaults={
+                'title': 'Episode 1 A',
+            })
+        self.episode2 = Episode.objects.get_or_create_for_url(
+            self.podcast2, 'http://example.com/simple-merge-test-episode1.mp3',
+            defaults={
+                'title': 'Episode 1 B',
+            })
+
+    def test_merge_podcasts(self):
+        merge(self.podcast1, self.podcast2)
 
 
 @override_settings(CACHE={})

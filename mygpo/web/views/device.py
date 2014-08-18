@@ -19,6 +19,7 @@ import uuid
 from functools import wraps
 from xml.parsers.expat import ExpatError
 
+from django.db import transaction
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
@@ -37,9 +38,7 @@ from restkit.errors import Unauthorized
 from mygpo.api import simple
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.users.models import Client, UserProxy
-from mygpo.users.tasks import sync_user, set_device_task_state
-from mygpo.db.couchdb.podcast_state import podcast_states_for_device, \
-         remove_device_from_podcast_state
+from mygpo.users.tasks import sync_user
 
 
 @vary_on_cookie
@@ -238,33 +237,44 @@ def symbian_opml(request, device):
 @device_decorator
 @login_required
 @allowed_methods(['POST'])
+@transaction.atomic
 def delete(request, device):
-    user = request.user
+    """ Mars a client as deleted, but does not permanently delete it """
+
+    # remoe the device from the sync group
     device.stop_sync()
+
+    # mark the subscriptions as deleted
+    Subscription.objects.filter(user=request.user, client=device)\
+                        .update(deleted=True)
+
+    # mark the client as deleted
     device.deleted = True
     device.save()
-    set_device_task_state.delay(user)
+
     return HttpResponseRedirect(reverse('devices'))
 
 
 @login_required
 @device_decorator
 def delete_permanently(request, device):
-
-    states = podcast_states_for_device(device.id.hex)
-    for state in states:
-        remove_device_from_podcast_state(state, device)
-
     device.delete()
     return HttpResponseRedirect(reverse('devices'))
 
 @device_decorator
 @login_required
+@transaction.atomic
 def undelete(request, device):
-    user = request.user
+    """ Marks the client as not deleted anymore """
+
+    # mark the subscriptions as not deleted anymore
+    Subscription.objects.filter(user=request.user, client=device)\
+                        .update(deleted=False)
+
+    # mark the client as not deleted anymore
     device.deleted = False
     device.save()
-    set_device_task_state.delay(user)
+
     return HttpResponseRedirect(reverse('device', args=[device.uid]))
 
 
@@ -308,7 +318,3 @@ def unsync(request, device):
                     err=str(e)))
 
     return HttpResponseRedirect(reverse('device', args=[device.uid]))
-
-
-from mygpo.web import views
-history = views.history

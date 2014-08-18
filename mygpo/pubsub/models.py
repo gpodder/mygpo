@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from couchdbkit.ext.django.schema import *
 
 # make sure this code is executed at startup
