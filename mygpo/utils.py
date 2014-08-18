@@ -53,7 +53,7 @@ def daterange(from_date, to_date=None, leap=timedelta(days=1)):
 
     if to_date is None:
         if isinstance(from_date, datetime):
-            to_date = datetime.now()
+            to_date = datetime.utcnow()
         else:
             to_date = date.today()
 
@@ -812,7 +812,7 @@ def deep_eq(_v1, _v2, datetime_fudge=default_fudge, _assert=False):
   >>> deep_eq(xrange(2), xrange(5))
   False
   >>> from datetime import datetime, timedelta
-  >>> d1, d2 = (datetime.now(), datetime.now() + timedelta(seconds=4))
+  >>> d1, d2 = (datetime.utcnow(), datetime.utcnow() + timedelta(seconds=4))
   >>> deep_eq(d1, d2)
   False
   >>> deep_eq(d1, d2, datetime_fudge=timedelta(seconds=5))

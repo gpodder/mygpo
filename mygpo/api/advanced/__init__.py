@@ -76,7 +76,7 @@ EPISODE_ACTION_KEYS = ('position', 'episode', 'action', 'device', 'timestamp',
 def episodes(request, username, version=1):
 
     version = int(version)
-    now = datetime.now()
+    now = datetime.utcnow()
     now_ = get_timestamp(now)
     ua_string = request.META.get('HTTP_USER_AGENT', '')
 

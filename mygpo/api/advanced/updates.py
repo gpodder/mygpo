@@ -61,7 +61,7 @@ class DeviceUpdates(View):
     @method_decorator(cors_origin())
     def get(self, request, username, device_uid):
 
-        now = datetime.now()
+        now = datetime.utcnow()
         now_ = get_timestamp(now)
 
         user = request.user

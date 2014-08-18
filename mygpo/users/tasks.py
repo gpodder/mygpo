@@ -63,7 +63,7 @@ def remove_unactivated_users():
     """ Remove users that have not been activated """
     User = get_user_model()
     valid_days = settings.ACTIVATION_VALID_DAYS
-    remove_before = datetime.now() - timedelta(days=valid_days)
+    remove_before = datetime.utcnow() - timedelta(days=valid_days)
     logger.warn('Removing unactivated users before %s', remove_before)
 
     users = User.objects.filter(is_active=False, date_joined__lt=remove_before)
