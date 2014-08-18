@@ -37,7 +37,7 @@ from django.views.decorators.cache import never_cache, cache_control
 
 from mygpo.decorators import repeat_on_conflict
 from mygpo.podcasts.models import Podcast, Episode, Tag
-from mygpo.users.models import History, HistoryEntry, Client
+from mygpo.users.models import HistoryEntry, Client
 from mygpo.users.tasks import update_suggestions
 from mygpo.subscriptions import get_subscribed_podcasts
 from mygpo.web.utils import process_lang_params

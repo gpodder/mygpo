@@ -1,29 +1,10 @@
-from mygpo.users.models import PodcastUserState
 from mygpo.db.couchdb import get_userdata_database
 from mygpo.db import QueryParameterMissing
 from mygpo.decorators import repeat_on_conflict
 
 
 def all_podcast_states(podcast):
-
-    if not podcast:
-        raise QueryParameterMissing('podcast')
-
-    udb = get_userdata_database()
-
-    r = udb.view('podcast_states/by_podcast',
-            startkey     = [podcast.get_id(), None],
-            endkey       = [podcast.get_id(), {}],
-            include_docs = True,
-            schema       = PodcastUserState,
-        )
-
-    states = list(r)
-
-    for state in states:
-        state.set_db(udb)
-
-    return states
+    return []
 
 
 @repeat_on_conflict(['state'])
