@@ -24,6 +24,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic.base import View
 from django.shortcuts import get_object_or_404
 
+from mygpo.podcasts.models import Podcast
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.backend import get_device
 from mygpo.utils import get_timestamp, \
