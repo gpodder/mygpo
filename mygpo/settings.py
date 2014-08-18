@@ -131,6 +131,7 @@ INSTALLED_APPS = (
     'djcelery',
     'mygpo.core',
     'mygpo.podcasts',
+    'mygpo.chapters',
     'mygpo.search',
     'mygpo.users',
     'mygpo.api',
