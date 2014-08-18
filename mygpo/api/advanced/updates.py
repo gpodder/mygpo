@@ -35,6 +35,7 @@ from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.advanced import clean_episode_action_data
 from mygpo.api.advanced.directory import episode_data, podcast_data
 from mygpo.utils import parse_bool, get_timestamp
+from mygpo.subscriptions import get_subscription_history, subscription_diff
 from mygpo.users.models import Client
 from mygpo.users.subscriptions import subscription_changes, podcasts_for_states
 from mygpo.api.basic_auth import require_valid_user, check_username
