@@ -27,10 +27,6 @@ class HistoryEntry(models.Model):
     podcast = models.ForeignKey(Podcast, db_index=True,
                                 on_delete=models.CASCADE)
 
-    # the episode which was involved in the event
-    episode = models.ForeignKey(Episode, db_index=True, null=True,
-                                on_delete=models.CASCADE)
-
     # the user which caused / triggered the event
     user = models.ForeignKey(settings.AUTH_USER_MODEL, db_index=True,
                              on_delete=models.CASCADE)
@@ -53,3 +49,64 @@ class HistoryEntry(models.Model):
         ordering = ['-timestamp']
 
         verbose_name_plural = "History Entries"
+
+
+class EpisodeHistoryEntry(models.Model):
+
+    DOWNLOAD = 'download'
+    PLAY = 'play'
+    DELETE = 'delete'
+    NEW = 'new'
+    FLATTR = 'flattr'
+    EPISODE_ACTIONS = (
+        (DOWNLOAD, 'downloaded'),
+        (PLAY, 'played'),
+        (DELETE, 'deleted'),
+        (NEW, 'marked as new'),
+        (FLATTR, 'flattr\'d'),
+    )
+
+    # the timestamp at which the event happened (provided by the client)
+    timestamp = models.DateTimeField()
+
+    # the timestamp at which the event was created (provided by the server)
+    created = models.DateTimeField()
+
+    # the episode which was involved in the event
+    episode = models.ForeignKey(Episode, db_index=True, null=True,
+                                on_delete=models.CASCADE)
+
+    # the user which caused / triggered the event
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, db_index=True,
+                             on_delete=models.CASCADE)
+
+    # the client on / for which the event happened
+    client = models.ForeignKey(Client, null=True, on_delete=models.CASCADE)
+
+    # the action that happened
+    action = models.CharField(
+        max_length=max(map(len, [action for action, name in EPISODE_ACTIONS])),
+        choices=EPISODE_ACTIONS,
+    )
+
+    # the URLs that were used to reference the podcast / episode
+    podcast_ref_url = models.URLField(null=True, blank=False, max_length=2048)
+    episode_ref_url = models.URLField(null=True, blank=False, max_length=2048)
+
+    # position (in seconds from the beginning) at which playback was started
+    started = models.IntegerField(null=True)
+
+    # position (in seconds from the beginning) at which playback was stopped
+    stopped = models.IntegerField(null=True)
+
+    # duration (in seconds) of the episode
+    total = models.IntegerField(null=True)
+
+    class Meta:
+        index_together = [
+            ['user', 'client', 'episode', 'action', 'timestamp'],
+        ]
+
+        ordering = ['-timestamp']
+
+        verbose_name_plural = "Episode History Entries"

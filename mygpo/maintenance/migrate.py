@@ -7,10 +7,11 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User
 
 from mygpo.podcasts.models import Tag
-from mygpo.users.models import UserProfile, Client, SyncGroup, PodcastUserState
+from mygpo.users.models import Chapter as C, EpisodeUserState
+from mygpo.chapters.models import Chapter
 from mygpo.subscriptions.models import Subscription, PodcastConfig
-from mygpo.history.models import HistoryEntry
-from mygpo.podcasts.models import Podcast
+from mygpo.history.models import EpisodeHistoryEntry
+from mygpo.podcasts.models import Episode, Podcast
 
 import logging
 logger = logging.getLogger(__name__)
@@ -28,7 +29,12 @@ def to_maxlength(cls, field, val):
     return val
 
 
-def migrate_pstate(state):
+#class EpisodeUserState(Document, SettingsMixin):
+#    ref_url       = StringProperty(required=True)
+#    podcast_ref_url = StringProperty(required=True)
+
+
+def migrate_estate(state):
     """ migrate a podcast state """
 
     try:
@@ -45,85 +51,24 @@ def migrate_pstate(state):
             id=state.podcast))
         return
 
-    logger.info('Updating podcast state for user {user} and podcast {podcast}'
-                .format(user=user, podcast=podcast))
+    try:
+        episode = Episode.objects.filter(podcast=podcast).get_by_any_id(state.episode)
+    except Episode.DoesNotExist:
+        logger.warn("Episode with ID '{id}' does not exist".format(
+            id=state.episode))
+        return
 
-    # move all tags
-    for tag in state.tags:
-        ctype = ContentType.objects.get_for_model(podcast)
-        tag, created = Tag.objects.get_or_create(tag=tag,
-                                                 source=Tag.USER,
-                                                 user=user,
-                                                 content_type=ctype,
-                                                 object_id=podcast.id
-                                                 )
-        if created:
-            logger.info("Created tag '{}' for user {} and podcast {}",
-                        tag, user, podcast)
+    logger.info('Updating episode state for user {user} and episode {episode}'
+                .format(user=user, episode=episode))
 
-    # create all history entries
-    history = HistoryEntry.objects.filter(user=user, podcast=podcast)
+    for chapter in state.chapters:
+        migrate_chapter(user, episode, chapter)
+
     for action in state.actions:
-        timestamp = action.timestamp
-        try:
-            client = user.client_set.get(id=action.device)
-        except Client.DoesNotExist:
-            logger.warn("Client '{cid}' does not exist; skipping".format(
-                cid=action.device))
-            continue
-        action = action.action
-        he_data = {
-            'timestamp': timestamp,
-            'podcast': podcast,
-            'user': user,
-            'client': client,
-            'action': action,
-        }
-        he, created = HistoryEntry.objects.get_or_create(**he_data)
-
-        if created:
-            logger.info('History Entry created: {user} {action} {podcast} '
-                        'on {client} @ {timestamp}'.format(**he_data))
-
-    # check which clients are currently subscribed
-    subscribed_devices = get_subscribed_devices(state)
-    subscribed_ids = subscribed_devices.keys()
-    subscribed_clients = user.client_set.filter(id__in=subscribed_ids)
-    unsubscribed_clients = user.client_set.exclude(id__in=subscribed_ids)
-
-    # create subscriptions for subscribed clients
-    for client in subscribed_clients:
-        ts = subscribed_devices[client.id.hex]
-        sub_data = {
-            'user': user,
-            'client': client,
-            'podcast': podcast,
-        }
-        defaults = {
-            'ref_url': state.ref_url,
-            'created': ts,
-            'modified': ts,
-            'deleted': client.id.hex in state.disabled_devices,
-        }
-        subscription, created = Subscription.objects.get_or_create(
-            defaults, **sub_data)
-
-        if created:
-            sub_data.update(defaults)
-            logger.info('Subscription created: {user} subscribed to {podcast} '
-                'on {client} @ {created}'.format(**sub_data))
-
-        else:
-            subscription.modified = ts
-            subscription.deleted = client.id.hex in state.disabled_devices
-            subscription.ref_url = state.ref_url
-            subscription.save()
-
-    # delete all other subscriptions
-    Subscription.objects.filter(user=user, podcast=podcast,
-                                client__in=unsubscribed_clients).delete()
+        migrate_eaction(user, episode, action)
 
     # only create the PodcastConfig obj if there are any settings
+    # TODO: where to put the settings?
     if state.settings:
         logger.info('Updating {num} settings'.format(num=len(state.settings)))
         PodcastConfig.objects.update_or_create(user=user, podcast=podcast,
@@ -131,6 +76,50 @@ def migrate_pstate(state):
                 'settings': json.dumps(state.settings),
             }
         )
+
+def migrate_chapter(user, episode, c):
+
+    chapter, created = Chapter.objects.get_or_create(user=user,
+                                                     episode=episode,
+                                                     start=c.start,
+                                                     end=c.end,
+                                                    )
+    chapter.label = c.label
+    chapter.advertisement = c.advertisement
+    chapter.save()
+
+
+def migrate_eaction(user, episode, ea):
+
+    try:
+        client = user.client_set.get(id=action.device)
+    except Client.DoesNotExist:
+        logger.warn("Client '{cid}' does not exist; skipping".format(
+            cid=action.device))
+        return
+
+    entry, created = EpisodeHistoryEntry.objects.get_or_create(
+        user=user,
+        client=client,
+        episode=episode,
+        action=ea.action,
+        timestamp=ea.timestamp,
+        defaults = {
+            'created': ea.upload_timestamp,
+            'started': ea.started,
+            'stopped': ea.playmark,
+            'total': ea.total,
+            'podcast_ref_url': ea.podcast_ref_url,
+            'episode_ref_url': ea.ref_url,
+        },
+    )
+
+    if created:
+        logger.info('Episode History Entry created: {user} {action} {episode}'
+                    'on {client} @ {timestamp}'.format(user=user,
+                        action=action, episode=episode, client=client,
+                        timestamp=timestamp))
+
 
 
 def get_subscribed_devices(state):
@@ -155,10 +144,10 @@ from couchdbkit.changes import ChangesStream, fold, foreach
 
 
 MIGRATIONS = {
-    'PodcastUserState': (PodcastUserState, migrate_pstate),
+    'PodcastUserState': (None, None),
     'User': (None, None),
     'Suggestions': (None, None),
-    'EpisodeUserState': (None, None),
+    'EpisodeUserState': (EpisodeUserState, migrate_estate),
 }
 
 def migrate_change(c):
