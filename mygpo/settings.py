@@ -139,6 +139,7 @@ INSTALLED_APPS = (
     'mygpo.publisher',
     'mygpo.subscriptions',
     'mygpo.history',
+    'mygpo.favorites',
     'mygpo.data',
     'mygpo.userfeeds',
     'mygpo.directory',

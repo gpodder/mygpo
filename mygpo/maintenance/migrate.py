@@ -67,15 +67,12 @@ def migrate_estate(state):
     for action in state.actions:
         migrate_eaction(user, episode, action)
 
-    # only create the PodcastConfig obj if there are any settings
-    # TODO: where to put the settings?
-    if state.settings:
-        logger.info('Updating {num} settings'.format(num=len(state.settings)))
-        PodcastConfig.objects.update_or_create(user=user, podcast=podcast,
-            defaults = {
-                'settings': json.dumps(state.settings),
-            }
-        )
+    is_favorite = state.settings.get('is_favorite', False)
+    if is_favorite:
+        FavoriteEpisode.objects.get_or_create(user=user, episode=episode)
+    else:
+        FavoriteEpisode.objects.filter(user=user, episode=episode).delete()
+
 
 def migrate_chapter(user, episode, c):
 
