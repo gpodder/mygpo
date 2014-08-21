@@ -58,7 +58,7 @@ def update_suggestions(user, max_suggestions=15):
     update_suggestions(suggestion, suggested)
 
 
-@periodic_task(run_every=timedelta(minutes=1))
+@periodic_task(run_every=timedelta(hours=1))
 def remove_unactivated_users():
     """ Remove users that have not been activated """
     User = get_user_model()
