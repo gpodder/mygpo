@@ -24,6 +24,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
+from django.contrib.contenttypes.models import ContentType
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control
 from django.contrib import messages
@@ -249,8 +250,12 @@ def slug_decorator(f):
     @wraps(f)
     def _decorator(request, p_slug, e_slug, *args, **kwargs):
 
-        query = Episode.objects.filter(slugs__slug=e_slug,
-                                       podcast__slugs__slug=p_slug)
+        query = Episode.objects.filter(
+            slugs__slug=e_slug,
+            slugs__content_type=ContentType.objects.get_for_model(Episode),
+            podcast__slugs__slug=p_slug,
+            podcast__slugs__content_type=ContentType.objects.get_for_model(Podcast),
+        )
 
         try:
             episode = query.prefetch_related('urls', 'slugs', 'podcast',

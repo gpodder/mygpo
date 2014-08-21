@@ -414,7 +414,10 @@ def slug_decorator(f):
     def _decorator(request, slug, *args, **kwargs):
 
         try:
-            podcast = Podcast.objects.filter(slugs__slug=slug)
+            podcast = Podcast.objects.filter(
+                slugs__slug=slug,
+                slugs__content_type=ContentType.objects.get_for_model(Podcast),
+            )
             podcast = podcast.prefetch_related('slugs', 'urls').get()
         except Podcast.DoesNotExist:
             raise Http404

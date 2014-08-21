@@ -11,6 +11,7 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404
 
 from mygpo.podcasts.models import PodcastGroup, Podcast, Episode
@@ -240,8 +241,11 @@ def update_episode_slug(request, episode):
 
     if new_slug:
         # remove the new slug from other episodes (of the same podcast)
-        other_episodes = Episode.objects.filter(podcast=podcast,
-                                                slugs__slug=new_slug)
+        other_episodes = Episode.objects.filter(
+            podcast=podcast,
+            slugs__slug=new_slug,
+            slugs__content_type=ContentType.objects.get_for_model(Episode),
+        )
 
         for other_episode in other_episodes:
 
