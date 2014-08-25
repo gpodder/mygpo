@@ -112,7 +112,7 @@
    </a>
   {% endif %}
 
-  {% if debug %}
+  {% if user.is_staff %}
    <a class="btn btn-default" href="{% edit_link episode %}">
     <i class="icon-cogs"></i>Admin
    </a>
