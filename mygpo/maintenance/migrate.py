@@ -7,11 +7,12 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User
 
 from mygpo.podcasts.models import Tag
-from mygpo.users.models import Chapter as C, EpisodeUserState
+from mygpo.users.models import Chapter as C, EpisodeUserState, Client
 from mygpo.chapters.models import Chapter
 from mygpo.subscriptions.models import Subscription, PodcastConfig
 from mygpo.history.models import EpisodeHistoryEntry
 from mygpo.podcasts.models import Episode, Podcast
+from mygpo.favorites.models import FavoriteEpisode
 
 import logging
 logger = logging.getLogger(__name__)
@@ -58,17 +59,18 @@ def migrate_estate(state):
             id=state.episode))
         return
 
-    logger.info('Updating episode state for user {user} and episode {episode}'
-                .format(user=user, episode=episode))
+    logger.info('Migrating episode state ({id}) for user {user} and episode {episode}'
+                .format(id=state._id, user=user, episode=episode))
 
     for chapter in state.chapters:
         migrate_chapter(user, episode, chapter)
 
     for action in state.actions:
-        migrate_eaction(user, episode, action)
+        migrate_eaction(user, episode, state, action)
 
     is_favorite = state.settings.get('is_favorite', False)
     if is_favorite:
+        logger.info('Favorite episode')
         FavoriteEpisode.objects.get_or_create(user=user, episode=episode)
     else:
         FavoriteEpisode.objects.filter(user=user, episode=episode).delete()
@@ -76,25 +78,34 @@ def migrate_estate(state):
 
 def migrate_chapter(user, episode, c):
 
-    chapter, created = Chapter.objects.get_or_create(user=user,
-                                                     episode=episode,
-                                                     start=c.start,
-                                                     end=c.end,
-                                                    )
-    chapter.label = c.label
-    chapter.advertisement = c.advertisement
-    chapter.save()
+    chapter, created = Chapter.objects.get_or_create(
+        user=user,
+        episode=episode,
+        start=c.start,
+        end=c.end,
+        defaults = {
+            'label': c.label or '',
+            'advertisement': c.advertisement,
+        }
+    )
 
 
-def migrate_eaction(user, episode, ea):
+def migrate_eaction(user, episode, state, ea):
 
-    try:
-        client = user.client_set.get(id=action.device)
-    except Client.DoesNotExist:
-        logger.warn("Client '{cid}' does not exist; skipping".format(
-            cid=action.device))
-        return
+    logger.info('Migrating {action} action'.format(action=ea.action))
 
+    if ea.device is None:
+        client = None
+
+    else:
+        try:
+            client = user.client_set.get(id=ea.device)
+        except Client.DoesNotExist:
+            logger.warn("Client '{cid}' does not exist; skipping".format(
+                cid=ea.device))
+            return
+
+    created = datetime.utcfromtimestamp(ea.upload_timestamp) if ea.upload_timestamp else datetime.utcnow()
     entry, created = EpisodeHistoryEntry.objects.get_or_create(
         user=user,
         client=client,
@@ -102,20 +113,20 @@ def migrate_eaction(user, episode, ea):
         action=ea.action,
         timestamp=ea.timestamp,
         defaults = {
-            'created': ea.upload_timestamp,
+            'created': created,
             'started': ea.started,
             'stopped': ea.playmark,
             'total': ea.total,
-            'podcast_ref_url': ea.podcast_ref_url,
-            'episode_ref_url': ea.ref_url,
+            'podcast_ref_url': state.podcast_ref_url,
+            'episode_ref_url': state.ref_url,
         },
     )
 
     if created:
         logger.info('Episode History Entry created: {user} {action} {episode}'
                     'on {client} @ {timestamp}'.format(user=user,
-                        action=action, episode=episode, client=client,
-                        timestamp=timestamp))
+                        action=entry.action, episode=episode, client=client,
+                        timestamp=entry.timestamp))
 
 
 
@@ -136,7 +147,7 @@ def get_subscribed_devices(state):
 
 
 from couchdbkit import Database
-db = Database('http://127.0.0.1:6984/mygpo_userdata_copy')
+db = Database('http://127.0.0.1:5984/mygpo_userdata_copy')
 from couchdbkit.changes import ChangesStream, fold, foreach
 
 
