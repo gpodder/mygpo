@@ -593,6 +593,12 @@ class Episode(UUIDModel, TitleModel, DescriptionModel, LinkModel,
     class Meta:
         ordering = ['-released']
 
+        index_together = [
+            ('podcast', 'outdated', 'released'),
+            ('podcast', 'released'),
+            ('released', 'podcast'),
+        ]
+
     @property
     def scope(self):
         """ An episode's scope is its podcast """
@@ -733,6 +739,10 @@ class Slug(OrderedModel, ScopedModel):
             # object have the same order key
             ('content_type', 'object_id', 'order'),
         )
+
+        index_together = [
+            ('slug', 'content_type')
+        ]
 
     def __repr__(self):
         return '{cls}(slug={slug}, order={order}, content_object={obj}'.format(
