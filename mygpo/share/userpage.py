@@ -1,7 +1,5 @@
 from datetime import datetime, timedelta
 
-from functools import partial
-
 from django.shortcuts import render
 from django.views.generic.base import View
 from django.utils.decorators import method_decorator
@@ -14,7 +12,6 @@ from mygpo.users.settings import FLATTR_USERNAME
 from mygpo.subscriptions import get_subscribed_podcasts
 from mygpo.decorators import requires_token
 from mygpo.users.subscriptions import PodcastPercentageListenedSorter
-from mygpo.web.views import GeventView
 from mygpo.db.couchdb.episode_state import favorite_episode_ids_for_user
 from mygpo.db.couchdb.user import get_latest_episode_ids, \
          get_num_played_episodes, get_seconds_played
@@ -22,7 +19,7 @@ from mygpo.db.couchdb.podcastlist import podcastlists_for_user
 
 
 
-class UserpageView(GeventView):
+class UserpageView(View):
     """ Shows the profile page for a user """
 
     @method_decorator(requires_token(token_name='userpage_token',
@@ -34,25 +31,21 @@ class UserpageView(GeventView):
         month_ago = datetime.today() - timedelta(days=31)
         site = RequestSite(request)
 
-        context_funs = {
-            'lists': partial(self.get_podcast_lists, user),
-            'subscriptions': partial(self.get_subscriptions, user),
-            'recent_episodes': partial(self.get_recent_episodes, user),
-            'seconds_played_total': partial(self.get_seconds_played_total, user),
-            'seconds_played_month': partial(self.get_seconds_played_since, user, month_ago),
-            'favorite_episodes': partial(self.get_favorite_episodes, user),
-            'num_played_episodes_total': partial(self.get_played_episodes_total, user),
-            'num_played_episodes_month': partial(self.get_played_episodes_since, user, month_ago),
-        }
-
         context = {
             'page_user': user,
             'flattr_username': user.profile.get_wksetting(FLATTR_USERNAME),
             'site': site.domain,
             'subscriptions_token': user.profile.get_token('subscriptions_token'),
             'favorite_feeds_token': user.profile.get_token('favorite_feeds_token'),
+            'lists': self.get_podcast_lists(user),
+            'subscriptions': self.get_subscriptions(user),
+            'recent_episodes': self.get_recent_episodes(user),
+            'seconds_played_total': self.get_seconds_played_total(user),
+            'seconds_played_month': self.get_seconds_played_since( user, month_ago),
+            'favorite_episodes': self.get_favorite_episodes(user),
+            'num_played_episodes_total': self.get_played_episodes_total(user),
+            'num_played_episodes_month': self.get_played_episodes_since(user, month_ago),
         }
-        context.update(self.get_context(context_funs))
 
         return render(request, 'userpage.html', context)
 

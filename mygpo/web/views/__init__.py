@@ -19,11 +19,6 @@ import sys
 from collections import defaultdict
 from datetime import datetime, timedelta
 
-try:
-    import gevent
-except ImportError:
-    gevent = None
-
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.contrib import messages
@@ -204,29 +199,3 @@ def mytags(request):
     return render(request, 'mytags.html', {
         'tags_tag': dict(tags_tag.items()),
     })
-
-
-
-class GeventView(View):
-    """ View that provides parts of the context via gevent coroutines """
-
-    def get_context(self, context_funs):
-        """ returns a dictionary that can be used for a template context
-
-        context_funs is a context-key => Greenlet object mapping """
-
-        if gevent:
-            jobs = {}
-            for key, fun in context_funs.items():
-                jobs[key] = gevent.spawn(fun)
-
-            gevent.joinall(jobs.values())
-
-            for key, gev in jobs.items():
-                context_funs[key] = gev.get()
-
-        else:
-            for key, fun in context_funs.items():
-                context_funs[key] = fun()
-
-        return context_funs
