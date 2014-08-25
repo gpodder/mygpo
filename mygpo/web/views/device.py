@@ -38,6 +38,7 @@ from restkit.errors import Unauthorized
 from mygpo.api import simple
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.users.models import Client, UserProxy
+from mygpo.subscriptions.models import Subscription
 from mygpo.users.tasks import sync_user
 
 
