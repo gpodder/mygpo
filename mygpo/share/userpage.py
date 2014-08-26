@@ -55,7 +55,7 @@ class UserpageView(View):
 
 
     def get_subscriptions(self, user):
-        subscriptions = get_subscribed_podcasts(user)
+        subscriptions = [sp.podcast for sp in get_subscribed_podcasts(user)]
         return PodcastPercentageListenedSorter(subscriptions, user)
 
 
