@@ -368,6 +368,11 @@ class SyncGroup(models.Model):
         client_podcasts = set(client.get_subscribed_podcasts())
         return all_podcasts.difference(client_podcasts)
 
+    @property
+    def display_name(self):
+        clients = self.client_set.all()
+        return ', '.join(client.display_name for client in clients)
+
 
 class Client(UUIDModel, DeleteableModel):
     """ A client application """
@@ -500,6 +505,10 @@ class Client(UUIDModel, DeleteableModel):
 
         return Client.objects.filter(sync_group=self.sync_group)\
                              .exclude(pk=self.pk)
+
+    @property
+    def display_name(self):
+        return self.name or self.uid
 
     def __str__(self):
         return '{} ({})'.format(self.name.encode('ascii', errors='replace'),

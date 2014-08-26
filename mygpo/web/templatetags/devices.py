@@ -84,9 +84,9 @@ def device_link(device):
 
 
 @register.filter
-def device_name(device):
+def device_name(client):
     """ returns the name of a single device """
-    return strip_tags(device.name or device.uid)
+    return strip_tags(client.display_name)
 
 
 @register.filter
