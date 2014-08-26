@@ -35,7 +35,7 @@ from feedservice.parse import parse_feed, FetchFeedException
 from feedservice.parse.text import ConvertMarkdown
 from feedservice.parse.models import ParserException
 from feedservice.parse.vimeo import VimeoError
-from mygpo.utils import file_hash
+from mygpo.utils import file_hash, to_maxlength
 from mygpo.web.logo import CoverArt
 from mygpo.data.podcast import subscribe_at_hub
 from mygpo.pubsub.models import SubscriptionError
@@ -145,7 +145,8 @@ class PodcastUpdater(object):
 #podcast.tags['feed'] = parsed.tags or podcast.tags.get('feed', [])
         podcast.common_episode_title = parsed.common_title or podcast.common_episode_title
         podcast.new_location = parsed.new_location or podcast.new_location
-        podcast.flattr_url = parsed.flattr or podcast.flattr_url
+        podcast.flattr_url = to_maxlength(Podcast, 'flattr_url',
+                                          parsed.flattr or podcast.flattr_url)
         podcast.hub = parsed.hub or podcast.hub
         podcast.license = parsed.license or podcast.license
 
@@ -328,7 +329,8 @@ def update_episode(parsed_episode, episode, podcast):
     episode.description = parsed_episode.description or episode.description
     episode.subtitle = parsed_episode.subtitle or episode.subtitle
     episode.content = parsed_episode.content or parsed_episode.description or episode.content
-    episode.link = parsed_episode.link or episode.link
+    episode.link = to_maxlength(Episode, 'link',
+                                parsed_episode.link or episode.link)
     episode.released = datetime.utcfromtimestamp(parsed_episode.released) if parsed_episode.released else episode.released
     episode.author = parsed_episode.author or episode.author
     episode.duration = parsed_episode.duration or episode.duration
@@ -336,11 +338,14 @@ def update_episode(parsed_episode, episode, podcast):
     episode.language = parsed_episode.language or episode.language or \
                                                   podcast.language
     episode.mimetypes = list(set(filter(None, [f.mimetype for f in parsed_episode.files])))
-    episode.flattr_url = parsed_episode.flattr or episode.flattr_url
+    episode.flattr_url = to_maxlength(Episode, 'flattr_url',
+                                      parsed_episode.flattr or
+                                      episode.flattr_url)
     episode.license = parsed_episode.license or episode.license
 
-    episode.title = parsed_episode.title or episode.title or \
-                    file_basename_no_extension(episode.url)
+    episode.title = to_maxlength(Episode, 'title',
+                                 parsed_episode.title or episode.title or
+                                 file_basename_no_extension(episode.url))
 
     episode.last_update = datetime.utcnow()
     episode.save()
