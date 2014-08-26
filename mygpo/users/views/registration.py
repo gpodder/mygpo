@@ -1,6 +1,8 @@
 import uuid
+import re
 
 from django import forms
+from django.core.validators import RegexValidator
 from django.db import IntegrityError, transaction
 from django.http import HttpResponseRedirect
 from django.views.generic.edit import FormView
@@ -19,10 +21,21 @@ from mygpo.users.models import UserProxy
 
 USERNAME_MAXLEN = get_user_model()._meta.get_field('username').max_length
 
+USERNAME_REGEX = re.compile(r'\w[\w.-]{2,}')
+
+
+class UsernameValidator(RegexValidator):
+    """ Validates that a username uses only allowed characters """
+    regex = USERNAME_REGEX
+    message = 'Invalid Username'
+    code='invalid-username'
+
 
 class RegistrationForm(forms.Form):
     """ Form that is used to register a new user """
-    username = forms.CharField(max_length=USERNAME_MAXLEN)
+    username = forms.CharField(max_length=USERNAME_MAXLEN,
+                               validators=[UsernameValidator()],
+                              )
     email = forms.EmailField()
     password1 = forms.CharField(widget=forms.PasswordInput())
     password2 = forms.CharField(widget=forms.PasswordInput())
