@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from django.utils.html import strip_tags
 from django.contrib.staticfiles.storage import staticfiles_storage
 
-from mygpo.users.models import Client
+from mygpo.users.models import Client, SyncGroup
 from mygpo.web.views.device import show
 
 
@@ -63,11 +63,12 @@ def device_icon(device):
 
 
 @register.filter
-def target_uid(devices):
-    if isinstance(devices, list):
-        return devices[0].uid
+def target_uid(client):
+    if isinstance(client, SyncGroup):
+        clients = client.client_set.all()
+        return clients[0].uid
     else:
-        return devices.uid
+        return client.uid
 
 
 @register.filter
@@ -97,7 +98,10 @@ def devices_name(devices):
 
 
 @register.filter
-def devices_uids(devices):
+def devices_uids(client):
     """ returns a comma-separated list of UIDs of one or more devices """
-    devices = devices if isinstance(devices, (list, tuple)) else [devices]
-    return ','.join(device.uid for device in devices)
+    if isinstance(client, SyncGroup):
+        clients = client.client_set.all()
+    elif isinstance(client, Client):
+        clients = [client]
+    return ','.join(client.uid for client in clients)
