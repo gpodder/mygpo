@@ -250,22 +250,29 @@ def slug_decorator(f):
     @wraps(f)
     def _decorator(request, p_slug, e_slug, *args, **kwargs):
 
-        query = Episode.objects.filter(
-            slugs__slug=e_slug,
-            slugs__content_type=ContentType.objects.get_for_model(Episode),
-            podcast__slugs__slug=p_slug,
-            podcast__slugs__content_type=ContentType.objects.get_for_model(Podcast),
+        pquery = Podcast.objects.filter(
+            slugs__slug=p_slug,
+            slugs__scope='',
         )
 
         try:
-            episode = query.prefetch_related('urls', 'slugs', 'podcast',
-                                             'podcast__slugs').get()
+            podcast = pquery.prefetch_related('slugs').get()
+        except Podcast.DoesNotExist:
+            raise Http404
+
+        equery = Episode.objects.filter(
+            podcast = podcast,
+            slugs__slug=e_slug,
+            slugs__scope=podcast.id.hex,
+        )
+
+        try:
+            episode = equery.prefetch_related('urls', 'slugs').get()
         except Episode.DoesNotExist:
             raise Http404
 
         # redirect when Id or a merged (non-cannonical) slug is used
         if episode.slug and episode.slug != e_slug:
-            podcast = episode.podcast
             return HttpResponseRedirect(
                     get_episode_link_target(episode, podcast))
 
