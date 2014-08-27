@@ -27,6 +27,7 @@ from mygpo.utils import parse_range, normalize_feed_url
 from mygpo.directory.tags import Topics
 from mygpo.web.utils import get_episode_link_target, get_podcast_link_target
 from mygpo.web.logo import get_logo_url
+from mygpo.subscriptions.models import SubscribedPodcast
 from mygpo.decorators import cors_origin
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.db.couchdb.directory import category_for_tag
@@ -102,14 +103,20 @@ def podcast_data(obj, domain, scaled_logo_size=64):
     if obj is None:
         raise ValueError('podcast should not be None')
 
-    podcast = obj
+    if isinstance(obj, SubscribedPodcast):
+        url = obj.ref_url
+        podcast = obj.podcast
+    else:
+        podcast = obj
+        url = podcast.url
+
     subscribers = podcast.subscribers
     last_subscribers = podcast.subscribers
 
-    scaled_logo_url = get_logo_url(obj, scaled_logo_size)
+    scaled_logo_url = get_logo_url(podcast, scaled_logo_size)
 
     return {
-        "url": podcast.url,
+        "url": url,
         "title": podcast.title,
         "description": podcast.description,
         "subscribers": subscribers,
@@ -117,7 +124,7 @@ def podcast_data(obj, domain, scaled_logo_size=64):
         "logo_url": podcast.logo_url,
         "scaled_logo_url": 'http://%s%s' % (domain, scaled_logo_url),
         "website": podcast.link,
-        "mygpo_link": 'http://%s%s' % (domain, get_podcast_link_target(obj)),
+        "mygpo_link": 'http://%s%s' % (domain, get_podcast_link_target(podcast)),
         }
 
 def episode_data(episode, domain, podcast=None):

@@ -98,10 +98,20 @@ class Exporter(object):
         opml.appendChild(head)
 
         def create_outline(channel):
+            from mygpo.subscriptions.models import SubscribedPodcast
+            if isinstance(channel, SubscribedPodcast):
+                title = channel.podcast.title
+                description = channel.podcast.description
+                url = channel.ref_url
+            else:
+                title = channel.title
+                description = channel.description
+                url = channel.url
+
             outline = doc.createElement('outline')
-            outline.setAttribute('title', channel.title or '')
-            outline.setAttribute('text', channel.description or '')
-            outline.setAttribute('xmlUrl', channel.url)
+            outline.setAttribute('title', title or '')
+            outline.setAttribute('text', description or '')
+            outline.setAttribute('xmlUrl', url)
             outline.setAttribute('type', 'rss')
             return outline
 
