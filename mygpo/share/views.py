@@ -192,12 +192,12 @@ class FavoritesPublic(View):
     def post(self, request):
 
         if self.public:
-            request.user.favorite_feeds_token = ''
-            request.user.save()
+            request.user.profile.favorite_feeds_token = ''
+            request.user.profile.save()
 
         else:
-            request.user.create_new_token('favorite_feeds_token', 8)
-            request.user.save()
+            request.user.profile.create_new_token('favorite_feeds_token', 8)
+            request.user.profile.save()
 
         token = request.user.favorite_feeds_token
 
@@ -237,19 +237,14 @@ class PublicSubscriptions(View):
     @method_decorator(login_required)
     def post(self, request):
 
-        self.update(request.user)
+        if self.public:
+            user.profile.subscriptions_token = ''
+        else:
+            user.profile.create_new_token('subscriptions_token')
+
+        user.profile.save()
 
         return HttpResponseRedirect(reverse('share'))
-
-
-    @repeat_on_conflict(['user'])
-    def update(self, user):
-        if self.public:
-            user.subscriptions_token = ''
-        else:
-            user.create_new_token('subscriptions_token')
-
-        user.save()
 
 
 class FavoritesFeedCreateEntry(View):
@@ -302,19 +297,15 @@ def overview(request):
 @login_required
 def set_token_public(request, token_name, public):
 
+    user = request.user
+
     if public:
-        @repeat_on_conflict(['user'])
-        def _update(user):
-            setattr(user, token_name, '')
-            user.save()
+        setattr(user.profile, token_name, '')
+        user.profile.save()
 
     else:
-        @repeat_on_conflict(['user'])
-        def _update(user):
-            user.create_new_token(token_name)
-            user.save()
-
-    _update(user=request.user)
+        user.profile.create_new_token(token_name)
+        user.profile.save()
 
     return HttpResponseRedirect(reverse('share'))
 

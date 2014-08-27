@@ -175,6 +175,14 @@ class UserProfile(TwitterModel, SettingsModel):
 
         return getattr(self, token_name)
 
+    def create_new_token(self, token_name):
+        """ resets a token """
+
+        if token_name not in TOKEN_NAMES:
+            raise TokenException('Invalid token name %s' % token_name)
+
+        setattr(self, token_name, random_token())
+
 
 class Suggestions(Document, RatingMixin):
     user = StringProperty(required=True)

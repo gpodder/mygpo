@@ -159,8 +159,8 @@ def save_podcast(request, podcast):
 @never_cache
 @require_publisher
 def new_update_token(request, username):
-    request.user.create_new_token('publisher_update_token')
-    request.user.save()
+    request.user.profile.create_new_token('publisher_update_token')
+    request.user.profile.save()
     messages.success(request, _('Publisher token updated'))
     return HttpResponseRedirect(reverse('publisher'))
 

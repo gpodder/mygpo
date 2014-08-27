@@ -283,25 +283,17 @@ def privacy(request):
 def share(request):
     site = RequestSite(request)
 
+    user = request.user
+
     if 'public_subscriptions' in request.GET:
-        @repeat_on_conflict(['user'])
-        def _update(user):
-            user.subscriptions_token = ''
-            user.save()
+        user.profile.subscriptions_token = ''
+        user.profile.save()
 
     elif 'private_subscriptions' in request.GET:
-        @repeat_on_conflict(['user'])
-        def _update(user):
-            user.create_new_token('subscriptions_token')
-            user.save()
+        user.profile.create_new_token('subscriptions_token')
+        user.profile.save()
 
-    else:
-        _update = None
-
-    if _update:
-        _update(user=request.user)
-
-    token = request.user.profile.get_token('subscriptions_token')
+    token = user.profile.get_token('subscriptions_token')
 
     return render(request, 'share.html', {
         'site': site,
