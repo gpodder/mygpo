@@ -119,8 +119,13 @@ class DeviceUpdates(View):
             max_per_podcast=5):
         """ Returns the episode updates since the timestamp """
 
-        episodes = Episode.objects.filter(podcast__in=subscribed_podcasts,
-                                          released__gt=since)[:max_per_podcast]
+        episodes = []
+        for podcast in subscribed_podcasts:
+            episodes.extend(Episode.objects.filter(
+                                podcast=podcast,
+                                released__gt=since
+                                ).order_by('-released')[:max_per_podcast]
+            )
 
         e_actions = chain.from_iterable(get_podcasts_episode_states(p,
                 user.profile.uuid.hex) for p in subscribed_podcasts)
