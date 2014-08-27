@@ -258,6 +258,7 @@ class SlugsMixin(models.Model):
 
         logger.info('%d existing slugs', len(existing))
 
+        slugs = [utils.to_maxlength(Slug, 'slug', slug) for slug in slugs]
         for n, slug in enumerate(slugs):
             try:
                 s = existing.pop(slug)
