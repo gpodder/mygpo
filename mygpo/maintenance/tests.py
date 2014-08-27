@@ -26,7 +26,7 @@ from django.contrib.auth import get_user_model
 
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.users.models import EpisodeAction
-from mygpo.maintenance.merge import PodcastMerger, merge
+from mygpo.maintenance.merge import PodcastMerger
 from mygpo.utils import get_timestamp
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
     add_episode_actions

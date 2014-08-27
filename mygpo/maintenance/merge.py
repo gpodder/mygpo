@@ -1,16 +1,14 @@
-from itertools import chain, imap as map
-import logging
-from functools import partial
-
-import restkit
+import collections
 
 from django.db import IntegrityError
+from django.contrib.contenttypes.models import ContentType
 
-from mygpo.podcasts.models import MergedUUID, ScopedModel, OrderedModel
+from mygpo.podcasts.models import (MergedUUID, ScopedModel, OrderedModel, Slug,
+                                   Tag, URL, MergedUUID, Podcast, Episode)
 from mygpo import utils
-from mygpo.decorators import repeat_on_conflict
-from mygpo.db.couchdb.podcast_state import all_podcast_states, \
-    delete_podcast_state, update_podcast_state_podcast, merge_podcast_states
+from mygpo.history.models import HistoryEntry
+from mygpo.publisher.models import PublishedPodcast
+from mygpo.subscriptions.models import Subscription, PodcastConfig
 from mygpo.db.couchdb.episode_state import all_episode_states, \
     update_episode_state_object, add_episode_actions, delete_episode_state, \
     merge_episode_states
@@ -33,7 +31,8 @@ class PodcastMerger(object):
             for m, podcast2 in enumerate(podcasts):
                 if podcast1 == podcast2 and n != m:
                     raise IncorrectMergeException(
-                        "can't merge podcast %s into itself %s" % (podcast1.get_id(), podcast2.get_id()))
+                        "can't merge podcast %s into itself %s" %
+                        (podcast1.get_id(), podcast2.get_id()))
 
         self.podcasts = podcasts
         self.actions = actions
@@ -51,12 +50,10 @@ class PodcastMerger(object):
 
         for podcast2 in self.podcasts:
             logger.info('Merging %r into target', podcast2)
-            self.merge_states(podcast1, podcast2)
             self.reassign_episodes(podcast1, podcast2)
-            self._merge_objs(podcast1=podcast1, podcast2=podcast2)
             logger.info('Deleting %r', podcast2)
-            podcast2.delete()
-            self.actions['merge-podcast'] += 1
+
+        merge_model_objects(podcast1, self.podcasts)
 
         return podcast1
 
@@ -68,18 +65,7 @@ class PodcastMerger(object):
                 continue
 
             episode = episodes.pop(0)
-            for ep in episodes:
-                em = EpisodeMerger(episode, ep, self.actions)
-                em.merge()
-
-    def _merge_objs(self, podcast1, podcast2):
-        reassign_merged_uuids(podcast1, podcast2)
-        reassign_slugs(podcast1, podcast2)
-        reassign_urls(podcast1, podcast2)
-        podcast1.content_types = ','.join(podcast1.content_types.split(',') +
-                                          podcast2.content_types.split(','))
-        podcast1.save()
-
+            merge_model_objects(episode, episodes)
 
     def reassign_episodes(self, podcast1, podcast2):
 
@@ -94,40 +80,6 @@ class PodcastMerger(object):
                 self.actions['reassign-episode-state'] += 1
 
                 update_episode_state_object(s, podcast1.get_id())
-
-            # TODO: change scopes?
-            e.podcast = podcast1
-            e.save()
-
-    def merge_states(self, podcast1, podcast2):
-        """Merges the Podcast states that are associated with the two Podcasts.
-
-        This should be done after two podcasts are merged
-        """
-
-        key = lambda x: x.user
-        states1 = sorted(all_podcast_states(podcast1), key=key)
-        states2 = sorted(all_podcast_states(podcast2), key=key)
-
-        logger.info('Merging %d podcast states of %r into %r', len(states2),
-            podcast2, podcast1)
-
-        for state, state2 in utils.iterate_together([states1, states2], key):
-
-            if state == state2:
-                continue
-
-            if state is None:
-                self.actions['move-podcast-state'] += 1
-                update_podcast_state_podcast(state2, podcast1.get_id(),
-                    podcast1.url)
-
-            elif state2 is None:
-                continue
-
-            else:
-                psm = PodcastStateMerger(state, state2, self.actions)
-                psm.merge()
 
 
 class EpisodeMerger(object):
@@ -145,17 +97,8 @@ class EpisodeMerger(object):
 
     def merge(self):
         logger.info('Merging episode %r into %r', self.episode2, self.episode1)
-        self._merge_objs(episode1=self.episode1, episode2=self.episode2)
         self.merge_states(self.episode1, self.episode2)
         logger.info('Deleting %r', self.episode2)
-        self.episode2.delete()
-        self.actions['merge-episode'] += 1
-
-    def _merge_objs(self, episode1, episode2):
-        reassign_urls(episode1, episode2)
-        reassign_merged_uuids(episode1, episode2)
-        reassign_slugs(episode1, episode2)
-
 
     def merge_states(self, episode, episode2):
         key = lambda x: x.user
@@ -163,7 +106,7 @@ class EpisodeMerger(object):
         states2 = sorted(all_episode_states(self.episode2), key=key)
 
         logger.info('Merging %d episode states of %r into %r', len(states2),
-                        episode2, episode)
+                    episode2, episode)
 
         for state, state2 in utils.iterate_together([states1, states2], key):
             if state == state2:
@@ -181,40 +124,6 @@ class EpisodeMerger(object):
             else:
                 esm = EpisodeStateMerger(state, state2, self.actions)
                 esm.merge()
-
-
-class PodcastStateMerger(object):
-    """Merges the two given podcast states"""
-
-    def __init__(self, state, state2, actions):
-
-        if state._id == state2._id:
-            raise IncorrectMergeException(
-                "can't merge podcast state into itself")
-
-        if state.user != state2.user:
-            raise IncorrectMergeException(
-                "states don't belong to the same user")
-
-        self.state = state
-        self.state2 = state2
-        self.actions = actions
-
-    def merge(self):
-        merge_podcast_states(self.state, self.state2)
-        self._add_actions(state=self.state, actions=self.state2.actions)
-        delete_podcast_state(self.state2)
-        self.actions['merged-podcast-state'] += 1
-
-
-    def _add_actions(self, state, actions):
-        try:
-            add_episode_actions(state, actions)
-        except restkit.Unauthorized:
-            # the merge could result in an invalid list of
-            # subscribe/unsubscribe actions -- we ignore it and
-            # just use the actions from state
-            return
 
 
 class EpisodeStateMerger(object):
@@ -276,65 +185,151 @@ def reassign_slugs(obj1, obj2):
 
 
 
-def merge(obj1, obj2):
-    """ Merges obj2 into obj1 """
+from django.db import transaction
+from django.db.models import get_models, Model
+from django.contrib.contenttypes.generic import GenericForeignKey
 
-    if type(obj1) != type(obj2):
-        raise ValueError('Only two objects of the same type can be merged')
+@transaction.commit_on_success
+def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
+    """
+    Use this function to merge model objects (i.e. Users, Organizations, Polls,
+    etc.) and migrate all of the related fields from the alias objects to the
+    primary object.
 
-    if obj1 == obj2:
-        raise ValueError('Cannot merge an object with itself')
+    Usage:
+    from django.contrib.auth.models import User
+    primary_user = User.objects.get(email='good_email@example.com')
+    duplicate_user = User.objects.get(email='good_email+duplicate@example.com')
+    merge_model_objects(primary_user, duplicate_user)
+    """
+    if not isinstance(alias_objects, list):
+        alias_objects = [alias_objects]
 
-    # first we need to move all objects that point to obj2 over to obj1
-    # relations can either be "direct" relations or generic ones
+    # check that all aliases are the same class as primary one and that
+    # they are subclass of model
+    primary_class = primary_object.__class__
 
-    # we iterate over all models that relate to obj2 (eg an Episode refers to
-    # a Podcast)
-    for rel_obj in obj2._meta.get_all_related_objects():
+    if not issubclass(primary_class, Model):
+        raise TypeError('Only django.db.models.Model subclasses can be merged')
 
-        # we can access the relating objects from obj2, eg a Podcast has a
-        # episode_set
-        accessor_name = rel_obj.get_accessor_name()
+    for alias_object in alias_objects:
+        if not isinstance(alias_object, primary_class):
+            raise TypeError('Only models of same class can be merged')
 
-        # then we need to update the relating obj's relating field (eg
-        # Episode.podcast) to obj1
-        rel_field = rel_obj.field.name
+    # Get a list of all GenericForeignKeys in all models
+    # TODO: this is a bit of a hack, since the generics framework should provide a similar
+    # method to the ForeignKey field for accessing the generic related fields.
+    generic_fields = []
+    for model in get_models():
+        for field_name, field in filter(lambda x: isinstance(x[1], GenericForeignKey), model.__dict__.iteritems()):
+            generic_fields.append(field)
 
-        objs = getattr(obj2, accessor_name).all()
-        for obj in objs:
+    blank_local_fields = set([field.attname for field in primary_object._meta.local_fields if getattr(primary_object, field.attname) in [None, '']])
 
-            if isinstance(obj, ScopedModel):
-                obj.scope = obj.get_default_scope()
+    # Loop through all alias objects and migrate their data to the primary object.
+    for alias_object in alias_objects:
+        # Migrate all foreign key references from alias object to primary object.
+        for related_object in alias_object._meta.get_all_related_objects():
+            # The variable name on the alias_object model.
+            alias_varname = related_object.get_accessor_name()
+            # The variable name on the related model.
+            obj_varname = related_object.field.name
+            related_objects = getattr(alias_object, alias_varname)
+            for obj in related_objects.all():
+                setattr(obj, obj_varname, primary_object)
+                reassigned(obj, primary_object)
+                obj.save()
 
-            if isinstance(obj, OrderedModel):
-                obj1_objs = getattr(obj1, accessor_name).all()
-                obj.order = max([o.order for o in obj1_objs] + [-1]) + 1
+        # Migrate all many to many references from alias object to primary object.
+        for related_many_object in alias_object._meta.get_all_related_many_to_many_objects():
+            alias_varname = related_many_object.get_accessor_name()
+            obj_varname = related_many_object.field.name
 
-            logger.info("Setting {obj}'s {field} to {obj1}".format(obj=obj,
-                field=rel_field, obj1=obj1))
-            setattr(obj, rel_field, obj1)
-            obj.save()
+            if alias_varname is not None:
+                # standard case
+                related_many_objects = getattr(alias_object, alias_varname).all()
+            else:
+                # special case, symmetrical relation, no reverse accessor
+                related_many_objects = getattr(alias_object, obj_varname).all()
+            for obj in related_many_objects.all():
+                getattr(obj, obj_varname).remove(alias_object)
+                reassigned(obj, primary_object)
+                getattr(obj, obj_varname).add(primary_object)
 
-        # TODO: update scope, ordered models, etc
+        # Migrate all generic foreign key references from alias object to primary object.
+        for field in generic_fields:
+            filter_kwargs = {}
+            filter_kwargs[field.fk_field] = alias_object._get_pk_val()
+            filter_kwargs[field.ct_field] = field.get_content_type(alias_object)
+            for generic_related_object in field.model.objects.filter(**filter_kwargs):
+                setattr(generic_related_object, field.name, primary_object)
+                reassigned(generic_related_object, primary_object)
+                generic_related_object.save()
 
-    for vf in obj2._meta.virtual_fields:
-        accessor_name = vf.get_attname()
-        fk_field, target_field = vf.resolve_related_fields()[0]
+        # Try to fill all missing values in primary object by values of duplicates
+        filled_up = set()
+        for field_name in blank_local_fields:
+            val = getattr(alias_object, field_name)
+            if val not in [None, '']:
+                setattr(primary_object, field_name, val)
+                filled_up.add(field_name)
+        blank_local_fields -= filled_up
 
-        objs = getattr(obj2, accessor_name).all()
-        for obj in objs:
+        if not keep_old:
+            before_delete(alias_object, primary_object)
+            alias_object.delete()
+    primary_object.save()
+    return primary_object
 
-            if isinstance(obj, ScopedModel):
-                obj.scope = obj.get_default_scope()
 
-            if isinstance(obj, OrderedModel):
-                obj1_objs = getattr(obj1, accessor_name).all()
-                obj.order = max([o.order for o in obj1_objs] + [-1]) + 1
+# https://djangosnippets.org/snippets/2283/
 
-            obj1_id = getattr(obj1, target_field.name)
-            logger.info("Setting {obj}'s {field} to {obj1}".format(obj=obj,
-                field=fk_field, obj1=obj1_id))
-            setattr(obj, fk_field.name, obj1_id)
-            obj.save()
 
-    obj2.delete()
+def reassigned(obj, new):
+    if isinstance(obj, URL):
+        # a URL has its parent's scope
+        obj.scope = new.scope
+
+        existing_urls = new.urls.all()
+        max_order = max([-1] + [u.order for u in existing_urls])
+        obj.order = max_order+1
+
+    elif isinstance(obj, Episode):
+        # obj is an Episode, new is a podcast
+        for url in obj.urls.all():
+            url.scope = new.as_scope
+            url.save()
+
+    elif isinstance(obj, Subscription):
+        pass
+
+    elif isinstance(obj, HistoryEntry):
+        pass
+
+    else:
+        raise TypeError('unknown type for reassigning: {objtype}'
+            .format(objtype=type(obj)))
+
+
+def before_delete(old, new):
+
+    if isinstance(old, Episode):
+        m = EpisodeMerger(new, old, collections.Counter())
+        m.merge()
+
+        MergedUUID.objects.create(
+            content_type=ContentType.objects.get_for_model(new),
+            object_id=new.pk,
+            uuid=old.pk,
+        )
+
+    elif isinstance(old, Podcast):
+        MergedUUID.objects.create(
+            content_type=ContentType.objects.get_for_model(new),
+            object_id=new.pk,
+            uuid=old.pk,
+        )
+
+    else:
+        raise TypeError('unknown type for deleting: {objtype}'
+            .format(objtype=type(old)))
