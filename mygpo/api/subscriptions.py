@@ -32,7 +32,8 @@ from mygpo.utils import get_timestamp, \
 from mygpo.decorators import cors_origin
 from mygpo.users.models import Client
 from mygpo.core.json import JSONDecodeError
-from mygpo.subscriptions import subscribe, unsubscribe, get_subscription_history, subscription_diff
+from mygpo.subscriptions import (subscribe, unsubscribe,
+    get_subscription_history, subscription_diff)
 from mygpo.api.basic_auth import require_valid_user, check_username
 
 
@@ -115,6 +116,8 @@ class SubscriptionsAPI(APIView):
     def post(self, request, version, username, device_uid):
         """ Client sends subscription updates """
         now = get_timestamp(datetime.utcnow())
+        logger.info('Subscription Upload @{username}/{device_uid}'.format(
+            username=request.user.username, device_uid=device_uid))
 
         d = get_device(request.user, device_uid,
                        request.META.get('HTTP_USER_AGENT', ''))
@@ -123,6 +126,10 @@ class SubscriptionsAPI(APIView):
 
         add = filter(None, actions.get('add', []))
         rem = filter(None, actions.get('remove', []))
+        logger.info('Subscription Upload @{username}/{device_uid}: add '
+            '{num_add}, remove {num_remove}'.format(
+            username=request.user.username, device_uid=device_uid,
+            num_add=len(add), num_remove=len(rem)))
 
         update_urls = self.update_subscriptions(request.user, d, add, rem)
 
@@ -137,6 +144,7 @@ class SubscriptionsAPI(APIView):
         if conflicts:
             msg = "can not add and remove '{}' at the same time".format(
                 str(conflicts))
+            logger.warn(msg)
             raise RequestException(msg)
 
         add_s = map(normalize_feed_url, add)
@@ -167,7 +175,12 @@ class SubscriptionsAPI(APIView):
     def get_changes(self, user, device, since, until):
         """ Returns subscription changes for the given device """
         history = get_subscription_history(user, device, since, until)
+        logger.info('Subscription History: {num}'.format(num=len(history)))
+
         add, rem = subscription_diff(history)
+        logger.info('Subscription Diff: +{num_add}/-{num_remove}'.format(
+            num_add=len(add), num_remove=len(rem)))
+
         until_ = get_timestamp(until)
 
         # TODO: we'd need to get the ref_urls here somehow

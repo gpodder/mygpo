@@ -155,20 +155,25 @@ def get_subscription_history(user, client=None, since=None, until=None,
     Setting device_id restricts the actions to a certain device
     """
 
+    logger.info('Subscription History for {user}'.format(user=user.username))
     history = HistoryEntry.objects.filter(user=user)\
                                   .filter(action__in=SUBSCRIPTION_ACTIONS)\
                                   .order_by('timestamp')
 
     if client:
+        logger.info('... client {client_uid}'.format(client_uid=client.uid))
         history = history.filter(client=client)
 
     if since:
+        logger.info('... since {since}'.format(since=since))
         history = history.filter(timestamp__gt=since)
 
     if until:
-        history = history.filter(timestamp__lte=since)
+        logger.info('... until {until}'.format(until=until))
+        history = history.filter(timestamp__lte=until)
 
     if public_only:
+        logger.info('... only public')
         private = PodcastConfig.objects.get_private_podcasts(user)
         history = history.exclude(podcast__in=private)
 
@@ -218,7 +223,9 @@ def subscription_diff(history):
         elif entry.action == HistoryEntry.UNSUBSCRIBE:
             subscriptions[entry.podcast] -= 1
 
-    subscribe = [podcast for (podcast, value) in subscriptions if value > 0]
-    unsubscribe = [podcast for (podcast, value) in subscriptions if value < 0]
+    subscribe = [podcast for (podcast, value) in
+                 subscriptions.items() if value > 0]
+    unsubscribe = [podcast for (podcast, value) in
+                   subscriptions.items() if value < 0]
 
     return subscribe, unsubscribe
