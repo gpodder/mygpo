@@ -1050,6 +1050,9 @@ def random_token(length=32):
 
 def to_maxlength(cls, field, val):
     """ Cut val to the maximum length of cls's field """
+    if val is None:
+        return None
+
     max_length = cls._meta.get_field(field).max_length
     orig_length = len(val)
     if orig_length > max_length:
