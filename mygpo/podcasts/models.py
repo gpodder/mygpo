@@ -520,6 +520,11 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
         return ''
 
     @property
+    def as_scope(self):
+        """ If models use this object as scope, they'll use this value """
+        return self.id.hex
+
+    @property
     def display_title(self):
         # TODO
         return self.title
@@ -557,21 +562,25 @@ class EpisodeManager(GenericManager):
     def get_or_create_for_url(self, podcast, url, defaults={}):
         # TODO: where to specify how uuid is created?
         import uuid
-        defaults.update({
-            'id': uuid.uuid1().hex,
-        })
-        episode, created = self.get_or_create(podcast=podcast,
-                                              urls__url=url,
-                                              defaults=defaults,
-                                             )
 
-        if created:
+        try:
+            url = URL.objects.get(url=url, scope=podcast.as_scope)
+
+        except URL.DoesNotExist:
+            episode = Episode.objects.create(podcast=podcast,
+                                             id=uuid.uuid1().hex,
+                                             **defaults
+                                            )
             url = URL.objects.create(url=url,
                                      order=0,
                                      scope=episode.scope,
                                      content_object=episode,
                                     )
-        return episode
+            return episode
+
+        else:
+            return url.content_object
+
 
 class Episode(UUIDModel, TitleModel, DescriptionModel, LinkModel,
         LanguageModel, LastUpdateModel, UpdateInfoModel, LicenseModel,
