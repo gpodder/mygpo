@@ -8,6 +8,7 @@ from mygpo.subscriptions.models import (Subscription, SubscribedPodcast,
     PodcastConfig, )
 from mygpo.subscriptions.signals import subscription_changed
 from mygpo.history.models import HistoryEntry
+from mygpo.utils import to_maxlength
 
 import logging
 logger = logging.getLogger(__name__)
@@ -27,7 +28,7 @@ def subscribe(podcast, user, client, ref_url=None):
 
     subscription, created = Subscription.objects.get_or_create(
         user=user, client=client, podcast=podcast, defaults={
-            'ref_url': ref_url,
+            'ref_url': to_maxlength(Subscription, 'ref_url', ref_url),
             'created': now,
             'modified': now,
         }
