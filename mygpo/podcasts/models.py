@@ -203,6 +203,9 @@ class SlugsMixin(models.Model):
 
         existing_slugs = self.slugs.all()
 
+        # cut slug to the maximum allowed length
+        slug = utils.to_maxlength(Slug, 'slug', slug)
+
         # check if slug already exists
         if slug in [s.slug for s in existing_slugs]:
             return
