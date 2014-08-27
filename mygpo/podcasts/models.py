@@ -338,6 +338,12 @@ class PodcastGroup(UUIDModel, TitleModel, SlugsMixin):
         # this could be done directly in the DB
         return sum([p.subscriber_count() for p in self.podcast_set.all()] + [0])
 
+    @property
+    def logo_url(self):
+        podcast = self.podcast_set.first()
+        podcast.logo_url
+
+
 class PodcastQuerySet(MergedUUIDQuerySet):
     """ Custom queries for Podcasts """
 
