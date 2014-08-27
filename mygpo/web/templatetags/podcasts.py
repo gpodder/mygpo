@@ -130,7 +130,7 @@ def podcast_group_link(podcast, title=None):
     from mygpo.podcasts.models import PodcastGroup
 
     if isinstance(podcast, PodcastGroup):
-        podcasts = list(podcast.podcasts)
+        podcasts = list(podcast.podcast_set.all())
     else:
         return podcast_link(podcast, title)
 
