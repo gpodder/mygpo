@@ -162,13 +162,16 @@ class UrlsMixin(models.Model):
             if url in existing_urls:
                 continue
 
-            URL.objects.create(url=url,
-                               order=next_order,
-                               scope=self.scope,
-                               content_object=self,
-                               )
-
-            next_order += 1
+            try:
+                URL.objects.create(url=url,
+                                   order=next_order,
+                                   scope=self.scope,
+                                   content_object=self,
+                                   )
+                next_order += 1
+            except IntegrityError as ie:
+                logger.warn('Could not add URL: {err}'.format(err=ie))
+                continue
 
 
 class SlugsMixin(models.Model):
