@@ -1,6 +1,6 @@
 Babel==1.3
 Pillow==2.5.1
-https://www.djangoproject.com/download/1.7c1/tarball/
+https://www.djangoproject.com/download/1.7c3/tarball/
 celery==3.1.13
 -e git+https://github.com/stefankoegl/couchdbkit.git@7593bca76f76097394840a96031ce7a297b18b34#egg=couchdbkit-dev
 coverage==3.7.1
