@@ -144,10 +144,10 @@ class FlattrSettingsView(View):
         flattr_mygpo = form.cleaned_data.get('flattr_mygpo', False)
         username = form.cleaned_data.get('username', '')
 
-        user.settings[FLATTR_AUTO.name] = auto_flattr
-        user.settings[FLATTR_MYGPO.name] = flattr_mygpo
-        user.settings[FLATTR_USERNAME.name] = username
-        user.save()
+        user.profile.set_wksetting(FLATTR_AUTO, auto_flattr)
+        user.profile.set_wksetting(FLATTR_MYGPO, flattr_mygpo)
+        user.profile.set_wksetting(FLATTR_USERNAME, username)
+        user.profile.save()
 
         return HttpResponseRedirect(reverse('account') + '#flattr')
 
@@ -157,10 +157,10 @@ class FlattrLogout(View):
 
     def get(self, request):
         user = request.user
-        user.settings[FLATTR_AUTO.name] = False
-        user.settings[FLATTR_TOKEN.name] = False
-        user.settings[FLATTR_MYGPO.name] = False
-        user.save()
+        user.profile.set_wksetting(FLATTR_AUTO, False)
+        user.profile.set_wksetting(FLATTR_TOKEN, False)
+        user.profile.set_wksetting(FLATTR_MYGPO, False)
+        user.profile.save()
         return HttpResponseRedirect(reverse('account') + '#flattr')
 
 
@@ -179,8 +179,8 @@ class FlattrTokenView(View):
         token = flattr.process_retrieved_code(url)
         if token:
             messages.success(request, _('Authentication successful'))
-            user.settings[FLATTR_TOKEN.name] = token
-            user.save()
+            user.profile.set_wksetting(FLATTR_TOKEN, token)
+            user.profile.save()
 
         else:
             messages.error(request, _('Authentication failed. Try again later'))
