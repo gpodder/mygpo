@@ -19,7 +19,7 @@ import uuid
 from functools import wraps
 from xml.parsers.expat import ExpatError
 
-from django.db import transaction
+from django.db import transaction, IntegrityError
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
@@ -32,8 +32,6 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control
-
-from restkit.errors import Unauthorized
 
 from mygpo.api import simple
 from mygpo.decorators import allowed_methods, repeat_on_conflict
@@ -131,7 +129,7 @@ def create(request):
         messages.error(request, _(unicode(e)))
         return HttpResponseRedirect(reverse('devices'))
 
-    except Unauthorized:
+    except IntegrityError:
         messages.error(request, _("You can't use the same Device "
                    "ID for two devices."))
         return HttpResponseRedirect(reverse('devices'))
@@ -161,7 +159,7 @@ def update(request, device):
         except ValidationError as e:
             messages.error(request, _(str(e)))
 
-        except Unauthorized as u:
+        except IntegrityError:
             messages.error(request, _("You can't use the same Device "
                        "ID for two devices."))
 
