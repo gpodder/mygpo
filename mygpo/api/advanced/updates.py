@@ -97,7 +97,7 @@ class DeviceUpdates(View):
 
         subscriptions = device.get_subscribed_podcasts()
 
-        add = [podcast_data(p, domain) for url in add]
+        add = [podcast_data(p, domain) for p in add]
         rem = [p.url for p in rem]
 
         return add, rem, subscriptions
