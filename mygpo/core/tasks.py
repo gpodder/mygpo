@@ -25,7 +25,8 @@ def flattr_thing(user, thing_id, domain, is_secure, thing_type):
         episode, podcast = None, thing
 
     elif thing_type == 'Episode':
-        thing = Episode.objects.get(id=thing_id).select_related('podcast')
+        query = Episode.objects.filter(id=thing_id).select_related('podcast')
+        thing = query.get()
         episode, podcast = thing, thing.podcast
 
     else:
