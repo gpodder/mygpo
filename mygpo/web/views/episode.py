@@ -268,6 +268,10 @@ def slug_decorator(f):
 
         try:
             episode = equery.prefetch_related('urls', 'slugs').get()
+
+            # set previously fetched podcast, to avoid additional query
+            episode.podcast = podcast
+
         except Episode.DoesNotExist:
             raise Http404
 

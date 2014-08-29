@@ -91,7 +91,7 @@ class PodcastPageTests(TestCase):
             # we only need (the last) one
             self.episode_slug = Slug.objects.create(content_object=episode,
                                                     order=0,
-                                                    scope=podcast.scope,
+                                                    scope=podcast.as_scope,
                                                     slug=str(n),
                                                     )
 
