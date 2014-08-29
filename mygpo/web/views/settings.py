@@ -31,7 +31,6 @@ from django.views.generic.base import View
 from django.utils.html import strip_tags
 
 from mygpo.podcasts.models import Podcast
-from mygpo.core.podcasts import PODCAST_SORT
 from mygpo.subscriptions.models import PodcastConfig
 from mygpo.decorators import allowed_methods, repeat_on_conflict
 from mygpo.web.forms import UserAccountForm, ProfileForm, FlattrForm
@@ -266,9 +265,6 @@ def privacy(request):
     for podcast in podcasts:
 
         subscriptions.append( (podcast, podcast in private) )
-
-#subs = set((podcasts.get(x[1], None), not x[0]) for x in subscriptions)
-#subs = sorted(subs, key=lambda (p, _): PODCAST_SORT(p))
 
     return render(request, 'privacy.html', {
         'private_subscriptions': not request.user.profile.get_wksetting(PUBLIC_SUB_USER),

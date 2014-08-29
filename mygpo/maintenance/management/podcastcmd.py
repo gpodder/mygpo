@@ -4,7 +4,6 @@ import random
 
 from django.core.management.base import BaseCommand
 
-from mygpo.core.podcasts import individual_podcasts
 from mygpo.podcasts.models import Podcast
 
 
@@ -50,7 +49,7 @@ class PodcastCommand(BaseCommand):
 
         if options.get('random'):
             podcasts = random_podcasts()
-            yield (p.url for p in individual_podcasts(podcasts))
+            yield (p.url for p in podcasts)
 
         if options.get('next'):
             podcasts = Podcast.objects.all().order_by_next_update()[:max_podcasts]
@@ -68,8 +67,7 @@ class PodcastCommand(BaseCommand):
 
 
     def get_toplist(self, max_podcasts=100):
-        toplist = Podcast.objects.all().toplist()
-        return individual_podcasts(p for i, p in toplist[:max_podcasts])
+        return Podcast.objects.all().toplist()[:max_podcasts]
 
 
 def random_podcasts():
