@@ -1,7 +1,9 @@
 import collections
 
-from django.db import IntegrityError
+from django.db import transaction, IntegrityError
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import get_models, Model
+from django.contrib.contenttypes.generic import GenericForeignKey
 
 from mygpo.podcasts.models import (MergedUUID, ScopedModel, OrderedModel, Slug,
                                    Tag, URL, MergedUUID, Podcast, Episode)
@@ -117,9 +119,11 @@ class EpisodeMerger(object):
 
             if state is None:
                 self.actions['move-episode-state'] += 1
-                update_episode_state_object(state2,
+                update_episode_state_object(
+                    state2,
                     self.episode1.podcast.get_id(),
-                    self.episode1.get_id())
+                    self.episode1.get_id()
+                )
 
             elif state2 is None:
                 continue
@@ -166,12 +170,14 @@ def reassign_urls(obj1, obj2):
             logger.warn('Moving URL failed: %s. Deleting.', str(ie))
             url.delete()
 
+
 def reassign_merged_uuids(obj1, obj2):
     # Reassign all IDs of obj2 to obj1
     MergedUUID.objects.create(uuid=obj2.id, content_object=obj1)
     for m in obj2.merged_uuids.all():
         m.content_object = obj1
         m.save()
+
 
 def reassign_slugs(obj1, obj2):
     # Reassign all Slugs of obj2 to obj1
@@ -187,11 +193,7 @@ def reassign_slugs(obj1, obj2):
             slug.delete()
 
 
-
-from django.db import transaction
-from django.db.models import get_models, Model
-from django.contrib.contenttypes.generic import GenericForeignKey
-
+# based on https://djangosnippets.org/snippets/2283/
 @transaction.commit_on_success
 def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
     """
@@ -220,18 +222,26 @@ def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
             raise TypeError('Only models of same class can be merged')
 
     # Get a list of all GenericForeignKeys in all models
-    # TODO: this is a bit of a hack, since the generics framework should provide a similar
-    # method to the ForeignKey field for accessing the generic related fields.
+    # TODO: this is a bit of a hack, since the generics framework should
+    # provide a similar method to the ForeignKey field for accessing the
+    # generic related fields.
     generic_fields = []
     for model in get_models():
-        for field_name, field in filter(lambda x: isinstance(x[1], GenericForeignKey), model.__dict__.iteritems()):
+        fields = filter(lambda x: isinstance(x[1], GenericForeignKey),
+                        model.__dict__.iteritems())
+        for field_name, field in fields:
             generic_fields.append(field)
 
-    blank_local_fields = set([field.attname for field in primary_object._meta.local_fields if getattr(primary_object, field.attname) in [None, '']])
+    blank_local_fields = set(
+        [field.attname for field
+         in primary_object._meta.local_fields
+         if getattr(primary_object, field.attname) in [None, '']])
 
-    # Loop through all alias objects and migrate their data to the primary object.
+    # Loop through all alias objects and migrate their data to
+    # the primary object.
     for alias_object in alias_objects:
-        # Migrate all foreign key references from alias object to primary object.
+        # Migrate all foreign key references from alias object to
+        # primary object.
         for related_object in alias_object._meta.get_all_related_objects():
             # The variable name on the alias_object model.
             alias_varname = related_object.get_accessor_name()
@@ -243,28 +253,35 @@ def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
                 reassigned(obj, primary_object)
                 obj.save()
 
-        # Migrate all many to many references from alias object to primary object.
-        for related_many_object in alias_object._meta.get_all_related_many_to_many_objects():
+        # Migrate all many to many references from alias object to
+        # primary object.
+        related = alias_object._meta.get_all_related_many_to_many_objects()
+        for related_many_object in related:
             alias_varname = related_many_object.get_accessor_name()
             obj_varname = related_many_object.field.name
 
             if alias_varname is not None:
                 # standard case
-                related_many_objects = getattr(alias_object, alias_varname).all()
+                related_many_objects = getattr(alias_object,
+                                               alias_varname).all()
             else:
                 # special case, symmetrical relation, no reverse accessor
-                related_many_objects = getattr(alias_object, obj_varname).all()
+                related_many_objects = getattr(alias_object,
+                                               obj_varname).all()
             for obj in related_many_objects.all():
                 getattr(obj, obj_varname).remove(alias_object)
                 reassigned(obj, primary_object)
                 getattr(obj, obj_varname).add(primary_object)
 
-        # Migrate all generic foreign key references from alias object to primary object.
+        # Migrate all generic foreign key references from alias
+        # object to primary object.
         for field in generic_fields:
             filter_kwargs = {}
             filter_kwargs[field.fk_field] = alias_object._get_pk_val()
-            filter_kwargs[field.ct_field] = field.get_content_type(alias_object)
-            for generic_related_object in field.model.objects.filter(**filter_kwargs):
+            filter_kwargs[field.ct_field] = field.get_content_type(
+                alias_object)
+            related = field.model.objects.filter(**filter_kwargs)
+            for generic_related_object in related:
                 setattr(generic_related_object, field.name, primary_object)
                 reassigned(generic_related_object, primary_object)
                 try:
@@ -276,7 +293,8 @@ def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
                     if ie.__cause__.pgcode == PG_UNIQUE_VIOLATION:
                         merge(generic_related_object, primary_object)
 
-        # Try to fill all missing values in primary object by values of duplicates
+        # Try to fill all missing values in primary object by
+        # values of duplicates
         filled_up = set()
         for field_name in blank_local_fields:
             val = getattr(alias_object, field_name)
@@ -290,9 +308,6 @@ def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
             alias_object.delete()
     primary_object.save()
     return primary_object
-
-
-# https://djangosnippets.org/snippets/2283/
 
 
 def reassigned(obj, new):
@@ -317,8 +332,8 @@ def reassigned(obj, new):
         pass
 
     else:
-        raise TypeError('unknown type for reassigning: {objtype}'
-            .format(objtype=type(obj)))
+        raise TypeError('unknown type for reassigning: {objtype}'.format(
+            objtype=type(obj)))
 
 
 def before_delete(old, new):
@@ -341,8 +356,8 @@ def before_delete(old, new):
         )
 
     else:
-        raise TypeError('unknown type for deleting: {objtype}'
-            .format(objtype=type(old)))
+        raise TypeError('unknown type for deleting: {objtype}'.format(
+            objtype=type(old)))
 
 
 def merge(moved_obj, new_target):
@@ -353,5 +368,5 @@ def merge(moved_obj, new_target):
         pass
 
     else:
-        raise TypeError('unknown type for merging: {objtype}'
-            .format(objtype=type(old)))
+        raise TypeError('unknown type for merging: {objtype}'.format(
+            objtype=type(old)))
