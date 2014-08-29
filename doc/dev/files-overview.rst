@@ -178,7 +178,6 @@ The ``mygpo`` project consists of the following files ::
     core/
       __init__.py
       tests.py
-      oldid.py
       json.py
       models.py
       proxy.py

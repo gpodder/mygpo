@@ -167,10 +167,6 @@ def get_podcast_group_link_target(group, view_name, add_args=[]):
         args = [group.slug]
         view_name = '%s-slug-id' % view_name
 
-    # to keep URLs short, we use use oldids
-    elif group.oldid:
-        args = [group.oldid]
-
     # as a fallback we use CouchDB-IDs
     else:
         args = [group._id]
