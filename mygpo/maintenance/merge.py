@@ -17,6 +17,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+PG_UNIQUE_VIOLATION = 23505
+
+
 class IncorrectMergeException(Exception):
     pass
 
@@ -264,7 +267,14 @@ def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
             for generic_related_object in field.model.objects.filter(**filter_kwargs):
                 setattr(generic_related_object, field.name, primary_object)
                 reassigned(generic_related_object, primary_object)
-                generic_related_object.save()
+                try:
+                    # execute save in a savepoint, so we can resume in the
+                    # transaction
+                    with transaction.atomic():
+                        generic_related_object.save()
+                except IntegrityError as ie:
+                    if ie.__cause__.pgcode == PG_UNIQUE_VIOLATION:
+                        merge(generic_related_object, primary_object)
 
         # Try to fill all missing values in primary object by values of duplicates
         filled_up = set()
@@ -332,4 +342,16 @@ def before_delete(old, new):
 
     else:
         raise TypeError('unknown type for deleting: {objtype}'
+            .format(objtype=type(old)))
+
+
+def merge(moved_obj, new_target):
+    if isinstance(moved_obj, URL):
+        # if we have two conflicting URLs, don't save the second one
+        # URLs don't have any interesting properties (except the URL) that
+        # we could merge
+        pass
+
+    else:
+        raise TypeError('unknown type for merging: {objtype}'
             .format(objtype=type(old)))
