@@ -118,22 +118,3 @@ def tags_for_user(user, podcast_id=None):
     for r in res:
         tags[r['key'][1]].append(r['value'])
     return tags
-
-
-@cache_result(timeout=60*60)
-def toplist(res_cls, view, key, limit, **view_args):
-
-    if not limit:
-        raise QueryParameterMissing('limit')
-
-
-    r = res_cls.view(view,
-            startkey     = key + [{}],
-            endkey       = key + [None],
-            include_docs = True,
-            descending   = True,
-            limit        = limit,
-            stale        = 'update_after',
-            **view_args
-        )
-    return list(r)
