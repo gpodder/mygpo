@@ -2,7 +2,6 @@ import time
 import urllib2
 from optparse import make_option
 
-from mygpo.decorators import repeat_on_conflict
 from mygpo.data import delicious
 from mygpo.maintenance.management.podcastcmd import PodcastCommand
 

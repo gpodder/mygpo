@@ -10,7 +10,6 @@ from django.conf import settings
 
 from mygpo.celery import celery
 from mygpo.db.couchdb.user import suggestions_for_user, update_suggestions
-from mygpo.decorators import repeat_on_conflict
 from mygpo.subscriptions import get_subscribed_podcasts
 
 from celery.utils.log import get_task_logger

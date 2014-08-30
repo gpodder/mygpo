@@ -28,7 +28,6 @@ from mygpo.core.models import (TwitterModel, UUIDModel, SettingsModel,
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.utils import random_token
 from mygpo.core.proxy import DocumentABCMeta, proxy_object
-from mygpo.decorators import repeat_on_conflict
 from mygpo.users.ratings import RatingMixin
 from mygpo.users.subscriptions import subscription_changes
 from mygpo.users.settings import FAV_FLAG, PUBLIC_SUB_PODCAST, SettingsMixin

@@ -31,7 +31,7 @@ from mygpo.users.settings import PUBLIC_SUB_PODCAST, FLATTR_TOKEN
 from mygpo.publisher.utils import check_publisher_permission
 from mygpo.users.models import Client
 from mygpo.web.forms import SyncForm
-from mygpo.decorators import allowed_methods, repeat_on_conflict
+from mygpo.decorators import allowed_methods
 from mygpo.web.utils import get_podcast_link_target, get_page_list, \
     check_restrictions
 from mygpo.db.couchdb.episode_state import get_podcasts_episode_states, \
