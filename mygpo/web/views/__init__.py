@@ -33,7 +33,6 @@ from django.views.decorators.cache import never_cache, cache_control
 from mygpo.decorators import repeat_on_conflict
 from mygpo.podcasts.models import Podcast, Episode, Tag
 from mygpo.users.models import HistoryEntry, Client
-from mygpo.users.tasks import update_suggestions
 from mygpo.subscriptions import get_subscribed_podcasts
 from mygpo.web.utils import process_lang_params
 from mygpo.utils import parse_range
@@ -41,8 +40,6 @@ from mygpo.utils import parse_range
 from mygpo.users.settings import FLATTR_AUTO, FLATTR_TOKEN
 from mygpo.publisher.models import PublishedPodcast
 from mygpo.db.couchdb.episode_state import favorite_episode_ids_for_user
-from mygpo.db.couchdb.user import (suggestions_for_user,
-    blacklist_suggested_podcast)
 from mygpo.db.couchdb.directory import tags_for_user
 from mygpo.db.couchdb.podcastlist import podcastlists_for_user
 
@@ -144,44 +141,6 @@ def dashboard(request, episode_count=10):
             'site': site,
             'show_install_reader': show_install_reader,
         })
-
-
-@never_cache
-@login_required
-#@slug_id_decorator
-def blacklist(request, blacklisted_podcast):
-    user = request.user
-    suggestion = suggestions_for_user(user)
-    blacklist_suggested_podcast(suggestion, blacklisted_podcast.get_id())
-    update_suggestions.delay(user)
-    return HttpResponseRedirect(reverse('suggestions'))
-
-
-@never_cache
-@login_required
-def rate_suggestions(request):
-    rating_val = int(request.GET.get('rate', None))
-
-    suggestion = suggestions_for_user(request.user)
-    suggestion.rate(rating_val, request.user.profile.uuid.hex)
-    suggestion.save()
-
-    messages.success(request, _('Thanks for rating!'))
-
-    return HttpResponseRedirect(reverse('suggestions'))
-
-
-@vary_on_cookie
-@cache_control(private=True)
-@login_required
-def suggestions(request):
-    suggestion_obj = suggestions_for_user(request.user)
-    suggestions = suggestion_obj.get_podcasts()
-    current_site = RequestSite(request)
-    return render(request, 'suggestions.html', {
-        'entries': suggestions,
-        'url': current_site
-    })
 
 
 @vary_on_cookie

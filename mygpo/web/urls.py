@@ -8,9 +8,6 @@ from mygpo.web.logo import CoverArt
 urlpatterns = patterns('mygpo.web.views',
  url(r'^$',                                                       'home',          name='home'),
  url(r'^logo/(?P<size>\d+)/(?P<prefix>.{3})/(?P<filename>[^/]*)$', CoverArt.as_view(), name='logo'),
- url(r'^suggestions/$',                                           'suggestions',   name='suggestions'),
- url(r'^suggestions/rate$',                                       'rate_suggestions', name='suggestions-rate'),
- url(r'^suggestions/blacklist/(?P<slug>[\w-]+)$',                 'blacklist',     name='suggestions-blacklist-slug'),
  url(r'^tags/',                                                   'mytags',        name='tags'),
 
  url(r'^online-help',
