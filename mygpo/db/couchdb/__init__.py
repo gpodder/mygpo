@@ -26,10 +26,6 @@ def get_userdata_database():
     return loading.get_db('userdata')
 
 
-def get_suggestions_database():
-    return loading.get_db('suggestions')
-
-
 def get_podcastlists_database():
     return loading.get_db('podcastlists')
 

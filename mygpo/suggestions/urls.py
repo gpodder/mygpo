@@ -7,11 +7,11 @@ urlpatterns = [
         views.suggestions,
         name='suggestions'),
 
-    url(r'^rate$',
-        views.rate_suggestions,
-        name='suggestions-rate'),
-
    url(r'^blacklist/(?P<slug>[\w-]+)$',
-        views.blacklist,
+        views.blacklist_slug,
         name='suggestions-blacklist-slug'),
+
+   url(r'^blacklist/(?P<podcast_id>[0-9a-f]{32})$',
+        views.blacklist_id,
+        name='suggestions-blacklist-id'),
 ]

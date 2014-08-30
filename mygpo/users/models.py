@@ -183,36 +183,6 @@ class UserProfile(TwitterModel, SettingsModel):
         setattr(self, token_name, random_token())
 
 
-class Suggestions(Document, RatingMixin):
-    user = StringProperty(required=True)
-    user_oldid = IntegerProperty()
-    podcasts = StringListProperty()
-    blacklist = StringListProperty()
-
-
-    def get_podcasts(self, count=None):
-        from mygpo.subscriptions import get_subscribed_podcasts
-        User = get_user_model()
-        user = User.objects.get(profile__uuid=self.user)
-        subscriptions = [sp.podcast.id.hex for sp in
-                         get_subscribed_podcasts(user)]
-
-        ids = filter(lambda x: not x in self.blacklist + subscriptions, self.podcasts)
-        if count:
-            ids = ids[:count]
-
-        podcasts = Podcast.objects.filter(id__in=ids).prefetch_related('slugs')
-        return filter(lambda x: x and x.title, podcasts)
-
-
-    def __repr__(self):
-        if not self._id:
-            return super(Suggestions, self).__repr__()
-        else:
-            return '%d Suggestions for %s (%s)' % \
-                (len(self.podcasts), self.user, self._id)
-
-
 class EpisodeAction(DocumentSchema):
     """
     One specific action to an episode. Must

@@ -187,32 +187,6 @@ Example Document ::
     }
 
 
-Suggestions
------------
-
-Contains the Podcast Suggestions and related meta-data (blacklist,
-suggestion-ratings) of a User. This is not places into PodcastUserState
-because the user did not yet interact with the Podcast directly.
-
-Example Document ::
-
-    {
-        user: "stefan",
-        podcasts: [
-            "119018023981293801823",
-            "192840890284092834093"
-        ],
-        blacklist: [
-            "456045698409586045860",
-            "935937498573549739485"
-        ],
-        ratings: [
-            { timestamp: "2010-09-13", rating: -1},
-            { timestamp: "2010-09-15", rating:  1}
-        ],
-    }
-
-
 EpisodeUserState
 ----------------
 

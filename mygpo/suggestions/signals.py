@@ -1,5 +1,5 @@
 from mygpo.subscriptions.signals import subscription_changed
-from mygpo.users.tasks import update_suggestions
+from mygpo.suggestions.tasks import update_suggestions
 
 
 def update_suggestions_on_subscription(sender, **kwargs):

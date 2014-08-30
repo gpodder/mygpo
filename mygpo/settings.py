@@ -47,9 +47,6 @@ COUCHDB_DATABASES = {
     'mygpo.pubsub':
         {'URL': 'http://127.0.0.1:5984/mygpo_pubsub'},
 
-    'mygpo.suggestions':
-        {'URL': 'http://127.0.0.1:5984/mygpo_suggestions'},
-
     'mygpo.share':
         {'URL': 'http://127.0.0.1:5984/mygpo_podcastlists'},
 
@@ -73,7 +70,6 @@ COUCHDB_DDOC_MAPPING = {
     'pubsub':     'pubsub',
     'userdata':   'userdata',
     'users':      'users',
-    'suggestions': 'suggestions',
 }
 
 # Local time zone for this installation. Choices can be found here:
@@ -249,6 +245,10 @@ LOGGING = {
         'mygpo': {
             'handlers': ['console'],
             'level': 'INFO',
+        },
+        'celery': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
         },
     },
 }

@@ -48,8 +48,8 @@ def subscribe(podcast, user, client, ref_url=None):
         action=HistoryEntry.SUBSCRIBE,
     )
 
-    subscription_changed.send(sender=podcast, user=user,
-                              client=client, subscribed=True)
+    subscription_changed.send(sender=podcast.__class__, instance=podcast,
+                              user=user, client=client, subscribed=True)
 
 
 @transaction.atomic
@@ -79,8 +79,8 @@ def unsubscribe(podcast, user, client):
         action=HistoryEntry.UNSUBSCRIBE,
     )
 
-    subscription_changed.send(sender=podcast, user=user,
-                              client=client, subscribed=False)
+    subscription_changed.send(sender=podcast.__class__, instance=podcast,
+                              user=user, client=client, subscribed=False)
 
 
 @transaction.atomic

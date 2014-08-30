@@ -42,7 +42,6 @@ from mygpo.directory.search import search_podcasts
 from mygpo.decorators import allowed_methods, cors_origin
 from mygpo.utils import parse_range, normalize_feed_url
 from mygpo.core.json import json, JSONDecodeError
-from mygpo.db.couchdb.user import suggestions_for_user
 
 import logging
 logger = logging.getLogger(__name__)
@@ -300,8 +299,9 @@ def search(request, format):
 def suggestions(request, count, format):
     count = parse_range(count, 1, 100, 100)
 
-    suggestion_obj = suggestions_for_user(request.user)
-    suggestions = suggestion_obj.get_podcasts(count)
+    user = request.user
+    suggestions = Podcast.objects.filter(podcastsuggestion__suggested_to=user,
+                                         podcastsuggestion__deleted=False)
     title = _('gpodder.net - %(count)d Suggestions') % {'count': len(suggestions)}
     domain = RequestSite(request).domain
     p_data = lambda p: podcast_data(p, domain)

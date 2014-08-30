@@ -1,32 +1,46 @@
 from itertools import chain
-from operator import itemgetter
 from collections import Counter
 
 from mygpo.celery import celery
-from mygpo.db.couchdb.user import (suggestions_for_user,
-    update_suggestions as update)
 from mygpo.subscriptions import get_subscribed_podcasts
+from mygpo.suggestions.models import PodcastSuggestion
 
 from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
 
+logger.warn(logger.level)
 
 @celery.task(max_retries=5, default_retry_delay=60)
 def update_suggestions(user, max_suggestions=15):
     """ updates the suggestions of a user """
-
-    # get suggestions object
-    suggestion = suggestions_for_user(user)
+    logger.info('Updating suggestions of user {user.username}'.format(
+        user=user))
 
     # calculate possible suggestions
-    subscribed_podcasts = get_subscribed_podcasts()
-    related = chain.from_iterable([p.related_podcasts for p in subscribed_podcasts])
+    subscribed_podcasts = [sp.podcast for sp in get_subscribed_podcasts(user)]
+    logger.debug('Found {num_podcasts} subscribed podcasts'.format(
+        num_podcasts=len(subscribed_podcasts)))
 
-    # filter out blacklisted podcasts
-    related = filter(lambda pid: not pid in suggestion.blacklist, related)
+    # TODO: update related_podcasts of the subscribed_podcasts?
+
+    related = list(chain.from_iterable([p.related_podcasts.all() for p
+                                        in subscribed_podcasts]))
 
     # get most relevant
     counter = Counter(related)
-    get_podcast_id = itemgetter(0)
-    suggested = map(get_podcast_id, counter.most_common(max_suggestions))
-    update(suggestion, suggested)
+    logger.debug('Found {num_related} related podcasts'.format(
+        num_related=len(counter)))
+
+    suggested = [p for p, count in counter.most_common(max_suggestions)]
+
+    for suggested_podcast in suggested:
+        ps, created = PodcastSuggestion.objects.get_or_create(
+            suggested_to=user,
+            podcast=suggested_podcast,
+        )
+        if created:
+            logger.info('Created suggestion for {podcast}'.format(
+                podcast=suggested_podcast))
+
+    user.profile.suggestions_up_to_date = True
+    user.profile.save()

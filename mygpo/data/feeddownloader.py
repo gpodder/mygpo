@@ -38,6 +38,7 @@ from feedservice.parse.vimeo import VimeoError
 from mygpo.utils import file_hash, to_maxlength
 from mygpo.web.logo import CoverArt
 from mygpo.data.podcast import subscribe_at_hub
+from mygpo.data.tasks import update_related_podcasts
 from mygpo.pubsub.models import SubscriptionError
 from mygpo.directory.tags import update_category
 
@@ -200,6 +201,7 @@ class PodcastUpdater(object):
                 podcast.add_slug(slug)
 
         assign_missing_episode_slugs(podcast)
+        update_related_podcasts.delay(podcast)
 
 
     def _update_categories(self, podcast, prev_timestamp):

@@ -37,16 +37,6 @@ Doc-Types: PodcastList
 * `podcastlists/random <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/podcastlists/views/random>`_
 
 
-Suggestions
-^^^^^^^^^^^
-
-Doc-Types: Suggestions
-
-**Views**
-
-* `suggestions/by_user <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/suggestions/views/by_user>`_
-
-
 Users
 ^^^^^
 
