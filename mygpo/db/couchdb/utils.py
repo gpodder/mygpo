@@ -16,9 +16,6 @@
 #
 
 import os.path
-import operator
-import string
-import functools
 
 from couchdbkit.loaders import FileSystemDocsLoader
 from couchdbkit.ext.django import loading
@@ -27,11 +24,6 @@ from django.conf import settings
 
 import logging
 logger = logging.getLogger(__name__)
-
-
-def is_couchdb_id(id_str):
-    f = functools.partial(operator.contains, string.hexdigits)
-    return len(id_str) == 32 and all(map(f, id_str))
 
 
 def sync_design_docs():
