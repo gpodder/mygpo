@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from importlib import import_module
 
 from celery.decorators import periodic_task
 
@@ -43,3 +44,16 @@ def remove_unactivated_users():
     logger.warn('Removing %d unactivated users', users.count())
 
     users.delete()
+
+
+@periodic_task(run_every=timedelta(hours=1))
+def clearsessions():
+    """ Clear expired sessions
+
+    This runs code that should normally be run by ``manage.py clearsessions``.
+    If Django's internals change, see
+    django/contrib/sessions/management/commands/clearsessions.py for the
+    current implementation. """
+
+    engine = import_module(settings.SESSION_ENGINE)
+    engine.SessionStore.clear_expired()
