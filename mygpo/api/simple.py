@@ -35,7 +35,7 @@ from mygpo.api.backend import get_device
 from mygpo.podcasts.models import Podcast
 from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
-from mygpo.directory.models import ExamplePodcasts
+from mygpo.directory.models import ExamplePodcast
 from mygpo.api.advanced.directory import podcast_data
 from mygpo.subscriptions import get_subscribed_podcasts, subscribe, unsubscribe
 from mygpo.directory.search import search_podcasts
@@ -324,17 +324,9 @@ def example_podcasts(request, format):
     if scale not in range(1, 257):
         return HttpResponseBadRequest('scale_logo has to be a number from 1 to 256')
 
-
     if not podcasts:
-
-        try:
-            examples = ExamplePodcasts.get('example_podcasts')
-            ids = examples.podcast_ids
-            podcasts = Podcasts.objects.filter(id__in=ids)
-            cache.set('example-podcasts', podcasts)
-
-        except ResourceNotFound:
-            podcasts = []
+        podcasts = ExamplePodcast.objects.get_podcasts()
+        cache.set('example-podcasts', podcasts)
 
     title = 'gPodder Podcast Directory'
     domain = RequestSite(request).domain

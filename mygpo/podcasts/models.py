@@ -13,7 +13,7 @@ from uuidfield import UUIDField
 
 from mygpo import utils
 from mygpo.core.models import (TwitterModel, UUIDModel, GenericManager,
-    UpdateInfoModel)
+    UpdateInfoModel, OrderedModel)
 
 import logging
 logger = logging.getLogger(__name__)
@@ -315,19 +315,6 @@ class TagsMixin(models.Model):
 
     class Meta:
         abstract = True
-
-
-class OrderedModel(models.Model):
-    """ A model that can be ordered
-
-    The implementing Model must make sure that 'order' is sufficiently unique
-    """
-
-    order = models.PositiveSmallIntegerField()
-
-    class Meta:
-        abstract = True
-        ordering = ['order']
 
 
 class PodcastGroup(UUIDModel, TitleModel, SlugsMixin):

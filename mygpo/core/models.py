@@ -104,3 +104,16 @@ class DeleteableModel(models.Model):
 
     class Meta:
         abstract = True
+
+
+class OrderedModel(models.Model):
+    """ A model that can be ordered
+
+    The implementing Model must make sure that 'order' is sufficiently unique
+    """
+
+    order = models.PositiveSmallIntegerField()
+
+    class Meta:
+        abstract = True
+        ordering = ['order']
