@@ -36,13 +36,9 @@ from mygpo.web.utils import get_podcast_link_target, get_page_list, \
     check_restrictions
 from mygpo.db.couchdb.episode_state import get_podcasts_episode_states, \
          episode_listener_counts
-from mygpo.db.couchdb.directory import tags_for_user, tags_for_podcast
 
 import logging
 logger = logging.getLogger(__name__)
-
-
-MAX_TAGS_ON_PAGE=50
 
 
 @vary_on_cookie
@@ -72,7 +68,8 @@ def show(request, podcast):
     else:
         rel_podcasts = []
 
-    tags, has_tagged = get_tags(podcast, user)
+    tags = get_tags(podcast, user)
+    has_tagged = any(t['is_own'] for t in tags)
 
     if user.is_authenticated():
         subscribed_devices = Client.objects.filter(
@@ -119,28 +116,22 @@ def show(request, podcast):
     })
 
 
-def get_tags(podcast, user):
+def get_tags(podcast, user, max_tags=50):
+    """ Returns all tags that user sees for the given podcast
+
+    The tag list is a list of dicts in the form of {'tag': 'tech', 'is_own':
+    True}. "is_own" indicates if the tag was created by the given user. """
     tags = {}
-    for t in tags_for_podcast(podcast):
-        tag_str = t.lower()
-        tags[tag_str] = False
 
-    if not user.is_anonymous():
-        users_tags = tags_for_user(user, podcast.get_id())
-        for t in users_tags.get(podcast.get_id(), []):
-            tag_str = t.lower()
-            tags[tag_str] = True
+    for tag in podcast.tags.all():
+        t = tag.tag.lower()
+        if not t in tags:
+            tags[t] = {'tag': t, 'is_own': False}
 
-    tag_list = [{'tag': key, 'is_own': value} for key, value in tags.iteritems()]
-    tag_list.sort(key=lambda x: x['tag'])
+        if tag.user == user:
+            tags[t]['is_own'] = True
 
-    if len(tag_list) > MAX_TAGS_ON_PAGE:
-        tag_list = filter(lambda x: x['is_own'], tag_list)
-        tag_list.append({'tag': '...', 'is_own': False})
-
-    has_own = any(t['is_own'] for t in tag_list)
-
-    return tag_list, has_own
+    return tags.values()
 
 
 def episode_list(podcast, user, offset=0, limit=None):

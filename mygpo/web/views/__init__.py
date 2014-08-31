@@ -40,7 +40,6 @@ from mygpo.utils import parse_range
 from mygpo.users.settings import FLATTR_AUTO, FLATTR_TOKEN
 from mygpo.publisher.models import PublishedPodcast
 from mygpo.db.couchdb.episode_state import favorite_episode_ids_for_user
-from mygpo.db.couchdb.directory import tags_for_user
 from mygpo.db.couchdb.podcastlist import podcastlists_for_user
 
 
@@ -98,7 +97,7 @@ def dashboard(request, episode_count=10):
     if not request.user.profile.get_token('userpage_token'):
         checklist.append('userpage')
 
-    if tags_for_user(request.user):
+    if Tag.objects.filter(user=request.user).exists():
         checklist.append('tags')
 
     # TODO add podcastlist_count_for_user
