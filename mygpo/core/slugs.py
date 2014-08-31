@@ -1,13 +1,8 @@
-from collections import defaultdict
-
 from itertools import count
-
-from couchdbkit.ext.django.schema import *
 
 from django.utils.text import slugify
 
 from mygpo.podcasts.models import Slug, Episode
-from mygpo.utils import partition
 
 
 # TODO: move to feed-downloader?
@@ -119,29 +114,3 @@ class EpisodeSlug(SlugGenerator):
             return slugify(obj.title)
 
         return None
-
-
-class SlugMixin(DocumentSchema):
-    slug         = StringProperty()
-    merged_slugs = StringListProperty()
-
-    def set_slug(self, slug):
-        """ Set the main slug of the object """
-
-        if self.slug:
-            self.merged_slugs.append(self.slug)
-
-        self.merged_slugs = list(set(self.merged_slugs) - set([slug]))
-
-        self.slug = slug
-
-
-    def remove_slug(self, slug):
-        """ Removes the slug from the object """
-
-        # remove main slug
-        if self.slug == slug:
-            self.slug = None
-
-        # remove from merged slugs
-        self.merged_slugs = list(set(self.merged_slugs) - set([slug]))
