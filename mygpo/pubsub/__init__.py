@@ -11,6 +11,7 @@ import logging
 from django.core.urlresolvers import reverse
 
 from mygpo.utils import random_token
+from mygpo.pubsub.models import HubSubscription, SubscriptionError
 
 logger = logging.getLogger(__name__)
 
@@ -18,17 +19,18 @@ logger = logging.getLogger(__name__)
 def subscribe(feedurl, huburl, base_url, mode='subscribe'):
     """ Subscribe to the feed at a Hub """
 
-    from mygpo.pubsub.models import Subscription, SubscriptionError
-    from mygpo.db.couchdb.pubsub import subscription_for_topic
-    from couchdbkit.ext.django import *
     logger.info('subscribing for {feed} at {hub}'.format(feed=feedurl,
-                                                             hub=huburl))
+                                                         hub=huburl))
     verify = 'sync'
 
-    subscription = subscription_for_topic(feedurl)
-    if subscription is None:
-        subscription = Subscription()
-        subscription.verify_token = random_token()
+    token_max_len = HubSubscription._meta.get_field('verify_token').max_length
+    subscription, created = HubSubscription.objects.get_or_create(
+        topic_url=feedurl,
+        defaults={
+            'verify_token': random_token(token_max_len),
+            'mode': '',
+        }
+    )
 
     if subscription.mode == mode:
         if subscription.verified:
@@ -40,7 +42,7 @@ def subscribe(feedurl, huburl, base_url, mode='subscribe'):
                     'old: %(oldmode)s, new: %(newmode)s. Overwriting.' %
                     dict(oldmode=subscription.mode, newmode=mode))
 
-    subscription.url = feedurl
+    subscription.topic_url = feedurl
     subscription.mode = mode
     subscription.save()
 
@@ -59,13 +61,15 @@ def subscribe(feedurl, huburl, base_url, mode='subscribe'):
 
     try:
         resp = urllib2.urlopen(huburl, data)
+
     except urllib2.HTTPError, e:
         if e.code != 204:  # we actually expect a 204 return code
-            msg = 'Could not send subscription to Hub: HTTP Error %d: %s' % (e.code, e.reason)
+            msg = 'Could not send subscription to Hub: HTTP Error %d: %s' % \
+                (e.code, e.reason)
             logger.warn(msg)
             raise SubscriptionError(msg)
+
     except Exception, e:
-        raise
         msg = 'Could not send subscription to Hub: %s' % repr(e)
         logger.warn(msg)
         raise SubscriptionError(msg)

@@ -31,7 +31,7 @@ from django.contrib.sites.models import RequestSite
 from mygpo.data.tasks import update_podcasts
 from mygpo.decorators import requires_token, allowed_methods
 from mygpo.db.couchdb.episode_state import episode_listener_counts
-from mygpo.db.couchdb.pubsub import subscription_for_topic
+from mygpo.pubsub.models import HubSubscription
 
 
 @vary_on_cookie
@@ -88,7 +88,10 @@ def podcast(request, podcast):
 
     heatmap = EpisodeHeatmap(podcast.get_id())
 
-    pubsubscription = subscription_for_topic(podcast.url)
+    try:
+        pubsubscription = HubSubscription.objects.get(topic_url=podcast.url)
+    except HubSubscription.DoesNotExist:
+        pubsubscription = None
 
     site = RequestSite(request)
     feedurl_quoted = urllib.quote(podcast.url)

@@ -10,12 +10,8 @@ from django.http import HttpResponseNotFound, HttpResponse
 from django.views.generic.base import View
 from django.views.decorators.csrf import csrf_exempt
 
-from couchdbkit.ext.django import *
-
-from mygpo.pubsub.models import SubscriptionError, Subscription
+from mygpo.pubsub.models import HubSubscription
 from mygpo.pubsub.signals import subscription_updated
-from mygpo.db.couchdb.pubsub import subscription_for_topic, \
-    set_subscription_verified
 
 logger = logging.getLogger(__name__)
 
@@ -44,9 +40,10 @@ class SubscribeView(View):
                 dict(mode=mode, topic=feed_url, challenge=challenge,
                      lease_seconds=lease_seconds, verify_token=verify_token))
 
-        subscription = subscription_for_topic(feed_url)
+        try:
+            subscription = HubSubscription.objects.get(topic_url=feed_url)
 
-        if subscription is None:
+        except HubSubscription.DoesNotExist:
             logger.warn('subscription does not exist')
             return HttpResponseNotFound()
 
@@ -59,7 +56,8 @@ class SubscribeView(View):
                 subscription.verify_token)
             return HttpResponseNotFound()
 
-        set_subscription_verified(subscription)
+        subscription.verified = True
+        subscription.save()
 
         logger.info('subscription confirmed')
         return HttpResponse(challenge)
@@ -76,9 +74,10 @@ class SubscribeView(View):
 
         logger.info('received notification for %s' % feed_url)
 
-        subscription = subscription_for_topic(feed_url)
+        try:
+            subscription = HubSubscription.objects.get(topic_url=feed_url)
 
-        if subscription is None:
+        except HubSubscription.DoesNotExist:
             logger.warn('no subscription for this URL')
             return HttpResponse(status=400)
 

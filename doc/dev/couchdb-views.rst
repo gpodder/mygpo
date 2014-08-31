@@ -201,18 +201,3 @@ Doc-Types: Category
 
 * `categories/by_tags <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/categories/views/by_tags>`_
 * `categories/by_update <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/categories/views/by_update>`_
-
-
-Pubsub
-------
-
-The following views and design documents relate to the "pubsub" database.
-
-Subscriptions
-^^^^^^^^^^^^^
-
-Doc-Types: Subscription
-
-**Views**
-
-* `subscriptions/by_topic <https://github.com/gpodder/mygpo/tree/master/couchdb/pubsub/_design/subscriptions/views/by_topic>`_
