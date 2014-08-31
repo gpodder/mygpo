@@ -12,7 +12,6 @@ from mygpo.chapters.models import Chapter
 from mygpo.subscriptions.models import Subscription, PodcastConfig
 from mygpo.history.models import EpisodeHistoryEntry
 from mygpo.podcasts.models import Episode, Podcast
-from mygpo.pubsub.models import Subscription as S, HubSubscription
 from mygpo.favorites.models import FavoriteEpisode
 
 import logging
@@ -130,36 +129,6 @@ def migrate_eaction(user, episode, state, ea):
                         timestamp=entry.timestamp))
 
 
-def migrate_pubsub(s):
-
-    try:
-        podcast = Podcast.objects.get(urls__url=s.url)
-    except Podcast.DoesNotExist:
-        logger.warn('Podcast with URL "{url}" does not exist; skipping'.format(
-            url=s.url))
-        return
-
-    # current values
-    values = {
-        'podcast': podcast,
-        'hub_url': podcast.hub or '',
-        'verify_token': s.verify_token,
-        'mode': s.mode,
-        'verified': s.verified,
-    }
-
-    subscription, created = HubSubscription.objects.get_or_create(
-        topic_url=s.url,
-        defaults=values,
-    )
-
-    # if the subscription was not created (with current values) we update it
-    if not created:
-        for attr, val in values.items():
-            setattr(subscription, attr, val)
-        subscription.save()
-
-
 def get_subscribed_devices(state):
     """ device Ids on which the user subscribed to the podcast """
     devices = {}
@@ -186,7 +155,6 @@ MIGRATIONS = {
     'User': (None, None),
     'Suggestions': (None, None),
     'EpisodeUserState': (EpisodeUserState, migrate_estate),
-    'Subscription': (S, migrate_pubsub),
 }
 
 def migrate_change(c):

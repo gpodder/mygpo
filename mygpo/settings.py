@@ -44,9 +44,6 @@ COUCHDB_DATABASES = {
     'mygpo.users':
         {'URL': 'http://127.0.0.1:5984/mygpo_users'},
 
-    'mygpo.pubsub':
-        {'URL': 'http://127.0.0.1:5984/mygpo_pubsub'},
-
     'mygpo.share':
         {'URL': 'http://127.0.0.1:5984/mygpo_podcastlists'},
 
@@ -67,7 +64,6 @@ COUCHDB_DATABASES = {
 # COUCHDB_DDOC_MAPPING is most probably not overwritten.
 COUCHDB_DDOC_MAPPING = {
     'categories': 'categories',
-    'pubsub':     'pubsub',
     'userdata':   'userdata',
     'users':      'users',
 }
