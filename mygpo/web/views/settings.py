@@ -258,7 +258,7 @@ def privacy(request):
     user = request.user
 
     podcasts = Podcast.objects.filter(subscription__user=user)\
-                              .distinct()
+                              .distinct('pk')
     private = PodcastConfig.objects.get_private_podcasts(user)
 
     subscriptions = []

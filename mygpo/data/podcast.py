@@ -56,7 +56,7 @@ def calc_similar_podcasts(podcast, num=20, user_sample=100):
     for user_id in user_ids:
         subscriptions = Podcast.objects\
             .filter(subscription__user__id__in=user_ids)\
-            .distinct()\
+            .distinct('pk')\
             .exclude(pk=podcast.pk)
         podcasts.update(Counter(subscriptions))
     logger.info('Found {num_podcasts}, returning top {num_results}'.format(
