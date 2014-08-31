@@ -8,7 +8,6 @@ from mygpo.suggestions.models import PodcastSuggestion
 from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
 
-logger.warn(logger.level)
 
 @celery.task(max_retries=5, default_retry_delay=60)
 def update_suggestions(user, max_suggestions=15):
