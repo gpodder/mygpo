@@ -6,32 +6,23 @@ import collections
 from datetime import datetime
 import dateutil.parser
 from itertools import imap
-import random
 import string
 
 from couchdbkit.ext.django.schema import *
 from uuidfield import UUIDField
 
-from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db import transaction, models
 from django.db.models import Q
 from django.contrib.auth.models import User as DjangoUser
-from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
-from django.core.cache import cache
-from django.contrib import messages
 
 from mygpo.core.models import (TwitterModel, UUIDModel, SettingsModel,
     GenericManager, DeleteableModel, )
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.utils import random_token
-from mygpo.core.proxy import DocumentABCMeta, proxy_object
-from mygpo.users.ratings import RatingMixin
-from mygpo.users.subscriptions import subscription_changes
-from mygpo.users.settings import FAV_FLAG, PUBLIC_SUB_PODCAST, SettingsMixin
-from mygpo.db.couchdb.user import user_history, device_history
+from mygpo.users.settings import FAV_FLAG, SettingsMixin
 
 import logging
 logger = logging.getLogger(__name__)

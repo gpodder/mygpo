@@ -7,7 +7,7 @@ from couchdbkit.ext.django.schema import *
 from django.core.urlresolvers import reverse
 
 from mygpo.core.proxy import DocumentABCMeta
-from mygpo.users.models import RatingMixin
+from mygpo.users.ratings import RatingMixin
 from mygpo.flattr import FlattrThing
 
 
