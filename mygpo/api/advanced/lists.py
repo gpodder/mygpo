@@ -34,14 +34,12 @@ from mygpo.utils import get_timestamp
 from mygpo.api.advanced.directory import podcast_data
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.share.models import PodcastList
+from mygpo.podcastlists.models import PodcastList
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.decorators import allowed_methods, repeat_on_conflict, cors_origin
 from mygpo.api.simple import parse_subscription, format_podcast_list, \
      check_format
-from mygpo.share.views import list_decorator
-from mygpo.db.couchdb.podcastlist import podcastlist_for_user_slug, \
-         podcastlists_for_user
-
+from mygpo.podcastlists.views import list_decorator
 
 
 @csrf_exempt
@@ -64,22 +62,25 @@ def create(request, username, format):
     if not slug:
         return HttpResponseBadRequest('Invalid title')
 
-    plist = podcastlist_for_user_slug(request.user.profile.uuid.hex, slug)
+    plist, created = PodcastList.objects.get_or_create(
+        user=request.user,
+        slug=slug,
+        defaults={
+            'title': title,
+            'slug': slug,
+            'created': datetime.utcnow(),
+            'modified': datetime.utcnow(),
+        }
+    )
 
-    if plist:
+    if not created:
         return HttpResponse('List already exists', status=409)
 
     urls = parse_subscription(request.body, format)
     podcasts = [Podcast.objects.get_or_create_for_url(url) for url in urls]
-    podcast_ids = [podcast.id.hex for podcast in podcasts]
 
-    plist = PodcastList()
-    plist.created_timestamp = get_timestamp(datetime.utcnow())
-    plist.title = title
-    plist.slug = slug
-    plist.user = request.user.profile.uuid.hex
-    plist.podcasts = podcast_ids
-    plist.save()
+    for podcast in podcasts:
+        plist.add_entry(podcast)
 
     response = HttpResponse(status=201)
     list_url = reverse('api-get-list', args=[request.user.username, slug, format])
@@ -110,7 +111,7 @@ def get_lists(request, username):
     if not user:
         raise Http404
 
-    lists = podcastlists_for_user(user.profile.uuid.hex)
+    lists = PodcastList.objects.filter(user=user)
 
     site = RequestSite(request)
 
@@ -148,14 +149,14 @@ def get_list(request, plist, owner, format):
     except (TypeError, ValueError):
         return HttpResponseBadRequest('scale_logo has to be a numeric value')
 
-    podcasts = Podcast.objects.filter(id__in=plist.podcasts)
-
     domain = RequestSite(request).domain
     p_data = lambda p: podcast_data(p, domain, scale)
     title = '{title} by {username}'.format(title=plist.title,
             username=owner.username)
 
-    return format_podcast_list(podcasts, format, title, json_map=p_data,
+    objs = [entry.content_object for entry in plist.entries.all()]
+
+    return format_podcast_list(objs, format, title, json_map=p_data,
             jsonp_padding=request.GET.get('jsonp', ''),
             xml_template='podcasts.xml', request=request)
 

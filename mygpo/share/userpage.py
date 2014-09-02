@@ -11,11 +11,11 @@ from mygpo.users.models import HistoryEntry
 from mygpo.users.settings import FLATTR_USERNAME
 from mygpo.subscriptions import get_subscribed_podcasts
 from mygpo.decorators import requires_token
+from mygpo.podcastlists.models import PodcastList
 from mygpo.users.subscriptions import PodcastPercentageListenedSorter
 from mygpo.db.couchdb.episode_state import favorite_episode_ids_for_user
 from mygpo.db.couchdb.user import get_latest_episode_ids, \
          get_num_played_episodes, get_seconds_played
-from mygpo.db.couchdb.podcastlist import podcastlists_for_user
 
 
 
@@ -51,7 +51,7 @@ class UserpageView(View):
 
 
     def get_podcast_lists(self, user):
-        return podcastlists_for_user(user.profile.uuid.hex)
+        return PodcastList.objects.filter(user=user)
 
 
     def get_subscriptions(self, user):

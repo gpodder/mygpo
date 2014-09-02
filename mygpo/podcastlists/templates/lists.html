@@ -26,7 +26,7 @@
    {% for list in lists %}
     <tr>
      <td><a href="{% url "list-show" user.username list.slug %}">{{ list.title }}</a></td>
-     <td>{% blocktrans with list.podcasts|length as num_podcasts %}{{ num_podcasts }} Podcasts{% endblocktrans %}</td>
+     <td>{% blocktrans with list.num_entries as num_podcasts %}{{ num_podcasts }} Podcasts{% endblocktrans %}</td>
      <td>
       <form action="{% url "list-delete" user.username list.slug %}" method="post">
        {% csrf_token %}

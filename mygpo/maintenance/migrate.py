@@ -10,9 +10,12 @@ from mygpo.podcasts.models import Tag
 from mygpo.users.models import Chapter as C, EpisodeUserState, Client
 from mygpo.chapters.models import Chapter
 from mygpo.subscriptions.models import Subscription, PodcastConfig
+from mygpo.share.models import PodcastList as PL
+from mygpo.podcastlists.models import PodcastList, PodcastListEntry
 from mygpo.history.models import EpisodeHistoryEntry
-from mygpo.podcasts.models import Episode, Podcast
+from mygpo.podcasts.models import Episode, Podcast, PodcastGroup
 from mygpo.favorites.models import FavoriteEpisode
+from mygpo.votes.models import Vote
 
 import logging
 logger = logging.getLogger(__name__)
@@ -129,6 +132,76 @@ def migrate_eaction(user, episode, state, ea):
                         timestamp=entry.timestamp))
 
 
+def migrate_plist(pl):
+
+    try:
+        user = User.objects.get(profile__uuid=pl.user)
+    except User.DoesNotExist:
+        logger.warn("User with ID '{id}' does not exist".format(
+            id=pl.user))
+        return
+
+    podcastlist, created = PodcastList.objects.get_or_create(
+        user=user,
+        slug=pl.slug,
+        defaults={
+            'title': pl.title,
+            'slug': pl.slug,
+            'created': datetime.utcfromtimestamp(pl.created_timestamp) \
+                if pl.created_timestamp else datetime.utcnow(),
+            'modified': datetime.utcfromtimestamp(pl.created_timestamp) \
+                if pl.created_timestamp else datetime.utcnow(),
+        }
+    )
+
+    next_order = podcastlist.max_order + 1
+
+    for podcast_id in pl.podcasts:
+
+        obj = None
+        try:
+            obj = Podcast.objects.all().get_by_any_id(podcast_id)
+        except Podcast.DoesNotExist:
+            pass
+
+        try:
+            obj = PodcastGroup.objects.get(id=podcast_id)
+        except PodcastGroup.DoesNotExist:
+            pass
+
+        if obj is None:
+            logger.warn("Podcast (group) with ID '{id}' does not exist".format(
+                id=podcast_id))
+            continue
+
+        entry, created = PodcastListEntry.objects.get_or_create(
+            podcastlist=podcastlist,
+            content_type=ContentType.objects.get_for_model(obj),
+            object_id=obj.id,
+            defaults={
+                'order': next_order,
+            },
+        )
+        next_order += 1
+
+    for rating in pl.ratings:
+
+        try:
+            vuser = User.objects.get(profile__uuid=rating.user)
+        except User.DoesNotExist:
+            logger.warn("User with ID '{id}' does not exist".format(
+                id=pl.user))
+            continue
+
+        vote, created = Vote.objects.get_or_create(
+            user=vuser,
+            content_type=ContentType.objects.get_for_model(podcastlist),
+            object_id=podcastlist.pk,
+            created=rating.timestamp,
+            modified=rating.timestamp,
+        )
+
+
 def get_subscribed_devices(state):
     """ device Ids on which the user subscribed to the podcast """
     devices = {}
@@ -155,6 +228,7 @@ MIGRATIONS = {
     'User': (None, None),
     'Suggestions': (None, None),
     'EpisodeUserState': (EpisodeUserState, migrate_estate),
+    'PodcastList': (PL, migrate_plist),
 }
 
 def migrate_change(c):

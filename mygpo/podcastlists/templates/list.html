@@ -49,18 +49,18 @@
    <th>{% trans "Subscribers" %}</th>
   </tr>
 
- {% for podcast in podcastlist.podcasts %}
+ {% for entry in podcastlist.entries.all %}
 
   <tr>
-   <td class="logo">{{ podcast|podcast_logo }}</td>
+   <td class="logo">{{ entry.content_object|podcast_logo }}</td>
    <td>
-    {% podcast_group_link podcast %}
+    {% podcast_group_link entry.content_object %}
    </td>
-   <td>{% vertical_bar podcast.subscriber_count max_subscribers %}</td>
+   <td>{% vertical_bar entry.content_object.subscriber_count max_subscribers %}</td>
 
    {% if is_own %}
     <td>
-     <form action="{% url "list-remove-podcast" owner.username podcastlist.slug podcast.get_id %}" method="post" target="_parent">
+     <form action="{% url "list-remove-podcast" owner.username podcastlist.slug entry.order %}" method="post" target="_parent">
       {% csrf_token %}
       <button class="btn btn-danger btn-sm" type="submit" >
        <i class="icon-remove"></i>

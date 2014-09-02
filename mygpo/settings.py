@@ -140,6 +140,8 @@ INSTALLED_APPS = (
     'mygpo.share',
     'mygpo.administration',
     'mygpo.pubsub',
+    'mygpo.podcastlists',
+    'mygpo.votes',
     'mygpo.db.couchdb',
 )
 

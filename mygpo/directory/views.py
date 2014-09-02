@@ -6,6 +6,7 @@ from collections import Counter
 
 from django.http import HttpResponseNotFound, Http404, HttpResponseRedirect
 from django.core.urlresolvers import reverse
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render
 from django.db.models import Count
 from django.contrib.sites.models import RequestSite
@@ -29,11 +30,10 @@ from mygpo.web.utils import process_lang_params, get_language_names, \
          get_page_list, get_podcast_link_target, sanitize_language_codes
 from mygpo.directory.tags import Topics
 from mygpo.users.settings import FLATTR_TOKEN
+from mygpo.podcastlists.models import PodcastList
 from mygpo.data.feeddownloader import PodcastUpdater, NoEpisodesException
 from mygpo.data.tasks import update_podcasts
 from mygpo.db.couchdb.directory import category_for_tag
-from mygpo.db.couchdb.podcastlist import random_podcastlists, \
-         podcastlist_count, podcastlists_by_rating
 
 
 class ToplistView(TemplateView):
@@ -136,20 +136,7 @@ class Directory(View):
 
 
     def get_random_list(self, podcasts_per_list=5):
-        User = get_user_model()
-        random_list = next(random_podcastlists(), None)
-        list_owner = None
-        if random_list:
-            podcast_ids = random_list.podcasts[:podcasts_per_list]
-            random_list = proxy_object(random_list)
-            random_list.more_podcasts = max(0, len(random_list.podcasts) - podcasts_per_list)
-            random_list.podcasts = Podcast.objects.filter(id__in=podcast_ids)
-
-            try:
-                random_list.user = User.objects.get(profile__uuid=random_list.user)
-            except User.DoesNotExist:
-                return
-
+        random_list = PodcastList.objects.order_by('?').first()
         yield random_list
 
 
@@ -226,30 +213,21 @@ def search(request, template='search.html', args={}):
 @vary_on_cookie
 def podcast_lists(request, page_size=20):
 
-    # Make sure page request is an int. If not, deliver first page.
+    lists = PodcastList.objects.all()\
+                               .annotate(num_votes=Count('votes'))\
+                               .order_by('-num_votes')
+
+    paginator = Paginator(lists, page_size)
+
+    page = request.GET.get('page')
     try:
-        page = int(request.GET.get('page', '1'))
-    except ValueError:
-        page = 1
+        lists = paginator.page(page)
+    except PageNotAnInteger:
+        lists = paginator.page(1)
+    except EmptyPage:
+        lists = paginator.page(paginator.num_pages)
 
-    lists = podcastlists_by_rating(skip=(page-1) * page_size, limit=page_size)
-
-
-    def _prepare_list(l):
-        User = get_user_model()
-        try:
-            user = User.objects.get(profile__uuid=l.user)
-        except User.DoesNotExist:
-            return None
-
-        l = proxy_object(l)
-        l.username = user.username if user else ''
-        return l
-
-    lists = filter(None, map(_prepare_list, lists))
-
-    num_pages = int(ceil(podcastlist_count() / float(page_size)))
-
+    num_pages = int(ceil(PodcastList.objects.count() / float(page_size)))
     page_list = get_page_list(1, num_pages, page, 15)
 
     return render(request, 'podcast_lists.html', {
