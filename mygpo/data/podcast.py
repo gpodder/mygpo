@@ -81,4 +81,4 @@ def subscribe_at_hub(podcast):
 
     logger.info('subscribing to {podcast} at {hub}.'.format(podcast=podcast,
                                                            hub=podcast.hub))
-    pubsub.subscribe(podcast.url, podcast.hub, base_url)
+    pubsub.subscribe(podcast, podcast.url, podcast.hub, base_url)

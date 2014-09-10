@@ -16,7 +16,7 @@ from mygpo.pubsub.models import HubSubscription, SubscriptionError
 logger = logging.getLogger(__name__)
 
 
-def subscribe(feedurl, huburl, base_url, mode='subscribe'):
+def subscribe(podcast, feedurl, huburl, base_url, mode='subscribe'):
     """ Subscribe to the feed at a Hub """
 
     logger.info('subscribing for {feed} at {hub}'.format(feed=feedurl,
@@ -29,6 +29,7 @@ def subscribe(feedurl, huburl, base_url, mode='subscribe'):
         defaults={
             'verify_token': random_token(token_max_len),
             'mode': '',
+            'podcast': podcast,
         }
     )
 
