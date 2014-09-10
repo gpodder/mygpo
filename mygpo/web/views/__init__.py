@@ -100,7 +100,7 @@ def dashboard(request, episode_count=10):
     if Tag.objects.filter(user=request.user).exists():
         checklist.append('tags')
 
-    if PodcastList.objects.filter(user=requset.user).exists():
+    if PodcastList.objects.filter(user=request.user).exists():
         checklist.append('lists')
 
     if PublishedPodcast.objects.filter(publisher=request.user).exists():
