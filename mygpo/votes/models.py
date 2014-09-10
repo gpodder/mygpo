@@ -9,7 +9,7 @@ from uuidfield import UUIDField
 from mygpo.core.models import UpdateInfoModel
 
 
-class Vote(models.Model):
+class Vote(UpdateInfoModel):
     """ A vote by a user for some object """
 
     # the user who voted
@@ -21,12 +21,6 @@ class Vote(models.Model):
     # this should suit UUID and integer primary keys
     object_id = UUIDField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
-
-    # overwrites UpdateInfoModel.created/modified during the migration; this
-    # can be removed after the migration, to use the shadowed field with
-    # auto_add_now
-    created = models.DateTimeField()
-    modified = models.DateTimeField()
 
     class Meta:
         unique_together = [

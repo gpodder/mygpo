@@ -124,8 +124,6 @@ def create_list(request):
         defaults={
             'id': uuid.uuid1(),
             'title': title,
-            'created': datetime.utcnow(),
-            'modified': datetime.utcnow()
         }
     )
 
@@ -174,10 +172,6 @@ def rate_list(request, plist, owner):
         user=request.user,
         content_type=ContentType.objects.get_for_model(plist),
         object_id=plist.id,
-        defaults={
-            'created': now,
-            'modified': now,
-        }
     )
     messages.success(request, _('Thanks for rating!'))
 

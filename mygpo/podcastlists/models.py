@@ -12,7 +12,7 @@ from mygpo.flattr import FlattrThing
 from mygpo.votes.models import VoteMixin
 
 
-class PodcastList(UUIDModel, VoteMixin):
+class PodcastList(UUIDModel, VoteMixin, UpdateInfoModel):
     """ A user-curated collection of podcasts """
 
     # the user that created (and owns) the list
@@ -24,12 +24,6 @@ class PodcastList(UUIDModel, VoteMixin):
 
     # the slug (unique for the user) that is derived from the title
     slug = models.SlugField(max_length=128)
-
-    # overwrites UpdateInfoModel.created/modified during the migration; this
-    # can be removed after the migration, to use the shadowed field with
-    # auto_add_now
-    created = models.DateTimeField()
-    modified = models.DateTimeField()
 
     class Meta:
         unique_together = [
