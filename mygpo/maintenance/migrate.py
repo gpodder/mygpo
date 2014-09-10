@@ -5,6 +5,7 @@ from datetime import datetime
 
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User
+from django.db import reset_queries
 
 from mygpo.podcasts.models import Tag
 from mygpo.users.models import Chapter as C, EpisodeUserState, Client
@@ -162,6 +163,7 @@ def migrate_change(c):
 
     obj = cls.wrap(doc)
     migrate(obj)
+    reset_queries()
 
 
 def migrate(since=0, db=db):
