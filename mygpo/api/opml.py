@@ -99,10 +99,16 @@ class Exporter(object):
 
         def create_outline(channel):
             from mygpo.subscriptions.models import SubscribedPodcast
+            from mygpo.podcasts.models import PodcastGroup
             if isinstance(channel, SubscribedPodcast):
                 title = channel.podcast.title
                 description = channel.podcast.description
                 url = channel.ref_url
+            elif isinstance(channel, PodcastGroup):
+                title = channel.title
+                podcast = channel.podcast_set.first()
+                description = podcast.description
+                url = podcast.url
             else:
                 title = channel.title
                 description = channel.description
