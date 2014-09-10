@@ -28,7 +28,7 @@
    <tr>
     <td><a href="{% url "list-show" l.user.username l.slug %}">{{ l.title }}</a></td>
     <td><a href="{% url "user" l.user.username %}">{{ l.user.username }}</a></td>
-    <td class="numeric">{{ l.podcasts|length }}</td>
+    <td class="numeric">{{ l.entries.count }}</td>
     <td>
      <a class="btn btn-default btn-sm" href="{% url "list-opml" l.user.username l.slug %}">
       <i class="icon-download"></i>
