@@ -606,6 +606,9 @@ class Episode(UUIDModel, TitleModel, DescriptionModel, LinkModel,
             ('podcast', 'outdated', 'released'),
             ('podcast', 'released'),
             ('released', 'podcast'),
+
+            # index for typical episode toplist queries
+            ('language', 'listeners'),
         ]
 
     @property
