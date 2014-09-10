@@ -33,7 +33,6 @@ from mygpo.podcasts.models import Podcast
 from mygpo.utils import get_timestamp
 from mygpo.api.advanced.directory import podcast_data
 from mygpo.api.httpresponse import JsonResponse
-from mygpo.share.models import PodcastList
 from mygpo.podcastlists.models import PodcastList
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.decorators import allowed_methods, repeat_on_conflict, cors_origin

@@ -44,12 +44,6 @@ COUCHDB_DATABASES = {
     'mygpo.users':
         {'URL': 'http://127.0.0.1:5984/mygpo_users'},
 
-    'mygpo.share':
-        {'URL': 'http://127.0.0.1:5984/mygpo_podcastlists'},
-
-    'mygpo.podcastlists':
-        {'URL': 'http://127.0.0.1:5984/mygpo_podcastlists'},
-
     'mygpo.categories':
         {'URL': 'http://127.0.0.1:5984/mygpo_categories'},
 

@@ -25,18 +25,6 @@ Doc-Types: User
 * `clients/by_ua_string <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/clients/views/by_ua_string>`_
 
 
-Podcast Lists
-^^^^^^^^^^^^^
-
-Doc-Types: PodcastList
-
-**Views**
-
-* `podcastlists/by_rating <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/podcastlists/views/by_rating>`_
-* `podcastlists/by_user_slug <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/podcastlists/views/by_user_slug>`_
-* `podcastlists/random <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/podcastlists/views/random>`_
-
-
 Users
 ^^^^^
 
