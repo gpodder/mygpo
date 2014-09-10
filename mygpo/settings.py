@@ -107,7 +107,7 @@ ROOT_URLCONF = 'mygpo.urls'
 TEMPLATE_DIRS = ()
 
 INSTALLED_APPS = (
-    'django.contrib.contenttypes',  # unused, but tests fail otherwise (?)
+    'django.contrib.contenttypes',
     'django.contrib.messages',
     'django.contrib.admin',
     'django.contrib.humanize',
