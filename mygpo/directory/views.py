@@ -224,8 +224,10 @@ def podcast_lists(request, page_size=20):
         lists = paginator.page(page)
     except PageNotAnInteger:
         lists = paginator.page(1)
+        page = 1
     except EmptyPage:
         lists = paginator.page(paginator.num_pages)
+        page = paginator.num_pages
 
     num_pages = int(ceil(PodcastList.objects.count() / float(page_size)))
     page_list = get_page_list(1, num_pages, page, 15)
