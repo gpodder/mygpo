@@ -30,7 +30,7 @@ class FavoritesPublic(View):
             request.user.profile.save()
 
         else:
-            request.user.profile.create_new_token('favorite_feeds_token', 8)
+            request.user.profile.create_new_token('favorite_feeds_token')
             request.user.profile.save()
 
         token = request.user.favorite_feeds_token
@@ -96,9 +96,10 @@ class FavoritesFeedCreateEntry(View):
 
         podcast = Podcast.objects.get_or_create_for_url(feed_url)
 
-        if not podcast.get_id() in user.published_objects:
-            user.published_objects.append(podcast.get_id())
-            user.save()
+        PublishedPodcast.objects.get_or_create(
+            podcast=podcast,
+            publisher=user,
+        )
 
         updater = PodcastUpdater()
         updater.update(feed_url)
