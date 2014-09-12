@@ -46,15 +46,25 @@
   <div class="btn-group">
 
    {% if subscriptions %}
-     <a class="btn btn-default" href="{% url "device-opml" device.uid %}">
+
+    <div class="btn-group">
+     <a href="{% url "device-opml" device.uid %}" type="button" class="btn btn-default">
       <i class="icon-download"></i>
       {% trans "Download OPML" %}
      </a>
-
-     <a class="btn btn-default" href="{% url "device-symbian-opml" device.uid %}">
-      <i class="icon-download"></i>
-      {% trans "OPML for Nokia Podcasting on Symbian " %}
-     </a>
+     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+      <span class="caret"></span>
+      <span class="sr-only">Toggle Dropdown</span>
+     </button>
+     <ul class="dropdown-menu" role="menu">
+      <li>
+       <a href="{% url "device-symbian-opml" device.uid %}">
+        <i class="icon-download"></i>
+        {% trans "OPML for Nokia Podcasting on Symbian " %}
+       </a>
+      </li>
+     </ul>
+    </div>
 
    {% endif %}
 
