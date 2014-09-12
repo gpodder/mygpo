@@ -3,6 +3,7 @@ import re
 
 from django import forms
 from django.core.validators import RegexValidator
+from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.http import HttpResponseRedirect
 from django.views.generic.edit import FormView
@@ -60,6 +61,10 @@ class RegistrationView(FormView):
 
         try:
             user = self.create_user(form)
+
+        except ValidationError as e:
+            messages.error(self.request, '; '.join(e.messages))
+            return HttpResponseRedirect(reverse('register'))
 
         except IntegrityError:
             messages.error(self.request,
