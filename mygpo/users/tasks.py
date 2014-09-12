@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from django.conf import settings
 
 from mygpo.celery import celery
+from mygpo.users.models import SyncGroup
 
 from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)

@@ -318,6 +318,7 @@ class SyncGroup(models.Model):
 
     def sync(self):
         """ Sync the group, ie bring all members up-to-date """
+        from mygpo.subscriptions import subscribe
 
         # get all subscribed podcasts
         podcasts = set(self.get_subscribed_podcasts())
@@ -329,7 +330,7 @@ class SyncGroup(models.Model):
                 subscribe(podcast, self.user, client)
 
     def get_subscribed_podcasts(self):
-        return Podcast.objects.filter(subscription__device__sync_group=self)
+        return Podcast.objects.filter(subscription__client__sync_group=self)
 
     def get_missing_podcasts(self, client, all_podcasts):
         """ the podcasts required to bring the device to the group's state """
@@ -411,12 +412,12 @@ class Client(UUIDModel, DeleteableModel):
             self.save()
 
         elif self.sync_group is not None:
-            self.sync_group = other.sync_group
-            self.save()
-
-        elif other.sync_group is not None:
             other.sync_group = self.sync_group
             other.save()
+
+        elif other.sync_group is not None:
+            self.sync_group = other.sync_group
+            self.save()
 
     def stop_sync(self):
         """ Stop synchronisation with other clients """
@@ -447,7 +448,7 @@ class Client(UUIDModel, DeleteableModel):
         user = UserProxy.objects.from_user(self.user)
         for group in user.get_grouped_devices():
 
-            if self in group.devices:
+            if self in group.devices and group.is_synced:
                 # the device's group can't be a sync-target
                 continue
 
