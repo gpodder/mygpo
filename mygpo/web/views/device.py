@@ -122,11 +122,12 @@ def create(request):
         device.name = device_form.cleaned_data['name']
         device.type = device_form.cleaned_data['type']
         device.uid  = device_form.cleaned_data['uid'].replace(' ', '-')
+        device.full_clean()
         device.save()
         messages.success(request, _('Device saved'))
 
     except ValidationError as e:
-        messages.error(request, _(unicode(e)))
+        messages.error(request, '; '.join(e.messages))
         return HttpResponseRedirect(reverse('devices'))
 
     except IntegrityError:
@@ -152,6 +153,7 @@ def update(request, device):
             device.name = device_form.cleaned_data['name']
             device.type = device_form.cleaned_data['type']
             device.uid  = device_form.cleaned_data['uid'].replace(' ', '-')
+            device.full_clean()
             device.save()
             messages.success(request, _('Device updated'))
             uid = device.uid  # accept the new UID after rest has succeeded

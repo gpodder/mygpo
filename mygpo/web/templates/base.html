@@ -80,7 +80,7 @@
 
                     {% if messages %}
                     {% for message in messages %}
-                    <div {% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %}>
+                    <div {% if message.tags == "error" %} class="alert alert-danger"{% elif message.tags %} class="alert alert-{{ message.tags }}"{% endif %}>
                         {{ message }}
                     </div>
                     {% endfor %}

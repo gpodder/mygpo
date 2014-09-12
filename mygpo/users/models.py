@@ -378,7 +378,7 @@ class Client(UUIDModel, DeleteableModel):
     # user-agent string from which the Client was last accessed (for writing)
     user_agent = models.CharField(max_length=300, null=True, blank=True)
 
-    sync_group = models.ForeignKey(SyncGroup, null=True,
+    sync_group = models.ForeignKey(SyncGroup, null=True, blank=True,
                                    on_delete=models.PROTECT)
 
     class Meta:
