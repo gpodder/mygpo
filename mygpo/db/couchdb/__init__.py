@@ -135,8 +135,8 @@ def get_single_result(db, view, **query_args):
         result = r.one()
 
     except MultipleResultsFound as ex:
-        logger.exception('Multiple results found in %s with params %s',
-                         view, query_args)
+        logger.info('Multiple results found in %s with params %s',
+                    view, query_args)
         # use the first result as fallback
         result = r.first()
 
