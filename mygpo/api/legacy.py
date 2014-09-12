@@ -47,11 +47,11 @@ def upload(request):
         protocol  = request.POST['protocol']
         opml      = request.FILES['opml'].read()
     except MultiValueDictKeyError:
-        return HttpResponse("@PROTOERROR", mimetype='text/plain')
+        return HttpResponse("@PROTOERROR", content_type='text/plain')
 
     user = auth(emailaddr, password)
     if (not user):
-        return HttpResponse('@AUTHFAIL', mimetype='text/plain')
+        return HttpResponse('@AUTHFAIL', content_type='text/plain')
 
     dev = get_device(user, LEGACY_DEVICE_UID,
             request.META.get('HTTP_USER_AGENT', ''))
@@ -79,7 +79,7 @@ def upload(request):
         p = Podcast.objects.get_or_create_for_url(r)
         unsubscribe(p, user, dev)
 
-    return HttpResponse('@SUCCESS', mimetype='text/plain')
+    return HttpResponse('@SUCCESS', content_type='text/plain')
 
 @never_cache
 @csrf_exempt
@@ -89,7 +89,7 @@ def getlist(request):
 
     user = auth(emailaddr, password)
     if user is None:
-        return HttpResponse('@AUTHFAIL', mimetype='text/plain')
+        return HttpResponse('@AUTHFAIL', content_type='text/plain')
 
     dev = get_device(user, LEGACY_DEVICE_UID,
             request.META.get('HTTP_USER_AGENT', ''),
@@ -101,7 +101,7 @@ def getlist(request):
 
     opml = exporter.generate(podcasts)
 
-    return HttpResponse(opml, mimetype='text/xml')
+    return HttpResponse(opml, content_type='text/xml')
 
 
 def auth(emailaddr, password):
