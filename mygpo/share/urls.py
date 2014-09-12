@@ -61,5 +61,5 @@ urlpatterns = patterns('mygpo.share.views',
 )
 
 urlpatterns += patterns('mygpo.share.userpage',
- url(r'^user/(?P<username>[\w.-]+)/?$', UserpageView.as_view(), name='user'),
+ url(r'^user/(?P<username>[\w.+-]+)/?$', UserpageView.as_view(), name='user'),
  )

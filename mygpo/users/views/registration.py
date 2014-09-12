@@ -21,7 +21,7 @@ from mygpo.users.models import UserProxy
 
 USERNAME_MAXLEN = get_user_model()._meta.get_field('username').max_length
 
-USERNAME_REGEX = re.compile(r'\w[\w.-]{2,}')
+USERNAME_REGEX = re.compile(r'^\w[\w.+-]*$')
 
 
 class UsernameValidator(RegexValidator):
@@ -77,6 +77,7 @@ class RegistrationView(FormView):
         user.email = form.cleaned_data['email']
         user.set_password(form.cleaned_data['password1'])
         user.is_active = False
+        user.full_clean()
         user.save()
 
         user.profile.uuid == uuid.uuid1()

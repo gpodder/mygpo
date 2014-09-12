@@ -9,7 +9,7 @@ urlpatterns = [
      'mygpo.subscriptions.views.download_all',
      name='subscriptions-opml'),
 
- url(r'^user/(?P<username>[\w.-]+)/subscriptions/rss/$',
+ url(r'^user/(?P<username>[\w.+-]+)/subscriptions/rss/$',
      'mygpo.subscriptions.views.subscriptions_feed',
      name='shared-subscriptions-rss'),
 ]

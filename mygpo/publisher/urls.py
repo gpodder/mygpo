@@ -2,8 +2,8 @@ from django.conf.urls import *
 
 urlpatterns = patterns('mygpo.publisher.views',
  url(r'^$',                             'home',                        name='publisher'),
- url(r'^(?P<username>[\w.-]+)/update$', 'update_published_podcasts',   name='publisher-update'),
- url(r'^(?P<username>[\w.-]+)/update-token', 'new_update_token',       name='publisher-new-update-token'),
+ url(r'^(?P<username>[\w.+-]+)/update$', 'update_published_podcasts',   name='publisher-update'),
+ url(r'^(?P<username>[\w.+-]+)/update-token', 'new_update_token',       name='publisher-new-update-token'),
 
  url(r'^podcast/(?P<slug>[\w-]+)/$',
       'podcast_slug',            name='podcast-publisher-detail-slug'),
