@@ -62,6 +62,13 @@
     {% trans "History" %}
    </a>
 
+  {% if device.sync_group %}
+    <a href="{% url "trigger-sync" device.uid %}" class="btn btn-default">
+     <i class="icon-refresh"></i>
+     {% trans "Trigger Sync" %}
+    </a>
+  {% endif %}
+
   {% if not device.deleted %}
 
    <a class="btn btn-default" href="{% url "device-edit" device.uid %}">

@@ -303,6 +303,16 @@ def sync(request, device):
 
 @device_decorator
 @login_required
+def resync(request, device):
+    """ Manually triggers a re-sync of a client """
+    sync_user.delay(request.user)
+    messages.success(request,
+                     _('Your subscription will be updated in a moment.'))
+    return HttpResponseRedirect(reverse('device', args=[device.uid]))
+
+
+@device_decorator
+@login_required
 @allowed_methods(['GET'])
 def unsync(request, device):
 
