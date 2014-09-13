@@ -29,7 +29,7 @@ from mygpo.podcasts.models import Podcast
 from mygpo.maintenance.merge import PodcastMerger
 from mygpo.api.backend import get_device
 from mygpo.users.models import Client, SyncGroup, UserProxy
-from mygpo.subscriptions import subscribe, unsubscribe
+from mygpo.subscriptions.tasks import subscribe, unsubscribe
 
 
 class DeviceSyncTests(unittest.TestCase):
@@ -101,12 +101,6 @@ class UnsubscribeMergeTests(TestCase):
         # merge podcast2 into podcast1
         pm = PodcastMerger([self.podcast1, self.podcast2], Counter(), [])
         pm.merge()
-
-        # seems that setting delayed_commit = false in the CouchDB config, as
-        # well as a delay here fix the intermittent failures.
-        # TODO: further investiation needed
-        import time
-        time.sleep(2)
 
         # get podcast for URL of podcast2 and unsubscribe from it
         p = Podcast.objects.get(urls__url=self.P2_URL)

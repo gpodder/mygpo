@@ -28,7 +28,7 @@ from mygpo.api.opml import Importer, Exporter
 from mygpo.users.models import SubscriptionException
 from mygpo.api.backend import get_device
 from mygpo.utils import normalize_feed_url
-from mygpo.subscriptions import subscribe, unsubscribe
+from mygpo.subscriptions.tasks import subscribe, unsubscribe
 
 import logging
 logger = logging.getLogger(__name__)

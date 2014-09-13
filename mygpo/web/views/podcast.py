@@ -16,12 +16,12 @@ from django.contrib.contenttypes.models import ContentType
 from mygpo.podcasts.models import Podcast, PodcastGroup, Episode, Tag
 from mygpo.users.models import SubscriptionException
 from mygpo.subscriptions.models import Subscription
-from mygpo.subscriptions import (
+from mygpo.subscriptions import get_subscribe_targets
+from mygpo.subscriptions.tasks import (
     subscribe as subscribe_podcast,
     unsubscribe as unsubscribe_podcast,
     subscribe_all as subscribe_podcast_all,
     unsubscribe_all as unsubscribe_podcast_all,
-    get_subscribe_targets
 )
 from mygpo.history.models import HistoryEntry
 from mygpo.core.proxy import proxy_object
@@ -282,7 +282,7 @@ def subscribe(request, podcast):
         for uid in device_uids:
             try:
                 device = request.user.client_set.get(uid=uid)
-                subscribe_podcast(podcast, request.user, device)
+                subscribe_podcast.delay(podcast, request.user, device)
 
             except Client.DoesNotExist as e:
                 messages.error(request, str(e))
@@ -303,7 +303,7 @@ def subscribe(request, podcast):
 def subscribe_all(request, podcast):
     """ subscribe all of the user's devices to the podcast """
     user = request.user
-    subscribe_podcast_all(podcast, user)
+    subscribe_podcast_all.delay(podcast, user)
     return HttpResponseRedirect(get_podcast_link_target(podcast))
 
 
@@ -325,7 +325,7 @@ def unsubscribe(request, podcast, device_uid):
         return HttpResponseRedirect(return_to)
 
     try:
-        unsubscribe_podcast(podcast, user, device)
+        unsubscribe_podcast.delay(podcast, user, device)
     except SubscriptionException as e:
         logger.exception('Web: %(username)s: could not unsubscribe from podcast %(podcast_url)s on device %(device_id)s' %
             {'username': request.user.username, 'podcast_url': podcast.url, 'device_id': device.id})
@@ -339,7 +339,7 @@ def unsubscribe(request, podcast, device_uid):
 def unsubscribe_all(request, podcast):
     """ unsubscribe all of the user's devices from the podcast """
     user = request.user
-    unsubscribe_podcast_all(podcast, user)
+    unsubscribe_podcast_all.delay(podcast, user)
     return HttpResponseRedirect(get_podcast_link_target(podcast))
 
 

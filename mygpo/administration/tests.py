@@ -16,7 +16,7 @@ from django.contrib.auth import get_user_model
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.users.models import Client, EpisodeAction
 from mygpo.maintenance.merge import PodcastMerger
-from mygpo.subscriptions import subscribe, unsubscribe
+from mygpo.subscriptions.tasks import subscribe, unsubscribe
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
     add_episode_actions
 from mygpo.utils import get_timestamp
@@ -56,9 +56,7 @@ class SimpleTest(TestCase):
         device2 = Client.objects.create(user=user, uid='dev2', id=uuid.uuid1())
 
         subscribe(p1, user, device1)
-        time.sleep(1)
         unsubscribe(p1, user, device1)
-        time.sleep(1)
         subscribe(p1, user, device1)
         subscribe(p2, user, device2)
 

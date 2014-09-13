@@ -37,7 +37,8 @@ from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.directory.models import ExamplePodcast
 from mygpo.api.advanced.directory import podcast_data
-from mygpo.subscriptions import get_subscribed_podcasts, subscribe, unsubscribe
+from mygpo.subscriptions import get_subscribed_podcasts
+from mygpo.subscriptions.tasks import subscribe, unsubscribe
 from mygpo.directory.search import search_podcasts
 from mygpo.decorators import allowed_methods, cors_origin
 from mygpo.utils import parse_range, normalize_feed_url
