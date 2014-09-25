@@ -22,7 +22,11 @@
 
   {% for s in subscriptionlist %}
    <tr>
-    <td class="logo">{{ s.podcast|podcast_logo }}</td>
+    <td class="logo">
+     <a href="{% podcast_link_target s.podcast %}">
+      {{ s.podcast|podcast_logo }}
+     </a>
+    </td>
     <td>{% podcast_group_link s.podcast %}<br/><span class="latest_episode">
      {% if s.episodes %}
       {% blocktrans with s.episodes as episode_count %}{{ episode_count }} Episodes{% endblocktrans %}

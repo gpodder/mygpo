@@ -5,6 +5,7 @@ from datetime import datetime
 
 from django.conf import settings
 from django.db import models, transaction, IntegrityError
+from django.utils.translation import ugettext as _
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes import generic
@@ -526,8 +527,12 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
 
     @property
     def display_title(self):
-        # TODO
-        return self.title
+        """ a title for display purposes """
+        if self.title:
+            return self.title
+
+        return _('Unknown Podcast from {domain}'.format(
+            domain=utils.get_domain(self.url)))
 
 
 class EpisodeQuerySet(MergedUUIDQuerySet):

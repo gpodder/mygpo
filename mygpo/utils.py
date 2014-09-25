@@ -1061,3 +1061,21 @@ def to_maxlength(cls, field, val):
                     cls.__name__, field, orig_length, max_length)
 
     return val
+
+
+def get_domain(url):
+    """ Returns the domain name of a URL
+
+    >>> get_domain('http://example.com')
+    'example.com'
+
+    >>> get_domain('https://example.com:80/my-podcast/feed.rss')
+    'example.com'
+    """
+    netloc = urlparse.urlparse(url).netloc
+    try:
+        port_idx = netloc.index(':')
+        return netloc[:port_idx]
+
+    except ValueError:
+        return netloc
