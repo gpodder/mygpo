@@ -130,6 +130,7 @@ INSTALLED_APPS = (
     'mygpo.userfeeds',
     'mygpo.suggestions',
     'mygpo.directory',
+    'mygpo.categories',
     'mygpo.maintenance',
     'mygpo.share',
     'mygpo.administration',
