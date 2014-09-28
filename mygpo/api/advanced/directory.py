@@ -29,8 +29,8 @@ from mygpo.web.utils import get_episode_link_target, get_podcast_link_target
 from mygpo.web.logo import get_logo_url
 from mygpo.subscriptions.models import SubscribedPodcast
 from mygpo.decorators import cors_origin
+from mygpo.categories.models import Category
 from mygpo.api.httpresponse import JsonResponse
-from mygpo.db.couchdb.directory import category_for_tag
 
 
 @csrf_exempt
@@ -48,13 +48,17 @@ def top_tags(request, count):
 @cors_origin()
 def tag_podcasts(request, tag, count):
     count = parse_range(count, 1, 100, 100)
-    category = category_for_tag(tag)
-    if not category:
+    try:
+        category = Category.objects.get(tags__tag=tag)
+
+    except Category.DoesNotExist:
         return JsonResponse([])
 
     domain = RequestSite(request).domain
-    query = category.get_podcasts(0, count)
-    resp = map(lambda p: podcast_data(p, domain), query)
+    entries = category.entries.all()\
+                               .prefetch_related('podcast', 'podcast__slugs',
+                                                 'podcast__urls')[:count]
+    resp = [podcast_data(entry.podcast, domain) for entry in entries]
     return JsonResponse(resp)
 
 
@@ -150,6 +154,6 @@ def episode_data(episode, domain, podcast=None):
 
 def category_data(category):
     return dict(
-        tag   = category.label,
-        usage = category.get_weight()
+        tag   = category.title,
+        usage = category.num_entries,
     )

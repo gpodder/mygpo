@@ -1,20 +1,35 @@
 from django.db import models
 
+from mygpo.core.models import UpdateInfoModel
 from mygpo.podcasts.models import Podcast
 
 
-class Category(models.Model):
+class Category(UpdateInfoModel):
     """ A category of podcasts """
 
     title = models.CharField(max_length=1000, null=False, blank=False,
                              unique=True)
 
+    num_entries = models.IntegerField()
+
     class Meta:
         verbose_name = 'Category'
         verbose_name_plural = 'Categories'
 
+        index_together = [
+            ('modified', 'num_entries'),
+        ]
 
-class CategoryEntry(models.Model):
+    def save(self, *args, **kwargs):
+        self.num_entries = self.entries.count()
+        super(Category, self).save(*args, **kwargs)
+
+    @property
+    def podcasts(self):
+        return self.entries.prefetch_related('podcast', 'podcast__slugs')
+
+
+class CategoryEntry(UpdateInfoModel,):
     """ A podcast in a category """
 
     category = models.ForeignKey(Category, related_name='entries',
@@ -23,14 +38,13 @@ class CategoryEntry(models.Model):
     podcast = models.ForeignKey(Podcast,
                                 on_delete=models.CASCADE)
 
-    # this could be used from UpdateInfoModel, except for the index on modified
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True, db_index=True)
-
-
     class Meta:
         unique_together = [
             ('category', 'podcast'),
+        ]
+
+        index_together = [
+            ('category', 'modified'),
         ]
 
 

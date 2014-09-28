@@ -18,16 +18,12 @@ class CategoryAdmin(admin.ModelAdmin):
 
     model = Category
 
-    list_display = ('title', 'num_podcasts', 'tag_list')
+    list_display = ('title', 'num_entries', 'tag_list')
 
     inlines = [
         CategoryEntryInline,
         CategoryTagInline,
     ]
-
-    def num_podcasts(self, category):
-        """ number of entries in a category """
-        return category.entries.count()
 
     def tag_list(self, category):
         return ', '.join(t.tag for t in category.tags.all()[:10])

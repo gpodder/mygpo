@@ -5,6 +5,7 @@ from datetime import datetime
 
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User
+from django.utils.text import slugify
 from django.db import reset_queries
 
 from mygpo.podcasts.models import Tag
@@ -143,7 +144,7 @@ def migrate_category(cat):
 
     for spelling in cat.spellings + [cat.label]:
         s, c = CategoryTag.objects.get_or_create(
-            tag=to_maxlength(CategoryTag, 'tag', spelling.strip()),
+            tag=slugify(to_maxlength(CategoryTag, 'tag', spelling.strip())),
             defaults={
                 'category': category,
             }
@@ -163,6 +164,8 @@ def migrate_category(cat):
 
         entry, c = CategoryEntry.objects.get_or_create(category=category,
                                                        podcast=podcast)
+
+    category.save()
 
 
 from couchdbkit import Database

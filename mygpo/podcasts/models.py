@@ -531,6 +531,11 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
         if self.title:
             return self.title
 
+        if not self.url:
+            logger.warn('Podcast with ID {podcast_id} does not have a URL'
+                .format(podcast_id=self.id.hex))
+            return _('Unknown Podcast')
+
         return _('Unknown Podcast from {domain}'.format(
             domain=utils.get_domain(self.url)))
 
