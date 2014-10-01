@@ -15,7 +15,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404
 
 from mygpo.podcasts.models import PodcastGroup, Podcast, Episode
-from mygpo.core.proxy import proxy_object
 from mygpo.publisher.auth import require_publisher, is_publisher
 from mygpo.publisher.forms import SearchPodcastForm
 from mygpo.publisher.utils import listener_data, episode_listener_data, \

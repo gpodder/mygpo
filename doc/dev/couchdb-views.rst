@@ -168,24 +168,3 @@ Doc-Types: PodcastUserState
 * `usertags/by_podcast <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/usertags/views/by_podcast>`_
 * `usertags/by_user <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/usertags/views/by_user>`_
 * `usertags/podcasts <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/usertags/views/podcasts>`_
-
-
-
-
-
-Categories
-----------
-
-This group of views is available on the categories database, called
-``mygpo_categories`` by default.
-
-
-Categories
-^^^^^^^^^^
-
-Doc-Types: Category
-
-**Views**
-
-* `categories/by_tags <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/categories/views/by_tags>`_
-* `categories/by_update <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/categories/views/by_update>`_

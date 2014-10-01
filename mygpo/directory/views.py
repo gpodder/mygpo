@@ -23,17 +23,16 @@ from django.contrib.auth import get_user_model
 from feedservice.parse.models import ParserException
 from feedservice.parse import FetchFeedException
 
-from mygpo.core.proxy import proxy_object
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.directory.search import search_podcasts
 from mygpo.web.utils import process_lang_params, get_language_names, \
          get_page_list, get_podcast_link_target, sanitize_language_codes
 from mygpo.directory.tags import Topics
 from mygpo.users.settings import FLATTR_TOKEN
+from mygpo.categories.models import Category
 from mygpo.podcastlists.models import PodcastList
 from mygpo.data.feeddownloader import PodcastUpdater, NoEpisodesException
 from mygpo.data.tasks import update_podcasts
-from mygpo.db.couchdb.directory import category_for_tag
 
 
 class ToplistView(TemplateView):
@@ -143,25 +142,31 @@ class Directory(View):
 @cache_control(private=True)
 @vary_on_cookie
 def category(request, category, page_size=20):
-    category = category_for_tag(category)
-    if not category:
+    try:
+        category = Category.objects.get(tags__tag=category)
+    except Category.DoesNotExist:
         return HttpResponseNotFound()
 
-    # Make sure page request is an int. If not, deliver first page.
+    podcasts = category.entries.all()\
+                               .prefetch_related('podcast', 'podcast__slugs')
+
+    paginator = Paginator(podcasts, page_size)
+
+    page = request.GET.get('page')
     try:
-        page = int(request.GET.get('page', '1'))
-    except ValueError:
-        page = 1
+        podcasts = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        podcasts = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        podcasts = paginator.page(paginator.num_pages)
 
-    entries = category.get_podcasts( (page-1) * page_size, page*page_size )
-    podcasts = filter(None, entries)
-    num_pages = int(ceil(len(category.podcasts) / page_size))
-
-    page_list = get_page_list(1, num_pages, page, 15)
+    page_list = get_page_list(1, paginator.num_pages, podcasts.number, 15)
 
     return render(request, 'category.html', {
         'entries': podcasts,
-        'category': category.label,
+        'category': category.title,
         'page_list': page_list,
         })
 

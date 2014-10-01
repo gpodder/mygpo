@@ -38,14 +38,8 @@ DATABASES = {
 }
 
 COUCHDB_DATABASES = {
-    'mygpo.directory':
-        {'URL': 'http://127.0.0.1:5984/mygpo_categories'},
-
     'mygpo.users':
         {'URL': 'http://127.0.0.1:5984/mygpo_users'},
-
-    'mygpo.categories':
-        {'URL': 'http://127.0.0.1:5984/mygpo_categories'},
 
     'mygpo.userdata':
         {'URL': 'http://127.0.0.1:5984/mygpo_userdata'},
@@ -57,7 +51,6 @@ COUCHDB_DATABASES = {
 # COUCHDB_DATABASES is likely to be overwritten in settings_prod.py while
 # COUCHDB_DDOC_MAPPING is most probably not overwritten.
 COUCHDB_DDOC_MAPPING = {
-    'categories': 'categories',
     'userdata':   'userdata',
     'users':      'users',
 }
@@ -130,6 +123,7 @@ INSTALLED_APPS = (
     'mygpo.userfeeds',
     'mygpo.suggestions',
     'mygpo.directory',
+    'mygpo.categories',
     'mygpo.maintenance',
     'mygpo.share',
     'mygpo.administration',
