@@ -244,18 +244,3 @@ Example Document ::
         start:   "2010-09-01",
         end:     "2010-09-15"
     }
-
-
-Category
---------
-
-Represents a category within the Podcast Directory.
-
-Example Document ::
-
-    {
-        label:     "Technology",
-        spellings: ["technology", "tech"],
-        weight:    1200,
-        updated:   "2010-09-28T08:38:03Z",
-    }

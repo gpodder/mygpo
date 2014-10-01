@@ -7,7 +7,6 @@ from itertools import chain
 from django.utils.text import slugify
 
 from mygpo.decorators import query_if_required, repeat_on_conflict
-from mygpo.core.proxy import proxy_object
 from mygpo.categories.models import Category, CategoryEntry
 
 

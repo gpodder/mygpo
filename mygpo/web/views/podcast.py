@@ -24,7 +24,6 @@ from mygpo.subscriptions import (
     get_subscribe_targets
 )
 from mygpo.history.models import HistoryEntry
-from mygpo.core.proxy import proxy_object
 from mygpo.core.tasks import flattr_thing
 from mygpo.utils import normalize_feed_url
 from mygpo.users.settings import PUBLIC_SUB_PODCAST, FLATTR_TOKEN

@@ -13,7 +13,6 @@ from django.http import Http404
 from babel import Locale, UnknownLocaleError
 
 from mygpo.podcasts.models import Podcast
-from mygpo.core.proxy import proxy_object
 
 
 def get_accepted_lang(request):
@@ -194,20 +193,6 @@ def get_episode_link_target(episode, podcast, view_name='episode',
         view_name = '%s-id' % view_name
 
     return strip_tags(reverse(view_name, args=args + add_args))
-
-
-def fetch_episode_data(episodes, podcasts={}):
-
-    if not podcasts:
-        podcasts = [episode.podcast for episode in episodes]
-        podcasts = {podcast.id: podcast for podcast in podcasts}
-
-    def set_podcast(episode):
-        episode = proxy_object(episode)
-        episode.podcast = podcasts.get(episode.podcast, None)
-        return episode
-
-    return map(set_podcast, episodes)
 
 
 # doesn't include the '@' because it's not stored as part of a twitter handle

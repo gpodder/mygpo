@@ -32,7 +32,6 @@ from django.utils.translation import ugettext as _
 
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.api.constants import EPISODE_ACTION_TYPES
-from mygpo.core.proxy import proxy_object
 from mygpo.core.tasks import flattr_thing
 from mygpo.users.models import Chapter, HistoryEntry, EpisodeAction
 from mygpo.utils import parse_time, get_timestamp

@@ -23,7 +23,6 @@ from django.contrib.auth import get_user_model
 from feedservice.parse.models import ParserException
 from feedservice.parse import FetchFeedException
 
-from mygpo.core.proxy import proxy_object
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.directory.search import search_podcasts
 from mygpo.web.utils import process_lang_params, get_language_names, \
