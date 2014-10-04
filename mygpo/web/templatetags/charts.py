@@ -18,6 +18,9 @@ def vertical_bar(value, max_value, display=None):
     else:
         value_str = str(value)
 
+    # handle value == None
+    value = value or 0
+
     try:
         ratio = min(float(value) / float(max_value), 1) * 100
     except ValueError:
