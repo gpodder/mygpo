@@ -39,20 +39,3 @@ def sync_design_docs():
             db = loading.get_db(label)
             loader = FileSystemDocsLoader(path)
             loader.sync(db, verbose=True)
-
-
-def view_cleanup():
-    """ do a view-cleanup for all databases """
-
-    logger.info('Doing view cleanup for all databases')
-    for label in settings.COUCHDB_DDOC_MAPPING.values():
-        logger.info('Doing view cleanup for database "%s"', label)
-        db = loading.get_db(label)
-        res = db.view_cleanup()
-
-        if res.get('ok', False):
-            log = logger.info
-        else:
-            log = logger.warn
-
-        log('Result of view cleanup for database "%s": %s', label, res)

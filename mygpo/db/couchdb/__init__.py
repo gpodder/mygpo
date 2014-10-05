@@ -1,5 +1,3 @@
-import itertools
-
 from operator import itemgetter
 from collections import namedtuple
 
@@ -7,27 +5,12 @@ from couchdbkit.ext.django import loading
 from couchdbkit import MultipleResultsFound
 from couchdbkit import *
 
-from mygpo.utils import split_quoted
-
 import logging
 logger = logging.getLogger(__name__)
 
 
-def get_categories_database():
-    """ returns the database that contains Category documents """
-    return loading.get_db('categories')
-
-
-def get_pubsub_database():
-    return loading.get_db('pubsub')
-
-
 def get_userdata_database():
     return loading.get_db('userdata')
-
-
-def get_podcastlists_database():
-    return loading.get_db('podcastlists')
 
 
 class BulkException(Exception):
@@ -95,28 +78,6 @@ def bulk_save_retry(obj_funs, db, reload_f=__default_reload):
     if errors:
         logger.warn('Errors at bulk-save: %s', errors)
         raise BulkException(errors)
-
-
-def lucene_query(fields, query_str):
-    """ returns a Lucene query string for the given fields and query string
-
-    >>> lucene_query(['title'], 'podcast show')
-    'title:"podcast" OR title:"show"'
-
-    >>> lucene_query(['a', 'b'], '"x y"')
-    'a:"x y" OR b:"x y"'
-    """
-
-    keywords = split_quoted(query_str)
-
-    # search all keywords in all fields
-    criteria = itertools.product(fields, keywords)
-
-    # build query str for each criterion
-    criteria_str = ['{field}:"{q}"'.format(field=f, q=q) for f, q in criteria]
-
-    # combine all with OR
-    return ' OR '.join(criteria_str)
 
 
 def get_single_result(db, view, **query_args):
