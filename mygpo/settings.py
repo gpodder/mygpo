@@ -189,7 +189,7 @@ CSRF_FAILURE_VIEW='mygpo.web.views.security.csrf_failure'
 
 # The following entries should be set in settings_prod.py
 DEFAULT_FROM_EMAIL = ''
-SECRET_KEY = ''
+SECRET_KEY = os.getenv('SECRET_KEY', '')
 GOOGLE_ANALYTICS_PROPERTY_ID=''
 DIRECTORY_EXCLUDED_TAGS = ()
 FLICKR_API_KEY = ''
