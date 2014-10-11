@@ -4,32 +4,6 @@ from mygpo.db import QueryParameterMissing
 
 
 @cache_result(timeout=60)
-def get_num_played_episodes(user, since=None, until={}):
-    """ Number of played episodes in interval """
-
-    if not user:
-        raise QueryParameterMissing('user')
-
-    since_str = since.strftime('%Y-%m-%d') if since else None
-    until_str = until.strftime('%Y-%m-%d') if until else {}
-
-    startkey = [user.profile.uuid.hex, since_str]
-    endkey   = [user.profile.uuid.hex, until_str]
-
-    udb = get_userdata_database()
-    val = get_single_result(udb, 'listeners/by_user',
-            startkey = startkey,
-            endkey   = endkey,
-            reduce   = True,
-            stale    = 'update_after',
-        )
-
-    return val['value'] if val else 0
-
-
-
-
-@cache_result(timeout=60)
 def get_latest_episode_ids(user, count=10):
     """ Returns the latest episodes that the user has accessed """
 
