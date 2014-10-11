@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+from collections import Counter
 
 from django.db import models
 from django.conf import settings
@@ -105,6 +106,9 @@ class EpisodeHistoryEntry(models.Model):
     class Meta:
         index_together = [
             ['user', 'client', 'episode', 'action', 'timestamp'],
+
+            # see query in played_episode_counts()
+            ['user', 'action', 'episode'],
         ]
 
         ordering = ['-timestamp']

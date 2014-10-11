@@ -4,30 +4,6 @@ from mygpo.db import QueryParameterMissing
 
 
 @cache_result(timeout=60)
-def get_num_listened_episodes(user):
-
-    if not user:
-        raise QueryParameterMissing('user')
-
-    udb = get_userdata_database()
-    r = udb.view('listeners/by_user_podcast',
-            startkey    = [user.profile.uuid.hex, None],
-            endkey      = [user.profile.uuid.hex, {}],
-            reduce      = True,
-            group_level = 2,
-            stale       = 'update_after',
-        )
-
-    return map(_wrap_num_listened, r)
-
-
-def _wrap_num_listened(obj):
-    count = obj['value']
-    podcast = obj['key'][1]
-    return (podcast, count)
-
-
-@cache_result(timeout=60)
 def get_num_played_episodes(user, since=None, until={}):
     """ Number of played episodes in interval """
 
