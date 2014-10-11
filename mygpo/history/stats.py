@@ -1,5 +1,6 @@
 from collections import Counter
 
+from mygpo.podcasts.models import Episode
 from mygpo.history.models import EpisodeHistoryEntry
 
 
@@ -32,3 +33,19 @@ def num_played_episodes(user, since=None, until=None):
         query = query.filter(timestamp__lte=until)
 
     return query.count()
+
+
+def last_played_episodes(user, limit=10):
+    """ The last episodes that the user played """
+    ep_ids = EpisodeHistoryEntry.objects\
+                                .filter(user=user,
+                                        action=EpisodeHistoryEntry.PLAY)\
+                                .order_by('episode__id', '-timestamp')\
+                                .distinct('episode__id')\
+                                .values_list('episode__id')
+    ep_ids = ep_ids[:limit]
+    episodes = Episode.objects.filter(id__in=ep_ids)\
+                              .select_related('podcast')\
+                              .prefetch_related('slugs',
+                                                'podcast__slugs')
+    return episodes
