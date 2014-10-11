@@ -30,11 +30,12 @@ from django.http import Http404, HttpResponse, HttpResponseNotFound
 from django.views.generic.base import View
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import last_modified
+from django.contrib.staticfiles.storage import staticfiles_storage
 
 import logging
 logger = logging.getLogger(__name__)
 
-LOGO_DIR = os.path.join(settings.BASE_DIR, '..', 'htdocs', 'media', 'logo')
+LOGO_DIR = os.path.join(settings.MEDIA_ROOT, 'logo')
 
 
 def _last_modified(request, size, prefix, filename):
@@ -155,9 +156,9 @@ def get_logo_url(podcast, size):
 
     if podcast.logo_url:
         filename = hashlib.sha1(podcast.logo_url).hexdigest()
+        prefix = CoverArt.get_prefix(filename)
+        return reverse('logo', args=[size, prefix, filename])
+
     else:
         filename = 'podcast-%d.png' % (hash(podcast.title) % 5, )
-
-    prefix = CoverArt.get_prefix(filename)
-
-    return reverse('logo', args=[size, prefix, filename])
+        return staticfiles_storage.url('logo/{0}'.format(filename))
