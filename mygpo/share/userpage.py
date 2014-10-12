@@ -13,9 +13,9 @@ from mygpo.subscriptions import get_subscribed_podcasts
 from mygpo.decorators import requires_token
 from mygpo.podcastlists.models import PodcastList
 from mygpo.users.subscriptions import PodcastPercentageListenedSorter
-from mygpo.history.stats import num_played_episodes, last_played_episodes
+from mygpo.history.stats import (num_played_episodes, last_played_episodes,
+    seconds_played)
 from mygpo.db.couchdb.episode_state import favorite_episode_ids_for_user
-from mygpo.db.couchdb.user import get_seconds_played
 
 
 
@@ -40,8 +40,8 @@ class UserpageView(View):
             'lists': self.get_podcast_lists(user),
             'subscriptions': self.get_subscriptions(user),
             'recent_episodes': last_played_episodes(user),
-            'seconds_played_total': self.get_seconds_played_total(user),
-            'seconds_played_month': self.get_seconds_played_since( user, month_ago),
+            'seconds_played_total': seconds_played(user),
+            'seconds_played_month': seconds_played(user, month_ago),
             'favorite_episodes': self.get_favorite_episodes(user),
             'num_played_episodes_total': num_played_episodes(user),
             'num_played_episodes_month': num_played_episodes(user, month_ago),
@@ -57,14 +57,6 @@ class UserpageView(View):
     def get_subscriptions(self, user):
         subscriptions = [sp.podcast for sp in get_subscribed_podcasts(user)]
         return PodcastPercentageListenedSorter(subscriptions, user)
-
-    def get_seconds_played_total(self, user):
-        return get_seconds_played(user)
-
-
-    def get_seconds_played_since(self, user, since):
-        return get_seconds_played(user, since=since)
-
 
     def get_favorite_episodes(self, user):
         favorite_ids = favorite_episode_ids_for_user(user)

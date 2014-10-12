@@ -49,3 +49,20 @@ def last_played_episodes(user, limit=10):
                               .prefetch_related('slugs',
                                                 'podcast__slugs')
     return episodes
+
+
+def seconds_played(user, since=None):
+    """ The seconds played by the user since the given timestamp """
+    query = EpisodeHistoryEntry.objects\
+                               .filter(user=user,
+                                       action=EpisodeHistoryEntry.PLAY,
+                                       stopped__isnull=False)\
+                               .extra(select={
+                                    'seconds': 'stopped-COALESCE(started, 0)'
+                                })
+
+    if since is not None:
+        query = query.filter(timestamp__gt=since)
+
+    seconds = query.values_list('seconds', flat=True)
+    return sum([0] + list(seconds))
