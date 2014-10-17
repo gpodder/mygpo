@@ -94,29 +94,6 @@ def all_episode_states(episode):
     return states
 
 
-
-def all_podcast_episode_states(podcast):
-
-    if not podcast:
-        raise QueryParameterMissing('podcast')
-
-    udb = get_userdata_database()
-    r = udb.view('episode_states/by_podcast_episode',
-            startkey     = [podcast.get_id(), None, None],
-            endkey       = [podcast.get_id(), {},   {}],
-            include_docs = True,
-            schema       = EpisodeUserState,
-        )
-
-    states = list(r)
-
-    for state in states:
-        state.set_db(udb)
-
-    return states
-
-
-
 @cache_result(timeout=60*60)
 def podcast_listener_count(episode):
     """ returns the number of users that have listened to this podcast """
