@@ -48,14 +48,14 @@ def timeline(data):
     s += 'data.addRows([\n'
 
     for r in data:
-        if 'episode' in r and r['episode']:
-            episode = '"%s"' % r['episode'].title if r['episode'].title else '"Unnamed Episode"'
+        if r.episode:
+            episode = '"%s"' % r.episode.display_title
             episode_ = '"released"'
         else:
             episode = 'undefined'
             episode_ = 'undefined'
 
-        s += '[new Date(%d, %d, %d), %d, %s, %s],\n' % (r['date'].year, r['date'].month-1, r['date'].day, r['listeners'], episode, episode_)
+        s += '[new Date(%d, %d, %d), %d, %s, %s],\n' % (r.date.year, r.date.month-1, r.date.day, r.playcount, episode, episode_)
 
     s += ']);\n'
     s += 'var chart = new google.visualization.AnnotatedTimeLine(document.getElementById("chart_div"));\n'

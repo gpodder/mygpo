@@ -111,6 +111,8 @@ class EpisodeHistoryEntry(models.Model):
             ['user', 'action', 'episode'],
 
             ['user', 'episode', 'timestamp'],
+
+            ['episode', 'timestamp'],
         ]
 
         ordering = ['-timestamp']

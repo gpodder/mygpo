@@ -1,5 +1,7 @@
 from collections import Counter
 
+from django.db.models import Count
+
 from mygpo.podcasts.models import Episode
 from mygpo.history.models import EpisodeHistoryEntry
 
@@ -66,3 +68,13 @@ def seconds_played(user, since=None):
 
     seconds = query.values_list('seconds', flat=True)
     return sum([0] + list(seconds))
+
+
+def playcounts_timerange(historyentries):
+    """ returns {date: play-count} containing all days w/ play events"""
+    listeners = historyentries.extra({'date': "date_trunc('day', timestamp)"})\
+                              .values('date')\
+                              .order_by('date')\
+                              .annotate(count=Count('pk'))
+
+    return {x['date'].date(): x['count'] for x in listeners}

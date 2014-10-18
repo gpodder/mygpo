@@ -95,32 +95,6 @@ def all_episode_states(episode):
 
 
 @cache_result(timeout=60*60)
-def podcast_listener_count_timespan(podcast, start=None, end={}):
-    """ returns (date, listener-count) tuples for all days w/ listeners """
-
-    if not podcast:
-        raise QueryParameterMissing('podcast')
-
-    if isinstance(start, datetime):
-        start = start.isoformat()
-
-    if isinstance(end, datetime):
-        end = end.isoformat()
-
-    udb = get_userdata_database()
-    r = udb.view('listeners/by_podcast',
-            startkey    = [podcast.get_id(), start],
-            endkey      = [podcast.get_id(), end],
-            group       = True,
-            group_level = 2,
-            reduce      = True,
-            stale       = 'update_after',
-        )
-
-    return map(_wrap_listener_count, r)
-
-
-@cache_result(timeout=60*60)
 def episode_listener_counts(episode):
     """ (Episode-Id, listener-count) tuples for episodes w/ listeners """
 
@@ -157,34 +131,6 @@ def get_podcasts_episode_states(podcast, user_id):
         )
 
     return map(lambda r: r['value'], res)
-
-
-@cache_result(timeout=60*60)
-def episode_listener_count_timespan(episode, start=None, end={}):
-    """ returns (date, listener-count) tuples for all days w/ listeners """
-
-    if not episode:
-        raise QueryParameterMissing('episode')
-
-
-    if isinstance(start, datetime):
-        start = start.isoformat()
-
-    if isinstance(end, datetime):
-        end = end.isoformat()
-
-    udb = get_userdata_database()
-    r = udb.view('listeners/by_episode',
-            startkey    = [episode._id, start],
-            endkey      = [episode._id, end],
-            group       = True,
-            group_level = 3,
-            reduce      = True,
-            stale       = 'update_after',
-        )
-
-    return map(_wrap_listener_count, r)
-
 
 
 def episode_state_for_ref_urls(user, podcast_url, episode_url):
@@ -322,12 +268,6 @@ def get_duplicate_episode_states(user, episode):
         state.set_db(udb)
 
     return states
-
-
-def _wrap_listener_count(res):
-    date = parser.parse(res['key'][1]).date()
-    listeners = res['value']
-    return (date, listeners)
 
 
 def _wrap_listeners(res):

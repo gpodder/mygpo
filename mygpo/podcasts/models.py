@@ -626,6 +626,11 @@ class Episode(UUIDModel, TitleModel, DescriptionModel, LinkModel,
         """ An episode's scope is its podcast """
         return self.podcast_id.hex
 
+    @property
+    def display_title(self):
+        # TODO: return basename of URL (see Podcast.display_title)
+        return self.title
+
     def get_short_title(self, common_title):
         """ Title when used within the podcast's context """
         if not self.title or not common_title:
