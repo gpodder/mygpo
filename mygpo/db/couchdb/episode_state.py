@@ -95,25 +95,6 @@ def all_episode_states(episode):
 
 
 @cache_result(timeout=60*60)
-def podcast_listener_count(episode):
-    """ returns the number of users that have listened to this podcast """
-
-    if not episode:
-        raise QueryParameterMissing('episode')
-
-    udb = get_userdata_database()
-    r = get_single_result(udb, 'listeners/by_podcast',
-            startkey    = [episode.get_id(), None],
-            endkey      = [episode.get_id(), {}],
-            group       = True,
-            group_level = 1,
-            reduce      = True,
-            stale       = 'update_after',
-        )
-    return r['value'] if r else 0
-
-
-@cache_result(timeout=60*60)
 def podcast_listener_count_timespan(podcast, start=None, end={}):
     """ returns (date, listener-count) tuples for all days w/ listeners """
 
@@ -176,27 +157,6 @@ def get_podcasts_episode_states(podcast, user_id):
         )
 
     return map(lambda r: r['value'], res)
-
-
-
-@cache_result(timeout=60*60)
-def episode_listener_count(episode, start=None, end={}):
-    """ returns the number of users that have listened to this episode """
-
-    if not episode:
-        raise QueryParameterMissing('episode')
-
-    udb = get_userdata_database()
-    r = get_single_result(udb, 'listeners/by_episode',
-            startkey    = [episode.id, start],
-            endkey      = [episode.id, end],
-            group       = True,
-            group_level = 2,
-            reduce      = True,
-            stale       = 'update_after',
-        )
-    return r['value'] if r else 0
-
 
 
 @cache_result(timeout=60*60)

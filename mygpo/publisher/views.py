@@ -29,7 +29,6 @@ from mygpo.web.utils import get_podcast_link_target, normalize_twitter, \
 from django.contrib.sites.models import RequestSite
 from mygpo.data.tasks import update_podcasts
 from mygpo.decorators import requires_token, allowed_methods
-from mygpo.db.couchdb.episode_state import episode_listener_counts
 from mygpo.pubsub.models import HubSubscription
 
 
