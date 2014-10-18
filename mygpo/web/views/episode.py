@@ -116,24 +116,24 @@ def history(request, episode):
 
     user = request.user
     podcast = episode.podcast
-    episode_state = episode_state_for_user_episode(user, episode)
 
-    # pre-populate data for fetch_data
-    podcasts_dict = {podcast.get_id(): podcast}
-    episodes_dict = {episode._id: episode}
+    history = EpisodeHistoryEntry.objects.filter(user=user,
+                                                 episode=episode,)\
+                                         .order_by('-timestamp')\
+                                         .prefetch_related('episode',
+                                                           'episode__slugs',
+                                                           'episode__podcast',
+                                                           'episode__podcast__slugs',
+                                                           'client')
 
-    history = list(episode_state.get_history_entries())
-    HistoryEntry.fetch_data(user, history,
-            podcasts=podcasts_dict, episodes=episodes_dict)
-
-    devices = {c.id.hex: c.name for c in user.client_set.all()}
+    clients = user.client_set.all()
 
     return render(request, 'episode-history.html', {
         'episode': episode,
         'podcast': podcast,
         'history': history,
         'actions': EPISODE_ACTION_TYPES,
-        'devices': devices,
+        'clients': clients,
     })
 
 
@@ -186,7 +186,8 @@ def list_favorites(request):
 @never_cache
 def add_action(request, episode):
 
-    device = request.user.get_device(request.POST.get('device'))
+    user = request.user
+    client = user.client_set.get(id=request.POST.get('device'))
 
     action_str = request.POST.get('action')
     timestamp = request.POST.get('timestamp', '')
@@ -202,10 +203,10 @@ def add_action(request, episode):
     action = EpisodeAction()
     action.timestamp = timestamp
     action.upload_timestamp = get_timestamp(datetime.utcnow())
-    action.device = device.id if device else None
+    action.device = client.id.hex if client else None
     action.action = action_str
 
-    state = episode_state_for_user_episode(request.user, episode)
+    state = episode_state_for_user_episode(user, episode)
     add_episode_actions(state, [action])
 
     podcast = episode.podcast
