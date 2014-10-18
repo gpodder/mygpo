@@ -40,8 +40,9 @@ from mygpo.web.heatmap import EpisodeHeatmap
 from mygpo.history.stats import last_played_episodes
 from mygpo.publisher.utils import check_publisher_permission
 from mygpo.web.utils import get_episode_link_target, check_restrictions
-from mygpo.db.couchdb.episode_state import favorite_episode_ids_for_user, \
-         chapters_for_episode, set_episode_favorite
+from mygpo.favorites.models import FavoriteEpisode
+from mygpo.db.couchdb.episode_state import (chapters_for_episode,
+    set_episode_favorite)
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
          add_episode_actions, update_episode_chapters
 from mygpo.userfeeds.feeds import FavoriteFeed
@@ -156,10 +157,7 @@ def list_favorites(request):
     user = request.user
     site = RequestSite(request)
 
-    favorite_ids = favorite_episode_ids_for_user(user)
-    favorites = Episode.objects.filter(id__in=favorite_ids)\
-                               .select_related('podcast')\
-                               .prefetch_related('slugs', 'podcast__slugs')
+    favorites = FavoriteEpisode.episodes_for_user(user)
 
     recently_listened = last_played_episodes(user)
 

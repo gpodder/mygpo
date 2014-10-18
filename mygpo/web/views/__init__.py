@@ -37,10 +37,10 @@ from mygpo.subscriptions import get_subscribed_podcasts
 from mygpo.web.utils import process_lang_params
 from mygpo.utils import parse_range
 from mygpo.podcastlists.models import PodcastList
+from mygpo.favorites.models import FavoriteEpisode
 #from mygpo.web.views.podcast import slug_id_decorator
 from mygpo.users.settings import FLATTR_AUTO, FLATTR_TOKEN
 from mygpo.publisher.models import PublishedPodcast
-from mygpo.db.couchdb.episode_state import favorite_episode_ids_for_user
 
 
 @vary_on_cookie
@@ -85,7 +85,7 @@ def dashboard(request, episode_count=10):
     if subscribed_podcasts:
         checklist.append('subscriptions')
 
-    if favorite_episode_ids_for_user(request.user):
+    if FavoriteEpisode.objects.filter(user=request.user).exists():
         checklist.append('favorites')
 
     if not request.user.profile.get_token('subscriptions_token'):

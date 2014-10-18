@@ -463,19 +463,6 @@ def update_episode_chapters(episode_state, add=[], rem=[]):
     episode_state.save()
 
 
-def favorite_episode_ids_for_user(user):
-
-    if not user:
-        raise QueryParameterMissing('user')
-
-    udb = get_userdata_database()
-    favorites = udb.view('favorites/episodes_by_user',
-            key = user.profile.uuid.hex,
-        )
-
-    return set(x['value']['_id'] for x in favorites)
-
-
 def chapters_for_episode(episode_id):
 
     if not episode_id:

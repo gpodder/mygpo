@@ -45,11 +45,10 @@ from mygpo.core.tasks import auto_flattr_episode
 from mygpo.users.models import (EpisodeAction, Client,
                                 InvalidEpisodeActionAttributes, )
 from mygpo.users.settings import FLATTR_AUTO
+from mygpo.favorites.models import FavoriteEpisode
 from mygpo.core.json import JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.db.couchdb import bulk_save_retry, get_userdata_database
-from mygpo.db.couchdb.episode_state import favorite_episode_ids_for_user
-
 from mygpo.db.couchdb.episode_state import episode_state_for_ref_urls, \
     get_episode_actions
 
@@ -402,8 +401,7 @@ def get_client_data(user, client):
 @never_cache
 @cors_origin()
 def favorites(request, username):
-    favorite_ids = favorite_episode_ids_for_user(request.user)
-    favorites = Episode.objects.get(id__in=favorite_ids)
+    favorites = FavoriteEpisode.episodes_for_user(request.user)
     domain = RequestSite(request).domain
     e_data = lambda e: episode_data(e, domain)
     ret = map(e_data, favorites)

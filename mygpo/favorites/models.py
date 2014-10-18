@@ -21,3 +21,12 @@ class FavoriteEpisode(UpdateInfoModel):
         unique_together = [
             ('user', 'episode'),
         ]
+
+    @classmethod
+    def episodes_for_user(cls, user):
+        """ Favorite episodes of the given user
+
+        Returns the episodes directly, not the FavoriteEpisode objects """
+        return Episode.objects.filter(favoriteepisode__user=user)\
+                              .select_related('podcast')\
+                              .prefetch_related('slugs', 'podcast__slugs')
