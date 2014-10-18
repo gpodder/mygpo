@@ -41,8 +41,7 @@ from mygpo.history.stats import last_played_episodes
 from mygpo.publisher.utils import check_publisher_permission
 from mygpo.web.utils import get_episode_link_target, check_restrictions
 from mygpo.favorites.models import FavoriteEpisode
-from mygpo.db.couchdb.episode_state import (chapters_for_episode,
-    set_episode_favorite)
+from mygpo.db.couchdb.episode_state import chapters_for_episode
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
          add_episode_actions, update_episode_chapters
 from mygpo.userfeeds.feeds import FavoriteFeed
@@ -64,8 +63,9 @@ def episode(request, episode):
     if user.is_authenticated():
 
         episode_state = episode_state_for_user_episode(user, episode)
-        is_fav = episode_state.is_favorite()
 
+        is_fav = FavoriteEpisode.objects.filter(user=user, episode=episode)\
+                                        .exists()
 
         # pre-populate data for fetch_data
         podcasts_dict = {podcast.get_id(): podcast}
@@ -139,13 +139,18 @@ def history(request, episode):
 @never_cache
 @login_required
 def toggle_favorite(request, episode):
-    episode_state = episode_state_for_user_episode(request.user, episode)
+    user = request.user
 
-    is_fav = episode_state.is_favorite()
-    set_episode_favorite(episode_state, not is_fav)
+    fav, created = FavoriteEpisode.objects.get_or_create(
+        user=user,
+        episode=episode,
+    )
+
+    # if the episode was already a favorite, remove it
+    if not created:
+        fav.delete()
 
     podcast = episode.podcast
-
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
 

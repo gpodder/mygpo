@@ -88,6 +88,10 @@ def main(request, username, scope):
 
     elif request.method == 'POST':
         actions = parse_request_body(request)
+
+        # TODO: handle well-known settings that trigger some behavior (eg
+        # marking an episode as favorite)
+
         ret = update_settings(settings_obj, actions)
         db.save_doc(base_obj)
         return JsonResponse(ret)

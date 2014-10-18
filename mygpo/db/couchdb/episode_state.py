@@ -484,10 +484,3 @@ def _wrap_chapter(res):
     udb = get_userdata_database()
     chapter.set_db(udb)
     return (user, chapter)
-
-
-@repeat_on_conflict(['episode_state'])
-def set_episode_favorite(episode_state, is_fav):
-    udb = get_userdata_database()
-    episode_state.set_favorite(is_fav)
-    udb.save_doc(episode_state)

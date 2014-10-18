@@ -74,13 +74,6 @@ def migrate_estate(state):
     for action in state.actions:
         migrate_eaction(user, episode, state, action)
 
-    is_favorite = state.settings.get('is_favorite', False)
-    if is_favorite:
-        logger.info('Favorite episode')
-        FavoriteEpisode.objects.get_or_create(user=user, episode=episode)
-    else:
-        FavoriteEpisode.objects.filter(user=user, episode=episode).delete()
-
 
 def migrate_chapter(user, episode, c):
 
