@@ -40,6 +40,7 @@ from mygpo.web.heatmap import EpisodeHeatmap
 from mygpo.history.stats import last_played_episodes
 from mygpo.publisher.utils import check_publisher_permission
 from mygpo.web.utils import get_episode_link_target, check_restrictions
+from mygpo.history.models import EpisodeHistoryEntry
 from mygpo.favorites.models import FavoriteEpisode
 from mygpo.db.couchdb.episode_state import chapters_for_episode
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
@@ -62,8 +63,6 @@ def episode(request, episode):
 
     if user.is_authenticated():
 
-        episode_state = episode_state_for_user_episode(user, episode)
-
         is_fav = FavoriteEpisode.objects.filter(user=user, episode=episode)\
                                         .exists()
 
@@ -71,7 +70,9 @@ def episode(request, episode):
         podcasts_dict = {podcast.get_id(): podcast}
         episodes_dict = {episode.id.hex: episode}
 
-        has_history = bool(list(episode_state.get_history_entries()))
+        has_history = EpisodeHistoryEntry.objects.filter(user=user,
+                                                         episode=episode)\
+                                                 .exists()
 
         played_parts = EpisodeHeatmap(podcast.get_id(),
                 episode.id, user.profile.uuid.hex, duration=episode.duration)

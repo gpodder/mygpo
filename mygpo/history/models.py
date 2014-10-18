@@ -109,6 +109,8 @@ class EpisodeHistoryEntry(models.Model):
 
             # see query in played_episode_counts()
             ['user', 'action', 'episode'],
+
+            ['user', 'episode', 'timestamp'],
         ]
 
         ordering = ['-timestamp']
