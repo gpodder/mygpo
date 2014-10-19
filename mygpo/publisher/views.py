@@ -82,7 +82,7 @@ def podcast(request, podcast):
     timeline_data = listener_data([podcast])
     subscription_data = subscriber_data([podcast])[-20:]
 
-    update_token = request.user.publisher_update_token
+    update_token = request.user.profile.publisher_update_token
 
     heatmap = EpisodeHeatmap(podcast.get_id())
 
