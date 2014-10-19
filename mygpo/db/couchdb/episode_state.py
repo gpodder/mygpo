@@ -203,52 +203,6 @@ def get_episode_actions(user_id, since=None, until={}, podcast_id=None,
     return actions, until
 
 
-
-@cache_result(timeout=60*60)
-def episode_states_count():
-    udb = get_userdata_database()
-    r = udb.view('episode_states/by_user_episode',
-            limit = 0,
-            stale = 'update_after',
-        )
-    return r.total_rows
-
-
-def get_nth_episode_state(n):
-    udb = get_userdata_database()
-    state = get_single_result(udb, 'episode_states/by_user_episode',
-            skip         = n,
-            include_docs = True,
-            limit        = 1,
-            schema       = EpisodeUserState,
-        )
-
-    return state
-
-
-def get_duplicate_episode_states(user, episode):
-
-    if not user:
-        raise QueryParameterMissing('user')
-
-    if not episode:
-        raise QueryParameterMissing('episode')
-
-    udb = get_userdata_database()
-    r = udb.view('episode_states/by_user_episode',
-            key          = [user, episode],
-            include_docs = True,
-            schema       = EpisodeUserState,
-        )
-
-    states = list(r)
-
-    for state in states:
-        state.set_db(udb)
-
-    return states
-
-
 @cache_result(timeout=60*60)
 def get_heatmap(podcast_id, episode_id, user_id):
     udb = get_userdata_database()
