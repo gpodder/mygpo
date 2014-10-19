@@ -33,8 +33,7 @@ from mygpo.web.forms import SyncForm
 from mygpo.decorators import allowed_methods
 from mygpo.web.utils import get_podcast_link_target, get_page_list, \
     check_restrictions
-from mygpo.db.couchdb.episode_state import get_podcasts_episode_states, \
-         episode_listener_counts
+from mygpo.db.couchdb.episode_state import get_podcasts_episode_states
 
 import logging
 logger = logging.getLogger(__name__)
@@ -134,35 +133,9 @@ def get_tags(podcast, user, max_tags=50):
 
 
 def episode_list(podcast, user, offset=0, limit=None):
-    """
-    Returns a list of episodes, with their action-attribute set to the latest
-    action. The attribute is unsert if there is no episode-action for
-    the episode.
-    """
-
-    listeners = dict(episode_listener_counts(podcast))
+    """ Returns a list of episodes """
     episodes = Episode.objects.filter(podcast=podcast).all().by_released()
     episodes = list(episodes.prefetch_related('slugs')[offset:offset+limit])
-
-    # if user.is_authenticated():
-
-        # prepare pre-populated data for HistoryEntry.fetch_data
-        # podcasts_dict = {podcast.get_id(): podcast}
-        # episodes_dict = dict( (episode.id, episode) for episode in episodes)
-
-        # TODO: refactor
-        # actions = get_podcasts_episode_states(podcast, user.profile.uuid.hex)
-        # actions = map(HistoryEntry.from_action_dict, actions)
-
-        # HistoryEntry.fetch_data(user, actions,
-        #   podcasts=podcasts_dict, episodes=episodes_dict)
-
-        # episode_actions = dict( (action.episode_id, action) for action in actions)
-    # else:
-        # episode_actions = {}
-
-    # annotate_episode = partial(_annotate_episode, listeners, episode_actions)
-    # return map(annotate_episode, episodes)
     return episodes
 
 
@@ -193,14 +166,6 @@ def all_episodes(request, podcast, page_size=20):
         'current_page': page,
         'is_publisher': is_publisher,
     })
-
-
-
-def _annotate_episode(listeners, episode_actions, episode):
-    episode.listener_count = listeners.pop(episode.get_id(), None)
-    episode.action = episode_actions.pop(episode.get_id(), None)
-    return episode
-
 
 
 @never_cache

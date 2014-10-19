@@ -94,27 +94,6 @@ def all_episode_states(episode):
     return states
 
 
-@cache_result(timeout=60*60)
-def episode_listener_counts(episode):
-    """ (Episode-Id, listener-count) tuples for episodes w/ listeners """
-
-    if not episode:
-        raise QueryParameterMissing('episode')
-
-    udb = get_userdata_database()
-    r = udb.view('listeners/by_podcast_episode',
-            startkey    = [episode.get_id(), None, None],
-            endkey      = [episode.get_id(), {},   {}],
-            group       = True,
-            group_level = 2,
-            reduce      = True,
-            stale       = 'update_after',
-        )
-
-    return map(_wrap_listeners, r)
-
-
-
 def get_podcasts_episode_states(podcast, user_id):
     """ Returns the latest episode actions for the podcast's episodes """
 
@@ -268,12 +247,6 @@ def get_duplicate_episode_states(user, episode):
         state.set_db(udb)
 
     return states
-
-
-def _wrap_listeners(res):
-    episode   = res['key'][1]
-    listeners = res['value']
-    return (episode, listeners)
 
 
 @cache_result(timeout=60*60)
