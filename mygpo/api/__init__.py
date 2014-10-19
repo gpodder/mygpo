@@ -17,6 +17,7 @@
 
 from datetime import datetime
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseBadRequest, HttpResponseNotFound
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
@@ -24,8 +25,8 @@ from django.utils.decorators import method_decorator
 from django.views.generic.base import View
 
 from mygpo.utils import parse_request_body
+from mygpo.api.exceptions import ParameterMissing
 from mygpo.decorators import cors_origin
-from mygpo.users.models import Client
 from mygpo.core.json import JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
 
@@ -50,10 +51,10 @@ class APIView(View):
         try:
             return super(APIView, self).dispatch(*args, **kwargs)
 
-        except Client.DoesNotExist as e:
+        except ObjectDoesNotExist as e:
             return HttpResponseNotFound(str(e))
 
-        except RequestException as e:
+        except (RequestException, ParameterMissing) as e:
             return HttpResponseBadRequest(str(e))
 
     def parsed_body(self, request):

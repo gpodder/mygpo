@@ -42,15 +42,6 @@ Userdata
 This group of views is available in the *userdata* database, called
 ``mygpo_userdata`` by default.
 
-Chapters
-^^^^^^^^
-
-Doc-Types: EpisodeUserState
-
-**Views**
-
-* `chapters/by_episode <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/chapters/views/by_episode>`_
-
 
 Episode Actions
 ^^^^^^^^^^^^^^^

@@ -33,7 +33,7 @@ from django.utils.translation import ugettext as _
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.api.constants import EPISODE_ACTION_TYPES
 from mygpo.core.tasks import flattr_thing
-from mygpo.users.models import Chapter, HistoryEntry, EpisodeAction
+from mygpo.users.models import HistoryEntry, EpisodeAction
 from mygpo.utils import parse_time, get_timestamp
 from mygpo.users.settings import FLATTR_TOKEN
 from mygpo.web.heatmap import EpisodeHeatmap
@@ -42,9 +42,8 @@ from mygpo.publisher.utils import check_publisher_permission
 from mygpo.web.utils import get_episode_link_target, check_restrictions
 from mygpo.history.models import EpisodeHistoryEntry
 from mygpo.favorites.models import FavoriteEpisode
-from mygpo.db.couchdb.episode_state import chapters_for_episode
 from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
-         add_episode_actions, update_episode_chapters
+         add_episode_actions
 from mygpo.userfeeds.feeds import FavoriteFeed
 
 

@@ -18,6 +18,7 @@ urlpatterns += patterns('mygpo.api.simple',
 
 from mygpo.api.subscriptions import SubscriptionsAPI
 from mygpo.api.advanced.updates import DeviceUpdates
+from mygpo.api.advanced.episode import ChaptersAPI
 
 urlpatterns += patterns('mygpo.api.advanced',
  url(r'^api/(?P<version>[12])/subscriptions/(?P<username>[\w.+-]+)/(?P<device_uid>[\w.-]+)\.json',
@@ -34,7 +35,7 @@ urlpatterns += patterns('mygpo.api.advanced',
     (r'^api/2/data/podcast\.json', 'directory.podcast_info'),
  url(r'^api/2/data/episode\.json', 'directory.episode_info', name='api-episode-info'),
 
-    (r'^api/2/chapters/(?P<username>[\w.+-]+)\.json', 'episode.chapters'),
+    (r'^api/2/chapters/(?P<username>[\w.+-]+)\.json', ChaptersAPI.as_view()),
     (r'^api/2/updates/(?P<username>[\w.+-]+)/(?P<device_uid>[\w.-]+)\.json',
         DeviceUpdates.as_view()),
 

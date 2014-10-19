@@ -9,7 +9,7 @@ from django.utils.text import slugify
 from django.db import reset_queries
 
 from mygpo.podcasts.models import Tag
-from mygpo.users.models import Chapter as C, EpisodeUserState, Client
+from mygpo.users.models import EpisodeUserState, Client
 from mygpo.chapters.models import Chapter
 from mygpo.subscriptions.models import Subscription, PodcastConfig
 from mygpo.podcastlists.models import PodcastList, PodcastListEntry
@@ -68,25 +68,8 @@ def migrate_estate(state):
     logger.info('Migrating episode state ({id}) for user {user} and episode {episode}'
                 .format(id=state._id, user=user, episode=episode))
 
-    for chapter in state.chapters:
-        migrate_chapter(user, episode, chapter)
-
     for action in state.actions:
         migrate_eaction(user, episode, state, action)
-
-
-def migrate_chapter(user, episode, c):
-
-    chapter, created = Chapter.objects.get_or_create(
-        user=user,
-        episode=episode,
-        start=c.start,
-        end=c.end,
-        defaults = {
-            'label': c.label or '',
-            'advertisement': c.advertisement,
-        }
-    )
 
 
 def migrate_eaction(user, episode, state, ea):

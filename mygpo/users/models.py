@@ -246,22 +246,6 @@ class EpisodeAction(DocumentSchema):
                     self.started, self.playmark, self.total]))
 
 
-class Chapter(Document):
-    """ A user-entered episode chapter """
-
-    device = StringProperty()
-    created = DateTimeProperty()
-    start = IntegerProperty(required=True)
-    end = IntegerProperty(required=True)
-    label = StringProperty()
-    advertisement = BooleanProperty()
-
-
-    def __repr__(self):
-        return '<%s %s (%d-%d)>' % (self.__class__.__name__, self.label,
-                self.start, self.end)
-
-
 class EpisodeUserState(Document, SettingsMixin):
     """
     Contains everything a user has done with an Episode
@@ -274,7 +258,7 @@ class EpisodeUserState(Document, SettingsMixin):
     ref_url       = StringProperty(required=True)
     podcast_ref_url = StringProperty(required=True)
     merged_ids    = StringListProperty()
-    chapters      = SchemaListProperty(Chapter)
+    chapters      = ListProperty()
     podcast       = StringProperty(required=True)
 
 
