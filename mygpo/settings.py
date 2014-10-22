@@ -72,12 +72,23 @@ SITE_ID = 1
 # to load the internationalization machinery.
 USE_I18N = True
 
+
+# Static Files
+
 STATIC_ROOT = 'staticfiles'
-STATIC_URL = '/media/'
+STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
-    os.path.abspath(os.path.join(BASE_DIR, '..', 'htdocs', 'media')),
+    os.path.abspath(os.path.join(BASE_DIR, '..', 'static')),
 )
+
+
+# Media Files
+
+MEDIA_ROOT = os.path.abspath(os.path.join(BASE_DIR, '..', 'media'))
+
+MEDIA_URL = '/media/'
+
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -189,7 +200,7 @@ CSRF_FAILURE_VIEW='mygpo.web.views.security.csrf_failure'
 
 # The following entries should be set in settings_prod.py
 DEFAULT_FROM_EMAIL = ''
-SECRET_KEY = ''
+SECRET_KEY = os.getenv('SECRET_KEY', '')
 GOOGLE_ANALYTICS_PROPERTY_ID=''
 DIRECTORY_EXCLUDED_TAGS = ()
 FLICKR_API_KEY = ''
