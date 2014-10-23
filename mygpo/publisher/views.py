@@ -82,7 +82,7 @@ def podcast(request, podcast):
     timeline_data = listener_data([podcast])
     subscription_data = subscriber_data([podcast])[-20:]
 
-    update_token = request.user.profile.publisher_update_token
+    update_token = request.user.profile.get_token('publisher_update_token')
 
     heatmap = EpisodeHeatmap(podcast)
 
@@ -171,9 +171,9 @@ def new_update_token(request, username):
 def update_published_podcasts(request, username):
     User = get_user_model()
     user = get_object_or_404(User, username=username)
-    published_podcasts = Podcast.objects.filter(id__in=user.published_objects)
+    published_podcasts = [pp.podcast for pp in user.publishedpodcast_set.all()]
     update_podcasts.delay([podcast.url for podcast in published_podcasts])
-    return HttpResponse('Updated:\n' + '\n'.join([p.url for p in published_podcasts]), mimetype='text/plain')
+    return HttpResponse('Updated:\n' + '\n'.join([p.url for p in published_podcasts]), content_type='text/plain')
 
 
 @vary_on_cookie
