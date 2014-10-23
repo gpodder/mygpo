@@ -28,6 +28,10 @@ class Category(UpdateInfoModel):
     def podcasts(self):
         return self.entries.prefetch_related('podcast', 'podcast__slugs')
 
+    @property
+    def clean_title(self):
+        return self.title.replace('\n', ' ')
+
 
 class CategoryEntry(UpdateInfoModel,):
     """ A podcast in a category """
