@@ -27,3 +27,7 @@ class PodcastResult(object):
 
     def get_id(self):
         return self.id
+
+    @property
+    def display_title(self):
+        return self.title
