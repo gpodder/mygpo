@@ -97,7 +97,7 @@ def update_sync_status(user, synclist, stopsync):
 
         # Setup all devices to sync with the first in the list
         uid = devlist[0]
-        dev = user.get_device_by_uid(uid)
+        dev = user.client_set.get(uid=uid)
 
         for other_uid in devlist[1:]:
             other = user.get_device_by_uid(other_uid)
