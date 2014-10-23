@@ -50,7 +50,7 @@ class Topics(object):
 
 @repeat_on_conflict()
 def update_category(podcast):
-    all_tags = list(chain.from_iterable(s for s in podcast.tags.values()))
+    all_tags = list(t.tag for t in podcast.tags.all())
 
     if not all_tags:
         return
