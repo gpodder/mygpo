@@ -203,31 +203,6 @@ def get_episode_actions(user_id, since=None, until={}, podcast_id=None,
     return actions, until
 
 
-@cache_result(timeout=60*60)
-def get_heatmap(podcast_id, episode_id, user_id):
-    udb = get_userdata_database()
-
-    group_level = len(filter(None, [podcast_id, episode_id, user_id]))
-
-    r = udb.view('heatmap/by_episode',
-            startkey    = [podcast_id, episode_id,       user_id],
-            endkey      = [podcast_id, episode_id or {}, user_id or {}],
-            reduce      = True,
-            group       = True,
-            group_level = group_level,
-            stale       = 'update_after',
-        )
-    # TODO: Heatmap not available during transition to Django ORM
-    r = False
-
-    if not r:
-        return [], []
-
-    else:
-        res = r.first()['value']
-        return res['heatmap'], res['borders']
-
-
 @repeat_on_conflict(['state'])
 def add_episode_actions(state, actions):
     udb = get_userdata_database()

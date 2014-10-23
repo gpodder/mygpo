@@ -79,16 +79,6 @@ Doc-Types: EpisodeUserState
 * `episodes/favorites_by_user <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/favorites/views/episodes_by_user>`_
 
 
-Heatmap
-^^^^^^^
-
-Doc-Types: EpisodeUserState
-
-**Views**
-
-* `heatmap/by_episode <https://github.com/gpodder/mygpo/tree/master/couchdb/general/_design/heatmap/views/by_episode>`_
-
-
 History
 ^^^^^^^
 

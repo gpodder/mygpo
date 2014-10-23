@@ -327,7 +327,7 @@ def update_episode(parsed_episode, episode, podcast):
     """ updates "episode" with the data from "parsed_episode" """
 
     # TODO: check if there have been any changes, to avoid unnecessary updates
-    episode.guid = parsed_episode.guid or episode.guid
+    episode.guid = to_maxlength(Episode, 'guid', parsed_episode.guid or episode.guid)
     episode.description = parsed_episode.description or episode.description
     episode.subtitle = parsed_episode.subtitle or episode.subtitle
     episode.content = parsed_episode.content or parsed_episode.description or episode.content
@@ -339,7 +339,7 @@ def update_episode(parsed_episode, episode, podcast):
     episode.filesize = parsed_episode.files[0].filesize
     episode.language = parsed_episode.language or episode.language or \
                                                   podcast.language
-    episode.mimetypes = list(set(filter(None, [f.mimetype for f in parsed_episode.files])))
+    episode.mimetypes = ','.join(list(set(filter(None, [f.mimetype for f in parsed_episode.files]))))
     episode.flattr_url = to_maxlength(Episode, 'flattr_url',
                                       parsed_episode.flattr or
                                       episode.flattr_url)

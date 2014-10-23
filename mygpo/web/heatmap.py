@@ -17,51 +17,68 @@
 
 from functools import wraps
 
-from mygpo.db.couchdb.episode_state import get_heatmap
+from mygpo.history.models import EpisodeHistoryEntry
 
 
 class EpisodeHeatmap(object):
     """ Information about how often certain parts of Episodes are played """
 
-    def __init__(self, podcast_id, episode_id=None, user_id=None,
-                 duration=None):
-        """ Initialize a new Episode heatmap
-
-        EpisodeHeatmap(podcast_id, [episode_id, [user_id]]) """
-
-        self.podcast_id = podcast_id
-
-        if episode_id is not None and podcast_id is None:
-            raise ValueError(
-                'episode_id can only be used if podcast_id is not None')
-
-        self.episode_id = episode_id
-
-        if user_id is not None and episode_id is None:
-            raise ValueError(
-                'user_id can only be used if episode_id is not None')
-
-        self.user_id = user_id
+    def __init__(self, podcast, episode=None, user=None, duration=None):
+        """ Initialize a new Episode heatmap """
         self.duration = duration
         self.heatmap = None
         self.borders = None
 
+        history = EpisodeHistoryEntry.objects.filter(episode__podcast=podcast)
+
+        if episode:
+            history = history.filter(episode=episode)
+
+        if user:
+            history = history.filter(user=user)
+
+        self.history = history
+
+    @staticmethod
+    def _raw_heatmap(events):
+        """ Returns the detailled (exact) heatmap
+
+        >>> _raw_heatmap([(70, 200), (0, 100), (0, 50)])
+        ([2, 1, 2, 1], [0, 50, 70, 100, 200])
+        """
+
+        # get a list of all borders that occur in events
+        borders = set()
+        for start, end in events:
+            borders.add(start)
+            borders.add(end)
+        borders = sorted(borders)
+
+        # this contains the value for the spaces within the borders
+        # therefore we need one field less then we have borders
+        counts = [0] * (len(borders)-1)
+
+        for start, end in events:
+            # for each event we calculate its range
+            start_idx = borders.index(start)
+            end_idx = borders.index(end)
+
+            # and increase the play-count within the range by 1
+            for inc in range(start_idx, end_idx):
+                counts[inc] = counts[inc] + 1
+
+        return counts, borders
+
+        # we return the heatmap as (start, stop, playcount) tuples
+        # for i in range(len(counts)):
+        #    yield (borders[i], borders[i+1], counts[i])
+
     def _query(self):
-        """ Queries the database and stores the heatmap and its borders """
-
-        self.heatmap, self.borders = get_heatmap(
-            self.podcast_id, self.episode_id, self.user_id)
-
-        if self.borders and self.heatmap:
-            # heatmap info doesn't reach until the end of the episode
-            # so we extend it with 0 listeners
-            if self.duration > self.borders[-1]:
-                self.heatmap.append(0)
-                self.borders.append(self.duration)
+        self.heatmap, self.borders = self._raw_heatmap(
+            self.history.values_list('started', 'stopped'))
 
     def query_if_required():
         """ If required, queries the database before calling the function """
-
         def decorator(f):
             @wraps(f)
             def tmp(self, *args, **kwargs):
@@ -87,8 +104,21 @@ class EpisodeHeatmap(object):
         Each tuple represents one part in the heatmap with a distinct
         play-count. from and to indicate the range of section in seconds."""
 
-        for i in range(len(self.heatmap)):
-            yield (self.borders[i], self.borders[i+1], self.heatmap[i])
+        # this could be written as "yield from"
+        for x in self._sections(self.heatmap, self.borders):
+            yield x
+
+    @staticmethod
+    def _sections(heatmap, borders):
+        """ Merges heatmap-counts and borders into a list of 3-tuples
+
+        Each tuple contains (start-border, end-border, play-count)
+
+        >>> list(_sections([2, 1, 2, 1], [0, 50, 70, 100, 200]))
+        [(0, 50, 2), (50, 70, 1), (70, 100, 2), (100, 200, 1)]
+        """
+        for i in range(len(heatmap)):
+            yield (borders[i], borders[i+1], heatmap[i])
 
     @query_if_required()
     def __nonzero__(self):

@@ -84,7 +84,7 @@ def podcast(request, podcast):
 
     update_token = request.user.profile.publisher_update_token
 
-    heatmap = EpisodeHeatmap(podcast.get_id())
+    heatmap = EpisodeHeatmap(podcast)
 
     try:
         pubsubscription = HubSubscription.objects.get(topic_url=podcast.url)
@@ -217,8 +217,7 @@ def episode(request, episode):
 
     timeline_data = list(episode_listener_data(episode))
 
-    heatmap = EpisodeHeatmap(episode.podcast, episode.id,
-              duration=episode.duration)
+    heatmap = EpisodeHeatmap(episode.podcast, episode, duration=episode.duration)
 
     return render(request, 'publisher/episode.html', {
         'is_secure': request.is_secure(),

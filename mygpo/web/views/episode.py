@@ -73,8 +73,7 @@ def episode(request, episode):
                                                          episode=episode)\
                                                  .exists()
 
-        played_parts = EpisodeHeatmap(podcast.get_id(),
-                episode.id, user.profile.uuid.hex, duration=episode.duration)
+        played_parts = EpisodeHeatmap(podcast, episode, user, episode.duration)
 
         devices = {c.id.hex: c for c in user.client_set.all()}
         can_flattr = user.profile.get_wksetting(FLATTR_TOKEN) and episode.flattr_url
