@@ -9,6 +9,7 @@ from django.views.generic.base import View
 from django.utils.decorators import method_decorator
 
 from mygpo.podcasts.models import Podcast
+from mygpo.publisher.models import PublishedPodcast
 from mygpo.userfeeds.feeds import FavoriteFeed
 from mygpo.data.feeddownloader import PodcastUpdater
 
