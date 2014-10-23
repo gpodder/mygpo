@@ -281,9 +281,8 @@ DEFAULT_BASE_URL = ''
 BROKER_URL='redis://localhost'
 CELERY_RESULT_BACKEND='redis://localhost'
 
-CELERY_SEND_TASK_ERROR_EMAILS = True,
-ADMINS=ADMINS,
-SERVER_EMAIL = "no-reply@example.com",
+#CELERY_SEND_TASK_ERROR_EMAILS = True
+SERVER_EMAIL = "no-reply@example.com"
 
 
 ### Google API
