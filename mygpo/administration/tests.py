@@ -14,12 +14,10 @@ from django.test import TestCase
 from django.contrib.auth import get_user_model
 
 from mygpo.podcasts.models import Podcast, Episode
-from mygpo.users.models import Client, EpisodeAction
+from mygpo.users.models import Client
+from mygpo.history.models import EpisodeHistoryEntry
 from mygpo.maintenance.merge import PodcastMerger
 from mygpo.subscriptions import subscribe, unsubscribe
-from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
-    add_episode_actions
-from mygpo.utils import get_timestamp
 
 
 class SimpleTest(TestCase):
@@ -62,13 +60,21 @@ class SimpleTest(TestCase):
         subscribe(p1, user, device1)
         subscribe(p2, user, device2)
 
-        s1 = episode_state_for_user_episode(user, e1)
-        add_episode_actions(s1, [EpisodeAction(action='play',
-                    upload_timestamp=get_timestamp(datetime.utcnow()))])
+        action1 = EpisodeHistoryEntry.objects.create(
+            episode = e1,
+            user = user,
+            action = EpisodeHistoryEntry.PLAY,
+            timestamp = datetime.utcnow(),
+            created = datetime.utcnow(),
+        )
 
-        s3 = episode_state_for_user_episode(user, e3)
-        add_episode_actions(s3, [EpisodeAction(action='play',
-                    upload_timestamp=get_timestamp(datetime.utcnow()))])
+        action3 = EpisodeHistoryEntry.objects.create(
+            episode = e3,
+            user = user,
+            action = EpisodeHistoryEntry.PLAY,
+            timestamp = datetime.utcnow(),
+            created = datetime.utcnow(),
+        )
 
         # we need that for later
         e3_id = e3.pk
@@ -83,13 +89,13 @@ class SimpleTest(TestCase):
         pm.merge()
 
         e1 = Episode.objects.get(pk=e1.pk)
-        es1 = episode_state_for_user_episode(user, e1)
-        self.assertEqual(len(es1.actions), 1)
+        history1 = EpisodeHistoryEntry.objects.filter(episode=e1, user=user)
+        self.assertEqual(len(history1), 1)
 
         # check if merged episode's id can still be accessed
         e3 = Episode.objects.filter(podcast=p1).get_by_any_id(e3_id)
-        es3 = episode_state_for_user_episode(user, e3)
-        self.assertEqual(len(es3.actions), 1)
+        history3 = EpisodeHistoryEntry.objects.filter(episode=e3, user=user)
+        self.assertEqual(len(history3), 1)
 
         p1 = Podcast.objects.get(pk=p1.get_id())
         subscribed_clients = Client.objects.filter(subscription__podcast=p1)

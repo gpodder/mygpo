@@ -25,11 +25,8 @@ from django.test.utils import override_settings
 from django.contrib.auth import get_user_model
 
 from mygpo.podcasts.models import Podcast, Episode
-from mygpo.users.models import EpisodeAction
+from mygpo.history.models import EpisodeHistoryEntry
 from mygpo.maintenance.merge import PodcastMerger
-from mygpo.utils import get_timestamp
-from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
-    add_episode_actions
 
 
 def u():
@@ -96,21 +93,27 @@ class MergeTests(TransactionTestCase):
 
     def test_merge_podcasts(self):
 
-        # Create additional data that will be merged
-        state1 = episode_state_for_user_episode(self.user, self.episode1)
-        state2 = episode_state_for_user_episode(self.user, self.episode2)
+        action1 = EpisodeHistoryEntry.objects.create(
+            timestamp=datetime.utcnow(),
+            created=datetime.utcnow(),
+            episode=self.episode1,
+            user=self.user,
+            client=None,
+            action=EpisodeHistoryEntry.PLAY,
+            podcast_ref_url=None,
+            episode_ref_url=None,
+        )
 
-        action1 = EpisodeAction(action='play',
-                                timestamp=datetime.utcnow(),
-                                upload_timestamp=get_timestamp(
-                                    datetime.utcnow()))
-        action2 = EpisodeAction(action='download',
-                                timestamp=datetime.utcnow(),
-                                upload_timestamp=get_timestamp(
-                                    datetime.utcnow()))
-
-        add_episode_actions(state1, [action1])
-        add_episode_actions(state2, [action2])
+        action2 = EpisodeHistoryEntry.objects.create(
+            timestamp=datetime.utcnow(),
+            created=datetime.utcnow(),
+            episode=self.episode2,
+            user=self.user,
+            client=None,
+            action=EpisodeHistoryEntry.DOWNLOAD,
+            podcast_ref_url=None,
+            episode_ref_url=None,
+        )
 
         # decide which episodes to merge
         groups = [(0, [self.episode1, self.episode2])]
@@ -119,11 +122,14 @@ class MergeTests(TransactionTestCase):
         pm = PodcastMerger([self.podcast1, self.podcast2], counter, groups)
         pm.merge()
 
-        state1 = episode_state_for_user_episode(self.user, self.episode1)
+        history = EpisodeHistoryEntry.objects.filter(
+            episode=self.episode1,
+            user=self.user,
+        )
 
-        # both actions must be present in state1
-        self.assertIn(action1, state1.actions)
-        self.assertIn(action2, state1.actions)
+        # both actions must be present for the merged episode
+        self.assertIn(action1, history)
+        self.assertIn(action2, history)
 
     def tearDown(self):
         self.episode1.delete()
@@ -189,21 +195,27 @@ class MergeGroupTests(TransactionTestCase):
         # assert that the podcasts are actually grouped
         self.assertEqual(podcast2.group, podcast3.group)
 
-        # Create additional data that will be merged
-        state1 = episode_state_for_user_episode(self.user, self.episode1)
-        state2 = episode_state_for_user_episode(self.user, self.episode2)
+        action1 = EpisodeHistoryEntry.objects.create(
+            timestamp=datetime.utcnow(),
+            created=datetime.utcnow(),
+            episode=self.episode1,
+            user=self.user,
+            client=None,
+            action=EpisodeHistoryEntry.PLAY,
+            podcast_ref_url=None,
+            episode_ref_url=None,
+        )
 
-        action1 = EpisodeAction(action='play',
-                                timestamp=datetime.utcnow(),
-                                upload_timestamp=get_timestamp(
-                                    datetime.utcnow()))
-        action2 = EpisodeAction(action='download',
-                                timestamp=datetime.utcnow(),
-                                upload_timestamp=get_timestamp(
-                                    datetime.utcnow()))
-
-        add_episode_actions(state1, [action1])
-        add_episode_actions(state2, [action2])
+        action2 = EpisodeHistoryEntry.objects.create(
+            timestamp=datetime.utcnow(),
+            created=datetime.utcnow(),
+            episode=self.episode2,
+            user=self.user,
+            client=None,
+            action=EpisodeHistoryEntry.DOWNLOAD,
+            podcast_ref_url=None,
+            episode_ref_url=None,
+        )
 
         # decide which episodes to merge
         groups = [(0, [self.episode1, self.episode2])]
@@ -214,10 +226,13 @@ class MergeGroupTests(TransactionTestCase):
         pm = PodcastMerger([podcast2, podcast1], counter, groups)
         pm.merge()
 
-        state1 = episode_state_for_user_episode(self.user, self.episode1)
+        history = EpisodeHistoryEntry.objects.filter(
+            episode = self.episode1,
+            user = self.user,
+        )
 
-        self.assertIn(action1, state1.actions)
-        self.assertIn(action2, state1.actions)
+        self.assertIn(action1, history)
+        self.assertIn(action2, history)
 
         episode1 = Episode.objects.get(pk=self.episode1.pk)
 

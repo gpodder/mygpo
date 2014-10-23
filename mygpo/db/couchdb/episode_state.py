@@ -1,6 +1,4 @@
 from hashlib import sha1
-from datetime import datetime
-from dateutil import parser
 
 from django.core.cache import cache
 
@@ -8,9 +6,7 @@ from mygpo.podcasts.models import Podcast, Episode
 from mygpo.users.models import EpisodeUserState
 from mygpo.db import QueryParameterMissing
 from mygpo.db.couchdb import get_userdata_database, get_single_result
-from mygpo.cache import cache_result
 from mygpo.decorators import repeat_on_conflict
-
 
 
 def episode_state_for_user_episode(user, episode):
@@ -60,38 +56,6 @@ def episode_state_for_user_episode(user, episode):
         # don't cache here, because the state is saved by the calling function
 
         return state
-
-
-
-def all_episode_states(episode):
-
-    if not episode:
-        raise QueryParameterMissing('episode')
-
-    if isinstance(episode.podcast, unicode):
-        podcast_id = episode.podcast
-    else:
-        podcast_id = episode.podcast.get_id()
-
-    if hasattr(episode, '_id'):
-        episode_id = episode._id
-    else:
-        episode_id = episode.get_id()
-
-    udb = get_userdata_database()
-    r = udb.view('episode_states/by_podcast_episode',
-            startkey     = [podcast_id, episode_id, None],
-            endkey       = [podcast_id, episode_id, {}],
-            include_docs = True,
-            schema       = EpisodeUserState,
-        )
-
-    states = list(r)
-
-    for state in states:
-        state.set_db(udb)
-
-    return states
 
 
 def get_podcasts_episode_states(podcast, user_id):
@@ -208,38 +172,3 @@ def add_episode_actions(state, actions):
     udb = get_userdata_database()
     state.add_actions(actions)
     udb.save_doc(state)
-
-
-@repeat_on_conflict(['state'])
-def update_episode_state_object(state, podcast_id, episode_id=None):
-    state.podcast = podcast_id
-
-    if episode_id is not None:
-        state.episode = episode_id
-
-    udb = get_userdata_database()
-    udb.save_doc(state)
-
-
-@repeat_on_conflict(['state'])
-def merge_episode_states(state, state2):
-    state.add_actions(state2.actions)
-
-    # overwrite settings in state2 with state's settings
-    settings = state2.settings
-    settings.update(state.settings)
-    state.settings = settings
-
-    merged_ids = set(state.merged_ids + [state2._id] + state2.merged_ids)
-    state.merged_ids = filter(None, merged_ids)
-
-    state.chapters = list(set(state.chapters + state2.chapters))
-
-    udb = get_userdata_database()
-    udb.save_doc(state)
-
-
-@repeat_on_conflict(['state'])
-def delete_episode_state(state):
-    udb = get_userdata_database()
-    udb.delete_doc(state)
