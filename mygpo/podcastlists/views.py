@@ -45,7 +45,7 @@ def list_decorator(must_own=False):
     return _tmp
 
 
-@login_required
+@list_decorator(must_own=False)
 def search(request, username, listname):
     return directory_search(request, 'list_search.html',
             {'listname': listname})
