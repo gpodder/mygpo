@@ -235,7 +235,7 @@ def podcast_lists(request, page_size=20):
         page = paginator.num_pages
 
     num_pages = int(ceil(PodcastList.objects.count() / float(page_size)))
-    page_list = get_page_list(1, num_pages, page, 15)
+    page_list = get_page_list(1, num_pages, int(page), 15)
 
     return render(request, 'podcast_lists.html', {
         'lists': lists,
