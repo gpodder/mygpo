@@ -58,9 +58,13 @@ def search_podcasts(query):
             "query" : {
                  'simple_query_string': {'query': query}
             },
-            "script_score" : {
-               'script': "_score * (doc.subscribers.value / 4000)"
-            }
+            "functions": [
+                {
+                    "script_score" : {
+                       'script': "_score * doc.subscribers.value"
+                    }
+                }
+            ]
         }
     }
     results = conn.search(query=q, indices=settings.ELASTICSEARCH_INDEX,
