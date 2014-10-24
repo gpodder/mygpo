@@ -48,7 +48,7 @@
     <form class="form-inline" method="get" action="{% url "search" %}" class="search">
      <div class="input-group">
       <span class="input-group-addon"><i class="icon-search"></i></span>
-      <input class="form-control" type="text" name="q" {% if q %}value="{{ q }}"{% endif %} placeholder="{% trans "Search term or feed URL" %}">
+      <input class="" type="text" name="q" {% if q %}value="{{ q }}"{% endif %} placeholder="{% trans "Search term or feed URL" %}">
       <span class="input-group-btn">
        <button class="btn btn-primary" type="submit">{% trans "Search" %}</button>
       </span>
@@ -60,11 +60,11 @@
 
  <div class="btn-group">
   <a class="btn btn-default" href="{% url "subscriptions-opml" %}">
-   <i class="icon-download"></i> {% trans "Download OPML" %}
+   <i class="fa-download"></i> {% trans "Download OPML" %}
   </a>
 
   <a class="btn btn-default" href="{% url "share" %}">
-   <i class="icon-share"></i> {% trans "Share" %}
+   <i class="fa-share"></i> {% trans "Share" %}
   </a>
  </div>
 

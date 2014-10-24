@@ -46,16 +46,11 @@
   </span>
  </div>
 
- <div class="description" {% if episode.language or podcast.language %}lang="{% firstof episode.language podcast.language %}"{% endif %}>
-  {% if long %}
-   {{ episode.description|default:""|truncatewords:"100"|markdown }}
-  {% else %}
-   {{ episode.subtitle|default:episode.description|default:""|truncatewords:"50"|striptags }}
-  {% endif %}
- </div>
-
  {% if long %}
-  <a href="{% episode_link_target episode podcast %}">more...</a>
+  <div class="description" {% if episode.language or podcast.language %}lang="{% firstof episode.language podcast.language %}"{% endif %}>
+   {{ episode.description|default:""|truncatewords:"100"|markdown }}
+   <a href="{% episode_link_target episode podcast %}">more...</a>
+  </div>
  {% endif %}
 
 </div>

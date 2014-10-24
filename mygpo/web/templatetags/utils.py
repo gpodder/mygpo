@@ -2,7 +2,7 @@ from django import template
 from django.utils.safestring import mark_safe
 
 from mygpo.web.utils import get_page_list, license_info, hours_to_str
-from mygpo.utils import edit_link
+from mygpo.utils import edit_link, get_domain
 
 
 register = template.Library()
@@ -61,6 +61,11 @@ def markdown(txt):
     import markdown2
     html = markdown2.markdown(txt, extras={'nofollow': True})
     return mark_safe(html)
+
+
+@register.filter
+def domain(url):
+    return get_domain(url)
 
 
 @register.filter
