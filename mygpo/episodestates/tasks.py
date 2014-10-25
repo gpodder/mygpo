@@ -10,9 +10,15 @@ logger = get_task_logger(__name__)
 def update_episode_state(historyentry):
     """ Updates the episode state with the saved EpisodeHistoryEntry """
 
+    user = historyentry.user
+    episode = historyentry.episode
+
+    logger.info('Updating Episode State for {user} / {episode}'.format(
+        user=user, episode=episode))
+
     state = EpisodeState.objects.update_or_create(
-        user=historyentry.user,
-        episode=historyentry.episode,
+        user=user,
+        episode=episode,
         defaults={
             'action': historyentry.action,
             'timestamp': historyentry.timestamp,
