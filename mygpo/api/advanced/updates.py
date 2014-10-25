@@ -32,10 +32,10 @@ from mygpo.api.advanced.directory import episode_data, podcast_data
 from mygpo.utils import parse_bool, get_timestamp
 from mygpo.subscriptions import get_subscription_history, subscription_diff
 from mygpo.users.models import Client
+from mygpo.episodestates.models import EpisodeState
 from mygpo.users.subscriptions import subscription_changes, podcasts_for_states
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.decorators import cors_origin
-from mygpo.db.couchdb.episode_state import get_podcasts_episode_states
 
 from collections import namedtuple
 EpisodeStatus = namedtuple('EpisodeStatus', 'episode status action')
@@ -127,25 +127,10 @@ class DeviceUpdates(View):
                                 ).order_by('-released')[:max_per_podcast]
             )
 
-        e_actions = chain.from_iterable(get_podcasts_episode_states(p,
-                user.profile.uuid.hex) for p in subscribed_podcasts)
+        states = EpisodeState.dict_for_user(user, episodes)
 
-        # TODO: get_podcasts_episode_states could be optimized by returning
-        # only actions within some time frame
-
-        e_status = { e.id.hex: EpisodeStatus(e, 'new', None) for e in episodes}
-
-        for action in e_actions:
-            e_id = action['episode_id']
-
-            if not e_id in e_status:
-                continue
-
-            episode = e_status[e_id].episode
-
-            e_status[e_id] = EpisodeStatus(episode, action['action'], action)
-
-        return e_status.itervalues()
+        for episode in episodes:
+            yield EpisodeStatus(episode, states.get(episode.id, 'new'), None)
 
 
     def get_episode_data(self, episode_status, podcasts, domain, include_actions, user, devices):

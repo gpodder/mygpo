@@ -58,24 +58,6 @@ def episode_state_for_user_episode(user, episode):
         return state
 
 
-def get_podcasts_episode_states(podcast, user_id):
-    """ Returns the latest episode actions for the podcast's episodes """
-
-    if not podcast:
-        raise QueryParameterMissing('podcast')
-
-    if not user_id:
-        raise QueryParameterMissing('user_id')
-
-    udb = get_userdata_database()
-    res = udb.view('episode_states/by_user_podcast',
-            startkey = [user_id, podcast.get_id(), None],
-            endkey   = [user_id, podcast.get_id(), {}],
-        )
-
-    return map(lambda r: r['value'], res)
-
-
 def episode_state_for_ref_urls(user, podcast_url, episode_url):
 
     if not user:
