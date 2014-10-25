@@ -124,6 +124,7 @@ INSTALLED_APPS = (
     'mygpo.suggestions',
     'mygpo.directory',
     'mygpo.categories',
+    'mygpo.episodestates',
     'mygpo.maintenance',
     'mygpo.share',
     'mygpo.administration',
