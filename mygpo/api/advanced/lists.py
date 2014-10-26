@@ -15,6 +15,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+import uuid
 from functools import partial
 from datetime import datetime
 
@@ -65,6 +66,7 @@ def create(request, username, format):
         user=request.user,
         slug=slug,
         defaults={
+            'id': uuid.uuid1(),
             'title': title,
             'slug': slug,
             'created': datetime.utcnow(),
@@ -126,18 +128,16 @@ def get_lists(request, username):
 @never_cache
 @allowed_methods(['GET', 'PUT', 'DELETE'])
 @cors_origin()
-def podcast_list(request, *args, **kwargs):
+def podcast_list(request, username, slug, format):
 
     handlers = dict(
             GET = get_list,
             PUT = update_list,
             DELETE = delete_list,
         )
+    return handlers[request.method](request, username, slug, format)
 
-    return handlers[request.method](request, *args, **kwargs)
 
-
-@never_cache
 @list_decorator(must_own=False)
 @cors_origin()
 def get_list(request, plist, owner, format):
@@ -160,18 +160,10 @@ def get_list(request, plist, owner, format):
             xml_template='podcasts.xml', request=request)
 
 
-@never_cache
-@require_valid_user
 @list_decorator(must_own=True)
 @cors_origin()
 def update_list(request, plist, owner, format):
     """ Replaces the podcasts in the list and returns 204 No Content """
-
-    is_own = owner == request.uuser
-
-    if not is_own:
-        return HttpResponseForbidden()
-
     urls = parse_subscription(request.body, format)
     podcasts = [Podcast.objects.get_or_create_for_url(url) for url in urls]
     plist.set_entries(podcasts)
@@ -179,17 +171,9 @@ def update_list(request, plist, owner, format):
     return HttpResponse(status=204)
 
 
-@never_cache
-@require_valid_user
 @list_decorator(must_own=True)
 @cors_origin()
 def delete_list(request, plist, owner, format):
     """ Delete the podcast list and returns 204 No Content """
-
-    is_own = owner == request.user
-
-    if not is_own:
-        return HttpResponseForbidden()
-
     plist.delete()
     return HttpResponse(status=204)

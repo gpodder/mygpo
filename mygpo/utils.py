@@ -1110,7 +1110,7 @@ def set_ordered_entries(obj, new_entries, existing, EntryClass,
     for n, entry in enumerate(new_entries):
         try:
             e = existing.pop(entry)
-            logger.info('Updating new entry %d: %s', n, entry)
+            logger.info('Updating existing entry %d: %s', n, entry)
             e.order = n
             e.save()
         except KeyError:
@@ -1120,9 +1120,11 @@ def set_ordered_entries(obj, new_entries, existing, EntryClass,
                     value_name: entry,
                     parent_name: obj,
                 }
-                EntryClass.objects.create(order=n,
-                                          scope=obj.scope,
-                                          **links)
+                from mygpo.podcasts.models import ScopedModel
+                if issubclass(EntryClass, ScopedModel):
+                    links['scope'] = obj.scope
+
+                EntryClass.objects.create(order=n, **links)
             except IntegrityError as ie:
                 logger.warn('Could not create enry for %s: %s', obj, ie)
 

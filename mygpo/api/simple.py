@@ -177,6 +177,7 @@ def get_subscriptions(user, device_uid, user_agent=None):
 
 
 def parse_subscription(raw_post_data, format):
+    """ Parses the data according to the format """
     if format == 'txt':
         urls = raw_post_data.split('\n')
 
@@ -194,10 +195,8 @@ def parse_subscription(raw_post_data, format):
     else:
         return []
 
-
     urls = map(normalize_feed_url, urls)
     urls = filter(None, urls)
-    urls = set(urls)
     return urls
 
 

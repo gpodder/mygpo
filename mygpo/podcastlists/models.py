@@ -42,7 +42,7 @@ class PodcastList(UUIDModel, VoteMixin, UpdateInfoModel):
 
     def add_entry(self, obj):
         entry, created = PodcastListEntry.objects.get_or_create(
-            podcastlist=podcastlist,
+            podcastlist=self,
             content_type=ContentType.objects.get_for_model(obj),
             object_id=obj.id,
             defaults={
@@ -65,9 +65,9 @@ class PodcastList(UUIDModel, VoteMixin, UpdateInfoModel):
     def set_entries(self, podcasts):
         """ Updates the list to include the given podcast, removes others """
 
-        existing = {e.podcast: e for e in self.entres.all()}
+        existing = {e.content_object: e for e in self.entries.all()}
         set_ordered_entries(self, podcasts, existing, PodcastListEntry,
-                            'podcast', 'content_object')
+                            'content_object', 'podcastlist')
 
 
 class PodcastListEntry(UpdateInfoModel, OrderedModel):
@@ -84,7 +84,7 @@ class PodcastListEntry(UpdateInfoModel, OrderedModel):
     object_id = UUIDField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         unique_together = [
             ('podcastlist', 'order'),
             ('podcastlist', 'content_type', 'object_id'),
