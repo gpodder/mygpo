@@ -27,7 +27,7 @@ from django.views.generic.base import View
 
 from mygpo.podcasts.models import Episode
 from mygpo.api.httpresponse import JsonResponse
-from mygpo.api.advanced import clean_episode_action_data
+from mygpo.api.advanced import episode_action_json
 from mygpo.api.advanced.directory import episode_data, podcast_data
 from mygpo.utils import parse_bool, get_timestamp
 from mygpo.subscriptions import get_subscription_history, subscription_diff
@@ -143,8 +143,9 @@ class DeviceUpdates(View):
         t['status'] = episode_status.status
 
         # include latest action (bug 1419)
+        # TODO
         if include_actions and episode_status.action:
-            t['action'] = clean_episode_action_data(episode_status.action, user, devices)
+            t['action'] = episode_action_json(episode_status.action, user)
 
         return t
 

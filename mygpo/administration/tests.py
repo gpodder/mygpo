@@ -65,7 +65,6 @@ class SimpleTest(TestCase):
             user = user,
             action = EpisodeHistoryEntry.PLAY,
             timestamp = datetime.utcnow(),
-            created = datetime.utcnow(),
         )
 
         action3 = EpisodeHistoryEntry.objects.create(
@@ -73,7 +72,6 @@ class SimpleTest(TestCase):
             user = user,
             action = EpisodeHistoryEntry.PLAY,
             timestamp = datetime.utcnow(),
-            created = datetime.utcnow(),
         )
 
         # we need that for later

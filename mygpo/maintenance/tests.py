@@ -95,7 +95,6 @@ class MergeTests(TransactionTestCase):
 
         action1 = EpisodeHistoryEntry.objects.create(
             timestamp=datetime.utcnow(),
-            created=datetime.utcnow(),
             episode=self.episode1,
             user=self.user,
             client=None,
@@ -106,7 +105,6 @@ class MergeTests(TransactionTestCase):
 
         action2 = EpisodeHistoryEntry.objects.create(
             timestamp=datetime.utcnow(),
-            created=datetime.utcnow(),
             episode=self.episode2,
             user=self.user,
             client=None,
@@ -197,7 +195,6 @@ class MergeGroupTests(TransactionTestCase):
 
         action1 = EpisodeHistoryEntry.objects.create(
             timestamp=datetime.utcnow(),
-            created=datetime.utcnow(),
             episode=self.episode1,
             user=self.user,
             client=None,
@@ -208,7 +205,6 @@ class MergeGroupTests(TransactionTestCase):
 
         action2 = EpisodeHistoryEntry.objects.create(
             timestamp=datetime.utcnow(),
-            created=datetime.utcnow(),
             episode=self.episode2,
             user=self.user,
             client=None,

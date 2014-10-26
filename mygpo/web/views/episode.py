@@ -42,8 +42,6 @@ from mygpo.publisher.utils import check_publisher_permission
 from mygpo.web.utils import get_episode_link_target, check_restrictions
 from mygpo.history.models import EpisodeHistoryEntry
 from mygpo.favorites.models import FavoriteEpisode
-from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
-         add_episode_actions
 from mygpo.userfeeds.feeds import FavoriteFeed
 
 
@@ -198,14 +196,17 @@ def add_action(request, episode):
     else:
         timestamp = datetime.utcnow()
 
-    action = EpisodeAction()
-    action.timestamp = timestamp
-    action.upload_timestamp = get_timestamp(datetime.utcnow())
-    action.device = client.id.hex if client else None
-    action.action = action_str
+    history = EpisodeHistoryEntry(
+        timestamp = timestamp,
+        action = action_str,
+        user = user,
+        episode = episode,
+    )
 
-    state = episode_state_for_user_episode(user, episode)
-    add_episode_actions(state, [action])
+    if client:
+        history.client = client
+
+    history.save()
 
     podcast = episode.podcast
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
@@ -225,11 +226,6 @@ def flattr_episode(request, episode):
     success, msg = task.get()
 
     if success:
-        action = EpisodeAction()
-        action.action = 'flattr'
-        action.upload_timestamp = get_timestamp(datetime.utcnow())
-        state = episode_state_for_user_episode(request.user, episode)
-        add_episode_actions(state, [action])
         messages.success(request, _("Flattr\'d"))
 
     else:

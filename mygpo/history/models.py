@@ -71,7 +71,7 @@ class EpisodeHistoryEntry(models.Model):
     timestamp = models.DateTimeField()
 
     # the timestamp at which the event was created (provided by the server)
-    created = models.DateTimeField()
+    created = models.DateTimeField(auto_now_add=True)
 
     # the episode which was involved in the event
     episode = models.ForeignKey(Episode, db_index=True, null=True,

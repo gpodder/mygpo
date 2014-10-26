@@ -10,8 +10,7 @@ from mygpo.data.feeddownloader import PodcastUpdater
 from mygpo.utils import get_timestamp
 from mygpo.users.models import EpisodeAction
 from mygpo.flattr import Flattr
-from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
-         add_episode_actions
+from mygpo.history.models import EpisodeHistoryEntry
 
 
 @celery.task(max_retries=5, default_retry_delay=60)
@@ -71,11 +70,12 @@ def auto_flattr_episode(user, episode_id):
         return False
 
     episode = Episode.objects.get(id=episode_id)
-    state = episode_state_for_user_episode(user, episode)
 
-    action = EpisodeAction()
-    action.action = 'flattr'
-    action.upload_timestamp = get_timestamp(datetime.utcnow())
-    add_episode_actions(state, [action])
+    EpisodeHistoryEntry.objects.create(
+        episode = episode,
+        action = EpisodeHistoryEntry.FLATTR,
+        timestamp = datetime.utcnow(),
+        user = user,
+    )
 
     return True

@@ -41,6 +41,7 @@ from mygpo.api.backend import get_device
 from mygpo.utils import format_time, parse_bool, get_timestamp, \
     parse_request_body, normalize_feed_url
 from mygpo.decorators import allowed_methods, cors_origin
+from mygpo.history.models import EpisodeHistoryEntry
 from mygpo.core.tasks import auto_flattr_episode
 from mygpo.users.models import (EpisodeAction, Client,
                                 InvalidEpisodeActionAttributes, )
@@ -48,9 +49,6 @@ from mygpo.users.settings import FLATTR_AUTO
 from mygpo.favorites.models import FavoriteEpisode
 from mygpo.core.json import JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
-from mygpo.db.couchdb import bulk_save_retry, get_userdata_database
-from mygpo.db.couchdb.episode_state import episode_state_for_ref_urls, \
-    get_episode_actions
 
 
 import logging
@@ -148,7 +146,7 @@ def episodes(request, username, version=1):
             device = None
 
         changes = get_episode_changes(request.user, podcast, device, since,
-                now_, aggregated, version)
+                now, aggregated, version)
 
         return JsonResponse(changes)
 
@@ -165,25 +163,22 @@ def convert_position(action):
 
 def get_episode_changes(user, podcast, device, since, until, aggregated, version):
 
-    devices = {client.id.hex: client.uid for client in user.client_set.all()}
+    history = EpisodeHistoryEntry.objects.filter(user=user,
+                                                 timestamp__lt=until)
 
-    args = {}
+    if since:
+        history = history.filter(timestamp__gte=since)
+
     if podcast is not None:
-        args['podcast_id'] = podcast.get_id()
+        history = history.filter(episode__podcast=podcast)
 
     if device is not None:
-        args['device_id'] = device.id.hex
-
-    actions, until = get_episode_actions(user.profile.uuid.hex, since, until, **args)
+        history = history.filter(client=device)
 
     if version == 1:
-        actions = imap(convert_position, actions)
+        history = imap(convert_position, history)
 
-    clean_data = partial(clean_episode_action_data,
-            user=user, devices=devices)
-
-    actions = map(clean_data, actions)
-    actions = filter(None, actions)
+    actions = [episode_action_json(a, user) for a in history]
 
     if aggregated:
         actions = dict( (a['episode'], a) for a in actions ).values()
@@ -191,57 +186,29 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
     return {'actions': actions, 'timestamp': until}
 
 
+def episode_action_json(history, user):
 
+    action = {
+        'podcast': history.podcast_ref_url or history.episode.podcast.url,
+        'episode': history.episode_ref_url or history.episode.url,
+        'action': history.action,
+        'timestamp': history.timestamp.isoformat(),
+    }
 
-def clean_episode_action_data(action, user, devices):
+    if history.client:
+        action['device'] = history.client.uid
 
-    if None in (action.get('podcast', None), action.get('episode', None)):
-        return None
-
-    if 'device_id' in action:
-        device_id = action['device_id']
-        device_uid = devices.get(device_id)
-        if device_uid:
-            action['device'] = device_uid
-
-        del action['device_id']
-
-    # remove superfluous keys
-    for x in action.keys():
-        if x not in EPISODE_ACTION_KEYS:
-            del action[x]
-
-    # set missing keys to None
-    for x in EPISODE_ACTION_KEYS:
-        if x not in action:
-            action[x] = None
-
-    if action['action'] != 'play':
-        if 'position' in action:
-            del action['position']
-
-        if 'total' in action:
-            del action['total']
-
-        if 'started' in action:
-            del action['started']
-
-        if 'playmark' in action:
-            del action['playmark']
-
-    else:
-        action['position'] = action.get('position', False) or 0
+    if history.action == EpisodeHistoryEntry.PLAY:
+        action['started'] = history.started
+        action['position'] = history.stopped  # TODO: check "playmark"
+        action['total'] = history.total
 
     return action
 
 
-
-
-
 def update_episodes(user, actions, now, ua_string):
     update_urls = []
-
-    grouped_actions = defaultdict(list)
+    auto_flattr = user.profile.get_wksetting(FLATTR_AUTO)
 
     # group all actions by their episode
     for action in actions:
@@ -256,45 +223,31 @@ def update_episodes(user, actions, now, ua_string):
         if episode_url == '':
             continue
 
-        act = parse_episode_action(action, user, update_urls, now, ua_string)
-        grouped_actions[ (podcast_url, episode_url) ].append(act)
+        podcast = Podcast.objects.get_or_create_for_url(podcast_url)
+        episode = Episode.objects.get_or_create_for_url(podcast, episode_url)
 
+        # parse_episode_action returns a EpisodeHistoryEntry obj
+        history = parse_episode_action(action, user, update_urls, now,
+                                       ua_string)
 
-    auto_flattr_episodes = []
+        # we could save ``history`` directly, but we check for duplicates first
+        EpisodeHistoryEntry.objects.get_or_create(
+            user = user,
+            client = history.client,
+            episode = episode,
+            action = history.action,
+            timestamp = history.timestamp,
+            defaults = {
+                'started': history.started,
+                'stopped': history.stopped,
+                'total': history.total,
+            }
+        )
 
-    # Prepare the updates for each episode state
-    obj_funs = []
-
-    for (p_url, e_url), action_list in grouped_actions.iteritems():
-        episode_state = episode_state_for_ref_urls(user, p_url, e_url)
-
-        if any(a['action'] == 'play' for a in actions):
-            auto_flattr_episodes.append(episode_state.episode)
-
-        fun = partial(update_episode_actions, action_list=action_list)
-        obj_funs.append( (episode_state, fun) )
-
-    udb = get_userdata_database()
-    bulk_save_retry(obj_funs, udb)
-
-    if user.profile.get_wksetting(FLATTR_AUTO):
-        for episode_id in auto_flattr_episodes:
-            auto_flattr_episode.delay(user, episode_id)
+        if history.action == EpisodeHistoryEntry.PLAY and auto_flattr:
+            auto_flattr_episode.delay(user, episode.id)
 
     return update_urls
-
-
-def update_episode_actions(episode_state, action_list):
-    """ Adds actions to the episode state and saves if necessary """
-
-    len1 = len(episode_state.actions)
-    episode_state.add_actions(action_list)
-
-    if len(episode_state.actions) == len1:
-        return None
-
-    return episode_state
-
 
 
 def parse_episode_action(action, user, update_urls, now, ua_string):
@@ -302,27 +255,24 @@ def parse_episode_action(action, user, update_urls, now, ua_string):
     if not valid_episodeaction(action_str):
         raise Exception('invalid action %s' % action_str)
 
-    new_action = EpisodeAction()
+    history = EpisodeHistoryEntry()
 
-    new_action.action = action['action']
+    history.action = action['action']
 
     if action.get('device', False):
-        device = get_device(user, action['device'], ua_string)
-        new_action.device = device.id.hex
+        client = get_device(user, action['device'], ua_string)
+        history.client = client
 
     if action.get('timestamp', False):
-        new_action.timestamp = dateutil.parser.parse(action['timestamp'])
+        history.timestamp = dateutil.parser.parse(action['timestamp'])
     else:
-        new_action.timestamp = now
-    new_action.timestamp = new_action.timestamp.replace(microsecond=0)
+        history.timestamp = now
 
-    new_action.upload_timestamp = get_timestamp(now)
+    history.started = action.get('started', None)
+    history.stopped = action.get('position', None)
+    history.total = action.get('total', None)
 
-    new_action.started = action.get('started', None)
-    new_action.playmark = action.get('position', None)
-    new_action.total = action.get('total', None)
-
-    return new_action
+    return history
 
 
 @csrf_exempt
