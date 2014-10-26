@@ -26,7 +26,6 @@ Contents
 .. toctree::
     :maxdepth: 1
 
-    files-overview
     couchdb-docs
     couchdb-views
     python3
