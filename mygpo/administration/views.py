@@ -30,7 +30,6 @@ from mygpo.users.models import UserProxy
 from mygpo.publisher.models import PublishedPodcast
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.celery import celery
-from mygpo.db.couchdb import get_userdata_database
 
 
 class InvalidPodcast(Exception):
@@ -58,10 +57,6 @@ class HostInfo(AdminView):
         hostname = socket.gethostname()
         django_version = django.VERSION
 
-        main_db = get_userdata_database()
-
-        db_tasks = main_db.server.active_tasks()
-
         i = celery.control.inspect()
         scheduled = i.scheduled()
         if not scheduled:
@@ -77,8 +72,6 @@ class HostInfo(AdminView):
             'base_dir': base_dir,
             'hostname': hostname,
             'django_version': django_version,
-            'main_db': main_db.uri,
-            'db_tasks': db_tasks,
             'num_celery_tasks': num_celery_tasks,
             'feed_queue_status': feed_queue_status,
         })
