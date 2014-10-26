@@ -10,6 +10,7 @@ from mygpo.core.models import UpdateInfoModel, OrderedModel, UUIDModel
 from mygpo.podcasts.models import Podcast
 from mygpo.flattr import FlattrThing
 from mygpo.votes.models import VoteMixin
+from mygpo.utils import set_ordered_entries
 
 
 class PodcastList(UUIDModel, VoteMixin, UpdateInfoModel):
@@ -61,6 +62,12 @@ class PodcastList(UUIDModel, VoteMixin, UpdateInfoModel):
                 language = None,
             )
 
+    def set_entries(self, podcasts):
+        """ Updates the list to include the given podcast, removes others """
+
+        existing = {e.podcast: e for e in self.entres.all()}
+        set_ordered_entries(self, podcasts, existing, PodcastListEntry,
+                            'podcast', 'content_object')
 
 
 class PodcastListEntry(UpdateInfoModel, OrderedModel):

@@ -35,7 +35,7 @@ from mygpo.api.advanced.directory import podcast_data
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.podcastlists.models import PodcastList
 from mygpo.api.basic_auth import require_valid_user, check_username
-from mygpo.decorators import allowed_methods, repeat_on_conflict, cors_origin
+from mygpo.decorators import allowed_methods, cors_origin
 from mygpo.api.simple import parse_subscription, format_podcast_list, \
      check_format
 from mygpo.podcastlists.views import list_decorator
@@ -174,14 +174,7 @@ def update_list(request, plist, owner, format):
 
     urls = parse_subscription(request.body, format)
     podcasts = [Podcast.objects.get_or_create_for_url(url) for url in urls]
-    podcast_ids = [podcast.id.hex for podcast in podcasts]
-
-    @repeat_on_conflict(['podcast_ids'])
-    def _update(plist, podcast_ids):
-        plist.podcasts = podcast_ids
-        plist.save()
-
-    _update(plist=plist, podcast_ids=podcast_ids)
+    plist.set_entries(podcasts)
 
     return HttpResponse(status=204)
 
@@ -198,10 +191,5 @@ def delete_list(request, plist, owner, format):
     if not is_own:
         return HttpResponseForbidden()
 
-    @repeat_on_conflict(['plist'])
-    def _delete(plist):
-        plist.delete()
-
-    _delete(plist=plist)
-
+    plist.delete()
     return HttpResponse(status=204)

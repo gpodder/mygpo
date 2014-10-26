@@ -34,6 +34,7 @@ import urllib2
 import zlib
 import shlex
 
+from django.db import transaction, IntegrityError
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
@@ -1079,3 +1080,53 @@ def get_domain(url):
 
     except ValueError:
         return netloc
+
+
+def set_ordered_entries(obj, new_entries, existing, EntryClass,
+                        value_name, parent_name):
+    """ Update the object's entries to the given list
+
+    'new_entries' should be a list of objects that are later wrapped in
+    EntryClass instances. 'value_name' is the name of the EntryClass property
+    that contains the values; 'parent_name' is the one that references obj.
+
+    Entries that do not exist are created. Existing entries that are not in
+    'new_entries' are deleted. """
+
+    logger.info('%d existing entries', len(existing))
+
+    logger.info('%d new entries', len(new_entries))
+
+    with transaction.atomic():
+        max_order = max([s.order for s in existing.values()] +
+                        [len(new_entries)])
+        logger.info('Renumbering entries starting from %d', max_order+1)
+        for n, entry in enumerate(existing.values(), max_order+1):
+            entry.order = n
+            entry.save()
+
+    logger.info('%d existing entries', len(existing))
+
+    for n, entry in enumerate(new_entries):
+        try:
+            e = existing.pop(entry)
+            logger.info('Updating new entry %d: %s', n, entry)
+            e.order = n
+            e.save()
+        except KeyError:
+            logger.info('Creating new entry %d: %s', n, entry)
+            try:
+                links = {
+                    value_name: entry,
+                    parent_name: obj,
+                }
+                EntryClass.objects.create(order=n,
+                                          scope=obj.scope,
+                                          **links)
+            except IntegrityError as ie:
+                logger.warn('Could not create enry for %s: %s', obj, ie)
+
+    with transaction.atomic():
+        delete = [s.pk for s in existing.values()]
+        logger.info('Deleting %d entries', len(delete))
+        EntryClass.objects.filter(id__in=delete).delete()

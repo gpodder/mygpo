@@ -248,43 +248,10 @@ class SlugsMixin(models.Model):
         'slugs' should be a list of strings. Slugs that do not exist are
         created.  Existing slugs that are not in the 'slugs' list are
         deleted. """
-        existing = {s.slug: s for s in self.slugs.all()}
-        logger.info('%d existing slugs', len(existing))
-
-        logger.info('%d new slugs', len(slugs))
-
-        with transaction.atomic():
-            max_order = max([s.order for s in existing.values()] + [len(slugs)])
-            logger.info('Renumbering slugs starting from %d', max_order+1)
-            for n, slug in enumerate(existing.values(), max_order+1):
-                slug.order = n
-                slug.save()
-
-        logger.info('%d existing slugs', len(existing))
-
         slugs = [utils.to_maxlength(Slug, 'slug', slug) for slug in slugs]
-        for n, slug in enumerate(slugs):
-            try:
-                s = existing.pop(slug)
-                logger.info('Updating new slug %d: %s', n, slug)
-                s.order = n
-                s.save()
-            except KeyError:
-                logger.info('Creating new slug %d: %s', n, slug)
-                try:
-                    Slug.objects.create(slug=slug,
-                                        content_object=self,
-                                        order=n,
-                                        scope=self.scope,
-                                       )
-                except IntegrityError as ie:
-                    logger.warn('Could not create Slug for %s: %s', self, ie)
-
-        with transaction.atomic():
-            delete = [s.pk for s in existing.values()]
-            logger.info('Deleting %d slugs', len(delete))
-            Slug.objects.filter(id__in=delete).delete()
-
+        existing = {s.slug: s for s in self.slugs.all()}
+        utils.set_ordered_entries(self, slugs, existing, Slug, 'slug',
+                                  'content_object')
 
 
 class MergedUUIDsMixin(models.Model):
