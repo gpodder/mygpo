@@ -6,9 +6,6 @@ from django.conf import settings
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.celery import celery
 from mygpo.history.models import HistoryEntry
-from mygpo.data.feeddownloader import PodcastUpdater
-from mygpo.utils import get_timestamp
-from mygpo.users.models import EpisodeAction
 from mygpo.flattr import Flattr
 from mygpo.history.models import EpisodeHistoryEntry
 

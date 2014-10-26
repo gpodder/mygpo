@@ -37,24 +37,6 @@ DATABASES = {
                 default='postgres://mygpo:mygpo@localhost/mygpo'),
 }
 
-COUCHDB_DATABASES = {
-    'mygpo.users':
-        {'URL': 'http://127.0.0.1:5984/mygpo_users'},
-
-    'mygpo.userdata':
-        {'URL': 'http://127.0.0.1:5984/mygpo_userdata'},
-}
-
-# Maps design documents to databases. The keys correspond to the directories in
-# mygpo/couch/, the values are the app labels which are mapped to the actual
-# databases in COUCHDB_DATABASES. This indirect mapping is used because
-# COUCHDB_DATABASES is likely to be overwritten in settings_prod.py while
-# COUCHDB_DDOC_MAPPING is most probably not overwritten.
-COUCHDB_DDOC_MAPPING = {
-    'userdata':   'userdata',
-    'users':      'users',
-}
-
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -131,7 +113,6 @@ INSTALLED_APPS = (
     'mygpo.pubsub',
     'mygpo.podcastlists',
     'mygpo.votes',
-    'mygpo.db.couchdb',
 )
 
 try:

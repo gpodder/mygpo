@@ -26,7 +26,5 @@ Contents
 .. toctree::
     :maxdepth: 1
 
-    couchdb-docs
-    couchdb-views
     python3
     postgres-setup

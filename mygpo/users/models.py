@@ -3,12 +3,8 @@ from __future__ import unicode_literals
 import re
 import uuid
 import collections
-from datetime import datetime
 import dateutil.parser
-from itertools import imap
-import string
 
-from couchdbkit.ext.django.schema import *
 from uuidfield import UUIDField
 
 from django.core.validators import RegexValidator
@@ -22,7 +18,6 @@ from mygpo.core.models import (TwitterModel, UUIDModel, SettingsModel,
     GenericManager, DeleteableModel, )
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.utils import random_token
-from mygpo.users.settings import FAV_FLAG, SettingsMixin
 
 import logging
 logger = logging.getLogger(__name__)
@@ -172,126 +167,6 @@ class UserProfile(TwitterModel, SettingsModel):
             raise TokenException('Invalid token name %s' % token_name)
 
         setattr(self, token_name, random_token())
-
-
-class EpisodeAction(DocumentSchema):
-    """
-    One specific action to an episode. Must
-    always be part of a EpisodeUserState
-    """
-
-    action        = StringProperty(required=True)
-
-    # walltime of the event (assigned by the uploading client, defaults to now)
-    timestamp     = DateTimeProperty(required=True, default=datetime.utcnow)
-
-    # upload time of the event
-    upload_timestamp = IntegerProperty(required=True)
-
-    device_oldid  = IntegerProperty(required=False)
-    device        = StringProperty()
-    started       = IntegerProperty()
-    playmark      = IntegerProperty()
-    total         = IntegerProperty()
-
-    def __eq__(self, other):
-        if not isinstance(other, EpisodeAction):
-            return False
-        vals = ('action', 'timestamp', 'device', 'started', 'playmark',
-                'total')
-        return all([getattr(self, v, None) == getattr(other, v, None) for v in vals])
-
-
-    def to_history_entry(self):
-        entry = HistoryEntry()
-        entry.action = self.action
-        entry.timestamp = self.timestamp
-        entry.device_id = self.device
-        entry.started = self.started
-        entry.position = self.playmark
-        entry.total = self.total
-        return entry
-
-
-
-    def validate_time_values(self):
-        """ Validates allowed combinations of time-values """
-
-        PLAY_ACTION_KEYS = ('playmark', 'started', 'total')
-
-        # Key found, but must not be supplied (no play action!)
-        if self.action != 'play':
-            for key in PLAY_ACTION_KEYS:
-                if getattr(self, key, None) is not None:
-                    raise InvalidEpisodeActionAttributes('%s only allowed in play actions' % key)
-
-        # Sanity check: If started or total are given, require playmark
-        if ((self.started is not None) or (self.total is not None)) and \
-                self.playmark is None:
-            raise InvalidEpisodeActionAttributes('started and total require position')
-
-        # Sanity check: total and playmark can only appear together
-        if ((self.total is not None) or (self.started is not None)) and \
-           ((self.total is None) or (self.started is None)):
-            raise InvalidEpisodeActionAttributes('total and started can only appear together')
-
-
-    def __repr__(self):
-        return '%s-Action on %s at %s (in %s)' % \
-            (self.action, self.device, self.timestamp, self._id)
-
-
-    def __hash__(self):
-        return hash(frozenset([self.action, self.timestamp, self.device,
-                    self.started, self.playmark, self.total]))
-
-
-class EpisodeUserState(Document, SettingsMixin):
-    """
-    Contains everything a user has done with an Episode
-    """
-
-    episode       = StringProperty(required=True)
-    actions       = SchemaListProperty(EpisodeAction)
-    user_oldid    = IntegerProperty()
-    user          = StringProperty(required=True)
-    ref_url       = StringProperty(required=True)
-    podcast_ref_url = StringProperty(required=True)
-    merged_ids    = StringListProperty()
-    chapters      = ListProperty()
-    podcast       = StringProperty(required=True)
-
-
-
-    def add_actions(self, actions):
-        map(EpisodeAction.validate_time_values, actions)
-        self.actions = list(self.actions) + actions
-        self.actions = list(set(self.actions))
-        self.actions = sorted(self.actions, key=lambda x: x.timestamp)
-
-
-    def is_favorite(self):
-        return self.get_wksetting(FAV_FLAG)
-
-
-    def set_favorite(self, set_to=True):
-        self.settings[FAV_FLAG.name] = set_to
-
-
-    def get_history_entries(self):
-        return imap(EpisodeAction.to_history_entry, self.actions)
-
-
-    def __repr__(self):
-        return 'Episode-State %s (in %s)' % \
-            (self.episode, self._id)
-
-    def __eq__(self, other):
-        if not isinstance(other, EpisodeUserState):
-            return False
-
-        return (self.episode == other.episode and
-                self.user == other.user)
 
 
 class SyncGroup(models.Model):

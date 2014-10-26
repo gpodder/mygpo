@@ -15,8 +15,6 @@ OK
 
 Not OK
 ------
-* restkit # https://github.com/benoitc/restkit/tree/py3_2
-* couchdbkit
 * Babel # used only in one place, could maybe be removed as a (hard) dependency
 
 Unknown

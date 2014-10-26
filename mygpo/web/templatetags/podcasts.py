@@ -124,8 +124,7 @@ register.tag('podcast_group_link_target', PodcastGroupLinkTargetNode.compile)
 def podcast_group_link(podcast, title=None):
     """ Returns the link strings for Podcast and PodcastGroup objects
 
-    automatically distringuishes between relational Podcast/PodcastGroup
-    objects and CouchDB-based Podcast/PodcastGroup objects """
+    automatically distinguishes between relational Podcast/PodcastGroup """
 
     from mygpo.podcasts.models import PodcastGroup
 

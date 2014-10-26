@@ -33,7 +33,6 @@ from django.utils.translation import ugettext as _
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.api.constants import EPISODE_ACTION_TYPES
 from mygpo.core.tasks import flattr_thing
-from mygpo.users.models import HistoryEntry, EpisodeAction
 from mygpo.utils import parse_time, get_timestamp
 from mygpo.users.settings import FLATTR_TOKEN
 from mygpo.web.heatmap import EpisodeHeatmap
@@ -225,7 +224,7 @@ def flattr_episode(request, episode):
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
 
-# To make all view accessible via either CouchDB-ID for Slugs
+# To make all view accessible via either IDs or Slugs
 # a decorator queries the episode and passes the Id on to the
 # regular views
 

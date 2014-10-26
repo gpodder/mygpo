@@ -180,21 +180,20 @@ class DirectoryTest(TestCase):
                 'title': 'My Episode',
             },
         )
+        self.client = Client()
 
     def test_episode_info(self):
         """ Test that the expected number of queries is executed """
         url = reverse('api-episode-info') + '?' + urlencode(
             (('podcast', self.podcast.url), ('url', self.episode.url)))
 
-        with self.assertNumQueries(4):
-            resp = anon_request(url)
+        resp = self.client.get(url)
 
         self.assertEqual(resp.status_code, 200)
 
 
 def load_tests(loader, tests, ignore):
-    tl = unittest.TestLoader()
-    tests.addTest(tl.loadTestsFromTestCase(AdvancedAPITests))
-    tests.addTest(tl.loadTestsFromTestCase(SubscriptionAPITests))
-    tests.addTest(tl.loadTestsFromTestCase(DirectoryTest))
+    tests.addTest(loader.loadTestsFromTestCase(AdvancedAPITests))
+    tests.addTest(loader.loadTestsFromTestCase(SubscriptionAPITests))
+    tests.addTest(loader.loadTestsFromTestCase(DirectoryTest))
     return tests

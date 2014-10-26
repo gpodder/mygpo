@@ -19,8 +19,6 @@ import string
 from itertools import islice
 from functools import wraps
 
-from couchdbkit.exceptions import ResourceNotFound
-
 from django.shortcuts import render
 from django.core.cache import cache
 from django.http import HttpResponse, HttpResponseBadRequest

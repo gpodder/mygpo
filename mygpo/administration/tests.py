@@ -54,9 +54,7 @@ class SimpleTest(TestCase):
         device2 = Client.objects.create(user=user, uid='dev2', id=uuid.uuid1())
 
         subscribe(p1, user, device1)
-        time.sleep(1)
         unsubscribe(p1, user, device1)
-        time.sleep(1)
         subscribe(p1, user, device1)
         subscribe(p2, user, device2)
 

@@ -137,10 +137,7 @@ def maintenance(request, *args, **kwargs):
 
 
 def get_podcast_link_target(podcast, view_name='podcast', add_args=[]):
-    """ Returns the link-target for a Podcast, preferring slugs over Ids
-
-    automatically distringuishes between relational Podcast objects and
-    CouchDB-based Podcasts """
+    """ Returns the link-target for a Podcast, preferring slugs over Ids """
 
     # we prefer slugs
     if podcast.slug:
@@ -156,30 +153,15 @@ def get_podcast_link_target(podcast, view_name='podcast', add_args=[]):
 
 
 def get_podcast_group_link_target(group, view_name, add_args=[]):
-    """ Returns the link-target for a Podcast group, preferring slugs over Ids
-
-    automatically distringuishes between relational Podcast objects and
-    CouchDB-based Podcasts """
-
-    # we prefer slugs
-    if group.slug:
-        args = [group.slug]
-        view_name = '%s-slug-id' % view_name
-
-    # as a fallback we use CouchDB-IDs
-    else:
-        args = [group._id]
-        view_name = '%s-slug-id' % view_name
-
+    """ the link-target for a Podcast group, preferring slugs over Ids """
+    args = [group.slug]
+    view_name = '%s-slug-id' % view_name
     return reverse(view_name, args=args + add_args)
 
 
 def get_episode_link_target(episode, podcast, view_name='episode',
                             add_args=[]):
-    """ Returns the link-target for an Episode, preferring slugs over Ids
-
-    automatically distringuishes between relational Episode objects and
-    CouchDB-based Episodes """
+    """ Returns the link-target for an Episode, preferring slugs over Ids """
 
     # prefer slugs
     if episode.slug:

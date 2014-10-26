@@ -102,12 +102,6 @@ class UnsubscribeMergeTests(TestCase):
         pm = PodcastMerger([self.podcast1, self.podcast2], Counter(), [])
         pm.merge()
 
-        # seems that setting delayed_commit = false in the CouchDB config, as
-        # well as a delay here fix the intermittent failures.
-        # TODO: further investiation needed
-        import time
-        time.sleep(2)
-
         # get podcast for URL of podcast2 and unsubscribe from it
         p = Podcast.objects.get(urls__url=self.P2_URL)
         unsubscribe(p, self.user, self.device)

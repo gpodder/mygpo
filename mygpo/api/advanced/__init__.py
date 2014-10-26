@@ -43,8 +43,7 @@ from mygpo.utils import format_time, parse_bool, get_timestamp, \
 from mygpo.decorators import allowed_methods, cors_origin
 from mygpo.history.models import EpisodeHistoryEntry
 from mygpo.core.tasks import auto_flattr_episode
-from mygpo.users.models import (EpisodeAction, Client,
-                                InvalidEpisodeActionAttributes, )
+from mygpo.users.models import Client, InvalidEpisodeActionAttributes
 from mygpo.users.settings import FLATTR_AUTO
 from mygpo.favorites.models import FavoriteEpisode
 from mygpo.core.json import JSONDecodeError
