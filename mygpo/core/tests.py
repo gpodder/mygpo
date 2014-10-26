@@ -21,7 +21,6 @@ import doctest
 import mygpo.utils
 
 
-def suite():
-    suite = unittest.TestSuite()
-    suite.addTest(doctest.DocTestSuite(mygpo.utils))
-    return suite
+def load_tests(loader, tests, ignore):
+    tests.addTest(doctest.DocTestSuite(mygpo.utils))
+    return tests

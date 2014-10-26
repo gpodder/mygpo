@@ -192,10 +192,9 @@ class DirectoryTest(TestCase):
         self.assertEqual(resp.status_code, 200)
 
 
-def suite():
+def load_tests(loader, tests, ignore):
     tl = unittest.TestLoader()
-    suite = unittest.TestSuite()
-    suite.addTest(tl.loadTestsFromTestCase(AdvancedAPITests))
-    suite.addTest(tl.loadTestsFromTestCase(SubscriptionAPITests))
-    suite.addTest(tl.loadTestsFromTestCase(DirectoryTest))
-    return suite
+    tests.addTest(tl.loadTestsFromTestCase(AdvancedAPITests))
+    tests.addTest(tl.loadTestsFromTestCase(SubscriptionAPITests))
+    tests.addTest(tl.loadTestsFromTestCase(DirectoryTest))
+    return tests

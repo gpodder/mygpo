@@ -120,8 +120,7 @@ class UnsubscribeMergeTests(TestCase):
         self.user.delete()
 
 
-def suite():
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(DeviceSyncTests))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(UnsubscribeMergeTests))
-    return suite
+def load_tests(loader, tests, ignore):
+    tests.addTest(unittest.TestLoader().loadTestsFromTestCase(DeviceSyncTests))
+    tests.addTest(unittest.TestLoader().loadTestsFromTestCase(UnsubscribeMergeTests))
+    return tests

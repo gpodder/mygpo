@@ -117,9 +117,8 @@ class PodcastPageTests(TestCase):
             anon_request(url)
 
 
-def suite():
-    suite = unittest.TestSuite()
-    suite.addTest(doctest.DocTestSuite(mygpo.web.utils))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(SimpleWebTests))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(PodcastPageTests))
-    return suite
+def load_tests(loader, tests, ignore):
+    tests.addTest(doctest.DocTestSuite(mygpo.web.utils))
+    tests.addTest(unittest.TestLoader().loadTestsFromTestCase(SimpleWebTests))
+    tests.addTest(unittest.TestLoader().loadTestsFromTestCase(PodcastPageTests))
+    return tests

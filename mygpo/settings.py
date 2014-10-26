@@ -141,13 +141,7 @@ try:
 except ImportError:
     print >> sys.stderr, 'Could not load django-debug-toolbar'
 
-
-TEST_EXCLUDE = (
-    'django',
-    'couchdbkit',
-)
-
-TEST_RUNNER='mygpo.test.MygpoTestSuiteRunner'
+TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 ACCOUNT_ACTIVATION_DAYS = 7
 

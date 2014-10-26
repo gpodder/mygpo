@@ -57,7 +57,11 @@ class SimpleMergeTests(TestCase):
             })
 
     def test_merge_podcasts(self):
-        merge(self.podcast1, self.podcast2)
+        # decide which episodes to merge
+        groups = [(0, [self.episode1, self.episode2])]
+        counter = Counter()
+        pm = PodcastMerger([self.podcast1, self.podcast2], counter, groups)
+        pm.merge()
 
 
 @override_settings(CACHE={})
@@ -243,8 +247,7 @@ class MergeGroupTests(TransactionTestCase):
         self.user.delete()
 
 
-def suite():
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(MergeTests))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(MergeGroupTests))
-    return suite
+def load_tests(loader, tests, ignore):
+    tests.addTest(unittest.TestLoader().loadTestsFromTestCase(MergeTests))
+    tests.addTest(unittest.TestLoader().loadTestsFromTestCase(MergeGroupTests))
+    return tests
