@@ -30,7 +30,6 @@ from django.views.generic.base import View
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control
 
-from mygpo.decorators import repeat_on_conflict
 from mygpo.podcasts.models import Podcast, Episode, Tag
 from mygpo.users.models import HistoryEntry, Client
 from mygpo.subscriptions import get_subscribed_podcasts

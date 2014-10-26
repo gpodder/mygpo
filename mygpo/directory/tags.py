@@ -6,7 +6,7 @@ from itertools import chain
 
 from django.utils.text import slugify
 
-from mygpo.decorators import query_if_required, repeat_on_conflict
+from mygpo.decorators import query_if_required
 from mygpo.categories.models import Category, CategoryEntry
 
 
@@ -48,7 +48,6 @@ class Topics(object):
         return self._categories
 
 
-@repeat_on_conflict()
 def update_category(podcast):
     all_tags = list(t.tag for t in podcast.tags.all())
 

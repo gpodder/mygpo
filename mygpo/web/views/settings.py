@@ -32,7 +32,7 @@ from django.utils.html import strip_tags
 
 from mygpo.podcasts.models import Podcast
 from mygpo.subscriptions.models import PodcastConfig
-from mygpo.decorators import allowed_methods, repeat_on_conflict
+from mygpo.decorators import allowed_methods
 from mygpo.web.forms import UserAccountForm, ProfileForm, FlattrForm
 from mygpo.web.utils import normalize_twitter
 from mygpo.flattr import Flattr
@@ -206,15 +206,10 @@ def delete_account(request):
     if request.method == 'GET':
         return render(request, 'delete_account.html')
 
-    @repeat_on_conflict(['user'])
-    def do_delete(user):
-        user.is_active = False
-        user.deleted = True
-        user.save()
-
-    do_delete(user=request.user)
+    user.is_active = False
+    user.deleted = True
+    user.save()
     logout(request)
-
     return render(request, 'deleted_account.html')
 
 

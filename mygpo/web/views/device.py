@@ -34,7 +34,7 @@ from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control
 
 from mygpo.api import simple
-from mygpo.decorators import allowed_methods, repeat_on_conflict
+from mygpo.decorators import allowed_methods
 from mygpo.users.models import Client, UserProxy
 from mygpo.subscriptions.models import Subscription
 from mygpo.users.tasks import sync_user
@@ -315,14 +315,8 @@ def resync(request, device):
 @login_required
 @allowed_methods(['GET'])
 def unsync(request, device):
-
-    @repeat_on_conflict(['user'])
-    def do_unsync(user, device):
-        device.stop_sync()
-        user.save()
-
     try:
-        do_unsync(user=request.user, device=device)
+        device.stop_sync()
 
     except ValueError, e:
         messages.error(request, 'Could not unsync the device: {err}'.format(
