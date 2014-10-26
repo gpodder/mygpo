@@ -1,11 +1,16 @@
 from __future__ import unicode_literals
 from collections import Counter
+from datetime import datetime
 
 from django.db import models
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.users.models import Client
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 class HistoryEntry(models.Model):
@@ -82,7 +87,8 @@ class EpisodeHistoryEntry(models.Model):
                              on_delete=models.CASCADE)
 
     # the client on / for which the event happened
-    client = models.ForeignKey(Client, null=True, on_delete=models.CASCADE)
+    client = models.ForeignKey(Client, null=True, blank=True,
+                               on_delete=models.CASCADE)
 
     # the action that happened
     action = models.CharField(
@@ -91,17 +97,17 @@ class EpisodeHistoryEntry(models.Model):
     )
 
     # the URLs that were used to reference the podcast / episode
-    podcast_ref_url = models.URLField(null=True, blank=False, max_length=2048)
-    episode_ref_url = models.URLField(null=True, blank=False, max_length=2048)
+    podcast_ref_url = models.URLField(null=True, blank=True, max_length=2048)
+    episode_ref_url = models.URLField(null=True, blank=True, max_length=2048)
 
     # position (in seconds from the beginning) at which playback was started
-    started = models.IntegerField(null=True)
+    started = models.IntegerField(null=True, blank=True)
 
     # position (in seconds from the beginning) at which playback was stopped
-    stopped = models.IntegerField(null=True)
+    stopped = models.IntegerField(null=True, blank=True)
 
     # duration (in seconds) of the episode
-    total = models.IntegerField(null=True)
+    total = models.IntegerField(null=True, blank=True)
 
     class Meta:
         index_together = [
@@ -118,3 +124,77 @@ class EpisodeHistoryEntry(models.Model):
         ordering = ['-timestamp']
 
         verbose_name_plural = "Episode History Entries"
+
+
+    def clean(self):
+        """ Validates allowed combinations of time-values """
+        PLAY_ACTION_KEYS = ('started', 'stopped', 'total')
+
+        # Key found, but must not be supplied (no play action!)
+        if self.action != EpisodeHistoryEntry.PLAY:
+            for key in PLAY_ACTION_KEYS:
+                if getattr(self, key, None) is not None:
+                    raise ValidationError(
+                        '%s only allowed in "play" entries' % key)
+
+        # Sanity check: If started or total are given, require stopped
+        if ((self.started is not None) or (self.total is not None)) and \
+                self.stopped is None:
+            raise ValidationError('started and total require position')
+
+        # Sanity check: total and playmark can only appear together
+        if ((self.total is not None) or (self.started is not None)) and \
+           ((self.total is None) or (self.started is None)):
+            raise ValidationError('total and started can only appear together')
+
+
+    @classmethod
+    def create_entry(cls, user, episode, action, client=None, timestamp=None,
+                     started=None, stopped=None, total=None,
+                     podcast_ref_url=None, episode_ref_url=None):
+
+        try:
+            entry = cls.objects.get(user=user, episode=episode, client=client,
+                                    action=action)
+            logger.warn('Trying to save duplicaete {cls} for {user} '
+                '/ {episode}'.format(cls=cls, user=user, episode=episode))
+            # if such an entry already exists, do nothing
+            return
+
+        except cls.DoesNotExist:
+            pass
+
+        entry = cls(user=user, episode=episode, action=action)
+
+        if client:
+            entry.client = client
+
+        if started:
+            entry.started = started
+
+        if stopped:
+            entry.stopped = stopped
+
+        if total:
+            entry.total = total
+
+        if timestamp is None:
+            entry.timestamp = datetime.utcnow()
+        else:
+            entry.timestamp = timestamp
+
+        if podcast_ref_url:
+            entry.podcast_ref_url = podcast_ref_url
+
+        if episode_ref_url:
+            entry.episode_ref_url = episode_ref_url
+
+        try:
+            entry.full_clean()
+            entry.save()
+            return entry
+
+        except ValidationError as e:
+            logger.warn('Validation of {cls} failed for {user}: {err}'.format(
+                cls=cls, user=user, err=e))
+            return None

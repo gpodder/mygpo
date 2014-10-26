@@ -196,18 +196,8 @@ def add_action(request, episode):
     else:
         timestamp = datetime.utcnow()
 
-    history = EpisodeHistoryEntry(
-        timestamp = timestamp,
-        action = action_str,
-        user = user,
-        episode = episode,
-    )
-
-    if client:
-        history.client = client
-
-    history.save()
-
+    EpisodeHistoryEntry.create_entry(user, episode, action_str, client,
+                                     timestamp)
     podcast = episode.podcast
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 

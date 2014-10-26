@@ -230,19 +230,11 @@ def update_episodes(user, actions, now, ua_string):
         history = parse_episode_action(action, user, update_urls, now,
                                        ua_string)
 
-        # we could save ``history`` directly, but we check for duplicates first
-        EpisodeHistoryEntry.objects.get_or_create(
-            user = user,
-            client = history.client,
-            episode = episode,
-            action = history.action,
-            timestamp = history.timestamp,
-            defaults = {
-                'started': history.started,
-                'stopped': history.stopped,
-                'total': history.total,
-            }
-        )
+        EpisodeHistoryEntry.create_entry(user, episode, history.action,
+                                         history.client, history.timestamp,
+                                         history.started, history.stopped,
+                                         history.total, podcast_url,
+                                         episode_url)
 
         if history.action == EpisodeHistoryEntry.PLAY and auto_flattr:
             auto_flattr_episode.delay(user, episode.id)

@@ -97,24 +97,16 @@ class MergeTests(TransactionTestCase):
 
     def test_merge_podcasts(self):
 
-        action1 = EpisodeHistoryEntry.objects.create(
-            timestamp=datetime.utcnow(),
-            episode=self.episode1,
-            user=self.user,
-            client=None,
-            action=EpisodeHistoryEntry.PLAY,
-            podcast_ref_url=None,
-            episode_ref_url=None,
+        action1 = EpisodeHistoryEntry.create_entry(
+            self.user,
+            self.episode1,
+            EpisodeHistoryEntry.PLAY,
         )
 
-        action2 = EpisodeHistoryEntry.objects.create(
-            timestamp=datetime.utcnow(),
-            episode=self.episode2,
-            user=self.user,
-            client=None,
-            action=EpisodeHistoryEntry.DOWNLOAD,
-            podcast_ref_url=None,
-            episode_ref_url=None,
+        action2 = EpisodeHistoryEntry.create_entry(
+            self.user,
+            self.episode2,
+            EpisodeHistoryEntry.DOWNLOAD,
         )
 
         # decide which episodes to merge
@@ -197,24 +189,16 @@ class MergeGroupTests(TransactionTestCase):
         # assert that the podcasts are actually grouped
         self.assertEqual(podcast2.group, podcast3.group)
 
-        action1 = EpisodeHistoryEntry.objects.create(
-            timestamp=datetime.utcnow(),
-            episode=self.episode1,
-            user=self.user,
-            client=None,
-            action=EpisodeHistoryEntry.PLAY,
-            podcast_ref_url=None,
-            episode_ref_url=None,
+        action1 = EpisodeHistoryEntry.create_entry(
+            self.user,
+            self.episode1,
+            EpisodeHistoryEntry.PLAY,
         )
 
-        action2 = EpisodeHistoryEntry.objects.create(
-            timestamp=datetime.utcnow(),
-            episode=self.episode2,
-            user=self.user,
-            client=None,
-            action=EpisodeHistoryEntry.DOWNLOAD,
-            podcast_ref_url=None,
-            episode_ref_url=None,
+        action2 = EpisodeHistoryEntry.create_entry(
+            self.user,
+            self.episode2,
+            EpisodeHistoryEntry.DOWNLOAD,
         )
 
         # decide which episodes to merge

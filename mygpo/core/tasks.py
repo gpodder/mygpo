@@ -71,11 +71,5 @@ def auto_flattr_episode(user, episode_id):
 
     episode = Episode.objects.get(id=episode_id)
 
-    EpisodeHistoryEntry.objects.create(
-        episode = episode,
-        action = EpisodeHistoryEntry.FLATTR,
-        timestamp = datetime.utcnow(),
-        user = user,
-    )
-
+    EpisodeHistoryEntry.create_entry(user, episode, EpisodeHistoryEntry.FLATTR)
     return True

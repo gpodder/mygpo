@@ -60,19 +60,10 @@ class SimpleTest(TestCase):
         subscribe(p1, user, device1)
         subscribe(p2, user, device2)
 
-        action1 = EpisodeHistoryEntry.objects.create(
-            episode = e1,
-            user = user,
-            action = EpisodeHistoryEntry.PLAY,
-            timestamp = datetime.utcnow(),
-        )
-
-        action3 = EpisodeHistoryEntry.objects.create(
-            episode = e3,
-            user = user,
-            action = EpisodeHistoryEntry.PLAY,
-            timestamp = datetime.utcnow(),
-        )
+        action1 = EpisodeHistoryEntry.create_entry(user, e1,
+                                                   EpisodeHistoryEntry.PLAY)
+        action3 = EpisodeHistoryEntry.create_entry(user, e3,
+                                                   EpisodeHistoryEntry.PLAY)
 
         # we need that for later
         e3_id = e3.pk
