@@ -259,9 +259,9 @@ def subscription_diff(history):
             subscriptions[entry.podcast] -= 1
 
     subscribe = [podcast for (podcast, value) in
-                 subscriptions.items() if value > 0]
+                 list(subscriptions.items()) if value > 0]
     unsubscribe = [podcast for (podcast, value) in
-                   subscriptions.items() if value < 0]
+                   list(subscriptions.items()) if value < 0]
 
     return subscribe, unsubscribe
 

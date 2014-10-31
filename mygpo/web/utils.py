@@ -19,11 +19,11 @@ def get_accepted_lang(request):
     """ returns a list of language codes accepted by the HTTP request """
 
     lang_str = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
-    lang_str = filter(lambda c: c in string.letters+',', lang_str)
+    lang_str = [c for c in lang_str if c in string.letters+',']
     langs = lang_str.split(',')
     langs = [s[:2] for s in langs]
-    langs = map(str.strip, langs)
-    langs = filter(None, langs)
+    langs = list(map(str.strip, langs))
+    langs = [_f for _f in langs if _f]
     return list(set(langs))
 
 
@@ -86,28 +86,28 @@ def get_page_list(start, total, cur, show_max):
     """
 
     if show_max >= (total - start):
-        return range(start, total+1)
+        return list(range(start, total+1))
 
     ps = []
     if (cur - start) > show_max / 2:
-        ps.extend(range(start, show_max / 4))
+        ps.extend(list(range(start, show_max / 4)))
         ps.append('...')
-        ps.extend(range(cur - show_max / 4, cur))
+        ps.extend(list(range(cur - show_max / 4, cur)))
 
     else:
-        ps.extend(range(start, cur))
+        ps.extend(list(range(start, cur)))
 
     ps.append(cur)
 
     if (total - cur) > show_max / 2:
         # for the first pages, show more pages at the beginning
         add = show_max / 2 - len(ps)
-        ps.extend(range(cur + 1, cur + show_max / 4 + add))
+        ps.extend(list(range(cur + 1, cur + show_max / 4 + add)))
         ps.append('...')
-        ps.extend(range(total - show_max / 4, total + 1))
+        ps.extend(list(range(total - show_max / 4, total + 1)))
 
     else:
-        ps.extend(range(cur + 1, total + 1))
+        ps.extend(list(range(cur + 1, total + 1)))
 
     return ps
 

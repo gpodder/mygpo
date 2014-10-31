@@ -73,11 +73,11 @@ def target_uid(client):
 
 @register.filter
 def device_list(devices):
-    links = map(device_link, devices)
+    links = list(map(device_link, devices))
     return mark_safe(''.join(links))
 
 def device_link(device):
-    return u'<a href="{link}" title="{name}">{icon}</a>'.format(
+    return '<a href="{link}" title="{name}">{icon}</a>'.format(
             link = reverse(show, args=[device.uid]),
             name = device.name,
             icon = device_icon(device),

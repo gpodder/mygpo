@@ -45,8 +45,8 @@ class DeviceSyncTests(unittest.TestCase):
         dev1 = Client.objects.create(id=uuid.uuid1(), user=self.user, uid='d1')
         dev2 = Client.objects.create(id=uuid.uuid1(), user=self.user, uid='d2')
 
-        group = self.user.get_grouped_devices().next()
-        self.assertEquals(group.is_synced, False)
+        group = next(self.user.get_grouped_devices())
+        self.assertEqual(group.is_synced, False)
         self.assertIn(dev1, group.devices)
         self.assertIn(dev2, group.devices)
 
@@ -57,18 +57,18 @@ class DeviceSyncTests(unittest.TestCase):
 
         groups = self.user.get_grouped_devices()
 
-        g2 = groups.next()
-        self.assertEquals(g2.is_synced, False)
+        g2 = next(groups)
+        self.assertEqual(g2.is_synced, False)
         self.assertIn(dev2, g2.devices)
 
-        g1 = groups.next()
-        self.assertEquals(g1.is_synced, True)
+        g1 = next(groups)
+        self.assertEqual(g1.is_synced, True)
         self.assertIn(dev1, g1.devices)
         self.assertIn(dev3, g1.devices)
 
         targets = dev1.get_sync_targets()
-        target = targets.next()
-        self.assertEquals(target, dev2)
+        target = next(targets)
+        self.assertEqual(target, dev2)
 
     def tearDown(self):
         Client.objects.filter(user=self.user).delete()

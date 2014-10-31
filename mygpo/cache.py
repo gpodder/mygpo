@@ -22,7 +22,7 @@ def cache_result(**cache_kwargs):
         def _get(*args, **kwargs):
 
             key = sha1(str(f.__module__) + str(f.__name__) +
-                       unicode(args) + unicode(kwargs)).hexdigest()
+                       str(args) + str(kwargs)).hexdigest()
 
             # the timeout parameter can't be used when getting from a cache
             get_kwargs = dict(cache_kwargs)

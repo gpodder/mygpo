@@ -1,7 +1,7 @@
-from __future__ import unicode_literals
+
 
 import uuid
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import json
 
 from django.core.urlresolvers import reverse
@@ -92,4 +92,4 @@ class TestAPI(TestCase):
             'scope': scope,
         })
         return '{url}?{params}'.format(url=url,
-                                       params=urllib.urlencode(params))
+                                       params=urllib.parse.urlencode(params))

@@ -4,8 +4,8 @@
 #
 #
 
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 import logging
 
 from django.core.urlresolvers import reverse
@@ -55,22 +55,22 @@ def subscribe(podcast, feedurl, huburl, base_url, mode='subscribe'):
         "hub.verify_token": subscription.verify_token,
     }
 
-    data = urllib.urlencode(data.items())
+    data = urllib.parse.urlencode(list(data.items()))
     logger.debug('sending request: %s' % repr(data))
 
     resp = None
 
     try:
-        resp = urllib2.urlopen(huburl, data)
+        resp = urllib.request.urlopen(huburl, data)
 
-    except urllib2.HTTPError, e:
+    except urllib.error.HTTPError as e:
         if e.code != 204:  # we actually expect a 204 return code
             msg = 'Could not send subscription to Hub: HTTP Error %d: %s' % \
                 (e.code, e.reason)
             logger.warn(msg)
             raise SubscriptionError(msg)
 
-    except Exception, e:
+    except Exception as e:
         msg = 'Could not send subscription to Hub: %s' % repr(e)
         logger.warn(msg)
         raise SubscriptionError(msg)
@@ -85,6 +85,6 @@ def subscribe(podcast, feedurl, huburl, base_url, mode='subscribe'):
 
 def callback_url(feedurl, base_url):
     callback = reverse('pubsub-subscribe')
-    param = urllib.urlencode([('url', feedurl)])
+    param = urllib.parse.urlencode([('url', feedurl)])
     return '{base}{callback}?{param}'.format(base=base_url, callback=callback,
                                              param=param)

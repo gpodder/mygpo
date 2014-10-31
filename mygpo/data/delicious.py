@@ -17,8 +17,8 @@
 
 
 import hashlib
-import urllib
-import urlparse
+import urllib.request, urllib.parse, urllib.error
+import urllib.parse
 
 from mygpo.core.json import json
 
@@ -30,9 +30,9 @@ def get_tags(url):
     used each tag
     """
 
-    split = urlparse.urlsplit(url)
+    split = urllib.parse.urlsplit(url)
     if split.path == '':
-        split = urlparse.SplitResult(split.scheme, split.netloc, '/', split.query, split.fragment)
+        split = urllib.parse.SplitResult(split.scheme, split.netloc, '/', split.query, split.fragment)
     url = split.geturl()
 
     m = hashlib.md5()
@@ -41,7 +41,7 @@ def get_tags(url):
     url_md5 = m.hexdigest()
     req = 'http://feeds.delicious.com/v2/json/urlinfo/%s' % url_md5
 
-    resp = urllib.urlopen(req).read()
+    resp = urllib.request.urlopen(req).read()
     try:
         resp_obj = json.loads(resp)
     except ValueError:
@@ -51,7 +51,7 @@ def get_tags(url):
     for o in resp_obj:
         if (not 'top_tags' in o) or (not o['top_tags']):
             return {}
-        for tag, count in o['top_tags'].iteritems():
+        for tag, count in o['top_tags'].items():
             tags[tag] = count
 
 

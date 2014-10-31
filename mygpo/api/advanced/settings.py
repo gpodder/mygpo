@@ -70,7 +70,7 @@ class SettingsAPI(APIView):
 
     def update_settings(self, settings, actions):
         """ Update the settings according to the actions """
-        for key, value in actions.get('set', {}).iteritems():
+        for key, value in actions.get('set', {}).items():
             settings.set_setting(key, value)
 
         for key in actions.get('remove', []):

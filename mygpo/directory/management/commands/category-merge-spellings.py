@@ -11,19 +11,19 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         if len(args) < 2:
-            print """
+            print("""
 Merges multiple categories into one by listing them as alternative spellings
 
 Usage:
   ./manage.py category-merge-spellings <category> <spelling1> [<spelling2> ...]
-"""
+""")
             return
 
         start_time = datetime.utcnow()
         cat_name = args[0]
         spellings = args[1:]
 
-        print "Adding new spellings for %s ..." % cat_name
+        print("Adding new spellings for %s ..." % cat_name)
         category, created = Category.objects.get_or_create(
             tags__tag=slugify(cat_name),
             defaults={

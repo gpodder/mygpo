@@ -28,9 +28,9 @@ import itertools
 from datetime import datetime, timedelta, date
 import time
 import hashlib
-import urlparse
-import urllib
-import urllib2
+import urllib.parse
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 import zlib
 import shlex
 
@@ -112,7 +112,7 @@ def parse_time(value):
         try:
             t = time.strptime(value, format)
             return t.tm_hour * 60*60 + t.tm_min * 60 + t.tm_sec
-        except ValueError, e:
+        except ValueError as e:
             continue
 
     return int(value)
@@ -175,9 +175,9 @@ def iterate_together(lists, key=lambda x: x, reverse=False):
 
     def _take(it):
         try:
-            i = it.next()
+            i = next(it)
             while i is None:
-                i = it.next()
+                i = next(it)
             return Next(i, True)
         except StopIteration:
             return Next(None, False)
@@ -201,7 +201,7 @@ def iterate_together(lists, key=lambda x: x, reverse=False):
                 res[n] = item.item
                 continue
 
-            min_v = min_(filter(lambda x: x is not None, res), key=key)
+            min_v = min_([x for x in res if x is not None], key=key)
 
             if key(item.item) == key(min_v):
                 res[n] = item.item
@@ -234,12 +234,12 @@ def progress(val, max_val, status_str='', max_width=50, stream=sys.stdout):
                    percentage_str + \
                    progress_str[percentage_start+len(percentage_str):]
 
-    print >> stream, '\r',
-    print >> stream, '[ %s ] %s / %s | %s' % (
+    print('\r', end=' ', file=stream)
+    print('[ %s ] %s / %s | %s' % (
         progress_str,
         val,
         max_val,
-        status_str),
+        status_str), end=' ', file=stream)
     stream.flush()
 
 
@@ -248,8 +248,8 @@ def set_cmp(list, simplify):
     Builds a set out of a list but uses the results of simplify to determine equality between items
     """
     simpl = lambda x: (simplify(x), x)
-    lst = dict(map(simpl, list))
-    return lst.values()
+    lst = dict(list(map(simpl, list)))
+    return list(lst.values())
 
 
 def first(it):
@@ -268,15 +268,15 @@ def intersect(a, b):
 
 
 def remove_control_chars(s):
-    all_chars = (unichr(i) for i in xrange(0x110000))
-    control_chars = ''.join(map(unichr, range(0,32) + range(127,160)))
+    all_chars = (chr(i) for i in range(0x110000))
+    control_chars = ''.join(map(chr, list(range(0,32)) + list(range(127,160))))
     control_char_re = re.compile('[%s]' % re.escape(control_chars))
 
     return control_char_re.sub('', s)
 
 
 def unzip(a):
-    return tuple(map(list,zip(*a)))
+    return tuple(map(list,list(zip(*a))))
 
 
 def parse_range(s, min, max, default=None):
@@ -325,7 +325,7 @@ def linearize(key, iterators, reverse=False):
     vals = []
     for i in iters:
         try:
-            v = i.next()
+            v = next(i)
             vals. append( (v, i) )
         except StopIteration:
             continue
@@ -335,7 +335,7 @@ def linearize(key, iterators, reverse=False):
         val, it = vals.pop(0)
         yield val
         try:
-            next_val = it.next()
+            next_val = next(it)
             vals.append( (next_val, it) )
         except StopIteration:
             pass
@@ -370,18 +370,18 @@ def skip_pairs(iterator, cmp=cmp):
     """
 
     iterator = iter(iterator)
-    next = iterator.next()
+    next = next(iterator)
 
     while True:
         item = next
         try:
-            next = iterator.next()
+            next = next(iterator)
         except StopIteration as e:
             yield item
             raise e
 
         if cmp(item, next) == 0:
-            next = iterator.next()
+            next = next(iterator)
         else:
             yield item
 
@@ -432,9 +432,9 @@ def longest_substr(strings):
     reference = shortest_of(strings)
     length = len(reference)
     #find a suitable slice i:j
-    for i in xrange(length):
+    for i in range(length):
         #only consider strings long at least len(substr) + 1
-        for j in xrange(i + len(substr) + 1, length):
+        for j in range(i + len(substr) + 1, length):
             candidate = reference[i:j]
             if all(candidate in text for text in strings):
                 substr = candidate
@@ -488,7 +488,7 @@ def file_hash(f, h=hashlib.md5, block_size=2**20):
 
 def split_list(l, prop):
     """ split elements that satisfy a property, and those that don't """
-    match   = filter(prop, l)
+    match   = list(filter(prop, l))
     nomatch = [x for x in l if x not in match]
     return match, nomatch
 
@@ -522,7 +522,7 @@ def sorted_chain(links, key, reverse=False):
         new_items = [(key(i), i, False) for i in item]
 
         # sort links (placeholders) and elements together
-        mixed_list = sorted(mixed_list + new_items, key=lambda (k, _v, _e): k,
+        mixed_list = sorted(mixed_list + new_items, key=lambda k__v__e: k__v__e[0],
                 reverse=reverse)
 
 
@@ -558,21 +558,21 @@ def url_add_authentication(url, username, password):
     # Relaxations of the strict quoting rules (bug 1521):
     # 1. Accept '@' in username and password
     # 2. Acecpt ':' in password only
-    username = urllib.quote(username, safe='@')
+    username = urllib.parse.quote(username, safe='@')
 
     if password is not None:
-        password = urllib.quote(password, safe='@:')
+        password = urllib.parse.quote(password, safe='@:')
         auth_string = ':'.join((username, password))
     else:
         auth_string = username
 
     url = url_strip_authentication(url)
 
-    url_parts = list(urlparse.urlsplit(url))
+    url_parts = list(urllib.parse.urlsplit(url))
     # url_parts[1] is the HOST part of the URL
     url_parts[1] = '@'.join((auth_string, url_parts[1]))
 
-    return urlparse.urlunsplit(url_parts)
+    return urllib.parse.urlunsplit(url_parts)
 
 
 def urlopen(url, headers=None, data=None):
@@ -582,12 +582,12 @@ def urlopen(url, headers=None, data=None):
     username, password = username_password_from_url(url)
     if username is not None or password is not None:
         url = url_strip_authentication(url)
-        password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
+        password_mgr = urllib.request.HTTPPasswordMgrWithDefaultRealm()
         password_mgr.add_password(None, url, username, password)
-        handler = urllib2.HTTPBasicAuthHandler(password_mgr)
-        opener = urllib2.build_opener(handler)
+        handler = urllib.request.HTTPBasicAuthHandler(password_mgr)
+        opener = urllib.request.build_opener(handler)
     else:
-        opener = urllib2.build_opener()
+        opener = urllib.request.build_opener()
 
     if headers is None:
         headers = {}
@@ -595,7 +595,7 @@ def urlopen(url, headers=None, data=None):
         headers = dict(headers)
 
     headers.update({'User-agent': settings.USER_AGENT})
-    request = urllib2.Request(url, data=data, headers=headers)
+    request = urllib.request.Request(url, data=data, headers=headers)
     return opener.open(request)
 
 
@@ -637,12 +637,12 @@ def username_password_from_url(url):
     >>> username_password_from_url('http://example.com/x@y:z@test.com/')
     (None, None)
     """
-    if type(url) not in (str, unicode):
+    if type(url) not in (str, str):
         raise ValueError('URL has to be a string or unicode object.')
 
     (username, password) = (None, None)
 
-    (scheme, netloc, path, params, query, fragment) = urlparse.urlparse(url)
+    (scheme, netloc, path, params, query, fragment) = urllib.parse.urlparse(url)
 
     if '@' in netloc:
         (authentication, netloc) = netloc.rsplit('@', 1)
@@ -662,10 +662,10 @@ def username_password_from_url(url):
             #    is handled by the authentication.split(':', 1) above, and
             #    will cause any extraneous ':'s to be part of the password.
 
-            username = urllib.unquote(username)
-            password = urllib.unquote(password)
+            username = urllib.parse.unquote(username)
+            password = urllib.parse.unquote(password)
         else:
-            username = urllib.unquote(authentication)
+            username = urllib.parse.unquote(authentication)
 
     return (username, password)
 
@@ -694,14 +694,14 @@ def url_strip_authentication(url):
     >>> url_strip_authentication('http://x@x.com:s3cret@example.com/')
     'http://example.com/'
     """
-    url_parts = list(urlparse.urlsplit(url))
+    url_parts = list(urllib.parse.urlsplit(url))
     # url_parts[1] is the HOST part of the URL
 
     # Remove existing authentication data
     if '@' in url_parts[1]:
         url_parts[1] = url_parts[1].rsplit('@', 1)[1]
 
-    return urlparse.urlunsplit(url_parts)
+    return urllib.parse.urlunsplit(url_parts)
 
 
 # Native filesystem encoding detection
@@ -723,7 +723,7 @@ def sanitize_encoding(filename):
         return filename
 
     global encoding
-    if not isinstance(filename, unicode):
+    if not isinstance(filename, str):
         filename = filename.decode(encoding, 'ignore')
     return filename.encode(encoding, 'ignore')
 
@@ -859,11 +859,11 @@ def deep_eq(_v1, _v2, datetime_fudge=default_fudge, _assert=False):
   # guard against strings because they are iterable and their
   # elements yield iterables infinitely.
   # I N C E P T I O N
-  for t in types.StringTypes:
+  for t in str:
     if isinstance(_v1, t):
       break
   else:
-    if isinstance(_v1, types.DictType):
+    if isinstance(_v1, dict):
       op = _deep_dict_eq
     else:
       try:
@@ -951,7 +951,7 @@ def normalize_feed_url(url):
     if not url or len(url) < 8:
         return None
 
-    if isinstance(url, unicode):
+    if isinstance(url, str):
         url = url.encode('utf-8', 'ignore')
 
     # This is a list of prefixes that you can use to minimize the amount of
@@ -967,7 +967,7 @@ def normalize_feed_url(url):
             'ytpl:': 'http://gdata.youtube.com/feeds/api/playlists/%s',
     }
 
-    for prefix, expansion in PREFIXES.iteritems():
+    for prefix, expansion in PREFIXES.items():
         if url.startswith(prefix):
             url = expansion % (url[len(prefix):],)
             break
@@ -976,14 +976,14 @@ def normalize_feed_url(url):
     if not '://' in url:
         url = 'http://' + url
 
-    scheme, netloc, path, query, fragment = urlparse.urlsplit(url)
+    scheme, netloc, path, query, fragment = urllib.parse.urlsplit(url)
 
     # Schemes and domain names are case insensitive
     scheme, netloc = scheme.lower(), netloc.lower()
 
     # encode non-encoded characters
-    path = urllib.quote(path, '/%')
-    query = urllib.quote_plus(query, ':&=')
+    path = urllib.parse.quote(path, '/%')
+    query = urllib.parse.quote_plus(query, ':&=')
 
     # Remove authentication to protect users' privacy
     netloc = netloc.rsplit('@', 1)[-1]
@@ -1000,7 +1000,7 @@ def normalize_feed_url(url):
         return None
 
     # urlunsplit might return "a slighty different, but equivalent URL"
-    return urlparse.urlunsplit((scheme, netloc, path, query, fragment))
+    return urllib.parse.urlunsplit((scheme, netloc, path, query, fragment))
 
 
 def partition(items, predicate=bool):
@@ -1073,7 +1073,7 @@ def get_domain(url):
     >>> get_domain('https://example.com:80/my-podcast/feed.rss')
     'example.com'
     """
-    netloc = urlparse.urlparse(url).netloc
+    netloc = urllib.parse.urlparse(url).netloc
     try:
         port_idx = netloc.index(':')
         return netloc[:port_idx]
@@ -1098,10 +1098,10 @@ def set_ordered_entries(obj, new_entries, existing, EntryClass,
     logger.info('%d new entries', len(new_entries))
 
     with transaction.atomic():
-        max_order = max([s.order for s in existing.values()] +
+        max_order = max([s.order for s in list(existing.values())] +
                         [len(new_entries)])
         logger.info('Renumbering entries starting from %d', max_order+1)
-        for n, entry in enumerate(existing.values(), max_order+1):
+        for n, entry in enumerate(list(existing.values()), max_order+1):
             entry.order = n
             entry.save()
 
@@ -1129,6 +1129,6 @@ def set_ordered_entries(obj, new_entries, existing, EntryClass,
                 logger.warn('Could not create enry for %s: %s', obj, ie)
 
     with transaction.atomic():
-        delete = [s.pk for s in existing.values()]
+        delete = [s.pk for s in list(existing.values())]
         logger.info('Deleting %d entries', len(delete))
         EntryClass.objects.filter(id__in=delete).delete()

@@ -1,5 +1,5 @@
 import time
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 from optparse import make_option
 
 from mygpo.data import delicious
@@ -29,8 +29,8 @@ class Command(PodcastCommand):
             time.sleep(1)
 
             try:
-                f = urllib2.urlopen(p.link)
-            except urllib2.HTTPError:
+                f = urllib.request.urlopen(p.link)
+            except urllib.error.HTTPError:
                 continue
 
             tags = delicious.get_tags(f.url)

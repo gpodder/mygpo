@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 
 import re
 from datetime import datetime
@@ -484,7 +484,7 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
         episodes = self.episode_set.all()[:num_episodes]
 
         # We take all non-empty titles
-        titles = filter(None, (e.title for e in episodes))
+        titles = [_f for _f in (e.title for e in episodes) if _f]
 
         # there can not be a "common" title of a single title
         if len(titles) < 2:

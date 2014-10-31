@@ -62,7 +62,7 @@ class ChaptersAPI(APIView):
         if since:
             chapters = chapters.filter(created__gte=since)
 
-        chapters_json = map(self.chapter_to_json, chapters)
+        chapters_json = list(map(self.chapter_to_json, chapters))
 
         return JsonResponse({
             'chapters': chapters_json,

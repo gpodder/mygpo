@@ -1,6 +1,6 @@
 """ This module contains models for the publisher pages """
 
-from __future__ import unicode_literals
+
 
 from django.db import models
 from django.conf import settings

@@ -16,7 +16,7 @@
 #
 
 from functools import partial
-from itertools import imap
+
 from collections import defaultdict
 from datetime import datetime
 from importlib import import_module
@@ -102,7 +102,7 @@ def episodes(request, username, version=1):
         try:
             update_urls = update_episodes(request.user, actions, now, ua_string)
         except ValidationError as e:
-            logger.warn(u'Validation Error while uploading episode actions for user %s: %s', username, unicode(e))
+            logger.warn('Validation Error while uploading episode actions for user %s: %s', username, str(e))
             return HttpResponseBadRequest(str(e))
 
         except InvalidEpisodeActionAttributes as e:
@@ -173,12 +173,12 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
         history = history.filter(client=device)
 
     if version == 1:
-        history = imap(convert_position, history)
+        history = map(convert_position, history)
 
     actions = [episode_action_json(a, user) for a in history]
 
     if aggregated:
-        actions = dict( (a['episode'], a) for a in actions ).values()
+        actions = list(dict( (a['episode'], a) for a in actions ).values())
 
     return {'actions': actions, 'timestamp': until}
 
@@ -343,7 +343,7 @@ def favorites(request, username):
     favorites = FavoriteEpisode.episodes_for_user(request.user)
     domain = RequestSite(request).domain
     e_data = lambda e: episode_data(e, domain)
-    ret = map(e_data, favorites)
+    ret = list(map(e_data, favorites))
     return JsonResponse(ret)
 
 

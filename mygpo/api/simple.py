@@ -98,7 +98,7 @@ def all_subscriptions(request, username, format):
     except (TypeError, ValueError):
         return HttpResponseBadRequest('scale_logo has to be a numeric value')
 
-    if scale not in range(1, 257):
+    if scale not in list(range(1, 257)):
         return HttpResponseBadRequest('scale_logo has to be a number from 1 to 256')
 
 
@@ -131,18 +131,18 @@ def format_podcast_list(obj_list, format, title, get_podcast=None,
     get_podcast = get_podcast or default_get_podcast
 
     if format == 'txt':
-        podcasts = map(get_podcast, obj_list)
+        podcasts = list(map(get_podcast, obj_list))
         s = '\n'.join([p.url for p in podcasts] + [''])
         return HttpResponse(s, content_type='text/plain')
 
     elif format == 'opml':
-        podcasts = map(get_podcast, obj_list)
+        podcasts = list(map(get_podcast, obj_list))
         exporter = Exporter(title)
         opml = exporter.generate(podcasts)
         return HttpResponse(opml, content_type='text/xml')
 
     elif format == 'json':
-        objs = map(json_map, obj_list)
+        objs = list(map(json_map, obj_list))
         return JsonResponse(objs)
 
     elif format == 'jsonp':
@@ -154,14 +154,14 @@ def format_podcast_list(obj_list, format, title, get_podcast=None,
         if any(x not in ALLOWED_FUNCNAME for x in jsonp_padding):
             return HttpResponseBadRequest('JSONP padding can only contain the characters %(char)s' % {'char': ALLOWED_FUNCNAME})
 
-        objs = map(json_map, obj_list)
+        objs = list(map(json_map, obj_list))
         return JsonResponse(objs, jsonp_padding=jsonp_padding)
 
     elif format == 'xml':
         if None in (xml_template, request):
             return HttpResponseBadRequest('XML is not a valid format for this request')
 
-        podcasts = map(json_map, obj_list)
+        podcasts = list(map(json_map, obj_list))
         template_args.update({'podcasts': podcasts})
 
         return render(request, xml_template, template_args,
@@ -196,7 +196,7 @@ def parse_subscription(raw_post_data, format):
         return []
 
     urls = filter(None, urls)
-    urls = map(normalize_feed_url, urls)
+    urls = list(map(normalize_feed_url, urls))
     return urls
 
 
@@ -205,8 +205,8 @@ def set_subscriptions(urls, user, device_uid, user_agent):
     device = get_device(user, device_uid, user_agent, undelete=True)
 
     subscriptions = dict( (p.url, p) for p in device.get_subscribed_podcasts())
-    new = [p for p in urls if p not in subscriptions.keys()]
-    rem = [p for p in subscriptions.keys() if p not in urls]
+    new = [p for p in urls if p not in list(subscriptions.keys())]
+    rem = [p for p in list(subscriptions.keys()) if p not in urls]
 
     remove_podcasts = Podcast.objects.filter(urls__url__in=rem)
     for podcast in remove_podcasts:
@@ -235,7 +235,7 @@ def toplist(request, count, format):
     except (TypeError, ValueError):
         return HttpResponseBadRequest('scale_logo has to be a numeric value')
 
-    if scale not in range(1, 257):
+    if scale not in list(range(1, 257)):
         return HttpResponseBadRequest('scale_logo has to be a number from 1 to 256')
 
 
@@ -274,7 +274,7 @@ def search(request, format):
     except (TypeError, ValueError):
         return HttpResponseBadRequest('scale_logo has to be a numeric value')
 
-    if scale not in range(1, 257):
+    if scale not in list(range(1, 257)):
         return HttpResponseBadRequest('scale_logo has to be a number from 1 to 256')
 
     if not query:
@@ -318,7 +318,7 @@ def example_podcasts(request, format):
     except (TypeError, ValueError):
         return HttpResponseBadRequest('scale_logo has to be a numeric value')
 
-    if scale not in range(1, 257):
+    if scale not in list(range(1, 257)):
         return HttpResponseBadRequest('scale_logo has to be a number from 1 to 256')
 
     if not podcasts:

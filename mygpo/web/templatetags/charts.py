@@ -71,8 +71,8 @@ def pie_chart(parts):
     parts = [
         'cht=p',
         'chs=250x100',
-        'chl=%s' % '|'.join(parts.iterkeys()),
-        'chd=t:%s' % ','.join([ repr(x) for x in parts.itervalues() ])
+        'chl=%s' % '|'.join(iter(parts.keys())),
+        'chd=t:%s' % ','.join([ repr(x) for x in parts.values() ])
         ]
 
     s = '<img src="http://chart.apis.google.com/chart?%s"' % '&'.join(parts)

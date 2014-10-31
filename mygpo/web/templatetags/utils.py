@@ -31,7 +31,7 @@ def page_list(cur, start, total, show_max):
 
 @register.filter
 def filter_dict(dic):
-    return [key for key, val in dic.iteritems() if val]
+    return [key for key, val in dic.items() if val]
 
 
 @register.filter
@@ -83,10 +83,10 @@ def license_name(license_url):
 @register.filter
 def urlquote(s):
     """ makes urllib.quote_plus available as a template filter """
-    import urllib
-    if isinstance(s, unicode):
+    import urllib.request, urllib.parse, urllib.error
+    if isinstance(s, str):
         s = s.encode('utf-8')
-    return mark_safe(urllib.quote_plus(s))
+    return mark_safe(urllib.parse.quote_plus(s))
 
 
 hours_to_str = register.filter(hours_to_str)

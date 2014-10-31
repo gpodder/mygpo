@@ -24,21 +24,21 @@ class UserAccountForm(forms.Form):
         required=True)
 
     password_current = forms.CharField(
-        label=_(u'Current password'),
+        label=_('Current password'),
         widget=forms.PasswordInput(render_value=False, attrs={
             'class': 'input input-sm form-control',
         }),
         required=False)
 
     password1 = forms.CharField(
-        label=_(u'New password'),
+        label=_('New password'),
         widget=forms.PasswordInput(render_value=False, attrs={
             'class': 'input input-sm form-control',
         }),
         required=False)
 
     password2 = forms.CharField(
-        label=_(u'Confirm password'),
+        label=_('Confirm password'),
         widget=forms.PasswordInput(render_value=False, attrs={
             'class': 'input input-sm form-control',
         }),
@@ -67,7 +67,7 @@ class UserAccountForm(forms.Form):
 
 class ProfileForm(forms.Form):
     twitter = forms.CharField(
-        label=_(u'Twitter'),
+        label=_('Twitter'),
         widget=forms.TextInput(attrs={
             'class': 'input input-sm form-control',
         }),
@@ -75,7 +75,7 @@ class ProfileForm(forms.Form):
     )
 
     about = forms.CharField(
-        label=_(u'A few words about you'),
+        label=_('A few words about you'),
         required=False,
         widget=forms.Textarea(attrs={
             'class': 'input input-sm form-control',
@@ -165,7 +165,7 @@ class SyncForm(forms.Form):
         )
 
     def set_targets(self, sync_targets, label=''):
-        targets = map(self.sync_target_choice, sync_targets)
+        targets = list(map(self.sync_target_choice, sync_targets))
         self.fields['targets'] = forms.ChoiceField(
             choices=targets,
             label=label)

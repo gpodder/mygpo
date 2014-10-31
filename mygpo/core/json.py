@@ -14,7 +14,7 @@ try:
     JSONDecodeError = ValueError
 
 except ImportError:
-    print >> sys.stderr, 'ujson not found'
+    print('ujson not found', file=sys.stderr)
 
     try:
         # If SimpleJSON is installed separately, it might be a recent version
@@ -22,8 +22,8 @@ except ImportError:
         JSONDecodeError = json.JSONDecodeError
 
     except ImportError:
-        print >> sys.stderr, 'simplejson not found'
+        print('simplejson not found', file=sys.stderr)
 
         # Otherwise use json from the stdlib
-        import json
+        from . import json
         JSONDecodeError = ValueError

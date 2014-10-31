@@ -1,5 +1,5 @@
 import re
-from htmlentitydefs import entitydefs
+from html.entities import entitydefs
 
 from django import template
 from django.utils.safestring import mark_safe
@@ -27,10 +27,10 @@ def remove_html_tags(html):
     result = re_strip_tags.sub('', result)
 
     # Convert numeric XML entities to their unicode character
-    result = re_unicode_entities.sub(lambda x: unichr(int(x.group(1))), result)
+    result = re_unicode_entities.sub(lambda x: chr(int(x.group(1))), result)
 
     # Convert named HTML entities to their unicode character
-    result = re_html_entities.sub(lambda x: unicode(entitydefs.get(x.group(1),''), 'iso-8859-1'), result)
+    result = re_html_entities.sub(lambda x: str(entitydefs.get(x.group(1),''), 'iso-8859-1'), result)
 
     # Convert more than two newlines to two newlines
     result = re.sub('([\r\n]{2})([\r\n])+', '\\1', result)

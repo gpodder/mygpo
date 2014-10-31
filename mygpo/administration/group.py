@@ -34,12 +34,12 @@ class PodcastGrouper(object):
 
         episode_groups = defaultdict(list)
 
-        episode_features = map(get_features, episodes.items())
+        episode_features = list(map(get_features, list(episodes.items())))
 
         for features, episode_id in episode_features:
             episode = episodes[episode_id]
             episode_groups[features].append(episode)
 
-        groups = sorted(episode_groups.values(), key=_SORT_KEY)
+        groups = sorted(list(episode_groups.values()), key=_SORT_KEY)
 
         return enumerate(groups)

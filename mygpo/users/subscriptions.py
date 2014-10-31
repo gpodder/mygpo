@@ -85,4 +85,4 @@ def podcasts_for_states(podcast_states):
     podcast_ids = [state.podcast for state in podcast_states]
     podcasts = Podcast.objects.filter(id__in=podcast_ids)
     podcasts = {podcast.id.hex: podcast for podcast in podcasts}
-    return podcasts.values()
+    return list(podcasts.values())

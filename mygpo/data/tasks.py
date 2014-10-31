@@ -25,7 +25,7 @@ def update_related_podcasts(podcast, max_related=20):
     get_podcast = itemgetter(0)
 
     related = calc_similar_podcasts(podcast)[:max_related]
-    related = map(get_podcast, related)
+    related = list(map(get_podcast, related))
 
     for p in related:
         podcast.related_podcasts.add(p)

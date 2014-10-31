@@ -55,8 +55,8 @@ class PodcastList(UUIDModel, VoteMixin, UpdateInfoModel):
         return FlattrThing(
                 url = reverse('list-show', args=[username, self.slug]),
                 title = self.title,
-                description = u'A collection of podcasts about "%s" by %s user %s' % (self.title, domain, username),
-                category = u'audio',
+                description = 'A collection of podcasts about "%s" by %s user %s' % (self.title, domain, username),
+                category = 'audio',
                 hidden = None,
                 tags = None,
                 language = None,

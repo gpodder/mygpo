@@ -1,6 +1,6 @@
 """ Wrappers for the results of a search """
 
-from __future__ import unicode_literals
+
 
 
 class PodcastResult(object):
@@ -11,7 +11,7 @@ class PodcastResult(object):
         """ Construct a PodcastResult from a search result """
         obj = cls()
 
-        for key, val in doc['_source'].items():
+        for key, val in list(doc['_source'].items()):
             setattr(obj, key, val)
 
         obj.id = doc['_id']

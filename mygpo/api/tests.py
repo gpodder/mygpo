@@ -15,11 +15,11 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from __future__ import unicode_literals
+
 
 import unittest
 import doctest
-from urllib import urlencode
+from urllib.parse import urlencode
 from copy import deepcopy
 
 from django.test.client import Client
@@ -103,7 +103,7 @@ class AdvancedAPITests(unittest.TestCase):
         return True
 
     def compare_actions(self, a1, a2):
-        for key, val in a1.items():
+        for key, val in list(a1.items()):
             if a2.get(key, None) != val:
                 return False
         return True

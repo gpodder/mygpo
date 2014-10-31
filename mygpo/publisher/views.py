@@ -1,5 +1,5 @@
 from functools import wraps
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, \
@@ -92,7 +92,7 @@ def podcast(request, podcast):
         pubsubscription = None
 
     site = RequestSite(request)
-    feedurl_quoted = urllib.quote(podcast.url)
+    feedurl_quoted = urllib.parse.quote(podcast.url)
 
     return render(request, 'publisher/podcast.html', {
         'site': site,
@@ -254,7 +254,7 @@ def update_episode_slug(request, episode):
 
             other_episode.remove_slug(new_slug)
             messages.warning(request,
-                _(u'Removed slug {slug} from {episode}'.format(
+                _('Removed slug {slug} from {episode}'.format(
                     slug=new_slug, episode=other_episode.title))
             )
 

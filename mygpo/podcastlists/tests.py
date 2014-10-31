@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 
 from django.core.urlresolvers import reverse
 from django.test.client import Client
@@ -51,10 +51,10 @@ class TestAPI(TestCase):
 
         # assert that the list has actually been created
         lists = PodcastList.objects.filter(user=self.user)
-        self.assertEquals(1, len(lists))
+        self.assertEqual(1, len(lists))
         pl = lists[0]
-        self.assertEquals(title, pl.title)
-        self.assertEquals(len(urls), pl.entries.count())
+        self.assertEqual(title, pl.title)
+        self.assertEqual(len(urls), pl.entries.count())
         pl.delete()
 
     def test_replace(self):
@@ -72,8 +72,8 @@ class TestAPI(TestCase):
 
         # assert that the list has actually been created
         lists = PodcastList.objects.filter(user=self.user)
-        self.assertEquals(1, len(lists))
-        self.assertEquals(title, lists[0].title)
+        self.assertEqual(1, len(lists))
+        self.assertEqual(title, lists[0].title)
 
         # replace existing list; the lists's URL is returned
         # in the Location header
@@ -88,8 +88,8 @@ class TestAPI(TestCase):
 
         # assert that the list has actually been updated
         resp = self.client.get(url, content_type="text/plain", **self.extra)
-        resp_urls = filter(None, resp.content.split('\n'))
-        self.assertEquals(urls2, resp_urls)
+        resp_urls = [_f for _f in resp.content.split('\n') if _f]
+        self.assertEqual(urls2, resp_urls)
 
         # delete the list
         self.client.delete(url)

@@ -75,7 +75,7 @@ class SimpleWebTests(TestCase):
 
         for page in pages:
             response = self.client.get(reverse(page, args=args), follow=True)
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
 
 
 class PodcastPageTests(TestCase):

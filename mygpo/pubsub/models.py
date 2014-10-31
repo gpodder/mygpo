@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 
 from django.db import models
 
@@ -38,7 +38,7 @@ class HubSubscription(UpdateInfoModel):
     # the last mode that was requested, either subscribe or unsubscribe
     mode = models.CharField(
         choices=MODE_CHOICES,
-        max_length=max(map(len, [mode for mode, name in MODE_CHOICES])),
+        max_length=max(list(map(len, [mode for mode, name in MODE_CHOICES]))),
         blank=True,
     )
 

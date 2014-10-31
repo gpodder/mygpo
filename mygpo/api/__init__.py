@@ -68,7 +68,7 @@ class APIView(View):
             # after all views using it have been refactored
             return parse_request_body(request)
         except (JSONDecodeError, UnicodeDecodeError, ValueError) as e:
-            msg = u'Could not decode request body for user {}: {}'.format(
+            msg = 'Could not decode request body for user {}: {}'.format(
                 request.user.username,
                 request.body.decode('ascii', errors='replace'))
             logger.warn(msg, exc_info=True)

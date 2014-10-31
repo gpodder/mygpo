@@ -121,7 +121,7 @@ try:
     INSTALLED_APPS += ('debug_toolbar', )
 
 except ImportError:
-    print >> sys.stderr, 'Could not load django-debug-toolbar'
+    print('Could not load django-debug-toolbar', file=sys.stderr)
 
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
@@ -289,7 +289,7 @@ if 'test' in sys.argv:
 INTERNAL_IPS = os.getenv('INTERNAL_IPS', '').split()
 
 try:
-    from settings_prod import *
-except ImportError, e:
+    from .settings_prod import *
+except ImportError as e:
     import sys
-    print >> sys.stderr, 'create settings_prod.py with your customized settings'
+    print('create settings_prod.py with your customized settings', file=sys.stderr)

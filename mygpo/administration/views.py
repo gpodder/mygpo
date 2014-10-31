@@ -62,7 +62,7 @@ class HostInfo(AdminView):
         if not scheduled:
             num_celery_tasks = None
         else:
-            num_celery_tasks = sum(len(node) for node in scheduled.values())
+            num_celery_tasks = sum(len(node) for node in list(scheduled.values()))
 
         feed_queue_status = self._get_feed_queue_status()
 
@@ -126,7 +126,7 @@ class MergeVerify(MergeBase):
 
             grouper = PodcastGrouper(podcasts)
 
-            get_features = lambda (e_id, e): ((e.url, e.title), e_id)
+            get_features = lambda e_id_e: ((e_id_e[1].url, e_id_e[1].title), e_id_e[0])
 
             num_groups = grouper.group(get_features)
 
@@ -160,13 +160,13 @@ class MergeProcess(MergeBase):
         grouper = PodcastGrouper(podcasts)
 
         features = {}
-        for key, feature in request.POST.items():
+        for key, feature in list(request.POST.items()):
             m = self.RE_EPISODE.match(key)
             if m:
                 episode_id = m.group(1)
                 features[episode_id] = feature
 
-        get_features = lambda (e_id, e): (features.get(e_id, e_id), e_id)
+        get_features = lambda e_id_e1: (features.get(e_id_e1[0], e_id_e1[0]), e_id_e1[0])
 
         num_groups = grouper.group(get_features)
 
@@ -214,7 +214,7 @@ class MergeStatus(AdminView):
 
         return self.render_to_response({
                 'ready': True,
-                'actions': actions.items(),
+                'actions': list(actions.items()),
                 'podcast': podcast,
             })
 
@@ -256,7 +256,7 @@ class ClientStatsJsonView(AdminView):
         cs = ClientStats()
         clients = cs.get_entries()
 
-        return JsonResponse(map(self.to_dict, clients.most_common()))
+        return JsonResponse(list(map(self.to_dict, clients.most_common())))
 
     def to_dict(self, res):
         obj, count = res

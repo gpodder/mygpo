@@ -59,8 +59,8 @@ class SubscriptionsAPI(APIView):
 
         actions = self.parsed_body(request)
 
-        add = filter(None, actions.get('add', []))
-        rem = filter(None, actions.get('remove', []))
+        add = [_f for _f in actions.get('add', []) if _f]
+        rem = [_f for _f in actions.get('remove', []) if _f]
         logger.info('Subscription Upload @{username}/{device_uid}: add '
             '{num_add}, remove {num_remove}'.format(
             username=request.user.username, device_uid=device_uid,
@@ -82,20 +82,20 @@ class SubscriptionsAPI(APIView):
             logger.warn(msg)
             raise RequestException(msg)
 
-        add_s = map(normalize_feed_url, add)
-        rem_s = map(normalize_feed_url, remove)
+        add_s = list(map(normalize_feed_url, add))
+        rem_s = list(map(normalize_feed_url, remove))
 
         assert len(add) == len(add_s) and len(remove) == len(rem_s)
 
-        pairs = zip(add + remove, add_s + rem_s)
-        updated_urls = filter(lambda (a, b): a != b, pairs)
+        pairs = list(zip(add + remove, add_s + rem_s))
+        updated_urls = [a_b for a_b in pairs if a_b[0] != a_b[1]]
 
-        add_s = filter(None, add_s)
-        rem_s = filter(None, rem_s)
+        add_s = [_f for _f in add_s if _f]
+        rem_s = [_f for _f in rem_s if _f]
 
         # If two different URLs (in add and remove) have
         # been sanitized to the same, we ignore the removal
-        rem_s = filter(lambda x: x not in add_s, rem_s)
+        rem_s = [x for x in rem_s if x not in add_s]
 
         for add_url in add_s:
             podcast = Podcast.objects.get_or_create_for_url(add_url)

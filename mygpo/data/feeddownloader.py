@@ -18,8 +18,8 @@
 #
 
 import os.path
-import urllib2
-import httplib
+import urllib.request, urllib.error, urllib.parse
+import http.client
 import hashlib
 from datetime import datetime
 from itertools import chain, islice
@@ -84,7 +84,7 @@ class PodcastUpdater(object):
             self._validate_parsed(parsed)
 
         except (ParserException, FetchFeedException, NoEpisodesException,
-                VimeoError, ValueError, socket.error, urllib2.HTTPError) as ex:
+                VimeoError, ValueError, socket.error, urllib.error.HTTPError) as ex:
             #TODO: catch valueError (for invalid Ipv6 in feedservice)
 
             if isinstance(ex, VimeoError):
@@ -329,7 +329,7 @@ class PodcastUpdater(object):
 
             # save new cover art
             with open(filename, 'w') as fp:
-                fp.write(urllib2.urlopen(cover_art).read())
+                fp.write(urllib.request.urlopen(cover_art).read())
 
             # get hash of new file
             with open(filename) as f:
@@ -344,8 +344,8 @@ class PodcastUpdater(object):
 
             return cover_art
 
-        except (urllib2.HTTPError, urllib2.URLError, ValueError,
-                httplib.BadStatusLine, socket.error, IOError) as e:
+        except (urllib.error.HTTPError, urllib.error.URLError, ValueError,
+                http.client.BadStatusLine, socket.error, IOError) as e:
             logger.warn('Exception while updating podcast logo: %s', str(e))
 
 
@@ -381,7 +381,7 @@ def update_episode(parsed_episode, episode, podcast):
     episode.filesize = parsed_episode.files[0].filesize
     episode.language = parsed_episode.language or episode.language or \
                                                   podcast.language
-    episode.mimetypes = ','.join(list(set(filter(None, [f.mimetype for f in parsed_episode.files]))))
+    episode.mimetypes = ','.join(list(set([_f for _f in [f.mimetype for f in parsed_episode.files] if _f])))
     episode.flattr_url = to_maxlength(Episode, 'flattr_url',
                                       parsed_episode.flattr or
                                       episode.flattr_url)

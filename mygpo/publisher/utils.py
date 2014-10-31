@@ -46,7 +46,7 @@ def listener_data(podcasts, start_date=datetime(2010, 1, 1),
     play_counts = playcounts_timerange(history)
 
     # we start either at the first episode-release or the first listen-event
-    events = episodes.keys() + play_counts.keys()
+    events = list(episodes.keys()) + list(play_counts.keys())
 
     if not events:
         # if we don't have any events, stop
@@ -72,7 +72,7 @@ def episode_listener_data(episode, start_date=datetime(2010, 1, 1),
     play_counts = playcounts_timerange(history)
 
     # we start either at the episode-release or the first listen-event
-    events = play_counts.keys() + \
+    events = list(play_counts.keys()) + \
              [episode.released.date()] if episode.released else []
 
     if not events:
@@ -99,13 +99,13 @@ def subscriber_data(podcasts):
 
         subdata = [podcast.subscribers]
 
-        data = dict(map(create_entry, subdata))
+        data = dict(list(map(create_entry, subdata)))
 
         for k in data:
             coll_data[k] += data[k]
 
     # create a list of {'x': label, 'y': value}
-    coll_data = sorted([dict(x=a, y=b) for (a, b) in coll_data.items()], key=lambda x: x['x'])
+    coll_data = sorted([dict(x=a, y=b) for (a, b) in list(coll_data.items())], key=lambda x: x['x'])
 
     return coll_data
 

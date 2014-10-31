@@ -7,7 +7,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         if len(args) != 5:
-            print 'Usage: ./manage.py group-podcasts <url1> <url2> <group-name> <name1> <name2>'
+            print('Usage: ./manage.py group-podcasts <url1> <url2> <group-name> <name1> <name2>')
             return
 
         p1_url = args[0]

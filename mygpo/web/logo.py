@@ -16,7 +16,7 @@
 #
 
 import os.path
-import StringIO
+import io
 from datetime import datetime
 from glob import glob
 import errno
@@ -92,7 +92,7 @@ class CoverArt(View):
             del draw
             resized = Image.composite(resized, background, resized)
 
-        io = StringIO.StringIO()
+        io = io.StringIO()
 
         try:
             resized.save(io, 'JPEG', optimize=True, progression=True,
@@ -120,7 +120,7 @@ class CoverArt(View):
     @staticmethod
     def get_existing_thumbnails(prefix, filename):
         files = glob(os.path.join(LOGO_DIR, '*', prefix, filename))
-        return filter(lambda f: 'original' not in f, files)
+        return [f for f in files if 'original' not in f]
 
     @staticmethod
     def get_original(prefix, filename):

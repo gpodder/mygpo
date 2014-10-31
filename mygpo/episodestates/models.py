@@ -15,8 +15,8 @@ class EpisodeState(models.Model):
 
     # the latest action
     action = models.CharField(
-        max_length=max(map(len, [action for action, name
-                                 in EpisodeHistoryEntry.EPISODE_ACTIONS])),
+        max_length=max(list(map(len, [action for action, name
+                                 in EpisodeHistoryEntry.EPISODE_ACTIONS]))),
         choices=EpisodeHistoryEntry.EPISODE_ACTIONS,
     )
 

@@ -4,9 +4,9 @@
 #  based on flattr.py from gPodder by Bernd Schlapsi <brot@gmx.info>
 #
 
-import urllib
-import urllib2
-import urlparse
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
+import urllib.parse
 from collections import namedtuple
 
 from django.conf import settings
@@ -63,9 +63,9 @@ class Flattr(object):
 
         try:
             response = utils.urlopen(url, headers, data)
-        except urllib2.HTTPError, error:
+        except urllib.error.HTTPError as error:
             return {'_gpodder_statuscode': error.getcode()}
-        except urllib2.URLError, error:
+        except urllib.error.URLError as error:
             return {'_gpodder_no_connection': False}
 
         if response.getcode() == 200:
@@ -83,8 +83,8 @@ class Flattr(object):
         return bool(self.user.profile.settings.get_wksetting(FLATTR_TOKEN))
 
     def process_retrieved_code(self, url):
-        url_parsed = urlparse.urlparse(url)
-        query = urlparse.parse_qs(url_parsed.query)
+        url_parsed = urllib.parse.urlparse(url)
+        query = urllib.parse.parse_qs(url_parsed.query)
 
         if 'code' in query:
             code = query['code'][0]
@@ -117,7 +117,7 @@ class Flattr(object):
         if not self.user.profile.settings.get_wksetting(FLATTR_TOKEN):
             return (0, False)
 
-        quote_url = urllib.quote_plus(utils.sanitize_encoding(payment_url))
+        quote_url = urllib.parse.quote_plus(utils.sanitize_encoding(payment_url))
         url = self.THING_INFO_URL_TEMPLATE % {'url': quote_url}
         data = self.request(url)
         return (int(data.get('flattrs', 0)), bool(data.get('flattred', False)))
@@ -177,14 +177,14 @@ class Flattr(object):
 
         optional_args = set(thing._fields) - set(['url'])
 
-        args = [(u'url', self.domain + thing.url)]
+        args = [('url', self.domain + thing.url)]
         args += [(arg, getattr(thing, arg, None)) for arg in optional_args]
-        args = filter(lambda (k, v): v, args)  # filter out empty arguments
+        args = [k_v for k_v in args if k_v[1]]  # filter out empty arguments
 
         # TODO: check encoding
         args = [(k, v.encode('utf-8')) for (k, v) in args]
 
-        args_str = urllib.urlencode(args)
+        args_str = urllib.parse.urlencode(args)
 
         autosubmit = URL_TEMPLATE + '&' + args_str
 

@@ -1,6 +1,6 @@
-from __future__ import division
 
-from itertools import imap as map
+
+
 from math import ceil
 from collections import Counter
 
@@ -275,7 +275,7 @@ class MissingPodcast(View):
                 except (ParserException, FetchFeedException,
                         NoEpisodesException) as ex:
                     can_add = False
-                    messages.error(request, unicode(ex))
+                    messages.error(request, str(ex))
 
         return render(request, 'missing.html', {
                 'site': site,
