@@ -8,9 +8,6 @@ from uuidfield import UUIDField
 
 from django.db import models, connection
 
-import logging
-logger = logging.getLogger(__name__)
-
 
 class UUIDModel(models.Model):
     """ Models that have an UUID as primary key """
@@ -32,43 +29,6 @@ class TwitterModel(models.Model):
 
     class Meta:
         abstract = True
-
-
-class SettingsModel(models.Model):
-    """ A model that can store arbitrary settings as JSON """
-
-    settings = models.TextField(null=False, default='{}')
-
-    class Meta:
-        abstract = True
-
-    def get_wksetting(self, setting):
-        """ returns the value of a well-known setting """
-        try:
-            settings = json.loads(self.settings)
-        except ValueError as ex:
-            logger.warn('Decoding settings failed: {msg}'.format(msg=str(ex)))
-            return None
-
-        return settings.get(setting.name, setting.default)
-
-    def set_wksetting(self, setting, value):
-        try:
-            settings = json.loads(self.settings)
-        except ValueError as ex:
-            logger.warn('Decoding settings failed: {msg}'.format(msg=str(ex)))
-            settings = {}
-        settings[setting.name] = value
-        self.settings = json.dumps(settings)
-
-    def get_setting(self, name, default):
-        settings = json.loads(self.settings)
-        return settings.get(name, default)
-
-    def set_setting(self, name, value):
-        settings = json.loads(self.settings)
-        settings[name] = value
-        self.settings = json.dumps(settings)
 
 
 class GenericManager(models.Manager):

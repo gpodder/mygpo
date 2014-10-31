@@ -4,8 +4,7 @@ import collections
 from django.db import transaction
 
 from mygpo.users.models import Client
-from mygpo.subscriptions.models import (Subscription, SubscribedPodcast,
-    PodcastConfig, )
+from mygpo.subscriptions.models import Subscription, SubscribedPodcast
 from mygpo.subscriptions.signals import subscription_changed
 from mygpo.history.models import HistoryEntry
 from mygpo.utils import to_maxlength
@@ -166,7 +165,7 @@ def get_subscribed_podcasts(user, only_public=False):
                                         .order_by('podcast')\
                                         .distinct('podcast')\
                                         .select_related('podcast')
-    private = PodcastConfig.objects.get_private_podcasts(user)
+    private = UserSettings.objects.get_private_podcasts(user)
 
     podcasts = []
     for subscription in subscriptions:
@@ -209,7 +208,7 @@ def get_subscription_history(user, client=None, since=None, until=None,
 
     if public_only:
         logger.info('... only public')
-        private = PodcastConfig.objects.get_private_podcasts(user)
+        private = UserSettings.objects.get_private_podcasts(user)
         history = history.exclude(podcast__in=private)
 
     return history

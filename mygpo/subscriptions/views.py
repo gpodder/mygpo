@@ -12,7 +12,7 @@ from django.contrib.syndication.views import Feed
 from django.contrib.auth import get_user_model
 
 from mygpo.podcasts.models import Podcast
-from mygpo.subscriptions.models import Subscription, PodcastConfig
+from mygpo.subscriptions.models import Subscription
 from mygpo.users.settings import PUBLIC_SUB_PODCAST
 from mygpo.utils import unzip, skip_pairs
 from mygpo.api import simple

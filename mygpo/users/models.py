@@ -14,8 +14,9 @@ from django.contrib.auth.models import User as DjangoUser
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-from mygpo.core.models import (TwitterModel, UUIDModel, SettingsModel,
+from mygpo.core.models import (TwitterModel, UUIDModel,
     GenericManager, DeleteableModel, )
+from mygpo.usersettings.models import UserSettings
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.utils import random_token
 
@@ -114,7 +115,7 @@ class UserProxy(DjangoUser):
             yield group
 
 
-class UserProfile(TwitterModel, SettingsModel):
+class UserProfile(TwitterModel):
     """ Additional information stored for a User """
 
     # the user to which this profile belongs
@@ -167,6 +168,14 @@ class UserProfile(TwitterModel, SettingsModel):
             raise TokenException('Invalid token name %s' % token_name)
 
         setattr(self, token_name, random_token())
+
+    @property
+    def settings(self):
+        try:
+            return UserSettings.objects.get(user=self.user, content_type=None)
+        except UserSettings.DoesNotExist:
+            return UserSettings(user=self.user, content_type=None,
+                                object_id=None)
 
 
 class SyncGroup(models.Model):

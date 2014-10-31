@@ -49,7 +49,7 @@ def requires_token(token_name, denied_template=None):
 
             User = get_user_model()
             user = get_object_or_404(User, username=username)
-            token = user.profile.get_token(token_name)
+            token = user.profile.settings.get_token(token_name)
             u_token = request.GET.get('token', '')
 
             if token == '' or token == u_token:

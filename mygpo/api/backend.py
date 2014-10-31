@@ -28,7 +28,7 @@ def get_device(user, uid, user_agent, undelete=True):
     If the device has been deleted and undelete=True, it is undeleted.
     """
 
-    store_ua = user.profile.get_wksetting(STORE_UA)
+    store_ua = user.profile.settings.get_wksetting(STORE_UA)
 
     save = False
 

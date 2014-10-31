@@ -32,7 +32,7 @@ class UserpageView(View):
 
         context = {
             'page_user': user,
-            'flattr_username': user.profile.get_wksetting(FLATTR_USERNAME),
+            'flattr_username': user.profile.settings.get_wksetting(FLATTR_USERNAME),
             'site': site.domain,
             'subscriptions_token': user.profile.get_token('subscriptions_token'),
             'favorite_feeds_token': user.profile.get_token('favorite_feeds_token'),

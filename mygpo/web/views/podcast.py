@@ -28,6 +28,7 @@ from mygpo.core.tasks import flattr_thing
 from mygpo.utils import normalize_feed_url
 from mygpo.users.settings import PUBLIC_SUB_PODCAST, FLATTR_TOKEN
 from mygpo.publisher.utils import check_publisher_permission
+from mygpo.usersettings.models import UserSettings
 from mygpo.users.models import Client
 from mygpo.web.forms import SyncForm
 from mygpo.decorators import allowed_methods
@@ -78,7 +79,7 @@ def show(request, podcast):
 
         has_history = HistoryEntry.objects.filter(user=user, podcast=podcast)\
                                           .exists()
-        can_flattr = (user.profile.get_wksetting(FLATTR_TOKEN) and
+        can_flattr = (user.profile.settings.get_wksetting(FLATTR_TOKEN) and
                       podcast.flattr_url)
 
     else:
@@ -327,12 +328,13 @@ def subscribe_url(request):
 @never_cache
 @allowed_methods(['POST'])
 def set_public(request, podcast, public):
-    config, created = PodcastConfig.objects.get_or_create(
+    settings, created = UserSettings.objects.get_or_create(
         user=request.user,
-        podcast=podcast,
+        content_type=ContentType.objects.get_for_model(podcast),
+        object_id=podcast.pk,
     )
-    config.set_wksetting(PUBLIC_SUB_PODCAST, public)
-    config.save()
+    settings.set_wksetting(PUBLIC_SUB_PODCAST, public)
+    settings.save()
     return HttpResponseRedirect(get_podcast_link_target(podcast))
 
 

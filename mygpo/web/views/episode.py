@@ -73,7 +73,7 @@ def episode(request, episode):
         played_parts = EpisodeHeatmap(podcast, episode, user, episode.duration)
 
         devices = {c.id.hex: c for c in user.client_set.all()}
-        can_flattr = user.profile.get_wksetting(FLATTR_TOKEN) and episode.flattr_url
+        can_flattr = user.profile.settings.get_wksetting(FLATTR_TOKEN) and episode.flattr_url
 
     else:
         has_history = False

@@ -105,10 +105,10 @@ def dashboard(request, episode_count=10):
     if PublishedPodcast.objects.filter(publisher=request.user).exists():
         checklist.append('publish')
 
-    if request.user.profile.get_wksetting(FLATTR_TOKEN):
+    if request.user.profile.settings.get_wksetting(FLATTR_TOKEN):
         checklist.append('flattr')
 
-    if request.user.profile.get_wksetting(FLATTR_AUTO):
+    if request.user.profile.settings.get_wksetting(FLATTR_AUTO):
         checklist.append('auto-flattr')
 
     tomorrow = datetime.today() + timedelta(days=1)

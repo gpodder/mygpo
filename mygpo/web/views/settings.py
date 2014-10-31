@@ -31,7 +31,7 @@ from django.views.generic.base import View
 from django.utils.html import strip_tags
 
 from mygpo.podcasts.models import Podcast
-from mygpo.subscriptions.models import PodcastConfig
+from mygpo.usersettings.models import UserSettings
 from mygpo.decorators import allowed_methods
 from mygpo.web.forms import UserAccountForm, ProfileForm, FlattrForm
 from mygpo.web.utils import normalize_twitter
@@ -59,14 +59,14 @@ def account(request):
 
         form = UserAccountForm({
             'email': request.user.email,
-            'public': request.user.profile.get_wksetting(PUBLIC_SUB_USER)
+            'public': request.user.profile.settings.get_wksetting(PUBLIC_SUB_USER)
             })
 
         flattr_form = FlattrForm({
-               'enable': request.user.profile.get_wksetting(FLATTR_AUTO),
-               'token': request.user.profile.get_wksetting(FLATTR_TOKEN),
-               'flattr_mygpo': request.user.profile.get_wksetting(FLATTR_MYGPO),
-               'username': request.user.profile.get_wksetting(FLATTR_USERNAME),
+               'enable': request.user.profile.settings.get_wksetting(FLATTR_AUTO),
+               'token': request.user.profile.settings.get_wksetting(FLATTR_TOKEN),
+               'flattr_mygpo': request.user.profile.settings.get_wksetting(FLATTR_MYGPO),
+               'username': request.user.profile.settings.get_wksetting(FLATTR_USERNAME),
             })
 
         return render(request, 'account.html', {
@@ -143,10 +143,11 @@ class FlattrSettingsView(View):
         flattr_mygpo = form.cleaned_data.get('flattr_mygpo', False)
         username = form.cleaned_data.get('username', '')
 
-        user.profile.set_wksetting(FLATTR_AUTO, auto_flattr)
-        user.profile.set_wksetting(FLATTR_MYGPO, flattr_mygpo)
-        user.profile.set_wksetting(FLATTR_USERNAME, username)
-        user.profile.save()
+        settings = user.profile.settings
+        settings.set_wksetting(FLATTR_AUTO, auto_flattr)
+        settings.set_wksetting(FLATTR_MYGPO, flattr_mygpo)
+        settings.set_wksetting(FLATTR_USERNAME, username)
+        settings.save()
 
         return HttpResponseRedirect(reverse('account') + '#flattr')
 
@@ -156,10 +157,11 @@ class FlattrLogout(View):
 
     def get(self, request):
         user = request.user
-        user.profile.set_wksetting(FLATTR_AUTO, False)
-        user.profile.set_wksetting(FLATTR_TOKEN, False)
-        user.profile.set_wksetting(FLATTR_MYGPO, False)
-        user.profile.save()
+        settings = user.profile.settings
+        settings.set_wksetting(FLATTR_AUTO, False)
+        settings.set_wksetting(FLATTR_TOKEN, False)
+        settings.set_wksetting(FLATTR_MYGPO, False)
+        settings.save()
         return HttpResponseRedirect(reverse('account') + '#flattr')
 
 
@@ -178,8 +180,9 @@ class FlattrTokenView(View):
         token = flattr.process_retrieved_code(url)
         if token:
             messages.success(request, _('Authentication successful'))
-            user.profile.set_wksetting(FLATTR_TOKEN, token)
-            user.profile.save()
+            settings = user.profile.settings
+            settings.set_wksetting(FLATTR_TOKEN, token)
+            settings.save()
 
         else:
             messages.error(request, _('Authentication failed. Try again later'))
@@ -236,13 +239,14 @@ class PodcastPrivacySettings(View):
     def post(self, request, podcast_id):
         podcast = Podcast.objects.get(id=podcast_id)
 
-        config, created = PodcastConfig.objects.get_or_create(
+        settings, created = UserSettings.objects.get_or_create(
             user=request.user,
-            podcast=podcast,
+            content_type=ContentType.objects.get_for_model(podcast),
+            object_id=podcast.pk,
         )
 
-        config.set_wksetting(PUBLIC_SUB_PODCAST, self.public)
-        config.save()
+        settings.set_wksetting(PUBLIC_SUB_PODCAST, self.public)
+        settings.save()
         return HttpResponseRedirect(reverse('privacy'))
 
 
@@ -254,7 +258,7 @@ def privacy(request):
 
     podcasts = Podcast.objects.filter(subscription__user=user)\
                               .distinct('pk')
-    private = PodcastConfig.objects.get_private_podcasts(user)
+    private = UserSettings.objects.get_private_podcasts(user)
 
     subscriptions = []
     for podcast in podcasts:
@@ -262,7 +266,7 @@ def privacy(request):
         subscriptions.append( (podcast, podcast in private) )
 
     return render(request, 'privacy.html', {
-        'private_subscriptions': not request.user.profile.get_wksetting(PUBLIC_SUB_USER),
+        'private_subscriptions': not request.user.profile.settings.get_wksetting(PUBLIC_SUB_USER),
         'subscriptions': subscriptions,
         'domain': site.domain,
         })

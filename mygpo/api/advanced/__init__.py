@@ -54,10 +54,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class RequestException(Exception):
-    """ Raised if the request is malfored or otherwise invalid """
-
-
 # keys that are allowed in episode actions
 EPISODE_ACTION_KEYS = ('position', 'episode', 'action', 'device', 'timestamp',
                        'started', 'total', 'podcast')
@@ -207,7 +203,7 @@ def episode_action_json(history, user):
 
 def update_episodes(user, actions, now, ua_string):
     update_urls = []
-    auto_flattr = user.profile.get_wksetting(FLATTR_AUTO)
+    auto_flattr = user.profile.settings.get_wksetting(FLATTR_AUTO)
 
     # group all actions by their episode
     for action in actions:

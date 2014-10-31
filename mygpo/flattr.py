@@ -55,8 +55,8 @@ class Flattr(object):
             # Inject username and password into the request URL
             url = utils.url_add_authentication(url, settings.FLATTR_KEY,
                     settings.FLATTR_SECRET)
-        elif self.user.profile.get_setting('flattr_token', ''):
-            headers['Authorization'] = 'Bearer ' + self.user.profile.get_wksetting(FLATTR_TOKEN)
+        elif self.user.profile.settings.get_setting('flattr_token', ''):
+            headers['Authorization'] = 'Bearer ' + self.user.profile.settings.get_wksetting(FLATTR_TOKEN)
 
         if data is not None:
             data = json.dumps(data)
@@ -80,7 +80,7 @@ class Flattr(object):
         }
 
     def has_token(self):
-        return bool(self.user.profile.get_wksetting(FLATTR_TOKEN))
+        return bool(self.user.profile.settings.get_wksetting(FLATTR_TOKEN))
 
     def process_retrieved_code(self, url):
         url_parsed = urlparse.urlparse(url)
@@ -114,7 +114,7 @@ class Flattr(object):
             flattrs ... The number of Flattrs this thing received
             flattred ... True if this user already flattred this thing
         """
-        if not self.user.profile.get_wksetting(FLATTR_TOKEN):
+        if not self.user.profile.settings.get_wksetting(FLATTR_TOKEN):
             return (0, False)
 
         quote_url = urllib.quote_plus(utils.sanitize_encoding(payment_url))
@@ -124,7 +124,7 @@ class Flattr(object):
 
 
     def get_auth_username(self):
-        if not self.user.profile.get_wksetting(FLATTR_TOKEN):
+        if not self.user.profile.settings.get_wksetting(FLATTR_TOKEN):
             return ''
 
         data = self.request(self.USER_INFO_URL)
@@ -165,7 +165,7 @@ class Flattr(object):
     def get_autosubmit_url(self, thing):
         """ returns the auto-submit URL for the given FlattrThing """
 
-        publish_username = self.user.profile.get_wksetting(FLATTR_USERNAME)
+        publish_username = self.user.profile.settings.get_wksetting(FLATTR_USERNAME)
 
         if not publish_username:
             return None

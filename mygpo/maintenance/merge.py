@@ -10,7 +10,7 @@ from mygpo.podcasts.models import (MergedUUID, ScopedModel, OrderedModel, Slug,
 from mygpo import utils
 from mygpo.history.models import HistoryEntry, EpisodeHistoryEntry
 from mygpo.publisher.models import PublishedPodcast
-from mygpo.subscriptions.models import Subscription, PodcastConfig
+from mygpo.subscriptions.models import Subscription
 
 import logging
 logger = logging.getLogger(__name__)

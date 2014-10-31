@@ -19,6 +19,7 @@ urlpatterns += patterns('mygpo.api.simple',
 from mygpo.api.subscriptions import SubscriptionsAPI
 from mygpo.api.advanced.updates import DeviceUpdates
 from mygpo.api.advanced.episode import ChaptersAPI
+from mygpo.api.advanced.settings import SettingsAPI
 
 urlpatterns += patterns('mygpo.api.advanced',
  url(r'^api/(?P<version>[12])/subscriptions/(?P<username>[\w.+-]+)/(?P<device_uid>[\w.-]+)\.json',
@@ -39,7 +40,10 @@ urlpatterns += patterns('mygpo.api.advanced',
     (r'^api/2/updates/(?P<username>[\w.+-]+)/(?P<device_uid>[\w.-]+)\.json',
         DeviceUpdates.as_view()),
 
-    (r'^api/2/settings/(?P<username>[\w.+-]+)/(?P<scope>account|device|podcast|episode)\.json', 'settings.main'),
+ url(r'^api/2/settings/(?P<username>[\w.+-]+)/(?P<scope>account|device|podcast|episode)\.json',
+        SettingsAPI.as_view(),
+        name='settings-api'),
+
     (r'^api/2/favorites/(?P<username>[\w.+-]+).json', 'favorites'),
 
     (r'^api/2/lists/(?P<username>[\w.+-]+)/create\.(?P<format>\w+)', 'lists.create'),

@@ -5,7 +5,7 @@ import collections
 from django.db import models
 from django.conf import settings
 
-from mygpo.core.models import UpdateInfoModel, DeleteableModel, SettingsModel
+from mygpo.core.models import UpdateInfoModel, DeleteableModel
 from mygpo.users.models import Client
 from mygpo.users.settings import PUBLIC_SUB_PODCAST
 from mygpo.podcasts.models import Podcast
@@ -62,41 +62,6 @@ class Subscription(DeleteableModel):
     def __str__(self):
         return '{user} subscribed to {podcast} on {client}'.format(
             user=self.user, podcast=self.podcast, client=self.client)
-
-
-class PodcastConfigmanager(models.Manager):
-    """ Manager for PodcastConfig objects """
-
-    def get_private_podcasts(self, user):
-        """ Returns the podcasts that the user has marked as private """
-        configs = PodcastConfig.objects.filter(user=user)\
-                                       .select_related('podcast')
-        private = []
-
-        for cfg in configs:
-            if not cfg.get_wksetting(PUBLIC_SUB_PODCAST):
-                private.append(cfg.podcast)
-
-        return private
-
-
-class PodcastConfig(SettingsModel, UpdateInfoModel):
-    """ Settings for a podcast, independant of a device / subscription """
-
-    # the user for which the config is stored
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, db_index=True,
-                             on_delete=models.CASCADE)
-
-    # the podcast for which the config is stored
-    podcast = models.ForeignKey(Podcast, db_index=True,
-                                on_delete=models.PROTECT)
-
-    class Meta:
-        unique_together = [
-            ['user', 'podcast'],
-        ]
-
-    objects = PodcastConfigmanager()
 
 
 SubscribedPodcast = collections.namedtuple('SubscribedPodcast',
