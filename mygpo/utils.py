@@ -341,51 +341,6 @@ def linearize(key, iterators, reverse=False):
             pass
 
 
-def skip_pairs(iterator, cmp=cmp):
-    """ Skips pairs of equal items
-
-    >>> list(skip_pairs([]))
-    []
-
-    >>> list(skip_pairs([1]))
-    [1]
-
-    >>> list(skip_pairs([1, 2, 3]))
-    [1, 2, 3]
-
-    >>> list(skip_pairs([1, 1]))
-    []
-
-    >>> list(skip_pairs([1, 2, 2]))
-    [1]
-
-    >>> list(skip_pairs([1, 2, 2, 3]))
-    [1, 3]
-
-    >>> list(skip_pairs([1, 2, 2, 2]))
-    [1, 2]
-
-    >>> list(skip_pairs([1, 2, 2, 2, 2, 3]))
-    [1, 3]
-    """
-
-    iterator = iter(iterator)
-    next = next(iterator)
-
-    while True:
-        item = next
-        try:
-            next = next(iterator)
-        except StopIteration as e:
-            yield item
-            raise e
-
-        if cmp(item, next) == 0:
-            next = next(iterator)
-        else:
-            yield item
-
-
 def get_timestamp(datetime_obj):
     """ Returns the timestamp as an int for the given datetime object
 

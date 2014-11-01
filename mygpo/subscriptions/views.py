@@ -14,7 +14,6 @@ from django.contrib.auth import get_user_model
 from mygpo.podcasts.models import Podcast
 from mygpo.subscriptions.models import Subscription
 from mygpo.users.settings import PUBLIC_SUB_PODCAST
-from mygpo.utils import unzip, skip_pairs
 from mygpo.api import simple
 from mygpo.subscriptions import get_subscribed_podcasts
 from mygpo.decorators import requires_token
