@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='podcast',
             name='related_podcasts',
-            field=models.ManyToManyField(related_name='related_podcasts_rel_+', to=b'podcasts.Podcast'),
+            field=models.ManyToManyField(related_name='related_podcasts_rel_+', to='self'),
         ),
         migrations.AlterIndexTogether(
             name='episode',
