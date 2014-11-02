@@ -19,7 +19,7 @@ def get_accepted_lang(request):
     """ returns a list of language codes accepted by the HTTP request """
 
     lang_str = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
-    lang_str = [c for c in lang_str if c in string.letters+',']
+    lang_str = [c for c in lang_str if c in string.ascii_letters+',']
     langs = lang_str.split(',')
     langs = [s[:2] for s in langs]
     langs = list(map(str.strip, langs))

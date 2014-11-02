@@ -146,7 +146,7 @@ def format_podcast_list(obj_list, format, title, get_podcast=None,
         return JsonResponse(objs)
 
     elif format == 'jsonp':
-        ALLOWED_FUNCNAME = string.letters + string.digits + '_'
+        ALLOWED_FUNCNAME = string.ascii_letters + string.digits + '_'
 
         if not jsonp_padding:
             return HttpResponseBadRequest('For a JSONP response, specify the name of the callback function in the jsonp parameter')

@@ -1001,7 +1001,7 @@ def edit_link(obj):
 def random_token(length=32):
     import random
     import string
-    return "".join(random.sample(string.letters+string.digits, length))
+    return "".join(random.sample(string.ascii_letters+string.digits, length))
 
 
 def to_maxlength(cls, field, val):
