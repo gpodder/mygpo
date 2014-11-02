@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='historyentry',
-            options={'ordering': [b'timestamp'], 'verbose_name_plural': b'History Entries'},
+            options={'ordering': ['timestamp'], 'verbose_name_plural': 'History Entries'},
         ),
     ]

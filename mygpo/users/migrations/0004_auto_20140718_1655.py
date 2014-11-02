@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='userprofile',
             name='settings',
-            field=models.TextField(default=b'{}'),
+            field=models.TextField(default='{}'),
             preserve_default=True,
         ),
     ]

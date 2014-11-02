@@ -19,8 +19,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', uuidfield.fields.UUIDField(max_length=32, serialize=False, primary_key=True)),
                 ('uid', models.CharField(max_length=64)),
-                ('name', models.CharField(default=b'New Device', max_length=100)),
-                ('type', models.CharField(default=b'other', max_length=7, choices=[(b'desktop', 'Desktop'), (b'laptop', 'Laptop'), (b'mobile', 'Cell phone'), (b'server', 'Server'), (b'tablet', 'Tablet'), (b'other', 'Other')])),
+                ('name', models.CharField(default='New Device', max_length=100)),
+                ('type', models.CharField(default='other', max_length=7, choices=[('desktop', 'Desktop'), ('laptop', 'Laptop'), ('mobile', 'Cell phone'), ('server', 'Server'), ('tablet', 'Tablet'), ('other', 'Other')])),
                 ('deleted', models.BooleanField(default=False)),
                 ('user_agent', models.CharField(max_length=300)),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
@@ -31,6 +31,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='client',
-            unique_together=set([(b'user', b'uid')]),
+            unique_together=set([('user', 'uid')]),
         ),
     ]

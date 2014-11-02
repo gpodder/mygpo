@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
                 ('order', models.PositiveSmallIntegerField()),
                 ('object_id', uuidfield.fields.UUIDField(max_length=32)),
                 ('content_type', models.ForeignKey(to='contenttypes.ContentType', on_delete=django.db.models.deletion.PROTECT)),
-                ('podcastlist', models.ForeignKey(related_name=b'entries', to='podcastlists.PodcastList')),
+                ('podcastlist', models.ForeignKey(related_name='entries', to='podcastlists.PodcastList')),
             ],
             options={
             },

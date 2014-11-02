@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterUniqueTogether(
             name='podcastconfig',
-            unique_together=set([(b'user', b'podcast')]),
+            unique_together=set([('user', 'podcast')]),
         ),
     ]

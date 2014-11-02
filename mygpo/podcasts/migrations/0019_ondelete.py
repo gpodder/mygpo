@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='podcast',
             name='group',
-            field=models.ForeignKey(to='podcasts.PodcastGroup', on_delete=django.db.models.deletion.PROTECT, to_field=b'id', null=True),
+            field=models.ForeignKey(to='podcasts.PodcastGroup', on_delete=django.db.models.deletion.PROTECT, to_field='id', null=True),
         ),
         migrations.AlterField(
             model_name='tag',
@@ -40,6 +40,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='episode',
             name='podcast',
-            field=models.ForeignKey(to='podcasts.Podcast', on_delete=django.db.models.deletion.PROTECT, to_field=b'id'),
+            field=models.ForeignKey(to='podcasts.Podcast', on_delete=django.db.models.deletion.PROTECT, to_field='id'),
         ),
     ]
