@@ -118,6 +118,8 @@ class EpisodeHistoryEntry(models.Model):
 
             ['user', 'episode', 'timestamp'],
 
+            ['user', 'timestamp'],
+
             ['episode', 'timestamp'],
         ]
 
