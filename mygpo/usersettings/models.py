@@ -8,6 +8,7 @@ from django.contrib.contenttypes import generic
 
 from uuidfield import UUIDField
 
+from mygpo.users.settings import PUBLIC_SUB_PODCAST
 from mygpo.podcasts.models import Podcast
 
 import logging
@@ -19,7 +20,7 @@ class UserSettingsManager(models.Manager):
 
     def get_private_podcasts(self, user):
         """ Returns the podcasts that the user has marked as private """
-        settings = self.objects.filter(
+        settings = self.filter(
             user=user,
             content_type=ContentType.objects.get_for_model(Podcast),
         )

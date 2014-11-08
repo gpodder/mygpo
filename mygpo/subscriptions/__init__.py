@@ -7,6 +7,7 @@ from mygpo.users.models import Client
 from mygpo.subscriptions.models import Subscription, SubscribedPodcast
 from mygpo.subscriptions.signals import subscription_changed
 from mygpo.history.models import HistoryEntry
+from mygpo.usersettings.models import UserSettings
 from mygpo.utils import to_maxlength
 
 import logging
