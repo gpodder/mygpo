@@ -1,13 +1,13 @@
 import json
 
 from django.db import migrations
-from django.contrib.contenttypes.models import ContentType
 
 
 def move_podcastsettings(apps, schema_editor):
 
     PodcastConfig = apps.get_model("subscriptions", "PodcastConfig")
     UserSettings = apps.get_model("usersettings", "UserSettings")
+    ContentType = apps.get_model('contenttypes', 'ContentType')
 
     for cfg in PodcastConfig.objects.all():
         if not json.loads(cfg.settings):
@@ -17,8 +17,8 @@ def move_podcastsettings(apps, schema_editor):
             user=cfg.user,
             # we can't get the contenttype from cfg.podcast as it would be a
             # different model
-            content_type=ContentType.objects.filter(app_label='podcasts',
-                                                    model='podcast'),
+            content_type=ContentType.objects.get(app_label='podcasts',
+                                                 model='podcast'),
             object_id=cfg.podcast.pk,
             defaults={
                 'settings': cfg.settings,
