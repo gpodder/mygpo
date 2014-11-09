@@ -77,3 +77,16 @@ class OrderedModel(models.Model):
     class Meta:
         abstract = True
         ordering = ['order']
+
+
+class OptionallyOrderedModel(models.Model):
+    """ A model that can be ordered, w/ unknown order of individual objects
+
+    The implementing Model must make sure that 'order' is sufficiently unique
+    """
+
+    order = models.PositiveIntegerField(null=True, default=None)
+
+    class Meta:
+        abstract = True
+        ordering = ['order']

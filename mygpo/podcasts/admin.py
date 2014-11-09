@@ -98,7 +98,7 @@ class PodcastAdmin(admin.ModelAdmin):
         }),
         ('Episodes', {
             'fields': ('common_episode_title', 'latest_episode_timestamp',
-                       'content_types', )
+                       'content_types', 'max_episode_order', )
         }),
         ('Feed updates', {
             'fields': ('outdated', 'new_location', 'last_update', )
@@ -144,7 +144,7 @@ class EpisodeAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': ('id', 'title', 'subtitle', 'description', 'link',
-                       'language', 'guid', 'released', 'podcast', )
+                       'language', 'guid', 'released', 'podcast', 'order', )
         }),
         ('Additional information', {
             'fields': ('created', 'license', 'flattr_url', 'author', 'content',

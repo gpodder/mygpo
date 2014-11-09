@@ -14,7 +14,7 @@ from uuidfield import UUIDField
 
 from mygpo import utils
 from mygpo.core.models import (TwitterModel, UUIDModel, GenericManager,
-    UpdateInfoModel, OrderedModel)
+    UpdateInfoModel, OrderedModel, OptionallyOrderedModel)
 
 import logging
 logger = logging.getLogger(__name__)
@@ -397,6 +397,9 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
     update_interval = models.PositiveSmallIntegerField(null=False,
         default=DEFAULT_UPDATE_INTERVAL)
 
+    # "order" value of the most recent episode (will be the highest of all)
+    max_episode_order = models.PositiveIntegerField(null=True, default=None)
+
     objects = PodcastManager()
 
     def subscriber_count(self):
@@ -562,7 +565,8 @@ class EpisodeManager(GenericManager):
 class Episode(UUIDModel, TitleModel, DescriptionModel, LinkModel,
         LanguageModel, LastUpdateModel, UpdateInfoModel, LicenseModel,
         FlattrModel, ContentTypesModel, MergedIdsModel, OutdatedModel,
-        AuthorModel, UrlsMixin, SlugsMixin, MergedUUIDsMixin):
+        AuthorModel, UrlsMixin, SlugsMixin, MergedUUIDsMixin,
+        OptionallyOrderedModel):
     """ An episode """
 
     guid = models.CharField(max_length=200, null=True)

@@ -25,6 +25,7 @@ from datetime import datetime
 from itertools import chain, islice
 import socket
 
+from django.db import transaction
 from django.conf import settings
 
 from mygpo.podcasts.models import Podcast, URL, Slug, Episode
@@ -100,7 +101,8 @@ class PodcastUpdater(object):
         assert parsed, 'fetch_feed must return something'
         p = Podcast.objects.get_or_create_for_url(podcast_url)
         episodes = self._update_episodes(p, parsed.episodes)
-        self._update_podcast(p, parsed, episodes)
+        max_episode_order = self._order_episodes(p)
+        self._update_podcast(p, parsed, episodes, max_episode_order)
         return p
 
 
@@ -129,7 +131,7 @@ class PodcastUpdater(object):
             raise NoEpisodesException('no episodes found')
 
 
-    def _update_podcast(self, podcast, parsed, episodes):
+    def _update_podcast(self, podcast, parsed, episodes, max_episode_order):
         """ updates a podcast according to new parser results """
 
         # we need that later to decide if we can "bump" a category
@@ -150,6 +152,7 @@ class PodcastUpdater(object):
                                           parsed.flattr or podcast.flattr_url)
         podcast.hub = parsed.hub or podcast.hub
         podcast.license = parsed.license or podcast.license
+        podcast.max_episode_order = max_episode_order
 
         podcast.add_missing_urls(parsed.urls)
 
@@ -264,6 +267,36 @@ class PodcastUpdater(object):
         for episode in outdated_episodes:
             mark_outdated(episode)
 
+    @transaction.atomic
+    def _order_episodes(self, podcast):
+        """ Reorder the podcast's episode according to release timestamp
+
+        Returns the highest order value (corresponding to the most recent
+        episode) """
+
+        num_episodes = podcast.episode_set.count()
+
+        episodes = podcast.episode_set.all().extra(select={
+                'has_released': 'released IS NOT NULL',
+            })\
+            .order_by('-has_released', '-released', 'pk')\
+            .only('pk')
+
+        for n, episode in enumerate(episodes.iterator(), 1):
+            # assign ``order`` from higher (most recent) to 0 (oldest)
+            # None means "unknown"
+            new_order = num_episodes - n
+
+            # optimize for new episodes that are newer than all existing
+            if episode.order == new_order:
+                continue
+
+            logger.info('Updating order from {} to {}'.format(episode.order,
+                                                              new_order))
+            episode.order = new_order
+            episode.save()
+
+        return num_episodes -1
 
     def _save_podcast_logo(self, cover_art):
         if not cover_art:
