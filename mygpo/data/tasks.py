@@ -1,7 +1,11 @@
 from operator import itemgetter
+from datetime import datetime, timedelta
+
+from celery.decorators import periodic_task
 
 from mygpo.data.podcast import calc_similar_podcasts
 from mygpo.celery import celery
+from mygpo.podcasts.models import Podcast
 
 
 @celery.task
@@ -22,3 +26,22 @@ def update_related_podcasts(podcast, max_related=20):
 
     for p in related:
         podcast.related_podcasts.add(p)
+
+
+# interval in which podcast updates are scheduled
+UPDATE_INTERVAL = timedelta(hours=1)
+
+
+@periodic_task(run_every=UPDATE_INTERVAL)
+def schedule_updates(self, interval=UPDATE_INTERVAL):
+    """ Schedules podcast updates that are due within ``interval`` """
+    now = datetime.utcnow()
+
+    # fetch podcasts for which an update is due within the next hour
+    podcasts = Podcast.objects.next_update_between(now, now+interval)\
+                              .prefetch_related('urls')\
+                              .only('pk')
+
+    # queue all those podcast updates
+    for podcast in podcasts:
+        update_podcasts.delay([podcast.url])

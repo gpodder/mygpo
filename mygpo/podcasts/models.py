@@ -337,6 +337,13 @@ class PodcastQuerySet(MergedUUIDQuerySet):
         q = self.extra(select={'next_update': NEXTUPDATE})
         return q.order_by('next_update')
 
+    def next_update_between(self, start, end):
+        NEXTUPDATE_BETWEEN = ("(last_update + (update_interval || "
+                              "' hours')::INTERVAL) BETWEEN %s AND %s")
+        return self.extra(
+            where=[NEXTUPDATE_BETWEEN], params=[start, end]
+        )
+
     def toplist(self, language=None):
         toplist = self
         if language:
