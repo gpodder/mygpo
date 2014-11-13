@@ -85,7 +85,7 @@ class OptionallyOrderedModel(models.Model):
     The implementing Model must make sure that 'order' is sufficiently unique
     """
 
-    order = models.PositiveIntegerField(null=True, default=None)
+    order = models.BigIntegerField(null=True, default=None)
 
     class Meta:
         abstract = True
