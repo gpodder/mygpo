@@ -20,12 +20,29 @@ import sys
 import os.path
 import dj_database_url
 
+
+def parse_bool(s):
+    """ parses a boolean setting """
+    if isinstance(s, bool):
+        return s
+    s = s.lower.strip()
+    return s not in ('n', 'no', 'false', '0', 'off')
+
+
+def parse_int(s):
+    return int(str(s))
+
+
+def parse_strlist(s):
+    return [item.strip() for item in s.split(',')]
+
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges#ChangedthewayURLpathsaredetermined
-FORCE_SCRIPT_NAME=""
+FORCE_SCRIPT_NAME = ""
 
-DEBUG = True
+DEBUG = parse_bool(os.getenv('DEBUG', True))
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = ()
@@ -146,9 +163,12 @@ TEST_EXCLUDE = (
     'couchdbkit',
 )
 
-TEST_RUNNER='mygpo.test.MygpoTestSuiteRunner'
 
-ACCOUNT_ACTIVATION_DAYS = 7
+TEST_RUNNER = 'mygpo.test.MygpoTestSuiteRunner'
+
+
+ACCOUNT_ACTIVATION_DAYS = parse_int(os.getenv('ACCOUNT_ACTIVATION_DAYS', 7))
+
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
@@ -184,17 +204,26 @@ USER_CLASS = 'mygpo.users.models.User'
 
 LOGIN_URL = '/login/'
 
-CSRF_FAILURE_VIEW='mygpo.web.views.security.csrf_failure'
+CSRF_FAILURE_VIEW = 'mygpo.web.views.security.csrf_failure'
 
 
-# The following entries should be set in settings_prod.py
-DEFAULT_FROM_EMAIL = ''
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', '')
+
+
 SECRET_KEY = os.getenv('SECRET_KEY', '')
-GOOGLE_ANALYTICS_PROPERTY_ID=''
-DIRECTORY_EXCLUDED_TAGS = ()
-FLICKR_API_KEY = ''
 
-MAINTENANCE = os.path.exists(os.path.join(BASE_DIR, 'MAINTENANCE'))
+
+GOOGLE_ANALYTICS_PROPERTY_ID = os.getenv('GOOGLE_ANALYTICS_PROPERTY_ID', '')
+
+
+DIRECTORY_EXCLUDED_TAGS = parse_strlist(os.getenv('DIRECTORY_EXCLUDED_TAGS',
+                                                  ''))
+
+
+FLICKR_API_KEY = os.getenv('FLICKR_API_KEY', '')
+
+
+MAINTENANCE = parse_bool(os.getenv('MAINTENANCE', False))
 
 
 LOGGING = {

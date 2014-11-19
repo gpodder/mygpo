@@ -20,6 +20,11 @@ coverage:
 clean:
 	find -name "*.pyc" -exec rm '{}' \;
 
+docker-build:
+	sudo docker build -t="mygpo/web" .
+
+docker-run:
+	sudo docker run --rm -p 8000:8000 --name web --link db:db -e SECRET_KEY=asdf mygpo/web
 
 .PHONY: all help test clean unittest coverage
 
