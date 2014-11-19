@@ -59,7 +59,7 @@
     </div>
   {% endif %}
 
-
+ {% if random_podcast %}
  {% cache 3600 random_podcast_box %}
    <div class="well">
 
@@ -82,6 +82,7 @@
 
    </div>
  {% endcache %}
+ {% endif %}
 
   <div class="well">
    <h4>{% blocktrans %}Explore {{ site }}{% endblocktrans %}</h4>

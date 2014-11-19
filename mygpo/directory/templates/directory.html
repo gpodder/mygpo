@@ -110,6 +110,7 @@
    {% endif %}
   {% endfor %}
 
+ {% if random_podcast %}
    <div class="well">
 
    <h4><small>{% trans "Random" %}</small></h4>
@@ -130,6 +131,7 @@
    </p>
 
    </div>
+ {% endif %}
 
 {% endblock %}
 
