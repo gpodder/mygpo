@@ -77,9 +77,7 @@ class DeviceSyncTests(unittest.TestCase):
 
 @override_settings(CACHE={})
 class UnsubscribeMergeTests(TestCase):
-    """ Test if merged podcasts can be properly unsubscribed
-
-    TODO: this test fails intermittently """
+    """ Test if merged podcasts can be properly unsubscribed """
 
     P2_URL = 'http://test.org/podcast/'
 
