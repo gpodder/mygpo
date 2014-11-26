@@ -122,9 +122,6 @@ class UserProfile(TwitterModel):
     user = models.OneToOneField(settings.AUTH_USER_MODEL,
                                 related_name='profile')
 
-    # the CouchDB _id of the user
-    uuid = UUIDField(unique=True)
-
     # if False, suggestions should be updated
     suggestions_up_to_date = models.BooleanField(default=False)
 
@@ -439,7 +436,5 @@ def create_missing_profile(sender, **kwargs):
     user = kwargs['instance']
 
     if not hasattr(user, 'profile'):
-        # TODO: remove uuid column once migration from CouchDB is complete
-        import uuid
-        profile = UserProfile.objects.create(user=user, uuid=uuid.uuid1())
+        profile = UserProfile.objects.create(user=user)
         user.profile = profile
