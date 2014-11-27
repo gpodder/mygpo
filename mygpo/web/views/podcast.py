@@ -134,7 +134,8 @@ def get_tags(podcast, user, max_tags=50):
 
 def episode_list(podcast, user, offset=0, limit=None):
     """ Returns a list of episodes """
-    episodes = Episode.objects.filter(podcast=podcast).all().by_released()
+    episodes = Episode.objects.filter(podcast=podcast)\
+                              .order_by('-order', '-released')
     episodes = list(episodes.prefetch_related('slugs')[offset:offset+limit])
     return episodes
 

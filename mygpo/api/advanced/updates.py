@@ -121,11 +121,10 @@ class DeviceUpdates(View):
 
         episodes = []
         for podcast in subscribed_podcasts:
-            episodes.extend(Episode.objects.filter(
-                                podcast=podcast,
-                                released__gt=since
-                                ).order_by('-released')[:max_per_podcast]
-            )
+            eps = Episode.objects.filter(podcast=podcast,
+                                         released__gt=since)\
+                                 .order_by('-order', '-released')
+            episodes.extend(eps[:max_per_podcast])
 
         states = EpisodeState.dict_for_user(user, episodes)
 

@@ -527,17 +527,6 @@ class EpisodeQuerySet(MergedUUIDQuerySet):
 
         return toplist.order_by('-listeners')
 
-    def by_released(self):
-        """ Sorts by release date, sorting missing release date last
-
-        When sorting by release date, we want to list those with the most
-        revent release date first. At the end the episodes without release date
-        should be sorted. """
-        return self.extra(select={
-                'has_released': 'released IS NOT NULL',
-            }).\
-            order_by('-has_released', '-released')
-
 
 class EpisodeManager(GenericManager):
     """ Custom queries for Episodes """
@@ -588,7 +577,7 @@ class Episode(UUIDModel, TitleModel, DescriptionModel, LinkModel,
     objects = EpisodeManager()
 
     class Meta:
-        ordering = ['-released']
+        ordering = ['-order', '-released']
 
         index_together = [
             ('podcast', 'outdated', 'released'),
@@ -597,6 +586,8 @@ class Episode(UUIDModel, TitleModel, DescriptionModel, LinkModel,
 
             # index for typical episode toplist queries
             ('language', 'listeners'),
+
+            ('podcast', 'order', 'released'),
         ]
 
     @property
