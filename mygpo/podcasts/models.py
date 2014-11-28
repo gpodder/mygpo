@@ -174,6 +174,27 @@ class UrlsMixin(models.Model):
                 logger.warn('Could not add URL: {err}'.format(err=ie))
                 continue
 
+    def set_url(self, url):
+        """ Sets the canonical URL """
+
+        urls = [u.url for u in self.urls.all()]
+        if url in urls:
+            urls.remove(url)
+
+        urls.insert(0, url)
+        self.set_urls(urls)
+
+    def set_urls(self, urls):
+        """ Update the object's URLS to the given list
+
+        'urls' should be a list of strings. Slugs that do not exist are
+        created.  Existing urls that are not in the 'urls' list are
+        deleted. """
+        urls = [utils.to_maxlength(URL, 'url', url) for url in urls]
+        existing = {u.url: u for u in self.urls.all()}
+        utils.set_ordered_entries(self, urls, existing, URL, 'url',
+                                  'content_object')
+
 
 class SlugsMixin(models.Model):
     """ Methods for working with Slug objects """

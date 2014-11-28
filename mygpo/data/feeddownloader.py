@@ -70,6 +70,11 @@ class PodcastUpdater(object):
             except NoPodcastCreated as npc:
                 logger.info('No podcast created: %s', npc)
 
+            except:
+                logger.exception('Error while updating podcast "%s"',
+                                 podcast_url)
+                raise
+
 
     def update(self, podcast_url):
         """ Update the podcast for the supplied URL """
@@ -142,11 +147,13 @@ class PodcastUpdater(object):
         podcast.subtitle = parsed.subtitle or podcast.subtitle
         podcast.link = parsed.link or podcast.link
         podcast.logo_url = parsed.logo or podcast.logo_url
-        podcast.author = parsed.author or podcast.author
-        podcast.language = parsed.language or podcast.language
-        podcast.content_types = parsed.content_types or podcast.content_types
+        podcast.author = to_maxlength(Podcast, 'author', parsed.author or podcast.author)
+        podcast.language = to_maxlength(Podcast, 'language', parsed.language or podcast.language)
+        podcast.content_types = ','.join(parsed.content_types) or podcast.content_types
 #podcast.tags['feed'] = parsed.tags or podcast.tags.get('feed', [])
-        podcast.common_episode_title = parsed.common_title or podcast.common_episode_title
+        podcast.common_episode_title = to_maxlength(Podcast,
+            'common_episode_title',
+            parsed.common_title or podcast.common_episode_title)
         podcast.new_location = parsed.new_location or podcast.new_location
         podcast.flattr_url = to_maxlength(Podcast, 'flattr_url',
                                           parsed.flattr or podcast.flattr_url)
@@ -163,7 +170,7 @@ class PodcastUpdater(object):
                     self._mark_outdated(podcast, 'redirected to different podcast')
                     return
             except Podcast.DoesNotExist:
-                podcast.urls.insert(0, podcast.new_location)
+                podcast.set_url(podcast.new_location)
 
 
         # latest episode timestamp
@@ -275,6 +282,8 @@ class PodcastUpdater(object):
         episode) """
 
         num_episodes = podcast.episode_set.count()
+        if not num_episodes:
+            return 0
 
         episodes = podcast.episode_set.all().extra(select={
                 'has_released': 'released IS NOT NULL',
@@ -367,7 +376,7 @@ def update_episode(parsed_episode, episode, podcast):
     episode.link = to_maxlength(Episode, 'link',
                                 parsed_episode.link or episode.link)
     episode.released = datetime.utcfromtimestamp(parsed_episode.released) if parsed_episode.released else episode.released
-    episode.author = parsed_episode.author or episode.author
+    episode.author = to_maxlength(Episode, 'author', parsed_episode.author or episode.author)
     episode.duration = parsed_episode.duration or episode.duration
     episode.filesize = parsed_episode.files[0].filesize
     episode.language = parsed_episode.language or episode.language or \
