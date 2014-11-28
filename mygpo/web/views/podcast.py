@@ -132,12 +132,22 @@ def get_tags(podcast, user, max_tags=50):
     return tags.values()
 
 
-def episode_list(podcast, user, offset=0, limit=None):
+def episode_list(podcast, user, offset=0, limit=20):
     """ Returns a list of episodes """
-    episodes = Episode.objects.filter(podcast=podcast)\
-                              .order_by('-order', '-released')
-    episodes = list(episodes.prefetch_related('slugs')[offset:offset+limit])
-    return episodes
+
+    # if "order" values are already available for a podcast, use the more
+    # efficient pagination (w/o OFFSET)
+    if podcast.max_episode_order:
+        page_start = podcast.max_episode_order - offset
+        page_end = page_start - limit
+        return Episode.objects.filter(podcast=podcast,
+                                      order__lte=page_start,
+                                      order__gt=page_end)\
+                              .order_by('-order')
+    else:
+        episodes = Episode.objects.filter(podcast=podcast)\
+                                  .order_by('-order', '-released')
+        return list(episodes.prefetch_related('slugs')[offset:offset+limit])
 
 
 def all_episodes(request, podcast, page_size=20):
