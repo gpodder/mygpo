@@ -196,7 +196,7 @@ def get_subscription_history(user, client=None, since=None, until=None,
                                   .order_by('timestamp')
 
     if client:
-        logger.info('... client {client_uid}'.format(client_uid=client.uid))
+        logger.info(u'... client {client_uid}'.format(client_uid=client.uid))
         history = history.filter(client=client)
 
     if since:
