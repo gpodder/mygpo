@@ -211,6 +211,7 @@ def delete_account(request):
     if request.method == 'GET':
         return render(request, 'delete_account.html')
 
+    user = request.user
     user.is_active = False
     user.deleted = True
     user.save()
@@ -226,9 +227,9 @@ class DefaultPrivacySettings(View):
     @method_decorator(login_required)
     @method_decorator(never_cache)
     def post(self, request):
-        profile = request.user.profile
-        profile.set_setting(PUBLIC_SUB_USER.name, self.public)
-        profile.save()
+        settings = request.user.profile.settings
+        settings.set_setting(PUBLIC_SUB_USER.name, self.public)
+        settings.save()
         return HttpResponseRedirect(reverse('privacy'))
 
 
