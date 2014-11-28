@@ -77,9 +77,6 @@ class PodcastAdmin(admin.ModelAdmin):
     # configuration for the list view
     list_display = ('title', 'main_url', )
 
-    # fetch the podcast's URL for the fields in list_display
-    list_select_related = ('urls', )
-
     list_filter = ('language', )
     search_fields = ('title', 'twitter', '^urls__url', )
 
@@ -133,9 +130,6 @@ class EpisodeAdmin(admin.ModelAdmin):
 
     # configuration for the list view
     list_display = ('title', 'podcast_title', 'main_url', )
-
-    # fetch the episode's podcast and URL for the fields in list_display
-    list_select_related = ('podcast', 'urls', )
 
     list_filter = ('language', )
     search_fields = ('title', '^urls__url')
@@ -194,7 +188,5 @@ class TagAdmin(admin.ModelAdmin):
     """ Admin page for tags """
 
     list_display = ('tag', 'content_object', 'source', 'user', )
-
-    list_select_related = ('user', )
 
     list_filter = ('source', )
