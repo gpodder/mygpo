@@ -18,8 +18,8 @@
       {% for target in targets %}
        <label class="checkbox">
         <input type="checkbox" value="{{ target|target_uid }}" name="{{ target|target_uid }}" checked="checked">
-        {% if target|is_list %}
-         {% for t in target %}
+        {% if target|is_syncgroup %}
+         {% for t in target.client_set.all %}
           <a href="{% url "device" t.uid %}">{{ t|device_icon }}{{ t.name|striptags }}</a>
          {% endfor %}
         {% else %}

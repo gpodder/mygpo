@@ -98,6 +98,11 @@ def devices_name(devices):
 
 
 @register.filter
+def is_syncgroup(obj):
+    return isinstance(obj, SyncGroup)
+
+
+@register.filter
 def devices_uids(client):
     """ returns a comma-separated list of UIDs of one or more devices """
     if isinstance(client, SyncGroup):
