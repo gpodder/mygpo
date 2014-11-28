@@ -15,7 +15,7 @@ from django.utils.translation import ugettext as _
 from django.views.generic.base import View
 
 from mygpo.podcasts.models import Podcast, PodcastGroup
-from mygpo.podcastlists.models import PodcastList
+from mygpo.podcastlists.models import PodcastList, PodcastListEntry
 from mygpo.api.simple import format_podcast_list
 from mygpo.votes.models import Vote
 from mygpo.directory.views import search as directory_search
