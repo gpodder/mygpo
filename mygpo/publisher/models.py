@@ -17,12 +17,12 @@ class PublishedPodcastManager(models.Manager):
     def publish_podcasts(self, user, podcasts):
         existed, created = 0, 0
         for podcast in podcasts:
-            pp, _ = PublishedPodcast.objects.get_or_create(
+            pp, new = PublishedPodcast.objects.get_or_create(
                 publisher=user,
                 podcast=podcast,
             )
 
-            if created:
+            if new:
                 created += 1
                 logger.info('Created publisher permissions for %r on %r',
                             user, podcast)

@@ -358,8 +358,10 @@ class MakePublisher(AdminView):
 
             podcasts.add(podcast)
 
-        self.set_publisher(request, user, podcasts)
-        self.send_mail(request, user, podcasts)
+        created, existed = self.set_publisher(request, user, podcasts)
+
+        if (created + existed) > 0:
+            self.send_mail(request, user, podcasts)
         return HttpResponseRedirect(reverse('admin-make-publisher-result'))
 
     def set_publisher(self, request, user, podcasts):
@@ -369,6 +371,7 @@ class MakePublisher(AdminView):
                          'Set publisher permissions for {created} podcasts; '
                          '{existed} already existed'.format(created=created,
                                                             existed=existed))
+        return created, existed
 
     def send_mail(self, request, user, podcasts):
         site = RequestSite(request)
