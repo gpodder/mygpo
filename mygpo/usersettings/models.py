@@ -28,7 +28,7 @@ class UserSettingsManager(models.Manager):
         private = []
         for setting in settings:
             if not setting.get_wksetting(PUBLIC_SUB_PODCAST):
-                private.append(cfg.podcast)
+                private.append(setting.content_object)
 
         return private
 
