@@ -59,7 +59,7 @@ def update_category(podcast):
     category, created = Category.objects.get_or_create(
         tags__tag=slugify(random_tag.strip()),
         defaults={
-            'label': random_tag,
+            'title': random_tag,
         }
     )
 
