@@ -310,3 +310,4 @@ update_podcast_id      = podcast_id_decorator(update_podcast)
 save_podcast_id        = podcast_id_decorator(save_podcast)
 
 group_slug               = group_id_decorator(group)
+group_id                 = group_id_decorator(group)

@@ -44,6 +44,7 @@ urlpatterns = patterns('mygpo.publisher.views',
 
 
  url(r'^group/(?P<pg_slug>[\w-]+)$',    'group_slug',               name='group-publisher-slug'),
+ url(r'^group/(?P<pg_slug>[\w-]+)$',    'group_id',               name='group-publisher-id'),
 
 
  url(r'^podcast/search$',               'search_podcast',              name='podcast-publisher-search'),
