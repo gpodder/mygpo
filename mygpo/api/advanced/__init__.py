@@ -121,6 +121,8 @@ def episodes(request, username, version=1):
 
         try:
             since = int(since_) if since_ else None
+            if since is not None:
+                since = datetime.utcfromtimestamp(since)
         except ValueError:
             return HttpResponseBadRequest('since-value is not a valid timestamp')
 
