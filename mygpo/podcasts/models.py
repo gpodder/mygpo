@@ -555,28 +555,34 @@ class EpisodeManager(GenericManager):
     def get_queryset(self):
         return EpisodeQuerySet(self.model, using=self._db)
 
-    @transaction.atomic
     def get_or_create_for_url(self, podcast, url, defaults={}):
         # TODO: where to specify how uuid is created?
         import uuid
 
         try:
-            url = URL.objects.get(url=url, scope=podcast.as_scope)
-
-        except URL.DoesNotExist:
-            episode = Episode.objects.create(podcast=podcast,
-                                             id=uuid.uuid1().hex,
-                                             **defaults
+            # try to fetch the episode
+            return Episode.objects.get(urls__url=url,
+                                       urls__scope=podcast.as_scope,
+                                      )
+        except Episode.DoesNotExist:
+            # episode did not exist, try to create it
+            try:
+                with transaction.atomic():
+                    episode = Episode.objects.create(podcast=podcast,
+                                                     id=uuid.uuid1().hex,
+                                                     **defaults)
+                    url = URL.objects.create(url=url,
+                                             order=0,
+                                             scope=episode.scope,
+                                             content_object=episode,
                                             )
-            url = URL.objects.create(url=url,
-                                     order=0,
-                                     scope=episode.scope,
-                                     content_object=episode,
-                                    )
-            return episode
+                    return episode
 
-        else:
-            return url.content_object
+            # URL could not be created, so it was created since the first get
+            except IntegrityError:
+                return Episode.objects.get(urls__url=url,
+                                           urls__scope=podcast.as_scope,
+                                          )
 
 
 class Episode(UUIDModel, TitleModel, DescriptionModel, LinkModel,
