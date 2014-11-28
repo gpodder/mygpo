@@ -124,8 +124,8 @@ def process_lang_params(request):
 
 
 def symbian_opml_changes(podcast):
-    podcast.description = (podcast.title or '') + '\n' + \
-                          (podcast.description or '')
+    podcast.podcast.description = podcast.podcast.display_title + '\n' + \
+                                 (podcast.podcast.description or '')
     return podcast
 
 
