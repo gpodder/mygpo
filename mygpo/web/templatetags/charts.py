@@ -122,6 +122,7 @@ def episode_heatmap_visualization(heatmap):
 
         rgb = colour_repr(plays, max_plays, colours)
         part_colours.append('%02x%02x%02x' % rgb)
+        start = start or 0
         widths.append( end-start )
 
     parts = [
