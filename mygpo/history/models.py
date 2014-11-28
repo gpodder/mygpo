@@ -155,16 +155,14 @@ class EpisodeHistoryEntry(models.Model):
                      started=None, stopped=None, total=None,
                      podcast_ref_url=None, episode_ref_url=None):
 
-        try:
-            entry = cls.objects.get(user=user, episode=episode, client=client,
-                                    action=action)
-            logger.warn('Trying to save duplicaete {cls} for {user} '
+        exists = cls.objects.filter(user=user, episode=episode,
+                                    client=client, action=action)\
+                            .exists()
+        if exists:
+            logger.warn('Trying to save duplicate {cls} for {user} '
                 '/ {episode}'.format(cls=cls, user=user, episode=episode))
             # if such an entry already exists, do nothing
             return
-
-        except cls.DoesNotExist:
-            pass
 
         entry = cls(user=user, episode=episode, action=action)
 
