@@ -7,6 +7,9 @@ from mygpo.data.podcast import calc_similar_podcasts
 from mygpo.celery import celery
 from mygpo.podcasts.models import Podcast
 
+from celery.utils.log import get_task_logger
+logger = get_task_logger(__name__)
+
 
 @celery.task
 def update_podcasts(podcast_urls):
@@ -33,15 +36,17 @@ UPDATE_INTERVAL = timedelta(hours=1)
 
 
 @periodic_task(run_every=UPDATE_INTERVAL)
-def schedule_updates(self, interval=UPDATE_INTERVAL):
+def schedule_updates(interval=UPDATE_INTERVAL):
     """ Schedules podcast updates that are due within ``interval`` """
     now = datetime.utcnow()
 
     # fetch podcasts for which an update is due within the next hour
-    podcasts = Podcast.objects.next_update_between(now, now+interval)\
+    podcasts = Podcast.objects.all()\
+                              .next_update_between(now, now+interval)\
                               .prefetch_related('urls')\
                               .only('pk')
 
+    logger.error('Scheduling %d podcasts for update', podcasts.count())
     # queue all those podcast updates
     for podcast in podcasts:
         update_podcasts.delay([podcast.url])
