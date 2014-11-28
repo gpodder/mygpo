@@ -171,6 +171,7 @@ class FlattrTokenView(View):
 
     Updates the user's Flattr token and redirects back to the account page """
 
+    @method_decorator(login_required)
     def get(self, request):
 
         user = request.user
