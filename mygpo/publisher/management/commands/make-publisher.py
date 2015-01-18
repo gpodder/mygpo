@@ -31,4 +31,4 @@ class Command(BaseCommand):
 
         urls = args[1:]
         podcasts = Podcast.objects.filter(urls__url__in=urls)
-        PublishedPodcast.objects.get_or_create(user, podcasts)
+        PublishedPodcast.objects.publish_podcasts(user, podcasts)
