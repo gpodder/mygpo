@@ -84,11 +84,14 @@ class PodcastPageTests(TestCase):
     def setUp(self):
         # create a podcast and some episodes
         podcast = Podcast.objects.create(id=uuid.uuid1().hex,
-                                         title='My Podcast')
+                                         title='My Podcast',
+                                         max_episode_order=1,
+                                         )
         for n in range(20):
             episode = Episode.objects.create(id=uuid.uuid1().hex,
                                              podcast=podcast,
-                                            )
+                                             order=1,
+                                             )
             # we only need (the last) one
             self.episode_slug = Slug.objects.create(content_object=episode,
                                                     order=0,
