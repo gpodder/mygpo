@@ -388,15 +388,28 @@ class PodcastManager(GenericManager):
         })
 
         url = utils.to_maxlength(URL, 'url', url)
-        podcast, created = self.get_or_create(urls__url=url, defaults=defaults)
+        try:
+            # try to fetch the podcast
+            return Podcast.objects.get(urls__url=url,
+                                       urls__scope='',
+                                       )
+        except Podcast.DoesNotExist:
+            # episode did not exist, try to create it
+            try:
+                with transaction.atomic():
+                    podcast = Podcast.objects.create(**defaults)
+                    url = URL.objects.create(url=url,
+                                             order=0,
+                                             scope='',
+                                             content_object=podcast,
+                                             )
+                    return podcast
 
-        if created:
-            url = URL.objects.create(url=url,
-                                     order=0,
-                                     scope='',
-                                     content_object=podcast,
-                                    )
-        return podcast
+            # URL could not be created, so it was created since the first get
+            except IntegrityError:
+                return Podcast.objects.get(urls__url=url,
+                                           urls__scope='',
+                                           )
 
 
 class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
