@@ -1,4 +1,3 @@
-import uuid
 import re
 
 from django import forms
@@ -99,7 +98,6 @@ class RegistrationView(FormView):
             else:
                 raise
 
-        user.profile.uuid == uuid.uuid1()
         user.profile.activation_key = random_token()
         user.profile.save()
 
