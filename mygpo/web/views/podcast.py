@@ -140,6 +140,7 @@ def episode_list(podcast, user, offset=0, limit=20):
     return Episode.objects.filter(podcast=podcast,
                                   order__lte=page_start,
                                   order__gt=page_end)\
+                          .prefetch_related('slugs')\
                           .order_by('-order')
 
 
