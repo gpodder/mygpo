@@ -24,7 +24,9 @@ class Topics(object):
 
     def _query(self):
         categories = list(Category.objects.filter(num_entries__gt=0)
-                                          .order_by('-modified')[:self.total])
+                                  .filter(tags__isnull=False)
+                                  .order_by('-modified')[:self.total]
+                                  .prefetch_related('tags'))
         self._categories = categories[:self.num_cat]
         self._tagcloud = sorted(categories[self.num_cat:],
                                 key=lambda x: x.title.lower())

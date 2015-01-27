@@ -154,6 +154,7 @@ def episode_data(episode, domain, podcast=None):
 
 def category_data(category):
     return dict(
-        tag   = category.title,
+        title = category.clean_title,
+        tag   = category.tag,
         usage = category.num_entries,
     )
