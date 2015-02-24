@@ -25,6 +25,8 @@ from django.core.urlresolvers import reverse
 
 
 class EmailAuthenticationBackend(ModelBackend):
+    """ Auth backend to enable login with email address as username """
+
     def authenticate(self, username=None, password=None):
         try:
             validate_email(username)
@@ -38,13 +40,6 @@ class EmailAuthenticationBackend(ModelBackend):
             return user if user.check_password(password) else None
 
         except ValidationError:
-            return None
-
-    def get_user(self, username):
-        User = get_user_model()
-        try:
-            return User.objects.get(username=username)
-        except User.DoesNotExist:
             return None
 
 
