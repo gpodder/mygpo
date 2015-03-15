@@ -34,8 +34,6 @@ class FavoritesPublic(View):
             request.user.profile.create_new_token('favorite_feeds_token')
             request.user.profile.save()
 
-        token = request.user.favorite_feeds_token
-
         return HttpResponseRedirect(reverse('share-favorites'))
 
 
