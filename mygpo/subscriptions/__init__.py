@@ -143,7 +143,8 @@ def get_subscribe_targets(podcast, user):
     subscribed """
 
     clients = Client.objects.filter(user=user)\
-                            .exclude(subscription__podcast=podcast)\
+                            .exclude(subscription__podcast=podcast,
+                                     subscription__user=user)\
                             .select_related('sync_group')
 
     targets = set()

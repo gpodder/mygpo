@@ -56,7 +56,8 @@ class Subscription(DeleteableModel):
         ]
 
         index_together = [
-            ['user', 'client']
+            ['user', 'client'],
+            ['podcast', 'user'],
         ]
 
     def __str__(self):
