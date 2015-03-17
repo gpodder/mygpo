@@ -282,7 +282,7 @@ class PodcastUpdater(object):
         Returns the highest order value (corresponding to the most recent
         episode) """
 
-        num_episodes = podcast.episode_set.count()
+        num_episodes = podcast.episode_count
         if not num_episodes:
             return 0
 
