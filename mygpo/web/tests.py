@@ -88,10 +88,11 @@ class PodcastPageTests(TestCase):
                                          max_episode_order=1,
                                          )
         for n in range(20):
-            episode = Episode.objects.create(id=uuid.uuid1().hex,
-                                             podcast=podcast,
-                                             order=1,
-                                             )
+            episode = Episode.objects.get_or_create_for_url(
+                podcast,
+                'http://www.example.com/episode%d.mp3' % (n, ),
+            )
+
             # we only need (the last) one
             self.episode_slug = Slug.objects.create(content_object=episode,
                                                     order=0,
@@ -108,7 +109,7 @@ class PodcastPageTests(TestCase):
         url = reverse('podcast-slug', args=(self.podcast_slug.slug, ))
         # the number of queries must be independent of the number of episodes
 
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(5):
             anon_request(url)
 
     def test_episode_queries(self):

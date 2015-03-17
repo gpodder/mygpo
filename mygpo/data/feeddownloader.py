@@ -182,8 +182,9 @@ class PodcastUpdater(object):
         if latest_episode:
             podcast.latest_episode_timestamp = latest_episode.released
 
-        podcast.episode_count = Episode.objects.filter(podcast=podcast).count()
-
+        # podcast.episode_count is not update here on purpose. It is, instead,
+        # continuously updated when creating new episodes in
+        # EpisodeManager.get_or_create_for_url
 
         self._update_categories(podcast, prev_latest_episode_timestamp)
 

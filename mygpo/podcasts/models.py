@@ -5,6 +5,7 @@ from datetime import datetime
 
 from django.conf import settings
 from django.db import models, transaction, IntegrityError
+from django.db.models import F
 from django.utils.translation import ugettext as _
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation
@@ -569,6 +570,10 @@ class EpisodeManager(GenericManager):
         return EpisodeQuerySet(self.model, using=self._db)
 
     def get_or_create_for_url(self, podcast, url, defaults={}):
+        """ Create an Episode for a given URL
+
+        This is the only place where new episodes are created """
+
         # TODO: where to specify how uuid is created?
         import uuid
 
@@ -584,11 +589,19 @@ class EpisodeManager(GenericManager):
                     episode = Episode.objects.create(podcast=podcast,
                                                      id=uuid.uuid1().hex,
                                                      **defaults)
+
                     url = URL.objects.create(url=url,
                                              order=0,
                                              scope=episode.scope,
                                              content_object=episode,
                                             )
+
+                    # Keep episode_count up to date here; it is not
+                    # recalculated when updating the podcast because counting
+                    # episodes can be very slow for podcasts with many episodes
+                    Podcast.objects.filter(pk=podcast.pk)\
+                                   .update(episode_count=F('episode_count')+1)
+
                     return episode
 
             # URL could not be created, so it was created since the first get
