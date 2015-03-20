@@ -1,8 +1,4 @@
-from collections import defaultdict, namedtuple, Counter
-from operator import itemgetter
-from datetime import datetime
 from random import choice
-from itertools import chain
 
 from django.utils.text import slugify
 
