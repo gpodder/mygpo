@@ -1,5 +1,6 @@
 from random import choice
 
+from django.db import IntegrityError
 from django.utils.text import slugify
 
 from mygpo.decorators import query_if_required
@@ -54,12 +55,23 @@ def update_category(podcast):
 
     random_tag = choice(all_tags)
 
-    category, created = Category.objects.get_or_create(
-        tags__tag=slugify(random_tag.strip()),
-        defaults={
-            'title': random_tag,
-        }
-    )
+    try:
+        category, created = Category.objects.get_or_create(
+            tags__tag=slugify(random_tag.strip()),
+            defaults={
+                'title': random_tag,
+            }
+        )
+
+    except IntegrityError as ie:
+        # check if category with this title already exists
+        # the exception message should be like:
+        # IntegrityError: duplicate key value violates unique
+        # constraint "categories_category_title_key"
+        if 'categories_category_title_key' not in str(ie):
+            raise
+
+        category = Category.objects.get(title=random_tag)
 
     if not created:
         # update modified timestamp
