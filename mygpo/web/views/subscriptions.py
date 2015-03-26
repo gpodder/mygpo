@@ -27,7 +27,8 @@ def for_user_opml(request, username):
     subscriptions = get_subscribed_podcasts(user, only_public=True)
 
     if parse_bool(request.GET.get('symbian', False)):
-        subscriptions = map(symbian_opml_changes, subscriptions)
+        subscriptions = map(symbian_opml_changes,
+                            [p.podcast for p in subscriptions])
 
     response = render(request, 'user_subscriptions.opml', {
         'subscriptions': subscriptions,
