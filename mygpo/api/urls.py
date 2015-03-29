@@ -8,7 +8,7 @@ urlpatterns = patterns('',
 
 urlpatterns += patterns('mygpo.api.simple',
     (r'^subscriptions/(?P<username>[\w.+-]+)/(?P<device_uid>[\w.-]+)\.(?P<format>\w+)', 'subscriptions'),
-    (r'^subscriptions/(?P<username>[\w.+-]+)\.(?P<format>\w+)', 'all_subscriptions'),
+ url(r'^subscriptions/(?P<username>[\w.+-]+)\.(?P<format>\w+)', 'all_subscriptions', name='api-all-subscriptions'),
  url(r'^toplist/(?P<count>\d+)\.(?P<format>\w+)', 'toplist',                   name='toplist-opml'),
     (r'^search\.(?P<format>\w+)', 'search'),
  url(r'^suggestions/(?P<count>\d+)\.(?P<format>\w+)', 'suggestions',           name='suggestions-opml'),
