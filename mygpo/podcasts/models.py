@@ -146,7 +146,7 @@ class UrlsMixin(models.Model):
     def url(self):
         """ The main URL of the model """
         # We could also use self.urls.first() here, but this would result in a
-        # different query and would render a .prefetch_related('urls') useless
+        # different query and would make a .prefetch_related('urls') useless
         # The assumption is that we will never have loads of URLS, so
         # fetching all won't hurt
         urls = list(self.urls.all())
@@ -212,7 +212,7 @@ class SlugsMixin(models.Model):
         TODO: should be retrieved from a (materialized) view """
 
         # We could also use self.slugs.first() here, but this would result in a
-        # different query and would render a .prefetch_related('slugs') useless
+        # different query and would make a .prefetch_related('slugs') useless
         # The assumption is that we will never have loads of slugs, so
         # fetching all won't hurt
         slugs = list(self.slugs.all())

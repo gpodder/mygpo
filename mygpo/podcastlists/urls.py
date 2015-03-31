@@ -3,29 +3,26 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
- url(r'^share/lists/$',
-    views.lists_own,
-    name='lists-overview'),
+
+ url(r'^lists/$',
+    views.PodcastListsOverview.as_view(),
+    name='podcast-lists'),
 
  url(r'^share/lists/create$',
     views.create_list,
     name='list-create'),
 
  url(r'^user/(?P<username>[\w.+-]+)/lists/$',
-    views.lists_user,
+    views.PodcastListsOfUser.as_view(),
     name='lists-user'),
 
  url(r'^user/(?P<username>[\w.+-]+)/list/(?P<slug>[\w-]+)$',
-    views.list_show,
+    views.PodcastListDetails.as_view(),
     name='list-show'),
 
  url(r'^user/(?P<username>[\w.+-]+)/list/(?P<slug>[\w-]+)\.opml$',
     views.list_opml,
     name='list-opml'),
-
- url(r'^user/(?P<username>[\w.+-]+)/list/(?P<slug>[\w-]+)/search$',
-    views.search,
-    name='list-search'),
 
  url(r'^user/(?P<username>[\w.+-]+)/list/(?P<slug>[\w-]+)/add/(?P<podcast_id>\w+)$',
     views.add_podcast,

@@ -20,7 +20,6 @@ from functools import wraps
 
 import dateutil.parser
 
-from django.shortcuts import render
 from django.http import HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
@@ -87,7 +86,7 @@ def episode(request, episode):
     prev = None #podcast.get_episode_before(episode)
     next = None #podcast.get_episode_after(episode)
 
-    return render(request, 'episode.html', {
+    return {
         'episode': episode,
         'podcast': podcast,
         'prev': prev,
@@ -99,37 +98,38 @@ def episode(request, episode):
         'devices': devices,
         'can_flattr': can_flattr,
         'is_publisher': is_publisher,
-    })
+    }
 
 
-@never_cache
-@login_required
-@vary_on_cookie
-@cache_control(private=True)
-def history(request, episode):
-    """ shows the history of the episode """
+class EpisodeHistory(APIView):
+    @never_cache
+    @login_required
+    @vary_on_cookie
+    @cache_control(private=True)
+    def get(self, request, episode):
+        """ shows the history of the episode """
 
-    user = request.user
-    podcast = episode.podcast
+        user = request.user
+        podcast = episode.podcast
 
-    history = EpisodeHistoryEntry.objects.filter(user=user,
-                                                 episode=episode,)\
-                                         .order_by('-timestamp')\
-                                         .prefetch_related('episode',
-                                                           'episode__slugs',
-                                                           'episode__podcast',
-                                                           'episode__podcast__slugs',
-                                                           'client')
+        history = EpisodeHistoryEntry.objects.filter(user=user,
+                                                     episode=episode,)\
+                                             .order_by('-timestamp')\
+                                             .prefetch_related('episode',
+                                                               'episode__slugs',
+                                                               'episode__podcast',
+                                                               'episode__podcast__slugs',
+                                                               'client')
 
-    clients = user.client_set.all()
+        clients = user.client_set.all()
 
-    return render(request, 'episode-history.html', {
-        'episode': episode,
-        'podcast': podcast,
-        'history': history,
-        'actions': EPISODE_ACTION_TYPES,
-        'clients': clients,
-    })
+        return {
+            'episode': episode,
+            'podcast': podcast,
+            'history': history,
+            'actions': EPISODE_ACTION_TYPES,
+            'clients': clients,
+        }
 
 
 @never_cache
@@ -148,34 +148,6 @@ def toggle_favorite(request, episode):
 
     podcast = episode.podcast
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
-
-
-
-@vary_on_cookie
-@cache_control(private=True)
-@login_required
-def list_favorites(request):
-    user = request.user
-    site = RequestSite(request)
-
-    favorites = FavoriteEpisode.episodes_for_user(user)
-
-    recently_listened = last_played_episodes(user)
-
-    favfeed = FavoriteFeed(user)
-    feed_url = favfeed.get_public_url(site.domain)
-
-    podcast = Podcast.objects.filter(urls__url=feed_url).first()
-
-    token = request.user.profile.favorite_feeds_token
-
-    return render(request, 'favorites.html', {
-        'episodes': favorites,
-        'feed_token': token,
-        'site': site,
-        'podcast': podcast,
-        'recently_listened': recently_listened,
-        })
 
 
 @never_cache

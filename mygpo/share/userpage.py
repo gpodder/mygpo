@@ -21,8 +21,7 @@ from mygpo.favorites.models import FavoriteEpisode
 class UserpageView(View):
     """ Shows the profile page for a user """
 
-    @method_decorator(requires_token(token_name='userpage_token',
-                denied_template='userpage-denied.html'))
+    @method_decorator(requires_token(token_name='userpage_token'))
     def get(self, request, username):
 
         User = get_user_model()

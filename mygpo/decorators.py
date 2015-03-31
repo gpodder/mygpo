@@ -19,7 +19,7 @@
 
 from functools import wraps
 
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.http import HttpResponseForbidden, HttpResponseNotAllowed
 from django.contrib.auth import get_user_model
 
@@ -27,7 +27,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def requires_token(token_name, denied_template=None):
+def requires_token(token_name):
     """
     returns a decorator that checks if the security token in the 'token' GET
     parameter matches the requires token for the resource. The protected
@@ -39,9 +39,7 @@ def requires_token(token_name, denied_template=None):
     * no token is required for the resource
     * the token in the 'token' GET parameter matches the required token
 
-    If the passed token does not match
-    * the denied_template is rendered and returned if given
-    * HttpResponseForbidden is returned, if denied_template is not given
+    If the passed token does not match HttpResponseForbidden is returned
     """
     def decorator(fn):
         @wraps(fn)
@@ -56,13 +54,7 @@ def requires_token(token_name, denied_template=None):
                 return fn(request, username, *args, **kwargs)
 
             else:
-                if denied_template:
-                    return render(request, denied_template, {
-                        'other_user': user
-                    })
-
-                else:
-                    return HttpResponseForbidden()
+                return HttpResponseForbidden()
 
         return tmp
     return decorator

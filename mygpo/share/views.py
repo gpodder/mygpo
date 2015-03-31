@@ -1,6 +1,5 @@
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
 from django.contrib.sites.models import RequestSite
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.vary import vary_on_cookie
@@ -35,30 +34,6 @@ class FavoritesPublic(View):
             request.user.profile.save()
 
         return HttpResponseRedirect(reverse('share-favorites'))
-
-
-
-class ShareFavorites(View):
-
-    @method_decorator(vary_on_cookie)
-    @method_decorator(cache_control(private=True))
-    @method_decorator(login_required)
-    def get(self, request):
-        user = request.user
-
-        favfeed = FavoriteFeed(user)
-        site = RequestSite(request)
-        feed_url = favfeed.get_public_url(site.domain)
-
-        podcast = Podcast.objects.filter(urls__url=feed_url).first()
-
-        token = user.profile.favorite_feeds_token
-
-        return render(request, 'share/favorites.html', {
-            'feed_token': token,
-            'site': site,
-            'podcast': podcast,
-            })
 
 
 class PublicSubscriptions(View):
@@ -104,28 +79,6 @@ class FavoritesFeedCreateEntry(View):
         updater.update(feed_url)
 
         return HttpResponseRedirect(reverse('share-favorites'))
-
-
-@login_required
-def overview(request):
-    user = request.user
-    site = RequestSite(request)
-
-    subscriptions_token = user.profile.get_token('subscriptions_token')
-    userpage_token = user.profile.get_token('userpage_token')
-    favfeed_token = user.profile.get_token('favorite_feeds_token')
-
-    favfeed = FavoriteFeed(user)
-    favfeed_url = favfeed.get_public_url(site.domain)
-    favfeed_podcast = Podcast.objects.filter(urls__url=favfeed_url).first()
-
-    return render(request, 'share/overview.html', {
-        'site': site,
-        'subscriptions_token': subscriptions_token,
-        'userpage_token': userpage_token,
-        'favfeed_token': favfeed_token,
-        'favfeed_podcast': favfeed_podcast,
-        })
 
 
 @login_required

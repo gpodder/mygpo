@@ -37,33 +37,9 @@ from mygpo.web.utils import process_lang_params
 from mygpo.utils import parse_range
 from mygpo.podcastlists.models import PodcastList
 from mygpo.favorites.models import FavoriteEpisode
-#from mygpo.web.views.podcast import slug_id_decorator
 from mygpo.users.settings import FLATTR_AUTO, FLATTR_TOKEN
+from mygpo.api import APIView
 from mygpo.publisher.models import PublishedPodcast
-
-
-@vary_on_cookie
-@cache_control(private=True)
-def home(request):
-    if request.user.is_authenticated():
-        return dashboard(request)
-    else:
-        return welcome(request)
-
-
-@vary_on_cookie
-@cache_control(private=True)
-def welcome(request):
-    current_site = RequestSite(request)
-
-    lang = process_lang_params(request)
-
-    toplist = Podcast.objects.all().toplist(lang)
-
-    return render(request, 'home.html', {
-          'url': current_site,
-          'toplist': toplist,
-    })
 
 
 @vary_on_cookie
@@ -140,18 +116,19 @@ def dashboard(request, episode_count=10):
         })
 
 
-@vary_on_cookie
-@cache_control(private=True)
-@login_required
-def mytags(request):
-    tags_tag = defaultdict(list)
+class MyTags(APIView):
+    @vary_on_cookie
+    @cache_control(private=True)
+    @login_required
+    def get(self, request):
+        tags_tag = defaultdict(list)
 
-    user = request.user
+        user = request.user
 
-    tags = Tag.objects.filter(source=Tag.USER, user=user).order_by('tag')
-    for tag in tags:
-        tags_tag[tag.tag].append(tag.content_object)
+        tags = Tag.objects.filter(source=Tag.USER, user=user).order_by('tag')
+        for tag in tags:
+            tags_tag[tag.tag].append(tag.content_object)
 
-    return render(request, 'mytags.html', {
-        'tags_tag': dict(tags_tag.items()),
-    })
+        return {
+            'tags_tag': dict(tags_tag.items()),
+        }

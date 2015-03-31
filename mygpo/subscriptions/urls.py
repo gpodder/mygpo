@@ -1,15 +1,17 @@
 from django.conf.urls import url
 
+from . import views
+
 urlpatterns = [
  url(r'^subscriptions/$',
-     'mygpo.subscriptions.views.show_list',
+     views.SubscriptionList.as_view(),
      name='subscriptions'),
 
- url(r'^download/subscriptions\.opml$',
-     'mygpo.subscriptions.views.download_all',
-     name='subscriptions-opml'),
-
  url(r'^user/(?P<username>[\w.+-]+)/subscriptions/rss/$',
-     'mygpo.subscriptions.views.subscriptions_feed',
+     views.subscriptions_feed,
      name='shared-subscriptions-rss'),
+
+ url(r'^user/(?P<username>[\w.+-]+)/subscriptions$',
+     views.UserSubscriptions.as_view(),
+     name='shared-subscriptions'),
 ]

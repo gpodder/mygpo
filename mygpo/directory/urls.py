@@ -1,8 +1,8 @@
 from django.conf.urls import *
 
-from mygpo.directory.views import Directory, Carousel, MissingPodcast, \
+from mygpo.directory.views import DirectoryTopics, \
          AddPodcast, AddPodcastStatus, FlattrPodcastList, LicensePodcastList, \
-         LicenseList, PodcastToplistView, EpisodeToplistView
+         LicenseList, PodcastToplistView, EpisodeToplistView, CategoryView
 
 urlpatterns = patterns('mygpo.directory.views',
  url(r'^toplist/$',
@@ -14,16 +14,8 @@ urlpatterns = patterns('mygpo.directory.views',
      name='episode-toplist'),
 
  url(r'^directory/$',
-     Directory.as_view(),
+     DirectoryTopics.as_view(),
      name='directory-home'),
-
- url(r'^carousel/$',
-     Carousel.as_view(),
-     name='carousel-demo'),
-
- url(r'^missing/$',
-     MissingPodcast.as_view(),
-     name='missing-podcast'),
 
  url(r'^add-podcast/$',
      AddPodcast.as_view(),
@@ -45,7 +37,7 @@ urlpatterns = patterns('mygpo.directory.views',
      LicensePodcastList.as_view(),
      name='license-podcasts-url'),
 
- url(r'^directory/(?P<category>.+)$',                          'category',                   name='directory'),
- url(r'^search/$',                        'search',      name='search'),
- url(r'^lists/$',                     'podcast_lists', name='podcast-lists'),
+ url(r'^directory/(?P<category>.+)$',
+     CategoryView.as_view(),
+     name='directory'),
 )

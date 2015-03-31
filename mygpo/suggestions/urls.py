@@ -4,14 +4,14 @@ from . import views
 
 urlpatterns = [
     url(r'^$',
-        views.suggestions,
+        views.SuggestionsList.as_view(),
         name='suggestions'),
 
    url(r'^blacklist/(?P<slug>[\w-]+)$',
-        views.blacklist_slug,
+        views.BlacklistSuggestion.as_view(),
         name='suggestions-blacklist-slug'),
 
    url(r'^blacklist/(?P<podcast_id>[0-9a-f]{32})$',
-        views.blacklist_id,
+        views.BlacklistSuggestion.as_view(),
         name='suggestions-blacklist-id'),
 ]

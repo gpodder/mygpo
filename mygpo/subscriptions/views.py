@@ -3,7 +3,7 @@ from datetime import datetime
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import RequestSite
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import cache_control
@@ -11,68 +11,54 @@ from django.utils.translation import ugettext as _
 from django.contrib.syndication.views import Feed
 from django.contrib.auth import get_user_model
 
+from mygpo.api import APIView
 from mygpo.podcasts.models import Podcast
 from mygpo.subscriptions.models import Subscription
-from mygpo.users.settings import PUBLIC_SUB_PODCAST
-from mygpo.utils import unzip, skip_pairs
-from mygpo.api import simple
-from mygpo.subscriptions import get_subscribed_podcasts
 from mygpo.decorators import requires_token
-from mygpo.users.models import HistoryEntry
-from mygpo.subscriptions import (get_subscribed_podcasts,
-    get_subscription_change_history, get_subscription_history)
+from mygpo.subscriptions import (get_subscription_change_history,
+    get_subscription_history)
 from mygpo.web.utils import get_podcast_link_target
 
 
-@vary_on_cookie
-@cache_control(private=True)
-@login_required
-def show_list(request):
-    current_site = RequestSite(request)
-    subscriptionlist = create_subscriptionlist(request)
-    return render(request, 'subscriptions.html', {
-        'subscriptionlist': subscriptionlist,
-        'url': current_site
-    })
+class SubscriptionList(APIView):
 
-@vary_on_cookie
-@cache_control(private=True)
-@login_required
-def download_all(request):
-    podcasts = get_subscribed_podcasts(request.user)
-    response = simple.format_podcast_list(podcasts, 'opml', request.user.username)
-    response['Content-Disposition'] = 'attachment; filename=all-subscriptions.opml'
-    return response
+    @vary_on_cookie
+    @cache_control(private=True)
+    @login_required
+    def get(self, request):
+        subscriptionlist = self.create_subscriptionlist(request)
+        return {
+            'subscriptions': subscriptionlist,
+        }
 
+    def create_subscriptionlist(self, request):
+        user = request.user
 
-def create_subscriptionlist(request):
-    user = request.user
+        # get all non-deleted subscriptions
+        subscriptions = Subscription.objects.filter(user=user)\
+                                            .exclude(deleted=True)\
+                                            .select_related('podcast', 'client')
 
-    # get all non-deleted subscriptions
-    subscriptions = Subscription.objects.filter(user=user)\
-                                        .exclude(deleted=True)\
-                                        .select_related('podcast', 'client')
+        # grou clients by subscribed podcasts
+        subscription_list = {}
+        for subscription in subscriptions:
+            podcast = subscription.podcast
 
-    # grou clients by subscribed podcasts
-    subscription_list = {}
-    for subscription in subscriptions:
-        podcast = subscription.podcast
+            if not podcast in subscription_list:
+                subscription_list[podcast] = {
+                    'podcast': podcast,
+                    'devices': [],
+                    'episodes': podcast.episode_count,
+                }
 
-        if not podcast in subscription_list:
-            subscription_list[podcast] = {
-                'podcast': podcast,
-                'devices': [],
-                'episodes': podcast.episode_count,
-            }
+            subscription_list[podcast]['devices'].append(subscription.client)
 
-        subscription_list[podcast]['devices'].append(subscription.client)
-
-    # sort most recently updated podcast first
-    subscriptions = subscription_list.values()
-    now = datetime.utcnow()
-    sort_key = lambda s: s['podcast'].latest_episode_timestamp or now
-    subscriptions = sorted(subscriptions, key=sort_key, reverse=True)
-    return subscriptions
+        # sort most recently updated podcast first
+        subscriptions = subscription_list.values()
+        now = datetime.utcnow()
+        sort_key = lambda s: s['podcast'].latest_episode_timestamp or now
+        subscriptions = sorted(subscriptions, key=sort_key, reverse=True)
+        return subscriptions
 
 
 @requires_token(token_name='subscriptions_token')
@@ -142,3 +128,18 @@ class SubscriptionsFeed(Feed):
 
     def item_pubdate(self, item):
         return item.timestamp
+
+
+class UserSubscriptions(APIView):
+    @requires_token(token_name='subscriptions_token')
+    def get(self, request, username):
+        User = get_user_model()
+        user = get_object_or_404(User, username=username)
+        subscriptions = get_subscribed_podcasts(user, only_public=True)
+        token = user.profile.get_token('subscriptions_token')
+
+        return {
+            'subscriptions': subscriptions,
+            'other_user': user,
+            'token': token,
+        }

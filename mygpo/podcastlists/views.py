@@ -4,13 +4,15 @@ from datetime import datetime
 
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponseForbidden
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.utils.text import slugify
 from django.contrib.sites.models import RequestSite
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
+from django.views.decorators.cache import cache_control
+from django.views.decorators.vary import vary_on_cookie
 from django.utils.translation import ugettext as _
 from django.views.generic.base import View
 
@@ -18,8 +20,8 @@ from mygpo.podcasts.models import Podcast, PodcastGroup
 from mygpo.podcastlists.models import PodcastList, PodcastListEntry
 from mygpo.api.simple import format_podcast_list
 from mygpo.votes.models import Vote
-from mygpo.directory.views import search as directory_search
 from mygpo.flattr import Flattr
+from mygpo.api import APIView
 
 import logging
 logger = logging.getLogger(__name__)
@@ -45,55 +47,37 @@ def list_decorator(must_own=False):
     return _tmp
 
 
-@list_decorator(must_own=False)
-def search(request, username, listname):
-    return directory_search(request, 'list_search.html',
-            {'listname': listname})
+class PodcastListsOfUser(APIView):
 
-
-@login_required
-def lists_own(request):
-
-    lists = PodcastList.objects.filter(user=request.user)
-
-    return render(request, 'lists.html', {
-            'lists': lists
-        })
-
-
-def lists_user(request, username):
-
-    User = get_user_model()
-    user = get_object_or_404(User, username=username)
-    lists = PodcastList.objects.filter(user=user)
-
-    return render(request, 'lists_user.html', {
-            'lists': lists,
+    def get(self, request, username):
+        User = get_user_model()
+        user = get_object_or_404(User, username=username)
+        lists = PodcastList.objects.filter(user=user)
+        return {
             'user': user,
-        })
+            'podcastlists': lists,
+        }
 
 
-@list_decorator(must_own=False)
-def list_show(request, plist, owner):
+class PodcastListDetails(APIView):
+    @list_decorator(must_own=False)
+    def get(self, request, username):
 
-    is_own = owner == request.user
-    site = RequestSite(request)
+        is_own = owner == request.user
 
-    objs = [entry.content_object for entry in plist.entries.all()]
-    max_subscribers = max([p.subscriber_count() for p in objs] + [0])
+        objs = [entry.content_object for entry in plist.entries.all()]
+        max_subscribers = max([p.subscriber_count() for p in objs] + [0])
 
-    thing = plist.get_flattr_thing(site.domain, owner.username)
-    flattr = Flattr(owner, site.domain, request.is_secure())
-    flattr_autosubmit = flattr.get_autosubmit_url(thing)
+        thing = plist.get_flattr_thing(site.domain, owner.username)
+        flattr = Flattr(owner, site.domain, request.is_secure())
+        flattr_autosubmit = flattr.get_autosubmit_url(thing)
 
-    return render(request, 'list.html', {
+        return {
             'podcastlist': plist,
-            'max_subscribers': max_subscribers,
             'owner': owner,
             'flattr_autosubmit': flattr_autosubmit,
-            'domain': site.domain,
             'is_own': is_own,
-        })
+        }
 
 
 @list_decorator(must_own=False)
@@ -176,3 +160,41 @@ def rate_list(request, plist, owner):
 
     list_url = reverse('list-show', args=[owner.username, plist.slug])
     return HttpResponseRedirect(list_url)
+
+
+class RandomPodcastList(APIView):
+
+    def get(self, request, podcasts_per_list=5):
+        random_list = PodcastList.objects.order_by('?').first()
+        yield random_list
+
+
+class PodcastListsOverview(APIView):
+
+    @cache_control(private=True)
+    @vary_on_cookie
+    def get(self, request, page_size=20):
+
+        lists = PodcastList.objects.all()\
+                                   .annotate(num_votes=Count('votes'))\
+                                   .order_by('-num_votes')
+
+        paginator = Paginator(lists, page_size)
+
+        page = request.GET.get('page')
+        try:
+            lists = paginator.page(page)
+        except PageNotAnInteger:
+            lists = paginator.page(1)
+            page = 1
+        except EmptyPage:
+            lists = paginator.page(paginator.num_pages)
+            page = paginator.num_pages
+
+        num_pages = int(ceil(PodcastList.objects.count() / float(page_size)))
+        page_list = get_page_list(1, num_pages, int(page), 15)
+
+        return {
+            'lists': lists,
+            'page_list': page_list,
+        }

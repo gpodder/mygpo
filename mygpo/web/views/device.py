@@ -20,7 +20,6 @@ from functools import wraps
 from xml.parsers.expat import ExpatError
 
 from django.db import transaction, IntegrityError
-from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, \
@@ -33,35 +32,28 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control
 
-from mygpo.api import simple
+from mygpo.api import simple, APIView
 from mygpo.decorators import allowed_methods
 from mygpo.users.models import Client, UserProxy
 from mygpo.subscriptions.models import Subscription
 from mygpo.users.tasks import sync_user
 
 
-@vary_on_cookie
-@cache_control(private=True)
-@login_required
-def overview(request):
+class ClientList(APIView):
 
-    user = UserProxy.objects.from_user(request.user)
-    device_groups = user.get_grouped_devices()
-    deleted_devices = Client.objects.filter(user=request.user, deleted=True)
+    @vary_on_cookie
+    @cache_control(private=True)
+    @login_required
+    def get(self, request):
 
-    # create a "default" device
-    device = Client()
-    device_form = DeviceForm({
-        'name': device.name,
-        'type': device.type,
-        'uid': device.uid
-        })
+        user = UserProxy.objects.from_user(request.user)
+        device_groups = user.get_grouped_devices()
+        deleted_devices = Client.objects.filter(user=request.user, deleted=True)
 
-    return render(request, 'devicelist.html', {
-        'device_groups': list(device_groups),
-        'deleted_devices': list(deleted_devices),
-        'device_form': device_form,
-    })
+        return {
+            'device_groups': list(device_groups),
+            'deleted_devices': list(deleted_devices),
+        }
 
 
 
@@ -84,25 +76,23 @@ def device_decorator(f):
 
 
 
-@login_required
-@device_decorator
-def show(request, device):
+class ClientDetails(APIView):
 
-    subscriptions = list(device.get_subscribed_podcasts())
-    synced_with = device.synced_with()
+    @login_required
+    @device_decorator
+    def get(self, request, device):
 
-    sync_targets = list(device.get_sync_targets())
-    sync_form = SyncForm()
-    sync_form.set_targets(sync_targets,
-            _('Synchronize with the following devices'))
+        subscriptions = list(device.get_subscribed_podcasts())
+        synced_with = device.synced_with()
 
-    return render(request, 'device.html', {
-        'device': device,
-        'sync_form': sync_form,
-        'subscriptions': subscriptions,
-        'synced_with': synced_with,
-        'has_sync_targets': len(sync_targets) > 0,
-    })
+        sync_targets = list(device.get_sync_targets())
+
+        return {
+            'device': device,
+            'sync_targets': sync_targets,
+            'subscriptions': subscriptions,
+            'synced_with': synced_with,
+        }
 
 
 @login_required
@@ -166,33 +156,6 @@ def update(request, device):
                        "ID for two devices."))
 
     return HttpResponseRedirect(reverse('device-edit', args=[uid]))
-
-
-@device_decorator
-@login_required
-@allowed_methods(['GET'])
-def edit(request, device):
-
-    device_form = DeviceForm({
-        'name': device.name,
-        'type': device.type,
-        'uid': device.uid
-        })
-
-    synced_with = device.synced_with()
-
-    sync_targets = list(device.get_sync_targets())
-    sync_form = SyncForm()
-    sync_form.set_targets(sync_targets,
-            _('Synchronize with the following devices'))
-
-    return render(request, 'device-edit.html', {
-        'device': device,
-        'device_form': device_form,
-        'sync_form': sync_form,
-        'synced_with': synced_with,
-        'has_sync_targets': len(sync_targets) > 0,
-    })
 
 
 @device_decorator

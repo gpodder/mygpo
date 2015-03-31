@@ -18,7 +18,6 @@
 import string
 import random
 
-from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.decorators import login_required
@@ -43,6 +42,7 @@ from mygpo.web.auth import get_google_oauth_flow
 from mygpo.users.models import UserProxy
 from mygpo.users.views.registration import send_activation_email
 from mygpo.utils import random_token
+from mygpo.api import APIView
 
 import logging
 logger = logging.getLogger(__name__)
@@ -55,19 +55,6 @@ def login(request, user):
 
 class LoginView(View):
     """ View to login a user """
-
-    def get(self, request):
-        """ Shows the login page """
-
-        # Do not show login page for already-logged-in users
-        if request.user.is_authenticated():
-            return HttpResponseRedirect(DEFAULT_LOGIN_REDIRECT)
-
-        return render(request, 'login.html', {
-            'url': RequestSite(request),
-            'next': request.GET.get('next', ''),
-        })
-
 
     @method_decorator(never_cache)
     def post(self, request):
@@ -120,48 +107,36 @@ class LoginView(View):
         return HttpResponseRedirect(DEFAULT_LOGIN_REDIRECT)
 
 
-@never_cache
-def restore_password(request):
+class RestorePassword(APIView):
 
-    if request.method == 'GET':
-        form = RestorePasswordForm()
-        return render(request, 'restore_password.html', {
-            'form': form,
-        })
+    def post(self, request):
 
+        form = RestorePasswordForm(request.POST)
+        if not form.is_valid():
+            return HttpResponseRedirect('/login/')
 
-    form = RestorePasswordForm(request.POST)
-    if not form.is_valid():
-        return HttpResponseRedirect('/login/')
-
-    try:
         user = UserProxy.objects.all().by_username_or_email(
                 form.cleaned_data['username'],
                 form.cleaned_data['email']
             )
 
-    except UserProxy.DoesNotExist:
-        messages.error(request, _('User does not exist.'))
-        return render(request, 'password_reset_failed.html')
+        if not user.is_active:
+            send_activation_email(user, request)
+            messages.error(request, _('Please activate your account first. '
+                'We have just re-sent your activation email'))
+            return HttpResponseRedirect(reverse('login'))
 
-    if not user.is_active:
-        send_activation_email(user, request)
-        messages.error(request, _('Please activate your account first. '
-            'We have just re-sent your activation email'))
-        return HttpResponseRedirect(reverse('login'))
-
-    site = RequestSite(request)
-    pwd = random_token(length=16)
-    user.set_password(pwd)
-    user.save()
-    subject = render_to_string('reset-pwd-subj.txt', {'site': site}).strip()
-    message = render_to_string('reset-pwd-msg.txt', {
-        'username': user.username,
-        'site': site,
-        'password': pwd,
-    })
-    user.email_user(subject, message)
-    return render(request, 'password_reset.html')
+        site = RequestSite(request)
+        pwd = random_token(length=16)
+        user.set_password(pwd)
+        user.save()
+        subject = render_to_string('reset-pwd-subj.txt', {'site': site}).strip()
+        message = render_to_string('reset-pwd-msg.txt', {
+            'username': user.username,
+            'site': site,
+            'password': pwd,
+        })
+        user.email_user(subject, message)
 
 
 class GoogleLogin(View):
