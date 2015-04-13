@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load humanize %}
+{% load episodes %}
+{% load devices %}
+{% load podcasts %}
+{% load mygpoutil %}
+{% load time %}
+{% load youtube %}
+{% load flickr %}
+{% load charts %}
+{% load utils %}
+{% load static %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/podcast/"|main_menu }}{% endblock %}
+{% block sectionmenu %}
+ {{ "/podcast/"|section_menu:podcast.display_title }}
+{% endblock %}
+
+{% block head %}
+ {% if episode.url|is_youtube_video %}
+  <script type="text/javascript" src="{% static "js/swfobject.js" %}"></script>
+  <script type="text/javascript" src="{% static "js/json2.js" %}"></script>
+  <script type="text/javascript" src="{% static "js/youtube-handler.js" %}"></script>
+ {% endif %}
+
+{% endblock head %}
+
+{% block title %}
+ {{ episode.title|default:"Unnamed Episode"|striptags }} -
+ {{ podcast.display_title|striptags}}
+{% endblock title %}
+
+{% block header %}
+ <h1>
+  <a href="{% podcast_link_target podcast %}">{{ podcast.display_title }}</a> /
+  {{ episode.title|default:"Unnamed Episode"|striptags }}
+
+  {% if user.is_authenticated %}
+   {% if is_favorite %}
+     <a href="{% episode_link_target episode podcast "episode-fav" %}">
+      <i class="fa-star"></i>
+     </a>
+   {% else %}
+     <a href="{% episode_link_target episode podcast "episode-fav" %}">
+      <i class="fa-star-o"></i>
+     </a>
+   {% endif %}
+  {% endif %}
+
+ </h1>
+{% endblock header %}
+
+{% block sidebar %}
+
+ {% if podcast.logo_url %}
+  <div id="podcastlogo"><a href="{% podcast_link_target podcast %}">{{ podcast|podcast_logo_big }}</a></div>
+ {% endif %}
+
+ <div id="info">
+
+  {% if episode.released %}
+   <div class="item">
+    <span class="key"><i class="fa-calendar"></i> Released</span>
+    <span class="value">{{ episode.released|naturalday }}</span>
+   </div>
+  {% endif %}
+
+  {% if not episode.outdated or "hide-outdated-urls" not in podcast.restrictions %}
+   <div class="item">
+    <span class="key"><i class="fa-download"></i> {% trans "Download" %}
+    <span class="value"><a href="{{episode.url}}">{{ episode.url|domain }}</a></span>
+   </div>
+  {% endif %}
+
+  {% if episode.link and episode.link != episode.url %}
+   <div class="item">
+    <span class="key"><i class="fa-external-link"></i> {% trans "Website" %}
+    <span class="value"><a href="{{ episode.link }}">{{ episode.link|domain }}</a></span>
+   </div>
+  {% endif %}
+
+  {% if episode.listeners %}
+   <div class="item">
+    <span class="key"><i class="fa-line-chart"></i> {% trans "Listeners" %}
+    <span class="value">{{ episode.listeners }}</span>
+   </div>
+  {% endif %}
+
+ </div>
+{% endblock sidebar %}
+
+
+{% block ads %}
+ {% comment %}disable ads on episode pages{% endcomment %}
+{% endblock %}

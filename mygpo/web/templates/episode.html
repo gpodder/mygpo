@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "episode-base.html" %}
 {% load i18n %}
 {% load humanize %}
 {% load episodes %}
@@ -15,11 +15,7 @@
 {% load menu %}
 {% block mainmenu %}{{ "/podcast/"|main_menu }}{% endblock %}
 {% block sectionmenu %}
- {% if podcast.title %}
-  {{ "/podcast/"|section_menu:podcast.title }}
- {% else %}
-  {{ "/podcast/"|section_menu:"Unnamed Podcast" }}
- {% endif %}
+ {{ "/podcast/"|section_menu:podcast.display_title }}
 {% endblock %}
 
 {% block head %}
@@ -30,49 +26,6 @@
  {% endif %}
 
 {% endblock head %}
-
-{% block title %}
- {{ episode.title|default:"Unnamed Episode"|striptags }} -
- {{ podcast.title|default:"Unnamed Podcast"|striptags}}
-{% endblock %}
-
-{% block header %}
-
-  {% if podcast.logo_url %}
-   <div id="podcastlogo"><a href="{% podcast_link_target podcast %}">{{ podcast|podcast_logo_big }}</a></div>
-  {% endif %}
-  <h1>
-   {{ episode.title|default:"Unnamed Episode"|striptags }}
-   {% if episode.released %}
-    <small>{{ episode.released|naturalday }}</small>
-   {% endif %}
-  </h1>
-  <small class="description">
-      {% trans "from" %} {% podcast_group_link podcast %}&middot;
-       {% if not episode.outdated or "hide-outdated-urls" not in podcast.restrictions %}
-        <a href="{{episode.url}}" title="{% trans "Download" %}">
-         <i class="icon-download"></i>
-        </a>
-       {% endif %}
-       {% if episode.link and episode.link != episode.url %}&middot;
-        <a href="{{episode.link}}" title="{% trans "Website" %}">
-         <i class="icon-external-link"></i>
-        </a>
-      {% endif %}
-      {% if episode.listeners %}&middot;
-       {{ episode.listeners }} {% trans "listeners" %}
-      {% endif %}
-  </small>
-
-
-  {% if episode.summary or episode.description %}
-   <div class="summary">
-    {{ episode.summary|default:episode.description|truncatewords:100|markdown }}
-   </div>
-  {% endif %}
-
-{% endblock %}
-
 
 
 {% block content %}
@@ -185,8 +138,3 @@
 
  </script>
 {% endblock javascript %}
-
-
-{% block ads %}
- {% comment %}disable ads on episode pages{% endcomment %}
-{% endblock %}

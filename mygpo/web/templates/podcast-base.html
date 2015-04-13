@@ -8,11 +8,7 @@
 {% load menu %}
 {% block mainmenu %}{{ "/podcast/"|main_menu }}{% endblock %}
 {% block sectionmenu %}
- {% if podcast.title %}
-  {{ "/podcast/"|section_menu:podcast.title }}
- {% else %}
-  {{ "/podcast/"|section_menu:"Unnamed Podcast" }}
- {% endif %}
+ {{ "/podcast/"|section_menu:podcast.display_title }}
 {% endblock %}
 
 {% block head %}
@@ -20,9 +16,15 @@
  {% google_plus_one_head %}
 {% endblock %}
 
-{% block title %}{{ podcast.title|default:"Unnamed Podcast"|striptags }}{% endblock %}
+{% block title %}{{ podcast.display_title|striptags }}{% endblock %}
 
 {% block header %}
+  <h1>
+   {{ podcast.display_title|striptags }}
+  </h1>
+{% endblock %}
+
+{% block sidebar %}
 
    {% if podcast.logo_url %}
     <div id="podcastlogo">
@@ -32,39 +34,55 @@
     </div>
    {% endif %}
 
-   <h1>
-    {% if podcast.title %}
-     {{ podcast.title|striptags }}
-    {% else %}
-     {% trans "Unnamed Podcast" %}
-    {%endif%}
-   </h1>
+   <div id="info">
 
-   <small class="description">
-    {% if podcast.author %}{% trans "by" %}
-     {{ podcast.author|striptags }}
+    {% if podcast.author %}
+     <div class="item">
+      <span class="key"><i class="fa-group"></i> Author</span>
+      <span class="value">{{ podcast.author|striptags }}</span>
+     </div>
     {% endif %}
+
     {% if podcast.twitter %}
-     <a href="https://twitter.com/{{ podcast.twitter|striptags }}"><i class="icon-twitter"></i></a>
-    {% endif %}&middot;
-    <a href="{{podcast.url}}" title="{% trans "Feed" %}">
-     <i class="icon-rss"></i>
-    </a>
-    {% if podcast.link %}&middot;
-     <a href="{{podcast.link}}" title="{% trans "Website" %}">
-      <i class="icon-external-link"></i>
-     </a>
-    {% endif %}&middot;
+     <div class="item">
+      <span class="key"><i class="fa-twitter"></i> Twitter</span>
+      <span class="value"><a href="https://twitter.com/{{ podcast.twitter|striptags }}">@{{ podcast.twitter }}</a></span>
+     </div>
+    {% endif %}
+
+    <div class="item">
+     <span class="key"><i class="fa-rss"></i> Feed</span>
+     <span class="value"><a href="{{podcast.url}}" title="{% trans "Feed" %}">{{ podcast.url|domain }}</a></span>
+    </div>
+
+    {% if podcast.link %}
+     <div class="item">
+      <span class="key"><i class="fa-external-link"></i> {% trans "Website" %}</span>
+      <span class="value"><a href="{{podcast.link}}"> {{ podcast.link|domain }}</a></span>
+     </div>
+    {% endif %}
+
     {% if podcast.license %}
-     <a href="{{ podcast.license }}">
-      <i class="icon-legal"></i>
-      {{ podcast.license|license_name }}
-     </a>
+     <div class="item">
+      <span class="key"><i class="fa-legal"></i> License</span>
+      <span class="value"><a href="{{ podcast.license }}">{{ podcast.license|license_name }}</a></span>
+     </div>
     {% endif %}
-    {% if podcast.subscriber_count %}&middot;
-     {{ podcast.subscriber_count }} {% trans "subscribers" %}
+
+    {% if podcast.subscriber_count %}
+     <div class="item">
+      <span class="key"><i class="fa-line-chart"></i> Subscribers</span>
+      <span class="value">{{ podcast.subscriber_count }}</span>
+     </div>
     {% endif %}
-   </small>
+   </div>
+
+   {% block sidebarcontent %}
+   {% endblock %}
+
+{% endblock sidebar %}
+
+{% block content %}
 
    {% if related_podcasts %}
     <div class="related-podcasts">
@@ -87,6 +105,9 @@
      {{ podcast.description|markdown }}
     </div>
    {% endif %}
+
+  {% block podcastcontent %}
+  {% endblock %}
 
 {% endblock %}
 

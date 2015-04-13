@@ -54,12 +54,23 @@ SITE_ID = 1
 # to load the internationalization machinery.
 USE_I18N = True
 
+
+# Static Files
+
 STATIC_ROOT = 'staticfiles'
-STATIC_URL = '/media/'
+STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
-    os.path.abspath(os.path.join(BASE_DIR, '..', 'htdocs', 'media')),
+    os.path.abspath(os.path.join(BASE_DIR, '..', 'static')),
 )
+
+
+# Media Files
+
+MEDIA_ROOT = os.path.abspath(os.path.join(BASE_DIR, '..', 'media'))
+
+MEDIA_URL = '/media/'
+
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (

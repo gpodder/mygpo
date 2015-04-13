@@ -1,0 +1,136 @@
+
+/* apply a natural box layout model to all elements, but allowing components to
+   change, see eg http://www.paulirish.com/2012/box-sizing-border-box-ftw/ */
+
+html {
+    box-sizing: border-box;
+}
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+
+
+@import url(//fonts.googleapis.com/css?family=Source+Sans+Pro:400,200,300,600,700,900);
+
+/* Fonts and colors */
+html {
+    font-family: 'Source Sans Pro', sans-serif;
+}
+
+a {
+    color: black;
+}
+
+/* Common Elements */
+
+h1 {
+    font-size: 2.2em;
+    padding: 1em 0 .1em 0;
+}
+
+/* linked icons */
+a i {
+    text-decoration: none;
+}
+
+
+/* Main navigation */
+
+
+#navigation a,
+#navigation li,
+#navigation ul,
+#navigation img,
+ul.sec-nav li
+{
+    display: inline;
+}
+
+
+/* Directory Pages */
+
+#info a
+{
+    text-decoration: none;
+}
+
+
+/* Podcast Pages */
+
+.episode {
+    padding: .4em 0 .4em 0;
+}
+
+.episode .title
+{
+    font-size: 1.4em;
+}
+
+.episode .title a {
+    text-decoration: none;
+}
+
+.episode .description,
+.episode .description a {
+    color: #999;
+}
+
+.episode .description img {
+    display: none;
+}
+
+.episode .released {
+    font-size: .8em;
+}
+
+
+@media (min-width: 1000px) {
+    #navigation,
+    #page {
+        width: 70em;
+        margin: 0 auto;
+    }
+
+    #podcastlogo img
+    {
+        max-width: 18em;
+        max-height: 18em;
+    }
+
+    #sidebar {
+        font-size: .9em;
+        float: right;
+        width: 18em;
+        margin-left: 1em;
+    }
+
+    .item .key {
+    }
+
+    .item .value {
+        float: right;
+    }
+
+/* Sticky footer */
+html {
+    position: relative;
+    min-height: 100%;
+}
+body {
+    margin: 0 0 400px; /* bottom = footer height */
+}
+footer {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 400px;
+    width: 100%;
+}
+
+footer ul {
+    width: 70em;
+    margin: 0 auto;
+}
+
+}
