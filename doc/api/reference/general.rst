@@ -1,144 +1,34 @@
 General Information
 ===================
 
-The API can be accessed via http and https. https is preferable from a security
-/ privacy point of view and should be used by all clients. gpodder.net also
-seems to be blocked in China via plain http.
+Protocol
+--------
 
-All endpoints are relative to https://api.gpodder.net/3/.
+The API is provided via https. Requests via http will redirect to the
+corresponding URL via https.
+
+CORS
+----
+
+All endpoints send the `Access-Control-Allow-Origin: *
+<http://www.w3.org/TR/cors/>`_ header which `allows web application to access
+the API <http://enable-cors.org/>`_.
 
 
-* Request and Response Formats: JSON
-* JSONP also available
-* Date format: ISO 8601 / `RFC 3339 <http://tools.ietf.org/html/rfc3339>`_
-  ``YYYY-MM-DDTHH:MM:SSZ``
+Identifying Podcasts and Episodes
+---------------------------------
 
 Podcast is identified by its feed URL, episode is identified by its media URL.
 
-TODO: see http://developer.github.com/v3/ for relevant information!
 
-TODO: see `URI Templates <http://tools.ietf.org/html/rfc6570>`_
+Date Format
+-----------
 
-
-Status Codes
-------------
-
-The API uses HTTP status codes to inform clients about type of response. The
-semantics are used according to `their specified semantics
-<http://www.iana.org/assignments/http-status-codes/>`_.
-
-The specification of each API endpoint describes which status codes should be
-expected. In addition the following status codes can be returned for any API
-request.
-
-+----------------------------+-----------------------------------------------+
-| Status Code                | Interpretation                                |
-+============================+===============================================+
-| 200 OK                     | All OK                                        |
-+----------------------------+-----------------------------------------------+
-| 301 Moved Permanently      | The resource has moved permanently to the     |
-|                            | location provided in the Location header.     |
-|                            | Subsequent requests should use the new        |
-|                            | location directly.                            |
-+----------------------------+-----------------------------------------------+
-| 303 See Other              | the response to the request is found at the   |
-|                            | location provided in the Location header. It  |
-|                            | should be retrieved using a GET request       |
-+----------------------------+-----------------------------------------------+
-| 400 Bad Request            | invalid JSON, invalid types                   |
-+----------------------------+-----------------------------------------------+
-| 503 Service Unavailable    | The service and/or API are under maintenance  |
-+----------------------------+-----------------------------------------------+
-
-* Request not allowed (eg quota, authentication, permissions, etc)
+Date format: ISO 8601 / `RFC 3339 <http://tools.ietf.org/html/rfc3339>`_:
+``YYYY-MM-DDTHH:MM:SSZ``
 
 
-Responses
----------
-
-All responses are valid JSON (unless otherwise stated).
-
-
-Error messages
---------------
-
-TODO: review `Problem Details for HTTP APIs
-<http://tools.ietf.org/html/draft-nottingham-http-problem>`_
-
-An error response looks like ::
-
-    { message: "message", errors: [...] }
-
-The ``errors`` array contains objects with the following information ::
-
-    {
-        field: "<JSON Pointer to field>",
-        code: "<error code>"
-    }
-
-The ``field`` value indicates where the error occured.
-
-* If the value starts with a ``/``, it should be interpreted as a `JSON Pointer
-  <http://tools.ietf.org/html/rfc6901>`_ to the problematic field in the
-  request body.
-
-* If the value starts with a ``?``, it is followed by the name of the parameter
-  that was responsible for the error.
-
-* The value can be null, indicating that the error was not caused by a specific
-  field.
-
-The ``code`` describes the actual error. The following error codes are defined:
-
-* ``ìnvalid_url``: The provided values is not a valid URL.
-* ``parameter_missing``: A mandatory parameter was not provided.
-* ``duplicate_list_name``: A podcast list with the same name already exists.
-* ``user_does_not_exist``: the specified user does not exist.
-* ``podcastlist_does_not_exist``: the specified podcast list does not exist.
-
-Error codes may be added on demand. Clients should therefore expect and accept
-arbitrary string values.
-
-
-Redirects
----------
-
-permanent (301) vs temporary (302, 307) redirects.
-
-
-Authentication
---------------
-
-See Authentication API
-
-
-
-Rate Limiting
--------------
-
-See usage quotas ::
-
-    GET /rate_limit
-
-    HTTP/1.1 200 OK
-    Status: 200 OK
-    X-RateLimit-Limit: 60
-    X-RateLimit-Remaining: 56
-
-What counts as request? conditional requests?
-
-
-
-Conditional Requests
---------------------
-
-Some responses return ``Last-Modified`` and ``ETag`` headers. Clients SHOULD
-use the values of these headers to make subsequent requests to those resources
-using the ``If-Modified-Since`` and ``If-None-Match`` headers, respectively. If
-the resource has not changed, the server will return a ``304 Not Modified``.
-Making a conditional request and receiving a 304 response does not count
-against the rate limit.
-
+.. _formats:
 
 Formats
 -------
@@ -151,50 +41,123 @@ expected to contain JSON objects.
 JSONP Callbacks
 ^^^^^^^^^^^^^^^
 
-You can pass a ``?callback=<function-name>`` parameter to any GET call to have
+You can pass a ``json=<function-name>`` parameter to any GET call to have
 the results wrapped in a JSON function. This is typically used when browsers
 want to embed content received from the API in web pages by getting around
 cross domain issues. The response includes the same data output as the regular
 API, plus the relevant HTTP Header information.
 
 
-Resource Types
---------------
+API Parametrization
+-------------------
 
-.. _podcast-type:
+Since 2.7
 
-Podcast
-^^^^^^^
-
-A podcast is represented as a JSON object containing at least an ``url``
-member. ::
-
-    {
-        url: "http://example.com/podcast.rss",
-        title: "Cool Podcast",
-        logo: "http://example.com/podcast-logo.png"
-    }
+Clients should retrieve and process clientconfig.json (see :doc:`clientconfig`)
+before making requests to the webservice. If a client can not process the
+configuration, it can assume the default configuration given in the
+clientconfig.json documentation.
 
 
-.. _tag-type:
+.. _devices:
 
-Tag
+Devices
+-------
+
+Devices are used throughout the API to identify a device / a client
+application. A device ID can be any string matching the regular expression
+``[\w.-]+``. The client application MUST generate a string to be used as its
+device ID, and SHOULD ensure that it is unique within the user account. A good
+approach is to combine the application name and the name of the host it is
+running on.
+
+If two applications share a device ID, this might cause subscriptions to be
+overwritten on the server side. While it is possible to retrieve a list of
+devices and their IDs from the server, this SHOULD NOT be used to let a user
+select an existing device ID.
+
+
+Formats
+-------
+Most of the resources are offered in several different formats
+
+* `OPML <http://www.opml.org/>`_
+* JSON
+* `JSONP <http://en.wikipedia.org/wiki/JSONP>`_ with an option function name
+  that wraps the result (since 2.8)
+* plain text with one URL per line
+* XML a custom XML format (see `example <http://gpodder.net/toplist.xml>`_,
+  since 2.9)
+
+
+JSON
+^^^^
+
+.. code-block:: json
+
+    [
+     {
+       "website": "http://sixgun.org",
+       "description": "The hardest-hitting Linux podcast around",
+       "title": "Linux Outlaws",
+       "url": "http://feeds.feedburner.com/linuxoutlaws",
+       "position_last_week": 1,
+       "subscribers_last_week": 1943,
+       "subscribers": 1954,
+       "mygpo_link": "http://gpodder.net/podcast/11092",
+       "logo_url": "http://sixgun.org/files/linuxoutlaws.jpg",
+       "scaled_logo_url": "http://gpodder.net/logo/64/fa9fd87a4f9e488096e52839450afe0b120684b4.jpg"
+     },
+    ]
+
+
+XML
 ^^^
 
-A tag is represented as a JSON object containing at least a ``label``
-member. ::
+.. code-block:: xml
 
-    {
-        "label": "Technology"
-    }
+    <podcasts>
+     <podcast>
+      <title>Linux Outlaws</title>
+      <url>http://feeds.feedburner.com/linuxoutlaws</url>
+      <website>http://sixgun.org</website>
+      <mygpo_link>http://gpodder.net/podcast/11092</mygpo_link>
+      <description>The hardest-hitting Linux podcast around</description>
+      <subscribers>1954</subscribers>
+      <subscribers_last_week>1943</subscribers_last_week>
+      <logo_url>http://sixgun.org/files/linuxoutlaws.jpg</logo_url>
+      <scaled_logo_url>http://gpodder.net/logo/64/fa9fd87a4f9e488096e52839450afe0b120684b4.jpg</scaled_logo_url>
+     </podcast>
+    </podcasts>
 
 
-Relations
----------
+API Variants
+------------
 
-`Relation types <http://tools.ietf.org/html/rfc5988#section-5.3>`_ that are
-used in the API:
+Simple API
+^^^^^^^^^^
 
-* ``https://api.gpodder.net/3/relation/tag-podcasts``: podcasts for a given tag
+The Simple API provides a way to upload and download subscription lists in
+bulk. This allows developers of podcast-related applications to quickly
+integrate support for the web service, as the only
 
-TODO: should they be on domain api.gpodder.net, or just gpodder.net?
+* Synchronization of episode status fields is not supported
+* This API uses more bandwith than the advanced API
+* The client can be stateless
+* The client can be low-powered - subscribe/unsubscribe events are calculated
+  on the server-side
+
+
+Advanced API
+^^^^^^^^^^^^
+
+The Advanced API provides more flexibility and enhanced functionality for
+applications that want a tighter integration with the web service. A reference
+implementation will be provided as part of the gPodder source code (and gPodder
+will make use of that reference implementation).
+
+* The client has to persist the synchronization state locally
+* Only changes to subscriptions are uploaded and downloaded
+* Synchronization of episode status fields is supported in this API
+* Only JSON is used as the data format to ease development
+
