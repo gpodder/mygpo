@@ -103,7 +103,7 @@ def reassign_slugs(obj1, obj2):
 
 
 # based on https://djangosnippets.org/snippets/2283/
-@transaction.commit_on_success
+@transaction.atomic
 def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
     """
     Use this function to merge model objects (i.e. Users, Organizations, Polls,
