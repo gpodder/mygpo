@@ -4,15 +4,13 @@ from __future__ import absolute_import, unicode_literals
 
 import json
 
-from uuidfield import UUIDField
-
 from django.db import models, connection
 
 
 class UUIDModel(models.Model):
     """ Models that have an UUID as primary key """
 
-    id = UUIDField(primary_key=True)
+    id = models.UUIDField(primary_key=True)
 
     class Meta:
         abstract = True

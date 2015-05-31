@@ -6,8 +6,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes import generic
 
-from uuidfield import UUIDField
-
 from mygpo.users.settings import PUBLIC_SUB_PODCAST
 from mygpo.podcasts.models import Podcast
 
@@ -69,7 +67,7 @@ class UserSettings(models.Model):
 
     # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
     content_type = models.ForeignKey(ContentType, null=True, blank=True)
-    object_id = UUIDField(null=True, blank=True)
+    object_id = models.UUIDField(null=True, blank=True)
     content_object = generic.GenericForeignKey('content_type', 'object_id')
 
     settings = models.TextField(null=False, default='{}')

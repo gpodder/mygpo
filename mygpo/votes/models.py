@@ -4,8 +4,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.fields import GenericRelation
 
-from uuidfield import UUIDField
-
 from mygpo.core.models import UpdateInfoModel
 
 
@@ -19,7 +17,7 @@ class Vote(UpdateInfoModel):
     # the object that was voted for
     content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
     # this should suit UUID and integer primary keys
-    object_id = UUIDField()
+    object_id = models.UUIDField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
 
     class Meta:

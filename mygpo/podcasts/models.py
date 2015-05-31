@@ -11,8 +11,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes import generic
 
-from uuidfield import UUIDField
-
 from mygpo import utils
 from mygpo.core.models import (TwitterModel, UUIDModel, GenericManager,
     UpdateInfoModel, OrderedModel, OptionallyOrderedModel)
@@ -385,7 +383,7 @@ class PodcastManager(GenericManager):
         # TODO: where to specify how uuid is created?
         import uuid
         defaults.update({
-            'id': uuid.uuid1().hex,
+            'id': uuid.uuid1(),
         })
 
         url = utils.to_maxlength(URL, 'url', url)
@@ -587,7 +585,7 @@ class EpisodeManager(GenericManager):
             try:
                 with transaction.atomic():
                     episode = Episode.objects.create(podcast=podcast,
-                                                     id=uuid.uuid1().hex,
+                                                     id=uuid.uuid1(),
                                                      **defaults)
 
                     url = URL.objects.create(url=url,
@@ -646,7 +644,7 @@ class Episode(UUIDModel, TitleModel, DescriptionModel, LinkModel,
     @property
     def scope(self):
         """ An episode's scope is its podcast """
-        return self.podcast_id.hex
+        return self.podcast.id.hex
 
     @property
     def display_title(self):
@@ -706,7 +704,7 @@ class URL(OrderedModel, ScopedModel):
 
     # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
     content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
-    object_id = UUIDField()
+    object_id = models.UUIDField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
 
     class Meta(OrderedModel.Meta):
@@ -754,7 +752,7 @@ class Tag(models.Model):
 
     # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
     content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
-    object_id = UUIDField()
+    object_id = models.UUIDField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
 
     class Meta:
@@ -775,7 +773,7 @@ class Slug(OrderedModel, ScopedModel):
 
     # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
     content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
-    object_id = UUIDField()
+    object_id = models.UUIDField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
 
     class Meta(OrderedModel.Meta):
@@ -808,11 +806,11 @@ class MergedUUID(models.Model):
     see also :class:`MergedUUIDsMixin`
     """
 
-    uuid = UUIDField(unique=True)
+    uuid = models.UUIDField(unique=True)
 
     # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
     content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
-    object_id = UUIDField()
+    object_id = models.UUIDField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
 
     class Meta:

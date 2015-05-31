@@ -83,7 +83,7 @@ class PodcastPageTests(TestCase):
 
     def setUp(self):
         # create a podcast and some episodes
-        podcast = Podcast.objects.create(id=uuid.uuid1().hex,
+        podcast = Podcast.objects.create(id=uuid.uuid1(),
                                          title='My Podcast',
                                          max_episode_order=1,
                                          )

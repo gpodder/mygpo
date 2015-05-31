@@ -5,8 +5,6 @@ import uuid
 import collections
 import dateutil.parser
 
-from uuidfield import UUIDField
-
 from django.core.validators import RegexValidator
 from django.db import transaction, models
 from django.db.models import Q
