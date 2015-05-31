@@ -76,7 +76,7 @@ class APIView(View):
 
     def get_since(self, request):
         """ Returns parsed "since" GET parameter """
-        since_ = request.GET.get('since', None)
+        since_ = int(request.GET.get('since', None))
 
         if since_ is None:
             raise RequestException("parameter 'since' missing")

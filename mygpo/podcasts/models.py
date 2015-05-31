@@ -37,9 +37,6 @@ class TitleModel(models.Model):
     subtitle = models.TextField(null=False, blank=True)
 
     def __str__(self):
-        return self.title.encode('ascii', errors='replace')
-
-    def __unicode(self):
         return self.title
 
     class Meta:
@@ -543,7 +540,7 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
 
         if not self.url:
             logger.warn('Podcast with ID {podcast_id} does not have a URL'
-                .format(podcast_id=self.id.hex))
+                .format(podcast_id=self.id))
             return _('Unknown Podcast')
 
         return _('Unknown Podcast from {domain}'.format(

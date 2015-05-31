@@ -343,11 +343,7 @@ class Client(UUIDModel, DeleteableModel):
         return self.name or self.uid
 
     def __str__(self):
-        return '{} ({})'.format(self.name.encode('ascii', errors='replace'),
-                                self.uid.encode('ascii', errors='replace'))
-
-    def __unicode__(self):
-        return '{} ({})'.format(self.name, self.uid)
+        return '{name} ({uid})'.format(name=self.name, uid=self.uid)
 
 
 TOKEN_NAMES = ('subscriptions_token', 'favorite_feeds_token',

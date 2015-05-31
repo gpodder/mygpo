@@ -1,4 +1,5 @@
 import os.path
+import base64
 
 from django.core.urlresolvers import resolve
 from django.contrib.auth.models import AnonymousUser
@@ -9,9 +10,9 @@ from mygpo.utils import random_token
 
 
 def create_auth_string(username, password):
-    import base64
-    credentials = base64.encodestring("%s:%s" % (username, password)).rstrip()
-    auth_string = 'Basic %s' % credentials
+    pwdstr = '{0}:{1}'.format(username, password).rstrip()
+    credentials = base64.b64encode(pwdstr.encode('utf-8'))
+    auth_string = 'Basic ' + credentials.decode('ascii')
     return auth_string
 
 

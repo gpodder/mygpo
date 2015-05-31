@@ -88,7 +88,7 @@ class TestAPI(TestCase):
 
         # assert that the list has actually been updated
         resp = self.client.get(url, content_type="text/plain", **self.extra)
-        resp_urls = [_f for _f in resp.content.split('\n') if _f]
+        resp_urls = [u for u in resp.content.decode('utf-8').split('\n') if u]
         self.assertEqual(urls2, resp_urls)
 
         # delete the list

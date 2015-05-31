@@ -77,7 +77,7 @@ def create(request, username, format):
     if not created:
         return HttpResponse('List already exists', status=409)
 
-    urls = parse_subscription(request.body, format)
+    urls = parse_subscription(request.body.decode('utf-8'), format)
     podcasts = [Podcast.objects.get_or_create_for_url(url) for url in urls]
 
     for podcast in podcasts:
@@ -164,7 +164,7 @@ def get_list(request, plist, owner, format):
 @cors_origin()
 def update_list(request, plist, owner, format):
     """ Replaces the podcasts in the list and returns 204 No Content """
-    urls = parse_subscription(request.body, format)
+    urls = parse_subscription(request.body.decode('utf-8'), format)
     podcasts = [Podcast.objects.get_or_create_for_url(url) for url in urls]
     plist.set_entries(podcasts)
 

@@ -52,7 +52,8 @@ def show(request, podcast):
     episodes = episode_list(podcast, request.user, limit=num_episodes)
     user = request.user
 
-    max_listeners = max([e.listeners for e in episodes] + [0])
+    listeners = list(filter(None, [e.listeners for e in episodes]))
+    max_listeners = max(listeners + [0])
 
     episode = None
 

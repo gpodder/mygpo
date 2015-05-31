@@ -1,4 +1,7 @@
+from __future__ import division
+
 import re
+import math
 import string
 import collections
 from datetime import datetime
@@ -19,7 +22,7 @@ def get_accepted_lang(request):
     """ returns a list of language codes accepted by the HTTP request """
 
     lang_str = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
-    lang_str = [c for c in lang_str if c in string.ascii_letters+',']
+    lang_str = ''.join([c for c in lang_str if c in string.ascii_letters+','])
     langs = lang_str.split(',')
     langs = [s[:2] for s in langs]
     langs = list(map(str.strip, langs))
@@ -42,8 +45,9 @@ def sanitize_language_codes(ls):
     >>> sanitize_language_codes(['de-at', 'de-ch'])
     ['de']
 
-    >>> sanitize_language_codes(['de-at', 'en', 'en-gb', '(asdf', 'Deutsch'])
-    ['de', 'en']
+    >>> sanitize_language_codes(['de-at', 'en', 'en-gb', '(asdf', 'Deutsch']) \
+        == ['de', 'en']
+    True
     """
 
     ls = [sanitize_language_code(l) for l in ls if l and RE_LANG.match(l)]
@@ -75,6 +79,9 @@ def get_page_list(start, total, cur, show_max):
     >>> get_page_list(1, 100, 1, 10)
     [1, 2, 3, 4, 5, 6, '...', 98, 99, 100]
 
+    >>> get_page_list(1, 995/10, 1, 10)
+    [1, 2, 3, 4, 5, 6, '...', 98, 99, 100]
+
     >>> get_page_list(1, 100, 50, 10)
     [1, '...', 48, 49, 50, 51, '...', 98, 99, 100]
 
@@ -85,14 +92,18 @@ def get_page_list(start, total, cur, show_max):
     [1, 2, 3]
     """
 
+    # if we get "total" as a float (eg from total_entries / entries_per_page)
+    # we round up
+    total = math.ceil(total)
+
     if show_max >= (total - start):
         return list(range(start, total+1))
 
     ps = []
     if (cur - start) > show_max / 2:
-        ps.extend(list(range(start, show_max / 4)))
+        ps.extend(list(range(start, int(show_max / 4))))
         ps.append('...')
-        ps.extend(list(range(cur - show_max / 4, cur)))
+        ps.extend(list(range(cur - int(show_max / 4), cur)))
 
     else:
         ps.extend(list(range(start, cur)))
@@ -101,10 +112,10 @@ def get_page_list(start, total, cur, show_max):
 
     if (total - cur) > show_max / 2:
         # for the first pages, show more pages at the beginning
-        add = show_max / 2 - len(ps)
-        ps.extend(list(range(cur + 1, cur + show_max / 4 + add)))
+        add = math.ceil(show_max / 2 - len(ps))
+        ps.extend(list(range(cur + 1, cur + int(show_max / 4) + add)))
         ps.append('...')
-        ps.extend(list(range(total - show_max / 4, total + 1)))
+        ps.extend(list(range(total - int(show_max / 4), total + 1)))
 
     else:
         ps.extend(list(range(cur + 1, total + 1)))
@@ -248,23 +259,23 @@ def hours_to_str(hours_total):
     """ returns a human-readable string representation of some hours
 
     >>> hours_to_str(1)
-    u'1 hour'
+    '1 hour'
 
     >>> hours_to_str(5)
-    u'5 hours'
+    '5 hours'
 
     >>> hours_to_str(100)
-    u'4 days, 4 hours'
+    '4 days, 4 hours'
 
     >>> hours_to_str(960)
-    u'5 weeks, 5 days'
+    '5 weeks, 5 days'
 
     >>> hours_to_str(961)
-    u'5 weeks, 5 days, 1 hour'
+    '5 weeks, 5 days, 1 hour'
     """
 
-    weeks = hours_total / 24 / 7
-    days = hours_total / 24 % 7
+    weeks = int(hours_total / 24 / 7)
+    days = int(hours_total / 24) % 7
     hours = hours_total % 24
 
     strs = []

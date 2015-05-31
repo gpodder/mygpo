@@ -75,7 +75,8 @@ def subscriptions(request, username, device_uid, format):
 
     elif request.method in ('PUT', 'POST'):
         try:
-            subscriptions = parse_subscription(request.body, format)
+            body = request.body.decode('utf-8')
+            subscriptions = parse_subscription(body, format)
 
         except JSONDecodeError as e:
             return HttpResponseBadRequest('Unable to parse POST data: %s' % str(e))

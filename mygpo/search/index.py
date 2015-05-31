@@ -25,7 +25,7 @@ def index_podcast(sender, **kwargs):
 
     conn = get_connection()
     podcast = kwargs['instance']
-    logger.info('Indexing podcast %s', podcast)
+    logger.info('Indexing podcast {0}', podcast)
 
     document = podcast_to_json(podcast)
 
@@ -40,7 +40,7 @@ def create_index():
     """ Creates the Elasticsearch index """
     conn = get_connection()
 
-    logger.info('Creating index %s' % settings.ELASTICSEARCH_INDEX)
+    logger.info('Creating index {0}', settings.ELASTICSEARCH_INDEX)
     try:
         conn.indices.create_index(settings.ELASTICSEARCH_INDEX)
 

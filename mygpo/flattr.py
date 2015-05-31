@@ -117,7 +117,7 @@ class Flattr(object):
         if not self.user.profile.settings.get_wksetting(FLATTR_TOKEN):
             return (0, False)
 
-        quote_url = urllib.parse.quote_plus(utils.sanitize_encoding(payment_url))
+        quote_url = urllib.parse.quote_plus(payment_url)
         url = self.THING_INFO_URL_TEMPLATE % {'url': quote_url}
         data = self.request(url)
         return (int(data.get('flattrs', 0)), bool(data.get('flattred', False)))

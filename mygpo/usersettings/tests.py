@@ -84,7 +84,7 @@ class TestAPI(TestCase):
         # get settings
         resp = self.client.get(url, **self.extra)
         self.assertEqual(resp.status_code, 200, resp.content)
-        self.assertEqual(json.loads(resp.content), {'a': 'x'})
+        self.assertEqual(json.loads(resp.content.decode('utf-8')), {'a': 'x'})
 
     def get_url(self, username, scope, params={}):
         url = reverse('settings-api', kwargs={

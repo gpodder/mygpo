@@ -15,6 +15,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+import base64
 from functools import wraps
 
 from django.http import HttpResponse, HttpResponseBadRequest
@@ -58,7 +59,9 @@ def view_or_basicauth(view, request, test_func, realm = "", *args, **kwargs):
         # NOTE: We are only support basic authentication for now.
         if auth_type.lower() == 'basic':
             try:
-                credentials = credentials.decode('base64').split(':', 1)
+                credentials = base64.b64decode(credentials)\
+                                    .decode('utf-8')\
+                                    .split(':', 1)
 
             except UnicodeDecodeError as e:
                 return HttpResponseBadRequest(
