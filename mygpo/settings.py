@@ -271,6 +271,8 @@ GOOGLE_CLIENT_SECRET=''
 SUPPORT_URL=''
 
 
+FEEDSERVICE_URL = os.getenv('FEEDSERVICE_URL', 'http://feeds.gpodder.net/')
+
 # Elasticsearch settings
 
 ELASTICSEARCH_SERVER = os.getenv('ELASTICSEARCH_SERVER', '127.0.0.1:9200')
