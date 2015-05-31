@@ -12,7 +12,11 @@ def assign_missing_episode_slugs(podcast):
     episodes = Episode.objects.filter(podcast=podcast, slugs__isnull=True)
 
     for episode in episodes:
-        slug = EpisodeSlug(episode, common_title).get_slug()
+        try:
+            slug = EpisodeSlug(episode, common_title).get_slug()
+        except ValueError:
+            return
+
         if slug:
             episode.set_slug(slug)
 
@@ -20,15 +24,13 @@ def assign_missing_episode_slugs(podcast):
 class SlugGenerator(object):
     """ Generates a unique slug for an object """
 
-
-    def __init__(self, obj, override_existing=False):
-        if obj.slug and not override_existing:
-            raise ValueError('%(obj)s already has slug %(slug)s' % \
-                dict(obj=obj, slug=obj.slug))
+    def __init__(self, obj):
+        if obj.slug:
+            raise ValueError('%(obj)s already has slug %(slug)s' %
+                             dict(obj=obj, slug=obj.slug))
 
         self.obj = obj
         self.base_slug = self._get_base_slug(obj)
-
 
     @staticmethod
     def _get_base_slug(obj):
@@ -90,15 +92,13 @@ class PodcastSlug(PodcastGroupSlug):
         return base_slug
 
 
-
 class EpisodeSlug(SlugGenerator):
     """ Generates slugs for Episodes """
 
-    def __init__(self, episode, common_title, override_existing=False):
+    def __init__(self, episode, common_title):
         self.common_title = common_title
-        super(EpisodeSlug, self).__init__(episode, override_existing)
+        super(EpisodeSlug, self).__init__(episode)
         self.podcast_id = episode.podcast
-
 
     def _get_base_slug(self, obj):
 

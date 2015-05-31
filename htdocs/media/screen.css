@@ -624,3 +624,7 @@ div.podcasts div.podcast:hover div.actions button.btn
     float: none;
     margin: 0 auto;
 }
+
+.hosting {
+    text-align: center;
+}

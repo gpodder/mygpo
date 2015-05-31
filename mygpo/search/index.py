@@ -31,7 +31,7 @@ def index_podcast(sender, **kwargs):
 
     try:
         conn.index(document, settings.ELASTICSEARCH_INDEX,
-                   'podcast', podcast.id.hex)
+                   'podcast', podcast.id)
     except NoServerAvailable:
         logger.exception('Indexing podcast failed')
 

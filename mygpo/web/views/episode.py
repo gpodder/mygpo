@@ -190,7 +190,7 @@ def add_action(request, episode):
     if timestamp:
         try:
             timestamp = dateutil.parser.parse(timestamp)
-        except (ValueError, AttributeError):
+        except (ValueError, AttributeError, TypeError):
             timestamp = datetime.utcnow()
     else:
         timestamp = datetime.utcnow()

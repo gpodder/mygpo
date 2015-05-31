@@ -17,14 +17,15 @@
 
 import uuid
 import unittest
-import doctest
 from collections import Counter
 
+from django.core.urlresolvers import reverse
+from django.test.client import Client as TestClient
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.contrib.auth import get_user_model
 
-import mygpo.utils
+from mygpo.test import create_auth_string, create_user
 from mygpo.podcasts.models import Podcast
 from mygpo.maintenance.merge import PodcastMerger
 from mygpo.api.backend import get_device
@@ -112,7 +113,27 @@ class UnsubscribeMergeTests(TestCase):
         self.user.delete()
 
 
+class AuthTests(TestCase):
+
+    def setUp(self):
+        self.user, pwd = create_user()
+        self.client = TestClient()
+        wrong_pwd = pwd + '1234'
+        self.extra = {
+            'HTTP_AUTHORIZATION': create_auth_string(self.user.username,
+                                                     wrong_pwd)
+        }
+
+    def test_queries_failed_auth(self):
+        """ Verifies the number of queries that are executed on failed auth """
+        url = reverse('api-all-subscriptions',
+                      args=(self.user.username, 'opml'))
+        with self.assertNumQueries(1):
+            resp = self.client.get(url, **self.extra)
+        self.assertEqual(resp.status_code, 401, resp.content)
+
+
 def load_tests(loader, tests, ignore):
-    tests.addTest(unittest.TestLoader().loadTestsFromTestCase(DeviceSyncTests))
-    tests.addTest(unittest.TestLoader().loadTestsFromTestCase(UnsubscribeMergeTests))
+    for m in [DeviceSyncTests, UnsubscribeMergeTests, AuthTests]:
+        tests.addTest(unittest.TestLoader().loadTestsFromTestCase(m))
     return tests

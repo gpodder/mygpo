@@ -3,16 +3,27 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-API 3 Documentation (draft)
-===========================
+API Documentation
+=================
 
-*This site contains drafts for the gpodder.net's future API -- version 3 --
-which is not yet implemented.  The current API is documented at
-http://wiki.gpodder.org/wiki/Web_Services/API_2.*
+This is the specification of Version 2 of the public API for the gpodder.net
+Web Services.
 
-The gpodder.net API allows clients to interact with gpodder.net. The API is
-provided via a REST interface, and is free of charge within certain quotas, and
-completely free for open source clients (see :ref:`usage`).
+Please consult the :doc:`integration` before integrating the gpodder.net API
+in your application.
+
+There are two different APIs for different target audiences:
+
+* The **Simple API** targets developers who want to write quick integration
+  into their existing applications
+* The **Advanced API** targets developers who want tight integration into their
+  applications (with more features)
+
+The API is versioned so that changes in the major version number indicate
+backwards incompatible changes. All other changes preserve backwards
+compatibility. See :doc:`changes` for a list of changes. The current
+version is 2.11. This versioning scheme has been introduced in `bug 1273
+<https://bugs.gpodder.org/show_bug.cgi?id=1273>`_.
 
 Contents
 --------
@@ -20,8 +31,7 @@ Contents
 .. toctree::
    :maxdepth: 2
 
-   usage
    integration
    reference/index
-   deprecation
-   libraries
+   Libraries <http://wiki.gpodder.org/wiki/Web_Services/Libraries>
+   changes

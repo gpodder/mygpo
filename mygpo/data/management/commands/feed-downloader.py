@@ -3,7 +3,7 @@ import traceback
 from optparse import make_option
 
 from mygpo.maintenance.management.podcastcmd import PodcastCommand
-from mygpo.data.feeddownloader import PodcastUpdater
+from mygpo.data.feeddownloader import update_podcasts
 
 import socket
 socket.setdefaulttimeout(300)
@@ -35,6 +35,5 @@ class Command(PodcastCommand):
         else:
             logger.info('Updating podcasts...')
 
-            updater = PodcastUpdater()
-            for podcast in updater.update_queue(queue):
+            for podcast in update_podcasts(queue):
                 logger.info('Updated podcast %s', podcast)

@@ -1,9 +1,6 @@
-from collections import defaultdict, namedtuple, Counter
-from operator import itemgetter
-from datetime import datetime
 from random import choice
-from itertools import chain
 
+from django.db import IntegrityError
 from django.utils.text import slugify
 
 from mygpo.decorators import query_if_required
@@ -24,7 +21,9 @@ class Topics(object):
 
     def _query(self):
         categories = list(Category.objects.filter(num_entries__gt=0)
-                                          .order_by('-modified')[:self.total])
+                                  .filter(tags__isnull=False)
+                                  .order_by('-modified')[:self.total]
+                                  .prefetch_related('tags'))
         self._categories = categories[:self.num_cat]
         self._tagcloud = sorted(categories[self.num_cat:],
                                 key=lambda x: x.title.lower())
@@ -56,12 +55,23 @@ def update_category(podcast):
 
     random_tag = choice(all_tags)
 
-    category, created = Category.objects.get_or_create(
-        tags__tag=slugify(random_tag.strip()),
-        defaults={
-            'title': random_tag,
-        }
-    )
+    try:
+        category, created = Category.objects.get_or_create(
+            tags__tag=slugify(random_tag.strip()),
+            defaults={
+                'title': random_tag,
+            }
+        )
+
+    except IntegrityError as ie:
+        # check if category with this title already exists
+        # the exception message should be like:
+        # IntegrityError: duplicate key value violates unique
+        # constraint "categories_category_title_key"
+        if 'categories_category_title_key' not in str(ie):
+            raise
+
+        category = Category.objects.get(title=random_tag)
 
     if not created:
         # update modified timestamp

@@ -21,11 +21,11 @@ from datetime import datetime, timedelta
 
 from django.test import TestCase
 
-from mygpo.podcasts.models import Podcast
+from mygpo.podcasts.models import Podcast, Episode
 
 
 def create_podcast(**kwargs):
-    return Podcast.objects.create(id=uuid.uuid1().hex, **kwargs)
+    return Podcast.objects.create(id=uuid.uuid1(), **kwargs)
 
 
 class PodcastTests(unittest.TestCase):
@@ -53,6 +53,29 @@ class PodcastTests(unittest.TestCase):
         p1 = Podcast.objects.get_or_create_for_url(URL)
         p2 = Podcast.objects.get_or_create_for_url(URL)
         self.assertEqual(p1.pk, p2.pk)
+
+    def test_episode_count(self):
+        """ Test if Podcast.episode_count is updated correctly """
+        PODCAST_URL = 'http://example.com/podcast.rss'
+        EPISODE_URL = 'http://example.com/episode%d.mp3'
+        NUM_EPISODES=3
+
+        p = Podcast.objects.get_or_create_for_url(PODCAST_URL)
+        for n in range(NUM_EPISODES):
+            Episode.objects.get_or_create_for_url(p, EPISODE_URL % (n, ))
+
+        p = Podcast.objects.get(pk=p.pk)
+        self.assertEqual(p.episode_count, NUM_EPISODES)
+
+        # the episodes already exist this time -- no episode is created
+        for n in range(NUM_EPISODES):
+            Episode.objects.get_or_create_for_url(p, EPISODE_URL % (n, ))
+
+        p = Podcast.objects.get(pk=p.pk)
+        self.assertEqual(p.episode_count, NUM_EPISODES)
+
+        real_count = Episode.objects.filter(podcast=p).count()
+        self.assertEqual(real_count, NUM_EPISODES)
 
 
 class PodcastGroupTests(unittest.TestCase):

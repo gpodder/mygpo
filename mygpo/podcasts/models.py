@@ -5,12 +5,11 @@ from datetime import datetime
 
 from django.conf import settings
 from django.db import models, transaction, IntegrityError
+from django.db.models import F
 from django.utils.translation import ugettext as _
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes import generic
-
-from uuidfield import UUIDField
 
 from mygpo import utils
 from mygpo.core.models import (TwitterModel, UUIDModel, GenericManager,
@@ -384,19 +383,32 @@ class PodcastManager(GenericManager):
         # TODO: where to specify how uuid is created?
         import uuid
         defaults.update({
-            'id': uuid.uuid1().hex,
+            'id': uuid.uuid1(),
         })
 
         url = utils.to_maxlength(URL, 'url', url)
-        podcast, created = self.get_or_create(urls__url=url, defaults=defaults)
+        try:
+            # try to fetch the podcast
+            return Podcast.objects.get(urls__url=url,
+                                       urls__scope='',
+                                       )
+        except Podcast.DoesNotExist:
+            # episode did not exist, try to create it
+            try:
+                with transaction.atomic():
+                    podcast = Podcast.objects.create(**defaults)
+                    url = URL.objects.create(url=url,
+                                             order=0,
+                                             scope='',
+                                             content_object=podcast,
+                                             )
+                    return podcast
 
-        if created:
-            url = URL.objects.create(url=url,
-                                     order=0,
-                                     scope='',
-                                     content_object=podcast,
-                                    )
-        return podcast
+            # URL could not be created, so it was created since the first get
+            except IntegrityError:
+                return Podcast.objects.get(urls__url=url,
+                                           urls__scope='',
+                                           )
 
 
 class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
@@ -556,6 +568,10 @@ class EpisodeManager(GenericManager):
         return EpisodeQuerySet(self.model, using=self._db)
 
     def get_or_create_for_url(self, podcast, url, defaults={}):
+        """ Create an Episode for a given URL
+
+        This is the only place where new episodes are created """
+
         # TODO: where to specify how uuid is created?
         import uuid
 
@@ -569,13 +585,21 @@ class EpisodeManager(GenericManager):
             try:
                 with transaction.atomic():
                     episode = Episode.objects.create(podcast=podcast,
-                                                     id=uuid.uuid1().hex,
+                                                     id=uuid.uuid1(),
                                                      **defaults)
+
                     url = URL.objects.create(url=url,
                                              order=0,
                                              scope=episode.scope,
                                              content_object=episode,
                                             )
+
+                    # Keep episode_count up to date here; it is not
+                    # recalculated when updating the podcast because counting
+                    # episodes can be very slow for podcasts with many episodes
+                    Podcast.objects.filter(pk=podcast.pk)\
+                                   .update(episode_count=F('episode_count')+1)
+
                     return episode
 
             # URL could not be created, so it was created since the first get
@@ -620,7 +644,7 @@ class Episode(UUIDModel, TitleModel, DescriptionModel, LinkModel,
     @property
     def scope(self):
         """ An episode's scope is its podcast """
-        return self.podcast_id.hex
+        return self.podcast.id.hex
 
     @property
     def display_title(self):
@@ -680,7 +704,7 @@ class URL(OrderedModel, ScopedModel):
 
     # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
     content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
-    object_id = UUIDField()
+    object_id = models.UUIDField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
 
     class Meta(OrderedModel.Meta):
@@ -728,7 +752,7 @@ class Tag(models.Model):
 
     # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
     content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
-    object_id = UUIDField()
+    object_id = models.UUIDField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
 
     class Meta:
@@ -749,7 +773,7 @@ class Slug(OrderedModel, ScopedModel):
 
     # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
     content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
-    object_id = UUIDField()
+    object_id = models.UUIDField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
 
     class Meta(OrderedModel.Meta):
@@ -782,11 +806,11 @@ class MergedUUID(models.Model):
     see also :class:`MergedUUIDsMixin`
     """
 
-    uuid = UUIDField(unique=True)
+    uuid = models.UUIDField(unique=True)
 
     # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
     content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
-    object_id = UUIDField()
+    object_id = models.UUIDField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
 
     class Meta:

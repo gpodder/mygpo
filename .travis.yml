@@ -18,3 +18,5 @@ script:
 
 env:
  - DATABASE_URL="postgres://postgres@localhost/mygpo_test"
+
+sudo: false

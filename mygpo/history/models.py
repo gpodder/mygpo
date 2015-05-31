@@ -156,7 +156,8 @@ class EpisodeHistoryEntry(models.Model):
                      podcast_ref_url=None, episode_ref_url=None):
 
         exists = cls.objects.filter(user=user, episode=episode,
-                                    client=client, action=action)\
+                                    client=client, action=action,
+                                    started=started, stopped=stopped)\
                             .exists()
         if exists:
             logger.warn('Trying to save duplicate {cls} for {user} '
@@ -169,13 +170,13 @@ class EpisodeHistoryEntry(models.Model):
         if client:
             entry.client = client
 
-        if started:
+        if started is not None:
             entry.started = started
 
-        if stopped:
+        if stopped is not None:
             entry.stopped = stopped
 
-        if total:
+        if total is not None:
             entry.total = total
 
         if timestamp is None:

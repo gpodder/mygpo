@@ -45,7 +45,9 @@ def get_photo_sizes(photo_id):
 
 def get_photo_id(url):
     photo_id_re = 'http://.*flickr.com/[^/]+/([^_]+)_.*'
-    return re.match(photo_id_re, url).group(1)
+    match = re.match(photo_id_re, url)
+    if match:
+        return match.group(1)
 
 
 def is_flickr_image(url):

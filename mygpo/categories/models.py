@@ -32,6 +32,10 @@ class Category(UpdateInfoModel):
     def clean_title(self):
         return self.title.replace('\n', ' ')
 
+    @property
+    def tag(self):
+        return self.tags.first().tag
+
 
 class CategoryEntry(UpdateInfoModel,):
     """ A podcast in a category """

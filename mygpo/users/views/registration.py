@@ -1,4 +1,3 @@
-import uuid
 import re
 
 from django import forms
@@ -79,13 +78,26 @@ class RegistrationView(FormView):
         User = get_user_model()
         user = User()
         user.username = form.cleaned_data['username']
-        user.email = form.cleaned_data['email']
+
+        email_addr = form.cleaned_data['email']
+        user.email = email_addr
+
         user.set_password(form.cleaned_data['password1'])
         user.is_active = False
         user.full_clean()
-        user.save()
 
-        user.profile.uuid == uuid.uuid1()
+        try:
+            user.save()
+
+        except IntegrityError as e:
+            if 'django_auth_unique_email' in str(e):
+                # this was not caught by the form validation, but now validates
+                # the DB's unique constraint
+                raise ValidationError('The email address {0} is '
+                                      'already in use.'.format(email_addr))
+            else:
+                raise
+
         user.profile.activation_key = random_token()
         user.profile.save()
 
