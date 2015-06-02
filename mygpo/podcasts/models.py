@@ -575,6 +575,8 @@ class EpisodeManager(GenericManager):
         # TODO: where to specify how uuid is created?
         import uuid
 
+        url = utils.to_maxlength(URL, 'url', url)
+
         try:
             # try to fetch the episode
             return Episode.objects.get(urls__url=url,
