@@ -201,7 +201,7 @@ def iterate_together(lists, key=lambda x: x, reverse=False):
                 res[n] = item.item
                 continue
 
-            min_v = min_([x for x in res if x is not None], key=key)
+            min_v = min_(filter(lambda x: x is not None, res), key=key)
 
             if key(item.item) == key(min_v):
                 res[n] = item.item
@@ -248,7 +248,7 @@ def set_cmp(list, simplify):
     Builds a set out of a list but uses the results of simplify to determine equality between items
     """
     simpl = lambda x: (simplify(x), x)
-    lst = dict(list(map(simpl, list)))
+    lst = dict(map(simpl, list))
     return list(lst.values())
 
 
@@ -276,7 +276,7 @@ def remove_control_chars(s):
 
 
 def unzip(a):
-    return tuple(map(list,list(zip(*a))))
+    return tuple(map(list,zip(*a)))
 
 
 def parse_range(s, min, max, default=None):
@@ -479,7 +479,7 @@ def sorted_chain(links, key, reverse=False):
         new_items = [(key(i), i, False) for i in item]
 
         # sort links (placeholders) and elements together
-        mixed_list = sorted(mixed_list + new_items, key=lambda k__v__e: k__v__e[0],
+        mixed_list = sorted(mixed_list + new_items, key=lambda t: t[0],
                 reverse=reverse)
 
 
@@ -907,10 +907,10 @@ def set_ordered_entries(obj, new_entries, existing, EntryClass,
     logger.info('%d new entries', len(new_entries))
 
     with transaction.atomic():
-        max_order = max([s.order for s in list(existing.values())] +
+        max_order = max([s.order for s in existing.values()] +
                         [len(new_entries)])
         logger.info('Renumbering entries starting from %d', max_order+1)
-        for n, entry in enumerate(list(existing.values()), max_order+1):
+        for n, entry in enumerate(existing.values(), max_order+1):
             entry.order = n
             entry.save()
 
@@ -938,6 +938,6 @@ def set_ordered_entries(obj, new_entries, existing, EntryClass,
                 logger.warn('Could not create enry for %s: %s', obj, ie)
 
     with transaction.atomic():
-        delete = [s.pk for s in list(existing.values())]
+        delete = [s.pk for s in existing.values()]
         logger.info('Deleting %d entries', len(delete))
         EntryClass.objects.filter(id__in=delete).delete()

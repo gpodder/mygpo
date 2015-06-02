@@ -42,7 +42,7 @@ class HistoryEntry(models.Model):
 
     # the action that happened
     action = models.CharField(
-        max_length=max(list(map(len, [action for action, name in PODCAST_ACTIONS]))),
+        max_length=max(map(len, [action for action, name in PODCAST_ACTIONS])),
         choices=PODCAST_ACTIONS,
     )
 
@@ -92,7 +92,7 @@ class EpisodeHistoryEntry(models.Model):
 
     # the action that happened
     action = models.CharField(
-        max_length=max(list(map(len, [action for action, name in EPISODE_ACTIONS]))),
+        max_length=max(map(len, [action for action, name in EPISODE_ACTIONS])),
         choices=EPISODE_ACTIONS,
     )
 

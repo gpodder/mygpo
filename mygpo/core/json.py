@@ -25,5 +25,5 @@ except ImportError:
         print('simplejson not found', file=sys.stderr)
 
         # Otherwise use json from the stdlib
-        from . import json
+        import json
         JSONDecodeError = ValueError

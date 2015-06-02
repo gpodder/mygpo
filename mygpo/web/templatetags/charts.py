@@ -71,7 +71,7 @@ def pie_chart(parts):
     parts = [
         'cht=p',
         'chs=250x100',
-        'chl=%s' % '|'.join(iter(parts.keys())),
+        'chl=%s' % '|'.join(parts.keys()),
         'chd=t:%s' % ','.join([ repr(x) for x in parts.values() ])
         ]
 

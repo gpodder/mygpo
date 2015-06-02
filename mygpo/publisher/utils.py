@@ -99,13 +99,13 @@ def subscriber_data(podcasts):
 
         subdata = [podcast.subscribers]
 
-        data = dict(list(map(create_entry, subdata)))
+        data = dict(map(create_entry, subdata))
 
         for k in data:
             coll_data[k] += data[k]
 
     # create a list of {'x': label, 'y': value}
-    coll_data = sorted([dict(x=a, y=b) for (a, b) in list(coll_data.items())], key=lambda x: x['x'])
+    coll_data = sorted([dict(x=a, y=b) for (a, b) in coll_data.items()], key=lambda x: x['x'])
 
     return coll_data
 

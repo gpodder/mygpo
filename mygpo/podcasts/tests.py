@@ -33,7 +33,7 @@ class PodcastTests(unittest.TestCase):
 
     def test_next_update(self):
         """ Test calculation of Podcast.next_update """
-        last_update = datetime(2014, 0o3, 31, 11, 00)
+        last_update = datetime(2014, 3, 31, 11, 00)
         update_interval = 123  # hours
 
         # create an "old" podcast with update-information

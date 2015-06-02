@@ -367,7 +367,7 @@ class HistoryEntry(object):
             ts = action.pop('timestamp')
             entry.timestamp = dateutil.parser.parse(ts)
 
-        for key, value in list(action.items()):
+        for key, value in action.items():
             setattr(entry, key, value)
 
         return entry
@@ -386,7 +386,7 @@ class HistoryEntry(object):
         if podcasts is None:
             # load podcast data
             podcast_ids = [getattr(x, 'podcast_id', None) for x in entries]
-            podcast_ids = [_f for _f in podcast_ids if _f]
+            podcast_ids = filter(None, podcast_ids)
             podcasts = Podcast.objects.filter(id__in=podcast_ids)\
                                       .prefetch_related('slugs')
             podcasts = {podcast.id.hex: podcast for podcast in podcasts}
@@ -394,7 +394,7 @@ class HistoryEntry(object):
         if episodes is None:
             # load episode data
             episode_ids = [getattr(x, 'episode_id', None) for x in entries]
-            episode_ids = [_f for _f in episode_ids if _f]
+            episode_ids = filter(None, episode_ids)
             episodes = Episode.objects.filter(id__in=episode_ids)\
                                       .select_related('podcast')\
                                       .prefetch_related('slugs',
@@ -404,7 +404,7 @@ class HistoryEntry(object):
         # load device data
         # does not need pre-populated data because no db-access is required
         device_ids = [getattr(x, 'device_id', None) for x in entries]
-        device_ids = [_f for _f in device_ids if _f]
+        device_ids = filter(None, device_ids)
         devices = {client.id.hex: client for client in user.client_set.all()}
 
 

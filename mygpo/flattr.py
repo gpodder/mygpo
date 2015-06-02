@@ -179,7 +179,7 @@ class Flattr(object):
 
         args = [('url', self.domain + thing.url)]
         args += [(arg, getattr(thing, arg, None)) for arg in optional_args]
-        args = [k_v for k_v in args if k_v[1]]  # filter out empty arguments
+        args = filter(lambda kv: kv[1], args)  # filter out empty arguments
 
         # TODO: check encoding
         args = [(k, v.encode('utf-8')) for (k, v) in args]

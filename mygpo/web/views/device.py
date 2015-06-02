@@ -228,7 +228,7 @@ def opml(request, device):
 @login_required
 def symbian_opml(request, device):
     subscriptions = simple.get_subscriptions(request.user, device.uid)
-    subscriptions = list(map(symbian_opml_changes, subscriptions))
+    subscriptions = map(symbian_opml_changes, subscriptions)
 
     response = simple.format_podcast_list(subscriptions, 'opml', request.user.username)
     response['Content-Disposition'] = 'attachment; filename=%s.opml' % device.uid

@@ -178,7 +178,7 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
     actions = [episode_action_json(a, user) for a in history]
 
     if aggregated:
-        actions = list(dict( (a['episode'], a) for a in actions ).values())
+        actions = dict( (a['episode'], a) for a in actions ).values()
 
     return {'actions': actions, 'timestamp': until}
 
@@ -343,7 +343,7 @@ def favorites(request, username):
     favorites = FavoriteEpisode.episodes_for_user(request.user)
     domain = RequestSite(request).domain
     e_data = lambda e: episode_data(e, domain)
-    ret = list(map(e_data, favorites))
+    ret = map(e_data, favorites)
     return JsonResponse(ret)
 
 

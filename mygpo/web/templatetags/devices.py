@@ -73,7 +73,7 @@ def target_uid(client):
 
 @register.filter
 def device_list(devices):
-    links = list(map(device_link, devices))
+    links = map(device_link, devices)
     return mark_safe(''.join(links))
 
 def device_link(device):

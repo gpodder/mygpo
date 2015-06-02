@@ -185,7 +185,7 @@ def add_tag(request, podcast):
     user = request.user
 
     tags = tag_str.split(',')
-    tags = list(map(str.strip, tags))
+    tags = map(str.strip, tags)
 
     ContentType.objects.get_for_model(podcast)
 
@@ -241,7 +241,7 @@ def subscribe(request, podcast):
     if request.method == 'POST':
 
         # multiple UIDs from the /podcast/<slug>/subscribe
-        device_uids = [k for (k,v) in list(request.POST.items()) if k==v]
+        device_uids = [k for (k,v) in request.POST.items() if k==v]
 
         # single UID from /podcast/<slug>
         if 'targets' in request.POST:

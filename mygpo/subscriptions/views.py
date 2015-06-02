@@ -67,7 +67,7 @@ def create_subscriptionlist(request):
         subscription_list[podcast]['devices'].append(subscription.client)
 
     # sort most recently updated podcast first
-    subscriptions = list(subscription_list.values())
+    subscriptions = subscription_list.values()
     now = datetime.utcnow()
     sort_key = lambda s: s['podcast'].latest_episode_timestamp or now
     subscriptions = sorted(subscriptions, key=sort_key, reverse=True)

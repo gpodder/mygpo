@@ -18,7 +18,7 @@ def get_podcast_types(episodes):
     A podcast is considered to be of a given types if the ratio of episodes that are of that type equals TYPE_THRESHOLD
     """
     has_mimetype = lambda e: e.mimetypes
-    episodes = list(filter(has_mimetype, episodes))
+    episodes = filter(has_mimetype, episodes)
     types = defaultdict()
     for e in episodes:
         for mimetype in e.mimetypes:
@@ -32,7 +32,7 @@ def get_podcast_types(episodes):
     l.sort(key=lambda x: x[1], reverse=True)
 
     return [x[0] for x in
-        [x for x in l if max_episodes / float(x[1]) >= TYPE_THRESHOLD]]
+        filter(lambda x: max_episodes / float(x[1]) >= TYPE_THRESHOLD, l)]
 
 
 def get_type(mimetype):

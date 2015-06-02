@@ -1,5 +1,3 @@
-from __future__ import division
-
 import re
 import math
 import string
@@ -45,8 +43,7 @@ def sanitize_language_codes(ls):
     >>> sanitize_language_codes(['de-at', 'de-ch'])
     ['de']
 
-    >>> sanitize_language_codes(['de-at', 'en', 'en-gb', '(asdf', 'Deutsch']) \
-        == ['de', 'en']
+    >>> set(sanitize_language_codes(['de-at', 'en', 'en-gb', '(asdf', 'Deutsch'])) == {'de', 'en'}
     True
     """
 

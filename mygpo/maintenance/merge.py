@@ -136,7 +136,8 @@ def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
     # generic related fields.
     generic_fields = []
     for model in get_models():
-        fields = [x for x in iter(model.__dict__.items()) if isinstance(x[1], GenericForeignKey)]
+        fields = filter(lambda x: isinstance(x[1], GenericForeignKey),
+                        model.__dict__.items())
         for field_name, field in fields:
             generic_fields.append(field)
 

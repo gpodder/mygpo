@@ -62,7 +62,7 @@ class ClientStats(UserAgentStats):
             self._clients = Counter()
 
             uas = super(ClientStats, self).get_entries()
-            for ua_string, count in list(uas.items()):
+            for ua_string, count in uas.items():
                 client = self.parse_ua_string(ua_string) or ua_string
                 self._clients[client] += count
 

@@ -61,8 +61,8 @@ def upload(request):
     i = Importer(opml)
 
     podcast_urls = [p['url'] for p in i.items]
-    podcast_urls = list(map(normalize_feed_url, podcast_urls))
-    podcast_urls = [_f for _f in podcast_urls if _f]
+    podcast_urls = map(normalize_feed_url, podcast_urls)
+    podcast_urls = list(filter(None, podcast_urls))
 
     new = [u for u in podcast_urls if u not in existing_urls]
     rem = [u for e in existing_urls if u not in podcast_urls]

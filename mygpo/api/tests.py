@@ -103,7 +103,7 @@ class AdvancedAPITests(unittest.TestCase):
         return True
 
     def compare_actions(self, a1, a2):
-        for key, val in list(a1.items()):
+        for key, val in a1.items():
             if a2.get(key, None) != val:
                 return False
         return True

@@ -153,5 +153,5 @@ def mytags(request):
         tags_tag[tag.tag].append(tag.content_object)
 
     return render(request, 'mytags.html', {
-        'tags_tag': dict(list(tags_tag.items())),
+        'tags_tag': dict(tags_tag.items()),
     })
