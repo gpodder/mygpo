@@ -46,9 +46,9 @@ def list_decorator(must_own=False):
 
 
 @list_decorator(must_own=False)
-def search(request, username, listname):
+def search(request, plist, owner):
     return directory_search(request, 'list_search.html',
-            {'listname': listname})
+            {'listname': plist.slug})
 
 
 @login_required
