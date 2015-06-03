@@ -1,6 +1,6 @@
 from mygpo.podcasts.models import Podcast
 from mygpo.utils import is_url, normalize_feed_url
-from mygpo.data.feeddownloader import update_podcast, NoPodcastCreated
+from mygpo.data.feeddownloader import PodcastUpdater, NoPodcastCreated
 from mygpo.search.index import search_podcasts as search
 
 
@@ -15,8 +15,11 @@ def search_podcasts(q):
             podcast = None
 
         if not podcast or not podcast.title:
+
+            updater = PodcastUpdater()
+
             try:
-                update_podcast(url)
+                updater.update(url)
             except NoPodcastCreated as npc:
                 return []
 

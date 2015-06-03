@@ -20,6 +20,9 @@ from django.contrib import messages
 from django.utils.translation import ugettext as _
 from django.contrib.auth import get_user_model
 
+from feedservice.parse.models import ParserException
+from feedservice.parse import FetchFeedException
+
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.directory.search import search_podcasts
 from mygpo.web.utils import process_lang_params, get_language_names, \
@@ -28,8 +31,7 @@ from mygpo.directory.tags import Topics
 from mygpo.users.settings import FLATTR_TOKEN
 from mygpo.categories.models import Category
 from mygpo.podcastlists.models import PodcastList
-from mygpo.data.feeddownloader import (verify_podcast_url, NoEpisodesException,
-    UpdatePodcastException)
+from mygpo.data.feeddownloader import PodcastUpdater, NoEpisodesException
 from mygpo.data.tasks import update_podcasts
 
 
@@ -265,10 +267,13 @@ class MissingPodcast(View):
             except Podcast.DoesNotExist:
                 # check if we could add a podcast for the given URL
                 podcast = False
-                try:
-                    can_add = verify_podcast_url(url)
+                updater = PodcastUpdater()
 
-                except (UpdatePodcastException, NoEpisodesException) as ex:
+                try:
+                    can_add = updater.verify_podcast_url(url)
+
+                except (ParserException, FetchFeedException,
+                        NoEpisodesException) as ex:
                     can_add = False
                     messages.error(request, unicode(ex))
 
@@ -316,7 +321,8 @@ class AddPodcastStatus(TemplateView):
             podcasts = result.get()
             messages.success(request, _('%d podcasts added' % len(podcasts)))
 
-        except (UpdatePodcastException, NoEpisodesException) as ex:
+        except (ParserException, FetchFeedException,
+                NoEpisodesException) as ex:
             messages.error(request, str(ex))
             podcast = None
 

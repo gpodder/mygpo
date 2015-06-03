@@ -19,4 +19,5 @@ Not OK
 
 Unknown
 -------
+* mygpo-feedservice
 * celery-redis
