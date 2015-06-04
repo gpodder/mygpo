@@ -85,6 +85,7 @@ def update_podcast(podcast_url):
 
     except requests.exceptions.RequestException as re:
         logging.exception('Error while fetching response from feedservice')
+        return
 
     except NoEpisodesException as nee:
         logging.warn('No episode found while parsing podcast')
