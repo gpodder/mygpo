@@ -268,7 +268,7 @@ def search(request, format):
 
     NUM_RESULTS = 20
 
-    query = request.GET.get('q', '').encode('utf-8')
+    query = request.GET.get('q', '')
 
     try:
         scale = int(request.GET.get('scale_logo', 64))
