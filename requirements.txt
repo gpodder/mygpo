@@ -5,7 +5,6 @@ celery==3.1.13
 dj-database-url==0.3.0
 django-redis-sessions==0.4.0
 feedparser==5.1.3
--e git+https://github.com/gpodder/mygpo-feedservice.git@b6d2641ad395455569435d22a224094b7dcef5b9#egg=feedservice-dev
 gunicorn==19.1.1
 html2text==2014.7.3
 markdown2==2.2.2
@@ -17,5 +16,6 @@ python3-memcached==1.51
 redis==2.10.3
 ujson==1.33
 django-celery==3.1.10
+requests==2.7.0
 # module is not longer used but still imported in migrations
 django-uuidfield==0.5.0
