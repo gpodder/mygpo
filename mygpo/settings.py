@@ -123,6 +123,15 @@ try:
 except ImportError:
     print >> sys.stderr, 'Could not load django-debug-toolbar'
 
+
+try:
+    import opbeat
+    INSTALLED_APPS += ('opbeat.contrib.django', )
+
+except ImportError:
+    pass
+
+
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 ACCOUNT_ACTIVATION_DAYS = 7
