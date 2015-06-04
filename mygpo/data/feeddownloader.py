@@ -94,11 +94,11 @@ def update_podcast(podcast_url):
         try:
             p = Podcast.objects.get(urls__url=podcast_url)
             # if it exists already, we mark it as outdated
-            _mark_outdated(p, 'error while fetching feed: %s' % str(ex))
+            _mark_outdated(p, 'error while fetching feed: %s' % str(nee))
             return p
 
         except Podcast.DoesNotExist:
-            raise NoPodcastCreated(ex)
+            raise NoPodcastCreated(nee)
 
     assert parsed, 'fetch_feed must return something'
     p = Podcast.objects.get_or_create_for_url(podcast_url)
