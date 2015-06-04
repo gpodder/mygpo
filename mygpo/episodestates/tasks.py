@@ -11,7 +11,13 @@ logger = get_task_logger(__name__)
 def update_episode_state(historyentry_pk):
     """ Updates the episode state with the saved EpisodeHistoryEntry """
 
-    historyentry = EpisodeHistoryEntry.objects.get(pk=historyentry_pk)
+    # previously an EpisodeHistoryEntry was passed as parameters directly;
+    # as there can still be tasks like this in the queue, we should still
+    # be able to handle it
+    if isinstance(historyentry_pk, EpisodeHistoryEntry):
+        historyentry = historyentry_pk
+    else:
+        historyentry = EpisodeHistoryEntry.objects.get(pk=historyentry_pk)
 
     user = historyentry.user
     episode = historyentry.episode
