@@ -177,7 +177,7 @@ RESULTS_PER_PAGE=20
 def search(request, template='search.html', args={}):
 
     if 'q' in request.GET:
-        q = request.GET.get('q', '').encode('utf-8')
+        q = request.GET.get('q', '')
 
         try:
             page = int(request.GET.get('page', 1))
