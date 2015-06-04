@@ -136,6 +136,9 @@ def get_tags(podcast, user, max_tags=50):
 def episode_list(podcast, user, offset=0, limit=20):
     """ Returns a list of episodes """
     # fast pagination by using Episode.order instead of offset/limit
+    if podcast.max_episode_order is None:
+        return []
+
     page_start = podcast.max_episode_order - offset
     page_end = page_start - limit
     return Episode.objects.filter(podcast=podcast,
@@ -354,7 +357,7 @@ def flattr_podcast(request, podcast):
     now = datetime.utcnow()
 
     # do flattring via the tasks queue, but wait for the result
-    task = flattr_thing.delay(user, podcast.get_id(), site.domain,
+    task = flattr_thing.delay(user.pk, podcast.get_id(), site.domain,
             request.is_secure(), 'Podcast')
     success, msg = task.get()
 

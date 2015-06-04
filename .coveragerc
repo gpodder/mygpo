@@ -1,0 +1,3 @@
+[run]
+branch = True
+omit=*/admin.py,*/wsgi.py,*/tests.py,*/management/*,*/migrations/*

@@ -10,4 +10,4 @@ def set_episode_state(sender, **kwargs):
     if not historyentry:
         return
 
-    update_episode_state.delay(historyentry)
+    update_episode_state.delay(historyentry.pk)

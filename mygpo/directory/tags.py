@@ -59,7 +59,7 @@ def update_category(podcast):
         category, created = Category.objects.get_or_create(
             tags__tag=slugify(random_tag.strip()),
             defaults={
-                'title': random_tag,
+                'title': random_tag.strip(),
             }
         )
 
@@ -72,6 +72,7 @@ def update_category(podcast):
             raise
 
         category = Category.objects.get(title=random_tag)
+        created = False
 
     if not created:
         # update modified timestamp
