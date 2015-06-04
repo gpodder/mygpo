@@ -356,7 +356,7 @@ def flattr_podcast(request, podcast):
     now = datetime.utcnow()
 
     # do flattring via the tasks queue, but wait for the result
-    task = flattr_thing.delay(user, podcast.get_id(), site.domain,
+    task = flattr_thing.delay(user.pk, podcast.get_id(), site.domain,
             request.is_secure(), 'Podcast')
     success, msg = task.get()
 

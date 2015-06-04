@@ -234,7 +234,7 @@ def update_episodes(user, actions, now, ua_string):
                                          episode_url)
 
         if history.action == EpisodeHistoryEntry.PLAY and auto_flattr:
-            auto_flattr_episode.delay(user, episode.id)
+            auto_flattr_episode.delay(user.pk, episode.pk)
 
     return update_urls
 
