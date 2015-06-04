@@ -1,3 +1,5 @@
+import urllib.parse
+
 from django import template
 from django.utils.safestring import mark_safe
 
@@ -83,7 +85,6 @@ def license_name(license_url):
 @register.filter
 def urlquote(s):
     """ makes urllib.quote_plus available as a template filter """
-    import urllib.request, urllib.parse, urllib.error
     if isinstance(s, str):
         s = s.encode('utf-8')
     return mark_safe(urllib.parse.quote_plus(s))
