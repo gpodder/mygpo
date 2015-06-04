@@ -317,7 +317,7 @@ def _save_podcast_logo(cover_art):
         return
 
     try:
-        image_sha1 = hashlib.sha1(cover_art).hexdigest()
+        image_sha1 = hashlib.sha1(cover_art.encode('utf-8')).hexdigest()
         prefix = CoverArt.get_prefix(image_sha1)
 
         filename = CoverArt.get_original(prefix, image_sha1)

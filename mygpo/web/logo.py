@@ -154,7 +154,7 @@ def get_logo_url(podcast, size):
     """ Return the logo URL for the podcast """
 
     if podcast.logo_url:
-        filename = hashlib.sha1(podcast.logo_url).hexdigest()
+        filename = hashlib.sha1(podcast.logo_url.encode('utf-8')).hexdigest()
     else:
         filename = 'podcast-%d.png' % (hash(podcast.title) % 5, )
 
