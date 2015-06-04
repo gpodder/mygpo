@@ -151,8 +151,8 @@ def _update_podcast(podcast, parsed, episodes, max_episode_order):
                                   podcast.author)
     podcast.language = to_maxlength(Podcast, 'language',
                                     parsed.get('language') or podcast.language)
-    podcast.content_types = ','.join(parsed.get('content_types') or
-                                     podcast.content_types)
+    podcast.content_types = ','.join(parsed.get('content_types')) or \
+                                     podcast.content_types
     #podcast.tags['feed'] = parsed.tags or podcast.tags.get('feed', [])
     podcast.common_episode_title = to_maxlength(
         Podcast,
