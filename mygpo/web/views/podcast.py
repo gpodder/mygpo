@@ -163,7 +163,8 @@ def all_episodes(request, podcast, page_size=20):
     num_pages = episodes_total / page_size
     page_list = get_page_list(1, num_pages, page, 15)
 
-    max_listeners = max([e.listeners for e in episodes] + [0])
+    listeners = [e.listeners for e in episodes if e.listeners is not None]
+    max_listeners = max(listeners, default=0)
 
     is_publisher = check_publisher_permission(user, podcast)
 
