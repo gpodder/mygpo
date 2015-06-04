@@ -1,21 +1,12 @@
 all: help
 
 help:
-	@echo 'make test            synchronize DB and run local webserver'
+	@echo 'make test            run tests and show coverage report'
 	@echo 'make clean           clean up files'
-	@echo 'make unittest        run unittests'
 
 test:
-	python manage.py syncdb
-	python manage.py runserver
-
-unittest:
-	python manage.py test
-
-coverage:
-	coverage run --omit="/usr/*" manage.py test
-	coverage report -m
-	rm .coverage
+	envdir envs/dev/ coverage run --branch --source=mygpo ./manage.py test
+	coverage report --show-missing
 
 clean:
 	find -name "*.pyc" -exec rm '{}' \;

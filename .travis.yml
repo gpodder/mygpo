@@ -8,13 +8,17 @@ services:
  - elasticsearch
 
 install:
- - pip install -r requirements.txt --allow-external argparse
+ - pip install -r requirements.txt -r requirements-test.txt
+ - pip install coveralls
 
 before_script:
   - psql -c 'create database mygpo_test;' -U postgres
 
 script:
-  python manage.py test
+  coverage run --branch --source=mygpo ./manage.py test
+
+after_script:
+  - coveralls
 
 env:
  - DATABASE_URL="postgres://postgres@localhost/mygpo_test"
