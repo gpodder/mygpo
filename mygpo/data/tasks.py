@@ -14,9 +14,8 @@ logger = get_task_logger(__name__)
 @celery.task
 def update_podcasts(podcast_urls):
     """ Task to update a podcast """
-    from mygpo.data.feeddownloader import PodcastUpdater
-    updater = PodcastUpdater()
-    podcasts = updater.update_queue(podcast_urls)
+    from mygpo.data.feeddownloader import update_podcasts as update
+    podcasts = update(podcast_urls)
     return list(podcasts)
 
 
