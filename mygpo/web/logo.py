@@ -92,15 +92,15 @@ class CoverArt(View):
             del draw
             resized = Image.composite(resized, background, resized)
 
-        io = io.StringIO()
+        sio = io.StringIO()
 
         try:
-            resized.save(io, 'JPEG', optimize=True, progression=True,
+            resized.save(sio, 'JPEG', optimize=True, progression=True,
                          quality=80)
         except IOError as ex:
             return self.send_file(original)
 
-        s = io.getvalue()
+        s = sio.getvalue()
 
         fp = open(target, 'wb')
         fp.write(s)
