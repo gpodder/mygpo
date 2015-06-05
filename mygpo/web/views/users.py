@@ -33,6 +33,7 @@ from django.utils.decorators import method_decorator
 from django.core.urlresolvers import reverse
 from django.utils.http import is_safe_url
 
+import requests
 from oauth2client.client import FlowExchangeError
 
 from mygpo.decorators import allowed_methods
@@ -196,7 +197,7 @@ class GoogleLoginCallback(TemplateView):
             logger.exception('Login with Google failed')
             return HttpResponseRedirect(reverse('login'))
 
-        email = credentials.token_response['id_token']['email']
+        email = self._get_email(credentials.token_response)
 
         # Connect account
         if request.user.is_authenticated():
@@ -225,3 +226,11 @@ class GoogleLoginCallback(TemplateView):
         user.backend='django.contrib.auth.backends.ModelBackend'
         login(request, user)
         return HttpResponseRedirect(DEFAULT_LOGIN_REDIRECT)
+
+    def _get_email(self, response):
+        USERINFO_URL = 'https://www.googleapis.com/userinfo/email?alt=json'
+        headers = {
+            'Authorization': 'Bearer ' + response['access_token'],
+        }
+        resp = requests.get(USERINFO_URL, headers=headers).json()
+        return resp['data']['email']
