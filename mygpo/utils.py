@@ -848,7 +848,7 @@ def split_quoted(s):
 def edit_link(obj):
     """ Return the link to the Django Admin Edit page """
     return reverse('admin:%s_%s_change' % (obj._meta.app_label,
-                                           obj._meta.module_name),
+                                           obj._meta.model_name),
                    args=(obj.pk,))
 
 
