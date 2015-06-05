@@ -333,7 +333,7 @@ def _save_podcast_logo(cover_art):
         logger.info('Logo %s', cover_art)
 
         # save new cover art
-        with open(filename, 'w') as fp:
+        with open(filename, 'wb') as fp:
             fp.write(urllib.request.urlopen(cover_art).read())
 
         # get hash of new file

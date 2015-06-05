@@ -92,7 +92,7 @@ class CoverArt(View):
             del draw
             resized = Image.composite(resized, background, resized)
 
-        sio = io.StringIO()
+        sio = io.BytesIO()
 
         try:
             resized.save(sio, 'JPEG', optimize=True, progression=True,
@@ -140,7 +140,7 @@ class CoverArt(View):
 
     def send_file(self, filename):
         try:
-            f = open(filename)
+            f = open(filename, 'rb')
         except IOError:
             return HttpResponseNotFound()
 
