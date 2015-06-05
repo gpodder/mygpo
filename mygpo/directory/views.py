@@ -98,7 +98,9 @@ class EpisodeToplistView(ToplistView):
         context['entries'] = entries
 
         # Determine maximum listener amount (or 0 if no entries exist)
-        context['max_listeners'] = max([0]+[e.listeners for e in entries])
+        listeners = [e.listeners for e in entries if e.listeners is not None]
+        max_listeners = max(listeners, default=0)
+        context['max_listeners'] = max_listeners
 
         return context
 
