@@ -94,7 +94,7 @@ class EpisodeHeatmap(object):
     def max_plays(self):
         """ Returns the highest number of plays of all sections """
 
-        return max(self.heatmap)
+        return max(self.heatmap, default=0)
 
     @property
     @query_if_required()

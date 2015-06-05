@@ -110,7 +110,7 @@ def episode_heatmap_visualization(heatmap):
     axis_label = []
     part_colours = []
     widths = []
-    duration = max(heatmap.borders)
+    duration = max(heatmap.borders, default=0)
 
     last_label = None
     for start, end, plays in heatmap.sections:
