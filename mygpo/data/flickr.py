@@ -28,7 +28,7 @@ def get_photo_sizes(photo_id):
     api_key = settings.FLICKR_API_KEY
     request = 'https://api.flickr.com/services/rest/?method=flickr.photos.getSizes&api_key=%s&photo_id=%s&format=json' % (api_key, photo_id)
 
-    resp = urllib.request.urlopen(request).read()
+    resp = urllib.request.urlopen(request).read().decode('utf-8')
 
     extract_re = '^jsonFlickrApi\((.*)\)$'
     m = re.match(extract_re, resp)
