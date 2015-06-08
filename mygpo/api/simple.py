@@ -197,7 +197,7 @@ def parse_subscription(raw_post_data, format):
         return []
 
     urls = filter(None, urls)
-    urls = map(normalize_feed_url, urls)
+    urls = list(map(normalize_feed_url, urls))
     return urls
 
 

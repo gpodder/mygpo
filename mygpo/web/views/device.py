@@ -202,7 +202,7 @@ def upload_opml(request, device):
     if not 'opml' in request.FILES:
         return HttpResponseRedirect(reverse('device-edit', args=[device.uid]))
 
-    opml = request.FILES['opml'].read()
+    opml = request.FILES['opml'].read().decode('utf-8')
 
     try:
         subscriptions = simple.parse_subscription(opml, 'opml')
