@@ -1,1 +1,2 @@
 envdir
+opbeat==2.1.1
