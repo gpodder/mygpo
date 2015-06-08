@@ -46,6 +46,7 @@ DATABASES = {
 _cache_used = bool(os.getenv('CACHE_BACKEND', False))
 
 if _cache_used:
+    CACHES = {}
     CACHES['default'] = {
         'BACKEND': os.getenv(
             'CACHE_BACKEND',
