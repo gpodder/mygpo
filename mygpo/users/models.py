@@ -423,12 +423,3 @@ class HistoryEntry(object):
 
 
         return entries
-
-
-def create_missing_profile(sender, **kwargs):
-    """ Creates a UserProfile if a User doesn't have one """
-    user = kwargs['instance']
-
-    if not hasattr(user, 'profile'):
-        profile = UserProfile.objects.create(user=user)
-        user.profile = profile

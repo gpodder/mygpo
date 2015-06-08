@@ -3,21 +3,15 @@ import collections
 
 from django.db import transaction
 
-from mygpo.users.models import Client
-from mygpo.subscriptions.models import Subscription, SubscribedPodcast
 from mygpo.subscriptions.signals import subscription_changed
-from mygpo.history.models import HistoryEntry
-from mygpo.usersettings.models import UserSettings
 from mygpo.utils import to_maxlength
 
 import logging
 logger = logging.getLogger(__name__)
 
-
-SUBSCRIPTION_ACTIONS = (
-    HistoryEntry.SUBSCRIBE,
-    HistoryEntry.UNSUBSCRIBE,
-)
+# we cannot import models in __init__.py, because it gets loaded while all
+# apps are loaded; ideally all these methods would be moved into a different
+# (non-__init__) module
 
 
 @transaction.atomic
@@ -78,6 +72,7 @@ def _perform_subscribe(podcast, user, clients, timestamp, ref_url):
     the subscription already existed. """
 
     for client in clients:
+        from mygpo.subscriptions.models import Subscription
         subscription, created = Subscription.objects.get_or_create(
             user=user, client=client, podcast=podcast, defaults={
                 'ref_url': to_maxlength(Subscription, 'ref_url', ref_url),
@@ -92,6 +87,7 @@ def _perform_subscribe(podcast, user, clients, timestamp, ref_url):
         logger.info('{user} subscribed to {podcast} on {client}'.format(
             user=user, podcast=podcast, client=client))
 
+        from mygpo.history.models import HistoryEntry
         HistoryEntry.objects.create(
             timestamp=timestamp,
             podcast=podcast,
@@ -109,6 +105,7 @@ def _perform_unsubscribe(podcast, user, clients, timestamp):
     Yields the clients on which a subscription was removed, ie not those where
     the podcast was not subscribed. """
 
+    from mygpo.subscriptions.models import Subscription
     for client in clients:
 
         try:
@@ -125,6 +122,7 @@ def _perform_unsubscribe(podcast, user, clients, timestamp):
         logger.info('{user} unsubscribed from {podcast} on {client}'.format(
             user=user, podcast=podcast, client=client))
 
+        from mygpo.history.models import HistoryEntry
         HistoryEntry.objects.create(
             timestamp=timestamp,
             podcast=podcast,
@@ -142,6 +140,7 @@ def get_subscribe_targets(podcast, user):
     This excludes all devices/syncgroups on which the podcast is already
     subscribed """
 
+    from mygpo.users.models import Client
     clients = Client.objects.filter(user=user)\
                             .exclude(subscription__podcast=podcast,
                                      subscription__user=user)\
@@ -163,6 +162,8 @@ def get_subscribed_podcasts(user, only_public=False):
     The attribute "url" contains the URL that was used when subscribing to
     the podcast """
 
+    from mygpo.usersettings.models import UserSettings
+    from mygpo.subscriptions.models import SubscribedPodcast
     subscriptions = Subscription.objects.filter(user=user)\
                                         .order_by('podcast')\
                                         .distinct('podcast')\
@@ -191,6 +192,8 @@ def get_subscription_history(user, client=None, since=None, until=None,
     Setting device_id restricts the actions to a certain device
     """
 
+    from mygpo.usersettings.models import UserSettings
+    from mygpo.history.models import SUBSCRIPTION_ACTIONS, HistoryEntry
     logger.info('Subscription History for {user}'.format(user=user.username))
     history = HistoryEntry.objects.filter(user=user)\
                                   .filter(action__in=SUBSCRIPTION_ACTIONS)\
@@ -229,6 +232,7 @@ def get_subscription_change_history(history):
     ``history``.
     """
 
+    from mygpo.history.models import HistoryEntry
     subscriptions = collections.defaultdict(int)
 
     for entry in history:
@@ -250,6 +254,7 @@ def get_subscription_change_history(history):
 def subscription_diff(history):
     """ Calculates a diff of subscriptions based on a history (sub/unsub) """
 
+    from mygpo.history.models import HistoryEntry
     subscriptions = collections.defaultdict(int)
 
     for entry in history:

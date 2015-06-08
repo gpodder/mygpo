@@ -57,6 +57,12 @@ class HistoryEntry(models.Model):
         verbose_name_plural = "History Entries"
 
 
+SUBSCRIPTION_ACTIONS = (
+    HistoryEntry.SUBSCRIBE,
+    HistoryEntry.UNSUBSCRIBE,
+)
+
+
 class EpisodeHistoryEntry(models.Model):
 
     DOWNLOAD = 'download'
