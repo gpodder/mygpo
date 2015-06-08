@@ -1,8 +1,8 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes import generic
-from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.contenttypes.fields import (GenericRelation,
+                                                GenericForeignKey)
 
 from mygpo.core.models import UpdateInfoModel
 
@@ -18,7 +18,7 @@ class Vote(UpdateInfoModel):
     content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
     # this should suit UUID and integer primary keys
     object_id = models.UUIDField()
-    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey('content_type', 'object_id')
 
     class Meta:
         unique_together = [

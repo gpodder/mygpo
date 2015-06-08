@@ -3,7 +3,7 @@ import collections
 from django.db import transaction, IntegrityError
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import get_models, Model
-from django.contrib.contenttypes.generic import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericForeignKey
 
 from mygpo.podcasts.models import (MergedUUID, ScopedModel, OrderedModel, Slug,
                                    Tag, URL, MergedUUID, Podcast, Episode)

@@ -8,8 +8,8 @@ from django.db import models, transaction, IntegrityError
 from django.db.models import F
 from django.utils.translation import ugettext as _
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericRelation
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import (GenericRelation,
+                                                GenericForeignKey)
 
 from mygpo import utils
 from mygpo.core.models import (TwitterModel, UUIDModel, GenericManager,
@@ -705,7 +705,7 @@ class URL(OrderedModel, ScopedModel):
     # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
     content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
     object_id = models.UUIDField()
-    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey('content_type', 'object_id')
 
     class Meta(OrderedModel.Meta):
         unique_together = (
@@ -753,7 +753,7 @@ class Tag(models.Model):
     # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
     content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
     object_id = models.UUIDField()
-    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey('content_type', 'object_id')
 
     class Meta:
         unique_together = (
@@ -774,7 +774,7 @@ class Slug(OrderedModel, ScopedModel):
     # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
     content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
     object_id = models.UUIDField()
-    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey('content_type', 'object_id')
 
     class Meta(OrderedModel.Meta):
         unique_together = (
@@ -811,7 +811,7 @@ class MergedUUID(models.Model):
     # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
     content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
     object_id = models.UUIDField()
-    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey('content_type', 'object_id')
 
     class Meta:
         verbose_name = 'Merged UUID'

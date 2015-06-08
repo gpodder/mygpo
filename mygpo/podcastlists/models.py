@@ -2,7 +2,7 @@ from django.db import models
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import GenericForeignKey
 
 from mygpo.core.models import UpdateInfoModel, OrderedModel, UUIDModel
 from mygpo.podcasts.models import Podcast
@@ -80,7 +80,7 @@ class PodcastListEntry(UpdateInfoModel, OrderedModel):
     # the object (Podcast or PodcastGroup) that is in the list
     content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
     object_id = models.UUIDField()
-    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey('content_type', 'object_id')
 
     class Meta(OrderedModel.Meta):
         unique_together = [
