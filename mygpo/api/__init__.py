@@ -76,13 +76,14 @@ class APIView(View):
 
     def get_since(self, request):
         """ Returns parsed "since" GET parameter """
-        since_ = int(request.GET.get('since', None))
+        since_ = request.GET.get('since', None)
 
         if since_ is None:
             raise RequestException("parameter 'since' missing")
 
         try:
-            since = datetime.fromtimestamp(int(since_))
+            since_ = int(since_)
+            since = datetime.fromtimestamp(since_)
         except ValueError:
             raise RequestException("'since' is not a valid timestamp")
 
