@@ -59,7 +59,7 @@ class Flattr(object):
             headers['Authorization'] = 'Bearer ' + self.user.profile.settings.get_wksetting(FLATTR_TOKEN)
 
         if data is not None:
-            data = json.dumps(data)
+            data = json.dumps(data).encode('utf-8')
 
         try:
             response = utils.urlopen(url, headers, data)
