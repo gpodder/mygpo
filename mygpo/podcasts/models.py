@@ -167,7 +167,7 @@ class UrlsMixin(models.Model):
                                    )
                 next_order += 1
             except IntegrityError as ie:
-                err = str(ie).decode('utf-8')
+                err = str(ie)
                 logger.warn(u'Could not add URL: {0}'.format(err))
                 continue
 
