@@ -12,7 +12,9 @@ urlpatterns = patterns('mygpo.web.views',
 
  url(r'^online-help',
      RedirectView.as_view(
-         url='http://gpoddernet.readthedocs.org/en/latest/user/index.html'),
+        url='http://gpoddernet.readthedocs.org/en/latest/user/index.html',
+        permanent=False,
+     ),
      name='help'),
 
  url(r'^developer/',
