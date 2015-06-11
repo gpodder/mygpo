@@ -17,7 +17,7 @@
 
 from django.http import Http404
 from django.core.urlresolvers import reverse
-from django.contrib.sites.models import RequestSite
+from django.contrib.sites.requests import RequestSite
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import cache_page
 from django.shortcuts import get_object_or_404

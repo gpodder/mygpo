@@ -26,7 +26,7 @@ import dateutil.parser
 from django.http import (HttpResponse, HttpResponseBadRequest, Http404,
                          HttpResponseNotFound, )
 from django.core.exceptions import ValidationError
-from django.contrib.sites.models import RequestSite
+from django.contrib.sites.requests import RequestSite
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 from django.conf import settings as dsettings

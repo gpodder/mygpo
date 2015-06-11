@@ -25,7 +25,7 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.cache import cache_page
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
-from django.contrib.sites.models import RequestSite
+from django.contrib.sites.requests import RequestSite
 from django.utils.translation import ugettext as _
 
 from mygpo.api.basic_auth import require_valid_user, check_username

@@ -26,7 +26,7 @@ from mygpo.web.views.podcast import (slug_decorator as podcast_slug_decorator,
     id_decorator as podcast_id_decorator)
 from mygpo.web.utils import get_podcast_link_target, normalize_twitter, \
      get_episode_link_target
-from django.contrib.sites.models import RequestSite
+from django.contrib.sites.requests import RequestSite
 from mygpo.data.tasks import update_podcasts
 from mygpo.decorators import requires_token, allowed_methods
 from mygpo.pubsub.models import HubSubscription

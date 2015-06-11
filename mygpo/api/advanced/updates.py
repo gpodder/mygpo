@@ -19,7 +19,7 @@ from itertools import chain
 from datetime import datetime
 
 from django.http import HttpResponseBadRequest, HttpResponseNotFound
-from django.contrib.sites.models import RequestSite
+from django.contrib.sites.requests import RequestSite
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 from django.utils.decorators import method_decorator

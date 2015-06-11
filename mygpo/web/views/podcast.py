@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.contrib.sites.models import RequestSite
+from django.contrib.sites.requests import RequestSite
 from django.utils.translation import ugettext as _
 from django.contrib import messages
 from django.views.decorators.vary import vary_on_cookie

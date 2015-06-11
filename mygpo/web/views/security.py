@@ -17,7 +17,7 @@
 #
 
 from django.shortcuts import render
-from django.contrib.sites.models import RequestSite
+from django.contrib.sites.requests import RequestSite
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import never_cache
 

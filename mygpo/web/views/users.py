@@ -23,7 +23,7 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.contrib.sites.models import RequestSite
+from django.contrib.sites.requests import RequestSite
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import never_cache
