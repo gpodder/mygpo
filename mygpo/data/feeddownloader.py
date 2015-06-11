@@ -116,11 +116,13 @@ def verify_podcast_url(podcast_url):
 
 
 def _fetch_feed(podcast_url):
-    params = {'url': podcast_url}
+    params = {
+        'url': podcast_url,
+        'process_text': 'markdown',
+    }
     headers = {
         'Accept': 'application/json',
     }
-    # markdown and other parameters?
     url = urljoin(settings.FEEDSERVICE_URL, 'parse')
     r = requests.get(url, params=params, headers=headers, timeout=10)
     return r.json()[0]
