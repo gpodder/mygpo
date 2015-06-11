@@ -86,6 +86,8 @@ class RegistrationView(FormView):
         user.is_active = False
         user.full_clean()
 
+        # TODO: verify if case-insensitive username already exists
+
         try:
             user.save()
 

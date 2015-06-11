@@ -4,7 +4,17 @@ from mygpo.podcasts.models import Podcast
 
 
 class Command(BaseCommand):
+
+    def add_arguments(self, parser):
+        parser.add_argument('title')
+        sp = parser.add_subparsers(dest='entries')
+        spe = sp.add_parser(name='entries', cmd=None, help='a')
+        spe.add_argument('url', type=str)
+        spe.add_argument('name', type=str)
+
     def handle(self, *args, **options):
+
+        print(repr(options))
 
         if len(args) != 5:
             print('Usage: ./manage.py group-podcasts <url1> <url2> <group-name> <name1> <name2>')
