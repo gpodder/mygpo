@@ -163,7 +163,7 @@ def get_subscribed_podcasts(user, only_public=False):
     the podcast """
 
     from mygpo.usersettings.models import UserSettings
-    from mygpo.subscriptions.models import SubscribedPodcast
+    from mygpo.subscriptions.models import SubscribedPodcast, Subscription
     subscriptions = Subscription.objects.filter(user=user)\
                                         .order_by('podcast')\
                                         .distinct('podcast')\
