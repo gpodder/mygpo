@@ -31,8 +31,6 @@ def get_bool(name, default):
 
 DEBUG = get_bool('DEBUG', False)
 
-TEMPLATE_DEBUG = DEBUG
-
 ADMINS = re.findall(r'\s*([^<]+) <([^>]+)>\s*', os.getenv('ADMINS', ''))
 
 MANAGERS = ADMINS
@@ -79,12 +77,38 @@ STATICFILES_DIRS = (
     os.path.abspath(os.path.join(BASE_DIR, '..', 'htdocs', 'media')),
 )
 
-# List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    ('django.template.loaders.cached.Loader', (
-        'django.template.loaders.app_directories.Loader',
-    )),
-)
+
+TEMPLATES = [{
+    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'DIRS': [],
+    'OPTIONS': {
+        'context_processors': [
+                'django.contrib.auth.context_processors.auth',
+                'django.template.context_processors.debug',
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
+                'django.template.context_processors.static',
+                'django.template.context_processors.tz',
+                'django.contrib.messages.context_processors.messages',
+                'mygpo.web.google.analytics',
+                'mygpo.web.google.adsense',
+                # make the debug variable available in templates
+                # https://docs.djangoproject.com/en/dev/ref/templates/api/#django-core-context-processors-debug
+                'django.core.context_processors.debug',
+
+                # required so that the request obj can be accessed from
+                # templates. this is used to direct users to previous
+                # page after login
+                'django.core.context_processors.request',
+        ],
+        'loaders': [
+            ('django.template.loaders.cached.Loader', [
+                'django.template.loaders.app_directories.Loader',
+            ]),
+        ],
+    },
+}]
+
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
@@ -96,8 +120,6 @@ MIDDLEWARE_CLASSES = (
 )
 
 ROOT_URLCONF = 'mygpo.urls'
-
-TEMPLATE_DIRS = ()
 
 INSTALLED_APPS = (
     'django.contrib.contenttypes',
@@ -170,21 +192,6 @@ SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 # https://docs.djangoproject.com/en/1.5/topics/http/sessions/#session-serialization
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
-
-from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
-
-TEMPLATE_CONTEXT_PROCESSORS += (
-    "mygpo.web.google.analytics",
-    "mygpo.web.google.adsense",
-
-    # make the debug variable available in templates
-    # https://docs.djangoproject.com/en/dev/ref/templates/api/#django-core-context-processors-debug
-    "django.core.context_processors.debug",
-
-    # required so that the request obj can be accessed from templates.
-    # this is used to direct users to previous page after login
-    'django.core.context_processors.request',
-)
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
