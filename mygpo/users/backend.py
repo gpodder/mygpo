@@ -12,13 +12,14 @@ class CaseInsensitiveModelBackend(ModelBackend):
         UserModel = get_user_model()
         users = UserModel.objects.filter(username__iexact=username)\
                                  .order_by('-last_login')
-        if users.count() == 0:
+        users = list(users)
+        if len(users) == 0:
             # Run the default password hasher once to reduce the timing
             # difference between an existing and a non-existing user (#20760).
             UserModel().set_password(password)
             return None
 
-        if users.count() > 1:
+        if len(users) > 1:
             logger.error('Login with non-unique username: %s', username)
 
         user = users[0]
