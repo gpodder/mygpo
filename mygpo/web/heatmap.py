@@ -50,8 +50,11 @@ class EpisodeHeatmap(object):
         # get a list of all borders that occur in events
         borders = set()
         for start, end in events:
-            borders.add(start)
-            borders.add(end)
+            if start is not None:
+                borders.add(start)
+
+            if end is not None:
+                borders.add(end)
         borders = sorted(borders)
 
         # this contains the value for the spaces within the borders
