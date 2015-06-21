@@ -125,7 +125,11 @@ def _fetch_feed(podcast_url):
     }
     url = urljoin(settings.FEEDSERVICE_URL, 'parse')
     r = requests.get(url, params=params, headers=headers, timeout=10)
-    return r.json()[0]
+    try:
+        return r.json()[0]
+    except ValueError:
+        logger.exception('Error while parsing response: {}', r.text)
+        raise
 
 
 def _validate_parsed(parsed):
