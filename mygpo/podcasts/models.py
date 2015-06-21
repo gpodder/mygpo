@@ -378,6 +378,10 @@ class PodcastManager(GenericManager):
 
     @transaction.atomic
     def get_or_create_for_url(self, url, defaults={}):
+
+        if not url:
+            raise ValueError('The URL must not be empty')
+
         # TODO: where to specify how uuid is created?
         import uuid
         defaults.update({
@@ -569,6 +573,9 @@ class EpisodeManager(GenericManager):
         """ Create an Episode for a given URL
 
         This is the only place where new episodes are created """
+
+        if not url:
+            raise ValueError('The URL must not be empty')
 
         # TODO: where to specify how uuid is created?
         import uuid
