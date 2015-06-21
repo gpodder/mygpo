@@ -181,7 +181,7 @@ except ImportError:
 ACCOUNT_ACTIVATION_DAYS = int(os.getenv('ACCOUNT_ACTIVATION_DAYS', 7))
 
 AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',
+    'mygpo.users.backend.CaseInsensitiveModelBackend',
     'mygpo.web.auth.EmailAuthenticationBackend',
 )
 
