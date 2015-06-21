@@ -13,7 +13,7 @@ from django.views.generic import TemplateView
 from django.views.generic.base import View
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.sites.requests import RequestSite
 
 from mygpo.utils import random_token
 from mygpo.users.models import UserProxy
@@ -22,6 +22,24 @@ from mygpo.users.models import UserProxy
 USERNAME_MAXLEN = get_user_model()._meta.get_field('username').max_length
 
 USERNAME_REGEX = re.compile(r'^\w[\w.+-]*$')
+
+
+class DuplicateUsername(ValidationError):
+    """ The username is already in use """
+
+    def __init__(self, username):
+        self.username = username
+        super().__init__('The username {0} is already in use.'
+                         .format(username))
+
+
+class DuplicateEmail(ValidationError):
+    """ The email address is already in use """
+
+    def __init__(self, email):
+        self.email = email
+        super().__init__('The email address {0} is already in use.'
+                         .format(email_addr))
 
 
 class UsernameValidator(RegexValidator):
@@ -77,7 +95,10 @@ class RegistrationView(FormView):
     def create_user(self, form):
         User = get_user_model()
         user = User()
-        user.username = form.cleaned_data['username']
+        username = form.cleaned_data['username']
+
+        self._check_username(username)
+        user.username = username
 
         email_addr = form.cleaned_data['email']
         user.email = email_addr
@@ -93,8 +114,7 @@ class RegistrationView(FormView):
             if 'django_auth_unique_email' in str(e):
                 # this was not caught by the form validation, but now validates
                 # the DB's unique constraint
-                raise ValidationError('The email address {0} is '
-                                      'already in use.'.format(email_addr))
+                raise DuplicateEmail(email_addr) from e
             else:
                 raise
 
@@ -102,6 +122,18 @@ class RegistrationView(FormView):
         user.profile.save()
 
         return user
+
+    def _check_username(self, username):
+        """ Check if the username is already in use
+
+        Until there is a case-insensitive constraint on usernames, it is
+        necessary to check for existing usernames manually. This is not a
+        perfect solution, but the chance that two people sign up with the same
+        username at the same time is low enough. """
+        UserModel = get_user_model()
+        users = UserModel.objects.filter(username__iexact=username)
+        if users.exists():
+            raise DuplicateUsername(username)
 
 
 class ActivationView(TemplateView):
@@ -183,7 +215,7 @@ def send_activation_email(user, request):
     subj = subj.strip()
 
     msg = render_to_string('registration/activation_email.txt', {
-        'site': get_current_site(request),
+        'site': RequestSite(request),
         'activation_key': user.profile.activation_key,
     })
     user.email_user(subj, msg)
