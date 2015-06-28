@@ -1,1 +1,2 @@
-coverage==4.0a5
+coverage==4.0a6
+django-coverage-plugin==0.5
