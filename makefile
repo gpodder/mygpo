@@ -5,8 +5,8 @@ help:
 	@echo 'make clean           clean up files'
 
 test:
-	envdir envs/dev/ coverage run --branch --source=mygpo ./manage.py test
-	coverage report --show-missing
+	envdir envs/dev/ coverage run ./manage.py test
+	coverage report
 
 clean:
 	find -name "*.pyc" -exec rm '{}' \;
