@@ -14,7 +14,6 @@ psycopg2==2.6
 pyes==0.99.5
 python-dateutil==2.4.2
 redis==2.10.3
-ujson==1.33
 django-celery==3.1.16
 requests==2.7.0
 # module is not longer used but still imported in migrations

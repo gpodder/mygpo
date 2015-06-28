@@ -46,7 +46,6 @@ from mygpo.core.tasks import auto_flattr_episode
 from mygpo.users.models import Client, InvalidEpisodeActionAttributes
 from mygpo.users.settings import FLATTR_AUTO
 from mygpo.favorites.models import FavoriteEpisode
-from mygpo.core.json import JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
 
 
@@ -75,7 +74,7 @@ def episodes(request, username, version=1):
     if request.method == 'POST':
         try:
             actions = parse_request_body(request)
-        except (JSONDecodeError, UnicodeDecodeError, ValueError) as e:
+        except (UnicodeDecodeError, ValueError) as e:
             msg = ('Could not decode episode update POST data for ' +
                    'user %s: %s') % (username,
                    request.body.decode('ascii', errors='replace'))
@@ -180,7 +179,7 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
     if aggregated:
         actions = dict( (a['episode'], a) for a in actions ).values()
 
-    return {'actions': actions, 'timestamp': until}
+    return {'actions': actions, 'timestamp': get_timestamp(until)}
 
 
 def episode_action_json(history, user):
@@ -278,7 +277,7 @@ def device(request, username, device_uid):
 
     try:
         data = parse_request_body(request)
-    except (JSONDecodeError, UnicodeDecodeError, ValueError) as e:
+    except (UnicodeDecodeError, ValueError) as e:
         msg = ('Could not decode device update POST data for ' +
                'user %s: %s') % (username,
                request.body.decode('ascii', errors='replace'))

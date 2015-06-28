@@ -16,6 +16,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+import json
 import functools
 import types
 import subprocess
@@ -37,8 +38,6 @@ import shlex
 from django.db import transaction, IntegrityError
 from django.conf import settings
 from django.core.urlresolvers import reverse
-
-from mygpo.core.json import json
 
 import logging
 logger = logging.getLogger(__name__)
@@ -697,7 +696,7 @@ def parse_request_body(request):
     if content_enc == 'gzip':
         raw_body = zlib.decompress(raw_body)
 
-    return json.loads(raw_body)
+    return json.loads(raw_body.decode('utf-8'))
 
 
 def normalize_feed_url(url):

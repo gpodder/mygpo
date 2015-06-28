@@ -4,6 +4,7 @@
 #  based on flattr.py from gPodder by Bernd Schlapsi <brot@gmx.info>
 #
 
+import json
 import urllib.request, urllib.parse, urllib.error
 import urllib.request, urllib.error, urllib.parse
 import urllib.parse
@@ -12,7 +13,6 @@ from collections import namedtuple
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
-from mygpo.core.json import json
 from mygpo.users.settings import FLATTR_TOKEN, FLATTR_USERNAME
 from mygpo import utils
 from django.utils.translation import ugettext as _

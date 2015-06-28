@@ -27,7 +27,6 @@ from django.views.generic.base import View
 from mygpo.utils import parse_request_body
 from mygpo.api.exceptions import ParameterMissing
 from mygpo.decorators import cors_origin
-from mygpo.core.json import JSONDecodeError
 from mygpo.api.basic_auth import require_valid_user, check_username
 
 
@@ -67,7 +66,7 @@ class APIView(View):
             # TODO: implementation of parse_request_body can be moved here
             # after all views using it have been refactored
             return parse_request_body(request)
-        except (JSONDecodeError, UnicodeDecodeError, ValueError) as e:
+        except (UnicodeDecodeError, ValueError) as e:
             msg = 'Could not decode request body for user {}: {}'.format(
                 request.user.username,
                 request.body.decode('ascii', errors='replace'))

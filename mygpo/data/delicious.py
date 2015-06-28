@@ -16,11 +16,10 @@
 #
 
 
+import json
 import hashlib
 import urllib.request, urllib.parse, urllib.error
 import urllib.parse
-
-from mygpo.core.json import json
 
 
 def get_tags(url):

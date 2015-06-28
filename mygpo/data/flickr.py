@@ -16,12 +16,11 @@
 #
 
 
+import json
 import re
 import urllib.request, urllib.parse, urllib.error
 
 from django.conf import settings
-
-from mygpo.core.json import json
 
 import logging
 logger = logging.getLogger(__name__)

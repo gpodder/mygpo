@@ -1,9 +1,6 @@
 """ This module contains abstract models that are used in multiple apps """
 
 
-
-import json
-
 from django.db import models, connection
 
 

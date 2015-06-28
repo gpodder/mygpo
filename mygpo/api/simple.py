@@ -15,6 +15,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+import json
 import string
 from itertools import islice
 from functools import wraps
@@ -39,7 +40,6 @@ from mygpo.subscriptions import get_subscribed_podcasts, subscribe, unsubscribe
 from mygpo.directory.search import search_podcasts
 from mygpo.decorators import allowed_methods, cors_origin
 from mygpo.utils import parse_range, normalize_feed_url
-from mygpo.core.json import json, JSONDecodeError
 
 import logging
 logger = logging.getLogger(__name__)
@@ -78,7 +78,7 @@ def subscriptions(request, username, device_uid, format):
             body = request.body.decode('utf-8')
             subscriptions = parse_subscription(body, format)
 
-        except JSONDecodeError as e:
+        except ValueError as e:
             return HttpResponseBadRequest('Unable to parse POST data: %s' % str(e))
 
         return set_subscriptions(subscriptions, request.user, device_uid,

@@ -16,7 +16,7 @@
 #
 
 
-
+import json
 import unittest
 import doctest
 from urllib.parse import urlencode
@@ -30,7 +30,6 @@ from django.contrib.auth import get_user_model
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.api.advanced import episodes
 from mygpo.test import create_auth_string, anon_request
-from mygpo.core.json import json
 
 
 class AdvancedAPITests(unittest.TestCase):
@@ -85,7 +84,7 @@ class AdvancedAPITests(unittest.TestCase):
 
         response = self.client.get(url, {'since': '0'}, **self.extra)
         self.assertEqual(response.status_code, 200, response.content)
-        response_obj = json.loads(response.content)
+        response_obj = json.loads(response.content.decode('utf-8'))
         actions = response_obj['actions']
         self.assertTrue(self.compare_action_list(self.action_data, actions))
 
@@ -153,7 +152,7 @@ class SubscriptionAPITests(unittest.TestCase):
         # verify that the subscription is returned correctly
         response = self.client.get(self.url, {'since': '0'}, **self.extra)
         self.assertEqual(response.status_code, 200, response.content)
-        response_obj = json.loads(response.content)
+        response_obj = json.loads(response.content.decode('utf-8'))
         self.assertEqual(self.action_data['add'], response_obj['add'])
         self.assertEqual([], response_obj.get('remove', []))
 

@@ -88,7 +88,7 @@ class SubscriptionsAPI(APIView):
         assert len(add) == len(add_s) and len(remove) == len(rem_s)
 
         pairs = zip(add + remove, add_s + rem_s)
-        updated_urls = filter(lambda pair: pair[0] != pair[1], pairs)
+        updated_urls = list(filter(lambda pair: pair[0] != pair[1], pairs))
 
         add_s = filter(None, add_s)
         rem_s = filter(None, rem_s)
