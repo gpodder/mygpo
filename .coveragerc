@@ -26,4 +26,4 @@ exclude_lines =
 
 show_missing = True
 
-omit=*/migrations/*
+omit=*/migrations/*,admin.py,*/wsgi.py,*/tests.py,*/management/*
