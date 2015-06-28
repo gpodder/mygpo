@@ -143,7 +143,7 @@ def format_podcast_list(obj_list, format, title, get_podcast=None,
         return HttpResponse(opml, content_type='text/xml')
 
     elif format == 'json':
-        objs = map(json_map, obj_list)
+        objs = list(map(json_map, obj_list))
         return JsonResponse(objs)
 
     elif format == 'jsonp':
