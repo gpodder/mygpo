@@ -1,6 +1,8 @@
 from operator import itemgetter
 from datetime import datetime, timedelta
 
+from django.db import IntegrityError
+
 from celery.decorators import periodic_task
 
 from mygpo.data.podcast import calc_similar_podcasts
@@ -27,7 +29,11 @@ def update_related_podcasts(podcast, max_related=20):
     related = map(get_podcast, related)
 
     for p in related:
-        podcast.related_podcasts.add(p)
+        try:
+            podcast.related_podcasts.add(p)
+        except IntegrityError:
+            logger.warn('Integrity error while adding related podcast',
+                        exc_info=True)
 
 
 # interval in which podcast updates are scheduled
