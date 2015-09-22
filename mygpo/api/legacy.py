@@ -65,7 +65,7 @@ def upload(request):
     podcast_urls = list(filter(None, podcast_urls))
 
     new = [u for u in podcast_urls if u not in existing_urls]
-    rem = [u for e in existing_urls if u not in podcast_urls]
+    rem = [u for u in existing_urls if u not in podcast_urls]
 
     #remove duplicates
     new = list(set(new))
