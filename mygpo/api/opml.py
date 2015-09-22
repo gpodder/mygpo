@@ -41,7 +41,7 @@ class Importer(object):
 
         try:
             doc = xml.dom.minidom.parseString(content)
-        except ExpatError e:
+        except ExpatError as e:
             raise ValueError from e
 
         for outline in doc.getElementsByTagName('outline'):
