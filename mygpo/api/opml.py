@@ -25,6 +25,7 @@ the web and to export a list of podcast objects to valid OPML 1.1 files.
 import os
 
 import xml.dom.minidom
+from xml.parsers.expat import ExpatError
 import email.utils
 
 
@@ -37,7 +38,11 @@ class Importer(object):
         containing podcast metadata.
         """
         self.items = []
-        doc = xml.dom.minidom.parseString(content)
+
+        try:
+            doc = xml.dom.minidom.parseString(content)
+        except ExpatError e:
+            raise ValueError from e
 
         for outline in doc.getElementsByTagName('outline'):
             if outline.getAttribute('type') in self.VALID_TYPES and \
