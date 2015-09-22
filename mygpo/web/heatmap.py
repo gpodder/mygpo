@@ -50,11 +50,8 @@ class EpisodeHeatmap(object):
         # get a list of all borders that occur in events
         borders = set()
         for start, end in events:
-            if start is not None:
-                borders.add(start)
-
-            if end is not None:
-                borders.add(end)
+            borders.add(start or 0)
+            borders.add(end or 0)
         borders = sorted(borders)
 
         # this contains the value for the spaces within the borders
@@ -63,8 +60,8 @@ class EpisodeHeatmap(object):
 
         for start, end in events:
             # for each event we calculate its range
-            start_idx = borders.index(start)
-            end_idx = borders.index(end)
+            start_idx = borders.index(start or 0)
+            end_idx = borders.index(end or 0)
 
             # and increase the play-count within the range by 1
             for inc in range(start_idx, end_idx):
