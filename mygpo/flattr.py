@@ -69,7 +69,7 @@ class Flattr(object):
             return {'_gpodder_no_connection': False}
 
         if response.getcode() == 200:
-            return json.loads(response.read())
+            return json.loads(response.read().decode('utf-8'))
 
         return {'_gpodder_statuscode': response.getcode()}
 
