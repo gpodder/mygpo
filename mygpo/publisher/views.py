@@ -186,7 +186,8 @@ def episodes(request, podcast):
 
     episodes = Episode.objects.filter(podcast=podcast).select_related('podcast').prefetch_related('slugs', 'podcast__slugs')
 
-    max_listeners = max([e.listeners for e in episodes] + [0])
+    listeners = map(None, (e.listeners for e in episodes))
+    max_listeners = max(listeners, default=0)
 
     return render(request, 'publisher/episodes.html', {
         'podcast': podcast,
