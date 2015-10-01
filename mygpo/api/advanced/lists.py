@@ -118,7 +118,7 @@ def get_lists(request, username):
 
     get_data = partial(_get_list_data, username=user.username,
                 domain=site.domain)
-    lists_data = map(get_data, lists)
+    lists_data = list(map(get_data, lists))
 
     return JsonResponse(lists_data)
 
