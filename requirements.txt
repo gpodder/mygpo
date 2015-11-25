@@ -6,7 +6,7 @@ dj-database-url==0.3.0
 django-redis-sessions==0.5.0
 python3-memcached==1.51
 feedparser==5.2.1
-gunicorn==19.3.0
+gunicorn==19.4.1
 html2text==2015.11.4
 markdown2==2.3.0
 oauth2client==1.5.2
