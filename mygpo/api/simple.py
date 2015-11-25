@@ -203,6 +203,9 @@ def parse_subscription(raw_post_data, format):
 
 def set_subscriptions(urls, user, device_uid, user_agent):
 
+    # remove empty urls
+    urls = list(filter(None, (u.strip() for u in urls)))
+
     device = get_device(user, device_uid, user_agent, undelete=True)
 
     subscriptions = dict( (p.url, p) for p in device.get_subscribed_podcasts())
