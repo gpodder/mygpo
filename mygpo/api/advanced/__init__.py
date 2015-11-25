@@ -211,12 +211,12 @@ def update_episodes(user, actions, now, ua_string):
 
         podcast_url = action.get('podcast', '')
         podcast_url = sanitize_append(podcast_url, update_urls)
-        if podcast_url == '':
+        if not podcast_url:
             continue
 
         episode_url = action.get('episode', '')
         episode_url = sanitize_append(episode_url, update_urls)
-        if episode_url == '':
+        if not episode_url:
             continue
 
         podcast = Podcast.objects.get_or_create_for_url(podcast_url)
