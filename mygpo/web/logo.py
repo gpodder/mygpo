@@ -21,6 +21,7 @@ from datetime import datetime
 from glob import glob
 import errno
 import hashlib
+import struct
 
 from PIL import Image, ImageDraw
 
@@ -76,7 +77,7 @@ class CoverArt(View):
         try:
             im.thumbnail((size, size), Image.ANTIALIAS)
             resized = im
-        except (IOError, IndexError) as ex:
+        except (struct.error, IOError, IndexError) as ex:
             # raised when trying to read an interlaced PNG;
             logger.warn('Could not create thumbnail: %s', str(ex))
 
