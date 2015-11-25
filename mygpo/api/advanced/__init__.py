@@ -209,12 +209,12 @@ def update_episodes(user, actions, now, ua_string):
     # group all actions by their episode
     for action in actions:
 
-        podcast_url = action['podcast']
+        podcast_url = action.get('podcast', '')
         podcast_url = sanitize_append(podcast_url, update_urls)
         if podcast_url == '':
             continue
 
-        episode_url = action['episode']
+        episode_url = action.get('episode', '')
         episode_url = sanitize_append(episode_url, update_urls)
         if episode_url == '':
             continue
