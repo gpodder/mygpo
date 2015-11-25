@@ -167,12 +167,14 @@ except ImportError:
 
 try:
     import opbeat
-    INSTALLED_APPS += ('opbeat.contrib.django', )
 
-    # add opbeat middleware to the beginning of the middleware classes list
-    MIDDLEWARE_CLASSES = \
-        ('opbeat.contrib.django.middleware.OpbeatAPMMiddleware',) + \
-        MIDDLEWARE_CLASSES
+    if not DEBUG:
+        INSTALLED_APPS += ('opbeat.contrib.django', )
+
+        # add opbeat middleware to the beginning of the middleware classes list
+        MIDDLEWARE_CLASSES = \
+            ('opbeat.contrib.django.middleware.OpbeatAPMMiddleware',) + \
+            MIDDLEWARE_CLASSES
 
 except ImportError:
     pass
