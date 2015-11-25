@@ -207,7 +207,7 @@ def upload_opml(request, device):
         subscriptions = simple.parse_subscription(opml, 'opml')
         simple.set_subscriptions(subscriptions, request.user, device.uid, None)
 
-    except (ExpatError, UnicodeDecodeError) as ex:
+    except (ValueError, ExpatError, UnicodeDecodeError) as ex:
         msg = _('Could not upload subscriptions: {err}').format(err=str(ex))
         messages.error(request, msg)
         return HttpResponseRedirect(reverse('device-edit', args=[device.uid]))
