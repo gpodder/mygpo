@@ -3,8 +3,7 @@ import json
 from django.db import models
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import (GenericRelation,
-                                                GenericForeignKey)
+from django.contrib.contenttypes.fields import GenericForeignKey
 
 from mygpo.users.settings import PUBLIC_SUB_PODCAST
 from mygpo.podcasts.models import Podcast

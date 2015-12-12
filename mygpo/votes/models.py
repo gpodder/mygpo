@@ -29,7 +29,7 @@ class Vote(UpdateInfoModel):
 
 class VoteMixin(models.Model):
 
-    votes = GenericRelation('Vote', related_query_name='votes')
+    votes = GenericRelation(Vote, related_query_name='votes')
 
     class Meta:
         abstract = True

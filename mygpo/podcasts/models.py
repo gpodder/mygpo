@@ -129,74 +129,92 @@ class AuthorModel(models.Model):
         abstract = True
 
 
-class UrlsMixin(models.Model):
-    """ Methods for working with URL objects """
+class MergedUUIDQuerySet(models.QuerySet):
+    """ QuerySet for Models inheriting from MergedUUID """
 
-    urls = GenericRelation('URL', related_query_name='urls')
+    def get_by_any_id(self, id):
+        """ Find am Episode by its own ID or by a merged ID """
+        # TODO: should this be done in the model?
+        try:
+            return self.get(id=id)
+        except self.model.DoesNotExist:
+            return self.get(merged_uuids__uuid=id)
+
+
+class TagsMixin(models.Model):
+    """ Methods for working with Tag objects """
+
+    tags = GenericRelation('Tag', related_query_name='tags')
 
     class Meta:
         abstract = True
 
-    @property
-    def url(self):
-        """ The main URL of the model """
-        # We could also use self.urls.first() here, but this would result in a
-        # different query and would render a .prefetch_related('urls') useless
-        # The assumption is that we will never have loads of URLS, so
-        # fetching all won't hurt
-        urls = list(self.urls.all())
-        return urls[0].url if urls else None
 
-    def add_missing_urls(self, new_urls):
-        """ Adds missing URLS from new_urls
+class ScopedModel(models.Model):
+    """ A model that belongs to some scope, usually for limited uniqueness
 
-        The order of existing URLs is not changed  """
-        existing_urls = self.urls.all()
-        next_order = max([-1] + [u.order for u in existing_urls]) + 1
-        existing_urls = [u.url for u in existing_urls]
+    scope does not allow null values, because null is not equal to null in SQL.
+    It could therefore not be used in unique constraints. """
 
-        for url in new_urls:
-            if url in existing_urls:
-                continue
+    # A slug / URL is unique within a scope; no two podcasts can have the same
+    # URL (scope ''), and no two episdoes of the same podcast (scope =
+    # podcast-ID) can have the same URL
+    scope = models.CharField(max_length=32, null=False, blank=True,
+                             db_index=True)
 
-            try:
-                URL.objects.create(url=url,
-                                   order=next_order,
-                                   scope=self.scope,
-                                   content_object=self,
-                                   )
-                next_order += 1
-            except IntegrityError as ie:
-                err = str(ie)
-                logger.warn(u'Could not add URL: {0}'.format(err))
-                continue
+    class Meta:
+        abstract = True
 
-    def set_url(self, url):
-        """ Sets the canonical URL """
+    def get_default_scope(self):
+        """ Returns the default scope of the object """
+        raise NotImplementedError('{cls} should implement get_default_scope'
+            .format(cls=self.__class__.__name__))
 
-        urls = [u.url for u in self.urls.all()]
-        if url in urls:
-            urls.remove(url)
 
-        urls.insert(0, url)
-        self.set_urls(urls)
 
-    def set_urls(self, urls):
-        """ Update the object's URLS to the given list
+class Slug(OrderedModel, ScopedModel):
+    """ Slug for any kind of Model
 
-        'urls' should be a list of strings. Slugs that do not exist are
-        created.  Existing urls that are not in the 'urls' list are
-        deleted. """
-        urls = [utils.to_maxlength(URL, 'url', url) for url in urls]
-        existing = {u.url: u for u in self.urls.all()}
-        utils.set_ordered_entries(self, urls, existing, URL, 'url',
-                                  'content_object')
+    Slugs are ordered, and the first slug is considered the canonical one.
+    See also :class:`SlugsMixin`
+    """
+
+    slug = models.SlugField(max_length=150, db_index=True)
+
+    # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
+    content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
+    object_id = models.UUIDField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    class Meta(OrderedModel.Meta):
+        unique_together = (
+            # a slug is unique per type; eg a podcast can have the same slug
+            # as an episode, but no two podcasts can have the same slug
+            ('slug', 'scope'),
+
+            # slugs of an object must be ordered, so that no two slugs of one
+            # object have the same order key
+            ('content_type', 'object_id', 'order'),
+        )
+
+        index_together = [
+            ('slug', 'content_type')
+        ]
+
+    def __repr__(self):
+        return '{cls}(slug={slug}, order={order}, content_object={obj}'.format(
+            cls=self.__class__.__name__,
+            slug=self.slug,
+            order=self.order,
+            obj=self.content_object
+        )
+
 
 
 class SlugsMixin(models.Model):
     """ Methods for working with Slug objects """
 
-    slugs = GenericRelation('Slug', related_query_name='slugs')
+    slugs = GenericRelation(Slug, related_query_name='slugs')
 
     class Meta:
         abstract = True
@@ -271,36 +289,6 @@ class SlugsMixin(models.Model):
         utils.set_ordered_entries(self, slugs, existing, Slug, 'slug',
                                   'content_object')
 
-
-class MergedUUIDsMixin(models.Model):
-    """ Methods for working with MergedUUID objects """
-
-    merged_uuids = GenericRelation('MergedUUID',
-                                   related_query_name='merged_uuids')
-
-    class Meta:
-        abstract = True
-
-
-class MergedUUIDQuerySet(models.QuerySet):
-    """ QuerySet for Models inheriting from MergedUUID """
-
-    def get_by_any_id(self, id):
-        """ Find am Episode by its own ID or by a merged ID """
-        # TODO: should this be done in the model?
-        try:
-            return self.get(id=id)
-        except self.model.DoesNotExist:
-            return self.get(merged_uuids__uuid=id)
-
-
-class TagsMixin(models.Model):
-    """ Methods for working with Tag objects """
-
-    tags = GenericRelation('Tag', related_query_name='tags')
-
-    class Meta:
-        abstract = True
 
 
 class PodcastGroup(UUIDModel, TitleModel, SlugsMixin):
@@ -411,6 +399,130 @@ class PodcastManager(GenericManager):
                 return Podcast.objects.get(urls__url=url,
                                            urls__scope='',
                                            )
+
+
+class URL(OrderedModel, ScopedModel):
+    """ Podcasts and Episodes can have multiple URLs
+
+    URLs are ordered, and the first slug is considered the canonical one """
+
+    url = models.URLField(max_length=2048)
+
+    # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
+    content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
+    object_id = models.UUIDField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    class Meta(OrderedModel.Meta):
+        unique_together = (
+            # a URL is unique per scope
+            ('url', 'scope'),
+
+            # URLs of an object must be ordered, so that no two slugs of one
+            # object have the same order key
+            ('content_type', 'object_id', 'order'),
+        )
+
+        verbose_name = 'URL'
+        verbose_name_plural = 'URLs'
+
+    def get_default_scope(self):
+        return self.content_object.scope
+
+
+
+class UrlsMixin(models.Model):
+    """ Methods for working with URL objects """
+
+    urls = GenericRelation(URL, related_query_name='urls')
+
+    class Meta:
+        abstract = True
+
+    @property
+    def url(self):
+        """ The main URL of the model """
+        # We could also use self.urls.first() here, but this would result in a
+        # different query and would render a .prefetch_related('urls') useless
+        # The assumption is that we will never have loads of URLS, so
+        # fetching all won't hurt
+        urls = list(self.urls.all())
+        return urls[0].url if urls else None
+
+    def add_missing_urls(self, new_urls):
+        """ Adds missing URLS from new_urls
+
+        The order of existing URLs is not changed  """
+        existing_urls = self.urls.all()
+        next_order = max([-1] + [u.order for u in existing_urls]) + 1
+        existing_urls = [u.url for u in existing_urls]
+
+        for url in new_urls:
+            if url in existing_urls:
+                continue
+
+            try:
+                URL.objects.create(url=url,
+                                   order=next_order,
+                                   scope=self.scope,
+                                   content_object=self,
+                                   )
+                next_order += 1
+            except IntegrityError as ie:
+                err = str(ie)
+                logger.warn(u'Could not add URL: {0}'.format(err))
+                continue
+
+    def set_url(self, url):
+        """ Sets the canonical URL """
+
+        urls = [u.url for u in self.urls.all()]
+        if url in urls:
+            urls.remove(url)
+
+        urls.insert(0, url)
+        self.set_urls(urls)
+
+    def set_urls(self, urls):
+        """ Update the object's URLS to the given list
+
+        'urls' should be a list of strings. Slugs that do not exist are
+        created.  Existing urls that are not in the 'urls' list are
+        deleted. """
+        urls = [utils.to_maxlength(URL, 'url', url) for url in urls]
+        existing = {u.url: u for u in self.urls.all()}
+        utils.set_ordered_entries(self, urls, existing, URL, 'url',
+                                  'content_object')
+
+
+class MergedUUID(models.Model):
+    """ If objects are merged their UUIDs are stored for later reference
+
+    see also :class:`MergedUUIDsMixin`
+    """
+
+    uuid = models.UUIDField(unique=True)
+
+    # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
+    content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
+    object_id = models.UUIDField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    class Meta:
+        verbose_name = 'Merged UUID'
+        verbose_name_plural = 'Merged UUIDs'
+
+
+class MergedUUIDsMixin(models.Model):
+    """ Methods for working with MergedUUID objects """
+
+    merged_uuids = GenericRelation(MergedUUID,
+                                   related_query_name='merged_uuids')
+
+    class Meta:
+        abstract = True
+
+
 
 
 class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
@@ -681,56 +793,6 @@ class Episode(UUIDModel, TitleModel, DescriptionModel, LinkModel,
         return int(match.group(1))
 
 
-class ScopedModel(models.Model):
-    """ A model that belongs to some scope, usually for limited uniqueness
-
-    scope does not allow null values, because null is not equal to null in SQL.
-    It could therefore not be used in unique constraints. """
-
-    # A slug / URL is unique within a scope; no two podcasts can have the same
-    # URL (scope ''), and no two episdoes of the same podcast (scope =
-    # podcast-ID) can have the same URL
-    scope = models.CharField(max_length=32, null=False, blank=True,
-                             db_index=True)
-
-    class Meta:
-        abstract = True
-
-    def get_default_scope(self):
-        """ Returns the default scope of the object """
-        raise NotImplementedError('{cls} should implement get_default_scope'
-            .format(cls=self.__class__.__name__))
-
-
-class URL(OrderedModel, ScopedModel):
-    """ Podcasts and Episodes can have multiple URLs
-
-    URLs are ordered, and the first slug is considered the canonical one """
-
-    url = models.URLField(max_length=2048)
-
-    # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
-    content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
-    object_id = models.UUIDField()
-    content_object = GenericForeignKey('content_type', 'object_id')
-
-    class Meta(OrderedModel.Meta):
-        unique_together = (
-            # a URL is unique per scope
-            ('url', 'scope'),
-
-            # URLs of an object must be ordered, so that no two slugs of one
-            # object have the same order key
-            ('content_type', 'object_id', 'order'),
-        )
-
-        verbose_name = 'URL'
-        verbose_name_plural = 'URLs'
-
-    def get_default_scope(self):
-        return self.content_object.scope
-
-
 class Tag(models.Model):
     """ Tags any kind of Model
 
@@ -769,57 +831,4 @@ class Tag(models.Model):
         )
 
 
-class Slug(OrderedModel, ScopedModel):
-    """ Slug for any kind of Model
 
-    Slugs are ordered, and the first slug is considered the canonical one.
-    See also :class:`SlugsMixin`
-    """
-
-    slug = models.SlugField(max_length=150, db_index=True)
-
-    # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
-    content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
-    object_id = models.UUIDField()
-    content_object = GenericForeignKey('content_type', 'object_id')
-
-    class Meta(OrderedModel.Meta):
-        unique_together = (
-            # a slug is unique per type; eg a podcast can have the same slug
-            # as an episode, but no two podcasts can have the same slug
-            ('slug', 'scope'),
-
-            # slugs of an object must be ordered, so that no two slugs of one
-            # object have the same order key
-            ('content_type', 'object_id', 'order'),
-        )
-
-        index_together = [
-            ('slug', 'content_type')
-        ]
-
-    def __repr__(self):
-        return '{cls}(slug={slug}, order={order}, content_object={obj}'.format(
-            cls=self.__class__.__name__,
-            slug=self.slug,
-            order=self.order,
-            obj=self.content_object
-        )
-
-
-class MergedUUID(models.Model):
-    """ If objects are merged their UUIDs are stored for later reference
-
-    see also :class:`MergedUUIDsMixin`
-    """
-
-    uuid = models.UUIDField(unique=True)
-
-    # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
-    content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
-    object_id = models.UUIDField()
-    content_object = GenericForeignKey('content_type', 'object_id')
-
-    class Meta:
-        verbose_name = 'Merged UUID'
-        verbose_name_plural = 'Merged UUIDs'

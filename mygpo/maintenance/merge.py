@@ -2,7 +2,8 @@ import collections
 
 from django.db import transaction, IntegrityError
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import get_models, Model
+from django.db.models import Model
+from django.apps import apps
 from django.contrib.contenttypes.fields import GenericForeignKey
 
 from mygpo.podcasts.models import (MergedUUID, ScopedModel, OrderedModel, Slug,
@@ -135,7 +136,7 @@ def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
     # provide a similar method to the ForeignKey field for accessing the
     # generic related fields.
     generic_fields = []
-    for model in get_models():
+    for model in apps.get_models():
         fields = filter(lambda x: isinstance(x[1], GenericForeignKey),
                         model.__dict__.items())
         for field_name, field in fields:
