@@ -108,7 +108,8 @@ class Exporter(object):
 
             outline = doc.createElement('outline')
             outline.setAttribute('title', title or '')
-            outline.setAttribute('text', description or '')
+            outline.setAttribute('description', description or '')
+            outline.setAttribute('text', title or description)
             outline.setAttribute('xmlUrl', url)
             outline.setAttribute('type', 'rss')
             return outline
