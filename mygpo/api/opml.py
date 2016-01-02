@@ -19,7 +19,7 @@
 """OPML importer and exporter (based on gPodder's "opml" module)
 
 This module contains helper classes to import subscriptions from OPML files on
-the web and to export a list of podcast objects to valid OPML 1.1 files.
+the web and to export a list of podcast objects to valid OPML 2.0 files.
 """
 
 import os
@@ -72,7 +72,7 @@ class Importer(object):
 class Exporter(object):
     """
     Helper class to export a list of channel objects to a local file in OPML
-    1.1 format. See www.opml.org for the OPML specification.
+    2.0 format. See www.opml.org for the OPML specification.
     """
 
     def __init__(self, title='my.gpodder.org Subscriptions'):
