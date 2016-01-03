@@ -105,21 +105,23 @@ class Exporter(object):
         def create_outline(channel):
             from mygpo.subscriptions.models import SubscribedPodcast
             from mygpo.podcasts.models import PodcastGroup
+
+            outline = doc.createElement('outline')
+
             if isinstance(channel, SubscribedPodcast):
                 title = channel.podcast.title
                 description = channel.podcast.description
                 url = channel.ref_url
             elif isinstance(channel, PodcastGroup):
                 title = channel.title
-                podcast = channel.podcast_set.first()
-                description = podcast.description
-                url = podcast.url
+                url = channel.podcast_set.first().url
+                for subchannel in channel.podcast_set.all():
+                    outline.appendChild(create_outline(subchannel)
             else:
                 title = channel.title
                 description = channel.description
                 url = channel.url
 
-            outline = doc.createElement('outline')
             outline.setAttribute('title', title or '')
             outline.setAttribute('description', description or '')
             outline.setAttribute('text', title or description)
