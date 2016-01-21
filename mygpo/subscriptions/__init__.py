@@ -2,6 +2,7 @@ from datetime import datetime
 import collections
 
 from django.db import transaction
+from django.db.utils import IntegrityError
 
 from mygpo.subscriptions.signals import subscription_changed
 from mygpo.utils import to_maxlength
@@ -71,18 +72,29 @@ def _perform_subscribe(podcast, user, clients, timestamp, ref_url):
     Yields the clients on which a subscription was added, ie not those where
     the subscription already existed. """
 
-    for client in clients:
-        from mygpo.subscriptions.models import Subscription
-        subscription, created = Subscription.objects.get_or_create(
-            user=user, client=client, podcast=podcast, defaults={
-                'ref_url': to_maxlength(Subscription, 'ref_url', ref_url),
-                'created': timestamp,
-                'modified': timestamp,
-            }
-        )
+    from mygpo.subscriptions.models import Subscription
 
-        if not created:
-            continue
+    for client in clients:
+        try:
+            with transaction.atomic():
+                subscription = Subscription.objects.create(
+                    user=user,
+                    client=client,
+                    podcast=podcast,
+                    ref_url=to_maxlength(Subscription, 'ref_url', ref_url),
+                    created=timestamp,
+                    modified=timestamp,
+                )
+
+        except IntegrityError as ie:
+            msg = str(ie)
+            if 'Key (user_id, client_id, podcast_id)' in msg:
+                # Subscription already exists -- skip
+                continue
+
+            else:
+                # unknown error
+                raise
 
         logger.info('{user} subscribed to {podcast} on {client}'.format(
             user=user, podcast=podcast, client=client))
