@@ -35,7 +35,6 @@ from mygpo.api.constants import EPISODE_ACTION_TYPES
 from mygpo.core.tasks import flattr_thing
 from mygpo.utils import parse_time, get_timestamp
 from mygpo.users.settings import FLATTR_TOKEN
-from mygpo.web.heatmap import EpisodeHeatmap
 from mygpo.history.stats import last_played_episodes
 from mygpo.publisher.utils import check_publisher_permission
 from mygpo.web.utils import get_episode_link_target, check_restrictions
@@ -70,15 +69,12 @@ def episode(request, episode):
                                                          episode=episode)\
                                                  .exists()
 
-        played_parts = EpisodeHeatmap(podcast, episode, user, episode.duration)
-
         devices = {c.id.hex: c for c in user.client_set.all()}
         can_flattr = user.profile.settings.get_wksetting(FLATTR_TOKEN) and episode.flattr_url
 
     else:
         has_history = False
         is_fav = False
-        played_parts = None
         devices = {}
         can_flattr = False
 
@@ -94,7 +90,6 @@ def episode(request, episode):
         'next': next,
         'has_history': has_history,
         'is_favorite': is_fav,
-        'played_parts': played_parts,
         'actions': EPISODE_ACTION_TYPES,
         'devices': devices,
         'can_flattr': can_flattr,

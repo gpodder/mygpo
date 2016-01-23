@@ -19,7 +19,6 @@ from mygpo.publisher.auth import require_publisher, is_publisher
 from mygpo.publisher.forms import SearchPodcastForm
 from mygpo.publisher.utils import listener_data, episode_listener_data, \
          check_publisher_permission, subscriber_data
-from mygpo.web.heatmap import EpisodeHeatmap
 from mygpo.web.views.episode import (slug_decorator as episode_slug_decorator,
     id_decorator as episode_id_decorator)
 from mygpo.web.views.podcast import (slug_decorator as podcast_slug_decorator,
@@ -84,8 +83,6 @@ def podcast(request, podcast):
 
     update_token = request.user.profile.get_token('publisher_update_token')
 
-    heatmap = EpisodeHeatmap(podcast)
-
     try:
         pubsubscription = HubSubscription.objects.get(topic_url=podcast.url)
     except HubSubscription.DoesNotExist:
@@ -102,7 +99,6 @@ def podcast(request, podcast):
         'timeline_data': timeline_data,
         'subscriber_data': subscription_data,
         'update_token': update_token,
-        'heatmap': heatmap,
         'feedurl_quoted': feedurl_quoted,
         'pubsubscription': pubsubscription,
         })
@@ -218,8 +214,6 @@ def episode(request, episode):
 
     timeline_data = list(episode_listener_data(episode))
 
-    heatmap = EpisodeHeatmap(episode.podcast, episode, duration=episode.duration)
-
     return render(request, 'publisher/episode.html', {
         'is_secure': request.is_secure(),
         'domain': site.domain,
@@ -227,7 +221,6 @@ def episode(request, episode):
         'podcast': podcast,
         'form': form,
         'timeline_data': timeline_data,
-        'heatmap': heatmap,
         })
 
 
