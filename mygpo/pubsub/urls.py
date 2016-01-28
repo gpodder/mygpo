@@ -1,8 +1,8 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
-from mygpo.pubsub.views import SubscribeView
+from . import views
 
 
-urlpatterns = patterns('',
- url(r'^subscribe$',      SubscribeView.as_view(),   name='pubsub-subscribe'),
-)
+urlpatterns = [
+ url(r'^subscribe$',      views.SubscribeView.as_view(),   name='pubsub-subscribe'),
+]

@@ -1,4 +1,4 @@
-from django.conf.urls import *
+from django.conf.urls import url
 
 from mygpo.administration.views import Overview, MergeSelect, MergeVerify, \
          MergeProcess, MergeStatus, ClientStatsView, ClientStatsJsonView, \
@@ -6,7 +6,7 @@ from mygpo.administration.views import Overview, MergeSelect, MergeVerify, \
          ActivateUserView, MakePublisherInput, MakePublisher, \
          MakePublisherResult
 
-urlpatterns = patterns('mygpo.admin.views',
+urlpatterns = [
  url(r'^$',              Overview.as_view(),     name='admin-overview'),
  url(r'^hostinfo$',      HostInfo.as_view(),     name='admin-hostinfo'),
  url(r'^merge/$',        MergeSelect.as_view(),  name='admin-merge'),
@@ -40,4 +40,4 @@ urlpatterns = patterns('mygpo.admin.views',
      MakePublisher.as_view(),
      name='admin-make-publisher-result'),
 
-)
+]

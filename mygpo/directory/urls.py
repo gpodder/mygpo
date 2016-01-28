@@ -1,51 +1,50 @@
-from django.conf.urls import *
+from django.conf.urls import url
 
-from mygpo.directory.views import Directory, Carousel, MissingPodcast, \
-         AddPodcast, AddPodcastStatus, FlattrPodcastList, LicensePodcastList, \
-         LicenseList, PodcastToplistView, EpisodeToplistView
+from . import views
 
-urlpatterns = patterns('mygpo.directory.views',
+urlpatterns = [
  url(r'^toplist/$',
-     PodcastToplistView.as_view(),
+     views.PodcastToplistView.as_view(),
      name='toplist'),
 
  url(r'^toplist/episodes$',
-     EpisodeToplistView.as_view(),
+     views.EpisodeToplistView.as_view(),
      name='episode-toplist'),
 
  url(r'^directory/$',
-     Directory.as_view(),
+     views.Directory.as_view(),
      name='directory-home'),
 
  url(r'^carousel/$',
-     Carousel.as_view(),
+     views.Carousel.as_view(),
      name='carousel-demo'),
 
  url(r'^missing/$',
-     MissingPodcast.as_view(),
+     views.MissingPodcast.as_view(),
      name='missing-podcast'),
 
  url(r'^add-podcast/$',
-     AddPodcast.as_view(),
+     views.AddPodcast.as_view(),
      name='add-podcast'),
 
  url(r'^add-podcast/(?P<task_id>[^/]+)$',
-     AddPodcastStatus.as_view(),
+     views.AddPodcastStatus.as_view(),
      name='add-podcast-status'),
 
  url(r'^directory/\+flattr$',
-     FlattrPodcastList.as_view(),
+     views.FlattrPodcastList.as_view(),
      name='flattr-podcasts'),
 
  url(r'^directory/\+license$',
-     LicenseList.as_view(),
+     views.LicenseList.as_view(),
      name='license-podcasts'),
 
  url(r'^directory/\+license/\+url/(?P<license_url>.+)$',
-     LicensePodcastList.as_view(),
+     views.LicensePodcastList.as_view(),
      name='license-podcasts-url'),
 
- url(r'^directory/(?P<category>.+)$',                          'category',                   name='directory'),
- url(r'^search/$',                        'search',      name='search'),
- url(r'^lists/$',                     'podcast_lists', name='podcast-lists'),
-)
+ url(r'^directory/(?P<category>.+)$',                          views.category,                   name='directory'),
+ url(r'^search/$',                        views.search,      name='search'),
+ url(r'^lists/$',                     views.podcast_lists, name='podcast-lists'),
+
+]
