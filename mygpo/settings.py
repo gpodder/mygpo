@@ -201,7 +201,7 @@ USER_CLASS = 'mygpo.users.models.User'
 
 LOGIN_URL = '/login/'
 
-CSRF_FAILURE_VIEW = 'mygpo.web.views.security.csrf_failure'
+CSRF_FAILURE_VIEW = 'mygpo.web.views.csrf_failure'
 
 
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', '')

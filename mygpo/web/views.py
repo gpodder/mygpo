@@ -155,3 +155,16 @@ def mytags(request):
     return render(request, 'mytags.html', {
         'tags_tag': dict(tags_tag.items()),
     })
+
+
+@never_cache
+def csrf_failure(request, reason=""):
+    site = RequestSite(request)
+    return render(request, 'csrf.html', {
+        'site': site,
+        'method': request.method,
+        'referer': request.META.get('HTTP_REFERER', _('another site')),
+        'path': request.path,
+        'get': request.GET,
+        'post': request.POST,
+    })
