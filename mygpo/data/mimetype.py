@@ -40,21 +40,49 @@ def get_type(mimetype):
 
     All "wanted" mimetypes are mapped to one of audio/video/image
     Everything else returns None
+
+    >>> get_type('audio/mpeg3')
+    'audio'
+
+    >>> get_type('video/mpeg')
+    'video'
+
+    >>> get_type('image/jpeg')
+    'image'
+
+    >>> get_type('application/ogg')
+    'audio'
+
+    >>> get_type('application/x-youtube')
+    'video'
+
+    >>> get_type('application/x-vimeo')
+    'video'
+
+    >>> get_type('application/octet-stream') == None
+    True
+
+    >>> get_type('') == None
+    True
+
+    >>> get_type('music') == None
+    True
     """
     if not mimetype:
         return None
 
-    if '/' in mimetype:
-        category, type = mimetype.split('/', 1)
-        if category in ('audio', 'video', 'image'):
-            return category
-        elif type == 'ogg':
-            return 'audio'
-        elif type == 'x-youtube':
-            return 'video'
-        elif type == 'x-vimeo':
-            return 'video'
-    return None
+    if '/' not in mimetype:
+        return None
+
+    category, type = mimetype.split('/', 1)
+    if category in ('audio', 'video', 'image'):
+        return category
+    elif type == 'ogg':
+        return 'audio'
+    elif type == 'x-youtube':
+        return 'video'
+    elif type == 'x-vimeo':
+        return 'video'
 
 
 def get_mimetype(mimetype, url):
