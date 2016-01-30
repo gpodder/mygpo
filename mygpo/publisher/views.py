@@ -19,10 +19,14 @@ from mygpo.publisher.auth import require_publisher, is_publisher
 from mygpo.publisher.forms import SearchPodcastForm
 from mygpo.publisher.utils import listener_data, episode_listener_data, \
          check_publisher_permission, subscriber_data
-from mygpo.web.views.episode import (slug_decorator as episode_slug_decorator,
-    id_decorator as episode_id_decorator)
-from mygpo.web.views.podcast import (slug_decorator as podcast_slug_decorator,
-    id_decorator as podcast_id_decorator)
+from mygpo.podcasts.views.episode import (
+    slug_decorator as episode_slug_decorator,
+    id_decorator as episode_id_decorator
+)
+from mygpo.podcasts.views.podcast import (
+    slug_decorator as podcast_slug_decorator,
+    id_decorator as podcast_id_decorator
+)
 from mygpo.web.utils import get_podcast_link_target, normalize_twitter, \
      get_episode_link_target
 from django.contrib.sites.requests import RequestSite

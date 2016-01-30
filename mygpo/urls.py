@@ -43,6 +43,7 @@ if settings.MAINTENANCE:
 # build links from them (eg login-link).
 urlpatterns += [
  url(r'^',           include('mygpo.web.urls')),
+ url(r'^',           include('mygpo.podcasts.urls')),
  url(r'^',           include('mygpo.directory.urls')),
  url(r'^',           include('mygpo.api.urls')),
  url(r'^',           include('mygpo.userfeeds.urls')),
