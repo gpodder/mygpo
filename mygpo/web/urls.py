@@ -5,7 +5,7 @@ from django.views.generic.base import TemplateView, RedirectView
 from mygpo.web.logo import CoverArt
 
 from . import views
-from .views import subscriptions, settings, device, users
+from .views import settings, device, users
 
 
 urlpatterns = [
@@ -39,14 +39,6 @@ urlpatterns = [
     url(r'^privacy/',
         TemplateView.as_view(template_name='privacy_policy.html'),
         name='privacy-policy'),
-
-    url(r'^user/(?P<username>[\w.+-]+)/subscriptions$',
-        subscriptions.for_user,
-        name='shared-subscriptions'),
-
-    url(r'^user/(?P<username>[\w.+-]+)/subscriptions\.opml$',
-        subscriptions.for_user_opml,
-        name='shared-subscriptions-opml'),
 
     url(r'^account/$',
         settings.account,

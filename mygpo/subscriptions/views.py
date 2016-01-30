@@ -21,6 +21,10 @@ from mygpo.users.models import HistoryEntry
 from mygpo.subscriptions import (get_subscribed_podcasts,
     get_subscription_change_history, get_subscription_history)
 from mygpo.web.utils import get_podcast_link_target
+from mygpo.utils import parse_bool
+from mygpo.decorators import requires_token
+from mygpo.web.utils import symbian_opml_changes
+
 
 
 @vary_on_cookie
@@ -141,3 +145,35 @@ class SubscriptionsFeed(Feed):
 
     def item_pubdate(self, item):
         return item.timestamp
+
+
+
+@requires_token(token_name='subscriptions_token', denied_template='user_subscriptions_denied.html')
+def for_user(request, username):
+    User = get_user_model()
+    user = get_object_or_404(User, username=username)
+    subscriptions = get_subscribed_podcasts(user, only_public=True)
+    token = user.profile.get_token('subscriptions_token')
+
+    return render(request, 'user_subscriptions.html', {
+        'subscriptions': subscriptions,
+        'other_user': user,
+        'token': token,
+        })
+
+@requires_token(token_name='subscriptions_token')
+def for_user_opml(request, username):
+    User = get_user_model()
+    user = get_object_or_404(User, username=username)
+    subscriptions = get_subscribed_podcasts(user, only_public=True)
+
+    if parse_bool(request.GET.get('symbian', False)):
+        subscriptions = map(symbian_opml_changes,
+                            [p.podcast for p in subscriptions])
+
+    response = render(request, 'user_subscriptions.opml', {
+        'subscriptions': subscriptions,
+        'other_user': user
+        })
+    response['Content-Disposition'] = 'attachment; filename=%s-subscriptions.opml' % username
+    return response
