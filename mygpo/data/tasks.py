@@ -45,11 +45,15 @@ def schedule_updates(interval=UPDATE_INTERVAL):
     """ Schedules podcast updates that are due within ``interval`` """
     now = datetime.utcnow()
 
+    # max number of updates to schedule (one per minute)
+    max_updates = UPDATE_INTERVAL.total_seconds() / 60
+
     # fetch podcasts for which an update is due within the next hour
     podcasts = Podcast.objects.all()\
                               .next_update_between(now, now+interval)\
                               .prefetch_related('urls')\
-                              .only('pk')
+                              .only('pk')\
+                              .limit(max_updates)
 
     logger.error('Scheduling %d podcasts for update', podcasts.count())
     # queue all those podcast updates
