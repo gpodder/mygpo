@@ -8,7 +8,7 @@ from django.utils.html import strip_tags
 from django.contrib.staticfiles.storage import staticfiles_storage
 
 from mygpo.users.models import Client, SyncGroup
-from mygpo.web.views.device import show
+from mygpo.users.views.device import show
 
 
 _ = ugettext
