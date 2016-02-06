@@ -213,7 +213,6 @@ def delete_account(request):
 
     user = request.user
     user.is_active = False
-    user.deleted = True
     user.save()
     logout(request)
     return render(request, 'deleted_account.html')
