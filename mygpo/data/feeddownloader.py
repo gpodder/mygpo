@@ -356,7 +356,7 @@ def _save_podcast_logo(cover_art):
         return cover_art
 
     except (urllib.error.HTTPError, urllib.error.URLError, ValueError,
-            http.client.BadStatusLine, socket.error, IOError) as e:
+            http.client.HTTPException, socket.error, IOError) as e:
         logger.warn('Exception while updating podcast logo: %s', str(e))
 
 
