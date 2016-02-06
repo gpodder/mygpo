@@ -52,8 +52,7 @@ def schedule_updates(interval=UPDATE_INTERVAL):
     podcasts = Podcast.objects.all()\
                               .next_update_between(now, now+interval)\
                               .prefetch_related('urls')\
-                              .only('pk')\
-                              .limit(max_updates)
+                              .only('pk')[:max_updates]
 
     logger.error('Scheduling %d podcasts for update', podcasts.count())
     # queue all those podcast updates
