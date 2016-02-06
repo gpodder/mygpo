@@ -29,6 +29,14 @@ def get_bool(name, default):
     return os.getenv(name, str(default)).lower() == 'true'
 
 
+def get_intOrNone(name, default):
+    """ Parses the env variable, accepts ints and literal None"""
+    value = os.getenv(name, str(default))
+    if value.lower() == 'none':
+        return None
+    return int(value)
+
+
 DEBUG = get_bool('DEBUG', False)
 
 ADMINS = re.findall(r'\s*([^<]+) <([^>]+)>\s*', os.getenv('ADMINS', ''))
@@ -343,6 +351,8 @@ CELERY_ACCEPT_CONTENT = ['pickle', 'json']
 
 CELERY_SEND_TASK_ERROR_EMAILS = get_bool('CELERY_SEND_TASK_ERROR_EMAILS',
                                          False)
+
+BROKER_POOL_LIMIT = get_intOrNone('BROKER_POOL_LIMIT', 10)
 
 ### Google API
 
