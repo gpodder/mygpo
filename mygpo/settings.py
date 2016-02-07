@@ -135,6 +135,7 @@ INSTALLED_APPS = [
     'django_celery_results',
     'django_celery_beat',
     'mygpo.core',
+    'mygpo.moauth',
     'mygpo.podcasts',
     'mygpo.chapters',
     'mygpo.search',
@@ -184,6 +185,7 @@ except ImportError:
 ACCOUNT_ACTIVATION_DAYS = int(os.getenv('ACCOUNT_ACTIVATION_DAYS', 7))
 
 AUTHENTICATION_BACKENDS = (
+    'mygpo.moauth.backends.OAuth2Backend',
     'mygpo.users.backend.CaseInsensitiveModelBackend',
     'mygpo.web.auth.EmailAuthenticationBackend',
 )
@@ -374,3 +376,12 @@ NOSE_ARGS = [
 
 
 SEARCH_CUTOFF = float(os.getenv('SEARCH_CUTOFF', 0.3))
+
+
+# OAuth
+
+MYGPO_AUTH_CLIENT_ID = os.getenv('MYGPO_AUTH_CLIENT_ID', None)
+MYGPO_AUTH_CLIENT_SECRET = os.getenv('MYGPO_AUTH_CLIENT_SECRET', None)
+
+MYGPO_AUTH_URL = os.getenv('MYGPO_AUTH_URL', None)
+

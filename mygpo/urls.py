@@ -35,6 +35,7 @@ urlpatterns += [
  url(r'^',           include('mygpo.subscriptions.urls')),
  url(r'^',           include('mygpo.users.urls')),
  url(r'^',           include('mygpo.podcastlists.urls')),
+ url(r'^',           include('mygpo.moauth.urls')),
  url(r'^suggestions/', include('mygpo.suggestions.urls')),
  url(r'^publisher/', include('mygpo.publisher.urls')),
  url(r'^administration/', include('mygpo.administration.urls')),
