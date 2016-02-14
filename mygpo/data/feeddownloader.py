@@ -104,6 +104,9 @@ def update_podcast(podcast_url):
     assert parsed, 'fetch_feed must return something'
     p = Podcast.objects.get_or_create_for_url(podcast_url)
     episodes = _update_episodes(p, parsed.get('episodes', []))
+    p.refresh_from_db()
+    p.episode_count = Episode.objects.filter(podcast=p).count()
+    p.save()
     max_episode_order = _order_episodes(p)
     _update_podcast(p, parsed, episodes, max_episode_order)
     return p
