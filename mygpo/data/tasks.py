@@ -58,3 +58,19 @@ def schedule_updates(interval=UPDATE_INTERVAL):
     # queue all those podcast updates
     for podcast in podcasts:
         update_podcasts.delay([podcast.url])
+
+
+@periodic_task(run_every=UPDATE_INTERVAL)
+def schedule_updates_longest_no_update():
+    """ Schedule podcasts for update that have not been updated for longest """
+
+    # max number of updates to schedule (one per minute)
+    max_updates = UPDATE_INTERVAL.total_seconds() / 60
+
+    podcasts = Podcast.objects.order_by('last_update')[:max_updates]
+
+    logger.info('Scheduling %d podcasts for update', podcasts.count())
+
+    # queue all those podcast updates
+    for podcast in podcasts:
+        update_podcasts.delay([podcast.url])
