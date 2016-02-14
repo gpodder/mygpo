@@ -1,7 +1,7 @@
 from django import template
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
-from django.utils.html import strip_tags
+from django.utils.html import strip_tags, format_html
 from django.contrib.staticfiles.storage import staticfiles_storage
 
 from mygpo import utils
@@ -127,8 +127,9 @@ def episode_link(episode, podcast, title=None):
 
     title = strip_tags(title)
 
-    return '<a href="%(target)s" title="%(title)s">%(title)s</a>' % \
-        dict(target=get_episode_link_target(episode, podcast), title=title)
+    return format_html('<a href="{target}" title="{title}">{title}</a>',
+                       target=get_episode_link_target(episode, podcast),
+                       title=title)
 
 
 @register.simple_tag
