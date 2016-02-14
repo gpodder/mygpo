@@ -1,5 +1,6 @@
 from django import template
 from django.utils.safestring import mark_safe
+from django.utils.html import format_html
 from django.contrib.staticfiles.storage import staticfiles_storage
 
 from mygpo.utils import format_time
@@ -27,10 +28,15 @@ def vertical_bar(value, max_value, display=None):
         return ''
 
     if ratio > 40:
-        left, right = '<span>'+ value_str +'</span>', ''
+        left = format_html('<span>{}</span>', value_str)
+        right = ''
     else:
-        left, right = '&nbsp;', '<span>'+ value_str +'</span>'
-    s = '<div class="barbg"><div class="bar" style="width: %.2d%%">%s</div>%s</div>' % (ratio, left, right)
+        left = format_html('&nbsp;')
+        right = format_html('<span>{}</span>', value_str)
+
+    return format_html('<div class="barbg"><div class="bar" '
+                       'style="width: {:.2d}%">{}</div>{}</div>',
+                       ratio, left, right)
     return s
 
 @register.filter
