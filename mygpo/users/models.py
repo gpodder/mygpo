@@ -58,7 +58,7 @@ class UserProxyQuerySet(models.QuerySet):
         if q:
             return self.get(q)
         else:
-            return self.none()
+            raise UserProxy.DoesNotExist
 
 
 class UserProxyManager(GenericManager):
