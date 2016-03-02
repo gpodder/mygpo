@@ -1,2 +1,2 @@
 envdir
-opbeat==3.2.1
+opbeat==3.2.2
