@@ -334,7 +334,7 @@ def _save_podcast_logo(cover_art):
 
         # get hash of existing file
         if os.path.exists(filename):
-            with open(filename) as f:
+            with open(filename, 'rb') as f:
                 old_hash = file_hash(f).digest()
         else:
             old_hash = ''
@@ -346,7 +346,7 @@ def _save_podcast_logo(cover_art):
             fp.write(urllib.request.urlopen(cover_art).read())
 
         # get hash of new file
-        with open(filename) as f:
+        with open(filename, 'rb') as f:
             new_hash = file_hash(f).digest()
 
         # remove thumbnails if cover changed
