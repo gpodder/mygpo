@@ -25,7 +25,7 @@ def index_podcast(sender, **kwargs):
 
     conn = get_connection()
     podcast = kwargs['instance']
-    logger.info('Indexing podcast {0}', podcast)
+    logger.info('Indexing podcast %s', podcast)
 
     document = podcast_to_json(podcast)
 
