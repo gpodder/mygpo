@@ -72,6 +72,9 @@
 
 {% block sidebar %}
 
+ {% include "podcast-ad-box.html" with podcast_ad=podcast_ad only %}
+
+
   {% for podcastlist in podcastlists %}
    {% if podcastlist and podcastlist.user.username %}
     <div class="well">

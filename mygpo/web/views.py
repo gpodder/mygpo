@@ -74,6 +74,8 @@ def dashboard(request, episode_count=10):
     subscribed_podcasts = get_subscribed_podcasts(request.user)
     subscribed_podcasts = [sp.podcast for sp in subscribed_podcasts]
 
+    podcast_ad = Podcast.objects.get_advertised_podcast()
+
     site = RequestSite(request)
 
     checklist = []
@@ -137,6 +139,7 @@ def dashboard(request, episode_count=10):
             'checklist': checklist,
             'site': site,
             'show_install_reader': show_install_reader,
+            'podcast_ad': podcast_ad,
         })
 
 

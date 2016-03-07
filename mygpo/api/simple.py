@@ -326,8 +326,12 @@ def example_podcasts(request, format):
         return HttpResponseBadRequest('scale_logo has to be a number from 1 to 256')
 
     if not podcasts:
-        podcasts = ExamplePodcast.objects.get_podcasts()
+        podcasts = list(ExamplePodcast.objects.get_podcasts())
         cache.set('example-podcasts', podcasts)
+
+    podcast_ad = Podcast.objects.get_advertised_podcast()
+    if podcast_ad:
+        podcasts = [podcast_ad] + podcasts
 
     title = 'gPodder Podcast Directory'
     domain = RequestSite(request).domain

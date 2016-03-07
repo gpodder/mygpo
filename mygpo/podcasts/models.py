@@ -1,7 +1,9 @@
 
 
+import uuid
 import re
 
+from django.core.cache import cache
 from django.conf import settings
 from django.db import models, transaction, IntegrityError
 from django.db.models import F
@@ -362,6 +364,19 @@ class PodcastManager(GenericManager):
 
     def get_queryset(self):
         return PodcastQuerySet(self.model, using=self._db)
+
+    def get_advertised_podcast(self):
+        """ Returns the currently advertised podcast """
+        if settings.PODCAST_AD_ID:
+            podcast = cache.get('podcast_ad')
+            if podcast:
+                return podcast
+
+            pk = uuid.UUID(settings.PODCAST_AD_ID)
+            podcast = self.get_queryset().get(pk=pk)
+            cache.set('pocdast_ad', podcast)
+            return podcast
+
 
     @transaction.atomic
     def get_or_create_for_url(self, url, defaults={}):

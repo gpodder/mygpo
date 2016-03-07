@@ -35,7 +35,8 @@ def show_list(request):
     subscriptionlist = create_subscriptionlist(request)
     return render(request, 'subscriptions.html', {
         'subscriptionlist': subscriptionlist,
-        'url': current_site
+        'url': current_site,
+        'podcast_ad': Podcast.objects.get_advertised_podcast(),
     })
 
 @vary_on_cookie

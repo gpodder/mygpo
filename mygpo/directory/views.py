@@ -131,6 +131,7 @@ class Directory(View):
             'topics': Topics(),
             'podcastlists': self.get_random_list(),
             'random_podcast': Podcast.objects.all().random().first(),
+            'podcast_ad': Podcast.objects.get_advertised_podcast(),
             })
 
 

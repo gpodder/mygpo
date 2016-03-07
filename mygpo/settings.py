@@ -387,3 +387,5 @@ INTERNAL_IPS = os.getenv('INTERNAL_IPS', '').split()
 
 EMAIL_BACKEND = os.getenv('EMAIL_BACKEND',
                           'django.core.mail.backends.smtp.EmailBackend')
+
+PODCAST_AD_ID = os.getenv('PODCAST_AD_ID')
