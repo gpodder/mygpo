@@ -128,10 +128,19 @@ def _fetch_feed(podcast_url):
     }
     url = urljoin(settings.FEEDSERVICE_URL, 'parse')
     r = requests.get(url, params=params, headers=headers, timeout=10)
+
+    if r.status_code != 200:
+        logger.error('Feed-service status code for "{}" was {}', podcast_url,
+                     r.status_code)
+        return None
+
     try:
         return r.json()[0]
     except ValueError:
-        logger.exception('Error while parsing response: {}', r.text)
+        logger.exception(
+            'Feed-service error while parsing response for url "{}": {}',
+            podcast_url, r.text,
+        )
         raise
 
 
