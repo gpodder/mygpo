@@ -684,7 +684,7 @@ def get_git_head():
     if err:
         return None, None
 
-    outs = out.split()
+    outs = [o.decode('utf-8') for o in out.split()]
     commit = outs[0]
     msg = ' ' .join(outs[1:])
     return commit, msg
