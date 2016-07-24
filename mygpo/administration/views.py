@@ -78,7 +78,7 @@ class HostInfo(AdminView):
 
     def _get_feed_queue_status(self):
         now = datetime.utcnow()
-        next_podcast = Podcast.objects.order_by_next_update().first()
+        next_podcast = Podcast.objects.all().order_by_next_update().first()
 
         delta = (next_podcast.next_update - now)
         delta_mins = delta.total_seconds() / 60
