@@ -570,6 +570,11 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
 
     objects = PodcastManager()
 
+    class Meta:
+        index_together = [
+            ('last_update',),
+        ]
+
     def subscriber_count(self):
         # TODO: implement
         return self.subscribers
