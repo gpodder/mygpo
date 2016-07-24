@@ -85,7 +85,19 @@ def update_podcast(podcast_url):
 
     except requests.exceptions.RequestException as re:
         logging.exception('Error while fetching response from feedservice')
-        return
+
+        # if we fail to parse the URL, we don't even create the
+        # podcast object
+        try:
+            p = Podcast.objects.get(urls__url=podcast_url)
+            # if it exists already, we mark it as outdated
+            _mark_outdated(p, 'error while fetching feed: %s' % str(re))
+            p.last_update = datetime.utcnow()
+            p.save()
+            return p
+
+        except Podcast.DoesNotExist:
+            raise NoPodcastCreated(re)
 
     except NoEpisodesException as nee:
         logging.warn('No episode found while parsing podcast')
