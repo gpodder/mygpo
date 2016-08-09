@@ -34,8 +34,7 @@ ADMINS = re.findall(r'\s*([^<]+) <([^>]+)>\s*', os.getenv('ADMINS', ''))
 MANAGERS = ADMINS
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default='postgres://mygpo:mygpo@localhost/mygpo'),
+    'default': dj_database_url.parse(os.environ['DATABASE_URL'])
 }
 
 

@@ -1,0 +1,45 @@
+
+version: '2'
+
+services:
+
+  base:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file: contrib/docker.env
+    volumes:
+      - .:/srv/mygpo
+      - ./contrib/docker.env:/docker.env
+
+  postgres:
+    build:
+      context: contrib
+      dockerfile: Dockerfile.postgres
+    environment:
+      POSTGRES_USER: mygpo
+      POSTGRES_PASSWORD: mygpo
+
+  memcached:
+    image: memcached:1.4
+
+  redis:
+    image: redis:3.2-alpine
+
+  web:
+    extends: base
+    command: python ./manage.py runserver 0.0.0.0:8000
+    links:
+      - redis
+      - postgres
+      - memcached
+    ports:
+      - '8000:8000'
+
+  worker:
+    extends: base
+    command: python manage.py celery beat -S djcelery.schedulers.DatabaseScheduler
+    links:
+      - web
+      - postgres
+      - redis
