@@ -53,13 +53,13 @@ def update_category(podcast):
     if not all_tags:
         return
 
-    random_tag = choice(all_tags)
+    random_tag = choice(all_tags).strip()
 
     try:
         category, created = Category.objects.get_or_create(
-            tags__tag=slugify(random_tag.strip()),
+            tags__tag=slugify(random_tag),
             defaults={
-                'title': random_tag.strip(),
+                'title': random_tag,
             }
         )
 
