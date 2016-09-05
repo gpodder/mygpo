@@ -17,10 +17,9 @@
 
 
 import json
+import copy
 import unittest
-import doctest
 from urllib.parse import urlencode
-from copy import deepcopy
 
 from django.test.client import Client
 from django.test import TestCase
@@ -71,22 +70,38 @@ class AdvancedAPITests(unittest.TestCase):
         self.user.delete()
 
     def test_episode_actions(self):
+        response = self._upload_episode_actions(self.user, self.action_data,
+                                                self.extra)
+        self.assertEqual(response.status_code, 200, response.content)
+
         url = reverse(episodes, kwargs={
             'version': '2',
             'username': self.user.username,
         })
-
-        # upload actions
-        response = self.client.post(url, json.dumps(self.action_data),
-                                    content_type="application/json",
-                                    **self.extra)
-        self.assertEqual(response.status_code, 200, response.content)
-
         response = self.client.get(url, {'since': '0'}, **self.extra)
         self.assertEqual(response.status_code, 200, response.content)
         response_obj = json.loads(response.content.decode('utf-8'))
         actions = response_obj['actions']
         self.assertTrue(self.compare_action_list(self.action_data, actions))
+
+    def test_invalid_client_id(self):
+        """ Invalid Client ID should return 400 """
+        action_data = copy.deepcopy(self.action_data)
+        action_data[0]['device'] = "gpodder@abcdef123"
+
+        response = self._upload_episode_actions(self.user, action_data,
+                                                self.extra)
+
+        self.assertEqual(response.status_code, 400, response.content)
+
+    def _upload_episode_actions(self, user, action_data, extra):
+        url = reverse(episodes, kwargs={
+            'version': '2',
+            'username': self.user.username,
+        })
+        return self.client.post(url, json.dumps(action_data),
+                                content_type="application/json",
+                                **extra)
 
     def compare_action_list(self, as1, as2):
         for a1 in as1:
