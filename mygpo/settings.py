@@ -119,14 +119,14 @@ TEMPLATES = [{
 }]
 
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-)
+]
 
 ROOT_URLCONF = 'mygpo.urls'
 
@@ -181,9 +181,9 @@ try:
         INSTALLED_APPS += ('opbeat.contrib.django', )
 
         # add opbeat middleware to the beginning of the middleware classes list
-        MIDDLEWARE_CLASSES = \
-            ('opbeat.contrib.django.middleware.OpbeatAPMMiddleware',) + \
-            MIDDLEWARE_CLASSES
+        MIDDLEWARE = \
+            ['opbeat.contrib.django.middleware.OpbeatAPMMiddleware'] + \
+            MIDDLEWARE
 
 except ImportError:
     pass
