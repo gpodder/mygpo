@@ -30,8 +30,8 @@ import requests
 from django.db import transaction
 from django.conf import settings
 
-from mygpo.podcasts.models import Podcast, URL, Slug, Episode
-from mygpo.core.slugs import assign_missing_episode_slugs, PodcastSlug
+from mygpo.podcasts.models import Podcast, Episode
+from mygpo.core.slugs import PodcastSlugs, EpisodeSlugs
 from mygpo.podcasts.models import DEFAULT_UPDATE_INTERVAL, \
     MIN_UPDATE_INTERVAL, MAX_UPDATE_INTERVAL
 from mygpo.utils import file_hash, to_maxlength
@@ -240,13 +240,40 @@ def _update_podcast(podcast, parsed, episodes, max_episode_order):
     except SubscriptionError as se:
         logger.warn('subscribing to hub failed: %s', str(se))
 
-    if not podcast.slug:
-        slug = PodcastSlug(podcast).get_slug()
-        if slug:
-            podcast.add_slug(slug)
-
+    assign_slug(podcast)
     assign_missing_episode_slugs(podcast)
     update_related_podcasts.delay(podcast)
+
+
+def assign_slug(podcast):
+    if podcast.slug:
+        return
+
+    for slug in PodcastSlugs(podcast):
+        try:
+            with transaction.atomic():
+                podcast.add_slug(slug)
+            break
+
+        except:
+            continue
+
+
+def assign_missing_episode_slugs(podcast):
+    common_title = podcast.get_common_episode_title()
+
+    episodes = Episode.objects.filter(podcast=podcast, slugs__isnull=True)
+
+    for episode in episodes:
+
+        for slug in EpisodeSlugs(episode, common_title):
+            try:
+                with transaction.atomic():
+                    episode.set_slug(slug)
+                break
+
+            except:
+                continue
 
 
 def _update_categories(podcast, prev_timestamp):

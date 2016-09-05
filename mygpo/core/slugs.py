@@ -2,24 +2,6 @@ from itertools import count
 
 from django.utils.text import slugify
 
-from mygpo.podcasts.models import Slug, Episode
-
-
-# TODO: move to feed-downloader?
-def assign_missing_episode_slugs(podcast):
-    common_title = podcast.get_common_episode_title()
-
-    episodes = Episode.objects.filter(podcast=podcast, slugs__isnull=True)
-
-    for episode in episodes:
-        try:
-            slug = EpisodeSlug(episode, common_title).get_slug()
-        except ValueError:
-            return
-
-        if slug:
-            episode.set_slug(slug)
-
 
 class SlugGenerator(object):
     """ Generates a unique slug for an object """
@@ -39,45 +21,32 @@ class SlugGenerator(object):
         base_slug = slugify(obj.title)
         return base_slug
 
+    def __iter__(self):
+        """ Generates possible slugs
 
-    @staticmethod
-    def _get_existing_slugs():
-        return []
+        The consumer can can consume until it get's an unused one """
 
-
-    def get_slug(self):
-        """ Gets existing slugs and appends numbers until slug is unique """
         if not self.base_slug:
-            return None
+            raise StopIteration
 
-        existing_slugs = self._get_existing_slugs()
-
-        if not self.base_slug in existing_slugs:
-            return str(self.base_slug)
+        # first we try with the base slug
+        yield str(self.base_slug)
 
         for n in count(1):
             tmp_slug = '%s-%d' % (self.base_slug, n)
-            if not tmp_slug in existing_slugs:
-                # slugify returns SafeUnicode, we need a plain string
-                return str(tmp_slug)
-
-    def _get_existing_slugs(self):
-        query = Slug.objects.filter(scope=self.obj.scope,
-                                    slug__startswith=self.base_slug)
-        return [s.slug for s in query]
+            # slugify returns SafeUnicode, we need a plain string
+            yield str(tmp_slug)
 
 
-class PodcastGroupSlug(SlugGenerator):
+class PodcastGroupSlugs(SlugGenerator):
     """ Generates slugs for Podcast Groups """
-
     pass
 
 
-class PodcastSlug(PodcastGroupSlug):
+class PodcastSlugs(PodcastGroupSlugs):
     """ Generates slugs for Podcasts """
 
-    @staticmethod
-    def _get_base_slug(podcast):
+    def _get_base_slug(self, podcast):
         base_slug = SlugGenerator._get_base_slug(podcast)
 
         if not base_slug:
@@ -92,16 +61,14 @@ class PodcastSlug(PodcastGroupSlug):
         return base_slug
 
 
-class EpisodeSlug(SlugGenerator):
+class EpisodeSlugs(SlugGenerator):
     """ Generates slugs for Episodes """
 
     def __init__(self, episode, common_title):
         self.common_title = common_title
-        super(EpisodeSlug, self).__init__(episode)
-        self.podcast_id = episode.podcast
+        super().__init__(episode)
 
     def _get_base_slug(self, obj):
-
         number = obj.get_episode_number(self.common_title)
         if number:
             return str(number)
