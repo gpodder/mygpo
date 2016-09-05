@@ -103,12 +103,12 @@ TEMPLATES = [{
                 'mygpo.web.google.adsense',
                 # make the debug variable available in templates
                 # https://docs.djangoproject.com/en/dev/ref/templates/api/#django-core-context-processors-debug
-                'django.core.context_processors.debug',
+                'django.template.context_processors.debug',
 
                 # required so that the request obj can be accessed from
                 # templates. this is used to direct users to previous
                 # page after login
-                'django.core.context_processors.request',
+                'django.template.context_processors.request',
         ],
         'loaders': [
             ('django.template.loaders.cached.Loader', [
