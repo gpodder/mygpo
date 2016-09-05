@@ -35,7 +35,9 @@ class Migration(migrations.Migration):
         # UserSettings for Users have no content_object; the following ensures
         # there can only be one such entry per user
         migrations.RunSQL(
-            'CREATE UNIQUE INDEX usersettings_unique_null ON usersettings_usersettings (user_id) WHERE content_type_id IS NULL;',
-            'DROP INDEX usersettings_unique_null;'
+            [('CREATE UNIQUE INDEX usersettings_unique_null '
+              'ON usersettings_usersettings (user_id) '
+              'WHERE content_type_id IS NULL;', None)],
+            [('DROP INDEX IF EXISTS usersettings_unique_null;', None)],
         )
     ]
