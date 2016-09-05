@@ -152,7 +152,7 @@ def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
     for alias_object in alias_objects:
         # Migrate all foreign key references from alias object to
         # primary object.
-        for related_object in alias_object._meta.get_all_related_objects():
+        for related_object in _get_all_related_objects(alias_object):
             # The variable name on the alias_object model.
             alias_varname = related_object.get_accessor_name()
             # The variable name on the related model.
@@ -165,7 +165,7 @@ def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
 
         # Migrate all many to many references from alias object to
         # primary object.
-        related = alias_object._meta.get_all_related_many_to_many_objects()
+        related = _get_all_related_many_to_many_objects(alias_object)
         for related_many_object in related:
             alias_varname = related_many_object.get_accessor_name()
             obj_varname = related_many_object.field.name
@@ -218,6 +218,21 @@ def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
             alias_object.delete()
     primary_object.save()
     return primary_object
+
+
+def _get_all_related_objects(obj):
+    return [
+        f for f in obj._meta.get_fields()
+        if (f.one_to_many or f.one_to_one) and
+        f.auto_created and not f.concrete
+    ]
+
+
+def _get_all_related_many_to_many_objects(obj):
+    return [
+        f for f in obj._meta.get_fields(include_hidden=True)
+        if f.many_to_many and f.auto_created
+    ]
 
 
 def reassigned(obj, new):
