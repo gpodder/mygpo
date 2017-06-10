@@ -23,6 +23,7 @@ Name                  Status     gpodder.net features                   License 
 `Podcatcher Deluxe`_  Active     Sync of subscriptions and actions      GPL 3
 `Podcast Addict`_     Active     none                                             `Podcast Addict export script`_
 `Podkicker`_          Active     none
+`SoundWaves`_         Active     Subscriptions sync                     GPL 3
 ====================  =========  =====================================  ========  ==================================================
 
 
@@ -34,7 +35,7 @@ Name                       Status        gpodder.net features                   
 =========================  ============  ======================================  ==========  ===============
 `gPodder`_                 Active        All                                     GPL         `gPodder Docs`_
 `Clementine`_              Active        Directory, Search, Subscription sync    GPL
-`Mopidy-Podcast-GPodder`_  Development   Directory, Search                       Apache 2.0
+`Mopidy-Podcast-GPodder`_  Deprecated    Directory, Search                       Apache 2.0
 =========================  ============  ======================================  ==========  ===============
 
 
@@ -148,6 +149,7 @@ Nokia Podcasting       -       Subscription service    GPL         `Podcasting D
 .. _Podcast Addict: https://play.google.com/store/apps/details?id=com.bambuna.podcastaddict
 .. _Podcast Addict export script: http://www.mameau.com/gpodder-podcast-import-script/
 .. _Podkicker: https://play.google.com/store/apps/details?id=ait.podka&hl=de
+.. _SoundWaves: https://github.com/bottiger/SoundWaves
 .. _Mopidy-Podcast-GPodder: http://github.com/tkem/mopidy-podcast-gpodder/
 .. _Amarok: http://amarok.kde.org/
 .. _BashPodder: http://lincgeek.org/bashpodder/
