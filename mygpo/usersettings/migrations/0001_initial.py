@@ -3,7 +3,6 @@
 
 from django.db import models, migrations
 from django.conf import settings
-import uuidfield.fields
 
 
 class Migration(migrations.Migration):
@@ -19,7 +18,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('settings', models.TextField(default='{}')),
-                ('object_id', uuidfield.fields.UUIDField(max_length=32, null=True, blank=True)),
+                ('object_id', models.UUIDField(max_length=32, null=True, blank=True)),
                 ('content_type', models.ForeignKey(blank=True, to='contenttypes.ContentType', null=True)),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],
