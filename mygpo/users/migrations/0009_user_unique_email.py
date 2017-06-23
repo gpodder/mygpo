@@ -13,7 +13,12 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunSQL(
-            sql = 'CREATE UNIQUE INDEX django_auth_unique_email ON auth_user (email);',
-            reverse_sql = 'DROP INDEX IF EXISTS django_auth_unique_email;',
+            sql=[
+                ('CREATE UNIQUE INDEX django_auth_unique_email '
+                 'ON auth_user (email);', None)
+            ],
+            reverse_sql=[
+                ('DROP INDEX IF EXISTS django_auth_unique_email;', None)
+            ],
         )
     ]
