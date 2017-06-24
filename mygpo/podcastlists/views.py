@@ -12,7 +12,7 @@ from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext as _
-from django.views.generic.base import View
+from django.views import View
 
 from mygpo.podcasts.models import Podcast, PodcastGroup
 from mygpo.podcastlists.models import PodcastList, PodcastListEntry

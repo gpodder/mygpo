@@ -28,7 +28,8 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import never_cache
 from django.template.loader import render_to_string
-from django.views.generic.base import View, TemplateView
+from django.views import View
+from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.core.urlresolvers import reverse
 from django.utils.http import is_safe_url

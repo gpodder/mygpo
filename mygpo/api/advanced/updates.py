@@ -23,7 +23,7 @@ from django.contrib.sites.requests import RequestSite
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 from django.utils.decorators import method_decorator
-from django.views.generic.base import View
+from django.views import View
 
 from mygpo.podcasts.models import Episode
 from mygpo.api.httpresponse import JsonResponse

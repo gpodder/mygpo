@@ -7,7 +7,7 @@
 import logging
 
 from django.http import HttpResponseNotFound, HttpResponse
-from django.views.generic.base import View
+from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
 from mygpo.pubsub.models import HubSubscription
