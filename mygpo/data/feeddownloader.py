@@ -229,6 +229,11 @@ def _update_podcast(podcast, parsed, episodes, max_episode_order):
     if not found:
         podcast.logo_url = None
 
+
+    # TODO: encapsulate
+    podcast.search_vector = SearchVector('title', weight='A') + \
+                            SearchVector('description', weight='B')
+
     # The podcast is always saved (not just when there are changes) because
     # we need to record the last update
     logger.info('Saving podcast.')

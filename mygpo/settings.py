@@ -139,6 +139,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'django.contrib.postgres',
     'djcelery',
     'mygpo.core',
     'mygpo.podcasts',
