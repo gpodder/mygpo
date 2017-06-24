@@ -45,7 +45,7 @@ from mygpo.publisher.models import PublishedPodcast
 @vary_on_cookie
 @cache_control(private=True)
 def home(request):
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         return dashboard(request)
     else:
         return welcome(request)

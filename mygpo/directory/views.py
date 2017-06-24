@@ -378,7 +378,7 @@ class FlattrPodcastList(PodcastListView):
 
     def get_context_data(self, num=100):
         context = super(FlattrPodcastList, self).get_context_data()
-        context['flattr_auth'] = (self.request.user.is_authenticated()
+        context['flattr_auth'] = (self.request.user.is_authenticated
                    #  and bool(self.request.user.get_wksetting(FLATTR_TOKEN))
                         )
         return context

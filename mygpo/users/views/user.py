@@ -62,7 +62,7 @@ class LoginView(View):
         """ Shows the login page """
 
         # Do not show login page for already-logged-in users
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             return HttpResponseRedirect(DEFAULT_LOGIN_REDIRECT)
 
         return render(request, 'login.html', {
@@ -201,7 +201,7 @@ class GoogleLoginCallback(TemplateView):
         email = self._get_email(credentials.token_response)
 
         # Connect account
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             request.user.google_email = email
             request.user.save()
             messages.success(request, _('Your account has been connected with '
