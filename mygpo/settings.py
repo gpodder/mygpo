@@ -67,7 +67,7 @@ SITE_ID = 1
 # to load the internationalization machinery.
 USE_I18N = True
 
-STATIC_ROOT = 'staticfiles'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/media/'
 
 STATICFILES_DIRS = (
@@ -112,6 +112,7 @@ TEMPLATES = [{
 
 
 MIDDLEWARE_CLASSES = (
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
