@@ -4,16 +4,13 @@ MAINTAINER Stefan Kögl <stefan@skoegl.net>
 # use bash instead of built-in sh, because it does not support "source" during build
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
-# install all packaged dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    python2.7 \
-    python2.7-dev \
-    python-virtualenv \
-    libpq-dev \
-    libjpeg-dev \
-    zlib1g-dev \
-    libwebp-dev
+RUN apt-get update
+
+# install Docker dependencies
+RUN apt-get install -y git virtualenv
+
+# install all packaged runtime dependencies
+RUN yes | make install-deps
 
 # create log directories
 RUN mkdir -p /var/log/gunicorn
