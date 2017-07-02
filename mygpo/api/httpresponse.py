@@ -15,9 +15,9 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from django.http import HttpResponse
+import json
 
-from mygpo.core.json import json
+from django.http import HttpResponse
 
 
 class JsonResponse(HttpResponse):

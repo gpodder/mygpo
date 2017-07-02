@@ -25,7 +25,8 @@ the web and to export a list of podcast objects to valid OPML 1.1 files.
 import os
 
 import xml.dom.minidom
-import email.Utils
+from xml.parsers.expat import ExpatError
+import email.utils
 
 
 class Importer(object):
@@ -37,7 +38,11 @@ class Importer(object):
         containing podcast metadata.
         """
         self.items = []
-        doc = xml.dom.minidom.parseString(content)
+
+        try:
+            doc = xml.dom.minidom.parseString(content)
+        except ExpatError as e:
+            raise ValueError from e
 
         for outline in doc.getElementsByTagName('outline'):
             if outline.getAttribute('type') in self.VALID_TYPES and \
@@ -72,7 +77,7 @@ class Exporter(object):
 
     def __init__(self, title='my.gpodder.org Subscriptions'):
         self.title = title
-        self.created = email.Utils.formatdate(localtime=True)
+        self.created = email.utils.formatdate(localtime=True)
 
     def generate(self, channels):
         """

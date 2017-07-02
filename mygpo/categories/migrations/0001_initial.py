@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 from django.db import models, migrations
 import datetime
@@ -7,7 +7,7 @@ import datetime
 
 class Migration(migrations.Migration):
 
-    replaces = [(b'categories', '0001_initial'), (b'categories', '0002_auto_20140927_1501'), (b'categories', '0003_category_num_entries'), (b'categories', '0004_auto_20140927_1540')]
+    replaces = [('categories', '0001_initial'), ('categories', '0002_auto_20140927_1501'), ('categories', '0003_category_num_entries'), ('categories', '0004_auto_20140927_1540')]
 
     dependencies = [
         ('podcasts', '0029_episode_index_toplist'),
@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('tag', models.SlugField(unique=True)),
-                ('category', models.ForeignKey(related_name=b'tags', to='categories.Category')),
+                ('category', models.ForeignKey(related_name='tags', to='categories.Category')),
             ],
             options={
             },
@@ -71,7 +71,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='categoryentry',
             name='category',
-            field=models.ForeignKey(related_name=b'entries', to='categories.Category'),
+            field=models.ForeignKey(related_name='entries', to='categories.Category'),
         ),
         migrations.AlterField(
             model_name='categoryentry',

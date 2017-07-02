@@ -23,7 +23,6 @@ from django.test import TestCase
 import mygpo.publisher.utils
 
 
-def suite():
-    suite = unittest.TestSuite()
-    suite.addTest(doctest.DocTestSuite(mygpo.publisher.utils))
-    return suite
+def load_tests(loader, tests, ignore):
+    tests.addTest(doctest.DocTestSuite(mygpo.publisher.utils))
+    return tests

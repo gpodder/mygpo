@@ -49,17 +49,10 @@
 {% endblock %}
 
 {% block sidebar %}
-  {% if sponsored_podcast %}
-    <div class="well">
-     <h4>{{ sponsored_podcast.title }} <small>(Supporting Podcast)</small></h4>
-     <div>{{ sponsored_podcast.podcast|podcast_logo }}</div>
-     <div style="margin-left: 40px">{{ sponsored_podcast.text|truncatewords:"20"}}</div>
-     <br style="clear: left;"/>
-     <small><a href="{% url "advertise" %}">advertise here</a></small>
-    </div>
-  {% endif %}
 
+ {% include "podcast-ad-box.html" with podcast_ad=podcast_ad only %}
 
+ {% if random_podcast %}
  {% cache 3600 random_podcast_box %}
    <div class="well">
 
@@ -82,6 +75,7 @@
 
    </div>
  {% endcache %}
+ {% endif %}
 
   <div class="well">
    <h4>{% blocktrans %}Explore {{ site }}{% endblocktrans %}</h4>

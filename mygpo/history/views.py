@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 
 from mygpo.users.models import Client
 from mygpo.history.models import HistoryEntry
-from mygpo.web.views.podcast import slug_decorator, id_decorator
+from mygpo.podcasts.views.podcast import slug_decorator, id_decorator
 
 @vary_on_cookie
 @cache_control(private=True)
@@ -16,7 +16,7 @@ def history(request, count=15, uid=None):
     client = None
 
     history = HistoryEntry.objects.filter(user=user)\
-                                  .select_related('podcast', 'episode')
+                                  .select_related('podcast')
 
     if uid:
         try:

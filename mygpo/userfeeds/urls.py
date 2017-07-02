@@ -1,5 +1,12 @@
-from django.conf.urls import *
+from django.conf.urls import url
 
-urlpatterns = patterns('mygpo.userfeeds.views',
- url(r'^user/(?P<username>[\w.+-]+)/favorites.xml$', 'favorite_feed', name='favorites-feed'),
-)
+from . import views
+
+
+urlpatterns = [
+
+    url(r'^user/(?P<username>[\w.+-]+)/favorites.xml$',
+        views.favorite_feed,
+        name='favorites-feed'),
+
+]

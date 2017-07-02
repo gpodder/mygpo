@@ -1,7 +1,6 @@
 from django.core.urlresolvers import reverse
 
-from mygpo.podcasts.models import Episode
-from mygpo.db.couchdb.episode_state import favorite_episode_ids_for_user
+from mygpo.favorites.models import FavoriteEpisode
 
 
 
@@ -14,9 +13,7 @@ class FavoriteFeed():
         return '%s\'s Favorite Episodes' % self.user.username
 
     def get_episodes(self):
-        favorite_ids = favorite_episode_ids_for_user(self.user)
-        return Episode.objects.filter(id__in=favorite_ids)\
-                              .select_related('podcast')
+        return FavoriteEpisode.episodes_for_user(self.user)
 
     def language(self):
         """

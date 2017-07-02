@@ -20,7 +20,7 @@
 # taken from gPodder :)
 
 import re
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 def is_video_link(url):
     return (get_youtube_id(url) is not None)
@@ -50,7 +50,7 @@ def get_real_cover(url):
             continue
         username = m.group(1)
         api_url = 'http://gdata.youtube.com/feeds/api/users/%s?v=2' % username
-        data = urllib.urlopen(api_url).read()
+        data = urllib.request.urlopen(api_url).read()
         match = re.search('<media:thumbnail url=[\'"]([^\'"]+)[\'"]/>', data)
         if match is not None:
             return match.group(1)

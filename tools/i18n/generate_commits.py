@@ -51,8 +51,8 @@ for filename in filenames:
 
     if translators and language is not None:
         if len(translators) != 1:
-            print '# Warning: %d other translators' % (len(translators) - 1,)
-        print 'git commit --author="%s" --message="Updated %s translation" %s' % (translators[0], language, filename)
+            print('# Warning: %d other translators' % (len(translators) - 1,))
+        print('git commit --author="%s" --message="Updated %s translation" %s' % (translators[0], language, filename))
     else:
-        print '# FIXME (could not parse):', '!'*10, filename, '!'*10
+        print('# FIXME (could not parse):', '!'*10, filename, '!'*10)
 

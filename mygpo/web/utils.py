@@ -1,4 +1,5 @@
 import re
+import math
 import string
 import collections
 from datetime import datetime
@@ -19,11 +20,11 @@ def get_accepted_lang(request):
     """ returns a list of language codes accepted by the HTTP request """
 
     lang_str = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
-    lang_str = filter(lambda c: c in string.letters+',', lang_str)
+    lang_str = ''.join([c for c in lang_str if c in string.ascii_letters+','])
     langs = lang_str.split(',')
     langs = [s[:2] for s in langs]
-    langs = map(str.strip, langs)
-    langs = filter(None, langs)
+    langs = list(map(str.strip, langs))
+    langs = [_f for _f in langs if _f]
     return list(set(langs))
 
 
@@ -42,8 +43,8 @@ def sanitize_language_codes(ls):
     >>> sanitize_language_codes(['de-at', 'de-ch'])
     ['de']
 
-    >>> sanitize_language_codes(['de-at', 'en', 'en-gb', '(asdf', 'Deutsch'])
-    ['de', 'en']
+    >>> set(sanitize_language_codes(['de-at', 'en', 'en-gb', '(asdf', 'Deutsch'])) == {'de', 'en'}
+    True
     """
 
     ls = [sanitize_language_code(l) for l in ls if l and RE_LANG.match(l)]
@@ -75,6 +76,9 @@ def get_page_list(start, total, cur, show_max):
     >>> get_page_list(1, 100, 1, 10)
     [1, 2, 3, 4, 5, 6, '...', 98, 99, 100]
 
+    >>> get_page_list(1, 995/10, 1, 10)
+    [1, 2, 3, 4, 5, 6, '...', 98, 99, 100]
+
     >>> get_page_list(1, 100, 50, 10)
     [1, '...', 48, 49, 50, 51, '...', 98, 99, 100]
 
@@ -85,29 +89,33 @@ def get_page_list(start, total, cur, show_max):
     [1, 2, 3]
     """
 
+    # if we get "total" as a float (eg from total_entries / entries_per_page)
+    # we round up
+    total = math.ceil(total)
+
     if show_max >= (total - start):
-        return range(start, total+1)
+        return list(range(start, total+1))
 
     ps = []
     if (cur - start) > show_max / 2:
-        ps.extend(range(start, show_max / 4))
+        ps.extend(list(range(start, int(show_max / 4))))
         ps.append('...')
-        ps.extend(range(cur - show_max / 4, cur))
+        ps.extend(list(range(cur - int(show_max / 4), cur)))
 
     else:
-        ps.extend(range(start, cur))
+        ps.extend(list(range(start, cur)))
 
     ps.append(cur)
 
     if (total - cur) > show_max / 2:
         # for the first pages, show more pages at the beginning
-        add = show_max / 2 - len(ps)
-        ps.extend(range(cur + 1, cur + show_max / 4 + add))
+        add = math.ceil(show_max / 2 - len(ps))
+        ps.extend(list(range(cur + 1, cur + int(show_max / 4) + add)))
         ps.append('...')
-        ps.extend(range(total - show_max / 4, total + 1))
+        ps.extend(list(range(total - int(show_max / 4), total + 1)))
 
     else:
-        ps.extend(range(cur + 1, total + 1))
+        ps.extend(list(range(cur + 1, total + 1)))
 
     return ps
 
@@ -124,8 +132,8 @@ def process_lang_params(request):
 
 
 def symbian_opml_changes(podcast):
-    podcast.description = (podcast.title or '') + '\n' + \
-                          (podcast.description or '')
+    podcast.description = podcast.display_title + '\n' + \
+                         (podcast.description or '')
     return podcast
 
 
@@ -137,10 +145,7 @@ def maintenance(request, *args, **kwargs):
 
 
 def get_podcast_link_target(podcast, view_name='podcast', add_args=[]):
-    """ Returns the link-target for a Podcast, preferring slugs over Ids
-
-    automatically distringuishes between relational Podcast objects and
-    CouchDB-based Podcasts """
+    """ Returns the link-target for a Podcast, preferring slugs over Ids """
 
     # we prefer slugs
     if podcast.slug:
@@ -156,30 +161,15 @@ def get_podcast_link_target(podcast, view_name='podcast', add_args=[]):
 
 
 def get_podcast_group_link_target(group, view_name, add_args=[]):
-    """ Returns the link-target for a Podcast group, preferring slugs over Ids
-
-    automatically distringuishes between relational Podcast objects and
-    CouchDB-based Podcasts """
-
-    # we prefer slugs
-    if group.slug:
-        args = [group.slug]
-        view_name = '%s-slug-id' % view_name
-
-    # as a fallback we use CouchDB-IDs
-    else:
-        args = [group._id]
-        view_name = '%s-slug-id' % view_name
-
+    """ the link-target for a Podcast group, preferring slugs over Ids """
+    args = [group.slug]
+    view_name = '%s-slug-id' % view_name
     return reverse(view_name, args=args + add_args)
 
 
 def get_episode_link_target(episode, podcast, view_name='episode',
                             add_args=[]):
-    """ Returns the link-target for an Episode, preferring slugs over Ids
-
-    automatically distringuishes between relational Episode objects and
-    CouchDB-based Episodes """
+    """ Returns the link-target for an Episode, preferring slugs over Ids """
 
     # prefer slugs
     if episode.slug:
@@ -266,23 +256,23 @@ def hours_to_str(hours_total):
     """ returns a human-readable string representation of some hours
 
     >>> hours_to_str(1)
-    u'1 hour'
+    '1 hour'
 
     >>> hours_to_str(5)
-    u'5 hours'
+    '5 hours'
 
     >>> hours_to_str(100)
-    u'4 days, 4 hours'
+    '4 days, 4 hours'
 
     >>> hours_to_str(960)
-    u'5 weeks, 5 days'
+    '5 weeks, 5 days'
 
     >>> hours_to_str(961)
-    u'5 weeks, 5 days, 1 hour'
+    '5 weeks, 5 days, 1 hour'
     """
 
-    weeks = hours_total / 24 / 7
-    days = hours_total / 24 % 7
+    weeks = int(hours_total / 24 / 7)
+    days = int(hours_total / 24) % 7
     hours = hours_total % 24
 
     strs = []

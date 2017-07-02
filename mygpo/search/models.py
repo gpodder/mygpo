@@ -1,6 +1,6 @@
 """ Wrappers for the results of a search """
 
-from __future__ import unicode_literals
+
 
 
 class PodcastResult(object):
@@ -27,3 +27,7 @@ class PodcastResult(object):
 
     def get_id(self):
         return self.id
+
+    @property
+    def display_title(self):
+        return self.title

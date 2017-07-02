@@ -9,7 +9,7 @@ from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
 
 
-@celery.task(max_retries=5, default_retry_delay=60)
+@celery.task
 def update_suggestions(user, max_suggestions=15):
     """ updates the suggestions of a user """
     logger.info('Updating suggestions of user {user.username}'.format(

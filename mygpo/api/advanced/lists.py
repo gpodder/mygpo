@@ -15,6 +15,7 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+import uuid
 from functools import partial
 from datetime import datetime
 
@@ -22,7 +23,7 @@ from django.http import HttpResponse, HttpResponseBadRequest, \
      HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from django.core.urlresolvers import reverse
-from django.contrib.sites.models import RequestSite
+from django.contrib.sites.requests import RequestSite
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify
 from django.views.decorators.cache import never_cache
@@ -35,7 +36,7 @@ from mygpo.api.advanced.directory import podcast_data
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.podcastlists.models import PodcastList
 from mygpo.api.basic_auth import require_valid_user, check_username
-from mygpo.decorators import allowed_methods, repeat_on_conflict, cors_origin
+from mygpo.decorators import allowed_methods, cors_origin
 from mygpo.api.simple import parse_subscription, format_podcast_list, \
      check_format
 from mygpo.podcastlists.views import list_decorator
@@ -65,6 +66,7 @@ def create(request, username, format):
         user=request.user,
         slug=slug,
         defaults={
+            'id': uuid.uuid1(),
             'title': title,
             'slug': slug,
             'created': datetime.utcnow(),
@@ -75,7 +77,7 @@ def create(request, username, format):
     if not created:
         return HttpResponse('List already exists', status=409)
 
-    urls = parse_subscription(request.body, format)
+    urls = parse_subscription(request.body.decode('utf-8'), format)
     podcasts = [Podcast.objects.get_or_create_for_url(url) for url in urls]
 
     for podcast in podcasts:
@@ -116,7 +118,7 @@ def get_lists(request, username):
 
     get_data = partial(_get_list_data, username=user.username,
                 domain=site.domain)
-    lists_data = map(get_data, lists)
+    lists_data = list(map(get_data, lists))
 
     return JsonResponse(lists_data)
 
@@ -126,18 +128,16 @@ def get_lists(request, username):
 @never_cache
 @allowed_methods(['GET', 'PUT', 'DELETE'])
 @cors_origin()
-def podcast_list(request, *args, **kwargs):
+def podcast_list(request, username, slug, format):
 
     handlers = dict(
             GET = get_list,
             PUT = update_list,
             DELETE = delete_list,
         )
+    return handlers[request.method](request, username, slug, format)
 
-    return handlers[request.method](request, *args, **kwargs)
 
-
-@never_cache
 @list_decorator(must_own=False)
 @cors_origin()
 def get_list(request, plist, owner, format):
@@ -160,48 +160,20 @@ def get_list(request, plist, owner, format):
             xml_template='podcasts.xml', request=request)
 
 
-@never_cache
-@require_valid_user
 @list_decorator(must_own=True)
 @cors_origin()
 def update_list(request, plist, owner, format):
     """ Replaces the podcasts in the list and returns 204 No Content """
-
-    is_own = owner == request.uuser
-
-    if not is_own:
-        return HttpResponseForbidden()
-
-    urls = parse_subscription(request.body, format)
+    urls = parse_subscription(request.body.decode('utf-8'), format)
     podcasts = [Podcast.objects.get_or_create_for_url(url) for url in urls]
-    podcast_ids = [podcast.id.hex for podcast in podcasts]
-
-    @repeat_on_conflict(['podcast_ids'])
-    def _update(plist, podcast_ids):
-        plist.podcasts = podcast_ids
-        plist.save()
-
-    _update(plist=plist, podcast_ids=podcast_ids)
+    plist.set_entries(podcasts)
 
     return HttpResponse(status=204)
 
 
-@never_cache
-@require_valid_user
 @list_decorator(must_own=True)
 @cors_origin()
 def delete_list(request, plist, owner, format):
     """ Delete the podcast list and returns 204 No Content """
-
-    is_own = owner == request.user
-
-    if not is_own:
-        return HttpResponseForbidden()
-
-    @repeat_on_conflict(['plist'])
-    def _delete(plist):
-        plist.delete()
-
-    _delete(plist=plist)
-
+    plist.delete()
     return HttpResponse(status=204)

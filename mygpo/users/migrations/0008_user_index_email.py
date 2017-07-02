@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 from django.db import models, migrations
 import django.db.models.deletion
@@ -14,7 +14,12 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunSQL(
-            sql = 'CREATE INDEX django_auth_user_email ON auth_user (email, username);',
-            reverse_sql = 'DROP INDEX IF EXISTS django_auth_user_email;',
+            sql=[
+                ('CREATE INDEX django_auth_user_email '
+                 'ON auth_user (email, username);', None)
+            ],
+            reverse_sql=[
+                ('DROP INDEX IF EXISTS django_auth_user_email;', None)
+            ],
         )
     ]

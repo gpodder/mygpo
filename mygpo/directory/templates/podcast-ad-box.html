@@ -1,0 +1,28 @@
+{% load cache %}
+{% load i18n %}
+{% load podcasts %}
+
+ {% if podcast_ad %}
+ {% cache 3600 podcast_ad_box %}
+   <div class="well">
+
+   <h4><small>{% trans "Sponsoring Podcast" %}</small></h4>
+
+
+   <a href="{% podcast_link_target podcast_ad %}">
+    <div id="podcastlogo">{{ podcast_ad|podcast_logo_medium }}</div>
+   </a>
+
+   <h4>{{ podcast_ad.title }}</h4>
+
+   <p class="description">
+    {{ podcast_ad.description|default:""|truncatewords:"50" }}
+   </p>
+
+   <p>
+    <a href="{% podcast_link_target podcast_ad %}">{% trans "more..." %}</a>
+   </p>
+
+   </div>
+ {% endcache %}
+ {% endif %}

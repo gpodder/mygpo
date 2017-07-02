@@ -23,7 +23,7 @@ from django.conf import settings
 
 from mygpo.podcasts.models import Podcast
 from mygpo.subscriptions.models import Subscription
-from mygpo import pubsub
+from mygpo.pubsub import utils
 
 logger = logging.getLogger(__name__)
 
@@ -81,4 +81,4 @@ def subscribe_at_hub(podcast):
 
     logger.info('subscribing to {podcast} at {hub}.'.format(podcast=podcast,
                                                            hub=podcast.hub))
-    pubsub.subscribe(podcast, podcast.url, podcast.hub, base_url)
+    utils.subscribe(podcast, podcast.url, podcast.hub, base_url)

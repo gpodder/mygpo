@@ -1,5 +1,5 @@
 from functools import wraps
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, \
@@ -19,17 +19,19 @@ from mygpo.publisher.auth import require_publisher, is_publisher
 from mygpo.publisher.forms import SearchPodcastForm
 from mygpo.publisher.utils import listener_data, episode_listener_data, \
          check_publisher_permission, subscriber_data
-from mygpo.web.heatmap import EpisodeHeatmap
-from mygpo.web.views.episode import (slug_decorator as episode_slug_decorator,
-    id_decorator as episode_id_decorator)
-from mygpo.web.views.podcast import (slug_decorator as podcast_slug_decorator,
-    id_decorator as podcast_id_decorator)
+from mygpo.podcasts.views.episode import (
+    slug_decorator as episode_slug_decorator,
+    id_decorator as episode_id_decorator
+)
+from mygpo.podcasts.views.podcast import (
+    slug_decorator as podcast_slug_decorator,
+    id_decorator as podcast_id_decorator
+)
 from mygpo.web.utils import get_podcast_link_target, normalize_twitter, \
      get_episode_link_target
-from django.contrib.sites.models import RequestSite
+from django.contrib.sites.requests import RequestSite
 from mygpo.data.tasks import update_podcasts
 from mygpo.decorators import requires_token, allowed_methods
-from mygpo.db.couchdb.episode_state import episode_listener_counts
 from mygpo.pubsub.models import HubSubscription
 
 
@@ -83,9 +85,7 @@ def podcast(request, podcast):
     timeline_data = listener_data([podcast])
     subscription_data = subscriber_data([podcast])[-20:]
 
-    update_token = request.user.publisher_update_token
-
-    heatmap = EpisodeHeatmap(podcast.get_id())
+    update_token = request.user.profile.get_token('publisher_update_token')
 
     try:
         pubsubscription = HubSubscription.objects.get(topic_url=podcast.url)
@@ -93,7 +93,7 @@ def podcast(request, podcast):
         pubsubscription = None
 
     site = RequestSite(request)
-    feedurl_quoted = urllib.quote(podcast.url)
+    feedurl_quoted = urllib.parse.quote(podcast.url)
 
     return render(request, 'publisher/podcast.html', {
         'site': site,
@@ -103,7 +103,6 @@ def podcast(request, podcast):
         'timeline_data': timeline_data,
         'subscriber_data': subscription_data,
         'update_token': update_token,
-        'heatmap': heatmap,
         'feedurl_quoted': feedurl_quoted,
         'pubsubscription': pubsubscription,
         })
@@ -172,9 +171,9 @@ def new_update_token(request, username):
 def update_published_podcasts(request, username):
     User = get_user_model()
     user = get_object_or_404(User, username=username)
-    published_podcasts = Podcast.objects.filter(id__in=user.published_objects)
+    published_podcasts = [pp.podcast for pp in user.publishedpodcast_set.all()]
     update_podcasts.delay([podcast.url for podcast in published_podcasts])
-    return HttpResponse('Updated:\n' + '\n'.join([p.url for p in published_podcasts]), mimetype='text/plain')
+    return HttpResponse('Updated:\n' + '\n'.join([p.url for p in published_podcasts]), content_type='text/plain')
 
 
 @vary_on_cookie
@@ -187,7 +186,8 @@ def episodes(request, podcast):
 
     episodes = Episode.objects.filter(podcast=podcast).select_related('podcast').prefetch_related('slugs', 'podcast__slugs')
 
-    max_listeners = max([e.listeners for e in episodes] + [0])
+    listeners = map(None, (e.listeners for e in episodes))
+    max_listeners = max(listeners, default=0)
 
     return render(request, 'publisher/episodes.html', {
         'podcast': podcast,
@@ -218,9 +218,6 @@ def episode(request, episode):
 
     timeline_data = list(episode_listener_data(episode))
 
-    heatmap = EpisodeHeatmap(episode.podcast, episode.id,
-              duration=episode.duration)
-
     return render(request, 'publisher/episode.html', {
         'is_secure': request.is_secure(),
         'domain': site.domain,
@@ -228,7 +225,6 @@ def episode(request, episode):
         'podcast': podcast,
         'form': form,
         'timeline_data': timeline_data,
-        'heatmap': heatmap,
         })
 
 
@@ -256,7 +252,7 @@ def update_episode_slug(request, episode):
 
             other_episode.remove_slug(new_slug)
             messages.warning(request,
-                _(u'Removed slug {slug} from {episode}'.format(
+                _('Removed slug {slug} from {episode}'.format(
                     slug=new_slug, episode=other_episode.title))
             )
 
@@ -312,3 +308,4 @@ update_podcast_id      = podcast_id_decorator(update_podcast)
 save_podcast_id        = podcast_id_decorator(save_podcast)
 
 group_slug               = group_id_decorator(group)
+group_id                 = group_id_decorator(group)

@@ -1,8 +1,7 @@
 # encoding: utf8
-from __future__ import unicode_literals
+
 
 from django.db import models, migrations
-import uuidfield.fields
 
 
 class Migration(migrations.Migration):
@@ -15,11 +14,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='slug',
             name='scope',
-            field=uuidfield.fields.UUIDField(max_length=32, null=True, db_index=True),
+            field=models.UUIDField(max_length=32, null=True, db_index=True),
         ),
         migrations.AlterField(
             model_name='url',
             name='scope',
-            field=uuidfield.fields.UUIDField(max_length=32, null=True, db_index=True),
+            field=models.UUIDField(max_length=32, null=True, db_index=True),
         ),
     ]

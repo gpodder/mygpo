@@ -15,12 +15,11 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-import unittest
 import doctest
 
-from django.test import TestCase
+import mygpo.data.mimetype
 
 
-def suite():
-    suite = unittest.TestSuite()
-    return suite
+def load_tests(loader, tests, ignore):
+    tests.addTest(doctest.DocTestSuite(mygpo.data.mimetype))
+    return tests
