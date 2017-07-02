@@ -44,7 +44,7 @@ def get_intOrNone(name, default):
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-DEBUG = get_bool(os.getenv('DEBUG', True))
+DEBUG = get_bool('DEBUG', False)
 
 
 ADMINS = re.findall(r'\s*([^<]+) <([^>]+)>\s*', os.getenv('ADMINS', ''))
@@ -241,7 +241,7 @@ FLICKR_API_KEY = os.getenv('FLICKR_API_KEY', '')
 SOUNDCLOUD_CONSUMER_KEY = os.getenv('SOUNDCLOUD_CONSUMER_KEY', '')
 
 
-MAINTENANCE = get_bool(os.getenv('MAINTENANCE', False))
+MAINTENANCE = get_bool('MAINTENANCE', False)
 
 
 
