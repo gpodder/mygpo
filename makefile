@@ -9,7 +9,7 @@ test:
 	coverage report
 
 clean:
-	find -name "*.pyc" -exec rm '{}' \;
+	git clean -fX
 
 
 .PHONY: all help test clean unittest coverage
