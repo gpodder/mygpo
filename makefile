@@ -11,6 +11,10 @@ test:
 clean:
 	git clean -fX
 
+install-deps:
+	sudo apt-get install libpq-dev libjpeg-dev zlib1g-dev libwebp-dev \
+		build-essential python3-dev virtualenv
 
-.PHONY: all help test clean unittest coverage
+
+.PHONY: all help test clean unittest coverage install-deps
 
