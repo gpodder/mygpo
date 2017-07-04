@@ -13,7 +13,7 @@ from django.http import HttpResponseRedirect
 from django.template.loader import render_to_string
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
-from django.contrib.sites.models import RequestSite
+from django.contrib.sites.requests import RequestSite
 from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.conf import settings
@@ -30,7 +30,6 @@ from mygpo.users.models import UserProxy
 from mygpo.publisher.models import PublishedPodcast
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.celery import celery
-from mygpo.db.couchdb import get_userdata_database
 
 
 class InvalidPodcast(Exception):
@@ -58,10 +57,6 @@ class HostInfo(AdminView):
         hostname = socket.gethostname()
         django_version = django.VERSION
 
-        main_db = get_userdata_database()
-
-        db_tasks = main_db.server.active_tasks()
-
         i = celery.control.inspect()
         scheduled = i.scheduled()
         if not scheduled:
@@ -77,15 +72,13 @@ class HostInfo(AdminView):
             'base_dir': base_dir,
             'hostname': hostname,
             'django_version': django_version,
-            'main_db': main_db.uri,
-            'db_tasks': db_tasks,
             'num_celery_tasks': num_celery_tasks,
             'feed_queue_status': feed_queue_status,
         })
 
     def _get_feed_queue_status(self):
         now = datetime.utcnow()
-        next_podcast = Podcast.objects.order_by_next_update().first()
+        next_podcast = Podcast.objects.all().order_by_next_update().first()
 
         delta = (next_podcast.next_update - now)
         delta_mins = delta.total_seconds() / 60
@@ -133,7 +126,7 @@ class MergeVerify(MergeBase):
 
             grouper = PodcastGrouper(podcasts)
 
-            get_features = lambda (e_id, e): ((e.url, e.title), e_id)
+            get_features = lambda id_e: ((id_e[1].url, id_e[1].title), id_e[0])
 
             num_groups = grouper.group(get_features)
 
@@ -173,7 +166,7 @@ class MergeProcess(MergeBase):
                 episode_id = m.group(1)
                 features[episode_id] = feature
 
-        get_features = lambda (e_id, e): (features.get(e_id, e_id), e_id)
+        get_features = lambda id_e: (features.get(id_e[0], id_e[0]), id_e[0])
 
         num_groups = grouper.group(get_features)
 
@@ -365,8 +358,10 @@ class MakePublisher(AdminView):
 
             podcasts.add(podcast)
 
-        self.set_publisher(request, user, podcasts)
-        self.send_mail(request, user, podcasts)
+        created, existed = self.set_publisher(request, user, podcasts)
+
+        if (created + existed) > 0:
+            self.send_mail(request, user, podcasts)
         return HttpResponseRedirect(reverse('admin-make-publisher-result'))
 
     def set_publisher(self, request, user, podcasts):
@@ -376,6 +371,7 @@ class MakePublisher(AdminView):
                          'Set publisher permissions for {created} podcasts; '
                          '{existed} already existed'.format(created=created,
                                                             existed=existed))
+        return created, existed
 
     def send_mail(self, request, user, podcasts):
         site = RequestSite(request)

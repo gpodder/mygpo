@@ -1,7 +1,6 @@
-from django.apps import AppConfig
+from django.apps import AppConfig, apps
 from django.db.models.signals import post_save
 
-from mygpo.podcasts.models import Podcast
 from mygpo.search.index import index_podcast
 
 
@@ -10,4 +9,6 @@ class SearchConfig(AppConfig):
     verbose_name = 'Search'
 
     def ready(self):
+        Podcast = apps.get_model('podcasts.Podcast')
         post_save.connect(index_podcast, sender=Podcast)
+        pass

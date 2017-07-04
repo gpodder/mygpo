@@ -1,8 +1,16 @@
-from django.apps import AppConfig
+from django.apps import AppConfig, apps
 from django.contrib.auth import get_user_model
 from django.db.models.signals import post_save
 
-from mygpo.users.models import create_missing_profile
+
+def create_missing_profile(sender, **kwargs):
+    """ Creates a UserProfile if a User doesn't have one """
+    user = kwargs['instance']
+
+    if not hasattr(user, 'profile'):
+        UserProfile = apps.get_model('users.UserProfile')
+        profile = UserProfile.objects.create(user=user)
+        user.profile = profile
 
 
 class UsersConfig(AppConfig):

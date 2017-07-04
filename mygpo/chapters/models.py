@@ -24,3 +24,9 @@ class Chapter(UpdateInfoModel):
 
     # the episode to which the chapter belongs
     episode = models.ForeignKey(Episode, on_delete=models.CASCADE)
+
+    class Meta:
+        index_together = [
+            ('user', 'episode', 'created'),
+            ('episode', 'user', 'start', 'end'),
+        ]

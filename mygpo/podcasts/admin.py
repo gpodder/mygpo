@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 
 from django.utils.html import format_html
 from django.utils.translation import ugettext as _
@@ -77,9 +77,6 @@ class PodcastAdmin(admin.ModelAdmin):
     # configuration for the list view
     list_display = ('title', 'main_url', )
 
-    # fetch the podcast's URL for the fields in list_display
-    list_select_related = ('urls', )
-
     list_filter = ('language', )
     search_fields = ('title', 'twitter', '^urls__url', )
 
@@ -98,7 +95,7 @@ class PodcastAdmin(admin.ModelAdmin):
         }),
         ('Episodes', {
             'fields': ('common_episode_title', 'latest_episode_timestamp',
-                       'content_types', )
+                       'content_types', 'max_episode_order', )
         }),
         ('Feed updates', {
             'fields': ('outdated', 'new_location', 'last_update', )
@@ -134,9 +131,6 @@ class EpisodeAdmin(admin.ModelAdmin):
     # configuration for the list view
     list_display = ('title', 'podcast_title', 'main_url', )
 
-    # fetch the episode's podcast and URL for the fields in list_display
-    list_select_related = ('podcast', 'urls', )
-
     list_filter = ('language', )
     search_fields = ('title', '^urls__url')
 
@@ -144,7 +138,7 @@ class EpisodeAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': ('id', 'title', 'subtitle', 'description', 'link',
-                       'language', 'guid', 'released', 'podcast', )
+                       'language', 'guid', 'released', 'podcast', 'order', )
         }),
         ('Additional information', {
             'fields': ('created', 'license', 'flattr_url', 'author', 'content',
@@ -194,7 +188,5 @@ class TagAdmin(admin.ModelAdmin):
     """ Admin page for tags """
 
     list_display = ('tag', 'content_object', 'source', 'user', )
-
-    list_select_related = ('user', )
 
     list_filter = ('source', )

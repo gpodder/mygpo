@@ -1,5 +1,5 @@
 from collections import defaultdict
-from itertools import ifilter as filter
+
 import mimetypes
 
 from django.utils.translation import ugettext_lazy as _
@@ -27,8 +27,8 @@ def get_podcast_types(episodes):
                 continue
             types[t] = types.get(t, 0) + 1
 
-    max_episodes = sum(types.itervalues())
-    l = list(types.iteritems())
+    max_episodes = sum(types.values())
+    l = list(types.items())
     l.sort(key=lambda x: x[1], reverse=True)
 
     return [x[0] for x in
@@ -40,21 +40,49 @@ def get_type(mimetype):
 
     All "wanted" mimetypes are mapped to one of audio/video/image
     Everything else returns None
+
+    >>> get_type('audio/mpeg3')
+    'audio'
+
+    >>> get_type('video/mpeg')
+    'video'
+
+    >>> get_type('image/jpeg')
+    'image'
+
+    >>> get_type('application/ogg')
+    'audio'
+
+    >>> get_type('application/x-youtube')
+    'video'
+
+    >>> get_type('application/x-vimeo')
+    'video'
+
+    >>> get_type('application/octet-stream') == None
+    True
+
+    >>> get_type('') == None
+    True
+
+    >>> get_type('music') == None
+    True
     """
     if not mimetype:
         return None
 
-    if '/' in mimetype:
-        category, type = mimetype.split('/', 1)
-        if category in ('audio', 'video', 'image'):
-            return category
-        elif type == 'ogg':
-            return 'audio'
-        elif type == 'x-youtube':
-            return 'video'
-        elif type == 'x-vimeo':
-            return 'video'
-    return None
+    if '/' not in mimetype:
+        return None
+
+    category, type = mimetype.split('/', 1)
+    if category in ('audio', 'video', 'image'):
+        return category
+    elif type == 'ogg':
+        return 'audio'
+    elif type == 'x-youtube':
+        return 'video'
+    elif type == 'x-vimeo':
+        return 'video'
 
 
 def get_mimetype(mimetype, url):

@@ -16,11 +16,12 @@
 #
 
 import os.path
-import StringIO
+import io
 from datetime import datetime
 from glob import glob
 import errno
 import hashlib
+import struct
 
 from PIL import Image, ImageDraw
 
@@ -77,7 +78,7 @@ class CoverArt(View):
         try:
             im.thumbnail((size, size), Image.ANTIALIAS)
             resized = im
-        except (IOError, IndexError) as ex:
+        except (struct.error, IOError, IndexError) as ex:
             # raised when trying to read an interlaced PNG;
             logger.warn('Could not create thumbnail: %s', str(ex))
 
@@ -93,15 +94,15 @@ class CoverArt(View):
             del draw
             resized = Image.composite(resized, background, resized)
 
-        io = StringIO.StringIO()
+        sio = io.BytesIO()
 
         try:
-            resized.save(io, 'JPEG', optimize=True, progression=True,
+            resized.save(sio, 'JPEG', optimize=True, progression=True,
                          quality=80)
         except IOError as ex:
             return self.send_file(original)
 
-        s = io.getvalue()
+        s = sio.getvalue()
 
         fp = open(target, 'wb')
         fp.write(s)
@@ -121,7 +122,7 @@ class CoverArt(View):
     @staticmethod
     def get_existing_thumbnails(prefix, filename):
         files = glob(os.path.join(LOGO_DIR, '*', prefix, filename))
-        return filter(lambda f: 'original' not in f, files)
+        return [f for f in files if 'original' not in f]
 
     @staticmethod
     def get_original(prefix, filename):
@@ -141,7 +142,7 @@ class CoverArt(View):
 
     def send_file(self, filename):
         try:
-            f = open(filename)
+            f = open(filename, 'rb')
         except IOError:
             return HttpResponseNotFound()
 
@@ -155,7 +156,7 @@ def get_logo_url(podcast, size):
     """ Return the logo URL for the podcast """
 
     if podcast.logo_url:
-        filename = hashlib.sha1(podcast.logo_url).hexdigest()
+        filename = hashlib.sha1(podcast.logo_url.encode('utf-8')).hexdigest()
         prefix = CoverArt.get_prefix(filename)
         return reverse('logo', args=[size, prefix, filename])
 

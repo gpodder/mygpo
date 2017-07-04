@@ -1,7 +1,7 @@
 from django import template
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
-from django.utils.html import strip_tags
+from django.utils.html import strip_tags, format_html
 from django.contrib.staticfiles.storage import staticfiles_storage
 
 from mygpo import utils
@@ -54,14 +54,14 @@ def episode_status_icon(action):
         elif action.action == 'download':
             s = '<img src="%s" alt="downloaded" title="%s" />' % (staticfiles_storage.url('download.png'), '%s%s%s' % (_('This episode has been downloaded'),date_string, device_string))
         elif action.action == 'play':
-            if action.playmark is not None:
+            if action.stopped is not None:
                 if getattr(action, 'started', None) is not None:
                     playback_info = _(' from %(start)s to %(end)s') % { \
                             'start': utils.format_time(action.started), \
-                            'end': utils.format_time(action.playmark)}
+                            'end': utils.format_time(action.stopped)}
                 else:
                     playback_info = _(' to position %s') % (\
-                            utils.format_time(action.playmark),)
+                            utils.format_time(action.stopped),)
             else:
                 playback_info = ''
             s = '<img src="%s" alt="played" title="%s" />' % (staticfiles_storage.url('playback.png'), '%s%s%s%s' % (_('This episode has been played'),date_string, device_string, playback_info))
@@ -127,8 +127,9 @@ def episode_link(episode, podcast, title=None):
 
     title = strip_tags(title)
 
-    return '<a href="%(target)s" title="%(title)s">%(title)s</a>' % \
-        dict(target=get_episode_link_target(episode, podcast), title=title)
+    return format_html('<a href="{target}" title="{title}">{title}</a>',
+                       target=get_episode_link_target(episode, podcast),
+                       title=title)
 
 
 @register.simple_tag

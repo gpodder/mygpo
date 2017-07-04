@@ -15,190 +15,135 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-import time
 from datetime import datetime
 
-import dateutil.parser
-
-from django.http import HttpResponseBadRequest, Http404
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.cache import never_cache
-
+from mygpo.api import APIView, RequestException
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.exceptions import ParameterMissing
-from mygpo.api.backend import get_device
-from mygpo.users.models import Chapter
-from mygpo.utils import parse_time, parse_request_body, normalize_feed_url
-from mygpo.decorators import allowed_methods, cors_origin
-from mygpo.api.basic_auth import require_valid_user, check_username
-from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
-    update_episode_chapters
+from mygpo.chapters.models import Chapter
+from mygpo.utils import parse_time, normalize_feed_url, get_timestamp
 
 
-@csrf_exempt
-@require_valid_user
-@check_username
-@never_cache
-@allowed_methods(['POST', 'GET'])
-@cors_origin()
-def chapters(request, username):
+class ChaptersAPI(APIView):
 
-    now = datetime.utcnow()
-    now_ = int(time.mktime(now.timetuple()))
+    def post(self, request, username):
+        """ Add / remove Chapters to/from an episode """
+        user = request.user
+        now_ = get_timestamp(datetime.utcnow())
 
-    if request.method == 'POST':
-        req = parse_request_body(request)
+        body = self.parsed_body(request)
 
-        if not 'podcast' in req:
-            return HttpResponseBadRequest('Podcast URL missing')
+        podcast_url, episode_url, update_urls = self.get_urls(body)
+        body['podcast'] = podcast_url
+        body['episode'] = episode_url
 
-        if not 'episode' in req:
-            return HttpResponseBadRequest('Episode URL missing')
+        if not podcast_url or not episode_url:
+            raise RequestException('Invalid Podcast or Episode URL')
 
-        podcast_url = req.get('podcast', '')
-        episode_url = req.get('episode', '')
+        self.update_chapters(body, user)
+        return JsonResponse({
+            'update_url': update_urls,
+            'timestamp': now_
+        })
+
+    def get(self, request, username):
+        """ Get chapters for an episode """
+        user = request.user
+        now_ = get_timestamp(datetime.utcnow())
+
+        podcast_url, episode_url, _update_urls = self.get_urls(request)
+
+        episode = Episode.objects.filter(podcast__urls__url=podcast_url,
+                                         urls__url=episode_url).get()
+
+        chapters = Chapter.objects.filter(user=user, episode=episode)
+
+        since = self.get_since(request)
+        if since:
+            chapters = chapters.filter(created__gte=since)
+
+        chapters_json = map(self.chapter_to_json, chapters)
+
+        return JsonResponse({
+            'chapters': chapters_json,
+            'timestamp': now_
+        })
+
+    def update_chapters(self, req, user):
+        """ Add / remove chapters according to the client's request """
+        podcast = Podcast.objects.get_or_create_for_url(podcast_url)
+        episode = Episode.objects.get_or_create_for_url(podcast, episode_url)
+
+        # add chapters
+        for chapter_data in req.get('chapters_add', []):
+            chapter = self.parse_new(user, chapter_data)
+            chapter.save()
+
+        # remove chapters
+        for chapter_data in req.get('chapters_remove', []):
+            start, end = self.parse_rem(chapter_data)
+            Chapter.objects.filter(user=user, episode=episode,
+                                   start=start, end=end)\
+                           .delete()
+
+    def parse_new(self, user, chapter_data):
+        """ Parse a chapter to be added """
+        chapter = Chapter()
+        if not 'start' in chapter_data:
+            raise ParameterMissing('start parameter missing')
+        chapter.start = parse_time(chapter_data['start'])
+
+        if not 'end' in chapter_data:
+            raise ParameterMissing('end parameter missing')
+        chapter.end = parse_time(chapter_data['end'])
+
+        chapter.label = chapter_data.get('label', '')
+        chapter.advertisement = chapter_data.get('advertisement', False)
+        return chapter
+
+    def parse_rem(self, chapter_data):
+        """ Parse a chapter to be removed """
+        if not 'start' in chapter_data:
+            raise ParameterMissing('start parameter missing')
+        start = parse_time(chapter_data['start'])
+
+        if not 'end' in chapter_data:
+            raise ParameterMissing('end parameter missing')
+        end = parse_time(chapter_data['end'])
+
+        return (start, end)
+
+    def get_urls(self, body):
+        """ Parse and normalize the URLs from the request """
+        podcast_url = body.get('podcast', '')
+        episode_url = body.get('episode', '')
+
+        if not podcast_url:
+            raise RequestException('Podcast URL missing')
+
+        if not episode_url:
+            raise RequestException('Episode URL missing')
+
         update_urls = []
 
         # podcast sanitizing
         s_podcast_url = normalize_feed_url(podcast_url)
         if s_podcast_url != podcast_url:
-            req['podcast'] = s_podcast_url
             update_urls.append((podcast_url, s_podcast_url or ''))
 
         # episode sanitizing
         s_episode_url = normalize_feed_url(episode_url, 'episode')
         if s_episode_url != episode_url:
-            req['episode'] = s_episode_url
             update_urls.append((episode_url, s_episode_url or ''))
 
-        if (s_podcast_url != '') and (s_episode_url != ''):
-            try:
-                update_chapters(req, request.user)
-            except ParameterMissing, e:
-                return HttpResponseBadRequest(e)
+        return s_podcast_url, s_episode_url, update_urls
 
-        return JsonResponse({
-            'update_url': update_url,
-            'timestamp': now_
-            })
-
-    elif request.method == 'GET':
-        if not 'podcast' in request.GET:
-            return HttpResponseBadRequest('podcast URL missing')
-
-        if not 'episode' in request.GET:
-            return HttpResponseBadRequest('Episode URL missing')
-
-        podcast_url = request.GET['podcast']
-        episode_url = request.GET['episode']
-
-        since_ = request.GET.get('since', None)
-        try:
-            since = datetime.fromtimestamp(float(since_)) if since_ else None
-        except ValueError:
-            return HttpResponseBadRequest('since-value is not a valid timestamp')
-
-        podcast_url = normalize_feed_url(podcast_url)
-        episode_url = normalize_feed_url(episode_url)
-
-        try:
-            episode = Episode.objects.filter(podcast__urls__url=podcast_url,
-                                             urls__url=episode_url).get()
-        except Episode.DoesNotExist:
-            raise Http404
-
-        e_state = episode_state_for_user_episode(request.user, episode)
-
-        chapterlist = sorted(e_state.chapters, key=lambda c: c.start)
-
-        if since:
-            chapterlist = filter(lambda c: c.created >= since, chapters)
-
-        chapters = []
-        for c in chapterlist:
-            if c.device is not None:
-                device = request.user.get_device(c.device)
-                device_uid = device.uid
-            else:
-                device_uid = None
-
-            chapters.append({
-                'start': c.start,
-                'end':   c.end,
-                'label': c.label,
-                'advertisement': c.advertisement,
-                'timestamp': c.created,
-                'device': device_uid
-                })
-
-        return JsonResponse({
-            'chapters': chapters,
-            'timestamp': now_
-            })
-
-
-def update_chapters(req, user):
-    podcast_url = normalize_feed_url(req['podcast'])
-    episode_url = normalize_feed_url(req['episode'])
-
-    podcast = Podcast.objects.get_or_create_for_url(podcast_url)
-    episode = Episode.objects.get_or_create_for_url(podcast, episode_url)
-
-    e_state = episode_state_for_user_episode(request.user, episode)
-
-    device = None
-    if 'device' in req:
-        device = get_device(request.user, req['device'],
-                request.META.get('HTTP_USER_AGENT', ''), undelete=True)
-
-    timestamp = dateutil.parser.parse(req['timestamp']) if 'timestamp' in req else datetime.utcnow()
-
-    new_chapters = parse_new_chapters(request.user, req.get('chapters_add', []))
-    rem_chapters = parse_rem_chapters(req.get('chapters_remove', []))
-
-    update_episode_chapters(e_state, new_chapters, rem_chapters)
-
-
-
-def parse_new_chapters(user, chapters):
-    for c in chapters:
-        if not 'start' in c:
-            raise ParameterMissing('start parameter missing')
-        start = parse_time(c['start'])
-
-        if not 'end' in c:
-            raise ParameterMissing('end parameter missing')
-        end = parse_time(c['end'])
-
-        label = c.get('label', '')
-        adv = c.get('advertisement', False)
-
-        device_uid = c.get('device', None)
-        if device_uid:
-            device_id = get_device(user, device_uid,
-                    request.META.get('HTTP_USER_AGENT', ''), undelete=True).id
-        else:
-            device_id = None
-
-        chapter = Chapter()
-        chapter.device = device_id
-        chapter.created = timestamp
-        chapter.start = start
-        chapter.end = end
-        chapter.label = label
-        chapter.advertisement = adv
-
-        yield chapter
-
-
-def parse_rem_chapters(chapers):
-    for c in chapters:
-        if not 'start' in c:
-            raise ParameterMissing('start parameter missing')
-        start = parse_time(c['start'])
-
-        if not 'end' in c:
-            raise ParameterMissing('end parameter missing')
-        end = parse_time(c['end'])
-
-        yield (start, end)
+    def chapter_to_json(self, chapter):
+        """ JSON representation of Chapter for GET response """
+        return {
+            'start': chapter.start,
+            'end': chapter.end,
+            'label': chapter.label,
+            'advertisement': chapter.advertisement,
+            'timestamp': chapter.created,
+        }

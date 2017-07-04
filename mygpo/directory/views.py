@@ -1,6 +1,6 @@
-from __future__ import division
 
-from itertools import imap as map
+
+
 from math import ceil
 from collections import Counter
 
@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render
 from django.db.models import Count
-from django.contrib.sites.models import RequestSite
+from django.contrib.sites.requests import RequestSite
 from django.views.decorators.cache import cache_control
 from django.views.decorators.vary import vary_on_cookie
 from django.views.generic import ListView
@@ -20,9 +20,6 @@ from django.contrib import messages
 from django.utils.translation import ugettext as _
 from django.contrib.auth import get_user_model
 
-from feedservice.parse.models import ParserException
-from feedservice.parse import FetchFeedException
-
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.directory.search import search_podcasts
 from mygpo.web.utils import process_lang_params, get_language_names, \
@@ -31,7 +28,8 @@ from mygpo.directory.tags import Topics
 from mygpo.users.settings import FLATTR_TOKEN
 from mygpo.categories.models import Category
 from mygpo.podcastlists.models import PodcastList
-from mygpo.data.feeddownloader import PodcastUpdater, NoEpisodesException
+from mygpo.data.feeddownloader import (verify_podcast_url, NoEpisodesException,
+    UpdatePodcastException)
 from mygpo.data.tasks import update_podcasts
 
 
@@ -100,7 +98,9 @@ class EpisodeToplistView(ToplistView):
         context['entries'] = entries
 
         # Determine maximum listener amount (or 0 if no entries exist)
-        context['max_listeners'] = max([0]+[e.listeners for e in entries])
+        listeners = [e.listeners for e in entries if e.listeners is not None]
+        max_listeners = max(listeners, default=0)
+        context['max_listeners'] = max_listeners
 
         return context
 
@@ -131,6 +131,7 @@ class Directory(View):
             'topics': Topics(),
             'podcastlists': self.get_random_list(),
             'random_podcast': Podcast.objects.all().random().first(),
+            'podcast_ad': Podcast.objects.get_advertised_podcast(),
             })
 
 
@@ -179,7 +180,7 @@ RESULTS_PER_PAGE=20
 def search(request, template='search.html', args={}):
 
     if 'q' in request.GET:
-        q = request.GET.get('q', '').encode('utf-8')
+        q = request.GET.get('q', '')
 
         try:
             page = int(request.GET.get('page', 1))
@@ -235,7 +236,7 @@ def podcast_lists(request, page_size=20):
         page = paginator.num_pages
 
     num_pages = int(ceil(PodcastList.objects.count() / float(page_size)))
-    page_list = get_page_list(1, num_pages, page, 15)
+    page_list = get_page_list(1, num_pages, int(page), 15)
 
     return render(request, 'podcast_lists.html', {
         'lists': lists,
@@ -267,15 +268,12 @@ class MissingPodcast(View):
             except Podcast.DoesNotExist:
                 # check if we could add a podcast for the given URL
                 podcast = False
-                updater = PodcastUpdater()
-
                 try:
-                    can_add = updater.verify_podcast_url(url)
+                    can_add = verify_podcast_url(url)
 
-                except (ParserException, FetchFeedException,
-                        NoEpisodesException) as ex:
+                except (UpdatePodcastException, NoEpisodesException) as ex:
                     can_add = False
-                    messages.error(request, unicode(ex))
+                    messages.error(request, str(ex))
 
         return render(request, 'missing.html', {
                 'site': site,
@@ -321,8 +319,7 @@ class AddPodcastStatus(TemplateView):
             podcasts = result.get()
             messages.success(request, _('%d podcasts added' % len(podcasts)))
 
-        except (ParserException, FetchFeedException,
-                NoEpisodesException) as ex:
+        except (UpdatePodcastException, NoEpisodesException) as ex:
             messages.error(request, str(ex))
             podcast = None
 

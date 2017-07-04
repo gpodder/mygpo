@@ -92,8 +92,8 @@
      <td><abbr title="{{ s.timestamp }}">{{ s.timestamp|naturalday }}</abbr></td>
      <td style="text-align: center;">{{ s|episode_status_icon }}</td>
      <td>
-      {% if s.device %}
-       <a href="{% url "device" s.device.uid %}">{{ s.device|device_icon }} {{ s.device.name|striptags }}</a>
+      {% if s.client %}
+       <a href="{% url "device" s.client.uid %}">{{ s.client|device_icon }} {{ s.client.name|striptags }}</a>
       {% endif %}
      </td>
      <td>{% if s.started or s.playmark %}{{s.started|format_time }} - {% endif %}
@@ -118,8 +118,8 @@
       <td>
        <select class="input" name="device">
         <option value=""></option>
-        {% for device_id, name in devices.items %}
-         <option value="{{ device_id }}">{{ name }}</option>
+        {% for client in clients %}
+         <option value="{{ client.id.hex }}">{{ client.name }}</option>
         {% endfor %}
        </select>
       </td>

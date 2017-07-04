@@ -1,8 +1,7 @@
 # encoding: utf8
-from __future__ import unicode_literals
+
 
 from django.db import models, migrations
-import uuidfield.fields
 
 
 class Migration(migrations.Migration):
@@ -15,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='PodcastGroup',
             fields=[
-                ('id', uuidfield.fields.UUIDField(max_length=32, serialize=False, primary_key=True)),
+                ('id', models.UUIDField(max_length=32, serialize=False, primary_key=True)),
                 ('title', models.CharField(max_length=1000, blank=True)),
                 ('subtitle', models.CharField(max_length=1000, blank=True)),
             ],
@@ -28,9 +27,9 @@ class Migration(migrations.Migration):
             name='MergedUUID',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('uuid', uuidfield.fields.UUIDField(unique=True, max_length=32)),
+                ('uuid', models.UUIDField(unique=True, max_length=32)),
                 ('content_type', models.ForeignKey(to='contenttypes.ContentType', to_field='id')),
-                ('object_id', uuidfield.fields.UUIDField(max_length=32)),
+                ('object_id', models.UUIDField(max_length=32)),
             ],
             options={
             },
@@ -41,13 +40,13 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('order', models.PositiveSmallIntegerField()),
-                ('scope', uuidfield.fields.UUIDField(max_length=32, null=True)),
+                ('scope', models.UUIDField(max_length=32, null=True)),
                 ('slug', models.SlugField()),
                 ('content_type', models.ForeignKey(to='contenttypes.ContentType', to_field='id')),
-                ('object_id', uuidfield.fields.UUIDField(max_length=32)),
+                ('object_id', models.UUIDField(max_length=32)),
             ],
             options={
-                'unique_together': set([(b'slug', b'scope'), (b'content_type', b'object_id', b'order')]),
+                'unique_together': set([('slug', 'scope'), ('content_type', 'object_id', 'order')]),
             },
             bases=(models.Model,),
         ),
@@ -56,12 +55,12 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('tag', models.SlugField()),
-                ('source', models.PositiveSmallIntegerField(choices=[(1, b'Feed'), (2, b'delicious'), (4, b'User')])),
+                ('source', models.PositiveSmallIntegerField(choices=[(1, 'Feed'), (2, 'delicious'), (4, 'User')])),
                 ('content_type', models.ForeignKey(to='contenttypes.ContentType', to_field='id')),
-                ('object_id', uuidfield.fields.UUIDField(max_length=32)),
+                ('object_id', models.UUIDField(max_length=32)),
             ],
             options={
-                'unique_together': set([(b'tag', b'source', b'content_type', b'object_id')]),
+                'unique_together': set([('tag', 'source', 'content_type', 'object_id')]),
             },
             bases=(models.Model,),
         ),
@@ -70,20 +69,20 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('order', models.PositiveSmallIntegerField()),
-                ('scope', uuidfield.fields.UUIDField(max_length=32, null=True)),
+                ('scope', models.UUIDField(max_length=32, null=True)),
                 ('url', models.URLField(max_length=1000)),
                 ('content_type', models.ForeignKey(to='contenttypes.ContentType', to_field='id')),
-                ('object_id', uuidfield.fields.UUIDField(max_length=32)),
+                ('object_id', models.UUIDField(max_length=32)),
             ],
             options={
-                'unique_together': set([(b'url', b'scope'), (b'content_type', b'object_id', b'order')]),
+                'unique_together': set([('url', 'scope'), ('content_type', 'object_id', 'order')]),
             },
             bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='Podcast',
             fields=[
-                ('id', uuidfield.fields.UUIDField(max_length=32, serialize=False, primary_key=True)),
+                ('id', models.UUIDField(max_length=32, serialize=False, primary_key=True)),
                 ('title', models.CharField(max_length=1000, blank=True)),
                 ('subtitle', models.CharField(max_length=1000, blank=True)),
                 ('description', models.TextField(blank=True)),
@@ -98,14 +97,14 @@ class Migration(migrations.Migration):
                 ('outdated', models.BooleanField(default=False)),
                 ('author', models.CharField(max_length=100, null=True, blank=True)),
                 ('logo_url', models.URLField(max_length=1000, null=True)),
-                ('group', models.ForeignKey(to='podcasts.PodcastGroup', to_field=b'id', null=True)),
+                ('group', models.ForeignKey(to='podcasts.PodcastGroup', to_field='id', null=True)),
                 ('group_member_name', models.CharField(max_length=30, null=True)),
                 ('common_episode_title', models.CharField(max_length=50, blank=True)),
                 ('new_location', models.URLField(max_length=1000, null=True)),
                 ('latest_episode_timestamp', models.DateTimeField(null=True)),
                 ('episode_count', models.PositiveIntegerField()),
                 ('hub', models.URLField(null=True)),
-                ('related_podcasts', models.ManyToManyField(to=b'podcasts.Podcast')),
+                ('related_podcasts', models.ManyToManyField(to='self')),
             ],
             options={
                 'abstract': False,
@@ -115,7 +114,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Episode',
             fields=[
-                ('id', uuidfield.fields.UUIDField(max_length=32, serialize=False, primary_key=True)),
+                ('id', models.UUIDField(max_length=32, serialize=False, primary_key=True)),
                 ('title', models.CharField(max_length=1000, blank=True)),
                 ('subtitle', models.CharField(max_length=1000, blank=True)),
                 ('description', models.TextField(blank=True)),
@@ -136,7 +135,7 @@ class Migration(migrations.Migration):
                 ('filesize', models.PositiveIntegerField(null=True)),
                 ('mimetypes', models.CharField(max_length=50)),
                 ('listeners', models.PositiveIntegerField(null=True)),
-                ('podcast', models.ForeignKey(to='podcasts.Podcast', to_field=b'id')),
+                ('podcast', models.ForeignKey(to='podcasts.Podcast', to_field='id')),
             ],
             options={
                 'abstract': False,

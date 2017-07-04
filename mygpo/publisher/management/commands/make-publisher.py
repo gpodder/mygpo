@@ -18,7 +18,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         if len(args) < 2:
-            print >> sys.stderr, 'Usage: ./manage.py make-publisher <username> <podcast-url-1> [<podcast-url-2> ...]'
+            print('Usage: ./manage.py make-publisher <username> <podcast-url-1> [<podcast-url-2> ...]', file=sys.stderr)
             return
 
         username = args[0]
@@ -26,9 +26,9 @@ class Command(BaseCommand):
         User = get_user_model()
         user = User.objects.get(username=username)
         if not user:
-            print >> sys.stderr, 'User %s does not exist' % username
+            print('User %s does not exist' % username, file=sys.stderr)
             return
 
         urls = args[1:]
         podcasts = Podcast.objects.filter(urls__url__in=urls)
-        PublishedPodcast.objects.get_or_create(user, podcasts)
+        PublishedPodcast.objects.publish_podcasts(user, podcasts)

@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 from django.db import models, migrations
 from django.conf import settings
-import uuidfield.fields
 
 
 class Migration(migrations.Migration):
@@ -26,7 +25,7 @@ class Migration(migrations.Migration):
                 ('publisher_update_token', models.CharField(max_length=32, null=True)),
                 ('userpage_token', models.CharField(max_length=32, null=True)),
                 ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
-                ('uuid', uuidfield.fields.UUIDField(unique=True, max_length=32)),
+                ('uuid', models.UUIDField(unique=True, max_length=32)),
             ],
             options={
                 'abstract': False,

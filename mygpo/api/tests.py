@@ -15,12 +15,11 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from __future__ import unicode_literals
 
+import json
+import copy
 import unittest
-import doctest
-from urllib import urlencode
-from copy import deepcopy
+from urllib.parse import urlencode
 
 from django.test.client import Client
 from django.test import TestCase
@@ -30,7 +29,6 @@ from django.contrib.auth import get_user_model
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.api.advanced import episodes
 from mygpo.test import create_auth_string, anon_request
-from mygpo.core.json import json
 
 
 class AdvancedAPITests(unittest.TestCase):
@@ -72,22 +70,38 @@ class AdvancedAPITests(unittest.TestCase):
         self.user.delete()
 
     def test_episode_actions(self):
+        response = self._upload_episode_actions(self.user, self.action_data,
+                                                self.extra)
+        self.assertEqual(response.status_code, 200, response.content)
+
         url = reverse(episodes, kwargs={
             'version': '2',
             'username': self.user.username,
         })
-
-        # upload actions
-        response = self.client.post(url, json.dumps(self.action_data),
-                                    content_type="application/json",
-                                    **self.extra)
-        self.assertEqual(response.status_code, 200, response.content)
-
         response = self.client.get(url, {'since': '0'}, **self.extra)
         self.assertEqual(response.status_code, 200, response.content)
-        response_obj = json.loads(response.content)
+        response_obj = json.loads(response.content.decode('utf-8'))
         actions = response_obj['actions']
         self.assertTrue(self.compare_action_list(self.action_data, actions))
+
+    def test_invalid_client_id(self):
+        """ Invalid Client ID should return 400 """
+        action_data = copy.deepcopy(self.action_data)
+        action_data[0]['device'] = "gpodder@abcdef123"
+
+        response = self._upload_episode_actions(self.user, action_data,
+                                                self.extra)
+
+        self.assertEqual(response.status_code, 400, response.content)
+
+    def _upload_episode_actions(self, user, action_data, extra):
+        url = reverse(episodes, kwargs={
+            'version': '2',
+            'username': self.user.username,
+        })
+        return self.client.post(url, json.dumps(action_data),
+                                content_type="application/json",
+                                **extra)
 
     def compare_action_list(self, as1, as2):
         for a1 in as1:
@@ -153,7 +167,7 @@ class SubscriptionAPITests(unittest.TestCase):
         # verify that the subscription is returned correctly
         response = self.client.get(self.url, {'since': '0'}, **self.extra)
         self.assertEqual(response.status_code, 200, response.content)
-        response_obj = json.loads(response.content)
+        response_obj = json.loads(response.content.decode('utf-8'))
         self.assertEqual(self.action_data['add'], response_obj['add'])
         self.assertEqual([], response_obj.get('remove', []))
 
@@ -180,22 +194,20 @@ class DirectoryTest(TestCase):
                 'title': 'My Episode',
             },
         )
+        self.client = Client()
 
     def test_episode_info(self):
         """ Test that the expected number of queries is executed """
         url = reverse('api-episode-info') + '?' + urlencode(
             (('podcast', self.podcast.url), ('url', self.episode.url)))
 
-        with self.assertNumQueries(4):
-            resp = anon_request(url)
+        resp = self.client.get(url)
 
         self.assertEqual(resp.status_code, 200)
 
 
-def suite():
-    tl = unittest.TestLoader()
-    suite = unittest.TestSuite()
-    suite.addTest(tl.loadTestsFromTestCase(AdvancedAPITests))
-    suite.addTest(tl.loadTestsFromTestCase(SubscriptionAPITests))
-    suite.addTest(tl.loadTestsFromTestCase(DirectoryTest))
-    return suite
+def load_tests(loader, tests, ignore):
+    tests.addTest(loader.loadTestsFromTestCase(AdvancedAPITests))
+    tests.addTest(loader.loadTestsFromTestCase(SubscriptionAPITests))
+    tests.addTest(loader.loadTestsFromTestCase(DirectoryTest))
+    return tests

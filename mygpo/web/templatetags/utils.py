@@ -1,3 +1,5 @@
+import urllib.parse
+
 from django import template
 from django.utils.safestring import mark_safe
 
@@ -31,7 +33,7 @@ def page_list(cur, start, total, show_max):
 
 @register.filter
 def filter_dict(dic):
-    return [key for key, val in dic.iteritems() if val]
+    return [key for key, val in dic.items() if val]
 
 
 @register.filter
@@ -52,9 +54,6 @@ def format_time(time):
 def is_tuple(obj):
     return isinstance(obj, tuple)
 
-@register.filter
-def is_list(obj):
-    return isinstance(obj, list)
 
 @register.filter
 def markdown(txt):
@@ -86,10 +85,9 @@ def license_name(license_url):
 @register.filter
 def urlquote(s):
     """ makes urllib.quote_plus available as a template filter """
-    import urllib
-    if isinstance(s, unicode):
+    if isinstance(s, str):
         s = s.encode('utf-8')
-    return mark_safe(urllib.quote_plus(s))
+    return mark_safe(urllib.parse.quote_plus(s))
 
 
 hours_to_str = register.filter(hours_to_str)

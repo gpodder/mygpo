@@ -15,22 +15,14 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+import base64
 from functools import wraps
 
 from django.http import HttpResponse, HttpResponseBadRequest
-from django.contrib.auth import authenticate
-
-from mygpo.decorators import repeat_on_conflict
-
+from django.contrib.auth import authenticate, login
 
 import logging
 logger = logging.getLogger(__name__)
-
-
-@repeat_on_conflict(['user'])
-def login(request, user):
-    from django.contrib.auth import login
-    login(request, user)
 
 
 
@@ -67,7 +59,9 @@ def view_or_basicauth(view, request, test_func, realm = "", *args, **kwargs):
         # NOTE: We are only support basic authentication for now.
         if auth_type.lower() == 'basic':
             try:
-                credentials = credentials.decode('base64').split(':', 1)
+                credentials = base64.b64decode(credentials)\
+                                    .decode('utf-8')\
+                                    .split(':', 1)
 
             except UnicodeDecodeError as e:
                 return HttpResponseBadRequest(
@@ -77,7 +71,7 @@ def view_or_basicauth(view, request, test_func, realm = "", *args, **kwargs):
                 uname, passwd = credentials
                 user = authenticate(username=uname, password=passwd)
                 if user is not None and user.is_active:
-                    login(request, user=user)
+                    login(request, user)
                     request.user = user
 
                     return view(request, *args, **kwargs)

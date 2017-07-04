@@ -15,11 +15,10 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
+import json
 import string
 from itertools import islice
 from functools import wraps
-
-from couchdbkit.exceptions import ResourceNotFound
 
 from django.shortcuts import render
 from django.core.cache import cache
@@ -27,7 +26,7 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.cache import cache_page
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
-from django.contrib.sites.models import RequestSite
+from django.contrib.sites.requests import RequestSite
 from django.utils.translation import ugettext as _
 
 from mygpo.api.basic_auth import require_valid_user, check_username
@@ -41,7 +40,6 @@ from mygpo.subscriptions import get_subscribed_podcasts, subscribe, unsubscribe
 from mygpo.directory.search import search_podcasts
 from mygpo.decorators import allowed_methods, cors_origin
 from mygpo.utils import parse_range, normalize_feed_url
-from mygpo.core.json import json, JSONDecodeError
 
 import logging
 logger = logging.getLogger(__name__)
@@ -77,9 +75,10 @@ def subscriptions(request, username, device_uid, format):
 
     elif request.method in ('PUT', 'POST'):
         try:
-            subscriptions = parse_subscription(request.body, format)
+            body = request.body.decode('utf-8')
+            subscriptions = parse_subscription(body, format)
 
-        except JSONDecodeError as e:
+        except ValueError as e:
             return HttpResponseBadRequest('Unable to parse POST data: %s' % str(e))
 
         return set_subscriptions(subscriptions, request.user, device_uid,
@@ -144,11 +143,11 @@ def format_podcast_list(obj_list, format, title, get_podcast=None,
         return HttpResponse(opml, content_type='text/xml')
 
     elif format == 'json':
-        objs = map(json_map, obj_list)
+        objs = list(map(json_map, obj_list))
         return JsonResponse(objs)
 
     elif format == 'jsonp':
-        ALLOWED_FUNCNAME = string.letters + string.digits + '_'
+        ALLOWED_FUNCNAME = string.ascii_letters + string.digits + '_'
 
         if not jsonp_padding:
             return HttpResponseBadRequest('For a JSONP response, specify the name of the callback function in the jsonp parameter')
@@ -179,6 +178,7 @@ def get_subscriptions(user, device_uid, user_agent=None):
 
 
 def parse_subscription(raw_post_data, format):
+    """ Parses the data according to the format """
     if format == 'txt':
         urls = raw_post_data.split('\n')
 
@@ -196,14 +196,15 @@ def parse_subscription(raw_post_data, format):
     else:
         return []
 
-
-    urls = map(normalize_feed_url, urls)
     urls = filter(None, urls)
-    urls = set(urls)
+    urls = list(map(normalize_feed_url, urls))
     return urls
 
 
 def set_subscriptions(urls, user, device_uid, user_agent):
+
+    # remove empty urls
+    urls = list(filter(None, (u.strip() for u in urls)))
 
     device = get_device(user, device_uid, user_agent, undelete=True)
 
@@ -270,7 +271,7 @@ def search(request, format):
 
     NUM_RESULTS = 20
 
-    query = request.GET.get('q', '').encode('utf-8')
+    query = request.GET.get('q', '')
 
     try:
         scale = int(request.GET.get('scale_logo', 64))
@@ -325,8 +326,12 @@ def example_podcasts(request, format):
         return HttpResponseBadRequest('scale_logo has to be a number from 1 to 256')
 
     if not podcasts:
-        podcasts = ExamplePodcast.objects.get_podcasts()
+        podcasts = list(ExamplePodcast.objects.get_podcasts())
         cache.set('example-podcasts', podcasts)
+
+    podcast_ad = Podcast.objects.get_advertised_podcast()
+    if podcast_ad:
+        podcasts = [podcast_ad] + podcasts
 
     title = 'gPodder Podcast Directory'
     domain = RequestSite(request).domain

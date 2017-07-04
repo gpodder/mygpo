@@ -1,53 +1,18 @@
 import os.path
+import base64
 
-from django.conf import settings
 from django.core.urlresolvers import resolve
 from django.contrib.auth.models import AnonymousUser
 from django.test.client import RequestFactory
+from django.contrib.auth import get_user_model
 
-from couchdbkit import Database
-from couchdbkit.loaders import FileSystemDocsLoader
-from couchdbkit.ext.django.testrunner import CouchDbKitTestSuiteRunner
-
-from mygpo.db.couchdb.utils import sync_design_docs
-
-
-# inspired by
-# http://djangosnippets.org/snippets/2211/
-
-class MygpoTestSuiteRunner(CouchDbKitTestSuiteRunner):
-    """
-    Test runner that is able to skip some tests according to settings.py
-    """
-
-    def __init__(self, *args, **kwargs):
-        self.EXCLUDED_APPS = getattr(settings, 'TEST_EXCLUDE', [])
-        settings.TESTING = True
-        super(MygpoTestSuiteRunner, self).__init__(*args, **kwargs)
-
-
-    def setup_databases(self, **kwargs):
-        ret = super(MygpoTestSuiteRunner, self).setup_databases(**kwargs)
-        sync_design_docs()
-        return ret
-
-
-    def build_suite(self, *args, **kwargs):
-        suite = super(MygpoTestSuiteRunner, self).build_suite(*args, **kwargs)
-        if not args[0] and not getattr(settings, 'RUN_ALL_TESTS', False):
-            tests = []
-            for case in suite:
-                pkg = case.__class__.__module__.split('.')[0]
-                if pkg not in self.EXCLUDED_APPS:
-                    tests.append(case)
-            suite._tests = tests
-        return suite
+from mygpo.utils import random_token
 
 
 def create_auth_string(username, password):
-    import base64
-    credentials = base64.encodestring("%s:%s" % (username, password)).rstrip()
-    auth_string = 'Basic %s' % credentials
+    pwdstr = '{0}:{1}'.format(username, password).rstrip()
+    credentials = base64.b64encode(pwdstr.encode('utf-8'))
+    auth_string = 'Basic ' + credentials.decode('ascii')
     return auth_string
 
 
@@ -62,3 +27,15 @@ def anon_request(url):
 
     response = view.func(request, *view.args, **view.kwargs)
     return response
+
+
+def create_user():
+    """ Create a user with random data """
+    User = get_user_model()
+    password = random_token(10)
+    username = random_token(8)
+    user = User(username=username, email=username + '@example.com')
+    user.set_password(password)
+    user.is_active = True
+    user.save()
+    return user, password

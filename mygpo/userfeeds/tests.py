@@ -21,6 +21,5 @@ import doctest
 from django.test import TestCase
 
 
-def suite():
-    suite = unittest.TestSuite()
-    return suite
+def load_tests(loader, tests, ignore):
+    return tests

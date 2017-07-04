@@ -1,4 +1,4 @@
-from itertools import islice, chain, imap as map
+from itertools import islice, chain
 from optparse import make_option
 import random
 

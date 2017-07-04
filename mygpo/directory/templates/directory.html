@@ -45,7 +45,7 @@
        {% if c.cls == "PodcastList" %}
         <a href="{% url "list-show" c.username c.slug %}">{% trans "more..." %}</a>
        {% else %}
-        <a href="{% url "directory" c.title %}">{% trans "more..." %}</a>
+        <a href="{% url "directory" c.clean_title %}">{% trans "more..." %}</a>
        {% endif %}
       <td></td>
      </tr>
@@ -63,7 +63,7 @@
   <div id="tagcloud">
    {% for category in topics.tagcloud %}
     <span style="font-size: {% smartwidthratio category.num_entries topics.min_entries topics.max_entries 4 1 %}em">
-     <a href="{% url "directory" category.title %}">{{ category.title }}</a>
+     <a href="{% url "directory" category.clean_title %}">{{ category.title }}</a>
     </span>
    {% endfor %}
   </div>
@@ -71,6 +71,9 @@
 
 
 {% block sidebar %}
+
+ {% include "podcast-ad-box.html" with podcast_ad=podcast_ad only %}
+
 
   {% for podcastlist in podcastlists %}
    {% if podcastlist and podcastlist.user.username %}
@@ -110,6 +113,7 @@
    {% endif %}
   {% endfor %}
 
+ {% if random_podcast %}
    <div class="well">
 
    <h4><small>{% trans "Random" %}</small></h4>
@@ -130,6 +134,7 @@
    </p>
 
    </div>
+ {% endif %}
 
 {% endblock %}
 

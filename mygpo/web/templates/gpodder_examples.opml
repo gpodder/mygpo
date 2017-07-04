@@ -3,7 +3,7 @@
     <title>gPodder Podcast Directory</title>
 </head>
 <body>
-    {% if sponsored_podcast %}<outline title="{{ sponsored_podcast.title }}" text="{{ sponsored_podcast.text }}" type="rss" xmlUrl="{{ sponsored_podcast.podcast.url }}" htmlUrl="{{ sponsored_podcast.podcast.link }}"/>{% endif %}
+    {% if podcast_ad %}<outline title="{{ podcast_ad.title }}" text="{{ podcast_ad.text }}" type="rss" xmlUrl="{{ podcast_ad.podcast.url }}" htmlUrl="{{ podcast_ad.podcast.link }}"/>{% endif %}
     <outline title="Linux Outlaws" text="A podcast about Linux and free and open source software with Dan and Fab." type="rss" xmlUrl="http://feeds.feedburner.com/linuxoutlaws" htmlUrl="http://linuxoutlaws.com/"/>
     <outline title="FLOSS Weekly" text="Free, Libre and Open Source Software and the people who are writing it." type="rss" xmlUrl="http://leo.am/podcasts/floss" htmlUrl="http://twit.tv/FLOSS"/>
     <outline title="bsdtalk" text="Talking about the BSD family of free operating systems." type="rss" xmlUrl="http://feeds.feedburner.com/Bsdtalk" htmlUrl="http://bsdtalk.blogspot.com/"/>

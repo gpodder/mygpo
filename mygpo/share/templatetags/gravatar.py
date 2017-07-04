@@ -21,6 +21,6 @@ def gravatar_img(user):
 def gravatar_url(user, size=PODCAST_LOGO_BIG_SIZE):
     email = user.email.strip().lower()
     m = hashlib.md5()
-    m.update(email)
+    m.update(email.encode('utf-8'))
     gravatar_hash = m.hexdigest()
     return GRAVATAR_IMG.format(hash_str=gravatar_hash, size=size)

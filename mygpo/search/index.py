@@ -40,7 +40,7 @@ def create_index():
     """ Creates the Elasticsearch index """
     conn = get_connection()
 
-    logger.info('Creating index %s' % settings.ELASTICSEARCH_INDEX)
+    logger.info('Creating index {0}', settings.ELASTICSEARCH_INDEX)
     try:
         conn.indices.create_index(settings.ELASTICSEARCH_INDEX)
 
@@ -58,9 +58,13 @@ def search_podcasts(query):
             "query" : {
                  'simple_query_string': {'query': query}
             },
-            "script_score" : {
-               'script': "_score * (doc.subscribers.value / 4000)"
-            }
+            "functions": [
+                {
+                    "script_score" : {
+                       'script': "_score * doc.subscribers.value"
+                    }
+                }
+            ]
         }
     }
     results = conn.search(query=q, indices=settings.ELASTICSEARCH_INDEX,

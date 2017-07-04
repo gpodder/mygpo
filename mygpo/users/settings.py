@@ -1,7 +1,5 @@
 from collections import namedtuple
 
-from couchdbkit.ext.django.schema import *
-
 
 WellKnownSetting = namedtuple('WellKnownSetting', 'name default')
 
@@ -32,15 +30,3 @@ FLATTR_USERNAME = WellKnownSetting('flattr_username', '')
 
 # Flag to mark an episode as favorite
 FAV_FLAG = WellKnownSetting('is_favorite', False)
-
-
-
-class SettingsMixin(DocumentSchema):
-    """ Objects that have an Old-Id from the old MySQL backend """
-
-    settings = DictProperty()
-
-
-    def get_wksetting(self, setting):
-        """ returns the value of a well-known setting """
-        return self.settings.get(setting.name, setting.default)
