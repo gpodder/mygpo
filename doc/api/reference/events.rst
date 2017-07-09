@@ -30,6 +30,8 @@ Episode Action Types
 * flattr
 
 
+.. _api-episode-actions-add:
+
 Upload Episode Actions
 ----------------------
 
@@ -106,6 +108,8 @@ Upload Episode Actions
     characters or don't start with either http or https) are rewritten to
     the empty string and are ignored by the Webservice.
 
+
+.. _api-episode-actions-get:
 
 Get Episode Actions
 -------------------
