@@ -34,4 +34,5 @@ Contents
    integration
    reference/index
    Libraries <http://wiki.gpodder.org/wiki/Web_Services/Libraries>
+   api1
    changes
