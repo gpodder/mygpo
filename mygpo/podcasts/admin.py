@@ -38,6 +38,8 @@ class URLAdmin(admin.ModelAdmin):
     list_display = ('url', 'content_type', 'object_id')
     list_filter = ('content_type', )
 
+    show_full_result_count = False
+
 
 class URLInline(GenericAdminLinkInline):
     model = URL
@@ -116,6 +118,8 @@ class PodcastAdmin(admin.ModelAdmin):
 
     readonly_fields = ('id', 'created', 'last_update', )
 
+    show_full_result_count = False
+
     def main_url(self, podcast):
         url = podcast.urls.first()
         if url is None:
@@ -162,6 +166,8 @@ class EpisodeAdmin(admin.ModelAdmin):
 
     readonly_fields = ('id', 'created', 'last_update', )
 
+    show_full_result_count = False
+
     def podcast_title(self, episode):
         return episode.podcast.title
 
@@ -182,6 +188,8 @@ class PodcastGroupAdmin(admin.ModelAdmin):
         PodcastInline,
     ]
 
+    show_full_result_count = False
+
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
@@ -190,3 +198,5 @@ class TagAdmin(admin.ModelAdmin):
     list_display = ('tag', 'content_object', 'source', 'user', )
 
     list_filter = ('source', )
+
+    show_full_result_count = False
