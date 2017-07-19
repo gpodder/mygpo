@@ -8,8 +8,7 @@ information and discover new interesting podcasts online.
 Supported Clients
 -----------------
 
-A list of supported clients is available `in the gPodder wiki
-<http://wiki.gpodder.org/wiki/Web_Services/Clients>`_.
+A list of supported clients is available in :ref:`clients`.
 
 To configure gPodder to connect to gpodder.net, open the my.gpodder.org /
 gpodder.net configuration dialog from the Subscriptions menu. Enter username
@@ -65,3 +64,9 @@ If you want to let others know about your which podcasts you are listening to,
 go to your `sharing page <https://gpodder.net/share/>`_ . You can either share
 your private URL with your friends or make it public and share your
 subscriptions with the whole world.
+
+
+.. toctree::
+   :maxdepth: 2
+
+   clients
