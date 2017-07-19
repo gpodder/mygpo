@@ -38,14 +38,14 @@ def get_device(user, uid, user_agent, undelete=True):
     # list of fields to update -- empty list = no update
     update_fields = []
 
-    with transaction.atomic():
-        try:
+    try:
+        with transaction.atomic():
             client = Client(id=uuid.uuid1(), user=user, uid=uid)
-            client.full_clean()
+            client.clean()
             client.save()
 
-        except IntegrityError:
-            client = Client.objects.get(user=user, uid=uid)
+    except IntegrityError:
+        client = Client.objects.get(user=user, uid=uid)
 
     if client.deleted and undelete:
         client.deleted = False
