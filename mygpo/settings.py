@@ -130,7 +130,7 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'mygpo.urls'
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.messages',
     'django.contrib.admin',
@@ -164,11 +164,11 @@ INSTALLED_APPS = (
     'mygpo.pubsub',
     'mygpo.podcastlists',
     'mygpo.votes',
-)
+]
 
 try:
     import debug_toolbar
-    INSTALLED_APPS += ('debug_toolbar', )
+    INSTALLED_APPS += ['debug_toolbar']
 
 except ImportError:
     pass
@@ -178,7 +178,7 @@ try:
     import opbeat
 
     if not DEBUG:
-        INSTALLED_APPS += ('opbeat.contrib.django', )
+        INSTALLED_APPS += ['opbeat.contrib.django']
 
         # add opbeat middleware to the beginning of the middleware classes list
         MIDDLEWARE_CLASSES = \
