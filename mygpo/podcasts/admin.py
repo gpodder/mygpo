@@ -53,6 +53,8 @@ class SlugInline(GenericTabularInline):
 class TagInline(GenericTabularInline):
     model = Tag
 
+    raw_id_fields = ('user', )
+
 
 class MergedUUIDInline(GenericTabularInline):
     model = MergedUUID
@@ -97,7 +99,7 @@ class PodcastAdmin(admin.ModelAdmin):
         }),
         ('Episodes', {
             'fields': ('common_episode_title', 'latest_episode_timestamp',
-                       'content_types', 'max_episode_order', )
+                       'content_types', 'max_episode_order', 'episode_count', )
         }),
         ('Feed updates', {
             'fields': ('outdated', 'new_location', 'last_update', )

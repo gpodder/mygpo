@@ -340,8 +340,10 @@ class MakePublisher(AdminView):
     def post(self, request):
         User = get_user_model()
         username = request.POST.get('username')
-        user = User.objects.get(username=username)
-        if user is None:
+
+        try:
+            user = User.objects.get(username__iexact=username)
+        except User.DoesNotExist:
             messages.error(request, 'User "{username}" not found'.format(username=username))
             return HttpResponseRedirect(reverse('admin-make-publisher-input'))
 
