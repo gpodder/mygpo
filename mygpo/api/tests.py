@@ -204,10 +204,3 @@ class DirectoryTest(TestCase):
         resp = self.client.get(url)
 
         self.assertEqual(resp.status_code, 200)
-
-
-def load_tests(loader, tests, ignore):
-    tests.addTest(loader.loadTestsFromTestCase(AdvancedAPITests))
-    tests.addTest(loader.loadTestsFromTestCase(SubscriptionAPITests))
-    tests.addTest(loader.loadTestsFromTestCase(DirectoryTest))
-    return tests

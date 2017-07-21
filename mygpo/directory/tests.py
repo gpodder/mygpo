@@ -41,8 +41,3 @@ class ToplistTests(unittest.TestCase):
         view = ToplistView()
         all_langs = view.all_languages()
         self.assertEqual(all_langs, {'de': 'Deutsch', 'en': 'English'})
-
-
-def load_tests(loader, tests, ignore):
-    tests.addTest(unittest.TestLoader().loadTestsFromTestCase(ToplistTests))
-    return tests

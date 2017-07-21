@@ -110,6 +110,9 @@ TEMPLATES = [{
                 # page after login
                 'django.core.context_processors.request',
         ],
+        'libraries': {
+            'staticfiles' : 'django.templatetags.static',
+        },
         'loaders': [
             ('django.template.loaders.cached.Loader', [
                 'django.template.loaders.app_directories.Loader',
@@ -164,6 +167,7 @@ INSTALLED_APPS = [
     'mygpo.pubsub',
     'mygpo.podcastlists',
     'mygpo.votes',
+    'django_nose',
 ]
 
 try:
@@ -391,3 +395,11 @@ EMAIL_BACKEND = os.getenv('EMAIL_BACKEND',
                           'django.core.mail.backends.smtp.EmailBackend')
 
 PODCAST_AD_ID = os.getenv('PODCAST_AD_ID')
+
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+NOSE_ARGS = [
+    '--with-doctest',
+    '--stop',
+    '--where=mygpo',
+]

@@ -15,12 +15,3 @@
 # along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
 #
 
-import unittest
-import doctest
-
-import mygpo.utils
-
-
-def load_tests(loader, tests, ignore):
-    tests.addTest(doctest.DocTestSuite(mygpo.utils))
-    return tests

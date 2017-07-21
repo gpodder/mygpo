@@ -229,9 +229,3 @@ class MergeGroupTests(TransactionTestCase):
         self.episode1.delete()
         self.podcast2.delete()
         self.user.delete()
-
-
-def load_tests(loader, tests, ignore):
-    tests.addTest(unittest.TestLoader().loadTestsFromTestCase(MergeTests))
-    tests.addTest(unittest.TestLoader().loadTestsFromTestCase(MergeGroupTests))
-    return tests
