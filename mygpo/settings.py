@@ -110,6 +110,9 @@ TEMPLATES = [{
                 # page after login
                 'django.template.context_processors.request',
         ],
+        'libraries': {
+            'staticfiles' : 'django.templatetags.static',
+        },
         'loaders': [
             ('django.template.loaders.cached.Loader', [
                 'django.template.loaders.app_directories.Loader',
@@ -130,7 +133,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'mygpo.urls'
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.messages',
     'django.contrib.admin',
@@ -165,11 +168,12 @@ INSTALLED_APPS = (
     'mygpo.pubsub',
     'mygpo.podcastlists',
     'mygpo.votes',
-)
+    'django_nose',
+]
 
 try:
     import debug_toolbar
-    INSTALLED_APPS += ('debug_toolbar', )
+    INSTALLED_APPS += ['debug_toolbar']
     MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
 
 except ImportError:
@@ -180,7 +184,7 @@ try:
     import opbeat
 
     if not DEBUG:
-        INSTALLED_APPS += ('opbeat.contrib.django', )
+        INSTALLED_APPS += ['opbeat.contrib.django']
 
         # add opbeat middleware to the beginning of the middleware classes list
         MIDDLEWARE = \
@@ -392,3 +396,11 @@ EMAIL_BACKEND = os.getenv('EMAIL_BACKEND',
                           'django.core.mail.backends.smtp.EmailBackend')
 
 PODCAST_AD_ID = os.getenv('PODCAST_AD_ID')
+
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+NOSE_ARGS = [
+    '--with-doctest',
+    '--stop',
+    '--where=mygpo',
+]

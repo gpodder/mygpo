@@ -342,7 +342,7 @@ def favorites(request, username):
     favorites = FavoriteEpisode.episodes_for_user(request.user)
     domain = RequestSite(request).domain
     e_data = lambda e: episode_data(e, domain)
-    ret = map(e_data, favorites)
+    ret = list(map(e_data, favorites))
     return JsonResponse(ret)
 
 

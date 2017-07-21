@@ -39,7 +39,7 @@ from mygpo.api.httpresponse import JsonResponse
 def top_tags(request, count):
     count = parse_range(count, 1, 100, 100)
     tag_cloud = Topics(count, num_cat=0)
-    resp = map(category_data, tag_cloud.tagcloud)
+    resp = list(map(category_data, tag_cloud.tagcloud))
     return JsonResponse(resp)
 
 

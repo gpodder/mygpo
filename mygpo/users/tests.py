@@ -131,9 +131,3 @@ class AuthTests(TestCase):
         with self.assertNumQueries(1):
             resp = self.client.get(url, **self.extra)
         self.assertEqual(resp.status_code, 401, resp.content)
-
-
-def load_tests(loader, tests, ignore):
-    for m in [DeviceSyncTests, UnsubscribeMergeTests, AuthTests]:
-        tests.addTest(unittest.TestLoader().loadTestsFromTestCase(m))
-    return tests

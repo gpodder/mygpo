@@ -140,10 +140,3 @@ class SlugTests(TestCase):
             # add a non-canonical slug
             podcast.add_slug('podcast-3')
             self.assertEqual(podcast.slug, 'podcast-1')
-
-
-def load_tests(loader, tests, ignore):
-    tests.addTest(unittest.TestLoader().loadTestsFromTestCase(PodcastTests))
-    tests.addTest(unittest.TestLoader().loadTestsFromTestCase(PodcastGroupTests))
-    tests.addTest(unittest.TestLoader().loadTestsFromTestCase(SlugTests))
-    return tests

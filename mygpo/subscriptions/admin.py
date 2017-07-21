@@ -16,3 +16,5 @@ class SubscriptionAdmin(admin.ModelAdmin):
     list_select_related = ('user', 'podcast', 'client', )
 
     raw_id_fields = ('user', 'podcast', 'client', )
+
+    show_full_result_count = False
