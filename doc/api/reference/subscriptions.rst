@@ -27,6 +27,8 @@ Get Subscriptions of Device
     :status 400: Invalid format
 
 
+.. _api-subscriptions-all:
+
 Get All Subscriptions
 ---------------------
 
@@ -93,6 +95,8 @@ Upload Subscriptions of Device
     above).
 
 
+.. _api-subscriptions-change-add:
+
 Upload Subscription Changes
 ---------------------------
 
@@ -151,6 +155,8 @@ Upload Subscription Changes
     http or https) are rewritten to the empty string and are ignored by
     the Webservice.
 
+
+.. _api-subscriptions-change-get:
 
 Get Subscription Changes
 ------------------------

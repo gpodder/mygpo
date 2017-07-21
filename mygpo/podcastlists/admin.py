@@ -28,3 +28,5 @@ class PodcastListAdmin(admin.ModelAdmin):
     ]
 
     raw_id_fields = ('user', )
+
+    show_full_result_count = False

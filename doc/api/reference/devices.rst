@@ -1,6 +1,8 @@
 Device API
 ==========
 
+.. _api-device-data-set:
+
 Update Device Data
 ------------------
 
@@ -31,6 +33,9 @@ Update Device Data
     :<json string caption: The new human readable label for the device
     :<json string type: he type of the device. Possible values: desktop, laptop, mobile, server, other
 
+
+
+.. _api-device-list:
 
 List Devices
 ------------
@@ -74,6 +79,8 @@ List Devices
 
     :param username: the username for which the devices should be returned
 
+
+.. _api-device-updates:
 
 Get Device Updates
 ------------------
