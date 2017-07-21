@@ -41,7 +41,7 @@ def get_device(user, uid, user_agent, undelete=True):
     try:
         with transaction.atomic():
             client = Client(id=uuid.uuid1(), user=user, uid=uid)
-            client.clean()
+            client.full_clean()
             client.save()
 
     except IntegrityError:
