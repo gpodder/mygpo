@@ -370,6 +370,9 @@ OPBEAT = {
     "SECRET_TOKEN": os.getenv('OPBEAT_SECRET_TOKEN', ''),
 }
 
+LOCALE_PATHS = [
+    os.path.abspath(os.path.join(BASE_DIR, 'locale')),
+]
 
 INTERNAL_IPS = os.getenv('INTERNAL_IPS', '').split()
 
