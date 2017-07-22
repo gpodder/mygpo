@@ -119,10 +119,3 @@ class PodcastPageTests(TestCase):
 
         with self.assertNumQueries(5):
             anon_request(url)
-
-
-def load_tests(loader, tests, ignore):
-    tests.addTest(doctest.DocTestSuite(mygpo.web.utils))
-    tests.addTest(unittest.TestLoader().loadTestsFromTestCase(SimpleWebTests))
-    tests.addTest(unittest.TestLoader().loadTestsFromTestCase(PodcastPageTests))
-    return tests

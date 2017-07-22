@@ -27,3 +27,4 @@ Contents
     :maxdepth: 1
 
     postgres-setup
+    libraries

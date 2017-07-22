@@ -17,6 +17,9 @@ class HistoryEntryAdmin(admin.ModelAdmin):
 
     raw_id_fields = ('user', 'podcast', 'client', )
 
+    show_full_result_count = False
+
+
 @admin.register(EpisodeHistoryEntry)
 class EpisodeHistoryEntryAdmin(admin.ModelAdmin):
     """ Admin page for episode history entries """
@@ -28,3 +31,5 @@ class EpisodeHistoryEntryAdmin(admin.ModelAdmin):
     list_select_related = ('user', 'episode', 'client', )
 
     raw_id_fields = ('user', 'episode', 'client', )
+
+    show_full_result_count = False

@@ -46,6 +46,8 @@ Podcast
   podcast-page, currently deactivated via API)
 
 
+.. _api-settings-set:
+
 Save Settings
 -------------
 
@@ -87,6 +89,8 @@ Save Settings
             "setting2": "value"
         }
 
+
+.. _api-settings-get:
 
 Get Settings
 ------------

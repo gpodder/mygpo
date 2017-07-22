@@ -13,3 +13,5 @@ class PodcastConfigAdmin(admin.ModelAdmin):
     list_select_related = ('user', 'content_object', )
 
     raw_id_fields = ('user', )
+
+    show_full_result_count = False

@@ -1,6 +1,9 @@
 Favorites API
 =============
 
+
+.. _api-favorite-episodes:
+
 Get Favorite Episodes
 ---------------------
 

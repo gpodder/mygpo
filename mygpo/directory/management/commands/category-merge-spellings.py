@@ -3,7 +3,7 @@ from datetime import datetime
 from django.core.management.base import BaseCommand
 from django.utils.text import slugify
 
-from mygpo.directory.models import Category, CategoryTag
+from mygpo.categories.models import Category, CategoryTag
 
 
 class Command(BaseCommand):
