@@ -35,9 +35,9 @@ def vertical_bar(value, max_value, display=None):
         right = format_html('<span>{}</span>', value_str)
 
     return format_html('<div class="barbg"><div class="bar" '
-                       'style="width: {:.2d}%">{}</div>{}</div>',
+                       'style="width: {:3.0}%">{}</div>{}</div>',
                        ratio, left, right)
-    return s
+
 
 @register.filter
 def timeline(data):
