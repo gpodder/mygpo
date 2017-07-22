@@ -372,11 +372,6 @@ SUPPORT_URL = os.getenv('SUPPORT_URL', '')
 
 FEEDSERVICE_URL = os.getenv('FEEDSERVICE_URL', 'http://feeds.gpodder.net/')
 
-# Elasticsearch settings
-
-ELASTICSEARCH_SERVER = os.getenv('ELASTICSEARCH_SERVER', '127.0.0.1:9200')
-ELASTICSEARCH_INDEX = os.getenv('ELASTICSEARCH_INDEX', 'mygpo')
-ELASTICSEARCH_TIMEOUT = float(os.getenv('ELASTICSEARCH_TIMEOUT', '2'))
 
 # time for how long an activation is valid; after that, an unactivated user
 # will be deleted
