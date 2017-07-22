@@ -10,10 +10,9 @@ from mygpo.directory.tasks import update_podcast_subscribers
 class Command(BaseCommand):
     """ For each podcast a task is scheduled to update its subscriber count """
 
-    option_list = BaseCommand.option_list + (
-        make_option('--silent', action='store_true', dest='silent',
-        default=False, help="Don't show any output"),
-    )
+    def add_arguments(self, parser):
+        parser.add_argument('--silent', action='store_true', dest='silent',
+            default=False, help="Don't show any output"),
 
     def handle(self, *args, **options):
 
