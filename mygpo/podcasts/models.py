@@ -569,7 +569,11 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
     # "order" value of the most recent episode (will be the highest of all)
     max_episode_order = models.PositiveIntegerField(null=True, default=None)
 
-    search_vector = SearchVectorField(null=False)
+    # indicates whether the search index is up-to-date (or needs updating)
+    search_index_uptodate = models.BooleanField(default=False, db_index=True)
+
+    # search vector for full-text search
+    search_vector = SearchVectorField(null=True)
 
     objects = PodcastManager()
 

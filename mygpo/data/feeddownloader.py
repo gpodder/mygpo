@@ -40,6 +40,7 @@ from mygpo.data.podcast import subscribe_at_hub
 from mygpo.data.tasks import update_related_podcasts
 from mygpo.pubsub.models import SubscriptionError
 from mygpo.directory.tags import update_category
+from mygpo.search import get_index_fields
 
 import logging
 logger = logging.getLogger(__name__)
@@ -172,6 +173,9 @@ def _update_podcast(podcast, parsed, episodes, max_episode_order):
     # we need that later to decide if we can "bump" a category
     prev_latest_episode_timestamp = podcast.latest_episode_timestamp
 
+    # will later be used to see whether the index is outdated
+    old_index_fields = get_index_fields(podcast)
+
     podcast.title = parsed.get('title') or podcast.title
     podcast.description = parsed.get('description') or podcast.description
     podcast.subtitle = parsed.get('subtitle') or podcast.subtitle
@@ -230,9 +234,10 @@ def _update_podcast(podcast, parsed, episodes, max_episode_order):
         podcast.logo_url = None
 
 
-    # TODO: encapsulate
-    podcast.search_vector = SearchVector('title', weight='A') + \
-                            SearchVector('description', weight='B')
+    # check if search index should be considered out of date
+    new_index_fields = get_index_fields(podcast)
+    if list(old_index_fields.items()) != list(new_index_fields.items()):
+        podcast.search_index_uptodate = False
 
     # The podcast is always saved (not just when there are changes) because
     # we need to record the last update
