@@ -157,7 +157,7 @@ INSTALLED_APPS = [
     'mygpo.pubsub',
     'mygpo.podcastlists',
     'mygpo.votes',
-    'django_nose',
+    # 'django_nose',
 ]
 
 try:
