@@ -1,6 +1,9 @@
 Directory API
 =============
 
+
+.. _api-top-tags:
+
 Retrieve Top Tags
 -----------------
 
@@ -42,6 +45,9 @@ Retrieve Top Tags
     :param count: number of tags to return
 
 
+
+.. _api-podcasts-tag:
+
 Retrieve Podcasts for Tag
 -------------------------
 
@@ -79,6 +85,9 @@ Retrieve Podcasts for Tag
     :param count: maximum number of podcasts to return
 
 
+
+.. _api-podcast-data:
+
 Retrieve Podcast Data
 ---------------------
 
@@ -107,6 +116,8 @@ Retrieve Podcast Data
 
     ::query url: the feed URL of the podcast
 
+
+.. _api-episode-data:
 
 Retrieve Episode Data
 ---------------------

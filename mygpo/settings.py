@@ -1,21 +1,3 @@
-# Django settings for mygpo project.
-#
-# This file is part of my.gpodder.org.
-#
-# my.gpodder.org is free software: you can redistribute it and/or modify it
-# under the terms of the GNU Affero General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at your
-# option) any later version.
-#
-# my.gpodder.org is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
-# License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
-#
-
 import re
 import sys
 import os.path
@@ -118,6 +100,9 @@ TEMPLATES = [{
                 # page after login
                 'django.core.context_processors.request',
         ],
+        'libraries': {
+            'staticfiles' : 'django.templatetags.static',
+        },
         'loaders': [
             ('django.template.loaders.cached.Loader', [
                 'django.template.loaders.app_directories.Loader',
@@ -138,7 +123,7 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'mygpo.urls'
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.messages',
     'django.contrib.admin',
@@ -172,11 +157,12 @@ INSTALLED_APPS = (
     'mygpo.pubsub',
     'mygpo.podcastlists',
     'mygpo.votes',
-)
+    'django_nose',
+]
 
 try:
     import debug_toolbar
-    INSTALLED_APPS += ('debug_toolbar', )
+    INSTALLED_APPS += ['debug_toolbar']
     MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware', )
 
 except ImportError:
@@ -187,7 +173,7 @@ try:
     import opbeat
 
     if not DEBUG:
-        INSTALLED_APPS += ('opbeat.contrib.django', )
+        INSTALLED_APPS += ['opbeat.contrib.django']
 
         # add opbeat middleware to the beginning of the middleware classes list
         MIDDLEWARE_CLASSES = \
@@ -397,6 +383,9 @@ OPBEAT = {
     "SECRET_TOKEN": os.getenv('OPBEAT_SECRET_TOKEN', ''),
 }
 
+LOCALE_PATHS = [
+    os.path.abspath(os.path.join(BASE_DIR, 'locale')),
+]
 
 INTERNAL_IPS = os.getenv('INTERNAL_IPS', '').split()
 
@@ -404,3 +393,11 @@ EMAIL_BACKEND = os.getenv('EMAIL_BACKEND',
                           'django.core.mail.backends.smtp.EmailBackend')
 
 PODCAST_AD_ID = os.getenv('PODCAST_AD_ID')
+
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+NOSE_ARGS = [
+    '--with-doctest',
+    '--stop',
+    '--where=mygpo',
+]

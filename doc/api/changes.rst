@@ -1,87 +1,101 @@
 API Changes
 ===========
 
-This page lists changes to the Advanced API. The current version is 2.11. This versioning scheme has been introduced in [1].
+This page lists changes to the Advanced API. The current version is 2.11. This
+versioning scheme has been introduced in `Bug 1273
+<https://bugs.gpodder.org/show_bug.cgi?id=1273>`_.
 
 Version 2.11
 ------------
 
-    added Download All subscriptions
+* added :ref:`api-subscriptions-all`.
 
 Version 2.10
 ------------
 
-    added Authentication API [2]
-    added Device Synchronization API [3]
-    added Podcast Lists API [4]
-    added include_actions parameter to Device Update API [5]
+* added Authentication API
+  (`bug 1397 <https://bugs.gpodder.org/show_bug.cgi?id=1397>`_)
+* added Device Synchronization API
+  (`bug 1266 <https://bugs.gpodder.org/show_bug.cgi?id=1266>`_)
+* added Podcast Lists API
+  (`bug 1402 <https://bugs.gpodder.org/show_bug.cgi?id=1402>`_)
+* added include_actions parameter to Device Update API
+  (`bug 1419 <https://bugs.gpodder.org/show_bug.cgi?id=1419>`_)
 
 
 Version 2.9
 -----------
 
-    added XML format to some Simple API requests [6] [7]
+* added XML format to some Simple API requests
+  (`bug 1362 <https://bugs.gpodder.org/show_bug.cgi?id=1362>`_,
+  `bug 1383 <https://bugs.gpodder.org/show_bug.cgi?id=1383>`_)
 
 
 Version 2.8
 -----------
 
-    added JSONP as a format to Simple API requests [8]
+* added `JSONP <http://en.wikipedia.org/wiki/JSON#JSONP>`_ as a format to
+  Simple API requests
+  (`bug 1302 <https://bugs.gpodder.org/show_bug.cgi?id=1302>`_)
 
 
 Version 2.7
 -----------
 
-    added API Parametrization
+* added :ref:`api-parametrization`
 
 
 Version 2.6
 -----------
 
-    added "released" to Retrieving Episode Data and Listing Favorite Episodes
+* added `released` to :ref:`api-episode-data` and :ref:`api-favorite-episodes`
 
 
 Version 2.5
 -----------
-    added "Subscribers Last Week" to Retrieving Podcast Data [9]
+
+* added "Subscribers Last Week" to :ref:`api-podcast-data`
+  (`bug 1188 <https://bugs.gpodder.org/show_bug.cgi?id=1188>`_)
 
 
 Version 2.4
 -----------
 
-    added Saving a Setting [10]
-    added Retrieving Settings
-    added Listing Favorite Episodes
+* added :ref:`api-settings-set`
+  (`bug 1082 <https://bugs.gpodder.org/show_bug.cgi?id=1082>`_)
+* added :ref:`api-settings-get`
+* added :ref:`api-favorite-episodes`
 
 
 Version 2.3
 -----------
 
-    added Retrieving Updates for a Device
+* added :ref:`api-device-updates`
 
 
 Version 2.2
 -----------
 
-    added Retrieving Top Tags
-    added Retrieving Podcasts of a Tag
-    added Retrieving Podcast Data
-    added Retrieving Episode Data
+* added :ref:`api-top-tags`
+* added :ref:`api-podcasts-tag`
+* added :ref:`api-podcast-data`
+* added :ref:`api-episode-data`
 
 
 Version 2.1
 -----------
 
-    added aggregated=true to Retrieving episode actions [11]
+* added ``aggregated=true`` to :ref:`api-episode-actions-get`
+  (`bug 1030 <https://bugs.gpodder.org/show_bug.cgi?id=1030>`_)
 
 
 Version 2.0
 -----------
 
-    added Add/remove subscriptions
-    added Retrieving subscription changes
-    added Uploading episode actions
-    added Retrieving episode actions
-    added (Re)naming devices and setting the type
-    added Getting a list of devices
+* added :ref:`api-subscriptions-change-add`
+* added :ref:`api-subscriptions-change-get`
+* added :ref:`api-episode-actions-add`
+* added :ref:`api-episode-actions-get`
+* added :ref:`api-device-data-set`
+* added :ref:`api-device-list`
 

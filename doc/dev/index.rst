@@ -26,4 +26,8 @@ Contents
 .. toctree::
     :maxdepth: 1
 
+    installation
     postgres-setup
+    libraries
+    configuration
+

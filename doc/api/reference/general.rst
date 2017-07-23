@@ -48,6 +48,8 @@ cross domain issues. The response includes the same data output as the regular
 API, plus the relevant HTTP Header information.
 
 
+.. _api-parametrization:
+
 API Parametrization
 -------------------
 

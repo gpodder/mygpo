@@ -1,3 +1,5 @@
+.. _db-setup:
+
 PostgreSQL Setup
 ================
 

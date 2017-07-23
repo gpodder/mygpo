@@ -16,3 +16,5 @@ class EpisodeStateAdmin(admin.ModelAdmin):
     list_select_related = ('user', 'episode', )
 
     raw_id_fields = ('user', 'episode', )
+
+    show_full_result_count = False

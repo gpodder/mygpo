@@ -55,8 +55,3 @@ class TestSubscribe(TestCase):
         self.podcast.delete()
         self.client.delete()
         self.user.delete()
-
-
-def load_tests(loader, tests, ignore):
-    tests.addTest(unittest.TestLoader().loadTestsFromTestCase(TestSubscribe))
-    return tests
