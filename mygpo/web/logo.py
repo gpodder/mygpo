@@ -11,7 +11,7 @@ from PIL import Image, ImageDraw
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.http import Http404, HttpResponse, HttpResponseNotFound
-from django.views.generic.base import View
+from django.views import View
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import last_modified
 

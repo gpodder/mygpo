@@ -16,10 +16,24 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Client',
             fields=[
-                ('id', models.UUIDField(max_length=32, serialize=False, primary_key=True)),
+                ('id', models.UUIDField(
+                    max_length=32,
+                    serialize=False,
+                    primary_key=True)),
                 ('uid', models.CharField(max_length=64)),
-                ('name', models.CharField(default='New Device', max_length=100)),
-                ('type', models.CharField(default='other', max_length=7, choices=[('desktop', 'Desktop'), ('laptop', 'Laptop'), ('mobile', 'Cell phone'), ('server', 'Server'), ('tablet', 'Tablet'), ('other', 'Other')])),
+                ('name', models.CharField(
+                    default='New Device',
+                    max_length=100)),
+                ('type', models.CharField(
+                    default='other',
+                    max_length=7,
+                    choices=[
+                        ('desktop', 'Desktop'),
+                        ('laptop', 'Laptop'),
+                        ('mobile', 'Cell phone'),
+                        ('server', 'Server'),
+                        ('tablet', 'Tablet'),
+                        ('other', 'Other')])),
                 ('deleted', models.BooleanField(default=False)),
                 ('user_agent', models.CharField(max_length=300)),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),

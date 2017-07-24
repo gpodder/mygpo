@@ -14,7 +14,8 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.vary import vary_on_cookie
 from django.views.generic import ListView
 from django.utils.decorators import method_decorator
-from django.views.generic.base import View, TemplateView
+from django.views import View
+from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils.translation import ugettext as _
@@ -377,7 +378,7 @@ class FlattrPodcastList(PodcastListView):
 
     def get_context_data(self, num=100):
         context = super(FlattrPodcastList, self).get_context_data()
-        context['flattr_auth'] = (self.request.user.is_authenticated()
+        context['flattr_auth'] = (self.request.user.is_authenticated
                    #  and bool(self.request.user.get_wksetting(FLATTR_TOKEN))
                         )
         return context

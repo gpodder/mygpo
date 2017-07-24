@@ -11,7 +11,8 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import never_cache
 from django.template.loader import render_to_string
-from django.views.generic.base import View, TemplateView
+from django.views import View
+from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.core.urlresolvers import reverse
 from django.utils.http import is_safe_url
@@ -44,7 +45,7 @@ class LoginView(View):
         """ Shows the login page """
 
         # Do not show login page for already-logged-in users
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             return HttpResponseRedirect(DEFAULT_LOGIN_REDIRECT)
 
         return render(request, 'login.html', {
@@ -183,7 +184,7 @@ class GoogleLoginCallback(TemplateView):
         email = self._get_email(credentials.token_response)
 
         # Connect account
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             request.user.google_email = email
             request.user.save()
             messages.success(request, _('Your account has been connected with '
