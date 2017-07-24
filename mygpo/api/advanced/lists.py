@@ -5,7 +5,7 @@ from datetime import datetime
 from django.http import HttpResponse, HttpResponseBadRequest, \
      HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.sites.requests import RequestSite
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify

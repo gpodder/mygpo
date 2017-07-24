@@ -3,7 +3,7 @@ import os.path
 from django import template
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.html import strip_tags
 from django.contrib.staticfiles.storage import staticfiles_storage
 

@@ -4,7 +4,7 @@ import uuid
 import urllib.request, urllib.parse, urllib.error
 import json
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.client import Client as TestClient
 from django.test import TestCase
 
