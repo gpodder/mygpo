@@ -28,6 +28,11 @@ RUN venv/bin/pip install \
     -r /srv/mygpo/requirements.txt \
     -r /srv/mygpo/requirements-setup.txt
 
+ENV SECRET_KEY temp
+
+RUN venv/bin/python manage.py collectstatic --no-input
+RUN venv/bin/python manage.py compilemessages
+
 # set up missing environment variables
 ENTRYPOINT ["/srv/mygpo/bin/docker-env.sh"]
 
