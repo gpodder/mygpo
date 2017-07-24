@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # Docker doesn't have a great way to set environment variables at startup.
 # This scripts will set up some defaults.
 

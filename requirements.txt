@@ -16,3 +16,4 @@ python-dateutil==2.6.0
 redis==2.10.5
 django-celery==3.2.1
 requests==2.18.1
+whitenoise==3.3.0

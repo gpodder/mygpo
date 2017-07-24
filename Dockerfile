@@ -1,17 +1,12 @@
-FROM ubuntu:latest
+FROM python:3
 MAINTAINER Stefan Kögl <stefan@skoegl.net>
 
-# use bash instead of built-in sh, because it does not support "source" during build
-RUN rm /bin/sh && ln -s /bin/bash /bin/sh
-
-RUN apt-get update
-
-# install Docker dependencies
-RUN apt-get install -y git virtualenv make
+RUN apt-get update && apt-get install -y git make
 
 # copy source
-COPY . /srv/mygpo
 WORKDIR /srv/mygpo
+
+COPY makefile .
 
 # install all packaged runtime dependencies
 RUN yes | make install-deps
@@ -19,25 +14,24 @@ RUN yes | make install-deps
 # create log directories
 RUN mkdir -p /var/log/gunicorn
 
-# run everything in a virtualenv
-RUN virtualenv -p `which python3` venv
-RUN source venv/bin/activate
+COPY requirements.txt .
+COPY requirements-setup.txt .
 
 # install all runtime dependencies
-RUN venv/bin/pip install \
-    -r /srv/mygpo/requirements.txt \
-    -r /srv/mygpo/requirements-setup.txt
+RUN pip install \
+    -r requirements.txt \
+    -r requirements-setup.txt
 
+# copy source
+COPY . .
+
+# Post-deployment actions
 ENV SECRET_KEY temp
-
-RUN venv/bin/python manage.py collectstatic --no-input
-RUN venv/bin/python manage.py compilemessages
+RUN python manage.py collectstatic --no-input
+RUN python manage.py compilemessages
 
 # set up missing environment variables
 ENTRYPOINT ["/srv/mygpo/bin/docker-env.sh"]
 
 # default launch command
 CMD ["gunicorn", "mygpo.wsgi:application", "--access-logfile", "-"]
-
-# HTTP port
-EXPOSE 8000
