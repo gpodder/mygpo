@@ -157,8 +157,8 @@ INSTALLED_APPS = [
     'mygpo.pubsub',
     'mygpo.podcastlists',
     'mygpo.votes',
-    'django_nose',
 ]
+
 
 try:
     import debug_toolbar
@@ -394,10 +394,20 @@ EMAIL_BACKEND = os.getenv('EMAIL_BACKEND',
 
 PODCAST_AD_ID = os.getenv('PODCAST_AD_ID')
 
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+try:
+    import django_nose
 
-NOSE_ARGS = [
-    '--with-doctest',
-    '--stop',
-    '--where=mygpo',
-]
+    INSTALLED_APPS += [
+        'django_nose',
+    ]
+
+    TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+    NOSE_ARGS = [
+        '--with-doctest',
+        '--stop',
+        '--where=mygpo',
+    ]
+
+except ImportError:
+    print('django-nose is not installed.')
