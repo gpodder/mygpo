@@ -1,5 +1,5 @@
 from django.conf.urls import url
-from django.contrib.auth.views import logout
+from django.contrib.auth.views import LogoutView
 from django.views.generic.base import TemplateView
 
 from .views import registration, settings, device, user
@@ -148,7 +148,7 @@ urlpatterns = [
         name='login-google-callback'),
 
     url(r'^logout/$',
-        logout,
+        LogoutView.as_view(),
         kwargs={'next_page': '/'},
         name='logout'),
 
