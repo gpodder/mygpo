@@ -5,7 +5,7 @@ from django.http import HttpResponseBadRequest, HttpResponseNotFound
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 from django.utils.decorators import method_decorator
-from django.views.generic.base import View
+from django.views import View
 
 from mygpo.utils import parse_request_body
 from mygpo.api.exceptions import ParameterMissing

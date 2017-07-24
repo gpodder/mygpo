@@ -39,7 +39,7 @@ def episode(request, episode):
     if not podcast:
         raise Http404
 
-    if user.is_authenticated():
+    if user.is_authenticated:
 
         is_fav = FavoriteEpisode.objects.filter(user=user, episode=episode)\
                                         .exists()

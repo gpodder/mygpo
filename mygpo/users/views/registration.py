@@ -10,7 +10,7 @@ from django.utils.translation import ugettext as _
 from django.template.loader import render_to_string
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.views.generic import TemplateView
-from django.views.generic.base import View
+from django.views import View
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.sites.requests import RequestSite
@@ -20,8 +20,6 @@ from mygpo.users.models import UserProxy
 
 
 USERNAME_MAXLEN = get_user_model()._meta.get_field('username').max_length
-
-USERNAME_REGEX = re.compile(r'^\w[\w.+-]*$')
 
 
 class DuplicateUsername(ValidationError):
@@ -44,9 +42,10 @@ class DuplicateEmail(ValidationError):
 
 class UsernameValidator(RegexValidator):
     """ Validates that a username uses only allowed characters """
-    regex = USERNAME_REGEX
+    regex = r'^\w[\w.+-]*$'
     message = 'Invalid Username'
-    code='invalid-username'
+    code = 'invalid-username'
+    flags = re.ASCII
 
 
 class RegistrationForm(forms.Form):

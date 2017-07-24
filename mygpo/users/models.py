@@ -10,6 +10,7 @@ from django.db import transaction, models
 from django.db.models import Q
 from django.contrib.auth.models import User as DjangoUser
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth.validators import ASCIIUsernameValidator
 from django.conf import settings
 
 from mygpo.core.models import (TwitterModel, UUIDModel,
@@ -75,6 +76,10 @@ class UserProxyManager(GenericManager):
 class UserProxy(DjangoUser):
 
     objects = UserProxyManager()
+
+    # only accept ASCII usernames, see
+    # https://docs.djangoproject.com/en/dev/releases/1.10/#official-support-for-unicode-usernames
+    username_validator = ASCIIUsernameValidator()
 
     class Meta:
         proxy = True

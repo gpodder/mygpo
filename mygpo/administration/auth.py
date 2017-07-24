@@ -14,7 +14,7 @@ def require_staff(protected_view):
         if token_auth:
             return protected_view(request, *args, **kwargs)
 
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             return HttpResponseRedirect('/login/')
 
         if request.user.is_staff:

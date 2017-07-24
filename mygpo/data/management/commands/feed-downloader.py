@@ -14,10 +14,12 @@ logger = logging.getLogger(__name__)
 
 class Command(PodcastCommand):
 
-    option_list = PodcastCommand.option_list + (
-        make_option('--list-only', action='store_true', dest='list',
+    def add_arguments(self, parser):
+
+        parser.add_argument('urls', nargs='+', type=str)
+
+        parser.add_argument('--list-only', action='store_true', dest='list',
             default=False, help="Don't update anything, just list podcasts "),
-        )
 
 
     def handle(self, *args, **options):

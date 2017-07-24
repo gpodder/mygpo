@@ -9,7 +9,7 @@ def require_publisher(protected_view):
     @wraps(protected_view)
     def wrapper(request, *args, **kwargs):
 
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             return HttpResponseRedirect('/login/')
 
         if is_publisher(request.user):
@@ -27,7 +27,7 @@ def is_publisher(user):
     or he has the staff flag set
     """
 
-    if not user.is_authenticated():
+    if not user.is_authenticated:
         return False
 
     if user.is_staff:

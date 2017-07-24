@@ -100,7 +100,7 @@ def require_valid_user(protected_view):
     @wraps(protected_view)
     def wrapper(request, *args, **kwargs):
         def check_valid_user(user):
-            return user.is_authenticated()
+            return user.is_authenticated
 
         return view_or_basicauth(protected_view, \
                                  request, \

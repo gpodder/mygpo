@@ -85,12 +85,12 @@ TEMPLATES = [{
                 'mygpo.web.google.adsense',
                 # make the debug variable available in templates
                 # https://docs.djangoproject.com/en/dev/ref/templates/api/#django-core-context-processors-debug
-                'django.core.context_processors.debug',
+                'django.template.context_processors.debug',
 
                 # required so that the request obj can be accessed from
                 # templates. this is used to direct users to previous
                 # page after login
-                'django.core.context_processors.request',
+                'django.template.context_processors.request',
         ],
         'libraries': {
             'staticfiles' : 'django.templatetags.static',
@@ -104,14 +104,14 @@ TEMPLATES = [{
 }]
 
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-)
+]
 
 ROOT_URLCONF = 'mygpo.urls'
 
@@ -155,7 +155,7 @@ INSTALLED_APPS = [
 try:
     import debug_toolbar
     INSTALLED_APPS += ['debug_toolbar']
-    MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware', )
+    MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
 
 except ImportError:
     pass
@@ -168,9 +168,9 @@ try:
         INSTALLED_APPS += ['opbeat.contrib.django']
 
         # add opbeat middleware to the beginning of the middleware classes list
-        MIDDLEWARE_CLASSES = \
-            ('opbeat.contrib.django.middleware.OpbeatAPMMiddleware',) + \
-            MIDDLEWARE_CLASSES
+        MIDDLEWARE = \
+            ['opbeat.contrib.django.middleware.OpbeatAPMMiddleware'] + \
+            MIDDLEWARE
 
 except ImportError:
     pass
