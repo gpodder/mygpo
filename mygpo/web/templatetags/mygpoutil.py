@@ -8,6 +8,7 @@ from django.utils.safestring import mark_safe
 register = template.Library()
 
 @register.filter
+@mark_safe
 def remove_html_tags(html):
     # If we would want more speed, we could make these global
     re_strip_tags = re.compile('<[^>]*>')
@@ -35,4 +36,4 @@ def remove_html_tags(html):
     # Convert more than two newlines to two newlines
     result = re.sub('([\r\n]{2})([\r\n])+', '\\1', result)
 
-    return mark_safe(result.strip())
+    return result.strip()

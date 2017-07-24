@@ -31,6 +31,7 @@ def device_type(device):
     return DEVICE_TYPES_DICT.get(device.type, _('Unknown'))
 
 @register.filter
+@mark_safe
 def device_icon(device):
 
     ua_str = (device.user_agent or '').lower()
@@ -57,7 +58,7 @@ def device_icon(device):
         html = '<img src="%(icon)s" alt="%(caption)s" class="device_icon"/>' \
             % dict(icon=staticfiles_storage.url(os.path.join('clients', icon)),
                    caption=caption)
-        return mark_safe(html)
+        return html
 
     return ''
 

@@ -16,13 +16,13 @@ from mygpo.web.utils import get_podcast_link_target, \
 register = template.Library()
 
 
+@mark_safe
 def create_podcast_logo(podcast, size):
     if not podcast:
         return ''
 
     size = int(size)
-    s = '<img src="%s" alt="" />' % (get_logo_url(podcast, size),)
-    return mark_safe(s)
+    return '<img src="%s" alt="" />' % (get_logo_url(podcast, size),)
 
 @register.filter
 def podcast_logo(podcast):
@@ -38,15 +38,16 @@ def podcast_logo_medium(podcast):
 
 
 @register.filter
+@mark_safe
 def podcast_status_icon(action):
     if action.action == 'subscribe':
-        s = '<img src="%s" />' % (staticfiles_storage.url('subscribe.png'),)
+        return '<img src="%s" />' % (staticfiles_storage.url('subscribe.png'),)
     elif action.action == 'unsubscribe':
-        s = '<img src="%s" />' % (staticfiles_storage.url('unsubscribe.png'),)
+        return '<img src="%s" />' % (staticfiles_storage.url('unsubscribe.png'),)
     elif action.action == 'flattr':
-        s = '<img src="https://flattr.com/_img/icons/flattr_logo_16.png" />'
+        return '<img src="https://flattr.com/_img/icons/flattr_logo_16.png" />'
 
-    return mark_safe(s)
+    return ''
 
 
 @register.filter
