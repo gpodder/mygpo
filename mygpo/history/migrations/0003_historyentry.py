@@ -23,6 +23,10 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='historyentry',
             name='client',
-            field=models.ForeignKey(to='users.Client', null=True),
+            field=models.ForeignKey(
+                to='users.Client',
+                null=True,
+                on_delete=models.CASCADE,
+            ),
         ),
     ]

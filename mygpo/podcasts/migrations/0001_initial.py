@@ -37,7 +37,9 @@ class Migration(migrations.Migration):
                 ('uuid', models.UUIDField(unique=True, max_length=32)),
                 ('content_type', models.ForeignKey(
                     to='contenttypes.ContentType',
-                    to_field='id')),
+                    to_field='id',
+                    on_delete=models.PROTECT,
+                )),
                 ('object_id', models.UUIDField(max_length=32)),
             ],
             options={
@@ -57,7 +59,9 @@ class Migration(migrations.Migration):
                 ('slug', models.SlugField()),
                 ('content_type', models.ForeignKey(
                     to='contenttypes.ContentType',
-                    to_field='id')),
+                    to_field='id',
+                    on_delete=models.PROTECT,
+                )),
                 ('object_id', models.UUIDField(max_length=32)),
             ],
             options={
@@ -81,7 +85,9 @@ class Migration(migrations.Migration):
                     choices=[(1, 'Feed'), (2, 'delicious'), (4, 'User')])),
                 ('content_type', models.ForeignKey(
                     to='contenttypes.ContentType',
-                    to_field='id')),
+                    to_field='id',
+                    on_delete=models.PROTECT,
+                )),
                 ('object_id', models.UUIDField(max_length=32)),
             ],
             options={
@@ -104,7 +110,9 @@ class Migration(migrations.Migration):
                 ('url', models.URLField(max_length=1000)),
                 ('content_type', models.ForeignKey(
                     to='contenttypes.ContentType',
-                    to_field='id')),
+                    to_field='id',
+                    on_delete=models.PROTECT,
+                )),
                 ('object_id', models.UUIDField(max_length=32)),
             ],
             options={
@@ -142,7 +150,9 @@ class Migration(migrations.Migration):
                 ('group', models.ForeignKey(
                     to='podcasts.PodcastGroup',
                     to_field='id',
-                    null=True)),
+                    null=True,
+                    on_delete=models.PROTECT,
+                )),
                 ('group_member_name', models.CharField(
                     max_length=30,
                     null=True)),
@@ -190,7 +200,11 @@ class Migration(migrations.Migration):
                 ('filesize', models.PositiveIntegerField(null=True)),
                 ('mimetypes', models.CharField(max_length=50)),
                 ('listeners', models.PositiveIntegerField(null=True)),
-                ('podcast', models.ForeignKey(to='podcasts.Podcast', to_field='id')),
+                ('podcast', models.ForeignKey(
+                    to='podcasts.Podcast',
+                    to_field='id',
+                    on_delete=models.PROTECT,
+                )),
             ],
             options={
                 'abstract': False,

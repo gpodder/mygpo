@@ -14,7 +14,12 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='episodehistoryentry',
             name='client',
-            field=models.ForeignKey(blank=True, to='users.Client', null=True),
+            field=models.ForeignKey(
+                blank=True,
+                to='users.Client',
+                null=True,
+                on_delete=models.CASCADE,
+            ),
             preserve_default=True,
         ),
         migrations.AlterField(
