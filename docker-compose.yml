@@ -32,6 +32,9 @@ services:
       - memcached
     ports:
       - '8000:8000'
+    depends_on:
+      - postgres
+      - redis
 
   worker:
     extends: base
@@ -49,5 +52,8 @@ services:
     command: python manage.py celery beat -S djcelery.schedulers.DatabaseScheduler
     links:
       - web
+      - postgres
+      - redis
+    depends_on:
       - postgres
       - redis
