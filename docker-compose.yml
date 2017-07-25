@@ -16,9 +16,6 @@ services:
     build:
       context: contrib
       dockerfile: Dockerfile.postgres
-    environment:
-      POSTGRES_USER: mygpo
-      POSTGRES_PASSWORD: mygpo
 
   memcached:
     image: memcached:1.4
