@@ -35,6 +35,17 @@ services:
 
   worker:
     extends: base
+    command: python manage.py celery worker
+    links:
+      - web
+      - postgres
+      - redis
+    depends_on:
+      - postgres
+      - redis
+
+  beat:
+    extends: base
     command: python manage.py celery beat -S djcelery.schedulers.DatabaseScheduler
     links:
       - web
