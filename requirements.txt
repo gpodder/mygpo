@@ -1,6 +1,6 @@
+Django==1.10.7
 Babel==2.4.0
 Pillow==4.1.1
-Django==1.9.13
 celery==3.1.24
 dj-database-url==0.4.2
 django-redis-sessions==0.5.6

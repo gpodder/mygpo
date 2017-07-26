@@ -1,20 +1,3 @@
-#
-# This file is part of my.gpodder.org.
-#
-# my.gpodder.org is free software: you can redistribute it and/or modify it
-# under the terms of the GNU Affero General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at your
-# option) any later version.
-#
-# my.gpodder.org is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
-# License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
-#
-
 import sys
 from collections import defaultdict
 from datetime import datetime, timedelta
@@ -26,7 +9,7 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.contrib.sites.requests import RequestSite
-from django.views.generic.base import View
+from django.views import View
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control
 
@@ -45,7 +28,7 @@ from mygpo.publisher.models import PublishedPodcast
 @vary_on_cookie
 @cache_control(private=True)
 def home(request):
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         return dashboard(request)
     else:
         return welcome(request)

@@ -20,6 +20,8 @@ class CategoryAdmin(admin.ModelAdmin):
 
     list_display = ('title', 'num_entries', 'tag_list')
 
+    show_full_result_count = False
+
     inlines = [
         CategoryEntryInline,
         CategoryTagInline,

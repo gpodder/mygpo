@@ -38,6 +38,8 @@ class ClientAdmin(admin.ModelAdmin):
 
     raw_id_fields = ('user', )
 
+    show_full_result_count = False
+
 
 @admin.register(SyncGroup)
 class SyncGroupAdmin(admin.ModelAdmin):
@@ -48,3 +50,5 @@ class SyncGroupAdmin(admin.ModelAdmin):
     def num_clients(self, group):
         """ Numer of clients that belong to this group """
         return Client.objects.filter(sync_group=group).count()
+
+    show_full_result_count = False

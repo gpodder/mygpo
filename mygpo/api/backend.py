@@ -1,20 +1,3 @@
-#
-# This file is part of my.gpodder.org.
-#
-# my.gpodder.org is free software: you can redistribute it and/or modify it
-# under the terms of the GNU Affero General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at your
-# option) any later version.
-#
-# my.gpodder.org is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
-# License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
-#
-
 import uuid
 
 from django.db import transaction, IntegrityError
@@ -38,14 +21,14 @@ def get_device(user, uid, user_agent, undelete=True):
     # list of fields to update -- empty list = no update
     update_fields = []
 
-    with transaction.atomic():
-        try:
+    try:
+        with transaction.atomic():
             client = Client(id=uuid.uuid1(), user=user, uid=uid)
             client.full_clean()
             client.save()
 
-        except IntegrityError:
-            client = Client.objects.get(user=user, uid=uid)
+    except IntegrityError:
+        client = Client.objects.get(user=user, uid=uid)
 
     if client.deleted and undelete:
         client.deleted = False

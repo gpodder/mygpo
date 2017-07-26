@@ -1,20 +1,3 @@
-#
-# This file is part of my.gpodder.org.
-#
-# my.gpodder.org is free software: you can redistribute it and/or modify it
-# under the terms of the GNU Affero General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at your
-# option) any later version.
-#
-# my.gpodder.org is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
-# License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
-#
-
 import unittest
 import uuid
 from datetime import datetime, timedelta
@@ -140,10 +123,3 @@ class SlugTests(TestCase):
             # add a non-canonical slug
             podcast.add_slug('podcast-3')
             self.assertEqual(podcast.slug, 'podcast-1')
-
-
-def load_tests(loader, tests, ignore):
-    tests.addTest(unittest.TestLoader().loadTestsFromTestCase(PodcastTests))
-    tests.addTest(unittest.TestLoader().loadTestsFromTestCase(PodcastGroupTests))
-    tests.addTest(unittest.TestLoader().loadTestsFromTestCase(SlugTests))
-    return tests

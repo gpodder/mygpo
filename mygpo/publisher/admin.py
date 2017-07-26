@@ -14,3 +14,5 @@ class ClientAdmin(admin.ModelAdmin):
     list_select_related = ('publisher', 'podcast', )
 
     raw_id_fields = ('publisher', 'podcast', )
+
+    show_full_result_count = False

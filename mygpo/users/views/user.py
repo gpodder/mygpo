@@ -1,20 +1,3 @@
-#
-# This file is part of my.gpodder.org.
-#
-# my.gpodder.org is free software: you can redistribute it and/or modify it
-# under the terms of the GNU Affero General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at your
-# option) any later version.
-#
-# my.gpodder.org is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
-# License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
-#
-
 import string
 import random
 
@@ -28,7 +11,8 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import never_cache
 from django.template.loader import render_to_string
-from django.views.generic.base import View, TemplateView
+from django.views import View
+from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.core.urlresolvers import reverse
 from django.utils.http import is_safe_url
@@ -61,7 +45,7 @@ class LoginView(View):
         """ Shows the login page """
 
         # Do not show login page for already-logged-in users
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             return HttpResponseRedirect(DEFAULT_LOGIN_REDIRECT)
 
         return render(request, 'login.html', {
@@ -200,7 +184,7 @@ class GoogleLoginCallback(TemplateView):
         email = self._get_email(credentials.token_response)
 
         # Connect account
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             request.user.google_email = email
             request.user.save()
             messages.success(request, _('Your account has been connected with '

@@ -71,7 +71,7 @@ def show(request, podcast):
     tags = get_tags(podcast, user)
     has_tagged = any(t['is_own'] for t in tags)
 
-    if user.is_authenticated():
+    if user.is_authenticated:
         subscribed_devices = Client.objects.filter(
             subscription__user=user,
             subscription__podcast=podcast,
