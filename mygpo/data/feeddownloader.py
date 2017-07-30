@@ -2,13 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import os.path
-import urllib.request, urllib.error, urllib.parse
+import urllib.parse
 from urllib.parse import urljoin
-import http.client
 import hashlib
 from datetime import datetime, timedelta
 from itertools import chain, islice
-import socket
 import requests
 
 from django.db import transaction
@@ -18,7 +16,7 @@ from mygpo.podcasts.models import Podcast, Episode
 from mygpo.core.slugs import PodcastSlugs, EpisodeSlugs
 from mygpo.podcasts.models import DEFAULT_UPDATE_INTERVAL, \
     MIN_UPDATE_INTERVAL, MAX_UPDATE_INTERVAL
-from mygpo.utils import file_hash, to_maxlength
+from mygpo.utils import to_maxlength
 from mygpo.web.logo import CoverArt
 from mygpo.data.podcast import subscribe_at_hub
 from mygpo.data.tasks import update_related_podcasts
@@ -209,7 +207,7 @@ def _update_podcast(podcast, parsed, episodes, max_episode_order):
     _update_categories(podcast, prev_latest_episode_timestamp)
 
     # try to download the logo and reset logo_url to None on http errors
-    found = _save_podcast_logo(podcast.logo_url)
+    found = CoverArt.save_podcast_logo(podcast.logo_url)
     if not found:
         podcast.logo_url = None
 
@@ -351,48 +349,6 @@ def _order_episodes(podcast):
         episode.save()
 
     return num_episodes - 1
-
-
-def _save_podcast_logo(cover_art):
-    if not cover_art:
-        return
-
-    try:
-        image_sha1 = hashlib.sha1(cover_art.encode('utf-8')).hexdigest()
-        prefix = CoverArt.get_prefix(image_sha1)
-
-        filename = CoverArt.get_original(prefix, image_sha1)
-        dirname = CoverArt.get_dir(filename)
-
-        # get hash of existing file
-        if os.path.exists(filename):
-            with open(filename, 'rb') as f:
-                old_hash = file_hash(f).digest()
-        else:
-            old_hash = ''
-
-        logger.info('Logo %s', cover_art)
-
-        # save new cover art
-        with open(filename, 'wb') as fp:
-            fp.write(urllib.request.urlopen(cover_art).read())
-
-        # get hash of new file
-        with open(filename, 'rb') as f:
-            new_hash = file_hash(f).digest()
-
-        # remove thumbnails if cover changed
-        if old_hash != new_hash:
-            thumbnails = CoverArt.get_existing_thumbnails(prefix, filename)
-            logger.info('Removing %d thumbnails', len(thumbnails))
-            for f in thumbnails:
-                os.unlink(f)
-
-        return cover_art
-
-    except (urllib.error.HTTPError, urllib.error.URLError, ValueError,
-            http.client.HTTPException, socket.error, IOError) as e:
-        logger.warn('Exception while updating podcast logo: %s', str(e))
 
 
 def _mark_outdated(podcast, msg=''):

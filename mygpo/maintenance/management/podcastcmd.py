@@ -65,7 +65,7 @@ class PodcastCommand(BaseCommand):
                     and not options.get('random')  and not options.get('next'):
             query = Podcast.objects.order_by('last_update')
             podcasts = query.select_related('urls')[:max_podcasts]
-            yield (p.url for p in podcasts)
+            #yield (p.url for p in podcasts)
 
 
     def get_toplist(self, max_podcasts=100):

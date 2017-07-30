@@ -12,7 +12,7 @@ urlpatterns = [
         views.home,
         name='home'),
 
-    url(r'^logo/(?P<size>\d+)/(?P<prefix>.{3})/(?P<filename>[^/]*)$',
+    url(r'^logo/(?P<size>\d+)/(?P<filename>[^/]*)$',
         CoverArt.as_view(),
         name='logo'),
 

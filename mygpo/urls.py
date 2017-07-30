@@ -3,6 +3,7 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.conf import settings
 from django.contrib.staticfiles.views import serve
+from django.conf.urls.static import static
 
 # strip the leading "/"
 static_prefix = settings.STATIC_URL[1:]
@@ -40,4 +41,4 @@ urlpatterns += [
  url(r'^administration/', include('mygpo.administration.urls')),
  url(r'^pubsub/',    include('mygpo.pubsub.urls')),
  url(r'^admin/',     include(admin.site.urls)),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
