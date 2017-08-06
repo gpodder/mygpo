@@ -2,7 +2,7 @@ import sys
 from collections import defaultdict
 from datetime import datetime, timedelta
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.utils.translation import ugettext as _

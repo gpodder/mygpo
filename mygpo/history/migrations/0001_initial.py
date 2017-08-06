@@ -20,9 +20,18 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('timestamp', models.DateTimeField()),
                 ('action', models.CharField(max_length=11, choices=[('subscribe', 'subscribed'), ('unsubscribe', 'unsubscribed')])),
-                ('client', models.ForeignKey(to='users.Client')),
-                ('podcast', models.ForeignKey(to='podcasts.Podcast')),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('client', models.ForeignKey(
+                    to='users.Client',
+                    on_delete=models.CASCADE,
+                )),
+                ('podcast', models.ForeignKey(
+                    to='podcasts.Podcast',
+                    on_delete=models.CASCADE,
+                )),
+                ('user', models.ForeignKey(
+                    to=settings.AUTH_USER_MODEL,
+                    on_delete=models.CASCADE,
+                )),
             ],
             options={
                 'ordering': ['timestamp'],

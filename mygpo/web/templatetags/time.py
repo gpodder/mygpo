@@ -24,6 +24,7 @@ def sec_to_time(sec):
 
 
 @register.filter
+@mark_safe
 def format_duration(sec):
     """ Converts seconds into a duration string
 
@@ -34,4 +35,4 @@ def format_duration(sec):
     hours = int(sec / 60 / 60)
     minutes = int((sec / 60) % 60)
     seconds = int(sec % 60)
-    return mark_safe(_('{h}h {m}m {s}s').format(h=hours, m=minutes, s=seconds))
+    return _('{h}h {m}m {s}s').format(h=hours, m=minutes, s=seconds)

@@ -8,7 +8,7 @@ from django.http import HttpResponseRedirect
 from django.views.generic.edit import FormView
 from django.utils.translation import ugettext as _
 from django.template.loader import render_to_string
-from django.core.urlresolvers import reverse, reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.views.generic import TemplateView
 from django.views import View
 from django.contrib import messages

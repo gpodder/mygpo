@@ -46,8 +46,14 @@ class Migration(migrations.Migration):
                 ('modified', models.DateTimeField(
                     auto_now=True,
                     db_index=True)),
-                ('category', models.ForeignKey(to='categories.Category')),
-                ('podcast', models.ForeignKey(to='podcasts.Podcast')),
+                ('category', models.ForeignKey(
+                    to='categories.Category',
+                    on_delete=models.CASCADE,
+                )),
+                ('podcast', models.ForeignKey(
+                    to='podcasts.Podcast',
+                    on_delete=models.CASCADE,
+                )),
             ],
             options={
             },
@@ -64,7 +70,9 @@ class Migration(migrations.Migration):
                 ('tag', models.SlugField(unique=True)),
                 ('category', models.ForeignKey(
                     related_name='tags',
-                    to='categories.Category')),
+                    to='categories.Category',
+                    on_delete=models.CASCADE,
+                )),
             ],
             options={
             },
@@ -102,7 +110,9 @@ class Migration(migrations.Migration):
             name='category',
             field=models.ForeignKey(
                 related_name='entries',
-                to='categories.Category'),
+                to='categories.Category',
+                on_delete=models.CASCADE,
+            ),
         ),
         migrations.AlterField(
             model_name='categoryentry',

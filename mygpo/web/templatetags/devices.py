@@ -3,7 +3,7 @@ import os.path
 from django import template
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.html import strip_tags
 from django.contrib.staticfiles.storage import staticfiles_storage
 
@@ -31,6 +31,7 @@ def device_type(device):
     return DEVICE_TYPES_DICT.get(device.type, _('Unknown'))
 
 @register.filter
+@mark_safe
 def device_icon(device):
 
     ua_str = (device.user_agent or '').lower()
@@ -57,7 +58,7 @@ def device_icon(device):
         html = '<img src="%(icon)s" alt="%(caption)s" class="device_icon"/>' \
             % dict(icon=staticfiles_storage.url(os.path.join('clients', icon)),
                    caption=caption)
-        return mark_safe(html)
+        return html
 
     return ''
 

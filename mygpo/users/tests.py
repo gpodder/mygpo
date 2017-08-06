@@ -2,7 +2,7 @@ import uuid
 import unittest
 from collections import Counter
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.client import Client as TestClient
 from django.test import TestCase
 from django.test.utils import override_settings
