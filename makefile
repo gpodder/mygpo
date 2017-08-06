@@ -5,8 +5,14 @@ help:
 	@echo 'make clean           clean up files'
 
 test:
-	envdir envs/dev/ coverage run ./manage.py test
+	envdir envs/dev/ python -Wd -m coverage run ./manage.py test
 	coverage report
+
+update-po:
+	envdir envs/dev/ python manage.py makemessages \
+		--ignore=doc/* --ignore=envs/* --ignore=htdocs/* --ignore=venv/* \
+		--ignore=res/* --ignore=tools/* --ignore=mygpo/*/migrations/*
+
 
 clean:
 	git clean -fX

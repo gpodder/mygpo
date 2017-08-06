@@ -11,7 +11,7 @@ import urllib.parse
 from collections import namedtuple
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from mygpo.users.settings import FLATTR_TOKEN, FLATTR_USERNAME
 from mygpo import utils

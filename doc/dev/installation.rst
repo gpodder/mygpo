@@ -1,5 +1,5 @@
-Deployment instructions for mygpo
-=================================
+Installation
+============
 
 
 Dependencies
@@ -8,56 +8,71 @@ Dependencies
 When no version number is indicated, it is advisable to install the current
 development version from the repository.
 
-* Python (>= 2.6) or PyPy (tested with 2.0 beta1)
+* Python >= 3.5
 * PostgreSQL
 
 
 Basic setup
 -----------
 
-Here's how you start from scratch with a new mygpo install (assuming a
-Ubuntu 12.04 x86 install, 'should work' with other versions/archs as well).
+On an Debian/Ubuntu based system, you can install dependencies with
 
-If you are on a Debian/Ubuntu system, do:
+.. code-block:: bash
 
-    sudo apt-get install erlang git python-pip python-dev libevent-dev
+    make install-deps
 
-For creating logo thumbnails, install libraries for the various image formats.
-They are used by the pillow library.
 
-    sudo apt-get install libjpeg-dev zlib1g-dev libpng12-dev
+mygpo itself can be cloned from the repository:
 
-Select a cozy place for the mygpo sources and clone it:
+.. code-block:: bash
 
     git clone git://github.com/gpodder/mygpo.git
     cd mygpo
 
-Now install additional dependencies locally (you could also use virtualenv or
-some other fancy stuff):
+Now install additional dependencies locally:
 
+
+.. code-block:: bash
+
+    virtualenv venv
+    source venv/bin/activate
     pip install -r requirements.txt
+    pip install -r requirements-dev.txt    # for local development
+    pip install -r requirements-doc.txt    # for building docs
+    pip install -r requirements-setup.txt  # for a productive setup
+    pip install -r requirements-test.txt   # for running tests
+
 
 That's it for the setup. Now to initialize the DB:
+
+First run the commands from :ref:`db-setup`. Then
+
+.. code-block:: bash
 
     cd mygpo
     python manage.py migrate
 
 ..and here we go:
 
+.. code-block:: bash
+
     python manage.py runserver
 
-Ok, so you need a user. This requires e-mails to be sent. If your machine is
-configured to send e-mail, that should work out well. If not, you can use the
-Django E-Mail File Backend to "send" mails to a local folder:
 
-    mkdir inbox
+Configuration
+-------------
 
-Now, edit mygpo/settings_prod.py (or create it) and add the following lines:
+For a development configuration you will probably want to use the following
 
-    import os.path
+.. code-block:: bash
 
-    EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-    EMAIL_FILE_PATH = os.path.join(os.path.dirname(__file__), '..', 'inbox')
+    mkdir -p envs/local
+    echo django.core.mail.backends.console.EmailBackend > envs/local/EMAIL_BACKEND
+    echo secret > envs/local/SECRET_KEY
+    echo postgres://mygpo:mygpo@localhost/mygpo > envs/local/DATABASE_URL
+    echo True > envs/local/DEBUG
+
+See :ref:`configuration` for further information.
 
 
 Accessing the dev server from other devices
@@ -66,6 +81,8 @@ Accessing the dev server from other devices
 Sometimes you might want to access the server from another machine than
 localhost. In that case, you have to pass an additional argument to the
 runserver command of manage.py, like this:
+
+.. code-block:: bash
 
     python manage.py runserver 0.0.0.0:8000
 
@@ -82,7 +99,8 @@ run special commands. This is usually done regularly on
 a production server using cron. You can also run these
 commands regularly on your development machine:
 
-    cd mygpo
+.. code-block:: bash
+
     python manage.py update-categories
     python manage.py update-toplist
     python manage.py update-episode-toplist
@@ -96,6 +114,8 @@ commands regularly on your development machine:
 
 or to only do a dry run (this won't do any web requests for feeds):
 
+.. code-block:: bash
+
     python manage.py feed-downloader --list-only [other parameters]
 
 
@@ -104,19 +124,10 @@ Maintaining publisher relationships with user accounts
 
 To set a user as publisher for a given feed URL, use:
 
+.. code-block:: bash
+
     cd mygpo
     python manage.py make-publisher <username> <feed-url> [...]
-
-
-Settings
---------
-
-Check the settings in mygpo/settings.py. If you want to change any settings,
-add them to mygpo/settings_prod.py with the correct value. If you want to
-avoid warning messages on startup, simply:
-
-    touch mygpo/settings_prod.py
-
 
 
 Web-Server
@@ -125,8 +136,9 @@ Web-Server
 Django comes with a development webservice which you can run from the mygpo
 directory with
 
+.. code-block:: bash
+
     python manage.py runserver
 
-If you want to run a production server, check out
-
-   https://docs.djangoproject.com/en/dev/howto/deployment/
+If you want to run a production server, check out `Deploying Django
+<https://docs.djangoproject.com/en/dev/howto/deployment/>`_.

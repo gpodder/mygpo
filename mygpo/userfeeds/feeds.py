@@ -1,4 +1,4 @@
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from mygpo.favorites.models import FavoriteEpisode
 

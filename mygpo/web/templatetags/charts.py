@@ -35,11 +35,12 @@ def vertical_bar(value, max_value, display=None):
         right = format_html('<span>{}</span>', value_str)
 
     return format_html('<div class="barbg"><div class="bar" '
-                       'style="width: {:.2d}%">{}</div>{}</div>',
+                       'style="width: {:3.0}%">{}</div>{}</div>',
                        ratio, left, right)
-    return s
+
 
 @register.filter
+@mark_safe
 def timeline(data):
     s = '<script type="text/javascript" src="//www.google.com/jsapi"></script>\n'
     s += '<script type="text/javascript">\n'
@@ -69,7 +70,7 @@ def timeline(data):
     s += '}\n'
     s += '</script>\n'
 
-    return mark_safe(s)
+    return s
 
 
 @register.filter

@@ -1,20 +1,3 @@
-#
-# This file is part of my.gpodder.org.
-#
-# my.gpodder.org is free software: you can redistribute it and/or modify it
-# under the terms of the GNU Affero General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at your
-# option) any later version.
-#
-# my.gpodder.org is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
-# License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
-#
-
 from functools import partial
 
 from collections import defaultdict
@@ -101,7 +84,8 @@ def episodes(request, username, version=1):
         try:
             update_urls = update_episodes(request.user, actions, now, ua_string)
         except ValidationError as e:
-            logger.warn('Validation Error while uploading episode actions for user %s: %s', username, str(e))
+            logger.warning('Validation Error while uploading episode actions '
+                'for user %s: %s', username, str(e))
             return HttpResponseBadRequest(str(e))
 
         except InvalidEpisodeActionAttributes as e:

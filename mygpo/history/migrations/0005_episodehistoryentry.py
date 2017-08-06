@@ -27,9 +27,20 @@ class Migration(migrations.Migration):
                 ('started', models.IntegerField(null=True)),
                 ('stopped', models.IntegerField(null=True)),
                 ('total', models.IntegerField(null=True)),
-                ('client', models.ForeignKey(to='users.Client', null=True)),
-                ('episode', models.ForeignKey(to='podcasts.Episode', null=True)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('client', models.ForeignKey(
+                    to='users.Client',
+                    null=True,
+                    on_delete=models.CASCADE,
+                )),
+                ('episode', models.ForeignKey(
+                    to='podcasts.Episode',
+                    null=True,
+                    on_delete=models.CASCADE,
+                )),
+                ('user', models.ForeignKey(
+                    to=settings.AUTH_USER_MODEL,
+                    on_delete=models.CASCADE,
+                )),
             ],
             options={
                 'ordering': ['-timestamp'],

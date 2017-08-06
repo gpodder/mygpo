@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-05-13 19:59+0000\n"
+"POT-Creation-Date: 2017-07-22 19:03+0000\n"
 "PO-Revision-Date: 2010-07-16 08:51+0200\n"
 "Last-Translator: Stefan Koegl <stefan@skoegl.net>\n"
 "Language-Team: DE <LL@li.org>\n"
@@ -16,585 +16,851 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: flattr.py:151
-msgid "Not enough means to flattr"
-msgstr ""
-
-#: flattr.py:153
+#: mygpo/administration/templates/admin/activate-user.html:9
+#: mygpo/administration/templates/admin/activate-user.html:12
+#: mygpo/administration/templates/admin/overview.html:22
 #, fuzzy
-msgid "Item does not exist on Flattr"
-msgstr "Der Benutzer existiert nicht."
+#| msgid "Reactivate"
+msgid "Activate User"
+msgstr "Wiederherstellen"
 
-#: flattr.py:155
-msgid "Already flattred or own item"
+#: mygpo/administration/templates/admin/activate-user.html:20
+#: mygpo/web/forms.py:217 mygpo/web/templates/account.html:127
+msgid "Username"
+msgstr "Benutzername"
+
+#: mygpo/administration/templates/admin/activate-user.html:27
+msgid "Email"
 msgstr ""
 
-#: flattr.py:157
+#: mygpo/administration/templates/admin/activate-user.html:35
 #, fuzzy
-msgid "Invalid request"
-msgstr "Unbekannte Anfrage"
+#| msgid "Reactivate"
+msgid "Activate"
+msgstr "Wiederherstellen"
 
-#: flattr.py:160
-msgid "No internet connection"
-msgstr ""
-
-#: flattr.py:162
-#, fuzzy
-msgid "No description"
-msgstr "Beschreibung"
-
-#: admin/views.py:120 admin/views.py:145
-msgid "No podcast with URL {url}"
-msgstr ""
-
-#: admin/templates/admin/clients.html:10
-#: admin/templates/admin/merge-grouping.html:10
-#: admin/templates/admin/merge-select.html:9
-#: admin/templates/admin/overview.html:9
-#: admin/templates/admin/overview.html:12 admin/templates/admin/stats.html:9
-#: admin/templates/admin/useragents.html:9
+#: mygpo/administration/templates/admin/clients.html:10
+#: mygpo/administration/templates/admin/make-publisher-result.html:16
+#: mygpo/administration/templates/admin/merge-grouping.html:10
+#: mygpo/administration/templates/admin/merge-select.html:9
+#: mygpo/administration/templates/admin/overview.html:9
+#: mygpo/administration/templates/admin/overview.html:12
+#: mygpo/administration/templates/admin/stats.html:9
+#: mygpo/administration/templates/admin/useragents.html:9
 msgid "Admin Area"
 msgstr ""
 
-#: admin/templates/admin/clients.html:13
-#: admin/templates/admin/useragents.html:12
+#: mygpo/administration/templates/admin/clients.html:13
+#: mygpo/administration/templates/admin/useragents.html:12
 msgid "User-Agent Statistics"
 msgstr ""
 
-#: admin/templates/admin/clients.html:19
-#: admin/templates/admin/filetypes.html:19
-#: admin/templates/admin/useragents.html:18
+#: mygpo/administration/templates/admin/clients.html:19
+#: mygpo/administration/templates/admin/filetypes.html:19
+#: mygpo/administration/templates/admin/useragents.html:18
 msgid "#"
 msgstr "#"
 
-#: admin/templates/admin/clients.html:20
+#: mygpo/administration/templates/admin/clients.html:20
 msgid "Client"
 msgstr ""
 
-#: admin/templates/admin/clients.html:21 admin/templates/admin/clients.html:23
-#: admin/templates/admin/clients.html:25
+#: mygpo/administration/templates/admin/clients.html:21
+#: mygpo/administration/templates/admin/clients.html:23
+#: mygpo/administration/templates/admin/clients.html:25
 msgid "Version"
 msgstr ""
 
-#: admin/templates/admin/clients.html:22
+#: mygpo/administration/templates/admin/clients.html:22
 #, fuzzy
 msgid "Library"
 msgstr "Programm-Bibliotheken"
 
-#: admin/templates/admin/clients.html:24
+#: mygpo/administration/templates/admin/clients.html:24
 msgid "OS"
 msgstr ""
 
-#: admin/templates/admin/clients.html:26
-#: admin/templates/admin/useragents.html:20
+#: mygpo/administration/templates/admin/clients.html:26
+#: mygpo/administration/templates/admin/useragents.html:20
 msgid "Number of Clients"
 msgstr ""
 
-#: admin/templates/admin/clients.html:53
-#: admin/templates/admin/useragents.html:33
+#: mygpo/administration/templates/admin/clients.html:53
+#: mygpo/administration/templates/admin/useragents.html:33
 msgid "Total"
 msgstr ""
 
-#: admin/templates/admin/filetypes.html:10
-#: admin/templates/admin/filetypes.html:13
-#: admin/templates/admin/overview.html:21
+#: mygpo/administration/templates/admin/filetypes.html:10
+#: mygpo/administration/templates/admin/filetypes.html:13
 msgid "File Type Stats"
 msgstr ""
 
-#: admin/templates/admin/filetypes.html:20
+#: mygpo/administration/templates/admin/filetypes.html:20
 #, fuzzy
 msgid "File Type"
 msgstr "Typ"
 
-#: admin/templates/admin/filetypes.html:21
+#: mygpo/administration/templates/admin/filetypes.html:21
 #, fuzzy
 msgid "Episode URLs"
 msgstr "Episoden"
 
-#: admin/templates/admin/hostinfo.html:9
-#: admin/templates/admin/hostinfo.html:12
-#: admin/templates/admin/overview.html:17
+#: mygpo/administration/templates/admin/hostinfo.html:9
+#: mygpo/administration/templates/admin/hostinfo.html:12
+#: mygpo/administration/templates/admin/overview.html:17
 msgid "Host Information"
 msgstr ""
 
-#: admin/templates/admin/hostinfo.html:20
+#: mygpo/administration/templates/admin/hostinfo.html:20
 msgid "mygpo Version"
 msgstr ""
 
-#: admin/templates/admin/hostinfo.html:31
+#: mygpo/administration/templates/admin/hostinfo.html:31
 #, fuzzy
 msgid "Base Directory"
 msgstr "Verzeichnis"
 
-#: admin/templates/admin/hostinfo.html:36
-msgid "Main Database"
-msgstr ""
-
-#: admin/templates/admin/hostinfo.html:41
+#: mygpo/administration/templates/admin/hostinfo.html:36
 #, fuzzy
 msgid "Hostname"
 msgstr "Benutzername"
 
-#: admin/templates/admin/hostinfo.html:46
+#: mygpo/administration/templates/admin/hostinfo.html:41
 msgid "Django Version"
 msgstr ""
 
-#: admin/templates/admin/hostinfo.html:54
-msgid "Database Tasks"
+#: mygpo/administration/templates/admin/hostinfo.html:46
+msgid "Feed Update Queue"
 msgstr ""
 
-#: admin/templates/admin/hostinfo.html:68
+#: mygpo/administration/templates/admin/hostinfo.html:49
+msgid "min ahead"
+msgstr ""
+
+#: mygpo/administration/templates/admin/hostinfo.html:51
+msgid "min behind"
+msgstr ""
+
+#: mygpo/administration/templates/admin/hostinfo.html:57
 msgid "Scheduled Celery Tasks"
 msgstr ""
 
-#: admin/templates/admin/merge-grouping.html:13
-#: admin/templates/admin/merge-select.html:12
-#: admin/templates/admin/overview.html:18
+#: mygpo/administration/templates/admin/make-publisher-input.html:9
+#: mygpo/administration/templates/admin/make-publisher-input.html:12
+#: mygpo/administration/templates/admin/make-publisher-result.html:9
+#: mygpo/administration/templates/admin/make-publisher-result.html:12
+#: mygpo/administration/views.py:387
+#, fuzzy
+#| msgid "Publisher Pages"
+msgid "Publisher Permissions"
+msgstr "Publisher-Seiten"
+
+#: mygpo/administration/templates/admin/make-publisher-mail.txt:2
+#, fuzzy, python-format
+#| msgid "Link to %(sitename)s"
+msgid "Hi %(username)s,"
+msgstr "Zu %(sitename)s verlinken"
+
+#: mygpo/administration/templates/admin/make-publisher-mail.txt:4
+#, fuzzy
+#| msgid "You have subscribed the following podcasts on this device"
+msgid "You have been assigned as a publisher for the following podcasts:"
+msgstr "Du hast die folgenden Podcasts auf diesem Gerät abonniert"
+
+#: mygpo/administration/templates/admin/make-publisher-mail.txt:11
+#, fuzzy
+#| msgid "You need to login to access this page."
+msgid "You can now access the publisher pages at"
+msgstr "Sie müssen sich einloggen um diese Seite anzuzeigen."
+
+#: mygpo/administration/templates/admin/make-publisher-mail.txt:15
+#, python-format
+msgid ""
+"There you can get statistics, insights and additional control over your "
+"podcast at %(domain)s."
+msgstr ""
+
+#: mygpo/administration/templates/admin/make-publisher-mail.txt:17
+#, python-format
+msgid "If you have any questions, please visit %(url)s"
+msgstr ""
+
+#: mygpo/administration/templates/admin/merge-grouping.html:13
+#: mygpo/administration/templates/admin/merge-select.html:12
+#: mygpo/administration/templates/admin/overview.html:18
 #, fuzzy
 msgid "Merge Podcasts and Episodes"
 msgstr "Podcast / Episode"
 
-#: admin/templates/admin/merge-grouping.html:24
+#: mygpo/administration/templates/admin/merge-grouping.html:24
 msgid ""
 "Episodes that have the same number will be merged. Please verify all your "
 "changes by clicking on 'Renew Groups' before starting the Merge."
 msgstr ""
 
-#: admin/templates/admin/merge-status.html:15
-#: admin/templates/admin/merge-status.html:24
-msgid "Merge Finished"
-msgstr ""
-
-#: admin/templates/admin/merge-status.html:17
-#: admin/templates/admin/merge-status.html:26
-msgid "Merge Ongoing"
-msgstr ""
-
-#: admin/templates/admin/merge-status.html:35
-msgid "The following actions were recorded:"
-msgstr ""
-
-#: admin/templates/admin/merge-status.html:43
-#, fuzzy
-msgid "Go to podcast"
-msgstr "Podcast hinzufügen"
-
-#: admin/templates/admin/merge-status.html:45
-#: directory/templates/directory/add-podcast-status.html:50
-msgid "The operation is still ongoing..."
-msgstr ""
-
-#: admin/templates/admin/merge-status.html:47
-#: directory/templates/directory/add-podcast-status.html:52
-msgid "Refresh"
-msgstr ""
-
-#: admin/templates/admin/overview.html:19
+#: mygpo/administration/templates/admin/overview.html:19
 #, fuzzy
 msgid "Client Stats"
 msgstr "Episoden-Status"
 
-#: admin/templates/admin/overview.html:19
-#: admin/templates/admin/overview.html:22
+#: mygpo/administration/templates/admin/overview.html:19
+#: mygpo/administration/templates/admin/overview.html:21
 msgid "JSON"
 msgstr ""
 
-#: admin/templates/admin/overview.html:20
+#: mygpo/administration/templates/admin/overview.html:20
 msgid "User-Agent Stats"
 msgstr ""
 
-#: admin/templates/admin/overview.html:22
+#: mygpo/administration/templates/admin/overview.html:21
 msgid "General Stats"
 msgstr ""
 
-#: admin/templates/admin/stats.html:12
+#: mygpo/administration/templates/admin/overview.html:23
+#, fuzzy
+#| msgid "Publisher Services"
+msgid "Assign Publisher Permissions"
+msgstr "Publisher-Seiten"
+
+#: mygpo/administration/templates/admin/stats.html:12
 msgid "Statistics"
 msgstr ""
 
-#: admin/templates/admin/stats.html:18
+#: mygpo/administration/templates/admin/stats.html:18
 msgid "Property"
 msgstr ""
 
-#: admin/templates/admin/stats.html:19
+#: mygpo/administration/templates/admin/stats.html:19
 msgid "Value"
 msgstr ""
 
-#: admin/templates/admin/useragents.html:19
+#: mygpo/administration/templates/admin/task-status.html:17
+#: mygpo/administration/templates/admin/task-status.html:26
+msgid "Operation Finished"
+msgstr ""
+
+#: mygpo/administration/templates/admin/task-status.html:19
+#: mygpo/administration/templates/admin/task-status.html:28
+msgid "Operation Ongoing"
+msgstr ""
+
+#: mygpo/administration/templates/admin/task-status.html:37
+msgid "The following actions were recorded:"
+msgstr ""
+
+#: mygpo/administration/templates/admin/task-status.html:42
+#: mygpo/publisher/templates/publisher/episode.html:80
+msgid "none"
+msgstr ""
+
+#: mygpo/administration/templates/admin/task-status.html:47
+#, fuzzy
+msgid "Go to podcast"
+msgstr "Podcast hinzufügen"
+
+#: mygpo/administration/templates/admin/task-status.html:49
+#: mygpo/directory/templates/directory/add-podcast-status.html:50
+msgid "The operation is still ongoing..."
+msgstr ""
+
+#: mygpo/administration/templates/admin/task-status.html:51
+#: mygpo/directory/templates/directory/add-podcast-status.html:52
+msgid "Refresh"
+msgstr ""
+
+#: mygpo/administration/templates/admin/useragents.html:19
 msgid "User-Agent"
 msgstr ""
 
-#: api/constants.py:25
+#: mygpo/administration/views.py:136 mygpo/administration/views.py:158
+#, python-brace-format
+msgid "No podcast with URL {url}"
+msgstr ""
+
+#: mygpo/administration/views.py:312
+msgid "Provide either username or email address"
+msgstr ""
+
+#: mygpo/administration/views.py:318
+#, fuzzy
+msgid "No user found"
+msgstr "Nicht gefunden"
+
+#: mygpo/administration/views.py:323
+#, python-brace-format
+msgid "User {username} ({email}) activated"
+msgstr ""
+
+#: mygpo/api/constants.py:8
 msgid "downloaded"
 msgstr "heruntergeladen"
 
-#: api/constants.py:26
+#: mygpo/api/constants.py:9
 msgid "played"
 msgstr "abgespielt"
 
-#: api/constants.py:27
+#: mygpo/api/constants.py:10
 msgid "deleted"
 msgstr "gelöscht"
 
-#: api/constants.py:28
+#: mygpo/api/constants.py:11
 msgid "marked as new"
 msgstr "als neu markiert"
 
-#: api/constants.py:29
+#: mygpo/api/constants.py:12
 msgid "flattr'd"
 msgstr ""
 
-#: api/constants.py:34
-msgid "Desktop"
-msgstr "Desktop"
-
-#: api/constants.py:35
-msgid "Laptop"
-msgstr "Laptop"
-
-#: api/constants.py:36
-msgid "Cell phone"
-msgstr "Handy"
-
-#: api/constants.py:37
-msgid "Server"
-msgstr "Server"
-
-#: api/constants.py:38
-msgid "Other"
-msgstr "Andere"
-
-#: api/constants.py:46
+#: mygpo/api/constants.py:20
 msgid "subscribed"
 msgstr "abonniert"
 
-#: api/constants.py:47
+#: mygpo/api/constants.py:21
 msgid "unsubscribed"
 msgstr "abonnement gelöscht"
 
-#: api/simple.py:79 api/simple.py:112
+#: mygpo/api/simple.py:55 mygpo/api/simple.py:90
 #, fuzzy, python-format
 msgid "%(username)s's Subscription List"
 msgstr "%(username)ss Podcast-Abos"
 
-#: api/simple.py:276
+#: mygpo/api/simple.py:237
 #, fuzzy, python-format
 msgid "gpodder.net - Top %(count)d"
 msgstr "my.gpodder.org - Top %s"
 
-#: api/simple.py:310
+#: mygpo/api/simple.py:272
 msgid "gpodder.net - Search"
 msgstr "gpodder.net - Suche"
 
-#: api/simple.py:325
+#: mygpo/api/simple.py:289
 #, fuzzy, python-format
 msgid "gpodder.net - %(count)d Suggestions"
 msgstr "my.gpodder.org - %s Empfehlungen"
 
-#: core/tasks.py:30
+#: mygpo/core/tasks.py:34
 #, python-format
 msgid "Can't flattr a '%s'"
 msgstr ""
 
-#: core/tasks.py:34
+#: mygpo/core/tasks.py:38
 #, fuzzy
 msgid "No Payment URL available"
 msgstr "Kein Logo verfügbar"
 
-#: data/mimetype.py:13
+#: mygpo/data/mimetype.py:13
 msgid "image"
 msgstr "bild"
 
-#: data/mimetype.py:13
+#: mygpo/data/mimetype.py:13
 msgid "audio"
 msgstr "audio"
 
-#: data/mimetype.py:13
+#: mygpo/data/mimetype.py:13
 msgid "video"
 msgstr "video"
 
-#: directory/views.py:315
-#, fuzzy, python-format
-msgid "%d podcasts added"
-msgstr "Podcasts"
-
-#: directory/templates/carousel.html:43 directory/templates/carousel.html:46
+#: mygpo/directory/templates/carousel.html:43
+#: mygpo/directory/templates/carousel.html:46
 msgid "Explore"
 msgstr ""
 
-#: directory/templates/carousel.html:81 web/templates/episode.html:125
+#: mygpo/directory/templates/carousel.html:81
+#: mygpo/web/templates/episode.html:158
 #, fuzzy
 msgid "..."
 msgstr "mehr..."
 
-#: directory/templates/directory.html:14 directory/templates/directory.html:17
+#: mygpo/directory/templates/directory.html:13
+#: mygpo/directory/templates/directory.html:16
 msgid "Podcast Directory"
 msgstr "Podcast-Verzeichnis"
 
-#: directory/templates/directory.html:32
+#: mygpo/directory/templates/directory.html:30
 #, python-format
 msgid ""
 "%(listtitle)s <span class=\"by-user\">by <a href=\"%(user-lists-url)s\">"
 "%(username)s</a></span>"
 msgstr ""
 
-#: directory/templates/directory.html:48 directory/templates/directory.html:50
-#: directory/templates/directory.html:140
-#: directory/templates/directory.html:168 web/templates/dashboard.html:81
+#: mygpo/directory/templates/directory.html:46
+#: mygpo/directory/templates/directory.html:48
+#: mygpo/directory/templates/directory.html:133
+#: mygpo/directory/templates/podcast-ad-box.html:23
+#: mygpo/web/templates/dashboard.html:73
 msgid "more..."
 msgstr "mehr..."
 
-#: directory/templates/directory.html:88
+#: mygpo/directory/templates/directory.html:85
 #, fuzzy
 msgid "Podcast List by"
 msgstr "Podcast-Verzeichnis"
 
-#: directory/templates/directory.html:105
+#: mygpo/directory/templates/directory.html:102
 #, python-format
 msgid "and %(more)s more"
 msgstr ""
 
-#: directory/templates/directory.html:111
+#: mygpo/directory/templates/directory.html:108
 #, fuzzy
 msgid "Create a Podcast List"
 msgstr "Vorgeschlagene Podcasts"
 
-#: directory/templates/directory.html:127
-msgid "Trending"
-msgstr ""
-
-#: directory/templates/directory.html:154 web/templates/dashboard.html:67
+#: mygpo/directory/templates/directory.html:119
+#: mygpo/web/templates/dashboard.html:59
 #, fuzzy
 msgid "Random"
 msgstr "Zufällige Podcasts"
 
-#: directory/templates/episode_toplist.html:12
-#: directory/templates/episode_toplist.html:15
-msgid "Episode-Toplist"
-msgstr "Episoden-Titel"
+#: mygpo/directory/templates/directory/add-podcast-status.html:16
+#: mygpo/directory/templates/directory/add-podcast-status.html:25
+#, fuzzy
+msgid "Podcast Added"
+msgstr "Podcast"
 
-#: directory/templates/episode_toplist.html:24
-msgid "Episode"
-msgstr "Episode"
+#: mygpo/directory/templates/directory/add-podcast-status.html:18
+#: mygpo/directory/templates/directory/add-podcast-status.html:27
+#, fuzzy
+msgid "Adding Podcast"
+msgstr "Podcast hinzufügen"
 
-#: directory/templates/episode_toplist.html:25
-#: publisher/templates/publisher/episodes.html:36
-#: web/templates/episodes.html:88 web/templates/podcast.html:106
-msgid "Listeners"
-msgstr "Hörer"
+#: mygpo/directory/templates/directory/add-podcast-status.html:44
+#, fuzzy
+msgid "No podcasts could be added"
+msgstr "Podcast die Sie veröffentlichen"
 
-#: directory/templates/episode_toplist.html:36
-#: publisher/templates/publisher/episode.html:33
-#: share/templates/userpage.html:121 share/templates/userpage.html.py:141
-#: web/templates/episode.html:51
-msgid "from"
-msgstr "von"
+#: mygpo/directory/templates/directory/license-podcasts.html:13
+#: mygpo/directory/templates/directory/license-podcasts.html:16
+#, python-format
+msgid "Podcasts with License %(licensename)s"
+msgstr ""
 
-#: directory/templates/episode_toplist.html:41
-#: directory/templates/flattr-podcasts.html:38
-#: directory/templates/toplist.html:53
+#: mygpo/directory/templates/directory/license-podcasts.html:24
+msgid "License overview"
+msgstr ""
+
+#: mygpo/directory/templates/directory/license-podcasts.html:29
+msgid "View License"
+msgstr ""
+
+#: mygpo/directory/templates/directory/license-podcasts.html:36
+#: mygpo/directory/templates/flattr-podcasts.html:24
+#: mygpo/directory/templates/search.html:35
+#: mygpo/directory/templates/toplist.html:26
+#: mygpo/podcastlists/templates/list.html:48 mygpo/web/templatetags/menu.py:33
+#: mygpo/web/templatetags/menu.py:69
+msgid "Podcast"
+msgstr "Podcast"
+
+#: mygpo/directory/templates/directory/license-podcasts.html:37
+#: mygpo/directory/templates/flattr-podcasts.html:25
+#: mygpo/directory/templates/search.html:36
+#: mygpo/directory/templates/toplist.html:27
+#: mygpo/podcastlists/templates/list.html:49
+msgid "Subscribers"
+msgstr "Abonnenten"
+
+#: mygpo/directory/templates/directory/license-podcasts.html:50
+#: mygpo/directory/templates/episode_toplist.html:41
+#: mygpo/directory/templates/flattr-podcasts.html:38
+#: mygpo/directory/templates/toplist.html:47
 #, fuzzy
 msgid "Currently not available"
 msgstr "Auch verfügbar: "
 
-#: directory/templates/episode_toplist.html:53
-#: directory/templates/toplist.html:66
+#: mygpo/directory/templates/directory/licenses.html:13
+#: mygpo/directory/templates/directory/licenses.html:16
+msgid "Podcasts with License Information"
+msgstr ""
+
+#: mygpo/directory/templates/directory/licenses.html:23
+#: mygpo/web/templatetags/menu.py:41
+msgid "License"
+msgstr ""
+
+#: mygpo/directory/templates/directory/licenses.html:24
+#: mygpo/directory/templates/podcast_lists.html:24
+#: mygpo/web/templates/base.html:135 mygpo/web/templates/home.html:155
+#: mygpo/web/templatetags/menu.py:43
+#, fuzzy
+msgid "Podcasts"
+msgstr "Podcast"
+
+#: mygpo/directory/templates/episode_toplist.html:12
+#: mygpo/directory/templates/episode_toplist.html:15
+msgid "Episode-Toplist"
+msgstr "Episoden-Titel"
+
+#: mygpo/directory/templates/episode_toplist.html:24
+msgid "Episode"
+msgstr "Episode"
+
+#: mygpo/directory/templates/episode_toplist.html:25
+#: mygpo/publisher/templates/publisher/episodes.html:36
+msgid "Listeners"
+msgstr "Hörer"
+
+#: mygpo/directory/templates/episode_toplist.html:36
+#: mygpo/publisher/templates/publisher/episode.html:33
+#: mygpo/share/templates/userpage.html:121
+#: mygpo/share/templates/userpage.html:141
+#: mygpo/web/templates/episode-history.html:50
+#: mygpo/web/templates/episode.html:51
+msgid "from"
+msgstr "von"
+
+#: mygpo/directory/templates/episode_toplist.html:53
+#: mygpo/directory/templates/episode_toplist.html:57
+#: mygpo/directory/templates/toplist.html:60
+#: mygpo/directory/templates/toplist.html:64
 #, fuzzy
 msgid "Language"
 msgstr "Sprachen"
 
-#: directory/templates/episode_toplist.html:57
-#: directory/templates/episode_toplist.html:59
-#: directory/templates/toplist.html:71 directory/templates/toplist.html:73
+#: mygpo/directory/templates/episode_toplist.html:61
+#: mygpo/directory/templates/episode_toplist.html:63
+#: mygpo/directory/templates/toplist.html:68
+#: mygpo/directory/templates/toplist.html:70
 msgid "all"
 msgstr ""
 
-#: directory/templates/episode_toplist.html:70
-#: directory/templates/toplist.html:85
+#: mygpo/directory/templates/episode_toplist.html:75
+#: mygpo/directory/templates/toplist.html:83
 msgid "OK"
 msgstr "OK"
 
-#: directory/templates/flattr-podcasts.html:13
-#: directory/templates/flattr-podcasts.html:16
+#: mygpo/directory/templates/flattr-podcasts.html:13
+#: mygpo/directory/templates/flattr-podcasts.html:16
 msgid "Podcasts using Flattr"
 msgstr ""
 
-#: directory/templates/flattr-podcasts.html:20
+#: mygpo/directory/templates/flattr-podcasts.html:20
 msgid ""
 "These podcasts use <a href=\"https://flattr.com/\">Flattr</a>. You can "
 "support them by flattring their episodes."
 msgstr ""
 
-#: directory/templates/flattr-podcasts.html:24
-#: directory/templates/search.html:31 directory/templates/toplist.html:25
-#: share/templates/list.html:48 web/templatetags/menu.py:32
-#: web/templatetags/menu.py:66
-msgid "Podcast"
-msgstr "Podcast"
-
-#: directory/templates/flattr-podcasts.html:25
-#: directory/templates/search.html:32 directory/templates/toplist.html:26
-#: share/templates/list.html:49
-msgid "Subscribers"
-msgstr "Abonnenten"
-
-#: directory/templates/flattr-podcasts.html:70
+#: mygpo/directory/templates/flattr-podcasts.html:68
 msgid "Login to Flattr"
 msgstr ""
 
-#: directory/templates/flattr-podcasts.html:72
+#: mygpo/directory/templates/flattr-podcasts.html:70
 #, fuzzy
-msgid "You have to login to Flattr to ues the Flattr features."
+msgid "You have to login to Flattr to use the Flattr features."
 msgstr "Sie müssen sich einloggen um diese Seite anzuzeigen."
 
-#: directory/templates/flattr-podcasts.html:73
+#: mygpo/directory/templates/flattr-podcasts.html:71
 #, fuzzy
 msgid "Flattr Settings"
 msgstr "Einstellungen"
 
-#: directory/templates/missing.html:11 directory/templates/missing.html:14
-#: web/templatetags/menu.py:34
+#: mygpo/directory/templates/missing.html:11
+#: mygpo/directory/templates/missing.html:14 mygpo/web/templatetags/menu.py:35
 #, fuzzy
 msgid "Missing Podcast"
 msgstr "Vorgeschlagene Podcasts"
 
-#: directory/templates/missing.html:20
+#: mygpo/directory/templates/missing.html:20
 #, python-format
 msgid ""
 "If you're missing a podcast on %(sitename)s, please enter its feed URL here"
 msgstr ""
 
-#: directory/templates/missing.html:25
+#: mygpo/directory/templates/missing.html:27
 msgid "Check"
 msgstr ""
 
-#: directory/templates/missing.html:33
+#: mygpo/directory/templates/missing.html:36
 msgid "The podcast already exists"
 msgstr ""
 
-#: directory/templates/missing.html:46
+#: mygpo/directory/templates/missing.html:49
 #, fuzzy
 msgid "Add Podcast"
 msgstr "Podcast hinzufügen"
 
-#: directory/templates/podcast_lists.html:13
-#: directory/templates/podcast_lists.html:16 share/templates/lists.html:13
-#: share/templates/lists.html.py:16 share/templates/lists_user.html:9
-#: web/templatetags/menu.py:35 web/templatetags/menu.py:56
+#: mygpo/directory/templates/podcast-ad-box.html:9
+#, fuzzy
+msgid "Sponsoring Podcast"
+msgstr "Vorgeschlagene Podcasts"
+
+#: mygpo/directory/templates/podcast_lists.html:13
+#: mygpo/directory/templates/podcast_lists.html:16
+#: mygpo/podcastlists/templates/lists.html:13
+#: mygpo/podcastlists/templates/lists.html:16
+#: mygpo/podcastlists/templates/lists_user.html:9
+#: mygpo/web/templatetags/menu.py:36 mygpo/web/templatetags/menu.py:59
 #, fuzzy
 msgid "Podcast Lists"
 msgstr "Podcast-Topliste"
 
-#: directory/templates/podcast_lists.html:22
+#: mygpo/directory/templates/podcast_lists.html:22
 #, fuzzy
 msgid "List Name"
 msgstr "Name"
 
-#: directory/templates/podcast_lists.html:23
+#: mygpo/directory/templates/podcast_lists.html:23
 #, fuzzy
 msgid "User"
 msgstr "Benutzername"
 
-#: directory/templates/podcast_lists.html:24 web/templates/base.html:165
-#: web/templates/home.html:191 web/templatetags/menu.py:40
-#, fuzzy
-msgid "Podcasts"
-msgstr "Podcast"
-
-#: directory/templates/podcast_lists.html:25
-#: publisher/templates/publisher/episode.html:35 web/templates/episode.html:53
+#: mygpo/directory/templates/podcast_lists.html:25
+#: mygpo/publisher/templates/publisher/episode.html:35
+#: mygpo/web/templates/episode-history.html:52
+#: mygpo/web/templates/episode.html:53
 msgid "Download"
 msgstr "herunterladen"
 
-#: directory/templates/podcast_lists.html:82
-#: share/templates/lists_user.html:37
+#: mygpo/directory/templates/podcast_lists.html:76
+#: mygpo/podcastlists/templates/lists_user.html:37
 msgid "Know Some Great Podcasts?"
 msgstr ""
 
-#: directory/templates/podcast_lists.html:83
-#: share/templates/lists_user.html:38
+#: mygpo/directory/templates/podcast_lists.html:77
+#: mygpo/podcastlists/templates/lists_user.html:38
 msgid "Create a list of podcasts about a topic you like"
 msgstr ""
 
-#: directory/templates/search.html:11 directory/templates/search.html.py:14
-#: directory/templates/search.html:22 share/templates/list.html:107
-#: web/templates/base.html:166 web/templates/home.html:192
-#: web/templatetags/menu.py:33
+#: mygpo/directory/templates/search.html:11
+#: mygpo/directory/templates/search.html:14
+#: mygpo/directory/templates/search.html:25
+#: mygpo/podcastlists/templates/list.html:111
+#: mygpo/subscriptions/templates/subscriptions.html:53
+#: mygpo/web/templates/base.html:136 mygpo/web/templates/home.html:156
+#: mygpo/web/templatetags/menu.py:34
 msgid "Search"
 msgstr "Suchen"
 
-#: directory/templates/search.html:79 share/templates/list_search.html:61
+#: mygpo/directory/templates/search.html:23
+#: mygpo/podcastlists/templates/list.html:109
+#: mygpo/subscriptions/templates/subscriptions.html:51
+msgid "Search term or feed URL"
+msgstr ""
+
+#: mygpo/directory/templates/search.html:79
+#: mygpo/podcastlists/templates/list_search.html:65
 #, fuzzy
 msgid "Nothing found"
 msgstr "Nicht gefunden"
 
-#: directory/templates/search.html:91
+#: mygpo/directory/templates/search.html:91
 #, fuzzy
 msgid "Search API"
 msgstr "Suchen"
 
-#: directory/templates/search.html:92
+#: mygpo/directory/templates/search.html:92
 msgid "Access the following address to search for <em>tech</em> podcasts."
 msgstr ""
 
-#: directory/templates/toplist.html:13 directory/templates/toplist.html:16
+#: mygpo/directory/templates/toplist.html:14
+#: mygpo/directory/templates/toplist.html:17
 msgid "Toplist"
 msgstr "Topliste"
 
-#: directory/templates/toplist.html:90
+#: mygpo/directory/templates/toplist.html:88
 msgid "Client Access"
 msgstr ""
 
-#: directory/templates/directory/add-podcast-status.html:16
-#: directory/templates/directory/add-podcast-status.html:25
-#, fuzzy
-msgid "Podcast Added"
-msgstr "Podcast"
+#: mygpo/directory/views.py:320
+#, fuzzy, python-format
+msgid "%d podcasts added"
+msgstr "Podcasts"
 
-#: directory/templates/directory/add-podcast-status.html:18
-#: directory/templates/directory/add-podcast-status.html:27
-#, fuzzy
-msgid "Adding Podcast"
-msgstr "Podcast hinzufügen"
+#: mygpo/flattr.py:151
+msgid "Not enough means to flattr"
+msgstr ""
 
-#: directory/templates/directory/add-podcast-status.html:44
+#: mygpo/flattr.py:153
 #, fuzzy
-msgid "No podcasts could be added"
-msgstr "Podcast die Sie veröffentlichen"
+msgid "Item does not exist on Flattr"
+msgstr "Der Benutzer existiert nicht."
 
-#: publisher/forms.py:5 publisher/templates/publisher/episode.html:60
+#: mygpo/flattr.py:155
+msgid "Already flattred or own item"
+msgstr ""
+
+#: mygpo/flattr.py:157
+#, fuzzy
+msgid "Invalid request"
+msgstr "Unbekannte Anfrage"
+
+#: mygpo/flattr.py:160
+msgid "No internet connection"
+msgstr ""
+
+#: mygpo/flattr.py:162
+#, fuzzy
+msgid "No description"
+msgstr "Beschreibung"
+
+#: mygpo/history/templates/history.html:12
+#: mygpo/history/templates/history.html:15
+#: mygpo/web/templates/podcast-history.html:32
+#: mygpo/web/templates/podcast.html:143
+#, fuzzy
+msgid "Subscription History"
+msgstr "Abo-Verlauf"
+
+#: mygpo/history/templates/history.html:12
+#: mygpo/history/templates/history.html:15
+msgid "for"
+msgstr "für"
+
+#: mygpo/history/templates/history.html:22
+#: mygpo/web/templates/device-edit.html:16
+msgid "Back to"
+msgstr "Zurück zu"
+
+#: mygpo/history/templates/history.html:66
+msgid "Nothing happened yet."
+msgstr ""
+
+#: mygpo/history/templates/history.html:73
+#: mygpo/history/templates/history.html:75
+msgid "Later"
+msgstr ""
+
+#: mygpo/history/templates/history.html:80
+#: mygpo/history/templates/history.html:82
+#, fuzzy
+msgid "Now"
+msgstr "Nein"
+
+#: mygpo/history/templates/history.html:87
+#: mygpo/history/templates/history.html:89
+msgid "Earlier"
+msgstr ""
+
+#: mygpo/podcastlists/templates/list.html:28
+#, python-format
+msgid "\"%(list_title)s\" by %(ownername)s"
+msgstr ""
+
+#: mygpo/podcastlists/templates/list.html:35
+#, python-format
+msgid "a podcast list by <a href=\"%(user-lists-url)s\">%(ownername)s</a>"
+msgstr ""
+
+#: mygpo/podcastlists/templates/list.html:74
+#, fuzzy
+msgid "No Podcasts"
+msgstr "Meine Podcasts"
+
+#: mygpo/podcastlists/templates/list.html:84
+msgid "Vote"
+msgstr ""
+
+#: mygpo/podcastlists/templates/list.html:90
+#, fuzzy
+msgid "Download as OPML"
+msgstr "Abos als OPML herunterladen."
+
+#: mygpo/podcastlists/templates/list.html:96
+#, fuzzy
+msgid "Flattr this podcast list"
+msgstr "Vorgeschlagene Podcasts"
+
+#: mygpo/podcastlists/templates/list.html:128
+#, fuzzy
+msgid "Your own Podcast Lists"
+msgstr "Podcast-Topliste"
+
+#: mygpo/podcastlists/templates/list.html:129
+#, fuzzy
+msgid "Create and share your own podcast lists "
+msgstr "Vorgeschlagene Podcasts"
+
+#: mygpo/podcastlists/templates/list.html:130
+#: mygpo/publisher/templates/publisher/home.html:31
+#: mygpo/web/templates/user_subscriptions.html:65
+msgid "Go"
+msgstr "OK"
+
+#: mygpo/podcastlists/templates/lists.html:29
+#: mygpo/podcastlists/templates/lists_user.html:22
+#: mygpo/share/templates/userpage.html:91
+#, python-format
+msgid "%(num_podcasts)s Podcasts"
+msgstr ""
+
+#: mygpo/podcastlists/templates/lists.html:34
+#: mygpo/web/templates/device-edit.html:77
+msgid "Delete"
+msgstr "Löschen"
+
+#: mygpo/podcastlists/templates/lists.html:41
+msgid "You don't have any podcast lists yet."
+msgstr ""
+
+#: mygpo/podcastlists/templates/lists.html:52
+#: mygpo/share/templates/share/favorites.html:57
+#: mygpo/web/templates/devicelist.html:64
+msgid "Create"
+msgstr ""
+
+#: mygpo/podcastlists/templates/lists.html:60
+msgid ""
+"Podcast Lists are intended to share podcasts about certain topics and are "
+"therefore always visible to everyone."
+msgstr ""
+
+#: mygpo/podcastlists/templates/lists_user.html:12
+#, python-format
+msgid "Podcast Lists by %(username)s"
+msgstr ""
+
+#: mygpo/podcastlists/templates/lists_user.html:27
+#, python-format
+msgid "%(username)s hasn't created any podcast lists yet."
+msgstr ""
+
+#: mygpo/podcastlists/views.py:110
+msgid "You have to specify a title."
+msgstr ""
+
+#: mygpo/podcastlists/views.py:116
+#, python-brace-format
+msgid "\"{title}\" is not a valid title"
+msgstr ""
+
+#: mygpo/podcastlists/views.py:175
+msgid "Thanks for rating!"
+msgstr ""
+
+#: mygpo/podcasts/admin.py:22 mygpo/web/templates/device-edit.html:28
+msgid "Edit"
+msgstr "Bearbeiten"
+
+#: mygpo/podcasts/models.py:680
+#, fuzzy
+#| msgid "Unnamed Podcast"
+msgid "Unknown Podcast"
+msgstr "Unbenannter Podcast"
+
+#: mygpo/podcasts/models.py:682
+#, python-brace-format
+msgid "Unknown Podcast from {domain}"
+msgstr ""
+
+#: mygpo/podcasts/views/episode.py:196 mygpo/podcasts/views/podcast.py:367
+msgid "Flattr'd"
+msgstr ""
+
+#: mygpo/publisher/forms.py:5
+#: mygpo/publisher/templates/publisher/episode.html:60
 msgid "URL"
 msgstr "URL"
 
-#: publisher/views.py:146
-msgid ""
-"The update has been scheduled. It might take some time until the results are "
-"visible."
-msgstr ""
-
-#: publisher/views.py:158 web/views/settings.py:132
-#, fuzzy
-msgid "Data updated"
-msgstr "Geräte-Liste"
-
-#: publisher/views.py:169
-#, fuzzy
-msgid "Publisher token updated"
-msgstr "Bewerben Sie Ihren Podcast"
-
-#: publisher/views.py:267
-msgid "Removed slug {slug} from {episode}"
-msgstr ""
-
-#: publisher/templates/link.html:8
+#: mygpo/publisher/templates/link.html:8
 msgid "For Podcast Authors"
 msgstr "Für Podcast-Autoren"
 
-#: publisher/templates/link.html:11
+#: mygpo/publisher/templates/link.html:11
 msgid "Link to"
 msgstr "Link zu"
 
-#: publisher/templates/link.html:17
-#: publisher/templates/publisher/podcast.html:107
+#: mygpo/publisher/templates/link.html:17
+#: mygpo/publisher/templates/publisher/podcast.html:199
 #, fuzzy, python-format
 msgid ""
 "You can paste this code on your website, so users of %(sitename)s can "
@@ -603,24 +869,25 @@ msgstr ""
 "Du kannst diesen Code auf deine Webseite geben, damit die Benutzer von "
 "%(sitename)s direkt deinen Podcast abonnieren können!"
 
-#: publisher/templates/link.html:18
+#: mygpo/publisher/templates/link.html:18
 #, fuzzy
 msgid "Change the field 'YOUR_ADRESS' with the adress of your podcast feed."
 msgstr "Ändere YOUR_ADRESS in die Adresse deines Podcastes um."
 
-#: publisher/templates/publisher/advertise.html:9
-#: publisher/templates/publisher/info.html:20 web/templates/base.html:184
-#: web/templates/base.html.py:211 web/templates/home.html:210
-#: web/templates/home.html.py:237 web/templatetags/menu.py:64
+#: mygpo/publisher/templates/publisher/advertise.html:9
+#: mygpo/publisher/templates/publisher/info.html:20
+#: mygpo/web/templates/base.html:154 mygpo/web/templates/base.html:181
+#: mygpo/web/templates/home.html:174 mygpo/web/templates/home.html:201
+#: mygpo/web/templatetags/menu.py:67
 msgid "Advertise"
 msgstr "Werben"
 
-#: publisher/templates/publisher/advertise.html:12
+#: mygpo/publisher/templates/publisher/advertise.html:12
 #, python-format
 msgid "Advertise on %(sitename)s"
 msgstr "Auf %(sitename)s werben"
 
-#: publisher/templates/publisher/advertise.html:18
+#: mygpo/publisher/templates/publisher/advertise.html:18
 #, python-format
 msgid ""
 "For just € 20,-- your podcast will be shown on the <strong>front page of "
@@ -631,7 +898,7 @@ msgstr ""
 "von %(sitename)s</strong> gezeigt. Zusätzlich ist er der erste Eintrag in "
 "der Liste der Beispiel-Podcasts von gPodder."
 
-#: publisher/templates/publisher/advertise.html:20
+#: mygpo/publisher/templates/publisher/advertise.html:20
 msgid ""
 "You can chose when your advertisement will be active, and the text that will "
 "be displayed for your podcast."
@@ -639,11 +906,11 @@ msgstr ""
 "Sie können wählen sowohl die Dauer als auch die angezeigte Beschreibung des "
 "Podcasts frei wählen."
 
-#: publisher/templates/publisher/advertise.html:22
+#: mygpo/publisher/templates/publisher/advertise.html:22
 msgid "Front Page"
 msgstr "Hauptseite"
 
-#: publisher/templates/publisher/advertise.html:23
+#: mygpo/publisher/templates/publisher/advertise.html:23
 #, python-format
 msgid ""
 "Your podcast will be displayed on the front page of %(sitename)s for both "
@@ -652,11 +919,11 @@ msgstr ""
 "Ihr Podcast wird auf der Startseite von %(sitename)s sowohl für eingeloggte "
 "als auch für neue Besucher angezeigt."
 
-#: publisher/templates/publisher/advertise.html:25
+#: mygpo/publisher/templates/publisher/advertise.html:25
 msgid "Example Podcasts"
 msgstr "Beispiel-Podcasts"
 
-#: publisher/templates/publisher/advertise.html:26
+#: mygpo/publisher/templates/publisher/advertise.html:26
 msgid ""
 "The gPodder client offers a list of example podcasts when started for the "
 "first time. This list is loaded from the web on demand. For the time of your "
@@ -666,11 +933,11 @@ msgstr ""
 "werden, wenn das Programm zum ersten Mal gestartet wird. Für die Dauer der "
 "Werbe-Einschaltung wird Ihr Podcast an erster Stelle angezeigt."
 
-#: publisher/templates/publisher/advertise.html:28
+#: mygpo/publisher/templates/publisher/advertise.html:28
 msgid "Visitors"
 msgstr "Besucher"
 
-#: publisher/templates/publisher/advertise.html:29
+#: mygpo/publisher/templates/publisher/advertise.html:29
 #, fuzzy
 msgid ""
 "Both the front page and the list of example podcasts are accessed by more "
@@ -682,11 +949,11 @@ msgstr ""
 "3000 Personen abgerufen (also <strong>6000 Personen</strong> insgesamt), die "
 "aktiv nach interessanten Podcasts suchen."
 
-#: publisher/templates/publisher/advertise.html:31
+#: mygpo/publisher/templates/publisher/advertise.html:31
 msgid "Start your Advertisement"
 msgstr "Werbung starten"
 
-#: publisher/templates/publisher/advertise.html:32
+#: mygpo/publisher/templates/publisher/advertise.html:32
 #, python-format
 msgid ""
 "Contact <a href=\"mailto:stefan@gpodder.net\">stefan@gpodder.net</a> if you "
@@ -697,145 +964,160 @@ msgstr ""
 "wenden Sie sich bitte an <a href=\"mailto:stefan@gpodder.net"
 "\">stefan@gpodder.net</a>. Die Bezahlung erfolgt einfach per Paypal."
 
-#: publisher/templates/publisher/episode.html:31
+#: mygpo/publisher/templates/publisher/episode.html:31
 msgid "Unnamed Episode"
 msgstr "Namenlose Episode"
 
-#: publisher/templates/publisher/episode.html:31
-#: publisher/templates/publisher/episodes.html:23
-#: publisher/templates/publisher/info.html:9
-#: publisher/templates/publisher/info.html:26
-#: publisher/templates/publisher/podcast.html:25
+#: mygpo/publisher/templates/publisher/episode.html:31
+#: mygpo/publisher/templates/publisher/episodes.html:23
+#: mygpo/publisher/templates/publisher/info.html:9
+#: mygpo/publisher/templates/publisher/info.html:26
+#: mygpo/publisher/templates/publisher/podcast.html:26
+#: mygpo/web/templates/episode.html:85 mygpo/web/templates/episodes.html:27
+#: mygpo/web/templates/podcast.html:39
 msgid "Publisher Pages"
 msgstr "Publisher-Seiten"
 
-#: publisher/templates/publisher/episode.html:40
-#: publisher/templates/publisher/podcast.html:37 web/templates/episode.html:58
-#: web/templates/podcast.html:54
+#: mygpo/publisher/templates/publisher/episode.html:40
+#: mygpo/publisher/templates/publisher/podcast.html:38
+#: mygpo/web/templates/episode-history.html:57
+#: mygpo/web/templates/episode.html:58 mygpo/web/templates/podcast-base.html:54
 #, fuzzy
 msgid "Website"
 msgstr "Website"
 
-#: publisher/templates/publisher/episode.html:45 web/templates/episode.html:63
+#: mygpo/publisher/templates/publisher/episode.html:45
+#: mygpo/web/templates/episode-history.html:62
+#: mygpo/web/templates/episode.html:63
 #, fuzzy
 msgid "listeners"
 msgstr "Hörer"
 
-#: publisher/templates/publisher/episode.html:51
-msgid "Return to the episode list"
-msgstr "Zurück zur Episoden-Liste"
-
-#: publisher/templates/publisher/episode.html:52
+#: mygpo/publisher/templates/publisher/episode.html:55
 #, fuzzy
-msgid "Return to podcast page"
+msgid "Episode List"
+msgstr "Episoden-Titel"
+
+#: mygpo/publisher/templates/publisher/episode.html:56
+#, fuzzy
+msgid "Podcast Page"
 msgstr "Zurück zum Podcast"
 
-#: publisher/templates/publisher/episode.html:61
+#: mygpo/publisher/templates/publisher/episode.html:61
 msgid ""
 "You can configure the URL of this episode. Previous keys will automatically "
 "be added to the alternative keys and always redirect to the current URL."
 msgstr ""
 
-#: publisher/templates/publisher/episode.html:67 web/templates/account.html:68
-#: web/templates/account.html.py:154 web/templates/account.html:215
-#: web/templates/device-edit.html:60
+#: mygpo/publisher/templates/publisher/episode.html:72
+#: mygpo/publisher/templates/publisher/podcast.html:91
+#: mygpo/web/templates/account.html:68 mygpo/web/templates/account.html:157
+#: mygpo/web/templates/account.html:213 mygpo/web/templates/device-edit.html:53
 msgid "Save"
 msgstr ""
 
-#: publisher/templates/publisher/episode.html:75
-msgid "none"
-msgstr ""
-
-#: publisher/templates/publisher/episode.html:81
+#: mygpo/publisher/templates/publisher/episode.html:86
 #, fuzzy
 msgid "Episode data"
 msgstr "Episoden-Status"
 
-#: publisher/templates/publisher/episode.html:82
-#: publisher/templates/publisher/podcast.html:57
+#: mygpo/publisher/templates/publisher/episode.html:87
 msgid "Last update: "
 msgstr ""
 
-#: publisher/templates/publisher/episode.html:92
-#: publisher/templates/publisher/podcast.html:133
-msgid "Red parts are often skipped, green parts never."
-msgstr "Rote Bereiche werden oft übersprungen; grüne werden bevorzugt gehört"
-
-#: publisher/templates/publisher/episodes.html:23
-#: publisher/templates/publisher/podcast.html:25
-#: web/templates/episodes.html:34 web/templates/podcast.html:39
+#: mygpo/publisher/templates/publisher/episodes.html:23
+#: mygpo/publisher/templates/publisher/podcast.html:26
+#: mygpo/web/templates/podcast-base.html:39
 msgid "Unnamed Podcast"
 msgstr "Unbenannter Podcast"
 
-#: publisher/templates/publisher/episodes.html:24
+#: mygpo/publisher/templates/publisher/episodes.html:24
 msgid "Return to Podcast Page"
 msgstr "Zurück zum Podcast"
 
-#: publisher/templates/publisher/episodes.html:31
-#: share/templates/userpage.html:185 share/templates/userpage.html.py:191
-#: web/templatetags/menu.py:41
+#: mygpo/publisher/templates/publisher/episodes.html:31
+#: mygpo/share/templates/userpage.html:185
+#: mygpo/share/templates/userpage.html:191 mygpo/web/templatetags/menu.py:44
 msgid "Episodes"
 msgstr "Episoden"
 
-#: publisher/templates/publisher/episodes.html:34
-#: web/templates/episodes.html:86 web/templates/podcast.html:104
+#: mygpo/publisher/templates/publisher/episodes.html:34
 msgid "Title"
 msgstr "Titel"
 
-#: publisher/templates/publisher/episodes.html:35
-#: web/templates/episodes.html:87 web/templates/podcast.html:105
+#: mygpo/publisher/templates/publisher/episodes.html:35
 msgid "Released"
 msgstr "Veröffentlicht"
 
-#: publisher/templates/publisher/group.html:21
+#: mygpo/publisher/templates/publisher/group.html:21
 msgid "Publisher Pages:"
 msgstr "Publisher-Seiten:"
 
-#: publisher/templates/publisher/group.html:26
+#: mygpo/publisher/templates/publisher/group.html:26
 msgid "This is a group of podcasts containing"
 msgstr "Eine Gruppe der folgenden Podcasts"
 
-#: publisher/templates/publisher/home.html:9
-#: publisher/templates/publisher/home.html:12
+#: mygpo/publisher/templates/publisher/home.html:9
 #, fuzzy
 msgid "Podcasts Published by Me"
 msgstr "Podcast die Sie veröffentlichen"
 
-#: publisher/templates/publisher/home.html:30
+#: mygpo/publisher/templates/publisher/home.html:12
 #, fuzzy
-msgid "Update your podcasts"
+#| msgid "Publisher Pages"
+msgid "Publisher Area"
+msgstr "Publisher-Seiten"
+
+#: mygpo/publisher/templates/publisher/home.html:21
+msgid "Staff only"
+msgstr ""
+
+#: mygpo/publisher/templates/publisher/home.html:24
+msgid "Go to the publisher page of any podcast by entering its feed URL"
+msgstr ""
+
+#: mygpo/publisher/templates/publisher/home.html:29
+msgid "http://"
+msgstr ""
+
+#: mygpo/publisher/templates/publisher/home.html:43
+#, fuzzy
+#| msgid "Publisher Pages"
+msgid "Published Podcasts"
+msgstr "Publisher-Seiten"
+
+#: mygpo/publisher/templates/publisher/home.html:46
+#, fuzzy
+#| msgid "You have subscribed the following podcasts on this device"
+msgid "You have publisher permissions for the following podcasts."
+msgstr "Du hast die folgenden Podcasts auf diesem Gerät abonniert"
+
+#: mygpo/publisher/templates/publisher/home.html:62
+#, fuzzy
+msgid "Update podcasts"
 msgstr "Podcast hinzufügen"
 
-#: publisher/templates/publisher/home.html:31
+#: mygpo/publisher/templates/publisher/home.html:65
 msgid ""
 "To update all of your published podcasts automatically, you can request the "
 "following URL"
 msgstr ""
 
-#: publisher/templates/publisher/home.html:35
+#: mygpo/publisher/templates/publisher/home.html:69
 #, fuzzy
 msgid "Create a new token"
 msgstr "Aktuelles Passwort"
 
-#: publisher/templates/publisher/home.html:41
-msgid "Go to the publisher page of any podcast by entering its feed URL"
-msgstr ""
-
-#: publisher/templates/publisher/home.html:46 share/templates/list.html:125
-#: web/templates/user_subscriptions.html:65
-msgid "Go"
-msgstr "OK"
-
-#: publisher/templates/publisher/info.html:12
+#: mygpo/publisher/templates/publisher/info.html:12
 msgid "Publisher Services"
 msgstr "Publisher-Seiten"
 
-#: publisher/templates/publisher/info.html:18
+#: mygpo/publisher/templates/publisher/info.html:18
 #, python-format
 msgid "%(sitename)s offers several services for podcast publishers."
 msgstr "%(sitename)s bietet spezielle Services für Podcast-Anbieter."
 
-#: publisher/templates/publisher/info.html:21
+#: mygpo/publisher/templates/publisher/info.html:21
 #, python-format
 msgid ""
 "You can place your podcast on the frontpage of %(sitename)s to promote your "
@@ -846,7 +1128,7 @@ msgstr ""
 "Zusätzlich erhalten Benutzer des gPodder-Clients Ihren Podcast als 1. "
 "Beispiel-Podcast angezeigt."
 
-#: publisher/templates/publisher/info.html:24
+#: mygpo/publisher/templates/publisher/info.html:24
 #, fuzzy, python-format
 msgid ""
 "You can find additional details on the <a href=\"%(advertise-url)s"
@@ -855,7 +1137,7 @@ msgstr ""
 "Details über die Werbe-Einschaltungen finden Sie auf der <a href=\"/"
 "publisher/advertise\">Werbe-Seite</a>."
 
-#: publisher/templates/publisher/info.html:27
+#: mygpo/publisher/templates/publisher/info.html:27
 #, python-format
 msgid ""
 "On the <strong>%(sitename)s Publisher Pages</strong> you can find valuable "
@@ -864,7 +1146,7 @@ msgstr ""
 "Auf den <strong>%(sitename)s Publisher-Seiten</strong> finden Sie "
 "interessante Statistiken über das Hör-Verhalten Ihrer Podcasts."
 
-#: publisher/templates/publisher/info.html:30
+#: mygpo/publisher/templates/publisher/info.html:30
 #, fuzzy, python-format
 msgid ""
 "The Publisher Pages are currently in Beta, but if you are publishing a "
@@ -888,7 +1170,7 @@ msgstr ""
 " <li>Eine \"offizielle\" Email-Adresse</li>\n"
 "</ul>"
 
-#: publisher/templates/publisher/info.html:39
+#: mygpo/publisher/templates/publisher/info.html:39
 #, fuzzy, python-format
 msgid ""
 "If you already are registered as a publisher, please <a href=\"%(login-url)s?"
@@ -897,12 +1179,12 @@ msgstr ""
 "Falls Sie bereits als Publisher registriert sind, <a href=\"/login/?next=/"
 "publisher/\">loggen Siei sich ein</a>."
 
-#: publisher/templates/publisher/info.html:41
+#: mygpo/publisher/templates/publisher/info.html:41
 #, python-format
 msgid "Link to %(sitename)s"
 msgstr "Zu %(sitename)s verlinken"
 
-#: publisher/templates/publisher/info.html:44
+#: mygpo/publisher/templates/publisher/info.html:44
 #, fuzzy, python-format
 msgid ""
 "If you <a href=\"%(link-here-url)s\">link to %(sitename)s</a> from your "
@@ -912,53 +1194,80 @@ msgstr ""
 "Wenn Sie auf <a href=\"/publisher/link/\">%(sitename)s verlinken</a> machen "
 "Sie es Ihren Besuchern besonders einfach Ihren Podcasts zu abonnieren"
 
-#: publisher/templates/publisher/podcast.html:27 web/templates/podcast.html:44
+#: mygpo/publisher/templates/publisher/podcast.html:28
+#: mygpo/web/templates/podcast-base.html:44
 msgid "by"
 msgstr ""
 
-#: publisher/templates/publisher/podcast.html:33
-#: share/templates/share/favorites.html:29 web/templates/podcast.html:50
+#: mygpo/publisher/templates/publisher/podcast.html:34
+#: mygpo/share/templates/share/favorites.html:29
+#: mygpo/web/templates/podcast-base.html:50
 msgid "Feed"
 msgstr ""
 
-#: publisher/templates/publisher/podcast.html:42 web/templates/podcast.html:59
+#: mygpo/publisher/templates/publisher/podcast.html:43
+#: mygpo/web/templates/podcast-base.html:65
 #, fuzzy
 msgid "subscribers"
 msgstr "Abonnenten"
 
-#: publisher/templates/publisher/podcast.html:47
+#: mygpo/publisher/templates/publisher/podcast.html:48
 #, python-format
 msgid ""
 "This is the publisher page of <strong>%(ptitle)s</strong>. You can see some "
 "stats and provide additional data for the podcast page."
 msgstr ""
 
-#: publisher/templates/publisher/podcast.html:48
+#: mygpo/publisher/templates/publisher/podcast.html:49
 #, fuzzy
 msgid "Go to Podcast Page"
 msgstr "Zurück zum Podcast"
 
-#: publisher/templates/publisher/podcast.html:55
+#: mygpo/publisher/templates/publisher/podcast.html:56
 msgid "The podcast information is regularly retrieved from the podcast feed"
 msgstr ""
 
-#: publisher/templates/publisher/podcast.html:61
+#: mygpo/publisher/templates/publisher/podcast.html:59
+msgid "Timing"
+msgstr ""
+
+#: mygpo/publisher/templates/publisher/podcast.html:61
+#, fuzzy
+msgid "Last update:"
+msgstr "Geräte-Liste"
+
+#: mygpo/publisher/templates/publisher/podcast.html:62
+#, fuzzy
+msgid "Update interval:"
+msgstr "Daten aus dem Feed holen"
+
+#: mygpo/publisher/templates/publisher/podcast.html:63
+#, fuzzy
+msgid "Next update:"
+msgstr "Geräte-Liste"
+
+#: mygpo/publisher/templates/publisher/podcast.html:68
 #, fuzzy
 msgid "Update now"
 msgstr "Daten aus dem Feed holen"
 
-#: publisher/templates/publisher/podcast.html:70 web/forms.py:59
-#: web/templates/base.html:191 web/templates/home.html:217
+#: mygpo/publisher/templates/publisher/podcast.html:79 mygpo/web/forms.py:70
+#: mygpo/web/templates/base.html:161 mygpo/web/templates/home.html:181
 msgid "Twitter"
 msgstr ""
 
-#: publisher/templates/publisher/podcast.html:86 web/templates/account.html:96
-#: web/templates/account.html.py:169 web/templates/base.html:182
-#: web/templates/home.html:208 web/templatetags/menu.py:36
+#: mygpo/publisher/templates/publisher/podcast.html:97
+msgid "Feed Check"
+msgstr ""
+
+#: mygpo/publisher/templates/publisher/podcast.html:105
+#: mygpo/web/templates/account.html:105 mygpo/web/templates/base.html:152
+#: mygpo/web/templates/episode.html:111 mygpo/web/templates/home.html:172
+#: mygpo/web/templates/podcast.html:151 mygpo/web/templatetags/menu.py:40
 msgid "Flattr"
 msgstr ""
 
-#: publisher/templates/publisher/podcast.html:88
+#: mygpo/publisher/templates/publisher/podcast.html:113
 #, python-format
 msgid ""
 "%(sitename)s supports <a href=\"https://flattr.com/\">Flattr</a>. When you "
@@ -967,225 +1276,130 @@ msgid ""
 "your content."
 msgstr ""
 
-#: publisher/templates/publisher/podcast.html:93
+#: mygpo/publisher/templates/publisher/podcast.html:117
 msgid ""
 " We discovered payment URLs in your pdocast feed. Your listeners can "
 "automatically flattr your content!"
 msgstr ""
 
-#: publisher/templates/publisher/podcast.html:97
+#: mygpo/publisher/templates/publisher/podcast.html:121
 msgid ""
 "We did not find <a href=\"http://developers.flattr.net/feed/\">payment URLs</"
-"a> in your pdocast feed. Add them so your listeners can support you!</a>"
+"a> in your podcast feed. Add them so your listeners can support you!</a>"
 msgstr ""
 
-#: publisher/templates/publisher/podcast.html:106
+#: mygpo/publisher/templates/publisher/podcast.html:133
+msgid "PubSubHubbub"
+msgstr ""
+
+#: mygpo/publisher/templates/publisher/podcast.html:142
+#, python-format
+msgid ""
+"If you publish your podcast feed through a <a href=\"https://code.google.com/"
+"p/pubsubhubbub/\">PubSubHubbu</a> hub, %(sitename)s can immediatelly update "
+"your podcast when a new episode is released."
+msgstr ""
+
+#: mygpo/publisher/templates/publisher/podcast.html:147
+#, python-format
+msgid ""
+"Your podcast is published through <a href=\"%(hub)s\">%(hub)s</a> and should "
+"update immediatelly for each new episode."
+msgstr ""
+
+#: mygpo/publisher/templates/publisher/podcast.html:151
+#, python-format
+msgid ""
+"Your podcast is published through <a href=\"%(hub)s\">%(hub)s</a> but our "
+"subscription has not yet been verified."
+msgstr ""
+
+#: mygpo/publisher/templates/publisher/podcast.html:156
+#, python-format
+msgid ""
+"We did not find a hub in your podcast feed. Your feed is updated regularly, "
+"but there might be some delay until a new episode shows up on %(sitename)s."
+msgstr ""
+
+#: mygpo/publisher/templates/publisher/podcast.html:168
+msgid "License Information"
+msgstr ""
+
+#: mygpo/publisher/templates/publisher/podcast.html:176
+#, python-format
+msgid ""
+"You should include license information in your feed so that users and "
+"%(sitename)s can know, under which conditions your content can be used."
+msgstr ""
+
+#: mygpo/publisher/templates/publisher/podcast.html:180
+#, python-format
+msgid ""
+"We found the following license in your podcast: <a href=\"%(license)s\">"
+"%(license)s</a>"
+msgstr ""
+
+#: mygpo/publisher/templates/publisher/podcast.html:184
+msgid ""
+"We did not find a license in your podcast feed. Refer to <a href=\"https://"
+"github.com/gpodder/podcast-feed-best-practice/blob/master/podcast-feed-best-"
+"practice.md#license\"> gPodder Podcast Feed Best Practice</a> on how to "
+"include license information."
+msgstr ""
+
+#: mygpo/publisher/templates/publisher/podcast.html:198
 #, fuzzy
 msgid "Link"
 msgstr "Link zu"
 
-#: publisher/templates/publisher/podcast.html:114
+#: mygpo/publisher/templates/publisher/podcast.html:206
 msgid "Show Group Stats"
 msgstr "Statistiken für alle Podcasts in der Gruppe anzeigen"
 
-#: publisher/templates/publisher/podcast.html:132
+#: mygpo/publisher/views.py:141
 msgid ""
-"This diagram shows which parts of the podcast's episodes are listened the "
-"most by users."
+"The update has been scheduled. It might take some time until the results are "
+"visible."
 msgstr ""
 
-#: share/views.py:125
-msgid "You have to specify a title."
-msgstr ""
-
-#: share/views.py:131
-msgid "\"{title}\" is not a valid title"
-msgstr ""
-
-#: share/views.py:198 web/views/__init__.py:209
-msgid "Thanks for rating!"
-msgstr ""
-
-#: share/templates/list.html:28
-#, python-format
-msgid "\"%(list_title)s\" by %(ownername)s"
-msgstr ""
-
-#: share/templates/list.html:35
-#, python-format
-msgid "a podcast list by <a href=\"%(user-lists-url)s\">%(ownername)s</a>"
-msgstr ""
-
-#: share/templates/list.html:74
+#: mygpo/publisher/views.py:154 mygpo/users/views/settings.py:110
 #, fuzzy
-msgid "No Podcasts"
-msgstr "Meine Podcasts"
-
-#: share/templates/list.html:84
-msgid "Vote"
-msgstr ""
-
-#: share/templates/list.html:90
-#, fuzzy
-msgid "Download as OPML"
-msgstr "Abos als OPML herunterladen."
-
-#: share/templates/list.html:96
-#, fuzzy
-msgid "Flattr this podcast list"
-msgstr "Vorgeschlagene Podcasts"
-
-#: share/templates/list.html:123
-#, fuzzy
-msgid "Your own Podcast Lists"
-msgstr "Podcast-Topliste"
-
-#: share/templates/list.html:124
-#, fuzzy
-msgid "Create and share your own podcast lists "
-msgstr "Vorgeschlagene Podcasts"
-
-#: share/templates/lists.html:26 share/templates/lists_user.html:22
-#: share/templates/userpage.html:91
-#, python-format
-msgid "%(num_podcasts)s Podcasts"
-msgstr ""
-
-#: share/templates/lists.html:31 web/templates/device-edit.html:80
-msgid "Delete"
-msgstr "Löschen"
-
-#: share/templates/lists.html:38
-msgid "You don't have any podcast lists yet."
-msgstr ""
-
-#: share/templates/lists.html:50
-#, fuzzy
-msgid "Create List"
+msgid "Data updated"
 msgstr "Geräte-Liste"
 
-#: share/templates/lists.html:55 share/templates/share/favorites.html:57
-#: web/templates/device-create.html:53
-msgid "Create"
-msgstr ""
-
-#: share/templates/lists.html:60
-msgid ""
-"Podcast Lists are intended to share podcasts about certain topics and are "
-"therefore always visible to everyone."
-msgstr ""
-
-#: share/templates/lists_user.html:12
-#, python-format
-msgid "Podcast Lists by %(username)s"
-msgstr ""
-
-#: share/templates/lists_user.html:27
-#, python-format
-msgid "%(username)s hasn't created any podcast lists yet."
-msgstr ""
-
-#: share/templates/userpage-denied.html:16
-#, python-format
-msgid ""
-"%(username)s didn't share his user page with you. Maybe you should contact "
-"him to get the correct link."
-msgstr ""
-
-#: share/templates/userpage-denied.html:20
-msgid "Want to have your own user page?"
-msgstr ""
-
-#: share/templates/userpage-denied.html:20
-#, python-format
-msgid ""
-" Go to your <a href=\"%(share-url)s\">Share Page</a> to get the link.</a>"
-msgstr ""
-
-#: share/templates/userpage.html:24
-#, fuzzy, python-format
-msgid "a user on %(site)s"
-msgstr "Zu %(sitename)s verlinken"
-
-#: share/templates/userpage.html:38
-#, python-format
-msgid ""
-"<strong>%(username)s</strong> is sharing his favorite podcasts on %(site)s."
-msgstr ""
-
-#: share/templates/userpage.html:50
-#, fuzzy, python-format
-msgid "%(subscription_count)s Subscriptions"
-msgstr "%(username)ss Podcast-Abos"
-
-#: share/templates/userpage.html:55
+#: mygpo/publisher/views.py:165
 #, fuzzy
-msgid "Episodes Listened"
-msgstr "Episoden-Status"
+msgid "Publisher token updated"
+msgstr "Bewerben Sie Ihren Podcast"
 
-#: share/templates/userpage.html:71 share/templates/userpage.html.py:100
-#: share/templates/userpage.html:151
-msgid "see all"
+#: mygpo/publisher/views.py:255
+#, python-brace-format
+msgid "Removed slug {slug} from {episode}"
 msgstr ""
 
-#: share/templates/userpage.html:86
-#, fuzzy, python-format
-msgid "%(list_count)s Podcast Lists"
-msgstr "%(listener_count)s Hörer"
-
-#: share/templates/userpage.html:113
-#, python-format
-msgid "%(num_episodes)s Recently Played Episodes"
-msgstr ""
-
-#: share/templates/userpage.html:134
-#, fuzzy, python-format
-msgid "%(num_fav_episodes)s Favorite Episodes"
-msgstr "Lieblings-Episoden"
-
-#: share/templates/userpage.html:169
-msgid "That's You!"
-msgstr ""
-
-#: share/templates/userpage.html:171
-msgid "Edit your profile"
-msgstr ""
-
-#: share/templates/userpage.html:179
+#: mygpo/share/templates/share/components/private-toggle.html:11
 #, fuzzy
-msgid "Stats"
-msgstr "Statistiken:"
+msgid "Public"
+msgstr "Publisher"
 
-#: share/templates/userpage.html:181
+#: mygpo/share/templates/share/components/private-toggle.html:16
 #, fuzzy
-msgid "Total Played:"
-msgstr "Abgespielt"
+msgid "Private"
+msgstr "Als Privat markieren"
 
-#: share/templates/userpage.html:187
-msgid "Played Last Month:"
-msgstr ""
-
-#: share/templates/userpage.html:193
-msgid "Member Since:"
-msgstr ""
-
-#: share/templates/userpage.html:197
-msgid "the early days"
-msgstr ""
-
-#: share/templates/share/favorites.html:10
-#: share/templates/share/favorites.html:14
+#: mygpo/share/templates/share/favorites.html:10
+#: mygpo/share/templates/share/favorites.html:14
 #, fuzzy
 msgid "Share your favorite episodes"
 msgstr "Lieblings-Episoden"
 
-#: share/templates/share/favorites.html:46
-#: share/templates/share/favorites.html:48
+#: mygpo/share/templates/share/favorites.html:46
+#: mygpo/share/templates/share/favorites.html:48
 #, fuzzy
 msgid "Directory Entry"
 msgstr "Verzeichnis"
 
-#: share/templates/share/favorites.html:70
+#: mygpo/share/templates/share/favorites.html:70
 #, fuzzy, python-format
 msgid ""
 "To keep your favorites private (from others and from the public pages of "
@@ -1197,27 +1411,27 @@ msgstr ""
 "deinem Client verwenden. Benutzername <strong>%(username)s</strong>, "
 "Passwort <strong>%(token)s</strong>."
 
-#: share/templates/share/favorites.html:72
+#: mygpo/share/templates/share/favorites.html:72
 #, fuzzy
 msgid "Username:"
 msgstr "Benutzername"
 
-#: share/templates/share/favorites.html:73
+#: mygpo/share/templates/share/favorites.html:73
 #, fuzzy
 msgid "Password:"
 msgstr "Passwort"
 
-#: share/templates/share/favorites.html:79
+#: mygpo/share/templates/share/favorites.html:79
 #, fuzzy
 msgid "Remove password"
 msgstr "Neues Passwort"
 
-#: share/templates/share/favorites.html:82
+#: mygpo/share/templates/share/favorites.html:82
 #, fuzzy
 msgid "Generate new password"
 msgstr "Neues Passwort erzeugen"
 
-#: share/templates/share/favorites.html:98
+#: mygpo/share/templates/share/favorites.html:98
 #, python-format
 msgid ""
 "You've marked your favorites-feed as public and others can\n"
@@ -1226,350 +1440,704 @@ msgstr ""
 "Deine Lieblings-Episoden sind öffentlich und andere können sie abonnieren. "
 "Sie werden auch auf %(sitename)s angezeigt."
 
-#: share/templates/share/favorites.html:110
+#: mygpo/share/templates/share/favorites.html:110
 #, fuzzy
 msgid "Create password"
 msgstr "Aktuelles Passwort"
 
-#: share/templates/share/overview.html:9
+#: mygpo/share/templates/share/overview.html:9
 msgid "Sharing"
 msgstr "Teilen"
 
-#: share/templates/share/overview.html:12 web/templates/favorites.html:39
-#: web/templates/podcast.html:228 web/templates/subscriptions.html:43
+#: mygpo/share/templates/share/overview.html:12
+#: mygpo/subscriptions/templates/subscriptions.html:67
+#: mygpo/web/templates/favorites.html:39
 msgid "Share"
 msgstr "Teilen"
 
-#: share/templates/share/overview.html:21 web/templates/device.html:19
-#: web/templates/podcast.html:145 web/templatetags/menu.py:43
-#: web/templatetags/menu.py:44 web/templatetags/menu.py:55
+#: mygpo/share/templates/share/overview.html:21
+#: mygpo/web/templates/device.html:19 mygpo/web/templates/privacy.html:25
+#: mygpo/web/templatetags/menu.py:46 mygpo/web/templatetags/menu.py:47
+#: mygpo/web/templatetags/menu.py:58
 msgid "Subscriptions"
 msgstr "Abonnements"
 
-#: share/templates/share/overview.html:24
-#: share/templates/share/overview.html:46
-#: share/templates/share/overview.html:63
-#, fuzzy
-msgid "Public"
-msgstr "Publisher"
-
-#: share/templates/share/overview.html:25
-#: share/templates/share/overview.html:47
-#: share/templates/share/overview.html:64
-#, fuzzy
-msgid "Private"
-msgstr "Als Privat markieren"
-
-#: share/templates/share/overview.html:37
-#: share/templates/share/overview.html:55
-#: share/templates/share/overview.html:82
+#: mygpo/share/templates/share/overview.html:34
+#: mygpo/share/templates/share/overview.html:49
+#: mygpo/share/templates/share/overview.html:76
 #, fuzzy
 msgid "New Token"
 msgstr "Neue Episode"
 
-#: share/templates/share/overview.html:43
+#: mygpo/share/templates/share/overview.html:40
 #, fuzzy
 msgid "User Page"
 msgstr "Benutzername"
 
-#: share/templates/share/overview.html:60
+#: mygpo/share/templates/share/overview.html:51
+#: mygpo/web/templatetags/menu.py:61
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: mygpo/share/templates/share/overview.html:57
 #, fuzzy
 msgid "Favorites Feed"
 msgstr "Favorit"
 
-#: share/templates/share/overview.html:135
-msgid "Private Items"
-msgstr ""
-
-#: share/templates/share/overview.html:136
+#: mygpo/share/templates/share/overview.html:84
 msgid ""
 "Private items are protected by a special token. Only those who know the "
 "exact link can access your content"
 msgstr ""
 
-#: web/forms.py:20 web/forms.py:174
+#: mygpo/share/templates/userpage-denied.html:16
+#, python-format
+msgid ""
+"%(username)s didn't share his user page with you. Maybe you should contact "
+"him to get the correct link."
+msgstr ""
+
+#: mygpo/share/templates/userpage-denied.html:20
+msgid "Want to have your own user page?"
+msgstr ""
+
+#: mygpo/share/templates/userpage-denied.html:20
+#, python-format
+msgid ""
+" Go to your <a href=\"%(share-url)s\">Share Page</a> to get the link.</a>"
+msgstr ""
+
+#: mygpo/share/templates/userpage.html:24
+#, fuzzy, python-format
+msgid "a user on %(site)s"
+msgstr "Zu %(sitename)s verlinken"
+
+#: mygpo/share/templates/userpage.html:38
+#, python-format
+msgid ""
+"<strong>%(username)s</strong> is sharing his favorite podcasts on %(site)s."
+msgstr ""
+
+#: mygpo/share/templates/userpage.html:50
+#, fuzzy, python-format
+msgid "%(subscription_count)s Subscriptions"
+msgstr "%(username)ss Podcast-Abos"
+
+#: mygpo/share/templates/userpage.html:55
+#, fuzzy
+msgid "Episodes Listened"
+msgstr "Episoden-Status"
+
+#: mygpo/share/templates/userpage.html:71
+#: mygpo/share/templates/userpage.html:100
+#: mygpo/share/templates/userpage.html:151
+msgid "see all"
+msgstr ""
+
+#: mygpo/share/templates/userpage.html:86
+#, fuzzy, python-format
+msgid "%(list_count)s Podcast Lists"
+msgstr "%(listener_count)s Hörer"
+
+#: mygpo/share/templates/userpage.html:113
+#, python-format
+msgid "%(num_episodes)s Recently Played Episodes"
+msgstr ""
+
+#: mygpo/share/templates/userpage.html:134
+#, fuzzy, python-format
+msgid "%(num_fav_episodes)s Favorite Episodes"
+msgstr "Lieblings-Episoden"
+
+#: mygpo/share/templates/userpage.html:169
+msgid "That's You!"
+msgstr ""
+
+#: mygpo/share/templates/userpage.html:171
+msgid "Edit your profile"
+msgstr ""
+
+#: mygpo/share/templates/userpage.html:179
+#, fuzzy
+msgid "Stats"
+msgstr "Statistiken:"
+
+#: mygpo/share/templates/userpage.html:181
+#, fuzzy
+msgid "Total Played:"
+msgstr "Abgespielt"
+
+#: mygpo/share/templates/userpage.html:187
+msgid "Played Last Month:"
+msgstr ""
+
+#: mygpo/share/templates/userpage.html:193
+msgid "Member Since:"
+msgstr ""
+
+#: mygpo/share/templates/userpage.html:197
+msgid "the early days"
+msgstr ""
+
+#: mygpo/subscriptions/templates/subscriptions.html:11
+#: mygpo/subscriptions/templates/subscriptions.html:15
+#, fuzzy
+msgid "Podcast Subscriptions"
+msgstr "Meine Podcast-Abos"
+
+#: mygpo/subscriptions/templates/subscriptions.html:32
+#, fuzzy, python-format
+msgid "%(episode_count)s Episodes"
+msgstr "%(listener_count)s Hörer"
+
+#: mygpo/subscriptions/templates/subscriptions.html:42
+#, python-format
+msgid ""
+"You don't have any subscriptions yet. Set up your <a href=\"%(devices)s"
+"\">podcast clients</a> and <a href=\"%(directory)s\">discover interesting "
+"podcasts</a>."
+msgstr ""
+
+#: mygpo/subscriptions/templates/subscriptions.html:63
+#: mygpo/suggestions/templates/suggestions.html:54
+#: mygpo/web/templates/device.html:53
+#, fuzzy
+msgid "Download OPML"
+msgstr "herunterladen"
+
+#: mygpo/subscriptions/views.py:108
+#, fuzzy, python-format
+msgid "%(username)s's Podcast Subscriptions on %(site)s"
+msgstr "%(username)ss Podcast-Abos"
+
+#: mygpo/subscriptions/views.py:112
+#, python-format
+msgid "Recent changes to %(username)s's podcast subscriptions on %(site)s"
+msgstr ""
+
+#: mygpo/subscriptions/views.py:136
+#, fuzzy, python-format
+msgid "%(username)s subscribed to %(podcast)s (%(site)s)"
+msgstr "Abonniere %(podcasttitle)s"
+
+#: mygpo/subscriptions/views.py:138
+#, fuzzy, python-format
+msgid "%(username)s unsubscribed from %(podcast)s (%(site)s)"
+msgstr "Abonniere %(podcasttitle)s"
+
+#: mygpo/suggestions/templates/suggestions.html:9
+#: mygpo/suggestions/templates/suggestions.html:12
+msgid "Suggested Podcasts"
+msgstr "Vorgeschlagene Podcasts"
+
+#: mygpo/suggestions/templates/suggestions.html:31
+#: mygpo/web/templates/podcast.html:59 mygpo/web/templates/subscribe.html:11
+#: mygpo/web/templates/subscribe.html:36
+msgid "Subscribe"
+msgstr "Abonnieren"
+
+#: mygpo/suggestions/templates/suggestions.html:36
+#, fuzzy
+msgid "No Interest"
+msgstr "Kein Interesse"
+
+#: mygpo/suggestions/templates/suggestions.html:47
+#, fuzzy
+msgid "No Suggestions Yet"
+msgstr "Empfehlungen"
+
+#: mygpo/users/models.py:220
+msgid "Desktop"
+msgstr "Desktop"
+
+#: mygpo/users/models.py:221
+msgid "Laptop"
+msgstr "Laptop"
+
+#: mygpo/users/models.py:222
+msgid "Cell phone"
+msgstr "Handy"
+
+#: mygpo/users/models.py:223
+msgid "Server"
+msgstr "Server"
+
+#: mygpo/users/models.py:224
+msgid "Tablet"
+msgstr ""
+
+#: mygpo/users/models.py:225
+msgid "Other"
+msgstr "Andere"
+
+#: mygpo/users/templates/registration/activation_failed.html:8
+#, fuzzy
+msgid "Activation failed"
+msgstr "Aktivierungs-Email gesendet"
+
+#: mygpo/users/templates/registration/activation_failed.html:11
+msgid "Account not activated"
+msgstr "Konto nicht aktiviert"
+
+#: mygpo/users/templates/registration/activation_failed.html:16
+#, fuzzy
+#| msgid "Your account could not be activated successfully."
+msgid "Your account could not be activated."
+msgstr "Dein Konto konnte nicht erfolgreich aktiviert werden."
+
+#: mygpo/users/templates/registration/registration_complete.html:9
+msgid "Registration complete"
+msgstr "Registrierung abgeschlossen"
+
+#: mygpo/users/templates/registration/registration_complete.html:13
+msgid ""
+"Please confirm your account using the email you should just have received."
+msgstr ""
+"Du solltest soeben ein Mail bekommen haben. Darin findest du einen Link zum "
+"Aktivieren deines Accounts"
+
+#: mygpo/users/templates/registration/registration_form.html:8
+#: mygpo/users/templates/registration/registration_form.html:11
+#, fuzzy
+msgid "Create Account"
+msgstr "Erstelle ein Benutzer-Konto"
+
+#: mygpo/users/templates/registration/registration_form.html:18
+msgid "You are already registered."
+msgstr "Sie sind bereits registriert. "
+
+#: mygpo/users/templates/registration/registration_form.html:72
+#: mygpo/web/templates/base.html:52 mygpo/web/templates/home.html:47
+#: mygpo/web/templates/home.html:103 mygpo/web/templates/login.html:48
+#: mygpo/web/templatetags/menu.py:24
+msgid "Register"
+msgstr "Registrieren"
+
+#: mygpo/users/templates/registration/registration_form.html:87
+#, fuzzy
+msgid "Activation Mail"
+msgstr "Aktivierungs-Email gesendet"
+
+#: mygpo/users/templates/registration/registration_form.html:88
+msgid ""
+"After registration, you'll receive an activation mail to confirm the "
+"validity of your email address."
+msgstr ""
+
+#: mygpo/users/templates/registration/registration_form.html:90
+#, python-format
+msgid ""
+"If it doesn't arrive, you can <a href=\"%(resend-activation-url)s\">resend</"
+"a> it."
+msgstr ""
+
+#: mygpo/users/templates/registration/resend_activation.html:4
+#: mygpo/users/templates/registration/resend_activation.html:8
+msgid "Resend activation e-mail"
+msgstr "Aktivierungs-Email erneut senden"
+
+#: mygpo/users/templates/registration/resend_activation.html:18
+#: mygpo/web/templates/restore_password.html:21
+#, fuzzy
+msgid ""
+"Please enter either your username or (if you don't know that either) the e-"
+"mail address which you used to register your account. An e-mail will be sent "
+"to you."
+msgstr ""
+" Bitte geben Sie entweder Ihren Benutzername oder Ihre Email-Adresse an. Sie "
+"erhalten dann in Kürze ein Email."
+
+#: mygpo/users/templates/registration/resend_activation.html:36
+msgid "Send activation e-mail"
+msgstr "Aktivierungs-Email senden"
+
+#: mygpo/users/templates/registration/resent_activation.html:4
+#: mygpo/users/templates/registration/resent_activation.html:7
+msgid "Sent Activation Email"
+msgstr "Aktivierungs-Email gesendet"
+
+#: mygpo/users/templates/registration/resent_activation.html:11
+msgid "The activation email has been reset."
+msgstr "Die Aktivierungs E-Mail wurde zurückgesetzt."
+
+#: mygpo/users/views/device.py:80 mygpo/users/views/device.py:170
+msgid "Synchronize with the following devices"
+msgstr "Synchronisierung der folgenden Geräte"
+
+#: mygpo/users/views/device.py:98
+msgid "Please fill out all fields."
+msgstr ""
+
+#: mygpo/users/views/device.py:110
+#, fuzzy
+msgid "Device saved"
+msgstr "Geräte"
+
+#: mygpo/users/views/device.py:117 mygpo/users/views/device.py:148
+msgid "You can't use the same Device ID for two devices."
+msgstr "Sie können nicht das gleiche Device ID für zwei Geräte benutzen. "
+
+#: mygpo/users/views/device.py:141
+#, fuzzy
+msgid "Device updated"
+msgstr "Geräte-Liste"
+
+#: mygpo/users/views/device.py:194
+#, python-brace-format
+msgid "Could not upload subscriptions: {err}"
+msgstr ""
+
+#: mygpo/users/views/device.py:292
+msgid "Your subscription will be updated in a moment."
+msgstr ""
+
+#: mygpo/users/views/registration.py:88
+msgid "Username or email address already in use"
+msgstr ""
+
+#: mygpo/users/views/registration.py:153
+msgid "The activation link is either not valid or has already expired."
+msgstr ""
+
+#: mygpo/users/views/registration.py:158
+#, fuzzy
+#| msgid "Your account already has been activated. Go ahead and log in."
+msgid "Your user has been activated. You can log in now."
+msgstr "Dein Konto wurde aktiviert! Viel Spaß mit my.gpodder.org"
+
+#: mygpo/users/views/registration.py:175
+msgid "Either username or email address are required."
+msgstr ""
+
+#: mygpo/users/views/registration.py:195 mygpo/users/views/user.py:128
+msgid "User does not exist."
+msgstr "Der Benutzer existiert nicht."
+
+#: mygpo/users/views/registration.py:199
+msgid "Your account already has been activated. Go ahead and log in."
+msgstr "Dein Konto wurde aktiviert! Viel Spaß mit my.gpodder.org"
+
+#: mygpo/users/views/settings.py:69 mygpo/users/views/settings.py:104
+msgid "Oops! Something went wrong. Please double-check the data you entered."
+msgstr ""
+"Oops! Irgendetwas ist schiefgegangen. Bitte überprüfen Sie die eingegebenen "
+"Daten. "
+
+#: mygpo/users/views/settings.py:167
+msgid "Authentication successful"
+msgstr ""
+
+#: mygpo/users/views/settings.py:173
+msgid "Authentication failed. Try again later"
+msgstr ""
+
+#: mygpo/users/views/settings.py:185
+#, fuzzy
+msgid "Your account has been disconnected"
+msgstr "Ihr Account wurde gelöscht"
+
+#: mygpo/users/views/user.py:70
+#, fuzzy
+msgid "Username missing"
+msgstr "Benutzername"
+
+#: mygpo/users/views/user.py:75
+#, fuzzy
+msgid "Password missing"
+msgstr "Ihr Passwort wurde zurückgesetzt"
+
+#: mygpo/users/views/user.py:82
+msgid "Wrong username or password."
+msgstr "Benutzername oder Passwort falsch"
+
+#: mygpo/users/views/user.py:88 mygpo/users/views/user.py:133
+#, fuzzy
+#| msgid "Please activate your account first."
+msgid ""
+"Please activate your account first. We have just re-sent your activation "
+"email"
+msgstr "Ihr Account muss zuerst aktiviert werden."
+
+#: mygpo/users/views/user.py:166 mygpo/users/views/user.py:171
+#, fuzzy
+msgid "Login failed."
+msgstr "Anmelden"
+
+#: mygpo/users/views/user.py:179
+msgid "Login with Google is currently not possible."
+msgstr ""
+
+#: mygpo/users/views/user.py:189
+#, python-brace-format
+msgid ""
+"Your account has been connected with {google}. Open Settings to change this."
+msgstr ""
+
+#: mygpo/users/views/user.py:201
+#, python-format
+msgid ""
+"No account connected with your Google account %s. Please log in to connect."
+msgstr ""
+
+#: mygpo/web/forms.py:20 mygpo/web/forms.py:222
 msgid "E-Mail address"
 msgstr "Deine Email-Adresse"
 
-#: web/forms.py:22
+#: mygpo/web/forms.py:27
 msgid "Current password"
 msgstr "Aktuelles Passwort"
 
-#: web/forms.py:27
+#: mygpo/web/forms.py:34
 msgid "New password"
 msgstr "Neues Passwort"
 
-#: web/forms.py:32
+#: mygpo/web/forms.py:41
 msgid "Confirm password"
 msgstr "Neues Passwort bestätigen"
 
-#: web/forms.py:63
+#: mygpo/web/forms.py:78
 msgid "A few words about you"
 msgstr ""
 
-#: web/forms.py:75
+#: mygpo/web/forms.py:93
 #, fuzzy
 msgid "Token"
 msgstr "Neue Episode"
 
-#: web/forms.py:80
+#: mygpo/web/forms.py:98
 msgid "Auto-Flattr played episodes"
 msgstr ""
 
-#: web/forms.py:84
+#: mygpo/web/forms.py:108
 msgid "Flattr us"
 msgstr ""
 
-#: web/forms.py:89
+#: mygpo/web/forms.py:117
 msgid "Username for own content"
 msgstr ""
 
-#: web/forms.py:96 web/templates/devicelist.html:21
+#: mygpo/web/forms.py:129 mygpo/web/templates/devicelist.html:23
 msgid "Name"
 msgstr "Name"
 
-#: web/forms.py:97 web/templates/devicelist.html:22
+#: mygpo/web/forms.py:134 mygpo/web/templates/devicelist.html:24
 msgid "Type"
 msgstr "Typ"
 
-#: web/forms.py:98 web/templates/device-create.html:66
-#: web/templates/devicelist.html:23
+#: mygpo/web/forms.py:138 mygpo/web/templates/devicelist.html:25
 msgid "Device ID"
 msgstr "Geräte-ID"
 
-#: web/forms.py:109
+#: mygpo/web/forms.py:141
+#, fuzzy
+#| msgid "Device"
+msgid "ID on device"
+msgstr "Geräte"
+
+#: mygpo/web/forms.py:153
 msgid "Share this subscription with other users (public)"
 msgstr "Diese Abo in die Statistiken aufnehmen"
 
-#: web/forms.py:148
+#: mygpo/web/forms.py:196
 msgid "No device selected"
 msgstr "Kein Gerät ausgewählt"
 
-#: web/forms.py:157
+#: mygpo/web/forms.py:205
 msgid "Please enter your username"
 msgstr "Entweder Benutzername"
 
-#: web/forms.py:162
+#: mygpo/web/forms.py:210
 msgid "or the email address used while registering"
 msgstr "oder Email-Adresse eingeben"
 
-#: web/forms.py:169
-msgid "Username"
-msgstr "Benutzername"
-
-#: web/templates/400.html:4 web/templates/400.html.py:7
+#: mygpo/web/templates/400.html:4 mygpo/web/templates/400.html:7
 msgid "Bad request"
 msgstr "Unbekannte Anfrage"
 
-#: web/templates/400.html:11
+#: mygpo/web/templates/400.html:11
 msgid "There has been an error processing your request."
 msgstr "Bei der Bearbeitung der Anfrage ist ein Fehler aufgetreten."
 
-#: web/templates/401.html:4 web/templates/401.html.py:7
+#: mygpo/web/templates/401.html:4 mygpo/web/templates/401.html:7
 msgid "Unauthorized"
 msgstr "Nicht autorisiert"
 
-#: web/templates/401.html:12
+#: mygpo/web/templates/401.html:12
 msgid "This page is only available to registered users."
 msgstr "Diese Seite ist ausschließlich für registrierte Benutzer."
 
-#: web/templates/account.html:8 web/templates/account.html.py:11
+#: mygpo/web/templates/account.html:8 mygpo/web/templates/account.html:11
 #, fuzzy
 msgid "Account Settings"
 msgstr "Account-Einstellungen"
 
-#: web/templates/account.html:36
-#, fuzzy
-msgid "Account Data"
-msgstr "Konto aktiviert"
+#: mygpo/web/templates/account.html:76 mygpo/web/templates/account.html:79
+#: mygpo/web/templates/delete_account.html:9
+msgid "Delete Account"
+msgstr "Account löschen"
 
-#: web/templates/account.html:76
-#, fuzzy
-msgid "Connected Services"
-msgstr "Gelöschte Geräte"
-
-#: web/templates/account.html:81
+#: mygpo/web/templates/account.html:90
 msgid "Google"
 msgstr ""
 
-#: web/templates/account.html:84
+#: mygpo/web/templates/account.html:93
 #, python-format
 msgid "Connected with %(gmail)s"
 msgstr ""
 
-#: web/templates/account.html:87 web/templates/account.html.py:100
-#: web/templates/account.html:180
+#: mygpo/web/templates/account.html:96 mygpo/web/templates/account.html:109
+#: mygpo/web/templates/account.html:177
 #, fuzzy
 msgid "Disconnect"
 msgstr "Entdecken"
 
-#: web/templates/account.html:90 web/templates/account.html.py:102
-#: web/templates/account.html:182
+#: mygpo/web/templates/account.html:99 mygpo/web/templates/account.html:111
+#: mygpo/web/templates/account.html:179
 msgid "Connect"
 msgstr ""
 
-#: web/templates/account.html:99 web/templates/account.html.py:179
+#: mygpo/web/templates/account.html:108 mygpo/web/templates/account.html:176
 #, python-format
 msgid ""
 "Connected with <a href=\"https://flattr.com/profile/%(flattrname)s\">"
 "%(flattrname)s</a>"
 msgstr ""
 
-#: web/templates/account.html:111 web/templates/account.html.py:114
-#: web/templates/delete_account.html:9
-msgid "Delete Account"
-msgstr "Account löschen"
-
-#: web/templates/account.html:123
-#, fuzzy
-msgid "Public profile"
-msgstr "Publisher"
-
-#: web/templates/account.html:126
-#, fuzzy
-msgid "for your userpage"
-msgstr "Benutzername"
-
-#: web/templates/account.html:170
-msgid "What's that?"
-msgstr ""
-
-#: web/templates/account.html:176
+#: mygpo/web/templates/account.html:173
 msgid "Flattr User"
 msgstr ""
 
-#: web/templates/account.html:196
+#: mygpo/web/templates/account.html:195
 #, fuzzy, python-format
 msgid "Auto-Flattr %(sitename)s"
 msgstr "Zu %(sitename)s verlinken"
 
-#: web/templates/account.html:204
+#: mygpo/web/templates/account.html:204
 msgid "Username for publishing own content"
 msgstr ""
 
-#: web/templates/base.html:70 web/templatetags/menu.py:59
+#: mygpo/web/templates/base.html:40 mygpo/web/templatetags/menu.py:62
 msgid "Account"
 msgstr "Account"
 
-#: web/templates/base.html:76 web/templates/base.html.py:80
-#: web/templates/home.html:70 web/templates/home.html.py:74
-#: web/templates/home.html:137 web/templates/login.html:8
-#: web/templates/login.html.py:11 web/templates/login.html:44
-#: web/templates/restore_password.html:8 web/templatetags/menu.py:23
+#: mygpo/web/templates/base.html:46 mygpo/web/templates/base.html:50
+#: mygpo/web/templates/home.html:41 mygpo/web/templates/home.html:45
+#: mygpo/web/templates/home.html:102 mygpo/web/templates/login.html:8
+#: mygpo/web/templates/login.html:11 mygpo/web/templates/login.html:46
+#: mygpo/web/templates/restore_password.html:8
+#: mygpo/web/templatetags/menu.py:23
 msgid "Login"
 msgstr "Anmelden"
 
-#: web/templates/base.html:81 web/templates/home.html:75
-#: web/templates/login.html:51
+#: mygpo/web/templates/base.html:51 mygpo/web/templates/home.html:46
+#: mygpo/web/templates/login.html:47
 msgid "Login with Google"
 msgstr ""
 
-#: web/templates/base.html:82 web/templates/home.html:76
-#: web/templates/home.html.py:138 web/templates/login.html:45
-#: web/templates/registration/registration_form.html:72
-#: web/templatetags/menu.py:24
-msgid "Register"
-msgstr "Registrieren"
-
-#: web/templates/base.html:163 web/templates/home.html:189
-#: web/templatetags/menu.py:30
+#: mygpo/web/templates/base.html:133 mygpo/web/templates/home.html:153
+#: mygpo/web/templatetags/menu.py:31
 msgid "Discover"
 msgstr "Entdecken"
 
-#: web/templates/base.html:164 web/templates/home.html:190
-#: web/templatetags/menu.py:31
+#: mygpo/web/templates/base.html:134 mygpo/web/templates/home.html:154
+#: mygpo/web/templatetags/menu.py:32
 msgid "Directory"
 msgstr "Verzeichnis"
 
-#: web/templates/base.html:172 web/templates/home.html:198
+#: mygpo/web/templates/base.html:142 mygpo/web/templates/home.html:162
 msgid "Support"
 msgstr ""
 
-#: web/templates/base.html:173 web/templates/home.html:199
+#: mygpo/web/templates/base.html:143 mygpo/web/templates/home.html:163
+#: mygpo/web/templatetags/menu.py:25
 msgid "Docs"
 msgstr ""
 
-#: web/templates/base.html:174 web/templates/home.html:200
+#: mygpo/web/templates/base.html:144 mygpo/web/templates/home.html:164
 msgid "Mailing&nbsp;List"
 msgstr ""
 
-#: web/templates/base.html:175 web/templates/home.html:201
+#: mygpo/web/templates/base.html:145 mygpo/web/templates/home.html:165
 #, fuzzy
 msgid "Questions"
 msgstr "Empfehlungen"
 
-#: web/templates/base.html:181 web/templates/home.html:207
+#: mygpo/web/templates/base.html:151 mygpo/web/templates/home.html:171
 msgid "Support&nbsp;Us"
 msgstr ""
 
-#: web/templates/base.html:183 web/templates/contribute.html:22
-#: web/templates/home.html:209
+#: mygpo/web/templates/base.html:153 mygpo/web/templates/contribute.html:22
+#: mygpo/web/templates/home.html:173
 msgid "Donate"
 msgstr ""
 
-#: web/templates/base.html:190 web/templates/home.html:216
+#: mygpo/web/templates/base.html:160 mygpo/web/templates/home.html:180
 msgid "Follow"
 msgstr ""
 
-#: web/templates/base.html:192 web/templates/home.html:218
+#: mygpo/web/templates/base.html:162 mygpo/web/templates/home.html:182
 msgid "Blog"
 msgstr ""
 
-#: web/templates/base.html:193 web/templates/home.html:219
+#: mygpo/web/templates/base.html:163 mygpo/web/templates/home.html:183
 msgid "Blog&nbsp;(RSS)"
 msgstr ""
 
-#: web/templates/base.html:199 web/templates/home.html:225
+#: mygpo/web/templates/base.html:169 mygpo/web/templates/home.html:189
 msgid "Develop"
 msgstr ""
 
-#: web/templates/base.html:200 web/templates/home.html:226
+#: mygpo/web/templates/base.html:170 mygpo/web/templates/home.html:190
 msgid "API"
 msgstr ""
 
-#: web/templates/base.html:201 web/templates/home.html:227
+#: mygpo/web/templates/base.html:171 mygpo/web/templates/home.html:191
 msgid "Libraries"
 msgstr "Programm-Bibliotheken"
 
-#: web/templates/base.html:202 web/templates/home.html:228
+#: mygpo/web/templates/base.html:172 mygpo/web/templates/home.html:192
 msgid "Clients"
 msgstr ""
 
-#: web/templates/base.html:208 web/templates/home.html:234
-#: web/templatetags/menu.py:62
+#: mygpo/web/templates/base.html:178 mygpo/web/templates/home.html:198
+#: mygpo/web/templatetags/menu.py:65
 #, fuzzy
 msgid "Publish"
 msgstr "Publisher"
 
-#: web/templates/base.html:209 web/templates/home.html:235
+#: mygpo/web/templates/base.html:179 mygpo/web/templates/home.html:199
 msgid "Get&nbsp;Access"
 msgstr ""
 
-#: web/templates/base.html:210 web/templates/home.html:236
+#: mygpo/web/templates/base.html:180 mygpo/web/templates/home.html:200
 msgid "Link&nbsp;To&nbsp;Us"
 msgstr ""
 
-#: web/templates/contribute.html:8 web/templatetags/menu.py:25
+#: mygpo/web/templates/base.html:189 mygpo/web/templates/home.html:208
+msgid "hosting provided by prgmr.com"
+msgstr ""
+
+#: mygpo/web/templates/contribute.html:8 mygpo/web/templatetags/menu.py:26
 msgid "Contribute"
 msgstr ""
 
-#: web/templates/contribute.html:11
+#: mygpo/web/templates/contribute.html:11
 #, fuzzy
 msgid "Contribute to gpodder.net"
 msgstr "Auf gpodder.net verlinken"
 
-#: web/templates/contribute.html:16
+#: mygpo/web/templates/contribute.html:16
 msgid ""
 "gpodder.net is run as a hobby project without continuous funding for "
 "servers, storage and bandwidth. We rely on contributors and donations to "
 "keep the site running and improve it constantly."
 msgstr ""
 
-#: web/templates/contribute.html:18
+#: mygpo/web/templates/contribute.html:18
 msgid "Work"
 msgstr ""
 
-#: web/templates/contribute.html:19
+#: mygpo/web/templates/contribute.html:19
 msgid ""
 "If you want to contribute to gpodder.net by writing code, check out the <a "
 "href=\"/developer/\">Development</a> page. We also appreciate contributions "
@@ -1579,7 +2147,7 @@ msgid ""
 "freenode.net."
 msgstr ""
 
-#: web/templates/contribute.html:23
+#: mygpo/web/templates/contribute.html:23
 msgid ""
 "If you want to support gpodder.net financially, you can donate via PayPal to "
 "stefan@skoegl.net. You can also send a book via Amazon (<a href=\"http://www."
@@ -1588,15 +2156,15 @@ msgid ""
 "wishlist/24JRVURXUKO6F\">UK</a>)."
 msgstr ""
 
-#: web/templates/csrf.html:8
+#: mygpo/web/templates/csrf.html:8
 msgid "Attention!"
 msgstr "Achtung!"
 
-#: web/templates/csrf.html:11
+#: mygpo/web/templates/csrf.html:11
 msgid "Attention, Attention!"
 msgstr "Achtung, Achtung!"
 
-#: web/templates/csrf.html:17
+#: mygpo/web/templates/csrf.html:17
 #, fuzzy, python-format
 msgid ""
 "It seems that %(referer)s has linked to %(site)s to get you to change some "
@@ -1611,27 +2179,27 @@ msgstr ""
 "\n"
 "<strong>Im Zweifelsfall wählen Sie Nein</strong>"
 
-#: web/templates/csrf.html:24
+#: mygpo/web/templates/csrf.html:24
 msgid "Yes"
 msgstr "Ja"
 
-#: web/templates/csrf.html:25
+#: mygpo/web/templates/csrf.html:25
 msgid "No"
 msgstr "Nein"
 
-#: web/templates/dashboard.html:14 web/templatetags/menu.py:52
+#: mygpo/web/templates/dashboard.html:14 mygpo/web/templatetags/menu.py:55
 msgid "Overview"
 msgstr "Übersicht"
 
-#: web/templates/dashboard.html:17
+#: mygpo/web/templates/dashboard.html:17
 msgid "Hi, "
 msgstr ""
 
-#: web/templates/dashboard.html:24
+#: mygpo/web/templates/dashboard.html:24
 msgid "Newest Episodes"
 msgstr "Aktuelle Episoden"
 
-#: web/templates/dashboard.html:39
+#: mygpo/web/templates/dashboard.html:39
 #, python-format
 msgid ""
 "Welcome to %(site)s! If this is your first visit, you should set up your <a "
@@ -1639,7 +2207,7 @@ msgid ""
 "a> and try to check as many <em>Explore</em> boxes as you can."
 msgstr ""
 
-#: web/templates/dashboard.html:44
+#: mygpo/web/templates/dashboard.html:44
 #, python-format
 msgid ""
 "If you have problems, have a look at the <a href=\"%(help)s\">docs</a> or "
@@ -1648,119 +2216,119 @@ msgid ""
 "\">forum</a>."
 msgstr ""
 
-#: web/templates/dashboard.html:89
+#: mygpo/web/templates/dashboard.html:81
 #, python-format
 msgid "Explore %(site)s"
 msgstr ""
 
-#: web/templates/dashboard.html:93
+#: mygpo/web/templates/dashboard.html:85
 #, fuzzy, python-format
 msgid "Sign up to %(site)s"
 msgstr "Zu %(sitename)s verlinken"
 
-#: web/templates/dashboard.html:98
+#: mygpo/web/templates/dashboard.html:90
 #, fuzzy
 msgid "Connect your Podcast Clients"
 msgstr "Podcast-Clients verwalten"
 
-#: web/templates/dashboard.html:103 web/templates/subscriptions.html:61
+#: mygpo/web/templates/dashboard.html:95
 #, fuzzy
 msgid "Subscribe to Podcasts"
 msgstr "Abonniere neue Podcasts"
 
-#: web/templates/dashboard.html:108
+#: mygpo/web/templates/dashboard.html:100
 #, fuzzy
 msgid "Mark your Favorite Episodes"
 msgstr "Lieblings-Episoden"
 
-#: web/templates/dashboard.html:113
+#: mygpo/web/templates/dashboard.html:105
 msgid "Share your Subscriptions"
 msgstr "Teile deine Abos"
 
-#: web/templates/dashboard.html:118
+#: mygpo/web/templates/dashboard.html:110
 msgid "Share your Favorite Episodes"
 msgstr "Teile deine Liebings-Episoden"
 
-#: web/templates/dashboard.html:123
+#: mygpo/web/templates/dashboard.html:115
 msgid "Share your Userpage"
 msgstr ""
 
-#: web/templates/dashboard.html:128
+#: mygpo/web/templates/dashboard.html:120
 #, fuzzy
 msgid "Tag Podcasts"
 msgstr "Vorgeschlagene Podcasts"
 
-#: web/templates/dashboard.html:133
+#: mygpo/web/templates/dashboard.html:125
 #, fuzzy
 msgid "Create Podcast Lists"
 msgstr "Vorgeschlagene Podcasts"
 
-#: web/templates/dashboard.html:138
+#: mygpo/web/templates/dashboard.html:130
 msgid "Connect to Flattr"
 msgstr ""
 
-#: web/templates/dashboard.html:143
+#: mygpo/web/templates/dashboard.html:135
 #, fuzzy
 msgid "Auto-Flattr Podcasts"
 msgstr "Meine Podcasts"
 
-#: web/templates/dashboard.html:148
+#: mygpo/web/templates/dashboard.html:140
 #, fuzzy
 msgid "Publish your own Podcast"
 msgstr "Bewerben Sie Ihren Podcast"
 
-#: web/templates/dashboard.html:158
+#: mygpo/web/templates/dashboard.html:150
 #, fuzzy
 msgid "Subscribe in Your Browser"
 msgstr "Abonnenten"
 
-#: web/templates/dashboard.html:160
+#: mygpo/web/templates/dashboard.html:152
 #, python-format
 msgid ""
 "Register %(site.domain)s as a feed reader, and subscribe to podcasts "
 "directly from your browser"
 msgstr ""
 
-#: web/templates/dashboard.html:163
+#: mygpo/web/templates/dashboard.html:155
 msgid "Install"
 msgstr ""
 
-#: web/templates/delete_account.html:14
+#: mygpo/web/templates/delete_account.html:14
 msgid "Delete your Account?"
 msgstr "Account löschen?"
 
-#: web/templates/delete_account.html:20
+#: mygpo/web/templates/delete_account.html:20
 msgid "Do you really want to delete your account?"
 msgstr "Möchten Sie Ihren Account wirklich löschen?"
 
-#: web/templates/delete_account.html:23
+#: mygpo/web/templates/delete_account.html:23
 msgid "Yes, please"
 msgstr "Ja, bitte"
 
-#: web/templates/deleted_account.html:9
+#: mygpo/web/templates/deleted_account.html:9
 #, fuzzy
 msgid "Account Deleted"
 msgstr "Konto gelöscht"
 
-#: web/templates/deleted_account.html:13
+#: mygpo/web/templates/deleted_account.html:13
 msgid "Your account has been deleted"
 msgstr "Ihr Account wurde gelöscht"
 
-#: web/templates/deleted_account.html:18
+#: mygpo/web/templates/deleted_account.html:18
 msgid "Thanks"
 msgstr "Danke"
 
-#: web/templates/developer.html:8 web/templates/developer.html.py:11
-#: web/templatetags/menu.py:26
+#: mygpo/web/templates/developer.html:8 mygpo/web/templates/developer.html:11
+#: mygpo/web/templatetags/menu.py:27
 msgid "Development"
 msgstr ""
 
-#: web/templates/developer.html:17
+#: mygpo/web/templates/developer.html:17
 #, fuzzy
 msgid "Webservice"
 msgstr "Website"
 
-#: web/templates/developer.html:18
+#: mygpo/web/templates/developer.html:18
 msgid ""
 "The sourcecode of the webservice gpodder.net is released as open source "
 "under the AGPLv3 and <a href=\"https://github.com/gpodder/mygpo\">hosted at "
@@ -1768,82 +2336,58 @@ msgid ""
 "enter_bug.cgi?product=gpodder.net\">gPodder Bugtracker</a>."
 msgstr ""
 
-#: web/templates/developer.html:21
+#: mygpo/web/templates/developer.html:21
 msgid "Integrating Clients"
 msgstr ""
 
-#: web/templates/developer.html:22
+#: mygpo/web/templates/developer.html:22
 msgid ""
 "If you want to integrate gpodder.net in some podcasting client, you might "
 "want to use one of the existing <a href=\"http://wiki.gpodder.org/wiki/"
 "Web_Services/Libraries\">client libraries</a>."
 msgstr ""
 
-#: web/templates/developer.html:23
+#: mygpo/web/templates/developer.html:23
 msgid ""
 "There are already several clients for different platforms which can be used "
 "as examples. <a href=\"http://wiki.gpodder.org/wiki/Web_Services/Clients"
 "\">See list of clients.</a>"
 msgstr ""
 
-#: web/templates/device-create.html:11
-#, fuzzy
-msgid "Create Device "
-msgstr "Gelöschte Geräte"
-
-#: web/templates/device-create.html:14 web/templates/devicelist.html:105
-#: web/templates/subscribe.html:71
-#, fuzzy
-msgid "Create Device"
-msgstr "Gelöschte Geräte"
-
-#: web/templates/device-create.html:67
-msgid ""
-"The Device ID connects your physical device with this page, so you should "
-"enter the same text on your device and here."
-msgstr ""
-
-#: web/templates/device-edit.html:11 web/templates/device.html:11
+#: mygpo/web/templates/device-edit.html:11 mygpo/web/templates/device.html:11
 #, python-format
 msgid "Device %(devicename)s"
 msgstr "Gerät %(devicename)s"
 
-#: web/templates/device-edit.html:16 web/templates/history.html:22
-msgid "Back to"
-msgstr "Zurück zu"
-
-#: web/templates/device-edit.html:22 web/templates/device.html:18
+#: mygpo/web/templates/device-edit.html:22 mygpo/web/templates/device.html:18
 msgid "This device was deleted."
 msgstr "Das Gerät wurde gelöscht."
 
-#: web/templates/device-edit.html:27
-msgid "Edit"
-msgstr "Bearbeiten"
-
-#: web/templates/device-edit.html:68
+#: mygpo/web/templates/device-edit.html:61
 #, fuzzy
 msgid "Replace Subscriptions"
 msgstr "Abonnements"
 
-#: web/templates/device-edit.html:70
+#: mygpo/web/templates/device-edit.html:65
 msgid "Replace your current subscriptions by uploading an OPML file."
 msgstr ""
 
-#: web/templates/device-edit.html:75
+#: mygpo/web/templates/device-edit.html:70
 msgid "Upload"
 msgstr "Hochladen"
 
-#: web/templates/device-edit.html:84
+#: mygpo/web/templates/device-edit.html:83
 #, fuzzy
 msgid "Delete Device"
 msgstr "Gelöschte Geräte"
 
-#: web/templates/device-edit.html:99 web/templates/device-edit.html.py:117
-#: web/templates/device.html:84 web/templates/device.html.py:102
+#: mygpo/web/templates/device-edit.html:99
+#: mygpo/web/templates/device-edit.html:117 mygpo/web/templates/device.html:102
+#: mygpo/web/templates/device.html:120
 msgid "Synchronize"
 msgstr "Synchronisieren"
 
-#: web/templates/device-edit.html:100 web/templates/device.html:85
+#: mygpo/web/templates/device-edit.html:100 mygpo/web/templates/device.html:103
 msgid ""
 "If you synchronize devices, they will always have the same subscriptions. A "
 "podcast that is subscribed on one device, will automatically be added to all "
@@ -1853,232 +2397,150 @@ msgstr ""
 "selbenAbonnements vorhanden sein. Ein Podcast der auf einem Gerät abonniert "
 "wurde, wird automatisch an alle synchronisierten Geräte weitergegeben."
 
-#: web/templates/device-edit.html:104 web/templates/device.html:89
+#: mygpo/web/templates/device-edit.html:104 mygpo/web/templates/device.html:107
 #, python-format
 msgid "%(devicename)s is currently not synchronized with other devices."
 msgstr "%(devicename)s wird zur Zeit mit keinem anderen Gerät synchronisiert."
 
-#: web/templates/device-edit.html:108 web/templates/device.html:93
+#: mygpo/web/templates/device-edit.html:108 mygpo/web/templates/device.html:111
 #, python-format
 msgid "%(devicename)s is currently synchronized with %(synclist)s."
 msgstr "%(devicename)s wird zur Zeit mit %(synclist)s synchronisiert."
 
-#: web/templates/device-edit.html:109 web/templates/device.html:94
+#: mygpo/web/templates/device-edit.html:109 mygpo/web/templates/device.html:112
 #, python-format
 msgid "Stop synchronisation for %(devicename)s "
 msgstr "Beende die Synchronisation für %(devicename)s "
 
-#: web/templates/device.html:30
+#: mygpo/web/templates/device.html:31 mygpo/web/templates/podcast.html:67
 msgid "Unsubscribe"
 msgstr "Entfernen"
 
-#: web/templates/device.html:39
+#: mygpo/web/templates/device.html:40
 #, fuzzy
 msgid "You don't have any podcasts subscribed on this device."
 msgstr ""
 "Auf diesem Gerät haben Sie keine Podcasts abonniert. Möglicherweise müssen "
 "Sie zuerst vom Client die Abo-Liste hochladen"
 
-#: web/templates/device.html:50 web/templates/subscriptions.html:39
-#: web/templates/suggestions.html:51
-#, fuzzy
-msgid "Download OPML"
-msgstr "herunterladen"
-
-#: web/templates/device.html:55
+#: mygpo/web/templates/device.html:63
 msgid "OPML for Nokia Podcasting on Symbian "
 msgstr ""
 
-#: web/templates/device.html:62 web/templates/episode.html:211
-#: web/templatetags/menu.py:49
+#: mygpo/web/templates/device.html:73
+#: mygpo/web/templates/episode-history.html:46
+#: mygpo/web/templates/episode-history.html:80
+#: mygpo/web/templatetags/menu.py:52
 msgid "History"
 msgstr "Verlauf"
 
-#: web/templates/device.html:69 web/templates/devicelist.html:24
-#: web/templates/devicelist.html.py:43
+#: mygpo/web/templates/device.html:79
+msgid "Trigger Sync"
+msgstr ""
+
+#: mygpo/web/templates/device.html:87 mygpo/web/templates/devicelist.html:26
+#: mygpo/web/templates/devicelist.html:45
 msgid "Configure"
 msgstr "Konfigurieren"
 
-#: web/templates/devicelist.html:10 web/templates/devicelist.html.py:13
+#: mygpo/web/templates/devicelist.html:10
+#: mygpo/web/templates/devicelist.html:13
 #, fuzzy
 msgid "Managed Devices"
 msgstr "Meine Geräte"
 
-#: web/templates/devicelist.html:29
+#: mygpo/web/templates/devicelist.html:31
 msgid "Synchronized"
 msgstr "Synchronisiert"
 
-#: web/templates/devicelist.html:31
+#: mygpo/web/templates/devicelist.html:33
 #, fuzzy
 msgid "Not Synchronized"
 msgstr "Synchronisieren"
 
-#: web/templates/devicelist.html:54
+#: mygpo/web/templates/devicelist.html:53
 msgid ""
 "You don't have any devices yet. Go to the <a href=\"http://wiki.gpodder.org/"
 "wiki/Web_Services/Clients\">clients</a> page to learn how to set up your "
 "client applications."
 msgstr ""
 
-#: web/templates/devicelist.html:60
+#: mygpo/web/templates/devicelist.html:74
 msgid "Deleted Devices"
 msgstr "Gelöschte Geräte"
 
-#: web/templates/devicelist.html:70
+#: mygpo/web/templates/devicelist.html:85
 msgid "Reactivate"
 msgstr "Wiederherstellen"
 
-#: web/templates/devicelist.html:78
+#: mygpo/web/templates/devicelist.html:93
 #, fuzzy
 msgid "Delete Permanently"
 msgstr "Account löschen"
 
-#: web/templates/devicelist.html:95
-#, fuzzy
-msgid "Adding New Devices"
-msgstr "Neues Gerät"
+#: mygpo/web/templates/episode-history.html:83
+msgid "Time"
+msgstr "Zeitpunkt"
 
-#: web/templates/devicelist.html:97
-#, fuzzy
-msgid ""
-"Just upload your subscriptions from a client, and it will automatically show "
-"up here."
-msgstr ""
-"Einfach im Client die Abo-Liste hochladen, dann wird das neue Gerät "
-"automatisch angezeigt"
+#: mygpo/web/templates/episode-history.html:84
+msgid "Action"
+msgstr "Aktivität"
 
-#: web/templates/devicelist.html:101
-#, fuzzy
-msgid "You can also manually create a new device."
-msgstr "Wie kann ich ein neues Gerät anlegen?"
+#: mygpo/web/templates/episode-history.html:85
+#: mygpo/web/templatetags/menu.py:51
+msgid "Device"
+msgstr "Geräte"
 
-#: web/templates/episode.html:102
+#: mygpo/web/templates/episode-history.html:126
+msgid "Add"
+msgstr "Hinzufügen"
+
+#: mygpo/web/templates/episode.html:91
 #, fuzzy
 msgid "Remove Favorite"
 msgstr "Favorit"
 
-#: web/templates/episode.html:106
+#: mygpo/web/templates/episode.html:95
 msgid "Favorite"
 msgstr "Favorit"
 
-#: web/templates/episode.html:161
-msgid "Chapters"
-msgstr "Kapitel"
-
-#: web/templates/episode.html:166
-msgid "Ad?"
-msgstr "Werbung?"
-
-#: web/templates/episode.html:167
-msgid "Label"
-msgstr "Bezeichnung"
-
-#: web/templates/episode.html:179
-msgid "Remove"
-msgstr "Entfernen"
-
-#: web/templates/episode.html:200 web/templates/episode.html.py:257
-msgid "Add"
-msgstr "Hinzufügen"
-
-#: web/templates/episode.html:214
-msgid "Time"
-msgstr "Zeitpunkt"
-
-#: web/templates/episode.html:215
-msgid "Action"
-msgstr "Aktivität"
-
-#: web/templates/episode.html:216 web/templatetags/menu.py:48
-msgid "Device"
-msgstr "Geräte"
-
-#: web/templates/episodes.html:39
-msgid "links"
-msgstr "Links"
-
-#: web/templates/episodes.html:41
-msgid "feed"
-msgstr "Feed"
-
-#: web/templates/episodes.html:44
-msgid "website"
-msgstr "Website"
-
-#: web/templates/episodes.html:46
-#, python-format
-msgid "%(subscriber_count)s subscribers, %(listener_count)s listeners"
-msgstr "%(subscriber_count)s Abonnenten, %(listener_count)s Hörer"
-
-#: web/templates/episodes.html:51 web/templates/podcast.html:65
-msgid "Also available"
-msgstr "Auch verfügbar: "
-
-#: web/templates/episodes.html:82 web/templates/podcast.html:129
+#: mygpo/web/templates/episode.html:103
 #, fuzzy
-msgid "All Episodes"
-msgstr "Episoden"
+#| msgid "Your Episode History"
+msgid "Episode History"
+msgstr "Dein Episoden Verlauf"
 
-#: web/templates/favorites.html:10 web/templates/favorites.html.py:13
-#: web/templatetags/menu.py:45 web/templatetags/menu.py:53
+#: mygpo/web/templates/favorites.html:10 mygpo/web/templates/favorites.html:13
+#: mygpo/web/templatetags/menu.py:48 mygpo/web/templatetags/menu.py:56
 msgid "Favorite Episodes"
 msgstr "Lieblings-Episoden"
 
-#: web/templates/history.html:12 web/templates/history.html.py:15
-#, fuzzy
-msgid "Subscription and Episode History"
-msgstr "Abo-Verlauf"
+#: mygpo/web/templates/login.html:15
+msgid "You need to login to access this page."
+msgstr "Sie müssen sich einloggen um diese Seite anzuzeigen."
 
-#: web/templates/history.html:12 web/templates/history.html.py:15
-msgid "for"
-msgstr "für"
-
-#: web/templates/history.html:69
-msgid "Nothing happened yet."
-msgstr ""
-
-#: web/templates/history.html:78
-msgid "Later"
-msgstr ""
-
-#: web/templates/history.html:83
-#, fuzzy
-msgid "Now"
-msgstr "Nein"
-
-#: web/templates/history.html:88
-msgid "Earlier"
-msgstr ""
-
-#: web/templates/home.html:8
-msgid "gpodder.net &mdash; discover and track your podcasts"
-msgstr ""
-
-#: web/templates/login.html:36
+#: mygpo/web/templates/login.html:40
 #, fuzzy
 msgid "Forgot your password?"
 msgstr "Kein Passwort verwenden"
 
-#: web/templates/login.html:63
-msgid "You need to login to access this page."
-msgstr "Sie müssen sich einloggen um diese Seite anzuzeigen."
-
-#: web/templates/maintenance.html:8 web/templates/maintenance.html.py:11
+#: mygpo/web/templates/maintenance.html:8
+#: mygpo/web/templates/maintenance.html:11
 msgid "Maintenance"
 msgstr ""
 
-#: web/templates/maintenance.html:15
+#: mygpo/web/templates/maintenance.html:15
 msgid ""
 "We are currently doing some work on gpodder.net but we should back online "
 "within a few minutes. Just wait a bit and try again!"
 msgstr ""
 
-#: web/templates/mytags.html:11 web/templates/mytags.html.py:14
-#: web/templatetags/menu.py:46
+#: mygpo/web/templates/mytags.html:11 mygpo/web/templates/mytags.html:14
+#: mygpo/web/templatetags/menu.py:49
 msgid "My Tags"
 msgstr "Meine Tags"
 
-#: web/templates/mytags.html:41
+#: mygpo/web/templates/mytags.html:41
 #, python-format
 msgid ""
 "You didn't tag any podcasts yet. Go to your <a href=\"%(subscriptions-url)s"
@@ -2087,291 +2549,127 @@ msgstr ""
 "Sie haben nicht alle Podcasts getagt. Gehen Sie zu Ihren<a href="
 "\"%(subscriptions-url)s\">abonnements</a> und tagen sie einige."
 
-#: web/templates/online-help.html:8 web/templates/online-help.html.py:11
-#: web/templatetags/menu.py:28
-msgid "Help"
-msgstr "Hilfe"
-
-#: web/templates/online-help.html:17
-msgid ""
-"gpodder.net is a web service to manage your podcast subscriptions via the "
-"web. You can synchronize your devices, view status information and discover "
-"new interesting podcasts online."
-msgstr ""
-"gpodder.net ist ein Webservice, mit dem Sie Ihre Podcast-Abos über das Web "
-"verwalten können. Außerdem können Sie Ihre Podcast-Clients untereinander "
-"synchronisieren und neue interessante Podcasts entdecken."
-
-#: web/templates/online-help.html:19
-msgid "Supported Clients"
-msgstr "Unterstützte Clients"
-
-#: web/templates/online-help.html:21
-msgid "<a href=\"http://gpodder.org/\">gPodder</a> since version 2.2"
-msgstr "<a href=\"http://gpodder.org/\">gPodder</a> ab Version 2.2"
-
-#: web/templates/online-help.html:22
-msgid ""
-"<a href=\"http://lincgeek.org/bashpodder/\">BashPodder</a> with the <a href="
-"\"http://thpinfo.com/2010/mygpoclient/\">mygpoclient</a>"
-msgstr ""
-"<a href=\"http://lincgeek.org/bashpodder/\">BashPodder</a> mit <a href="
-"\"http://thpinfo.com/2010/mygpoclient/\">mygpoclient</a>"
-
-#: web/templates/online-help.html:23
-msgid "Nokia Podcasting on Symbian devices"
-msgstr "Nokia Podcasting auf Symbian geräte"
-
-#: web/templates/online-help.html:26
-msgid ""
-"To configure gPodder to connect to gpodder.net, open the my.gpodder.org / "
-"gpodder.net configuration dialog from the Subscriptions menu. Enter "
-"<strong>username and password</strong> that you've used during the "
-"registration on the webservice. The <strong>device ID</strong> is "
-"automatically generated from the hostname and will be used to identify this "
-"specific device in the webservice. Next <strong>enable the synchronisation</"
-"strong> of your subscription list. For the start, <strong>upload your "
-"subscription list</strong> to the webservice. Subsequent changes will be "
-"transmitted automatically."
-msgstr ""
-"Um gPodder mit Ihrem Account auf gpodder.net zu verknüpfen, öffnen Sie die "
-"Einstellungen, geben Ihren Benutzernamen und Ihr Passwort an und aktivieren "
-"die Synchronisation.\n"
-"\n"
-"Danach müssen Sie nur noch Ihre Abo-Liste uploaden, zukünftige Änderungen "
-"werden dann automatisch übertragen."
-
-#: web/templates/online-help.html:28 web/templatetags/menu.py:47
-msgid "Devices"
-msgstr "Geräte"
-
-#: web/templates/online-help.html:29
-msgid ""
-"Each device connected to the webservice will be identified by its "
-"<strong>Device ID</strong> which should therefore be unique (at least for "
-"your user account). <strong>Do not try to synchronize devices by using the "
-"same Device ID.</strong>"
-msgstr ""
-"Jedes Gerät wird über seine Geräte-ID identifiziert. Diese wird automatisch "
-"vom Client generiert und sollte eindeutig sein."
-
-#: web/templates/online-help.html:32
-#, fuzzy, python-format
-msgid ""
-"A list of your devices can be found on the <a href=\"%(devices-url)s"
-"\">devices page</a>."
-msgstr ""
-"Eine Übersicht über Ihre Geräte finden Sie in der <a href=\"/devices/"
-"\">Geräte-Liste</a>."
-
-#: web/templates/online-help.html:34
-msgid "Synchronizing Devices"
-msgstr "Geräte Synchronisieren"
-
-#: web/templates/online-help.html:35
-msgid ""
-"If you have at least two devices connected to the webservice, you can "
-"synchronize some of them. Open the device page for one of them, click "
-"synchronize and select the device to synchronize with. After synchronizing, "
-"the subscriptions of the devices will be merged. Adding a subscription at "
-"one device will automatically add it to the others. Same for deletions."
-msgstr ""
-"Wenn Sie mindestens zwei Geräte, die an den Webservice haben, können Sie "
-"synchronisieren einige von ihnen. Öffnen Sie das Gerät Seite für einen von "
-"ihnen , klicken Sie synchronisieren und wählen Sie das Gerät zu "
-"synchronisieren Nach der Synchronisierung werden die Abonnements der Geräte "
-"zusammengeführt werden. Hinzufügen einer Zeichnung zu einem Gerät wird "
-"automatisch fügen Sie es den anderen. Das Gleiche gilt für Löschungen "
-
-#: web/templates/online-help.html:38
-#, python-format
-msgid ""
-"The <a href=\"%(devices-url)s\">device list</a> groups devices that are "
-"synchronized with each other."
-msgstr ""
-"Die <a href=\"%(devices-url)s\">geräte-liste</a> ordnet Geräte, die "
-"miteinander synchronisiert werden."
-
-#: web/templates/online-help.html:40
-msgid "Episode States"
-msgstr "Episoden-Status"
-
-#: web/templates/online-help.html:41
-msgid ""
-"Episode states (such as played, downloaded, etc) are synchronized across all "
-"devices."
-msgstr ""
-"Episoden (wie z. B. gespielt, heruntergeladene, etc.) werden auf allen "
-"Geräten synchronisiert. "
-
-#: web/templates/online-help.html:43 web/templates/privacy.html:9
-#: web/templates/privacy.html.py:12
-msgid "Privacy Settings"
-msgstr "Einstellungen"
-
-#: web/templates/online-help.html:49
-#, python-format
-msgid ""
-"By default we include information about your subscriptions in our <a href="
-"\"%(toplist-url)s\">toplist</a> and <a href=\"%(suggestions-url)s\">podcast "
-"suggestions</a>. <strong>We will never associate your username and/or email "
-"address with your subscriptions on public pages.</strong> You can even opt-"
-"out from our anonymized statistics at the <a href=\"%(privacy-url)s"
-"\">privacy page</a>. If you mark some podcasts as private, they will also "
-"not show up in your sharable subscription list."
-msgstr ""
-"Standardmäßig fügen wir Informationen über Ihre Abonnements in unsere <a "
-"href=\"%(toplist-url)s\">Topliste</a> und <a href=\"%(suggestions-url)s"
-"\">Podcast Anregungen</a>. <strong> Wir werden nie Ihren Benutzernamen und/"
-"oder e-Mail-Adresse Ihres Abonnements auf öffentlichen Seiten "
-"veröffentlichen.</strong> Sie können sogar opt-Out aus unserer "
-"anonymisierten Statistiken auf der <a href=\"%(privacy-url)s"
-"\">Datenschutzseite.</a>. Wenn Sie einige Podcasts als privat markieren, "
-"werden sie in Ihrer freigebbar Abonnementliste auch nicht auftauchen. "
-
-#: web/templates/online-help.html:51
-msgid "Sharing your Subscriptions"
-msgstr "Zeige deine Podcast-Abos anderen"
-
-#: web/templates/online-help.html:53
-#, python-format
-msgid ""
-"If you want to let others know about your which podcasts you are listening "
-"to, go to your <a href=\"%(share-url)s\">sharing page</a>. You can either "
-"share your private URL with your friends or make it public and share your "
-"subscriptions with the whole world."
-msgstr ""
-"Wenn Sie andere wissen lassen über Ihre Podcasts, um Ihre <a href="
-"\"%(share-url)s\">Sharing Seite</a> gehen werden wollen . Sie können "
-"entweder Ihre eigenen URL mit deinen Freunden oder öffentlich machen und "
-"teilen Sie Ihre Abonnements mit der ganzen Welt."
-
-#: web/templates/password_reset.html:4
+#: mygpo/web/templates/password_reset.html:4
 msgid "Password reset"
 msgstr "Ihr Passwort wurde zurückgesetzt"
 
-#: web/templates/password_reset.html:7
+#: mygpo/web/templates/password_reset.html:7
 msgid "Your password has been reset"
 msgstr "Dein Passwort wurde zurückgesetzt"
 
-#: web/templates/password_reset.html:13
+#: mygpo/web/templates/password_reset.html:13
 #, python-format
 msgid ""
 "You should have received an mail with your new password. Please <a href="
 "\"%(login-url)s\">log in</a> now."
 msgstr ""
 
-#: web/templates/password_reset_failed.html:4
+#: mygpo/web/templates/password_reset_failed.html:4
 msgid "Password could not be reset"
 msgstr "Passwort nicht zurückgesetzt"
 
-#: web/templates/password_reset_failed.html:7
+#: mygpo/web/templates/password_reset_failed.html:7
 msgid "Your password could not be reset"
 msgstr "Das Passwort konnte nicht zurückgesetzt werden,"
 
-#: web/templates/password_reset_failed.html:12
+#: mygpo/web/templates/password_reset_failed.html:12
 msgid "Unfortunately we were not able to reset your password."
 msgstr "Leider waren wir nicht in der Lage, Ihr Passwort zurückzusetzen."
 
-#: web/templates/podcast.html:100
+#: mygpo/web/templates/podcast-history.html:47
+msgid "no history yet"
+msgstr ""
+
+#: mygpo/web/templates/podcast.html:48
+#, fuzzy
+#| msgid "Subscribe"
+msgid "Login to Subscribe"
+msgstr "Abonnieren"
+
+#: mygpo/web/templates/podcast.html:78
+#, fuzzy
+msgid "Subscribe on all devices"
+msgstr "Abonniere neue Podcasts"
+
+#: mygpo/web/templates/podcast.html:110
+#, fuzzy
+msgid "Unsubscribe from all devices "
+msgstr "Abonniere neue Podcasts"
+
+#: mygpo/web/templates/podcast.html:157 mygpo/web/templates/podcast.html:172
+#, fuzzy
+#| msgid "My Tags"
+msgid "Tags"
+msgstr "Meine Tags"
+
+#: mygpo/web/templates/podcast.html:207
 #, fuzzy
 msgid "Older Episodes"
 msgstr "Episoden"
 
-#: web/templates/podcast.html:150 web/templates/subscribe.html:27
-msgid "Subscribe to this podcast"
-msgstr "Abonniere diesen Podcast"
+#: mygpo/web/templates/privacy.html:9 mygpo/web/templates/privacy.html:12
+msgid "Privacy Settings"
+msgstr "Einstellungen"
 
-#: web/templates/podcast.html:244
-#, fuzzy
-msgid "Subscription History"
-msgstr "Abo-Verlauf"
-
-#: web/templates/privacy.html:18
+#: mygpo/web/templates/privacy.html:18
 #, python-format
 msgid "%(domain)s distinguishes between public and private subscriptions."
 msgstr ""
 
-#: web/templates/privacy.html:20
+#: mygpo/web/templates/privacy.html:20
 msgid ""
 "<strong>Public</strong> subscriptions are included in your <a href=\"/share/"
 "\">shared podcasts</a> and our anonymized public statistics."
 msgstr ""
 
-#: web/templates/privacy.html:21
+#: mygpo/web/templates/privacy.html:21
 msgid ""
 "<strong>Private</strong> subscriptions do neither show up in your list of "
 "shared podcasts, nor are considered in our statistics."
 msgstr ""
 
-#: web/templates/privacy.html:27
-msgid "New subscriptions will be public by default."
-msgstr ""
+#: mygpo/web/templates/privacy.html:29
+#, fuzzy
+#| msgid "User subscriptions"
+msgid "Default for new subscriptions"
+msgstr "Benutzer-Abonnements"
 
-#: web/templates/privacy.html:31
-msgid "Change to Private"
-msgstr ""
-
-#: web/templates/privacy.html:35
-msgid "New subscriptions will be private by default."
-msgstr ""
-
-#: web/templates/privacy.html:39
-msgid "Change to Public"
-msgstr ""
-
-#: web/templates/privacy.html:46
+#: mygpo/web/templates/privacy.html:68
 #, fuzzy
 msgid "Public Subscriptions"
 msgstr "Abonnements"
 
-#: web/templates/privacy.html:57
+#: mygpo/web/templates/privacy.html:79
 #, fuzzy
 msgid "Make Private"
 msgstr "Als Privat markieren"
 
-#: web/templates/privacy.html:68
+#: mygpo/web/templates/privacy.html:90
 #, fuzzy
 msgid "Private Subscriptions"
 msgstr "Abonnements"
 
-#: web/templates/privacy.html:79
+#: mygpo/web/templates/privacy.html:101
 #, fuzzy
 msgid "Make Public"
 msgstr "Als Öffentlich markieren"
 
-#: web/templates/privacy_policy.html:8 web/templatetags/menu.py:27
+#: mygpo/web/templates/privacy_policy.html:8 mygpo/web/templatetags/menu.py:28
 #, fuzzy
 msgid "Privacy Policy"
 msgstr "Einstellungen"
 
-#: web/templates/restore_password.html:21
-#: web/templates/registration/resend_activation.html:18
-#, fuzzy
-msgid ""
-"Please enter either your username or (if you don't know that either) the e-"
-"mail address which you used to register your account. An e-mail will be sent "
-"to you."
-msgstr ""
-" Bitte geben Sie entweder Ihren Benutzername oder Ihre Email-Adresse an. Sie "
-"erhalten dann in Kürze ein Email."
-
-#: web/templates/restore_password.html:29
+#: mygpo/web/templates/restore_password.html:29
 #, fuzzy
 msgid "Reset Password"
 msgstr "Passwort"
 
-#: web/templates/subscribe.html:17 web/templates/subscribe.html.py:25
+#: mygpo/web/templates/subscribe.html:7
 #, python-format
 msgid "Subscribe to %(podcasttitle)s"
 msgstr "Abonniere %(podcasttitle)s"
 
-#: web/templates/subscribe.html:40
-#, fuzzy
-msgid "Subscribe on devices"
-msgstr "Abonniere neue Podcasts"
-
-#: web/templates/subscribe.html:69
+#: mygpo/web/templates/subscribe.html:41
 msgid ""
 "You can't subscribe to this podcast, because you don't have any devices (on "
 "which you don't have subscribed to the podcast already."
@@ -2380,11 +2678,16 @@ msgstr ""
 "Geräte  (auf denen Sie nicht mit dem Podcast haben den Newsletter bereits "
 "abonniert haben."
 
-#: web/templates/subscribe.html:77
+#: mygpo/web/templates/subscribe.html:43
+#, fuzzy
+msgid "Create Device"
+msgstr "Gelöschte Geräte"
+
+#: mygpo/web/templates/subscribe.html:49
 msgid "Why Unnamed Podcast?"
 msgstr "Warum unbenannte Podcasts?"
 
-#: web/templates/subscribe.html:77
+#: mygpo/web/templates/subscribe.html:49
 msgid ""
 "Because we display names after we have fetched the information form the feed "
 "-- and this may take some time. Until this is completed, the podcast will "
@@ -2394,101 +2697,57 @@ msgstr ""
 "Anspruch nehmen kann. Bis dies erledigt ist wird der Podcast auf diese Wiese "
 "dargestellt."
 
-#: web/templates/subscriptions.html:11 web/templates/subscriptions.html:15
-#, fuzzy
-msgid "Podcast Subscriptions"
-msgstr "Meine Podcast-Abos"
-
-#: web/templates/subscriptions.html:29
-#, fuzzy, python-format
-msgid "%(episode_count)s Episodes"
-msgstr "%(listener_count)s Hörer"
-
-#: web/templates/subscriptions.html:52
-#, python-format
-msgid ""
-"You don't have any subscriptions yet. Set up your <a href=\"%(devices)s"
-"\">podcast clients</a> and <a href=\"%(directory)s\">discover interesting "
-"podcasts</a>."
-msgstr ""
-
-#: web/templates/subscriptions.html:65
-#, python-format
-msgid ""
-"Browse the <a href=\"%(toplist-url)s\">toplist</a> and your <a href="
-"\"%(suggestions-url)s\">personal suggestions</a>, <a href=\"%(search-url)s"
-"\">search</a> or paste the URL of the podcast's feed here"
-msgstr ""
-
-#: web/templates/suggestions.html:9 web/templates/suggestions.html.py:12
-msgid "Suggested Podcasts"
-msgstr "Vorgeschlagene Podcasts"
-
-#: web/templates/suggestions.html:27
-msgid "Subscribe"
-msgstr "Abonnieren"
-
-#: web/templates/suggestions.html:34
-#, fuzzy
-msgid "No Interest"
-msgstr "Kein Interesse"
-
-#: web/templates/suggestions.html:42
-#, fuzzy
-msgid "No Suggestions Yet"
-msgstr "Empfehlungen"
-
-#: web/templates/user_subscriptions.html:14
-#: web/templates/user_subscriptions.html:18
-#: web/templates/user_subscriptions_denied.html:10
-#: web/templates/user_subscriptions_denied.html:14
+#: mygpo/web/templates/user_subscriptions.html:14
+#: mygpo/web/templates/user_subscriptions.html:18
+#: mygpo/web/templates/user_subscriptions_denied.html:10
+#: mygpo/web/templates/user_subscriptions_denied.html:14
 #, python-format
 msgid "%(username)s's Subscriptions"
 msgstr "%(username)ss Podcast-Abos"
 
-#: web/templates/user_subscriptions.html:21
+#: mygpo/web/templates/user_subscriptions.html:21
 #, python-format
 msgid ""
 "<a href=\"%(userpage-url)s\">%(username)s</a> has %(num_subscriptions)s "
 "subscriptions"
 msgstr ""
 
-#: web/templates/user_subscriptions.html:42
+#: mygpo/web/templates/user_subscriptions.html:42
 msgid "Download Subscriptions as OPML"
 msgstr "Abos als OPML herunterladen."
 
-#: web/templates/user_subscriptions.html:45
+#: mygpo/web/templates/user_subscriptions.html:45
 #, fuzzy
 msgid "Subscribe to Changes"
 msgstr "Abonniert auf"
 
-#: web/templates/user_subscriptions.html:51
+#: mygpo/web/templates/user_subscriptions.html:51
 #, python-format
 msgid "%(username)s doesn't have any subscriptions yet."
 msgstr "%(username)s hat noch keine Podcast-Abos."
 
-#: web/templates/user_subscriptions.html:61
+#: mygpo/web/templates/user_subscriptions.html:61
 #, fuzzy
 msgid "Share Your Subscriptions"
 msgstr "Zeige deine Podcast-Abos anderen"
 
-#: web/templates/user_subscriptions.html:62
+#: mygpo/web/templates/user_subscriptions.html:62
 #, fuzzy
 msgid "Want to share your own subscriptions?"
 msgstr "Zeige deine Podcast-Abos anderen"
 
-#: web/templates/user_subscriptions.html:71
+#: mygpo/web/templates/user_subscriptions.html:71
 #, fuzzy
 msgid "Nokia Podcasting"
 msgstr "Podcast"
 
-#: web/templates/user_subscriptions.html:72
+#: mygpo/web/templates/user_subscriptions.html:72
 msgid ""
 "Add <tt>&amp;symbian=true#.opml</tt> to the OPML URL to get an OPML file for "
 "Nokia Podcasting on Symbian devices."
 msgstr ""
 
-#: web/templates/user_subscriptions_denied.html:20
+#: mygpo/web/templates/user_subscriptions_denied.html:20
 #, python-format
 msgid ""
 "%(username)s didn't share his subscriptions with you. Maybe you should "
@@ -2497,371 +2756,428 @@ msgstr ""
 "%(username)s hat seine Podcast-Abos nicht mit dir geteilt. Kontaktiere ihn, "
 "um den korrekten Link zu erhalten."
 
-#: web/templates/user_subscriptions_denied.html:23
+#: mygpo/web/templates/user_subscriptions_denied.html:23
 msgid "Want to share your subscriptions?"
 msgstr "Willst du deine Podcast-Abos mit anderen teilen?"
 
-#: web/templates/user_subscriptions_denied.html:23
+#: mygpo/web/templates/user_subscriptions_denied.html:23
 msgid ""
 "Just go to your <a href/\"/account/\">account settings</a> to get the link.</"
 "a>"
 msgstr ""
 "Sie einfach zu Ihrem Kontoeinstellungen gehen , um den Link zu bekommen. "
 
-#: web/templates/registration/activate.html:10
-#: web/templates/registration/activation_complete.html:10
-msgid "Account activated"
-msgstr "Konto aktiviert"
-
-#: web/templates/registration/activate.html:12
-msgid "Account not activated"
-msgstr "Konto nicht aktiviert"
-
-#: web/templates/registration/activate.html:19
-#: web/templates/registration/activation_complete.html:14
-#, fuzzy
-msgid "Your account has been activated! Enjoy using gpodder.net"
-msgstr "Dein Konto wurde aktiviert! Viel Spaß mit my.gpodder.org"
-
-#: web/templates/registration/activate.html:21
-msgid "Your account could not be activated successfully."
-msgstr "Dein Konto konnte nicht erfolgreich aktiviert werden."
-
-#: web/templates/registration/registration_complete.html:9
-msgid "Registration complete"
-msgstr "Registrierung abgeschlossen"
-
-#: web/templates/registration/registration_complete.html:13
-msgid ""
-"Please confirm your account using the email you should just have received."
-msgstr ""
-"Du solltest soeben ein Mail bekommen haben. Darin findest du einen Link zum "
-"Aktivieren deines Accounts"
-
-#: web/templates/registration/registration_form.html:8
-#: web/templates/registration/registration_form.html:11
-#, fuzzy
-msgid "Create Account"
-msgstr "Erstelle ein Benutzer-Konto"
-
-#: web/templates/registration/registration_form.html:18
-msgid "You are already registered."
-msgstr "Sie sind bereits registriert. "
-
-#: web/templates/registration/registration_form.html:87
-#, fuzzy
-msgid "Activation Mail"
-msgstr "Aktivierungs-Email gesendet"
-
-#: web/templates/registration/registration_form.html:88
-msgid ""
-"After registration, you'll receive an activation mail to confirm the "
-"validity of your email address."
-msgstr ""
-
-#: web/templates/registration/registration_form.html:90
-#, python-format
-msgid ""
-"If it doesn't arrive, you can <a href=\"%(resend-activation-url)s\">resend</"
-"a> it."
-msgstr ""
-
-#: web/templates/registration/resend_activation.html:4
-#: web/templates/registration/resend_activation.html:8
-msgid "Resend activation e-mail"
-msgstr "Aktivierungs-Email erneut senden"
-
-#: web/templates/registration/resend_activation.html:35
-msgid "Send activation e-mail"
-msgstr "Aktivierungs-Email senden"
-
-#: web/templates/registration/resent_activation.html:4
-#: web/templates/registration/resent_activation.html:7
-msgid "Sent Activation Email"
-msgstr "Aktivierungs-Email gesendet"
-
-#: web/templates/registration/resent_activation.html:11
-msgid "The activation email has been reset."
-msgstr "Die Aktivierungs E-Mail wurde zurückgesetzt."
-
-#: web/templatetags/devices.py:27
+#: mygpo/web/templatetags/devices.py:31
 msgid "Unknown"
 msgstr "Unbekannt"
 
-#: web/templatetags/episodes.py:20
+#: mygpo/web/templatetags/episodes.py:20
 msgid "New episode"
 msgstr "Neue Episode"
 
-#: web/templatetags/episodes.py:23
+#: mygpo/web/templatetags/episodes.py:23
 #, python-format
 msgid "Downloaded to %s"
 msgstr "Heruntergeladen in %s"
 
-#: web/templatetags/episodes.py:25
+#: mygpo/web/templatetags/episodes.py:25
 msgid "Downloaded"
 msgstr "Heruntergeladen"
 
-#: web/templatetags/episodes.py:28
+#: mygpo/web/templatetags/episodes.py:28
 #, python-format
 msgid "Played on %s"
 msgstr "Abgespielt in %s"
 
-#: web/templatetags/episodes.py:30
+#: mygpo/web/templatetags/episodes.py:30
 msgid "Played"
 msgstr "Abgespielt"
 
-#: web/templatetags/episodes.py:33
+#: mygpo/web/templatetags/episodes.py:33
 #, python-format
 msgid "Deleted on %s"
 msgstr "Gelöscht in %s"
 
-#: web/templatetags/episodes.py:35
+#: mygpo/web/templatetags/episodes.py:35
 msgid "Deleted"
 msgstr "Gelöscht"
 
-#: web/templatetags/episodes.py:37
+#: mygpo/web/templatetags/episodes.py:37
 msgid "Unknown status"
 msgstr "Unbekannter Status"
 
-#: web/templatetags/episodes.py:42
+#: mygpo/web/templatetags/episodes.py:43
 msgid "Unplayed episode"
 msgstr "Namenlose Episode"
 
-#: web/templatetags/episodes.py:45 web/templatetags/episodes.py:46
+#: mygpo/web/templatetags/episodes.py:46 mygpo/web/templatetags/episodes.py:47
 #, python-format
 msgid " on %s"
 msgstr " an %s"
 
-#: web/templatetags/episodes.py:49
+#: mygpo/web/templatetags/episodes.py:50
 #, fuzzy
 msgid "The episode has been flattr'd"
 msgstr "Diese Episode wurde abgespielt"
 
-#: web/templatetags/episodes.py:52
+#: mygpo/web/templatetags/episodes.py:53
 msgid "This episode has been marked new"
 msgstr "Diese Episode wurde als neu markiert"
 
-#: web/templatetags/episodes.py:54
+#: mygpo/web/templatetags/episodes.py:55
 msgid "This episode has been downloaded"
 msgstr "Diese Episode wurde heruntergeladen"
 
-#: web/templatetags/episodes.py:58
+#: mygpo/web/templatetags/episodes.py:59
 #, python-format
 msgid " from %(start)s to %(end)s"
 msgstr "vom %(start)s zum %(end)s"
 
-#: web/templatetags/episodes.py:62
+#: mygpo/web/templatetags/episodes.py:63
 #, python-format
 msgid " to position %s"
 msgstr "in position %s"
 
-#: web/templatetags/episodes.py:66
+#: mygpo/web/templatetags/episodes.py:67
 msgid "This episode has been played"
 msgstr "Diese Episode wurde abgespielt"
 
-#: web/templatetags/episodes.py:68
+#: mygpo/web/templatetags/episodes.py:69
 msgid "This episode has been deleted"
 msgstr "Diese Episode wurde gelöscht"
 
-#: web/templatetags/episodes.py:129
+#: mygpo/web/templatetags/episodes.py:126
 #, fuzzy
 msgid "Unknown Episode"
 msgstr "Namenlose Episode"
 
-#: web/templatetags/menu.py:22 web/templatetags/menu.py:63
+#: mygpo/web/templatetags/menu.py:22 mygpo/web/templatetags/menu.py:66
 msgid "Home"
 msgstr "Home"
 
-#: web/templatetags/menu.py:37
+#: mygpo/web/templatetags/menu.py:29
+msgid "Help"
+msgstr "Hilfe"
+
+#: mygpo/web/templatetags/menu.py:37
 msgid "User subscriptions"
 msgstr "Benutzer-Abonnements"
 
-#: web/templatetags/menu.py:38
+#: mygpo/web/templatetags/menu.py:38
 msgid "Suggestions"
 msgstr "Empfehlungen"
 
-#: web/templatetags/menu.py:39
+#: mygpo/web/templatetags/menu.py:39
+msgid "Features"
+msgstr ""
+
+#: mygpo/web/templatetags/menu.py:42
 #, fuzzy
 msgid "Toplists"
 msgstr "Topliste"
 
-#: web/templatetags/menu.py:51
+#: mygpo/web/templatetags/menu.py:50
+msgid "Devices"
+msgstr "Geräte"
+
+#: mygpo/web/templatetags/menu.py:54
 msgid "Community"
 msgstr ""
 
-#: web/templatetags/menu.py:54
+#: mygpo/web/templatetags/menu.py:57
 #, fuzzy
 msgid "My Userpage"
 msgstr "Benutzername"
 
-#: web/templatetags/menu.py:58
-msgid "Settings"
-msgstr "Einstellungen"
-
-#: web/templatetags/menu.py:60
+#: mygpo/web/templatetags/menu.py:63
 msgid "Privacy"
 msgstr "Privatsphäre "
 
-#: web/templatetags/menu.py:65
+#: mygpo/web/templatetags/menu.py:68
 msgid "Link to gpodder.net"
 msgstr "Auf gpodder.net verlinken"
 
-#: web/templatetags/time.py:21
+#: mygpo/web/templatetags/time.py:37
+#, python-brace-format
 msgid "{h}h {m}m {s}s"
 msgstr ""
 
-#: web/views/device.py:89 web/views/device.py:210
-msgid "Synchronize with the following devices"
-msgstr "Synchronisierung der folgenden Geräte"
+#: mygpo/web/utils.py:281
+#, python-format
+msgid "%(weeks)d week"
+msgid_plural "%(weeks)d weeks"
+msgstr[0] ""
+msgstr[1] ""
 
-#: web/views/device.py:108
-msgid "Please fill out all fields."
-msgstr ""
+#: mygpo/web/utils.py:285
+#, python-format
+msgid "%(days)d day"
+msgid_plural "%(days)d days"
+msgstr[0] ""
+msgstr[1] ""
 
-#: web/views/device.py:120
-#, fuzzy
-msgid "Device saved"
-msgstr "Geräte"
+#: mygpo/web/utils.py:289
+#, python-format
+msgid "%(hours)d hour"
+msgid_plural "%(hours)d hours"
+msgstr[0] ""
+msgstr[1] ""
 
-#: web/views/device.py:131 web/views/device.py:166
-msgid "You can't use the same Device ID for two devices."
-msgstr "Sie können nicht das gleiche Device ID für zwei Geräte benutzen. "
-
-#: web/views/device.py:159
-#, fuzzy
-msgid "Device updated"
-msgstr "Geräte-Liste"
-
-#: web/views/device.py:235
-msgid "Could not upload subscriptions: {err}"
-msgstr ""
-
-#: web/views/episode.py:133
-msgid "Could not add Chapter: {msg}"
-msgstr ""
-
-#: web/views/episode.py:262 web/views/podcast.py:358
-msgid "Flattr'd"
-msgstr ""
-
-#: web/views/security.py:31
+#: mygpo/web/views.py:152
 msgid "another site"
 msgstr "eine andere Seite"
 
-#: web/views/settings.py:92 web/views/settings.py:126
-msgid "Oops! Something went wrong. Please double-check the data you entered."
-msgstr ""
-"Oops! Irgendetwas ist schiefgegangen. Bitte überprüfen Sie die eingegebenen "
-"Daten. "
+#~ msgid "Return to the episode list"
+#~ msgstr "Zurück zur Episoden-Liste"
 
-#: web/views/settings.py:179
-msgid "Authentication successful"
-msgstr ""
-
-#: web/views/settings.py:183
-msgid "Authentication failed. Try again later"
-msgstr ""
-
-#: web/views/settings.py:194
 #, fuzzy
-msgid "Your account has been disconnected"
-msgstr "Ihr Account wurde gelöscht"
+#~ msgid "Return to podcast page"
+#~ msgstr "Zurück zum Podcast"
 
-#: web/views/subscriptions.py:139
-#, fuzzy, python-format
-msgid "%(username)s's Podcast Subscriptions on %(site)s"
-msgstr "%(username)ss Podcast-Abos"
+#~ msgid "Red parts are often skipped, green parts never."
+#~ msgstr ""
+#~ "Rote Bereiche werden oft übersprungen; grüne werden bevorzugt gehört"
 
-#: web/views/subscriptions.py:143
-#, python-format
-msgid "Recent changes to %(username)s's podcast subscriptions on %(site)s"
-msgstr ""
-
-#: web/views/subscriptions.py:170
-#, fuzzy, python-format
-msgid "%(username)s subscribed to %(podcast)s (%(site)s)"
-msgstr "Abonniere %(podcasttitle)s"
-
-#: web/views/subscriptions.py:172
-#, fuzzy, python-format
-msgid "%(username)s unsubscribed from %(podcast)s (%(site)s)"
-msgstr "Abonniere %(podcasttitle)s"
-
-#: web/views/users.py:80
 #, fuzzy
-msgid "Username missing"
-msgstr "Benutzername"
+#~ msgid "Create List"
+#~ msgstr "Geräte-Liste"
 
-#: web/views/users.py:85
 #, fuzzy
-msgid "Password missing"
-msgstr "Ihr Passwort wurde zurückgesetzt"
+#~ msgid "Account Data"
+#~ msgstr "Konto aktiviert"
 
-#: web/views/users.py:92
-msgid "Wrong username or password."
-msgstr "Benutzername oder Passwort falsch"
-
-#: web/views/users.py:99
-msgid "You have deleted your account, but you can register again"
-msgstr "Ihr Account wurde gelöscht, aber Sie können sich wieder neu anmelden"
-
-#: web/views/users.py:105
-msgid "Please activate your account first."
-msgstr "Ihr Account muss zuerst aktiviert werden."
-
-#: web/views/users.py:150 web/views/users.py:194
-msgid "User does not exist."
-msgstr "Der Benutzer existiert nicht."
-
-#: web/views/users.py:156
-#, python-format
-msgid "Reset password for your account on %s"
-msgstr "Passwort für Ihren Account bei %s zurücksetzen"
-
-#: web/views/users.py:157
-#, python-format
-msgid ""
-"Here is your new password for your account %(username)s on %(site)s: "
-"%(password)s"
-msgstr ""
-"Hier ist dein neues Passwort für deinen Account %(username)s bei %(site)s: "
-"%(password)s"
-
-#: web/views/users.py:190
-msgid "Invalid Username entered"
-msgstr "Invalid Username eingegeben "
-
-#: web/views/users.py:197
-msgid "You have deleted your account, but you can regster again."
-msgstr "Ihr Account wurde gelöscht, aber Sie können sich wieder neu anmelden"
-
-#: web/views/users.py:201
-msgid "Your account already has been activated. Go ahead and log in."
-msgstr "Dein Konto wurde aktiviert! Viel Spaß mit my.gpodder.org"
-
-#: web/views/users.py:204
-msgid ""
-"Your activation key has expired. Please try another username, or retry with "
-"the same one tomorrow."
-msgstr ""
-"Ihren Aktivierungsschlüssel ist abgelaufen. Bitte versuchen Sie einen "
-"anderen Benutzernamen, oder wiederholen Sie mit dem gleichen Morgen."
-
-#: web/views/users.py:239 web/views/users.py:244
 #, fuzzy
-msgid "Login failed."
-msgstr "Anmelden"
+#~ msgid "Connected Services"
+#~ msgstr "Gelöschte Geräte"
 
-#: web/views/users.py:254
-msgid ""
-"Your account has been connected with {google}. Open Settings to change this."
-msgstr ""
+#, fuzzy
+#~ msgid "Public profile"
+#~ msgstr "Publisher"
 
-#: web/views/users.py:264
-#, python-format
-msgid ""
-"No account connected with your Google account %s. Please log in to connect."
-msgstr ""
+#, fuzzy
+#~ msgid "for your userpage"
+#~ msgstr "Benutzername"
+
+#, fuzzy
+#~ msgid "Create Device "
+#~ msgstr "Gelöschte Geräte"
+
+#, fuzzy
+#~ msgid "Adding New Devices"
+#~ msgstr "Neues Gerät"
+
+#, fuzzy
+#~ msgid ""
+#~ "Just upload your subscriptions from a client, and it will automatically "
+#~ "show up here."
+#~ msgstr ""
+#~ "Einfach im Client die Abo-Liste hochladen, dann wird das neue Gerät "
+#~ "automatisch angezeigt"
+
+#, fuzzy
+#~ msgid "You can also manually create a new device."
+#~ msgstr "Wie kann ich ein neues Gerät anlegen?"
+
+#~ msgid "Chapters"
+#~ msgstr "Kapitel"
+
+#~ msgid "Ad?"
+#~ msgstr "Werbung?"
+
+#~ msgid "Label"
+#~ msgstr "Bezeichnung"
+
+#~ msgid "Remove"
+#~ msgstr "Entfernen"
+
+#~ msgid "links"
+#~ msgstr "Links"
+
+#~ msgid "feed"
+#~ msgstr "Feed"
+
+#~ msgid "website"
+#~ msgstr "Website"
+
+#~ msgid "%(subscriber_count)s subscribers, %(listener_count)s listeners"
+#~ msgstr "%(subscriber_count)s Abonnenten, %(listener_count)s Hörer"
+
+#~ msgid "Also available"
+#~ msgstr "Auch verfügbar: "
+
+#, fuzzy
+#~ msgid "All Episodes"
+#~ msgstr "Episoden"
+
+#, fuzzy
+#~ msgid "Subscription and Episode History"
+#~ msgstr "Abo-Verlauf"
+
+#~ msgid ""
+#~ "gpodder.net is a web service to manage your podcast subscriptions via the "
+#~ "web. You can synchronize your devices, view status information and "
+#~ "discover new interesting podcasts online."
+#~ msgstr ""
+#~ "gpodder.net ist ein Webservice, mit dem Sie Ihre Podcast-Abos über das "
+#~ "Web verwalten können. Außerdem können Sie Ihre Podcast-Clients "
+#~ "untereinander synchronisieren und neue interessante Podcasts entdecken."
+
+#~ msgid "Supported Clients"
+#~ msgstr "Unterstützte Clients"
+
+#~ msgid "<a href=\"http://gpodder.org/\">gPodder</a> since version 2.2"
+#~ msgstr "<a href=\"http://gpodder.org/\">gPodder</a> ab Version 2.2"
+
+#~ msgid ""
+#~ "<a href=\"http://lincgeek.org/bashpodder/\">BashPodder</a> with the <a "
+#~ "href=\"http://thpinfo.com/2010/mygpoclient/\">mygpoclient</a>"
+#~ msgstr ""
+#~ "<a href=\"http://lincgeek.org/bashpodder/\">BashPodder</a> mit <a href="
+#~ "\"http://thpinfo.com/2010/mygpoclient/\">mygpoclient</a>"
+
+#~ msgid "Nokia Podcasting on Symbian devices"
+#~ msgstr "Nokia Podcasting auf Symbian geräte"
+
+#~ msgid ""
+#~ "To configure gPodder to connect to gpodder.net, open the my.gpodder.org / "
+#~ "gpodder.net configuration dialog from the Subscriptions menu. Enter "
+#~ "<strong>username and password</strong> that you've used during the "
+#~ "registration on the webservice. The <strong>device ID</strong> is "
+#~ "automatically generated from the hostname and will be used to identify "
+#~ "this specific device in the webservice. Next <strong>enable the "
+#~ "synchronisation</strong> of your subscription list. For the start, "
+#~ "<strong>upload your subscription list</strong> to the webservice. "
+#~ "Subsequent changes will be transmitted automatically."
+#~ msgstr ""
+#~ "Um gPodder mit Ihrem Account auf gpodder.net zu verknüpfen, öffnen Sie "
+#~ "die Einstellungen, geben Ihren Benutzernamen und Ihr Passwort an und "
+#~ "aktivieren die Synchronisation.\n"
+#~ "\n"
+#~ "Danach müssen Sie nur noch Ihre Abo-Liste uploaden, zukünftige Änderungen "
+#~ "werden dann automatisch übertragen."
+
+#~ msgid ""
+#~ "Each device connected to the webservice will be identified by its "
+#~ "<strong>Device ID</strong> which should therefore be unique (at least for "
+#~ "your user account). <strong>Do not try to synchronize devices by using "
+#~ "the same Device ID.</strong>"
+#~ msgstr ""
+#~ "Jedes Gerät wird über seine Geräte-ID identifiziert. Diese wird "
+#~ "automatisch vom Client generiert und sollte eindeutig sein."
+
+#, fuzzy
+#~ msgid ""
+#~ "A list of your devices can be found on the <a href=\"%(devices-url)s"
+#~ "\">devices page</a>."
+#~ msgstr ""
+#~ "Eine Übersicht über Ihre Geräte finden Sie in der <a href=\"/devices/"
+#~ "\">Geräte-Liste</a>."
+
+#~ msgid "Synchronizing Devices"
+#~ msgstr "Geräte Synchronisieren"
+
+#~ msgid ""
+#~ "If you have at least two devices connected to the webservice, you can "
+#~ "synchronize some of them. Open the device page for one of them, click "
+#~ "synchronize and select the device to synchronize with. After "
+#~ "synchronizing, the subscriptions of the devices will be merged. Adding a "
+#~ "subscription at one device will automatically add it to the others. Same "
+#~ "for deletions."
+#~ msgstr ""
+#~ "Wenn Sie mindestens zwei Geräte, die an den Webservice haben, können Sie "
+#~ "synchronisieren einige von ihnen. Öffnen Sie das Gerät Seite für einen "
+#~ "von ihnen , klicken Sie synchronisieren und wählen Sie das Gerät zu "
+#~ "synchronisieren Nach der Synchronisierung werden die Abonnements der "
+#~ "Geräte zusammengeführt werden. Hinzufügen einer Zeichnung zu einem Gerät "
+#~ "wird automatisch fügen Sie es den anderen. Das Gleiche gilt für "
+#~ "Löschungen "
+
+#~ msgid ""
+#~ "The <a href=\"%(devices-url)s\">device list</a> groups devices that are "
+#~ "synchronized with each other."
+#~ msgstr ""
+#~ "Die <a href=\"%(devices-url)s\">geräte-liste</a> ordnet Geräte, die "
+#~ "miteinander synchronisiert werden."
+
+#~ msgid "Episode States"
+#~ msgstr "Episoden-Status"
+
+#~ msgid ""
+#~ "Episode states (such as played, downloaded, etc) are synchronized across "
+#~ "all devices."
+#~ msgstr ""
+#~ "Episoden (wie z. B. gespielt, heruntergeladene, etc.) werden auf allen "
+#~ "Geräten synchronisiert. "
+
+#~ msgid ""
+#~ "By default we include information about your subscriptions in our <a href="
+#~ "\"%(toplist-url)s\">toplist</a> and <a href=\"%(suggestions-url)s"
+#~ "\">podcast suggestions</a>. <strong>We will never associate your username "
+#~ "and/or email address with your subscriptions on public pages.</strong> "
+#~ "You can even opt-out from our anonymized statistics at the <a href="
+#~ "\"%(privacy-url)s\">privacy page</a>. If you mark some podcasts as "
+#~ "private, they will also not show up in your sharable subscription list."
+#~ msgstr ""
+#~ "Standardmäßig fügen wir Informationen über Ihre Abonnements in unsere <a "
+#~ "href=\"%(toplist-url)s\">Topliste</a> und <a href=\"%(suggestions-url)s"
+#~ "\">Podcast Anregungen</a>. <strong> Wir werden nie Ihren Benutzernamen "
+#~ "und/oder e-Mail-Adresse Ihres Abonnements auf öffentlichen Seiten "
+#~ "veröffentlichen.</strong> Sie können sogar opt-Out aus unserer "
+#~ "anonymisierten Statistiken auf der <a href=\"%(privacy-url)s"
+#~ "\">Datenschutzseite.</a>. Wenn Sie einige Podcasts als privat markieren, "
+#~ "werden sie in Ihrer freigebbar Abonnementliste auch nicht auftauchen. "
+
+#~ msgid "Sharing your Subscriptions"
+#~ msgstr "Zeige deine Podcast-Abos anderen"
+
+#~ msgid ""
+#~ "If you want to let others know about your which podcasts you are "
+#~ "listening to, go to your <a href=\"%(share-url)s\">sharing page</a>. You "
+#~ "can either share your private URL with your friends or make it public and "
+#~ "share your subscriptions with the whole world."
+#~ msgstr ""
+#~ "Wenn Sie andere wissen lassen über Ihre Podcasts, um Ihre <a href="
+#~ "\"%(share-url)s\">Sharing Seite</a> gehen werden wollen . Sie können "
+#~ "entweder Ihre eigenen URL mit deinen Freunden oder öffentlich machen und "
+#~ "teilen Sie Ihre Abonnements mit der ganzen Welt."
+
+#~ msgid "Subscribe to this podcast"
+#~ msgstr "Abonniere diesen Podcast"
+
+#~ msgid "Account activated"
+#~ msgstr "Konto aktiviert"
+
+#, fuzzy
+#~ msgid "Your account has been activated! Enjoy using gpodder.net"
+#~ msgstr "Dein Konto wurde aktiviert! Viel Spaß mit my.gpodder.org"
+
+#~ msgid "You have deleted your account, but you can register again"
+#~ msgstr ""
+#~ "Ihr Account wurde gelöscht, aber Sie können sich wieder neu anmelden"
+
+#~ msgid "Reset password for your account on %s"
+#~ msgstr "Passwort für Ihren Account bei %s zurücksetzen"
+
+#~ msgid ""
+#~ "Here is your new password for your account %(username)s on %(site)s: "
+#~ "%(password)s"
+#~ msgstr ""
+#~ "Hier ist dein neues Passwort für deinen Account %(username)s bei "
+#~ "%(site)s: %(password)s"
+
+#~ msgid "Invalid Username entered"
+#~ msgstr "Invalid Username eingegeben "
+
+#~ msgid "You have deleted your account, but you can regster again."
+#~ msgstr ""
+#~ "Ihr Account wurde gelöscht, aber Sie können sich wieder neu anmelden"
+
+#~ msgid ""
+#~ "Your activation key has expired. Please try another username, or retry "
+#~ "with the same one tomorrow."
+#~ msgstr ""
+#~ "Ihren Aktivierungsschlüssel ist abgelaufen. Bitte versuchen Sie einen "
+#~ "anderen Benutzernamen, oder wiederholen Sie mit dem gleichen Morgen."
 
 #~ msgid "released"
 #~ msgstr "veröffentlicht"
@@ -2877,10 +3193,6 @@ msgstr ""
 
 #~ msgid "API Documentation"
 #~ msgstr "API-Dokumentation"
-
-#, fuzzy
-#~ msgid "Episode-List"
-#~ msgstr "Episoden-Titel"
 
 #~ msgid "Back to the podcast page"
 #~ msgstr "Zurück zur Podcast-Seite"
@@ -3007,8 +3319,9 @@ msgstr ""
 #, fuzzy
 #~ msgid ""
 #~ "You aren't subscribed to this podcast. Therefor your chapters are also "
-#~ "visible to other users. If you do no want that, <a href=\"%(subscribe-url)"
-#~ "s\">subscribe to the podcast</a> and mark your subscription as private."
+#~ "visible to other users. If you do no want that, <a href=\"%(subscribe-"
+#~ "url)s\">subscribe to the podcast</a> and mark your subscription as "
+#~ "private."
 #~ msgstr ""
 #~ "Sie haben diesen Podcast nicht abonniert.\n"
 #~ "\n"
@@ -3343,8 +3656,9 @@ msgstr ""
 #~ "href=\"/publisher/advertise\">mehr...</a>"
 
 #~ msgid ""
-#~ "These are the %(count)s most subscribed podcasts for the languages %(lang)"
-#~ "s. You can select the included languages <a href=\"#languages\">below</a>."
+#~ "These are the %(count)s most subscribed podcasts for the languages "
+#~ "%(lang)s. You can select the included languages <a href=\"#languages"
+#~ "\">below</a>."
 #~ msgstr ""
 #~ "Das sind die %(count)s am häufig abonnierten Podcasts in den Sprachen "
 #~ "%(lang)s. Sie können die angezeigten Sprachen <a href=\"#languages"
@@ -3389,9 +3703,6 @@ msgstr ""
 #~ msgid "Online Help"
 #~ msgstr "Online-Hilfe"
 
-#~ msgid "You have subscribed the following podcasts on this device"
-#~ msgstr "Du hast die folgenden Podcasts auf diesem Gerät abonniert"
-
 #~ msgid "Since"
 #~ msgstr "Seit"
 
@@ -3401,9 +3712,6 @@ msgstr ""
 #~ msgstr ""
 #~ "Eine Episode für <a href=\"/podcast/%(podcast_id)s\">%(podcast)s</a> "
 #~ "Podcast."
-
-#~ msgid "Your Episode History"
-#~ msgstr "Dein Episoden Verlauf"
 
 #~ msgid "When"
 #~ msgstr "Wann"
