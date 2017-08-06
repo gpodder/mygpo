@@ -40,6 +40,7 @@ def vertical_bar(value, max_value, display=None):
 
 
 @register.filter
+@mark_safe
 def timeline(data):
     s = '<script type="text/javascript" src="//www.google.com/jsapi"></script>\n'
     s += '<script type="text/javascript">\n'
@@ -69,7 +70,7 @@ def timeline(data):
     s += '}\n'
     s += '</script>\n'
 
-    return mark_safe(s)
+    return s
 
 
 @register.filter

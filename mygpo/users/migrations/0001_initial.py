@@ -34,7 +34,10 @@ class Migration(migrations.Migration):
                     max_length=32,
                     null=True)),
                 ('userpage_token', models.CharField(max_length=32, null=True)),
-                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
+                ('user', models.OneToOneField(
+                    to=settings.AUTH_USER_MODEL,
+                    on_delete=models.CASCADE,
+                )),
                 ('uuid', models.UUIDField(unique=True, max_length=32)),
             ],
             options={

@@ -8,7 +8,7 @@ import urllib.request, urllib.parse, urllib.error
 import urllib.request, urllib.error, urllib.parse
 import logging
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from mygpo.utils import random_token
 from mygpo.pubsub.models import HubSubscription, SubscriptionError

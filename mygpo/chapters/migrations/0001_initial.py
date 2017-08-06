@@ -23,8 +23,14 @@ class Migration(migrations.Migration):
                 ('end', models.IntegerField()),
                 ('label', models.CharField(max_length=100)),
                 ('advertisement', models.BooleanField(default=False)),
-                ('episode', models.ForeignKey(to='podcasts.Episode')),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('episode', models.ForeignKey(
+                    to='podcasts.Episode',
+                    on_delete=models.CASCADE,
+                )),
+                ('user', models.ForeignKey(
+                    to=settings.AUTH_USER_MODEL,
+                    on_delete=models.CASCADE,
+                )),
             ],
             options={
                 'abstract': False,
