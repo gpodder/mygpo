@@ -2,6 +2,7 @@
 
 import uuid
 import re
+from datetime import timedelta
 
 from django.core.cache import cache
 from django.conf import settings
@@ -343,6 +344,10 @@ class PodcastQuerySet(MergedUUIDQuerySet):
         NEXTUPDATE = "last_update + (update_interval || ' hours')::INTERVAL"
         q = self.extra(select={'next_update': NEXTUPDATE})
         return q.order_by('next_update')
+
+    @property
+    def next_update(self):
+        return self.last_update + timedelta(hours=self.update_interval)
 
     def next_update_between(self, start, end):
         NEXTUPDATE_BETWEEN = ("(last_update + (update_interval || "
