@@ -35,8 +35,6 @@ class PodcastUpdateResult(models.Model):
 
         get_latest_by = 'start'
 
-        order_with_respect_to = 'podcast'
-
         ordering = ['-start']
 
         indexes = [
