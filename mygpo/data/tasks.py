@@ -54,10 +54,7 @@ def schedule_updates(interval=UPDATE_INTERVAL):
                               .prefetch_related('urls')\
                               .only('pk')[:max_updates]
 
-    logger.error('Scheduling %d podcasts for update', podcasts.count())
-    # queue all those podcast updates
-    for podcast in podcasts:
-        update_podcasts.delay([podcast.url])
+    _schedule_updates(podcasts)
 
 
 @periodic_task(run_every=UPDATE_INTERVAL)
@@ -68,9 +65,16 @@ def schedule_updates_longest_no_update():
     max_updates = UPDATE_INTERVAL.total_seconds() / 60
 
     podcasts = Podcast.objects.order_by('last_update')[:max_updates]
+    _schedule_updates(podcasts)
 
+
+def _schedule_updates(podcasts):
+    """ Schedule updates for podcasts """
     logger.info('Scheduling %d podcasts for update', podcasts.count())
 
     # queue all those podcast updates
     for podcast in podcasts:
-        update_podcasts.delay([podcast.url])
+        # update_podcasts.delay() seems to block other task execution,
+        # therefore celery.send_task() is used instead
+        celery.send_task('mygpo.data.tasks.update_podcasts',
+                         args=[podcast.url])
