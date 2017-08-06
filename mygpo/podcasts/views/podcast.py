@@ -64,7 +64,7 @@ def show(request, podcast):
 
     if podcast.group:
         group = podcast.group
-        rel_podcasts = group.podcast_set.exclude(pk=podcast.pk)
+        rel_podcasts = group.podcast_set.all()
     else:
         rel_podcasts = []
 
