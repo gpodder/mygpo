@@ -719,11 +719,23 @@ class EpisodeManager(GenericManager):
         url = utils.to_maxlength(URL, 'url', url)
 
         try:
-            # try to fetch the episode
-            return Episode.objects.get(urls__url=url,
-                                       urls__scope=podcast.as_scope,
-                                      )
-        except Episode.DoesNotExist:
+            url = URL.objects.get(url=url, scope=podcast.as_scope)
+            episode = url.content_object
+
+            if episode is None:
+
+                with transaction.atomic():
+                    episode = Episode.objects.create(podcast=podcast,
+                                                     id=uuid.uuid1(),
+                                                     **defaults)
+
+                    url.content_object = episode
+                    url.save()
+
+            return episode
+
+
+        except URL.DoesNotExist:
             # episode did not exist, try to create it
             try:
                 with transaction.atomic():
