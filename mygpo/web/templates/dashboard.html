@@ -36,12 +36,12 @@
     </table>
    {% else %}
     <p>
-     {% blocktrans %}Welcome to {{ site }}! If this is your first visit, you should set up your <a href="http://wiki.gpodder.org/wiki/Web_Services/Clients">podcast client</a> and try to check as many <em>Explore</em> boxes as you can.{% endblocktrans %}
+     {% blocktrans %}Welcome to {{ site }}! If this is your first visit, you should set up your <a href="https://gpoddernet.readthedocs.io/en/latest/user/clients.html">podcast client</a> and try to check as many <em>Explore</em> boxes as you can.{% endblocktrans %}
     </p>
 
     <p>
      {% url "help" as help %}
-     {% blocktrans %}If you have problems, have a look at the <a href="{{ help }}">docs</a> or ask questions on the <a href="http://wiki.gpodder.org/wiki/Mailing_List">mailing list</a> or <a href="https://getsatisfaction.com/gpoddernet">forum</a>.{% endblocktrans %}
+     {% blocktrans %}If you have problems, have a look at the <a href="{{ help }}">docs</a> or ask questions on the <a href="https://gpodder.github.io/docs/mailing-list.html">mailing list</a> or <a href="https://github.com/gpodder/mygpo/issues">forum</a>.{% endblocktrans %}
     </p>
 
    {% endif %}
