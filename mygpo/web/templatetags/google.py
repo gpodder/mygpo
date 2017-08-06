@@ -10,10 +10,12 @@ register = template.Library()
 
 
 @register.simple_tag
+@mark_safe
 def google_plus_one_head():
-    return mark_safe("""<script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>""")
+    return """<script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>"""
 
 
 @register.simple_tag
+@mark_safe
 def google_plus_one_button():
-    return mark_safe("""<g:plusone size="medium"></g:plusone>""")
+    return """<g:plusone size="medium"></g:plusone>"""

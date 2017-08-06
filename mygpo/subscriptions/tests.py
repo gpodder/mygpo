@@ -40,15 +40,15 @@ class TestSubscribe(TestCase):
         ))
 
         # ensure only one client is changed
-        self.assertEquals(len(changed_clients), 1)
-        self.assertEquals(changed_clients[0], self.client)
+        self.assertEqual(len(changed_clients), 1)
+        self.assertEqual(changed_clients[0], self.client)
 
         # ensure exactly one subscription has been created
         subscriptions = models.Subscription.objects.filter(
             podcast=self.podcast,
             user=self.user
         )
-        self.assertEquals(subscriptions.count(), 1)
+        self.assertEqual(subscriptions.count(), 1)
         subscriptions[0].delete()
 
     def tearDown(self):

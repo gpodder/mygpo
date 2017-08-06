@@ -1,7 +1,7 @@
 from functools import wraps, partial
 from datetime import datetime
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponseBadRequest, HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
@@ -64,7 +64,7 @@ def show(request, podcast):
 
     if podcast.group:
         group = podcast.group
-        rel_podcasts = group.podcast_set.exclude(pk=podcast.pk)
+        rel_podcasts = group.podcast_set.all()
     else:
         rel_podcasts = []
 

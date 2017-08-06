@@ -84,7 +84,8 @@ def episodes(request, username, version=1):
         try:
             update_urls = update_episodes(request.user, actions, now, ua_string)
         except ValidationError as e:
-            logger.warn('Validation Error while uploading episode actions for user %s: %s', username, str(e))
+            logger.warning('Validation Error while uploading episode actions '
+                'for user %s: %s', username, str(e))
             return HttpResponseBadRequest(str(e))
 
         except InvalidEpisodeActionAttributes as e:

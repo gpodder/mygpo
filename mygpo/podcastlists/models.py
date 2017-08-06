@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -78,7 +78,7 @@ class PodcastListEntry(UpdateInfoModel, OrderedModel):
                                    )
 
     # the object (Podcast or PodcastGroup) that is in the list
-    content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.UUIDField()
     content_object = GenericForeignKey('content_type', 'object_id')
 

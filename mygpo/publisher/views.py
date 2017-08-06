@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect, \
 from django.core.cache import cache
 from django.views.decorators.cache import never_cache, cache_control
 from django.views.decorators.vary import vary_on_cookie
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.contrib import messages
 from django.contrib.auth import get_user_model

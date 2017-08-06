@@ -5,7 +5,7 @@ help:
 	@echo 'make clean           clean up files'
 
 test:
-	envdir envs/dev/ coverage run ./manage.py test
+	envdir envs/dev/ python -Wd -m coverage run ./manage.py test
 	coverage report
 
 update-po:
