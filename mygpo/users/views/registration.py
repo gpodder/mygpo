@@ -37,7 +37,7 @@ class DuplicateEmail(ValidationError):
     def __init__(self, email):
         self.email = email
         super().__init__('The email address {0} is already in use.'
-                         .format(email_addr))
+                         .format(email))
 
 
 class UsernameValidator(RegexValidator):
