@@ -26,7 +26,6 @@ from mygpo.web.forms import ResendActivationForm
 from mygpo.constants import DEFAULT_LOGIN_REDIRECT
 from mygpo.web.auth import get_google_oauth_flow
 from mygpo.users.models import UserProxy
-from mygpo.users.views.registration import send_activation_email
 from mygpo.utils import random_token
 
 import logging
@@ -83,11 +82,11 @@ class LoginView(View):
             messages.error(request, _('Wrong username or password.'))
             return HttpResponseRedirect(login_page)
 
-
         if not user.is_active:
-            send_activation_email(user, request)
+            # send_activation_email(user, request)
             messages.error(request, _('Please activate your account first. '
-                'We have just re-sent your activation email'))
+                                      'We have just re-sent your activation '
+                                      'email'))
             return HttpResponseRedirect(login_page)
 
         # set up the user's session
@@ -130,9 +129,10 @@ def restore_password(request):
         return render(request, 'password_reset_failed.html')
 
     if not user.is_active:
-        send_activation_email(user, request)
+        # send_activation_email(user, request)
         messages.error(request, _('Please activate your account first. '
-            'We have just re-sent your activation email'))
+                                  'We have just re-sent your activation '
+                                  'email'))
         return HttpResponseRedirect(reverse('login'))
 
     site = RequestSite(request)

@@ -1,6 +1,7 @@
 from django.core.checks import register, Warning
 from django.db import connection
 from django.db.utils import OperationalError
+from django.conf import settings
 
 
 SQL = """
@@ -36,5 +37,17 @@ def check_case_insensitive_users(app_configs=None, **kwargs):
             pass
         else:
             raise
+
+    return errors
+
+
+@register()
+def check_registration_url(app_configs=None, **kwargs):
+    errors = []
+
+    if not settings.MYGPO_AUTH_REGISTER_URL:
+        txt = 'The setting MYGPO_AUTH_REGISTER_URL is not set.'
+        wid = 'users.W002'
+        errors.append(Warning(txt, id=wid))
 
     return errors
