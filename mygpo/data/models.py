@@ -2,10 +2,11 @@ from datetime import datetime
 
 from django.db import models
 
+from mygpo.core.models import UUIDModel
 from mygpo.podcasts.models import Podcast
 
 
-class PodcastUpdateResult(models.Model):
+class PodcastUpdateResult(UUIDModel):
     """ Results of a podcast update
 
     Once an instance is stored, the update is assumed to be finished. """
