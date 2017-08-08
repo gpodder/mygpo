@@ -2185,7 +2185,7 @@ msgstr "Episódios Recentes"
 #, python-format
 msgid ""
 "Welcome to %(site)s! If this is your first visit, you should set up your <a "
-"href=\"http://wiki.gpodder.org/wiki/Web_Services/Clients\">podcast client</"
+"href=\"https://gpoddernet.readthedocs.io/en/latest/user/clients.html\">podcast client</"
 "a> and try to check as many <em>Explore</em> boxes as you can."
 msgstr ""
 
@@ -2193,8 +2193,8 @@ msgstr ""
 #, python-format
 msgid ""
 "If you have problems, have a look at the <a href=\"%(help)s\">docs</a> or "
-"ask questions on the <a href=\"http://wiki.gpodder.org/wiki/Mailing_List"
-"\">mailing list</a> or <a href=\"https://getsatisfaction.com/gpoddernet"
+"ask questions on the <a href=\"https://gpodder.github.io/docs/mailing-list.html"
+"\">mailing list</a> or <a href=\"https://github.com/gpodder/mygpo/issues"
 "\">forum</a>."
 msgstr ""
 
@@ -2326,14 +2326,14 @@ msgstr ""
 #: mygpo/web/templates/developer.html:22
 msgid ""
 "If you want to integrate gpodder.net in some podcasting client, you might "
-"want to use one of the existing <a href=\"http://wiki.gpodder.org/wiki/"
-"Web_Services/Libraries\">client libraries</a>."
+"want to use one of the existing <a href=\"https://gpoddernet.readthedocs.io/en/"
+"latest/dev/libraries.html\">client libraries</a>."
 msgstr ""
 
 #: mygpo/web/templates/developer.html:23
 msgid ""
 "There are already several clients for different platforms which can be used "
-"as examples. <a href=\"http://wiki.gpodder.org/wiki/Web_Services/Clients"
+"as examples. <a href=\"https://gpoddernet.readthedocs.io/en/latest/user/clients.html"
 "\">See list of clients.</a>"
 msgstr ""
 
@@ -2442,8 +2442,8 @@ msgstr "Sincronizado"
 
 #: mygpo/web/templates/devicelist.html:53
 msgid ""
-"You don't have any devices yet. Go to the <a href=\"http://wiki.gpodder.org/"
-"wiki/Web_Services/Clients\">clients</a> page to learn how to set up your "
+"You don't have any devices yet. Go to the <a href=\"https://gpoddernet.readthedocs.io/en/"
+"latest/user/clients.html\">clients</a> page to learn how to set up your "
 "client applications."
 msgstr ""
 

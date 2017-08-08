@@ -81,7 +81,7 @@
 
     <div class="input-group col-lg-10">
       <span class="input-group-addon">@</span>
-      <input type="text" class="form-control" id="inputTwitter" name="twitter" placeholder="username" value="{{ podcast.twitter }}">
+      <input type="text" class="form-control" id="inputTwitter" name="twitter" placeholder="username" value="{{ podcast.twitter|default:"" }}">
     </div>
    </div>
 
