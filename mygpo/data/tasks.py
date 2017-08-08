@@ -45,8 +45,8 @@ def schedule_updates(interval=UPDATE_INTERVAL):
     """ Schedules podcast updates that are due within ``interval`` """
     now = datetime.utcnow()
 
-    # max number of updates to schedule (one per minute)
-    max_updates = UPDATE_INTERVAL.total_seconds() / 60
+    # max number of updates to schedule (one every 10s)
+    max_updates = UPDATE_INTERVAL.total_seconds() / 20
 
     # fetch podcasts for which an update is due within the next hour
     podcasts = Podcast.objects.all()\
@@ -54,23 +54,27 @@ def schedule_updates(interval=UPDATE_INTERVAL):
                               .prefetch_related('urls')\
                               .only('pk')[:max_updates]
 
-    logger.error('Scheduling %d podcasts for update', podcasts.count())
-    # queue all those podcast updates
-    for podcast in podcasts:
-        update_podcasts.delay([podcast.url])
+    _schedule_updates(podcasts)
 
 
 @periodic_task(run_every=UPDATE_INTERVAL)
 def schedule_updates_longest_no_update():
     """ Schedule podcasts for update that have not been updated for longest """
 
-    # max number of updates to schedule (one per minute)
-    max_updates = UPDATE_INTERVAL.total_seconds() / 60
+    # max number of updates to schedule (one every 20s)
+    max_updates = UPDATE_INTERVAL.total_seconds() / 20
 
     podcasts = Podcast.objects.order_by('last_update')[:max_updates]
+    _schedule_updates(podcasts)
 
+
+def _schedule_updates(podcasts):
+    """ Schedule updates for podcasts """
     logger.info('Scheduling %d podcasts for update', podcasts.count())
 
     # queue all those podcast updates
     for podcast in podcasts:
-        update_podcasts.delay([podcast.url])
+        # update_podcasts.delay() seems to block other task execution,
+        # therefore celery.send_task() is used instead
+        celery.send_task('mygpo.data.tasks.update_podcasts',
+                         args=[podcast.url])

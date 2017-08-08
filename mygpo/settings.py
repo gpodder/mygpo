@@ -164,9 +164,10 @@ INSTALLED_APPS = [
 ]
 
 try:
-    import debug_toolbar
-    INSTALLED_APPS += ['debug_toolbar']
-    MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
+    if DEBUG:
+        import debug_toolbar
+        INSTALLED_APPS += ['debug_toolbar']
+        MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
 
 except ImportError:
     pass
@@ -177,11 +178,6 @@ try:
 
     if not DEBUG:
         INSTALLED_APPS += ['opbeat.contrib.django']
-
-        # add opbeat middleware to the beginning of the middleware classes list
-        MIDDLEWARE = \
-            ['opbeat.contrib.django.middleware.OpbeatAPMMiddleware'] + \
-            MIDDLEWARE
 
 except ImportError:
     pass

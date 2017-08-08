@@ -7,7 +7,7 @@ import responses
 
 from django.conf import settings
 from django.test import TestCase, Client, override_settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.files.storage import FileSystemStorage
 from django.contrib.auth import get_user_model
 

@@ -2,6 +2,7 @@
 
 import uuid
 import re
+from datetime import timedelta
 
 from django.core.cache import cache
 from django.conf import settings
@@ -343,6 +344,10 @@ class PodcastQuerySet(MergedUUIDQuerySet):
         NEXTUPDATE = "last_update + (update_interval || ' hours')::INTERVAL"
         q = self.extra(select={'next_update': NEXTUPDATE})
         return q.order_by('next_update')
+
+    @property
+    def next_update(self):
+        return self.last_update + timedelta(hours=self.update_interval)
 
     def next_update_between(self, start, end):
         NEXTUPDATE_BETWEEN = ("(last_update + (update_interval || "
@@ -714,11 +719,23 @@ class EpisodeManager(GenericManager):
         url = utils.to_maxlength(URL, 'url', url)
 
         try:
-            # try to fetch the episode
-            return Episode.objects.get(urls__url=url,
-                                       urls__scope=podcast.as_scope,
-                                      )
-        except Episode.DoesNotExist:
+            url = URL.objects.get(url=url, scope=podcast.as_scope)
+            episode = url.content_object
+
+            if episode is None:
+
+                with transaction.atomic():
+                    episode = Episode.objects.create(podcast=podcast,
+                                                     id=uuid.uuid1(),
+                                                     **defaults)
+
+                    url.content_object = episode
+                    url.save()
+
+            return episode
+
+
+        except URL.DoesNotExist:
             # episode did not exist, try to create it
             try:
                 with transaction.atomic():

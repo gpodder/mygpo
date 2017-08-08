@@ -46,6 +46,10 @@ def update_podcasts(queue):
 
     for n, podcast_url in enumerate(queue, 1):
         logger.info('Update %d - %s', n, podcast_url)
+        if not podcast_url:
+            logger.warn('Podcast URL empty, skipping')
+            continue
+
         try:
             yield update_podcast(podcast_url)
 
@@ -121,7 +125,7 @@ def _fetch_feed(podcast_url):
         'Accept': 'application/json',
     }
     url = urljoin(settings.FEEDSERVICE_URL, 'parse')
-    r = requests.get(url, params=params, headers=headers, timeout=10)
+    r = requests.get(url, params=params, headers=headers, timeout=30)
 
     if r.status_code != 200:
         logger.error('Feed-service status code for "%s" was %s', podcast_url,
@@ -424,13 +428,13 @@ def mark_outdated(obj):
 def get_update_interval(episodes):
     """ calculates the avg interval between new episodes """
 
-    count = len(episodes)
+    count = episodes.count()
     if not count:
         logger.info('no episodes, using default interval of %dh',
                     DEFAULT_UPDATE_INTERVAL)
         return DEFAULT_UPDATE_INTERVAL
 
-    earliest = episodes[0]
+    earliest = episodes.first()
     now = datetime.utcnow()
 
     timespan_s = (now - earliest.released).total_seconds()

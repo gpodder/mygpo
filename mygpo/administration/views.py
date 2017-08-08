@@ -7,7 +7,7 @@ from datetime import datetime
 import django
 from django.shortcuts import render
 from django.contrib import messages
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.cache import cache
 from django.http import HttpResponseRedirect
 from django.template.loader import render_to_string

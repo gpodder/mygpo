@@ -29,8 +29,13 @@ class Migration(migrations.Migration):
                 ('content_type', models.ForeignKey(
                     blank=True,
                     to='contenttypes.ContentType',
-                    null=True)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                    null=True,
+                    on_delete=models.PROTECT,
+                )),
+                ('user', models.ForeignKey(
+                    to=settings.AUTH_USER_MODEL,
+                    on_delete=models.CASCADE,
+                )),
             ],
             options={
             },

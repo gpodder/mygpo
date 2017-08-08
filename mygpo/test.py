@@ -1,7 +1,7 @@
 import os.path
 import base64
 
-from django.core.urlresolvers import resolve
+from django.urls import resolve
 from django.contrib.auth.models import AnonymousUser
 from django.test.client import RequestFactory
 from django.contrib.auth import get_user_model

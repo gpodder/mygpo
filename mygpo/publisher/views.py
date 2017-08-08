@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect, \
 from django.core.cache import cache
 from django.views.decorators.cache import never_cache, cache_control
 from django.views.decorators.vary import vary_on_cookie
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -65,7 +65,7 @@ def search_podcast(request):
     form = SearchPodcastForm(request.POST)
     if form.is_valid():
         podcast_url = form.cleaned_data['url']
-        podcast = get_objet_or_404(Podcast, urls__url=podcast_url)
+        podcast = get_object_or_404(Podcast, urls__url=podcast_url)
         url = get_podcast_link_target(podcast, 'podcast-publisher-detail')
     else:
         url = reverse('publisher')
@@ -93,7 +93,7 @@ def podcast(request, podcast):
         pubsubscription = None
 
     site = RequestSite(request)
-    feedurl_quoted = urllib.parse.quote(podcast.url)
+    feedurl_quoted = urllib.parse.quote(podcast.url.encode('ascii'))
 
     return render(request, 'publisher/podcast.html', {
         'site': site,
@@ -186,7 +186,7 @@ def episodes(request, podcast):
 
     episodes = Episode.objects.filter(podcast=podcast).select_related('podcast').prefetch_related('slugs', 'podcast__slugs')
 
-    listeners = map(None, (e.listeners for e in episodes))
+    listeners = filter(None, (e.listeners for e in episodes))
     max_listeners = max(listeners, default=0)
 
     return render(request, 'publisher/episodes.html', {

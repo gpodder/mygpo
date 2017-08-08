@@ -23,7 +23,10 @@ class Migration(migrations.Migration):
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('modified', models.DateTimeField(auto_now=True)),
                 ('podcast', models.ForeignKey(to='podcasts.Podcast', on_delete=django.db.models.deletion.PROTECT)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(
+                    to=settings.AUTH_USER_MODEL,
+                    on_delete=models.CASCADE,
+                )),
             ],
             options={
                 'abstract': False,
@@ -38,9 +41,15 @@ class Migration(migrations.Migration):
                 ('ref_url', models.URLField(max_length=2048)),
                 ('created', models.DateTimeField()),
                 ('modified', models.DateTimeField()),
-                ('client', models.ForeignKey(to='users.Client')),
+                ('client', models.ForeignKey(
+                    to='users.Client',
+                    on_delete=models.CASCADE,
+                )),
                 ('podcast', models.ForeignKey(to='podcasts.Podcast', on_delete=django.db.models.deletion.PROTECT)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(
+                    to=settings.AUTH_USER_MODEL,
+                    on_delete=models.CASCADE,
+                )),
             ],
             options={
             },

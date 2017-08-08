@@ -25,7 +25,10 @@ class Migration(migrations.Migration):
                 ('slug', models.SlugField(max_length=128)),
                 ('created', models.DateTimeField()),
                 ('modified', models.DateTimeField()),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(
+                    to=settings.AUTH_USER_MODEL,
+                    on_delete=models.CASCADE,
+                )),
             ],
             options={
             },
@@ -45,10 +48,12 @@ class Migration(migrations.Migration):
                 ('object_id', models.UUIDField(max_length=32)),
                 ('content_type', models.ForeignKey(
                     to='contenttypes.ContentType',
-                    on_delete=django.db.models.deletion.PROTECT)),
+                    on_delete=django.db.models.deletion.CASCADE)),
                 ('podcastlist', models.ForeignKey(
                     related_name='entries',
-                    to='podcastlists.PodcastList')),
+                    to='podcastlists.PodcastList',
+                    on_delete=models.CASCADE,
+                )),
             ],
             options={
             },

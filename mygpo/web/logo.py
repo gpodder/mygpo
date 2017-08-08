@@ -7,7 +7,7 @@ import struct
 
 from PIL import Image, ImageDraw
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.conf import settings
 from django.http import Http404, HttpResponseRedirect
 from django.views import View

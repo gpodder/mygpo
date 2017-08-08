@@ -4,6 +4,7 @@ from django.utils.safestring import mark_safe
 register = template.Library()
 
 @register.filter
+@mark_safe
 def bar_chart(parts):
 
     maxv = max([ int(x['y']) for x in parts ])
@@ -24,6 +25,4 @@ def bar_chart(parts):
         'chxr=1,0,%d' % maxv,  # labeling for axis 1 (y) from 0 to max
         ]
 
-    s = '<img src="//chart.apis.google.com/chart?%s" />' % '&'.join(parts)
-
-    return mark_safe(s)
+    return '<img src="//chart.apis.google.com/chart?%s" />' % '&'.join(parts)

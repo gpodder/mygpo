@@ -65,7 +65,12 @@ class UserSettings(models.Model):
                              on_delete=models.CASCADE)
 
     # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
-    content_type = models.ForeignKey(ContentType, null=True, blank=True)
+    content_type = models.ForeignKey(
+        ContentType,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+    )
     object_id = models.UUIDField(null=True, blank=True)
     content_object = GenericForeignKey('content_type', 'object_id')
 

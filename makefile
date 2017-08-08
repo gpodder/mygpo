@@ -8,7 +8,7 @@ test: envs/test/MEDIA_ROOT
 	# assume defined media root directory, empty before running tests
 	rm -rf $(shell cat envs/test/MEDIA_ROOT)
 	mkdir -p $(shell cat envs/test/MEDIA_ROOT)
-	envdir envs/test/ coverage run ./manage.py test
+	envdir envs/test/ python -Wd -m coverage run ./manage.py test
 	coverage report
 
 update-po:
