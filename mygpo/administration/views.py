@@ -1,5 +1,6 @@
 import re
 import socket
+import uuid
 from itertools import count, chain
 from collections import Counter
 from datetime import datetime
@@ -23,6 +24,7 @@ from mygpo.podcasts.models import Podcast, Episode
 from mygpo.administration.auth import require_staff
 from mygpo.administration.group import PodcastGrouper
 from mygpo.maintenance.merge import PodcastMerger, IncorrectMergeException
+from mygpo.maintenance.models import MergeQueue
 from mygpo.administration.clients import UserAgentStats, ClientStats
 from mygpo.administration.tasks import merge_podcasts
 from mygpo.utils import get_git_head
@@ -89,11 +91,23 @@ class MergeSelect(AdminView):
     template_name = 'admin/merge-select.html'
 
     def get(self, request):
-        num = int(request.GET.get('podcasts', 2))
-        urls = [''] * num
+        queue_length = MergeQueue.objects.count()
+
+        use_queue = bool(request.GET.get('queue', False))
+        if use_queue:
+            queue = MergeQueue.objects.first()
+            urls = [podcast.url for podcast in queue.podcasts]
+            queue_id = queue.id.hex
+
+        else:
+            num = int(request.GET.get('podcasts', 2))
+            urls = [''] * num
+            queue_id = ''
 
         return self.render_to_response({
+                'queue_length': queue_length,
                 'urls': urls,
+                'queue_id': queue_id,
             })
 
 
@@ -139,6 +153,7 @@ class MergeVerify(MergeBase):
             num_groups = []
 
         return self.render_to_response({
+                'queue_id': request.POST.get('queue_id', ''),
                 'podcasts': podcasts,
                 'groups': num_groups,
             })
@@ -169,9 +184,11 @@ class MergeProcess(MergeBase):
         get_features = lambda id_e: (features.get(id_e[0], id_e[0]), id_e[0])
 
         num_groups = grouper.group(get_features)
+        queue_id = request.POST.get('queue_id', '')
 
         if 'renew' in request.POST:
             return render(request, 'admin/merge-grouping.html', {
+                    'queue_id': queue_id,
                     'podcasts': podcasts,
                     'groups': num_groups,
                 })
@@ -182,7 +199,7 @@ class MergeProcess(MergeBase):
             podcast_ids = [p.get_id() for p in podcasts]
             num_groups = list(num_groups)
 
-            res = merge_podcasts.delay(podcast_ids, num_groups)
+            res = merge_podcasts.delay(podcast_ids, num_groups, queue_id)
 
             return HttpResponseRedirect(reverse('admin-merge-status',
                         args=[res.task_id]))

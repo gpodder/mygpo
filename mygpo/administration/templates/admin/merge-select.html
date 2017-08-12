@@ -13,6 +13,13 @@
 {% endblock %}
 
 {% block content %}
+ {% if queue_length > 0 %}
+  <div>
+   Queue Length: {{ queue_length }} -
+   <a href="{% url "admin-merge" %}?queue=1">Take from Queue</a>
+  </div>
+ {% endif %}
+
  <form method="post" action="{% url "admin-merge-verify" %}" role="form">
   {% csrf_token %}
    {% for url in urls %}
@@ -22,6 +29,7 @@
     </div>
    {% endfor %}
     <input class="btn btn-default" type="submit" value="OK" />
+    <input class="hidden" name="queue_id" value="{{ queue_id }}" />
  </form>
 
 {% endblock %}
