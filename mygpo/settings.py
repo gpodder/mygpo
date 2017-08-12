@@ -103,6 +103,10 @@ TEMPLATES = [{
     },
 }]
 
+if DEBUG:
+    # don't use cached template loader
+    TEMPLATES[0]['OPTIONS']['loaders'] = TEMPLATES[0]['OPTIONS']['loaders'][0][1]
+
 
 MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
