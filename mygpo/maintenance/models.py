@@ -13,7 +13,10 @@ class MergeQueueEntry(UUIDModel):
 
     podcast = models.ForeignKey(Podcast, on_delete=models.CASCADE)
 
-    queue = models.ForeignKey(MergeQueue, on_delete=models.CASCADE)
+    queue = models.ForeignKey(MergeQueue,
+                              on_delete=models.CASCADE,
+                              related_name='entries',
+                              related_query_name='entry')
 
     class Meta:
         unique_together = [

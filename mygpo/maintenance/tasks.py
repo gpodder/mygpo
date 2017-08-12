@@ -49,7 +49,7 @@ def populate_merge_queue():
         for podcast in podcasts.iterator():
 
             # already in a merge queue
-            if podcast.mergequeueentry_set.exists():
+            if podcast.entries.exists():
                 continue
 
             # add to merge queue

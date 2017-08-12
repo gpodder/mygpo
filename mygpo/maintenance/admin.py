@@ -25,4 +25,4 @@ class MergeQueueAdmin(admin.ModelAdmin):
     ]
 
     def num_entries(self, obj):
-        return obj.mergequeueentry_set.count()
+        return obj.entries.count()
