@@ -20,16 +20,14 @@ def merge_podcasts(podcast_ids, num_groups, queue_id=''):
 
     logger.info('merging podcasts %s', podcasts)
 
-    actions = Counter()
-
-    pm = PodcastMerger(podcasts, actions, num_groups)
+    pm = PodcastMerger(podcasts, num_groups)
     podcast = pm.merge()
 
-    logger.info('merging result: %s', actions)
+    logger.info('merging successful')
 
     if queue_id:
         qid = uuid.UUID(queue_id)
         logger.info('Deleting merge queue entry {}'.format(qid))
         MergeQueue.objects.filter(id=qid).delete()
 
-    return actions, podcast
+    return podcast

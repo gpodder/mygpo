@@ -81,7 +81,7 @@ class UnsubscribeMergeTests(TestCase):
         subscribe(self.podcast2, self.user, self.device)
 
         # merge podcast2 into podcast1
-        pm = PodcastMerger([self.podcast1, self.podcast2], Counter(), [])
+        pm = PodcastMerger([self.podcast1, self.podcast2], [])
         pm.merge()
 
         # get podcast for URL of podcast2 and unsubscribe from it

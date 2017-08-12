@@ -28,7 +28,7 @@ class IncorrectMergeException(Exception):
 class PodcastMerger(object):
     """ Merges podcasts and their related objects """
 
-    def __init__(self, podcasts, actions, groups):
+    def __init__(self, podcasts, groups):
         """ Prepares to merge podcasts[1:] into podcasts[0]  """
 
         for n, podcast1 in enumerate(podcasts):
@@ -39,7 +39,6 @@ class PodcastMerger(object):
                         (podcast1.get_id(), podcast2.get_id()))
 
         self.podcasts = podcasts
-        self.actions = actions
         self.groups = groups
 
     def merge(self):
