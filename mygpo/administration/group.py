@@ -29,15 +29,18 @@ class PodcastGrouper(object):
 
 
     def group(self, get_features):
+        """ Groups the episodes by features extracted using ``get_features``
+
+        get_features is a callable that expects an episode as parameter, and
+        returns a value representing the extracted feature(s).
+        """
 
         episodes = self.__get_episodes()
 
         episode_groups = defaultdict(list)
 
-        episode_features = map(get_features, episodes.items())
-
-        for features, episode_id in episode_features:
-            episode = episodes[episode_id]
+        for episode in episodes.values():
+            features = get_features(episode)
             episode_groups[features].append(episode)
 
         groups = sorted(episode_groups.values(), key=_SORT_KEY)

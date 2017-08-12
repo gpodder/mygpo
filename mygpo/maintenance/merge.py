@@ -12,6 +12,7 @@ from mygpo import utils
 from mygpo.history.models import HistoryEntry, EpisodeHistoryEntry
 from mygpo.publisher.models import PublishedPodcast
 from mygpo.subscriptions.models import Subscription
+from . import models
 
 import logging
 logger = logging.getLogger(__name__)
@@ -68,7 +69,7 @@ class PodcastMerger(object):
 
 # based on https://djangosnippets.org/snippets/2283/
 @transaction.atomic
-def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
+def merge_model_objects(primary_object, alias_objects, keep_old=False):
     """
     Use this function to merge model objects (i.e. Users, Organizations, Polls,
     etc.) and migrate all of the related fields from the alias objects to the
@@ -78,10 +79,8 @@ def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
     from django.contrib.auth.models import User
     primary_user = User.objects.get(email='good_email@example.com')
     duplicate_user = User.objects.get(email='good_email+duplicate@example.com')
-    merge_model_objects(primary_user, duplicate_user)
+    merge_model_objects(primary_user, [duplicate_user])
     """
-    if not isinstance(alias_objects, list):
-        alias_objects = [alias_objects]
 
     # check that all aliases are the same class as primary one and that
     # they are subclass of model
@@ -105,11 +104,6 @@ def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
         for field_name, field in fields:
             generic_fields.append(field)
 
-    blank_local_fields = set(
-        [field.attname for field
-         in primary_object._meta.local_fields
-         if getattr(primary_object, field.attname) in [None, '']])
-
     # Loop through all alias objects and migrate their data to
     # the primary object.
     for alias_object in alias_objects:
@@ -123,8 +117,9 @@ def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
             related_objects = getattr(alias_object, alias_varname)
             for obj in related_objects.all():
                 setattr(obj, obj_varname, primary_object)
-                reassigned(obj, primary_object)
-                obj.save()
+                deleted = reassigned(obj, primary_object)
+                if not deleted:
+                    obj.save()
 
         # Migrate all many to many references from alias object to
         # primary object.
@@ -143,8 +138,9 @@ def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
                                                obj_varname).all()
             for obj in related_many_objects.all():
                 getattr(obj, obj_varname).remove(alias_object)
-                reassigned(obj, primary_object)
-                getattr(obj, obj_varname).add(primary_object)
+                deleted = reassigned(obj, primary_object)
+                if not deleted:
+                    getattr(obj, obj_varname).add(primary_object)
 
         # Migrate all generic foreign key references from alias
         # object to primary object.
@@ -156,7 +152,10 @@ def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
             related = field.model.objects.filter(**filter_kwargs)
             for generic_related_object in related:
                 setattr(generic_related_object, field.name, primary_object)
-                reassigned(generic_related_object, primary_object)
+                deleted = reassigned(generic_related_object, primary_object)
+                if deleted:
+                    continue
+
                 try:
                     # execute save in a savepoint, so we can resume in the
                     # transaction
@@ -166,20 +165,10 @@ def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
                     if ie.__cause__.pgcode == PG_UNIQUE_VIOLATION:
                         merge(generic_related_object, primary_object)
 
-        # Try to fill all missing values in primary object by
-        # values of duplicates
-        filled_up = set()
-        for field_name in blank_local_fields:
-            val = getattr(alias_object, field_name)
-            if val not in [None, '']:
-                setattr(primary_object, field_name, val)
-                filled_up.add(field_name)
-        blank_local_fields -= filled_up
-
         if not keep_old:
             before_delete(alias_object, primary_object)
             alias_object.delete()
-    primary_object.save()
+
     return primary_object
 
 
@@ -199,6 +188,17 @@ def _get_all_related_many_to_many_objects(obj):
 
 
 def reassigned(obj, new):
+    """ handles changes necessary when reassigning `obj` to `new`
+
+    Some objects have a dependent object (eg URL has a Podcast or Episode.
+    During merging, the object might be assigned from to a new Episode.
+    The re-assignment requires the "scope" field to be set to the value
+    of the new episode. In some cases it might require the existing object to
+    be deleted, to preserve uniqueness.
+
+    Returns whether the object was deleted.
+    """
+
     if isinstance(obj, URL):
         # a URL has its parent's scope
         obj.scope = new.scope
@@ -207,11 +207,27 @@ def reassigned(obj, new):
         max_order = max([-1] + [u.order for u in existing_urls])
         obj.order = max_order+1
 
+    elif isinstance(obj, Slug):
+        # a Slug has its parent's scope
+        obj.scope = new.scope
+
+        existing_slugs = new.slugs.all()
+        max_order = max([-1] + [s.order for s in existing_slugs])
+        obj.order = max_order+1
+
     elif isinstance(obj, Episode):
         # obj is an Episode, new is a podcast
         for url in obj.urls.all():
             url.scope = new.as_scope
-            url.save()
+            try:
+                with transaction.atomic():
+                    url.save()
+            except IntegrityError as ie:
+                if 'podcasts_url_url_scope_key' in str(ie):
+                    url.delete()
+                    return True
+                else:
+                    raise
 
     elif isinstance(obj, Subscription):
         pass
@@ -222,9 +238,16 @@ def reassigned(obj, new):
     elif isinstance(obj, HistoryEntry):
         pass
 
+    elif isinstance(obj, models.MergeQueueEntry):
+        obj.delete()
+        return True
+
     else:
         raise TypeError('unknown type for reassigning: {objtype}'.format(
             objtype=type(obj)))
+
+    # Object was not deleted
+    return False
 
 
 def before_delete(old, new):

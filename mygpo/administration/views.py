@@ -140,10 +140,9 @@ class MergeVerify(MergeBase):
 
             grouper = PodcastGrouper(podcasts)
 
-            get_features = lambda id_e: ((id_e[1].url, id_e[1].title), id_e[0])
+            get_features = lambda episode: (episode.url, episode.title)
 
             num_groups = grouper.group(get_features)
-
 
         except InvalidPodcast as ip:
             messages.error(request,
@@ -178,10 +177,10 @@ class MergeProcess(MergeBase):
         for key, feature in request.POST.items():
             m = self.RE_EPISODE.match(key)
             if m:
-                episode_id = m.group(1)
+                episode_id = uuid.UUID(m.group(1))
                 features[episode_id] = feature
 
-        get_features = lambda id_e: (features.get(id_e[0], id_e[0]), id_e[0])
+        get_features = lambda episode: features[episode.id]
 
         num_groups = grouper.group(get_features)
         queue_id = request.POST.get('queue_id', '')

@@ -47,7 +47,7 @@
      <td>
       {% for episode in episodes %}
        {% if episode.podcast.get_id == podcast.get_id %}
-        <input type="text" name="episode_{{ gepisode.id }}" value="{{ n }}" size="2"/>
+        <input type="text" name="episode_{{ episode.get_id }}" value="{{ n }}" size="2"/>
         {% episode_link episode podcast %}<br />
        {% endif %}
       {% endfor %}
