@@ -66,43 +66,6 @@ class PodcastMerger(object):
             merge_model_objects(episode, episodes)
 
 
-def reassign_urls(obj1, obj2):
-    # Reassign all URLs of obj2 to obj1
-    max_order = max([0] + [u.order for u in obj1.urls.all()])
-
-    for n, url in enumerate(obj2.urls.all(), max_order+1):
-        url.content_object = obj1
-        url.order = n
-        url.scope = obj1.scope
-        try:
-            url.save()
-        except IntegrityError as ie:
-            logger.warn('Moving URL failed: %s. Deleting.', str(ie))
-            url.delete()
-
-
-def reassign_merged_uuids(obj1, obj2):
-    # Reassign all IDs of obj2 to obj1
-    MergedUUID.objects.create(uuid=obj2.id, content_object=obj1)
-    for m in obj2.merged_uuids.all():
-        m.content_object = obj1
-        m.save()
-
-
-def reassign_slugs(obj1, obj2):
-    # Reassign all Slugs of obj2 to obj1
-    max_order = max([0] + [s.order for s in obj1.slugs.all()])
-    for n, slug in enumerate(obj2.slugs.all(), max_order+1):
-        slug.content_object = obj1
-        slug.order = n
-        slug.scope = obj1.scope
-        try:
-            slug.save()
-        except IntegrityError as ie:
-            logger.warn('Moving Slug failed: %s. Deleting', str(ie))
-            slug.delete()
-
-
 # based on https://djangosnippets.org/snippets/2283/
 @transaction.atomic
 def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
