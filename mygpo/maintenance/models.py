@@ -9,7 +9,7 @@ class MergeTask(UUIDModel):
 
     @property
     def podcasts(self):
-        """ Returns the podcasts of the queue, sorted by subscribers """
+        """ Returns the podcasts of the task, sorted by subscribers """
         podcasts = [entry.podcast for entry in self.entries.all()]
         podcasts = sorted(podcasts,
                           key=lambda p: p.subscribers, reverse=True)
@@ -21,12 +21,12 @@ class MergeTaskEntry(UUIDModel):
 
     podcast = models.ForeignKey(Podcast, on_delete=models.CASCADE)
 
-    queue = models.ForeignKey(MergeTask,
+    task = models.ForeignKey(MergeTask,
                               on_delete=models.CASCADE,
                               related_name='entries',
                               related_query_name='entry')
 
     class Meta:
         unique_together = [
-            ['podcast', ]  # a podcast can only belong to one queue
+            ['podcast', ]  # a podcast can only belong to one task
         ]
