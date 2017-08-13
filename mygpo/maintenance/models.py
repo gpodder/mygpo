@@ -4,7 +4,7 @@ from mygpo.core.models import UUIDModel
 from mygpo.podcasts.models import Podcast
 
 
-class MergeQueue(UUIDModel):
+class MergeTask(UUIDModel):
     """ A Group of podcasts that could be merged """
 
     @property
@@ -16,12 +16,12 @@ class MergeQueue(UUIDModel):
         return podcasts
 
 
-class MergeQueueEntry(UUIDModel):
-    """ An entry in a MergeQueue """
+class MergeTaskEntry(UUIDModel):
+    """ An entry in a MergeTask """
 
     podcast = models.ForeignKey(Podcast, on_delete=models.CASCADE)
 
-    queue = models.ForeignKey(MergeQueue,
+    queue = models.ForeignKey(MergeTask,
                               on_delete=models.CASCADE,
                               related_name='entries',
                               related_query_name='entry')

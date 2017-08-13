@@ -4,7 +4,7 @@ from collections import Counter
 from mygpo.podcasts.models import Podcast
 from mygpo.celery import celery
 from mygpo.maintenance.merge import PodcastMerger
-from mygpo.maintenance.models import MergeQueue
+from mygpo.maintenance.models import MergeTask
 
 from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
@@ -28,6 +28,6 @@ def merge_podcasts(podcast_ids, num_groups, queue_id=''):
     if queue_id:
         qid = uuid.UUID(queue_id)
         logger.info('Deleting merge queue entry {}'.format(qid))
-        MergeQueue.objects.filter(id=qid).delete()
+        MergeTask.objects.filter(id=qid).delete()
 
     return podcast

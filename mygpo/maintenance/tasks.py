@@ -38,7 +38,7 @@ def populate_merge_queue():
         mqs = _get_merge_queues(podcasts)
 
         if len(mqs) == 0:
-            mq = models.MergeQueue.objects.create(id=uuid.uuid4())
+            mq = models.MergeTask.objects.create(id=uuid.uuid4())
 
         if len(mqs) == 1:
             mq = mqs.pop()
@@ -53,7 +53,7 @@ def populate_merge_queue():
                 continue
 
             # add to merge queue
-            mqe = models.MergeQueueEntry.objects.create(
+            mqe = models.MergeTaskEntry.objects.create(
                 id=uuid.uuid4(),
                 podcast=podcast,
                 queue=mq,
@@ -61,7 +61,7 @@ def populate_merge_queue():
 
 
 def _get_merge_queues(podcasts):
-    mqs = models.MergeQueue.objects.filter(
+    mqs = models.MergeTask.objects.filter(
         mergequeueentry__podcast__in=podcasts,
     ).distinct()
     return set(mqs)

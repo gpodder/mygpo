@@ -237,7 +237,7 @@ def reassigned(obj, new):
     elif isinstance(obj, HistoryEntry):
         pass
 
-    elif isinstance(obj, models.MergeQueueEntry):
+    elif isinstance(obj, models.MergeTaskEntry):
         obj.delete()
         return True
 

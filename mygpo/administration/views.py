@@ -24,7 +24,7 @@ from mygpo.podcasts.models import Podcast, Episode
 from mygpo.administration.auth import require_staff
 from mygpo.administration.group import PodcastGrouper
 from mygpo.maintenance.merge import PodcastMerger, IncorrectMergeException
-from mygpo.maintenance.models import MergeQueue
+from mygpo.maintenance.models import MergeTask
 from mygpo.administration.clients import UserAgentStats, ClientStats
 from mygpo.administration.tasks import merge_podcasts
 from mygpo.utils import get_git_head
@@ -91,11 +91,11 @@ class MergeSelect(AdminView):
     template_name = 'admin/merge-select.html'
 
     def get(self, request):
-        queue_length = MergeQueue.objects.count()
+        queue_length = MergeTask.objects.count()
 
         use_queue = bool(request.GET.get('queue', False))
         if use_queue:
-            queue = MergeQueue.objects.first()
+            queue = MergeTask.objects.first()
             urls = [podcast.url for podcast in queue.podcasts]
             queue_id = queue.id.hex
 
