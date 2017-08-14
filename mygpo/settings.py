@@ -384,3 +384,6 @@ NOSE_ARGS = [
     '--stop',
     '--where=mygpo',
 ]
+
+
+MAX_EPISODE_ACTIONS = int(os.getenv('MAX_EPISODE_ACTIONS', 1000))

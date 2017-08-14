@@ -1,16 +1,21 @@
 import json
+import uuid
 import copy
 import unittest
+from datetime import datetime, timedelta
 from urllib.parse import urlencode
 
 from django.test.client import Client
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from django.test.utils import override_settings
 
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.api.advanced import episodes
+from mygpo.history.models import EpisodeHistoryEntry
 from mygpo.test import create_auth_string, anon_request
+from mygpo.utils import get_timestamp
 
 
 class AdvancedAPITests(unittest.TestCase):
@@ -186,3 +191,79 @@ class DirectoryTest(TestCase):
         resp = self.client.get(url)
 
         self.assertEqual(resp.status_code, 200)
+
+
+class EpisodeActionTests(TestCase):
+
+    def setUp(self):
+        self.podcast = Podcast.objects.get_or_create_for_url(
+            'http://example.com/directory-podcast.xml',
+            defaults = {
+                'title': 'My Podcast',
+            },
+        )
+        self.episode = Episode.objects.get_or_create_for_url(
+            self.podcast,
+            'http://example.com/directory-podcast/1.mp3',
+            defaults = {
+                'title': 'My Episode',
+            },
+        )
+        User = get_user_model()
+        self.password = 'asdf'
+        self.username = 'adv-api-user'
+        self.user = User(username=self.username, email='user@example.com')
+        self.user.set_password(self.password)
+        self.user.save()
+        self.user.is_active = True
+        self.client = Client()
+        self.extra = {
+            'HTTP_AUTHORIZATION': create_auth_string(self.username,
+                                                     self.password)
+        }
+
+    def tearDown(self):
+        self.episode.delete()
+        self.podcast.delete()
+        self.user.delete()
+
+    @override_settings(MAX_EPISODE_ACTIONS=10)
+    def test_limit_actions(self):
+        """ Test that max MAX_EPISODE_ACTIONS episodes are returned """
+
+        timestamps = []
+        t = datetime.utcnow()
+        for n in range(15):
+            timestamp = t - timedelta(seconds=n)
+            EpisodeHistoryEntry.objects.create(
+                timestamp = timestamp,
+                episode = self.episode,
+                user = self.user,
+                action = EpisodeHistoryEntry.DOWNLOAD,
+            )
+            timestamps.append(timestamp)
+
+        url = reverse(episodes, kwargs={
+            'version': '2',
+            'username': self.user.username,
+        })
+        response = self.client.get(url, {'since': '0'}, **self.extra)
+        self.assertEqual(response.status_code, 200, response.content)
+        response_obj = json.loads(response.content.decode('utf-8'))
+        actions = response_obj['actions']
+
+        # 10 actions should be returned
+        self.assertEqual(len(actions), 10)
+
+        timestamps = sorted(timestamps)
+
+        # the first 10 actions, according to their timestamp should be returned
+        for action, timestamp in zip(actions, timestamps):
+            self.assertEqual(timestamp.isoformat(), action['timestamp'])
+
+        # the `timestamp` field in the response should be the timestamp of the
+        # last returned action
+        self.assertEqual(
+            get_timestamp(timestamps[9]),
+            response_obj['timestamp']
+        )
