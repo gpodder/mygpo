@@ -380,3 +380,6 @@ NOSE_ARGS = [
     '--stop',
     '--where=mygpo',
 ]
+
+
+SEARCH_CUTOFF = float(os.getenv('SEARCH_CUTOFF', 0.3))
