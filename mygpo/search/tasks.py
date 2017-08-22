@@ -1,3 +1,5 @@
+import functools
+import operator
 from datetime import timedelta
 
 from celery.decorators import periodic_task
@@ -6,6 +8,8 @@ from django.db import transaction
 from django.contrib.postgres.search import SearchVector
 
 from mygpo.podcasts.models import Podcast
+
+from . import INDEX_FIELDS
 
 from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
@@ -35,12 +39,23 @@ def update_search_index(run_every=UPDATE_INTERVAL):
     count = to_update.count()
     logger.info('Updating search index for {} podcasts'.format(count))
 
+    vectors = _get_search_vectors()
+
     for podcast in to_update:
         Podcast.objects.filter(pk=podcast.pk)\
-            .update(search_vector=
-                        SearchVector('title', weight='A') +
-                        SearchVector('description', weight='B'),
-		            search_index_uptodate=True,
-        )
+            .update(search_vector=vectors,
+                    search_index_uptodate=True,
+                    )
 
     logger.info('Finished indexing podcasts')
+
+
+def _get_search_vectors():
+    """ Return the combined search vector to use for indexing podcasts """
+    vectors = []
+    for (field, weight) in INDEX_FIELDS.items():
+        # index the podcast based on the stored language
+        vectors.append(SearchVector(field, weight=weight))
+
+    # vectors can be combined with +
+    return functools.reduce(operator.__add__, vectors)
