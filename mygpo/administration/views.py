@@ -383,7 +383,7 @@ class MakePublisher(AdminView):
                 'support_url': settings.SUPPORT_URL,
                 'site': site,
             },
-            context_instance=RequestContext(request))
+            request=request)
         subj = get_email_subject(site, _('Publisher Permissions'))
 
         user.email_user(subj, msg)
