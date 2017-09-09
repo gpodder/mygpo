@@ -1,7 +1,7 @@
 Django==1.11.5
 Babel==2.5.0
 Pillow==4.2.1
-celery==3.1.24
+celery[redis]==4.1.0
 dj-database-url==0.4.2
 django-redis-sessions==0.6
 python3-memcached==1.51
@@ -14,5 +14,6 @@ psycopg2cffi==2.7.6
 pyes==0.99.6
 python-dateutil==2.6.1
 redis==2.10.6
-django-celery==3.2.1
+django-celery-results==1.0.1
+django-celery-beat==1.0.1
 requests==2.18.4
