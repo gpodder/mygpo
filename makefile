@@ -19,7 +19,7 @@ clean:
 
 install-deps:
 	apt-get install libpq-dev libjpeg-dev zlib1g-dev libwebp-dev \
-		build-essential python3-dev make gettext
+		build-essential python3-dev make gettext virtualenv libffi-dev
 
 docker-build:
 	sudo docker build -t="mygpo/web" .

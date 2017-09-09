@@ -10,7 +10,7 @@ gunicorn==19.7.1
 html2text==2016.9.19
 markdown2==2.3.4
 oauth2client==4.1.1
-psycopg2==2.7.1
+psycopg2cffi==2.7.6
 pyes==0.99.6
 python-dateutil==2.6.0
 redis==2.10.5

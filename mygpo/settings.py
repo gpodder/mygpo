@@ -4,6 +4,13 @@ import os.path
 import dj_database_url
 
 
+try:
+    from psycopg2cffi import compat
+    compat.register()
+except ImportError:
+    pass
+
+
 def parse_int(s):
     return int(str(s))
 
