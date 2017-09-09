@@ -2,7 +2,11 @@ language: python
 
 python:
  - "3.5"
+ - "3.6"
+ - "3.6-dev"
+ - "3.7-dev"
  - "nightly"
+ - "pypy3"
 
 services:
  - redis-server

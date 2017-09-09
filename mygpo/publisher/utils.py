@@ -2,7 +2,7 @@ from collections import namedtuple, defaultdict
 from datetime import timedelta, datetime, time
 
 from mygpo.podcasts.models import Episode
-from mygpo.utils import daterange, flatten
+from mygpo.utils import daterange
 from mygpo.history.models import EpisodeHistoryEntry
 from mygpo.history.stats import playcounts_timerange
 from mygpo.publisher.models import PublishedPodcast
