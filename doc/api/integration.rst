@@ -10,13 +10,13 @@ applications. It describes good practice and points out caveats.
 General
 -------
 
-* The `Mailing List <http://wiki.gpodder.org/wiki/Mailing_List>`_ is the right
+* The `Mailing List <https://gpodder.github.io/docs/mailing-list.html>`_ is the right
   place to ask questions
 
 * Consult the :ref:`api-reference` for available functionality.
 
 * Add your client to `the clients list
-  <http://wiki.gpodder.org/wiki/Web_Services/Clients>`_ when you're ready
+  <https://gpoddernet.readthedocs.io/en/latest/user/clients.html>`_ when you're ready
 
 * Please use the name *gpodder.net* (all lowercase, .net suffix) to refer to
   the webservice. *gPodder* (uppercase P, no suffix) refers to the `client
@@ -27,7 +27,7 @@ Implementation
 --------------
 
 * If possible/available use an `existing library
-  <http://wiki.gpodder.org/wiki/Web_Services/Libraries>`_.
+  <https://gpoddernet.readthedocs.io/en/latest/dev/libraries.html>`_.
 
 * If you have to implement your own client, please consider releasing it as a
   library.

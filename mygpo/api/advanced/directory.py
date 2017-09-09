@@ -1,5 +1,5 @@
 from django.http import Http404
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.sites.requests import RequestSite
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import cache_page

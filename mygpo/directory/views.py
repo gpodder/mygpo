@@ -5,7 +5,7 @@ from math import ceil
 from collections import Counter
 
 from django.http import HttpResponseNotFound, Http404, HttpResponseRedirect
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render
 from django.db.models import Count

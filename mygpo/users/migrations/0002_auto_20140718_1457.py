@@ -36,7 +36,10 @@ class Migration(migrations.Migration):
                         ('other', 'Other')])),
                 ('deleted', models.BooleanField(default=False)),
                 ('user_agent', models.CharField(max_length=300)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(
+                    to=settings.AUTH_USER_MODEL,
+                    on_delete=models.CASCADE,
+                )),
             ],
             options={
             },

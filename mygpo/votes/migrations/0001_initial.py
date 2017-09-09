@@ -28,7 +28,10 @@ class Migration(migrations.Migration):
                 ('content_type', models.ForeignKey(
                     to='contenttypes.ContentType',
                     on_delete=django.db.models.deletion.PROTECT)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(
+                    to=settings.AUTH_USER_MODEL,
+                    on_delete=models.CASCADE,
+                )),
             ],
             options={
             },

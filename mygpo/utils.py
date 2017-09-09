@@ -21,7 +21,7 @@ import shlex
 
 from django.db import transaction, IntegrityError
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 import logging
 logger = logging.getLogger(__name__)
@@ -119,87 +119,6 @@ def parse_bool(val):
     return False
 
 
-def iterate_together(lists, key=lambda x: x, reverse=False):
-    """
-    takes ordered, possibly sparse, lists with similar items
-    (some items have a corresponding item in the other lists, some don't).
-
-    It then yield tuples of corresponding items, where one element is None is
-    there is no corresponding entry in one of the lists.
-
-    Tuples where both elements are None are skipped.
-
-    The results of the key method are used for the comparisons.
-
-    If reverse is True, the lists are expected to be sorted in reverse order
-    and the results will also be sorted reverse
-
-    >>> list(iterate_together([range(1, 3), range(1, 4, 2)]))
-    [(1, 1), (2, None), (None, 3)]
-
-    >>> list(iterate_together([[], []]))
-    []
-
-    >>> list(iterate_together([range(1, 3), range(3, 5)]))
-    [(1, None), (2, None), (None, 3), (None, 4)]
-
-    >>> list(iterate_together([range(1, 3), []]))
-    [(1, None), (2, None)]
-
-    >>> list(iterate_together([[1, None, 3], [None, None, 3]]))
-    [(1, None), (3, 3)]
-    """
-
-    Next = collections.namedtuple('Next', 'item more')
-    min_ = min if not reverse else max
-    lt_  = operator.lt if not reverse else operator.gt
-
-    lists = [iter(l) for l in lists]
-
-    def _take(it):
-        try:
-            i = next(it)
-            while i is None:
-                i = next(it)
-            return Next(i, True)
-        except StopIteration:
-            return Next(None, False)
-
-    def new_res():
-        return [None]*len(lists)
-
-    # take first bunch of items
-    items = [_take(l) for l in lists]
-
-    while any(i.item is not None or i.more for i in items):
-
-        res = new_res()
-
-        for n, item in enumerate(items):
-
-            if item.item is None:
-                continue
-
-            if all(x is None for x in res):
-                res[n] = item.item
-                continue
-
-            min_v = min_(filter(lambda x: x is not None, res), key=key)
-
-            if key(item.item) == key(min_v):
-                res[n] = item.item
-
-            elif lt_(key(item.item), key(min_v)):
-                res = new_res()
-                res[n] = item.item
-
-        for n, x in enumerate(res):
-            if x is not None:
-                items[n] = _take(lists[n])
-
-        yield tuple(res)
-
-
 def progress(val, max_val, status_str='', max_width=50, stream=sys.stdout):
 
     factor = float(val)/max_val if max_val > 0 else 0
@@ -226,40 +145,8 @@ def progress(val, max_val, status_str='', max_width=50, stream=sys.stdout):
     stream.flush()
 
 
-def set_cmp(list, simplify):
-    """
-    Builds a set out of a list but uses the results of simplify to determine equality between items
-    """
-    simpl = lambda x: (simplify(x), x)
-    lst = dict(map(simpl, list))
-    return list(lst.values())
-
-
-def first(it):
-    """
-    returns the first not-None object or None if the iterator is exhausted
-    """
-    for x in it:
-        if x is not None:
-            return x
-    return None
-
-
 def intersect(a, b):
     return list(set(a) & set(b))
-
-
-
-def remove_control_chars(s):
-    all_chars = (chr(i) for i in range(0x110000))
-    control_chars = ''.join(map(chr, list(range(0,32)) + list(range(127,160))))
-    control_char_re = re.compile('[%s]' % re.escape(control_chars))
-
-    return control_char_re.sub('', s)
-
-
-def unzip(a):
-    return tuple(map(list,zip(*a)))
 
 
 def parse_range(s, min, max, default=None):
@@ -294,36 +181,6 @@ def parse_range(s, min, max, default=None):
 
     except (ValueError, TypeError):
         return default if default is not None else out_type((max-min)/2)
-
-
-
-def flatten(l):
-    return [item for sublist in l for item in sublist]
-
-
-def linearize(key, iterators, reverse=False):
-    """
-    Linearizes a number of iterators, sorted by some comparison function
-    """
-
-    iters = [iter(i) for i in iterators]
-    vals = []
-    for i in iters:
-        try:
-            v = next(i)
-            vals. append( (v, i) )
-        except StopIteration:
-            continue
-
-    while vals:
-        vals = sorted(vals, key=lambda x: key(x[0]), reverse=reverse)
-        val, it = vals.pop(0)
-        yield val
-        try:
-            next_val = next(it)
-            vals.append( (next_val, it) )
-        except StopIteration:
-            pass
 
 
 def get_timestamp(datetime_obj):
@@ -381,42 +238,6 @@ def longest_substr(strings):
     return substr
 
 
-
-def additional_value(it, gen_val, val_changed=lambda _: True):
-    """ Provides an additional value to the elements, calculated when needed
-
-    For the elements from the iterator, some additional value can be computed
-    by gen_val (which might be an expensive computation).
-
-    If the elements in the iterator are ordered so that some subsequent
-    elements would generate the same additional value, val_changed can be
-    provided, which receives the next element from the iterator and the
-    previous additional value. If the element would generate the same
-    additional value (val_changed returns False), its computation is skipped.
-
-    >>> # get the next full hundred higher than x
-    >>> # this will probably be an expensive calculation
-    >>> next_hundred = lambda x: x + 100-(x % 100)
-
-    >>> # returns True if h is not the value that next_hundred(x) would provide
-    >>> # this should be a relatively cheap calculation, compared to the above
-    >>> diff_hundred = lambda x, h: (h-x) < 0 or (h - x) > 100
-
-    >>> xs = [0, 50, 100, 101, 199, 200, 201]
-    >>> list(additional_value(xs, next_hundred, diff_hundred))
-    [(0, 100), (50, 100), (100, 100), (101, 200), (199, 200), (200, 200), (201, 300)]
-    """
-
-    _none = object()
-    current = _none
-
-    for x in it:
-        if current is _none or val_changed(x, current):
-            current = gen_val(x)
-
-        yield (x, current)
-
-
 def file_hash(f, h=hashlib.md5, block_size=2**20):
     """ returns the hash of the contents of a file """
     f_hash = h()
@@ -427,46 +248,6 @@ def file_hash(f, h=hashlib.md5, block_size=2**20):
         f_hash.update( buf )
 
     return f_hash
-
-
-def split_list(l, prop):
-    """ split elements that satisfy a property, and those that don't """
-    match   = list(filter(prop, l))
-    nomatch = [x for x in l if x not in match]
-    return match, nomatch
-
-
-def sorted_chain(links, key, reverse=False):
-    """ Takes a list of iters can iterates over sorted elements
-
-    Each elment of links should be a tuple of (sort_key, iterator). The
-    elements of each iterator should be sorted already. sort_key should
-    indicate the key of the first element and needs to be comparable to the
-    result of key(elem).
-
-    The function returns an iterator over the globally sorted element that
-    ensures that as little iterators as possible are evaluated.  When
-    evaluating """
-
-    # mixed_list initially contains all placeholders; later evaluated
-    # elements (from the iterators) are mixed in
-    mixed_list = [(k, link, True) for k, link in links]
-
-    while mixed_list:
-        _, item, expand = mixed_list.pop(0)
-
-        # found an element (from an earlier expansion), yield it
-        if not expand:
-            yield item
-            continue
-
-        # found an iter that needs to be expanded.
-        # The iterator is fully consumed
-        new_items = [(key(i), i, False) for i in item]
-
-        # sort links (placeholders) and elements together
-        mixed_list = sorted(mixed_list + new_items, key=lambda t: t[0],
-                reverse=reverse)
 
 
 def url_add_authentication(url, username, password):
@@ -796,39 +577,6 @@ def normalize_feed_url(url):
 
     # urlunsplit might return "a slighty different, but equivalent URL"
     return urllib.parse.urlunsplit((scheme, netloc, path, query, fragment))
-
-
-def partition(items, predicate=bool):
-    a, b = itertools.tee((predicate(item), item) for item in items)
-    return ((item for pred, item in a if not pred),
-            (item for pred, item in b if pred))
-
-
-def split_quoted(s):
-    """ Splits a quoted string
-
-    >>> split_quoted('some "quoted text"') == ['some', 'quoted text']
-    True
-
-    >>> split_quoted('"quoted text') == ['quoted', 'text']
-    True
-
-    # 4 quotes here are 2 in the doctest is one in the actual string
-    >>> split_quoted('text\\\\') == ['text']
-    True
-    """
-
-    try:
-        # split by whitespace, preserve quoted substrings
-        keywords = shlex.split(s)
-
-    except ValueError:
-        # No closing quotation (eg '"text')
-        # No escaped character (eg '\')
-        s = s.replace('"', '').replace("'", '').replace('\\', '')
-        keywords = shlex.split(s)
-
-    return keywords
 
 
 def edit_link(obj):

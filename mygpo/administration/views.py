@@ -7,7 +7,7 @@ from datetime import datetime
 import django
 from django.shortcuts import render
 from django.contrib import messages
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.cache import cache
 from django.http import HttpResponseRedirect
 from django.template.loader import render_to_string
@@ -383,7 +383,7 @@ class MakePublisher(AdminView):
                 'support_url': settings.SUPPORT_URL,
                 'site': site,
             },
-            context_instance=RequestContext(request))
+            request=request)
         subj = get_email_subject(site, _('Publisher Permissions'))
 
         user.email_user(subj, msg)

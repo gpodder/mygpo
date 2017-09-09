@@ -10,8 +10,9 @@ from mygpo.utils import edit_link
 register = template.Library()
 
 @register.filter
+@mark_safe
 def lookup(dic, key):
-    return mark_safe(dic.get(key, ''))
+    return dic.get(key, '')
 
 @register.filter
 def lookup_list(dict, keys):
@@ -45,9 +46,10 @@ def remove(l, item):
     return [x for x in l if x != item]
 
 @register.filter
+@mark_safe
 def format_time(time):
     from mygpo.utils import format_time as _format_time
-    return mark_safe(_format_time(time))
+    return _format_time(time)
 
 
 @register.filter
@@ -56,18 +58,18 @@ def is_tuple(obj):
 
 
 @register.filter
+@mark_safe
 def markdown(txt):
     import markdown2
-    html = markdown2.markdown(txt, extras={'nofollow': True})
-    return mark_safe(html)
+    return markdown2.markdown(txt, extras={'nofollow': True})
 
 
 @register.filter
+@mark_safe
 def nbsp(s):
     """ collapses multiple whitespaces and replaces them with &nbsp; """
     import re
-    s = re.sub("\s+", "&nbsp;", s)
-    return mark_safe(s)
+    return re.sub("\s+", "&nbsp;", s)
 
 
 @register.filter
@@ -83,11 +85,12 @@ def license_name(license_url):
 
 
 @register.filter
+@mark_safe
 def urlquote(s):
     """ makes urllib.quote_plus available as a template filter """
     if isinstance(s, str):
         s = s.encode('utf-8')
-    return mark_safe(urllib.parse.quote_plus(s))
+    return urllib.parse.quote_plus(s)
 
 
 hours_to_str = register.filter(hours_to_str)

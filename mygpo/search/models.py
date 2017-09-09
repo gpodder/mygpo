@@ -1,6 +1,6 @@
 """ Wrappers for the results of a search """
 
-
+import uuid
 
 
 class PodcastResult(object):
@@ -14,7 +14,7 @@ class PodcastResult(object):
         for key, val in doc['_source'].items():
             setattr(obj, key, val)
 
-        obj.id = doc['_id']
+        obj.id = uuid.UUID(doc['_id']).hex
         return obj
 
     @property

@@ -18,7 +18,7 @@ class ExamplePodcastsManager(models.Manager):
 class ExamplePodcast(UpdateInfoModel, OrderedModel):
     """ Example podcasts returned by the API """
 
-    podcast = models.ForeignKey(Podcast)
+    podcast = models.ForeignKey(Podcast, on_delete=models.CASCADE)
 
     objects = ExamplePodcastsManager()
 
