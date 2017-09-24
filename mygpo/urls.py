@@ -39,5 +39,5 @@ urlpatterns += [
  url(r'^publisher/', include('mygpo.publisher.urls')),
  url(r'^administration/', include('mygpo.administration.urls')),
  url(r'^pubsub/',    include('mygpo.pubsub.urls')),
- url(r'^admin/',     include(admin.site.urls)),
+ url(r'^admin/',     admin.site.urls),
 ]
