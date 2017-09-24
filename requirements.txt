@@ -15,5 +15,5 @@ pyes==0.99.6
 python-dateutil==2.6.1
 redis==2.10.6
 django-celery-results==1.0.1
-django-celery-beat==1.0.1
+https://github.com/celery/django-celery-beat/archive/master.zip#egg=django-celery-beat
 requests==2.18.4
