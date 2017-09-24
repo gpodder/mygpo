@@ -4,7 +4,6 @@ from django.utils.safestring import mark_safe
 register = template.Library()
 
 @register.filter
-@mark_safe
 def google_analytics_async(property_id):
     s = """
     <script type="text/javascript">
@@ -22,4 +21,4 @@ def google_analytics_async(property_id):
         })();
     </script>""" % property_id
 
-    return s
+    return mark_safe(s)
