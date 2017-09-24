@@ -123,6 +123,7 @@ class UserProfile(TwitterModel):
 
     # the user to which this profile belongs
     user = models.OneToOneField(settings.AUTH_USER_MODEL,
+                                on_delete=models.CASCADE,
                                 related_name='profile')
 
     # if False, suggestions should be updated
