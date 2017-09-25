@@ -1,6 +1,8 @@
 from itertools import chain
 from collections import Counter
 
+from django.contrib.auth import get_user_model
+
 from mygpo.celery import celery
 from mygpo.subscriptions import get_subscribed_podcasts
 from mygpo.suggestions.models import PodcastSuggestion
@@ -10,8 +12,12 @@ logger = get_task_logger(__name__)
 
 
 @celery.task
-def update_suggestions(user, max_suggestions=15):
+def update_suggestions(user_pk, max_suggestions=15):
     """ updates the suggestions of a user """
+
+    User = get_user_model()
+    user = User.objects.get(pk=user_pk)
+
     logger.info('Updating suggestions of user {user.username}'.format(
         user=user))
 
