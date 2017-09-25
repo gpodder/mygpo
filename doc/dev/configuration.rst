@@ -67,6 +67,7 @@ Directory
 ---------
 
 * ``DIRECTORY_EXCLUDED_TAGS`` - space-separated list of tags that should be excluded from the podcast directory
+* ``SEARCH_CUTOFF`` - minimum search rank (between 0 and 1, default 0.3) below which results are excluded. See `Django's documentation on Weighting queries <https://docs.djangoproject.com/en/1.11/ref/contrib/postgres/search/#weighting-queries>`_
 
 
 Feeds
