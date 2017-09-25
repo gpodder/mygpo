@@ -1,4 +1,4 @@
-from itertools import islice, chain, imap as map
+from itertools import islice, chain
 from optparse import make_option
 import random
 
@@ -10,23 +10,22 @@ from mygpo.podcasts.models import Podcast
 class PodcastCommand(BaseCommand):
     """ command that operates on a list of podcasts specified by parameters """
 
-    option_list = BaseCommand.option_list + (
-        make_option('--toplist', action='store_true', dest='toplist',
+
+    def add_arguments(self, parser):
+        parser.add_argument('--toplist', action='store_true', dest='toplist',
             default=False, help="Update all entries from the Toplist."),
 
-        make_option('--update-new', action='store_true', dest='new',
+        parser.add_argument('--update-new', action='store_true', dest='new',
             default=False, help="Update all podcasts with new Episodes"),
 
-        make_option('--max', action='store', dest='max', type='int',
+        parser.add_argument('--max', action='store', dest='max', type='int',
             default=0, help="Set how many feeds should be updated at maximum"),
 
-        make_option('--random', action='store_true', dest='random',
+        parser.add_argument('--random', action='store_true', dest='random',
             default=False, help="Update random podcasts, best used with --max"),
 
-        make_option('--next', action='store_true', dest='next',
+        parser.add_argument('--next', action='store_true', dest='next',
             default=False, help="Podcasts that are due to be updated next"),
-        )
-
 
 
     def get_podcasts(self, *args, **options):
@@ -58,6 +57,9 @@ class PodcastCommand(BaseCommand):
 
         if args:
             yield args
+
+        if options.get('urls'):
+            yield options.get('urls')
 
         if not args and not options.get('toplist') and not options.get('new') \
                     and not options.get('random')  and not options.get('next'):

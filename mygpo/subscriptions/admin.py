@@ -1,8 +1,8 @@
-from __future__ import unicode_literals
+
 
 from django.contrib import admin
 
-from mygpo.subscriptions.models import Subscription, PodcastConfig
+from mygpo.subscriptions.models import Subscription
 
 
 @admin.register(Subscription)
@@ -17,14 +17,4 @@ class SubscriptionAdmin(admin.ModelAdmin):
 
     raw_id_fields = ('user', 'podcast', 'client', )
 
-
-@admin.register(PodcastConfig)
-class PodcastConfigAdmin(admin.ModelAdmin):
-
-    # configuration for the list view
-    list_display = ('user', 'podcast', )
-
-    # fetch the related objects for the fields in list_display
-    list_select_related = ('user', 'podcast', )
-
-    raw_id_fields = ('user', 'podcast', )
+    show_full_result_count = False

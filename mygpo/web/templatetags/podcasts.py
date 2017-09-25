@@ -3,7 +3,7 @@ import hashlib
 from django import template
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
-from django.utils.html import strip_tags
+from django.utils.html import strip_tags, format_html
 from django.contrib.staticfiles.storage import staticfiles_storage
 
 from mygpo.web.logo import get_logo_url
@@ -14,10 +14,15 @@ from mygpo.web.utils import get_podcast_link_target, \
 
 
 register = template.Library()
+
+
+@mark_safe
 def create_podcast_logo(podcast, size):
+    if not podcast:
+        return ''
+
     size = int(size)
-    s = '<img src="%s" alt="" />' % (get_logo_url(podcast, size),)
-    return mark_safe(s)
+    return '<img src="%s" alt="" />' % (get_logo_url(podcast, size),)
 
 @register.filter
 def podcast_logo(podcast):
@@ -33,15 +38,16 @@ def podcast_logo_medium(podcast):
 
 
 @register.filter
+@mark_safe
 def podcast_status_icon(action):
     if action.action == 'subscribe':
-        s = '<img src="%s" />' % (staticfiles_storage.url('subscribe.png'),)
+        return '<img src="%s" />' % (staticfiles_storage.url('subscribe.png'),)
     elif action.action == 'unsubscribe':
-        s = '<img src="%s" />' % (staticfiles_storage.url('unsubscribe.png'),)
+        return '<img src="%s" />' % (staticfiles_storage.url('unsubscribe.png'),)
     elif action.action == 'flattr':
-        s = '<img src="https://flattr.com/_img/icons/flattr_logo_16.png" />'
+        return '<img src="https://flattr.com/_img/icons/flattr_logo_16.png" />'
 
-    return mark_safe(s)
+    return ''
 
 
 @register.filter
@@ -124,8 +130,7 @@ register.tag('podcast_group_link_target', PodcastGroupLinkTargetNode.compile)
 def podcast_group_link(podcast, title=None):
     """ Returns the link strings for Podcast and PodcastGroup objects
 
-    automatically distringuishes between relational Podcast/PodcastGroup
-    objects and CouchDB-based Podcast/PodcastGroup objects """
+    automatically distinguishes between relational Podcast/PodcastGroup """
 
     from mygpo.podcasts.models import PodcastGroup
 
@@ -143,9 +148,9 @@ def podcast_group_link(podcast, title=None):
 def podcast_link(podcast, title=None):
     """ Returns the link for a single Podcast """
 
-    title = title or getattr(podcast, 'display_title', None) or podcast.title
+    title = title or podcast.display_title
 
     title = strip_tags(title)
 
-    return '<a href="%(target)s" title="%(title)s">%(title)s</a>' % \
-        dict(target=get_podcast_link_target(podcast), title=title)
+    return format_html('<a href="{target}" title="{title}">{title}</a>',
+        target=get_podcast_link_target(podcast), title=title)

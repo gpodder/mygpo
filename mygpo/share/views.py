@@ -1,16 +1,17 @@
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.contrib.sites.models import RequestSite
+from django.contrib.sites.requests import RequestSite
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import cache_control
-from django.views.generic.base import View
+from django.views import View
 from django.utils.decorators import method_decorator
 
 from mygpo.podcasts.models import Podcast
+from mygpo.publisher.models import PublishedPodcast
 from mygpo.userfeeds.feeds import FavoriteFeed
-from mygpo.data.feeddownloader import PodcastUpdater
+from mygpo.data.feeddownloader import update_podcast
 
 import logging
 logger = logging.getLogger(__name__)
@@ -32,8 +33,6 @@ class FavoritesPublic(View):
         else:
             request.user.profile.create_new_token('favorite_feeds_token')
             request.user.profile.save()
-
-        token = request.user.favorite_feeds_token
 
         return HttpResponseRedirect(reverse('share-favorites'))
 
@@ -101,8 +100,7 @@ class FavoritesFeedCreateEntry(View):
             publisher=user,
         )
 
-        updater = PodcastUpdater()
-        updater.update(feed_url)
+        update_podcast(feed_url)
 
         return HttpResponseRedirect(reverse('share-favorites'))
 

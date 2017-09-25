@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 from django.db import models, migrations
 
@@ -18,7 +18,10 @@ class Migration(migrations.Migration):
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('modified', models.DateTimeField(auto_now=True)),
                 ('order', models.PositiveSmallIntegerField()),
-                ('podcast', models.ForeignKey(to='podcasts.Podcast')),
+                ('podcast', models.ForeignKey(
+                    to='podcasts.Podcast',
+                    on_delete=models.CASCADE,
+                )),
             ],
             options={
                 'ordering': ['order'],

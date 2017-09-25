@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 
 from django.contrib import admin
 
@@ -28,3 +28,5 @@ class PodcastListAdmin(admin.ModelAdmin):
     ]
 
     raw_id_fields = ('user', )
+
+    show_full_result_count = False

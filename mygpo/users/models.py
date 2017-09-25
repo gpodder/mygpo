@@ -1,28 +1,23 @@
-from __future__ import unicode_literals
+
 
 import re
 import uuid
 import collections
-from datetime import datetime
 import dateutil.parser
-from itertools import imap
-import string
-
-from couchdbkit.ext.django.schema import *
-from uuidfield import UUIDField
 
 from django.core.validators import RegexValidator
 from django.db import transaction, models
 from django.db.models import Q
 from django.contrib.auth.models import User as DjangoUser
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth.validators import ASCIIUsernameValidator
 from django.conf import settings
 
-from mygpo.core.models import (TwitterModel, UUIDModel, SettingsModel,
+from mygpo.core.models import (TwitterModel, UUIDModel,
     GenericManager, DeleteableModel, )
+from mygpo.usersettings.models import UserSettings
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.utils import random_token
-from mygpo.users.settings import FAV_FLAG, SettingsMixin
 
 import logging
 logger = logging.getLogger(__name__)
@@ -64,7 +59,7 @@ class UserProxyQuerySet(models.QuerySet):
         if q:
             return self.get(q)
         else:
-            return self.none()
+            raise UserProxy.DoesNotExist
 
 
 class UserProxyManager(GenericManager):
@@ -81,6 +76,10 @@ class UserProxyManager(GenericManager):
 class UserProxy(DjangoUser):
 
     objects = UserProxyManager()
+
+    # only accept ASCII usernames, see
+    # https://docs.djangoproject.com/en/dev/releases/1.10/#official-support-for-unicode-usernames
+    username_validator = ASCIIUsernameValidator()
 
     class Meta:
         proxy = True
@@ -119,15 +118,12 @@ class UserProxy(DjangoUser):
             yield group
 
 
-class UserProfile(TwitterModel, SettingsModel):
+class UserProfile(TwitterModel):
     """ Additional information stored for a User """
 
     # the user to which this profile belongs
     user = models.OneToOneField(settings.AUTH_USER_MODEL,
                                 related_name='profile')
-
-    # the CouchDB _id of the user
-    uuid = UUIDField(unique=True)
 
     # if False, suggestions should be updated
     suggestions_up_to_date = models.BooleanField(default=False)
@@ -173,141 +169,13 @@ class UserProfile(TwitterModel, SettingsModel):
 
         setattr(self, token_name, random_token())
 
-
-class EpisodeAction(DocumentSchema):
-    """
-    One specific action to an episode. Must
-    always be part of a EpisodeUserState
-    """
-
-    action        = StringProperty(required=True)
-
-    # walltime of the event (assigned by the uploading client, defaults to now)
-    timestamp     = DateTimeProperty(required=True, default=datetime.utcnow)
-
-    # upload time of the event
-    upload_timestamp = IntegerProperty(required=True)
-
-    device_oldid  = IntegerProperty(required=False)
-    device        = StringProperty()
-    started       = IntegerProperty()
-    playmark      = IntegerProperty()
-    total         = IntegerProperty()
-
-    def __eq__(self, other):
-        if not isinstance(other, EpisodeAction):
-            return False
-        vals = ('action', 'timestamp', 'device', 'started', 'playmark',
-                'total')
-        return all([getattr(self, v, None) == getattr(other, v, None) for v in vals])
-
-
-    def to_history_entry(self):
-        entry = HistoryEntry()
-        entry.action = self.action
-        entry.timestamp = self.timestamp
-        entry.device_id = self.device
-        entry.started = self.started
-        entry.position = self.playmark
-        entry.total = self.total
-        return entry
-
-
-
-    def validate_time_values(self):
-        """ Validates allowed combinations of time-values """
-
-        PLAY_ACTION_KEYS = ('playmark', 'started', 'total')
-
-        # Key found, but must not be supplied (no play action!)
-        if self.action != 'play':
-            for key in PLAY_ACTION_KEYS:
-                if getattr(self, key, None) is not None:
-                    raise InvalidEpisodeActionAttributes('%s only allowed in play actions' % key)
-
-        # Sanity check: If started or total are given, require playmark
-        if ((self.started is not None) or (self.total is not None)) and \
-                self.playmark is None:
-            raise InvalidEpisodeActionAttributes('started and total require position')
-
-        # Sanity check: total and playmark can only appear together
-        if ((self.total is not None) or (self.started is not None)) and \
-           ((self.total is None) or (self.started is None)):
-            raise InvalidEpisodeActionAttributes('total and started can only appear together')
-
-
-    def __repr__(self):
-        return '%s-Action on %s at %s (in %s)' % \
-            (self.action, self.device, self.timestamp, self._id)
-
-
-    def __hash__(self):
-        return hash(frozenset([self.action, self.timestamp, self.device,
-                    self.started, self.playmark, self.total]))
-
-
-class Chapter(Document):
-    """ A user-entered episode chapter """
-
-    device = StringProperty()
-    created = DateTimeProperty()
-    start = IntegerProperty(required=True)
-    end = IntegerProperty(required=True)
-    label = StringProperty()
-    advertisement = BooleanProperty()
-
-
-    def __repr__(self):
-        return '<%s %s (%d-%d)>' % (self.__class__.__name__, self.label,
-                self.start, self.end)
-
-
-class EpisodeUserState(Document, SettingsMixin):
-    """
-    Contains everything a user has done with an Episode
-    """
-
-    episode       = StringProperty(required=True)
-    actions       = SchemaListProperty(EpisodeAction)
-    user_oldid    = IntegerProperty()
-    user          = StringProperty(required=True)
-    ref_url       = StringProperty(required=True)
-    podcast_ref_url = StringProperty(required=True)
-    merged_ids    = StringListProperty()
-    chapters      = SchemaListProperty(Chapter)
-    podcast       = StringProperty(required=True)
-
-
-
-    def add_actions(self, actions):
-        map(EpisodeAction.validate_time_values, actions)
-        self.actions = list(self.actions) + actions
-        self.actions = list(set(self.actions))
-        self.actions = sorted(self.actions, key=lambda x: x.timestamp)
-
-
-    def is_favorite(self):
-        return self.get_wksetting(FAV_FLAG)
-
-
-    def set_favorite(self, set_to=True):
-        self.settings[FAV_FLAG.name] = set_to
-
-
-    def get_history_entries(self):
-        return imap(EpisodeAction.to_history_entry, self.actions)
-
-
-    def __repr__(self):
-        return 'Episode-State %s (in %s)' % \
-            (self.episode, self._id)
-
-    def __eq__(self, other):
-        if not isinstance(other, EpisodeUserState):
-            return False
-
-        return (self.episode == other.episode and
-                self.user == other.user)
+    @property
+    def settings(self):
+        try:
+            return UserSettings.objects.get(user=self.user, content_type=None)
+        except UserSettings.DoesNotExist:
+            return UserSettings(user=self.user, content_type=None,
+                                object_id=None)
 
 
 class SyncGroup(models.Model):
@@ -480,11 +348,7 @@ class Client(UUIDModel, DeleteableModel):
         return self.name or self.uid
 
     def __str__(self):
-        return '{} ({})'.format(self.name.encode('ascii', errors='replace'),
-                                self.uid.encode('ascii', errors='replace'))
-
-    def __unicode__(self):
-        return u'{} ({})'.format(self.name, self.uid)
+        return '{name} ({uid})'.format(name=self.name, uid=self.uid)
 
 
 TOKEN_NAMES = ('subscriptions_token', 'favorite_feeds_token',
@@ -564,14 +428,3 @@ class HistoryEntry(object):
 
 
         return entries
-
-
-def create_missing_profile(sender, **kwargs):
-    """ Creates a UserProfile if a User doesn't have one """
-    user = kwargs['instance']
-
-    if not hasattr(user, 'profile'):
-        # TODO: remove uuid column once migration from CouchDB is complete
-        import uuid
-        profile = UserProfile.objects.create(user=user, uuid=uuid.uuid1())
-        user.profile = profile

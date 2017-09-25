@@ -4,7 +4,7 @@
 </head>
 <body>
   {% for podcast in subscriptions %}
-    <outline title="{{ podcast.title }}" text="{{ podcast.description|truncatewords:"20" }}" type="rss" xmlUrl="{{ podcast.url }}" htmlUrl="{{ podcast.link }}"/>
+    <outline title="{{ podcast.podcast.display_title }}" text="{{ podcast.podcast.description|truncatewords:"20" }}" type="rss" xmlUrl="{{ podcast.ref_url }}" htmlUrl="{{ podcast.podcast.link }}"/>
   {% endfor %}
 </body>
 </opml>

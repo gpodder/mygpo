@@ -1,39 +1,37 @@
-from __future__ import division
 
-from itertools import imap as map
+
+
 from math import ceil
 from collections import Counter
 
 from django.http import HttpResponseNotFound, Http404, HttpResponseRedirect
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render
 from django.db.models import Count
-from django.contrib.sites.models import RequestSite
+from django.contrib.sites.requests import RequestSite
 from django.views.decorators.cache import cache_control
 from django.views.decorators.vary import vary_on_cookie
 from django.views.generic import ListView
 from django.utils.decorators import method_decorator
-from django.views.generic.base import View, TemplateView
+from django.views import View
+from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 from django.contrib.auth import get_user_model
 
-from feedservice.parse.models import ParserException
-from feedservice.parse import FetchFeedException
-
-from mygpo.core.proxy import proxy_object
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.directory.search import search_podcasts
 from mygpo.web.utils import process_lang_params, get_language_names, \
          get_page_list, get_podcast_link_target, sanitize_language_codes
 from mygpo.directory.tags import Topics
 from mygpo.users.settings import FLATTR_TOKEN
+from mygpo.categories.models import Category
 from mygpo.podcastlists.models import PodcastList
-from mygpo.data.feeddownloader import PodcastUpdater, NoEpisodesException
+from mygpo.data.feeddownloader import (verify_podcast_url, NoEpisodesException,
+    UpdatePodcastException)
 from mygpo.data.tasks import update_podcasts
-from mygpo.db.couchdb.directory import category_for_tag
 
 
 class ToplistView(TemplateView):
@@ -101,7 +99,9 @@ class EpisodeToplistView(ToplistView):
         context['entries'] = entries
 
         # Determine maximum listener amount (or 0 if no entries exist)
-        context['max_listeners'] = max([0]+[e.listeners for e in entries])
+        listeners = [e.listeners for e in entries if e.listeners is not None]
+        max_listeners = max(listeners, default=0)
+        context['max_listeners'] = max_listeners
 
         return context
 
@@ -132,6 +132,7 @@ class Directory(View):
             'topics': Topics(),
             'podcastlists': self.get_random_list(),
             'random_podcast': Podcast.objects.all().random().first(),
+            'podcast_ad': Podcast.objects.get_advertised_podcast(),
             })
 
 
@@ -143,25 +144,31 @@ class Directory(View):
 @cache_control(private=True)
 @vary_on_cookie
 def category(request, category, page_size=20):
-    category = category_for_tag(category)
-    if not category:
+    try:
+        category = Category.objects.get(tags__tag=category)
+    except Category.DoesNotExist:
         return HttpResponseNotFound()
 
-    # Make sure page request is an int. If not, deliver first page.
+    podcasts = category.entries.all()\
+                               .prefetch_related('podcast', 'podcast__slugs')
+
+    paginator = Paginator(podcasts, page_size)
+
+    page = request.GET.get('page')
     try:
-        page = int(request.GET.get('page', '1'))
-    except ValueError:
-        page = 1
+        podcasts = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        podcasts = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        podcasts = paginator.page(paginator.num_pages)
 
-    entries = category.get_podcasts( (page-1) * page_size, page*page_size )
-    podcasts = filter(None, entries)
-    num_pages = int(ceil(len(category.podcasts) / page_size))
-
-    page_list = get_page_list(1, num_pages, page, 15)
+    page_list = get_page_list(1, paginator.num_pages, podcasts.number, 15)
 
     return render(request, 'category.html', {
         'entries': podcasts,
-        'category': category.label,
+        'category': category.title,
         'page_list': page_list,
         })
 
@@ -174,7 +181,7 @@ RESULTS_PER_PAGE=20
 def search(request, template='search.html', args={}):
 
     if 'q' in request.GET:
-        q = request.GET.get('q', '').encode('utf-8')
+        q = request.GET.get('q', '')
 
         try:
             page = int(request.GET.get('page', 1))
@@ -230,7 +237,7 @@ def podcast_lists(request, page_size=20):
         page = paginator.num_pages
 
     num_pages = int(ceil(PodcastList.objects.count() / float(page_size)))
-    page_list = get_page_list(1, num_pages, page, 15)
+    page_list = get_page_list(1, num_pages, int(page), 15)
 
     return render(request, 'podcast_lists.html', {
         'lists': lists,
@@ -262,15 +269,12 @@ class MissingPodcast(View):
             except Podcast.DoesNotExist:
                 # check if we could add a podcast for the given URL
                 podcast = False
-                updater = PodcastUpdater()
-
                 try:
-                    can_add = updater.verify_podcast_url(url)
+                    can_add = verify_podcast_url(url)
 
-                except (ParserException, FetchFeedException,
-                        NoEpisodesException) as ex:
+                except (UpdatePodcastException, NoEpisodesException) as ex:
                     can_add = False
-                    messages.error(request, unicode(ex))
+                    messages.error(request, str(ex))
 
         return render(request, 'missing.html', {
                 'site': site,
@@ -316,8 +320,7 @@ class AddPodcastStatus(TemplateView):
             podcasts = result.get()
             messages.success(request, _('%d podcasts added' % len(podcasts)))
 
-        except (ParserException, FetchFeedException,
-                NoEpisodesException) as ex:
+        except (UpdatePodcastException, NoEpisodesException) as ex:
             messages.error(request, str(ex))
             podcast = None
 
@@ -375,7 +378,7 @@ class FlattrPodcastList(PodcastListView):
 
     def get_context_data(self, num=100):
         context = super(FlattrPodcastList, self).get_context_data()
-        context['flattr_auth'] = (self.request.user.is_authenticated()
+        context['flattr_auth'] = (self.request.user.is_authenticated
                    #  and bool(self.request.user.get_wksetting(FLATTR_TOKEN))
                         )
         return context

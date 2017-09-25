@@ -21,17 +21,19 @@ LIKE_BUTTON_STR = """<iframe class="fb_like" src="//www.facebook.com/plugins/lik
 # http://docs.djangoproject.com/en/dev/howto/custom-template-tags/#shortcut-for-simple-tags
 
 @register.simple_tag
+@mark_safe
 def fb_like_episode(episode, podcast):
     url = 'http://gpodder.net/%s' % get_episode_link_target(episode, podcast)
     s = LIKE_BUTTON_STR % dict(url=url)
-    return mark_safe(s)
+    return s
 
 
 @register.filter
+@mark_safe
 def fb_like_podcast(podcast):
     url = 'http://gpodder.net%s' % get_podcast_link_target(podcast)
     s = LIKE_BUTTON_STR % dict(url=url)
-    return mark_safe(s)
+    return s
 
 
 
@@ -57,6 +59,7 @@ def opengraph_episode(episode, podcast):
     return s
 
 @register.filter
+@mark_safe
 def opengraph_podcast(podcast):
     s = OPENGRAPH_STR % dict(
         title     = podcast.title,
@@ -66,4 +69,4 @@ def opengraph_podcast(podcast):
         site_name = 'gpodder.net',
         admins    = '0'
     )
-    return mark_safe(s)
+    return s

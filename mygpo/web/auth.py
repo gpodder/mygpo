@@ -1,30 +1,15 @@
-#
-# This file is part of my.gpodder.org.
-#
-# my.gpodder.org is free software: you can redistribute it and/or modify it
-# under the terms of the GNU Affero General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at your
-# option) any later version.
-#
-# my.gpodder.org is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
-# License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
-#
-
 from django.contrib.auth.backends import ModelBackend
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.conf import settings
-from django.contrib.sites.models import RequestSite
+from django.contrib.sites.requests import RequestSite
 from django.contrib.auth import get_user_model
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 
 class EmailAuthenticationBackend(ModelBackend):
+    """ Auth backend to enable login with email address as username """
+
     def authenticate(self, username=None, password=None):
         try:
             validate_email(username)
@@ -38,13 +23,6 @@ class EmailAuthenticationBackend(ModelBackend):
             return user if user.check_password(password) else None
 
         except ValidationError:
-            return None
-
-    def get_user(self, username):
-        User = get_user_model()
-        try:
-            return User.objects.get(username=username)
-        except User.DoesNotExist:
             return None
 
 

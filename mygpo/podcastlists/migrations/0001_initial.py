@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 from django.db import models, migrations
 import django.db.models.deletion
 from django.conf import settings
-import uuidfield.fields
 
 
 class Migration(migrations.Migration):
@@ -18,12 +17,18 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='PodcastList',
             fields=[
-                ('id', uuidfield.fields.UUIDField(max_length=32, serialize=False, primary_key=True)),
+                ('id', models.UUIDField(
+                    max_length=32,
+                    serialize=False,
+                    primary_key=True)),
                 ('title', models.CharField(max_length=512)),
                 ('slug', models.SlugField(max_length=128)),
                 ('created', models.DateTimeField()),
                 ('modified', models.DateTimeField()),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(
+                    to=settings.AUTH_USER_MODEL,
+                    on_delete=models.CASCADE,
+                )),
             ],
             options={
             },
@@ -32,13 +37,23 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='PodcastListEntry',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.AutoField(
+                    verbose_name='ID',
+                    serialize=False,
+                    auto_created=True,
+                    primary_key=True)),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('modified', models.DateTimeField(auto_now=True)),
                 ('order', models.PositiveSmallIntegerField()),
-                ('object_id', uuidfield.fields.UUIDField(max_length=32)),
-                ('content_type', models.ForeignKey(to='contenttypes.ContentType', on_delete=django.db.models.deletion.PROTECT)),
-                ('podcastlist', models.ForeignKey(related_name=b'entries', to='podcastlists.PodcastList')),
+                ('object_id', models.UUIDField(max_length=32)),
+                ('content_type', models.ForeignKey(
+                    to='contenttypes.ContentType',
+                    on_delete=django.db.models.deletion.CASCADE)),
+                ('podcastlist', models.ForeignKey(
+                    related_name='entries',
+                    to='podcastlists.PodcastList',
+                    on_delete=models.CASCADE,
+                )),
             ],
             options={
             },
@@ -46,7 +61,9 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='podcastlistentry',
-            unique_together=set([('podcastlist', 'order'), ('podcastlist', 'content_type', 'object_id')]),
+            unique_together=set([
+                ('podcastlist', 'order'),
+                ('podcastlist', 'content_type', 'object_id')]),
         ),
         migrations.AlterUniqueTogether(
             name='podcastlist',

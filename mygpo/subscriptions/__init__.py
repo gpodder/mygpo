@@ -1,18 +1,16 @@
 import collections
 
 from mygpo.users.models import Client
-from mygpo.subscriptions.models import (Subscription, SubscribedPodcast,
-    PodcastConfig, )
-from mygpo.history.models import HistoryEntry
+from mygpo.usersettings.models import UserSettings
+from mygpo.subscriptions.models import Subscription, SubscribedPodcast
+from mygpo.history.models import SUBSCRIPTION_ACTIONS, HistoryEntry
 
 import logging
 logger = logging.getLogger(__name__)
 
-
-SUBSCRIPTION_ACTIONS = (
-    HistoryEntry.SUBSCRIBE,
-    HistoryEntry.UNSUBSCRIBE,
-)
+# we cannot import models in __init__.py, because it gets loaded while all
+# apps are loaded; ideally all these methods would be moved into a different
+# (non-__init__) module
 
 
 def get_subscribe_targets(podcast, user):
@@ -22,7 +20,8 @@ def get_subscribe_targets(podcast, user):
     subscribed """
 
     clients = Client.objects.filter(user=user)\
-                            .exclude(subscription__podcast=podcast)\
+                            .exclude(subscription__podcast=podcast,
+                                     subscription__user=user)\
                             .select_related('sync_group')
 
     targets = set()
@@ -45,7 +44,7 @@ def get_subscribed_podcasts(user, only_public=False):
                                         .order_by('podcast')\
                                         .distinct('podcast')\
                                         .select_related('podcast')
-    private = PodcastConfig.objects.get_private_podcasts(user)
+    private = UserSettings.objects.get_private_podcasts(user)
 
     podcasts = []
     for subscription in subscriptions:
@@ -75,7 +74,7 @@ def get_subscription_history(user, client=None, since=None, until=None,
                                   .order_by('timestamp')
 
     if client:
-        logger.info('... client {client_uid}'.format(client_uid=client.uid))
+        logger.info(u'... client {client_uid}'.format(client_uid=client.uid))
         history = history.filter(client=client)
 
     if since:
@@ -88,7 +87,7 @@ def get_subscription_history(user, client=None, since=None, until=None,
 
     if public_only:
         logger.info('... only public')
-        private = PodcastConfig.objects.get_private_podcasts(user)
+        private = UserSettings.objects.get_private_podcasts(user)
         history = history.exclude(podcast__in=private)
 
     return history

@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 
 from django.contrib import admin
 
@@ -20,3 +20,5 @@ class HubSubscriptionAdmin(admin.ModelAdmin):
     list_filter = ('mode', 'verified', )
 
     search_fields = ('topic_url', 'podcast__title', 'hub_url', )
+
+    show_full_result_count = False

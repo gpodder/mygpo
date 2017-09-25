@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 
 from django.utils.html import format_html
 from django.utils.translation import ugettext as _
@@ -38,6 +38,8 @@ class URLAdmin(admin.ModelAdmin):
     list_display = ('url', 'content_type', 'object_id')
     list_filter = ('content_type', )
 
+    show_full_result_count = False
+
 
 class URLInline(GenericAdminLinkInline):
     model = URL
@@ -50,6 +52,8 @@ class SlugInline(GenericTabularInline):
 
 class TagInline(GenericTabularInline):
     model = Tag
+
+    raw_id_fields = ('user', )
 
 
 class MergedUUIDInline(GenericTabularInline):
@@ -77,9 +81,6 @@ class PodcastAdmin(admin.ModelAdmin):
     # configuration for the list view
     list_display = ('title', 'main_url', )
 
-    # fetch the podcast's URL for the fields in list_display
-    list_select_related = ('urls', )
-
     list_filter = ('language', )
     search_fields = ('title', 'twitter', '^urls__url', )
 
@@ -98,10 +99,11 @@ class PodcastAdmin(admin.ModelAdmin):
         }),
         ('Episodes', {
             'fields': ('common_episode_title', 'latest_episode_timestamp',
-                       'content_types', )
+                       'content_types', 'max_episode_order', 'episode_count', )
         }),
         ('Feed updates', {
-            'fields': ('outdated', 'new_location', 'last_update', )
+            'fields': ('outdated', 'new_location', 'last_update',
+                       'search_index_uptodate', 'search_vector', )
         }),
         ('Admin', {
             'fields': ('restrictions', 'hub', )
@@ -117,7 +119,10 @@ class PodcastAdmin(admin.ModelAdmin):
 
     raw_id_fields = ('related_podcasts', )
 
-    readonly_fields = ('id', 'created', 'last_update', )
+    readonly_fields = ('id', 'created', 'last_update',
+                       'search_index_uptodate', 'search_vector', )
+
+    show_full_result_count = False
 
     def main_url(self, podcast):
         url = podcast.urls.first()
@@ -134,9 +139,6 @@ class EpisodeAdmin(admin.ModelAdmin):
     # configuration for the list view
     list_display = ('title', 'podcast_title', 'main_url', )
 
-    # fetch the episode's podcast and URL for the fields in list_display
-    list_select_related = ('podcast', 'urls', )
-
     list_filter = ('language', )
     search_fields = ('title', '^urls__url')
 
@@ -144,7 +146,7 @@ class EpisodeAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': ('id', 'title', 'subtitle', 'description', 'link',
-                       'language', 'guid', 'released', 'podcast', )
+                       'language', 'guid', 'released', 'podcast', 'order', )
         }),
         ('Additional information', {
             'fields': ('created', 'license', 'flattr_url', 'author', 'content',
@@ -168,6 +170,8 @@ class EpisodeAdmin(admin.ModelAdmin):
 
     readonly_fields = ('id', 'created', 'last_update', )
 
+    show_full_result_count = False
+
     def podcast_title(self, episode):
         return episode.podcast.title
 
@@ -188,6 +192,8 @@ class PodcastGroupAdmin(admin.ModelAdmin):
         PodcastInline,
     ]
 
+    show_full_result_count = False
+
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
@@ -195,6 +201,6 @@ class TagAdmin(admin.ModelAdmin):
 
     list_display = ('tag', 'content_object', 'source', 'user', )
 
-    list_select_related = ('user', )
-
     list_filter = ('source', )
+
+    show_full_result_count = False

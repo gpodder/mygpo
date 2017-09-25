@@ -1,243 +1,249 @@
-.. _directory-api:
-
 Directory API
 =============
 
-The Directory API can be used to discover podcasts.
 
-TODO: report problems with podcasts (eg duplicates, missing data)
+.. _api-top-tags:
+
+Retrieve Top Tags
+-----------------
+
+..  http:get:: /api/2/tags/(int:count).json
+    :synopsis: Returns a list of the count most used tags.
+
+    * Does not require authentication
+    * Since 2.2
+
+    **Example response**:
+
+    .. sourcecode:: http
+
+        HTTP/1.1 200 OK
+
+        [
+          {
+           "title": "Technology",
+           "tag": "technology",
+           "usage": 530
+          },
+          {
+           "title": "Society & Culture",
+           "tag": "society-culture",
+           "usage": 420
+          },
+          {
+           "title": "Arts",
+           "tag": "arts",
+           "usage": 400
+          },
+          {
+           "title": "News & Politics",
+           "tag": "News & Politics",
+           "usage": 320
+          }
+        ]
+
+    :param count: number of tags to return
 
 
-Resources
----------
 
-The Directory API defines the following resources ::
+.. _api-podcasts-tag:
 
-    /search/podcasts
-    /directory/toplist
-    /directory/tags/latest
-    /directory/tag/{tag}
-    /user/{username}/suggestions
+Retrieve Podcasts for Tag
+-------------------------
+
+..  http:get:: /api/2/tag/(tag)/(int:count).json
+    :synopsis: Returns the most-subscribed podcasts that are tagged with tag.
+
+    * Does not require authentication
+    * Since 2.2
+
+    **Example response**:
+
+    .. sourcecode:: http
+
+        HTTP/1.1 200 OK
+
+        [
+         {"url": "http://leo.am/podcasts/floss",
+          "title": "FLOSS Weekly",
+          "description": "Each Thursday we talk about Free Libre and Open Source Software with the people who are writing it. Part of the TWiT Netcast Network.",
+          "subscribers": 1138,
+          "logo_url: "http://leoville.tv/podcasts/coverart/floss144audio.jpg",
+          "website": "http://twit.tv/",
+          "mygpo_link": "http://gpodder.net/podcast/12925"},
+
+         {"url": "http://leo.am/podcasts/twit",
+          "title": "this WEEK in TECH - MP3 Edition",
+          "description": "Your first podcast of the week is the last word in tech. [...]",
+          "subscribers": 895,
+          "logo_url": "http://leoville.tv/podcasts/coverart/twit144audio.jpg",
+          "website": "http://thisweekintech.com/",
+          "mygpo_link": "http://thisweekintech.com/"}
+        ]
+
+    :param tag: URL-encoded tag
+    :param count: maximum number of podcasts to return
+
+
+
+.. _api-podcast-data:
+
+Retrieve Podcast Data
+---------------------
+
+.. http:get:: /api/2/data/podcast.json
+
+    Returns information for the podcast with the given URL or 404 if there is
+    no podcast with this URL.
+
+    * No authentication required
+    * Since 2.2
+
+    .. sourcecode:: http
+
+        HTTP/1.1 200 OK
+
+        {
+         "website": "http://coverville.com",
+         "mygpo_link": "http://www.gpodder.net/podcast/16124",
+         "description": "The best cover songs, delivered to your ears two to three times a week!",
+         "subscribers": 19,
+         "title": "Coverville",
+         "url": "http://feeds.feedburner.com/coverville",
+         "subscribers_last_week": 19,
+         "logo_url": "http://www.coverville.com/art/coverville_iTunes300.jpg"
+        }
+
+    ::query url: the feed URL of the podcast
+
+
+.. _api-episode-data:
+
+Retrieve Episode Data
+---------------------
+
+.. http:get:: /api/2/data/episode.json
+
+    Returns information for the episode with the given {episode-url} that
+    belongs to the podcast with the {podcast-url}
+
+    * Does not require authentication
+    * Since 2.2 (added released in 2.6)
+
+    **Example response**:
+
+    .. sourcecode:: http
+
+        HTTP/1.1 200 OK
+
+        {
+         "title": "TWiT 245: No Hitler For You",
+         "url": "http://www.podtrac.com/pts/redirect.mp3/aolradio.podcast.aol.com/twit/twit0245.mp3",
+         "podcast_title": "this WEEK in TECH - MP3 Edition",
+         "podcast_url": "http://leo.am/podcasts/twit",
+         "description": "[...]",
+         "website": "http://www.podtrac.com/pts/redirect.mp3/aolradio.podcast.aol.com/twit/twit0245.mp3",
+         "released": "2010-12-25T00:30:00",
+         "mygpo_link": "http://gpodder.net/episode/1046492"
+        }
+
+    ::query podcast-url: feed URL of the podcast to which the episode belongs
+    ::query episode-url: media URL of the episode
 
 
 Podcast Toplist
 ---------------
 
-The podcast toplist ranks podcasts by their number of subscribers.
+..  http:get:: /toplist/(int:number).(format)
+    :synopsis: Get list of most popular podcasts
+
+    * Does not require authentication (public content)
+    * Since 1.0
+
+    **Example request**:
+
+    .. sourcecode:: http
+
+        GET /toplist/50.json
+
+    **Example response**:
+
+    .. sourcecode:: http
+
+        HTTP/1.1 200 OK
+
+        [
+         {
+           "website": "http://linuxoutlaws.com/podcast",
+           "description": "Open source talk with a serious attitude",
+           "title": "Linux Outlaws",
+           "url": "http://feeds.feedburner.com/linuxoutlaws",
+           "position_last_week": 0,
+           "subscribers_last_week": 1736,
+           "subscribers": 1736,
+           "mygpo_link": "http://www.gpodder.net/podcast/11092",
+           "logo_url": "http://linuxoutlaws.com/files/albumart-itunes.jpg"
+         },
+         {
+           "website": "http://syndication.mediafly.com/redirect/show/d581e9b773784df7a56f37e1138c037c",
+           "description": "We're not talking dentistry here; FLOSS all about Free Libre Open Source Software. Join hosts Randal Schwartz and Leo Laporte every Saturday as they talk with the most interesting and important people in the Open Source and Free Software community.",
+           "title": "FLOSS Weekly Video (large)",
+           "url": "http://feeds.twit.tv/floss_video_large",
+           "position_last_week": 0,
+           "subscribers_last_week": 50,
+           "subscribers": 50,
+           "mygpo_link": "http://www.gpodder.net/podcast/31991",
+           "logo_url": "http://static.mediafly.com/publisher/images/06cecab60c784f9d9866f5dcb73227c3/icon-150x150.png"
+         }]
+
+    :query jsonp: a functionname on which the response is wrapped (only valid
+                  for format ``jsonp``; since 2.8)
+    :query scale_logo: returns logo URLs to scaled images, see below.
+    :param number: maximum number of podcasts to return
+    :param format: see :ref:`formats`
 
 
-Parameters
-^^^^^^^^^^
+    The number field might be any value in the range 1..100 (inclusive both
+    boundaries).
 
-* **lang**: a ISO 639-1 (two-letter) language code. If given, only podcasts in
-  this language are returned. If omitted, no language restriction is made.
+    For the JSON and XML formats, an optional paramter scale_logo={size} can be
+    passed, which provides a link to a scaled logo (scaled_logo_url) for each
+    podcast. size has to be a positive number up to 256 and defaults to 64.
 
-Request
-^^^^^^^
+    The OPML and TXT formats do not add any information about the (absolute and
+    relative) popularity for each podcast, only the ordering can be
+    considered. The JSON format includes a more detailed list, usable for
+    clients that want to display a detailed toplist or post-process the
+    toplist:
 
-Get the toplist ::
-
-    GET /directory/toplist{?lang:2}
-    Content-Tpe: application/json
-
-
-Response
-^^^^^^^^
-
-The response contains a ``toplist`` member which has a list of
-:ref:`podcast-type` objects. The first entry in the list represents the highest
-ranking podcast in the toplist. If a ``lang`` parameter was included in the
-request, it is also included in the response. ::
-
-    200 OK
-    Content-Tpe: application/json
-
-    {
-        "toplist": [
-            podcast1,
-            podcast2,
-            podcast3,
-            ...
-        ],
-        "lang": "en"
-    }
+    All shown keys must be provided by the server. The description field may be
+    set to the empty string in case a description is not available. The title
+    field may be set to the URL in case a title is not available. The
+    subscribers_last_week field may be set to zero if no data is available. The
+    client can use the subscribers_last_week counts to re-sort the list and get
+    a ranking for the last week. With this information, a relative "position
+    movement" can also be calculated if the developer of the client decides to
+    do so.
 
 
 Podcast Search
 --------------
 
-Parameters
-^^^^^^^^^^
+.. http:get:: /search.(format)
 
-* **q**: query string (mandatory)
+    Carries out a service-wide search for podcasts that match the given query.
+    Returns a list of podcasts. See :ref:`formats` for details on the response
+    formats.
 
+    * Does not require authentication (public content)
+    * Since 2.0
 
-Request
-^^^^^^^
-
-The search query is provided as a GET parameter. ::
-
-    GET /search/podcasts{?q}
-    Content-Tpe: application/json
-
-
-Responses
-^^^^^^^^^
-
-If the search could be performed, the search results (if any) are returned in
-the ``search`` member. The query is returned in the ``query`` member. ::
-
-    200 OK
-    Content-Type: application/json
-
-    {
-        "search": [
-            podcast1,
-            podcast2,
-            ...
-        ],
-        "query": "query text"
-    }
-
-
-If the search could not be performed, for example because the query was
-missing ::
-
-    400 Bad Request
-    Content-Type: application/json
-
-    {
-        "message": "parameter q missing",
-        "errors": [
-            {
-                field: "?q",
-                code: "parameter_missing"
-            }
-        ]
-    }
-
-
-Example
-^^^^^^^
-
-Example::
-
-    GET /search/podcasts?q=linux
-    Content-Tpe: application/json
-
-
-    200 OK
-    Content-Tpe: application/json
-
-    {
-        "search": [
-            { "url": "http://example.com/feed.rss", ...},
-            { ... },
-            ...
-        ],
-        "query": "linux"
-    }
-
-
-
-Latest Tags
------------
-
-The "Latest Tags" endpoint returns *current* tags. Those are tags for which
-podcasts have recently published a new episode.
-
-Parameters
-^^^^^^^^^^
-
-* **num**: number of tags to return (optional, default: 10)
-
-
-Request
-^^^^^^^
-
-The number of tags to return can be included in the request. ::
-
-    GET /directory/tags/latest{?num}
-    Content-Tpe: application/json
-
-
-Reponse
-^^^^^^^
-
-In the ``tags`` member a list of :ref:`tag-type` objects is provided. ::
-
-    200 OK
-    Content-Tpe: application/json
-    Link: <https://api.gpodder.net/3/directory/tag/{label}>; rel="https://api.gpodder.net/3/relation/tag-podcasts"; title="Podcasts for tag {label}"
-
-    {
-        "tags": [
-            { "label": "Technology" },
-            { ... },
-            ...
-        ]
-    }
-
-Clients can use the provided ``Link`` header and resolve the `URI template
-<http://tools.ietf.org/html/rfc6570>`_ to obtain the URL for retrieving the
-podcasts of a certain tag.
-
-
-Podcasts for Tag
-----------------
-
-Clients can retrieve podcasts for a given tag.
-
-
-Request
-^^^^^^^
-
-Request. ::
-
-    GET /directory/tag/{tag}
-    Content-Tpe: application/json
-
-
-Response
-^^^^^^^^
-
-Response. ::
-
-    200 OK
-    Content-Tpe: application/json
-
-    TODO: body
-
-
-Podcast Suggestions
--------------------
-
-Clients can retrieve suggested podcasts for the current user.
-
-
-Request
-^^^^^^^
-
-Request. ::
-
-    GET /user/{username}/suggestions
-    Content-Tpe: application/json
-
-
-
-Response
-^^^^^^^^
-
-The response contains a ``suggestions`` member which has a list of
-:ref:`podcast-type` objects. ::
-
-    200 OK
-    Content-Tpe: application/json
-
-    {
-        "suggestions": [
-            { podcast1 },
-            { podcast2 },
-            ...
-        ]
-    }
+    :query q: search query
+    :query jsonp: used to wrap the JSON results in a function call (JSONP); the
+                   value of this parameter is the name of the function; since
+                   2.8
+    :query scale_logo: when set, the results (only JSON and XML formats)
+                       include links to the podcast logos that are scaled to
+                       the requested size. The links are provided in the
+                       scaled_logo_url field; since 2.9
+    :param format: see :ref:`formats`

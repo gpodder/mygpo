@@ -1,20 +1,3 @@
-#
-# This file is part of my.gpodder.org.
-#
-# my.gpodder.org is free software: you can redistribute it and/or modify it
-# under the terms of the GNU Affero General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at your
-# option) any later version.
-#
-# my.gpodder.org is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
-# License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
-#
-
 from datetime import datetime
 
 from django.http import HttpResponse
@@ -62,10 +45,10 @@ def upload(request):
 
     podcast_urls = [p['url'] for p in i.items]
     podcast_urls = map(normalize_feed_url, podcast_urls)
-    podcast_urls = filter(None, podcast_urls)
+    podcast_urls = list(filter(None, podcast_urls))
 
     new = [u for u in podcast_urls if u not in existing_urls]
-    rem = [u for e in existing_urls if u not in podcast_urls]
+    rem = [u for u in existing_urls if u not in podcast_urls]
 
     #remove duplicates
     new = list(set(new))

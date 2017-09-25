@@ -9,10 +9,10 @@
 {% block mainmenu %}{{ "/history/"|main_menu }}{% endblock %}
 {% block sectionmenu %}{{ "/history/"|section_menu }}{% endblock %}
 
-{% block title %}{% trans "Subscription and Episode History" %}{% if client %} {% trans "for" %} {{ client.name|striptags }}{% endif %}{% endblock %}
+{% block title %}{% trans "Subscription History" %}{% if client %} {% trans "for" %} {{ client.name|striptags }}{% endif %}{% endblock %}
 
 {% block header %}
-<h1>{% trans "Subscription and Episode History" %}{% if client %} {% trans "for" %} {{ client.name|striptags }}{% endif %}</h1>
+<h1>{% trans "Subscription History" %}{% if client %} {% trans "for" %} {{ client.name|striptags }}{% endif %}</h1>
 {% endblock %}
 
 

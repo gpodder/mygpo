@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 from django.db import models, migrations
 from django.conf import settings
@@ -19,18 +19,27 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('timestamp', models.DateTimeField()),
-                ('action', models.CharField(max_length=11, choices=[(b'subscribe', b'subscribed'), (b'unsubscribe', b'unsubscribed')])),
-                ('client', models.ForeignKey(to='users.Client')),
-                ('podcast', models.ForeignKey(to='podcasts.Podcast')),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('action', models.CharField(max_length=11, choices=[('subscribe', 'subscribed'), ('unsubscribe', 'unsubscribed')])),
+                ('client', models.ForeignKey(
+                    to='users.Client',
+                    on_delete=models.CASCADE,
+                )),
+                ('podcast', models.ForeignKey(
+                    to='podcasts.Podcast',
+                    on_delete=models.CASCADE,
+                )),
+                ('user', models.ForeignKey(
+                    to=settings.AUTH_USER_MODEL,
+                    on_delete=models.CASCADE,
+                )),
             ],
             options={
-                'ordering': [b'timestamp'],
+                'ordering': ['timestamp'],
             },
             bases=(models.Model,),
         ),
         migrations.AlterIndexTogether(
             name='historyentry',
-            index_together=set([(b'user', b'podcast'), (b'user', b'client')]),
+            index_together=set([('user', 'podcast'), ('user', 'client')]),
         ),
     ]

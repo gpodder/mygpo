@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 from django.db import models, migrations
 
@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterUniqueTogether(
             name='publishedpodcast',
-            unique_together=set([(b'publisher', b'podcast')]),
+            unique_together=set([('publisher', 'podcast')]),
         ),
     ]

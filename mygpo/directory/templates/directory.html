@@ -5,7 +5,6 @@
 {% load charts %}
 {% load math %}
 {% load utils %}
-{% load cache %}
 
 {% load menu %}
 {% block mainmenu %}{{ "/directory/"|main_menu }}{% endblock %}
@@ -19,7 +18,6 @@
 
 
 {% block content %}
-  {% cache 60 topics %}
   {% for c in topics.categories %}
 
    {% if forloop.counter0|divisibleby:"2" %}
@@ -31,14 +29,14 @@
      {% url "user" c.username as user-lists-url %}
      <h2>{% blocktrans with c.title as listtitle and c.username as username %}{{ listtitle }} <span class="by-user">by <a href="{{ user-lists-url }}">{{ username }}</a></span>{% endblocktrans %}</h2>
     {% else %}
-     <h2>{{ c.label }}</h2>
+     <h2>{{ c.title }}</h2>
     {% endif %}
 
     <table class="list">
-     {% for podcast in c.get_podcasts %}
+     {% for entry in c.podcasts|slice:":10" %}
       <tr>
-       <td class="logo">{{ podcast|podcast_logo }}</td>
-       <td>{% podcast_group_link podcast %}</td>
+       <td class="logo">{{ entry.podcast|podcast_logo }}</td>
+       <td>{% podcast_group_link entry.podcast %}</td>
       </tr>
      {% endfor %}
      <tr>
@@ -47,7 +45,7 @@
        {% if c.cls == "PodcastList" %}
         <a href="{% url "list-show" c.username c.slug %}">{% trans "more..." %}</a>
        {% else %}
-        <a href="{% url "directory" c.label %}">{% trans "more..." %}</a>
+        <a href="{% url "directory" c.clean_title %}">{% trans "more..." %}</a>
        {% endif %}
       <td></td>
      </tr>
@@ -59,25 +57,24 @@
    {% endif %}
 
   {% endfor %}
-  {% endcache %}
 
   <hr style="clear: both;"/>
 
-  {% cache 60 tagcloud %}
   <div id="tagcloud">
-   {% for tag in topics.tagcloud %}
-    <span style="font-size: {% smartwidthratio tag.get_weight topics.min_weight topics.max_weight 4 1 %}em">
-     <a href="{% url "directory" tag.label %}">{{ tag.label }}</a>
+   {% for category in topics.tagcloud %}
+    <span style="font-size: {% smartwidthratio category.num_entries topics.min_entries topics.max_entries 4 1 %}em">
+     <a href="{% url "directory" category.clean_title %}">{{ category.title }}</a>
     </span>
    {% endfor %}
   </div>
-  {% endcache %}
 {% endblock %}
 
 
 {% block sidebar %}
 
-  {% cache 3600 podcastlist %}
+ {% include "podcast-ad-box.html" with podcast_ad=podcast_ad only %}
+
+
   {% for podcastlist in podcastlists %}
    {% if podcastlist and podcastlist.user.username %}
     <div class="well">
@@ -115,9 +112,8 @@
    </div>
    {% endif %}
   {% endfor %}
- {% endcache %}
 
-  {% cache 3600 random_podcast_box %}
+ {% if random_podcast %}
    <div class="well">
 
    <h4><small>{% trans "Random" %}</small></h4>
@@ -138,7 +134,7 @@
    </p>
 
    </div>
- {% endcache %}
+ {% endif %}
 
 {% endblock %}
 

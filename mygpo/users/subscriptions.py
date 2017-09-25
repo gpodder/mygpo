@@ -1,9 +1,5 @@
-import collections
-from operator import itemgetter
-
-from mygpo.utils import linearize
 from mygpo.podcasts.models import Podcast
-from mygpo.db.couchdb.user import get_num_listened_episodes
+from mygpo.history.stats import played_episode_counts
 
 
 class PodcastSorter(object):
@@ -52,9 +48,9 @@ class PodcastPercentageListenedSorter(PodcastSorter):
 
         SORT_KEY = lambda podcast: podcast.percent_listened
 
-        counts = dict(get_num_listened_episodes(self.user))
+        counts = played_episode_counts(self.user)
         for podcast in self.podcasts:
-            c = counts.get(podcast.get_id(), 0)
+            c = counts.get(podcast.id, 0)
             if podcast.episode_count:
                 podcast.percent_listened = c / float(podcast.episode_count)
                 podcast.episodes_listened = c

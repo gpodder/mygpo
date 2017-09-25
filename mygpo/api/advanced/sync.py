@@ -1,26 +1,8 @@
-#
-# This file is part of my.gpodder.org.
-#
-# my.gpodder.org is free software: you can redistribute it and/or modify it
-# under the terms of the GNU Affero General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at your
-# option) any later version.
-#
-# my.gpodder.org is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
-# License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
-#
-
 from django.http import HttpResponseBadRequest, HttpResponseNotFound
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 
 from mygpo.decorators import allowed_methods, cors_origin
-from mygpo.core.json import JSONDecodeError
 from mygpo.utils import parse_request_body
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.api.httpresponse import JsonResponse
@@ -43,7 +25,7 @@ def main(request, username):
     else:
         try:
             actions = parse_request_body(request)
-        except JSONDecodeError as e:
+        except ValueError as e:
             return HttpResponseBadRequest(str(e))
 
         synclist = actions.get('synchronize', [])
@@ -97,7 +79,7 @@ def update_sync_status(user, synclist, stopsync):
 
         # Setup all devices to sync with the first in the list
         uid = devlist[0]
-        dev = user.get_device_by_uid(uid)
+        dev = user.client_set.get(uid=uid)
 
         for other_uid in devlist[1:]:
             other = user.get_device_by_uid(other_uid)

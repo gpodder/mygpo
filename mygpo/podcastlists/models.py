@@ -1,15 +1,14 @@
 from django.db import models
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes import generic
-
-from uuidfield import UUIDField
+from django.contrib.contenttypes.fields import GenericForeignKey
 
 from mygpo.core.models import UpdateInfoModel, OrderedModel, UUIDModel
 from mygpo.podcasts.models import Podcast
 from mygpo.flattr import FlattrThing
 from mygpo.votes.models import VoteMixin
+from mygpo.utils import set_ordered_entries
 
 
 class PodcastList(UUIDModel, VoteMixin, UpdateInfoModel):
@@ -41,7 +40,7 @@ class PodcastList(UUIDModel, VoteMixin, UpdateInfoModel):
 
     def add_entry(self, obj):
         entry, created = PodcastListEntry.objects.get_or_create(
-            podcastlist=podcastlist,
+            podcastlist=self,
             content_type=ContentType.objects.get_for_model(obj),
             object_id=obj.id,
             defaults={
@@ -54,13 +53,19 @@ class PodcastList(UUIDModel, VoteMixin, UpdateInfoModel):
         return FlattrThing(
                 url = reverse('list-show', args=[username, self.slug]),
                 title = self.title,
-                description = u'A collection of podcasts about "%s" by %s user %s' % (self.title, domain, username),
-                category = u'audio',
+                description = 'A collection of podcasts about "%s" by %s user %s' % (self.title, domain, username),
+                category = 'audio',
                 hidden = None,
                 tags = None,
                 language = None,
             )
 
+    def set_entries(self, podcasts):
+        """ Updates the list to include the given podcast, removes others """
+
+        existing = {e.content_object: e for e in self.entries.all()}
+        set_ordered_entries(self, podcasts, existing, PodcastListEntry,
+                            'content_object', 'podcastlist')
 
 
 class PodcastListEntry(UpdateInfoModel, OrderedModel):
@@ -73,11 +78,11 @@ class PodcastListEntry(UpdateInfoModel, OrderedModel):
                                    )
 
     # the object (Podcast or PodcastGroup) that is in the list
-    content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
-    object_id = UUIDField()
-    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.UUIDField()
+    content_object = GenericForeignKey('content_type', 'object_id')
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         unique_together = [
             ('podcastlist', 'order'),
             ('podcastlist', 'content_type', 'object_id'),

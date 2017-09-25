@@ -4,15 +4,15 @@
 #  based on flattr.py from gPodder by Bernd Schlapsi <brot@gmx.info>
 #
 
-import urllib
-import urllib2
-import urlparse
+import json
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
+import urllib.parse
 from collections import namedtuple
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
-from mygpo.core.json import json
 from mygpo.users.settings import FLATTR_TOKEN, FLATTR_USERNAME
 from mygpo import utils
 from django.utils.translation import ugettext as _
@@ -55,21 +55,21 @@ class Flattr(object):
             # Inject username and password into the request URL
             url = utils.url_add_authentication(url, settings.FLATTR_KEY,
                     settings.FLATTR_SECRET)
-        elif self.user.profile.get_setting('flattr_token', ''):
-            headers['Authorization'] = 'Bearer ' + self.user.profile.get_wksetting(FLATTR_TOKEN)
+        elif self.user.profile.settings.get_setting('flattr_token', ''):
+            headers['Authorization'] = 'Bearer ' + self.user.profile.settings.get_wksetting(FLATTR_TOKEN)
 
         if data is not None:
-            data = json.dumps(data)
+            data = json.dumps(data).encode('utf-8')
 
         try:
             response = utils.urlopen(url, headers, data)
-        except urllib2.HTTPError, error:
+        except urllib.error.HTTPError as error:
             return {'_gpodder_statuscode': error.getcode()}
-        except urllib2.URLError, error:
+        except urllib.error.URLError as error:
             return {'_gpodder_no_connection': False}
 
         if response.getcode() == 200:
-            return json.loads(response.read())
+            return json.loads(response.read().decode('utf-8'))
 
         return {'_gpodder_statuscode': response.getcode()}
 
@@ -80,11 +80,11 @@ class Flattr(object):
         }
 
     def has_token(self):
-        return bool(self.user.profile.get_wksetting(FLATTR_TOKEN))
+        return bool(self.user.profile.settings.get_wksetting(FLATTR_TOKEN))
 
     def process_retrieved_code(self, url):
-        url_parsed = urlparse.urlparse(url)
-        query = urlparse.parse_qs(url_parsed.query)
+        url_parsed = urllib.parse.urlparse(url)
+        query = urllib.parse.parse_qs(url_parsed.query)
 
         if 'code' in query:
             code = query['code'][0]
@@ -114,17 +114,17 @@ class Flattr(object):
             flattrs ... The number of Flattrs this thing received
             flattred ... True if this user already flattred this thing
         """
-        if not self.user.profile.get_wksetting(FLATTR_TOKEN):
+        if not self.user.profile.settings.get_wksetting(FLATTR_TOKEN):
             return (0, False)
 
-        quote_url = urllib.quote_plus(utils.sanitize_encoding(payment_url))
+        quote_url = urllib.parse.quote_plus(payment_url)
         url = self.THING_INFO_URL_TEMPLATE % {'url': quote_url}
         data = self.request(url)
         return (int(data.get('flattrs', 0)), bool(data.get('flattred', False)))
 
 
     def get_auth_username(self):
-        if not self.user.profile.get_wksetting(FLATTR_TOKEN):
+        if not self.user.profile.settings.get_wksetting(FLATTR_TOKEN):
             return ''
 
         data = self.request(self.USER_INFO_URL)
@@ -165,7 +165,7 @@ class Flattr(object):
     def get_autosubmit_url(self, thing):
         """ returns the auto-submit URL for the given FlattrThing """
 
-        publish_username = self.user.profile.get_wksetting(FLATTR_USERNAME)
+        publish_username = self.user.profile.settings.get_wksetting(FLATTR_USERNAME)
 
         if not publish_username:
             return None
@@ -177,14 +177,14 @@ class Flattr(object):
 
         optional_args = set(thing._fields) - set(['url'])
 
-        args = [(u'url', self.domain + thing.url)]
+        args = [('url', self.domain + thing.url)]
         args += [(arg, getattr(thing, arg, None)) for arg in optional_args]
-        args = filter(lambda (k, v): v, args)  # filter out empty arguments
+        args = filter(lambda kv: kv[1], args)  # filter out empty arguments
 
         # TODO: check encoding
         args = [(k, v.encode('utf-8')) for (k, v) in args]
 
-        args_str = urllib.urlencode(args)
+        args_str = urllib.parse.urlencode(args)
 
         autosubmit = URL_TEMPLATE + '&' + args_str
 

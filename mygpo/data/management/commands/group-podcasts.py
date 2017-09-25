@@ -3,18 +3,26 @@ from django.core.management.base import BaseCommand
 from mygpo.podcasts.models import Podcast
 
 
+def pairwise(t):
+    it = iter(t)
+    return zip(it,it)
+
+
 class Command(BaseCommand):
+
+    def add_arguments(self, parser):
+        parser.add_argument('title')
+        parser.add_argument('url1')
+        parser.add_argument('name1')
+        parser.add_argument('url2')
+        parser.add_argument('name2')
+
     def handle(self, *args, **options):
-
-        if len(args) != 5:
-            print 'Usage: ./manage.py group-podcasts <url1> <url2> <group-name> <name1> <name2>'
-            return
-
-        p1_url = args[0]
-        p2_url = args[1]
-        group_title = args[2]
-        myname = args[3]
-        othername = args[4]
+        p1_url = options['url1']
+        p2_url = options['url2']
+        group_title = options['title']
+        myname = options['name1']
+        othername = options['name2']
 
         p1 = Podcast.objects.get(urls__url=p1_url)
         p2 = Podcast.objects.get(urls__url=p2_url)

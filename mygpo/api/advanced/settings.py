@@ -1,104 +1,63 @@
-#
-# This file is part of my.gpodder.org.
-#
-# my.gpodder.org is free software: you can redistribute it and/or modify it
-# under the terms of the GNU Affero General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at your
-# option) any later version.
-#
-# my.gpodder.org is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
-# License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
-#
+import json
 
-from django.http import HttpResponseBadRequest, Http404, HttpResponseNotFound
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.cache import never_cache
 from django.shortcuts import get_object_or_404
 
-from mygpo.decorators import allowed_methods, cors_origin
+from mygpo.api import APIView, RequestException
 from mygpo.podcasts.models import Podcast, Episode
-from mygpo.utils import parse_request_body
-from mygpo.api.basic_auth import require_valid_user, check_username
+from mygpo.usersettings.models import UserSettings
 from mygpo.api.httpresponse import JsonResponse
-from mygpo.users.models import Client
-from mygpo.db.couchdb import get_userdata_database
-from mygpo.db.couchdb.episode_state import episode_state_for_user_episode
 
 
-@csrf_exempt
-@require_valid_user
-@check_username
-@never_cache
-@allowed_methods(['GET', 'POST'])
-@cors_origin()
-def main(request, username, scope):
+class SettingsAPI(APIView):
+    """ Settings API
 
-    udb = get_userdata_database()
+    wiki.gpodder.org/wiki/Web_Services/API_2/Settings """
 
-    def user_settings(user):
-        return user, user, None
+    def get(self, request, username, scope):
+        """ Get settings for scope object """
+        user = request.user
+        scope = self.get_scope(request, scope)
+        settings = UserSettings.objects.get_for_scope(user, scope)
+        return JsonResponse(settings.as_dict())
 
-    def device_settings(user, uid):
-        device = user.get_device_by_uid(uid)
+    def post(self, request, username, scope):
+        """ Update settings for scope object """
+        user = request.user
+        scope = self.get_scope(request, scope)
+        actions = self.parsed_body(request)
+        settings = UserSettings.objects.get_for_scope(user, scope)
+        resp = self.update_settings(settings, actions)
+        return JsonResponse(resp)
 
-        # get it from the user directly so that changes
-        # to settings_obj are reflected in user (bug 1344)
-        settings_obj = user.get_device_by_uid(uid)
+    def get_scope(self, request, scope):
+        """ Get the scope object """
+        if scope == 'account':
+            return None
 
-        return user, settings_obj, None
+        if scope == 'device':
+            uid = request.GET.get('device', '')
+            return request.user.client_set.get(uid=uid)
 
-    def podcast_settings(user, url):
-        podcast = get_object_or_404(Podcast, urls__url=url)
-        # TODO: fix
-        return None, None, None
+        episode_url = request.GET.get('episode', '')
+        podcast_url = request.GET.get('podcast', '')
 
-    def episode_settings(user, url, podcast_url):
-        try:
-            episode = Episode.objects.filter(podcast__urls__url=podcast_url,
-                                             urls__url=url).get()
-        except Episode.DoesNotExist:
-            raise Http404
+        if scope == 'podcast':
+            return get_object_or_404(Podcast, urls__url=podcast_url)
 
-        episode_state = episode_state_for_user_episode(user, episode)
-        return episode_state, episode_state, udb
+        if scope == 'episode':
+            podcast = get_object_or_404(Podcast, urls__url=podcast_url)
+            return get_object_or_404(Episode, podcast=podcast,
+                                     urls__url=episode_url)
 
-    models = dict(
-            account = lambda: user_settings(request.user),
-            device  = lambda: device_settings(request.user, request.GET.get('device', '')),
-            podcast = lambda: podcast_settings(request.user, request.GET.get('podcast', '')),
-            episode = lambda: episode_settings(request.user, request.GET.get('episode', ''), request.GET.get('podcast', ''))
-        )
+        raise RequestException('undefined scope %s' % scope)
 
+    def update_settings(self, settings, actions):
+        """ Update the settings according to the actions """
+        for key, value in actions.get('set', {}).items():
+            settings.set_setting(key, value)
 
-    if scope not in models.keys():
-        return HttpResponseBadRequest('undefined scope %s' % scope)
+        for key in actions.get('remove', []):
+            settings.del_setting(key)
 
-    try:
-        base_obj, settings_obj, db = models[scope]()
-    except Client.DoesNotExist as e:
-        return HttpResponseNotFound(str(e))
-
-    if request.method == 'GET':
-        return JsonResponse( settings_obj.settings )
-
-    elif request.method == 'POST':
-        actions = parse_request_body(request)
-        ret = update_settings(settings_obj, actions)
-        db.save_doc(base_obj)
-        return JsonResponse(ret)
-
-
-def update_settings(obj, actions):
-    for key, value in actions.get('set', {}).iteritems():
-        obj.settings[key] = value
-
-    for key in actions.get('remove', []):
-        if key in obj.settings:
-            del obj.settings[key]
-
-    return obj.settings
+        settings.save()
+        return settings.as_dict()

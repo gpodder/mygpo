@@ -1,4 +1,3 @@
-import uuid
 import re
 
 from django import forms
@@ -9,12 +8,12 @@ from django.http import HttpResponseRedirect
 from django.views.generic.edit import FormView
 from django.utils.translation import ugettext as _
 from django.template.loader import render_to_string
-from django.core.urlresolvers import reverse, reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.views.generic import TemplateView
-from django.views.generic.base import View
+from django.views import View
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.sites.requests import RequestSite
 
 from mygpo.utils import random_token
 from mygpo.users.models import UserProxy
@@ -22,14 +21,31 @@ from mygpo.users.models import UserProxy
 
 USERNAME_MAXLEN = get_user_model()._meta.get_field('username').max_length
 
-USERNAME_REGEX = re.compile(r'^\w[\w.+-]*$')
+
+class DuplicateUsername(ValidationError):
+    """ The username is already in use """
+
+    def __init__(self, username):
+        self.username = username
+        super().__init__('The username {0} is already in use.'
+                         .format(username))
+
+
+class DuplicateEmail(ValidationError):
+    """ The email address is already in use """
+
+    def __init__(self, email):
+        self.email = email
+        super().__init__('The email address {0} is already in use.'
+                         .format(email))
 
 
 class UsernameValidator(RegexValidator):
     """ Validates that a username uses only allowed characters """
-    regex = USERNAME_REGEX
+    regex = r'^\w[\w.+-]*$'
     message = 'Invalid Username'
-    code='invalid-username'
+    code = 'invalid-username'
+    flags = re.ASCII
 
 
 class RegistrationForm(forms.Form):
@@ -78,18 +94,45 @@ class RegistrationView(FormView):
     def create_user(self, form):
         User = get_user_model()
         user = User()
-        user.username = form.cleaned_data['username']
-        user.email = form.cleaned_data['email']
+        username = form.cleaned_data['username']
+
+        self._check_username(username)
+        user.username = username
+
+        email_addr = form.cleaned_data['email']
+        user.email = email_addr
+
         user.set_password(form.cleaned_data['password1'])
         user.is_active = False
         user.full_clean()
-        user.save()
 
-        user.profile.uuid == uuid.uuid1()
+        try:
+            user.save()
+
+        except IntegrityError as e:
+            if 'django_auth_unique_email' in str(e):
+                # this was not caught by the form validation, but now validates
+                # the DB's unique constraint
+                raise DuplicateEmail(email_addr) from e
+            else:
+                raise
+
         user.profile.activation_key = random_token()
         user.profile.save()
 
         return user
+
+    def _check_username(self, username):
+        """ Check if the username is already in use
+
+        Until there is a case-insensitive constraint on usernames, it is
+        necessary to check for existing usernames manually. This is not a
+        perfect solution, but the chance that two people sign up with the same
+        username at the same time is low enough. """
+        UserModel = get_user_model()
+        users = UserModel.objects.filter(username__iexact=username)
+        if users.exists():
+            raise DuplicateUsername(username)
 
 
 class ActivationView(TemplateView):
@@ -171,7 +214,7 @@ def send_activation_email(user, request):
     subj = subj.strip()
 
     msg = render_to_string('registration/activation_email.txt', {
-        'site': get_current_site(request),
+        'site': RequestSite(request),
         'activation_key': user.profile.activation_key,
     })
     user.email_user(subj, msg)

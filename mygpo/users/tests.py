@@ -1,30 +1,14 @@
-#
-# This file is part of my.gpodder.org.
-#
-# my.gpodder.org is free software: you can redistribute it and/or modify it
-# under the terms of the GNU Affero General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at your
-# option) any later version.
-#
-# my.gpodder.org is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
-# License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
-#
-
 import uuid
 import unittest
-import doctest
 from collections import Counter
 
+from django.urls import reverse
+from django.test.client import Client as TestClient
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.contrib.auth import get_user_model
 
-import mygpo.utils
+from mygpo.test import create_auth_string, create_user
 from mygpo.podcasts.models import Podcast
 from mygpo.maintenance.merge import PodcastMerger
 from mygpo.api.backend import get_device
@@ -45,8 +29,8 @@ class DeviceSyncTests(unittest.TestCase):
         dev1 = Client.objects.create(id=uuid.uuid1(), user=self.user, uid='d1')
         dev2 = Client.objects.create(id=uuid.uuid1(), user=self.user, uid='d2')
 
-        group = self.user.get_grouped_devices().next()
-        self.assertEquals(group.is_synced, False)
+        group = next(self.user.get_grouped_devices())
+        self.assertEqual(group.is_synced, False)
         self.assertIn(dev1, group.devices)
         self.assertIn(dev2, group.devices)
 
@@ -57,18 +41,18 @@ class DeviceSyncTests(unittest.TestCase):
 
         groups = self.user.get_grouped_devices()
 
-        g2 = groups.next()
-        self.assertEquals(g2.is_synced, False)
+        g2 = next(groups)
+        self.assertEqual(g2.is_synced, False)
         self.assertIn(dev2, g2.devices)
 
-        g1 = groups.next()
-        self.assertEquals(g1.is_synced, True)
+        g1 = next(groups)
+        self.assertEqual(g1.is_synced, True)
         self.assertIn(dev1, g1.devices)
         self.assertIn(dev3, g1.devices)
 
         targets = dev1.get_sync_targets()
-        target = targets.next()
-        self.assertEquals(target, dev2)
+        target = next(targets)
+        self.assertEqual(target, dev2)
 
     def tearDown(self):
         Client.objects.filter(user=self.user).delete()
@@ -77,9 +61,7 @@ class DeviceSyncTests(unittest.TestCase):
 
 @override_settings(CACHE={})
 class UnsubscribeMergeTests(TestCase):
-    """ Test if merged podcasts can be properly unsubscribed
-
-    TODO: this test fails intermittently """
+    """ Test if merged podcasts can be properly unsubscribed """
 
     P2_URL = 'http://test.org/podcast/'
 
@@ -114,8 +96,21 @@ class UnsubscribeMergeTests(TestCase):
         self.user.delete()
 
 
-def suite():
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(DeviceSyncTests))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(UnsubscribeMergeTests))
-    return suite
+class AuthTests(TestCase):
+
+    def setUp(self):
+        self.user, pwd = create_user()
+        self.client = TestClient()
+        wrong_pwd = pwd + '1234'
+        self.extra = {
+            'HTTP_AUTHORIZATION': create_auth_string(self.user.username,
+                                                     wrong_pwd)
+        }
+
+    def test_queries_failed_auth(self):
+        """ Verifies the number of queries that are executed on failed auth """
+        url = reverse('api-all-subscriptions',
+                      args=(self.user.username, 'opml'))
+        with self.assertNumQueries(1):
+            resp = self.client.get(url, **self.extra)
+        self.assertEqual(resp.status_code, 401, resp.content)

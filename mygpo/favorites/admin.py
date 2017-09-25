@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 
 from django.contrib import admin
 
@@ -16,3 +16,5 @@ class FavoriteEpisodeAdmin(admin.ModelAdmin):
     list_select_related = ('user', 'episode', )
 
     raw_id_fields = ('user', 'episode', )
+
+    show_full_result_count = False

@@ -33,11 +33,6 @@
   </tr>
 
   <tr>
-   <td><strong>{% trans "Main Database" %}</strong></td>
-   <td><tt>{{ main_db }}</tt></td>
-  </tr>
-
-  <tr>
    <td><strong>{% trans "Hostname" %}</strong></td>
    <td><tt>{{ hostname }}</tt></td>
   </tr>
@@ -59,28 +54,18 @@
   </tr>
 
   <tr>
-   <td><strong>{% trans "Scheduled Celery Tasks" %}</strong></td>
-   <td><tt>{{ num_celery_tasks }}</tt></td>
+   <td>
+    <strong>
+     {% trans "Number of podcasts with outdated search index" %}
+    </strong>
+   </td>
+   <td class="numeric">{{ num_index_outdated }}</td>
   </tr>
 
   <tr>
-   <td><strong>{% trans "Database Tasks" %}</strong></td>
-   <td>{{ db_tasks|length }}</td>
+   <td><strong>{% trans "Scheduled Celery Tasks" %}</strong></td>
+   <td><tt>{{ num_celery_tasks }}</tt></td>
   </tr>
-
-  {% for task in db_tasks %}
-   <tr>
-    <td></td>
-    <td>
-     <ul>
-      {% for key, val in task.items %}
-       <li>{{ key }}: {{ val}}</li>
-      {% endfor %}
-     </ul>
-    </td>
-   </tr>
-  {% endfor %}
-
 
  </table>
 

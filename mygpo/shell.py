@@ -8,9 +8,11 @@
 # to get all relevant classes, and an instantiated db object.
 #
 
-from mygpo.podcasts.models import *
-from mygpo.users.models import *
-from mygpo.directory.models import *
-from mygpo.share.models import *
-
 from django.core.cache import cache
+
+# Auto-import all Models
+from django.apps import apps
+from django.utils.module_loading import import_string
+for m in apps.get_models():
+    import_string('{module}.{model}'.format(module=m.__module__,
+                                            model=m.__name__))

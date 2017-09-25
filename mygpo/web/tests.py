@@ -1,26 +1,9 @@
-#
-# This file is part of my.gpodder.org.
-#
-# my.gpodder.org is free software: you can redistribute it and/or modify it
-# under the terms of the GNU Affero General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at your
-# option) any later version.
-#
-# my.gpodder.org is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
-# License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
-#
-
 import unittest
 import doctest
 import uuid
 
 from django.test import TestCase
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.auth import get_user_model
 
 from mygpo.podcasts.models import Podcast, Episode, Slug
@@ -75,7 +58,7 @@ class SimpleWebTests(TestCase):
 
         for page in pages:
             response = self.client.get(reverse(page, args=args), follow=True)
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
 
 
 class PodcastPageTests(TestCase):
@@ -83,11 +66,16 @@ class PodcastPageTests(TestCase):
 
     def setUp(self):
         # create a podcast and some episodes
-        podcast = Podcast.objects.create(id=uuid.uuid1().hex)
+        podcast = Podcast.objects.create(id=uuid.uuid1(),
+                                         title='My Podcast',
+                                         max_episode_order=1,
+                                         )
         for n in range(20):
-            episode = Episode.objects.create(id=uuid.uuid1().hex,
-                                             podcast=podcast,
-                                            )
+            episode = Episode.objects.get_or_create_for_url(
+                podcast,
+                'http://www.example.com/episode%d.mp3' % (n, ),
+            )
+
             # we only need (the last) one
             self.episode_slug = Slug.objects.create(content_object=episode,
                                                     order=0,
@@ -104,7 +92,7 @@ class PodcastPageTests(TestCase):
         url = reverse('podcast-slug', args=(self.podcast_slug.slug, ))
         # the number of queries must be independent of the number of episodes
 
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(5):
             anon_request(url)
 
     def test_episode_queries(self):
@@ -114,11 +102,3 @@ class PodcastPageTests(TestCase):
 
         with self.assertNumQueries(5):
             anon_request(url)
-
-
-def suite():
-    suite = unittest.TestSuite()
-    suite.addTest(doctest.DocTestSuite(mygpo.web.utils))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(SimpleWebTests))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(PodcastPageTests))
-    return suite

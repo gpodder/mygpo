@@ -81,7 +81,7 @@
 
     <div class="input-group col-lg-10">
       <span class="input-group-addon">@</span>
-      <input type="text" class="form-control" id="inputTwitter" name="twitter" placeholder="username" value="{{ podcast.twitter }}">
+      <input type="text" class="form-control" id="inputTwitter" name="twitter" placeholder="username" value="{{ podcast.twitter|default:"" }}">
     </div>
    </div>
 
@@ -216,15 +216,6 @@
    <h3>Subscriptions</h3>
    <p>Please note that the chart shows subscriptions per user and device, so a single user subscribing to this podcast on 5 devices acccounts for 5 subscriptions.</p>
    {{ subscriber_data|bar_chart }}
-  {% endif %}
-
-  {% if heatmap %}
-    <h3>Heatmap</h3>
-    <div>
-     {% trans "This diagram shows which parts of the podcast's episodes are listened the most by users." %}
-     {% trans "Red parts are often skipped, green parts never." %}
-    </div>
-    {{ heatmap|episode_heatmap_visualization }}
   {% endif %}
 
 {% endblock %}

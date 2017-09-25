@@ -1,23 +1,6 @@
-#
-# This file is part of my.gpodder.org.
-#
-# my.gpodder.org is free software: you can redistribute it and/or modify it
-# under the terms of the GNU Affero General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at your
-# option) any later version.
-#
-# my.gpodder.org is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
-# License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
-#
-
 from django.http import Http404
-from django.core.urlresolvers import reverse
-from django.contrib.sites.models import RequestSite
+from django.urls import reverse
+from django.contrib.sites.requests import RequestSite
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import cache_page
 from django.shortcuts import get_object_or_404
@@ -29,8 +12,8 @@ from mygpo.web.utils import get_episode_link_target, get_podcast_link_target
 from mygpo.web.logo import get_logo_url
 from mygpo.subscriptions.models import SubscribedPodcast
 from mygpo.decorators import cors_origin
+from mygpo.categories.models import Category
 from mygpo.api.httpresponse import JsonResponse
-from mygpo.db.couchdb.directory import category_for_tag
 
 
 @csrf_exempt
@@ -39,7 +22,7 @@ from mygpo.db.couchdb.directory import category_for_tag
 def top_tags(request, count):
     count = parse_range(count, 1, 100, 100)
     tag_cloud = Topics(count, num_cat=0)
-    resp = map(category_data, tag_cloud.tagcloud)
+    resp = list(map(category_data, tag_cloud.tagcloud))
     return JsonResponse(resp)
 
 
@@ -48,13 +31,17 @@ def top_tags(request, count):
 @cors_origin()
 def tag_podcasts(request, tag, count):
     count = parse_range(count, 1, 100, 100)
-    category = category_for_tag(tag)
-    if not category:
+    try:
+        category = Category.objects.get(tags__tag=tag)
+
+    except Category.DoesNotExist:
         return JsonResponse([])
 
     domain = RequestSite(request).domain
-    query = category.get_podcasts(0, count)
-    resp = map(lambda p: podcast_data(p, domain), query)
+    entries = category.entries.all()\
+                               .prefetch_related('podcast', 'podcast__slugs',
+                                                 'podcast__urls')[:count]
+    resp = [podcast_data(entry.podcast, domain) for entry in entries]
     return JsonResponse(resp)
 
 
@@ -150,6 +137,7 @@ def episode_data(episode, domain, podcast=None):
 
 def category_data(category):
     return dict(
-        tag   = category.label,
-        usage = category.get_weight()
+        title = category.clean_title,
+        tag   = category.tag,
+        usage = category.num_entries,
     )

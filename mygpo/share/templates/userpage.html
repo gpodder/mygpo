@@ -88,7 +88,7 @@
     {% for list in lists|slice:":5" %}
      <tr>
       <td><a href="{% url "list-show" page_user.username list.slug %}">{{ list.title }}</a></td>
-      <td>{% blocktrans with list.podcasts|length as num_podcasts %}{{ num_podcasts }} Podcasts{% endblocktrans %}</td>
+      <td>{% blocktrans with list.num_entries as num_podcasts %}{{ num_podcasts }} Podcasts{% endblocktrans %}</td>
      </tr>
     {% endfor %}
 

@@ -15,7 +15,7 @@ def podcast_to_json(podcast):
         # modified is not indexed
         'license': podcast.license,  # maybe get a license name here?
         'flattr_url': podcast.flattr_url,
-        'content_types': filter(None, podcast.content_types),
+        'content_types': list(filter(None, podcast.content_types)),
         'outdated': podcast.outdated,
         'author': podcast.author,
         'logo_url': podcast.logo_url,

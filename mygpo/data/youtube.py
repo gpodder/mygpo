@@ -1,26 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-#
-# This file is part of my.gpodder.org.
-#
-# my.gpodder.org is free software: you can redistribute it and/or modify it
-# under the terms of the GNU Affero General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at your
-# option) any later version.
-#
-# my.gpodder.org is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
-# License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
-#
 
 # taken from gPodder :)
 
 import re
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 def is_video_link(url):
     return (get_youtube_id(url) is not None)
@@ -50,7 +34,7 @@ def get_real_cover(url):
             continue
         username = m.group(1)
         api_url = 'http://gdata.youtube.com/feeds/api/users/%s?v=2' % username
-        data = urllib.urlopen(api_url).read()
+        data = urllib.request.urlopen(api_url).read()
         match = re.search('<media:thumbnail url=[\'"]([^\'"]+)[\'"]/>', data)
         if match is not None:
             return match.group(1)

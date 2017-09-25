@@ -1,25 +1,26 @@
 all: help
 
 help:
-	@echo 'make test            synchronize DB and run local webserver'
+	@echo 'make test            run tests and show coverage report'
 	@echo 'make clean           clean up files'
-	@echo 'make unittest        run unittests'
 
 test:
-	python manage.py syncdb
-	python manage.py runserver
+	envdir envs/dev/ python -Wd -m coverage run ./manage.py test
+	coverage report
 
-unittest:
-	python manage.py test
+update-po:
+	envdir envs/dev/ python manage.py makemessages \
+		--ignore=doc/* --ignore=envs/* --ignore=htdocs/* --ignore=venv/* \
+		--ignore=res/* --ignore=tools/* --ignore=mygpo/*/migrations/*
 
-coverage:
-	coverage run --omit="/usr/*" manage.py test
-	coverage report -m
-	rm .coverage
 
 clean:
-	find -name "*.pyc" -exec rm '{}' \;
+	git clean -fX
+
+install-deps:
+	sudo apt-get install libpq-dev libjpeg-dev zlib1g-dev libwebp-dev \
+		build-essential python3-dev virtualenv libffi-dev
 
 
-.PHONY: all help test clean unittest coverage
+.PHONY: all help test clean unittest coverage install-deps
 

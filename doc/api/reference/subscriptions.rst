@@ -1,255 +1,195 @@
-.. _subscriptions-api:
-
 Subscriptions API
 =================
 
-The subscriptions API is used to manage the podcast subscriptions of a client
-device.
-
-
-Resources
----------
-
-The Subscriptions API defines the following resources ::
-
- /user/{username}/subscriptions
- /user/{username}/device/{deviceid}/subscriptions
-
-The first resource represents the summary of subscriptions over all devices. It
-can not be modified directly.
-
-The second resource represents the subscriptions of a single
-:ref:`device-integration`.
-
-
-Subscription Upload
--------------------
-
-Clients can upload the podcast subscriptions for a :ref:`device-integration` to
-replace its existing subscriptions.
-
-
-Request
-^^^^^^^
-
-The client sends an object containing all current subscriptions for the
-device. ::
-
- PUT /user/{username}/device/{deviceid}/subscriptions
- Content-Type: application/json
-
- {
-    podcasts: [
-        { url: "http://example.com/podcast.rss" },
-        { url: "http://podcast.com/episodes.xml" }
-    ]
- }
-
-
-Response
-^^^^^^^^
-
-The server can respond with the following status codes.
-
-If a ``Link`` header with ``rel=changes`` is provided, this URL can be used to
-retrieve changes to the subscriptions since the respective response (see
-:ref:`subscription-change-download`)
-
-If a new device has been created ::
-
- 201 Created
- Link: <https://api.gpodder.net/user/{username}/device/{deviceid}/subscription?since=0>; rel=changes
-
- no body
-
-
-If the subscriptions have been processed immediatelly ::
-
- 204 No Content
- Link: <https://api.gpodder.net/user/{username}/device/{deviceid}/subscription?since=1234>; rel=changes
-
- no body
-
-
-If the subscriptions have been accepted for later processing ::
-
- 202 Accepted
-
- no body
-
-No change download address is provided in this case, as is is not yet known at
-the time of the response. If the client needs to know the current
-subscriptions, it should follow up by a request to download the subscriptions.
-
-If invalid podcast information is provided (eg an invalid feed URL), the whole
-request will be rejected. ::
-
- 400 Bad Request
- Content-Type: application/json
-
- {
-   "message": "Invalid podcast URL",
-   "errors": [
-     {
-       "field": "/podcasts/1",
-       "code": "invalid_url"
-     }
-   ]
- }
-
-
-Subscription Download
----------------------
-
-Clients can download the current subscriptions either of a single
-:ref:`device-integration` or over all of the user's devices.
-
-
-Request
-^^^^^^^
-
-Download subscriptions of a device ::
-
- GET /user/{username}/device/{deviceid}/subscriptions
- Content-Type: application/json
-
-
-Download all of the user's subscriptions ::
-
- GET /user/{username}/subscriptions
- Content-Type: application/json
-
-
-Response
-^^^^^^^^
-
-The podcasts correspond to the :ref:`podcast-type` type. ::
-
- 200 OK
- Link: <https://api.gpodder.net/user/{username}/device/{deviceid}/subscription?since=1234>; rel=changes
- Content-Type: application/json
-
- {
-    podcasts: [
-        { podcast1 },
-        { podcast2 }
-    ]
- }
-
-The changes link is not provided if all subscriptions of a user are requested.
-
-
-Subscription Change Upload
---------------------------
-
-Clients can update the current subscriptions of a :ref:`device-integration` by
-reporting subscribed and unsubscribed podcasts.
-
-
-Request
-^^^^^^^
-
-A client can send which podcasts have been subscribed and unsubscribed. ::
-
- POST /user/{username}/device/{deviceid}/subscriptions
- Content-Tpe: application/json
-
- {
-    subscribe: [
-        { url: "http://example.com/podcast.rss" }
-    ]
-    unsubscribe: [
-        { url: "http://podcast.com/episodes.xml" }
-    ]
- }
-
-A client MUST NOT upload a change set where both ``subscribe`` and
-``unsubscribe`` are empty, or where the same podcast is given in both
-``subscribe`` and ``unsubscribe``.
-
-
-Response
-^^^^^^^^
-
-The server responds with either of the following status codes.
-
-The changes are processed immediatelly. ::
-
- 200 OK
- Content-Tpe: application/json
-
- body according to Subscription Download
-
-
-The changes have been accepted for later processing. ::
-
- 204 Accepted
-
- no body
-
-No response body is provided in this case, as it is not yet known.
-
-
-.. _subscription-change-download:
-
-Subscription Change Download
-----------------------------
-
-Download changes to the subscriptions of a :ref:`device-integration`.
-
-
-Request
-^^^^^^^
-
-The client makes the following request. ::
-
- GET /user/{username}/device/{deviceid}/subscriptions{?since}
- Content-Tpe: application/json
-
-
-Response
-^^^^^^^^
-
-The server can response with any of the following status codes.
-
-The changes are returned immediatelly. ::
-
- 200 OK
- Link: <https://api.gpodder.net/user/{username}/device/{deviceid}/subscription?since=1234>; rel=changes
- Content-Type: application/json
-
- {
-    subscribe: [
-        { url: "http://example.com/podcast.rss" }
-    ]
-    unsubscribe: [
-        { url: "http://podcast.com/episodes.xml" }
-    ]
- }
-
-The server can also return a prepared response (see
-:ref:`prepared-response-api`).
-
-
-Integration Recommendations
+Get Subscriptions of Device
 ---------------------------
 
-This section describes how the API can be accessed for common use cases.
+..  http:get:: /subscriptions/(username)/(deviceid).(format)
+    :synopsis: Get a list of subscribed podcasts for the given user.
 
-* On first startup a client CAN retrieve the list of all the user's
-  subscriptions to offer as suggestions.
+    * Requires HTTP authentication
+    * Since 1.0
 
-* On first startup a client SHOULD generate a unique :ref:`device-integration`
-  Id for managing its own subscriptions in subsequent API calls.
+    **Example request**:
 
-* A client which has been somehow "reset" can re-use an existing device ID and
-  restore its subscriptions from there. It SHOULD NOT share the same device ID
-  with another installation which is still used.
+    .. sourcecode:: http
 
-* A client SHOULD either use the combination of Subscription Upload and
-  Download endpoints, or the Subscription Change endpoints to keep its
-  subscriptions up to date.
+        GET /subscriptions/bob/asdf.opml
 
-* When retrieving subscriptions or subscription changes, a client SHOULD use
-  the URL in the ``Link`` header with ``rel=changes`` (if present) to retrieve
-  subsequent changes to the resource.
+    :param username: username for which subscriptions should be returned
+    :param deviceid: see :ref:`devices`
+    :param format: see :ref:`formats`
+    :query jsonp: function name for the JSONP format (since 2.8)
+
+    :status 200: the subscriptions are returned in the requested format
+    :status 401: Invalid user
+    :status 404: Invalid device ID
+    :status 400: Invalid format
+
+
+.. _api-subscriptions-all:
+
+Get All Subscriptions
+---------------------
+
+..  http:get:: /subscriptions/(username).(format)
+    :synopsis: Get a list of all subscribed podcasts for the given user.
+
+    * Requires HTTP authentication
+    * Since 2.11
+
+    **Example request**:
+
+    .. sourcecode:: http
+
+        GET /subscriptions/bob.opml
+
+    This can be used to present the user a list of podcasts when the
+    application starts for the first time.
+
+    :param username: username for which subscriptions should be returned
+    :param deviceid: see :ref:`devices`
+    :param format: see :ref:`formats`
+    :query jsonp: function name for the JSONP format (since 2.8)
+
+    :status 200: the subscriptions are returned in the requested format
+    :status 401: Invalid user
+    :status 400: Invalid format
+
+
+Upload Subscriptions of Device
+------------------------------
+
+..  http:put:: /subscriptions/(username)/(deviceid).(format)
+    :synopsis: Upload subscriptions
+
+    * Requires HTTP authentication
+    * Since 1.0
+
+    Upload the current subscription list of the given user to the server. The
+    data should be provided either in OPML, JSON or plaintext (one URL per
+    line) format, and should be uploaded just like a normal PUT request
+    (i.e. in the body of the request).
+
+    For successful updates, the implementation always returns the status code
+    200 and the empty string (i.e. an empty HTTP body) as a result, any other
+    string should be interpreted by the client as an (undefined) error.
+
+    **Example request**:
+
+    .. sourcecode:: http
+
+        PUT /subscriptions/john/e9c4ea4ae004efac40.txt
+
+    :param username: username for which subscriptions should be uploaded
+    :param deviceid: see :ref:`devices`
+    :param format: see :ref:`formats`
+
+    :status 200: the subscriptions have been updated
+    :status 401: Invalid user
+    :status 400: Invalid format
+
+    In case the device does not exist for the given user, it is automatically
+    created. If clients want to determine if a device exists, you have to to a
+    GET request on the same URL first and check for a the 404 status code (see
+    above).
+
+
+.. _api-subscriptions-change-add:
+
+Upload Subscription Changes
+---------------------------
+
+..  http:post:: /api/2/subscriptions/(username)/(deviceid).json
+    :synopsis: Update the subscription list for a given device.
+
+    * Requires HTTP authentication
+    * Since 2.0
+
+    Only deltas are supported here. Timestamps are not supported, and are
+    issued by the server.
+
+    **Example request**:
+
+    .. sourcecode:: http
+
+        {
+            "add": ["http://example.com/feed.rss", "http://example.org/podcast.php"],
+            "remove": ["http://example.net/foo.xml"]
+        }
+
+    :param username: username for which subscriptions should be returned
+    :param deviceid: see :ref:`devices`
+    :status 400: the same feed has been added and removed in the same request
+    :status 200: the subscriptions have been updated
+
+    In positive responses the server returns a timestamp/ID that can be used
+    for requesting changes since this upload in a subsequent API call. In
+    addition, the server sends a list of URLs that have been rewritten
+    (sanitized, see bug:747) as a list of tuples with the key "update_urls".
+    The client SHOULD parse this list and update the local subscription list
+    accordingly (the server only sanitizes the URL, so the semantic "content"
+    should stay the same and therefore the client can simply update the
+    URL value locally and use it for future updates.
+
+    **Example response**:
+
+    .. sourcecode:: http
+
+        {
+          "timestamp": 1337,
+          "update_urls":
+           [
+            [
+             "http://feeds2.feedburner.com/LinuxOutlaws?format=xml",
+             "http://feeds.feedburner.com/LinuxOutlaws"
+            ],
+            [
+             "http://example.org/podcast.rss ",
+             "http://example.org/podcast.rss"
+            ]
+           ]
+        }
+
+    URLs that are not allowed (currently all URLs that don't start with either
+    http or https) are rewritten to the empty string and are ignored by
+    the Webservice.
+
+
+.. _api-subscriptions-change-get:
+
+Get Subscription Changes
+------------------------
+
+..  http:get:: /api/2/subscriptions/(username)/(deviceid).json
+    :synopsis: retrieve subscription changes
+
+    * Requires HTTP authentication
+    * Since 2.0
+
+    This API call retrieves the subscription changes since the timestamp
+    provided in the since parameter. Its value SHOULD be timestamp value from
+    the previous call to this API endpoint. If there has been no previous call,
+    the cliend SHOULD use 0.
+
+    The response format is the same as the upload format: A dictionary with two
+    keys "add" and "remove" where the value for each key is a list of URLs that
+    should be added or removed. The timestamp SHOULD be stored by the client in
+    order to provide it in the since parameter in the next request.
+
+    **Example response**:
+
+    In case nothing has changed, the server returns something like the
+    following JSON content.
+
+    .. sourcecode:: http
+
+        {
+           "add": [],
+           "remove": [],
+           "timestamp": 12347
+        }
+
+    :param username: username for which subscriptions should be returned
+    :param deviceid: see :ref:`devices`
+    :query since: the ``timestamp`` value of the last response

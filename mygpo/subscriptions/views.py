@@ -1,8 +1,8 @@
 from datetime import datetime
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from django.contrib.sites.models import RequestSite
+from django.contrib.sites.requests import RequestSite
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.views.decorators.vary import vary_on_cookie
@@ -12,9 +12,8 @@ from django.contrib.syndication.views import Feed
 from django.contrib.auth import get_user_model
 
 from mygpo.podcasts.models import Podcast
-from mygpo.subscriptions.models import Subscription, PodcastConfig
+from mygpo.subscriptions.models import Subscription
 from mygpo.users.settings import PUBLIC_SUB_PODCAST
-from mygpo.utils import unzip, skip_pairs
 from mygpo.api import simple
 from mygpo.subscriptions import get_subscribed_podcasts
 from mygpo.decorators import requires_token
@@ -22,6 +21,10 @@ from mygpo.users.models import HistoryEntry
 from mygpo.subscriptions import (get_subscribed_podcasts,
     get_subscription_change_history, get_subscription_history)
 from mygpo.web.utils import get_podcast_link_target
+from mygpo.utils import parse_bool
+from mygpo.decorators import requires_token
+from mygpo.web.utils import symbian_opml_changes
+
 
 
 @vary_on_cookie
@@ -32,7 +35,8 @@ def show_list(request):
     subscriptionlist = create_subscriptionlist(request)
     return render(request, 'subscriptions.html', {
         'subscriptionlist': subscriptionlist,
-        'url': current_site
+        'url': current_site,
+        'podcast_ad': Podcast.objects.get_advertised_podcast(),
     })
 
 @vary_on_cookie
@@ -142,3 +146,35 @@ class SubscriptionsFeed(Feed):
 
     def item_pubdate(self, item):
         return item.timestamp
+
+
+
+@requires_token(token_name='subscriptions_token', denied_template='user_subscriptions_denied.html')
+def for_user(request, username):
+    User = get_user_model()
+    user = get_object_or_404(User, username=username)
+    subscriptions = get_subscribed_podcasts(user, only_public=True)
+    token = user.profile.get_token('subscriptions_token')
+
+    return render(request, 'user_subscriptions.html', {
+        'subscriptions': subscriptions,
+        'other_user': user,
+        'token': token,
+        })
+
+@requires_token(token_name='subscriptions_token')
+def for_user_opml(request, username):
+    User = get_user_model()
+    user = get_object_or_404(User, username=username)
+    subscriptions = get_subscribed_podcasts(user, only_public=True)
+
+    if parse_bool(request.GET.get('symbian', False)):
+        subscriptions = map(symbian_opml_changes,
+                            [p.podcast for p in subscriptions])
+
+    response = render(request, 'user_subscriptions.opml', {
+        'subscriptions': subscriptions,
+        'other_user': user
+        })
+    response['Content-Disposition'] = 'attachment; filename=%s-subscriptions.opml' % username
+    return response

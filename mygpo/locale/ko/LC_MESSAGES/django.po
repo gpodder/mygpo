@@ -1,0 +1,3183 @@
+# gpodder.net Korean translation
+# Changwoo Ryu <cwryu@debian.org>, 2017.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: mygpo\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-07-22 19:03+0000\n"
+"PO-Revision-Date: 2017-07-06 17:10+0900\n"
+"Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
+"Language-Team: Changwoo Ryu <cwryu@debian.org>\n"
+"Language: ko\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: mygpo/administration/templates/admin/activate-user.html:9
+#: mygpo/administration/templates/admin/activate-user.html:12
+#: mygpo/administration/templates/admin/overview.html:22
+#, fuzzy
+#| msgid "Reactivate"
+msgid "Activate User"
+msgstr "다시 활성화"
+
+#: mygpo/administration/templates/admin/activate-user.html:20
+#: mygpo/web/forms.py:217 mygpo/web/templates/account.html:127
+msgid "Username"
+msgstr "사용자 이름"
+
+#: mygpo/administration/templates/admin/activate-user.html:27
+msgid "Email"
+msgstr ""
+
+#: mygpo/administration/templates/admin/activate-user.html:35
+#, fuzzy
+#| msgid "Reactivate"
+msgid "Activate"
+msgstr "다시 활성화"
+
+#: mygpo/administration/templates/admin/clients.html:10
+#: mygpo/administration/templates/admin/make-publisher-result.html:16
+#: mygpo/administration/templates/admin/merge-grouping.html:10
+#: mygpo/administration/templates/admin/merge-select.html:9
+#: mygpo/administration/templates/admin/overview.html:9
+#: mygpo/administration/templates/admin/overview.html:12
+#: mygpo/administration/templates/admin/stats.html:9
+#: mygpo/administration/templates/admin/useragents.html:9
+msgid "Admin Area"
+msgstr "관리 영역"
+
+#: mygpo/administration/templates/admin/clients.html:13
+#: mygpo/administration/templates/admin/useragents.html:12
+msgid "User-Agent Statistics"
+msgstr "브라우저 User-Agent 통계"
+
+#: mygpo/administration/templates/admin/clients.html:19
+#: mygpo/administration/templates/admin/filetypes.html:19
+#: mygpo/administration/templates/admin/useragents.html:18
+msgid "#"
+msgstr "#"
+
+#: mygpo/administration/templates/admin/clients.html:20
+msgid "Client"
+msgstr "클라이언트"
+
+#: mygpo/administration/templates/admin/clients.html:21
+#: mygpo/administration/templates/admin/clients.html:23
+#: mygpo/administration/templates/admin/clients.html:25
+msgid "Version"
+msgstr "버전"
+
+#: mygpo/administration/templates/admin/clients.html:22
+msgid "Library"
+msgstr "라이브러리"
+
+#: mygpo/administration/templates/admin/clients.html:24
+msgid "OS"
+msgstr "운영체제"
+
+#: mygpo/administration/templates/admin/clients.html:26
+#: mygpo/administration/templates/admin/useragents.html:20
+msgid "Number of Clients"
+msgstr "클라이언트 수"
+
+#: mygpo/administration/templates/admin/clients.html:53
+#: mygpo/administration/templates/admin/useragents.html:33
+msgid "Total"
+msgstr "총합"
+
+#: mygpo/administration/templates/admin/filetypes.html:10
+#: mygpo/administration/templates/admin/filetypes.html:13
+msgid "File Type Stats"
+msgstr "파일 종류 통계"
+
+#: mygpo/administration/templates/admin/filetypes.html:20
+msgid "File Type"
+msgstr "파일 종류"
+
+#: mygpo/administration/templates/admin/filetypes.html:21
+msgid "Episode URLs"
+msgstr "에피소드 URL"
+
+#: mygpo/administration/templates/admin/hostinfo.html:9
+#: mygpo/administration/templates/admin/hostinfo.html:12
+#: mygpo/administration/templates/admin/overview.html:17
+msgid "Host Information"
+msgstr "호스트 정보"
+
+#: mygpo/administration/templates/admin/hostinfo.html:20
+msgid "mygpo Version"
+msgstr "mygpo 버전"
+
+#: mygpo/administration/templates/admin/hostinfo.html:31
+msgid "Base Directory"
+msgstr "베이스 디렉터리"
+
+#: mygpo/administration/templates/admin/hostinfo.html:36
+msgid "Hostname"
+msgstr "호스트 이름"
+
+#: mygpo/administration/templates/admin/hostinfo.html:41
+msgid "Django Version"
+msgstr "Django 버전"
+
+#: mygpo/administration/templates/admin/hostinfo.html:46
+msgid "Feed Update Queue"
+msgstr ""
+
+#: mygpo/administration/templates/admin/hostinfo.html:49
+#, fuzzy
+#| msgid "Admin Area"
+msgid "min ahead"
+msgstr "관리 영역"
+
+#: mygpo/administration/templates/admin/hostinfo.html:51
+msgid "min behind"
+msgstr ""
+
+#: mygpo/administration/templates/admin/hostinfo.html:57
+msgid "Scheduled Celery Tasks"
+msgstr "예정된 Celery 작업"
+
+#: mygpo/administration/templates/admin/make-publisher-input.html:9
+#: mygpo/administration/templates/admin/make-publisher-input.html:12
+#: mygpo/administration/templates/admin/make-publisher-result.html:9
+#: mygpo/administration/templates/admin/make-publisher-result.html:12
+#: mygpo/administration/views.py:387
+#, fuzzy
+#| msgid "Publisher Pages"
+msgid "Publisher Permissions"
+msgstr "제작자 페이지"
+
+#: mygpo/administration/templates/admin/make-publisher-mail.txt:2
+#, fuzzy, python-format
+#| msgid "Link to %(sitename)s"
+msgid "Hi %(username)s,"
+msgstr "%(sitename)s에 링크"
+
+#: mygpo/administration/templates/admin/make-publisher-mail.txt:4
+msgid "You have been assigned as a publisher for the following podcasts:"
+msgstr ""
+
+#: mygpo/administration/templates/admin/make-publisher-mail.txt:11
+#, fuzzy
+#| msgid "You need to login to access this page."
+msgid "You can now access the publisher pages at"
+msgstr "이 페이지를 보려면 로그인이 필요합니다."
+
+#: mygpo/administration/templates/admin/make-publisher-mail.txt:15
+#, python-format
+msgid ""
+"There you can get statistics, insights and additional control over your "
+"podcast at %(domain)s."
+msgstr ""
+
+#: mygpo/administration/templates/admin/make-publisher-mail.txt:17
+#, python-format
+msgid "If you have any questions, please visit %(url)s"
+msgstr ""
+
+#: mygpo/administration/templates/admin/merge-grouping.html:13
+#: mygpo/administration/templates/admin/merge-select.html:12
+#: mygpo/administration/templates/admin/overview.html:18
+msgid "Merge Podcasts and Episodes"
+msgstr "팟캐스트 및 에피소드 병합"
+
+#: mygpo/administration/templates/admin/merge-grouping.html:24
+msgid ""
+"Episodes that have the same number will be merged. Please verify all your "
+"changes by clicking on 'Renew Groups' before starting the Merge."
+msgstr ""
+"번호가 같은 에피소드는 병합됩니다. 병합 하기 전에 '그룹 새로 고침'을 눌러 모"
+"든 변경 사항을 확인하십시오."
+
+#: mygpo/administration/templates/admin/overview.html:19
+msgid "Client Stats"
+msgstr "클라이언트 통계"
+
+#: mygpo/administration/templates/admin/overview.html:19
+#: mygpo/administration/templates/admin/overview.html:21
+msgid "JSON"
+msgstr "JSON"
+
+#: mygpo/administration/templates/admin/overview.html:20
+msgid "User-Agent Stats"
+msgstr "User-Agent 통계"
+
+#: mygpo/administration/templates/admin/overview.html:21
+msgid "General Stats"
+msgstr "일반 통계"
+
+#: mygpo/administration/templates/admin/overview.html:23
+#, fuzzy
+#| msgid "Publisher Services"
+msgid "Assign Publisher Permissions"
+msgstr "제작자 서비스"
+
+#: mygpo/administration/templates/admin/stats.html:12
+msgid "Statistics"
+msgstr "통계"
+
+#: mygpo/administration/templates/admin/stats.html:18
+msgid "Property"
+msgstr "속성"
+
+#: mygpo/administration/templates/admin/stats.html:19
+msgid "Value"
+msgstr "값"
+
+#: mygpo/administration/templates/admin/task-status.html:17
+#: mygpo/administration/templates/admin/task-status.html:26
+#, fuzzy
+#| msgid "Merge Finished"
+msgid "Operation Finished"
+msgstr "병합이 끝났습니다"
+
+#: mygpo/administration/templates/admin/task-status.html:19
+#: mygpo/administration/templates/admin/task-status.html:28
+#, fuzzy
+#| msgid "Merge Ongoing"
+msgid "Operation Ongoing"
+msgstr "병합 진행 중"
+
+#: mygpo/administration/templates/admin/task-status.html:37
+msgid "The following actions were recorded:"
+msgstr "다음 동작이 기록되었습니다:"
+
+#: mygpo/administration/templates/admin/task-status.html:42
+#: mygpo/publisher/templates/publisher/episode.html:80
+msgid "none"
+msgstr "없음"
+
+#: mygpo/administration/templates/admin/task-status.html:47
+msgid "Go to podcast"
+msgstr "팟캐스트로 이동"
+
+#: mygpo/administration/templates/admin/task-status.html:49
+#: mygpo/directory/templates/directory/add-podcast-status.html:50
+msgid "The operation is still ongoing..."
+msgstr "작업이 아직 진행 중입니다..."
+
+#: mygpo/administration/templates/admin/task-status.html:51
+#: mygpo/directory/templates/directory/add-podcast-status.html:52
+msgid "Refresh"
+msgstr "새로 고침"
+
+#: mygpo/administration/templates/admin/useragents.html:19
+msgid "User-Agent"
+msgstr "User-Agent"
+
+#: mygpo/administration/views.py:136 mygpo/administration/views.py:158
+#, python-brace-format
+msgid "No podcast with URL {url}"
+msgstr "{url} URL의 팟캐스트 없음"
+
+#: mygpo/administration/views.py:312
+msgid "Provide either username or email address"
+msgstr ""
+
+#: mygpo/administration/views.py:318
+#, fuzzy
+#| msgid "Nothing found"
+msgid "No user found"
+msgstr "검색 결과가 없습니다"
+
+#: mygpo/administration/views.py:323
+#, python-brace-format
+msgid "User {username} ({email}) activated"
+msgstr ""
+
+#: mygpo/api/constants.py:8
+msgid "downloaded"
+msgstr "다운로드함"
+
+#: mygpo/api/constants.py:9
+msgid "played"
+msgstr "재생함"
+
+#: mygpo/api/constants.py:10
+msgid "deleted"
+msgstr "삭제함"
+
+#: mygpo/api/constants.py:11
+msgid "marked as new"
+msgstr "새 항목으로 표시"
+
+#: mygpo/api/constants.py:12
+msgid "flattr'd"
+msgstr "Flattr함"
+
+#: mygpo/api/constants.py:20
+msgid "subscribed"
+msgstr "구독함"
+
+#: mygpo/api/constants.py:21
+msgid "unsubscribed"
+msgstr "구독 해지함"
+
+#: mygpo/api/simple.py:55 mygpo/api/simple.py:90
+#, python-format
+msgid "%(username)s's Subscription List"
+msgstr "%(username)s의 구독 목록"
+
+#: mygpo/api/simple.py:237
+#, python-format
+msgid "gpodder.net - Top %(count)d"
+msgstr "gpodder.net - 톱 %(count)d"
+
+#: mygpo/api/simple.py:272
+msgid "gpodder.net - Search"
+msgstr "gpodder.net - 검색"
+
+#: mygpo/api/simple.py:289
+#, python-format
+msgid "gpodder.net - %(count)d Suggestions"
+msgstr "gpodder.net - 제안 %(count)d개"
+
+#: mygpo/core/tasks.py:34
+#, python-format
+msgid "Can't flattr a '%s'"
+msgstr "'%s'에 Flattr할 수 없습니다"
+
+#: mygpo/core/tasks.py:38
+msgid "No Payment URL available"
+msgstr "과금 URL이 없습니다"
+
+#: mygpo/data/mimetype.py:13
+msgid "image"
+msgstr "이미지"
+
+#: mygpo/data/mimetype.py:13
+msgid "audio"
+msgstr "오디오"
+
+#: mygpo/data/mimetype.py:13
+msgid "video"
+msgstr "비디오"
+
+#: mygpo/directory/templates/carousel.html:43
+#: mygpo/directory/templates/carousel.html:46
+msgid "Explore"
+msgstr "둘러보기"
+
+#: mygpo/directory/templates/carousel.html:81
+#: mygpo/web/templates/episode.html:158
+msgid "..."
+msgstr "..."
+
+#: mygpo/directory/templates/directory.html:13
+#: mygpo/directory/templates/directory.html:16
+msgid "Podcast Directory"
+msgstr "팟캐스트 디렉터리"
+
+#: mygpo/directory/templates/directory.html:30
+#, python-format
+msgid ""
+"%(listtitle)s <span class=\"by-user\">by <a href=\"%(user-lists-url)s\">"
+"%(username)s</a></span>"
+msgstr ""
+"f%(listtitle)s <span class=\"by-user\">by <a href=\"%(user-lists-url)s\">"
+"%(username)s</a></span>"
+
+#: mygpo/directory/templates/directory.html:46
+#: mygpo/directory/templates/directory.html:48
+#: mygpo/directory/templates/directory.html:133
+#: mygpo/directory/templates/podcast-ad-box.html:23
+#: mygpo/web/templates/dashboard.html:73
+msgid "more..."
+msgstr "더 보기..."
+
+#: mygpo/directory/templates/directory.html:85
+msgid "Podcast List by"
+msgstr "팟캐스트 목록 by"
+
+#: mygpo/directory/templates/directory.html:102
+#, python-format
+msgid "and %(more)s more"
+msgstr "그리고 %(more)s개 더"
+
+#: mygpo/directory/templates/directory.html:108
+msgid "Create a Podcast List"
+msgstr "팟캐스트 목록 만들기"
+
+#: mygpo/directory/templates/directory.html:119
+#: mygpo/web/templates/dashboard.html:59
+msgid "Random"
+msgstr "임의"
+
+#: mygpo/directory/templates/directory/add-podcast-status.html:16
+#: mygpo/directory/templates/directory/add-podcast-status.html:25
+msgid "Podcast Added"
+msgstr "추가한 팟캐스트"
+
+#: mygpo/directory/templates/directory/add-podcast-status.html:18
+#: mygpo/directory/templates/directory/add-podcast-status.html:27
+msgid "Adding Podcast"
+msgstr "팟캐스트 추가 중"
+
+#: mygpo/directory/templates/directory/add-podcast-status.html:44
+msgid "No podcasts could be added"
+msgstr "추가한 팟캐스트가 없습니다"
+
+#: mygpo/directory/templates/directory/license-podcasts.html:13
+#: mygpo/directory/templates/directory/license-podcasts.html:16
+#, fuzzy, python-format
+#| msgid "Podcast Lists by %(username)s"
+msgid "Podcasts with License %(licensename)s"
+msgstr "팟캐스트 목록 by %(username)s"
+
+#: mygpo/directory/templates/directory/license-podcasts.html:24
+msgid "License overview"
+msgstr ""
+
+#: mygpo/directory/templates/directory/license-podcasts.html:29
+msgid "View License"
+msgstr ""
+
+#: mygpo/directory/templates/directory/license-podcasts.html:36
+#: mygpo/directory/templates/flattr-podcasts.html:24
+#: mygpo/directory/templates/search.html:35
+#: mygpo/directory/templates/toplist.html:26
+#: mygpo/podcastlists/templates/list.html:48 mygpo/web/templatetags/menu.py:33
+#: mygpo/web/templatetags/menu.py:69
+msgid "Podcast"
+msgstr "팟캐스트"
+
+#: mygpo/directory/templates/directory/license-podcasts.html:37
+#: mygpo/directory/templates/flattr-podcasts.html:25
+#: mygpo/directory/templates/search.html:36
+#: mygpo/directory/templates/toplist.html:27
+#: mygpo/podcastlists/templates/list.html:49
+msgid "Subscribers"
+msgstr "구독자"
+
+#: mygpo/directory/templates/directory/license-podcasts.html:50
+#: mygpo/directory/templates/episode_toplist.html:41
+#: mygpo/directory/templates/flattr-podcasts.html:38
+#: mygpo/directory/templates/toplist.html:47
+msgid "Currently not available"
+msgstr "현재 사용할 수 없음"
+
+#: mygpo/directory/templates/directory/licenses.html:13
+#: mygpo/directory/templates/directory/licenses.html:16
+#, fuzzy
+#| msgid "Host Information"
+msgid "Podcasts with License Information"
+msgstr "호스트 정보"
+
+#: mygpo/directory/templates/directory/licenses.html:23
+#: mygpo/web/templatetags/menu.py:41
+msgid "License"
+msgstr ""
+
+#: mygpo/directory/templates/directory/licenses.html:24
+#: mygpo/directory/templates/podcast_lists.html:24
+#: mygpo/web/templates/base.html:135 mygpo/web/templates/home.html:155
+#: mygpo/web/templatetags/menu.py:43
+msgid "Podcasts"
+msgstr "팟캐스트"
+
+#: mygpo/directory/templates/episode_toplist.html:12
+#: mygpo/directory/templates/episode_toplist.html:15
+msgid "Episode-Toplist"
+msgstr "에피소드-순위"
+
+#: mygpo/directory/templates/episode_toplist.html:24
+msgid "Episode"
+msgstr "에피소드"
+
+#: mygpo/directory/templates/episode_toplist.html:25
+#: mygpo/publisher/templates/publisher/episodes.html:36
+msgid "Listeners"
+msgstr "청취자"
+
+#: mygpo/directory/templates/episode_toplist.html:36
+#: mygpo/publisher/templates/publisher/episode.html:33
+#: mygpo/share/templates/userpage.html:121
+#: mygpo/share/templates/userpage.html:141
+#: mygpo/web/templates/episode-history.html:50
+#: mygpo/web/templates/episode.html:51
+msgid "from"
+msgstr "위치"
+
+#: mygpo/directory/templates/episode_toplist.html:53
+#: mygpo/directory/templates/episode_toplist.html:57
+#: mygpo/directory/templates/toplist.html:60
+#: mygpo/directory/templates/toplist.html:64
+msgid "Language"
+msgstr "언어"
+
+#: mygpo/directory/templates/episode_toplist.html:61
+#: mygpo/directory/templates/episode_toplist.html:63
+#: mygpo/directory/templates/toplist.html:68
+#: mygpo/directory/templates/toplist.html:70
+msgid "all"
+msgstr "모두"
+
+#: mygpo/directory/templates/episode_toplist.html:75
+#: mygpo/directory/templates/toplist.html:83
+msgid "OK"
+msgstr "확인"
+
+#: mygpo/directory/templates/flattr-podcasts.html:13
+#: mygpo/directory/templates/flattr-podcasts.html:16
+msgid "Podcasts using Flattr"
+msgstr "Flattr 사용 팟캐스트"
+
+#: mygpo/directory/templates/flattr-podcasts.html:20
+msgid ""
+"These podcasts use <a href=\"https://flattr.com/\">Flattr</a>. You can "
+"support them by flattring their episodes."
+msgstr ""
+"이 팟캐스트는 <a href=\"https://flattr.com/\">Flattr</a>를 사용합니다. 팟캐스"
+"트 에피소드를 flattr해서 후원할 수 있습니다."
+
+#: mygpo/directory/templates/flattr-podcasts.html:68
+msgid "Login to Flattr"
+msgstr "Flattr에 로그인"
+
+#: mygpo/directory/templates/flattr-podcasts.html:70
+#, fuzzy
+#| msgid "You have to login to Flattr to ues the Flattr features."
+msgid "You have to login to Flattr to use the Flattr features."
+msgstr "Flattr 기능을 사용하려면 Flattr에 로그인해야 합니다"
+
+#: mygpo/directory/templates/flattr-podcasts.html:71
+msgid "Flattr Settings"
+msgstr "Flattr 설정"
+
+#: mygpo/directory/templates/missing.html:11
+#: mygpo/directory/templates/missing.html:14 mygpo/web/templatetags/menu.py:35
+msgid "Missing Podcast"
+msgstr "빠진 팟캐스트"
+
+#: mygpo/directory/templates/missing.html:20
+#, python-format
+msgid ""
+"If you're missing a podcast on %(sitename)s, please enter its feed URL here"
+msgstr "%(sitename)s에 팟캐스트가 빠졌으면, 그 피드 URL을 여기 입력하십시오"
+
+#: mygpo/directory/templates/missing.html:27
+msgid "Check"
+msgstr "확인"
+
+#: mygpo/directory/templates/missing.html:36
+msgid "The podcast already exists"
+msgstr "팟캐스트가 이미 있습니다"
+
+#: mygpo/directory/templates/missing.html:49
+msgid "Add Podcast"
+msgstr "팟캐스트 추가"
+
+#: mygpo/directory/templates/podcast-ad-box.html:9
+#, fuzzy
+#| msgid "Missing Podcast"
+msgid "Sponsoring Podcast"
+msgstr "빠진 팟캐스트"
+
+#: mygpo/directory/templates/podcast_lists.html:13
+#: mygpo/directory/templates/podcast_lists.html:16
+#: mygpo/podcastlists/templates/lists.html:13
+#: mygpo/podcastlists/templates/lists.html:16
+#: mygpo/podcastlists/templates/lists_user.html:9
+#: mygpo/web/templatetags/menu.py:36 mygpo/web/templatetags/menu.py:59
+msgid "Podcast Lists"
+msgstr "팟캐스트 목록"
+
+#: mygpo/directory/templates/podcast_lists.html:22
+msgid "List Name"
+msgstr "목록 이름"
+
+#: mygpo/directory/templates/podcast_lists.html:23
+msgid "User"
+msgstr "사용자"
+
+#: mygpo/directory/templates/podcast_lists.html:25
+#: mygpo/publisher/templates/publisher/episode.html:35
+#: mygpo/web/templates/episode-history.html:52
+#: mygpo/web/templates/episode.html:53
+msgid "Download"
+msgstr "다운로드"
+
+#: mygpo/directory/templates/podcast_lists.html:76
+#: mygpo/podcastlists/templates/lists_user.html:37
+msgid "Know Some Great Podcasts?"
+msgstr "멋진 팟캐스트 알고 계신가요?"
+
+#: mygpo/directory/templates/podcast_lists.html:77
+#: mygpo/podcastlists/templates/lists_user.html:38
+msgid "Create a list of podcasts about a topic you like"
+msgstr "좋아하는 주제의 팟캐스트 목록 만들기"
+
+#: mygpo/directory/templates/search.html:11
+#: mygpo/directory/templates/search.html:14
+#: mygpo/directory/templates/search.html:25
+#: mygpo/podcastlists/templates/list.html:111
+#: mygpo/subscriptions/templates/subscriptions.html:53
+#: mygpo/web/templates/base.html:136 mygpo/web/templates/home.html:156
+#: mygpo/web/templatetags/menu.py:34
+msgid "Search"
+msgstr "검색"
+
+#: mygpo/directory/templates/search.html:23
+#: mygpo/podcastlists/templates/list.html:109
+#: mygpo/subscriptions/templates/subscriptions.html:51
+msgid "Search term or feed URL"
+msgstr ""
+
+#: mygpo/directory/templates/search.html:79
+#: mygpo/podcastlists/templates/list_search.html:65
+msgid "Nothing found"
+msgstr "검색 결과가 없습니다"
+
+#: mygpo/directory/templates/search.html:91
+msgid "Search API"
+msgstr "검색 API"
+
+#: mygpo/directory/templates/search.html:92
+msgid "Access the following address to search for <em>tech</em> podcasts."
+msgstr "<em>기술</em> 팟캐스트를 검색하려면 다음 주소를 보십시오."
+
+#: mygpo/directory/templates/toplist.html:14
+#: mygpo/directory/templates/toplist.html:17
+msgid "Toplist"
+msgstr "순위"
+
+#: mygpo/directory/templates/toplist.html:88
+msgid "Client Access"
+msgstr "클라이언트 접근"
+
+#: mygpo/directory/views.py:320
+#, python-format
+msgid "%d podcasts added"
+msgstr "팟캐스트 %d개 추가함"
+
+#: mygpo/flattr.py:151
+msgid "Not enough means to flattr"
+msgstr "Flattr 권한이 없습니다"
+
+#: mygpo/flattr.py:153
+msgid "Item does not exist on Flattr"
+msgstr "항목이 Flattr에 없습니다"
+
+#: mygpo/flattr.py:155
+msgid "Already flattred or own item"
+msgstr "이미 Flattr했거나 자기 자신의 항목입니다"
+
+#: mygpo/flattr.py:157
+msgid "Invalid request"
+msgstr "잘못된 요청"
+
+#: mygpo/flattr.py:160
+msgid "No internet connection"
+msgstr "인터넷 연결되지 않음"
+
+#: mygpo/flattr.py:162
+msgid "No description"
+msgstr "설명 없음"
+
+#: mygpo/history/templates/history.html:12
+#: mygpo/history/templates/history.html:15
+#: mygpo/web/templates/podcast-history.html:32
+#: mygpo/web/templates/podcast.html:143
+msgid "Subscription History"
+msgstr "구독 기록"
+
+# 구독 목록 for 클라이언트
+#: mygpo/history/templates/history.html:12
+#: mygpo/history/templates/history.html:15
+msgid "for"
+msgstr ","
+
+#: mygpo/history/templates/history.html:22
+#: mygpo/web/templates/device-edit.html:16
+msgid "Back to"
+msgstr "돌아가기"
+
+#: mygpo/history/templates/history.html:66
+msgid "Nothing happened yet."
+msgstr "아직 아무 일도 일어나지 않았습니다."
+
+#: mygpo/history/templates/history.html:73
+#: mygpo/history/templates/history.html:75
+msgid "Later"
+msgstr "더 나중"
+
+#: mygpo/history/templates/history.html:80
+#: mygpo/history/templates/history.html:82
+msgid "Now"
+msgstr "지금"
+
+#: mygpo/history/templates/history.html:87
+#: mygpo/history/templates/history.html:89
+msgid "Earlier"
+msgstr "더 예전"
+
+#: mygpo/podcastlists/templates/list.html:28
+#, python-format
+msgid "\"%(list_title)s\" by %(ownername)s"
+msgstr "\"%(list_title)s\" by %(ownername)s"
+
+#: mygpo/podcastlists/templates/list.html:35
+#, python-format
+msgid "a podcast list by <a href=\"%(user-lists-url)s\">%(ownername)s</a>"
+msgstr "팟캐스트 목록 by <a href=\"%(user-lists-url)s\">%(ownername)s</a>"
+
+#: mygpo/podcastlists/templates/list.html:74
+msgid "No Podcasts"
+msgstr "팟캐스트 없음"
+
+#: mygpo/podcastlists/templates/list.html:84
+msgid "Vote"
+msgstr "투표"
+
+#: mygpo/podcastlists/templates/list.html:90
+msgid "Download as OPML"
+msgstr "OPML로 다운로드"
+
+#: mygpo/podcastlists/templates/list.html:96
+msgid "Flattr this podcast list"
+msgstr "이 팟캐스트 목록에 Flattr"
+
+#: mygpo/podcastlists/templates/list.html:128
+msgid "Your own Podcast Lists"
+msgstr "나만의 팟캐스트 목록"
+
+#: mygpo/podcastlists/templates/list.html:129
+msgid "Create and share your own podcast lists "
+msgstr "나만의 팟캐스트 목록 만들기 및 공유 "
+
+#: mygpo/podcastlists/templates/list.html:130
+#: mygpo/publisher/templates/publisher/home.html:31
+#: mygpo/web/templates/user_subscriptions.html:65
+msgid "Go"
+msgstr "이동"
+
+#: mygpo/podcastlists/templates/lists.html:29
+#: mygpo/podcastlists/templates/lists_user.html:22
+#: mygpo/share/templates/userpage.html:91
+#, python-format
+msgid "%(num_podcasts)s Podcasts"
+msgstr "팟캐스트 %(num_podcasts)s개"
+
+#: mygpo/podcastlists/templates/lists.html:34
+#: mygpo/web/templates/device-edit.html:77
+msgid "Delete"
+msgstr "삭제"
+
+#: mygpo/podcastlists/templates/lists.html:41
+msgid "You don't have any podcast lists yet."
+msgstr "아직 팟캐스트 목록을 만들지 않았습니다."
+
+#: mygpo/podcastlists/templates/lists.html:52
+#: mygpo/share/templates/share/favorites.html:57
+#: mygpo/web/templates/devicelist.html:64
+msgid "Create"
+msgstr "만들기"
+
+#: mygpo/podcastlists/templates/lists.html:60
+msgid ""
+"Podcast Lists are intended to share podcasts about certain topics and are "
+"therefore always visible to everyone."
+msgstr ""
+"팟캐스트 목록은 특정 주제에 대한 팟캐스트를 공유해서 모든 사람이 언제나 볼 "
+"수 있게 합니다."
+
+#: mygpo/podcastlists/templates/lists_user.html:12
+#, python-format
+msgid "Podcast Lists by %(username)s"
+msgstr "팟캐스트 목록 by %(username)s"
+
+#: mygpo/podcastlists/templates/lists_user.html:27
+#, python-format
+msgid "%(username)s hasn't created any podcast lists yet."
+msgstr "%(username)s 사용자는 아직 팟캐스트를 하나도 만들지 않았습니다."
+
+#: mygpo/podcastlists/views.py:110
+msgid "You have to specify a title."
+msgstr "제목을 지정해야 합니다."
+
+#: mygpo/podcastlists/views.py:116
+#, python-brace-format
+msgid "\"{title}\" is not a valid title"
+msgstr "\"{title}\"은(는) 올바른 제목이 아닙니다."
+
+#: mygpo/podcastlists/views.py:175
+msgid "Thanks for rating!"
+msgstr "평가해 주셔서 감사합니다!"
+
+#: mygpo/podcasts/admin.py:22 mygpo/web/templates/device-edit.html:28
+msgid "Edit"
+msgstr "편집"
+
+#: mygpo/podcasts/models.py:680
+#, fuzzy
+#| msgid "Unnamed Podcast"
+msgid "Unknown Podcast"
+msgstr "이름 없는 팟캐스트"
+
+#: mygpo/podcasts/models.py:682
+#, python-brace-format
+msgid "Unknown Podcast from {domain}"
+msgstr ""
+
+#: mygpo/podcasts/views/episode.py:196 mygpo/podcasts/views/podcast.py:367
+msgid "Flattr'd"
+msgstr "Flattr함"
+
+#: mygpo/publisher/forms.py:5
+#: mygpo/publisher/templates/publisher/episode.html:60
+msgid "URL"
+msgstr "URL"
+
+#: mygpo/publisher/templates/link.html:8
+msgid "For Podcast Authors"
+msgstr "팟캐스트 제작자용"
+
+#: mygpo/publisher/templates/link.html:11
+msgid "Link to"
+msgstr "연결하기"
+
+#: mygpo/publisher/templates/link.html:17
+#: mygpo/publisher/templates/publisher/podcast.html:199
+#, python-format
+msgid ""
+"You can paste this code on your website, so users of %(sitename)s can "
+"directly subscribe to your podcast."
+msgstr ""
+"다음 코드를 웹사이트에 붙여 넣으면, %(sitename)s 사용자가 여러분 팟캐스트에 "
+"직접 구독할 수 있습니다."
+
+#: mygpo/publisher/templates/link.html:18
+msgid "Change the field 'YOUR_ADRESS' with the adress of your podcast feed."
+msgstr "'YOUR_ADRESS' 필드를 여러분 팟캐스트 피드 주소로 바꾸십시오."
+
+#: mygpo/publisher/templates/publisher/advertise.html:9
+#: mygpo/publisher/templates/publisher/info.html:20
+#: mygpo/web/templates/base.html:154 mygpo/web/templates/base.html:181
+#: mygpo/web/templates/home.html:174 mygpo/web/templates/home.html:201
+#: mygpo/web/templatetags/menu.py:67
+msgid "Advertise"
+msgstr "광고"
+
+#: mygpo/publisher/templates/publisher/advertise.html:12
+#, python-format
+msgid "Advertise on %(sitename)s"
+msgstr "%(sitename)s에 광고"
+
+#: mygpo/publisher/templates/publisher/advertise.html:18
+#, python-format
+msgid ""
+"For just € 20,-- your podcast will be shown on the <strong>front page of "
+"%(sitename)s for a week</strong>. Additionally it will be the first podcast "
+"in <strong>gPodder's list of example podcasts.</strong>"
+msgstr ""
+"20유로만으로 여러분의 팟캐스트가 <strong>1주일 동안 %(sitename)s의 초기 화면"
+"에</strong> 표시됩니다. 또 <strong>gPodder의 예제 팟캐스트 목록</strong>의 첫"
+"번째로 여러분의 팟캐스트가 표시됩니다."
+
+#: mygpo/publisher/templates/publisher/advertise.html:20
+msgid ""
+"You can chose when your advertisement will be active, and the text that will "
+"be displayed for your podcast."
+msgstr ""
+"팟캐스트의 광고를 언제 활성화할지, 무슨 문구를 표시할 지 선택할 수 있습니다."
+
+#: mygpo/publisher/templates/publisher/advertise.html:22
+msgid "Front Page"
+msgstr "초기 화면"
+
+#: mygpo/publisher/templates/publisher/advertise.html:23
+#, python-format
+msgid ""
+"Your podcast will be displayed on the front page of %(sitename)s for both "
+"logged-in and anonymous users."
+msgstr ""
+"여러분의 팟캐스트가 %(sitename)s 사이트 로그인 및 익명 사용자의 초기 화면에 "
+"표시됩니다."
+
+#: mygpo/publisher/templates/publisher/advertise.html:25
+msgid "Example Podcasts"
+msgstr "예제 팟캐스트"
+
+#: mygpo/publisher/templates/publisher/advertise.html:26
+msgid ""
+"The gPodder client offers a list of example podcasts when started for the "
+"first time. This list is loaded from the web on demand. For the time of your "
+"advertisement, your podcast will be the first in the list."
+msgstr ""
+"gPodder 클라이언트는 처음 시작할 때 팟캐스트 예제 목록을 표시합니다. 이 목록"
+"은 웹에서 요청에 따라 읽어들입니다. 광고를 할 경우, 여러분의 팟캐스트가 목록 "
+"처음에 나타납니다."
+
+#: mygpo/publisher/templates/publisher/advertise.html:28
+msgid "Visitors"
+msgstr "방문자"
+
+#: mygpo/publisher/templates/publisher/advertise.html:29
+msgid ""
+"Both the front page and the list of example podcasts are accessed by more "
+"than 1000 people daily, who are actively looking for interesting podcasts. "
+"We do, however, not guarantee a certain number of visitors during your "
+"advertisement period."
+msgstr ""
+"초기 화면과 예제 팟캐스트 목록은 매일 1000명 이상이 보고, 이들은 흥미로운 팟"
+"캐스트를 적극적으로 찾는 사람들입니다. 하지만 광고 기간 중에 일정 수의 방문자"
+"를 보장하지는 않습니다."
+
+#: mygpo/publisher/templates/publisher/advertise.html:31
+msgid "Start your Advertisement"
+msgstr "광고 시작하기"
+
+#: mygpo/publisher/templates/publisher/advertise.html:32
+#, python-format
+msgid ""
+"Contact <a href=\"mailto:stefan@gpodder.net\">stefan@gpodder.net</a> if you "
+"would like to advertise on %(sitename)s or if you have any questions. "
+"Payments are done via PayPal to thp@perli.net."
+msgstr ""
+"%(sitename)s 사이트에 광고를 하고 싶거나 문의 사항이 있으면 <a href=\"mailto:"
+"stefan@gpodder.net\">stefan@gpodder.net</a> 주소로 연락하십시오. 광고비는 "
+"PayPal thp@perli.net으로 보냅니다."
+
+#: mygpo/publisher/templates/publisher/episode.html:31
+msgid "Unnamed Episode"
+msgstr "이름 없는 에피소드"
+
+#: mygpo/publisher/templates/publisher/episode.html:31
+#: mygpo/publisher/templates/publisher/episodes.html:23
+#: mygpo/publisher/templates/publisher/info.html:9
+#: mygpo/publisher/templates/publisher/info.html:26
+#: mygpo/publisher/templates/publisher/podcast.html:26
+#: mygpo/web/templates/episode.html:85 mygpo/web/templates/episodes.html:27
+#: mygpo/web/templates/podcast.html:39
+msgid "Publisher Pages"
+msgstr "제작자 페이지"
+
+#: mygpo/publisher/templates/publisher/episode.html:40
+#: mygpo/publisher/templates/publisher/podcast.html:38
+#: mygpo/web/templates/episode-history.html:57
+#: mygpo/web/templates/episode.html:58 mygpo/web/templates/podcast-base.html:54
+msgid "Website"
+msgstr "웹사이트"
+
+#: mygpo/publisher/templates/publisher/episode.html:45
+#: mygpo/web/templates/episode-history.html:62
+#: mygpo/web/templates/episode.html:63
+msgid "listeners"
+msgstr "청취자"
+
+#: mygpo/publisher/templates/publisher/episode.html:55
+#, fuzzy
+#| msgid "Episode URLs"
+msgid "Episode List"
+msgstr "에피소드 URL"
+
+#: mygpo/publisher/templates/publisher/episode.html:56
+#, fuzzy
+#| msgid "Go to Podcast Page"
+msgid "Podcast Page"
+msgstr "팟캐스트 페이지로 이동"
+
+#: mygpo/publisher/templates/publisher/episode.html:61
+msgid ""
+"You can configure the URL of this episode. Previous keys will automatically "
+"be added to the alternative keys and always redirect to the current URL."
+msgstr ""
+"이 에피소드의 URL을 설정할 수 있습니다. 예전 키는 자동으로 보조 키로 추가되"
+"고 현재 URL로 리다이렉트됩니다."
+
+#: mygpo/publisher/templates/publisher/episode.html:72
+#: mygpo/publisher/templates/publisher/podcast.html:91
+#: mygpo/web/templates/account.html:68 mygpo/web/templates/account.html:157
+#: mygpo/web/templates/account.html:213 mygpo/web/templates/device-edit.html:53
+msgid "Save"
+msgstr "저장"
+
+#: mygpo/publisher/templates/publisher/episode.html:86
+msgid "Episode data"
+msgstr "에피소드 데이터"
+
+#: mygpo/publisher/templates/publisher/episode.html:87
+msgid "Last update: "
+msgstr "최근 업데이트: "
+
+#: mygpo/publisher/templates/publisher/episodes.html:23
+#: mygpo/publisher/templates/publisher/podcast.html:26
+#: mygpo/web/templates/podcast-base.html:39
+msgid "Unnamed Podcast"
+msgstr "이름 없는 팟캐스트"
+
+#: mygpo/publisher/templates/publisher/episodes.html:24
+msgid "Return to Podcast Page"
+msgstr "팟캐스트 페이지로 돌아가기"
+
+#: mygpo/publisher/templates/publisher/episodes.html:31
+#: mygpo/share/templates/userpage.html:185
+#: mygpo/share/templates/userpage.html:191 mygpo/web/templatetags/menu.py:44
+msgid "Episodes"
+msgstr "에피소드"
+
+#: mygpo/publisher/templates/publisher/episodes.html:34
+msgid "Title"
+msgstr "제목"
+
+#: mygpo/publisher/templates/publisher/episodes.html:35
+msgid "Released"
+msgstr "발표"
+
+#: mygpo/publisher/templates/publisher/group.html:21
+msgid "Publisher Pages:"
+msgstr "제작자 페이지:"
+
+#: mygpo/publisher/templates/publisher/group.html:26
+msgid "This is a group of podcasts containing"
+msgstr "다음 팟캐스트가 들어 있는 팟캐스트 모음입니다:"
+
+#: mygpo/publisher/templates/publisher/home.html:9
+msgid "Podcasts Published by Me"
+msgstr "내가 공개한 팟캐스트"
+
+#: mygpo/publisher/templates/publisher/home.html:12
+#, fuzzy
+#| msgid "Publisher Pages"
+msgid "Publisher Area"
+msgstr "제작자 페이지"
+
+#: mygpo/publisher/templates/publisher/home.html:21
+msgid "Staff only"
+msgstr ""
+
+#: mygpo/publisher/templates/publisher/home.html:24
+msgid "Go to the publisher page of any podcast by entering its feed URL"
+msgstr "어떤 팟캐스트든지 피드 URL을 입력해 해당 제작자의 페이지로 이동합니다"
+
+#: mygpo/publisher/templates/publisher/home.html:29
+msgid "http://"
+msgstr ""
+
+#: mygpo/publisher/templates/publisher/home.html:43
+#, fuzzy
+#| msgid "Publisher Pages"
+msgid "Published Podcasts"
+msgstr "제작자 페이지"
+
+#: mygpo/publisher/templates/publisher/home.html:46
+msgid "You have publisher permissions for the following podcasts."
+msgstr ""
+
+#: mygpo/publisher/templates/publisher/home.html:62
+#, fuzzy
+#| msgid "Update your podcasts"
+msgid "Update podcasts"
+msgstr "내 팟캐스트 업데이트"
+
+#: mygpo/publisher/templates/publisher/home.html:65
+msgid ""
+"To update all of your published podcasts automatically, you can request the "
+"following URL"
+msgstr ""
+"여러분의 모든 공개 팟캐스트를 자동으로 업데이트하려면, 다음 URL에 요청하면 됩"
+"니다"
+
+#: mygpo/publisher/templates/publisher/home.html:69
+msgid "Create a new token"
+msgstr "새 토큰 만들기"
+
+#: mygpo/publisher/templates/publisher/info.html:12
+msgid "Publisher Services"
+msgstr "제작자 서비스"
+
+#: mygpo/publisher/templates/publisher/info.html:18
+#, python-format
+msgid "%(sitename)s offers several services for podcast publishers."
+msgstr ""
+"%(sitename)s 사이트에서 팟캐스트 제작자에게 몇 가지 서비스를 제공합니다."
+
+#: mygpo/publisher/templates/publisher/info.html:21
+#, python-format
+msgid ""
+"You can place your podcast on the frontpage of %(sitename)s to promote your "
+"podcast. Users of the gPodder client will also find your podcast as the "
+"first item in the list of example podcast."
+msgstr ""
+"여러분의 팟캐스트를 %(sitename)s의 초기 화면에 표시해 여러분 팟캐스트를 홍보"
+"할 수 있습니다. gPodder 클라이언트의 사용자들도 예제 팟캐스트 목록의 첫번째 "
+"항목으로 여러분의 팟캐스트를 찾게 됩니다."
+
+#: mygpo/publisher/templates/publisher/info.html:24
+#, python-format
+msgid ""
+"You can find additional details on the <a href=\"%(advertise-url)s"
+"\">advertisement page</a>."
+msgstr ""
+"<a href=\"%(advertise-url)s\">광고 페이지</a>에서 자세히 볼 수 있습니다."
+
+#: mygpo/publisher/templates/publisher/info.html:27
+#, python-format
+msgid ""
+"On the <strong>%(sitename)s Publisher Pages</strong> you can find valuable "
+"information about the Podcasts published by you."
+msgstr ""
+"<strong>%(sitename)s 제작자 페이지</strong>에 여러분이 공개한 팟캐스트에 대"
+"한 여러 정보를 볼 수 있습니다."
+
+#: mygpo/publisher/templates/publisher/info.html:30
+#, python-format
+msgid ""
+"The Publisher Pages are currently in Beta, but if you are publishing a "
+"podcast listed on %(sitename)s, feel free to apply by sending a mail with\n"
+"  <ul>\n"
+"   <li>your username on %(sitename)s (<a href=\"%(register-url)s\">register "
+"if you don't have one</a>)</li>\n"
+"   <li>the name and URL of the podcast you are publishing</li>\n"
+"   <li>an email address that is visible somewhere on the podcast's website "
+"(to legitimate you)\n"
+"  </ul>\n"
+"  to <a href=\"mailto:stefan@gpodder.net\">stefan@gpodder.net</a>."
+msgstr ""
+"제작자 페이지는 현재 베타 버전입니다. %(sitename)s에 들어 있는 팟캐스트의 제"
+"작자라면 다음과 같은 내용의 메일을 <a href=\"mailto:stefan@gpodder.net"
+"\">stefan@gpodder.net</a> 주소로 보내 지원해 주십시오.\n"
+"  <ul>\n"
+"   <li>%(sitename)s의 사용자 이름 (<a href=\"%(register-url)s\">아직 없으면 "
+"등록</a>)</li>\n"
+"   <li>제작한 팟캐스트의 이름과 URL</li>\n"
+"   <li>팟캐스트 웹사이트에서 볼 수 있는 (본인의) 메일 주소</li>\n"
+"  </ul>"
+
+#: mygpo/publisher/templates/publisher/info.html:39
+#, python-format
+msgid ""
+"If you already are registered as a publisher, please <a href=\"%(login-url)s?"
+"next=/publisher/\">login</a>."
+msgstr ""
+"이미 제작자로 등록했다면, <a href=\"%(login-url)s?next=/publisher/\">로그인</"
+"a>하십시오."
+
+#: mygpo/publisher/templates/publisher/info.html:41
+#, python-format
+msgid "Link to %(sitename)s"
+msgstr "%(sitename)s에 링크"
+
+#: mygpo/publisher/templates/publisher/info.html:44
+#, python-format
+msgid ""
+"If you <a href=\"%(link-here-url)s\">link to %(sitename)s</a> from your "
+"website, you can make it really easy for your visitors to subscribe to your "
+"podcast - especially for users of mobile phones."
+msgstr ""
+"여러분 웹사이트에서 <a href=\"%(link-here-url)s\">%(sitename)s에 링크</a>하"
+"면, 웹 방문자가 팟캐스트에 아주 쉽게 구독할 수 있습니다. 특히 휴대폰 사용자"
+"의 경우 그렇습니다."
+
+#: mygpo/publisher/templates/publisher/podcast.html:28
+#: mygpo/web/templates/podcast-base.html:44
+msgid "by"
+msgstr "by"
+
+#: mygpo/publisher/templates/publisher/podcast.html:34
+#: mygpo/share/templates/share/favorites.html:29
+#: mygpo/web/templates/podcast-base.html:50
+msgid "Feed"
+msgstr "피드"
+
+#: mygpo/publisher/templates/publisher/podcast.html:43
+#: mygpo/web/templates/podcast-base.html:65
+msgid "subscribers"
+msgstr "구독자"
+
+#: mygpo/publisher/templates/publisher/podcast.html:48
+#, python-format
+msgid ""
+"This is the publisher page of <strong>%(ptitle)s</strong>. You can see some "
+"stats and provide additional data for the podcast page."
+msgstr ""
+"<strong>%(ptitle)s</strong>의 제작자 페이지입니다. 팟캐스트 페이지에 대한 통"
+"계와 추가 정보를 볼 수 있습니다."
+
+#: mygpo/publisher/templates/publisher/podcast.html:49
+msgid "Go to Podcast Page"
+msgstr "팟캐스트 페이지로 이동"
+
+#: mygpo/publisher/templates/publisher/podcast.html:56
+msgid "The podcast information is regularly retrieved from the podcast feed"
+msgstr "팟캐스트 정보는 주기적으로 팟캐스트 피드에서 가져옵니다"
+
+#: mygpo/publisher/templates/publisher/podcast.html:59
+msgid "Timing"
+msgstr ""
+
+#: mygpo/publisher/templates/publisher/podcast.html:61
+#, fuzzy
+#| msgid "Last update: "
+msgid "Last update:"
+msgstr "최근 업데이트: "
+
+#: mygpo/publisher/templates/publisher/podcast.html:62
+#, fuzzy
+#| msgid "Update now"
+msgid "Update interval:"
+msgstr "지금 업데이트"
+
+#: mygpo/publisher/templates/publisher/podcast.html:63
+#, fuzzy
+#| msgid "Last update: "
+msgid "Next update:"
+msgstr "최근 업데이트: "
+
+#: mygpo/publisher/templates/publisher/podcast.html:68
+msgid "Update now"
+msgstr "지금 업데이트"
+
+#: mygpo/publisher/templates/publisher/podcast.html:79 mygpo/web/forms.py:70
+#: mygpo/web/templates/base.html:161 mygpo/web/templates/home.html:181
+msgid "Twitter"
+msgstr "Twitter"
+
+#: mygpo/publisher/templates/publisher/podcast.html:97
+#, fuzzy
+#| msgid "Check"
+msgid "Feed Check"
+msgstr "확인"
+
+#: mygpo/publisher/templates/publisher/podcast.html:105
+#: mygpo/web/templates/account.html:105 mygpo/web/templates/base.html:152
+#: mygpo/web/templates/episode.html:111 mygpo/web/templates/home.html:172
+#: mygpo/web/templates/podcast.html:151 mygpo/web/templatetags/menu.py:40
+msgid "Flattr"
+msgstr "Flattr"
+
+#: mygpo/publisher/templates/publisher/podcast.html:113
+#, python-format
+msgid ""
+"%(sitename)s supports <a href=\"https://flattr.com/\">Flattr</a>. When you "
+"provide <a href=\"http://developers.flattr.net/feed/\">payment URLs</a> in "
+"your podcast feed, your listeners can support you financially by flattring "
+"your content."
+msgstr ""
+"%(sitename)s 사이트는 <a href=\"https://flattr.com/\">Flattr</a>를 지원합니"
+"다. 여러분의 팟캐스트 피드에 <a href=\"http://developers.flattr.net/feed/\">"
+"과금 URLs</a>을 제공하면, 청취자들이 여러분 컨텐츠에 \"flattr\"하는 방법으로 "
+"금전적 지원을 할 수 있습니다."
+
+#: mygpo/publisher/templates/publisher/podcast.html:117
+msgid ""
+" We discovered payment URLs in your pdocast feed. Your listeners can "
+"automatically flattr your content!"
+msgstr ""
+"팟캐스트 피드에 과금 URL을 발견했습니다. 청취자들이 컨텐츠에 자동으로 flattr"
+"할 수 있습니다!"
+
+#: mygpo/publisher/templates/publisher/podcast.html:121
+#, fuzzy
+#| msgid ""
+#| "We did not find <a href=\"http://developers.flattr.net/feed/\">payment "
+#| "URLs</a> in your pdocast feed. Add them so your listeners can support you!"
+#| "</a>"
+msgid ""
+"We did not find <a href=\"http://developers.flattr.net/feed/\">payment URLs</"
+"a> in your podcast feed. Add them so your listeners can support you!</a>"
+msgstr ""
+"팟캐스트 피드에 <a href=\"http://developers.flattr.net/feed/\">과금 URL</a>"
+"이 없습니다. 과금 URL을 추가하면 청취자들이 여러분 팟캐스트를 지원할 수 있습"
+"니다!"
+
+#: mygpo/publisher/templates/publisher/podcast.html:133
+msgid "PubSubHubbub"
+msgstr ""
+
+#: mygpo/publisher/templates/publisher/podcast.html:142
+#, python-format
+msgid ""
+"If you publish your podcast feed through a <a href=\"https://code.google.com/"
+"p/pubsubhubbub/\">PubSubHubbu</a> hub, %(sitename)s can immediatelly update "
+"your podcast when a new episode is released."
+msgstr ""
+
+#: mygpo/publisher/templates/publisher/podcast.html:147
+#, python-format
+msgid ""
+"Your podcast is published through <a href=\"%(hub)s\">%(hub)s</a> and should "
+"update immediatelly for each new episode."
+msgstr ""
+
+#: mygpo/publisher/templates/publisher/podcast.html:151
+#, python-format
+msgid ""
+"Your podcast is published through <a href=\"%(hub)s\">%(hub)s</a> but our "
+"subscription has not yet been verified."
+msgstr ""
+
+#: mygpo/publisher/templates/publisher/podcast.html:156
+#, python-format
+msgid ""
+"We did not find a hub in your podcast feed. Your feed is updated regularly, "
+"but there might be some delay until a new episode shows up on %(sitename)s."
+msgstr ""
+
+#: mygpo/publisher/templates/publisher/podcast.html:168
+#, fuzzy
+#| msgid "Host Information"
+msgid "License Information"
+msgstr "호스트 정보"
+
+#: mygpo/publisher/templates/publisher/podcast.html:176
+#, python-format
+msgid ""
+"You should include license information in your feed so that users and "
+"%(sitename)s can know, under which conditions your content can be used."
+msgstr ""
+
+#: mygpo/publisher/templates/publisher/podcast.html:180
+#, python-format
+msgid ""
+"We found the following license in your podcast: <a href=\"%(license)s\">"
+"%(license)s</a>"
+msgstr ""
+
+#: mygpo/publisher/templates/publisher/podcast.html:184
+msgid ""
+"We did not find a license in your podcast feed. Refer to <a href=\"https://"
+"github.com/gpodder/podcast-feed-best-practice/blob/master/podcast-feed-best-"
+"practice.md#license\"> gPodder Podcast Feed Best Practice</a> on how to "
+"include license information."
+msgstr ""
+
+#: mygpo/publisher/templates/publisher/podcast.html:198
+msgid "Link"
+msgstr "링크"
+
+#: mygpo/publisher/templates/publisher/podcast.html:206
+msgid "Show Group Stats"
+msgstr "그룹 통계 표시"
+
+#: mygpo/publisher/views.py:141
+msgid ""
+"The update has been scheduled. It might take some time until the results are "
+"visible."
+msgstr ""
+"업데이트가 예정되어 있습니다. 결과가 나오려면 시간이 걸릴 수도 있습니다."
+
+#: mygpo/publisher/views.py:154 mygpo/users/views/settings.py:110
+msgid "Data updated"
+msgstr "데이터 업데이트됨"
+
+#: mygpo/publisher/views.py:165
+msgid "Publisher token updated"
+msgstr "제작자 토큰이 업데이트되었습니다"
+
+# slug - RSS permlink의 유니크한 부분을 말한다
+#: mygpo/publisher/views.py:255
+#, python-brace-format
+msgid "Removed slug {slug} from {episode}"
+msgstr "{episode}의 슬러그 {slug} 제거함"
+
+#: mygpo/share/templates/share/components/private-toggle.html:11
+msgid "Public"
+msgstr "공개"
+
+#: mygpo/share/templates/share/components/private-toggle.html:16
+msgid "Private"
+msgstr "비공개"
+
+#: mygpo/share/templates/share/favorites.html:10
+#: mygpo/share/templates/share/favorites.html:14
+msgid "Share your favorite episodes"
+msgstr "즐겨 듣는 에피소드 공유"
+
+#: mygpo/share/templates/share/favorites.html:46
+#: mygpo/share/templates/share/favorites.html:48
+msgid "Directory Entry"
+msgstr "디렉터리 항목"
+
+#: mygpo/share/templates/share/favorites.html:70
+#, python-format
+msgid ""
+"To keep your favorites private (from others and from the public pages of "
+"%(site)s), you need to use HTTP-Authentication in your client. "
+msgstr ""
+"즐겨 듣기를 비공개로 (다른 사람들이나 %(site)s의 공개 페이지에 표시되지 않"
+"게) 유지하려면, 클라이언트에 HTTP 인증 기능을 사용해야 합니다."
+
+#: mygpo/share/templates/share/favorites.html:72
+msgid "Username:"
+msgstr "사용자명:"
+
+#: mygpo/share/templates/share/favorites.html:73
+msgid "Password:"
+msgstr "비밀번호:"
+
+#: mygpo/share/templates/share/favorites.html:79
+msgid "Remove password"
+msgstr "비밀번호 제거"
+
+#: mygpo/share/templates/share/favorites.html:82
+msgid "Generate new password"
+msgstr "새 비밀번호 생성"
+
+#: mygpo/share/templates/share/favorites.html:98
+#, python-format
+msgid ""
+"You've marked your favorites-feed as public and others can\n"
+"      subscribe to it. It will also be indexed by %(sitename)s."
+msgstr ""
+"즐겨 듣는 피드를 공개로 표시해서 다른 사람들이 구독할 수\n"
+"      있게 했습니다. 또 %(sitename)s 사이트 목록에도 포함됩니다."
+
+#: mygpo/share/templates/share/favorites.html:110
+msgid "Create password"
+msgstr "비밀번호 만들기"
+
+#: mygpo/share/templates/share/overview.html:9
+msgid "Sharing"
+msgstr "공유"
+
+#: mygpo/share/templates/share/overview.html:12
+#: mygpo/subscriptions/templates/subscriptions.html:67
+#: mygpo/web/templates/favorites.html:39
+msgid "Share"
+msgstr "공유"
+
+#: mygpo/share/templates/share/overview.html:21
+#: mygpo/web/templates/device.html:19 mygpo/web/templates/privacy.html:25
+#: mygpo/web/templatetags/menu.py:46 mygpo/web/templatetags/menu.py:47
+#: mygpo/web/templatetags/menu.py:58
+msgid "Subscriptions"
+msgstr "구독"
+
+#: mygpo/share/templates/share/overview.html:34
+#: mygpo/share/templates/share/overview.html:49
+#: mygpo/share/templates/share/overview.html:76
+msgid "New Token"
+msgstr "새 토큰"
+
+#: mygpo/share/templates/share/overview.html:40
+msgid "User Page"
+msgstr "사용자 페이지"
+
+#: mygpo/share/templates/share/overview.html:51
+#: mygpo/web/templatetags/menu.py:61
+msgid "Settings"
+msgstr "설정"
+
+#: mygpo/share/templates/share/overview.html:57
+msgid "Favorites Feed"
+msgstr "즐겨 듣는 피드"
+
+#: mygpo/share/templates/share/overview.html:84
+msgid ""
+"Private items are protected by a special token. Only those who know the "
+"exact link can access your content"
+msgstr ""
+"비공개 항목은 특별한 토큰에 따라 보호됩니다. 정확한 링크를 아는 사람만 이 컨"
+"텐츠에 접근할 수 있습니다"
+
+#: mygpo/share/templates/userpage-denied.html:16
+#, python-format
+msgid ""
+"%(username)s didn't share his user page with you. Maybe you should contact "
+"him to get the correct link."
+msgstr ""
+"%(username)s 사용자는 사용자 페이지를 공유하지 않았습니다. 직접 연락해서 올바"
+"른 링크를 알아내야 할 것 같습니다."
+
+#: mygpo/share/templates/userpage-denied.html:20
+msgid "Want to have your own user page?"
+msgstr "나만의 사용자 페이지를 만드시겠습니까?"
+
+#: mygpo/share/templates/userpage-denied.html:20
+#, python-format
+msgid ""
+" Go to your <a href=\"%(share-url)s\">Share Page</a> to get the link.</a>"
+msgstr "<a href=\"%(share-url)s\">페이지 공유</a>에서 링크를 받으십시오."
+
+#: mygpo/share/templates/userpage.html:24
+#, python-format
+msgid "a user on %(site)s"
+msgstr "%(site)s 사이트 사용자"
+
+#: mygpo/share/templates/userpage.html:38
+#, python-format
+msgid ""
+"<strong>%(username)s</strong> is sharing his favorite podcasts on %(site)s."
+msgstr ""
+"<strong>%(username)s</strong> 사용자느 즐겨 듣는 팟캐스트를 %(site)s에 공유합"
+"니다."
+
+#: mygpo/share/templates/userpage.html:50
+#, python-format
+msgid "%(subscription_count)s Subscriptions"
+msgstr "구독 %(subscription_count)s개"
+
+#: mygpo/share/templates/userpage.html:55
+msgid "Episodes Listened"
+msgstr "청취한 에피소드"
+
+#: mygpo/share/templates/userpage.html:71
+#: mygpo/share/templates/userpage.html:100
+#: mygpo/share/templates/userpage.html:151
+msgid "see all"
+msgstr "모두 보기"
+
+#: mygpo/share/templates/userpage.html:86
+#, python-format
+msgid "%(list_count)s Podcast Lists"
+msgstr "팟캐스트 목록 %(list_count)s개"
+
+#: mygpo/share/templates/userpage.html:113
+#, python-format
+msgid "%(num_episodes)s Recently Played Episodes"
+msgstr "최근 재생한 에피소드 %(num_episodes)s개"
+
+#: mygpo/share/templates/userpage.html:134
+#, python-format
+msgid "%(num_fav_episodes)s Favorite Episodes"
+msgstr "즐겨 듣는 에피소드 %(num_fav_episodes)s개"
+
+#: mygpo/share/templates/userpage.html:169
+msgid "That's You!"
+msgstr "이게 나예요!"
+
+#: mygpo/share/templates/userpage.html:171
+msgid "Edit your profile"
+msgstr "프로파일 편집"
+
+#: mygpo/share/templates/userpage.html:179
+msgid "Stats"
+msgstr "통계"
+
+#: mygpo/share/templates/userpage.html:181
+msgid "Total Played:"
+msgstr "전체 재생:"
+
+#: mygpo/share/templates/userpage.html:187
+msgid "Played Last Month:"
+msgstr "지난달 재생:"
+
+#: mygpo/share/templates/userpage.html:193
+msgid "Member Since:"
+msgstr "가입한 때:"
+
+#: mygpo/share/templates/userpage.html:197
+msgid "the early days"
+msgstr "옛날옛적에"
+
+#: mygpo/subscriptions/templates/subscriptions.html:11
+#: mygpo/subscriptions/templates/subscriptions.html:15
+msgid "Podcast Subscriptions"
+msgstr "팟캐스트 구독"
+
+#: mygpo/subscriptions/templates/subscriptions.html:32
+#, python-format
+msgid "%(episode_count)s Episodes"
+msgstr "에피소드 %(episode_count)s개"
+
+#: mygpo/subscriptions/templates/subscriptions.html:42
+#, python-format
+msgid ""
+"You don't have any subscriptions yet. Set up your <a href=\"%(devices)s"
+"\">podcast clients</a> and <a href=\"%(directory)s\">discover interesting "
+"podcasts</a>."
+msgstr ""
+"아직 구독이 없습니다. <a href=\"%(devices)s\">팟캐스트 클라이언트</a>와 <a "
+"href=\"%(directory)s\">재미있는 팟캐스트 찾기</a>를 설정하십시오."
+
+#: mygpo/subscriptions/templates/subscriptions.html:63
+#: mygpo/suggestions/templates/suggestions.html:54
+#: mygpo/web/templates/device.html:53
+msgid "Download OPML"
+msgstr "OPML 다운로드"
+
+#: mygpo/subscriptions/views.py:108
+#, python-format
+msgid "%(username)s's Podcast Subscriptions on %(site)s"
+msgstr "%(username)s의 팟캐스트 구독, (%(site)s)"
+
+#: mygpo/subscriptions/views.py:112
+#, python-format
+msgid "Recent changes to %(username)s's podcast subscriptions on %(site)s"
+msgstr "최근에 %(username)s의 팟캐스트 구독 (%(site)s) 변경 사항"
+
+#: mygpo/subscriptions/views.py:136
+#, python-format
+msgid "%(username)s subscribed to %(podcast)s (%(site)s)"
+msgstr "%(username)s %(podcast)s에 구독 (%(site)s)"
+
+#: mygpo/subscriptions/views.py:138
+#, python-format
+msgid "%(username)s unsubscribed from %(podcast)s (%(site)s)"
+msgstr "%(username)s %(podcast)s에서 구독 해제 (%(site)s)"
+
+#: mygpo/suggestions/templates/suggestions.html:9
+#: mygpo/suggestions/templates/suggestions.html:12
+msgid "Suggested Podcasts"
+msgstr "추천 팟캐스트"
+
+#: mygpo/suggestions/templates/suggestions.html:31
+#: mygpo/web/templates/podcast.html:59 mygpo/web/templates/subscribe.html:11
+#: mygpo/web/templates/subscribe.html:36
+msgid "Subscribe"
+msgstr "구독"
+
+#: mygpo/suggestions/templates/suggestions.html:36
+msgid "No Interest"
+msgstr "관심 없음"
+
+#: mygpo/suggestions/templates/suggestions.html:47
+msgid "No Suggestions Yet"
+msgstr "아직 추천 없음"
+
+#: mygpo/users/models.py:220
+msgid "Desktop"
+msgstr "데스크톱"
+
+#: mygpo/users/models.py:221
+msgid "Laptop"
+msgstr "노트북"
+
+#: mygpo/users/models.py:222
+msgid "Cell phone"
+msgstr "휴대전화"
+
+#: mygpo/users/models.py:223
+msgid "Server"
+msgstr "서버"
+
+#: mygpo/users/models.py:224
+msgid "Tablet"
+msgstr ""
+
+#: mygpo/users/models.py:225
+msgid "Other"
+msgstr "기타"
+
+#: mygpo/users/templates/registration/activation_failed.html:8
+#, fuzzy
+#| msgid "Activation Mail"
+msgid "Activation failed"
+msgstr "활성화 메일"
+
+#: mygpo/users/templates/registration/activation_failed.html:11
+msgid "Account not activated"
+msgstr "계정 활성화되지 않음"
+
+#: mygpo/users/templates/registration/activation_failed.html:16
+#, fuzzy
+#| msgid "Your account could not be activated successfully."
+msgid "Your account could not be activated."
+msgstr "계정을 성공적으로 활성화하지 못했습니다."
+
+#: mygpo/users/templates/registration/registration_complete.html:9
+msgid "Registration complete"
+msgstr "등록 완료"
+
+#: mygpo/users/templates/registration/registration_complete.html:13
+msgid ""
+"Please confirm your account using the email you should just have received."
+msgstr "받으신 메일 내용에 따라 계정을 확인해 주십시오."
+
+#: mygpo/users/templates/registration/registration_form.html:8
+#: mygpo/users/templates/registration/registration_form.html:11
+msgid "Create Account"
+msgstr "계정 만들기"
+
+#: mygpo/users/templates/registration/registration_form.html:18
+msgid "You are already registered."
+msgstr "이미 등록했습니다."
+
+#: mygpo/users/templates/registration/registration_form.html:72
+#: mygpo/web/templates/base.html:52 mygpo/web/templates/home.html:47
+#: mygpo/web/templates/home.html:103 mygpo/web/templates/login.html:48
+#: mygpo/web/templatetags/menu.py:24
+msgid "Register"
+msgstr "등록"
+
+#: mygpo/users/templates/registration/registration_form.html:87
+msgid "Activation Mail"
+msgstr "활성화 메일"
+
+#: mygpo/users/templates/registration/registration_form.html:88
+msgid ""
+"After registration, you'll receive an activation mail to confirm the "
+"validity of your email address."
+msgstr "등록한 뒤에, 메일 주소가 맞는지 확인하는 활성화 메일을 받게 됩니다."
+
+#: mygpo/users/templates/registration/registration_form.html:90
+#, python-format
+msgid ""
+"If it doesn't arrive, you can <a href=\"%(resend-activation-url)s\">resend</"
+"a> it."
+msgstr ""
+"메일이 도착하지 않으면, <a href=\"%(resend-activation-url)s\">다시 보내</a> "
+"보십시오."
+
+#: mygpo/users/templates/registration/resend_activation.html:4
+#: mygpo/users/templates/registration/resend_activation.html:8
+msgid "Resend activation e-mail"
+msgstr "활성화 메일 다시 보내기"
+
+#: mygpo/users/templates/registration/resend_activation.html:18
+#: mygpo/web/templates/restore_password.html:21
+msgid ""
+"Please enter either your username or (if you don't know that either) the e-"
+"mail address which you used to register your account. An e-mail will be sent "
+"to you."
+msgstr ""
+"사용자 이름이나 (사용자 이름을 모르면) 계정 등록할 때 사용한 메일 주소를 입력"
+"하십시오. 메일을 받게 됩니다."
+
+#: mygpo/users/templates/registration/resend_activation.html:36
+msgid "Send activation e-mail"
+msgstr "활성화 메일 보내기"
+
+#: mygpo/users/templates/registration/resent_activation.html:4
+#: mygpo/users/templates/registration/resent_activation.html:7
+msgid "Sent Activation Email"
+msgstr "활성화 메일을 보냈습니다"
+
+#: mygpo/users/templates/registration/resent_activation.html:11
+msgid "The activation email has been reset."
+msgstr "활성화 메일이 초기화되었습니다."
+
+#: mygpo/users/views/device.py:80 mygpo/users/views/device.py:170
+msgid "Synchronize with the following devices"
+msgstr "다음 장치에 동기화"
+
+#: mygpo/users/views/device.py:98
+msgid "Please fill out all fields."
+msgstr "모든 필드를 채우십시오."
+
+#: mygpo/users/views/device.py:110
+msgid "Device saved"
+msgstr "장치를 저장했습니다"
+
+#: mygpo/users/views/device.py:117 mygpo/users/views/device.py:148
+msgid "You can't use the same Device ID for two devices."
+msgstr "장치 두 개에 같은 장치 ID를 사용할 수 없습니다."
+
+#: mygpo/users/views/device.py:141
+msgid "Device updated"
+msgstr "장치 업데이트함"
+
+#: mygpo/users/views/device.py:194
+#, python-brace-format
+msgid "Could not upload subscriptions: {err}"
+msgstr "구독을 업로드할 수 없습니다: {err}"
+
+#: mygpo/users/views/device.py:292
+#, fuzzy
+#| msgid "New subscriptions will be private by default."
+msgid "Your subscription will be updated in a moment."
+msgstr "새로 구독하면 기본값으로 비공개입니다."
+
+#: mygpo/users/views/registration.py:88
+msgid "Username or email address already in use"
+msgstr ""
+
+#: mygpo/users/views/registration.py:153
+msgid "The activation link is either not valid or has already expired."
+msgstr ""
+
+#: mygpo/users/views/registration.py:158
+#, fuzzy
+#| msgid "Your account already has been activated. Go ahead and log in."
+msgid "Your user has been activated. You can log in now."
+msgstr "계정을 이미 활성화했습니다. 계속 사용하시려면 로그인하십시오."
+
+#: mygpo/users/views/registration.py:175
+msgid "Either username or email address are required."
+msgstr ""
+
+#: mygpo/users/views/registration.py:195 mygpo/users/views/user.py:128
+msgid "User does not exist."
+msgstr "사용자가 없습니다."
+
+#: mygpo/users/views/registration.py:199
+msgid "Your account already has been activated. Go ahead and log in."
+msgstr "계정을 이미 활성화했습니다. 계속 사용하시려면 로그인하십시오."
+
+#: mygpo/users/views/settings.py:69 mygpo/users/views/settings.py:104
+msgid "Oops! Something went wrong. Please double-check the data you entered."
+msgstr "앗! 뭔가가 잘못됐습니다. 입력한 데이터가 맞는지 한 번 더 확인하십시오."
+
+#: mygpo/users/views/settings.py:167
+msgid "Authentication successful"
+msgstr "인증 성공"
+
+#: mygpo/users/views/settings.py:173
+msgid "Authentication failed. Try again later"
+msgstr "인증이 실패했습니다. 나중에 다시 시도해 보십시오"
+
+#: mygpo/users/views/settings.py:185
+msgid "Your account has been disconnected"
+msgstr "계정의 연결이 끊겼습니다"
+
+#: mygpo/users/views/user.py:70
+msgid "Username missing"
+msgstr "사용자 이름이 없습니다"
+
+#: mygpo/users/views/user.py:75
+msgid "Password missing"
+msgstr "비밀번호가 없습니다"
+
+#: mygpo/users/views/user.py:82
+msgid "Wrong username or password."
+msgstr "사용자 이름 또는 비밀번호가 틀렸습니다."
+
+#: mygpo/users/views/user.py:88 mygpo/users/views/user.py:133
+#, fuzzy
+#| msgid "Please activate your account first."
+msgid ""
+"Please activate your account first. We have just re-sent your activation "
+"email"
+msgstr "먼저 계정을 활성화하십시오."
+
+#: mygpo/users/views/user.py:166 mygpo/users/views/user.py:171
+msgid "Login failed."
+msgstr "로그인 실패."
+
+#: mygpo/users/views/user.py:179
+msgid "Login with Google is currently not possible."
+msgstr ""
+
+#: mygpo/users/views/user.py:189
+#, python-brace-format
+msgid ""
+"Your account has been connected with {google}. Open Settings to change this."
+msgstr ""
+"계정이 {google} 계정과 연결되었습니다. 변경하려면 설정 페이지를 여십시오."
+
+#: mygpo/users/views/user.py:201
+#, python-format
+msgid ""
+"No account connected with your Google account %s. Please log in to connect."
+msgstr "%s Google 계정과 연결된 계정이 없습니다. 연결하려면 로그인하십시오."
+
+#: mygpo/web/forms.py:20 mygpo/web/forms.py:222
+msgid "E-Mail address"
+msgstr "전자메일 주소"
+
+#: mygpo/web/forms.py:27
+msgid "Current password"
+msgstr "현재 비밀번호"
+
+#: mygpo/web/forms.py:34
+msgid "New password"
+msgstr "새 비밀번호"
+
+#: mygpo/web/forms.py:41
+msgid "Confirm password"
+msgstr "비밀번호 확인"
+
+#: mygpo/web/forms.py:78
+msgid "A few words about you"
+msgstr "짤막한 자기 소개"
+
+#: mygpo/web/forms.py:93
+msgid "Token"
+msgstr "토큰"
+
+#: mygpo/web/forms.py:98
+msgid "Auto-Flattr played episodes"
+msgstr "재생한 에피소드 자동 Flattr"
+
+#: mygpo/web/forms.py:108
+msgid "Flattr us"
+msgstr "Flattr하기"
+
+#: mygpo/web/forms.py:117
+msgid "Username for own content"
+msgstr "자기 컨텐츠의 사용자 이름"
+
+#: mygpo/web/forms.py:129 mygpo/web/templates/devicelist.html:23
+msgid "Name"
+msgstr "이름"
+
+#: mygpo/web/forms.py:134 mygpo/web/templates/devicelist.html:24
+msgid "Type"
+msgstr "종류"
+
+#: mygpo/web/forms.py:138 mygpo/web/templates/devicelist.html:25
+msgid "Device ID"
+msgstr "장치 ID"
+
+#: mygpo/web/forms.py:141
+#, fuzzy
+#| msgid "Device"
+msgid "ID on device"
+msgstr "장치"
+
+#: mygpo/web/forms.py:153
+msgid "Share this subscription with other users (public)"
+msgstr "이 구독을 다른 사용자와 공유 (공개)"
+
+#: mygpo/web/forms.py:196
+msgid "No device selected"
+msgstr "장치를 선택하지 않았습니다"
+
+#: mygpo/web/forms.py:205
+msgid "Please enter your username"
+msgstr "사용자 이름을 입력하십시오"
+
+#: mygpo/web/forms.py:210
+msgid "or the email address used while registering"
+msgstr "(또는 등록할 때 사용한 메일 주소)"
+
+#: mygpo/web/templates/400.html:4 mygpo/web/templates/400.html:7
+msgid "Bad request"
+msgstr "잘못된 요청"
+
+#: mygpo/web/templates/400.html:11
+msgid "There has been an error processing your request."
+msgstr "요청을 처리하는데 오류가 발생했습니다."
+
+#: mygpo/web/templates/401.html:4 mygpo/web/templates/401.html:7
+msgid "Unauthorized"
+msgstr "권한 없음"
+
+#: mygpo/web/templates/401.html:12
+msgid "This page is only available to registered users."
+msgstr "이 페이지는 등록한 사용자만 사용할 수 있습니다."
+
+#: mygpo/web/templates/account.html:8 mygpo/web/templates/account.html:11
+msgid "Account Settings"
+msgstr "계정 설정"
+
+#: mygpo/web/templates/account.html:76 mygpo/web/templates/account.html:79
+#: mygpo/web/templates/delete_account.html:9
+msgid "Delete Account"
+msgstr "계정 삭제"
+
+#: mygpo/web/templates/account.html:90
+msgid "Google"
+msgstr "Google"
+
+#: mygpo/web/templates/account.html:93
+#, python-format
+msgid "Connected with %(gmail)s"
+msgstr "%(gmail)s 계정에 연결됨"
+
+#: mygpo/web/templates/account.html:96 mygpo/web/templates/account.html:109
+#: mygpo/web/templates/account.html:177
+msgid "Disconnect"
+msgstr "연결 해제"
+
+#: mygpo/web/templates/account.html:99 mygpo/web/templates/account.html:111
+#: mygpo/web/templates/account.html:179
+msgid "Connect"
+msgstr "연결"
+
+#: mygpo/web/templates/account.html:108 mygpo/web/templates/account.html:176
+#, python-format
+msgid ""
+"Connected with <a href=\"https://flattr.com/profile/%(flattrname)s\">"
+"%(flattrname)s</a>"
+msgstr ""
+"<a href=\"https://flattr.com/profile/%(flattrname)s\">%(flattrname)s</a> "
+"flattr에 연결됨"
+
+#: mygpo/web/templates/account.html:173
+msgid "Flattr User"
+msgstr "Flattr 사용자"
+
+#: mygpo/web/templates/account.html:195
+#, python-format
+msgid "Auto-Flattr %(sitename)s"
+msgstr "%(sitename)s 자동 Flattr"
+
+#: mygpo/web/templates/account.html:204
+msgid "Username for publishing own content"
+msgstr "내 컨텐츠를 공개하는 데 쓸 사용자 이름"
+
+#: mygpo/web/templates/base.html:40 mygpo/web/templatetags/menu.py:62
+msgid "Account"
+msgstr "계정"
+
+#: mygpo/web/templates/base.html:46 mygpo/web/templates/base.html:50
+#: mygpo/web/templates/home.html:41 mygpo/web/templates/home.html:45
+#: mygpo/web/templates/home.html:102 mygpo/web/templates/login.html:8
+#: mygpo/web/templates/login.html:11 mygpo/web/templates/login.html:46
+#: mygpo/web/templates/restore_password.html:8
+#: mygpo/web/templatetags/menu.py:23
+msgid "Login"
+msgstr "로그인"
+
+#: mygpo/web/templates/base.html:51 mygpo/web/templates/home.html:46
+#: mygpo/web/templates/login.html:47
+msgid "Login with Google"
+msgstr "Google로 로그인"
+
+#: mygpo/web/templates/base.html:133 mygpo/web/templates/home.html:153
+#: mygpo/web/templatetags/menu.py:31
+msgid "Discover"
+msgstr "팟캐스트 찾기"
+
+#: mygpo/web/templates/base.html:134 mygpo/web/templates/home.html:154
+#: mygpo/web/templatetags/menu.py:32
+msgid "Directory"
+msgstr "디렉터리"
+
+#: mygpo/web/templates/base.html:142 mygpo/web/templates/home.html:162
+msgid "Support"
+msgstr "지원"
+
+#: mygpo/web/templates/base.html:143 mygpo/web/templates/home.html:163
+#: mygpo/web/templatetags/menu.py:25
+msgid "Docs"
+msgstr "문서"
+
+#: mygpo/web/templates/base.html:144 mygpo/web/templates/home.html:164
+msgid "Mailing&nbsp;List"
+msgstr "메일링&nbsp;리스트"
+
+#: mygpo/web/templates/base.html:145 mygpo/web/templates/home.html:165
+msgid "Questions"
+msgstr "문의"
+
+#: mygpo/web/templates/base.html:151 mygpo/web/templates/home.html:171
+msgid "Support&nbsp;Us"
+msgstr "후원&nbsp;안내"
+
+#: mygpo/web/templates/base.html:153 mygpo/web/templates/contribute.html:22
+#: mygpo/web/templates/home.html:173
+msgid "Donate"
+msgstr "기부"
+
+#: mygpo/web/templates/base.html:160 mygpo/web/templates/home.html:180
+msgid "Follow"
+msgstr "팔로우"
+
+#: mygpo/web/templates/base.html:162 mygpo/web/templates/home.html:182
+msgid "Blog"
+msgstr "블로그"
+
+#: mygpo/web/templates/base.html:163 mygpo/web/templates/home.html:183
+msgid "Blog&nbsp;(RSS)"
+msgstr "블로그&nbsp;(RSS)"
+
+#: mygpo/web/templates/base.html:169 mygpo/web/templates/home.html:189
+msgid "Develop"
+msgstr "개발"
+
+#: mygpo/web/templates/base.html:170 mygpo/web/templates/home.html:190
+msgid "API"
+msgstr "API"
+
+#: mygpo/web/templates/base.html:171 mygpo/web/templates/home.html:191
+msgid "Libraries"
+msgstr "라이브러리"
+
+#: mygpo/web/templates/base.html:172 mygpo/web/templates/home.html:192
+msgid "Clients"
+msgstr "클라이언트"
+
+#: mygpo/web/templates/base.html:178 mygpo/web/templates/home.html:198
+#: mygpo/web/templatetags/menu.py:65
+msgid "Publish"
+msgstr "발행"
+
+#: mygpo/web/templates/base.html:179 mygpo/web/templates/home.html:199
+msgid "Get&nbsp;Access"
+msgstr "접근하기"
+
+#: mygpo/web/templates/base.html:180 mygpo/web/templates/home.html:200
+msgid "Link&nbsp;To&nbsp;Us"
+msgstr "여기로&nbsp;링크"
+
+#: mygpo/web/templates/base.html:189 mygpo/web/templates/home.html:208
+msgid "hosting provided by prgmr.com"
+msgstr ""
+
+#: mygpo/web/templates/contribute.html:8 mygpo/web/templatetags/menu.py:26
+msgid "Contribute"
+msgstr "기여"
+
+#: mygpo/web/templates/contribute.html:11
+msgid "Contribute to gpodder.net"
+msgstr "gpodder.net에 기여"
+
+#: mygpo/web/templates/contribute.html:16
+msgid ""
+"gpodder.net is run as a hobby project without continuous funding for "
+"servers, storage and bandwidth. We rely on contributors and donations to "
+"keep the site running and improve it constantly."
+msgstr ""
+"gpodder.net은 서버, 저장 공간, 대역폭에 대한 금전 지원 없이 취미로 운영되고 "
+"있습니다. 기여자들과 기부로 사이트를 운영하고 있고 계속 발전하고 있습니다."
+
+#: mygpo/web/templates/contribute.html:18
+msgid "Work"
+msgstr "작업"
+
+#: mygpo/web/templates/contribute.html:19
+msgid ""
+"If you want to contribute to gpodder.net by writing code, check out the <a "
+"href=\"/developer/\">Development</a> page. We also appreciate contributions "
+"of non-coding work, such as web and interface design, server operations, "
+"testing, etc. If you are interested, join the <a href=\"http://wiki.gpodder."
+"org/wiki/Mailing_List\">mailing list</a> or the IRC channel #gpodder on chat."
+"freenode.net."
+msgstr ""
+"코드 작성으로 gpodder.net에 기여하시려면, <a href<a href=\"/developer/\">개발"
+"</a> 페이지를 보십시오. 웹, 인터페이스 디자인, 서버 작업, 테스트 같은 코딩이 "
+"아닌 작업도 환영합니다. 관심이 있으시면 <a href=\"https://gpoddernet.readthedocs.io/en/"
+"wiki/Mailing_List\">메일링 리스트</a> 또는 chat.freenode.net의 IRC 채널 "
+"#gpodder에 참여해 보십시오."
+
+#: mygpo/web/templates/contribute.html:23
+msgid ""
+"If you want to support gpodder.net financially, you can donate via PayPal to "
+"stefan@skoegl.net. You can also send a book via Amazon (<a href=\"http://www."
+"amazon.de/wishlist/24H4ORJ0Z0JBH\">DE</a>, <a href=\"http://amzn.com/"
+"w/3IPIF4J4F2C5R\">US</a> or <a href=\"http://www.amazon.co.uk/registry/"
+"wishlist/24JRVURXUKO6F\">UK</a>)."
+msgstr ""
+"금전적으로 gpodder.net을 지원하시려면, 페이팔로 stefan@skoegl.net에 기부하실 "
+"수 있습니다. 또 아마존 (<a href=\"http://www.amazon.de/wishlist/24H4ORJ0Z0JBH"
+"\">DE</a>, <a href=\"http://amzn.com/w/3IPIF4J4F2C5R\">US</a>, <a href="
+"\"http://www.amazon.co.uk/registry/wishlist/24JRVURXUKO6F\">UK</a>)를 통해 책"
+"을 보내 주실 수도 있습니다."
+
+#: mygpo/web/templates/csrf.html:8
+msgid "Attention!"
+msgstr "조심!"
+
+#: mygpo/web/templates/csrf.html:11
+msgid "Attention, Attention!"
+msgstr "조심, 조심!"
+
+#: mygpo/web/templates/csrf.html:17
+#, python-format
+msgid ""
+"It seems that %(referer)s has linked to %(site)s to get you to change some "
+"data. <strong>This will possibly change some of your data / settings!</"
+"strong>. Do you really want to continue? <strong>If in doubt, chose No.</"
+"strong>"
+msgstr ""
+"%(referer)s 쪽에서 %(site)s에 링크해서 데이터를 바꾸려는 것 같습니다. "
+"<strong>이렇게 되면 일부 데이터 / 설정을 바꿀 수도 있습니다!</strong>. 정말"
+"로 계속 하시겠습니까? <strong>잘 모르겠으면, 아니요를 고르십시오.</strong>"
+
+#: mygpo/web/templates/csrf.html:24
+msgid "Yes"
+msgstr "예"
+
+#: mygpo/web/templates/csrf.html:25
+msgid "No"
+msgstr "아니요"
+
+#: mygpo/web/templates/dashboard.html:14 mygpo/web/templatetags/menu.py:55
+msgid "Overview"
+msgstr "개요"
+
+#: mygpo/web/templates/dashboard.html:17
+msgid "Hi, "
+msgstr "안녕하세요, "
+
+#: mygpo/web/templates/dashboard.html:24
+msgid "Newest Episodes"
+msgstr "새 에피소드"
+
+#: mygpo/web/templates/dashboard.html:39
+#, python-format
+msgid ""
+"Welcome to %(site)s! If this is your first visit, you should set up your <a "
+"href=\"https://gpoddernet.readthedocs.io/en/latest/user/clients.html\">podcast client</"
+"a> and try to check as many <em>Explore</em> boxes as you can."
+msgstr ""
+"%(site)s에 잘 오셨습니다! 처음 오셨으면, <a href=\"https://gpoddernet.readthedocs.io/en/"
+"latest/user/clients.html\">팟캐스트 클라이언트</a>를 설정하시고 간으한 여러 "
+"<em>둘러보기</em> 상자를 확인해 보세요."
+
+#: mygpo/web/templates/dashboard.html:44
+#, python-format
+msgid ""
+"If you have problems, have a look at the <a href=\"%(help)s\">docs</a> or "
+"ask questions on the <a href=\"https://gpodder.github.io/docs/mailing-list.html"
+"\">mailing list</a> or <a href=\"https://github.com/gpodder/mygpo/issues"
+"\">forum</a>."
+msgstr ""
+"문제가 있으면<a href=\"%(help)s\">문서</a>를 보시거나, <a href=\"http://wiki."
+"gpodder.org/wiki/Mailing_List\">메일링 리스트</a> 또는 <a href=\"https://"
+"getsatisfaction.com/gpoddernet\">포럼</a>에 질문하십시오."
+
+#: mygpo/web/templates/dashboard.html:81
+#, python-format
+msgid "Explore %(site)s"
+msgstr "%(site)s 둘러보기"
+
+#: mygpo/web/templates/dashboard.html:85
+#, python-format
+msgid "Sign up to %(site)s"
+msgstr "%(site)s에 가입"
+
+#: mygpo/web/templates/dashboard.html:90
+msgid "Connect your Podcast Clients"
+msgstr "팟캐스트 클라이언트 연결하기"
+
+#: mygpo/web/templates/dashboard.html:95
+msgid "Subscribe to Podcasts"
+msgstr "팟캐스트 구독"
+
+#: mygpo/web/templates/dashboard.html:100
+msgid "Mark your Favorite Episodes"
+msgstr "즐겨 듣는 에피소드 표시"
+
+#: mygpo/web/templates/dashboard.html:105
+msgid "Share your Subscriptions"
+msgstr "구독 목록 공유"
+
+#: mygpo/web/templates/dashboard.html:110
+msgid "Share your Favorite Episodes"
+msgstr "즐겨 듣는 에피소드 공유"
+
+#: mygpo/web/templates/dashboard.html:115
+msgid "Share your Userpage"
+msgstr "사용자 페이지 공유"
+
+#: mygpo/web/templates/dashboard.html:120
+msgid "Tag Podcasts"
+msgstr "팟캐스트 태그하기"
+
+#: mygpo/web/templates/dashboard.html:125
+msgid "Create Podcast Lists"
+msgstr "팟캐스트 목록 만들기"
+
+#: mygpo/web/templates/dashboard.html:130
+msgid "Connect to Flattr"
+msgstr "Flattr에 연결"
+
+#: mygpo/web/templates/dashboard.html:135
+msgid "Auto-Flattr Podcasts"
+msgstr "팟캐스트 자동 Flattr"
+
+#: mygpo/web/templates/dashboard.html:140
+msgid "Publish your own Podcast"
+msgstr "여러분의 팟캐스트 공개"
+
+#: mygpo/web/templates/dashboard.html:150
+msgid "Subscribe in Your Browser"
+msgstr "브라우저에서 구독"
+
+#: mygpo/web/templates/dashboard.html:152
+#, python-format
+msgid ""
+"Register %(site.domain)s as a feed reader, and subscribe to podcasts "
+"directly from your browser"
+msgstr ""
+"%(site.domain)s 사이트를 피드 리더로 등록하고, 브라우저에서 바로 팟캐스트에 "
+"구독하세요."
+
+#: mygpo/web/templates/dashboard.html:155
+msgid "Install"
+msgstr "설치"
+
+#: mygpo/web/templates/delete_account.html:14
+msgid "Delete your Account?"
+msgstr "계정을 삭제하시겠습니까?"
+
+#: mygpo/web/templates/delete_account.html:20
+msgid "Do you really want to delete your account?"
+msgstr "정말로 계정을 삭제하시겠습니까?"
+
+#: mygpo/web/templates/delete_account.html:23
+msgid "Yes, please"
+msgstr "네, 그렇습니다"
+
+#: mygpo/web/templates/deleted_account.html:9
+msgid "Account Deleted"
+msgstr "계정 삭제됨"
+
+#: mygpo/web/templates/deleted_account.html:13
+msgid "Your account has been deleted"
+msgstr "계정이 삭제되었습니다"
+
+#: mygpo/web/templates/deleted_account.html:18
+msgid "Thanks"
+msgstr "감사합니다"
+
+#: mygpo/web/templates/developer.html:8 mygpo/web/templates/developer.html:11
+#: mygpo/web/templatetags/menu.py:27
+msgid "Development"
+msgstr "개발"
+
+#: mygpo/web/templates/developer.html:17
+msgid "Webservice"
+msgstr "웹서비스"
+
+#: mygpo/web/templates/developer.html:18
+msgid ""
+"The sourcecode of the webservice gpodder.net is released as open source "
+"under the AGPLv3 and <a href=\"https://github.com/gpodder/mygpo\">hosted at "
+"GitHub</a>. Bugs can be reported at the <a href=\"https://bugs.gpodder.org/"
+"enter_bug.cgi?product=gpodder.net\">gPodder Bugtracker</a>."
+msgstr ""
+"gpodder.net 웹서비스의 소스 코드는 AGPL 버전3에 따라 오픈소스로 공개되고 <a "
+"href=\"https://github.com/gpodder.net/mygpo\">GitHub에서 호스팅합니다</a>. 문"
+"제점은 <a href=\"https://bugs.gpodder.org/enter_bug.cgi?product=gpodder.net"
+"\">gPodder Bugtracker</a>에서 전달할 수 있습니다."
+
+#: mygpo/web/templates/developer.html:21
+msgid "Integrating Clients"
+msgstr "클라이언트 연동"
+
+#: mygpo/web/templates/developer.html:22
+msgid ""
+"If you want to integrate gpodder.net in some podcasting client, you might "
+"want to use one of the existing <a href=\"https://gpoddernet.readthedocs.io/en/"
+"latest/dev/libraries.html\">client libraries</a>."
+msgstr ""
+"gpodder.net을 팟캐스트 클라이언트에 연동하려면, <a href=\"http://wiki."
+"gpodder.org/wiki/Web_Services/Libraries\">클라이언트 라이브러리</a> 중 하나"
+"를 사용해 보십시오."
+
+#: mygpo/web/templates/developer.html:23
+msgid ""
+"There are already several clients for different platforms which can be used "
+"as examples. <a href=\"https://gpoddernet.readthedocs.io/en/latest/user/clients.html"
+"\">See list of clients.</a>"
+msgstr ""
+"예제로 사용할 수 있는 여러가지 플랫폼의 여러 클라이언트가 이미 있습니다. <a "
+"href=\"https://gpoddernet.readthedocs.io/en/latest/user/clients.html\">클라이언트 목록을 "
+"참고하십시오.</a>"
+
+#: mygpo/web/templates/device-edit.html:11 mygpo/web/templates/device.html:11
+#, python-format
+msgid "Device %(devicename)s"
+msgstr "장치 %(devicename)s"
+
+#: mygpo/web/templates/device-edit.html:22 mygpo/web/templates/device.html:18
+msgid "This device was deleted."
+msgstr "이 장치를 삭제했습니다."
+
+#: mygpo/web/templates/device-edit.html:61
+msgid "Replace Subscriptions"
+msgstr "구독 대체하기"
+
+#: mygpo/web/templates/device-edit.html:65
+msgid "Replace your current subscriptions by uploading an OPML file."
+msgstr "현재 구독을 업로드한 OPML 파일로 대체"
+
+#: mygpo/web/templates/device-edit.html:70
+msgid "Upload"
+msgstr "업로드"
+
+#: mygpo/web/templates/device-edit.html:83
+msgid "Delete Device"
+msgstr "장치 삭제"
+
+#: mygpo/web/templates/device-edit.html:99
+#: mygpo/web/templates/device-edit.html:117 mygpo/web/templates/device.html:102
+#: mygpo/web/templates/device.html:120
+msgid "Synchronize"
+msgstr "동기화"
+
+#: mygpo/web/templates/device-edit.html:100 mygpo/web/templates/device.html:103
+msgid ""
+"If you synchronize devices, they will always have the same subscriptions. A "
+"podcast that is subscribed on one device, will automatically be added to all "
+"synchronized devices."
+msgstr ""
+"장치를 동기화하면, 장치마다 동일한 구독을 받게 됩니다. 한 장치에서 구독한 팟"
+"캐스트는 다른 모든 장치에 자동으로 추가됩니다."
+
+#: mygpo/web/templates/device-edit.html:104 mygpo/web/templates/device.html:107
+#, python-format
+msgid "%(devicename)s is currently not synchronized with other devices."
+msgstr "%(devicename)s 장치는 현재 다른 장치와 동기화되지 않았습니다."
+
+#: mygpo/web/templates/device-edit.html:108 mygpo/web/templates/device.html:111
+#, python-format
+msgid "%(devicename)s is currently synchronized with %(synclist)s."
+msgstr "%(devicename)s 장치는 현재 %(synclist)s에 동기화되었습니다."
+
+#: mygpo/web/templates/device-edit.html:109 mygpo/web/templates/device.html:112
+#, python-format
+msgid "Stop synchronisation for %(devicename)s "
+msgstr "%(devicename)s에 동기화 중지"
+
+#: mygpo/web/templates/device.html:31 mygpo/web/templates/podcast.html:67
+msgid "Unsubscribe"
+msgstr "구독 해제"
+
+#: mygpo/web/templates/device.html:40
+msgid "You don't have any podcasts subscribed on this device."
+msgstr "이 장치에서 구독한 팟캐스트가 아직 없습니다"
+
+#: mygpo/web/templates/device.html:63
+msgid "OPML for Nokia Podcasting on Symbian "
+msgstr "심비안 노키아 팟캐스트용 OPML"
+
+#: mygpo/web/templates/device.html:73
+#: mygpo/web/templates/episode-history.html:46
+#: mygpo/web/templates/episode-history.html:80
+#: mygpo/web/templatetags/menu.py:52
+msgid "History"
+msgstr "기록"
+
+#: mygpo/web/templates/device.html:79
+msgid "Trigger Sync"
+msgstr ""
+
+#: mygpo/web/templates/device.html:87 mygpo/web/templates/devicelist.html:26
+#: mygpo/web/templates/devicelist.html:45
+msgid "Configure"
+msgstr "준비하기"
+
+#: mygpo/web/templates/devicelist.html:10
+#: mygpo/web/templates/devicelist.html:13
+msgid "Managed Devices"
+msgstr "관리되는 장치"
+
+#: mygpo/web/templates/devicelist.html:31
+msgid "Synchronized"
+msgstr "동기화됨"
+
+#: mygpo/web/templates/devicelist.html:33
+msgid "Not Synchronized"
+msgstr "동기화되지 않음"
+
+#: mygpo/web/templates/devicelist.html:53
+msgid ""
+"You don't have any devices yet. Go to the <a href=\"https://gpoddernet.readthedocs.io/en/"
+"latest/user/clients.html\">clients</a> page to learn how to set up your "
+"client applications."
+msgstr ""
+"아직 장치가 하나도 없습니다. <a href=\"https://gpoddernet.readthedocs.io/en/"
+"Web_Services/Clients\">클라이언트</a> 페이지로 가서 클라이언트 애플리케이션 "
+"설정 방법을 알아보십시오."
+
+#: mygpo/web/templates/devicelist.html:74
+msgid "Deleted Devices"
+msgstr "삭제한 장치"
+
+#: mygpo/web/templates/devicelist.html:85
+msgid "Reactivate"
+msgstr "다시 활성화"
+
+#: mygpo/web/templates/devicelist.html:93
+msgid "Delete Permanently"
+msgstr "영구히 삭제"
+
+#: mygpo/web/templates/episode-history.html:83
+msgid "Time"
+msgstr "시간"
+
+#: mygpo/web/templates/episode-history.html:84
+msgid "Action"
+msgstr "동작"
+
+#: mygpo/web/templates/episode-history.html:85
+#: mygpo/web/templatetags/menu.py:51
+msgid "Device"
+msgstr "장치"
+
+#: mygpo/web/templates/episode-history.html:126
+msgid "Add"
+msgstr "추가"
+
+#: mygpo/web/templates/episode.html:91
+msgid "Remove Favorite"
+msgstr "즐겨 듣기 삭제"
+
+#: mygpo/web/templates/episode.html:95
+msgid "Favorite"
+msgstr "즐겨 듣기"
+
+#: mygpo/web/templates/episode.html:103
+#, fuzzy
+#| msgid "Episodes"
+msgid "Episode History"
+msgstr "에피소드"
+
+#: mygpo/web/templates/favorites.html:10 mygpo/web/templates/favorites.html:13
+#: mygpo/web/templatetags/menu.py:48 mygpo/web/templatetags/menu.py:56
+msgid "Favorite Episodes"
+msgstr "즐겨 듣는 에피소드"
+
+#: mygpo/web/templates/login.html:15
+msgid "You need to login to access this page."
+msgstr "이 페이지를 보려면 로그인이 필요합니다."
+
+#: mygpo/web/templates/login.html:40
+msgid "Forgot your password?"
+msgstr "비밀번호를 잊었습니까?"
+
+#: mygpo/web/templates/maintenance.html:8
+#: mygpo/web/templates/maintenance.html:11
+msgid "Maintenance"
+msgstr "점검"
+
+#: mygpo/web/templates/maintenance.html:15
+msgid ""
+"We are currently doing some work on gpodder.net but we should back online "
+"within a few minutes. Just wait a bit and try again!"
+msgstr ""
+"현재 gpodder.net에 작업 중입니다. 수 분 안에 다시 돌아올 예정입니다. 잠시 기"
+"다렸다 다시 시도해 보십시오"
+
+#: mygpo/web/templates/mytags.html:11 mygpo/web/templates/mytags.html:14
+#: mygpo/web/templatetags/menu.py:49
+msgid "My Tags"
+msgstr "내 태그"
+
+#: mygpo/web/templates/mytags.html:41
+#, python-format
+msgid ""
+"You didn't tag any podcasts yet. Go to your <a href=\"%(subscriptions-url)s"
+"\">subscriptions</a> and tag some."
+msgstr ""
+"아직 어떤 팟캐스트에도 태그를 붙이지 않았습니다. <a href="
+"\"%(subscriptions-url)s\">구독</a>으로 가서 태그를 붙이십시오."
+
+#: mygpo/web/templates/password_reset.html:4
+msgid "Password reset"
+msgstr "암호 초기화"
+
+#: mygpo/web/templates/password_reset.html:7
+msgid "Your password has been reset"
+msgstr "암호를 초기화했습니다"
+
+#: mygpo/web/templates/password_reset.html:13
+#, python-format
+msgid ""
+"You should have received an mail with your new password. Please <a href="
+"\"%(login-url)s\">log in</a> now."
+msgstr ""
+"새 암호가 들어 있는 메일을 받았을 것입니다. 지금 <a href=\"%(login-url)s\">로"
+"그인</a>하십시오."
+
+#: mygpo/web/templates/password_reset_failed.html:4
+msgid "Password could not be reset"
+msgstr "비밀번호를 초기화할 수 없습니다"
+
+#: mygpo/web/templates/password_reset_failed.html:7
+msgid "Your password could not be reset"
+msgstr "내 비밀번호를 초기화할 수 없습니다"
+
+#: mygpo/web/templates/password_reset_failed.html:12
+msgid "Unfortunately we were not able to reset your password."
+msgstr "안타깝지만 비밀번호를 초기화할 수 없었습니다."
+
+#: mygpo/web/templates/podcast-history.html:47
+msgid "no history yet"
+msgstr ""
+
+#: mygpo/web/templates/podcast.html:48
+#, fuzzy
+#| msgid "Subscribe"
+msgid "Login to Subscribe"
+msgstr "구독"
+
+#: mygpo/web/templates/podcast.html:78
+#, fuzzy
+#| msgid "Subscribe on devices"
+msgid "Subscribe on all devices"
+msgstr "장치에서 구독"
+
+#: mygpo/web/templates/podcast.html:110
+#, fuzzy
+#| msgid "Subscribe on devices"
+msgid "Unsubscribe from all devices "
+msgstr "장치에서 구독"
+
+#: mygpo/web/templates/podcast.html:157 mygpo/web/templates/podcast.html:172
+#, fuzzy
+#| msgid "My Tags"
+msgid "Tags"
+msgstr "내 태그"
+
+#: mygpo/web/templates/podcast.html:207
+msgid "Older Episodes"
+msgstr "더 예전 에피소드"
+
+#: mygpo/web/templates/privacy.html:9 mygpo/web/templates/privacy.html:12
+msgid "Privacy Settings"
+msgstr "개인 정보 설정"
+
+#: mygpo/web/templates/privacy.html:18
+#, python-format
+msgid "%(domain)s distinguishes between public and private subscriptions."
+msgstr "%(domain)s은(는) 공개와 비공개 구독을 구분합니다."
+
+#: mygpo/web/templates/privacy.html:20
+msgid ""
+"<strong>Public</strong> subscriptions are included in your <a href=\"/share/"
+"\">shared podcasts</a> and our anonymized public statistics."
+msgstr ""
+"<strong>공개</strong> 구독은 <a href=\"/share/\">팟캐스트 공유</a> 및 저희의 "
+"익명화된 공개 통계에 포함됩니다."
+
+#: mygpo/web/templates/privacy.html:21
+msgid ""
+"<strong>Private</strong> subscriptions do neither show up in your list of "
+"shared podcasts, nor are considered in our statistics."
+msgstr ""
+"<strong>비공개</strong> 구독은 공유 팟캐스트 목록에도 나타나지 않고 저희 통계"
+"에도 포함되지 않습니다."
+
+#: mygpo/web/templates/privacy.html:29
+#, fuzzy
+#| msgid "User subscriptions"
+msgid "Default for new subscriptions"
+msgstr "사용자 구독"
+
+#: mygpo/web/templates/privacy.html:68
+msgid "Public Subscriptions"
+msgstr "공개 구독"
+
+#: mygpo/web/templates/privacy.html:79
+msgid "Make Private"
+msgstr "비공개로 만들기"
+
+#: mygpo/web/templates/privacy.html:90
+msgid "Private Subscriptions"
+msgstr "비공개 구독"
+
+#: mygpo/web/templates/privacy.html:101
+msgid "Make Public"
+msgstr "공개로 만들기"
+
+#: mygpo/web/templates/privacy_policy.html:8 mygpo/web/templatetags/menu.py:28
+msgid "Privacy Policy"
+msgstr "개인 정보 정책"
+
+#: mygpo/web/templates/restore_password.html:29
+msgid "Reset Password"
+msgstr "비밀번호 초기화"
+
+#: mygpo/web/templates/subscribe.html:7
+#, python-format
+msgid "Subscribe to %(podcasttitle)s"
+msgstr "%(podcasttitle)s에 구독"
+
+#: mygpo/web/templates/subscribe.html:41
+msgid ""
+"You can't subscribe to this podcast, because you don't have any devices (on "
+"which you don't have subscribed to the podcast already."
+msgstr ""
+"(이 팟캐스트에 이미 구독하지 않은) 장치가 하나도 없으므로 이 팟캐스트에 구독"
+"할 수 없습니다."
+
+#: mygpo/web/templates/subscribe.html:43
+msgid "Create Device"
+msgstr "장치 만들기"
+
+#: mygpo/web/templates/subscribe.html:49
+msgid "Why Unnamed Podcast?"
+msgstr "왜 이름 없는 팟캐스트가 있지요?"
+
+#: mygpo/web/templates/subscribe.html:49
+msgid ""
+"Because we display names after we have fetched the information form the feed "
+"-- and this may take some time. Until this is completed, the podcast will "
+"simply be called this way."
+msgstr ""
+"피드에서 가져온 정보를 바탕으로 이름을 표시하고, 가져오는데 시간이 걸릴 수 있"
+"기 때문에, 이런 작업이 끝나기 전까지는 이 팟캐스트는 이런 식으로 불립니다."
+
+#: mygpo/web/templates/user_subscriptions.html:14
+#: mygpo/web/templates/user_subscriptions.html:18
+#: mygpo/web/templates/user_subscriptions_denied.html:10
+#: mygpo/web/templates/user_subscriptions_denied.html:14
+#, python-format
+msgid "%(username)s's Subscriptions"
+msgstr "%(username)s의 구독"
+
+#: mygpo/web/templates/user_subscriptions.html:21
+#, python-format
+msgid ""
+"<a href=\"%(userpage-url)s\">%(username)s</a> has %(num_subscriptions)s "
+"subscriptions"
+msgstr ""
+"<a href=\"%(userpage-url)s\">%(username)s</a> 사용자는 구독이 "
+"%(num_subscriptions)s개 있습니다"
+
+#: mygpo/web/templates/user_subscriptions.html:42
+msgid "Download Subscriptions as OPML"
+msgstr "구독 목록을 OPML로 다운로드"
+
+#: mygpo/web/templates/user_subscriptions.html:45
+msgid "Subscribe to Changes"
+msgstr "변경 사항 구독"
+
+#: mygpo/web/templates/user_subscriptions.html:51
+#, python-format
+msgid "%(username)s doesn't have any subscriptions yet."
+msgstr "%(username)s 사용자는 아직 구독이 없습니다"
+
+#: mygpo/web/templates/user_subscriptions.html:61
+msgid "Share Your Subscriptions"
+msgstr "구독 공유하기"
+
+#: mygpo/web/templates/user_subscriptions.html:62
+msgid "Want to share your own subscriptions?"
+msgstr "내 구독을 공유하고 싶으십니까?"
+
+#: mygpo/web/templates/user_subscriptions.html:71
+msgid "Nokia Podcasting"
+msgstr "노키아 팟캐스트"
+
+#: mygpo/web/templates/user_subscriptions.html:72
+msgid ""
+"Add <tt>&amp;symbian=true#.opml</tt> to the OPML URL to get an OPML file for "
+"Nokia Podcasting on Symbian devices."
+msgstr ""
+"심비안 장치의 노키아 팟캐스트용 OPML 파일을 받으려면 OPML URL에 <tt>&amp;"
+"symbian=true#.opml</tt> 이라고 추가하십시오."
+
+#: mygpo/web/templates/user_subscriptions_denied.html:20
+#, python-format
+msgid ""
+"%(username)s didn't share his subscriptions with you. Maybe you should "
+"contact him to get the correct link."
+msgstr ""
+"%(username)s 사용자는 구독을 공유하지 않았습니다. 직접 연락해서 올바른 링크"
+"를 알아내야 할 것 같습니다."
+
+#: mygpo/web/templates/user_subscriptions_denied.html:23
+msgid "Want to share your subscriptions?"
+msgstr "내 구독을 공유하고 싶으십니까?"
+
+#: mygpo/web/templates/user_subscriptions_denied.html:23
+msgid ""
+"Just go to your <a href/\"/account/\">account settings</a> to get the link.</"
+"a>"
+msgstr "<a href/\"/account/\">계정 설정</a>에서 링크를 알아내십시오."
+
+#: mygpo/web/templatetags/devices.py:31
+msgid "Unknown"
+msgstr "알 수 없음"
+
+#: mygpo/web/templatetags/episodes.py:20
+msgid "New episode"
+msgstr "새 에피소드"
+
+#: mygpo/web/templatetags/episodes.py:23
+#, python-format
+msgid "Downloaded to %s"
+msgstr "%s에 다운로드함"
+
+#: mygpo/web/templatetags/episodes.py:25
+msgid "Downloaded"
+msgstr "다운로드함"
+
+#: mygpo/web/templatetags/episodes.py:28
+#, python-format
+msgid "Played on %s"
+msgstr "%s에 재생함"
+
+#: mygpo/web/templatetags/episodes.py:30
+msgid "Played"
+msgstr "재생함"
+
+#: mygpo/web/templatetags/episodes.py:33
+#, python-format
+msgid "Deleted on %s"
+msgstr "%s에 삭제함"
+
+#: mygpo/web/templatetags/episodes.py:35
+msgid "Deleted"
+msgstr "삭제함"
+
+#: mygpo/web/templatetags/episodes.py:37
+msgid "Unknown status"
+msgstr "알 수 없는 상태"
+
+#: mygpo/web/templatetags/episodes.py:43
+msgid "Unplayed episode"
+msgstr "재생하지 않은 상태"
+
+#: mygpo/web/templatetags/episodes.py:46 mygpo/web/templatetags/episodes.py:47
+#, python-format
+msgid " on %s"
+msgstr " 시각 %s"
+
+#: mygpo/web/templatetags/episodes.py:50
+msgid "The episode has been flattr'd"
+msgstr "에피소드에 Flattr했습니다"
+
+#: mygpo/web/templatetags/episodes.py:53
+msgid "This episode has been marked new"
+msgstr "이 에피소드를 새 항목으로 표시했습니다"
+
+#: mygpo/web/templatetags/episodes.py:55
+msgid "This episode has been downloaded"
+msgstr "이 에피소드를 다운로드했습니다"
+
+#: mygpo/web/templatetags/episodes.py:59
+#, python-format
+msgid " from %(start)s to %(end)s"
+msgstr " %(start)s에서 %(end)s 위치로"
+
+#: mygpo/web/templatetags/episodes.py:63
+#, python-format
+msgid " to position %s"
+msgstr " %s 위치로"
+
+#: mygpo/web/templatetags/episodes.py:67
+msgid "This episode has been played"
+msgstr "이 에피소드를 재생했습니다"
+
+#: mygpo/web/templatetags/episodes.py:69
+msgid "This episode has been deleted"
+msgstr "이 에피소드를 삭제했습니다"
+
+#: mygpo/web/templatetags/episodes.py:126
+msgid "Unknown Episode"
+msgstr "알 수 없는 에피소드"
+
+#: mygpo/web/templatetags/menu.py:22 mygpo/web/templatetags/menu.py:66
+msgid "Home"
+msgstr "홈"
+
+#: mygpo/web/templatetags/menu.py:29
+msgid "Help"
+msgstr "도움말"
+
+#: mygpo/web/templatetags/menu.py:37
+msgid "User subscriptions"
+msgstr "사용자 구독"
+
+#: mygpo/web/templatetags/menu.py:38
+msgid "Suggestions"
+msgstr "제안"
+
+#: mygpo/web/templatetags/menu.py:39
+msgid "Features"
+msgstr ""
+
+#: mygpo/web/templatetags/menu.py:42
+msgid "Toplists"
+msgstr "순위"
+
+#: mygpo/web/templatetags/menu.py:50
+msgid "Devices"
+msgstr "장치"
+
+#: mygpo/web/templatetags/menu.py:54
+msgid "Community"
+msgstr "커뮤니티"
+
+#: mygpo/web/templatetags/menu.py:57
+msgid "My Userpage"
+msgstr "내 사용자 페이지"
+
+#: mygpo/web/templatetags/menu.py:63
+msgid "Privacy"
+msgstr "개인 정보"
+
+#: mygpo/web/templatetags/menu.py:68
+msgid "Link to gpodder.net"
+msgstr "gpodder.net에 링크"
+
+#: mygpo/web/templatetags/time.py:37
+#, python-brace-format
+msgid "{h}h {m}m {s}s"
+msgstr "{h}시간 {m}분 {s}초"
+
+#: mygpo/web/utils.py:281
+#, python-format
+msgid "%(weeks)d week"
+msgid_plural "%(weeks)d weeks"
+msgstr[0] ""
+msgstr[1] ""
+
+#: mygpo/web/utils.py:285
+#, python-format
+msgid "%(days)d day"
+msgid_plural "%(days)d days"
+msgstr[0] ""
+msgstr[1] ""
+
+#: mygpo/web/utils.py:289
+#, python-format
+msgid "%(hours)d hour"
+msgid_plural "%(hours)d hours"
+msgstr[0] ""
+msgstr[1] ""
+
+#: mygpo/web/views.py:152
+msgid "another site"
+msgstr "다른 사이트"
+
+#~ msgid "Main Database"
+#~ msgstr "메인 데이터베이스"
+
+#~ msgid "Database Tasks"
+#~ msgstr "데이터베이스 작업"
+
+#~ msgid "Trending"
+#~ msgstr "인기"
+
+#~ msgid "Return to the episode list"
+#~ msgstr "에피소드 목록으로 돌아가기"
+
+#~ msgid "Return to podcast page"
+#~ msgstr "팟캐스트 페이지로 돌아가기"
+
+#~ msgid "Red parts are often skipped, green parts never."
+#~ msgstr "빨간 부분은 자주 건너뛰고, 녹색 부분은 건너뛰지 않는 부분입니다."
+
+#~ msgid ""
+#~ "This diagram shows which parts of the podcast's episodes are listened the "
+#~ "most by users."
+#~ msgstr ""
+#~ "이 표는 청취자들이 팟캐스트 에피소드의 어떤 부분을 주로 듣는지 표시합니다."
+
+#~ msgid "Create List"
+#~ msgstr "목록 만들기"
+
+#~ msgid "Private Items"
+#~ msgstr "비공개 항목"
+
+#~ msgid "Account Data"
+#~ msgstr "계정 데이터"
+
+#~ msgid "Connected Services"
+#~ msgstr "연결한 서비스"
+
+#~ msgid "Public profile"
+#~ msgstr "공개 프로필"
+
+#~ msgid "for your userpage"
+#~ msgstr "사용자 페이지용"
+
+#~ msgid "What's that?"
+#~ msgstr "이것이 무엇입니까?"
+
+#~ msgid "Create Device "
+#~ msgstr "장치 만들기 "
+
+#~ msgid ""
+#~ "The Device ID connects your physical device with this page, so you should "
+#~ "enter the same text on your device and here."
+#~ msgstr ""
+#~ "장치 ID는 물리적인 장치를 이 페이지와 연결합니다. 그러므로 장치에 있는 동"
+#~ "일한 텍스트를 여기 입력해야 합니다."
+
+#~ msgid "Adding New Devices"
+#~ msgstr "새 장치 추가 중"
+
+#~ msgid ""
+#~ "Just upload your subscriptions from a client, and it will automatically "
+#~ "show up here."
+#~ msgstr "클라이언트에서 구독을 업로드하면, 여기에 자동으로 나타납니다."
+
+#~ msgid "You can also manually create a new device."
+#~ msgstr "수동으로 새 장치를 만들 수도 있습니다."
+
+#~ msgid "Chapters"
+#~ msgstr "챕터"
+
+#~ msgid "Ad?"
+#~ msgstr "광고?"
+
+#~ msgid "Label"
+#~ msgstr "레이블"
+
+#~ msgid "Remove"
+#~ msgstr "제거"
+
+#~ msgid "links"
+#~ msgstr "링크"
+
+#~ msgid "feed"
+#~ msgstr "피드"
+
+#~ msgid "website"
+#~ msgstr "웹사이트"
+
+#~ msgid "%(subscriber_count)s subscribers, %(listener_count)s listeners"
+#~ msgstr "구독자 %(subscriber_count)s, 청취자 %(listener_count)s"
+
+#~ msgid "Also available"
+#~ msgstr "또 사용 가능"
+
+#~ msgid "All Episodes"
+#~ msgstr "모든 에피소드"
+
+#~ msgid "Subscription and Episode History"
+#~ msgstr "구독 및 에피소드 기록"
+
+#~ msgid "gpodder.net &mdash; discover and track your podcasts"
+#~ msgstr "gpodder.net &mdash; 내 팟캐스트를 찾고 추적하기"
+
+#~ msgid ""
+#~ "gpodder.net is a web service to manage your podcast subscriptions via the "
+#~ "web. You can synchronize your devices, view status information and "
+#~ "discover new interesting podcasts online."
+#~ msgstr ""
+#~ "gpodder.net는 웹을 통해 팟캐스트 구독을 관리하는 서비스입니다. 장치를 동기"
+#~ "화할 수 있고, 상태 정보를 확인하고, 새로 나온 재미있는 팟캐스트를 온라인에"
+#~ "서 찾아볼 수 있습니다."
+
+#~ msgid "Supported Clients"
+#~ msgstr "지원하는 클라이언트"
+
+#~ msgid "<a href=\"http://gpodder.org/\">gPodder</a> since version 2.2"
+#~ msgstr "<a href=\"http://gpodder.org/\">gPodder</a> 버전 2.2 이상"
+
+#~ msgid ""
+#~ "<a href=\"http://lincgeek.org/bashpodder/\">BashPodder</a> with the <a "
+#~ "href=\"http://thpinfo.com/2010/mygpoclient/\">mygpoclient</a>"
+#~ msgstr ""
+#~ "<a href=\"http://lincgeek.org/bashpodder/\">BashPodder</a> (<a href="
+#~ "\"http://thpinfo.com/2010/mygpoclient/\">mygpoclient</a>와 같이)"
+
+#~ msgid "Nokia Podcasting on Symbian devices"
+#~ msgstr "심비안 장치의 노키아 팟캐스트"
+
+#~ msgid ""
+#~ "To configure gPodder to connect to gpodder.net, open the my.gpodder.org / "
+#~ "gpodder.net configuration dialog from the Subscriptions menu. Enter "
+#~ "<strong>username and password</strong> that you've used during the "
+#~ "registration on the webservice. The <strong>device ID</strong> is "
+#~ "automatically generated from the hostname and will be used to identify "
+#~ "this specific device in the webservice. Next <strong>enable the "
+#~ "synchronisation</strong> of your subscription list. For the start, "
+#~ "<strong>upload your subscription list</strong> to the webservice. "
+#~ "Subsequent changes will be transmitted automatically."
+#~ msgstr ""
+#~ "gpodder.net에 연결하는데 gPodder를 설정하려면, my.gpodder.org 웹 페이지를 "
+#~ "열거나 구독 메뉴에서 gpodder.net 설정 창을 여십시오. 거기에서 웹 서비스 등"
+#~ "록에 사용한 <strong>사용자 이름과 비밀번호</strong>를 입력하십시오. "
+#~ "<strong>장치 ID</strong>가 자동으로 생성되고, 웹서비스 안에서 이 특정 장치"
+#~ "를 구분할 수 있게 됩니다. 그 다음 구독 목록에 대해 <strong>동기화 사용</"
+#~ "strong>하십시오. 맨 먼저 웹서비스에 <strong>구독 목록 업로드</strong>하십"
+#~ "시오. 그 뒤의 변경 사항은 자동으로 전송됩니다."
+
+#~ msgid ""
+#~ "Each device connected to the webservice will be identified by its "
+#~ "<strong>Device ID</strong> which should therefore be unique (at least for "
+#~ "your user account). <strong>Do not try to synchronize devices by using "
+#~ "the same Device ID.</strong>"
+#~ msgstr ""
+#~ "웹서비스에 연결된 장치는 장치의 (사용자 계정마다 유일한) <strong>장치 ID</"
+#~ "strong>로 구분됩니다. <strong>동일한 장치 ID로 여러 장치를 동기화하지 마십"
+#~ "시오.</strong>"
+
+#~ msgid ""
+#~ "A list of your devices can be found on the <a href=\"%(devices-url)s"
+#~ "\">devices page</a>."
+#~ msgstr "장치 목록은 <a href=\"%(devices-url)s\">장치 페이지</a>에 있습니다."
+
+#~ msgid "Synchronizing Devices"
+#~ msgstr "장치 동기화"
+
+#~ msgid ""
+#~ "If you have at least two devices connected to the webservice, you can "
+#~ "synchronize some of them. Open the device page for one of them, click "
+#~ "synchronize and select the device to synchronize with. After "
+#~ "synchronizing, the subscriptions of the devices will be merged. Adding a "
+#~ "subscription at one device will automatically add it to the others. Same "
+#~ "for deletions."
+#~ msgstr ""
+#~ "웹서비스에 두 개 이상의 장치를 연결할 경우, 장치를 다른 장치에 맞게 동기화"
+#~ "할 수 있습니다. 한 장치의 장치 페이지를 열고, 동기화를 누르고 동기화할 장"
+#~ "치를 선택하십시오. 동기화가 끝나고 나면, 장치의 구독 내용이 병합됩니다. "
+#~ "한 장치에서 구독을 추가하면 다른 장치에서도 추가됩니다. 삭제한 경우도 마찬"
+#~ "가지입니다."
+
+#~ msgid ""
+#~ "The <a href=\"%(devices-url)s\">device list</a> groups devices that are "
+#~ "synchronized with each other."
+#~ msgstr ""
+#~ "<a href=\"%(devices-url)s\">장치 목록</a>에는 서로 동기화되고 있는 장치가 "
+#~ "모여 있습니다."
+
+#~ msgid "Episode States"
+#~ msgstr "에피소드 상태"
+
+#~ msgid ""
+#~ "Episode states (such as played, downloaded, etc) are synchronized across "
+#~ "all devices."
+#~ msgstr "에피소드 상태는 (재생, 다운로드 등) 모든 장치에 대해 동기화됩니다."
+
+#~ msgid ""
+#~ "By default we include information about your subscriptions in our <a href="
+#~ "\"%(toplist-url)s\">toplist</a> and <a href=\"%(suggestions-url)s"
+#~ "\">podcast suggestions</a>. <strong>We will never associate your username "
+#~ "and/or email address with your subscriptions on public pages.</strong> "
+#~ "You can even opt-out from our anonymized statistics at the <a href="
+#~ "\"%(privacy-url)s\">privacy page</a>. If you mark some podcasts as "
+#~ "private, they will also not show up in your sharable subscription list."
+#~ msgstr ""
+#~ "기본값으로 <a href=\"%(toplist-url)s\">순위</a> 및 <a href="
+#~ "\"%(suggestions-url)s\">팟캐스트 추천</a>에 여러분의 구독을 포함하고 있습"
+#~ "니다. <strong>저희는 절대로 구독한 여러분의 사용자 이름이나 메일 주소를 공"
+#~ "개 페이지에 연결하지 않습니다.</strong> 원하시면 <a href=\"%(privacy-url)s"
+#~ "\">개인정보 페이지</a>에서 저희의 익명화된 통계를 거부하실 수도 있습니다. "
+#~ "또 비공개로 표시한 팟캐스트의 경우에도, 공유 가능 구독 목록에 나타나지 않"
+#~ "습니다."
+
+#~ msgid "Sharing your Subscriptions"
+#~ msgstr "내 구독 공유하기"
+
+#~ msgid ""
+#~ "If you want to let others know about your which podcasts you are "
+#~ "listening to, go to your <a href=\"%(share-url)s\">sharing page</a>. You "
+#~ "can either share your private URL with your friends or make it public and "
+#~ "share your subscriptions with the whole world."
+#~ msgstr ""
+#~ "내가 어떤 팟캐스트를 듣고 있는지 다른 사람에게 알리려면, <a href="
+#~ "\"%(share-url)s\">공유 페이지</a>로 가십시오. 비공개 URL을 친구들과 공유"
+#~ "할 수도 있고, 공개로 만들어서 전세계와 공유할 수도 있습니다."
+
+#~ msgid "Subscribe to this podcast"
+#~ msgstr "이 팟캐스트에 구독"
+
+#~ msgid "New subscriptions will be public by default."
+#~ msgstr "새로 구독하면 기본값으로 공개입니다."
+
+#~ msgid "Change to Private"
+#~ msgstr "비공개로 바꾸기"
+
+#~ msgid "Change to Public"
+#~ msgstr "공개로 바꾸기"
+
+#~ msgid ""
+#~ "Browse the <a href=\"%(toplist-url)s\">toplist</a> and your <a href="
+#~ "\"%(suggestions-url)s\">personal suggestions</a>, <a href=\"%(search-url)s"
+#~ "\">search</a> or paste the URL of the podcast's feed here"
+#~ msgstr ""
+#~ "<a href=\"%(toplist-url)s\">순위</a> 및 <a href=\"%(suggestions-url)s\">개"
+#~ "인 추천</a>을 찾아보거나, <a href=\"%(search-url)s\">검색</a>하거나, 팟캐"
+#~ "스트의 URL을 여기 붙여넣으십시오."
+
+#~ msgid "Account activated"
+#~ msgstr "계정 활성화됨"
+
+#~ msgid "Your account has been activated! Enjoy using gpodder.net"
+#~ msgstr "계정을 활성화했습니다. gpodder.net 사용을 즐겨 주십시오"
+
+#~ msgid "Could not add Chapter: {msg}"
+#~ msgstr "챕터를 추가할 수 없습니다: {msg}"
+
+#~ msgid "You have deleted your account, but you can register again"
+#~ msgstr "계정을 삭제했지만, 다시 등록할 수 있습니다"
+
+#~ msgid "Reset password for your account on %s"
+#~ msgstr "%s의 계정에 대해 비밀번호 초기화"
+
+#~ msgid ""
+#~ "Here is your new password for your account %(username)s on %(site)s: "
+#~ "%(password)s"
+#~ msgstr ""
+#~ "다음은 %(site)s 사이트 %(username)s 사용자의 새 비밀번호입니다: "
+#~ "%(password)s"
+
+#~ msgid "Invalid Username entered"
+#~ msgstr "잘못된 사용자 이름을 입력했습니다"
+
+#~ msgid "You have deleted your account, but you can regster again."
+#~ msgstr "계정을 삭제했지만, 다시 등록할 수 있습니다"
+
+#~ msgid ""
+#~ "Your activation key has expired. Please try another username, or retry "
+#~ "with the same one tomorrow."
+#~ msgstr ""
+#~ "활성화 키가 만료되었습니다. 다른 사용자 이름을 사용하시거나, 같은 이름을 "
+#~ "사용하시려면 내일 다시 해 보십시오."

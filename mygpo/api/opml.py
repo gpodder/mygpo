@@ -1,20 +1,4 @@
 # -*- coding: utf-8 -*-
-#
-# This file is part of my.gpodder.org.
-#
-# my.gpodder.org is free software: you can redistribute it and/or modify it
-# under the terms of the GNU Affero General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at your
-# option) any later version.
-#
-# my.gpodder.org is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
-# License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
-#
 
 """OPML importer and exporter (based on gPodder's "opml" module)
 
@@ -25,7 +9,8 @@ the web and to export a list of podcast objects to valid OPML 1.1 files.
 import os
 
 import xml.dom.minidom
-import email.Utils
+from xml.parsers.expat import ExpatError
+import email.utils
 
 
 class Importer(object):
@@ -37,7 +22,11 @@ class Importer(object):
         containing podcast metadata.
         """
         self.items = []
-        doc = xml.dom.minidom.parseString(content)
+
+        try:
+            doc = xml.dom.minidom.parseString(content)
+        except ExpatError as e:
+            raise ValueError from e
 
         for outline in doc.getElementsByTagName('outline'):
             if outline.getAttribute('type') in self.VALID_TYPES and \
@@ -72,7 +61,7 @@ class Exporter(object):
 
     def __init__(self, title='my.gpodder.org Subscriptions'):
         self.title = title
-        self.created = email.Utils.formatdate(localtime=True)
+        self.created = email.utils.formatdate(localtime=True)
 
     def generate(self, channels):
         """

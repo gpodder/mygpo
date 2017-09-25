@@ -148,15 +148,6 @@
    <img src="{{ episode.url }}" />
   {% endif %}
 
-  {% if user.is_authenticated %}
-
-   {% if played_parts %}
-    <h3>Already played</h3>
-    {{ played_parts|episode_heatmap_visualization }}
-   {% endif %}
-
-  {% endif %}
-
    <ul class="pagination">
     {% if prev %}
      <li>

@@ -1,33 +1,17 @@
-#
-# This file is part of my.gpodder.org.
-#
-# my.gpodder.org is free software: you can redistribute it and/or modify it
-# under the terms of the GNU Affero General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at your
-# option) any later version.
-#
-# my.gpodder.org is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
-# License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with my.gpodder.org. If not, see <http://www.gnu.org/licenses/>.
-#
-
 import os.path
-import StringIO
+import io
 from datetime import datetime
 from glob import glob
 import errno
 import hashlib
+import struct
 
 from PIL import Image, ImageDraw
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.conf import settings
 from django.http import Http404, HttpResponse, HttpResponseNotFound
-from django.views.generic.base import View
+from django.views import View
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import last_modified
 
@@ -76,7 +60,7 @@ class CoverArt(View):
         try:
             im.thumbnail((size, size), Image.ANTIALIAS)
             resized = im
-        except (IOError, IndexError) as ex:
+        except (struct.error, IOError, IndexError) as ex:
             # raised when trying to read an interlaced PNG;
             logger.warn('Could not create thumbnail: %s', str(ex))
 
@@ -92,15 +76,15 @@ class CoverArt(View):
             del draw
             resized = Image.composite(resized, background, resized)
 
-        io = StringIO.StringIO()
+        sio = io.BytesIO()
 
         try:
-            resized.save(io, 'JPEG', optimize=True, progression=True,
+            resized.save(sio, 'JPEG', optimize=True, progression=True,
                          quality=80)
         except IOError as ex:
             return self.send_file(original)
 
-        s = io.getvalue()
+        s = sio.getvalue()
 
         fp = open(target, 'wb')
         fp.write(s)
@@ -120,7 +104,7 @@ class CoverArt(View):
     @staticmethod
     def get_existing_thumbnails(prefix, filename):
         files = glob(os.path.join(LOGO_DIR, '*', prefix, filename))
-        return filter(lambda f: 'original' not in f, files)
+        return [f for f in files if 'original' not in f]
 
     @staticmethod
     def get_original(prefix, filename):
@@ -140,7 +124,7 @@ class CoverArt(View):
 
     def send_file(self, filename):
         try:
-            f = open(filename)
+            f = open(filename, 'rb')
         except IOError:
             return HttpResponseNotFound()
 
@@ -154,7 +138,7 @@ def get_logo_url(podcast, size):
     """ Return the logo URL for the podcast """
 
     if podcast.logo_url:
-        filename = hashlib.sha1(podcast.logo_url).hexdigest()
+        filename = hashlib.sha1(podcast.logo_url.encode('utf-8')).hexdigest()
     else:
         filename = 'podcast-%d.png' % (hash(podcast.title) % 5, )
 

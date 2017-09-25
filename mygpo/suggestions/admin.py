@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 
 from django.contrib import admin
 
@@ -16,3 +16,5 @@ class PodcastSuggestionAdmin(admin.ModelAdmin):
     list_select_related = ('suggested_to', 'podcast', )
 
     raw_id_fields = ('suggested_to', 'podcast', )
+
+    show_full_result_count = False

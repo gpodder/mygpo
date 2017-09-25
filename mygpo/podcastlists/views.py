@@ -2,21 +2,20 @@ import uuid
 from functools import wraps
 from datetime import datetime
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404
 from django.utils.text import slugify
-from django.contrib.sites.models import RequestSite
+from django.contrib.sites.requests import RequestSite
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext as _
-from django.views.generic.base import View
+from django.views import View
 
 from mygpo.podcasts.models import Podcast, PodcastGroup
-from mygpo.podcastlists.models import PodcastList
-from mygpo.core.proxy import proxy_object
+from mygpo.podcastlists.models import PodcastList, PodcastListEntry
 from mygpo.api.simple import format_podcast_list
 from mygpo.votes.models import Vote
 from mygpo.directory.views import search as directory_search
@@ -46,10 +45,10 @@ def list_decorator(must_own=False):
     return _tmp
 
 
-@login_required
-def search(request, username, listname):
+@list_decorator(must_own=False)
+def search(request, plist, owner):
     return directory_search(request, 'list_search.html',
-            {'listname': listname})
+            {'listname': plist.slug})
 
 
 @login_required

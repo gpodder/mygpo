@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 from django.db import models, migrations
 from django.conf import settings
@@ -17,7 +17,10 @@ class Migration(migrations.Migration):
             name='SyncGroup',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(
+                    to=settings.AUTH_USER_MODEL,
+                    on_delete=models.CASCADE,
+                )),
             ],
             options={
             },
@@ -26,7 +29,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='client',
             name='sync_group',
-            field=models.ForeignKey(to='users.SyncGroup', null=True),
+            field=models.ForeignKey(
+                to='users.SyncGroup',
+                null=True,
+                on_delete=models.CASCADE,
+            ),
             preserve_default=True,
         ),
         migrations.AddField(
@@ -38,7 +45,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='userprofile',
             name='settings',
-            field=models.TextField(default=b'{}'),
+            field=models.TextField(default='{}'),
             preserve_default=True,
         ),
     ]
