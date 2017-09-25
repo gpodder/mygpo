@@ -65,6 +65,7 @@ class HostInfo(AdminView):
             num_celery_tasks = sum(len(node) for node in scheduled.values())
 
         feed_queue_status = self._get_feed_queue_status()
+        num_index_outdated = self._get_num_outdated_search_index()
 
         return self.render_to_response({
             'git_commit': commit,
@@ -74,6 +75,7 @@ class HostInfo(AdminView):
             'django_version': django_version,
             'num_celery_tasks': num_celery_tasks,
             'feed_queue_status': feed_queue_status,
+            'num_index_outdated': num_index_outdated,
         })
 
     def _get_feed_queue_status(self):
@@ -84,6 +86,8 @@ class HostInfo(AdminView):
         delta_mins = delta.total_seconds() / 60
         return delta_mins
 
+    def _get_num_outdated_search_index(self):
+        return Podcast.objects.filter(search_index_uptodate=False).count()
 
 class MergeSelect(AdminView):
     template_name = 'admin/merge-select.html'
