@@ -406,3 +406,6 @@ try:
 
 except ImportError:
     print('django-nose is not installed.')
+
+
+SEARCH_CUTOFF = float(os.getenv('SEARCH_CUTOFF', 0.3))
