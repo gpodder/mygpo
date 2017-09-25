@@ -1,7 +1,3 @@
-import collections
-from operator import itemgetter
-
-from mygpo.utils import linearize
 from mygpo.podcasts.models import Podcast
 from mygpo.history.stats import played_episode_counts
 
