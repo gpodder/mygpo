@@ -132,7 +132,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'django.contrib.postgres',
-    'djcelery',
+    'django_celery_results',
+    'django_celery_beat',
     'mygpo.core',
     'mygpo.podcasts',
     'mygpo.chapters',
@@ -332,19 +333,13 @@ DEFAULT_BASE_URL = os.getenv('DEFAULT_BASE_URL', '')
 
 ### Celery
 
-BROKER_URL = os.getenv('BROKER_URL', 'redis://localhost')
-CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
+CELERY_BROKER_URL = os.getenv('BROKER_URL', 'redis://localhost')
+CELERY_RESULT_BACKEND = 'django-db'
 
-SERVER_EMAIL = os.getenv('SERVER_EMAIL', 'no-reply@example.com')
+CELERY_RESULT_EXPIRES = 60 * 60  # 1h expiry time in seconds
 
-CELERY_TASK_RESULT_EXPIRES = 60 * 60  # 1h expiry time in seconds
+CELERY_ACCEPT_CONTENT = ['json']
 
-CELERY_ACCEPT_CONTENT = ['pickle', 'json']
-
-CELERY_SEND_TASK_ERROR_EMAILS = get_bool('CELERY_SEND_TASK_ERROR_EMAILS',
-                                         False)
-
-BROKER_POOL_LIMIT = get_intOrNone('BROKER_POOL_LIMIT', 10)
 
 ### Google API
 
