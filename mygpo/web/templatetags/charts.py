@@ -3,9 +3,6 @@ from django.utils.safestring import mark_safe
 from django.utils.html import format_html
 from django.contrib.staticfiles.storage import staticfiles_storage
 
-from mygpo.utils import format_time
-from mygpo.publisher.utils import colour_repr
-
 
 register = template.Library()
 
@@ -71,28 +68,3 @@ def timeline(data):
     s += '</script>\n'
 
     return s
-
-
-@register.filter
-def pie_chart(parts):
-    parts = [
-        'cht=p',
-        'chs=250x100',
-        'chl=%s' % '|'.join(parts.keys()),
-        'chd=t:%s' % ','.join([ repr(x) for x in parts.values() ])
-        ]
-
-    s = '<img src="http://chart.apis.google.com/chart?%s"' % '&'.join(parts)
-
-    return mark_safe(s)
-
-
-@register.simple_tag
-def subscriber_change(change):
-
-    if change > 1:
-        change -= 1
-        return '+{0:.1%}'.format(change)
-
-    # we don't care about negative changes
-    return ''
