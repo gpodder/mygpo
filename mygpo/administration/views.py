@@ -15,15 +15,13 @@ from django.template.loader import render_to_string
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
 from django.contrib.sites.requests import RequestSite
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, View
 from django.utils.decorators import method_decorator
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.administration.auth import require_staff
-from mygpo.administration.group import PodcastGrouper
-from mygpo.maintenance.merge import PodcastMerger, IncorrectMergeException
 from mygpo.maintenance.models import MergeTask
 from mygpo.administration.clients import UserAgentStats, ClientStats
 from mygpo.administration.tasks import merge_podcasts
@@ -96,29 +94,32 @@ class MergeSelect(AdminView):
 
     def get(self, request):
         queue_length = MergeTask.objects.count()
+        task = MergeTask.objects.first()
 
-        use_queue = bool(request.GET.get('queue', False))
-        if use_queue:
-            queue = MergeTask.objects.first()
-            urls = [podcast.url for podcast in queue.podcasts]
-            queue_id = queue.id.hex
-
-        else:
-            num = int(request.GET.get('podcasts', 2))
-            urls = [''] * num
-            queue_id = ''
+        num = int(request.GET.get('podcasts', 2))
+        urls = [''] * num
+        queue_id = ''
 
         return self.render_to_response({
                 'queue_length': queue_length,
                 'urls': urls,
-                'queue_id': queue_id,
+                'task': task,
             })
 
 
-class MergeBase(AdminView):
+class CreateMergeTask(AdminView):
+
+    def post(self, request):
+        podcasts = self._get_podcasts(request)
+
+        task = MergeTask.objects.create_from_podcasts(podcasts)
+
+        return HttpResponseRedirect(
+            reverse('admin-merge-verify', args=[task.id])
+        )
 
     def _get_podcasts(self, request):
-        podcasts = []
+
         for n in count():
             podcast_url = request.POST.get('feed%d' % n, None)
             if podcast_url is None:
@@ -128,84 +129,68 @@ class MergeBase(AdminView):
                 continue
 
             p = Podcast.objects.get(urls__url=podcast_url)
-            podcasts.append(p)
+            yield p
 
-        return podcasts
+
+class MergeBase(AdminView):
+    pass
 
 
 class MergeVerify(MergeBase):
 
     template_name = 'admin/merge-grouping.html'
 
-    def post(self, request):
-
-        try:
-            podcasts = self._get_podcasts(request)
-
-            grouper = PodcastGrouper(podcasts)
-
-            get_features = lambda episode: (episode.url, episode.title)
-
-            num_groups = grouper.group(get_features)
-
-        except InvalidPodcast as ip:
-            messages.error(request,
-                    _('No podcast with URL {url}').format(url=str(ip)))
-
-            podcasts = []
-            num_groups = []
-
+    def get(self, request, task_id):
+        task = MergeTask.objects.get(id=uuid.UUID(task_id))
+        podcasts = list(sorted(task.podcasts, key=lambda p: p.subscribers))
+        groups = task.episode_groups()
         return self.render_to_response({
-                'queue_id': request.POST.get('queue_id', ''),
-                'podcasts': podcasts,
-                'groups': num_groups,
-            })
+            'podcasts': podcasts,
+            'groups': groups,
+            'task': task,
+        })
 
 
-class MergeProcess(MergeBase):
+class UpdateMergeTask(View):
 
     RE_EPISODE = re.compile(r'episode_([0-9a-fA-F]{32})')
 
-    def post(self, request):
+    def post(self, request, task_id):
+        task = MergeTask.objects.get(id=uuid.UUID(task_id))
+        podcasts = task.podcasts
 
-        try:
-            podcasts = self._get_podcasts(request)
+        features = self._features_from_post(request.POST)
+        get_features = lambda episode: features[episode.id]
 
-        except InvalidPodcast as ip:
-            messages.error(request,
-                    _('No podcast with URL {url}').format(url=str(ip)))
+        # update groups within MergeTask
+        task.set_groups(get_features)
+        task.save()
 
-        grouper = PodcastGrouper(podcasts)
+        return HttpResponseRedirect(
+            reverse('admin-merge-verify', args=[task.id])
+        )
 
+    def _features_from_post(self, post):
         features = {}
-        for key, feature in request.POST.items():
+        for key, feature in post.items():
             m = self.RE_EPISODE.match(key)
             if m:
                 episode_id = uuid.UUID(m.group(1))
                 features[episode_id] = feature
 
-        get_features = lambda episode: features[episode.id]
-
-        num_groups = grouper.group(get_features)
-        queue_id = request.POST.get('queue_id', '')
-
-        if 'renew' in request.POST:
-            return render(request, 'admin/merge-grouping.html', {
-                    'queue_id': queue_id,
-                    'podcasts': podcasts,
-                    'groups': num_groups,
-                })
+        return features
 
 
-        elif 'merge' in request.POST:
+class MergeProcess(MergeBase):
 
-            podcast_ids = [p.get_id() for p in podcasts]
-            num_groups = list(num_groups)
+    def post(self, request, task_id):
 
-            res = merge_podcasts.delay(podcast_ids, num_groups, queue_id)
+        task = MergeTask.objects.get(id=uuid.UUID(task_id))
 
-            return HttpResponseRedirect(reverse('admin-merge-status',
-                        args=[res.task_id]))
+        res = merge_podcasts.delay(task.pk)
+
+        return HttpResponseRedirect(reverse('admin-merge-status',
+                    args=[res.task_id]))
 
 
 class MergeStatus(AdminView):
@@ -225,16 +210,11 @@ class MergeStatus(AdminView):
         # TODO: what to do with multiple frontends?
         cache.clear()
 
-        try:
-            actions, podcast = result.get()
-
-        except IncorrectMergeException as ime:
-            messages.error(request, str(ime))
-            return HttpResponseRedirect(reverse('admin-merge'))
+        podcast_id = result.get()
+        podcast = Podcast.objects.get(id=podcast_id)
 
         return self.render_to_response({
                 'ready': True,
-                'actions': actions.items(),
                 'podcast': podcast,
             })
 
