@@ -18,12 +18,14 @@ def update_podcasts(podcast_urls):
     """ Task to update a podcast """
     from mygpo.data.feeddownloader import update_podcasts as update
     podcasts = update(podcast_urls)
-    return list(podcasts)
+    return [podcast.pk for podcast in podcasts]
 
 
 @celery.task
-def update_related_podcasts(podcast, max_related=20):
+def update_related_podcasts(podcast_pk, max_related=20):
     get_podcast = itemgetter(0)
+
+    podcast = Podcast.objects.get(pk=pk)
 
     related = calc_similar_podcasts(podcast)[:max_related]
     related = map(get_podcast, related)

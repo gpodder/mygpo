@@ -317,7 +317,8 @@ class AddPodcastStatus(TemplateView):
             })
 
         try:
-            podcasts = result.get()
+            podcast_ids = result.get()
+            podcasts = Podcast.objects.filter(pk__in=podcast_ids)
             messages.success(request, _('%d podcasts added' % len(podcasts)))
 
         except (UpdatePodcastException, NoEpisodesException) as ex:
