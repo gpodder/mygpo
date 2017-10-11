@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import path
 from django.views.generic.base import TemplateView, RedirectView
 
 from mygpo.web.logo import CoverArt
@@ -8,33 +8,33 @@ from . import views
 
 urlpatterns = [
 
-    url(r'^$',
+    path('',
         views.home,
         name='home'),
 
-    url(r'^logo/(?P<size>\d+)/(?P<prefix>.{3})/(?P<filename>[^/]*)$',
+    path('logo/<int:size>/<str:prefix>/<str:filename>$',
         CoverArt.as_view(),
         name='logo'),
 
-    url(r'^tags/',
+    path('tags/',
         views.mytags,
         name='tags'),
 
-    url(r'^online-help',
+    path('online-help',
         RedirectView.as_view(
             url='http://gpoddernet.readthedocs.org/en/latest/user/index.html',
             permanent=False,
         ),
         name='help'),
 
-    url(r'^developer/',
+    path('developer/',
         TemplateView.as_view(template_name='developer.html')),
 
-    url(r'^contribute/',
+    path('contribute/',
         TemplateView.as_view(template_name='contribute.html'),
         name='contribute'),
 
-    url(r'^privacy/',
+    path('privacy/',
         TemplateView.as_view(template_name='privacy_policy.html'),
         name='privacy-policy'),
 

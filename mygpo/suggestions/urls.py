@@ -1,19 +1,19 @@
-from django.conf.urls import url
+from django.urls import path
 
 from . import views
 
 
 urlpatterns = [
 
-    url(r'^$',
+    path('',
         views.suggestions,
         name='suggestions'),
 
-    url(r'^blacklist/(?P<slug>[\w-]+)$',
+    path('blacklist/<slug:slug>',
         views.blacklist_slug,
         name='suggestions-blacklist-slug'),
 
-    url(r'^blacklist/(?P<podcast_id>[0-9a-f]{32})$',
+    path('blacklist/<uuid:podcast_id>',
         views.blacklist_id,
         name='suggestions-blacklist-id'),
 
