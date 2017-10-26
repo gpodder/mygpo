@@ -125,16 +125,6 @@
       {% trans "Create Podcast Lists" %}
      </a>
     </li>
-    <li><i class="icon-check{% if not "flattr" in checklist %}-empty{% endif %}"></i>
-     <a href="{% url "account" %}#flattr">
-      {% trans "Connect to Flattr" %}
-     </a>
-    </li>
-    <li><i class="icon-check{% if not "auto-flattr" in checklist %}-empty{% endif %}"></i>
-     <a href="{% url "account" %}#flattr">
-      {% trans "Auto-Flattr Podcasts" %}
-     </a>
-    </li>
     <li><i class="icon-check{% if not "publish" in checklist %}-empty{% endif %}"></i>
      <a href="{% url "publisher" %}">
       {% trans "Publish your own Podcast" %}

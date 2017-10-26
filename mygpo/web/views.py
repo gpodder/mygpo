@@ -21,7 +21,6 @@ from mygpo.utils import parse_range
 from mygpo.podcastlists.models import PodcastList
 from mygpo.favorites.models import FavoriteEpisode
 #from mygpo.web.views.podcast import slug_id_decorator
-from mygpo.users.settings import FLATTR_AUTO, FLATTR_TOKEN
 from mygpo.publisher.models import PublishedPodcast
 
 
@@ -89,12 +88,6 @@ def dashboard(request, episode_count=10):
 
     if PublishedPodcast.objects.filter(publisher=request.user).exists():
         checklist.append('publish')
-
-    if request.user.profile.settings.get_wksetting(FLATTR_TOKEN):
-        checklist.append('flattr')
-
-    if request.user.profile.settings.get_wksetting(FLATTR_AUTO):
-        checklist.append('auto-flattr')
 
     tomorrow = datetime.today() + timedelta(days=1)
 

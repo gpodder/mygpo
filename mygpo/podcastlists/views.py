@@ -19,7 +19,6 @@ from mygpo.podcastlists.models import PodcastList, PodcastListEntry
 from mygpo.api.simple import format_podcast_list
 from mygpo.votes.models import Vote
 from mygpo.directory.views import search as directory_search
-from mygpo.flattr import Flattr
 
 import logging
 logger = logging.getLogger(__name__)
@@ -82,15 +81,10 @@ def list_show(request, plist, owner):
     objs = [entry.content_object for entry in plist.entries.all()]
     max_subscribers = max([p.subscriber_count() for p in objs] + [0])
 
-    thing = plist.get_flattr_thing(site.domain, owner.username)
-    flattr = Flattr(owner, site.domain, request.is_secure())
-    flattr_autosubmit = flattr.get_autosubmit_url(thing)
-
     return render(request, 'list.html', {
             'podcastlist': plist,
             'max_subscribers': max_subscribers,
             'owner': owner,
-            'flattr_autosubmit': flattr_autosubmit,
             'domain': site.domain,
             'is_own': is_own,
         })

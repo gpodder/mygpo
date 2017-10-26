@@ -37,7 +37,6 @@ MENU_STRUCTURE = (
             ('/user/subscriptions/', _('User subscriptions')),
             ('/suggestions/', _('Suggestions')),
             ('', _('Features')),
-            ('/directory/+flattr', _('Flattr')),
             ('/directory/+license', _('License')),
             ('', _('Toplists')),
             ('/toplist/', _('Podcasts')),
