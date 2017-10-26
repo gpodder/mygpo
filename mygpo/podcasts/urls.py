@@ -53,10 +53,6 @@ urlpatterns = [
         podcast.all_episodes_id,
         name='podcast-all-episodes-id'),
 
-    url(r'^podcast/(?P<podcast_id>[0-9a-f]{32})/-flattr',
-        podcast.flattr_podcast_id,
-        name='podcast-flattr-id'),
-
     # Podcast Views with Slugs
     url(r'^podcast/(?P<slug>[\w-]+)/?$',
         podcast.show_slug,
@@ -100,10 +96,6 @@ urlpatterns = [
         podcast.all_episodes_slug,
         name='podcast-all-episodes-slug'),
 
-    url(r'^podcast/(?P<slug>[\w-]+)/-flattr',
-        podcast.flattr_podcast_slug,
-        name='podcast-flattr-slug'),
-
     url(r'^favorites/$',
         episode.list_favorites,
         name='favorites'),
@@ -122,10 +114,6 @@ urlpatterns = [
         episode.add_action_id,
         name='add-episode-action-id'),
 
-    url(r'^podcast/(?P<p_id>[0-9a-f]{32})/(?P<e_id>[0-9a-f]{32})/-flattr',
-        episode.flattr_episode_id,
-        name='flattr-episode-id'),
-
     url(r'^podcast/(?P<p_id>[0-9a-f]{32})/(?P<e_id>[0-9a-f]{32})/\+history',
         episode.episode_history_id,
         name='episode-history-id'),
@@ -142,9 +130,6 @@ urlpatterns = [
     url(r'^podcast/(?P<p_slug>[\w-]+)/(?P<e_slug>[\w-]+)/add-action',
         episode.add_action_slug,
         name='add-episode-action-slug'),
-
-    url(r'^podcast/(?P<p_slug>[\w-]+)/(?P<e_slug>[\w-]+)/-flattr',
-        episode.flattr_episode_slug,  name='flattr-episode-slug'),
 
     url(r'^podcast/(?P<p_slug>[\w-]+)/(?P<e_slug>[\w-]+)/\+history',
         episode.episode_history_slug,

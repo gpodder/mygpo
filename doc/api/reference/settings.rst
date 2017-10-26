@@ -23,14 +23,6 @@ Account
   device (default: true)
 * ``public_subscriptions``: default "public" value for subscriptions (default:
   true)
-* ``flattr_token``: auth-token for a Flattr login; empty when not logged in
-  (default: empty)
-* ``auto_flattr``: auto-flattr episodes, only relevant when logged into Flattr
-  account (default: false)
-* ``flattr_mygpo``: automatically flattr gpodder.net, only relevant when logged
-  into Flattr account (default: false)
-* ``flattr_username``: username under which own items (eg podcast lists) are
-  published (default: empty)
 
 Episode
 ^^^^^^^
