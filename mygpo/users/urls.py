@@ -46,18 +46,6 @@ urlpatterns = [
         settings.AccountRemoveGoogle.as_view(),
         name='account-google-remove'),
 
-    path('account/flattr',
-        settings.FlattrSettingsView.as_view(),
-        name='flattr-settings'),
-
-    path('account/flattr/token',
-        settings.FlattrTokenView.as_view(),
-        name='flattr-token'),
-
-    path('account/flattr/logout',
-        settings.FlattrLogout.as_view(),
-        name='flattr-logout'),
-
     path('account/privacy/default-public',
         settings.DefaultPrivacySettings.as_view(public=True),
         name='privacy_default_public'),

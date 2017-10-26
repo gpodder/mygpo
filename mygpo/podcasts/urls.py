@@ -47,10 +47,6 @@ podcast_uuid_patterns = [
         podcast.all_episodes_id,
         name='podcast-all-episodes-id'),
 
-    path('-flattr',
-        podcast.flattr_podcast_id,
-        name='podcast-flattr-id'),
-
 ]
 
 podcast_slug_patterns = [
@@ -93,10 +89,6 @@ podcast_slug_patterns = [
         podcast.all_episodes_slug,
         name='podcast-all-episodes-slug'),
 
-    path('-flattr',
-        podcast.flattr_podcast_slug,
-        name='podcast-flattr-slug'),
-
 ]
 
 
@@ -109,10 +101,6 @@ episode_uuid_patterns = [
     path('add-action',
         episode.add_action_id,
         name='add-episode-action-id'),
-
-    path('-flattr',
-        episode.flattr_episode_id,
-        name='flattr-episode-id'),
 
     path('+history',
         episode.episode_history_id,
@@ -130,9 +118,6 @@ episode_slug_patterns = [
     path('add-action',
         episode.add_action_slug,
         name='add-episode-action-slug'),
-
-    path('-flattr',
-        episode.flattr_episode_slug,  name='flattr-episode-slug'),
 
     path('+history',
         episode.episode_history_slug,

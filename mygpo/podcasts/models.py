@@ -329,10 +329,6 @@ class PodcastQuerySet(MergedUUIDQuerySet):
         ruuid = uuid.uuid1()
         return self.exclude(title='').filter(id__gt=ruuid)
 
-    def flattr(self):
-        """ Podcasts providing Flattr information """
-        return self.exclude(flattr_url__isnull=True)
-
     def license(self, license_url=None):
         """ Podcasts with any / the given license """
         if license_url:

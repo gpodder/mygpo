@@ -15,9 +15,7 @@ from django.utils.translation import ugettext as _
 
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.api.constants import EPISODE_ACTION_TYPES
-from mygpo.core.tasks import flattr_thing
 from mygpo.utils import parse_time, get_timestamp
-from mygpo.users.settings import FLATTR_TOKEN
 from mygpo.history.stats import last_played_episodes
 from mygpo.publisher.utils import check_publisher_permission
 from mygpo.web.utils import get_episode_link_target, check_restrictions
@@ -53,13 +51,11 @@ def episode(request, episode):
                                                  .exists()
 
         devices = {c.id.hex: c for c in user.client_set.all()}
-        can_flattr = user.profile.settings.get_wksetting(FLATTR_TOKEN) and episode.flattr_url
 
     else:
         has_history = False
         is_fav = False
         devices = {}
-        can_flattr = False
 
     is_publisher = check_publisher_permission(user, podcast)
 
@@ -75,7 +71,6 @@ def episode(request, episode):
         'is_favorite': is_fav,
         'actions': EPISODE_ACTION_TYPES,
         'devices': devices,
-        'can_flattr': can_flattr,
         'is_publisher': is_publisher,
     })
 
@@ -179,29 +174,6 @@ def add_action(request, episode):
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
 
-@never_cache
-@login_required
-def flattr_episode(request, episode):
-    """ Flattrs an episode, records an event and redirects to the episode """
-
-    user = request.user
-    site = RequestSite(request)
-
-    # Flattr via the tasks queue, but wait for the result
-    task = flattr_thing.delay(user.pk, episode._id, site.domain,
-            request.is_secure(), 'Episode')
-    success, msg = task.get()
-
-    if success:
-        messages.success(request, _("Flattr\'d"))
-
-    else:
-        messages.error(request, msg)
-
-    podcast = episode.podcast
-    return HttpResponseRedirect(get_episode_link_target(episode, podcast))
-
-
 # To make all view accessible via either IDs or Slugs
 # a decorator queries the episode and passes the Id on to the
 # regular views
@@ -272,11 +244,9 @@ def id_decorator(f):
 show_slug            = slug_decorator(episode)
 toggle_favorite_slug = slug_decorator(toggle_favorite)
 add_action_slug      = slug_decorator(add_action)
-flattr_episode_slug  = slug_decorator(flattr_episode)
 episode_history_slug = slug_decorator(history)
 
 show_id            = id_decorator(episode)
 toggle_favorite_id = id_decorator(toggle_favorite)
 add_action_id      = id_decorator(add_action)
-flattr_episode_id  = id_decorator(flattr_episode)
 episode_history_id = id_decorator(history)

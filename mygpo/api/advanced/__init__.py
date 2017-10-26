@@ -25,9 +25,7 @@ from mygpo.utils import format_time, parse_bool, get_timestamp, \
     parse_request_body, normalize_feed_url
 from mygpo.decorators import allowed_methods, cors_origin
 from mygpo.history.models import EpisodeHistoryEntry
-from mygpo.core.tasks import auto_flattr_episode
 from mygpo.users.models import Client, InvalidEpisodeActionAttributes
-from mygpo.users.settings import FLATTR_AUTO
 from mygpo.favorites.models import FavoriteEpisode
 from mygpo.api.basic_auth import require_valid_user, check_username
 
@@ -188,7 +186,6 @@ def episode_action_json(history, user):
 
 def update_episodes(user, actions, now, ua_string):
     update_urls = []
-    auto_flattr = user.profile.settings.get_wksetting(FLATTR_AUTO)
 
     # group all actions by their episode
     for action in actions:
@@ -215,9 +212,6 @@ def update_episodes(user, actions, now, ua_string):
                                          history.started, history.stopped,
                                          history.total, podcast_url,
                                          episode_url)
-
-        if history.action == EpisodeHistoryEntry.PLAY and auto_flattr:
-            auto_flattr_episode.delay(user.pk, episode.pk)
 
     return update_urls
 
