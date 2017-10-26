@@ -7,7 +7,7 @@ gpodder.net
 The sourcecode of the webservice gpodder.net is released as open source under
 the `AGPLv3 <http://www.gnu.org/licenses/agpl-3.0.html>`_ and `hosted at GitHub
 <https://github.com/gpodder/mygpo>`_. Bugs can be reported at the `gPodder
-Bugtracker <https://bugs.gpodder.org/enter_bug.cgi?product=gpodder.net>`_.
+Bugtracker <https://github.com/gpodder/mygpo/issues>`_.
 
 Integrating Clients
 -------------------
