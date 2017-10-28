@@ -13,6 +13,8 @@ update-po:
 		--ignore=doc/* --ignore=envs/* --ignore=htdocs/* --ignore=venv/* \
 		--ignore=res/* --ignore=tools/* --ignore=mygpo/*/migrations/*
 
+notebook:
+	envdir envs/dev/ python manage.py shell_plus --notebook
 
 clean:
 	git clean -fX
