@@ -37,10 +37,6 @@ Initialize the tables. This needs needs to be run for every update. ::
     sudo docker run --rm --link db:db -e SECRET_KEY=asdf mygpo/web python manage.py migrate
 
 
-Elasticsearch
--------------
-
-
 Redis
 -----
 
