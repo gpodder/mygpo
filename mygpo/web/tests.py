@@ -130,10 +130,10 @@ class PodcastLogoTests(TestCase):
         self.podcast.delete()
 
     def _save_logo(self):
-        with responses.RequestsMock() as rsps:
+        with responses.RequestsMock() as rsps, \
+             open('../res/gpoddernet_228.png', 'rb') as body:
             rsps.add(responses.GET, self.URL, status=200,
-                     body=open('../res/gpoddernet_228.png', 'rb'),
-                     content_type='image/png')
+                     body=body, content_type='image/png')
 
             CoverArt.save_podcast_logo(self.URL)
 
@@ -143,6 +143,8 @@ class PodcastLogoTests(TestCase):
         response = self.client.get(logo_url)
         self.assertEqual(302, response.status_code)
         redir = response['Location']
+
+        logger.warn('Redirecting to {}'.format(redir))
 
         response = self.client.get(redir)
         self.assertEqual(200, response.status_code)
@@ -171,7 +173,6 @@ class PodcastLogoTests(TestCase):
 
         self._save_logo()
         logo_url = get_logo_url(self.podcast, 32)
-        logger.warn('#############' + logo_url)
 
         response = self.client.get(logo_url)
         self.assertEqual(302, response.status_code, response.content)
@@ -216,17 +217,16 @@ class PodcastLogoTests(TestCase):
         logo.LOGO_STORAGE = _logo_storage
 
     def test_new_logo(self):
-        with responses.RequestsMock() as rsps:
-            pass
+        with responses.RequestsMock() as rsps, \
+             open('../res/gpoddernet_228.png', 'rb') as body1, \
+             open('../res/gpoddernet_228.png', 'rb') as body2, \
+             open('../res/gpoddernet_16.png', 'rb') as body3:
             rsps.add(responses.GET, self.URL, status=200,
-                     body=open('../res/gpoddernet_228.png', 'rb'),
-                     content_type='image/png')
+                     body=body1, content_type='image/png')
             rsps.add(responses.GET, self.URL, status=200,
-                     body=open('../res/gpoddernet_228.png', 'rb'),
-                     content_type='image/png')
+                     body=body2, content_type='image/png')
             rsps.add(responses.GET, self.URL, status=200,
-                     body=open('../res/gpoddernet_16.png', 'rb'),
-                     content_type='image/png')
+                     body=body3, content_type='image/png')
 
             logo_url = get_logo_url(self.podcast, 32)
 

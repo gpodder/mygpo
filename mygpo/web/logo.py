@@ -59,7 +59,7 @@ class CoverArt(View):
             return self.send_file(target)
 
         if not self.storage.exists(original):
-            logger.warn('Original cover {} not found'.format(original))
+            logger.warning('Original cover {} not found'.format(original))
             raise Http404('Cover Art not available' + original)
 
         target_dir = self.get_dir(filename)
@@ -69,7 +69,7 @@ class CoverArt(View):
             if im.mode not in ('RGB', 'RGBA'):
                 im = im.convert('RGBA')
         except IOError as ioe:
-            logger.warn('Cover file {} cannot be opened: {}'.format(
+            logger.warning('Cover file {} cannot be opened: {}'.format(
                 original, ioe))
             raise Http404('Cannot open cover file') from ioe
 
@@ -78,7 +78,7 @@ class CoverArt(View):
             resized = im
         except (struct.error, IOError, IndexError) as ex:
             # raised when trying to read an interlaced PNG;
-            logger.warn('Could not create thumbnail: %s', str(ex))
+            logger.warning('Could not create thumbnail: %s', str(ex))
 
             # we use the original instead
             return self.send_file(original)
@@ -90,6 +90,8 @@ class CoverArt(View):
                          quality=80)
         except IOError as ex:
             return self.send_file(original)
+        finally:
+            fp.close()
 
         self.storage.save(target, sio)
 
@@ -106,10 +108,12 @@ class CoverArt(View):
     @staticmethod
     def remove_existing_thumbnails(prefix, filename):
         dirs, _files = LOGO_STORAGE.listdir('logo') # TODO: cache list of sizes
-        thumbs = []
         for size in dirs:
-            print(size, prefix, filename)
+            if size == 'original':
+                continue
+
             path = os.path.join('logo', size, prefix, filename)
+            logger.info('Removing {}'.format(path))
             LOGO_STORAGE.delete(path)
 
     @staticmethod
@@ -138,7 +142,7 @@ class CoverArt(View):
             else:
                 old_hash = ''
 
-            logger.info('Logo %s', cover_art_url)
+            logger.info('Logo {}, saving to {}'.format(cover_art_url, filename))
 
             # save new cover art
             LOGO_STORAGE.delete(filename)
@@ -158,7 +162,7 @@ class CoverArt(View):
 
         except (ValueError, requests.exceptions.RequestException,
                 socket.error, IOError) as e:
-            logger.warn('Exception while updating podcast logo: %s', str(e))
+            logger.warning('Exception while updating podcast logo: %s', str(e))
 
 
 def get_prefix(filename):
