@@ -16,17 +16,5 @@ PUBLIC_SUB_PODCAST = WellKnownSetting('public_subscription', True)
 # Default public-flag value (stored in the podcast)
 PUBLIC_SUB_USER = WellKnownSetting('public_subscriptions', True)
 
-# Flattr authentication token, empty if not logged in
-FLATTR_TOKEN = WellKnownSetting('flattr_token', '')
-
-# enable auto-flattring
-FLATTR_AUTO = WellKnownSetting('auto_flattr', False)
-
-# auto-flattr mygpo
-FLATTR_MYGPO = WellKnownSetting('flattr_mygpo', False)
-
-# username for flattr buttons for own content
-FLATTR_USERNAME = WellKnownSetting('flattr_username', '')
-
 # Flag to mark an episode as favorite
 FAV_FLAG = WellKnownSetting('is_favorite', False)

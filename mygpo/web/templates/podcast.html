@@ -144,14 +144,6 @@
     </a>
    {% endif %}
 
-   {% if can_flattr %}
-    <a class="btn btn-default" href="{% podcast_link_target podcast "podcast-flattr" %}">
-     <img src="https://flattr.com/_img/icons/flattr_logo_16.png"
-      alt="Flattr {{ podcast.title|default:"Unnamed Podcast"|striptags }}" />
-     {% trans "Flattr" %}
-    </a>
-   {% endif %}
-
    <a href="javascript:void(0);" onclick="$('#tag-box').toggle();" class="btn btn-default">
     <i class="icon-tag"></i>
     {% trans "Tags" %}

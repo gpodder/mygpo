@@ -238,7 +238,7 @@ def _update_podcast(podcast, parsed, episodes, max_episode_order):
 
     assign_slug(podcast)
     assign_missing_episode_slugs(podcast)
-    update_related_podcasts.delay(podcast)
+    update_related_podcasts.delay(podcast.pk)
 
 
 def assign_slug(podcast):

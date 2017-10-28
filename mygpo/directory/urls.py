@@ -33,10 +33,6 @@ urlpatterns = [
         views.AddPodcastStatus.as_view(),
         name='add-podcast-status'),
 
-    url(r'^directory/\+flattr$',
-        views.FlattrPodcastList.as_view(),
-        name='flattr-podcasts'),
-
     url(r'^directory/\+license$',
         views.LicenseList.as_view(),
         name='license-podcasts'),

@@ -84,44 +84,6 @@ class ProfileForm(forms.Form):
     )
 
 
-class FlattrForm(forms.Form):
-    """ Per-user Flattr settings """
-
-    # Authentication token; empty or None when not signed in
-    token = forms.CharField(
-        required=False,
-        label=_('Token'))
-
-    # Auto-flattring enabled
-    enable = forms.BooleanField(
-        required=False,
-        label=_('Auto-Flattr played episodes'),
-        widget=forms.CheckboxInput(attrs={
-            'class': 'input input-sm form-control',
-        }),
-    )
-
-    # Auto-flattr mygpo (or whatever the FLATTR_MYGPO_THING
-    # in settings_prod.py is) on every other flattr
-    flattr_mygpo = forms.BooleanField(
-        required=False,
-        label=_('Flattr us'),
-        widget=forms.CheckboxInput(attrs={
-            'class': 'input input-sm form-control',
-        }),
-    )
-
-    # username under which own content (eg podcast lists) should be published
-    username = forms.CharField(
-        required=False,
-        label=_('Username for own content'),
-        widget=forms.TextInput(attrs={
-            'class': 'input input-sm form-control',
-            'placeholder': 'Device Name',
-        }),
-    )
-
-
 class DeviceForm(forms.Form):
     """
     form for editing device information by a user.

@@ -104,14 +104,6 @@
     </a>
    {% endif %}
 
-  {% if can_flattr %}
-   <a class="btn btn-default" href="{% episode_link_target episode podcast "flattr-episode" %}">
-    <img src="https://flattr.com/_img/icons/flattr_logo_16.png"
-     alt="Flattr {{ episode.title|default:"Unnamed Episode"|striptags }}" />
-     {% trans "Flattr" %}
-   </a>
-  {% endif %}
-
   {% if user.is_staff %}
    <a class="btn btn-default" href="{% edit_link episode %}">
     <i class="icon-cogs"></i>Admin
