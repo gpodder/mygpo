@@ -30,3 +30,4 @@ Contents
     postgres-setup
     libraries
     configuration
+    jupyter-notebook

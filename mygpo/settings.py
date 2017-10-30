@@ -172,6 +172,15 @@ except ImportError:
 
 
 try:
+    if DEBUG:
+        import django_extensions
+        INSTALLED_APPS += ['django_extensions']
+
+except ImportError:
+    pass
+
+
+try:
     import opbeat
 
     if not DEBUG:
