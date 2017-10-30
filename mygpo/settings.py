@@ -112,6 +112,8 @@ TEMPLATES = [{
 
 
 MIDDLEWARE = [
+    'django.middleware.cache.UpdateCacheMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # before CommonMiddleware
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -159,6 +161,8 @@ INSTALLED_APPS = [
     'mygpo.podcastlists',
     'mygpo.votes',
     'django_nose',
+    'oauth2_provider',
+    'corsheaders',
 ]
 
 try:
@@ -340,6 +344,10 @@ SUPPORT_URL = os.getenv('SUPPORT_URL', '')
 
 
 FEEDSERVICE_URL = os.getenv('FEEDSERVICE_URL', 'http://feeds.gpodder.net/')
+
+# Allow CORS from everywhere; required for OAuth in JS
+# This could replace the custom implementation in mygpo.decorators.cors_origin
+CORS_ORIGIN_ALLOW_ALL = True
 
 
 # time for how long an activation is valid; after that, an unactivated user
