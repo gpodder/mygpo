@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from django.db import IntegrityError
 
 from celery.decorators import periodic_task
+from django_db_geventpool.utils import close_connection
 
 from mygpo.data.podcast import calc_similar_podcasts
 from mygpo.celery import celery
@@ -14,6 +15,7 @@ logger = get_task_logger(__name__)
 
 
 @celery.task
+@close_connection
 def update_podcasts(podcast_urls):
     """ Task to update a podcast """
     from mygpo.data.feeddownloader import update_podcasts as update
@@ -23,6 +25,7 @@ def update_podcasts(podcast_urls):
 
 
 @celery.task
+@close_connection
 def update_related_podcasts(podcast_pk, max_related=20):
     get_podcast = itemgetter(0)
 
@@ -44,6 +47,7 @@ UPDATE_INTERVAL = timedelta(hours=1)
 
 
 @periodic_task(run_every=UPDATE_INTERVAL)
+@close_connection
 def schedule_updates(interval=UPDATE_INTERVAL):
     """ Schedules podcast updates that are due within ``interval`` """
     now = datetime.utcnow()
@@ -61,6 +65,7 @@ def schedule_updates(interval=UPDATE_INTERVAL):
 
 
 @periodic_task(run_every=UPDATE_INTERVAL)
+@close_connection
 def schedule_updates_longest_no_update():
     """ Schedule podcasts for update that have not been updated for longest """
 
