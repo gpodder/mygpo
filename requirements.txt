@@ -14,5 +14,5 @@ psycopg2cffi==2.7.6
 python-dateutil==2.6.1
 redis==2.10.6
 django-celery-results==1.0.1
-https://github.com/celery/django-celery-beat/archive/master.zip#egg=django-celery-beat
+django-celery-beat==1.1.0
 requests==2.18.4
