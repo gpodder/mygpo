@@ -26,3 +26,5 @@ envs
 
 # Jupyter Notebooks
 notebooks/
+
+.cache

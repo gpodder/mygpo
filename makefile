@@ -5,8 +5,8 @@ help:
 	@echo 'make clean           clean up files'
 
 test:
-	envdir envs/dev/ python -Wd -m coverage run ./manage.py test
-	coverage report
+	envdir envs/dev/ pytest --cov=mygpo/ --cov-branch
+	coverage report --show-missing
 
 update-po:
 	envdir envs/dev/ python manage.py makemessages \
