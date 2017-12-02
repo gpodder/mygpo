@@ -217,7 +217,7 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', '')
 
 SECRET_KEY = os.getenv('SECRET_KEY', '')
 
-if 'test' in sys.argv:
+if 'pytest' in sys.argv[0]:
     SECRET_KEY = 'test'
 
 GOOGLE_ANALYTICS_PROPERTY_ID = os.getenv('GOOGLE_ANALYTICS_PROPERTY_ID', '')
