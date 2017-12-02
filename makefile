@@ -17,6 +17,8 @@ update-po:
 		--ignore=res/* --ignore=tools/* --ignore=mygpo/*/migrations/* \
 		--ignore=static/*
 
+notebook:
+	envdir envs/dev/ python manage.py shell_plus --notebook
 
 clean:
 	git clean -fX
