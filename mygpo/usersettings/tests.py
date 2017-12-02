@@ -5,7 +5,7 @@ import urllib.request, urllib.parse, urllib.error
 import json
 
 from django.urls import reverse
-from django.test.client import Client as TestClient
+from django.test.client import Client as TClient
 from django.test import TestCase
 
 from mygpo.test import create_auth_string, create_user
@@ -32,7 +32,7 @@ class TestAPI(TestCase):
             user = self.user,
             uid = self.uid,
         )
-        self.client = TestClient()
+        self.client = TClient()
         self.extra = {
             'HTTP_AUTHORIZATION': create_auth_string(self.user.username, pwd)
         }

@@ -14,9 +14,12 @@ logger = get_task_logger(__name__)
 
 
 @celery.task(max_retries=5, default_retry_delay=60)
-def sync_user(user):
+def sync_user(user_pk):
     """ Syncs all of the user's sync groups """
     from mygpo.users.models import SubscriptionException
+
+    User = get_user_model()
+    user = User.objects.get(pk=user_pk)
 
     groups = models.SyncGroup.objects.filter(user=user)
     for group in groups:

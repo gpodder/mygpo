@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 class DeviceUpdates(View):
     """ returns various updates for a device
 
-    http://wiki.gpodder.org/wiki/Web_Services/API_2/Devices#Get_Updates """
+    https://gpoddernet.readthedocs.io/en/latest/api//Devices#Get_Updates """
 
     @method_decorator(csrf_exempt)
     @method_decorator(require_valid_user)

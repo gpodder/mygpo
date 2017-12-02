@@ -92,7 +92,7 @@
                         It works best with the <a href="http://gpodder.org/">gPodder</a>
                         application, but you can also use it with
                         <a href="http://amarok.kde.org/">Amarok</a>,
-                        <a href="http://wiki.gpodder.org/wiki/Web_Services/Clients">other
+                        <a href="https://gpoddernet.readthedocs.io/en/latest/user/clients.html">other
                             supported clients</a> or as standalone web application without
                         any client app.
                         </p>
@@ -161,15 +161,14 @@
                             <ul>
                                 <li><strong>{% trans "Support" %}</strong></li>
                                 <li><a href="{% url "help" %}">{% trans "Docs" %}</a></li>
-                                <li><a href="http://wiki.gpodder.org/wiki/Mailing_List">{% trans "Mailing&nbsp;List" %}</a></li>
-                                <li><a href="https://getsatisfaction.com/gpoddernet">{%trans "Questions" %}</a></li>
+                                <li><a href="https://gpodder.github.io/docs/mailing-list.html">{% trans "Mailing&nbsp;List" %}</a></li>
+                                <li><a href="https://github.com/gpodder/mygpo/issues">{%trans "Questions" %}</a></li>
                             </ul>
                         </div>
 
                         <div class="col-md-1">
                             <ul>
                                 <li><strong>{% trans "Support&nbsp;Us" %}</strong></li>
-                                <li><a href="http://flattr.com/thing/2304/gpodder-net">{% trans "Flattr" %}</a></li>
                                 <li><a href="{% url "contribute" %}">{% trans "Donate" %}</a></li>
                                 <li><a href="{% url "advertise" %}">{% trans "Advertise" %}</a></li>
                             </ul>
@@ -187,9 +186,9 @@
                         <div class="col-md-1">
                             <ul>
                                 <li><strong>{% trans "Develop" %}</strong></li>
-                                <li><a href="http://wiki.gpodder.org/wiki/Web_Services/API_2">{% trans "API" %}</a></li>
-                                <li><a href="http://wiki.gpodder.org/wiki/Web_Services/Libraries">{% trans "Libraries" %}</a></li>
-                                <li><a href="http://wiki.gpodder.org/wiki/Web_Services/Clients">{% trans "Clients" %}</a></li>
+                                <li><a href="https://gpoddernet.readthedocs.io/en/latest/api/">{% trans "API" %}</a></li>
+                                <li><a href="https://gpoddernet.readthedocs.io/en/latest/dev/libraries.html">{% trans "Libraries" %}</a></li>
+                                <li><a href="https://gpoddernet.readthedocs.io/en/latest/user/clients.html">{% trans "Clients" %}</a></li>
                             </ul>
                         </div>
 
@@ -224,21 +223,5 @@
             <script src="{% static "js/bootstrap-dropdown.js" %}"></script>
 
             {% block javascript %}{% endblock javascript %}
-
-            <!-- getsatisfaction.com feedback tab -->
-            <script type="text/javascript">
-                var is_ssl = ("https:" == document.location.protocol);
-                var asset_host = is_ssl ? "https://s3.amazonaws.com/getsatisfaction.com/" : "http://s3.amazonaws.com/getsatisfaction.com/";
-                document.write(unescape("%3Cscript src='" + asset_host + "javascripts/feedback-v2.js' type='text/javascript'%3E%3C/script%3E"));
-            </script>
-            <script type="text/javascript">
-                var feedback_widget_options = {};
-                feedback_widget_options.display = "overlay";
-                feedback_widget_options.company = "gpoddernet";
-                feedback_widget_options.placement = "left";
-                feedback_widget_options.color = "#222";
-                feedback_widget_options.style = "idea";
-                var feedback_widget = new GSFN.feedback_widget(feedback_widget_options);
-            </script>
 
 {% endblock %}

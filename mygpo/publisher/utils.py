@@ -2,7 +2,7 @@ from collections import namedtuple, defaultdict
 from datetime import timedelta, datetime, time
 
 from mygpo.podcasts.models import Episode
-from mygpo.utils import daterange, flatten
+from mygpo.utils import daterange
 from mygpo.history.models import EpisodeHistoryEntry
 from mygpo.history.stats import playcounts_timerange
 from mygpo.publisher.models import PublishedPodcast
@@ -103,41 +103,3 @@ def check_publisher_permission(user, podcast):
         return True
 
     return PublishedPodcast.objects.filter(publisher=user, podcast=podcast).exists()
-
-
-def colour_repr(val, max_val, colours):
-    """
-    returns a color representing the given value within a color gradient.
-
-    The color gradient is given by a list of (r, g, b) tupels. The value
-    is first located within two colors (of the list) and then approximated
-    between these two colors, based on its position within this segment.
-    """
-    if len(colours) == 1:
-        return colours[0]
-
-    if max_val == 0:
-        return colours[0]
-
-    # calculate position in the gradient; defines the segment
-    pos = float(val) / max_val
-    colour_nr1 = min(len(colours)-1, int(pos * (len(colours)-1)))
-    colour_nr2 = min(len(colours)-1, colour_nr1+1)
-    colour1 = colours[ colour_nr1 ]
-    colour2 = colours[ colour_nr2 ]
-
-    r1, g1, b1 = colour1
-    r2, g2, b2 = colour2
-
-    # determine bounds of segment
-    lower_bound = float(max_val) / (len(colours)-1) * colour_nr1
-    upper_bound = min(max_val, lower_bound + float(max_val) / (len(colours)-1))
-
-    # position within the segment
-    percent = (val - lower_bound) / upper_bound
-
-    r_step = r2 - r1
-    g_step = g2 - g1
-    b_step = b2 - b1
-
-    return (r1 + r_step * percent, g1 + g_step * percent, b1 + b_step * percent)

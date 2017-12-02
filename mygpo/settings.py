@@ -4,6 +4,13 @@ import os.path
 import dj_database_url
 
 
+try:
+    from psycopg2cffi import compat
+    compat.register()
+except ImportError:
+    pass
+
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -124,7 +131,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'djcelery',
+    'django.contrib.postgres',
+    'django_celery_results',
+    'django_celery_beat',
     'mygpo.core',
     'mygpo.podcasts',
     'mygpo.chapters',
@@ -149,13 +158,22 @@ INSTALLED_APPS = [
     'mygpo.pubsub',
     'mygpo.podcastlists',
     'mygpo.votes',
-    'django_nose',
 ]
 
 try:
-    import debug_toolbar
-    INSTALLED_APPS += ['debug_toolbar']
-    MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
+    if DEBUG:
+        import debug_toolbar
+        INSTALLED_APPS += ['debug_toolbar']
+        MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
+
+except ImportError:
+    pass
+
+
+try:
+    if DEBUG:
+        import django_extensions
+        INSTALLED_APPS += ['django_extensions']
 
 except ImportError:
     pass
@@ -166,11 +184,6 @@ try:
 
     if not DEBUG:
         INSTALLED_APPS += ['opbeat.contrib.django']
-
-        # add opbeat middleware to the beginning of the middleware classes list
-        MIDDLEWARE = \
-            ['opbeat.contrib.django.middleware.OpbeatAPMMiddleware'] + \
-            MIDDLEWARE
 
 except ImportError:
     pass
@@ -204,7 +217,7 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', '')
 
 SECRET_KEY = os.getenv('SECRET_KEY', '')
 
-if 'test' in sys.argv:
+if 'pytest' in sys.argv[0]:
     SECRET_KEY = 'test'
 
 GOOGLE_ANALYTICS_PROPERTY_ID = os.getenv('GOOGLE_ANALYTICS_PROPERTY_ID', '')
@@ -305,17 +318,6 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # enabled access to staff-only areas with ?staff=<STAFF_TOKEN>
 STAFF_TOKEN = os.getenv('STAFF_TOKEN', None)
 
-# Flattr settings -- available after you register your app
-FLATTR_KEY = os.getenv('FLATTR_KEY', '')
-FLATTR_SECRET = os.getenv('FLATTR_SECRET', '')
-
-# Flattr thing of the webservice. Will be flattr'd when a user sets
-# the "Auto-Flattr gpodder.net" option
-FLATTR_MYGPO_THING = os.getenv(
-    'FLATTR_MYGPO_THING',
-    'https://flattr.com/submit/auto?user_id=stefankoegl&url=http://gpodder.net'
-)
-
 # The User-Agent string used for outgoing HTTP requests
 USER_AGENT = 'gpodder.net (+https://github.com/gpodder/mygpo)'
 
@@ -328,19 +330,13 @@ DEFAULT_BASE_URL = os.getenv('DEFAULT_BASE_URL', '')
 
 ### Celery
 
-BROKER_URL = os.getenv('BROKER_URL', 'redis://localhost')
-CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
+CELERY_BROKER_URL = os.getenv('BROKER_URL', 'redis://localhost')
+CELERY_RESULT_BACKEND = 'django-db'
 
-SERVER_EMAIL = os.getenv('SERVER_EMAIL', 'no-reply@example.com')
+CELERY_RESULT_EXPIRES = 60 * 60  # 1h expiry time in seconds
 
-CELERY_TASK_RESULT_EXPIRES = 60 * 60  # 1h expiry time in seconds
+CELERY_ACCEPT_CONTENT = ['json']
 
-CELERY_ACCEPT_CONTENT = ['pickle', 'json']
-
-CELERY_SEND_TASK_ERROR_EMAILS = get_bool('CELERY_SEND_TASK_ERROR_EMAILS',
-                                         False)
-
-BROKER_POOL_LIMIT = get_intOrNone('BROKER_POOL_LIMIT', 10)
 
 ### Google API
 
@@ -353,11 +349,6 @@ SUPPORT_URL = os.getenv('SUPPORT_URL', '')
 
 FEEDSERVICE_URL = os.getenv('FEEDSERVICE_URL', 'http://feeds.gpodder.net/')
 
-# Elasticsearch settings
-
-ELASTICSEARCH_SERVER = os.getenv('ELASTICSEARCH_SERVER', '127.0.0.1:9200')
-ELASTICSEARCH_INDEX = os.getenv('ELASTICSEARCH_INDEX', 'mygpo')
-ELASTICSEARCH_TIMEOUT = float(os.getenv('ELASTICSEARCH_TIMEOUT', '2'))
 
 # time for how long an activation is valid; after that, an unactivated user
 # will be deleted
@@ -381,10 +372,5 @@ EMAIL_BACKEND = os.getenv('EMAIL_BACKEND',
 
 PODCAST_AD_ID = os.getenv('PODCAST_AD_ID')
 
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
-NOSE_ARGS = [
-    '--with-doctest',
-    '--stop',
-    '--where=mygpo',
-]
+SEARCH_CUTOFF = float(os.getenv('SEARCH_CUTOFF', 0.3))

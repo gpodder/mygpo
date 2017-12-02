@@ -278,7 +278,7 @@ def sync(request, device):
     except Client.DoesNotExist as e:
         messages.error(request, str(e))
 
-    sync_user.delay(request.user)
+    sync_user.delay(request.user.pk)
 
     return HttpResponseRedirect(reverse('device', args=[device.uid]))
 
@@ -287,7 +287,7 @@ def sync(request, device):
 @login_required
 def resync(request, device):
     """ Manually triggers a re-sync of a client """
-    sync_user.delay(request.user)
+    sync_user.delay(request.user.pk)
     messages.success(request,
                      _('Your subscription will be updated in a moment.'))
     return HttpResponseRedirect(reverse('device', args=[device.uid]))

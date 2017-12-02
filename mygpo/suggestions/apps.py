@@ -8,7 +8,7 @@ def update_suggestions_on_subscription(sender, **kwargs):
     """ update a user's suggestions after one of his subscriptions change """
     from mygpo.suggestions.tasks import update_suggestions
     user = kwargs['user']
-    update_suggestions.delay(user)
+    update_suggestions.delay(user.pk)
 
 
 class SuggestionsConfig(AppConfig):

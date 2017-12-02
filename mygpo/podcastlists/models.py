@@ -6,7 +6,6 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 
 from mygpo.core.models import UpdateInfoModel, OrderedModel, UUIDModel
 from mygpo.podcasts.models import Podcast
-from mygpo.flattr import FlattrThing
 from mygpo.votes.models import VoteMixin
 from mygpo.utils import set_ordered_entries
 
@@ -47,18 +46,6 @@ class PodcastList(UUIDModel, VoteMixin, UpdateInfoModel):
                 'order': self.max_order + 1,
             },
         )
-
-    def get_flattr_thing(self, domain, username):
-        """ Returns a "Thing" which can be flattred by other Flattr users """
-        return FlattrThing(
-                url = reverse('list-show', args=[username, self.slug]),
-                title = self.title,
-                description = 'A collection of podcasts about "%s" by %s user %s' % (self.title, domain, username),
-                category = 'audio',
-                hidden = None,
-                tags = None,
-                language = None,
-            )
 
     def set_entries(self, podcasts):
         """ Updates the list to include the given podcast, removes others """

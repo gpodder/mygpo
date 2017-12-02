@@ -24,6 +24,7 @@ from mygpo.data.podcast import subscribe_at_hub
 from mygpo.data.tasks import update_related_podcasts
 from mygpo.pubsub.models import SubscriptionError
 from mygpo.directory.tags import update_category
+from mygpo.search import get_index_fields
 
 import logging
 logger = logging.getLogger(__name__)
@@ -48,6 +49,10 @@ def update_podcasts(queue):
 
     for n, podcast_url in enumerate(queue, 1):
         logger.info('Update %d - %s', n, podcast_url)
+        if not podcast_url:
+            logger.warn('Podcast URL empty, skipping')
+            continue
+
         try:
             yield update_podcast(podcast_url)
 
@@ -123,7 +128,7 @@ def _fetch_feed(podcast_url):
         'Accept': 'application/json',
     }
     url = urljoin(settings.FEEDSERVICE_URL, 'parse')
-    r = requests.get(url, params=params, headers=headers, timeout=10)
+    r = requests.get(url, params=params, headers=headers, timeout=30)
 
     if r.status_code != 200:
         logger.error('Feed-service status code for "%s" was %s', podcast_url,
@@ -155,6 +160,9 @@ def _update_podcast(podcast, parsed, episodes, max_episode_order):
 
     # we need that later to decide if we can "bump" a category
     prev_latest_episode_timestamp = podcast.latest_episode_timestamp
+
+    # will later be used to see whether the index is outdated
+    old_index_fields = get_index_fields(podcast)
 
     podcast.title = parsed.get('title') or podcast.title
     podcast.description = parsed.get('description') or podcast.description
@@ -213,6 +221,12 @@ def _update_podcast(podcast, parsed, episodes, max_episode_order):
     if not found:
         podcast.logo_url = None
 
+
+    # check if search index should be considered out of date
+    new_index_fields = get_index_fields(podcast)
+    if list(old_index_fields.items()) != list(new_index_fields.items()):
+        podcast.search_index_uptodate = False
+
     # The podcast is always saved (not just when there are changes) because
     # we need to record the last update
     logger.info('Saving podcast.')
@@ -226,7 +240,7 @@ def _update_podcast(podcast, parsed, episodes, max_episode_order):
 
     assign_slug(podcast)
     assign_missing_episode_slugs(podcast)
-    update_related_podcasts.delay(podcast)
+    update_related_podcasts.delay(podcast.pk)
 
 
 def assign_slug(podcast):
@@ -468,13 +482,13 @@ def mark_outdated(obj):
 def get_update_interval(episodes):
     """ calculates the avg interval between new episodes """
 
-    count = len(episodes)
+    count = episodes.count()
     if not count:
         logger.info('no episodes, using default interval of %dh',
                     DEFAULT_UPDATE_INTERVAL)
         return DEFAULT_UPDATE_INTERVAL
 
-    earliest = episodes[0]
+    earliest = episodes.first()
     now = datetime.utcnow()
 
     timespan_s = (now - earliest.released).total_seconds()

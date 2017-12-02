@@ -3,7 +3,7 @@ import unittest
 from collections import Counter
 
 from django.urls import reverse
-from django.test.client import Client as TestClient
+from django.test.client import Client as TClient
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.contrib.auth import get_user_model
@@ -100,7 +100,7 @@ class AuthTests(TestCase):
 
     def setUp(self):
         self.user, pwd = create_user()
-        self.client = TestClient()
+        self.client = TClient()
         wrong_pwd = pwd + '1234'
         self.extra = {
             'HTTP_AUTHORIZATION': create_auth_string(self.user.username,

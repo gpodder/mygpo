@@ -2,6 +2,7 @@
 
 import uuid
 import re
+from datetime import timedelta
 
 from django.core.cache import cache
 from django.conf import settings
@@ -11,6 +12,7 @@ from django.utils.translation import ugettext as _
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import (GenericRelation,
                                                 GenericForeignKey)
+from django.contrib.postgres.search import SearchVectorField
 
 from mygpo import utils
 from mygpo.core.models import (TwitterModel, UUIDModel, GenericManager,
@@ -327,10 +329,6 @@ class PodcastQuerySet(MergedUUIDQuerySet):
         ruuid = uuid.uuid1()
         return self.exclude(title='').filter(id__gt=ruuid)
 
-    def flattr(self):
-        """ Podcasts providing Flattr information """
-        return self.exclude(flattr_url__isnull=True)
-
     def license(self, license_url=None):
         """ Podcasts with any / the given license """
         if license_url:
@@ -343,6 +341,10 @@ class PodcastQuerySet(MergedUUIDQuerySet):
         NEXTUPDATE = "last_update + (update_interval || ' hours')::INTERVAL"
         q = self.extra(select={'next_update': NEXTUPDATE})
         return q.order_by('next_update')
+
+    @property
+    def next_update(self):
+        return self.last_update + timedelta(hours=self.update_interval)
 
     def next_update_between(self, start, end):
         NEXTUPDATE_BETWEEN = ("(last_update + (update_interval || "
@@ -568,6 +570,12 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
     # "order" value of the most recent episode (will be the highest of all)
     max_episode_order = models.PositiveIntegerField(null=True, default=None)
 
+    # indicates whether the search index is up-to-date (or needs updating)
+    search_index_uptodate = models.BooleanField(default=False, db_index=True)
+
+    # search vector for full-text search
+    search_vector = SearchVectorField(null=True)
+
     objects = PodcastManager()
 
     class Meta:
@@ -714,11 +722,23 @@ class EpisodeManager(GenericManager):
         url = utils.to_maxlength(URL, 'url', url)
 
         try:
-            # try to fetch the episode
-            return Episode.objects.get(urls__url=url,
-                                       urls__scope=podcast.as_scope,
-                                      )
-        except Episode.DoesNotExist:
+            url = URL.objects.get(url=url, scope=podcast.as_scope)
+            episode = url.content_object
+
+            if episode is None:
+
+                with transaction.atomic():
+                    episode = Episode.objects.create(podcast=podcast,
+                                                     id=uuid.uuid1(),
+                                                     **defaults)
+
+                    url.content_object = episode
+                    url.save()
+
+            return episode
+
+
+        except URL.DoesNotExist:
             # episode did not exist, try to create it
             try:
                 with transaction.atomic():

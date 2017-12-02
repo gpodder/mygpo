@@ -18,12 +18,14 @@ def update_podcasts(podcast_urls):
     """ Task to update a podcast """
     from mygpo.data.feeddownloader import update_podcasts as update
     podcasts = update(podcast_urls)
-    return list(podcasts)
+    return [podcast.pk for podcast in podcasts]
 
 
 @celery.task
-def update_related_podcasts(podcast, max_related=20):
+def update_related_podcasts(podcast_pk, max_related=20):
     get_podcast = itemgetter(0)
+
+    podcast = Podcast.objects.get(pk=pk)
 
     related = calc_similar_podcasts(podcast)[:max_related]
     related = map(get_podcast, related)
@@ -45,8 +47,8 @@ def schedule_updates(interval=UPDATE_INTERVAL):
     """ Schedules podcast updates that are due within ``interval`` """
     now = datetime.utcnow()
 
-    # max number of updates to schedule (one per minute)
-    max_updates = UPDATE_INTERVAL.total_seconds() / 60
+    # max number of updates to schedule (one every 10s)
+    max_updates = UPDATE_INTERVAL.total_seconds() / 20
 
     # fetch podcasts for which an update is due within the next hour
     podcasts = Podcast.objects.all()\
@@ -54,23 +56,27 @@ def schedule_updates(interval=UPDATE_INTERVAL):
                               .prefetch_related('urls')\
                               .only('pk')[:max_updates]
 
-    logger.error('Scheduling %d podcasts for update', podcasts.count())
-    # queue all those podcast updates
-    for podcast in podcasts:
-        update_podcasts.delay([podcast.url])
+    _schedule_updates(podcasts)
 
 
 @periodic_task(run_every=UPDATE_INTERVAL)
 def schedule_updates_longest_no_update():
     """ Schedule podcasts for update that have not been updated for longest """
 
-    # max number of updates to schedule (one per minute)
-    max_updates = UPDATE_INTERVAL.total_seconds() / 60
+    # max number of updates to schedule (one every 20s)
+    max_updates = UPDATE_INTERVAL.total_seconds() / 20
 
     podcasts = Podcast.objects.order_by('last_update')[:max_updates]
+    _schedule_updates(podcasts)
 
+
+def _schedule_updates(podcasts):
+    """ Schedule updates for podcasts """
     logger.info('Scheduling %d podcasts for update', podcasts.count())
 
     # queue all those podcast updates
     for podcast in podcasts:
-        update_podcasts.delay([podcast.url])
+        # update_podcasts.delay() seems to block other task execution,
+        # therefore celery.send_task() is used instead
+        celery.send_task('mygpo.data.tasks.update_podcasts',
+                         args=[podcast.url])

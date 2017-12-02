@@ -5,7 +5,7 @@ from mygpo.users.tasks import sync_user
 def sync_user_on_subscription(sender, **kwargs):
     """ synchronizes the user after one of his subscriptions has changed """
     user = kwargs['user']
-    sync_user.delay(user)
+    sync_user.delay(user.pk)
 
 
 subscription_changed.connect(sync_user_on_subscription,

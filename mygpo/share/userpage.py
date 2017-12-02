@@ -8,7 +8,6 @@ from django.contrib.auth import get_user_model
 
 from mygpo.podcasts.models import Episode
 from mygpo.users.models import HistoryEntry
-from mygpo.users.settings import FLATTR_USERNAME
 from mygpo.subscriptions import get_subscribed_podcasts
 from mygpo.decorators import requires_token
 from mygpo.podcastlists.models import PodcastList
@@ -32,7 +31,6 @@ class UserpageView(View):
 
         context = {
             'page_user': user,
-            'flattr_username': user.profile.settings.get_wksetting(FLATTR_USERNAME),
             'site': site.domain,
             'subscriptions_token': user.profile.get_token('subscriptions_token'),
             'favorite_feeds_token': user.profile.get_token('favorite_feeds_token'),
