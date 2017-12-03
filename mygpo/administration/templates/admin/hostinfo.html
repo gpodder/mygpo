@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load time %}
 {% load podcasts %}
 
 {% load menu %}
@@ -60,6 +61,15 @@
     </strong>
    </td>
    <td class="numeric">{{ num_index_outdated }}</td>
+  </tr>
+
+  <tr>
+   <td>
+    <strong>
+     {% trans "Average podcast update duration" %}
+    </strong>
+   </td>
+   <td class="numeric">{{ avg_podcast_update_duration.total_seconds|format_duration}}</td>
   </tr>
 
   <tr>
