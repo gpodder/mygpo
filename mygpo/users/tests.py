@@ -66,8 +66,11 @@ class UnsubscribeMergeTests(TestCase):
     P2_URL = 'http://test.org/podcast/'
 
     def setUp(self):
-        self.podcast1 = Podcast.objects.get_or_create_for_url('http://example.com/feed.rss')
-        self.podcast2 = Podcast.objects.get_or_create_for_url(self.P2_URL)
+        self.podcast1 = Podcast.objects.get_or_create_for_url(
+            'http://example.com/feed.rss').object
+
+        self.podcast2 = Podcast.objects.get_or_create_for_url(
+            self.P2_URL).object
 
         User = get_user_model()
         self.user = User(username='test-merge')

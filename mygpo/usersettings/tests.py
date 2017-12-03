@@ -22,11 +22,14 @@ class TestAPI(TestCase):
         self.podcast_url = 'http://example.com/podcast.rss'
         self.episode_url = 'http://example.com/podcast/episode-1.mp3'
         self.uid = 'client-uid'
-        self.podcast = Podcast.objects.get_or_create_for_url(self.podcast_url)
+        self.podcast = Podcast.objects.get_or_create_for_url(
+            self.podcast_url).object
+
         self.episode = Episode.objects.get_or_create_for_url(
             self.podcast,
             self.episode_url,
-        )
+        ).object
+
         self.user_client = Client.objects.create(
             id = uuid.uuid1(),
             user = self.user,
