@@ -342,8 +342,8 @@ class PodcastQuerySet(MergedUUIDQuerySet):
     def order_by_next_update(self):
         """ Sort podcasts by next scheduled update """
         NEXTUPDATE = "last_update + (update_interval || ' hours')::INTERVAL"
-        q = self.extra(select={'next_update': NEXTUPDATE})
-        return q.order_by('next_update')
+        q = self.extra(select={'_next_update': NEXTUPDATE})
+        return q.order_by('_next_update')
 
     @property
     def next_update(self):
