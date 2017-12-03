@@ -28,6 +28,8 @@ from mygpo.pubsub.models import SubscriptionError
 from mygpo.directory.tags import update_category
 from mygpo.search import get_index_fields
 
+from . import models
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -77,22 +79,31 @@ class PodcastUpdater(object):
     def update_podcast(self):
         """ Update the podcast """
 
-        parsed = self.parse_feed()
-        if not parsed:
-            return
+        with models.PodcastUpdateResult(podcast_url=self.podcast_url) as res:
 
-        podcast = Podcast.objects.get_or_create_for_url(self.podcast_url)
+            parsed = self.parse_feed()
+            if not parsed:
+                res.podcast_created = False
+                res.error_message = '"{}" could not be parsed'.format(
+                    self.podcast_url)
+                return
 
-        episode_updater = MultiEpisodeUpdater(podcast)
-        episode_updater.update_episodes(parsed.get('episodes', []))
+            podcast, created = Podcast.objects.get_or_create_for_url(
+                self.podcast_url)
+            res.podcast = podcast
+            res.podcast_created = created
 
-        podcast.refresh_from_db()
-        podcast.episode_count = Episode.objects.filter(podcast=podcast).count()
-        podcast.save()
+            res.episodes_added = 0
+            episode_updater = MultiEpisodeUpdater(podcast, res)
+            episode_updater.update_episodes(parsed.get('episodes', []))
 
-        episode_updater.order_episodes()
+            podcast.refresh_from_db()
+            podcast.episode_count = episode_updater.count_episodes()
+            podcast.save()
 
-        self._update_podcast(podcast, parsed, episode_updater)
+            episode_updater.order_episodes()
+
+            self._update_podcast(podcast, parsed, episode_updater)
 
         return podcast
 
@@ -123,7 +134,7 @@ class PodcastUpdater(object):
             # if we fail to parse the URL, we don't even create the
             # podcast object
             try:
-                p = Podcast.objects.get(urls__url=podcast_url)
+                p = Podcast.objects.get(urls__url=self.podcast_url)
                 # if it exists already, we mark it as outdated
                 self._mark_outdated(p, 'error while fetching feed: {}'.format(
                     str(nee)))
@@ -354,8 +365,9 @@ class PodcastUpdater(object):
 
 class MultiEpisodeUpdater(object):
 
-    def __init__(self, podcast):
+    def __init__(self, podcast, update_result):
         self.podcast = podcast
+        self.update_result = update_result
         self.updated_episodes = []
         self.max_episode_order = None
 
@@ -378,7 +390,11 @@ class MultiEpisodeUpdater(object):
 
             logger.info('Updating episode %d / %d', n, len(parsed_episodes))
 
-            episode = Episode.objects.get_or_create_for_url(self.podcast, url)
+            episode, created = Episode.objects.get_or_create_for_url(
+                self.podcast, url)
+
+            if created:
+                self.update_result.episodes_added += 1
 
             updater = EpisodeUpdater(episode, self.podcast)
             updater.update_episode(parsed)
@@ -434,6 +450,9 @@ class MultiEpisodeUpdater(object):
             if f.get('urls', []):
                 return f['urls'][0]
         return None
+
+    def count_episodes(self):
+        return Episode.objects.filter(podcast=self.podcast).count()
 
     def get_update_interval(self, episodes):
         """ calculates the avg interval between new episodes """

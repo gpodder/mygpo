@@ -696,6 +696,10 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
         return _('Unknown Podcast from {domain}'.format(
             domain=utils.get_domain(self.url)))
 
+    @property
+    def next_update(self):
+        return self.last_update + timedelta(hours=self.update_interval)
+
 
 class EpisodeQuerySet(MergedUUIDQuerySet):
     """ QuerySet for Episodes """

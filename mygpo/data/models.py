@@ -1,3 +1,5 @@
+import uuid
+
 from datetime import datetime
 
 from django.db import models
@@ -11,8 +13,11 @@ class PodcastUpdateResult(UUIDModel):
 
     Once an instance is stored, the update is assumed to be finished. """
 
+    # URL of the podcast to be updated
+    podcast_url = models.URLField(max_length=2048)
+
     # The podcast that was updated
-    podcast = models.ForeignKey(Podcast, on_delete=models.CASCADE)
+    podcast = models.ForeignKey(Podcast, on_delete=models.CASCADE, null=True)
 
     # The timestamp at which the updated started to be executed
     start = models.DateTimeField(default=datetime.utcnow)
@@ -42,3 +47,30 @@ class PodcastUpdateResult(UUIDModel):
             models.Index(fields=['podcast', 'start'])
         ]
 
+    def __str__(self):
+        return 'Update Result for "{}" @ {:%Y-%m-%d %H:%M}'.format(
+            self.podcast, self.start)
+
+    # Use as context manager
+
+    def __enter__(self):
+        self.id = uuid.uuid4()
+        self.start = datetime.utcnow()
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.duration = datetime.utcnow() - self.start
+
+        success = (exc_type, exc_value, traceback) == (None, None, None)
+        self.successful = success
+
+        if not success:
+            self.error_message = str(exc_value)
+
+            if self.podcast_created is None:
+                self.podcast_created = False
+
+            if self.episodes_added is None:
+                self.episodes_added = 0
+
+        self.save()
