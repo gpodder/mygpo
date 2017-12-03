@@ -200,7 +200,7 @@ def set_subscriptions(urls, user, device_uid, user_agent):
         unsubscribe(podcast, user, device)
 
     for url in new:
-        podcast = Podcast.objects.get_or_create_for_url(url)
+        podcast = Podcast.objects.get_or_create_for_url(url).object
         subscribe(podcast, user, device, url)
 
     # Only an empty response is a successful response

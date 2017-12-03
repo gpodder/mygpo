@@ -81,7 +81,7 @@ class SubscriptionsAPI(APIView):
         rem_s = filter(lambda x: x not in add_s, rem_s)
 
         for add_url in add_s:
-            podcast = Podcast.objects.get_or_create_for_url(add_url)
+            podcast = Podcast.objects.get_or_create_for_url(add_url).object
             subscribe(podcast, user, device, add_url)
 
         remove_podcasts = Podcast.objects.filter(urls__url__in=rem_s)

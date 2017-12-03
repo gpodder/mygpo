@@ -326,7 +326,7 @@ def subscribe_url(request):
     if not url:
         raise Http404('Please specify a valid url')
 
-    podcast = Podcast.objects.get_or_create_for_url(url)
+    podcast = Podcast.objects.get_or_create_for_url(url).object
 
     return HttpResponseRedirect(get_podcast_link_target(podcast, 'subscribe'))
 

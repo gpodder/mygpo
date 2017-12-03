@@ -93,7 +93,7 @@ class FavoritesFeedCreateEntry(View):
         site = RequestSite(request)
         feed_url = feed.get_public_url(site.domain)
 
-        podcast = Podcast.objects.get_or_create_for_url(feed_url)
+        podcast = Podcast.objects.get_or_create_for_url(feed_url).object
 
         PublishedPodcast.objects.get_or_create(
             podcast=podcast,
