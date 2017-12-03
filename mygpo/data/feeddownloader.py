@@ -81,20 +81,29 @@ class PodcastUpdater(object):
 
         with models.PodcastUpdateResult(podcast_url=self.podcast_url) as res:
 
-            parsed = self.parse_feed()
-            if not parsed:
+            parsed, podcast, created = self.parse_feed()
+
+            if not podcast:
                 res.podcast_created = False
                 res.error_message = '"{}" could not be parsed'.format(
                     self.podcast_url)
+
                 return
 
-            podcast, created = Podcast.objects.get_or_create_for_url(
-                self.podcast_url)
             res.podcast = podcast
             res.podcast_created = created
 
             res.episodes_added = 0
             episode_updater = MultiEpisodeUpdater(podcast, res)
+
+            if not parsed:
+                # if it exists already, we mark it as outdated
+                self._mark_outdated(
+                    podcast,
+                    'error while fetching feed',
+                    episode_updater)
+                return
+
             episode_updater.update_episodes(parsed.get('episodes', []))
 
             podcast.refresh_from_db()
@@ -112,38 +121,24 @@ class PodcastUpdater(object):
             parsed = self._fetch_feed()
             self._validate_parsed(parsed)
 
-        except requests.exceptions.RequestException as re:
-            logging.exception('Error while fetching response from feedservice')
+        except (requests.exceptions.RequestException,
+                NoEpisodesException) as ex:
+            logging.exception('Error while fetching/parsing feed')
 
             # if we fail to parse the URL, we don't even create the
             # podcast object
             try:
                 p = Podcast.objects.get(urls__url=podcast_url)
-                # if it exists already, we mark it as outdated
-                _mark_outdated(p, 'error while fetching feed: %s' % str(re))
-                p.last_update = datetime.utcnow()
-                p.save()
-                return None
+                return (None, p, False)
 
             except Podcast.DoesNotExist as pdne:
-                raise NoPodcastCreated(re) from pdne
+                raise NoPodcastCreated(ex) from pdne
 
-        except NoEpisodesException as nee:
-            logging.warn('No episode found while parsing podcast')
+        # Parsing went well, get podcast
+        podcast, created = Podcast.objects.get_or_create_for_url(
+            self.podcast_url)
 
-            # if we fail to parse the URL, we don't even create the
-            # podcast object
-            try:
-                p = Podcast.objects.get(urls__url=self.podcast_url)
-                # if it exists already, we mark it as outdated
-                self._mark_outdated(p, 'error while fetching feed: {}'.format(
-                    str(nee)))
-                return None
-
-            except Podcast.DoesNotExist as pdne:
-                raise NoPodcastCreated(nee) from pdne
-
-        return parsed
+        return (parsed, podcast, created)
 
     def _fetch_feed(self):
         params = {
@@ -230,7 +225,11 @@ class PodcastUpdater(object):
                 )
 
                 if new_podcast != podcast:
-                    _mark_outdated(podcast, 'redirected to different podcast')
+                    self._mark_outdated(
+                        podcast,
+                        'redirected to different podcast',
+                        episode_updater,
+                    )
                     return
             except Podcast.DoesNotExist:
                 podcast.set_url(podcast.new_location)
@@ -355,12 +354,12 @@ class PodcastUpdater(object):
                 http.client.HTTPException, socket.error, IOError) as e:
             logger.warn('Exception while updating podcast logo: %s', str(e))
 
-    def _mark_outdated(podcast, msg=''):
+    def _mark_outdated(self, podcast, msg, episode_updater):
         logger.info('marking podcast outdated: %s', msg)
         podcast.outdated = True
         podcast.last_update = datetime.utcnow()
         podcast.save()
-        _update_episodes(podcast, [])
+        episode_updater.update_episodes([])
 
 
 class MultiEpisodeUpdater(object):
