@@ -341,16 +341,20 @@ class PodcastQuerySet(MergedUUIDQuerySet):
 
     def order_by_next_update(self):
         """ Sort podcasts by next scheduled update """
-        NEXTUPDATE = "last_update + (update_interval || ' hours')::INTERVAL"
+        NEXTUPDATE = ("last_update + (update_interval * "
+                      "update_interval_factor || ' hours')::INTERVAL")
         q = self.extra(select={'_next_update': NEXTUPDATE})
         return q.order_by('_next_update')
 
     @property
     def next_update(self):
-        return self.last_update + timedelta(hours=self.update_interval)
+        interval = (timedelta(hours=self.update_interval) *
+                    self.update_interval_factor)
+        return self.last_update + interval
 
     def next_update_between(self, start, end):
-        NEXTUPDATE_BETWEEN = ("(last_update + (update_interval || "
+        NEXTUPDATE_BETWEEN = ("(last_update + (update_interval * "
+                              " update_interval_factor || "
                               "' hours')::INTERVAL) BETWEEN %s AND %s")
         return self.extra(
             where=[NEXTUPDATE_BETWEEN], params=[start, end]
@@ -570,8 +574,14 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
     latest_episode_timestamp = models.DateTimeField(null=True)
     episode_count = models.PositiveIntegerField(default=0)
     hub = models.URLField(null=True)
+
+    # Interval between episodes, within a specified range
     update_interval = models.PositiveSmallIntegerField(null=False,
         default=DEFAULT_UPDATE_INTERVAL)
+
+    # factor to increase update_interval if an update does not find any
+    # new episodes
+    update_interval_factor = models.FloatField(default=1)
 
     # "order" value of the most recent episode (will be the highest of all)
     max_episode_order = models.PositiveIntegerField(null=True, default=None)
@@ -698,7 +708,9 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
 
     @property
     def next_update(self):
-        return self.last_update + timedelta(hours=self.update_interval)
+        interval = (timedelta(hours=self.update_interval) *
+                    self.update_interval_factor)
+        return self.last_update + interval
 
 
 class EpisodeQuerySet(MergedUUIDQuerySet):

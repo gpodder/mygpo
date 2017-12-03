@@ -239,7 +239,18 @@ class PodcastUpdater(object):
                                           released__isnull=False)\
                                   .order_by('released')
 
+        # Determine update interval
+
+        # Update interval is based on intervals between episodes
         podcast.update_interval = episode_updater.get_update_interval(episodes)
+
+        # factor is increased / decreased depending on whether the latest
+        # update has returned episodes
+        if episode_updater.episodes_added == 0:  # no episodes, incr factor
+            podcast.update_interval_factor *= 1.2
+        elif episode_updater.episodes_added > 1:  # new episodes, decr factor
+            newfactor = podcast.update_interval_factor / 1.2
+            podcast.update_interval_factor = max(1, newfactor)  # never below 1
 
         latest_episode = episodes.last()
         if latest_episode:
