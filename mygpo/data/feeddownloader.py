@@ -128,7 +128,7 @@ class PodcastUpdater(object):
             # if we fail to parse the URL, we don't even create the
             # podcast object
             try:
-                p = Podcast.objects.get(urls__url=podcast_url)
+                p = Podcast.objects.get(urls__url=self.podcast_url)
                 return (None, p, False)
 
             except Podcast.DoesNotExist as pdne:
