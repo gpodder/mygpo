@@ -78,5 +78,6 @@ def _schedule_updates(podcasts):
     for podcast in podcasts:
         # update_podcasts.delay() seems to block other task execution,
         # therefore celery.send_task() is used instead
+        urls = [podcast.url]
         celery.send_task('mygpo.data.tasks.update_podcasts',
-                         args=[podcast.url])
+                         args=[urls])
