@@ -4,6 +4,8 @@ from itertools import count, chain
 from collections import Counter
 from datetime import datetime
 
+import redis
+
 import django
 from django.shortcuts import render
 from django.contrib import messages
@@ -57,13 +59,6 @@ class HostInfo(AdminView):
         hostname = socket.gethostname()
         django_version = django.VERSION
 
-        i = celery.control.inspect()
-        scheduled = i.scheduled()
-        if not scheduled:
-            num_celery_tasks = None
-        else:
-            num_celery_tasks = sum(len(node) for node in scheduled.values())
-
         feed_queue_status = self._get_feed_queue_status()
         num_index_outdated = self._get_num_outdated_search_index()
 
@@ -73,10 +68,21 @@ class HostInfo(AdminView):
             'base_dir': base_dir,
             'hostname': hostname,
             'django_version': django_version,
-            'num_celery_tasks': num_celery_tasks,
+            'num_celery_tasks': self._get_waiting_celery_tasks(),
             'feed_queue_status': feed_queue_status,
             'num_index_outdated': num_index_outdated,
         })
+
+    def _get_waiting_celery_tasks(self):
+        con = celery.broker_connection()
+
+        args = {'host': con.hostname}
+        if con.port:
+            args['port'] = con.port
+
+        r = redis.StrictRedis(**args)
+        return r.llen('celery')
+
 
     def _get_feed_queue_status(self):
         now = datetime.utcnow()
