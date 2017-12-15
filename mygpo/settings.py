@@ -179,16 +179,6 @@ except ImportError:
     pass
 
 
-try:
-    import opbeat
-
-    if not DEBUG:
-        INSTALLED_APPS += ['opbeat.contrib.django']
-
-except ImportError:
-    pass
-
-
 ACCOUNT_ACTIVATION_DAYS = int(os.getenv('ACCOUNT_ACTIVATION_DAYS', 7))
 
 AUTHENTICATION_BACKENDS = (
