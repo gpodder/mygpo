@@ -18,6 +18,7 @@ def update_podcasts(podcast_urls):
     """ Task to update a podcast """
     from mygpo.data.feeddownloader import update_podcasts as update
     podcasts = update(podcast_urls)
+    podcasts = filter(None, podcasts)
     return [podcast.pk for podcast in podcasts]
 
 

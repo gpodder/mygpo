@@ -64,6 +64,9 @@ def update_podcasts(queue):
         except NoPodcastCreated as npc:
             logger.info('No podcast created: %s', npc)
 
+        except GeneratorExit:
+            pass
+
         except:
             logger.exception('Error while updating podcast "%s"',
                              podcast_url)
@@ -112,7 +115,7 @@ class PodcastUpdater(object):
 
             episode_updater.order_episodes()
 
-            self._update_podcast(podcast, parsed, episode_updater)
+            self._update_podcast(podcast, parsed, episode_updater, res)
 
         return podcast
 
@@ -153,7 +156,7 @@ class PodcastUpdater(object):
 
         if r.status_code != 200:
             logger.error('Feed-service status code for "{}" was {}'.format(
-                podcast_url, r.status_code))
+                url, r.status_code))
             return None
 
         try:
@@ -174,7 +177,7 @@ class PodcastUpdater(object):
         if not parsed or not parsed.get('episodes', []):
             raise NoEpisodesException('no episodes found')
 
-    def _update_podcast(self, podcast, parsed, episode_updater):
+    def _update_podcast(self, podcast, parsed, episode_updater, update_result):
         """ updates a podcast according to new parser results """
 
         # we need that later to decide if we can "bump" a category
@@ -246,9 +249,10 @@ class PodcastUpdater(object):
 
         # factor is increased / decreased depending on whether the latest
         # update has returned episodes
-        if episode_updater.episodes_added == 0:  # no episodes, incr factor
-            podcast.update_interval_factor *= 1.2
-        elif episode_updater.episodes_added > 1:  # new episodes, decr factor
+        if update_result.episodes_added == 0:  # no episodes, incr factor
+            newfactor = podcast.update_interval_factor * 1.2
+            podcast.update_interval_factor = min(1000, newfactor)  # never above 1000
+        elif update_result.episodes_added > 1:  # new episodes, decr factor
             newfactor = podcast.update_interval_factor / 1.2
             podcast.update_interval_factor = max(1, newfactor)  # never below 1
 
@@ -600,7 +604,8 @@ def file_basename_no_extension(filename):
     return name
 
 
-def verify_podcast_url(self):
-    parsed = _fetch_feed(self.podcast_url)
-    self._validate_parsed(parsed)
+def verify_podcast_url(url):
+    updater = PodcastUpdater(url)
+    parsed = updater._fetch_feed()
+    updater._validate_parsed(parsed)
     return True
