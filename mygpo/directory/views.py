@@ -3,6 +3,7 @@
 
 from math import ceil
 from collections import Counter
+from datetime import datetime, timedelta
 
 from django.http import HttpResponseNotFound, Http404, HttpResponseRedirect
 from django.urls import reverse
@@ -28,6 +29,7 @@ from mygpo.web.utils import process_lang_params, get_language_names, \
 from mygpo.directory.tags import Topics
 from mygpo.categories.models import Category
 from mygpo.podcastlists.models import PodcastList
+from mygpo.subscriptions.models import Subscription
 from mygpo.data.feeddownloader import (verify_podcast_url, NoEpisodesException,
     UpdatePodcastException)
 from mygpo.data.tasks import update_podcasts
@@ -393,3 +395,30 @@ class LicenseList(TemplateView):
 
         counter = Counter({l['license']: l['id__count'] for l in values})
         return counter.most_common()
+
+
+class TrendingPodcastsView(PodcastListView):
+    """ Podcast with most recent subscribers """
+
+    template_name = 'directory/trending.html'
+
+    def get_queryset(self):
+        starttime = datetime.utcnow()-timedelta(days=7)
+        max_entries = 20
+        subscriptions = Subscription.objects.filter(created__gte=starttime)
+
+        # With the following line this error would be raised:
+        #   annotate() + distinct(fields) is not implemented.
+        #
+        #subscriptions = subscriptions.distinct('podcast', 'user')
+        trending = subscriptions.values('podcast')\
+                                .annotate(users=Count('user'))\
+                                .order_by('-users')
+
+        podcast_ids = [entry['podcast'] for entry in trending]
+        podcasts = Podcast.objects.filter(id__in=podcast_ids)
+
+        # TODO: order by number of recent subscribers?
+        podcasts = podcasts.order_by('-latest_episode_timestamp')
+
+        return podcasts

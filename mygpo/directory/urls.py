@@ -9,6 +9,10 @@ urlpatterns = [
         views.PodcastToplistView.as_view(),
         name='toplist'),
 
+    url(r'^trending/$',
+        views.TrendingPodcastsView.as_view(),
+        name='trending'),
+
     url(r'^toplist/episodes$',
         views.EpisodeToplistView.as_view(),
         name='episode-toplist'),
