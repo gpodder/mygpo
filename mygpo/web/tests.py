@@ -74,7 +74,7 @@ class PodcastPageTests(TestCase):
             episode = Episode.objects.get_or_create_for_url(
                 podcast,
                 'http://www.example.com/episode%d.mp3' % (n, ),
-            )
+            ).object
 
             # we only need (the last) one
             self.episode_slug = Slug.objects.create(content_object=episode,

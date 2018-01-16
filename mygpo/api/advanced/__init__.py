@@ -200,8 +200,8 @@ def update_episodes(user, actions, now, ua_string):
         if not episode_url:
             continue
 
-        podcast = Podcast.objects.get_or_create_for_url(podcast_url)
-        episode = Episode.objects.get_or_create_for_url(podcast, episode_url)
+        podcast = Podcast.objects.get_or_create_for_url(podcast_url).object
+        episode = Episode.objects.get_or_create_for_url(podcast, episode_url).object
 
         # parse_episode_action returns a EpisodeHistoryEntry obj
         history = parse_episode_action(action, user, update_urls, now,

@@ -37,4 +37,12 @@ def check_case_insensitive_users(app_configs=None, **kwargs):
         else:
             raise
 
+    except ProgrammingError as pe:
+        if 'relation "auth_user" does not exist' in str(pe):
+            # Ignore if the table does not yet exist, eg when initally
+            # running ``manage.py migrate``
+            pass
+        else:
+            raise
+
     return errors

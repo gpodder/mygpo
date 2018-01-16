@@ -18,6 +18,7 @@ def update_podcasts(podcast_urls):
     """ Task to update a podcast """
     from mygpo.data.feeddownloader import update_podcasts as update
     podcasts = update(podcast_urls)
+    podcasts = filter(None, podcasts)
     return [podcast.pk for podcast in podcasts]
 
 
@@ -25,7 +26,7 @@ def update_podcasts(podcast_urls):
 def update_related_podcasts(podcast_pk, max_related=20):
     get_podcast = itemgetter(0)
 
-    podcast = Podcast.objects.get(pk=pk)
+    podcast = Podcast.objects.get(pk=podcast_pk)
 
     related = calc_similar_podcasts(podcast)[:max_related]
     related = map(get_podcast, related)
@@ -78,5 +79,6 @@ def _schedule_updates(podcasts):
     for podcast in podcasts:
         # update_podcasts.delay() seems to block other task execution,
         # therefore celery.send_task() is used instead
+        urls = [podcast.url]
         celery.send_task('mygpo.data.tasks.update_podcasts',
-                         args=[podcast.url])
+                         args=[urls])
