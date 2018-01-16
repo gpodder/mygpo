@@ -37,7 +37,7 @@ services:
 
   worker:
     extends: base
-    command: python manage.py celery worker
+    command: celery -A mygpo worker --concurrency=3 -l info -Ofair
     links:
       - web
       - postgres
@@ -48,7 +48,7 @@ services:
 
   beat:
     extends: base
-    command: python manage.py celery beat -S djcelery.schedulers.DatabaseScheduler
+    command: celery -A mygpo beat --pidfile /tmp/celerybeat.pid -S django
     links:
       - web
       - postgres
