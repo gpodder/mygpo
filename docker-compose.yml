@@ -3,15 +3,6 @@ version: '2'
 
 services:
 
-  base:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    env_file: contrib/docker.env
-    volumes:
-      - .:/srv/mygpo
-      - ./contrib/docker.env:/docker.env
-
   postgres:
     build:
       context: contrib
@@ -24,7 +15,9 @@ services:
     image: redis:3.2-alpine
 
   web:
-    extends: base
+    extends:
+      file: docker-compose-common.yml
+      service: base
     links:
       - redis
       - postgres
@@ -36,8 +29,10 @@ services:
       - redis
 
   worker:
-    extends: base
-    command: /srv/mygpo/contrib/wait-for-postgres.sh celery -A mygpo worker --concurrency=3 -l info -Ofair
+    extends:
+      file: docker-compose-common.yml
+      service: base
+    command: /srv/mygpo/contrib/wait-for-postgres.py celery -A mygpo worker --concurrency=3 -l info -Ofair
     links:
       - web
       - postgres
@@ -47,8 +42,10 @@ services:
       - redis
 
   beat:
-    extends: base
-    command: /srv/mygpo/contrib/wait-for-postgres.sh celery -A mygpo beat --pidfile /tmp/celerybeat.pid -S django
+    extends:
+      file: docker-compose-common.yml
+      service: base
+    command: /srv/mygpo/contrib/wait-for-postgres.py celery -A mygpo beat --pidfile /tmp/celerybeat.pid -S django
     links:
       - web
       - postgres

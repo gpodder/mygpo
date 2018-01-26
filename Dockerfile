@@ -34,6 +34,6 @@ RUN python manage.py compilemessages
 ENTRYPOINT ["/srv/mygpo/bin/docker-env.sh"]
 
 # default launch command
-CMD ["/srv/mygpo/contrib/wait-for-postgres.sh", "gunicorn", "mygpo.wsgi:application", "--access-logfile", "-", "--bind=0.0.0.0:8000"]
+CMD ["/srv/mygpo/contrib/wait-for-postgres.py", "gunicorn", "mygpo.wsgi:application", "--access-logfile", "-", "--bind=0.0.0.0:8000"]
 
 EXPOSE 8000
