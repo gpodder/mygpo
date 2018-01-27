@@ -3,7 +3,7 @@ import unittest
 from collections import Counter
 
 from django.urls import reverse
-from django.test.client import Client as TestClient
+from django.test.client import Client as TClient
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.contrib.auth import get_user_model
@@ -66,8 +66,11 @@ class UnsubscribeMergeTests(TestCase):
     P2_URL = 'http://test.org/podcast/'
 
     def setUp(self):
-        self.podcast1 = Podcast.objects.get_or_create_for_url('http://example.com/feed.rss')
-        self.podcast2 = Podcast.objects.get_or_create_for_url(self.P2_URL)
+        self.podcast1 = Podcast.objects.get_or_create_for_url(
+            'http://example.com/feed.rss').object
+
+        self.podcast2 = Podcast.objects.get_or_create_for_url(
+            self.P2_URL).object
 
         User = get_user_model()
         self.user = User(username='test-merge')
@@ -100,7 +103,7 @@ class AuthTests(TestCase):
 
     def setUp(self):
         self.user, pwd = create_user()
-        self.client = TestClient()
+        self.client = TClient()
         wrong_pwd = pwd + '1234'
         self.extra = {
             'HTTP_AUTHORIZATION': create_auth_string(self.user.username,

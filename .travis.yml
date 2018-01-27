@@ -19,7 +19,7 @@ before_script:
   - psql -c 'create database mygpo_test;' -U postgres
 
 script:
-  coverage run --branch --source=mygpo ./manage.py test
+  - pytest --cov=mygpo/ --cov-branch
 
 after_script:
   - coveralls

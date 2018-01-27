@@ -54,8 +54,8 @@ class ChaptersAPI(APIView):
 
     def update_chapters(self, req, user):
         """ Add / remove chapters according to the client's request """
-        podcast = Podcast.objects.get_or_create_for_url(podcast_url)
-        episode = Episode.objects.get_or_create_for_url(podcast, episode_url)
+        podcast = Podcast.objects.get_or_create_for_url(podcast_url).object
+        episode = Episode.objects.get_or_create_for_url(podcast, episode_url).object
 
         # add chapters
         for chapter_data in req.get('chapters_add', []):

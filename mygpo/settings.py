@@ -158,7 +158,6 @@ INSTALLED_APPS = [
     'mygpo.pubsub',
     'mygpo.podcastlists',
     'mygpo.votes',
-    'django_nose',
 ]
 
 try:
@@ -172,10 +171,9 @@ except ImportError:
 
 
 try:
-    import opbeat
-
-    if not DEBUG:
-        INSTALLED_APPS += ['opbeat.contrib.django']
+    if DEBUG:
+        import django_extensions
+        INSTALLED_APPS += ['django_extensions']
 
 except ImportError:
     pass
@@ -209,7 +207,7 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', '')
 
 SECRET_KEY = os.getenv('SECRET_KEY', '')
 
-if 'test' in sys.argv:
+if 'pytest' in sys.argv[0]:
     SECRET_KEY = 'test'
 
 GOOGLE_ANALYTICS_PROPERTY_ID = os.getenv('GOOGLE_ANALYTICS_PROPERTY_ID', '')
@@ -363,14 +361,6 @@ EMAIL_BACKEND = os.getenv('EMAIL_BACKEND',
                           'django.core.mail.backends.smtp.EmailBackend')
 
 PODCAST_AD_ID = os.getenv('PODCAST_AD_ID')
-
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-
-NOSE_ARGS = [
-    '--with-doctest',
-    '--stop',
-    '--where=mygpo',
-]
 
 
 SEARCH_CUTOFF = float(os.getenv('SEARCH_CUTOFF', 0.3))

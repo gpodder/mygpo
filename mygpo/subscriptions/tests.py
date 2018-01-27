@@ -25,7 +25,7 @@ class TestSubscribe(TestCase):
             user=self.user, uid='dev1', id=uuid.uuid1())
 
         self.url = 'http://www.example.com/pdocast.rss'
-        self.podcast = Podcast.objects.get_or_create_for_url(self.url)
+        self.podcast = Podcast.objects.get_or_create_for_url(self.url).object
 
     def test_duplicate_subscribe(self):
         """ Test that a duplicate subscription is skipped """

@@ -1,2 +1,3 @@
-web: gunicorn mygpo.wsgi:application -c gunicorn.conf.py
-beat: python manage.py celery beat -S django --pidfile /var/run/mygpo/celerybeat.pid
+web: gunicorn mygpo.wsgi:application -c conf/gunicorn.conf.py
+beat: celery -A mygpo beat --pidfile /tmp/celerybeat.pid -S django
+celery: celery -A mygpo worker --concurrency=3 -l info -Ofair

@@ -1595,7 +1595,7 @@ msgstr "Registrierung abgeschlossen"
 msgid ""
 "Please confirm your account using the email you should just have received."
 msgstr ""
-"Du solltest soeben ein Mail bekommen haben. Darin findest du einen Link zum "
+"Du solltest soeben eine E-Mail bekommen haben. Darin findest du einen Link zum "
 "Aktivieren deines Accounts"
 
 #: mygpo/users/templates/registration/registration_form.html:8
@@ -1618,7 +1618,7 @@ msgstr "Registrieren"
 #: mygpo/users/templates/registration/registration_form.html:87
 #, fuzzy
 msgid "Activation Mail"
-msgstr "Aktivierungs-Email gesendet"
+msgstr "Aktivierungs-E-Mail gesendet"
 
 #: mygpo/users/templates/registration/registration_form.html:88
 msgid ""
@@ -1660,7 +1660,7 @@ msgstr "Aktivierungs-Email gesendet"
 
 #: mygpo/users/templates/registration/resent_activation.html:11
 msgid "The activation email has been reset."
-msgstr "Die Aktivierungs E-Mail wurde zurückgesetzt."
+msgstr "Die Aktivierungs-E-Mail wurde zurückgesetzt."
 
 #: mygpo/users/views/device.py:80 mygpo/users/views/device.py:170
 msgid "Synchronize with the following devices"
@@ -1775,7 +1775,7 @@ msgstr ""
 
 #: mygpo/web/forms.py:20 mygpo/web/forms.py:184
 msgid "E-Mail address"
-msgstr "Deine Email-Adresse"
+msgstr "Deine E-Mail-Adresse"
 
 #: mygpo/web/forms.py:27
 msgid "Current password"
@@ -3398,7 +3398,7 @@ msgstr "eine andere Seite"
 #~ msgstr "Wiederherstellungs-Email senden"
 
 #~ msgid "Didn't receive your activation mail?"
-#~ msgstr "Aktivierungs-Mail nicht erhalten?"
+#~ msgstr "Aktivierungs-E-Mail nicht erhalten?"
 
 #~ msgid "Not yet a member?"
 #~ msgstr "Noch kein Mitglied?"
