@@ -4,6 +4,7 @@
 {% load podcasts %}
 {% load charts %}
 {% load pcharts %}
+{% load time %}
 {% load static %}
 {% load menu %}
 {% load utils %}
@@ -56,12 +57,49 @@
   <p>{% trans "The podcast information is regularly retrieved from the podcast feed" %}</p>
   <pre><a href="{{ podcast.url }}">{{ podcast.url }}</a></pre>
 
-  <h3>{% trans "Timing" %}</h3>
-  <ul>
-   <li>{% trans "Last update:" %} {{ podcast.last_update|naturaltime }}</li>
-   <li>{% trans "Update interval:" %} {{ podcast.update_interval|hours_to_str }}</li>
-   <li>{% trans "Next update:" %} {{ podcast.next_update|naturaltime }}</li>
-  </ul>
+  <h3>{% trans "Updates" %}</h3>
+
+  {% trans "Update interval:" %} {{ podcast.update_interval|hours_to_str }}
+
+  <table>
+   <thead>
+    <tr>
+     <th>Start</th>
+     <th>Duration</th>
+     <th>Status</th>
+     <th class="numeric">Episodes Added</th>
+    </tr>
+   </thead>
+   <tbody>
+    <tr class="status-neutral">
+     <td>{{ podcast.next_update|naturaltime }}</td>
+     <td></td>
+     <td>Next</td>
+     <td class="numeric"></td>
+    </tr>
+    {% for result in update_results %}
+     <tr {% if result.successful %} class="status-success" {% else %} class="status-error" {% endif %}>
+      <td>{{ result.start|naturaltime }}</td>
+      <td>{{ result.duration.total_seconds|format_duration }}</td>
+      <td>
+       {% if result.successful %}
+        {% trans "Successful" %}
+       {% else %}
+        {% trans "Error" %} {{ result.error_message }}
+       {% endif %}
+      </td>
+      <td class="numeric">{{ result.episodes_added }}</td>
+     </tr>
+    {% empty %}
+     <tr class="status-neutral">
+      <td>{{ podcast.last_update|naturaltime }}</td>
+      <td></td>
+      <td></td>
+      <td class="numeric"></td>
+     </tr>
+    {% endfor %}
+   </tbody>
+  </table>
 
   <form class="form-inline" action="{% podcast_link_target podcast "podcast-publisher-update" %}" method="post">
    {% csrf_token %}

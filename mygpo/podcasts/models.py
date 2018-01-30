@@ -1,5 +1,5 @@
 
-
+import collections
 import uuid
 import re
 from datetime import timedelta
@@ -20,6 +20,9 @@ from mygpo.core.models import (TwitterModel, UUIDModel, GenericManager,
 
 import logging
 logger = logging.getLogger(__name__)
+
+
+GetCreateResult = collections.namedtuple('GetCreateResult', 'object created')
 
 
 # default podcast update interval in hours
@@ -338,16 +341,20 @@ class PodcastQuerySet(MergedUUIDQuerySet):
 
     def order_by_next_update(self):
         """ Sort podcasts by next scheduled update """
-        NEXTUPDATE = "last_update + (update_interval || ' hours')::INTERVAL"
-        q = self.extra(select={'next_update': NEXTUPDATE})
-        return q.order_by('next_update')
+        NEXTUPDATE = ("last_update + (update_interval * "
+                      "update_interval_factor || ' hours')::INTERVAL")
+        q = self.extra(select={'_next_update': NEXTUPDATE})
+        return q.order_by('_next_update')
 
     @property
     def next_update(self):
-        return self.last_update + timedelta(hours=self.update_interval)
+        interval = (timedelta(hours=self.update_interval) *
+                    self.update_interval_factor)
+        return self.last_update + interval
 
     def next_update_between(self, start, end):
-        NEXTUPDATE_BETWEEN = ("(last_update + (update_interval || "
+        NEXTUPDATE_BETWEEN = ("(last_update + (update_interval * "
+                              " update_interval_factor || "
                               "' hours')::INTERVAL) BETWEEN %s AND %s")
         return self.extra(
             where=[NEXTUPDATE_BETWEEN], params=[start, end]
@@ -395,9 +402,11 @@ class PodcastManager(GenericManager):
         url = utils.to_maxlength(URL, 'url', url)
         try:
             # try to fetch the podcast
-            return Podcast.objects.get(urls__url=url,
-                                       urls__scope='',
-                                       )
+            podcast = Podcast.objects.get(urls__url=url,
+                                          urls__scope='',
+                                          )
+            return GetCreateResult(podcast, False)
+
         except Podcast.DoesNotExist:
             # episode did not exist, try to create it
             try:
@@ -408,13 +417,14 @@ class PodcastManager(GenericManager):
                                              scope='',
                                              content_object=podcast,
                                              )
-                    return podcast
+                    return GetCreateResult(podcast, True)
 
             # URL could not be created, so it was created since the first get
             except IntegrityError:
-                return Podcast.objects.get(urls__url=url,
-                                           urls__scope='',
-                                           )
+                podcast = Podcast.objects.get(urls__url=url,
+                                              urls__scope='',
+                                              )
+                return GetCreateResult(podcast, False)
 
 
 class URL(OrderedModel, ScopedModel):
@@ -564,8 +574,14 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
     latest_episode_timestamp = models.DateTimeField(null=True)
     episode_count = models.PositiveIntegerField(default=0)
     hub = models.URLField(null=True)
+
+    # Interval between episodes, within a specified range
     update_interval = models.PositiveSmallIntegerField(null=False,
         default=DEFAULT_UPDATE_INTERVAL)
+
+    # factor to increase update_interval if an update does not find any
+    # new episodes
+    update_interval_factor = models.FloatField(default=1)
 
     # "order" value of the most recent episode (will be the highest of all)
     max_episode_order = models.PositiveIntegerField(null=True, default=None)
@@ -690,6 +706,12 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
         return _('Unknown Podcast from {domain}'.format(
             domain=utils.get_domain(self.url)))
 
+    @property
+    def next_update(self):
+        interval = (timedelta(hours=self.update_interval) *
+                    self.update_interval_factor)
+        return self.last_update + interval
+
 
 class EpisodeQuerySet(MergedUUIDQuerySet):
     """ QuerySet for Episodes """
@@ -723,6 +745,7 @@ class EpisodeManager(GenericManager):
 
         try:
             url = URL.objects.get(url=url, scope=podcast.as_scope)
+            created = False
             episode = url.content_object
 
             if episode is None:
@@ -734,8 +757,9 @@ class EpisodeManager(GenericManager):
 
                     url.content_object = episode
                     url.save()
+                    created = True
 
-            return episode
+            return GetCreateResult(episode, created)
 
 
         except URL.DoesNotExist:
@@ -758,13 +782,14 @@ class EpisodeManager(GenericManager):
                     Podcast.objects.filter(pk=podcast.pk)\
                                    .update(episode_count=F('episode_count')+1)
 
-                    return episode
+                    return GetCreateResult(episode, True)
 
             # URL could not be created, so it was created since the first get
             except IntegrityError:
-                return Episode.objects.get(urls__url=url,
-                                           urls__scope=podcast.as_scope,
-                                          )
+                episode = Episode.objects.get(urls__url=url,
+                                              urls__scope=podcast.as_scope,
+                                              )
+                return GetCreateResult(episode, False)
 
 
 class Episode(UUIDModel, TitleModel, DescriptionModel, LinkModel,

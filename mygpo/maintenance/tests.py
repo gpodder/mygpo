@@ -22,22 +22,22 @@ class SimpleMergeTests(TestCase):
         self.podcast1 = Podcast.objects.get_or_create_for_url(
             'http://example.com/simple-merge-test-feed.rss',
             defaults={'title': 'Podcast 1'},
-        )
+        ).object
         self.podcast2 = Podcast.objects.get_or_create_for_url(
             'http://simple-merge-test.org/podcast/',
             defaults={'title': 'Podcast 2'},
-        )
+        ).object
 
         self.episode1 = Episode.objects.get_or_create_for_url(
             self.podcast1, 'http://example.com/simple-merge-test-episode1.mp3',
             defaults={
                 'title': 'Episode 1 A',
-            })
+            }).object
         self.episode2 = Episode.objects.get_or_create_for_url(
             self.podcast2, 'http://example.com/simple-merge-test-episode1.mp3',
             defaults={
                 'title': 'Episode 1 B',
-            })
+            }).object
 
     def test_merge_podcasts(self):
         # decide which episodes to merge
@@ -55,22 +55,22 @@ class MergeTests(TransactionTestCase):
         self.podcast1 = Podcast.objects.get_or_create_for_url(
             'http://example.com/merge-test-feed.rss',
             defaults={'title': 'Podcast 1'},
-        )
+        ).object
         self.podcast2 = Podcast.objects.get_or_create_for_url(
             'http://merge-test.org/podcast/',
             defaults={'title': 'Podcast 2'},
-        )
+        ).object
 
         self.episode1 = Episode.objects.get_or_create_for_url(
             self.podcast1, 'http://example.com/merge-test-episode1.mp3',
             defaults={
                 'title': 'Episode 1 A',
-            })
+            }).object
         self.episode2 = Episode.objects.get_or_create_for_url(
             self.podcast2, 'http://example.com/merge-test-episode1.mp3',
             defaults={
                 'title': 'Episode 1 B',
-            })
+            }).object
 
         User = get_user_model()
         self.user = User(username='test-merge')
@@ -123,38 +123,38 @@ class MergeGroupTests(TransactionTestCase):
             defaults={
                 'title': 'Podcast 1',
             },
-        )
+        ).object
         self.podcast2 = Podcast.objects.get_or_create_for_url(
             'http://test.org/group-merge-podcast/',
             defaults={
                 'title': 'Podcast 2',
             },
-        )
+        ).object
         self.podcast3 = Podcast.objects.get_or_create_for_url(
             'http://group-test.org/feed/',
             defaults={
                 'title': 'Podcast 3',
             },
-        )
+        ).object
 
         self.episode1 = Episode.objects.get_or_create_for_url(
             self.podcast1, 'http://example.com/group-merge-episode1.mp3',
             defaults={
                 'title': 'Episode 1 A',
             },
-        )
+        ).object
         self.episode2 = Episode.objects.get_or_create_for_url(
             self.podcast2, 'http://example.com/group-merge-episode1.mp3',
             defaults={
                 'title': 'Episode 1 B',
             },
-        )
+        ).object
         self.episode3 = Episode.objects.get_or_create_for_url(
             self.podcast3, 'http://example.com/group-merge-media.mp3',
             defaults={
                 'title': 'Episode 2',
             },
-        )
+        ).object
 
         self.podcast2.group_with(self.podcast3, 'My Group', 'Feed1', 'Feed2')
 

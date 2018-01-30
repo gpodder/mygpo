@@ -1,6 +1,7 @@
 import unittest
 import doctest
 import uuid
+import os.path
 
 import requests
 import responses
@@ -18,6 +19,15 @@ from mygpo.test import create_auth_string, anon_request
 
 import logging
 logger = logging.getLogger(__name__)
+
+
+IMG_PATH1 = os.path.abspath(
+    os.path.join(settings.BASE_DIR, '..', 'res', 'gpoddernet_228.png')
+)
+
+IMG_PATH2 = os.path.abspath(
+    os.path.join(settings.BASE_DIR, '..', 'res', 'gpoddernet_16.png')
+)
 
 
 class SimpleWebTests(TestCase):
@@ -83,7 +93,7 @@ class PodcastPageTests(TestCase):
             episode = Episode.objects.get_or_create_for_url(
                 podcast,
                 'http://www.example.com/episode%d.mp3' % (n, ),
-            )
+            ).object
 
             # we only need (the last) one
             self.episode_slug = Slug.objects.create(content_object=episode,
@@ -131,7 +141,7 @@ class PodcastLogoTests(TestCase):
 
     def _save_logo(self):
         with responses.RequestsMock() as rsps, \
-             open('../res/gpoddernet_228.png', 'rb') as body:
+             open(IMG_PATH1, 'rb') as body:
             rsps.add(responses.GET, self.URL, status=200,
                      body=body, content_type='image/png')
 
@@ -218,9 +228,9 @@ class PodcastLogoTests(TestCase):
 
     def test_new_logo(self):
         with responses.RequestsMock() as rsps, \
-             open('../res/gpoddernet_228.png', 'rb') as body1, \
-             open('../res/gpoddernet_228.png', 'rb') as body2, \
-             open('../res/gpoddernet_16.png', 'rb') as body3:
+             open(IMG_PATH1, 'rb') as body1, \
+             open(IMG_PATH1, 'rb') as body2, \
+             open(IMG_PATH2, 'rb') as body3:
             rsps.add(responses.GET, self.URL, status=200,
                      body=body1, content_type='image/png')
             rsps.add(responses.GET, self.URL, status=200,

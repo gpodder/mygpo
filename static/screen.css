@@ -1,3 +1,9 @@
+:root {
+    --color-status-success: 90;
+    --color-status-error: 0;
+    --color-status-neutral: 247;
+}
+
 
 /* Landscape phones and down */
 @media (min-width: 980px)
@@ -608,4 +614,17 @@ div.podcasts div.podcast:hover div.actions button.btn
 
 .hosting {
     text-align: center;
+}
+
+.status-success {
+    background-color: hsla(var(--color-status-success), 100%, 75%, 1);
+}
+
+
+.status-error {
+    background-color: hsla(var(--color-status-error), 100%, 75%, 1);
+}
+
+.status-neutral {
+    background-color: hsla(var(--color-status-neutral), 16%, 85%, 1);
 }

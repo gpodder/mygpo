@@ -1,5 +1,6 @@
 import hashlib
 
+from django.utils.safestring import mark_safe
 from django import template
 
 from mygpo.constants import PODCAST_LOGO_BIG_SIZE
@@ -7,10 +8,11 @@ from mygpo.constants import PODCAST_LOGO_BIG_SIZE
 
 register = template.Library()
 
-GRAVATAR_IMG = 'https://secure.gravatar.com/avatar/{hash_str}?s={size}&d=mm'
+GRAVATAR_IMG = 'https://secure.gravatar.com/avatar/{hash_str}?s={size}'
 
 
 @register.simple_tag
+@mark_safe
 def gravatar_img(user):
     return '<img src="{url}" alt="{username}" />'.format(
             url=gravatar_url(user),

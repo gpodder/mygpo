@@ -8,8 +8,8 @@ test: envs/test/MEDIA_ROOT
 	# assume defined media root directory, empty before running tests
 	rm -rf $(shell cat envs/test/MEDIA_ROOT)
 	mkdir -p $(shell cat envs/test/MEDIA_ROOT)
-	envdir envs/test/ python -Wd -m coverage run ./manage.py test
-	coverage report
+	envdir envs/dev/ pytest --cov=mygpo/ --cov-branch
+	coverage report --show-missing
 
 update-po:
 	envdir envs/dev/ python manage.py makemessages \

@@ -31,6 +31,7 @@ from mygpo.web.utils import get_podcast_link_target, normalize_twitter, \
      get_episode_link_target
 from django.contrib.sites.requests import RequestSite
 from mygpo.data.tasks import update_podcasts
+from mygpo.data.models import PodcastUpdateResult
 from mygpo.decorators import requires_token, allowed_methods
 from mygpo.pubsub.models import HubSubscription
 
@@ -92,6 +93,11 @@ def podcast(request, podcast):
     except HubSubscription.DoesNotExist:
         pubsubscription = None
 
+    MAX_UPDATE_RESULTS=10
+
+    update_results = PodcastUpdateResult.objects.filter(podcast=podcast)
+    update_results = update_results[:MAX_UPDATE_RESULTS]
+
     site = RequestSite(request)
     feedurl_quoted = urllib.parse.quote(podcast.url.encode('ascii'))
 
@@ -105,6 +111,7 @@ def podcast(request, podcast):
         'update_token': update_token,
         'feedurl_quoted': feedurl_quoted,
         'pubsubscription': pubsubscription,
+        'update_results': update_results,
         })
 
 

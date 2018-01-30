@@ -18,7 +18,7 @@ class PodcastCommand(BaseCommand):
         parser.add_argument('--update-new', action='store_true', dest='new',
             default=False, help="Update all podcasts with new Episodes"),
 
-        parser.add_argument('--max', action='store', dest='max', type='int',
+        parser.add_argument('--max', action='store', dest='max', type=int,
             default=0, help="Set how many feeds should be updated at maximum"),
 
         parser.add_argument('--random', action='store_true', dest='random',
@@ -27,6 +27,7 @@ class PodcastCommand(BaseCommand):
         parser.add_argument('--next', action='store_true', dest='next',
             default=False, help="Podcasts that are due to be updated next"),
 
+        parser.add_argument('urls', nargs='+', type=str)
 
     def get_podcasts(self, *args, **options):
         return chain.from_iterable(self._get_podcasts(*args, **options))
@@ -54,18 +55,15 @@ class PodcastCommand(BaseCommand):
             podcasts = Podcast.objects.all().order_by_next_update()[:max_podcasts]
             yield (p.url for p in podcasts)
 
-
-        if args:
-            yield args
-
         if options.get('urls'):
             yield options.get('urls')
 
-        if not args and not options.get('toplist') and not options.get('new') \
-                    and not options.get('random')  and not options.get('next'):
+        if not options.get('urls') and not options.get('toplist') and \
+           not options.get('new') and not options.get('random') and \
+           not options.get('next'):
             query = Podcast.objects.order_by('last_update')
             podcasts = query.select_related('urls')[:max_podcasts]
-            #yield (p.url for p in podcasts)
+            yield (p.url for p in podcasts)
 
 
     def get_toplist(self, max_podcasts=100):

@@ -5,7 +5,7 @@ import urllib.request, urllib.parse, urllib.error
 import json
 
 from django.urls import reverse
-from django.test.client import Client as TestClient
+from django.test.client import Client as TClient
 from django.test import TestCase
 
 from mygpo.test import create_auth_string, create_user
@@ -22,17 +22,20 @@ class TestAPI(TestCase):
         self.podcast_url = 'http://example.com/podcast.rss'
         self.episode_url = 'http://example.com/podcast/episode-1.mp3'
         self.uid = 'client-uid'
-        self.podcast = Podcast.objects.get_or_create_for_url(self.podcast_url)
+        self.podcast = Podcast.objects.get_or_create_for_url(
+            self.podcast_url).object
+
         self.episode = Episode.objects.get_or_create_for_url(
             self.podcast,
             self.episode_url,
-        )
+        ).object
+
         self.user_client = Client.objects.create(
             id = uuid.uuid1(),
             user = self.user,
             uid = self.uid,
         )
-        self.client = TestClient()
+        self.client = TClient()
         self.extra = {
             'HTTP_AUTHORIZATION': create_auth_string(self.user.username, pwd)
         }
