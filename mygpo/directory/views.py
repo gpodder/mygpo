@@ -26,7 +26,6 @@ from mygpo.directory.search import search_podcasts
 from mygpo.web.utils import process_lang_params, get_language_names, \
          get_page_list, get_podcast_link_target, sanitize_language_codes
 from mygpo.directory.tags import Topics
-from mygpo.users.settings import FLATTR_TOKEN
 from mygpo.categories.models import Category
 from mygpo.podcastlists.models import PodcastList
 from mygpo.data.feeddownloader import (verify_podcast_url, NoEpisodesException,
@@ -317,7 +316,8 @@ class AddPodcastStatus(TemplateView):
             })
 
         try:
-            podcasts = result.get()
+            podcast_ids = result.get()
+            podcasts = Podcast.objects.filter(pk__in=podcast_ids)
             messages.success(request, _('%d podcasts added' % len(podcasts)))
 
         except (UpdatePodcastException, NoEpisodesException) as ex:
@@ -366,22 +366,6 @@ class PodcastListView(ListView):
         page = self._page
         podcasts = page.object_list
         return max([p.subscriber_count() for p in podcasts] + [0])
-
-
-class FlattrPodcastList(PodcastListView):
-    """ Lists podcasts that have Flattr payment URLs """
-
-    template_name = 'flattr-podcasts.html'
-
-    def get_queryset(self):
-        return Podcast.objects.all().flattr()
-
-    def get_context_data(self, num=100):
-        context = super(FlattrPodcastList, self).get_context_data()
-        context['flattr_auth'] = (self.request.user.is_authenticated
-                   #  and bool(self.request.user.get_wksetting(FLATTR_TOKEN))
-                        )
-        return context
 
 
 class LicensePodcastList(PodcastListView):

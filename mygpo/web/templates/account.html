@@ -23,9 +23,6 @@
   <li>
    <a href="#profile" data-toggle="tab">Public Profile</a>
   </li>
-  <li>
-   <a href="#flattr" data-toggle="tab">Flattr</a>
-  </li>
  </ul>
 
  <div class="tab-content">
@@ -101,18 +98,6 @@
      </td>
     </tr>
 
-    <tr>
-     <td><strong>{% trans "Flattr" %}</strong></th>
-     <td>
-      {% if flattr_form.token.value %}
-       {% blocktrans with flattr.get_auth_username as flattrname %}Connected with <a href="https://flattr.com/profile/{{ flattrname }}">{{ flattrname }}</a>{% endblocktrans %}
-       <a class="btn btn-default" href="{% url "flattr-logout" %}">{% trans "Disconnect" %}</a>
-      {% else %}
-       <a class="btn btn-default" href="{{ flattr.get_auth_url }}">{% trans "Connect" %}</a>
-      {% endif %}
-     </td>
-    </tr>
-
    </table>
 
   </div> <!-- pane end -->
@@ -161,62 +146,6 @@
    </form>
 
   </div>
-
-
-  <div class="tab-pane" id="flattr">
-
-   <form action="{% url "flattr-settings" %}" method="POST" class="form-horizontal">
-    {% csrf_token %}
-
-
-    <div class="form-group">
-     <label for="token" class="col-lg-3 control-label">{% trans "Flattr User" %}</label>
-     <div class="col-lg-9">
-      {% if flattr_form.token.value %}
-       {% blocktrans with flattr.get_auth_username as flattrname %}Connected with <a href="https://flattr.com/profile/{{ flattrname }}">{{ flattrname }}</a>{% endblocktrans %}
-       <a class="btn btn-default" href="{% url "flattr-logout" %}">{% trans "Disconnect" %}</a>
-      {% else %}
-       <a class="btn btn-default" href="{{ flattr.get_auth_url }}">{% trans "Connect" %}</a>
-      {% endif %}
-     </div>
-    </div>
-
-    <div class="form-group">
-     <label class="col-lg-3 control-label" for="about">
-      {{ flattr_form.enable.label_tag }}
-     </label>
-     <div class="col-lg-9">
-      {{ flattr_form.enable }}
-     </div>
-    </div>
-
-    <div class="form-group">
-     <label class="col-lg-3 control-label" for="about">
-      {% blocktrans with site as sitename %}Auto-Flattr {{ sitename }}{% endblocktrans %}
-     </label>
-     <div class="col-lg-9">
-      {{ flattr_form.flattr_mygpo }}
-     </div>
-    </div>
-
-    <div class="form-group">
-     <label class="col-lg-3 control-label" for="username">
-      {% blocktrans with site as sitename %}Username for publishing own content{% endblocktrans %}
-     </label>
-     <div class="col-lg-9">
-      {{ flattr_form.username }}
-     </div>
-    </div>
-
-    <div class="form-group">
-     <div class="col-lg-offset-3 col-lg-9">
-      <button class="btn btn-primary" type="submit">{% trans "Save" %}</button>
-     </div>
-    </div>
-
-   </form>
-
-  </div> <!-- pane end -->
 
  </div>
 

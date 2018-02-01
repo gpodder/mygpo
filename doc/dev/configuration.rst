@@ -73,8 +73,6 @@ Directory
 Feeds
 -----
 
-* ``FLATTR_KEY`` - Flattr API key
-* ``FLATTR_SECRET`` - Flattr API secret
 * ``FLICKR_API_KEY`` - Flickr API key
 * ``SOUNDCLOUD_CONSUMER_KEY`` - Soundcloud Consumer key
 

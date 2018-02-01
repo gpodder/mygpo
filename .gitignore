@@ -23,3 +23,8 @@ venv*
 
 # envdirs
 envs
+
+# Jupyter Notebooks
+notebooks/
+
+.cache

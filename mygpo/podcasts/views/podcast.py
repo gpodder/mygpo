@@ -24,9 +24,8 @@ from mygpo.subscriptions import (
     get_subscribe_targets
 )
 from mygpo.history.models import HistoryEntry
-from mygpo.core.tasks import flattr_thing
 from mygpo.utils import normalize_feed_url
-from mygpo.users.settings import PUBLIC_SUB_PODCAST, FLATTR_TOKEN
+from mygpo.users.settings import PUBLIC_SUB_PODCAST
 from mygpo.publisher.utils import check_publisher_permission
 from mygpo.usersettings.models import UserSettings
 from mygpo.users.models import Client
@@ -81,14 +80,11 @@ def show(request, podcast):
 
         has_history = HistoryEntry.objects.filter(user=user, podcast=podcast)\
                                           .exists()
-        can_flattr = (user.profile.settings.get_wksetting(FLATTR_TOKEN) and
-                      podcast.flattr_url)
 
     else:
         has_history = False
         subscribed_devices = []
         subscribe_targets = []
-        can_flattr = False
 
     is_publisher = check_publisher_permission(user, podcast)
 
@@ -109,7 +105,6 @@ def show(request, podcast):
         'episode': episode,
         'episodes': episodes,
         'max_listeners': max_listeners,
-        'can_flattr': can_flattr,
         'is_publisher': is_publisher,
         'page_list': page_list,
         'current_page': 1,
@@ -331,7 +326,7 @@ def subscribe_url(request):
     if not url:
         raise Http404('Please specify a valid url')
 
-    podcast = Podcast.objects.get_or_create_for_url(url)
+    podcast = Podcast.objects.get_or_create_for_url(url).object
 
     return HttpResponseRedirect(get_podcast_link_target(podcast, 'subscribe'))
 
@@ -346,29 +341,6 @@ def set_public(request, podcast, public):
     )
     settings.set_wksetting(PUBLIC_SUB_PODCAST, public)
     settings.save()
-    return HttpResponseRedirect(get_podcast_link_target(podcast))
-
-
-@never_cache
-@login_required
-def flattr_podcast(request, podcast):
-    """ Flattrs a podcast, records an event and redirects to the podcast """
-
-    user = request.user
-    site = RequestSite(request)
-    now = datetime.utcnow()
-
-    # do flattring via the tasks queue, but wait for the result
-    task = flattr_thing.delay(user.pk, podcast.get_id(), site.domain,
-            request.is_secure(), 'Podcast')
-    success, msg = task.get()
-
-    if success:
-        messages.success(request, _("Flattr\'d"))
-
-    else:
-        messages.error(request, msg)
-
     return HttpResponseRedirect(get_podcast_link_target(podcast))
 
 
@@ -428,7 +400,6 @@ add_tag_slug         = slug_decorator(add_tag)
 remove_tag_slug      = slug_decorator(remove_tag)
 set_public_slug      = slug_decorator(set_public)
 all_episodes_slug    = slug_decorator(all_episodes)
-flattr_podcast_slug  = slug_decorator(flattr_podcast)
 
 
 show_id            = id_decorator(show)
@@ -440,4 +411,3 @@ add_tag_id         = id_decorator(add_tag)
 remove_tag_id      = id_decorator(remove_tag)
 set_public_id      = id_decorator(set_public)
 all_episodes_id    = id_decorator(all_episodes)
-flattr_podcast_id  = id_decorator(flattr_podcast)
