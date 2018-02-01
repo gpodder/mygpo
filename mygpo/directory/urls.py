@@ -1,59 +1,59 @@
-from django.conf.urls import url
+from django.urls import path
 
 from . import views
 
 
 urlpatterns = [
 
-    url(r'^toplist/$',
+    path('toplist/',
         views.PodcastToplistView.as_view(),
         name='toplist'),
 
-    url(r'^trending/$',
+    path('trending/',
         views.TrendingPodcastsView.as_view(),
         name='trending'),
 
-    url(r'^toplist/episodes$',
+    path('toplist/episodes',
         views.EpisodeToplistView.as_view(),
         name='episode-toplist'),
 
-    url(r'^directory/$',
+    path('directory/',
         views.Directory.as_view(),
         name='directory-home'),
 
-    url(r'^carousel/$',
+    path('carousel/',
         views.Carousel.as_view(),
         name='carousel-demo'),
 
-    url(r'^missing/$',
+    path('missing/',
         views.MissingPodcast.as_view(),
         name='missing-podcast'),
 
-    url(r'^add-podcast/$',
+    path('add-podcast/',
         views.AddPodcast.as_view(),
         name='add-podcast'),
 
-    url(r'^add-podcast/(?P<task_id>[^/]+)$',
+    path('add-podcast/<uuid:task_id>',
         views.AddPodcastStatus.as_view(),
         name='add-podcast-status'),
 
-    url(r'^directory/\+license$',
+    path('directory/+license',
         views.LicenseList.as_view(),
         name='license-podcasts'),
 
-    url(r'^directory/\+license/\+url/(?P<license_url>.+)$',
+    path('directory/+license/+url/<path:license_url>',
         views.LicensePodcastList.as_view(),
         name='license-podcasts-url'),
 
-    url(r'^directory/(?P<category>.+)$',
+    path('directory/<path:category>',
         views.category,
         name='directory'),
 
-    url(r'^search/$',
+    path('search/',
         views.search,
         name='search'),
 
-    url(r'^lists/$',
+    path('lists/',
         views.podcast_lists,
         name='podcast-lists'),
 
