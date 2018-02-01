@@ -29,10 +29,9 @@ LOGO_STORAGE = FileSystemStorage(
 )
 
 
-def _last_modified(request, size, filename):
+def _last_modified(request, size, prefix, filename):
 
-    prefix = get_prefix(filename)
-    target = os.path.join('logo', size, prefix, filename)
+    target = os.path.join('logo', str(size), prefix, filename)
 
     try:
         return LOGO_STORAGE.get_modified_time(target)
@@ -47,7 +46,7 @@ class CoverArt(View):
         self.storage = LOGO_STORAGE
 
     @method_decorator(last_modified(_last_modified))
-    def get(self, request, size, filename):
+    def get(self, request, size, prefix, filename):
 
         size = int(size)
 
@@ -178,7 +177,7 @@ def get_logo_url(podcast, size):
 
     if podcast.logo_url:
         filename = hashlib.sha1(podcast.logo_url.encode('utf-8')).hexdigest()
-        return reverse('logo', args=[size, filename])
+        return reverse('logo', args=[size, get_prefix(filename), filename])
 
     else:
         filename = 'podcast-%d.png' % (hash(podcast.title) % 5, )
