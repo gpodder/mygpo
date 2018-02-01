@@ -22,7 +22,7 @@ class SlugGenerator(object):
 
         The consumer can can consume until it get's an unused one """
 
-        if obj.slug:
+        if self.obj.slug:
             # The object already has a slug
             raise StopIteration
 

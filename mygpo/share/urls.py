@@ -1,69 +1,74 @@
-from django.conf.urls import url
+from django.urls import path, register_converter
 
 from . import views, userpage
+
+from mygpo.users import converters
+
+
+register_converter(converters.UsernameConverter, 'username')
 
 
 urlpatterns = [
 
-    url(r'^share/$',
+    path('share/',
         views.overview,
         name='share'),
 
-    url(r'^share/subscriptions-public$',
+    path('share/subscriptions-public',
         views.set_token_public,
         kwargs={'public': True, 'token_name': 'subscriptions_token'},
         name='subscriptions-public'),
 
-    url(r'^share/subscriptions-private$',
+    path('share/subscriptions-private',
         views.set_token_public,
         kwargs={'public': False, 'token_name': 'subscriptions_token'},
         name='subscriptions-private'),
 
-    url(r'^share/favfeed-public$',
+    path('share/favfeed-public',
         views.set_token_public,
         kwargs={'public': True, 'token_name': 'favorite_feeds_token'},
         name='favfeed-public'),
 
-    url(r'^share/favfeed-private$',
+    path('share/favfeed-private',
         views.set_token_public,
         kwargs={'public': False, 'token_name': 'favorite_feeds_token'},
         name='favfeed-private'),
 
-    url(r'^share/userpage-public$',
+    path('share/userpage-public',
         views.set_token_public,
         kwargs={'public': True, 'token_name': 'userpage_token'},
         name='userpage-public'),
 
-    url(r'^share/userpage-private$',
+    path('share/userpage-private',
         views.set_token_public,
         kwargs={'public': False, 'token_name': 'userpage_token'},
         name='userpage-private'),
 
-    url(r'^share/favorites$',
+    path('share/favorites',
         views.ShareFavorites.as_view(),
         name='share-favorites'),
 
-    url(r'^favorites/private',
+    path('favorites/private',
         views.FavoritesPublic.as_view(public=False),
         name='favorites_private'),
 
-    url(r'^favorites/public',
+    path('favorites/public',
         views.FavoritesPublic.as_view(public=True),
         name='favorites_public'),
 
-    url(r'^share/subscriptions/private',
+    path('share/subscriptions/private',
         views.PublicSubscriptions.as_view(public=False),
         name='private_subscriptions'),
 
-    url(r'^share/subscriptions/public',
+    path('share/subscriptions/public',
         views.PublicSubscriptions.as_view(public=True),
         name='public_subscriptions'),
 
-    url(r'^share/favorites/create-directory-entry',
+    path('share/favorites/create-directory-entry',
         views.FavoritesFeedCreateEntry.as_view(),
         name='favorites-create-entry'),
 
-    url(r'^user/(?P<username>[\w.+-]+)/?$',
+    path('user/<username:username>/',
         userpage.UserpageView.as_view(),
         name='user'),
 

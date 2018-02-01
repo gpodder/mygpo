@@ -58,18 +58,16 @@ def is_tuple(obj):
 
 
 @register.filter
-@mark_safe
 def markdown(txt):
     import markdown2
-    return markdown2.markdown(txt, extras={'nofollow': True})
+    return mark_safe(markdown2.markdown(txt, extras={'nofollow': True}))
 
 
 @register.filter
-@mark_safe
 def nbsp(s):
     """ collapses multiple whitespaces and replaces them with &nbsp; """
     import re
-    return re.sub("\s+", "&nbsp;", s)
+    return mark_safe(re.sub("\s+", "&nbsp;", s))
 
 
 @register.filter
@@ -85,12 +83,11 @@ def license_name(license_url):
 
 
 @register.filter
-@mark_safe
 def urlquote(s):
     """ makes urllib.quote_plus available as a template filter """
     if isinstance(s, str):
         s = s.encode('utf-8')
-    return urllib.parse.quote_plus(s)
+    return mark_safe(urllib.parse.quote_plus(s))
 
 
 hours_to_str = register.filter(hours_to_str)

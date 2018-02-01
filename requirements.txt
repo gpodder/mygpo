@@ -1,4 +1,4 @@
-Django==1.11.5
+Django==2.0.1
 Babel==2.5.0
 Pillow==4.2.1
 celery[redis]==4.1.0
@@ -14,6 +14,7 @@ psycopg2cffi==2.7.7
 python-dateutil==2.6.1
 redis==2.10.6
 django-celery-results==1.0.1
-django-celery-beat==1.0.1
+# django-celery-beat > 1.1.0
+git+https://github.com/celery/django-celery-beat.git@feaf34e2c30e28273b03d754d50e9a1d9f1191c6#egg=django-celery-beat
 requests==2.18.4
 django-db-geventpool==2
