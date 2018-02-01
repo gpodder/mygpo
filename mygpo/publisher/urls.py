@@ -1,88 +1,93 @@
-from django.conf.urls import url
+from django.urls import path, register_converter
 
 from . import views
+
+from mygpo.users import converters
+
+
+register_converter(converters.UsernameConverter, 'username')
 
 
 urlpatterns = [
 
-    url(r'^$',
+    path('',
         views.home,
         name='publisher'),
 
-    url(r'^(?P<username>[\w.+-]+)/update$',
+    path('<username:username>/update',
         views.update_published_podcasts,
         name='publisher-update'),
 
-    url(r'^(?P<username>[\w.+-]+)/update-token',
+    path('<username:username>/update-token',
         views.new_update_token,
         name='publisher-new-update-token'),
 
-    url(r'^podcast/(?P<slug>[\w-]+)/$',
+    path('podcast/<slug:slug>/',
         views.podcast_slug,
         name='podcast-publisher-detail-slug'),
 
-    url(r'^podcast/(?P<slug>[\w-]+)/update$',
+    path('podcast/<slug:slug>/update',
         views.update_podcast_slug,
         name='podcast-publisher-update-slug'),
 
-    url(r'^podcast/(?P<slug>[\w-]+)/save$',
+    path('podcast/<slug:slug>/save',
         views.save_podcast_slug,
         name='podcast-publisher-save-slug'),
 
-    url(r'^podcast/(?P<slug>[\w-]+)/episodes$',
+    path('podcast/<slug:slug>/episodes',
         views.episodes_slug,
         name='podcast-publisher-episodes-slug'),
 
-    url(r'^podcast/(?P<p_slug>[\w-]+)/(?P<e_slug>[\w-]+)$',
+    path('podcast/<slug:p_slug>/<slug:e_slug>',
         views.episode_slug,
         name='episode-publisher-detail-slug'),
 
-    url(r'^podcast/(?P<p_slug>[\w-]+)/(?P<e_slug>[\w-]+)/set-slug$',
+    path('podcast/<slug:p_slug>/<slug:e_slug>/set-slug',
         views.update_episode_slug_slug,
         name='publisher-set-episode-slug-slug'),
 
-    url(r'^podcast/(?P<podcast_id>[0-9a-f]{32})/$',
+    path('podcast/<uuid:podcast_id>/',
         views.podcast_id,
         name='podcast-publisher-detail-id'),
 
-    url(r'^podcast/(?P<podcast_id>[0-9a-f]{32})/update$',
+    path('podcast/<uuid:podcast_id>/update',
         views.update_podcast_id,
         name='podcast-publisher-update-id'),
 
-    url(r'^podcast/(?P<podcast_id>[0-9a-f]{32})/save$',
+    path('podcast/<uuid:podcast_id>/save',
         views.save_podcast_id,
         name='podcast-publisher-save-id'),
 
-    url(r'^podcast/(?P<podcast_id>[0-9a-f]{32})/episodes$',
+    path('podcast/<uuid:podcast_id>/episodes',
         views.episodes_id,
         name='podcast-publisher-episodes-id'),
 
-    url(r'^podcast/(?P<podcast_id>[0-9a-f]{32})/(?P<e_id>[0-9a-f]{32})$',
+    path('podcast/<uuid:podcast_id>/<uuid:e_id>',
         views.episode_id,
         name='episode-publisher-detail-id'),
 
-    url(r'^podcast/(?P<podcast_id>[0-9a-f]{32})/(?P<episode_id>[0-9a-f]{32})/'
+    path('podcast/<uuid:podcast_id>/<uuid:episode_id>/'
         'set-slug$',
         views.update_episode_slug_id,
         name='publisher-set-episode-slug-id'),
 
-    url(r'^group/(?P<pg_slug>[\w-]+)$',
+    path('group/<slug:pg_slug>',
         views.group_slug,
         name='group-publisher-slug'),
 
-    url(r'^group/(?P<pg_slug>[\w-]+)$',
+    path('group/<slug:pg_slug>',
         views.group_id,
         name='group-publisher-id'),
 
-    url(r'^podcast/search$',
+    path('podcast/search',
         views.search_podcast,
         name='podcast-publisher-search'),
 
-    url(r'^link/$',
+    path('link/',
         views.link,
         name='link-here'),
 
-    url(r'^advertise$',
+    path('advertise',
         views.advertise,
         name='advertise'),
 
