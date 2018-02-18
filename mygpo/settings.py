@@ -75,12 +75,23 @@ SITE_ID = 1
 # to load the internationalization machinery.
 USE_I18N = True
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATIC_URL = '/media/'
+
+# Static Files
+
+STATIC_ROOT = 'staticfiles'
+STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
-    os.path.abspath(os.path.join(BASE_DIR, '..', 'htdocs', 'media')),
+    os.path.abspath(os.path.join(BASE_DIR, '..', 'static')),
 )
+
+
+# Media Files
+
+MEDIA_ROOT = os.getenv('MEDIA_ROOT',
+                       os.path.abspath(os.path.join(BASE_DIR, '..', 'media')))
+
+MEDIA_URL = '/media/'
 
 
 TEMPLATES = [{

@@ -67,7 +67,7 @@ urlpatterns = [
         name='episode-publisher-detail-id'),
 
     path('podcast/<uuid:podcast_id>/<uuid:episode_id>/'
-        'set-slug$',
+        'set-slug',
         views.update_episode_slug_id,
         name='publisher-set-episode-slug-id'),
 
