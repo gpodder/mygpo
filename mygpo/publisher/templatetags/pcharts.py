@@ -1,10 +1,8 @@
 from django import template
-from django.utils.safestring import mark_safe
 
 register = template.Library()
 
-@register.filter
-@mark_safe
+@register.filter(is_safe=True)
 def bar_chart(parts):
 
     maxv = max([ int(x['y']) for x in parts ])
