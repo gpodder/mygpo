@@ -14,7 +14,7 @@ class UUIDModel(models.Model):
 
     def get_id(self):
         """ String representation of the ID """
-        return self.id.hex
+        return self.id
 
 
 class TwitterModel(models.Model):
