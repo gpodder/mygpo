@@ -1,6 +1,7 @@
 import os.path
 
 from django import template
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext
 from django.urls import reverse
 from django.utils.html import strip_tags
@@ -29,7 +30,8 @@ DEVICE_TYPE_ICONS = {
 def device_type(device):
     return DEVICE_TYPES_DICT.get(device.type, _('Unknown'))
 
-@register.filter(is_safe=True)
+@register.filter
+@mark_safe
 def device_icon(device):
 
     ua_str = (device.user_agent or '').lower()
@@ -70,10 +72,10 @@ def target_uid(client):
         return client.uid
 
 
-@register.filter(is_safe=True)
+@register.filter
 def device_list(devices):
     links = map(device_link, devices)
-    return ''.join(links)
+    return mark_safe(''.join(links))
 
 def device_link(device):
     return '<a href="{link}" title="{name}">{icon}</a>'.format(

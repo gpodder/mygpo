@@ -2,11 +2,13 @@ import re
 from html.entities import entitydefs
 
 from django import template
+from django.utils.safestring import mark_safe
 
 
 register = template.Library()
 
-@register.filter(is_safe=True)
+@register.filter
+@mark_safe
 def remove_html_tags(html):
     # If we would want more speed, we could make these global
     re_strip_tags = re.compile('<[^>]*>')

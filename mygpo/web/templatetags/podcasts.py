@@ -37,7 +37,8 @@ def podcast_logo_medium(podcast):
     return create_podcast_logo(podcast, PODCAST_LOGO_MEDIUM_SIZE)
 
 
-@register.filter(is_safe=True)
+@register.filter
+@mark_safe
 def podcast_status_icon(action):
     if action.action == 'subscribe':
         return '<img src="%s" />' % (staticfiles_storage.url('subscribe.png'),)

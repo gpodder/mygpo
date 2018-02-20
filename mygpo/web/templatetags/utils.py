@@ -1,6 +1,7 @@
 import urllib.parse
 
 from django import template
+from django.utils.safestring import mark_safe
 
 from mygpo.web.utils import get_page_list, license_info, hours_to_str
 from mygpo.utils import edit_link
@@ -8,7 +9,8 @@ from mygpo.utils import edit_link
 
 register = template.Library()
 
-@register.filter(is_safe=True)
+@register.filter
+@mark_safe
 def lookup(dic, key):
     return dic.get(key, '')
 
@@ -43,7 +45,8 @@ def append(l, item):
 def remove(l, item):
     return [x for x in l if x != item]
 
-@register.filter(is_safe=True)
+@register.filter
+@mark_safe
 def format_time(time):
     from mygpo.utils import format_time as _format_time
     return _format_time(time)
@@ -54,17 +57,17 @@ def is_tuple(obj):
     return isinstance(obj, tuple)
 
 
-@register.filter(is_safe=True)
+@register.filter
 def markdown(txt):
     import markdown2
-    return markdown2.markdown(txt, extras={'nofollow': True})
+    return mark_safe(markdown2.markdown(txt, extras={'nofollow': True}))
 
 
-@register.filter(is_safe=True)
+@register.filter
 def nbsp(s):
     """ collapses multiple whitespaces and replaces them with &nbsp; """
     import re
-    return re.sub("\s+", "&nbsp;", s)
+    return mark_safe(re.sub("\s+", "&nbsp;", s))
 
 
 @register.filter
@@ -79,12 +82,12 @@ def license_name(license_url):
     return info.url
 
 
-@register.filter(is_safe=True)
+@register.filter
 def urlquote(s):
     """ makes urllib.quote_plus available as a template filter """
     if isinstance(s, str):
         s = s.encode('utf-8')
-    return urllib.parse.quote_plus(s)
+    return mark_safe(urllib.parse.quote_plus(s))
 
 
 hours_to_str = register.filter(hours_to_str)
