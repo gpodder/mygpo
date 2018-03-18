@@ -218,6 +218,11 @@ div#podcastlogo
     padding-bottom: 10px;
 }
 
+#podcastlogo img {
+    max-height: 128px;
+    max-width: 128px;
+}
+
 
 .short
 {
