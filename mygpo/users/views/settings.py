@@ -17,11 +17,9 @@ from django.utils.html import strip_tags
 from mygpo.podcasts.models import Podcast
 from mygpo.usersettings.models import UserSettings
 from mygpo.decorators import allowed_methods
-from mygpo.web.forms import UserAccountForm, ProfileForm, FlattrForm
+from mygpo.web.forms import UserAccountForm, ProfileForm
 from mygpo.web.utils import normalize_twitter
-from mygpo.flattr import Flattr
-from mygpo.users.settings import PUBLIC_SUB_USER, PUBLIC_SUB_PODCAST, \
-         FLATTR_TOKEN, FLATTR_AUTO, FLATTR_MYGPO, FLATTR_USERNAME
+from mygpo.users.settings import PUBLIC_SUB_USER, PUBLIC_SUB_PODCAST
 
 
 @login_required
@@ -33,7 +31,6 @@ def account(request):
     if request.method == 'GET':
 
         site = RequestSite(request)
-        flattr = Flattr(request.user, site.domain, request.is_secure())
         userpage_token = request.user.profile.get_token('userpage_token')
 
         profile_form = ProfileForm({
@@ -46,19 +43,10 @@ def account(request):
             'public': request.user.profile.settings.get_wksetting(PUBLIC_SUB_USER)
             })
 
-        flattr_form = FlattrForm({
-               'enable': request.user.profile.settings.get_wksetting(FLATTR_AUTO),
-               'token': request.user.profile.settings.get_wksetting(FLATTR_TOKEN),
-               'flattr_mygpo': request.user.profile.settings.get_wksetting(FLATTR_MYGPO),
-               'username': request.user.profile.settings.get_wksetting(FLATTR_USERNAME),
-            })
-
         return render(request, 'account.html', {
             'site': site,
             'form': form,
             'profile_form': profile_form,
-            'flattr_form': flattr_form,
-            'flattr': flattr,
             'userpage_token': userpage_token,
             })
 
@@ -110,69 +98,6 @@ class ProfileView(View):
         messages.success(request, _('Data updated'))
 
         return HttpResponseRedirect(reverse('account') + '#profile')
-
-
-class FlattrSettingsView(View):
-    """ Updates Flattr settings and redirects back to the Account page """
-
-    def post(self, request):
-        user = request.user
-
-        form = FlattrForm(request.POST)
-
-        if not form.is_valid():
-            raise ValueError('asdf')
-
-        auto_flattr = form.cleaned_data.get('enable', False)
-        flattr_mygpo = form.cleaned_data.get('flattr_mygpo', False)
-        username = form.cleaned_data.get('username', '')
-
-        settings = user.profile.settings
-        settings.set_wksetting(FLATTR_AUTO, auto_flattr)
-        settings.set_wksetting(FLATTR_MYGPO, flattr_mygpo)
-        settings.set_wksetting(FLATTR_USERNAME, username)
-        settings.save()
-
-        return HttpResponseRedirect(reverse('account') + '#flattr')
-
-
-class FlattrLogout(View):
-    """ Removes Flattr authentication token """
-
-    def get(self, request):
-        user = request.user
-        settings = user.profile.settings
-        settings.set_wksetting(FLATTR_AUTO, False)
-        settings.set_wksetting(FLATTR_TOKEN, False)
-        settings.set_wksetting(FLATTR_MYGPO, False)
-        settings.save()
-        return HttpResponseRedirect(reverse('account') + '#flattr')
-
-
-class FlattrTokenView(View):
-    """ Callback for the Flattr authentication
-
-    Updates the user's Flattr token and redirects back to the account page """
-
-    @method_decorator(login_required)
-    def get(self, request):
-
-        user = request.user
-        site = RequestSite(request)
-        flattr = Flattr(user, site.domain, request.is_secure())
-
-        url = request.build_absolute_uri()
-        token = flattr.process_retrieved_code(url)
-        if token:
-            messages.success(request, _('Authentication successful'))
-            settings = user.profile.settings
-            settings.set_wksetting(FLATTR_TOKEN, token)
-            settings.save()
-
-        else:
-            messages.error(request, _('Authentication failed. Try again later'))
-
-        return HttpResponseRedirect(reverse('account') + '#flattr')
 
 
 class AccountRemoveGoogle(View):

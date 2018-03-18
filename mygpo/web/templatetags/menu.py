@@ -1,5 +1,4 @@
 from django import template
-from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext
 from django.utils.translation import ugettext_lazy as _
 
@@ -37,7 +36,6 @@ MENU_STRUCTURE = (
             ('/user/subscriptions/', _('User subscriptions')),
             ('/suggestions/', _('Suggestions')),
             ('', _('Features')),
-            ('/directory/+flattr', _('Flattr')),
             ('/directory/+license', _('License')),
             ('', _('Toplists')),
             ('/toplist/', _('Podcasts')),
@@ -70,8 +68,7 @@ MENU_STRUCTURE = (
         )),
 )
 
-@register.filter
-@mark_safe
+@register.filter(is_safe=True)
 def main_menu(selected):
     found_section = False
     links = []
@@ -101,8 +98,7 @@ def get_section_items(selected):
             (selected, selected),
     ]
 
-@register.filter
-@mark_safe
+@register.filter(is_safe=True)
 def section_menu(selected, title=None):
 
     items = []

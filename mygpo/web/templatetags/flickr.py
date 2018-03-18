@@ -1,5 +1,4 @@
 from django import template
-from django.utils.safestring import mark_safe
 
 from mygpo.data import flickr
 
@@ -10,8 +9,7 @@ register = template.Library()
 def is_flickr_photo(url):
     return flickr.is_flickr_image(url)
 
-@register.filter
-@mark_safe
+@register.filter(is_safe=True)
 def embed_flickr_photo(episode):
     img = flickr.get_display_photo(episode.url)
     s = '<a href="%s" title="%s"><img src="%s" alt="%s" /></a>' % (episode.link, episode.title, img, episode.title)

@@ -168,14 +168,14 @@ class DirectoryTest(TestCase):
             defaults = {
                 'title': 'My Podcast',
             },
-        )
+        ).object
         self.episode = Episode.objects.get_or_create_for_url(
             self.podcast,
             'http://example.com/directory-podcast/1.mp3',
             defaults = {
                 'title': 'My Episode',
             },
-        )
+        ).object
         self.client = Client()
 
     def test_episode_info(self):

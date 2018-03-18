@@ -58,8 +58,7 @@ def opengraph_episode(episode, podcast):
     )
     return s
 
-@register.filter
-@mark_safe
+@register.filter(is_safe=True)
 def opengraph_podcast(podcast):
     s = OPENGRAPH_STR % dict(
         title     = podcast.title,

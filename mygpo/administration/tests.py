@@ -24,22 +24,22 @@ class SimpleTest(TestCase):
 
     def test_merge(self):
 
-        p1 = Podcast.objects.get_or_create_for_url('http://example.com/podcast1.rss')
-        p2 = Podcast.objects.get_or_create_for_url('http://example.com/podcast2.rss')
+        p1 = Podcast.objects.get_or_create_for_url('http://example.com/podcast1.rss').object
+        p2 = Podcast.objects.get_or_create_for_url('http://example.com/podcast2.rss').object
 
-        e1 = Episode.objects.get_or_create_for_url(p1, 'http://example.com/podcast1/e1.mp3')
+        e1 = Episode.objects.get_or_create_for_url(p1, 'http://example.com/podcast1/e1.mp3').object
         e1.title = 'Episode 1'
         e1.save()
 
-        e2 = Episode.objects.get_or_create_for_url(p2, 'http://example.com/podcast1/e2.mp3')
+        e2 = Episode.objects.get_or_create_for_url(p2, 'http://example.com/podcast1/e2.mp3').object
         e2.title = 'Episode 2'
         e2.save()
 
-        e3 = Episode.objects.get_or_create_for_url(p2, 'http://example.com/podcast2/e2.mp3')
+        e3 = Episode.objects.get_or_create_for_url(p2, 'http://example.com/podcast2/e2.mp3').object
         e3.title = 'Episode 3'
         e3.save()
 
-        e4 = Episode.objects.get_or_create_for_url(p2, 'http://example.com/podcast2/e3.mp3')
+        e4 = Episode.objects.get_or_create_for_url(p2, 'http://example.com/podcast2/e3.mp3').object
         e4.title = 'Episode 4'
         e4.save()
 

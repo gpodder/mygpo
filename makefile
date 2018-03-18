@@ -4,15 +4,21 @@ help:
 	@echo 'make test            run tests and show coverage report'
 	@echo 'make clean           clean up files'
 
-test:
-	envdir envs/dev/ python -Wd -m coverage run ./manage.py test
-	coverage report
+test: envs/test/MEDIA_ROOT
+	# assume defined media root directory, empty before running tests
+	rm -rf $(shell cat envs/test/MEDIA_ROOT)
+	mkdir -p $(shell cat envs/test/MEDIA_ROOT)
+	envdir envs/dev/ pytest --cov=mygpo/ --cov-branch
+	coverage report --show-missing
 
 update-po:
 	envdir envs/dev/ python manage.py makemessages \
-		--ignore=doc/* --ignore=envs/* --ignore=htdocs/* --ignore=venv/* \
-		--ignore=res/* --ignore=tools/* --ignore=mygpo/*/migrations/*
+		--ignore=doc/* --ignore=envs/* --ignore=media/* --ignore=venv/* \
+		--ignore=res/* --ignore=tools/* --ignore=mygpo/*/migrations/* \
+		--ignore=static/*
 
+notebook:
+	envdir envs/dev/ python manage.py shell_plus --notebook
 
 clean:
 	git clean -fX

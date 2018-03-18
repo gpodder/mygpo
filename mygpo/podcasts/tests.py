@@ -33,8 +33,8 @@ class PodcastTests(unittest.TestCase):
     def test_get_or_create_for_url(self):
         """ Test that get_or_create_for_url returns existing Podcast """
         URL = 'http://example.com/get_or_create.rss'
-        p1 = Podcast.objects.get_or_create_for_url(URL)
-        p2 = Podcast.objects.get_or_create_for_url(URL)
+        p1 = Podcast.objects.get_or_create_for_url(URL).object
+        p2 = Podcast.objects.get_or_create_for_url(URL).object
         self.assertEqual(p1.pk, p2.pk)
 
     def test_episode_count(self):
@@ -43,7 +43,7 @@ class PodcastTests(unittest.TestCase):
         EPISODE_URL = 'http://example.com/episode%d.mp3'
         NUM_EPISODES=3
 
-        p = Podcast.objects.get_or_create_for_url(PODCAST_URL)
+        p = Podcast.objects.get_or_create_for_url(PODCAST_URL).object
         for n in range(NUM_EPISODES):
             Episode.objects.get_or_create_for_url(p, EPISODE_URL % (n, ))
 

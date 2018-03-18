@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 class CaseInsensitiveModelBackend(ModelBackend):
     """ Authenticates with a case-insensitive username """
 
-    def authenticate(self, username=None, password=None, **kwargs):
+    def authenticate(self, request, username=None, password=None, **kwargs):
         UserModel = get_user_model()
         users = UserModel.objects.filter(username__iexact=username)\
                                  .order_by('-last_login')

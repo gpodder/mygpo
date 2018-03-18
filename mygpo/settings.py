@@ -67,12 +67,23 @@ SITE_ID = 1
 # to load the internationalization machinery.
 USE_I18N = True
 
+
+# Static Files
+
 STATIC_ROOT = 'staticfiles'
-STATIC_URL = '/media/'
+STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
-    os.path.abspath(os.path.join(BASE_DIR, '..', 'htdocs', 'media')),
+    os.path.abspath(os.path.join(BASE_DIR, '..', 'static')),
 )
+
+
+# Media Files
+
+MEDIA_ROOT = os.getenv('MEDIA_ROOT',
+                       os.path.abspath(os.path.join(BASE_DIR, '..', 'media')))
+
+MEDIA_URL = '/media/'
 
 
 TEMPLATES = [{
@@ -162,7 +173,6 @@ INSTALLED_APPS = [
     'mygpo.pubsub',
     'mygpo.podcastlists',
     'mygpo.votes',
-    'django_nose',
 ]
 
 try:
@@ -176,10 +186,9 @@ except ImportError:
 
 
 try:
-    import opbeat
-
-    if not DEBUG:
-        INSTALLED_APPS += ['opbeat.contrib.django']
+    if DEBUG:
+        import django_extensions
+        INSTALLED_APPS += ['django_extensions']
 
 except ImportError:
     pass
@@ -213,7 +222,7 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', '')
 
 SECRET_KEY = os.getenv('SECRET_KEY', '')
 
-if 'test' in sys.argv:
+if 'pytest' in sys.argv[0]:
     SECRET_KEY = 'test'
 
 GOOGLE_ANALYTICS_PROPERTY_ID = os.getenv('GOOGLE_ANALYTICS_PROPERTY_ID', '')
@@ -314,17 +323,6 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # enabled access to staff-only areas with ?staff=<STAFF_TOKEN>
 STAFF_TOKEN = os.getenv('STAFF_TOKEN', None)
 
-# Flattr settings -- available after you register your app
-FLATTR_KEY = os.getenv('FLATTR_KEY', '')
-FLATTR_SECRET = os.getenv('FLATTR_SECRET', '')
-
-# Flattr thing of the webservice. Will be flattr'd when a user sets
-# the "Auto-Flattr gpodder.net" option
-FLATTR_MYGPO_THING = os.getenv(
-    'FLATTR_MYGPO_THING',
-    'https://flattr.com/submit/auto?user_id=stefankoegl&url=http://gpodder.net'
-)
-
 # The User-Agent string used for outgoing HTTP requests
 USER_AGENT = 'gpodder.net (+https://github.com/gpodder/mygpo)'
 
@@ -378,14 +376,6 @@ EMAIL_BACKEND = os.getenv('EMAIL_BACKEND',
                           'django.core.mail.backends.smtp.EmailBackend')
 
 PODCAST_AD_ID = os.getenv('PODCAST_AD_ID')
-
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-
-NOSE_ARGS = [
-    '--with-doctest',
-    '--stop',
-    '--where=mygpo',
-]
 
 
 SEARCH_CUTOFF = float(os.getenv('SEARCH_CUTOFF', 0.3))

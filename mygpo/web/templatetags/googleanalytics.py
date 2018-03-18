@@ -1,10 +1,8 @@
 from django import template
-from django.utils.safestring import mark_safe
 
 register = template.Library()
 
-@register.filter
-@mark_safe
+@register.filter(is_safe=True)
 def google_analytics_async(property_id):
     s = """
     <script type="text/javascript">

@@ -1,153 +1,144 @@
-from django.conf.urls import url
+from django.urls import path, register_converter
 from django.contrib.auth.views import LogoutView
 from django.views.generic.base import TemplateView
 
 from .views import registration, settings, device, user
+from mygpo.users import converters
+
+register_converter(converters.ClientUIDConverter, 'client-uid')
 
 
 urlpatterns = [
 
-    url(r'^register/$',
+    path('register/',
         registration.RegistrationView.as_view(),
         name='register'),
 
-    url(r'^registration_complete/$',
+    path('registration_complete/',
         registration.TemplateView.as_view(
             template_name='registration/registration_complete.html'),
         name='registration-complete'),
 
-    url(r'^activate/(?P<activation_key>\w+)$',
+    path('activate/<str:activation_key>',
         registration.ActivationView.as_view()),
 
-    url(r'^registration/resend$',
+    path('registration/resend',
         registration.ResendActivationView.as_view(),
         name='resend-activation'),
 
-    url(r'^registration/resent$',
+    path('registration/resent',
         registration.ResentActivationView.as_view(),
         name='resent-activation'),
 
-    url(r'^account/$',
+    path('account/',
         settings.account,
         name='account'),
 
-    url(r'^account/privacy$',
+    path('account/privacy',
         settings.privacy,
         name='privacy'),
 
-    url(r'^account/profile$',
+    path('account/profile',
         settings.ProfileView.as_view(),
         name='profile'),
 
-    url(r'^account/google/remove$',
+    path('account/google/remove',
         settings.AccountRemoveGoogle.as_view(),
         name='account-google-remove'),
 
-    url(r'^account/flattr$',
-        settings.FlattrSettingsView.as_view(),
-        name='flattr-settings'),
-
-    url(r'^account/flattr/token$',
-        settings.FlattrTokenView.as_view(),
-        name='flattr-token'),
-
-    url(r'^account/flattr/logout$',
-        settings.FlattrLogout.as_view(),
-        name='flattr-logout'),
-
-    url(r'^account/privacy/default-public$',
+    path('account/privacy/default-public',
         settings.DefaultPrivacySettings.as_view(public=True),
         name='privacy_default_public'),
 
-    url(r'^account/privacy/default-private$',
+    path('account/privacy/default-private',
         settings.DefaultPrivacySettings.as_view(public=False),
         name='privacy_default_private'),
 
-    url(r'^account/privacy/(?P<podcast_id>[\w]+)/public$',
+    path('account/privacy/<uuid:podcast_id>/public',
         settings.PodcastPrivacySettings.as_view(public=True),
         name='privacy_podcast_public'),
 
-    url(r'^account/privacy/(?P<podcast_id>[\w]+)/private$',
+    path('account/privacy/<uuid:podcast_id>/private',
         settings.PodcastPrivacySettings.as_view(public=False),
         name='privacy_podcast_private'),
 
-    url(r'^account/delete$',
+    path('account/delete',
         settings.delete_account,
         name='delete-account'),
 
-    url(r'^devices/$',
+    path('devices/',
         device.overview,
         name='devices'),
 
-    url(r'^devices/create-device$',
+    path('devices/create-device',
         device.create,
         name='device-create'),
 
-    url(r'^device/(?P<uid>[\w.-]+)\.opml$',
+    path('device/<client-uid:uid>.opml',
         device.opml,
         name='device-opml'),
 
-    url(r'^device/(?P<uid>[\w.-]+)$',
+    path('device/<client-uid:uid>',
         device.show,
         name='device'),
 
-    url(r'^device/(?P<uid>[\w.-]+)/symbian.opml$',
+    path('device/<client-uid:uid>/symbian.opml',
         device.symbian_opml,
         name='device-symbian-opml'),
 
-    url(r'^device/(?P<uid>[\w.-]+)/sync$',
+    path('device/<client-uid:uid>/sync',
         device.sync,
         name='device-sync'),
 
-    url(r'^device/(?P<uid>[\w.-]+)/unsync$',
+    path('device/<client-uid:uid>/unsync',
         device.unsync,
         name='device-unsync'),
 
-    url(r'^device/(?P<uid>[\w.-]+)/resync$',
+    path('device/<client-uid:uid>/resync',
         device.resync,
         name='trigger-sync'),
 
-    url(r'^device/(?P<uid>[\w.-]+)/delete$',
+    path('device/<client-uid:uid>/delete',
         device.delete,
         name='device-delete'),
 
-    url(r'^device/(?P<uid>[\w.-]+)/remove$',
+    path('device/<client-uid:uid>/remove',
         device.delete_permanently,
         name='device-delete-permanently'),
 
-    url(r'^device/(?P<uid>[\w.-]+)/undelete$',
+    path('device/<client-uid:uid>/undelete',
         device.undelete,
         name='device-undelete'),
 
-    url(r'^device/(?P<uid>[\w.-]+)/edit$',
+    path('device/<client-uid:uid>/edit',
         device.edit,
         name='device-edit'),
 
-    url(r'^device/(?P<uid>[\w.-]+)/update$',
+    path('device/<client-uid:uid>/update',
         device.update,
         name='device-update'),
 
-    url(r'^device/(?P<uid>[\w.-]+)/upload-opml$',
+    path('device/<client-uid:uid>/upload-opml',
         device.upload_opml,
         name='device-upload-opml'),
 
-    url(r'^register/restore_password$',
+    path('register/restore_password',
         user.restore_password,
         name='restore-password'),
 
-    url(r'^login/$',
+    path('login/',
         user.LoginView.as_view(),
         name='login'),
 
-    url(r'^login/google$',
+    path('login/google',
         user.GoogleLogin.as_view(),
         name='login-google'),
 
-    url(r'^login/oauth2callback$',
+    path('login/oauth2callback',
         user.GoogleLoginCallback.as_view(),
         name='login-google-callback'),
 
-    url(r'^logout/$',
+    path('logout/',
         LogoutView.as_view(),
         kwargs={'next_page': '/'},
         name='logout'),

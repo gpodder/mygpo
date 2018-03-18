@@ -5,7 +5,10 @@ from itertools import count, chain
 from collections import Counter
 from datetime import datetime
 
+import redis
+
 import django
+from django.db.models import Avg
 from django.shortcuts import render
 from django.contrib import messages
 from django.urls import reverse
@@ -26,6 +29,7 @@ from mygpo.maintenance.models import MergeTask
 from mygpo.administration.clients import UserAgentStats, ClientStats
 from mygpo.administration.tasks import merge_podcasts
 from mygpo.utils import get_git_head
+from mygpo.data.models import PodcastUpdateResult
 from mygpo.users.models import UserProxy
 from mygpo.publisher.models import PublishedPodcast
 from mygpo.api.httpresponse import JsonResponse
@@ -57,15 +61,9 @@ class HostInfo(AdminView):
         hostname = socket.gethostname()
         django_version = django.VERSION
 
-        i = celery.control.inspect()
-        scheduled = i.scheduled()
-        if not scheduled:
-            num_celery_tasks = None
-        else:
-            num_celery_tasks = sum(len(node) for node in scheduled.values())
-
         feed_queue_status = self._get_feed_queue_status()
         num_index_outdated = self._get_num_outdated_search_index()
+        avg_podcast_update_duration = self._get_avg_podcast_update_duration()
 
         return self.render_to_response({
             'git_commit': commit,
@@ -73,10 +71,25 @@ class HostInfo(AdminView):
             'base_dir': base_dir,
             'hostname': hostname,
             'django_version': django_version,
-            'num_celery_tasks': num_celery_tasks,
+            'num_celery_tasks': self._get_waiting_celery_tasks(),
+            'avg_podcast_update_duration': avg_podcast_update_duration,
             'feed_queue_status': feed_queue_status,
             'num_index_outdated': num_index_outdated,
         })
+
+    def _get_waiting_celery_tasks(self):
+        con = celery.broker_connection()
+
+        args = {'host': con.hostname}
+        if con.port:
+            args['port'] = con.port
+
+        r = redis.StrictRedis(**args)
+        return r.llen('celery')
+
+    def _get_avg_podcast_update_duration(self):
+        queryset = PodcastUpdateResult.objects.filter(successful=True)
+        return queryset.aggregate(avg_duration=Avg('duration'))['avg_duration']
 
     def _get_feed_queue_status(self):
         now = datetime.utcnow()
