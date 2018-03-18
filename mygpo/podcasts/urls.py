@@ -129,7 +129,7 @@ urlpatterns = [
 
     path('subscribe',
         podcast.subscribe_url,
-        name='subscribe-by-path'),
+        name='subscribe-by-url'),
 
     # Podcast Views with UUIDs
     path('podcast/<uuid:podcast_id>',

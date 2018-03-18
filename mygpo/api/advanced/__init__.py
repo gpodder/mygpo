@@ -249,7 +249,7 @@ def parse_episode_action(action, user, update_urls, now, ua_string):
 # instead of "POST" requests for uploading device settings
 @allowed_methods(['POST', 'PUT'])
 @cors_origin()
-def device(request, username, device_uid):
+def device(request, username, device_uid, version=None):
     d = get_device(request.user, device_uid,
             request.META.get('HTTP_USER_AGENT', ''))
 
@@ -295,7 +295,7 @@ def valid_episodeaction(type):
 @never_cache
 @allowed_methods(['GET'])
 @cors_origin()
-def devices(request, username):
+def devices(request, username, version=None):
     user = request.user
     clients = user.client_set.filter(deleted=False)
     client_data = [get_client_data(user, client) for client in clients]

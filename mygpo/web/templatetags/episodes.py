@@ -1,5 +1,4 @@
 from django import template
-from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.utils.html import strip_tags, format_html
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -36,7 +35,7 @@ def episode_status_text(episode):
 
     return _('Unknown status')
 
-@register.filter
+@register.filter(is_safe=True)
 def episode_status_icon(action):
     if not action or not action.action:
         s = '<img src="%s" alt="nothing" title="%s" />' % \
@@ -70,7 +69,7 @@ def episode_status_icon(action):
         else:
             return action.action  # this is not marked safe by intention
 
-    return mark_safe(s)
+    return s
 
 
 @register.filter

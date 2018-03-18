@@ -58,7 +58,7 @@ def opengraph_episode(episode, podcast):
     )
     return s
 
-@register.filter
+@register.filter(is_safe=True)
 def opengraph_podcast(podcast):
     s = OPENGRAPH_STR % dict(
         title     = podcast.title,
@@ -68,4 +68,4 @@ def opengraph_podcast(podcast):
         site_name = 'gpodder.net',
         admins    = '0'
     )
-    return mark_safe(s)
+    return s

@@ -62,7 +62,7 @@ class PodcastCommand(BaseCommand):
            not options.get('new') and not options.get('random') and \
            not options.get('next'):
             query = Podcast.objects.order_by('last_update')
-            podcasts = query[:max_podcasts]
+            podcasts = query.select_related('urls')[:max_podcasts]
             yield (p.url for p in podcasts)
 
 
