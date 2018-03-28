@@ -36,7 +36,7 @@ urlpatterns = [
     path('search.<str:format>',
         simple.search),
 
-    path(r'^suggestions/<int:count>.<str:format>',
+    path('suggestions/<int:count>.<str:format>',
         simple.suggestions,
         name='suggestions-opml'),
 

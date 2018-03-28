@@ -3,7 +3,7 @@ from django.utils.safestring import mark_safe
 
 register = template.Library()
 
-@register.filter
+@register.filter()
 def google_analytics_async(property_id):
     s = """
     <script type="text/javascript">

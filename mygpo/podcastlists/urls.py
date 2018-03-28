@@ -18,7 +18,7 @@ userpatterns = [
         views.list_show,
         name='list-show'),
 
-    path('list/<slug:slug>.opml$',
+    path('list/<slug:slug>.opml',
         views.list_opml,
         name='list-opml'),
 

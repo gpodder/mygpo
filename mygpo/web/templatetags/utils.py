@@ -1,5 +1,6 @@
 import urllib.parse
 
+from django.utils.safestring import mark_safe
 from django import template
 from django.utils.safestring import mark_safe
 
@@ -9,8 +10,7 @@ from mygpo.utils import edit_link
 
 register = template.Library()
 
-@register.filter
-@mark_safe
+@register.filter()
 def lookup(dic, key):
     return dic.get(key, '')
 
@@ -57,13 +57,13 @@ def is_tuple(obj):
     return isinstance(obj, tuple)
 
 
-@register.filter
+@register.filter()
 def markdown(txt):
     import markdown2
     return mark_safe(markdown2.markdown(txt, extras={'nofollow': True}))
 
 
-@register.filter
+@register.filter()
 def nbsp(s):
     """ collapses multiple whitespaces and replaces them with &nbsp; """
     import re
@@ -82,7 +82,7 @@ def license_name(license_url):
     return info.url
 
 
-@register.filter
+@register.filter()
 def urlquote(s):
     """ makes urllib.quote_plus available as a template filter """
     if isinstance(s, str):

@@ -1,17 +1,12 @@
 import os.path
-from django.urls import include, path, register_converter
+from django.urls import include, path, register_converter, re_path
 from django.contrib import admin
 from django.conf import settings
-from django.contrib.staticfiles.views import serve
+from django.conf.urls.static import static
 
-# strip the leading "/"
-static_prefix = settings.STATIC_URL[1:]
 
 # This URLs should be always be served, even during maintenance mode
-urlpatterns = [
-    path('%s<path:path>' % static_prefix, serve)
-]
-
+urlpatterns = static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 
 # Check for maintenace mode
@@ -19,9 +14,8 @@ from django.conf import settings
 if settings.MAINTENANCE:
     from mygpo.web import utils
     urlpatterns += [
-        path('', utils.maintenance),
+        re_path('', utils.maintenance)
     ]
-
 
 # URLs are still registered during maintenace mode because we need to
 # build links from them (eg login-link).

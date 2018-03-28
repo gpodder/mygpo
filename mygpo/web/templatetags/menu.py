@@ -69,7 +69,7 @@ MENU_STRUCTURE = (
         )),
 )
 
-@register.filter
+@register.filter()
 def main_menu(selected):
     found_section = False
     links = []
@@ -99,7 +99,7 @@ def get_section_items(selected):
             (selected, selected),
     ]
 
-@register.filter
+@register.filter()
 def section_menu(selected, title=None):
 
     items = []
