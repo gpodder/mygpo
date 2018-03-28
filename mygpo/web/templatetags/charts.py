@@ -1,5 +1,7 @@
 from django import template
+from django.utils.safestring import mark_safe
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from django.contrib.staticfiles.storage import staticfiles_storage
 
 
@@ -35,7 +37,7 @@ def vertical_bar(value, max_value, display=None):
                        ratio, left, right)
 
 
-@register.filter(is_safe=True)
+@register.filter()
 def timeline(data):
     s = '<script type="text/javascript" src="//www.google.com/jsapi"></script>\n'
     s += '<script type="text/javascript">\n'
@@ -65,4 +67,4 @@ def timeline(data):
     s += '}\n'
     s += '</script>\n'
 
-    return s
+    return mark_safe(s)
