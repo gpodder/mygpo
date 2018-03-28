@@ -1,5 +1,9 @@
+import re
+
 from django.urls import path
+from django.conf import settings
 from django.views.generic.base import TemplateView, RedirectView
+from django.views.static import serve
 
 from mygpo.web.logo import CoverArt
 
@@ -12,9 +16,17 @@ urlpatterns = [
         views.home,
         name='home'),
 
-    path('logo/<int:size>/<str:prefix>/<str:filename>$',
+    path('logo/<int:size>/<str:prefix>/<str:filename>',
         CoverArt.as_view(),
         name='logo'),
+
+    # Media files are also served in production mode. For performance, these
+    # files should be served by a reverse proxy in practice
+    path('%s<path:path>' % settings.MEDIA_URL.lstrip('/'),
+        serve,
+        name='media',
+        kwargs=dict(document_root=settings.MEDIA_ROOT)
+    ),
 
     path('tags/',
         views.mytags,

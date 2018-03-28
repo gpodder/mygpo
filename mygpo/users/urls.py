@@ -78,7 +78,7 @@ urlpatterns = [
         device.opml,
         name='device-opml'),
 
-    path('device/<client-uid:uid>$',
+    path('device/<client-uid:uid>',
         device.show,
         name='device'),
 
