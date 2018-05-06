@@ -37,17 +37,18 @@ def podcast_logo_medium(podcast):
     return create_podcast_logo(podcast, PODCAST_LOGO_MEDIUM_SIZE)
 
 
-@register.filter
-@mark_safe
+@register.filter()
 def podcast_status_icon(action):
     if action.action == 'subscribe':
-        return '<img src="%s" />' % (staticfiles_storage.url('subscribe.png'),)
+        s = '<img src="%s" />' % (staticfiles_storage.url('subscribe.png'),)
     elif action.action == 'unsubscribe':
-        return '<img src="%s" />' % (staticfiles_storage.url('unsubscribe.png'),)
+        s = '<img src="%s" />' % (staticfiles_storage.url('unsubscribe.png'),)
     elif action.action == 'flattr':
-        return '<img src="https://flattr.com/_img/icons/flattr_logo_16.png" />'
+        s = '<img src="https://flattr.com/_img/icons/flattr_logo_16.png" />'
+    else:
+        s = ''
 
-    return ''
+    return mark_safe(s)
 
 
 @register.filter
