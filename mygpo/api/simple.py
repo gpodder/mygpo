@@ -176,6 +176,9 @@ def parse_subscription(raw_post_data, format):
         end = raw_post_data.find(']') + 1
         urls = json.loads(raw_post_data[begin:end])
 
+        if not isinstance(urls, list):
+            raise ValueError('A list of feed URLs was expected')
+
     else:
         return []
 
