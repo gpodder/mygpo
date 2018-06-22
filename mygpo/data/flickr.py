@@ -32,7 +32,10 @@ def get_photo_sizes(photo_id):
         logger.warn('Retrieving Flickr photo sizes failed: %s', str(e))
         return []
 
-    resp_obj = resp.json()
+    try:
+        resp_obj = resp.json()
+    except json.JSONDecodeError as jde:
+        return []
 
     try:
         return resp_obj['sizes']['size']
