@@ -24,6 +24,10 @@ tags:
   externalDocs:
     description: "Find out more"
     url: "https://gpoddernet.readthedocs.io/en/latest/api/reference/directory.html"
+- name: "Suggestions"
+  externalDocs:
+    description: "Find out more"
+    url: "https://gpoddernet.readthedocs.io/en/latest/api/reference/suggestions.html"
 paths:
   /clientconfig.json:
     get:
@@ -245,6 +249,50 @@ paths:
         description: "returns logo URLs to scaled images"
         schema:
           type: "number"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+            text/plain:
+              schema:
+                type: "string"
+            text/xml:
+              schema:
+                type: "object"
+            application/xml:
+              schema:
+                type: "object"
+            application/json-p:
+              schema:
+                type: "string"
+  /suggestions/{number}.{format}:
+    get:
+      tags:
+      - "Suggestions"
+      summary: "Retrieve Suggested Podcasts"
+      parameters:
+      - name: "number"
+        in: "path"
+        description: "maximum number of podcasts to return"
+        required: true
+        schema:
+          type: "string"
+      - name: "format"
+        in: "path"
+        description: "Format of the response"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Format"
+      - name: "jsonp"
+        in: "query"
+        description: "a functionname on which the response is wrapped (only valid for format jsonp; since 2.8)"
+        schema:
+          type: "string"
+      security:
+        - basicAuth: []
       responses:
         200:
           description: "OK"
