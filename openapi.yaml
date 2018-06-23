@@ -9,7 +9,7 @@ info:
     name: "GNU Affero General Public License v3.0"
     url: "https://github.com/podStation/mygpo/blob/master/COPYING"
 servers:
-  - url: https://gpodder.net/api/2
+  - url: https://gpodder.net
     description: "Client parametrization server"
 tags:
 - name: "Client Parametrization"
@@ -26,9 +26,6 @@ tags:
     url: "https://gpoddernet.readthedocs.io/en/latest/api/reference/directory.html"
 paths:
   /clientconfig.json:
-    # Server override as it is not an API
-    servers:
-      - url: https://gpodder.net
     get:
       tags:
       - "Client Parametrization"
@@ -42,7 +39,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ClientConfiguration"
-  /auth/{username}/login.json:
+  /api/2/auth/{username}/login.json:
     post:
       tags:
       - "Authentication"
@@ -63,7 +60,7 @@ paths:
           description: "Unauthorized"
         400:
           description: "Cookies have different username then the one provided"
-  /auth/{username}/logout.json:
+  /api/2/auth/{username}/logout.json:
     post:
       tags:
       - "Authentication"
@@ -83,7 +80,7 @@ paths:
           description: "OK"
         400:
           description: "if the client provides a cookie, but for a different username than the one given"
-  /tags/{count}.json:
+  /api/2/tags/{count}.json:
     get:
       tags:
       - "Directory"
@@ -102,7 +99,7 @@ paths:
             application/json:
               schema:
                 type: "object"
-  /tag/{tag}/{count}.json:
+  /api/2/tag/{tag}/{count}.json:
     get:
       tags:
       - "Directory"
@@ -127,7 +124,7 @@ paths:
             application/json:
               schema:
                 type: "object"
-  /data/podcast.json:
+  /api/2/data/podcast.json:
     get:
       tags:
       - "Directory"
@@ -147,6 +144,126 @@ paths:
             application/json:
               schema:
                 type: "object"
+  /api/2/data/episode.json:
+    get:
+      tags:
+      - "Directory"
+      summary: "Retrieve Episode Data"
+      description: "Returns information for the episode with the given {episode-url} that belongs to the podcast with the {podcast-url}"
+      parameters:
+      - name: "podcast-url"
+        in: "query"
+        description: "feed URL of the podcast to which the episode belongs"
+        required: true
+        schema:
+          type: "string"
+      - name: "episode-url"
+        in: "query"
+        description: "media URL of the episode"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+  /toplist/{number}.{format}:
+    get:
+      tags:
+      - "Directory"
+      summary: "Podcast Toplist"
+      parameters:
+      - name: "number"
+        in: "path"
+        description: "maximum number of podcasts to return"
+        required: true
+        schema:
+          type: "string"
+      - name: "format"
+        in: "path"
+        description: "Format of the response"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Format"
+      - name: "jsonp"
+        in: "query"
+        description: "a functionname on which the response is wrapped (only valid for format jsonp; since 2.8)"
+        schema:
+          type: "string"
+      - name: "scale_logo"
+        in: "query"
+        description: "returns logo URLs to scaled images"
+        schema:
+          type: "number"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+            text/plain:
+              schema:
+                type: "string"
+            text/xml:
+              schema:
+                type: "object"
+            application/xml:
+              schema:
+                type: "object"
+            application/json-p:
+              schema:
+                type: "string"
+  /search.{format}:
+    get:
+      tags:
+      - "Directory"
+      summary: "Podcast Toplist"
+      parameters:
+      - name: "format"
+        in: "path"
+        description: "Format of the response"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Format"
+      - name: "q"
+        in: "query"
+        description: "search query"
+        required: true
+        schema:
+          type: "string"
+      - name: "jsonp"
+        in: "query"
+        description: "a functionname on which the response is wrapped (only valid for format jsonp; since 2.8)"
+        schema:
+          type: "string"
+      - name: "scale_logo"
+        in: "query"
+        description: "returns logo URLs to scaled images"
+        schema:
+          type: "number"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+            text/plain:
+              schema:
+                type: "string"
+            text/xml:
+              schema:
+                type: "object"
+            application/xml:
+              schema:
+                type: "object"
+            application/json-p:
+              schema:
+                type: "string"
 components:
   securitySchemes:
     basicAuth:
@@ -170,3 +287,11 @@ components:
         update_timeout:
           type: "integer"
           description: "Time in seconds for which the values in this file can be considered valid."
+    Format:
+      type: "string"
+      enum: 
+      - "json"
+      - "xml"
+      - "opml"
+      - "txt"
+      - "jsonp"
