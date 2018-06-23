@@ -67,7 +67,8 @@ paths:
     post:
       tags:
       - "Authentication"
-      summary: Log in the given user for the given device via HTTP Basic Auth.
+      summary: "Log out user"
+      description: "Log out the given user. Removes the session ID from the database."
       parameters:
       - name: "username"
         in: "path"
@@ -81,12 +82,12 @@ paths:
         200:
           description: "OK"
         400:
-          description: "Cookies have different username then the one provided"
+          description: "if the client provides a cookie, but for a different username than the one given"
   /tags/{count}.json:
     get:
       tags:
       - "Directory"
-      summary: Retrieve Top Tags
+      summary: "Retrieve Top Tags"
       parameters:
       - name: "count"
         in: "path"
@@ -94,6 +95,51 @@ paths:
         required: true
         schema:
           type: "number"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+  /tag/{tag}/{count}.json:
+    get:
+      tags:
+      - "Directory"
+      summary: "Retrieve Podcasts for Tag"
+      parameters:
+      - name: "count"
+        in: "path"
+        description: "maximum number of podcasts to return"
+        required: true
+        schema:
+          type: "number"
+      - name: "tag"
+        in: "path"
+        description: "URL-encoded tag"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+  /data/podcast.json:
+    get:
+      tags:
+      - "Directory"
+      summary: "Retrieve Podcast Data"
+      description: "Returns information for the podcast with the given URL or 404 if there is no podcast with this URL."
+      parameters:
+      - name: "url"
+        in: "query"
+        description: "the feed URL of the podcast"
+        required: true
+        schema:
+          type: "string"
       responses:
         200:
           description: "OK"
