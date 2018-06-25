@@ -28,6 +28,10 @@ tags:
   externalDocs:
     description: "Find out more"
     url: "https://gpoddernet.readthedocs.io/en/latest/api/reference/suggestions.html"
+- name: "Device"
+  externalDocs:
+    description: "Find out more"
+    url: "https://gpoddernet.readthedocs.io/en/latest/api/reference/suggestions.html"
 paths:
   /clientconfig.json:
     get:
@@ -95,7 +99,7 @@ paths:
         description: "number of tags to return"
         required: true
         schema:
-          type: "number"
+          type: "integer"
       responses:
         200:
           description: "OK"
@@ -114,7 +118,7 @@ paths:
         description: "maximum number of podcasts to return"
         required: true
         schema:
-          type: "number"
+          type: "integer"
       - name: "tag"
         in: "path"
         description: "URL-encoded tag"
@@ -185,7 +189,7 @@ paths:
         description: "maximum number of podcasts to return"
         required: true
         schema:
-          type: "string"
+          type: "integer"
       - name: "format"
         in: "path"
         description: "Format of the response"
@@ -201,7 +205,7 @@ paths:
         in: "query"
         description: "returns logo URLs to scaled images"
         schema:
-          type: "number"
+          type: "integer"
       responses:
         200:
           description: "OK"
@@ -248,7 +252,7 @@ paths:
         in: "query"
         description: "returns logo URLs to scaled images"
         schema:
-          type: "number"
+          type: "integer"
       responses:
         200:
           description: "OK"
@@ -279,7 +283,7 @@ paths:
         description: "maximum number of podcasts to return"
         required: true
         schema:
-          type: "string"
+          type: "integer"
       - name: "format"
         in: "path"
         description: "Format of the response"
@@ -312,6 +316,94 @@ paths:
             application/json-p:
               schema:
                 type: "string"
+  /api/2/devices/{username}/{deviceid}.json:
+    post:
+      tags:
+      - "Device"
+      summary: "Update Device Data"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "Username to login"
+        required: true
+        schema:
+          type: "string"
+      - name: "deviceid"
+        in: "path"
+        description: "Device Id"
+        required: true
+        schema:
+          $ref: "#/components/schemas/DeviceId"
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceUpdateData'
+      responses:
+        200:
+          description: "OK"
+  /api/2/devices/{username}.json:
+    get:
+      tags:
+      - "Device"
+      summary: "List Devices"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "Username to login"
+        required: true
+        schema:
+          type: "string"
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+  /api/2/updates/{username}/{deviceid}.json:
+    get:
+      tags:
+      - "Device"
+      summary: "Get Device Updates"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "Username to login"
+        required: true
+        schema:
+          type: "string"
+      - name: "deviceid"
+        in: "path"
+        description: "Device Id"
+        required: true
+        schema:
+          $ref: "#/components/schemas/DeviceId"
+      - name: "since"
+        in: "query"
+        description: "`timestamp` when updates have last been retrieved"
+        required: true
+        schema:
+          type: "integer"
+      - name: "include_actions"
+        in: "query"
+        description: "Default: false, since 2.10"
+        schema:
+          $ref: "#/components/schemas/DeviceId"
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
 components:
   securitySchemes:
     basicAuth:
@@ -343,3 +435,19 @@ components:
       - "opml"
       - "txt"
       - "jsonp"
+    DeviceId:
+      type: "string"
+      pattern: "^[\\w.-]+$"
+    DeviceUpdateData:
+      type: "object"
+      properties:
+        caption:
+          type: "string"
+        type:
+          type: "string"
+          enum:
+          - "desktop"
+          - "laptop"
+          - "mobile"
+          - "server"
+          - "other"
