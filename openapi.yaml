@@ -32,6 +32,10 @@ tags:
   externalDocs:
     description: "Find out more"
     url: "https://gpoddernet.readthedocs.io/en/latest/api/reference/suggestions.html"
+- name: "Device Synchronization"
+  externalDocs:
+    description: "Find out more"
+    url: "https://gpoddernet.readthedocs.io/en/latest/api/reference/sync.html"
 paths:
   /clientconfig.json:
     get:
@@ -404,6 +408,53 @@ paths:
             application/json:
               schema:
                 type: "object"
+  /api/2/sync-devices/{username}.json:
+    get:
+      tags:
+      - "Device Synchronization"
+      summary: "Get Sync Status"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "Username to login"
+        required: true
+        schema:
+          type: "string"
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+    post:
+      tags:
+      - "Device Synchronization"
+      summary: "Start / Stop Sync"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "Username to login"
+        required: true
+        schema:
+          type: "string"
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceSynchronizationRequest'
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
 components:
   securitySchemes:
     basicAuth:
@@ -451,3 +502,16 @@ components:
           - "mobile"
           - "server"
           - "other"
+    DeviceSynchronizationRequest:
+      type: "object"
+      properties:
+        synchronize:
+          type: "array"
+          items:
+            type: "array"
+            items:
+              $ref: "#/components/schemas/DeviceId"
+        stop-synchronize:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/DeviceId"
