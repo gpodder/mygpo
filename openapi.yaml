@@ -36,6 +36,10 @@ tags:
   externalDocs:
     description: "Find out more"
     url: "https://gpoddernet.readthedocs.io/en/latest/api/reference/sync.html"
+- name: "Subscriptions"
+  externalDocs:
+    description: "Find out more"
+    url: "https://gpoddernet.readthedocs.io/en/latest/api/reference/subscriptions.html"
 paths:
   /clientconfig.json:
     get:
@@ -455,6 +459,7 @@ paths:
             application/json:
               schema:
                 type: "object"
+  /subscriptions/(username)/(deviceid).(format):
 components:
   securitySchemes:
     basicAuth:
