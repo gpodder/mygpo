@@ -36,6 +36,10 @@ tags:
   externalDocs:
     description: "Find out more"
     url: "https://gpoddernet.readthedocs.io/en/latest/api/reference/sync.html"
+- name: "Device Synchronization"
+  externalDocs:
+    description: "Find out more"
+    url: "https://gpoddernet.readthedocs.io/en/latest/api/reference/sync.html"
 - name: "Subscriptions"
   externalDocs:
     description: "Find out more"
@@ -206,7 +210,7 @@ paths:
           $ref: "#/components/schemas/Format"
       - name: "jsonp"
         in: "query"
-        description: "a functionname on which the response is wrapped (only valid for format jsonp; since 2.8)"
+        description: "a function name on which the response is wrapped (only valid for format jsonp; since 2.8)"
         schema:
           type: "string"
       - name: "scale_logo"
@@ -459,7 +463,212 @@ paths:
             application/json:
               schema:
                 type: "object"
-  /subscriptions/(username)/(deviceid).(format):
+  /api/2/favorites/{username}.json:
+    get:
+      tags:
+      - "Favorites"
+      summary: "Get Favorite Episodes"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username for which the favorites should be returned"
+        required: true
+        schema:
+          type: "string"
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+  /subscriptions/{username}/{deviceid}.{format}:
+    get:
+      tags:
+      - "Subscriptions"
+      summary: "Update Device Data"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username for which subscriptions should be returned"
+        required: true
+        schema:
+          type: "string"
+      - name: "deviceid"
+        in: "path"
+        description: "Device Id"
+        required: true
+        schema:
+          $ref: "#/components/schemas/DeviceId"
+      - name: "format"
+        in: "path"
+        description: "Format of the response"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Format"
+      - name: "jsonp"
+        in: "query"
+        description: "a function name on which the response is wrapped (only valid for format jsonp; since 2.8)"
+        schema:
+          type: "string"
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+        401:
+          description: "Invalid user"
+        404:
+          description: "Invalid device ID"
+        400:
+          description: "Invalid format"
+    put:
+      tags:
+      - "Subscriptions"
+      summary: "Upload Subscriptions of Device"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username for which subscriptions should be returned"
+        required: true
+        schema:
+          type: "string"
+      - name: "deviceid"
+        in: "path"
+        description: "Device Id"
+        required: true
+        schema:
+          $ref: "#/components/schemas/DeviceId"
+      - name: "format"
+        in: "path"
+        description: "Format of the response"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Format"
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadSubscriptionRequest'
+      responses:
+        200:
+          description: "OK"
+        401:
+          description: "Invalid user"
+        400:
+          description: "Invalid format"
+  /subscriptions/{username}.{format}:
+    get:
+      tags:
+      - "Subscriptions"
+      summary: "Get All Subscriptions"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username for which subscriptions should be returned"
+        required: true
+        schema:
+          type: "string"
+      - name: "format"
+        in: "path"
+        description: "Format of the response"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Format"
+      - name: "jsonp"
+        in: "query"
+        description: "a function name on which the response is wrapped (only valid for format jsonp; since 2.8)"
+        schema:
+          type: "string"
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+        401:
+          description: "Invalid user"
+        400:
+          description: "Invalid format"
+  /api/2/subscriptions/{username}/{deviceid}.json:
+    post:
+      tags:
+      - "Subscriptions"
+      summary: "Upload Subscription Changes"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username for which subscriptions should be returned"
+        required: true
+        schema:
+          type: "string"
+      - name: "deviceid"
+        in: "path"
+        description: "Device Id"
+        required: true
+        schema:
+          $ref: "#/components/schemas/DeviceId"
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadSubscriptionChangesRequest'
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+        400:
+          description: "Invalid format"
+    get:
+      tags:
+      - "Subscriptions"
+      summary: "Get Subscription Changes"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username for which subscriptions should be returned"
+        required: true
+        schema:
+          type: "string"
+      - name: "deviceid"
+        in: "path"
+        description: "Device Id"
+        required: true
+        schema:
+          $ref: "#/components/schemas/DeviceId"
+      - name: "since"
+        in: "query"
+        description: "the `timestamp` value of the last response"
+        required: true
+        schema:
+          type: "integer"
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
 components:
   securitySchemes:
     basicAuth:
@@ -517,6 +726,21 @@ components:
             items:
               $ref: "#/components/schemas/DeviceId"
         stop-synchronize:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/DeviceId"
+    UploadSubscriptionRequest:
+      type: "array"
+      items:
+        $ref: "#/components/schemas/DeviceId"
+    UploadSubscriptionChangesRequest:
+      type: "object"
+      properties:
+        add:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/DeviceId"
+        remove:
           type: "array"
           items:
             $ref: "#/components/schemas/DeviceId"
