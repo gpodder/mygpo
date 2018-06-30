@@ -44,10 +44,14 @@ tags:
   externalDocs:
     description: "Find out more"
     url: "https://gpoddernet.readthedocs.io/en/latest/api/reference/subscriptions.html"
-- name: "Episode Actions API"
+- name: "Episode Actions"
   externalDocs:
     description: "Find out more"
     url: "https://gpoddernet.readthedocs.io/en/latest/api/reference/events.html"
+- name: "Subscriptions"
+  externalDocs:
+    description: "Find out more"
+    url: "https://gpoddernet.readthedocs.io/en/latest/api/reference/settings.html"
 paths:
   /clientconfig.json:
     get:
@@ -741,6 +745,93 @@ paths:
             application/json:
               schema:
                 type: "object"
+  /api/2/settings/{username}/{scope}.json:
+    post:
+      tags:
+      - "Settings"
+      summary: "Save Settings"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username for which the settings will be saved"
+        required: true
+        schema:
+          type: "string"
+      - name: "scope"
+        in: "path"
+        required: true
+        schema:
+          $ref: "#/components/schemas/SettingsScope"
+      - name: "podcast"
+        in: "query"
+        description: "Feed URL of a podcast (required for scope podcast and episode)"
+        schema:
+          type: "string"
+      - name: "device"
+        in: "query"
+        description: "(required for scope device)"
+        schema:
+          $ref: "#/components/schemas/DeviceId"
+      - name: "episode"
+        in: "query"
+        description: "media URL of the episode (required for scope episode)"
+        schema:
+          type: "string"
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaveSettingsRequest'
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+    get:
+      tags:
+      - "Settings"
+      summary: "Save Settings"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username for which the settings will be saved"
+        required: true
+        schema:
+          type: "string"
+      - name: "scope"
+        in: "path"
+        required: true
+        schema:
+          $ref: "#/components/schemas/SettingsScope"
+      - name: "podcast"
+        in: "query"
+        description: "Feed URL of a podcast (required for scope podcast and episode)"
+        schema:
+          type: "string"
+      - name: "device"
+        in: "query"
+        description: "(required for scope device)"
+        schema:
+          $ref: "#/components/schemas/DeviceId"
+      - name: "episode"
+        in: "query"
+        description: "media URL of the episode (required for scope episode)"
+        schema:
+          type: "string"
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
 components:
   securitySchemes:
     basicAuth:
@@ -845,3 +936,19 @@ components:
             type: "integer"
           total:
             type: "integer"
+    SettingsScope:
+      type: "string"
+      enum:
+      - "account"
+      - "device"
+      - "podcast"
+      - "episode"
+    SaveSettingsRequest:
+      type: "object"
+      properties:
+        set:
+          type: "object"
+        remove:
+          type: "array"
+          items:
+            type: "string"
