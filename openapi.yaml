@@ -680,7 +680,7 @@ paths:
   /api/2/episodes/{username}.json:
     post:
       tags:
-      - "Episode Actions API"
+      - "Episode Actions"
       summary: "Upload Episode Actions"
       parameters:
       - name: "username"
@@ -706,7 +706,7 @@ paths:
                 type: "object"
     get:
       tags:
-      - "Episode Actions API"
+      - "Episode Actions"
       summary: "Get Episode Actions"
       parameters:
       - name: "username"
