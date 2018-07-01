@@ -1,6 +1,6 @@
 {
     "mygpo":  {
-        "baseurl": "http://gpodder.net/"
+        "baseurl": "https://gpodder.net/"
     },
 
     "mygpo-feedservice": {
