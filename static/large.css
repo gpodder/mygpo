@@ -1,0 +1,19 @@
+
+/* Overall Layout */
+
+#wrapper {
+    grid-template-areas:
+        "header header header"
+        "nav    main   side"
+        "footer footer footer";
+    grid-template-columns: 1fr 5fr 2fr;
+    grid-column-gap: 2em;
+}
+
+main.home {
+    padding-left: 20%;
+    width: 60%;
+}
+
+main.home div {
+}

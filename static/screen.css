@@ -5,33 +5,9 @@
 }
 
 
-/* Landscape phones and down */
-@media (min-width: 980px)
-{
-
-#inline_logo
-{
-display: none;
-}
-
-}
-
 /****************
     General
 *****************/
-
-body
-{
-    font-family: 'Source Sans Pro', sans-serif;
-}
-
-#logo
-{
-    position: fixed;
-    left: 20px;
-    top: -2px;
-    z-index: 4000;
-}
 
 body h1
 {
@@ -175,10 +151,6 @@ table.list th.group i
 {
     color: #222;
     hypens: auto;
-    -webkit-hyphens: auto;
-    -moz-hyphens: auto;
-    -ms-hyphens: auto;
-    -o-hyphens: auto;
     text-align: justify;
 }
 
@@ -404,6 +376,12 @@ iframe.results
    Footer
 *******************/
 
+footer nav {
+    padding: 0 20% 0 25%;
+    display: flex;
+    justify-content: space-around;
+}
+
 footer, footer a
 {
     color: #777;
@@ -615,21 +593,4 @@ div.podcasts div.podcast:hover div.actions button.btn
 .centered {
     float: none;
     margin: 0 auto;
-}
-
-.hosting {
-    text-align: center;
-}
-
-.status-success {
-    background-color: hsla(var(--color-status-success), 100%, 75%, 1);
-}
-
-
-.status-error {
-    background-color: hsla(var(--color-status-error), 100%, 75%, 1);
-}
-
-.status-neutral {
-    background-color: hsla(var(--color-status-neutral), 16%, 85%, 1);
 }

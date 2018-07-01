@@ -121,6 +121,10 @@ TEMPLATES = [{
     },
 }]
 
+if DEBUG:
+    loaders = TEMPLATES[0]['OPTIONS']['loaders'][0][1]
+    TEMPLATES[0]['OPTIONS']['loaders'] = loaders
+
 
 MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',

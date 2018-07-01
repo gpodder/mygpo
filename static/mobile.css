@@ -1,0 +1,17 @@
+
+/* Overall Layout */
+
+#wrapper {
+    grid-template-areas:
+        "header"
+        "nav"
+		"main"
+		"side"
+        "footer";
+}
+
+
+nav.secondary ul,
+nav.secondary ul li {
+    display: inline;
+}
