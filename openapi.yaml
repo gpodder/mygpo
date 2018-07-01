@@ -52,6 +52,10 @@ tags:
   externalDocs:
     description: "Find out more"
     url: "https://gpoddernet.readthedocs.io/en/latest/api/reference/settings.html"
+- name: "Podcast Lists"
+  externalDocs:
+    description: "Find out more"
+    url: "https://gpoddernet.readthedocs.io/en/latest/api/reference/podcastlists.html"
 paths:
   /clientconfig.json:
     get:
@@ -828,10 +832,166 @@ paths:
       responses:
         200:
           description: "OK"
+        409:
+          description: "if the the user already has a podcast list with the (generated) name"
+  /api/2/lists/{username}/create.{format}:
+    post:
+      tags:
+      - "Podcast Lists"
+      summary: "Create Podcast List"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username for which a new podcast list should be created"
+        required: true
+        schema:
+          type: "string"
+      - name: "format"
+        in: "path"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Format"
+      - name: "title"
+        in: "query"
+        required: true
+        schema:
+          type: "string"
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "array"
+              items:
+                type: "string"
+      responses:
+        200:
+          description: "OK"
           content:
             application/json:
               schema:
                 type: "object"
+  /api/2/lists/{username}.json:
+    get:
+      tags:
+      - "Podcast Lists"
+      summary: "Get User’s Lists"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username for which a new podcast list should be created"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+        404:
+          description: "the user was not found"
+  /api/2/lists/{username}/list/{listname}.{format}:
+    get:
+      tags:
+      - "Podcast Lists"
+      summary: "Get a Podcast List"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username for which a new podcast list should be created"
+        required: true
+        schema:
+          type: "string"
+      - name: "listname"
+        in: "path"
+        description: "name of the requested podcast list"
+        required: true
+        schema:
+          type: "string"
+      - name: "format"
+        in: "path"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Format"
+      responses:
+        200:
+          description: "the podcast list is returned in in the requested format"
+          content:
+            application/json:
+              schema:
+                type: "object"
+        404:
+          description: "if the user or the list do not exist"
+    put:
+      tags:
+      - "Podcast Lists"
+      summary: "Update a Podcast List"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username to which the list belongs"
+        required: true
+        schema:
+          type: "string"
+      - name: "listname"
+        in: "path"
+        description: "name of the requested podcast list"
+        required: true
+        schema:
+          type: "string"
+      - name: "format"
+        in: "path"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Format"
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "array"
+              items:
+                type: "string"
+      responses:
+        204:
+          description: "if the podcast list has been created / updated"
+        404:
+          description: "if the user or the list do not exist"
+    delete:
+      tags:
+      - "Podcast Lists"
+      summary: "Delete a Podcast List"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username to which the list belongs"
+        required: true
+        schema:
+          type: "string"
+      - name: "listname"
+        in: "path"
+        description: "name of the requested podcast list"
+        required: true
+        schema:
+          type: "string"
+      - name: "format"
+        in: "path"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Format"
+      security:
+        - basicAuth: []
+      responses:
+        204:
+          description: "if the podcast list has been created / updated"
+        404:
+          description: "if the podcast list has been deleted"
 components:
   securitySchemes:
     basicAuth:
