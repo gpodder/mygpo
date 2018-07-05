@@ -1,0 +1,8 @@
+[
+  "mygpo/api/tests.py::AdvancedAPITests::test_episode_actions",
+  "mygpo/api/tests.py::AdvancedAPITests::test_invalid_client_id",
+  "mygpo/api/tests.py::SubscriptionAPITests::test_set_get_subscriptions",
+  "mygpo/api/tests.py::SubscriptionAPITests::test_unauth_request",
+  "mygpo/api/tests.py::DirectoryTest::test_episode_info",
+  "mygpo/api/tests.py::OpenAPIDefinitionValidityTest::test_api_definition_validity"
+]
