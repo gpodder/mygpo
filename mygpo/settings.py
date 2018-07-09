@@ -99,6 +99,9 @@ MEDIA_ROOT = os.getenv(
 
 MEDIA_URL = '/media/'
 
+API_DEFINITION_FILE_NAME = 'openapi.yaml'
+API_DEFINITION_FILE_PATH = os.path.abspath('./mygpo/api')
+API_DEFINITION_FILE_FULL_PATH = API_DEFINITION_FILE_PATH + '/' + API_DEFINITION_FILE_NAME
 
 TEMPLATES = [
     {
