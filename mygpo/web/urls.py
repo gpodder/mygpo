@@ -41,6 +41,10 @@ urlpatterns = [
     path(
         'privacy/',
         TemplateView.as_view(template_name='privacy_policy.html'),
-        name='privacy-policy',
-    ),
+        name='privacy-policy'),
+
+    path('api/',
+        TemplateView.as_view(template_name='openapi.html'),
+        name='openapi'),
+
 ]
