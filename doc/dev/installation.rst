@@ -59,6 +59,12 @@ For a development configuration you will probably want to use the following
     echo postgres://mygpo:mygpo@localhost/mygpo > envs/local/DATABASE_URL
     echo True > envs/local/DEBUG
 
+On an Debian/Ubuntu based system, you can perform this configuration with
+
+.. code-block:: bash
+
+    make dev-config
+
 See :ref:`configuration` for further information.
 
 

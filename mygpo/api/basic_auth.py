@@ -1,4 +1,5 @@
 import base64
+import binascii
 from functools import wraps
 
 from django.http import HttpResponse, HttpResponseBadRequest
@@ -46,7 +47,7 @@ def view_or_basicauth(view, request, test_func, realm = "", *args, **kwargs):
                                     .decode('utf-8')\
                                     .split(':', 1)
 
-            except UnicodeDecodeError as e:
+            except (UnicodeDecodeError, binascii.Error) as e:
                 return HttpResponseBadRequest(
                     'Could not decode credentials: {msg}'.format(msg=str(e)))
 

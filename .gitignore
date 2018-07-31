@@ -28,3 +28,4 @@ envs
 notebooks/
 
 .cache
+.pytest_cache
