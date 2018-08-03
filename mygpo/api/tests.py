@@ -201,14 +201,14 @@ class EpisodeActionTests(TestCase):
             defaults = {
                 'title': 'My Podcast',
             },
-        )
+        ).object
         self.episode = Episode.objects.get_or_create_for_url(
             self.podcast,
             'http://example.com/directory-podcast/1.mp3',
             defaults = {
                 'title': 'My Episode',
             },
-        )
+        ).object
         User = get_user_model()
         self.password = 'asdf'
         self.username = 'adv-api-user'
