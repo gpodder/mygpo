@@ -1,4 +1,4 @@
-FROM python:3
+FROM python:3.6
 MAINTAINER Stefan Kögl <stefan@skoegl.net>
 
 RUN apt-get update && apt-get install -y git make
