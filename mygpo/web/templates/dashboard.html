@@ -54,26 +54,7 @@
 
  {% if random_podcast %}
  {% cache 3600 random_podcast_box %}
-   <div class="well">
-
-   <h4><small>{% trans "Random" %}</small></h4>
-
-
-   <a href="{% podcast_link_target random_podcast %}">
-    <div id="podcastlogo">{{ random_podcast|podcast_logo_medium }}</div>
-   </a>
-
-   <h4>{{ random_podcast.title }}</h4>
-
-   <p class="description">
-    {{ random_podcast.description|default:""|truncatewords:"50" }}
-   </p>
-
-   <p>
-    <a href="{% podcast_link_target random_podcast %}">{% trans "more..." %}</a>
-   </p>
-
-   </div>
+   {% include "components/podcast-box.html" with podcast=random_podcast only %}
  {% endcache %}
  {% endif %}
 
