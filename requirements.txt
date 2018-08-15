@@ -1,4 +1,4 @@
-Django==2.1rc1
+Django==2.1
 Babel==2.6.0
 Pillow==5.2.0
 celery[redis]==4.2.1
