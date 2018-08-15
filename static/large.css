@@ -6,7 +6,7 @@
         "header header header"
         "nav    main   side"
         "footer footer footer";
-    grid-template-columns: 1fr 5fr 2fr;
+    grid-template-columns: 10% auto fit-content(20%);
     grid-column-gap: 2em;
 }
 
@@ -16,4 +16,19 @@ main.home {
 }
 
 main.home div {
+}
+
+
+/* Directory */
+
+.categories {
+    display: grid;
+    grid-gap: 15px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr) ) ;
+}
+
+.categories .ad {
+    /* span the full 2nd row */
+    grid-row: 2;
+    grid-column: 1 / -1;
 }

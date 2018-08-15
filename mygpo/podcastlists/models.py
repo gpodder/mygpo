@@ -74,3 +74,7 @@ class PodcastListEntry(UpdateInfoModel, OrderedModel):
             ('podcastlist', 'order'),
             ('podcastlist', 'content_type', 'object_id'),
         ]
+
+    @property
+    def podcast(self):
+        return self.content_object
