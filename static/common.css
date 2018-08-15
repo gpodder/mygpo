@@ -53,6 +53,7 @@ nav ul {
 
 header {
 	display: flex;
+
 }
 
 header nav ul {
@@ -67,7 +68,12 @@ header nav ul li {
 	padding-right: 1em;
 }
 
+nav ul li.active {
+}
 
+nav ul li.active a {
+    color: black;
+}
 
 
 /* Footer */
