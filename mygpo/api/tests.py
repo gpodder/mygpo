@@ -267,3 +267,28 @@ class EpisodeActionTests(TestCase):
             get_timestamp(timestamps[9]),
             response_obj['timestamp']
         )
+
+
+    def test_no_actions(self):
+        """ Test when there are no actions to return """
+
+        t1 = get_timestamp(datetime.utcnow())
+
+        url = reverse(episodes, kwargs={
+            'version': '2',
+            'username': self.user.username,
+        })
+        response = self.client.get(url, {'since': '0'}, **self.extra)
+        self.assertEqual(response.status_code, 200, response.content)
+        response_obj = json.loads(response.content.decode('utf-8'))
+        actions = response_obj['actions']
+
+        # 10 actions should be returned
+        self.assertEqual(len(actions), 0)
+
+        returned = response_obj['timestamp']
+        t2 = get_timestamp(datetime.utcnow())
+        # the `timestamp` field in the response should be the timestamp of the
+        # last returned action
+        self.assertGreaterEqual(returned, t1)
+        self.assertGreaterEqual(t2, returned)

@@ -171,8 +171,12 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
     if aggregated:
         actions = list(dict( (a['episode'], a) for a in actions ).values())
 
-    timestamp = history[-1].timestamp
-    return {'actions': actions, 'timestamp': get_timestamp(timestamp)}
+    if history:
+        ts = get_timestamp(history[-1].timestamp)
+    else:
+        ts = get_timestamp(until)
+
+    return {'actions': actions, 'timestamp': ts}
 
 
 def episode_action_json(history, user):
