@@ -405,20 +405,14 @@ class TrendingPodcastsView(PodcastListView):
     def get_queryset(self):
         starttime = datetime.utcnow()-timedelta(days=7)
         max_entries = 20
-        subscriptions = Subscription.objects.filter(created__gte=starttime)
 
-        # With the following line this error would be raised:
-        #   annotate() + distinct(fields) is not implemented.
-        #
-        #subscriptions = subscriptions.distinct('podcast', 'user')
-        trending = subscriptions.values('podcast')\
-                                .annotate(users=Count('user'))\
-                                .order_by('-users')
+        podcasts = Podcast.objects.annotate(
+            subscriptions=Sum(Case(
+                When(subscription__created__gte=starttime, then=Value(1)),
+                default=Value(0),
+                output_field=IntegerField())))
 
-        podcast_ids = [entry['podcast'] for entry in trending]
-        podcasts = Podcast.objects.filter(id__in=podcast_ids)
+        trending = podcasts.exclude(subscriptions__lt=1)
+        trending = trending.order_by('-subscriptions')
 
-        # TODO: order by number of recent subscribers?
-        podcasts = podcasts.order_by('-latest_episode_timestamp')
-
-        return podcasts
+        return trending
