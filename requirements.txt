@@ -1,19 +1,19 @@
-Django==2.0.3
-Babel==2.5.3
-Pillow==5.0.0
-celery[redis]==4.1.0
+Django==2.0.8
+Babel==2.6.0
+Pillow==5.2.0
+celery[redis]==4.2.1
 dj-database-url==0.5.0
 django-redis-sessions==0.6.1
 python3-memcached==1.51
 feedparser==5.2.1
-gunicorn==19.7.1
+gunicorn==19.9.0
 html2text==2018.1.9
 markdown2==2.3.5
 oauth2client==4.1.2
-psycopg2cffi==2.7.7
-python-dateutil==2.7.2
+psycopg2cffi==2.8.1
+python-dateutil==2.7.3
 redis==2.10.6
 django-celery-results==1.0.1
 # django-celery-beat > 1.1.0
 git+https://github.com/celery/django-celery-beat.git@feaf34e2c30e28273b03d754d50e9a1d9f1191c6#egg=django-celery-beat
-requests==2.18.4
+requests==2.19.1

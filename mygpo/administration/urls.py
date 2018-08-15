@@ -52,6 +52,10 @@ urlpatterns = [
         views.ActivateUserView.as_view(),
         name='admin-activate-user'),
 
+    path('resend-activation-email',
+        views.ResendActivationEmail.as_view(),
+        name='admin-resend-activation'),
+
     path('make-publisher/input',
         views.MakePublisherInput.as_view(),
         name='admin-make-publisher-input'),

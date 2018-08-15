@@ -138,7 +138,7 @@ def format_podcast_list(obj_list, format, title, get_podcast=None,
         if any(x not in ALLOWED_FUNCNAME for x in jsonp_padding):
             return HttpResponseBadRequest('JSONP padding can only contain the characters %(char)s' % {'char': ALLOWED_FUNCNAME})
 
-        objs = map(json_map, obj_list)
+        objs = list(map(json_map, obj_list))
         return JsonResponse(objs, jsonp_padding=jsonp_padding)
 
     elif format == 'xml':
@@ -175,6 +175,9 @@ def parse_subscription(raw_post_data, format):
         begin = raw_post_data.find('[')
         end = raw_post_data.find(']') + 1
         urls = json.loads(raw_post_data[begin:end])
+
+        if not isinstance(urls, list):
+            raise ValueError('A list of feed URLs was expected')
 
     else:
         return []
