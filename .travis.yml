@@ -18,6 +18,7 @@ before_script:
   - psql -c 'create database mygpo_test;' -U postgres
 
 script:
+  - make check-code-format
   - pytest --cov=mygpo/ --cov-branch
 
 after_script:

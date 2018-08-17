@@ -37,6 +37,9 @@ install-deps:
 format-code:
 	black --py36 --skip-string-normalization mygpo/
 
+check-code-format:
+	black --check --py36 --skip-string-normalization mygpo/
+
 
 .PHONY: all help test clean unittest coverage install-deps format-code
 

@@ -3,3 +3,4 @@ django-coverage-plugin==1.5.0
 pytest-django
 pytest-cov
 responses==0.9.0
+black
