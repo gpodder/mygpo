@@ -14,6 +14,7 @@ from mygpo.api.basic_auth import require_valid_user, check_username
 
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -22,7 +23,6 @@ class RequestException(Exception):
 
 
 class APIView(View):
-
     @method_decorator(csrf_exempt)
     @method_decorator(require_valid_user)
     @method_decorator(check_username)
@@ -51,8 +51,8 @@ class APIView(View):
             return parse_request_body(request)
         except (UnicodeDecodeError, ValueError) as e:
             msg = 'Could not decode request body for user {}: {}'.format(
-                request.user.username,
-                request.body.decode('ascii', errors='replace'))
+                request.user.username, request.body.decode('ascii', errors='replace')
+            )
             logger.warn(msg, exc_info=True)
             raise RequestException(msg)
 

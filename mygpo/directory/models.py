@@ -11,8 +11,9 @@ class ExamplePodcastsManager(models.Manager):
 
     def get_podcasts(self):
         """ The example podcasts """
-        return Podcast.objects.filter(examplepodcast__isnull=False)\
-                              .order_by('examplepodcast__order')
+        return Podcast.objects.filter(examplepodcast__isnull=False).order_by(
+            'examplepodcast__order'
+        )
 
 
 class ExamplePodcast(UpdateInfoModel, OrderedModel):
@@ -23,6 +24,4 @@ class ExamplePodcast(UpdateInfoModel, OrderedModel):
     objects = ExamplePodcastsManager()
 
     class Meta(OrderedModel.Meta):
-        unique_together = [
-            ('order', )
-        ]
+        unique_together = [('order',)]

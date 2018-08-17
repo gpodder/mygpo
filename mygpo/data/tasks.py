@@ -10,6 +10,7 @@ from mygpo.celery import celery
 from mygpo.podcasts.models import Podcast
 
 from celery.utils.log import get_task_logger
+
 logger = get_task_logger(__name__)
 
 
@@ -17,6 +18,7 @@ logger = get_task_logger(__name__)
 def update_podcasts(podcast_urls):
     """ Task to update a podcast """
     from mygpo.data.feeddownloader import update_podcasts as update
+
     podcasts = update(podcast_urls)
     podcasts = filter(None, podcasts)
     return [podcast.pk for podcast in podcasts]
@@ -35,8 +37,7 @@ def update_related_podcasts(podcast_pk, max_related=20):
         try:
             podcast.related_podcasts.add(p)
         except IntegrityError:
-            logger.warn('Integrity error while adding related podcast',
-                        exc_info=True)
+            logger.warn('Integrity error while adding related podcast', exc_info=True)
 
 
 # interval in which podcast updates are scheduled
@@ -52,10 +53,12 @@ def schedule_updates(interval=UPDATE_INTERVAL):
     max_updates = UPDATE_INTERVAL.total_seconds() / 20
 
     # fetch podcasts for which an update is due within the next hour
-    podcasts = Podcast.objects.all()\
-                              .next_update_between(now, now+interval)\
-                              .prefetch_related('urls')\
-                              .only('pk')[:max_updates]
+    podcasts = (
+        Podcast.objects.all()
+        .next_update_between(now, now + interval)
+        .prefetch_related('urls')
+        .only('pk')[:max_updates]
+    )
 
     _schedule_updates(podcasts)
 
@@ -80,5 +83,4 @@ def _schedule_updates(podcasts):
         # update_podcasts.delay() seems to block other task execution,
         # therefore celery.send_task() is used instead
         urls = [podcast.url]
-        celery.send_task('mygpo.data.tasks.update_podcasts',
-                         args=[urls])
+        celery.send_task('mygpo.data.tasks.update_podcasts', args=[urls])

@@ -17,8 +17,9 @@ def favorite_feed(request, username):
 
     feed = FavoriteFeed(user)
 
-    return render(request, 'userfeed.xml', {
-        'site': site,
-        'feed_user': user,
-        'feed': feed,
-        }, content_type='text/xml')
+    return render(
+        request,
+        'userfeed.xml',
+        {'site': site, 'feed_user': user, 'feed': feed},
+        content_type='text/xml',
+    )

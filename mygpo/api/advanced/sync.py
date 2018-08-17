@@ -41,7 +41,6 @@ def main(request, username):
         return JsonResponse(get_sync_status(user))
 
 
-
 def get_sync_status(user):
     """ Returns the current Device Sync status """
 
@@ -58,11 +57,7 @@ def get_sync_status(user):
         else:
             unsynced = uids
 
-    return {
-        'synchronized': sync_groups,
-        'not-synchronized': unsynced
-    }
-
+    return {'synchronized': sync_groups, 'not-synchronized': unsynced}
 
 
 def update_sync_status(user, synclist, stopsync):
@@ -84,7 +79,6 @@ def update_sync_status(user, synclist, stopsync):
         for other_uid in devlist[1:]:
             other = user.get_device_by_uid(other_uid)
             dev.sync_with(other)
-
 
     for uid in stopsync:
         dev = user.get_device_by_uid(uid)

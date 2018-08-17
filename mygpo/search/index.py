@@ -15,6 +15,7 @@ from django.contrib.postgres.search import SearchQuery, SearchRank
 from django.conf import settings
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -28,19 +29,19 @@ def search_podcasts(query):
 
     query = SearchQuery(query)
 
-    results = Podcast.objects\
-    .annotate(
-        rank=SearchRank(F('search_vector'), query)
-    )\
-    .annotate(
-        order=ExpressionWrapper(
-            F('rank') * F('subscribers'),
-            output_field=FloatField())
-    )\
-    .filter(rank__gte=SEARCH_CUTOFF)\
-    .order_by('-order')
+    results = (
+        Podcast.objects.annotate(rank=SearchRank(F('search_vector'), query))
+        .annotate(
+            order=ExpressionWrapper(
+                F('rank') * F('subscribers'), output_field=FloatField()
+            )
+        )
+        .filter(rank__gte=SEARCH_CUTOFF)
+        .order_by('-order')
+    )
 
-    logger.debug('Found {count} podcasts for "{query}"', count=len(results),
-                 query=query)
+    logger.debug(
+        'Found {count} podcasts for "{query}"', count=len(results), query=query
+    )
 
     return results

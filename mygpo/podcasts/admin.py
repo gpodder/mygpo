@@ -4,8 +4,15 @@ from django.utils.html import format_html
 from django.utils.translation import ugettext as _
 from django.contrib import admin
 from django.contrib.contenttypes.admin import GenericTabularInline
-from mygpo.podcasts.models import (Podcast, Episode, URL, Slug, Tag,
-    MergedUUID, PodcastGroup)
+from mygpo.podcasts.models import (
+    Podcast,
+    Episode,
+    URL,
+    Slug,
+    Tag,
+    MergedUUID,
+    PodcastGroup,
+)
 from mygpo.utils import edit_link
 
 
@@ -36,14 +43,14 @@ class GenericAdminLinkInline(AdminLinkMixin, GenericTabularInline):
 class URLAdmin(admin.ModelAdmin):
     model = URL
     list_display = ('url', 'content_type', 'object_id')
-    list_filter = ('content_type', )
+    list_filter = ('content_type',)
 
     show_full_result_count = False
 
 
 class URLInline(GenericAdminLinkInline):
     model = URL
-    fields = ('order', 'url', 'admin_link', )
+    fields = ('order', 'url', 'admin_link')
 
 
 class SlugInline(GenericTabularInline):
@@ -53,7 +60,7 @@ class SlugInline(GenericTabularInline):
 class TagInline(GenericTabularInline):
     model = Tag
 
-    raw_id_fields = ('user', )
+    raw_id_fields = ('user',)
 
 
 class MergedUUIDInline(GenericTabularInline):
@@ -65,7 +72,7 @@ class PodcastInline(AdminLinkInline):
 
     fields = ('id', 'title', 'group_member_name', 'admin_link')
 
-    readonly_fields = ('id', ) + AdminLinkInline.readonly_fields
+    readonly_fields = ('id',) + AdminLinkInline.readonly_fields
 
     can_delete = False
 
@@ -79,48 +86,69 @@ class PodcastAdmin(admin.ModelAdmin):
     """ Admin page for podcasts """
 
     # configuration for the list view
-    list_display = ('title', 'main_url', )
+    list_display = ('title', 'main_url')
 
-    list_filter = ('language', )
-    search_fields = ('title', 'twitter', '^urls__url', )
+    list_filter = ('language',)
+    search_fields = ('title', 'twitter', '^urls__url')
 
     # configuration for the create / edit view
     fieldsets = (
-        (None, {
-            'fields': ('id', 'title', 'subtitle', 'description', 'link',
-                       'language')
-        }),
-        ('Additional information', {
-            'fields': ('created', 'license', 'flattr_url', 'author', 'twitter',
-                       'related_podcasts', )
-        }),
-        ('Podcast Group', {
-            'fields': ('group', 'group_member_name',)
-        }),
-        ('Episodes', {
-            'fields': ('common_episode_title', 'latest_episode_timestamp',
-                       'content_types', 'max_episode_order', 'episode_count', )
-        }),
-        ('Feed updates', {
-            'fields': ('outdated', 'new_location', 'last_update',
-                       'search_index_uptodate', 'search_vector', )
-        }),
-        ('Admin', {
-            'fields': ('restrictions', 'hub', )
-        }),
+        (
+            None,
+            {'fields': ('id', 'title', 'subtitle', 'description', 'link', 'language')},
+        ),
+        (
+            'Additional information',
+            {
+                'fields': (
+                    'created',
+                    'license',
+                    'flattr_url',
+                    'author',
+                    'twitter',
+                    'related_podcasts',
+                )
+            },
+        ),
+        ('Podcast Group', {'fields': ('group', 'group_member_name')}),
+        (
+            'Episodes',
+            {
+                'fields': (
+                    'common_episode_title',
+                    'latest_episode_timestamp',
+                    'content_types',
+                    'max_episode_order',
+                    'episode_count',
+                )
+            },
+        ),
+        (
+            'Feed updates',
+            {
+                'fields': (
+                    'outdated',
+                    'new_location',
+                    'last_update',
+                    'search_index_uptodate',
+                    'search_vector',
+                )
+            },
+        ),
+        ('Admin', {'fields': ('restrictions', 'hub')}),
     )
 
-    inlines = [
-        URLInline,
-        SlugInline,
-        TagInline,
-        MergedUUIDInline,
-    ]
+    inlines = [URLInline, SlugInline, TagInline, MergedUUIDInline]
 
-    raw_id_fields = ('related_podcasts', )
+    raw_id_fields = ('related_podcasts',)
 
-    readonly_fields = ('id', 'created', 'last_update',
-                       'search_index_uptodate', 'search_vector', )
+    readonly_fields = (
+        'id',
+        'created',
+        'last_update',
+        'search_index_uptodate',
+        'search_vector',
+    )
 
     show_full_result_count = False
 
@@ -137,38 +165,55 @@ class EpisodeAdmin(admin.ModelAdmin):
     """ Admin page for episodes """
 
     # configuration for the list view
-    list_display = ('title', 'podcast_title', 'main_url', )
+    list_display = ('title', 'podcast_title', 'main_url')
 
-    list_filter = ('language', )
+    list_filter = ('language',)
     search_fields = ('title', '^urls__url')
 
     # configuration for the create / edit view
     fieldsets = (
-        (None, {
-            'fields': ('id', 'title', 'subtitle', 'description', 'link',
-                       'language', 'guid', 'released', 'podcast', 'order', )
-        }),
-        ('Additional information', {
-            'fields': ('created', 'license', 'flattr_url', 'author', 'content',
-                       'listeners', )
-        }),
-        ('Media file', {
-            'fields': ('duration', 'filesize', 'content_types', 'mimetypes', )
-        }),
-        ('Feed updates', {
-            'fields': ('outdated', 'last_update', )
-        }),
+        (
+            None,
+            {
+                'fields': (
+                    'id',
+                    'title',
+                    'subtitle',
+                    'description',
+                    'link',
+                    'language',
+                    'guid',
+                    'released',
+                    'podcast',
+                    'order',
+                )
+            },
+        ),
+        (
+            'Additional information',
+            {
+                'fields': (
+                    'created',
+                    'license',
+                    'flattr_url',
+                    'author',
+                    'content',
+                    'listeners',
+                )
+            },
+        ),
+        (
+            'Media file',
+            {'fields': ('duration', 'filesize', 'content_types', 'mimetypes')},
+        ),
+        ('Feed updates', {'fields': ('outdated', 'last_update')}),
     )
 
-    inlines = [
-        URLInline,
-        SlugInline,
-        MergedUUIDInline,
-    ]
+    inlines = [URLInline, SlugInline, MergedUUIDInline]
 
-    raw_id_fields = ('podcast', )
+    raw_id_fields = ('podcast',)
 
-    readonly_fields = ('id', 'created', 'last_update', )
+    readonly_fields = ('id', 'created', 'last_update')
 
     show_full_result_count = False
 
@@ -184,13 +229,11 @@ class PodcastGroupAdmin(admin.ModelAdmin):
     """ Admin page for podcast groups """
 
     # configuration for the list view
-    list_display = ('title', )
+    list_display = ('title',)
 
-    search_fields = ('title', )
+    search_fields = ('title',)
 
-    inlines = [
-        PodcastInline,
-    ]
+    inlines = [PodcastInline]
 
     show_full_result_count = False
 
@@ -199,8 +242,8 @@ class PodcastGroupAdmin(admin.ModelAdmin):
 class TagAdmin(admin.ModelAdmin):
     """ Admin page for tags """
 
-    list_display = ('tag', 'content_object', 'source', 'user', )
+    list_display = ('tag', 'content_object', 'source', 'user')
 
-    list_filter = ('source', )
+    list_filter = ('source',)
 
     show_full_result_count = False

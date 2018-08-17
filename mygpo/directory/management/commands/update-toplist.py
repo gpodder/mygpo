@@ -11,8 +11,13 @@ class Command(BaseCommand):
     """ For each podcast a task is scheduled to update its subscriber count """
 
     def add_arguments(self, parser):
-        parser.add_argument('--silent', action='store_true', dest='silent',
-            default=False, help="Don't show any output"),
+        parser.add_argument(
+            '--silent',
+            action='store_true',
+            dest='silent',
+            default=False,
+            help="Don't show any output",
+        ),
 
     def handle(self, *args, **options):
 

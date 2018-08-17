@@ -6,9 +6,7 @@ from django.db import models, migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('podcasts', '0015_auto_20140616_1105'),
-    ]
+    dependencies = [('podcasts', '0015_auto_20140616_1105')]
 
     operations = [
         migrations.AddField(
@@ -16,5 +14,5 @@ class Migration(migrations.Migration):
             name='subscribers',
             field=models.PositiveIntegerField(default=0),
             preserve_default=True,
-        ),
+        )
     ]

@@ -6,9 +6,7 @@ from django.db import models, migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('podcastlists', '0001_initial'),
-    ]
+    dependencies = [('podcastlists', '0001_initial')]
 
     operations = [
         migrations.AlterField(

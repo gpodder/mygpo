@@ -6,27 +6,33 @@ from django.db import models, migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('history', '0002_pluralname'),
-    ]
+    dependencies = [('history', '0002_pluralname')]
 
     operations = [
         migrations.AlterModelOptions(
             name='historyentry',
-            options={'ordering': ['-timestamp'], 'verbose_name_plural': 'History Entries'},
+            options={
+                'ordering': ['-timestamp'],
+                'verbose_name_plural': 'History Entries',
+            },
         ),
         migrations.AlterField(
             model_name='historyentry',
             name='action',
-            field=models.CharField(max_length=11, choices=[('subscribe', 'subscribed'), ('unsubscribe', 'unsubscribed'), ('flattr', "flattr'd")]),
+            field=models.CharField(
+                max_length=11,
+                choices=[
+                    ('subscribe', 'subscribed'),
+                    ('unsubscribe', 'unsubscribed'),
+                    ('flattr', "flattr'd"),
+                ],
+            ),
         ),
         migrations.AlterField(
             model_name='historyentry',
             name='client',
             field=models.ForeignKey(
-                to='users.Client',
-                null=True,
-                on_delete=models.CASCADE,
+                to='users.Client', null=True, on_delete=models.CASCADE
             ),
         ),
     ]

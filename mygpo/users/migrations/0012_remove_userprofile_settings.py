@@ -11,9 +11,4 @@ class Migration(migrations.Migration):
         ('usersettings', '0002_move_existing'),
     ]
 
-    operations = [
-        migrations.RemoveField(
-            model_name='userprofile',
-            name='settings',
-        ),
-    ]
+    operations = [migrations.RemoveField(model_name='userprofile', name='settings')]

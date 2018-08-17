@@ -6,18 +6,24 @@
 import re
 import urllib.request, urllib.parse, urllib.error
 
+
 def is_video_link(url):
-    return (get_youtube_id(url) is not None)
+    return get_youtube_id(url) is not None
+
 
 def get_youtube_id(url):
     if url is None:
         return None
 
-    r = re.compile('http://(?:[a-z]+\.)?youtube\.com/v/(.*)\.swf', re.IGNORECASE).match(url)
+    r = re.compile('http://(?:[a-z]+\.)?youtube\.com/v/(.*)\.swf', re.IGNORECASE).match(
+        url
+    )
     if r is not None:
         return r.group(1)
 
-    r = re.compile('http://(?:[a-z]+\.)?youtube\.com/watch\?v=([^&]*)', re.IGNORECASE).match(url)
+    r = re.compile(
+        'http://(?:[a-z]+\.)?youtube\.com/watch\?v=([^&]*)', re.IGNORECASE
+    ).match(url)
     if r is not None:
         return r.group(1)
 
@@ -25,8 +31,14 @@ def get_youtube_id(url):
 
 
 def get_real_cover(url):
-    rs = [re.compile('http://www\\.youtube\\.com/rss/user/([^/]+)/videos\\.rss',  re.IGNORECASE),
-          re.compile('http://www\\.youtube\\.com/profile_videos\\?user=([^\&]+)', re.IGNORECASE)]
+    rs = [
+        re.compile(
+            'http://www\\.youtube\\.com/rss/user/([^/]+)/videos\\.rss', re.IGNORECASE
+        ),
+        re.compile(
+            'http://www\\.youtube\\.com/profile_videos\\?user=([^\&]+)', re.IGNORECASE
+        ),
+    ]
 
     for r in rs:
         m = r.match(url)

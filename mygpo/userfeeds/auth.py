@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 
 #############################################################################
 #
-def view_or_basicauth(view, request, username, token_name, realm = "", *args, **kwargs):
+def view_or_basicauth(view, request, username, token_name, realm="", *args, **kwargs):
 
     User = get_user_model()
     user = get_object_or_404(User, username=username)
@@ -28,7 +28,6 @@ def view_or_basicauth(view, request, username, token_name, realm = "", *args, **
 
     else:
         return auth_request()
-
 
     auth = auth.split(None, 1)
 
@@ -65,15 +64,12 @@ def auth_request(realm=''):
 #
 def require_token_auth(token_name):
     def wrapper(protected_view):
-
         @wraps(protected_view)
         def tmp(request, username, *args, **kwargs):
-            return view_or_basicauth(protected_view, \
-                                     request, \
-                                     username, \
-                                     token_name, \
-                                     '', \
-                                     *args, \
-                                     **kwargs)
+            return view_or_basicauth(
+                protected_view, request, username, token_name, '', *args, **kwargs
+            )
+
         return tmp
+
     return wrapper

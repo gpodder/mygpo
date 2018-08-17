@@ -38,9 +38,9 @@ def tag_podcasts(request, tag, count):
         return JsonResponse([])
 
     domain = RequestSite(request).domain
-    entries = category.entries.all()\
-                               .prefetch_related('podcast', 'podcast__slugs',
-                                                 'podcast__urls')[:count]
+    entries = category.entries.all().prefetch_related(
+        'podcast', 'podcast__slugs', 'podcast__urls'
+    )[:count]
     resp = [podcast_data(entry.podcast, domain) for entry in entries]
     return JsonResponse(resp)
 
@@ -74,8 +74,9 @@ def episode_info(request):
         raise Http404
 
     try:
-        query = Episode.objects.filter(podcast__urls__url=podcast_url,
-                                       urls__url=episode_url)
+        query = Episode.objects.filter(
+            podcast__urls__url=podcast_url, urls__url=episode_url
+        )
         episode = query.select_related('podcast').get()
     except Episode.DoesNotExist:
         raise Http404
@@ -112,7 +113,8 @@ def podcast_data(obj, domain, scaled_logo_size=64):
         "scaled_logo_url": 'http://%s%s' % (domain, scaled_logo_url),
         "website": podcast.link,
         "mygpo_link": 'http://%s%s' % (domain, get_podcast_link_target(podcast)),
-        }
+    }
+
 
 def episode_data(episode, domain, podcast=None):
 
@@ -125,9 +127,11 @@ def episode_data(episode, domain, podcast=None):
         "podcast_url": podcast.url if podcast else '',
         "description": episode.description,
         "website": episode.link,
-        "mygpo_link": 'http://%(domain)s%(res)s' % dict(domain=domain,
-            res=get_episode_link_target(episode, podcast)) if podcast else ''
-        }
+        "mygpo_link": 'http://%(domain)s%(res)s'
+        % dict(domain=domain, res=get_episode_link_target(episode, podcast))
+        if podcast
+        else '',
+    }
 
     if episode.released:
         data['released'] = episode.released.strftime('%Y-%m-%dT%H:%M:%S')
@@ -137,7 +141,5 @@ def episode_data(episode, domain, podcast=None):
 
 def category_data(category):
     return dict(
-        title = category.clean_title,
-        tag   = category.tag,
-        usage = category.num_entries,
+        title=category.clean_title, tag=category.tag, usage=category.num_entries
     )

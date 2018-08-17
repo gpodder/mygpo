@@ -18,6 +18,7 @@ from mygpo.web.logo import CoverArt, get_logo_url
 from mygpo.test import create_auth_string, anon_request
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -31,7 +32,6 @@ IMG_PATH2 = os.path.abspath(
 
 
 class SimpleWebTests(TestCase):
-
     @classmethod
     def setUpClass(self):
         User = get_user_model()
@@ -63,17 +63,19 @@ class SimpleWebTests(TestCase):
             'device-create',
             'login',
             'logout',
-            'home']
+            'home',
+        ]
 
         self.access_pages(pages, [], True)
 
     def test_access_podcast_pages(self):
-        pages = ['podcast', ]
+        pages = ['podcast']
 
     def access_pages(self, pages, args, login):
         if login:
-            self.client.post('/login/', dict(
-                login_username=self.user.username, pwd='pwd'))
+            self.client.post(
+                '/login/', dict(login_username=self.user.username, pwd='pwd')
+            )
 
         for page in pages:
             response = self.client.get(reverse(page, args=args), follow=True)
@@ -85,30 +87,26 @@ class PodcastPageTests(TestCase):
 
     def setUp(self):
         # create a podcast and some episodes
-        podcast = Podcast.objects.create(id=uuid.uuid1(),
-                                         title='My Podcast',
-                                         max_episode_order=1,
-                                         )
+        podcast = Podcast.objects.create(
+            id=uuid.uuid1(), title='My Podcast', max_episode_order=1
+        )
         for n in range(20):
             episode = Episode.objects.get_or_create_for_url(
-                podcast,
-                'http://www.example.com/episode%d.mp3' % (n, ),
+                podcast, 'http://www.example.com/episode%d.mp3' % (n,)
             ).object
 
             # we only need (the last) one
-            self.episode_slug = Slug.objects.create(content_object=episode,
-                                                    order=0,
-                                                    scope=podcast.as_scope,
-                                                    slug=str(n),
-                                                    )
+            self.episode_slug = Slug.objects.create(
+                content_object=episode, order=0, scope=podcast.as_scope, slug=str(n)
+            )
 
-        self.podcast_slug = Slug.objects.create(content_object=podcast,
-                                                order=n, scope=podcast.scope,
-                                                slug='podcast')
+        self.podcast_slug = Slug.objects.create(
+            content_object=podcast, order=n, scope=podcast.scope, slug='podcast'
+        )
 
     def test_podcast_queries(self):
         """ Test that the expected number of queries is executed """
-        url = reverse('podcast-slug', args=(self.podcast_slug.slug, ))
+        url = reverse('podcast-slug', args=(self.podcast_slug.slug,))
         # the number of queries must be independent of the number of episodes
 
         with self.assertNumQueries(5):
@@ -116,34 +114,31 @@ class PodcastPageTests(TestCase):
 
     def test_episode_queries(self):
         """ Test that the expected number of queries is executed """
-        url = reverse('episode-slug', args=(self.podcast_slug.slug,
-                                            self.episode_slug.slug))
+        url = reverse(
+            'episode-slug', args=(self.podcast_slug.slug, self.episode_slug.slug)
+        )
 
         with self.assertNumQueries(5):
             anon_request(url)
 
 
 class PodcastLogoTests(TestCase):
-
     def setUp(self):
         # create a podcast
         self.URL = 'http://example.com/{}.png'.format(uuid.uuid1().hex)
-        self.podcast = Podcast.objects.create(id=uuid.uuid1(),
-                                              title='My Podcast',
-                                              max_episode_order=1,
-                                              logo_url=self.URL,
-                                              )
+        self.podcast = Podcast.objects.create(
+            id=uuid.uuid1(), title='My Podcast', max_episode_order=1, logo_url=self.URL
+        )
         self.client = Client()
-
 
     def tearDown(self):
         self.podcast.delete()
 
     def _save_logo(self):
-        with responses.RequestsMock() as rsps, \
-             open(IMG_PATH1, 'rb') as body:
-            rsps.add(responses.GET, self.URL, status=200,
-                     body=body, content_type='image/png')
+        with responses.RequestsMock() as rsps, open(IMG_PATH1, 'rb') as body:
+            rsps.add(
+                responses.GET, self.URL, status=200, body=body, content_type='image/png'
+            )
 
             CoverArt.save_podcast_logo(self.URL)
 
@@ -159,7 +154,6 @@ class PodcastLogoTests(TestCase):
         response = self.client.get(redir)
         self.assertEqual(200, response.status_code)
         return response
-
 
     def test_save_logo(self):
         self._save_logo()
@@ -195,29 +189,30 @@ class PodcastLogoTests(TestCase):
         try:
             CoverArt.save_podcast_logo(None)
         except:
-            self.fail('CoverArt.save_podcast_logo(None) should not raise '
-                      'an exception')
+            self.fail(
+                'CoverArt.save_podcast_logo(None) should not raise ' 'an exception'
+            )
 
     def test_exception_during_fetch(self):
         with responses.RequestsMock() as rsps:
-            rsps.add(responses.GET, self.URL,
-                     body=requests.exceptions.RequestException(
-                         'Fetching URL failed'))
+            rsps.add(
+                responses.GET,
+                self.URL,
+                body=requests.exceptions.RequestException('Fetching URL failed'),
+            )
 
             CoverArt.save_podcast_logo(self.URL)
 
     def test_error_open_file(self):
-
         class ErrFileSystemStorage(FileSystemStorage):
             def open(*args, **kwargs):
                 raise IOError
 
         self._save_logo()
         from mygpo.web import logo
+
         _logo_storage = logo.LOGO_STORAGE
-        logo.LOGO_STORAGE = ErrFileSystemStorage(
-            location=settings.MEDIA_ROOT,
-        )
+        logo.LOGO_STORAGE = ErrFileSystemStorage(location=settings.MEDIA_ROOT)
 
         logo_url = get_logo_url(self.podcast, 32)
 
@@ -227,16 +222,30 @@ class PodcastLogoTests(TestCase):
         logo.LOGO_STORAGE = _logo_storage
 
     def test_new_logo(self):
-        with responses.RequestsMock() as rsps, \
-             open(IMG_PATH1, 'rb') as body1, \
-             open(IMG_PATH1, 'rb') as body2, \
-             open(IMG_PATH2, 'rb') as body3:
-            rsps.add(responses.GET, self.URL, status=200,
-                     body=body1, content_type='image/png')
-            rsps.add(responses.GET, self.URL, status=200,
-                     body=body2, content_type='image/png')
-            rsps.add(responses.GET, self.URL, status=200,
-                     body=body3, content_type='image/png')
+        with responses.RequestsMock() as rsps, open(IMG_PATH1, 'rb') as body1, open(
+            IMG_PATH1, 'rb'
+        ) as body2, open(IMG_PATH2, 'rb') as body3:
+            rsps.add(
+                responses.GET,
+                self.URL,
+                status=200,
+                body=body1,
+                content_type='image/png',
+            )
+            rsps.add(
+                responses.GET,
+                self.URL,
+                status=200,
+                body=body2,
+                content_type='image/png',
+            )
+            rsps.add(
+                responses.GET,
+                self.URL,
+                status=200,
+                body=body3,
+                content_type='image/png',
+            )
 
             logo_url = get_logo_url(self.podcast, 32)
 
@@ -248,12 +257,14 @@ class PodcastLogoTests(TestCase):
             CoverArt.save_podcast_logo(self.URL)
             response2 = self._fetch_cover(self.podcast)
 
-            self.assertEqual(list(response1.streaming_content),
-                             list(response2.streaming_content))
+            self.assertEqual(
+                list(response1.streaming_content), list(response2.streaming_content)
+            )
 
             # changed
             CoverArt.save_podcast_logo(self.URL)
             response3 = self._fetch_cover(self.podcast)
 
-            self.assertNotEqual(list(response2.streaming_content),
-                                list(response3.streaming_content))
+            self.assertNotEqual(
+                list(response2.streaming_content), list(response3.streaming_content)
+            )

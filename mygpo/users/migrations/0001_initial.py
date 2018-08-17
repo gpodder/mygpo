@@ -7,42 +7,38 @@ from django.conf import settings
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('auth', '__first__'),
-    ]
+    dependencies = [('auth', '__first__')]
 
     operations = [
         migrations.CreateModel(
             name='UserProfile',
             fields=[
-                ('id', models.AutoField(
-                    verbose_name='ID',
-                    serialize=False,
-                    auto_created=True,
-                    primary_key=True)),
+                (
+                    'id',
+                    models.AutoField(
+                        verbose_name='ID',
+                        serialize=False,
+                        auto_created=True,
+                        primary_key=True,
+                    ),
+                ),
                 ('twitter', models.CharField(max_length=15, null=True)),
                 ('suggestions_up_to_date', models.BooleanField(default=False)),
                 ('about', models.TextField(blank=True)),
                 ('google_email', models.CharField(max_length=100, null=True)),
-                ('subscriptions_token', models.CharField(
-                    max_length=32,
-                    null=True)),
-                ('favorite_feeds_token', models.CharField(
-                    max_length=32,
-                    null=True)),
-                ('publisher_update_token', models.CharField(
-                    max_length=32,
-                    null=True)),
+                ('subscriptions_token', models.CharField(max_length=32, null=True)),
+                ('favorite_feeds_token', models.CharField(max_length=32, null=True)),
+                ('publisher_update_token', models.CharField(max_length=32, null=True)),
                 ('userpage_token', models.CharField(max_length=32, null=True)),
-                ('user', models.OneToOneField(
-                    to=settings.AUTH_USER_MODEL,
-                    on_delete=models.CASCADE,
-                )),
+                (
+                    'user',
+                    models.OneToOneField(
+                        to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+                    ),
+                ),
                 ('uuid', models.UUIDField(unique=True, max_length=32)),
             ],
-            options={
-                'abstract': False,
-            },
+            options={'abstract': False},
             bases=(models.Model,),
-        ),
+        )
     ]

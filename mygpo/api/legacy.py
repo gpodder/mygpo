@@ -14,30 +14,31 @@ from mygpo.utils import normalize_feed_url
 from mygpo.subscriptions import subscribe, unsubscribe
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 
 LEGACY_DEVICE_NAME = 'Legacy Device'
-LEGACY_DEVICE_UID  = 'legacy'
+LEGACY_DEVICE_UID = 'legacy'
+
 
 @never_cache
 @csrf_exempt
 def upload(request):
     try:
         emailaddr = request.POST['username']
-        password  = request.POST['password']
-        action    = request.POST['action']
-        protocol  = request.POST['protocol']
-        opml      = request.FILES['opml'].read()
+        password = request.POST['password']
+        action = request.POST['action']
+        protocol = request.POST['protocol']
+        opml = request.FILES['opml'].read()
     except MultiValueDictKeyError:
         return HttpResponse("@PROTOERROR", content_type='text/plain')
 
     user = auth(emailaddr, password)
-    if (not user):
+    if not user:
         return HttpResponse('@AUTHFAIL', content_type='text/plain')
 
-    dev = get_device(user, LEGACY_DEVICE_UID,
-            request.META.get('HTTP_USER_AGENT', ''))
+    dev = get_device(user, LEGACY_DEVICE_UID, request.META.get('HTTP_USER_AGENT', ''))
 
     existing_urls = [x.url for x in dev.get_subscribed_podcasts()]
 
@@ -50,7 +51,7 @@ def upload(request):
     new = [u for u in podcast_urls if u not in existing_urls]
     rem = [u for u in existing_urls if u not in podcast_urls]
 
-    #remove duplicates
+    # remove duplicates
     new = list(set(new))
     rem = list(set(rem))
 
@@ -64,6 +65,7 @@ def upload(request):
 
     return HttpResponse('@SUCCESS', content_type='text/plain')
 
+
 @never_cache
 @csrf_exempt
 def getlist(request):
@@ -74,9 +76,9 @@ def getlist(request):
     if user is None:
         return HttpResponse('@AUTHFAIL', content_type='text/plain')
 
-    dev = get_device(user, LEGACY_DEVICE_UID,
-            request.META.get('HTTP_USER_AGENT', ''),
-            undelete=True)
+    dev = get_device(
+        user, LEGACY_DEVICE_UID, request.META.get('HTTP_USER_AGENT', ''), undelete=True
+    )
     podcasts = dev.get_subscribed_podcasts()
 
     title = "{username}'s subscriptions".format(username=user.username)

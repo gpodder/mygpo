@@ -13,12 +13,12 @@ class HubSubscriptionAdmin(admin.ModelAdmin):
     list_display = ('podcast', 'hub_url', 'mode', 'verified')
 
     # fetch the related objects for the fields in list_display
-    list_select_related = ('podcast', )
+    list_select_related = ('podcast',)
 
-    raw_id_fields = ('podcast', )
+    raw_id_fields = ('podcast',)
 
-    list_filter = ('mode', 'verified', )
+    list_filter = ('mode', 'verified')
 
-    search_fields = ('topic_url', 'podcast__title', 'hub_url', )
+    search_fields = ('topic_url', 'podcast__title', 'hub_url')
 
     show_full_result_count = False

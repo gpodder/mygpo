@@ -9,6 +9,7 @@ from mygpo.users.settings import PUBLIC_SUB_PODCAST
 from mygpo.podcasts.models import Podcast
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -18,8 +19,7 @@ class UserSettingsManager(models.Manager):
     def get_private_podcasts(self, user):
         """ Returns the podcasts that the user has marked as private """
         settings = self.filter(
-            user=user,
-            content_type=ContentType.objects.get_for_model(Podcast),
+            user=user, content_type=ContentType.objects.get_for_model(Podcast)
         )
 
         private = []
@@ -42,18 +42,14 @@ class UserSettingsManager(models.Manager):
 
         try:
             return UserSettings.objects.get(
-                user=user,
-                content_type=content_type,
-                object_id=object_id,
+                user=user, content_type=content_type, object_id=object_id
             )
 
         except UserSettings.DoesNotExist:
             # if it does not exist, return a new instance. It is up to the
             # caller to save the object if required
             return UserSettings(
-                user=user,
-                content_type=content_type,
-                object_id=object_id,
+                user=user, content_type=content_type, object_id=object_id
             )
 
 
@@ -61,15 +57,11 @@ class UserSettings(models.Model):
     """ Stores settings for a podcast, episode, user or client """
 
     # the user for which the config is stored
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
     content_type = models.ForeignKey(
-        ContentType,
-        null=True,
-        blank=True,
-        on_delete=models.PROTECT,
+        ContentType, null=True, blank=True, on_delete=models.PROTECT
     )
     object_id = models.UUIDField(null=True, blank=True)
     content_object = GenericForeignKey('content_type', 'object_id')
@@ -77,9 +69,7 @@ class UserSettings(models.Model):
     settings = models.TextField(null=False, default='{}')
 
     class Meta:
-        unique_together = [
-            ['user', 'content_type', 'object_id'],
-        ]
+        unique_together = [['user', 'content_type', 'object_id']]
 
         verbose_name_plural = 'User Settings'
         verbose_name = 'User Settings'

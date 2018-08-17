@@ -18,10 +18,7 @@ class HubSubscription(UpdateInfoModel):
     SUBSCRIBE = 'subscribe'
     UNSUBSCRIBE = 'unsubscribe'
 
-    MODE_CHOICES = (
-        (SUBSCRIBE, 'subscribe'),
-        (UNSUBSCRIBE, 'unsubscribe'),
-    )
+    MODE_CHOICES = ((SUBSCRIBE, 'subscribe'), (UNSUBSCRIBE, 'unsubscribe'))
 
     # podcast to which the subscription belongs
     podcast = models.ForeignKey(Podcast, on_delete=models.PROTECT)

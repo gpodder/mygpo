@@ -18,7 +18,4 @@ def adsense(request):
     if not slot_bottom:
         return {}
 
-    return {
-        'adsense_client': adclient,
-        'adsense_slot_bottom': slot_bottom,
-    }
+    return {'adsense_client': adclient, 'adsense_slot_bottom': slot_bottom}

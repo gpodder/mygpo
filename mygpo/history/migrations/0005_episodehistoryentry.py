@@ -18,29 +18,53 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='EpisodeHistoryEntry',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                (
+                    'id',
+                    models.AutoField(
+                        verbose_name='ID',
+                        serialize=False,
+                        auto_created=True,
+                        primary_key=True,
+                    ),
+                ),
                 ('timestamp', models.DateTimeField()),
                 ('created', models.DateTimeField()),
-                ('action', models.CharField(max_length=8, choices=[('download', 'downloaded'), ('play', 'played'), ('delete', 'deleted'), ('new', 'marked as new'), ('flattr', "flattr'd")])),
+                (
+                    'action',
+                    models.CharField(
+                        max_length=8,
+                        choices=[
+                            ('download', 'downloaded'),
+                            ('play', 'played'),
+                            ('delete', 'deleted'),
+                            ('new', 'marked as new'),
+                            ('flattr', "flattr'd"),
+                        ],
+                    ),
+                ),
                 ('podcast_ref_url', models.URLField(max_length=2048, null=True)),
                 ('episode_ref_url', models.URLField(max_length=2048, null=True)),
                 ('started', models.IntegerField(null=True)),
                 ('stopped', models.IntegerField(null=True)),
                 ('total', models.IntegerField(null=True)),
-                ('client', models.ForeignKey(
-                    to='users.Client',
-                    null=True,
-                    on_delete=models.CASCADE,
-                )),
-                ('episode', models.ForeignKey(
-                    to='podcasts.Episode',
-                    null=True,
-                    on_delete=models.CASCADE,
-                )),
-                ('user', models.ForeignKey(
-                    to=settings.AUTH_USER_MODEL,
-                    on_delete=models.CASCADE,
-                )),
+                (
+                    'client',
+                    models.ForeignKey(
+                        to='users.Client', null=True, on_delete=models.CASCADE
+                    ),
+                ),
+                (
+                    'episode',
+                    models.ForeignKey(
+                        to='podcasts.Episode', null=True, on_delete=models.CASCADE
+                    ),
+                ),
+                (
+                    'user',
+                    models.ForeignKey(
+                        to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+                    ),
+                ),
             ],
             options={
                 'ordering': ['-timestamp'],
@@ -52,8 +76,5 @@ class Migration(migrations.Migration):
             name='episodehistoryentry',
             index_together=set([('user', 'client', 'episode', 'action', 'timestamp')]),
         ),
-        migrations.RemoveField(
-            model_name='historyentry',
-            name='episode',
-        ),
+        migrations.RemoveField(model_name='historyentry', name='episode'),
     ]
