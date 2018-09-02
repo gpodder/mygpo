@@ -43,20 +43,7 @@ Now install additional dependencies locally:
     pip install -r requirements-test.txt   # for running tests
 
 
-That's it for the setup. Now to initialize the DB:
-
-First run the commands from :ref:`db-setup`. Then
-
-.. code-block:: bash
-
-    cd mygpo
-    python manage.py migrate
-
-..and here we go:
-
-.. code-block:: bash
-
-    python manage.py runserver
+That's it for the setup.
 
 
 Configuration
@@ -72,7 +59,33 @@ For a development configuration you will probably want to use the following
     echo postgres://mygpo:mygpo@localhost/mygpo > envs/local/DATABASE_URL
     echo True > envs/local/DEBUG
 
+On an Debian/Ubuntu based system, you can perform this configuration with
+
+.. code-block:: bash
+
+    make dev-config
+
 See :ref:`configuration` for further information.
+
+
+Database Initialization
+-----------------------
+
+Now to initialize the DB:
+
+First run the commands from :ref:`db-setup`. Then
+
+.. code-block:: bash
+
+    cd mygpo
+    envdir envs/local python manage.py migrate
+
+..and here we go:
+
+.. code-block:: bash
+
+    envdir envs/local python manage.py runserver
+
 
 
 Accessing the dev server from other devices
@@ -84,7 +97,7 @@ runserver command of manage.py, like this:
 
 .. code-block:: bash
 
-    python manage.py runserver 0.0.0.0:8000
+    envdir envs/local python manage.py runserver 0.0.0.0:8000
 
 Beware, though, that this will expose the web service to your all networks
 that your machine is connected to. Apply common sense and ideally use only
@@ -101,22 +114,22 @@ commands regularly on your development machine:
 
 .. code-block:: bash
 
-    python manage.py update-categories
-    python manage.py update-toplist
-    python manage.py update-episode-toplist
+    envdir envs/local python manage.py update-categories
+    envdir envs/local python manage.py update-toplist
+    envdir envs/local python manage.py update-episode-toplist
 
-    python manage.py feed-downloader
-    python manage.py feed-downloader <feed-url> [...]
-    python manage.py feed-downloader --max <max-updates>
-    python manage.py feed-downloader --random --max <max-updates>
-    python manage.py feed-downloader --toplist --max <max-updates>
-    python manage.py feed-downloader --update-new --max <max-updates>
+    envdir envs/local python manage.py feed-downloader
+    envdir envs/local python manage.py feed-downloader <feed-url> [...]
+    envdir envs/local python manage.py feed-downloader --max <max-updates>
+    envdir envs/local python manage.py feed-downloader --random --max <max-updates>
+    envdir envs/local python manage.py feed-downloader --toplist --max <max-updates>
+    envdir envs/local python manage.py feed-downloader --update-new --max <max-updates>
 
 or to only do a dry run (this won't do any web requests for feeds):
 
 .. code-block:: bash
 
-    python manage.py feed-downloader --list-only [other parameters]
+    envdir envs/local python manage.py feed-downloader --list-only [other parameters]
 
 
 Maintaining publisher relationships with user accounts
@@ -127,7 +140,7 @@ To set a user as publisher for a given feed URL, use:
 .. code-block:: bash
 
     cd mygpo
-    python manage.py make-publisher <username> <feed-url> [...]
+    envdir envs/local python manage.py make-publisher <username> <feed-url> [...]
 
 
 Web-Server
@@ -138,7 +151,7 @@ directory with
 
 .. code-block:: bash
 
-    python manage.py runserver
+    envdir envs/local python manage.py runserver
 
 If you want to run a production server, check out `Deploying Django
 <https://docs.djangoproject.com/en/dev/howto/deployment/>`_.

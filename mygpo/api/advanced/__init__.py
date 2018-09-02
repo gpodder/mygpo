@@ -144,6 +144,9 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
     history = EpisodeHistoryEntry.objects.filter(user=user,
                                                  timestamp__lt=until)
 
+    # return the earlier entries first
+    history = history.order_by('timestamp')
+
     if since:
         history = history.filter(timestamp__gte=since)
 
@@ -156,12 +159,24 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
     if version == 1:
         history = map(convert_position, history)
 
+    # Limit number of returned episode actions
+    max_actions = dsettings.MAX_EPISODE_ACTIONS
+    history = history[:max_actions]
+
+    # evaluate query and turn into list, for negative indexing
+    history = list(history)
+
     actions = [episode_action_json(a, user) for a in history]
 
     if aggregated:
         actions = list(dict( (a['episode'], a) for a in actions ).values())
 
-    return {'actions': actions, 'timestamp': get_timestamp(until)}
+    if history:
+        ts = get_timestamp(history[-1].timestamp)
+    else:
+        ts = get_timestamp(until)
+
+    return {'actions': actions, 'timestamp': ts}
 
 
 def episode_action_json(history, user):
@@ -200,8 +215,8 @@ def update_episodes(user, actions, now, ua_string):
         if not episode_url:
             continue
 
-        podcast = Podcast.objects.get_or_create_for_url(podcast_url)
-        episode = Episode.objects.get_or_create_for_url(podcast, episode_url)
+        podcast = Podcast.objects.get_or_create_for_url(podcast_url).object
+        episode = Episode.objects.get_or_create_for_url(podcast, episode_url).object
 
         # parse_episode_action returns a EpisodeHistoryEntry obj
         history = parse_episode_action(action, user, update_urls, now,
@@ -249,7 +264,7 @@ def parse_episode_action(action, user, update_urls, now, ua_string):
 # instead of "POST" requests for uploading device settings
 @allowed_methods(['POST', 'PUT'])
 @cors_origin()
-def device(request, username, device_uid):
+def device(request, username, device_uid, version=None):
     d = get_device(request.user, device_uid,
             request.META.get('HTTP_USER_AGENT', ''))
 
@@ -295,7 +310,7 @@ def valid_episodeaction(type):
 @never_cache
 @allowed_methods(['GET'])
 @cors_origin()
-def devices(request, username):
+def devices(request, username, version=None):
     user = request.user
     clients = user.client_set.filter(deleted=False)
     client_data = [get_client_data(user, client) for client in clients]

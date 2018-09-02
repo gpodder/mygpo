@@ -16,8 +16,7 @@ class Command(PodcastCommand):
 
     def add_arguments(self, parser):
 
-        parser.add_argument('urls', nargs='+', type=str)
-
+        super().add_arguments(parser)
         parser.add_argument('--list-only', action='store_true', dest='list',
             default=False, help="Don't update anything, just list podcasts "),
 

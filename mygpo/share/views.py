@@ -11,7 +11,7 @@ from django.utils.decorators import method_decorator
 from mygpo.podcasts.models import Podcast
 from mygpo.publisher.models import PublishedPodcast
 from mygpo.userfeeds.feeds import FavoriteFeed
-from mygpo.data.feeddownloader import update_podcast
+from mygpo.data.feeddownloader import PodcastUpdater
 
 import logging
 logger = logging.getLogger(__name__)
@@ -93,14 +93,15 @@ class FavoritesFeedCreateEntry(View):
         site = RequestSite(request)
         feed_url = feed.get_public_url(site.domain)
 
-        podcast = Podcast.objects.get_or_create_for_url(feed_url)
+        podcast = Podcast.objects.get_or_create_for_url(feed_url).object
 
         PublishedPodcast.objects.get_or_create(
             podcast=podcast,
             publisher=user,
         )
 
-        update_podcast(feed_url)
+        updater = PodcastUpdater(feed_url)
+        updater.update_podcast()
 
         return HttpResponseRedirect(reverse('share-favorites'))
 

@@ -24,7 +24,7 @@ from mygpo.subscriptions import (
     get_subscribe_targets
 )
 from mygpo.history.models import HistoryEntry
-from mygpo.utils import normalize_feed_url
+from mygpo.utils import normalize_feed_url, to_maxlength
 from mygpo.users.settings import PUBLIC_SUB_PODCAST
 from mygpo.publisher.utils import check_publisher_permission
 from mygpo.usersettings.models import UserSettings
@@ -186,10 +186,16 @@ def add_tag(request, podcast):
 
     tags = tag_str.split(',')
     tags = map(str.strip, tags)
+    tags = map(str.lower, tags)
+    tags = list(filter(None, tags))
 
     ContentType.objects.get_for_model(podcast)
 
     for tag in tags:
+
+        # trim to maximum length
+        tag = to_maxlength(Tag, 'tag', tag)
+
         Tag.objects.get_or_create(
             tag=tag,
             source=Tag.USER,
@@ -208,8 +214,8 @@ def add_tag(request, podcast):
 @login_required
 def remove_tag(request, podcast):
 
-    tag_str = request.GET.get('tag', '')
-    if not tag_str:
+    tag_str = request.GET.get('tag', None)
+    if tag_str is None:
         return HttpResponseBadRequest()
 
     user = request.user
@@ -219,13 +225,14 @@ def remove_tag(request, podcast):
 
     ContentType.objects.get_for_model(podcast)
 
-    Tag.objects.filter(
-        tag__in=tags,
-        source=Tag.USER,
-        user=user,
-        content_type=ContentType.objects.get_for_model(podcast),
-        object_id=podcast.id,
-    ).delete()
+    for tag in tags:
+        Tag.objects.filter(
+            tag__iexact=tag,
+            source=Tag.USER,
+            user=user,
+            content_type=ContentType.objects.get_for_model(podcast),
+            object_id=podcast.id,
+        ).delete()
 
     if request.GET.get('next', '') == 'mytags':
         return HttpResponseRedirect('/tags/')
@@ -326,7 +333,7 @@ def subscribe_url(request):
     if not url:
         raise Http404('Please specify a valid url')
 
-    podcast = Podcast.objects.get_or_create_for_url(url)
+    podcast = Podcast.objects.get_or_create_for_url(url).object
 
     return HttpResponseRedirect(get_podcast_link_target(podcast, 'subscribe'))
 

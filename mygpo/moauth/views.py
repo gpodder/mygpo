@@ -4,7 +4,7 @@ from requests.auth import HTTPBasicAuth
 import urllib.parse
 
 from django.db import IntegrityError
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.shortcuts import render
 from django.views.generic.base import RedirectView
 from django.views.generic.base import View

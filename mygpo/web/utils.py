@@ -154,7 +154,7 @@ def get_podcast_link_target(podcast, view_name='podcast', add_args=[]):
 
     # as a fallback we use UUIDs
     else:
-        args = [podcast.get_id()]
+        args = [podcast.id]
         view_name = '%s-id' % view_name
 
     return reverse(view_name, args=args + add_args)
@@ -179,7 +179,7 @@ def get_episode_link_target(episode, podcast, view_name='episode',
     # fallback: UUIDs
     else:
         podcast = podcast or episode.podcast
-        args = [podcast.get_id(), episode.get_id()]
+        args = [podcast.id, episode.id]
         view_name = '%s-id' % view_name
 
     return strip_tags(reverse(view_name, args=args + add_args))

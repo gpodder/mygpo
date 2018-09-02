@@ -69,8 +69,7 @@ MENU_STRUCTURE = (
         )),
 )
 
-@register.filter
-@mark_safe
+@register.filter()
 def main_menu(selected):
     found_section = False
     links = []
@@ -88,7 +87,7 @@ def main_menu(selected):
         else:
             items.append('<li><a href="%s">%s</a></li>' % (uri, ugettext(caption)))
 
-    return '\n'.join(items)
+    return mark_safe('\n'.join(items))
 
 def get_section_items(selected):
     for label, items in MENU_STRUCTURE:
@@ -100,8 +99,7 @@ def get_section_items(selected):
             (selected, selected),
     ]
 
-@register.filter
-@mark_safe
+@register.filter()
 def section_menu(selected, title=None):
 
     items = []
@@ -127,4 +125,4 @@ def section_menu(selected, title=None):
             else:
                 items.append('<li><a href="%s">%s</a></li>' % (uri, ugettext(caption)))
 
-    return '\n'.join(items)
+    return mark_safe('\n'.join(items))

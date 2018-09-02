@@ -1,7 +1,6 @@
 language: python
 
 python:
- - "3.5"
  - "3.6"
  - "3.6-dev"
  - "3.7-dev"
@@ -19,7 +18,7 @@ before_script:
   - psql -c 'create database mygpo_test;' -U postgres
 
 script:
-  coverage run --branch --source=mygpo ./manage.py test
+  - pytest --cov=mygpo/ --cov-branch
 
 after_script:
   - coveralls
@@ -28,3 +27,11 @@ env:
  - DATABASE_URL="postgres://postgres@localhost/mygpo_test"
 
 sudo: false
+
+# temporarily allow failures on 3.7
+# see https://github.com/chtd/psycopg2cffi/issues/95
+matrix:
+  allow_failures:
+    - python: "3.7-dev"
+    - python: "nightly"
+
