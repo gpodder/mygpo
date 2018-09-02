@@ -389,4 +389,6 @@ EMAIL_BACKEND = os.getenv('EMAIL_BACKEND',
 PODCAST_AD_ID = os.getenv('PODCAST_AD_ID')
 
 
+MAX_EPISODE_ACTIONS = int(os.getenv('MAX_EPISODE_ACTIONS', 1000))
+
 SEARCH_CUTOFF = float(os.getenv('SEARCH_CUTOFF', 0.3))
