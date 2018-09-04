@@ -14,22 +14,6 @@ urlpatterns = [
         registration.RegistrationView.as_view(),
         name='register'),
 
-    path('registration_complete/',
-        registration.TemplateView.as_view(
-            template_name='registration/registration_complete.html'),
-        name='registration-complete'),
-
-    path('activate/<str:activation_key>',
-        registration.ActivationView.as_view()),
-
-    path('registration/resend',
-        registration.ResendActivationView.as_view(),
-        name='resend-activation'),
-
-    path('registration/resent',
-        registration.ResentActivationView.as_view(),
-        name='resent-activation'),
-
     path('account/',
         settings.account,
         name='account'),

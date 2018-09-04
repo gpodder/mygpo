@@ -30,6 +30,7 @@ urlpatterns += [
     path('',                include('mygpo.subscriptions.urls')),
     path('',                include('mygpo.users.urls')),
     path('',                include('mygpo.podcastlists.urls')),
+    path('',                include('mygpo.moauth.urls')),
     path('suggestions/',    include('mygpo.suggestions.urls')),
     path('publisher/',      include('mygpo.publisher.urls')),
     path('administration/', include('mygpo.administration.urls')),

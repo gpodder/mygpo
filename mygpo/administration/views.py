@@ -27,7 +27,6 @@ from mygpo.administration.auth import require_staff
 from mygpo.administration.group import PodcastGrouper
 from mygpo.maintenance.merge import PodcastMerger, IncorrectMergeException
 from mygpo.administration.clients import UserAgentStats, ClientStats
-from mygpo.users.views.registration import send_activation_email
 from mygpo.administration.tasks import merge_podcasts
 from mygpo.utils import get_git_head
 from mygpo.data.models import PodcastUpdateResult
@@ -371,7 +370,7 @@ class ResendActivationEmail(AdminView):
             messages.success(request, 'User {username} is already activated')
 
         else:
-            send_activation_email(user, request)
+            #send_activation_email(user, request)
             messages.success(request,
                              _('Email for {username} ({email}) resent'.format(
                                 username=user.username, email=user.email)))
