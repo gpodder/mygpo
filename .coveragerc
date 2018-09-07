@@ -2,6 +2,8 @@
 branch = True
 source=mygpo/
 omit=*/admin.py,*/wsgi.py,*/tests.py,*/management/*
+plugins =
+    django_coverage_plugin
 
 
 [report]
