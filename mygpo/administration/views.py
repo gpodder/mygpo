@@ -27,6 +27,7 @@ from mygpo.administration.auth import require_staff
 from mygpo.administration.group import PodcastGrouper
 from mygpo.maintenance.merge import PodcastMerger, IncorrectMergeException
 from mygpo.administration.clients import UserAgentStats, ClientStats
+from mygpo.users.views.registration import send_activation_email
 from mygpo.administration.tasks import merge_podcasts
 from mygpo.utils import get_git_head
 from mygpo.data.models import PodcastUpdateResult
@@ -330,7 +331,7 @@ class ActivateUserView(AdminView):
             return HttpResponseRedirect(reverse('admin-activate-user'))
 
         try:
-            user = UserProxy.objects.by_username_or_email(username, email)
+            user = UserProxy.objects.all().by_username_or_email(username, email)
         except UserProxy.DoesNotExist:
             messages.error(request, _('No user found'))
             return HttpResponseRedirect(reverse('admin-activate-user'))
@@ -340,6 +341,42 @@ class ActivateUserView(AdminView):
                          _('User {username} ({email}) activated'.format(
                             username=user.username, email=user.email)))
         return HttpResponseRedirect(reverse('admin-activate-user'))
+
+
+class ResendActivationEmail(AdminView):
+    """ Resends the users activation email """
+
+    template_name = 'admin/resend-acivation.html'
+
+    def get(self, request):
+        return self.render_to_response({})
+
+    def post(self, request):
+
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+
+        if not (username or email):
+            messages.error(request,
+                           _('Provide either username or email address'))
+            return HttpResponseRedirect(reverse('admin-resend-activation'))
+
+        try:
+            user = UserProxy.objects.all().by_username_or_email(username, email)
+        except UserProxy.DoesNotExist:
+            messages.error(request, _('No user found'))
+            return HttpResponseRedirect(reverse('admin-resend-activation'))
+
+        if user.is_active:
+            messages.success(request, 'User {username} is already activated')
+
+        else:
+            send_activation_email(user, request)
+            messages.success(request,
+                             _('Email for {username} ({email}) resent'.format(
+                                username=user.username, email=user.email)))
+
+        return HttpResponseRedirect(reverse('admin-resend-activation'))
 
 
 

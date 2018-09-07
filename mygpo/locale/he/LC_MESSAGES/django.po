@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-29 20:11+0000\n"
+"POT-Creation-Date: 2018-09-02 18:14+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2018\n"
 "Language-Team: Hebrew (https://www.transifex.com/yaron/teams/87581/he/)\n"
@@ -22,15 +22,18 @@ msgstr ""
 #: mygpo/administration/templates/admin/activate-user.html:9
 #: mygpo/administration/templates/admin/activate-user.html:12
 #: mygpo/administration/templates/admin/overview.html:22
+#: mygpo/administration/templates/admin/resend-acivation.html:9
 msgid "Activate User"
 msgstr "הפעלת משתמש"
 
 #: mygpo/administration/templates/admin/activate-user.html:20
+#: mygpo/administration/templates/admin/resend-acivation.html:20
 #: mygpo/web/forms.py:179 mygpo/web/templates/account.html:112
 msgid "Username"
 msgstr "שם משתמש"
 
 #: mygpo/administration/templates/admin/activate-user.html:27
+#: mygpo/administration/templates/admin/resend-acivation.html:27
 msgid "Email"
 msgstr "כתובת"
 
@@ -151,7 +154,7 @@ msgstr "משימות מתוזמנות ב־Celery"
 #: mygpo/administration/templates/admin/make-publisher-input.html:12
 #: mygpo/administration/templates/admin/make-publisher-result.html:9
 #: mygpo/administration/templates/admin/make-publisher-result.html:12
-#: mygpo/administration/views.py:404
+#: mygpo/administration/views.py:441
 msgid "Publisher Permissions"
 msgstr "הרשאות הפצה"
 
@@ -213,8 +216,24 @@ msgid "General Stats"
 msgstr "סטטיסטיקה כללית"
 
 #: mygpo/administration/templates/admin/overview.html:23
+#, fuzzy
+#| msgid "Resend activation e-mail"
+msgid "Resend Activation Email"
+msgstr "שליחת הודעת הפעלה בדוא״ל מחדש"
+
+#: mygpo/administration/templates/admin/overview.html:24
 msgid "Assign Publisher Permissions"
 msgstr "הקצאת הרשאות הפצה"
+
+#: mygpo/administration/templates/admin/resend-acivation.html:12
+#, fuzzy
+#| msgid "Resend activation e-mail"
+msgid "Resend Activation email"
+msgstr "שליחת הודעת הפעלה בדוא״ל מחדש"
+
+#: mygpo/administration/templates/admin/resend-acivation.html:35
+msgid "Resend"
+msgstr ""
 
 #: mygpo/administration/templates/admin/stats.html:12
 msgid "Statistics"
@@ -265,22 +284,28 @@ msgstr "רענון"
 msgid "User-Agent"
 msgstr "סוכן דפדפן"
 
-#: mygpo/administration/views.py:153 mygpo/administration/views.py:175
+#: mygpo/administration/views.py:154 mygpo/administration/views.py:176
 #, python-brace-format
 msgid "No podcast with URL {url}"
 msgstr "אין פודקאסט בכתובת {url}"
 
-#: mygpo/administration/views.py:329
+#: mygpo/administration/views.py:330 mygpo/administration/views.py:361
 msgid "Provide either username or email address"
 msgstr "יש לספק שם משתמש או כתובת דוא״ל"
 
-#: mygpo/administration/views.py:335
+#: mygpo/administration/views.py:336 mygpo/administration/views.py:367
 msgid "No user found"
 msgstr "לא נמצאו משתמשים"
 
-#: mygpo/administration/views.py:340
+#: mygpo/administration/views.py:341
 #, python-brace-format
 msgid "User {username} ({email}) activated"
+msgstr "המשתמש {username} ‎({email}) עבר עימות"
+
+#: mygpo/administration/views.py:376
+#, fuzzy, python-brace-format
+#| msgid "User {username} ({email}) activated"
+msgid "Email for {username} ({email}) resent"
 msgstr "המשתמש {username} ‎({email}) עבר עימות"
 
 #: mygpo/api/constants.py:8
