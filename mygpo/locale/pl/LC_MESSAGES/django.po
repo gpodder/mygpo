@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mygpo\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-29 20:11+0000\n"
+"POT-Creation-Date: 2018-09-02 18:14+0000\n"
 "PO-Revision-Date: 2010-01-27 17:38+0100\n"
 "Last-Translator: Tomasz Dominikowski <dominikowski@gmail.com>\n"
 "Language-Team: Polish <dominikowski@gmail.com>\n"
@@ -21,17 +21,20 @@ msgstr ""
 #: mygpo/administration/templates/admin/activate-user.html:9
 #: mygpo/administration/templates/admin/activate-user.html:12
 #: mygpo/administration/templates/admin/overview.html:22
+#: mygpo/administration/templates/admin/resend-acivation.html:9
 #, fuzzy
 #| msgid "Reactivate"
 msgid "Activate User"
 msgstr "Reaktywuj"
 
 #: mygpo/administration/templates/admin/activate-user.html:20
+#: mygpo/administration/templates/admin/resend-acivation.html:20
 #: mygpo/web/forms.py:179 mygpo/web/templates/account.html:112
 msgid "Username"
 msgstr "Nazwa użytkownika"
 
 #: mygpo/administration/templates/admin/activate-user.html:27
+#: mygpo/administration/templates/admin/resend-acivation.html:27
 msgid "Email"
 msgstr ""
 
@@ -160,7 +163,7 @@ msgstr ""
 #: mygpo/administration/templates/admin/make-publisher-input.html:12
 #: mygpo/administration/templates/admin/make-publisher-result.html:9
 #: mygpo/administration/templates/admin/make-publisher-result.html:12
-#: mygpo/administration/views.py:404
+#: mygpo/administration/views.py:441
 #, fuzzy
 #| msgid "Publisher Pages"
 msgid "Publisher Permissions"
@@ -228,9 +231,25 @@ msgstr "Statystyki ogólne"
 
 #: mygpo/administration/templates/admin/overview.html:23
 #, fuzzy
+#| msgid "Resend activation e-mail"
+msgid "Resend Activation Email"
+msgstr "Wyślij ponownie e-mail aktywacyjny"
+
+#: mygpo/administration/templates/admin/overview.html:24
+#, fuzzy
 #| msgid "Publisher Services"
 msgid "Assign Publisher Permissions"
 msgstr "Serwisy "
+
+#: mygpo/administration/templates/admin/resend-acivation.html:12
+#, fuzzy
+#| msgid "Resend activation e-mail"
+msgid "Resend Activation email"
+msgstr "Wyślij ponownie e-mail aktywacyjny"
+
+#: mygpo/administration/templates/admin/resend-acivation.html:35
+msgid "Resend"
+msgstr ""
 
 #: mygpo/administration/templates/admin/stats.html:12
 msgid "Statistics"
@@ -284,23 +303,28 @@ msgstr ""
 msgid "User-Agent"
 msgstr "User-Agent"
 
-#: mygpo/administration/views.py:153 mygpo/administration/views.py:175
+#: mygpo/administration/views.py:154 mygpo/administration/views.py:176
 #, python-brace-format
 msgid "No podcast with URL {url}"
 msgstr "Brak podcastu z URL {url}"
 
-#: mygpo/administration/views.py:329
+#: mygpo/administration/views.py:330 mygpo/administration/views.py:361
 msgid "Provide either username or email address"
 msgstr ""
 
-#: mygpo/administration/views.py:335
+#: mygpo/administration/views.py:336 mygpo/administration/views.py:367
 #, fuzzy
 msgid "No user found"
 msgstr "Nie odnaleziono"
 
-#: mygpo/administration/views.py:340
+#: mygpo/administration/views.py:341
 #, python-brace-format
 msgid "User {username} ({email}) activated"
+msgstr ""
+
+#: mygpo/administration/views.py:376
+#, python-brace-format
+msgid "Email for {username} ({email}) resent"
 msgstr ""
 
 #: mygpo/api/constants.py:8

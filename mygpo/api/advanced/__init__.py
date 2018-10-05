@@ -144,6 +144,9 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
     history = EpisodeHistoryEntry.objects.filter(user=user,
                                                  timestamp__lt=until)
 
+    # return the earlier entries first
+    history = history.order_by('timestamp')
+
     if since:
         history = history.filter(timestamp__gte=since)
 
@@ -156,12 +159,24 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
     if version == 1:
         history = map(convert_position, history)
 
+    # Limit number of returned episode actions
+    max_actions = dsettings.MAX_EPISODE_ACTIONS
+    history = history[:max_actions]
+
+    # evaluate query and turn into list, for negative indexing
+    history = list(history)
+
     actions = [episode_action_json(a, user) for a in history]
 
     if aggregated:
         actions = list(dict( (a['episode'], a) for a in actions ).values())
 
-    return {'actions': actions, 'timestamp': get_timestamp(until)}
+    if history:
+        ts = get_timestamp(history[-1].timestamp)
+    else:
+        ts = get_timestamp(until)
+
+    return {'actions': actions, 'timestamp': ts}
 
 
 def episode_action_json(history, user):
