@@ -18,14 +18,6 @@ HIDDEN_URIS = (
 )
 
 MENU_STRUCTURE = (
-        (_('Subscriptions'), (
-            ('/subscriptions/', _('Subscriptions')),
-            ('/favorites/', _('Favorite Episodes')),
-            ('/tags/', _('My Tags')),
-            ('/devices/', _('Devices')),
-            ('/device/', _('Device')),
-            ('/history/', _('History')),
-        )),
         (_('Community'), (
             ('/share/', _('Overview')),
             ('/share/favorites', _('Favorite Episodes')),
