@@ -77,6 +77,10 @@
 
    <div>{% trans "Nothing found" %}</div>
 
+   <form action="{% url "missing-podcast" %}" method="get">
+    <button>{% trans "Add missing podcast" %}</button>
+   </form>
+
   {% endif %}
 
  {% endif %}

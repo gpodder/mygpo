@@ -18,20 +18,6 @@ HIDDEN_URIS = (
 )
 
 MENU_STRUCTURE = (
-        (_('Discover'), (
-            ('/directory/', _('Directory')),
-            ('/podcast/', _('Podcast')),
-            ('/search/', _('Search')),
-            ('/missing/', _('Missing Podcast')),
-            ('/lists/', _('Podcast Lists')),
-            ('/user/subscriptions/', _('User subscriptions')),
-            ('/suggestions/', _('Suggestions')),
-            ('', _('Features')),
-            ('/directory/+license', _('License')),
-            ('', _('Toplists')),
-            ('/toplist/', _('Podcasts')),
-            ('/toplist/episodes', _('Episodes')),
-        )),
         (_('Subscriptions'), (
             ('/subscriptions/', _('Subscriptions')),
             ('/favorites/', _('Favorite Episodes')),
