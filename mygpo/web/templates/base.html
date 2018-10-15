@@ -96,8 +96,9 @@
             <ul>
                 <li><strong>{% trans "Support" %}</strong></li>
                 <li><a href="{% url "help" %}">{% trans "Docs" %}</a></li>
+                <li><a href="{% url "help" %}">{% trans "Docs" %}</a></li>
                 <li><a href="https://gpodder.github.io/docs/mailing-list.html">{% trans "Mailing&nbsp;List" %}</a></li>
-                <li><a href="https://github.com/gpodder/mygpo/issues">{%trans "Questions" %}</a></li>
+                <li><a href="{% url "privacy-policy" %}">{% trans "Privacy Policy" %}</a></li>
             </ul>
 
             <ul>
@@ -114,7 +115,7 @@
             </ul>
 
             <ul>
-                <li><strong>{% trans "Develop" %}</strong></li>
+                <li><a href="{% url "developer" %}"><strong>{% trans "Develop" %}</strong></a></li>
                 <li><a href="https://gpoddernet.readthedocs.io/en/latest/api/">{% trans "API" %}</a></li>
                 <li><a href="https://gpoddernet.readthedocs.io/en/latest/dev/libraries.html">{% trans "Libraries" %}</a></li>
                 <li><a href="https://gpoddernet.readthedocs.io/en/latest/user/clients.html">{% trans "Clients" %}</a></li>

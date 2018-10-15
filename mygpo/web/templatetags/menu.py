@@ -18,16 +18,6 @@ HIDDEN_URIS = (
 )
 
 MENU_STRUCTURE = (
-        ('', (
-            ('/', _('Home')),
-            ('/login/', _('Login')),
-            ('/register/', _('Register')),
-            ('', _('Docs')),
-            ('/contribute/', _('Contribute')),
-            ('/developer/', _('Development')),
-            ('/privacy/', _('Privacy Policy')),
-            ('/online-help', _('Help')),
-        )),
         (_('Discover'), (
             ('/directory/', _('Directory')),
             ('/podcast/', _('Podcast')),
