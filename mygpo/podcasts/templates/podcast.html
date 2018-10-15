@@ -8,7 +8,6 @@
 {% load utils %}
 
 {% load menu %}
-{% block mainmenu %}{{ "/podcast/"|main_menu }}{% endblock %}
 {% block sectionmenu %}
  {% if podcast.title %}
   {{ "/podcast/"|section_menu:podcast.title }}

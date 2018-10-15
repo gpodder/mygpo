@@ -109,6 +109,8 @@ TEMPLATES = [{
                 # templates. this is used to direct users to previous
                 # page after login
                 'django.template.context_processors.request',
+
+                'mygpo.web.nav.primary_navigation',
         ],
         'libraries': {
             'staticfiles' : 'django.templatetags.static',

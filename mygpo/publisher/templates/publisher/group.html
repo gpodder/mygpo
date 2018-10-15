@@ -6,7 +6,6 @@
 {% load pcharts %}
 
 {% load menu %}
-{% block mainmenu %}{{ "/publisher/"|main_menu }}{% endblock %}
 {% block sectionmenu %}{{ "/publisher/podcast/"|section_menu:group.title }}{% endblock %}
 
 {% block title %}{{ group.title|striptags }}{% endblock %}

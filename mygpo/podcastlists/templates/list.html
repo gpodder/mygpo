@@ -8,14 +8,6 @@
 
 {% load menu %}
 
-{% block mainmenu %}
- {% if is_own %}
-  {{ "/share/"|main_menu }}
- {% else %}
-  {{ "/directory/"|main_menu }}
- {% endif %}
-{% endblock %}
-
 {% block sectionmenu %}
  {% if is_own %}
   {{ "/share/lists/"|section_menu }}

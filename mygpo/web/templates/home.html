@@ -20,9 +20,6 @@
 
             <ul>
                 <li><a href="/">gpodder.net</a></li>
-                {% block mainmenu %}
-                {{ "/"|main_menu }}
-                {% endblock %}
                 {% if user.is_authenticated %}
                     <li><a href="{% url "account" %}">{{ user.username }}</a></li>
                     <li><a href="{% url "logout" %}">Sign Out</a></li>

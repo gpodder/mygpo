@@ -69,26 +69,6 @@ MENU_STRUCTURE = (
         )),
 )
 
-@register.filter()
-def main_menu(selected):
-    found_section = False
-    links = []
-    for label, items in MENU_STRUCTURE[1:]:
-        uris = [uri for uri, caption in items]
-        if selected in uris:
-            found_section = True
-        links.append((items[0][0], label, uris))
-
-    items = []
-    for uri, caption, subpages in links:
-        if selected in subpages or ('/' in subpages and not found_section):
-            items.append('<li class="active"><a href="%s">%s</a></li>' % \
-                    (uri, ugettext(caption)))
-        else:
-            items.append('<li><a href="%s">%s</a></li>' % (uri, ugettext(caption)))
-
-    return mark_safe('\n'.join(items))
-
 def get_section_items(selected):
     for label, items in MENU_STRUCTURE:
         if selected in (uri for uri, caption in items):
