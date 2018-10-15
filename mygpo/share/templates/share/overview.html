@@ -77,6 +77,18 @@
    </td>
   </tr>
 
+  <tr>
+   <td><i class="icon-list icon-large"></i> {% trans "Podcast Lists" %}</td>
+   <td>{% trans "Public" %}</td>
+   <td>
+     <a href="{% url "lists-user" user.username %}"><img src="{% static "22x22/internet-web-browser.png" %}" class="action-button" /></a>
+   </td>
+   <td>
+    <a class="btn btn-sm btn-link" href="{% url "lists-overview" %}">Edit Podcast Lists</a>
+   </td>
+  </tr>
+
+
  </table>
 
  <div class="alert alert-info">

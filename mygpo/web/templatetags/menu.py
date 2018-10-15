@@ -18,13 +18,6 @@ HIDDEN_URIS = (
 )
 
 MENU_STRUCTURE = (
-        (_('Community'), (
-            ('/share/', _('Overview')),
-            ('/share/favorites', _('Favorite Episodes')),
-            ('/share/me', _('My Userpage')),
-            ('/user/subscriptions/', _('Subscriptions')),
-            ('/share/lists/', _('Podcast Lists')),
-        )),
         (_('Settings'), (
             ('/account/', _('Account')),
             ('/account/privacy', _('Privacy')),
