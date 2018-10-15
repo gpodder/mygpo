@@ -22,12 +22,6 @@ MENU_STRUCTURE = (
             ('/account/', _('Account')),
             ('/account/privacy', _('Privacy')),
         )),
-        (_('Publish'), (
-            ('/publisher/', _('Home')),
-            ('/publisher/advertise', _('Advertise')),
-            ('/publisher/link/', _('Link to gpodder.net')),
-            ('/publisher/podcast/', _('Podcast')),
-        )),
 )
 
 def get_section_items(selected):

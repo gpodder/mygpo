@@ -9,6 +9,13 @@
 
 {% block header %}
  <h1>{% trans "Publisher Area" %}</h1>
+
+ <nav>
+  <ul class="sections">
+   <li><a href="{% url "advertise" %}">Advertise</a></li>
+   <li><a href="{% url "link-here" %}">Link to gpodder.net</a></li>
+  </ul>
+ </nav>
 {% endblock %}
 
 
