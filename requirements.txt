@@ -16,4 +16,4 @@ redis==2.10.6
 django-celery-results==1.0.1
 # django-celery-beat > 1.1.0
 git+https://github.com/celery/django-celery-beat.git@feaf34e2c30e28273b03d754d50e9a1d9f1191c6#egg=django-celery-beat
-requests==2.19.1
+requests==2.20.0
