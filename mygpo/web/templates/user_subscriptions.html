@@ -2,10 +2,6 @@
 {% load i18n %}
 {% load podcasts %}
 
-{% load menu %}
-{% block mainmenu %}{{ "/share/"|main_menu }}{% endblock %}
-{% block sectionmenu %}{{ "/user/subscriptions/"|section_menu:other_user.username }}{% endblock %}
-
 {% block head %}
  <link rel="alternate" title="Subscription Changes of {{ other_user.username }}" href="{% url "shared-subscriptions-rss" other_user.username %}" type="application/rss+xml">
 {% endblock %}

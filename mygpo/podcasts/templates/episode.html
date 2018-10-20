@@ -12,16 +12,6 @@
 {% load utils %}
 {% load static %}
 
-{% load menu %}
-{% block mainmenu %}{{ "/podcast/"|main_menu }}{% endblock %}
-{% block sectionmenu %}
- {% if podcast.title %}
-  {{ "/podcast/"|section_menu:podcast.title }}
- {% else %}
-  {{ "/podcast/"|section_menu:"Unnamed Podcast" }}
- {% endif %}
-{% endblock %}
-
 {% block head %}
  {% if episode.url|is_youtube_video %}
   <script type="text/javascript" src="{% static "js/swfobject.js" %}"></script>

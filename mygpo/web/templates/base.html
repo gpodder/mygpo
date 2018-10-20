@@ -1,6 +1,5 @@
 {% extends "skeleton.html" %}
 {% load i18n %}
-{% load menu %}
 {% load static %}
 {% load utils %}
 
@@ -17,32 +16,15 @@
         </div>
 
         <nav class="primary">
-
             <ul>
-                <li><a href="/">gpodder.net</a></li>
-                {% block mainmenu %}
-                {{ "/"|main_menu }}
-                {% endblock %}
-                {% if user.is_authenticated %}
-                    <li><a href="{% url "account" %}">{{ user.username }}</a></li>
-                    <li><a href="{% url "logout" %}">Sign Out</a></li>
-                {% else %}
-                    <li><a href="{% url "login" %}?next={{ request.get_full_path|urlquote }}">{% trans "Login" %}</a></li>
-                    <li><a href="{% url "login-google" %}?next={{ request.get_full_path|urlquote }}">{% trans "Login with Google" %}</a></li>
-                    <li><a href="{% url "register" %}">{% trans "Register" %}</a></li>
-                {% endif %}
+              {% for entry in primary_nav %}
+               <li><a href="{% url entry.urlname %}">{{ entry.label }}</a></li>
+              {% endfor %}
             </ul>
         </nav>
 
     </header>
 
-
-    <nav class="secondary">
-        <ul>
-            {% block sectionmenu %}
-            {% endblock %}
-        </ul>
-    </nav>
 
     <main>
 
@@ -106,8 +88,9 @@
             <ul>
                 <li><strong>{% trans "Support" %}</strong></li>
                 <li><a href="{% url "help" %}">{% trans "Docs" %}</a></li>
+                <li><a href="{% url "help" %}">{% trans "Docs" %}</a></li>
                 <li><a href="https://gpodder.github.io/docs/mailing-list.html">{% trans "Mailing&nbsp;List" %}</a></li>
-                <li><a href="https://github.com/gpodder/mygpo/issues">{%trans "Questions" %}</a></li>
+                <li><a href="{% url "privacy-policy" %}">{% trans "Privacy Policy" %}</a></li>
             </ul>
 
             <ul>
@@ -124,7 +107,7 @@
             </ul>
 
             <ul>
-                <li><strong>{% trans "Develop" %}</strong></li>
+                <li><a href="{% url "developer" %}"><strong>{% trans "Develop" %}</strong></a></li>
                 <li><a href="https://gpoddernet.readthedocs.io/en/latest/api/">{% trans "API" %}</a></li>
                 <li><a href="https://gpoddernet.readthedocs.io/en/latest/dev/libraries.html">{% trans "Libraries" %}</a></li>
                 <li><a href="https://gpoddernet.readthedocs.io/en/latest/user/clients.html">{% trans "Clients" %}</a></li>

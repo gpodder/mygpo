@@ -2,14 +2,17 @@
 {% load i18n %}
 {% load podcasts %}
 
-{% load menu %}
-{% block mainmenu %}{{ "/publisher/"|main_menu }}{% endblock %}
-{% block sectionmenu %}{{ "/publisher/"|section_menu }}{% endblock %}
-
 {% block title %}{% trans "Podcasts Published by Me" %}{% endblock %}
 
 {% block header %}
  <h1>{% trans "Publisher Area" %}</h1>
+
+ <nav>
+  <ul class="sections">
+   <li><a href="{% url "advertise" %}">Advertise</a></li>
+   <li><a href="{% url "link-here" %}">Link to gpodder.net</a></li>
+  </ul>
+ </nav>
 {% endblock %}
 
 

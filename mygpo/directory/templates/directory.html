@@ -6,14 +6,22 @@
 {% load math %}
 {% load utils %}
 
-{% load menu %}
-{% block mainmenu %}{{ "/directory/"|main_menu }}{% endblock %}
-{% block sectionmenu %}{{ "/directory/"|section_menu }}{% endblock %}
-
 {% block title %}{% trans "Podcast Directory" %}{% endblock %}
 
 {% block header %}
    <h1>{% trans "Podcast Directory" %}</h1>
+
+   <nav>
+    <ul class="sections">
+     <li><a href="{% url "search" %}">Search Podcasts</a></li>
+     <li><a href="{% url "podcast-lists" %}">Podcast Lists</a></li>
+     <li><a href="{% url "suggestions" %}">Suggested Podcasts</a></li>
+     <li><a href="{% url "license-podcasts" %}">Podcast Licenses</a></li>
+     <li><a href="{% url "toplist" %}">Podcast Toplist</a></li>
+     <li><a href="{% url "episode-toplist" %}">Episode Toplist</a></li>
+    </li>
+   </nav>
+
 {% endblock %}
 
 

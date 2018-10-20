@@ -40,7 +40,8 @@ urlpatterns = [
         name='help'),
 
     path('developer/',
-        TemplateView.as_view(template_name='developer.html')),
+        TemplateView.as_view(template_name='developer.html'),
+        name='developer'),
 
     path('contribute/',
         TemplateView.as_view(template_name='contribute.html'),

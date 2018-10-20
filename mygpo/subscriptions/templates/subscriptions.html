@@ -4,15 +4,21 @@
 {% load episodes %}
 {% load podcasts %}
 
-{% load menu %}
-{% block mainmenu %}{{ "/subscriptions/"|main_menu }}{% endblock %}
-{% block sectionmenu %}{{ "/subscriptions/"|section_menu }}{% endblock %}
-
 {% block title %}{% trans "Podcast Subscriptions" %}{% endblock %}
 
 
 {% block header %}
  <h1>{% trans "Podcast Subscriptions" %}</h1>
+
+ <nav>
+  <ul class="sections">
+   <li><a href="{% url "favorites" %}">Favorite Episodes</a></li>
+   <li><a href="{% url "tags" %}">My Tags</a></li>
+   <li><a href="{% url "devices" %}">Devices</a></li>
+   <li><a href="{% url "history" %}">History</a></li>
+  </li>
+ </nav>
+
 {% endblock %}
 
 
