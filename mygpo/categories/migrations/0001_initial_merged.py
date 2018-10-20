@@ -98,7 +98,7 @@ class Migration(migrations.Migration):
             model_name='category',
             name='created',
             field=models.DateTimeField(
-                default=datetime.datetime(2014, 9, 28, 13, 26, 28, 914038),
+                default=datetime.datetime(2014, 9, 28, 13, 26, 28, 914_038),
                 auto_now_add=True,
             ),
             preserve_default=False,
@@ -107,7 +107,7 @@ class Migration(migrations.Migration):
             model_name='category',
             name='modified',
             field=models.DateTimeField(
-                default=datetime.datetime(2014, 9, 28, 13, 26, 28, 914095),
+                default=datetime.datetime(2014, 9, 28, 13, 26, 28, 914_095),
                 auto_now=True,
             ),
             preserve_default=False,

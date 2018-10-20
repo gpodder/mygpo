@@ -1,5 +1,3 @@
-
-
 from django.contrib import admin
 
 from mygpo.podcastlists.models import PodcastList, PodcastListEntry

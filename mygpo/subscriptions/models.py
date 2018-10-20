@@ -1,5 +1,3 @@
-
-
 import collections
 
 from django.db import models

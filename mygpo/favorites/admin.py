@@ -1,5 +1,3 @@
-
-
 from django.contrib import admin
 
 from mygpo.favorites.models import FavoriteEpisode

@@ -1,5 +1,3 @@
-
-
 from django.contrib import admin
 
 from mygpo.history.models import HistoryEntry, EpisodeHistoryEntry

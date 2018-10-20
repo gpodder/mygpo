@@ -1,5 +1,3 @@
-
-
 from django.contrib.contenttypes.admin import GenericTabularInline
 
 from . import models

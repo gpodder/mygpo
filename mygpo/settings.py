@@ -279,7 +279,7 @@ if _use_log_file:
         'level': 'INFO',
         'class': 'logging.handlers.RotatingFileHandler',
         'filename': os.getenv('LOGGING_FILENAME'),
-        'maxBytes': 10000000,
+        'maxBytes': 10_000_000,
         'backupCount': 10,
         'formatter': 'verbose',
     }

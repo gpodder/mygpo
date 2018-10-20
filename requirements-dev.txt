@@ -5,4 +5,4 @@ flake8
 django-debug-toolbar==1.10.1
 django-extensions
 jupyter
-black
+black==18.9b0

@@ -1,5 +1,3 @@
-
-
 from django.contrib import admin
 
 from mygpo.pubsub.models import HubSubscription

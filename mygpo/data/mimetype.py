@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 
 # If 20% of the episodes of a podcast are of a given type,
 # then the podcast is considered to be of that type, too
-TYPE_THRESHOLD = .2
+TYPE_THRESHOLD = 0.2
 
 
 CONTENT_TYPES = (_('image'), _('audio'), _('video'))
