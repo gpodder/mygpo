@@ -66,13 +66,11 @@ class SimpleTest(TestCase):
         # we need that for later
         e3_id = e3.pk
 
-        actions = Counter()
-
         # decide which episodes to merge
         groups = [(0, [e1]), (1, [e2, e3]), (2, [e4])]
 
         # carry out the merge
-        pm = PodcastMerger([p1, p2], actions, groups)
+        pm = PodcastMerger([p1, p2], groups)
         pm.merge()
 
         e1 = Episode.objects.get(pk=e1.pk)

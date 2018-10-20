@@ -16,11 +16,23 @@ urlpatterns = [
         views.MergeSelect.as_view(),
         name='admin-merge'),
 
+    path('merge/create',
+        views.CreateMergeTask.as_view(),
+        name='admin-merge-create'),
+
+    path('merge/verify/<uuid:task_id>',
+        views.MergeVerify.as_view(),
+        name='admin-merge-verify'),
+
+    path('merge/update/<uuid:task_id>',
+        views.UpdateMergeTask.as_view(),
+        name='admin-merge-update'),
+
     path('merge/verify',
         views.MergeVerify.as_view(),
         name='admin-merge-verify'),
 
-    path('merge/process',
+    path('merge/process/<uuid:task_id>',
         views.MergeProcess.as_view(),
         name='admin-merge-process'),
 

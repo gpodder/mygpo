@@ -133,11 +133,6 @@ def episode_link(episode, podcast, title=None):
 
 
 @register.simple_tag
-def get_id(obj):
-    return obj._id
-
-
-@register.simple_tag
 def episode_number(episode, podcast):
     num = episode.get_episode_number(podcast.common_episode_title)
     return num or ""

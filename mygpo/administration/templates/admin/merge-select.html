@@ -13,7 +13,14 @@
 {% endblock %}
 
 {% block content %}
- <form method="post" action="{% url "admin-merge-verify" %}" role="form">
+  <div>
+   Queue Length: {{ queue_length }}
+   {% if task %}
+    - <a href="{% url "admin-merge-verify" task.pk %}">Take from Queue</a>
+   {% endif %}
+  </div>
+
+ <form method="post" action="{% url "admin-merge-create" %}" role="form">
   {% csrf_token %}
    {% for url in urls %}
     <div class="form-group">
@@ -22,6 +29,7 @@
     </div>
    {% endfor %}
     <input class="btn btn-default" type="submit" value="OK" />
+    <input class="hidden" name="queue_id" value="{{ queue_id }}" />
  </form>
 
 {% endblock %}

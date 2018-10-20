@@ -42,8 +42,7 @@ class SimpleMergeTests(TestCase):
     def test_merge_podcasts(self):
         # decide which episodes to merge
         groups = [(0, [self.episode1, self.episode2])]
-        counter = Counter()
-        pm = PodcastMerger([self.podcast1, self.podcast2], counter, groups)
+        pm = PodcastMerger([self.podcast1, self.podcast2], groups)
         pm.merge()
 
 
@@ -94,9 +93,8 @@ class MergeTests(TransactionTestCase):
 
         # decide which episodes to merge
         groups = [(0, [self.episode1, self.episode2])]
-        counter = Counter()
 
-        pm = PodcastMerger([self.podcast1, self.podcast2], counter, groups)
+        pm = PodcastMerger([self.podcast1, self.podcast2], groups)
         pm.merge()
 
         history = EpisodeHistoryEntry.objects.filter(
@@ -186,11 +184,10 @@ class MergeGroupTests(TransactionTestCase):
 
         # decide which episodes to merge
         groups = [(0, [self.episode1, self.episode2])]
-        counter = Counter()
 
         episode2_id = self.episode2.id
 
-        pm = PodcastMerger([podcast2, podcast1], counter, groups)
+        pm = PodcastMerger([podcast2, podcast1], groups)
         pm.merge()
 
         history = EpisodeHistoryEntry.objects.filter(

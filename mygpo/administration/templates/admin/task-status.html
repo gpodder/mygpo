@@ -34,16 +34,6 @@
 
  {% if ready %}
 
-  <p>{% trans "The following actions were recorded:" %}
-   <ul>
-    {% for action, count in actions %}
-     <li>{{ action }}: {{ count }}</li>
-    {% empty %}
-     <li><em>{% trans "none" %}</em></li>
-    {% endfor %}
-   </ul>
-  </p>
-
   <p>{% trans "Go to podcast" %} {% podcast_group_link podcast %}</p>
  {% else %}
   <p>{% trans "The operation is still ongoing..." %}</p>
