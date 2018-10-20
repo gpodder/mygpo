@@ -1,18 +1,18 @@
 language: python
 
 dist: xenial
-sudo: true
 
 python:
  - "3.6"
+ - "3.7"
  - "3.6-dev"
  - "3.7-dev"
  - "nightly"
- - "pypy3"
+ - "pypy3.5"
 
 services:
  - redis-server
-  - postgresql
+ - postgresql
 
 addons:
   postgresql: "10"
@@ -33,11 +33,3 @@ after_script:
 
 env:
  - DATABASE_URL="postgres://travis:travis@localhost/mygpo_test"
-
-# temporarily allow failures on 3.7
-# see https://github.com/chtd/psycopg2cffi/issues/95
-matrix:
-  allow_failures:
-    - python: "3.7-dev"
-    - python: "nightly"
-
