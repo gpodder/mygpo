@@ -6,9 +6,6 @@
 {% load math %}
 {% load utils %}
 
-{% load menu %}
-{% block sectionmenu %}{{ "/directory/+license"|section_menu }}{% endblock %}
-
 {% block title %}{% blocktrans with view.license_url|license_name as licensename %}Podcasts with License {{ licensename }}{% endblocktrans %}{% endblock %}
 
 {% block header %}

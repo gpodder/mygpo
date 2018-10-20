@@ -2,9 +2,6 @@
 {% load i18n %}
 {% load podcasts %}
 
-{% load menu %}
-{% block sectionmenu %}{{ "/share/"|section_menu:other_user.username }}{% endblock %}
-
 {% block title %}{{ other_user.username }}{% endblock %}
 
 {% block header %}

@@ -4,9 +4,6 @@
 {% load devices %}
 {% load podcasts %}
 
-{% load menu %}
-{% block sectionmenu %}{{ "/device/"|section_menu:device.name }}{% endblock %}
-
 {% block title %}{% blocktrans with device.name|striptags as devicename %}Device {{ devicename }}{% endblocktrans %}{% endblock %}
 
 {% block header %}

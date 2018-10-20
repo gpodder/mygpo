@@ -5,15 +5,6 @@
 {% load google %}
 {% load utils %}
 
-{% load menu %}
-{% block sectionmenu %}
- {% if podcast.title %}
-  {{ "/podcast/"|section_menu:podcast.title }}
- {% else %}
-  {{ "/podcast/"|section_menu:"Unnamed Podcast" }}
- {% endif %}
-{% endblock %}
-
 {% block head %}
  {{ podcast|opengraph_podcast }}
  {% google_plus_one_head %}

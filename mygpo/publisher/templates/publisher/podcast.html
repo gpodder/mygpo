@@ -6,9 +6,7 @@
 {% load pcharts %}
 {% load time %}
 {% load static %}
-{% load menu %}
 {% load utils %}
-{% block sectionmenu %}{{ "/publisher/podcast/"|section_menu:podcast.title }}{% endblock %}
 
 {% block title %}{{ podcast.title|default:"Unnamed Podcast"|striptags }}{% endblock %}
 

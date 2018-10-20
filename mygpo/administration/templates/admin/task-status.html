@@ -2,9 +2,6 @@
 {% load i18n %}
 {% load podcasts %}
 
-{% load menu %}
-{% block sectionmenu %}{{ "/admin/"|section_menu:"Admin" }}{% endblock %}
-
 {% block head %}
  {% if not ready %}
   <meta http-equiv="refresh" content="10">

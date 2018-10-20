@@ -5,9 +5,6 @@
 {% load podcasts %}
 {% load episodes %}
 
-{% load menu %}
-{% block sectionmenu %}{{ "/history/"|section_menu }}{% endblock %}
-
 {% block title %}{% trans "Subscription History" %}{% if client %} {% trans "for" %} {{ client.name|striptags }}{% endif %}{% endblock %}
 
 {% block header %}

@@ -6,16 +6,6 @@
 {% load math %}
 {% load utils %}
 
-{% load menu %}
-
-{% block sectionmenu %}
- {% if is_own %}
-  {{ "/share/lists/"|section_menu }}
- {% else %}
-  {{ "/lists/"|section_menu }}
- {% endif %}
-{% endblock %}
-
 {% block title %}
  {% blocktrans with podcastlist.title as list_title and owner.username as ownername %}"{{ list_title }}" by {{ ownername }}{% endblocktrans %}
 {% endblock %}
