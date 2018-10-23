@@ -225,7 +225,8 @@ img.device_icon
      Searching
 *******************/
 
-form.search input[type="text"]
+form.search input[type="text"],
+form.search input[type="search"]
 {
     width: 300px;
     display: inline;

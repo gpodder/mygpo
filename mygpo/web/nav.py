@@ -1,6 +1,9 @@
 
 import collections
 
+from mygpo.subscriptions import get_subscribed_podcasts
+
+
 NavEntry = collections.namedtuple('NavEntry', 'urlname label')
 
 PRIMARY_NAV = [
@@ -32,6 +35,12 @@ def primary_navigation(request):
     else:
         nav = PRIMARY_NAV + PRIMARY_NAV_ANON
 
+    if user.is_authenticated:
+        subscriptions = get_subscribed_podcasts(user)
+    else:
+        subscriptions = []
+
     return {
         'primary_nav': nav,
+        'subscriptions': subscriptions,
     }

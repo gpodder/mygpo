@@ -1,6 +1,7 @@
 {% extends "skeleton.html" %}
 {% load i18n %}
 {% load static %}
+{% load podcasts %}
 {% load utils %}
 
 {% block body %}
@@ -25,6 +26,20 @@
 
     </header>
 
+    <nav class="secondary">
+        <ul>
+          {% for subscription in subscriptions %}
+            <li>
+             <a href="{% podcast_link_target subscription.podcast %}">{{ subscription.podcast }}</a>
+            </li>
+          {% endfor %}
+          <li>
+           <form class="form-inline" method="get" action="{% url "search" %}" class="search">
+            <input type="search" name="q" placeholder="{% trans "Search Podcasts" %}" >
+           </form>
+          </li>
+        </ul>
+    </nav>
 
     <main>
 
