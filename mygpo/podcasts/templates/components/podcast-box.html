@@ -1,0 +1,40 @@
+{% load charts %}
+{% load podcasts %}
+{% load humanize %}
+{% load i18n %}
+{% load utils %}
+
+{% comment %}
+ renders a box describing a podcast
+
+ requires parameters:
+  * podcast
+  * long
+
+{% endcomment %}
+
+<div class="podcast">
+
+ <div class="header">
+
+  <a href="{% podcast_link_target podcast %}">
+   <div id="podcastlogo">{{ podcast|podcast_logo_medium }}</div>
+  </a>
+
+  <span class="title">
+   {% podcast_link podcast %}
+  </span>
+
+ <div class="description" {% if podcast.language %}lang="{{ podcast.language }}"{% endif %}>
+  {% if long %}
+   {{ podcast.description|default:""|truncatewords:"100"|markdown }}
+  {% else %}
+   {{ podcast.description|default:""|truncatewords:"50"|striptags }}
+  {% endif %}
+ </div>
+
+ {% if long %}
+  <a href="{% podcast_link_target podcast %}">more...</a>
+ {% endif %}
+
+</div>

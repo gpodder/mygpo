@@ -6,10 +6,6 @@
 {% load math %}
 {% load utils %}
 
-{% load menu %}
-{% block mainmenu %}{{ "/directory/"|main_menu }}{% endblock %}
-{% block sectionmenu %}{{ "/directory/"|section_menu:category }}{% endblock %}
-
 {% block title %}{{ category }}{% endblock %}
 
 {% block header %}

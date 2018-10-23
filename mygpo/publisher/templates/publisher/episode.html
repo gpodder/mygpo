@@ -6,10 +6,6 @@
 {% load charts %}
 {% load pcharts %}
 
-{% load menu %}
-{% block mainmenu %}{{ "/publisher/"|main_menu }}{% endblock %}
-{% block sectionmenu %}{{ "/publisher/podcast/"|section_menu:podcast.title }}{% endblock %}
-
 {% block title %}{{ episode.title|default:"Unnamed Episode"|striptags }}{% endblock %}
 
 {% block head %}

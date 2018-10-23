@@ -1,0 +1,109 @@
+/* General */
+
+body
+{
+    font-family: 'Source Sans Pro', sans-serif;
+}
+
+
+/* Overall Layout */
+
+body {
+	padding: 0 !important; /*remove after removing bootstrap */
+}
+
+#wrapper {
+    display: grid;
+    /* grid-template-areas in the size-specific layouts */
+}
+
+header {
+    grid-area: header;
+}
+
+nav.secondary {
+    grid-area: nav;
+}
+
+main {
+    grid-area: main;
+}
+
+aside {
+    grid-area: side;
+}
+
+footer {
+    grid-area: footer;
+}
+
+
+/* Navigation General */
+
+nav ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+/* Header Navigation */
+
+#logo {
+	padding-right: 20px;
+}
+
+header {
+	display: flex;
+}
+
+header nav ul {
+	height: 100%;
+	display: flex;
+	flex-wrap: wrap;
+	align-content: center;
+}
+
+header nav ul li {
+	display: inline;
+	padding-right: 1em;
+}
+
+nav ul li.active {
+}
+
+nav ul li.active a {
+    color: black;
+}
+
+
+/* Footer */
+
+.hosting {
+    text-align: center;
+}
+
+
+/* Messages */
+
+.status-success {
+    background-color: hsla(var(--color-status-success), 100%, 75%, 1);
+}
+
+.status-error {
+    background-color: hsla(var(--color-status-error), 100%, 75%, 1);
+}
+
+.status-neutral {
+    background-color: hsla(var(--color-status-neutral), 16%, 85%, 1);
+}
+
+
+/* Sections Navigation */
+
+ul.sections li {
+    display: inline;
+}
+
+ul.sections li + li:before
+{
+  content: '· ';
+}

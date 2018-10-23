@@ -6,32 +6,32 @@
 {% load math %}
 {% load utils %}
 
-{% load menu %}
-{% block mainmenu %}{{ "/directory/"|main_menu }}{% endblock %}
-{% block sectionmenu %}{{ "/directory/"|section_menu }}{% endblock %}
-
 {% block title %}{% trans "Podcast Directory" %}{% endblock %}
 
 {% block header %}
    <h1>{% trans "Podcast Directory" %}</h1>
+
+   <nav>
+    <ul class="sections">
+     <li><a href="{% url "search" %}">Search Podcasts</a></li>
+     <li><a href="{% url "podcast-lists" %}">Podcast Lists</a></li>
+     <li><a href="{% url "suggestions" %}">Suggested Podcasts</a></li>
+     <li><a href="{% url "license-podcasts" %}">Podcast Licenses</a></li>
+     <li><a href="{% url "toplist" %}">Podcast Toplist</a></li>
+     <li><a href="{% url "episode-toplist" %}">Episode Toplist</a></li>
+    </li>
+   </nav>
+
 {% endblock %}
 
 
 {% block content %}
+
+ <div class="categories">
+
   {% for c in topics.categories %}
-
-   {% if forloop.counter0|divisibleby:"2" %}
-    <div class="row">
-   {% endif %}
-
-   <div class="col-md-6">
-    {% if c.cls == "PodcastList" %}
-     {% url "user" c.username as user-lists-url %}
-     <h2>{% blocktrans with c.title as listtitle and c.username as username %}{{ listtitle }} <span class="by-user">by <a href="{{ user-lists-url }}">{{ username }}</a></span>{% endblocktrans %}</h2>
-    {% else %}
-     <h2>{{ c.title }}</h2>
-    {% endif %}
-
+   <div>
+    <h2>{{ c.title }}</h2>
     <table class="list">
      {% for entry in c.podcasts|slice:":10" %}
       <tr>
@@ -42,21 +42,45 @@
      <tr>
       <td></td>
       <td>
-       {% if c.cls == "PodcastList" %}
-        <a href="{% url "list-show" c.username c.slug %}">{% trans "more..." %}</a>
-       {% else %}
-        <a href="{% url "directory" c.clean_title %}">{% trans "more..." %}</a>
-       {% endif %}
+       <a href="{% url "directory" c.clean_title %}">{% trans "more..." %}</a>
       <td></td>
      </tr>
     </table>
    </div>
-
-   {% if forloop.counter|divisibleby:"2" %}
-    </div>
-   {% endif %}
-
   {% endfor %}
+
+  {% if podcast_ad %}
+   <div class="ad">
+    {% include "podcast-ad-box.html" with podcast_ad=podcast_ad only %}
+   </div>
+  {% endif %}
+
+  {% for pl in podcastlists %}
+   <div>
+    <h2>{{ pl.title }}
+    {% url "user" pl.user.username as user_lists_url %}
+    <span class="by-user">{% trans "by" %} <a href="{{ user_lists_url }}">{{ pl.user.username }}</a></span>
+    </h2>
+
+    <table class="list">
+     {% for entry in pl.entries.all|slice:":10" %}
+      <tr>
+       <td class="logo">{{ entry.podcast|podcast_logo }}</td>
+       <td>{% podcast_group_link entry.podcast %}</td>
+      </tr>
+     {% endfor %}
+     <tr>
+      <td></td>
+      <td>
+       <a href="{% url "list-show" pl.user.username pl.slug %}">{% trans "more..." %}</a>
+      <td></td>
+     </tr>
+    </table>
+   </div>
+  {% endfor %}
+
+
+ </div>
 
   <hr style="clear: both;"/>
 
@@ -68,73 +92,3 @@
    {% endfor %}
   </div>
 {% endblock %}
-
-
-{% block sidebar %}
-
- {% include "podcast-ad-box.html" with podcast_ad=podcast_ad only %}
-
-
-  {% for podcastlist in podcastlists %}
-   {% if podcastlist and podcastlist.user.username %}
-    <div class="well">
-     <h4>
-      <a href="{% url "list-show" podcastlist.user.username podcastlist.slug %}">
-       {{ podcastlist.title }}
-      </a>
-      <small>{% trans "Podcast List by" %}
-       <a href="{% url "lists-user" podcastlist.user.username %}">
-        {{ podcastlist.user.username }}
-       </a>
-      </small>
-     </h4>
-
-     <div class="logo-group">
-      {% for podcast in podcastlist.podcasts %}
-
-       <a href="{% podcast_link_target podcast %}">
-        {{ podcast|podcast_logo }}
-       </a>
-
-      {% endfor %}
-
-      {% if podcastlist.more_podcasts %}
-       {% blocktrans with podcastlist.more_podcasts as more %}and {{ more }} more{% endblocktrans %}
-      {% endif %}
-     </div>
-
-     <div class="btn-group">
-      <a class="btn btn-primary" href="{% url "lists-overview" %}">
-      {% trans "Create a Podcast List" %}
-     </a>
-     </div>
-
-   </div>
-   {% endif %}
-  {% endfor %}
-
- {% if random_podcast %}
-   <div class="well">
-
-   <h4><small>{% trans "Random" %}</small></h4>
-
-
-   <a href="{% podcast_link_target random_podcast %}">
-    <div id="podcastlogo">{{ random_podcast|podcast_logo_medium }}</div>
-   </a>
-
-   <h4>{{ random_podcast.title }}</h4>
-
-   <p class="description">
-    {{ random_podcast.description|default:""|truncatewords:"50" }}
-   </p>
-
-   <p>
-    <a href="{% podcast_link_target random_podcast %}">{% trans "more..." %}</a>
-   </p>
-
-   </div>
- {% endif %}
-
-{% endblock %}
-

@@ -1,227 +1,159 @@
 {% extends "skeleton.html" %}
 {% load i18n %}
-{% load menu %}
 {% load static %}
+{% load utils %}
 
 {% block titletag %}gpodder.net &mdash; discover and track your podcasts{% endblock %}
 
 {% block body %}
 
-        <div class="navbar navbar-default navbar-fixed-top">
-            <div class="container">
-                <div class="navbar-header">
-                    <a class="btn navbar-btn" data-toggle="collapse" data-target=".navbar-collapse">
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </a>
-                    <a class="navbar-brand" href="/"><img id="inline_logo" src="{% static "gpoddernet_25.png" %}" alt="gpodder.net" /><span style="padding-left: 65px; padding-right: 10px;" >gpodder.net</span></a>
-                </div>
-                <div class="navbar-collapse collapse">
-                        <ul class="nav navbar-nav">
-                            {% block mainmenu %}
-                            {{ "/"|main_menu }}
-                            {% endblock %}
-                        </ul>
+    <header>
 
-                    <ul class="nav navbar-nav navbar-right">
-                     <li class="dropdown">
-                    {% if user.is_authenticated %}
-                    <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-                        <i class="icon-user"></i> {{ user.username }}
-                        <span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="{% url "account" %}">Profile</a></li>
-                        <li class="divider"></li>
-                        <li><a href="{% url "logout" %}">Sign Out</a></li>
-                    </ul>
-                    {% else %}
-                    <a class="btn dropdown-toggle" data-toggle="dropdown" href="">
-                        <i class="icon-user"></i> {% trans "Login" %}
-                        <span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="{% url "login" %}">{% trans "Login" %}</a></li>
-                        <li><a href="{% url "login-google" %}">{% trans "Login with Google" %}</a></li>
-                        <li><a href="{% url "register" %}">{% trans "Register" %}</a></li>
-                    </ul>
-                    {% endif %}
-                    </li>
-                </ul>
-            </div>
+        <div id="logo">
+            <a href="/">
+                <img src="{% static "gpoddernet_64.png" %}" alt="gpodder.net" />
+            </a>
         </div>
-    </div>
 
-    <div class="container">
-        <div class="row">
-            <div class="col-md-2">
-            </div><!--/span-->
-            <div class="col-md-10">
+        <nav class="primary">
 
-                {% if messages %}
-                {% for message in messages %}
-                <div {% if message.tags %} class="{{ message.tags }}"{% endif %}>
-                    {{ message }}
-                </div>
-                {% endfor %}
+            <ul>
+                <li><a href="/">gpodder.net</a></li>
+                {% if user.is_authenticated %}
+                    <li><a href="{% url "account" %}">{{ user.username }}</a></li>
+                    <li><a href="{% url "logout" %}">Sign Out</a></li>
+                {% else %}
+                    <li><a href="{% url "login" %}?next={{ request.get_full_path|urlquote }}">{% trans "Login" %}</a></li>
+                    <li><a href="{% url "login-google" %}?next={{ request.get_full_path|urlquote }}">{% trans "Login with Google" %}</a></li>
+                    <li><a href="{% url "register" %}">{% trans "Register" %}</a></li>
                 {% endif %}
+            </ul>
+        </nav>
 
+    </header>
 
-                <div class="row">
-                    <div class="col-md-12">
-                        {% block header %}
-                        <h1>Discover and track your podcasts</h1>
-                        {% endblock %}
-                    </div>
+    <main class="home">
+
+        {% block header %}
+        <h1>Discover and track your podcasts</h1>
+        {% endblock %}
+
+        {% if messages %}
+        {% for message in messages %}
+        <div {% if message.tags == "error" %} class="alert alert-danger"{% elif message.tags %} class="alert alert-{{ message.tags }}"{% endif %}>
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <div id="content">
+            {% block content %}
+
+            <img style="float: right;" src="{% static "gpoddernet_228.png" %}" alt="gpodder.net" />
+            <p>
+            gpodder.net is a libre web service that allows you to manage your
+            podcast subscriptions and discover new content. If you use multiple
+            devices, you can synchronize subscriptions and your listening progress.
+            </p>
+
+            <p>
+            It works best with the <a href="http://gpodder.org/">gPodder</a>
+            application, but you can also use it with
+            <a href="http://amarok.kde.org/">Amarok</a>,
+            <a href="https://gpoddernet.readthedocs.io/en/latest/user/clients.html">other
+                supported clients</a> or as standalone web application without
+            any client app.
+            </p>
+
+            <div class="well">
+                <div style="width: 12em; margin-left: auto; margin-right: auto;">
+                    <a class="btn btn-primary" href="{% url "login" %}">{% trans "Login" %}</a>
+                    <a class="btn btn-primary" href="{% url "register" %}">{% trans "Register" %}</a>
                 </div>
-
-
-                <div class="row">
-                    <div class="col-md-8" id="content">
-                        {% block content %}
-
-                        <img style="float: right;" src="{% static "gpoddernet_228.png" %}" alt="gpodder.net" />
-                        <p>
-                        gpodder.net is a libre web service that allows you to manage your
-                        podcast subscriptions and discover new content. If you use multiple
-                        devices, you can synchronize subscriptions and your listening progress.
-                        </p>
-
-                        <p>
-                        It works best with the <a href="http://gpodder.org/">gPodder</a>
-                        application, but you can also use it with
-                        <a href="http://amarok.kde.org/">Amarok</a>,
-                        <a href="https://gpoddernet.readthedocs.io/en/latest/user/clients.html">other
-                            supported clients</a> or as standalone web application without
-                        any client app.
-                        </p>
-
-                        <div class="well">
-                            <div style="width: 12em; margin-left: auto; margin-right: auto;">
-                                <a class="btn btn-primary" href="{% url "login" %}">{% trans "Login" %}</a>
-                                <a class="btn btn-primary" href="{% url "register" %}">{% trans "Register" %}</a>
-                            </div>
-                        </div>
-
-                        <h3>Features</h3>
-
-                        <ul>
-                            <li>Share your favorite content with others</li>
-                            <li>Keep track of your playback progress</li>
-                            <li>Back up your subscriptions</li>
-                            <li>Discover new content, based on your listening habits</li>
-                            <li>Create and share lists of related podcasts</li>
-                            <li><em>For publishers:</em> Find out which parts
-                            of your content are popular</li>
-                        </ul>
-
-                        {% endblock %}
-                    </div>
-
-
-                    <div class="col-md-4" id="sidebar">
-                        {% block sidebar %}
-                        {% endblock %}
-                    </div>
-                </div>
-
-
-                <footer class="row">
-
-                 {% block ads %}
-                  {% if adsense_client %}
-                   <hr />
-
-                   <script type="text/javascript"><!--
-                    google_ad_client = "{{ adsense_client }}";
-                    /* "Bottom" slot */
-                    google_ad_slot = "{{ adsense_slot_bottom }}";
-                    google_ad_width = 728;
-                    google_ad_height = 90;
-                    //-->
-                   </script>
-                   <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js">
-                   </script>
-                  {% endif %}
-                 {% endblock %}
-
-                        <hr />
-
-                        <div class="col-md-1">
-                            <ul>
-                                <li><strong>{% trans "Discover" %}</strong></li>
-                                <li><a href="{% url "directory-home" %}">{% trans "Directory" %}</a></li>
-                                <li><a href="{% url "toplist" %}">{% trans "Podcasts" %}</a></li>
-                                <li><a href="{% url "search" %}">{% trans "Search" %}</a></li>
-                            </ul>
-                        </div>
-
-                        <div class="col-md-1">
-                            <ul>
-                                <li><strong>{% trans "Support" %}</strong></li>
-                                <li><a href="{% url "help" %}">{% trans "Docs" %}</a></li>
-                                <li><a href="https://gpodder.github.io/docs/mailing-list.html">{% trans "Mailing&nbsp;List" %}</a></li>
-                                <li><a href="https://github.com/gpodder/mygpo/issues">{%trans "Questions" %}</a></li>
-                            </ul>
-                        </div>
-
-                        <div class="col-md-1">
-                            <ul>
-                                <li><strong>{% trans "Support&nbsp;Us" %}</strong></li>
-                                <li><a href="{% url "contribute" %}">{% trans "Donate" %}</a></li>
-                                <li><a href="{% url "advertise" %}">{% trans "Advertise" %}</a></li>
-                            </ul>
-                        </div>
-
-                        <div class="col-md-1">
-                            <ul>
-                                <li><strong>{% trans "Follow" %}</strong></li>
-                                <li><a href="https://twitter.com/gpoddernet">{% trans "Twitter" %}</a></li>
-                                <li><a href="http://blog.gpodder.org/">{% trans "Blog" %}</a></li>
-                                <li><a href="http://blog.gpodder.org/feeds/posts/default">{% trans "Blog&nbsp;(RSS)" %}</a></li>
-                            </ul>
-                        </div>
-
-                        <div class="col-md-1">
-                            <ul>
-                                <li><strong>{% trans "Develop" %}</strong></li>
-                                <li><a href="https://gpoddernet.readthedocs.io/en/latest/api/">{% trans "API" %}</a></li>
-                                <li><a href="https://gpoddernet.readthedocs.io/en/latest/dev/libraries.html">{% trans "Libraries" %}</a></li>
-                                <li><a href="https://gpoddernet.readthedocs.io/en/latest/user/clients.html">{% trans "Clients" %}</a></li>
-                            </ul>
-                        </div>
-
-                        <div class="col-md-1">
-                            <ul>
-                                <li><strong>{% trans "Publish" %}</strong></li>
-                                <li><a href="{% url "publisher" %}">{% trans "Get&nbsp;Access" %}</a></li>
-                                <li><a href="{% url "link-here" %}">{% trans "Link&nbsp;To&nbsp;Us" %}</a></li>
-                                <li><a href="{% url "advertise" %}">{% trans "Advertise" %}</a></li>
-                            </ul>
-                        </div>
-
-                      </div>
-                    <div class="row">
-                       <div class="col-lg-offset-2 col-md-6 hosting">
-                         <a href="http://www.prgmr.com/">{% trans "hosting provided by prgmr.com" %}</a>
-                       </div>
-                    </div>
-
-                    </footer>
-
-                    </div><!--/.fluid-container-->
-
-                </div>
-
             </div>
 
-            <!-- Le javascript
-            ================================================== -->
-            <!-- Placed at the end of the document so the pages load faster -->
-            <script src="{% static "js/jquery.js" %}"></script>
-            <script src="{% static "js/bootstrap-dropdown.js" %}"></script>
+            <h3>Features</h3>
 
-            {% block javascript %}{% endblock javascript %}
+            <ul>
+                <li>Share your favorite content with others</li>
+                <li>Keep track of your playback progress</li>
+                <li>Back up your subscriptions</li>
+                <li>Discover new content, based on your listening habits</li>
+                <li>Create and share lists of related podcasts</li>
+                <li><em>For publishers:</em> Find out which parts
+                of your content are popular</li>
+            </ul>
+
+            {% endblock %}
+        </div>
+    </main>
+
+    <aside>
+        {% block sidebar %}
+        {% endblock %}
+    </aside>
+
+    <footer>
+        <nav>
+
+            <ul>
+                <li><strong>{% trans "Discover" %}</strong></li>
+                <li><a href="{% url "directory-home" %}">{% trans "Directory" %}</a></li>
+                <li><a href="{% url "toplist" %}">{% trans "Podcasts" %}</a></li>
+                <li><a href="{% url "search" %}">{% trans "Search" %}</a></li>
+            </ul>
+
+            <ul>
+                <li><strong>{% trans "Support" %}</strong></li>
+                <li><a href="{% url "help" %}">{% trans "Docs" %}</a></li>
+                <li><a href="https://gpodder.github.io/docs/mailing-list.html">{% trans "Mailing&nbsp;List" %}</a></li>
+                <li><a href="https://github.com/gpodder/mygpo/issues">{%trans "Questions" %}</a></li>
+            </ul>
+
+            <ul>
+                <li><strong>{% trans "Support&nbsp;Us" %}</strong></li>
+                <li><a href="{% url "contribute" %}">{% trans "Donate" %}</a></li>
+                <li><a href="{% url "advertise" %}">{% trans "Advertise" %}</a></li>
+            </ul>
+
+            <ul>
+                <li><strong>{% trans "Follow" %}</strong></li>
+                <li><a href="https://twitter.com/gpoddernet">{% trans "Twitter" %}</a></li>
+                <li><a href="http://blog.gpodder.org/">{% trans "Blog" %}</a></li>
+                <li><a href="http://blog.gpodder.org/feeds/posts/default">{% trans "Blog&nbsp;(RSS)" %}</a></li>
+            </ul>
+
+            <ul>
+                <li><strong>{% trans "Develop" %}</strong></li>
+                <li><a href="https://gpoddernet.readthedocs.io/en/latest/api/">{% trans "API" %}</a></li>
+                <li><a href="https://gpoddernet.readthedocs.io/en/latest/dev/libraries.html">{% trans "Libraries" %}</a></li>
+                <li><a href="https://gpoddernet.readthedocs.io/en/latest/user/clients.html">{% trans "Clients" %}</a></li>
+            </ul>
+
+            <ul>
+                <li><strong>{% trans "Publish" %}</strong></li>
+                <li><a href="{% url "publisher" %}">{% trans "Get&nbsp;Access" %}</a></li>
+                <li><a href="{% url "link-here" %}">{% trans "Link&nbsp;To&nbsp;Us" %}</a></li>
+                <li><a href="{% url "advertise" %}">{% trans "Advertise" %}</a></li>
+            </ul>
+
+        </nav>
+
+        <div class="hosting">
+            <a href="http://www.prgmr.com/">{% trans "hosting provided by prgmr.com" %}</a>
+        </div>
+
+    </footer>
+
+</div>
+
+
+<!-- Le javascript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="{% static "js/jquery.js" %}"></script>
+<script src="{% static "js/bootstrap-dropdown.js" %}"></script>
+
+{% block javascript %}{% endblock javascript %}
 
 {% endblock %}

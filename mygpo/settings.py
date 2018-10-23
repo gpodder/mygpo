@@ -109,6 +109,8 @@ TEMPLATES = [{
                 # templates. this is used to direct users to previous
                 # page after login
                 'django.template.context_processors.request',
+
+                'mygpo.web.nav.primary_navigation',
         ],
         'libraries': {
             'staticfiles' : 'django.templatetags.static',
@@ -120,6 +122,10 @@ TEMPLATES = [{
         ],
     },
 }]
+
+if DEBUG:
+    loaders = TEMPLATES[0]['OPTIONS']['loaders'][0][1]
+    TEMPLATES[0]['OPTIONS']['loaders'] = loaders
 
 
 MIDDLEWARE = [

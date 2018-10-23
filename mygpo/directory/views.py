@@ -136,7 +136,8 @@ class Directory(View):
 
 
     def get_random_list(self, podcasts_per_list=5):
-        random_list = PodcastList.objects.order_by('?').first()
+        all_lists = PodcastList.objects.filter(entries__isnull=False)
+        random_list = all_lists.order_by('?').first()
         yield random_list
 
 

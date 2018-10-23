@@ -1,10 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% load menu %}
-{% block mainmenu %}{{ "/account/"|main_menu }}{% endblock %}
-{% block sectionmenu %}{{ "/account/"|section_menu }}{% endblock %}
-
 {% block title %}{% trans "Account Settings" %}{% endblock %}
 
 {% block header %}
@@ -67,6 +63,15 @@
     </div>
 
    </form>
+
+   <div class="panel panel-info">
+    <div class="panel-heading">
+     <h2 class="panel-title">{% trans "Privacy Settings" %}</h2>
+    </div>
+    <div class="panel-body">
+     <a class="btn btn-default" href="{% url "privacy" %}">{% trans "Open Privacy Settings" %}</a>
+    </div>
+   </div>
 
    <div class="panel panel-danger">
     <div class="panel-heading">
