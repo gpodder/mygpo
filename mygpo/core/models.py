@@ -20,7 +20,7 @@ class UUIDModel(models.Model):
 class TwitterModel(models.Model):
     """ A model that has a twitter handle """
 
-    twitter = models.CharField(max_length=15, null=True, blank=False)
+    twitter = models.CharField(max_length=15, null=True, blank=True)
 
     class Meta:
         abstract = True
