@@ -16,9 +16,9 @@ class SearchTests(unittest.TestCase):
 
         # create a podcast
         podcast = Podcast(
-            id = uuid.uuid1(),
-            title = 'Awesome Podcast',
-            description = 'An amazing podcast on many topics',
+            id=uuid.uuid1(),
+            title='Awesome Podcast',
+            description='An amazing podcast on many topics',
         )
         podcast.save()
 

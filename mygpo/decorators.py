@@ -24,6 +24,7 @@ from django.http import HttpResponseForbidden, HttpResponseNotAllowed
 from django.contrib.auth import get_user_model
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -43,6 +44,7 @@ def requires_token(token_name, denied_template=None):
     * the denied_template is rendered and returned if given
     * HttpResponseForbidden is returned, if denied_template is not given
     """
+
     def decorator(fn):
         @wraps(fn)
         def tmp(request, username, *args, **kwargs):
@@ -57,14 +59,13 @@ def requires_token(token_name, denied_template=None):
 
             else:
                 if denied_template:
-                    return render(request, denied_template, {
-                        'other_user': user
-                    })
+                    return render(request, denied_template, {'other_user': user})
 
                 else:
                     return HttpResponseForbidden()
 
         return tmp
+
     return decorator
 
 
@@ -99,6 +100,7 @@ def query_if_required():
             return f(self, *args, **kwargs)
 
         return wrapper
+
     return decorator
 
 
@@ -113,4 +115,5 @@ def cors_origin(allowed_origin='*'):
             return resp
 
         return wrapper
+
     return decorator

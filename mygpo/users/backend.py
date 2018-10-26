@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -10,8 +11,9 @@ class CaseInsensitiveModelBackend(ModelBackend):
 
     def authenticate(self, request, username=None, password=None, **kwargs):
         UserModel = get_user_model()
-        users = UserModel.objects.filter(username__iexact=username)\
-                                 .order_by('-last_login')
+        users = UserModel.objects.filter(username__iexact=username).order_by(
+            '-last_login'
+        )
         users = list(users)
         if len(users) == 0:
             # Run the default password hasher once to reduce the timing

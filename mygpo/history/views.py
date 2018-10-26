@@ -8,6 +8,7 @@ from mygpo.users.models import Client
 from mygpo.history.models import HistoryEntry
 from mygpo.podcasts.views.podcast import slug_decorator, id_decorator
 
+
 @vary_on_cookie
 @cache_control(private=True)
 @login_required
@@ -15,8 +16,7 @@ def history(request, count=15, uid=None):
     user = request.user
     client = None
 
-    history = HistoryEntry.objects.filter(user=user)\
-                                  .select_related('podcast')
+    history = HistoryEntry.objects.filter(user=user).select_related('podcast')
 
     if uid:
         try:
@@ -41,11 +41,9 @@ def history(request, count=15, uid=None):
         # If page is out of range (e.g. 9999), deliver last page of results.
         entries = paginator.page(paginator.num_pages)
 
-    return render(request, 'history.html', {
-        'history': entries,
-        'client': client,
-        'page': page,
-    })
+    return render(
+        request, 'history.html', {'history': entries, 'client': client, 'page': page}
+    )
 
 
 @never_cache
@@ -56,10 +54,9 @@ def podcast_history(request, podcast):
     user = request.user
     history = HistoryEntry.objects.filter(user=request.user, podcast=podcast)
 
-    return render(request, 'podcast-history.html', {
-        'history': history,
-        'podcast': podcast,
-    })
+    return render(
+        request, 'podcast-history.html', {'history': history, 'podcast': podcast}
+    )
 
 
 history_podcast_slug = slug_decorator(podcast_history)

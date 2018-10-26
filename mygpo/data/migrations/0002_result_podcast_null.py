@@ -8,14 +8,16 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('data', '0001_initial'),
-    ]
+    dependencies = [('data', '0001_initial')]
 
     operations = [
         migrations.AlterField(
             model_name='podcastupdateresult',
             name='podcast',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='podcasts.Podcast'),
-        ),
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to='podcasts.Podcast',
+            ),
+        )
     ]

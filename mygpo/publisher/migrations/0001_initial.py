@@ -16,18 +16,27 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='PublishedPodcast',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('podcast', models.ForeignKey(
-                    to='podcasts.Podcast',
-                    on_delete=models.CASCADE,
-                )),
-                ('publisher', models.ForeignKey(
-                    to=settings.AUTH_USER_MODEL,
-                    on_delete=models.CASCADE,
-                )),
+                (
+                    'id',
+                    models.AutoField(
+                        verbose_name='ID',
+                        serialize=False,
+                        auto_created=True,
+                        primary_key=True,
+                    ),
+                ),
+                (
+                    'podcast',
+                    models.ForeignKey(to='podcasts.Podcast', on_delete=models.CASCADE),
+                ),
+                (
+                    'publisher',
+                    models.ForeignKey(
+                        to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+                    ),
+                ),
             ],
-            options={
-            },
+            options={},
             bases=(models.Model,),
-        ),
+        )
     ]

@@ -8,5 +8,6 @@ def sync_user_on_subscription(sender, **kwargs):
     sync_user.delay(user.pk)
 
 
-subscription_changed.connect(sync_user_on_subscription,
-                             dispatch_uid='sync_user_on_subscription')
+subscription_changed.connect(
+    sync_user_on_subscription, dispatch_uid='sync_user_on_subscription'
+)

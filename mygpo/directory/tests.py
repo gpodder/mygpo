@@ -16,10 +16,9 @@ class ToplistTests(unittest.TestCase):
         """ Test the all_languages method of the toplists """
         languages = ['de', 'de_AT', 'en']
         for lang in languages:
-            Podcast.objects.create(id=uuid.uuid1(),
-                                   created=datetime.utcnow(),
-                                   language=lang,
-                                )
+            Podcast.objects.create(
+                id=uuid.uuid1(), created=datetime.utcnow(), language=lang
+            )
 
         view = ToplistView()
         all_langs = view.all_languages()

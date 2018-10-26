@@ -36,14 +36,17 @@ class GenericManager(models.Manager):
         workaround which only gives approximate results. see:
         http://wiki.postgresql.org/wiki/Slow_Counting """
         cursor = connection.cursor()
-        cursor.execute("select reltuples from pg_class where relname='%s';" %
-                       self.model._meta.db_table)
+        cursor.execute(
+            "select reltuples from pg_class where relname='%s';"
+            % self.model._meta.db_table
+        )
         row = cursor.fetchone()
         return int(row[0])
 
 
 class UpdateInfoModel(models.Model):
     """ Model that keeps track of when it was created and updated """
+
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 

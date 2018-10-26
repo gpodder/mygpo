@@ -10,6 +10,10 @@ python:
  - "nightly"
  - "pypy3.5"
 
+matrix:
+  allow_failures:
+  - python: 'pypy3.5'
+
 services:
  - redis-server
  - postgresql
@@ -26,6 +30,7 @@ before_script:
   - psql -c 'create database mygpo_test;' -U postgres
 
 script:
+  - make check-code-format
   - pytest --cov=mygpo/ --cov-branch
 
 after_script:

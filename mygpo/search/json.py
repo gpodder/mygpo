@@ -1,4 +1,3 @@
-
 """ Converts models to a JSON representation """
 
 

@@ -6,14 +6,24 @@ from django.db.models import Model
 from django.apps import apps
 from django.contrib.contenttypes.fields import GenericForeignKey
 
-from mygpo.podcasts.models import (MergedUUID, ScopedModel, OrderedModel, Slug,
-                                   Tag, URL, MergedUUID, Podcast, Episode)
+from mygpo.podcasts.models import (
+    MergedUUID,
+    ScopedModel,
+    OrderedModel,
+    Slug,
+    Tag,
+    URL,
+    MergedUUID,
+    Podcast,
+    Episode,
+)
 from mygpo import utils
 from mygpo.history.models import HistoryEntry, EpisodeHistoryEntry
 from mygpo.publisher.models import PublishedPodcast
 from mygpo.subscriptions.models import Subscription
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -34,8 +44,9 @@ class PodcastMerger(object):
             for m, podcast2 in enumerate(podcasts):
                 if podcast1 == podcast2 and n != m:
                     raise IncorrectMergeException(
-                        "can't merge podcast %s into itself %s" %
-                        (podcast1.get_id(), podcast2.get_id()))
+                        "can't merge podcast %s into itself %s"
+                        % (podcast1.get_id(), podcast2.get_id())
+                    )
 
         self.podcasts = podcasts
         self.actions = actions
@@ -70,7 +81,7 @@ def reassign_urls(obj1, obj2):
     # Reassign all URLs of obj2 to obj1
     max_order = max([0] + [u.order for u in obj1.urls.all()])
 
-    for n, url in enumerate(obj2.urls.all(), max_order+1):
+    for n, url in enumerate(obj2.urls.all(), max_order + 1):
         url.content_object = obj1
         url.order = n
         url.scope = obj1.scope
@@ -92,7 +103,7 @@ def reassign_merged_uuids(obj1, obj2):
 def reassign_slugs(obj1, obj2):
     # Reassign all Slugs of obj2 to obj1
     max_order = max([0] + [s.order for s in obj1.slugs.all()])
-    for n, slug in enumerate(obj2.slugs.all(), max_order+1):
+    for n, slug in enumerate(obj2.slugs.all(), max_order + 1):
         slug.content_object = obj1
         slug.order = n
         slug.scope = obj1.scope
@@ -137,15 +148,19 @@ def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
     # generic related fields.
     generic_fields = []
     for model in apps.get_models():
-        fields = filter(lambda x: isinstance(x[1], GenericForeignKey),
-                        model.__dict__.items())
+        fields = filter(
+            lambda x: isinstance(x[1], GenericForeignKey), model.__dict__.items()
+        )
         for field_name, field in fields:
             generic_fields.append(field)
 
     blank_local_fields = set(
-        [field.attname for field
-         in primary_object._meta.local_fields
-         if getattr(primary_object, field.attname) in [None, '']])
+        [
+            field.attname
+            for field in primary_object._meta.local_fields
+            if getattr(primary_object, field.attname) in [None, '']
+        ]
+    )
 
     # Loop through all alias objects and migrate their data to
     # the primary object.
@@ -172,12 +187,10 @@ def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
 
             if alias_varname is not None:
                 # standard case
-                related_many_objects = getattr(alias_object,
-                                               alias_varname).all()
+                related_many_objects = getattr(alias_object, alias_varname).all()
             else:
                 # special case, symmetrical relation, no reverse accessor
-                related_many_objects = getattr(alias_object,
-                                               obj_varname).all()
+                related_many_objects = getattr(alias_object, obj_varname).all()
             for obj in related_many_objects.all():
                 getattr(obj, obj_varname).remove(alias_object)
                 reassigned(obj, primary_object)
@@ -188,8 +201,7 @@ def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
         for field in generic_fields:
             filter_kwargs = {}
             filter_kwargs[field.fk_field] = alias_object._get_pk_val()
-            filter_kwargs[field.ct_field] = field.get_content_type(
-                alias_object)
+            filter_kwargs[field.ct_field] = field.get_content_type(alias_object)
             related = field.model.objects.filter(**filter_kwargs)
             for generic_related_object in related:
                 setattr(generic_related_object, field.name, primary_object)
@@ -222,15 +234,16 @@ def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
 
 def _get_all_related_objects(obj):
     return [
-        f for f in obj._meta.get_fields()
-        if (f.one_to_many or f.one_to_one) and
-        f.auto_created and not f.concrete
+        f
+        for f in obj._meta.get_fields()
+        if (f.one_to_many or f.one_to_one) and f.auto_created and not f.concrete
     ]
 
 
 def _get_all_related_many_to_many_objects(obj):
     return [
-        f for f in obj._meta.get_fields(include_hidden=True)
+        f
+        for f in obj._meta.get_fields(include_hidden=True)
         if f.many_to_many and f.auto_created
     ]
 
@@ -242,7 +255,7 @@ def reassigned(obj, new):
 
         existing_urls = new.urls.all()
         max_order = max([-1] + [u.order for u in existing_urls])
-        obj.order = max_order+1
+        obj.order = max_order + 1
 
     elif isinstance(obj, Episode):
         # obj is an Episode, new is a podcast
@@ -260,8 +273,9 @@ def reassigned(obj, new):
         pass
 
     else:
-        raise TypeError('unknown type for reassigning: {objtype}'.format(
-            objtype=type(obj)))
+        raise TypeError(
+            'unknown type for reassigning: {objtype}'.format(objtype=type(obj))
+        )
 
 
 def before_delete(old, new):
@@ -281,8 +295,9 @@ def before_delete(old, new):
         )
 
     else:
-        raise TypeError('unknown type for deleting: {objtype}'.format(
-            objtype=type(old)))
+        raise TypeError(
+            'unknown type for deleting: {objtype}'.format(objtype=type(old))
+        )
 
 
 def merge(moved_obj, new_target):
@@ -293,5 +308,4 @@ def merge(moved_obj, new_target):
         pass
 
     else:
-        raise TypeError('unknown type for merging: {objtype}'.format(
-            objtype=type(old)))
+        raise TypeError('unknown type for merging: {objtype}'.format(objtype=type(old)))

@@ -6,6 +6,7 @@ from django.utils.translation import ugettext as _
 from mygpo.users.models import Client
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -16,33 +17,36 @@ class UserAccountForm(forms.Form):
     if one of the three password fields is set, a password change is assumed
     and the current and new passwords are checked.
     """
+
     email = forms.EmailField(
         label=_('E-Mail address'),
-        widget=forms.TextInput(attrs={
-            'class': 'input input-sm form-control',
-        }),
-        required=True)
+        widget=forms.TextInput(attrs={'class': 'input input-sm form-control'}),
+        required=True,
+    )
 
     password_current = forms.CharField(
         label=_('Current password'),
-        widget=forms.PasswordInput(render_value=False, attrs={
-            'class': 'input input-sm form-control',
-        }),
-        required=False)
+        widget=forms.PasswordInput(
+            render_value=False, attrs={'class': 'input input-sm form-control'}
+        ),
+        required=False,
+    )
 
     password1 = forms.CharField(
         label=_('New password'),
-        widget=forms.PasswordInput(render_value=False, attrs={
-            'class': 'input input-sm form-control',
-        }),
-        required=False)
+        widget=forms.PasswordInput(
+            render_value=False, attrs={'class': 'input input-sm form-control'}
+        ),
+        required=False,
+    )
 
     password2 = forms.CharField(
         label=_('Confirm password'),
-        widget=forms.PasswordInput(render_value=False, attrs={
-            'class': 'input input-sm form-control',
-        }),
-        required=False)
+        widget=forms.PasswordInput(
+            render_value=False, attrs={'class': 'input input-sm form-control'}
+        ),
+        required=False,
+    )
 
     def is_valid(self):
         if not super(UserAccountForm, self).is_valid():
@@ -68,18 +72,14 @@ class UserAccountForm(forms.Form):
 class ProfileForm(forms.Form):
     twitter = forms.CharField(
         label=_('Twitter'),
-        widget=forms.TextInput(attrs={
-            'class': 'input input-sm form-control',
-        }),
+        widget=forms.TextInput(attrs={'class': 'input input-sm form-control'}),
         required=False,
     )
 
     about = forms.CharField(
         label=_('A few words about you'),
         required=False,
-        widget=forms.Textarea(attrs={
-            'class': 'input input-sm form-control',
-        }),
+        widget=forms.Textarea(attrs={'class': 'input input-sm form-control'}),
         help_text='You can use Markdown',
     )
 
@@ -88,20 +88,29 @@ class DeviceForm(forms.Form):
     """
     form for editing device information by a user.
     """
-    name = forms.CharField(max_length=100, label=_('Name'),
-                widget=forms.TextInput(attrs={
-                    'class': 'input input-sm form-control',
-                    'placeholder': 'Device Name',
-                }))
-    type = forms.ChoiceField(choices=Client.TYPES, label=_('Type'),
-                widget=forms.Select(attrs={
-                    'class': 'input input-sm form-control',
-                }))
-    uid = forms.CharField(max_length=50, label=_('Device ID'),
-                widget=forms.TextInput(attrs={
-                    'class': 'input input-sm form-control',
-                    'placeholder': _('ID on device'),
-                }))
+
+    name = forms.CharField(
+        max_length=100,
+        label=_('Name'),
+        widget=forms.TextInput(
+            attrs={'class': 'input input-sm form-control', 'placeholder': 'Device Name'}
+        ),
+    )
+    type = forms.ChoiceField(
+        choices=Client.TYPES,
+        label=_('Type'),
+        widget=forms.Select(attrs={'class': 'input input-sm form-control'}),
+    )
+    uid = forms.CharField(
+        max_length=50,
+        label=_('Device ID'),
+        widget=forms.TextInput(
+            attrs={
+                'class': 'input input-sm form-control',
+                'placeholder': _('ID on device'),
+            }
+        ),
+    )
 
 
 class PrivacyForm(forms.Form):
@@ -111,8 +120,8 @@ class PrivacyForm(forms.Form):
     """
 
     public = forms.BooleanField(
-        required=False,
-        label=_('Share this subscription with other users (public)'))
+        required=False, label=_('Share this subscription with other users (public)')
+    )
 
 
 class SyncForm(forms.Form):
@@ -121,16 +130,12 @@ class SyncForm(forms.Form):
     """
 
     targets = forms.CharField(
-            widget = forms.Select(attrs={
-                'class': 'input input-sm form-control',
-            }),
-        )
+        widget=forms.Select(attrs={'class': 'input input-sm form-control'})
+    )
 
     def set_targets(self, sync_targets, label=''):
         targets = list(map(self.sync_target_choice, sync_targets))
-        self.fields['targets'] = forms.ChoiceField(
-            choices=targets,
-            label=label)
+        self.fields['targets'] = forms.ChoiceField(choices=targets, label=label)
 
     def sync_target_choice(self, target):
         """
@@ -163,23 +168,17 @@ class SyncForm(forms.Form):
 
 class ResendActivationForm(forms.Form):
     username = forms.CharField(
-        max_length=100,
-        label=_('Please enter your username'),
-        required=False)
+        max_length=100, label=_('Please enter your username'), required=False
+    )
 
     email = forms.CharField(
         max_length=100,
         label=_('or the email address used while registering'),
-        required=False)
+        required=False,
+    )
 
 
 class RestorePasswordForm(forms.Form):
-    username = forms.CharField(
-        max_length=100,
-        label=_('Username'),
-        required=False)
+    username = forms.CharField(max_length=100, label=_('Username'), required=False)
 
-    email = forms.CharField(
-        max_length=100,
-        label=_('E-Mail address'),
-        required=False)
+    email = forms.CharField(max_length=100, label=_('E-Mail address'), required=False)

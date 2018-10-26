@@ -34,6 +34,12 @@ install-deps:
 	sudo apt-get install libpq-dev libjpeg-dev zlib1g-dev libwebp-dev \
 		build-essential python3-dev virtualenv libffi-dev
 
+format-code:
+	black --py36 --skip-string-normalization mygpo/
 
-.PHONY: all help test clean unittest coverage install-deps
+check-code-format:
+	black --check --py36 --skip-string-normalization mygpo/
+
+
+.PHONY: all help test clean unittest coverage install-deps format-code
 

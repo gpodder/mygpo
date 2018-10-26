@@ -13,7 +13,9 @@ def get_tags(url):
 
     split = urllib.parse.urlsplit(url)
     if split.path == '':
-        split = urllib.parse.SplitResult(split.scheme, split.netloc, '/', split.query, split.fragment)
+        split = urllib.parse.SplitResult(
+            split.scheme, split.netloc, '/', split.query, split.fragment
+        )
     url = split.geturl()
 
     m = hashlib.md5()
@@ -34,6 +36,5 @@ def get_tags(url):
             return {}
         for tag, count in o['top_tags'].items():
             tags[tag] = count
-
 
     return tags

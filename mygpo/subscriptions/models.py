@@ -1,5 +1,3 @@
-
-
 import collections
 
 from django.db import models
@@ -27,16 +25,15 @@ class Subscription(DeleteableModel):
     """ A subscription to a podcast on a specific client """
 
     # the user that subscribed to a podcast
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, db_index=True,
-                             on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, db_index=True, on_delete=models.CASCADE
+    )
 
     # the client on which the user subscribed to the podcast
-    client = models.ForeignKey(Client, db_index=True,
-                               on_delete=models.CASCADE)
+    client = models.ForeignKey(Client, db_index=True, on_delete=models.CASCADE)
 
     # the podcast to which the user subscribed to
-    podcast = models.ForeignKey(Podcast, db_index=True,
-                                on_delete=models.PROTECT)
+    podcast = models.ForeignKey(Podcast, db_index=True, on_delete=models.PROTECT)
 
     # the URL that the user subscribed to; a podcast might have multiple URLs,
     # the we want to return the users the ones they know
@@ -51,19 +48,16 @@ class Subscription(DeleteableModel):
     objects = SubscriptionManager()
 
     class Meta:
-        unique_together = [
-            ['user', 'client', 'podcast'],
-        ]
+        unique_together = [['user', 'client', 'podcast']]
 
-        index_together = [
-            ['user', 'client'],
-            ['podcast', 'user'],
-        ]
+        index_together = [['user', 'client'], ['podcast', 'user']]
 
     def __str__(self):
         return '{user} subscribed to {podcast} on {client}'.format(
-            user=self.user, podcast=self.podcast, client=self.client)
+            user=self.user, podcast=self.podcast, client=self.client
+        )
 
 
-SubscribedPodcast = collections.namedtuple('SubscribedPodcast',
-                                           'podcast public ref_url')
+SubscribedPodcast = collections.namedtuple(
+    'SubscribedPodcast', 'podcast public ref_url'
+)

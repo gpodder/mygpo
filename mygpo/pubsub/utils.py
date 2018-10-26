@@ -19,8 +19,7 @@ logger = logging.getLogger(__name__)
 def subscribe(podcast, feedurl, huburl, base_url, mode='subscribe'):
     """ Subscribe to the feed at a Hub """
 
-    logger.info('subscribing for {feed} at {hub}'.format(feed=feedurl,
-                                                         hub=huburl))
+    logger.info('subscribing for {feed} at {hub}'.format(feed=feedurl, hub=huburl))
     verify = 'sync'
 
     token_max_len = HubSubscription._meta.get_field('verify_token').max_length
@@ -30,7 +29,7 @@ def subscribe(podcast, feedurl, huburl, base_url, mode='subscribe'):
             'verify_token': random_token(token_max_len),
             'mode': '',
             'podcast': podcast,
-        }
+        },
     )
 
     if subscription.mode == mode:
@@ -39,19 +38,21 @@ def subscribe(podcast, feedurl, huburl, base_url, mode='subscribe'):
             return
 
     else:
-        logger.info('subscription exists but has wrong mode: ' +
-                    'old: %(oldmode)s, new: %(newmode)s. Overwriting.' %
-                    dict(oldmode=subscription.mode, newmode=mode))
+        logger.info(
+            'subscription exists but has wrong mode: '
+            + 'old: %(oldmode)s, new: %(newmode)s. Overwriting.'
+            % dict(oldmode=subscription.mode, newmode=mode)
+        )
 
     subscription.topic_url = feedurl
     subscription.mode = mode
     subscription.save()
 
     data = {
-        "hub.callback":     callback_url(feedurl, base_url),
-        "hub.mode":         mode,
-        "hub.topic":        feedurl,
-        "hub.verify":       verify,
+        "hub.callback": callback_url(feedurl, base_url),
+        "hub.mode": mode,
+        "hub.topic": feedurl,
+        "hub.verify": verify,
         "hub.verify_token": subscription.verify_token,
     }
 
@@ -65,8 +66,10 @@ def subscribe(podcast, feedurl, huburl, base_url, mode='subscribe'):
 
     except urllib.error.HTTPError as e:
         if e.code != 204:  # we actually expect a 204 return code
-            msg = 'Could not send subscription to Hub: HTTP Error %d: %s' % \
-                (e.code, e.reason)
+            msg = 'Could not send subscription to Hub: HTTP Error %d: %s' % (
+                e.code,
+                e.reason,
+            )
             logger.warn(msg)
             raise SubscriptionError(msg)
 
@@ -79,12 +82,12 @@ def subscribe(podcast, feedurl, huburl, base_url, mode='subscribe'):
         status = resp.code
         if status != 204:
             logger.warn('received incorrect status %d' % status)
-            raise SubscriptionError('Subscription has not been accepted by '
-                                    'the Hub')
+            raise SubscriptionError('Subscription has not been accepted by ' 'the Hub')
 
 
 def callback_url(feedurl, base_url):
     callback = reverse('pubsub-subscribe')
     param = urllib.parse.urlencode([('url', feedurl)])
-    return '{base}{callback}?{param}'.format(base=base_url, callback=callback,
-                                             param=param)
+    return '{base}{callback}?{param}'.format(
+        base=base_url, callback=callback, param=param
+    )

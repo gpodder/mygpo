@@ -11,31 +11,26 @@ def forward(apps, schema_editor):
 
     migrations.RunSQL(
         sql=[
-            ('CREATE UNIQUE INDEX user_case_insensitive_unique '
-             'ON auth_user ((lower(username)));', None),
-        ],
+            (
+                'CREATE UNIQUE INDEX user_case_insensitive_unique '
+                'ON auth_user ((lower(username)));',
+                None,
+            )
+        ]
     )
 
 
 def reverse(apps, schema_editor):
-    migrations.RunSQL([
-        ('DROP INDEX IF EXISTS user_case_insensitive_unique', None),
-    ])
+    migrations.RunSQL([('DROP INDEX IF EXISTS user_case_insensitive_unique', None)])
 
 
 class Migration(migrations.Migration):
     """ Create a unique case-insensitive index on the username column """
 
-    dependencies = [
-        ('auth', '0001_initial'),
-        ('users', '0014_django_uuidfield'),
-    ]
+    dependencies = [('auth', '0001_initial'), ('users', '0014_django_uuidfield')]
 
     operations = [
         # Wrap RunSQL in RunPython to check for DB backend
         # http://stackoverflow.com/a/37521148/693140
-        migrations.RunPython(
-            code=forward,
-            reverse_code=reverse,
-        )
+        migrations.RunPython(code=forward, reverse_code=reverse)
     ]

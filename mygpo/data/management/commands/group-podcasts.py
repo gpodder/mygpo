@@ -5,11 +5,10 @@ from mygpo.podcasts.models import Podcast
 
 def pairwise(t):
     it = iter(t)
-    return zip(it,it)
+    return zip(it, it)
 
 
 class Command(BaseCommand):
-
     def add_arguments(self, parser):
         parser.add_argument('title')
         parser.add_argument('url1')

@@ -7,6 +7,7 @@ from django import template
 
 register = template.Library()
 
+
 @register.filter
 def sec_to_time(sec):
     """ Converts seconds to a time object
@@ -19,7 +20,7 @@ def sec_to_time(sec):
     s = int(sec)
     hour = int(s / 60 / 60)
     minute = int((s / 60) % 60)
-    sec = int(s % 60 )
+    sec = int(s % 60)
     return time(hour, minute, sec)
 
 

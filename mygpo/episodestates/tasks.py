@@ -22,14 +22,14 @@ def update_episode_state(historyentry_pk):
     user = historyentry.user
     episode = historyentry.episode
 
-    logger.info('Updating Episode State for {user} / {episode}'.format(
-        user=user, episode=episode))
+    logger.info(
+        'Updating Episode State for {user} / {episode}'.format(
+            user=user, episode=episode
+        )
+    )
 
     state = EpisodeState.objects.update_or_create(
         user=user,
         episode=episode,
-        defaults={
-            'action': historyentry.action,
-            'timestamp': historyentry.timestamp,
-        }
+        defaults={'action': historyentry.action, 'timestamp': historyentry.timestamp},
     )
