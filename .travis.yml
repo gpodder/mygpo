@@ -7,12 +7,16 @@ python:
  - "3.7"
  - "3.6-dev"
  - "3.7-dev"
+ - "3.8-dev"
  - "nightly"
  - "pypy3.5"
 
 matrix:
   allow_failures:
-  - python: 'pypy3.5'
+  - python:
+    'pypy3.5'
+    '3.8-dev'
+    'nightly'
 
 services:
  - redis-server
