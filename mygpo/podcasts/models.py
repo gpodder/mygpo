@@ -70,7 +70,7 @@ class LinkModel(models.Model):
 class LanguageModel(models.Model):
     """ Model that has a language """
 
-    language = models.CharField(max_length=10, null=True, blank=False,
+    language = models.CharField(max_length=10, null=True, blank=True,
                                 db_index=True)
 
     class Meta:
@@ -91,7 +91,7 @@ class LastUpdateModel(models.Model):
 
 class LicenseModel(models.Model):
     # URL to a license (usually Creative Commons)
-    license = models.CharField(max_length=100, null=True, blank=False,
+    license = models.CharField(max_length=100, null=True, blank=True,
                                db_index=True)
 
     class Meta:
@@ -100,7 +100,7 @@ class LicenseModel(models.Model):
 
 class FlattrModel(models.Model):
     # A Flattr payment URL
-    flattr_url = models.URLField(null=True, blank=False, max_length=1000,
+    flattr_url = models.URLField(null=True, blank=True, max_length=1000,
                                  db_index=True)
 
     class Meta:
@@ -559,21 +559,21 @@ class Podcast(UUIDModel, TitleModel, DescriptionModel, LinkModel,
     """ A Podcast """
 
     logo_url = models.URLField(null=True, max_length=1000)
-    group = models.ForeignKey(PodcastGroup, null=True,
+    group = models.ForeignKey(PodcastGroup, null=True, blank=True,
                               on_delete=models.PROTECT)
-    group_member_name = models.CharField(max_length=30, null=True, blank=False)
+    group_member_name = models.CharField(max_length=30, null=True, blank=True)
 
     # if p1 is related to p2, p2 is also related to p1
-    related_podcasts = models.ManyToManyField('self', symmetrical=True)
+    related_podcasts = models.ManyToManyField('self', symmetrical=True, blank=True)
 
     subscribers = models.PositiveIntegerField(default=0)
-    restrictions = models.CharField(max_length=20, null=False, blank=True,
+    restrictions = models.CharField(max_length=20, blank=True,
                                     default='')
-    common_episode_title = models.CharField(max_length=100, null=False, blank=True)
-    new_location = models.URLField(max_length=1000, null=True, blank=False)
-    latest_episode_timestamp = models.DateTimeField(null=True)
+    common_episode_title = models.CharField(max_length=100, blank=True)
+    new_location = models.URLField(max_length=1000, null=True, blank=True)
+    latest_episode_timestamp = models.DateTimeField(null=True, blank=True)
     episode_count = models.PositiveIntegerField(default=0)
-    hub = models.URLField(null=True)
+    hub = models.URLField(null=True, blank=True)
 
     # Interval between episodes, within a specified range
     update_interval = models.PositiveSmallIntegerField(null=False,
