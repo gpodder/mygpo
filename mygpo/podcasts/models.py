@@ -554,7 +554,7 @@ class Podcast(
     group_member_name = models.CharField(max_length=30, null=True, blank=False)
 
     # if p1 is related to p2, p2 is also related to p1
-    related_podcasts = models.ManyToManyField('self', symmetrical=True)
+    related_podcasts = models.ManyToManyField('self', symmetrical=True, blank=True)
 
     subscribers = models.PositiveIntegerField(default=0)
     restrictions = models.CharField(max_length=20, null=False, blank=True, default='')
@@ -562,7 +562,7 @@ class Podcast(
     new_location = models.URLField(max_length=1000, null=True, blank=False)
     latest_episode_timestamp = models.DateTimeField(null=True)
     episode_count = models.PositiveIntegerField(default=0)
-    hub = models.URLField(null=True)
+    hub = models.URLField(null=True, blank=True)
 
     # Interval between episodes, within a specified range
     update_interval = models.PositiveSmallIntegerField(
