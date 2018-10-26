@@ -10,6 +10,10 @@ python:
  - "nightly"
  - "pypy3.5"
 
+matrix:
+  allow_failures:
+  - python: 'pypy3.5'
+
 services:
  - redis-server
  - postgresql
