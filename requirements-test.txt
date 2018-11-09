@@ -2,5 +2,5 @@ coverage==4.5.1
 django-coverage-plugin==1.6.0
 pytest-django
 pytest-cov
-responses==0.10.2
+responses==0.10.3
 black==18.9b0
