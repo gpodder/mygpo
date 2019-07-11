@@ -24,6 +24,7 @@ What are the tasks?
 * developing new features
 * fixing bugs
 * responding to bug reports
+* keeping the system up and running 
 
 
 What requirements are there to a new maintainer?
@@ -31,6 +32,7 @@ What requirements are there to a new maintainer?
 
 * Python knowledge
 * Basic understanding of web technologies
+* Basic understanding of relational databases
 
 
 What do you gain from maintaining gpodder.net?
@@ -66,6 +68,11 @@ What if there is no new maintainer?
 
 If now maintainer is found, gpodder.net will most likely be shut down by the
 end of 2019.
+
+
+Interested?
+-----------
+Please write to stefan@skoegl.net
 
 
 
