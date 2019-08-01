@@ -114,7 +114,6 @@ commands regularly on your development machine:
 
 .. code-block:: bash
 
-    envdir envs/local python manage.py update-categories
     envdir envs/local python manage.py update-toplist
     envdir envs/local python manage.py update-episode-toplist
 
