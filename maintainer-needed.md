@@ -63,7 +63,7 @@ I reserve the right to cancel the handover if I deem necessary.
 What if there is no new maintainer?
 -----------------------------------
 
-If now new maintainer can be found, gpodder.net most likely going to be shut down by the
+If no new maintainer can be found, gpodder.net most likely going to be shut down by the
 end of 2019.
 
 
