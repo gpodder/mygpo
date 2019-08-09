@@ -193,10 +193,10 @@ def normalize_twitter(s):
 
 
 CCLICENSE = re.compile(
-    r'http://(www\.)?creativecommons.org/licenses/([a-z-]+)/([0-9.]+)?/?'
+    r'https?://(www\.)?creativecommons.org/licenses/([a-z-]+)/([0-9.]+)?/?'
 )
 CCPUBLICDOMAIN = re.compile(
-    r'http://(www\.)?creativecommons.org/licenses/publicdomain/?'
+    r'https?://(www\.)?creativecommons.org/licenses/publicdomain/?'
 )
 LicenseInfo = collections.namedtuple('LicenseInfo', 'name version url')
 
