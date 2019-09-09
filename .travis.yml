@@ -13,10 +13,9 @@ python:
 
 matrix:
   allow_failures:
-  - python:
-    'pypy3.5'
-    '3.8-dev'
-    'nightly'
+  - python: 'pypy3.5'
+  - python: '3.8-dev'
+  - python: 'nightly'
 
 services:
  - redis-server
