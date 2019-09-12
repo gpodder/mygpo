@@ -14,6 +14,7 @@ except ImportError:
 
 import django
 import six
+
 django.utils.six = six
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
