@@ -55,7 +55,7 @@ def update_podcasts(queue):
     for n, podcast_url in enumerate(queue, 1):
         logger.info('Update %d - %s', n, podcast_url)
         if not podcast_url:
-            logger.warn('Podcast URL empty, skipping')
+            logger.warning('Podcast URL empty, skipping')
             continue
 
         try:
@@ -275,7 +275,7 @@ class PodcastUpdater(object):
         try:
             subscribe_at_hub(podcast)
         except SubscriptionError as se:
-            logger.warn('subscribing to hub failed: %s', str(se))
+            logger.warning('subscribing to hub failed: %s', str(se))
 
         self.assign_slug(podcast)
         episode_updater.assign_missing_episode_slugs()

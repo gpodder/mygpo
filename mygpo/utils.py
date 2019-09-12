@@ -608,7 +608,7 @@ def to_maxlength(cls, field, val):
     orig_length = len(val)
     if orig_length > max_length:
         val = val[:max_length]
-        logger.warn(
+        logger.warning(
             '%s.%s length reduced from %d to %d',
             cls.__name__,
             field,
@@ -679,7 +679,7 @@ def set_ordered_entries(
 
                 EntryClass.objects.create(order=n, **links)
             except IntegrityError as ie:
-                logger.warn('Could not create enry for %s: %s', obj, ie)
+                logger.warning('Could not create enry for %s: %s', obj, ie)
 
     with transaction.atomic():
         delete = [s.pk for s in existing.values()]

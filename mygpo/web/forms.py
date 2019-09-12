@@ -159,7 +159,7 @@ class SyncForm(forms.Form):
         in the form.
         """
         if not self.is_valid():
-            logger.warn('no target given in SyncForm')
+            logger.warning('no target given in SyncForm')
             raise ValueError(_('No device selected'))
 
         target = self.cleaned_data['targets']

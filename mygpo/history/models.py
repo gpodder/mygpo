@@ -169,7 +169,7 @@ class EpisodeHistoryEntry(models.Model):
             stopped=stopped,
         ).exists()
         if exists:
-            logger.warn(
+            logger.warning(
                 'Trying to save duplicate {cls} for {user} '
                 '/ {episode}'.format(cls=cls, user=user, episode=episode)
             )
@@ -207,7 +207,7 @@ class EpisodeHistoryEntry(models.Model):
             return entry
 
         except ValidationError as e:
-            logger.warn(
+            logger.warning(
                 'Validation of {cls} failed for {user}: {err}'.format(
                     cls=cls, user=user, err=e
                 )

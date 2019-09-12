@@ -149,7 +149,7 @@ class PodcastLogoTests(TestCase):
         self.assertEqual(302, response.status_code)
         redir = response['Location']
 
-        logger.warn('Redirecting to {}'.format(redir))
+        logger.warning('Redirecting to {}'.format(redir))
 
         response = self.client.get(redir)
         self.assertEqual(200, response.status_code)

@@ -37,7 +37,7 @@ def update_related_podcasts(podcast_pk, max_related=20):
         try:
             podcast.related_podcasts.add(p)
         except IntegrityError:
-            logger.warn('Integrity error while adding related podcast', exc_info=True)
+            logger.warning('Integrity error while adding related podcast', exc_info=True)
 
 
 # interval in which podcast updates are scheduled

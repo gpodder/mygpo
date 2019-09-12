@@ -476,7 +476,7 @@ class UrlsMixin(models.Model):
                 next_order += 1
             except IntegrityError as ie:
                 err = str(ie)
-                logger.warn(u'Could not add URL: {0}'.format(err))
+                logger.warning(u'Could not add URL: {0}'.format(err))
                 continue
 
     def set_url(self, url):
@@ -687,7 +687,7 @@ class Podcast(
             return self.title
 
         if not self.url:
-            logger.warn(
+            logger.warning(
                 'Podcast with ID {podcast_id} does not have a URL'.format(
                     podcast_id=self.id
                 )

@@ -30,7 +30,7 @@ def get_photo_sizes(photo_id):
     try:
         resp = requests.get(url)
     except requests.exceptions.RequestException as e:
-        logger.warn('Retrieving Flickr photo sizes failed: %s', str(e))
+        logger.warning('Retrieving Flickr photo sizes failed: %s', str(e))
         return []
 
     try:

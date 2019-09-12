@@ -78,7 +78,7 @@ def episodes(request, username, version=1):
                 username,
                 request.body.decode('ascii', errors='replace'),
             )
-            logger.warn(msg, exc_info=True)
+            logger.warning(msg, exc_info=True)
             return HttpResponseBadRequest(msg)
 
         logger.info(
@@ -115,7 +115,7 @@ def episodes(request, username, version=1):
                 'invalid episode action attributes while uploading episode actions for user %s'
                 % (username,)
             )
-            logger.warn(msg, exc_info=True)
+            logger.warning(msg, exc_info=True)
             return HttpResponseBadRequest(str(e))
 
         logger.info(
@@ -308,7 +308,7 @@ def device(request, username, device_uid, version=None):
             username,
             request.body.decode('ascii', errors='replace'),
         )
-        logger.warn(msg, exc_info=True)
+        logger.warning(msg, exc_info=True)
         return HttpResponseBadRequest(msg)
 
     if 'caption' in data:

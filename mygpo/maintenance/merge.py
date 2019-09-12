@@ -88,7 +88,7 @@ def reassign_urls(obj1, obj2):
         try:
             url.save()
         except IntegrityError as ie:
-            logger.warn('Moving URL failed: %s. Deleting.', str(ie))
+            logger.warning('Moving URL failed: %s. Deleting.', str(ie))
             url.delete()
 
 
@@ -110,7 +110,7 @@ def reassign_slugs(obj1, obj2):
         try:
             slug.save()
         except IntegrityError as ie:
-            logger.warn('Moving Slug failed: %s. Deleting', str(ie))
+            logger.warning('Moving Slug failed: %s. Deleting', str(ie))
             slug.delete()
 
 
