@@ -24,6 +24,9 @@ update-po:
 		--ignore=res/* --ignore=tools/* --ignore=mygpo/*/migrations/* \
 		--ignore=static/*
 
+compilemessages:
+	envdir envs/dev/ python manage.py compilemessages
+
 notebook:
 	envdir envs/dev/ python manage.py shell_plus --notebook
 
