@@ -4,7 +4,7 @@ import string
 import collections
 from datetime import datetime
 
-from django.utils.translation import ungettext
+from django.utils.translation import ngettext
 from django.views.decorators.cache import never_cache
 from django.utils.html import strip_tags
 from django.urls import reverse
@@ -282,15 +282,15 @@ def hours_to_str(hours_total):
 
     if weeks:
         strs.append(
-            ungettext('%(weeks)d week', '%(weeks)d weeks', weeks) % {'weeks': weeks}
+            ngettext('%(weeks)d week', '%(weeks)d weeks', weeks) % {'weeks': weeks}
         )
 
     if days:
-        strs.append(ungettext('%(days)d day', '%(days)d days', days) % {'days': days})
+        strs.append(ngettext('%(days)d day', '%(days)d days', days) % {'days': days})
 
     if hours:
         strs.append(
-            ungettext('%(hours)d hour', '%(hours)d hours', hours) % {'hours': hours}
+            ngettext('%(hours)d hour', '%(hours)d hours', hours) % {'hours': hours}
         )
 
     return ', '.join(strs)
