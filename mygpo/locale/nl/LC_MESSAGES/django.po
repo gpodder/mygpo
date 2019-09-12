@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-02 18:14+0000\n"
+"POT-Creation-Date: 2019-09-12 20:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Heimen Stoffels <vistausss@outlook.com>, 2018\n"
 "Language-Team: Dutch (Netherlands) (https://www.transifex.com/yaron/"
@@ -28,7 +28,7 @@ msgstr "Gebruiker activeren"
 
 #: mygpo/administration/templates/admin/activate-user.html:20
 #: mygpo/administration/templates/admin/resend-acivation.html:20
-#: mygpo/web/forms.py:179 mygpo/web/templates/account.html:112
+#: mygpo/web/forms.py:182 mygpo/web/templates/account.html:112
 msgid "Username"
 msgstr "Gebruikersnaam"
 
@@ -154,7 +154,7 @@ msgstr "Ingeplande Celery-taken"
 #: mygpo/administration/templates/admin/make-publisher-input.html:12
 #: mygpo/administration/templates/admin/make-publisher-result.html:9
 #: mygpo/administration/templates/admin/make-publisher-result.html:12
-#: mygpo/administration/views.py:441
+#: mygpo/administration/views.py:447
 msgid "Publisher Permissions"
 msgstr "Uitgeversmachtigingen"
 
@@ -286,25 +286,25 @@ msgstr "Verversen"
 msgid "User-Agent"
 msgstr "Gebruikersagent"
 
-#: mygpo/administration/views.py:154 mygpo/administration/views.py:176
+#: mygpo/administration/views.py:152 mygpo/administration/views.py:170
 #, python-brace-format
 msgid "No podcast with URL {url}"
 msgstr "Geen podcast met de URL {url}"
 
-#: mygpo/administration/views.py:330 mygpo/administration/views.py:361
+#: mygpo/administration/views.py:321 mygpo/administration/views.py:356
 msgid "Provide either username or email address"
 msgstr "Geef een gebruikersnaam of e-mailadres op"
 
-#: mygpo/administration/views.py:336 mygpo/administration/views.py:367
+#: mygpo/administration/views.py:327 mygpo/administration/views.py:362
 msgid "No user found"
 msgstr "Geen gebruiker gevonden"
 
-#: mygpo/administration/views.py:341
+#: mygpo/administration/views.py:334
 #, python-brace-format
 msgid "User {username} ({email}) activated"
 msgstr "Gebruiker {username} ({email}) is geactiveerd"
 
-#: mygpo/administration/views.py:376
+#: mygpo/administration/views.py:373
 #, fuzzy, python-brace-format
 #| msgid "User {username} ({email}) activated"
 msgid "Email for {username} ({email}) resent"
@@ -338,21 +338,21 @@ msgstr "geabonneerd"
 msgid "unsubscribed"
 msgstr "gedeabonneerd"
 
-#: mygpo/api/simple.py:55 mygpo/api/simple.py:90
+#: mygpo/api/simple.py:58 mygpo/api/simple.py:93
 #, python-format
 msgid "%(username)s's Subscription List"
 msgstr "%(username)s's abonnementenlijst"
 
-#: mygpo/api/simple.py:240
+#: mygpo/api/simple.py:262
 #, python-format
 msgid "gpodder.net - Top %(count)d"
 msgstr "gpodder.net - Top %(count)d"
 
-#: mygpo/api/simple.py:275
+#: mygpo/api/simple.py:298
 msgid "gpodder.net - Search"
 msgstr "gpodder.net - Zoeken"
 
-#: mygpo/api/simple.py:292
+#: mygpo/api/simple.py:324
 #, python-format
 msgid "gpodder.net - %(count)d Suggestions"
 msgstr "gpodder.net - %(count)d suggesties"
@@ -450,8 +450,8 @@ msgstr "Licentie tonen"
 #: mygpo/directory/templates/directory/license-podcasts.html:36
 #: mygpo/directory/templates/search.html:35
 #: mygpo/directory/templates/toplist.html:26
-#: mygpo/podcastlists/templates/list.html:48 mygpo/web/templatetags/menu.py:33
-#: mygpo/web/templatetags/menu.py:68
+#: mygpo/podcastlists/templates/list.html:48 mygpo/web/templatetags/menu.py:37
+#: mygpo/web/templatetags/menu.py:78
 msgid "Podcast"
 msgstr "Podcast"
 
@@ -474,14 +474,14 @@ msgid "Podcasts with License Information"
 msgstr "Podcasts met licentie-informatie"
 
 #: mygpo/directory/templates/directory/licenses.html:23
-#: mygpo/web/templatetags/menu.py:40
+#: mygpo/web/templatetags/menu.py:44
 msgid "License"
 msgstr "Licentie"
 
 #: mygpo/directory/templates/directory/licenses.html:24
 #: mygpo/directory/templates/podcast_lists.html:24
 #: mygpo/web/templates/base.html:135 mygpo/web/templates/home.html:155
-#: mygpo/web/templatetags/menu.py:42
+#: mygpo/web/templatetags/menu.py:46
 msgid "Podcasts"
 msgstr "Podcasts"
 
@@ -528,7 +528,7 @@ msgid "OK"
 msgstr "Oké"
 
 #: mygpo/directory/templates/missing.html:11
-#: mygpo/directory/templates/missing.html:14 mygpo/web/templatetags/menu.py:35
+#: mygpo/directory/templates/missing.html:14 mygpo/web/templatetags/menu.py:39
 msgid "Missing Podcast"
 msgstr "Ontbrekende podcast"
 
@@ -561,7 +561,7 @@ msgstr "Gesponsorde podcast"
 #: mygpo/podcastlists/templates/lists.html:13
 #: mygpo/podcastlists/templates/lists.html:16
 #: mygpo/podcastlists/templates/lists_user.html:9
-#: mygpo/web/templatetags/menu.py:36 mygpo/web/templatetags/menu.py:58
+#: mygpo/web/templatetags/menu.py:40 mygpo/web/templatetags/menu.py:68
 msgid "Podcast Lists"
 msgstr "Podcastlijsten"
 
@@ -596,7 +596,7 @@ msgstr "Creëer een lijst met podcasts over een onderwerp dat je interesseert"
 #: mygpo/podcastlists/templates/list.html:104
 #: mygpo/subscriptions/templates/subscriptions.html:53
 #: mygpo/web/templates/base.html:136 mygpo/web/templates/home.html:156
-#: mygpo/web/templatetags/menu.py:34
+#: mygpo/web/templatetags/menu.py:38
 msgid "Search"
 msgstr "Zoeken"
 
@@ -628,14 +628,14 @@ msgstr "Toplijst"
 msgid "Client Access"
 msgstr "Client-toegang"
 
-#: mygpo/directory/views.py:321
+#: mygpo/directory/views.py:334
 #, python-format
 msgid "%d podcasts added"
 msgstr "%d podcasts toegevoegd"
 
 #: mygpo/history/templates/episode-history.html:47
 #: mygpo/history/templates/episode-history.html:81
-#: mygpo/web/templates/device.html:73 mygpo/web/templatetags/menu.py:51
+#: mygpo/web/templates/device.html:73 mygpo/web/templatetags/menu.py:58
 msgid "History"
 msgstr "Geschiedenis"
 
@@ -662,7 +662,7 @@ msgid "Action"
 msgstr "Actie"
 
 #: mygpo/history/templates/episode-history.html:86
-#: mygpo/web/templatetags/menu.py:50
+#: mygpo/web/templatetags/menu.py:57
 msgid "Device"
 msgstr "Apparaat"
 
@@ -786,28 +786,28 @@ msgstr "Podcastlijsten van %(username)s"
 msgid "%(username)s hasn't created any podcast lists yet."
 msgstr "%(username)s heeft nog geen podcastlijsten gecreëerd."
 
-#: mygpo/podcastlists/views.py:104
+#: mygpo/podcastlists/views.py:103
 msgid "You have to specify a title."
 msgstr "Je moet een titel opgeven."
 
-#: mygpo/podcastlists/views.py:110
+#: mygpo/podcastlists/views.py:109
 #, python-brace-format
 msgid "\"{title}\" is not a valid title"
 msgstr "\"{title}\" is geen geldige titel"
 
-#: mygpo/podcastlists/views.py:169
+#: mygpo/podcastlists/views.py:162
 msgid "Thanks for rating!"
 msgstr "Bedankt voor het beoordelen!"
 
-#: mygpo/podcasts/admin.py:22 mygpo/web/templates/device-edit.html:28
+#: mygpo/podcasts/admin.py:27 mygpo/web/templates/device-edit.html:28
 msgid "Edit"
 msgstr "Bewerken"
 
-#: mygpo/podcasts/models.py:704
+#: mygpo/podcasts/models.py:695
 msgid "Unknown Podcast"
 msgstr "Onbekende podcast"
 
-#: mygpo/podcasts/models.py:706
+#: mygpo/podcasts/models.py:698
 #, python-brace-format
 msgid "Unknown Podcast from {domain}"
 msgstr "Onbekende podcast van {domain}"
@@ -888,7 +888,7 @@ msgstr "Labels"
 msgid "Older Episodes"
 msgstr "Oudere afleveringen"
 
-#: mygpo/publisher/forms.py:5
+#: mygpo/publisher/forms.py:6
 #: mygpo/publisher/templates/publisher/episode.html:60
 msgid "URL"
 msgstr "URL"
@@ -919,7 +919,7 @@ msgstr "Vervang 'YOUR_ADRESS' door het adres van je podcastfeed."
 #: mygpo/publisher/templates/publisher/info.html:20
 #: mygpo/web/templates/base.html:153 mygpo/web/templates/base.html:180
 #: mygpo/web/templates/home.html:173 mygpo/web/templates/home.html:200
-#: mygpo/web/templatetags/menu.py:66
+#: mygpo/web/templatetags/menu.py:76
 msgid "Advertise"
 msgstr "Adverteren"
 
@@ -1048,7 +1048,7 @@ msgstr "Terug naar podcastpagina"
 
 #: mygpo/publisher/templates/publisher/episodes.html:31
 #: mygpo/share/templates/userpage.html:182
-#: mygpo/share/templates/userpage.html:188 mygpo/web/templatetags/menu.py:43
+#: mygpo/share/templates/userpage.html:188 mygpo/web/templatetags/menu.py:47
 msgid "Episodes"
 msgstr "Afleveringen"
 
@@ -1241,7 +1241,7 @@ msgstr ""
 msgid "Update now"
 msgstr "Nu bijwerken"
 
-#: mygpo/publisher/templates/publisher/podcast.html:117 mygpo/web/forms.py:70
+#: mygpo/publisher/templates/publisher/podcast.html:117 mygpo/web/forms.py:74
 #: mygpo/web/templates/base.html:160 mygpo/web/templates/home.html:180
 msgid "Twitter"
 msgstr "Twitter"
@@ -1336,7 +1336,7 @@ msgstr "Link"
 msgid "Show Group Stats"
 msgstr "Groepsstatistieken tonen"
 
-#: mygpo/publisher/views.py:148
+#: mygpo/publisher/views.py:173
 msgid ""
 "The update has been scheduled. It might take some time until the results are "
 "visible."
@@ -1344,15 +1344,15 @@ msgstr ""
 "De bijwerking is ingepland. Het kan even duren voordat de resultaten "
 "zichtbaar zijn."
 
-#: mygpo/publisher/views.py:161 mygpo/users/views/settings.py:98
+#: mygpo/publisher/views.py:188 mygpo/users/views/settings.py:112
 msgid "Data updated"
 msgstr "Gegevens bijgewerkt"
 
-#: mygpo/publisher/views.py:172
+#: mygpo/publisher/views.py:198
 msgid "Publisher token updated"
 msgstr "Uitgever-toegangssleutel bijgewerkt"
 
-#: mygpo/publisher/views.py:262
+#: mygpo/publisher/views.py:301
 #, python-brace-format
 msgid "Removed slug {slug} from {episode}"
 msgstr "Slug {slug} verwijderd uit {episode}"
@@ -1425,8 +1425,8 @@ msgstr "Delen"
 
 #: mygpo/share/templates/share/overview.html:21
 #: mygpo/web/templates/device.html:19 mygpo/web/templates/privacy.html:25
-#: mygpo/web/templatetags/menu.py:45 mygpo/web/templatetags/menu.py:46
-#: mygpo/web/templatetags/menu.py:57
+#: mygpo/web/templatetags/menu.py:51 mygpo/web/templatetags/menu.py:53
+#: mygpo/web/templatetags/menu.py:67
 msgid "Subscriptions"
 msgstr "Abonnementen"
 
@@ -1441,7 +1441,7 @@ msgid "User Page"
 msgstr "Gebruikerspagina"
 
 #: mygpo/share/templates/share/overview.html:51
-#: mygpo/web/templatetags/menu.py:60
+#: mygpo/web/templatetags/menu.py:71
 msgid "Settings"
 msgstr "Instellingen"
 
@@ -1575,23 +1575,23 @@ msgstr ""
 msgid "Download OPML"
 msgstr "OPML downloaden"
 
-#: mygpo/subscriptions/views.py:108
+#: mygpo/subscriptions/views.py:117
 #, python-format
 msgid "%(username)s's Podcast Subscriptions on %(site)s"
 msgstr "%(username)s's podcastabonnementen op %(site)s"
 
-#: mygpo/subscriptions/views.py:112
+#: mygpo/subscriptions/views.py:123
 #, python-format
 msgid "Recent changes to %(username)s's podcast subscriptions on %(site)s"
 msgstr ""
 "Recente wijzigen aan %(username)s's podcastabonnementenlijst op %(site)s"
 
-#: mygpo/subscriptions/views.py:136
+#: mygpo/subscriptions/views.py:147
 #, python-format
 msgid "%(username)s subscribed to %(podcast)s (%(site)s)"
 msgstr "%(username)s heeft zich geabonneerd op %(podcast)s (%(site)s)"
 
-#: mygpo/subscriptions/views.py:138
+#: mygpo/subscriptions/views.py:149
 #, python-format
 msgid "%(username)s unsubscribed from %(podcast)s (%(site)s)"
 msgstr "%(username)s heeft zich gedeabonneerd op %(podcast)s (%(site)s)"
@@ -1609,27 +1609,27 @@ msgstr "Niet geïnteresseerd"
 msgid "No Suggestions Yet"
 msgstr "Nog geen aanbevelingen"
 
-#: mygpo/users/models.py:226
+#: mygpo/users/models.py:224
 msgid "Desktop"
 msgstr "Desktop"
 
-#: mygpo/users/models.py:227
+#: mygpo/users/models.py:225
 msgid "Laptop"
 msgstr "Laptop"
 
-#: mygpo/users/models.py:228
+#: mygpo/users/models.py:226
 msgid "Cell phone"
 msgstr "Mobiele telefoon"
 
-#: mygpo/users/models.py:229
+#: mygpo/users/models.py:227
 msgid "Server"
 msgstr "Server"
 
-#: mygpo/users/models.py:230
+#: mygpo/users/models.py:228
 msgid "Tablet"
 msgstr "Tablet"
 
-#: mygpo/users/models.py:231
+#: mygpo/users/models.py:229
 msgid "Other"
 msgstr "Overig"
 
@@ -1666,7 +1666,7 @@ msgstr "Je bent al geregistreerd."
 #: mygpo/users/templates/registration/registration_form.html:72
 #: mygpo/web/templates/base.html:52 mygpo/web/templates/home.html:47
 #: mygpo/web/templates/home.html:103 mygpo/web/templates/login.html:48
-#: mygpo/web/templatetags/menu.py:24
+#: mygpo/web/templatetags/menu.py:25
 msgid "Register"
 msgstr "Registreren"
 
@@ -1721,32 +1721,32 @@ msgstr "Activatie-e-mail verstuurd"
 msgid "The activation email has been resent."
 msgstr "De activatie-e-mail is opnieuw verstuurd."
 
-#: mygpo/users/views/device.py:80 mygpo/users/views/device.py:170
+#: mygpo/users/views/device.py:82 mygpo/users/views/device.py:174
 msgid "Synchronize with the following devices"
 msgstr "Synchroniseren met de volgende apparaten"
 
-#: mygpo/users/views/device.py:98
+#: mygpo/users/views/device.py:104
 msgid "Please fill out all fields."
 msgstr "Voer alle velden in."
 
-#: mygpo/users/views/device.py:110
+#: mygpo/users/views/device.py:116
 msgid "Device saved"
 msgstr "Apparaat opgeslagen"
 
-#: mygpo/users/views/device.py:117 mygpo/users/views/device.py:148
+#: mygpo/users/views/device.py:124 mygpo/users/views/device.py:155
 msgid "You can't use the same Device ID for two devices."
 msgstr "Je kunt dezelfde apparaat-ID niet gebruiken voor twee apparaten."
 
-#: mygpo/users/views/device.py:141
+#: mygpo/users/views/device.py:147
 msgid "Device updated"
 msgstr "Apparaat bijgewerkt"
 
-#: mygpo/users/views/device.py:194
+#: mygpo/users/views/device.py:202
 #, python-brace-format
 msgid "Could not upload subscriptions: {err}"
 msgstr "Abonnementen kunnen niet worden geüpload: {err}"
 
-#: mygpo/users/views/device.py:292
+#: mygpo/users/views/device.py:302
 msgid "Your subscription will be updated in a moment."
 msgstr "Je abonnement wordt zometeen bijgewerkt."
 
@@ -1754,62 +1754,62 @@ msgstr "Je abonnement wordt zometeen bijgewerkt."
 msgid "Username or email address already in use"
 msgstr "Gebruikersnaam of e-mailadres is al in gebruik"
 
-#: mygpo/users/views/registration.py:152
+#: mygpo/users/views/registration.py:153
 msgid "The activation link is either not valid or has already expired."
 msgstr "De activatielink is ongeldig of reeds verlopen."
 
-#: mygpo/users/views/registration.py:157
+#: mygpo/users/views/registration.py:159
 msgid "Your user has been activated. You can log in now."
 msgstr "Je account is geactiveerd; je kunt nu inloggen."
 
-#: mygpo/users/views/registration.py:174
+#: mygpo/users/views/registration.py:177
 msgid "Either username or email address are required."
 msgstr "Je gebruikersnaam of e-mailadres is vereist."
 
-#: mygpo/users/views/registration.py:194 mygpo/users/views/user.py:129
+#: mygpo/users/views/registration.py:197 mygpo/users/views/user.py:131
 msgid "User does not exist."
 msgstr "Account bestaat niet."
 
-#: mygpo/users/views/registration.py:198
+#: mygpo/users/views/registration.py:203
 msgid "Your account already has been activated. Go ahead and log in."
 msgstr "Je account is al geactiveerd. Ga door met inloggen."
 
-#: mygpo/users/views/settings.py:57 mygpo/users/views/settings.py:92
+#: mygpo/users/views/settings.py:67 mygpo/users/views/settings.py:104
 msgid "Oops! Something went wrong. Please double-check the data you entered."
 msgstr "Oeps! Er is iets misgegaan. Controleer de ingevoerde gegevens."
 
-#: mygpo/users/views/settings.py:110
+#: mygpo/users/views/settings.py:124
 msgid "Your account has been disconnected"
 msgstr "Je account is niet langer gekoppeld"
 
-#: mygpo/users/views/user.py:71
+#: mygpo/users/views/user.py:73
 msgid "Username missing"
 msgstr "Gebruikersnaam ontbreekt"
 
-#: mygpo/users/views/user.py:76
+#: mygpo/users/views/user.py:78
 msgid "Password missing"
 msgstr "Wachtwoord ontbreekt"
 
-#: mygpo/users/views/user.py:83
+#: mygpo/users/views/user.py:85
 msgid "Wrong username or password."
 msgstr "Onjuiste gebruikersnaam of wachtwoord."
 
-#: mygpo/users/views/user.py:89 mygpo/users/views/user.py:134
+#: mygpo/users/views/user.py:93 mygpo/users/views/user.py:139
 msgid ""
 "Please activate your account first. We have just re-sent your activation "
 "email"
 msgstr ""
 "Activeer eerst je account. We hebben je activatie-e-mail opnieuw verstuurd."
 
-#: mygpo/users/views/user.py:167 mygpo/users/views/user.py:172
+#: mygpo/users/views/user.py:172 mygpo/users/views/user.py:177
 msgid "Login failed."
 msgstr "Inloggen mislukt."
 
-#: mygpo/users/views/user.py:180
+#: mygpo/users/views/user.py:185
 msgid "Login with Google is currently not possible."
 msgstr "Inloggen met Google is momenteel niet mogelijk."
 
-#: mygpo/users/views/user.py:190
+#: mygpo/users/views/user.py:198
 #, python-brace-format
 msgid ""
 "Your account has been connected with {google}. Open Settings to change this."
@@ -1817,7 +1817,7 @@ msgstr ""
 "Je account is gekoppeld aan {google}. Open de instellingen om dit te "
 "wijzigen."
 
-#: mygpo/users/views/user.py:202
+#: mygpo/users/views/user.py:214
 #, python-format
 msgid ""
 "No account connected with your Google account %s. Please log in to connect."
@@ -1825,55 +1825,55 @@ msgstr ""
 "Er is geen account gekoppeld aan je Google-account '%s'. Log in om te "
 "koppelen."
 
-#: mygpo/web/forms.py:20 mygpo/web/forms.py:184
+#: mygpo/web/forms.py:22 mygpo/web/forms.py:184
 msgid "E-Mail address"
 msgstr "E-mailadres"
 
-#: mygpo/web/forms.py:27
+#: mygpo/web/forms.py:28
 msgid "Current password"
 msgstr "Huidig wachtwoord"
 
-#: mygpo/web/forms.py:34
+#: mygpo/web/forms.py:36
 msgid "New password"
 msgstr "Nieuw wachtwoord"
 
-#: mygpo/web/forms.py:41
+#: mygpo/web/forms.py:44
 msgid "Confirm password"
 msgstr "Wachtwoord bevestigen"
 
-#: mygpo/web/forms.py:78
+#: mygpo/web/forms.py:80
 msgid "A few words about you"
 msgstr "Vertel iets over jezelf"
 
-#: mygpo/web/forms.py:91 mygpo/web/templates/devicelist.html:23
+#: mygpo/web/forms.py:94 mygpo/web/templates/devicelist.html:23
 msgid "Name"
 msgstr "Naam"
 
-#: mygpo/web/forms.py:96 mygpo/web/templates/devicelist.html:24
+#: mygpo/web/forms.py:101 mygpo/web/templates/devicelist.html:24
 msgid "Type"
 msgstr "Type"
 
-#: mygpo/web/forms.py:100 mygpo/web/templates/devicelist.html:25
+#: mygpo/web/forms.py:106 mygpo/web/templates/devicelist.html:25
 msgid "Device ID"
 msgstr "Apparaat-ID"
 
-#: mygpo/web/forms.py:103
+#: mygpo/web/forms.py:110
 msgid "ID on device"
 msgstr "ID op apparaat"
 
-#: mygpo/web/forms.py:115
+#: mygpo/web/forms.py:123
 msgid "Share this subscription with other users (public)"
 msgstr "Deel dit abonnement met andere gebruikers (openbaar)"
 
-#: mygpo/web/forms.py:158
+#: mygpo/web/forms.py:163
 msgid "No device selected"
 msgstr "Geen apparaat geselecteerd"
 
-#: mygpo/web/forms.py:167
+#: mygpo/web/forms.py:171
 msgid "Please enter your username"
 msgstr "Voer je gebruikersnaam in"
 
-#: mygpo/web/forms.py:172
+#: mygpo/web/forms.py:176
 msgid "or the email address used while registering"
 msgstr "of het e-mailadres dat je gebruikt hebt bij het registreren"
 
@@ -1919,7 +1919,7 @@ msgstr "Ontkoppelen"
 msgid "Connect"
 msgstr "Koppelen"
 
-#: mygpo/web/templates/base.html:40 mygpo/web/templatetags/menu.py:61
+#: mygpo/web/templates/base.html:40 mygpo/web/templatetags/menu.py:71
 msgid "Account"
 msgstr "Account"
 
@@ -1928,7 +1928,7 @@ msgstr "Account"
 #: mygpo/web/templates/home.html:102 mygpo/web/templates/login.html:8
 #: mygpo/web/templates/login.html:11 mygpo/web/templates/login.html:46
 #: mygpo/web/templates/restore_password.html:8
-#: mygpo/web/templatetags/menu.py:23
+#: mygpo/web/templatetags/menu.py:24
 msgid "Login"
 msgstr "Inloggen"
 
@@ -1938,12 +1938,12 @@ msgid "Login with Google"
 msgstr "Inloggen met Google"
 
 #: mygpo/web/templates/base.html:133 mygpo/web/templates/home.html:153
-#: mygpo/web/templatetags/menu.py:31
+#: mygpo/web/templatetags/menu.py:34
 msgid "Discover"
 msgstr "Ontdekken"
 
 #: mygpo/web/templates/base.html:134 mygpo/web/templates/home.html:154
-#: mygpo/web/templatetags/menu.py:32
+#: mygpo/web/templatetags/menu.py:36
 msgid "Directory"
 msgstr "Map"
 
@@ -1952,7 +1952,7 @@ msgid "Support"
 msgstr "Ondersteuning"
 
 #: mygpo/web/templates/base.html:143 mygpo/web/templates/home.html:163
-#: mygpo/web/templatetags/menu.py:25
+#: mygpo/web/templatetags/menu.py:26
 msgid "Docs"
 msgstr "Documentatie"
 
@@ -2002,7 +2002,7 @@ msgid "Clients"
 msgstr "Clients"
 
 #: mygpo/web/templates/base.html:177 mygpo/web/templates/home.html:197
-#: mygpo/web/templatetags/menu.py:64
+#: mygpo/web/templatetags/menu.py:73
 msgid "Publish"
 msgstr "Publiceren"
 
@@ -2018,7 +2018,7 @@ msgstr "Link&npsb;naar&nbsp;ons"
 msgid "hosting provided by prgmr.com"
 msgstr "hosting geleverd door prgmr.com"
 
-#: mygpo/web/templates/contribute.html:8 mygpo/web/templatetags/menu.py:26
+#: mygpo/web/templates/contribute.html:8 mygpo/web/templatetags/menu.py:27
 msgid "Contribute"
 msgstr "Bijdragen"
 
@@ -2100,7 +2100,7 @@ msgstr "Ja"
 msgid "No"
 msgstr "Nee"
 
-#: mygpo/web/templates/dashboard.html:14 mygpo/web/templatetags/menu.py:54
+#: mygpo/web/templates/dashboard.html:14 mygpo/web/templatetags/menu.py:64
 msgid "Overview"
 msgstr "Overzicht"
 
@@ -2226,7 +2226,7 @@ msgid "Thanks"
 msgstr "Bedankt"
 
 #: mygpo/web/templates/developer.html:8 mygpo/web/templates/developer.html:11
-#: mygpo/web/templatetags/menu.py:27
+#: mygpo/web/templatetags/menu.py:28
 msgid "Development"
 msgstr "Ontwikkeling"
 
@@ -2381,7 +2381,7 @@ msgid "Delete Permanently"
 msgstr "Permanent verwijderen"
 
 #: mygpo/web/templates/favorites.html:10 mygpo/web/templates/favorites.html:13
-#: mygpo/web/templatetags/menu.py:47 mygpo/web/templatetags/menu.py:55
+#: mygpo/web/templatetags/menu.py:54 mygpo/web/templatetags/menu.py:65
 msgid "Favorite Episodes"
 msgstr "Favoriete afleveringen"
 
@@ -2408,7 +2408,7 @@ msgstr ""
 "opnieuw!"
 
 #: mygpo/web/templates/mytags.html:11 mygpo/web/templates/mytags.html:14
-#: mygpo/web/templatetags/menu.py:48
+#: mygpo/web/templatetags/menu.py:55
 msgid "My Tags"
 msgstr "Mijn labels"
 
@@ -2496,7 +2496,7 @@ msgstr "Privé-abonnementen"
 msgid "Make Public"
 msgstr "Openbaar maken"
 
-#: mygpo/web/templates/privacy_policy.html:8 mygpo/web/templatetags/menu.py:28
+#: mygpo/web/templates/privacy_policy.html:8 mygpo/web/templatetags/menu.py:29
 msgid "Privacy Policy"
 msgstr "Privacybeleid"
 
@@ -2615,165 +2615,165 @@ msgstr ""
 "Ga dan naar je <a href/\"/account/\">accountinstellingen</a> om de juiste "
 "link te verkrijgen.</a>"
 
-#: mygpo/web/templatetags/devices.py:32
+#: mygpo/web/templatetags/devices.py:33
 msgid "Unknown"
 msgstr "Onbekend"
 
-#: mygpo/web/templatetags/episodes.py:20
+#: mygpo/web/templatetags/episodes.py:21
 msgid "New episode"
 msgstr "Nieuwe aflevering"
 
-#: mygpo/web/templatetags/episodes.py:23
+#: mygpo/web/templatetags/episodes.py:24
 #, python-format
 msgid "Downloaded to %s"
 msgstr "Gedownload naar %s"
 
-#: mygpo/web/templatetags/episodes.py:25
+#: mygpo/web/templatetags/episodes.py:26
 msgid "Downloaded"
 msgstr "Gedownload"
 
-#: mygpo/web/templatetags/episodes.py:28
+#: mygpo/web/templatetags/episodes.py:29
 #, python-format
 msgid "Played on %s"
 msgstr "Beluisterd op %s"
 
-#: mygpo/web/templatetags/episodes.py:30
+#: mygpo/web/templatetags/episodes.py:31
 msgid "Played"
 msgstr "Beluisterd"
 
-#: mygpo/web/templatetags/episodes.py:33
+#: mygpo/web/templatetags/episodes.py:34
 #, python-format
 msgid "Deleted on %s"
 msgstr "Verwijderd van %s"
 
-#: mygpo/web/templatetags/episodes.py:35
+#: mygpo/web/templatetags/episodes.py:36
 msgid "Deleted"
 msgstr "Verwijderd"
 
-#: mygpo/web/templatetags/episodes.py:37
+#: mygpo/web/templatetags/episodes.py:38
 msgid "Unknown status"
 msgstr "Onbekende status"
 
-#: mygpo/web/templatetags/episodes.py:43
+#: mygpo/web/templatetags/episodes.py:46
 msgid "Unplayed episode"
 msgstr "Onbeluisterde aflevering"
 
-#: mygpo/web/templatetags/episodes.py:46 mygpo/web/templatetags/episodes.py:47
+#: mygpo/web/templatetags/episodes.py:50 mygpo/web/templatetags/episodes.py:51
 #, python-format
 msgid " on %s"
 msgstr "op %s"
 
-#: mygpo/web/templatetags/episodes.py:50
+#: mygpo/web/templatetags/episodes.py:56
 msgid "The episode has been flattr'd"
 msgstr "De aflevering is geflattr'd"
 
-#: mygpo/web/templatetags/episodes.py:53
+#: mygpo/web/templatetags/episodes.py:63
 msgid "This episode has been marked new"
 msgstr "Deze aflevering is gemarkeerd als nieuw"
 
-#: mygpo/web/templatetags/episodes.py:55
+#: mygpo/web/templatetags/episodes.py:69
 msgid "This episode has been downloaded"
 msgstr "Deze aflevering is gedownload"
 
-#: mygpo/web/templatetags/episodes.py:59
+#: mygpo/web/templatetags/episodes.py:74
 #, python-format
 msgid " from %(start)s to %(end)s"
 msgstr "van %(start)s tot %(end)s"
 
-#: mygpo/web/templatetags/episodes.py:63
+#: mygpo/web/templatetags/episodes.py:79
 #, python-format
 msgid " to position %s"
 msgstr "tot aan positie %s"
 
-#: mygpo/web/templatetags/episodes.py:67
+#: mygpo/web/templatetags/episodes.py:88
 msgid "This episode has been played"
 msgstr "Deze aflevering is afgespeeld"
 
-#: mygpo/web/templatetags/episodes.py:69
+#: mygpo/web/templatetags/episodes.py:98
 msgid "This episode has been deleted"
 msgstr "Deze aflevering is verwijderd"
 
-#: mygpo/web/templatetags/episodes.py:126
+#: mygpo/web/templatetags/episodes.py:157
 msgid "Unknown Episode"
 msgstr "Onbekende aflevering"
 
-#: mygpo/web/templatetags/menu.py:22 mygpo/web/templatetags/menu.py:65
+#: mygpo/web/templatetags/menu.py:23 mygpo/web/templatetags/menu.py:75
 msgid "Home"
 msgstr "Startpagina"
 
-#: mygpo/web/templatetags/menu.py:29
+#: mygpo/web/templatetags/menu.py:30
 msgid "Help"
 msgstr "Hulp"
 
-#: mygpo/web/templatetags/menu.py:37
+#: mygpo/web/templatetags/menu.py:41
 msgid "User subscriptions"
 msgstr "Gebruikersabonnementen"
 
-#: mygpo/web/templatetags/menu.py:38
+#: mygpo/web/templatetags/menu.py:42
 msgid "Suggestions"
 msgstr "Aanbevelingen"
 
-#: mygpo/web/templatetags/menu.py:39
+#: mygpo/web/templatetags/menu.py:43
 msgid "Features"
 msgstr "Functies"
 
-#: mygpo/web/templatetags/menu.py:41
+#: mygpo/web/templatetags/menu.py:45
 msgid "Toplists"
 msgstr "Toplijsten"
 
-#: mygpo/web/templatetags/menu.py:49
+#: mygpo/web/templatetags/menu.py:56
 msgid "Devices"
 msgstr "Apparaten"
 
-#: mygpo/web/templatetags/menu.py:53
+#: mygpo/web/templatetags/menu.py:62
 msgid "Community"
 msgstr "Gemeenschap"
 
-#: mygpo/web/templatetags/menu.py:56
+#: mygpo/web/templatetags/menu.py:66
 msgid "My Userpage"
 msgstr "Mijn gebruikerspagina"
 
-#: mygpo/web/templatetags/menu.py:62
+#: mygpo/web/templatetags/menu.py:71
 msgid "Privacy"
 msgstr "Privacy"
 
-#: mygpo/web/templatetags/menu.py:67
+#: mygpo/web/templatetags/menu.py:77
 msgid "Link to gpodder.net"
 msgstr "Link naar gpodder.net"
 
-#: mygpo/web/templatetags/time.py:42
+#: mygpo/web/templatetags/time.py:43
 #, python-brace-format
 msgid "{h}h {m}m {s}s"
 msgstr "{h}h {m}m {s}s"
 
-#: mygpo/web/templatetags/time.py:44
+#: mygpo/web/templatetags/time.py:45
 #, fuzzy, python-brace-format
 #| msgid "{h}h {m}m {s}s"
 msgid "{m}m {s}s"
 msgstr "{h}h {m}m {s}s"
 
-#: mygpo/web/utils.py:281
+#: mygpo/web/utils.py:285
 #, python-format
 msgid "%(weeks)d week"
 msgid_plural "%(weeks)d weeks"
 msgstr[0] "%(weeks)d week"
 msgstr[1] "%(weeks)d weken"
 
-#: mygpo/web/utils.py:285
+#: mygpo/web/utils.py:289
 #, python-format
 msgid "%(days)d day"
 msgid_plural "%(days)d days"
 msgstr[0] "%(days)d dag"
 msgstr[1] "%(days)d dagen"
 
-#: mygpo/web/utils.py:289
+#: mygpo/web/utils.py:293
 #, python-format
 msgid "%(hours)d hour"
 msgid_plural "%(hours)d hours"
 msgstr[0] "%(hours)d uur"
 msgstr[1] "%(hours)d uur"
 
-#: mygpo/web/views.py:145
+#: mygpo/web/views.py:146
 msgid "another site"
 msgstr "een andere site"
 
