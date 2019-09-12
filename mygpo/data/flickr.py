@@ -82,7 +82,7 @@ def is_flickr_image(url):
 
     if url is None:
         return False
-    return bool(re.search('flickr\.com.*\.(jpg|jpeg|png|gif)', url))
+    return bool(re.search(r'flickr\.com.*\.(jpg|jpeg|png|gif)', url))
 
 
 def get_display_photo(url, label='Medium'):

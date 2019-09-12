@@ -13,7 +13,7 @@ register = template.Library()
 def remove_html_tags(html):
     # If we would want more speed, we could make these global
     re_strip_tags = re.compile('<[^>]*>')
-    re_unicode_entities = re.compile('&#(\d{2,4});')
+    re_unicode_entities = re.compile(r'&#(\d{2,4});')
     re_html_entities = re.compile('&(.{2,8});')
     re_newline_tags = re.compile('(<br[^>]*>|<[/]?ul[^>]*>|</li>)', re.I)
     re_listing_tags = re.compile('<li[^>]*>', re.I)

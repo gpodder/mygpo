@@ -15,14 +15,14 @@ def get_youtube_id(url):
     if url is None:
         return None
 
-    r = re.compile('http://(?:[a-z]+\.)?youtube\.com/v/(.*)\.swf', re.IGNORECASE).match(
+    r = re.compile(r'http://(?:[a-z]+\.)?youtube\.com/v/(.*)\.swf', re.IGNORECASE).match(
         url
     )
     if r is not None:
         return r.group(1)
 
     r = re.compile(
-        'http://(?:[a-z]+\.)?youtube\.com/watch\?v=([^&]*)', re.IGNORECASE
+        r'http://(?:[a-z]+\.)?youtube\.com/watch\?v=([^&]*)', re.IGNORECASE
     ).match(url)
     if r is not None:
         return r.group(1)
@@ -33,10 +33,10 @@ def get_youtube_id(url):
 def get_real_cover(url):
     rs = [
         re.compile(
-            'http://www\\.youtube\\.com/rss/user/([^/]+)/videos\\.rss', re.IGNORECASE
+            r'http://www\\.youtube\\.com/rss/user/([^/]+)/videos\\.rss', re.IGNORECASE
         ),
         re.compile(
-            'http://www\\.youtube\\.com/profile_videos\\?user=([^\&]+)', re.IGNORECASE
+            r'http://www\\.youtube\\.com/profile_videos\\?user=([^\&]+)', re.IGNORECASE
         ),
     ]
 
