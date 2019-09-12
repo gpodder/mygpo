@@ -1,7 +1,7 @@
 import re
 
 from django import forms
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from mygpo.users.models import Client
 

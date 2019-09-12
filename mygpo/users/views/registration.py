@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.http import HttpResponseRedirect
 from django.views.generic.edit import FormView
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 from django.views.generic import TemplateView

@@ -1,7 +1,7 @@
 # Set _ to no-op, because we just want to mark the strings as
 # translatable and will use gettext on these strings later on
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 EPISODE_ACTION_TYPES = (

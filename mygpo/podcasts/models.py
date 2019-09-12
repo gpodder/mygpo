@@ -7,7 +7,7 @@ from django.core.cache import cache
 from django.conf import settings
 from django.db import models, transaction, IntegrityError
 from django.db.models import F
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
 from django.contrib.postgres.search import SearchVectorField

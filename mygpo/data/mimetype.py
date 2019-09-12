@@ -2,7 +2,7 @@ from collections import defaultdict
 
 import mimetypes
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 # If 20% of the episodes of a podcast are of a given type,

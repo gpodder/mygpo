@@ -10,7 +10,7 @@ from django.views.decorators.cache import cache_page
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 from django.contrib.sites.requests import RequestSite
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.api.backend import get_device

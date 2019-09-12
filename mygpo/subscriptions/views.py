@@ -7,7 +7,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import cache_control
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.contrib.syndication.views import Feed
 from django.contrib.auth import get_user_model
 
