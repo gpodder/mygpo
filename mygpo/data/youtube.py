@@ -15,9 +15,9 @@ def get_youtube_id(url):
     if url is None:
         return None
 
-    r = re.compile(r'http://(?:[a-z]+\.)?youtube\.com/v/(.*)\.swf', re.IGNORECASE).match(
-        url
-    )
+    r = re.compile(
+        r'http://(?:[a-z]+\.)?youtube\.com/v/(.*)\.swf', re.IGNORECASE
+    ).match(url)
     if r is not None:
         return r.group(1)
 
