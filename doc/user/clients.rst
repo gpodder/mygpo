@@ -11,7 +11,7 @@ Android
 ====================  =========  =====================================  ========  ==================================================
 Name                  Status     gpodder.net features                   License   Documentation
 ====================  =========  =====================================  ========  ==================================================
-`Podax`_              Active     Subscription sync                      BSD
+`Podax`_              Abandoned  Subscription sync                      BSD
 `Volksempfänger`_     Abandoned  Podcast search                         ISC
 `SwallowCatcher`_     Abandoned  Planned                                AGPL
 `Detlef Gpodderson`_  Abandoned  Subscription and Episode Action sync   GPL       `Detlef Repository`_
