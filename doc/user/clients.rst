@@ -14,7 +14,7 @@ Name                  Status     gpodder.net features                   License 
 `Podax`_              Active     Subscription sync                      BSD
 `Volksempfänger`_     Abandoned  Podcast search                         ISC
 `SwallowCatcher`_     Abandoned  Planned                                AGPL
-`Detlef Gpodderson`_  Active     Subscription and Episode Action sync   GPL       `Detlef Repository`_
+`Detlef Gpodderson`_  Abandoned  Subscription and Episode Action sync   GPL       `Detlef Repository`_
 `AntennaPod`_         Active     Directory, Search, Subscription sync   MIT
 `gpodroid`_           Abandoned  Subscriptions only                     EPL       `gpodroid Repository`_
 `Podstars`_           Active     Podcast search
