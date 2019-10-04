@@ -19,7 +19,7 @@ Name                  Status     gpodder.net features                   License 
 `gpodroid`_           Abandoned  Subscriptions only                     EPL       `gpodroid Repository`_
 `Podstars`_           Active     Podcast search
 `Listen Up Free`_     Active     sync, subscription, search
-`Podcatcher Deluxe`_  Active     Sync of subscriptions and actions      GPL 3
+`Podcatcher Deluxe`_  Dead       Sync of subscriptions and actions      GPL 3
 `Podcast Addict`_     Active     none                                             `Podcast Addict export script`_
 `Podkicker`_          Active     none
 `SoundWaves`_         Active     Subscriptions sync                     GPL 3
