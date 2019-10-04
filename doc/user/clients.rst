@@ -11,17 +11,17 @@ Android
 ====================  =========  =====================================  ========  ==================================================
 Name                  Status     gpodder.net features                   License   Documentation
 ====================  =========  =====================================  ========  ==================================================
+`AntennaPod`_         Active     Directory, Search, Subscription sync   MIT
+`Listen Up Free`_     Active     sync, subscription, search
+`Podcast Addict`_     Active     none                                             `Podcast Addict export script`_
+`Podkicker`_          Active     none
 `Podax`_              Abandoned  Subscription sync                      BSD
 `Volksempfänger`_     Abandoned  Podcast search                         ISC
 `SwallowCatcher`_     Abandoned  Planned                                AGPL
 `Detlef Gpodderson`_  Abandoned  Subscription and Episode Action sync   GPL       `Detlef Repository`_
-`AntennaPod`_         Active     Directory, Search, Subscription sync   MIT
 `gpodroid`_           Abandoned  Subscriptions only                     EPL       `gpodroid Repository`_
 `Podstars`_           Abandoned  Podcast search
-`Listen Up Free`_     Active     sync, subscription, search
 `Podcatcher Deluxe`_  Dead       Sync of subscriptions and actions      GPL 3
-`Podcast Addict`_     Active     none                                             `Podcast Addict export script`_
-`Podkicker`_          Active     none
 `SoundWaves`_         Abandoned  Subscriptions sync                     GPL 3
 ====================  =========  =====================================  ========  ==================================================
 
