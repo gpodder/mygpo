@@ -22,7 +22,7 @@ Name                  Status     gpodder.net features                   License 
 `Podcatcher Deluxe`_  Dead       Sync of subscriptions and actions      GPL 3
 `Podcast Addict`_     Active     none                                             `Podcast Addict export script`_
 `Podkicker`_          Active     none
-`SoundWaves`_         Active     Subscriptions sync                     GPL 3
+`SoundWaves`_         Abandoned  Subscriptions sync                     GPL 3
 ====================  =========  =====================================  ========  ==================================================
 
 
