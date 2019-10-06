@@ -1,4 +1,4 @@
-coverage==4.5.3
+coverage==4.5.4
 django-coverage-plugin==1.6.0
 pytest-django
 pytest-cov
