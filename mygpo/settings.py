@@ -368,3 +368,20 @@ PODCAST_AD_ID = os.getenv('PODCAST_AD_ID')
 MAX_EPISODE_ACTIONS = int(os.getenv('MAX_EPISODE_ACTIONS', 1000))
 
 SEARCH_CUTOFF = float(os.getenv('SEARCH_CUTOFF', 0.3))
+
+
+### Sentry
+
+try:
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+
+    # Sentry Data Source Name (DSN)
+    sentry_dsn = os.getenv('SENTRY_DSN', '')
+    if not sentry_dsn:
+        raise ValueError('Could not set up sentry because ' 'SENTRY_DSN is not set')
+
+    sentry_sdk.init(dsn=sentry_dsn, integrations=[DjangoIntegration()])
+
+except (ImportError, ValueError):
+    pass
