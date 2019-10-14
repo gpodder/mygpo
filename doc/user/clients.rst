@@ -8,23 +8,22 @@ Clients
 Android
 -------
 
-====================  =========  =====================================  ========  ==================================================
-Name                  Status     gpodder.net features                   License   Documentation
-====================  =========  =====================================  ========  ==================================================
-`Podax`_              Active     Subscription sync                      BSD
-`Volksempfänger`_     Abandoned  Podcast search                         ISC
-`SwallowCatcher`_     Active     Planned                                AGPL
-`Detlef Gpodderson`_  Active     Subscription and Episode Action sync   GPL       `Detlef Repository`_
-`AntennaPod`_         Active     Directory, Search, Subscription sync   MIT
-`gpodroid`_           Abandoned  Subscriptions only                     EPL       `gpodroid Repository`_
-`Podstars`_           Active     Podcast search
-`Listen Up Free`_     Active     sync, subscription, search
-`Feed Farmer`_        Active     Search, Toplist
-`Podcatcher Deluxe`_  Active     Sync of subscriptions and actions      GPL 3
-`Podcast Addict`_     Active     none                                             `Podcast Addict export script`_
-`Podkicker`_          Active     none
-`SoundWaves`_         Active     Subscriptions sync                     GPL 3
-====================  =========  =====================================  ========  ==================================================
+====================  ==========  =====================================  ========  ==================================================
+Name                  Status      gpodder.net features                   License   Documentation
+====================  ==========  =====================================  ========  ==================================================
+`AntennaPod`_         Active      Directory, Search, Subscription sync   MIT
+`Listen Up Free`_     Active      sync, subscription, search
+`Podcast Addict`_     Active      none                                             `Podcast Addict export script`_
+`Podkicker`_          Active      none
+`Podax`_              Abandoned   Subscription sync                      BSD
+`Volksempfänger`_     Abandoned   Podcast search                         ISC
+`SwallowCatcher`_     Abandoned   Planned                                AGPL
+`Detlef Gpodderson`_  Abandoned   Subscription and Episode Action sync   GPL       `Detlef Repository`_
+`gpodroid`_           Abandoned   Subscriptions only                     EPL       `gpodroid Repository`_
+`Podstars`_           Abandoned   Podcast search
+`Podcatcher Deluxe`_  Deprecated  Sync of subscriptions and actions      GPL 3
+`SoundWaves`_         Abandoned   Subscriptions sync                     GPL 3
+====================  ==========  =====================================  ========  ==================================================
 
 
 Mac OS X

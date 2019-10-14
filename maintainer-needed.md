@@ -72,5 +72,11 @@ Interested?
 Please write to stefan@skoegl.net
 
 
+Status
+------
+Several people have stepped forward already, and a small team is forming to take over maintenance of gpodder.net. 
+Not all tasks have been distributed yet, so more volunteers are still welcome.
+
+
 
 -- Stefan Kögl

@@ -100,7 +100,10 @@ class LoginView(View):
         login(request, user)
 
         if next_page:
-            if is_safe_url(next_page):
+
+            domain = RequestSite(request).domain
+            allowed_hosts = [domain]
+            if is_safe_url(next_page, allowed_hosts):
                 return HttpResponseRedirect(next_page)
 
             else:

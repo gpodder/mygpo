@@ -38,10 +38,10 @@ install-deps:
 		build-essential python3-dev virtualenv libffi-dev
 
 format-code:
-	black --py36 --skip-string-normalization mygpo/
+	black --target-version py36 --skip-string-normalization mygpo/
 
 check-code-format:
-	black --check --py36 --skip-string-normalization mygpo/
+	black --check --target-version py36 --skip-string-normalization mygpo/
 
 
 .PHONY: all help test clean unittest coverage install-deps format-code
