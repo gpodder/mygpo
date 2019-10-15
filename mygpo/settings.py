@@ -376,6 +376,7 @@ try:
     import sentry_sdk
     from sentry_sdk.integrations.django import DjangoIntegration
     from sentry_sdk.integrations.celery import CeleryIntegration
+    from sentry_sdk.integrations.redis import RedisIntegration
 
     # Sentry Data Source Name (DSN)
     sentry_dsn = os.getenv('SENTRY_DSN', '')
@@ -383,7 +384,8 @@ try:
         raise ValueError('Could not set up sentry because ' 'SENTRY_DSN is not set')
 
     sentry_sdk.init(
-        dsn=sentry_dsn, integrations=[DjangoIntegration(), CeleryIntegration()]
+        dsn=sentry_dsn,
+        integrations=[DjangoIntegration(), CeleryIntegration(), RedisIntegration()],
     )
 
 except (ImportError, ValueError):
