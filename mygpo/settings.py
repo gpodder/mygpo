@@ -386,6 +386,7 @@ try:
     sentry_sdk.init(
         dsn=sentry_dsn,
         integrations=[DjangoIntegration(), CeleryIntegration(), RedisIntegration()],
+        send_default_pii=True,
     )
 
 except (ImportError, ValueError):
