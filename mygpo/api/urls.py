@@ -35,14 +35,11 @@ urlpatterns = [
         kwargs={'count': 50, 'format': 'opml'},
         name='api-simple-toplist.opml',
     ),
-    path(
-        'toplist/<int:count>.<str:format>',
-        simple.toplist,
-        name='api-simple-toplist'
-    ),
+    path('toplist/<int:count>.<str:format>', simple.toplist, name='api-simple-toplist'),
     path(
         'toplist.<str:format>',
-        simple.toplist, kwargs={'count': 50},
+        simple.toplist,
+        kwargs={'count': 50},
         name='api-simple-toplist-50',
     ),
     path('gpodder-examples.<str:format>', simple.example_podcasts, name='example-opml'),

@@ -284,7 +284,9 @@ class SimpleAPITests(unittest.TestCase):
             'HTTP_AUTHORIZATION': create_auth_string(self.username, self.password)
         }
         self.formats = ['txt', 'json', 'jsonp', 'opml']
-        self.subscriptions_urls = dict((fmt, self.get_subscriptions_url(fmt)) for fmt in self.formats)
+        self.subscriptions_urls = dict(
+            (fmt, self.get_subscriptions_url(fmt)) for fmt in self.formats
+        )
         self.blank_values = {
             'txt': b'\n',
             'json': b'[]',
@@ -292,23 +294,17 @@ class SimpleAPITests(unittest.TestCase):
         }
         self.all_subscriptions_url = reverse(
             'api-all-subscriptions',
-            kwargs={
-                'format': 'txt',
-                'username': self.user.username,
-            },
+            kwargs={'format': 'txt', 'username': self.user.username},
         )
-        self.toplist_urls = dict((fmt, self.get_toplist_url(fmt)) for fmt in self.formats)
+        self.toplist_urls = dict(
+            (fmt, self.get_toplist_url(fmt)) for fmt in self.formats
+        )
 
     def tearDown(self):
         self.user.delete()
 
     def get_toplist_url(self, fmt):
-        return reverse(
-            'api-simple-toplist-50',
-            kwargs={
-                'format': fmt,
-            },
-        )
+        return reverse('api-simple-toplist-50', kwargs={'format': fmt})
 
     def get_subscriptions_url(self, fmt):
         return reverse(
@@ -343,7 +339,9 @@ class SimpleAPITests(unittest.TestCase):
         podcast = Podcast.objects.get_or_create_for_url(
             sample_url, defaults={'title': 'My Podcast'}
         ).object
-        with unittest.mock.patch('mygpo.users.models.Client.get_subscribed_podcasts') as mock_get:
+        with unittest.mock.patch(
+            'mygpo.users.models.Client.get_subscribed_podcasts'
+        ) as mock_get:
             mock_get.return_value = [podcast]
             response = self.client.get(self.subscriptions_urls['txt'], **self.extra)
         self.assertEqual(response.status_code, 200, response.content)
@@ -361,7 +359,6 @@ class SimpleAPITests(unittest.TestCase):
             'json': json.dumps([sample_url]),
             #'opml': Exporter('Subscriptions').generate([sample_url]),
             'opml': Exporter('Subscriptions').generate([podcast]),
-
         }
         payloads = dict(
             (fmt, format_podcast_list([podcast], fmt, 'test title').content)
@@ -380,11 +377,15 @@ class SimpleAPITests(unittest.TestCase):
         self.assertEqual(response.status_code, 400, response.content)
 
     def test_get_all_subscriptions_invalid_scale(self):
-        response = self.client.get(self.all_subscriptions_url, data={'scale_logo': 0}, **self.extra)
+        response = self.client.get(
+            self.all_subscriptions_url, data={'scale_logo': 0}, **self.extra
+        )
         self.assertEqual(response.status_code, 400, response.content)
 
     def test_get_all_subscriptions_non_numeric_scale(self):
-        response = self.client.get(self.all_subscriptions_url, data={'scale_logo': 'a'}, **self.extra)
+        response = self.client.get(
+            self.all_subscriptions_url, data={'scale_logo': 'a'}, **self.extra
+        )
         self.assertEqual(response.status_code, 400, response.content)
 
     def test_get_all_subscriptions_valid_empty(self):
@@ -392,11 +393,15 @@ class SimpleAPITests(unittest.TestCase):
         self.assertEqual(response.status_code, 200, response.content)
 
     def test_get_toplist_invalid_scale(self):
-        response = self.client.get(self.toplist_urls['opml'], data={'scale_logo': 0}, **self.extra)
+        response = self.client.get(
+            self.toplist_urls['opml'], data={'scale_logo': 0}, **self.extra
+        )
         self.assertEqual(response.status_code, 400, response.content)
 
     def test_get_toplist_non_numeric_scale(self):
-        response = self.client.get(self.toplist_urls['txt'], data={'scale_logo': 'a'}, **self.extra)
+        response = self.client.get(
+            self.toplist_urls['txt'], data={'scale_logo': 'a'}, **self.extra
+        )
         self.assertEqual(response.status_code, 400, response.content)
 
     def test_get_toplist_valid_empty(self):
