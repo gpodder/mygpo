@@ -1,6 +1,6 @@
 from django.urls import path, register_converter
 
-from . import legacy, simple, advanced, advanced, subscriptions
+from . import legacy, simple, advanced, subscriptions
 from .advanced import auth, lists, sync, updates, episode, settings
 from mygpo.users import converters
 from mygpo.usersettings.converters import ScopeConverter
@@ -13,24 +13,38 @@ register_converter(ScopeConverter, 'scope')
 urlpatterns = [
     path('upload', legacy.upload),
     path('getlist', legacy.getlist),
-    path('toplist.opml', simple.toplist, kwargs={'count': 50, 'format': 'opml'}),
     path(
         'subscriptions/<username:username>/' '<client-uid:device_uid>.<str:format>',
         simple.subscriptions,
+        name='api-simple-subscriptions',
     ),
     path(
         'subscriptions/<username:username>.<str:format>',
         simple.all_subscriptions,
         name='api-all-subscriptions',
     ),
-    path('toplist/<int:count>.<str:format>', simple.toplist, name='toplist-opml'),
     path('search.<str:format>', simple.search),
     path(
         'suggestions/<int:count>.<str:format>',
         simple.suggestions,
         name='suggestions-opml',
     ),
-    path('toplist.<str:format>', simple.toplist, kwargs={'count': 50}),
+    path(
+        'toplist.opml',
+        simple.toplist,
+        kwargs={'count': 50, 'format': 'opml'},
+        name='api-simple-toplist.opml',
+    ),
+    path(
+        'toplist/<int:count>.<str:format>',
+        simple.toplist,
+        name='api-simple-toplist'
+    ),
+    path(
+        'toplist.<str:format>',
+        simple.toplist, kwargs={'count': 50},
+        name='api-simple-toplist-50',
+    ),
     path('gpodder-examples.<str:format>', simple.example_podcasts, name='example-opml'),
     path(
         'api/<int:version>/subscriptions/<username:username>/'
