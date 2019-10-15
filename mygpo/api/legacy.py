@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from django.http import HttpResponse
 from django.utils.datastructures import MultiValueDictKeyError
 from django.views.decorators.csrf import csrf_exempt
@@ -8,7 +6,6 @@ from django.contrib.auth import get_user_model
 
 from mygpo.podcasts.models import Podcast
 from mygpo.api.opml import Importer, Exporter
-from mygpo.users.models import SubscriptionException
 from mygpo.api.backend import get_device
 from mygpo.utils import normalize_feed_url
 from mygpo.subscriptions import subscribe, unsubscribe
