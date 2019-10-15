@@ -375,13 +375,16 @@ SEARCH_CUTOFF = float(os.getenv('SEARCH_CUTOFF', 0.3))
 try:
     import sentry_sdk
     from sentry_sdk.integrations.django import DjangoIntegration
+    from sentry_sdk.integrations.celery import CeleryIntegration
 
     # Sentry Data Source Name (DSN)
     sentry_dsn = os.getenv('SENTRY_DSN', '')
     if not sentry_dsn:
         raise ValueError('Could not set up sentry because ' 'SENTRY_DSN is not set')
 
-    sentry_sdk.init(dsn=sentry_dsn, integrations=[DjangoIntegration()])
+    sentry_sdk.init(
+        dsn=sentry_dsn, integrations=[DjangoIntegration(), CeleryIntegration()]
+    )
 
 except (ImportError, ValueError):
     pass
