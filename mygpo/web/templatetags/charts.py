@@ -7,6 +7,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 
 register = template.Library()
 
+
 @register.simple_tag
 def vertical_bar(value, max_value, display=None):
     if not max_value:
@@ -32,9 +33,13 @@ def vertical_bar(value, max_value, display=None):
         left = format_html('&nbsp;')
         right = format_html('<span>{}</span>', value_str)
 
-    return format_html('<div class="barbg"><div class="bar" '
-                       'style="width: {:3.0}%">{}</div>{}</div>',
-                       ratio, left, right)
+    return format_html(
+        '<div class="barbg"><div class="bar" '
+        'style="width: {:3.0}%">{}</div>{}</div>',
+        ratio,
+        left,
+        right,
+    )
 
 
 @register.filter()
@@ -59,7 +64,14 @@ def timeline(data):
             episode = 'undefined'
             episode_ = 'undefined'
 
-        s += '[new Date(%d, %d, %d), %d, %s, %s],\n' % (r.date.year, r.date.month-1, r.date.day, r.playcount, episode, episode_)
+        s += '[new Date(%d, %d, %d), %d, %s, %s],\n' % (
+            r.date.year,
+            r.date.month - 1,
+            r.date.day,
+            r.playcount,
+            episode,
+            episode_,
+        )
 
     s += ']);\n'
     s += 'var chart = new google.visualization.AnnotatedTimeLine(document.getElementById("chart_div"));\n'

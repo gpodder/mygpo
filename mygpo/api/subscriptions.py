@@ -8,10 +8,15 @@ from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.backend import get_device
 from mygpo.utils import get_timestamp, normalize_feed_url, intersect
 from mygpo.users.models import Client
-from mygpo.subscriptions import (subscribe, unsubscribe,
-                                 get_subscription_history, subscription_diff)
+from mygpo.subscriptions import (
+    subscribe,
+    unsubscribe,
+    get_subscription_history,
+    subscription_diff,
+)
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -25,43 +30,44 @@ class SubscriptionsAPI(APIView):
         device = get_object_or_404(Client, user=user, uid=device_uid)
         since = self.get_since(request)
         add, rem, until = self.get_changes(user, device, since, now)
-        return JsonResponse({
-            'add': add,
-            'remove': rem,
-            'timestamp': until
-        })
+        return JsonResponse({'add': add, 'remove': rem, 'timestamp': until})
 
     def post(self, request, version, username, device_uid):
         """ Client sends subscription updates """
         now = get_timestamp(datetime.utcnow())
-        logger.info('Subscription Upload @{username}/{device_uid}'.format(
-            username=request.user.username, device_uid=device_uid))
+        logger.info(
+            'Subscription Upload @{username}/{device_uid}'.format(
+                username=request.user.username, device_uid=device_uid
+            )
+        )
 
-        d = get_device(request.user, device_uid,
-                       request.META.get('HTTP_USER_AGENT', ''))
+        d = get_device(
+            request.user, device_uid, request.META.get('HTTP_USER_AGENT', '')
+        )
 
         actions = self.parsed_body(request)
 
         add = list(filter(None, actions.get('add', [])))
         rem = list(filter(None, actions.get('remove', [])))
-        logger.info('Subscription Upload @{username}/{device_uid}: add '
+        logger.info(
+            'Subscription Upload @{username}/{device_uid}: add '
             '{num_add}, remove {num_remove}'.format(
-            username=request.user.username, device_uid=device_uid,
-            num_add=len(add), num_remove=len(rem)))
+                username=request.user.username,
+                device_uid=device_uid,
+                num_add=len(add),
+                num_remove=len(rem),
+            )
+        )
 
         update_urls = self.update_subscriptions(request.user, d, add, rem)
 
-        return JsonResponse({
-            'timestamp': now,
-            'update_urls': update_urls,
-        })
+        return JsonResponse({'timestamp': now, 'update_urls': update_urls})
 
     def update_subscriptions(self, user, device, add, remove):
 
         conflicts = intersect(add, remove)
         if conflicts:
-            msg = "can not add and remove '{}' at the same time".format(
-                str(conflicts))
+            msg = "can not add and remove '{}' at the same time".format(str(conflicts))
             logger.warn(msg)
             raise RequestException(msg)
 
@@ -96,8 +102,11 @@ class SubscriptionsAPI(APIView):
         logger.info('Subscription History: {num}'.format(num=len(history)))
 
         add, rem = subscription_diff(history)
-        logger.info('Subscription Diff: +{num_add}/-{num_remove}'.format(
-            num_add=len(add), num_remove=len(rem)))
+        logger.info(
+            'Subscription Diff: +{num_add}/-{num_remove}'.format(
+                num_add=len(add), num_remove=len(rem)
+            )
+        )
 
         until_ = get_timestamp(until)
 

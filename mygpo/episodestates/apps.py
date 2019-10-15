@@ -6,6 +6,7 @@ def set_episode_state(sender, **kwargs):
     """ Updates the episode state with the saved EpisodeHistoryEntry """
 
     from mygpo.episodestates.tasks import update_episode_state
+
     historyentry = kwargs.get('instance', None)
 
     if not historyentry:

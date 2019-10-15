@@ -4,15 +4,10 @@ from django.db import models, migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('podcasts', '0029_episode_index_toplist'),
-    ]
+    dependencies = [('podcasts', '0029_episode_index_toplist')]
 
     operations = [
-        migrations.AlterModelOptions(
-            name='episode',
-            options={'ordering': ['order']},
-        ),
+        migrations.AlterModelOptions(name='episode', options={'ordering': ['order']}),
         migrations.AddField(
             model_name='episode',
             name='order',

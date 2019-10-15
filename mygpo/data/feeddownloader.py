@@ -15,8 +15,11 @@ from django.conf import settings
 
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.core.slugs import PodcastSlugs, EpisodeSlugs
-from mygpo.podcasts.models import DEFAULT_UPDATE_INTERVAL, \
-    MIN_UPDATE_INTERVAL, MAX_UPDATE_INTERVAL
+from mygpo.podcasts.models import (
+    DEFAULT_UPDATE_INTERVAL,
+    MIN_UPDATE_INTERVAL,
+    MAX_UPDATE_INTERVAL,
+)
 from mygpo.utils import to_maxlength
 from mygpo.web.logo import CoverArt
 from mygpo.data.podcast import subscribe_at_hub
@@ -28,6 +31,7 @@ from mygpo.search import get_index_fields
 from . import models
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 MAX_EPISODES_UPDATE = 200
@@ -65,8 +69,7 @@ def update_podcasts(queue):
             pass
 
         except:
-            logger.exception('Error while updating podcast "%s"',
-                             podcast_url)
+            logger.exception('Error while updating podcast "%s"', podcast_url)
             raise
 
 
@@ -85,8 +88,7 @@ class PodcastUpdater(object):
 
             if not podcast:
                 res.podcast_created = False
-                res.error_message = '"{}" could not be parsed'.format(
-                    self.podcast_url)
+                res.error_message = '"{}" could not be parsed'.format(self.podcast_url)
 
                 return
 
@@ -99,9 +101,8 @@ class PodcastUpdater(object):
             if not parsed:
                 # if it exists already, we mark it as outdated
                 self._mark_outdated(
-                    podcast,
-                    'error while fetching feed',
-                    episode_updater)
+                    podcast, 'error while fetching feed', episode_updater
+                )
                 return
 
             episode_updater.update_episodes(parsed.get('episodes', []))
@@ -121,8 +122,7 @@ class PodcastUpdater(object):
             parsed = self._fetch_feed()
             self._validate_parsed(parsed)
 
-        except (requests.exceptions.RequestException,
-                NoEpisodesException) as ex:
+        except (requests.exceptions.RequestException, NoEpisodesException) as ex:
             logging.exception('Error while fetching/parsing feed')
 
             # if we fail to parse the URL, we don't even create the
@@ -135,25 +135,20 @@ class PodcastUpdater(object):
                 raise NoPodcastCreated(ex) from pdne
 
         # Parsing went well, get podcast
-        podcast, created = Podcast.objects.get_or_create_for_url(
-            self.podcast_url)
+        podcast, created = Podcast.objects.get_or_create_for_url(self.podcast_url)
 
         return (parsed, podcast, created)
 
     def _fetch_feed(self):
-        params = {
-            'url': self.podcast_url,
-            'process_text': 'markdown',
-        }
-        headers = {
-            'Accept': 'application/json',
-        }
+        params = {'url': self.podcast_url, 'process_text': 'markdown'}
+        headers = {'Accept': 'application/json'}
         url = urljoin(settings.FEEDSERVICE_URL, 'parse')
         r = requests.get(url, params=params, headers=headers, timeout=30)
 
         if r.status_code != 200:
-            logger.error('Feed-service status code for "{}" was {}'.format(
-                url, r.status_code))
+            logger.error(
+                'Feed-service status code for "{}" was {}'.format(url, r.status_code)
+            )
             return None
 
         try:
@@ -161,7 +156,8 @@ class PodcastUpdater(object):
         except ValueError:
             logger.exception(
                 'Feed-service error while parsing response for url "%s": %s',
-                podcast_url, r.text,
+                podcast_url,
+                r.text,
             )
             raise
 
@@ -190,28 +186,29 @@ class PodcastUpdater(object):
         podcast.logo_url = parsed.get('logo') or podcast.logo_url
 
         podcast.author = to_maxlength(
-            Podcast, 'author',
-            parsed.get('author') or podcast.author)
+            Podcast, 'author', parsed.get('author') or podcast.author
+        )
 
         podcast.language = to_maxlength(
-            Podcast, 'language',
-            parsed.get('language') or podcast.language)
+            Podcast, 'language', parsed.get('language') or podcast.language
+        )
 
-        podcast.content_types = (','.join(parsed.get('content_types')) or
-                                 podcast.content_types)
+        podcast.content_types = (
+            ','.join(parsed.get('content_types')) or podcast.content_types
+        )
 
         # podcast.tags['feed'] = parsed.tags or podcast.tags.get('feed', [])
 
         podcast.common_episode_title = to_maxlength(
             Podcast,
             'common_episode_title',
-            parsed.get('common_title') or podcast.common_episode_title)
+            parsed.get('common_title') or podcast.common_episode_title,
+        )
 
-        podcast.new_location = (parsed.get('new_location') or
-                                podcast.new_location)
-        podcast.flattr_url = to_maxlength(Podcast, 'flattr_url',
-                                          parsed.get('flattr') or
-                                          podcast.flattr_url)
+        podcast.new_location = parsed.get('new_location') or podcast.new_location
+        podcast.flattr_url = to_maxlength(
+            Podcast, 'flattr_url', parsed.get('flattr') or podcast.flattr_url
+        )
         podcast.hub = parsed.get('hub') or podcast.hub
         podcast.license = parsed.get('license') or podcast.license
         podcast.max_episode_order = episode_updater.max_episode_order
@@ -220,24 +217,20 @@ class PodcastUpdater(object):
 
         if podcast.new_location:
             try:
-                new_podcast = Podcast.objects.get(
-                    urls__url=podcast.new_location
-                )
+                new_podcast = Podcast.objects.get(urls__url=podcast.new_location)
 
                 if new_podcast != podcast:
                     self._mark_outdated(
-                        podcast,
-                        'redirected to different podcast',
-                        episode_updater,
+                        podcast, 'redirected to different podcast', episode_updater
                     )
                     return
             except Podcast.DoesNotExist:
                 podcast.set_url(podcast.new_location)
 
         # latest episode timestamp
-        episodes = Episode.objects.filter(podcast=podcast,
-                                          released__isnull=False)\
-                                  .order_by('released')
+        episodes = Episode.objects.filter(
+            podcast=podcast, released__isnull=False
+        ).order_by('released')
 
         # Determine update interval
 
@@ -311,8 +304,7 @@ class PodcastUpdater(object):
             return
 
         # no new episode
-        if prev_timestamp and \
-           (podcast.latest_episode_timestamp <= prev_timestamp):
+        if prev_timestamp and (podcast.latest_episode_timestamp <= prev_timestamp):
             return
 
         # too far in the future
@@ -334,7 +326,6 @@ class PodcastUpdater(object):
 
 
 class MultiEpisodeUpdater(object):
-
     def __init__(self, podcast, update_result):
         self.podcast = podcast
         self.update_result = update_result
@@ -345,10 +336,10 @@ class MultiEpisodeUpdater(object):
 
         pid = self.podcast.get_id()
 
-        episodes_to_update = list(islice(parsed_episodes, 0,
-                                         MAX_EPISODES_UPDATE))
-        logger.info('Parsed %d (%d) episodes', len(parsed_episodes),
-                    len(episodes_to_update))
+        episodes_to_update = list(islice(parsed_episodes, 0, MAX_EPISODES_UPDATE))
+        logger.info(
+            'Parsed %d (%d) episodes', len(parsed_episodes), len(episodes_to_update)
+        )
 
         logger.info('Updating %d episodes', len(episodes_to_update))
         for n, parsed in enumerate(episodes_to_update, 1):
@@ -360,8 +351,7 @@ class MultiEpisodeUpdater(object):
 
             logger.info('Updating episode %d / %d', n, len(parsed_episodes))
 
-            episode, created = Episode.objects.get_or_create_for_url(
-                self.podcast, url)
+            episode, created = Episode.objects.get_or_create_for_url(self.podcast, url)
 
             if created:
                 self.update_result.episodes_added += 1
@@ -372,8 +362,9 @@ class MultiEpisodeUpdater(object):
             self.updated_episodes.append(episode)
 
         # and mark the remaining ones outdated
-        current_episodes = Episode.objects.filter(podcast=self.podcast,
-                                                  outdated=False)[:500]
+        current_episodes = Episode.objects.filter(podcast=self.podcast, outdated=False)[
+            :500
+        ]
         outdated_episodes = set(current_episodes) - set(self.updated_episodes)
 
         logger.info('Marking %d episodes as outdated', len(outdated_episodes))
@@ -392,11 +383,12 @@ class MultiEpisodeUpdater(object):
         if not num_episodes:
             return 0
 
-        episodes = self.podcast.episode_set.all().extra(select={
-            'has_released': 'released IS NOT NULL',
-            })\
-            .order_by('-has_released', '-released', 'pk')\
+        episodes = (
+            self.podcast.episode_set.all()
+            .extra(select={'has_released': 'released IS NOT NULL'})
+            .order_by('-has_released', '-released', 'pk')
             .only('pk')
+        )
 
         for n, episode in enumerate(episodes.iterator(), 1):
             # assign ``order`` from higher (most recent) to 0 (oldest)
@@ -407,8 +399,7 @@ class MultiEpisodeUpdater(object):
             if episode.order == new_order:
                 continue
 
-            logger.info('Updating order from {} to {}'.format(episode.order,
-                                                              new_order))
+            logger.info('Updating order from {} to {}'.format(episode.order, new_order))
             episode.order = new_order
             episode.save()
 
@@ -429,8 +420,9 @@ class MultiEpisodeUpdater(object):
 
         count = episodes.count()
         if not count:
-            logger.info('no episodes, using default interval of %dh',
-                        DEFAULT_UPDATE_INTERVAL)
+            logger.info(
+                'no episodes, using default interval of %dh', DEFAULT_UPDATE_INTERVAL
+            )
             return DEFAULT_UPDATE_INTERVAL
 
         earliest = episodes.first()
@@ -440,8 +432,9 @@ class MultiEpisodeUpdater(object):
         timespan_h = timespan_s / 60 / 60
 
         interval = int(timespan_h / count)
-        logger.info('%d episodes in %d days => %dh interval', count,
-                    timespan_h / 24, interval)
+        logger.info(
+            '%d episodes in %d days => %dh interval', count, timespan_h / 24, interval
+        )
 
         # place interval between {MIN,MAX}_UPDATE_INTERVAL
         interval = max(interval, MIN_UPDATE_INTERVAL)
@@ -452,8 +445,7 @@ class MultiEpisodeUpdater(object):
     def assign_missing_episode_slugs(self):
         common_title = self.podcast.get_common_episode_title()
 
-        episodes = Episode.objects.filter(podcast=self.podcast,
-                                          slugs__isnull=True)
+        episodes = Episode.objects.filter(podcast=self.podcast, slugs__isnull=True)
 
         for episode in episodes:
 
@@ -480,60 +472,72 @@ class EpisodeUpdater(object):
         # TODO: check if there have been any changes, to
         # avoid unnecessary updates
         self.episode.guid = to_maxlength(
-            Episode, 'guid',
-            parsed_episode.get('guid') or self.episode.guid)
+            Episode, 'guid', parsed_episode.get('guid') or self.episode.guid
+        )
 
-        self.episode.description = (parsed_episode.get('description') or
-                                    self.episode.description)
+        self.episode.description = (
+            parsed_episode.get('description') or self.episode.description
+        )
 
-        self.episode.subtitle = (parsed_episode.get('subtitle') or
-                                 self.episode.subtitle)
+        self.episode.subtitle = parsed_episode.get('subtitle') or self.episode.subtitle
 
-        self.episode.content = (parsed_episode.get('content') or
-                                parsed_episode.get('description') or
-                                self.episode.content)
+        self.episode.content = (
+            parsed_episode.get('content')
+            or parsed_episode.get('description')
+            or self.episode.content
+        )
 
         self.episode.link = to_maxlength(
-            Episode, 'link',
-            parsed_episode.get('link') or self.episode.link)
+            Episode, 'link', parsed_episode.get('link') or self.episode.link
+        )
 
-        self.episode.released = (datetime.utcfromtimestamp(
-            parsed_episode.get('released')) if parsed_episode.get('released')
-            else self.episode.released)
+        self.episode.released = (
+            datetime.utcfromtimestamp(parsed_episode.get('released'))
+            if parsed_episode.get('released')
+            else self.episode.released
+        )
 
         self.episode.author = to_maxlength(
-            Episode, 'author',
-            parsed_episode.get('author') or self.episode.author)
+            Episode, 'author', parsed_episode.get('author') or self.episode.author
+        )
 
-        self.episode.duration = (parsed_episode.get('duration') or
-                                 self.episode.duration)
+        self.episode.duration = parsed_episode.get('duration') or self.episode.duration
 
         self.episode.filesize = parsed_episode['files'][0]['filesize']
 
-        self.episode.language = (parsed_episode.get('language') or
-                                 self.episode.language or
-                                 self.podcast.language)
+        self.episode.language = (
+            parsed_episode.get('language')
+            or self.episode.language
+            or self.podcast.language
+        )
 
         mimetypes = [f['mimetype'] for f in parsed_episode.get('files', [])]
         self.episode.mimetypes = ','.join(list(set(filter(None, mimetypes))))
 
         self.episode.flattr_url = to_maxlength(
-            Episode, 'flattr_url',
-            parsed_episode.get('flattr') or self.episode.flattr_url)
+            Episode,
+            'flattr_url',
+            parsed_episode.get('flattr') or self.episode.flattr_url,
+        )
 
-        self.episode.license = (parsed_episode.get('license') or
-                                self.episode.license)
+        self.episode.license = parsed_episode.get('license') or self.episode.license
 
         self.episode.title = to_maxlength(
-            Episode, 'title',
-            parsed_episode.get('title') or self.episode.title or
-            file_basename_no_extension(self.episode.url))
+            Episode,
+            'title',
+            parsed_episode.get('title')
+            or self.episode.title
+            or file_basename_no_extension(self.episode.url),
+        )
 
         self.episode.last_update = datetime.utcnow()
         self.episode.save()
 
-        parsed_urls = list(chain.from_iterable(
-            f.get('urls', []) for f in parsed_episode.get('files', [])))
+        parsed_urls = list(
+            chain.from_iterable(
+                f.get('urls', []) for f in parsed_episode.get('files', [])
+            )
+        )
         self.episode.add_missing_urls(parsed_urls)
 
     def mark_outdated(self):

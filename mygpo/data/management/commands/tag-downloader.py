@@ -8,6 +8,7 @@ from mygpo.maintenance.management.podcastcmd import PodcastCommand
 
 SOURCE = 'delicious'
 
+
 class Command(PodcastCommand):
     """
     Adds tags from the webservice delicious.com to podcasts
@@ -36,7 +37,6 @@ class Command(PodcastCommand):
             tags = delicious.get_tags(f.url)
 
             self.update(podcast=p, tags=tags)
-
 
     def update(self, podcast, tags):
         podcast.tags[SOURCE] = tags

@@ -10,9 +10,11 @@ from mygpo.utils import edit_link
 
 register = template.Library()
 
+
 @register.filter()
 def lookup(dic, key):
     return dic.get(key, '')
+
 
 @register.filter
 def lookup_list(dict, keys):
@@ -25,7 +27,8 @@ def lookup_list(dict, keys):
 def smartwidthratio(val, min_val, max_val, upper, lower):
     if max_val == 0:
         return 0
-    return max(lower, (float(val-min_val) / max_val * upper))
+    return max(lower, (float(val - min_val) / max_val * upper))
+
 
 @register.filter
 def page_list(cur, start, total, show_max):
@@ -41,14 +44,17 @@ def filter_dict(dic):
 def append(l, item):
     return l + [item]
 
+
 @register.filter
 def remove(l, item):
     return [x for x in l if x != item]
+
 
 @register.filter
 @mark_safe
 def format_time(time):
     from mygpo.utils import format_time as _format_time
+
     return _format_time(time)
 
 
@@ -60,6 +66,7 @@ def is_tuple(obj):
 @register.filter()
 def markdown(txt):
     import markdown2
+
     return mark_safe(markdown2.markdown(txt, extras={'nofollow': True}))
 
 
@@ -67,6 +74,7 @@ def markdown(txt):
 def nbsp(s):
     """ collapses multiple whitespaces and replaces them with &nbsp; """
     import re
+
     return mark_safe(re.sub("\s+", "&nbsp;", s))
 
 
@@ -91,6 +99,7 @@ def urlquote(s):
 
 
 hours_to_str = register.filter(hours_to_str)
+
 
 @register.simple_tag
 def protocol(request):

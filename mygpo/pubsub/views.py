@@ -28,17 +28,26 @@ class SubscribeView(View):
 
         # received arguments: hub.mode, hub.topic, hub.challenge,
         # hub.lease_seconds, hub.verify_token
-        mode          = request.GET.get('hub.mode')
-        feed_url      = request.GET.get('hub.topic')
-        challenge     = request.GET.get('hub.challenge')
+        mode = request.GET.get('hub.mode')
+        feed_url = request.GET.get('hub.topic')
+        challenge = request.GET.get('hub.challenge')
         lease_seconds = request.GET.get('hub.lease_seconds')
-        verify_token  = request.GET.get('hub.verify_token')
+        verify_token = request.GET.get('hub.verify_token')
 
-        logger.debug(('received subscription-parameters: mode: %(mode)s, ' +
-                'topic: %(topic)s, challenge: %(challenge)s, lease_seconds: ' +
-                '%(lease_seconds)s, verify_token: %(verify_token)s') % \
-                dict(mode=mode, topic=feed_url, challenge=challenge,
-                     lease_seconds=lease_seconds, verify_token=verify_token))
+        logger.debug(
+            (
+                'received subscription-parameters: mode: %(mode)s, '
+                + 'topic: %(topic)s, challenge: %(challenge)s, lease_seconds: '
+                + '%(lease_seconds)s, verify_token: %(verify_token)s'
+            )
+            % dict(
+                mode=mode,
+                topic=feed_url,
+                challenge=challenge,
+                lease_seconds=lease_seconds,
+                verify_token=verify_token,
+            )
+        )
 
         try:
             subscription = HubSubscription.objects.get(topic_url=feed_url)
@@ -52,8 +61,7 @@ class SubscribeView(View):
             return HttpResponseNotFound()
 
         if subscription.verify_token != verify_token:
-            logger.warn('invalid verify_token, %s expected' %
-                subscription.verify_token)
+            logger.warn('invalid verify_token, %s expected' % subscription.verify_token)
             return HttpResponseNotFound()
 
         subscription.verified = True
@@ -61,7 +69,6 @@ class SubscribeView(View):
 
         logger.info('subscription confirmed')
         return HttpResponse(challenge)
-
 
     def post(self, request):
         """ Callback to notify about a feed update """

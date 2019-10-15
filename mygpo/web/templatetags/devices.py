@@ -20,16 +20,18 @@ DEVICE_TYPES_DICT = dict(Client.TYPES)
 
 # This dictionary maps device types to their icon files
 DEVICE_TYPE_ICONS = {
-        'desktop': 'computer.png',
-        'laptop': 'stock_notebook.png',
-        'mobile': 'stock_cell-phone.png',
-        'server': 'server.png',
-        'other': 'audio-x-generic.png',
+    'desktop': 'computer.png',
+    'laptop': 'stock_notebook.png',
+    'mobile': 'stock_cell-phone.png',
+    'server': 'server.png',
+    'other': 'audio-x-generic.png',
 }
+
 
 @register.filter
 def device_type(device):
     return DEVICE_TYPES_DICT.get(device.type, _('Unknown'))
+
 
 @register.filter()
 def device_icon(device):
@@ -52,12 +54,11 @@ def device_icon(device):
         icon = DEVICE_TYPE_ICONS.get(device_type, None)
         caption = DEVICE_TYPES_DICT.get(device_type, None)
 
-
     if icon is not None and caption is not None:
         caption = ugettext(caption)
-        html = '<img src="%(icon)s" alt="%(caption)s" class="device_icon"/>' \
-            % dict(icon=staticfiles_storage.url(os.path.join('clients', icon)),
-                   caption=caption)
+        html = '<img src="%(icon)s" alt="%(caption)s" class="device_icon"/>' % dict(
+            icon=staticfiles_storage.url(os.path.join('clients', icon)), caption=caption
+        )
         return mark_safe(html)
 
     return ''
@@ -77,12 +78,13 @@ def device_list(devices):
     links = map(device_link, devices)
     return mark_safe(''.join(links))
 
+
 def device_link(device):
     return '<a href="{link}" title="{name}">{icon}</a>'.format(
-            link = reverse(show, args=[device.uid]),
-            name = device.name,
-            icon = device_icon(device),
-        )
+        link=reverse(show, args=[device.uid]),
+        name=device.name,
+        icon=device_icon(device),
+    )
 
 
 @register.filter

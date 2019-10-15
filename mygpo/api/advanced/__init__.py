@@ -6,8 +6,12 @@ from importlib import import_module
 
 import dateutil.parser
 
-from django.http import (HttpResponse, HttpResponseBadRequest, Http404,
-                         HttpResponseNotFound, )
+from django.http import (
+    HttpResponse,
+    HttpResponseBadRequest,
+    Http404,
+    HttpResponseNotFound,
+)
 from django.core.exceptions import ValidationError
 from django.contrib.sites.requests import RequestSite
 from django.views.decorators.csrf import csrf_exempt
@@ -21,8 +25,13 @@ from mygpo.api.constants import EPISODE_ACTION_TYPES
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.advanced.directory import episode_data
 from mygpo.api.backend import get_device
-from mygpo.utils import format_time, parse_bool, get_timestamp, \
-    parse_request_body, normalize_feed_url
+from mygpo.utils import (
+    format_time,
+    parse_bool,
+    get_timestamp,
+    parse_request_body,
+    normalize_feed_url,
+)
 from mygpo.decorators import allowed_methods, cors_origin
 from mygpo.history.models import EpisodeHistoryEntry
 from mygpo.users.models import Client, InvalidEpisodeActionAttributes
@@ -31,12 +40,21 @@ from mygpo.api.basic_auth import require_valid_user, check_username
 
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 
 # keys that are allowed in episode actions
-EPISODE_ACTION_KEYS = ('position', 'episode', 'action', 'device', 'timestamp',
-                       'started', 'total', 'podcast')
+EPISODE_ACTION_KEYS = (
+    'position',
+    'episode',
+    'action',
+    'device',
+    'timestamp',
+    'started',
+    'total',
+    'podcast',
+)
 
 
 @csrf_exempt
@@ -56,13 +74,17 @@ def episodes(request, username, version=1):
         try:
             actions = parse_request_body(request)
         except (UnicodeDecodeError, ValueError) as e:
-            msg = ('Could not decode episode update POST data for ' +
-                   'user %s: %s') % (username,
-                   request.body.decode('ascii', errors='replace'))
+            msg = ('Could not decode episode update POST data for ' + 'user %s: %s') % (
+                username,
+                request.body.decode('ascii', errors='replace'),
+            )
             logger.warn(msg, exc_info=True)
             return HttpResponseBadRequest(msg)
 
-        logger.info('start: user %s: %d actions from %s' % (request.user, len(actions), ua_string))
+        logger.info(
+            'start: user %s: %d actions from %s'
+            % (request.user, len(actions), ua_string)
+        )
 
         # handle in background
         if len(actions) > dsettings.API_ACTIONS_MAX_NONBG:
@@ -78,26 +100,34 @@ def episodes(request, username, version=1):
                 # TODO: return 202 Accepted
                 return JsonResponse({'timestamp': now_, 'update_urls': []})
 
-
         try:
             update_urls = update_episodes(request.user, actions, now, ua_string)
         except ValidationError as e:
-            logger.warning('Validation Error while uploading episode actions '
-                'for user %s: %s', username, str(e))
+            logger.warning(
+                'Validation Error while uploading episode actions ' 'for user %s: %s',
+                username,
+                str(e),
+            )
             return HttpResponseBadRequest(str(e))
 
         except InvalidEpisodeActionAttributes as e:
-            msg = 'invalid episode action attributes while uploading episode actions for user %s' % (username,)
+            msg = (
+                'invalid episode action attributes while uploading episode actions for user %s'
+                % (username,)
+            )
             logger.warn(msg, exc_info=True)
             return HttpResponseBadRequest(str(e))
 
-        logger.info('done:  user %s: %d actions from %s' % (request.user, len(actions), ua_string))
+        logger.info(
+            'done:  user %s: %d actions from %s'
+            % (request.user, len(actions), ua_string)
+        )
         return JsonResponse({'timestamp': now_, 'update_urls': update_urls})
 
     elif request.method == 'GET':
-        podcast_url= request.GET.get('podcast', None)
+        podcast_url = request.GET.get('podcast', None)
         device_uid = request.GET.get('device', None)
-        since_     = request.GET.get('since', None)
+        since_ = request.GET.get('since', None)
         aggregated = parse_bool(request.GET.get('aggregated', False))
 
         try:
@@ -123,11 +153,11 @@ def episodes(request, username, version=1):
         else:
             device = None
 
-        changes = get_episode_changes(request.user, podcast, device, since,
-                now, aggregated, version)
+        changes = get_episode_changes(
+            request.user, podcast, device, since, now, aggregated, version
+        )
 
         return JsonResponse(changes)
-
 
 
 def convert_position(action):
@@ -138,11 +168,9 @@ def convert_position(action):
     return action
 
 
-
 def get_episode_changes(user, podcast, device, since, until, aggregated, version):
 
-    history = EpisodeHistoryEntry.objects.filter(user=user,
-                                                 timestamp__lt=until)
+    history = EpisodeHistoryEntry.objects.filter(user=user, timestamp__lt=until)
 
     # return the earlier entries first
     history = history.order_by('timestamp')
@@ -169,7 +197,7 @@ def get_episode_changes(user, podcast, device, since, until, aggregated, version
     actions = [episode_action_json(a, user) for a in history]
 
     if aggregated:
-        actions = list(dict( (a['episode'], a) for a in actions ).values())
+        actions = list(dict((a['episode'], a) for a in actions).values())
 
     if history:
         ts = get_timestamp(history[-1].timestamp)
@@ -219,20 +247,26 @@ def update_episodes(user, actions, now, ua_string):
         episode = Episode.objects.get_or_create_for_url(podcast, episode_url).object
 
         # parse_episode_action returns a EpisodeHistoryEntry obj
-        history = parse_episode_action(action, user, update_urls, now,
-                                       ua_string)
+        history = parse_episode_action(action, user, update_urls, now, ua_string)
 
-        EpisodeHistoryEntry.create_entry(user, episode, history.action,
-                                         history.client, history.timestamp,
-                                         history.started, history.stopped,
-                                         history.total, podcast_url,
-                                         episode_url)
+        EpisodeHistoryEntry.create_entry(
+            user,
+            episode,
+            history.action,
+            history.client,
+            history.timestamp,
+            history.started,
+            history.stopped,
+            history.total,
+            podcast_url,
+            episode_url,
+        )
 
     return update_urls
 
 
 def parse_episode_action(action, user, update_urls, now, ua_string):
-    action_str  = action.get('action', None)
+    action_str = action.get('action', None)
     if not valid_episodeaction(action_str):
         raise Exception('invalid action %s' % action_str)
 
@@ -265,15 +299,15 @@ def parse_episode_action(action, user, update_urls, now, ua_string):
 @allowed_methods(['POST', 'PUT'])
 @cors_origin()
 def device(request, username, device_uid, version=None):
-    d = get_device(request.user, device_uid,
-            request.META.get('HTTP_USER_AGENT', ''))
+    d = get_device(request.user, device_uid, request.META.get('HTTP_USER_AGENT', ''))
 
     try:
         data = parse_request_body(request)
     except (UnicodeDecodeError, ValueError) as e:
-        msg = ('Could not decode device update POST data for ' +
-               'user %s: %s') % (username,
-               request.body.decode('ascii', errors='replace'))
+        msg = ('Could not decode device update POST data for ' + 'user %s: %s') % (
+            username,
+            request.body.decode('ascii', errors='replace'),
+        )
         logger.warn(msg, exc_info=True)
         return HttpResponseBadRequest(msg)
 
@@ -297,6 +331,7 @@ def valid_devicetype(type):
             return True
     return False
 
+
 def valid_episodeaction(type):
     for t in EPISODE_ACTION_TYPES:
         if t[0] == type:
@@ -319,11 +354,10 @@ def devices(request, username, version=None):
 
 def get_client_data(user, client):
     return dict(
-        id           = client.uid,
-        caption      = client.name,
-        type         = client.type,
-        subscriptions= Subscription.objects.filter(user=user, client=client)\
-                                           .count(),
+        id=client.uid,
+        caption=client.name,
+        type=client.type,
+        subscriptions=Subscription.objects.filter(user=user, client=client).count(),
     )
 
 
@@ -342,5 +376,5 @@ def favorites(request, username):
 def sanitize_append(url, sanitized_list):
     urls = normalize_feed_url(url)
     if url != urls:
-        sanitized_list.append( (url, urls or '') )
+        sanitized_list.append((url, urls or ''))
     return urls

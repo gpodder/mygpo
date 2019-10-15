@@ -1,7 +1,7 @@
 [main]
 host = https://transifex.com
 
-[mygpo.website-api]
+[gpoddernet.gpoddernet]
 file_filter = mygpo/locale/<lang>/LC_MESSAGES/django.po
 source_file = mygpo/locale/en/LC_MESSAGES/django.po
 source_lang = en

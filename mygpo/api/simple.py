@@ -1,6 +1,5 @@
 import json
 import string
-from itertools import islice
 from functools import wraps
 
 from django.shortcuts import render
@@ -25,18 +24,21 @@ from mygpo.decorators import allowed_methods, cors_origin
 from mygpo.utils import parse_range, normalize_feed_url
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 
 ALLOWED_FORMATS = ('txt', 'opml', 'json', 'jsonp', 'xml')
 
+
 def check_format(fn):
     @wraps(fn)
     def tmp(request, format, *args, **kwargs):
-        if not format in ALLOWED_FORMATS:
+        if format not in ALLOWED_FORMATS:
             return HttpResponseBadRequest('Invalid format')
 
         return fn(request, *args, format=format, **kwargs)
+
     return tmp
 
 
@@ -54,7 +56,9 @@ def subscriptions(request, username, device_uid, format):
     if request.method == 'GET':
         title = _('%(username)s\'s Subscription List') % {'username': username}
         subscriptions = get_subscriptions(request.user, device_uid, user_agent)
-        return format_podcast_list(subscriptions, format, title, jsonp_padding=request.GET.get('jsonp'))
+        return format_podcast_list(
+            subscriptions, format, title, jsonp_padding=request.GET.get('jsonp')
+        )
 
     elif request.method in ('PUT', 'POST'):
         try:
@@ -64,8 +68,7 @@ def subscriptions(request, username, device_uid, format):
         except ValueError as e:
             return HttpResponseBadRequest('Unable to parse POST data: %s' % str(e))
 
-        return set_subscriptions(subscriptions, request.user, device_uid,
-                user_agent)
+        return set_subscriptions(subscriptions, request.user, device_uid, user_agent)
 
 
 @csrf_exempt
@@ -85,18 +88,31 @@ def all_subscriptions(request, username, format):
     if scale not in range(1, 257):
         return HttpResponseBadRequest('scale_logo has to be a number from 1 to 256')
 
-
     subscriptions = get_subscribed_podcasts(request.user)
     title = _('%(username)s\'s Subscription List') % {'username': username}
     domain = RequestSite(request).domain
     p_data = lambda p: podcast_data(p, domain, scale)
-    return format_podcast_list(subscriptions, format, title,
-            json_map=p_data, xml_template='podcasts.xml', request=request)
+    return format_podcast_list(
+        subscriptions,
+        format,
+        title,
+        json_map=p_data,
+        xml_template='podcasts.xml',
+        request=request,
+    )
 
 
-def format_podcast_list(obj_list, format, title, get_podcast=None,
-        json_map=lambda x: x.url, jsonp_padding=None,
-        xml_template=None, request=None, template_args={}):
+def format_podcast_list(
+    obj_list,
+    format,
+    title,
+    get_podcast=None,
+    json_map=lambda x: x.url,
+    jsonp_padding=None,
+    xml_template=None,
+    request=None,
+    template_args={},
+):
     """
     Formats a list of podcasts for use in a API response
 
@@ -133,10 +149,15 @@ def format_podcast_list(obj_list, format, title, get_podcast=None,
         ALLOWED_FUNCNAME = string.ascii_letters + string.digits + '_'
 
         if not jsonp_padding:
-            return HttpResponseBadRequest('For a JSONP response, specify the name of the callback function in the jsonp parameter')
+            return HttpResponseBadRequest(
+                'For a JSONP response, specify the name of the callback function in the jsonp parameter'
+            )
 
         if any(x not in ALLOWED_FUNCNAME for x in jsonp_padding):
-            return HttpResponseBadRequest('JSONP padding can only contain the characters %(char)s' % {'char': ALLOWED_FUNCNAME})
+            return HttpResponseBadRequest(
+                'JSONP padding can only contain the characters %(char)s'
+                % {'char': ALLOWED_FUNCNAME}
+            )
 
         objs = list(map(json_map, obj_list))
         return JsonResponse(objs, jsonp_padding=jsonp_padding)
@@ -148,8 +169,9 @@ def format_podcast_list(obj_list, format, title, get_podcast=None,
         podcasts = map(json_map, obj_list)
         template_args.update({'podcasts': podcasts})
 
-        return render(request, xml_template, template_args,
-                content_type='application/xml')
+        return render(
+            request, xml_template, template_args, content_type='application/xml'
+        )
 
     else:
         return None
@@ -194,7 +216,7 @@ def set_subscriptions(urls, user, device_uid, user_agent):
 
     device = get_device(user, device_uid, user_agent, undelete=True)
 
-    subscriptions = dict( (p.url, p) for p in device.get_subscribed_podcasts())
+    subscriptions = dict((p.url, p) for p in device.get_subscribed_podcasts())
     new = [p for p in urls if p not in subscriptions.keys()]
     rem = [p for p in subscriptions.keys() if p not in urls]
 
@@ -228,25 +250,22 @@ def toplist(request, count, format):
     if scale not in range(1, 257):
         return HttpResponseBadRequest('scale_logo has to be a number from 1 to 256')
 
-
-    def get_podcast(t):
-        return t
-
     def json_map(t):
         podcast = t
         p = podcast_data(podcast, domain, scale)
         return p
 
     title = _('gpodder.net - Top %(count)d') % {'count': len(entries)}
-    return format_podcast_list(entries,
-                               format,
-                               title,
-                               get_podcast=get_podcast,
-                               json_map=json_map,
-                               jsonp_padding=request.GET.get('jsonp', ''),
-                               xml_template='podcasts.xml',
-                               request=request,
-                            )
+    return format_podcast_list(
+        entries,
+        format,
+        title,
+        get_podcast=lambda t: t,
+        json_map=json_map,
+        jsonp_padding=request.GET.get('jsonp', ''),
+        xml_template='podcasts.xml',
+        request=request,
+    )
 
 
 @check_format
@@ -275,7 +294,15 @@ def search(request, format):
     title = _('gpodder.net - Search')
     domain = RequestSite(request).domain
     p_data = lambda p: podcast_data(p, domain, scale)
-    return format_podcast_list(results, format, title, json_map=p_data, jsonp_padding=request.GET.get('jsonp', ''), xml_template='podcasts.xml', request=request)
+    return format_podcast_list(
+        results,
+        format,
+        title,
+        json_map=p_data,
+        jsonp_padding=request.GET.get('jsonp', ''),
+        xml_template='podcasts.xml',
+        request=request,
+    )
 
 
 @require_valid_user
@@ -287,12 +314,19 @@ def suggestions(request, count, format):
     count = parse_range(count, 1, 100, 100)
 
     user = request.user
-    suggestions = Podcast.objects.filter(podcastsuggestion__suggested_to=user,
-                                         podcastsuggestion__deleted=False)
+    suggestions = Podcast.objects.filter(
+        podcastsuggestion__suggested_to=user, podcastsuggestion__deleted=False
+    )
     title = _('gpodder.net - %(count)d Suggestions') % {'count': len(suggestions)}
     domain = RequestSite(request).domain
     p_data = lambda p: podcast_data(p, domain)
-    return format_podcast_list(suggestions, format, title, json_map=p_data, jsonp_padding=request.GET.get('jsonp'))
+    return format_podcast_list(
+        suggestions,
+        format,
+        title,
+        json_map=p_data,
+        jsonp_padding=request.GET.get('jsonp'),
+    )
 
 
 @check_format
@@ -323,10 +357,10 @@ def example_podcasts(request, format):
     domain = RequestSite(request).domain
     p_data = lambda p: podcast_data(p, domain, scale)
     return format_podcast_list(
-            podcasts,
-            format,
-            title,
-            json_map=p_data,
-            xml_template='podcasts.xml',
-            request=request,
-        )
+        podcasts,
+        format,
+        title,
+        json_map=p_data,
+        xml_template='podcasts.xml',
+        request=request,
+    )

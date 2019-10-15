@@ -6,8 +6,11 @@ from django.db import transaction, IntegrityError
 from django.shortcuts import render
 from django.urls import reverse
 from django.core.exceptions import ValidationError
-from django.http import HttpResponseRedirect, HttpResponseBadRequest, \
-        HttpResponseNotFound
+from django.http import (
+    HttpResponseRedirect,
+    HttpResponseBadRequest,
+    HttpResponseNotFound,
+)
 from django.contrib import messages
 from mygpo.web.forms import DeviceForm, SyncForm
 from mygpo.web.utils import symbian_opml_changes
@@ -34,18 +37,19 @@ def overview(request):
 
     # create a "default" device
     device = Client()
-    device_form = DeviceForm({
-        'name': device.name,
-        'type': device.type,
-        'uid': device.uid
-        })
+    device_form = DeviceForm(
+        {'name': device.name, 'type': device.type, 'uid': device.uid}
+    )
 
-    return render(request, 'devicelist.html', {
-        'device_groups': list(device_groups),
-        'deleted_devices': list(deleted_devices),
-        'device_form': device_form,
-    })
-
+    return render(
+        request,
+        'devicelist.html',
+        {
+            'device_groups': list(device_groups),
+            'deleted_devices': list(deleted_devices),
+            'device_form': device_form,
+        },
+    )
 
 
 def device_decorator(f):
@@ -66,7 +70,6 @@ def device_decorator(f):
     return _decorator
 
 
-
 @login_required
 @device_decorator
 def show(request, device):
@@ -76,16 +79,19 @@ def show(request, device):
 
     sync_targets = list(device.get_sync_targets())
     sync_form = SyncForm()
-    sync_form.set_targets(sync_targets,
-            _('Synchronize with the following devices'))
+    sync_form.set_targets(sync_targets, _('Synchronize with the following devices'))
 
-    return render(request, 'device.html', {
-        'device': device,
-        'sync_form': sync_form,
-        'subscriptions': subscriptions,
-        'synced_with': synced_with,
-        'has_sync_targets': len(sync_targets) > 0,
-    })
+    return render(
+        request,
+        'device.html',
+        {
+            'device': device,
+            'sync_form': sync_form,
+            'subscriptions': subscriptions,
+            'synced_with': synced_with,
+            'has_sync_targets': len(sync_targets) > 0,
+        },
+    )
 
 
 @login_required
@@ -104,7 +110,7 @@ def create(request):
         device.id = uuid.uuid1()
         device.name = device_form.cleaned_data['name']
         device.type = device_form.cleaned_data['type']
-        device.uid  = device_form.cleaned_data['uid'].replace(' ', '-')
+        device.uid = device_form.cleaned_data['uid'].replace(' ', '-')
         device.full_clean()
         device.save()
         messages.success(request, _('Device saved'))
@@ -114,12 +120,12 @@ def create(request):
         return HttpResponseRedirect(reverse('devices'))
 
     except IntegrityError:
-        messages.error(request, _("You can't use the same Device "
-                   "ID for two devices."))
+        messages.error(
+            request, _("You can't use the same Device " "ID for two devices.")
+        )
         return HttpResponseRedirect(reverse('devices'))
 
     return HttpResponseRedirect(reverse('device-edit', args=[device.uid]))
-
 
 
 @device_decorator
@@ -135,7 +141,7 @@ def update(request, device):
         try:
             device.name = device_form.cleaned_data['name']
             device.type = device_form.cleaned_data['type']
-            device.uid  = device_form.cleaned_data['uid'].replace(' ', '-')
+            device.uid = device_form.cleaned_data['uid'].replace(' ', '-')
             device.full_clean()
             device.save()
             messages.success(request, _('Device updated'))
@@ -145,8 +151,9 @@ def update(request, device):
             messages.error(request, _(str(e)))
 
         except IntegrityError:
-            messages.error(request, _("You can't use the same Device "
-                       "ID for two devices."))
+            messages.error(
+                request, _("You can't use the same Device " "ID for two devices.")
+            )
 
     return HttpResponseRedirect(reverse('device-edit', args=[uid]))
 
@@ -156,26 +163,27 @@ def update(request, device):
 @allowed_methods(['GET'])
 def edit(request, device):
 
-    device_form = DeviceForm({
-        'name': device.name,
-        'type': device.type,
-        'uid': device.uid
-        })
+    device_form = DeviceForm(
+        {'name': device.name, 'type': device.type, 'uid': device.uid}
+    )
 
     synced_with = device.synced_with()
 
     sync_targets = list(device.get_sync_targets())
     sync_form = SyncForm()
-    sync_form.set_targets(sync_targets,
-            _('Synchronize with the following devices'))
+    sync_form.set_targets(sync_targets, _('Synchronize with the following devices'))
 
-    return render(request, 'device-edit.html', {
-        'device': device,
-        'device_form': device_form,
-        'sync_form': sync_form,
-        'synced_with': synced_with,
-        'has_sync_targets': len(sync_targets) > 0,
-    })
+    return render(
+        request,
+        'device-edit.html',
+        {
+            'device': device,
+            'device_form': device_form,
+            'sync_form': sync_form,
+            'synced_with': synced_with,
+            'has_sync_targets': len(sync_targets) > 0,
+        },
+    )
 
 
 @device_decorator
@@ -201,7 +209,11 @@ def upload_opml(request, device):
 @device_decorator
 @login_required
 def opml(request, device):
-    response = simple.format_podcast_list(simple.get_subscriptions(request.user, device.uid), 'opml', request.user.username)
+    response = simple.format_podcast_list(
+        simple.get_subscriptions(request.user, device.uid),
+        'opml',
+        request.user.username,
+    )
     response['Content-Disposition'] = 'attachment; filename=%s.opml' % device.uid
     return response
 
@@ -228,8 +240,7 @@ def delete(request, device):
     device.stop_sync()
 
     # mark the subscriptions as deleted
-    Subscription.objects.filter(user=request.user, client=device)\
-                        .update(deleted=True)
+    Subscription.objects.filter(user=request.user, client=device).update(deleted=True)
 
     # mark the client as deleted
     device.deleted = True
@@ -244,6 +255,7 @@ def delete_permanently(request, device):
     device.delete()
     return HttpResponseRedirect(reverse('devices'))
 
+
 @device_decorator
 @login_required
 @transaction.atomic
@@ -251,8 +263,7 @@ def undelete(request, device):
     """ Marks the client as not deleted anymore """
 
     # mark the subscriptions as not deleted anymore
-    Subscription.objects.filter(user=request.user, client=device)\
-                        .update(deleted=False)
+    Subscription.objects.filter(user=request.user, client=device).update(deleted=False)
 
     # mark the client as not deleted anymore
     device.deleted = False
@@ -288,8 +299,7 @@ def sync(request, device):
 def resync(request, device):
     """ Manually triggers a re-sync of a client """
     sync_user.delay(request.user.pk)
-    messages.success(request,
-                     _('Your subscription will be updated in a moment.'))
+    messages.success(request, _('Your subscription will be updated in a moment.'))
     return HttpResponseRedirect(reverse('device', args=[device.uid]))
 
 
@@ -301,7 +311,6 @@ def unsync(request, device):
         device.stop_sync()
 
     except ValueError as e:
-        messages.error(request, 'Could not unsync the device: {err}'.format(
-                    err=str(e)))
+        messages.error(request, 'Could not unsync the device: {err}'.format(err=str(e)))
 
     return HttpResponseRedirect(reverse('device', args=[device.uid]))

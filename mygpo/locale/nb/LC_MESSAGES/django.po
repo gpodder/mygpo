@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-29 20:11+0000\n"
+"POT-Creation-Date: 2019-09-12 20:10+0000\n"
 "PO-Revision-Date: 2010-02-28 18:33+0100\n"
 "Last-Translator: Jim Nygård <jim@nygard.priv.no>\n"
 "Language-Team: gpodder <>\n"
@@ -20,16 +20,19 @@ msgstr ""
 #: mygpo/administration/templates/admin/activate-user.html:9
 #: mygpo/administration/templates/admin/activate-user.html:12
 #: mygpo/administration/templates/admin/overview.html:22
+#: mygpo/administration/templates/admin/resend-acivation.html:9
 msgid "Activate User"
 msgstr ""
 
 #: mygpo/administration/templates/admin/activate-user.html:20
-#: mygpo/web/forms.py:179 mygpo/web/templates/account.html:112
+#: mygpo/administration/templates/admin/resend-acivation.html:20
+#: mygpo/web/forms.py:182 mygpo/web/templates/account.html:112
 #, fuzzy
 msgid "Username"
 msgstr "Velg et brukernavn"
 
 #: mygpo/administration/templates/admin/activate-user.html:27
+#: mygpo/administration/templates/admin/resend-acivation.html:27
 msgid "Email"
 msgstr ""
 
@@ -155,7 +158,7 @@ msgstr ""
 #: mygpo/administration/templates/admin/make-publisher-input.html:12
 #: mygpo/administration/templates/admin/make-publisher-result.html:9
 #: mygpo/administration/templates/admin/make-publisher-result.html:12
-#: mygpo/administration/views.py:404
+#: mygpo/administration/views.py:447
 msgid "Publisher Permissions"
 msgstr ""
 
@@ -219,7 +222,21 @@ msgid "General Stats"
 msgstr ""
 
 #: mygpo/administration/templates/admin/overview.html:23
+#, fuzzy
+msgid "Resend Activation Email"
+msgstr "Send aktiveringseposten på nytt"
+
+#: mygpo/administration/templates/admin/overview.html:24
 msgid "Assign Publisher Permissions"
+msgstr ""
+
+#: mygpo/administration/templates/admin/resend-acivation.html:12
+#, fuzzy
+msgid "Resend Activation email"
+msgstr "Send aktiveringseposten på nytt"
+
+#: mygpo/administration/templates/admin/resend-acivation.html:35
+msgid "Resend"
 msgstr ""
 
 #: mygpo/administration/templates/admin/stats.html:12
@@ -272,23 +289,28 @@ msgstr ""
 msgid "User-Agent"
 msgstr ""
 
-#: mygpo/administration/views.py:153 mygpo/administration/views.py:175
+#: mygpo/administration/views.py:152 mygpo/administration/views.py:170
 #, python-brace-format
 msgid "No podcast with URL {url}"
 msgstr ""
 
-#: mygpo/administration/views.py:329
+#: mygpo/administration/views.py:321 mygpo/administration/views.py:356
 msgid "Provide either username or email address"
 msgstr ""
 
-#: mygpo/administration/views.py:335
+#: mygpo/administration/views.py:327 mygpo/administration/views.py:362
 #, fuzzy
 msgid "No user found"
 msgstr "Ikke funnet"
 
-#: mygpo/administration/views.py:340
+#: mygpo/administration/views.py:334
 #, python-brace-format
 msgid "User {username} ({email}) activated"
+msgstr ""
+
+#: mygpo/administration/views.py:373
+#, python-brace-format
+msgid "Email for {username} ({email}) resent"
 msgstr ""
 
 #: mygpo/api/constants.py:8
@@ -319,21 +341,21 @@ msgstr "abonnert"
 msgid "unsubscribed"
 msgstr "avabonnement"
 
-#: mygpo/api/simple.py:55 mygpo/api/simple.py:90
+#: mygpo/api/simple.py:58 mygpo/api/simple.py:93
 #, fuzzy, python-format
 msgid "%(username)s's Subscription List"
 msgstr "%(username)s sine Abonnement"
 
-#: mygpo/api/simple.py:240
+#: mygpo/api/simple.py:262
 #, fuzzy, python-format
 msgid "gpodder.net - Top %(count)d"
 msgstr "my.gpodder.org - Topp %s"
 
-#: mygpo/api/simple.py:275
+#: mygpo/api/simple.py:298
 msgid "gpodder.net - Search"
 msgstr ""
 
-#: mygpo/api/simple.py:292
+#: mygpo/api/simple.py:324
 #, fuzzy, python-format
 msgid "gpodder.net - %(count)d Suggestions"
 msgstr "my.gpodder.org - %s Forslag"
@@ -434,8 +456,8 @@ msgstr ""
 #: mygpo/directory/templates/directory/license-podcasts.html:36
 #: mygpo/directory/templates/search.html:35
 #: mygpo/directory/templates/toplist.html:26
-#: mygpo/podcastlists/templates/list.html:48 mygpo/web/templatetags/menu.py:33
-#: mygpo/web/templatetags/menu.py:68
+#: mygpo/podcastlists/templates/list.html:48 mygpo/web/templatetags/menu.py:37
+#: mygpo/web/templatetags/menu.py:78
 msgid "Podcast"
 msgstr "Podkast"
 
@@ -459,14 +481,14 @@ msgid "Podcasts with License Information"
 msgstr ""
 
 #: mygpo/directory/templates/directory/licenses.html:23
-#: mygpo/web/templatetags/menu.py:40
+#: mygpo/web/templatetags/menu.py:44
 msgid "License"
 msgstr ""
 
 #: mygpo/directory/templates/directory/licenses.html:24
 #: mygpo/directory/templates/podcast_lists.html:24
 #: mygpo/web/templates/base.html:135 mygpo/web/templates/home.html:155
-#: mygpo/web/templatetags/menu.py:42
+#: mygpo/web/templatetags/menu.py:46
 #, fuzzy
 msgid "Podcasts"
 msgstr "Podkast"
@@ -514,7 +536,7 @@ msgid "OK"
 msgstr "OK"
 
 #: mygpo/directory/templates/missing.html:11
-#: mygpo/directory/templates/missing.html:14 mygpo/web/templatetags/menu.py:35
+#: mygpo/directory/templates/missing.html:14 mygpo/web/templatetags/menu.py:39
 #, fuzzy
 msgid "Missing Podcast"
 msgstr "Podkastforslag"
@@ -548,7 +570,7 @@ msgstr "Podkastforslag"
 #: mygpo/podcastlists/templates/lists.html:13
 #: mygpo/podcastlists/templates/lists.html:16
 #: mygpo/podcastlists/templates/lists_user.html:9
-#: mygpo/web/templatetags/menu.py:36 mygpo/web/templatetags/menu.py:58
+#: mygpo/web/templatetags/menu.py:40 mygpo/web/templatetags/menu.py:68
 #, fuzzy
 msgid "Podcast Lists"
 msgstr "Podkast toppliste"
@@ -587,7 +609,7 @@ msgstr ""
 #: mygpo/podcastlists/templates/list.html:104
 #: mygpo/subscriptions/templates/subscriptions.html:53
 #: mygpo/web/templates/base.html:136 mygpo/web/templates/home.html:156
-#: mygpo/web/templatetags/menu.py:34
+#: mygpo/web/templatetags/menu.py:38
 msgid "Search"
 msgstr "Søk"
 
@@ -621,14 +643,14 @@ msgstr "Toppliste"
 msgid "Client Access"
 msgstr ""
 
-#: mygpo/directory/views.py:321
+#: mygpo/directory/views.py:334
 #, fuzzy, python-format
 msgid "%d podcasts added"
 msgstr "Podkaster"
 
 #: mygpo/history/templates/episode-history.html:47
 #: mygpo/history/templates/episode-history.html:81
-#: mygpo/web/templates/device.html:73 mygpo/web/templatetags/menu.py:51
+#: mygpo/web/templates/device.html:73 mygpo/web/templatetags/menu.py:58
 msgid "History"
 msgstr "Historikk"
 
@@ -658,7 +680,7 @@ msgid "Action"
 msgstr "Handling"
 
 #: mygpo/history/templates/episode-history.html:86
-#: mygpo/web/templatetags/menu.py:50
+#: mygpo/web/templatetags/menu.py:57
 msgid "Device"
 msgstr "Enhet"
 
@@ -786,30 +808,30 @@ msgstr ""
 msgid "%(username)s hasn't created any podcast lists yet."
 msgstr "%(username)s har ingen abonnementer ennå."
 
-#: mygpo/podcastlists/views.py:104
+#: mygpo/podcastlists/views.py:103
 msgid "You have to specify a title."
 msgstr ""
 
-#: mygpo/podcastlists/views.py:110
+#: mygpo/podcastlists/views.py:109
 #, python-brace-format
 msgid "\"{title}\" is not a valid title"
 msgstr ""
 
-#: mygpo/podcastlists/views.py:169
+#: mygpo/podcastlists/views.py:162
 msgid "Thanks for rating!"
 msgstr ""
 
-#: mygpo/podcasts/admin.py:22 mygpo/web/templates/device-edit.html:28
+#: mygpo/podcasts/admin.py:27 mygpo/web/templates/device-edit.html:28
 msgid "Edit"
 msgstr "Rediger"
 
-#: mygpo/podcasts/models.py:704
+#: mygpo/podcasts/models.py:695
 #, fuzzy
 #| msgid "Unnamed Podcast"
 msgid "Unknown Podcast"
 msgstr "Podkast uten navn"
 
-#: mygpo/podcasts/models.py:706
+#: mygpo/podcasts/models.py:698
 #, python-brace-format
 msgid "Unknown Podcast from {domain}"
 msgstr ""
@@ -898,7 +920,7 @@ msgstr ""
 msgid "Older Episodes"
 msgstr "Episoder"
 
-#: mygpo/publisher/forms.py:5
+#: mygpo/publisher/forms.py:6
 #: mygpo/publisher/templates/publisher/episode.html:60
 msgid "URL"
 msgstr "URL"
@@ -930,7 +952,7 @@ msgstr "Bytt ut teksten 'YOUR_ADRESS' med adressen til din podkast."
 #: mygpo/publisher/templates/publisher/info.html:20
 #: mygpo/web/templates/base.html:153 mygpo/web/templates/base.html:180
 #: mygpo/web/templates/home.html:173 mygpo/web/templates/home.html:200
-#: mygpo/web/templatetags/menu.py:66
+#: mygpo/web/templatetags/menu.py:76
 msgid "Advertise"
 msgstr ""
 
@@ -1043,7 +1065,7 @@ msgstr ""
 
 #: mygpo/publisher/templates/publisher/episodes.html:31
 #: mygpo/share/templates/userpage.html:182
-#: mygpo/share/templates/userpage.html:188 mygpo/web/templatetags/menu.py:43
+#: mygpo/share/templates/userpage.html:188 mygpo/web/templatetags/menu.py:47
 msgid "Episodes"
 msgstr "Episoder"
 
@@ -1215,7 +1237,7 @@ msgstr ""
 msgid "Update now"
 msgstr ""
 
-#: mygpo/publisher/templates/publisher/podcast.html:117 mygpo/web/forms.py:70
+#: mygpo/publisher/templates/publisher/podcast.html:117 mygpo/web/forms.py:74
 #: mygpo/web/templates/base.html:160 mygpo/web/templates/home.html:180
 msgid "Twitter"
 msgstr ""
@@ -1291,23 +1313,23 @@ msgstr ""
 msgid "Show Group Stats"
 msgstr ""
 
-#: mygpo/publisher/views.py:148
+#: mygpo/publisher/views.py:173
 msgid ""
 "The update has been scheduled. It might take some time until the results are "
 "visible."
 msgstr ""
 
-#: mygpo/publisher/views.py:161 mygpo/users/views/settings.py:98
+#: mygpo/publisher/views.py:188 mygpo/users/views/settings.py:112
 #, fuzzy
 msgid "Data updated"
 msgstr "Enhetsliste"
 
-#: mygpo/publisher/views.py:172
+#: mygpo/publisher/views.py:198
 #, fuzzy
 msgid "Publisher token updated"
 msgstr "Abonner på nye podkaster"
 
-#: mygpo/publisher/views.py:262
+#: mygpo/publisher/views.py:301
 #, python-brace-format
 msgid "Removed slug {slug} from {episode}"
 msgstr ""
@@ -1385,8 +1407,8 @@ msgstr "Hvor"
 
 #: mygpo/share/templates/share/overview.html:21
 #: mygpo/web/templates/device.html:19 mygpo/web/templates/privacy.html:25
-#: mygpo/web/templatetags/menu.py:45 mygpo/web/templatetags/menu.py:46
-#: mygpo/web/templatetags/menu.py:57
+#: mygpo/web/templatetags/menu.py:51 mygpo/web/templatetags/menu.py:53
+#: mygpo/web/templatetags/menu.py:67
 msgid "Subscriptions"
 msgstr "Abonnementer"
 
@@ -1403,7 +1425,7 @@ msgid "User Page"
 msgstr "Velg et brukernavn"
 
 #: mygpo/share/templates/share/overview.html:51
-#: mygpo/web/templatetags/menu.py:60
+#: mygpo/web/templatetags/menu.py:71
 msgid "Settings"
 msgstr "Innstillinger"
 
@@ -1538,22 +1560,22 @@ msgstr ""
 msgid "Download OPML"
 msgstr "lastet ned"
 
-#: mygpo/subscriptions/views.py:108
+#: mygpo/subscriptions/views.py:117
 #, fuzzy, python-format
 msgid "%(username)s's Podcast Subscriptions on %(site)s"
 msgstr "%(username)s sine Abonnement"
 
-#: mygpo/subscriptions/views.py:112
+#: mygpo/subscriptions/views.py:123
 #, python-format
 msgid "Recent changes to %(username)s's podcast subscriptions on %(site)s"
 msgstr ""
 
-#: mygpo/subscriptions/views.py:136
+#: mygpo/subscriptions/views.py:147
 #, fuzzy, python-format
 msgid "%(username)s subscribed to %(podcast)s (%(site)s)"
 msgstr "Abonner på %(podcasttitle)s"
 
-#: mygpo/subscriptions/views.py:138
+#: mygpo/subscriptions/views.py:149
 #, fuzzy, python-format
 msgid "%(username)s unsubscribed from %(podcast)s (%(site)s)"
 msgstr "Abonner på %(podcasttitle)s"
@@ -1572,27 +1594,27 @@ msgstr ""
 msgid "No Suggestions Yet"
 msgstr "Forslag"
 
-#: mygpo/users/models.py:226
+#: mygpo/users/models.py:224
 msgid "Desktop"
 msgstr "Desktop"
 
-#: mygpo/users/models.py:227
+#: mygpo/users/models.py:225
 msgid "Laptop"
 msgstr "Laptop"
 
-#: mygpo/users/models.py:228
+#: mygpo/users/models.py:226
 msgid "Cell phone"
 msgstr "Mobiltelefon"
 
-#: mygpo/users/models.py:229
+#: mygpo/users/models.py:227
 msgid "Server"
 msgstr "Tjener"
 
-#: mygpo/users/models.py:230
+#: mygpo/users/models.py:228
 msgid "Tablet"
 msgstr ""
 
-#: mygpo/users/models.py:231
+#: mygpo/users/models.py:229
 msgid "Other"
 msgstr "Annen"
 
@@ -1634,7 +1656,7 @@ msgstr ""
 #: mygpo/users/templates/registration/registration_form.html:72
 #: mygpo/web/templates/base.html:52 mygpo/web/templates/home.html:47
 #: mygpo/web/templates/home.html:103 mygpo/web/templates/login.html:48
-#: mygpo/web/templatetags/menu.py:24
+#: mygpo/web/templatetags/menu.py:25
 msgid "Register"
 msgstr "Registrer"
 
@@ -1691,35 +1713,35 @@ msgstr "Send aktiveringseposten på nytt"
 msgid "The activation email has been resent."
 msgstr "Send aktiveringseposten på nytt"
 
-#: mygpo/users/views/device.py:80 mygpo/users/views/device.py:170
+#: mygpo/users/views/device.py:82 mygpo/users/views/device.py:174
 msgid "Synchronize with the following devices"
 msgstr "Synkroniser med disse enhetene"
 
-#: mygpo/users/views/device.py:98
+#: mygpo/users/views/device.py:104
 msgid "Please fill out all fields."
 msgstr ""
 
-#: mygpo/users/views/device.py:110
+#: mygpo/users/views/device.py:116
 #, fuzzy
 msgid "Device saved"
 msgstr "Enheter"
 
-#: mygpo/users/views/device.py:117 mygpo/users/views/device.py:148
+#: mygpo/users/views/device.py:124 mygpo/users/views/device.py:155
 #, fuzzy
 msgid "You can't use the same Device ID for two devices."
 msgstr "Du kan ikke bruke den samme UID på to enheter."
 
-#: mygpo/users/views/device.py:141
+#: mygpo/users/views/device.py:147
 #, fuzzy
 msgid "Device updated"
 msgstr "Enhetsliste"
 
-#: mygpo/users/views/device.py:194
+#: mygpo/users/views/device.py:202
 #, python-brace-format
 msgid "Could not upload subscriptions: {err}"
 msgstr ""
 
-#: mygpo/users/views/device.py:292
+#: mygpo/users/views/device.py:302
 msgid "Your subscription will be updated in a moment."
 msgstr ""
 
@@ -1727,136 +1749,136 @@ msgstr ""
 msgid "Username or email address already in use"
 msgstr ""
 
-#: mygpo/users/views/registration.py:152
+#: mygpo/users/views/registration.py:153
 msgid "The activation link is either not valid or has already expired."
 msgstr ""
 
-#: mygpo/users/views/registration.py:157
+#: mygpo/users/views/registration.py:159
 #, fuzzy
 #| msgid "Your account already has been activated. Go ahead and log in."
 msgid "Your user has been activated. You can log in now."
 msgstr "Din konto er allerede aktivert. Det er bare å logge inn."
 
-#: mygpo/users/views/registration.py:174
+#: mygpo/users/views/registration.py:177
 msgid "Either username or email address are required."
 msgstr ""
 
-#: mygpo/users/views/registration.py:194 mygpo/users/views/user.py:129
+#: mygpo/users/views/registration.py:197 mygpo/users/views/user.py:131
 msgid "User does not exist."
 msgstr "Brukeren finnes ikke."
 
-#: mygpo/users/views/registration.py:198
+#: mygpo/users/views/registration.py:203
 msgid "Your account already has been activated. Go ahead and log in."
 msgstr "Din konto er allerede aktivert. Det er bare å logge inn."
 
-#: mygpo/users/views/settings.py:57 mygpo/users/views/settings.py:92
+#: mygpo/users/views/settings.py:67 mygpo/users/views/settings.py:104
 msgid "Oops! Something went wrong. Please double-check the data you entered."
 msgstr ""
 
-#: mygpo/users/views/settings.py:110
+#: mygpo/users/views/settings.py:124
 #, fuzzy
 msgid "Your account has been disconnected"
 msgstr "Din konto er slettet"
 
-#: mygpo/users/views/user.py:71
+#: mygpo/users/views/user.py:73
 #, fuzzy
 msgid "Username missing"
 msgstr "Velg et brukernavn"
 
-#: mygpo/users/views/user.py:76
+#: mygpo/users/views/user.py:78
 #, fuzzy
 msgid "Password missing"
 msgstr "Passord tilbakestilt"
 
-#: mygpo/users/views/user.py:83
+#: mygpo/users/views/user.py:85
 #, fuzzy
 msgid "Wrong username or password."
 msgstr "Ukjent bruker eller feil passord"
 
-#: mygpo/users/views/user.py:89 mygpo/users/views/user.py:134
+#: mygpo/users/views/user.py:93 mygpo/users/views/user.py:139
 #, fuzzy
 msgid ""
 "Please activate your account first. We have just re-sent your activation "
 "email"
 msgstr "Du må aktivere brukeren først."
 
-#: mygpo/users/views/user.py:167 mygpo/users/views/user.py:172
+#: mygpo/users/views/user.py:172 mygpo/users/views/user.py:177
 #, fuzzy
 msgid "Login failed."
 msgstr "Logg inn"
 
-#: mygpo/users/views/user.py:180
+#: mygpo/users/views/user.py:185
 msgid "Login with Google is currently not possible."
 msgstr ""
 
-#: mygpo/users/views/user.py:190
+#: mygpo/users/views/user.py:198
 #, python-brace-format
 msgid ""
 "Your account has been connected with {google}. Open Settings to change this."
 msgstr ""
 
-#: mygpo/users/views/user.py:202
+#: mygpo/users/views/user.py:214
 #, python-format
 msgid ""
 "No account connected with your Google account %s. Please log in to connect."
 msgstr ""
 
-#: mygpo/web/forms.py:20 mygpo/web/forms.py:184
+#: mygpo/web/forms.py:22 mygpo/web/forms.py:184
 #, fuzzy
 msgid "E-Mail address"
 msgstr "Din e-postadresse"
 
-#: mygpo/web/forms.py:27
+#: mygpo/web/forms.py:28
 #, fuzzy
 msgid "Current password"
 msgstr "Ditt nåværende passord"
 
-#: mygpo/web/forms.py:34
+#: mygpo/web/forms.py:36
 #, fuzzy
 msgid "New password"
 msgstr "Ditt nye passord"
 
-#: mygpo/web/forms.py:41
+#: mygpo/web/forms.py:44
 #, fuzzy
 msgid "Confirm password"
 msgstr "Ditt nye passord"
 
-#: mygpo/web/forms.py:78
+#: mygpo/web/forms.py:80
 msgid "A few words about you"
 msgstr ""
 
-#: mygpo/web/forms.py:91 mygpo/web/templates/devicelist.html:23
+#: mygpo/web/forms.py:94 mygpo/web/templates/devicelist.html:23
 msgid "Name"
 msgstr "Navn"
 
-#: mygpo/web/forms.py:96 mygpo/web/templates/devicelist.html:24
+#: mygpo/web/forms.py:101 mygpo/web/templates/devicelist.html:24
 msgid "Type"
 msgstr "Type"
 
-#: mygpo/web/forms.py:100 mygpo/web/templates/devicelist.html:25
+#: mygpo/web/forms.py:106 mygpo/web/templates/devicelist.html:25
 #, fuzzy
 msgid "Device ID"
 msgstr "Enhet"
 
-#: mygpo/web/forms.py:103
+#: mygpo/web/forms.py:110
 #, fuzzy
 #| msgid "Device"
 msgid "ID on device"
 msgstr "Enhet"
 
-#: mygpo/web/forms.py:115
+#: mygpo/web/forms.py:123
 msgid "Share this subscription with other users (public)"
 msgstr ""
 
-#: mygpo/web/forms.py:158
+#: mygpo/web/forms.py:163
 msgid "No device selected"
 msgstr "Ingen enhet valgt"
 
-#: mygpo/web/forms.py:167
+#: mygpo/web/forms.py:171
 msgid "Please enter your username"
 msgstr "Angi ditt brukernavn"
 
-#: mygpo/web/forms.py:172
+#: mygpo/web/forms.py:176
 msgid "or the email address used while registering"
 msgstr "eller e-postadressen du brukte ved registrering"
 
@@ -1904,7 +1926,7 @@ msgstr "Oppdag"
 msgid "Connect"
 msgstr ""
 
-#: mygpo/web/templates/base.html:40 mygpo/web/templatetags/menu.py:61
+#: mygpo/web/templates/base.html:40 mygpo/web/templatetags/menu.py:71
 #, fuzzy
 msgid "Account"
 msgstr "Slett konto"
@@ -1914,7 +1936,7 @@ msgstr "Slett konto"
 #: mygpo/web/templates/home.html:102 mygpo/web/templates/login.html:8
 #: mygpo/web/templates/login.html:11 mygpo/web/templates/login.html:46
 #: mygpo/web/templates/restore_password.html:8
-#: mygpo/web/templatetags/menu.py:23
+#: mygpo/web/templatetags/menu.py:24
 msgid "Login"
 msgstr "Logg inn"
 
@@ -1924,12 +1946,12 @@ msgid "Login with Google"
 msgstr ""
 
 #: mygpo/web/templates/base.html:133 mygpo/web/templates/home.html:153
-#: mygpo/web/templatetags/menu.py:31
+#: mygpo/web/templatetags/menu.py:34
 msgid "Discover"
 msgstr "Oppdag"
 
 #: mygpo/web/templates/base.html:134 mygpo/web/templates/home.html:154
-#: mygpo/web/templatetags/menu.py:32
+#: mygpo/web/templatetags/menu.py:36
 #, fuzzy
 msgid "Directory"
 msgstr "Historikk"
@@ -1939,7 +1961,7 @@ msgid "Support"
 msgstr ""
 
 #: mygpo/web/templates/base.html:143 mygpo/web/templates/home.html:163
-#: mygpo/web/templatetags/menu.py:25
+#: mygpo/web/templatetags/menu.py:26
 msgid "Docs"
 msgstr ""
 
@@ -1990,7 +2012,7 @@ msgid "Clients"
 msgstr ""
 
 #: mygpo/web/templates/base.html:177 mygpo/web/templates/home.html:197
-#: mygpo/web/templatetags/menu.py:64
+#: mygpo/web/templatetags/menu.py:73
 msgid "Publish"
 msgstr ""
 
@@ -2006,7 +2028,7 @@ msgstr ""
 msgid "hosting provided by prgmr.com"
 msgstr ""
 
-#: mygpo/web/templates/contribute.html:8 mygpo/web/templatetags/menu.py:26
+#: mygpo/web/templates/contribute.html:8 mygpo/web/templatetags/menu.py:27
 msgid "Contribute"
 msgstr ""
 
@@ -2070,7 +2092,7 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: mygpo/web/templates/dashboard.html:14 mygpo/web/templatetags/menu.py:54
+#: mygpo/web/templates/dashboard.html:14 mygpo/web/templatetags/menu.py:64
 msgid "Overview"
 msgstr ""
 
@@ -2196,7 +2218,7 @@ msgid "Thanks"
 msgstr "Takk"
 
 #: mygpo/web/templates/developer.html:8 mygpo/web/templates/developer.html:11
-#: mygpo/web/templatetags/menu.py:27
+#: mygpo/web/templatetags/menu.py:28
 msgid "Development"
 msgstr ""
 
@@ -2346,7 +2368,7 @@ msgid "Delete Permanently"
 msgstr "Slett konto"
 
 #: mygpo/web/templates/favorites.html:10 mygpo/web/templates/favorites.html:13
-#: mygpo/web/templatetags/menu.py:47 mygpo/web/templatetags/menu.py:55
+#: mygpo/web/templatetags/menu.py:54 mygpo/web/templatetags/menu.py:65
 #, fuzzy
 msgid "Favorite Episodes"
 msgstr "Siste episode"
@@ -2373,7 +2395,7 @@ msgid ""
 msgstr ""
 
 #: mygpo/web/templates/mytags.html:11 mygpo/web/templates/mytags.html:14
-#: mygpo/web/templatetags/menu.py:48
+#: mygpo/web/templatetags/menu.py:55
 msgid "My Tags"
 msgstr ""
 
@@ -2458,7 +2480,7 @@ msgstr "Abonnementer"
 msgid "Make Public"
 msgstr ""
 
-#: mygpo/web/templates/privacy_policy.html:8 mygpo/web/templatetags/menu.py:28
+#: mygpo/web/templates/privacy_policy.html:8 mygpo/web/templatetags/menu.py:29
 #, fuzzy
 msgid "Privacy Policy"
 msgstr "Personvern"
@@ -2580,175 +2602,175 @@ msgstr ""
 "Bare gå til dine <a href/\"/account/\">konto innstillinger</a> for å få "
 "lenken.</a>"
 
-#: mygpo/web/templatetags/devices.py:32
+#: mygpo/web/templatetags/devices.py:33
 msgid "Unknown"
 msgstr "Ukjent"
 
-#: mygpo/web/templatetags/episodes.py:20
+#: mygpo/web/templatetags/episodes.py:21
 #, fuzzy
 msgid "New episode"
 msgstr "Episode"
 
-#: mygpo/web/templatetags/episodes.py:23
+#: mygpo/web/templatetags/episodes.py:24
 #, fuzzy, python-format
 msgid "Downloaded to %s"
 msgstr "lastet ned"
 
-#: mygpo/web/templatetags/episodes.py:25
+#: mygpo/web/templatetags/episodes.py:26
 #, fuzzy
 msgid "Downloaded"
 msgstr "lastet ned"
 
-#: mygpo/web/templatetags/episodes.py:28
+#: mygpo/web/templatetags/episodes.py:29
 #, fuzzy, python-format
 msgid "Played on %s"
 msgstr "på %s"
 
-#: mygpo/web/templatetags/episodes.py:30
+#: mygpo/web/templatetags/episodes.py:31
 #, fuzzy
 msgid "Played"
 msgstr "avspilt"
 
-#: mygpo/web/templatetags/episodes.py:33
+#: mygpo/web/templatetags/episodes.py:34
 #, fuzzy, python-format
 msgid "Deleted on %s"
 msgstr "Slett konto"
 
-#: mygpo/web/templatetags/episodes.py:35
+#: mygpo/web/templatetags/episodes.py:36
 #, fuzzy
 msgid "Deleted"
 msgstr "Slett"
 
-#: mygpo/web/templatetags/episodes.py:37
+#: mygpo/web/templatetags/episodes.py:38
 #, fuzzy
 msgid "Unknown status"
 msgstr "Ukjent"
 
-#: mygpo/web/templatetags/episodes.py:43
+#: mygpo/web/templatetags/episodes.py:46
 #, fuzzy
 msgid "Unplayed episode"
 msgstr "Episoden uten navn"
 
-#: mygpo/web/templatetags/episodes.py:46 mygpo/web/templatetags/episodes.py:47
+#: mygpo/web/templatetags/episodes.py:50 mygpo/web/templatetags/episodes.py:51
 #, python-format
 msgid " on %s"
 msgstr "på %s"
 
-#: mygpo/web/templatetags/episodes.py:50
+#: mygpo/web/templatetags/episodes.py:56
 #, fuzzy
 msgid "The episode has been flattr'd"
 msgstr "Denne episoden er avspilt"
 
-#: mygpo/web/templatetags/episodes.py:53
+#: mygpo/web/templatetags/episodes.py:63
 msgid "This episode has been marked new"
 msgstr "Denne episoden er markert som ny"
 
-#: mygpo/web/templatetags/episodes.py:55
+#: mygpo/web/templatetags/episodes.py:69
 msgid "This episode has been downloaded"
 msgstr "Denne episoden er lastet ned"
 
-#: mygpo/web/templatetags/episodes.py:59
+#: mygpo/web/templatetags/episodes.py:74
 #, python-format
 msgid " from %(start)s to %(end)s"
 msgstr ""
 
-#: mygpo/web/templatetags/episodes.py:63
+#: mygpo/web/templatetags/episodes.py:79
 #, python-format
 msgid " to position %s"
 msgstr ""
 
-#: mygpo/web/templatetags/episodes.py:67
+#: mygpo/web/templatetags/episodes.py:88
 msgid "This episode has been played"
 msgstr "Denne episoden er avspilt"
 
-#: mygpo/web/templatetags/episodes.py:69
+#: mygpo/web/templatetags/episodes.py:98
 msgid "This episode has been deleted"
 msgstr "Denne episoden er slettet"
 
-#: mygpo/web/templatetags/episodes.py:126
+#: mygpo/web/templatetags/episodes.py:157
 #, fuzzy
 msgid "Unknown Episode"
 msgstr "Episoden uten navn"
 
-#: mygpo/web/templatetags/menu.py:22 mygpo/web/templatetags/menu.py:65
+#: mygpo/web/templatetags/menu.py:23 mygpo/web/templatetags/menu.py:75
 msgid "Home"
 msgstr "Hjem"
 
-#: mygpo/web/templatetags/menu.py:29
+#: mygpo/web/templatetags/menu.py:30
 msgid "Help"
-msgstr ""
-
-#: mygpo/web/templatetags/menu.py:37
-#, fuzzy
-msgid "User subscriptions"
-msgstr "Dine Abonnement"
-
-#: mygpo/web/templatetags/menu.py:38
-msgid "Suggestions"
-msgstr "Forslag"
-
-#: mygpo/web/templatetags/menu.py:39
-msgid "Features"
 msgstr ""
 
 #: mygpo/web/templatetags/menu.py:41
 #, fuzzy
+msgid "User subscriptions"
+msgstr "Dine Abonnement"
+
+#: mygpo/web/templatetags/menu.py:42
+msgid "Suggestions"
+msgstr "Forslag"
+
+#: mygpo/web/templatetags/menu.py:43
+msgid "Features"
+msgstr ""
+
+#: mygpo/web/templatetags/menu.py:45
+#, fuzzy
 msgid "Toplists"
 msgstr "Toppliste"
 
-#: mygpo/web/templatetags/menu.py:49
+#: mygpo/web/templatetags/menu.py:56
 msgid "Devices"
 msgstr "Enheter"
 
-#: mygpo/web/templatetags/menu.py:53
+#: mygpo/web/templatetags/menu.py:62
 msgid "Community"
 msgstr ""
 
-#: mygpo/web/templatetags/menu.py:56
+#: mygpo/web/templatetags/menu.py:66
 #, fuzzy
 msgid "My Userpage"
 msgstr "Velg et brukernavn"
 
-#: mygpo/web/templatetags/menu.py:62
+#: mygpo/web/templatetags/menu.py:71
 msgid "Privacy"
 msgstr "Personvern"
 
-#: mygpo/web/templatetags/menu.py:67
+#: mygpo/web/templatetags/menu.py:77
 msgid "Link to gpodder.net"
 msgstr ""
 
-#: mygpo/web/templatetags/time.py:42
+#: mygpo/web/templatetags/time.py:43
 #, python-brace-format
 msgid "{h}h {m}m {s}s"
 msgstr ""
 
-#: mygpo/web/templatetags/time.py:44
+#: mygpo/web/templatetags/time.py:45
 #, python-brace-format
 msgid "{m}m {s}s"
 msgstr ""
 
-#: mygpo/web/utils.py:281
+#: mygpo/web/utils.py:285
 #, python-format
 msgid "%(weeks)d week"
 msgid_plural "%(weeks)d weeks"
 msgstr[0] ""
 msgstr[1] ""
 
-#: mygpo/web/utils.py:285
+#: mygpo/web/utils.py:289
 #, python-format
 msgid "%(days)d day"
 msgid_plural "%(days)d days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: mygpo/web/utils.py:289
+#: mygpo/web/utils.py:293
 #, python-format
 msgid "%(hours)d hour"
 msgid_plural "%(hours)d hours"
 msgstr[0] ""
 msgstr[1] ""
 
-#: mygpo/web/views.py:145
+#: mygpo/web/views.py:146
 msgid "another site"
 msgstr ""
 

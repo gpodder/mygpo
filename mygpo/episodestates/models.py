@@ -8,15 +8,15 @@ from mygpo.history.models import EpisodeHistoryEntry
 class EpisodeState(models.Model):
     """ The latest status of an episode for a user """
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     episode = models.ForeignKey(Episode, on_delete=models.CASCADE)
 
     # the latest action
     action = models.CharField(
-        max_length=max(map(len, [action for action, name
-                                 in EpisodeHistoryEntry.EPISODE_ACTIONS])),
+        max_length=max(
+            map(len, [action for action, name in EpisodeHistoryEntry.EPISODE_ACTIONS])
+        ),
         choices=EpisodeHistoryEntry.EPISODE_ACTIONS,
     )
 
@@ -24,9 +24,7 @@ class EpisodeState(models.Model):
     timestamp = models.DateTimeField()
 
     class Meta:
-        unique_together = [
-            ('user', 'episode')
-        ]
+        unique_together = [('user', 'episode')]
 
     @classmethod
     def dict_for_user(cls, user, episodes=None):

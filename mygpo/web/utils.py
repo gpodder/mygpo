@@ -20,7 +20,7 @@ def get_accepted_lang(request):
     """ returns a list of language codes accepted by the HTTP request """
 
     lang_str = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
-    lang_str = ''.join([c for c in lang_str if c in string.ascii_letters+','])
+    lang_str = ''.join([c for c in lang_str if c in string.ascii_letters + ','])
     langs = lang_str.split(',')
     langs = [s[:2] for s in langs]
     langs = list(map(str.strip, langs))
@@ -94,7 +94,7 @@ def get_page_list(start, total, cur, show_max):
     total = math.ceil(total)
 
     if show_max >= (total - start):
-        return list(range(start, total+1))
+        return list(range(start, total + 1))
 
     ps = []
     if (cur - start) > show_max / 2:
@@ -132,8 +132,7 @@ def process_lang_params(request):
 
 
 def symbian_opml_changes(podcast):
-    podcast.description = podcast.display_title + '\n' + \
-                         (podcast.description or '')
+    podcast.description = podcast.display_title + '\n' + (podcast.description or '')
     return podcast
 
 
@@ -167,8 +166,7 @@ def get_podcast_group_link_target(group, view_name, add_args=[]):
     return reverse(view_name, args=args + add_args)
 
 
-def get_episode_link_target(episode, podcast, view_name='episode',
-                            add_args=[]):
+def get_episode_link_target(episode, podcast, view_name='episode', add_args=[]):
     """ Returns the link-target for an Episode, preferring slugs over Ids """
 
     # prefer slugs
@@ -194,9 +192,14 @@ def normalize_twitter(s):
     return "".join(i for i in s if i in TWITTER_CHARS)
 
 
-CCLICENSE = re.compile(r'http://(www\.)?creativecommons.org/licenses/([a-z-]+)/([0-9.]+)?/?')
-CCPUBLICDOMAIN = re.compile(r'http://(www\.)?creativecommons.org/licenses/publicdomain/?')
+CCLICENSE = re.compile(
+    r'http://(www\.)?creativecommons.org/licenses/([a-z-]+)/([0-9.]+)?/?'
+)
+CCPUBLICDOMAIN = re.compile(
+    r'http://(www\.)?creativecommons.org/licenses/publicdomain/?'
+)
 LicenseInfo = collections.namedtuple('LicenseInfo', 'name version url')
+
 
 def license_info(license_url):
     """ Extracts license information from the license URL
@@ -278,15 +281,16 @@ def hours_to_str(hours_total):
     strs = []
 
     if weeks:
-        strs.append(ungettext('%(weeks)d week', '%(weeks)d weeks', weeks) %
-            { 'weeks': weeks})
+        strs.append(
+            ungettext('%(weeks)d week', '%(weeks)d weeks', weeks) % {'weeks': weeks}
+        )
 
     if days:
-        strs.append(ungettext('%(days)d day', '%(days)d days', days) %
-            { 'days': days})
+        strs.append(ungettext('%(days)d day', '%(days)d days', days) % {'days': days})
 
     if hours:
-        strs.append(ungettext('%(hours)d hour', '%(hours)d hours', hours) %
-            { 'hours': hours})
+        strs.append(
+            ungettext('%(hours)d hour', '%(hours)d hours', hours) % {'hours': hours}
+        )
 
     return ', '.join(strs)

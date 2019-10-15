@@ -18,7 +18,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         if len(args) < 2:
-            print('Usage: ./manage.py make-publisher <username> <podcast-url-1> [<podcast-url-2> ...]', file=sys.stderr)
+            print(
+                'Usage: ./manage.py make-publisher <username> <podcast-url-1> [<podcast-url-2> ...]',
+                file=sys.stderr,
+            )
             return
 
         username = args[0]

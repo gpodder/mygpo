@@ -11,12 +11,21 @@ class UserProfileInline(admin.StackedInline):
     can_delete = False
     verbose_name_plural = 'profile'
 
+
 # Define a new User admin
 class UserAdmin(UserAdmin):
-    inlines = (UserProfileInline, )
+    inlines = (UserProfileInline,)
 
-    list_display = ('username', 'email', 'is_active', 'is_staff',
-                    'is_superuser', 'date_joined', 'last_login')
+    list_display = (
+        'username',
+        'email',
+        'is_active',
+        'is_staff',
+        'is_superuser',
+        'date_joined',
+        'last_login',
+    )
+
 
 # Re-register UserAdmin
 admin.site.unregister(User)
@@ -28,15 +37,15 @@ class ClientAdmin(admin.ModelAdmin):
     """ Admin page for clients """
 
     # configuration for the list view
-    list_display = ('name', 'user', 'uid', 'type', )
+    list_display = ('name', 'user', 'uid', 'type')
 
     # fetch the client's user for the fields in list_display
-    list_select_related = ('user', )
+    list_select_related = ('user',)
 
-    list_filter = ('type', )
-    search_fields = ('name', 'uid', 'user__username', )
+    list_filter = ('type',)
+    search_fields = ('name', 'uid', 'user__username')
 
-    raw_id_fields = ('user', )
+    raw_id_fields = ('user',)
 
     show_full_result_count = False
 

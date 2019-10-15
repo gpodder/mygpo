@@ -6,6 +6,7 @@ import dj_database_url
 
 try:
     from psycopg2cffi import compat
+
     compat.register()
 except ImportError:
     pass
@@ -41,8 +42,7 @@ ADMINS = re.findall(r'\s*([^<]+) <([^>]+)>\s*', os.getenv('ADMINS', ''))
 MANAGERS = ADMINS
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default='postgres://mygpo:mygpo@localhost/mygpo'),
+    'default': dj_database_url.config(default='postgres://mygpo:mygpo@localhost/mygpo')
 }
 
 
@@ -52,8 +52,8 @@ if _cache_used:
     CACHES = {}
     CACHES['default'] = {
         'BACKEND': os.getenv(
-            'CACHE_BACKEND',
-            'django.core.cache.backends.memcached.MemcachedCache'),
+            'CACHE_BACKEND', 'django.core.cache.backends.memcached.MemcachedCache'
+        ),
         'LOCATION': os.getenv('CACHE_LOCATION'),
     }
 
@@ -81,25 +81,25 @@ USE_I18N = True
 STATIC_ROOT = 'staticfiles'
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = (
-    os.path.abspath(os.path.join(BASE_DIR, '..', 'static')),
-)
+STATICFILES_DIRS = (os.path.abspath(os.path.join(BASE_DIR, '..', 'static')),)
 
 
 # Media Files
 
-MEDIA_ROOT = os.getenv('MEDIA_ROOT',
-                       os.path.abspath(os.path.join(BASE_DIR, '..', 'media')))
+MEDIA_ROOT = os.getenv(
+    'MEDIA_ROOT', os.path.abspath(os.path.join(BASE_DIR, '..', 'media'))
+)
 
 MEDIA_URL = '/media/'
 
 
-TEMPLATES = [{
-    'BACKEND': 'django.template.backends.django.DjangoTemplates',
-    'DIRS': [],
-    'OPTIONS': {
-        'debug': DEBUG,
-        'context_processors': [
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'OPTIONS': {
+            'debug': DEBUG,
+            'context_processors': [
                 'django.contrib.auth.context_processors.auth',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.i18n',
@@ -112,22 +112,21 @@ TEMPLATES = [{
                 # make the debug variable available in templates
                 # https://docs.djangoproject.com/en/dev/ref/templates/api/#django-core-context-processors-debug
                 'django.template.context_processors.debug',
-
                 # required so that the request obj can be accessed from
                 # templates. this is used to direct users to previous
                 # page after login
                 'django.template.context_processors.request',
-        ],
-        'libraries': {
-            'staticfiles' : 'django.templatetags.static',
+            ],
+            'libraries': {'staticfiles': 'django.templatetags.static'},
+            'loaders': [
+                (
+                    'django.template.loaders.cached.Loader',
+                    ['django.template.loaders.app_directories.Loader'],
+                )
+            ],
         },
-        'loaders': [
-            ('django.template.loaders.cached.Loader', [
-                'django.template.loaders.app_directories.Loader',
-            ]),
-        ],
-    },
-}]
+    }
+]
 
 
 MIDDLEWARE = [
@@ -184,6 +183,7 @@ INSTALLED_APPS = [
 try:
     if DEBUG:
         import debug_toolbar
+
         INSTALLED_APPS += ['debug_toolbar']
         MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
 
@@ -194,6 +194,7 @@ except ImportError:
 try:
     if DEBUG:
         import django_extensions
+
         INSTALLED_APPS += ['django_extensions']
 
 except ImportError:
@@ -254,15 +255,9 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
-        'verbose': {
-            'format': '%(asctime)s %(name)s %(levelname)s %(message)s',
-        },
+        'verbose': {'format': '%(asctime)s %(name)s %(levelname)s %(message)s'}
     },
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse'
-        },
-    },
+    'filters': {'require_debug_false': {'()': 'django.utils.log.RequireDebugFalse'}},
     'handlers': {
         'console': {
             'level': os.getenv('LOGGING_CONSOLE_LEVEL', 'DEBUG'),
@@ -277,8 +272,7 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': os.getenv('LOGGING_DJANGO_HANDLERS',
-                                  'console').split(),
+            'handlers': os.getenv('LOGGING_DJANGO_HANDLERS', 'console').split(),
             'propagate': True,
             'level': os.getenv('LOGGING_DJANGO_LEVEL', 'WARN'),
         },
@@ -287,8 +281,7 @@ LOGGING = {
             'level': os.getenv('LOGGING_MYGPO_LEVEL', 'INFO'),
         },
         'celery': {
-            'handlers': os.getenv('LOGGING_CELERY_HANDLERS',
-                                  'console').split(),
+            'handlers': os.getenv('LOGGING_CELERY_HANDLERS', 'console').split(),
             'level': os.getenv('LOGGING_CELERY_LEVEL', 'DEBUG'),
         },
     },
@@ -301,15 +294,14 @@ if _use_log_file:
         'level': 'INFO',
         'class': 'logging.handlers.RotatingFileHandler',
         'filename': os.getenv('LOGGING_FILENAME'),
-        'maxBytes': 10000000,
+        'maxBytes': 10_000_000,
         'backupCount': 10,
         'formatter': 'verbose',
     }
 
 
 # minimum number of subscribers a podcast must have to be assigned a slug
-PODCAST_SLUG_SUBSCRIBER_LIMIT = int(os.getenv(
-                                    'PODCAST_SLUG_SUBSCRIBER_LIMIT', 10))
+PODCAST_SLUG_SUBSCRIBER_LIMIT = int(os.getenv('PODCAST_SLUG_SUBSCRIBER_LIMIT', 10))
 
 # minimum number of subscribers that a podcast needs to "push" one of its
 # categories to the top
@@ -377,14 +369,13 @@ OPBEAT = {
     "SECRET_TOKEN": os.getenv('OPBEAT_SECRET_TOKEN', ''),
 }
 
-LOCALE_PATHS = [
-    os.path.abspath(os.path.join(BASE_DIR, 'locale')),
-]
+LOCALE_PATHS = [os.path.abspath(os.path.join(BASE_DIR, 'locale'))]
 
 INTERNAL_IPS = os.getenv('INTERNAL_IPS', '').split()
 
-EMAIL_BACKEND = os.getenv('EMAIL_BACKEND',
-                          'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_BACKEND = os.getenv(
+    'EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend'
+)
 
 PODCAST_AD_ID = os.getenv('PODCAST_AD_ID')
 
@@ -392,3 +383,20 @@ PODCAST_AD_ID = os.getenv('PODCAST_AD_ID')
 MAX_EPISODE_ACTIONS = int(os.getenv('MAX_EPISODE_ACTIONS', 1000))
 
 SEARCH_CUTOFF = float(os.getenv('SEARCH_CUTOFF', 0.3))
+
+
+### Sentry
+
+try:
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+
+    # Sentry Data Source Name (DSN)
+    sentry_dsn = os.getenv('SENTRY_DSN', '')
+    if not sentry_dsn:
+        raise ValueError('Could not set up sentry because ' 'SENTRY_DSN is not set')
+
+    sentry_sdk.init(dsn=sentry_dsn, integrations=[DjangoIntegration()])
+
+except (ImportError, ValueError):
+    pass

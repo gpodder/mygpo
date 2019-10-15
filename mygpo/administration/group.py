@@ -5,6 +5,7 @@ from collections import defaultdict
 DEFAULT_RELEASE = datetime(1970, 1, 1)
 _SORT_KEY = lambda eps: eps[0].released or DEFAULT_RELEASE
 
+
 class PodcastGrouper(object):
     """ Groups episodes of two podcasts based on certain features
 
@@ -19,14 +20,12 @@ class PodcastGrouper(object):
 
         self.podcasts = podcasts
 
-
     def __get_episodes(self):
         episodes = {}
         for podcast in self.podcasts:
             episodes.update(dict((e.id, e) for e in podcast.episode_set.all()))
 
         return episodes
-
 
     def group(self, get_features):
 

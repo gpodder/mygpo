@@ -17,28 +17,36 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Vote',
             fields=[
-                ('id', models.AutoField(
-                    verbose_name='ID',
-                    serialize=False,
-                    auto_created=True,
-                    primary_key=True)),
+                (
+                    'id',
+                    models.AutoField(
+                        verbose_name='ID',
+                        serialize=False,
+                        auto_created=True,
+                        primary_key=True,
+                    ),
+                ),
                 ('object_id', models.UUIDField(max_length=32)),
                 ('created', models.DateTimeField()),
                 ('modified', models.DateTimeField()),
-                ('content_type', models.ForeignKey(
-                    to='contenttypes.ContentType',
-                    on_delete=django.db.models.deletion.PROTECT)),
-                ('user', models.ForeignKey(
-                    to=settings.AUTH_USER_MODEL,
-                    on_delete=models.CASCADE,
-                )),
+                (
+                    'content_type',
+                    models.ForeignKey(
+                        to='contenttypes.ContentType',
+                        on_delete=django.db.models.deletion.PROTECT,
+                    ),
+                ),
+                (
+                    'user',
+                    models.ForeignKey(
+                        to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+                    ),
+                ),
             ],
-            options={
-            },
+            options={},
             bases=(models.Model,),
         ),
         migrations.AlterUniqueTogether(
-            name='vote',
-            unique_together=set([('user', 'content_type', 'object_id')]),
+            name='vote', unique_together=set([('user', 'content_type', 'object_id')])
         ),
     ]

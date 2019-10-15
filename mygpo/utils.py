@@ -24,6 +24,7 @@ from django.conf import settings
 from django.urls import reverse
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -45,6 +46,7 @@ def daterange(from_date, to_date=None, leap=timedelta(days=1)):
         yield from_date
         from_date = from_date + leap
     return
+
 
 def format_time(value):
     """Format an offset (in seconds) to a string
@@ -70,6 +72,7 @@ def format_time(value):
     else:
         return dt.strftime('%H:%M:%S')
 
+
 def parse_time(value):
     """
     >>> parse_time(10)
@@ -94,7 +97,7 @@ def parse_time(value):
     for format in ('%H:%M:%S', '%M:%S'):
         try:
             t = time.strptime(value, format)
-            return t.tm_hour * 60*60 + t.tm_min * 60 + t.tm_sec
+            return t.tm_hour * 60 * 60 + t.tm_min * 60 + t.tm_sec
         except ValueError as e:
             continue
 
@@ -121,27 +124,29 @@ def parse_bool(val):
 
 def progress(val, max_val, status_str='', max_width=50, stream=sys.stdout):
 
-    factor = float(val)/max_val if max_val > 0 else 0
+    factor = float(val) / max_val if max_val > 0 else 0
 
     # progress as percentage
     percentage_str = '{val:.2%}'.format(val=factor)
 
     # progress bar filled with #s
-    factor = min(int(factor*max_width), max_width)
-    progress_str = '#' * factor + ' ' * (max_width-factor)
+    factor = min(int(factor * max_width), max_width)
+    progress_str = '#' * factor + ' ' * (max_width - factor)
 
-    #insert percentage into bar
-    percentage_start = int((max_width-len(percentage_str))/2)
-    progress_str = progress_str[:percentage_start] + \
-                   percentage_str + \
-                   progress_str[percentage_start+len(percentage_str):]
+    # insert percentage into bar
+    percentage_start = int((max_width - len(percentage_str)) / 2)
+    progress_str = (
+        progress_str[:percentage_start]
+        + percentage_str
+        + progress_str[percentage_start + len(percentage_str) :]
+    )
 
     print('\r', end=' ', file=stream)
-    print('[ %s ] %s / %s | %s' % (
-        progress_str,
-        val,
-        max_val,
-        status_str), end=' ', file=stream)
+    print(
+        '[ %s ] %s / %s | %s' % (progress_str, val, max_val, status_str),
+        end=' ',
+        file=stream,
+    )
     stream.flush()
 
 
@@ -180,7 +185,7 @@ def parse_range(s, min, max, default=None):
         return val
 
     except (ValueError, TypeError):
-        return default if default is not None else out_type((max-min)/2)
+        return default if default is not None else out_type((max - min) / 2)
 
 
 def get_timestamp(datetime_obj):
@@ -195,8 +200,8 @@ def get_timestamp(datetime_obj):
     return int(time.mktime(datetime_obj.timetuple()))
 
 
-
 re_url = re.compile('^https?://')
+
 
 def is_url(string):
     """ Returns true if a string looks like an URL
@@ -211,12 +216,12 @@ def is_url(string):
     return bool(re_url.match(string))
 
 
-
 # from http://stackoverflow.com/questions/2892931/longest-common-substring-from-more-than-two-strings-python
 # this does not increase asymptotical complexity
 # but can still waste more time than it saves.
 def shortest_of(strings):
     return min(strings, key=len)
+
 
 def longest_substr(strings):
     """
@@ -228,9 +233,9 @@ def longest_substr(strings):
         return substr
     reference = shortest_of(strings)
     length = len(reference)
-    #find a suitable slice i:j
+    # find a suitable slice i:j
     for i in range(length):
-        #only consider strings long at least len(substr) + 1
+        # only consider strings long at least len(substr) + 1
         for j in range(i + len(substr) + 1, length):
             candidate = reference[i:j]
             if all(candidate in text for text in strings):
@@ -238,14 +243,14 @@ def longest_substr(strings):
     return substr
 
 
-def file_hash(f, h=hashlib.md5, block_size=2**20):
+def file_hash(f, h=hashlib.md5, block_size=2 ** 20):
     """ returns the hash of the contents of a file """
     f_hash = h()
     while True:
         buf = f.read(block_size)
         if not buf:
             break
-        f_hash.update( buf )
+        f_hash.update(buf)
 
     return f_hash
 
@@ -321,7 +326,6 @@ def urlopen(url, headers=None, data=None):
     headers.update({'User-agent': settings.USER_AGENT})
     request = urllib.request.Request(url, data=data, headers=headers)
     return opener.open(request)
-
 
 
 def username_password_from_url(url):
@@ -436,10 +440,11 @@ def get_git_head():
     """ returns the commit and message of the current git HEAD """
 
     try:
-        pr = subprocess.Popen('/usr/bin/git log -n 1 --oneline'.split(),
-            cwd = settings.BASE_DIR,
-            stdout = subprocess.PIPE,
-            stderr = subprocess.PIPE,
+        pr = subprocess.Popen(
+            '/usr/bin/git log -n 1 --oneline'.split(),
+            cwd=settings.BASE_DIR,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
         )
 
     except OSError:
@@ -451,7 +456,7 @@ def get_git_head():
 
     outs = [o.decode('utf-8') for o in out.split()]
     commit = outs[0]
-    msg = ' ' .join(outs[1:])
+    msg = ' '.join(outs[1:])
     return commit, msg
 
 
@@ -534,18 +539,18 @@ def normalize_feed_url(url):
     # keystrokes that you have to use.
     # Feel free to suggest other useful prefixes, and I'll add them here.
     PREFIXES = {
-            'fb:': 'http://feeds.feedburner.com/%s',
-            'yt:': 'http://www.youtube.com/rss/user/%s/videos.rss',
-            'sc:': 'http://soundcloud.com/%s',
-            'fm4od:': 'http://onapp1.orf.at/webcam/fm4/fod/%s.xspf',
-            # YouTube playlists. To get a list of playlists per-user, use:
-            # https://gdata.youtube.com/feeds/api/users/<username>/playlists
-            'ytpl:': 'http://gdata.youtube.com/feeds/api/playlists/%s',
+        'fb:': 'http://feeds.feedburner.com/%s',
+        'yt:': 'http://www.youtube.com/rss/user/%s/videos.rss',
+        'sc:': 'http://soundcloud.com/%s',
+        'fm4od:': 'http://onapp1.orf.at/webcam/fm4/fod/%s.xspf',
+        # YouTube playlists. To get a list of playlists per-user, use:
+        # https://gdata.youtube.com/feeds/api/users/<username>/playlists
+        'ytpl:': 'http://gdata.youtube.com/feeds/api/playlists/%s',
     }
 
     for prefix, expansion in PREFIXES.items():
         if url.startswith(prefix):
-            url = expansion % (url[len(prefix):],)
+            url = expansion % (url[len(prefix) :],)
             break
 
     # Assume HTTP for URLs without scheme
@@ -581,15 +586,17 @@ def normalize_feed_url(url):
 
 def edit_link(obj):
     """ Return the link to the Django Admin Edit page """
-    return reverse('admin:%s_%s_change' % (obj._meta.app_label,
-                                           obj._meta.model_name),
-                   args=(obj.pk,))
+    return reverse(
+        'admin:%s_%s_change' % (obj._meta.app_label, obj._meta.model_name),
+        args=(obj.pk,),
+    )
 
 
 def random_token(length=32):
     import random
     import string
-    return "".join(random.sample(string.ascii_letters+string.digits, length))
+
+    return "".join(random.sample(string.ascii_letters + string.digits, length))
 
 
 def to_maxlength(cls, field, val):
@@ -601,8 +608,13 @@ def to_maxlength(cls, field, val):
     orig_length = len(val)
     if orig_length > max_length:
         val = val[:max_length]
-        logger.warn('%s.%s length reduced from %d to %d',
-                    cls.__name__, field, orig_length, max_length)
+        logger.warn(
+            '%s.%s length reduced from %d to %d',
+            cls.__name__,
+            field,
+            orig_length,
+            max_length,
+        )
 
     return val
 
@@ -625,8 +637,9 @@ def get_domain(url):
         return netloc
 
 
-def set_ordered_entries(obj, new_entries, existing, EntryClass,
-                        value_name, parent_name):
+def set_ordered_entries(
+    obj, new_entries, existing, EntryClass, value_name, parent_name
+):
     """ Update the object's entries to the given list
 
     'new_entries' should be a list of objects that are later wrapped in
@@ -641,10 +654,9 @@ def set_ordered_entries(obj, new_entries, existing, EntryClass,
     logger.info('%d new entries', len(new_entries))
 
     with transaction.atomic():
-        max_order = max([s.order for s in existing.values()] +
-                        [len(new_entries)])
-        logger.info('Renumbering entries starting from %d', max_order+1)
-        for n, entry in enumerate(existing.values(), max_order+1):
+        max_order = max([s.order for s in existing.values()] + [len(new_entries)])
+        logger.info('Renumbering entries starting from %d', max_order + 1)
+        for n, entry in enumerate(existing.values(), max_order + 1):
             entry.order = n
             entry.save()
 
@@ -659,11 +671,9 @@ def set_ordered_entries(obj, new_entries, existing, EntryClass,
         except KeyError:
             logger.info('Creating new entry %d: %s', n, entry)
             try:
-                links = {
-                    value_name: entry,
-                    parent_name: obj,
-                }
+                links = {value_name: entry, parent_name: obj}
                 from mygpo.podcasts.models import ScopedModel
+
                 if issubclass(EntryClass, ScopedModel):
                     links['scope'] = obj.scope
 

@@ -1,4 +1,3 @@
-import os.path
 import base64
 
 from django.urls import resolve
