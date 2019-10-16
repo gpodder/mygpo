@@ -369,6 +369,7 @@ MAX_EPISODE_ACTIONS = int(os.getenv('MAX_EPISODE_ACTIONS', 1000))
 
 SEARCH_CUTOFF = float(os.getenv('SEARCH_CUTOFF', 0.3))
 
+QUERY_LENGTH_CUTOFF = int(os.getenv('QUERY_LENGTH_CUTOFF', 3))
 
 ### Sentry
 
