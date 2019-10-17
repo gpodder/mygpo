@@ -64,6 +64,3 @@ class SearchTests(unittest.TestCase):
 
         results = search_podcasts('sasa')
         self.assertEqual(len(results), 0)
-
-
-        
