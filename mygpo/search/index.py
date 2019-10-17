@@ -27,8 +27,7 @@ def search_podcasts(query):
     """ Search for podcasts according to 'query' """
     if is_query_too_short(query):
         logger.debug('Found no podcasts for "{query}". Query is too short', query=query)
-        results = ()
-        return results
+        return Podcast.objects.none()
 
     logger.debug('Searching for "{query}" podcasts"', query=query)
 

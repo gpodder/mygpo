@@ -35,32 +35,22 @@ class SearchTests(unittest.TestCase):
         """
          Search for a podcast with query length smaller than 3
          With QUERY_LENGTH_CUTOFF = 3 
-         Server would normally time out
+         Server would normally time out, however Podcasts exist for the given 
+         search term.
         """
-        results = search_podcasts('s')
+        # create a podcast
+        podcast = Podcast(
+            id=uuid.uuid1(),
+            title='The Tricky Podcast',
+            description='The only podcast containing tricky messages.',
+        )
+        podcast.save()
+
+        # explicitly trigger a search index update
+        update_search_index()
+
+        results = search_podcasts('The')
         self.assertEqual(len(results), 0)
 
-        results = search_podcasts('sa')
-        self.assertEqual(len(results), 0)
-
-        results = search_podcasts('sas')
-        self.assertEqual(len(results), 0)
-
-    @override_settings(QUERY_LENGTH_CUTOFF=4)
-    def test_short_search_podcast(self):
-        """
-        Search for a podcast with query length smaller than 4
-        With QUERY_LENGTH_CUTOFF = 4
-        Server would normally not time out anymore
-        """
-        results = search_podcasts('s')
-        self.assertEqual(len(results), 0)
-
-        results = search_podcasts('sa')
-        self.assertEqual(len(results), 0)
-
-        results = search_podcasts('sas')
-        self.assertEqual(len(results), 0)
-
-        results = search_podcasts('sasa')
-        self.assertEqual(len(results), 0)
+        results = search_podcasts('The Tricky')
+        self.assertEqual(results[0].id, podcast.id)
