@@ -26,9 +26,7 @@ QUERY_LENGTH_CUTOFF = settings.QUERY_LENGTH_CUTOFF
 def search_podcasts(query):
     """ Search for podcasts according to 'query' """
     if is_query_too_short(query):
-        logger.debug(
-            'Found no podcasts for "{query}". Query is too short', query=query
-        )
+        logger.debug('Found no podcasts for "{query}". Query is too short', query=query)
         results = ()
         return results
 
@@ -53,5 +51,6 @@ def search_podcasts(query):
 
     return results
 
+
 def is_query_too_short(query):
-    return len(query.replace(" ","")) <= QUERY_LENGTH_CUTOFF
+    return len(query.replace(" ", "")) <= QUERY_LENGTH_CUTOFF
