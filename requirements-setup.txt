@@ -1,2 +1,2 @@
 envdir
-sentry-sdk==0.12.3
+sentry-sdk==0.13.0
