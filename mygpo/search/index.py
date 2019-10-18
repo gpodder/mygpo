@@ -20,8 +20,6 @@ logger = logging.getLogger(__name__)
 
 SEARCH_CUTOFF = settings.SEARCH_CUTOFF
 
-QUERY_LENGTH_CUTOFF = settings.QUERY_LENGTH_CUTOFF
-
 
 def search_podcasts(query):
     """ Search for podcasts according to 'query' """
@@ -52,4 +50,4 @@ def search_podcasts(query):
 
 
 def is_query_too_short(query):
-    return len(query.replace(" ", "")) <= QUERY_LENGTH_CUTOFF
+    return len(query.replace(" ", "")) <= settings.QUERY_LENGTH_CUTOFF
