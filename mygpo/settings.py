@@ -235,8 +235,7 @@ if 'pytest' in sys.argv[0]:
 GOOGLE_ANALYTICS_PROPERTY_ID = os.getenv('GOOGLE_ANALYTICS_PROPERTY_ID', '')
 
 
-DIRECTORY_EXCLUDED_TAGS = parse_strlist(os.getenv('DIRECTORY_EXCLUDED_TAGS',
-                                                  ''))
+DIRECTORY_EXCLUDED_TAGS = parse_strlist(os.getenv('DIRECTORY_EXCLUDED_TAGS', ''))
 
 
 FLICKR_API_KEY = os.getenv('FLICKR_API_KEY', '')
@@ -245,7 +244,6 @@ SOUNDCLOUD_CONSUMER_KEY = os.getenv('SOUNDCLOUD_CONSUMER_KEY', '')
 
 
 MAINTENANCE = get_bool('MAINTENANCE', False)
-
 
 
 ALLOWED_HOSTS = ['*']
