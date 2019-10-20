@@ -14,7 +14,7 @@ class PodcastUpdateResult(UUIDModel):
     Once an instance is stored, the update is assumed to be finished. """
 
     # URL of the podcast to be updated
-    podcast_url = models.TextField(default='unknown')
+    podcast_url = models.URLField(max_length=2048)
 
     # The podcast that was updated
     podcast = models.ForeignKey(Podcast, on_delete=models.CASCADE, null=True)
