@@ -65,6 +65,10 @@ def update_podcasts(queue):
         except NoPodcastCreated as npc:
             logger.info('No podcast created: %s', npc)
 
+        except NoEpisodesException as nee:
+            logger.info(f'No episodes found when parsing {podcast_url}')
+            continue
+
         except GeneratorExit:
             pass
 
