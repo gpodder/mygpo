@@ -44,7 +44,7 @@ if _USE_GEVENT:
     default = DATABASES['default']
     default['ENGINE'] = ('django_db_geventpool.backends.postgresql_psycopg2',)
     default['CONN_MAX_AGE'] = 0
-    options = default.get('OPTIONS', [])
+    options = default.get('OPTIONS', {})
     options['MAX_CONNS'] = 20
 
 
