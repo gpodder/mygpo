@@ -5,16 +5,16 @@ help:
 	@echo 'make clean           clean up files'
 
 dev-config:
-	mkdir -p envs/local
-	echo django.core.mail.backends.console.EmailBackend > envs/local/EMAIL_BACKEND
-	echo secret > envs/local/SECRET_KEY
-	echo postgres://mygpo:mygpo@localhost/mygpo > envs/local/DATABASE_URL
-	echo True > envs/local/DEBUG
+	mkdir -p envs/dev
+	echo django.core.mail.backends.console.EmailBackend > envs/dev/EMAIL_BACKEND
+	echo secret > envs/dev/SECRET_KEY
+	echo postgres://mygpo:mygpo@localhost/mygpo > envs/dev/DATABASE_URL
+	echo True > envs/dev/DEBUG
 
-test: envs/test/MEDIA_ROOT
+test: envs/dev/MEDIA_ROOT
 	# assume defined media root directory, empty before running tests
-	rm -rf $(shell cat envs/test/MEDIA_ROOT)
-	mkdir -p $(shell cat envs/test/MEDIA_ROOT)
+	rm -rf $(shell cat envs/dev/MEDIA_ROOT)
+	mkdir -p $(shell cat envs/dev/MEDIA_ROOT)
 	envdir envs/dev/ python -Wd -m pytest --cov=mygpo/ --cov-branch
 	coverage report --show-missing
 

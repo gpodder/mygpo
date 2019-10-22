@@ -1,6 +1,5 @@
 import json
 import string
-from itertools import islice
 from functools import wraps
 
 from django.shortcuts import render
@@ -35,7 +34,7 @@ ALLOWED_FORMATS = ('txt', 'opml', 'json', 'jsonp', 'xml')
 def check_format(fn):
     @wraps(fn)
     def tmp(request, format, *args, **kwargs):
-        if not format in ALLOWED_FORMATS:
+        if format not in ALLOWED_FORMATS:
             return HttpResponseBadRequest('Invalid format')
 
         return fn(request, *args, format=format, **kwargs)
@@ -251,9 +250,6 @@ def toplist(request, count, format):
     if scale not in range(1, 257):
         return HttpResponseBadRequest('scale_logo has to be a number from 1 to 256')
 
-    def get_podcast(t):
-        return t
-
     def json_map(t):
         podcast = t
         p = podcast_data(podcast, domain, scale)
@@ -264,7 +260,7 @@ def toplist(request, count, format):
         entries,
         format,
         title,
-        get_podcast=get_podcast,
+        get_podcast=lambda t: t,
         json_map=json_map,
         jsonp_padding=request.GET.get('jsonp', ''),
         xml_template='podcasts.xml',

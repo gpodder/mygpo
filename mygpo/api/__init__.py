@@ -49,7 +49,7 @@ class APIView(View):
             # TODO: implementation of parse_request_body can be moved here
             # after all views using it have been refactored
             return parse_request_body(request)
-        except (UnicodeDecodeError, ValueError) as e:
+        except (UnicodeDecodeError, ValueError):
             msg = 'Could not decode request body for user {}: {}'.format(
                 request.user.username, request.body.decode('ascii', errors='replace')
             )

@@ -1,5 +1,4 @@
 import re
-import uuid
 import collections
 import dateutil.parser
 
@@ -22,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 RE_DEVICE_UID = re.compile(r'^[\w.-]+$')
+
 
 # TODO: derive from ValidationException?
 class InvalidEpisodeActionAttributes(ValueError):
@@ -103,7 +103,7 @@ class UserProxy(DjangoUser):
         for client in clients:
             # check if we have just found a new group
             if last_group != client.sync_group:
-                if group != None:
+                if group is not None:
                     yield group
 
                 group = GroupedDevices(client.sync_group is not None, [])
@@ -112,7 +112,7 @@ class UserProxy(DjangoUser):
             group.devices.append(client)
 
         # yield remaining group
-        if group != None:
+        if group is not None:
             yield group
 
 
@@ -308,8 +308,6 @@ class Client(UUIDModel, DeleteableModel):
         """ Returns the devices and groups with which the device can be synced
 
         Groups are represented as lists of devices """
-
-        sg = self.sync_group
 
         user = UserProxy.objects.from_user(self.user)
         for group in user.get_grouped_devices():

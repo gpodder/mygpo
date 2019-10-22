@@ -65,6 +65,10 @@ def update_podcasts(queue):
         except NoPodcastCreated as npc:
             logger.info('No podcast created: %s', npc)
 
+        except NoEpisodesException as nee:
+            logger.info(f'No episodes found when parsing {podcast_url}')
+            continue
+
         except GeneratorExit:
             pass
 
@@ -123,7 +127,7 @@ class PodcastUpdater(object):
             self._validate_parsed(parsed)
 
         except (requests.exceptions.RequestException, NoEpisodesException) as ex:
-            logging.exception('Error while fetching/parsing feed')
+            logger.warn('Error while fetching/parsing feed', exc_info=True)
 
             # if we fail to parse the URL, we don't even create the
             # podcast object
