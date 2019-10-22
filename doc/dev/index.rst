@@ -31,3 +31,4 @@ Contents
     libraries
     configuration
     jupyter-notebook
+    translate

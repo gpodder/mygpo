@@ -368,3 +368,31 @@ PODCAST_AD_ID = os.getenv('PODCAST_AD_ID')
 MAX_EPISODE_ACTIONS = int(os.getenv('MAX_EPISODE_ACTIONS', 1000))
 
 SEARCH_CUTOFF = float(os.getenv('SEARCH_CUTOFF', 0.3))
+
+# Maximum non-whitespace length of search query
+# If length of query is shorter than QUERY_LENGTH_CUTOFF, no results
+# will be returned to avoid a server timeout due to too many possible
+# responses
+QUERY_LENGTH_CUTOFF = int(os.getenv('QUERY_LENGTH_CUTOFF', 3))
+
+### Sentry
+
+try:
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+    from sentry_sdk.integrations.celery import CeleryIntegration
+    from sentry_sdk.integrations.redis import RedisIntegration
+
+    # Sentry Data Source Name (DSN)
+    sentry_dsn = os.getenv('SENTRY_DSN', '')
+    if not sentry_dsn:
+        raise ValueError('Could not set up sentry because ' 'SENTRY_DSN is not set')
+
+    sentry_sdk.init(
+        dsn=sentry_dsn,
+        integrations=[DjangoIntegration(), CeleryIntegration(), RedisIntegration()],
+        send_default_pii=True,
+    )
+
+except (ImportError, ValueError):
+    pass

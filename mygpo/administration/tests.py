@@ -6,8 +6,6 @@ Replace this with more appropriate tests for your application.
 """
 
 import uuid
-import time
-from datetime import datetime
 from collections import Counter
 
 from django.test import TestCase

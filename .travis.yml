@@ -5,15 +5,14 @@ dist: xenial
 python:
  - "3.6"
  - "3.7"
- - "3.6-dev"
  - "3.7-dev"
  - "3.8-dev"
  - "nightly"
- - "pypy3.5"
+ - "pypy3"
 
 matrix:
   allow_failures:
-  - python: 'pypy3.5'
+  - python: 'pypy3'
   - python: '3.8-dev'
   - python: 'nightly'
 
