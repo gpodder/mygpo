@@ -8,7 +8,6 @@ from mygpo.categories.models import Category, CategoryEntry
 
 
 class Topics(object):
-
     def __init__(self, total=100, num_cat=10, podcasts_per_cat=10):
         self.total = total
         self.num_cat = num_cat
@@ -20,13 +19,16 @@ class Topics(object):
         return self._categories is None
 
     def _query(self):
-        categories = list(Category.objects.filter(num_entries__gt=0)
-                                  .filter(tags__isnull=False)
-                                  .order_by('-modified')[:self.total]
-                                  .prefetch_related('tags'))
-        self._categories = categories[:self.num_cat]
-        self._tagcloud = sorted(categories[self.num_cat:],
-                                key=lambda x: x.title.lower())
+        categories = list(
+            Category.objects.filter(num_entries__gt=0)
+            .filter(tags__isnull=False)
+            .order_by('-modified')[: self.total]
+            .prefetch_related('tags')
+        )
+        self._categories = categories[: self.num_cat]
+        self._tagcloud = sorted(
+            categories[self.num_cat :], key=lambda x: x.title.lower()
+        )
 
     @property
     @query_if_required()
@@ -57,10 +59,7 @@ def update_category(podcast):
 
     try:
         category, created = Category.objects.get_or_create(
-            tags__tag=slugify(random_tag),
-            defaults={
-                'title': random_tag,
-            }
+            tags__tag=slugify(random_tag), defaults={'title': random_tag}
         )
 
     except IntegrityError as ie:
@@ -80,8 +79,7 @@ def update_category(podcast):
 
     # add podcast to the category as newest entry
     entry, created = CategoryEntry.objects.get_or_create(
-        category=category,
-        podcast=podcast,
+        category=category, podcast=podcast
     )
 
     if not created:

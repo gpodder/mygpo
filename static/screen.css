@@ -140,6 +140,12 @@ td.logo
     width: 32px;
 }
 
+td.logo img
+{
+    max-height: 32px;
+    max-width: 32px;
+}
+
 table form
 {
     display: inline;
@@ -168,7 +174,7 @@ table.list th.group i
 .summary
 {
     color: #222;
-    hypens: auto;
+    hyphens: auto;
     -webkit-hyphens: auto;
     -moz-hyphens: auto;
     -ms-hyphens: auto;
@@ -212,6 +218,11 @@ div#podcastlogo
     padding-bottom: 10px;
 }
 
+#podcastlogo img {
+    max-height: 128px;
+    max-width: 128px;
+}
+
 
 .short
 {
@@ -235,31 +246,6 @@ img.device_icon
 {
     padding: 3px;
     vertical-align: middle;
-}
-
-ul.devices li.desktop
-{
-    list-style-image: url('16x16/computer.png');
-}
-
-ul.devices li.laptop
-{
-    list-style-image: url('16x16/stock_notebook.png');
-}
-
-ul.devices li.mobile
-{
-    list-style-image: url('16x16/stock_cell-phone.png');
-}
-
-ul.devices li.server
-{
-    list-style-image: url('16x16/server.png');
-}
-
-ul.devices li.other
-{
-    list-style-image: url('16x16/audio-x-generic.png');
 }
 
 

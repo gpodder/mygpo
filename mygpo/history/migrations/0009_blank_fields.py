@@ -6,19 +6,14 @@ from django.db import models, migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('history', '0008_episodehistory_index'),
-    ]
+    dependencies = [('history', '0008_episodehistory_index')]
 
     operations = [
         migrations.AlterField(
             model_name='episodehistoryentry',
             name='client',
             field=models.ForeignKey(
-                blank=True,
-                to='users.Client',
-                null=True,
-                on_delete=models.CASCADE,
+                blank=True, to='users.Client', null=True, on_delete=models.CASCADE
             ),
             preserve_default=True,
         ),

@@ -19,8 +19,7 @@ class Chapter(UpdateInfoModel):
     advertisement = models.BooleanField(default=False)
 
     # the user that created the chapter
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     # the episode to which the chapter belongs
     episode = models.ForeignKey(Episode, on_delete=models.CASCADE)

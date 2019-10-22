@@ -49,15 +49,27 @@ That's it for the setup.
 Configuration
 -------------
 
+Configuration of mygpo is done through environment variables. For development
+purposes you can set up a directory ``envs/dev`` and create a file for each
+variable that you want to set.
+
 For a development configuration you will probably want to use the following
 
 .. code-block:: bash
 
-    mkdir -p envs/local
-    echo django.core.mail.backends.console.EmailBackend > envs/local/EMAIL_BACKEND
-    echo secret > envs/local/SECRET_KEY
-    echo postgres://mygpo:mygpo@localhost/mygpo > envs/local/DATABASE_URL
-    echo True > envs/local/DEBUG
+    mkdir -p envs/dev
+    echo django.core.mail.backends.console.EmailBackend > envs/dev/EMAIL_BACKEND
+    echo secret > envs/dev/SECRET_KEY
+    echo postgres://mygpo:mygpo@localhost/mygpo > envs/dev/DATABASE_URL
+    echo True > envs/dev/DEBUG
+    mkdir -p /tmp/mygpo-test-media
+    echo /tmp/mygpo-test-media > envs/dev/MEDIA_ROOT
+
+On an Debian/Ubuntu based system, you can perform this configuration with
+
+.. code-block:: bash
+
+    make dev-config
 
 See :ref:`configuration` for further information.
 
@@ -72,13 +84,13 @@ First run the commands from :ref:`db-setup`. Then
 .. code-block:: bash
 
     cd mygpo
-    envdir envs/local python manage.py migrate
+    envdir envs/dev python manage.py migrate
 
 ..and here we go:
 
 .. code-block:: bash
 
-    envdir envs/local python manage.py runserver
+    envdir envs/dev python manage.py runserver
 
 
 
@@ -91,7 +103,7 @@ runserver command of manage.py, like this:
 
 .. code-block:: bash
 
-    envdir envs/local python manage.py runserver 0.0.0.0:8000
+    envdir envs/dev python manage.py runserver 0.0.0.0:8000
 
 Beware, though, that this will expose the web service to your all networks
 that your machine is connected to. Apply common sense and ideally use only
@@ -108,22 +120,21 @@ commands regularly on your development machine:
 
 .. code-block:: bash
 
-    envdir envs/local python manage.py update-categories
-    envdir envs/local python manage.py update-toplist
-    envdir envs/local python manage.py update-episode-toplist
+    envdir envs/dev python manage.py update-toplist
+    envdir envs/dev python manage.py update-episode-toplist
 
-    envdir envs/local python manage.py feed-downloader
-    envdir envs/local python manage.py feed-downloader <feed-url> [...]
-    envdir envs/local python manage.py feed-downloader --max <max-updates>
-    envdir envs/local python manage.py feed-downloader --random --max <max-updates>
-    envdir envs/local python manage.py feed-downloader --toplist --max <max-updates>
-    envdir envs/local python manage.py feed-downloader --update-new --max <max-updates>
+    envdir envs/dev python manage.py feed-downloader
+    envdir envs/dev python manage.py feed-downloader <feed-url> [...]
+    envdir envs/dev python manage.py feed-downloader --max <max-updates>
+    envdir envs/dev python manage.py feed-downloader --random --max <max-updates>
+    envdir envs/dev python manage.py feed-downloader --toplist --max <max-updates>
+    envdir envs/dev python manage.py feed-downloader --update-new --max <max-updates>
 
 or to only do a dry run (this won't do any web requests for feeds):
 
 .. code-block:: bash
 
-    envdir envs/local python manage.py feed-downloader --list-only [other parameters]
+    envdir envs/dev apython manage.py feed-downloader --list-only [other parameters]
 
 
 Maintaining publisher relationships with user accounts
@@ -134,7 +145,7 @@ To set a user as publisher for a given feed URL, use:
 .. code-block:: bash
 
     cd mygpo
-    envdir envs/local python manage.py make-publisher <username> <feed-url> [...]
+    envdir envs/dev python manage.py make-publisher <username> <feed-url> [...]
 
 
 Web-Server
@@ -145,7 +156,7 @@ directory with
 
 .. code-block:: bash
 
-    envdir envs/local python manage.py runserver
+    envdir envs/dev python manage.py runserver
 
 If you want to run a production server, check out `Deploying Django
 <https://docs.djangoproject.com/en/dev/howto/deployment/>`_.

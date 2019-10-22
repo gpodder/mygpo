@@ -3,6 +3,7 @@ import os.path
 from django import template
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext
+from django.utils.safestring import mark_safe
 from django.urls import reverse
 from django.utils.html import strip_tags
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -19,19 +20,20 @@ DEVICE_TYPES_DICT = dict(Client.TYPES)
 
 # This dictionary maps device types to their icon files
 DEVICE_TYPE_ICONS = {
-        'desktop': 'computer.png',
-        'laptop': 'stock_notebook.png',
-        'mobile': 'stock_cell-phone.png',
-        'server': 'server.png',
-        'other': 'audio-x-generic.png',
+    'desktop': 'computer.png',
+    'laptop': 'stock_notebook.png',
+    'mobile': 'stock_cell-phone.png',
+    'server': 'server.png',
+    'other': 'audio-x-generic.png',
 }
+
 
 @register.filter
 def device_type(device):
     return DEVICE_TYPES_DICT.get(device.type, _('Unknown'))
 
-@register.filter
-@mark_safe
+
+@register.filter()
 def device_icon(device):
 
     ua_str = (device.user_agent or '').lower()
@@ -52,13 +54,12 @@ def device_icon(device):
         icon = DEVICE_TYPE_ICONS.get(device_type, None)
         caption = DEVICE_TYPES_DICT.get(device_type, None)
 
-
     if icon is not None and caption is not None:
         caption = ugettext(caption)
-        html = '<img src="%(icon)s" alt="%(caption)s" class="device_icon"/>' \
-            % dict(icon=staticfiles_storage.url(os.path.join('clients', icon)),
-                   caption=caption)
-        return html
+        html = '<img src="%(icon)s" alt="%(caption)s" class="device_icon"/>' % dict(
+            icon=staticfiles_storage.url(os.path.join('clients', icon)), caption=caption
+        )
+        return mark_safe(html)
 
     return ''
 
@@ -72,17 +73,18 @@ def target_uid(client):
         return client.uid
 
 
-@register.filter
+@register.filter()
 def device_list(devices):
     links = map(device_link, devices)
     return mark_safe(''.join(links))
 
+
 def device_link(device):
     return '<a href="{link}" title="{name}">{icon}</a>'.format(
-            link = reverse(show, args=[device.uid]),
-            name = device.name,
-            icon = device_icon(device),
-        )
+        link=reverse(show, args=[device.uid]),
+        name=device.name,
+        icon=device_icon(device),
+    )
 
 
 @register.filter

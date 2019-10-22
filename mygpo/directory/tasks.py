@@ -14,12 +14,14 @@ def update_podcast_subscribers(podcast_id):
         podcast = Podcast.objects.get(id=podcast_id)
 
         # calculate current number of subscribers
-        podcast.subscribers = Subscription.objects.filter(podcast=podcast)\
-                                                  .order_by('user')\
-                                                  .distinct('user')\
-                                                  .count()
+        podcast.subscribers = (
+            Subscription.objects.filter(podcast=podcast)
+            .order_by('user')
+            .distinct('user')
+            .count()
+        )
         podcast.save()
 
-    #TODO: which exceptions?
+    # TODO: which exceptions?
     except Exception as ex:
         raise update_podcast_subscribers.retry(exc=ex)

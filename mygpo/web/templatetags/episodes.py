@@ -11,6 +11,7 @@ from mygpo.web.utils import get_episode_link_target
 
 register = template.Library()
 
+
 @register.filter
 def episode_status_text(episode):
     if not episode or not episode.action:
@@ -36,37 +37,66 @@ def episode_status_text(episode):
 
     return _('Unknown status')
 
-@register.filter
+
+@register.filter()
 def episode_status_icon(action):
     if not action or not action.action:
-        s = '<img src="%s" alt="nothing" title="%s" />' % \
-            (staticfiles_storage.url('nothing.png'), _('Unplayed episode'))
+        s = '<img src="%s" alt="nothing" title="%s" />' % (
+            staticfiles_storage.url('nothing.png'),
+            _('Unplayed episode'),
+        )
 
     else:
-        date_string   = (_(' on %s') % (action.timestamp)) if action.timestamp else ''
+        date_string = (_(' on %s') % (action.timestamp)) if action.timestamp else ''
         device_string = (_(' on %s') % (action.client.name)) if action.client else ''
 
         if action.action == 'flattr':
-            s = '<img src="https://flattr.com/_img/icons/flattr_logo_16.png" alt="flattr" title="%s" />' % (_("The episode has been flattr'd"),)
+            s = (
+                '<img src="https://flattr.com/_img/icons/flattr_logo_16.png" alt="flattr" title="%s" />'
+                % (_("The episode has been flattr'd"),)
+            )
 
         elif action.action == 'new':
-            s = '<img src="%s" alt="new" title="%s" />' % (staticfiles_storage.url('new.png'), '%s%s%s' % (_('This episode has been marked new'),date_string, device_string))
+            s = '<img src="%s" alt="new" title="%s" />' % (
+                staticfiles_storage.url('new.png'),
+                '%s%s%s'
+                % (_('This episode has been marked new'), date_string, device_string),
+            )
         elif action.action == 'download':
-            s = '<img src="%s" alt="downloaded" title="%s" />' % (staticfiles_storage.url('download.png'), '%s%s%s' % (_('This episode has been downloaded'),date_string, device_string))
+            s = '<img src="%s" alt="downloaded" title="%s" />' % (
+                staticfiles_storage.url('download.png'),
+                '%s%s%s'
+                % (_('This episode has been downloaded'), date_string, device_string),
+            )
         elif action.action == 'play':
             if action.stopped is not None:
                 if getattr(action, 'started', None) is not None:
-                    playback_info = _(' from %(start)s to %(end)s') % { \
-                            'start': utils.format_time(action.started), \
-                            'end': utils.format_time(action.stopped)}
+                    playback_info = _(' from %(start)s to %(end)s') % {
+                        'start': utils.format_time(action.started),
+                        'end': utils.format_time(action.stopped),
+                    }
                 else:
-                    playback_info = _(' to position %s') % (\
-                            utils.format_time(action.stopped),)
+                    playback_info = _(' to position %s') % (
+                        utils.format_time(action.stopped),
+                    )
             else:
                 playback_info = ''
-            s = '<img src="%s" alt="played" title="%s" />' % (staticfiles_storage.url('playback.png'), '%s%s%s%s' % (_('This episode has been played'),date_string, device_string, playback_info))
+            s = '<img src="%s" alt="played" title="%s" />' % (
+                staticfiles_storage.url('playback.png'),
+                '%s%s%s%s'
+                % (
+                    _('This episode has been played'),
+                    date_string,
+                    device_string,
+                    playback_info,
+                ),
+            )
         elif action.action == 'delete':
-            s = '<img src="%s" alt="deleted" title="%s"/>' % (staticfiles_storage.url('delete.png'), '%s%s%s' % (_('This episode has been deleted'),date_string, device_string))
+            s = '<img src="%s" alt="deleted" title="%s"/>' % (
+                staticfiles_storage.url('delete.png'),
+                '%s%s%s'
+                % (_('This episode has been deleted'), date_string, device_string),
+            )
         else:
             return action.action  # this is not marked safe by intention
 
@@ -88,26 +118,26 @@ class EpisodeLinkTargetNode(template.Node):
         self.view_name = view_name.replace('"', '')
         self.add_args = [template.Variable(arg) for arg in add_args]
 
-
     def render(self, context):
         episode = self.episode.resolve(context)
         podcast = self.podcast.resolve(context)
         add_args = [arg.resolve(context) for arg in self.add_args]
         return get_episode_link_target(episode, podcast, self.view_name, add_args)
 
-
     @staticmethod
     def compile(parser, token):
         try:
-            contents  = token.split_contents()
-            tag_name  = contents[0]
-            episode   = contents[1]
-            podcast   = contents[2]
+            contents = token.split_contents()
+            tag_name = contents[0]
+            episode = contents[1]
+            podcast = contents[2]
             view_name = contents[3] if len(contents) > 3 else 'episode'
-            add_args  = contents[4:]
+            add_args = contents[4:]
 
         except ValueError:
-            raise template.TemplateSyntaxError("%r tag requires at least one argument" % token.contents.split()[0])
+            raise template.TemplateSyntaxError(
+                "%r tag requires at least one argument" % token.contents.split()[0]
+            )
 
         return EpisodeLinkTargetNode(episode, podcast, view_name, add_args)
 
@@ -115,21 +145,25 @@ class EpisodeLinkTargetNode(template.Node):
 register.tag('episode_link_target', EpisodeLinkTargetNode.compile)
 
 
-
 @register.simple_tag
 def episode_link(episode, podcast, title=None):
     """ Returns the link for a single Episode """
 
-    title = title or getattr(episode, 'display_title', None) or \
-            episode.get_short_title(podcast.common_episode_title) or \
-            episode.title or \
-            _('Unknown Episode')
+    title = (
+        title
+        or getattr(episode, 'display_title', None)
+        or episode.get_short_title(podcast.common_episode_title)
+        or episode.title
+        or _('Unknown Episode')
+    )
 
     title = strip_tags(title)
 
-    return format_html('<a href="{target}" title="{title}">{title}</a>',
-                       target=get_episode_link_target(episode, podcast),
-                       title=title)
+    return format_html(
+        '<a href="{target}" title="{title}">{title}</a>',
+        target=get_episode_link_target(episode, podcast),
+        title=title,
+    )
 
 
 @register.simple_tag
@@ -141,6 +175,7 @@ def get_id(obj):
 def episode_number(episode, podcast):
     num = episode.get_episode_number(podcast.common_episode_title)
     return num or ""
+
 
 @register.simple_tag
 def episode_short_title(episode, podcast):

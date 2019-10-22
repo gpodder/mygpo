@@ -7,9 +7,7 @@ import datetime
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('podcasts', '0013_auto_20140615_0903'),
-    ]
+    dependencies = [('podcasts', '0013_auto_20140615_0903')]
 
     operations = [
         migrations.AlterField(

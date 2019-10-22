@@ -7,8 +7,7 @@ from mygpo.podcasts.models import Podcast
 class Category(UpdateInfoModel):
     """ A category of podcasts """
 
-    title = models.CharField(max_length=1000, null=False, blank=False,
-                             unique=True)
+    title = models.CharField(max_length=1000, null=False, blank=False, unique=True)
 
     num_entries = models.IntegerField()
 
@@ -16,9 +15,7 @@ class Category(UpdateInfoModel):
         verbose_name = 'Category'
         verbose_name_plural = 'Categories'
 
-        index_together = [
-            ('modified', 'num_entries'),
-        ]
+        index_together = [('modified', 'num_entries')]
 
     def save(self, *args, **kwargs):
         self.num_entries = self.entries.count()
@@ -37,28 +34,25 @@ class Category(UpdateInfoModel):
         return self.tags.first().tag
 
 
-class CategoryEntry(UpdateInfoModel,):
+class CategoryEntry(UpdateInfoModel):
     """ A podcast in a category """
 
-    category = models.ForeignKey(Category, related_name='entries',
-                                 on_delete=models.CASCADE)
+    category = models.ForeignKey(
+        Category, related_name='entries', on_delete=models.CASCADE
+    )
 
-    podcast = models.ForeignKey(Podcast,
-                                on_delete=models.CASCADE)
+    podcast = models.ForeignKey(Podcast, on_delete=models.CASCADE)
 
     class Meta:
-        unique_together = [
-            ('category', 'podcast'),
-        ]
+        unique_together = [('category', 'podcast')]
 
-        index_together = [
-            ('category', 'modified'),
-        ]
+        index_together = [('category', 'modified')]
 
 
 class CategoryTag(models.Model):
 
     tag = models.SlugField(unique=True)
 
-    category = models.ForeignKey(Category, related_name='tags',
-                                 on_delete=models.CASCADE)
+    category = models.ForeignKey(
+        Category, related_name='tags', on_delete=models.CASCADE
+    )

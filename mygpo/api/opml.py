@@ -29,19 +29,21 @@ class Importer(object):
             raise ValueError from e
 
         for outline in doc.getElementsByTagName('outline'):
-            if outline.getAttribute('type') in self.VALID_TYPES and \
-                    outline.getAttribute('xmlUrl') or \
-                    outline.getAttribute('url'):
+            if (
+                outline.getAttribute('type') in self.VALID_TYPES
+                and outline.getAttribute('xmlUrl')
+                or outline.getAttribute('url')
+            ):
                 channel = {
-                    'url': outline.getAttribute('xmlUrl') or \
-                           outline.getAttribute('url'),
-                    'title': outline.getAttribute('title') or \
-                             outline.getAttribute('text') or \
-                             outline.getAttribute('xmlUrl') or \
-                             outline.getAttribute('url'),
-                    'description': outline.getAttribute('text') or \
-                                   outline.getAttribute('xmlUrl') or \
-                                   outline.getAttribute('url'),
+                    'url': outline.getAttribute('xmlUrl')
+                    or outline.getAttribute('url'),
+                    'title': outline.getAttribute('title')
+                    or outline.getAttribute('text')
+                    or outline.getAttribute('xmlUrl')
+                    or outline.getAttribute('url'),
+                    'description': outline.getAttribute('text')
+                    or outline.getAttribute('xmlUrl')
+                    or outline.getAttribute('url'),
                 }
 
                 if channel['description'] == channel['title']:
@@ -89,6 +91,7 @@ class Exporter(object):
         def create_outline(channel):
             from mygpo.subscriptions.models import SubscribedPodcast
             from mygpo.podcasts.models import PodcastGroup
+
             if isinstance(channel, SubscribedPodcast):
                 title = channel.podcast.title
                 description = channel.podcast.description
@@ -115,6 +118,4 @@ class Exporter(object):
             body.appendChild(create_outline(channel))
         opml.appendChild(body)
 
-        return doc.toprettyxml(encoding='utf-8', \
-                               indent='  ', \
-                               newl=os.linesep)
+        return doc.toprettyxml(encoding='utf-8', indent='  ', newl=os.linesep)

@@ -11,6 +11,7 @@ from mygpo.celery import celery
 from . import models
 
 from celery.utils.log import get_task_logger
+
 logger = get_task_logger(__name__)
 
 
@@ -53,8 +54,7 @@ def remove_inactive_users():
 
     for user in users:
         clients = models.Client.objects.filter(user=user)
-        logger.warn('Deleting %d clients of user "%s"',
-                    len(clients), user.username)
+        logger.warn('Deleting %d clients of user "%s"', len(clients), user.username)
         clients.delete()
         logger.warn('Deleting user "%s"', user.username)
         user.delete()

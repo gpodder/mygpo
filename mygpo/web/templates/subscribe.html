@@ -38,7 +38,7 @@
     </div>
    </form>
   {% else %}
-   <p>{% trans "You can't subscribe to this podcast, because you don't have any devices (on which you don't have subscribed to the podcast already." %}</p>
+   <p>{% trans "You can't subscribe to this podcast, because you don't have any devices (on which you don't have subscribed to the podcast already)." %}</p>
    <a class="btn btn-success" href="{% url "devices" %}">
     <i class="icon-plus"></i> {% trans "Create Device" %}
    </a>
@@ -46,7 +46,7 @@
   {% endif %}
 
   {% if not podcast.title %}
-   <div class="alert alert-info"><strong>{% trans "Why Unnamed Podcast?" %}</strong> {% trans "Because we display names after we have fetched the information form the feed -- and this may take some time. Until this is completed, the podcast will simply be called this way." %}</div>
+   <div class="alert alert-info"><strong>{% trans "Why Unnamed Podcast?" %}</strong> {% trans "Because we display names after we have fetched the information from the feed -- and this may take some time. Until this is completed, the podcast will simply be called this way." %}</div>
   {% endif %}
 
 {% endblock %}

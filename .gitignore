@@ -1,5 +1,5 @@
 *.pyc
-htdocs/media/logo/*
+media/*
 logs/*
 *.mo
 mygpo/settings_prod.py
@@ -28,3 +28,4 @@ envs
 notebooks/
 
 .cache
+.pytest_cache

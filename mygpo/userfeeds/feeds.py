@@ -3,9 +3,7 @@ from django.urls import reverse
 from mygpo.favorites.models import FavoriteEpisode
 
 
-
-class FavoriteFeed():
-
+class FavoriteFeed:
     def __init__(self, user):
         self.user = user
 
@@ -27,4 +25,7 @@ class FavoriteFeed():
             return ''
 
     def get_public_url(self, domain):
-        return 'http://%s%s' % (domain, reverse('favorites-feed', args=[self.user.username]))
+        return 'http://%s%s' % (
+            domain,
+            reverse('favorites-feed', args=[self.user.username]),
+        )

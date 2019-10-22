@@ -2,8 +2,12 @@ from functools import wraps
 import urllib.request, urllib.parse, urllib.error
 
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect, \
-        HttpResponseForbidden, Http404
+from django.http import (
+    HttpResponse,
+    HttpResponseRedirect,
+    HttpResponseForbidden,
+    Http404,
+)
 from django.core.cache import cache
 from django.views.decorators.cache import never_cache, cache_control
 from django.views.decorators.vary import vary_on_cookie
@@ -17,18 +21,25 @@ from django.shortcuts import get_object_or_404
 from mygpo.podcasts.models import PodcastGroup, Podcast, Episode
 from mygpo.publisher.auth import require_publisher, is_publisher
 from mygpo.publisher.forms import SearchPodcastForm
-from mygpo.publisher.utils import listener_data, episode_listener_data, \
-         check_publisher_permission, subscriber_data
+from mygpo.publisher.utils import (
+    listener_data,
+    episode_listener_data,
+    check_publisher_permission,
+    subscriber_data,
+)
 from mygpo.podcasts.views.episode import (
     slug_decorator as episode_slug_decorator,
-    id_decorator as episode_id_decorator
+    id_decorator as episode_id_decorator,
 )
 from mygpo.podcasts.views.podcast import (
     slug_decorator as podcast_slug_decorator,
-    id_decorator as podcast_id_decorator
+    id_decorator as podcast_id_decorator,
 )
-from mygpo.web.utils import get_podcast_link_target, normalize_twitter, \
-     get_episode_link_target
+from mygpo.web.utils import (
+    get_podcast_link_target,
+    normalize_twitter,
+    get_episode_link_target,
+)
 from django.contrib.sites.requests import RequestSite
 from mygpo.data.tasks import update_podcasts
 from mygpo.data.models import PodcastUpdateResult
@@ -40,23 +51,26 @@ from mygpo.pubsub.models import HubSubscription
 @cache_control(private=True)
 def home(request):
     if is_publisher(request.user):
-        podcasts = Podcast.objects.filter(publishedpodcast__publisher=request.user)\
-                                  .prefetch_related('slugs')
+        podcasts = Podcast.objects.filter(
+            publishedpodcast__publisher=request.user
+        ).prefetch_related('slugs')
         site = RequestSite(request)
         update_token = request.user.profile.get_token('publisher_update_token')
         form = SearchPodcastForm()
-        return render(request, 'publisher/home.html', {
-            'update_token': update_token,
-            'podcasts': podcasts,
-            'form': form,
-            'site': site,
-            })
+        return render(
+            request,
+            'publisher/home.html',
+            {
+                'update_token': update_token,
+                'podcasts': podcasts,
+                'form': form,
+                'site': site,
+            },
+        )
 
     else:
         site = RequestSite(request)
-        return render(request, 'publisher/info.html', {
-            'site': site
-            })
+        return render(request, 'publisher/info.html', {'site': site})
 
 
 @vary_on_cookie
@@ -93,7 +107,7 @@ def podcast(request, podcast):
     except HubSubscription.DoesNotExist:
         pubsubscription = None
 
-    MAX_UPDATE_RESULTS=10
+    MAX_UPDATE_RESULTS = 10
 
     update_results = PodcastUpdateResult.objects.filter(podcast=podcast)
     update_results = update_results[:MAX_UPDATE_RESULTS]
@@ -101,18 +115,22 @@ def podcast(request, podcast):
     site = RequestSite(request)
     feedurl_quoted = urllib.parse.quote(podcast.url.encode('ascii'))
 
-    return render(request, 'publisher/podcast.html', {
-        'site': site,
-        'podcast': podcast,
-        'group': podcast.group,
-        'form': None,
-        'timeline_data': timeline_data,
-        'subscriber_data': subscription_data,
-        'update_token': update_token,
-        'feedurl_quoted': feedurl_quoted,
-        'pubsubscription': pubsubscription,
-        'update_results': update_results,
-        })
+    return render(
+        request,
+        'publisher/podcast.html',
+        {
+            'site': site,
+            'podcast': podcast,
+            'group': podcast.group,
+            'form': None,
+            'timeline_data': timeline_data,
+            'subscriber_data': subscription_data,
+            'update_token': update_token,
+            'feedurl_quoted': feedurl_quoted,
+            'pubsubscription': pubsubscription,
+            'update_results': update_results,
+        },
+    )
 
 
 @vary_on_cookie
@@ -129,11 +147,15 @@ def group(request, group):
     timeline_data = listener_data(podcasts)
     subscription_data = list(subscriber_data(podcasts))[-20:]
 
-    return render(request, 'publisher/group.html', {
-        'group': group,
-        'timeline_data': timeline_data,
-        'subscriber_data': subscription_data,
-        })
+    return render(
+        request,
+        'publisher/group.html',
+        {
+            'group': group,
+            'timeline_data': timeline_data,
+            'subscriber_data': subscription_data,
+        },
+    )
 
 
 @vary_on_cookie
@@ -145,7 +167,12 @@ def update_podcast(request, podcast):
         return HttpResponseForbidden()
 
     update_podcasts.delay([podcast.url])
-    messages.success(request, _('The update has been scheduled. It might take some time until the results are visible.'))
+    messages.success(
+        request,
+        _(
+            'The update has been scheduled. It might take some time until the results are visible.'
+        ),
+    )
 
     url = get_podcast_link_target(podcast, 'podcast-publisher-detail')
     return HttpResponseRedirect(url)
@@ -161,7 +188,6 @@ def save_podcast(request, podcast):
     messages.success(request, _('Data updated'))
     url = get_podcast_link_target(podcast, 'podcast-publisher-detail')
     return HttpResponseRedirect(url)
-
 
 
 @never_cache
@@ -180,7 +206,10 @@ def update_published_podcasts(request, username):
     user = get_object_or_404(User, username=username)
     published_podcasts = [pp.podcast for pp in user.publishedpodcast_set.all()]
     update_podcasts.delay([podcast.url for podcast in published_podcasts])
-    return HttpResponse('Updated:\n' + '\n'.join([p.url for p in published_podcasts]), content_type='text/plain')
+    return HttpResponse(
+        'Updated:\n' + '\n'.join([p.url for p in published_podcasts]),
+        content_type='text/plain',
+    )
 
 
 @vary_on_cookie
@@ -191,16 +220,20 @@ def episodes(request, podcast):
     if not check_publisher_permission(request.user, podcast):
         return HttpResponseForbidden()
 
-    episodes = Episode.objects.filter(podcast=podcast).select_related('podcast').prefetch_related('slugs', 'podcast__slugs')
+    episodes = (
+        Episode.objects.filter(podcast=podcast)
+        .select_related('podcast')
+        .prefetch_related('slugs', 'podcast__slugs')
+    )
 
     listeners = filter(None, (e.listeners for e in episodes))
     max_listeners = max(listeners, default=0)
 
-    return render(request, 'publisher/episodes.html', {
-        'podcast': podcast,
-        'episodes': episodes,
-        'max_listeners': max_listeners
-        })
+    return render(
+        request,
+        'publisher/episodes.html',
+        {'podcast': podcast, 'episodes': episodes, 'max_listeners': max_listeners},
+    )
 
 
 @require_publisher
@@ -225,14 +258,18 @@ def episode(request, episode):
 
     timeline_data = list(episode_listener_data(episode))
 
-    return render(request, 'publisher/episode.html', {
-        'is_secure': request.is_secure(),
-        'domain': site.domain,
-        'episode': episode,
-        'podcast': podcast,
-        'form': form,
-        'timeline_data': timeline_data,
-        })
+    return render(
+        request,
+        'publisher/episode.html',
+        {
+            'is_secure': request.is_secure(),
+            'domain': site.domain,
+            'episode': episode,
+            'podcast': podcast,
+            'form': form,
+            'timeline_data': timeline_data,
+        },
+    )
 
 
 @require_publisher
@@ -258,9 +295,13 @@ def update_episode_slug(request, episode):
                 continue
 
             other_episode.remove_slug(new_slug)
-            messages.warning(request,
-                _('Removed slug {slug} from {episode}'.format(
-                    slug=new_slug, episode=other_episode.title))
+            messages.warning(
+                request,
+                _(
+                    'Removed slug {slug} from {episode}'.format(
+                        slug=new_slug, episode=other_episode.title
+                    )
+                ),
             )
 
     episode.set_slug(new_slug)
@@ -277,18 +318,14 @@ def update_episode_slug(request, episode):
 @cache_control(private=True)
 def link(request):
     current_site = RequestSite(request)
-    return render(request, 'link.html', {
-        'url': current_site
-        })
+    return render(request, 'link.html', {'url': current_site})
 
 
 @vary_on_cookie
 @cache_control(private=True)
 def advertise(request):
     site = RequestSite(request)
-    return render(request, 'publisher/advertise.html', {
-        'site': site
-    })
+    return render(request, 'publisher/advertise.html', {'site': site})
 
 
 def group_id_decorator(f):
@@ -300,19 +337,19 @@ def group_id_decorator(f):
     return _decorator
 
 
-episode_slug             = episode_slug_decorator(episode)
+episode_slug = episode_slug_decorator(episode)
 update_episode_slug_slug = episode_slug_decorator(update_episode_slug)
-podcast_slug             = podcast_slug_decorator(podcast)
-episodes_slug            = podcast_slug_decorator(episodes)
-update_podcast_slug      = podcast_slug_decorator(update_podcast)
-save_podcast_slug        = podcast_slug_decorator(save_podcast)
+podcast_slug = podcast_slug_decorator(podcast)
+episodes_slug = podcast_slug_decorator(episodes)
+update_podcast_slug = podcast_slug_decorator(update_podcast)
+save_podcast_slug = podcast_slug_decorator(save_podcast)
 
-episode_id             = episode_id_decorator(episode)
+episode_id = episode_id_decorator(episode)
 update_episode_slug_id = episode_id_decorator(update_episode_slug)
-podcast_id             = podcast_id_decorator(podcast)
-episodes_id            = podcast_id_decorator(episodes)
-update_podcast_id      = podcast_id_decorator(update_podcast)
-save_podcast_id        = podcast_id_decorator(save_podcast)
+podcast_id = podcast_id_decorator(podcast)
+episodes_id = podcast_id_decorator(episodes)
+update_podcast_id = podcast_id_decorator(update_podcast)
+save_podcast_id = podcast_id_decorator(save_podcast)
 
-group_slug               = group_id_decorator(group)
-group_id                 = group_id_decorator(group)
+group_slug = group_id_decorator(group)
+group_id = group_id_decorator(group)

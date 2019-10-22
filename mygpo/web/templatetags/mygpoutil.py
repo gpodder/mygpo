@@ -1,14 +1,15 @@
 import re
 from html.entities import entitydefs
 
+from django.utils.safestring import mark_safe
 from django import template
 from django.utils.safestring import mark_safe
 
 
 register = template.Library()
 
-@register.filter
-@mark_safe
+
+@register.filter()
 def remove_html_tags(html):
     # If we would want more speed, we could make these global
     re_strip_tags = re.compile('<[^>]*>')
@@ -31,9 +32,11 @@ def remove_html_tags(html):
     result = re_unicode_entities.sub(lambda x: chr(int(x.group(1))), result)
 
     # Convert named HTML entities to their unicode character
-    result = re_html_entities.sub(lambda x: str(entitydefs.get(x.group(1),''), 'iso-8859-1'), result)
+    result = re_html_entities.sub(
+        lambda x: str(entitydefs.get(x.group(1), ''), 'iso-8859-1'), result
+    )
 
     # Convert more than two newlines to two newlines
     result = re.sub('([\r\n]{2})([\r\n])+', '\\1', result)
 
-    return result.strip()
+    return mark_safe(result.strip())

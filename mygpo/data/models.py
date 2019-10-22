@@ -43,13 +43,12 @@ class PodcastUpdateResult(UUIDModel):
 
         ordering = ['-start']
 
-        indexes = [
-            models.Index(fields=['podcast', 'start'])
-        ]
+        indexes = [models.Index(fields=['podcast', 'start'])]
 
     def __str__(self):
         return 'Update Result for "{}" @ {:%Y-%m-%d %H:%M}'.format(
-            self.podcast, self.start)
+            self.podcast, self.start
+        )
 
     # Use as context manager
 

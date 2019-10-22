@@ -9,14 +9,11 @@ class PodcastSorter(object):
         self.podcasts = podcasts
         self.sorted_podcasts = None
 
-
     def _sort(self):
         return self.podcasts
 
-
     def __len__(self):
         return len(self.podcasts)
-
 
     def __getitem__(self, val):
         if self.sorted_podcasts is None:
@@ -31,7 +28,6 @@ class PodcastSorter(object):
         return iter(self.sorted_podcasts)
 
 
-
 class PodcastPercentageListenedSorter(PodcastSorter):
     """ Sorts podcasts by the percentage of listened episodes
 
@@ -42,7 +38,6 @@ class PodcastPercentageListenedSorter(PodcastSorter):
     def __init__(self, podcasts, user):
         super(PodcastPercentageListenedSorter, self).__init__(podcasts)
         self.user = user
-
 
     def _sort(self):
 
@@ -68,9 +63,9 @@ def subscription_changes(device_id, podcast_states, since, until):
     for p_state in podcast_states:
         change = p_state.get_change_between(device_id, since, until)
         if change == 'subscribe':
-            add.append( p_state.ref_url )
+            add.append(p_state.ref_url)
         elif change == 'unsubscribe':
-            rem.append( p_state.ref_url )
+            rem.append(p_state.ref_url)
 
     return add, rem
 

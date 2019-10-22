@@ -3,9 +3,11 @@ from django.utils.safestring import mark_safe
 
 register = template.Library()
 
-@register.filter
+
+@register.filter()
 def google_analytics_async(property_id):
-    s = """
+    s = (
+        """
     <script type="text/javascript">
         var _gaq = _gaq || [];
         _gaq.push(['_setAccount', '%s']);
@@ -19,6 +21,8 @@ def google_analytics_async(property_id):
             var s = document.getElementsByTagName('script')[0];
             s.parentNode.insertBefore(ga, s);
         })();
-    </script>""" % property_id
+    </script>"""
+        % property_id
+    )
 
     return mark_safe(s)

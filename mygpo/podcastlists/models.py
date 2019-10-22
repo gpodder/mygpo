@@ -14,8 +14,7 @@ class PodcastList(UUIDModel, VoteMixin, UpdateInfoModel):
     """ A user-curated collection of podcasts """
 
     # the user that created (and owns) the list
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     # the user-assigned title of the list
     title = models.CharField(max_length=512)
@@ -26,7 +25,7 @@ class PodcastList(UUIDModel, VoteMixin, UpdateInfoModel):
     class Meta:
         unique_together = [
             # a slug is unique for a user
-            ('user', 'slug'),
+            ('user', 'slug')
         ]
 
     @property
@@ -42,27 +41,25 @@ class PodcastList(UUIDModel, VoteMixin, UpdateInfoModel):
             podcastlist=self,
             content_type=ContentType.objects.get_for_model(obj),
             object_id=obj.id,
-            defaults={
-                'order': self.max_order + 1,
-            },
+            defaults={'order': self.max_order + 1},
         )
 
     def set_entries(self, podcasts):
         """ Updates the list to include the given podcast, removes others """
 
         existing = {e.content_object: e for e in self.entries.all()}
-        set_ordered_entries(self, podcasts, existing, PodcastListEntry,
-                            'content_object', 'podcastlist')
+        set_ordered_entries(
+            self, podcasts, existing, PodcastListEntry, 'content_object', 'podcastlist'
+        )
 
 
 class PodcastListEntry(UpdateInfoModel, OrderedModel):
     """ An entry in a Podcast List """
 
     # the list that the entry belongs to
-    podcastlist = models.ForeignKey(PodcastList,
-                                    related_name='entries',
-                                    on_delete=models.CASCADE,
-                                   )
+    podcastlist = models.ForeignKey(
+        PodcastList, related_name='entries', on_delete=models.CASCADE
+    )
 
     # the object (Podcast or PodcastGroup) that is in the list
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)

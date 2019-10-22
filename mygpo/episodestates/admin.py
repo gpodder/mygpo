@@ -1,5 +1,3 @@
-
-
 from django.contrib import admin
 
 from mygpo.episodestates.models import EpisodeState
@@ -13,8 +11,8 @@ class EpisodeStateAdmin(admin.ModelAdmin):
     list_display = ('user', 'episode', 'action')
 
     # fetch the related objects for the fields in list_display
-    list_select_related = ('user', 'episode', )
+    list_select_related = ('user', 'episode')
 
-    raw_id_fields = ('user', 'episode', )
+    raw_id_fields = ('user', 'episode')
 
     show_full_result_count = False

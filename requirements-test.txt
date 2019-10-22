@@ -1,5 +1,6 @@
-coverage==4.4.1
-django-coverage-plugin==1.5.0
+coverage==4.5.4
+django-coverage-plugin==1.6.0
 pytest-django
 pytest-cov
-responses==0.8.1
+responses==0.10.6
+black==19.3b0

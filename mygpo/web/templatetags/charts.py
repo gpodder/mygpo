@@ -1,10 +1,12 @@
 from django import template
 from django.utils.safestring import mark_safe
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from django.contrib.staticfiles.storage import staticfiles_storage
 
 
 register = template.Library()
+
 
 @register.simple_tag
 def vertical_bar(value, max_value, display=None):
@@ -31,13 +33,16 @@ def vertical_bar(value, max_value, display=None):
         left = format_html('&nbsp;')
         right = format_html('<span>{}</span>', value_str)
 
-    return format_html('<div class="barbg"><div class="bar" '
-                       'style="width: {:3.0}%">{}</div>{}</div>',
-                       ratio, left, right)
+    return format_html(
+        '<div class="barbg"><div class="bar" '
+        'style="width: {:3.0}%">{}</div>{}</div>',
+        ratio,
+        left,
+        right,
+    )
 
 
-@register.filter
-@mark_safe
+@register.filter()
 def timeline(data):
     s = '<script type="text/javascript" src="//www.google.com/jsapi"></script>\n'
     s += '<script type="text/javascript">\n'
@@ -59,7 +64,14 @@ def timeline(data):
             episode = 'undefined'
             episode_ = 'undefined'
 
-        s += '[new Date(%d, %d, %d), %d, %s, %s],\n' % (r.date.year, r.date.month-1, r.date.day, r.playcount, episode, episode_)
+        s += '[new Date(%d, %d, %d), %d, %s, %s],\n' % (
+            r.date.year,
+            r.date.month - 1,
+            r.date.day,
+            r.playcount,
+            episode,
+            episode_,
+        )
 
     s += ']);\n'
     s += 'var chart = new google.visualization.AnnotatedTimeLine(document.getElementById("chart_div"));\n'
@@ -67,4 +79,4 @@ def timeline(data):
     s += '}\n'
     s += '</script>\n'
 
-    return s
+    return mark_safe(s)

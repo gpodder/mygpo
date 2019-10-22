@@ -17,18 +17,32 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='FavoriteEpisode',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                (
+                    'id',
+                    models.AutoField(
+                        verbose_name='ID',
+                        serialize=False,
+                        auto_created=True,
+                        primary_key=True,
+                    ),
+                ),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('modified', models.DateTimeField(auto_now=True)),
-                ('episode', models.ForeignKey(to='podcasts.Episode', on_delete=django.db.models.deletion.PROTECT)),
-                ('user', models.ForeignKey(
-                    to=settings.AUTH_USER_MODEL,
-                    on_delete=models.CASCADE,
-                )),
+                (
+                    'episode',
+                    models.ForeignKey(
+                        to='podcasts.Episode',
+                        on_delete=django.db.models.deletion.PROTECT,
+                    ),
+                ),
+                (
+                    'user',
+                    models.ForeignKey(
+                        to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+                    ),
+                ),
             ],
-            options={
-                'abstract': False,
-            },
+            options={'abstract': False},
             bases=(models.Model,),
-        ),
+        )
     ]

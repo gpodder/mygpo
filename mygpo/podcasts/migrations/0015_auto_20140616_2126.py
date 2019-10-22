@@ -14,9 +14,7 @@ def set_scope(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('podcasts', '0014_auto_20140615_1032'),
-    ]
+    dependencies = [('podcasts', '0014_auto_20140615_1032')]
 
     operations = [
         migrations.AlterField(
@@ -33,12 +31,15 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='slug',
             name='scope',
-            field=models.CharField(db_index=True, max_length=32, blank=True, null=False),
+            field=models.CharField(
+                db_index=True, max_length=32, blank=True, null=False
+            ),
         ),
         migrations.AlterField(
             model_name='url',
             name='scope',
-            field=models.CharField(db_index=True, max_length=32, blank=True, null=False),
+            field=models.CharField(
+                db_index=True, max_length=32, blank=True, null=False
+            ),
         ),
-
     ]

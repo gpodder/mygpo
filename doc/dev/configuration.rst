@@ -61,6 +61,7 @@ Search
 
 * ``ELASTICSEARCH_SERVER`` - ``host:port`` of the Elasticsearch server
 * ``ELASTICSEARCH_TIMEOUT`` - timeout in seconds for queries to the Elasticsearch server
+* ``QUERY_LENGTH_CUTOFF`` - Maximum non-whitespace length of search query
 
 
 Directory
@@ -95,3 +96,8 @@ Social Login
 
 * ``GOOGLE_CLIENT_ID`` - Google Client ID
 * ``GOOGLE_CLIENT_SECRET`` - Google Client Secret
+
+
+API
+---
+* ``MAX_EPISODE_ACTIONS`` - maximum number of episode actions that the API will return in one `GET` request.

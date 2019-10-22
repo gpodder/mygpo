@@ -13,19 +13,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterUniqueTogether(
-            name='podcastconfig',
-            unique_together=None,
-        ),
-        migrations.RemoveField(
-            model_name='podcastconfig',
-            name='podcast',
-        ),
-        migrations.RemoveField(
-            model_name='podcastconfig',
-            name='user',
-        ),
-        migrations.DeleteModel(
-            name='PodcastConfig',
-        ),
+        migrations.AlterUniqueTogether(name='podcastconfig', unique_together=None),
+        migrations.RemoveField(model_name='podcastconfig', name='podcast'),
+        migrations.RemoveField(model_name='podcastconfig', name='user'),
+        migrations.DeleteModel(name='PodcastConfig'),
     ]

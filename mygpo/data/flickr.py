@@ -5,6 +5,7 @@ import requests
 from django.conf import settings
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -32,7 +33,10 @@ def get_photo_sizes(photo_id):
         logger.warn('Retrieving Flickr photo sizes failed: %s', str(e))
         return []
 
-    resp_obj = resp.json()
+    try:
+        resp_obj = resp.json()
+    except json.JSONDecodeError as jde:
+        return []
 
     try:
         return resp_obj['sizes']['size']
@@ -79,6 +83,7 @@ def is_flickr_image(url):
     if url is None:
         return False
     return bool(re.search('flickr\.com.*\.(jpg|jpeg|png|gif)', url))
+
 
 def get_display_photo(url, label='Medium'):
     photo_id = get_photo_id(url)

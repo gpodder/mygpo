@@ -27,6 +27,7 @@ from mygpo.administration.auth import require_staff
 from mygpo.administration.group import PodcastGrouper
 from mygpo.maintenance.merge import PodcastMerger, IncorrectMergeException
 from mygpo.administration.clients import UserAgentStats, ClientStats
+from mygpo.users.views.registration import send_activation_email
 from mygpo.administration.tasks import merge_podcasts
 from mygpo.utils import get_git_head
 from mygpo.data.models import PodcastUpdateResult
@@ -39,8 +40,8 @@ from mygpo.celery import celery
 class InvalidPodcast(Exception):
     """ raised when we try to merge a podcast that doesn't exist """
 
-class AdminView(TemplateView):
 
+class AdminView(TemplateView):
     @method_decorator(require_staff)
     def dispatch(self, *args, **kwargs):
         return super(AdminView, self).dispatch(*args, **kwargs)
@@ -65,17 +66,19 @@ class HostInfo(AdminView):
         num_index_outdated = self._get_num_outdated_search_index()
         avg_podcast_update_duration = self._get_avg_podcast_update_duration()
 
-        return self.render_to_response({
-            'git_commit': commit,
-            'git_msg': msg,
-            'base_dir': base_dir,
-            'hostname': hostname,
-            'django_version': django_version,
-            'num_celery_tasks': self._get_waiting_celery_tasks(),
-            'avg_podcast_update_duration': avg_podcast_update_duration,
-            'feed_queue_status': feed_queue_status,
-            'num_index_outdated': num_index_outdated,
-        })
+        return self.render_to_response(
+            {
+                'git_commit': commit,
+                'git_msg': msg,
+                'base_dir': base_dir,
+                'hostname': hostname,
+                'django_version': django_version,
+                'num_celery_tasks': self._get_waiting_celery_tasks(),
+                'avg_podcast_update_duration': avg_podcast_update_duration,
+                'feed_queue_status': feed_queue_status,
+                'num_index_outdated': num_index_outdated,
+            }
+        )
 
     def _get_waiting_celery_tasks(self):
         con = celery.broker_connection()
@@ -95,12 +98,13 @@ class HostInfo(AdminView):
         now = datetime.utcnow()
         next_podcast = Podcast.objects.all().order_by_next_update().first()
 
-        delta = (next_podcast.next_update - now)
+        delta = next_podcast.next_update - now
         delta_mins = delta.total_seconds() / 60
         return delta_mins
 
     def _get_num_outdated_search_index(self):
         return Podcast.objects.filter(search_index_uptodate=False).count()
+
 
 class MergeSelect(AdminView):
     template_name = 'admin/merge-select.html'
@@ -109,13 +113,10 @@ class MergeSelect(AdminView):
         num = int(request.GET.get('podcasts', 2))
         urls = [''] * num
 
-        return self.render_to_response({
-                'urls': urls,
-            })
+        return self.render_to_response({'urls': urls})
 
 
 class MergeBase(AdminView):
-
     def _get_podcasts(self, request):
         podcasts = []
         for n in count():
@@ -147,18 +148,13 @@ class MergeVerify(MergeBase):
 
             num_groups = grouper.group(get_features)
 
-
         except InvalidPodcast as ip:
-            messages.error(request,
-                    _('No podcast with URL {url}').format(url=str(ip)))
+            messages.error(request, _('No podcast with URL {url}').format(url=str(ip)))
 
             podcasts = []
             num_groups = []
 
-        return self.render_to_response({
-                'podcasts': podcasts,
-                'groups': num_groups,
-            })
+        return self.render_to_response({'podcasts': podcasts, 'groups': num_groups})
 
 
 class MergeProcess(MergeBase):
@@ -171,8 +167,7 @@ class MergeProcess(MergeBase):
             podcasts = self._get_podcasts(request)
 
         except InvalidPodcast as ip:
-            messages.error(request,
-                    _('No podcast with URL {url}').format(url=str(ip)))
+            messages.error(request, _('No podcast with URL {url}').format(url=str(ip)))
 
         grouper = PodcastGrouper(podcasts)
 
@@ -188,11 +183,11 @@ class MergeProcess(MergeBase):
         num_groups = grouper.group(get_features)
 
         if 'renew' in request.POST:
-            return render(request, 'admin/merge-grouping.html', {
-                    'podcasts': podcasts,
-                    'groups': num_groups,
-                })
-
+            return render(
+                request,
+                'admin/merge-grouping.html',
+                {'podcasts': podcasts, 'groups': num_groups},
+            )
 
         elif 'merge' in request.POST:
 
@@ -201,8 +196,9 @@ class MergeProcess(MergeBase):
 
             res = merge_podcasts.delay(podcast_ids, num_groups)
 
-            return HttpResponseRedirect(reverse('admin-merge-status',
-                        args=[res.task_id]))
+            return HttpResponseRedirect(
+                reverse('admin-merge-status', args=[res.task_id])
+            )
 
 
 class MergeStatus(AdminView):
@@ -214,9 +210,7 @@ class MergeStatus(AdminView):
         result = merge_podcasts.AsyncResult(task_id)
 
         if not result.ready():
-            return self.render_to_response({
-                'ready': False,
-            })
+            return self.render_to_response({'ready': False})
 
         # clear cache to make merge result visible
         # TODO: what to do with multiple frontends?
@@ -229,12 +223,9 @@ class MergeStatus(AdminView):
             messages.error(request, str(ime))
             return HttpResponseRedirect(reverse('admin-merge'))
 
-        return self.render_to_response({
-                'ready': True,
-                'actions': actions.items(),
-                'podcast': podcast,
-            })
-
+        return self.render_to_response(
+            {'ready': True, 'actions': actions.items(), 'podcast': podcast}
+        )
 
 
 class UserAgentStatsView(AdminView):
@@ -245,11 +236,13 @@ class UserAgentStatsView(AdminView):
         uas = UserAgentStats()
         useragents = uas.get_entries()
 
-        return self.render_to_response({
+        return self.render_to_response(
+            {
                 'useragents': useragents.most_common(),
                 'max_users': uas.max_users,
                 'total': uas.total_users,
-            })
+            }
+        )
 
 
 class ClientStatsView(AdminView):
@@ -260,11 +253,13 @@ class ClientStatsView(AdminView):
         cs = ClientStats()
         clients = cs.get_entries()
 
-        return self.render_to_response({
+        return self.render_to_response(
+            {
                 'clients': clients.most_common(),
                 'max_users': cs.max_users,
                 'total': cs.total_users,
-            })
+            }
+        )
 
 
 class ClientStatsJsonView(AdminView):
@@ -298,9 +293,7 @@ class StatsView(AdminView):
 
     def get(self, request):
         stats = self._get_stats()
-        return self.render_to_response({
-            'stats': stats,
-        })
+        return self.render_to_response({'stats': stats})
 
 
 class StatsJsonView(StatsView):
@@ -325,22 +318,65 @@ class ActivateUserView(AdminView):
         email = request.POST.get('email')
 
         if not (username or email):
-            messages.error(request,
-                           _('Provide either username or email address'))
+            messages.error(request, _('Provide either username or email address'))
             return HttpResponseRedirect(reverse('admin-activate-user'))
 
         try:
-            user = UserProxy.objects.by_username_or_email(username, email)
+            user = UserProxy.objects.all().by_username_or_email(username, email)
         except UserProxy.DoesNotExist:
             messages.error(request, _('No user found'))
             return HttpResponseRedirect(reverse('admin-activate-user'))
 
         user.activate()
-        messages.success(request,
-                         _('User {username} ({email}) activated'.format(
-                            username=user.username, email=user.email)))
+        messages.success(
+            request,
+            _(
+                'User {username} ({email}) activated'.format(
+                    username=user.username, email=user.email
+                )
+            ),
+        )
         return HttpResponseRedirect(reverse('admin-activate-user'))
 
+
+class ResendActivationEmail(AdminView):
+    """ Resends the users activation email """
+
+    template_name = 'admin/resend-acivation.html'
+
+    def get(self, request):
+        return self.render_to_response({})
+
+    def post(self, request):
+
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+
+        if not (username or email):
+            messages.error(request, _('Provide either username or email address'))
+            return HttpResponseRedirect(reverse('admin-resend-activation'))
+
+        try:
+            user = UserProxy.objects.all().by_username_or_email(username, email)
+        except UserProxy.DoesNotExist:
+            messages.error(request, _('No user found'))
+            return HttpResponseRedirect(reverse('admin-resend-activation'))
+
+        if user.is_active:
+            messages.success(request, 'User {username} is already activated')
+
+        else:
+            send_activation_email(user, request)
+            messages.success(
+                request,
+                _(
+                    'Email for {username} ({email}) resent'.format(
+                        username=user.username, email=user.email
+                    )
+                ),
+            )
+
+        return HttpResponseRedirect(reverse('admin-resend-activation'))
 
 
 class MakePublisherInput(AdminView):
@@ -361,7 +397,9 @@ class MakePublisher(AdminView):
         try:
             user = User.objects.get(username__iexact=username)
         except User.DoesNotExist:
-            messages.error(request, 'User "{username}" not found'.format(username=username))
+            messages.error(
+                request, 'User "{username}" not found'.format(username=username)
+            )
             return HttpResponseRedirect(reverse('admin-make-publisher-input'))
 
         feeds = request.POST.get('feeds')
@@ -372,7 +410,9 @@ class MakePublisher(AdminView):
             try:
                 podcast = Podcast.objects.get(urls__url=feed)
             except Podcast.DoesNotExist:
-                messages.warning(request, 'Podcast with URL {feed} not found'.format(feed=feed))
+                messages.warning(
+                    request, 'Podcast with URL {feed} not found'.format(feed=feed)
+                )
                 continue
 
             podcasts.add(podcast)
@@ -384,27 +424,32 @@ class MakePublisher(AdminView):
         return HttpResponseRedirect(reverse('admin-make-publisher-result'))
 
     def set_publisher(self, request, user, podcasts):
-        created, existed = PublishedPodcast.objects.publish_podcasts(user,
-                                                                     podcasts)
-        messages.success(request,
-                         'Set publisher permissions for {created} podcasts; '
-                         '{existed} already existed'.format(created=created,
-                                                            existed=existed))
+        created, existed = PublishedPodcast.objects.publish_podcasts(user, podcasts)
+        messages.success(
+            request,
+            'Set publisher permissions for {created} podcasts; '
+            '{existed} already existed'.format(created=created, existed=existed),
+        )
         return created, existed
 
     def send_mail(self, request, user, podcasts):
         site = RequestSite(request)
-        msg = render_to_string('admin/make-publisher-mail.txt', {
+        msg = render_to_string(
+            'admin/make-publisher-mail.txt',
+            {
                 'user': user,
                 'podcasts': podcasts,
                 'support_url': settings.SUPPORT_URL,
                 'site': site,
             },
-            request=request)
+            request=request,
+        )
         subj = get_email_subject(site, _('Publisher Permissions'))
 
         user.email_user(subj, msg)
-        messages.success(request, 'Sent email to user "{username}"'.format(username=user.username))
+        messages.success(
+            request, 'Sent email to user "{username}"'.format(username=user.username)
+        )
 
 
 class MakePublisherResult(AdminView):

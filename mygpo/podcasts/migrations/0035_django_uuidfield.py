@@ -4,9 +4,7 @@ from django.db import models, migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('podcasts', '0034_episode_ordering'),
-    ]
+    dependencies = [('podcasts', '0034_episode_ordering')]
 
     operations = [
         migrations.AlterField(
@@ -15,14 +13,10 @@ class Migration(migrations.Migration):
             field=models.UUIDField(serialize=False, primary_key=True),
         ),
         migrations.AlterField(
-            model_name='mergeduuid',
-            name='object_id',
-            field=models.UUIDField(),
+            model_name='mergeduuid', name='object_id', field=models.UUIDField()
         ),
         migrations.AlterField(
-            model_name='mergeduuid',
-            name='uuid',
-            field=models.UUIDField(unique=True),
+            model_name='mergeduuid', name='uuid', field=models.UUIDField(unique=True)
         ),
         migrations.AlterField(
             model_name='podcast',
@@ -35,18 +29,12 @@ class Migration(migrations.Migration):
             field=models.UUIDField(serialize=False, primary_key=True),
         ),
         migrations.AlterField(
-            model_name='slug',
-            name='object_id',
-            field=models.UUIDField(),
+            model_name='slug', name='object_id', field=models.UUIDField()
         ),
         migrations.AlterField(
-            model_name='tag',
-            name='object_id',
-            field=models.UUIDField(),
+            model_name='tag', name='object_id', field=models.UUIDField()
         ),
         migrations.AlterField(
-            model_name='url',
-            name='object_id',
-            field=models.UUIDField(),
+            model_name='url', name='object_id', field=models.UUIDField()
         ),
     ]
