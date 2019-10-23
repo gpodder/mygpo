@@ -40,6 +40,7 @@ class SlugGenerator(object):
 
 class PodcastGroupSlugs(SlugGenerator):
     """ Generates slugs for Podcast Groups """
+
     pass
 
 

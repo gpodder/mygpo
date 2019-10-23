@@ -4,14 +4,11 @@ from django.db import models, migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('podcasts', '0031_podcast_max_episode_order'),
-    ]
+    dependencies = [('podcasts', '0031_podcast_max_episode_order')]
 
     operations = [
         migrations.AlterModelOptions(
-            name='episode',
-            options={'ordering': ['-released']},
+            name='episode', options={'ordering': ['-released']}
         ),
         migrations.AlterField(
             model_name='episode',

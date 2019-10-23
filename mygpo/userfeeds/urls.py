@@ -9,9 +9,9 @@ register_converter(converters.UsernameConverter, 'username')
 
 
 urlpatterns = [
-
-    path('user/<username:username>/favorites.xml',
+    path(
+        'user/<username:username>/favorites.xml',
         views.favorite_feed,
-        name='favorites-feed'),
-
+        name='favorites-feed',
+    )
 ]

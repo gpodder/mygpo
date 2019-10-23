@@ -7,9 +7,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('data', '0002_result_podcast_null'),
-    ]
+    dependencies = [('data', '0002_result_podcast_null')]
 
     operations = [
         migrations.AddField(
@@ -17,5 +15,5 @@ class Migration(migrations.Migration):
             name='podcast_url',
             field=models.URLField(default='unknown', max_length=2048),
             preserve_default=False,
-        ),
+        )
     ]

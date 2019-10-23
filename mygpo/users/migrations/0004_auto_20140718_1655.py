@@ -16,23 +16,30 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='SyncGroup',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('user', models.ForeignKey(
-                    to=settings.AUTH_USER_MODEL,
-                    on_delete=models.CASCADE,
-                )),
+                (
+                    'id',
+                    models.AutoField(
+                        verbose_name='ID',
+                        serialize=False,
+                        auto_created=True,
+                        primary_key=True,
+                    ),
+                ),
+                (
+                    'user',
+                    models.ForeignKey(
+                        to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+                    ),
+                ),
             ],
-            options={
-            },
+            options={},
             bases=(models.Model,),
         ),
         migrations.AddField(
             model_name='client',
             name='sync_group',
             field=models.ForeignKey(
-                to='users.SyncGroup',
-                null=True,
-                on_delete=models.CASCADE,
+                to='users.SyncGroup', null=True, on_delete=models.CASCADE
             ),
             preserve_default=True,
         ),

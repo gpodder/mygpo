@@ -39,16 +39,15 @@ def episode(request, episode):
 
     if user.is_authenticated:
 
-        is_fav = FavoriteEpisode.objects.filter(user=user, episode=episode)\
-                                        .exists()
+        is_fav = FavoriteEpisode.objects.filter(user=user, episode=episode).exists()
 
         # pre-populate data for fetch_data
         podcasts_dict = {podcast.get_id(): podcast}
         episodes_dict = {episode.id.hex: episode}
 
-        has_history = EpisodeHistoryEntry.objects.filter(user=user,
-                                                         episode=episode)\
-                                                 .exists()
+        has_history = EpisodeHistoryEntry.objects.filter(
+            user=user, episode=episode
+        ).exists()
 
         devices = {c.id.hex: c for c in user.client_set.all()}
 
@@ -59,20 +58,24 @@ def episode(request, episode):
 
     is_publisher = check_publisher_permission(user, podcast)
 
-    prev = None #podcast.get_episode_before(episode)
-    next = None #podcast.get_episode_after(episode)
+    prev = None  # podcast.get_episode_before(episode)
+    next = None  # podcast.get_episode_after(episode)
 
-    return render(request, 'episode.html', {
-        'episode': episode,
-        'podcast': podcast,
-        'prev': prev,
-        'next': next,
-        'has_history': has_history,
-        'is_favorite': is_fav,
-        'actions': EPISODE_ACTION_TYPES,
-        'devices': devices,
-        'is_publisher': is_publisher,
-    })
+    return render(
+        request,
+        'episode.html',
+        {
+            'episode': episode,
+            'podcast': podcast,
+            'prev': prev,
+            'next': next,
+            'has_history': has_history,
+            'is_favorite': is_fav,
+            'actions': EPISODE_ACTION_TYPES,
+            'devices': devices,
+            'is_publisher': is_publisher,
+        },
+    )
 
 
 @never_cache
@@ -85,24 +88,31 @@ def history(request, episode):
     user = request.user
     podcast = episode.podcast
 
-    history = EpisodeHistoryEntry.objects.filter(user=user,
-                                                 episode=episode,)\
-                                         .order_by('-timestamp')\
-                                         .prefetch_related('episode',
-                                                           'episode__slugs',
-                                                           'episode__podcast',
-                                                           'episode__podcast__slugs',
-                                                           'client')
+    history = (
+        EpisodeHistoryEntry.objects.filter(user=user, episode=episode)
+        .order_by('-timestamp')
+        .prefetch_related(
+            'episode',
+            'episode__slugs',
+            'episode__podcast',
+            'episode__podcast__slugs',
+            'client',
+        )
+    )
 
     clients = user.client_set.all()
 
-    return render(request, 'episode-history.html', {
-        'episode': episode,
-        'podcast': podcast,
-        'history': history,
-        'actions': EPISODE_ACTION_TYPES,
-        'clients': clients,
-    })
+    return render(
+        request,
+        'episode-history.html',
+        {
+            'episode': episode,
+            'podcast': podcast,
+            'history': history,
+            'actions': EPISODE_ACTION_TYPES,
+            'clients': clients,
+        },
+    )
 
 
 @never_cache
@@ -110,10 +120,7 @@ def history(request, episode):
 def toggle_favorite(request, episode):
     user = request.user
 
-    fav, created = FavoriteEpisode.objects.get_or_create(
-        user=user,
-        episode=episode,
-    )
+    fav, created = FavoriteEpisode.objects.get_or_create(user=user, episode=episode)
 
     # if the episode was already a favorite, remove it
     if not created:
@@ -121,7 +128,6 @@ def toggle_favorite(request, episode):
 
     podcast = episode.podcast
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
-
 
 
 @vary_on_cookie
@@ -142,13 +148,17 @@ def list_favorites(request):
 
     token = request.user.profile.favorite_feeds_token
 
-    return render(request, 'favorites.html', {
-        'episodes': favorites,
-        'feed_token': token,
-        'site': site,
-        'podcast': podcast,
-        'recently_listened': recently_listened,
-        })
+    return render(
+        request,
+        'favorites.html',
+        {
+            'episodes': favorites,
+            'feed_token': token,
+            'site': site,
+            'podcast': podcast,
+            'recently_listened': recently_listened,
+        },
+    )
 
 
 @never_cache
@@ -168,8 +178,7 @@ def add_action(request, episode):
     else:
         timestamp = datetime.utcnow()
 
-    EpisodeHistoryEntry.create_entry(user, episode, action_str, client,
-                                     timestamp)
+    EpisodeHistoryEntry.create_entry(user, episode, action_str, client, timestamp)
     podcast = episode.podcast
     return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
@@ -178,14 +187,12 @@ def add_action(request, episode):
 # a decorator queries the episode and passes the Id on to the
 # regular views
 
+
 def slug_decorator(f):
     @wraps(f)
     def _decorator(request, p_slug, e_slug, *args, **kwargs):
 
-        pquery = Podcast.objects.filter(
-            slugs__slug=p_slug,
-            slugs__scope='',
-        )
+        pquery = Podcast.objects.filter(slugs__slug=p_slug, slugs__scope='')
 
         try:
             podcast = pquery.prefetch_related('slugs').get()
@@ -193,9 +200,7 @@ def slug_decorator(f):
             raise Http404
 
         equery = Episode.objects.filter(
-            podcast = podcast,
-            slugs__slug=e_slug,
-            slugs__scope=podcast.id.hex,
+            podcast=podcast, slugs__slug=e_slug, slugs__scope=podcast.id.hex
         )
 
         try:
@@ -209,8 +214,7 @@ def slug_decorator(f):
 
         # redirect when Id or a merged (non-cannonical) slug is used
         if episode.slug and episode.slug != e_slug:
-            return HttpResponseRedirect(
-                    get_episode_link_target(episode, podcast))
+            return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
         return f(request, episode, *args, **kwargs)
 
@@ -222,8 +226,7 @@ def id_decorator(f):
     def _decorator(request, p_id, e_id, *args, **kwargs):
 
         try:
-            query = Episode.objects.filter(id=e_id,
-                                           podcast_id=p_id)
+            query = Episode.objects.filter(id=e_id, podcast_id=p_id)
             episode = query.select_related('podcast').get()
 
         except Episode.DoesNotExist:
@@ -232,21 +235,19 @@ def id_decorator(f):
         # redirect when Id or a merged (non-cannonical) slug is used
         if episode.slug and episode.slug != e_id:
             podcast = episode.podcast
-            return HttpResponseRedirect(
-                    get_episode_link_target(episode, podcast))
+            return HttpResponseRedirect(get_episode_link_target(episode, podcast))
 
         return f(request, episode, *args, **kwargs)
 
     return _decorator
 
 
-
-show_slug            = slug_decorator(episode)
+show_slug = slug_decorator(episode)
 toggle_favorite_slug = slug_decorator(toggle_favorite)
-add_action_slug      = slug_decorator(add_action)
+add_action_slug = slug_decorator(add_action)
 episode_history_slug = slug_decorator(history)
 
-show_id            = id_decorator(episode)
+show_id = id_decorator(episode)
 toggle_favorite_id = id_decorator(toggle_favorite)
-add_action_id      = id_decorator(add_action)
+add_action_id = id_decorator(add_action)
 episode_history_id = id_decorator(history)

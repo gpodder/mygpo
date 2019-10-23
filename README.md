@@ -4,6 +4,8 @@ mygpo - Source for gpodder.net
 mygpo is the website and webservice powering gpodder.net.
 
 
+[**Please note that this project is looking for a new maintainer**](https://github.com/gpodder/mygpo/blob/master/maintainer-needed.md)
+
 
 License
 -------

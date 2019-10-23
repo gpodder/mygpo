@@ -1,4 +1,3 @@
-
 from collections import Counter
 from datetime import datetime
 
@@ -10,6 +9,7 @@ from mygpo.podcasts.models import Podcast, Episode
 from mygpo.users.models import Client
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -28,14 +28,13 @@ class HistoryEntry(models.Model):
     # the timestamp at which the event happened
     timestamp = models.DateTimeField()
 
-
     # the podcast which was involved in the event
-    podcast = models.ForeignKey(Podcast, db_index=True,
-                                on_delete=models.CASCADE)
+    podcast = models.ForeignKey(Podcast, db_index=True, on_delete=models.CASCADE)
 
     # the user which caused / triggered the event
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, db_index=True,
-                             on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, db_index=True, on_delete=models.CASCADE
+    )
 
     # the client on / for which the event happened
     client = models.ForeignKey(Client, null=True, on_delete=models.CASCADE)
@@ -47,20 +46,14 @@ class HistoryEntry(models.Model):
     )
 
     class Meta:
-        index_together = [
-            ['user', 'client'],
-            ['user', 'podcast'],
-        ]
+        index_together = [['user', 'client'], ['user', 'podcast']]
 
         ordering = ['-timestamp']
 
         verbose_name_plural = "History Entries"
 
 
-SUBSCRIPTION_ACTIONS = (
-    HistoryEntry.SUBSCRIBE,
-    HistoryEntry.UNSUBSCRIBE,
-)
+SUBSCRIPTION_ACTIONS = (HistoryEntry.SUBSCRIBE, HistoryEntry.UNSUBSCRIBE)
 
 
 class EpisodeHistoryEntry(models.Model):
@@ -85,16 +78,17 @@ class EpisodeHistoryEntry(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     # the episode which was involved in the event
-    episode = models.ForeignKey(Episode, db_index=True, null=True,
-                                on_delete=models.CASCADE)
+    episode = models.ForeignKey(
+        Episode, db_index=True, null=True, on_delete=models.CASCADE
+    )
 
     # the user which caused / triggered the event
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, db_index=True,
-                             on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, db_index=True, on_delete=models.CASCADE
+    )
 
     # the client on / for which the event happened
-    client = models.ForeignKey(Client, null=True, blank=True,
-                               on_delete=models.CASCADE)
+    client = models.ForeignKey(Client, null=True, blank=True, on_delete=models.CASCADE)
 
     # the action that happened
     action = models.CharField(
@@ -118,21 +112,16 @@ class EpisodeHistoryEntry(models.Model):
     class Meta:
         index_together = [
             ['user', 'client', 'episode', 'action', 'timestamp'],
-
             # see query in played_episode_counts()
             ['user', 'action', 'episode'],
-
             ['user', 'episode', 'timestamp'],
-
             ['user', 'timestamp'],
-
             ['episode', 'timestamp'],
         ]
 
         ordering = ['-timestamp']
 
         verbose_name_plural = "Episode History Entries"
-
 
     def clean(self):
         """ Validates allowed combinations of time-values """
@@ -142,32 +131,48 @@ class EpisodeHistoryEntry(models.Model):
         if self.action != EpisodeHistoryEntry.PLAY:
             for key in PLAY_ACTION_KEYS:
                 if getattr(self, key, None) is not None:
-                    raise ValidationError(
-                        '%s only allowed in "play" entries' % key)
+                    raise ValidationError('%s only allowed in "play" entries' % key)
 
         # Sanity check: If started or total are given, require stopped
-        if ((self.started is not None) or (self.total is not None)) and \
-                self.stopped is None:
+        if (
+            (self.started is not None) or (self.total is not None)
+        ) and self.stopped is None:
             raise ValidationError('started and total require position')
 
         # Sanity check: total and playmark can only appear together
-        if ((self.total is not None) or (self.started is not None)) and \
-           ((self.total is None) or (self.started is None)):
+        if ((self.total is not None) or (self.started is not None)) and (
+            (self.total is None) or (self.started is None)
+        ):
             raise ValidationError('total and started can only appear together')
 
-
     @classmethod
-    def create_entry(cls, user, episode, action, client=None, timestamp=None,
-                     started=None, stopped=None, total=None,
-                     podcast_ref_url=None, episode_ref_url=None):
+    def create_entry(
+        cls,
+        user,
+        episode,
+        action,
+        client=None,
+        timestamp=None,
+        started=None,
+        stopped=None,
+        total=None,
+        podcast_ref_url=None,
+        episode_ref_url=None,
+    ):
 
-        exists = cls.objects.filter(user=user, episode=episode,
-                                    client=client, action=action,
-                                    started=started, stopped=stopped)\
-                            .exists()
+        exists = cls.objects.filter(
+            user=user,
+            episode=episode,
+            client=client,
+            action=action,
+            started=started,
+            stopped=stopped,
+        ).exists()
         if exists:
-            logger.warn('Trying to save duplicate {cls} for {user} '
-                '/ {episode}'.format(cls=cls, user=user, episode=episode))
+            logger.warn(
+                'Trying to save duplicate {cls} for {user} '
+                '/ {episode}'.format(cls=cls, user=user, episode=episode)
+            )
             # if such an entry already exists, do nothing
             return
 
@@ -202,6 +207,9 @@ class EpisodeHistoryEntry(models.Model):
             return entry
 
         except ValidationError as e:
-            logger.warn('Validation of {cls} failed for {user}: {err}'.format(
-                cls=cls, user=user, err=e))
+            logger.warn(
+                'Validation of {cls} failed for {user}: {err}'.format(
+                    cls=cls, user=user, err=e
+                )
+            )
             return None

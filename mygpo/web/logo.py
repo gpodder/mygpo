@@ -19,14 +19,13 @@ from django.core.files.storage import FileSystemStorage
 from mygpo.utils import file_hash
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 # Use Django's File Storage API to access podcast logos. This could be swapped
 # out for another storage implementation (eg for storing to Amazon S3)
 # https://docs.djangoproject.com/en/1.11/ref/files/storage/
-LOGO_STORAGE = FileSystemStorage(
-    location=settings.MEDIA_ROOT,
-)
+LOGO_STORAGE = FileSystemStorage(location=settings.MEDIA_ROOT)
 
 
 def _last_modified(request, size, prefix, filename):
@@ -41,7 +40,6 @@ def _last_modified(request, size, prefix, filename):
 
 
 class CoverArt(View):
-
     def __init__(self):
         self.storage = LOGO_STORAGE
 
@@ -68,8 +66,7 @@ class CoverArt(View):
             if im.mode not in ('RGB', 'RGBA'):
                 im = im.convert('RGBA')
         except IOError as ioe:
-            logger.warning('Cover file {} cannot be opened: {}'.format(
-                original, ioe))
+            logger.warning('Cover file {} cannot be opened: {}'.format(original, ioe))
             raise Http404('Cannot open cover file') from ioe
 
         try:
@@ -85,8 +82,7 @@ class CoverArt(View):
         sio = io.BytesIO()
 
         try:
-            resized.save(sio, 'JPEG', optimize=True, progression=True,
-                         quality=80)
+            resized.save(sio, 'JPEG', optimize=True, progression=True, quality=80)
         except IOError as ex:
             return self.send_file(original)
         finally:
@@ -106,7 +102,7 @@ class CoverArt(View):
 
     @staticmethod
     def remove_existing_thumbnails(prefix, filename):
-        dirs, _files = LOGO_STORAGE.listdir('logo') # TODO: cache list of sizes
+        dirs, _files = LOGO_STORAGE.listdir('logo')  # TODO: cache list of sizes
         for size in dirs:
             if size == 'original':
                 continue
@@ -159,8 +155,12 @@ class CoverArt(View):
 
             return cover_art_url
 
-        except (ValueError, requests.exceptions.RequestException,
-                socket.error, IOError) as e:
+        except (
+            ValueError,
+            requests.exceptions.RequestException,
+            socket.error,
+            IOError,
+        ) as e:
             logger.warning('Exception while updating podcast logo: %s', str(e))
 
 
@@ -180,5 +180,5 @@ def get_logo_url(podcast, size):
         return reverse('logo', args=[size, get_prefix(filename), filename])
 
     else:
-        filename = 'podcast-%d.png' % (hash(podcast.title) % 5, )
+        filename = 'podcast-%d.png' % (hash(podcast.title) % 5,)
         return staticfiles_storage.url('logo/{0}'.format(filename))

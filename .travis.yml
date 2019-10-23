@@ -1,37 +1,41 @@
 language: python
 
+dist: xenial
+
 python:
  - "3.6"
- - "3.6-dev"
- - "3.7-dev"
+ - "3.7"
+ - "3.8"
+ - "3.8-dev"
  - "nightly"
  - "pypy3"
 
+matrix:
+  allow_failures:
+  - python: 'pypy3'
+  - python: 'nightly'
+
 services:
  - redis-server
+ - postgresql
+
+addons:
+  postgresql: "10"
 
 install:
  - pip install -r requirements.txt -r requirements-test.txt
  - pip install coveralls
 
 before_script:
+  - psql -c "ALTER USER travis WITH PASSWORD 'travis';"
   - psql -c 'create database mygpo_test;' -U postgres
 
 script:
+  - make check-code-format
   - pytest --cov=mygpo/ --cov-branch
 
 after_script:
   - coveralls
 
 env:
- - DATABASE_URL="postgres://postgres@localhost/mygpo_test"
-
-sudo: false
-
-# temporarily allow failures on 3.7
-# see https://github.com/chtd/psycopg2cffi/issues/95
-matrix:
-  allow_failures:
-    - python: "3.7-dev"
-    - python: "nightly"
-
+ - DATABASE_URL="postgres://travis:travis@localhost/mygpo_test"

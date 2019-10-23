@@ -87,7 +87,7 @@
    <div class="well">
    <h4>{% trans "Client Access" %}</h4>
 
-    <p>Access <a href="{% url "toplist-opml" 30 "opml" %}">http://{{ view.site }}{% url "toplist-opml" 30 "opml" %}</a> for the Top-30.</p>
+    <p>Access <a href="{% url "api-simple-toplist" 30 "opml" %}">http://{{ view.site }}{% url "api-simple-toplist" 30 "opml" %}</a> for the Top-30.</p>
  </div>
 
 {% endblock %}

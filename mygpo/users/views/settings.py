@@ -33,28 +33,40 @@ def account(request):
         site = RequestSite(request)
         userpage_token = request.user.profile.get_token('userpage_token')
 
-        profile_form = ProfileForm({
-               'twitter': request.user.profile.twitter,
-               'about':   request.user.profile.about,
-            })
+        profile_form = ProfileForm(
+            {
+                'twitter': request.user.profile.twitter,
+                'about': request.user.profile.about,
+            }
+        )
 
-        form = UserAccountForm({
-            'email': request.user.email,
-            'public': request.user.profile.settings.get_wksetting(PUBLIC_SUB_USER)
-            })
+        form = UserAccountForm(
+            {
+                'email': request.user.email,
+                'public': request.user.profile.settings.get_wksetting(PUBLIC_SUB_USER),
+            }
+        )
 
-        return render(request, 'account.html', {
-            'site': site,
-            'form': form,
-            'profile_form': profile_form,
-            'userpage_token': userpage_token,
-            })
+        return render(
+            request,
+            'account.html',
+            {
+                'site': site,
+                'form': form,
+                'profile_form': profile_form,
+                'userpage_token': userpage_token,
+            },
+        )
 
     try:
         form = UserAccountForm(request.POST)
 
         if not form.is_valid():
-            raise ValueError(_('Oops! Something went wrong. Please double-check the data you entered.'))
+            raise ValueError(
+                _(
+                    'Oops! Something went wrong. Please double-check the data you entered.'
+                )
+            )
 
         if form.cleaned_data['password_current']:
             if not request.user.check_password(form.cleaned_data['password_current']):
@@ -75,9 +87,7 @@ def account(request):
     except (ValueError, ValidationError) as e:
         messages.error(request, str(e))
 
-    return render(request, 'account.html', {
-        'form': form,
-    })
+    return render(request, 'account.html', {'form': form})
 
 
 class ProfileView(View):
@@ -89,7 +99,11 @@ class ProfileView(View):
         form = ProfileForm(request.POST)
 
         if not form.is_valid():
-            raise ValueError(_('Oops! Something went wrong. Please double-check the data you entered.'))
+            raise ValueError(
+                _(
+                    'Oops! Something went wrong. Please double-check the data you entered.'
+                )
+            )
 
         request.user.twitter = normalize_twitter(form.cleaned_data['twitter'])
         request.user.about = strip_tags(form.cleaned_data['about'])
@@ -124,7 +138,6 @@ def delete_account(request):
     user.save()
     logout(request)
     return render(request, 'deleted_account.html')
-
 
 
 class DefaultPrivacySettings(View):
@@ -166,20 +179,25 @@ def privacy(request):
     site = RequestSite(request)
     user = request.user
 
-    podcasts = Podcast.objects.filter(subscription__user=user)\
-                              .distinct('pk')
+    podcasts = Podcast.objects.filter(subscription__user=user).distinct('pk')
     private = UserSettings.objects.get_private_podcasts(user)
 
     subscriptions = []
     for podcast in podcasts:
 
-        subscriptions.append( (podcast, podcast in private) )
+        subscriptions.append((podcast, podcast in private))
 
-    return render(request, 'privacy.html', {
-        'private_subscriptions': not request.user.profile.settings.get_wksetting(PUBLIC_SUB_USER),
-        'subscriptions': subscriptions,
-        'domain': site.domain,
-        })
+    return render(
+        request,
+        'privacy.html',
+        {
+            'private_subscriptions': not request.user.profile.settings.get_wksetting(
+                PUBLIC_SUB_USER
+            ),
+            'subscriptions': subscriptions,
+            'domain': site.domain,
+        },
+    )
 
 
 @vary_on_cookie
@@ -200,7 +218,4 @@ def share(request):
 
     token = user.profile.get_token('subscriptions_token')
 
-    return render(request, 'share.html', {
-        'site': site,
-        'token': token,
-        })
+    return render(request, 'share.html', {'site': site, 'token': token})

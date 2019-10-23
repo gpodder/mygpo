@@ -15,8 +15,8 @@ GRAVATAR_IMG = 'https://secure.gravatar.com/avatar/{hash_str}?s={size}'
 @mark_safe
 def gravatar_img(user):
     return '<img src="{url}" alt="{username}" />'.format(
-            url=gravatar_url(user),
-            username=user.username)
+        url=gravatar_url(user), username=user.username
+    )
 
 
 @register.simple_tag

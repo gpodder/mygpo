@@ -21,7 +21,7 @@ API_RESPONSE = {
                 'media': 'photo',
                 'height': 75,
                 'width': 75,
-                'label': 'Square'
+                'label': 'Square',
             },
             {
                 'source': MEDIUM_URL,
@@ -29,36 +29,38 @@ API_RESPONSE = {
                 'media': 'photo',
                 'height': '500',
                 'width': '333',
-                'label': 'Medium'
+                'label': 'Medium',
             },
         ],
         'candownload': 1,
-        'canprint': 0
-    }
+        'canprint': 0,
+    },
 }
 
-FLICKR_URL = re.compile('https://api.flickr.com/services/rest/\?method=flickr.photos.getSizes&api_key=.*photo_id=.*&format=json&nojsoncallback=1')
+FLICKR_URL = re.compile(
+    'https://api.flickr.com/services/rest/\?method=flickr.photos.getSizes&api_key=.*photo_id=.*&format=json&nojsoncallback=1'
+)
 
 
 class FlickrTests(TestCase):
-
     def test_get_sizes(self):
         with responses.RequestsMock() as rsps:
-            rsps.add(responses.GET, FLICKR_URL, status=200,
-                     body=json.dumps(API_RESPONSE))
+            rsps.add(
+                responses.GET, FLICKR_URL, status=200, body=json.dumps(API_RESPONSE)
+            )
 
             sizes = flickr.get_photo_sizes('1235123123')
 
         self.assertEquals(sizes, API_RESPONSE['sizes']['size'])
 
-
     def test_display_image(self):
         with responses.RequestsMock() as rsps:
-            rsps.add(responses.GET, FLICKR_URL, status=200,
-                     body=json.dumps(API_RESPONSE))
+            rsps.add(
+                responses.GET, FLICKR_URL, status=200, body=json.dumps(API_RESPONSE)
+            )
 
-            disp_photo = flickr.get_display_photo('https://farm9.staticflickr.com/8747/12346789012_bf1e234567_b.jpg')
+            disp_photo = flickr.get_display_photo(
+                'https://farm9.staticflickr.com/8747/12346789012_bf1e234567_b.jpg'
+            )
 
         self.assertEquals(disp_photo, MEDIUM_URL)
-
-

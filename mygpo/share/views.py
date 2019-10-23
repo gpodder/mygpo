@@ -14,6 +14,7 @@ from mygpo.userfeeds.feeds import FavoriteFeed
 from mygpo.data.feeddownloader import PodcastUpdater
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -37,9 +38,7 @@ class FavoritesPublic(View):
         return HttpResponseRedirect(reverse('share-favorites'))
 
 
-
 class ShareFavorites(View):
-
     @method_decorator(vary_on_cookie)
     @method_decorator(cache_control(private=True))
     @method_decorator(login_required)
@@ -54,11 +53,11 @@ class ShareFavorites(View):
 
         token = user.profile.favorite_feeds_token
 
-        return render(request, 'share/favorites.html', {
-            'feed_token': token,
-            'site': site,
-            'podcast': podcast,
-            })
+        return render(
+            request,
+            'share/favorites.html',
+            {'feed_token': token, 'site': site, 'podcast': podcast},
+        )
 
 
 class PublicSubscriptions(View):
@@ -95,10 +94,7 @@ class FavoritesFeedCreateEntry(View):
 
         podcast = Podcast.objects.get_or_create_for_url(feed_url).object
 
-        PublishedPodcast.objects.get_or_create(
-            podcast=podcast,
-            publisher=user,
-        )
+        PublishedPodcast.objects.get_or_create(podcast=podcast, publisher=user)
 
         updater = PodcastUpdater(feed_url)
         updater.update_podcast()
@@ -119,13 +115,17 @@ def overview(request):
     favfeed_url = favfeed.get_public_url(site.domain)
     favfeed_podcast = Podcast.objects.filter(urls__url=favfeed_url).first()
 
-    return render(request, 'share/overview.html', {
-        'site': site,
-        'subscriptions_token': subscriptions_token,
-        'userpage_token': userpage_token,
-        'favfeed_token': favfeed_token,
-        'favfeed_podcast': favfeed_podcast,
-        })
+    return render(
+        request,
+        'share/overview.html',
+        {
+            'site': site,
+            'subscriptions_token': subscriptions_token,
+            'userpage_token': userpage_token,
+            'favfeed_token': favfeed_token,
+            'favfeed_podcast': favfeed_podcast,
+        },
+    )
 
 
 @login_required

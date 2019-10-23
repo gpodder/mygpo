@@ -7,19 +7,14 @@ from django.conf import settings
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('podcasts', '0022_index_episode_listeners'),
-        ('auth', '__first__'),
-    ]
+    dependencies = [('podcasts', '0022_index_episode_listeners'), ('auth', '__first__')]
 
     operations = [
         migrations.AddField(
             model_name='tag',
             name='user',
             field=models.ForeignKey(
-                to=settings.AUTH_USER_MODEL,
-                null=True,
-                on_delete=models.CASCADE,
+                to=settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE
             ),
             preserve_default=True,
         ),
@@ -35,6 +30,8 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='tag',
-            unique_together=set([('tag', 'source', 'user', 'content_type', 'object_id')]),
+            unique_together=set(
+                [('tag', 'source', 'user', 'content_type', 'object_id')]
+            ),
         ),
     ]

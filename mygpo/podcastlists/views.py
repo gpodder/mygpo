@@ -21,6 +21,7 @@ from mygpo.votes.models import Vote
 from mygpo.directory.views import search as directory_search
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -46,8 +47,7 @@ def list_decorator(must_own=False):
 
 @list_decorator(must_own=False)
 def search(request, plist, owner):
-    return directory_search(request, 'list_search.html',
-            {'listname': plist.slug})
+    return directory_search(request, 'list_search.html', {'listname': plist.slug})
 
 
 @login_required
@@ -55,9 +55,7 @@ def lists_own(request):
 
     lists = PodcastList.objects.filter(user=request.user)
 
-    return render(request, 'lists.html', {
-            'lists': lists
-        })
+    return render(request, 'lists.html', {'lists': lists})
 
 
 def lists_user(request, username):
@@ -66,10 +64,7 @@ def lists_user(request, username):
     user = get_object_or_404(User, username=username)
     lists = PodcastList.objects.filter(user=user)
 
-    return render(request, 'lists_user.html', {
-            'lists': lists,
-            'user': user,
-        })
+    return render(request, 'lists_user.html', {'lists': lists, 'user': user})
 
 
 @list_decorator(must_own=False)
@@ -81,13 +76,17 @@ def list_show(request, plist, owner):
     objs = [entry.content_object for entry in plist.entries.all()]
     max_subscribers = max([p.subscriber_count() for p in objs] + [0])
 
-    return render(request, 'list.html', {
+    return render(
+        request,
+        'list.html',
+        {
             'podcastlist': plist,
             'max_subscribers': max_subscribers,
             'owner': owner,
             'domain': site.domain,
             'is_own': is_own,
-        })
+        },
+    )
 
 
 @list_decorator(must_own=False)
@@ -107,17 +106,11 @@ def create_list(request):
     slug = slugify(title)
 
     if not slug:
-        messages.error(request, _('"{title}" is not a valid title').format(
-                    title=title))
+        messages.error(request, _('"{title}" is not a valid title').format(title=title))
         return HttpResponseRedirect(reverse('lists-overview'))
 
     plist, created = PodcastList.objects.get_or_create(
-        user=request.user,
-        slug=slug,
-        defaults={
-            'id': uuid.uuid1(),
-            'title': title,
-        }
+        user=request.user, slug=slug, defaults={'id': uuid.uuid1(), 'title': title}
     )
 
     list_url = reverse('list-show', args=[request.user.username, slug])

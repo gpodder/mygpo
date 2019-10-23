@@ -13,9 +13,7 @@ def set_restriction(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('podcasts', '0015_auto_20140616_2126'),
-    ]
+    dependencies = [('podcasts', '0015_auto_20140616_2126')]
 
     operations = [
         migrations.RunPython(set_restriction),

@@ -174,7 +174,7 @@ table.list th.group i
 .summary
 {
     color: #222;
-    hypens: auto;
+    hyphens: auto;
     -webkit-hyphens: auto;
     -moz-hyphens: auto;
     -ms-hyphens: auto;

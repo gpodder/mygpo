@@ -17,22 +17,36 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='PodcastSuggestion',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                (
+                    'id',
+                    models.AutoField(
+                        verbose_name='ID',
+                        serialize=False,
+                        auto_created=True,
+                        primary_key=True,
+                    ),
+                ),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('modified', models.DateTimeField(auto_now=True)),
                 ('deleted', models.BooleanField(default=False)),
-                ('podcast', models.ForeignKey(to='podcasts.Podcast', on_delete=django.db.models.deletion.PROTECT)),
-                ('suggested_to', models.ForeignKey(
-                    to=settings.AUTH_USER_MODEL,
-                    on_delete=models.CASCADE,
-                )),
+                (
+                    'podcast',
+                    models.ForeignKey(
+                        to='podcasts.Podcast',
+                        on_delete=django.db.models.deletion.PROTECT,
+                    ),
+                ),
+                (
+                    'suggested_to',
+                    models.ForeignKey(
+                        to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+                    ),
+                ),
             ],
-            options={
-            },
+            options={},
             bases=(models.Model,),
         ),
         migrations.AlterUniqueTogether(
-            name='podcastsuggestion',
-            unique_together=set([('suggested_to', 'podcast')]),
+            name='podcastsuggestion', unique_together=set([('suggested_to', 'podcast')])
         ),
     ]

@@ -15,8 +15,7 @@ class UserAgentStats(object):
 
     def get_entries(self):
         if self._useragents is None:
-            result = Client.objects.values('user_agent')\
-                                   .annotate(Count('user_agent'))
+            result = Client.objects.values('user_agent').annotate(Count('user_agent'))
             result = {x['user_agent']: x['user_agent__count'] for x in result}
             self._useragents = Counter(result)
 
@@ -40,7 +39,9 @@ class UserAgentStats(object):
 
 
 # regular expressions for detecting a client application from a User-Agent
-RE_GPODROID = re.compile('GpodRoid ([0-9.]+) Mozilla/5.0 \(Linux; U; Android ([0-9a-z.-]+);')
+RE_GPODROID = re.compile(
+    'GpodRoid ([0-9.]+) Mozilla/5.0 \(Linux; U; Android ([0-9a-z.-]+);'
+)
 RE_GPODDER = re.compile('mygpoclient/([0-9.]+) \([^)]+\) gPodder/([0-9.]+)')
 RE_MYGPOCLIENT = re.compile('mygpoclient/([0-9.]+) \([^)]+\)')
 RE_CLEMENTINE = re.compile('Clementine ([0-9a-z.-]+)')
@@ -55,7 +56,6 @@ class ClientStats(UserAgentStats):
         self._clients = None
         super(ClientStats, self).__init__()
 
-
     def get_entries(self):
 
         if self._clients is None:
@@ -67,7 +67,6 @@ class ClientStats(UserAgentStats):
                 self._clients[client] += count
 
         return self._clients
-
 
     def parse_ua_string(self, ua_string):
 
@@ -93,6 +92,8 @@ class ClientStats(UserAgentStats):
 
         m = RE_GPNACCOUNT.search(ua_string)
         if m:
-            return Client(None, None, 'gpodder.net-account-android', None, 'android', None)
+            return Client(
+                None, None, 'gpodder.net-account-android', None, 'android', None
+            )
 
         return None

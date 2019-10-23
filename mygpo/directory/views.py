@@ -1,6 +1,3 @@
-
-
-
 from math import ceil
 from collections import Counter
 from datetime import datetime, timedelta
@@ -24,14 +21,21 @@ from django.contrib.auth import get_user_model
 
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.directory.search import search_podcasts
-from mygpo.web.utils import process_lang_params, get_language_names, \
-         get_page_list, get_podcast_link_target, sanitize_language_codes
+from mygpo.web.utils import (
+    process_lang_params,
+    get_language_names,
+    get_page_list,
+    get_podcast_link_target,
+    sanitize_language_codes,
+)
 from mygpo.directory.tags import Topics
 from mygpo.categories.models import Category
 from mygpo.podcastlists.models import PodcastList
-from mygpo.subscriptions.models import Subscription
-from mygpo.data.feeddownloader import (verify_podcast_url, NoEpisodesException,
-    UpdatePodcastException)
+from mygpo.data.feeddownloader import (
+    verify_podcast_url,
+    NoEpisodesException,
+    UpdatePodcastException,
+)
 from mygpo.data.tasks import update_podcasts
 
 
@@ -75,9 +79,11 @@ class PodcastToplistView(ToplistView):
     def get_context_data(self, num=100):
         context = super(PodcastToplistView, self).get_context_data()
 
-        entries = Podcast.objects.all()\
-                                 .prefetch_related('slugs')\
-                                 .toplist(self.language())[:num]
+        entries = (
+            Podcast.objects.all()
+            .prefetch_related('slugs')
+            .toplist(self.language())[:num]
+        )
         context['entries'] = entries
 
         context['max_subscribers'] = max([0] + [p.subscriber_count() for p in entries])
@@ -93,10 +99,12 @@ class EpisodeToplistView(ToplistView):
     def get_context_data(self, num=100):
         context = super(EpisodeToplistView, self).get_context_data()
 
-        entries = Episode.objects.all()\
-                                 .select_related('podcast')\
-                                 .prefetch_related('slugs', 'podcast__slugs')\
-                                 .toplist(self.language())[:num]
+        entries = (
+            Episode.objects.all()
+            .select_related('podcast')
+            .prefetch_related('slugs', 'podcast__slugs')
+            .toplist(self.language())[:num]
+        )
         context['entries'] = entries
 
         # Determine maximum listener amount (or 0 if no entries exist)
@@ -114,10 +122,14 @@ class Carousel(View):
     @method_decorator(vary_on_cookie)
     def get(self, request):
 
-        return render(request, 'carousel.html', {
-            # evaluated lazyly, cached by template
-            'topics': Topics(),
-            })
+        return render(
+            request,
+            'carousel.html',
+            {
+                # evaluated lazyly, cached by template
+                'topics': Topics()
+            },
+        )
 
 
 class Directory(View):
@@ -127,15 +139,17 @@ class Directory(View):
     @method_decorator(vary_on_cookie)
     def get(self, request):
 
-        return render(request, 'directory.html', {
-
-            # evaluated lazyly, cached by template
-            'topics': Topics(),
-            'podcastlists': self.get_random_list(),
-            'random_podcast': Podcast.objects.all().random().first(),
-            'podcast_ad': Podcast.objects.get_advertised_podcast(),
-            })
-
+        return render(
+            request,
+            'directory.html',
+            {
+                # evaluated lazyly, cached by template
+                'topics': Topics(),
+                'podcastlists': self.get_random_list(),
+                'random_podcast': Podcast.objects.all().random().first(),
+                'podcast_ad': Podcast.objects.get_advertised_podcast(),
+            },
+        )
 
     def get_random_list(self, podcasts_per_list=5):
         random_list = PodcastList.objects.order_by('?').first()
@@ -150,8 +164,7 @@ def category(request, category, page_size=20):
     except Category.DoesNotExist:
         return HttpResponseNotFound()
 
-    podcasts = category.entries.all()\
-                               .prefetch_related('podcast', 'podcast__slugs')
+    podcasts = category.entries.all().prefetch_related('podcast', 'podcast__slugs')
 
     paginator = Paginator(podcasts, page_size)
 
@@ -167,15 +180,15 @@ def category(request, category, page_size=20):
 
     page_list = get_page_list(1, paginator.num_pages, podcasts.number, 15)
 
-    return render(request, 'category.html', {
-        'entries': podcasts,
-        'category': category.title,
-        'page_list': page_list,
-        })
+    return render(
+        request,
+        'category.html',
+        {'entries': podcasts, 'category': category.title, 'page_list': page_list},
+    )
 
 
+RESULTS_PER_PAGE = 20
 
-RESULTS_PER_PAGE=20
 
 @cache_control(private=True)
 @vary_on_cookie
@@ -189,11 +202,11 @@ def search(request, template='search.html', args={}):
         except ValueError:
             page = 1
 
-        start = RESULTS_PER_PAGE*(page-1)
+        start = RESULTS_PER_PAGE * (page - 1)
         results = search_podcasts(q)
         total = len(results)
         num_pages = int(ceil(total / RESULTS_PER_PAGE))
-        results = results[start:start+RESULTS_PER_PAGE]
+        results = results[start : start + RESULTS_PER_PAGE]
 
         page_list = get_page_list(1, num_pages, page, 15)
 
@@ -206,24 +219,29 @@ def search(request, template='search.html', args={}):
 
     current_site = RequestSite(request)
 
-    return render(request, template, dict(
-            q= q,
-            results= results,
-            page_list= page_list,
-            max_subscribers= max_subscribers,
-            domain= current_site.domain,
-            **args
-            ))
-
+    return render(
+        request,
+        template,
+        dict(
+            q=q,
+            results=results,
+            page_list=page_list,
+            max_subscribers=max_subscribers,
+            domain=current_site.domain,
+            **args,
+        ),
+    )
 
 
 @cache_control(private=True)
 @vary_on_cookie
 def podcast_lists(request, page_size=20):
 
-    lists = PodcastList.objects.all()\
-                               .annotate(num_votes=Count('votes'))\
-                               .order_by('-num_votes')
+    lists = (
+        PodcastList.objects.all()
+        .annotate(num_votes=Count('votes'))
+        .order_by('-num_votes')
+    )
 
     paginator = Paginator(lists, page_size)
 
@@ -240,11 +258,9 @@ def podcast_lists(request, page_size=20):
     num_pages = int(ceil(PodcastList.objects.count() / float(page_size)))
     page_list = get_page_list(1, num_pages, int(page), 15)
 
-    return render(request, 'podcast_lists.html', {
-        'lists': lists,
-        'page_list': page_list,
-        })
-
+    return render(
+        request, 'podcast_lists.html', {'lists': lists, 'page_list': page_list}
+    )
 
 
 class MissingPodcast(View):
@@ -277,12 +293,11 @@ class MissingPodcast(View):
                     can_add = False
                     messages.error(request, str(ex))
 
-        return render(request, 'missing.html', {
-                'site': site,
-                'q': url,
-                'podcast': podcast,
-                'can_add': can_add,
-            })
+        return render(
+            request,
+            'missing.html',
+            {'site': site, 'q': url, 'podcast': podcast, 'can_add': can_add},
+        )
 
 
 class AddPodcast(View):
@@ -300,8 +315,7 @@ class AddPodcast(View):
 
         res = update_podcasts.delay([url])
 
-        return HttpResponseRedirect(reverse('add-podcast-status',
-                args=[res.task_id]))
+        return HttpResponseRedirect(reverse('add-podcast-status', args=[res.task_id]))
 
 
 class AddPodcastStatus(TemplateView):
@@ -313,9 +327,7 @@ class AddPodcastStatus(TemplateView):
         result = update_podcasts.AsyncResult(task_id)
 
         if not result.ready():
-            return self.render_to_response({
-                'ready': False,
-            })
+            return self.render_to_response({'ready': False})
 
         try:
             podcast_ids = result.get()
@@ -326,10 +338,7 @@ class AddPodcastStatus(TemplateView):
             messages.error(request, str(ex))
             podcast = None
 
-        return self.render_to_response({
-                'ready': True,
-                'podcasts': podcasts,
-            })
+        return self.render_to_response({'ready': True, 'podcasts': podcasts})
 
 
 class PodcastListView(ListView):
@@ -357,11 +366,9 @@ class PodcastListView(ListView):
     def page_list(self, page_size=15):
         """ Return a list of pages, eg [1, 2, 3, '...', 6, 7, 8] """
         page = self._page
-        return get_page_list(1,
-                             page.paginator.num_pages,
-                             page.number,
-                             page.paginator.per_page,
-                            )
+        return get_page_list(
+            1, page.paginator.num_pages, page.number, page.paginator.per_page
+        )
 
     def max_subscribers(self):
         """ Maximum subscribers of the podcasts on this page """
@@ -403,14 +410,18 @@ class TrendingPodcastsView(PodcastListView):
     template_name = 'directory/trending.html'
 
     def get_queryset(self):
-        starttime = datetime.utcnow()-timedelta(days=7)
+        starttime = datetime.utcnow() - timedelta(days=7)
         max_entries = 20
 
         podcasts = Podcast.objects.annotate(
-            subscriptions=Sum(Case(
-                When(subscription__created__gte=starttime, then=Value(1)),
-                default=Value(0),
-                output_field=IntegerField())))
+            subscriptions=Sum(
+                Case(
+                    When(subscription__created__gte=starttime, then=Value(1)),
+                    default=Value(0),
+                    output_field=IntegerField(),
+                )
+            )
+        )
 
         trending = podcasts.exclude(subscriptions__lt=1)
         trending = trending.order_by('-subscriptions')

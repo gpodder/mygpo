@@ -155,7 +155,7 @@
 <script type="text/javascript">
   function registerHandler()
   {
-    navigator.registerContentHandler("application/vnd.mozilla.maybe.feed",
+    navigator.registerProtocolHandler("application/vnd.mozilla.maybe.feed",
         document.location.protocol + "//{{ site.domain }}/subscribe?url=%s",
         "{{ site.domain }}");
   }

@@ -61,6 +61,7 @@ Search
 
 * ``ELASTICSEARCH_SERVER`` - ``host:port`` of the Elasticsearch server
 * ``ELASTICSEARCH_TIMEOUT`` - timeout in seconds for queries to the Elasticsearch server
+* ``QUERY_LENGTH_CUTOFF`` - Maximum non-whitespace length of search query
 
 
 Directory

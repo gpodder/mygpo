@@ -8,6 +8,7 @@ from mygpo.subscriptions.signals import subscription_changed
 from mygpo.utils import to_maxlength
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 # we cannot import models in __init__.py, because it gets loaded while all
@@ -96,10 +97,14 @@ def _perform_subscribe(podcast, user, clients, timestamp, ref_url):
                 # unknown error
                 raise
 
-        logger.info('{user} subscribed to {podcast} on {client}'.format(
-            user=user, podcast=podcast, client=client))
+        logger.info(
+            '{user} subscribed to {podcast} on {client}'.format(
+                user=user, podcast=podcast, client=client
+            )
+        )
 
         from mygpo.history.models import HistoryEntry
+
         HistoryEntry.objects.create(
             timestamp=timestamp,
             podcast=podcast,
@@ -118,23 +123,26 @@ def _perform_unsubscribe(podcast, user, clients, timestamp):
     the podcast was not subscribed. """
 
     from mygpo.subscriptions.models import Subscription
+
     for client in clients:
 
         try:
             subscription = Subscription.objects.get(
-                user=user,
-                client=client,
-                podcast=podcast,
+                user=user, client=client, podcast=podcast
             )
         except Subscription.DoesNotExist:
             continue
 
         subscription.delete()
 
-        logger.info('{user} unsubscribed from {podcast} on {client}'.format(
-            user=user, podcast=podcast, client=client))
+        logger.info(
+            '{user} unsubscribed from {podcast} on {client}'.format(
+                user=user, podcast=podcast, client=client
+            )
+        )
 
         from mygpo.history.models import HistoryEntry
+
         HistoryEntry.objects.create(
             timestamp=timestamp,
             podcast=podcast,
@@ -153,10 +161,12 @@ def get_subscribe_targets(podcast, user):
     subscribed """
 
     from mygpo.users.models import Client
-    clients = Client.objects.filter(user=user)\
-                            .exclude(subscription__podcast=podcast,
-                                     subscription__user=user)\
-                            .select_related('sync_group')
+
+    clients = (
+        Client.objects.filter(user=user)
+        .exclude(subscription__podcast=podcast, subscription__user=user)
+        .select_related('sync_group')
+    )
 
     targets = set()
     for client in clients:
@@ -176,10 +186,13 @@ def get_subscribed_podcasts(user, only_public=False):
 
     from mygpo.usersettings.models import UserSettings
     from mygpo.subscriptions.models import SubscribedPodcast, Subscription
-    subscriptions = Subscription.objects.filter(user=user)\
-                                        .order_by('podcast')\
-                                        .distinct('podcast')\
-                                        .select_related('podcast')
+
+    subscriptions = (
+        Subscription.objects.filter(user=user)
+        .order_by('podcast')
+        .distinct('podcast')
+        .select_related('podcast')
+    )
     private = UserSettings.objects.get_private_podcasts(user)
 
     podcasts = []
@@ -197,8 +210,9 @@ def get_subscribed_podcasts(user, only_public=False):
     return podcasts
 
 
-def get_subscription_history(user, client=None, since=None, until=None,
-                             public_only=False):
+def get_subscription_history(
+    user, client=None, since=None, until=None, public_only=False
+):
     """ Returns chronologically ordered subscription history entries
 
     Setting device_id restricts the actions to a certain device
@@ -206,10 +220,13 @@ def get_subscription_history(user, client=None, since=None, until=None,
 
     from mygpo.usersettings.models import UserSettings
     from mygpo.history.models import SUBSCRIPTION_ACTIONS, HistoryEntry
+
     logger.info('Subscription History for {user}'.format(user=user.username))
-    history = HistoryEntry.objects.filter(user=user)\
-                                  .filter(action__in=SUBSCRIPTION_ACTIONS)\
-                                  .order_by('timestamp')
+    history = (
+        HistoryEntry.objects.filter(user=user)
+        .filter(action__in=SUBSCRIPTION_ACTIONS)
+        .order_by('timestamp')
+    )
 
     if client:
         logger.info(u'... client {client_uid}'.format(client_uid=client.uid))
@@ -245,6 +262,7 @@ def get_subscription_change_history(history):
     """
 
     from mygpo.history.models import HistoryEntry
+
     subscriptions = collections.defaultdict(int)
 
     for entry in history:
@@ -267,6 +285,7 @@ def subscription_diff(history):
     """ Calculates a diff of subscriptions based on a history (sub/unsub) """
 
     from mygpo.history.models import HistoryEntry
+
     subscriptions = collections.defaultdict(int)
 
     for entry in history:
@@ -276,10 +295,8 @@ def subscription_diff(history):
         elif entry.action == HistoryEntry.UNSUBSCRIBE:
             subscriptions[entry.podcast] -= 1
 
-    subscribe = [podcast for (podcast, value) in
-                 subscriptions.items() if value > 0]
-    unsubscribe = [podcast for (podcast, value) in
-                   subscriptions.items() if value < 0]
+    subscribe = [podcast for (podcast, value) in subscriptions.items() if value > 0]
+    unsubscribe = [podcast for (podcast, value) in subscriptions.items() if value < 0]
 
     return subscribe, unsubscribe
 
@@ -298,6 +315,10 @@ def _affected_clients(client):
 def _fire_events(podcast, user, clients, subscribed):
     """ Fire the events for subscription / unsubscription """
     for client in clients:
-        subscription_changed.send(sender=podcast.__class__, instance=podcast,
-                                  user=user, client=client,
-                                  subscribed=subscribed)
+        subscription_changed.send(
+            sender=podcast.__class__,
+            instance=podcast,
+            user=user,
+            client=client,
+            subscribed=subscribed,
+        )
