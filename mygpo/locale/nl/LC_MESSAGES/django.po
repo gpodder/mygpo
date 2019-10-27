@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-12 20:10+0000\n"
+"POT-Creation-Date: 2019-10-27 12:14+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Heimen Stoffels <vistausss@outlook.com>, 2018\n"
 "Language-Team: Dutch (Netherlands) (https://www.transifex.com/yaron/"
@@ -338,21 +338,21 @@ msgstr "geabonneerd"
 msgid "unsubscribed"
 msgstr "gedeabonneerd"
 
-#: mygpo/api/simple.py:58 mygpo/api/simple.py:93
+#: mygpo/api/simple.py:57 mygpo/api/simple.py:92
 #, python-format
 msgid "%(username)s's Subscription List"
 msgstr "%(username)s's abonnementenlijst"
 
-#: mygpo/api/simple.py:262
+#: mygpo/api/simple.py:258
 #, python-format
 msgid "gpodder.net - Top %(count)d"
 msgstr "gpodder.net - Top %(count)d"
 
-#: mygpo/api/simple.py:298
+#: mygpo/api/simple.py:294
 msgid "gpodder.net - Search"
 msgstr "gpodder.net - Zoeken"
 
-#: mygpo/api/simple.py:324
+#: mygpo/api/simple.py:320
 #, python-format
 msgid "gpodder.net - %(count)d Suggestions"
 msgstr "gpodder.net - %(count)d suggesties"
@@ -1152,7 +1152,19 @@ msgstr ""
 "informatie vinden over door jou gepubliceerde podcasts."
 
 #: mygpo/publisher/templates/publisher/info.html:30
-#, python-format
+#, fuzzy, python-format
+#| msgid ""
+#| "The Publisher Pages are currently in Beta, but if you are publishing a "
+#| "podcast listed on %(sitename)s, feel free to apply by sending a mail "
+#| "with\n"
+#| "  <ul>\n"
+#| "   <li>your username on %(sitename)s (<a href=\"%(register-url)s"
+#| "\">register if you don't have one</a>)</li>\n"
+#| "   <li>the name and URL of the podcast you are publishing</li>\n"
+#| "   <li>an email address that is visible somewhere on the podcast's "
+#| "website (to legitimate you)\n"
+#| "  </ul>\n"
+#| "  to <a href=\"mailto:stefan@gpodder.net\">stefan@gpodder.net</a>."
 msgid ""
 "The Publisher Pages are currently in Beta, but if you are publishing a "
 "podcast listed on %(sitename)s, feel free to apply by sending a mail with\n"
@@ -1163,7 +1175,7 @@ msgid ""
 "   <li>an email address that is visible somewhere on the podcast's website "
 "(to legitimate you)\n"
 "  </ul>\n"
-"  to <a href=\"mailto:stefan@gpodder.net\">stefan@gpodder.net</a>."
+"  to <a href=\"mailto:support@gpodder.net\">support@gpodder.net</a>."
 msgstr ""
 "De uitgeverspagina's bevinden zich momenteel in een bèta-stadium, maar als "
 "je een podcast publiceert die genoemd wordt op %(sitename)s, dan kun je een "
@@ -1766,7 +1778,7 @@ msgstr "Je account is geactiveerd; je kunt nu inloggen."
 msgid "Either username or email address are required."
 msgstr "Je gebruikersnaam of e-mailadres is vereist."
 
-#: mygpo/users/views/registration.py:197 mygpo/users/views/user.py:131
+#: mygpo/users/views/registration.py:197 mygpo/users/views/user.py:134
 msgid "User does not exist."
 msgstr "Account bestaat niet."
 
@@ -1794,22 +1806,22 @@ msgstr "Wachtwoord ontbreekt"
 msgid "Wrong username or password."
 msgstr "Onjuiste gebruikersnaam of wachtwoord."
 
-#: mygpo/users/views/user.py:93 mygpo/users/views/user.py:139
+#: mygpo/users/views/user.py:93 mygpo/users/views/user.py:142
 msgid ""
 "Please activate your account first. We have just re-sent your activation "
 "email"
 msgstr ""
 "Activeer eerst je account. We hebben je activatie-e-mail opnieuw verstuurd."
 
-#: mygpo/users/views/user.py:172 mygpo/users/views/user.py:177
+#: mygpo/users/views/user.py:175 mygpo/users/views/user.py:180
 msgid "Login failed."
 msgstr "Inloggen mislukt."
 
-#: mygpo/users/views/user.py:185
+#: mygpo/users/views/user.py:188
 msgid "Login with Google is currently not possible."
 msgstr "Inloggen met Google is momenteel niet mogelijk."
 
-#: mygpo/users/views/user.py:198
+#: mygpo/users/views/user.py:201
 #, python-brace-format
 msgid ""
 "Your account has been connected with {google}. Open Settings to change this."
@@ -1817,7 +1829,7 @@ msgstr ""
 "Je account is gekoppeld aan {google}. Open de instellingen om dit te "
 "wijzigen."
 
-#: mygpo/users/views/user.py:214
+#: mygpo/users/views/user.py:217
 #, python-format
 msgid ""
 "No account connected with your Google account %s. Please log in to connect."
@@ -2752,21 +2764,21 @@ msgstr "{h}h {m}m {s}s"
 msgid "{m}m {s}s"
 msgstr "{h}h {m}m {s}s"
 
-#: mygpo/web/utils.py:285
+#: mygpo/web/utils.py:297
 #, python-format
 msgid "%(weeks)d week"
 msgid_plural "%(weeks)d weeks"
 msgstr[0] "%(weeks)d week"
 msgstr[1] "%(weeks)d weken"
 
-#: mygpo/web/utils.py:289
+#: mygpo/web/utils.py:301
 #, python-format
 msgid "%(days)d day"
 msgid_plural "%(days)d days"
 msgstr[0] "%(days)d dag"
 msgstr[1] "%(days)d dagen"
 
-#: mygpo/web/utils.py:293
+#: mygpo/web/utils.py:305
 #, python-format
 msgid "%(hours)d hour"
 msgid_plural "%(hours)d hours"
