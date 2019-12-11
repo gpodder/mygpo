@@ -10,6 +10,7 @@ development version from the repository.
 
 * Python >= 3.5
 * PostgreSQL
+* Redis
 
 
 Basic setup
