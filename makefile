@@ -35,7 +35,7 @@ clean:
 
 install-deps:
 	sudo apt-get install libpq-dev libjpeg-dev zlib1g-dev libwebp-dev \
-		build-essential python3-dev virtualenv libffi-dev
+		build-essential python3-dev virtualenv libffi-dev redis
 
 format-code:
 	black --target-version py36 --skip-string-normalization mygpo/
