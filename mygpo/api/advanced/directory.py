@@ -135,6 +135,8 @@ def episode_data(episode, domain, podcast=None):
 
     if episode.released:
         data['released'] = episode.released.strftime('%Y-%m-%dT%H:%M:%S')
+    else:
+        data['released'] = ''
 
     return data
 
