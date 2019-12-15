@@ -66,7 +66,7 @@ For a development configuration you will probably want to use the following
     mkdir -p /tmp/mygpo-test-media
     echo /tmp/mygpo-test-media > envs/dev/MEDIA_ROOT
 
-On an Debian/Ubuntu based system, you can perform this configuration with
+You can perform this configuration with
 
 .. code-block:: bash
 
