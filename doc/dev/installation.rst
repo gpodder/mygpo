@@ -16,7 +16,7 @@ development version from the repository.
 Basic setup
 -----------
 
-On an Debian/Ubuntu based system, you can install dependencies with
+On a Debian/Ubuntu based system, you can install dependencies with
 
 .. code-block:: bash
 
