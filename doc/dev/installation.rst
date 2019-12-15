@@ -84,7 +84,6 @@ First run the commands from :ref:`db-setup`. Then
 
 .. code-block:: bash
 
-    cd mygpo
     envdir envs/dev python manage.py migrate
 
 ..and here we go:
@@ -145,7 +144,6 @@ To set a user as publisher for a given feed URL, use:
 
 .. code-block:: bash
 
-    cd mygpo
     envdir envs/dev python manage.py make-publisher <username> <feed-url> [...]
 
 
