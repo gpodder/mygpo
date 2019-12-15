@@ -16,7 +16,7 @@ development version from the repository.
 Basic setup
 -----------
 
-On an Debian/Ubuntu based system, you can install dependencies with
+On a Debian/Ubuntu based system, you can install dependencies with
 
 .. code-block:: bash
 
@@ -66,7 +66,7 @@ For a development configuration you will probably want to use the following
     mkdir -p /tmp/mygpo-test-media
     echo /tmp/mygpo-test-media > envs/dev/MEDIA_ROOT
 
-On an Debian/Ubuntu based system, you can perform this configuration with
+You can perform this configuration with
 
 .. code-block:: bash
 
@@ -84,7 +84,6 @@ First run the commands from :ref:`db-setup`. Then
 
 .. code-block:: bash
 
-    cd mygpo
     envdir envs/dev python manage.py migrate
 
 ..and here we go:
@@ -145,7 +144,6 @@ To set a user as publisher for a given feed URL, use:
 
 .. code-block:: bash
 
-    cd mygpo
     envdir envs/dev python manage.py make-publisher <username> <feed-url> [...]
 
 
