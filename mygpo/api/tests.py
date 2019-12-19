@@ -2,6 +2,7 @@ import copy
 from datetime import datetime, timedelta
 import json
 import unittest
+import unittest.mock
 from urllib.parse import urlencode
 
 from django.test.client import Client
