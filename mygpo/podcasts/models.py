@@ -550,7 +550,9 @@ class Podcast(
     """ A Podcast """
 
     logo_url = models.URLField(null=True, max_length=1000)
-    group = models.ForeignKey(PodcastGroup, null=True, blank=True, on_delete=models.PROTECT)
+    group = models.ForeignKey(
+        PodcastGroup, null=True, blank=True, on_delete=models.PROTECT
+    )
     group_member_name = models.CharField(max_length=30, null=True, blank=True)
 
     # if p1 is related to p2, p2 is also related to p1

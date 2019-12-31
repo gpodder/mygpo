@@ -13,17 +13,23 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='episode',
             name='flattr_url',
-            field=models.URLField(blank=True, db_index=True, max_length=1000, null=True),
+            field=models.URLField(
+                blank=True, db_index=True, max_length=1000, null=True
+            ),
         ),
         migrations.AlterField(
             model_name='episode',
             name='license',
-            field=models.CharField(blank=True, db_index=True, max_length=100, null=True),
+            field=models.CharField(
+                blank=True, db_index=True, max_length=100, null=True
+            ),
         ),
         migrations.AlterField(
             model_name='podcast',
             name='flattr_url',
-            field=models.URLField(blank=True, db_index=True, max_length=1000, null=True),
+            field=models.URLField(
+                blank=True, db_index=True, max_length=1000, null=True
+            ),
         ),
         migrations.AlterField(
             model_name='podcast',
@@ -38,7 +44,9 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='podcast',
             name='license',
-            field=models.CharField(blank=True, db_index=True, max_length=100, null=True),
+            field=models.CharField(
+                blank=True, db_index=True, max_length=100, null=True
+            ),
         ),
         migrations.AlterField(
             model_name='podcast',
@@ -48,7 +56,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='podcast',
             name='related_podcasts',
-            field=models.ManyToManyField(blank=True, related_name='_podcast_related_podcasts_+', to='podcasts.Podcast'),
+            field=models.ManyToManyField(
+                blank=True,
+                related_name='_podcast_related_podcasts_+',
+                to='podcasts.Podcast',
+            ),
         ),
         migrations.AlterField(
             model_name='podcast',
