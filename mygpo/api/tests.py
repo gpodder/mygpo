@@ -300,9 +300,7 @@ class SimpleAPITests(unittest.TestCase):
         self.toplist_urls = dict(
             (fmt, self.get_toplist_url(fmt)) for fmt in self.formats
         )
-        self.search_urls = dict(
-            (fmt, self.get_search_url(fmt)) for fmt in self.formats
-        )
+        self.search_urls = dict((fmt, self.get_search_url(fmt)) for fmt in self.formats)
 
     def tearDown(self):
         self.user.delete()
@@ -319,6 +317,7 @@ class SimpleAPITests(unittest.TestCase):
                 'device_uid': self.device_uid,
             },
         )
+
     def get_search_url(self, fmt):
         return reverse('api-simple-search', kwargs={'format': fmt})
 
@@ -425,7 +424,8 @@ class SimpleAPITests(unittest.TestCase):
         expected_content = b'scale_logo has to be a numeric value'
 
         self._test_response_for_data(
-            self.search_urls['json'], data, expected_status, expected_content)
+            self.search_urls['json'], data, expected_status, expected_content
+        )
 
     def test_search_scale_out_of_range(self):
         data = {'scale_logo': 3000}
@@ -433,7 +433,8 @@ class SimpleAPITests(unittest.TestCase):
         expected_content = b'scale_logo has to be a number from 1 to 256'
 
         self._test_response_for_data(
-            self.search_urls['opml'], data, expected_status, expected_content)
+            self.search_urls['opml'], data, expected_status, expected_content
+        )
 
     def test_search_no_query(self):
         data = {'scale_logo': 1}
@@ -441,11 +442,12 @@ class SimpleAPITests(unittest.TestCase):
         expected_content = b'/search.opml|txt|json?q={query}'
 
         self._test_response_for_data(
-            self.search_urls['opml'], data, expected_status, expected_content)
+            self.search_urls['opml'], data, expected_status, expected_content
+        )
 
     def test_search_valid_query_status(self):
         data = {'scale_logo': 1, 'q': 'foo'}
-        expected_status = 200;
+        expected_status = 200
 
         response = self.client.get(self.search_urls['json'], data)
         self.assertEqual(response.status_code, expected_status)

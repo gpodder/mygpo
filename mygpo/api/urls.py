@@ -23,11 +23,7 @@ urlpatterns = [
         simple.all_subscriptions,
         name='api-all-subscriptions',
     ),
-    path(
-        'search.<str:format>',
-        simple.search,
-        name='api-simple-search',
-    ),
+    path('search.<str:format>', simple.search, name='api-simple-search',),
     path(
         'suggestions/<int:count>.<str:format>',
         simple.suggestions,
