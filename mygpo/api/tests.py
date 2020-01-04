@@ -442,3 +442,10 @@ class SimpleAPITests(unittest.TestCase):
 
         self._test_response_for_data(
             self.search_urls['opml'], data, expected_status, expected_content)
+
+    def test_search_valid_query_status(self):
+        data = {'scale_logo': 1, 'q': 'foo'}
+        expected_status = 200;
+
+        response = self.client.get(self.search_urls['json'], data)
+        self.assertEqual(response.status_code, expected_status)
