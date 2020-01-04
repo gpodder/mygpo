@@ -300,6 +300,9 @@ class SimpleAPITests(unittest.TestCase):
         self.toplist_urls = dict(
             (fmt, self.get_toplist_url(fmt)) for fmt in self.formats
         )
+        self.search_urls = dict(
+            (fmt, self.get_search_url(fmt)) for fmt in self.formats
+        )
 
     def tearDown(self):
         self.user.delete()
@@ -316,6 +319,13 @@ class SimpleAPITests(unittest.TestCase):
                 'device_uid': self.device_uid,
             },
         )
+    def get_search_url(self, fmt):
+        return reverse('api-simple-search', kwargs={'format': fmt})
+
+    def _test_response_for_data(self, url, data, status_code, content):
+        response = self.client.get(url, data)
+        self.assertEqual(response.status_code, status_code)
+        self.assertEqual(response.content, content)
 
     def test_get_subscriptions_empty(self):
         testers = {
@@ -408,3 +418,27 @@ class SimpleAPITests(unittest.TestCase):
     def test_get_toplist_valid_empty(self):
         response = self.client.get(self.toplist_urls['json'], **self.extra)
         self.assertEqual(response.status_code, 200, response.content)
+
+    def test_search_non_numeric_scale_logo(self):
+        data = {'scale_logo': 'a'}
+        expected_status = 400
+        expected_content = b'scale_logo has to be a numeric value'
+
+        self._test_response_for_data(
+            self.search_urls['json'], data, expected_status, expected_content)
+
+    def test_search_scale_out_of_range(self):
+        data = {'scale_logo': 3000}
+        expected_status = 400
+        expected_content = b'scale_logo has to be a number from 1 to 256'
+
+        self._test_response_for_data(
+            self.search_urls['opml'], data, expected_status, expected_content)
+
+    def test_search_no_query(self):
+        data = {'scale_logo': 1}
+        expected_status = 400
+        expected_content = b'/search.opml|txt|json?q={query}'
+
+        self._test_response_for_data(
+            self.search_urls['opml'], data, expected_status, expected_content)
