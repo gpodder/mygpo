@@ -74,7 +74,7 @@ class LinkModel(models.Model):
 class LanguageModel(models.Model):
     """ Model that has a language """
 
-    language = models.CharField(max_length=10, null=True, blank=False, db_index=True)
+    language = models.CharField(max_length=10, null=True, blank=True, db_index=True)
 
     class Meta:
         abstract = True
@@ -86,7 +86,7 @@ class LastUpdateModel(models.Model):
     # date and time at which the model has last been updated from its source
     # (eg a podcast feed). None means that the object has been created as a
     # stub, without information from the source.
-    last_update = models.DateTimeField(null=True)
+    last_update = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         abstract = True
@@ -94,7 +94,7 @@ class LastUpdateModel(models.Model):
 
 class LicenseModel(models.Model):
     # URL to a license (usually Creative Commons)
-    license = models.CharField(max_length=100, null=True, blank=False, db_index=True)
+    license = models.CharField(max_length=100, null=True, blank=True, db_index=True)
 
     class Meta:
         abstract = True
@@ -102,7 +102,7 @@ class LicenseModel(models.Model):
 
 class FlattrModel(models.Model):
     # A Flattr payment URL
-    flattr_url = models.URLField(null=True, blank=False, max_length=1000, db_index=True)
+    flattr_url = models.URLField(null=True, blank=True, max_length=1000, db_index=True)
 
     class Meta:
         abstract = True
@@ -550,8 +550,10 @@ class Podcast(
     """ A Podcast """
 
     logo_url = models.URLField(null=True, max_length=1000)
-    group = models.ForeignKey(PodcastGroup, null=True, on_delete=models.PROTECT)
-    group_member_name = models.CharField(max_length=30, null=True, blank=False)
+    group = models.ForeignKey(
+        PodcastGroup, null=True, blank=True, on_delete=models.PROTECT
+    )
+    group_member_name = models.CharField(max_length=30, null=True, blank=True)
 
     # if p1 is related to p2, p2 is also related to p1
     related_podcasts = models.ManyToManyField('self', symmetrical=True, blank=True)
@@ -559,9 +561,9 @@ class Podcast(
     subscribers = models.PositiveIntegerField(default=0)
     restrictions = models.CharField(max_length=20, null=False, blank=True, default='')
     common_episode_title = models.CharField(max_length=100, null=False, blank=True)
-    new_location = models.URLField(max_length=1000, null=True, blank=False)
-    latest_episode_timestamp = models.DateTimeField(null=True)
-    episode_count = models.PositiveIntegerField(default=0)
+    new_location = models.URLField(max_length=1000, null=True, blank=True)
+    latest_episode_timestamp = models.DateTimeField(null=True, blank=True)
+    episode_count = models.PositiveIntegerField(default=0, blank=True)
     hub = models.URLField(null=True, blank=True)
 
     # Interval between episodes, within a specified range
@@ -574,7 +576,7 @@ class Podcast(
     update_interval_factor = models.FloatField(default=1)
 
     # "order" value of the most recent episode (will be the highest of all)
-    max_episode_order = models.PositiveIntegerField(null=True, default=None)
+    max_episode_order = models.PositiveIntegerField(null=True, blank=True, default=None)
 
     # indicates whether the search index is up-to-date (or needs updating)
     search_index_uptodate = models.BooleanField(default=False, db_index=True)
