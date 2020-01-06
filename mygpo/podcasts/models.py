@@ -5,7 +5,7 @@ from datetime import timedelta
 
 from django.core.cache import cache
 from django.conf import settings
-from django.db import models, transaction, IntegrityError
+from django.db import models, transaction, IntegrityError, DataError
 from django.db.models import F
 from django.utils.translation import ugettext as _
 from django.contrib.contenttypes.models import ContentType
@@ -474,7 +474,7 @@ class UrlsMixin(models.Model):
                     url=url, order=next_order, scope=self.scope, content_object=self
                 )
                 next_order += 1
-            except IntegrityError as ie:
+            except (IntegrityError, DataError) as ie:
                 err = str(ie)
                 logger.warn(u'Could not add URL: {0}'.format(err))
                 continue

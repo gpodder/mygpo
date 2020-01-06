@@ -4,7 +4,7 @@ bind = "unix:/tmp/mygpo.sock"
 workers = multiprocessing.cpu_count()
 
 # The maximum number of requests a worker will process before restarting.
-max_requests = 1000
+# max_requests = 1000
 
 errorlog='/var/log/gunicorn/error.log'
 accesslog='/var/log/gunicorn/access.log'

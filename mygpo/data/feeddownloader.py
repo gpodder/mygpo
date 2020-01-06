@@ -162,7 +162,7 @@ class PodcastUpdater(object):
         except ValueError:
             logger.exception(
                 'Feed-service error while parsing response for url "%s": %s',
-                podcast_url,
+                self.podcast_url,
                 r.text,
             )
             raise

@@ -87,7 +87,10 @@ def episodes(request, username, version=1):
         )
 
         # handle in background
-        if len(actions) > dsettings.API_ACTIONS_MAX_NONBG:
+        if (
+            dsettings.API_ACTIONS_MAX_NONBG is not None
+            and len(actions) > dsettings.API_ACTIONS_MAX_NONBG
+        ):
             bg_handler = dsettings.API_ACTIONS_BG_HANDLER
             if bg_handler is not None:
 

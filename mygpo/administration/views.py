@@ -144,7 +144,9 @@ class MergeVerify(MergeBase):
 
             grouper = PodcastGrouper(podcasts)
 
-            get_features = lambda id_e: ((id_e[1].url, id_e[1].title), id_e[0])
+            def get_features(id_id):
+                e = Episode.objects.get(pk=id_id[0])
+                return ((e.url, e.title), id_id[0])
 
             num_groups = grouper.group(get_features)
 
