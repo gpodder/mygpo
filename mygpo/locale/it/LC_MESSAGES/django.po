@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-27 20:48+0000\n"
+"POT-Creation-Date: 2020-01-09 22:43+0000\n"
 "PO-Revision-Date: 2018-10-28 18:17+0000\n"
 "Last-Translator: Enrico B. <enricobe@hotmail.com>, 2018\n"
 "Language-Team: Italian (https://www.transifex.com/gpoddernet/teams/93001/"
@@ -158,7 +158,7 @@ msgstr ""
 #: mygpo/administration/templates/admin/make-publisher-input.html:12
 #: mygpo/administration/templates/admin/make-publisher-result.html:9
 #: mygpo/administration/templates/admin/make-publisher-result.html:12
-#: mygpo/administration/views.py:447
+#: mygpo/administration/views.py:449
 msgid "Publisher Permissions"
 msgstr "Permessi di pubblicazione"
 
@@ -285,25 +285,25 @@ msgstr "Aggiorna"
 msgid "User-Agent"
 msgstr "User-Agent"
 
-#: mygpo/administration/views.py:152 mygpo/administration/views.py:170
+#: mygpo/administration/views.py:154 mygpo/administration/views.py:172
 #, python-brace-format
 msgid "No podcast with URL {url}"
 msgstr "Nessun podcast con l'URL {url}"
 
-#: mygpo/administration/views.py:321 mygpo/administration/views.py:356
+#: mygpo/administration/views.py:323 mygpo/administration/views.py:358
 msgid "Provide either username or email address"
 msgstr "Inserisci username o indirizzo email"
 
-#: mygpo/administration/views.py:327 mygpo/administration/views.py:362
+#: mygpo/administration/views.py:329 mygpo/administration/views.py:364
 msgid "No user found"
 msgstr "Nessun utente trovato"
 
-#: mygpo/administration/views.py:334
+#: mygpo/administration/views.py:336
 #, python-brace-format
 msgid "User {username} ({email}) activated"
 msgstr "Utente {username} ({email}) attivato"
 
-#: mygpo/administration/views.py:373
+#: mygpo/administration/views.py:375
 #, python-brace-format
 msgid "Email for {username} ({email}) resent"
 msgstr "Email per {username} ({email}) reinviata"
@@ -801,11 +801,11 @@ msgstr "Grazie per la valutazione!"
 msgid "Edit"
 msgstr "Modifica"
 
-#: mygpo/podcasts/models.py:695
+#: mygpo/podcasts/models.py:697
 msgid "Unknown Podcast"
 msgstr "Podcast sconosciuto"
 
-#: mygpo/podcasts/models.py:698
+#: mygpo/podcasts/models.py:700
 #, python-brace-format
 msgid "Unknown Podcast from {domain}"
 msgstr "Podcast sconosciuto da {domain}"
@@ -2067,17 +2067,9 @@ msgstr ""
 
 #: mygpo/web/templates/contribute.html:23
 msgid ""
-"If you want to support gpodder.net financially, you can donate via PayPal to "
-"stefan@skoegl.net. You can also send a book via Amazon (<a href=\"http://www."
-"amazon.de/wishlist/24H4ORJ0Z0JBH\">DE</a>, <a href=\"http://amzn.com/"
-"w/3IPIF4J4F2C5R\">US</a> or <a href=\"http://www.amazon.co.uk/registry/"
-"wishlist/24JRVURXUKO6F\">UK</a>)."
+"If you want to support gpodder.net financially, you can donate via <a href="
+"\"https://paypal.me/pools/c/8lxTu5kqTp\">PayPal</a>."
 msgstr ""
-"Se desideri supportare finanziariamente gpodder.net, puoi donare tramite "
-"PayPal a stefan@skoegl.net. Puoi anche inviare un libro via Amazon (<a href="
-"\"http://www.amazon.de/wishlist/24H4ORJ0Z0JBH\">DE</a>, <a href=\"http://"
-"amzn.com/w/3IPIF4J4F2C5R\">US</a> or <a href=\"http://www.amazon.co.uk/"
-"registry/wishlist/24JRVURXUKO6F\">UK</a>)."
 
 #: mygpo/web/templates/csrf.html:8
 msgid "Attention!"
@@ -2742,12 +2734,12 @@ msgstr "Privacy"
 msgid "Link to gpodder.net"
 msgstr "Link a gpodder.net"
 
-#: mygpo/web/templatetags/time.py:43
+#: mygpo/web/templatetags/time.py:42
 #, python-brace-format
 msgid "{h}h {m}m {s}s"
 msgstr "{h}h {m}m {s}s"
 
-#: mygpo/web/templatetags/time.py:45
+#: mygpo/web/templatetags/time.py:44
 #, python-brace-format
 msgid "{m}m {s}s"
 msgstr "{m}m {s}s"
@@ -2773,6 +2765,27 @@ msgid_plural "%(hours)d hours"
 msgstr[0] "%(hours)d ora"
 msgstr[1] "%(hours)d ore"
 
-#: mygpo/web/views.py:146
+#: mygpo/web/views.py:149
 msgid "another site"
 msgstr "altro sito"
+
+#, fuzzy
+#~| msgid ""
+#~| "If you want to support gpodder.net financially, you can donate via "
+#~| "PayPal to stefan@skoegl.net. You can also send a book via Amazon (<a "
+#~| "href=\"http://www.amazon.de/wishlist/24H4ORJ0Z0JBH\">DE</a>, <a href="
+#~| "\"http://amzn.com/w/3IPIF4J4F2C5R\">US</a> or <a href=\"http://www."
+#~| "amazon.co.uk/registry/wishlist/24JRVURXUKO6F\">UK</a>)."
+#~ msgid ""
+#~ "If you want to support gpodder.net financially, you can donate via <a "
+#~ "href=\"https://paypal.me/pools/c/8lxTu5kqTp\">PayPal</a>. You can also "
+#~ "send a book via Amazon (<a href=\"http://www.amazon.de/"
+#~ "wishlist/24H4ORJ0Z0JBH\">DE</a>, <a href=\"http://amzn.com/w/3IPIF4J4F2C5R"
+#~ "\">US</a> or <a href=\"http://www.amazon.co.uk/registry/"
+#~ "wishlist/24JRVURXUKO6F\">UK</a>)."
+#~ msgstr ""
+#~ "Se desideri supportare finanziariamente gpodder.net, puoi donare tramite "
+#~ "PayPal a stefan@skoegl.net. Puoi anche inviare un libro via Amazon (<a "
+#~ "href=\"http://www.amazon.de/wishlist/24H4ORJ0Z0JBH\">DE</a>, <a href="
+#~ "\"http://amzn.com/w/3IPIF4J4F2C5R\">US</a> or <a href=\"http://www.amazon."
+#~ "co.uk/registry/wishlist/24JRVURXUKO6F\">UK</a>)."
