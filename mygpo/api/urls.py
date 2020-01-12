@@ -59,11 +59,21 @@ urlpatterns = [
     path('api/2/auth/<username:username>/logout.json', auth.logout),
     path('api/2/tags/<int:count>.json', advanced.directory.top_tags),
     path('api/2/tag/<str:tag>/<int:count>.json', advanced.directory.tag_podcasts),
-    path('api/2/data/podcast.json', advanced.directory.podcast_info),
+    path(
+        'api/2/data/podcast.json',
+        advanced.directory.podcast_info,
+        name='api-podcast-info',
+    ),
     path(
         'api/2/data/episode.json',
         advanced.directory.episode_info,
         name='api-episode-info',
+    ),
+    path('api/2/podcasts/create', advanced.directory.add_podcast),
+    path(
+        'api/2/task/<uuid:job_id>',
+        advanced.directory.add_podcast_status,
+        name='api-add-podcast-status',
     ),
     path('api/2/chapters/<username:username>.json', episode.ChaptersAPI.as_view()),
     path(
