@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mygpo\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-27 20:48+0000\n"
+"POT-Creation-Date: 2020-01-09 22:43+0000\n"
 "PO-Revision-Date: 2017-07-06 17:10+0900\n"
 "Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
 "Language-Team: Changwoo Ryu <cwryu@debian.org>\n"
@@ -155,7 +155,7 @@ msgstr "예정된 Celery 작업"
 #: mygpo/administration/templates/admin/make-publisher-input.html:12
 #: mygpo/administration/templates/admin/make-publisher-result.html:9
 #: mygpo/administration/templates/admin/make-publisher-result.html:12
-#: mygpo/administration/views.py:447
+#: mygpo/administration/views.py:449
 #, fuzzy
 #| msgid "Publisher Pages"
 msgid "Publisher Permissions"
@@ -295,27 +295,27 @@ msgstr "새로 고침"
 msgid "User-Agent"
 msgstr "User-Agent"
 
-#: mygpo/administration/views.py:152 mygpo/administration/views.py:170
+#: mygpo/administration/views.py:154 mygpo/administration/views.py:172
 #, python-brace-format
 msgid "No podcast with URL {url}"
 msgstr "{url} URL의 팟캐스트 없음"
 
-#: mygpo/administration/views.py:321 mygpo/administration/views.py:356
+#: mygpo/administration/views.py:323 mygpo/administration/views.py:358
 msgid "Provide either username or email address"
 msgstr ""
 
-#: mygpo/administration/views.py:327 mygpo/administration/views.py:362
+#: mygpo/administration/views.py:329 mygpo/administration/views.py:364
 #, fuzzy
 #| msgid "Nothing found"
 msgid "No user found"
 msgstr "검색 결과가 없습니다"
 
-#: mygpo/administration/views.py:334
+#: mygpo/administration/views.py:336
 #, python-brace-format
 msgid "User {username} ({email}) activated"
 msgstr ""
 
-#: mygpo/administration/views.py:373
+#: mygpo/administration/views.py:375
 #, python-brace-format
 msgid "Email for {username} ({email}) resent"
 msgstr ""
@@ -817,13 +817,13 @@ msgstr "평가해 주셔서 감사합니다!"
 msgid "Edit"
 msgstr "편집"
 
-#: mygpo/podcasts/models.py:695
+#: mygpo/podcasts/models.py:697
 #, fuzzy
 #| msgid "Unnamed Podcast"
 msgid "Unknown Podcast"
 msgstr "이름 없는 팟캐스트"
 
-#: mygpo/podcasts/models.py:698
+#: mygpo/podcasts/models.py:700
 #, python-brace-format
 msgid "Unknown Podcast from {domain}"
 msgstr ""
@@ -2095,17 +2095,9 @@ msgstr ""
 
 #: mygpo/web/templates/contribute.html:23
 msgid ""
-"If you want to support gpodder.net financially, you can donate via PayPal to "
-"stefan@skoegl.net. You can also send a book via Amazon (<a href=\"http://www."
-"amazon.de/wishlist/24H4ORJ0Z0JBH\">DE</a>, <a href=\"http://amzn.com/"
-"w/3IPIF4J4F2C5R\">US</a> or <a href=\"http://www.amazon.co.uk/registry/"
-"wishlist/24JRVURXUKO6F\">UK</a>)."
+"If you want to support gpodder.net financially, you can donate via <a href="
+"\"https://paypal.me/pools/c/8lxTu5kqTp\">PayPal</a>."
 msgstr ""
-"금전적으로 gpodder.net을 지원하시려면, 페이팔로 stefan@skoegl.net에 기부하실 "
-"수 있습니다. 또 아마존 (<a href=\"http://www.amazon.de/wishlist/24H4ORJ0Z0JBH"
-"\">DE</a>, <a href=\"http://amzn.com/w/3IPIF4J4F2C5R\">US</a>, <a href="
-"\"http://www.amazon.co.uk/registry/wishlist/24JRVURXUKO6F\">UK</a>)를 통해 책"
-"을 보내 주실 수도 있습니다."
 
 #: mygpo/web/templates/csrf.html:8
 msgid "Attention!"
@@ -2774,12 +2766,12 @@ msgstr "개인 정보"
 msgid "Link to gpodder.net"
 msgstr "gpodder.net에 링크"
 
-#: mygpo/web/templatetags/time.py:43
+#: mygpo/web/templatetags/time.py:42
 #, python-brace-format
 msgid "{h}h {m}m {s}s"
 msgstr "{h}시간 {m}분 {s}초"
 
-#: mygpo/web/templatetags/time.py:45
+#: mygpo/web/templatetags/time.py:44
 #, fuzzy, python-brace-format
 #| msgid "{h}h {m}m {s}s"
 msgid "{m}m {s}s"
@@ -2806,9 +2798,30 @@ msgid_plural "%(hours)d hours"
 msgstr[0] ""
 msgstr[1] ""
 
-#: mygpo/web/views.py:146
+#: mygpo/web/views.py:149
 msgid "another site"
 msgstr "다른 사이트"
+
+#, fuzzy
+#~| msgid ""
+#~| "If you want to support gpodder.net financially, you can donate via "
+#~| "PayPal to stefan@skoegl.net. You can also send a book via Amazon (<a "
+#~| "href=\"http://www.amazon.de/wishlist/24H4ORJ0Z0JBH\">DE</a>, <a href="
+#~| "\"http://amzn.com/w/3IPIF4J4F2C5R\">US</a> or <a href=\"http://www."
+#~| "amazon.co.uk/registry/wishlist/24JRVURXUKO6F\">UK</a>)."
+#~ msgid ""
+#~ "If you want to support gpodder.net financially, you can donate via <a "
+#~ "href=\"https://paypal.me/pools/c/8lxTu5kqTp\">PayPal</a>. You can also "
+#~ "send a book via Amazon (<a href=\"http://www.amazon.de/"
+#~ "wishlist/24H4ORJ0Z0JBH\">DE</a>, <a href=\"http://amzn.com/w/3IPIF4J4F2C5R"
+#~ "\">US</a> or <a href=\"http://www.amazon.co.uk/registry/"
+#~ "wishlist/24JRVURXUKO6F\">UK</a>)."
+#~ msgstr ""
+#~ "금전적으로 gpodder.net을 지원하시려면, 페이팔로 stefan@skoegl.net에 기부하"
+#~ "실 수 있습니다. 또 아마존 (<a href=\"http://www.amazon.de/"
+#~ "wishlist/24H4ORJ0Z0JBH\">DE</a>, <a href=\"http://amzn.com/w/3IPIF4J4F2C5R"
+#~ "\">US</a>, <a href=\"http://www.amazon.co.uk/registry/"
+#~ "wishlist/24JRVURXUKO6F\">UK</a>)를 통해 책을 보내 주실 수도 있습니다."
 
 #, fuzzy
 #~| msgid "Last update: "

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-27 20:48+0000\n"
+"POT-Creation-Date: 2020-01-09 22:43+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2018\n"
 "Language-Team: Hebrew (https://www.transifex.com/yaron/teams/87581/he/)\n"
@@ -154,7 +154,7 @@ msgstr "משימות מתוזמנות ב־Celery"
 #: mygpo/administration/templates/admin/make-publisher-input.html:12
 #: mygpo/administration/templates/admin/make-publisher-result.html:9
 #: mygpo/administration/templates/admin/make-publisher-result.html:12
-#: mygpo/administration/views.py:447
+#: mygpo/administration/views.py:449
 msgid "Publisher Permissions"
 msgstr "הרשאות הפצה"
 
@@ -284,25 +284,25 @@ msgstr "רענון"
 msgid "User-Agent"
 msgstr "סוכן דפדפן"
 
-#: mygpo/administration/views.py:152 mygpo/administration/views.py:170
+#: mygpo/administration/views.py:154 mygpo/administration/views.py:172
 #, python-brace-format
 msgid "No podcast with URL {url}"
 msgstr "אין פודקאסט בכתובת {url}"
 
-#: mygpo/administration/views.py:321 mygpo/administration/views.py:356
+#: mygpo/administration/views.py:323 mygpo/administration/views.py:358
 msgid "Provide either username or email address"
 msgstr "יש לספק שם משתמש או כתובת דוא״ל"
 
-#: mygpo/administration/views.py:327 mygpo/administration/views.py:362
+#: mygpo/administration/views.py:329 mygpo/administration/views.py:364
 msgid "No user found"
 msgstr "לא נמצאו משתמשים"
 
-#: mygpo/administration/views.py:334
+#: mygpo/administration/views.py:336
 #, python-brace-format
 msgid "User {username} ({email}) activated"
 msgstr "המשתמש {username} ‎({email}) עבר עימות"
 
-#: mygpo/administration/views.py:373
+#: mygpo/administration/views.py:375
 #, fuzzy, python-brace-format
 #| msgid "User {username} ({email}) activated"
 msgid "Email for {username} ({email}) resent"
@@ -799,11 +799,11 @@ msgstr "תודה לך על הדירוג!"
 msgid "Edit"
 msgstr "עריכה"
 
-#: mygpo/podcasts/models.py:695
+#: mygpo/podcasts/models.py:697
 msgid "Unknown Podcast"
 msgstr "פודקאסט לא ידוע"
 
-#: mygpo/podcasts/models.py:698
+#: mygpo/podcasts/models.py:700
 #, python-brace-format
 msgid "Unknown Podcast from {domain}"
 msgstr "פודקאסט לא ידוע מ־{domain}"
@@ -2040,17 +2040,9 @@ msgstr ""
 
 #: mygpo/web/templates/contribute.html:23
 msgid ""
-"If you want to support gpodder.net financially, you can donate via PayPal to "
-"stefan@skoegl.net. You can also send a book via Amazon (<a href=\"http://www."
-"amazon.de/wishlist/24H4ORJ0Z0JBH\">DE</a>, <a href=\"http://amzn.com/"
-"w/3IPIF4J4F2C5R\">US</a> or <a href=\"http://www.amazon.co.uk/registry/"
-"wishlist/24JRVURXUKO6F\">UK</a>)."
+"If you want to support gpodder.net financially, you can donate via <a href="
+"\"https://paypal.me/pools/c/8lxTu5kqTp\">PayPal</a>."
 msgstr ""
-"אם ברצונך לתמוך ב־gpodder.net כלכלית, ניתן לתרום דרך PayPal לטובת "
-"stefan@skoegl.net. ניתן גם לשלוח ספר דרך Amazon (<a href=\"http://www.amazon."
-"de/wishlist/24H4ORJ0Z0JBH\">DE</a>, <a href=\"http://amzn.com/w/3IPIF4J4F2C5R"
-"\">US</a> או <a href=\"http://www.amazon.co.uk/registry/"
-"wishlist/24JRVURXUKO6F\">UK</a>)."
 
 #: mygpo/web/templates/csrf.html:8
 msgid "Attention!"
@@ -2719,12 +2711,12 @@ msgstr "פרטיות"
 msgid "Link to gpodder.net"
 msgstr "מעבר אל gpodder.net"
 
-#: mygpo/web/templatetags/time.py:43
+#: mygpo/web/templatetags/time.py:42
 #, python-brace-format
 msgid "{h}h {m}m {s}s"
 msgstr "{h} שע׳ {m} דק׳ {s} שנ׳"
 
-#: mygpo/web/templatetags/time.py:45
+#: mygpo/web/templatetags/time.py:44
 #, fuzzy, python-brace-format
 #| msgid "{h}h {m}m {s}s"
 msgid "{m}m {s}s"
@@ -2757,9 +2749,30 @@ msgstr[1] "שעתיים"
 msgstr[2] "%(hours)d שעות"
 msgstr[3] "%(hours)d שעות"
 
-#: mygpo/web/views.py:146
+#: mygpo/web/views.py:149
 msgid "another site"
 msgstr "אתר אחר"
+
+#, fuzzy
+#~| msgid ""
+#~| "If you want to support gpodder.net financially, you can donate via "
+#~| "PayPal to stefan@skoegl.net. You can also send a book via Amazon (<a "
+#~| "href=\"http://www.amazon.de/wishlist/24H4ORJ0Z0JBH\">DE</a>, <a href="
+#~| "\"http://amzn.com/w/3IPIF4J4F2C5R\">US</a> or <a href=\"http://www."
+#~| "amazon.co.uk/registry/wishlist/24JRVURXUKO6F\">UK</a>)."
+#~ msgid ""
+#~ "If you want to support gpodder.net financially, you can donate via <a "
+#~ "href=\"https://paypal.me/pools/c/8lxTu5kqTp\">PayPal</a>. You can also "
+#~ "send a book via Amazon (<a href=\"http://www.amazon.de/"
+#~ "wishlist/24H4ORJ0Z0JBH\">DE</a>, <a href=\"http://amzn.com/w/3IPIF4J4F2C5R"
+#~ "\">US</a> or <a href=\"http://www.amazon.co.uk/registry/"
+#~ "wishlist/24JRVURXUKO6F\">UK</a>)."
+#~ msgstr ""
+#~ "אם ברצונך לתמוך ב־gpodder.net כלכלית, ניתן לתרום דרך PayPal לטובת "
+#~ "stefan@skoegl.net. ניתן גם לשלוח ספר דרך Amazon (<a href=\"http://www."
+#~ "amazon.de/wishlist/24H4ORJ0Z0JBH\">DE</a>, <a href=\"http://amzn.com/"
+#~ "w/3IPIF4J4F2C5R\">US</a> או <a href=\"http://www.amazon.co.uk/registry/"
+#~ "wishlist/24JRVURXUKO6F\">UK</a>)."
 
 #~ msgid "Timing"
 #~ msgstr "תזמון"
