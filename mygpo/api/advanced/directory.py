@@ -115,7 +115,7 @@ def add_podcast(request):
         job_status_path = reverse(
             'api-add-podcast-status', kwargs={'job_id': res.task_id}
         )
-        response['Location'] = f'{job_status_path}?url={url}'
+        response['Location'] = f'{job_status_path}'
         return response
 
 
