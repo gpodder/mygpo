@@ -11,7 +11,7 @@ html2text==2019.9.26
 markdown2==2.3.8
 oauth2client==4.1.3
 psycopg2cffi==2.8.1
-python-dateutil==2.8.0
+python-dateutil==2.8.1
 redis==3.3.11
 django-celery-results==1.1.2
 django-celery-beat==1.5.0
