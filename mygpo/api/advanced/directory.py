@@ -159,6 +159,7 @@ def podcast_data(obj, domain, scaled_logo_size=64):
     return {
         "url": url,
         "title": podcast.title,
+        "author": podcast.author,
         "description": podcast.description,
         "subscribers": subscribers,
         "subscribers_last_week": last_subscribers,
