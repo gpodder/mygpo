@@ -124,8 +124,8 @@ Retrieve Episode Data
 
 .. http:get:: /api/2/data/episode.json
 
-    Returns information for the episode with the given {episode-url} that
-    belongs to the podcast with the {podcast-url}
+    Returns information for the episode with the given {url} that
+    belongs to the podcast with the {podcast}
 
     * Does not require authentication
     * Since 2.2 (added released in 2.6)
@@ -147,8 +147,8 @@ Retrieve Episode Data
          "mygpo_link": "http://gpodder.net/episode/1046492"
         }
 
-    ::query podcast-url: feed URL of the podcast to which the episode belongs
-    ::query episode-url: media URL of the episode
+    ::query podcast: feed URL of the podcast to which the episode belongs
+    ::query url: media URL of the episode
 
 
 Podcast Toplist
