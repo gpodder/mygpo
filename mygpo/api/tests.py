@@ -185,6 +185,27 @@ class DirectoryTest(TestCase):
 
         self.assertEqual(resp.status_code, 200)
 
+    def test_add_podcast_existed(self):
+        """Test add podcast API for existed podcast"""
+        url = reverse('api-add-podcast')
+        body = {'url': self.podcast.url}
+        location = reverse('api-podcast-info') + '?url=' + self.podcast.url
+        add_resp = self.client.post(url, body, content_type='application/json')
+        self.assertEqual(add_resp.status_code, 302)
+        self.assertEqual(add_resp.get('Location'), location)
+
+    def test_add_podcast_new(self):
+        """Test add podcast API for new podcast"""
+        podcast_url = 'http://example.com/new-podcast.xml'
+        add_url = reverse('api-add-podcast')
+        body = {'url': podcast_url}
+        add_resp = self.client.post(add_url, body, content_type='application/json')
+        self.assertEqual(add_resp.status_code, 202)
+        status_url = add_resp.get('Location')
+        status_resp = self.client.get(status_url)
+        self.assertEqual(status_resp.status_code, 200)
+        self.assertEqual(status_resp.json().get('status'), 'pending')
+
 
 class EpisodeActionTests(TestCase):
     def setUp(self):
