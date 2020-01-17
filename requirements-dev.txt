@@ -1,4 +1,4 @@
-transifex-client==0.13.6
+transifex-client==0.13.7
 sphinx
 pep8
 flake8
