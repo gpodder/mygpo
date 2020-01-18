@@ -44,6 +44,7 @@ def podcast_logo_medium(podcast):
 
 @register.filter()
 def podcast_status_icon(action):
+    s = ''
     if action.action == 'subscribe':
         s = '<img src="%s" />' % (staticfiles_storage.url('subscribe.png'),)
     elif action.action == 'unsubscribe':

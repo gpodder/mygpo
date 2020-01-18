@@ -81,7 +81,9 @@ class PodcastUpdater(object):
     """ Updates the podcast specified by the podcast_url """
 
     def __init__(self, podcast_url):
-        self.podcast_url = podcast_url
+        self.podcast_url = (
+            (podcast_url[:2046] + '..') if len(podcast_url) > 2048 else podcast_url
+        )
 
     def update_podcast(self):
         """ Update the podcast """
@@ -160,7 +162,7 @@ class PodcastUpdater(object):
         except ValueError:
             logger.exception(
                 'Feed-service error while parsing response for url "%s": %s',
-                podcast_url,
+                self.podcast_url,
                 r.text,
             )
             raise

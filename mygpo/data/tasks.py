@@ -52,7 +52,7 @@ def schedule_updates(interval=UPDATE_INTERVAL):
     now = datetime.utcnow()
 
     # max number of updates to schedule (one every 10s)
-    max_updates = UPDATE_INTERVAL.total_seconds() / 20
+    max_updates = UPDATE_INTERVAL.total_seconds() / 10
 
     # fetch podcasts for which an update is due within the next hour
     podcasts = (
@@ -70,7 +70,7 @@ def schedule_updates_longest_no_update():
     """ Schedule podcasts for update that have not been updated for longest """
 
     # max number of updates to schedule (one every 20s)
-    max_updates = UPDATE_INTERVAL.total_seconds() / 20
+    max_updates = UPDATE_INTERVAL.total_seconds() / 10
 
     podcasts = Podcast.objects.order_by('last_update')[:max_updates]
     _schedule_updates(podcasts)
@@ -78,7 +78,7 @@ def schedule_updates_longest_no_update():
 
 def _schedule_updates(podcasts):
     """ Schedule updates for podcasts """
-    logger.info('Scheduling %d podcasts for update', podcasts.count())
+    logger.info('Scheduling %d podcasts for update', len(podcasts))
 
     # queue all those podcast updates
     for podcast in podcasts:

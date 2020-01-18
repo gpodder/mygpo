@@ -89,12 +89,15 @@ def dashboard(request, episode_count=10):
 
     tomorrow = datetime.today() + timedelta(days=1)
 
-    newest_episodes = (
-        Episode.objects.filter(podcast__in=subscribed_podcasts, released__lt=tomorrow)
-        .select_related('podcast')
-        .prefetch_related('slugs', 'podcast__slugs')
-        .order_by('-released')[:episode_count]
-    )
+    #    newest_episodes = Episode.objects.filter(podcast__in=subscribed_podcasts,
+    #                                             released__lt=tomorrow).\
+    #                                      select_related('podcast').\
+    #                                      prefetch_related('slugs',
+    #                                                       'podcast__slugs').\
+    #                                      order_by('-released')[:episode_count]
+    #
+
+    newest_episodes = []
 
     # we only show the "install reader" link in firefox, because we don't know
     # yet how/if this works in other browsers.

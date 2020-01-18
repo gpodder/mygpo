@@ -10,7 +10,7 @@ General
 -------
 
 * ``ADMINS`` - corresponds to `Django's ADMINS setting <https://docs.djangoproject.com/en/dev/ref/settings/#admins>`_. Specified as ``Name <email@host.com>``. Multiple entries can be separated by whitespace.
-* ``DEBUG`` - Debug flug, see `Django's DEBUG setting <https://docs.djangoproject.com/en/1.11/ref/settings/#std:setting-DEBUG>`_
+* ``DEBUG`` - Debug flag, see `Django's DEBUG setting <https://docs.djangoproject.com/en/1.11/ref/settings/#std:setting-DEBUG>`_
 * ``DEFAULT_BASE_URL`` - base URL for creating URLs, eg ``https://gpodder.net``
 * ``GOOGLE_ANALYTICS_PROPERTY_ID`` - Google Analytics Property ID
 * ``MAINTENANCE`` - Maintenance flag

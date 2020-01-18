@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mygpo\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-12 20:10+0000\n"
+"POT-Creation-Date: 2020-01-09 22:43+0000\n"
 "PO-Revision-Date: 2017-07-06 17:10+0900\n"
 "Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
 "Language-Team: Changwoo Ryu <cwryu@debian.org>\n"
@@ -155,7 +155,7 @@ msgstr "예정된 Celery 작업"
 #: mygpo/administration/templates/admin/make-publisher-input.html:12
 #: mygpo/administration/templates/admin/make-publisher-result.html:9
 #: mygpo/administration/templates/admin/make-publisher-result.html:12
-#: mygpo/administration/views.py:447
+#: mygpo/administration/views.py:449
 #, fuzzy
 #| msgid "Publisher Pages"
 msgid "Publisher Permissions"
@@ -295,27 +295,27 @@ msgstr "새로 고침"
 msgid "User-Agent"
 msgstr "User-Agent"
 
-#: mygpo/administration/views.py:152 mygpo/administration/views.py:170
+#: mygpo/administration/views.py:154 mygpo/administration/views.py:172
 #, python-brace-format
 msgid "No podcast with URL {url}"
 msgstr "{url} URL의 팟캐스트 없음"
 
-#: mygpo/administration/views.py:321 mygpo/administration/views.py:356
+#: mygpo/administration/views.py:323 mygpo/administration/views.py:358
 msgid "Provide either username or email address"
 msgstr ""
 
-#: mygpo/administration/views.py:327 mygpo/administration/views.py:362
+#: mygpo/administration/views.py:329 mygpo/administration/views.py:364
 #, fuzzy
 #| msgid "Nothing found"
 msgid "No user found"
 msgstr "검색 결과가 없습니다"
 
-#: mygpo/administration/views.py:334
+#: mygpo/administration/views.py:336
 #, python-brace-format
 msgid "User {username} ({email}) activated"
 msgstr ""
 
-#: mygpo/administration/views.py:373
+#: mygpo/administration/views.py:375
 #, python-brace-format
 msgid "Email for {username} ({email}) resent"
 msgstr ""
@@ -348,21 +348,21 @@ msgstr "구독함"
 msgid "unsubscribed"
 msgstr "구독 해지함"
 
-#: mygpo/api/simple.py:58 mygpo/api/simple.py:93
+#: mygpo/api/simple.py:57 mygpo/api/simple.py:92
 #, python-format
 msgid "%(username)s's Subscription List"
 msgstr "%(username)s의 구독 목록"
 
-#: mygpo/api/simple.py:262
+#: mygpo/api/simple.py:258
 #, python-format
 msgid "gpodder.net - Top %(count)d"
 msgstr "gpodder.net - 톱 %(count)d"
 
-#: mygpo/api/simple.py:298
+#: mygpo/api/simple.py:294
 msgid "gpodder.net - Search"
 msgstr "gpodder.net - 검색"
 
-#: mygpo/api/simple.py:324
+#: mygpo/api/simple.py:320
 #, python-format
 msgid "gpodder.net - %(count)d Suggestions"
 msgstr "gpodder.net - 제안 %(count)d개"
@@ -817,13 +817,13 @@ msgstr "평가해 주셔서 감사합니다!"
 msgid "Edit"
 msgstr "편집"
 
-#: mygpo/podcasts/models.py:695
+#: mygpo/podcasts/models.py:697
 #, fuzzy
 #| msgid "Unnamed Podcast"
 msgid "Unknown Podcast"
 msgstr "이름 없는 팟캐스트"
 
-#: mygpo/podcasts/models.py:698
+#: mygpo/podcasts/models.py:700
 #, python-brace-format
 msgid "Unknown Podcast from {domain}"
 msgstr ""
@@ -1183,7 +1183,19 @@ msgstr ""
 "한 여러 정보를 볼 수 있습니다."
 
 #: mygpo/publisher/templates/publisher/info.html:30
-#, python-format
+#, fuzzy, python-format
+#| msgid ""
+#| "The Publisher Pages are currently in Beta, but if you are publishing a "
+#| "podcast listed on %(sitename)s, feel free to apply by sending a mail "
+#| "with\n"
+#| "  <ul>\n"
+#| "   <li>your username on %(sitename)s (<a href=\"%(register-url)s"
+#| "\">register if you don't have one</a>)</li>\n"
+#| "   <li>the name and URL of the podcast you are publishing</li>\n"
+#| "   <li>an email address that is visible somewhere on the podcast's "
+#| "website (to legitimate you)\n"
+#| "  </ul>\n"
+#| "  to <a href=\"mailto:stefan@gpodder.net\">stefan@gpodder.net</a>."
 msgid ""
 "The Publisher Pages are currently in Beta, but if you are publishing a "
 "podcast listed on %(sitename)s, feel free to apply by sending a mail with\n"
@@ -1194,7 +1206,7 @@ msgid ""
 "   <li>an email address that is visible somewhere on the podcast's website "
 "(to legitimate you)\n"
 "  </ul>\n"
-"  to <a href=\"mailto:stefan@gpodder.net\">stefan@gpodder.net</a>."
+"  to <a href=\"mailto:support@gpodder.net\">support@gpodder.net</a>."
 msgstr ""
 "제작자 페이지는 현재 베타 버전입니다. %(sitename)s에 들어 있는 팟캐스트의 제"
 "작자라면 다음과 같은 내용의 메일을 <a href=\"mailto:stefan@gpodder.net"
@@ -1785,7 +1797,7 @@ msgstr "계정을 이미 활성화했습니다. 계속 사용하시려면 로그
 msgid "Either username or email address are required."
 msgstr ""
 
-#: mygpo/users/views/registration.py:197 mygpo/users/views/user.py:131
+#: mygpo/users/views/registration.py:197 mygpo/users/views/user.py:134
 msgid "User does not exist."
 msgstr "사용자가 없습니다."
 
@@ -1813,7 +1825,7 @@ msgstr "비밀번호가 없습니다"
 msgid "Wrong username or password."
 msgstr "사용자 이름 또는 비밀번호가 틀렸습니다."
 
-#: mygpo/users/views/user.py:93 mygpo/users/views/user.py:139
+#: mygpo/users/views/user.py:93 mygpo/users/views/user.py:142
 #, fuzzy
 #| msgid "Please activate your account first."
 msgid ""
@@ -1821,22 +1833,22 @@ msgid ""
 "email"
 msgstr "먼저 계정을 활성화하십시오."
 
-#: mygpo/users/views/user.py:172 mygpo/users/views/user.py:177
+#: mygpo/users/views/user.py:175 mygpo/users/views/user.py:180
 msgid "Login failed."
 msgstr "로그인 실패."
 
-#: mygpo/users/views/user.py:185
+#: mygpo/users/views/user.py:188
 msgid "Login with Google is currently not possible."
 msgstr ""
 
-#: mygpo/users/views/user.py:198
+#: mygpo/users/views/user.py:201
 #, python-brace-format
 msgid ""
 "Your account has been connected with {google}. Open Settings to change this."
 msgstr ""
 "계정이 {google} 계정과 연결되었습니다. 변경하려면 설정 페이지를 여십시오."
 
-#: mygpo/users/views/user.py:214
+#: mygpo/users/views/user.py:217
 #, python-format
 msgid ""
 "No account connected with your Google account %s. Please log in to connect."
@@ -2083,17 +2095,9 @@ msgstr ""
 
 #: mygpo/web/templates/contribute.html:23
 msgid ""
-"If you want to support gpodder.net financially, you can donate via PayPal to "
-"stefan@skoegl.net. You can also send a book via Amazon (<a href=\"http://www."
-"amazon.de/wishlist/24H4ORJ0Z0JBH\">DE</a>, <a href=\"http://amzn.com/"
-"w/3IPIF4J4F2C5R\">US</a> or <a href=\"http://www.amazon.co.uk/registry/"
-"wishlist/24JRVURXUKO6F\">UK</a>)."
+"If you want to support gpodder.net financially, you can donate via <a href="
+"\"https://paypal.me/pools/c/8lxTu5kqTp\">PayPal</a>."
 msgstr ""
-"금전적으로 gpodder.net을 지원하시려면, 페이팔로 stefan@skoegl.net에 기부하실 "
-"수 있습니다. 또 아마존 (<a href=\"http://www.amazon.de/wishlist/24H4ORJ0Z0JBH"
-"\">DE</a>, <a href=\"http://amzn.com/w/3IPIF4J4F2C5R\">US</a>, <a href="
-"\"http://www.amazon.co.uk/registry/wishlist/24JRVURXUKO6F\">UK</a>)를 통해 책"
-"을 보내 주실 수도 있습니다."
 
 #: mygpo/web/templates/csrf.html:8
 msgid "Attention!"
@@ -2256,11 +2260,17 @@ msgid "Webservice"
 msgstr "웹서비스"
 
 #: mygpo/web/templates/developer.html:18
+#, fuzzy
+#| msgid ""
+#| "The sourcecode of the webservice gpodder.net is released as open source "
+#| "under the AGPLv3 and <a href=\"https://github.com/gpodder/mygpo\">hosted "
+#| "at GitHub</a>. Bugs can be reported at the <a href=\"https://bugs.gpodder."
+#| "org/enter_bug.cgi?product=gpodder.net\">gPodder Bugtracker</a>."
 msgid ""
 "The sourcecode of the webservice gpodder.net is released as open source "
 "under the AGPLv3 and <a href=\"https://github.com/gpodder/mygpo\">hosted at "
-"GitHub</a>. Bugs can be reported at the <a href=\"https://bugs.gpodder.org/"
-"enter_bug.cgi?product=gpodder.net\">gPodder Bugtracker</a>."
+"GitHub</a>. Bugs can be reported at the <a href=\"https://github.com/gpodder/"
+"gpodder/issues\">gPodder Issue Tracker on GitHub</a>."
 msgstr ""
 "gpodder.net 웹서비스의 소스 코드는 AGPL 버전3에 따라 오픈소스로 공개되고 <a "
 "href=\"https://github.com/gpodder.net/mygpo\">GitHub에서 호스팅합니다</a>. 문"
@@ -2756,41 +2766,62 @@ msgstr "개인 정보"
 msgid "Link to gpodder.net"
 msgstr "gpodder.net에 링크"
 
-#: mygpo/web/templatetags/time.py:43
+#: mygpo/web/templatetags/time.py:42
 #, python-brace-format
 msgid "{h}h {m}m {s}s"
 msgstr "{h}시간 {m}분 {s}초"
 
-#: mygpo/web/templatetags/time.py:45
+#: mygpo/web/templatetags/time.py:44
 #, fuzzy, python-brace-format
 #| msgid "{h}h {m}m {s}s"
 msgid "{m}m {s}s"
 msgstr "{h}시간 {m}분 {s}초"
 
-#: mygpo/web/utils.py:285
+#: mygpo/web/utils.py:297
 #, python-format
 msgid "%(weeks)d week"
 msgid_plural "%(weeks)d weeks"
 msgstr[0] ""
 msgstr[1] ""
 
-#: mygpo/web/utils.py:289
+#: mygpo/web/utils.py:301
 #, python-format
 msgid "%(days)d day"
 msgid_plural "%(days)d days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: mygpo/web/utils.py:293
+#: mygpo/web/utils.py:305
 #, python-format
 msgid "%(hours)d hour"
 msgid_plural "%(hours)d hours"
 msgstr[0] ""
 msgstr[1] ""
 
-#: mygpo/web/views.py:146
+#: mygpo/web/views.py:149
 msgid "another site"
 msgstr "다른 사이트"
+
+#, fuzzy
+#~| msgid ""
+#~| "If you want to support gpodder.net financially, you can donate via "
+#~| "PayPal to stefan@skoegl.net. You can also send a book via Amazon (<a "
+#~| "href=\"http://www.amazon.de/wishlist/24H4ORJ0Z0JBH\">DE</a>, <a href="
+#~| "\"http://amzn.com/w/3IPIF4J4F2C5R\">US</a> or <a href=\"http://www."
+#~| "amazon.co.uk/registry/wishlist/24JRVURXUKO6F\">UK</a>)."
+#~ msgid ""
+#~ "If you want to support gpodder.net financially, you can donate via <a "
+#~ "href=\"https://paypal.me/pools/c/8lxTu5kqTp\">PayPal</a>. You can also "
+#~ "send a book via Amazon (<a href=\"http://www.amazon.de/"
+#~ "wishlist/24H4ORJ0Z0JBH\">DE</a>, <a href=\"http://amzn.com/w/3IPIF4J4F2C5R"
+#~ "\">US</a> or <a href=\"http://www.amazon.co.uk/registry/"
+#~ "wishlist/24JRVURXUKO6F\">UK</a>)."
+#~ msgstr ""
+#~ "금전적으로 gpodder.net을 지원하시려면, 페이팔로 stefan@skoegl.net에 기부하"
+#~ "실 수 있습니다. 또 아마존 (<a href=\"http://www.amazon.de/"
+#~ "wishlist/24H4ORJ0Z0JBH\">DE</a>, <a href=\"http://amzn.com/w/3IPIF4J4F2C5R"
+#~ "\">US</a>, <a href=\"http://www.amazon.co.uk/registry/"
+#~ "wishlist/24JRVURXUKO6F\">UK</a>)를 통해 책을 보내 주실 수도 있습니다."
 
 #, fuzzy
 #~| msgid "Last update: "

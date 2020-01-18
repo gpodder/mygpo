@@ -38,7 +38,7 @@ API_RESPONSE = {
 }
 
 FLICKR_URL = re.compile(
-    'https://api.flickr.com/services/rest/\?method=flickr.photos.getSizes&api_key=.*photo_id=.*&format=json&nojsoncallback=1'
+    r'https://api.flickr.com/services/rest/\?method=flickr.photos.getSizes&api_key=.*photo_id=.*&format=json&nojsoncallback=1'
 )
 
 

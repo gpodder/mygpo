@@ -97,8 +97,8 @@ def podcast(request, podcast):
     if not check_publisher_permission(request.user, podcast):
         return HttpResponseForbidden()
 
-    timeline_data = listener_data([podcast])
-    subscription_data = subscriber_data([podcast])[-20:]
+    timeline_data = None  # listener_data([podcast])
+    subscription_data = None  # subscriber_data([podcast])[-20:]
 
     update_token = request.user.profile.get_token('publisher_update_token')
 
