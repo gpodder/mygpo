@@ -401,3 +401,5 @@ try:
 
 except (ImportError, ValueError):
     pass
+
+TEST_RUNNER = 'djcelery.contrib.test_runner.CeleryTestSuiteRunner'

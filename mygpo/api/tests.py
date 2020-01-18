@@ -18,6 +18,7 @@ from mygpo.api.simple import format_podcast_list
 from mygpo.history.models import EpisodeHistoryEntry
 from mygpo.test import create_auth_string
 from mygpo.utils import get_timestamp
+from mygpo.data.tasks import update_podcasts
 
 
 class AdvancedAPITests(unittest.TestCase):
@@ -205,6 +206,9 @@ class DirectoryTest(TestCase):
         status_resp = self.client.get(status_url)
         self.assertEqual(status_resp.status_code, 200)
         self.assertEqual(status_resp.json().get('status'), 'pending')
+        job_id = status_url.split('/')[-1]
+        result = update_podcasts.apply(task_id=job_id)
+        self.assertTrue(result.ready())
 
 
 class EpisodeActionTests(TestCase):
