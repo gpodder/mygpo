@@ -3,14 +3,17 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+# Translators:
+# Yaron Shahrabani <sh.yaron@gmail.com>, 2019
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-09 22:43+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2018\n"
+"POT-Creation-Date: 2020-01-18 18:57+0000\n"
+"PO-Revision-Date: 2018-06-20 06:29+0000\n"
+"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2019\n"
 "Language-Team: Hebrew (https://www.transifex.com/yaron/teams/87581/he/)\n"
 "Language: he\n"
 "MIME-Version: 1.0\n"
@@ -2753,27 +2756,6 @@ msgstr[3] "%(hours)d שעות"
 msgid "another site"
 msgstr "אתר אחר"
 
-#, fuzzy
-#~| msgid ""
-#~| "If you want to support gpodder.net financially, you can donate via "
-#~| "PayPal to stefan@skoegl.net. You can also send a book via Amazon (<a "
-#~| "href=\"http://www.amazon.de/wishlist/24H4ORJ0Z0JBH\">DE</a>, <a href="
-#~| "\"http://amzn.com/w/3IPIF4J4F2C5R\">US</a> or <a href=\"http://www."
-#~| "amazon.co.uk/registry/wishlist/24JRVURXUKO6F\">UK</a>)."
-#~ msgid ""
-#~ "If you want to support gpodder.net financially, you can donate via <a "
-#~ "href=\"https://paypal.me/pools/c/8lxTu5kqTp\">PayPal</a>. You can also "
-#~ "send a book via Amazon (<a href=\"http://www.amazon.de/"
-#~ "wishlist/24H4ORJ0Z0JBH\">DE</a>, <a href=\"http://amzn.com/w/3IPIF4J4F2C5R"
-#~ "\">US</a> or <a href=\"http://www.amazon.co.uk/registry/"
-#~ "wishlist/24JRVURXUKO6F\">UK</a>)."
-#~ msgstr ""
-#~ "אם ברצונך לתמוך ב־gpodder.net כלכלית, ניתן לתרום דרך PayPal לטובת "
-#~ "stefan@skoegl.net. ניתן גם לשלוח ספר דרך Amazon (<a href=\"http://www."
-#~ "amazon.de/wishlist/24H4ORJ0Z0JBH\">DE</a>, <a href=\"http://amzn.com/"
-#~ "w/3IPIF4J4F2C5R\">US</a> או <a href=\"http://www.amazon.co.uk/registry/"
-#~ "wishlist/24JRVURXUKO6F\">UK</a>)."
-
 #~ msgid "Timing"
 #~ msgstr "תזמון"
 
@@ -2782,3 +2764,16 @@ msgstr "אתר אחר"
 
 #~ msgid "Next update:"
 #~ msgstr "העדכון הבא:"
+
+#~ msgid ""
+#~ "If you want to support gpodder.net financially, you can donate via PayPal "
+#~ "to stefan@skoegl.net. You can also send a book via Amazon (<a href="
+#~ "\"http://www.amazon.de/wishlist/24H4ORJ0Z0JBH\">DE</a>, <a href=\"http://"
+#~ "amzn.com/w/3IPIF4J4F2C5R\">US</a> or <a href=\"http://www.amazon.co.uk/"
+#~ "registry/wishlist/24JRVURXUKO6F\">UK</a>)."
+#~ msgstr ""
+#~ "אם ברצונך לתמוך ב־gpodder.net כלכלית, ניתן לתרום דרך PayPal לטובת "
+#~ "stefan@skoegl.net. ניתן גם לשלוח ספר דרך Amazon (<a href=\"http://www."
+#~ "amazon.de/wishlist/24H4ORJ0Z0JBH\">DE</a>, <a href=\"http://amzn.com/"
+#~ "w/3IPIF4J4F2C5R\">US</a> או <a href=\"http://www.amazon.co.uk/registry/"
+#~ "wishlist/24JRVURXUKO6F\">UK</a>)."
