@@ -15,7 +15,7 @@ test: envs/dev/MEDIA_ROOT
 	# assume defined media root directory, empty before running tests
 	rm -rf $(shell cat envs/dev/MEDIA_ROOT)
 	mkdir -p $(shell cat envs/dev/MEDIA_ROOT)
-	envdir envs/dev/ pytest --cov=mygpo/ --cov-branch
+	envdir envs/dev/ python -Wd -m pytest --cov=mygpo/ --cov-branch
 	coverage report --show-missing
 
 update-po:

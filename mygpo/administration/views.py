@@ -15,7 +15,7 @@ from django.core.cache import cache
 from django.http import HttpResponseRedirect
 from django.template.loader import render_to_string
 from django.template import RequestContext
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.contrib.sites.requests import RequestSite
 from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator

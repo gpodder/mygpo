@@ -45,15 +45,15 @@ def remove_inactive_users():
     # time for which to keep unactivated and deleted users
     valid_days = settings.ACTIVATION_VALID_DAYS
     remove_before = datetime.utcnow() - timedelta(days=valid_days)
-    logger.warn('Removing unactivated users before %s', remove_before)
+    logger.warning('Removing unactivated users before %s', remove_before)
 
     users = User.objects.filter(is_active=False, date_joined__lt=remove_before)
 
     for user in users:
         clients = models.Client.objects.filter(user=user)
-        logger.warn('Deleting %d clients of user "%s"', len(clients), user.username)
+        logger.warning('Deleting %d clients of user "%s"', len(clients), user.username)
         clients.delete()
-        logger.warn('Deleting user "%s"', user.username)
+        logger.warning('Deleting user "%s"', user.username)
         user.delete()
 
 

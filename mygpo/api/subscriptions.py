@@ -68,7 +68,7 @@ class SubscriptionsAPI(APIView):
         conflicts = intersect(add, remove)
         if conflicts:
             msg = "can not add and remove '{}' at the same time".format(str(conflicts))
-            logger.warn(msg)
+            logger.warning(msg)
             raise RequestException(msg)
 
         add_s = list(map(normalize_feed_url, add))

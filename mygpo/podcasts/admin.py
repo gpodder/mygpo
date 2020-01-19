@@ -1,5 +1,5 @@
 from django.utils.html import format_html
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.contrib import admin
 from django.contrib.contenttypes.admin import GenericTabularInline
 from mygpo.podcasts.models import (

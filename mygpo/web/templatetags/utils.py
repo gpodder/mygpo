@@ -74,7 +74,7 @@ def nbsp(s):
     """ collapses multiple whitespaces and replaces them with &nbsp; """
     import re
 
-    return mark_safe(re.sub("\s+", "&nbsp;", s))
+    return mark_safe(re.sub(r"\s+", "&nbsp;", s))
 
 
 @register.filter

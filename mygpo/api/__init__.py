@@ -53,7 +53,7 @@ class APIView(View):
             msg = 'Could not decode request body for user {}: {}'.format(
                 request.user.username, request.body.decode('ascii', errors='replace')
             )
-            logger.warn(msg, exc_info=True)
+            logger.warning(msg, exc_info=True)
             raise RequestException(msg)
 
     def get_since(self, request):

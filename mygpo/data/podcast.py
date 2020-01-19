@@ -65,7 +65,7 @@ def subscribe_at_hub(podcast):
     base_url = settings.DEFAULT_BASE_URL
 
     if not base_url:
-        logger.warn(
+        logger.warning(
             'Could not subscribe to podcast {podcast} '
             'at hub {hub} because DEFAULT_BASE_URL is not '
             'set.'.format(podcast=podcast, hub=podcast.hub)

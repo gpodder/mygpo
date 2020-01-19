@@ -30,7 +30,7 @@ def get_photo_sizes(photo_id):
     try:
         resp = requests.get(url)
     except requests.exceptions.RequestException as e:
-        logger.warn('Retrieving Flickr photo sizes failed: %s', str(e))
+        logger.warning('Retrieving Flickr photo sizes failed: %s', str(e))
         return []
 
     try:
@@ -82,7 +82,7 @@ def is_flickr_image(url):
 
     if url is None:
         return False
-    return bool(re.search('flickr\.com.*\.(jpg|jpeg|png|gif)', url))
+    return bool(re.search(r'flickr\.com.*\.(jpg|jpeg|png|gif)', url))
 
 
 def get_display_photo(url, label='Medium'):
