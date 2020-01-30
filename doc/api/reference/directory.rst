@@ -66,6 +66,7 @@ Retrieve Podcasts for Tag
         [
          {"url": "http://leo.am/podcasts/floss",
           "title": "FLOSS Weekly",
+          "author": "Leo Laporte",
           "description": "Each Thursday we talk about Free Libre and Open Source Software with the people who are writing it. Part of the TWiT Netcast Network.",
           "subscribers": 1138,
           "logo_url: "http://leoville.tv/podcasts/coverart/floss144audio.jpg",
@@ -74,6 +75,7 @@ Retrieve Podcasts for Tag
 
          {"url": "http://leo.am/podcasts/twit",
           "title": "this WEEK in TECH - MP3 Edition",
+          "author": "Leo Laporte",
           "description": "Your first podcast of the week is the last word in tech. [...]",
           "subscribers": 895,
           "logo_url": "http://leoville.tv/podcasts/coverart/twit144audio.jpg",
@@ -109,6 +111,7 @@ Retrieve Podcast Data
          "description": "The best cover songs, delivered to your ears two to three times a week!",
          "subscribers": 19,
          "title": "Coverville",
+         "author": "Brian Ibbott",
          "url": "http://feeds.feedburner.com/coverville",
          "subscribers_last_week": 19,
          "logo_url": "http://www.coverville.com/art/coverville_iTunes300.jpg"
@@ -177,6 +180,7 @@ Podcast Toplist
            "website": "http://linuxoutlaws.com/podcast",
            "description": "Open source talk with a serious attitude",
            "title": "Linux Outlaws",
+           "author": "Sixgun Productions",
            "url": "http://feeds.feedburner.com/linuxoutlaws",
            "position_last_week": 0,
            "subscribers_last_week": 1736,
@@ -188,6 +192,7 @@ Podcast Toplist
            "website": "http://syndication.mediafly.com/redirect/show/d581e9b773784df7a56f37e1138c037c",
            "description": "We're not talking dentistry here; FLOSS all about Free Libre Open Source Software. Join hosts Randal Schwartz and Leo Laporte every Saturday as they talk with the most interesting and important people in the Open Source and Free Software community.",
            "title": "FLOSS Weekly Video (large)",
+           "author": "Leo Laporte",
            "url": "http://feeds.twit.tv/floss_video_large",
            "position_last_week": 0,
            "subscribers_last_week": 50,
