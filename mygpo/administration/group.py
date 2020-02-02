@@ -23,7 +23,7 @@ class PodcastGrouper(object):
     def __get_episodes(self):
         episodes = {}
         for podcast in self.podcasts:
-            episodes.update(dict((e.id, e) for e in podcast.episode_set.all()))
+            episodes.update(dict((e.id, e.id) for e in podcast.episode_set.all()))
 
         return episodes
 
@@ -39,6 +39,7 @@ class PodcastGrouper(object):
             episode = episodes[episode_id]
             episode_groups[features].append(episode)
 
-        groups = sorted(episode_groups.values(), key=_SORT_KEY)
+        # groups = sorted(episode_groups.values(), key=_SORT_KEY)
+        groups = episode_groups.values()
 
         return enumerate(groups)

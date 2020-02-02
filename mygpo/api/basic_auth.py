@@ -125,7 +125,7 @@ def check_username(protected_view):
 
         else:
             # TODO: raise SuspiciousOperation here?
-            logger.warn(
+            logger.warning(
                 'username in authentication (%s) and in requested resource (%s) don\'t match'
                 % (request.user.username, username)
             )

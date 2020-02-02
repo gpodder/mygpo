@@ -9,7 +9,9 @@ def update_suggestions_on_subscription(sender, **kwargs):
     from mygpo.suggestions.tasks import update_suggestions
 
     user = kwargs['user']
-    update_suggestions.delay(user.pk)
+
+
+#    update_suggestions.delay(user.pk)
 
 
 class SuggestionsConfig(AppConfig):

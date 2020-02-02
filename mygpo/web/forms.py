@@ -1,7 +1,7 @@
 import re
 
 from django import forms
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from mygpo.users.models import Client
 
@@ -159,7 +159,7 @@ class SyncForm(forms.Form):
         in the form.
         """
         if not self.is_valid():
-            logger.warn('no target given in SyncForm')
+            logger.warning('no target given in SyncForm')
             raise ValueError(_('No device selected'))
 
         target = self.cleaned_data['targets']

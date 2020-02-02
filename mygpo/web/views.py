@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.contrib import messages
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.contrib.sites.requests import RequestSite
@@ -89,12 +89,15 @@ def dashboard(request, episode_count=10):
 
     tomorrow = datetime.today() + timedelta(days=1)
 
-    newest_episodes = (
-        Episode.objects.filter(podcast__in=subscribed_podcasts, released__lt=tomorrow)
-        .select_related('podcast')
-        .prefetch_related('slugs', 'podcast__slugs')
-        .order_by('-released')[:episode_count]
-    )
+    #    newest_episodes = Episode.objects.filter(podcast__in=subscribed_podcasts,
+    #                                             released__lt=tomorrow).\
+    #                                      select_related('podcast').\
+    #                                      prefetch_related('slugs',
+    #                                                       'podcast__slugs').\
+    #                                      order_by('-released')[:episode_count]
+    #
+
+    newest_episodes = []
 
     # we only show the "install reader" link in firefox, because we don't know
     # yet how/if this works in other browsers.

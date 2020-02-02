@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth import logout
 from django.contrib import messages
 from django.forms import ValidationError
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.requests import RequestSite

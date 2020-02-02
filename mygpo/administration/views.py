@@ -15,7 +15,7 @@ from django.core.cache import cache
 from django.http import HttpResponseRedirect
 from django.template.loader import render_to_string
 from django.template import RequestContext
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.contrib.sites.requests import RequestSite
 from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
@@ -144,7 +144,9 @@ class MergeVerify(MergeBase):
 
             grouper = PodcastGrouper(podcasts)
 
-            get_features = lambda id_e: ((id_e[1].url, id_e[1].title), id_e[0])
+            def get_features(id_id):
+                e = Episode.objects.get(pk=id_id[0])
+                return ((e.url, e.title), id_id[0])
 
             num_groups = grouper.group(get_features)
 

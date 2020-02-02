@@ -4,7 +4,7 @@ import string
 import collections
 from datetime import datetime
 
-from django.utils.translation import ungettext
+from django.utils.translation import ngettext
 from django.views.decorators.cache import never_cache
 from django.utils.html import strip_tags
 from django.urls import reverse
@@ -193,10 +193,10 @@ def normalize_twitter(s):
 
 
 CCLICENSE = re.compile(
-    r'http://(www\.)?creativecommons.org/licenses/([a-z-]+)/([0-9.]+)?/?'
+    r'https?://(www\.)?creativecommons.org/licenses/([a-z-]+)/([0-9.]+)?/?'
 )
 CCPUBLICDOMAIN = re.compile(
-    r'http://(www\.)?creativecommons.org/licenses/publicdomain/?'
+    r'https?://(www\.)?creativecommons.org/licenses/publicdomain/?'
 )
 LicenseInfo = collections.namedtuple('LicenseInfo', 'name version url')
 
@@ -212,7 +212,15 @@ def license_info(license_url):
     >>> i.url
     'http://creativecommons.org/licenses/by/3.0/'
 
+    >>> ihttps = license_info('https://creativecommons.org/licenses/by/3.0/')
+    >>> i.name == ihttps.name and i.version == ihttps.version
+    True
+
     >>> iwww = license_info('http://www.creativecommons.org/licenses/by/3.0/')
+    >>> i.name == iwww.name and i.version == iwww.version
+    True
+
+    >>> iwww = license_info('https://www.creativecommons.org/licenses/by/3.0/')
     >>> i.name == iwww.name and i.version == iwww.version
     True
 
@@ -220,6 +228,10 @@ def license_info(license_url):
     >>> i.name
     'Public Domain'
     >>> i.version is None
+    True
+
+    >>> ihttps = license_info('https://www.creativecommons.org/licenses/publicdomain')
+    >>> i.name == ihttps.name and i.version == ihttps.version
     True
 
     >>> i = license_info('http://example.com/my-own-license')
@@ -282,15 +294,15 @@ def hours_to_str(hours_total):
 
     if weeks:
         strs.append(
-            ungettext('%(weeks)d week', '%(weeks)d weeks', weeks) % {'weeks': weeks}
+            ngettext('%(weeks)d week', '%(weeks)d weeks', weeks) % {'weeks': weeks}
         )
 
     if days:
-        strs.append(ungettext('%(days)d day', '%(days)d days', days) % {'days': days})
+        strs.append(ngettext('%(days)d day', '%(days)d days', days) % {'days': days})
 
     if hours:
         strs.append(
-            ungettext('%(hours)d hour', '%(hours)d hours', hours) % {'hours': hours}
+            ngettext('%(hours)d hour', '%(hours)d hours', hours) % {'hours': hours}
         )
 
     return ', '.join(strs)

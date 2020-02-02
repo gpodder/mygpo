@@ -2,7 +2,7 @@ import os.path
 
 from django import template
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext
+from django.utils.translation import gettext
 from django.utils.safestring import mark_safe
 from django.urls import reverse
 from django.utils.html import strip_tags
@@ -12,7 +12,7 @@ from mygpo.users.models import Client, SyncGroup
 from mygpo.users.views.device import show
 
 
-_ = ugettext
+_ = gettext
 register = template.Library()
 
 # Create a dictionary of device_type -> caption mappings
@@ -55,7 +55,7 @@ def device_icon(device):
         caption = DEVICE_TYPES_DICT.get(device_type, None)
 
     if icon is not None and caption is not None:
-        caption = ugettext(caption)
+        caption = gettext(caption)
         html = '<img src="%(icon)s" alt="%(caption)s" class="device_icon"/>' % dict(
             icon=staticfiles_storage.url(os.path.join('clients', icon)), caption=caption
         )

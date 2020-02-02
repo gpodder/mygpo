@@ -29,6 +29,7 @@ Retrieve Suggested Podcasts
            "description": "Linux Geekdom",
            "subscribers": 0,
            "title": "Linux Geekdom",
+           "author": "aj@linuxgeekdom.com (A.J. Stringham)",
            "url": "http://www.linuxgeekdom.com/rssmp3.xml",
            "subscribers_last_week": 0,
            "logo_url": null
@@ -39,6 +40,7 @@ Retrieve Suggested Podcasts
            "description": "Going Linux",
            "subscribers": 571,
            "title": "Going Linux",
+           "author": "Larry Bushey",
            "url": "http://goinglinux.com/mp3podcast.xml",
            "subscribers_last_week": 571,
            "logo_url": "http://goinglinux.com/images/GoingLinux80.png"

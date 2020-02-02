@@ -2,7 +2,7 @@ import hashlib
 
 from django import template
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from mygpo.web.logo import get_logo_url
 from mygpo.constants import PODCAST_LOGO_BIG_SIZE

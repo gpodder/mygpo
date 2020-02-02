@@ -70,18 +70,18 @@ def subscribe(podcast, feedurl, huburl, base_url, mode='subscribe'):
                 e.code,
                 e.reason,
             )
-            logger.warn(msg)
+            logger.warning(msg)
             raise SubscriptionError(msg)
 
     except Exception as e:
         msg = 'Could not send subscription to Hub: %s' % repr(e)
-        logger.warn(msg)
+        logger.warning(msg)
         raise SubscriptionError(msg)
 
     if resp:
         status = resp.code
         if status != 204:
-            logger.warn('received incorrect status %d' % status)
+            logger.warning('received incorrect status %d' % status)
             raise SubscriptionError('Subscription has not been accepted by ' 'the Hub')
 
 

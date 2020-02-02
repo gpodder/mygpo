@@ -12,6 +12,11 @@ except ImportError:
     pass
 
 
+import django
+import six
+
+django.utils.six = six
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -227,6 +232,8 @@ CSRF_FAILURE_VIEW = 'mygpo.web.views.csrf_failure'
 
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', '')
 
+SERVER_EMAIL = os.getenv('SERVER_EMAIL', DEFAULT_FROM_EMAIL)
+
 SECRET_KEY = os.getenv('SECRET_KEY', '')
 
 if 'pytest' in sys.argv[0]:
@@ -295,6 +302,9 @@ if _use_log_file:
     }
 
 
+DATA_UPLOAD_MAX_MEMORY_SIZE = get_intOrNone('DATA_UPLOAD_MAX_MEMORY_SIZE', None)
+
+
 # minimum number of subscribers a podcast must have to be assigned a slug
 PODCAST_SLUG_SUBSCRIBER_LIMIT = int(os.getenv('PODCAST_SLUG_SUBSCRIBER_LIMIT', 10))
 
@@ -305,7 +315,7 @@ MIN_SUBSCRIBERS_CATEGORY = int(os.getenv('MIN_SUBSCRIBERS_CATEGORY', 10))
 # maximum number of episode actions that the API processes immediatelly before
 # returning the response. Larger requests will be handled in background.
 # Handler can be set to None to disable
-API_ACTIONS_MAX_NONBG = int(os.getenv('API_ACTIONS_MAX_NONBG', 100))
+API_ACTIONS_MAX_NONBG = get_intOrNone('API_ACTIONS_MAX_NONBG', 100)
 API_ACTIONS_BG_HANDLER = 'mygpo.api.tasks.episode_actions_celery_handler'
 
 
