@@ -98,21 +98,23 @@ class Exporter(object):
                 title = channel.podcast.title
                 description = channel.podcast.description
                 url = channel.ref_url
+                outline.setAttribute('xmlUrl', url)
+                outline.setAttribute('description', description or '')
+                outline.setAttribute('type', 'rss')
             elif isinstance(channel, PodcastGroup):
                 title = channel.title
-                url = channel.podcast_set.first().url
                 for subchannel in channel.podcast_set.all():
                     outline.appendChild(create_outline(subchannel))
             else:
                 title = channel.title
                 description = channel.description
                 url = channel.url
+                outline.setAttribute('xmlUrl', url)
+                outline.setAttribute('description', description or '')
+                outline.setAttribute('type', 'rss')
 
             outline.setAttribute('title', title or '')
-            outline.setAttribute('description', description or '')
-            outline.setAttribute('text', title or description)
-            outline.setAttribute('xmlUrl', url)
-            outline.setAttribute('type', 'rss')
+            outline.setAttribute('text', title or '')
             return outline
 
         body = doc.createElement('body')
