@@ -1,9 +1,12 @@
+from django_db_geventpool.utils import close_connection
+
 from mygpo.podcasts.models import Podcast
 from mygpo.subscriptions.models import Subscription
 from mygpo.celery import celery
 
 
 @celery.task(max_retries=5)
+@close_connection
 def update_podcast_subscribers(podcast_id):
     """ Updates the subscriber count of a podcast """
 
