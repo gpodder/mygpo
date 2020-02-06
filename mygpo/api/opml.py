@@ -96,22 +96,20 @@ class Exporter(object):
 
             if isinstance(channel, SubscribedPodcast):
                 title = channel.podcast.title
-                description = channel.podcast.description
-                url = channel.ref_url
-                outline.setAttribute('xmlUrl', url)
-                outline.setAttribute('description', description or '')
+                outline.setAttribute('xmlUrl', channel.ref_url)
+                outline.setAttribute('description', channel.podcast.description or '')
                 outline.setAttribute('type', 'rss')
+                outline.setAttribute('htmlUrl', channel.podcast.link or '')
             elif isinstance(channel, PodcastGroup):
                 title = channel.title
                 for subchannel in channel.podcast_set.all():
                     outline.appendChild(create_outline(subchannel))
             else:
                 title = channel.title
-                description = channel.description
-                url = channel.url
-                outline.setAttribute('xmlUrl', url)
-                outline.setAttribute('description', description or '')
+                outline.setAttribute('xmlUrl', channel.url)
+                outline.setAttribute('description', channel.description or '')
                 outline.setAttribute('type', 'rss')
+                outline.setAttribute('htmlUrl', channel.podcast.link or '')
 
             outline.setAttribute('title', title or '')
             outline.setAttribute('text', title or '')
