@@ -109,7 +109,7 @@ class Exporter(object):
                 outline.setAttribute('xmlUrl', channel.url)
                 outline.setAttribute('description', channel.description or '')
                 outline.setAttribute('type', 'rss')
-                outline.setAttribute('htmlUrl', channel.podcast.link or '')
+                outline.setAttribute('htmlUrl', channel.link or '')
 
             outline.setAttribute('title', title or '')
             outline.setAttribute('text', title or '')
