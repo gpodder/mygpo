@@ -13,14 +13,14 @@ register_converter(ScopeConverter, 'scope')
 
 
 urlpatterns = [
-    path('api/' + django_settings.API_DEFINITION_FILE_NAME,
+    path(
+        'api/' + django_settings.API_DEFINITION_FILE_NAME,
         serve,
         kwargs={
             'path': django_settings.API_DEFINITION_FILE_NAME,
-            'document_root': django_settings.API_DEFINITION_FILE_PATH
-            }
-        ),
-
+            'document_root': django_settings.API_DEFINITION_FILE_PATH,
+        },
+    ),
     path('upload', legacy.upload),
     path('getlist', legacy.getlist),
     path(
@@ -33,7 +33,7 @@ urlpatterns = [
         simple.all_subscriptions,
         name='api-all-subscriptions',
     ),
-    path('search.<str:format>', simple.search, name='api-simple-search',),
+    path('search.<str:format>', simple.search, name='api-simple-search'),
     path(
         'suggestions/<int:count>.<str:format>',
         simple.suggestions,

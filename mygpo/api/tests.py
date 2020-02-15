@@ -457,6 +457,7 @@ class SimpleAPITests(unittest.TestCase):
         response = self.client.get(self.search_urls['json'], data)
         self.assertEqual(response.status_code, expected_status)
 
+
 class OpenAPIDefinitionValidityTest(TestCase):
     "Test the validity of the OpenAPI definition file"
 
