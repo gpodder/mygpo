@@ -1,6 +1,4 @@
 from django.urls import path, register_converter
-from django.conf import settings as django_settings
-from django.views.static import serve
 
 from . import legacy, simple, advanced, subscriptions
 from .advanced import auth, lists, sync, updates, episode, settings
@@ -13,14 +11,6 @@ register_converter(ScopeConverter, 'scope')
 
 
 urlpatterns = [
-    path(
-        'api/' + django_settings.API_DEFINITION_FILE_NAME,
-        serve,
-        kwargs={
-            'path': django_settings.API_DEFINITION_FILE_NAME,
-            'document_root': django_settings.API_DEFINITION_FILE_PATH,
-        },
-    ),
     path('upload', legacy.upload),
     path('getlist', legacy.getlist),
     path(
@@ -33,7 +23,7 @@ urlpatterns = [
         simple.all_subscriptions,
         name='api-all-subscriptions',
     ),
-    path('search.<str:format>', simple.search, name='api-simple-search'),
+    path('search.<str:format>', simple.search, name='api-simple-search',),
     path(
         'suggestions/<int:count>.<str:format>',
         simple.suggestions,
