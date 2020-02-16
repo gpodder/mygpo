@@ -2,6 +2,7 @@ import copy
 from datetime import datetime, timedelta
 import json
 import unittest
+import os
 import unittest.mock
 from urllib.parse import urlencode
 
@@ -10,6 +11,9 @@ from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.test.utils import override_settings
+
+from openapi_spec_validator import validate_spec_url
+from jsonschema import ValidationError
 
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.api.advanced import episodes
@@ -451,3 +455,10 @@ class SimpleAPITests(unittest.TestCase):
 
         response = self.client.get(self.search_urls['json'], data)
         self.assertEqual(response.status_code, expected_status)
+
+
+class OpenAPIDefinitionValidityTest(TestCase):
+    "Test the validity of the OpenAPI definition file"
+
+    def test_api_definition_validity(self):
+        validate_spec_url('file://' + os.path.abspath('./mygpo/api/openapi.yaml'))
