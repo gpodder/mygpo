@@ -9,18 +9,6 @@ from mygpo.users.settings import PUBLIC_SUB_PODCAST
 from mygpo.podcasts.models import Podcast
 
 
-class SubscriptionManager(models.Manager):
-    """ Manages subscriptions """
-
-    def subscribe(self, device, podcast):
-        # create subscription, add history
-        pass
-
-    def unsubscribe(self, device, podcast):
-        # delete subscription, add history
-        pass
-
-
 class Subscription(DeleteableModel):
     """ A subscription to a podcast on a specific client """
 
@@ -44,8 +32,6 @@ class Subscription(DeleteableModel):
     # migration is complete, this model should inherit from UpdateInfoModel
     created = models.DateTimeField()
     modified = models.DateTimeField()
-
-    objects = SubscriptionManager()
 
     class Meta:
         unique_together = [['user', 'client', 'podcast']]

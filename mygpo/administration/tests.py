@@ -15,7 +15,7 @@ from mygpo.podcasts.models import Podcast, Episode
 from mygpo.users.models import Client
 from mygpo.history.models import EpisodeHistoryEntry
 from mygpo.maintenance.merge import PodcastMerger
-from mygpo.subscriptions import subscribe, unsubscribe
+from mygpo.subscriptions.tasks import subscribe, unsubscribe
 
 
 class SimpleTest(TestCase):
