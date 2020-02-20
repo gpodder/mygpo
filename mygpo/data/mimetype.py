@@ -2,15 +2,16 @@ from collections import defaultdict
 
 import mimetypes
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 # If 20% of the episodes of a podcast are of a given type,
 # then the podcast is considered to be of that type, too
-TYPE_THRESHOLD=.2
+TYPE_THRESHOLD = 0.2
 
 
 CONTENT_TYPES = (_('image'), _('audio'), _('video'))
+
 
 def get_podcast_types(episodes):
     """Returns the types of a podcast
@@ -31,8 +32,9 @@ def get_podcast_types(episodes):
     l = list(types.items())
     l.sort(key=lambda x: x[1], reverse=True)
 
-    return [x[0] for x in
-        filter(lambda x: max_episodes / float(x[1]) >= TYPE_THRESHOLD, l)]
+    return [
+        x[0] for x in filter(lambda x: max_episodes / float(x[1]) >= TYPE_THRESHOLD, l)
+    ]
 
 
 def get_type(mimetype):

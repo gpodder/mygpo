@@ -1,89 +1,86 @@
-from django.conf.urls import url
+from django.urls import path, register_converter
 
 from . import views
 
+from mygpo.users import converters
+
+
+register_converter(converters.UsernameConverter, 'username')
+
 
 urlpatterns = [
-
-    url(r'^$',
-        views.home,
-        name='publisher'),
-
-    url(r'^(?P<username>[\w.+-]+)/update$',
+    path('', views.home, name='publisher'),
+    path(
+        '<username:username>/update',
         views.update_published_podcasts,
-        name='publisher-update'),
-
-    url(r'^(?P<username>[\w.+-]+)/update-token',
+        name='publisher-update',
+    ),
+    path(
+        '<username:username>/update-token',
         views.new_update_token,
-        name='publisher-new-update-token'),
-
-    url(r'^podcast/(?P<slug>[\w-]+)/$',
-        views.podcast_slug,
-        name='podcast-publisher-detail-slug'),
-
-    url(r'^podcast/(?P<slug>[\w-]+)/update$',
+        name='publisher-new-update-token',
+    ),
+    path(
+        'podcast/<slug:slug>/', views.podcast_slug, name='podcast-publisher-detail-slug'
+    ),
+    path(
+        'podcast/<slug:slug>/update',
         views.update_podcast_slug,
-        name='podcast-publisher-update-slug'),
-
-    url(r'^podcast/(?P<slug>[\w-]+)/save$',
+        name='podcast-publisher-update-slug',
+    ),
+    path(
+        'podcast/<slug:slug>/save',
         views.save_podcast_slug,
-        name='podcast-publisher-save-slug'),
-
-    url(r'^podcast/(?P<slug>[\w-]+)/episodes$',
+        name='podcast-publisher-save-slug',
+    ),
+    path(
+        'podcast/<slug:slug>/episodes',
         views.episodes_slug,
-        name='podcast-publisher-episodes-slug'),
-
-    url(r'^podcast/(?P<p_slug>[\w-]+)/(?P<e_slug>[\w-]+)$',
+        name='podcast-publisher-episodes-slug',
+    ),
+    path(
+        'podcast/<slug:p_slug>/<slug:e_slug>',
         views.episode_slug,
-        name='episode-publisher-detail-slug'),
-
-    url(r'^podcast/(?P<p_slug>[\w-]+)/(?P<e_slug>[\w-]+)/set-slug$',
+        name='episode-publisher-detail-slug',
+    ),
+    path(
+        'podcast/<slug:p_slug>/<slug:e_slug>/set-slug',
         views.update_episode_slug_slug,
-        name='publisher-set-episode-slug-slug'),
-
-    url(r'^podcast/(?P<podcast_id>[0-9a-f]{32})/$',
+        name='publisher-set-episode-slug-slug',
+    ),
+    path(
+        'podcast/<uuid:podcast_id>/',
         views.podcast_id,
-        name='podcast-publisher-detail-id'),
-
-    url(r'^podcast/(?P<podcast_id>[0-9a-f]{32})/update$',
+        name='podcast-publisher-detail-id',
+    ),
+    path(
+        'podcast/<uuid:podcast_id>/update',
         views.update_podcast_id,
-        name='podcast-publisher-update-id'),
-
-    url(r'^podcast/(?P<podcast_id>[0-9a-f]{32})/save$',
+        name='podcast-publisher-update-id',
+    ),
+    path(
+        'podcast/<uuid:podcast_id>/save',
         views.save_podcast_id,
-        name='podcast-publisher-save-id'),
-
-    url(r'^podcast/(?P<podcast_id>[0-9a-f]{32})/episodes$',
+        name='podcast-publisher-save-id',
+    ),
+    path(
+        'podcast/<uuid:podcast_id>/episodes',
         views.episodes_id,
-        name='podcast-publisher-episodes-id'),
-
-    url(r'^podcast/(?P<podcast_id>[0-9a-f]{32})/(?P<e_id>[0-9a-f]{32})$',
+        name='podcast-publisher-episodes-id',
+    ),
+    path(
+        'podcast/<uuid:podcast_id>/<uuid:e_id>',
         views.episode_id,
-        name='episode-publisher-detail-id'),
-
-    url(r'^podcast/(?P<podcast_id>[0-9a-f]{32})/(?P<episode_id>[0-9a-f]{32})/'
-        'set-slug$',
+        name='episode-publisher-detail-id',
+    ),
+    path(
+        'podcast/<uuid:podcast_id>/<uuid:episode_id>/' 'set-slug',
         views.update_episode_slug_id,
-        name='publisher-set-episode-slug-id'),
-
-    url(r'^group/(?P<pg_slug>[\w-]+)$',
-        views.group_slug,
-        name='group-publisher-slug'),
-
-    url(r'^group/(?P<pg_slug>[\w-]+)$',
-        views.group_id,
-        name='group-publisher-id'),
-
-    url(r'^podcast/search$',
-        views.search_podcast,
-        name='podcast-publisher-search'),
-
-    url(r'^link/$',
-        views.link,
-        name='link-here'),
-
-    url(r'^advertise$',
-        views.advertise,
-        name='advertise'),
-
+        name='publisher-set-episode-slug-id',
+    ),
+    path('group/<slug:pg_slug>', views.group_slug, name='group-publisher-slug'),
+    path('group/<slug:pg_slug>', views.group_id, name='group-publisher-id'),
+    path('podcast/search', views.search_podcast, name='podcast-publisher-search'),
+    path('link/', views.link, name='link-here'),
+    path('advertise', views.advertise, name='advertise'),
 ]

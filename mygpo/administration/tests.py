@@ -6,8 +6,6 @@ Replace this with more appropriate tests for your application.
 """
 
 import uuid
-import time
-from datetime import datetime
 from collections import Counter
 
 from django.test import TestCase
@@ -24,25 +22,36 @@ from mygpo.utils import get_timestamp
 
 
 class SimpleTest(TestCase):
-
     def test_merge(self):
 
-        p1 = Podcast.objects.get_or_create_for_url('http://example.com/podcast1.rss')
-        p2 = Podcast.objects.get_or_create_for_url('http://example.com/podcast2.rss')
+        p1 = Podcast.objects.get_or_create_for_url(
+            'http://example.com/podcast1.rss'
+        ).object
+        p2 = Podcast.objects.get_or_create_for_url(
+            'http://example.com/podcast2.rss'
+        ).object
 
-        e1 = Episode.objects.get_or_create_for_url(p1, 'http://example.com/podcast1/e1.mp3')
+        e1 = Episode.objects.get_or_create_for_url(
+            p1, 'http://example.com/podcast1/e1.mp3'
+        ).object
         e1.title = 'Episode 1'
         e1.save()
 
-        e2 = Episode.objects.get_or_create_for_url(p2, 'http://example.com/podcast1/e2.mp3')
+        e2 = Episode.objects.get_or_create_for_url(
+            p2, 'http://example.com/podcast1/e2.mp3'
+        ).object
         e2.title = 'Episode 2'
         e2.save()
 
-        e3 = Episode.objects.get_or_create_for_url(p2, 'http://example.com/podcast2/e2.mp3')
+        e3 = Episode.objects.get_or_create_for_url(
+            p2, 'http://example.com/podcast2/e2.mp3'
+        ).object
         e3.title = 'Episode 3'
         e3.save()
 
-        e4 = Episode.objects.get_or_create_for_url(p2, 'http://example.com/podcast2/e3.mp3')
+        e4 = Episode.objects.get_or_create_for_url(
+            p2, 'http://example.com/podcast2/e3.mp3'
+        ).object
         e4.title = 'Episode 4'
         e4.save()
 
@@ -61,10 +70,8 @@ class SimpleTest(TestCase):
         subscribe(p1, user, device1)
         subscribe(p2, user, device2)
 
-        action1 = EpisodeHistoryEntry.create_entry(user, e1,
-                                                   EpisodeHistoryEntry.PLAY)
-        action3 = EpisodeHistoryEntry.create_entry(user, e3,
-                                                   EpisodeHistoryEntry.PLAY)
+        action1 = EpisodeHistoryEntry.create_entry(user, e1, EpisodeHistoryEntry.PLAY)
+        action3 = EpisodeHistoryEntry.create_entry(user, e3, EpisodeHistoryEntry.PLAY)
 
         # we need that for later
         e3_id = e3.pk
@@ -72,7 +79,7 @@ class SimpleTest(TestCase):
         actions = Counter()
 
         # decide which episodes to merge
-        groups = [(0, [e1]), (1, [e2, e3]), (2, [e4])]
+        groups = [(0, [e1.id]), (1, [e2.id, e3.id]), (2, [e4.id])]
 
         # carry out the merge
         pm = PodcastMerger([p1, p2], actions, groups)

@@ -1,12 +1,17 @@
-from django.conf.urls import url
+from django.urls import path, register_converter
 
 from . import views
 
+from mygpo.users import converters
+
+
+register_converter(converters.UsernameConverter, 'username')
+
 
 urlpatterns = [
-
-    url(r'^user/(?P<username>[\w.+-]+)/favorites.xml$',
+    path(
+        'user/<username:username>/favorites.xml',
         views.favorite_feed,
-        name='favorites-feed'),
-
+        name='favorites-feed',
+    )
 ]

@@ -1,60 +1,29 @@
-from django.conf.urls import url
+from django.urls import path
 
 from . import views
 
 
 urlpatterns = [
-
-    url(r'^toplist/$',
-        views.PodcastToplistView.as_view(),
-        name='toplist'),
-
-    url(r'^toplist/episodes$',
-        views.EpisodeToplistView.as_view(),
-        name='episode-toplist'),
-
-    url(r'^directory/$',
-        views.Directory.as_view(),
-        name='directory-home'),
-
-    url(r'^carousel/$',
-        views.Carousel.as_view(),
-        name='carousel-demo'),
-
-    url(r'^missing/$',
-        views.MissingPodcast.as_view(),
-        name='missing-podcast'),
-
-    url(r'^add-podcast/$',
-        views.AddPodcast.as_view(),
-        name='add-podcast'),
-
-    url(r'^add-podcast/(?P<task_id>[^/]+)$',
+    path('toplist/', views.PodcastToplistView.as_view(), name='toplist'),
+    path(
+        'toplist/episodes', views.EpisodeToplistView.as_view(), name='episode-toplist'
+    ),
+    path('directory/', views.Directory.as_view(), name='directory-home'),
+    path('carousel/', views.Carousel.as_view(), name='carousel-demo'),
+    path('missing/', views.MissingPodcast.as_view(), name='missing-podcast'),
+    path('add-podcast/', views.AddPodcast.as_view(), name='add-podcast'),
+    path(
+        'add-podcast/<uuid:task_id>',
         views.AddPodcastStatus.as_view(),
-        name='add-podcast-status'),
-
-    url(r'^directory/\+flattr$',
-        views.FlattrPodcastList.as_view(),
-        name='flattr-podcasts'),
-
-    url(r'^directory/\+license$',
-        views.LicenseList.as_view(),
-        name='license-podcasts'),
-
-    url(r'^directory/\+license/\+url/(?P<license_url>.+)$',
+        name='add-podcast-status',
+    ),
+    path('directory/+license', views.LicenseList.as_view(), name='license-podcasts'),
+    path(
+        'directory/+license/+url/<path:license_url>',
         views.LicensePodcastList.as_view(),
-        name='license-podcasts-url'),
-
-    url(r'^directory/(?P<category>.+)$',
-        views.category,
-        name='directory'),
-
-    url(r'^search/$',
-        views.search,
-        name='search'),
-
-    url(r'^lists/$',
-        views.podcast_lists,
-        name='podcast-lists'),
-
+        name='license-podcasts-url',
+    ),
+    path('directory/<path:category>', views.category, name='directory'),
+    path('search/', views.search, name='search'),
+    path('lists/', views.podcast_lists, name='podcast-lists'),
 ]

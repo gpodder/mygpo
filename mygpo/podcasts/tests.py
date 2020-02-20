@@ -26,33 +26,31 @@ class PodcastTests(unittest.TestCase):
         p = Podcast.objects.all().order_by_next_update().first()
 
         # assert that the next_update property is calculated correctly
-        self.assertEqual(p.next_update,
-                         last_update + timedelta(hours=update_interval))
-
+        self.assertEqual(p.next_update, last_update + timedelta(hours=update_interval))
 
     def test_get_or_create_for_url(self):
         """ Test that get_or_create_for_url returns existing Podcast """
         URL = 'http://example.com/get_or_create.rss'
-        p1 = Podcast.objects.get_or_create_for_url(URL)
-        p2 = Podcast.objects.get_or_create_for_url(URL)
+        p1 = Podcast.objects.get_or_create_for_url(URL).object
+        p2 = Podcast.objects.get_or_create_for_url(URL).object
         self.assertEqual(p1.pk, p2.pk)
 
     def test_episode_count(self):
         """ Test if Podcast.episode_count is updated correctly """
         PODCAST_URL = 'http://example.com/podcast.rss'
         EPISODE_URL = 'http://example.com/episode%d.mp3'
-        NUM_EPISODES=3
+        NUM_EPISODES = 3
 
-        p = Podcast.objects.get_or_create_for_url(PODCAST_URL)
+        p = Podcast.objects.get_or_create_for_url(PODCAST_URL).object
         for n in range(NUM_EPISODES):
-            Episode.objects.get_or_create_for_url(p, EPISODE_URL % (n, ))
+            Episode.objects.get_or_create_for_url(p, EPISODE_URL % (n,))
 
         p = Podcast.objects.get(pk=p.pk)
         self.assertEqual(p.episode_count, NUM_EPISODES)
 
         # the episodes already exist this time -- no episode is created
         for n in range(NUM_EPISODES):
-            Episode.objects.get_or_create_for_url(p, EPISODE_URL % (n, ))
+            Episode.objects.get_or_create_for_url(p, EPISODE_URL % (n,))
 
         p = Podcast.objects.get(pk=p.pk)
         self.assertEqual(p.episode_count, NUM_EPISODES)

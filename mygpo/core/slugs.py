@@ -7,10 +7,6 @@ class SlugGenerator(object):
     """ Generates a unique slug for an object """
 
     def __init__(self, obj):
-        if obj.slug:
-            raise ValueError('%(obj)s already has slug %(slug)s' %
-                             dict(obj=obj, slug=obj.slug))
-
         self.obj = obj
         self.base_slug = self._get_base_slug(obj)
 
@@ -26,6 +22,10 @@ class SlugGenerator(object):
 
         The consumer can can consume until it get's an unused one """
 
+        if self.obj.slug:
+            # The object already has a slug
+            raise StopIteration
+
         if not self.base_slug:
             raise StopIteration
 
@@ -40,6 +40,7 @@ class SlugGenerator(object):
 
 class PodcastGroupSlugs(SlugGenerator):
     """ Generates slugs for Podcast Groups """
+
     pass
 
 

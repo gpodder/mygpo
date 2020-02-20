@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth import logout
 from django.contrib import messages
 from django.forms import ValidationError
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.requests import RequestSite
@@ -17,11 +17,9 @@ from django.utils.html import strip_tags
 from mygpo.podcasts.models import Podcast
 from mygpo.usersettings.models import UserSettings
 from mygpo.decorators import allowed_methods
-from mygpo.web.forms import UserAccountForm, ProfileForm, FlattrForm
+from mygpo.web.forms import UserAccountForm, ProfileForm
 from mygpo.web.utils import normalize_twitter
-from mygpo.flattr import Flattr
-from mygpo.users.settings import PUBLIC_SUB_USER, PUBLIC_SUB_PODCAST, \
-         FLATTR_TOKEN, FLATTR_AUTO, FLATTR_MYGPO, FLATTR_USERNAME
+from mygpo.users.settings import PUBLIC_SUB_USER, PUBLIC_SUB_PODCAST
 
 
 @login_required
@@ -33,40 +31,42 @@ def account(request):
     if request.method == 'GET':
 
         site = RequestSite(request)
-        flattr = Flattr(request.user, site.domain, request.is_secure())
         userpage_token = request.user.profile.get_token('userpage_token')
 
-        profile_form = ProfileForm({
-               'twitter': request.user.profile.twitter,
-               'about':   request.user.profile.about,
-            })
+        profile_form = ProfileForm(
+            {
+                'twitter': request.user.profile.twitter,
+                'about': request.user.profile.about,
+            }
+        )
 
-        form = UserAccountForm({
-            'email': request.user.email,
-            'public': request.user.profile.settings.get_wksetting(PUBLIC_SUB_USER)
-            })
+        form = UserAccountForm(
+            {
+                'email': request.user.email,
+                'public': request.user.profile.settings.get_wksetting(PUBLIC_SUB_USER),
+            }
+        )
 
-        flattr_form = FlattrForm({
-               'enable': request.user.profile.settings.get_wksetting(FLATTR_AUTO),
-               'token': request.user.profile.settings.get_wksetting(FLATTR_TOKEN),
-               'flattr_mygpo': request.user.profile.settings.get_wksetting(FLATTR_MYGPO),
-               'username': request.user.profile.settings.get_wksetting(FLATTR_USERNAME),
-            })
-
-        return render(request, 'account.html', {
-            'site': site,
-            'form': form,
-            'profile_form': profile_form,
-            'flattr_form': flattr_form,
-            'flattr': flattr,
-            'userpage_token': userpage_token,
-            })
+        return render(
+            request,
+            'account.html',
+            {
+                'site': site,
+                'form': form,
+                'profile_form': profile_form,
+                'userpage_token': userpage_token,
+            },
+        )
 
     try:
         form = UserAccountForm(request.POST)
 
         if not form.is_valid():
-            raise ValueError(_('Oops! Something went wrong. Please double-check the data you entered.'))
+            raise ValueError(
+                _(
+                    'Oops! Something went wrong. Please double-check the data you entered.'
+                )
+            )
 
         if form.cleaned_data['password_current']:
             if not request.user.check_password(form.cleaned_data['password_current']):
@@ -87,9 +87,7 @@ def account(request):
     except (ValueError, ValidationError) as e:
         messages.error(request, str(e))
 
-    return render(request, 'account.html', {
-        'form': form,
-    })
+    return render(request, 'account.html', {'form': form})
 
 
 class ProfileView(View):
@@ -101,7 +99,11 @@ class ProfileView(View):
         form = ProfileForm(request.POST)
 
         if not form.is_valid():
-            raise ValueError(_('Oops! Something went wrong. Please double-check the data you entered.'))
+            raise ValueError(
+                _(
+                    'Oops! Something went wrong. Please double-check the data you entered.'
+                )
+            )
 
         request.user.twitter = normalize_twitter(form.cleaned_data['twitter'])
         request.user.about = strip_tags(form.cleaned_data['about'])
@@ -110,69 +112,6 @@ class ProfileView(View):
         messages.success(request, _('Data updated'))
 
         return HttpResponseRedirect(reverse('account') + '#profile')
-
-
-class FlattrSettingsView(View):
-    """ Updates Flattr settings and redirects back to the Account page """
-
-    def post(self, request):
-        user = request.user
-
-        form = FlattrForm(request.POST)
-
-        if not form.is_valid():
-            raise ValueError('asdf')
-
-        auto_flattr = form.cleaned_data.get('enable', False)
-        flattr_mygpo = form.cleaned_data.get('flattr_mygpo', False)
-        username = form.cleaned_data.get('username', '')
-
-        settings = user.profile.settings
-        settings.set_wksetting(FLATTR_AUTO, auto_flattr)
-        settings.set_wksetting(FLATTR_MYGPO, flattr_mygpo)
-        settings.set_wksetting(FLATTR_USERNAME, username)
-        settings.save()
-
-        return HttpResponseRedirect(reverse('account') + '#flattr')
-
-
-class FlattrLogout(View):
-    """ Removes Flattr authentication token """
-
-    def get(self, request):
-        user = request.user
-        settings = user.profile.settings
-        settings.set_wksetting(FLATTR_AUTO, False)
-        settings.set_wksetting(FLATTR_TOKEN, False)
-        settings.set_wksetting(FLATTR_MYGPO, False)
-        settings.save()
-        return HttpResponseRedirect(reverse('account') + '#flattr')
-
-
-class FlattrTokenView(View):
-    """ Callback for the Flattr authentication
-
-    Updates the user's Flattr token and redirects back to the account page """
-
-    @method_decorator(login_required)
-    def get(self, request):
-
-        user = request.user
-        site = RequestSite(request)
-        flattr = Flattr(user, site.domain, request.is_secure())
-
-        url = request.build_absolute_uri()
-        token = flattr.process_retrieved_code(url)
-        if token:
-            messages.success(request, _('Authentication successful'))
-            settings = user.profile.settings
-            settings.set_wksetting(FLATTR_TOKEN, token)
-            settings.save()
-
-        else:
-            messages.error(request, _('Authentication failed. Try again later'))
-
-        return HttpResponseRedirect(reverse('account') + '#flattr')
 
 
 class AccountRemoveGoogle(View):
@@ -199,7 +138,6 @@ def delete_account(request):
     user.save()
     logout(request)
     return render(request, 'deleted_account.html')
-
 
 
 class DefaultPrivacySettings(View):
@@ -241,20 +179,25 @@ def privacy(request):
     site = RequestSite(request)
     user = request.user
 
-    podcasts = Podcast.objects.filter(subscription__user=user)\
-                              .distinct('pk')
+    podcasts = Podcast.objects.filter(subscription__user=user).distinct('pk')
     private = UserSettings.objects.get_private_podcasts(user)
 
     subscriptions = []
     for podcast in podcasts:
 
-        subscriptions.append( (podcast, podcast in private) )
+        subscriptions.append((podcast, podcast in private))
 
-    return render(request, 'privacy.html', {
-        'private_subscriptions': not request.user.profile.settings.get_wksetting(PUBLIC_SUB_USER),
-        'subscriptions': subscriptions,
-        'domain': site.domain,
-        })
+    return render(
+        request,
+        'privacy.html',
+        {
+            'private_subscriptions': not request.user.profile.settings.get_wksetting(
+                PUBLIC_SUB_USER
+            ),
+            'subscriptions': subscriptions,
+            'domain': site.domain,
+        },
+    )
 
 
 @vary_on_cookie
@@ -275,7 +218,4 @@ def share(request):
 
     token = user.profile.get_token('subscriptions_token')
 
-    return render(request, 'share.html', {
-        'site': site,
-        'token': token,
-        })
+    return render(request, 'share.html', {'site': site, 'token': token})

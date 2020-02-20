@@ -1,0 +1,248 @@
+{% extends "podcast-base.html" %}
+{% load i18n %}
+{% load humanize %}
+{% load episodes %}
+{% load podcasts %}
+{% load devices %}
+{% load charts %}
+{% load utils %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/podcast/"|main_menu }}{% endblock %}
+{% block sectionmenu %}
+ {% if podcast.title %}
+  {{ "/podcast/"|section_menu:podcast.title }}
+ {% else %}
+  {{ "/podcast/"|section_menu:"Unnamed Podcast" }}
+ {% endif %}
+{% endblock %}
+
+{% block title %}{{ podcast.title|default:"Unnamed Podcast"|striptags }}{% endblock %}
+
+
+{% block content %}
+
+  {% if episode %}
+   <div class="first-episode">
+    {% include "components/episode-box.html" with podcast=podcast episode=episode long=True only %}
+   </div>
+  {% endif %}
+
+ <hr />
+
+ <div class="btn-toolbar">
+
+  {% if is_publisher %}
+   <div class="btn-group">
+    <a class="btn btn-default" href="{% podcast_link_target podcast "podcast-publisher-detail" %}">
+     <i class="icon-wrench"></i>
+     {% trans "Publisher Pages" %}
+    </a>
+   </div>
+  {% endif %}
+
+  {% if not user.is_authenticated %}
+   <div class="btn-group">
+    <a class="btn btn-default" href="{% podcast_link_target podcast "subscribe" %}">
+     <i class="icon-plus"></i>
+     {% trans "Login to Subscribe" %}
+    </a>
+   </div>
+  {% endif %}
+
+  {% if devices or can_subscribe %}
+
+   <div class="btn-group">
+    {% if can_subscribe %}
+     <button class="btn btn-primary" onclick="submitForm('subscribe+all');">
+      <i class="icon-plus-sign"></i>
+      {% trans "Subscribe" %}
+     </button>
+     <button class="btn dropdown-toggle btn-primary" data-toggle="dropdown">
+      <span class="caret"></span>
+     </button>
+    {% else %}
+     <button class="btn btn-default" onclick="submitForm('unsubscribe+all');">
+      <i class="icon-remove-sign"></i>
+      {% trans "Unsubscribe" %}
+     </button>
+     <button class="btn dropdown-toggle btn-default" data-toggle="dropdown">
+      <span class="caret"></span>
+     </button>
+    {% endif %}
+    <ul class="dropdown-menu">
+     {% if can_subscribe %}
+      <li value="+all">
+       <a href="javascript:void(0);" onclick="submitForm('subscribe+all');">
+        <i class="icon-plus-sign"></i>
+        {% trans "Subscribe on all devices" %}
+       </a>
+       <form class="internal"
+             method="post"
+             action="{% podcast_link_target podcast "subscribe-all" %}"
+             id="subscribe+all">
+        {% csrf_token %}
+       </form>
+      </li>
+     {% endif %}
+     {% for device in subscribe_targets %}
+      <li value="{{ device.uid }}">
+       <a href="javascript:void(0);" onclick="submitForm('subscribe-{{ device|devices_uids }}');">
+        <i class="icon-plus"></i>
+        {{ device|devices_name }}
+       </a>
+       <form class="internal"
+             action="{% podcast_link_target podcast "subscribe" %}"
+             method="post"
+             id="subscribe-{{ device|devices_uids }}">
+         {% csrf_token %}
+         <input type="hidden" name="targets" value="{{ device|devices_uids }}" />
+       </form>
+      </li>
+     {% endfor %}
+     {% if can_subscribe and devices %}
+      <li class="divider"></li>
+     {% endif %}
+     {% if devices %}
+      <li value="+none">
+       <a href="javascript:void(0);" onclick="submitForm('unsubscribe+all');">
+        <i class="icon-remove-sign"></i>
+        {% trans "Unsubscribe from all devices " %}
+       </a>
+       <form class="internal"
+             method="post"
+             action="{% podcast_link_target podcast "unsubscribe-all" %}"
+             id="unsubscribe+all">
+        {% csrf_token %}
+       </form>
+      </li>
+     {% endif %}
+     {% for device in devices %}
+      <li value="{{ device.uid }}">
+       <a href="javascript:void(0);" onclick="submitForm('unsubscribe-{{ device.uid }}');">
+        <i class="icon-remove"></i>
+        {{ device|devices_name }}
+       </a>
+       <form class="internal"
+             method="post"
+             action="{% podcast_link_target podcast "unsubscribe" device.uid %}?return_to={% podcast_link_target podcast %}"
+             id="unsubscribe-{{ device.uid }}">
+        {% csrf_token %}
+       </form>
+      </li>
+     {% endfor %}
+    </ul>
+   </div>
+
+  {% endif %}
+
+
+   {% if has_history %}
+    <a class="btn btn-default" href="{% podcast_link_target podcast "podcast-history" %}">
+     <i class="icon-calendar"></i>
+     {% trans "Subscription History" %}
+    </a>
+   {% endif %}
+
+   <a href="javascript:void(0);" onclick="$('#tag-box').toggle();" class="btn btn-default">
+    <i class="icon-tag"></i>
+    {% trans "Tags" %}
+   </a>
+
+   {% if user.is_staff %}
+    <a class="btn btn-default" href="{% edit_link podcast %}">
+     <i class="icon-cogs"></i>Admin
+    </a>
+   {% endif %}
+
+  </div>
+
+  <div id="tag-box">
+   <hr />
+
+   <i class="icon-tag"></i>
+   <strong>{% trans "Tags" %}: </strong>
+
+   {% for tag in tags %}
+    {% spaceless %}
+     {% if tag.is_own %}
+      <span class="own">{{ tag.tag }} <a class="remove" href="{% podcast_link_target podcast "remove-tag" %}?tag={{ tag.tag }}">X</a></span>
+     {% else %}
+       <span class="other">{{ tag.tag }}</span>
+     {% endif %}
+     {% if not forloop.last %}
+      <span class="seperator">,</span>
+     {% endif %}
+    {% endspaceless %}
+   {% endfor %}
+
+   {% if user.is_authenticated %}
+    <form class="form-inline" action="{% podcast_link_target podcast "add-tag" %}">
+     <div class="input-group">
+      <span class="input-group-addon input-sm"><i class="icon-tag"></i></span>
+      <input class="input-sm form-control" type="text" name="tag" />
+      <span class="input-group-btn">
+       <button class="btn btn-success btn-sm" type="submit">
+        <i class="icon-plus"></i>
+       </button>
+      </span>
+     </div>
+    </form>
+   {% endif %}
+  </div>
+
+ <hr />
+
+
+ {% if episodes %}
+
+  <h3>{% trans "Older Episodes" %}</h3>
+
+  <div class="episodes">
+
+   {% for episode in episodes %}
+    {% include "components/episode-box.html" with episode=episode podcast=podcast only %}
+   {% endfor %}
+
+  </div>
+
+  <ul class="pagination">
+ {% for page in page_list %}
+  <li>
+   {% if page == "..." %}
+    <span>{{ page }}</span>
+   {% else %}
+
+     {% if page == current_page %}
+      <a href="{% podcast_link_target podcast "podcast-all-episodes" %}?page={{ page }}"><strong>{{ page }}</strong></a>
+     {% else %}
+      <a href="{% podcast_link_target podcast "podcast-all-episodes" %}?page={{ page }}">{{ page }}</a>
+     {% endif %}
+   {% endif %}
+  </li>
+ {% endfor %}
+ </ul>
+
+ {% endif %}
+
+{% endblock %}
+
+
+{% block javascript %}
+    {{ block.super }}
+    <script language="javascript">
+        <!--
+        function submitForm(formid)
+        {
+            document.forms[formid].submit();
+            return true;
+        }
+
+        {% if not has_tagged %}
+          // done in JS so that box is always visible if JS is disabled
+          $('#tag-box').toggle();
+        {% endif %}
+        -->
+    </script>
+
+{% endblock %}

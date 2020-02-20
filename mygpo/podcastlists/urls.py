@@ -1,50 +1,35 @@
-from django.conf.urls import url
+from django.urls import path, register_converter, include
 
 from . import views
 
+from mygpo.users import converters
+
+
+register_converter(converters.UsernameConverter, 'username')
+
+
+userpatterns = [
+    path('lists/', views.lists_user, name='lists-user'),
+    path('list/<slug:slug>', views.list_show, name='list-show'),
+    path('list/<slug:slug>.opml', views.list_opml, name='list-opml'),
+    path('list/<slug:slug>/search', views.search, name='list-search'),
+    path(
+        'list/<slug:slug>/add/<uuid:podcast_id>',
+        views.add_podcast,
+        name='list-add-podcast',
+    ),
+    path(
+        'list/<slug:slug>/remove/<int:order>',
+        views.remove_podcast,
+        name='list-remove-podcast',
+    ),
+    path('list/<slug:slug>/delete', views.delete_list, name='list-delete'),
+    path('list/<slug:slug>/rate', views.rate_list, name='list-rate'),
+]
+
 
 urlpatterns = [
-
-    url(r'^share/lists/$',
-        views.lists_own,
-        name='lists-overview'),
-
-    url(r'^share/lists/create$',
-        views.create_list,
-        name='list-create'),
-
-    url(r'^user/(?P<username>[\w.+-]+)/lists/$',
-        views.lists_user,
-        name='lists-user'),
-
-    url(r'^user/(?P<username>[\w.+-]+)/list/(?P<slug>[\w-]+)$',
-        views.list_show,
-        name='list-show'),
-
-    url(r'^user/(?P<username>[\w.+-]+)/list/(?P<slug>[\w-]+)\.opml$',
-        views.list_opml,
-        name='list-opml'),
-
-    url(r'^user/(?P<username>[\w.+-]+)/list/(?P<slug>[\w-]+)/search$',
-        views.search,
-        name='list-search'),
-
-    url(r'^user/(?P<username>[\w.+-]+)/list/(?P<slug>[\w-]+)/add/'
-        '(?P<podcast_id>\w+)$',
-        views.add_podcast,
-        name='list-add-podcast'),
-
-    url(r'^user/(?P<username>[\w.+-]+)/list/(?P<slug>[\w-]+)/remove/'
-        '(?P<order>\d+)$',
-        views.remove_podcast,
-        name='list-remove-podcast'),
-
-    url(r'^user/(?P<username>[\w.+-]+)/list/(?P<slug>[\w-]+)/delete$',
-        views.delete_list,
-        name='list-delete'),
-
-    url(r'^user/(?P<username>[\w.+-]+)/list/(?P<slug>[\w-]+)/rate$',
-        views.rate_list,
-        name='list-rate'),
-
+    path('share/lists/', views.lists_own, name='lists-overview'),
+    path('share/lists/create', views.create_list, name='list-create'),
+    path('user/<username:username>/', include(userpatterns)),
 ]

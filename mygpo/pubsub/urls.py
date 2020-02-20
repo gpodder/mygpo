@@ -1,12 +1,8 @@
-from django.conf.urls import url
+from django.urls import path
 
 from . import views
 
 
 urlpatterns = [
-
-    url(r'^subscribe$',
-        views.SubscribeView.as_view(),
-        name='pubsub-subscribe'),
-
+    path('subscribe', views.SubscribeView.as_view(), name='pubsub-subscribe')
 ]

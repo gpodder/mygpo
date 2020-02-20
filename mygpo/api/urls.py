@@ -1,107 +1,97 @@
-from django.conf.urls import url
+from django.urls import path, register_converter
 
-from . import legacy, simple, advanced, advanced, subscriptions
+from . import legacy, simple, advanced, subscriptions
 from .advanced import auth, lists, sync, updates, episode, settings
+from mygpo.users import converters
+from mygpo.usersettings.converters import ScopeConverter
+
+register_converter(converters.ClientUIDConverter, 'client-uid')
+register_converter(converters.UsernameConverter, 'username')
+register_converter(ScopeConverter, 'scope')
 
 
 urlpatterns = [
-    url(r'^upload$',
-        legacy.upload),
-
-    url(r'^getlist$',
-        legacy.getlist),
-
-    url(r'^toplist.opml$',
-        simple.toplist,
-        kwargs={'count': 50, 'format': 'opml'}),
-
-    url(r'^subscriptions/(?P<username>[\w.+-]+)/'
-        '(?P<device_uid>[\w.-]+)\.(?P<format>\w+)',
-        simple.subscriptions),
-
-    url(r'^subscriptions/(?P<username>[\w.+-]+)\.(?P<format>\w+)',
+    path('upload', legacy.upload),
+    path('getlist', legacy.getlist),
+    path(
+        'subscriptions/<username:username>/' '<client-uid:device_uid>.<str:format>',
+        simple.subscriptions,
+        name='api-simple-subscriptions',
+    ),
+    path(
+        'subscriptions/<username:username>.<str:format>',
         simple.all_subscriptions,
-        name='api-all-subscriptions'),
-
-    url(r'^toplist/(?P<count>\d+)\.(?P<format>\w+)',
-        simple.toplist,
-        name='toplist-opml'),
-
-    url(r'^search\.(?P<format>\w+)',
-        simple.search),
-
-    url(r'^suggestions/(?P<count>\d+)\.(?P<format>\w+)',
+        name='api-all-subscriptions',
+    ),
+    path('search.<str:format>', simple.search, name='api-simple-search',),
+    path(
+        'suggestions/<int:count>.<str:format>',
         simple.suggestions,
-        name='suggestions-opml'),
-
-    url(r'^toplist\.(?P<format>\w+)$',
+        name='suggestions-opml',
+    ),
+    path(
+        'toplist.opml',
         simple.toplist,
-        kwargs={'count': 50}),
-
-    url(r'^gpodder-examples\.(?P<format>\w+)$',
-        simple.example_podcasts,
-        name='example-opml'),
-
-    url(r'^api/(?P<version>[12])/subscriptions/(?P<username>[\w.+-]+)/'
-        '(?P<device_uid>[\w.-]+)\.json',
+        kwargs={'count': 50, 'format': 'opml'},
+        name='api-simple-toplist.opml',
+    ),
+    path('toplist/<int:count>.<str:format>', simple.toplist, name='api-simple-toplist'),
+    path(
+        'toplist.<str:format>',
+        simple.toplist,
+        kwargs={'count': 50},
+        name='api-simple-toplist-50',
+    ),
+    path('gpodder-examples.<str:format>', simple.example_podcasts, name='example-opml'),
+    path(
+        'api/<int:version>/subscriptions/<username:username>/'
+        '<client-uid:device_uid>.json',
         subscriptions.SubscriptionsAPI.as_view(),
-        name='subscriptions-api'),
-
-    url(r'^api/(?P<version>[12])/episodes/(?P<username>[\w.+-]+)\.json',
-        advanced.episodes),
-
-    url(r'^api/[12]/devices/(?P<username>[\w.+-]+)/'
-        '(?P<device_uid>[\w.-]+)\.json',
-        advanced.device),
-
-    url(r'^api/[12]/devices/(?P<username>[\w.+-]+)\.json',
-        advanced.devices),
-
-    url(r'^api/2/auth/(?P<username>[\w.+-]+)/login\.json',
-        auth.login),
-
-    url(r'^api/2/auth/(?P<username>[\w.+-]+)/logout\.json',
-        auth.logout),
-
-    url(r'^api/2/tags/(?P<count>\d+)\.json',
-        advanced.directory.top_tags),
-
-    url(r'^api/2/tag/(?P<tag>[^/]+)/(?P<count>\d+)\.json',
-        advanced.directory.tag_podcasts),
-
-    url(r'^api/2/data/podcast\.json',
-        advanced.directory.podcast_info),
-
-    url(r'^api/2/data/episode\.json',
+        name='subscriptions-api',
+    ),
+    path('api/<int:version>/episodes/<username:username>.json', advanced.episodes),
+    path(
+        'api/<int:version>/devices/<username:username>/' '<client-uid:device_uid>.json',
+        advanced.device,
+    ),
+    path('api/<int:version>/devices/<username:username>.json', advanced.devices),
+    path('api/2/auth/<username:username>/login.json', auth.login),
+    path('api/2/auth/<username:username>/logout.json', auth.logout),
+    path('api/2/tags/<int:count>.json', advanced.directory.top_tags),
+    path('api/2/tag/<str:tag>/<int:count>.json', advanced.directory.tag_podcasts),
+    path(
+        'api/2/data/podcast.json',
+        advanced.directory.podcast_info,
+        name='api-podcast-info',
+    ),
+    path(
+        'api/2/data/episode.json',
         advanced.directory.episode_info,
-        name='api-episode-info'),
-
-    url(r'^api/2/chapters/(?P<username>[\w.+-]+)\.json',
-        episode.ChaptersAPI.as_view()),
-
-    url(r'^api/2/updates/(?P<username>[\w.+-]+)/(?P<device_uid>[\w.-]+)\.json',
-        updates.DeviceUpdates.as_view()),
-
-    url(r'^api/2/settings/(?P<username>[\w.+-]+)/'
-        '(?P<scope>account|device|podcast|episode)\.json',
+        name='api-episode-info',
+    ),
+    path('api/2/podcasts/create', advanced.directory.add_podcast),
+    path(
+        'api/2/task/<uuid:job_id>',
+        advanced.directory.add_podcast_status,
+        name='api-add-podcast-status',
+    ),
+    path('api/2/chapters/<username:username>.json', episode.ChaptersAPI.as_view()),
+    path(
+        'api/2/updates/<username:username>/<client-uid:device_uid>.json',
+        updates.DeviceUpdates.as_view(),
+    ),
+    path(
+        'api/2/settings/<username:username>/<scope:scope>.json',
         settings.SettingsAPI.as_view(),
-        name='settings-api'),
-
-    url(r'^api/2/favorites/(?P<username>[\w.+-]+).json',
-        advanced.favorites),
-
-    url(r'^api/2/lists/(?P<username>[\w.+-]+)/create\.(?P<format>\w+)',
-        lists.create),
-
-    url(r'^api/2/lists/(?P<username>[\w.+-]+)\.json',
-        lists.get_lists),
-
-    url(r'^api/2/lists/(?P<username>[\w.+-]+)/list/'
-        '(?P<slug>[\w-]+)\.(?P<format>\w+)',
+        name='settings-api',
+    ),
+    path('api/2/favorites/<username:username>.json', advanced.favorites),
+    path('api/2/lists/<username:username>/create.<str:format>', lists.create),
+    path('api/2/lists/<username:username>.json', lists.get_lists),
+    path(
+        'api/2/lists/<username:username>/list/<slug:slug>.<str:format>',
         lists.podcast_list,
-        name='api-get-list'),
-
-    url(r'^api/2/sync-devices/(?P<username>[\w.+-]+)\.json',
-        sync.main),
-
+        name='api-get-list',
+    ),
+    path('api/2/sync-devices/<username:username>.json', sync.main),
 ]

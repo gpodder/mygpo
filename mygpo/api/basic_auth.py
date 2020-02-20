@@ -1,17 +1,18 @@
 import base64
+import binascii
 from functools import wraps
 
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.contrib.auth import authenticate, login
 
 import logging
-logger = logging.getLogger(__name__)
 
+logger = logging.getLogger(__name__)
 
 
 #############################################################################
 #
-def view_or_basicauth(view, request, test_func, realm = "", *args, **kwargs):
+def view_or_basicauth(view, request, test_func, realm="", *args, **kwargs):
     """
     This is a helper function used by both 'require_valid_user' and
     'has_perm_or_basicauth' that does the nitty of determining if they
@@ -33,7 +34,6 @@ def view_or_basicauth(view, request, test_func, realm = "", *args, **kwargs):
     if not auth:
         return auth_request()
 
-
     auth = auth.split(None, 1)
 
     if len(auth) == 2:
@@ -42,13 +42,14 @@ def view_or_basicauth(view, request, test_func, realm = "", *args, **kwargs):
         # NOTE: We are only support basic authentication for now.
         if auth_type.lower() == 'basic':
             try:
-                credentials = base64.b64decode(credentials)\
-                                    .decode('utf-8')\
-                                    .split(':', 1)
+                credentials = (
+                    base64.b64decode(credentials).decode('utf-8').split(':', 1)
+                )
 
-            except UnicodeDecodeError as e:
+            except (UnicodeDecodeError, binascii.Error) as e:
                 return HttpResponseBadRequest(
-                    'Could not decode credentials: {msg}'.format(msg=str(e)))
+                    'Could not decode credentials: {msg}'.format(msg=str(e))
+                )
 
             if len(credentials) == 2:
                 uname, passwd = credentials
@@ -97,17 +98,16 @@ def require_valid_user(protected_view):
 
     XXX: Fix usage descriptions, ideally provide an example as doctest.
     """
+
     @wraps(protected_view)
     def wrapper(request, *args, **kwargs):
         def check_valid_user(user):
             return user.is_authenticated
 
-        return view_or_basicauth(protected_view, \
-                                 request, \
-                                 check_valid_user, \
-                                 '', \
-                                 *args, \
-                                 **kwargs)
+        return view_or_basicauth(
+            protected_view, request, check_valid_user, '', *args, **kwargs
+        )
+
     return wrapper
 
 
@@ -116,6 +116,7 @@ def check_username(protected_view):
     decorator to check whether the username passed to the view (from the URL)
     matches the username with which the user is authenticated.
     """
+
     @wraps(protected_view)
     def wrapper(request, username, *args, **kwargs):
 
@@ -124,15 +125,21 @@ def check_username(protected_view):
 
         else:
             # TODO: raise SuspiciousOperation here?
-            logger.warn('username in authentication (%s) and in requested resource (%s) don\'t match' % (request.user.username, username))
-            return HttpResponseBadRequest('username in authentication (%s) and in requested resource (%s) don\'t match' % (request.user.username, username))
+            logger.warning(
+                'username in authentication (%s) and in requested resource (%s) don\'t match'
+                % (request.user.username, username)
+            )
+            return HttpResponseBadRequest(
+                'username in authentication (%s) and in requested resource (%s) don\'t match'
+                % (request.user.username, username)
+            )
 
     return wrapper
 
 
 #############################################################################
 #
-def has_perm_or_basicauth(perm, realm = ""):
+def has_perm_or_basicauth(perm, realm=""):
     """
     This is similar to the above decorator 'logged_in_or_basicauth'
     except that it requires the logged in user to have a specific
@@ -145,11 +152,14 @@ def has_perm_or_basicauth(perm, realm = ""):
         ...
 
     """
+
     def view_decorator(func):
         @wraps(func)
         def wrapper(request, *args, **kwargs):
-            return view_or_basicauth(func, request,
-                                     lambda u: u.has_perm(perm),
-                                     realm, *args, **kwargs)
+            return view_or_basicauth(
+                func, request, lambda u: u.has_perm(perm), realm, *args, **kwargs
+            )
+
         return wrapper
+
     return view_decorator

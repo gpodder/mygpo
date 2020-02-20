@@ -6,9 +6,7 @@ from django.db import models, migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('podcasts', '0001_initial'),
-    ]
+    dependencies = [('podcasts', '0001_initial')]
 
     operations = [
         migrations.AddField(
@@ -44,9 +42,7 @@ class Migration(migrations.Migration):
             field=models.DateTimeField(null=True),
         ),
         migrations.AlterField(
-            model_name='slug',
-            name='slug',
-            field=models.SlugField(max_length=150),
+            model_name='slug', name='slug', field=models.SlugField(max_length=150)
         ),
         migrations.AlterField(
             model_name='episode',
@@ -64,8 +60,6 @@ class Migration(migrations.Migration):
             field=models.CharField(db_index=True, max_length=1000, blank=True),
         ),
         migrations.AlterField(
-            model_name='url',
-            name='url',
-            field=models.URLField(max_length=2048),
+            model_name='url', name='url', field=models.URLField(max_length=2048)
         ),
     ]

@@ -40,7 +40,7 @@ Update Device Data
 List Devices
 ------------
 
-..  http:post:: /api/2/devices/(username).json
+..  http:get:: /api/2/devices/(username).json
     :synopsis: list the user's devices
 
     * Requires HTTP authentication

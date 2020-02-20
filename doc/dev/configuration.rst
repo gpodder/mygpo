@@ -10,7 +10,7 @@ General
 -------
 
 * ``ADMINS`` - corresponds to `Django's ADMINS setting <https://docs.djangoproject.com/en/dev/ref/settings/#admins>`_. Specified as ``Name <email@host.com>``. Multiple entries can be separated by whitespace.
-* ``DEBUG`` - Debug flug, see `Django's DEBUG setting <https://docs.djangoproject.com/en/1.11/ref/settings/#std:setting-DEBUG>`_
+* ``DEBUG`` - Debug flag, see `Django's DEBUG setting <https://docs.djangoproject.com/en/1.11/ref/settings/#std:setting-DEBUG>`_
 * ``DEFAULT_BASE_URL`` - base URL for creating URLs, eg ``https://gpodder.net``
 * ``GOOGLE_ANALYTICS_PROPERTY_ID`` - Google Analytics Property ID
 * ``MAINTENANCE`` - Maintenance flag
@@ -61,6 +61,7 @@ Search
 
 * ``ELASTICSEARCH_SERVER`` - ``host:port`` of the Elasticsearch server
 * ``ELASTICSEARCH_TIMEOUT`` - timeout in seconds for queries to the Elasticsearch server
+* ``QUERY_LENGTH_CUTOFF`` - Maximum non-whitespace length of search query
 
 
 Directory
@@ -73,8 +74,6 @@ Directory
 Feeds
 -----
 
-* ``FLATTR_KEY`` - Flattr API key
-* ``FLATTR_SECRET`` - Flattr API secret
 * ``FLICKR_API_KEY`` - Flickr API key
 * ``SOUNDCLOUD_CONSUMER_KEY`` - Soundcloud Consumer key
 
@@ -97,3 +96,8 @@ Social Login
 
 * ``GOOGLE_CLIENT_ID`` - Google Client ID
 * ``GOOGLE_CLIENT_SECRET`` - Google Client Secret
+
+
+API
+---
+* ``MAX_EPISODE_ACTIONS`` - maximum number of episode actions that the API will return in one `GET` request.

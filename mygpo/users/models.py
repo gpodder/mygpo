@@ -1,7 +1,4 @@
-
-
 import re
-import uuid
 import collections
 import dateutil.parser
 
@@ -9,21 +6,22 @@ from django.core.validators import RegexValidator
 from django.db import transaction, models
 from django.db.models import Q
 from django.contrib.auth.models import User as DjangoUser
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.validators import ASCIIUsernameValidator
 from django.conf import settings
 
-from mygpo.core.models import (TwitterModel, UUIDModel,
-    GenericManager, DeleteableModel, )
+from mygpo.core.models import TwitterModel, UUIDModel, GenericManager, DeleteableModel
 from mygpo.usersettings.models import UserSettings
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.utils import random_token
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 
 RE_DEVICE_UID = re.compile(r'^[\w.-]+$')
+
 
 # TODO: derive from ValidationException?
 class InvalidEpisodeActionAttributes(ValueError):
@@ -39,13 +37,13 @@ GroupedDevices = collections.namedtuple('GroupedDevices', 'is_synced devices')
 
 class UIDValidator(RegexValidator):
     """ Validates that the Device UID conforms to the given regex """
+
     regex = RE_DEVICE_UID
     message = 'Invalid Device ID'
-    code='invalid-uid'
+    code = 'invalid-uid'
 
 
 class UserProxyQuerySet(models.QuerySet):
-
     def by_username_or_email(self, username, email):
         """ Queries for a User by username or email """
         q = Q()
@@ -92,12 +90,12 @@ class UserProxy(DjangoUser):
         self.profile.activation_key = None
         self.profile.save()
 
-
     def get_grouped_devices(self):
         """ Returns groups of synced devices and a unsynced group """
 
-        clients = Client.objects.filter(user=self, deleted=False)\
-                                .order_by('-sync_group')
+        clients = Client.objects.filter(user=self, deleted=False).order_by(
+            '-sync_group'
+        )
 
         last_group = object()
         group = None
@@ -105,7 +103,7 @@ class UserProxy(DjangoUser):
         for client in clients:
             # check if we have just found a new group
             if last_group != client.sync_group:
-                if group != None:
+                if group is not None:
                     yield group
 
                 group = GroupedDevices(client.sync_group is not None, [])
@@ -114,7 +112,7 @@ class UserProxy(DjangoUser):
             group.devices.append(client)
 
         # yield remaining group
-        if group != None:
+        if group is not None:
             yield group
 
 
@@ -122,8 +120,9 @@ class UserProfile(TwitterModel):
     """ Additional information stored for a User """
 
     # the user to which this profile belongs
-    user = models.OneToOneField(settings.AUTH_USER_MODEL,
-                                related_name='profile')
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile'
+    )
 
     # if False, suggestions should be updated
     suggestions_up_to_date = models.BooleanField(default=False)
@@ -135,20 +134,22 @@ class UserProfile(TwitterModel):
     google_email = models.CharField(max_length=100, null=True)
 
     # token for accessing subscriptions of this use
-    subscriptions_token = models.CharField(max_length=32, null=True,
-                                           default=random_token)
+    subscriptions_token = models.CharField(
+        max_length=32, null=True, default=random_token
+    )
 
     # token for accessing the favorite-episodes feed of this user
-    favorite_feeds_token = models.CharField(max_length=32, null=True,
-                                            default=random_token)
+    favorite_feeds_token = models.CharField(
+        max_length=32, null=True, default=random_token
+    )
 
     # token for automatically updating feeds published by this user
-    publisher_update_token = models.CharField(max_length=32, null=True,
-                                              default=random_token)
+    publisher_update_token = models.CharField(
+        max_length=32, null=True, default=random_token
+    )
 
     # token for accessing the userpage of this user
-    userpage_token = models.CharField(max_length=32, null=True,
-                                      default=random_token)
+    userpage_token = models.CharField(max_length=32, null=True, default=random_token)
 
     # key for activating the user
     activation_key = models.CharField(max_length=40, null=True)
@@ -174,15 +175,13 @@ class UserProfile(TwitterModel):
         try:
             return UserSettings.objects.get(user=self.user, content_type=None)
         except UserSettings.DoesNotExist:
-            return UserSettings(user=self.user, content_type=None,
-                                object_id=None)
+            return UserSettings(user=self.user, content_type=None, object_id=None)
 
 
 class SyncGroup(models.Model):
     """ A group of Clients """
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def sync(self):
         """ Sync the group, ie bring all members up-to-date """
@@ -234,26 +233,25 @@ class Client(UUIDModel, DeleteableModel):
     uid = models.CharField(max_length=64, validators=[UIDValidator()])
 
     # the user to which the Client belongs
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     # User-assigned name
     name = models.CharField(max_length=100, default='New Device')
 
     # one of several predefined types
-    type = models.CharField(max_length=max(len(k) for k, v in TYPES),
-                            choices=TYPES, default=OTHER)
+    type = models.CharField(
+        max_length=max(len(k) for k, v in TYPES), choices=TYPES, default=OTHER
+    )
 
     # user-agent string from which the Client was last accessed (for writing)
     user_agent = models.CharField(max_length=300, null=True, blank=True)
 
-    sync_group = models.ForeignKey(SyncGroup, null=True, blank=True,
-                                   on_delete=models.PROTECT)
+    sync_group = models.ForeignKey(
+        SyncGroup, null=True, blank=True, on_delete=models.PROTECT
+    )
 
     class Meta:
-        unique_together = (
-            ('user', 'uid'),
-        )
+        unique_together = (('user', 'uid'),)
 
     @transaction.atomic
     def sync_with(self, other):
@@ -262,17 +260,17 @@ class Client(UUIDModel, DeleteableModel):
         if self.user != other.user:
             raise ValueError('the devices do not belong to the user')
 
-        if self.sync_group is not None and \
-           other.sync_group is not None and \
-           self.sync_group != other.sync_group:
+        if (
+            self.sync_group is not None
+            and other.sync_group is not None
+            and self.sync_group != other.sync_group
+        ):
             # merge sync_groups
             ogroup = other.sync_group
-            Client.objects.filter(sync_group=ogroup)\
-                          .update(sync_group=self.sync_group)
+            Client.objects.filter(sync_group=ogroup).update(sync_group=self.sync_group)
             ogroup.delete()
 
-        elif self.sync_group is None and \
-             other.sync_group is None:
+        elif self.sync_group is None and other.sync_group is None:
             sg = SyncGroup.objects.create(user=self.user)
             other.sync_group = sg
             other.save()
@@ -311,8 +309,6 @@ class Client(UUIDModel, DeleteableModel):
 
         Groups are represented as lists of devices """
 
-        sg = self.sync_group
-
         user = UserProxy.objects.from_user(self.user)
         for group in user.get_grouped_devices():
 
@@ -340,8 +336,7 @@ class Client(UUIDModel, DeleteableModel):
         if not self.sync_group:
             return []
 
-        return Client.objects.filter(sync_group=self.sync_group)\
-                             .exclude(pk=self.pk)
+        return Client.objects.filter(sync_group=self.sync_group).exclude(pk=self.pk)
 
     @property
     def display_name(self):
@@ -351,8 +346,12 @@ class Client(UUIDModel, DeleteableModel):
         return '{name} ({uid})'.format(name=self.name, uid=self.uid)
 
 
-TOKEN_NAMES = ('subscriptions_token', 'favorite_feeds_token',
-        'publisher_update_token', 'userpage_token')
+TOKEN_NAMES = (
+    'subscriptions_token',
+    'favorite_feeds_token',
+    'publisher_update_token',
+    'userpage_token',
+)
 
 
 class TokenException(Exception):
@@ -361,7 +360,6 @@ class TokenException(Exception):
 
 class HistoryEntry(object):
     """ A class that can represent subscription and episode actions """
-
 
     @classmethod
     def from_action_dict(cls, action):
@@ -377,33 +375,32 @@ class HistoryEntry(object):
 
         return entry
 
-
     @property
     def playmark(self):
         return getattr(self, 'position', None)
 
-
     @classmethod
-    def fetch_data(cls, user, entries,
-            podcasts=None, episodes=None):
+    def fetch_data(cls, user, entries, podcasts=None, episodes=None):
         """ Efficiently loads additional data for a number of entries """
 
         if podcasts is None:
             # load podcast data
             podcast_ids = [getattr(x, 'podcast_id', None) for x in entries]
             podcast_ids = filter(None, podcast_ids)
-            podcasts = Podcast.objects.filter(id__in=podcast_ids)\
-                                      .prefetch_related('slugs')
+            podcasts = Podcast.objects.filter(id__in=podcast_ids).prefetch_related(
+                'slugs'
+            )
             podcasts = {podcast.id.hex: podcast for podcast in podcasts}
 
         if episodes is None:
             # load episode data
             episode_ids = [getattr(x, 'episode_id', None) for x in entries]
             episode_ids = filter(None, episode_ids)
-            episodes = Episode.objects.filter(id__in=episode_ids)\
-                                      .select_related('podcast')\
-                                      .prefetch_related('slugs',
-                                                        'podcast__slugs')
+            episodes = (
+                Episode.objects.filter(id__in=episode_ids)
+                .select_related('podcast')
+                .prefetch_related('slugs', 'podcast__slugs')
+            )
             episodes = {episode.id.hex: episode for episode in episodes}
 
         # load device data
@@ -411,7 +408,6 @@ class HistoryEntry(object):
         device_ids = [getattr(x, 'device_id', None) for x in entries]
         device_ids = filter(None, device_ids)
         devices = {client.id.hex: client for client in user.client_set.all()}
-
 
         for entry in entries:
             podcast_id = getattr(entry, 'podcast_id', None)
@@ -425,6 +421,5 @@ class HistoryEntry(object):
 
             device = devices.get(getattr(entry, 'device_id', None), None)
             entry.device = device
-
 
         return entries

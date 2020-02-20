@@ -2,8 +2,7 @@ import uuid
 from functools import partial
 from datetime import datetime
 
-from django.http import HttpResponse, HttpResponseBadRequest, \
-     HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
 from django.contrib.sites.requests import RequestSite
@@ -20,8 +19,7 @@ from mygpo.api.httpresponse import JsonResponse
 from mygpo.podcastlists.models import PodcastList
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.decorators import allowed_methods, cors_origin
-from mygpo.api.simple import parse_subscription, format_podcast_list, \
-     check_format
+from mygpo.api.simple import parse_subscription, format_podcast_list, check_format
 from mygpo.podcastlists.views import list_decorator
 
 
@@ -54,14 +52,14 @@ def create(request, username, format):
             'slug': slug,
             'created': datetime.utcnow(),
             'modified': datetime.utcnow(),
-        }
+        },
     )
 
     if not created:
         return HttpResponse('List already exists', status=409)
 
     urls = parse_subscription(request.body.decode('utf-8'), format)
-    podcasts = [Podcast.objects.get_or_create_for_url(url) for url in urls]
+    podcasts = [Podcast.objects.get_or_create_for_url(url).object for url in urls]
 
     for podcast in podcasts:
         plist.add_entry(podcast)
@@ -73,14 +71,12 @@ def create(request, username, format):
     return response
 
 
-
 def _get_list_data(l, username, domain):
     return dict(
-            title= l.title,
-            name = l.slug,
-            web  = 'http://%s%s' % (domain,
-                reverse('list-show', args=[username, l.slug])),
-        )
+        title=l.title,
+        name=l.slug,
+        web='http://%s%s' % (domain, reverse('list-show', args=[username, l.slug])),
+    )
 
 
 @csrf_exempt
@@ -99,8 +95,7 @@ def get_lists(request, username):
 
     site = RequestSite(request)
 
-    get_data = partial(_get_list_data, username=user.username,
-                domain=site.domain)
+    get_data = partial(_get_list_data, username=user.username, domain=site.domain)
     lists_data = list(map(get_data, lists))
 
     return JsonResponse(lists_data)
@@ -113,11 +108,7 @@ def get_lists(request, username):
 @cors_origin()
 def podcast_list(request, username, slug, format):
 
-    handlers = dict(
-            GET = get_list,
-            PUT = update_list,
-            DELETE = delete_list,
-        )
+    handlers = dict(GET=get_list, PUT=update_list, DELETE=delete_list)
     return handlers[request.method](request, username, slug, format)
 
 
@@ -133,14 +124,19 @@ def get_list(request, plist, owner, format):
 
     domain = RequestSite(request).domain
     p_data = lambda p: podcast_data(p, domain, scale)
-    title = '{title} by {username}'.format(title=plist.title,
-            username=owner.username)
+    title = '{title} by {username}'.format(title=plist.title, username=owner.username)
 
     objs = [entry.content_object for entry in plist.entries.all()]
 
-    return format_podcast_list(objs, format, title, json_map=p_data,
-            jsonp_padding=request.GET.get('jsonp', ''),
-            xml_template='podcasts.xml', request=request)
+    return format_podcast_list(
+        objs,
+        format,
+        title,
+        json_map=p_data,
+        jsonp_padding=request.GET.get('jsonp', ''),
+        xml_template='podcasts.xml',
+        request=request,
+    )
 
 
 @list_decorator(must_own=True)
@@ -148,7 +144,7 @@ def get_list(request, plist, owner, format):
 def update_list(request, plist, owner, format):
     """ Replaces the podcasts in the list and returns 204 No Content """
     urls = parse_subscription(request.body.decode('utf-8'), format)
-    podcasts = [Podcast.objects.get_or_create_for_url(url) for url in urls]
+    podcasts = [Podcast.objects.get_or_create_for_url(url).object for url in urls]
     plist.set_entries(podcasts)
 
     return HttpResponse(status=204)

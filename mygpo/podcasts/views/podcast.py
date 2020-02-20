@@ -6,7 +6,6 @@ from django.http import HttpResponseBadRequest, HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.requests import RequestSite
-from django.utils.translation import ugettext as _
 from django.contrib import messages
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control
@@ -24,18 +23,17 @@ from mygpo.subscriptions.tasks import (
     unsubscribe_all as unsubscribe_podcast_all,
 )
 from mygpo.history.models import HistoryEntry
-from mygpo.core.tasks import flattr_thing
-from mygpo.utils import normalize_feed_url
-from mygpo.users.settings import PUBLIC_SUB_PODCAST, FLATTR_TOKEN
+from mygpo.utils import normalize_feed_url, to_maxlength
+from mygpo.users.settings import PUBLIC_SUB_PODCAST
 from mygpo.publisher.utils import check_publisher_permission
 from mygpo.usersettings.models import UserSettings
 from mygpo.users.models import Client
 from mygpo.web.forms import SyncForm
 from mygpo.decorators import allowed_methods
-from mygpo.web.utils import get_podcast_link_target, get_page_list, \
-    check_restrictions
+from mygpo.web.utils import get_podcast_link_target, get_page_list, check_restrictions
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -73,22 +71,17 @@ def show(request, podcast):
 
     if user.is_authenticated:
         subscribed_devices = Client.objects.filter(
-            subscription__user=user,
-            subscription__podcast=podcast,
+            subscription__user=user, subscription__podcast=podcast
         )
 
         subscribe_targets = get_subscribe_targets(podcast, user)
 
-        has_history = HistoryEntry.objects.filter(user=user, podcast=podcast)\
-                                          .exists()
-        can_flattr = (user.profile.settings.get_wksetting(FLATTR_TOKEN) and
-                      podcast.flattr_url)
+        has_history = HistoryEntry.objects.filter(user=user, podcast=podcast).exists()
 
     else:
         has_history = False
         subscribed_devices = []
         subscribe_targets = []
-        can_flattr = False
 
     is_publisher = check_publisher_permission(user, podcast)
 
@@ -96,24 +89,27 @@ def show(request, podcast):
     num_pages = episodes_total / num_episodes
     page_list = get_page_list(1, num_pages, 1, 15)
 
-    return render(request, 'podcast.html', {
-        'tags': tags,
-        'has_tagged': has_tagged,
-        'url': current_site,
-        'has_history': has_history,
-        'podcast': podcast,
-        'devices': subscribed_devices,
-        'related_podcasts': rel_podcasts,
-        'can_subscribe': len(subscribe_targets) > 0,
-        'subscribe_targets': subscribe_targets,
-        'episode': episode,
-        'episodes': episodes,
-        'max_listeners': max_listeners,
-        'can_flattr': can_flattr,
-        'is_publisher': is_publisher,
-        'page_list': page_list,
-        'current_page': 1,
-    })
+    return render(
+        request,
+        'podcast.html',
+        {
+            'tags': tags,
+            'has_tagged': has_tagged,
+            'url': current_site,
+            'has_history': has_history,
+            'podcast': podcast,
+            'devices': subscribed_devices,
+            'related_podcasts': rel_podcasts,
+            'can_subscribe': len(subscribe_targets) > 0,
+            'subscribe_targets': subscribe_targets,
+            'episode': episode,
+            'episodes': episodes,
+            'max_listeners': max_listeners,
+            'is_publisher': is_publisher,
+            'page_list': page_list,
+            'current_page': 1,
+        },
+    )
 
 
 def get_tags(podcast, user, max_tags=50):
@@ -142,11 +138,13 @@ def episode_list(podcast, user, offset=0, limit=20):
 
     page_start = podcast.max_episode_order - offset
     page_end = page_start - limit
-    return Episode.objects.filter(podcast=podcast,
-                                  order__lte=page_start,
-                                  order__gt=page_end)\
-                          .prefetch_related('slugs')\
-                          .order_by('-order')
+    return (
+        Episode.objects.filter(
+            podcast=podcast, order__lte=page_start, order__gt=page_end
+        )
+        .prefetch_related('slugs')
+        .order_by('-order')
+    )
 
 
 def all_episodes(request, podcast, page_size=20):
@@ -159,7 +157,7 @@ def all_episodes(request, podcast, page_size=20):
 
     user = request.user
 
-    episodes = episode_list(podcast, user, (page-1) * page_size, page_size)
+    episodes = episode_list(podcast, user, (page - 1) * page_size, page_size)
     episodes_total = podcast.episode_count or 0
     num_pages = episodes_total / page_size
     page_list = get_page_list(1, num_pages, page, 15)
@@ -169,14 +167,18 @@ def all_episodes(request, podcast, page_size=20):
 
     is_publisher = check_publisher_permission(user, podcast)
 
-    return render(request, 'episodes.html', {
-        'podcast': podcast,
-        'episodes': episodes,
-        'max_listeners': max_listeners,
-        'page_list': page_list,
-        'current_page': page,
-        'is_publisher': is_publisher,
-    })
+    return render(
+        request,
+        'episodes.html',
+        {
+            'podcast': podcast,
+            'episodes': episodes,
+            'max_listeners': max_listeners,
+            'page_list': page_list,
+            'current_page': page,
+            'is_publisher': is_publisher,
+        },
+    )
 
 
 @never_cache
@@ -191,10 +193,16 @@ def add_tag(request, podcast):
 
     tags = tag_str.split(',')
     tags = map(str.strip, tags)
+    tags = map(str.lower, tags)
+    tags = list(filter(None, tags))
 
     ContentType.objects.get_for_model(podcast)
 
     for tag in tags:
+
+        # trim to maximum length
+        tag = to_maxlength(Tag, 'tag', tag)
+
         Tag.objects.get_or_create(
             tag=tag,
             source=Tag.USER,
@@ -213,8 +221,8 @@ def add_tag(request, podcast):
 @login_required
 def remove_tag(request, podcast):
 
-    tag_str = request.GET.get('tag', '')
-    if not tag_str:
+    tag_str = request.GET.get('tag', None)
+    if tag_str is None:
         return HttpResponseBadRequest()
 
     user = request.user
@@ -224,13 +232,14 @@ def remove_tag(request, podcast):
 
     ContentType.objects.get_for_model(podcast)
 
-    Tag.objects.filter(
-        tag__in=tags,
-        source=Tag.USER,
-        user=user,
-        content_type=ContentType.objects.get_for_model(podcast),
-        object_id=podcast.id,
-    ).delete()
+    for tag in tags:
+        Tag.objects.filter(
+            tag__iexact=tag,
+            source=Tag.USER,
+            user=user,
+            content_type=ContentType.objects.get_for_model(podcast),
+            object_id=podcast.id,
+        ).delete()
 
     if request.GET.get('next', '') == 'mytags':
         return HttpResponseRedirect('/tags/')
@@ -246,7 +255,7 @@ def subscribe(request, podcast):
     if request.method == 'POST':
 
         # multiple UIDs from the /podcast/<slug>/subscribe
-        device_uids = [k for (k,v) in request.POST.items() if k==v]
+        device_uids = [k for (k, v) in request.POST.items() if k == v]
 
         # single UID from /podcast/<slug>
         if 'targets' in request.POST:
@@ -266,10 +275,7 @@ def subscribe(request, podcast):
 
     targets = get_subscribe_targets(podcast, request.user)
 
-    return render(request, 'subscribe.html', {
-        'targets': targets,
-        'podcast': podcast,
-    })
+    return render(request, 'subscribe.html', {'targets': targets, 'podcast': podcast})
 
 
 @never_cache
@@ -302,8 +308,14 @@ def unsubscribe(request, podcast, device_uid):
     try:
         unsubscribe_podcast.delay(podcast, user, device)
     except SubscriptionException as e:
-        logger.exception('Web: %(username)s: could not unsubscribe from podcast %(podcast_url)s on device %(device_id)s' %
-            {'username': request.user.username, 'podcast_url': podcast.url, 'device_id': device.id})
+        logger.exception(
+            'Web: %(username)s: could not unsubscribe from podcast %(podcast_url)s on device %(device_id)s'
+            % {
+                'username': request.user.username,
+                'podcast_url': podcast.url,
+                'device_id': device.id,
+            }
+        )
 
     return HttpResponseRedirect(return_to)
 
@@ -324,14 +336,16 @@ def subscribe_url(request):
     url = request.GET.get('url', None)
 
     if not url:
-        raise Http404('http://my.gpodder.org/subscribe?url=http://www.example.com/podcast.xml')
+        raise Http404(
+            'http://my.gpodder.org/subscribe?url=http://www.example.com/podcast.xml'
+        )
 
     url = normalize_feed_url(url)
 
     if not url:
         raise Http404('Please specify a valid url')
 
-    podcast = Podcast.objects.get_or_create_for_url(url)
+    podcast = Podcast.objects.get_or_create_for_url(url).object
 
     return HttpResponseRedirect(get_podcast_link_target(podcast, 'subscribe'))
 
@@ -349,32 +363,10 @@ def set_public(request, podcast, public):
     return HttpResponseRedirect(get_podcast_link_target(podcast))
 
 
-@never_cache
-@login_required
-def flattr_podcast(request, podcast):
-    """ Flattrs a podcast, records an event and redirects to the podcast """
-
-    user = request.user
-    site = RequestSite(request)
-    now = datetime.utcnow()
-
-    # do flattring via the tasks queue, but wait for the result
-    task = flattr_thing.delay(user.pk, podcast.get_id(), site.domain,
-            request.is_secure(), 'Podcast')
-    success, msg = task.get()
-
-    if success:
-        messages.success(request, _("Flattr\'d"))
-
-    else:
-        messages.error(request, msg)
-
-    return HttpResponseRedirect(get_podcast_link_target(podcast))
-
-
 # To make all view accessible via either IDs or Slugs
 # a decorator queries the podcast and passes the Id on to the
 # regular views
+
 
 def slug_decorator(f):
     @wraps(f)
@@ -419,25 +411,23 @@ def id_decorator(f):
     return _decorator
 
 
-show_slug            = slug_decorator(show)
-subscribe_slug       = slug_decorator(subscribe)
-subscribe_all_slug   = slug_decorator(subscribe_all)
-unsubscribe_slug     = slug_decorator(unsubscribe)
+show_slug = slug_decorator(show)
+subscribe_slug = slug_decorator(subscribe)
+subscribe_all_slug = slug_decorator(subscribe_all)
+unsubscribe_slug = slug_decorator(unsubscribe)
 unsubscribe_all_slug = slug_decorator(unsubscribe_all)
-add_tag_slug         = slug_decorator(add_tag)
-remove_tag_slug      = slug_decorator(remove_tag)
-set_public_slug      = slug_decorator(set_public)
-all_episodes_slug    = slug_decorator(all_episodes)
-flattr_podcast_slug  = slug_decorator(flattr_podcast)
+add_tag_slug = slug_decorator(add_tag)
+remove_tag_slug = slug_decorator(remove_tag)
+set_public_slug = slug_decorator(set_public)
+all_episodes_slug = slug_decorator(all_episodes)
 
 
-show_id            = id_decorator(show)
-subscribe_id       = id_decorator(subscribe)
-subscribe_all_id   = id_decorator(subscribe_all)
-unsubscribe_id     = id_decorator(unsubscribe)
+show_id = id_decorator(show)
+subscribe_id = id_decorator(subscribe)
+subscribe_all_id = id_decorator(subscribe_all)
+unsubscribe_id = id_decorator(unsubscribe)
 unsubscribe_all_id = id_decorator(unsubscribe_all)
-add_tag_id         = id_decorator(add_tag)
-remove_tag_id      = id_decorator(remove_tag)
-set_public_id      = id_decorator(set_public)
-all_episodes_id    = id_decorator(all_episodes)
-flattr_podcast_id  = id_decorator(flattr_podcast)
+add_tag_id = id_decorator(add_tag)
+remove_tag_id = id_decorator(remove_tag)
+set_public_id = id_decorator(set_public)
+all_episodes_id = id_decorator(all_episodes)

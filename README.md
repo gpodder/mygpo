@@ -4,7 +4,6 @@ mygpo - Source for gpodder.net
 mygpo is the website and webservice powering gpodder.net.
 
 
-
 License
 -------
 mygpo is licensed under the GNU Affero General Public License Version 3. See file [COPYING](COPYING) for details.

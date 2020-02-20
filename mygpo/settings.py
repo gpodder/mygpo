@@ -6,10 +6,16 @@ import dj_database_url
 
 try:
     from psycopg2cffi import compat
+
     compat.register()
 except ImportError:
     pass
 
+
+import django
+import six
+
+django.utils.six = six
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -33,9 +39,18 @@ ADMINS = re.findall(r'\s*([^<]+) <([^>]+)>\s*', os.getenv('ADMINS', ''))
 MANAGERS = ADMINS
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default='postgres://mygpo:mygpo@localhost/mygpo'),
+    'default': dj_database_url.config(default='postgres://mygpo:mygpo@localhost/mygpo')
 }
+
+
+_USE_GEVENT = get_bool('USE_GEVENT', False)
+if _USE_GEVENT:
+    # see https://github.com/jneight/django-db-geventpool
+    default = DATABASES['default']
+    default['ENGINE'] = ('django_db_geventpool.backends.postgresql_psycopg2',)
+    default['CONN_MAX_AGE'] = 0
+    options = default.get('OPTIONS', {})
+    options['MAX_CONNS'] = 20
 
 
 _cache_used = bool(os.getenv('CACHE_BACKEND', False))
@@ -44,8 +59,8 @@ if _cache_used:
     CACHES = {}
     CACHES['default'] = {
         'BACKEND': os.getenv(
-            'CACHE_BACKEND',
-            'django.core.cache.backends.memcached.MemcachedCache'),
+            'CACHE_BACKEND', 'django.core.cache.backends.memcached.MemcachedCache'
+        ),
         'LOCATION': os.getenv('CACHE_LOCATION'),
     }
 
@@ -67,20 +82,31 @@ SITE_ID = 1
 # to load the internationalization machinery.
 USE_I18N = True
 
-STATIC_ROOT = 'staticfiles'
-STATIC_URL = '/media/'
 
-STATICFILES_DIRS = (
-    os.path.abspath(os.path.join(BASE_DIR, '..', 'htdocs', 'media')),
+# Static Files
+
+STATIC_ROOT = 'staticfiles'
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS = (os.path.abspath(os.path.join(BASE_DIR, '..', 'static')),)
+
+
+# Media Files
+
+MEDIA_ROOT = os.getenv(
+    'MEDIA_ROOT', os.path.abspath(os.path.join(BASE_DIR, '..', 'media'))
 )
 
+MEDIA_URL = '/media/'
 
-TEMPLATES = [{
-    'BACKEND': 'django.template.backends.django.DjangoTemplates',
-    'DIRS': [],
-    'OPTIONS': {
-        'debug': DEBUG,
-        'context_processors': [
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'OPTIONS': {
+            'debug': DEBUG,
+            'context_processors': [
                 'django.contrib.auth.context_processors.auth',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.i18n',
@@ -93,22 +119,21 @@ TEMPLATES = [{
                 # make the debug variable available in templates
                 # https://docs.djangoproject.com/en/dev/ref/templates/api/#django-core-context-processors-debug
                 'django.template.context_processors.debug',
-
                 # required so that the request obj can be accessed from
                 # templates. this is used to direct users to previous
                 # page after login
                 'django.template.context_processors.request',
-        ],
-        'libraries': {
-            'staticfiles' : 'django.templatetags.static',
+            ],
+            'libraries': {'staticfiles': 'django.templatetags.static'},
+            'loaders': [
+                (
+                    'django.template.loaders.cached.Loader',
+                    ['django.template.loaders.app_directories.Loader'],
+                )
+            ],
         },
-        'loaders': [
-            ('django.template.loaders.cached.Loader', [
-                'django.template.loaders.app_directories.Loader',
-            ]),
-        ],
-    },
-}]
+    }
+]
 
 
 MIDDLEWARE = [
@@ -158,12 +183,12 @@ INSTALLED_APPS = [
     'mygpo.pubsub',
     'mygpo.podcastlists',
     'mygpo.votes',
-    'django_nose',
 ]
 
 try:
     if DEBUG:
         import debug_toolbar
+
         INSTALLED_APPS += ['debug_toolbar']
         MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
 
@@ -172,10 +197,10 @@ except ImportError:
 
 
 try:
-    import opbeat
+    if DEBUG:
+        import django_extensions
 
-    if not DEBUG:
-        INSTALLED_APPS += ['opbeat.contrib.django']
+        INSTALLED_APPS += ['django_extensions']
 
 except ImportError:
     pass
@@ -207,9 +232,11 @@ CSRF_FAILURE_VIEW = 'mygpo.web.views.csrf_failure'
 
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', '')
 
+SERVER_EMAIL = os.getenv('SERVER_EMAIL', DEFAULT_FROM_EMAIL)
+
 SECRET_KEY = os.getenv('SECRET_KEY', '')
 
-if 'test' in sys.argv:
+if 'pytest' in sys.argv[0]:
     SECRET_KEY = 'test'
 
 GOOGLE_ANALYTICS_PROPERTY_ID = os.getenv('GOOGLE_ANALYTICS_PROPERTY_ID', '')
@@ -230,15 +257,9 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
-        'verbose': {
-            'format': '%(asctime)s %(name)s %(levelname)s %(message)s',
-        },
+        'verbose': {'format': '%(asctime)s %(name)s %(levelname)s %(message)s'}
     },
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse'
-        },
-    },
+    'filters': {'require_debug_false': {'()': 'django.utils.log.RequireDebugFalse'}},
     'handlers': {
         'console': {
             'level': os.getenv('LOGGING_CONSOLE_LEVEL', 'DEBUG'),
@@ -253,8 +274,7 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': os.getenv('LOGGING_DJANGO_HANDLERS',
-                                  'console').split(),
+            'handlers': os.getenv('LOGGING_DJANGO_HANDLERS', 'console').split(),
             'propagate': True,
             'level': os.getenv('LOGGING_DJANGO_LEVEL', 'WARN'),
         },
@@ -263,8 +283,7 @@ LOGGING = {
             'level': os.getenv('LOGGING_MYGPO_LEVEL', 'INFO'),
         },
         'celery': {
-            'handlers': os.getenv('LOGGING_CELERY_HANDLERS',
-                                  'console').split(),
+            'handlers': os.getenv('LOGGING_CELERY_HANDLERS', 'console').split(),
             'level': os.getenv('LOGGING_CELERY_LEVEL', 'DEBUG'),
         },
     },
@@ -277,15 +296,17 @@ if _use_log_file:
         'level': 'INFO',
         'class': 'logging.handlers.RotatingFileHandler',
         'filename': os.getenv('LOGGING_FILENAME'),
-        'maxBytes': 10000000,
+        'maxBytes': 10_000_000,
         'backupCount': 10,
         'formatter': 'verbose',
     }
 
 
+DATA_UPLOAD_MAX_MEMORY_SIZE = get_intOrNone('DATA_UPLOAD_MAX_MEMORY_SIZE', None)
+
+
 # minimum number of subscribers a podcast must have to be assigned a slug
-PODCAST_SLUG_SUBSCRIBER_LIMIT = int(os.getenv(
-                                    'PODCAST_SLUG_SUBSCRIBER_LIMIT', 10))
+PODCAST_SLUG_SUBSCRIBER_LIMIT = int(os.getenv('PODCAST_SLUG_SUBSCRIBER_LIMIT', 10))
 
 # minimum number of subscribers that a podcast needs to "push" one of its
 # categories to the top
@@ -294,7 +315,7 @@ MIN_SUBSCRIBERS_CATEGORY = int(os.getenv('MIN_SUBSCRIBERS_CATEGORY', 10))
 # maximum number of episode actions that the API processes immediatelly before
 # returning the response. Larger requests will be handled in background.
 # Handler can be set to None to disable
-API_ACTIONS_MAX_NONBG = int(os.getenv('API_ACTIONS_MAX_NONBG', 100))
+API_ACTIONS_MAX_NONBG = get_intOrNone('API_ACTIONS_MAX_NONBG', 100)
 API_ACTIONS_BG_HANDLER = 'mygpo.api.tasks.episode_actions_celery_handler'
 
 
@@ -309,17 +330,6 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # enabled access to staff-only areas with ?staff=<STAFF_TOKEN>
 STAFF_TOKEN = os.getenv('STAFF_TOKEN', None)
-
-# Flattr settings -- available after you register your app
-FLATTR_KEY = os.getenv('FLATTR_KEY', '')
-FLATTR_SECRET = os.getenv('FLATTR_SECRET', '')
-
-# Flattr thing of the webservice. Will be flattr'd when a user sets
-# the "Auto-Flattr gpodder.net" option
-FLATTR_MYGPO_THING = os.getenv(
-    'FLATTR_MYGPO_THING',
-    'https://flattr.com/submit/auto?user_id=stefankoegl&url=http://gpodder.net'
-)
 
 # The User-Agent string used for outgoing HTTP requests
 USER_AGENT = 'gpodder.net (+https://github.com/gpodder/mygpo)'
@@ -364,24 +374,45 @@ OPBEAT = {
     "SECRET_TOKEN": os.getenv('OPBEAT_SECRET_TOKEN', ''),
 }
 
-LOCALE_PATHS = [
-    os.path.abspath(os.path.join(BASE_DIR, 'locale')),
-]
+LOCALE_PATHS = [os.path.abspath(os.path.join(BASE_DIR, 'locale'))]
 
 INTERNAL_IPS = os.getenv('INTERNAL_IPS', '').split()
 
-EMAIL_BACKEND = os.getenv('EMAIL_BACKEND',
-                          'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_BACKEND = os.getenv(
+    'EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend'
+)
 
 PODCAST_AD_ID = os.getenv('PODCAST_AD_ID')
 
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
-NOSE_ARGS = [
-    '--with-doctest',
-    '--stop',
-    '--where=mygpo',
-]
-
+MAX_EPISODE_ACTIONS = int(os.getenv('MAX_EPISODE_ACTIONS', 1000))
 
 SEARCH_CUTOFF = float(os.getenv('SEARCH_CUTOFF', 0.3))
+
+# Maximum non-whitespace length of search query
+# If length of query is shorter than QUERY_LENGTH_CUTOFF, no results
+# will be returned to avoid a server timeout due to too many possible
+# responses
+QUERY_LENGTH_CUTOFF = int(os.getenv('QUERY_LENGTH_CUTOFF', 3))
+
+### Sentry
+
+try:
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+    from sentry_sdk.integrations.celery import CeleryIntegration
+    from sentry_sdk.integrations.redis import RedisIntegration
+
+    # Sentry Data Source Name (DSN)
+    sentry_dsn = os.getenv('SENTRY_DSN', '')
+    if not sentry_dsn:
+        raise ValueError('Could not set up sentry because ' 'SENTRY_DSN is not set')
+
+    sentry_sdk.init(
+        dsn=sentry_dsn,
+        integrations=[DjangoIntegration(), CeleryIntegration(), RedisIntegration()],
+        send_default_pii=True,
+    )
+
+except (ImportError, ValueError):
+    pass

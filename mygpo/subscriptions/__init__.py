@@ -6,6 +6,7 @@ from mygpo.subscriptions.models import Subscription, SubscribedPodcast
 from mygpo.history.models import SUBSCRIPTION_ACTIONS, HistoryEntry
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 # we cannot import models in __init__.py, because it gets loaded while all
@@ -19,10 +20,11 @@ def get_subscribe_targets(podcast, user):
     This excludes all devices/syncgroups on which the podcast is already
     subscribed """
 
-    clients = Client.objects.filter(user=user)\
-                            .exclude(subscription__podcast=podcast,
-                                     subscription__user=user)\
-                            .select_related('sync_group')
+    clients = (
+        Client.objects.filter(user=user)
+        .exclude(subscription__podcast=podcast, subscription__user=user)
+        .select_related('sync_group')
+    )
 
     targets = set()
     for client in clients:
@@ -40,10 +42,12 @@ def get_subscribed_podcasts(user, only_public=False):
     The attribute "url" contains the URL that was used when subscribing to
     the podcast """
 
-    subscriptions = Subscription.objects.filter(user=user)\
-                                        .order_by('podcast')\
-                                        .distinct('podcast')\
-                                        .select_related('podcast')
+    subscriptions = (
+        Subscription.objects.filter(user=user)
+        .order_by('podcast')
+        .distinct('podcast')
+        .select_related('podcast')
+    )
     private = UserSettings.objects.get_private_podcasts(user)
 
     podcasts = []
@@ -61,17 +65,20 @@ def get_subscribed_podcasts(user, only_public=False):
     return podcasts
 
 
-def get_subscription_history(user, client=None, since=None, until=None,
-                             public_only=False):
+def get_subscription_history(
+    user, client=None, since=None, until=None, public_only=False
+):
     """ Returns chronologically ordered subscription history entries
 
     Setting device_id restricts the actions to a certain device
     """
 
     logger.info('Subscription History for {user}'.format(user=user.username))
-    history = HistoryEntry.objects.filter(user=user)\
-                                  .filter(action__in=SUBSCRIPTION_ACTIONS)\
-                                  .order_by('timestamp')
+    history = (
+        HistoryEntry.objects.filter(user=user)
+        .filter(action__in=SUBSCRIPTION_ACTIONS)
+        .order_by('timestamp')
+    )
 
     if client:
         logger.info(u'... client {client_uid}'.format(client_uid=client.uid))
@@ -136,9 +143,7 @@ def subscription_diff(history):
         elif entry.action == HistoryEntry.UNSUBSCRIBE:
             subscriptions[entry.podcast] -= 1
 
-    subscribe = [podcast for (podcast, value) in
-                 subscriptions.items() if value > 0]
-    unsubscribe = [podcast for (podcast, value) in
-                   subscriptions.items() if value < 0]
+    subscribe = [podcast for (podcast, value) in subscriptions.items() if value > 0]
+    unsubscribe = [podcast for (podcast, value) in subscriptions.items() if value < 0]
 
     return subscribe, unsubscribe

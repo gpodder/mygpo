@@ -3,7 +3,7 @@
 """OPML importer and exporter (based on gPodder's "opml" module)
 
 This module contains helper classes to import subscriptions from OPML files on
-the web and to export a list of podcast objects to valid OPML 1.1 files.
+the web and to export a list of podcast objects to valid OPML 2.0 files.
 """
 
 import os
@@ -29,19 +29,21 @@ class Importer(object):
             raise ValueError from e
 
         for outline in doc.getElementsByTagName('outline'):
-            if outline.getAttribute('type') in self.VALID_TYPES and \
-                    outline.getAttribute('xmlUrl') or \
-                    outline.getAttribute('url'):
+            if (
+                outline.getAttribute('type') in self.VALID_TYPES
+                and outline.getAttribute('xmlUrl')
+                or outline.getAttribute('url')
+            ):
                 channel = {
-                    'url': outline.getAttribute('xmlUrl') or \
-                           outline.getAttribute('url'),
-                    'title': outline.getAttribute('title') or \
-                             outline.getAttribute('text') or \
-                             outline.getAttribute('xmlUrl') or \
-                             outline.getAttribute('url'),
-                    'description': outline.getAttribute('text') or \
-                                   outline.getAttribute('xmlUrl') or \
-                                   outline.getAttribute('url'),
+                    'url': outline.getAttribute('xmlUrl')
+                    or outline.getAttribute('url'),
+                    'title': outline.getAttribute('title')
+                    or outline.getAttribute('text')
+                    or outline.getAttribute('xmlUrl')
+                    or outline.getAttribute('url'),
+                    'description': outline.getAttribute('text')
+                    or outline.getAttribute('xmlUrl')
+                    or outline.getAttribute('url'),
                 }
 
                 if channel['description'] == channel['title']:
@@ -56,7 +58,7 @@ class Importer(object):
 class Exporter(object):
     """
     Helper class to export a list of channel objects to a local file in OPML
-    1.1 format. See www.opml.org for the OPML specification.
+    2.0 format. See www.opml.org for the OPML specification.
     """
 
     def __init__(self, title='my.gpodder.org Subscriptions'):
@@ -89,25 +91,28 @@ class Exporter(object):
         def create_outline(channel):
             from mygpo.subscriptions.models import SubscribedPodcast
             from mygpo.podcasts.models import PodcastGroup
-            if isinstance(channel, SubscribedPodcast):
-                title = channel.podcast.title
-                description = channel.podcast.description
-                url = channel.ref_url
-            elif isinstance(channel, PodcastGroup):
-                title = channel.title
-                podcast = channel.podcast_set.first()
-                description = podcast.description
-                url = podcast.url
-            else:
-                title = channel.title
-                description = channel.description
-                url = channel.url
 
             outline = doc.createElement('outline')
+
+            if isinstance(channel, SubscribedPodcast):
+                title = channel.podcast.title
+                outline.setAttribute('xmlUrl', channel.ref_url)
+                outline.setAttribute('description', channel.podcast.description or '')
+                outline.setAttribute('type', 'rss')
+                outline.setAttribute('htmlUrl', channel.podcast.link or '')
+            elif isinstance(channel, PodcastGroup):
+                title = channel.title
+                for subchannel in channel.podcast_set.all():
+                    outline.appendChild(create_outline(subchannel))
+            else:
+                title = channel.title
+                outline.setAttribute('xmlUrl', channel.url)
+                outline.setAttribute('description', channel.description or '')
+                outline.setAttribute('type', 'rss')
+                outline.setAttribute('htmlUrl', channel.link or '')
+
             outline.setAttribute('title', title or '')
-            outline.setAttribute('text', description or '')
-            outline.setAttribute('xmlUrl', url)
-            outline.setAttribute('type', 'rss')
+            outline.setAttribute('text', title or '')
             return outline
 
         body = doc.createElement('body')
@@ -115,6 +120,4 @@ class Exporter(object):
             body.appendChild(create_outline(channel))
         opml.appendChild(body)
 
-        return doc.toprettyxml(encoding='utf-8', \
-                               indent='  ', \
-                               newl=os.linesep)
+        return doc.toprettyxml(encoding='utf-8', indent='  ', newl=os.linesep)

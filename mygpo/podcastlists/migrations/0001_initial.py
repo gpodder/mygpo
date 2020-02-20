@@ -17,56 +17,66 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='PodcastList',
             fields=[
-                ('id', models.UUIDField(
-                    max_length=32,
-                    serialize=False,
-                    primary_key=True)),
+                (
+                    'id',
+                    models.UUIDField(max_length=32, serialize=False, primary_key=True),
+                ),
                 ('title', models.CharField(max_length=512)),
                 ('slug', models.SlugField(max_length=128)),
                 ('created', models.DateTimeField()),
                 ('modified', models.DateTimeField()),
-                ('user', models.ForeignKey(
-                    to=settings.AUTH_USER_MODEL,
-                    on_delete=models.CASCADE,
-                )),
+                (
+                    'user',
+                    models.ForeignKey(
+                        to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+                    ),
+                ),
             ],
-            options={
-            },
+            options={},
             bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='PodcastListEntry',
             fields=[
-                ('id', models.AutoField(
-                    verbose_name='ID',
-                    serialize=False,
-                    auto_created=True,
-                    primary_key=True)),
+                (
+                    'id',
+                    models.AutoField(
+                        verbose_name='ID',
+                        serialize=False,
+                        auto_created=True,
+                        primary_key=True,
+                    ),
+                ),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('modified', models.DateTimeField(auto_now=True)),
                 ('order', models.PositiveSmallIntegerField()),
                 ('object_id', models.UUIDField(max_length=32)),
-                ('content_type', models.ForeignKey(
-                    to='contenttypes.ContentType',
-                    on_delete=django.db.models.deletion.CASCADE)),
-                ('podcastlist', models.ForeignKey(
-                    related_name='entries',
-                    to='podcastlists.PodcastList',
-                    on_delete=models.CASCADE,
-                )),
+                (
+                    'content_type',
+                    models.ForeignKey(
+                        to='contenttypes.ContentType',
+                        on_delete=django.db.models.deletion.CASCADE,
+                    ),
+                ),
+                (
+                    'podcastlist',
+                    models.ForeignKey(
+                        related_name='entries',
+                        to='podcastlists.PodcastList',
+                        on_delete=models.CASCADE,
+                    ),
+                ),
             ],
-            options={
-            },
+            options={},
             bases=(models.Model,),
         ),
         migrations.AlterUniqueTogether(
             name='podcastlistentry',
-            unique_together=set([
-                ('podcastlist', 'order'),
-                ('podcastlist', 'content_type', 'object_id')]),
+            unique_together=set(
+                [('podcastlist', 'order'), ('podcastlist', 'content_type', 'object_id')]
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='podcastlist',
-            unique_together=set([('user', 'slug')]),
+            name='podcastlist', unique_together=set([('user', 'slug')])
         ),
     ]

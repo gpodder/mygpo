@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.contrib import messages
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.contrib.sites.requests import RequestSite
@@ -20,8 +20,8 @@ from mygpo.web.utils import process_lang_params
 from mygpo.utils import parse_range
 from mygpo.podcastlists.models import PodcastList
 from mygpo.favorites.models import FavoriteEpisode
-#from mygpo.web.views.podcast import slug_id_decorator
-from mygpo.users.settings import FLATTR_AUTO, FLATTR_TOKEN
+
+# from mygpo.web.views.podcast import slug_id_decorator
 from mygpo.publisher.models import PublishedPodcast
 
 
@@ -43,10 +43,7 @@ def welcome(request):
 
     toplist = Podcast.objects.all().toplist(lang)
 
-    return render(request, 'home.html', {
-          'url': current_site,
-          'toplist': toplist,
-    })
+    return render(request, 'home.html', {'url': current_site, 'toplist': toplist})
 
 
 @vary_on_cookie
@@ -90,31 +87,29 @@ def dashboard(request, episode_count=10):
     if PublishedPodcast.objects.filter(publisher=request.user).exists():
         checklist.append('publish')
 
-    if request.user.profile.settings.get_wksetting(FLATTR_TOKEN):
-        checklist.append('flattr')
-
-    if request.user.profile.settings.get_wksetting(FLATTR_AUTO):
-        checklist.append('auto-flattr')
-
     tomorrow = datetime.today() + timedelta(days=1)
 
-    newest_episodes = Episode.objects.filter(podcast__in=subscribed_podcasts,
-                                             released__lt=tomorrow).\
-                                      select_related('podcast').\
-                                      prefetch_related('slugs',
-                                                       'podcast__slugs').\
-                                      order_by('-released')[:episode_count]
+    #    newest_episodes = Episode.objects.filter(podcast__in=subscribed_podcasts,
+    #                                             released__lt=tomorrow).\
+    #                                      select_related('podcast').\
+    #                                      prefetch_related('slugs',
+    #                                                       'podcast__slugs').\
+    #                                      order_by('-released')[:episode_count]
+    #
 
+    newest_episodes = []
 
     # we only show the "install reader" link in firefox, because we don't know
     # yet how/if this works in other browsers.
     # hints appreciated at https://bugs.gpodder.org/show_bug.cgi?id=58
-    show_install_reader = \
-                'firefox' in request.META.get('HTTP_USER_AGENT', '').lower()
+    show_install_reader = 'firefox' in request.META.get('HTTP_USER_AGENT', '').lower()
 
     random_podcast = Podcast.objects.all().random().prefetch_related('slugs').first()
 
-    return render(request, 'dashboard.html', {
+    return render(
+        request,
+        'dashboard.html',
+        {
             'user': request.user,
             'subscribed_podcasts': subscribed_podcasts,
             'newest_episodes': list(newest_episodes),
@@ -123,7 +118,8 @@ def dashboard(request, episode_count=10):
             'site': site,
             'show_install_reader': show_install_reader,
             'podcast_ad': podcast_ad,
-        })
+        },
+    )
 
 
 @vary_on_cookie
@@ -138,19 +134,21 @@ def mytags(request):
     for tag in tags:
         tags_tag[tag.tag].append(tag.content_object)
 
-    return render(request, 'mytags.html', {
-        'tags_tag': dict(tags_tag.items()),
-    })
+    return render(request, 'mytags.html', {'tags_tag': dict(tags_tag.items())})
 
 
 @never_cache
 def csrf_failure(request, reason=""):
     site = RequestSite(request)
-    return render(request, 'csrf.html', {
-        'site': site,
-        'method': request.method,
-        'referer': request.META.get('HTTP_REFERER', _('another site')),
-        'path': request.path,
-        'get': request.GET,
-        'post': request.POST,
-    })
+    return render(
+        request,
+        'csrf.html',
+        {
+            'site': site,
+            'method': request.method,
+            'referer': request.META.get('HTTP_REFERER', _('another site')),
+            'path': request.path,
+            'get': request.GET,
+            'post': request.POST,
+        },
+    )

@@ -11,6 +11,7 @@ from mygpo.suggestions.models import PodcastSuggestion
 from mygpo.podcasts.models import Podcast
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -19,12 +20,15 @@ logger = logging.getLogger(__name__)
 def blacklist(request, blacklisted_podcast):
     user = request.user
 
-    logger.info('Removing suggestion of "{podcast}" for "{user}"'.format(
-        podcast=blacklisted_podcast, user=user))
+    logger.info(
+        'Removing suggestion of "{podcast}" for "{user}"'.format(
+            podcast=blacklisted_podcast, user=user
+        )
+    )
 
-    suggestion = PodcastSuggestion.objects.filter(suggested_to=user,
-                                                  podcast=blacklisted_podcast)\
-                                          .update(deleted=True)
+    suggestion = PodcastSuggestion.objects.filter(
+        suggested_to=user, podcast=blacklisted_podcast
+    ).update(deleted=True)
     return HttpResponseRedirect(reverse('suggestions'))
 
 
@@ -33,13 +37,13 @@ def blacklist(request, blacklisted_podcast):
 @login_required
 def suggestions(request):
     user = request.user
-    suggestions = Podcast.objects.filter(podcastsuggestion__suggested_to=user,
-                                         podcastsuggestion__deleted=False)
+    suggestions = Podcast.objects.filter(
+        podcastsuggestion__suggested_to=user, podcastsuggestion__deleted=False
+    )
     current_site = RequestSite(request)
-    return render(request, 'suggestions.html', {
-        'entries': suggestions,
-        'url': current_site
-    })
+    return render(
+        request, 'suggestions.html', {'entries': suggestions, 'url': current_site}
+    )
 
 
 blacklist_slug = slug_decorator(blacklist)

@@ -6,6 +6,7 @@ from mygpo.users.settings import STORE_UA
 from mygpo.users.models import Client
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 

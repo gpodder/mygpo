@@ -1,0 +1,2779 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+# Translators:
+# Yaron Shahrabani <sh.yaron@gmail.com>, 2019
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-01-18 18:57+0000\n"
+"PO-Revision-Date: 2018-06-20 06:29+0000\n"
+"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2019\n"
+"Language-Team: Hebrew (https://www.transifex.com/yaron/teams/87581/he/)\n"
+"Language: he\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % "
+"1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;\n"
+
+#: mygpo/administration/templates/admin/activate-user.html:9
+#: mygpo/administration/templates/admin/activate-user.html:12
+#: mygpo/administration/templates/admin/overview.html:22
+#: mygpo/administration/templates/admin/resend-acivation.html:9
+msgid "Activate User"
+msgstr "הפעלת משתמש"
+
+#: mygpo/administration/templates/admin/activate-user.html:20
+#: mygpo/administration/templates/admin/resend-acivation.html:20
+#: mygpo/web/forms.py:182 mygpo/web/templates/account.html:112
+msgid "Username"
+msgstr "שם משתמש"
+
+#: mygpo/administration/templates/admin/activate-user.html:27
+#: mygpo/administration/templates/admin/resend-acivation.html:27
+msgid "Email"
+msgstr "כתובת"
+
+#: mygpo/administration/templates/admin/activate-user.html:35
+msgid "Activate"
+msgstr "הפעלה"
+
+#: mygpo/administration/templates/admin/clients.html:10
+#: mygpo/administration/templates/admin/make-publisher-result.html:16
+#: mygpo/administration/templates/admin/merge-grouping.html:10
+#: mygpo/administration/templates/admin/merge-select.html:9
+#: mygpo/administration/templates/admin/overview.html:9
+#: mygpo/administration/templates/admin/overview.html:12
+#: mygpo/administration/templates/admin/stats.html:9
+#: mygpo/administration/templates/admin/useragents.html:9
+msgid "Admin Area"
+msgstr "אזור ניהול"
+
+#: mygpo/administration/templates/admin/clients.html:13
+#: mygpo/administration/templates/admin/useragents.html:12
+msgid "User-Agent Statistics"
+msgstr "סטטיסטיקת דפדפנים"
+
+#: mygpo/administration/templates/admin/clients.html:19
+#: mygpo/administration/templates/admin/filetypes.html:19
+#: mygpo/administration/templates/admin/useragents.html:18
+msgid "#"
+msgstr "מס׳"
+
+#: mygpo/administration/templates/admin/clients.html:20
+msgid "Client"
+msgstr "לקוח"
+
+#: mygpo/administration/templates/admin/clients.html:21
+#: mygpo/administration/templates/admin/clients.html:23
+#: mygpo/administration/templates/admin/clients.html:25
+msgid "Version"
+msgstr "גרסה"
+
+#: mygpo/administration/templates/admin/clients.html:22
+msgid "Library"
+msgstr "ספריה"
+
+#: mygpo/administration/templates/admin/clients.html:24
+msgid "OS"
+msgstr "מערכת הפעלה"
+
+#: mygpo/administration/templates/admin/clients.html:26
+#: mygpo/administration/templates/admin/useragents.html:20
+msgid "Number of Clients"
+msgstr "מספר לקוחות"
+
+#: mygpo/administration/templates/admin/clients.html:53
+#: mygpo/administration/templates/admin/useragents.html:33
+msgid "Total"
+msgstr "סך הכול"
+
+#: mygpo/administration/templates/admin/filetypes.html:10
+#: mygpo/administration/templates/admin/filetypes.html:13
+msgid "File Type Stats"
+msgstr "סטטיסטיקת סוגי קבצים"
+
+#: mygpo/administration/templates/admin/filetypes.html:20
+msgid "File Type"
+msgstr "סוג קובץ"
+
+#: mygpo/administration/templates/admin/filetypes.html:21
+msgid "Episode URLs"
+msgstr "כתובות פרקים"
+
+#: mygpo/administration/templates/admin/hostinfo.html:10
+#: mygpo/administration/templates/admin/hostinfo.html:13
+#: mygpo/administration/templates/admin/overview.html:17
+msgid "Host Information"
+msgstr "פרטי מארח"
+
+#: mygpo/administration/templates/admin/hostinfo.html:21
+msgid "mygpo Version"
+msgstr "גרסת mygpo"
+
+#: mygpo/administration/templates/admin/hostinfo.html:32
+msgid "Base Directory"
+msgstr "תיקיית בסיס"
+
+#: mygpo/administration/templates/admin/hostinfo.html:37
+msgid "Hostname"
+msgstr "שם מארח"
+
+#: mygpo/administration/templates/admin/hostinfo.html:42
+msgid "Django Version"
+msgstr "גרסת Django"
+
+#: mygpo/administration/templates/admin/hostinfo.html:47
+msgid "Feed Update Queue"
+msgstr "תור עדכון הזנות"
+
+#: mygpo/administration/templates/admin/hostinfo.html:50
+msgid "min ahead"
+msgstr "דקות הקדמה"
+
+#: mygpo/administration/templates/admin/hostinfo.html:52
+msgid "min behind"
+msgstr "דקות איחור"
+
+#: mygpo/administration/templates/admin/hostinfo.html:60
+msgid "Number of podcasts with outdated search index"
+msgstr "מספר הפודקאסטים עם אינדקס חיפוש בלתי עדכני"
+
+#: mygpo/administration/templates/admin/hostinfo.html:69
+msgid "Average podcast update duration"
+msgstr ""
+
+#: mygpo/administration/templates/admin/hostinfo.html:76
+msgid "Scheduled Celery Tasks"
+msgstr "משימות מתוזמנות ב־Celery"
+
+#: mygpo/administration/templates/admin/make-publisher-input.html:9
+#: mygpo/administration/templates/admin/make-publisher-input.html:12
+#: mygpo/administration/templates/admin/make-publisher-result.html:9
+#: mygpo/administration/templates/admin/make-publisher-result.html:12
+#: mygpo/administration/views.py:449
+msgid "Publisher Permissions"
+msgstr "הרשאות הפצה"
+
+#: mygpo/administration/templates/admin/make-publisher-mail.txt:2
+#, python-format
+msgid "Hi %(username)s,"
+msgstr "שלום %(username)s,"
+
+#: mygpo/administration/templates/admin/make-publisher-mail.txt:4
+msgid "You have been assigned as a publisher for the following podcasts:"
+msgstr "הוקצית להפצה של הפודקאסטים הבאים:"
+
+#: mygpo/administration/templates/admin/make-publisher-mail.txt:11
+msgid "You can now access the publisher pages at"
+msgstr "כעת באפשרותך לגשת לעמודי ההפצה תחת"
+
+#: mygpo/administration/templates/admin/make-publisher-mail.txt:15
+#, python-format
+msgid ""
+"There you can get statistics, insights and additional control over your "
+"podcast at %(domain)s."
+msgstr ""
+"שם ניתן לקבל סטטיסטיקה, תובנות ושליטה נוספת על הפודקאסט שלך ב־%(domain)s."
+
+#: mygpo/administration/templates/admin/make-publisher-mail.txt:17
+#, python-format
+msgid "If you have any questions, please visit %(url)s"
+msgstr "אם יש לך שאלות, ניתן לבקר ב־%(url)s"
+
+#: mygpo/administration/templates/admin/merge-grouping.html:13
+#: mygpo/administration/templates/admin/merge-select.html:12
+#: mygpo/administration/templates/admin/overview.html:18
+msgid "Merge Podcasts and Episodes"
+msgstr "מיזוג פודקאסטים ופרקים"
+
+#: mygpo/administration/templates/admin/merge-grouping.html:24
+msgid ""
+"Episodes that have the same number will be merged. Please verify all your "
+"changes by clicking on 'Renew Groups' before starting the Merge."
+msgstr ""
+"פרקים שיש להם את אותו המספר ימוזגו. נא לאמת את כל השינויים שלך על ידי לחיצה "
+"על ‚חידוש קבוצות’ בטרם התחלת המיזוג."
+
+#: mygpo/administration/templates/admin/overview.html:19
+msgid "Client Stats"
+msgstr "סטטיסטיקת לקוח"
+
+#: mygpo/administration/templates/admin/overview.html:19
+#: mygpo/administration/templates/admin/overview.html:21
+msgid "JSON"
+msgstr "JSON"
+
+#: mygpo/administration/templates/admin/overview.html:20
+msgid "User-Agent Stats"
+msgstr "סטטיסטיקת דפדפן"
+
+#: mygpo/administration/templates/admin/overview.html:21
+msgid "General Stats"
+msgstr "סטטיסטיקה כללית"
+
+#: mygpo/administration/templates/admin/overview.html:23
+#, fuzzy
+#| msgid "Resend activation e-mail"
+msgid "Resend Activation Email"
+msgstr "שליחת הודעת הפעלה בדוא״ל מחדש"
+
+#: mygpo/administration/templates/admin/overview.html:24
+msgid "Assign Publisher Permissions"
+msgstr "הקצאת הרשאות הפצה"
+
+#: mygpo/administration/templates/admin/resend-acivation.html:12
+#, fuzzy
+#| msgid "Resend activation e-mail"
+msgid "Resend Activation email"
+msgstr "שליחת הודעת הפעלה בדוא״ל מחדש"
+
+#: mygpo/administration/templates/admin/resend-acivation.html:35
+msgid "Resend"
+msgstr ""
+
+#: mygpo/administration/templates/admin/stats.html:12
+msgid "Statistics"
+msgstr "סטטיסטיקה"
+
+#: mygpo/administration/templates/admin/stats.html:18
+msgid "Property"
+msgstr "מאפיין"
+
+#: mygpo/administration/templates/admin/stats.html:19
+msgid "Value"
+msgstr "ערך"
+
+#: mygpo/administration/templates/admin/task-status.html:17
+#: mygpo/administration/templates/admin/task-status.html:26
+msgid "Operation Finished"
+msgstr "הפעולה הסתיימה"
+
+#: mygpo/administration/templates/admin/task-status.html:19
+#: mygpo/administration/templates/admin/task-status.html:28
+msgid "Operation Ongoing"
+msgstr "הפעולה מתבצעת"
+
+#: mygpo/administration/templates/admin/task-status.html:37
+msgid "The following actions were recorded:"
+msgstr "הפעולות הבאות הוקלטו:"
+
+#: mygpo/administration/templates/admin/task-status.html:42
+#: mygpo/publisher/templates/publisher/episode.html:80
+msgid "none"
+msgstr "אין"
+
+#: mygpo/administration/templates/admin/task-status.html:47
+msgid "Go to podcast"
+msgstr "מעבר לפודקאסט"
+
+#: mygpo/administration/templates/admin/task-status.html:49
+#: mygpo/directory/templates/directory/add-podcast-status.html:50
+msgid "The operation is still ongoing..."
+msgstr "הפעולה עדיין מתבצעת…"
+
+#: mygpo/administration/templates/admin/task-status.html:51
+#: mygpo/directory/templates/directory/add-podcast-status.html:52
+msgid "Refresh"
+msgstr "רענון"
+
+#: mygpo/administration/templates/admin/useragents.html:19
+msgid "User-Agent"
+msgstr "סוכן דפדפן"
+
+#: mygpo/administration/views.py:154 mygpo/administration/views.py:172
+#, python-brace-format
+msgid "No podcast with URL {url}"
+msgstr "אין פודקאסט בכתובת {url}"
+
+#: mygpo/administration/views.py:323 mygpo/administration/views.py:358
+msgid "Provide either username or email address"
+msgstr "יש לספק שם משתמש או כתובת דוא״ל"
+
+#: mygpo/administration/views.py:329 mygpo/administration/views.py:364
+msgid "No user found"
+msgstr "לא נמצאו משתמשים"
+
+#: mygpo/administration/views.py:336
+#, python-brace-format
+msgid "User {username} ({email}) activated"
+msgstr "המשתמש {username} ‎({email}) עבר עימות"
+
+#: mygpo/administration/views.py:375
+#, fuzzy, python-brace-format
+#| msgid "User {username} ({email}) activated"
+msgid "Email for {username} ({email}) resent"
+msgstr "המשתמש {username} ‎({email}) עבר עימות"
+
+#: mygpo/api/constants.py:8
+msgid "downloaded"
+msgstr "התקבל"
+
+#: mygpo/api/constants.py:9
+msgid "played"
+msgstr "התנגן"
+
+#: mygpo/api/constants.py:10
+msgid "deleted"
+msgstr "נמחק"
+
+#: mygpo/api/constants.py:11
+msgid "marked as new"
+msgstr "סומן כחדש"
+
+#: mygpo/api/constants.py:12
+msgid "flattr'd"
+msgstr "קיבל flattr"
+
+#: mygpo/api/constants.py:20
+msgid "subscribed"
+msgstr "נרשם"
+
+#: mygpo/api/constants.py:21
+msgid "unsubscribed"
+msgstr "בוטל רישום"
+
+#: mygpo/api/simple.py:57 mygpo/api/simple.py:92
+#, python-format
+msgid "%(username)s's Subscription List"
+msgstr "רשימת המינויים של %(username)s"
+
+#: mygpo/api/simple.py:258
+#, python-format
+msgid "gpodder.net - Top %(count)d"
+msgstr "gpodder.net - %(count)d המובילים"
+
+#: mygpo/api/simple.py:294
+msgid "gpodder.net - Search"
+msgstr "gpodder.net - חיפוש"
+
+#: mygpo/api/simple.py:320
+#, python-format
+msgid "gpodder.net - %(count)d Suggestions"
+msgstr "gpodder.net - %(count)d הצעות"
+
+#: mygpo/data/mimetype.py:13
+msgid "image"
+msgstr "תמונה"
+
+#: mygpo/data/mimetype.py:13
+msgid "audio"
+msgstr "קטע שמיעה"
+
+#: mygpo/data/mimetype.py:13
+msgid "video"
+msgstr "סרטון"
+
+#: mygpo/directory/templates/carousel.html:43
+#: mygpo/directory/templates/carousel.html:46
+msgid "Explore"
+msgstr "עיון"
+
+#: mygpo/directory/templates/carousel.html:81
+#: mygpo/podcasts/templates/episode.html:150
+msgid "..."
+msgstr "…"
+
+#: mygpo/directory/templates/directory.html:13
+#: mygpo/directory/templates/directory.html:16
+msgid "Podcast Directory"
+msgstr "תיקיית פודקאסטים"
+
+#: mygpo/directory/templates/directory.html:30
+#, python-format
+msgid ""
+"%(listtitle)s <span class=\"by-user\">by <a href=\"%(user-lists-url)s\">"
+"%(username)s</a></span>"
+msgstr ""
+"%(listtitle)s <span class=\"by-user\">מאת <a href=\"%(user-lists-url)s\">"
+"%(username)s</a></span>"
+
+#: mygpo/directory/templates/directory.html:46
+#: mygpo/directory/templates/directory.html:48
+#: mygpo/directory/templates/directory.html:133
+#: mygpo/directory/templates/podcast-ad-box.html:23
+#: mygpo/web/templates/dashboard.html:73
+msgid "more..."
+msgstr "עוד…"
+
+#: mygpo/directory/templates/directory.html:85
+msgid "Podcast List by"
+msgstr "רשימת פודקאסטים מאת"
+
+#: mygpo/directory/templates/directory.html:102
+#, python-format
+msgid "and %(more)s more"
+msgstr "ו־%(more)s נוספים"
+
+#: mygpo/directory/templates/directory.html:108
+msgid "Create a Podcast List"
+msgstr "יצירת רשימת פודקאסטים"
+
+#: mygpo/directory/templates/directory.html:119
+#: mygpo/web/templates/dashboard.html:59
+msgid "Random"
+msgstr "אקראי"
+
+#: mygpo/directory/templates/directory/add-podcast-status.html:16
+#: mygpo/directory/templates/directory/add-podcast-status.html:25
+msgid "Podcast Added"
+msgstr "נוסף פודקאסט"
+
+#: mygpo/directory/templates/directory/add-podcast-status.html:18
+#: mygpo/directory/templates/directory/add-podcast-status.html:27
+msgid "Adding Podcast"
+msgstr "פודקאסט מתווסף"
+
+#: mygpo/directory/templates/directory/add-podcast-status.html:44
+msgid "No podcasts could be added"
+msgstr "לא ניתן להוסיף פודקאסטים"
+
+#: mygpo/directory/templates/directory/license-podcasts.html:13
+#: mygpo/directory/templates/directory/license-podcasts.html:16
+#, python-format
+msgid "Podcasts with License %(licensename)s"
+msgstr "פודקאסט עם הרישיון %(licensename)s"
+
+#: mygpo/directory/templates/directory/license-podcasts.html:24
+msgid "License overview"
+msgstr "סקירת רישיון"
+
+#: mygpo/directory/templates/directory/license-podcasts.html:29
+msgid "View License"
+msgstr "הצגת הרישיון"
+
+#: mygpo/directory/templates/directory/license-podcasts.html:36
+#: mygpo/directory/templates/search.html:35
+#: mygpo/directory/templates/toplist.html:26
+#: mygpo/podcastlists/templates/list.html:48 mygpo/web/templatetags/menu.py:37
+#: mygpo/web/templatetags/menu.py:78
+msgid "Podcast"
+msgstr "פודקאסט"
+
+#: mygpo/directory/templates/directory/license-podcasts.html:37
+#: mygpo/directory/templates/search.html:36
+#: mygpo/directory/templates/toplist.html:27
+#: mygpo/podcastlists/templates/list.html:49
+msgid "Subscribers"
+msgstr "מנויים"
+
+#: mygpo/directory/templates/directory/license-podcasts.html:50
+#: mygpo/directory/templates/episode_toplist.html:41
+#: mygpo/directory/templates/toplist.html:47
+msgid "Currently not available"
+msgstr "לא זמין כרגע"
+
+#: mygpo/directory/templates/directory/licenses.html:13
+#: mygpo/directory/templates/directory/licenses.html:16
+msgid "Podcasts with License Information"
+msgstr "פודקאסטים עם פרטי רישיון"
+
+#: mygpo/directory/templates/directory/licenses.html:23
+#: mygpo/web/templatetags/menu.py:44
+msgid "License"
+msgstr "רישיון"
+
+#: mygpo/directory/templates/directory/licenses.html:24
+#: mygpo/directory/templates/podcast_lists.html:24
+#: mygpo/web/templates/base.html:135 mygpo/web/templates/home.html:155
+#: mygpo/web/templatetags/menu.py:46
+msgid "Podcasts"
+msgstr "פודקאסטים"
+
+#: mygpo/directory/templates/episode_toplist.html:12
+#: mygpo/directory/templates/episode_toplist.html:15
+msgid "Episode-Toplist"
+msgstr "רשימת הפרקים המובילים"
+
+#: mygpo/directory/templates/episode_toplist.html:24
+msgid "Episode"
+msgstr "פרק"
+
+#: mygpo/directory/templates/episode_toplist.html:25
+#: mygpo/publisher/templates/publisher/episodes.html:36
+msgid "Listeners"
+msgstr "מאזינים"
+
+#: mygpo/directory/templates/episode_toplist.html:36
+#: mygpo/history/templates/episode-history.html:51
+#: mygpo/podcasts/templates/episode.html:51
+#: mygpo/publisher/templates/publisher/episode.html:33
+#: mygpo/share/templates/userpage.html:118
+#: mygpo/share/templates/userpage.html:138
+msgid "from"
+msgstr "מאת"
+
+#: mygpo/directory/templates/episode_toplist.html:53
+#: mygpo/directory/templates/episode_toplist.html:57
+#: mygpo/directory/templates/toplist.html:60
+#: mygpo/directory/templates/toplist.html:64
+msgid "Language"
+msgstr "שפה"
+
+#: mygpo/directory/templates/episode_toplist.html:61
+#: mygpo/directory/templates/episode_toplist.html:63
+#: mygpo/directory/templates/toplist.html:68
+#: mygpo/directory/templates/toplist.html:70
+msgid "all"
+msgstr "הכול"
+
+#: mygpo/directory/templates/episode_toplist.html:75
+#: mygpo/directory/templates/toplist.html:83
+msgid "OK"
+msgstr "אישור"
+
+#: mygpo/directory/templates/missing.html:11
+#: mygpo/directory/templates/missing.html:14 mygpo/web/templatetags/menu.py:39
+msgid "Missing Podcast"
+msgstr "פודקאסט חסר"
+
+#: mygpo/directory/templates/missing.html:20
+#, python-format
+msgid ""
+"If you're missing a podcast on %(sitename)s, please enter its feed URL here"
+msgstr "אם חסר לך פודקאסט ב־%(sitename)s, נא להקליד את כתובת ההזנה שלו להלן"
+
+#: mygpo/directory/templates/missing.html:27
+msgid "Check"
+msgstr "בדיקה"
+
+#: mygpo/directory/templates/missing.html:36
+msgid "The podcast already exists"
+msgstr "הפודקאסט כבר קיים"
+
+#: mygpo/directory/templates/missing.html:49
+msgid "Add Podcast"
+msgstr "הוספת פודקאסט"
+
+#: mygpo/directory/templates/podcast-ad-box.html:9
+msgid "Sponsoring Podcast"
+msgstr "מימון פודקאסט"
+
+#: mygpo/directory/templates/podcast_lists.html:13
+#: mygpo/directory/templates/podcast_lists.html:16
+#: mygpo/podcastlists/templates/lists.html:13
+#: mygpo/podcastlists/templates/lists.html:16
+#: mygpo/podcastlists/templates/lists_user.html:9
+#: mygpo/web/templatetags/menu.py:40 mygpo/web/templatetags/menu.py:68
+msgid "Podcast Lists"
+msgstr "רשימות פודקאסטים"
+
+#: mygpo/directory/templates/podcast_lists.html:22
+msgid "List Name"
+msgstr "שם רשימה"
+
+#: mygpo/directory/templates/podcast_lists.html:23
+msgid "User"
+msgstr "משתמש"
+
+#: mygpo/directory/templates/podcast_lists.html:25
+#: mygpo/history/templates/episode-history.html:53
+#: mygpo/podcasts/templates/episode.html:53
+#: mygpo/publisher/templates/publisher/episode.html:35
+msgid "Download"
+msgstr "הורדה"
+
+#: mygpo/directory/templates/podcast_lists.html:76
+#: mygpo/podcastlists/templates/lists_user.html:37
+msgid "Know Some Great Podcasts?"
+msgstr "ידוע לך על פודקאסטים מעולים?"
+
+#: mygpo/directory/templates/podcast_lists.html:77
+#: mygpo/podcastlists/templates/lists_user.html:38
+msgid "Create a list of podcasts about a topic you like"
+msgstr "יצירת רשימת פודקאסטים על נושא מועדף עליך"
+
+#: mygpo/directory/templates/search.html:11
+#: mygpo/directory/templates/search.html:14
+#: mygpo/directory/templates/search.html:25
+#: mygpo/podcastlists/templates/list.html:104
+#: mygpo/subscriptions/templates/subscriptions.html:53
+#: mygpo/web/templates/base.html:136 mygpo/web/templates/home.html:156
+#: mygpo/web/templatetags/menu.py:38
+msgid "Search"
+msgstr "חיפוש"
+
+#: mygpo/directory/templates/search.html:23
+#: mygpo/podcastlists/templates/list.html:102
+#: mygpo/subscriptions/templates/subscriptions.html:51
+msgid "Search term or feed URL"
+msgstr "ביטוי לחיפוש או כתובת הזנה"
+
+#: mygpo/directory/templates/search.html:79
+#: mygpo/podcastlists/templates/list_search.html:65
+msgid "Nothing found"
+msgstr "לא נמצא שום דבר"
+
+#: mygpo/directory/templates/search.html:91
+msgid "Search API"
+msgstr "API לחיפוש"
+
+#: mygpo/directory/templates/search.html:92
+msgid "Access the following address to search for <em>tech</em> podcasts."
+msgstr "ניתן לגשת לכתובת הבאה לחיפוש אחר פודקאסטים בנושא <em>טכנולוגיה</em>."
+
+#: mygpo/directory/templates/toplist.html:14
+#: mygpo/directory/templates/toplist.html:17
+msgid "Toplist"
+msgstr "רשימות מובילות"
+
+#: mygpo/directory/templates/toplist.html:88
+msgid "Client Access"
+msgstr "גישת לקוח"
+
+#: mygpo/directory/views.py:334
+#, python-format
+msgid "%d podcasts added"
+msgstr "נוספו %d פודקאסטים"
+
+#: mygpo/history/templates/episode-history.html:47
+#: mygpo/history/templates/episode-history.html:81
+#: mygpo/web/templates/device.html:73 mygpo/web/templatetags/menu.py:58
+msgid "History"
+msgstr "היסטוריה"
+
+#: mygpo/history/templates/episode-history.html:58
+#: mygpo/podcasts/templates/episode.html:58
+#: mygpo/podcasts/templates/podcast-base.html:54
+#: mygpo/publisher/templates/publisher/episode.html:40
+#: mygpo/publisher/templates/publisher/podcast.html:39
+msgid "Website"
+msgstr "אתר"
+
+#: mygpo/history/templates/episode-history.html:63
+#: mygpo/podcasts/templates/episode.html:63
+#: mygpo/publisher/templates/publisher/episode.html:45
+msgid "listeners"
+msgstr "מאזינים"
+
+#: mygpo/history/templates/episode-history.html:84
+msgid "Time"
+msgstr "זמן"
+
+#: mygpo/history/templates/episode-history.html:85
+msgid "Action"
+msgstr "פעולה"
+
+#: mygpo/history/templates/episode-history.html:86
+#: mygpo/web/templatetags/menu.py:57
+msgid "Device"
+msgstr "מכשיר"
+
+#: mygpo/history/templates/episode-history.html:127
+msgid "Add"
+msgstr "הוספה"
+
+#: mygpo/history/templates/history.html:12
+#: mygpo/history/templates/history.html:15
+#: mygpo/history/templates/podcast-history.html:32
+#: mygpo/podcasts/templates/podcast.html:143
+msgid "Subscription History"
+msgstr "היסטוריית מינויים"
+
+#: mygpo/history/templates/history.html:12
+#: mygpo/history/templates/history.html:15
+msgid "for"
+msgstr "עבור"
+
+#: mygpo/history/templates/history.html:22
+#: mygpo/web/templates/device-edit.html:16
+msgid "Back to"
+msgstr "חזרה אל"
+
+#: mygpo/history/templates/history.html:66
+msgid "Nothing happened yet."
+msgstr "שום דבר לא קרה עדיין."
+
+#: mygpo/history/templates/history.html:73
+#: mygpo/history/templates/history.html:75
+msgid "Later"
+msgstr "מאוחר יותר"
+
+#: mygpo/history/templates/history.html:80
+#: mygpo/history/templates/history.html:82
+msgid "Now"
+msgstr "עכשיו"
+
+#: mygpo/history/templates/history.html:87
+#: mygpo/history/templates/history.html:89
+msgid "Earlier"
+msgstr "מוקדם יותר"
+
+#: mygpo/history/templates/podcast-history.html:47
+msgid "no history yet"
+msgstr "אין היסטוריה עדיין"
+
+#: mygpo/podcastlists/templates/list.html:28
+#, python-format
+msgid "\"%(list_title)s\" by %(ownername)s"
+msgstr "„%(list_title)s” מאת %(ownername)s"
+
+#: mygpo/podcastlists/templates/list.html:35
+#, python-format
+msgid "a podcast list by <a href=\"%(user-lists-url)s\">%(ownername)s</a>"
+msgstr "רשימת פודקאסטים מאת <a href=\"%(user-lists-url)s\">%(ownername)s</a>"
+
+#: mygpo/podcastlists/templates/list.html:74
+msgid "No Podcasts"
+msgstr "אין פודקאסטים"
+
+#: mygpo/podcastlists/templates/list.html:84
+msgid "Vote"
+msgstr "הצבעה"
+
+#: mygpo/podcastlists/templates/list.html:90
+msgid "Download as OPML"
+msgstr "הורדה כ־OPML"
+
+#: mygpo/podcastlists/templates/list.html:121
+msgid "Your own Podcast Lists"
+msgstr "רשימות הפודקאסטים האישיות שלך"
+
+#: mygpo/podcastlists/templates/list.html:122
+msgid "Create and share your own podcast lists "
+msgstr "יצירה ושיתוף של רשימות פודקאסטים משלך"
+
+#: mygpo/podcastlists/templates/list.html:123
+#: mygpo/publisher/templates/publisher/home.html:31
+#: mygpo/web/templates/user_subscriptions.html:65
+msgid "Go"
+msgstr "להמשיך"
+
+#: mygpo/podcastlists/templates/lists.html:29
+#: mygpo/podcastlists/templates/lists_user.html:22
+#: mygpo/share/templates/userpage.html:88
+#, python-format
+msgid "%(num_podcasts)s Podcasts"
+msgstr "%(num_podcasts)s פודקאסטים"
+
+#: mygpo/podcastlists/templates/lists.html:34
+#: mygpo/web/templates/device-edit.html:77
+msgid "Delete"
+msgstr "מחיקה"
+
+#: mygpo/podcastlists/templates/lists.html:41
+msgid "You don't have any podcast lists yet."
+msgstr "אין לך רשימות פודקאסטים עדיין."
+
+#: mygpo/podcastlists/templates/lists.html:52
+#: mygpo/share/templates/share/favorites.html:57
+#: mygpo/web/templates/devicelist.html:64
+msgid "Create"
+msgstr "יצירה"
+
+#: mygpo/podcastlists/templates/lists.html:60
+msgid ""
+"Podcast Lists are intended to share podcasts about certain topics and are "
+"therefore always visible to everyone."
+msgstr ""
+"רשימות פודקאסטים מיועדות לשיתוף פודקאסטים בנושאים מסוימים ולכן הן תמיד "
+"גלויות לכולם."
+
+#: mygpo/podcastlists/templates/lists_user.html:12
+#, python-format
+msgid "Podcast Lists by %(username)s"
+msgstr "רשימות פודקאסטים מאת %(username)s"
+
+#: mygpo/podcastlists/templates/lists_user.html:27
+#, python-format
+msgid "%(username)s hasn't created any podcast lists yet."
+msgstr "לא נוצרו עדיין רשימות פודקאסטים על ידי המשתמש %(username)s."
+
+#: mygpo/podcastlists/views.py:103
+msgid "You have to specify a title."
+msgstr "עליך לציין כותרת."
+
+#: mygpo/podcastlists/views.py:109
+#, python-brace-format
+msgid "\"{title}\" is not a valid title"
+msgstr "„{title}” אינה כותרת תקנית"
+
+#: mygpo/podcastlists/views.py:162
+msgid "Thanks for rating!"
+msgstr "תודה לך על הדירוג!"
+
+#: mygpo/podcasts/admin.py:27 mygpo/web/templates/device-edit.html:28
+msgid "Edit"
+msgstr "עריכה"
+
+#: mygpo/podcasts/models.py:697
+msgid "Unknown Podcast"
+msgstr "פודקאסט לא ידוע"
+
+#: mygpo/podcasts/models.py:700
+#, python-brace-format
+msgid "Unknown Podcast from {domain}"
+msgstr "פודקאסט לא ידוע מ־{domain}"
+
+#: mygpo/podcasts/templates/episode.html:85
+#: mygpo/podcasts/templates/episodes.html:27
+#: mygpo/podcasts/templates/podcast.html:39
+#: mygpo/publisher/templates/publisher/episode.html:31
+#: mygpo/publisher/templates/publisher/episodes.html:23
+#: mygpo/publisher/templates/publisher/info.html:9
+#: mygpo/publisher/templates/publisher/info.html:26
+#: mygpo/publisher/templates/publisher/podcast.html:27
+msgid "Publisher Pages"
+msgstr "עמודי הפצה"
+
+#: mygpo/podcasts/templates/episode.html:91
+msgid "Remove Favorite"
+msgstr "הסרת מועדף"
+
+#: mygpo/podcasts/templates/episode.html:95
+msgid "Favorite"
+msgstr "הוספה למועדפים"
+
+#: mygpo/podcasts/templates/episode.html:103
+msgid "Episode History"
+msgstr "היסטוריית פרקים"
+
+#: mygpo/podcasts/templates/podcast-base.html:39
+#: mygpo/publisher/templates/publisher/episodes.html:23
+#: mygpo/publisher/templates/publisher/podcast.html:27
+msgid "Unnamed Podcast"
+msgstr "פודקאסט ללא שם"
+
+#: mygpo/podcasts/templates/podcast-base.html:44
+#: mygpo/publisher/templates/publisher/podcast.html:29
+msgid "by"
+msgstr "מאת"
+
+#: mygpo/podcasts/templates/podcast-base.html:50
+#: mygpo/publisher/templates/publisher/podcast.html:35
+#: mygpo/share/templates/share/favorites.html:29
+msgid "Feed"
+msgstr "הזנה"
+
+#: mygpo/podcasts/templates/podcast-base.html:65
+#: mygpo/publisher/templates/publisher/podcast.html:44
+msgid "subscribers"
+msgstr "מנויים"
+
+#: mygpo/podcasts/templates/podcast.html:48
+msgid "Login to Subscribe"
+msgstr "יש להיכנס כדי להירשם"
+
+#: mygpo/podcasts/templates/podcast.html:59
+#: mygpo/suggestions/templates/suggestions.html:31
+#: mygpo/web/templates/subscribe.html:11 mygpo/web/templates/subscribe.html:36
+msgid "Subscribe"
+msgstr "הרשמה"
+
+#: mygpo/podcasts/templates/podcast.html:67 mygpo/web/templates/device.html:31
+msgid "Unsubscribe"
+msgstr "ביטול הרשמה"
+
+#: mygpo/podcasts/templates/podcast.html:78
+msgid "Subscribe on all devices"
+msgstr "הרשמה בכל המכשירים"
+
+#: mygpo/podcasts/templates/podcast.html:110
+msgid "Unsubscribe from all devices "
+msgstr "ביטול ההרשמה בכל המכשירים"
+
+#: mygpo/podcasts/templates/podcast.html:149
+#: mygpo/podcasts/templates/podcast.html:164
+msgid "Tags"
+msgstr "תגיות"
+
+#: mygpo/podcasts/templates/podcast.html:199
+msgid "Older Episodes"
+msgstr "פרקים ישנים יותר"
+
+#: mygpo/publisher/forms.py:6
+#: mygpo/publisher/templates/publisher/episode.html:60
+msgid "URL"
+msgstr "כתובת"
+
+#: mygpo/publisher/templates/link.html:8
+msgid "For Podcast Authors"
+msgstr "ליוצרי פודקאסטים"
+
+#: mygpo/publisher/templates/link.html:11
+msgid "Link to"
+msgstr "קישור אל"
+
+#: mygpo/publisher/templates/link.html:17
+#: mygpo/publisher/templates/publisher/podcast.html:209
+#, python-format
+msgid ""
+"You can paste this code on your website, so users of %(sitename)s can "
+"directly subscribe to your podcast."
+msgstr ""
+"ניתן להדביק את הקוד הזה באתר שלך, כדי שהמשתמשים של %(sitename)s יכולים "
+"להירשם ישירות לפודקאסט שלך."
+
+#: mygpo/publisher/templates/link.html:18
+msgid "Change the field 'YOUR_ADRESS' with the adress of your podcast feed."
+msgstr "יש להחליף את השדה ‚YOUR_ADRESS’ בכתובת הזנת הפודקאסט שלך."
+
+#: mygpo/publisher/templates/publisher/advertise.html:9
+#: mygpo/publisher/templates/publisher/info.html:20
+#: mygpo/web/templates/base.html:153 mygpo/web/templates/base.html:180
+#: mygpo/web/templates/home.html:173 mygpo/web/templates/home.html:200
+#: mygpo/web/templatetags/menu.py:76
+msgid "Advertise"
+msgstr "פרסום"
+
+#: mygpo/publisher/templates/publisher/advertise.html:12
+#, python-format
+msgid "Advertise on %(sitename)s"
+msgstr "פרסום ב־%(sitename)s"
+
+#: mygpo/publisher/templates/publisher/advertise.html:18
+#, python-format
+msgid ""
+"For just € 20,-- your podcast will be shown on the <strong>front page of "
+"%(sitename)s for a week</strong>. Additionally it will be the first podcast "
+"in <strong>gPodder's list of example podcasts.</strong>"
+msgstr ""
+"עבור 20 אירו בלבד הפודקאסט שלך יכול להופיע ב<strong>עמוד הפתיחה של "
+"%(sitename)s למשך שבוע</strong>. בנוסף הוא יהיה הפודקאסט הראשון "
+"ה<strong>רשימת הפודקאסטים לדוגמה של gPodder.</strong>"
+
+#: mygpo/publisher/templates/publisher/advertise.html:20
+msgid ""
+"You can chose when your advertisement will be active, and the text that will "
+"be displayed for your podcast."
+msgstr "ניתן לבחור אם הפרסום שלך יהיה פעיל, והטקסט שיוצג עבור הפודקאסט שלך."
+
+#: mygpo/publisher/templates/publisher/advertise.html:22
+msgid "Front Page"
+msgstr "עמוד פתיחה"
+
+#: mygpo/publisher/templates/publisher/advertise.html:23
+#, python-format
+msgid ""
+"Your podcast will be displayed on the front page of %(sitename)s for both "
+"logged-in and anonymous users."
+msgstr ""
+"הפודקאסט שלך יופיע בעמוד הפתיחה של %(sitename)s גם למשתמשים שנכנסו למערכת "
+"וגם למשתמשים אלמוניים."
+
+#: mygpo/publisher/templates/publisher/advertise.html:25
+msgid "Example Podcasts"
+msgstr "פודקאסטים לדוגמה"
+
+#: mygpo/publisher/templates/publisher/advertise.html:26
+msgid ""
+"The gPodder client offers a list of example podcasts when started for the "
+"first time. This list is loaded from the web on demand. For the time of your "
+"advertisement, your podcast will be the first in the list."
+msgstr ""
+"הלקוח של gPodder מציע רשימת פודקאסטים לדוגמה כשהוא מופעל בפעם הראשונה. רשימה "
+"זו נטענת מהאתר לפי דרישה. לזמן הפרסום שלך, הפודקאסט שלך יהיה הראשון ברשימה."
+
+#: mygpo/publisher/templates/publisher/advertise.html:28
+msgid "Visitors"
+msgstr "מבקרים"
+
+#: mygpo/publisher/templates/publisher/advertise.html:29
+msgid ""
+"Both the front page and the list of example podcasts are accessed by more "
+"than 1000 people daily, who are actively looking for interesting podcasts. "
+"We do, however, not guarantee a certain number of visitors during your "
+"advertisement period."
+msgstr ""
+"גם עמוד הפתיחה וגם רשימת הדוגמאות מקבלים חשיפה של למעלה מ־1000 איש ביום, "
+"שמחפשים באופן פעיל פודקאסטים מעניינים. עם זאת, איננו מתחייבים למספר מסוים של "
+"מבקרים במהלך תקופת הפרסום שלך."
+
+#: mygpo/publisher/templates/publisher/advertise.html:31
+msgid "Start your Advertisement"
+msgstr "התחלת הפרסום שלך"
+
+#: mygpo/publisher/templates/publisher/advertise.html:32
+#, python-format
+msgid ""
+"Contact <a href=\"mailto:stefan@gpodder.net\">stefan@gpodder.net</a> if you "
+"would like to advertise on %(sitename)s or if you have any questions. "
+"Payments are done via PayPal to thp@perli.net."
+msgstr ""
+"עליך ליצור קשר עם <a href=\"mailto:stefan@gpodder.net\">stefan@gpodder.net</"
+"a> אם ברצונך לפרסם באתר %(sitename)s או אם יש לך שאלות. התשלום הוא דרך "
+"PayPal לטובת thp@perli.net."
+
+#: mygpo/publisher/templates/publisher/episode.html:31
+msgid "Unnamed Episode"
+msgstr "פרק ללא שם"
+
+#: mygpo/publisher/templates/publisher/episode.html:55
+msgid "Episode List"
+msgstr "רשימת פרקים"
+
+#: mygpo/publisher/templates/publisher/episode.html:56
+msgid "Podcast Page"
+msgstr "עמוד פודקאסט"
+
+#: mygpo/publisher/templates/publisher/episode.html:61
+msgid ""
+"You can configure the URL of this episode. Previous keys will automatically "
+"be added to the alternative keys and always redirect to the current URL."
+msgstr ""
+"ניתן להגדיר את כתובת הפרק הזה. מפתחות קודמים יתווספו אוטומטית למפתחות "
+"החלופיים ותמיד יפנו לכתובת הנוכחית."
+
+#: mygpo/publisher/templates/publisher/episode.html:72
+#: mygpo/publisher/templates/publisher/podcast.html:129
+#: mygpo/web/templates/account.html:65 mygpo/web/templates/account.html:142
+#: mygpo/web/templates/device-edit.html:53
+msgid "Save"
+msgstr "שמירה"
+
+#: mygpo/publisher/templates/publisher/episode.html:86
+msgid "Episode data"
+msgstr "נתוני פודקאסט"
+
+#: mygpo/publisher/templates/publisher/episode.html:87
+msgid "Last update: "
+msgstr "עדכון אחרון:"
+
+#: mygpo/publisher/templates/publisher/episodes.html:24
+msgid "Return to Podcast Page"
+msgstr "חזרה לעמוד הפודקאסט"
+
+#: mygpo/publisher/templates/publisher/episodes.html:31
+#: mygpo/share/templates/userpage.html:182
+#: mygpo/share/templates/userpage.html:188 mygpo/web/templatetags/menu.py:47
+msgid "Episodes"
+msgstr "פרקים"
+
+#: mygpo/publisher/templates/publisher/episodes.html:34
+msgid "Title"
+msgstr "כותרת"
+
+#: mygpo/publisher/templates/publisher/episodes.html:35
+msgid "Released"
+msgstr "יצא לאור"
+
+#: mygpo/publisher/templates/publisher/group.html:21
+msgid "Publisher Pages:"
+msgstr "עמודי הפצה:"
+
+#: mygpo/publisher/templates/publisher/group.html:26
+msgid "This is a group of podcasts containing"
+msgstr "זו קבוצה של פודקאסטים שמכילה"
+
+#: mygpo/publisher/templates/publisher/home.html:9
+msgid "Podcasts Published by Me"
+msgstr "פודקאסטים שאני פרסמתי"
+
+#: mygpo/publisher/templates/publisher/home.html:12
+msgid "Publisher Area"
+msgstr "אזור הפצה"
+
+#: mygpo/publisher/templates/publisher/home.html:21
+msgid "Staff only"
+msgstr "צוות בלבד"
+
+#: mygpo/publisher/templates/publisher/home.html:24
+msgid "Go to the publisher page of any podcast by entering its feed URL"
+msgstr "ניתן לעבור לעמוד ההפצה של כל פודקאסט שהוא על ידי הקלדת כתובת ההזנה שלו"
+
+#: mygpo/publisher/templates/publisher/home.html:29
+msgid "http://"
+msgstr "http://‎"
+
+#: mygpo/publisher/templates/publisher/home.html:43
+msgid "Published Podcasts"
+msgstr "פודקאסטים שפורסמו"
+
+#: mygpo/publisher/templates/publisher/home.html:46
+msgid "You have publisher permissions for the following podcasts."
+msgstr "יש לך הרשאות הפצה לפודקאסטים הבאים."
+
+#: mygpo/publisher/templates/publisher/home.html:62
+msgid "Update podcasts"
+msgstr "עדכון פודקאסטים"
+
+#: mygpo/publisher/templates/publisher/home.html:65
+msgid ""
+"To update all of your published podcasts automatically, you can request the "
+"following URL"
+msgstr "כדי לעדכן את כל הפודקאסטים שפרסמת אוטומטית, ניתן לבקש את הכתובת הבאה"
+
+#: mygpo/publisher/templates/publisher/home.html:69
+msgid "Create a new token"
+msgstr "יצירת אסימון חדש"
+
+#: mygpo/publisher/templates/publisher/info.html:12
+msgid "Publisher Services"
+msgstr "שירותי הפצה"
+
+#: mygpo/publisher/templates/publisher/info.html:18
+#, python-format
+msgid "%(sitename)s offers several services for podcast publishers."
+msgstr "%(sitename)s מציע מגוון שירותים למפיצי פודקאסטים."
+
+#: mygpo/publisher/templates/publisher/info.html:21
+#, python-format
+msgid ""
+"You can place your podcast on the frontpage of %(sitename)s to promote your "
+"podcast. Users of the gPodder client will also find your podcast as the "
+"first item in the list of example podcast."
+msgstr ""
+"יש לך אפשרות להציג את הפודקאסט שלך בעמוד הפתיחה של %(sitename)s כדי לקדם את "
+"הפודקאסט שלך. המשתמשים בלקוח ה־gPodder גם כן יוכלו למצוא את הפודקאסט שלך "
+"בתור הפריט הראשון ברשימת הפודקאסטים לדוגמה."
+
+#: mygpo/publisher/templates/publisher/info.html:24
+#, python-format
+msgid ""
+"You can find additional details on the <a href=\"%(advertise-url)s"
+"\">advertisement page</a>."
+msgstr ""
+"ניתן למצוא פרטים נוספים ב<a href=\"%(advertise-url)s\">עמוד הפרסומות</a>."
+
+#: mygpo/publisher/templates/publisher/info.html:27
+#, python-format
+msgid ""
+"On the <strong>%(sitename)s Publisher Pages</strong> you can find valuable "
+"information about the Podcasts published by you."
+msgstr ""
+"תחת <strong>עמודי ההפצה של %(sitename)s</strong> ניתן למצוא מידע חשוב בנוגע "
+"לפודקאסטים שמופצים על ידיך."
+
+#: mygpo/publisher/templates/publisher/info.html:30
+#, fuzzy, python-format
+#| msgid ""
+#| "The Publisher Pages are currently in Beta, but if you are publishing a "
+#| "podcast listed on %(sitename)s, feel free to apply by sending a mail "
+#| "with\n"
+#| "  <ul>\n"
+#| "   <li>your username on %(sitename)s (<a href=\"%(register-url)s"
+#| "\">register if you don't have one</a>)</li>\n"
+#| "   <li>the name and URL of the podcast you are publishing</li>\n"
+#| "   <li>an email address that is visible somewhere on the podcast's "
+#| "website (to legitimate you)\n"
+#| "  </ul>\n"
+#| "  to <a href=\"mailto:stefan@gpodder.net\">stefan@gpodder.net</a>."
+msgid ""
+"The Publisher Pages are currently in Beta, but if you are publishing a "
+"podcast listed on %(sitename)s, feel free to apply by sending a mail with\n"
+"  <ul>\n"
+"   <li>your username on %(sitename)s (<a href=\"%(register-url)s\">register "
+"if you don't have one</a>)</li>\n"
+"   <li>the name and URL of the podcast you are publishing</li>\n"
+"   <li>an email address that is visible somewhere on the podcast's website "
+"(to legitimate you)\n"
+"  </ul>\n"
+"  to <a href=\"mailto:support@gpodder.net\">support@gpodder.net</a>."
+msgstr ""
+"עמודי ההפצה נמצאים בשלבי ניסוי, אך אם יש לך פודקאסט בהפצתך שרשום תחת "
+"%(sitename)s, אפשר להירשם לתכנית על ידי שליחת הודעה בדוא״ל עם\n"
+"  <ul>\n"
+"   <li>שם המשתמש שלך באתר %(sitename)s (<a href=\"%(register-url)s\">עליך "
+"להירשם אם עוד אין לך אחד כזה</a>)</li>\n"
+"   <li>שם כתובת הפודקאסט שמופץ על ידיך</li>\n"
+"   <li>כתובת דוא״ל שגלויה במקום כלשהו באתר הפודקאסט (כדי לוודא שאכן יש לך "
+"קשר ישיר אליו)\n"
+"  </ul>\n"
+"  אל <a href=\"mailto:stefan@gpodder.net\">stefan@gpodder.net</a>."
+
+#: mygpo/publisher/templates/publisher/info.html:39
+#, python-format
+msgid ""
+"If you already are registered as a publisher, please <a href=\"%(login-url)s?"
+"next=/publisher/\">login</a>."
+msgstr ""
+"אם כבר נרשמת בתור מפיץ, נא <a href=\"%(login-url)s?next=/publisher/"
+"\">להיכנס</a>."
+
+#: mygpo/publisher/templates/publisher/info.html:41
+#, python-format
+msgid "Link to %(sitename)s"
+msgstr "קישור אל %(sitename)s"
+
+#: mygpo/publisher/templates/publisher/info.html:44
+#, python-format
+msgid ""
+"If you <a href=\"%(link-here-url)s\">link to %(sitename)s</a> from your "
+"website, you can make it really easy for your visitors to subscribe to your "
+"podcast - especially for users of mobile phones."
+msgstr ""
+"<a href=\"%(link-here-url)s\">הוספת קישור אל %(sitename)s</a> מהאתר שלך, תקל "
+"על המבקרים באתר שלך להירשם לפודקאסט שלך - במיוחד עבור משתמשים בטלפונים "
+"ניידים."
+
+#: mygpo/publisher/templates/publisher/podcast.html:49
+#, python-format
+msgid ""
+"This is the publisher page of <strong>%(ptitle)s</strong>. You can see some "
+"stats and provide additional data for the podcast page."
+msgstr ""
+"זה הוא עמוד ההפצה של <strong>%(ptitle)s</strong>. ניתן לצפות בסטטיסטיקה "
+"ולספק נתונים נוספים לעמוד הפודקאסט."
+
+#: mygpo/publisher/templates/publisher/podcast.html:50
+msgid "Go to Podcast Page"
+msgstr "מעבר לעמוד הפודקאסט"
+
+#: mygpo/publisher/templates/publisher/podcast.html:57
+msgid "The podcast information is regularly retrieved from the podcast feed"
+msgstr "פרטי הפודקאסט מתקבלים על פי רוב מהזנת הפודקאסט"
+
+#: mygpo/publisher/templates/publisher/podcast.html:60
+#, fuzzy
+#| msgid "Update now"
+msgid "Updates"
+msgstr "עדכון כעת"
+
+#: mygpo/publisher/templates/publisher/podcast.html:62
+msgid "Update interval:"
+msgstr "מרווח בין עדכונים:"
+
+#: mygpo/publisher/templates/publisher/podcast.html:86
+msgid "Successful"
+msgstr ""
+
+#: mygpo/publisher/templates/publisher/podcast.html:88
+msgid "Error"
+msgstr ""
+
+#: mygpo/publisher/templates/publisher/podcast.html:106
+msgid "Update now"
+msgstr "עדכון כעת"
+
+#: mygpo/publisher/templates/publisher/podcast.html:117 mygpo/web/forms.py:74
+#: mygpo/web/templates/base.html:160 mygpo/web/templates/home.html:180
+msgid "Twitter"
+msgstr "טוויטר"
+
+#: mygpo/publisher/templates/publisher/podcast.html:135
+msgid "Feed Check"
+msgstr "בדיקת הזנה"
+
+#: mygpo/publisher/templates/publisher/podcast.html:143
+msgid "PubSubHubbub"
+msgstr "PubSubHubbub"
+
+#: mygpo/publisher/templates/publisher/podcast.html:152
+#, python-format
+msgid ""
+"If you publish your podcast feed through a <a href=\"https://code.google.com/"
+"p/pubsubhubbub/\">PubSubHubbu</a> hub, %(sitename)s can immediatelly update "
+"your podcast when a new episode is released."
+msgstr ""
+"על ידי פרסום הזנת הפודקאסטים שלך דרך נקודת הריכוז <a href=\"https://code."
+"google.com/p/pubsubhubbub/\">PubSubHubbu</a>, ל־%(sitename)s יש אפשרות לעדכן "
+"את הפודקאסט שלך ברגע שפרק חדש מופץ."
+
+#: mygpo/publisher/templates/publisher/podcast.html:157
+#, python-format
+msgid ""
+"Your podcast is published through <a href=\"%(hub)s\">%(hub)s</a> and should "
+"update immediatelly for each new episode."
+msgstr ""
+"הפודקאסט שלך מופץ דרך <a href=\"%(hub)s\">%(hub)s</a> והוא אמור להתעדכן מיד "
+"בכל פרק."
+
+#: mygpo/publisher/templates/publisher/podcast.html:161
+#, python-format
+msgid ""
+"Your podcast is published through <a href=\"%(hub)s\">%(hub)s</a> but our "
+"subscription has not yet been verified."
+msgstr ""
+"הפודקאסט שלך מופץ דרך <a href=\"%(hub)s\">%(hub)s</a> אך המינוי שלך טרם אומת."
+
+#: mygpo/publisher/templates/publisher/podcast.html:166
+#, python-format
+msgid ""
+"We did not find a hub in your podcast feed. Your feed is updated regularly, "
+"but there might be some delay until a new episode shows up on %(sitename)s."
+msgstr ""
+"לא מצאנו נקודת ריכוז להזנת הפודקאסט שלך. ההזנה שלך מתעדכנת באופן סדיר, אך "
+"תיתכן השהיה קצרה עד שהפרקים יופיעו ב־%(sitename)s."
+
+#: mygpo/publisher/templates/publisher/podcast.html:178
+msgid "License Information"
+msgstr "פרטי רישיון"
+
+#: mygpo/publisher/templates/publisher/podcast.html:186
+#, python-format
+msgid ""
+"You should include license information in your feed so that users and "
+"%(sitename)s can know, under which conditions your content can be used."
+msgstr ""
+"מוטב לכלול פרטי רישיון כחלק מההזנה שלך כדי שהמשתמשים לצד %(sitename)s יוכלו "
+"לדעת, תחת אילו תנאים ניתן להשתמש בתוכן שלך."
+
+#: mygpo/publisher/templates/publisher/podcast.html:190
+#, python-format
+msgid ""
+"We found the following license in your podcast: <a href=\"%(license)s\">"
+"%(license)s</a>"
+msgstr ""
+"מצאנו את הרישיון הבא בפודקאסט שלך: <a href=\"%(license)s\">%(license)s</a>"
+
+#: mygpo/publisher/templates/publisher/podcast.html:194
+msgid ""
+"We did not find a license in your podcast feed. Refer to <a href=\"https://"
+"github.com/gpodder/podcast-feed-best-practice/blob/master/podcast-feed-best-"
+"practice.md#license\"> gPodder Podcast Feed Best Practice</a> on how to "
+"include license information."
+msgstr ""
+"לא מצאנו רישיון בהזנת הפודקאסט שלך. יש לפנות אל <a href=\"https://github.com/"
+"gpodder/podcast-feed-best-practice/blob/master/podcast-feed-best-practice."
+"md#license\">ההמלצות להזנות פודקאסטים של gPodder</a> על כיצד מוטב להוסיף "
+"פרטי רישיון."
+
+#: mygpo/publisher/templates/publisher/podcast.html:208
+msgid "Link"
+msgstr "קישור"
+
+#: mygpo/publisher/templates/publisher/podcast.html:216
+msgid "Show Group Stats"
+msgstr "הצגת סטטיסטיקה קבוצתית"
+
+#: mygpo/publisher/views.py:173
+msgid ""
+"The update has been scheduled. It might take some time until the results are "
+"visible."
+msgstr "תוזמן עדכון. יכול להיות שיחלוף קצת זמן עד שניתן יהיה לראות תוצאות."
+
+#: mygpo/publisher/views.py:188 mygpo/users/views/settings.py:112
+msgid "Data updated"
+msgstr "נתונים עודכנו"
+
+#: mygpo/publisher/views.py:198
+msgid "Publisher token updated"
+msgstr "אסימון מפרסם עודכן"
+
+#: mygpo/publisher/views.py:301
+#, python-brace-format
+msgid "Removed slug {slug} from {episode}"
+msgstr "הוסר השם המופשט {slug} מהפרק {episode}"
+
+#: mygpo/share/templates/share/components/private-toggle.html:11
+msgid "Public"
+msgstr "ציבורי"
+
+#: mygpo/share/templates/share/components/private-toggle.html:16
+msgid "Private"
+msgstr "פרטי"
+
+#: mygpo/share/templates/share/favorites.html:10
+#: mygpo/share/templates/share/favorites.html:14
+msgid "Share your favorite episodes"
+msgstr "שיתוף הפרקים המועדפים עליך"
+
+#: mygpo/share/templates/share/favorites.html:46
+#: mygpo/share/templates/share/favorites.html:48
+msgid "Directory Entry"
+msgstr "רשומה בספרייה"
+
+#: mygpo/share/templates/share/favorites.html:70
+#, python-format
+msgid ""
+"To keep your favorites private (from others and from the public pages of "
+"%(site)s), you need to use HTTP-Authentication in your client. "
+msgstr ""
+"כדי לשמור על פרטיות המועדפים שלך (מפני אחרים ומפני העמודים הציבוריים של "
+"%(site)s), עליך להשתמש ב־HTTP-Authentication בלקוח שלך."
+
+#: mygpo/share/templates/share/favorites.html:72
+msgid "Username:"
+msgstr "שם משתמש:"
+
+#: mygpo/share/templates/share/favorites.html:73
+msgid "Password:"
+msgstr "ססמה:"
+
+#: mygpo/share/templates/share/favorites.html:79
+msgid "Remove password"
+msgstr "הסרת ססמה"
+
+#: mygpo/share/templates/share/favorites.html:82
+msgid "Generate new password"
+msgstr "יצירת ססמה חדשה"
+
+#: mygpo/share/templates/share/favorites.html:98
+#, python-format
+msgid ""
+"You've marked your favorites-feed as public and others can\n"
+"      subscribe to it. It will also be indexed by %(sitename)s."
+msgstr ""
+"סימנת את רשימת המועדפים שלך כציבורית ואחרים יכולים\n"
+"      להירשם אליה. היא גם תופיע באינדקס של %(sitename)s."
+
+#: mygpo/share/templates/share/favorites.html:110
+msgid "Create password"
+msgstr "יצירת ססמה"
+
+#: mygpo/share/templates/share/overview.html:9
+msgid "Sharing"
+msgstr "מתבצע שיתוף"
+
+#: mygpo/share/templates/share/overview.html:12
+#: mygpo/subscriptions/templates/subscriptions.html:67
+#: mygpo/web/templates/favorites.html:39
+msgid "Share"
+msgstr "שיתוף"
+
+#: mygpo/share/templates/share/overview.html:21
+#: mygpo/web/templates/device.html:19 mygpo/web/templates/privacy.html:25
+#: mygpo/web/templatetags/menu.py:51 mygpo/web/templatetags/menu.py:53
+#: mygpo/web/templatetags/menu.py:67
+msgid "Subscriptions"
+msgstr "מינויים"
+
+#: mygpo/share/templates/share/overview.html:34
+#: mygpo/share/templates/share/overview.html:49
+#: mygpo/share/templates/share/overview.html:76
+msgid "New Token"
+msgstr "אסימון חדש"
+
+#: mygpo/share/templates/share/overview.html:40
+msgid "User Page"
+msgstr "דף משתמש"
+
+#: mygpo/share/templates/share/overview.html:51
+#: mygpo/web/templatetags/menu.py:71
+msgid "Settings"
+msgstr "הגדרות"
+
+#: mygpo/share/templates/share/overview.html:57
+msgid "Favorites Feed"
+msgstr "הזנת מועדפים"
+
+#: mygpo/share/templates/share/overview.html:84
+msgid ""
+"Private items are protected by a special token. Only those who know the "
+"exact link can access your content"
+msgstr ""
+"פריטים פרטיים מוגנים באסימון מיוחד. רק אלו שמכירים את הקישור המדויק יוכלו "
+"לגשת לתוכן שלך"
+
+#: mygpo/share/templates/userpage-denied.html:16
+#, python-format
+msgid ""
+"%(username)s didn't share his user page with you. Maybe you should contact "
+"him to get the correct link."
+msgstr ""
+"עמוד המשתמש של %(username)s לא משותף אתך. אולי עדיף ליצור קשר עם המשתמש כדי "
+"לקבל את הקישור הנכון."
+
+#: mygpo/share/templates/userpage-denied.html:20
+msgid "Want to have your own user page?"
+msgstr "מעניין אותך לקבל עמוד משתמש משלך?"
+
+#: mygpo/share/templates/userpage-denied.html:20
+#, python-format
+msgid ""
+" Go to your <a href=\"%(share-url)s\">Share Page</a> to get the link.</a>"
+msgstr ""
+" עליך לעבור ל<a href=\"%(share-url)s\">שיתוף עמוד</a> כדי לקבל את הקישור.</a>"
+
+#: mygpo/share/templates/userpage.html:24
+#, python-format
+msgid "a user on %(site)s"
+msgstr "משתמש ב־%(site)s"
+
+#: mygpo/share/templates/userpage.html:35
+#, python-format
+msgid ""
+"<strong>%(username)s</strong> is sharing his favorite podcasts on %(site)s."
+msgstr ""
+"הפודקאסטים המועדפים של <strong>%(username)s</strong> משותפים ב־%(site)s."
+
+#: mygpo/share/templates/userpage.html:47
+#, python-format
+msgid "%(subscription_count)s Subscriptions"
+msgstr "%(subscription_count)s מינויים"
+
+#: mygpo/share/templates/userpage.html:52
+msgid "Episodes Listened"
+msgstr "פרקים שנוגנו"
+
+#: mygpo/share/templates/userpage.html:68
+#: mygpo/share/templates/userpage.html:97
+#: mygpo/share/templates/userpage.html:148
+msgid "see all"
+msgstr "להציג הכול"
+
+#: mygpo/share/templates/userpage.html:83
+#, python-format
+msgid "%(list_count)s Podcast Lists"
+msgstr "%(list_count)s רשימות פודקאסטים"
+
+#: mygpo/share/templates/userpage.html:110
+#, python-format
+msgid "%(num_episodes)s Recently Played Episodes"
+msgstr "%(num_episodes)s פרקים שנוגנו לאחרונה"
+
+#: mygpo/share/templates/userpage.html:131
+#, python-format
+msgid "%(num_fav_episodes)s Favorite Episodes"
+msgstr "%(num_fav_episodes)s פרקים מועדפים"
+
+#: mygpo/share/templates/userpage.html:166
+msgid "That's You!"
+msgstr "מדובר בך!"
+
+#: mygpo/share/templates/userpage.html:168
+msgid "Edit your profile"
+msgstr "עריכת הפרופיל שלך"
+
+#: mygpo/share/templates/userpage.html:176
+msgid "Stats"
+msgstr "סטטיסטיקה"
+
+#: mygpo/share/templates/userpage.html:178
+msgid "Total Played:"
+msgstr "סך הכול התנגנו:"
+
+#: mygpo/share/templates/userpage.html:184
+msgid "Played Last Month:"
+msgstr "התנגנו בחודש שעבר:"
+
+#: mygpo/share/templates/userpage.html:190
+msgid "Member Since:"
+msgstr "חברות מאז:"
+
+#: mygpo/share/templates/userpage.html:194
+msgid "the early days"
+msgstr "ימי קדם"
+
+#: mygpo/subscriptions/templates/subscriptions.html:11
+#: mygpo/subscriptions/templates/subscriptions.html:15
+msgid "Podcast Subscriptions"
+msgstr "מינויים לפודקאסטים"
+
+#: mygpo/subscriptions/templates/subscriptions.html:32
+#, python-format
+msgid "%(episode_count)s Episodes"
+msgstr "%(episode_count)s פרקים"
+
+#: mygpo/subscriptions/templates/subscriptions.html:42
+#, python-format
+msgid ""
+"You don't have any subscriptions yet. Set up your <a href=\"%(devices)s"
+"\">podcast clients</a> and <a href=\"%(directory)s\">discover interesting "
+"podcasts</a>."
+msgstr ""
+"אין לך מינויים עדיין. עליך להגדיר את <a href=\"%(devices)s\">לקוח "
+"הפודקאסטים</a> שלך ואת <a href=\"%(directory)s\">איתור פודקאסטים מעניינים</"
+"a>."
+
+#: mygpo/subscriptions/templates/subscriptions.html:63
+#: mygpo/suggestions/templates/suggestions.html:54
+#: mygpo/web/templates/device.html:53
+msgid "Download OPML"
+msgstr "הורדת OPML"
+
+#: mygpo/subscriptions/views.py:117
+#, python-format
+msgid "%(username)s's Podcast Subscriptions on %(site)s"
+msgstr "מינויי הפודקאסטים של %(username)s ב־%(site)s"
+
+#: mygpo/subscriptions/views.py:123
+#, python-format
+msgid "Recent changes to %(username)s's podcast subscriptions on %(site)s"
+msgstr "השינויים האחרונים למינויי הפודקאסטים של %(username)s תחת %(site)s"
+
+#: mygpo/subscriptions/views.py:147
+#, python-format
+msgid "%(username)s subscribed to %(podcast)s (%(site)s)"
+msgstr "הרשמה אל %(podcast)s מצד %(username)s (%(site)s)"
+
+#: mygpo/subscriptions/views.py:149
+#, python-format
+msgid "%(username)s unsubscribed from %(podcast)s (%(site)s)"
+msgstr "ביטול הרשמה אל %(podcast)s מצד %(username)s (%(site)s)"
+
+#: mygpo/suggestions/templates/suggestions.html:9
+#: mygpo/suggestions/templates/suggestions.html:12
+msgid "Suggested Podcasts"
+msgstr "פודקאסטים מומלצים"
+
+#: mygpo/suggestions/templates/suggestions.html:36
+msgid "No Interest"
+msgstr "אין עניין"
+
+#: mygpo/suggestions/templates/suggestions.html:47
+msgid "No Suggestions Yet"
+msgstr "אין הצעות עדיין"
+
+#: mygpo/users/models.py:224
+msgid "Desktop"
+msgstr "מחשב שולחני"
+
+#: mygpo/users/models.py:225
+msgid "Laptop"
+msgstr "מחשב נייד"
+
+#: mygpo/users/models.py:226
+msgid "Cell phone"
+msgstr "טלפון סלולרי"
+
+#: mygpo/users/models.py:227
+msgid "Server"
+msgstr "שרת"
+
+#: mygpo/users/models.py:228
+msgid "Tablet"
+msgstr "מחשב לוח"
+
+#: mygpo/users/models.py:229
+msgid "Other"
+msgstr "אחר"
+
+#: mygpo/users/templates/registration/activation_failed.html:8
+msgid "Activation failed"
+msgstr "ההפעלה נכשלה"
+
+#: mygpo/users/templates/registration/activation_failed.html:11
+msgid "Account not activated"
+msgstr "החשבון לא הופעל"
+
+#: mygpo/users/templates/registration/activation_failed.html:16
+msgid "Your account could not be activated."
+msgstr "לא ניתן להפעיל את החשבון שלך."
+
+#: mygpo/users/templates/registration/registration_complete.html:9
+msgid "Registration complete"
+msgstr "ההרשמה הושלמה"
+
+#: mygpo/users/templates/registration/registration_complete.html:13
+msgid ""
+"Please confirm your account using the email you should just have received."
+msgstr "נא לאמת את החשבון שלך בעזרת ההודעה שקיבלת בדוא״ל."
+
+#: mygpo/users/templates/registration/registration_form.html:8
+#: mygpo/users/templates/registration/registration_form.html:11
+msgid "Create Account"
+msgstr "יצירת חשבון"
+
+#: mygpo/users/templates/registration/registration_form.html:18
+msgid "You are already registered."
+msgstr "כבר נרשמת."
+
+#: mygpo/users/templates/registration/registration_form.html:72
+#: mygpo/web/templates/base.html:52 mygpo/web/templates/home.html:47
+#: mygpo/web/templates/home.html:103 mygpo/web/templates/login.html:48
+#: mygpo/web/templatetags/menu.py:25
+msgid "Register"
+msgstr "הרשמה"
+
+#: mygpo/users/templates/registration/registration_form.html:87
+msgid "Activation Mail"
+msgstr "הודעת הפעלה בדוא״ל"
+
+#: mygpo/users/templates/registration/registration_form.html:88
+msgid ""
+"After registration, you'll receive an activation mail to confirm the "
+"validity of your email address."
+msgstr ""
+"לאחר ההרשמה, תגיע אליך הודעת הפעלה בדוא״ל כדי לאמת את כתובת הדוא״ל שלך."
+
+#: mygpo/users/templates/registration/registration_form.html:90
+#, python-format
+msgid ""
+"If it doesn't arrive, you can <a href=\"%(resend-activation-url)s\">resend</"
+"a> it."
+msgstr ""
+"אם ההודעה לא מגיעה אליך, ניתן <a href=\"%(resend-activation-url)s\">לשלוח "
+"אותה מחדש</a>."
+
+#: mygpo/users/templates/registration/resend_activation.html:4
+#: mygpo/users/templates/registration/resend_activation.html:8
+msgid "Resend activation e-mail"
+msgstr "שליחת הודעת הפעלה בדוא״ל מחדש"
+
+#: mygpo/users/templates/registration/resend_activation.html:18
+#: mygpo/web/templates/restore_password.html:21
+msgid ""
+"Please enter either your username or (if you don't know that either) the e-"
+"mail address which you used to register your account. An e-mail will be sent "
+"to you."
+msgstr ""
+"נא להקליד את שם משתמש או (או אם הפרט הזה חסר לך) את כתובת הדוא״ל בה השתמשת "
+"לטובת רישום לחשבון. תישלח אליך הודעה בדוא״ל."
+
+#: mygpo/users/templates/registration/resend_activation.html:36
+msgid "Send activation e-mail"
+msgstr "שליחת הודעת הפעלה בדוא״ל"
+
+#: mygpo/users/templates/registration/resent_activation.html:4
+#: mygpo/users/templates/registration/resent_activation.html:7
+msgid "Sent Activation Email"
+msgstr "נשלחה הודעה הפעלה בדוא״ל"
+
+#: mygpo/users/templates/registration/resent_activation.html:11
+#, fuzzy
+#| msgid "The activation email has been reset."
+msgid "The activation email has been resent."
+msgstr "הודעת האימות נשלחה בדוא״ל מחדש."
+
+#: mygpo/users/views/device.py:82 mygpo/users/views/device.py:174
+msgid "Synchronize with the following devices"
+msgstr "סנכרון עם המכשירים הבאים"
+
+#: mygpo/users/views/device.py:104
+msgid "Please fill out all fields."
+msgstr "נא למלא את כל השדות."
+
+#: mygpo/users/views/device.py:116
+msgid "Device saved"
+msgstr "המכשיר נשמר"
+
+#: mygpo/users/views/device.py:124 mygpo/users/views/device.py:155
+msgid "You can't use the same Device ID for two devices."
+msgstr " ניתן להשתמש באותו מזהה המכשיר על שני מכשירים."
+
+#: mygpo/users/views/device.py:147
+msgid "Device updated"
+msgstr "מכשיר עודכן"
+
+#: mygpo/users/views/device.py:202
+#, python-brace-format
+msgid "Could not upload subscriptions: {err}"
+msgstr "לא ניתן להעלות מינויים: {err}"
+
+#: mygpo/users/views/device.py:302
+msgid "Your subscription will be updated in a moment."
+msgstr "המינוי שלך יתעדכן בעוד רגע קט."
+
+#: mygpo/users/views/registration.py:87
+msgid "Username or email address already in use"
+msgstr "שם המשתמש או כתובת הדוא״ל כבר נמצאים בשימוש"
+
+#: mygpo/users/views/registration.py:153
+msgid "The activation link is either not valid or has already expired."
+msgstr "קישור ההפעלה שגוי או שתוקפו פג."
+
+#: mygpo/users/views/registration.py:159
+msgid "Your user has been activated. You can log in now."
+msgstr "המשתמש שלך הופעל. כעת יתאפשר לך להיכנס."
+
+#: mygpo/users/views/registration.py:177
+msgid "Either username or email address are required."
+msgstr "נדרשים שם משתמש או כתובת דוא״ל."
+
+#: mygpo/users/views/registration.py:197 mygpo/users/views/user.py:134
+msgid "User does not exist."
+msgstr "משתמש לא קיים."
+
+#: mygpo/users/views/registration.py:203
+msgid "Your account already has been activated. Go ahead and log in."
+msgstr "החשבון שלך כבר הופעל. אפשר לנסות להיכנס לחשבון."
+
+#: mygpo/users/views/settings.py:67 mygpo/users/views/settings.py:104
+msgid "Oops! Something went wrong. Please double-check the data you entered."
+msgstr "אופס! משהו השתבש. נא לבדוק שנית את המידע שהקלדת."
+
+#: mygpo/users/views/settings.py:124
+msgid "Your account has been disconnected"
+msgstr "חשבונך נותק"
+
+#: mygpo/users/views/user.py:73
+msgid "Username missing"
+msgstr "חסר שם משתמש"
+
+#: mygpo/users/views/user.py:78
+msgid "Password missing"
+msgstr "חסרה ססמה"
+
+#: mygpo/users/views/user.py:85
+msgid "Wrong username or password."
+msgstr "שם משתמש או ססמה שגויים."
+
+#: mygpo/users/views/user.py:93 mygpo/users/views/user.py:142
+msgid ""
+"Please activate your account first. We have just re-sent your activation "
+"email"
+msgstr ""
+"נא להפעיל את החשבון שלך תחילה. הרגע שלחנו לך את הודעת ההפעלה בדוא״ל מחדש"
+
+#: mygpo/users/views/user.py:175 mygpo/users/views/user.py:180
+msgid "Login failed."
+msgstr "הכניסה נכשלה."
+
+#: mygpo/users/views/user.py:188
+msgid "Login with Google is currently not possible."
+msgstr "הכניסה עם Google אינה אפשרית כרגע."
+
+#: mygpo/users/views/user.py:201
+#, python-brace-format
+msgid ""
+"Your account has been connected with {google}. Open Settings to change this."
+msgstr "החשבון שלך התחבר עם {google}. ניתן לפתוח את ההגדרות כדי לשנות את זה."
+
+#: mygpo/users/views/user.py:217
+#, python-format
+msgid ""
+"No account connected with your Google account %s. Please log in to connect."
+msgstr "אף חשבון לא התחבר לחשבון שלך ב־Google %s. נא להיכנס כדי להתחבר."
+
+#: mygpo/web/forms.py:22 mygpo/web/forms.py:184
+msgid "E-Mail address"
+msgstr "כתובת דוא״ל"
+
+#: mygpo/web/forms.py:28
+msgid "Current password"
+msgstr "ססמה נוכחית"
+
+#: mygpo/web/forms.py:36
+msgid "New password"
+msgstr "ססמה חדשה"
+
+#: mygpo/web/forms.py:44
+msgid "Confirm password"
+msgstr "אימות ססמה"
+
+#: mygpo/web/forms.py:80
+msgid "A few words about you"
+msgstr "כמה מילים עליך"
+
+#: mygpo/web/forms.py:94 mygpo/web/templates/devicelist.html:23
+msgid "Name"
+msgstr "שם"
+
+#: mygpo/web/forms.py:101 mygpo/web/templates/devicelist.html:24
+msgid "Type"
+msgstr "סוג"
+
+#: mygpo/web/forms.py:106 mygpo/web/templates/devicelist.html:25
+msgid "Device ID"
+msgstr "מזהה מכשיר"
+
+#: mygpo/web/forms.py:110
+msgid "ID on device"
+msgstr "מזהה על המכשיר"
+
+#: mygpo/web/forms.py:123
+msgid "Share this subscription with other users (public)"
+msgstr "שיתוף המינוי הזה עם משתמשים אחרים (ציבורי)"
+
+#: mygpo/web/forms.py:163
+msgid "No device selected"
+msgstr "לא נבחר מכשיר"
+
+#: mygpo/web/forms.py:171
+msgid "Please enter your username"
+msgstr "נא להקליד את שם המשתמש שלך"
+
+#: mygpo/web/forms.py:176
+msgid "or the email address used while registering"
+msgstr "או את כתובת הדוא״ל בה השתמשת בעת ההרשמה"
+
+#: mygpo/web/templates/400.html:4 mygpo/web/templates/400.html:7
+msgid "Bad request"
+msgstr "בקשה שגויה"
+
+#: mygpo/web/templates/400.html:11
+msgid "There has been an error processing your request."
+msgstr "אירעה שגיאה בעת עיבוד הבקשה שלך."
+
+#: mygpo/web/templates/401.html:4 mygpo/web/templates/401.html:7
+msgid "Unauthorized"
+msgstr "אין הרשאה"
+
+#: mygpo/web/templates/401.html:12
+msgid "This page is only available to registered users."
+msgstr "עמוד זה זמין ללקוחות רשומים בלבד."
+
+#: mygpo/web/templates/account.html:8 mygpo/web/templates/account.html:11
+msgid "Account Settings"
+msgstr "הגדרות חשבון"
+
+#: mygpo/web/templates/account.html:73 mygpo/web/templates/account.html:76
+#: mygpo/web/templates/delete_account.html:9
+msgid "Delete Account"
+msgstr "מחיקת חשבון"
+
+#: mygpo/web/templates/account.html:87
+msgid "Google"
+msgstr "Google"
+
+#: mygpo/web/templates/account.html:90
+#, python-format
+msgid "Connected with %(gmail)s"
+msgstr "מחובר עם %(gmail)s"
+
+#: mygpo/web/templates/account.html:93
+msgid "Disconnect"
+msgstr "ניתוק"
+
+#: mygpo/web/templates/account.html:96
+msgid "Connect"
+msgstr "חיבור"
+
+#: mygpo/web/templates/base.html:40 mygpo/web/templatetags/menu.py:71
+msgid "Account"
+msgstr "חשבון"
+
+#: mygpo/web/templates/base.html:46 mygpo/web/templates/base.html:50
+#: mygpo/web/templates/home.html:41 mygpo/web/templates/home.html:45
+#: mygpo/web/templates/home.html:102 mygpo/web/templates/login.html:8
+#: mygpo/web/templates/login.html:11 mygpo/web/templates/login.html:46
+#: mygpo/web/templates/restore_password.html:8
+#: mygpo/web/templatetags/menu.py:24
+msgid "Login"
+msgstr "כניסה"
+
+#: mygpo/web/templates/base.html:51 mygpo/web/templates/home.html:46
+#: mygpo/web/templates/login.html:47
+msgid "Login with Google"
+msgstr "כניסה עם Google"
+
+#: mygpo/web/templates/base.html:133 mygpo/web/templates/home.html:153
+#: mygpo/web/templatetags/menu.py:34
+msgid "Discover"
+msgstr "עיון"
+
+#: mygpo/web/templates/base.html:134 mygpo/web/templates/home.html:154
+#: mygpo/web/templatetags/menu.py:36
+msgid "Directory"
+msgstr "ספרייה"
+
+#: mygpo/web/templates/base.html:142 mygpo/web/templates/home.html:162
+msgid "Support"
+msgstr "תמיכה"
+
+#: mygpo/web/templates/base.html:143 mygpo/web/templates/home.html:163
+#: mygpo/web/templatetags/menu.py:26
+msgid "Docs"
+msgstr "מסמכים"
+
+#: mygpo/web/templates/base.html:144 mygpo/web/templates/home.html:164
+msgid "Mailing&nbsp;List"
+msgstr "קבוצת&nbsp;דיונים"
+
+#: mygpo/web/templates/base.html:145 mygpo/web/templates/home.html:165
+msgid "Questions"
+msgstr "שאלות"
+
+#: mygpo/web/templates/base.html:151 mygpo/web/templates/home.html:171
+msgid "Support&nbsp;Us"
+msgstr "להביע&nbsp;תמיכה&nbsp;בנו"
+
+#: mygpo/web/templates/base.html:152 mygpo/web/templates/contribute.html:22
+#: mygpo/web/templates/home.html:172
+msgid "Donate"
+msgstr "תרומה"
+
+#: mygpo/web/templates/base.html:159 mygpo/web/templates/home.html:179
+msgid "Follow"
+msgstr "לעקוב"
+
+#: mygpo/web/templates/base.html:161 mygpo/web/templates/home.html:181
+msgid "Blog"
+msgstr "בלוג"
+
+#: mygpo/web/templates/base.html:162 mygpo/web/templates/home.html:182
+msgid "Blog&nbsp;(RSS)"
+msgstr "בלוג&nbsp;(RSS)"
+
+#: mygpo/web/templates/base.html:168 mygpo/web/templates/home.html:188
+msgid "Develop"
+msgstr "פיתוח"
+
+#: mygpo/web/templates/base.html:169 mygpo/web/templates/home.html:189
+msgid "API"
+msgstr "API"
+
+#: mygpo/web/templates/base.html:170 mygpo/web/templates/home.html:190
+msgid "Libraries"
+msgstr "ספריות"
+
+#: mygpo/web/templates/base.html:171 mygpo/web/templates/home.html:191
+msgid "Clients"
+msgstr "לקוחות"
+
+#: mygpo/web/templates/base.html:177 mygpo/web/templates/home.html:197
+#: mygpo/web/templatetags/menu.py:73
+msgid "Publish"
+msgstr "פרסום"
+
+#: mygpo/web/templates/base.html:178 mygpo/web/templates/home.html:198
+msgid "Get&nbsp;Access"
+msgstr "קבלת&nbsp;גישה"
+
+#: mygpo/web/templates/base.html:179 mygpo/web/templates/home.html:199
+msgid "Link&nbsp;To&nbsp;Us"
+msgstr "קישור&nbsp;אלינו"
+
+#: mygpo/web/templates/base.html:188 mygpo/web/templates/home.html:207
+msgid "hosting provided by prgmr.com"
+msgstr "האירוח סופק על ידי prgmr.com"
+
+#: mygpo/web/templates/contribute.html:8 mygpo/web/templatetags/menu.py:27
+msgid "Contribute"
+msgstr "תרומה"
+
+#: mygpo/web/templates/contribute.html:11
+msgid "Contribute to gpodder.net"
+msgstr "תרומה ל־gpodder.net"
+
+#: mygpo/web/templates/contribute.html:16
+msgid ""
+"gpodder.net is run as a hobby project without continuous funding for "
+"servers, storage and bandwidth. We rely on contributors and donations to "
+"keep the site running and improve it constantly."
+msgstr ""
+"gpodder.net מופעל כמיזם תחביב ללא מקור מימון מתחדש לשרתים, לאחסון ולתעבורה. "
+"אנו סומכים על מתנדבים ותרומות כדי להשאיר את האתר פעיל ולשפר אותו שלב אחר שלב."
+
+#: mygpo/web/templates/contribute.html:18
+msgid "Work"
+msgstr "עבודה"
+
+#: mygpo/web/templates/contribute.html:19
+msgid ""
+"If you want to contribute to gpodder.net by writing code, check out the <a "
+"href=\"/developer/\">Development</a> page. We also appreciate contributions "
+"of non-coding work, such as web and interface design, server operations, "
+"testing, etc. If you are interested, join the <a href=\"https://gpodder."
+"github.io/docs/mailing-list.html\">mailing list</a> or the IRC channel "
+"#gpodder on chat.freenode.net."
+msgstr ""
+"אם מעניין אותך להתנדב לטובת gpodder.net עם כתיבת קוד, כדאי לבקר בעמוד <a "
+"href=\"/developer/\">פיתוח</a>. אנו גם מעריכים צורות התנדבות שאינן בצורת "
+"קוד, כגון עיצוב האתר, פעולות בשרת, בדיקות וכו׳. אם כל זה מעניין אותך, "
+"באפשרותך להצטרף ל<a href=\"https://gpodder.github.io/docs/mailing-list.html"
+"\">רשימת הדיונים</a> או לערוץ ה־IRC בשם ‎#gpodder תחת chat.freenode.net."
+
+#: mygpo/web/templates/contribute.html:23
+msgid ""
+"If you want to support gpodder.net financially, you can donate via <a href="
+"\"https://paypal.me/pools/c/8lxTu5kqTp\">PayPal</a>."
+msgstr ""
+
+#: mygpo/web/templates/csrf.html:8
+msgid "Attention!"
+msgstr "נא לשים לב!"
+
+#: mygpo/web/templates/csrf.html:11
+msgid "Attention, Attention!"
+msgstr "לשים לב בבקשה!"
+
+#: mygpo/web/templates/csrf.html:17
+#, python-format
+msgid ""
+"It seems that %(referer)s has linked to %(site)s to get you to change some "
+"data. <strong>This will possibly change some of your data / settings!</"
+"strong>. Do you really want to continue? <strong>If in doubt, chose No.</"
+"strong>"
+msgstr ""
+"נראה כי %(referer)s קושר אל %(site)s כדי לנסות לשכנע אותך לשנות נתונים. "
+"<strong>מצב כזה עשוי לגרום לך לשנות חלק מהנתונים / הגדרות שלך!</strong>. "
+"להמשיך? <strong>במקרה של ספק עדיף לבחור בלא.</strong>"
+
+#: mygpo/web/templates/csrf.html:24
+msgid "Yes"
+msgstr "כן"
+
+#: mygpo/web/templates/csrf.html:25
+msgid "No"
+msgstr "לא"
+
+#: mygpo/web/templates/dashboard.html:14 mygpo/web/templatetags/menu.py:64
+msgid "Overview"
+msgstr "סקירה"
+
+#: mygpo/web/templates/dashboard.html:17
+msgid "Hi, "
+msgstr "היי,"
+
+#: mygpo/web/templates/dashboard.html:24
+msgid "Newest Episodes"
+msgstr "הפרקים החדשים ביותר"
+
+#: mygpo/web/templates/dashboard.html:39
+#, python-format
+msgid ""
+"Welcome to %(site)s! If this is your first visit, you should set up your <a "
+"href=\"https://gpoddernet.readthedocs.io/en/latest/user/clients.html"
+"\">podcast client</a> and try to check as many <em>Explore</em> boxes as you "
+"can."
+msgstr ""
+"ברוך בואך אל %(site)s! אם זה הביקור הראשון שלך, כדאי לך להגדיר את <a href="
+"\"https://gpoddernet.readthedocs.io/en/latest/user/clients.html\">לקוח "
+"הפודקאסטים</a> שלך ולנסות לחקור כמה שיותר תיבות <em>סיור</em> שאפשר."
+
+#: mygpo/web/templates/dashboard.html:44
+#, python-format
+msgid ""
+"If you have problems, have a look at the <a href=\"%(help)s\">docs</a> or "
+"ask questions on the <a href=\"https://gpodder.github.io/docs/mailing-list."
+"html\">mailing list</a> or <a href=\"https://github.com/gpodder/mygpo/issues"
+"\">forum</a>."
+msgstr ""
+"במקרה של תקלות, מוטב לעיין ב<a href=\"%(help)s\">מסמכים</a> או לשאול שאלות "
+"ב<a href=\"https://gpodder.github.io/docs/mailing-list.html\">רשימת הדיונים</"
+"a> או ב<a href=\"https://github.com/gpodder/mygpo/issues\">פורום</a>."
+
+#: mygpo/web/templates/dashboard.html:81
+#, python-format
+msgid "Explore %(site)s"
+msgstr "סיור ב־%(site)s"
+
+#: mygpo/web/templates/dashboard.html:85
+#, python-format
+msgid "Sign up to %(site)s"
+msgstr "הרשמה ל־%(site)s"
+
+#: mygpo/web/templates/dashboard.html:90
+msgid "Connect your Podcast Clients"
+msgstr "חיבור לקוחות הפודקאסטים שלך"
+
+#: mygpo/web/templates/dashboard.html:95
+msgid "Subscribe to Podcasts"
+msgstr "רישום לפודקאסטים"
+
+#: mygpo/web/templates/dashboard.html:100
+msgid "Mark your Favorite Episodes"
+msgstr "סימון הפרקים המועדפים עליך"
+
+#: mygpo/web/templates/dashboard.html:105
+msgid "Share your Subscriptions"
+msgstr "שיתוף המינויים שלך"
+
+#: mygpo/web/templates/dashboard.html:110
+msgid "Share your Favorite Episodes"
+msgstr "שיתוף הפרקים המועדפים עליך"
+
+#: mygpo/web/templates/dashboard.html:115
+msgid "Share your Userpage"
+msgstr "שיתוף עמוד המשתמש שלך"
+
+#: mygpo/web/templates/dashboard.html:120
+msgid "Tag Podcasts"
+msgstr "תיוג פודקאסטים"
+
+#: mygpo/web/templates/dashboard.html:125
+msgid "Create Podcast Lists"
+msgstr "יצירת רשימות פודקאסטים"
+
+#: mygpo/web/templates/dashboard.html:130
+msgid "Publish your own Podcast"
+msgstr "הפצת פודקאסט משלך"
+
+#: mygpo/web/templates/dashboard.html:140
+msgid "Subscribe in Your Browser"
+msgstr "רישום בדפדפן שלך"
+
+#: mygpo/web/templates/dashboard.html:142
+#, python-format
+msgid ""
+"Register %(site.domain)s as a feed reader, and subscribe to podcasts "
+"directly from your browser"
+msgstr ""
+"ניתן לרשום את %(site.domain)s כקורא הזנות ולהירשם לפודקאסטים ישירות מהדפדפן "
+"שלך."
+
+#: mygpo/web/templates/dashboard.html:145
+msgid "Install"
+msgstr "התקנה"
+
+#: mygpo/web/templates/delete_account.html:14
+msgid "Delete your Account?"
+msgstr "למחוק את החשבון שלך?"
+
+#: mygpo/web/templates/delete_account.html:20
+msgid "Do you really want to delete your account?"
+msgstr "האם באמת רצונך הוא למחוק את החשבון שלך?"
+
+#: mygpo/web/templates/delete_account.html:23
+msgid "Yes, please"
+msgstr "כן, בבקשה"
+
+#: mygpo/web/templates/deleted_account.html:9
+msgid "Account Deleted"
+msgstr "החשבון נמחק"
+
+#: mygpo/web/templates/deleted_account.html:13
+msgid "Your account has been deleted"
+msgstr "חשבונך נמחק"
+
+#: mygpo/web/templates/deleted_account.html:18
+msgid "Thanks"
+msgstr "תודות"
+
+#: mygpo/web/templates/developer.html:8 mygpo/web/templates/developer.html:11
+#: mygpo/web/templatetags/menu.py:28
+msgid "Development"
+msgstr "פיתוח"
+
+#: mygpo/web/templates/developer.html:17
+msgid "Webservice"
+msgstr "שירות מקוון"
+
+#: mygpo/web/templates/developer.html:18
+#, fuzzy
+#| msgid ""
+#| "The sourcecode of the webservice gpodder.net is released as open source "
+#| "under the AGPLv3 and <a href=\"https://github.com/gpodder/mygpo\">hosted "
+#| "at GitHub</a>. Bugs can be reported at the <a href=\"https://bugs.gpodder."
+#| "org/enter_bug.cgi?product=gpodder.net\">gPodder Bugtracker</a>."
+msgid ""
+"The sourcecode of the webservice gpodder.net is released as open source "
+"under the AGPLv3 and <a href=\"https://github.com/gpodder/mygpo\">hosted at "
+"GitHub</a>. Bugs can be reported at the <a href=\"https://github.com/gpodder/"
+"gpodder/issues\">gPodder Issue Tracker on GitHub</a>."
+msgstr ""
+"קוד המקור של השירות המקוון gpodder.net מופץ לקהל הרחב כקוד פתוח תחת הרישיון "
+"AGPLv3 והוא <a href=\"https://github.com/gpodder/mygpo\">מתארח ב־GitHub</a>. "
+"ניתן לדווח על תקלות ב<a href=\"https://bugs.gpodder.org/enter_bug.cgi?"
+"product=gpodder.net\">עוקב המשימות של gPodder</a>."
+
+#: mygpo/web/templates/developer.html:21
+msgid "Integrating Clients"
+msgstr "שילוב לקוחות"
+
+#: mygpo/web/templates/developer.html:22
+msgid ""
+"If you want to integrate gpodder.net in some podcasting client, you might "
+"want to use one of the existing <a href=\"https://gpoddernet.readthedocs.io/"
+"en/latest/dev/libraries.html\">client libraries</a>."
+msgstr ""
+"אם ברצונך לשלב את gpodder.net בלקוח פודקאסטים כלשהו, יכול להיות שעדיף לך "
+"להשתמש באחת מ<a href=\"https://gpoddernet.readthedocs.io/en/latest/dev/"
+"libraries.html\">ספריות הלקוח</a> הקיימות."
+
+#: mygpo/web/templates/developer.html:23
+msgid ""
+"There are already several clients for different platforms which can be used "
+"as examples. <a href=\"https://gpoddernet.readthedocs.io/en/latest/user/"
+"clients.html\">See list of clients.</a>"
+msgstr ""
+"כבר ישנם מגוון לקוחות לפלטפורמות שונות בהם ניתן להשתמש כדוגמאות. <a href="
+"\"https://gpoddernet.readthedocs.io/en/latest/user/clients.html\">הצגת רשימת "
+"הלקוחות.</a>"
+
+#: mygpo/web/templates/device-edit.html:11 mygpo/web/templates/device.html:11
+#, python-format
+msgid "Device %(devicename)s"
+msgstr "מכשיר %(devicename)s"
+
+#: mygpo/web/templates/device-edit.html:22 mygpo/web/templates/device.html:18
+msgid "This device was deleted."
+msgstr "מכשיר זה נמחק."
+
+#: mygpo/web/templates/device-edit.html:61
+msgid "Replace Subscriptions"
+msgstr "החלפת מינויים"
+
+#: mygpo/web/templates/device-edit.html:65
+msgid "Replace your current subscriptions by uploading an OPML file."
+msgstr "ניתן להחליף את המינויים הנוכחיים שלך על ידי העלאת קובץ OPML."
+
+#: mygpo/web/templates/device-edit.html:70
+msgid "Upload"
+msgstr "העלאה"
+
+#: mygpo/web/templates/device-edit.html:83
+msgid "Delete Device"
+msgstr "מחיקת מכשיר"
+
+#: mygpo/web/templates/device-edit.html:99
+#: mygpo/web/templates/device-edit.html:117 mygpo/web/templates/device.html:102
+#: mygpo/web/templates/device.html:120
+msgid "Synchronize"
+msgstr "סנכרון"
+
+#: mygpo/web/templates/device-edit.html:100 mygpo/web/templates/device.html:103
+msgid ""
+"If you synchronize devices, they will always have the same subscriptions. A "
+"podcast that is subscribed on one device, will automatically be added to all "
+"synchronized devices."
+msgstr ""
+"סמקרה של סנכרון מכשירים, תמיד יהיו להם את אותם המינויים. פודקאסט אליו נרשמת "
+"במכשיר אחד יתווסף אוטומטית לכל המכשירים המסונכרנים."
+
+#: mygpo/web/templates/device-edit.html:104 mygpo/web/templates/device.html:107
+#, python-format
+msgid "%(devicename)s is currently not synchronized with other devices."
+msgstr "%(devicename)s לא מסונכרן כרגע עם מכשירים אחרים."
+
+#: mygpo/web/templates/device-edit.html:108 mygpo/web/templates/device.html:111
+#, python-format
+msgid "%(devicename)s is currently synchronized with %(synclist)s."
+msgstr "%(devicename)s מסונכרן כעת עם %(synclist)s."
+
+#: mygpo/web/templates/device-edit.html:109 mygpo/web/templates/device.html:112
+#, python-format
+msgid "Stop synchronisation for %(devicename)s "
+msgstr "עצירת סנכרון עבור %(devicename)s"
+
+#: mygpo/web/templates/device.html:40
+msgid "You don't have any podcasts subscribed on this device."
+msgstr "לא נרשמת לאף פודקאסט במכשיר הזה."
+
+#: mygpo/web/templates/device.html:63
+msgid "OPML for Nokia Podcasting on Symbian "
+msgstr "OPML לפודקאסטים של נוקיה על סימביאן"
+
+#: mygpo/web/templates/device.html:79
+msgid "Trigger Sync"
+msgstr "הפעלת סנכרון"
+
+#: mygpo/web/templates/device.html:87 mygpo/web/templates/devicelist.html:26
+#: mygpo/web/templates/devicelist.html:45
+msgid "Configure"
+msgstr "הגדרה"
+
+#: mygpo/web/templates/devicelist.html:10
+#: mygpo/web/templates/devicelist.html:13
+msgid "Managed Devices"
+msgstr "מכשירים מנוהלים"
+
+#: mygpo/web/templates/devicelist.html:31
+msgid "Synchronized"
+msgstr "מסונכרן"
+
+#: mygpo/web/templates/devicelist.html:33
+msgid "Not Synchronized"
+msgstr "לא מסונכרן"
+
+#: mygpo/web/templates/devicelist.html:53
+msgid ""
+"You don't have any devices yet. Go to the <a href=\"https://gpoddernet."
+"readthedocs.io/en/latest/user/clients.html\">clients</a> page to learn how "
+"to set up your client applications."
+msgstr ""
+"לא מוגדרים עבורך מכשירים עדיין. נא לעבור לעמוד ה<a href=\"https://gpoddernet."
+"readthedocs.io/en/latest/user/clients.html\">לקוחות</a> כדי ללמוד איך להגדיר "
+"את יישומי הלקוח שלך."
+
+#: mygpo/web/templates/devicelist.html:74
+msgid "Deleted Devices"
+msgstr "מכשירים שנמחקו"
+
+#: mygpo/web/templates/devicelist.html:85
+msgid "Reactivate"
+msgstr "הפעלה מחדש"
+
+#: mygpo/web/templates/devicelist.html:93
+msgid "Delete Permanently"
+msgstr "מחיקה לצמיתות"
+
+#: mygpo/web/templates/favorites.html:10 mygpo/web/templates/favorites.html:13
+#: mygpo/web/templatetags/menu.py:54 mygpo/web/templatetags/menu.py:65
+msgid "Favorite Episodes"
+msgstr "פרקים מועדפים"
+
+#: mygpo/web/templates/login.html:15
+msgid "You need to login to access this page."
+msgstr "עליך להיכנס כדי לגשת לעמוד הזה."
+
+#: mygpo/web/templates/login.html:40
+msgid "Forgot your password?"
+msgstr "שכחת את הססמה שלך?"
+
+#: mygpo/web/templates/maintenance.html:8
+#: mygpo/web/templates/maintenance.html:11
+msgid "Maintenance"
+msgstr "תחזוקה"
+
+#: mygpo/web/templates/maintenance.html:15
+msgid ""
+"We are currently doing some work on gpodder.net but we should back online "
+"within a few minutes. Just wait a bit and try again!"
+msgstr ""
+"אנו מבצעים עבודות על gpodder.net אך אנו צפויים לחזור בעוד מספר דקות. עליך "
+"פשוט לחכות מעט ולנסות שוב!"
+
+#: mygpo/web/templates/mytags.html:11 mygpo/web/templates/mytags.html:14
+#: mygpo/web/templatetags/menu.py:55
+msgid "My Tags"
+msgstr "התגיות שלי"
+
+#: mygpo/web/templates/mytags.html:41
+#, python-format
+msgid ""
+"You didn't tag any podcasts yet. Go to your <a href=\"%(subscriptions-url)s"
+"\">subscriptions</a> and tag some."
+msgstr ""
+"לא תייגת אף פודקאסט עדיין. יש לגשת אל ה<a href=\"%(subscriptions-url)s"
+"\">מינויים</a> שלך ולתייג כמה מהם."
+
+#: mygpo/web/templates/password_reset.html:4
+msgid "Password reset"
+msgstr "איפוס ססמה"
+
+#: mygpo/web/templates/password_reset.html:7
+msgid "Your password has been reset"
+msgstr "הססמה שלך עברה איפוס"
+
+#: mygpo/web/templates/password_reset.html:13
+#, python-format
+msgid ""
+"You should have received an mail with your new password. Please <a href="
+"\"%(login-url)s\">log in</a> now."
+msgstr ""
+"אמורה הייתה להגיע אליך הודעה עם הססמה החדשה שלך. נא <a href=\"%(login-url)s"
+"\">להיכנס</a> כעת."
+
+#: mygpo/web/templates/password_reset_failed.html:4
+msgid "Password could not be reset"
+msgstr "לא ניתן לאפס את הססמה"
+
+#: mygpo/web/templates/password_reset_failed.html:7
+msgid "Your password could not be reset"
+msgstr "לא ניתן לאפס את הססמה שלך"
+
+#: mygpo/web/templates/password_reset_failed.html:12
+msgid "Unfortunately we were not able to reset your password."
+msgstr "לרוע המזל, לא הצלחנו לאפס לך את הססמה."
+
+#: mygpo/web/templates/privacy.html:9 mygpo/web/templates/privacy.html:12
+msgid "Privacy Settings"
+msgstr "הגדרות פרטיות"
+
+#: mygpo/web/templates/privacy.html:18
+#, python-format
+msgid "%(domain)s distinguishes between public and private subscriptions."
+msgstr "ב־%(domain)s קיימת הבדלה בין מינויים ציבוריים לפרטיים."
+
+#: mygpo/web/templates/privacy.html:20
+msgid ""
+"<strong>Public</strong> subscriptions are included in your <a href=\"/share/"
+"\">shared podcasts</a> and our anonymized public statistics."
+msgstr ""
+"מינויים <strong>ציבוריים</strong> נכללים ב<a href=\"/share/\">פודקאסטים "
+"המשותפים</a> שלך ובסטטיסטיקה הציבורית האלמונית שלנו."
+
+#: mygpo/web/templates/privacy.html:21
+msgid ""
+"<strong>Private</strong> subscriptions do neither show up in your list of "
+"shared podcasts, nor are considered in our statistics."
+msgstr ""
+"מינויים <strong>פרטיים</strong> אינם מופיעים ברשימת הפודקאסטים המשותפים שלך, "
+"או בסטטיסטיקות שלנו."
+
+#: mygpo/web/templates/privacy.html:29
+msgid "Default for new subscriptions"
+msgstr "בררת מחדל למינויים חדשים"
+
+#: mygpo/web/templates/privacy.html:68
+msgid "Public Subscriptions"
+msgstr "מינויים ציבוריים"
+
+#: mygpo/web/templates/privacy.html:79
+msgid "Make Private"
+msgstr "הסתרה מהציבור"
+
+#: mygpo/web/templates/privacy.html:90
+msgid "Private Subscriptions"
+msgstr "מינויים פרטיים"
+
+#: mygpo/web/templates/privacy.html:101
+msgid "Make Public"
+msgstr "חשיפה לציבור"
+
+#: mygpo/web/templates/privacy_policy.html:8 mygpo/web/templatetags/menu.py:29
+msgid "Privacy Policy"
+msgstr "מדיניות פרטיות"
+
+#: mygpo/web/templates/restore_password.html:29
+msgid "Reset Password"
+msgstr "איפוס ססמה"
+
+#: mygpo/web/templates/subscribe.html:7
+#, python-format
+msgid "Subscribe to %(podcasttitle)s"
+msgstr "הרשמה אל %(podcasttitle)s"
+
+#: mygpo/web/templates/subscribe.html:41
+#, fuzzy
+#| msgid ""
+#| "You can't subscribe to this podcast, because you don't have any devices "
+#| "(on which you don't have subscribed to the podcast already."
+msgid ""
+"You can't subscribe to this podcast, because you don't have any devices (on "
+"which you don't have subscribed to the podcast already)."
+msgstr ""
+"אין לך אפשרות להירשום לפודקאסט הזה כיוון שאין לך מכשירים (שבהם לא נרשמת "
+"עדיין לפודקאסט)."
+
+#: mygpo/web/templates/subscribe.html:43
+msgid "Create Device"
+msgstr "יצירת התקן"
+
+#: mygpo/web/templates/subscribe.html:49
+msgid "Why Unnamed Podcast?"
+msgstr "למה פודקאסט ללא שם?"
+
+#: mygpo/web/templates/subscribe.html:49
+#, fuzzy
+#| msgid ""
+#| "Because we display names after we have fetched the information form the "
+#| "feed -- and this may take some time. Until this is completed, the podcast "
+#| "will simply be called this way."
+msgid ""
+"Because we display names after we have fetched the information from the feed "
+"-- and this may take some time. Until this is completed, the podcast will "
+"simply be called this way."
+msgstr ""
+"כיוון שאנו מציגים שמות לאחר אחזור המידע מההזנה -- פעולה שעשויה לארוך זמן מה. "
+"עד להשלמת פעולה זו, הפודקאסט פשוט ייקרא כך."
+
+#: mygpo/web/templates/user_subscriptions.html:14
+#: mygpo/web/templates/user_subscriptions.html:18
+#: mygpo/web/templates/user_subscriptions_denied.html:10
+#: mygpo/web/templates/user_subscriptions_denied.html:14
+#, python-format
+msgid "%(username)s's Subscriptions"
+msgstr "המינויים של %(username)s"
+
+#: mygpo/web/templates/user_subscriptions.html:21
+#, python-format
+msgid ""
+"<a href=\"%(userpage-url)s\">%(username)s</a> has %(num_subscriptions)s "
+"subscriptions"
+msgstr ""
+"ל־<a href=\"%(userpage-url)s\">%(username)s</a> יש %(num_subscriptions)s "
+"מינויים"
+
+#: mygpo/web/templates/user_subscriptions.html:42
+msgid "Download Subscriptions as OPML"
+msgstr "הורדת המינויים כ־OPML"
+
+#: mygpo/web/templates/user_subscriptions.html:45
+msgid "Subscribe to Changes"
+msgstr "רישום לשינויים"
+
+#: mygpo/web/templates/user_subscriptions.html:51
+#, python-format
+msgid "%(username)s doesn't have any subscriptions yet."
+msgstr "ל־%(username)s אין מינויים עדיין."
+
+#: mygpo/web/templates/user_subscriptions.html:61
+msgid "Share Your Subscriptions"
+msgstr "שיתוף המינויים שלך"
+
+#: mygpo/web/templates/user_subscriptions.html:62
+msgid "Want to share your own subscriptions?"
+msgstr "מעניין אותך לשתף את המינויים שלך?"
+
+#: mygpo/web/templates/user_subscriptions.html:71
+msgid "Nokia Podcasting"
+msgstr "פודקאסטים של נוקיה"
+
+#: mygpo/web/templates/user_subscriptions.html:72
+msgid ""
+"Add <tt>&amp;symbian=true#.opml</tt> to the OPML URL to get an OPML file for "
+"Nokia Podcasting on Symbian devices."
+msgstr ""
+"יש להוסיף <tt>&amp;symbian=true#.opml</tt> לכתובת ה־OPML כדי לקבל קובץ OPML "
+"עבור פודקאסטים של נוקיה על מכשירי סימביאן."
+
+#: mygpo/web/templates/user_subscriptions_denied.html:20
+#, python-format
+msgid ""
+"%(username)s didn't share his subscriptions with you. Maybe you should "
+"contact him to get the correct link."
+msgstr ""
+"המינויים של %(username)s לא שותפו אתך. אולי עדיף ליצור קשר עם המשתמש כדי "
+"לקבל את הקישור הנכון."
+
+#: mygpo/web/templates/user_subscriptions_denied.html:23
+msgid "Want to share your subscriptions?"
+msgstr "מעניין אותך לשתף את המינויים שלך?"
+
+#: mygpo/web/templates/user_subscriptions_denied.html:23
+msgid ""
+"Just go to your <a href/\"/account/\">account settings</a> to get the link.</"
+"a>"
+msgstr ""
+"עליך פשוט לגשת אל <a href/\"/account/\">הגדרות החשבון</a> כדי לקבל את הקישור."
+"</a>"
+
+#: mygpo/web/templatetags/devices.py:33
+msgid "Unknown"
+msgstr "לא ידוע"
+
+#: mygpo/web/templatetags/episodes.py:21
+msgid "New episode"
+msgstr "פרק חדש"
+
+#: mygpo/web/templatetags/episodes.py:24
+#, python-format
+msgid "Downloaded to %s"
+msgstr "התקבל אל %s"
+
+#: mygpo/web/templatetags/episodes.py:26
+msgid "Downloaded"
+msgstr "התקבל"
+
+#: mygpo/web/templatetags/episodes.py:29
+#, python-format
+msgid "Played on %s"
+msgstr "התנגן ב־%s"
+
+#: mygpo/web/templatetags/episodes.py:31
+msgid "Played"
+msgstr "התנגן"
+
+#: mygpo/web/templatetags/episodes.py:34
+#, python-format
+msgid "Deleted on %s"
+msgstr "נמחק ב־%s"
+
+#: mygpo/web/templatetags/episodes.py:36
+msgid "Deleted"
+msgstr "נמחק"
+
+#: mygpo/web/templatetags/episodes.py:38
+msgid "Unknown status"
+msgstr "מצב לא ידוע"
+
+#: mygpo/web/templatetags/episodes.py:46
+msgid "Unplayed episode"
+msgstr "פרק שלא התנגן"
+
+#: mygpo/web/templatetags/episodes.py:50 mygpo/web/templatetags/episodes.py:51
+#, python-format
+msgid " on %s"
+msgstr "ב־%s"
+
+#: mygpo/web/templatetags/episodes.py:56
+msgid "The episode has been flattr'd"
+msgstr "הפרק קיבל flattr"
+
+#: mygpo/web/templatetags/episodes.py:63
+msgid "This episode has been marked new"
+msgstr "הפרק סומן כחדש"
+
+#: mygpo/web/templatetags/episodes.py:69
+msgid "This episode has been downloaded"
+msgstr "הפרק התקבל"
+
+#: mygpo/web/templatetags/episodes.py:74
+#, python-format
+msgid " from %(start)s to %(end)s"
+msgstr " מ־%(start)s עד %(end)s"
+
+#: mygpo/web/templatetags/episodes.py:79
+#, python-format
+msgid " to position %s"
+msgstr "למיקום %s"
+
+#: mygpo/web/templatetags/episodes.py:88
+msgid "This episode has been played"
+msgstr "הפרק התנגן"
+
+#: mygpo/web/templatetags/episodes.py:98
+msgid "This episode has been deleted"
+msgstr "הפרק נמחק"
+
+#: mygpo/web/templatetags/episodes.py:157
+msgid "Unknown Episode"
+msgstr "פרק לא ידוע"
+
+#: mygpo/web/templatetags/menu.py:23 mygpo/web/templatetags/menu.py:75
+msgid "Home"
+msgstr "בית"
+
+#: mygpo/web/templatetags/menu.py:30
+msgid "Help"
+msgstr "עזרה"
+
+#: mygpo/web/templatetags/menu.py:41
+msgid "User subscriptions"
+msgstr "מינויי המשתמש"
+
+#: mygpo/web/templatetags/menu.py:42
+msgid "Suggestions"
+msgstr "הצעות"
+
+#: mygpo/web/templatetags/menu.py:43
+msgid "Features"
+msgstr "תכונות"
+
+#: mygpo/web/templatetags/menu.py:45
+msgid "Toplists"
+msgstr "רשימות מובילות"
+
+#: mygpo/web/templatetags/menu.py:56
+msgid "Devices"
+msgstr "התקנים"
+
+#: mygpo/web/templatetags/menu.py:62
+msgid "Community"
+msgstr "קהילה"
+
+#: mygpo/web/templatetags/menu.py:66
+msgid "My Userpage"
+msgstr "עמוד המשתמש שלי"
+
+#: mygpo/web/templatetags/menu.py:71
+msgid "Privacy"
+msgstr "פרטיות"
+
+#: mygpo/web/templatetags/menu.py:77
+msgid "Link to gpodder.net"
+msgstr "מעבר אל gpodder.net"
+
+#: mygpo/web/templatetags/time.py:42
+#, python-brace-format
+msgid "{h}h {m}m {s}s"
+msgstr "{h} שע׳ {m} דק׳ {s} שנ׳"
+
+#: mygpo/web/templatetags/time.py:44
+#, fuzzy, python-brace-format
+#| msgid "{h}h {m}m {s}s"
+msgid "{m}m {s}s"
+msgstr "{h} שע׳ {m} דק׳ {s} שנ׳"
+
+#: mygpo/web/utils.py:297
+#, python-format
+msgid "%(weeks)d week"
+msgid_plural "%(weeks)d weeks"
+msgstr[0] "שבוע אחד"
+msgstr[1] "שבועיים"
+msgstr[2] "%(weeks)d שבועות"
+msgstr[3] "%(weeks)d שבועות"
+
+#: mygpo/web/utils.py:301
+#, python-format
+msgid "%(days)d day"
+msgid_plural "%(days)d days"
+msgstr[0] "יום אחד"
+msgstr[1] "יומיים"
+msgstr[2] "%(days)d ימים"
+msgstr[3] "%(days)d ימים"
+
+#: mygpo/web/utils.py:305
+#, python-format
+msgid "%(hours)d hour"
+msgid_plural "%(hours)d hours"
+msgstr[0] "שעה אחת"
+msgstr[1] "שעתיים"
+msgstr[2] "%(hours)d שעות"
+msgstr[3] "%(hours)d שעות"
+
+#: mygpo/web/views.py:149
+msgid "another site"
+msgstr "אתר אחר"
+
+#~ msgid "Timing"
+#~ msgstr "תזמון"
+
+#~ msgid "Last update:"
+#~ msgstr "עדכון אחרון:"
+
+#~ msgid "Next update:"
+#~ msgstr "העדכון הבא:"
+
+#~ msgid ""
+#~ "If you want to support gpodder.net financially, you can donate via PayPal "
+#~ "to stefan@skoegl.net. You can also send a book via Amazon (<a href="
+#~ "\"http://www.amazon.de/wishlist/24H4ORJ0Z0JBH\">DE</a>, <a href=\"http://"
+#~ "amzn.com/w/3IPIF4J4F2C5R\">US</a> or <a href=\"http://www.amazon.co.uk/"
+#~ "registry/wishlist/24JRVURXUKO6F\">UK</a>)."
+#~ msgstr ""
+#~ "אם ברצונך לתמוך ב־gpodder.net כלכלית, ניתן לתרום דרך PayPal לטובת "
+#~ "stefan@skoegl.net. ניתן גם לשלוח ספר דרך Amazon (<a href=\"http://www."
+#~ "amazon.de/wishlist/24H4ORJ0Z0JBH\">DE</a>, <a href=\"http://amzn.com/"
+#~ "w/3IPIF4J4F2C5R\">US</a> או <a href=\"http://www.amazon.co.uk/registry/"
+#~ "wishlist/24JRVURXUKO6F\">UK</a>)."

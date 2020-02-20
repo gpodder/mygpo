@@ -17,12 +17,9 @@ def move_podcastsettings(apps, schema_editor):
             user=cfg.user,
             # we can't get the contenttype from cfg.podcast as it would be a
             # different model
-            content_type=ContentType.objects.get(app_label='podcasts',
-                                                 model='podcast'),
+            content_type=ContentType.objects.get(app_label='podcasts', model='podcast'),
             object_id=cfg.podcast.pk,
-            defaults={
-                'settings': cfg.settings,
-            }
+            defaults={'settings': cfg.settings},
         )
 
 
@@ -39,9 +36,7 @@ def move_usersettings(apps, schema_editor):
             user=profile.user,
             content_type=None,
             object_id=None,
-            defaults={
-                'settings': profile.settings,
-            }
+            defaults={'settings': profile.settings},
         )
 
 

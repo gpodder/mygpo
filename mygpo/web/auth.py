@@ -10,7 +10,7 @@ from django.urls import reverse
 class EmailAuthenticationBackend(ModelBackend):
     """ Auth backend to enable login with email address as username """
 
-    def authenticate(self, username=None, password=None):
+    def authenticate(self, request, username=None, password=None):
         try:
             validate_email(username)
 
@@ -38,12 +38,14 @@ def get_google_oauth_flow(request):
     callback = 'http{s}://{domain}{callback}'.format(
         s='s' if request.is_secure() else '',
         domain=site.domain,
-        callback=reverse('login-google-callback'))
+        callback=reverse('login-google-callback'),
+    )
 
     flow = OAuth2WebServerFlow(
         client_id=settings.GOOGLE_CLIENT_ID,
         client_secret=settings.GOOGLE_CLIENT_SECRET,
         scope='https://www.googleapis.com/auth/userinfo.email',
-        redirect_uri=callback)
+        redirect_uri=callback,
+    )
 
     return flow

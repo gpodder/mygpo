@@ -21,9 +21,11 @@ from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.decorators import cors_origin
 
 from collections import namedtuple
+
 EpisodeStatus = namedtuple('EpisodeStatus', 'episode status action')
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -58,19 +60,21 @@ class DeviceUpdates(View):
 
         domain = RequestSite(request).domain
 
-        add, rem, subscriptions = self.get_subscription_changes(user, device,
-                                                                since, now,
-                                                                domain)
-        updates = self.get_episode_changes(user, subscriptions, domain,
-                                           include_actions, since)
+        add, rem, subscriptions = self.get_subscription_changes(
+            user, device, since, now, domain
+        )
+        updates = self.get_episode_changes(
+            user, subscriptions, domain, include_actions, since
+        )
 
-        return JsonResponse({
-            'add': add,
-            'rem': rem,
-            'updates': updates,
-            'timestamp': get_timestamp(now),
-        })
-
+        return JsonResponse(
+            {
+                'add': add,
+                'rem': rem,
+                'updates': updates,
+                'timestamp': get_timestamp(now),
+            }
+        )
 
     def get_subscription_changes(self, user, device, since, now, domain):
         """ gets new, removed and current subscriptions """
@@ -85,7 +89,6 @@ class DeviceUpdates(View):
 
         return add, rem, subscriptions
 
-
     def get_episode_changes(self, user, subscriptions, domain, include_actions, since):
         devices = {dev.id.hex: dev.uid for dev in user.client_set.all()}
 
@@ -94,19 +97,21 @@ class DeviceUpdates(View):
 
         episode_updates = self.get_episode_updates(user, subscriptions, since)
 
-        return [self.get_episode_data(status, podcasts, domain,
-                include_actions, user, devices) for status in episode_updates]
+        return [
+            self.get_episode_data(
+                status, podcasts, domain, include_actions, user, devices
+            )
+            for status in episode_updates
+        ]
 
-
-    def get_episode_updates(self, user, subscribed_podcasts, since,
-            max_per_podcast=5):
+    def get_episode_updates(self, user, subscribed_podcasts, since, max_per_podcast=5):
         """ Returns the episode updates since the timestamp """
 
         episodes = []
         for podcast in subscribed_podcasts:
-            eps = Episode.objects.filter(podcast=podcast,
-                                         released__gt=since)\
-                                 .order_by('-order', '-released')
+            eps = Episode.objects.filter(podcast=podcast, released__gt=since).order_by(
+                '-order', '-released'
+            )
             episodes.extend(eps[:max_per_podcast])
 
         states = EpisodeState.dict_for_user(user, episodes)
@@ -114,8 +119,9 @@ class DeviceUpdates(View):
         for episode in episodes:
             yield EpisodeStatus(episode, states.get(episode.id, 'new'), None)
 
-
-    def get_episode_data(self, episode_status, podcasts, domain, include_actions, user, devices):
+    def get_episode_data(
+        self, episode_status, podcasts, domain, include_actions, user, devices
+    ):
         """ Get episode data for an episode status object """
 
         # TODO: shouldn't the podcast_id be in the episode status?

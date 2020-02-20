@@ -16,28 +16,25 @@ class TestSubscribe(TestCase):
     def setUp(self):
         User = get_user_model()
         self.user = User(
-            username='duplicate-subscribe',
-            email='duplicate-subscribe@example.com',
+            username='duplicate-subscribe', email='duplicate-subscribe@example.com'
         )
         self.user.set_password('secret')
         self.user.save()
-        self.client = Client.objects.create(
-            user=self.user, uid='dev1', id=uuid.uuid1())
+        self.client = Client.objects.create(user=self.user, uid='dev1', id=uuid.uuid1())
 
         self.url = 'http://www.example.com/pdocast.rss'
-        self.podcast = Podcast.objects.get_or_create_for_url(self.url)
+        self.podcast = Podcast.objects.get_or_create_for_url(self.url).object
 
     def test_duplicate_subscribe(self):
         """ Test that a duplicate subscription is skipped """
         from . import _perform_subscribe
+
         clients = [self.client, self.client]
-        changed_clients = list(_perform_subscribe(
-            self.podcast,
-            self.user,
-            clients,
-            datetime.utcnow(),
-            self.url,
-        ))
+        changed_clients = list(
+            _perform_subscribe(
+                self.podcast, self.user, clients, datetime.utcnow(), self.url
+            )
+        )
 
         # ensure only one client is changed
         self.assertEqual(len(changed_clients), 1)
@@ -45,8 +42,7 @@ class TestSubscribe(TestCase):
 
         # ensure exactly one subscription has been created
         subscriptions = models.Subscription.objects.filter(
-            podcast=self.podcast,
-            user=self.user
+            podcast=self.podcast, user=self.user
         )
         self.assertEqual(subscriptions.count(), 1)
         subscriptions[0].delete()

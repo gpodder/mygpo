@@ -1,5 +1,3 @@
-
-
 from django.contrib import admin
 
 from mygpo.podcastlists.models import PodcastList, PodcastListEntry
@@ -18,15 +16,12 @@ class PodcastListAdmin(admin.ModelAdmin):
     list_display = ('title', 'user', 'slug', 'num_entries', 'vote_count')
 
     # fetch related objects for the list view
-    list_select_related = ('user', )
+    list_select_related = ('user',)
 
     search_fields = ('title', 'user__username', 'slug')
 
-    inlines = [
-        PodcastListEntryInline,
-        VoteInline,
-    ]
+    inlines = [PodcastListEntryInline, VoteInline]
 
-    raw_id_fields = ('user', )
+    raw_id_fields = ('user',)
 
     show_full_result_count = False

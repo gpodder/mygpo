@@ -7,9 +7,7 @@ from django.conf import settings
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('users', '0009_user_unique_email'),
-    ]
+    dependencies = [('users', '0009_user_unique_email')]
 
     operations = [
         migrations.AlterField(
@@ -20,5 +18,5 @@ class Migration(migrations.Migration):
                 to=settings.AUTH_USER_MODEL,
                 on_delete=models.CASCADE,
             ),
-        ),
+        )
     ]

@@ -16,29 +16,34 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='UserSettings',
             fields=[
-                ('id', models.AutoField(
-                    verbose_name='ID',
-                    serialize=False,
-                    auto_created=True,
-                    primary_key=True)),
+                (
+                    'id',
+                    models.AutoField(
+                        verbose_name='ID',
+                        serialize=False,
+                        auto_created=True,
+                        primary_key=True,
+                    ),
+                ),
                 ('settings', models.TextField(default='{}')),
-                ('object_id', models.UUIDField(
-                    max_length=32,
-                    null=True,
-                    blank=True)),
-                ('content_type', models.ForeignKey(
-                    blank=True,
-                    to='contenttypes.ContentType',
-                    null=True,
-                    on_delete=models.PROTECT,
-                )),
-                ('user', models.ForeignKey(
-                    to=settings.AUTH_USER_MODEL,
-                    on_delete=models.CASCADE,
-                )),
+                ('object_id', models.UUIDField(max_length=32, null=True, blank=True)),
+                (
+                    'content_type',
+                    models.ForeignKey(
+                        blank=True,
+                        to='contenttypes.ContentType',
+                        null=True,
+                        on_delete=models.PROTECT,
+                    ),
+                ),
+                (
+                    'user',
+                    models.ForeignKey(
+                        to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+                    ),
+                ),
             ],
-            options={
-            },
+            options={},
             bases=(models.Model,),
         ),
         migrations.AlterUniqueTogether(
@@ -49,9 +54,14 @@ class Migration(migrations.Migration):
         # UserSettings for Users have no content_object; the following ensures
         # there can only be one such entry per user
         migrations.RunSQL(
-            [('CREATE UNIQUE INDEX usersettings_unique_null '
-              'ON usersettings_usersettings (user_id) '
-              'WHERE content_type_id IS NULL;', None)],
+            [
+                (
+                    'CREATE UNIQUE INDEX usersettings_unique_null '
+                    'ON usersettings_usersettings (user_id) '
+                    'WHERE content_type_id IS NULL;',
+                    None,
+                )
+            ],
             [('DROP INDEX IF EXISTS usersettings_unique_null;', None)],
-        )
+        ),
     ]

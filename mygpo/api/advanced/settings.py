@@ -46,8 +46,7 @@ class SettingsAPI(APIView):
 
         if scope == 'episode':
             podcast = get_object_or_404(Podcast, urls__url=podcast_url)
-            return get_object_or_404(Episode, podcast=podcast,
-                                     urls__url=episode_url)
+            return get_object_or_404(Episode, podcast=podcast, urls__url=episode_url)
 
         raise RequestException('undefined scope %s' % scope)
 

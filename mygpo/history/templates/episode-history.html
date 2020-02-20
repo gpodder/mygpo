@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load humanize %}
+{% load episodes %}
+{% load devices %}
+{% load podcasts %}
+{% load mygpoutil %}
+{% load time %}
+{% load youtube %}
+{% load flickr %}
+{% load charts %}
+{% load utils %}
+{% load static %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/podcast/"|main_menu }}{% endblock %}
+{% block sectionmenu %}
+ {% if podcast.title %}
+  {{ "/podcast/"|section_menu:podcast.title }}
+ {% else %}
+  {{ "/podcast/"|section_menu:"Unnamed Podcast" }}
+ {% endif %}
+{% endblock %}
+
+{% block head %}
+ {% if episode.url|is_youtube_video %}
+  <script type="text/javascript" src="{% static "js/swfobject.js" %}"></script>
+  <script type="text/javascript" src="{% static "js/json2.js" %}"></script>
+  <script type="text/javascript" src="{% static "js/youtube-handler.js" %}"></script>
+ {% endif %}
+
+{% endblock head %}
+
+{% block title %}
+ {{ episode.title|default:"Unnamed Episode"|striptags }} -
+ {{ podcast.title|default:"Unnamed Podcast"|striptags}}
+{% endblock %}
+
+{% block header %}
+
+  {% if podcast.logo_url %}
+   <div id="podcastlogo"><a href="{% podcast_link_target podcast %}">{{ podcast|podcast_logo_big }}</a></div>
+  {% endif %}
+  <h1>
+   {{ episode.title|default:"Unnamed Episode"|striptags }}
+   {% if episode.released %}
+    <small>{% trans "History" %}</small>
+   {% endif %}
+  </h1>
+  <small class="description">
+      {% trans "from" %} {% podcast_group_link podcast %}&middot;
+       {% if not episode.outdated or "hide-outdated-urls" not in podcast.restrictions %}
+        <a href="{{episode.url}}" title="{% trans "Download" %}">
+         <i class="icon-download"></i>
+        </a>
+       {% endif %}
+       {% if episode.link and episode.link != episode.url %}&middot;
+        <a href="{{episode.link}}" title="{% trans "Website" %}">
+         <i class="icon-external-link"></i>
+        </a>
+      {% endif %}
+      {% if episode.listeners %}&middot;
+       {{ episode.listeners }} {% trans "listeners" %}
+      {% endif %}
+  </small>
+
+
+  {% if episode.summary or episode.description %}
+   <div class="summary">
+    {{ episode.summary|default:episode.description|truncatewords:100|markdown }}
+   </div>
+  {% endif %}
+
+{% endblock %}
+
+
+
+{% block content %}
+
+  {% if user.is_authenticated or history %}
+  <h4>{% trans "History" %}</h4>
+  <table class="list">
+   <tr>
+    <th>{% trans "Time" %}</th>
+    <th>{% trans "Action" %}</th>
+    <th>{% trans "Device" %}</th>
+    <th></th>
+   </tr>
+
+   {% for s in history %}
+    <tr>
+     <td><abbr title="{{ s.timestamp }}">{{ s.timestamp|naturalday }}</abbr></td>
+     <td style="text-align: center;">{{ s|episode_status_icon }}</td>
+     <td>
+      {% if s.client %}
+       <a href="{% url "device" s.client.uid %}">{{ s.client|device_icon }} {{ s.client.name|striptags }}</a>
+      {% endif %}
+     </td>
+     <td>{% if s.started or s.playmark %}{{s.started|format_time }} - {% endif %}
+         {% if s.playmark %}{{ s.playmark|format_time }}{% endif %}
+     </td>
+	</tr>
+   {% endfor %}
+
+   {% if user.is_authenticated %}
+    <tr>
+     <form action="{% episode_link_target episode podcast "add-episode-action" %}" method="POST">
+      {% csrf_token %}
+      <td>
+       <input class="input" type="text" id="timestamp" name="timestamp" placeholder="empty = now" /></td>
+      <td>
+       <select class="input" name="action">
+        {% for action, str in actions %}
+         <option value="{{ action }}">{{ str }}</option>
+        {% endfor %}
+       </select>
+      </td>
+      <td>
+       <select class="input" name="device">
+        <option value=""></option>
+        {% for client in clients %}
+         <option value="{{ client.id.hex }}">{{ client.name }}</option>
+        {% endfor %}
+       </select>
+      </td>
+      <td>
+       <input class="btn" type="submit" value="{% trans "Add" %}" />
+      </td>
+     </form>
+    </tr>
+   {% endif %}
+  </table>
+  {% endif %}
+
+{% endblock %}
+
+{% block ads %}
+ {% comment %}disable ads on episode pages{% endcomment %}
+{% endblock %}

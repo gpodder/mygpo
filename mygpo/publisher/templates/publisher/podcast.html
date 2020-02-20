@@ -4,6 +4,7 @@
 {% load podcasts %}
 {% load charts %}
 {% load pcharts %}
+{% load time %}
 {% load static %}
 {% load menu %}
 {% load utils %}
@@ -56,12 +57,49 @@
   <p>{% trans "The podcast information is regularly retrieved from the podcast feed" %}</p>
   <pre><a href="{{ podcast.url }}">{{ podcast.url }}</a></pre>
 
-  <h3>{% trans "Timing" %}</h3>
-  <ul>
-   <li>{% trans "Last update:" %} {{ podcast.last_update|naturaltime }}</li>
-   <li>{% trans "Update interval:" %} {{ podcast.update_interval|hours_to_str }}</li>
-   <li>{% trans "Next update:" %} {{ podcast.next_update|naturaltime }}</li>
-  </ul>
+  <h3>{% trans "Updates" %}</h3>
+
+  {% trans "Update interval:" %} {{ podcast.update_interval|hours_to_str }}
+
+  <table>
+   <thead>
+    <tr>
+     <th>Start</th>
+     <th>Duration</th>
+     <th>Status</th>
+     <th class="numeric">Episodes Added</th>
+    </tr>
+   </thead>
+   <tbody>
+    <tr class="status-neutral">
+     <td>{{ podcast.next_update|naturaltime }}</td>
+     <td></td>
+     <td>Next</td>
+     <td class="numeric"></td>
+    </tr>
+    {% for result in update_results %}
+     <tr {% if result.successful %} class="status-success" {% else %} class="status-error" {% endif %}>
+      <td>{{ result.start|naturaltime }}</td>
+      <td>{{ result.duration.total_seconds|format_duration }}</td>
+      <td>
+       {% if result.successful %}
+        {% trans "Successful" %}
+       {% else %}
+        {% trans "Error" %} {{ result.error_message }}
+       {% endif %}
+      </td>
+      <td class="numeric">{{ result.episodes_added }}</td>
+     </tr>
+    {% empty %}
+     <tr class="status-neutral">
+      <td>{{ podcast.last_update|naturaltime }}</td>
+      <td></td>
+      <td></td>
+      <td class="numeric"></td>
+     </tr>
+    {% endfor %}
+   </tbody>
+  </table>
 
   <form class="form-inline" action="{% podcast_link_target podcast "podcast-publisher-update" %}" method="post">
    {% csrf_token %}
@@ -97,34 +135,6 @@
    <h2>{% trans "Feed Check" %}</h2>
 
    <div class="panel-group" id="accordion">
-    <div class="panel panel-default">
-     <div class="panel-heading">
-      <h4 class="panel-title">
-       <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseFlattr">
-        <i class="icon-check{% if not podcast.flattr_url %}-empty{% endif %}"></i>
-         {% trans "Flattr" %}
-       </a>
-      </h4>
-     </div>
-
-     <div id="collapseFlattr" class="panel-collapse collapse in">
-      <div class="panel-body">
-       <p>
-        {% blocktrans with site.domain as sitename %}{{ sitename }} supports <a href="https://flattr.com/">Flattr</a>. When you provide <a href="http://developers.flattr.net/feed/">payment URLs</a> in your podcast feed, your listeners can support you financially by flattring your content.{% endblocktrans %}
-       </p>
-       {% if podcast.flattr_url %}
-        <div class="alert alert-success">
-         {% blocktrans %} We discovered payment URLs in your pdocast feed. Your listeners can automatically flattr your content!{% endblocktrans %}
-        </div>
-       {% else %}
-        <div class="alert alert-warning">
-         {% blocktrans %}We did not find <a href="http://developers.flattr.net/feed/">payment URLs</a> in your podcast feed. Add them so your listeners can support you!</a>{% endblocktrans %}
-        </div>
-       {% endif %}
-      </div>
-     </div>
-    </div>
-
     <div class="panel panel-default">
      <div class="panel-heading">
       <h4 class="panel-title">

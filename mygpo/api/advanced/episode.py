@@ -8,7 +8,6 @@ from mygpo.utils import parse_time, normalize_feed_url, get_timestamp
 
 
 class ChaptersAPI(APIView):
-
     def post(self, request, username):
         """ Add / remove Chapters to/from an episode """
         user = request.user
@@ -24,10 +23,7 @@ class ChaptersAPI(APIView):
             raise RequestException('Invalid Podcast or Episode URL')
 
         self.update_chapters(body, user)
-        return JsonResponse({
-            'update_url': update_urls,
-            'timestamp': now_
-        })
+        return JsonResponse({'update_url': update_urls, 'timestamp': now_})
 
     def get(self, request, username):
         """ Get chapters for an episode """
@@ -36,8 +32,9 @@ class ChaptersAPI(APIView):
 
         podcast_url, episode_url, _update_urls = self.get_urls(request)
 
-        episode = Episode.objects.filter(podcast__urls__url=podcast_url,
-                                         urls__url=episode_url).get()
+        episode = Episode.objects.filter(
+            podcast__urls__url=podcast_url, urls__url=episode_url
+        ).get()
 
         chapters = Chapter.objects.filter(user=user, episode=episode)
 
@@ -47,15 +44,12 @@ class ChaptersAPI(APIView):
 
         chapters_json = map(self.chapter_to_json, chapters)
 
-        return JsonResponse({
-            'chapters': chapters_json,
-            'timestamp': now_
-        })
+        return JsonResponse({'chapters': chapters_json, 'timestamp': now_})
 
     def update_chapters(self, req, user):
         """ Add / remove chapters according to the client's request """
-        podcast = Podcast.objects.get_or_create_for_url(podcast_url)
-        episode = Episode.objects.get_or_create_for_url(podcast, episode_url)
+        podcast = Podcast.objects.get_or_create_for_url(podcast_url).object
+        episode = Episode.objects.get_or_create_for_url(podcast, episode_url).object
 
         # add chapters
         for chapter_data in req.get('chapters_add', []):
@@ -65,9 +59,9 @@ class ChaptersAPI(APIView):
         # remove chapters
         for chapter_data in req.get('chapters_remove', []):
             start, end = self.parse_rem(chapter_data)
-            Chapter.objects.filter(user=user, episode=episode,
-                                   start=start, end=end)\
-                           .delete()
+            Chapter.objects.filter(
+                user=user, episode=episode, start=start, end=end
+            ).delete()
 
     def parse_new(self, user, chapter_data):
         """ Parse a chapter to be added """

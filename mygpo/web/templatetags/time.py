@@ -1,11 +1,12 @@
 from datetime import time
 
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django import template
 
 
 register = template.Library()
+
 
 @register.filter
 def sec_to_time(sec):
@@ -19,20 +20,26 @@ def sec_to_time(sec):
     s = int(sec)
     hour = int(s / 60 / 60)
     minute = int((s / 60) % 60)
-    sec = int(s % 60 )
+    sec = int(s % 60)
     return time(hour, minute, sec)
 
 
 @register.filter
-@mark_safe
 def format_duration(sec):
     """ Converts seconds into a duration string
 
     >>> format_duration(1000)
-    '0h 16m 40s'
+    '16m 40s'
 
+    >>> format_duration(10009)
+    '2h 46m 49s'
     """
     hours = int(sec / 60 / 60)
     minutes = int((sec / 60) % 60)
     seconds = int(sec % 60)
-    return _('{h}h {m}m {s}s').format(h=hours, m=minutes, s=seconds)
+
+    if hours:
+        s = _('{h}h {m}m {s}s').format(h=hours, m=minutes, s=seconds)
+    else:
+        s = _('{m}m {s}s').format(m=minutes, s=seconds)
+    return mark_safe(s)

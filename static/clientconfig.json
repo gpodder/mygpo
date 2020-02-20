@@ -1,0 +1,11 @@
+{
+    "mygpo":  {
+        "baseurl": "https://gpodder.net/"
+    },
+
+    "mygpo-feedservice": {
+        "baseurl": "http://feeds.gpodder.net/"
+    },
+
+    "update_timeout":    604800
+}

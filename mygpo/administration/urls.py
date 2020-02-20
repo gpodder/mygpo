@@ -1,67 +1,43 @@
-from django.conf.urls import url
+from django.urls import path
 
 from . import views
 
 
 urlpatterns = [
-    url(r'^$',
-        views.Overview.as_view(),
-        name='admin-overview'),
-
-    url(r'^hostinfo$',
-        views.HostInfo.as_view(),
-        name='admin-hostinfo'),
-
-    url(r'^merge/$',
-        views.MergeSelect.as_view(),
-        name='admin-merge'),
-
-    url(r'^merge/verify$',
-        views.MergeVerify.as_view(),
-        name='admin-merge-verify'),
-
-    url(r'^merge/process$',
-        views.MergeProcess.as_view(),
-        name='admin-merge-process'),
-
-    url(r'^merge/status/(?P<task_id>[^/]+)$',
+    path('', views.Overview.as_view(), name='admin-overview'),
+    path('hostinfo', views.HostInfo.as_view(), name='admin-hostinfo'),
+    path('merge/', views.MergeSelect.as_view(), name='admin-merge'),
+    path('merge/verify', views.MergeVerify.as_view(), name='admin-merge-verify'),
+    path('merge/process', views.MergeProcess.as_view(), name='admin-merge-process'),
+    path(
+        'merge/status/<uuid:task_id>',
         views.MergeStatus.as_view(),
-        name='admin-merge-status'),
-
-    url(r'^clients$',
-        views.ClientStatsView.as_view(),
-        name='clients'),
-
-    url(r'^clients\.json$',
-        views.ClientStatsJsonView.as_view(),
-        name='clients-json'),
-
-    url(r'^clients/user_agents$',
-        views.UserAgentStatsView.as_view(),
-        name='useragents'),
-
-    url(r'^stats$',
-        views.StatsView.as_view(),
-        name='stats'),
-
-    url(r'^stats\.json$',
-        views.StatsJsonView.as_view(),
-        name='stats-json'),
-
-    url(r'^activate-user/$',
-        views.ActivateUserView.as_view(),
-        name='admin-activate-user'),
-
-    url(r'^make-publisher/input$',
+        name='admin-merge-status',
+    ),
+    path('clients', views.ClientStatsView.as_view(), name='clients'),
+    path('clients.json', views.ClientStatsJsonView.as_view(), name='clients-json'),
+    path('clients/user_agents', views.UserAgentStatsView.as_view(), name='useragents'),
+    path('stats', views.StatsView.as_view(), name='stats'),
+    path('stats.json', views.StatsJsonView.as_view(), name='stats-json'),
+    path('activate-user', views.ActivateUserView.as_view(), name='admin-activate-user'),
+    path(
+        'resend-activation-email',
+        views.ResendActivationEmail.as_view(),
+        name='admin-resend-activation',
+    ),
+    path(
+        'make-publisher/input',
         views.MakePublisherInput.as_view(),
-        name='admin-make-publisher-input'),
-
-    url(r'^make-publisher/process$',
+        name='admin-make-publisher-input',
+    ),
+    path(
+        'make-publisher/process',
         views.MakePublisher.as_view(),
-        name='admin-make-publisher'),
-
-    url(r'^make-publisher/result$',
+        name='admin-make-publisher',
+    ),
+    path(
+        'make-publisher/result',
         views.MakePublisher.as_view(),
-        name='admin-make-publisher-result'),
-
+        name='admin-make-publisher-result',
+    ),
 ]

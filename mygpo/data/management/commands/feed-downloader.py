@@ -6,21 +6,25 @@ from mygpo.maintenance.management.podcastcmd import PodcastCommand
 from mygpo.data.feeddownloader import update_podcasts
 
 import socket
+
 socket.setdefaulttimeout(300)
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 
 class Command(PodcastCommand):
-
     def add_arguments(self, parser):
 
-        parser.add_argument('urls', nargs='+', type=str)
-
-        parser.add_argument('--list-only', action='store_true', dest='list',
-            default=False, help="Don't update anything, just list podcasts "),
-
+        super().add_arguments(parser)
+        parser.add_argument(
+            '--list-only',
+            action='store_true',
+            dest='list',
+            default=False,
+            help="Don't update anything, just list podcasts ",
+        ),
 
     def handle(self, *args, **options):
 
