@@ -9,6 +9,7 @@ from mygpo.utils import to_maxlength
 from mygpo.celery import celery
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -72,18 +73,24 @@ def _perform_subscribe(podcast, user, clients, timestamp, ref_url):
 
     for client in clients:
         subscription, created = Subscription.objects.get_or_create(
-            user=user, client=client, podcast=podcast, defaults={
+            user=user,
+            client=client,
+            podcast=podcast,
+            defaults={
                 'ref_url': to_maxlength(Subscription, 'ref_url', ref_url),
                 'created': timestamp,
                 'modified': timestamp,
-            }
+            },
         )
 
         if not created:
             continue
 
-        logger.info('{user} subscribed to {podcast} on {client}'.format(
-            user=user, podcast=podcast, client=client))
+        logger.info(
+            '{user} subscribed to {podcast} on {client}'.format(
+                user=user, podcast=podcast, client=client
+            )
+        )
 
         HistoryEntry.objects.create(
             timestamp=timestamp,
@@ -107,17 +114,18 @@ def _perform_unsubscribe(podcast, user, clients, timestamp):
 
         try:
             subscription = Subscription.objects.get(
-                user=user,
-                client=client,
-                podcast=podcast,
+                user=user, client=client, podcast=podcast
             )
         except Subscription.DoesNotExist:
             continue
 
         subscription.delete()
 
-        logger.info('{user} unsubscribed from {podcast} on {client}'.format(
-            user=user, podcast=podcast, client=client))
+        logger.info(
+            '{user} unsubscribed from {podcast} on {client}'.format(
+                user=user, podcast=podcast, client=client
+            )
+        )
 
         HistoryEntry.objects.create(
             timestamp=timestamp,
@@ -144,6 +152,10 @@ def _affected_clients(client):
 def _fire_events(podcast, user, clients, subscribed):
     """ Fire the events for subscription / unsubscription """
     for client in clients:
-        subscription_changed.send(sender=podcast.__class__, instance=podcast,
-                                  user=user, client=client,
-                                  subscribed=subscribed)
+        subscription_changed.send(
+            sender=podcast.__class__,
+            instance=podcast,
+            user=user,
+            client=client,
+            subscribed=subscribed,
+        )

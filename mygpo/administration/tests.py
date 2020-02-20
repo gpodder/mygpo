@@ -16,9 +16,6 @@ from mygpo.users.models import Client
 from mygpo.history.models import EpisodeHistoryEntry
 from mygpo.maintenance.merge import PodcastMerger
 from mygpo.subscriptions.tasks import subscribe, unsubscribe
-from mygpo.db.couchdb.episode_state import episode_state_for_user_episode, \
-    add_episode_actions
-from mygpo.utils import get_timestamp
 
 
 class SimpleTest(TestCase):
