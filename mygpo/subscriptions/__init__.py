@@ -1,9 +1,5 @@
 import collections
 
-from mygpo.users.models import Client
-from mygpo.usersettings.models import UserSettings
-from mygpo.subscriptions.models import Subscription, SubscribedPodcast
-from mygpo.history.models import SUBSCRIPTION_ACTIONS, HistoryEntry
 
 import logging
 
@@ -19,6 +15,9 @@ def get_subscribe_targets(podcast, user):
 
     This excludes all devices/syncgroups on which the podcast is already
     subscribed """
+
+    # django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet.
+    from mygpo.users.models import Client
 
     clients = (
         Client.objects.filter(user=user)
@@ -42,12 +41,19 @@ def get_subscribed_podcasts(user, only_public=False):
     The attribute "url" contains the URL that was used when subscribing to
     the podcast """
 
+    # django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet.
+    from mygpo.subscriptions.models import Subscription, SubscribedPodcast
+
     subscriptions = (
         Subscription.objects.filter(user=user)
         .order_by('podcast')
         .distinct('podcast')
         .select_related('podcast')
     )
+
+    # django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet.
+    from mygpo.usersettings.models import UserSettings
+
     private = UserSettings.objects.get_private_podcasts(user)
 
     podcasts = []
@@ -73,6 +79,9 @@ def get_subscription_history(
     Setting device_id restricts the actions to a certain device
     """
 
+    # django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet.
+    from mygpo.history.models import SUBSCRIPTION_ACTIONS, HistoryEntry
+
     logger.info('Subscription History for {user}'.format(user=user.username))
     history = (
         HistoryEntry.objects.filter(user=user)
@@ -93,6 +102,9 @@ def get_subscription_history(
         history = history.filter(timestamp__lte=until)
 
     if public_only:
+        # django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet.
+        from mygpo.usersettings.models import UserSettings
+
         logger.info('... only public')
         private = UserSettings.objects.get_private_podcasts(user)
         history = history.exclude(podcast__in=private)
@@ -112,6 +124,9 @@ def get_subscription_change_history(history):
     This method assumes, that no subscriptions exist at the beginning of
     ``history``.
     """
+
+    # django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet.
+    from mygpo.history.models import HistoryEntry
 
     subscriptions = collections.defaultdict(int)
 
@@ -133,6 +148,9 @@ def get_subscription_change_history(history):
 
 def subscription_diff(history):
     """ Calculates a diff of subscriptions based on a history (sub/unsub) """
+
+    # django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet.
+    from mygpo.history.models import HistoryEntry
 
     subscriptions = collections.defaultdict(int)
 

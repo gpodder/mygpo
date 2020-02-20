@@ -27,7 +27,7 @@ class TestSubscribe(TestCase):
 
     def test_duplicate_subscribe(self):
         """ Test that a duplicate subscription is skipped """
-        from . import _perform_subscribe
+        from mygpo.subscriptions.tasks import _perform_subscribe
 
         clients = [self.client, self.client]
         changed_clients = list(
