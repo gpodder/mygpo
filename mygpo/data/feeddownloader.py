@@ -55,7 +55,7 @@ def update_podcasts(queue):
     for n, podcast_url in enumerate(queue, 1):
         logger.info('Update %d - %s', n, podcast_url)
         if not podcast_url:
-            logger.warn('Podcast URL empty, skipping')
+            logger.warning('Podcast URL empty, skipping')
             continue
 
         try:
@@ -81,7 +81,9 @@ class PodcastUpdater(object):
     """ Updates the podcast specified by the podcast_url """
 
     def __init__(self, podcast_url):
-        self.podcast_url = podcast_url
+        self.podcast_url = (
+            (podcast_url[:2046] + '..') if len(podcast_url) > 2048 else podcast_url
+        )
 
     def update_podcast(self):
         """ Update the podcast """
@@ -160,7 +162,7 @@ class PodcastUpdater(object):
         except ValueError:
             logger.exception(
                 'Feed-service error while parsing response for url "%s": %s',
-                podcast_url,
+                self.podcast_url,
                 r.text,
             )
             raise
@@ -279,7 +281,7 @@ class PodcastUpdater(object):
         try:
             subscribe_at_hub(podcast)
         except SubscriptionError as se:
-            logger.warn('subscribing to hub failed: %s', str(se))
+            logger.warning('subscribing to hub failed: %s', str(se))
 
         self.assign_slug(podcast)
         episode_updater.assign_missing_episode_slugs()

@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from importlib import import_module
 
 from celery.decorators import periodic_task
+from django_db_geventpool.utils import close_connection
 
 from django.contrib.auth import get_user_model
 from django.conf import settings
@@ -15,6 +16,7 @@ logger = get_task_logger(__name__)
 
 
 @celery.task(max_retries=5, default_retry_delay=60)
+@close_connection
 def sync_user(user_pk):
     """ Syncs all of the user's sync groups """
     from mygpo.users.models import SubscriptionException
@@ -38,6 +40,7 @@ def sync_user(user_pk):
 
 
 @periodic_task(run_every=timedelta(hours=1))
+@close_connection
 def remove_inactive_users():
     """ Remove users that have not been activated """
     User = get_user_model()
@@ -45,19 +48,20 @@ def remove_inactive_users():
     # time for which to keep unactivated and deleted users
     valid_days = settings.ACTIVATION_VALID_DAYS
     remove_before = datetime.utcnow() - timedelta(days=valid_days)
-    logger.warn('Removing unactivated users before %s', remove_before)
+    logger.warning('Removing unactivated users before %s', remove_before)
 
     users = User.objects.filter(is_active=False, date_joined__lt=remove_before)
 
     for user in users:
         clients = models.Client.objects.filter(user=user)
-        logger.warn('Deleting %d clients of user "%s"', len(clients), user.username)
+        logger.warning('Deleting %d clients of user "%s"', len(clients), user.username)
         clients.delete()
-        logger.warn('Deleting user "%s"', user.username)
+        logger.warning('Deleting user "%s"', user.username)
         user.delete()
 
 
 @periodic_task(run_every=timedelta(hours=1))
+@close_connection
 def clearsessions():
     """ Clear expired sessions
 

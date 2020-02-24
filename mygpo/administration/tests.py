@@ -15,7 +15,7 @@ from mygpo.podcasts.models import Podcast, Episode
 from mygpo.users.models import Client
 from mygpo.history.models import EpisodeHistoryEntry
 from mygpo.maintenance.merge import PodcastMerger
-from mygpo.subscriptions import subscribe, unsubscribe
+from mygpo.subscriptions.tasks import subscribe, unsubscribe
 
 
 class SimpleTest(TestCase):
@@ -76,7 +76,7 @@ class SimpleTest(TestCase):
         actions = Counter()
 
         # decide which episodes to merge
-        groups = [(0, [e1]), (1, [e2, e3]), (2, [e4])]
+        groups = [(0, [e1.id]), (1, [e2.id, e3.id]), (2, [e4.id])]
 
         # carry out the merge
         pm = PodcastMerger([p1, p2], actions, groups)

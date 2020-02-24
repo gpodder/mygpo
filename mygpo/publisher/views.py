@@ -12,7 +12,7 @@ from django.core.cache import cache
 from django.views.decorators.cache import never_cache, cache_control
 from django.views.decorators.vary import vary_on_cookie
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
@@ -97,8 +97,8 @@ def podcast(request, podcast):
     if not check_publisher_permission(request.user, podcast):
         return HttpResponseForbidden()
 
-    timeline_data = listener_data([podcast])
-    subscription_data = subscriber_data([podcast])[-20:]
+    timeline_data = None  # listener_data([podcast])
+    subscription_data = None  # subscriber_data([podcast])[-20:]
 
     update_token = request.user.profile.get_token('publisher_update_token')
 

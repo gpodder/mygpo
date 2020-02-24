@@ -15,7 +15,7 @@ test: envs/dev/MEDIA_ROOT
 	# assume defined media root directory, empty before running tests
 	rm -rf $(shell cat envs/dev/MEDIA_ROOT)
 	mkdir -p $(shell cat envs/dev/MEDIA_ROOT)
-	envdir envs/dev/ pytest --cov=mygpo/ --cov-branch
+	envdir envs/dev/ python -Wd -m pytest --cov=mygpo/ --cov-branch
 	coverage report --show-missing
 
 update-po:
@@ -34,8 +34,8 @@ clean:
 	git clean -fX
 
 install-deps:
-	apt-get install libpq-dev libjpeg-dev zlib1g-dev libwebp-dev \
-		build-essential python3-dev make gettext virtualenv libffi-dev
+    sudo apt-get install libpq-dev libjpeg-dev zlib1g-dev libwebp-dev \
+		build-essential python3-dev virtualenv libffi-dev redis postgresql
 
 docker-build:
 	sudo docker build -t="mygpo/web" .

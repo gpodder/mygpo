@@ -1,5 +1,7 @@
 from collections import Counter
 
+from django_db_geventpool.utils import close_connection
+
 from mygpo.podcasts.models import Podcast
 from mygpo.celery import celery
 from mygpo.maintenance.merge import PodcastMerger
@@ -10,6 +12,7 @@ logger = get_task_logger(__name__)
 
 
 @celery.task
+@close_connection
 def merge_podcasts(podcast_ids, num_groups):
     """ Task to merge some podcasts"""
 

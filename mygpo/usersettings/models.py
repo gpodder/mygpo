@@ -81,7 +81,7 @@ class UserSettings(models.Model):
         try:
             settings = json.loads(self.settings)
         except ValueError as ex:
-            logger.warn('Decoding settings failed: {msg}'.format(msg=str(ex)))
+            logger.warning('Decoding settings failed: {msg}'.format(msg=str(ex)))
             return None
 
         return settings.get(setting.name, setting.default)
@@ -90,7 +90,7 @@ class UserSettings(models.Model):
         try:
             settings = json.loads(self.settings)
         except ValueError as ex:
-            logger.warn('Decoding settings failed: {msg}'.format(msg=str(ex)))
+            logger.warning('Decoding settings failed: {msg}'.format(msg=str(ex)))
             settings = {}
         settings[setting.name] = value
         self.settings = json.dumps(settings)

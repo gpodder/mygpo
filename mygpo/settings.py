@@ -12,12 +12,12 @@ except ImportError:
     pass
 
 
-def parse_int(s):
-    return int(str(s))
+import django
+import six
 
+django.utils.six = six
 
-def parse_strlist(s):
-    return [item.strip() for item in s.split(',')]
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def get_bool(name, default):
@@ -32,8 +32,6 @@ def get_intOrNone(name, default):
     return int(value)
 
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
 DEBUG = get_bool('DEBUG', False)
 
 
@@ -44,6 +42,16 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': dj_database_url.config(default='postgres://mygpo:mygpo@localhost/mygpo')
 }
+
+
+_USE_GEVENT = get_bool('USE_GEVENT', False)
+if _USE_GEVENT:
+    # see https://github.com/jneight/django-db-geventpool
+    default = DATABASES['default']
+    default['ENGINE'] = ('django_db_geventpool.backends.postgresql_psycopg2',)
+    default['CONN_MAX_AGE'] = 0
+    options = default.get('OPTIONS', {})
+    options['MAX_CONNS'] = 20
 
 
 _cache_used = bool(os.getenv('CACHE_BACKEND', False))
@@ -201,7 +209,7 @@ except ImportError:
     pass
 
 
-ACCOUNT_ACTIVATION_DAYS = parse_int(os.getenv('ACCOUNT_ACTIVATION_DAYS', 7))
+ACCOUNT_ACTIVATION_DAYS = int(os.getenv('ACCOUNT_ACTIVATION_DAYS', 7))
 
 
 AUTHENTICATION_BACKENDS = (
@@ -227,6 +235,8 @@ CSRF_FAILURE_VIEW = 'mygpo.web.views.csrf_failure'
 
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', '')
 
+SERVER_EMAIL = os.getenv('SERVER_EMAIL', DEFAULT_FROM_EMAIL)
+
 SECRET_KEY = os.getenv('SECRET_KEY', '')
 
 if 'pytest' in sys.argv[0]:
@@ -235,7 +245,7 @@ if 'pytest' in sys.argv[0]:
 GOOGLE_ANALYTICS_PROPERTY_ID = os.getenv('GOOGLE_ANALYTICS_PROPERTY_ID', '')
 
 
-DIRECTORY_EXCLUDED_TAGS = parse_strlist(os.getenv('DIRECTORY_EXCLUDED_TAGS', ''))
+DIRECTORY_EXCLUDED_TAGS = os.getenv('DIRECTORY_EXCLUDED_TAGS', '').split()
 
 
 FLICKR_API_KEY = os.getenv('FLICKR_API_KEY', '')
@@ -298,6 +308,9 @@ if _use_log_file:
     }
 
 
+DATA_UPLOAD_MAX_MEMORY_SIZE = get_intOrNone('DATA_UPLOAD_MAX_MEMORY_SIZE', None)
+
+
 # minimum number of subscribers a podcast must have to be assigned a slug
 PODCAST_SLUG_SUBSCRIBER_LIMIT = int(os.getenv('PODCAST_SLUG_SUBSCRIBER_LIMIT', 10))
 
@@ -308,7 +321,7 @@ MIN_SUBSCRIBERS_CATEGORY = int(os.getenv('MIN_SUBSCRIBERS_CATEGORY', 10))
 # maximum number of episode actions that the API processes immediatelly before
 # returning the response. Larger requests will be handled in background.
 # Handler can be set to None to disable
-API_ACTIONS_MAX_NONBG = int(os.getenv('API_ACTIONS_MAX_NONBG', 100))
+API_ACTIONS_MAX_NONBG = get_intOrNone('API_ACTIONS_MAX_NONBG', 100)
 API_ACTIONS_BG_HANDLER = 'mygpo.api.tasks.episode_actions_celery_handler'
 
 

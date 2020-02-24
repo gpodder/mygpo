@@ -102,6 +102,7 @@ JSON
        "website": "http://sixgun.org",
        "description": "The hardest-hitting Linux podcast around",
        "title": "Linux Outlaws",
+       "author": "Sixgun Productions",
        "url": "http://feeds.feedburner.com/linuxoutlaws",
        "position_last_week": 1,
        "subscribers_last_week": 1943,
@@ -124,6 +125,7 @@ XML
       <url>http://feeds.feedburner.com/linuxoutlaws</url>
       <website>http://sixgun.org</website>
       <mygpo_link>http://gpodder.net/podcast/11092</mygpo_link>
+      <author>Sixgun Productions</author>
       <description>The hardest-hitting Linux podcast around</description>
       <subscribers>1954</subscribers>
       <subscribers_last_week>1943</subscribers_last_week>

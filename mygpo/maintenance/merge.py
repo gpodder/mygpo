@@ -72,9 +72,12 @@ class PodcastMerger(object):
             if not episodes:
                 continue
 
-            episode = episodes.pop(0)
+            episode_id = episodes.pop(0)
+            episode = Episode.objects.get(pk=episode_id)
             logger.info('Merging %d episodes', len(episodes))
-            merge_model_objects(episode, episodes)
+
+            eps = [Episode.objects.get(pk=eid) for eid in episodes]
+            merge_model_objects(episode, eps)
 
 
 def reassign_urls(obj1, obj2):
@@ -88,7 +91,7 @@ def reassign_urls(obj1, obj2):
         try:
             url.save()
         except IntegrityError as ie:
-            logger.warn('Moving URL failed: %s. Deleting.', str(ie))
+            logger.warning('Moving URL failed: %s. Deleting.', str(ie))
             url.delete()
 
 
@@ -110,7 +113,7 @@ def reassign_slugs(obj1, obj2):
         try:
             slug.save()
         except IntegrityError as ie:
-            logger.warn('Moving Slug failed: %s. Deleting', str(ie))
+            logger.warning('Moving Slug failed: %s. Deleting', str(ie))
             slug.delete()
 
 

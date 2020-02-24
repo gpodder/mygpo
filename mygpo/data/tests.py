@@ -38,7 +38,7 @@ API_RESPONSE = {
 }
 
 FLICKR_URL = re.compile(
-    'https://api.flickr.com/services/rest/\?method=flickr.photos.getSizes&api_key=.*photo_id=.*&format=json&nojsoncallback=1'
+    r'https://api.flickr.com/services/rest/\?method=flickr.photos.getSizes&api_key=.*photo_id=.*&format=json&nojsoncallback=1'
 )
 
 
@@ -51,7 +51,7 @@ class FlickrTests(TestCase):
 
             sizes = flickr.get_photo_sizes('1235123123')
 
-        self.assertEquals(sizes, API_RESPONSE['sizes']['size'])
+        self.assertEqual(sizes, API_RESPONSE['sizes']['size'])
 
     def test_display_image(self):
         with responses.RequestsMock() as rsps:
@@ -63,4 +63,4 @@ class FlickrTests(TestCase):
                 'https://farm9.staticflickr.com/8747/12346789012_bf1e234567_b.jpg'
             )
 
-        self.assertEquals(disp_photo, MEDIUM_URL)
+        self.assertEqual(disp_photo, MEDIUM_URL)

@@ -14,7 +14,7 @@ from django.http import (
 from django.contrib import messages
 from mygpo.web.forms import DeviceForm, SyncForm
 from mygpo.web.utils import symbian_opml_changes
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control

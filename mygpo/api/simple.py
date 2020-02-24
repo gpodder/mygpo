@@ -9,7 +9,7 @@ from django.views.decorators.cache import cache_page
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 from django.contrib.sites.requests import RequestSite
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.api.backend import get_device
@@ -18,7 +18,8 @@ from mygpo.api.opml import Exporter, Importer
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.directory.models import ExamplePodcast
 from mygpo.api.advanced.directory import podcast_data
-from mygpo.subscriptions import get_subscribed_podcasts, subscribe, unsubscribe
+from mygpo.subscriptions import get_subscribed_podcasts
+from mygpo.subscriptions.tasks import subscribe, unsubscribe
 from mygpo.directory.search import search_podcasts
 from mygpo.decorators import allowed_methods, cors_origin
 from mygpo.utils import parse_range, normalize_feed_url

@@ -3,14 +3,17 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+# Translators:
+# Yaron Shahrabani <sh.yaron@gmail.com>, 2019
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-12 20:10+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2018\n"
+"POT-Creation-Date: 2020-01-18 18:57+0000\n"
+"PO-Revision-Date: 2018-06-20 06:29+0000\n"
+"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2019\n"
 "Language-Team: Hebrew (https://www.transifex.com/yaron/teams/87581/he/)\n"
 "Language: he\n"
 "MIME-Version: 1.0\n"
@@ -154,7 +157,7 @@ msgstr "משימות מתוזמנות ב־Celery"
 #: mygpo/administration/templates/admin/make-publisher-input.html:12
 #: mygpo/administration/templates/admin/make-publisher-result.html:9
 #: mygpo/administration/templates/admin/make-publisher-result.html:12
-#: mygpo/administration/views.py:447
+#: mygpo/administration/views.py:449
 msgid "Publisher Permissions"
 msgstr "הרשאות הפצה"
 
@@ -284,25 +287,25 @@ msgstr "רענון"
 msgid "User-Agent"
 msgstr "סוכן דפדפן"
 
-#: mygpo/administration/views.py:152 mygpo/administration/views.py:170
+#: mygpo/administration/views.py:154 mygpo/administration/views.py:172
 #, python-brace-format
 msgid "No podcast with URL {url}"
 msgstr "אין פודקאסט בכתובת {url}"
 
-#: mygpo/administration/views.py:321 mygpo/administration/views.py:356
+#: mygpo/administration/views.py:323 mygpo/administration/views.py:358
 msgid "Provide either username or email address"
 msgstr "יש לספק שם משתמש או כתובת דוא״ל"
 
-#: mygpo/administration/views.py:327 mygpo/administration/views.py:362
+#: mygpo/administration/views.py:329 mygpo/administration/views.py:364
 msgid "No user found"
 msgstr "לא נמצאו משתמשים"
 
-#: mygpo/administration/views.py:334
+#: mygpo/administration/views.py:336
 #, python-brace-format
 msgid "User {username} ({email}) activated"
 msgstr "המשתמש {username} ‎({email}) עבר עימות"
 
-#: mygpo/administration/views.py:373
+#: mygpo/administration/views.py:375
 #, fuzzy, python-brace-format
 #| msgid "User {username} ({email}) activated"
 msgid "Email for {username} ({email}) resent"
@@ -336,21 +339,21 @@ msgstr "נרשם"
 msgid "unsubscribed"
 msgstr "בוטל רישום"
 
-#: mygpo/api/simple.py:58 mygpo/api/simple.py:93
+#: mygpo/api/simple.py:57 mygpo/api/simple.py:92
 #, python-format
 msgid "%(username)s's Subscription List"
 msgstr "רשימת המינויים של %(username)s"
 
-#: mygpo/api/simple.py:262
+#: mygpo/api/simple.py:258
 #, python-format
 msgid "gpodder.net - Top %(count)d"
 msgstr "gpodder.net - %(count)d המובילים"
 
-#: mygpo/api/simple.py:298
+#: mygpo/api/simple.py:294
 msgid "gpodder.net - Search"
 msgstr "gpodder.net - חיפוש"
 
-#: mygpo/api/simple.py:324
+#: mygpo/api/simple.py:320
 #, python-format
 msgid "gpodder.net - %(count)d Suggestions"
 msgstr "gpodder.net - %(count)d הצעות"
@@ -799,11 +802,11 @@ msgstr "תודה לך על הדירוג!"
 msgid "Edit"
 msgstr "עריכה"
 
-#: mygpo/podcasts/models.py:695
+#: mygpo/podcasts/models.py:697
 msgid "Unknown Podcast"
 msgstr "פודקאסט לא ידוע"
 
-#: mygpo/podcasts/models.py:698
+#: mygpo/podcasts/models.py:700
 #, python-brace-format
 msgid "Unknown Podcast from {domain}"
 msgstr "פודקאסט לא ידוע מ־{domain}"
@@ -1138,7 +1141,19 @@ msgstr ""
 "לפודקאסטים שמופצים על ידיך."
 
 #: mygpo/publisher/templates/publisher/info.html:30
-#, python-format
+#, fuzzy, python-format
+#| msgid ""
+#| "The Publisher Pages are currently in Beta, but if you are publishing a "
+#| "podcast listed on %(sitename)s, feel free to apply by sending a mail "
+#| "with\n"
+#| "  <ul>\n"
+#| "   <li>your username on %(sitename)s (<a href=\"%(register-url)s"
+#| "\">register if you don't have one</a>)</li>\n"
+#| "   <li>the name and URL of the podcast you are publishing</li>\n"
+#| "   <li>an email address that is visible somewhere on the podcast's "
+#| "website (to legitimate you)\n"
+#| "  </ul>\n"
+#| "  to <a href=\"mailto:stefan@gpodder.net\">stefan@gpodder.net</a>."
 msgid ""
 "The Publisher Pages are currently in Beta, but if you are publishing a "
 "podcast listed on %(sitename)s, feel free to apply by sending a mail with\n"
@@ -1149,7 +1164,7 @@ msgid ""
 "   <li>an email address that is visible somewhere on the podcast's website "
 "(to legitimate you)\n"
 "  </ul>\n"
-"  to <a href=\"mailto:stefan@gpodder.net\">stefan@gpodder.net</a>."
+"  to <a href=\"mailto:support@gpodder.net\">support@gpodder.net</a>."
 msgstr ""
 "עמודי ההפצה נמצאים בשלבי ניסוי, אך אם יש לך פודקאסט בהפצתך שרשום תחת "
 "%(sitename)s, אפשר להירשם לתכנית על ידי שליחת הודעה בדוא״ל עם\n"
@@ -1742,7 +1757,7 @@ msgstr "המשתמש שלך הופעל. כעת יתאפשר לך להיכנס."
 msgid "Either username or email address are required."
 msgstr "נדרשים שם משתמש או כתובת דוא״ל."
 
-#: mygpo/users/views/registration.py:197 mygpo/users/views/user.py:131
+#: mygpo/users/views/registration.py:197 mygpo/users/views/user.py:134
 msgid "User does not exist."
 msgstr "משתמש לא קיים."
 
@@ -1770,28 +1785,28 @@ msgstr "חסרה ססמה"
 msgid "Wrong username or password."
 msgstr "שם משתמש או ססמה שגויים."
 
-#: mygpo/users/views/user.py:93 mygpo/users/views/user.py:139
+#: mygpo/users/views/user.py:93 mygpo/users/views/user.py:142
 msgid ""
 "Please activate your account first. We have just re-sent your activation "
 "email"
 msgstr ""
 "נא להפעיל את החשבון שלך תחילה. הרגע שלחנו לך את הודעת ההפעלה בדוא״ל מחדש"
 
-#: mygpo/users/views/user.py:172 mygpo/users/views/user.py:177
+#: mygpo/users/views/user.py:175 mygpo/users/views/user.py:180
 msgid "Login failed."
 msgstr "הכניסה נכשלה."
 
-#: mygpo/users/views/user.py:185
+#: mygpo/users/views/user.py:188
 msgid "Login with Google is currently not possible."
 msgstr "הכניסה עם Google אינה אפשרית כרגע."
 
-#: mygpo/users/views/user.py:198
+#: mygpo/users/views/user.py:201
 #, python-brace-format
 msgid ""
 "Your account has been connected with {google}. Open Settings to change this."
 msgstr "החשבון שלך התחבר עם {google}. ניתן לפתוח את ההגדרות כדי לשנות את זה."
 
-#: mygpo/users/views/user.py:214
+#: mygpo/users/views/user.py:217
 #, python-format
 msgid ""
 "No account connected with your Google account %s. Please log in to connect."
@@ -2028,17 +2043,9 @@ msgstr ""
 
 #: mygpo/web/templates/contribute.html:23
 msgid ""
-"If you want to support gpodder.net financially, you can donate via PayPal to "
-"stefan@skoegl.net. You can also send a book via Amazon (<a href=\"http://www."
-"amazon.de/wishlist/24H4ORJ0Z0JBH\">DE</a>, <a href=\"http://amzn.com/"
-"w/3IPIF4J4F2C5R\">US</a> or <a href=\"http://www.amazon.co.uk/registry/"
-"wishlist/24JRVURXUKO6F\">UK</a>)."
+"If you want to support gpodder.net financially, you can donate via <a href="
+"\"https://paypal.me/pools/c/8lxTu5kqTp\">PayPal</a>."
 msgstr ""
-"אם ברצונך לתמוך ב־gpodder.net כלכלית, ניתן לתרום דרך PayPal לטובת "
-"stefan@skoegl.net. ניתן גם לשלוח ספר דרך Amazon (<a href=\"http://www.amazon."
-"de/wishlist/24H4ORJ0Z0JBH\">DE</a>, <a href=\"http://amzn.com/w/3IPIF4J4F2C5R"
-"\">US</a> או <a href=\"http://www.amazon.co.uk/registry/"
-"wishlist/24JRVURXUKO6F\">UK</a>)."
 
 #: mygpo/web/templates/csrf.html:8
 msgid "Attention!"
@@ -2201,11 +2208,17 @@ msgid "Webservice"
 msgstr "שירות מקוון"
 
 #: mygpo/web/templates/developer.html:18
+#, fuzzy
+#| msgid ""
+#| "The sourcecode of the webservice gpodder.net is released as open source "
+#| "under the AGPLv3 and <a href=\"https://github.com/gpodder/mygpo\">hosted "
+#| "at GitHub</a>. Bugs can be reported at the <a href=\"https://bugs.gpodder."
+#| "org/enter_bug.cgi?product=gpodder.net\">gPodder Bugtracker</a>."
 msgid ""
 "The sourcecode of the webservice gpodder.net is released as open source "
 "under the AGPLv3 and <a href=\"https://github.com/gpodder/mygpo\">hosted at "
-"GitHub</a>. Bugs can be reported at the <a href=\"https://bugs.gpodder.org/"
-"enter_bug.cgi?product=gpodder.net\">gPodder Bugtracker</a>."
+"GitHub</a>. Bugs can be reported at the <a href=\"https://github.com/gpodder/"
+"gpodder/issues\">gPodder Issue Tracker on GitHub</a>."
 msgstr ""
 "קוד המקור של השירות המקוון gpodder.net מופץ לקהל הרחב כקוד פתוח תחת הרישיון "
 "AGPLv3 והוא <a href=\"https://github.com/gpodder/mygpo\">מתארח ב־GitHub</a>. "
@@ -2701,18 +2714,18 @@ msgstr "פרטיות"
 msgid "Link to gpodder.net"
 msgstr "מעבר אל gpodder.net"
 
-#: mygpo/web/templatetags/time.py:43
+#: mygpo/web/templatetags/time.py:42
 #, python-brace-format
 msgid "{h}h {m}m {s}s"
 msgstr "{h} שע׳ {m} דק׳ {s} שנ׳"
 
-#: mygpo/web/templatetags/time.py:45
+#: mygpo/web/templatetags/time.py:44
 #, fuzzy, python-brace-format
 #| msgid "{h}h {m}m {s}s"
 msgid "{m}m {s}s"
 msgstr "{h} שע׳ {m} דק׳ {s} שנ׳"
 
-#: mygpo/web/utils.py:285
+#: mygpo/web/utils.py:297
 #, python-format
 msgid "%(weeks)d week"
 msgid_plural "%(weeks)d weeks"
@@ -2721,7 +2734,7 @@ msgstr[1] "שבועיים"
 msgstr[2] "%(weeks)d שבועות"
 msgstr[3] "%(weeks)d שבועות"
 
-#: mygpo/web/utils.py:289
+#: mygpo/web/utils.py:301
 #, python-format
 msgid "%(days)d day"
 msgid_plural "%(days)d days"
@@ -2730,7 +2743,7 @@ msgstr[1] "יומיים"
 msgstr[2] "%(days)d ימים"
 msgstr[3] "%(days)d ימים"
 
-#: mygpo/web/utils.py:293
+#: mygpo/web/utils.py:305
 #, python-format
 msgid "%(hours)d hour"
 msgid_plural "%(hours)d hours"
@@ -2739,7 +2752,7 @@ msgstr[1] "שעתיים"
 msgstr[2] "%(hours)d שעות"
 msgstr[3] "%(hours)d שעות"
 
-#: mygpo/web/views.py:146
+#: mygpo/web/views.py:149
 msgid "another site"
 msgstr "אתר אחר"
 
@@ -2751,3 +2764,16 @@ msgstr "אתר אחר"
 
 #~ msgid "Next update:"
 #~ msgstr "העדכון הבא:"
+
+#~ msgid ""
+#~ "If you want to support gpodder.net financially, you can donate via PayPal "
+#~ "to stefan@skoegl.net. You can also send a book via Amazon (<a href="
+#~ "\"http://www.amazon.de/wishlist/24H4ORJ0Z0JBH\">DE</a>, <a href=\"http://"
+#~ "amzn.com/w/3IPIF4J4F2C5R\">US</a> or <a href=\"http://www.amazon.co.uk/"
+#~ "registry/wishlist/24JRVURXUKO6F\">UK</a>)."
+#~ msgstr ""
+#~ "אם ברצונך לתמוך ב־gpodder.net כלכלית, ניתן לתרום דרך PayPal לטובת "
+#~ "stefan@skoegl.net. ניתן גם לשלוח ספר דרך Amazon (<a href=\"http://www."
+#~ "amazon.de/wishlist/24H4ORJ0Z0JBH\">DE</a>, <a href=\"http://amzn.com/"
+#~ "w/3IPIF4J4F2C5R\">US</a> או <a href=\"http://www.amazon.co.uk/registry/"
+#~ "wishlist/24JRVURXUKO6F\">UK</a>)."

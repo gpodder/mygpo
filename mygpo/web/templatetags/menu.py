@@ -1,7 +1,7 @@
 from django import template
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
 
 
 register = template.Library()
@@ -95,10 +95,10 @@ def main_menu(selected):
     for uri, caption, subpages in links:
         if selected in subpages or ('/' in subpages and not found_section):
             items.append(
-                '<li class="active"><a href="%s">%s</a></li>' % (uri, ugettext(caption))
+                '<li class="active"><a href="%s">%s</a></li>' % (uri, gettext(caption))
             )
         else:
-            items.append('<li><a href="%s">%s</a></li>' % (uri, ugettext(caption)))
+            items.append('<li><a href="%s">%s</a></li>' % (uri, gettext(caption)))
 
     return mark_safe('\n'.join(items))
 
@@ -124,17 +124,17 @@ def section_menu(selected, title=None):
                 caption = title
             if uri in HIDDEN_URIS:
                 items.append(
-                    '<li class="active"><a href="">%s</a></li>' % ugettext(caption)
+                    '<li class="active"><a href="">%s</a></li>' % gettext(caption)
                 )
             elif uri == '':
                 items.append(
                     '<li class="disabled nav-header"><a href="">%s</a></li>'
-                    % ugettext(caption)
+                    % gettext(caption)
                 )
             else:
                 items.append(
                     '<li class="active"><a href="%s">%s</a></li>'
-                    % (uri, ugettext(caption))
+                    % (uri, gettext(caption))
                 )
         else:
             if uri in HIDDEN_URIS:
@@ -142,9 +142,9 @@ def section_menu(selected, title=None):
 
             if not uri:
                 items.append(
-                    '<li class="disabled nav-header"><a>%s</a></li>' % ugettext(caption)
+                    '<li class="disabled nav-header"><a>%s</a></li>' % gettext(caption)
                 )
             else:
-                items.append('<li><a href="%s">%s</a></li>' % (uri, ugettext(caption)))
+                items.append('<li><a href="%s">%s</a></li>' % (uri, gettext(caption)))
 
     return mark_safe('\n'.join(items))

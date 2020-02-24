@@ -1,4 +1,7 @@
+import json
+
 from django.http import Http404
+from django.http.response import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.sites.requests import RequestSite
 from django.views.decorators.csrf import csrf_exempt
@@ -14,6 +17,8 @@ from mygpo.subscriptions.models import SubscribedPodcast
 from mygpo.decorators import cors_origin
 from mygpo.categories.models import Category
 from mygpo.api.httpresponse import JsonResponse
+from mygpo.data.tasks import update_podcasts
+from mygpo.decorators import allowed_methods
 
 
 @csrf_exempt
@@ -87,6 +92,54 @@ def episode_info(request):
     return JsonResponse(resp)
 
 
+@csrf_exempt
+@allowed_methods(['POST'])
+@cors_origin()
+def add_podcast(request):
+    # TODO what if the url doesn't have a valid podcast?
+    url = normalize_feed_url(json.loads(request.body.decode('utf-8')).get('url', ''))
+
+    # 404 before we query for url, because query would complain
+    # about missing param
+    if not url:
+        raise Http404
+
+    try:
+        # podcast exists, redirects
+        Podcast.objects.get(urls__url=url)
+        api_podcast_info_path = reverse('api-podcast-info')
+        return HttpResponseRedirect(f'{api_podcast_info_path}?url={url}')
+    except Podcast.DoesNotExist:
+        # podcast doesn't exist, add new podcast
+        res = update_podcasts.delay([url])
+        response = HttpResponse(status=202)
+        job_status_path = reverse(
+            'api-add-podcast-status', kwargs={"job_id": res.task_id}
+        )
+        response['Location'] = f'{job_status_path}?url={url}'
+        return response
+
+
+@csrf_exempt
+@allowed_methods(['GET'])
+@cors_origin()
+def add_podcast_status(request, job_id):
+    url = request.GET.get('url', '')
+    result = update_podcasts.AsyncResult(job_id)
+    resp = {'id': str(job_id), 'type': 'create-podcast', 'url': url}
+
+    if not result.ready():
+        resp['status'] = 'pending'
+    elif result.successful():
+        resp['status'] = 'successful'
+        resp['podcast'] = f'/api/2/data/podcast.json?url={url}'
+    elif result.failed():
+        resp['status'] = 'unsuccessful'
+        resp['error'] = 'feed could not be parsed'
+
+    return JsonResponse(resp)
+
+
 def podcast_data(obj, domain, scaled_logo_size=64):
     if obj is None:
         raise ValueError('podcast should not be None')
@@ -106,6 +159,7 @@ def podcast_data(obj, domain, scaled_logo_size=64):
     return {
         "url": url,
         "title": podcast.title,
+        "author": podcast.author,
         "description": podcast.description,
         "subscribers": subscribers,
         "subscribers_last_week": last_subscribers,
@@ -135,6 +189,8 @@ def episode_data(episode, domain, podcast=None):
 
     if episode.released:
         data['released'] = episode.released.strftime('%Y-%m-%dT%H:%M:%S')
+    else:
+        data['released'] = ''
 
     return data
 

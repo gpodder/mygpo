@@ -1,11 +1,5 @@
-from datetime import datetime
 import collections
 
-from django.db import transaction
-from django.db.utils import IntegrityError
-
-from mygpo.subscriptions.signals import subscription_changed
-from mygpo.utils import to_maxlength
 
 import logging
 
@@ -16,150 +10,13 @@ logger = logging.getLogger(__name__)
 # (non-__init__) module
 
 
-@transaction.atomic
-def subscribe(podcast, user, client, ref_url=None):
-    """ subscribes user to the current podcast on one client
-
-    Takes syned devices into account. """
-    ref_url = ref_url or podcast.url
-    now = datetime.utcnow()
-    clients = _affected_clients(client)
-
-    # fully execute subscriptions, before firing events
-    changed = list(_perform_subscribe(podcast, user, clients, now, ref_url))
-    _fire_events(podcast, user, changed, True)
-
-
-@transaction.atomic
-def unsubscribe(podcast, user, client):
-    """ unsubscribes user from the current podcast on one client
-
-    Takes syned devices into account. """
-    now = datetime.utcnow()
-    clients = _affected_clients(client)
-
-    # fully execute unsubscriptions, before firing events
-    # otherwise the first fired event might revert the unsubscribe
-    changed = list(_perform_unsubscribe(podcast, user, clients, now))
-    _fire_events(podcast, user, changed, False)
-
-
-@transaction.atomic
-def subscribe_all(podcast, user, ref_url=None):
-    """ subscribes user to the current podcast on all clients """
-    ref_url = ref_url or podcast.url
-    now = datetime.utcnow()
-    clients = user.client_set.all()
-
-    # fully execute subscriptions, before firing events
-    changed = list(_perform_subscribe(podcast, user, clients, now, ref_url))
-    _fire_events(podcast, user, changed, True)
-
-
-@transaction.atomic
-def unsubscribe_all(podcast, user):
-    """ unsubscribes user from the current podcast on all clients """
-    now = datetime.utcnow()
-    clients = user.client_set.filter(subscription__podcast=podcast)
-
-    # fully execute subscriptions, before firing events
-    changed = list(_perform_unsubscribe(podcast, user, clients, now))
-    _fire_events(podcast, user, changed, False)
-
-
-def _perform_subscribe(podcast, user, clients, timestamp, ref_url):
-    """ Subscribes to a podcast on multiple clients
-
-    Yields the clients on which a subscription was added, ie not those where
-    the subscription already existed. """
-
-    from mygpo.subscriptions.models import Subscription
-
-    for client in clients:
-        try:
-            with transaction.atomic():
-                subscription = Subscription.objects.create(
-                    user=user,
-                    client=client,
-                    podcast=podcast,
-                    ref_url=to_maxlength(Subscription, 'ref_url', ref_url),
-                    created=timestamp,
-                    modified=timestamp,
-                )
-
-        except IntegrityError as ie:
-            msg = str(ie)
-            if 'Key (user_id, client_id, podcast_id)' in msg:
-                # Subscription already exists -- skip
-                continue
-
-            else:
-                # unknown error
-                raise
-
-        logger.info(
-            '{user} subscribed to {podcast} on {client}'.format(
-                user=user, podcast=podcast, client=client
-            )
-        )
-
-        from mygpo.history.models import HistoryEntry
-
-        HistoryEntry.objects.create(
-            timestamp=timestamp,
-            podcast=podcast,
-            user=user,
-            client=client,
-            action=HistoryEntry.SUBSCRIBE,
-        )
-
-        yield client
-
-
-def _perform_unsubscribe(podcast, user, clients, timestamp):
-    """ Unsubscribes from a podcast on multiple clients
-
-    Yields the clients on which a subscription was removed, ie not those where
-    the podcast was not subscribed. """
-
-    from mygpo.subscriptions.models import Subscription
-
-    for client in clients:
-
-        try:
-            subscription = Subscription.objects.get(
-                user=user, client=client, podcast=podcast
-            )
-        except Subscription.DoesNotExist:
-            continue
-
-        subscription.delete()
-
-        logger.info(
-            '{user} unsubscribed from {podcast} on {client}'.format(
-                user=user, podcast=podcast, client=client
-            )
-        )
-
-        from mygpo.history.models import HistoryEntry
-
-        HistoryEntry.objects.create(
-            timestamp=timestamp,
-            podcast=podcast,
-            user=user,
-            client=client,
-            action=HistoryEntry.UNSUBSCRIBE,
-        )
-
-        yield client
-
-
 def get_subscribe_targets(podcast, user):
     """ Clients / SyncGroup on which the podcast can be subscribed
 
     This excludes all devices/syncgroups on which the podcast is already
     subscribed """
 
+    # django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet.
     from mygpo.users.models import Client
 
     clients = (
@@ -184,8 +41,8 @@ def get_subscribed_podcasts(user, only_public=False):
     The attribute "url" contains the URL that was used when subscribing to
     the podcast """
 
-    from mygpo.usersettings.models import UserSettings
-    from mygpo.subscriptions.models import SubscribedPodcast, Subscription
+    # django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet.
+    from mygpo.subscriptions.models import Subscription, SubscribedPodcast
 
     subscriptions = (
         Subscription.objects.filter(user=user)
@@ -193,6 +50,10 @@ def get_subscribed_podcasts(user, only_public=False):
         .distinct('podcast')
         .select_related('podcast')
     )
+
+    # django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet.
+    from mygpo.usersettings.models import UserSettings
+
     private = UserSettings.objects.get_private_podcasts(user)
 
     podcasts = []
@@ -218,7 +79,7 @@ def get_subscription_history(
     Setting device_id restricts the actions to a certain device
     """
 
-    from mygpo.usersettings.models import UserSettings
+    # django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet.
     from mygpo.history.models import SUBSCRIPTION_ACTIONS, HistoryEntry
 
     logger.info('Subscription History for {user}'.format(user=user.username))
@@ -241,6 +102,9 @@ def get_subscription_history(
         history = history.filter(timestamp__lte=until)
 
     if public_only:
+        # django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet.
+        from mygpo.usersettings.models import UserSettings
+
         logger.info('... only public')
         private = UserSettings.objects.get_private_podcasts(user)
         history = history.exclude(podcast__in=private)
@@ -261,6 +125,7 @@ def get_subscription_change_history(history):
     ``history``.
     """
 
+    # django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet.
     from mygpo.history.models import HistoryEntry
 
     subscriptions = collections.defaultdict(int)
@@ -284,6 +149,7 @@ def get_subscription_change_history(history):
 def subscription_diff(history):
     """ Calculates a diff of subscriptions based on a history (sub/unsub) """
 
+    # django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet.
     from mygpo.history.models import HistoryEntry
 
     subscriptions = collections.defaultdict(int)
@@ -299,26 +165,3 @@ def subscription_diff(history):
     unsubscribe = [podcast for (podcast, value) in subscriptions.items() if value < 0]
 
     return subscribe, unsubscribe
-
-
-def _affected_clients(client):
-    """ the clients that are affected if the given one is to be changed """
-    if client.sync_group:
-        # if the client is synced, all are affected
-        return client.sync_group.client_set.all()
-
-    else:
-        # if its not synced, only the client is affected
-        return [client]
-
-
-def _fire_events(podcast, user, clients, subscribed):
-    """ Fire the events for subscription / unsubscription """
-    for client in clients:
-        subscription_changed.send(
-            sender=podcast.__class__,
-            instance=podcast,
-            user=user,
-            client=client,
-            subscribed=subscribed,
-        )

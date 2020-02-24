@@ -51,11 +51,10 @@ def remove(l, item):
 
 
 @register.filter
-@mark_safe
 def format_time(time):
     from mygpo.utils import format_time as _format_time
 
-    return _format_time(time)
+    return mark_safe(_format_time(time))
 
 
 @register.filter
@@ -75,7 +74,7 @@ def nbsp(s):
     """ collapses multiple whitespaces and replaces them with &nbsp; """
     import re
 
-    return mark_safe(re.sub("\s+", "&nbsp;", s))
+    return mark_safe(re.sub(r"\s+", "&nbsp;", s))
 
 
 @register.filter

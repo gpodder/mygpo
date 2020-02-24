@@ -8,12 +8,9 @@ from mygpo.api.httpresponse import JsonResponse
 from mygpo.api.backend import get_device
 from mygpo.utils import get_timestamp, normalize_feed_url, intersect
 from mygpo.users.models import Client
-from mygpo.subscriptions import (
-    subscribe,
-    unsubscribe,
-    get_subscription_history,
-    subscription_diff,
-)
+from mygpo.subscriptions.tasks import subscribe, unsubscribe
+from mygpo.subscriptions import get_subscription_history, subscription_diff
+from mygpo.api.basic_auth import require_valid_user, check_username
 
 import logging
 
@@ -68,7 +65,7 @@ class SubscriptionsAPI(APIView):
         conflicts = intersect(add, remove)
         if conflicts:
             msg = "can not add and remove '{}' at the same time".format(str(conflicts))
-            logger.warn(msg)
+            logger.warning(msg)
             raise RequestException(msg)
 
         add_s = list(map(normalize_feed_url, add))

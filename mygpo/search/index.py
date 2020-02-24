@@ -39,7 +39,7 @@ def search_podcasts(query):
             )
         )
         .filter(rank__gte=SEARCH_CUTOFF)
-        .order_by('-order')
+        .order_by('-order')[:100]
     )
 
     logger.debug(
