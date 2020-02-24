@@ -34,6 +34,7 @@ def get_intOrNone(name, default):
 
 DEBUG = get_bool('DEBUG', False)
 
+
 ADMINS = re.findall(r'\s*([^<]+) <([^>]+)>\s*', os.getenv('ADMINS', ''))
 
 MANAGERS = ADMINS
@@ -137,6 +138,7 @@ TEMPLATES = [
 
 
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -185,6 +187,7 @@ INSTALLED_APPS = [
     'mygpo.votes',
 ]
 
+
 try:
     if DEBUG:
         import debug_toolbar
@@ -208,6 +211,7 @@ except ImportError:
 
 ACCOUNT_ACTIVATION_DAYS = int(os.getenv('ACCOUNT_ACTIVATION_DAYS', 7))
 
+
 AUTHENTICATION_BACKENDS = (
     'mygpo.users.backend.CaseInsensitiveModelBackend',
     'mygpo.web.auth.EmailAuthenticationBackend',
@@ -229,7 +233,6 @@ LOGIN_URL = '/login/'
 
 CSRF_FAILURE_VIEW = 'mygpo.web.views.csrf_failure'
 
-
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', '')
 
 SERVER_EMAIL = os.getenv('SERVER_EMAIL', DEFAULT_FROM_EMAIL)
@@ -241,11 +244,14 @@ if 'pytest' in sys.argv[0]:
 
 GOOGLE_ANALYTICS_PROPERTY_ID = os.getenv('GOOGLE_ANALYTICS_PROPERTY_ID', '')
 
+
 DIRECTORY_EXCLUDED_TAGS = os.getenv('DIRECTORY_EXCLUDED_TAGS', '').split()
+
 
 FLICKR_API_KEY = os.getenv('FLICKR_API_KEY', '')
 
 SOUNDCLOUD_CONSUMER_KEY = os.getenv('SOUNDCLOUD_CONSUMER_KEY', '')
+
 
 MAINTENANCE = get_bool('MAINTENANCE', False)
 

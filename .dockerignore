@@ -1,0 +1,12 @@
+.git
+htdocs/media/logo
+mygpo/settings_prod.py
+doc/
+res/
+tools/
+locale/
+venv*
+*.pyc
+*/*.pyc
+*/*/*.pyc
+*/*/*/*.pyc

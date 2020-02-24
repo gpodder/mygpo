@@ -24,6 +24,7 @@ Contents
    publisher/index
    api/index
    dev/index
+   ops/index
    Translator Documentation <http://wiki.gpodder.org/wiki/Translations>
 
 

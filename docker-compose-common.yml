@@ -1,0 +1,14 @@
+
+version: '2'
+
+services:
+
+  base:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file: contrib/docker.env
+    volumes:
+      - .:/srv/mygpo
+      - ./contrib/docker.env:/docker.env
+

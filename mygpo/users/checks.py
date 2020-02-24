@@ -29,8 +29,10 @@ def check_case_insensitive_users(app_configs=None, **kwargs):
             wid = 'users.W001'
             errors.append(Warning(txt, id=wid))
 
-    except OperationalError as oe:
-        if 'no such table: auth_user' in str(oe):
+    except (OperationalError, ProgrammingError) as oe:
+        if 'no such table: auth_user' in str(
+            oe
+        ) or 'relation "auth_user" does not exist' in str(oe):
             # Ignore if the table does not yet exist, eg when initally
             # running ``manage.py migrate``
             pass

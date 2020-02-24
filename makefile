@@ -37,6 +37,12 @@ install-deps:
 	sudo apt-get install libpq-dev libjpeg-dev zlib1g-dev libwebp-dev \
 		build-essential python3-dev virtualenv libffi-dev redis postgresql
 
+docker-build:
+	sudo docker build -t="mygpo/web" .
+
+docker-run:
+	sudo docker run --rm -p 8000:8000 --name web --link db:db -e SECRET_KEY=asdf mygpo/web
+
 format-code:
 	black --target-version py36 --skip-string-normalization mygpo/
 

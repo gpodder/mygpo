@@ -1,0 +1,55 @@
+
+version: '2'
+
+services:
+
+  postgres:
+    build:
+      context: contrib
+      dockerfile: Dockerfile.postgres
+
+  memcached:
+    image: memcached:1.4
+
+  redis:
+    image: redis:3.2-alpine
+
+  web:
+    extends:
+      file: docker-compose-common.yml
+      service: base
+    links:
+      - redis
+      - postgres
+      - memcached
+    ports:
+      - '8000:8000'
+    depends_on:
+      - postgres
+      - redis
+
+  worker:
+    extends:
+      file: docker-compose-common.yml
+      service: base
+    command: /srv/mygpo/contrib/wait-for-postgres.py celery -A mygpo worker --concurrency=3 -l info -Ofair
+    links:
+      - web
+      - postgres
+      - redis
+    depends_on:
+      - postgres
+      - redis
+
+  beat:
+    extends:
+      file: docker-compose-common.yml
+      service: base
+    command: /srv/mygpo/contrib/wait-for-postgres.py celery -A mygpo beat --pidfile /tmp/celerybeat.pid -S django
+    links:
+      - web
+      - postgres
+      - redis
+    depends_on:
+      - postgres
+      - redis
