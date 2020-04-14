@@ -9,7 +9,7 @@ WORKDIR /srv/mygpo
 COPY makefile .
 
 # install all packaged runtime dependencies
-RUN yes | make install-deps
+RUN yes | make install-deps APT=apt-get
 
 # create log directories
 RUN mkdir -p /var/log/gunicorn

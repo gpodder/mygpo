@@ -1,3 +1,5 @@
+APT=sudo apt-get
+
 all: help
 
 help:
@@ -34,7 +36,7 @@ clean:
 	git clean -fX
 
 install-deps:
-	sudo apt-get install libpq-dev libjpeg-dev zlib1g-dev libwebp-dev \
+	$(APT) install libpq-dev libjpeg-dev zlib1g-dev libwebp-dev \
 		build-essential python3-dev virtualenv libffi-dev redis postgresql
 
 docker-build:
