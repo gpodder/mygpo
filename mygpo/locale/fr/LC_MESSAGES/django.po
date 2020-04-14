@@ -813,7 +813,7 @@ msgstr "Podcast inconnu"
 #: mygpo/podcasts/models.py:700
 #, python-brace-format
 msgid "Unknown Podcast from {domain}"
-msgstr "Podcast inconnu de {domaine}"
+msgstr "Podcast inconnu de {domain}"
 
 #: mygpo/podcasts/templates/episode.html:85
 #: mygpo/podcasts/templates/episodes.html:27
