@@ -86,7 +86,7 @@ USE_I18N = True
 
 # Static Files
 
-STATIC_ROOT = 'staticfiles'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (os.path.abspath(os.path.join(BASE_DIR, '..', 'static')),)
