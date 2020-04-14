@@ -36,7 +36,7 @@ clean:
 	git clean -fX
 
 install-deps:
-	$(APT) install libpq-dev libjpeg-dev zlib1g-dev libwebp-dev \
+	$(APT) install libpq-dev libjpeg-dev zlib1g-dev libwebp-dev gettext \
 		build-essential python3-dev virtualenv libffi-dev redis postgresql
 
 docker-build:
