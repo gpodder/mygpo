@@ -19,6 +19,10 @@ from mygpo.podcasts.models import Podcast, Episode
 from mygpo.api.advanced import episodes
 from mygpo.api.opml import Exporter, Importer
 from mygpo.api.simple import format_podcast_list
+from mygpo.api.simple import check_format
+from mygpo.api.simple import subscriptions
+from mygpo.api.simple import search
+from mygpo.api.simple import example_podcasts
 from mygpo.history.models import EpisodeHistoryEntry
 from mygpo.test import create_auth_string
 from mygpo.utils import get_timestamp
@@ -322,6 +326,15 @@ class SimpleAPITests(unittest.TestCase):
             },
         )
 
+    def get_subscriptions_url_bad(self, fmt):
+        return reverse(
+            'api-simple-subscriptions',
+            kwargs={
+                'format': fmt,
+                'username': self.user.username,
+            },
+        )
+
     def get_search_url(self, fmt):
         return reverse('api-simple-search', kwargs={'format': fmt})
 
@@ -371,8 +384,8 @@ class SimpleAPITests(unittest.TestCase):
         payloads = {
             'txt': sample_url,
             'json': json.dumps([sample_url]),
-            #'opml': Exporter('Subscriptions').generate([sample_url]),
             'opml': Exporter('Subscriptions').generate([podcast]),
+            'xml': '<note><to>Test</to><body>TestTest</body></note>'
         }
         payloads = dict(
             (fmt, format_podcast_list([podcast], fmt, 'test title').content)
@@ -456,6 +469,44 @@ class SimpleAPITests(unittest.TestCase):
         response = self.client.get(self.search_urls['json'], data)
         self.assertEqual(response.status_code, expected_status)
 
+    def test_invalid_check_format(self):
+        #  test coverage for simple.py lines 38
+        output = check_format('bad format')
+        self.assertEqual(output, 'Invalid format')
+        output = check_format(100)
+        self.assertEqual(output, 'Invalid format')
+        output = check_format()
+        self.assertEqual(output, 'Invalid format')
+
+    def test_invalid_json_char_format_podcast_list(self):
+        # test coverage for simple.py lines 156-177
+        sample_url = 'http://example.com/directory-podcast.xml'
+        podcast = Podcast.objects.get_or_create_for_url(
+            sample_url, defaults={'title': 'My Podcast'}
+        ).object
+        payloads = {
+            'jsomp': 'sample text \b with bad char',
+            'xml': '<note><to>Test</to><body>TestTest</body></note>'
+            }
+        payloads = dict(
+            (fmt, format_podcast_list([podcast], fmt, 'test title').content)
+            for fmt in self.formats
+        )
+        for fmt in self.formats:
+            responce = format_podcast_list([podcast], 'jsomp', 'test title').content
+            self.assertEqual(responce, 400)
+            responce = format_podcast_list([podcast], 'xml', 'test title').content
+            self.assertEqual(responce, 400)
+
+    def test_search(self, url, data):
+        # coverage for simple.py lines 277-283, 293-297
+        response = search(self.client.get(url, data), 'txt')
+        self.assertNotEqual(response, 400)
+
+    def test_example_podcast(self, url, data):
+        # coverage for simple.py lines 338-342, 349-360
+        responce = example_podcasts(self.client.get(url, data), 'txt')
+        self.assertAlmostEqual(responce, Podcast)
 
 class OpenAPIDefinitionValidityTest(TestCase):
     "Test the validity of the OpenAPI definition file"
