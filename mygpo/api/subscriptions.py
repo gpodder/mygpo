@@ -85,11 +85,11 @@ class SubscriptionsAPI(APIView):
 
         for add_url in add_s:
             podcast = Podcast.objects.get_or_create_for_url(add_url).object
-            subscribe(podcast, user, device, add_url)
+            subscribe(podcast.pk, user.pk, device.uid, add_url)
 
         remove_podcasts = Podcast.objects.filter(urls__url__in=rem_s)
         for podcast in remove_podcasts:
-            unsubscribe(podcast, user, device)
+            unsubscribe(podcast.pk, user.pk, device.uid)
 
         return updated_urls
 

@@ -223,11 +223,11 @@ def set_subscriptions(urls, user, device_uid, user_agent):
 
     remove_podcasts = Podcast.objects.filter(urls__url__in=rem)
     for podcast in remove_podcasts:
-        unsubscribe(podcast, user, device)
+        unsubscribe(podcast.pk, user.pk, device.uid)
 
     for url in new:
         podcast = Podcast.objects.get_or_create_for_url(url).object
-        subscribe(podcast, user, device, url)
+        subscribe(podcast.pk, user.pk, device.uid, url)
 
     # Only an empty response is a successful response
     return HttpResponse('', content_type='text/plain')

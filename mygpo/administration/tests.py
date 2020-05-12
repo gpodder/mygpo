@@ -62,10 +62,10 @@ class SimpleTest(TestCase):
         device1 = Client.objects.create(user=user, uid='dev1', id=uuid.uuid1())
         device2 = Client.objects.create(user=user, uid='dev2', id=uuid.uuid1())
 
-        subscribe(p1, user, device1)
-        unsubscribe(p1, user, device1)
-        subscribe(p1, user, device1)
-        subscribe(p2, user, device2)
+        subscribe(p1.pk, user.pk, device1.uid)
+        unsubscribe(p1.pk, user.pk, device1.uid)
+        subscribe(p1.pk, user.pk, device1.uid)
+        subscribe(p2.pk, user.pk, device2.uid)
 
         action1 = EpisodeHistoryEntry.create_entry(user, e1, EpisodeHistoryEntry.PLAY)
         action3 = EpisodeHistoryEntry.create_entry(user, e3, EpisodeHistoryEntry.PLAY)

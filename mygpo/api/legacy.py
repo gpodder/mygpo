@@ -54,11 +54,11 @@ def upload(request):
 
     for n in new:
         p = Podcast.objects.get_or_create_for_url(n).object
-        subscribe(p, user, dev)
+        subscribe(p.pk, user.pk, dev.uid)
 
     for r in rem:
         p = Podcast.objects.get_or_create_for_url(r).object
-        unsubscribe(p, user, dev)
+        unsubscribe(p.pk, user.pk, dev.uid)
 
     return HttpResponse('@SUCCESS', content_type='text/plain')
 
