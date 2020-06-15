@@ -1,5 +1,6 @@
 from math import ceil
 from collections import Counter
+from datetime import datetime, timedelta
 
 from django.http import HttpResponseNotFound, Http404, HttpResponseRedirect
 from django.urls import reverse
@@ -401,3 +402,28 @@ class LicenseList(TemplateView):
 
         counter = Counter({l['license']: l['id__count'] for l in values})
         return counter.most_common()
+
+
+class TrendingPodcastsView(PodcastListView):
+    """ Podcast with most recent subscribers """
+
+    template_name = 'directory/trending.html'
+
+    def get_queryset(self):
+        starttime = datetime.utcnow() - timedelta(days=7)
+        max_entries = 20
+
+        podcasts = Podcast.objects.annotate(
+            subscriptions=Sum(
+                Case(
+                    When(subscription__created__gte=starttime, then=Value(1)),
+                    default=Value(0),
+                    output_field=IntegerField(),
+                )
+            )
+        )
+
+        trending = podcasts.exclude(subscriptions__lt=1)
+        trending = trending.order_by('-subscriptions')
+
+        return trending

@@ -5,6 +5,7 @@ from . import views
 
 urlpatterns = [
     path('toplist/', views.PodcastToplistView.as_view(), name='toplist'),
+    path('trending/', views.TrendingPodcastsView.as_view(), name='trending'),
     path(
         'toplist/episodes', views.EpisodeToplistView.as_view(), name='episode-toplist'
     ),

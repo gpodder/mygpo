@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+{% load podcasts %}
+{% load charts %}
+{% load math %}
+{% load utils %}
+{% load static %}
+
+{% load menu %}
+{% block mainmenu %}{{ "/trending/"|main_menu }}{% endblock %}
+{% block sectionmenu %}{{ "/trending/"|section_menu }}{% endblock %}
+
+{% block title %}{% trans "Trending Podcasts" %}{% endblock %}
+
+{% block header %}
+   <h1>{% trans "Trending Podcasts" %}</h1>
+{% endblock %}
+
+{% block content %}
+  <table class="list">
+   <tr>
+    <th></th>
+    <th></th>
+    <th></th>
+    <th>{% trans "Podcast" %}</th>
+    <th>{% trans "Subscribers" %}</th>
+   </tr>
+  {% for podcast in podcasts %}
+   <tr>
+    <td class="numeric toplist-pos">
+     {% ifchanged podcast.subscriber_count %}
+      {{ forloop.counter }}
+     {% endifchanged %}
+    </td>
+    <td class="oldposition">
+    </td>
+    <td class="logo">{{ podcast|podcast_logo }}</td>
+    <td>
+     {% podcast_group_link podcast %}
+    </td>
+    <td>{% vertical_bar podcast.subscriber_count max_subscribers %}</td>
+   </tr>
+  {% empty %}
+   <tr>
+    <td colspan="5">
+     {% trans "Currently not available" %}
+    </td>
+   </tr>
+  {% endfor %}
+  </table>
+
+{% endblock %}
+
+
+{% block sidebar %}
+
+ <div class="well">
+   <h4>{% trans "Client Access" %}</h4>
+
+    <p>Access <a href="{% url "toplist-opml" 30 "opml" %}">http://{{ view.site }}{% url "toplist-opml" 30 "opml" %}</a> for the Top-30.</p>
+ </div>
+
+{% endblock %}
