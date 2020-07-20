@@ -8,7 +8,7 @@ from mygpo.podcasts.models import Podcast
 from mygpo.api.opml import Importer, Exporter
 from mygpo.api.backend import get_device
 from mygpo.utils import normalize_feed_url
-from mygpo.subscriptions import subscribe, unsubscribe
+from mygpo.subscriptions.tasks import subscribe, unsubscribe
 
 import logging
 

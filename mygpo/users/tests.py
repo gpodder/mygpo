@@ -13,7 +13,7 @@ from mygpo.podcasts.models import Podcast
 from mygpo.maintenance.merge import PodcastMerger
 from mygpo.api.backend import get_device
 from mygpo.users.models import Client, SyncGroup, UserProxy
-from mygpo.subscriptions import subscribe, unsubscribe
+from mygpo.subscriptions.tasks import subscribe, unsubscribe
 
 
 class DeviceSyncTests(unittest.TestCase):

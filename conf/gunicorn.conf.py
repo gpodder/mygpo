@@ -13,4 +13,32 @@ loglevel='info'
 timeout = 120
 graceful_timeout = 60
 
-worker_connections = 100
+
+def get_bool(name, default):
+    return os.getenv(name, str(default)).lower() == 'true'
+
+
+def _post_fork_handler(server, worker):
+    patch_psycopg()
+    worker.log.info("Made Psycopg2 Green")
+
+
+# check if we want to use gevent
+_USE_GEVENT = get_bool('USE_GEVENT', False)
+
+
+try:
+    # check f we *can* use gevent
+    from psycogreen.gevent import patch_psycopg
+except ImportError:
+    _USE_GEVENT = False
+
+
+if _USE_GEVENT:
+    # Active gevent-related settings
+
+    worker_connections = 100
+    worker_class = 'gevent'
+
+    # activate the handler
+    post_fork = _post_fork_handler

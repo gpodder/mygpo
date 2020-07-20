@@ -39,3 +39,7 @@ after_script:
 
 env:
  - DATABASE_URL="postgres://travis:travis@localhost/mygpo_test"
+
+notifications:
+  slack:
+    secure: Fsaaj7TtFhd+/HghDCZ7vDxQKCSWoY4h6IC1jLKomOQNpfgaTtwfLJQ6VeR0kkXafR2nCIC6OC30sJ7w2yAoa6qCkRJuLxWLz0Vu8L7Y1YAAHn+AIit17kym3L1QMj+rZUUtCvcfudAmP/uakZlz3NfnwrKZhmfe/NowUalNl0k=

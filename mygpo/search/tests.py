@@ -1,15 +1,15 @@
 import uuid
-import unittest
 
 from mygpo.podcasts.models import Podcast
 from django.contrib.postgres.search import SearchVector
+from django.test import TransactionTestCase
 from django.test.utils import override_settings
 
 from .index import search_podcasts
 from .tasks import update_search_index
 
 
-class SearchTests(unittest.TestCase):
+class SearchTests(TransactionTestCase):
     """ Tests podcast search """
 
     def test_search_podcast(self):
@@ -34,8 +34,8 @@ class SearchTests(unittest.TestCase):
     def test_shortest_search_podcast(self):
         """
          Search for a podcast with query length smaller than 3
-         With QUERY_LENGTH_CUTOFF = 3 
-         Server would normally time out, however Podcasts exist for the given 
+         With QUERY_LENGTH_CUTOFF = 3
+         Server would normally time out, however Podcasts exist for the given
          search term.
         """
         # create a podcast

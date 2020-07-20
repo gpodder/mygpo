@@ -23,10 +23,15 @@ Contributing
 ------------
 gpodder.net is an open source project and your contributions are wanted and appreciated.  To get started please see the [developer documentation](http://gpoddernet.readthedocs.io/en/latest/dev/index.html).
 
+Slack
+------------
+Join our Slack channel: [gpodder-net.slack.com](https://gpodder-net.slack.com/)
+
+[Invitation link](https://join.slack.com/t/gpodder-net/shared_invite/zt-aaiagl5i-uZeqVR8w1Yf_G~9rhktRfw)
 
 Mailing List
 ------------
-mygpo and gpodder.net related issues are discussed on the [gPodder Mailing List](https://gpodder.github.io/docs/mailing-list.html).
+gpodder.org related issues are discussed on the [gPodder Mailing List](https://gpodder.github.io/docs/mailing-list.html).
 
 
 Documentation

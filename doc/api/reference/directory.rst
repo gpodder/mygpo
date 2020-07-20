@@ -66,6 +66,7 @@ Retrieve Podcasts for Tag
         [
          {"url": "http://leo.am/podcasts/floss",
           "title": "FLOSS Weekly",
+          "author": "Leo Laporte",
           "description": "Each Thursday we talk about Free Libre and Open Source Software with the people who are writing it. Part of the TWiT Netcast Network.",
           "subscribers": 1138,
           "logo_url: "http://leoville.tv/podcasts/coverart/floss144audio.jpg",
@@ -74,6 +75,7 @@ Retrieve Podcasts for Tag
 
          {"url": "http://leo.am/podcasts/twit",
           "title": "this WEEK in TECH - MP3 Edition",
+          "author": "Leo Laporte",
           "description": "Your first podcast of the week is the last word in tech. [...]",
           "subscribers": 895,
           "logo_url": "http://leoville.tv/podcasts/coverart/twit144audio.jpg",
@@ -109,8 +111,8 @@ Retrieve Podcast Data
          "description": "The best cover songs, delivered to your ears two to three times a week!",
          "subscribers": 19,
          "title": "Coverville",
+         "author": "Brian Ibbott",
          "url": "http://feeds.feedburner.com/coverville",
-         "subscribers_last_week": 19,
          "logo_url": "http://www.coverville.com/art/coverville_iTunes300.jpg"
         }
 
@@ -177,9 +179,9 @@ Podcast Toplist
            "website": "http://linuxoutlaws.com/podcast",
            "description": "Open source talk with a serious attitude",
            "title": "Linux Outlaws",
+           "author": "Sixgun Productions",
            "url": "http://feeds.feedburner.com/linuxoutlaws",
            "position_last_week": 0,
-           "subscribers_last_week": 1736,
            "subscribers": 1736,
            "mygpo_link": "http://www.gpodder.net/podcast/11092",
            "logo_url": "http://linuxoutlaws.com/files/albumart-itunes.jpg"
@@ -188,9 +190,9 @@ Podcast Toplist
            "website": "http://syndication.mediafly.com/redirect/show/d581e9b773784df7a56f37e1138c037c",
            "description": "We're not talking dentistry here; FLOSS all about Free Libre Open Source Software. Join hosts Randal Schwartz and Leo Laporte every Saturday as they talk with the most interesting and important people in the Open Source and Free Software community.",
            "title": "FLOSS Weekly Video (large)",
+           "author": "Leo Laporte",
            "url": "http://feeds.twit.tv/floss_video_large",
            "position_last_week": 0,
-           "subscribers_last_week": 50,
            "subscribers": 50,
            "mygpo_link": "http://www.gpodder.net/podcast/31991",
            "logo_url": "http://static.mediafly.com/publisher/images/06cecab60c784f9d9866f5dcb73227c3/icon-150x150.png"
@@ -218,12 +220,7 @@ Podcast Toplist
 
     All shown keys must be provided by the server. The description field may be
     set to the empty string in case a description is not available. The title
-    field may be set to the URL in case a title is not available. The
-    subscribers_last_week field may be set to zero if no data is available. The
-    client can use the subscribers_last_week counts to re-sort the list and get
-    a ranking for the last week. With this information, a relative "position
-    movement" can also be calculated if the developer of the client decides to
-    do so.
+    field may be set to the URL in case a title is not available.
 
 
 Podcast Search

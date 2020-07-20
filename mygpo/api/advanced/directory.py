@@ -152,16 +152,15 @@ def podcast_data(obj, domain, scaled_logo_size=64):
         url = podcast.url
 
     subscribers = podcast.subscribers
-    last_subscribers = podcast.subscribers
 
     scaled_logo_url = get_logo_url(podcast, scaled_logo_size)
 
     return {
         "url": url,
         "title": podcast.title,
+        "author": podcast.author,
         "description": podcast.description,
         "subscribers": subscribers,
-        "subscribers_last_week": last_subscribers,
         "logo_url": podcast.logo_url,
         "scaled_logo_url": 'http://%s%s' % (domain, scaled_logo_url),
         "website": podcast.link,

@@ -3,7 +3,7 @@
 """OPML importer and exporter (based on gPodder's "opml" module)
 
 This module contains helper classes to import subscriptions from OPML files on
-the web and to export a list of podcast objects to valid OPML 1.1 files.
+the web and to export a list of podcast objects to valid OPML 2.0 files.
 """
 
 import os
@@ -58,7 +58,7 @@ class Importer(object):
 class Exporter(object):
     """
     Helper class to export a list of channel objects to a local file in OPML
-    1.1 format. See www.opml.org for the OPML specification.
+    2.0 format. See www.opml.org for the OPML specification.
     """
 
     def __init__(self, title='my.gpodder.org Subscriptions'):
@@ -92,25 +92,27 @@ class Exporter(object):
             from mygpo.subscriptions.models import SubscribedPodcast
             from mygpo.podcasts.models import PodcastGroup
 
+            outline = doc.createElement('outline')
+
             if isinstance(channel, SubscribedPodcast):
                 title = channel.podcast.title
-                description = channel.podcast.description
-                url = channel.ref_url
+                outline.setAttribute('xmlUrl', channel.ref_url)
+                outline.setAttribute('description', channel.podcast.description or '')
+                outline.setAttribute('type', 'rss')
+                outline.setAttribute('htmlUrl', channel.podcast.link or '')
             elif isinstance(channel, PodcastGroup):
                 title = channel.title
-                podcast = channel.podcast_set.first()
-                description = podcast.description
-                url = podcast.url
+                for subchannel in channel.podcast_set.all():
+                    outline.appendChild(create_outline(subchannel))
             else:
                 title = channel.title
-                description = channel.description
-                url = channel.url
+                outline.setAttribute('xmlUrl', channel.url)
+                outline.setAttribute('description', channel.description or '')
+                outline.setAttribute('type', 'rss')
+                outline.setAttribute('htmlUrl', channel.link or '')
 
-            outline = doc.createElement('outline')
             outline.setAttribute('title', title or '')
-            outline.setAttribute('text', description or '')
-            outline.setAttribute('xmlUrl', url)
-            outline.setAttribute('type', 'rss')
+            outline.setAttribute('text', title or '')
             return outline
 
         body = doc.createElement('body')

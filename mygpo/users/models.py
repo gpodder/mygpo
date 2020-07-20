@@ -185,7 +185,7 @@ class SyncGroup(models.Model):
 
     def sync(self):
         """ Sync the group, ie bring all members up-to-date """
-        from mygpo.subscriptions import subscribe
+        from mygpo.subscriptions.tasks import subscribe
 
         # get all subscribed podcasts
         podcasts = set(self.get_subscribed_podcasts())
@@ -194,7 +194,7 @@ class SyncGroup(models.Model):
         for client in self.client_set.all():
             missing_podcasts = self.get_missing_podcasts(client, podcasts)
             for podcast in missing_podcasts:
-                subscribe(podcast, self.user, client)
+                subscribe.delay(podcast, self.user, client)
 
     def get_subscribed_podcasts(self):
         return Podcast.objects.filter(subscription__client__sync_group=self)

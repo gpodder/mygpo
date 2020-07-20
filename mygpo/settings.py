@@ -43,6 +43,16 @@ DATABASES = {
 }
 
 
+_USE_GEVENT = get_bool('USE_GEVENT', False)
+if _USE_GEVENT:
+    # see https://github.com/jneight/django-db-geventpool
+    default = DATABASES['default']
+    default['ENGINE'] = ('django_db_geventpool.backends.postgresql_psycopg2',)
+    default['CONN_MAX_AGE'] = 0
+    options = default.get('OPTIONS', {})
+    options['MAX_CONNS'] = 20
+
+
 _cache_used = bool(os.getenv('CACHE_BACKEND', False))
 
 if _cache_used:

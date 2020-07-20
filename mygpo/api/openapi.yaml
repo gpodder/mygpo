@@ -1,0 +1,1110 @@
+openapi: 3.0.0
+info:
+  description: "gpodder.net APIs"
+  version: "2.11.0"
+  title: "gpodder.net APIs"
+  contact:
+    url: "https://gpoddernet.readthedocs.io/en/latest/api/"
+  license:
+    name: "GNU Affero General Public License v3.0"
+    url: "https://github.com/podStation/mygpo/blob/master/COPYING"
+servers:
+  - url: https://gpodder.net
+    description: "Client parametrization server"
+tags:
+- name: "Client Parametrization"
+  externalDocs:
+    description: "Find out more"
+    url: "https://gpoddernet.readthedocs.io/en/latest/api/reference/clientconfig.html"
+- name: "Authentication"
+  externalDocs:
+    description: "Find out more"
+    url: "https://gpoddernet.readthedocs.io/en/latest/api/reference/auth.html"
+- name: "Directory"
+  externalDocs:
+    description: "Find out more"
+    url: "https://gpoddernet.readthedocs.io/en/latest/api/reference/directory.html"
+- name: "Suggestions"
+  externalDocs:
+    description: "Find out more"
+    url: "https://gpoddernet.readthedocs.io/en/latest/api/reference/suggestions.html"
+- name: "Device"
+  externalDocs:
+    description: "Find out more"
+    url: "https://gpoddernet.readthedocs.io/en/latest/api/reference/suggestions.html"
+- name: "Device Synchronization"
+  externalDocs:
+    description: "Find out more"
+    url: "https://gpoddernet.readthedocs.io/en/latest/api/reference/sync.html"
+- name: "Subscriptions"
+  externalDocs:
+    description: "Find out more"
+    url: "https://gpoddernet.readthedocs.io/en/latest/api/reference/subscriptions.html"
+- name: "Episode Actions"
+  externalDocs:
+    description: "Find out more"
+    url: "https://gpoddernet.readthedocs.io/en/latest/api/reference/events.html"
+- name: "Settings"
+  externalDocs:
+    description: "Find out more"
+    url: "https://gpoddernet.readthedocs.io/en/latest/api/reference/settings.html"
+- name: "Podcast Lists"
+  externalDocs:
+    description: "Find out more"
+    url: "https://gpoddernet.readthedocs.io/en/latest/api/reference/podcastlists.html"
+paths:
+  /clientconfig.json:
+    get:
+      tags:
+      - "Client Parametrization"
+      summary: "Retrieves client parametrization"
+      description: ""
+      operationId: "getClientParametrization"
+      responses:
+        200:
+          description: "Ok"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClientConfiguration"
+  /api/2/auth/{username}/login.json:
+    post:
+      tags:
+      - "Authentication"
+      summary: Log in the given user for the given device via HTTP Basic Auth.
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "Username to login"
+        required: true
+        schema:
+          type: "string"
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: "OK"
+        401:
+          description: "Unauthorized"
+        400:
+          description: "Cookies have different username then the one provided"
+  /api/2/auth/{username}/logout.json:
+    post:
+      tags:
+      - "Authentication"
+      summary: "Log out user"
+      description: "Log out the given user. Removes the session ID from the database."
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "Username to login"
+        required: true
+        schema:
+          type: "string"
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: "OK"
+        400:
+          description: "if the client provides a cookie, but for a different username than the one given"
+  /api/2/tags/{count}.json:
+    get:
+      tags:
+      - "Directory"
+      summary: "Retrieve Top Tags"
+      parameters:
+      - name: "count"
+        in: "path"
+        description: "number of tags to return"
+        required: true
+        schema:
+          type: "integer"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+  /api/2/tag/{tag}/{count}.json:
+    get:
+      tags:
+      - "Directory"
+      summary: "Retrieve Podcasts for Tag"
+      parameters:
+      - name: "count"
+        in: "path"
+        description: "maximum number of podcasts to return"
+        required: true
+        schema:
+          type: "integer"
+      - name: "tag"
+        in: "path"
+        description: "URL-encoded tag"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+  /api/2/data/podcast.json:
+    get:
+      tags:
+      - "Directory"
+      summary: "Retrieve Podcast Data"
+      description: "Returns information for the podcast with the given URL or 404 if there is no podcast with this URL."
+      parameters:
+      - name: "url"
+        in: "query"
+        description: "the feed URL of the podcast"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+  /api/2/data/episode.json:
+    get:
+      tags:
+      - "Directory"
+      summary: "Retrieve Episode Data"
+      description: "Returns information for the episode with the given {episode-url} that belongs to the podcast with the {podcast-url}"
+      parameters:
+      - name: "podcast-url"
+        in: "query"
+        description: "feed URL of the podcast to which the episode belongs"
+        required: true
+        schema:
+          type: "string"
+      - name: "episode-url"
+        in: "query"
+        description: "media URL of the episode"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+  /toplist/{number}.{format}:
+    get:
+      tags:
+      - "Directory"
+      summary: "Podcast Toplist"
+      parameters:
+      - name: "number"
+        in: "path"
+        description: "maximum number of podcasts to return"
+        required: true
+        schema:
+          type: "integer"
+      - name: "format"
+        in: "path"
+        description: "Format of the response"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Format"
+      - name: "jsonp"
+        in: "query"
+        description: "a function name on which the response is wrapped (only valid for format jsonp; since 2.8)"
+        schema:
+          type: "string"
+      - name: "scale_logo"
+        in: "query"
+        description: "returns logo URLs to scaled images"
+        schema:
+          type: "integer"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+            text/plain:
+              schema:
+                type: "string"
+            text/xml:
+              schema:
+                type: "object"
+            application/xml:
+              schema:
+                type: "object"
+            application/json-p:
+              schema:
+                type: "string"
+  /search.{format}:
+    get:
+      tags:
+      - "Directory"
+      summary: "Podcast Toplist"
+      parameters:
+      - name: "format"
+        in: "path"
+        description: "Format of the response"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Format"
+      - name: "q"
+        in: "query"
+        description: "search query"
+        required: true
+        schema:
+          type: "string"
+      - name: "jsonp"
+        in: "query"
+        description: "a functionname on which the response is wrapped (only valid for format jsonp; since 2.8)"
+        schema:
+          type: "string"
+      - name: "scale_logo"
+        in: "query"
+        description: "returns logo URLs to scaled images"
+        schema:
+          type: "integer"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+            text/plain:
+              schema:
+                type: "string"
+            text/xml:
+              schema:
+                type: "object"
+            application/xml:
+              schema:
+                type: "object"
+            application/json-p:
+              schema:
+                type: "string"
+  /suggestions/{number}.{format}:
+    get:
+      tags:
+      - "Suggestions"
+      summary: "Retrieve Suggested Podcasts"
+      parameters:
+      - name: "number"
+        in: "path"
+        description: "maximum number of podcasts to return"
+        required: true
+        schema:
+          type: "integer"
+      - name: "format"
+        in: "path"
+        description: "Format of the response"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Format"
+      - name: "jsonp"
+        in: "query"
+        description: "a functionname on which the response is wrapped (only valid for format jsonp; since 2.8)"
+        schema:
+          type: "string"
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+            text/plain:
+              schema:
+                type: "string"
+            text/xml:
+              schema:
+                type: "object"
+            application/xml:
+              schema:
+                type: "object"
+            application/json-p:
+              schema:
+                type: "string"
+  /api/2/devices/{username}/{deviceid}.json:
+    post:
+      tags:
+      - "Device"
+      summary: "Update Device Data"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "Username to login"
+        required: true
+        schema:
+          type: "string"
+      - name: "deviceid"
+        in: "path"
+        description: "Device Id"
+        required: true
+        schema:
+          $ref: "#/components/schemas/DeviceId"
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceUpdateData'
+      responses:
+        200:
+          description: "OK"
+  /api/2/devices/{username}.json:
+    get:
+      tags:
+      - "Device"
+      summary: "List Devices"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "Username to login"
+        required: true
+        schema:
+          type: "string"
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+  /api/2/updates/{username}/{deviceid}.json:
+    get:
+      tags:
+      - "Device"
+      summary: "Get Device Updates"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "Username to login"
+        required: true
+        schema:
+          type: "string"
+      - name: "deviceid"
+        in: "path"
+        description: "Device Id"
+        required: true
+        schema:
+          $ref: "#/components/schemas/DeviceId"
+      - name: "since"
+        in: "query"
+        description: "`timestamp` when updates have last been retrieved"
+        required: true
+        schema:
+          type: "integer"
+      - name: "include_actions"
+        in: "query"
+        description: "Default: false, since 2.10"
+        schema:
+          $ref: "#/components/schemas/DeviceId"
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+  /api/2/sync-devices/{username}.json:
+    get:
+      tags:
+      - "Device Synchronization"
+      summary: "Get Sync Status"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "Username to login"
+        required: true
+        schema:
+          type: "string"
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+    post:
+      tags:
+      - "Device Synchronization"
+      summary: "Start / Stop Sync"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "Username to login"
+        required: true
+        schema:
+          type: "string"
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceSynchronizationRequest'
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+  /api/2/favorites/{username}.json:
+    get:
+      tags:
+      - "Favorites"
+      summary: "Get Favorite Episodes"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username for which the favorites should be returned"
+        required: true
+        schema:
+          type: "string"
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+  /subscriptions/{username}/{deviceid}.{format}:
+    get:
+      tags:
+      - "Subscriptions"
+      summary: "Update Device Data"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username for which subscriptions should be returned"
+        required: true
+        schema:
+          type: "string"
+      - name: "deviceid"
+        in: "path"
+        description: "Device Id"
+        required: true
+        schema:
+          $ref: "#/components/schemas/DeviceId"
+      - name: "format"
+        in: "path"
+        description: "Format of the response"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Format"
+      - name: "jsonp"
+        in: "query"
+        description: "a function name on which the response is wrapped (only valid for format jsonp; since 2.8)"
+        schema:
+          type: "string"
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+        401:
+          description: "Invalid user"
+        404:
+          description: "Invalid device ID"
+        400:
+          description: "Invalid format"
+    put:
+      tags:
+      - "Subscriptions"
+      summary: "Upload Subscriptions of Device"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username for which subscriptions should be returned"
+        required: true
+        schema:
+          type: "string"
+      - name: "deviceid"
+        in: "path"
+        description: "Device Id"
+        required: true
+        schema:
+          $ref: "#/components/schemas/DeviceId"
+      - name: "format"
+        in: "path"
+        description: "Format of the response"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Format"
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadSubscriptionRequest'
+      responses:
+        200:
+          description: "OK"
+        401:
+          description: "Invalid user"
+        400:
+          description: "Invalid format"
+  /subscriptions/{username}.{format}:
+    get:
+      tags:
+      - "Subscriptions"
+      summary: "Get All Subscriptions"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username for which subscriptions should be returned"
+        required: true
+        schema:
+          type: "string"
+      - name: "format"
+        in: "path"
+        description: "Format of the response"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Format"
+      - name: "jsonp"
+        in: "query"
+        description: "a function name on which the response is wrapped (only valid for format jsonp; since 2.8)"
+        schema:
+          type: "string"
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+        401:
+          description: "Invalid user"
+        400:
+          description: "Invalid format"
+  /api/2/subscriptions/{username}/{deviceid}.json:
+    post:
+      tags:
+      - "Subscriptions"
+      summary: "Upload Subscription Changes"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username for which subscriptions should be returned"
+        required: true
+        schema:
+          type: "string"
+      - name: "deviceid"
+        in: "path"
+        description: "Device Id"
+        required: true
+        schema:
+          $ref: "#/components/schemas/DeviceId"
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadSubscriptionChangesRequest'
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+        400:
+          description: "Invalid format"
+    get:
+      tags:
+      - "Subscriptions"
+      summary: "Get Subscription Changes"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username for which subscriptions should be returned"
+        required: true
+        schema:
+          type: "string"
+      - name: "deviceid"
+        in: "path"
+        description: "Device Id"
+        required: true
+        schema:
+          $ref: "#/components/schemas/DeviceId"
+      - name: "since"
+        in: "query"
+        description: "the `timestamp` value of the last response"
+        required: true
+        schema:
+          type: "integer"
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+  /api/2/episodes/{username}.json:
+    post:
+      tags:
+      - "Episode Actions"
+      summary: "Upload Episode Actions"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username for which the actions will be set"
+        required: true
+        schema:
+          type: "string"
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetEpisodeActionsRequest'
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+    get:
+      tags:
+      - "Episode Actions"
+      summary: "Get Episode Actions"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username for which the actions will be retrieved"
+        required: true
+        schema:
+          type: "string"
+      - name: "podcast"
+        in: "query"
+        description: "The URL of a Podcast feed; if set, only actions for episodes of the given podcast are returned"
+        required: true
+        schema:
+          type: "string"
+      - name: "device"
+        in: "query"
+        description: "A Device ID; if set, only actions for the given device are returned"
+        schema:
+          type: "string"
+      - name: "since"
+        in: "query"
+        description: "Only episode actions since the given timestamp are returned"
+        schema:
+          type: "integer"
+      - name: "aggregated"
+        in: "query"
+        description: "If true, only the latest actions is returned for each episode (added in 2.1)"
+        schema:
+          type: "string"
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+  /api/2/settings/{username}/{scope}.json:
+    post:
+      tags:
+      - "Settings"
+      summary: "Save Settings"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username for which the settings will be saved"
+        required: true
+        schema:
+          type: "string"
+      - name: "scope"
+        in: "path"
+        required: true
+        schema:
+          $ref: "#/components/schemas/SettingsScope"
+      - name: "podcast"
+        in: "query"
+        description: "Feed URL of a podcast (required for scope podcast and episode)"
+        schema:
+          type: "string"
+      - name: "device"
+        in: "query"
+        description: "(required for scope device)"
+        schema:
+          $ref: "#/components/schemas/DeviceId"
+      - name: "episode"
+        in: "query"
+        description: "media URL of the episode (required for scope episode)"
+        schema:
+          type: "string"
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaveSettingsRequest'
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+    get:
+      tags:
+      - "Settings"
+      summary: "Save Settings"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username for which the settings will be saved"
+        required: true
+        schema:
+          type: "string"
+      - name: "scope"
+        in: "path"
+        required: true
+        schema:
+          $ref: "#/components/schemas/SettingsScope"
+      - name: "podcast"
+        in: "query"
+        description: "Feed URL of a podcast (required for scope podcast and episode)"
+        schema:
+          type: "string"
+      - name: "device"
+        in: "query"
+        description: "(required for scope device)"
+        schema:
+          $ref: "#/components/schemas/DeviceId"
+      - name: "episode"
+        in: "query"
+        description: "media URL of the episode (required for scope episode)"
+        schema:
+          type: "string"
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: "OK"
+        409:
+          description: "if the the user already has a podcast list with the (generated) name"
+  /api/2/lists/{username}/create.{format}:
+    post:
+      tags:
+      - "Podcast Lists"
+      summary: "Create Podcast List"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username for which a new podcast list should be created"
+        required: true
+        schema:
+          type: "string"
+      - name: "format"
+        in: "path"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Format"
+      - name: "title"
+        in: "query"
+        required: true
+        schema:
+          type: "string"
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "array"
+              items:
+                type: "string"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+  /api/2/lists/{username}.json:
+    get:
+      tags:
+      - "Podcast Lists"
+      summary: "Get User’s Lists"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username for which a new podcast list should be created"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+        404:
+          description: "the user was not found"
+  /api/2/lists/{username}/list/{listname}.{format}:
+    get:
+      tags:
+      - "Podcast Lists"
+      summary: "Get a Podcast List"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username for which a new podcast list should be created"
+        required: true
+        schema:
+          type: "string"
+      - name: "listname"
+        in: "path"
+        description: "name of the requested podcast list"
+        required: true
+        schema:
+          type: "string"
+      - name: "format"
+        in: "path"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Format"
+      responses:
+        200:
+          description: "the podcast list is returned in in the requested format"
+          content:
+            application/json:
+              schema:
+                type: "object"
+        404:
+          description: "if the user or the list do not exist"
+    put:
+      tags:
+      - "Podcast Lists"
+      summary: "Update a Podcast List"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username to which the list belongs"
+        required: true
+        schema:
+          type: "string"
+      - name: "listname"
+        in: "path"
+        description: "name of the requested podcast list"
+        required: true
+        schema:
+          type: "string"
+      - name: "format"
+        in: "path"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Format"
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "array"
+              items:
+                type: "string"
+      responses:
+        204:
+          description: "if the podcast list has been created / updated"
+        404:
+          description: "if the user or the list do not exist"
+    delete:
+      tags:
+      - "Podcast Lists"
+      summary: "Delete a Podcast List"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username to which the list belongs"
+        required: true
+        schema:
+          type: "string"
+      - name: "listname"
+        in: "path"
+        description: "name of the requested podcast list"
+        required: true
+        schema:
+          type: "string"
+      - name: "format"
+        in: "path"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Format"
+      security:
+        - basicAuth: []
+      responses:
+        204:
+          description: "if the podcast list has been created / updated"
+        404:
+          description: "if the podcast list has been deleted"
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    ClientConfiguration:
+      type: "object"
+      properties:
+        mygpo:
+          type: "object"
+          properties:
+            baseurl:
+              type: "string"
+              description: "URL to which the gpodder.net API Endpoints should be appended"
+        mygpo-feedservice:
+          properties:
+            baseurl:
+              type: "string"
+              description: "Base URL of the gpodder.net feed service"
+        update_timeout:
+          type: "integer"
+          description: "Time in seconds for which the values in this file can be considered valid."
+    Format:
+      type: "string"
+      enum: 
+      - "json"
+      - "xml"
+      - "opml"
+      - "txt"
+      - "jsonp"
+    DeviceId:
+      type: "string"
+      pattern: "^[\\w.-]+$"
+    DeviceUpdateData:
+      type: "object"
+      properties:
+        caption:
+          type: "string"
+        type:
+          type: "string"
+          enum:
+          - "desktop"
+          - "laptop"
+          - "mobile"
+          - "server"
+          - "other"
+    DeviceSynchronizationRequest:
+      type: "object"
+      properties:
+        synchronize:
+          type: "array"
+          items:
+            type: "array"
+            items:
+              $ref: "#/components/schemas/DeviceId"
+        stop-synchronize:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/DeviceId"
+    UploadSubscriptionRequest:
+      type: "array"
+      items:
+        $ref: "#/components/schemas/DeviceId"
+    UploadSubscriptionChangesRequest:
+      type: "object"
+      properties:
+        add:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/DeviceId"
+        remove:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/DeviceId"
+    EpisodeActionTypes:
+      type: "string"
+      enum:
+      - "download"
+      - "delete"
+      - "play"
+      - "new"
+      - "flattr"
+    SetEpisodeActionsRequest:
+      type: "array"
+      items:
+        type: "object"
+        properties:
+          podcast:
+            type: "string"
+          episode:
+            type: "string"
+          device:
+            $ref: "#/components/schemas/DeviceId"
+          action:
+            $ref: "#/components/schemas/EpisodeActionTypes"
+          timestamp:
+            type: "integer"
+          started:
+            type: "integer"
+          position:
+            type: "integer"
+          total:
+            type: "integer"
+    SettingsScope:
+      type: "string"
+      enum:
+      - "account"
+      - "device"
+      - "podcast"
+      - "episode"
+    SaveSettingsRequest:
+      type: "object"
+      properties:
+        set:
+          type: "object"
+        remove:
+          type: "array"
+          items:
+            type: "string"

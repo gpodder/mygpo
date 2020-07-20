@@ -3,6 +3,8 @@ from collections import Counter
 
 from django.contrib.auth import get_user_model
 
+from django_db_geventpool.utils import close_connection
+
 from mygpo.celery import celery
 from mygpo.subscriptions import get_subscribed_podcasts
 from mygpo.suggestions.models import PodcastSuggestion
@@ -13,6 +15,7 @@ logger = get_task_logger(__name__)
 
 
 @celery.task
+@close_connection
 def update_suggestions(user_pk, max_suggestions=15):
     """ updates the suggestions of a user """
 
