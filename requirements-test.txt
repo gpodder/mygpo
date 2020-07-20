@@ -1,5 +1,6 @@
 coverage==5.1
 django-coverage-plugin==1.8.0
+pytest>=4.6
 pytest-django
 pytest-cov
 responses==0.10.15
