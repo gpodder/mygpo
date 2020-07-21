@@ -16,4 +16,4 @@ redis==3.5.3
 django-celery-results==1.2.1
 django-celery-beat==2.0.0
 requests==2.24.0
-django-db-geventpool==3.2.1
+django-db-geventpool==3.2.2
