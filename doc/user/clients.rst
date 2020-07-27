@@ -12,6 +12,7 @@ Android
 Name                  Status      gpodder.net features                   License   Documentation
 ====================  ==========  =====================================  ========  ==================================================
 `AntennaPod`_         Active      Directory, Search, Subscription sync   MIT
+`Escapepod`_          Active      Search                                 MIT
 `Listen Up Free`_     Active      sync, subscription, search
 `Podcast Addict`_     Active      none                                             `Podcast Addict export script`_
 `Podkicker`_          Active      none
@@ -139,6 +140,7 @@ Nokia Podcasting       -       Subscription service    GPL         `Podcasting D
 .. _Detlef Gpodderson: https://play.google.com/apps/testing/at.ac.tuwien.detlef
 .. _Detlef Repository: https://github.com/gpodder/detlef
 .. _AntennaPod: http://antennapod.org/
+.. _Escapepod: https://github.com/y20k/escapepod
 .. _gpodroid: https://play.google.com/store/apps/details?id=com.unitedcoders.android.gpodroid
 .. _gpodroid Repository: https://github.com/gpodder/GpodRoid
 .. _Podstars: https://play.google.com/store/apps/details?id=com.miga.podstars
