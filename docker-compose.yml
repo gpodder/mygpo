@@ -7,6 +7,8 @@ services:
     build:
       context: contrib
       dockerfile: Dockerfile.postgres
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: 'trust'
 
   memcached:
     image: memcached:1.4
