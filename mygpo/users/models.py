@@ -194,7 +194,7 @@ class SyncGroup(models.Model):
         for client in self.client_set.all():
             missing_podcasts = self.get_missing_podcasts(client, podcasts)
             for podcast in missing_podcasts:
-                subscribe.delay(podcast, self.user, client)
+                subscribe.delay(podcast.pk, self.user.pk, client.uid)
 
     def get_subscribed_podcasts(self):
         return Podcast.objects.filter(subscription__client__sync_group=self)

@@ -78,7 +78,7 @@ class UnsubscribeMergeTests(TestCase):
         self.device = get_device(self.user, 'dev', '')
 
     def test_merge_podcasts(self):
-        subscribe(self.podcast2, self.user, self.device)
+        subscribe(self.podcast2.pk, self.user.pk, self.device.uid)
 
         # merge podcast2 into podcast1
         pm = PodcastMerger([self.podcast1, self.podcast2], Counter(), [])
@@ -86,7 +86,7 @@ class UnsubscribeMergeTests(TestCase):
 
         # get podcast for URL of podcast2 and unsubscribe from it
         p = Podcast.objects.get(urls__url=self.P2_URL)
-        unsubscribe(p, self.user, self.device)
+        unsubscribe(p.pk, self.user.pk, self.device.uid)
 
         subscriptions = Podcast.objects.filter(subscription__user=self.user)
         self.assertEqual(0, len(subscriptions))

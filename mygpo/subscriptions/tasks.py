@@ -1,10 +1,12 @@
 from datetime import datetime
 
+from django.contrib.auth import get_user_model
 from django.db import transaction
 
 from mygpo.subscriptions.models import Subscription
 from mygpo.subscriptions.signals import subscription_changed
 from mygpo.history.models import HistoryEntry
+from mygpo.podcasts.models import Podcast
 from mygpo.utils import to_maxlength
 from mygpo.celery import celery
 
@@ -14,10 +16,17 @@ logger = logging.getLogger(__name__)
 
 
 @celery.task(max_retries=5, default_retry_delay=60)
-def subscribe(podcast, user, client, ref_url=None):
+def subscribe(podcast_pk, user_pk, client_uid, ref_url=None):
     """ subscribes user to the current podcast on one client
 
     Takes syned devices into account. """
+    podcast = Podcast.objects.get(pk=podcast_pk)
+
+    User = get_user_model()
+    user = User.objects.get(pk=user_pk)
+
+    client = user.client_set.get(uid=client_uid)
+
     ref_url = ref_url or podcast.url
     now = datetime.utcnow()
     clients = _affected_clients(client)
@@ -28,10 +37,17 @@ def subscribe(podcast, user, client, ref_url=None):
 
 
 @celery.task(max_retries=5, default_retry_delay=60)
-def unsubscribe(podcast, user, client):
+def unsubscribe(podcast_pk, user_pk, client_uid):
     """ unsubscribes user from the current podcast on one client
 
     Takes syned devices into account. """
+    podcast = Podcast.objects.get(pk=podcast_pk)
+
+    User = get_user_model()
+    user = User.objects.get(pk=user_pk)
+
+    client = user.client_set.get(uid=client_uid)
+
     now = datetime.utcnow()
     clients = _affected_clients(client)
 
@@ -42,8 +58,13 @@ def unsubscribe(podcast, user, client):
 
 
 @celery.task(max_retries=5, default_retry_delay=60)
-def subscribe_all(podcast, user, ref_url=None):
+def subscribe_all(podcast_pk, user_pk, ref_url=None):
     """ subscribes user to the current podcast on all clients """
+    podcast = Podcast.objects.get(pk=podcast_pk)
+
+    User = get_user_model()
+    user = User.objects.get(pk=user_pk)
+
     ref_url = ref_url or podcast.url
     now = datetime.utcnow()
     clients = user.client_set.all()
@@ -54,8 +75,13 @@ def subscribe_all(podcast, user, ref_url=None):
 
 
 @celery.task(max_retries=5, default_retry_delay=60)
-def unsubscribe_all(podcast, user):
+def unsubscribe_all(podcast_pk, user_pk):
     """ unsubscribes user from the current podcast on all clients """
+    podcast = Podcast.objects.get(pk=podcast_pk)
+
+    User = get_user_model()
+    user = User.objects.get(pk=user_pk)
+
     now = datetime.utcnow()
     clients = user.client_set.filter(subscription__podcast=podcast)
 
