@@ -268,3 +268,43 @@ class PodcastLogoTests(TestCase):
             self.assertNotEqual(
                 list(response2.streaming_content), list(response3.streaming_content)
             )
+
+
+class PublisherPageTests(TestCase):
+    """ Test the publisher page """
+
+    @classmethod
+    def setUpTestData(self):
+        User = get_user_model()
+        self.user = User(username='web-test', email='web-test@example.com')
+        self.user.set_password('pwd')
+        self.user.is_staff = True
+        self.user.save()
+
+    def test_publisher_detail_slug(self):
+        # create a podcast with slug
+        podcast = Podcast.objects.get_or_create_for_url(
+            'http://example.com/podcast.rss'
+        ).object
+        slug = 'test'
+        podcast.set_slug(slug)
+
+        url = reverse('podcast-publisher-detail-slug', args=(slug,))
+
+        self.client.login(username='web-test', password='pwd')
+
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+
+    def test_publisher_detail_id(self):
+        # create a podcast with no slug
+        podcast = Podcast.objects.get_or_create_for_url(
+            'http://example.com/podcast2.rss'
+        ).object
+
+        url = reverse('podcast-publisher-detail-id', args=(podcast.id,))
+
+        self.client.login(username='web-test', password='pwd')
+
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
