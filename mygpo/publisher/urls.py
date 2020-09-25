@@ -21,34 +21,6 @@ urlpatterns = [
         name='publisher-new-update-token',
     ),
     path(
-        'podcast/<slug:slug>/', views.podcast_slug, name='podcast-publisher-detail-slug'
-    ),
-    path(
-        'podcast/<slug:slug>/update',
-        views.update_podcast_slug,
-        name='podcast-publisher-update-slug',
-    ),
-    path(
-        'podcast/<slug:slug>/save',
-        views.save_podcast_slug,
-        name='podcast-publisher-save-slug',
-    ),
-    path(
-        'podcast/<slug:slug>/episodes',
-        views.episodes_slug,
-        name='podcast-publisher-episodes-slug',
-    ),
-    path(
-        'podcast/<slug:p_slug>/<slug:e_slug>',
-        views.episode_slug,
-        name='episode-publisher-detail-slug',
-    ),
-    path(
-        'podcast/<slug:p_slug>/<slug:e_slug>/set-slug',
-        views.update_episode_slug_slug,
-        name='publisher-set-episode-slug-slug',
-    ),
-    path(
         'podcast/<uuid:podcast_id>/',
         views.podcast_id,
         name='podcast-publisher-detail-id',
@@ -77,6 +49,34 @@ urlpatterns = [
         'podcast/<uuid:podcast_id>/<uuid:episode_id>/' 'set-slug',
         views.update_episode_slug_id,
         name='publisher-set-episode-slug-id',
+    ),
+    path(
+        'podcast/<slug:slug>/', views.podcast_slug, name='podcast-publisher-detail-slug'
+    ),
+    path(
+        'podcast/<slug:slug>/update',
+        views.update_podcast_slug,
+        name='podcast-publisher-update-slug',
+    ),
+    path(
+        'podcast/<slug:slug>/save',
+        views.save_podcast_slug,
+        name='podcast-publisher-save-slug',
+    ),
+    path(
+        'podcast/<slug:slug>/episodes',
+        views.episodes_slug,
+        name='podcast-publisher-episodes-slug',
+    ),
+    path(
+        'podcast/<slug:p_slug>/<slug:e_slug>',
+        views.episode_slug,
+        name='episode-publisher-detail-slug',
+    ),
+    path(
+        'podcast/<slug:p_slug>/<slug:e_slug>/set-slug',
+        views.update_episode_slug_slug,
+        name='publisher-set-episode-slug-slug',
     ),
     path('group/<slug:pg_slug>', views.group_slug, name='group-publisher-slug'),
     path('group/<slug:pg_slug>', views.group_id, name='group-publisher-id'),

@@ -266,7 +266,7 @@ def subscribe(request, podcast):
         for uid in device_uids:
             try:
                 device = request.user.client_set.get(uid=uid)
-                subscribe_podcast.delay(podcast, request.user, device)
+                subscribe_podcast.delay(podcast.pk, request.user.pk, device.uid)
 
             except Client.DoesNotExist as e:
                 messages.error(request, str(e))
@@ -284,7 +284,7 @@ def subscribe(request, podcast):
 def subscribe_all(request, podcast):
     """ subscribe all of the user's devices to the podcast """
     user = request.user
-    subscribe_podcast_all.delay(podcast, user)
+    subscribe_podcast_all.delay(podcast.pk, user.pk)
     return HttpResponseRedirect(get_podcast_link_target(podcast))
 
 
@@ -306,7 +306,7 @@ def unsubscribe(request, podcast, device_uid):
         return HttpResponseRedirect(return_to)
 
     try:
-        unsubscribe_podcast.delay(podcast, user, device)
+        unsubscribe_podcast.delay(podcast.pk, user.pk, device.uid)
     except SubscriptionException as e:
         logger.exception(
             'Web: %(username)s: could not unsubscribe from podcast %(podcast_url)s on device %(device_id)s'
@@ -326,7 +326,7 @@ def unsubscribe(request, podcast, device_uid):
 def unsubscribe_all(request, podcast):
     """ unsubscribe all of the user's devices from the podcast """
     user = request.user
-    unsubscribe_podcast_all.delay(podcast, user)
+    unsubscribe_podcast_all.delay(podcast.pk, user.pk)
     return HttpResponseRedirect(get_podcast_link_target(podcast))
 
 

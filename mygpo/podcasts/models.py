@@ -702,6 +702,9 @@ class Podcast(
 
     @property
     def next_update(self):
+        if not self.last_update:
+            return None
+
         interval = timedelta(hours=self.update_interval) * self.update_interval_factor
         return self.last_update + interval
 
