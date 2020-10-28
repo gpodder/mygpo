@@ -96,7 +96,6 @@ def episode_info(request):
 @allowed_methods(['POST'])
 @cors_origin()
 def add_podcast(request):
-    # TODO what if the url doesn't have a valid podcast?
     url = normalize_feed_url(json.loads(request.body.decode('utf-8')).get('url', ''))
 
     # 404 before we query for url, because query would complain
@@ -114,9 +113,9 @@ def add_podcast(request):
         res = update_podcasts.delay([url])
         response = HttpResponse(status=202)
         job_status_path = reverse(
-            'api-add-podcast-status', kwargs={"job_id": res.task_id}
+            'api-add-podcast-status', kwargs={'job_id': res.task_id}
         )
-        response['Location'] = f'{job_status_path}?url={url}'
+        response['Location'] = f'{job_status_path}'
         return response
 
 

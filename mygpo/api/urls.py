@@ -69,7 +69,9 @@ urlpatterns = [
         advanced.directory.episode_info,
         name='api-episode-info',
     ),
-    path('api/2/podcasts/create', advanced.directory.add_podcast),
+    path(
+        'api/2/podcasts/create', advanced.directory.add_podcast, name='api-add-podcast'
+    ),
     path(
         'api/2/task/<uuid:job_id>',
         advanced.directory.add_podcast_status,

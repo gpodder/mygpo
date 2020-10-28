@@ -22,6 +22,7 @@ from mygpo.api.simple import format_podcast_list
 from mygpo.history.models import EpisodeHistoryEntry
 from mygpo.test import create_auth_string
 from mygpo.utils import get_timestamp
+from mygpo.data.tasks import update_podcasts
 
 
 class AdvancedAPITests(unittest.TestCase):
@@ -188,6 +189,30 @@ class DirectoryTest(TestCase):
         resp = self.client.get(url)
 
         self.assertEqual(resp.status_code, 200)
+
+    def test_add_podcast_existed(self):
+        """Test add podcast API for existed podcast"""
+        url = reverse('api-add-podcast')
+        body = {'url': self.podcast.url}
+        location = reverse('api-podcast-info') + '?url=' + self.podcast.url
+        add_resp = self.client.post(url, body, content_type='application/json')
+        self.assertEqual(add_resp.status_code, 302)
+        self.assertEqual(add_resp.get('Location'), location)
+
+    def test_add_podcast_new(self):
+        """Test add podcast API for new podcast"""
+        podcast_url = 'http://example.com/new-podcast.xml'
+        add_url = reverse('api-add-podcast')
+        body = {'url': podcast_url}
+        add_resp = self.client.post(add_url, body, content_type='application/json')
+        self.assertEqual(add_resp.status_code, 202)
+        status_url = add_resp.get('Location')
+        status_resp = self.client.get(status_url)
+        self.assertEqual(status_resp.status_code, 200)
+        self.assertEqual(status_resp.json().get('status'), 'pending')
+        job_id = status_url.split('/')[-1]
+        result = update_podcasts.apply(task_id=job_id)
+        self.assertTrue(result.ready())
 
 
 class EpisodeActionTests(TestCase):
