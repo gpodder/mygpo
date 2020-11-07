@@ -22,7 +22,7 @@ from mygpo.decorators import cors_origin
 
 from collections import namedtuple
 
-EpisodeStatus = namedtuple('EpisodeStatus', 'episode status action')
+EpisodeStatus = namedtuple("EpisodeStatus", "episode status action")
 
 import logging
 
@@ -30,9 +30,9 @@ logger = logging.getLogger(__name__)
 
 
 class DeviceUpdates(View):
-    """ returns various updates for a device
+    """returns various updates for a device
 
-    https://gpoddernet.readthedocs.io/en/latest/api//Devices#Get_Updates """
+    https://gpoddernet.readthedocs.io/en/latest/api//Devices#Get_Updates"""
 
     @method_decorator(csrf_exempt)
     @method_decorator(require_valid_user)
@@ -56,7 +56,7 @@ class DeviceUpdates(View):
         except ValueError as e:
             return HttpResponseBadRequest(str(e))
 
-        include_actions = parse_bool(request.GET.get('include_actions', False))
+        include_actions = parse_bool(request.GET.get("include_actions", False))
 
         domain = RequestSite(request).domain
 
@@ -69,10 +69,10 @@ class DeviceUpdates(View):
 
         return JsonResponse(
             {
-                'add': add,
-                'rem': rem,
-                'updates': updates,
-                'timestamp': get_timestamp(now),
+                "add": add,
+                "rem": rem,
+                "updates": updates,
+                "timestamp": get_timestamp(now),
             }
         )
 
@@ -110,14 +110,14 @@ class DeviceUpdates(View):
         episodes = []
         for podcast in subscribed_podcasts:
             eps = Episode.objects.filter(podcast=podcast, released__gt=since).order_by(
-                '-order', '-released'
+                "-order", "-released"
             )
             episodes.extend(eps[:max_per_podcast])
 
         states = EpisodeState.dict_for_user(user, episodes)
 
         for episode in episodes:
-            yield EpisodeStatus(episode, states.get(episode.id, 'new'), None)
+            yield EpisodeStatus(episode, states.get(episode.id, "new"), None)
 
     def get_episode_data(
         self, episode_status, podcasts, domain, include_actions, user, devices
@@ -128,20 +128,20 @@ class DeviceUpdates(View):
         podcast_id = episode_status.episode.podcast
         podcast = podcasts.get(podcast_id, None)
         t = episode_data(episode_status.episode, domain, podcast)
-        t['status'] = episode_status.status
+        t["status"] = episode_status.status
 
         # include latest action (bug 1419)
         # TODO
         if include_actions and episode_status.action:
-            t['action'] = episode_action_json(episode_status.action, user)
+            t["action"] = episode_action_json(episode_status.action, user)
 
         return t
 
     def get_since(self, request):
         """ parses the "since" parameter """
-        since_ = request.GET.get('since', None)
+        since_ = request.GET.get("since", None)
         if since_ is None:
-            raise ValueError('parameter since missing')
+            raise ValueError("parameter since missing")
         try:
             return datetime.fromtimestamp(float(since_))
         except ValueError as e:

@@ -9,9 +9,9 @@ from mygpo.podcasts.models import Podcast
 
 
 class PodcastUpdateResult(UUIDModel):
-    """ Results of a podcast update
+    """Results of a podcast update
 
-    Once an instance is stored, the update is assumed to be finished. """
+    Once an instance is stored, the update is assumed to be finished."""
 
     # URL of the podcast to be updated
     podcast_url = models.URLField(max_length=2048)
@@ -39,11 +39,11 @@ class PodcastUpdateResult(UUIDModel):
 
     class Meta(object):
 
-        get_latest_by = 'start'
+        get_latest_by = "start"
 
-        ordering = ['-start']
+        ordering = ["-start"]
 
-        indexes = [models.Index(fields=['podcast', 'start'])]
+        indexes = [models.Index(fields=["podcast", "start"])]
 
     def __str__(self):
         return 'Update Result for "{}" @ {:%Y-%m-%d %H:%M}'.format(

@@ -32,14 +32,14 @@ def search_podcasts(query):
     query = SearchQuery(query)
 
     results = (
-        Podcast.objects.annotate(rank=SearchRank(F('search_vector'), query))
+        Podcast.objects.annotate(rank=SearchRank(F("search_vector"), query))
         .annotate(
             order=ExpressionWrapper(
-                F('rank') * F('subscribers'), output_field=FloatField()
+                F("rank") * F("subscribers"), output_field=FloatField()
             )
         )
         .filter(rank__gte=SEARCH_CUTOFF)
-        .order_by('-order')[:100]
+        .order_by("-order")[:100]
     )
 
     logger.debug(

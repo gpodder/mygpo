@@ -28,45 +28,45 @@ from mygpo.podcastlists.views import list_decorator
 @check_username
 @check_format
 @never_cache
-@allowed_methods(['POST'])
+@allowed_methods(["POST"])
 @cors_origin()
 def create(request, username, format):
     """ Creates a new podcast list and links to it in the Location header """
 
-    title = request.GET.get('title', None)
+    title = request.GET.get("title", None)
 
     if not title:
-        return HttpResponseBadRequest('Title missing')
+        return HttpResponseBadRequest("Title missing")
 
     slug = slugify(title)
 
     if not slug:
-        return HttpResponseBadRequest('Invalid title')
+        return HttpResponseBadRequest("Invalid title")
 
     plist, created = PodcastList.objects.get_or_create(
         user=request.user,
         slug=slug,
         defaults={
-            'id': uuid.uuid1(),
-            'title': title,
-            'slug': slug,
-            'created': datetime.utcnow(),
-            'modified': datetime.utcnow(),
+            "id": uuid.uuid1(),
+            "title": title,
+            "slug": slug,
+            "created": datetime.utcnow(),
+            "modified": datetime.utcnow(),
         },
     )
 
     if not created:
-        return HttpResponse('List already exists', status=409)
+        return HttpResponse("List already exists", status=409)
 
-    urls = parse_subscription(request.body.decode('utf-8'), format)
+    urls = parse_subscription(request.body.decode("utf-8"), format)
     podcasts = [Podcast.objects.get_or_create_for_url(url).object for url in urls]
 
     for podcast in podcasts:
         plist.add_entry(podcast)
 
     response = HttpResponse(status=201)
-    list_url = reverse('api-get-list', args=[request.user.username, slug, format])
-    response['Location'] = list_url
+    list_url = reverse("api-get-list", args=[request.user.username, slug, format])
+    response["Location"] = list_url
 
     return response
 
@@ -75,13 +75,13 @@ def _get_list_data(l, username, domain):
     return dict(
         title=l.title,
         name=l.slug,
-        web='http://%s%s' % (domain, reverse('list-show', args=[username, l.slug])),
+        web="http://%s%s" % (domain, reverse("list-show", args=[username, l.slug])),
     )
 
 
 @csrf_exempt
 @never_cache
-@allowed_methods(['GET'])
+@allowed_methods(["GET"])
 @cors_origin()
 def get_lists(request, username):
     """ Returns a list of all podcast lists by the given user """
@@ -104,7 +104,7 @@ def get_lists(request, username):
 @csrf_exempt
 @check_format
 @never_cache
-@allowed_methods(['GET', 'PUT', 'DELETE'])
+@allowed_methods(["GET", "PUT", "DELETE"])
 @cors_origin()
 def podcast_list(request, username, slug, format):
 
@@ -118,13 +118,13 @@ def get_list(request, plist, owner, format):
     """ Returns the contents of the podcast list """
 
     try:
-        scale = int(request.GET.get('scale_logo', 64))
+        scale = int(request.GET.get("scale_logo", 64))
     except (TypeError, ValueError):
-        return HttpResponseBadRequest('scale_logo has to be a numeric value')
+        return HttpResponseBadRequest("scale_logo has to be a numeric value")
 
     domain = RequestSite(request).domain
     p_data = lambda p: podcast_data(p, domain, scale)
-    title = '{title} by {username}'.format(title=plist.title, username=owner.username)
+    title = "{title} by {username}".format(title=plist.title, username=owner.username)
 
     objs = [entry.content_object for entry in plist.entries.all()]
 
@@ -133,8 +133,8 @@ def get_list(request, plist, owner, format):
         format,
         title,
         json_map=p_data,
-        jsonp_padding=request.GET.get('jsonp', ''),
-        xml_template='podcasts.xml',
+        jsonp_padding=request.GET.get("jsonp", ""),
+        xml_template="podcasts.xml",
         request=request,
     )
 
@@ -143,7 +143,7 @@ def get_list(request, plist, owner, format):
 @cors_origin()
 def update_list(request, plist, owner, format):
     """ Replaces the podcasts in the list and returns 204 No Content """
-    urls = parse_subscription(request.body.decode('utf-8'), format)
+    urls = parse_subscription(request.body.decode("utf-8"), format)
     podcasts = [Podcast.objects.get_or_create_for_url(url).object for url in urls]
     plist.set_entries(podcasts)
 

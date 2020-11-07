@@ -1,1 +1,1 @@
-default_app_config = 'mygpo.suggestions.apps.SuggestionsConfig'
+default_app_config = "mygpo.suggestions.apps.SuggestionsConfig"

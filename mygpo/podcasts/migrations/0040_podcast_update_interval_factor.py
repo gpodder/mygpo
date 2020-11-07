@@ -7,12 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [('podcasts', '0039_podcast_search_index_uptodate')]
+    dependencies = [("podcasts", "0039_podcast_search_index_uptodate")]
 
     operations = [
         migrations.AddField(
-            model_name='podcast',
-            name='update_interval_factor',
+            model_name="podcast",
+            name="update_interval_factor",
             field=models.FloatField(default=1),
         )
     ]

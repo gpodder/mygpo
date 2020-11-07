@@ -15,4 +15,4 @@ from django.apps import apps
 from django.utils.module_loading import import_string
 
 for m in apps.get_models():
-    import_string('{module}.{model}'.format(module=m.__module__, model=m.__name__))
+    import_string("{module}.{model}".format(module=m.__module__, model=m.__name__))

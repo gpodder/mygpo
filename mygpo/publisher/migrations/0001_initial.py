@@ -9,28 +9,28 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('podcasts', '__first__'),
+        ("podcasts", "__first__"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='PublishedPodcast',
+            name="PublishedPodcast",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.AutoField(
-                        verbose_name='ID',
+                        verbose_name="ID",
                         serialize=False,
                         auto_created=True,
                         primary_key=True,
                     ),
                 ),
                 (
-                    'podcast',
-                    models.ForeignKey(to='podcasts.Podcast', on_delete=models.CASCADE),
+                    "podcast",
+                    models.ForeignKey(to="podcasts.Podcast", on_delete=models.CASCADE),
                 ),
                 (
-                    'publisher',
+                    "publisher",
                     models.ForeignKey(
                         to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE
                     ),

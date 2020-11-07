@@ -17,9 +17,9 @@ logger = logging.getLogger(__name__)
 
 @celery.task(max_retries=5, default_retry_delay=60)
 def subscribe(podcast_pk, user_pk, client_uid, ref_url=None):
-    """ subscribes user to the current podcast on one client
+    """subscribes user to the current podcast on one client
 
-    Takes syned devices into account. """
+    Takes syned devices into account."""
     podcast = Podcast.objects.get(pk=podcast_pk)
 
     User = get_user_model()
@@ -38,9 +38,9 @@ def subscribe(podcast_pk, user_pk, client_uid, ref_url=None):
 
 @celery.task(max_retries=5, default_retry_delay=60)
 def unsubscribe(podcast_pk, user_pk, client_uid):
-    """ unsubscribes user from the current podcast on one client
+    """unsubscribes user from the current podcast on one client
 
-    Takes syned devices into account. """
+    Takes syned devices into account."""
     podcast = Podcast.objects.get(pk=podcast_pk)
 
     User = get_user_model()
@@ -92,10 +92,10 @@ def unsubscribe_all(podcast_pk, user_pk):
 
 @transaction.atomic
 def _perform_subscribe(podcast, user, clients, timestamp, ref_url):
-    """ Subscribes to a podcast on multiple clients
+    """Subscribes to a podcast on multiple clients
 
     Yields the clients on which a subscription was added, ie not those where
-    the subscription already existed. """
+    the subscription already existed."""
 
     for client in clients:
         subscription, created = Subscription.objects.get_or_create(
@@ -103,9 +103,9 @@ def _perform_subscribe(podcast, user, clients, timestamp, ref_url):
             client=client,
             podcast=podcast,
             defaults={
-                'ref_url': to_maxlength(Subscription, 'ref_url', ref_url),
-                'created': timestamp,
-                'modified': timestamp,
+                "ref_url": to_maxlength(Subscription, "ref_url", ref_url),
+                "created": timestamp,
+                "modified": timestamp,
             },
         )
 
@@ -113,7 +113,7 @@ def _perform_subscribe(podcast, user, clients, timestamp, ref_url):
             continue
 
         logger.info(
-            '{user} subscribed to {podcast} on {client}'.format(
+            "{user} subscribed to {podcast} on {client}".format(
                 user=user, podcast=podcast, client=client
             )
         )
@@ -131,10 +131,10 @@ def _perform_subscribe(podcast, user, clients, timestamp, ref_url):
 
 @transaction.atomic
 def _perform_unsubscribe(podcast, user, clients, timestamp):
-    """ Unsubscribes from a podcast on multiple clients
+    """Unsubscribes from a podcast on multiple clients
 
     Yields the clients on which a subscription was removed, ie not those where
-    the podcast was not subscribed. """
+    the podcast was not subscribed."""
 
     for client in clients:
 
@@ -148,7 +148,7 @@ def _perform_unsubscribe(podcast, user, clients, timestamp):
         subscription.delete()
 
         logger.info(
-            '{user} unsubscribed from {podcast} on {client}'.format(
+            "{user} unsubscribed from {podcast} on {client}".format(
                 user=user, podcast=podcast, client=client
             )
         )

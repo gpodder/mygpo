@@ -16,31 +16,31 @@ from mygpo.pubsub.models import HubSubscription, SubscriptionError
 logger = logging.getLogger(__name__)
 
 
-def subscribe(podcast, feedurl, huburl, base_url, mode='subscribe'):
+def subscribe(podcast, feedurl, huburl, base_url, mode="subscribe"):
     """ Subscribe to the feed at a Hub """
 
-    logger.info('subscribing for {feed} at {hub}'.format(feed=feedurl, hub=huburl))
-    verify = 'sync'
+    logger.info("subscribing for {feed} at {hub}".format(feed=feedurl, hub=huburl))
+    verify = "sync"
 
-    token_max_len = HubSubscription._meta.get_field('verify_token').max_length
+    token_max_len = HubSubscription._meta.get_field("verify_token").max_length
     subscription, created = HubSubscription.objects.get_or_create(
         topic_url=feedurl,
         defaults={
-            'verify_token': random_token(token_max_len),
-            'mode': '',
-            'podcast': podcast,
+            "verify_token": random_token(token_max_len),
+            "mode": "",
+            "podcast": podcast,
         },
     )
 
     if subscription.mode == mode:
         if subscription.verified:
-            logger.info('subscription already exists')
+            logger.info("subscription already exists")
             return
 
     else:
         logger.info(
-            'subscription exists but has wrong mode: '
-            + 'old: %(oldmode)s, new: %(newmode)s. Overwriting.'
+            "subscription exists but has wrong mode: "
+            + "old: %(oldmode)s, new: %(newmode)s. Overwriting."
             % dict(oldmode=subscription.mode, newmode=mode)
         )
 
@@ -57,7 +57,7 @@ def subscribe(podcast, feedurl, huburl, base_url, mode='subscribe'):
     }
 
     data = urllib.parse.urlencode(list(data.items()))
-    logger.debug('sending request: %s' % repr(data))
+    logger.debug("sending request: %s" % repr(data))
 
     resp = None
 
@@ -66,7 +66,7 @@ def subscribe(podcast, feedurl, huburl, base_url, mode='subscribe'):
 
     except urllib.error.HTTPError as e:
         if e.code != 204:  # we actually expect a 204 return code
-            msg = 'Could not send subscription to Hub: HTTP Error %d: %s' % (
+            msg = "Could not send subscription to Hub: HTTP Error %d: %s" % (
                 e.code,
                 e.reason,
             )
@@ -74,20 +74,20 @@ def subscribe(podcast, feedurl, huburl, base_url, mode='subscribe'):
             raise SubscriptionError(msg)
 
     except Exception as e:
-        msg = 'Could not send subscription to Hub: %s' % repr(e)
+        msg = "Could not send subscription to Hub: %s" % repr(e)
         logger.warning(msg)
         raise SubscriptionError(msg)
 
     if resp:
         status = resp.code
         if status != 204:
-            logger.warning('received incorrect status %d' % status)
-            raise SubscriptionError('Subscription has not been accepted by ' 'the Hub')
+            logger.warning("received incorrect status %d" % status)
+            raise SubscriptionError("Subscription has not been accepted by " "the Hub")
 
 
 def callback_url(feedurl, base_url):
-    callback = reverse('pubsub-subscribe')
-    param = urllib.parse.urlencode([('url', feedurl)])
-    return '{base}{callback}?{param}'.format(
+    callback = reverse("pubsub-subscribe")
+    param = urllib.parse.urlencode([("url", feedurl)])
+    return "{base}{callback}?{param}".format(
         base=base_url, callback=callback, param=param
     )

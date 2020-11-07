@@ -23,11 +23,11 @@ class PublishedPodcastManager(models.Manager):
 
             if new:
                 created += 1
-                logger.info('Created publisher permissions for %r on %r', user, podcast)
+                logger.info("Created publisher permissions for %r on %r", user, podcast)
             else:
                 existed += 1
                 logger.info(
-                    'Publisher permissions for %r on %r already exist', user, podcast
+                    "Publisher permissions for %r on %r already exist", user, podcast
                 )
 
         return created, existed
@@ -38,6 +38,6 @@ class PublishedPodcast(models.Model):
     podcast = models.ForeignKey(Podcast, on_delete=models.CASCADE)
 
     class Meta:
-        unique_together = (('publisher', 'podcast'),)
+        unique_together = (("publisher", "podcast"),)
 
     objects = PublishedPodcastManager()

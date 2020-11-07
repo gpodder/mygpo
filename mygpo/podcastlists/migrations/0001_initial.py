@@ -10,23 +10,23 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('contenttypes', '0001_initial'),
+        ("contenttypes", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='PodcastList',
+            name="PodcastList",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.UUIDField(max_length=32, serialize=False, primary_key=True),
                 ),
-                ('title', models.CharField(max_length=512)),
-                ('slug', models.SlugField(max_length=128)),
-                ('created', models.DateTimeField()),
-                ('modified', models.DateTimeField()),
+                ("title", models.CharField(max_length=512)),
+                ("slug", models.SlugField(max_length=128)),
+                ("created", models.DateTimeField()),
+                ("modified", models.DateTimeField()),
                 (
-                    'user',
+                    "user",
                     models.ForeignKey(
                         to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE
                     ),
@@ -36,33 +36,33 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.CreateModel(
-            name='PodcastListEntry',
+            name="PodcastListEntry",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.AutoField(
-                        verbose_name='ID',
+                        verbose_name="ID",
                         serialize=False,
                         auto_created=True,
                         primary_key=True,
                     ),
                 ),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('modified', models.DateTimeField(auto_now=True)),
-                ('order', models.PositiveSmallIntegerField()),
-                ('object_id', models.UUIDField(max_length=32)),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("modified", models.DateTimeField(auto_now=True)),
+                ("order", models.PositiveSmallIntegerField()),
+                ("object_id", models.UUIDField(max_length=32)),
                 (
-                    'content_type',
+                    "content_type",
                     models.ForeignKey(
-                        to='contenttypes.ContentType',
+                        to="contenttypes.ContentType",
                         on_delete=django.db.models.deletion.CASCADE,
                     ),
                 ),
                 (
-                    'podcastlist',
+                    "podcastlist",
                     models.ForeignKey(
-                        related_name='entries',
-                        to='podcastlists.PodcastList',
+                        related_name="entries",
+                        to="podcastlists.PodcastList",
                         on_delete=models.CASCADE,
                     ),
                 ),
@@ -71,12 +71,12 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.AlterUniqueTogether(
-            name='podcastlistentry',
+            name="podcastlistentry",
             unique_together=set(
-                [('podcastlist', 'order'), ('podcastlist', 'content_type', 'object_id')]
+                [("podcastlist", "order"), ("podcastlist", "content_type", "object_id")]
             ),
         ),
         migrations.AlterUniqueTogether(
-            name='podcastlist', unique_together=set([('user', 'slug')])
+            name="podcastlist", unique_together=set([("user", "slug")])
         ),
     ]

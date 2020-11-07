@@ -5,16 +5,16 @@ from django.db.models.signals import post_save
 
 def create_missing_profile(sender, **kwargs):
     """ Creates a UserProfile if a User doesn't have one """
-    user = kwargs['instance']
+    user = kwargs["instance"]
 
-    if not hasattr(user, 'profile'):
-        UserProfile = apps.get_model('users.UserProfile')
+    if not hasattr(user, "profile"):
+        UserProfile = apps.get_model("users.UserProfile")
         profile = UserProfile.objects.create(user=user)
         user.profile = profile
 
 
 class UsersConfig(AppConfig):
-    name = 'mygpo.users'
+    name = "mygpo.users"
     verbose_name = "Users and Clients"
 
     def ready(self):

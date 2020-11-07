@@ -9,24 +9,24 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('users', '0003_auto_20140718_1502'),
+        ("users", "0003_auto_20140718_1502"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='SyncGroup',
+            name="SyncGroup",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.AutoField(
-                        verbose_name='ID',
+                        verbose_name="ID",
                         serialize=False,
                         auto_created=True,
                         primary_key=True,
                     ),
                 ),
                 (
-                    'user',
+                    "user",
                     models.ForeignKey(
                         to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE
                     ),
@@ -36,23 +36,23 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.AddField(
-            model_name='client',
-            name='sync_group',
+            model_name="client",
+            name="sync_group",
             field=models.ForeignKey(
-                to='users.SyncGroup', null=True, on_delete=models.CASCADE
+                to="users.SyncGroup", null=True, on_delete=models.CASCADE
             ),
             preserve_default=True,
         ),
         migrations.AddField(
-            model_name='userprofile',
-            name='activation_key',
+            model_name="userprofile",
+            name="activation_key",
             field=models.CharField(max_length=32, null=True),
             preserve_default=True,
         ),
         migrations.AddField(
-            model_name='userprofile',
-            name='settings',
-            field=models.TextField(default='{}'),
+            model_name="userprofile",
+            name="settings",
+            field=models.TextField(default="{}"),
             preserve_default=True,
         ),
     ]

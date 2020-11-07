@@ -25,7 +25,7 @@ class UserpageView(View):
 
     @method_decorator(
         requires_token(
-            token_name='userpage_token', denied_template='userpage-denied.html'
+            token_name="userpage_token", denied_template="userpage-denied.html"
         )
     )
     def get(self, request, username):
@@ -36,21 +36,21 @@ class UserpageView(View):
         site = RequestSite(request)
 
         context = {
-            'page_user': user,
-            'site': site.domain,
-            'subscriptions_token': user.profile.get_token('subscriptions_token'),
-            'favorite_feeds_token': user.profile.get_token('favorite_feeds_token'),
-            'lists': self.get_podcast_lists(user),
-            'subscriptions': self.get_subscriptions(user),
-            'recent_episodes': last_played_episodes(user),
-            'seconds_played_total': seconds_played(user),
-            'seconds_played_month': seconds_played(user, month_ago),
-            'favorite_episodes': FavoriteEpisode.episodes_for_user(user),
-            'num_played_episodes_total': num_played_episodes(user),
-            'num_played_episodes_month': num_played_episodes(user, month_ago),
+            "page_user": user,
+            "site": site.domain,
+            "subscriptions_token": user.profile.get_token("subscriptions_token"),
+            "favorite_feeds_token": user.profile.get_token("favorite_feeds_token"),
+            "lists": self.get_podcast_lists(user),
+            "subscriptions": self.get_subscriptions(user),
+            "recent_episodes": last_played_episodes(user),
+            "seconds_played_total": seconds_played(user),
+            "seconds_played_month": seconds_played(user, month_ago),
+            "favorite_episodes": FavoriteEpisode.episodes_for_user(user),
+            "num_played_episodes_total": num_played_episodes(user),
+            "num_played_episodes_month": num_played_episodes(user, month_ago),
         }
 
-        return render(request, 'userpage.html', context)
+        return render(request, "userpage.html", context)
 
     def get_podcast_lists(self, user):
         return PodcastList.objects.filter(user=user)

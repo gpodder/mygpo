@@ -22,8 +22,8 @@ class Topics(object):
         categories = list(
             Category.objects.filter(num_entries__gt=0)
             .filter(tags__isnull=False)
-            .order_by('-modified')[: self.total]
-            .prefetch_related('tags')
+            .order_by("-modified")[: self.total]
+            .prefetch_related("tags")
         )
         self._categories = categories[: self.num_cat]
         self._tagcloud = sorted(
@@ -59,7 +59,7 @@ def update_category(podcast):
 
     try:
         category, created = Category.objects.get_or_create(
-            tags__tag=slugify(random_tag), defaults={'title': random_tag}
+            tags__tag=slugify(random_tag), defaults={"title": random_tag}
         )
 
     except IntegrityError as ie:
@@ -67,7 +67,7 @@ def update_category(podcast):
         # the exception message should be like:
         # IntegrityError: duplicate key value violates unique
         # constraint "categories_category_title_key"
-        if 'categories_category_title_key' not in str(ie):
+        if "categories_category_title_key" not in str(ie):
             raise
 
         category = Category.objects.get(title=random_tag)

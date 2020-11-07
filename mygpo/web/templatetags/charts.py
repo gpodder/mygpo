@@ -11,10 +11,10 @@ register = template.Library()
 @register.simple_tag
 def vertical_bar(value, max_value, display=None):
     if not max_value:
-        return ''
+        return ""
 
-    if display == 'ratio':
-        value_str = '%d/%d' % (value, max_value)
+    if display == "ratio":
+        value_str = "%d/%d" % (value, max_value)
     else:
         value_str = str(value)
 
@@ -24,14 +24,14 @@ def vertical_bar(value, max_value, display=None):
     try:
         ratio = min(float(value) / float(max_value), 1) * 100
     except ValueError:
-        return ''
+        return ""
 
     if ratio > 40:
-        left = format_html('<span>{}</span>', value_str)
-        right = ''
+        left = format_html("<span>{}</span>", value_str)
+        right = ""
     else:
-        left = format_html('&nbsp;')
-        right = format_html('<span>{}</span>', value_str)
+        left = format_html("&nbsp;")
+        right = format_html("<span>{}</span>", value_str)
 
     return format_html(
         '<div class="barbg"><div class="bar" '
@@ -47,24 +47,24 @@ def timeline(data):
     s = '<script type="text/javascript" src="//www.google.com/jsapi"></script>\n'
     s += '<script type="text/javascript">\n'
     s += 'google.load("visualization", "1", {"packages":["annotatedtimeline"]});\n'
-    s += 'google.setOnLoadCallback(drawChart);\n'
-    s += 'function drawChart() {\n'
-    s += 'var data = new google.visualization.DataTable();\n'
+    s += "google.setOnLoadCallback(drawChart);\n"
+    s += "function drawChart() {\n"
+    s += "var data = new google.visualization.DataTable();\n"
     s += 'data.addColumn("date", "Date");\n'
     s += 'data.addColumn("number", "Listeners");\n'
     s += 'data.addColumn("string", "title1");\n'
     s += 'data.addColumn("string", "text1");\n'
-    s += 'data.addRows([\n'
+    s += "data.addRows([\n"
 
     for r in data:
         if r.episode:
             episode = '"%s"' % r.episode.display_title
             episode_ = '"released"'
         else:
-            episode = 'undefined'
-            episode_ = 'undefined'
+            episode = "undefined"
+            episode_ = "undefined"
 
-        s += '[new Date(%d, %d, %d), %d, %s, %s],\n' % (
+        s += "[new Date(%d, %d, %d), %d, %s, %s],\n" % (
             r.date.year,
             r.date.month - 1,
             r.date.day,
@@ -73,10 +73,10 @@ def timeline(data):
             episode_,
         )
 
-    s += ']);\n'
+    s += "]);\n"
     s += 'var chart = new google.visualization.AnnotatedTimeLine(document.getElementById("chart_div"));\n'
-    s += 'chart.draw(data, {displayAnnotations: true});\n'
-    s += '}\n'
-    s += '</script>\n'
+    s += "chart.draw(data, {displayAnnotations: true});\n"
+    s += "}\n"
+    s += "</script>\n"
 
     return mark_safe(s)

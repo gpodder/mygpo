@@ -16,18 +16,18 @@ class Vote(UpdateInfoModel):
     content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
     # this should suit UUID and integer primary keys
     object_id = models.UUIDField()
-    content_object = GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey("content_type", "object_id")
 
     class Meta:
         unique_together = [
             # a user can only vote once per object
-            ('user', 'content_type', 'object_id')
+            ("user", "content_type", "object_id")
         ]
 
 
 class VoteMixin(models.Model):
 
-    votes = GenericRelation(Vote, related_query_name='votes')
+    votes = GenericRelation(Vote, related_query_name="votes")
 
     class Meta:
         abstract = True

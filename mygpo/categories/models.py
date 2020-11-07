@@ -12,10 +12,10 @@ class Category(UpdateInfoModel):
     num_entries = models.IntegerField()
 
     class Meta:
-        verbose_name = 'Category'
-        verbose_name_plural = 'Categories'
+        verbose_name = "Category"
+        verbose_name_plural = "Categories"
 
-        index_together = [('modified', 'num_entries')]
+        index_together = [("modified", "num_entries")]
 
     def save(self, *args, **kwargs):
         self.num_entries = self.entries.count()
@@ -23,11 +23,11 @@ class Category(UpdateInfoModel):
 
     @property
     def podcasts(self):
-        return self.entries.prefetch_related('podcast', 'podcast__slugs')
+        return self.entries.prefetch_related("podcast", "podcast__slugs")
 
     @property
     def clean_title(self):
-        return self.title.replace('\n', ' ')
+        return self.title.replace("\n", " ")
 
     @property
     def tag(self):
@@ -38,15 +38,15 @@ class CategoryEntry(UpdateInfoModel):
     """ A podcast in a category """
 
     category = models.ForeignKey(
-        Category, related_name='entries', on_delete=models.CASCADE
+        Category, related_name="entries", on_delete=models.CASCADE
     )
 
     podcast = models.ForeignKey(Podcast, on_delete=models.CASCADE)
 
     class Meta:
-        unique_together = [('category', 'podcast')]
+        unique_together = [("category", "podcast")]
 
-        index_together = [('category', 'modified')]
+        index_together = [("category", "modified")]
 
 
 class CategoryTag(models.Model):
@@ -54,5 +54,5 @@ class CategoryTag(models.Model):
     tag = models.SlugField(unique=True)
 
     category = models.ForeignKey(
-        Category, related_name='tags', on_delete=models.CASCADE
+        Category, related_name="tags", on_delete=models.CASCADE
     )

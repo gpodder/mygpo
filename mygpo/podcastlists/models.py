@@ -25,7 +25,7 @@ class PodcastList(UUIDModel, VoteMixin, UpdateInfoModel):
     class Meta:
         unique_together = [
             # a slug is unique for a user
-            ('user', 'slug')
+            ("user", "slug")
         ]
 
     @property
@@ -41,7 +41,7 @@ class PodcastList(UUIDModel, VoteMixin, UpdateInfoModel):
             podcastlist=self,
             content_type=ContentType.objects.get_for_model(obj),
             object_id=obj.id,
-            defaults={'order': self.max_order + 1},
+            defaults={"order": self.max_order + 1},
         )
 
     def set_entries(self, podcasts):
@@ -49,7 +49,7 @@ class PodcastList(UUIDModel, VoteMixin, UpdateInfoModel):
 
         existing = {e.content_object: e for e in self.entries.all()}
         set_ordered_entries(
-            self, podcasts, existing, PodcastListEntry, 'content_object', 'podcastlist'
+            self, podcasts, existing, PodcastListEntry, "content_object", "podcastlist"
         )
 
 
@@ -58,16 +58,16 @@ class PodcastListEntry(UpdateInfoModel, OrderedModel):
 
     # the list that the entry belongs to
     podcastlist = models.ForeignKey(
-        PodcastList, related_name='entries', on_delete=models.CASCADE
+        PodcastList, related_name="entries", on_delete=models.CASCADE
     )
 
     # the object (Podcast or PodcastGroup) that is in the list
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.UUIDField()
-    content_object = GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey("content_type", "object_id")
 
     class Meta(OrderedModel.Meta):
         unique_together = [
-            ('podcastlist', 'order'),
-            ('podcastlist', 'content_type', 'object_id'),
+            ("podcastlist", "order"),
+            ("podcastlist", "content_type", "object_id"),
         ]

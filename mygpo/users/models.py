@@ -20,7 +20,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-RE_DEVICE_UID = re.compile(r'^[\w.-]+$')
+RE_DEVICE_UID = re.compile(r"^[\w.-]+$")
 
 
 # TODO: derive from ValidationException?
@@ -32,15 +32,15 @@ class SubscriptionException(Exception):
     """ raised when a subscription can not be modified """
 
 
-GroupedDevices = collections.namedtuple('GroupedDevices', 'is_synced devices')
+GroupedDevices = collections.namedtuple("GroupedDevices", "is_synced devices")
 
 
 class UIDValidator(RegexValidator):
     """ Validates that the Device UID conforms to the given regex """
 
     regex = RE_DEVICE_UID
-    message = 'Invalid Device ID'
-    code = 'invalid-uid'
+    message = "Invalid Device ID"
+    code = "invalid-uid"
 
 
 class UserProxyQuerySet(models.QuerySet):
@@ -94,7 +94,7 @@ class UserProxy(DjangoUser):
         """ Returns groups of synced devices and a unsynced group """
 
         clients = Client.objects.filter(user=self, deleted=False).order_by(
-            '-sync_group'
+            "-sync_group"
         )
 
         last_group = object()
@@ -121,7 +121,7 @@ class UserProfile(TwitterModel):
 
     # the user to which this profile belongs
     user = models.OneToOneField(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile'
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile"
     )
 
     # if False, suggestions should be updated
@@ -158,7 +158,7 @@ class UserProfile(TwitterModel):
         """ returns a token """
 
         if token_name not in TOKEN_NAMES:
-            raise TokenException('Invalid token name %s' % token_name)
+            raise TokenException("Invalid token name %s" % token_name)
 
         return getattr(self, token_name)
 
@@ -166,7 +166,7 @@ class UserProfile(TwitterModel):
         """ resets a token """
 
         if token_name not in TOKEN_NAMES:
-            raise TokenException('Invalid token name %s' % token_name)
+            raise TokenException("Invalid token name %s" % token_name)
 
         setattr(self, token_name, random_token())
 
@@ -207,26 +207,26 @@ class SyncGroup(models.Model):
     @property
     def display_name(self):
         clients = self.client_set.all()
-        return ', '.join(client.display_name for client in clients)
+        return ", ".join(client.display_name for client in clients)
 
 
 class Client(UUIDModel, DeleteableModel):
     """ A client application """
 
-    DESKTOP = 'desktop'
-    LAPTOP = 'laptop'
-    MOBILE = 'mobile'
-    SERVER = 'server'
-    TABLET = 'tablet'
-    OTHER = 'other'
+    DESKTOP = "desktop"
+    LAPTOP = "laptop"
+    MOBILE = "mobile"
+    SERVER = "server"
+    TABLET = "tablet"
+    OTHER = "other"
 
     TYPES = (
-        (DESKTOP, _('Desktop')),
-        (LAPTOP, _('Laptop')),
-        (MOBILE, _('Cell phone')),
-        (SERVER, _('Server')),
-        (TABLET, _('Tablet')),
-        (OTHER, _('Other')),
+        (DESKTOP, _("Desktop")),
+        (LAPTOP, _("Laptop")),
+        (MOBILE, _("Cell phone")),
+        (SERVER, _("Server")),
+        (TABLET, _("Tablet")),
+        (OTHER, _("Other")),
     )
 
     # User-assigned ID; must be unique for the user
@@ -236,7 +236,7 @@ class Client(UUIDModel, DeleteableModel):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     # User-assigned name
-    name = models.CharField(max_length=100, default='New Device')
+    name = models.CharField(max_length=100, default="New Device")
 
     # one of several predefined types
     type = models.CharField(
@@ -251,14 +251,14 @@ class Client(UUIDModel, DeleteableModel):
     )
 
     class Meta:
-        unique_together = (('user', 'uid'),)
+        unique_together = (("user", "uid"),)
 
     @transaction.atomic
     def sync_with(self, other):
         """ Puts two devices in a common sync group"""
 
         if self.user != other.user:
-            raise ValueError('the devices do not belong to the user')
+            raise ValueError("the devices do not belong to the user")
 
         if (
             self.sync_group is not None
@@ -289,15 +289,15 @@ class Client(UUIDModel, DeleteableModel):
         """ Stop synchronisation with other clients """
         sg = self.sync_group
 
-        logger.info('Stopping synchronisation of %r', self)
+        logger.info("Stopping synchronisation of %r", self)
         self.sync_group = None
         self.save()
 
         clients = Client.objects.filter(sync_group=sg)
-        logger.info('%d other clients remaining in sync group', len(clients))
+        logger.info("%d other clients remaining in sync group", len(clients))
 
         if len(clients) < 2:
-            logger.info('Deleting sync group %r', sg)
+            logger.info("Deleting sync group %r", sg)
             for client in clients:
                 client.sync_group = None
                 client.save()
@@ -305,9 +305,9 @@ class Client(UUIDModel, DeleteableModel):
             sg.delete()
 
     def get_sync_targets(self):
-        """ Returns the devices and groups with which the device can be synced
+        """Returns the devices and groups with which the device can be synced
 
-        Groups are represented as lists of devices """
+        Groups are represented as lists of devices"""
 
         user = UserProxy.objects.from_user(self.user)
         for group in user.get_grouped_devices():
@@ -326,10 +326,10 @@ class Client(UUIDModel, DeleteableModel):
                         yield dev
 
     def get_subscribed_podcasts(self):
-        """ Returns all subscribed podcasts for the device
+        """Returns all subscribed podcasts for the device
 
         The attribute "url" contains the URL that was used when subscribing to
-        the podcast """
+        the podcast"""
         return Podcast.objects.filter(subscription__client=self)
 
     def synced_with(self):
@@ -343,14 +343,14 @@ class Client(UUIDModel, DeleteableModel):
         return self.name or self.uid
 
     def __str__(self):
-        return '{name} ({uid})'.format(name=self.name, uid=self.uid)
+        return "{name} ({uid})".format(name=self.name, uid=self.uid)
 
 
 TOKEN_NAMES = (
-    'subscriptions_token',
-    'favorite_feeds_token',
-    'publisher_update_token',
-    'userpage_token',
+    "subscriptions_token",
+    "favorite_feeds_token",
+    "publisher_update_token",
+    "userpage_token",
 )
 
 
@@ -366,8 +366,8 @@ class HistoryEntry(object):
 
         entry = HistoryEntry()
 
-        if 'timestamp' in action:
-            ts = action.pop('timestamp')
+        if "timestamp" in action:
+            ts = action.pop("timestamp")
             entry.timestamp = dateutil.parser.parse(ts)
 
         for key, value in action.items():
@@ -377,7 +377,7 @@ class HistoryEntry(object):
 
     @property
     def playmark(self):
-        return getattr(self, 'position', None)
+        return getattr(self, "position", None)
 
     @classmethod
     def fetch_data(cls, user, entries, podcasts=None, episodes=None):
@@ -385,41 +385,41 @@ class HistoryEntry(object):
 
         if podcasts is None:
             # load podcast data
-            podcast_ids = [getattr(x, 'podcast_id', None) for x in entries]
+            podcast_ids = [getattr(x, "podcast_id", None) for x in entries]
             podcast_ids = filter(None, podcast_ids)
             podcasts = Podcast.objects.filter(id__in=podcast_ids).prefetch_related(
-                'slugs'
+                "slugs"
             )
             podcasts = {podcast.id.hex: podcast for podcast in podcasts}
 
         if episodes is None:
             # load episode data
-            episode_ids = [getattr(x, 'episode_id', None) for x in entries]
+            episode_ids = [getattr(x, "episode_id", None) for x in entries]
             episode_ids = filter(None, episode_ids)
             episodes = (
                 Episode.objects.filter(id__in=episode_ids)
-                .select_related('podcast')
-                .prefetch_related('slugs', 'podcast__slugs')
+                .select_related("podcast")
+                .prefetch_related("slugs", "podcast__slugs")
             )
             episodes = {episode.id.hex: episode for episode in episodes}
 
         # load device data
         # does not need pre-populated data because no db-access is required
-        device_ids = [getattr(x, 'device_id', None) for x in entries]
+        device_ids = [getattr(x, "device_id", None) for x in entries]
         device_ids = filter(None, device_ids)
         devices = {client.id.hex: client for client in user.client_set.all()}
 
         for entry in entries:
-            podcast_id = getattr(entry, 'podcast_id', None)
+            podcast_id = getattr(entry, "podcast_id", None)
             entry.podcast = podcasts.get(podcast_id, None)
 
-            episode_id = getattr(entry, 'episode_id', None)
+            episode_id = getattr(entry, "episode_id", None)
             entry.episode = episodes.get(episode_id, None)
 
-            if hasattr(entry, 'user'):
+            if hasattr(entry, "user"):
                 entry.user = user
 
-            device = devices.get(getattr(entry, 'device_id', None), None)
+            device = devices.get(getattr(entry, "device_id", None), None)
             entry.device = device
 
         return entries

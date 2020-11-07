@@ -12,7 +12,7 @@ class CaseInsensitiveModelBackend(ModelBackend):
     def authenticate(self, request, username=None, password=None, **kwargs):
         UserModel = get_user_model()
         users = UserModel.objects.filter(username__iexact=username).order_by(
-            '-last_login'
+            "-last_login"
         )
         users = list(users)
         if len(users) == 0:
@@ -22,7 +22,7 @@ class CaseInsensitiveModelBackend(ModelBackend):
             return None
 
         if len(users) > 1:
-            logger.error('Login with non-unique username: %s', username)
+            logger.error("Login with non-unique username: %s", username)
 
         user = users[0]
         if user.check_password(password):

@@ -24,7 +24,7 @@ LIKE_BUTTON_STR = """<iframe class="fb_like" src="//www.facebook.com/plugins/lik
 @register.simple_tag
 @mark_safe
 def fb_like_episode(episode, podcast):
-    url = 'http://gpodder.net/%s' % get_episode_link_target(episode, podcast)
+    url = "http://gpodder.net/%s" % get_episode_link_target(episode, podcast)
     s = LIKE_BUTTON_STR % dict(url=url)
     return s
 
@@ -32,7 +32,7 @@ def fb_like_episode(episode, podcast):
 @register.filter
 @mark_safe
 def fb_like_podcast(podcast):
-    url = 'http://gpodder.net%s' % get_podcast_link_target(podcast)
+    url = "http://gpodder.net%s" % get_podcast_link_target(podcast)
     s = LIKE_BUTTON_STR % dict(url=url)
     return s
 
@@ -51,11 +51,11 @@ OPENGRAPH_STR = """
 def opengraph_episode(episode, podcast):
     s = OPENGRAPH_STR % dict(
         title=episode.title,
-        type='episode',
-        image='http://gpodder.net%s' % get_logo_url(podcast, PODCAST_LOGO_BIG_SIZE),
-        url='http://gpodder.net%s' % get_episode_link_target(episode, podcast),
-        site_name='gpodder.net',
-        admins='0',
+        type="episode",
+        image="http://gpodder.net%s" % get_logo_url(podcast, PODCAST_LOGO_BIG_SIZE),
+        url="http://gpodder.net%s" % get_episode_link_target(episode, podcast),
+        site_name="gpodder.net",
+        admins="0",
     )
     return s
 
@@ -64,10 +64,10 @@ def opengraph_episode(episode, podcast):
 def opengraph_podcast(podcast):
     s = OPENGRAPH_STR % dict(
         title=podcast.title,
-        type='episode',
-        image='http://gpodder.net%s' % get_logo_url(podcast, PODCAST_LOGO_BIG_SIZE),
-        url='http://gpodder.net%s' % get_podcast_link_target(podcast),
-        site_name='gpodder.net',
-        admins='0',
+        type="episode",
+        image="http://gpodder.net%s" % get_logo_url(podcast, PODCAST_LOGO_BIG_SIZE),
+        url="http://gpodder.net%s" % get_podcast_link_target(podcast),
+        site_name="gpodder.net",
+        admins="0",
     )
     return mark_safe(s)

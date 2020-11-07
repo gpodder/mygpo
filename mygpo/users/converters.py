@@ -1,5 +1,5 @@
 class UsernameConverter:
-    regex = r'[\w.+-]+'
+    regex = r"[\w.+-]+"
 
     def to_python(self, value):
         return value
@@ -9,7 +9,7 @@ class UsernameConverter:
 
 
 class ClientUIDConverter:
-    regex = r'[\w.-]+'
+    regex = r"[\w.-]+"
 
     def to_python(self, value):
         return value

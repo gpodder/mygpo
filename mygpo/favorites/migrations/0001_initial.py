@@ -10,39 +10,39 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('podcasts', '0023_auto_20140729_1711'),
+        ("podcasts", "0023_auto_20140729_1711"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='FavoriteEpisode',
+            name="FavoriteEpisode",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.AutoField(
-                        verbose_name='ID',
+                        verbose_name="ID",
                         serialize=False,
                         auto_created=True,
                         primary_key=True,
                     ),
                 ),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('modified', models.DateTimeField(auto_now=True)),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("modified", models.DateTimeField(auto_now=True)),
                 (
-                    'episode',
+                    "episode",
                     models.ForeignKey(
-                        to='podcasts.Episode',
+                        to="podcasts.Episode",
                         on_delete=django.db.models.deletion.PROTECT,
                     ),
                 ),
                 (
-                    'user',
+                    "user",
                     models.ForeignKey(
                         to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE
                     ),
                 ),
             ],
-            options={'abstract': False},
+            options={"abstract": False},
             bases=(models.Model,),
         )
     ]

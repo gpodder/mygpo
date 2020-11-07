@@ -26,6 +26,6 @@ class Chapter(UpdateInfoModel):
 
     class Meta:
         index_together = [
-            ('user', 'episode', 'created'),
-            ('episode', 'user', 'start', 'end'),
+            ("user", "episode", "created"),
+            ("episode", "user", "start", "end"),
         ]
