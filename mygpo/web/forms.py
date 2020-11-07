@@ -19,31 +19,31 @@ class UserAccountForm(forms.Form):
     """
 
     email = forms.EmailField(
-        label=_('E-Mail address'),
-        widget=forms.TextInput(attrs={'class': 'input input-sm form-control'}),
+        label=_("E-Mail address"),
+        widget=forms.TextInput(attrs={"class": "input input-sm form-control"}),
         required=True,
     )
 
     password_current = forms.CharField(
-        label=_('Current password'),
+        label=_("Current password"),
         widget=forms.PasswordInput(
-            render_value=False, attrs={'class': 'input input-sm form-control'}
+            render_value=False, attrs={"class": "input input-sm form-control"}
         ),
         required=False,
     )
 
     password1 = forms.CharField(
-        label=_('New password'),
+        label=_("New password"),
         widget=forms.PasswordInput(
-            render_value=False, attrs={'class': 'input input-sm form-control'}
+            render_value=False, attrs={"class": "input input-sm form-control"}
         ),
         required=False,
     )
 
     password2 = forms.CharField(
-        label=_('Confirm password'),
+        label=_("Confirm password"),
         widget=forms.PasswordInput(
-            render_value=False, attrs={'class': 'input input-sm form-control'}
+            render_value=False, attrs={"class": "input input-sm form-control"}
         ),
         required=False,
     )
@@ -52,15 +52,15 @@ class UserAccountForm(forms.Form):
         if not super(UserAccountForm, self).is_valid():
             return False
 
-        pw1 = self.cleaned_data['password1']
-        pw2 = self.cleaned_data['password2']
+        pw1 = self.cleaned_data["password1"]
+        pw2 = self.cleaned_data["password2"]
 
-        if self.cleaned_data['password_current'] or pw1 or pw2:
+        if self.cleaned_data["password_current"] or pw1 or pw2:
 
-            if self.cleaned_data['password_current'] == '':
+            if self.cleaned_data["password_current"] == "":
                 return False  # must give current password
 
-            if pw1 == '':
+            if pw1 == "":
                 return False  # cant set empty password
 
             if pw1 != pw2:
@@ -71,16 +71,16 @@ class UserAccountForm(forms.Form):
 
 class ProfileForm(forms.Form):
     twitter = forms.CharField(
-        label=_('Twitter'),
-        widget=forms.TextInput(attrs={'class': 'input input-sm form-control'}),
+        label=_("Twitter"),
+        widget=forms.TextInput(attrs={"class": "input input-sm form-control"}),
         required=False,
     )
 
     about = forms.CharField(
-        label=_('A few words about you'),
+        label=_("A few words about you"),
         required=False,
-        widget=forms.Textarea(attrs={'class': 'input input-sm form-control'}),
-        help_text='You can use Markdown',
+        widget=forms.Textarea(attrs={"class": "input input-sm form-control"}),
+        help_text="You can use Markdown",
     )
 
 
@@ -91,23 +91,23 @@ class DeviceForm(forms.Form):
 
     name = forms.CharField(
         max_length=100,
-        label=_('Name'),
+        label=_("Name"),
         widget=forms.TextInput(
-            attrs={'class': 'input input-sm form-control', 'placeholder': 'Device Name'}
+            attrs={"class": "input input-sm form-control", "placeholder": "Device Name"}
         ),
     )
     type = forms.ChoiceField(
         choices=Client.TYPES,
-        label=_('Type'),
-        widget=forms.Select(attrs={'class': 'input input-sm form-control'}),
+        label=_("Type"),
+        widget=forms.Select(attrs={"class": "input input-sm form-control"}),
     )
     uid = forms.CharField(
         max_length=50,
-        label=_('Device ID'),
+        label=_("Device ID"),
         widget=forms.TextInput(
             attrs={
-                'class': 'input input-sm form-control',
-                'placeholder': _('ID on device'),
+                "class": "input input-sm form-control",
+                "placeholder": _("ID on device"),
             }
         ),
     )
@@ -120,7 +120,7 @@ class PrivacyForm(forms.Form):
     """
 
     public = forms.BooleanField(
-        required=False, label=_('Share this subscription with other users (public)')
+        required=False, label=_("Share this subscription with other users (public)")
     )
 
 
@@ -130,12 +130,12 @@ class SyncForm(forms.Form):
     """
 
     targets = forms.CharField(
-        widget=forms.Select(attrs={'class': 'input input-sm form-control'})
+        widget=forms.Select(attrs={"class": "input input-sm form-control"})
     )
 
-    def set_targets(self, sync_targets, label=''):
+    def set_targets(self, sync_targets, label=""):
         targets = list(map(self.sync_target_choice, sync_targets))
-        self.fields['targets'] = forms.ChoiceField(choices=targets, label=label)
+        self.fields["targets"] = forms.ChoiceField(choices=targets, label=label)
 
     def sync_target_choice(self, target):
         """
@@ -151,7 +151,7 @@ class SyncForm(forms.Form):
             return (target.uid, target.name)
 
         elif isinstance(target, list):
-            return (target[0].uid, ', '.join(d.name for d in target))
+            return (target[0].uid, ", ".join(d.name for d in target))
 
     def get_target(self):
         """
@@ -159,26 +159,26 @@ class SyncForm(forms.Form):
         in the form.
         """
         if not self.is_valid():
-            logger.warning('no target given in SyncForm')
-            raise ValueError(_('No device selected'))
+            logger.warning("no target given in SyncForm")
+            raise ValueError(_("No device selected"))
 
-        target = self.cleaned_data['targets']
+        target = self.cleaned_data["targets"]
         return target
 
 
 class ResendActivationForm(forms.Form):
     username = forms.CharField(
-        max_length=100, label=_('Please enter your username'), required=False
+        max_length=100, label=_("Please enter your username"), required=False
     )
 
     email = forms.CharField(
         max_length=100,
-        label=_('or the email address used while registering'),
+        label=_("or the email address used while registering"),
         required=False,
     )
 
 
 class RestorePasswordForm(forms.Form):
-    username = forms.CharField(max_length=100, label=_('Username'), required=False)
+    username = forms.CharField(max_length=100, label=_("Username"), required=False)
 
-    email = forms.CharField(max_length=100, label=_('E-Mail address'), required=False)
+    email = forms.CharField(max_length=100, label=_("E-Mail address"), required=False)

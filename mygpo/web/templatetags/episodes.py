@@ -15,87 +15,87 @@ register = template.Library()
 @register.filter
 def episode_status_text(episode):
     if not episode or not episode.action:
-        return ''
+        return ""
 
-    if episode.action == 'new':
-        return _('New episode')
-    elif episode.action == 'download':
+    if episode.action == "new":
+        return _("New episode")
+    elif episode.action == "download":
         if episode.device.name:
-            return _('Downloaded to %s') % episode.device.name
+            return _("Downloaded to %s") % episode.device.name
         else:
-            return _('Downloaded')
-    elif episode.action == 'play':
+            return _("Downloaded")
+    elif episode.action == "play":
         if episode.device.name:
-            return _('Played on %s') % episode.device.name
+            return _("Played on %s") % episode.device.name
         else:
-            return _('Played')
-    elif episode.action == 'delete':
+            return _("Played")
+    elif episode.action == "delete":
         if episode.device.name:
-            return _('Deleted on %s') % episode.device.name
+            return _("Deleted on %s") % episode.device.name
         else:
-            return _('Deleted')
+            return _("Deleted")
 
-    return _('Unknown status')
+    return _("Unknown status")
 
 
 @register.filter()
 def episode_status_icon(action):
     if not action or not action.action:
         s = '<img src="%s" alt="nothing" title="%s" />' % (
-            staticfiles_storage.url('nothing.png'),
-            _('Unplayed episode'),
+            staticfiles_storage.url("nothing.png"),
+            _("Unplayed episode"),
         )
 
     else:
-        date_string = (_(' on %s') % (action.timestamp)) if action.timestamp else ''
-        device_string = (_(' on %s') % (action.client.name)) if action.client else ''
+        date_string = (_(" on %s") % (action.timestamp)) if action.timestamp else ""
+        device_string = (_(" on %s") % (action.client.name)) if action.client else ""
 
-        if action.action == 'flattr':
+        if action.action == "flattr":
             s = (
                 '<img src="https://flattr.com/_img/icons/flattr_logo_16.png" alt="flattr" title="%s" />'
                 % (_("The episode has been flattr'd"),)
             )
 
-        elif action.action == 'new':
+        elif action.action == "new":
             s = '<img src="%s" alt="new" title="%s" />' % (
-                staticfiles_storage.url('new.png'),
-                '%s%s%s'
-                % (_('This episode has been marked new'), date_string, device_string),
+                staticfiles_storage.url("new.png"),
+                "%s%s%s"
+                % (_("This episode has been marked new"), date_string, device_string),
             )
-        elif action.action == 'download':
+        elif action.action == "download":
             s = '<img src="%s" alt="downloaded" title="%s" />' % (
-                staticfiles_storage.url('download.png'),
-                '%s%s%s'
-                % (_('This episode has been downloaded'), date_string, device_string),
+                staticfiles_storage.url("download.png"),
+                "%s%s%s"
+                % (_("This episode has been downloaded"), date_string, device_string),
             )
-        elif action.action == 'play':
+        elif action.action == "play":
             if action.stopped is not None:
-                if getattr(action, 'started', None) is not None:
-                    playback_info = _(' from %(start)s to %(end)s') % {
-                        'start': utils.format_time(action.started),
-                        'end': utils.format_time(action.stopped),
+                if getattr(action, "started", None) is not None:
+                    playback_info = _(" from %(start)s to %(end)s") % {
+                        "start": utils.format_time(action.started),
+                        "end": utils.format_time(action.stopped),
                     }
                 else:
-                    playback_info = _(' to position %s') % (
+                    playback_info = _(" to position %s") % (
                         utils.format_time(action.stopped),
                     )
             else:
-                playback_info = ''
+                playback_info = ""
             s = '<img src="%s" alt="played" title="%s" />' % (
-                staticfiles_storage.url('playback.png'),
-                '%s%s%s%s'
+                staticfiles_storage.url("playback.png"),
+                "%s%s%s%s"
                 % (
-                    _('This episode has been played'),
+                    _("This episode has been played"),
                     date_string,
                     device_string,
                     playback_info,
                 ),
             )
-        elif action.action == 'delete':
+        elif action.action == "delete":
             s = '<img src="%s" alt="deleted" title="%s"/>' % (
-                staticfiles_storage.url('delete.png'),
-                '%s%s%s'
-                % (_('This episode has been deleted'), date_string, device_string),
+                staticfiles_storage.url("delete.png"),
+                "%s%s%s"
+                % (_("This episode has been deleted"), date_string, device_string),
             )
         else:
             return action.action  # this is not marked safe by intention
@@ -105,17 +105,17 @@ def episode_status_icon(action):
 
 @register.filter
 def is_image(episode):
-    mimetypes = episode.mimetypes.split(',')
-    return any(get_type(mimetype) == 'image' for mimetype in mimetypes)
+    mimetypes = episode.mimetypes.split(",")
+    return any(get_type(mimetype) == "image" for mimetype in mimetypes)
 
 
 class EpisodeLinkTargetNode(template.Node):
     """ Links to a (view of a) Podcast """
 
-    def __init__(self, episode, podcast, view_name='episode', add_args=[]):
+    def __init__(self, episode, podcast, view_name="episode", add_args=[]):
         self.episode = template.Variable(episode)
         self.podcast = template.Variable(podcast)
-        self.view_name = view_name.replace('"', '')
+        self.view_name = view_name.replace('"', "")
         self.add_args = [template.Variable(arg) for arg in add_args]
 
     def render(self, context):
@@ -131,7 +131,7 @@ class EpisodeLinkTargetNode(template.Node):
             tag_name = contents[0]
             episode = contents[1]
             podcast = contents[2]
-            view_name = contents[3] if len(contents) > 3 else 'episode'
+            view_name = contents[3] if len(contents) > 3 else "episode"
             add_args = contents[4:]
 
         except ValueError:
@@ -142,7 +142,7 @@ class EpisodeLinkTargetNode(template.Node):
         return EpisodeLinkTargetNode(episode, podcast, view_name, add_args)
 
 
-register.tag('episode_link_target', EpisodeLinkTargetNode.compile)
+register.tag("episode_link_target", EpisodeLinkTargetNode.compile)
 
 
 @register.simple_tag
@@ -151,10 +151,10 @@ def episode_link(episode, podcast, title=None):
 
     title = (
         title
-        or getattr(episode, 'display_title', None)
+        or getattr(episode, "display_title", None)
         or episode.get_short_title(podcast.common_episode_title)
         or episode.title
-        or _('Unknown Episode')
+        or _("Unknown Episode")
     )
 
     title = strip_tags(title)

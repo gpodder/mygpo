@@ -19,7 +19,7 @@ class Command(BaseCommand):
 
         if len(args) < 2:
             print(
-                'Usage: ./manage.py make-publisher <username> <podcast-url-1> [<podcast-url-2> ...]',
+                "Usage: ./manage.py make-publisher <username> <podcast-url-1> [<podcast-url-2> ...]",
                 file=sys.stderr,
             )
             return
@@ -29,7 +29,7 @@ class Command(BaseCommand):
         User = get_user_model()
         user = User.objects.get(username=username)
         if not user:
-            print('User %s does not exist' % username, file=sys.stderr)
+            print("User %s does not exist" % username, file=sys.stderr)
             return
 
         urls = args[1:]

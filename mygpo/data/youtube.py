@@ -16,13 +16,13 @@ def get_youtube_id(url):
         return None
 
     r = re.compile(
-        r'http://(?:[a-z]+\.)?youtube\.com/v/(.*)\.swf', re.IGNORECASE
+        r"http://(?:[a-z]+\.)?youtube\.com/v/(.*)\.swf", re.IGNORECASE
     ).match(url)
     if r is not None:
         return r.group(1)
 
     r = re.compile(
-        r'http://(?:[a-z]+\.)?youtube\.com/watch\?v=([^&]*)', re.IGNORECASE
+        r"http://(?:[a-z]+\.)?youtube\.com/watch\?v=([^&]*)", re.IGNORECASE
     ).match(url)
     if r is not None:
         return r.group(1)
@@ -33,10 +33,10 @@ def get_youtube_id(url):
 def get_real_cover(url):
     rs = [
         re.compile(
-            r'http://www\\.youtube\\.com/rss/user/([^/]+)/videos\\.rss', re.IGNORECASE
+            r"http://www\\.youtube\\.com/rss/user/([^/]+)/videos\\.rss", re.IGNORECASE
         ),
         re.compile(
-            r'http://www\\.youtube\\.com/profile_videos\\?user=([^\&]+)', re.IGNORECASE
+            r"http://www\\.youtube\\.com/profile_videos\\?user=([^\&]+)", re.IGNORECASE
         ),
     ]
 
@@ -45,9 +45,9 @@ def get_real_cover(url):
         if m is None:
             continue
         username = m.group(1)
-        api_url = 'http://gdata.youtube.com/feeds/api/users/%s?v=2' % username
+        api_url = "http://gdata.youtube.com/feeds/api/users/%s?v=2" % username
         data = urllib.request.urlopen(api_url).read()
-        match = re.search('<media:thumbnail url=[\'"]([^\'"]+)[\'"]/>', data)
+        match = re.search("<media:thumbnail url=['\"]([^'\"]+)['\"]/>", data)
         if match is not None:
             return match.group(1)
 

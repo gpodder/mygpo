@@ -22,12 +22,12 @@ def update_suggestions(user_pk, max_suggestions=15):
     User = get_user_model()
     user = User.objects.get(pk=user_pk)
 
-    logger.info('Updating suggestions of user {user.username}'.format(user=user))
+    logger.info("Updating suggestions of user {user.username}".format(user=user))
 
     # calculate possible suggestions
     subscribed_podcasts = [sp.podcast for sp in get_subscribed_podcasts(user)]
     logger.debug(
-        'Found {num_podcasts} subscribed podcasts'.format(
+        "Found {num_podcasts} subscribed podcasts".format(
             num_podcasts=len(subscribed_podcasts)
         )
     )
@@ -41,7 +41,7 @@ def update_suggestions(user_pk, max_suggestions=15):
     # get most relevant
     counter = Counter(related)
     logger.debug(
-        'Found {num_related} related podcasts'.format(num_related=len(counter))
+        "Found {num_related} related podcasts".format(num_related=len(counter))
     )
 
     suggested = [p for p, count in counter.most_common(max_suggestions)]
@@ -52,7 +52,7 @@ def update_suggestions(user_pk, max_suggestions=15):
         )
         if created:
             logger.info(
-                'Created suggestion for {podcast}'.format(podcast=suggested_podcast)
+                "Created suggestion for {podcast}".format(podcast=suggested_podcast)
             )
 
     user.profile.suggestions_up_to_date = True

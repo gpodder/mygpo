@@ -18,9 +18,9 @@ class SlugGenerator(object):
         return base_slug
 
     def __iter__(self):
-        """ Generates possible slugs
+        """Generates possible slugs
 
-        The consumer can can consume until it get's an unused one """
+        The consumer can can consume until it get's an unused one"""
 
         if self.obj.slug:
             # The object already has a slug
@@ -33,7 +33,7 @@ class SlugGenerator(object):
         yield str(self.base_slug)
 
         for n in count(1):
-            tmp_slug = '%s-%d' % (self.base_slug, n)
+            tmp_slug = "%s-%d" % (self.base_slug, n)
             # slugify returns SafeUnicode, we need a plain string
             yield str(tmp_slug)
 
@@ -57,7 +57,7 @@ class PodcastSlugs(PodcastGroupSlugs):
         if podcast.group_member_name:
             member_slug = slugify(podcast.group_member_name)
             if member_slug and not member_slug in base_slug:
-                base_slug = '%s-%s' % (base_slug, member_slug)
+                base_slug = "%s-%s" % (base_slug, member_slug)
 
         return base_slug
 

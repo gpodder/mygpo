@@ -19,16 +19,16 @@ from mygpo.podcasts.models import Podcast
 def get_accepted_lang(request):
     """ returns a list of language codes accepted by the HTTP request """
 
-    lang_str = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
-    lang_str = ''.join([c for c in lang_str if c in string.ascii_letters + ','])
-    langs = lang_str.split(',')
+    lang_str = request.META.get("HTTP_ACCEPT_LANGUAGE", "")
+    lang_str = "".join([c for c in lang_str if c in string.ascii_letters + ","])
+    langs = lang_str.split(",")
     langs = [s[:2] for s in langs]
     langs = list(map(str.strip, langs))
     langs = [_f for _f in langs if _f]
     return list(set(langs))
 
 
-RE_LANG = re.compile('^[a-zA-Z]{2}[-_]?.*$')
+RE_LANG = re.compile("^[a-zA-Z]{2}[-_]?.*$")
 
 
 def sanitize_language_code(lang):
@@ -99,7 +99,7 @@ def get_page_list(start, total, cur, show_max):
     ps = []
     if (cur - start) > show_max / 2:
         ps.extend(list(range(start, int(show_max / 4))))
-        ps.append('...')
+        ps.append("...")
         ps.extend(list(range(cur - int(show_max / 4), cur)))
 
     else:
@@ -111,7 +111,7 @@ def get_page_list(start, total, cur, show_max):
         # for the first pages, show more pages at the beginning
         add = math.ceil(show_max / 2 - len(ps))
         ps.extend(list(range(cur + 1, cur + int(show_max / 4) + add)))
-        ps.append('...')
+        ps.append("...")
         ps.extend(list(range(total - int(show_max / 4), total + 1)))
 
     else:
@@ -122,39 +122,39 @@ def get_page_list(start, total, cur, show_max):
 
 def process_lang_params(request):
 
-    lang = request.GET.get('lang', None)
+    lang = request.GET.get("lang", None)
 
     if lang is None:
         langs = get_accepted_lang(request)
-        lang = next(iter(langs), '')
+        lang = next(iter(langs), "")
 
     return sanitize_language_code(lang)
 
 
 def symbian_opml_changes(podcast):
-    podcast.description = podcast.display_title + '\n' + (podcast.description or '')
+    podcast.description = podcast.display_title + "\n" + (podcast.description or "")
     return podcast
 
 
 @never_cache
 def maintenance(request, *args, **kwargs):
-    resp = render(request, 'maintenance.html', {})
+    resp = render(request, "maintenance.html", {})
     resp.status_code = 503
     return resp
 
 
-def get_podcast_link_target(podcast, view_name='podcast', add_args=[]):
+def get_podcast_link_target(podcast, view_name="podcast", add_args=[]):
     """ Returns the link-target for a Podcast, preferring slugs over Ids """
 
     # we prefer slugs
     if podcast.slug:
         args = [podcast.slug]
-        view_name = '%s-slug' % view_name
+        view_name = "%s-slug" % view_name
 
     # as a fallback we use UUIDs
     else:
         args = [podcast.id]
-        view_name = '%s-id' % view_name
+        view_name = "%s-id" % view_name
 
     return reverse(view_name, args=args + add_args)
 
@@ -162,29 +162,29 @@ def get_podcast_link_target(podcast, view_name='podcast', add_args=[]):
 def get_podcast_group_link_target(group, view_name, add_args=[]):
     """ the link-target for a Podcast group, preferring slugs over Ids """
     args = [group.slug]
-    view_name = '%s-slug-id' % view_name
+    view_name = "%s-slug-id" % view_name
     return reverse(view_name, args=args + add_args)
 
 
-def get_episode_link_target(episode, podcast, view_name='episode', add_args=[]):
+def get_episode_link_target(episode, podcast, view_name="episode", add_args=[]):
     """ Returns the link-target for an Episode, preferring slugs over Ids """
 
     # prefer slugs
     if episode.slug:
         args = [podcast.slug, episode.slug]
-        view_name = '%s-slug' % view_name
+        view_name = "%s-slug" % view_name
 
     # fallback: UUIDs
     else:
         podcast = podcast or episode.podcast
         args = [podcast.id, episode.id]
-        view_name = '%s-id' % view_name
+        view_name = "%s-id" % view_name
 
     return strip_tags(reverse(view_name, args=args + add_args))
 
 
 # doesn't include the '@' because it's not stored as part of a twitter handle
-TWITTER_CHARS = string.ascii_letters + string.digits + '_'
+TWITTER_CHARS = string.ascii_letters + string.digits + "_"
 
 
 def normalize_twitter(s):
@@ -193,16 +193,16 @@ def normalize_twitter(s):
 
 
 CCLICENSE = re.compile(
-    r'https?://(www\.)?creativecommons.org/licenses/([a-z-]+)/([0-9.]+)?/?'
+    r"https?://(www\.)?creativecommons.org/licenses/([a-z-]+)/([0-9.]+)?/?"
 )
 CCPUBLICDOMAIN = re.compile(
-    r'https?://(www\.)?creativecommons.org/licenses/publicdomain/?'
+    r"https?://(www\.)?creativecommons.org/licenses/publicdomain/?"
 )
-LicenseInfo = collections.namedtuple('LicenseInfo', 'name version url')
+LicenseInfo = collections.namedtuple("LicenseInfo", "name version url")
 
 
 def license_info(license_url):
-    """ Extracts license information from the license URL
+    """Extracts license information from the license URL
 
     >>> i = license_info('http://creativecommons.org/licenses/by/3.0/')
     >>> i.name
@@ -245,11 +245,11 @@ def license_info(license_url):
     m = CCLICENSE.match(license_url)
     if m:
         _, name, version = m.groups()
-        return LicenseInfo('CC %s' % name.upper(), version, license_url)
+        return LicenseInfo("CC %s" % name.upper(), version, license_url)
 
     m = CCPUBLICDOMAIN.match(license_url)
     if m:
-        return LicenseInfo('Public Domain', None, license_url)
+        return LicenseInfo("Public Domain", None, license_url)
 
     return LicenseInfo(None, None, license_url)
 
@@ -257,7 +257,7 @@ def license_info(license_url):
 def check_restrictions(obj):
     """ checks for known restrictions of the object """
 
-    restrictions = obj.restrictions.split(',')
+    restrictions = obj.restrictions.split(",")
     if "hide" in restrictions:
         raise Http404
 
@@ -268,7 +268,7 @@ def check_restrictions(obj):
 
 
 def hours_to_str(hours_total):
-    """ returns a human-readable string representation of some hours
+    """returns a human-readable string representation of some hours
 
     >>> hours_to_str(1)
     '1 hour'
@@ -294,15 +294,15 @@ def hours_to_str(hours_total):
 
     if weeks:
         strs.append(
-            ngettext('%(weeks)d week', '%(weeks)d weeks', weeks) % {'weeks': weeks}
+            ngettext("%(weeks)d week", "%(weeks)d weeks", weeks) % {"weeks": weeks}
         )
 
     if days:
-        strs.append(ngettext('%(days)d day', '%(days)d days', days) % {'days': days})
+        strs.append(ngettext("%(days)d day", "%(days)d days", days) % {"days": days})
 
     if hours:
         strs.append(
-            ngettext('%(hours)d hour', '%(hours)d hours', hours) % {'hours': hours}
+            ngettext("%(hours)d hour", "%(hours)d hours", hours) % {"hours": hours}
         )
 
-    return ', '.join(strs)
+    return ", ".join(strs)

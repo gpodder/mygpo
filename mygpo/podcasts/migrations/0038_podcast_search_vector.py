@@ -8,12 +8,12 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [('podcasts', '0037_index_podcast_lastupdate')]
+    dependencies = [("podcasts", "0037_index_podcast_lastupdate")]
 
     operations = [
         migrations.AddField(
-            model_name='podcast',
-            name='search_vector',
+            model_name="podcast",
+            name="search_vector",
             field=SearchVectorField(null=True),
         )
     ]

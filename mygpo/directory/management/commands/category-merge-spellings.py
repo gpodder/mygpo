@@ -26,13 +26,13 @@ Usage:
 
         print("Adding new spellings for %s ..." % cat_name)
         category, created = Category.objects.get_or_create(
-            tags__tag=slugify(cat_name), defaults={'title': cat_name}
+            tags__tag=slugify(cat_name), defaults={"title": cat_name}
         )
 
         for spelling in spellings:
 
             tag, created = CategoryTag.objects.get_or_create(
-                tag=spelling, defaults={'category': category}
+                tag=spelling, defaults={"category": category}
             )
 
             if created:

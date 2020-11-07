@@ -11,10 +11,10 @@ logger = logging.getLogger(__name__)
 
 
 def get_subscribe_targets(podcast, user):
-    """ Clients / SyncGroup on which the podcast can be subscribed
+    """Clients / SyncGroup on which the podcast can be subscribed
 
     This excludes all devices/syncgroups on which the podcast is already
-    subscribed """
+    subscribed"""
 
     # django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet.
     from mygpo.users.models import Client
@@ -22,7 +22,7 @@ def get_subscribe_targets(podcast, user):
     clients = (
         Client.objects.filter(user=user)
         .exclude(subscription__podcast=podcast, subscription__user=user)
-        .select_related('sync_group')
+        .select_related("sync_group")
     )
 
     targets = set()
@@ -36,19 +36,19 @@ def get_subscribe_targets(podcast, user):
 
 
 def get_subscribed_podcasts(user, only_public=False):
-    """ Returns all subscribed podcasts for the user
+    """Returns all subscribed podcasts for the user
 
     The attribute "url" contains the URL that was used when subscribing to
-    the podcast """
+    the podcast"""
 
     # django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet.
     from mygpo.subscriptions.models import Subscription, SubscribedPodcast
 
     subscriptions = (
         Subscription.objects.filter(user=user)
-        .order_by('podcast')
-        .distinct('podcast')
-        .select_related('podcast')
+        .order_by("podcast")
+        .distinct("podcast")
+        .select_related("podcast")
     )
 
     # django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet.
@@ -74,7 +74,7 @@ def get_subscribed_podcasts(user, only_public=False):
 def get_subscription_history(
     user, client=None, since=None, until=None, public_only=False
 ):
-    """ Returns chronologically ordered subscription history entries
+    """Returns chronologically ordered subscription history entries
 
     Setting device_id restricts the actions to a certain device
     """
@@ -82,30 +82,30 @@ def get_subscription_history(
     # django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet.
     from mygpo.history.models import SUBSCRIPTION_ACTIONS, HistoryEntry
 
-    logger.info('Subscription History for {user}'.format(user=user.username))
+    logger.info("Subscription History for {user}".format(user=user.username))
     history = (
         HistoryEntry.objects.filter(user=user)
         .filter(action__in=SUBSCRIPTION_ACTIONS)
-        .order_by('timestamp')
+        .order_by("timestamp")
     )
 
     if client:
-        logger.info(u'... client {client_uid}'.format(client_uid=client.uid))
+        logger.info(u"... client {client_uid}".format(client_uid=client.uid))
         history = history.filter(client=client)
 
     if since:
-        logger.info('... since {since}'.format(since=since))
+        logger.info("... since {since}".format(since=since))
         history = history.filter(timestamp__gt=since)
 
     if until:
-        logger.info('... until {until}'.format(until=until))
+        logger.info("... until {until}".format(until=until))
         history = history.filter(timestamp__lte=until)
 
     if public_only:
         # django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet.
         from mygpo.usersettings.models import UserSettings
 
-        logger.info('... only public')
+        logger.info("... only public")
         private = UserSettings.objects.get_private_podcasts(user)
         history = history.exclude(podcast__in=private)
 
@@ -113,7 +113,7 @@ def get_subscription_history(
 
 
 def get_subscription_change_history(history):
-    """ Actions that added/removed podcasts from the subscription list
+    """Actions that added/removed podcasts from the subscription list
 
     Returns an iterator of all subscription actions that either
      * added subscribed a podcast that hasn't been subscribed directly

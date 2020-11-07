@@ -7,13 +7,13 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [('data', '0002_result_podcast_null')]
+    dependencies = [("data", "0002_result_podcast_null")]
 
     operations = [
         migrations.AddField(
-            model_name='podcastupdateresult',
-            name='podcast_url',
-            field=models.URLField(default='unknown', max_length=2048),
+            model_name="podcastupdateresult",
+            name="podcast_url",
+            field=models.URLField(default="unknown", max_length=2048),
             preserve_default=False,
         )
     ]

@@ -37,11 +37,11 @@ def show_list(request):
     subscriptionlist = create_subscriptionlist(request)
     return render(
         request,
-        'subscriptions.html',
+        "subscriptions.html",
         {
-            'subscriptionlist': subscriptionlist,
-            'url': current_site,
-            'podcast_ad': Podcast.objects.get_advertised_podcast(),
+            "subscriptionlist": subscriptionlist,
+            "url": current_site,
+            "podcast_ad": Podcast.objects.get_advertised_podcast(),
         },
     )
 
@@ -51,8 +51,8 @@ def show_list(request):
 @login_required
 def download_all(request):
     podcasts = get_subscribed_podcasts(request.user)
-    response = simple.format_podcast_list(podcasts, 'opml', request.user.username)
-    response['Content-Disposition'] = 'attachment; filename=all-subscriptions.opml'
+    response = simple.format_podcast_list(podcasts, "opml", request.user.username)
+    response["Content-Disposition"] = "attachment; filename=all-subscriptions.opml"
     return response
 
 
@@ -63,7 +63,7 @@ def create_subscriptionlist(request):
     subscriptions = (
         Subscription.objects.filter(user=user)
         .exclude(deleted=True)
-        .select_related('podcast', 'client')
+        .select_related("podcast", "client")
     )
 
     # grou clients by subscribed podcasts
@@ -73,29 +73,29 @@ def create_subscriptionlist(request):
 
         if not podcast in subscription_list:
             subscription_list[podcast] = {
-                'podcast': podcast,
-                'devices': [],
-                'episodes': podcast.episode_count,
+                "podcast": podcast,
+                "devices": [],
+                "episodes": podcast.episode_count,
             }
 
-        subscription_list[podcast]['devices'].append(subscription.client)
+        subscription_list[podcast]["devices"].append(subscription.client)
 
     # sort most recently updated podcast first
     subscriptions = subscription_list.values()
     now = datetime.utcnow()
-    sort_key = lambda s: s['podcast'].latest_episode_timestamp or now
+    sort_key = lambda s: s["podcast"].latest_episode_timestamp or now
     subscriptions = sorted(subscriptions, key=sort_key, reverse=True)
     return subscriptions
 
 
-@requires_token(token_name='subscriptions_token')
+@requires_token(token_name="subscriptions_token")
 def subscriptions_feed(request, username):
     # Create to feed manually so we can wrap the token-authentication around it
     f = SubscriptionsFeed(username)
     obj = f.get_object(request, username)
     feedgen = f.get_feed(obj, request)
     response = HttpResponse(content_type=feedgen.content_type)
-    feedgen.write(response, 'utf-8')
+    feedgen.write(response, "utf-8")
     return response
 
 
@@ -114,17 +114,17 @@ class SubscriptionsFeed(Feed):
         return user
 
     def title(self, user):
-        return _('%(username)s\'s Podcast Subscriptions on %(site)s') % dict(
+        return _("%(username)s's Podcast Subscriptions on %(site)s") % dict(
             username=user.username, site=self.site
         )
 
     def description(self, user):
         return _(
-            'Recent changes to %(username)s\'s podcast subscriptions on %(site)s'
+            "Recent changes to %(username)s's podcast subscriptions on %(site)s"
         ) % dict(username=user.username, site=self.site)
 
     def link(self, user):
-        return reverse('shared-subscriptions', args=[user.username])
+        return reverse("shared-subscriptions", args=[user.username])
 
     def items(self, user):
         history = get_subscription_history(user, public_only=True)
@@ -136,17 +136,17 @@ class SubscriptionsFeed(Feed):
         return user.username
 
     def author_link(self, user):
-        return reverse('shared-subscriptions', args=[user.username])
+        return reverse("shared-subscriptions", args=[user.username])
 
     # entry-specific data below
 
     description_template = "subscription-feed-description.html"
 
     def item_title(self, entry):
-        if entry.action == 'subscribe':
-            s = _('%(username)s subscribed to %(podcast)s (%(site)s)')
+        if entry.action == "subscribe":
+            s = _("%(username)s subscribed to %(podcast)s (%(site)s)")
         else:
-            s = _('%(username)s unsubscribed from %(podcast)s (%(site)s)')
+            s = _("%(username)s unsubscribed from %(podcast)s (%(site)s)")
 
         return s % dict(
             username=self.username, podcast=entry.podcast.display_title, site=self.site
@@ -160,36 +160,36 @@ class SubscriptionsFeed(Feed):
 
 
 @requires_token(
-    token_name='subscriptions_token', denied_template='user_subscriptions_denied.html'
+    token_name="subscriptions_token", denied_template="user_subscriptions_denied.html"
 )
 def for_user(request, username):
     User = get_user_model()
     user = get_object_or_404(User, username=username)
     subscriptions = get_subscribed_podcasts(user, only_public=True)
-    token = user.profile.get_token('subscriptions_token')
+    token = user.profile.get_token("subscriptions_token")
 
     return render(
         request,
-        'user_subscriptions.html',
-        {'subscriptions': subscriptions, 'other_user': user, 'token': token},
+        "user_subscriptions.html",
+        {"subscriptions": subscriptions, "other_user": user, "token": token},
     )
 
 
-@requires_token(token_name='subscriptions_token')
+@requires_token(token_name="subscriptions_token")
 def for_user_opml(request, username):
     User = get_user_model()
     user = get_object_or_404(User, username=username)
     subscriptions = get_subscribed_podcasts(user, only_public=True)
 
-    if parse_bool(request.GET.get('symbian', False)):
+    if parse_bool(request.GET.get("symbian", False)):
         subscriptions = map(symbian_opml_changes, [p.podcast for p in subscriptions])
 
     response = render(
         request,
-        'user_subscriptions.opml',
-        {'subscriptions': subscriptions, 'other_user': user},
+        "user_subscriptions.opml",
+        {"subscriptions": subscriptions, "other_user": user},
     )
-    response['Content-Disposition'] = (
-        'attachment; filename=%s-subscriptions.opml' % username
+    response["Content-Disposition"] = (
+        "attachment; filename=%s-subscriptions.opml" % username
     )
     return response

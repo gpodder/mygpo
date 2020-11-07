@@ -7,7 +7,7 @@ from mygpo.userfeeds.auth import require_token_auth
 from mygpo.userfeeds.feeds import FavoriteFeed
 
 
-@require_token_auth('favorite_feeds_token')
+@require_token_auth("favorite_feeds_token")
 def favorite_feed(request, username):
 
     site = RequestSite(request)
@@ -19,7 +19,7 @@ def favorite_feed(request, username):
 
     return render(
         request,
-        'userfeed.xml',
-        {'site': site, 'feed_user': user, 'feed': feed},
-        content_type='text/xml',
+        "userfeed.xml",
+        {"site": site, "feed_user": user, "feed": feed},
+        content_type="text/xml",
     )

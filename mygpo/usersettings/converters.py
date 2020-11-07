@@ -1,5 +1,5 @@
 class ScopeConverter:
-    regex = 'account|device|podcast|episode'
+    regex = "account|device|podcast|episode"
 
     def to_python(self, value):
         return value

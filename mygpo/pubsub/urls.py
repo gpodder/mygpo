@@ -4,5 +4,5 @@ from . import views
 
 
 urlpatterns = [
-    path('subscribe', views.SubscribeView.as_view(), name='pubsub-subscribe')
+    path("subscribe", views.SubscribeView.as_view(), name="pubsub-subscribe")
 ]

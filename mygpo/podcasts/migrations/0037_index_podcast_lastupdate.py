@@ -7,10 +7,10 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [('podcasts', '0036_related_podcasts')]
+    dependencies = [("podcasts", "0036_related_podcasts")]
 
     operations = [
         migrations.AlterIndexTogether(
-            name='podcast', index_together=set([('last_update',)])
+            name="podcast", index_together=set([("last_update",)])
         )
     ]

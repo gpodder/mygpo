@@ -38,16 +38,16 @@ def overview(request):
     # create a "default" device
     device = Client()
     device_form = DeviceForm(
-        {'name': device.name, 'type': device.type, 'uid': device.uid}
+        {"name": device.name, "type": device.type, "uid": device.uid}
     )
 
     return render(
         request,
-        'devicelist.html',
+        "devicelist.html",
         {
-            'device_groups': list(device_groups),
-            'deleted_devices': list(deleted_devices),
-            'device_form': device_form,
+            "device_groups": list(device_groups),
+            "deleted_devices": list(deleted_devices),
+            "device_form": device_form,
         },
     )
 
@@ -79,58 +79,58 @@ def show(request, device):
 
     sync_targets = list(device.get_sync_targets())
     sync_form = SyncForm()
-    sync_form.set_targets(sync_targets, _('Synchronize with the following devices'))
+    sync_form.set_targets(sync_targets, _("Synchronize with the following devices"))
 
     return render(
         request,
-        'device.html',
+        "device.html",
         {
-            'device': device,
-            'sync_form': sync_form,
-            'subscriptions': subscriptions,
-            'synced_with': synced_with,
-            'has_sync_targets': len(sync_targets) > 0,
+            "device": device,
+            "sync_form": sync_form,
+            "subscriptions": subscriptions,
+            "synced_with": synced_with,
+            "has_sync_targets": len(sync_targets) > 0,
         },
     )
 
 
 @login_required
 @never_cache
-@allowed_methods(['POST'])
+@allowed_methods(["POST"])
 def create(request):
     device_form = DeviceForm(request.POST)
 
     if not device_form.is_valid():
-        messages.error(request, _('Please fill out all fields.'))
-        return HttpResponseRedirect(reverse('devices'))
+        messages.error(request, _("Please fill out all fields."))
+        return HttpResponseRedirect(reverse("devices"))
 
     try:
         device = Client()
         device.user = request.user
         device.id = uuid.uuid1()
-        device.name = device_form.cleaned_data['name']
-        device.type = device_form.cleaned_data['type']
-        device.uid = device_form.cleaned_data['uid'].replace(' ', '-')
+        device.name = device_form.cleaned_data["name"]
+        device.type = device_form.cleaned_data["type"]
+        device.uid = device_form.cleaned_data["uid"].replace(" ", "-")
         device.full_clean()
         device.save()
-        messages.success(request, _('Device saved'))
+        messages.success(request, _("Device saved"))
 
     except ValidationError as e:
-        messages.error(request, '; '.join(e.messages))
-        return HttpResponseRedirect(reverse('devices'))
+        messages.error(request, "; ".join(e.messages))
+        return HttpResponseRedirect(reverse("devices"))
 
     except IntegrityError:
         messages.error(
             request, _("You can't use the same Device " "ID for two devices.")
         )
-        return HttpResponseRedirect(reverse('devices'))
+        return HttpResponseRedirect(reverse("devices"))
 
-    return HttpResponseRedirect(reverse('device-edit', args=[device.uid]))
+    return HttpResponseRedirect(reverse("device-edit", args=[device.uid]))
 
 
 @device_decorator
 @login_required
-@allowed_methods(['POST'])
+@allowed_methods(["POST"])
 def update(request, device):
     device_form = DeviceForm(request.POST)
 
@@ -139,12 +139,12 @@ def update(request, device):
     if device_form.is_valid():
 
         try:
-            device.name = device_form.cleaned_data['name']
-            device.type = device_form.cleaned_data['type']
-            device.uid = device_form.cleaned_data['uid'].replace(' ', '-')
+            device.name = device_form.cleaned_data["name"]
+            device.type = device_form.cleaned_data["type"]
+            device.uid = device_form.cleaned_data["uid"].replace(" ", "-")
             device.full_clean()
             device.save()
-            messages.success(request, _('Device updated'))
+            messages.success(request, _("Device updated"))
             uid = device.uid  # accept the new UID after rest has succeeded
 
         except ValidationError as e:
@@ -155,33 +155,33 @@ def update(request, device):
                 request, _("You can't use the same Device " "ID for two devices.")
             )
 
-    return HttpResponseRedirect(reverse('device-edit', args=[uid]))
+    return HttpResponseRedirect(reverse("device-edit", args=[uid]))
 
 
 @device_decorator
 @login_required
-@allowed_methods(['GET'])
+@allowed_methods(["GET"])
 def edit(request, device):
 
     device_form = DeviceForm(
-        {'name': device.name, 'type': device.type, 'uid': device.uid}
+        {"name": device.name, "type": device.type, "uid": device.uid}
     )
 
     synced_with = device.synced_with()
 
     sync_targets = list(device.get_sync_targets())
     sync_form = SyncForm()
-    sync_form.set_targets(sync_targets, _('Synchronize with the following devices'))
+    sync_form.set_targets(sync_targets, _("Synchronize with the following devices"))
 
     return render(
         request,
-        'device-edit.html',
+        "device-edit.html",
         {
-            'device': device,
-            'device_form': device_form,
-            'sync_form': sync_form,
-            'synced_with': synced_with,
-            'has_sync_targets': len(sync_targets) > 0,
+            "device": device,
+            "device_form": device_form,
+            "sync_form": sync_form,
+            "synced_with": synced_with,
+            "has_sync_targets": len(sync_targets) > 0,
         },
     )
 
@@ -190,20 +190,20 @@ def edit(request, device):
 @login_required
 def upload_opml(request, device):
 
-    if not 'opml' in request.FILES:
-        return HttpResponseRedirect(reverse('device-edit', args=[device.uid]))
+    if not "opml" in request.FILES:
+        return HttpResponseRedirect(reverse("device-edit", args=[device.uid]))
 
     try:
-        opml = request.FILES['opml'].read().decode('utf-8')
-        subscriptions = simple.parse_subscription(opml, 'opml')
+        opml = request.FILES["opml"].read().decode("utf-8")
+        subscriptions = simple.parse_subscription(opml, "opml")
         simple.set_subscriptions(subscriptions, request.user, device.uid, None)
 
     except (ValueError, ExpatError, UnicodeDecodeError) as ex:
-        msg = _('Could not upload subscriptions: {err}').format(err=str(ex))
+        msg = _("Could not upload subscriptions: {err}").format(err=str(ex))
         messages.error(request, msg)
-        return HttpResponseRedirect(reverse('device-edit', args=[device.uid]))
+        return HttpResponseRedirect(reverse("device-edit", args=[device.uid]))
 
-    return HttpResponseRedirect(reverse('device', args=[device.uid]))
+    return HttpResponseRedirect(reverse("device", args=[device.uid]))
 
 
 @device_decorator
@@ -211,10 +211,10 @@ def upload_opml(request, device):
 def opml(request, device):
     response = simple.format_podcast_list(
         simple.get_subscriptions(request.user, device.uid),
-        'opml',
+        "opml",
         request.user.username,
     )
-    response['Content-Disposition'] = 'attachment; filename=%s.opml' % device.uid
+    response["Content-Disposition"] = "attachment; filename=%s.opml" % device.uid
     return response
 
 
@@ -224,14 +224,14 @@ def symbian_opml(request, device):
     subscriptions = simple.get_subscriptions(request.user, device.uid)
     subscriptions = map(symbian_opml_changes, subscriptions)
 
-    response = simple.format_podcast_list(subscriptions, 'opml', request.user.username)
-    response['Content-Disposition'] = 'attachment; filename=%s.opml' % device.uid
+    response = simple.format_podcast_list(subscriptions, "opml", request.user.username)
+    response["Content-Disposition"] = "attachment; filename=%s.opml" % device.uid
     return response
 
 
 @device_decorator
 @login_required
-@allowed_methods(['POST'])
+@allowed_methods(["POST"])
 @transaction.atomic
 def delete(request, device):
     """ Mars a client as deleted, but does not permanently delete it """
@@ -246,14 +246,14 @@ def delete(request, device):
     device.deleted = True
     device.save()
 
-    return HttpResponseRedirect(reverse('devices'))
+    return HttpResponseRedirect(reverse("devices"))
 
 
 @login_required
 @device_decorator
 def delete_permanently(request, device):
     device.delete()
-    return HttpResponseRedirect(reverse('devices'))
+    return HttpResponseRedirect(reverse("devices"))
 
 
 @device_decorator
@@ -269,17 +269,17 @@ def undelete(request, device):
     device.deleted = False
     device.save()
 
-    return HttpResponseRedirect(reverse('device', args=[device.uid]))
+    return HttpResponseRedirect(reverse("device", args=[device.uid]))
 
 
 @device_decorator
 @login_required
-@allowed_methods(['POST'])
+@allowed_methods(["POST"])
 def sync(request, device):
 
     form = SyncForm(request.POST)
     if not form.is_valid():
-        return HttpResponseBadRequest('invalid')
+        return HttpResponseBadRequest("invalid")
 
     try:
         target_uid = form.get_target()
@@ -291,7 +291,7 @@ def sync(request, device):
 
     sync_user.delay(request.user.pk)
 
-    return HttpResponseRedirect(reverse('device', args=[device.uid]))
+    return HttpResponseRedirect(reverse("device", args=[device.uid]))
 
 
 @device_decorator
@@ -299,18 +299,18 @@ def sync(request, device):
 def resync(request, device):
     """ Manually triggers a re-sync of a client """
     sync_user.delay(request.user.pk)
-    messages.success(request, _('Your subscription will be updated in a moment.'))
-    return HttpResponseRedirect(reverse('device', args=[device.uid]))
+    messages.success(request, _("Your subscription will be updated in a moment."))
+    return HttpResponseRedirect(reverse("device", args=[device.uid]))
 
 
 @device_decorator
 @login_required
-@allowed_methods(['GET'])
+@allowed_methods(["GET"])
 def unsync(request, device):
     try:
         device.stop_sync()
 
     except ValueError as e:
-        messages.error(request, 'Could not unsync the device: {err}'.format(err=str(e)))
+        messages.error(request, "Could not unsync the device: {err}".format(err=str(e)))
 
-    return HttpResponseRedirect(reverse('device', args=[device.uid]))
+    return HttpResponseRedirect(reverse("device", args=[device.uid]))

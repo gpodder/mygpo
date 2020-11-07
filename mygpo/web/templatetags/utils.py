@@ -13,7 +13,7 @@ register = template.Library()
 
 @register.filter()
 def lookup(dic, key):
-    return dic.get(key, '')
+    return dic.get(key, "")
 
 
 @register.filter
@@ -66,7 +66,7 @@ def is_tuple(obj):
 def markdown(txt):
     import markdown2
 
-    return mark_safe(markdown2.markdown(txt, extras={'nofollow': True}))
+    return mark_safe(markdown2.markdown(txt, extras={"nofollow": True}))
 
 
 @register.filter()
@@ -84,7 +84,7 @@ def license_name(license_url):
     info = license_info(license_url)
 
     if info.name:
-        return '%s %s' % (info.name, info.version or '')
+        return "%s %s" % (info.name, info.version or "")
 
     return info.url
 
@@ -93,7 +93,7 @@ def license_name(license_url):
 def urlquote(s):
     """ makes urllib.quote_plus available as a template filter """
     if isinstance(s, str):
-        s = s.encode('utf-8')
+        s = s.encode("utf-8")
     return mark_safe(urllib.parse.quote_plus(s))
 
 
@@ -102,7 +102,7 @@ hours_to_str = register.filter(hours_to_str)
 
 @register.simple_tag
 def protocol(request):
-    return 'http{s}://'.format(s='s' if request.is_secure() else '')
+    return "http{s}://".format(s="s" if request.is_secure() else "")
 
 
 edit_link = register.simple_tag(edit_link)

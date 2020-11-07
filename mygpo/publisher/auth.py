@@ -10,12 +10,12 @@ def require_publisher(protected_view):
     def wrapper(request, *args, **kwargs):
 
         if not request.user.is_authenticated:
-            return HttpResponseRedirect('/login/')
+            return HttpResponseRedirect("/login/")
 
         if is_publisher(request.user):
             return protected_view(request, *args, **kwargs)
 
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect("/")
 
     return wrapper
 

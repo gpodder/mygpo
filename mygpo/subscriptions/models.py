@@ -34,16 +34,16 @@ class Subscription(DeleteableModel):
     modified = models.DateTimeField()
 
     class Meta:
-        unique_together = [['user', 'client', 'podcast']]
+        unique_together = [["user", "client", "podcast"]]
 
-        index_together = [['user', 'client'], ['podcast', 'user']]
+        index_together = [["user", "client"], ["podcast", "user"]]
 
     def __str__(self):
-        return '{user} subscribed to {podcast} on {client}'.format(
+        return "{user} subscribed to {podcast} on {client}".format(
             user=self.user, podcast=self.podcast, client=self.client
         )
 
 
 SubscribedPodcast = collections.namedtuple(
-    'SubscribedPodcast', 'podcast public ref_url'
+    "SubscribedPodcast", "podcast public ref_url"
 )

@@ -21,7 +21,7 @@ register = template.Library()
 @mark_safe
 def create_podcast_logo(podcast, size):
     if not podcast:
-        return ''
+        return ""
 
     size = int(size)
     return '<img src="%s" alt="" />' % (get_logo_url(podcast, size),)
@@ -44,15 +44,15 @@ def podcast_logo_medium(podcast):
 
 @register.filter()
 def podcast_status_icon(action):
-    s = ''
-    if action.action == 'subscribe':
-        s = '<img src="%s" />' % (staticfiles_storage.url('subscribe.png'),)
-    elif action.action == 'unsubscribe':
-        s = '<img src="%s" />' % (staticfiles_storage.url('unsubscribe.png'),)
-    elif action.action == 'flattr':
+    s = ""
+    if action.action == "subscribe":
+        s = '<img src="%s" />' % (staticfiles_storage.url("subscribe.png"),)
+    elif action.action == "unsubscribe":
+        s = '<img src="%s" />' % (staticfiles_storage.url("unsubscribe.png"),)
+    elif action.action == "flattr":
         s = '<img src="https://flattr.com/_img/icons/flattr_logo_16.png" />'
     else:
-        s = ''
+        s = ""
 
     return mark_safe(s)
 
@@ -70,7 +70,7 @@ class PodcastLinkTargetNode(template.Node):
 
     def __init__(self, podcast, view_name, add_args):
         self.podcast = template.Variable(podcast)
-        self.view_name = view_name.replace('"', '')
+        self.view_name = view_name.replace('"', "")
         self.add_args = [template.Variable(arg) for arg in add_args]
 
     def render(self, context):
@@ -84,7 +84,7 @@ class PodcastLinkTargetNode(template.Node):
             contents = token.split_contents()
             tag_name = contents[0]
             podcast = contents[1]
-            view_name = contents[2] if len(contents) > 2 else 'podcast'
+            view_name = contents[2] if len(contents) > 2 else "podcast"
             add_args = contents[3:]
 
         except ValueError:
@@ -95,7 +95,7 @@ class PodcastLinkTargetNode(template.Node):
         return PodcastLinkTargetNode(podcast, view_name, add_args)
 
 
-register.tag('podcast_link_target', PodcastLinkTargetNode.compile)
+register.tag("podcast_link_target", PodcastLinkTargetNode.compile)
 
 
 class PodcastGroupLinkTargetNode(template.Node):
@@ -103,7 +103,7 @@ class PodcastGroupLinkTargetNode(template.Node):
 
     def __init__(self, group, view_name, add_args):
         self.group = template.Variable(group)
-        self.view_name = view_name.replace('"', '')
+        self.view_name = view_name.replace('"', "")
         self.add_args = [template.Variable(arg) for arg in add_args]
 
     def render(self, context):
@@ -117,7 +117,7 @@ class PodcastGroupLinkTargetNode(template.Node):
             contents = token.split_contents()
             tag_name = contents[0]
             podcast = contents[1]
-            view_name = contents[2] if len(contents) > 2 else 'podcast'
+            view_name = contents[2] if len(contents) > 2 else "podcast"
             add_args = contents[3:]
 
         except ValueError:
@@ -128,14 +128,14 @@ class PodcastGroupLinkTargetNode(template.Node):
         return PodcastLinkTargetNode(podcast, view_name, add_args)
 
 
-register.tag('podcast_group_link_target', PodcastGroupLinkTargetNode.compile)
+register.tag("podcast_group_link_target", PodcastGroupLinkTargetNode.compile)
 
 
 @register.simple_tag
 def podcast_group_link(podcast, title=None):
-    """ Returns the link strings for Podcast and PodcastGroup objects
+    """Returns the link strings for Podcast and PodcastGroup objects
 
-    automatically distinguishes between relational Podcast/PodcastGroup """
+    automatically distinguishes between relational Podcast/PodcastGroup"""
 
     from mygpo.podcasts.models import PodcastGroup
 
@@ -145,8 +145,8 @@ def podcast_group_link(podcast, title=None):
         return podcast_link(podcast, title)
 
     links = (podcast_link(p, p.group_member_name) for p in podcasts)
-    link_text = ' '.join(links)
-    return '%(title)s (%(links)s)' % dict(title=podcast.title, links=link_text)
+    link_text = " ".join(links)
+    return "%(title)s (%(links)s)" % dict(title=podcast.title, links=link_text)
 
 
 @register.simple_tag

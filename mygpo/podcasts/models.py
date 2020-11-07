@@ -27,7 +27,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-GetCreateResult = collections.namedtuple('GetCreateResult', 'object created')
+GetCreateResult = collections.namedtuple("GetCreateResult", "object created")
 
 
 # default podcast update interval in hours
@@ -150,17 +150,17 @@ class MergedUUIDQuerySet(models.QuerySet):
 class TagsMixin(models.Model):
     """ Methods for working with Tag objects """
 
-    tags = GenericRelation('Tag', related_query_name='tags')
+    tags = GenericRelation("Tag", related_query_name="tags")
 
     class Meta:
         abstract = True
 
 
 class ScopedModel(models.Model):
-    """ A model that belongs to some scope, usually for limited uniqueness
+    """A model that belongs to some scope, usually for limited uniqueness
 
     scope does not allow null values, because null is not equal to null in SQL.
-    It could therefore not be used in unique constraints. """
+    It could therefore not be used in unique constraints."""
 
     # A slug / URL is unique within a scope; no two podcasts can have the same
     # URL (scope ''), and no two episdoes of the same podcast (scope =
@@ -173,14 +173,14 @@ class ScopedModel(models.Model):
     def get_default_scope(self):
         """ Returns the default scope of the object """
         raise NotImplementedError(
-            '{cls} should implement get_default_scope'.format(
+            "{cls} should implement get_default_scope".format(
                 cls=self.__class__.__name__
             )
         )
 
 
 class Slug(OrderedModel, ScopedModel):
-    """ Slug for any kind of Model
+    """Slug for any kind of Model
 
     Slugs are ordered, and the first slug is considered the canonical one.
     See also :class:`SlugsMixin`
@@ -191,22 +191,22 @@ class Slug(OrderedModel, ScopedModel):
     # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
     content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
     object_id = models.UUIDField()
-    content_object = GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey("content_type", "object_id")
 
     class Meta(OrderedModel.Meta):
         unique_together = (
             # a slug is unique per type; eg a podcast can have the same slug
             # as an episode, but no two podcasts can have the same slug
-            ('slug', 'scope'),
+            ("slug", "scope"),
             # slugs of an object must be ordered, so that no two slugs of one
             # object have the same order key
-            ('content_type', 'object_id', 'order'),
+            ("content_type", "object_id", "order"),
         )
 
-        index_together = [('slug', 'content_type')]
+        index_together = [("slug", "content_type")]
 
     def __repr__(self):
-        return '{cls}(slug={slug}, order={order}, content_object={obj}'.format(
+        return "{cls}(slug={slug}, order={order}, content_object={obj}".format(
             cls=self.__class__.__name__,
             slug=self.slug,
             order=self.order,
@@ -217,16 +217,16 @@ class Slug(OrderedModel, ScopedModel):
 class SlugsMixin(models.Model):
     """ Methods for working with Slug objects """
 
-    slugs = GenericRelation(Slug, related_query_name='slugs')
+    slugs = GenericRelation(Slug, related_query_name="slugs")
 
     class Meta:
         abstract = True
 
     @property
     def slug(self):
-        """ The main slug of the podcast
+        """The main slug of the podcast
 
-        TODO: should be retrieved from a (materialized) view """
+        TODO: should be retrieved from a (materialized) view"""
 
         # We could also use self.slugs.first() here, but this would result in a
         # different query and would render a .prefetch_related('slugs') useless
@@ -234,7 +234,7 @@ class SlugsMixin(models.Model):
         # fetching all won't hurt
         slugs = list(self.slugs.all())
         slug = slugs[0].slug if slugs else None
-        logger.debug('Found slugs %r, picking %r', slugs, slug)
+        logger.debug("Found slugs %r, picking %r", slugs, slug)
         return slug
 
     def add_slug(self, slug):
@@ -246,7 +246,7 @@ class SlugsMixin(models.Model):
         existing_slugs = self.slugs.all()
 
         # cut slug to the maximum allowed length
-        slug = utils.to_maxlength(Slug, 'slug', slug)
+        slug = utils.to_maxlength(Slug, "slug", slug)
 
         # check if slug already exists
         if slug in [s.slug for s in existing_slugs]:
@@ -277,14 +277,14 @@ class SlugsMixin(models.Model):
         ).delete()
 
     def set_slugs(self, slugs):
-        """ Update the object's slugs to the given list
+        """Update the object's slugs to the given list
 
         'slugs' should be a list of strings. Slugs that do not exist are
         created.  Existing slugs that are not in the 'slugs' list are
-        deleted. """
-        slugs = [utils.to_maxlength(Slug, 'slug', slug) for slug in slugs]
+        deleted."""
+        slugs = [utils.to_maxlength(Slug, "slug", slug) for slug in slugs]
         existing = {s.slug: s for s in self.slugs.all()}
-        utils.set_ordered_entries(self, slugs, existing, Slug, 'slug', 'content_object')
+        utils.set_ordered_entries(self, slugs, existing, Slug, "slug", "content_object")
 
 
 class PodcastGroup(UUIDModel, TitleModel, SlugsMixin):
@@ -293,7 +293,7 @@ class PodcastGroup(UUIDModel, TitleModel, SlugsMixin):
     @property
     def scope(self):
         """ A podcast group is always in the global scope """
-        return ''
+        return ""
 
     def subscriber_count(self):
         # this could be done directly in the DB
@@ -309,10 +309,10 @@ class PodcastQuerySet(MergedUUIDQuerySet):
     """ Custom queries for Podcasts """
 
     def random(self):
-        """ Random podcasts
+        """Random podcasts
 
         Excludes podcasts with missing title to guarantee some
-        minimum quality of the results """
+        minimum quality of the results"""
 
         # Using PostgreSQL's RANDOM() is very expensive, so we're generating a
         # random uuid and query podcasts with a higher ID
@@ -321,7 +321,7 @@ class PodcastQuerySet(MergedUUIDQuerySet):
         import uuid
 
         ruuid = uuid.uuid1()
-        return self.exclude(title='').filter(id__gt=ruuid)
+        return self.exclude(title="").filter(id__gt=ruuid)
 
     def license(self, license_url=None):
         """ Podcasts with any / the given license """
@@ -336,8 +336,8 @@ class PodcastQuerySet(MergedUUIDQuerySet):
             "last_update + (update_interval * "
             "update_interval_factor || ' hours')::INTERVAL"
         )
-        q = self.extra(select={'_next_update': NEXTUPDATE})
-        return q.order_by('_next_update')
+        q = self.extra(select={"_next_update": NEXTUPDATE})
+        return q.order_by("_next_update")
 
     @property
     def next_update(self):
@@ -357,7 +357,7 @@ class PodcastQuerySet(MergedUUIDQuerySet):
         if language:
             toplist = toplist.filter(language=language)
 
-        return toplist.order_by('-subscribers')
+        return toplist.order_by("-subscribers")
 
 
 class PodcastManager(GenericManager):
@@ -369,30 +369,30 @@ class PodcastManager(GenericManager):
     def get_advertised_podcast(self):
         """ Returns the currently advertised podcast """
         if settings.PODCAST_AD_ID:
-            podcast = cache.get('podcast_ad')
+            podcast = cache.get("podcast_ad")
             if podcast:
                 return podcast
 
             pk = uuid.UUID(settings.PODCAST_AD_ID)
             podcast = self.get_queryset().get(pk=pk)
-            cache.set('pocdast_ad', podcast)
+            cache.set("pocdast_ad", podcast)
             return podcast
 
     @transaction.atomic
     def get_or_create_for_url(self, url, defaults={}):
 
         if not url:
-            raise ValueError('The URL must not be empty')
+            raise ValueError("The URL must not be empty")
 
         # TODO: where to specify how uuid is created?
         import uuid
 
-        defaults.update({'id': uuid.uuid1()})
+        defaults.update({"id": uuid.uuid1()})
 
-        url = utils.to_maxlength(URL, 'url', url)
+        url = utils.to_maxlength(URL, "url", url)
         try:
             # try to fetch the podcast
-            podcast = Podcast.objects.get(urls__url=url, urls__scope='')
+            podcast = Podcast.objects.get(urls__url=url, urls__scope="")
             return GetCreateResult(podcast, False)
 
         except Podcast.DoesNotExist:
@@ -401,39 +401,39 @@ class PodcastManager(GenericManager):
                 with transaction.atomic():
                     podcast = Podcast.objects.create(**defaults)
                     url = URL.objects.create(
-                        url=url, order=0, scope='', content_object=podcast
+                        url=url, order=0, scope="", content_object=podcast
                     )
                     return GetCreateResult(podcast, True)
 
             # URL could not be created, so it was created since the first get
             except IntegrityError:
-                podcast = Podcast.objects.get(urls__url=url, urls__scope='')
+                podcast = Podcast.objects.get(urls__url=url, urls__scope="")
                 return GetCreateResult(podcast, False)
 
 
 class URL(OrderedModel, ScopedModel):
-    """ Podcasts and Episodes can have multiple URLs
+    """Podcasts and Episodes can have multiple URLs
 
-    URLs are ordered, and the first slug is considered the canonical one """
+    URLs are ordered, and the first slug is considered the canonical one"""
 
     url = models.URLField(max_length=2048)
 
     # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
     content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
     object_id = models.UUIDField()
-    content_object = GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey("content_type", "object_id")
 
     class Meta(OrderedModel.Meta):
         unique_together = (
             # a URL is unique per scope
-            ('url', 'scope'),
+            ("url", "scope"),
             # URLs of an object must be ordered, so that no two slugs of one
             # object have the same order key
-            ('content_type', 'object_id', 'order'),
+            ("content_type", "object_id", "order"),
         )
 
-        verbose_name = 'URL'
-        verbose_name_plural = 'URLs'
+        verbose_name = "URL"
+        verbose_name_plural = "URLs"
 
     def get_default_scope(self):
         return self.content_object.scope
@@ -442,7 +442,7 @@ class URL(OrderedModel, ScopedModel):
 class UrlsMixin(models.Model):
     """ Methods for working with URL objects """
 
-    urls = GenericRelation(URL, related_query_name='urls')
+    urls = GenericRelation(URL, related_query_name="urls")
 
     class Meta:
         abstract = True
@@ -458,9 +458,9 @@ class UrlsMixin(models.Model):
         return urls[0].url if urls else None
 
     def add_missing_urls(self, new_urls):
-        """ Adds missing URLS from new_urls
+        """Adds missing URLS from new_urls
 
-        The order of existing URLs is not changed  """
+        The order of existing URLs is not changed"""
         existing_urls = self.urls.all()
         next_order = max([-1] + [u.order for u in existing_urls]) + 1
         existing_urls = [u.url for u in existing_urls]
@@ -476,7 +476,7 @@ class UrlsMixin(models.Model):
                 next_order += 1
             except (IntegrityError, DataError) as ie:
                 err = str(ie)
-                logger.warning(u'Could not add URL: {0}'.format(err))
+                logger.warning(u"Could not add URL: {0}".format(err))
                 continue
 
     def set_url(self, url):
@@ -490,18 +490,18 @@ class UrlsMixin(models.Model):
         self.set_urls(urls)
 
     def set_urls(self, urls):
-        """ Update the object's URLS to the given list
+        """Update the object's URLS to the given list
 
         'urls' should be a list of strings. Slugs that do not exist are
         created.  Existing urls that are not in the 'urls' list are
-        deleted. """
-        urls = [utils.to_maxlength(URL, 'url', url) for url in urls]
+        deleted."""
+        urls = [utils.to_maxlength(URL, "url", url) for url in urls]
         existing = {u.url: u for u in self.urls.all()}
-        utils.set_ordered_entries(self, urls, existing, URL, 'url', 'content_object')
+        utils.set_ordered_entries(self, urls, existing, URL, "url", "content_object")
 
 
 class MergedUUID(models.Model):
-    """ If objects are merged their UUIDs are stored for later reference
+    """If objects are merged their UUIDs are stored for later reference
 
     see also :class:`MergedUUIDsMixin`
     """
@@ -511,17 +511,17 @@ class MergedUUID(models.Model):
     # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
     content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
     object_id = models.UUIDField()
-    content_object = GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey("content_type", "object_id")
 
     class Meta:
-        verbose_name = 'Merged UUID'
-        verbose_name_plural = 'Merged UUIDs'
+        verbose_name = "Merged UUID"
+        verbose_name_plural = "Merged UUIDs"
 
 
 class MergedUUIDsMixin(models.Model):
     """ Methods for working with MergedUUID objects """
 
-    merged_uuids = GenericRelation(MergedUUID, related_query_name='merged_uuids')
+    merged_uuids = GenericRelation(MergedUUID, related_query_name="merged_uuids")
 
     class Meta:
         abstract = True
@@ -556,10 +556,10 @@ class Podcast(
     group_member_name = models.CharField(max_length=30, null=True, blank=True)
 
     # if p1 is related to p2, p2 is also related to p1
-    related_podcasts = models.ManyToManyField('self', symmetrical=True, blank=True)
+    related_podcasts = models.ManyToManyField("self", symmetrical=True, blank=True)
 
     subscribers = models.PositiveIntegerField(default=0)
-    restrictions = models.CharField(max_length=20, null=False, blank=True, default='')
+    restrictions = models.CharField(max_length=20, null=False, blank=True, default="")
     common_episode_title = models.CharField(max_length=100, null=False, blank=True)
     new_location = models.URLField(max_length=1000, null=True, blank=True)
     latest_episode_timestamp = models.DateTimeField(null=True, blank=True)
@@ -587,7 +587,7 @@ class Podcast(
     objects = PodcastManager()
 
     class Meta:
-        index_together = [('last_update',)]
+        index_together = [("last_update",)]
 
     def subscriber_count(self):
         # TODO: implement
@@ -605,7 +605,7 @@ class Podcast(
         group2 = other.group
 
         if group1 and group2:
-            raise ValueError('both podcasts already are in different groups')
+            raise ValueError("both podcasts already are in different groups")
 
         elif not (group1 or group2):
             # Form a new group
@@ -655,7 +655,7 @@ class Podcast(
 
         # but consider only the part up to the first number. Otherwise we risk
         # removing part of the number (eg if a feed contains episodes 100-199)
-        common_title = re.search(r'^\D*', common_title).group(0)
+        common_title = re.search(r"^\D*", common_title).group(0)
 
         if len(common_title.strip()) < 2:
             return None
@@ -675,7 +675,7 @@ class Podcast(
     @property
     def scope(self):
         """ A podcast is always in the global scope """
-        return ''
+        return ""
 
     @property
     def as_scope(self):
@@ -690,14 +690,14 @@ class Podcast(
 
         if not self.url:
             logger.warning(
-                'Podcast with ID {podcast_id} does not have a URL'.format(
+                "Podcast with ID {podcast_id} does not have a URL".format(
                     podcast_id=self.id
                 )
             )
-            return _('Unknown Podcast')
+            return _("Unknown Podcast")
 
         return _(
-            'Unknown Podcast from {domain}'.format(domain=utils.get_domain(self.url))
+            "Unknown Podcast from {domain}".format(domain=utils.get_domain(self.url))
         )
 
     @property
@@ -717,7 +717,7 @@ class EpisodeQuerySet(MergedUUIDQuerySet):
         if language:
             toplist = toplist.filter(language=language)
 
-        return toplist.order_by('-listeners')
+        return toplist.order_by("-listeners")
 
 
 class EpisodeManager(GenericManager):
@@ -727,17 +727,17 @@ class EpisodeManager(GenericManager):
         return EpisodeQuerySet(self.model, using=self._db)
 
     def get_or_create_for_url(self, podcast, url, defaults={}):
-        """ Create an Episode for a given URL
+        """Create an Episode for a given URL
 
-        This is the only place where new episodes are created """
+        This is the only place where new episodes are created"""
 
         if not url:
-            raise ValueError('The URL must not be empty')
+            raise ValueError("The URL must not be empty")
 
         # TODO: where to specify how uuid is created?
         import uuid
 
-        url = utils.to_maxlength(URL, 'url', url)
+        url = utils.to_maxlength(URL, "url", url)
 
         try:
             url = URL.objects.get(url=url, scope=podcast.as_scope)
@@ -773,7 +773,7 @@ class EpisodeManager(GenericManager):
                     # recalculated when updating the podcast because counting
                     # episodes can be very slow for podcasts with many episodes
                     Podcast.objects.filter(pk=podcast.pk).update(
-                        episode_count=F('episode_count') + 1
+                        episode_count=F("episode_count") + 1
                     )
 
                     return GetCreateResult(episode, True)
@@ -819,15 +819,15 @@ class Episode(
     objects = EpisodeManager()
 
     class Meta:
-        ordering = ['-order', '-released']
+        ordering = ["-order", "-released"]
 
         index_together = [
-            ('podcast', 'outdated', 'released'),
-            ('podcast', 'released'),
-            ('released', 'podcast'),
+            ("podcast", "outdated", "released"),
+            ("podcast", "released"),
+            ("released", "podcast"),
             # index for typical episode toplist queries
-            ('language', 'listeners'),
-            ('podcast', 'order', 'released'),
+            ("language", "listeners"),
+            ("podcast", "order", "released"),
         ]
 
     @property
@@ -845,8 +845,8 @@ class Episode(
         if not self.title or not common_title:
             return None
 
-        title = self.title.replace(common_title, '').strip()
-        title = re.sub(r'^[\W\d]+', '', title)
+        title = self.title.replace(common_title, "").strip()
+        title = re.sub(r"^[\W\d]+", "", title)
         return title
 
     def get_episode_number(self, common_title):
@@ -854,8 +854,8 @@ class Episode(
         if not self.title or not common_title:
             return None
 
-        title = self.title.replace(common_title, '').strip()
-        match = re.search(r'^\W*(\d+)', title)
+        title = self.title.replace(common_title, "").strip()
+        match = re.search(r"^\W*(\d+)", title)
         if not match:
             return None
 
@@ -863,7 +863,7 @@ class Episode(
 
 
 class Tag(models.Model):
-    """ Tags any kind of Model
+    """Tags any kind of Model
 
     See also :class:`TagsMixin`
     """
@@ -872,7 +872,7 @@ class Tag(models.Model):
     DELICIOUS = 2
     USER = 4
 
-    SOURCE_CHOICES = ((FEED, 'Feed'), (DELICIOUS, 'delicious'), (USER, 'User'))
+    SOURCE_CHOICES = ((FEED, "Feed"), (DELICIOUS, "delicious"), (USER, "User"))
 
     tag = models.SlugField()
 
@@ -888,10 +888,10 @@ class Tag(models.Model):
     # see https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
     content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
     object_id = models.UUIDField()
-    content_object = GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey("content_type", "object_id")
 
     class Meta:
         unique_together = (
             # a tag can only be assigned once from one source to one item
-            ('tag', 'source', 'user', 'content_type', 'object_id'),
+            ("tag", "source", "user", "content_type", "object_id"),
         )

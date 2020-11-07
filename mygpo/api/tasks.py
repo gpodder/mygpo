@@ -11,7 +11,7 @@ logger = get_task_logger(__name__)
 @celery.task(max_retries=5, default_retry_delay=60)
 @close_connection
 def import_episode_actions(user, actions, upload_ts, ua_string):
-    logger.info('Importing %d tasks for user %s', len(actions), user)
+    logger.info("Importing %d tasks for user %s", len(actions), user)
     update_episodes(user, actions, upload_ts, ua_string)
 
 

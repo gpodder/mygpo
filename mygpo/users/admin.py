@@ -9,7 +9,7 @@ from mygpo.users.models import UserProfile, Client, SyncGroup
 class UserProfileInline(admin.StackedInline):
     model = UserProfile
     can_delete = False
-    verbose_name_plural = 'profile'
+    verbose_name_plural = "profile"
 
 
 # Define a new User admin
@@ -17,13 +17,13 @@ class UserAdmin(UserAdmin):
     inlines = (UserProfileInline,)
 
     list_display = (
-        'username',
-        'email',
-        'is_active',
-        'is_staff',
-        'is_superuser',
-        'date_joined',
-        'last_login',
+        "username",
+        "email",
+        "is_active",
+        "is_staff",
+        "is_superuser",
+        "date_joined",
+        "last_login",
     )
 
 
@@ -37,15 +37,15 @@ class ClientAdmin(admin.ModelAdmin):
     """ Admin page for clients """
 
     # configuration for the list view
-    list_display = ('name', 'user', 'uid', 'type')
+    list_display = ("name", "user", "uid", "type")
 
     # fetch the client's user for the fields in list_display
-    list_select_related = ('user',)
+    list_select_related = ("user",)
 
-    list_filter = ('type',)
-    search_fields = ('name', 'uid', 'user__username')
+    list_filter = ("type",)
+    search_fields = ("name", "uid", "user__username")
 
-    raw_id_fields = ('user',)
+    raw_id_fields = ("user",)
 
     show_full_result_count = False
 
@@ -54,7 +54,7 @@ class ClientAdmin(admin.ModelAdmin):
 class SyncGroupAdmin(admin.ModelAdmin):
     """ Admin page for SyncGroups """
 
-    list_display = ('user', 'num_clients')
+    list_display = ("user", "num_clients")
 
     def num_clients(self, group):
         """ Numer of clients that belong to this group """

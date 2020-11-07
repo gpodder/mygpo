@@ -65,12 +65,12 @@ def format_time(value):
     try:
         dt = datetime.utcfromtimestamp(value)
     except (ValueError, TypeError):
-        return ''
+        return ""
 
     if dt.hour == 0:
-        return dt.strftime('%M:%S')
+        return dt.strftime("%M:%S")
     else:
-        return dt.strftime('%H:%M:%S')
+        return dt.strftime("%H:%M:%S")
 
 
 def parse_time(value):
@@ -85,16 +85,16 @@ def parse_time(value):
     3910
     """
     if value is None:
-        raise ValueError('None value in parse_time')
+        raise ValueError("None value in parse_time")
 
     if isinstance(value, int):
         # Don't need to parse already-converted time value
         return value
 
-    if value == '':
-        raise ValueError('Empty valueing in parse_time')
+    if value == "":
+        raise ValueError("Empty valueing in parse_time")
 
-    for format in ('%H:%M:%S', '%M:%S'):
+    for format in ("%H:%M:%S", "%M:%S"):
         try:
             t = time.strptime(value, format)
             return t.tm_hour * 60 * 60 + t.tm_min * 60 + t.tm_sec
@@ -117,21 +117,21 @@ def parse_bool(val):
     """
     if isinstance(val, bool):
         return val
-    if val.lower() == 'true':
+    if val.lower() == "true":
         return True
     return False
 
 
-def progress(val, max_val, status_str='', max_width=50, stream=sys.stdout):
+def progress(val, max_val, status_str="", max_width=50, stream=sys.stdout):
 
     factor = float(val) / max_val if max_val > 0 else 0
 
     # progress as percentage
-    percentage_str = '{val:.2%}'.format(val=factor)
+    percentage_str = "{val:.2%}".format(val=factor)
 
     # progress bar filled with #s
     factor = min(int(factor * max_width), max_width)
-    progress_str = '#' * factor + ' ' * (max_width - factor)
+    progress_str = "#" * factor + " " * (max_width - factor)
 
     # insert percentage into bar
     percentage_start = int((max_width - len(percentage_str)) / 2)
@@ -141,10 +141,10 @@ def progress(val, max_val, status_str='', max_width=50, stream=sys.stdout):
         + progress_str[percentage_start + len(percentage_str) :]
     )
 
-    print('\r', end=' ', file=stream)
+    print("\r", end=" ", file=stream)
     print(
-        '[ %s ] %s / %s | %s' % (progress_str, val, max_val, status_str),
-        end=' ',
+        "[ %s ] %s / %s | %s" % (progress_str, val, max_val, status_str),
+        end=" ",
         file=stream,
     )
     stream.flush()
@@ -189,7 +189,7 @@ def parse_range(s, min, max, default=None):
 
 
 def get_timestamp(datetime_obj):
-    """ Returns the timestamp as an int for the given datetime object
+    """Returns the timestamp as an int for the given datetime object
 
     >>> get_timestamp(datetime(2011, 4, 7, 9, 30, 6))
     1302168606
@@ -200,11 +200,11 @@ def get_timestamp(datetime_obj):
     return int(time.mktime(datetime_obj.timetuple()))
 
 
-re_url = re.compile('^https?://')
+re_url = re.compile("^https?://")
 
 
 def is_url(string):
-    """ Returns true if a string looks like an URL
+    """Returns true if a string looks like an URL
 
     >>> is_url('http://example.com/some-path/file.xml')
     True
@@ -281,17 +281,17 @@ def url_add_authentication(url, username, password):
     >>> url_add_authentication('http://x.org/', 'a b', 'c d')
     'http://a%20b:c%20d@x.org/'
     """
-    if username is None or username == '':
+    if username is None or username == "":
         return url
 
     # Relaxations of the strict quoting rules (bug 1521):
     # 1. Accept '@' in username and password
     # 2. Acecpt ':' in password only
-    username = urllib.parse.quote(username, safe='@')
+    username = urllib.parse.quote(username, safe="@")
 
     if password is not None:
-        password = urllib.parse.quote(password, safe='@:')
-        auth_string = ':'.join((username, password))
+        password = urllib.parse.quote(password, safe="@:")
+        auth_string = ":".join((username, password))
     else:
         auth_string = username
 
@@ -299,7 +299,7 @@ def url_add_authentication(url, username, password):
 
     url_parts = list(urllib.parse.urlsplit(url))
     # url_parts[1] is the HOST part of the URL
-    url_parts[1] = '@'.join((auth_string, url_parts[1]))
+    url_parts[1] = "@".join((auth_string, url_parts[1]))
 
     return urllib.parse.urlunsplit(url_parts)
 
@@ -323,7 +323,7 @@ def urlopen(url, headers=None, data=None):
     else:
         headers = dict(headers)
 
-    headers.update({'User-agent': settings.USER_AGENT})
+    headers.update({"User-agent": settings.USER_AGENT})
     request = urllib.request.Request(url, data=data, headers=headers)
     return opener.open(request)
 
@@ -366,16 +366,16 @@ def username_password_from_url(url):
     (None, None)
     """
     if type(url) not in (str, str):
-        raise ValueError('URL has to be a string or unicode object.')
+        raise ValueError("URL has to be a string or unicode object.")
 
     (username, password) = (None, None)
 
     (scheme, netloc, path, params, query, fragment) = urllib.parse.urlparse(url)
 
-    if '@' in netloc:
-        (authentication, netloc) = netloc.rsplit('@', 1)
-        if ':' in authentication:
-            (username, password) = authentication.split(':', 1)
+    if "@" in netloc:
+        (authentication, netloc) = netloc.rsplit("@", 1)
+        if ":" in authentication:
+            (username, password) = authentication.split(":", 1)
 
             # RFC1738 dictates that we should not allow ['/', '@', ':']
             # characters in the username and password field (Section 3.1):
@@ -426,8 +426,8 @@ def url_strip_authentication(url):
     # url_parts[1] is the HOST part of the URL
 
     # Remove existing authentication data
-    if '@' in url_parts[1]:
-        url_parts[1] = url_parts[1].rsplit('@', 1)[1]
+    if "@" in url_parts[1]:
+        url_parts[1] = url_parts[1].rsplit("@", 1)[1]
 
     return urllib.parse.urlunsplit(url_parts)
 
@@ -441,7 +441,7 @@ def get_git_head():
 
     try:
         pr = subprocess.Popen(
-            '/usr/bin/git log -n 1 --oneline'.split(),
+            "/usr/bin/git log -n 1 --oneline".split(),
             cwd=settings.BASE_DIR,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -454,9 +454,9 @@ def get_git_head():
     if err:
         return None, None
 
-    outs = [o.decode('utf-8') for o in out.split()]
+    outs = [o.decode("utf-8") for o in out.split()]
     commit = outs[0]
-    msg = ' '.join(outs[1:])
+    msg = " ".join(outs[1:])
     return commit, msg
 
 
@@ -464,12 +464,12 @@ def parse_request_body(request):
     """ returns the parsed request body, handles gzip encoding """
 
     raw_body = request.body
-    content_enc = request.META.get('HTTP_CONTENT_ENCODING')
+    content_enc = request.META.get("HTTP_CONTENT_ENCODING")
 
-    if content_enc == 'gzip':
+    if content_enc == "gzip":
         raw_body = zlib.decompress(raw_body)
 
-    return json.loads(raw_body.decode('utf-8'))
+    return json.loads(raw_body.decode("utf-8"))
 
 
 def normalize_feed_url(url):
@@ -539,13 +539,13 @@ def normalize_feed_url(url):
     # keystrokes that you have to use.
     # Feel free to suggest other useful prefixes, and I'll add them here.
     PREFIXES = {
-        'fb:': 'http://feeds.feedburner.com/%s',
-        'yt:': 'http://www.youtube.com/rss/user/%s/videos.rss',
-        'sc:': 'http://soundcloud.com/%s',
-        'fm4od:': 'http://onapp1.orf.at/webcam/fm4/fod/%s.xspf',
+        "fb:": "http://feeds.feedburner.com/%s",
+        "yt:": "http://www.youtube.com/rss/user/%s/videos.rss",
+        "sc:": "http://soundcloud.com/%s",
+        "fm4od:": "http://onapp1.orf.at/webcam/fm4/fod/%s.xspf",
         # YouTube playlists. To get a list of playlists per-user, use:
         # https://gdata.youtube.com/feeds/api/users/<username>/playlists
-        'ytpl:': 'http://gdata.youtube.com/feeds/api/playlists/%s',
+        "ytpl:": "http://gdata.youtube.com/feeds/api/playlists/%s",
     }
 
     for prefix, expansion in PREFIXES.items():
@@ -554,8 +554,8 @@ def normalize_feed_url(url):
             break
 
     # Assume HTTP for URLs without scheme
-    if not '://' in url:
-        url = 'http://' + url
+    if not "://" in url:
+        url = "http://" + url
 
     scheme, netloc, path, query, fragment = urllib.parse.urlsplit(url)
 
@@ -563,21 +563,21 @@ def normalize_feed_url(url):
     scheme, netloc = scheme.lower(), netloc.lower()
 
     # encode non-encoded characters
-    path = urllib.parse.quote(path, '/%')
-    query = urllib.parse.quote_plus(query, ':&=')
+    path = urllib.parse.quote(path, "/%")
+    query = urllib.parse.quote_plus(query, ":&=")
 
     # Remove authentication to protect users' privacy
-    netloc = netloc.rsplit('@', 1)[-1]
+    netloc = netloc.rsplit("@", 1)[-1]
 
     # Normalize empty paths to "/"
-    if path == '':
-        path = '/'
+    if path == "":
+        path = "/"
 
     # feed://, itpc:// and itms:// are really http://
-    if scheme in ('feed', 'itpc', 'itms'):
-        scheme = 'http'
+    if scheme in ("feed", "itpc", "itms"):
+        scheme = "http"
 
-    if scheme not in ('http', 'https', 'ftp', 'file'):
+    if scheme not in ("http", "https", "ftp", "file"):
         return None
 
     # urlunsplit might return "a slighty different, but equivalent URL"
@@ -587,7 +587,7 @@ def normalize_feed_url(url):
 def edit_link(obj):
     """ Return the link to the Django Admin Edit page """
     return reverse(
-        'admin:%s_%s_change' % (obj._meta.app_label, obj._meta.model_name),
+        "admin:%s_%s_change" % (obj._meta.app_label, obj._meta.model_name),
         args=(obj.pk,),
     )
 
@@ -609,7 +609,7 @@ def to_maxlength(cls, field, val):
     if orig_length > max_length:
         val = val[:max_length]
         logger.warning(
-            '%s.%s length reduced from %d to %d',
+            "%s.%s length reduced from %d to %d",
             cls.__name__,
             field,
             orig_length,
@@ -620,7 +620,7 @@ def to_maxlength(cls, field, val):
 
 
 def get_domain(url):
-    """ Returns the domain name of a URL
+    """Returns the domain name of a URL
 
     >>> get_domain('http://example.com')
     'example.com'
@@ -630,7 +630,7 @@ def get_domain(url):
     """
     netloc = urllib.parse.urlparse(url).netloc
     try:
-        port_idx = netloc.index(':')
+        port_idx = netloc.index(":")
         return netloc[:port_idx]
 
     except ValueError:
@@ -640,48 +640,48 @@ def get_domain(url):
 def set_ordered_entries(
     obj, new_entries, existing, EntryClass, value_name, parent_name
 ):
-    """ Update the object's entries to the given list
+    """Update the object's entries to the given list
 
     'new_entries' should be a list of objects that are later wrapped in
     EntryClass instances. 'value_name' is the name of the EntryClass property
     that contains the values; 'parent_name' is the one that references obj.
 
     Entries that do not exist are created. Existing entries that are not in
-    'new_entries' are deleted. """
+    'new_entries' are deleted."""
 
-    logger.info('%d existing entries', len(existing))
+    logger.info("%d existing entries", len(existing))
 
-    logger.info('%d new entries', len(new_entries))
+    logger.info("%d new entries", len(new_entries))
 
     with transaction.atomic():
         max_order = max([s.order for s in existing.values()] + [len(new_entries)])
-        logger.info('Renumbering entries starting from %d', max_order + 1)
+        logger.info("Renumbering entries starting from %d", max_order + 1)
         for n, entry in enumerate(existing.values(), max_order + 1):
             entry.order = n
             entry.save()
 
-    logger.info('%d existing entries', len(existing))
+    logger.info("%d existing entries", len(existing))
 
     for n, entry in enumerate(new_entries):
         try:
             e = existing.pop(entry)
-            logger.info('Updating existing entry %d: %s', n, entry)
+            logger.info("Updating existing entry %d: %s", n, entry)
             e.order = n
             e.save()
         except KeyError:
-            logger.info('Creating new entry %d: %s', n, entry)
+            logger.info("Creating new entry %d: %s", n, entry)
             try:
                 links = {value_name: entry, parent_name: obj}
                 from mygpo.podcasts.models import ScopedModel
 
                 if issubclass(EntryClass, ScopedModel):
-                    links['scope'] = obj.scope
+                    links["scope"] = obj.scope
 
                 EntryClass.objects.create(order=n, **links)
             except IntegrityError as ie:
-                logger.warning('Could not create enry for %s: %s', obj, ie)
+                logger.warning("Could not create enry for %s: %s", obj, ie)
 
     with transaction.atomic():
         delete = [s.pk for s in existing.values()]
-        logger.info('Deleting %d entries', len(delete))
+        logger.info("Deleting %d entries", len(delete))
         EntryClass.objects.filter(id__in=delete).delete()

@@ -1,1 +1,1 @@
-default_app_config = 'mygpo.data.apps.DataAppConfig'
+default_app_config = "mygpo.data.apps.DataAppConfig"

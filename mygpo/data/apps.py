@@ -15,9 +15,9 @@ def update_podcast(sender, **kwargs):
 
 
 class DataAppConfig(AppConfig):
-    name = 'mygpo.data'
+    name = "mygpo.data"
 
     def ready(self):
         subscription_updated.connect(
-            update_podcast, dispatch_uid='update_podcast-pubsub'
+            update_podcast, dispatch_uid="update_podcast-pubsub"
         )

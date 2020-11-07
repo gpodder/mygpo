@@ -16,13 +16,13 @@ logger = logging.getLogger(__name__)
 class HistoryEntry(models.Model):
     """ A entry in the history """
 
-    SUBSCRIBE = 'subscribe'
-    UNSUBSCRIBE = 'unsubscribe'
-    FLATTR = 'flattr'
+    SUBSCRIBE = "subscribe"
+    UNSUBSCRIBE = "unsubscribe"
+    FLATTR = "flattr"
     PODCAST_ACTIONS = (
-        (SUBSCRIBE, 'subscribed'),
-        (UNSUBSCRIBE, 'unsubscribed'),
-        (FLATTR, 'flattr\'d'),
+        (SUBSCRIBE, "subscribed"),
+        (UNSUBSCRIBE, "unsubscribed"),
+        (FLATTR, "flattr'd"),
     )
 
     # the timestamp at which the event happened
@@ -46,9 +46,9 @@ class HistoryEntry(models.Model):
     )
 
     class Meta:
-        index_together = [['user', 'client'], ['user', 'podcast']]
+        index_together = [["user", "client"], ["user", "podcast"]]
 
-        ordering = ['-timestamp']
+        ordering = ["-timestamp"]
 
         verbose_name_plural = "History Entries"
 
@@ -58,17 +58,17 @@ SUBSCRIPTION_ACTIONS = (HistoryEntry.SUBSCRIBE, HistoryEntry.UNSUBSCRIBE)
 
 class EpisodeHistoryEntry(models.Model):
 
-    DOWNLOAD = 'download'
-    PLAY = 'play'
-    DELETE = 'delete'
-    NEW = 'new'
-    FLATTR = 'flattr'
+    DOWNLOAD = "download"
+    PLAY = "play"
+    DELETE = "delete"
+    NEW = "new"
+    FLATTR = "flattr"
     EPISODE_ACTIONS = (
-        (DOWNLOAD, 'downloaded'),
-        (PLAY, 'played'),
-        (DELETE, 'deleted'),
-        (NEW, 'marked as new'),
-        (FLATTR, 'flattr\'d'),
+        (DOWNLOAD, "downloaded"),
+        (PLAY, "played"),
+        (DELETE, "deleted"),
+        (NEW, "marked as new"),
+        (FLATTR, "flattr'd"),
     )
 
     # the timestamp at which the event happened (provided by the client)
@@ -111,21 +111,21 @@ class EpisodeHistoryEntry(models.Model):
 
     class Meta:
         index_together = [
-            ['user', 'client', 'episode', 'action', 'timestamp'],
+            ["user", "client", "episode", "action", "timestamp"],
             # see query in played_episode_counts()
-            ['user', 'action', 'episode'],
-            ['user', 'episode', 'timestamp'],
-            ['user', 'timestamp'],
-            ['episode', 'timestamp'],
+            ["user", "action", "episode"],
+            ["user", "episode", "timestamp"],
+            ["user", "timestamp"],
+            ["episode", "timestamp"],
         ]
 
-        ordering = ['-timestamp']
+        ordering = ["-timestamp"]
 
         verbose_name_plural = "Episode History Entries"
 
     def clean(self):
         """ Validates allowed combinations of time-values """
-        PLAY_ACTION_KEYS = ('started', 'stopped', 'total')
+        PLAY_ACTION_KEYS = ("started", "stopped", "total")
 
         # Key found, but must not be supplied (no play action!)
         if self.action != EpisodeHistoryEntry.PLAY:
@@ -137,13 +137,13 @@ class EpisodeHistoryEntry(models.Model):
         if (
             (self.started is not None) or (self.total is not None)
         ) and self.stopped is None:
-            raise ValidationError('started and total require position')
+            raise ValidationError("started and total require position")
 
         # Sanity check: total and playmark can only appear together
         if ((self.total is not None) or (self.started is not None)) and (
             (self.total is None) or (self.started is None)
         ):
-            raise ValidationError('total and started can only appear together')
+            raise ValidationError("total and started can only appear together")
 
     @classmethod
     def create_entry(
@@ -170,8 +170,8 @@ class EpisodeHistoryEntry(models.Model):
         ).exists()
         if exists:
             logger.warning(
-                'Trying to save duplicate {cls} for {user} '
-                '/ {episode}'.format(cls=cls, user=user, episode=episode)
+                "Trying to save duplicate {cls} for {user} "
+                "/ {episode}".format(cls=cls, user=user, episode=episode)
             )
             # if such an entry already exists, do nothing
             return
@@ -208,7 +208,7 @@ class EpisodeHistoryEntry(models.Model):
 
         except ValidationError as e:
             logger.warning(
-                'Validation of {cls} failed for {user}: {err}'.format(
+                "Validation of {cls} failed for {user}: {err}".format(
                     cls=cls, user=user, err=e
                 )
             )

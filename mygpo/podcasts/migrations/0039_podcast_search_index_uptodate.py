@@ -7,12 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [('podcasts', '0038_podcast_search_vector')]
+    dependencies = [("podcasts", "0038_podcast_search_vector")]
 
     operations = [
         migrations.AddField(
-            model_name='podcast',
-            name='search_index_uptodate',
+            model_name="podcast",
+            name="search_index_uptodate",
             field=models.BooleanField(db_index=True, default=False),
         )
     ]

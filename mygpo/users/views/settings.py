@@ -25,36 +25,36 @@ from mygpo.users.settings import PUBLIC_SUB_USER, PUBLIC_SUB_PODCAST
 @login_required
 @vary_on_cookie
 @cache_control(private=True)
-@allowed_methods(['GET', 'POST'])
+@allowed_methods(["GET", "POST"])
 def account(request):
 
-    if request.method == 'GET':
+    if request.method == "GET":
 
         site = RequestSite(request)
-        userpage_token = request.user.profile.get_token('userpage_token')
+        userpage_token = request.user.profile.get_token("userpage_token")
 
         profile_form = ProfileForm(
             {
-                'twitter': request.user.profile.twitter,
-                'about': request.user.profile.about,
+                "twitter": request.user.profile.twitter,
+                "about": request.user.profile.about,
             }
         )
 
         form = UserAccountForm(
             {
-                'email': request.user.email,
-                'public': request.user.profile.settings.get_wksetting(PUBLIC_SUB_USER),
+                "email": request.user.email,
+                "public": request.user.profile.settings.get_wksetting(PUBLIC_SUB_USER),
             }
         )
 
         return render(
             request,
-            'account.html',
+            "account.html",
             {
-                'site': site,
-                'form': form,
-                'profile_form': profile_form,
-                'userpage_token': userpage_token,
+                "site": site,
+                "form": form,
+                "profile_form": profile_form,
+                "userpage_token": userpage_token,
             },
         )
 
@@ -64,17 +64,17 @@ def account(request):
         if not form.is_valid():
             raise ValueError(
                 _(
-                    'Oops! Something went wrong. Please double-check the data you entered.'
+                    "Oops! Something went wrong. Please double-check the data you entered."
                 )
             )
 
-        if form.cleaned_data['password_current']:
-            if not request.user.check_password(form.cleaned_data['password_current']):
-                raise ValueError('Current password is incorrect')
+        if form.cleaned_data["password_current"]:
+            if not request.user.check_password(form.cleaned_data["password_current"]):
+                raise ValueError("Current password is incorrect")
 
-            request.user.set_password(form.cleaned_data['password1'])
+            request.user.set_password(form.cleaned_data["password1"])
 
-        request.user.email = form.cleaned_data['email']
+        request.user.email = form.cleaned_data["email"]
 
         try:
             request.user.save()
@@ -82,12 +82,12 @@ def account(request):
             # TODO: which exception?
             messages.error(request, str(ex))
 
-        messages.success(request, 'Account updated')
+        messages.success(request, "Account updated")
 
     except (ValueError, ValidationError) as e:
         messages.error(request, str(e))
 
-    return render(request, 'account.html', {'form': form})
+    return render(request, "account.html", {"form": form})
 
 
 class ProfileView(View):
@@ -101,17 +101,17 @@ class ProfileView(View):
         if not form.is_valid():
             raise ValueError(
                 _(
-                    'Oops! Something went wrong. Please double-check the data you entered.'
+                    "Oops! Something went wrong. Please double-check the data you entered."
                 )
             )
 
-        request.user.twitter = normalize_twitter(form.cleaned_data['twitter'])
-        request.user.about = strip_tags(form.cleaned_data['about'])
+        request.user.twitter = normalize_twitter(form.cleaned_data["twitter"])
+        request.user.about = strip_tags(form.cleaned_data["about"])
 
         request.user.save()
-        messages.success(request, _('Data updated'))
+        messages.success(request, _("Data updated"))
 
-        return HttpResponseRedirect(reverse('account') + '#profile')
+        return HttpResponseRedirect(reverse("account") + "#profile")
 
 
 class AccountRemoveGoogle(View):
@@ -121,23 +121,23 @@ class AccountRemoveGoogle(View):
     def post(self, request):
         request.user.google_email = None
         request.user.save()
-        messages.success(request, _('Your account has been disconnected'))
-        return HttpResponseRedirect(reverse('account'))
+        messages.success(request, _("Your account has been disconnected"))
+        return HttpResponseRedirect(reverse("account"))
 
 
 @login_required
 @never_cache
-@allowed_methods(['GET', 'POST'])
+@allowed_methods(["GET", "POST"])
 def delete_account(request):
 
-    if request.method == 'GET':
-        return render(request, 'delete_account.html')
+    if request.method == "GET":
+        return render(request, "delete_account.html")
 
     user = request.user
     user.is_active = False
     user.save()
     logout(request)
-    return render(request, 'deleted_account.html')
+    return render(request, "deleted_account.html")
 
 
 class DefaultPrivacySettings(View):
@@ -150,7 +150,7 @@ class DefaultPrivacySettings(View):
         settings = request.user.profile.settings
         settings.set_setting(PUBLIC_SUB_USER.name, self.public)
         settings.save()
-        return HttpResponseRedirect(reverse('privacy'))
+        return HttpResponseRedirect(reverse("privacy"))
 
 
 class PodcastPrivacySettings(View):
@@ -170,7 +170,7 @@ class PodcastPrivacySettings(View):
 
         settings.set_wksetting(PUBLIC_SUB_PODCAST, self.public)
         settings.save()
-        return HttpResponseRedirect(reverse('privacy'))
+        return HttpResponseRedirect(reverse("privacy"))
 
 
 @login_required
@@ -179,7 +179,7 @@ def privacy(request):
     site = RequestSite(request)
     user = request.user
 
-    podcasts = Podcast.objects.filter(subscription__user=user).distinct('pk')
+    podcasts = Podcast.objects.filter(subscription__user=user).distinct("pk")
     private = UserSettings.objects.get_private_podcasts(user)
 
     subscriptions = []
@@ -189,13 +189,13 @@ def privacy(request):
 
     return render(
         request,
-        'privacy.html',
+        "privacy.html",
         {
-            'private_subscriptions': not request.user.profile.settings.get_wksetting(
+            "private_subscriptions": not request.user.profile.settings.get_wksetting(
                 PUBLIC_SUB_USER
             ),
-            'subscriptions': subscriptions,
-            'domain': site.domain,
+            "subscriptions": subscriptions,
+            "domain": site.domain,
         },
     )
 
@@ -208,14 +208,14 @@ def share(request):
 
     user = request.user
 
-    if 'public_subscriptions' in request.GET:
-        user.profile.subscriptions_token = ''
+    if "public_subscriptions" in request.GET:
+        user.profile.subscriptions_token = ""
         user.profile.save()
 
-    elif 'private_subscriptions' in request.GET:
-        user.profile.create_new_token('subscriptions_token')
+    elif "private_subscriptions" in request.GET:
+        user.profile.create_new_token("subscriptions_token")
         user.profile.save()
 
-    token = user.profile.get_token('subscriptions_token')
+    token = user.profile.get_token("subscriptions_token")
 
-    return render(request, 'share.html', {'site': site, 'token': token})
+    return render(request, "share.html", {"site": site, "token": token})

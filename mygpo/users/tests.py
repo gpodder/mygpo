@@ -18,21 +18,21 @@ from mygpo.subscriptions.tasks import subscribe, unsubscribe
 
 class DeviceSyncTests(unittest.TestCase):
     def setUp(self):
-        self.user = UserProxy(username='test')
-        self.user.email = 'test@invalid.com'
-        self.user.set_password('secret!')
+        self.user = UserProxy(username="test")
+        self.user.email = "test@invalid.com"
+        self.user.set_password("secret!")
         self.user.save()
 
     def test_group(self):
-        dev1 = Client.objects.create(id=uuid.uuid1(), user=self.user, uid='d1')
-        dev2 = Client.objects.create(id=uuid.uuid1(), user=self.user, uid='d2')
+        dev1 = Client.objects.create(id=uuid.uuid1(), user=self.user, uid="d1")
+        dev2 = Client.objects.create(id=uuid.uuid1(), user=self.user, uid="d2")
 
         group = next(self.user.get_grouped_devices())
         self.assertEqual(group.is_synced, False)
         self.assertIn(dev1, group.devices)
         self.assertIn(dev2, group.devices)
 
-        dev3 = Client.objects.create(id=uuid.uuid1(), user=self.user, uid='d3')
+        dev3 = Client.objects.create(id=uuid.uuid1(), user=self.user, uid="d3")
 
         dev1.sync_with(dev3)
 
@@ -60,22 +60,22 @@ class DeviceSyncTests(unittest.TestCase):
 class UnsubscribeMergeTests(TestCase):
     """ Test if merged podcasts can be properly unsubscribed """
 
-    P2_URL = 'http://test.org/podcast/'
+    P2_URL = "http://test.org/podcast/"
 
     def setUp(self):
         self.podcast1 = Podcast.objects.get_or_create_for_url(
-            'http://example.com/feed.rss'
+            "http://example.com/feed.rss"
         ).object
 
         self.podcast2 = Podcast.objects.get_or_create_for_url(self.P2_URL).object
 
         User = get_user_model()
-        self.user = User(username='test-merge')
-        self.user.email = 'test@example.com'
-        self.user.set_password('secret!')
+        self.user = User(username="test-merge")
+        self.user.email = "test@example.com"
+        self.user.set_password("secret!")
         self.user.save()
 
-        self.device = get_device(self.user, 'dev', '')
+        self.device = get_device(self.user, "dev", "")
 
     def test_merge_podcasts(self):
         subscribe(self.podcast2.pk, self.user.pk, self.device.uid)
@@ -100,14 +100,14 @@ class AuthTests(TestCase):
     def setUp(self):
         self.user, pwd = create_user()
         self.client = TClient()
-        wrong_pwd = pwd + '1234'
+        wrong_pwd = pwd + "1234"
         self.extra = {
-            'HTTP_AUTHORIZATION': create_auth_string(self.user.username, wrong_pwd)
+            "HTTP_AUTHORIZATION": create_auth_string(self.user.username, wrong_pwd)
         }
 
     def test_queries_failed_auth(self):
         """ Verifies the number of queries that are executed on failed auth """
-        url = reverse('api-all-subscriptions', args=(self.user.username, 'opml'))
+        url = reverse("api-all-subscriptions", args=(self.user.username, "opml"))
         with self.assertNumQueries(1):
             resp = self.client.get(url, **self.extra)
         self.assertEqual(resp.status_code, 401, resp.content)

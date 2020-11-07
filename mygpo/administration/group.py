@@ -7,16 +7,16 @@ _SORT_KEY = lambda eps: eps[0].released or DEFAULT_RELEASE
 
 
 class PodcastGrouper(object):
-    """ Groups episodes of two podcasts based on certain features
+    """Groups episodes of two podcasts based on certain features
 
-    The results are sorted by release timestamp """
+    The results are sorted by release timestamp"""
 
     DEFAULT_RELEASE = datetime(1970, 1, 1)
 
     def __init__(self, podcasts):
 
         if not podcasts or (None in podcasts):
-            raise ValueError('podcasts must not be None')
+            raise ValueError("podcasts must not be None")
 
         self.podcasts = podcasts
 

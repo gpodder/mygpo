@@ -23,11 +23,11 @@ logger = logging.getLogger(__name__)
 
 
 IMG_PATH1 = os.path.abspath(
-    os.path.join(settings.BASE_DIR, '..', 'res', 'gpoddernet_228.png')
+    os.path.join(settings.BASE_DIR, "..", "res", "gpoddernet_228.png")
 )
 
 IMG_PATH2 = os.path.abspath(
-    os.path.join(settings.BASE_DIR, '..', 'res', 'gpoddernet_16.png')
+    os.path.join(settings.BASE_DIR, "..", "res", "gpoddernet_16.png")
 )
 
 
@@ -35,11 +35,11 @@ class SimpleWebTests(TestCase):
     @classmethod
     def setUpClass(self):
         User = get_user_model()
-        self.user = User(username='web-test', email='web-test@example.com')
-        self.user.set_password('pwd')
+        self.user = User(username="web-test", email="web-test@example.com")
+        self.user.set_password("pwd")
         self.user.save()
 
-        self.auth_string = create_auth_string('test', 'pwd')
+        self.auth_string = create_auth_string("test", "pwd")
 
     @classmethod
     def tearDownClass(self):
@@ -47,34 +47,34 @@ class SimpleWebTests(TestCase):
 
     def test_access_parameterless_pages(self):
         pages = [
-            'history',
-            'suggestions',
-            'tags',
-            'subscriptions',
-            'subscriptions-opml',
-            'favorites',
-            'account',
-            'privacy',
-            'delete-account',
-            'share',
-            'toplist',
-            'episode-toplist',
-            'devices',
-            'device-create',
-            'login',
-            'logout',
-            'home',
+            "history",
+            "suggestions",
+            "tags",
+            "subscriptions",
+            "subscriptions-opml",
+            "favorites",
+            "account",
+            "privacy",
+            "delete-account",
+            "share",
+            "toplist",
+            "episode-toplist",
+            "devices",
+            "device-create",
+            "login",
+            "logout",
+            "home",
         ]
 
         self.access_pages(pages, [], True)
 
     def test_access_podcast_pages(self):
-        pages = ['podcast']
+        pages = ["podcast"]
 
     def access_pages(self, pages, args, login):
         if login:
             self.client.post(
-                '/login/', dict(login_username=self.user.username, pwd='pwd')
+                "/login/", dict(login_username=self.user.username, pwd="pwd")
             )
 
         for page in pages:
@@ -88,11 +88,11 @@ class PodcastPageTests(TestCase):
     def setUp(self):
         # create a podcast and some episodes
         podcast = Podcast.objects.create(
-            id=uuid.uuid1(), title='My Podcast', max_episode_order=1
+            id=uuid.uuid1(), title="My Podcast", max_episode_order=1
         )
         for n in range(20):
             episode = Episode.objects.get_or_create_for_url(
-                podcast, 'http://www.example.com/episode%d.mp3' % (n,)
+                podcast, "http://www.example.com/episode%d.mp3" % (n,)
             ).object
 
             # we only need (the last) one
@@ -101,12 +101,12 @@ class PodcastPageTests(TestCase):
             )
 
         self.podcast_slug = Slug.objects.create(
-            content_object=podcast, order=n, scope=podcast.scope, slug='podcast'
+            content_object=podcast, order=n, scope=podcast.scope, slug="podcast"
         )
 
     def test_podcast_queries(self):
         """ Test that the expected number of queries is executed """
-        url = reverse('podcast-slug', args=(self.podcast_slug.slug,))
+        url = reverse("podcast-slug", args=(self.podcast_slug.slug,))
         # the number of queries must be independent of the number of episodes
 
         with self.assertNumQueries(5):
@@ -115,7 +115,7 @@ class PodcastPageTests(TestCase):
     def test_episode_queries(self):
         """ Test that the expected number of queries is executed """
         url = reverse(
-            'episode-slug', args=(self.podcast_slug.slug, self.episode_slug.slug)
+            "episode-slug", args=(self.podcast_slug.slug, self.episode_slug.slug)
         )
 
         with self.assertNumQueries(5):
@@ -125,9 +125,9 @@ class PodcastPageTests(TestCase):
 class PodcastLogoTests(TestCase):
     def setUp(self):
         # create a podcast
-        self.URL = 'http://example.com/{}.png'.format(uuid.uuid1().hex)
+        self.URL = "http://example.com/{}.png".format(uuid.uuid1().hex)
         self.podcast = Podcast.objects.create(
-            id=uuid.uuid1(), title='My Podcast', max_episode_order=1, logo_url=self.URL
+            id=uuid.uuid1(), title="My Podcast", max_episode_order=1, logo_url=self.URL
         )
         self.client = Client()
 
@@ -135,9 +135,9 @@ class PodcastLogoTests(TestCase):
         self.podcast.delete()
 
     def _save_logo(self):
-        with responses.RequestsMock() as rsps, open(IMG_PATH1, 'rb') as body:
+        with responses.RequestsMock() as rsps, open(IMG_PATH1, "rb") as body:
             rsps.add(
-                responses.GET, self.URL, status=200, body=body, content_type='image/png'
+                responses.GET, self.URL, status=200, body=body, content_type="image/png"
             )
 
             CoverArt.save_podcast_logo(self.URL)
@@ -147,9 +147,9 @@ class PodcastLogoTests(TestCase):
 
         response = self.client.get(logo_url)
         self.assertEqual(302, response.status_code)
-        redir = response['Location']
+        redir = response["Location"]
 
-        logger.warning('Redirecting to {}'.format(redir))
+        logger.warning("Redirecting to {}".format(redir))
 
         response = self.client.get(redir)
         self.assertEqual(200, response.status_code)
@@ -160,7 +160,7 @@ class PodcastLogoTests(TestCase):
         self._fetch_cover(self.podcast)
 
     def test_get_nonexisting(self):
-        URL = 'http://example.com/non-existing-logo.png'
+        URL = "http://example.com/non-existing-logo.png"
 
         self.podcast.logo_url = URL
 
@@ -170,10 +170,10 @@ class PodcastLogoTests(TestCase):
         self.assertEqual(404, response.status_code)
 
     def test_get_existing_thumbnail(self):
-        """ Retrieve an already existing thumbnail
+        """Retrieve an already existing thumbnail
 
         No distinction is visible outside, but it covers different
-        code paths """
+        code paths"""
 
         self._save_logo()
         logo_url = get_logo_url(self.podcast, 32)
@@ -190,7 +190,7 @@ class PodcastLogoTests(TestCase):
             CoverArt.save_podcast_logo(None)
         except:
             self.fail(
-                'CoverArt.save_podcast_logo(None) should not raise ' 'an exception'
+                "CoverArt.save_podcast_logo(None) should not raise " "an exception"
             )
 
     def test_exception_during_fetch(self):
@@ -198,7 +198,7 @@ class PodcastLogoTests(TestCase):
             rsps.add(
                 responses.GET,
                 self.URL,
-                body=requests.exceptions.RequestException('Fetching URL failed'),
+                body=requests.exceptions.RequestException("Fetching URL failed"),
             )
 
             CoverArt.save_podcast_logo(self.URL)
@@ -222,29 +222,29 @@ class PodcastLogoTests(TestCase):
         logo.LOGO_STORAGE = _logo_storage
 
     def test_new_logo(self):
-        with responses.RequestsMock() as rsps, open(IMG_PATH1, 'rb') as body1, open(
-            IMG_PATH1, 'rb'
-        ) as body2, open(IMG_PATH2, 'rb') as body3:
+        with responses.RequestsMock() as rsps, open(IMG_PATH1, "rb") as body1, open(
+            IMG_PATH1, "rb"
+        ) as body2, open(IMG_PATH2, "rb") as body3:
             rsps.add(
                 responses.GET,
                 self.URL,
                 status=200,
                 body=body1,
-                content_type='image/png',
+                content_type="image/png",
             )
             rsps.add(
                 responses.GET,
                 self.URL,
                 status=200,
                 body=body2,
-                content_type='image/png',
+                content_type="image/png",
             )
             rsps.add(
                 responses.GET,
                 self.URL,
                 status=200,
                 body=body3,
-                content_type='image/png',
+                content_type="image/png",
             )
 
             logo_url = get_logo_url(self.podcast, 32)
@@ -276,22 +276,22 @@ class PublisherPageTests(TestCase):
     @classmethod
     def setUpTestData(self):
         User = get_user_model()
-        self.user = User(username='web-test', email='web-test@example.com')
-        self.user.set_password('pwd')
+        self.user = User(username="web-test", email="web-test@example.com")
+        self.user.set_password("pwd")
         self.user.is_staff = True
         self.user.save()
 
     def test_publisher_detail_slug(self):
         # create a podcast with slug
         podcast = Podcast.objects.get_or_create_for_url(
-            'http://example.com/podcast.rss'
+            "http://example.com/podcast.rss"
         ).object
-        slug = 'test'
+        slug = "test"
         podcast.set_slug(slug)
 
-        url = reverse('podcast-publisher-detail-slug', args=(slug,))
+        url = reverse("podcast-publisher-detail-slug", args=(slug,))
 
-        self.client.login(username='web-test', password='pwd')
+        self.client.login(username="web-test", password="pwd")
 
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
@@ -299,12 +299,12 @@ class PublisherPageTests(TestCase):
     def test_publisher_detail_id(self):
         # create a podcast with no slug
         podcast = Podcast.objects.get_or_create_for_url(
-            'http://example.com/podcast2.rss'
+            "http://example.com/podcast2.rss"
         ).object
 
-        url = reverse('podcast-publisher-detail-id', args=(podcast.id,))
+        url = reverse("podcast-publisher-detail-id", args=(podcast.id,))
 
-        self.client.login(username='web-test', password='pwd')
+        self.client.login(username="web-test", password="pwd")
 
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)

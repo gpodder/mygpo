@@ -22,45 +22,45 @@ class SimpleTest(TestCase):
     def test_merge(self):
 
         p1 = Podcast.objects.get_or_create_for_url(
-            'http://example.com/podcast1.rss'
+            "http://example.com/podcast1.rss"
         ).object
         p2 = Podcast.objects.get_or_create_for_url(
-            'http://example.com/podcast2.rss'
+            "http://example.com/podcast2.rss"
         ).object
 
         e1 = Episode.objects.get_or_create_for_url(
-            p1, 'http://example.com/podcast1/e1.mp3'
+            p1, "http://example.com/podcast1/e1.mp3"
         ).object
-        e1.title = 'Episode 1'
+        e1.title = "Episode 1"
         e1.save()
 
         e2 = Episode.objects.get_or_create_for_url(
-            p2, 'http://example.com/podcast1/e2.mp3'
+            p2, "http://example.com/podcast1/e2.mp3"
         ).object
-        e2.title = 'Episode 2'
+        e2.title = "Episode 2"
         e2.save()
 
         e3 = Episode.objects.get_or_create_for_url(
-            p2, 'http://example.com/podcast2/e2.mp3'
+            p2, "http://example.com/podcast2/e2.mp3"
         ).object
-        e3.title = 'Episode 3'
+        e3.title = "Episode 3"
         e3.save()
 
         e4 = Episode.objects.get_or_create_for_url(
-            p2, 'http://example.com/podcast2/e3.mp3'
+            p2, "http://example.com/podcast2/e3.mp3"
         ).object
-        e4.title = 'Episode 4'
+        e4.title = "Episode 4"
         e4.save()
 
         User = get_user_model()
         user = User()
-        user.username = 'user-test_merge'
-        user.email = 'user-test_merge@example.com'
-        user.set_password('secret')
+        user.username = "user-test_merge"
+        user.email = "user-test_merge@example.com"
+        user.set_password("secret")
         user.save()
 
-        device1 = Client.objects.create(user=user, uid='dev1', id=uuid.uuid1())
-        device2 = Client.objects.create(user=user, uid='dev2', id=uuid.uuid1())
+        device1 = Client.objects.create(user=user, uid="dev1", id=uuid.uuid1())
+        device2 = Client.objects.create(user=user, uid="dev2", id=uuid.uuid1())
 
         subscribe(p1.pk, user.pk, device1.uid)
         unsubscribe(p1.pk, user.pk, device1.uid)

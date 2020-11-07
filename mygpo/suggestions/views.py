@@ -29,7 +29,7 @@ def blacklist(request, blacklisted_podcast):
     suggestion = PodcastSuggestion.objects.filter(
         suggested_to=user, podcast=blacklisted_podcast
     ).update(deleted=True)
-    return HttpResponseRedirect(reverse('suggestions'))
+    return HttpResponseRedirect(reverse("suggestions"))
 
 
 @vary_on_cookie
@@ -42,7 +42,7 @@ def suggestions(request):
     )
     current_site = RequestSite(request)
     return render(
-        request, 'suggestions.html', {'entries': suggestions, 'url': current_site}
+        request, "suggestions.html", {"entries": suggestions, "url": current_site}
     )
 
 

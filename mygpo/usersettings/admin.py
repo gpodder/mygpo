@@ -7,11 +7,11 @@ from mygpo.usersettings.models import UserSettings
 class PodcastConfigAdmin(admin.ModelAdmin):
 
     # configuration for the list view
-    list_display = ('user', 'content_object')
+    list_display = ("user", "content_object")
 
     # fetch the related objects for the fields in list_display
-    list_select_related = ('user', 'content_object')
+    list_select_related = ("user", "content_object")
 
-    raw_id_fields = ('user',)
+    raw_id_fields = ("user",)
 
     show_full_result_count = False
