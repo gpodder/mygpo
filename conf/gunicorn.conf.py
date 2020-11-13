@@ -1,4 +1,5 @@
 import multiprocessing
+import os
 
 bind = "unix:/tmp/mygpo.sock"
 workers = multiprocessing.cpu_count()
