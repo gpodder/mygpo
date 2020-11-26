@@ -25,6 +25,9 @@ compatibility. See :doc:`changes` for a list of changes. The current
 version is 2.11. This versioning scheme has been introduced in `bug 1273
 <https://bugs.gpodder.org/show_bug.cgi?id=1273>`_.
 
+The API is available as a machine-readable file in OpenAPI format at
+https://raw.githubusercontent.com/gpodder/mygpo/master/mygpo/api/openapi.yaml
+
 Contents
 --------
 
