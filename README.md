@@ -11,7 +11,7 @@ mygpo is licensed under the GNU Affero General Public License Version 3. See fil
 
 Installation
 ------------
-See the [installation instructions](http://gpoddernet.readthedocs.io/en/latest/dev/installation.html) for details.
+See the [installation instructions](https://gpoddernet.readthedocs.io/en/latest/dev/installation.html) for details.
 
 
 Bugs
@@ -21,7 +21,7 @@ Please report bugs in the [GitHub issue tracker](https://github.com/gpodder/mygp
 
 Contributing
 ------------
-gpodder.net is an open source project and your contributions are wanted and appreciated.  To get started please see the [developer documentation](http://gpoddernet.readthedocs.io/en/latest/dev/index.html).
+gpodder.net is an open source project and your contributions are wanted and appreciated.  To get started please see the [developer documentation](https://gpoddernet.readthedocs.io/en/latest/dev/index.html).
 
 Slack
 ------------
@@ -36,7 +36,7 @@ gpodder.org related issues are discussed on the [gPodder Mailing List](https://g
 
 Documentation
 -------------
-Documentation, especially for the API, is stored in the [**doc** folder](https://github.com/gpodder/mygpo/tree/master/doc) and can be read on [ReadTheDocs](http://gpoddernet.readthedocs.io/en/latest/index.html).
+Documentation, especially for the API, is stored in the [**doc** folder](https://github.com/gpodder/mygpo/tree/master/doc) and can be read on [ReadTheDocs](https://gpoddernet.readthedocs.io/en/latest/index.html).
 
 
 Name (Why mygpo?)

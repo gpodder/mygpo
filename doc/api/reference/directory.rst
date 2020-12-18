@@ -116,7 +116,7 @@ Retrieve Podcast Data
          "logo_url": "http://www.coverville.com/art/coverville_iTunes300.jpg"
         }
 
-    ::query url: the feed URL of the podcast
+    :query url: the feed URL of the podcast
 
 
 .. _api-episode-data:
@@ -149,8 +149,8 @@ Retrieve Episode Data
          "mygpo_link": "http://gpodder.net/episode/1046492"
         }
 
-    ::query podcast: feed URL of the podcast to which the episode belongs
-    ::query url: media URL of the episode
+    :query podcast: feed URL of the podcast to which the episode belongs
+    :query url: media URL of the episode
 
 
 Podcast Toplist
