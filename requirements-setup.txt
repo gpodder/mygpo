@@ -1,3 +1,3 @@
 envdir
-gevent==20.9.0
+gevent==20.12.1
 sentry-sdk==0.19.5
