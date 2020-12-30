@@ -38,7 +38,7 @@ def main(request, username):
         except Client.DoesNotExist as e:
             return HttpResponseNotFound(str(e))
 
-        return JsonResponse(get_sync_status(user))
+        return JsonResponse(get_sync_status(request.user))
 
 
 def get_sync_status(user):
@@ -77,11 +77,11 @@ def update_sync_status(user, synclist, stopsync):
         dev = user.client_set.get(uid=uid)
 
         for other_uid in devlist[1:]:
-            other = user.get_device_by_uid(other_uid)
+            other = user.client_set.get(uid=other_uid)
             dev.sync_with(other)
 
     for uid in stopsync:
-        dev = user.get_device_by_uid(uid)
+        dev = user.client_set.get(uid=uid)
         try:
             dev.stop_sync()
         except ValueError:
