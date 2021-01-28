@@ -11,7 +11,7 @@ gunicorn==20.0.4
 html2text==2020.1.16
 markdown2==2.3.10
 oauth2client==4.1.3
-psycopg2cffi==2.8.1
+psycopg2cffi==2.9.0
 python-dateutil==2.8.1
 redis==3.5.3
 django-celery-results==2.0.0
