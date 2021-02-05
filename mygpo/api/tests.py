@@ -27,16 +27,16 @@ from mygpo.utils import get_timestamp
 class AdvancedAPITests(unittest.TestCase):
     def setUp(self):
         User = get_user_model()
-        self.password = 'asdf'
-        self.username = 'adv-api-user'
-        self.user = User(username=self.username, email='user@example.com')
+        self.password = "asdf"
+        self.username = "adv-api-user"
+        self.user = User(username=self.username, email="user@example.com")
         self.user.set_password(self.password)
         self.user.save()
         self.user.is_active = True
         self.client = Client()
 
         self.extra = {
-            'HTTP_AUTHORIZATION': create_auth_string(self.username, self.password)
+            "HTTP_AUTHORIZATION": create_auth_string(self.username, self.password)
         }
 
         self.action_data = [
@@ -64,24 +64,24 @@ class AdvancedAPITests(unittest.TestCase):
         response = self._upload_episode_actions(self.user, self.action_data, self.extra)
         self.assertEqual(response.status_code, 200, response.content)
 
-        url = reverse(episodes, kwargs={'version': '2', 'username': self.user.username})
-        response = self.client.get(url, {'since': '0'}, **self.extra)
+        url = reverse(episodes, kwargs={"version": "2", "username": self.user.username})
+        response = self.client.get(url, {"since": "0"}, **self.extra)
         self.assertEqual(response.status_code, 200, response.content)
-        response_obj = json.loads(response.content.decode('utf-8'))
-        actions = response_obj['actions']
+        response_obj = json.loads(response.content.decode("utf-8"))
+        actions = response_obj["actions"]
         self.assertTrue(self.compare_action_list(self.action_data, actions))
 
     def test_invalid_client_id(self):
         """ Invalid Client ID should return 400 """
         action_data = copy.deepcopy(self.action_data)
-        action_data[0]['device'] = "gpodder@abcdef123"
+        action_data[0]["device"] = "gpodder@abcdef123"
 
         response = self._upload_episode_actions(self.user, action_data, self.extra)
 
         self.assertEqual(response.status_code, 400, response.content)
 
     def _upload_episode_actions(self, user, action_data, extra):
-        url = reverse(episodes, kwargs={'version': '2', 'username': self.user.username})
+        url = reverse(episodes, kwargs={"version": "2", "username": self.user.username})
         return self.client.post(
             url, json.dumps(action_data), content_type="application/json", **extra
         )
@@ -94,7 +94,7 @@ class AdvancedAPITests(unittest.TestCase):
                     found = True
 
             if not found:
-                raise ValueError('%s not found in %s' % (a1, as2))
+                raise ValueError("%s not found in %s" % (a1, as2))
                 return False
 
         return True
@@ -111,27 +111,27 @@ class SubscriptionAPITests(unittest.TestCase):
 
     def setUp(self):
         User = get_user_model()
-        self.password = 'asdf'
-        self.username = 'subscription-api-user'
-        self.device_uid = 'test-device'
-        self.user = User(username=self.username, email='user@example.com')
+        self.password = "asdf"
+        self.username = "subscription-api-user"
+        self.device_uid = "test-device"
+        self.user = User(username=self.username, email="user@example.com")
         self.user.set_password(self.password)
         self.user.save()
         self.user.is_active = True
         self.client = Client()
 
         self.extra = {
-            'HTTP_AUTHORIZATION': create_auth_string(self.username, self.password)
+            "HTTP_AUTHORIZATION": create_auth_string(self.username, self.password)
         }
 
-        self.action_data = {'add': ['http://example.com/podcast.rss']}
+        self.action_data = {"add": ["http://example.com/podcast.rss"]}
 
         self.url = reverse(
-            'subscriptions-api',
+            "subscriptions-api",
             kwargs={
-                'version': '2',
-                'username': self.user.username,
-                'device_uid': self.device_uid,
+                "version": "2",
+                "username": self.user.username,
+                "device_uid": self.device_uid,
             },
         )
 
@@ -151,15 +151,15 @@ class SubscriptionAPITests(unittest.TestCase):
         self.assertEqual(response.status_code, 200, response.content)
 
         # verify that the subscription is returned correctly
-        response = self.client.get(self.url, {'since': '0'}, **self.extra)
+        response = self.client.get(self.url, {"since": "0"}, **self.extra)
         self.assertEqual(response.status_code, 200, response.content)
-        response_obj = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(self.action_data['add'], response_obj['add'])
-        self.assertEqual([], response_obj.get('remove', []))
+        response_obj = json.loads(response.content.decode("utf-8"))
+        self.assertEqual(self.action_data["add"], response_obj["add"])
+        self.assertEqual([], response_obj.get("remove", []))
 
     def test_unauth_request(self):
         """ Tests that an unauthenticated request gives a 401 response """
-        response = self.client.get(self.url, {'since': '0'})
+        response = self.client.get(self.url, {"since": "0"})
         self.assertEqual(response.status_code, 401, response.content)
 
 
@@ -168,21 +168,21 @@ class DirectoryTest(TestCase):
 
     def setUp(self):
         self.podcast = Podcast.objects.get_or_create_for_url(
-            'http://example.com/directory-podcast.xml', defaults={'title': 'My Podcast'}
+            "http://example.com/directory-podcast.xml", defaults={"title": "My Podcast"}
         ).object
         self.episode = Episode.objects.get_or_create_for_url(
             self.podcast,
-            'http://example.com/directory-podcast/1.mp3',
-            defaults={'title': 'My Episode'},
+            "http://example.com/directory-podcast/1.mp3",
+            defaults={"title": "My Episode"},
         ).object
         self.client = Client()
 
     def test_episode_info(self):
         """ Test that the expected number of queries is executed """
         url = (
-            reverse('api-episode-info')
-            + '?'
-            + urlencode((('podcast', self.podcast.url), ('url', self.episode.url)))
+            reverse("api-episode-info")
+            + "?"
+            + urlencode((("podcast", self.podcast.url), ("url", self.episode.url)))
         )
 
         resp = self.client.get(url)
@@ -193,23 +193,23 @@ class DirectoryTest(TestCase):
 class EpisodeActionTests(TestCase):
     def setUp(self):
         self.podcast = Podcast.objects.get_or_create_for_url(
-            'http://example.com/directory-podcast.xml', defaults={'title': 'My Podcast'}
+            "http://example.com/directory-podcast.xml", defaults={"title": "My Podcast"}
         ).object
         self.episode = Episode.objects.get_or_create_for_url(
             self.podcast,
-            'http://example.com/directory-podcast/1.mp3',
-            defaults={'title': 'My Episode'},
+            "http://example.com/directory-podcast/1.mp3",
+            defaults={"title": "My Episode"},
         ).object
         User = get_user_model()
-        self.password = 'asdf'
-        self.username = 'adv-api-user'
-        self.user = User(username=self.username, email='user@example.com')
+        self.password = "asdf"
+        self.username = "adv-api-user"
+        self.user = User(username=self.username, email="user@example.com")
         self.user.set_password(self.password)
         self.user.save()
         self.user.is_active = True
         self.client = Client()
         self.extra = {
-            'HTTP_AUTHORIZATION': create_auth_string(self.username, self.password)
+            "HTTP_AUTHORIZATION": create_auth_string(self.username, self.password)
         }
 
     def tearDown(self):
@@ -233,11 +233,11 @@ class EpisodeActionTests(TestCase):
             )
             timestamps.append(timestamp)
 
-        url = reverse(episodes, kwargs={'version': '2', 'username': self.user.username})
-        response = self.client.get(url, {'since': '0'}, **self.extra)
+        url = reverse(episodes, kwargs={"version": "2", "username": self.user.username})
+        response = self.client.get(url, {"since": "0"}, **self.extra)
         self.assertEqual(response.status_code, 200, response.content)
-        response_obj = json.loads(response.content.decode('utf-8'))
-        actions = response_obj['actions']
+        response_obj = json.loads(response.content.decode("utf-8"))
+        actions = response_obj["actions"]
 
         # 10 actions should be returned
         self.assertEqual(len(actions), 10)
@@ -246,27 +246,27 @@ class EpisodeActionTests(TestCase):
 
         # the first 10 actions, according to their timestamp should be returned
         for action, timestamp in zip(actions, timestamps):
-            self.assertEqual(timestamp.isoformat(), action['timestamp'])
+            self.assertEqual(timestamp.isoformat(), action["timestamp"])
 
         # the `timestamp` field in the response should be the timestamp of the
         # last returned action
-        self.assertEqual(get_timestamp(timestamps[9]), response_obj['timestamp'])
+        self.assertEqual(get_timestamp(timestamps[9]), response_obj["timestamp"])
 
     def test_no_actions(self):
         """ Test when there are no actions to return """
 
         t1 = get_timestamp(datetime.utcnow())
 
-        url = reverse(episodes, kwargs={'version': '2', 'username': self.user.username})
-        response = self.client.get(url, {'since': '0'}, **self.extra)
+        url = reverse(episodes, kwargs={"version": "2", "username": self.user.username})
+        response = self.client.get(url, {"since": "0"}, **self.extra)
         self.assertEqual(response.status_code, 200, response.content)
-        response_obj = json.loads(response.content.decode('utf-8'))
-        actions = response_obj['actions']
+        response_obj = json.loads(response.content.decode("utf-8"))
+        actions = response_obj["actions"]
 
         # 10 actions should be returned
         self.assertEqual(len(actions), 0)
 
-        returned = response_obj['timestamp']
+        returned = response_obj["timestamp"]
         t2 = get_timestamp(datetime.utcnow())
         # the `timestamp` field in the response should be the timestamp of the
         # last returned action
@@ -277,29 +277,29 @@ class EpisodeActionTests(TestCase):
 class SimpleAPITests(unittest.TestCase):
     def setUp(self):
         User = get_user_model()
-        self.password = 'asdf'
-        self.username = 'subscription-api-user'
-        self.device_uid = 'test-device'
-        self.user = User(username=self.username, email='user@example.com')
+        self.password = "asdf"
+        self.username = "subscription-api-user"
+        self.device_uid = "test-device"
+        self.user = User(username=self.username, email="user@example.com")
         self.user.set_password(self.password)
         self.user.save()
         self.user.is_active = True
         self.client = Client()
         self.extra = {
-            'HTTP_AUTHORIZATION': create_auth_string(self.username, self.password)
+            "HTTP_AUTHORIZATION": create_auth_string(self.username, self.password)
         }
-        self.formats = ['txt', 'json', 'jsonp', 'opml']
+        self.formats = ["txt", "json", "jsonp", "opml"]
         self.subscriptions_urls = dict(
             (fmt, self.get_subscriptions_url(fmt)) for fmt in self.formats
         )
         self.blank_values = {
-            'txt': b'\n',
-            'json': b'[]',
-            'opml': Exporter('Subscriptions').generate([]),
+            "txt": b"\n",
+            "json": b"[]",
+            "opml": Exporter("Subscriptions").generate([]),
         }
         self.all_subscriptions_url = reverse(
-            'api-all-subscriptions',
-            kwargs={'format': 'txt', 'username': self.user.username},
+            "api-all-subscriptions",
+            kwargs={"format": "txt", "username": self.user.username},
         )
         self.toplist_urls = dict(
             (fmt, self.get_toplist_url(fmt)) for fmt in self.formats
@@ -310,20 +310,20 @@ class SimpleAPITests(unittest.TestCase):
         self.user.delete()
 
     def get_toplist_url(self, fmt):
-        return reverse('api-simple-toplist-50', kwargs={'format': fmt})
+        return reverse("api-simple-toplist-50", kwargs={"format": fmt})
 
     def get_subscriptions_url(self, fmt):
         return reverse(
-            'api-simple-subscriptions',
+            "api-simple-subscriptions",
             kwargs={
-                'format': fmt,
-                'username': self.user.username,
-                'device_uid': self.device_uid,
+                "format": fmt,
+                "username": self.user.username,
+                "device_uid": self.device_uid,
             },
         )
 
     def get_search_url(self, fmt):
-        return reverse('api-simple-search', kwargs={'format': fmt})
+        return reverse("api-simple-search", kwargs={"format": fmt})
 
     def _test_response_for_data(self, url, data, status_code, content):
         response = self.client.get(url, data)
@@ -332,73 +332,73 @@ class SimpleAPITests(unittest.TestCase):
 
     def test_get_subscriptions_empty(self):
         testers = {
-            'txt': lambda c: self.assertEqual(c, b''),
-            'json': lambda c: self.assertEqual(c, b'[]'),
-            'jsonp': lambda c: self.assertEqual(c, b'test([])'),
-            'opml': lambda c: self.assertListEqual(Importer(c).items, []),
+            "txt": lambda c: self.assertEqual(c, b""),
+            "json": lambda c: self.assertEqual(c, b"[]"),
+            "jsonp": lambda c: self.assertEqual(c, b"test([])"),
+            "opml": lambda c: self.assertListEqual(Importer(c).items, []),
         }
         for fmt in self.formats:
             url = self.subscriptions_urls[fmt]
-            response = self.client.get(url, data={'jsonp': 'test'}, **self.extra)
+            response = self.client.get(url, data={"jsonp": "test"}, **self.extra)
             self.assertEqual(response.status_code, 200, response.content)
             testers[fmt](response.content)
 
     def test_get_subscriptions_invalid_jsonp(self):
-        url = self.subscriptions_urls['jsonp']
-        response = self.client.get(url, data={'jsonp': '!'}, **self.extra)
+        url = self.subscriptions_urls["jsonp"]
+        response = self.client.get(url, data={"jsonp": "!"}, **self.extra)
         self.assertEqual(response.status_code, 400, response.content)
 
     def test_get_subscriptions_with_content(self):
-        sample_url = 'http://example.com/directory-podcast.xml'
+        sample_url = "http://example.com/directory-podcast.xml"
         podcast = Podcast.objects.get_or_create_for_url(
-            sample_url, defaults={'title': 'My Podcast'}
+            sample_url, defaults={"title": "My Podcast"}
         ).object
         with unittest.mock.patch(
-            'mygpo.users.models.Client.get_subscribed_podcasts'
+            "mygpo.users.models.Client.get_subscribed_podcasts"
         ) as mock_get:
             mock_get.return_value = [podcast]
-            response = self.client.get(self.subscriptions_urls['txt'], **self.extra)
+            response = self.client.get(self.subscriptions_urls["txt"], **self.extra)
         self.assertEqual(response.status_code, 200, response.content)
-        retrieved_urls = response.content.split(b'\n')[:-1]
+        retrieved_urls = response.content.split(b"\n")[:-1]
         expected_urls = [sample_url.encode()]
         self.assertEqual(retrieved_urls, expected_urls)
 
     def test_post_subscription_valid(self):
-        sample_url = 'http://example.com/directory-podcast.xml'
+        sample_url = "http://example.com/directory-podcast.xml"
         podcast = Podcast.objects.get_or_create_for_url(
-            sample_url, defaults={'title': 'My Podcast'}
+            sample_url, defaults={"title": "My Podcast"}
         ).object
         payloads = {
-            'txt': sample_url,
-            'json': json.dumps([sample_url]),
+            "txt": sample_url,
+            "json": json.dumps([sample_url]),
             #'opml': Exporter('Subscriptions').generate([sample_url]),
-            'opml': Exporter('Subscriptions').generate([podcast]),
+            "opml": Exporter("Subscriptions").generate([podcast]),
         }
         payloads = dict(
-            (fmt, format_podcast_list([podcast], fmt, 'test title').content)
+            (fmt, format_podcast_list([podcast], fmt, "test title").content)
             for fmt in self.formats
         )
         for fmt in self.formats:
             url = self.subscriptions_urls[fmt]
             payload = payloads[fmt]
-            response = self.client.generic('POST', url, payload, **self.extra)
+            response = self.client.generic("POST", url, payload, **self.extra)
             self.assertEqual(response.status_code, 200, response.content)
 
     def test_post_subscription_invalid(self):
-        url = self.subscriptions_urls['json']
-        payload = 'invalid_json'
-        response = self.client.generic('POST', url, payload, **self.extra)
+        url = self.subscriptions_urls["json"]
+        payload = "invalid_json"
+        response = self.client.generic("POST", url, payload, **self.extra)
         self.assertEqual(response.status_code, 400, response.content)
 
     def test_get_all_subscriptions_invalid_scale(self):
         response = self.client.get(
-            self.all_subscriptions_url, data={'scale_logo': 0}, **self.extra
+            self.all_subscriptions_url, data={"scale_logo": 0}, **self.extra
         )
         self.assertEqual(response.status_code, 400, response.content)
 
     def test_get_all_subscriptions_non_numeric_scale(self):
         response = self.client.get(
-            self.all_subscriptions_url, data={'scale_logo': 'a'}, **self.extra
+            self.all_subscriptions_url, data={"scale_logo": "a"}, **self.extra
         )
         self.assertEqual(response.status_code, 400, response.content)
 
@@ -408,52 +408,52 @@ class SimpleAPITests(unittest.TestCase):
 
     def test_get_toplist_invalid_scale(self):
         response = self.client.get(
-            self.toplist_urls['opml'], data={'scale_logo': 0}, **self.extra
+            self.toplist_urls["opml"], data={"scale_logo": 0}, **self.extra
         )
         self.assertEqual(response.status_code, 400, response.content)
 
     def test_get_toplist_non_numeric_scale(self):
         response = self.client.get(
-            self.toplist_urls['txt'], data={'scale_logo': 'a'}, **self.extra
+            self.toplist_urls["txt"], data={"scale_logo": "a"}, **self.extra
         )
         self.assertEqual(response.status_code, 400, response.content)
 
     def test_get_toplist_valid_empty(self):
-        response = self.client.get(self.toplist_urls['json'], **self.extra)
+        response = self.client.get(self.toplist_urls["json"], **self.extra)
         self.assertEqual(response.status_code, 200, response.content)
 
     def test_search_non_numeric_scale_logo(self):
-        data = {'scale_logo': 'a'}
+        data = {"scale_logo": "a"}
         expected_status = 400
-        expected_content = b'scale_logo has to be a numeric value'
+        expected_content = b"scale_logo has to be a numeric value"
 
         self._test_response_for_data(
-            self.search_urls['json'], data, expected_status, expected_content
+            self.search_urls["json"], data, expected_status, expected_content
         )
 
     def test_search_scale_out_of_range(self):
-        data = {'scale_logo': 3000}
+        data = {"scale_logo": 3000}
         expected_status = 400
-        expected_content = b'scale_logo has to be a number from 1 to 256'
+        expected_content = b"scale_logo has to be a number from 1 to 256"
 
         self._test_response_for_data(
-            self.search_urls['opml'], data, expected_status, expected_content
+            self.search_urls["opml"], data, expected_status, expected_content
         )
 
     def test_search_no_query(self):
-        data = {'scale_logo': 1}
+        data = {"scale_logo": 1}
         expected_status = 400
-        expected_content = b'/search.opml|txt|json?q={query}'
+        expected_content = b"/search.opml|txt|json?q={query}"
 
         self._test_response_for_data(
-            self.search_urls['opml'], data, expected_status, expected_content
+            self.search_urls["opml"], data, expected_status, expected_content
         )
 
     def test_search_valid_query_status(self):
-        data = {'scale_logo': 1, 'q': 'foo'}
+        data = {"scale_logo": 1, "q": "foo"}
         expected_status = 200
 
-        response = self.client.get(self.search_urls['json'], data)
+        response = self.client.get(self.search_urls["json"], data)
         self.assertEqual(response.status_code, expected_status)
 
 
@@ -461,4 +461,4 @@ class OpenAPIDefinitionValidityTest(TestCase):
     "Test the validity of the OpenAPI definition file"
 
     def test_api_definition_validity(self):
-        validate_spec_url('file://' + os.path.abspath('./mygpo/api/openapi.yaml'))
+        validate_spec_url("file://" + os.path.abspath("./mygpo/api/openapi.yaml"))

@@ -52,14 +52,14 @@ def requires_token(token_name, denied_template=None):
             User = get_user_model()
             user = get_object_or_404(User, username=username)
             token = user.profile.get_token(token_name)
-            u_token = request.GET.get('token', '')
+            u_token = request.GET.get("token", "")
 
-            if token == '' or token == u_token:
+            if token == "" or token == u_token:
                 return fn(request, username, *args, **kwargs)
 
             else:
                 if denied_template:
-                    return render(request, denied_template, {'other_user': user})
+                    return render(request, denied_template, {"other_user": user})
 
                 else:
                     return HttpResponseForbidden()
@@ -84,7 +84,7 @@ def allowed_methods(methods):
 
 
 def query_if_required():
-    """ If required, queries some resource before calling the function
+    """If required, queries some resource before calling the function
 
     The decorated method is expected to be bound and its class is
     expected to have define the methods _needs_query() and _query().
@@ -104,14 +104,14 @@ def query_if_required():
     return decorator
 
 
-def cors_origin(allowed_origin='*'):
+def cors_origin(allowed_origin="*"):
     """ Adds an Access-Control-Allow-Origin header to the response """
 
     def decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
             resp = f(*args, **kwargs)
-            resp['Access-Control-Allow-Origin'] = allowed_origin
+            resp["Access-Control-Allow-Origin"] = allowed_origin
             return resp
 
         return wrapper

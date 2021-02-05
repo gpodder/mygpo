@@ -28,14 +28,14 @@ class FavoritesPublic(View):
     def post(self, request):
 
         if self.public:
-            request.user.profile.favorite_feeds_token = ''
+            request.user.profile.favorite_feeds_token = ""
             request.user.profile.save()
 
         else:
-            request.user.profile.create_new_token('favorite_feeds_token')
+            request.user.profile.create_new_token("favorite_feeds_token")
             request.user.profile.save()
 
-        return HttpResponseRedirect(reverse('share-favorites'))
+        return HttpResponseRedirect(reverse("share-favorites"))
 
 
 class ShareFavorites(View):
@@ -55,8 +55,8 @@ class ShareFavorites(View):
 
         return render(
             request,
-            'share/favorites.html',
-            {'feed_token': token, 'site': site, 'podcast': podcast},
+            "share/favorites.html",
+            {"feed_token": token, "site": site, "podcast": podcast},
         )
 
 
@@ -70,13 +70,13 @@ class PublicSubscriptions(View):
     def post(self, request):
 
         if self.public:
-            user.profile.subscriptions_token = ''
+            user.profile.subscriptions_token = ""
         else:
-            user.profile.create_new_token('subscriptions_token')
+            user.profile.create_new_token("subscriptions_token")
 
         user.profile.save()
 
-        return HttpResponseRedirect(reverse('share'))
+        return HttpResponseRedirect(reverse("share"))
 
 
 class FavoritesFeedCreateEntry(View):
@@ -99,7 +99,7 @@ class FavoritesFeedCreateEntry(View):
         updater = PodcastUpdater(feed_url)
         updater.update_podcast()
 
-        return HttpResponseRedirect(reverse('share-favorites'))
+        return HttpResponseRedirect(reverse("share-favorites"))
 
 
 @login_required
@@ -107,9 +107,9 @@ def overview(request):
     user = request.user
     site = RequestSite(request)
 
-    subscriptions_token = user.profile.get_token('subscriptions_token')
-    userpage_token = user.profile.get_token('userpage_token')
-    favfeed_token = user.profile.get_token('favorite_feeds_token')
+    subscriptions_token = user.profile.get_token("subscriptions_token")
+    userpage_token = user.profile.get_token("userpage_token")
+    favfeed_token = user.profile.get_token("favorite_feeds_token")
 
     favfeed = FavoriteFeed(user)
     favfeed_url = favfeed.get_public_url(site.domain)
@@ -117,13 +117,13 @@ def overview(request):
 
     return render(
         request,
-        'share/overview.html',
+        "share/overview.html",
         {
-            'site': site,
-            'subscriptions_token': subscriptions_token,
-            'userpage_token': userpage_token,
-            'favfeed_token': favfeed_token,
-            'favfeed_podcast': favfeed_podcast,
+            "site": site,
+            "subscriptions_token": subscriptions_token,
+            "userpage_token": userpage_token,
+            "favfeed_token": favfeed_token,
+            "favfeed_podcast": favfeed_podcast,
         },
     )
 
@@ -134,11 +134,11 @@ def set_token_public(request, token_name, public):
     user = request.user
 
     if public:
-        setattr(user.profile, token_name, '')
+        setattr(user.profile, token_name, "")
         user.profile.save()
 
     else:
         user.profile.create_new_token(token_name)
         user.profile.save()
 
-    return HttpResponseRedirect(reverse('share'))
+    return HttpResponseRedirect(reverse("share"))

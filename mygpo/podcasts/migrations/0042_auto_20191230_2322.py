@@ -7,18 +7,18 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('podcasts', '0041_auto_20191230_2319'),
+        ("podcasts", "0041_auto_20191230_2319"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='podcast',
-            name='group',
+            model_name="podcast",
+            name="group",
             field=models.ForeignKey(
                 blank=True,
                 null=True,
                 on_delete=django.db.models.deletion.PROTECT,
-                to='podcasts.PodcastGroup',
+                to="podcasts.PodcastGroup",
             ),
         ),
     ]

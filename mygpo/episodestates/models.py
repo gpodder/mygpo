@@ -24,7 +24,7 @@ class EpisodeState(models.Model):
     timestamp = models.DateTimeField()
 
     class Meta:
-        unique_together = [('user', 'episode')]
+        unique_together = [("user", "episode")]
 
     @classmethod
     def dict_for_user(cls, user, episodes=None):
@@ -34,4 +34,4 @@ class EpisodeState(models.Model):
         if episodes is not None:
             states = states.filter(episode__in=episodes)
 
-        return dict(states.values_list('episode', 'action'))
+        return dict(states.values_list("episode", "action"))

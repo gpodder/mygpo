@@ -30,15 +30,15 @@ class PodcastTests(unittest.TestCase):
 
     def test_get_or_create_for_url(self):
         """ Test that get_or_create_for_url returns existing Podcast """
-        URL = 'http://example.com/get_or_create.rss'
+        URL = "http://example.com/get_or_create.rss"
         p1 = Podcast.objects.get_or_create_for_url(URL).object
         p2 = Podcast.objects.get_or_create_for_url(URL).object
         self.assertEqual(p1.pk, p2.pk)
 
     def test_episode_count(self):
         """ Test if Podcast.episode_count is updated correctly """
-        PODCAST_URL = 'http://example.com/podcast.rss'
-        EPISODE_URL = 'http://example.com/episode%d.mp3'
+        PODCAST_URL = "http://example.com/podcast.rss"
+        EPISODE_URL = "http://example.com/episode%d.mp3"
         NUM_EPISODES = 3
 
         p = Podcast.objects.get_or_create_for_url(PODCAST_URL).object
@@ -66,30 +66,30 @@ class PodcastGroupTests(unittest.TestCase):
         self.podcast1 = create_podcast()
         self.podcast2 = create_podcast()
 
-        group = self.podcast1.group_with(self.podcast2, 'My Group', 'p1', 'p2')
+        group = self.podcast1.group_with(self.podcast2, "My Group", "p1", "p2")
 
         self.assertIn(self.podcast1, group.podcast_set.all())
         self.assertIn(self.podcast2, group.podcast_set.all())
         self.assertEqual(len(group.podcast_set.all()), 2)
-        self.assertEqual(group.title, 'My Group')
-        self.assertEqual(self.podcast1.group_member_name, 'p1')
-        self.assertEqual(self.podcast2.group_member_name, 'p2')
+        self.assertEqual(group.title, "My Group")
+        self.assertEqual(self.podcast1.group_member_name, "p1")
+        self.assertEqual(self.podcast2.group_member_name, "p2")
 
         # add to group
         self.podcast3 = create_podcast()
 
-        group = self.podcast1.group_with(self.podcast3, 'My Group', 'p1', 'p3')
+        group = self.podcast1.group_with(self.podcast3, "My Group", "p1", "p3")
 
         self.assertIn(self.podcast3, group.podcast_set.all())
-        self.assertEqual(self.podcast3.group_member_name, 'p3')
+        self.assertEqual(self.podcast3.group_member_name, "p3")
 
         # add group to podcast
         self.podcast4 = create_podcast()
 
-        group = self.podcast4.group_with(self.podcast1, 'My Group', 'p4', 'p1')
+        group = self.podcast4.group_with(self.podcast1, "My Group", "p4", "p1")
 
         self.assertIn(self.podcast4, group.podcast_set.all())
-        self.assertEqual(self.podcast4.group_member_name, 'p4')
+        self.assertEqual(self.podcast4.group_member_name, "p4")
 
 
 class SlugTests(TestCase):
@@ -104,20 +104,20 @@ class SlugTests(TestCase):
 
         with self.assertNumQueries(8):
             # set the canonical slug
-            podcast.set_slug('podcast-1')
-            self.assertEqual(podcast.slug, 'podcast-1')
+            podcast.set_slug("podcast-1")
+            self.assertEqual(podcast.slug, "podcast-1")
 
         with self.assertNumQueries(9):
             # set a new list of slugs
-            podcast.set_slugs(['podcast-2', 'podcast-1'])
-            self.assertEqual(podcast.slug, 'podcast-2')
+            podcast.set_slugs(["podcast-2", "podcast-1"])
+            self.assertEqual(podcast.slug, "podcast-2")
 
         with self.assertNumQueries(2):
             # remove the canonical slug
-            podcast.remove_slug('podcast-2')
-            self.assertEqual(podcast.slug, 'podcast-1')
+            podcast.remove_slug("podcast-2")
+            self.assertEqual(podcast.slug, "podcast-1")
 
         with self.assertNumQueries(3):
             # add a non-canonical slug
-            podcast.add_slug('podcast-3')
-            self.assertEqual(podcast.slug, 'podcast-1')
+            podcast.add_slug("podcast-3")
+            self.assertEqual(podcast.slug, "podcast-1")

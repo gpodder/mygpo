@@ -16,17 +16,17 @@ logger = get_task_logger(__name__)
 def merge_podcasts(podcast_ids, num_groups):
     """ Task to merge some podcasts"""
 
-    logger.info('merging podcast ids %s', podcast_ids)
+    logger.info("merging podcast ids %s", podcast_ids)
 
     podcasts = list(Podcast.objects.filter(id__in=podcast_ids))
 
-    logger.info('merging podcasts %s', podcasts)
+    logger.info("merging podcasts %s", podcasts)
 
     actions = Counter()
 
     pm = PodcastMerger(podcasts, actions, num_groups)
     podcast = pm.merge()
 
-    logger.info('merging result: %s', actions)
+    logger.info("merging result: %s", actions)
 
     return actions, podcast

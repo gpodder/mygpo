@@ -14,15 +14,15 @@ class FavoriteEpisode(UpdateInfoModel):
     episode = models.ForeignKey(Episode, db_index=True, on_delete=models.PROTECT)
 
     class Meta:
-        unique_together = [('user', 'episode')]
+        unique_together = [("user", "episode")]
 
     @classmethod
     def episodes_for_user(cls, user):
-        """ Favorite episodes of the given user
+        """Favorite episodes of the given user
 
-        Returns the episodes directly, not the FavoriteEpisode objects """
+        Returns the episodes directly, not the FavoriteEpisode objects"""
         return (
             Episode.objects.filter(favoriteepisode__user=user)
-            .select_related('podcast')
-            .prefetch_related('slugs', 'podcast__slugs')
+            .select_related("podcast")
+            .prefetch_related("slugs", "podcast__slugs")
         )

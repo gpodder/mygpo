@@ -27,28 +27,28 @@ class SubscriptionsAPI(APIView):
         device = get_object_or_404(Client, user=user, uid=device_uid)
         since = self.get_since(request)
         add, rem, until = self.get_changes(user, device, since, now)
-        return JsonResponse({'add': add, 'remove': rem, 'timestamp': until})
+        return JsonResponse({"add": add, "remove": rem, "timestamp": until})
 
     def post(self, request, version, username, device_uid):
         """ Client sends subscription updates """
         now = get_timestamp(datetime.utcnow())
         logger.info(
-            'Subscription Upload @{username}/{device_uid}'.format(
+            "Subscription Upload @{username}/{device_uid}".format(
                 username=request.user.username, device_uid=device_uid
             )
         )
 
         d = get_device(
-            request.user, device_uid, request.META.get('HTTP_USER_AGENT', '')
+            request.user, device_uid, request.META.get("HTTP_USER_AGENT", "")
         )
 
         actions = self.parsed_body(request)
 
-        add = list(filter(None, actions.get('add', [])))
-        rem = list(filter(None, actions.get('remove', [])))
+        add = list(filter(None, actions.get("add", [])))
+        rem = list(filter(None, actions.get("remove", [])))
         logger.info(
-            'Subscription Upload @{username}/{device_uid}: add '
-            '{num_add}, remove {num_remove}'.format(
+            "Subscription Upload @{username}/{device_uid}: add "
+            "{num_add}, remove {num_remove}".format(
                 username=request.user.username,
                 device_uid=device_uid,
                 num_add=len(add),
@@ -58,7 +58,7 @@ class SubscriptionsAPI(APIView):
 
         update_urls = self.update_subscriptions(request.user, d, add, rem)
 
-        return JsonResponse({'timestamp': now, 'update_urls': update_urls})
+        return JsonResponse({"timestamp": now, "update_urls": update_urls})
 
     def update_subscriptions(self, user, device, add, remove):
 
@@ -85,22 +85,22 @@ class SubscriptionsAPI(APIView):
 
         for add_url in add_s:
             podcast = Podcast.objects.get_or_create_for_url(add_url).object
-            subscribe(podcast, user, device, add_url)
+            subscribe(podcast.pk, user.pk, device.uid, add_url)
 
         remove_podcasts = Podcast.objects.filter(urls__url__in=rem_s)
         for podcast in remove_podcasts:
-            unsubscribe(podcast, user, device)
+            unsubscribe(podcast.pk, user.pk, device.uid)
 
         return updated_urls
 
     def get_changes(self, user, device, since, until):
         """ Returns subscription changes for the given device """
         history = get_subscription_history(user, device, since, until)
-        logger.info('Subscription History: {num}'.format(num=len(history)))
+        logger.info("Subscription History: {num}".format(num=len(history)))
 
         add, rem = subscription_diff(history)
         logger.info(
-            'Subscription Diff: +{num_add}/-{num_remove}'.format(
+            "Subscription Diff: +{num_add}/-{num_remove}".format(
                 num_add=len(add), num_remove=len(rem)
             )
         )

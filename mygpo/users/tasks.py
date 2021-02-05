@@ -35,7 +35,7 @@ def sync_user(user_pk):
             pass
 
         except Exception as e:
-            logger.exception('retrying task')
+            logger.exception("retrying task")
             raise sync_user.retry()
 
 
@@ -48,7 +48,7 @@ def remove_inactive_users():
     # time for which to keep unactivated and deleted users
     valid_days = settings.ACTIVATION_VALID_DAYS
     remove_before = datetime.utcnow() - timedelta(days=valid_days)
-    logger.warning('Removing unactivated users before %s', remove_before)
+    logger.warning("Removing unactivated users before %s", remove_before)
 
     users = User.objects.filter(is_active=False, date_joined__lt=remove_before)
 
@@ -63,12 +63,12 @@ def remove_inactive_users():
 @periodic_task(run_every=timedelta(hours=1))
 @close_connection
 def clearsessions():
-    """ Clear expired sessions
+    """Clear expired sessions
 
     This runs code that should normally be run by ``manage.py clearsessions``.
     If Django's internals change, see
     django/contrib/sessions/management/commands/clearsessions.py for the
-    current implementation. """
+    current implementation."""
 
     engine = import_module(settings.SESSION_ENGINE)
     engine.SessionStore.clear_expired()

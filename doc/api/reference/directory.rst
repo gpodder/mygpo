@@ -113,11 +113,10 @@ Retrieve Podcast Data
          "title": "Coverville",
          "author": "Brian Ibbott",
          "url": "http://feeds.feedburner.com/coverville",
-         "subscribers_last_week": 19,
          "logo_url": "http://www.coverville.com/art/coverville_iTunes300.jpg"
         }
 
-    ::query url: the feed URL of the podcast
+    :query url: the feed URL of the podcast
 
 
 .. _api-episode-data:
@@ -150,8 +149,8 @@ Retrieve Episode Data
          "mygpo_link": "http://gpodder.net/episode/1046492"
         }
 
-    ::query podcast: feed URL of the podcast to which the episode belongs
-    ::query url: media URL of the episode
+    :query podcast: feed URL of the podcast to which the episode belongs
+    :query url: media URL of the episode
 
 
 Podcast Toplist
@@ -183,7 +182,6 @@ Podcast Toplist
            "author": "Sixgun Productions",
            "url": "http://feeds.feedburner.com/linuxoutlaws",
            "position_last_week": 0,
-           "subscribers_last_week": 1736,
            "subscribers": 1736,
            "mygpo_link": "http://www.gpodder.net/podcast/11092",
            "logo_url": "http://linuxoutlaws.com/files/albumart-itunes.jpg"
@@ -195,7 +193,6 @@ Podcast Toplist
            "author": "Leo Laporte",
            "url": "http://feeds.twit.tv/floss_video_large",
            "position_last_week": 0,
-           "subscribers_last_week": 50,
            "subscribers": 50,
            "mygpo_link": "http://www.gpodder.net/podcast/31991",
            "logo_url": "http://static.mediafly.com/publisher/images/06cecab60c784f9d9866f5dcb73227c3/icon-150x150.png"
@@ -223,12 +220,7 @@ Podcast Toplist
 
     All shown keys must be provided by the server. The description field may be
     set to the empty string in case a description is not available. The title
-    field may be set to the URL in case a title is not available. The
-    subscribers_last_week field may be set to zero if no data is available. The
-    client can use the subscribers_last_week counts to re-sort the list and get
-    a ranking for the last week. With this information, a relative "position
-    movement" can also be calculated if the developer of the client decides to
-    do so.
+    field may be set to the URL in case a title is not available.
 
 
 Podcast Search

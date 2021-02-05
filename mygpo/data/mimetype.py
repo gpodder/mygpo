@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 TYPE_THRESHOLD = 0.2
 
 
-CONTENT_TYPES = (_('image'), _('audio'), _('video'))
+CONTENT_TYPES = (_("image"), _("audio"), _("video"))
 
 
 def get_podcast_types(episodes):
@@ -73,18 +73,18 @@ def get_type(mimetype):
     if not mimetype:
         return None
 
-    if '/' not in mimetype:
+    if "/" not in mimetype:
         return None
 
-    category, type = mimetype.split('/', 1)
-    if category in ('audio', 'video', 'image'):
+    category, type = mimetype.split("/", 1)
+    if category in ("audio", "video", "image"):
         return category
-    elif type == 'ogg':
-        return 'audio'
-    elif type == 'x-youtube':
-        return 'video'
-    elif type == 'x-vimeo':
-        return 'video'
+    elif type == "ogg":
+        return "audio"
+    elif type == "x-youtube":
+        return "video"
+    elif type == "x-vimeo":
+        return "video"
 
 
 def get_mimetype(mimetype, url):

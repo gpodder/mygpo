@@ -30,7 +30,7 @@ LOGO_STORAGE = FileSystemStorage(location=settings.MEDIA_ROOT)
 
 def _last_modified(request, size, prefix, filename):
 
-    target = os.path.join('logo', str(size), prefix, filename)
+    target = os.path.join("logo", str(size), prefix, filename)
 
     try:
         return LOGO_STORAGE.get_modified_time(target)
@@ -56,25 +56,25 @@ class CoverArt(View):
             return self.send_file(target)
 
         if not self.storage.exists(original):
-            logger.warning('Original cover {} not found'.format(original))
-            raise Http404('Cover Art not available' + original)
+            logger.warning("Original cover {} not found".format(original))
+            raise Http404("Cover Art not available" + original)
 
         target_dir = self.get_dir(filename)
         try:
-            fp = self.storage.open(original, 'rb')
+            fp = self.storage.open(original, "rb")
             im = Image.open(fp)
-            if im.mode not in ('RGB', 'RGBA'):
-                im = im.convert('RGBA')
+            if im.mode not in ("RGB", "RGBA"):
+                im = im.convert("RGBA")
         except IOError as ioe:
-            logger.warning('Cover file {} cannot be opened: {}'.format(original, ioe))
-            raise Http404('Cannot open cover file') from ioe
+            logger.warning("Cover file {} cannot be opened: {}".format(original, ioe))
+            raise Http404("Cannot open cover file") from ioe
 
         try:
             im.thumbnail((size, size), Image.ANTIALIAS)
             resized = im
         except (struct.error, IOError, IndexError) as ex:
             # raised when trying to read an interlaced PNG;
-            logger.warning('Could not create thumbnail: %s', str(ex))
+            logger.warning("Could not create thumbnail: %s", str(ex))
 
             # we use the original instead
             return self.send_file(original)
@@ -82,7 +82,7 @@ class CoverArt(View):
         sio = io.BytesIO()
 
         try:
-            resized.save(sio, 'JPEG', optimize=True, progression=True, quality=80)
+            resized.save(sio, "JPEG", optimize=True, progression=True, quality=80)
         except IOError as ex:
             return self.send_file(original)
         finally:
@@ -94,7 +94,7 @@ class CoverArt(View):
 
     @staticmethod
     def get_thumbnail_path(size, prefix, filename):
-        return os.path.join('logo', str(size), prefix, filename)
+        return os.path.join("logo", str(size), prefix, filename)
 
     @staticmethod
     def get_dir(filename):
@@ -102,18 +102,18 @@ class CoverArt(View):
 
     @staticmethod
     def remove_existing_thumbnails(prefix, filename):
-        dirs, _files = LOGO_STORAGE.listdir('logo')  # TODO: cache list of sizes
+        dirs, _files = LOGO_STORAGE.listdir("logo")  # TODO: cache list of sizes
         for size in dirs:
-            if size == 'original':
+            if size == "original":
                 continue
 
-            path = os.path.join('logo', size, prefix, filename)
-            logger.info('Removing {}'.format(path))
+            path = os.path.join("logo", size, prefix, filename)
+            logger.info("Removing {}".format(path))
             LOGO_STORAGE.delete(path)
 
     @staticmethod
     def get_original_path(prefix, filename):
-        return os.path.join('logo', 'original', prefix, filename)
+        return os.path.join("logo", "original", prefix, filename)
 
     def send_file(self, filename):
         return HttpResponseRedirect(LOGO_STORAGE.url(filename))
@@ -124,7 +124,7 @@ class CoverArt(View):
             return
 
         try:
-            image_sha1 = hashlib.sha1(cover_art_url.encode('utf-8')).hexdigest()
+            image_sha1 = hashlib.sha1(cover_art_url.encode("utf-8")).hexdigest()
             prefix = get_prefix(image_sha1)
 
             filename = cls.get_original_path(prefix, image_sha1)
@@ -132,12 +132,12 @@ class CoverArt(View):
 
             # get hash of existing file
             if LOGO_STORAGE.exists(filename):
-                with LOGO_STORAGE.open(filename, 'rb') as f:
+                with LOGO_STORAGE.open(filename, "rb") as f:
                     old_hash = file_hash(f).digest()
             else:
-                old_hash = ''
+                old_hash = ""
 
-            logger.info('Logo {}, saving to {}'.format(cover_art_url, filename))
+            logger.info("Logo {}, saving to {}".format(cover_art_url, filename))
 
             # save new cover art
             LOGO_STORAGE.delete(filename)
@@ -145,12 +145,12 @@ class CoverArt(View):
             LOGO_STORAGE.save(filename, source)
 
             # get hash of new file
-            with LOGO_STORAGE.open(filename, 'rb') as f:
+            with LOGO_STORAGE.open(filename, "rb") as f:
                 new_hash = file_hash(f).digest()
 
             # remove thumbnails if cover changed
             if old_hash != new_hash:
-                logger.info('Removing thumbnails')
+                logger.info("Removing thumbnails")
                 thumbnails = cls.remove_existing_thumbnails(prefix, filename)
 
             return cover_art_url
@@ -161,7 +161,7 @@ class CoverArt(View):
             socket.error,
             IOError,
         ) as e:
-            logger.warning('Exception while updating podcast logo: %s', str(e))
+            logger.warning("Exception while updating podcast logo: %s", str(e))
 
 
 def get_prefix(filename):
@@ -169,16 +169,16 @@ def get_prefix(filename):
 
 
 def get_logo_url(podcast, size):
-    """ Return the logo URL for the podcast
+    """Return the logo URL for the podcast
 
     The logo either comes from the media storage (see CoverArt) or from the
     default logos in the static storage.
     """
 
     if podcast.logo_url:
-        filename = hashlib.sha1(podcast.logo_url.encode('utf-8')).hexdigest()
-        return reverse('logo', args=[size, get_prefix(filename), filename])
+        filename = hashlib.sha1(podcast.logo_url.encode("utf-8")).hexdigest()
+        return reverse("logo", args=[size, get_prefix(filename), filename])
 
     else:
-        filename = 'podcast-%d.png' % (hash(podcast.title) % 5,)
-        return staticfiles_storage.url('logo/{0}'.format(filename))
+        filename = "podcast-%d.png" % (hash(podcast.title) % 5,)
+        return staticfiles_storage.url("logo/{0}".format(filename))

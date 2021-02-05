@@ -105,7 +105,6 @@ JSON
        "author": "Sixgun Productions",
        "url": "http://feeds.feedburner.com/linuxoutlaws",
        "position_last_week": 1,
-       "subscribers_last_week": 1943,
        "subscribers": 1954,
        "mygpo_link": "http://gpodder.net/podcast/11092",
        "logo_url": "http://sixgun.org/files/linuxoutlaws.jpg",
@@ -128,7 +127,6 @@ XML
       <author>Sixgun Productions</author>
       <description>The hardest-hitting Linux podcast around</description>
       <subscribers>1954</subscribers>
-      <subscribers_last_week>1943</subscribers_last_week>
       <logo_url>http://sixgun.org/files/linuxoutlaws.jpg</logo_url>
       <scaled_logo_url>http://gpodder.net/logo/64/fa9fd87a4f9e488096e52839450afe0b120684b4.jpg</scaled_logo_url>
      </podcast>

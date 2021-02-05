@@ -29,11 +29,11 @@ class PodcastSorter(object):
 
 
 class PodcastPercentageListenedSorter(PodcastSorter):
-    """ Sorts podcasts by the percentage of listened episodes
+    """Sorts podcasts by the percentage of listened episodes
 
     Adds the attributes percent_listened and episodes_listened to the podcasts
 
-    Cost: 1 DB query """
+    Cost: 1 DB query"""
 
     def __init__(self, podcasts, user):
         super(PodcastPercentageListenedSorter, self).__init__(podcasts)
@@ -62,9 +62,9 @@ def subscription_changes(device_id, podcast_states, since, until):
     add, rem = [], []
     for p_state in podcast_states:
         change = p_state.get_change_between(device_id, since, until)
-        if change == 'subscribe':
+        if change == "subscribe":
             add.append(p_state.ref_url)
-        elif change == 'unsubscribe':
+        elif change == "unsubscribe":
             rem.append(p_state.ref_url)
 
     return add, rem

@@ -10,34 +10,34 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('contenttypes', '0001_initial'),
+        ("contenttypes", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Vote',
+            name="Vote",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.AutoField(
-                        verbose_name='ID',
+                        verbose_name="ID",
                         serialize=False,
                         auto_created=True,
                         primary_key=True,
                     ),
                 ),
-                ('object_id', models.UUIDField(max_length=32)),
-                ('created', models.DateTimeField()),
-                ('modified', models.DateTimeField()),
+                ("object_id", models.UUIDField(max_length=32)),
+                ("created", models.DateTimeField()),
+                ("modified", models.DateTimeField()),
                 (
-                    'content_type',
+                    "content_type",
                     models.ForeignKey(
-                        to='contenttypes.ContentType',
+                        to="contenttypes.ContentType",
                         on_delete=django.db.models.deletion.PROTECT,
                     ),
                 ),
                 (
-                    'user',
+                    "user",
                     models.ForeignKey(
                         to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE
                     ),
@@ -47,6 +47,6 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.AlterUniqueTogether(
-            name='vote', unique_together=set([('user', 'content_type', 'object_id')])
+            name="vote", unique_together=set([("user", "content_type", "object_id")])
         ),
     ]

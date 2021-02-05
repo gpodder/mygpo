@@ -47,7 +47,7 @@ def list_decorator(must_own=False):
 
 @list_decorator(must_own=False)
 def search(request, plist, owner):
-    return directory_search(request, 'list_search.html', {'listname': plist.slug})
+    return directory_search(request, "list_search.html", {"listname": plist.slug})
 
 
 @login_required
@@ -55,7 +55,7 @@ def lists_own(request):
 
     lists = PodcastList.objects.filter(user=request.user)
 
-    return render(request, 'lists.html', {'lists': lists})
+    return render(request, "lists.html", {"lists": lists})
 
 
 def lists_user(request, username):
@@ -64,7 +64,7 @@ def lists_user(request, username):
     user = get_object_or_404(User, username=username)
     lists = PodcastList.objects.filter(user=user)
 
-    return render(request, 'lists_user.html', {'lists': lists, 'user': user})
+    return render(request, "lists_user.html", {"lists": lists, "user": user})
 
 
 @list_decorator(must_own=False)
@@ -78,13 +78,13 @@ def list_show(request, plist, owner):
 
     return render(
         request,
-        'list.html',
+        "list.html",
         {
-            'podcastlist': plist,
-            'max_subscribers': max_subscribers,
-            'owner': owner,
-            'domain': site.domain,
-            'is_own': is_own,
+            "podcastlist": plist,
+            "max_subscribers": max_subscribers,
+            "owner": owner,
+            "domain": site.domain,
+            "is_own": is_own,
         },
     )
 
@@ -92,28 +92,28 @@ def list_show(request, plist, owner):
 @list_decorator(must_own=False)
 def list_opml(request, plist, owner):
     podcasts = [entry.content_object for entry in plist.entries.all()]
-    return format_podcast_list(podcasts, 'opml', plist.title)
+    return format_podcast_list(podcasts, "opml", plist.title)
 
 
 @login_required
 def create_list(request):
-    title = request.POST.get('title', None)
+    title = request.POST.get("title", None)
 
     if not title:
-        messages.error(request, _('You have to specify a title.'))
-        return HttpResponseRedirect(reverse('lists-overview'))
+        messages.error(request, _("You have to specify a title."))
+        return HttpResponseRedirect(reverse("lists-overview"))
 
     slug = slugify(title)
 
     if not slug:
         messages.error(request, _('"{title}" is not a valid title').format(title=title))
-        return HttpResponseRedirect(reverse('lists-overview'))
+        return HttpResponseRedirect(reverse("lists-overview"))
 
     plist, created = PodcastList.objects.get_or_create(
-        user=request.user, slug=slug, defaults={'id': uuid.uuid1(), 'title': title}
+        user=request.user, slug=slug, defaults={"id": uuid.uuid1(), "title": title}
     )
 
-    list_url = reverse('list-show', args=[request.user.username, slug])
+    list_url = reverse("list-show", args=[request.user.username, slug])
     return HttpResponseRedirect(list_url)
 
 
@@ -130,7 +130,7 @@ def add_podcast(request, plist, owner, podcast_id):
             raise Http404
 
     plist.add_entry(obj)
-    list_url = reverse('list-show', args=[owner.username, plist.slug])
+    list_url = reverse("list-show", args=[owner.username, plist.slug])
     return HttpResponseRedirect(list_url)
 
 
@@ -138,7 +138,7 @@ def add_podcast(request, plist, owner, podcast_id):
 @list_decorator(must_own=True)
 def remove_podcast(request, plist, owner, order):
     PodcastListEntry.objects.filter(podcastlist=plist, order=order).delete()
-    list_url = reverse('list-show', args=[owner.username, plist.slug])
+    list_url = reverse("list-show", args=[owner.username, plist.slug])
     return HttpResponseRedirect(list_url)
 
 
@@ -146,7 +146,7 @@ def remove_podcast(request, plist, owner, order):
 @list_decorator(must_own=True)
 def delete_list(request, plist, owner):
     plist.delete()
-    return HttpResponseRedirect(reverse('lists-overview'))
+    return HttpResponseRedirect(reverse("lists-overview"))
 
 
 @login_required
@@ -159,7 +159,7 @@ def rate_list(request, plist, owner):
         content_type=ContentType.objects.get_for_model(plist),
         object_id=plist.id,
     )
-    messages.success(request, _('Thanks for rating!'))
+    messages.success(request, _("Thanks for rating!"))
 
-    list_url = reverse('list-show', args=[owner.username, plist.slug])
+    list_url = reverse("list-show", args=[owner.username, plist.slug])
     return HttpResponseRedirect(list_url)

@@ -8,15 +8,15 @@ from mygpo.history.stats import playcounts_timerange
 from mygpo.publisher.models import PublishedPodcast
 
 
-ListenerData = namedtuple('ListenerData', 'date playcount episode')
+ListenerData = namedtuple("ListenerData", "date playcount episode")
 
 
 def listener_data(podcasts, start_date=datetime(2010, 1, 1), leap=timedelta(days=1)):
-    """ Returns data for the podcast listener timeseries
+    """Returns data for the podcast listener timeseries
 
     An iterator with data for each day (starting from either the first released
     episode or the earliest play-event) is returned, where each day is
-    reresented by a ListenerData tuple. """
+    reresented by a ListenerData tuple."""
     # index episodes by releaes-date
     episodes = Episode.objects.filter(podcast__in=podcasts, released__gt=start_date)
     episodes = {e.released.date(): e for e in episodes}
@@ -44,10 +44,10 @@ def listener_data(podcasts, start_date=datetime(2010, 1, 1), leap=timedelta(days
 def episode_listener_data(
     episode, start_date=datetime(2010, 1, 1), leap=timedelta(days=1)
 ):
-    """ Returns data for the episode listener timeseries
+    """Returns data for the episode listener timeseries
 
     An iterator with data for each day (starting from the first event
-    is returned, where each day is represented by a ListenerData tuple """
+    is returned, where each day is represented by a ListenerData tuple"""
     history = EpisodeHistoryEntry.objects.filter(
         episode=episode, timestamp__gte=start_date
     )
@@ -79,7 +79,7 @@ def subscriber_data(podcasts):
 
     # TODO. rewrite
     for podcast in podcasts:
-        create_entry = lambda r: (r.timestamp.strftime('%y-%m'), r.subscriber_count)
+        create_entry = lambda r: (r.timestamp.strftime("%y-%m"), r.subscriber_count)
 
         subdata = [podcast.subscribers]
 
@@ -90,7 +90,7 @@ def subscriber_data(podcasts):
 
     # create a list of {'x': label, 'y': value}
     coll_data = sorted(
-        [dict(x=a, y=b) for (a, b) in coll_data.items()], key=lambda x: x['x']
+        [dict(x=a, y=b) for (a, b) in coll_data.items()], key=lambda x: x["x"]
     )
 
     return coll_data

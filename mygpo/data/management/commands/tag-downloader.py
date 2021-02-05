@@ -6,7 +6,7 @@ from mygpo.data import delicious
 from mygpo.maintenance.management.podcastcmd import PodcastCommand
 
 
-SOURCE = 'delicious'
+SOURCE = "delicious"
 
 
 class Command(PodcastCommand):

@@ -14,12 +14,12 @@ from mygpo.users.tasks import sync_user
 @require_valid_user
 @check_username
 @never_cache
-@allowed_methods(['GET', 'POST'])
+@allowed_methods(["GET", "POST"])
 @cors_origin()
 def main(request, username):
     """ API Endpoint for Device Synchronisation """
 
-    if request.method == 'GET':
+    if request.method == "GET":
         return JsonResponse(get_sync_status(request.user))
 
     else:
@@ -28,8 +28,8 @@ def main(request, username):
         except ValueError as e:
             return HttpResponseBadRequest(str(e))
 
-        synclist = actions.get('synchronize', [])
-        stopsync = actions.get('stop-synchronize', [])
+        synclist = actions.get("synchronize", [])
+        stopsync = actions.get("stop-synchronize", [])
 
         try:
             update_sync_status(request.user, synclist, stopsync)
@@ -38,7 +38,7 @@ def main(request, username):
         except Client.DoesNotExist as e:
             return HttpResponseNotFound(str(e))
 
-        return JsonResponse(get_sync_status(user))
+        return JsonResponse(get_sync_status(request.user))
 
 
 def get_sync_status(user):
@@ -57,31 +57,31 @@ def get_sync_status(user):
         else:
             unsynced = uids
 
-    return {'synchronized': sync_groups, 'not-synchronized': unsynced}
+    return {"synchronized": sync_groups, "not-synchronized": unsynced}
 
 
 def update_sync_status(user, synclist, stopsync):
-    """ Updates the current Device Sync status
+    """Updates the current Device Sync status
 
     Synchronisation between devices can be set up and stopped.  Devices are
     identified by their UIDs. Unknown UIDs cause errors, no new devices are
-    created. """
+    created."""
 
     for devlist in synclist:
 
         if len(devlist) <= 1:
-            raise ValueError('at least two devices are needed to sync')
+            raise ValueError("at least two devices are needed to sync")
 
         # Setup all devices to sync with the first in the list
         uid = devlist[0]
         dev = user.client_set.get(uid=uid)
 
         for other_uid in devlist[1:]:
-            other = user.get_device_by_uid(other_uid)
+            other = user.client_set.get(uid=other_uid)
             dev.sync_with(other)
 
     for uid in stopsync:
-        dev = user.get_device_by_uid(uid)
+        dev = user.client_set.get(uid=uid)
         try:
             dev.stop_sync()
         except ValueError:

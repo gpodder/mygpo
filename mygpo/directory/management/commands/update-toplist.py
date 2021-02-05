@@ -12,19 +12,19 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--silent',
-            action='store_true',
-            dest='silent',
+            "--silent",
+            action="store_true",
+            dest="silent",
             default=False,
             help="Don't show any output",
         ),
 
     def handle(self, *args, **options):
 
-        silent = options.get('silent')
+        silent = options.get("silent")
 
         podcasts = Podcast.objects.all()
-        total = podcasts.count_fast()
+        total = podcasts.count()
 
         for n, podcast in enumerate(podcasts):
             update_podcast_subscribers.delay(podcast.get_id())

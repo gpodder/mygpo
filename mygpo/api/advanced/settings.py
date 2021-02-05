@@ -9,9 +9,9 @@ from mygpo.api.httpresponse import JsonResponse
 
 
 class SettingsAPI(APIView):
-    """ Settings API
+    """Settings API
 
-    wiki.gpodder.org/wiki/Web_Services/API_2/Settings """
+    wiki.gpodder.org/wiki/Web_Services/API_2/Settings"""
 
     def get(self, request, username, scope):
         """ Get settings for scope object """
@@ -31,31 +31,31 @@ class SettingsAPI(APIView):
 
     def get_scope(self, request, scope):
         """ Get the scope object """
-        if scope == 'account':
+        if scope == "account":
             return None
 
-        if scope == 'device':
-            uid = request.GET.get('device', '')
+        if scope == "device":
+            uid = request.GET.get("device", "")
             return request.user.client_set.get(uid=uid)
 
-        episode_url = request.GET.get('episode', '')
-        podcast_url = request.GET.get('podcast', '')
+        episode_url = request.GET.get("episode", "")
+        podcast_url = request.GET.get("podcast", "")
 
-        if scope == 'podcast':
+        if scope == "podcast":
             return get_object_or_404(Podcast, urls__url=podcast_url)
 
-        if scope == 'episode':
+        if scope == "episode":
             podcast = get_object_or_404(Podcast, urls__url=podcast_url)
             return get_object_or_404(Episode, podcast=podcast, urls__url=episode_url)
 
-        raise RequestException('undefined scope %s' % scope)
+        raise RequestException("undefined scope %s" % scope)
 
     def update_settings(self, settings, actions):
         """ Update the settings according to the actions """
-        for key, value in actions.get('set', {}).items():
+        for key, value in actions.get("set", {}).items():
             settings.set_setting(key, value)
 
-        for key in actions.get('remove', []):
+        for key in actions.get("remove", []):
             settings.del_setting(key)
 
         settings.save()

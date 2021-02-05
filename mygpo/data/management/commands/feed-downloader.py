@@ -19,9 +19,9 @@ class Command(PodcastCommand):
 
         super().add_arguments(parser)
         parser.add_argument(
-            '--list-only',
-            action='store_true',
-            dest='list',
+            "--list-only",
+            action="store_true",
+            dest="list",
             default=False,
             help="Don't update anything, just list podcasts ",
         ),
@@ -30,16 +30,16 @@ class Command(PodcastCommand):
 
         queue = self.get_podcasts(*args, **options)
 
-        max_podcasts = options.get('max')
+        max_podcasts = options.get("max")
         if max_podcasts:
             queue = islice(queue, 0, max_podcasts)
 
-        if options.get('list'):
+        if options.get("list"):
             for podcast in queue:
-                logger.info('Podcast %s', podcast)
+                logger.info("Podcast %s", podcast)
 
         else:
-            logger.info('Updating podcasts...')
+            logger.info("Updating podcasts...")
 
             for podcast in update_podcasts(queue):
-                logger.info('Updated podcast %s', podcast)
+                logger.info("Updated podcast %s", podcast)

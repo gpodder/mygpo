@@ -34,11 +34,11 @@ def get_device(user, uid, user_agent, undelete=True):
 
     if client.deleted and undelete:
         client.deleted = False
-        update_fields.append('deleted')
+        update_fields.append("deleted")
 
     if store_ua and user_agent and client.user_agent != user_agent:
         client.user_agent = user_agent
-        update_fields.append('user_agent')
+        update_fields.append("user_agent")
 
     if update_fields:
         client.save(update_fields=update_fields)

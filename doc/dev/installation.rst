@@ -16,19 +16,27 @@ development version from the repository.
 Basic setup
 -----------
 
-On a Debian/Ubuntu based system, you can install dependencies with
-
-.. code-block:: bash
-
-    make install-deps
-
-
 mygpo itself can be cloned from the repository:
 
 .. code-block:: bash
 
     git clone git://github.com/gpodder/mygpo.git
     cd mygpo
+
+
+On a Debian/Ubuntu based system, you can install dependencies with
+
+.. code-block:: bash
+
+    make install-deps
+
+Or:
+
+.. code-block:: bash
+
+    sudo apt-get install libpq-dev libjpeg-dev zlib1g-dev libwebp-dev \
+		build-essential python3-dev virtualenv libffi-dev redis postgresql
+
 
 Now install additional dependencies locally:
 

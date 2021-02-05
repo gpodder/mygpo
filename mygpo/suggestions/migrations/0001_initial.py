@@ -9,35 +9,35 @@ from django.conf import settings
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('podcasts', '0028_episode_indexes'),
+        ("podcasts", "0028_episode_indexes"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='PodcastSuggestion',
+            name="PodcastSuggestion",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.AutoField(
-                        verbose_name='ID',
+                        verbose_name="ID",
                         serialize=False,
                         auto_created=True,
                         primary_key=True,
                     ),
                 ),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('modified', models.DateTimeField(auto_now=True)),
-                ('deleted', models.BooleanField(default=False)),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("modified", models.DateTimeField(auto_now=True)),
+                ("deleted", models.BooleanField(default=False)),
                 (
-                    'podcast',
+                    "podcast",
                     models.ForeignKey(
-                        to='podcasts.Podcast',
+                        to="podcasts.Podcast",
                         on_delete=django.db.models.deletion.PROTECT,
                     ),
                 ),
                 (
-                    'suggested_to',
+                    "suggested_to",
                     models.ForeignKey(
                         to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE
                     ),
@@ -47,6 +47,6 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.AlterUniqueTogether(
-            name='podcastsuggestion', unique_together=set([('suggested_to', 'podcast')])
+            name="podcastsuggestion", unique_together=set([("suggested_to", "podcast")])
         ),
     ]

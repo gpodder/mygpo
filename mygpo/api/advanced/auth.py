@@ -12,7 +12,7 @@ from mygpo.decorators import allowed_methods, cors_origin
 @csrf_exempt
 @require_valid_user
 @check_username
-@allowed_methods(['POST'])
+@allowed_methods(["POST"])
 @never_cache
 @cors_origin()
 def login(request, username):
@@ -26,7 +26,7 @@ def login(request, username):
 
 @csrf_exempt
 @check_username
-@allowed_methods(['POST'])
+@allowed_methods(["POST"])
 @never_cache
 @cors_origin()
 def logout(request, username):

@@ -43,7 +43,7 @@ def welcome(request):
 
     toplist = Podcast.objects.all().toplist(lang)
 
-    return render(request, 'home.html', {'url': current_site, 'toplist': toplist})
+    return render(request, "home.html", {"url": current_site, "toplist": toplist})
 
 
 @vary_on_cookie
@@ -61,31 +61,31 @@ def dashboard(request, episode_count=10):
     checklist = []
 
     if request.user.client_set.count():
-        checklist.append('devices')
+        checklist.append("devices")
 
     if subscribed_podcasts:
-        checklist.append('subscriptions')
+        checklist.append("subscriptions")
 
     if FavoriteEpisode.objects.filter(user=request.user).exists():
-        checklist.append('favorites')
+        checklist.append("favorites")
 
-    if not request.user.profile.get_token('subscriptions_token'):
-        checklist.append('share')
+    if not request.user.profile.get_token("subscriptions_token"):
+        checklist.append("share")
 
-    if not request.user.profile.get_token('favorite_feeds_token'):
-        checklist.append('share-favorites')
+    if not request.user.profile.get_token("favorite_feeds_token"):
+        checklist.append("share-favorites")
 
-    if not request.user.profile.get_token('userpage_token'):
-        checklist.append('userpage')
+    if not request.user.profile.get_token("userpage_token"):
+        checklist.append("userpage")
 
     if Tag.objects.filter(user=request.user).exists():
-        checklist.append('tags')
+        checklist.append("tags")
 
     if PodcastList.objects.filter(user=request.user).exists():
-        checklist.append('lists')
+        checklist.append("lists")
 
     if PublishedPodcast.objects.filter(publisher=request.user).exists():
-        checklist.append('publish')
+        checklist.append("publish")
 
     tomorrow = datetime.today() + timedelta(days=1)
 
@@ -102,22 +102,22 @@ def dashboard(request, episode_count=10):
     # we only show the "install reader" link in firefox, because we don't know
     # yet how/if this works in other browsers.
     # hints appreciated at https://bugs.gpodder.org/show_bug.cgi?id=58
-    show_install_reader = 'firefox' in request.META.get('HTTP_USER_AGENT', '').lower()
+    show_install_reader = "firefox" in request.META.get("HTTP_USER_AGENT", "").lower()
 
-    random_podcast = Podcast.objects.all().random().prefetch_related('slugs').first()
+    random_podcast = Podcast.objects.all().random().prefetch_related("slugs").first()
 
     return render(
         request,
-        'dashboard.html',
+        "dashboard.html",
         {
-            'user': request.user,
-            'subscribed_podcasts': subscribed_podcasts,
-            'newest_episodes': list(newest_episodes),
-            'random_podcast': random_podcast,
-            'checklist': checklist,
-            'site': site,
-            'show_install_reader': show_install_reader,
-            'podcast_ad': podcast_ad,
+            "user": request.user,
+            "subscribed_podcasts": subscribed_podcasts,
+            "newest_episodes": list(newest_episodes),
+            "random_podcast": random_podcast,
+            "checklist": checklist,
+            "site": site,
+            "show_install_reader": show_install_reader,
+            "podcast_ad": podcast_ad,
         },
     )
 
@@ -130,11 +130,11 @@ def mytags(request):
 
     user = request.user
 
-    tags = Tag.objects.filter(source=Tag.USER, user=user).order_by('tag')
+    tags = Tag.objects.filter(source=Tag.USER, user=user).order_by("tag")
     for tag in tags:
         tags_tag[tag.tag].append(tag.content_object)
 
-    return render(request, 'mytags.html', {'tags_tag': dict(tags_tag.items())})
+    return render(request, "mytags.html", {"tags_tag": dict(tags_tag.items())})
 
 
 @never_cache
@@ -142,13 +142,13 @@ def csrf_failure(request, reason=""):
     site = RequestSite(request)
     return render(
         request,
-        'csrf.html',
+        "csrf.html",
         {
-            'site': site,
-            'method': request.method,
-            'referer': request.META.get('HTTP_REFERER', _('another site')),
-            'path': request.path,
-            'get': request.GET,
-            'post': request.POST,
+            "site": site,
+            "method": request.method,
+            "referer": request.META.get("HTTP_REFERER", _("another site")),
+            "path": request.path,
+            "get": request.GET,
+            "post": request.POST,
         },
     )

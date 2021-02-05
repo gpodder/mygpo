@@ -1,4 +1,5 @@
 import multiprocessing
+import os
 
 bind = "unix:/tmp/mygpo.sock"
 workers = multiprocessing.cpu_count()
@@ -6,16 +7,16 @@ workers = multiprocessing.cpu_count()
 # The maximum number of requests a worker will process before restarting.
 # max_requests = 1000
 
-errorlog='/var/log/gunicorn/error.log'
-accesslog='/var/log/gunicorn/access.log'
-loglevel='info'
+errorlog = "/var/log/gunicorn/error.log"
+accesslog = "/var/log/gunicorn/access.log"
+loglevel = "info"
 
 timeout = 120
 graceful_timeout = 60
 
 
 def get_bool(name, default):
-    return os.getenv(name, str(default)).lower() == 'true'
+    return os.getenv(name, str(default)).lower() == "true"
 
 
 def _post_fork_handler(server, worker):
@@ -24,7 +25,7 @@ def _post_fork_handler(server, worker):
 
 
 # check if we want to use gevent
-_USE_GEVENT = get_bool('USE_GEVENT', False)
+_USE_GEVENT = get_bool("USE_GEVENT", False)
 
 
 try:
@@ -38,7 +39,7 @@ if _USE_GEVENT:
     # Active gevent-related settings
 
     worker_connections = 100
-    worker_class = 'gevent'
+    worker_class = "gevent"
 
     # activate the handler
     post_fork = _post_fork_handler

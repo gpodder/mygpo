@@ -11,33 +11,33 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [('podcasts', '0037_index_podcast_lastupdate')]
+    dependencies = [("podcasts", "0037_index_podcast_lastupdate")]
 
     operations = [
         migrations.CreateModel(
-            name='PodcastUpdateResult',
+            name="PodcastUpdateResult",
             fields=[
-                ('id', models.UUIDField(primary_key=True, serialize=False)),
-                ('start', models.DateTimeField(default=datetime.datetime.utcnow)),
-                ('duration', models.DurationField()),
-                ('successful', models.BooleanField()),
-                ('error_message', models.TextField()),
-                ('podcast_created', models.BooleanField()),
-                ('episodes_added', models.IntegerField()),
+                ("id", models.UUIDField(primary_key=True, serialize=False)),
+                ("start", models.DateTimeField(default=datetime.datetime.utcnow)),
+                ("duration", models.DurationField()),
+                ("successful", models.BooleanField()),
+                ("error_message", models.TextField()),
+                ("podcast_created", models.BooleanField()),
+                ("episodes_added", models.IntegerField()),
                 (
-                    'podcast',
+                    "podcast",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        to='podcasts.Podcast',
+                        to="podcasts.Podcast",
                     ),
                 ),
             ],
-            options={'get_latest_by': 'start', 'ordering': ['-start']},
+            options={"get_latest_by": "start", "ordering": ["-start"]},
         ),
         migrations.AddIndex(
-            model_name='podcastupdateresult',
+            model_name="podcastupdateresult",
             index=models.Index(
-                fields=['podcast', 'start'], name='data_podcas_podcast_cf4cc1_idx'
+                fields=["podcast", "start"], name="data_podcas_podcast_cf4cc1_idx"
             ),
         ),
     ]

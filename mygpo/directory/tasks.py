@@ -16,8 +16,8 @@ def update_podcast_subscribers(podcast_id):
         # calculate current number of subscribers
         podcast.subscribers = (
             Subscription.objects.filter(podcast=podcast)
-            .order_by('user')
-            .distinct('user')
+            .order_by("user")
+            .distinct("user")
             .count()
         )
         podcast.save()
