@@ -30,9 +30,9 @@ class UserSettingsManager(models.Manager):
         return private
 
     def get_for_scope(self, user, scope):
-        """ Returns the settings object for the given user and scope obj
+        """Returns the settings object for the given user and scope obj
 
-        If scope is None, the settings for the user are returned """
+        If scope is None, the settings for the user are returned"""
         if scope is None:
             content_type = None
             object_id = None
@@ -64,15 +64,15 @@ class UserSettings(models.Model):
         ContentType, null=True, blank=True, on_delete=models.PROTECT
     )
     object_id = models.UUIDField(null=True, blank=True)
-    content_object = GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey("content_type", "object_id")
 
-    settings = models.TextField(null=False, default='{}')
+    settings = models.TextField(null=False, default="{}")
 
     class Meta:
-        unique_together = [['user', 'content_type', 'object_id']]
+        unique_together = [["user", "content_type", "object_id"]]
 
-        verbose_name_plural = 'User Settings'
-        verbose_name = 'User Settings'
+        verbose_name_plural = "User Settings"
+        verbose_name = "User Settings"
 
     objects = UserSettingsManager()
 
@@ -81,7 +81,7 @@ class UserSettings(models.Model):
         try:
             settings = json.loads(self.settings)
         except ValueError as ex:
-            logger.warning('Decoding settings failed: {msg}'.format(msg=str(ex)))
+            logger.warning("Decoding settings failed: {msg}".format(msg=str(ex)))
             return None
 
         return settings.get(setting.name, setting.default)
@@ -90,7 +90,7 @@ class UserSettings(models.Model):
         try:
             settings = json.loads(self.settings)
         except ValueError as ex:
-            logger.warning('Decoding settings failed: {msg}'.format(msg=str(ex)))
+            logger.warning("Decoding settings failed: {msg}".format(msg=str(ex)))
             settings = {}
         settings[setting.name] = value
         self.settings = json.dumps(settings)

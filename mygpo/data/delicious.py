@@ -12,17 +12,17 @@ def get_tags(url):
     """
 
     split = urllib.parse.urlsplit(url)
-    if split.path == '':
+    if split.path == "":
         split = urllib.parse.SplitResult(
-            split.scheme, split.netloc, '/', split.query, split.fragment
+            split.scheme, split.netloc, "/", split.query, split.fragment
         )
     url = split.geturl()
 
     m = hashlib.md5()
-    m.update(url.encode('ascii'))
+    m.update(url.encode("ascii"))
 
     url_md5 = m.hexdigest()
-    req = 'http://feeds.delicious.com/v2/json/urlinfo/%s' % url_md5
+    req = "http://feeds.delicious.com/v2/json/urlinfo/%s" % url_md5
 
     resp = urllib.request.urlopen(req).read()
     try:
@@ -32,9 +32,9 @@ def get_tags(url):
 
     tags = {}
     for o in resp_obj:
-        if (not 'top_tags' in o) or (not o['top_tags']):
+        if (not "top_tags" in o) or (not o["top_tags"]):
             return {}
-        for tag, count in o['top_tags'].items():
+        for tag, count in o["top_tags"].items():
             tags[tag] = count
 
     return tags

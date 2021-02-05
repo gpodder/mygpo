@@ -6,17 +6,17 @@ from django.db import models, migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [('history', '0007_episodehistory_index')]
+    dependencies = [("history", "0007_episodehistory_index")]
 
     operations = [
         migrations.AlterIndexTogether(
-            name='episodehistoryentry',
+            name="episodehistoryentry",
             index_together=set(
                 [
-                    ('user', 'action', 'episode'),
-                    ('user', 'client', 'episode', 'action', 'timestamp'),
-                    ('episode', 'timestamp'),
-                    ('user', 'episode', 'timestamp'),
+                    ("user", "action", "episode"),
+                    ("user", "client", "episode", "action", "timestamp"),
+                    ("episode", "timestamp"),
+                    ("user", "episode", "timestamp"),
                 ]
             ),
         )

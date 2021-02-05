@@ -20,34 +20,34 @@ DEVICE_TYPES_DICT = dict(Client.TYPES)
 
 # This dictionary maps device types to their icon files
 DEVICE_TYPE_ICONS = {
-    'desktop': 'computer.png',
-    'laptop': 'stock_notebook.png',
-    'mobile': 'stock_cell-phone.png',
-    'server': 'server.png',
-    'other': 'audio-x-generic.png',
+    "desktop": "computer.png",
+    "laptop": "stock_notebook.png",
+    "mobile": "stock_cell-phone.png",
+    "server": "server.png",
+    "other": "audio-x-generic.png",
 }
 
 
 @register.filter
 def device_type(device):
-    return DEVICE_TYPES_DICT.get(device.type, _('Unknown'))
+    return DEVICE_TYPES_DICT.get(device.type, _("Unknown"))
 
 
 @register.filter()
 def device_icon(device):
 
-    ua_str = (device.user_agent or '').lower()
+    ua_str = (device.user_agent or "").lower()
 
     # TODO: better client detection
-    if 'gpodder' in ua_str:
-        icon = 'gpodder.png'
-        caption = 'gPodder'
-    elif 'amarok' in ua_str:
-        icon = 'amarok.png'
-        caption = 'Amarok'
-    elif 'podax' in ua_str:
-        icon = 'podax.png'
-        caption = 'Podax'
+    if "gpodder" in ua_str:
+        icon = "gpodder.png"
+        caption = "gPodder"
+    elif "amarok" in ua_str:
+        icon = "amarok.png"
+        caption = "Amarok"
+    elif "podax" in ua_str:
+        icon = "podax.png"
+        caption = "Podax"
 
     else:
         device_type = device.type
@@ -57,11 +57,11 @@ def device_icon(device):
     if icon is not None and caption is not None:
         caption = gettext(caption)
         html = '<img src="%(icon)s" alt="%(caption)s" class="device_icon"/>' % dict(
-            icon=staticfiles_storage.url(os.path.join('clients', icon)), caption=caption
+            icon=staticfiles_storage.url(os.path.join("clients", icon)), caption=caption
         )
         return mark_safe(html)
 
-    return ''
+    return ""
 
 
 @register.filter
@@ -76,7 +76,7 @@ def target_uid(client):
 @register.filter()
 def device_list(devices):
     links = map(device_link, devices)
-    return mark_safe(''.join(links))
+    return mark_safe("".join(links))
 
 
 def device_link(device):
@@ -97,7 +97,7 @@ def device_name(client):
 def devices_name(devices):
     """ returns the name of a single device, or of a list of devices """
     devices = devices if isinstance(devices, (list, tuple)) else [devices]
-    return ', '.join(device_name(device) for device in devices)
+    return ", ".join(device_name(device) for device in devices)
 
 
 @register.filter
@@ -112,4 +112,4 @@ def devices_uids(client):
         clients = client.client_set.all()
     elif isinstance(client, Client):
         clients = [client]
-    return ','.join(client.uid for client in clients)
+    return ",".join(client.uid for client in clients)

@@ -7,18 +7,18 @@ from . import models
 class PodcastUpdateResultAdmin(admin.ModelAdmin):
     model = models.PodcastUpdateResult
 
-    list_display = ['title', 'start', 'duration', 'successful', 'episodes_added']
+    list_display = ["title", "start", "duration", "successful", "episodes_added"]
 
     readonly_fields = [
-        'id',
-        'podcast_url',
-        'podcast',
-        'start',
-        'duration',
-        'successful',
-        'error_message',
-        'podcast_created',
-        'episodes_added',
+        "id",
+        "podcast_url",
+        "podcast",
+        "start",
+        "duration",
+        "successful",
+        "error_message",
+        "podcast_created",
+        "episodes_added",
     ]
 
     def title(self, res):

@@ -9,35 +9,35 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('contenttypes', '0001_initial'),
+        ("contenttypes", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='UserSettings',
+            name="UserSettings",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.AutoField(
-                        verbose_name='ID',
+                        verbose_name="ID",
                         serialize=False,
                         auto_created=True,
                         primary_key=True,
                     ),
                 ),
-                ('settings', models.TextField(default='{}')),
-                ('object_id', models.UUIDField(max_length=32, null=True, blank=True)),
+                ("settings", models.TextField(default="{}")),
+                ("object_id", models.UUIDField(max_length=32, null=True, blank=True)),
                 (
-                    'content_type',
+                    "content_type",
                     models.ForeignKey(
                         blank=True,
-                        to='contenttypes.ContentType',
+                        to="contenttypes.ContentType",
                         null=True,
                         on_delete=models.PROTECT,
                     ),
                 ),
                 (
-                    'user',
+                    "user",
                     models.ForeignKey(
                         to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE
                     ),
@@ -47,8 +47,8 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.AlterUniqueTogether(
-            name='usersettings',
-            unique_together=set([('user', 'content_type', 'object_id')]),
+            name="usersettings",
+            unique_together=set([("user", "content_type", "object_id")]),
         ),
         # PostgreSQL does not consider null values for unique constraints;
         # UserSettings for Users have no content_object; the following ensures
@@ -56,12 +56,12 @@ class Migration(migrations.Migration):
         migrations.RunSQL(
             [
                 (
-                    'CREATE UNIQUE INDEX usersettings_unique_null '
-                    'ON usersettings_usersettings (user_id) '
-                    'WHERE content_type_id IS NULL;',
+                    "CREATE UNIQUE INDEX usersettings_unique_null "
+                    "ON usersettings_usersettings (user_id) "
+                    "WHERE content_type_id IS NULL;",
                     None,
                 )
             ],
-            [('DROP INDEX IF EXISTS usersettings_unique_null;', None)],
+            [("DROP INDEX IF EXISTS usersettings_unique_null;", None)],
         ),
     ]

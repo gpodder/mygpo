@@ -21,12 +21,12 @@ class AdminLinkMixin(object):
         """ Link to the admin page """
 
         if not instance.pk:
-            return ''
+            return ""
 
         url = edit_link(instance)
-        return format_html('<a href="{}">{}</a>', url, _('Edit'))
+        return format_html('<a href="{}">{}</a>', url, _("Edit"))
 
-    readonly_fields = ('admin_link',)
+    readonly_fields = ("admin_link",)
 
 
 class AdminLinkInline(AdminLinkMixin, admin.TabularInline):
@@ -40,15 +40,15 @@ class GenericAdminLinkInline(AdminLinkMixin, GenericTabularInline):
 @admin.register(URL)
 class URLAdmin(admin.ModelAdmin):
     model = URL
-    list_display = ('url', 'content_type', 'object_id')
-    list_filter = ('content_type',)
+    list_display = ("url", "content_type", "object_id")
+    list_filter = ("content_type",)
 
     show_full_result_count = False
 
 
 class URLInline(GenericAdminLinkInline):
     model = URL
-    fields = ('order', 'url', 'admin_link')
+    fields = ("order", "url", "admin_link")
 
 
 class SlugInline(GenericTabularInline):
@@ -58,7 +58,7 @@ class SlugInline(GenericTabularInline):
 class TagInline(GenericTabularInline):
     model = Tag
 
-    raw_id_fields = ('user',)
+    raw_id_fields = ("user",)
 
 
 class MergedUUIDInline(GenericTabularInline):
@@ -68,9 +68,9 @@ class MergedUUIDInline(GenericTabularInline):
 class PodcastInline(AdminLinkInline):
     model = Podcast
 
-    fields = ('id', 'title', 'group_member_name', 'admin_link')
+    fields = ("id", "title", "group_member_name", "admin_link")
 
-    readonly_fields = ('id',) + AdminLinkInline.readonly_fields
+    readonly_fields = ("id",) + AdminLinkInline.readonly_fields
 
     can_delete = False
 
@@ -84,68 +84,68 @@ class PodcastAdmin(admin.ModelAdmin):
     """ Admin page for podcasts """
 
     # configuration for the list view
-    list_display = ('title', 'main_url')
+    list_display = ("title", "main_url")
 
-    list_filter = ('language',)
-    search_fields = ('title', 'twitter', '^urls__url')
+    list_filter = ("language",)
+    search_fields = ("title", "twitter", "^urls__url")
 
     # configuration for the create / edit view
     fieldsets = (
         (
             None,
-            {'fields': ('id', 'title', 'subtitle', 'description', 'link', 'language')},
+            {"fields": ("id", "title", "subtitle", "description", "link", "language")},
         ),
         (
-            'Additional information',
+            "Additional information",
             {
-                'fields': (
-                    'created',
-                    'license',
-                    'flattr_url',
-                    'author',
-                    'twitter',
-                    'related_podcasts',
+                "fields": (
+                    "created",
+                    "license",
+                    "flattr_url",
+                    "author",
+                    "twitter",
+                    "related_podcasts",
                 )
             },
         ),
-        ('Podcast Group', {'fields': ('group', 'group_member_name')}),
+        ("Podcast Group", {"fields": ("group", "group_member_name")}),
         (
-            'Episodes',
+            "Episodes",
             {
-                'fields': (
-                    'common_episode_title',
-                    'latest_episode_timestamp',
-                    'content_types',
-                    'max_episode_order',
-                    'episode_count',
+                "fields": (
+                    "common_episode_title",
+                    "latest_episode_timestamp",
+                    "content_types",
+                    "max_episode_order",
+                    "episode_count",
                 )
             },
         ),
         (
-            'Feed updates',
+            "Feed updates",
             {
-                'fields': (
-                    'outdated',
-                    'new_location',
-                    'last_update',
-                    'search_index_uptodate',
-                    'search_vector',
+                "fields": (
+                    "outdated",
+                    "new_location",
+                    "last_update",
+                    "search_index_uptodate",
+                    "search_vector",
                 )
             },
         ),
-        ('Admin', {'fields': ('restrictions', 'hub')}),
+        ("Admin", {"fields": ("restrictions", "hub")}),
     )
 
     inlines = [URLInline, SlugInline, TagInline, MergedUUIDInline]
 
-    raw_id_fields = ('related_podcasts',)
+    raw_id_fields = ("related_podcasts",)
 
     readonly_fields = (
-        'id',
-        'created',
-        'last_update',
-        'search_index_uptodate',
-        'search_vector',
+        "id",
+        "created",
+        "last_update",
+        "search_index_uptodate",
+        "search_vector",
     )
 
     show_full_result_count = False
@@ -153,7 +153,7 @@ class PodcastAdmin(admin.ModelAdmin):
     def main_url(self, podcast):
         url = podcast.urls.first()
         if url is None:
-            return ''
+            return ""
 
         return url.url
 
@@ -163,55 +163,55 @@ class EpisodeAdmin(admin.ModelAdmin):
     """ Admin page for episodes """
 
     # configuration for the list view
-    list_display = ('title', 'podcast_title', 'main_url')
+    list_display = ("title", "podcast_title", "main_url")
 
-    list_filter = ('language',)
-    search_fields = ('title', '^urls__url')
+    list_filter = ("language",)
+    search_fields = ("title", "^urls__url")
 
     # configuration for the create / edit view
     fieldsets = (
         (
             None,
             {
-                'fields': (
-                    'id',
-                    'title',
-                    'subtitle',
-                    'description',
-                    'link',
-                    'language',
-                    'guid',
-                    'released',
-                    'podcast',
-                    'order',
+                "fields": (
+                    "id",
+                    "title",
+                    "subtitle",
+                    "description",
+                    "link",
+                    "language",
+                    "guid",
+                    "released",
+                    "podcast",
+                    "order",
                 )
             },
         ),
         (
-            'Additional information',
+            "Additional information",
             {
-                'fields': (
-                    'created',
-                    'license',
-                    'flattr_url',
-                    'author',
-                    'content',
-                    'listeners',
+                "fields": (
+                    "created",
+                    "license",
+                    "flattr_url",
+                    "author",
+                    "content",
+                    "listeners",
                 )
             },
         ),
         (
-            'Media file',
-            {'fields': ('duration', 'filesize', 'content_types', 'mimetypes')},
+            "Media file",
+            {"fields": ("duration", "filesize", "content_types", "mimetypes")},
         ),
-        ('Feed updates', {'fields': ('outdated', 'last_update')}),
+        ("Feed updates", {"fields": ("outdated", "last_update")}),
     )
 
     inlines = [URLInline, SlugInline, MergedUUIDInline]
 
-    raw_id_fields = ('podcast',)
+    raw_id_fields = ("podcast",)
 
-    readonly_fields = ('id', 'created', 'last_update')
+    readonly_fields = ("id", "created", "last_update")
 
     show_full_result_count = False
 
@@ -227,9 +227,9 @@ class PodcastGroupAdmin(admin.ModelAdmin):
     """ Admin page for podcast groups """
 
     # configuration for the list view
-    list_display = ('title',)
+    list_display = ("title",)
 
-    search_fields = ('title',)
+    search_fields = ("title",)
 
     inlines = [PodcastInline]
 
@@ -240,8 +240,8 @@ class PodcastGroupAdmin(admin.ModelAdmin):
 class TagAdmin(admin.ModelAdmin):
     """ Admin page for tags """
 
-    list_display = ('tag', 'content_object', 'source', 'user')
+    list_display = ("tag", "content_object", "source", "user")
 
-    list_filter = ('source',)
+    list_filter = ("source",)
 
     show_full_result_count = False

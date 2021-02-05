@@ -18,8 +18,8 @@ class SearchTests(TransactionTestCase):
         # create a podcast
         podcast = Podcast(
             id=uuid.uuid1(),
-            title='Awesome Podcast',
-            description='An amazing podcast on many topics',
+            title="Awesome Podcast",
+            description="An amazing podcast on many topics",
         )
         podcast.save()
 
@@ -27,30 +27,30 @@ class SearchTests(TransactionTestCase):
         update_search_index()
 
         # search for the podcast
-        results = search_podcasts('awesome')
+        results = search_podcasts("awesome")
         self.assertEqual(results[0].id, podcast.id)
 
     @override_settings(QUERY_LENGTH_CUTOFF=3)
     def test_shortest_search_podcast(self):
         """
-         Search for a podcast with query length smaller than 3
-         With QUERY_LENGTH_CUTOFF = 3
-         Server would normally time out, however Podcasts exist for the given
-         search term.
+        Search for a podcast with query length smaller than 3
+        With QUERY_LENGTH_CUTOFF = 3
+        Server would normally time out, however Podcasts exist for the given
+        search term.
         """
         # create a podcast
         podcast = Podcast(
             id=uuid.uuid1(),
-            title='The Tricky Podcast',
-            description='The only podcast containing tricky messages.',
+            title="The Tricky Podcast",
+            description="The only podcast containing tricky messages.",
         )
         podcast.save()
 
         # explicitly trigger a search index update
         update_search_index()
 
-        results = search_podcasts('The')
+        results = search_podcasts("The")
         self.assertEqual(len(results), 0)
 
-        results = search_podcasts('The Tricky')
+        results = search_podcasts("The Tricky")
         self.assertEqual(results[0].id, podcast.id)

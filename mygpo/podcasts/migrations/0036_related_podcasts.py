@@ -7,14 +7,14 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [('podcasts', '0035_django_uuidfield')]
+    dependencies = [("podcasts", "0035_django_uuidfield")]
 
     operations = [
         migrations.AlterField(
-            model_name='podcast',
-            name='related_podcasts',
+            model_name="podcast",
+            name="related_podcasts",
             field=models.ManyToManyField(
-                related_name='_podcast_related_podcasts_+', to='podcasts.Podcast'
+                related_name="_podcast_related_podcasts_+", to="podcasts.Podcast"
             ),
         )
     ]

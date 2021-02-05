@@ -41,7 +41,7 @@ def update_related_podcasts(podcast_pk, max_related=20):
             podcast.related_podcasts.add(p)
         except IntegrityError:
             logger.warning(
-                'Integrity error while adding related podcast', exc_info=True
+                "Integrity error while adding related podcast", exc_info=True
             )
 
 
@@ -62,8 +62,8 @@ def schedule_updates(interval=UPDATE_INTERVAL):
     podcasts = (
         Podcast.objects.all()
         .next_update_between(now, now + interval)
-        .prefetch_related('urls')
-        .only('pk')[:max_updates]
+        .prefetch_related("urls")
+        .only("pk")[:max_updates]
     )
 
     _schedule_updates(podcasts)
@@ -77,17 +77,17 @@ def schedule_updates_longest_no_update():
     # max number of updates to schedule (one every 20s)
     max_updates = UPDATE_INTERVAL.total_seconds() / 10
 
-    podcasts = Podcast.objects.order_by('last_update')[:max_updates]
+    podcasts = Podcast.objects.order_by("last_update")[:max_updates]
     _schedule_updates(podcasts)
 
 
 def _schedule_updates(podcasts):
     """ Schedule updates for podcasts """
-    logger.info('Scheduling %d podcasts for update', len(podcasts))
+    logger.info("Scheduling %d podcasts for update", len(podcasts))
 
     # queue all those podcast updates
     for podcast in podcasts:
         # update_podcasts.delay() seems to block other task execution,
         # therefore celery.send_task() is used instead
         urls = [podcast.url]
-        celery.send_task('mygpo.data.tasks.update_podcasts', args=[urls])
+        celery.send_task("mygpo.data.tasks.update_podcasts", args=[urls])

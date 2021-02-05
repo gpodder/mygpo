@@ -12,23 +12,23 @@ logger = logging.getLogger(__name__)
 
 
 def calc_similar_podcasts(podcast, num=20, user_sample=100):
-    """ Get a list of podcasts that seem to be similar to the given one.
+    """Get a list of podcasts that seem to be similar to the given one.
 
     The similarity is based on similar subscriptions; for performance
-    reasons, only a sample of subscribers is considered """
+    reasons, only a sample of subscribers is considered"""
 
-    logger.info('Calculating podcasts similar to {podcast}'.format(podcast=podcast))
+    logger.info("Calculating podcasts similar to {podcast}".format(podcast=podcast))
 
     # get all users that subscribe to this podcast
     user_ids = (
         Subscription.objects.filter(podcast=podcast)
-        .order_by('user')
-        .distinct('user')
-        .values_list('user', flat=True)
+        .order_by("user")
+        .distinct("user")
+        .values_list("user", flat=True)
     )
     logger.info(
-        'Found {num_subscribers} subscribers, taking a sample '
-        'of {sample_size}'.format(
+        "Found {num_subscribers} subscribers, taking a sample "
+        "of {sample_size}".format(
             num_subscribers=len(user_ids), sample_size=user_sample
         )
     )
@@ -43,12 +43,12 @@ def calc_similar_podcasts(podcast, num=20, user_sample=100):
     for user_id in user_ids:
         subscriptions = (
             Podcast.objects.filter(subscription__user__id__in=user_ids)
-            .distinct('pk')
+            .distinct("pk")
             .exclude(pk=podcast.pk)
         )
         podcasts.update(Counter(subscriptions))
     logger.info(
-        'Found {num_podcasts}, returning top {num_results}'.format(
+        "Found {num_podcasts}, returning top {num_results}".format(
             num_podcasts=len(podcasts), num_results=num
         )
     )
@@ -66,13 +66,13 @@ def subscribe_at_hub(podcast):
 
     if not base_url:
         logger.warning(
-            'Could not subscribe to podcast {podcast} '
-            'at hub {hub} because DEFAULT_BASE_URL is not '
-            'set.'.format(podcast=podcast, hub=podcast.hub)
+            "Could not subscribe to podcast {podcast} "
+            "at hub {hub} because DEFAULT_BASE_URL is not "
+            "set.".format(podcast=podcast, hub=podcast.hub)
         )
         return
 
     logger.info(
-        'subscribing to {podcast} at {hub}.'.format(podcast=podcast, hub=podcast.hub)
+        "subscribing to {podcast} at {hub}.".format(podcast=podcast, hub=podcast.hub)
     )
     utils.subscribe(podcast, podcast.url, podcast.hub, base_url)

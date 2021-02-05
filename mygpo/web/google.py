@@ -4,7 +4,7 @@ from django.conf import settings
 def analytics(request):
     pid = settings.GOOGLE_ANALYTICS_PROPERTY_ID
     if pid:
-        return {'google_analytics_property_id': pid}
+        return {"google_analytics_property_id": pid}
     else:
         return {}
 
@@ -18,4 +18,4 @@ def adsense(request):
     if not slot_bottom:
         return {}
 
-    return {'adsense_client': adclient, 'adsense_slot_bottom': slot_bottom}
+    return {"adsense_client": adclient, "adsense_slot_bottom": slot_bottom}

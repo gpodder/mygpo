@@ -14,7 +14,7 @@ class ToplistTests(unittest.TestCase):
 
     def test_toplist_languages(self):
         """ Test the all_languages method of the toplists """
-        languages = ['de', 'de_AT', 'en']
+        languages = ["de", "de_AT", "en"]
         for lang in languages:
             Podcast.objects.create(
                 id=uuid.uuid1(), created=datetime.utcnow(), language=lang
@@ -22,4 +22,4 @@ class ToplistTests(unittest.TestCase):
 
         view = ToplistView()
         all_langs = view.all_languages()
-        self.assertEqual(all_langs, {'de': 'Deutsch', 'en': 'English'})
+        self.assertEqual(all_langs, {"de": "Deutsch", "en": "English"})

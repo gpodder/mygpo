@@ -9,14 +9,14 @@ class SubscriptionError(Exception):
 
 
 class HubSubscription(UpdateInfoModel):
-    """ A client-side PubSubHubbub subscription
+    """A client-side PubSubHubbub subscription
 
-    https://code.google.com/p/pubsubhubbub/ """
+    https://code.google.com/p/pubsubhubbub/"""
 
-    SUBSCRIBE = 'subscribe'
-    UNSUBSCRIBE = 'unsubscribe'
+    SUBSCRIBE = "subscribe"
+    UNSUBSCRIBE = "unsubscribe"
 
-    MODE_CHOICES = ((SUBSCRIBE, 'subscribe'), (UNSUBSCRIBE, 'unsubscribe'))
+    MODE_CHOICES = ((SUBSCRIBE, "subscribe"), (UNSUBSCRIBE, "unsubscribe"))
 
     # podcast to which the subscription belongs
     podcast = models.ForeignKey(Podcast, on_delete=models.PROTECT)

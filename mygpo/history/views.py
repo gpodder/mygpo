@@ -16,7 +16,7 @@ def history(request, count=15, uid=None):
     user = request.user
     client = None
 
-    history = HistoryEntry.objects.filter(user=user).select_related('podcast')
+    history = HistoryEntry.objects.filter(user=user).select_related("podcast")
 
     if uid:
         try:
@@ -30,7 +30,7 @@ def history(request, count=15, uid=None):
 
     paginator = Paginator(history, count)
 
-    page = request.GET.get('page')
+    page = request.GET.get("page")
 
     try:
         entries = paginator.page(page)
@@ -42,7 +42,7 @@ def history(request, count=15, uid=None):
         entries = paginator.page(paginator.num_pages)
 
     return render(
-        request, 'history.html', {'history': entries, 'client': client, 'page': page}
+        request, "history.html", {"history": entries, "client": client, "page": page}
     )
 
 
@@ -55,7 +55,7 @@ def podcast_history(request, podcast):
     history = HistoryEntry.objects.filter(user=request.user, podcast=podcast)
 
     return render(
-        request, 'podcast-history.html', {'history': history, 'podcast': podcast}
+        request, "podcast-history.html", {"history": history, "podcast": podcast}
     )
 
 

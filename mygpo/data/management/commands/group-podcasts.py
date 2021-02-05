@@ -10,18 +10,18 @@ def pairwise(t):
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
-        parser.add_argument('title')
-        parser.add_argument('url1')
-        parser.add_argument('name1')
-        parser.add_argument('url2')
-        parser.add_argument('name2')
+        parser.add_argument("title")
+        parser.add_argument("url1")
+        parser.add_argument("name1")
+        parser.add_argument("url2")
+        parser.add_argument("name2")
 
     def handle(self, *args, **options):
-        p1_url = options['url1']
-        p2_url = options['url2']
-        group_title = options['title']
-        myname = options['name1']
-        othername = options['name2']
+        p1_url = options["url1"]
+        p2_url = options["url2"]
+        group_title = options["title"]
+        myname = options["name1"]
+        othername = options["name2"]
 
         p1 = Podcast.objects.get(urls__url=p1_url)
         p2 = Podcast.objects.get(urls__url=p2_url)

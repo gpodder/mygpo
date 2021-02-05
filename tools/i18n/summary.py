@@ -14,6 +14,7 @@ import subprocess
 
 width = 40
 
+
 class Language(object):
     def __init__(self, language, translated, fuzzy, untranslated):
         self.language = language
@@ -22,40 +23,55 @@ class Language(object):
         self.untranslated = int(untranslated)
 
     def get_translated_ratio(self):
-        return float(self.translated)/float(self.translated+self.fuzzy+self.untranslated)
+        return float(self.translated) / float(
+            self.translated + self.fuzzy + self.untranslated
+        )
 
     def get_fuzzy_ratio(self):
-        return float(self.fuzzy)/float(self.translated+self.fuzzy+self.untranslated)
+        return float(self.fuzzy) / float(
+            self.translated + self.fuzzy + self.untranslated
+        )
 
     def get_untranslated_ratio(self):
-        return float(self.untranslated)/float(self.translated+self.fuzzy+self.untranslated)
+        return float(self.untranslated) / float(
+            self.translated + self.fuzzy + self.untranslated
+        )
 
     def __cmp__(self, other):
         return cmp(self.get_translated_ratio(), other.get_translated_ratio())
 
+
 languages = []
 
-COUNTS_RE = '((\d+) translated message[s]?)?(, (\d+) fuzzy translation[s]?)?(, (\d+) untranslated message[s]?)?\.'
+COUNTS_RE = "((\d+) translated message[s]?)?(, (\d+) fuzzy translation[s]?)?(, (\d+) untranslated message[s]?)?\."
 
-po_folder = os.path.join(os.path.dirname(__file__), '..', '..', 'mygpo', 'locale')
-for filename in glob.glob(os.path.join(po_folder, '*', 'LC_MESSAGES', 'django.po')):
-    language = filename.split('/')[-3]
-    msgfmt = subprocess.Popen(['msgfmt', '--statistics', filename],
-            stderr=subprocess.PIPE)
+po_folder = os.path.join(os.path.dirname(__file__), "..", "..", "mygpo", "locale")
+for filename in glob.glob(os.path.join(po_folder, "*", "LC_MESSAGES", "django.po")):
+    language = filename.split("/")[-3]
+    msgfmt = subprocess.Popen(
+        ["msgfmt", "--statistics", filename], stderr=subprocess.PIPE
+    )
     _, stderr = msgfmt.communicate()
 
     match = re.match(COUNTS_RE, stderr).groups()
-    languages.append(Language(language, match[1] or '0', match[3] or '0', match[5] or '0'))
+    languages.append(
+        Language(language, match[1] or "0", match[3] or "0", match[5] or "0")
+    )
 
-print('')
+print("")
 for language in sorted(languages):
-    tc = '#'*(int(math.floor(width*language.get_translated_ratio())))
-    fc = '~'*(int(math.floor(width*language.get_fuzzy_ratio())))
-    uc = ' '*(width-len(tc)-len(fc))
+    tc = "#" * (int(math.floor(width * language.get_translated_ratio())))
+    fc = "~" * (int(math.floor(width * language.get_fuzzy_ratio())))
+    uc = " " * (width - len(tc) - len(fc))
 
-    print(' %5s [%s%s%s] -- %3.0f %% translated' % (language.language, tc, fc, uc, language.get_translated_ratio()*100))
+    print(
+        " %5s [%s%s%s] -- %3.0f %% translated"
+        % (language.language, tc, fc, uc, language.get_translated_ratio() * 100)
+    )
 
-print("""
+print(
+    """
   Total translations: %s
-""" % (len(languages)))
-
+"""
+    % (len(languages))
+)

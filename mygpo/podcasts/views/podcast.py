@@ -39,7 +39,7 @@ logger = logging.getLogger(__name__)
 
 @vary_on_cookie
 @cache_control(private=True)
-@allowed_methods(['GET'])
+@allowed_methods(["GET"])
 def show(request, podcast):
     """ Shows a podcast detail page """
 
@@ -67,7 +67,7 @@ def show(request, podcast):
         rel_podcasts = []
 
     tags = get_tags(podcast, user)
-    has_tagged = any(t['is_own'] for t in tags)
+    has_tagged = any(t["is_own"] for t in tags)
 
     if user.is_authenticated:
         subscribed_devices = Client.objects.filter(
@@ -91,41 +91,41 @@ def show(request, podcast):
 
     return render(
         request,
-        'podcast.html',
+        "podcast.html",
         {
-            'tags': tags,
-            'has_tagged': has_tagged,
-            'url': current_site,
-            'has_history': has_history,
-            'podcast': podcast,
-            'devices': subscribed_devices,
-            'related_podcasts': rel_podcasts,
-            'can_subscribe': len(subscribe_targets) > 0,
-            'subscribe_targets': subscribe_targets,
-            'episode': episode,
-            'episodes': episodes,
-            'max_listeners': max_listeners,
-            'is_publisher': is_publisher,
-            'page_list': page_list,
-            'current_page': 1,
+            "tags": tags,
+            "has_tagged": has_tagged,
+            "url": current_site,
+            "has_history": has_history,
+            "podcast": podcast,
+            "devices": subscribed_devices,
+            "related_podcasts": rel_podcasts,
+            "can_subscribe": len(subscribe_targets) > 0,
+            "subscribe_targets": subscribe_targets,
+            "episode": episode,
+            "episodes": episodes,
+            "max_listeners": max_listeners,
+            "is_publisher": is_publisher,
+            "page_list": page_list,
+            "current_page": 1,
         },
     )
 
 
 def get_tags(podcast, user, max_tags=50):
-    """ Returns all tags that user sees for the given podcast
+    """Returns all tags that user sees for the given podcast
 
     The tag list is a list of dicts in the form of {'tag': 'tech', 'is_own':
-    True}. "is_own" indicates if the tag was created by the given user. """
+    True}. "is_own" indicates if the tag was created by the given user."""
     tags = {}
 
     for tag in podcast.tags.all():
         t = tag.tag.lower()
         if not t in tags:
-            tags[t] = {'tag': t, 'is_own': False}
+            tags[t] = {"tag": t, "is_own": False}
 
         if tag.user == user:
-            tags[t]['is_own'] = True
+            tags[t]["is_own"] = True
 
     return list(tags.values())
 
@@ -142,8 +142,8 @@ def episode_list(podcast, user, offset=0, limit=20):
         Episode.objects.filter(
             podcast=podcast, order__lte=page_start, order__gt=page_end
         )
-        .prefetch_related('slugs')
-        .order_by('-order')
+        .prefetch_related("slugs")
+        .order_by("-order")
     )
 
 
@@ -151,7 +151,7 @@ def all_episodes(request, podcast, page_size=20):
 
     # Make sure page request is an int. If not, deliver first page.
     try:
-        page = int(request.GET.get('page', '1'))
+        page = int(request.GET.get("page", "1"))
     except ValueError:
         page = 1
 
@@ -169,14 +169,14 @@ def all_episodes(request, podcast, page_size=20):
 
     return render(
         request,
-        'episodes.html',
+        "episodes.html",
         {
-            'podcast': podcast,
-            'episodes': episodes,
-            'max_listeners': max_listeners,
-            'page_list': page_list,
-            'current_page': page,
-            'is_publisher': is_publisher,
+            "podcast": podcast,
+            "episodes": episodes,
+            "max_listeners": max_listeners,
+            "page_list": page_list,
+            "current_page": page,
+            "is_publisher": is_publisher,
         },
     )
 
@@ -185,13 +185,13 @@ def all_episodes(request, podcast, page_size=20):
 @login_required
 def add_tag(request, podcast):
 
-    tag_str = request.GET.get('tag', '')
+    tag_str = request.GET.get("tag", "")
     if not tag_str:
         return HttpResponseBadRequest()
 
     user = request.user
 
-    tags = tag_str.split(',')
+    tags = tag_str.split(",")
     tags = map(str.strip, tags)
     tags = map(str.lower, tags)
     tags = list(filter(None, tags))
@@ -201,7 +201,7 @@ def add_tag(request, podcast):
     for tag in tags:
 
         # trim to maximum length
-        tag = to_maxlength(Tag, 'tag', tag)
+        tag = to_maxlength(Tag, "tag", tag)
 
         Tag.objects.get_or_create(
             tag=tag,
@@ -211,8 +211,8 @@ def add_tag(request, podcast):
             object_id=podcast.id,
         )
 
-    if request.GET.get('next', '') == 'mytags':
-        return HttpResponseRedirect('/tags/')
+    if request.GET.get("next", "") == "mytags":
+        return HttpResponseRedirect("/tags/")
 
     return HttpResponseRedirect(get_podcast_link_target(podcast))
 
@@ -221,13 +221,13 @@ def add_tag(request, podcast):
 @login_required
 def remove_tag(request, podcast):
 
-    tag_str = request.GET.get('tag', None)
+    tag_str = request.GET.get("tag", None)
     if tag_str is None:
         return HttpResponseBadRequest()
 
     user = request.user
 
-    tags = tag_str.split(',')
+    tags = tag_str.split(",")
     tags = list(map(str.strip, tags))
 
     ContentType.objects.get_for_model(podcast)
@@ -241,32 +241,32 @@ def remove_tag(request, podcast):
             object_id=podcast.id,
         ).delete()
 
-    if request.GET.get('next', '') == 'mytags':
-        return HttpResponseRedirect('/tags/')
+    if request.GET.get("next", "") == "mytags":
+        return HttpResponseRedirect("/tags/")
 
     return HttpResponseRedirect(get_podcast_link_target(podcast))
 
 
 @never_cache
 @login_required
-@allowed_methods(['GET', 'POST'])
+@allowed_methods(["GET", "POST"])
 def subscribe(request, podcast):
 
-    if request.method == 'POST':
+    if request.method == "POST":
 
         # multiple UIDs from the /podcast/<slug>/subscribe
         device_uids = [k for (k, v) in request.POST.items() if k == v]
 
         # single UID from /podcast/<slug>
-        if 'targets' in request.POST:
-            devices = request.POST.get('targets')
-            devices = devices.split(',')
+        if "targets" in request.POST:
+            devices = request.POST.get("targets")
+            devices = devices.split(",")
             device_uids.extend(devices)
 
         for uid in device_uids:
             try:
                 device = request.user.client_set.get(uid=uid)
-                subscribe_podcast.delay(podcast, request.user, device)
+                subscribe_podcast.delay(podcast.pk, request.user.pk, device.uid)
 
             except Client.DoesNotExist as e:
                 messages.error(request, str(e))
@@ -275,16 +275,16 @@ def subscribe(request, podcast):
 
     targets = get_subscribe_targets(podcast, request.user)
 
-    return render(request, 'subscribe.html', {'targets': targets, 'podcast': podcast})
+    return render(request, "subscribe.html", {"targets": targets, "podcast": podcast})
 
 
 @never_cache
 @login_required
-@allowed_methods(['POST'])
+@allowed_methods(["POST"])
 def subscribe_all(request, podcast):
     """ subscribe all of the user's devices to the podcast """
     user = request.user
-    subscribe_podcast_all.delay(podcast, user)
+    subscribe_podcast_all.delay(podcast.pk, user.pk)
     return HttpResponseRedirect(get_podcast_link_target(podcast))
 
 
@@ -292,10 +292,10 @@ def subscribe_all(request, podcast):
 @login_required
 def unsubscribe(request, podcast, device_uid):
 
-    return_to = request.GET.get('return_to', None)
+    return_to = request.GET.get("return_to", None)
 
     if not return_to:
-        raise Http404('Wrong URL')
+        raise Http404("Wrong URL")
 
     user = request.user
     try:
@@ -306,14 +306,14 @@ def unsubscribe(request, podcast, device_uid):
         return HttpResponseRedirect(return_to)
 
     try:
-        unsubscribe_podcast.delay(podcast, user, device)
+        unsubscribe_podcast.delay(podcast.pk, user.pk, device.uid)
     except SubscriptionException as e:
         logger.exception(
-            'Web: %(username)s: could not unsubscribe from podcast %(podcast_url)s on device %(device_id)s'
+            "Web: %(username)s: could not unsubscribe from podcast %(podcast_url)s on device %(device_id)s"
             % {
-                'username': request.user.username,
-                'podcast_url': podcast.url,
-                'device_id': device.id,
+                "username": request.user.username,
+                "podcast_url": podcast.url,
+                "device_id": device.id,
             }
         )
 
@@ -322,36 +322,36 @@ def unsubscribe(request, podcast, device_uid):
 
 @never_cache
 @login_required
-@allowed_methods(['POST'])
+@allowed_methods(["POST"])
 def unsubscribe_all(request, podcast):
     """ unsubscribe all of the user's devices from the podcast """
     user = request.user
-    unsubscribe_podcast_all.delay(podcast, user)
+    unsubscribe_podcast_all.delay(podcast.pk, user.pk)
     return HttpResponseRedirect(get_podcast_link_target(podcast))
 
 
 @never_cache
 @login_required
 def subscribe_url(request):
-    url = request.GET.get('url', None)
+    url = request.GET.get("url", None)
 
     if not url:
         raise Http404(
-            'http://my.gpodder.org/subscribe?url=http://www.example.com/podcast.xml'
+            "http://my.gpodder.org/subscribe?url=http://www.example.com/podcast.xml"
         )
 
     url = normalize_feed_url(url)
 
     if not url:
-        raise Http404('Please specify a valid url')
+        raise Http404("Please specify a valid url")
 
     podcast = Podcast.objects.get_or_create_for_url(url).object
 
-    return HttpResponseRedirect(get_podcast_link_target(podcast, 'subscribe'))
+    return HttpResponseRedirect(get_podcast_link_target(podcast, "subscribe"))
 
 
 @never_cache
-@allowed_methods(['POST'])
+@allowed_methods(["POST"])
 def set_public(request, podcast, public):
     settings, created = UserSettings.objects.get_or_create(
         user=request.user,
@@ -377,7 +377,7 @@ def slug_decorator(f):
                 slugs__slug=slug,
                 slugs__content_type=ContentType.objects.get_for_model(Podcast),
             )
-            podcast = podcast.prefetch_related('slugs', 'urls').get()
+            podcast = podcast.prefetch_related("slugs", "urls").get()
         except Podcast.DoesNotExist:
             raise Http404
 
@@ -396,7 +396,7 @@ def id_decorator(f):
 
         try:
             podcast = Podcast.objects.filter(id=podcast_id)
-            podcast = podcast.prefetch_related('slugs', 'urls').get()
+            podcast = podcast.prefetch_related("slugs", "urls").get()
 
             # if the podcast has a slug, redirect to its canonical URL
             if podcast.slug:

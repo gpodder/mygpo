@@ -63,17 +63,17 @@ def episode(request, episode):
 
     return render(
         request,
-        'episode.html',
+        "episode.html",
         {
-            'episode': episode,
-            'podcast': podcast,
-            'prev': prev,
-            'next': next,
-            'has_history': has_history,
-            'is_favorite': is_fav,
-            'actions': EPISODE_ACTION_TYPES,
-            'devices': devices,
-            'is_publisher': is_publisher,
+            "episode": episode,
+            "podcast": podcast,
+            "prev": prev,
+            "next": next,
+            "has_history": has_history,
+            "is_favorite": is_fav,
+            "actions": EPISODE_ACTION_TYPES,
+            "devices": devices,
+            "is_publisher": is_publisher,
         },
     )
 
@@ -90,13 +90,13 @@ def history(request, episode):
 
     history = (
         EpisodeHistoryEntry.objects.filter(user=user, episode=episode)
-        .order_by('-timestamp')
+        .order_by("-timestamp")
         .prefetch_related(
-            'episode',
-            'episode__slugs',
-            'episode__podcast',
-            'episode__podcast__slugs',
-            'client',
+            "episode",
+            "episode__slugs",
+            "episode__podcast",
+            "episode__podcast__slugs",
+            "client",
         )
     )
 
@@ -104,13 +104,13 @@ def history(request, episode):
 
     return render(
         request,
-        'episode-history.html',
+        "episode-history.html",
         {
-            'episode': episode,
-            'podcast': podcast,
-            'history': history,
-            'actions': EPISODE_ACTION_TYPES,
-            'clients': clients,
+            "episode": episode,
+            "podcast": podcast,
+            "history": history,
+            "actions": EPISODE_ACTION_TYPES,
+            "clients": clients,
         },
     )
 
@@ -150,13 +150,13 @@ def list_favorites(request):
 
     return render(
         request,
-        'favorites.html',
+        "favorites.html",
         {
-            'episodes': favorites,
-            'feed_token': token,
-            'site': site,
-            'podcast': podcast,
-            'recently_listened': recently_listened,
+            "episodes": favorites,
+            "feed_token": token,
+            "site": site,
+            "podcast": podcast,
+            "recently_listened": recently_listened,
         },
     )
 
@@ -165,10 +165,10 @@ def list_favorites(request):
 def add_action(request, episode):
 
     user = request.user
-    client = user.client_set.get(id=request.POST.get('device'))
+    client = user.client_set.get(id=request.POST.get("device"))
 
-    action_str = request.POST.get('action')
-    timestamp = request.POST.get('timestamp', '')
+    action_str = request.POST.get("action")
+    timestamp = request.POST.get("timestamp", "")
 
     if timestamp:
         try:
@@ -192,10 +192,10 @@ def slug_decorator(f):
     @wraps(f)
     def _decorator(request, p_slug, e_slug, *args, **kwargs):
 
-        pquery = Podcast.objects.filter(slugs__slug=p_slug, slugs__scope='')
+        pquery = Podcast.objects.filter(slugs__slug=p_slug, slugs__scope="")
 
         try:
-            podcast = pquery.prefetch_related('slugs').get()
+            podcast = pquery.prefetch_related("slugs").get()
         except Podcast.DoesNotExist:
             raise Http404
 
@@ -204,7 +204,7 @@ def slug_decorator(f):
         )
 
         try:
-            episode = equery.prefetch_related('urls', 'slugs').get()
+            episode = equery.prefetch_related("urls", "slugs").get()
 
             # set previously fetched podcast, to avoid additional query
             episode.podcast = podcast
@@ -227,7 +227,7 @@ def id_decorator(f):
 
         try:
             query = Episode.objects.filter(id=e_id, podcast_id=p_id)
-            episode = query.select_related('podcast').get()
+            episode = query.select_related("podcast").get()
 
         except Episode.DoesNotExist:
             raise Http404

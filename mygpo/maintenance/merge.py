@@ -55,10 +55,10 @@ class PodcastMerger(object):
     def merge(self):
         """ Carries out the actual merging """
 
-        logger.info('Start merging of podcasts: %r', self.podcasts)
+        logger.info("Start merging of podcasts: %r", self.podcasts)
 
         podcast1 = self.podcasts.pop(0)
-        logger.info('Merge target: %r', podcast1)
+        logger.info("Merge target: %r", podcast1)
 
         self.merge_episodes()
         merge_model_objects(podcast1, self.podcasts)
@@ -74,7 +74,7 @@ class PodcastMerger(object):
 
             episode_id = episodes.pop(0)
             episode = Episode.objects.get(pk=episode_id)
-            logger.info('Merging %d episodes', len(episodes))
+            logger.info("Merging %d episodes", len(episodes))
 
             eps = [Episode.objects.get(pk=eid) for eid in episodes]
             merge_model_objects(episode, eps)
@@ -91,7 +91,7 @@ def reassign_urls(obj1, obj2):
         try:
             url.save()
         except IntegrityError as ie:
-            logger.warning('Moving URL failed: %s. Deleting.', str(ie))
+            logger.warning("Moving URL failed: %s. Deleting.", str(ie))
             url.delete()
 
 
@@ -113,7 +113,7 @@ def reassign_slugs(obj1, obj2):
         try:
             slug.save()
         except IntegrityError as ie:
-            logger.warning('Moving Slug failed: %s. Deleting', str(ie))
+            logger.warning("Moving Slug failed: %s. Deleting", str(ie))
             slug.delete()
 
 
@@ -139,11 +139,11 @@ def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
     primary_class = primary_object.__class__
 
     if not issubclass(primary_class, Model):
-        raise TypeError('Only django.db.models.Model subclasses can be merged')
+        raise TypeError("Only django.db.models.Model subclasses can be merged")
 
     for alias_object in alias_objects:
         if not isinstance(alias_object, primary_class):
-            raise TypeError('Only models of same class can be merged')
+            raise TypeError("Only models of same class can be merged")
 
     # Get a list of all GenericForeignKeys in all models
     # TODO: this is a bit of a hack, since the generics framework should
@@ -161,7 +161,7 @@ def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
         [
             field.attname
             for field in primary_object._meta.local_fields
-            if getattr(primary_object, field.attname) in [None, '']
+            if getattr(primary_object, field.attname) in [None, ""]
         ]
     )
 
@@ -223,7 +223,7 @@ def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
         filled_up = set()
         for field_name in blank_local_fields:
             val = getattr(alias_object, field_name)
-            if val not in [None, '']:
+            if val not in [None, ""]:
                 setattr(primary_object, field_name, val)
                 filled_up.add(field_name)
         blank_local_fields -= filled_up
@@ -277,7 +277,7 @@ def reassigned(obj, new):
 
     else:
         raise TypeError(
-            'unknown type for reassigning: {objtype}'.format(objtype=type(obj))
+            "unknown type for reassigning: {objtype}".format(objtype=type(obj))
         )
 
 
@@ -299,7 +299,7 @@ def before_delete(old, new):
 
     else:
         raise TypeError(
-            'unknown type for deleting: {objtype}'.format(objtype=type(old))
+            "unknown type for deleting: {objtype}".format(objtype=type(old))
         )
 
 
@@ -311,4 +311,4 @@ def merge(moved_obj, new_target):
         pass
 
     else:
-        raise TypeError('unknown type for merging: {objtype}'.format(objtype=type(old)))
+        raise TypeError("unknown type for merging: {objtype}".format(objtype=type(old)))

@@ -10,7 +10,7 @@ register = template.Library()
 
 @register.filter
 def sec_to_time(sec):
-    """ Converts seconds to a time object
+    """Converts seconds to a time object
 
     >>> t = sec_to_time(1000)
     >>> (t.hour, t.minute, t.second)
@@ -26,7 +26,7 @@ def sec_to_time(sec):
 
 @register.filter
 def format_duration(sec):
-    """ Converts seconds into a duration string
+    """Converts seconds into a duration string
 
     >>> format_duration(1000)
     '16m 40s'
@@ -39,7 +39,7 @@ def format_duration(sec):
     seconds = int(sec % 60)
 
     if hours:
-        s = _('{h}h {m}m {s}s').format(h=hours, m=minutes, s=seconds)
+        s = _("{h}h {m}m {s}s").format(h=hours, m=minutes, s=seconds)
     else:
-        s = _('{m}m {s}s').format(m=minutes, s=seconds)
+        s = _("{m}m {s}s").format(m=minutes, s=seconds)
     return mark_safe(s)

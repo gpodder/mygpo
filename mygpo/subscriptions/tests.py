@@ -16,13 +16,13 @@ class TestSubscribe(TestCase):
     def setUp(self):
         User = get_user_model()
         self.user = User(
-            username='duplicate-subscribe', email='duplicate-subscribe@example.com'
+            username="duplicate-subscribe", email="duplicate-subscribe@example.com"
         )
-        self.user.set_password('secret')
+        self.user.set_password("secret")
         self.user.save()
-        self.client = Client.objects.create(user=self.user, uid='dev1', id=uuid.uuid1())
+        self.client = Client.objects.create(user=self.user, uid="dev1", id=uuid.uuid1())
 
-        self.url = 'http://www.example.com/pdocast.rss'
+        self.url = "http://www.example.com/pdocast.rss"
         self.podcast = Podcast.objects.get_or_create_for_url(self.url).object
 
     def test_duplicate_subscribe(self):

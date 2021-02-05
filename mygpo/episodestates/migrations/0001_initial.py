@@ -8,43 +8,43 @@ from django.conf import settings
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('podcasts', '0029_episode_index_toplist'),
+        ("podcasts", "0029_episode_index_toplist"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='EpisodeState',
+            name="EpisodeState",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.AutoField(
-                        verbose_name='ID',
+                        verbose_name="ID",
                         serialize=False,
                         auto_created=True,
                         primary_key=True,
                     ),
                 ),
                 (
-                    'action',
+                    "action",
                     models.CharField(
                         max_length=8,
                         choices=[
-                            ('download', 'downloaded'),
-                            ('play', 'played'),
-                            ('delete', 'deleted'),
-                            ('new', 'marked as new'),
-                            ('flattr', "flattr'd"),
+                            ("download", "downloaded"),
+                            ("play", "played"),
+                            ("delete", "deleted"),
+                            ("new", "marked as new"),
+                            ("flattr", "flattr'd"),
                         ],
                     ),
                 ),
-                ('timestamp', models.DateTimeField()),
+                ("timestamp", models.DateTimeField()),
                 (
-                    'episode',
-                    models.ForeignKey(to='podcasts.Episode', on_delete=models.CASCADE),
+                    "episode",
+                    models.ForeignKey(to="podcasts.Episode", on_delete=models.CASCADE),
                 ),
                 (
-                    'user',
+                    "user",
                     models.ForeignKey(
                         to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE
                     ),
@@ -54,6 +54,6 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.AlterUniqueTogether(
-            name='episodestate', unique_together=set([('user', 'episode')])
+            name="episodestate", unique_together=set([("user", "episode")])
         ),
     ]

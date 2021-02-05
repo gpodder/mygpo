@@ -30,11 +30,11 @@ class GenericManager(models.Manager):
     """ Generic manager methods """
 
     def count_fast(self):
-        """ Fast approximate count of all model instances
+        """Fast approximate count of all model instances
 
         PostgreSQL is slow when counting records without an index. This is a
         workaround which only gives approximate results. see:
-        http://wiki.postgresql.org/wiki/Slow_Counting """
+        http://wiki.postgresql.org/wiki/Slow_Counting"""
         cursor = connection.cursor()
         cursor.execute(
             "select reltuples from pg_class where relname='%s';"
@@ -65,7 +65,7 @@ class DeleteableModel(models.Model):
 
 
 class OrderedModel(models.Model):
-    """ A model that can be ordered
+    """A model that can be ordered
 
     The implementing Model must make sure that 'order' is sufficiently unique
     """
@@ -74,11 +74,11 @@ class OrderedModel(models.Model):
 
     class Meta:
         abstract = True
-        ordering = ['order']
+        ordering = ["order"]
 
 
 class OptionallyOrderedModel(models.Model):
-    """ A model that can be ordered, w/ unknown order of individual objects
+    """A model that can be ordered, w/ unknown order of individual objects
 
     The implementing Model must make sure that 'order' is sufficiently unique
     """
@@ -87,4 +87,4 @@ class OptionallyOrderedModel(models.Model):
 
     class Meta:
         abstract = True
-        ordering = ['order']
+        ordering = ["order"]

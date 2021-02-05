@@ -7,75 +7,75 @@ from django.utils.translation import gettext_lazy as _
 register = template.Library()
 
 HIDDEN_URIS = (
-    '/login/',
-    '/register/',
-    '/podcast/',
-    '/device/',
-    '/user/subscriptions/',
-    '/publisher/podcast/',
-    '/share/me',
+    "/login/",
+    "/register/",
+    "/podcast/",
+    "/device/",
+    "/user/subscriptions/",
+    "/publisher/podcast/",
+    "/share/me",
 )
 
 MENU_STRUCTURE = (
     (
-        '',
+        "",
         (
-            ('/', _('Home')),
-            ('/login/', _('Login')),
-            ('/register/', _('Register')),
-            ('', _('Docs')),
-            ('/contribute/', _('Contribute')),
-            ('/developer/', _('Development')),
-            ('/privacy/', _('Privacy Policy')),
-            ('/online-help', _('Help')),
+            ("/", _("Home")),
+            ("/login/", _("Login")),
+            ("/register/", _("Register")),
+            ("", _("Docs")),
+            ("/contribute/", _("Contribute")),
+            ("/developer/", _("Development")),
+            ("/privacy/", _("Privacy Policy")),
+            ("/online-help", _("Help")),
         ),
     ),
     (
-        _('Discover'),
+        _("Discover"),
         (
-            ('/directory/', _('Directory')),
-            ('/podcast/', _('Podcast')),
-            ('/search/', _('Search')),
-            ('/missing/', _('Missing Podcast')),
-            ('/lists/', _('Podcast Lists')),
-            ('/user/subscriptions/', _('User subscriptions')),
-            ('/suggestions/', _('Suggestions')),
-            ('', _('Features')),
-            ('/directory/+license', _('License')),
-            ('', _('Toplists')),
-            ('/toplist/', _('Podcasts')),
-            ('/toplist/episodes', _('Episodes')),
+            ("/directory/", _("Directory")),
+            ("/podcast/", _("Podcast")),
+            ("/search/", _("Search")),
+            ("/missing/", _("Missing Podcast")),
+            ("/lists/", _("Podcast Lists")),
+            ("/user/subscriptions/", _("User subscriptions")),
+            ("/suggestions/", _("Suggestions")),
+            ("", _("Features")),
+            ("/directory/+license", _("License")),
+            ("", _("Toplists")),
+            ("/toplist/", _("Podcasts")),
+            ("/toplist/episodes", _("Episodes")),
         ),
     ),
     (
-        _('Subscriptions'),
+        _("Subscriptions"),
         (
-            ('/subscriptions/', _('Subscriptions')),
-            ('/favorites/', _('Favorite Episodes')),
-            ('/tags/', _('My Tags')),
-            ('/devices/', _('Devices')),
-            ('/device/', _('Device')),
-            ('/history/', _('History')),
+            ("/subscriptions/", _("Subscriptions")),
+            ("/favorites/", _("Favorite Episodes")),
+            ("/tags/", _("My Tags")),
+            ("/devices/", _("Devices")),
+            ("/device/", _("Device")),
+            ("/history/", _("History")),
         ),
     ),
     (
-        _('Community'),
+        _("Community"),
         (
-            ('/share/', _('Overview')),
-            ('/share/favorites', _('Favorite Episodes')),
-            ('/share/me', _('My Userpage')),
-            ('/user/subscriptions/', _('Subscriptions')),
-            ('/share/lists/', _('Podcast Lists')),
+            ("/share/", _("Overview")),
+            ("/share/favorites", _("Favorite Episodes")),
+            ("/share/me", _("My Userpage")),
+            ("/user/subscriptions/", _("Subscriptions")),
+            ("/share/lists/", _("Podcast Lists")),
         ),
     ),
-    (_('Settings'), (('/account/', _('Account')), ('/account/privacy', _('Privacy')))),
+    (_("Settings"), (("/account/", _("Account")), ("/account/privacy", _("Privacy")))),
     (
-        _('Publish'),
+        _("Publish"),
         (
-            ('/publisher/', _('Home')),
-            ('/publisher/advertise', _('Advertise')),
-            ('/publisher/link/', _('Link to gpodder.net')),
-            ('/publisher/podcast/', _('Podcast')),
+            ("/publisher/", _("Home")),
+            ("/publisher/advertise", _("Advertise")),
+            ("/publisher/link/", _("Link to gpodder.net")),
+            ("/publisher/podcast/", _("Podcast")),
         ),
     ),
 )
@@ -93,14 +93,14 @@ def main_menu(selected):
 
     items = []
     for uri, caption, subpages in links:
-        if selected in subpages or ('/' in subpages and not found_section):
+        if selected in subpages or ("/" in subpages and not found_section):
             items.append(
                 '<li class="active"><a href="%s">%s</a></li>' % (uri, gettext(caption))
             )
         else:
             items.append('<li><a href="%s">%s</a></li>' % (uri, gettext(caption)))
 
-    return mark_safe('\n'.join(items))
+    return mark_safe("\n".join(items))
 
 
 def get_section_items(selected):
@@ -120,13 +120,13 @@ def section_menu(selected, title=None):
         if uri == selected:
             if title is not None:
                 if len(title) > 35:
-                    title = title[:33] + '...'
+                    title = title[:33] + "..."
                 caption = title
             if uri in HIDDEN_URIS:
                 items.append(
                     '<li class="active"><a href="">%s</a></li>' % gettext(caption)
                 )
-            elif uri == '':
+            elif uri == "":
                 items.append(
                     '<li class="disabled nav-header"><a href="">%s</a></li>'
                     % gettext(caption)
@@ -147,4 +147,4 @@ def section_menu(selected, title=None):
             else:
                 items.append('<li><a href="%s">%s</a></li>' % (uri, gettext(caption)))
 
-    return mark_safe('\n'.join(items))
+    return mark_safe("\n".join(items))

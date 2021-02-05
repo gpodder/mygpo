@@ -12,15 +12,25 @@ import os.path
 
 filenames = []
 
-pofiles = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-        '..', '..', '..', 'mygpo', 'locale', '*', 'LC_MESSAGES', 'django.po')
+pofiles = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    "..",
+    "..",
+    "..",
+    "mygpo",
+    "locale",
+    "*",
+    "LC_MESSAGES",
+    "django.po",
+)
 
-process = subprocess.Popen(['git', 'status', '--porcelain'] +
-        glob.glob(pofiles), stdout=subprocess.PIPE)
+process = subprocess.Popen(
+    ["git", "status", "--porcelain"] + glob.glob(pofiles), stdout=subprocess.PIPE
+)
 stdout, stderr = process.communicate()
 for line in stdout.splitlines():
     status, filename = line.strip().split()
-    if status == 'M':
+    if status == "M":
         filenames.append(filename)
 
 for filename in filenames:
@@ -28,18 +38,18 @@ for filename in filenames:
     translators = []
     language = None
 
-    filename = os.path.join('..', '..', filename)
+    filename = os.path.join("..", "..", filename)
     for line in open(filename).read().splitlines():
-        if line.startswith('# Translators:'):
+        if line.startswith("# Translators:"):
             in_translators = True
         elif in_translators:
-            match = re.match(r'# ([^<]* <[^>]*>)', line)
+            match = re.match(r"# ([^<]* <[^>]*>)", line)
             if match:
                 translators.append(match.group(1))
             else:
                 in_translators = False
 
-        match = re.search(r'Last-Translator: ([^<]* <[^>]*>)', line)
+        match = re.search(r"Last-Translator: ([^<]* <[^>]*>)", line)
         if match:
             translators.append(match.group(1))
 
@@ -51,8 +61,10 @@ for filename in filenames:
 
     if translators and language is not None:
         if len(translators) != 1:
-            print('# Warning: %d other translators' % (len(translators) - 1,))
-        print('git commit --author="%s" --message="Updated %s translation" %s' % (translators[0], language, filename))
+            print("# Warning: %d other translators" % (len(translators) - 1,))
+        print(
+            'git commit --author="%s" --message="Updated %s translation" %s'
+            % (translators[0], language, filename)
+        )
     else:
-        print('# FIXME (could not parse):', '!'*10, filename, '!'*10)
-
+        print("# FIXME (could not parse):", "!" * 10, filename, "!" * 10)

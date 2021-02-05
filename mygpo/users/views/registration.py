@@ -19,7 +19,7 @@ from mygpo.utils import random_token
 from mygpo.users.models import UserProxy
 
 
-USERNAME_MAXLEN = get_user_model()._meta.get_field('username').max_length
+USERNAME_MAXLEN = get_user_model()._meta.get_field("username").max_length
 
 
 class DuplicateUsername(ValidationError):
@@ -27,7 +27,7 @@ class DuplicateUsername(ValidationError):
 
     def __init__(self, username):
         self.username = username
-        super().__init__('The username {0} is already in use.'.format(username))
+        super().__init__("The username {0} is already in use.".format(username))
 
 
 class DuplicateEmail(ValidationError):
@@ -35,15 +35,15 @@ class DuplicateEmail(ValidationError):
 
     def __init__(self, email):
         self.email = email
-        super().__init__('The email address {0} is already in use.'.format(email))
+        super().__init__("The email address {0} is already in use.".format(email))
 
 
 class UsernameValidator(RegexValidator):
     """ Validates that a username uses only allowed characters """
 
-    regex = r'^\w[\w.+-]*$'
-    message = 'Invalid Username'
-    code = 'invalid-username'
+    regex = r"^\w[\w.+-]*$"
+    message = "Invalid Username"
+    code = "invalid-username"
     flags = re.ASCII
 
 
@@ -59,19 +59,19 @@ class RegistrationForm(forms.Form):
 
     def clean(self):
         cleaned_data = super(RegistrationForm, self).clean()
-        password1 = cleaned_data.get('password1')
-        password2 = cleaned_data.get('password2')
+        password1 = cleaned_data.get("password1")
+        password2 = cleaned_data.get("password2")
 
         if not password1 or password1 != password2:
-            raise forms.ValidationError('Passwords do not match')
+            raise forms.ValidationError("Passwords do not match")
 
 
 class RegistrationView(FormView):
     """ View to register a new user """
 
-    template_name = 'registration/registration_form.html'
+    template_name = "registration/registration_form.html"
     form_class = RegistrationForm
-    success_url = reverse_lazy('registration-complete')
+    success_url = reverse_lazy("registration-complete")
 
     def form_valid(self, form):
         """ called whene the form was POSTed and its contents were valid """
@@ -80,12 +80,12 @@ class RegistrationView(FormView):
             user = self.create_user(form)
 
         except ValidationError as e:
-            messages.error(self.request, '; '.join(e.messages))
-            return HttpResponseRedirect(reverse('register'))
+            messages.error(self.request, "; ".join(e.messages))
+            return HttpResponseRedirect(reverse("register"))
 
         except IntegrityError:
-            messages.error(self.request, _('Username or email address already in use'))
-            return HttpResponseRedirect(reverse('register'))
+            messages.error(self.request, _("Username or email address already in use"))
+            return HttpResponseRedirect(reverse("register"))
 
         send_activation_email(user, self.request)
         return super(RegistrationView, self).form_valid(form)
@@ -94,15 +94,15 @@ class RegistrationView(FormView):
     def create_user(self, form):
         User = get_user_model()
         user = User()
-        username = form.cleaned_data['username']
+        username = form.cleaned_data["username"]
 
         self._check_username(username)
         user.username = username
 
-        email_addr = form.cleaned_data['email']
+        email_addr = form.cleaned_data["email"]
         user.email = email_addr
 
-        user.set_password(form.cleaned_data['password1'])
+        user.set_password(form.cleaned_data["password1"])
         user.is_active = False
         user.full_clean()
 
@@ -110,7 +110,7 @@ class RegistrationView(FormView):
             user.save()
 
         except IntegrityError as e:
-            if 'django_auth_unique_email' in str(e):
+            if "django_auth_unique_email" in str(e):
                 # this was not caught by the form validation, but now validates
                 # the DB's unique constraint
                 raise DuplicateEmail(email_addr) from e
@@ -123,12 +123,12 @@ class RegistrationView(FormView):
         return user
 
     def _check_username(self, username):
-        """ Check if the username is already in use
+        """Check if the username is already in use
 
         Until there is a case-insensitive constraint on usernames, it is
         necessary to check for existing usernames manually. This is not a
         perfect solution, but the chance that two people sign up with the same
-        username at the same time is low enough. """
+        username at the same time is low enough."""
         UserModel = get_user_model()
         users = UserModel.objects.filter(username__iexact=username)
         if users.exists():
@@ -138,7 +138,7 @@ class RegistrationView(FormView):
 class ActivationView(TemplateView):
     """ Activates an already registered user """
 
-    template_name = 'registration/activation_failed.html'
+    template_name = "registration/activation_failed.html"
 
     def get(self, request, activation_key):
         User = get_user_model()
@@ -150,15 +150,15 @@ class ActivationView(TemplateView):
         except UserProxy.DoesNotExist:
             messages.error(
                 request,
-                _('The activation link is either not ' 'valid or has already expired.'),
+                _("The activation link is either not " "valid or has already expired."),
             )
             return super(ActivationView, self).get(request, activation_key)
 
         user.activate()
         messages.success(
-            request, _('Your user has been activated. ' 'You can log in now.')
+            request, _("Your user has been activated. " "You can log in now.")
         )
-        return HttpResponseRedirect(reverse('login'))
+        return HttpResponseRedirect(reverse("login"))
 
 
 class ResendActivationForm(forms.Form):
@@ -169,38 +169,38 @@ class ResendActivationForm(forms.Form):
 
     def clean(self):
         cleaned_data = super(ResendActivationForm, self).clean()
-        username = cleaned_data.get('username')
-        email = cleaned_data.get('email')
+        username = cleaned_data.get("username")
+        email = cleaned_data.get("email")
 
         if not username and not email:
             raise forms.ValidationError(
-                _('Either username or email address ' 'are required.')
+                _("Either username or email address " "are required.")
             )
 
 
 class ResendActivationView(FormView):
     """ View to resend the activation email """
 
-    template_name = 'registration/resend_activation.html'
+    template_name = "registration/resend_activation.html"
     form_class = ResendActivationForm
-    success_url = reverse_lazy('resent-activation')
+    success_url = reverse_lazy("resent-activation")
 
     def form_valid(self, form):
         """ called whene the form was POSTed and its contents were valid """
 
         try:
             user = UserProxy.objects.all().by_username_or_email(
-                form.cleaned_data['username'], form.cleaned_data['email']
+                form.cleaned_data["username"], form.cleaned_data["email"]
             )
 
         except UserProxy.DoesNotExist:
-            messages.error(self.request, _('User does not exist.'))
-            return HttpResponseRedirect(reverse('resend-activation'))
+            messages.error(self.request, _("User does not exist."))
+            return HttpResponseRedirect(reverse("resend-activation"))
 
         if user.profile.activation_key is None:
             messages.success(
                 self.request,
-                _('Your account already has been ' 'activated. Go ahead and log in.'),
+                _("Your account already has been " "activated. Go ahead and log in."),
             )
 
         send_activation_email(user, self.request)
@@ -208,18 +208,18 @@ class ResendActivationView(FormView):
 
 
 class ResentActivationView(TemplateView):
-    template_name = 'registration/resent_activation.html'
+    template_name = "registration/resent_activation.html"
 
 
 def send_activation_email(user, request):
     """ Sends the activation email for the given user """
 
-    subj = render_to_string('registration/activation_email_subject.txt')
+    subj = render_to_string("registration/activation_email_subject.txt")
     # remove trailing newline added by render_to_string
     subj = subj.strip()
 
     msg = render_to_string(
-        'registration/activation_email.txt',
-        {'site': RequestSite(request), 'activation_key': user.profile.activation_key},
+        "registration/activation_email.txt",
+        {"site": RequestSite(request), "activation_key": user.profile.activation_key},
     )
     user.email_user(subj, msg)

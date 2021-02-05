@@ -180,23 +180,16 @@ the toplist:
        "title": "FLOSS Weekly",
        "description": "Free, Libre and Open Source Software with Leo.",
        "subscribers": 4711,
-       "subscribers_last_week": 4700
       },
       {"url": "http://feeds.feedburner.com/LinuxOutlaws",
        "title": "The Linux Outlaws",
        "description": "A podcast about Linux with Dan and Fab.",
        "subscribers": 1337,
-       "subscribers_last_week": 1330,
       }]
 
 All shown keys must be provided by the server. The ``description`` field may be
 set to the empty string in case a description is not available. The ``title``
-field may be set to the URL in case a title is not available. The
-``subscribers_last_week`` field may be set to zero if no data is available. The
-client can use the ``subscribers_last_week`` counts to re-sort the list and get
-a ranking for the last week. With this information, a relative "position
-movement" can also be calculated if the developer of the client decides to do
-so.
+field may be set to the URL in case a title is not available.
 
 Downloading podcast suggestions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

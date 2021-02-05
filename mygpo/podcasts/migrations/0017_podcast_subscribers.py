@@ -6,12 +6,12 @@ from django.db import models, migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [('podcasts', '0015_auto_20140616_1105')]
+    dependencies = [("podcasts", "0015_auto_20140616_1105")]
 
     operations = [
         migrations.AddField(
-            model_name='podcast',
-            name='subscribers',
+            model_name="podcast",
+            name="subscribers",
             field=models.PositiveIntegerField(default=0),
             preserve_default=True,
         )

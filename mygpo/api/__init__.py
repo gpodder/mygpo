@@ -43,22 +43,22 @@ class APIView(View):
         """ Returns the object parsed from the JSON request body """
 
         if not request.body:
-            raise RequestException('POST data must not be empty')
+            raise RequestException("POST data must not be empty")
 
         try:
             # TODO: implementation of parse_request_body can be moved here
             # after all views using it have been refactored
             return parse_request_body(request)
         except (UnicodeDecodeError, ValueError):
-            msg = 'Could not decode request body for user {}: {}'.format(
-                request.user.username, request.body.decode('ascii', errors='replace')
+            msg = "Could not decode request body for user {}: {}".format(
+                request.user.username, request.body.decode("ascii", errors="replace")
             )
             logger.warning(msg, exc_info=True)
             raise RequestException(msg)
 
     def get_since(self, request):
         """ Returns parsed "since" GET parameter """
-        since_ = request.GET.get('since', None)
+        since_ = request.GET.get("since", None)
 
         if since_ is None:
             raise RequestException("parameter 'since' missing")
