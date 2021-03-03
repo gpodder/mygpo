@@ -64,6 +64,7 @@ def create_subscriptionlist(request):
         Subscription.objects.filter(user=user)
         .exclude(deleted=True)
         .select_related("podcast", "client")
+        .prefetch_related("podcast__slugs")
     )
 
     # grou clients by subscribed podcasts
