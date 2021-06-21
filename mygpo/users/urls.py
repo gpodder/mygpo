@@ -91,5 +91,5 @@ urlpatterns = [
         user.GoogleLoginCallback.as_view(),
         name="login-google-callback",
     ),
-    path("logout/", LogoutView.as_view(), kwargs={"next_page": "/"}, name="logout"),
+    path("logout/", LogoutView.as_view(next_page="home"), name="logout"),
 ]
