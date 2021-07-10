@@ -17,6 +17,13 @@ if settings.MAINTENANCE:
 
     urlpatterns += [re_path("", utils.maintenance)]
 
+# Add debug urlpattern for debug_toolbar
+if settings.DEBUG:
+	import debug_toolbar
+	urlpatterns += [
+		path('__debug__/', include(debug_toolbar.urls)),
+	]
+
 # URLs are still registered during maintenace mode because we need to
 # build links from them (eg login-link).
 urlpatterns += [
