@@ -215,6 +215,7 @@ def episode_action_json(history, user):
     action = {
         "podcast": history.podcast_ref_url or history.episode.podcast.url,
         "episode": history.episode_ref_url or history.episode.url,
+        "guid": history.episode.guid,
         "action": history.action,
         "timestamp": history.timestamp.isoformat(),
     }
