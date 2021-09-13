@@ -1,0 +1,100 @@
+name: Pull Request Build
+
+on: [pull_request]
+
+jobs:
+  build: 
+
+    runs-on: ubuntu 20.04
+
+    services:
+      redis
+        image: redis:5
+      postgres
+        image: postgres:12
+        env:
+          POSTGRES_PASSWORD: postgres
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Setup Python 3.8
+        uses: actions/setup-python@v2
+          with: 
+            python-version: 3.8
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install coveralls
+          pip install -r requirements.txt requirements-test.txt
+        |
+
+      - name: Setup PostgreSQL
+        run: |
+          psql -c 'create database mygpo_test;' -U postgres
+        |
+      
+      - name: Check Format and Coverage
+        run: |
+          make check-code-format
+          pytest --cov=mygpo/ --cov-branch
+          coveralls
+        |
+
+
+    
+
+# TravisCI info
+
+os: linux
+dist: focal
+language: python
+
+python:
+ - "3.8"
+ - "3.8-dev"
+ - "nightly"
+ - "pypy3"
+
+jobs:
+  allow_failures:
+  - python: '3.8-dev'
+  - python: 'nightly'
+  - python: 'pypy3'
+
+services:
+ - redis
+ - postgresql
+
+addons:
+  postgresql: "12"
+  apt:
+    packages:
+      - postgresql-12
+      - postgresql-client-12
+
+env:
+  global:
+  - PGUSER=travis
+  - PGPORT=5433
+  - PGHOST=localhost
+
+before_install:
+- sudo sed -i -e '/local.*peer/s/travis/all/' -e 's/peer\|md5/trust/g' /etc/postgresql/*/main/pg_hba.conf
+- sudo service postgresql restart
+- sleep 1
+
+install:
+ - pip install -r requirements.txt -r requirements-test.txt
+ - pip install coveralls
+
+before_script:
+  - psql -c 'create database mygpo_test;' -U travis
+
+script:
+  - make check-code-format
+  - pytest --cov=mygpo/ --cov-branch
+
+after_script:
+  - coveralls
