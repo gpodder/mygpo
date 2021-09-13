@@ -6,25 +6,21 @@ jobs:
   build: 
 
     runs-on: ubuntu 20.04
+    strategy:
+      matrix:
+        python-version: [3.8]
 
-    services:
-      redis:
-        image: redis
-        ports: 6379:6379
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_PASSWORD: postgres
-          ports: 5432:5432
-
-    steps:
+      steps:
       - uses: actions/checkout@v2
       
-      - name: Setup Python
+      - name: Setup Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
-      
+        with: 
+          python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
+          sudo apt-get update -q
+          make install-deps
           python -m pip install --upgrade pip
           pip install coveralls
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
