@@ -8,7 +8,7 @@ from mygpo.celery import celery
 @celery.task(max_retries=5)
 @close_connection
 def update_podcast_subscribers(podcast_id):
-    """ Updates the subscriber count of a podcast """
+    """Updates the subscriber count of a podcast"""
 
     try:
         podcast = Podcast.objects.get(id=podcast_id)

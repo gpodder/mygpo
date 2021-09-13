@@ -9,7 +9,7 @@ from mygpo.utils import parse_time, normalize_feed_url, get_timestamp
 
 class ChaptersAPI(APIView):
     def post(self, request, username):
-        """ Add / remove Chapters to/from an episode """
+        """Add / remove Chapters to/from an episode"""
         user = request.user
         now_ = get_timestamp(datetime.utcnow())
 
@@ -26,7 +26,7 @@ class ChaptersAPI(APIView):
         return JsonResponse({"update_url": update_urls, "timestamp": now_})
 
     def get(self, request, username):
-        """ Get chapters for an episode """
+        """Get chapters for an episode"""
         user = request.user
         now_ = get_timestamp(datetime.utcnow())
 
@@ -47,7 +47,7 @@ class ChaptersAPI(APIView):
         return JsonResponse({"chapters": chapters_json, "timestamp": now_})
 
     def update_chapters(self, req, user):
-        """ Add / remove chapters according to the client's request """
+        """Add / remove chapters according to the client's request"""
         podcast = Podcast.objects.get_or_create_for_url(podcast_url).object
         episode = Episode.objects.get_or_create_for_url(podcast, episode_url).object
 
@@ -64,7 +64,7 @@ class ChaptersAPI(APIView):
             ).delete()
 
     def parse_new(self, user, chapter_data):
-        """ Parse a chapter to be added """
+        """Parse a chapter to be added"""
         chapter = Chapter()
         if not "start" in chapter_data:
             raise ParameterMissing("start parameter missing")
@@ -79,7 +79,7 @@ class ChaptersAPI(APIView):
         return chapter
 
     def parse_rem(self, chapter_data):
-        """ Parse a chapter to be removed """
+        """Parse a chapter to be removed"""
         if not "start" in chapter_data:
             raise ParameterMissing("start parameter missing")
         start = parse_time(chapter_data["start"])
@@ -91,7 +91,7 @@ class ChaptersAPI(APIView):
         return (start, end)
 
     def get_urls(self, body):
-        """ Parse and normalize the URLs from the request """
+        """Parse and normalize the URLs from the request"""
         podcast_url = body.get("podcast", "")
         episode_url = body.get("episode", "")
 
@@ -116,7 +116,7 @@ class ChaptersAPI(APIView):
         return s_podcast_url, s_episode_url, update_urls
 
     def chapter_to_json(self, chapter):
-        """ JSON representation of Chapter for GET response """
+        """JSON representation of Chapter for GET response"""
         return {
             "start": chapter.start,
             "end": chapter.end,

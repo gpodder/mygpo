@@ -8,7 +8,7 @@ from mygpo.podcasts.models import Podcast
 
 
 class PodcastCommand(BaseCommand):
-    """ command that operates on a list of podcasts specified by parameters """
+    """command that operates on a list of podcasts specified by parameters"""
 
     def add_arguments(self, parser):
         parser.add_argument(

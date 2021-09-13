@@ -17,7 +17,7 @@ from mygpo.podcasts.models import Podcast
 
 
 def get_accepted_lang(request):
-    """ returns a list of language codes accepted by the HTTP request """
+    """returns a list of language codes accepted by the HTTP request"""
 
     lang_str = request.META.get("HTTP_ACCEPT_LANGUAGE", "")
     lang_str = "".join([c for c in lang_str if c in string.ascii_letters + ","])
@@ -144,7 +144,7 @@ def maintenance(request, *args, **kwargs):
 
 
 def get_podcast_link_target(podcast, view_name="podcast", add_args=[]):
-    """ Returns the link-target for a Podcast, preferring slugs over Ids """
+    """Returns the link-target for a Podcast, preferring slugs over Ids"""
 
     # we prefer slugs
     if podcast.slug:
@@ -160,14 +160,14 @@ def get_podcast_link_target(podcast, view_name="podcast", add_args=[]):
 
 
 def get_podcast_group_link_target(group, view_name, add_args=[]):
-    """ the link-target for a Podcast group, preferring slugs over Ids """
+    """the link-target for a Podcast group, preferring slugs over Ids"""
     args = [group.slug]
     view_name = "%s-slug-id" % view_name
     return reverse(view_name, args=args + add_args)
 
 
 def get_episode_link_target(episode, podcast, view_name="episode", add_args=[]):
-    """ Returns the link-target for an Episode, preferring slugs over Ids """
+    """Returns the link-target for an Episode, preferring slugs over Ids"""
 
     # prefer slugs
     if episode.slug:
@@ -188,7 +188,7 @@ TWITTER_CHARS = string.ascii_letters + string.digits + "_"
 
 
 def normalize_twitter(s):
-    """ normalize user input that is supposed to be a Twitter handle """
+    """normalize user input that is supposed to be a Twitter handle"""
     return "".join(i for i in s if i in TWITTER_CHARS)
 
 
@@ -255,7 +255,7 @@ def license_info(license_url):
 
 
 def check_restrictions(obj):
-    """ checks for known restrictions of the object """
+    """checks for known restrictions of the object"""
 
     restrictions = obj.restrictions.split(",")
     if "hide" in restrictions:

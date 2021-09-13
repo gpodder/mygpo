@@ -34,7 +34,7 @@ admin.site.register(User, UserAdmin)
 
 @admin.register(Client)
 class ClientAdmin(admin.ModelAdmin):
-    """ Admin page for clients """
+    """Admin page for clients"""
 
     # configuration for the list view
     list_display = ("name", "user", "uid", "type")
@@ -52,12 +52,12 @@ class ClientAdmin(admin.ModelAdmin):
 
 @admin.register(SyncGroup)
 class SyncGroupAdmin(admin.ModelAdmin):
-    """ Admin page for SyncGroups """
+    """Admin page for SyncGroups"""
 
     list_display = ("user", "num_clients")
 
     def num_clients(self, group):
-        """ Numer of clients that belong to this group """
+        """Numer of clients that belong to this group"""
         return Client.objects.filter(sync_group=group).count()
 
     show_full_result_count = False

@@ -91,7 +91,7 @@ def account(request):
 
 
 class ProfileView(View):
-    """ Updates the public profile and redirects back to the account view """
+    """Updates the public profile and redirects back to the account view"""
 
     def post(self, request):
         user = request.user
@@ -115,7 +115,7 @@ class ProfileView(View):
 
 
 class AccountRemoveGoogle(View):
-    """ Removes the connected Google account """
+    """Removes the connected Google account"""
 
     @method_decorator(login_required)
     def post(self, request):

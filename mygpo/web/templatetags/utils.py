@@ -71,7 +71,7 @@ def markdown(txt):
 
 @register.filter()
 def nbsp(s):
-    """ collapses multiple whitespaces and replaces them with &nbsp; """
+    """collapses multiple whitespaces and replaces them with &nbsp;"""
     import re
 
     return mark_safe(re.sub(r"\s+", "&nbsp;", s))
@@ -79,7 +79,7 @@ def nbsp(s):
 
 @register.filter
 def license_name(license_url):
-    """ returns a "pretty" license name for a license URL """
+    """returns a "pretty" license name for a license URL"""
 
     info = license_info(license_url)
 
@@ -91,7 +91,7 @@ def license_name(license_url):
 
 @register.filter()
 def urlquote(s):
-    """ makes urllib.quote_plus available as a template filter """
+    """makes urllib.quote_plus available as a template filter"""
     if isinstance(s, str):
         s = s.encode("utf-8")
     return mark_safe(urllib.parse.quote_plus(s))

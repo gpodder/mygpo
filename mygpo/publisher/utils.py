@@ -97,7 +97,7 @@ def subscriber_data(podcasts):
 
 
 def check_publisher_permission(user, podcast):
-    """ Checks if the user has publisher permissions for the given podcast """
+    """Checks if the user has publisher permissions for the given podcast"""
 
     if not user.is_authenticated:
         return False

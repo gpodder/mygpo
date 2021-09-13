@@ -21,7 +21,7 @@ from mygpo.favorites.models import FavoriteEpisode
 
 
 class UserpageView(View):
-    """ Shows the profile page for a user """
+    """Shows the profile page for a user"""
 
     @method_decorator(
         requires_token(

@@ -27,7 +27,7 @@ MAX_INDEX = 1000
 @periodic_task(run_every=UPDATE_INTERVAL)
 @close_connection
 def update_search_index(run_every=UPDATE_INTERVAL):
-    """ Schedules podcast updates that are due within ``interval`` """
+    """Schedules podcast updates that are due within ``interval``"""
 
     logger.info("Updating search index")
 
@@ -53,7 +53,7 @@ def update_search_index(run_every=UPDATE_INTERVAL):
 
 
 def _get_search_vectors():
-    """ Return the combined search vector to use for indexing podcasts """
+    """Return the combined search vector to use for indexing podcasts"""
     vectors = []
     for (field, weight) in INDEX_FIELDS.items():
         # index the podcast based on the stored language

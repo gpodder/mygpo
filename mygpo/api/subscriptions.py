@@ -18,10 +18,10 @@ logger = logging.getLogger(__name__)
 
 
 class SubscriptionsAPI(APIView):
-    """ API for sending and retrieving podcast subscription updates """
+    """API for sending and retrieving podcast subscription updates"""
 
     def get(self, request, version, username, device_uid):
-        """ Client retrieves subscription updates """
+        """Client retrieves subscription updates"""
         now = datetime.utcnow()
         user = request.user
         device = get_object_or_404(Client, user=user, uid=device_uid)
@@ -30,7 +30,7 @@ class SubscriptionsAPI(APIView):
         return JsonResponse({"add": add, "remove": rem, "timestamp": until})
 
     def post(self, request, version, username, device_uid):
-        """ Client sends subscription updates """
+        """Client sends subscription updates"""
         now = get_timestamp(datetime.utcnow())
         logger.info(
             "Subscription Upload @{username}/{device_uid}".format(
@@ -94,7 +94,7 @@ class SubscriptionsAPI(APIView):
         return updated_urls
 
     def get_changes(self, user, device, since, until):
-        """ Returns subscription changes for the given device """
+        """Returns subscription changes for the given device"""
         history = get_subscription_history(user, device, since, until)
         logger.info("Subscription History: {num}".format(num=len(history)))
 

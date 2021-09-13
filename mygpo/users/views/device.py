@@ -234,7 +234,7 @@ def symbian_opml(request, device):
 @allowed_methods(["POST"])
 @transaction.atomic
 def delete(request, device):
-    """ Mars a client as deleted, but does not permanently delete it """
+    """Mars a client as deleted, but does not permanently delete it"""
 
     # remoe the device from the sync group
     device.stop_sync()
@@ -260,7 +260,7 @@ def delete_permanently(request, device):
 @login_required
 @transaction.atomic
 def undelete(request, device):
-    """ Marks the client as not deleted anymore """
+    """Marks the client as not deleted anymore"""
 
     # mark the subscriptions as not deleted anymore
     Subscription.objects.filter(user=request.user, client=device).update(deleted=False)
@@ -297,7 +297,7 @@ def sync(request, device):
 @device_decorator
 @login_required
 def resync(request, device):
-    """ Manually triggers a re-sync of a client """
+    """Manually triggers a re-sync of a client"""
     sync_user.delay(request.user.pk)
     messages.success(request, _("Your subscription will be updated in a moment."))
     return HttpResponseRedirect(reverse("device", args=[device.uid]))

@@ -41,7 +41,7 @@ logger = logging.getLogger(__name__)
 @cache_control(private=True)
 @allowed_methods(["GET"])
 def show(request, podcast):
-    """ Shows a podcast detail page """
+    """Shows a podcast detail page"""
 
     podcast = check_restrictions(podcast)
 
@@ -131,7 +131,7 @@ def get_tags(podcast, user, max_tags=50):
 
 
 def episode_list(podcast, user, offset=0, limit=20):
-    """ Returns a list of episodes """
+    """Returns a list of episodes"""
     # fast pagination by using Episode.order instead of offset/limit
     if podcast.max_episode_order is None:
         return []
@@ -282,7 +282,7 @@ def subscribe(request, podcast):
 @login_required
 @allowed_methods(["POST"])
 def subscribe_all(request, podcast):
-    """ subscribe all of the user's devices to the podcast """
+    """subscribe all of the user's devices to the podcast"""
     user = request.user
     subscribe_podcast_all.delay(podcast.pk, user.pk)
     return HttpResponseRedirect(get_podcast_link_target(podcast))
@@ -324,7 +324,7 @@ def unsubscribe(request, podcast, device_uid):
 @login_required
 @allowed_methods(["POST"])
 def unsubscribe_all(request, podcast):
-    """ unsubscribe all of the user's devices from the podcast """
+    """unsubscribe all of the user's devices from the podcast"""
     user = request.user
     unsubscribe_podcast_all.delay(podcast.pk, user.pk)
     return HttpResponseRedirect(get_podcast_link_target(podcast))

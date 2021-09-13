@@ -58,7 +58,7 @@ class DeviceSyncTests(unittest.TestCase):
 
 @override_settings(CACHE={})
 class UnsubscribeMergeTests(TestCase):
-    """ Test if merged podcasts can be properly unsubscribed """
+    """Test if merged podcasts can be properly unsubscribed"""
 
     P2_URL = "http://test.org/podcast/"
 
@@ -106,7 +106,7 @@ class AuthTests(TestCase):
         }
 
     def test_queries_failed_auth(self):
-        """ Verifies the number of queries that are executed on failed auth """
+        """Verifies the number of queries that are executed on failed auth"""
         url = reverse("api-all-subscriptions", args=(self.user.username, "opml"))
         with self.assertNumQueries(1):
             resp = self.client.get(url, **self.extra)

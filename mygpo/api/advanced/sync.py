@@ -17,7 +17,7 @@ from mygpo.users.tasks import sync_user
 @allowed_methods(["GET", "POST"])
 @cors_origin()
 def main(request, username):
-    """ API Endpoint for Device Synchronisation """
+    """API Endpoint for Device Synchronisation"""
 
     if request.method == "GET":
         return JsonResponse(get_sync_status(request.user))
@@ -42,7 +42,7 @@ def main(request, username):
 
 
 def get_sync_status(user):
-    """ Returns the current Device Sync status """
+    """Returns the current Device Sync status"""
 
     sync_groups = []
     unsynced = []

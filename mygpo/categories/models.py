@@ -5,7 +5,7 @@ from mygpo.podcasts.models import Podcast
 
 
 class Category(UpdateInfoModel):
-    """ A category of podcasts """
+    """A category of podcasts"""
 
     title = models.CharField(max_length=1000, null=False, blank=False, unique=True)
 
@@ -35,7 +35,7 @@ class Category(UpdateInfoModel):
 
 
 class CategoryEntry(UpdateInfoModel):
-    """ A podcast in a category """
+    """A podcast in a category"""
 
     category = models.ForeignKey(
         Category, related_name="entries", on_delete=models.CASCADE

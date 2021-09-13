@@ -23,7 +23,7 @@ USERNAME_MAXLEN = get_user_model()._meta.get_field("username").max_length
 
 
 class DuplicateUsername(ValidationError):
-    """ The username is already in use """
+    """The username is already in use"""
 
     def __init__(self, username):
         self.username = username
@@ -31,7 +31,7 @@ class DuplicateUsername(ValidationError):
 
 
 class DuplicateEmail(ValidationError):
-    """ The email address is already in use """
+    """The email address is already in use"""
 
     def __init__(self, email):
         self.email = email
@@ -39,7 +39,7 @@ class DuplicateEmail(ValidationError):
 
 
 class UsernameValidator(RegexValidator):
-    """ Validates that a username uses only allowed characters """
+    """Validates that a username uses only allowed characters"""
 
     regex = r"^\w[\w.+-]*$"
     message = "Invalid Username"
@@ -48,7 +48,7 @@ class UsernameValidator(RegexValidator):
 
 
 class RegistrationForm(forms.Form):
-    """ Form that is used to register a new user """
+    """Form that is used to register a new user"""
 
     username = forms.CharField(
         max_length=USERNAME_MAXLEN, validators=[UsernameValidator()]
@@ -67,14 +67,14 @@ class RegistrationForm(forms.Form):
 
 
 class RegistrationView(FormView):
-    """ View to register a new user """
+    """View to register a new user"""
 
     template_name = "registration/registration_form.html"
     form_class = RegistrationForm
     success_url = reverse_lazy("registration-complete")
 
     def form_valid(self, form):
-        """ called whene the form was POSTed and its contents were valid """
+        """called whene the form was POSTed and its contents were valid"""
 
         try:
             user = self.create_user(form)
@@ -136,7 +136,7 @@ class RegistrationView(FormView):
 
 
 class ActivationView(TemplateView):
-    """ Activates an already registered user """
+    """Activates an already registered user"""
 
     template_name = "registration/activation_failed.html"
 
@@ -162,7 +162,7 @@ class ActivationView(TemplateView):
 
 
 class ResendActivationForm(forms.Form):
-    """ Form for resending the activation email """
+    """Form for resending the activation email"""
 
     username = forms.CharField(max_length=USERNAME_MAXLEN, required=False)
     email = forms.EmailField(required=False)
@@ -179,14 +179,14 @@ class ResendActivationForm(forms.Form):
 
 
 class ResendActivationView(FormView):
-    """ View to resend the activation email """
+    """View to resend the activation email"""
 
     template_name = "registration/resend_activation.html"
     form_class = ResendActivationForm
     success_url = reverse_lazy("resent-activation")
 
     def form_valid(self, form):
-        """ called whene the form was POSTed and its contents were valid """
+        """called whene the form was POSTed and its contents were valid"""
 
         try:
             user = UserProxy.objects.all().by_username_or_email(
@@ -212,7 +212,7 @@ class ResentActivationView(TemplateView):
 
 
 def send_activation_email(user, request):
-    """ Sends the activation email for the given user """
+    """Sends the activation email for the given user"""
 
     subj = render_to_string("registration/activation_email_subject.txt")
     # remove trailing newline added by render_to_string

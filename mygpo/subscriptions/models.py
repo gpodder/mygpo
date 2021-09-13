@@ -10,7 +10,7 @@ from mygpo.podcasts.models import Podcast
 
 
 class Subscription(DeleteableModel):
-    """ A subscription to a podcast on a specific client """
+    """A subscription to a podcast on a specific client"""
 
     # the user that subscribed to a podcast
     user = models.ForeignKey(

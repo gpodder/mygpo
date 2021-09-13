@@ -10,10 +10,10 @@ from .tasks import update_search_index
 
 
 class SearchTests(TransactionTestCase):
-    """ Tests podcast search """
+    """Tests podcast search"""
 
     def test_search_podcast(self):
-        """ Search if a podcast is found in the search results """
+        """Search if a podcast is found in the search results"""
 
         # create a podcast
         podcast = Podcast(

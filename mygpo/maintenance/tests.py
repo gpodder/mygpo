@@ -47,7 +47,7 @@ class SimpleMergeTests(TestCase):
 
 @override_settings(CACHE={})
 class MergeTests(TransactionTestCase):
-    """ Tests merging of two podcasts, their episodes and states """
+    """Tests merging of two podcasts, their episodes and states"""
 
     def setUp(self):
         self.podcast1 = Podcast.objects.get_or_create_for_url(
@@ -106,7 +106,7 @@ class MergeTests(TransactionTestCase):
 
 
 class MergeGroupTests(TransactionTestCase):
-    """ Tests merging of two podcasts, one of which is part of a group """
+    """Tests merging of two podcasts, one of which is part of a group"""
 
     def setUp(self):
         self.podcast1 = Podcast.objects.get_or_create_for_url(

@@ -100,7 +100,7 @@ def subscriptions_feed(request, username):
 
 
 class SubscriptionsFeed(Feed):
-    """ A feed showing subscription changes for a certain user """
+    """A feed showing subscription changes for a certain user"""
 
     NUM_ITEMS = 20
 

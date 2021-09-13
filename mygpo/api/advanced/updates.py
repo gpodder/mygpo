@@ -77,7 +77,7 @@ class DeviceUpdates(View):
         )
 
     def get_subscription_changes(self, user, device, since, now, domain):
-        """ gets new, removed and current subscriptions """
+        """gets new, removed and current subscriptions"""
 
         history = get_subscription_history(user, device, since, now)
         add, rem = subscription_diff(history)
@@ -105,7 +105,7 @@ class DeviceUpdates(View):
         ]
 
     def get_episode_updates(self, user, subscribed_podcasts, since, max_per_podcast=5):
-        """ Returns the episode updates since the timestamp """
+        """Returns the episode updates since the timestamp"""
 
         episodes = []
         for podcast in subscribed_podcasts:
@@ -122,7 +122,7 @@ class DeviceUpdates(View):
     def get_episode_data(
         self, episode_status, podcasts, domain, include_actions, user, devices
     ):
-        """ Get episode data for an episode status object """
+        """Get episode data for an episode status object"""
 
         # TODO: shouldn't the podcast_id be in the episode status?
         podcast_id = episode_status.episode.podcast
@@ -138,7 +138,7 @@ class DeviceUpdates(View):
         return t
 
     def get_since(self, request):
-        """ parses the "since" parameter """
+        """parses the "since" parameter"""
         since_ = request.GET.get("since", None)
         if since_ is None:
             raise ValueError("parameter since missing")

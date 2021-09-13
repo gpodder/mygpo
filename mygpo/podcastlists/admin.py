@@ -10,7 +10,7 @@ class PodcastListEntryInline(admin.TabularInline):
 
 @admin.register(PodcastList)
 class PodcastListAdmin(admin.ModelAdmin):
-    """ Admin page for podcast lists"""
+    """Admin page for podcast lists"""
 
     # configuration for the list view
     list_display = ("title", "user", "slug", "num_entries", "vote_count")

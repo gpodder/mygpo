@@ -6,5 +6,5 @@ INDEX_FIELDS = {"title": "A", "description": "B"}
 
 
 def get_index_fields(podcast):
-    """ Returns a dict of the fields to be included in the search index """
+    """Returns a dict of the fields to be included in the search index"""
     return {field: getattr(podcast, field) for field in INDEX_FIELDS.keys()}

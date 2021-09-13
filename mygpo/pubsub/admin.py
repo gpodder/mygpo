@@ -5,7 +5,7 @@ from mygpo.pubsub.models import HubSubscription
 
 @admin.register(HubSubscription)
 class HubSubscriptionAdmin(admin.ModelAdmin):
-    """ Admin page for pubsubhubbub subscriptions """
+    """Admin page for pubsubhubbub subscriptions"""
 
     # configuration for the list view
     list_display = ("podcast", "hub_url", "mode", "verified")

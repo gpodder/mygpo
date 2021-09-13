@@ -6,7 +6,7 @@ from mygpo.podcasts.models import Episode
 
 
 class Chapter(UpdateInfoModel):
-    """ A chapter of an Episode """
+    """A chapter of an Episode"""
 
     # Seconds at which the chapter starts and ends
     start = models.IntegerField()

@@ -8,7 +8,7 @@ Client = namedtuple("Client", "client client_version lib lib_version os os_versi
 
 
 class UserAgentStats(object):
-    """ Provides User-Agent statistics """
+    """Provides User-Agent statistics"""
 
     def __init__(self):
         self._useragents = None
@@ -50,7 +50,7 @@ RE_GPNACCOUNT = re.compile(r"GPodder.net Account for Android")
 
 
 class ClientStats(UserAgentStats):
-    """ Provides statistics about client applications """
+    """Provides statistics about client applications"""
 
     def __init__(self):
         self._clients = None
