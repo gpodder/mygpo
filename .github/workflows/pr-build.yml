@@ -37,8 +37,8 @@ jobs:
         sudo sed -i -e '/local.*peer/s/runner/all/' -e 's/peer\|md5/trust/g' /etc/postgresql/*/main/pg_hba.conf
         sudo service postgresql restart
         sleep 1
-        psql -c "CREATE USER runner WITH PASSWORD 'runner';"
-        psql -c "CREATE DATABASE mygpo_test OWNER runner;"-U postgres
+        sudo -u postgres psql -c "CREATE USER runner WITH PASSWORD 'runner';"
+        sudo -u postgres psql -c "CREATE DATABASE mygpo_test OWNER runner;"
       
     - name: Check Format and Coverage
       run: |
