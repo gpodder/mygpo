@@ -9,10 +9,10 @@ jobs:
     container: python:3.8
 
     services:
-      redis
+      redis:
         image: redis
         ports: 6379:6379
-      postgres
+      postgres:
         image: postgres
         env:
           POSTGRES_PASSWORD: postgres
