@@ -28,16 +28,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install coveralls
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        |
+          if [ -f requirements-test.txt ]; then pip install -r requirements-test.txt; fi
 
       - name: Setup PostgreSQL
         run: |
           psql -c 'create database mygpo_test;' -U postgres
-        |
       
       - name: Check Format and Coverage
         run: |
           make check-code-format
           python -m pytest --cov=mygpo/ --cov-branch
           python -m coveralls
-        |
