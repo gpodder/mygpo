@@ -6,7 +6,6 @@ jobs:
   build: 
 
     runs-on: ubuntu 20.04
-    container: python:3.8
 
     services:
       redis:
@@ -16,7 +15,7 @@ jobs:
         image: postgres
         env:
           POSTGRES_PASSWORD: postgres
-          ports: 
+          ports: 5432:5432
 
     steps:
       - uses: actions/checkout@v2
