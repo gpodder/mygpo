@@ -10,28 +10,29 @@ jobs:
       matrix:
         python-version: [3.8]
 
-      steps:
-      - uses: actions/checkout@v2
+    steps:
+    - uses: actions/checkout@v2
       
-      - name: Setup Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with: 
-          python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
-        run: |
-          sudo apt-get update -q
-          make install-deps
-          python -m pip install --upgrade pip
-          pip install coveralls
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          if [ -f requirements-test.txt ]; then pip install -r requirements-test.txt; fi
+    - name: Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with: 
+        python-version: ${{ matrix.python-version }}
+      
+    - name: Install dependencies
+      run: |
+        sudo apt-get update -q
+        make install-deps
+        python -m pip install --upgrade pip
+        pip install coveralls
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        if [ -f requirements-test.txt ]; then pip install -r requirements-test.txt; fi
 
-      - name: Setup PostgreSQL
-        run: |
-          psql -c 'create database mygpo_test;' -U postgres
+    - name: Setup PostgreSQL
+      run: |
+        psql -c 'create database mygpo_test;' -U postgres
       
-      - name: Check Format and Coverage
-        run: |
-          make check-code-format
-          python -m pytest --cov=mygpo/ --cov-branch
-          python -m coveralls
+    - name: Check Format and Coverage
+      run: |
+        make check-code-format
+        python -m pytest --cov=mygpo/ --cov-branch
+        python -m coveralls
