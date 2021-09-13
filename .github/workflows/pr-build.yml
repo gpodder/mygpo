@@ -31,6 +31,9 @@ jobs:
 
     - name: Setup PostgreSQL
       run: |
+        sudo sed -i -e '/local.*peer/s/postgres/all/' -e 's/peer\|md5/trust/g' /etc/postgresql/*/main/pg_hba.conf
+        sudo service postgresql restart
+        sleep 1
         psql -c "ALTER USER postres WITH PASSWORD 'postgres';"
         psql -c 'create database mygpo_test;' -U postgres
       
