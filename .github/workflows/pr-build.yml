@@ -9,9 +9,9 @@ jobs:
 
     services:
       redis
-        image: redis:5
+        image: redis
       postgres
-        image: postgres:12
+        image: postgres
         env:
           POSTGRES_PASSWORD: postgres
 
@@ -41,4 +41,3 @@ jobs:
           pytest --cov=mygpo/ --cov-branch
           coveralls
         |
-        
