@@ -9,6 +9,8 @@ jobs:
     strategy:
       matrix:
         python-version: [3.8]
+    env:
+      DATABASE_URL: postgres://travis:travis@localhost/mygpo_test
 
     steps:
     - uses: actions/checkout@v2
@@ -29,6 +31,7 @@ jobs:
 
     - name: Setup PostgreSQL
       run: |
+        psql -c "ALTER USER postres WITH PASSWORD 'postgres';"
         psql -c 'create database mygpo_test;' -U postgres
       
     - name: Check Format and Coverage
