@@ -1,0 +1,46 @@
+name: Pull Request Build
+
+on: [pull_request]
+
+jobs:
+  build: 
+
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: [3.8]
+    env:
+      POSTGRES_DB: mygpo_test
+      POSTGRES_PASSWORD: runner
+      POSTGRES_USER: runner
+      POSTGRES_PORT: 5432
+
+    steps:
+    - uses: actions/checkout@v2
+      
+    - name: Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with: 
+        python-version: ${{ matrix.python-version }}
+      
+    - name: Install dependencies
+      run: |
+        sudo apt-get update -q
+        make install-deps
+        python -m pip install --upgrade pip
+        pip install coveralls
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        if [ -f requirements-test.txt ]; then pip install -r requirements-test.txt; fi
+    - name: Setup PostgreSQL
+      run: |
+        sudo sed -i -e '/local.*peer/s/runner/all/' -e 's/peer\|md5/trust/g' /etc/postgresql/*/main/pg_hba.conf
+        sudo service postgresql restart
+        sleep 1
+        sudo -u postgres psql -c "CREATE USER runner WITH PASSWORD 'runner';"
+        sudo -u postgres psql -c "CREATE DATABASE mygpo_test OWNER runner;"
+      
+    - name: Check Format and Coverage
+      run: |
+        make check-code-format
+        python -m pytest --cov=mygpo/ --cov-branch
+        python -m coveralls
