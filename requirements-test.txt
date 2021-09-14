@@ -4,5 +4,5 @@ pytest>=4.6
 pytest-django
 pytest-cov
 responses==0.13.3
-black==21.5b1
+black==21.9b0
 openapi-spec-validator
