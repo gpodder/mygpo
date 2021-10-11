@@ -1,5 +1,3 @@
-default_app_config = "mygpo.search.apps.SearchConfig"
-
 # Field that should be indexed, with their levels per
 # https://docs.djangoproject.com/en/1.11/ref/contrib/postgres/search/#weighting-queries
 INDEX_FIELDS = {"title": "A", "description": "B"}
