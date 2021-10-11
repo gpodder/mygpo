@@ -5,7 +5,7 @@ from mygpo.directory.models import ExamplePodcast
 
 @admin.register(ExamplePodcast)
 class ExamplePodcastAdmin(admin.ModelAdmin):
-    """ Admin page for example podcasts """
+    """Admin page for example podcasts"""
 
     # configuration for the list view
     list_display = ("podcast",)

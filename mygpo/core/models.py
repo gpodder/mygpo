@@ -5,7 +5,7 @@ from django.db import models, connection
 
 
 class UUIDModel(models.Model):
-    """ Models that have an UUID as primary key """
+    """Models that have an UUID as primary key"""
 
     id = models.UUIDField(primary_key=True)
 
@@ -13,12 +13,12 @@ class UUIDModel(models.Model):
         abstract = True
 
     def get_id(self):
-        """ String representation of the ID """
+        """String representation of the ID"""
         return self.id
 
 
 class TwitterModel(models.Model):
-    """ A model that has a twitter handle """
+    """A model that has a twitter handle"""
 
     twitter = models.CharField(max_length=15, null=True, blank=True)
 
@@ -27,7 +27,7 @@ class TwitterModel(models.Model):
 
 
 class GenericManager(models.Manager):
-    """ Generic manager methods """
+    """Generic manager methods"""
 
     def count_fast(self):
         """Fast approximate count of all model instances
@@ -45,7 +45,7 @@ class GenericManager(models.Manager):
 
 
 class UpdateInfoModel(models.Model):
-    """ Model that keeps track of when it was created and updated """
+    """Model that keeps track of when it was created and updated"""
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -55,7 +55,7 @@ class UpdateInfoModel(models.Model):
 
 
 class DeleteableModel(models.Model):
-    """ A model that can be marked as deleted """
+    """A model that can be marked as deleted"""
 
     # indicates that the object has been deleted
     deleted = models.BooleanField(default=False)

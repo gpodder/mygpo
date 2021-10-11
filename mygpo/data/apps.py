@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 
 def update_podcast(sender, **kwargs):
-    """ update podcast in background when receiving pubsub-notification """
+    """update podcast in background when receiving pubsub-notification"""
     from mygpo.data.tasks import update_podcasts
 
     logger.info('updating podcast for "%s" after pubsub notification', sender)

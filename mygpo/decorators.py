@@ -105,7 +105,7 @@ def query_if_required():
 
 
 def cors_origin(allowed_origin="*"):
-    """ Adds an Access-Control-Allow-Origin header to the response """
+    """Adds an Access-Control-Allow-Origin header to the response"""
 
     def decorator(f):
         @wraps(f)

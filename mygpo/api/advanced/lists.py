@@ -31,7 +31,7 @@ from mygpo.podcastlists.views import list_decorator
 @allowed_methods(["POST"])
 @cors_origin()
 def create(request, username, format):
-    """ Creates a new podcast list and links to it in the Location header """
+    """Creates a new podcast list and links to it in the Location header"""
 
     title = request.GET.get("title", None)
 
@@ -84,7 +84,7 @@ def _get_list_data(l, username, domain):
 @allowed_methods(["GET"])
 @cors_origin()
 def get_lists(request, username):
-    """ Returns a list of all podcast lists by the given user """
+    """Returns a list of all podcast lists by the given user"""
 
     User = get_user_model()
     user = User.objects.get(username=username)
@@ -115,7 +115,7 @@ def podcast_list(request, username, slug, format):
 @list_decorator(must_own=False)
 @cors_origin()
 def get_list(request, plist, owner, format):
-    """ Returns the contents of the podcast list """
+    """Returns the contents of the podcast list"""
 
     try:
         scale = int(request.GET.get("scale_logo", 64))
@@ -142,7 +142,7 @@ def get_list(request, plist, owner, format):
 @list_decorator(must_own=True)
 @cors_origin()
 def update_list(request, plist, owner, format):
-    """ Replaces the podcasts in the list and returns 204 No Content """
+    """Replaces the podcasts in the list and returns 204 No Content"""
     urls = parse_subscription(request.body.decode("utf-8"), format)
     podcasts = [Podcast.objects.get_or_create_for_url(url).object for url in urls]
     plist.set_entries(podcasts)
@@ -153,6 +153,6 @@ def update_list(request, plist, owner, format):
 @list_decorator(must_own=True)
 @cors_origin()
 def delete_list(request, plist, owner, format):
-    """ Delete the podcast list and returns 204 No Content """
+    """Delete the podcast list and returns 204 No Content"""
     plist.delete()
     return HttpResponse(status=204)

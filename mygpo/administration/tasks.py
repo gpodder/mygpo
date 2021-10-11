@@ -1,4 +1,5 @@
 from collections import Counter
+from celery.app import shared_task
 
 from django_db_geventpool.utils import close_connection
 
@@ -11,10 +12,10 @@ from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
 
 
-@celery.task
+@shared_task
 @close_connection
 def merge_podcasts(podcast_ids, num_groups):
-    """ Task to merge some podcasts"""
+    """Task to merge some podcasts"""
 
     logger.info("merging podcast ids %s", podcast_ids)
 

@@ -41,7 +41,7 @@ MAX_UPDATE_INTERVAL = 24 * 30
 
 
 class TitleModel(models.Model):
-    """ Model that has a title """
+    """Model that has a title"""
 
     title = models.CharField(max_length=1000, null=False, blank=True, db_index=True)
     subtitle = models.TextField(null=False, blank=True)
@@ -54,7 +54,7 @@ class TitleModel(models.Model):
 
 
 class DescriptionModel(models.Model):
-    """ Model that has a description """
+    """Model that has a description"""
 
     description = models.TextField(null=False, blank=True)
 
@@ -63,7 +63,7 @@ class DescriptionModel(models.Model):
 
 
 class LinkModel(models.Model):
-    """ Model that has a link """
+    """Model that has a link"""
 
     link = models.URLField(null=True, max_length=1000)
 
@@ -72,7 +72,7 @@ class LinkModel(models.Model):
 
 
 class LanguageModel(models.Model):
-    """ Model that has a language """
+    """Model that has a language"""
 
     language = models.CharField(max_length=10, null=True, blank=True, db_index=True)
 
@@ -81,7 +81,7 @@ class LanguageModel(models.Model):
 
 
 class LastUpdateModel(models.Model):
-    """ Model with timestamp of last update from its source """
+    """Model with timestamp of last update from its source"""
 
     # date and time at which the model has last been updated from its source
     # (eg a podcast feed). None means that the object has been created as a
@@ -136,10 +136,10 @@ class AuthorModel(models.Model):
 
 
 class MergedUUIDQuerySet(models.QuerySet):
-    """ QuerySet for Models inheriting from MergedUUID """
+    """QuerySet for Models inheriting from MergedUUID"""
 
     def get_by_any_id(self, id):
-        """ Find am Episode by its own ID or by a merged ID """
+        """Find am Episode by its own ID or by a merged ID"""
         # TODO: should this be done in the model?
         try:
             return self.get(id=id)
@@ -148,7 +148,7 @@ class MergedUUIDQuerySet(models.QuerySet):
 
 
 class TagsMixin(models.Model):
-    """ Methods for working with Tag objects """
+    """Methods for working with Tag objects"""
 
     tags = GenericRelation("Tag", related_query_name="tags")
 
@@ -171,7 +171,7 @@ class ScopedModel(models.Model):
         abstract = True
 
     def get_default_scope(self):
-        """ Returns the default scope of the object """
+        """Returns the default scope of the object"""
         raise NotImplementedError(
             "{cls} should implement get_default_scope".format(
                 cls=self.__class__.__name__
@@ -215,7 +215,7 @@ class Slug(OrderedModel, ScopedModel):
 
 
 class SlugsMixin(models.Model):
-    """ Methods for working with Slug objects """
+    """Methods for working with Slug objects"""
 
     slugs = GenericRelation(Slug, related_query_name="slugs")
 
@@ -238,7 +238,7 @@ class SlugsMixin(models.Model):
         return slug
 
     def add_slug(self, slug):
-        """ Adds a (non-cannonical) slug """
+        """Adds a (non-cannonical) slug"""
 
         if not slug:
             raise ValueError("'%s' is not a valid slug" % slug)
@@ -259,7 +259,7 @@ class SlugsMixin(models.Model):
         )
 
     def set_slug(self, slug):
-        """ Sets the canonical slug """
+        """Sets the canonical slug"""
 
         slugs = [s.slug for s in self.slugs.all()]
         if slug in slugs:
@@ -269,7 +269,7 @@ class SlugsMixin(models.Model):
         self.set_slugs(slugs)
 
     def remove_slug(self, slug):
-        """ Removes a slug """
+        """Removes a slug"""
         Slug.objects.filter(
             slug=slug,
             content_type=ContentType.objects.get_for_model(self),
@@ -288,11 +288,11 @@ class SlugsMixin(models.Model):
 
 
 class PodcastGroup(UUIDModel, TitleModel, SlugsMixin):
-    """ Groups multiple podcasts together """
+    """Groups multiple podcasts together"""
 
     @property
     def scope(self):
-        """ A podcast group is always in the global scope """
+        """A podcast group is always in the global scope"""
         return ""
 
     def subscriber_count(self):
@@ -306,7 +306,7 @@ class PodcastGroup(UUIDModel, TitleModel, SlugsMixin):
 
 
 class PodcastQuerySet(MergedUUIDQuerySet):
-    """ Custom queries for Podcasts """
+    """Custom queries for Podcasts"""
 
     def random(self):
         """Random podcasts
@@ -324,14 +324,14 @@ class PodcastQuerySet(MergedUUIDQuerySet):
         return self.exclude(title="").filter(id__gt=ruuid)
 
     def license(self, license_url=None):
-        """ Podcasts with any / the given license """
+        """Podcasts with any / the given license"""
         if license_url:
             return self.filter(license=license_url)
         else:
             return self.exclude(license__isnull=True)
 
     def order_by_next_update(self):
-        """ Sort podcasts by next scheduled update """
+        """Sort podcasts by next scheduled update"""
         NEXTUPDATE = (
             "last_update + (update_interval * "
             "update_interval_factor || ' hours')::INTERVAL"
@@ -361,13 +361,13 @@ class PodcastQuerySet(MergedUUIDQuerySet):
 
 
 class PodcastManager(GenericManager):
-    """ Manager for the Podcast model """
+    """Manager for the Podcast model"""
 
     def get_queryset(self):
         return PodcastQuerySet(self.model, using=self._db)
 
     def get_advertised_podcast(self):
-        """ Returns the currently advertised podcast """
+        """Returns the currently advertised podcast"""
         if settings.PODCAST_AD_ID:
             podcast = cache.get("podcast_ad")
             if podcast:
@@ -440,7 +440,7 @@ class URL(OrderedModel, ScopedModel):
 
 
 class UrlsMixin(models.Model):
-    """ Methods for working with URL objects """
+    """Methods for working with URL objects"""
 
     urls = GenericRelation(URL, related_query_name="urls")
 
@@ -449,7 +449,7 @@ class UrlsMixin(models.Model):
 
     @property
     def url(self):
-        """ The main URL of the model """
+        """The main URL of the model"""
         # We could also use self.urls.first() here, but this would result in a
         # different query and would render a .prefetch_related('urls') useless
         # The assumption is that we will never have loads of URLS, so
@@ -480,7 +480,7 @@ class UrlsMixin(models.Model):
                 continue
 
     def set_url(self, url):
-        """ Sets the canonical URL """
+        """Sets the canonical URL"""
 
         urls = [u.url for u in self.urls.all()]
         if url in urls:
@@ -519,7 +519,7 @@ class MergedUUID(models.Model):
 
 
 class MergedUUIDsMixin(models.Model):
-    """ Methods for working with MergedUUID objects """
+    """Methods for working with MergedUUID objects"""
 
     merged_uuids = GenericRelation(MergedUUID, related_query_name="merged_uuids")
 
@@ -547,7 +547,7 @@ class Podcast(
     MergedUUIDsMixin,
     TwitterModel,
 ):
-    """ A Podcast """
+    """A Podcast"""
 
     logo_url = models.URLField(null=True, max_length=1000)
     group = models.ForeignKey(
@@ -594,7 +594,7 @@ class Podcast(
         return self.subscribers
 
     def group_with(self, other, grouptitle, myname, othername):
-        """ Group the podcast with another one """
+        """Group the podcast with another one"""
         # TODO: move to PodcastGroup?
 
         if bool(self.group) and (self.group == other.group):
@@ -674,17 +674,17 @@ class Podcast(
 
     @property
     def scope(self):
-        """ A podcast is always in the global scope """
+        """A podcast is always in the global scope"""
         return ""
 
     @property
     def as_scope(self):
-        """ If models use this object as scope, they'll use this value """
+        """If models use this object as scope, they'll use this value"""
         return self.id.hex
 
     @property
     def display_title(self):
-        """ a title for display purposes """
+        """a title for display purposes"""
         if self.title:
             return self.title
 
@@ -710,7 +710,7 @@ class Podcast(
 
 
 class EpisodeQuerySet(MergedUUIDQuerySet):
-    """ QuerySet for Episodes """
+    """QuerySet for Episodes"""
 
     def toplist(self, language=None):
         toplist = self
@@ -721,7 +721,7 @@ class EpisodeQuerySet(MergedUUIDQuerySet):
 
 
 class EpisodeManager(GenericManager):
-    """ Custom queries for Episodes """
+    """Custom queries for Episodes"""
 
     def get_queryset(self):
         return EpisodeQuerySet(self.model, using=self._db)
@@ -805,7 +805,7 @@ class Episode(
     MergedUUIDsMixin,
     OptionallyOrderedModel,
 ):
-    """ An episode """
+    """An episode"""
 
     guid = models.CharField(max_length=200, null=True)
     content = models.TextField()
@@ -832,7 +832,7 @@ class Episode(
 
     @property
     def scope(self):
-        """ An episode's scope is its podcast """
+        """An episode's scope is its podcast"""
         return self.podcast.id.hex
 
     @property
@@ -841,7 +841,7 @@ class Episode(
         return self.title
 
     def get_short_title(self, common_title):
-        """ Title when used within the podcast's context """
+        """Title when used within the podcast's context"""
         if not self.title or not common_title:
             return None
 
@@ -850,7 +850,7 @@ class Episode(
         return title
 
     def get_episode_number(self, common_title):
-        """ Number of the episode """
+        """Number of the episode"""
         if not self.title or not common_title:
             return None
 

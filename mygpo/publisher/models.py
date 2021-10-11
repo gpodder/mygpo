@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 class PublishedPodcastManager(models.Manager):
-    """ Manager for the PublishedPodcast model """
+    """Manager for the PublishedPodcast model"""
 
     def publish_podcasts(self, user, podcasts):
         existed, created = 0, 0

@@ -14,14 +14,14 @@ class SettingsAPI(APIView):
     wiki.gpodder.org/wiki/Web_Services/API_2/Settings"""
 
     def get(self, request, username, scope):
-        """ Get settings for scope object """
+        """Get settings for scope object"""
         user = request.user
         scope = self.get_scope(request, scope)
         settings = UserSettings.objects.get_for_scope(user, scope)
         return JsonResponse(settings.as_dict())
 
     def post(self, request, username, scope):
-        """ Update settings for scope object """
+        """Update settings for scope object"""
         user = request.user
         scope = self.get_scope(request, scope)
         actions = self.parsed_body(request)
@@ -30,7 +30,7 @@ class SettingsAPI(APIView):
         return JsonResponse(resp)
 
     def get_scope(self, request, scope):
-        """ Get the scope object """
+        """Get the scope object"""
         if scope == "account":
             return None
 
@@ -51,7 +51,7 @@ class SettingsAPI(APIView):
         raise RequestException("undefined scope %s" % scope)
 
     def update_settings(self, settings, actions):
-        """ Update the settings according to the actions """
+        """Update the settings according to the actions"""
         for key, value in actions.get("set", {}).items():
             settings.set_setting(key, value)
 

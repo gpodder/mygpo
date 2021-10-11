@@ -38,7 +38,7 @@ from mygpo.celery import celery
 
 
 class InvalidPodcast(Exception):
-    """ raised when we try to merge a podcast that doesn't exist """
+    """raised when we try to merge a podcast that doesn't exist"""
 
 
 class AdminView(TemplateView):
@@ -52,7 +52,7 @@ class Overview(AdminView):
 
 
 class HostInfo(AdminView):
-    """ shows host information for diagnosis """
+    """shows host information for diagnosis"""
 
     template_name = "admin/hostinfo.html"
 
@@ -204,7 +204,7 @@ class MergeProcess(MergeBase):
 
 
 class MergeStatus(AdminView):
-    """ Displays the status of the merge operation """
+    """Displays the status of the merge operation"""
 
     template_name = "admin/task-status.html"
 
@@ -282,7 +282,7 @@ class ClientStatsJsonView(AdminView):
 
 
 class StatsView(AdminView):
-    """ shows general stats as HTML page """
+    """shows general stats as HTML page"""
 
     template_name = "admin/stats.html"
 
@@ -299,7 +299,7 @@ class StatsView(AdminView):
 
 
 class StatsJsonView(StatsView):
-    """ provides general stats as JSON """
+    """provides general stats as JSON"""
 
     def get(self, request):
         stats = self._get_stats()
@@ -307,7 +307,7 @@ class StatsJsonView(StatsView):
 
 
 class ActivateUserView(AdminView):
-    """ Lets admins manually activate users """
+    """Lets admins manually activate users"""
 
     template_name = "admin/activate-user.html"
 
@@ -342,7 +342,7 @@ class ActivateUserView(AdminView):
 
 
 class ResendActivationEmail(AdminView):
-    """ Resends the users activation email """
+    """Resends the users activation email"""
 
     template_name = "admin/resend-acivation.html"
 
@@ -382,13 +382,13 @@ class ResendActivationEmail(AdminView):
 
 
 class MakePublisherInput(AdminView):
-    """ Get all information necessary for making someone publisher """
+    """Get all information necessary for making someone publisher"""
 
     template_name = "admin/make-publisher-input.html"
 
 
 class MakePublisher(AdminView):
-    """ Assign publisher permissions """
+    """Assign publisher permissions"""
 
     template_name = "admin/make-publisher-result.html"
 

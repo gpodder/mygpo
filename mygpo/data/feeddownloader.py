@@ -42,15 +42,15 @@ class UpdatePodcastException(Exception):
 
 
 class NoPodcastCreated(Exception):
-    """ raised when no podcast obj was created for a new URL """
+    """raised when no podcast obj was created for a new URL"""
 
 
 class NoEpisodesException(Exception):
-    """ raised when parsing something that doesn't contain any episodes """
+    """raised when parsing something that doesn't contain any episodes"""
 
 
 def update_podcasts(queue):
-    """ Fetch data for the URLs supplied as the queue iterable """
+    """Fetch data for the URLs supplied as the queue iterable"""
 
     for n, podcast_url in enumerate(queue, 1):
         logger.info("Update %d - %s", n, podcast_url)
@@ -78,7 +78,7 @@ def update_podcasts(queue):
 
 
 class PodcastUpdater(object):
-    """ Updates the podcast specified by the podcast_url """
+    """Updates the podcast specified by the podcast_url"""
 
     def __init__(self, podcast_url):
         self.podcast_url = (
@@ -86,7 +86,7 @@ class PodcastUpdater(object):
         )
 
     def update_podcast(self):
-        """ Update the podcast """
+        """Update the podcast"""
 
         with models.PodcastUpdateResult(podcast_url=self.podcast_url) as res:
 
@@ -177,7 +177,7 @@ class PodcastUpdater(object):
             raise NoEpisodesException("no episodes found")
 
     def _update_podcast(self, podcast, parsed, episode_updater, update_result):
-        """ updates a podcast according to new parser results """
+        """updates a podcast according to new parser results"""
 
         # we need that later to decide if we can "bump" a category
         prev_latest_episode_timestamp = podcast.latest_episode_timestamp
@@ -301,7 +301,7 @@ class PodcastUpdater(object):
                 continue
 
     def _update_categories(self, podcast, prev_timestamp):
-        """ checks some practical requirements and updates a category """
+        """checks some practical requirements and updates a category"""
 
         max_timestamp = datetime.utcnow() + timedelta(days=1)
 
@@ -412,7 +412,7 @@ class MultiEpisodeUpdater(object):
         self.max_episode_order = num_episodes - 1
 
     def get_episode_url(self, parsed_episode):
-        """ returns the URL of a parsed episode """
+        """returns the URL of a parsed episode"""
         for f in parsed_episode.get("files", []):
             if f.get("urls", []):
                 return f["urls"][0]
@@ -422,7 +422,7 @@ class MultiEpisodeUpdater(object):
         return Episode.objects.filter(podcast=self.podcast).count()
 
     def get_update_interval(self, episodes):
-        """ calculates the avg interval between new episodes """
+        """calculates the avg interval between new episodes"""
 
         count = episodes.count()
         if not count:
@@ -466,14 +466,14 @@ class MultiEpisodeUpdater(object):
 
 
 class EpisodeUpdater(object):
-    """ Updates an individual episode """
+    """Updates an individual episode"""
 
     def __init__(self, episode, podcast):
         self.episode = episode
         self.podcast = podcast
 
     def update_episode(self, parsed_episode):
-        """ updates "episode" with the data from "parsed_episode" """
+        """updates "episode" with the data from "parsed_episode" """
 
         # TODO: check if there have been any changes, to
         # avoid unnecessary updates
@@ -547,7 +547,7 @@ class EpisodeUpdater(object):
         self.episode.add_missing_urls(parsed_urls)
 
     def mark_outdated(self):
-        """ marks the episode outdated if its not already """
+        """marks the episode outdated if its not already"""
         if self.episode.outdated:
             return None
 

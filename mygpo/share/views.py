@@ -80,7 +80,7 @@ class PublicSubscriptions(View):
 
 
 class FavoritesFeedCreateEntry(View):
-    """ Creates a Podcast object for the user's favorites feed """
+    """Creates a Podcast object for the user's favorites feed"""
 
     @method_decorator(vary_on_cookie)
     @method_decorator(cache_control(private=True))

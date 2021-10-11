@@ -4,7 +4,7 @@ from django.db.models.signals import post_save
 
 
 def create_missing_profile(sender, **kwargs):
-    """ Creates a UserProfile if a User doesn't have one """
+    """Creates a UserProfile if a User doesn't have one"""
     user = kwargs["instance"]
 
     if not hasattr(user, "profile"):

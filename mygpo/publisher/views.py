@@ -276,7 +276,7 @@ def episode(request, episode):
 @never_cache
 @allowed_methods(["POST"])
 def update_episode_slug(request, episode):
-    """ sets a new "main" slug, and moves the existing to the merged slugs """
+    """sets a new "main" slug, and moves the existing to the merged slugs"""
 
     new_slug = request.POST.get("slug")
     podcast = episode.podcast

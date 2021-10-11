@@ -5,7 +5,7 @@ from mygpo.subscriptions.signals import subscription_changed
 
 
 def update_suggestions_on_subscription(sender, **kwargs):
-    """ update a user's suggestions after one of his subscriptions change """
+    """update a user's suggestions after one of his subscriptions change"""
     from mygpo.suggestions.tasks import update_suggestions
 
     user = kwargs["user"]

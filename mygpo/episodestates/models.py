@@ -6,7 +6,7 @@ from mygpo.history.models import EpisodeHistoryEntry
 
 
 class EpisodeState(models.Model):
-    """ The latest status of an episode for a user """
+    """The latest status of an episode for a user"""
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
@@ -28,7 +28,7 @@ class EpisodeState(models.Model):
 
     @classmethod
     def dict_for_user(cls, user, episodes=None):
-        """ The state of the users episode as a {episode: state} dict """
+        """The state of the users episode as a {episode: state} dict"""
         states = cls.objects.filter(user=user)
 
         if episodes is not None:

@@ -5,7 +5,7 @@ from mygpo.favorites.models import FavoriteEpisode
 
 @admin.register(FavoriteEpisode)
 class FavoriteEpisodeAdmin(admin.ModelAdmin):
-    """ Admin page for favorite episodes """
+    """Admin page for favorite episodes"""
 
     # configuration for the list view
     list_display = ("user", "episode")

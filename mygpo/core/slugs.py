@@ -4,7 +4,7 @@ from django.utils.text import slugify
 
 
 class SlugGenerator(object):
-    """ Generates a unique slug for an object """
+    """Generates a unique slug for an object"""
 
     def __init__(self, obj):
         self.obj = obj
@@ -39,13 +39,13 @@ class SlugGenerator(object):
 
 
 class PodcastGroupSlugs(SlugGenerator):
-    """ Generates slugs for Podcast Groups """
+    """Generates slugs for Podcast Groups"""
 
     pass
 
 
 class PodcastSlugs(PodcastGroupSlugs):
-    """ Generates slugs for Podcasts """
+    """Generates slugs for Podcasts"""
 
     def _get_base_slug(self, podcast):
         base_slug = SlugGenerator._get_base_slug(podcast)
@@ -63,7 +63,7 @@ class PodcastSlugs(PodcastGroupSlugs):
 
 
 class EpisodeSlugs(SlugGenerator):
-    """ Generates slugs for Episodes """
+    """Generates slugs for Episodes"""
 
     def __init__(self, episode, common_title):
         self.common_title = common_title

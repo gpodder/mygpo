@@ -5,7 +5,7 @@ from mygpo.history.models import HistoryEntry, EpisodeHistoryEntry
 
 @admin.register(HistoryEntry)
 class HistoryEntryAdmin(admin.ModelAdmin):
-    """ Admin page for history entries """
+    """Admin page for history entries"""
 
     # configuration for the list view
     list_display = ("user", "timestamp", "podcast", "action", "client")
@@ -20,7 +20,7 @@ class HistoryEntryAdmin(admin.ModelAdmin):
 
 @admin.register(EpisodeHistoryEntry)
 class EpisodeHistoryEntryAdmin(admin.ModelAdmin):
-    """ Admin page for episode history entries """
+    """Admin page for episode history entries"""
 
     # configuration for the list view
     list_display = ("user", "timestamp", "episode", "action", "client")

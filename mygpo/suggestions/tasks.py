@@ -5,6 +5,8 @@ from django.contrib.auth import get_user_model
 
 from django_db_geventpool.utils import close_connection
 
+from celery import shared_task
+
 from mygpo.celery import celery
 from mygpo.subscriptions import get_subscribed_podcasts
 from mygpo.suggestions.models import PodcastSuggestion
@@ -14,10 +16,10 @@ from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
 
 
-@celery.task
+@shared_task
 @close_connection
 def update_suggestions(user_pk, max_suggestions=15):
-    """ updates the suggestions of a user """
+    """updates the suggestions of a user"""
 
     User = get_user_model()
     user = User.objects.get(pk=user_pk)

@@ -8,7 +8,7 @@ from mygpo.directory.tasks import update_podcast_subscribers
 
 
 class Command(BaseCommand):
-    """ For each podcast a task is scheduled to update its subscriber count """
+    """For each podcast a task is scheduled to update its subscriber count"""
 
     def add_arguments(self, parser):
         parser.add_argument(

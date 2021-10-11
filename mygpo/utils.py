@@ -244,7 +244,7 @@ def longest_substr(strings):
 
 
 def file_hash(f, h=hashlib.md5, block_size=2 ** 20):
-    """ returns the hash of the contents of a file """
+    """returns the hash of the contents of a file"""
     f_hash = h()
     while True:
         buf = f.read(block_size)
@@ -437,7 +437,7 @@ encoding = sys.getfilesystemencoding()
 
 
 def get_git_head():
-    """ returns the commit and message of the current git HEAD """
+    """returns the commit and message of the current git HEAD"""
 
     try:
         pr = subprocess.Popen(
@@ -461,7 +461,7 @@ def get_git_head():
 
 
 def parse_request_body(request):
-    """ returns the parsed request body, handles gzip encoding """
+    """returns the parsed request body, handles gzip encoding"""
 
     raw_body = request.body
     content_enc = request.META.get("HTTP_CONTENT_ENCODING")
@@ -585,7 +585,7 @@ def normalize_feed_url(url):
 
 
 def edit_link(obj):
-    """ Return the link to the Django Admin Edit page """
+    """Return the link to the Django Admin Edit page"""
     return reverse(
         "admin:%s_%s_change" % (obj._meta.app_label, obj._meta.model_name),
         args=(obj.pk,),
@@ -600,7 +600,7 @@ def random_token(length=32):
 
 
 def to_maxlength(cls, field, val):
-    """ Cut val to the maximum length of cls's field """
+    """Cut val to the maximum length of cls's field"""
     if val is None:
         return None
 

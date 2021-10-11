@@ -37,7 +37,7 @@ class TestAPI(TestCase):
         self.podcast.delete()
 
     def test_user_settings(self):
-        """ Create, update and verify settings for the user """
+        """Create, update and verify settings for the user"""
         url = self.get_url(self.user.username, "account")
         self._do_test_url(url)
 

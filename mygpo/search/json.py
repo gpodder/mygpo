@@ -2,7 +2,7 @@
 
 
 def podcast_to_json(podcast):
-    """ Convert a podcast to JSON for indexing """
+    """Convert a podcast to JSON for indexing"""
     doc = {
         "title": podcast.title,
         "subtitle": podcast.subtitle,

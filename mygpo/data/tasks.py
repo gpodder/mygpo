@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 from django.db import IntegrityError
 
-from celery.decorators import periodic_task
+from celery import shared_task
 from django_db_geventpool.utils import close_connection
 
 from mygpo.data.podcast import calc_similar_podcasts
@@ -15,10 +15,10 @@ from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
 
 
-@celery.task
+@shared_task
 @close_connection
 def update_podcasts(podcast_urls):
-    """ Task to update a podcast """
+    """Task to update a podcast"""
     from mygpo.data.feeddownloader import update_podcasts as update
 
     podcasts = update(podcast_urls)
@@ -26,7 +26,7 @@ def update_podcasts(podcast_urls):
     return [podcast.pk for podcast in podcasts]
 
 
-@celery.task
+@shared_task
 @close_connection
 def update_related_podcasts(podcast_pk, max_related=20):
     get_podcast = itemgetter(0)
@@ -49,10 +49,10 @@ def update_related_podcasts(podcast_pk, max_related=20):
 UPDATE_INTERVAL = timedelta(hours=1)
 
 
-@periodic_task(run_every=UPDATE_INTERVAL)
+@shared_task
 @close_connection
 def schedule_updates(interval=UPDATE_INTERVAL):
-    """ Schedules podcast updates that are due within ``interval`` """
+    """Schedules podcast updates that are due within ``interval``"""
     now = datetime.utcnow()
 
     # max number of updates to schedule (one every 10s)
@@ -69,10 +69,10 @@ def schedule_updates(interval=UPDATE_INTERVAL):
     _schedule_updates(podcasts)
 
 
-@periodic_task(run_every=UPDATE_INTERVAL)
+@shared_task
 @close_connection
 def schedule_updates_longest_no_update():
-    """ Schedule podcasts for update that have not been updated for longest """
+    """Schedule podcasts for update that have not been updated for longest"""
 
     # max number of updates to schedule (one every 20s)
     max_updates = UPDATE_INTERVAL.total_seconds() / 10
@@ -82,7 +82,7 @@ def schedule_updates_longest_no_update():
 
 
 def _schedule_updates(podcasts):
-    """ Schedule updates for podcasts """
+    """Schedule updates for podcasts"""
     logger.info("Scheduling %d podcasts for update", len(podcasts))
 
     # queue all those podcast updates
