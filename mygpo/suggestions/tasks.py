@@ -14,7 +14,7 @@ from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
 
 
-@celery.task
+@shared_task
 @close_connection
 def update_suggestions(user_pk, max_suggestions=15):
     """updates the suggestions of a user"""

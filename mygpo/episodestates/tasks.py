@@ -8,7 +8,7 @@ from mygpo.episodestates.models import EpisodeState
 logger = get_task_logger(__name__)
 
 
-@celery.task
+@shared_task
 @close_connection
 def update_episode_state(historyentry_pk):
     """Updates the episode state with the saved EpisodeHistoryEntry"""

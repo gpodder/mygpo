@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from importlib import import_module
 
-from celery.decorators import periodic_task
+from celery import shared_task
 from django_db_geventpool.utils import close_connection
 
 from django.contrib.auth import get_user_model
@@ -15,7 +15,7 @@ from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
 
 
-@celery.task(max_retries=5, default_retry_delay=60)
+@shared_task(max_retries=5, default_retry_delay=60)
 @close_connection
 def sync_user(user_pk):
     """Syncs all of the user's sync groups"""
@@ -39,7 +39,7 @@ def sync_user(user_pk):
             raise sync_user.retry()
 
 
-@periodic_task(run_every=timedelta(hours=1))
+@shared_task(run_every=timedelta(hours=1))
 @close_connection
 def remove_inactive_users():
     """Remove users that have not been activated"""
@@ -60,7 +60,7 @@ def remove_inactive_users():
         user.delete()
 
 
-@periodic_task(run_every=timedelta(hours=1))
+@shared_task(run_every=timedelta(hours=1))
 @close_connection
 def clearsessions():
     """Clear expired sessions

@@ -2,20 +2,20 @@ from datetime import datetime
 
 from django.contrib.auth import get_user_model
 from django.db import transaction
+from celery import shared_task
 
 from mygpo.subscriptions.models import Subscription
 from mygpo.subscriptions.signals import subscription_changed
 from mygpo.history.models import HistoryEntry
 from mygpo.podcasts.models import Podcast
 from mygpo.utils import to_maxlength
-from mygpo.celery import celery
 
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-@celery.task(max_retries=5, default_retry_delay=60)
+@shared_task(max_retries=5, default_retry_delay=60)
 def subscribe(podcast_pk, user_pk, client_uid, ref_url=None):
     """subscribes user to the current podcast on one client
 
@@ -36,7 +36,7 @@ def subscribe(podcast_pk, user_pk, client_uid, ref_url=None):
     _fire_events(podcast, user, changed, True)
 
 
-@celery.task(max_retries=5, default_retry_delay=60)
+@shared_task(max_retries=5, default_retry_delay=60)
 def unsubscribe(podcast_pk, user_pk, client_uid):
     """unsubscribes user from the current podcast on one client
 
@@ -57,7 +57,7 @@ def unsubscribe(podcast_pk, user_pk, client_uid):
     _fire_events(podcast, user, changed, False)
 
 
-@celery.task(max_retries=5, default_retry_delay=60)
+@shared_task(max_retries=5, default_retry_delay=60)
 def subscribe_all(podcast_pk, user_pk, ref_url=None):
     """subscribes user to the current podcast on all clients"""
     podcast = Podcast.objects.get(pk=podcast_pk)
@@ -74,7 +74,7 @@ def subscribe_all(podcast_pk, user_pk, ref_url=None):
     _fire_events(podcast, user, changed, True)
 
 
-@celery.task(max_retries=5, default_retry_delay=60)
+@shared_task(max_retries=5, default_retry_delay=60)
 def unsubscribe_all(podcast_pk, user_pk):
     """unsubscribes user from the current podcast on all clients"""
     podcast = Podcast.objects.get(pk=podcast_pk)
