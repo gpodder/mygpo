@@ -57,7 +57,7 @@ def calc_similar_podcasts(podcast, num=20, user_sample=100):
 
 
 def subscribe_at_hub(podcast):
-    """ Tries to subscribe to the given podcast at its hub """
+    """Tries to subscribe to the given podcast at its hub"""
 
     if not podcast.hub:
         return

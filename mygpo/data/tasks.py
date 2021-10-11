@@ -18,7 +18,7 @@ logger = get_task_logger(__name__)
 @celery.task
 @close_connection
 def update_podcasts(podcast_urls):
-    """ Task to update a podcast """
+    """Task to update a podcast"""
     from mygpo.data.feeddownloader import update_podcasts as update
 
     podcasts = update(podcast_urls)
@@ -52,7 +52,7 @@ UPDATE_INTERVAL = timedelta(hours=1)
 @periodic_task(run_every=UPDATE_INTERVAL)
 @close_connection
 def schedule_updates(interval=UPDATE_INTERVAL):
-    """ Schedules podcast updates that are due within ``interval`` """
+    """Schedules podcast updates that are due within ``interval``"""
     now = datetime.utcnow()
 
     # max number of updates to schedule (one every 10s)
@@ -72,7 +72,7 @@ def schedule_updates(interval=UPDATE_INTERVAL):
 @periodic_task(run_every=UPDATE_INTERVAL)
 @close_connection
 def schedule_updates_longest_no_update():
-    """ Schedule podcasts for update that have not been updated for longest """
+    """Schedule podcasts for update that have not been updated for longest"""
 
     # max number of updates to schedule (one every 20s)
     max_updates = UPDATE_INTERVAL.total_seconds() / 10
@@ -82,7 +82,7 @@ def schedule_updates_longest_no_update():
 
 
 def _schedule_updates(podcasts):
-    """ Schedule updates for podcasts """
+    """Schedule updates for podcasts"""
     logger.info("Scheduling %d podcasts for update", len(podcasts))
 
     # queue all those podcast updates

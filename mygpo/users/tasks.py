@@ -18,7 +18,7 @@ logger = get_task_logger(__name__)
 @celery.task(max_retries=5, default_retry_delay=60)
 @close_connection
 def sync_user(user_pk):
-    """ Syncs all of the user's sync groups """
+    """Syncs all of the user's sync groups"""
     from mygpo.users.models import SubscriptionException
 
     User = get_user_model()
@@ -42,7 +42,7 @@ def sync_user(user_pk):
 @periodic_task(run_every=timedelta(hours=1))
 @close_connection
 def remove_inactive_users():
-    """ Remove users that have not been activated """
+    """Remove users that have not been activated"""
     User = get_user_model()
 
     # time for which to keep unactivated and deleted users

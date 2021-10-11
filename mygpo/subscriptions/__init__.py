@@ -147,7 +147,7 @@ def get_subscription_change_history(history):
 
 
 def subscription_diff(history):
-    """ Calculates a diff of subscriptions based on a history (sub/unsub) """
+    """Calculates a diff of subscriptions based on a history (sub/unsub)"""
 
     # django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet.
     from mygpo.history.models import HistoryEntry

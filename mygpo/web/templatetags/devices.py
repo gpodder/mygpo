@@ -89,13 +89,13 @@ def device_link(device):
 
 @register.filter
 def device_name(client):
-    """ returns the name of a single device """
+    """returns the name of a single device"""
     return strip_tags(client.display_name)
 
 
 @register.filter
 def devices_name(devices):
-    """ returns the name of a single device, or of a list of devices """
+    """returns the name of a single device, or of a list of devices"""
     devices = devices if isinstance(devices, (list, tuple)) else [devices]
     return ", ".join(device_name(device) for device in devices)
 
@@ -107,7 +107,7 @@ def is_syncgroup(obj):
 
 @register.filter
 def devices_uids(client):
-    """ returns a comma-separated list of UIDs of one or more devices """
+    """returns a comma-separated list of UIDs of one or more devices"""
     if isinstance(client, SyncGroup):
         clients = client.client_set.all()
     elif isinstance(client, Client):

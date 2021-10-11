@@ -83,7 +83,7 @@ def episode(request, episode):
 @vary_on_cookie
 @cache_control(private=True)
 def history(request, episode):
-    """ shows the history of the episode """
+    """shows the history of the episode"""
 
     user = request.user
     podcast = episode.podcast

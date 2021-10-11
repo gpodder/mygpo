@@ -25,18 +25,18 @@ RE_DEVICE_UID = re.compile(r"^[\w.-]+$")
 
 # TODO: derive from ValidationException?
 class InvalidEpisodeActionAttributes(ValueError):
-    """ raised when the attribues of an episode action fail validation """
+    """raised when the attribues of an episode action fail validation"""
 
 
 class SubscriptionException(Exception):
-    """ raised when a subscription can not be modified """
+    """raised when a subscription can not be modified"""
 
 
 GroupedDevices = collections.namedtuple("GroupedDevices", "is_synced devices")
 
 
 class UIDValidator(RegexValidator):
-    """ Validates that the Device UID conforms to the given regex """
+    """Validates that the Device UID conforms to the given regex"""
 
     regex = RE_DEVICE_UID
     message = "Invalid Device ID"
@@ -45,7 +45,7 @@ class UIDValidator(RegexValidator):
 
 class UserProxyQuerySet(models.QuerySet):
     def by_username_or_email(self, username, email):
-        """ Queries for a User by username or email """
+        """Queries for a User by username or email"""
         q = Q()
 
         if username:
@@ -61,13 +61,13 @@ class UserProxyQuerySet(models.QuerySet):
 
 
 class UserProxyManager(GenericManager):
-    """ Manager for the UserProxy model """
+    """Manager for the UserProxy model"""
 
     def get_queryset(self):
         return UserProxyQuerySet(self.model, using=self._db)
 
     def from_user(self, user):
-        """ Get the UserProxy corresponding for the given User """
+        """Get the UserProxy corresponding for the given User"""
         return self.get(pk=user.pk)
 
 
@@ -91,7 +91,7 @@ class UserProxy(DjangoUser):
         self.profile.save()
 
     def get_grouped_devices(self):
-        """ Returns groups of synced devices and a unsynced group """
+        """Returns groups of synced devices and a unsynced group"""
 
         clients = Client.objects.filter(user=self, deleted=False).order_by(
             "-sync_group"
@@ -117,7 +117,7 @@ class UserProxy(DjangoUser):
 
 
 class UserProfile(TwitterModel):
-    """ Additional information stored for a User """
+    """Additional information stored for a User"""
 
     # the user to which this profile belongs
     user = models.OneToOneField(
@@ -155,7 +155,7 @@ class UserProfile(TwitterModel):
     activation_key = models.CharField(max_length=40, null=True)
 
     def get_token(self, token_name):
-        """ returns a token """
+        """returns a token"""
 
         if token_name not in TOKEN_NAMES:
             raise TokenException("Invalid token name %s" % token_name)
@@ -163,7 +163,7 @@ class UserProfile(TwitterModel):
         return getattr(self, token_name)
 
     def create_new_token(self, token_name):
-        """ resets a token """
+        """resets a token"""
 
         if token_name not in TOKEN_NAMES:
             raise TokenException("Invalid token name %s" % token_name)
@@ -179,12 +179,12 @@ class UserProfile(TwitterModel):
 
 
 class SyncGroup(models.Model):
-    """ A group of Clients """
+    """A group of Clients"""
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def sync(self):
-        """ Sync the group, ie bring all members up-to-date """
+        """Sync the group, ie bring all members up-to-date"""
         from mygpo.subscriptions.tasks import subscribe
 
         # get all subscribed podcasts
@@ -200,7 +200,7 @@ class SyncGroup(models.Model):
         return Podcast.objects.filter(subscription__client__sync_group=self)
 
     def get_missing_podcasts(self, client, all_podcasts):
-        """ the podcasts required to bring the device to the group's state """
+        """the podcasts required to bring the device to the group's state"""
         client_podcasts = set(client.get_subscribed_podcasts())
         return all_podcasts.difference(client_podcasts)
 
@@ -211,7 +211,7 @@ class SyncGroup(models.Model):
 
 
 class Client(UUIDModel, DeleteableModel):
-    """ A client application """
+    """A client application"""
 
     DESKTOP = "desktop"
     LAPTOP = "laptop"
@@ -255,7 +255,7 @@ class Client(UUIDModel, DeleteableModel):
 
     @transaction.atomic
     def sync_with(self, other):
-        """ Puts two devices in a common sync group"""
+        """Puts two devices in a common sync group"""
 
         if self.user != other.user:
             raise ValueError("the devices do not belong to the user")
@@ -286,7 +286,7 @@ class Client(UUIDModel, DeleteableModel):
             self.save()
 
     def stop_sync(self):
-        """ Stop synchronisation with other clients """
+        """Stop synchronisation with other clients"""
         sg = self.sync_group
 
         logger.info("Stopping synchronisation of %r", self)
@@ -359,7 +359,7 @@ class TokenException(Exception):
 
 
 class HistoryEntry(object):
-    """ A class that can represent subscription and episode actions """
+    """A class that can represent subscription and episode actions"""
 
     @classmethod
     def from_action_dict(cls, action):
@@ -381,7 +381,7 @@ class HistoryEntry(object):
 
     @classmethod
     def fetch_data(cls, user, entries, podcasts=None, episodes=None):
-        """ Efficiently loads additional data for a number of entries """
+        """Efficiently loads additional data for a number of entries"""
 
         if podcasts is None:
             # load podcast data

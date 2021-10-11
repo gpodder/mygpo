@@ -11,7 +11,7 @@ from mygpo.utils import set_ordered_entries
 
 
 class PodcastList(UUIDModel, VoteMixin, UpdateInfoModel):
-    """ A user-curated collection of podcasts """
+    """A user-curated collection of podcasts"""
 
     # the user that created (and owns) the list
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -45,7 +45,7 @@ class PodcastList(UUIDModel, VoteMixin, UpdateInfoModel):
         )
 
     def set_entries(self, podcasts):
-        """ Updates the list to include the given podcast, removes others """
+        """Updates the list to include the given podcast, removes others"""
 
         existing = {e.content_object: e for e in self.entries.all()}
         set_ordered_entries(
@@ -54,7 +54,7 @@ class PodcastList(UUIDModel, VoteMixin, UpdateInfoModel):
 
 
 class PodcastListEntry(UpdateInfoModel, OrderedModel):
-    """ An entry in a Podcast List """
+    """An entry in a Podcast List"""
 
     # the list that the entry belongs to
     podcastlist = models.ForeignKey(

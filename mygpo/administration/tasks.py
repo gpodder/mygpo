@@ -14,7 +14,7 @@ logger = get_task_logger(__name__)
 @celery.task
 @close_connection
 def merge_podcasts(podcast_ids, num_groups):
-    """ Task to merge some podcasts"""
+    """Task to merge some podcasts"""
 
     logger.info("merging podcast ids %s", podcast_ids)
 

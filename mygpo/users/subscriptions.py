@@ -3,7 +3,7 @@ from mygpo.history.stats import played_episode_counts
 
 
 class PodcastSorter(object):
-    """ Sorts a list of podcast """
+    """Sorts a list of podcast"""
 
     def __init__(self, podcasts):
         self.podcasts = podcasts
@@ -57,7 +57,7 @@ class PodcastPercentageListenedSorter(PodcastSorter):
 
 
 def subscription_changes(device_id, podcast_states, since, until):
-    """ returns subscription changes for the device and podcast states """
+    """returns subscription changes for the device and podcast states"""
 
     add, rem = [], []
     for p_state in podcast_states:
@@ -71,7 +71,7 @@ def subscription_changes(device_id, podcast_states, since, until):
 
 
 def podcasts_for_states(podcast_states):
-    """ returns the podcasts corresponding to the podcast states """
+    """returns the podcasts corresponding to the podcast states"""
 
     podcast_ids = [state.podcast for state in podcast_states]
     podcasts = Podcast.objects.filter(id__in=podcast_ids)

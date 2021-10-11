@@ -27,7 +27,7 @@ def anon_request(url):
 
 
 def create_user():
-    """ Create a user with random data """
+    """Create a user with random data"""
     User = get_user_model()
     password = random_token(10)
     username = random_token(8)

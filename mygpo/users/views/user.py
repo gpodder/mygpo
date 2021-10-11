@@ -41,10 +41,10 @@ def login(request, user):
 
 
 class LoginView(View):
-    """ View to login a user """
+    """View to login a user"""
 
     def get(self, request):
-        """ Shows the login page """
+        """Shows the login page"""
 
         # Do not show login page for already-logged-in users
         if request.user.is_authenticated:
@@ -58,7 +58,7 @@ class LoginView(View):
 
     @method_decorator(never_cache)
     def post(self, request):
-        """ Carries out the login, redirects to get if it fails """
+        """Carries out the login, redirects to get if it fails"""
 
         # redirect target on successful login
         next_page = request.POST.get("next", "")
@@ -158,7 +158,7 @@ def restore_password(request):
 
 
 class GoogleLogin(View):
-    """ Redirects to Google Authentication page """
+    """Redirects to Google Authentication page"""
 
     def get(self, request):
         flow = get_google_oauth_flow(request)
@@ -167,7 +167,7 @@ class GoogleLogin(View):
 
 
 class GoogleLoginCallback(TemplateView):
-    """ Logs user in, or connects user to account """
+    """Logs user in, or connects user to account"""
 
     def get(self, request):
 

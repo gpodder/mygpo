@@ -39,12 +39,12 @@ from mygpo.data.tasks import update_podcasts
 
 
 class ToplistView(TemplateView):
-    """ Generic Top List view """
+    """Generic Top List view"""
 
     @method_decorator(vary_on_cookie)
     @method_decorator(cache_control(private=True))
     def dispatch(self, *args, **kwargs):
-        """ Only used for applying decorators """
+        """Only used for applying decorators"""
         return super(ToplistView, self).dispatch(*args, **kwargs)
 
     def all_languages(self):
@@ -62,16 +62,16 @@ class ToplistView(TemplateView):
         return get_language_names(langs)
 
     def language(self):
-        """ Currently selected language """
+        """Currently selected language"""
         return process_lang_params(self.request)
 
     def site(self):
-        """ Current site for constructing absolute links """
+        """Current site for constructing absolute links"""
         return RequestSite(self.request)
 
 
 class PodcastToplistView(ToplistView):
-    """ Most subscribed podcasts """
+    """Most subscribed podcasts"""
 
     template_name = "toplist.html"
 
@@ -91,7 +91,7 @@ class PodcastToplistView(ToplistView):
 
 
 class EpisodeToplistView(ToplistView):
-    """ Most listened-to episodes """
+    """Most listened-to episodes"""
 
     template_name = "episode_toplist.html"
 
@@ -115,7 +115,7 @@ class EpisodeToplistView(ToplistView):
 
 
 class Carousel(View):
-    """ A carousel demo """
+    """A carousel demo"""
 
     @method_decorator(cache_control(private=True))
     @method_decorator(vary_on_cookie)
@@ -132,7 +132,7 @@ class Carousel(View):
 
 
 class Directory(View):
-    """ The main directory page """
+    """The main directory page"""
 
     @method_decorator(cache_control(private=True))
     @method_decorator(vary_on_cookie)
@@ -263,7 +263,7 @@ def podcast_lists(request, page_size=20):
 
 
 class MissingPodcast(View):
-    """ Check if a podcast is missing """
+    """Check if a podcast is missing"""
 
     @method_decorator(login_required)
     def get(self, request):
@@ -300,7 +300,7 @@ class MissingPodcast(View):
 
 
 class AddPodcast(View):
-    """ Add a missing podcast"""
+    """Add a missing podcast"""
 
     @method_decorator(login_required)
     @method_decorator(cache_control(private=True))
@@ -318,7 +318,7 @@ class AddPodcast(View):
 
 
 class AddPodcastStatus(TemplateView):
-    """ Status of adding a podcast """
+    """Status of adding a podcast"""
 
     template_name = "directory/add-podcast-status.html"
 
@@ -341,7 +341,7 @@ class AddPodcastStatus(TemplateView):
 
 
 class PodcastListView(ListView):
-    """ A generic podcast list view """
+    """A generic podcast list view"""
 
     paginate_by = 15
     context_object_name = "podcasts"
@@ -349,7 +349,7 @@ class PodcastListView(ListView):
     @method_decorator(vary_on_cookie)
     @method_decorator(cache_control(private=True))
     def dispatch(self, *args, **kwargs):
-        """ Only used for applying decorators """
+        """Only used for applying decorators"""
         return super(PodcastListView, self).dispatch(*args, **kwargs)
 
     @property
@@ -363,21 +363,21 @@ class PodcastListView(ListView):
         return self.get_context_data()["page_obj"]
 
     def page_list(self, page_size=15):
-        """ Return a list of pages, eg [1, 2, 3, '...', 6, 7, 8] """
+        """Return a list of pages, eg [1, 2, 3, '...', 6, 7, 8]"""
         page = self._page
         return get_page_list(
             1, page.paginator.num_pages, page.number, page.paginator.per_page
         )
 
     def max_subscribers(self):
-        """ Maximum subscribers of the podcasts on this page """
+        """Maximum subscribers of the podcasts on this page"""
         page = self._page
         podcasts = page.object_list
         return max([p.subscriber_count() for p in podcasts] + [0])
 
 
 class LicensePodcastList(PodcastListView):
-    """ Lists podcasts with a given license """
+    """Lists podcasts with a given license"""
 
     template_name = "directory/license-podcasts.html"
 
@@ -390,12 +390,12 @@ class LicensePodcastList(PodcastListView):
 
 
 class LicenseList(TemplateView):
-    """ Lists all podcast licenses """
+    """Lists all podcast licenses"""
 
     template_name = "directory/licenses.html"
 
     def licenses(self):
-        """ Returns all podcast licenses """
+        """Returns all podcast licenses"""
         query = Podcast.objects.exclude(license__isnull=True)
         values = query.values("license").annotate(Count("id")).order_by()
 

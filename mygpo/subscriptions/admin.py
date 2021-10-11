@@ -5,7 +5,7 @@ from mygpo.subscriptions.models import Subscription
 
 @admin.register(Subscription)
 class SubscriptionAdmin(admin.ModelAdmin):
-    """ Admin page for subscriptions """
+    """Admin page for subscriptions"""
 
     # configuration for the list view
     list_display = ("user", "podcast", "client")

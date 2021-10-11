@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 class HistoryEntry(models.Model):
-    """ A entry in the history """
+    """A entry in the history"""
 
     SUBSCRIBE = "subscribe"
     UNSUBSCRIBE = "unsubscribe"
@@ -124,7 +124,7 @@ class EpisodeHistoryEntry(models.Model):
         verbose_name_plural = "Episode History Entries"
 
     def clean(self):
-        """ Validates allowed combinations of time-values """
+        """Validates allowed combinations of time-values"""
         PLAY_ACTION_KEYS = ("started", "stopped", "total")
 
         # Key found, but must not be supplied (no play action!)

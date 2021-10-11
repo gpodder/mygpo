@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 class RequestException(Exception):
-    """ Raised if the request is malfored or otherwise invalid """
+    """Raised if the request is malfored or otherwise invalid"""
 
 
 class APIView(View):
@@ -29,7 +29,7 @@ class APIView(View):
     @method_decorator(never_cache)
     @method_decorator(cors_origin())
     def dispatch(self, *args, **kwargs):
-        """ Dispatches request and does generic error handling """
+        """Dispatches request and does generic error handling"""
         try:
             return super(APIView, self).dispatch(*args, **kwargs)
 
@@ -40,7 +40,7 @@ class APIView(View):
             return HttpResponseBadRequest(str(e))
 
     def parsed_body(self, request):
-        """ Returns the object parsed from the JSON request body """
+        """Returns the object parsed from the JSON request body"""
 
         if not request.body:
             raise RequestException("POST data must not be empty")
@@ -57,7 +57,7 @@ class APIView(View):
             raise RequestException(msg)
 
     def get_since(self, request):
-        """ Returns parsed "since" GET parameter """
+        """Returns parsed "since" GET parameter"""
         since_ = request.GET.get("since", None)
 
         if since_ is None:

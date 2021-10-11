@@ -15,10 +15,10 @@ from mygpo.utils import edit_link
 
 
 class AdminLinkMixin(object):
-    """ Adds an Admin link """
+    """Adds an Admin link"""
 
     def admin_link(self, instance):
-        """ Link to the admin page """
+        """Link to the admin page"""
 
         if not instance.pk:
             return ""
@@ -30,11 +30,11 @@ class AdminLinkMixin(object):
 
 
 class AdminLinkInline(AdminLinkMixin, admin.TabularInline):
-    """ TabularInline that adds an Admin link for the inlined model """
+    """TabularInline that adds an Admin link for the inlined model"""
 
 
 class GenericAdminLinkInline(AdminLinkMixin, GenericTabularInline):
-    """ TabularInline that adds an Admin link for the inlined model """
+    """TabularInline that adds an Admin link for the inlined model"""
 
 
 @admin.register(URL)
@@ -75,13 +75,13 @@ class PodcastInline(AdminLinkInline):
     can_delete = False
 
     def has_add_permission(self, request):
-        """ Podcasts must be created and then added to the group """
+        """Podcasts must be created and then added to the group"""
         return False
 
 
 @admin.register(Podcast)
 class PodcastAdmin(admin.ModelAdmin):
-    """ Admin page for podcasts """
+    """Admin page for podcasts"""
 
     # configuration for the list view
     list_display = ("title", "main_url")
@@ -160,7 +160,7 @@ class PodcastAdmin(admin.ModelAdmin):
 
 @admin.register(Episode)
 class EpisodeAdmin(admin.ModelAdmin):
-    """ Admin page for episodes """
+    """Admin page for episodes"""
 
     # configuration for the list view
     list_display = ("title", "podcast_title", "main_url")
@@ -224,7 +224,7 @@ class EpisodeAdmin(admin.ModelAdmin):
 
 @admin.register(PodcastGroup)
 class PodcastGroupAdmin(admin.ModelAdmin):
-    """ Admin page for podcast groups """
+    """Admin page for podcast groups"""
 
     # configuration for the list view
     list_display = ("title",)
@@ -238,7 +238,7 @@ class PodcastGroupAdmin(admin.ModelAdmin):
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
-    """ Admin page for tags """
+    """Admin page for tags"""
 
     list_display = ("tag", "content_object", "source", "user")
 

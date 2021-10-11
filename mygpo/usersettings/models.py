@@ -14,10 +14,10 @@ logger = logging.getLogger(__name__)
 
 
 class UserSettingsManager(models.Manager):
-    """ Manager for PodcastConfig objects """
+    """Manager for PodcastConfig objects"""
 
     def get_private_podcasts(self, user):
-        """ Returns the podcasts that the user has marked as private """
+        """Returns the podcasts that the user has marked as private"""
         settings = self.filter(
             user=user, content_type=ContentType.objects.get_for_model(Podcast)
         )
@@ -54,7 +54,7 @@ class UserSettingsManager(models.Manager):
 
 
 class UserSettings(models.Model):
-    """ Stores settings for a podcast, episode, user or client """
+    """Stores settings for a podcast, episode, user or client"""
 
     # the user for which the config is stored
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -77,7 +77,7 @@ class UserSettings(models.Model):
     objects = UserSettingsManager()
 
     def get_wksetting(self, setting):
-        """ returns the value of a well-known setting """
+        """returns the value of a well-known setting"""
         try:
             settings = json.loads(self.settings)
         except ValueError as ex:

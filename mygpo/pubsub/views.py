@@ -17,14 +17,14 @@ logger = logging.getLogger(__name__)
 
 
 class SubscribeView(View):
-    """ Endpoint for Pubsubhubbub subscriptions """
+    """Endpoint for Pubsubhubbub subscriptions"""
 
     @csrf_exempt
     def dispatch(self, *args, **kwargs):
         return super(SubscribeView, self).dispatch(*args, **kwargs)
 
     def get(self, request):
-        """ Callback used by the Hub to verify the subscription request """
+        """Callback used by the Hub to verify the subscription request"""
 
         # received arguments: hub.mode, hub.topic, hub.challenge,
         # hub.lease_seconds, hub.verify_token
@@ -73,7 +73,7 @@ class SubscribeView(View):
         return HttpResponse(challenge)
 
     def post(self, request):
-        """ Callback to notify about a feed update """
+        """Callback to notify about a feed update"""
 
         feed_url = request.GET.get("url")
 

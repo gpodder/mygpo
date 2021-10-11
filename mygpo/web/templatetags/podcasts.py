@@ -59,14 +59,14 @@ def podcast_status_icon(action):
 
 @register.filter
 def is_podcast(podcast):
-    """ Returns True if the argument is a podcast (esp not a PodcastGroup) """
+    """Returns True if the argument is a podcast (esp not a PodcastGroup)"""
     from mygpo.podcasts.models import Podcast
 
     return isinstance(podcast, Podcast)
 
 
 class PodcastLinkTargetNode(template.Node):
-    """ Links to a (view of a) Podcast """
+    """Links to a (view of a) Podcast"""
 
     def __init__(self, podcast, view_name, add_args):
         self.podcast = template.Variable(podcast)
@@ -99,7 +99,7 @@ register.tag("podcast_link_target", PodcastLinkTargetNode.compile)
 
 
 class PodcastGroupLinkTargetNode(template.Node):
-    """ Links to a (view of a) Podcast """
+    """Links to a (view of a) Podcast"""
 
     def __init__(self, group, view_name, add_args):
         self.group = template.Variable(group)
@@ -151,7 +151,7 @@ def podcast_group_link(podcast, title=None):
 
 @register.simple_tag
 def podcast_link(podcast, title=None):
-    """ Returns the link for a single Podcast """
+    """Returns the link for a single Podcast"""
 
     title = title or podcast.display_title
 

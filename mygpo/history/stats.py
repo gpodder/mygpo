@@ -7,7 +7,7 @@ from mygpo.history.models import EpisodeHistoryEntry
 
 
 def played_episode_counts(user):
-    """ number of played episodes per podcast for the given user """
+    """number of played episodes per podcast for the given user"""
     # retrieve list of unique episodes that the user has played.
     # for each episode only it's podcast is returned, because we don't care
     # about which episodes exactly have been played, only the number
@@ -21,7 +21,7 @@ def played_episode_counts(user):
 
 
 def num_played_episodes(user, since=None, until=None):
-    """ Number of distinct episodes the user has played in the interval """
+    """Number of distinct episodes the user has played in the interval"""
     query = (
         EpisodeHistoryEntry.objects.filter(user=user, action=EpisodeHistoryEntry.PLAY)
         .order_by("episode__id")
@@ -38,7 +38,7 @@ def num_played_episodes(user, since=None, until=None):
 
 
 def last_played_episodes(user, limit=10):
-    """ The last episodes that the user played """
+    """The last episodes that the user played"""
     ep_ids = (
         EpisodeHistoryEntry.objects.filter(user=user, action=EpisodeHistoryEntry.PLAY)
         .order_by("episode__id", "-timestamp")
@@ -55,7 +55,7 @@ def last_played_episodes(user, limit=10):
 
 
 def seconds_played(user, since=None):
-    """ The seconds played by the user since the given timestamp """
+    """The seconds played by the user since the given timestamp"""
     query = EpisodeHistoryEntry.objects.filter(
         user=user, action=EpisodeHistoryEntry.PLAY, stopped__isnull=False
     ).extra(select={"seconds": "stopped-COALESCE(started, 0)"})
@@ -68,7 +68,7 @@ def seconds_played(user, since=None):
 
 
 def playcounts_timerange(historyentries):
-    """ returns {date: play-count} containing all days w/ play events"""
+    """returns {date: play-count} containing all days w/ play events"""
     listeners = (
         historyentries.extra({"date": "date_trunc('day', timestamp)"})
         .values("date")

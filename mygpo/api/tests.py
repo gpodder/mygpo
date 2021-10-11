@@ -72,7 +72,7 @@ class AdvancedAPITests(unittest.TestCase):
         self.assertTrue(self.compare_action_list(self.action_data, actions))
 
     def test_invalid_client_id(self):
-        """ Invalid Client ID should return 400 """
+        """Invalid Client ID should return 400"""
         action_data = copy.deepcopy(self.action_data)
         action_data[0]["device"] = "gpodder@abcdef123"
 
@@ -107,7 +107,7 @@ class AdvancedAPITests(unittest.TestCase):
 
 
 class SubscriptionAPITests(unittest.TestCase):
-    """ Tests the Subscription API """
+    """Tests the Subscription API"""
 
     def setUp(self):
         User = get_user_model()
@@ -139,7 +139,7 @@ class SubscriptionAPITests(unittest.TestCase):
         self.user.delete()
 
     def test_set_get_subscriptions(self):
-        """ Tests that an upload subscription is returned back correctly """
+        """Tests that an upload subscription is returned back correctly"""
 
         # upload a subscription
         response = self.client.post(
@@ -158,13 +158,13 @@ class SubscriptionAPITests(unittest.TestCase):
         self.assertEqual([], response_obj.get("remove", []))
 
     def test_unauth_request(self):
-        """ Tests that an unauthenticated request gives a 401 response """
+        """Tests that an unauthenticated request gives a 401 response"""
         response = self.client.get(self.url, {"since": "0"})
         self.assertEqual(response.status_code, 401, response.content)
 
 
 class DirectoryTest(TestCase):
-    """ Test Directory API """
+    """Test Directory API"""
 
     def setUp(self):
         self.podcast = Podcast.objects.get_or_create_for_url(
@@ -178,7 +178,7 @@ class DirectoryTest(TestCase):
         self.client = Client()
 
     def test_episode_info(self):
-        """ Test that the expected number of queries is executed """
+        """Test that the expected number of queries is executed"""
         url = (
             reverse("api-episode-info")
             + "?"
@@ -219,7 +219,7 @@ class EpisodeActionTests(TestCase):
 
     @override_settings(MAX_EPISODE_ACTIONS=10)
     def test_limit_actions(self):
-        """ Test that max MAX_EPISODE_ACTIONS episodes are returned """
+        """Test that max MAX_EPISODE_ACTIONS episodes are returned"""
 
         timestamps = []
         t = datetime.utcnow()
@@ -253,7 +253,7 @@ class EpisodeActionTests(TestCase):
         self.assertEqual(get_timestamp(timestamps[9]), response_obj["timestamp"])
 
     def test_no_actions(self):
-        """ Test when there are no actions to return """
+        """Test when there are no actions to return"""
 
         t1 = get_timestamp(datetime.utcnow())
 

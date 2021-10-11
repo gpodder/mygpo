@@ -110,7 +110,7 @@ def is_image(episode):
 
 
 class EpisodeLinkTargetNode(template.Node):
-    """ Links to a (view of a) Podcast """
+    """Links to a (view of a) Podcast"""
 
     def __init__(self, episode, podcast, view_name="episode", add_args=[]):
         self.episode = template.Variable(episode)
@@ -147,7 +147,7 @@ register.tag("episode_link_target", EpisodeLinkTargetNode.compile)
 
 @register.simple_tag
 def episode_link(episode, podcast, title=None):
-    """ Returns the link for a single Episode """
+    """Returns the link for a single Episode"""
 
     title = (
         title

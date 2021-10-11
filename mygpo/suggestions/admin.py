@@ -5,7 +5,7 @@ from mygpo.suggestions.models import PodcastSuggestion
 
 @admin.register(PodcastSuggestion)
 class PodcastSuggestionAdmin(admin.ModelAdmin):
-    """ Admin page for suggestions """
+    """Admin page for suggestions"""
 
     # configuration for the list view
     list_display = ("suggested_to", "podcast", "deleted")

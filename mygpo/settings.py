@@ -25,7 +25,7 @@ def get_bool(name, default):
 
 
 def get_intOrNone(name, default):
-    """ Parses the env variable, accepts ints and literal None"""
+    """Parses the env variable, accepts ints and literal None"""
     value = os.getenv(name, str(default))
     if value.lower() == "none":
         return None

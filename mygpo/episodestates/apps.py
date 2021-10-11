@@ -3,7 +3,7 @@ from django.db.models.signals import post_save
 
 
 def set_episode_state(sender, **kwargs):
-    """ Updates the episode state with the saved EpisodeHistoryEntry """
+    """Updates the episode state with the saved EpisodeHistoryEntry"""
 
     from mygpo.episodestates.tasks import update_episode_state
 

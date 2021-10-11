@@ -8,7 +8,7 @@ from mygpo.podcastlists.models import PodcastList
 
 
 class TestAPI(TestCase):
-    """ Tests the Podcast List API """
+    """Tests the Podcast List API"""
 
     def setUp(self):
         self.user, pwd = create_user()
@@ -19,7 +19,7 @@ class TestAPI(TestCase):
         self.user.delete()
 
     def test_create_missing_title(self):
-        """ verify error response when creating podcast list w/o title """
+        """verify error response when creating podcast list w/o title"""
         url = reverse(
             views.create, kwargs={"username": self.user.username, "format": "txt"}
         )
@@ -32,7 +32,7 @@ class TestAPI(TestCase):
         self.assertEqual(resp.status_code, 400, resp.content)
 
     def test_create(self):
-        """ Create a podcast list and verify """
+        """Create a podcast list and verify"""
         title = "My Podcast List"
         url = get_create_url(self.user.username, "txt", title)
 
@@ -52,7 +52,7 @@ class TestAPI(TestCase):
         pl.delete()
 
     def test_replace(self):
-        """ Create, replace and delete a podcast list """
+        """Create, replace and delete a podcast list"""
         title = "My Podcast List"
         url = get_create_url(self.user.username, "txt", title)
 

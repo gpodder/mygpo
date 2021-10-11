@@ -5,7 +5,7 @@ from mygpo.publisher.models import PublishedPodcast
 
 @admin.register(PublishedPodcast)
 class ClientAdmin(admin.ModelAdmin):
-    """ Admin page for published podcasts"""
+    """Admin page for published podcasts"""
 
     # configuration for the list view
     list_display = ("publisher", "podcast")

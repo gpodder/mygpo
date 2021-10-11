@@ -83,7 +83,7 @@ class SimpleWebTests(TestCase):
 
 
 class PodcastPageTests(TestCase):
-    """ Test the podcast page """
+    """Test the podcast page"""
 
     def setUp(self):
         # create a podcast and some episodes
@@ -105,7 +105,7 @@ class PodcastPageTests(TestCase):
         )
 
     def test_podcast_queries(self):
-        """ Test that the expected number of queries is executed """
+        """Test that the expected number of queries is executed"""
         url = reverse("podcast-slug", args=(self.podcast_slug.slug,))
         # the number of queries must be independent of the number of episodes
 
@@ -113,7 +113,7 @@ class PodcastPageTests(TestCase):
             anon_request(url)
 
     def test_episode_queries(self):
-        """ Test that the expected number of queries is executed """
+        """Test that the expected number of queries is executed"""
         url = reverse(
             "episode-slug", args=(self.podcast_slug.slug, self.episode_slug.slug)
         )
@@ -185,7 +185,7 @@ class PodcastLogoTests(TestCase):
         self.assertEqual(302, response.status_code, response.content)
 
     def test_save_empty_logo(self):
-        """ Make sure that save_podcast_logo(None) does not fail """
+        """Make sure that save_podcast_logo(None) does not fail"""
         try:
             CoverArt.save_podcast_logo(None)
         except:
@@ -271,7 +271,7 @@ class PodcastLogoTests(TestCase):
 
 
 class PublisherPageTests(TestCase):
-    """ Test the publisher page """
+    """Test the publisher page"""
 
     @classmethod
     def setUpTestData(self):

@@ -10,10 +10,10 @@ from mygpo.directory.views import ToplistView
 
 
 class ToplistTests(unittest.TestCase):
-    """ Test podcast and episode toplists """
+    """Test podcast and episode toplists"""
 
     def test_toplist_languages(self):
-        """ Test the all_languages method of the toplists """
+        """Test the all_languages method of the toplists"""
         languages = ["de", "de_AT", "en"]
         for lang in languages:
             Podcast.objects.create(

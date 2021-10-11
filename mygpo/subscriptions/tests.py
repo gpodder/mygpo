@@ -11,7 +11,7 @@ from . import models
 
 
 class TestSubscribe(TestCase):
-    """ Test subscribing to podcasts """
+    """Test subscribing to podcasts"""
 
     def setUp(self):
         User = get_user_model()
@@ -26,7 +26,7 @@ class TestSubscribe(TestCase):
         self.podcast = Podcast.objects.get_or_create_for_url(self.url).object
 
     def test_duplicate_subscribe(self):
-        """ Test that a duplicate subscription is skipped """
+        """Test that a duplicate subscription is skipped"""
         from mygpo.subscriptions.tasks import _perform_subscribe
 
         clients = [self.client, self.client]

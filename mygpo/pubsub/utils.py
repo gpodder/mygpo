@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 def subscribe(podcast, feedurl, huburl, base_url, mode="subscribe"):
-    """ Subscribe to the feed at a Hub """
+    """Subscribe to the feed at a Hub"""
 
     logger.info("subscribing for {feed} at {hub}".format(feed=feedurl, hub=huburl))
     verify = "sync"

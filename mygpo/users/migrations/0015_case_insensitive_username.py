@@ -25,7 +25,7 @@ def reverse(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-    """ Create a unique case-insensitive index on the username column """
+    """Create a unique case-insensitive index on the username column"""
 
     dependencies = [("auth", "0001_initial"), ("users", "0014_django_uuidfield")]
 

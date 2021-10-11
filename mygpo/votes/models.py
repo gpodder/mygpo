@@ -7,7 +7,7 @@ from mygpo.core.models import UpdateInfoModel
 
 
 class Vote(UpdateInfoModel):
-    """ A vote by a user for some object """
+    """A vote by a user for some object"""
 
     # the user who voted
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -33,7 +33,7 @@ class VoteMixin(models.Model):
         abstract = True
 
     def vote(self, user):
-        """ Register a vote from the user for the current object """
+        """Register a vote from the user for the current object"""
         Vote.objects.get_or_create(
             user=user,
             content_type=ContentType.objects.get_for_model(self),
