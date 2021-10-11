@@ -2,7 +2,7 @@ import functools
 import operator
 from datetime import timedelta
 
-from celery.decorators import periodic_task
+from celery import shared_task
 from django_db_geventpool.utils import close_connection
 
 from django.db import transaction
@@ -24,7 +24,7 @@ UPDATE_INTERVAL = timedelta(hours=1)
 MAX_INDEX = 1000
 
 
-@periodic_task(run_every=UPDATE_INTERVAL)
+@shared_task(run_every=UPDATE_INTERVAL)
 @close_connection
 def update_search_index(run_every=UPDATE_INTERVAL):
     """Schedules podcast updates that are due within ``interval``"""

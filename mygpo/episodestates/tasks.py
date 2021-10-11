@@ -1,5 +1,6 @@
 from celery.utils.log import get_task_logger
 from django_db_geventpool.utils import close_connection
+from celery import shared_task
 
 from mygpo.celery import celery
 from mygpo.history.models import EpisodeHistoryEntry

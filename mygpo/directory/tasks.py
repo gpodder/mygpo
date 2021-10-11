@@ -1,4 +1,5 @@
 from django_db_geventpool.utils import close_connection
+from celery import shared_task
 
 from mygpo.podcasts.models import Podcast
 from mygpo.subscriptions.models import Subscription
