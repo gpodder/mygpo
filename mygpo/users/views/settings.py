@@ -179,7 +179,11 @@ def privacy(request):
     site = RequestSite(request)
     user = request.user
 
-    podcasts = Podcast.objects.filter(subscription__user=user).distinct("pk")
+    podcasts = (
+        Podcast.objects.filter(subscription__user=user)
+        .distinct("pk")
+        .prefetch_related("slugs")
+    )
     private = UserSettings.objects.get_private_podcasts(user)
 
     subscriptions = []

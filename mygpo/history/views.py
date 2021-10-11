@@ -16,7 +16,11 @@ def history(request, count=15, uid=None):
     user = request.user
     client = None
 
-    history = HistoryEntry.objects.filter(user=user).select_related("podcast")
+    history = (
+        HistoryEntry.objects.filter(user=user)
+        .select_related("podcast", "client")
+        .prefetch_related("podcast__slugs")
+    )
 
     if uid:
         try:

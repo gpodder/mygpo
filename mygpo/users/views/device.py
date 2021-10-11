@@ -74,7 +74,7 @@ def device_decorator(f):
 @device_decorator
 def show(request, device):
 
-    subscriptions = list(device.get_subscribed_podcasts())
+    subscriptions = list(device.get_subscribed_podcasts().prefetch_related("slugs"))
     synced_with = device.synced_with()
 
     sync_targets = list(device.get_sync_targets())

@@ -40,6 +40,7 @@ def search_podcasts(query):
         )
         .filter(rank__gte=SEARCH_CUTOFF)
         .order_by("-order")[:100]
+        .prefetch_related("slugs")
     )
 
     logger.debug(

@@ -82,7 +82,13 @@ class CoverArt(View):
         sio = io.BytesIO()
 
         try:
-            resized.save(sio, "JPEG", optimize=True, progression=True, quality=80)
+            resized.save(
+                sio,
+                "JPEG" if im.mode == "RGB" else "PNG",
+                optimize=True,
+                progression=True,
+                quality=80,
+            )
         except IOError as ex:
             return self.send_file(original)
         finally:

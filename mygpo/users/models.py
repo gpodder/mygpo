@@ -93,8 +93,10 @@ class UserProxy(DjangoUser):
     def get_grouped_devices(self):
         """Returns groups of synced devices and a unsynced group"""
 
-        clients = Client.objects.filter(user=self, deleted=False).order_by(
-            "-sync_group"
+        clients = (
+            Client.objects.filter(user=self, deleted=False)
+            .order_by("-sync_group")
+            .prefetch_related("sync_group")
         )
 
         last_group = object()
