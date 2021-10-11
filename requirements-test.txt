@@ -1,8 +1,8 @@
 coverage==5.3.1
-django-coverage-plugin==1.8.0
+django-coverage-plugin==2.0.1
 pytest>=4.6
 pytest-django
 pytest-cov
 responses==0.13.3
-black==21.5b1
+black==21.9b0
 openapi-spec-validator
