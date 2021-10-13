@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.contrib.auth import logout
@@ -20,6 +20,7 @@ from mygpo.decorators import allowed_methods
 from mygpo.web.forms import UserAccountForm, ProfileForm
 from mygpo.web.utils import normalize_twitter
 from mygpo.users.settings import PUBLIC_SUB_USER, PUBLIC_SUB_PODCAST
+from mygpo.users.models import UserProfile
 
 
 @login_required
@@ -105,10 +106,12 @@ class ProfileView(View):
                 )
             )
 
-        request.user.twitter = normalize_twitter(form.cleaned_data["twitter"])
-        request.user.about = strip_tags(form.cleaned_data["about"])
+        # Retrieve user profile for request associated user
+        user_profile = get_object_or_404(UserProfile, user=request.user)
+        user_profile.twitter = normalize_twitter(form.cleaned_data["twitter"])
+        user_profile.about = strip_tags(form.cleaned_data["about"])
 
-        request.user.save()
+        user_profile.save()
         messages.success(request, _("Data updated"))
 
         return HttpResponseRedirect(reverse("account") + "#profile")
