@@ -74,7 +74,7 @@ class PodcastInline(AdminLinkInline):
 
     can_delete = False
 
-    def has_add_permission(self, request):
+    def has_add_permission(self, request, obj=None):
         """Podcasts must be created and then added to the group"""
         return False
 
