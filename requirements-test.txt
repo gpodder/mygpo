@@ -1,4 +1,4 @@
-coverage==6.0.1
+coverage==5.5
 django-coverage-plugin==2.0.1
 pytest>=4.6
 pytest-django
