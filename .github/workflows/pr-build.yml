@@ -10,7 +10,7 @@ jobs:
       matrix:
         python-version: [3.8]
     env:
-      POSTGRES_DB: mygpo_test
+      POSTGRES_DB: mygpo
       POSTGRES_PASSWORD: mygpo
       POSTGRES_USER: mygpo
       POSTGRES_PORT: 5432
@@ -36,11 +36,13 @@ jobs:
         sudo sed -i -e '/local.*peer/s/mygpo/all/' -e 's/peer\|md5/trust/g' /etc/postgresql/*/main/pg_hba.conf
         sudo service postgresql restart
         sleep 1
-        sudo -u postgres psql -c "CREATE USER mygpo WITH PASSWORD 'mygpo';"
-        sudo -u postgres psql -c "CREATE DATABASE mygpo_test OWNER mygpo;"
+        sudo -u postgres psql -c "CREATE USER mygpo WITH PASSWORD 'mygpo' CREATEDB;"
+        #sudo -u postgres psql -c "CREATE DATABASE mygpo_test OWNER mygpo;"
       
     - name: Check Format and Coverage
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         make check-code-format
         python -m pytest --cov=mygpo/ --cov-branch
-        python -m coveralls
+        python -m coveralls --service=github
