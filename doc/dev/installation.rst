@@ -71,6 +71,7 @@ For a development configuration you will probably want to use the following
     echo secret > envs/dev/SECRET_KEY
     echo postgres://mygpo:mygpo@localhost/mygpo > envs/dev/DATABASE_URL
     echo True > envs/dev/DEBUG
+    echo "127.0.0.1" > envs/dev/INTERNAL_IPS
     mkdir -p /tmp/mygpo-test-media
     echo /tmp/mygpo-test-media > envs/dev/MEDIA_ROOT
 
