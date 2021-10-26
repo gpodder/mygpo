@@ -10,8 +10,11 @@ class PodcastConfigAdmin(admin.ModelAdmin):
     list_display = ("user", "content_object")
 
     # fetch the related objects for the fields in list_display
-    list_select_related = ("user", "content_object")
+    list_select_related = ("user",)
 
     raw_id_fields = ("user",)
 
     show_full_result_count = False
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related("content_object")
