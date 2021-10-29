@@ -90,6 +90,13 @@ class RegistrationView(FormView):
         send_activation_email(user, self.request)
         return super(RegistrationView, self).form_valid(form)
 
+    def form_invalid(self, form):
+        """Populate session messages if form validation fails"""
+        for key, errors in form.errors.items():
+            messages.error(self.request, "; ".join([error for error in errors]))
+
+        return super().form_invalid(form)
+
     @transaction.atomic
     def create_user(self, form):
         User = get_user_model()
