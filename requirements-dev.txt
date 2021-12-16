@@ -2,7 +2,7 @@ transifex-client==0.14.3
 sphinx
 pep8
 flake8
-django-debug-toolbar==3.2.2
+django-debug-toolbar==3.2.4
 django-extensions
 jupyter
 black==21.10b0
