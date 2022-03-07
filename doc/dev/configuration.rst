@@ -86,9 +86,11 @@ Logging
 * ``LOGGING_DJANGO_HANDLERS`` - space separated list of logging handlers for Django log events
 * ``LOGGING_MYGPO_HANDLERS`` - space separated list of logging handlers for mygpo log events
 * ``LOGGING_FILENAME`` - filename for filesystem logs
+* ``LOGGING_DIR_GUNICRON`` - directory for gunicron to log into
 * ``OPBEAT_APP_ID`` - Opbeat App ID
 * ``OPBEAT_ORGANIZATION_ID`` - Opbeat Organization ID
 * ``OPBEAT_SECRET_TOKEN`` - Opbeat Secret Token
+
 
 
 Social Login
