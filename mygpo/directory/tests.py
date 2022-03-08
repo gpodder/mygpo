@@ -1,9 +1,7 @@
 import unittest
-import doctest
 import uuid
 from datetime import datetime
 
-from django.test import TestCase
 
 from mygpo.podcasts.models import Podcast
 from mygpo.directory.views import ToplistView

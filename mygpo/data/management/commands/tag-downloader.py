@@ -1,6 +1,5 @@
 import time
 import urllib.request, urllib.error, urllib.parse
-from optparse import make_option
 
 from mygpo.data import delicious
 from mygpo.maintenance.management.podcastcmd import PodcastCommand

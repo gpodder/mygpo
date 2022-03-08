@@ -35,7 +35,7 @@ def get_photo_sizes(photo_id):
 
     try:
         resp_obj = resp.json()
-    except json.JSONDecodeError as jde:
+    except json.JSONDecodeError:
         return []
 
     try:

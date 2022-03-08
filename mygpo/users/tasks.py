@@ -7,7 +7,6 @@ from django_db_geventpool.utils import close_connection
 from django.contrib.auth import get_user_model
 from django.conf import settings
 
-from mygpo.celery import celery
 from . import models
 
 from celery.utils.log import get_task_logger
@@ -34,7 +33,7 @@ def sync_user(user_pk):
             # no need to retry on SubscriptionException
             pass
 
-        except Exception as e:
+        except Exception:
             logger.exception("retrying task")
             raise sync_user.retry()
 

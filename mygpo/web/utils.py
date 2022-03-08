@@ -2,7 +2,6 @@ import re
 import math
 import string
 import collections
-from datetime import datetime
 
 from django.utils.translation import ngettext
 from django.views.decorators.cache import never_cache
@@ -12,8 +11,6 @@ from django.shortcuts import render
 from django.http import Http404
 
 from babel import Locale, UnknownLocaleError
-
-from mygpo.podcasts.models import Podcast
 
 
 def get_accepted_lang(request):

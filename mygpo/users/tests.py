@@ -12,7 +12,7 @@ from mygpo.test import create_auth_string, create_user
 from mygpo.podcasts.models import Podcast
 from mygpo.maintenance.merge import PodcastMerger
 from mygpo.api.backend import get_device
-from mygpo.users.models import Client, SyncGroup, UserProxy
+from mygpo.users.models import Client, UserProxy
 from mygpo.subscriptions.tasks import subscribe, unsubscribe
 
 

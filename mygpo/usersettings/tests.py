@@ -7,8 +7,6 @@ from django.test.client import Client as TClient
 from django.test import TestCase
 
 from mygpo.test import create_auth_string, create_user
-from mygpo.api.advanced import settings as views
-from mygpo.usersettings.models import UserSettings
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.users.models import Client
 

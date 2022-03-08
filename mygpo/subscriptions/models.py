@@ -3,9 +3,8 @@ import collections
 from django.db import models
 from django.conf import settings
 
-from mygpo.core.models import UpdateInfoModel, DeleteableModel
+from mygpo.core.models import DeleteableModel
 from mygpo.users.models import Client
-from mygpo.users.settings import PUBLIC_SUB_PODCAST
 from mygpo.podcasts.models import Podcast
 
 
