@@ -26,7 +26,7 @@ def blacklist(request, blacklisted_podcast):
         )
     )
 
-    suggestion = PodcastSuggestion.objects.filter(
+    PodcastSuggestion.objects.filter(
         suggested_to=user, podcast=blacklisted_podcast
     ).update(deleted=True)
     return HttpResponseRedirect(reverse("suggestions"))

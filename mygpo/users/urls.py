@@ -1,6 +1,5 @@
 from django.urls import path, register_converter
 from django.contrib.auth.views import LogoutView
-from django.views.generic.base import TemplateView
 
 from .views import registration, settings, device, user
 from mygpo.users import converters

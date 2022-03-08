@@ -19,7 +19,7 @@ def search_podcasts(q):
         if not podcast or not podcast.title:
             try:
                 updater.update_podcast()
-            except NoPodcastCreated as npc:
+            except NoPodcastCreated:
                 return []
 
         try:

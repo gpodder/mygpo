@@ -1,7 +1,6 @@
 import re
 import socket
-from itertools import count, chain
-from collections import Counter
+from itertools import count
 from datetime import datetime
 
 import redis
@@ -14,7 +13,6 @@ from django.urls import reverse
 from django.core.cache import cache
 from django.http import HttpResponseRedirect
 from django.template.loader import render_to_string
-from django.template import RequestContext
 from django.utils.translation import gettext as _
 from django.contrib.sites.requests import RequestSite
 from django.views.generic import TemplateView
@@ -25,7 +23,7 @@ from django.contrib.auth import get_user_model
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.administration.auth import require_staff
 from mygpo.administration.group import PodcastGrouper
-from mygpo.maintenance.merge import PodcastMerger, IncorrectMergeException
+from mygpo.maintenance.merge import IncorrectMergeException
 from mygpo.administration.clients import UserAgentStats, ClientStats
 from mygpo.users.views.registration import send_activation_email
 from mygpo.administration.tasks import merge_podcasts

@@ -5,7 +5,6 @@ from datetime import timedelta
 from celery import shared_task
 from django_db_geventpool.utils import close_connection
 
-from django.db import transaction
 from django.contrib.postgres.search import SearchVector
 
 from mygpo.podcasts.models import Podcast

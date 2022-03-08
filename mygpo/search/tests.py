@@ -1,7 +1,6 @@
 import uuid
 
 from mygpo.podcasts.models import Podcast
-from django.contrib.postgres.search import SearchVector
 from django.test import TransactionTestCase
 from django.test.utils import override_settings
 

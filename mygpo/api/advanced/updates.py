@@ -1,4 +1,3 @@
-from itertools import chain
 from datetime import datetime
 
 from django.http import HttpResponseBadRequest, HttpResponseNotFound
@@ -16,7 +15,6 @@ from mygpo.utils import parse_bool, get_timestamp
 from mygpo.subscriptions import get_subscription_history, subscription_diff
 from mygpo.users.models import Client
 from mygpo.episodestates.models import EpisodeState
-from mygpo.users.subscriptions import subscription_changes, podcasts_for_states
 from mygpo.api.basic_auth import require_valid_user, check_username
 from mygpo.decorators import cors_origin
 
@@ -42,7 +40,6 @@ class DeviceUpdates(View):
     def get(self, request, username, device_uid):
 
         now = datetime.utcnow()
-        now_ = get_timestamp(now)
 
         user = request.user
 

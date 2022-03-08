@@ -2,7 +2,6 @@ from celery.utils.log import get_task_logger
 from django_db_geventpool.utils import close_connection
 from celery import shared_task
 
-from mygpo.celery import celery
 from mygpo.history.models import EpisodeHistoryEntry
 from mygpo.episodestates.models import EpisodeState
 
@@ -31,7 +30,7 @@ def update_episode_state(historyentry_pk):
         )
     )
 
-    state = EpisodeState.objects.update_or_create(
+    EpisodeState.objects.update_or_create(
         user=user,
         episode=episode,
         defaults={"action": historyentry.action, "timestamp": historyentry.timestamp},
