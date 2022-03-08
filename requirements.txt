@@ -1,5 +1,5 @@
 Django<4.1
-celery==5.1.2
+celery==5.2.3
 Babel==2.9.1
 Pillow==9.0.1
 celery[redis]==5.1.2
