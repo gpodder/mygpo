@@ -278,6 +278,8 @@ class MissingPodcast(View):
         else:
             try:
                 podcast = Podcast.objects.get(urls__url=url)
+                if podcast.link is None:
+                    raise Podcast.DoesNotExist
                 can_add = False
 
             except Podcast.DoesNotExist:
