@@ -226,25 +226,23 @@ class PodcastLogoTests(TestCase):
                 responses.GET,
                 self.URL,
                 status=200,
-                body=body1,
+                body=body1.read(),
                 content_type="image/png",
             )
             rsps.add(
                 responses.GET,
                 self.URL,
                 status=200,
-                body=body2,
+                body=body2.read(),
                 content_type="image/png",
             )
             rsps.add(
                 responses.GET,
                 self.URL,
                 status=200,
-                body=body3,
+                body=body3.read(),
                 content_type="image/png",
             )
-
-            get_logo_url(self.podcast, 32)
 
             # first request
             CoverArt.save_podcast_logo(self.URL)
