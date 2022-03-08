@@ -16,5 +16,5 @@ python-dateutil==2.8.2
 redis==4.0.2
 django-celery-results==2.2.0
 django-celery-beat==2.2.1
-requests==2.26.0
+requests==2.27.1
 django-db-geventpool==4.0.0
