@@ -3,6 +3,6 @@ django-coverage-plugin==2.0.3
 pytest>=4.6
 pytest-django
 pytest-cov
-responses==0.14.0
+responses==0.21.0
 black==22.6
 openapi-spec-validator
