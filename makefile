@@ -19,10 +19,10 @@ test: envs/dev/MEDIA_ROOT
 	coverage report --show-missing
 
 update-po:
-	envdir envs/dev/ python manage.py makemessages \
+	envdir envs/dev python manage.py makemessages \
 		--ignore=doc/* --ignore=envs/* --ignore=media/* --ignore=venv/* \
 		--ignore=res/* --ignore=tools/* --ignore=mygpo/*/migrations/* \
-		--ignore=static/*
+		--ignore=static/* --all
 
 compilemessages:
 	envdir envs/dev/ python manage.py compilemessages
@@ -35,7 +35,8 @@ clean:
 
 install-deps:
 	sudo apt-get install libpq-dev libjpeg-dev zlib1g-dev libwebp-dev \
-		build-essential python3-dev virtualenv libffi-dev redis postgresql
+		build-essential python3-dev virtualenv libffi-dev redis postgresql \
+		gettext
 
 format-code:
 	black --target-version py38 --skip-string-normalization mygpo/

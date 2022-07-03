@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mygpo\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-18 18:57+0000\n"
+"POT-Creation-Date: 2022-07-03 22:32+0000\n"
 "PO-Revision-Date: 2017-07-06 17:10+0900\n"
 "Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
 "Language-Team: Changwoo Ryu <cwryu@debian.org>\n"
@@ -348,21 +348,21 @@ msgstr "구독함"
 msgid "unsubscribed"
 msgstr "구독 해지함"
 
-#: mygpo/api/simple.py:57 mygpo/api/simple.py:92
+#: mygpo/api/simple.py:58 mygpo/api/simple.py:93
 #, python-format
 msgid "%(username)s's Subscription List"
 msgstr "%(username)s의 구독 목록"
 
-#: mygpo/api/simple.py:258
+#: mygpo/api/simple.py:259
 #, python-format
 msgid "gpodder.net - Top %(count)d"
 msgstr "gpodder.net - 톱 %(count)d"
 
-#: mygpo/api/simple.py:294
+#: mygpo/api/simple.py:295
 msgid "gpodder.net - Search"
 msgstr "gpodder.net - 검색"
 
-#: mygpo/api/simple.py:320
+#: mygpo/api/simple.py:321
 #, python-format
 msgid "gpodder.net - %(count)d Suggestions"
 msgstr "gpodder.net - 제안 %(count)d개"
@@ -1371,7 +1371,7 @@ msgid ""
 msgstr ""
 "업데이트가 예정되어 있습니다. 결과가 나오려면 시간이 걸릴 수도 있습니다."
 
-#: mygpo/publisher/views.py:188 mygpo/users/views/settings.py:112
+#: mygpo/publisher/views.py:188 mygpo/users/views/settings.py:115
 msgid "Data updated"
 msgstr "데이터 업데이트됨"
 
@@ -1601,22 +1601,22 @@ msgstr ""
 msgid "Download OPML"
 msgstr "OPML 다운로드"
 
-#: mygpo/subscriptions/views.py:117
+#: mygpo/subscriptions/views.py:118
 #, python-format
 msgid "%(username)s's Podcast Subscriptions on %(site)s"
 msgstr "%(username)s의 팟캐스트 구독, (%(site)s)"
 
-#: mygpo/subscriptions/views.py:123
+#: mygpo/subscriptions/views.py:124
 #, python-format
 msgid "Recent changes to %(username)s's podcast subscriptions on %(site)s"
 msgstr "최근에 %(username)s의 팟캐스트 구독 (%(site)s) 변경 사항"
 
-#: mygpo/subscriptions/views.py:147
+#: mygpo/subscriptions/views.py:148
 #, python-format
 msgid "%(username)s subscribed to %(podcast)s (%(site)s)"
 msgstr "%(username)s %(podcast)s에 구독 (%(site)s)"
 
-#: mygpo/subscriptions/views.py:149
+#: mygpo/subscriptions/views.py:150
 #, python-format
 msgid "%(username)s unsubscribed from %(podcast)s (%(site)s)"
 msgstr "%(username)s %(podcast)s에서 구독 해제 (%(site)s)"
@@ -1634,27 +1634,27 @@ msgstr "관심 없음"
 msgid "No Suggestions Yet"
 msgstr "아직 추천 없음"
 
-#: mygpo/users/models.py:224
+#: mygpo/users/models.py:226
 msgid "Desktop"
 msgstr "데스크톱"
 
-#: mygpo/users/models.py:225
+#: mygpo/users/models.py:227
 msgid "Laptop"
 msgstr "노트북"
 
-#: mygpo/users/models.py:226
+#: mygpo/users/models.py:228
 msgid "Cell phone"
 msgstr "휴대전화"
 
-#: mygpo/users/models.py:227
+#: mygpo/users/models.py:229
 msgid "Server"
 msgstr "서버"
 
-#: mygpo/users/models.py:228
+#: mygpo/users/models.py:230
 msgid "Tablet"
 msgstr ""
 
-#: mygpo/users/models.py:229
+#: mygpo/users/models.py:231
 msgid "Other"
 msgstr "기타"
 
@@ -1805,11 +1805,11 @@ msgstr "사용자가 없습니다."
 msgid "Your account already has been activated. Go ahead and log in."
 msgstr "계정을 이미 활성화했습니다. 계속 사용하시려면 로그인하십시오."
 
-#: mygpo/users/views/settings.py:67 mygpo/users/views/settings.py:104
+#: mygpo/users/views/settings.py:68 mygpo/users/views/settings.py:105
 msgid "Oops! Something went wrong. Please double-check the data you entered."
 msgstr "앗! 뭔가가 잘못됐습니다. 입력한 데이터가 맞는지 한 번 더 확인하십시오."
 
-#: mygpo/users/views/settings.py:124
+#: mygpo/users/views/settings.py:127
 msgid "Your account has been disconnected"
 msgstr "계정의 연결이 끊겼습니다"
 
