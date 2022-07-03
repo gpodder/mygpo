@@ -2728,7 +2728,7 @@ msgstr "Épisode inconnu"
 
 #: mygpo/web/templatetags/menu.py:23 mygpo/web/templatetags/menu.py:75
 msgid "Home"
-msgstr "Acceuil"
+msgstr "Accueil"
 
 #: mygpo/web/templatetags/menu.py:30
 msgid "Help"
