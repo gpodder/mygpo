@@ -19,10 +19,10 @@ test: envs/dev/MEDIA_ROOT
 	coverage report --show-missing
 
 update-po:
-	envdir envs/dev/ python manage.py makemessages \
+	envdir envs/dev python manage.py makemessages \
 		--ignore=doc/* --ignore=envs/* --ignore=media/* --ignore=venv/* \
 		--ignore=res/* --ignore=tools/* --ignore=mygpo/*/migrations/* \
-		--ignore=static/*
+		--ignore=static/* --all
 
 compilemessages:
 	envdir envs/dev/ python manage.py compilemessages
