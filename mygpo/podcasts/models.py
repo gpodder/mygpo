@@ -476,7 +476,7 @@ class UrlsMixin(models.Model):
                 next_order += 1
             except (IntegrityError, DataError) as ie:
                 err = str(ie)
-                logger.warning(u"Could not add URL: {0}".format(err))
+                logger.warning("Could not add URL: {0}".format(err))
                 continue
 
     def set_url(self, url):
