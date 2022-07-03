@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.views.decorators.cache import never_cache, cache_control
 from django.views.decorators.vary import vary_on_cookie
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 from mygpo.users.models import Client
 from mygpo.history.models import HistoryEntry
@@ -55,7 +56,6 @@ def history(request, count=15, uid=None):
 def podcast_history(request, podcast):
     """shows the subscription history of the user"""
 
-    user = request.user
     history = HistoryEntry.objects.filter(user=request.user, podcast=podcast)
 
     return render(

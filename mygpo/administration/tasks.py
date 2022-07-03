@@ -4,7 +4,6 @@ from celery.app import shared_task
 from django_db_geventpool.utils import close_connection
 
 from mygpo.podcasts.models import Podcast
-from mygpo.celery import celery
 from mygpo.maintenance.merge import PodcastMerger
 
 from celery.utils.log import get_task_logger

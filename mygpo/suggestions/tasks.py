@@ -7,7 +7,6 @@ from django_db_geventpool.utils import close_connection
 
 from celery import shared_task
 
-from mygpo.celery import celery
 from mygpo.subscriptions import get_subscribed_podcasts
 from mygpo.suggestions.models import PodcastSuggestion
 

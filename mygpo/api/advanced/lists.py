@@ -2,7 +2,7 @@ import uuid
 from functools import partial
 from datetime import datetime
 
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
 from django.contrib.sites.requests import RequestSite
@@ -10,10 +10,8 @@ from django.contrib.auth import get_user_model
 from django.utils.text import slugify
 from django.views.decorators.cache import never_cache
 from django.http import Http404
-from django.shortcuts import get_object_or_404
 
 from mygpo.podcasts.models import Podcast
-from mygpo.utils import get_timestamp
 from mygpo.api.advanced.directory import podcast_data
 from mygpo.api.httpresponse import JsonResponse
 from mygpo.podcastlists.models import PodcastList

@@ -10,7 +10,6 @@ from django.utils.translation import gettext as _
 from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 from django.views.generic import TemplateView
-from django.views import View
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.sites.requests import RequestSite
@@ -141,8 +140,6 @@ class ActivationView(TemplateView):
     template_name = "registration/activation_failed.html"
 
     def get(self, request, activation_key):
-        User = get_user_model()
-
         try:
             user = UserProxy.objects.get(
                 profile__activation_key=activation_key, is_active=False

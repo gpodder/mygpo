@@ -1,6 +1,5 @@
 import uuid
 from functools import wraps
-from datetime import datetime
 
 from django.urls import reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponseForbidden
@@ -12,7 +11,6 @@ from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import gettext as _
-from django.views import View
 
 from mygpo.podcasts.models import Podcast, PodcastGroup
 from mygpo.podcastlists.models import PodcastList, PodcastListEntry
@@ -109,7 +107,7 @@ def create_list(request):
         messages.error(request, _('"{title}" is not a valid title').format(title=title))
         return HttpResponseRedirect(reverse("lists-overview"))
 
-    plist, created = PodcastList.objects.get_or_create(
+    PodcastList.objects.get_or_create(
         user=request.user, slug=slug, defaults={"id": uuid.uuid1(), "title": title}
     )
 
@@ -152,9 +150,7 @@ def delete_list(request, plist, owner):
 @login_required
 @list_decorator(must_own=False)
 def rate_list(request, plist, owner):
-    now = datetime.utcnow()
-
-    vote, created = Vote.objects.get_or_create(
+    Vote.objects.get_or_create(
         user=request.user,
         content_type=ContentType.objects.get_for_model(plist),
         object_id=plist.id,

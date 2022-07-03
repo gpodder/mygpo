@@ -2,10 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os.path
-import urllib.request
-import urllib.error
 from urllib.parse import urljoin
-import hashlib
 from datetime import datetime, timedelta
 from itertools import chain, islice
 import requests
@@ -65,7 +62,7 @@ def update_podcasts(queue):
         except NoPodcastCreated as npc:
             logger.info("No podcast created: %s", npc)
 
-        except NoEpisodesException as nee:
+        except NoEpisodesException:
             logger.info(f"No episodes found when parsing {podcast_url}")
             continue
 
@@ -339,9 +336,6 @@ class MultiEpisodeUpdater(object):
         self.max_episode_order = None
 
     def update_episodes(self, parsed_episodes):
-
-        pid = self.podcast.get_id()
-
         episodes_to_update = list(islice(parsed_episodes, 0, MAX_EPISODES_UPDATE))
         logger.info(
             "Parsed %d (%d) episodes", len(parsed_episodes), len(episodes_to_update)

@@ -16,7 +16,6 @@ from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils.translation import gettext as _
-from django.contrib.auth import get_user_model
 
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.directory.search import search_podcasts
@@ -24,7 +23,6 @@ from mygpo.web.utils import (
     process_lang_params,
     get_language_names,
     get_page_list,
-    get_podcast_link_target,
     sanitize_language_codes,
 )
 from mygpo.directory.tags import Topics
@@ -335,7 +333,7 @@ class AddPodcastStatus(TemplateView):
 
         except (UpdatePodcastException, NoEpisodesException) as ex:
             messages.error(request, str(ex))
-            podcast = None
+            podcasts = []
 
         return self.render_to_response({"ready": True, "podcasts": podcasts})
 

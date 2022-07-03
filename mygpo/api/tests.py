@@ -13,7 +13,6 @@ from django.contrib.auth import get_user_model
 from django.test.utils import override_settings
 
 from openapi_spec_validator import validate_spec_url
-from jsonschema import ValidationError
 
 from mygpo.podcasts.models import Podcast, Episode
 from mygpo.api.advanced import episodes

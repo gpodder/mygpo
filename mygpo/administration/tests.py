@@ -67,8 +67,8 @@ class SimpleTest(TestCase):
         subscribe(p1.pk, user.pk, device1.uid)
         subscribe(p2.pk, user.pk, device2.uid)
 
-        action1 = EpisodeHistoryEntry.create_entry(user, e1, EpisodeHistoryEntry.PLAY)
-        action3 = EpisodeHistoryEntry.create_entry(user, e3, EpisodeHistoryEntry.PLAY)
+        EpisodeHistoryEntry.create_entry(user, e1, EpisodeHistoryEntry.PLAY)
+        EpisodeHistoryEntry.create_entry(user, e3, EpisodeHistoryEntry.PLAY)
 
         # we need that for later
         e3_id = e3.pk

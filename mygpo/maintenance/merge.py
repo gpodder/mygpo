@@ -1,5 +1,3 @@
-import collections
-
 from django.db import transaction, IntegrityError
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Model
@@ -8,18 +6,12 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 
 from mygpo.podcasts.models import (
     MergedUUID,
-    ScopedModel,
-    OrderedModel,
-    Slug,
-    Tag,
     URL,
     MergedUUID,
     Podcast,
     Episode,
 )
-from mygpo import utils
 from mygpo.history.models import HistoryEntry, EpisodeHistoryEntry
-from mygpo.publisher.models import PublishedPodcast
 from mygpo.subscriptions.models import Subscription
 
 import logging

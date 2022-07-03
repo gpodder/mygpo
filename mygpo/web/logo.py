@@ -5,7 +5,7 @@ import hashlib
 import socket
 import struct
 
-from PIL import Image, ImageDraw
+from PIL import Image
 
 from django.urls import reverse
 from django.conf import settings
@@ -59,7 +59,6 @@ class CoverArt(View):
             logger.warning("Original cover {} not found".format(original))
             raise Http404("Cover Art not available" + original)
 
-        target_dir = self.get_dir(filename)
         try:
             fp = self.storage.open(original, "rb")
             im = Image.open(fp)
@@ -134,7 +133,6 @@ class CoverArt(View):
             prefix = get_prefix(image_sha1)
 
             filename = cls.get_original_path(prefix, image_sha1)
-            dirname = cls.get_dir(filename)
 
             # get hash of existing file
             if LOGO_STORAGE.exists(filename):
@@ -157,7 +155,7 @@ class CoverArt(View):
             # remove thumbnails if cover changed
             if old_hash != new_hash:
                 logger.info("Removing thumbnails")
-                thumbnails = cls.remove_existing_thumbnails(prefix, filename)
+                cls.remove_existing_thumbnails(prefix, filename)
 
             return cover_art_url
 

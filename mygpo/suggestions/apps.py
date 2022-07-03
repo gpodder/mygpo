@@ -1,5 +1,4 @@
 from django.apps import AppConfig, apps
-from django.db.models.signals import post_save
 
 from mygpo.subscriptions.signals import subscription_changed
 

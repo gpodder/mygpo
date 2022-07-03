@@ -1,5 +1,4 @@
-from itertools import islice, chain
-from optparse import make_option
+from itertools import chain
 import random
 
 from django.core.management.base import BaseCommand

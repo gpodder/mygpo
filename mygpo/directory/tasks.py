@@ -3,7 +3,6 @@ from celery import shared_task
 
 from mygpo.podcasts.models import Podcast
 from mygpo.subscriptions.models import Subscription
-from mygpo.celery import celery
 
 
 @shared_task(max_retries=5)

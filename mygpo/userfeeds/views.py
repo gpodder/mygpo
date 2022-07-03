@@ -1,7 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.sites.requests import RequestSite
 from django.contrib.auth import get_user_model
-from django.http import Http404
 
 from mygpo.userfeeds.auth import require_token_auth
 from mygpo.userfeeds.feeds import FavoriteFeed

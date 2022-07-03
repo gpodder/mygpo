@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from django.core.management.base import BaseCommand
 from django.utils.text import slugify
 
@@ -20,7 +18,6 @@ Usage:
             )
             return
 
-        start_time = datetime.utcnow()
         cat_name = args[0]
         spellings = args[1:]
 

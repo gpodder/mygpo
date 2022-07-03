@@ -3,7 +3,6 @@ from celery.utils.log import get_task_logger
 
 from django_db_geventpool.utils import close_connection
 
-from mygpo.celery import celery
 from mygpo.api.advanced import update_episodes
 
 logger = get_task_logger(__name__)

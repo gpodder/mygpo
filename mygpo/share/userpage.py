@@ -6,8 +6,6 @@ from django.utils.decorators import method_decorator
 from django.contrib.sites.requests import RequestSite
 from django.contrib.auth import get_user_model
 
-from mygpo.podcasts.models import Episode
-from mygpo.users.models import HistoryEntry
 from mygpo.subscriptions import get_subscribed_podcasts
 from mygpo.decorators import requires_token
 from mygpo.podcastlists.models import PodcastList

@@ -95,8 +95,6 @@ class ProfileView(View):
     """Updates the public profile and redirects back to the account view"""
 
     def post(self, request):
-        user = request.user
-
         form = ProfileForm(request.POST)
 
         if not form.is_valid():

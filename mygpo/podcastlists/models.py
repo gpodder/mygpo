@@ -1,11 +1,9 @@
 from django.db import models
-from django.urls import reverse
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 
 from mygpo.core.models import UpdateInfoModel, OrderedModel, UUIDModel
-from mygpo.podcasts.models import Podcast
 from mygpo.votes.models import VoteMixin
 from mygpo.utils import set_ordered_entries
 
@@ -37,7 +35,7 @@ class PodcastList(UUIDModel, VoteMixin, UpdateInfoModel):
         return self.entries.count()
 
     def add_entry(self, obj):
-        entry, created = PodcastListEntry.objects.get_or_create(
+        PodcastListEntry.objects.get_or_create(
             podcastlist=self,
             content_type=ContentType.objects.get_for_model(obj),
             object_id=obj.id,

@@ -1,6 +1,4 @@
 from itertools import islice
-import traceback
-from optparse import make_option
 
 from mygpo.maintenance.management.podcastcmd import PodcastCommand
 from mygpo.data.feeddownloader import update_podcasts

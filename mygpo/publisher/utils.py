@@ -1,5 +1,5 @@
 from collections import namedtuple, defaultdict
-from datetime import timedelta, datetime, time
+from datetime import timedelta, datetime
 
 from mygpo.podcasts.models import Episode
 from mygpo.utils import daterange

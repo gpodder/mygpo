@@ -1,5 +1,3 @@
-import re
-
 from django.urls import path
 from django.conf import settings
 from django.views.generic.base import TemplateView, RedirectView

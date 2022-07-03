@@ -1,5 +1,3 @@
-import unittest
-import doctest
 import uuid
 import os.path
 
@@ -7,13 +5,12 @@ import requests
 import responses
 
 from django.conf import settings
-from django.test import TestCase, Client, override_settings
+from django.test import TestCase, Client
 from django.urls import reverse
 from django.core.files.storage import FileSystemStorage
 from django.contrib.auth import get_user_model
 
 from mygpo.podcasts.models import Podcast, Episode, Slug
-import mygpo.web.utils
 from mygpo.web.logo import CoverArt, get_logo_url
 from mygpo.test import create_auth_string, anon_request
 
@@ -247,7 +244,7 @@ class PodcastLogoTests(TestCase):
                 content_type="image/png",
             )
 
-            logo_url = get_logo_url(self.podcast, 32)
+            get_logo_url(self.podcast, 32)
 
             # first request
             CoverArt.save_podcast_logo(self.URL)
