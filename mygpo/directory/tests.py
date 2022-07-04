@@ -27,6 +27,7 @@ class ToplistTests(unittest.TestCase):
         all_langs = view.all_languages()
         self.assertEqual(all_langs, {"de": "Deutsch", "en": "English"})
 
+
 class MissingPodcastTests(TestCase):
     """Test adding Missing podcasts"""
 
@@ -49,33 +50,43 @@ class MissingPodcastTests(TestCase):
     def test_cant_add_valid_podcast(self, mock_podcast_manager_get):
         """Test valid podcast is not addable"""
         mock_podcast_manager_get.return_value = Podcast.objects.create(
-            id=uuid.uuid1(), created=datetime.utcnow(), link='https://mypodcast.com'
+            id=uuid.uuid1(), created=datetime.utcnow(), link="https://mypodcast.com"
         )
 
-        response = self.request_podcast('https://gpodder.net/missing?q=https://mypodcast.com')
+        response = self.request_podcast(
+            "https://gpodder.net/missing?q=https://mypodcast.com"
+        )
 
         self.assertNotContains(response, "Add Podcast")
 
     @mock.patch("mygpo.data.feeddownloader.PodcastUpdater")
     @mock.patch("mygpo.podcasts.models.PodcastManager.get")
-    def test_can_add_podcast_without_link(self, mock_podcast_manager_get, mock_podcast_updater):
+    def test_can_add_podcast_without_link(
+        self, mock_podcast_manager_get, mock_podcast_updater
+    ):
         """Test valid podcast without a link is addable"""
         mock_podcast_manager_get.return_value = Podcast.objects.create(
             id=uuid.uuid1(), created=datetime.utcnow()
         )
 
-        response = self.request_podcast('https://gpodder.net/missing?q=https://mypodcast.com')
+        response = self.request_podcast(
+            "https://gpodder.net/missing?q=https://mypodcast.com"
+        )
 
         self.assertContains(response, "Add Podcast")
         mock_podcast_updater.assert_called_once()
 
     @mock.patch("mygpo.data.feeddownloader.PodcastUpdater")
     @mock.patch("mygpo.podcasts.models.PodcastManager.get")
-    def test_can_add_non_existent_podcast(self, mock_podcast_manager_get, mock_podcast_updater):
+    def test_can_add_non_existent_podcast(
+        self, mock_podcast_manager_get, mock_podcast_updater
+    ):
         """Test non existent podcast is addable"""
-        mock_podcast_manager_get.side_effect=Podcast.DoesNotExist
+        mock_podcast_manager_get.side_effect = Podcast.DoesNotExist
 
-        response = self.request_podcast('https://gpodder.net/missing?q=https://mypodcast.com')
+        response = self.request_podcast(
+            "https://gpodder.net/missing?q=https://mypodcast.com"
+        )
 
         self.assertContains(response, "Add Podcast")
         mock_podcast_updater.assert_called_once()
@@ -83,13 +94,17 @@ class MissingPodcastTests(TestCase):
     @mock.patch("django.contrib.messages.error")
     @mock.patch("mygpo.data.feeddownloader.PodcastUpdater")
     @mock.patch("mygpo.podcasts.models.PodcastManager.get")
-    def test_cant_add_invalid_podcast(self, mock_podcast_manager_get, mock_podcast_updater, _mock_messages):
+    def test_cant_add_invalid_podcast(
+        self, mock_podcast_manager_get, mock_podcast_updater, _mock_messages
+    ):
         """Test invalid podcast is not addable"""
         mock_podcast_manager_get.return_value = Podcast.objects.create(
-            id=uuid.uuid1(), created=datetime.utcnow(), link='https://mypodcast.com'
+            id=uuid.uuid1(), created=datetime.utcnow(), link="https://mypodcast.com"
         )
-        mock_podcast_updater.side_effect=NoEpisodesException
+        mock_podcast_updater.side_effect = NoEpisodesException
 
-        response = self.request_podcast('https://gpodder.net/missing?q=https://mypodcast.com')
+        response = self.request_podcast(
+            "https://gpodder.net/missing?q=https://mypodcast.com"
+        )
 
         self.assertNotContains(response, "Add Podcast")

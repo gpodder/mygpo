@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-03 22:32+0000\n"
+"POT-Creation-Date: 2022-07-04 12:52+0000\n"
 "PO-Revision-Date: 2018-10-28 18:17+0000\n"
 "Last-Translator: Enrico B. <enricobe@hotmail.com>, 2018\n"
 "Language-Team: Italian (https://www.transifex.com/gpoddernet/teams/93001/"
@@ -626,7 +626,7 @@ msgstr "Classifica"
 msgid "Client Access"
 msgstr "Sottoscrizione client"
 
-#: mygpo/directory/views.py:334
+#: mygpo/directory/views.py:336
 #, python-format
 msgid "%d podcasts added"
 msgstr "%d podcast aggiunti"

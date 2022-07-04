@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gpodder.net\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-03 22:32+0000\n"
+"POT-Creation-Date: 2022-07-04 12:52+0000\n"
 "PO-Revision-Date: 2010-06-17 17:01-0000\n"
 "Last-Translator: Sérgio Marques <smarquespt@gmail.com>\n"
 "Language-Team: PT\n"
@@ -654,7 +654,7 @@ msgstr "Os Melhores"
 msgid "Client Access"
 msgstr ""
 
-#: mygpo/directory/views.py:334
+#: mygpo/directory/views.py:336
 #, fuzzy, python-format
 msgid "%d podcasts added"
 msgstr "podcasts"

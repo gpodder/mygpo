@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gpodder.net\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-03 22:32+0000\n"
+"POT-Creation-Date: 2022-07-04 12:52+0000\n"
 "PO-Revision-Date: 2012-10-13 12:53+0000\n"
 "Last-Translator: zeugma <unknown@example.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/projects/p/mygpo/"
@@ -619,7 +619,7 @@ msgstr ""
 msgid "Client Access"
 msgstr ""
 
-#: mygpo/directory/views.py:334
+#: mygpo/directory/views.py:336
 #, fuzzy, python-format
 msgid "%d podcasts added"
 msgstr "Bir podcast ekle"

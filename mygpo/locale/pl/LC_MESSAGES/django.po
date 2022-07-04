@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mygpo\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-03 22:32+0000\n"
+"POT-Creation-Date: 2022-07-04 12:52+0000\n"
 "PO-Revision-Date: 2010-01-27 17:38+0100\n"
 "Last-Translator: Tomasz Dominikowski <dominikowski@gmail.com>\n"
 "Language-Team: Polish <dominikowski@gmail.com>\n"
@@ -665,7 +665,7 @@ msgstr "Lista najlepszych"
 msgid "Client Access"
 msgstr "Dostęp klienta"
 
-#: mygpo/directory/views.py:334
+#: mygpo/directory/views.py:336
 #, fuzzy, python-format
 msgid "%d podcasts added"
 msgstr "Podcasty"

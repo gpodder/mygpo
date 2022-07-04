@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-03 22:32+0000\n"
+"POT-Creation-Date: 2022-07-04 12:52+0000\n"
 "PO-Revision-Date: 2010-07-16 08:51+0200\n"
 "Last-Translator: Stefan Koegl <stefan@skoegl.net>\n"
 "Language-Team: DE <LL@li.org>\n"
@@ -655,7 +655,7 @@ msgstr "Topliste"
 msgid "Client Access"
 msgstr ""
 
-#: mygpo/directory/views.py:334
+#: mygpo/directory/views.py:336
 #, fuzzy, python-format
 msgid "%d podcasts added"
 msgstr "Podcasts"
