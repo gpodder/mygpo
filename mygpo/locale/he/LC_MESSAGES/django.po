@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-03 22:32+0000\n"
+"POT-Creation-Date: 2022-07-04 12:52+0000\n"
 "PO-Revision-Date: 2018-06-20 06:29+0000\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2019\n"
 "Language-Team: Hebrew (https://www.transifex.com/yaron/teams/87581/he/)\n"
@@ -627,7 +627,7 @@ msgstr "רשימות מובילות"
 msgid "Client Access"
 msgstr "גישת לקוח"
 
-#: mygpo/directory/views.py:334
+#: mygpo/directory/views.py:336
 #, python-format
 msgid "%d podcasts added"
 msgstr "נוספו %d פודקאסטים"

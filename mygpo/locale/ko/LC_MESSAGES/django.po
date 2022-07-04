@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mygpo\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-03 22:32+0000\n"
+"POT-Creation-Date: 2022-07-04 12:52+0000\n"
 "PO-Revision-Date: 2017-07-06 17:10+0900\n"
 "Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
 "Language-Team: Changwoo Ryu <cwryu@debian.org>\n"
@@ -641,7 +641,7 @@ msgstr "순위"
 msgid "Client Access"
 msgstr "클라이언트 접근"
 
-#: mygpo/directory/views.py:334
+#: mygpo/directory/views.py:336
 #, python-format
 msgid "%d podcasts added"
 msgstr "팟캐스트 %d개 추가함"
