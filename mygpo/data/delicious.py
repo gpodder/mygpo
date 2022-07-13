@@ -18,7 +18,7 @@ def get_tags(url):
         )
     url = split.geturl()
 
-    m = hashlib.md5()
+    m = hashlib.sha256()
     m.update(url.encode("ascii"))
 
     url_md5 = m.hexdigest()

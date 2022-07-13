@@ -130,7 +130,7 @@ class CoverArt(View):
             return
 
         try:
-            image_sha1 = hashlib.sha1(cover_art_url.encode("utf-8")).hexdigest()
+            image_sha1 = hashlib.sha256(cover_art_url.encode("utf-8")).hexdigest()
             prefix = get_prefix(image_sha1)
 
             filename = cls.get_original_path(prefix, image_sha1)
@@ -182,7 +182,7 @@ def get_logo_url(podcast, size):
     """
 
     if podcast.logo_url:
-        filename = hashlib.sha1(podcast.logo_url.encode("utf-8")).hexdigest()
+        filename = hashlib.sha256(podcast.logo_url.encode("utf-8")).hexdigest()
         return reverse("logo", args=[size, get_prefix(filename), filename])
 
     else:
