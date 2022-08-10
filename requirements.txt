@@ -3,7 +3,7 @@ celery==5.2.7
 Babel==2.10.3
 Pillow==9.2.0
 celery[redis]==5.2.7
-dj-database-url==0.5.0
+dj-database-url==1.0.0
 django-redis-sessions==0.6.2
 python-memcached==1.59
 feedparser==6.0.10
