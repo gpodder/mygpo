@@ -1,3 +1,4 @@
+envdir
 Django==3.2.14
 celery==5.2.7
 Babel==2.10.3
@@ -18,3 +19,4 @@ django-celery-beat==2.3.0
 django-celery-results==2.4.0
 requests==2.28.1
 django-db-geventpool==4.0.1
+django-configurations>=2.2,<3.0
