@@ -14,7 +14,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-branch_coverage = [];
+branch_coverage = []
 
 
 LEGACY_DEVICE_NAME = "Legacy Device"
@@ -26,6 +26,7 @@ LEGACY_DEVICE_UID = "legacy"
 def upload(request):
     try:
         # Branch ID: 0
+        branch_coverage[0] = True
         emailaddr = request.POST["username"]
         password = request.POST["password"]
         action = request.POST["action"]
@@ -33,11 +34,13 @@ def upload(request):
         opml = request.FILES["opml"].read()
     except MultiValueDictKeyError:
         # Branch ID: 1
+        branch_coverage[1] = True
         return HttpResponse("@PROTOERROR", content_type="text/plain")
 
     user = auth(emailaddr, password)
     if not user:
         # Branch ID: 2
+        branch_coverage[2] = True
         return HttpResponse("@AUTHFAIL", content_type="text/plain")
 
     dev = get_device(user, LEGACY_DEVICE_UID, request.META.get("HTTP_USER_AGENT", ""))
@@ -48,6 +51,7 @@ def upload(request):
     existing_urls = [];
     for x in dev.get_subscribed_podcasts():
         # Branch ID: 3
+        branch_coverage[3] = True
         existing_urls.append(x.url)
 
     i = Importer(opml)
@@ -58,6 +62,7 @@ def upload(request):
     podcast_urls = []
     for p in i.items:
         # Branch ID: 4
+        branch_coverage[4] = True
         podcast_urls.append(p["url"])
 
     
@@ -70,8 +75,10 @@ def upload(request):
     new = []
     for u in podcast_urls:
         # Branch ID: 5
+        branch_coverage[5] = True
         if u not in existing_urls:
             # Branch ID: 6
+            branch_coverage[6] = True
             new.append(u)
         
     #rem = [u for u in existing_urls if u not in podcast_urls]
@@ -79,12 +86,12 @@ def upload(request):
     rem = []
     for u in existing_urls:
         # Branch ID: 7
+        branch_coverage[7] = True
         if u not in podcast_urls:
             # Branch ID: 8
+            branch_coverage[8] = True
             rem.append(u)
         
-
-
 
     # remove duplicates
     new = list(set(new))
@@ -92,11 +99,13 @@ def upload(request):
 
     for n in new:
         # Branch ID: 9
+        branch_coverage[9] = True
         p = Podcast.objects.get_or_create_for_url(n).object
         subscribe(p.pk, user.pk, dev.uid)
 
     for r in rem:
         # Branch ID: 10
+        branch_coverage[10] = True
         p = Podcast.objects.get_or_create_for_url(r).object
         unsubscribe(p.pk, user.pk, dev.uid)
 
