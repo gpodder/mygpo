@@ -14,6 +14,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+branch_coverage = [];
+
 
 LEGACY_DEVICE_NAME = "Legacy Device"
 LEGACY_DEVICE_UID = "legacy"
@@ -23,40 +25,78 @@ LEGACY_DEVICE_UID = "legacy"
 @csrf_exempt
 def upload(request):
     try:
+        # Branch ID: 0
         emailaddr = request.POST["username"]
         password = request.POST["password"]
         action = request.POST["action"]
         protocol = request.POST["protocol"]
         opml = request.FILES["opml"].read()
     except MultiValueDictKeyError:
+        # Branch ID: 1
         return HttpResponse("@PROTOERROR", content_type="text/plain")
 
     user = auth(emailaddr, password)
     if not user:
+        # Branch ID: 2
         return HttpResponse("@AUTHFAIL", content_type="text/plain")
 
     dev = get_device(user, LEGACY_DEVICE_UID, request.META.get("HTTP_USER_AGENT", ""))
 
-    existing_urls = [x.url for x in dev.get_subscribed_podcasts()]
+    # existing_urls = [x.url for x in dev.get_subscribed_podcasts()]
+
+    # Break down the iteration
+    existing_urls = [];
+    for x in dev.get_subscribed_podcasts():
+        # Branch ID: 3
+        existing_urls.append(x.url)
 
     i = Importer(opml)
 
-    podcast_urls = [p["url"] for p in i.items]
+    # podcast_urls = [p["url"] for p in i.items]
+
+    # Break down iteration
+    podcast_urls = []
+    for p in i.items:
+        # Branch ID: 4
+        podcast_urls.append(p["url"])
+
+    
     podcast_urls = map(normalize_feed_url, podcast_urls)
     podcast_urls = list(filter(None, podcast_urls))
 
-    new = [u for u in podcast_urls if u not in existing_urls]
-    rem = [u for u in existing_urls if u not in podcast_urls]
+    # new = [u for u in podcast_urls if u not in existing_urls]
+
+    # Break down iteration
+    new = []
+    for u in podcast_urls:
+        # Branch ID: 5
+        if u not in existing_urls:
+            # Branch ID: 6
+            new.append(u)
+        
+    #rem = [u for u in existing_urls if u not in podcast_urls]
+
+    rem = []
+    for u in existing_urls:
+        # Branch ID: 7
+        if u not in podcast_urls:
+            # Branch ID: 8
+            rem.append(u)
+        
+
+
 
     # remove duplicates
     new = list(set(new))
     rem = list(set(rem))
 
     for n in new:
+        # Branch ID: 9
         p = Podcast.objects.get_or_create_for_url(n).object
         subscribe(p.pk, user.pk, dev.uid)
 
     for r in rem:
+        # Branch ID: 10
         p = Podcast.objects.get_or_create_for_url(r).object
         unsubscribe(p.pk, user.pk, dev.uid)
 
