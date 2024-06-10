@@ -109,6 +109,15 @@ def upload(request):
         p = Podcast.objects.get_or_create_for_url(r).object
         unsubscribe(p.pk, user.pk, dev.uid)
 
+
+    with open('/home/hussein/sep/fork/mygpo/mygpo/api/legacy_coverage.txt', 'w') as file:
+        for index, coverage in enumerate(branch_coverage):
+            if coverage:
+                file.write(f"Branch {index} was taken\n")
+            else:
+                file.write(f"Branch {index} was not taken\n")
+
+                
     return HttpResponse("@SUCCESS", content_type="text/plain")
 
 
