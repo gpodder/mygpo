@@ -48,7 +48,7 @@ def upload(request):
     # existing_urls = [x.url for x in dev.get_subscribed_podcasts()]
 
     # Break down the iteration
-    existing_urls = [];
+    existing_urls = []
     for x in dev.get_subscribed_podcasts():
         # Branch ID: 3
         branch_coverage[3] = True
@@ -110,14 +110,14 @@ def upload(request):
         unsubscribe(p.pk, user.pk, dev.uid)
 
 
-    with open('/home/hussein/sep/fork/mygpo/mygpo/api/legacy_coverage.txt', 'w') as file:
+    with open('/home/hussein/sep/fork/mygpo/legacy_coverage.txt', 'w') as file:
         for index, coverage in enumerate(branch_coverage):
             if coverage:
                 file.write(f"Branch {index} was taken\n")
             else:
                 file.write(f"Branch {index} was not taken\n")
 
-                
+
     return HttpResponse("@SUCCESS", content_type="text/plain")
 
 

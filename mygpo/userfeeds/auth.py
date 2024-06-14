@@ -4,6 +4,8 @@ from django.http import HttpResponse, HttpResponseBadRequest, Http404
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 
+branch_coverage = [False] * 9
+
 
 #############################################################################
 #
@@ -16,36 +18,61 @@ def view_or_basicauth(view, request, username, token_name, realm="", *args, **kw
 
     # check if a token is required at all
     if token == "":
+        # Branch ID: 0
+        branch_coverage[0] = True
         return view(request, username, *args, **kwargs)
 
     # this header format is used when passing auth-headers
     # from Aapache to fcgi
     if "AUTHORIZATION" in request.META:
+        # Branch ID: 1
+        branch_coverage[1] = True
         auth = request.META["AUTHORIZATION"]
 
     elif "HTTP_AUTHORIZATION" in request.META:
+        # Branch ID: 2
+        branch_coverage[2] = True
         auth = request.META["HTTP_AUTHORIZATION"]
 
     else:
+        # Branch ID: 3
+        branch_coverage[3] = True
         return auth_request()
 
     auth = auth.split(None, 1)
 
     if len(auth) == 2:
+        # Branch ID: 4
+        branch_coverage[4] = True
         auth_type, credentials = auth
 
         # NOTE: We are only support basic authentication for now.
         if auth_type.lower() == "basic":
+            # Branch ID: 5
+            branch_coverage[5] = True
             credentials = credentials.decode("base64").split(":", 1)
             if len(credentials) == 2:
-
+                # Branch ID: 6
+                branch_coverage[6] = True
                 uname, passwd = credentials
 
                 if uname != username:
+                    # Branch ID: 7
+                    branch_coverage[7] = True
                     return auth_request()
 
                 if token == passwd:
+                    # Branch ID: 8
+                    branch_coverage[8] = True
                     return view(request, uname, *args, **kwargs)
+                
+    with open('/home/hussein/sep/fork/mygpo/view_or_basicauth_coverage.txt', 'w') as file:
+        for index, coverage in enumerate(branch_coverage):
+            if coverage:
+                file.write(f"Branch {index} was taken\n")
+            else:
+                file.write(f"Branch {index} was not taken\n")
+
 
     return auth_request()
 
