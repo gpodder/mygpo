@@ -6,7 +6,7 @@ import dj_database_url
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 try:
-    from psycopg2cffi import compat
+    from psycopg2 import compat
 
     compat.register()
 except ImportError:
@@ -42,9 +42,9 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'mygpo_database',   # Your new database name
-        'USER': 'mygpo_user',       # Your new database user
-        'PASSWORD': 'newpassword',  # Your new database user's password
+        'NAME': 'mygpo_database',   # new database name
+        'USER': 'mygpo_user',       # new database user
+        'PASSWORD': 'newpassword',  # new database user's password
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -228,7 +228,7 @@ SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 # TODO: use (default) JSON serializer for security
 # this would currently fail as we're (de)serializing datetime objects
 # https://docs.djangoproject.com/en/1.5/topics/http/sessions/#session-serialization
-SESSION_SERIALIZER = "django.contrib.sessions.serializers.PickleSerializer"
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
 
 MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"

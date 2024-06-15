@@ -11,7 +11,7 @@ register_converter(ScopeConverter, "scope")
 
 
 urlpatterns = [
-    path("upload", legacy.upload),
+    path("upload", legacy.upload, name='upload'),
     path("getlist", legacy.getlist),
     path(
         "subscriptions/<username:username>/" "<client-uid:device_uid>.<str:format>",

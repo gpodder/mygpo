@@ -182,9 +182,15 @@ def get_logo_url(podcast, size):
     """
 
     if podcast.logo_url:
+        with open('/home/hussein/sep/fork/mygpo/get_logo_url_coverage.txt', 'w') as file:
+                    file.write(f"Branch 1 was taken\nCoverage = 50%\n")
         filename = hashlib.sha1(podcast.logo_url.encode("utf-8")).hexdigest()
         return reverse("logo", args=[size, get_prefix(filename), filename])
 
     else:
+        with open('/home/hussein/sep/fork/mygpo/get_logo_url_coverage.txt', 'w') as file:
+                    file.write(f"Branch 2 was taken\nCoverage = 50%\n")
         filename = "podcast-%d.png" % (hash(podcast.title) % 5,)
         return staticfiles_storage.url("logo/{0}".format(filename))
+    
+    

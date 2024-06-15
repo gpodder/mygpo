@@ -9,7 +9,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
+branch_coverage_UAF = []
 class UserAccountForm(forms.Form):
     """
     the form that is used in the account settings.
@@ -48,6 +48,7 @@ class UserAccountForm(forms.Form):
         required=False,
     )
 
+
     def is_valid(self):
         if not super(UserAccountForm, self).is_valid():
             return False
@@ -56,18 +57,25 @@ class UserAccountForm(forms.Form):
         pw2 = self.cleaned_data["password2"]
 
         if self.cleaned_data["password_current"] or pw1 or pw2:
+            with open('/home/hussein/sep/fork/mygpo/is_valid_coverage.txt', 'w') as file:
+                    file.write(f"Branch 0 was taken\n")
 
             if self.cleaned_data["password_current"] == "":
+                with open('/home/hussein/sep/fork/mygpo/is_valid_coverage.txt', 'w') as file:
+                    file.write(f"Branch 1 was taken\n")
                 return False  # must give current password
 
             if pw1 == "":
+                with open('/home/hussein/sep/fork/mygpo/is_valid_coverage.txt', 'w') as file:
+                    file.write(f"Branch 2 was taken\n")
                 return False  # cant set empty password
 
             if pw1 != pw2:
-                return False  # 5must confirm password
+                with open('/home/hussein/sep/fork/mygpo/is_valid_coverage.txt', 'w') as file:
+                    file.write(f"Branch 3 was taken\n")
+                return False  # must confirm password
 
         return True
-
 
 class ProfileForm(forms.Form):
     twitter = forms.CharField(

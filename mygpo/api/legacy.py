@@ -14,8 +14,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-branch_coverage = []
-
 
 LEGACY_DEVICE_NAME = "Legacy Device"
 LEGACY_DEVICE_UID = "legacy"
@@ -23,7 +21,7 @@ LEGACY_DEVICE_UID = "legacy"
 
 @never_cache
 @csrf_exempt
-def upload(request):
+def upload(request, branch_coverage):
     try:
         # Branch ID: 0
         branch_coverage[0] = True
@@ -49,10 +47,12 @@ def upload(request):
 
     # Break down the iteration
     existing_urls = []
+
     for x in dev.get_subscribed_podcasts():
         # Branch ID: 3
         branch_coverage[3] = True
         existing_urls.append(x.url)
+        
 
     i = Importer(opml)
 
@@ -74,8 +74,6 @@ def upload(request):
     # Break down iteration
     new = []
     for u in podcast_urls:
-        # Branch ID: 5
-        branch_coverage[5] = True
         if u not in existing_urls:
             # Branch ID: 6
             branch_coverage[6] = True
@@ -85,8 +83,6 @@ def upload(request):
 
     rem = []
     for u in existing_urls:
-        # Branch ID: 7
-        branch_coverage[7] = True
         if u not in podcast_urls:
             # Branch ID: 8
             branch_coverage[8] = True
@@ -98,24 +94,12 @@ def upload(request):
     rem = list(set(rem))
 
     for n in new:
-        # Branch ID: 9
-        branch_coverage[9] = True
         p = Podcast.objects.get_or_create_for_url(n).object
         subscribe(p.pk, user.pk, dev.uid)
 
     for r in rem:
-        # Branch ID: 10
-        branch_coverage[10] = True
         p = Podcast.objects.get_or_create_for_url(r).object
         unsubscribe(p.pk, user.pk, dev.uid)
-
-
-    with open('/home/hussein/sep/fork/mygpo/legacy_coverage.txt', 'w') as file:
-        for index, coverage in enumerate(branch_coverage):
-            if coverage:
-                file.write(f"Branch {index} was taken\n")
-            else:
-                file.write(f"Branch {index} was not taken\n")
 
 
     return HttpResponse("@SUCCESS", content_type="text/plain")

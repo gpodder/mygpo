@@ -4,12 +4,11 @@ from django.http import HttpResponse, HttpResponseBadRequest, Http404
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 
-branch_coverage = [False] * 9
 
 
 #############################################################################
 #
-def view_or_basicauth(view, request, username, token_name, realm="", *args, **kwargs):
+def view_or_basicauth(branch_coverage, view, request, username, token_name, realm="", *args, **kwargs):
 
     User = get_user_model()
     user = get_object_or_404(User, username=username)
@@ -65,13 +64,7 @@ def view_or_basicauth(view, request, username, token_name, realm="", *args, **kw
                     # Branch ID: 8
                     branch_coverage[8] = True
                     return view(request, uname, *args, **kwargs)
-                
-    with open('/home/hussein/sep/fork/mygpo/view_or_basicauth_coverage.txt', 'w') as file:
-        for index, coverage in enumerate(branch_coverage):
-            if coverage:
-                file.write(f"Branch {index} was taken\n")
-            else:
-                file.write(f"Branch {index} was not taken\n")
+            
 
 
     return auth_request()
